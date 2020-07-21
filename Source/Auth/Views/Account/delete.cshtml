@@ -1,0 +1,35 @@
+﻿@model DeleteViewModel
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["DeleteAccount"];
+    ViewData["Description"] = Localizer["DeleteYourAccount"];
+}
+
+<div class="message danger">@Localizer["DeleteWarning"]</div>
+
+<form asp-controller="account" asp-action="delete" method="post" role="form" autocomplete="off">
+    <h1>@Localizer["DeleteYourAccount"]</h1>
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="form-group relative">
+        <input type="password" asp-for="Password" maxlength="100" placeholder="@Localizer["Password"]" aria-label="@Localizer["Password"]" autocomplete="off" required />
+        <button type="button" class="password-show-button" data-for="Password">@Localizer["Show"]</button>
+    </div>
+
+    <footer>
+        <a href="/" class="button">@Localizer["Back"]</a>
+        <button type="submit" class="button">@Localizer["DeleteAccount"]</button>
+    </footer>
+</form>
+
+<script>
+    var showLabel = "@Localizer["Show"]";
+    var hideLabel = "@Localizer["Hide"]";
+</script>
+<environment include="Development">
+    <script src="~/js/shared/password-show-hide.js" asp-append-version="true"></script>
+</environment>
+<environment include="Production">
+    <script src="https://cdn.personalassistant.site/js/shared/password-show-hide.min.js"></script>
+</environment>

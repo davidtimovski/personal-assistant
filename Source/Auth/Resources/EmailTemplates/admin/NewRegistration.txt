@@ -1,0 +1,6 @@
+﻿Hello
+A new user has just registered.
+Name: #NAME#
+Email: #EMAIL#
+Best regards,
+PersonalAssistant.site

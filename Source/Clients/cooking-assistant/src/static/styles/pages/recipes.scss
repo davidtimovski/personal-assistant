@@ -1,0 +1,69 @@
+.recipes-wrap {
+  margin-bottom: 30px;
+}
+
+.recipe {
+  position: relative;
+  display: block;
+  background: #ddd;
+  border-radius: var(--border-radius);
+  margin-bottom: 15px;
+  font-size: 0;
+  text-decoration: none;
+  color: inherit;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  transition: color var(--transition);
+}
+.recipe:hover {
+  color: var(--primary-color-dark);
+}
+.recipe img {
+  width: 100%;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+.recipe-name {
+  position: absolute;
+  top: 20px;
+  left: -3px;
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-left: 3px solid var(--primary-color);
+  border-top-right-radius: var(--border-radius);
+  border-bottom-right-radius: 15px;
+  box-shadow: var(--box-shadow);
+  padding: 5px 16px 6px 15px;
+  font-size: 1.1rem;
+  line-height: 1.3rem;
+  color: inherit;
+}
+.num-ingredients-missing {
+  display: none;
+  position: absolute;
+  right: -3px;
+  bottom: 20px;
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-right: 3px solid var(--danger-color);
+  border-top-left-radius: var(--border-radius);
+  border-bottom-left-radius: 12px;
+  box-shadow: var(--box-shadow);
+  padding: 5px 15px 6px 16px;
+  text-align: right;
+  font-size: 0.9rem;
+  line-height: 1.1rem;
+  color: var(--danger-color);
+}
+.ingredients-missing .num-ingredients-missing {
+  display: block;
+}
+
+
+/* Workaround for sticky :hover on mobile devices */
+.touch-device .recipe:hover {
+  color: var(--primary-color);
+}

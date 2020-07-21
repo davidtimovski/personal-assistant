@@ -1,0 +1,31 @@
+<template>
+  <div class="au-animate animate-fade-in animate-fade-out">
+    <div class="page-title-wrap">
+      <div class="side inactive small">
+        <i class="fas fa-archive"></i>
+      </div>
+      <div class="page-title">
+        <span t="archiveList.archive">Archive</span>&nbsp;<span class="colored-text">${model.name}</span>?
+      </div>
+      <a route-href="route: list; params.bind: { id: model.id }" class="side back">
+        <i class="fas fa-times"></i>
+      </a>
+    </div>
+
+    <div class="content-wrap">
+
+      <div class="text-wrap">${archivingAListText}</div>
+
+      <div class="save-delete-wrap">
+        <a click.delegate="archive()" class="button primary-button ${archiveButtonIsLoading ? 'disabled' : ''}">
+          <span class="button-loader ${archiveButtonIsLoading ? 'loading' : ''}">
+            <i class="fas fa-circle-notch fa-spin"></i>
+          </span>
+          <span t="archiveList.archive">Archive</span>
+        </a>
+        <a route-href="route: list; params.bind: { id: model.id }" t="cancel" class="button secondary-button">Cancel</a>
+      </div>
+
+    </div>
+  </div>
+</template>

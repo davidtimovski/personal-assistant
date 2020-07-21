@@ -1,0 +1,70 @@
+<template>
+  <require from="../static/styles/pages/inbox.scss"></require>
+  <require from="./../resources/elements/tooltip"></require>
+  <require from="./../resources/elements/empty-list-message.html"></require>
+
+  <div class="au-animate animate-fade-in animate-fade-out">
+    <div class="page-title-wrap">
+      <div class="side inactive medium">
+        <i class="fas fa-inbox"></i>
+      </div>
+      <div t="inbox.inbox" class="page-title">Inbox</div>
+      <a route-href="route: recipes" class="side back">
+        <i class="fas fa-times"></i>
+      </a>
+    </div>
+
+    <div class="content-wrap">
+
+      <div class="send-requests-wrap">
+        <tooltip if.bind="pendingReceivedRecipes.length > 0" key.bind="receivedRecipesTooltipKey"></tooltip>
+
+        <div repeat.for="receivedRecipe of pendingReceivedRecipes" class="send-request">
+          <a if.bind="!receivedRecipe.leftSideIsLoading" click.delegate="decline(receivedRecipe)" class="side">
+            <i class="fas fa-ban"></i>
+          </a>
+          <span if.bind="receivedRecipe.leftSideIsLoading" class="side side-loading">
+            <i class="fas fa-circle-notch fa-spin"></i>
+          </span>
+          <span class="name">
+            <span class="colored-text">${receivedRecipe.recipeName}</span>
+            <span t="inbox.from">from</span>
+            <span class="colored-text">${receivedRecipe.recipeSenderName}</span>
+          </span>
+          <a if.bind="!receivedRecipe.rightSideIsLoading" click.delegate="accept(receivedRecipe)" class="side">
+            <i class="fas fa-check"></i>
+          </a>
+          <span if.bind="receivedRecipe.rightSideIsLoading" class="side side-loading">
+            <i class="fas fa-circle-notch fa-spin"></i>
+          </span>
+        </div>
+
+        <empty-list-message if.bind="pendingShareRequests.length === 0" message.bind="emptyListMessage">
+        </empty-list-message>
+      </div>
+
+      <div if.bind="declinedReceivedRecipes.length > 0">
+        <div class="labeled-separator">
+          <div class="labeled-separator-text" t="inbox.blockedUsers">Blocked users</div>
+          <hr>
+        </div>
+
+        <div class="send-requests-wrap declined">
+          <div repeat.for="receivedRecipe of declinedReceivedRecipes" class="send-request">
+            <div class="side inactive">
+              <i class="fas fa-ban"></i>
+            </div>
+            <span class="name">${receivedRecipe.recipeSenderName}</span>
+            <a if.bind="!receivedRecipe.rightSideIsLoading" click.delegate="delete(receivedRecipe)" class="side delete">
+              <i class="fas fa-times-circle"></i>
+            </a>
+            <span if.bind="receivedRecipe.rightSideIsLoading" class="side side-loading">
+              <i class="fas fa-circle-notch fa-spin"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</template>

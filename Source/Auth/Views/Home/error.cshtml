@@ -1,0 +1,23 @@
+﻿@model ErrorViewModel
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = 404;
+    ViewData["Description"] = Localizer["NotFound"];
+}
+
+@if (Model.ErrorCode == 404)
+{
+    <h1>@Localizer["NotFound"]</h1>
+    <p>@Localizer["ThereIsNothingHere"]</p>
+}
+else
+{
+    <h1>@Localizer["UnexpectedError"]</h1>
+    <p>@Localizer["SomeUnexpectedStupidityHappened"]</p>
+}
+
+<br />
+
+<footer>
+    <a href="/" class="button">@Localizer["BackToHome"]</a>
+</footer>

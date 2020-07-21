@@ -1,0 +1,377 @@
+<template>
+  <require from="../static/styles/pages/edit-ingredient.scss"></require>
+
+  <div class="au-animate animate-fade-in animate-fade-out">
+    <div class="page-title-wrap">
+      <div class="side inactive small">
+        <i class="fas fa-pencil-alt"></i>
+      </div>
+      <div class="page-title">
+        <span t="editIngredient.edit">Edit</span>&nbsp;<span class="colored-text">${model.name}</span>
+      </div>
+      <a route-href="route: ingredients" class="side back">
+        <i class="fas fa-times"></i>
+      </a>
+    </div>
+
+    <div class="content-wrap edit-ingredient">
+      <div if.bind="!model" class="double-circle-loading">
+        <div class="double-bounce1"></div>
+        <div class="double-bounce2"></div>
+      </div>
+
+      <div else>
+        <section if.bind="model.recipes.length === 0" class="message warning">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span t="editIngredient.notUsed">This ingredient is not used in any recipe.</span>
+        </section>
+
+        <section else class="used-in-recipes-section">
+          <div class="ingredient-recipes">
+            <header t="editIngredient.usedInTheseRecipes">Used in these recipes</header>
+            <ul>
+              <li repeat.for="recipe of model.recipes">${recipe}</li>
+            </ul>
+          </div>
+        </section>
+
+        <section show.bind="model.taskId" class="linked-to-task-alert">
+          <i class="fas fa-info-circle"></i>
+          <span t="editIngredient.thisIngredientIsLinked">This ingredient is linked to a task in To Do Assistant.</span>
+          <div class="unlink-button-wrap">
+            <button type="button" class="small-button" click.delegate="unlinkFromTask()"
+              t="editIngredient.unlink">Unlink</button>
+          </div>
+        </section>
+
+        <form>
+          <div if.bind="!model.taskId" class="form-control">
+            <input type="text" value.bind="model.name & validate" maxlength="50"
+              class.bind="nameIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]editIngredient.ingredientName">
+
+            <div class="link-button-wrap">
+              <button type="button" class="link-button" show.bind="!tasksSearchVisible" click.delegate="linkToTask()"
+                t="editIngredient.linkToTask">Link to task in To Do Assistant</button>
+            </div>
+
+            <div class="add-ingredient-wrap" show.bind="tasksSearchVisible">
+              <input type="text" ref="pickTaskInput" t="[placeholder,aria-label]editIngredient.searchTasks"
+                maxlength="50">
+            </div>
+          </div>
+
+          <div class="nutrition-price-data-wrap">
+
+            <div class="data-wrap">
+              <button type="button" if.bind="!model.nutritionData.isSet" click.delegate="setNutritionData()"
+                class="wide-button au-animate animate-fade-in animate-fade-out" t="editIngredient.setNutritionData">Set
+                nutrition data</button>
+
+              <div else class="data-content-wrap au-animate animate-fade-in animate-fade-out">
+                <div class="data-content">
+                  <div class="data-header">
+                    <i class="fas fa-clipboard"></i>
+                    <span t="editIngredient.nutrition">Nutrition</span>
+                  </div>
+                  <div class="data-size-selectors">
+                    <label class="data-size ${model.nutritionData.servingSizeIsOneUnit ? '' : 'selected'}">
+                      <input type="radio" name="servingSizeToggle" model.bind="false"
+                        checked.bind="model.nutritionData.servingSizeIsOneUnit">
+                      <span t="editIngredient.amount">Amount</span>
+                      &nbsp;
+                      <input type="number" value.bind="model.nutritionData.servingSize"
+                        disabled.bind="model.nutritionData.servingSizeIsOneUnit" min="1">
+                      <div class="unit-input-addon">g</div>
+                      <i class="fas fa-check"></i>
+                    </label>
+                    <div class="data-size-separator"></div>
+                    <label class="is-one-unit-wrap ${model.nutritionData.servingSizeIsOneUnit ? 'selected' : ''}">
+                      <input type="radio" name="servingSizeToggle" model.bind="true"
+                        checked.bind="model.nutritionData.servingSizeIsOneUnit">
+                      <span t="editIngredient.oneUnit">One unit (ex. Egg)</span>
+                      <i class="fas fa-check"></i>
+                    </label>
+                  </div>
+
+                  <table class="data-table-form">
+                    <tbody>
+                      <tr>
+                        <td t="calories">Calories</td>
+                        <td>
+                          <div class="input-wrap">
+                            <input type="number" value.bind="model.nutritionData.calories & validate"
+                              class.bind="caloriesIsInvalid ? 'invalid' : ''" min="0" max="999">
+                            <div class="unit-input-addon">kcal</div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td t="fat">Fat</td>
+                        <td>
+                          <div class="input-wrap">
+                            <input type="number" value.bind="model.nutritionData.fat & validate"
+                              class.bind="fatIsInvalid ? 'invalid' : ''" min="0" max="999">
+                            <div class="unit-input-addon">g</div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td t="saturatedFat">Saturated fat</td>
+                        <td>
+                          <div class="input-wrap">
+                            <input type="number" value.bind="model.nutritionData.saturatedFat & validate"
+                              class.bind="saturatedFatIsInvalid ? 'invalid' : ''" min="0" max="999">
+                            <div class="unit-input-addon">g</div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td t="transFat">Trans fat</td>
+                        <td>
+                          <div class="input-wrap">
+                            <input type="number" value.bind="model.nutritionData.transFat & validate"
+                              class.bind="transFatIsInvalid ? 'invalid' : ''" min="0" max="999">
+                            <div class="unit-input-addon">g</div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td t="carbohydrate">Carbohydrate</td>
+                        <td>
+                          <div class="input-wrap">
+                            <input type="number" value.bind="model.nutritionData.carbohydrate & validate"
+                              class.bind="carbohydrateIsInvalid ? 'invalid' : ''" min="0" max="999">
+                            <div class="unit-input-addon">g</div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td t="sugars">Sugars</td>
+                        <td>
+                          <div class="input-wrap">
+                            <input type="number" value.bind="model.nutritionData.sugars & validate"
+                              class.bind="sugarsIsInvalid ? 'invalid' : ''" min="0" max="999">
+                            <div class="unit-input-addon">g</div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td t="addedSugars">Added sugars</td>
+                        <td>
+                          <div class="input-wrap">
+                            <input type="number" value.bind="model.nutritionData.addedSugars & validate"
+                              class.bind="addedSugarsIsInvalid ? 'invalid' : ''" min="0" max="999">
+                            <div class="unit-input-addon">g</div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td t="fiber">Fiber</td>
+                        <td>
+                          <div class="input-wrap">
+                            <input type="number" value.bind="model.nutritionData.fiber & validate"
+                              class.bind="fiberIsInvalid ? 'invalid' : ''" min="0" max="999">
+                            <div class="unit-input-addon">g</div>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td t="protein">Protein</td>
+                        <td>
+                          <div class="input-wrap">
+                            <input type="number" value.bind="model.nutritionData.protein & validate"
+                              class.bind="proteinIsInvalid ? 'invalid' : ''" min="0" max="999">
+                            <div class="unit-input-addon">g</div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td t="sodium">Sodium</td>
+                        <td>
+                          <div class="input-wrap">
+                            <input type="number" value.bind="model.nutritionData.sodium & validate"
+                              class.bind="sodiumIsInvalid ? 'invalid' : ''" min="0" max="9999">
+                            <div class="unit-input-addon">mg</div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td t="cholesterol">Cholesterol</td>
+                        <td>
+                          <div class="input-wrap">
+                            <input type="number" value.bind="model.nutritionData.cholesterol & validate"
+                              class.bind="cholesterolIsInvalid ? 'invalid' : ''" min="0" max="9999">
+                            <div class="unit-input-addon">mg</div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td t="vitaminA">Vitamin A</td>
+                        <td>
+                          <div class="input-wrap">
+                            <input type="number" value.bind="model.nutritionData.vitaminA & validate"
+                              class.bind="vitaminAIsInvalid ? 'invalid' : ''" min="0" max="9999">
+                            <div class="unit-input-addon">mg</div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td t="vitaminC">Vitamin C</td>
+                        <td>
+                          <div class="input-wrap">
+                            <input type="number" value.bind="model.nutritionData.vitaminC & validate"
+                              class.bind="vitaminCIsInvalid ? 'invalid' : ''" min="0" max="9999">
+                            <div class="unit-input-addon">mg</div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td t="vitaminD">Vitamin D</td>
+                        <td>
+                          <div class="input-wrap">
+                            <input type="number" value.bind="model.nutritionData.vitaminD & validate"
+                              class.bind="vitaminDIsInvalid ? 'invalid' : ''" min="0" max="9999">
+                            <div class="unit-input-addon">mg</div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td t="calcium">Calcium</td>
+                        <td>
+                          <div class="input-wrap">
+                            <input type="number" value.bind="model.nutritionData.calcium & validate"
+                              class.bind="calciumIsInvalid ? 'invalid' : ''" min="0" max="9999">
+                            <div class="unit-input-addon">mg</div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td t="iron">Iron</td>
+                        <td>
+                          <div class="input-wrap">
+                            <input type="number" value.bind="model.nutritionData.iron & validate"
+                              class.bind="ironIsInvalid ? 'invalid' : ''" min="0" max="9999">
+                            <div class="unit-input-addon">mg</div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td t="potassium">Potassium</td>
+                        <td>
+                          <div class="input-wrap">
+                            <input type="number" value.bind="model.nutritionData.potassium & validate"
+                              class.bind="potassiumIsInvalid ? 'invalid' : ''" min="0" max="9999">
+                            <div class="unit-input-addon">mg</div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td t="magnesium">Magnesium</td>
+                        <td>
+                          <div class="input-wrap">
+                            <input type="number" value.bind="model.nutritionData.magnesium & validate"
+                              class.bind="magnesiumIsInvalid ? 'invalid' : ''" min="0" max="9999">
+                            <div class="unit-input-addon">mg</div>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="link-button-wrap">
+                  <button type="button" click.delegate="removeNutritionData()" class="link-button"
+                    t="editIngredient.removeNutritionData">Remove nutrition data</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="data-wrap">
+              <button type="button" if.bind="!model.priceData.isSet" click.delegate="setPriceData()"
+                class="wide-button au-animate animate-fade-in animate-fade-out" t="editIngredient.setPriceData">Set
+                price data</button>
+
+              <div else class="data-content-wrap au-animate animate-fade-in animate-fade-out">
+                <div class="data-content">
+                  <div class="data-header">
+                    <i class="fas fa-tag"></i>
+                    <span t="editIngredient.price">Price</span>
+                  </div>
+                  <div class="data-size-selectors">
+                    <label class="data-size ${model.priceData.productSizeIsOneUnit ? '' : 'selected'}">
+                      <input type="radio" name="productSizeToggle" model.bind="false"
+                        checked.bind="model.priceData.productSizeIsOneUnit">
+                      <span t="editIngredient.amount">Amount</span>
+                      &nbsp;
+                      <input type="number" value.bind="model.priceData.productSize"
+                        disabled.bind="model.priceData.productSizeIsOneUnit" min="1">
+                      <div class="unit-input-addon">g</div>
+                      <i class="fas fa-check"></i>
+                    </label>
+                    <div class="data-size-separator"></div>
+                    <label class="is-one-unit-wrap ${model.priceData.productSizeIsOneUnit ? 'selected' : ''}">
+                      <input type="radio" name="productSizeToggle" model.bind="true"
+                        checked.bind="model.priceData.productSizeIsOneUnit">
+                      <span t="editIngredient.oneUnit">One unit (ex. Egg)</span>
+                      <i class="fas fa-check"></i>
+                    </label>
+                  </div>
+
+                  <table class="data-table-form">
+                    <tbody>
+                      <tr>
+                        <td t="editIngredient.price">Price</td>
+                        <td>
+                          <div class="input-wrap">
+                            <input type="number" value.bind="model.priceData.price & validate"
+                              class="price-input ${priceIsInvalid ? 'invalid' : ''}" min="0" max="9999">
+                            <div class="unit-input-addon">${model.priceData.currency}</div>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="link-button-wrap">
+                  <button type="button" click.delegate="removePriceData()" class="link-button"
+                    t="editIngredient.removePriceData">Remove price data</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </form>
+
+        <hr>
+
+        <div show.bind="model.recipes.length > 0 && deleteInProgress" class="delete-confirmation-alert">
+          <span t="editIngredient.ingredientUsedInRecipes">This ingredient is used in the recipes mentioned
+            above.</span>
+          <br>
+          <span t="editIngredient.areYouSureYouWantToDelete">Are you sure you want to delete it?</span>
+        </div>
+
+        <div class="save-delete-wrap">
+          <a if.bind="!deleteInProgress" click.delegate="save()"
+            class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
+            <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
+              <i class="fas fa-circle-notch fa-spin"></i>
+            </span>
+            <span t="save">Save</span>
+          </a>
+          <a click.delegate="delete()"
+            class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}">
+            <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
+              <i class="fas fa-circle-notch fa-spin"></i>
+            </span>
+            <span>${deleteButtonText}</span>
+          </a>
+          <button type="button" if.bind="deleteInProgress" click.delegate="cancel()" t="cancel"
+            class="button secondary-button">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

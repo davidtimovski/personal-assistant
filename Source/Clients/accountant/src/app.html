@@ -1,0 +1,13 @@
+<template>
+  <require from="./static/styles/app.scss"></require>
+  <require from="./resources/elements/alert"></require>
+
+  <main class.bind="isTouchDevice ? 'touch-device' : ''">
+    <div></div>
+    <div class="center">
+      <router-view></router-view>
+      <alert></alert>
+    </div>
+    <div></div>
+  </main>
+</template>

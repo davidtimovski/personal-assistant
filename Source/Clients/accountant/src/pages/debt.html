@@ -1,0 +1,68 @@
+<template>
+  <require from="./../resources/elements/empty-list-message.html"></require>
+  <require from="./../resources/value-converters/money-format"></require>
+
+  <div class="au-animate animate-fade-in animate-fade-out">
+    <div class="page-title-wrap">
+      <div class="side inactive">
+        <i class="fas fa-hand-holding-usd"></i>
+      </div>
+      <div t="debt.debt" class="page-title">Debt</div>
+      <a route-href="route: dashboard" class="side back">
+        <i class="fas fa-times"></i>
+      </a>
+    </div>
+
+    <div class="content-wrap">
+
+      <div class="content-body">
+        <div if.bind="!debts" class="double-circle-loading">
+          <div class="double-bounce1"></div>
+          <div class="double-bounce2"></div>
+        </div>
+
+        <table if.bind="debts && debts.length > 0" class="editable-table">
+          <thead>
+            <tr>
+              <th class="edit-link-cell"></th>
+              <th class="edit-link-cell"></th>
+              <th t="amount">Amount</th>
+              <th t="debt.person">Person</th>
+              <th class="sync-icon-cell"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr repeat.for="debt of debts" class.bind="debt.id === getEditedId ? 'highlighted-row' : ''">
+              <td class="edit-link-cell">
+                <a route-href="route: editDebt; params.bind: { id: debt.id }" class="link">
+                  <i class="fas fa-pencil-alt"></i>
+                </a>
+              </td>
+              <td class="edit-link-cell">
+                <a click.delegate="settleDebt(debt.id, debt.userIsDebtor)" class="link debt-icon">
+                  <i class="fas fa-hand-holding-usd ${debt.userIsDebtor ? 'debtor' : 'lender'}"></i>
+                </a>
+              </td>
+              <td>${debt.amount | moneyFormat:debt.currency}</td>
+              <td>${debt.person}</td>
+              <td class="sync-icon-cell">
+                <i if.bind="!debt.synced" class="fas fa-sync-alt"></i>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <empty-list-message if.bind="debts.length === 0" message.bind="emptyListMessage">
+        </empty-list-message>
+      </div>
+
+      <div class="centering-wrap">
+        <a click.delegate="newDebt()" class="wide-button new-button ${syncing ? 'disabled' : ''}"
+          t="[aria-label]debt.newDebt">
+          <i class="fas fa-plus"></i>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</template>

@@ -1,0 +1,198 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="About" xml:space="preserve">
+    <value>За нас</value>
+  </data>
+  <data name="AccountDeleteSuccess" xml:space="preserve">
+    <value>Сметката беше успешно избришана.&lt;br&gt;Жал ни е што нè напуштате.</value>
+  </data>
+  <data name="DontHaveAnAccount" xml:space="preserve">
+    <value>Немате сметка?</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Емаил</value>
+  </data>
+  <data name="EmailConfirmationRequired" xml:space="preserve">
+    <value>Ве молиме потврдете го вашиот емаил</value>
+  </data>
+  <data name="ForgotYourPassword" xml:space="preserve">
+    <value>Ја заборавивте лозинката?</value>
+  </data>
+  <data name="Hide" xml:space="preserve">
+    <value>Сокриј</value>
+  </data>
+  <data name="LanguageChangeSuccess" xml:space="preserve">
+    <value>Профилот и јазикот беа успешно ажурирани.&lt;br&gt;Може да се најавите.</value>
+  </data>
+  <data name="LogIn" xml:space="preserve">
+    <value>Најава</value>
+  </data>
+  <data name="LogIntoAccountant" xml:space="preserve">
+    <value>Најава во Accountant</value>
+  </data>
+  <data name="LogIntoCookingAssistant" xml:space="preserve">
+    <value>Најава во Cooking Assistant</value>
+  </data>
+  <data name="LogIntoToDoAssistant" xml:space="preserve">
+    <value>Најава во To Do Assistant</value>
+  </data>
+  <data name="PageDescription" xml:space="preserve">
+    <value>Апликации за организирани луѓе</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Лозинка</value>
+  </data>
+  <data name="PasswordResetEmailSent" xml:space="preserve">
+    <value>Емаил-от за ресетирање на лозинка беше испратен.&lt;br&gt;Искористете го да ја ресетирате вашата лозинка.</value>
+  </data>
+  <data name="PasswordResetEmailSentGmail" xml:space="preserve">
+    <value>Емаил-от за ресетирање на лозинка беше испратен.&lt;br&gt;&lt;a href="https://www.google.com/gmail/"&gt;Искористете го&lt;/a&gt; да ја ресетирате вашата лозинка.</value>
+  </data>
+  <data name="PasswordResetEmailSentOutlook" xml:space="preserve">
+    <value>Емаил-от за ресетирање на лозинка беше испратен.&lt;br&gt;&lt;a href="https://outlook.live.com/"&gt;Искористете го&lt;/a&gt; да ја ресетирате вашата лозинка.</value>
+  </data>
+  <data name="PasswordResetEmailSentYahoo" xml:space="preserve">
+    <value>Емаил-от за ресетирање на лозинка беше испратен.&lt;br&gt;&lt;a href="https://login.yahoo.com/"&gt;Искористете го&lt;/a&gt; да ја ресетирате вашата лозинка.</value>
+  </data>
+  <data name="PasswordResetSuccess" xml:space="preserve">
+    <value>Лозинката беше успешно ресетирана</value>
+  </data>
+  <data name="PrivacyPolicy" xml:space="preserve">
+    <value>Полиса за приватност</value>
+  </data>
+  <data name="RegistrationConfirmed" xml:space="preserve">
+    <value>Вашата регистрација беше успешно потврдена. Може да се најавите.</value>
+  </data>
+  <data name="RegistrationEmailSent" xml:space="preserve">
+    <value>Ќе добиете емаил за регистрација во следните 5 минути.&lt;br&gt;Искористете го да ја верификувате вашата сметка пред да се најавите.</value>
+  </data>
+  <data name="RegistrationEmailSentGmail" xml:space="preserve">
+    <value>Ќе добиете емаил за регистрација во следните 5 минути.&lt;br&gt;&lt;a href="https://www.google.com/gmail/"&gt;Искористете го&lt;/a&gt; да ја верификувате вашата сметка пред да се најавите.</value>
+  </data>
+  <data name="RegistrationEmailSentOutlook" xml:space="preserve">
+    <value>Ќе добиете емаил за регистрација во следните 5 минути.&lt;br&gt;&lt;a href="https://outlook.live.com/"&gt;Искористете го&lt;/a&gt; да ја верификувате вашата сметка пред да се најавите.</value>
+  </data>
+  <data name="RegistrationEmailSentYahoo" xml:space="preserve">
+    <value>Ќе добиете емаил за регистрација во следните 5 минути.&lt;br&gt;&lt;a href="https://login.yahoo.com/"&gt;Искористете го&lt;/a&gt; да ја верификувате вашата сметка пред да се најавите.</value>
+  </data>
+  <data name="Show" xml:space="preserve">
+    <value>Покажи</value>
+  </data>
+</root>

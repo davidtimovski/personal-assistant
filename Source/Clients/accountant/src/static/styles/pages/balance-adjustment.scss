@@ -1,0 +1,19 @@
+.input-wrap {
+  display: inline-flex;
+  justify-content: end;
+}
+
+.unit-input-addon {
+  background: #ddd;
+  border-radius: var(--border-radius);
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  box-shadow: var(--box-shadow);
+  padding: 0 12px;
+}
+
+@media screen and (min-width: 1200px) {
+  .unit-input-addon {
+    line-height: 45px;
+  }
+}

@@ -1,0 +1,17 @@
+﻿@inject IViewLocalizer Localizer
+@{
+    Layout = "_LayoutWide";
+    ViewData["Title"] = Localizer["About"];
+    ViewData["Description"] = Localizer["About"];
+}
+
+<article>
+    <h1>@Localizer["About"]</h1>
+
+    @Localizer["AboutText"]
+</article>
+
+<footer>
+    <a href="/" class="button">@Localizer["Back"]</a>
+    <span></span>
+</footer>

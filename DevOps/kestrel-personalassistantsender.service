@@ -1,0 +1,18 @@
+[Unit]
+Description=PersonalAssistant.Sender running on Ubuntu
+After=rabbitmq-server.service
+
+[Service]
+WorkingDirectory=/home/personalassistant/Sender
+ExecStart=/usr/bin/dotnet /home/personalassistant/Sender/Sender.dll
+Restart=always
+# Restart service after 10 seconds if dotnet service crashes
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=dotnet-personalassistantsender
+User=personalassistant
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+
+[Install]
+WantedBy=multi-user.target

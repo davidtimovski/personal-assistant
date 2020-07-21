@@ -1,0 +1,16 @@
+<template>
+  <require from="../../static/styles/components/amount-input.scss"></require>
+
+  <div class="input-wrap ${changing ? 'changing' : ''}">
+    <input type="number" if.bind="model.currency === 'MKD'" id="amount" ref="amountInput"
+      value.bind="model.amount & validate" min="1" max="10000000"
+      class="amount-input ${amountIsInvalid ? 'invalid' : ''}" required>
+    <input type="number" else id="amount" ref="amountInput" value.bind="model.amount & validate" step="any" min="0.01"
+      max="8000000" class="amount-input ${amountIsInvalid ? 'invalid' : ''}" required>
+
+    <input type="text" class="select-currency-input" ref="selectCurrencyInput" maxlength="3"
+      t="[placeholder,aria-label]currency">
+    <button type="button" click.delegate="toggleChangeCurrency()"
+      class="selected-currency-button">${model.currency}</button>
+  </div>
+</template>

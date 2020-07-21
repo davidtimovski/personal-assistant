@@ -1,0 +1,22 @@
+<template bindable="key" class="${isVisible ? 'visible' : ''}">
+  <require from="./tooltip.scss"></require>
+
+  <div click.delegate="toggleOpen()" class="question-wrap">
+    <span ref="questionSpan" class="question glow">${tooltip.question}</span>
+  </div>
+  <div class="answer-wrap ${isOpen ? 'visible' : ''}">
+    <div class="answer">
+      <i class="fas fa-info-circle ${isDismissed ? 'faded' : ''}"></i>
+      <span>${tooltip.answer}</span>
+      <div show.bind="!isDismissed" class="dismiss-wrap">
+        <button type="button" click.delegate="dismiss()" t="tooltips.okayUnderstood">Okay, understood</button>
+      </div>
+    </div>
+  </div>
+  <div class="dismissed-wrap ${isDismissed ? 'visible' : ''}">
+    <div class="dismissed">
+      <i class="fas fa-arrow-alt-circle-up"></i>
+      <span t="tooltips.tooltipWillNoLongerShow"></span>
+    </div>
+  </div>
+</template>

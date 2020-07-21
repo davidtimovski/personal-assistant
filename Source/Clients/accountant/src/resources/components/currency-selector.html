@@ -1,0 +1,10 @@
+<template>
+  <div class="currency-selector-wrap">
+    <div t="preferences.currency">Currency</div>
+    <div class="currency-selector ${changing ? 'changing' : ''}">
+      <input type="text" class="search-currencies-input" ref="selectCurrencyInput" maxlength="3"
+        t="[placeholder,aria-label]preferences.change">
+      <button type="button" click.delegate="toggleChangeCurrency()" class="selected-currency">${currency}</button>
+    </div>
+  </div>
+</template>

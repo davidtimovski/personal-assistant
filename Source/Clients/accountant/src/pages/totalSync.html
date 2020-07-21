@@ -1,0 +1,34 @@
+<template>
+  <div class="au-animate animate-fade-in animate-fade-out">
+    <div class="page-title-wrap">
+      <div class="side inactive medium">
+        <i class="fas fa-cloud-download-alt"></i>
+      </div>
+      <div class="page-title" t="totalSync.totalSync">Total sync</div>
+      <a click.delegate="back()" class="side back">
+        <i class="fas fa-times"></i>
+      </a>
+    </div>
+
+    <div class="content-wrap">
+
+      <section show.bind="!connTracker.isOnline" class="message warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span t="totalSync.offlineText">You have to be online in order to sync.</span>
+      </section>
+
+      <div t="totalSync.syncText" class="text-wrap"></div>
+
+      <div class="save-delete-wrap">
+        <a click.delegate="sync()" class="button primary-button ${!canSync ? 'disabled' : ''}">
+          <span class="button-loader ${syncButtonIsLoading ? 'loading' : ''}">
+            <i class="fas fa-circle-notch fa-spin"></i>
+          </span>
+          <span t="totalSync.sync">Sync</span>
+        </a>
+        <a route-href="route: menu" t="cancel" class="button secondary-button">Cancel</a>
+      </div>
+
+    </div>
+  </div>
+</template>

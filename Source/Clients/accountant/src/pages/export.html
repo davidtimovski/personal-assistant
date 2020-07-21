@@ -1,0 +1,34 @@
+<template>
+  <div class="au-animate animate-fade-in animate-fade-out">
+    <div class="page-title-wrap">
+      <div class="side inactive small">
+        <i class="fas fa-download"></i>
+      </div>
+      <div class="page-title" t="export.export">Export</div>
+      <a route-href="route: dashboard" class="side back">
+        <i class="fas fa-times"></i>
+      </a>
+    </div>
+
+    <div class="content-wrap">
+
+      <section show.bind="!connTracker.isOnline" class="message warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span t="export.offlineText">You have to be online in order to export.</span>
+      </section>
+
+      <div t="[html]export.exportText" class="text-wrap"></div>
+
+      <div class="save-delete-wrap">
+        <a click.delegate="export()" class="button primary-button ${!canExport ? 'disabled' : ''}">
+          <span class="button-loader ${exportButtonIsLoading ? 'loading' : ''}">
+            <i class="fas fa-circle-notch fa-spin"></i>
+          </span>
+          <span t="export.export">Export</span>
+        </a>
+        <a route-href="route: menu" t="cancel" class="button secondary-button">Cancel</a>
+      </div>
+
+    </div>
+  </div>
+</template>

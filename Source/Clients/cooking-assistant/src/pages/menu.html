@@ -1,0 +1,62 @@
+<template>
+  <div class="au-animate animate-fade-in animate-fade-out">
+    <div class="page-title-wrap">
+      <div class="side inactive">
+        <i class="fas fa-bars"></i>
+      </div>
+      <div t="menu.menu" class="page-title">Menu</div>
+      <a route-href="route: recipes" class="side back">
+        <i class="fas fa-times"></i>
+      </a>
+    </div>
+
+    <div class="content-wrap">
+
+      <div class="horizontal-buttons-wrap">
+        <a click.delegate="goToDietaryProfile()" class="wide-button with-badge">
+          <span class="button-loader ${dietaryProfileButtonIsLoading ? 'loading' : ''}">
+            <i class="fas fa-circle-notch fa-spin"></i>
+          </span>
+          <span t="menu.dietaryProfile">Dietary profile</span>
+        </a>
+
+        <a route-href="route: ingredients" class="wide-button" t="menu.ingredients">Ingredients</a>
+
+        <a click.delegate="goToInbox()" class="wide-button with-badge">
+          <span class="button-loader ${inboxButtonIsLoading ? 'loading' : ''}">
+            <i class="fas fa-circle-notch fa-spin"></i>
+          </span>
+          <span t="menu.inbox">Inbox</span>
+          <span if.bind="pendingSendRequestCount > 0" class="badge">${pendingSendRequestCount}</span>
+        </a>
+
+        <a click.delegate="goToPreferences()" class="wide-button with-badge">
+          <span class="button-loader ${preferencesButtonIsLoading ? 'loading' : ''}">
+            <i class="fas fa-circle-notch fa-spin"></i>
+          </span>
+          <span t="menu.preferences">Preferences</span>
+        </a>
+
+        <a click.delegate="goToHelp()" class="wide-button with-badge">
+          <span class="button-loader ${helpButtonIsLoading ? 'loading' : ''}">
+            <i class="fas fa-circle-notch fa-spin"></i>
+          </span>
+          <span t="menu.help">Help</span>
+        </a>
+      </div>
+
+      <hr>
+
+      <div class="horizontal-buttons-wrap">
+        <a href.bind="personalAssistantUrl" class="wide-button" t="menu.goToPersonalAssistant">Go to Personal
+          Assistant</a>
+        <a click.delegate="logOut()" class="wide-button" t="menu.logOut">Log Out</a>
+      </div>
+
+      <hr>
+
+      <div class="version"><span t="menu.version">Version</span> ${version}</div>
+
+    </div>
+  </div>
+</template>

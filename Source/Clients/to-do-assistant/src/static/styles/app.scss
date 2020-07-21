@@ -1,0 +1,173 @@
+@import "../../../../shared/src/static/styles/core.scss";
+@import "../../../../shared/src/static/styles/top-buttons-drawer.scss";
+
+:root {
+  --primary-color: var(--to-do-assistant-color);
+  --primary-color-dark: #097cdc;
+  --primary-color-light: #eeeeff;
+  --faded-color: #98b0c5;
+}
+
+.double-bounce1,
+.double-bounce2 {
+  background-color: #7accff;
+}
+
+.wide-button .badge {
+  background: linear-gradient(225deg, #00a6ed, #7a46f3);
+}
+
+.button.primary-button,
+.save-delete-wrap .primary-button.loading:disabled {
+  background: linear-gradient(225deg, #00a6ed, #7a46f3);
+  background-size: 400% 400%;
+}
+.button.primary-button:disabled {
+  color: var(--primary-color);
+}
+
+.cooking-assistant-color {
+  color: var(--cooking-assistant-color);
+}
+
+.page-title.with-buttons {
+  padding: 10px 48px;
+}
+
+.top-buttons-drawer.open .top-buttons-drawer-wrap {
+  max-height: 325px;
+}
+
+.icon-wrap {
+  width: calc(100% - 20px);
+  background: #fafafa;
+  border: none;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  outline: none;
+  padding: 0 10px;
+  line-height: 45px;
+  color: #888;
+}
+.icon-wrap .placeholder {
+  padding-left: 5px;
+}
+.icon-wrap .placeholder.editing {
+  color: var(--regular-color);
+}
+.icon-wrap .icon-options {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto;
+  padding-bottom: 10px;
+}
+.icon-wrap .icon-option {
+  display: inline-block;
+  border-radius: var(--border-radius);
+  margin: 3px;
+  font-size: 24px;
+  line-height: 37px;
+  text-align: center;
+  cursor: pointer;
+
+  transition: background var(--transition);
+}
+.icon-wrap .icon-option.selected {
+  background: #e1f2ff;
+}
+
+.reorderable-repeat-dragging-me.to-do-list,
+.reorderable-repeat-dragging-me .to-do-task-content {
+  visibility: visible; /* unset visibility: hidden */
+  background: #eee;
+  box-shadow: inset 0 1px 4px 0 rgba(0, 0, 0, 0.14);
+  color: transparent; /* hide text */
+}
+
+.labeled-separator-text i {
+  margin-right: 5px;
+}
+
+.completed-tasks .to-do-tasks-wrap,
+.share-requests-wrap.declined,
+.notifications-wrap.seen {
+  margin-top: 15px;
+}
+
+.reorder-toggle {
+  position: absolute;
+  top: 0;
+  left: 45px;
+  z-index: 1;
+  padding: 12px 13px 11px;
+  font-size: 25px;
+  text-decoration: none;
+  color: var(--faded-color);
+
+  transition: color var(--transition);
+  cursor: pointer;
+}
+.reorder-toggle.checked {
+  color: var(--primary-color);
+}
+.reorder-toggle input {
+  display: none;
+}
+.reorder-toggle:hover {
+  color: var(--primary-color-dark);
+}
+.sort-handle {
+  cursor: grab;
+  cursor: -webkit-grab;
+}
+.reordering .reorder-icon {
+  display: inline-block;
+}
+.reorder-icon {
+  display: none;
+  width: 45px;
+  height: 45px;
+  line-height: 45px;
+  text-align: center;
+  color: var(--primary-color);
+}
+
+.share-requests-wrap.declined .share-request,
+.notifications-wrap.seen .notification:not(.highlighted) {
+  opacity: 0.6;
+
+  transition: opacity var(--transition);
+}
+.share-requests-wrap.declined .share-request:hover,
+.notifications-wrap.seen .notification:hover {
+  opacity: 1;
+}
+.share-request {
+  display: flex;
+  justify-content: space-between;
+  background: #fafafa;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  margin-bottom: 10px;
+}
+.share-request .name {
+  width: 100%;
+  padding: 9px 5px;
+  line-height: 27px;
+  text-align: center;
+  cursor: default;
+}
+
+.alert-message {
+  padding: 9px 10px;
+  line-height: 27px;
+  text-align: center;
+}
+
+@media screen and (max-width: 450px) {
+  .to-do-lists-wrap hr {
+    margin: 5px 20%;
+  }
+}
+
+@import "./desktop.scss";
+@import "./touch.scss";

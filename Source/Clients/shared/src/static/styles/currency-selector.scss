@@ -1,0 +1,71 @@
+.currency-selector-wrap {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 4px;
+  line-height: 31px;
+}
+.currency-selector {
+  display: flex;
+  line-height: 31px;
+}
+.currency-selector .search-currencies-input {
+  opacity: 0;
+  width: 70px;
+  font-size: 1rem;
+  line-height: 31px;
+  transition: opacity var(--transition-quick);
+}
+.currency-selector.changing .search-currencies-input {
+  opacity: 1;
+}
+.selected-currency {
+  background: var(--primary-color);
+  border: none;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  outline: none;
+  padding: 0 12px;
+  font-size: inherit;
+  line-height: 27px;
+  cursor: pointer;
+  color: #fff;
+  transition: background var(--transition-quick),
+    border-radius var(--transition-quick), box-shadow var(--transition-quick);
+}
+.currency-selector.changing .selected-currency {
+  background: var(--primary-color-dark);
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  box-shadow: inset var(--box-shadow);
+}
+
+.currency-autocomplete-customizations {
+  background: #fafafa;
+  border-bottom-left-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+.currency-autocomplete-customizations > div {
+  padding: 5px 10px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.currency-autocomplete-customizations .group {
+  background: var(--primary-color);
+  color: #fafafa;
+}
+.currency-autocomplete-customizations .selected {
+  background: #e1e1e1;
+}
+
+/* DESKTOP */
+@media screen and (min-width: 1200px) {
+  .currency-selector-wrap,
+  .currency-selector,
+  .currency-selector .search-currencies-input {
+    line-height: 35px;
+  }
+  .currency-selector .search-currencies-input {
+    font-size: 1.2rem;
+  }
+}

@@ -1,0 +1,243 @@
+{
+  "versionUpdatedTo": "Version updated to {{version}}",
+  "waitingForConnection": "Waiting for connection..",
+  "unexpectedError": "An unexpected error occurred",
+  "currencyConversionError": "An unexpected error occurred whilst converting currencies",
+  "refresh": "Refresh",
+  "failedToFetchError": "Please check your internet connection.",
+  "unsuccessfulSync": "Sync was unsuccessful.",
+  "profilePicture": "Profile picture",
+  "name": "Name",
+  "save": "Save",
+  "delete": "Delete",
+  "sure": "Sure?",
+  "cancel": "Cancel",
+  "create": "Create",
+  "amount": "Amount",
+  "amountBetween": "Amount must be between {{from}} and {{to}}",
+  "currency": "Currency",
+  "category": "Category",
+  "account": "Account",
+  "date": "Date",
+  "description": "Description",
+  "password": "Password",
+  "encryptedPlaceholder": "[ Encrypted ]",
+  "balance": "Balance",
+  "uncategorized": "Uncategorized",
+  "deletedAccount": "[deleted account]",
+  "whileOfflineCannotModify": "While offline you cannot modify data that has already been synced with the cloud.",
+  "months": {
+    "0": "January",
+    "1": "February",
+    "2": "March",
+    "3": "April",
+    "4": "May",
+    "5": "June",
+    "6": "July",
+    "7": "August",
+    "8": "September",
+    "9": "October",
+    "10": "November",
+    "11": "December"
+  },
+  "dashboard": {
+    "newExpense": "New expense",
+    "newDeposit": "New deposit",
+    "available": "Available",
+    "spent": "Spent",
+    "expenditures": "Expenditures",
+    "upcomingExpenses": "Upcoming expenses",
+    "debt": "Debt",
+    "to": "To",
+    "from": "From"
+  },
+  "newTransaction": {
+    "newExpense": "New expense",
+    "newDeposit": "New deposit",
+    "settleDebtTo": "Settle debt to",
+    "settleDebtFrom": "Settle debt from",
+    "encryptDescription": "Encrypt description",
+    "submit": "Submit",
+    "dateIsRequired": "The Date is required",
+    "passwordIsRequired": "The Password is required for encryption",
+    "debtSettlingSuccessful": "Debt was successfully settled",
+    "submitSuccessful": "Transaction was successfully submitted"
+  },
+  "transaction": {
+    "transaction": "Transaction",
+    "originalAmountIn": "Original amount in ",
+    "type": "Type",
+    "expense": "Expense",
+    "deposit": "Deposit",
+    "transfer": "Transfer",
+    "accounts": "Accounts",
+    "to": "{{from}} to {{to}}",
+    "toAccount": "To account",
+    "fromAccount": "From account"
+  },
+  "editTransaction": {
+    "editTransaction": "Edit transaction",
+    "saveSuccessful": "Transaction was successfully saved",
+    "deleteSuccessful": "Transaction was successfully deleted"
+  },
+  "transactions": {
+    "transactions": "Transactions",
+    "from": "From",
+    "to": "To",
+    "all": "All",
+    "expenses": "Expenses",
+    "deposits": "Deposits",
+    "transfers": "Transfers",
+    "searchByDescription": "Search by description",
+    "previous": "Previous",
+    "next": "Next",
+    "thereIsNothingHere": "There is nothing here"
+  },
+  "upcomingExpenses": {
+    "upcomingExpenses": "Upcoming expenses",
+    "month": "Month",
+    "emptyListMessage": "You don't have any upcoming expenses",
+    "newUpcomingExpense": "New upcoming expense"
+  },
+  "editUpcomingExpense": {
+    "newUpcomingExpense": "New upcoming expense",
+    "editUpcomingExpense": "Edit upcoming expense",
+    "generatedAlert": "This upcoming expense has been automatically generated.",
+    "description": "Description. Leave empty if you want it to target all expenses in the category.",
+    "saveSuccessful": "Upcoming expense was successfully saved",
+    "deleteSuccessful": "Upcoming expense was successfully deleted"
+  },
+  "debt": {
+    "debt": "Debt",
+    "person": "Person",
+    "emptyListMessage": "You don't have any debt",
+    "newDebt": "New debt"
+  },
+  "editDebt": {
+    "newDebt": "New debt",
+    "editDebt": "Edit debt",
+    "person": "Person",
+    "iAmThe": "I am the..",
+    "lender": "Lender",
+    "debtor": "Debtor",
+    "saveSuccessful": "Debt was successfully saved",
+    "deleteSuccessful": "Debt was successfully deleted"
+  },
+  "categories": {
+    "categories": "Categories",
+    "emptyListMessage": "You don't have any categories yet",
+    "newCategory": "New category"
+  },
+  "editCategory": {
+    "newCategory": "New category",
+    "edit": "Edit",
+    "categoryName": "Category name",
+    "type": "Type",
+    "generateUpcomingExpense": "Generate upcoming expense",
+    "allTransactions": "All transactions",
+    "depositOnly": "Deposit only",
+    "expenseOnly": "Expense only",
+    "categoryHasTransactions": "This category has transactions.<br>Deleting it will remove them as well.",
+    "okayDelete": "Okay, delete",
+    "deleteSuccessful": "Category was successfully deleted"
+  },
+  "accounts": {
+    "accounts": "Accounts",
+    "transferFunds": "Transfer funds",
+    "newAccount": "New account"
+  },
+  "transferFunds": {
+    "transferFunds": "Transfer funds",
+    "fromAccount": "From account:",
+    "toAccount": "To account:",
+    "transfer": "Transfer",
+    "accountOnlyHas": "There is only {{balance}} on the \"{{account}}\" account",
+    "transferSuccessful": "Funds were successfully transferred"
+  },
+  "editAccount": {
+    "newAccount": "New account",
+    "edit": "Edit",
+    "mainAccount": "This is your main account. It represents your current capital and every new expense or deposit initially goes here.",
+    "accountName": "Account name",
+    "accountHasTransactions": "This account has transactions.<br>Deleting it will remove them as well.",
+    "okayDelete": "Okay, delete",
+    "deleteSuccessful": "Account was successfully deleted"
+  },
+  "balanceAdjustment": {
+    "balanceAdjustment": "Balance adjustment",
+    "adjustedBy": "Adjusted by",
+    "description": "Description",
+    "adjust": "Adjust",
+    "adjustmentSuccessful": "Balance was successfully adjusted"
+  },
+  "pieChartReport": {
+    "pieChart": "Pie chart",
+    "expenses": "Expenses",
+    "deposits": "Deposits"
+  },
+  "expenditureHeatmap": {
+    "expenditureHeatmap": "Expenditure heatmap",
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat",
+    "sun": "Sun"
+  },
+  "export": {
+    "export": "Export",
+    "exportText": "This will export all of your transactions in a <span class='colored-text'>.csv</span> file which you can open in Excel and similar spreadsheet applications.",
+    "offlineText": "You have to be online in order to export.",
+    "transactions": "transactions"
+  },
+  "totalSync": {
+    "totalSync": "Total sync",
+    "syncText": "This will remove any local data that hasn't been synchronized and reload everything from the cloud.",
+    "offlineText": "You have to be online in order to sync.",
+    "sync": "Sync"
+  },
+  "help": {
+    "help": "Help"
+  },
+  "menu": {
+    "menu": "Menu",
+    "transactions": "Transactions",
+    "upcomingExpenses": "Upcoming expenses",
+    "debt": "Debt",
+    "categories": "Categories",
+    "accounts": "Accounts",
+    "balanceAdjustment": "Balance adjustment",
+    "reports": "Reports",
+    "pieChart": "Pie chart",
+    "expenditureHeatmap": "Expenditure heatmap",
+    "export": "Export",
+    "totalSync": "Total sync",
+    "preferences": "Preferences",
+    "help": "Help",
+    "goToPersonalAssistant": "Go to Personal Assistant",
+    "logOut": "Log Out",
+    "version": "Version"
+  },
+  "preferences": {
+    "preferences": "Preferences",
+    "currency": "Currency",
+    "change": "Change",
+    "showOnDashboard": "Show on dashboard",
+    "upcomingExpenses": "Upcoming expenses",
+    "debt": "Debt"
+  },
+  "notFound": {
+    "youSeemLost": "You seem lost..",
+    "takeMeHome": "Take me home"
+  },
+  "tooltips": {
+    "okayUnderstood": "Okay, understood",
+    "tooltipWillNoLongerShow": "This tooltip will no longer show. If you wish to retain it, go to the Menu page and click the \"Help\" button.",
+    "encryptedDescription": {
+      "title": "Encrypted description",
+      "question": "What does this do?",
+      "answer": "If you encrypt the Description it will not be visible without a password. When encrypting, it is highly advisable that you use a password that you will not forget (like for example your Personal Assistant password). If you forget the password you will be no longer able to decrypt the Description, only reset/change it."
+    }
+  }
+}

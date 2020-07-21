@@ -1,0 +1,74 @@
+<template>
+  <div class="au-animate animate-fade-in animate-fade-out">
+    <div class="page-title-wrap">
+      <div class="side inactive small">
+        <i class="fas fa-pencil-alt"></i>
+      </div>
+      <div class="page-title">
+        <span if.bind="isNewAccount" t="editAccount.newAccount"></span>
+        <span else>
+          <span t="editAccount.edit">Edit</span>&nbsp;<span class="colored-text">${account.name}</span>
+        </span>
+      </div>
+      <a route-href="route: accounts" class="side back">
+        <i class="fas fa-times"></i>
+      </a>
+    </div>
+
+    <div class="content-wrap">
+
+      <div if.bind="!account" class="double-circle-loading">
+        <div class="double-bounce1"></div>
+        <div class="double-bounce2"></div>
+      </div>
+
+      <div else>
+        <section show.bind="!connTracker.isOnline && account.synced" class="message warning">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span t="whileOfflineCannotModify">While offline you cannot modify data that has already been synced with the
+            cloud.</span>
+        </section>
+
+        <section if.bind="isMainAccount" class="message info">
+          <i class="fas fa-info-circle"></i>
+          <span t="editAccount.mainAccount">This is your main account. It represents your current capital and every new
+            expense or deposit initially goes here.</span>
+        </section>
+
+        <form submit.trigger="save()">
+          <div class="form-control">
+            <input type="text" value.bind="account.name & validate" ref="nameInput" maxlength="30"
+              class.bind="nameIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]editAccount.accountName" required>
+          </div>
+        </form>
+
+        <hr>
+
+        <div show.bind="deleteInProgress && transactionsWarningVisible" class="delete-confirmation-alert">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span t="[html]editAccount.accountHasTransactions"></span>
+        </div>
+
+        <div class="save-delete-wrap">
+          <a if.bind="!deleteInProgress" click.delegate="save()"
+            class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
+            <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
+              <i class="fas fa-circle-notch fa-spin"></i>
+            </span>
+            <span>${saveButtonText}</span>
+          </a>
+          <a if.bind="!isNewAccount && !isMainAccount" click.delegate="delete()"
+            class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}">
+            <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
+              <i class="fas fa-circle-notch fa-spin"></i>
+            </span>
+            <span>${deleteButtonText}</span>
+          </a>
+          <button type="button" if.bind="isNewAccount || deleteInProgress || isMainAccount" click.delegate="cancel()"
+            t="cancel" class="button secondary-button">Cancel</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</template>

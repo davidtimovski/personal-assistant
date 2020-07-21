@@ -1,0 +1,24 @@
+﻿// Configure bundling and minification for the project.
+// More info at https://go.microsoft.com/fwlink/?LinkId=808241
+[
+  {
+    "outputFileName": "bin/Release/CDN/css/style.min.css",
+    // An array of relative input file paths. Globbing patterns supported
+    "inputFiles": [
+      "wwwroot/css/reset.css",
+      "wwwroot/css/main.css"
+    ]
+  },
+  {
+    "outputFileName": "bin/Release/CDN/js/account/edit-profile.min.js",
+    "inputFiles": [
+      "wwwroot/js/account/edit-profile.js"
+    ]
+  },
+  {
+    "outputFileName": "bin/Release/CDN/js/shared/password-show-hide.min.js",
+    "inputFiles": [
+      "wwwroot/js/shared/password-show-hide.js"
+    ]
+  }
+]

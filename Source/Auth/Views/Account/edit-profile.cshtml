@@ -1,0 +1,57 @@
+﻿@model ViewProfileViewModel
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["EditProfile"];
+    ViewData["Description"] = Localizer["EditProfile"];
+}
+
+<div class="profile-image-container">
+    <div class="profile-image-wrap">
+        <img src="@Model.ImageUri" id="profile-image" alt="@Localizer["ProfileImage"]" />
+        <div id="profile-image-overlay">@Localizer["Uploading"]</div>
+    </div>
+
+    <div class="profile-image-buttons">
+        <input type="file" id="file-input" accept="image/*" />
+        <label for="file-input" id="change-profile-image-label">@Localizer["Change"]</label>
+        <button type="button" id="remove-image-button" class="@(Model.ImageUri == Model.DefaultImageUri ? "hidden" : string.Empty)">@Localizer["Remove"]</button>
+    </div>
+</div>
+
+<div id="message-container"></div>
+
+<form asp-controller="account" asp-action="edit-profile" method="post" role="form">
+    <h1>@Localizer["EditProfile"]</h1>
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <input type="hidden" asp-for="ImageUri" />
+
+    <div class="form-group">
+        <input type="text" asp-for="Name" maxlength="30" placeholder="@Localizer["Name"]" aria-label="@Localizer["Name"]" required />
+    </div>
+    <div class="form-group">
+        <select asp-for="Language" aria-label="@Localizer["Language"]">
+            <option value="en-US">English</option>
+            <option value="mk-MK">Македонски</option>
+        </select>
+    </div>
+
+    <footer>
+        <a href="/" class="button">@Localizer["Back"]</a>
+        <button type="submit" id="save-profile-button" class="button">@Localizer["SaveProfile"]</button>
+    </footer>
+</form>
+
+<script>
+    var languageChangedWarning = "@Localizer["LanguageChangedWarning"]";
+    var largeImageWarning = "@Localizer["LargeImageWarning"]";
+    var defaultImageUri = "@Model.DefaultImageUri";
+    var baseUrl = "@Model.BaseUrl";
+</script>
+<environment include="Development">
+    <script src="~/js/account/edit-profile.js" asp-append-version="true"></script>
+</environment>
+<environment include="Production">
+    <script src="https://cdn.personalassistant.site/js/account/edit-profile.min.js"></script>
+</environment>

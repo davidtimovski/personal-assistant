@@ -1,0 +1,4 @@
+﻿Hello, #NAME#
+Confirm your registration by following this link: #URL#
+Best regards,
+PersonalAssistant.site

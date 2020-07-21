@@ -1,0 +1,12 @@
+.description-view {
+  background: #f1f1f1;
+  box-shadow: inset var(--box-shadow);
+  border-radius: var(--border-radius);
+  padding: 6px 12px 12px 12px;
+  line-height: 30px;
+}
+.description-view label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--faded-color);
+}

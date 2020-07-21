@@ -1,0 +1,23 @@
+﻿using FluentValidation;
+using PersonalAssistant.Application.Contracts.Common;
+
+namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models
+{
+    public class ShareUserAndPermission
+    {
+        public int UserId { get; set; }
+        public bool IsAdmin { get; set; }
+    }
+
+    public class ShareUserAndPermissionValidator : AbstractValidator<ShareUserAndPermission>
+    {
+        private const string prefix = nameof(ShareUserAndPermission);
+
+        public ShareUserAndPermissionValidator(IUserService userService)
+        {
+            RuleFor(dto => dto.UserId)
+                .NotEmpty().WithMessage("Unauthorized")
+                .MustAsync(async (userId, val) => await userService.ExistsAsync(userId)).WithMessage($"{prefix}.UserDoesNotExist");
+        }
+    }
+}

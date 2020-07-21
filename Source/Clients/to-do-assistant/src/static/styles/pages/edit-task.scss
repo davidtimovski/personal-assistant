@@ -1,0 +1,69 @@
+.assign-to-user {
+  display: none;
+  background: #fafafa;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding-bottom: 0;
+}
+.assign-to-user-header {
+  background: var(--primary-color);
+  border-top-left-radius: var(--border-radius);
+  border-top-right-radius: var(--border-radius);
+  padding: 0 10px;
+  text-align: center;
+  color: #fff;
+}
+.assign-to-user-content {
+  padding: 6px 10px;
+}
+.assign-to-user input[type="radio"] {
+  display: none;
+}
+.assign-to-user.visible {
+  display: block;
+}
+.assign-to-user-image {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  margin: 6px 12px 0 0;
+}
+.assign-to-user-item {
+  padding: 9px 0;
+  line-height: 27px;
+}
+.assign-to-user .radio {
+  display: flex;
+  justify-content: flex-start;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+
+  transition: color var(--transition);
+}
+.assign-to-user .radio:hover {
+  color: var(--primary-color);
+}
+.assign-to-user .radio.selected {
+  color: var(--primary-color-dark) !important;
+}
+.assign-to-user .radio i {
+  display: none;
+  margin-left: 5px;
+}
+.assign-to-user .radio.selected i {
+  display: inline;
+}
+
+/* Workaround for sticky :hover on mobile devices */
+.touch-device .assign-to-user .radio:hover {
+  color: var(--regular-color);
+}
+
+@media screen and (min-width: 1200px) {
+  .assign-to-user-header {
+    line-height: 45px;
+  }
+  .assign-to-user-content {
+    padding: 9px 15px;
+  }
+}

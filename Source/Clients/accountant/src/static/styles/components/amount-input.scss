@@ -1,0 +1,44 @@
+.input-wrap {
+  display: flex;
+  line-height: 37px;
+}
+.input-wrap .select-currency-input {
+  display: none;
+  width: 80px;
+  font-size: 1rem;
+  line-height: 37px;
+}
+.input-wrap.changing .amount-input {
+  display: none;
+}
+.input-wrap.changing .select-currency-input {
+  display: inline-block;
+}
+.selected-currency-button {
+  background: #ddd;
+  border: none;
+  border-radius: var(--border-radius);
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  box-shadow: var(--box-shadow);
+  outline: none;
+  padding: 0 12px;
+  font-size: inherit;
+  line-height: 27px;
+  color: inherit;
+  cursor: pointer;
+  transition: background var(--transition-quick),
+    box-shadow var(--transition-quick), color var(--transition-quick);
+}
+.input-wrap.changing .selected-currency-button {
+  background: var(--primary-color);
+  box-shadow: inset var(--box-shadow);
+  color: #fff;
+}
+
+@media screen and (min-width: 1200px) {
+  .input-wrap .select-currency-input {
+    font-size: 1.2rem;
+    line-height: 45px;
+  }
+}

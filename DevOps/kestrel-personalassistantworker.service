@@ -1,0 +1,17 @@
+[Unit]
+Description=PersonalAssistant.Worker running on Ubuntu
+
+[Service]
+WorkingDirectory=/home/personalassistant/Worker
+ExecStart=/usr/bin/dotnet /home/personalassistant/Worker/Worker.dll
+Restart=always
+# Restart service after 10 seconds if dotnet service crashes
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=dotnet-personalassistantworker
+User=personalassistant
+Environment=DOTNET_ENVIRONMENT=Production
+Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+
+[Install]
+WantedBy=multi-user.target

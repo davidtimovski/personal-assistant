@@ -1,0 +1,6 @@
+﻿Hello
+A user has just verified their email address.
+Name: #NAME#
+Email: #EMAIL#
+Best regards,
+PersonalAssistant.site

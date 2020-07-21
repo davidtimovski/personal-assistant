@@ -1,0 +1,65 @@
+<template>
+  <require from="../static/styles/pages/accounts.scss"></require>
+  <require from="./../resources/value-converters/money-format"></require>
+
+  <div class="au-animate animate-fade-in animate-fade-out">
+    <div class="page-title-wrap">
+      <div class="side inactive small">
+        <i class="fas fa-money-check-alt"></i>
+      </div>
+      <div t="accounts.accounts" class="page-title">Accounts</div>
+      <a route-href="route: dashboard" class="side back">
+        <i class="fas fa-times"></i>
+      </a>
+    </div>
+
+    <div class="content-wrap">
+
+      <div class="content-body">
+        <div if.bind="!accounts" class="double-circle-loading">
+          <div class="double-bounce1"></div>
+          <div class="double-bounce2"></div>
+        </div>
+
+        <div else>
+          <table class="editable-table accounts-table">
+            <tbody>
+              <tr repeat.for="account of accounts"
+                class.bind="account.id === getEditedId || account.id === getEditedId2 ? 'highlighted-row' : ''">
+                <td class="edit-link-cell">
+                  <a route-href="route: editAccount; params.bind: { id: account.id }" class="link">
+                    <i class="fas fa-pencil-alt"></i>
+                  </a>
+                </td>
+                <td>${account.name}</td>
+                <td>${account.balance | moneyFormat:currency}</td>
+                <td class="sync-icon-cell">
+                  <i if.bind="!account.synced" class="fas fa-sync-alt"></i>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot if.bind="accounts.length > 1">
+              <tr>
+                <td colspan="4">${sum | moneyFormat:currency}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <div class="centering-wrap">
+        <a click.delegate="newAccount()" class="wide-button new-button ${syncing ? 'disabled' : ''}"
+          t="[aria-label]accounts.newAccount">
+          <i class="fas fa-plus"></i>
+        </a>
+      </div>
+
+      <div if.bind="accounts && accounts.length > 0">
+        <hr>
+
+        <a route-href="route: transferFunds" class="wide-button" t="accounts.transferFunds">Transfer funds</a>
+      </div>
+
+    </div>
+  </div>
+</template>

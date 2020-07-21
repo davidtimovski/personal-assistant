@@ -1,0 +1,31 @@
+<template>
+  <div class="au-animate animate-fade-in animate-fade-out">
+    <div class="page-title-wrap">
+      <div class="side inactive">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="page-title">
+        <span t="uncompleteTasks.uncompleteTasksIn">Uncomplete tasks in</span>&nbsp;<span
+          class="colored-text">${model.name}</span>?
+      </div>
+      <a route-href="route: list; params.bind: { id: model.id }" class="side back">
+        <i class="fas fa-times"></i>
+      </a>
+    </div>
+
+    <div class="content-wrap">
+
+      <div class="text-wrap">${uncompleteText}</div>
+
+      <div class="save-delete-wrap">
+        <a click.delegate="uncomplete()" class="button primary-button ${uncompleteButtonIsLoading ? 'disabled' : ''}">
+          <span class="button-loader ${uncompleteButtonIsLoading ? 'loading' : ''}">
+            <i class="fas fa-circle-notch fa-spin"></i>
+          </span>
+          <span t="uncompleteTasks.uncomplete">Uncomplete</span>
+        </a>
+        <a route-href="route: list; params.bind: { id: model.id }" t="cancel" class="button secondary-button">Cancel</a>
+      </div>
+    </div>
+  </div>
+</template>

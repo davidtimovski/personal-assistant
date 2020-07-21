@@ -1,0 +1,64 @@
+<template>
+  <require from="../static/styles/pages/notifications.scss"></require>
+  <require from="./../resources/elements/empty-list-message.html"></require>
+
+  <div class="au-animate animate-fade-in animate-fade-out">
+    <div class="page-title-wrap">
+      <div class="side inactive small">
+        <i class="fas fa-bell"></i>
+      </div>
+      <div t="notifications.notifications" class="page-title">Notifications</div>
+      <a route-href="route: lists" class="side back">
+        <i class="fas fa-times"></i>
+      </a>
+    </div>
+
+    <div class="content-wrap">
+
+      <div if.bind="!unseenNotifications && !seenNotifications" class="double-circle-loading">
+        <div class="double-bounce1"></div>
+        <div class="double-bounce2"></div>
+      </div>
+
+      <div else class="notifications-wrap">
+        <div repeat.for="notification of unseenNotifications" click.delegate="open(notification)"
+          class="notification ${notification.id === getHighlightedId ? 'highlighted' : ''} ${notification.listId ? 'openable' : ''}">
+          <img class="notification-image" src.bind="notification.userImageUri" t="[alt]profilePicture">
+          <div class="notification-content">
+            <div class="name" innerhtml.bind="notification.message"></div>
+            <div class="notification-time">${notification.formattedCreatedDate}</div>
+          </div>
+        </div>
+
+        <empty-list-message if.bind="unseenNotifications.length === 0" message.bind="emptyListMessage">
+        </empty-list-message>
+      </div>
+
+      <div if.bind="seenNotifications.length > 0">
+        <div class="centering-wrap">
+          <button type="button" if.bind="!seenNotificationsVisible" click.delegate="showSeenNotifications()"
+            class="show-button" t="notifications.showSeen">Show seen</button>
+        </div>
+
+        <div if.bind="seenNotificationsVisible">
+          <div class="labeled-separator">
+            <div class="labeled-separator-text" t="notifications.seen">Seen</div>
+            <hr>
+          </div>
+
+          <div class="notifications-wrap seen">
+            <div repeat.for="notification of seenNotifications" click.delegate="open(notification)"
+              class="notification ${notification.id === getHighlightedId ? 'highlighted' : ''} ${notification.listId ? 'openable' : ''}">
+              <img class="notification-image" src.bind="notification.userImageUri" t="[alt]profilePicture">
+              <div class="notification-content">
+                <div class="name" innerhtml.bind="notification.message"></div>
+                <div class="notification-time">${notification.formattedCreatedDate}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</template>
