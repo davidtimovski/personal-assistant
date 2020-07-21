@@ -1,0 +1,172 @@
+<template>
+  <require from="../static/styles/pages/edit-recipe.scss"></require>
+  <require from="./../resources/elements/tooltip"></require>
+  <require from="./../resources/value-converters/null-format"></require>
+  <require from="./../resources/elements/servings-selector"></require>
+
+  <div class="au-animate animate-fade-in animate-fade-out">
+    <div class="page-title-wrap">
+      <div if.bind="model.id" class="side inactive medium">
+        <i class="fas fa-cog"></i>
+      </div>
+      <div else class="side inactive small">
+        <i class="fas fa-pencil-alt"></i>
+      </div>
+      <div class="page-title">
+        <span if.bind="isNewRecipe" t="editRecipe.newRecipe">New recipe</span>
+        <span else>
+          <span t="editRecipe.edit">Edit</span>&nbsp;<span class="colored-text">${model.name}</span>
+        </span>
+      </div>
+      <a if.bind="isNewRecipe" route-href="route: recipes" class="side back">
+        <i class="fas fa-times"></i>
+      </a>
+      <a else route-href="route: recipe; params.bind: { id: model.id }" class="side back">
+        <i class="fas fa-times"></i>
+      </a>
+    </div>
+
+    <div class="content-wrap">
+
+      <form class="edit-recipe-form">
+
+        <div class="form-control">
+          <input type="text" value.bind="model.name & validate" ref="nameInput" maxlength="50"
+            class.bind="nameIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]editRecipe.recipeName">
+        </div>
+
+        <div class="edit-image-wrap">
+          <img src.bind="model.imageUri" class="image" t="[alt]editRecipe.imageOfMeal">
+          <div class="image-loader ${imageIsUploading ? 'uploading' : ''}">
+            <i class="fas fa-circle-notch fa-spin"></i>
+          </div>
+          <div show.bind="!imageIsUploading" class="edit-image-buttons">
+            <input type="file" id="file-input" accept="image/*" ref="imageInput" change.delegate="uploadImage()">
+            <label for="file-input" t="editRecipe.change">Change</label>
+            <button type="button" show.bind="model.imageUri" t="editRecipe.remove"
+              click.delegate="removeImage()">Remove</button>
+          </div>
+        </div>
+
+        <div class="form-control">
+          <textarea value.bind="model.description" class="small" maxlength="250"
+            t="[placeholder,aria-label]editRecipe.description"></textarea>
+        </div>
+
+        <div class="form-control">
+          <div class="video-url-input-wrap">
+            <input type="text" value.bind="model.videoUrl" change.delegate="videoUrlChanged()"
+              class.bind="videoUrlIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]editRecipe.youTubeUrl">
+            <i class="fab fa-youtube"></i>
+          </div>
+
+          <pre show.bind="videoIFrameSrc.length > 0"
+            class="video-wrap"><iframe ref="videoIFrame" src.bind="videoIFrameSrc" class="video-iframe" allowfullscreen></iframe></pre>
+        </div>
+
+        <div class="form-control">
+          <label class="label ${getIngredientsCount > 0 ? 'dark' : ''}">
+            <span t="editRecipe.ingredients">Ingredients</span>: <span>${getIngredientsCount}</span>
+          </label>
+
+          <tooltip key.bind="ingredientFromTaskTooltipKey"></tooltip>
+
+          <div class="add-ingredient-wrap">
+            <div class="add-input-wrap">
+              <input type="text" value.bind="ingredientName" ref="addIngredientsInput"
+                placeholder="${addIngredientsInputPlaceholder}" aria-label="${addIngredientsInputPlaceholder}"
+                maxlength="50" class.bind="ingredientNameIsInvalid ? 'invalid' : ''">
+              <a click.delegate="addNewIngredient()">
+                <i class="fas fa-plus-circle"></i>
+              </a>
+            </div>
+            <a click.delegate="changeIngredientSuggestionsSource()"
+              class="toggle-from-tasks ${ingredientSuggestionsComeFromTasks ? 'checked' : ''}">
+              <i class="fas fa-list"></i>
+            </a>
+          </div>
+
+          <div show.bind="model.ingredients.length > 0" class="new-ingredients-wrap">
+            <div repeat.for="ingredient of model.ingredients"
+              class="new-ingredient au-animate animate-fade-in ${ingredient.taskId ? 'from-task' : ''}">
+              <div class="ingredient-name-wrap">
+                <input type="text" if.bind="!ingredient.existing && !ingredient.taskId"
+                  value.bind="ingredient.name | nullFormat" keyup.trigger="ingredientChanged(ingredient)" maxlength="50"
+                  class="name-input">
+                <div else class="name-input uneditable">${ingredient.name}</div>
+                <i if.bind="ingredient.taskId" class="fas fa-list"></i>
+              </div>
+              <div class="ingredient-amount-input-wrap">
+                <input type="text" value.bind="ingredient.amount | nullFormat" class="amount-input"
+                  keyup.trigger="ingredientChanged(ingredient)" maxlength="4"
+                  t="[placeholder,aria-label]editRecipe.amount">
+                <div click.delegate="toggleUnit(ingredient)" class="unit-toggle">
+                  <button type="button" show.bind="ingredient.unit" t="editRecipe.${ingredient.unit}"></button>
+                  <i show.bind="!ingredient.unit" class="fas fa-asterisk"></i>
+                </div>
+                <a click.delegate="removeIngredient(ingredient)" class="side">
+                  <i class="fas fa-times-circle"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-control">
+          <textarea value.bind="model.instructions" maxlength="5000"
+            t="[placeholder,aria-label]editRecipe.instructions"></textarea>
+        </div>
+
+        <div class="form-control">
+          <div class="prep-cook-duration-wrap">
+            <div class="duration-side">
+              <label class="label" t="editRecipe.prepDuration">Prep duration</label>
+              <input type="number" value.bind="prepDurationHours" keyup.trigger="prepDurationChanged()" min="0" max="23"
+                class="duration-input hours" t="[aria-label]editRecipe.prepDurationHours">
+              <span t="hoursLetter">h</span>&nbsp;
+              <input type="number" value.bind="prepDurationMinutes" keyup.trigger="prepDurationChanged()" min="0"
+                max="59" class="duration-input minutes" t="[aria-label]editRecipe.prepDurationMinutes">
+              <span t="minutesLetter">m</span>
+            </div>
+            <div class="duration-side">
+              <label class="label" t="editRecipe.cookDuration">Cook duration</label>
+              <input type="number" value.bind="cookDurationHours" keyup.trigger="cookDurationChanged()" min="0" max="23"
+                class="duration-input hours" t="[aria-label]editRecipe.cookDurationHours">
+              <span t="hoursLetter">h</span>&nbsp;
+              <input type="number" value.bind="cookDurationMinutes" keyup.trigger="cookDurationChanged()" min="0"
+                max="59" class="duration-input minutes" t="[aria-label]editRecipe.cookDurationMinutes">
+              <span t="minutesLetter">m</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-control">
+          <label class="label" t="editRecipe.recipeIsFor">This recipe is for</label>
+          <servings-selector if.bind="model.servings" recipe.bind="model" viewing.bind="false"></servings-selector>
+        </div>
+
+      </form>
+
+      <hr>
+
+      <div class="save-delete-wrap">
+        <a if.bind="!confirmationInProgress" click.delegate="save()"
+          class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
+          <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
+            <i class="fas fa-circle-notch fa-spin"></i>
+          </span>
+          <span>${saveButtonText}</span>
+        </a>
+        <a if.bind="!isNewRecipe" click.delegate="delete()"
+          class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${confirmationInProgress ? 'confirm' : ''}">
+          <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
+            <i class="fas fa-circle-notch fa-spin"></i>
+          </span>
+          <span>${deleteButtonText}</span>
+        </a>
+        <button type="button" if.bind="isNewRecipe || confirmationInProgress" click.delegate="cancel()" t="cancel"
+          class="button secondary-button">Cancel</button>
+      </div>
+    </div>
+  </div>
+</template>

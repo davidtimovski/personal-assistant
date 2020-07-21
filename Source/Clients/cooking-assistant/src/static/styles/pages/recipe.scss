@@ -1,0 +1,116 @@
+.recipe-wrap .prep-cook-duration-wrap .duration-label {
+  padding-left: 0;
+  margin-bottom: 0;
+  color: inherit;
+}
+.recipe-wrap .prep-cook-duration-wrap {
+  background: #fafafa;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 15px;
+  margin-bottom: 10px;
+}
+.recipe-wrap .video-wrap {
+  margin-bottom: 10px;
+  font-size: 0;
+}
+
+.nutrition-header {
+  cursor: pointer;
+}
+
+.nutrition-row {
+  margin: 5px 0;
+}
+.nutrition-row-quantity {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 15px;
+  line-height: 28px;
+}
+.nutrition-row-progress-wrap {
+  position: relative;
+  height: 4px;
+  background: #ddd;
+  margin: 0 15px;
+}
+.nutrition-row-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 4px;
+}
+.nutrition-row-progress.good {
+  background: var(--primary-color);
+}
+.nutrition-row-progress.average {
+  background: #f8a042;
+}
+.nutrition-row-progress.bad {
+  background: var(--danger-color);
+}
+.nutrition-row-progress.terrible {
+  background: var(--danger-color-dark);
+}
+
+.recipe-ingredients-table {
+  width: 100%;
+  box-shadow: var(--box-shadow);
+  margin-bottom: 10px;
+}
+.recipe-ingredients-table tr:first-child th {
+  background: var(--primary-color);
+  border-top-left-radius: var(--border-radius);
+  border-top-right-radius: var(--border-radius);
+  padding: 6px 5px;
+  line-height: 26px;
+  color: #fff;
+}
+.recipe-ingredient-name i {
+  margin-right: 5px;
+  color: var(--faded-color);
+}
+.recipe-ingredients-table tbody tr td {
+  padding: 5px 15px;
+  line-height: 28px;
+  transition: color var(--transition-quick);
+}
+.recipe-ingredients-table tbody tr:hover td {
+  color: var(--primary-color-dark);
+}
+.recipe-ingredients-table tbody tr:nth-child(odd) {
+  background: #eee;
+}
+.recipe-ingredients-table tbody tr td:nth-child(even) {
+  text-align: right;
+}
+.recipe-ingredients-table tbody tr.missing td {
+  color: var(--danger-color);
+}
+
+.instructions-wrap {
+  background: #fafafa;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  margin-bottom: 10px;
+}
+
+.cost-wrap {
+  margin-top: 20px;
+  line-height: 30px;
+}
+.cost-content {
+  text-align: right;
+  cursor: pointer;
+}
+.cost {
+  color: var(--primary-color);
+}
+
+.source-message {
+  background: #fafafa;
+  padding: 10px 15px;
+  line-height: 2rem;
+  text-align: center;
+  color: var(--primary-color-dark);
+}

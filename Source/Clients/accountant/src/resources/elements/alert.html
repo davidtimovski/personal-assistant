@@ -1,0 +1,9 @@
+<template show.bind="message" class="alert ${type}">
+  <require from="./alert.scss"></require>
+
+  <span class="alert-body">
+    <span class="alert-message" innerhtml.bind="message"></span>
+    <a ref="refreshLink" click.delegate="refresh()" class="refresh-link" t="refresh">Refresh</a>
+    <a ref="syncLink" click.delegate="totalSync()" class="refresh-link" t="totalSync.totalSync">Total sync</a>
+  </span>
+</template>

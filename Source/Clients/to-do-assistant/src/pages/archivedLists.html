@@ -1,0 +1,35 @@
+<template>
+  <require from="./../resources/elements/empty-list-message.html"></require>
+
+  <div class="au-animate animate-fade-in animate-fade-out">
+    <div class="page-title-wrap">
+      <div class="side inactive small">
+        <i class="fas fa-archive"></i>
+      </div>
+      <div t="archivedLists.archivedLists" class="page-title">Archived lists</div>
+      <a route-href="route: lists" class="side back">
+        <i class="fas fa-times"></i>
+      </a>
+    </div>
+
+    <div class="content-wrap">
+
+      <div if.bind="!archivedLists" class="double-circle-loading">
+        <div class="double-bounce1"></div>
+        <div class="double-bounce2"></div>
+      </div>
+
+      <a repeat.for="list of archivedLists"
+        class="to-do-list ${list.id === getEditedId ? 'highlighted' : ''} ${list.sharingState !== 0 && list.sharingState !== 1 ? 'is-shared' : ''} ${list.sharingState === 1 ? 'will-be-shared' : ''}"
+        route-href="route: list; params.bind: { id: list.id }">
+        <i class="icon ${getClassFromIcon(list.icon)}"></i>
+        <span class="name">${list.name}</span>
+        <i class="fas fa-users shared-icon"></i>
+        <i class="fas fa-user-clock shared-icon"></i>
+      </a>
+
+      <empty-list-message if.bind="archivedLists.length === 0" message.bind="emptyListMessage"></empty-list-message>
+
+    </div>
+  </div>
+</template>

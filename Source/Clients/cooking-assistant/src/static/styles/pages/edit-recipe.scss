@@ -1,0 +1,194 @@
+label.label {
+  display: block;
+  padding-left: 5px;
+  margin-bottom: 10px;
+  color: #888;
+}
+label.label.dark {
+  color: var(--regular-color);
+}
+
+.edit-image-wrap {
+  position: relative;
+  margin-bottom: 10px;
+  font-size: 0;
+}
+.edit-image-wrap .image {
+  width: 100%;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+.edit-image-buttons {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 0;
+}
+.edit-image-wrap input[type="file"] {
+  display: none;
+}
+.edit-image-wrap label {
+  display: inline-block;
+  background: var(--primary-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 0 12px;
+  font-size: 1.2rem;
+  line-height: 2rem;
+  color: #fafafa;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--transition);
+}
+.edit-image-wrap button {
+  background: var(--primary-color);
+  border: none;
+  outline: none;
+  border-radius: var(--border-radius);
+  padding: 0 12px;
+  margin-left: 8px;
+  font-size: 1.2rem;
+  line-height: 2rem;
+  color: #fafafa;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.edit-image-wrap label:hover,
+.edit-image-wrap button:hover {
+  background: var(--primary-color-dark);
+}
+
+.image-loader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: var(--border-radius);
+  opacity: 0;
+
+  transition: opacity var(--transition);
+}
+.image-loader i {
+  font-size: 50px;
+  color: var(--primary-color);
+}
+.image-loader.uploading {
+  opacity: 1;
+}
+
+.video-url-input-wrap {
+  position: relative;
+  margin-bottom: 10px;
+}
+.video-url-input-wrap input {
+  width: calc(100% - 68px);
+  padding-right: 56px;
+  line-height: 45px;
+}
+.video-url-input-wrap .fa-youtube {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 29px;
+  color: var(--faded-color);
+}
+
+.new-ingredients-wrap {
+  margin-top: 10px;
+}
+.new-ingredient {
+  display: flex;
+  justify-content: space-between;
+}
+.new-ingredient:nth-child(n + 2) {
+  margin-top: 5px;
+}
+.new-ingredient .fa-list {
+  display: none;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 27px;
+  color: var(--primary-color);
+}
+.new-ingredient.from-task .fa-list {
+  display: block;
+}
+.new-ingredient .ingredient-name-wrap {
+  position: relative;
+  width: calc(100% - 173px);
+}
+.new-ingredient .name-input {
+  box-shadow: var(--box-shadow);
+  border-radius: var(--border-radius);
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.new-ingredient .name-input.uneditable {
+  background: #eeffee;
+  padding: 8px 12px;
+  line-height: 29px;
+  color: var(--primary-color-dark);
+}
+.new-ingredient.from-task .name-input {
+  padding-right: 50px;
+  width: calc(100% - 62px);
+}
+.new-ingredient .ingredient-amount-input-wrap {
+  display: flex;
+}
+.new-ingredient .amount-input {
+  width: auto;
+  max-width: 95px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.new-ingredient .unit-toggle {
+  text-align: center;
+  color: var(--primary-color);
+}
+.new-ingredient .unit-toggle > button {
+  background: var(--primary-color);
+  border: none;
+  border-radius: var(--border-radius);
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  outline: none;
+  box-shadow: var(--box-shadow);
+  padding: 7px 12px 9px;
+  font-size: 22px;
+  color: #fafafa;
+  cursor: pointer;
+
+  transition: background var(--transition);
+}
+.new-ingredient .unit-toggle > .fa-asterisk {
+  background: var(--primary-color);
+  border-radius: var(--border-radius);
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  box-shadow: var(--box-shadow);
+  padding: 14px 13px 12px;
+  font-size: 15px;
+  line-height: 19px;
+  cursor: pointer;
+  color: #fafafa;
+
+  transition: background var(--transition);
+}
+.new-ingredient .unit-toggle > button:hover,
+.new-ingredient .unit-toggle > .fa-asterisk:hover {
+  background: var(--primary-color-dark);
+}
+
+/* Workaround for sticky :hover on mobile devices */
+.touch-device .new-ingredient .unit-toggle > button:hover,
+.touch-device .new-ingredient .unit-toggle > .fa-asterisk:hover,
+.touch-device .edit-image-wrap label:hover {
+  background: var(--primary-color);
+}

@@ -1,0 +1,101 @@
+﻿@inject Microsoft.ApplicationInsights.AspNetCore.JavaScriptSnippet JavaScriptSnippet
+@{
+    var backgroundClass = string.Empty;
+    switch (ViewData["Title"])
+    {
+        case "To Do Assistant":
+            backgroundClass = "to-do-assistant-bg";
+            break;
+        case "Cooking Assistant":
+            backgroundClass = "cooking-assistant-bg";
+            break;
+        case "Accountant":
+            backgroundClass = "accountant-bg";
+            break;
+    }
+}
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="google-site-verification" content="UWBbtL3i1nhy04-tZJHnxyezrooysuPCMjVtXUtnb5c" />
+    <meta name="description" content="@ViewData["Description"]">
+    <link rel="icon" href="/favicon.png">
+
+    <title>@ViewData["Title"] - Personal Assistant</title>
+
+    <link rel="preconnect" href="https://cdn.personalassistant.site" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Didact+Gothic&display=swap">
+    <environment include="Development">
+        <link rel="stylesheet" href="~/css/reset.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
+    </environment>
+    <environment include="Production">
+        <link rel="preload" href="https://cdn.personalassistant.site/css/style.min.css" as="style" asp-append-version="true">
+        <link rel="stylesheet" href="https://cdn.personalassistant.site/css/style.min.css" asp-append-version="true" />
+    </environment>
+    @Html.Raw(JavaScriptSnippet.FullScript)
+</head>
+<body class="@backgroundClass">
+    <main class="wide-layout">
+        <div class="side large-screen">
+            <div class="cell-wrap">
+                <div class="cell"></div>
+            </div>
+            <div class="cell-wrap">
+                <div class="cell"></div>
+            </div>
+            <div class="cell-wrap">
+                <div class="cell"></div>
+            </div>
+            <div class="cell-wrap">
+                <div class="cell"></div>
+            </div>
+            <div class="cell-wrap">
+                <div class="cell"></div>
+            </div>
+        </div>
+        <div class="middle">
+            <div class="cell-wrap top">
+                <a href="/" class="cell branding-link">
+                    <div class="branding">
+                        <div class="logo">Personal Assistant</div>
+                        <div class="slogan">Apps for organized people</div>
+                    </div>
+                </a>
+            </div>
+            <partial name="_LanguagePartial" />
+            <div id="container">
+                @RenderBody()
+            </div>
+            <div class="cell-wrap bottom">
+                <div class="cell">Copyright © @DateTime.Now.Year Personal Assistant</div>
+            </div>
+        </div>
+        <div class="side large-screen">
+            <div class="cell-wrap">
+                <div class="cell"></div>
+            </div>
+            <div class="cell-wrap">
+                <div class="cell"></div>
+            </div>
+            <div class="cell-wrap">
+                <div class="cell"></div>
+            </div>
+            <div class="cell-wrap">
+                <div class="cell"></div>
+            </div>
+            <div class="cell-wrap">
+                <div class="cell"></div>
+            </div>
+        </div>
+
+        <partial name="_CookieConsentPartial" />
+    </main>
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>

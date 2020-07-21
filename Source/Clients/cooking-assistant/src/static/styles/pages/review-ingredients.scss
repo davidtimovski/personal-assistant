@@ -1,0 +1,111 @@
+.review-image-name-wrap {
+  position: relative;
+}
+.review-recipe-name-wrap {
+  position: absolute;
+  width: 100%;
+  background: rgba(73, 224, 155, 0.85);
+  border-top-left-radius: var(--border-radius);
+  border-top-right-radius: var(--border-radius);
+  padding: 8px 0;
+  line-height: 28px;
+  text-align: center;
+  color: #fff;
+}
+.review-introduction {
+  margin-bottom: 25px;
+  line-height: 30px;
+  text-align: center;
+}
+.review-introduction-button-wrap {
+  text-align: center;
+}
+.review-ingredient-name {
+  text-align: center;
+}
+.review-replacement-arrow {
+  margin: 0 8px;
+  font-size: 28px;
+  vertical-align: text-bottom;
+  color: var(--primary-color);
+}
+.review-revert-icon {
+  padding: 6px 6px 6px 3px;
+  font-size: 14px;
+  vertical-align: super;
+  color: var(--primary-color);
+  transition: color var(--transition);
+}
+.review-revert-icon:hover {
+  color: var(--primary-color-dark);
+}
+.review-search-input {
+  margin-top: 25px;
+}
+.review-suggestion {
+  padding: 9px 6px 0;
+  line-height: 30px;
+}
+.review-suggestion a {
+  text-decoration: underline;
+  color: var(--primary-color);
+  transition: color var(--transition);
+}
+.review-suggestion a:hover {
+  color: var(--primary-color-dark);
+}
+.review-transfer-data {
+  margin-top: 30px;
+}
+.review-pagination {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+}
+.review-pagination-arrow {
+  padding: 5px;
+  font-size: 30px;
+  color: var(--primary-color);
+  cursor: pointer;
+  transition: color var(--transition);
+}
+.review-pagination-arrow:hover {
+  color: var(--primary-color-dark);
+}
+.review-pagination-numbering {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100px;
+  text-align: center;
+  font-size: 22px;
+  line-height: 38px;
+}
+.review-done-button {
+  background: var(--primary-color);
+  border-radius: 23px;
+  box-shadow: var(--box-shadow);
+  padding: 11px 20px;
+  font-size: 1.1rem;
+  color: #fafafa;
+  transition: background var(--transition), width var(--transition);
+}
+.review-done-button:hover {
+  background: var(--primary-color-dark);
+}
+.review-done-button .fa-spin {
+  margin-left: 6px;
+}
+
+
+/* Workaround for sticky :hover on mobile devices */
+.touch-device .review-revert-icon:hover,
+.touch-device .review-suggestion a:hover,
+.touch-device .review-pagination-arrow:hover {
+  color: var(--primary-color);
+}
+.touch-device .review-done-button:hover {
+  background: var(--primary-color);
+}

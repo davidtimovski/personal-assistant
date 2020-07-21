@@ -1,0 +1,9 @@
+<template bindable="recipe, viewing">
+  <a click.delegate="decrementServings()" class="side">
+    <i class="fas fa-minus"></i>
+  </a>
+  <span class="servings">${servingsLabel}</span>
+  <a click.delegate="incrementServings()" class="side">
+    <i class="fas fa-plus"></i>
+  </a>
+</template>

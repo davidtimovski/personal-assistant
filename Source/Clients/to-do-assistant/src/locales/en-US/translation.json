@@ -1,0 +1,191 @@
+{
+  "versionUpdatedTo": "Version updated to {{version}}",
+  "waitingForConnection": "Waiting for connection..",
+  "unexpectedError": "An unexpected error occurred",
+  "refresh": "Refresh",
+  "failedToFetchError": "Please check your internet connection.",
+  "profilePicture": "Profile picture",
+  "name": "Name",
+  "listName": "List name",
+  "email": "Email",
+  "save": "Save",
+  "delete": "Delete",
+  "sure": "Sure?",
+  "cancel": "Cancel",
+  "deleteOnCompletion": "Delete tasks on completion",
+  "weekdays": {
+    "0": "Sunday",
+    "1": "Monday",
+    "2": "Tuesday",
+    "3": "Wednesday",
+    "4": "Thursday",
+    "5": "Friday",
+    "6": "Saturday"
+  },
+  "months": {
+    "0": "January",
+    "1": "February",
+    "2": "March",
+    "3": "April",
+    "4": "May",
+    "5": "June",
+    "6": "July",
+    "7": "August",
+    "8": "September",
+    "9": "October",
+    "10": "November",
+    "11": "December"
+  },
+  "lists": {
+    "addList": "Add list"
+  },
+  "list": {
+    "bulkAddTasks": "Bulk add tasks",
+    "shareList": "Share list",
+    "members": "Members",
+    "copy": "Copy",
+    "uncompleteAllTasks": "Uncomplete all tasks",
+    "archive": "Archive",
+    "add": "Add",
+    "addPrivate": "Add private",
+    "search": "Search",
+    "privateTasks": "Private tasks",
+    "showDone": "Show done",
+    "hideDone": "Hide done",
+    "donePrivateTasks": "Done private tasks",
+    "alreadyExists": "Already exists",
+    "alreadyExistsUncomplete": "Already exists. Do you want to uncomplete it?",
+    "similarTasksExist": "There are a few similar tasks here: {{taskNames}}. Do you still want to add this task?",
+    "archivedList": "This list is archived.<br>Do you want to restore it?",
+    "emptyListMessage": "There's nothing here"
+  },
+  "editList": {
+    "newList": "New list",
+    "settings": "settings",
+    "icon": "Icon",
+    "addTasks": "Add tasks?",
+    "eachRow": "Each row will be a new task",
+    "notifications": "Notifications",
+    "create": "Create",
+    "leave": "Leave",
+    "deleteSuccessful": "List was successfully deleted",
+    "youHaveLeftTheList": "You have left the list"
+  },
+  "shareList": {
+    "share": "Share",
+    "member": "Member",
+    "admin": "Admin",
+    "shareWith": "Share with",
+    "members": "Members",
+    "userDoesntExist": "No user with that email exists.",
+    "cannotShareWithUser": "This user has blocked a share request from you previously. You cannot share with them until they unblock you.",
+    "shareRequestSent": "Share request was successfully sent",
+    "shareRequestsSent": "Share requests were successfully sent",
+    "sharingDetailsSaved": "Sharing details successfully saved"
+  },
+  "copyList": {
+    "copyOf": "Copy of",
+    "createCopy": "Create copy",
+    "copyAsText": "Copy as text",
+    "copySuccessful": "List was successfully copied"
+  },
+  "archiveList": {
+    "archive": "Archive",
+    "archivingAList": "Archiving a list will hide it from your home page and disable notifications for it. It is a way for you to tidy up your home page by hiding lists that you currently aren't using. To open or restore archived lists go to the Menu page and click the \"Archived lists\" button.",
+    "archivingAListShared": "Archiving a list will hide it from your home page and disable notifications for it. This will not affect any of the users that share the list, it is only a way for you to tidy up your home page by hiding lists that you currently aren't using. To open or restore archived lists go to the Menu page and click the \"Archived lists\" button.",
+    "archiveSuccessful": "List was successfully archived"
+  },
+  "uncompleteTasks": {
+    "uncompleteTasksIn": "Uncomplete tasks in",
+    "thisWillUncomplete": "This will uncomplete all tasks in this list.",
+    "thisWillUncompleteShared": "This will uncomplete all public and your own private tasks in this list. The private tasks of users that may be sharing the list will not be affected.",
+    "uncomplete": "Uncomplete",
+    "uncompleteTasksSuccessful": "Tasks were successfully uncompleted"
+  },
+  "bulkAddTasks": {
+    "bulkAddTasks": "Bulk add tasks",
+    "eachRow": "Each row will be a new task",
+    "add": "Add",
+    "tasksWillBePrivate": "Tasks will be private",
+    "addSuccessful": "Tasks were successfully added"
+  },
+  "editTask": {
+    "edit": "Edit",
+    "list": "List",
+    "deleteWhenDone": "Delete when done",
+    "taskIsPrivate": "Task is private",
+    "assignToUser": "Assign to user",
+    "assignedToUser": "Assigned to user",
+    "nobody": "Nobody",
+    "taskUsedAsIngredientInRecipes": "This task is used as an ingredient in the following recipes in <span class=\"cooking-assistant-color\">Cooking Assistant</span>: ",
+    "deletingItWillUnlinkIt": "Deleting it will unlink it from <span class=\"cooking-assistant-color\">Cooking Assistant</span>.",
+    "okayDelete": "Okay, delete",
+    "deleteSuccessful": "Task was successfully deleted"
+  },
+  "notifications": {
+    "notifications": "Notifications",
+    "showSeen": "Show seen",
+    "seen": "Seen",
+    "emptyListMessage": "There are no new notifications"
+  },
+  "shareRequests": {
+    "shareRequests": "Share requests",
+    "by": "by",
+    "blockedUsers": "Blocked users",
+    "emptyListMessage": "There are no new share requests"
+  },
+  "archivedLists": {
+    "archivedLists": "Archived lists",
+    "emptyListMessage": "You haven't archived any lists"
+  },
+  "help": {
+    "help": "Help"
+  },
+  "menu": {
+    "menu": "Menu",
+    "notifications": "Notifications",
+    "shareRequests": "Share requests",
+    "archivedLists": "Archived lists",
+    "preferences": "Preferences",
+    "help": "Help",
+    "goToPersonalAssistant": "Go to Personal Assistant",
+    "logOut": "Log Out",
+    "version": "Version"
+  },
+  "preferences": {
+    "preferences": "Preferences",
+    "notifications": "Notifications",
+    "notificationsPermission": "You must first give notifications permission to the app.",
+    "notificationsWereEnabled": "Notifications were successfully enabled.",
+    "notificationsUnpermitted": "Notifications are currently unpermitted. Please permit Notifications for To Do Assistant in your browser first.",
+    "sounds": "Sounds"
+  },
+  "notFound": {
+    "youSeemLost": "You seem lost..",
+    "takeMeHome": "Take me home"
+  },
+  "tooltips": {
+    "okayUnderstood": "Okay, understood",
+    "tooltipWillNoLongerShow": "This tooltip will no longer show. If you wish to retain it, go to the Menu page and click the \"Help\" button.",
+    "oneTimeTasks": {
+      "title": "Delete tasks on completion",
+      "question": "What is this?",
+      "answer": "When checked, the tasks in this list will by default be deleted when set to done instead of moved below."
+    },
+    "memberVsAdmin": {
+      "title": "List member VS admin",
+      "question": "What is the difference?",
+      "answer": "Members can only change tasks whereas Adminis can change the list itself as well as share it with other users."
+    },
+    "shareRequests": {
+      "title": "Share requests",
+      "question": "What is this?",
+      "answer": "Someone wants to share a list with you. Shared lists are a way for multiple users to collaborate. If you decline a share request the user that made it will not be able to further share any more with you."
+    },
+    "privateTasks": {
+      "title": "Private tasks",
+      "question": "What is this?",
+      "answer": "Private tasks allow you to keep track of personal matters in a shared list. Other users in the shared list cannot see them."
+    }
+  }
+}

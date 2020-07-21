@@ -1,0 +1,64 @@
+.ingredient {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  background: #fafafa;
+  box-shadow: var(--box-shadow);
+  border-radius: var(--border-radius);
+  margin-bottom: 10px;
+  padding: 9px 15px;
+  color: var(--regular-color);
+  line-height: 27px;
+  text-decoration: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  transition: color var(--transition-quick);
+}
+.ingredient:last-child {
+  margin-bottom: 0;
+}
+.ingredient:hover {
+  color: var(--primary-color-dark);
+}
+.ingredient .name {
+  padding-right: 15px;
+}
+.ingredient-icons-container {
+  font-size: 24px;
+  color: var(--faded-color);
+  white-space: nowrap;
+}
+.ingredient-icons-container .fa-link,
+.ingredient-icons-container .fa-tag {
+  font-size: 22px;
+}
+.ingredient-icons-container i {
+  margin-left: 5px;
+}
+.ingredient-icons-container i:first-child {
+  margin-left: 0;
+}
+
+.ingredients-search-wrap {
+  position: relative;
+  margin-bottom: 30px;
+}
+.ingredients-search-wrap input.searching {
+  width: calc(100% - 62px);
+  padding-right: 50px;
+}
+.ingredients-search-wrap .fa-times {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 12px 15px;
+  color: var(--primary-color);
+  cursor: pointer;
+  transition: color var(--transition);
+}
+.ingredients-search-wrap .fa-times:hover {
+  color: var(--primary-color-dark);
+}

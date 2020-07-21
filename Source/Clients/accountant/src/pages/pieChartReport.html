@@ -1,0 +1,83 @@
+<template>
+  <require from="../static/styles/pages/pie-chart-report.scss"></require>
+  <require from="./../resources/value-converters/money-format"></require>
+
+  <div class="au-animate animate-fade-in animate-fade-out">
+    <div class="page-title-wrap">
+      <div class="side inactive medium">
+        <i class="fas fa-chart-pie"></i>
+      </div>
+      <div t="pieChartReport.pieChart" class="page-title">Pie chart</div>
+      <a route-href="route: dashboard" class="side back">
+        <i class="fas fa-times"></i>
+      </a>
+    </div>
+
+    <div class="content-wrap">
+
+      <form>
+        <div class="form-control inline">
+          <label for="from-date" t="transactions.from">From</label>
+          <input type="date" id="from-date" value.bind="fromDate" change.delegate="loadData()">
+        </div>
+        <div class="form-control inline">
+          <label for="to-date" t="transactions.to">To</label>
+          <input type="date" id="to-date" value.bind="toDate" max="${maxDate}" change.delegate="loadData()">
+        </div>
+        <div class="form-control">
+          <div class="double-radio-wrap">
+            <div class="double-radio-side">
+              <label class.bind="type === 1 ? 'selected' : ''">
+                <span t="pieChartReport.expenses">Expenses</span>
+                <input type="radio" name="debtorLenderToggle" model.bind="1" checked.bind="type"
+                  change.delegate="loadData()">
+                <span class="checkbox-icon">
+                  <i class="fas fa-check"></i>
+                </span>
+              </label>
+            </div>
+            <div class="double-radio-side">
+              <label class.bind="type === 2 ? 'selected' : ''">
+                <span t="pieChartReport.deposits">Deposits</span>
+                <input type="radio" name="debtorLenderToggle" model.bind="2" checked.bind="type"
+                  change.delegate="loadData()">
+                <span class="checkbox-icon">
+                  <i class="fas fa-check"></i>
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <div show.bind="!items" class="double-circle-loading">
+        <div class="double-bounce1"></div>
+        <div class="double-bounce2"></div>
+      </div>
+
+      <div class="pie-chart-wrap">
+        <canvas id="chart"></canvas>
+      </div>
+
+      <table if.bind="showTable" class="key-value-table au-animate animate-fade-in animate-fade-out">
+        <tbody>
+          <tr repeat.for="item of items">
+            <td><span class="legend-color" css="background: ${item.color};"></span>${item.category}</td>
+            <td class="amount-cell">${item.amount | moneyFormat:currency}</td>
+          </tr>
+        </tbody>
+        <tfoot if.bind="items.length > 1">
+          <tr>
+            <td colspan="3">
+              <!-- Space taker -->
+            </td>
+          </tr>
+          <tr>
+            <td colspan="3">${sum | moneyFormat:currency}</td>
+          </tr>
+        </tfoot>
+      </table>
+
+    </div>
+  </div>
+</template>

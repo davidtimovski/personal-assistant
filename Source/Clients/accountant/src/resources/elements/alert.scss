@@ -1,0 +1,62 @@
+.alert {
+  position: fixed;
+  bottom: 30px;
+  z-index: 1;
+  width: 100%;
+  text-align: center;
+  font-size: 1rem;
+}
+.alert-body {
+  display: inline-block;
+  border-radius: 6px;
+  box-shadow: var(--box-shadow);
+  padding: 7px 15px;
+  text-align: center;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.alert.error .alert-message {
+  color: var(--danger-color);
+}
+.alert.error .alert-body {
+  background: #fdd;
+}
+.alert.error .side {
+  color: var(--danger-color);
+}
+.alert.error .side:not(.side-loading):hover {
+  color: var(--danger-color-dark);
+}
+.alert.success .alert-message {
+  color: var(--green-color-dark);
+}
+.alert.success .alert-body {
+  background: #dfd;
+}
+.alert .refresh-link {
+  display: none;
+  margin-top: 10px;
+  text-decoration: underline;
+}
+
+/* Workaround for sticky :hover on mobile devices */
+.touch-device .alert .side:not(.side-loading):hover {
+  color: var(--danger-color);
+}
+
+@media screen and (min-width: 1200px) {
+  .alert {
+    top: 30px;
+    bottom: unset;
+    right: 30px;
+    width: unset;
+    font-size: 1.1rem;
+    text-align: right;
+  }
+
+  .alert-body {
+    padding: 10px 15px;
+  }
+}

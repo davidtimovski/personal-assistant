@@ -1,0 +1,232 @@
+@import "../../../../shared/src/static/styles/core.scss";
+@import "../../../../shared/src/static/styles/top-buttons-drawer.scss";
+@import "../../../../shared/src/static/styles/input-date.scss";
+@import "../../../../shared/src/static/styles/currency-selector.scss";
+
+:root {
+  --primary-color: var(--cooking-assistant-color);
+  --primary-color-dark: #08cb6b;
+  --primary-color-light: #dcfffb;
+  --faded-color: #a8d4bf;
+}
+
+.top-buttons-drawer.open .top-buttons-drawer-wrap {
+  max-height: 145px;
+}
+
+textarea.small {
+  height: 75px;
+}
+
+.double-bounce1,
+.double-bounce2 {
+  background-color: #7affcc;
+}
+
+.wide-button .badge {
+  background: linear-gradient(225deg, #00eda6, #7a46f3);
+}
+
+.button.primary-button,
+.save-delete-wrap .primary-button.loading:disabled {
+  background: linear-gradient(225deg, #00eda6, #7a46f3);
+  background-size: 400% 400%;
+}
+.button.primary-button:disabled {
+  color: var(--primary-color);
+}
+
+.add-ingredient-wrap {
+  display: flex;
+  justify-content: space-between;
+}
+.add-ingredient-wrap .toggle-from-tasks {
+  background: #fafafa;
+  border: none;
+  border-radius: var(--border-radius);
+  outline: none;
+  box-shadow: var(--box-shadow);
+  padding: 3px 11px 1px;
+  margin-left: 10px;
+  font-size: 29px;
+  line-height: 40px;
+  text-decoration: none;
+  color: var(--primary-color);
+  cursor: pointer;
+
+  transition: background var(--transition), color var(--transition);
+}
+.add-ingredient-wrap .toggle-from-tasks.checked {
+  background: var(--primary-color);
+  color: #fafafa;
+}
+.add-input-wrap {
+  position: relative;
+  width: 100%;
+}
+.add-input-wrap input {
+  width: calc(100% - 62px);
+  padding-right: 50px;
+  line-height: 45px;
+}
+.add-input-wrap a {
+  position: absolute;
+  top: 1px;
+  right: 0;
+  background: none;
+  border: none;
+  outline: none;
+  padding: 0 12px;
+  font-size: 23px;
+  line-height: 45px;
+  text-decoration: none;
+  color: var(--primary-color);
+  cursor: pointer;
+
+  transition: color var(--transition);
+}
+.add-input-wrap a:hover {
+  color: var(--primary-color-dark);
+}
+
+.video-wrap {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 56.25%;
+}
+.video-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  box-shadow: var(--box-shadow);
+}
+
+.prep-cook-duration-wrap {
+  display: flex;
+  justify-content: space-between;
+}
+.prep-cook-duration-wrap .duration-side {
+  width: 48%;
+}
+.prep-cook-duration-wrap .duration-input {
+  width: 26px;
+  text-align: center;
+}
+
+.recipe-wrap .image,
+.review-introduction-wrap .image {
+  width: 100%;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  margin-bottom: 10px;
+}
+section header {
+  background: var(--primary-color);
+  border-top-left-radius: var(--border-radius);
+  border-top-right-radius: var(--border-radius);
+  padding: 6px 5px;
+  line-height: 26px;
+  text-align: center;
+  color: #fff;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.description {
+  margin-bottom: 30px;
+  line-height: 30px;
+  text-align: center;
+  font-style: italic;
+  color: var(--faded-color);
+}
+
+.instructions {
+  padding: 15px;
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+servings-selector {
+  display: flex;
+  justify-content: space-between;
+  background: #fafafa;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  margin-bottom: 10px;
+}
+.servings {
+  padding: 9px 5px;
+  line-height: 27px;
+  text-align: center;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.autocomplete-customizations {
+  background: #fafafa;
+  border-bottom-left-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+.autocomplete-customizations > div {
+  padding: 5px 10px;
+  cursor: pointer;
+}
+.autocomplete-customizations .group {
+  background: var(--primary-color);
+  color: #fafafa;
+}
+.autocomplete-customizations .selected {
+  background: #e1e1e1;
+}
+
+.small-button {
+  background: linear-gradient(225deg, #00eda6, #7a46f3);
+  background-size: 400% 400%;
+  border: none;
+  border-radius: var(--border-radius);
+  outline: none;
+  box-shadow: var(--box-shadow);
+  padding: 0 20px;
+  font-size: 1rem;
+  line-height: 2rem;
+  color: #fafafa;
+  cursor: pointer;
+
+  animation: AnimateGradiant 8s ease infinite;
+}
+
+.intake-header {
+  position: relative;
+  background: var(--primary-color);
+  border-top-left-radius: var(--border-radius);
+  border-top-right-radius: var(--border-radius);
+  padding: 6px 5px;
+  line-height: 26px;
+  text-align: center;
+  color: #fff;
+}
+.unit-input-addon {
+  background: #ddd;
+  border-radius: var(--border-radius);
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  box-shadow: var(--box-shadow);
+  padding: 6px 12px 7px;
+  font-size: 20px;
+  line-height: 23px;
+}
+
+@media screen and (max-width: 600px) {
+  .unit-input-addon {
+    font-size: 18px;
+  }
+}
+
+@import "./desktop.scss";

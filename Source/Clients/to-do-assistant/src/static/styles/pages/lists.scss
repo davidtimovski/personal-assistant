@@ -1,0 +1,89 @@
+.to-do-lists-wrap {
+  margin-bottom: 30px;
+}
+.to-do-lists-wrap.reordering .icon {
+  display: none;
+}
+.to-do-list-placeholder {
+  background: #eee;
+  border-radius: var(--border-radius);
+  padding: 9px 10px;
+  margin: 15px 0;
+  line-height: 27px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.to-do-list-placeholder:first-child {
+  margin-top: 0;
+}
+.to-do-list-placeholder:last-child {
+  margin-bottom: 0;
+}
+.to-do-list-placeholder:nth-child(2) {
+  opacity: 0.85;
+}
+.to-do-list-placeholder:nth-child(3) {
+  opacity: 0.65;
+}
+.to-do-list-placeholder:nth-child(4) {
+  opacity: 0.55;
+}
+.to-do-list-placeholder:nth-child(5) {
+  opacity: 0.35;
+}
+
+.to-do-list {
+  position: relative;
+  display: flex;
+  justify-content: flex-start;
+  border-radius: var(--border-radius);
+  margin: 12px 0;
+  color: var(--regular-color);
+  text-decoration: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.to-do-list:first-child {
+  margin-top: 0;
+}
+.to-do-list:last-child {
+  margin-bottom: 0;
+}
+.to-do-list:hover {
+  background: #e1f2ff;
+}
+.to-do-list .icon {
+  width: 45px;
+  min-width: 45px;
+  height: 45px;
+  line-height: 45px;
+  text-align: center;
+  font-size: 23px;
+  color: var(--faded-color);
+}
+.to-do-list .shared-icon {
+  display: none;
+  position: absolute;
+  top: 11px;
+  right: 10px;
+  font-size: 24px;
+  color: var(--faded-color);
+}
+.to-do-list.is-shared,
+.to-do-list.will-be-shared {
+  padding-right: 50px;
+}
+.to-do-list.is-shared .fa-users {
+  display: inline;
+}
+.to-do-list.will-be-shared .fa-user-clock {
+  display: inline;
+}
+.to-do-list .name {
+  padding: 8px 10px;
+  line-height: 27px;
+}

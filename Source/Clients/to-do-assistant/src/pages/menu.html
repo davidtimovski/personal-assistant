@@ -1,0 +1,57 @@
+<template>
+  <div class="au-animate animate-fade-in animate-fade-out">
+    <div class="page-title-wrap">
+      <div class="side inactive">
+        <i class="fas fa-bars"></i>
+      </div>
+      <div t="menu.menu" class="page-title">Menu</div>
+      <a route-href="route: lists" class="side back">
+        <i class="fas fa-times"></i>
+      </a>
+    </div>
+
+    <div class="content-wrap">
+
+      <div class="horizontal-buttons-wrap">
+        <a route-href="route: notifications" class="wide-button with-badge">
+          <span t="menu.notifications">Notifications</span>
+          <span if.bind="unseenNotifications > 0" class="badge">${unseenNotifications}</span>
+        </a>
+
+        <a route-href="route: shareRequests" class="wide-button with-badge">
+          <span t="menu.shareRequests">Share requests</span>
+          <span if.bind="pendingShareRequestCount > 0" class="badge">${pendingShareRequestCount}</span>
+        </a>
+
+        <a route-href="route: archivedLists" class="wide-button" t="menu.archivedLists">Archived lists</a>
+
+        <a click.delegate="goToPreferences()" class="wide-button with-badge">
+          <span class="button-loader ${preferencesButtonIsLoading ? 'loading' : ''}">
+            <i class="fas fa-circle-notch fa-spin"></i>
+          </span>
+          <span t="menu.preferences">Preferences</span>
+        </a>
+
+        <a click.delegate="goToHelp()" class="wide-button with-badge">
+          <span class="button-loader ${helpButtonIsLoading ? 'loading' : ''}">
+            <i class="fas fa-circle-notch fa-spin"></i>
+          </span>
+          <span t="menu.help">Help</span>
+        </a>
+      </div>
+
+      <hr>
+
+      <div class="horizontal-buttons-wrap">
+        <a href.bind="personalAssistantUrl" class="wide-button" t="menu.goToPersonalAssistant">Go to Personal
+          Assistant</a>
+        <a click.delegate="logOut()" class="wide-button" t="menu.logOut">Log Out</a>
+      </div>
+
+      <hr>
+
+      <div class="version"><span t="menu.version">Version</span> ${version}</div>
+
+    </div>
+  </div>
+</template>

@@ -1,0 +1,315 @@
+@import "../../../../shared/src/static/styles/core.scss";
+@import "../../../../shared/src/static/styles/input-date.scss";
+@import "../../../../shared/src/static/styles/currency-selector.scss";
+
+:root {
+  --primary-color: var(--accountant-color);
+  --primary-color-dark: #4946ec;
+  --primary-color-light: #eae8ff;
+  --faded-color: #b098c5;
+  --deposit-color: #65c565;
+  --expense-color: #f55551;
+  --transfer-color: #6597f5;
+}
+
+.double-bounce1,
+.double-bounce2 {
+  background-color: #bb8aff;
+}
+
+.button.primary-button,
+.save-delete-wrap .primary-button.loading:disabled {
+  background: linear-gradient(225deg, #7a46f3, #00a6ed);
+  background-size: 400% 400%;
+}
+.button.primary-button:disabled {
+  color: var(--primary-color);
+}
+
+.side.disabled,
+.new-button.disabled {
+  cursor: default;
+  color: var(--faded-color);
+}
+
+.key-value-table-title {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+  margin: 35px 0 10px;
+  color: var(--primary-color);
+}
+a.key-value-table-title {
+  display: block;
+  text-decoration: none;
+}
+.key-value-table {
+  width: 100%;
+  font-size: 1rem;
+}
+.key-value-table td {
+  padding: 5px 15px 5px 0;
+  line-height: 1.2rem;
+}
+.key-value-table td:last-child {
+  padding-right: 0;
+  text-align: right;
+}
+.key-value-table .amount-cell {
+  white-space: nowrap;
+}
+.key-value-table tfoot tr:last-child td {
+  border-top: 1px solid #ddd;
+  padding: 5px 0;
+  font-size: 1.1rem;
+}
+
+.form-control.inline {
+  display: flex;
+  justify-content: space-between;
+}
+.form-control.inline label {
+  padding-right: 25px;
+}
+.form-control.inline span:nth-child(2) {
+  text-align: right;
+}
+
+form label:not(.toggle) {
+  display: block;
+}
+form.viewing label {
+  width: auto;
+}
+form input[type="text"],
+form input[type="number"],
+form select,
+form input[type="date"] {
+  line-height: 37px;
+}
+form .amount-input {
+  width: 80px;
+  text-align: center;
+}
+form .category-select {
+  width: 210px;
+  background-position: right 15px top 17px;
+}
+form input[type="date"] {
+  width: 140px;
+  text-align: center;
+}
+form .description-textarea {
+  height: 80px;
+  max-height: 200px;
+}
+
+.loadable-select {
+  position: relative;
+}
+.loadable-select select {
+  transition: opacity var(--transition);
+}
+.loadable-select i {
+  position: absolute;
+  top: 9px;
+  left: 10px;
+  font-size: 1.3rem;
+  color: var(--primary-color);
+}
+.loadable-select.loaded i {
+  display: none;
+}
+
+.content-body {
+  margin-bottom: 30px;
+}
+
+.editable-table {
+  width: 100%;
+  margin-top: 20px;
+}
+.editable-table tbody tr:nth-child(odd),
+.editable-table tbody tr:hover {
+  background: #f1f1f1;
+}
+.editable-table th {
+  padding: 10px 5px;
+  line-height: 24px;
+  font-size: 1rem;
+  color: var(--primary-color-dark);
+}
+.editable-table td {
+  padding: 5px;
+  line-height: 24px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 0.9rem;
+}
+.editable-table .date-cell {
+  white-space: nowrap;
+}
+.editable-table .edit-link-cell {
+  padding: 0 8px 0 0;
+  text-align: left;
+}
+.editable-table .type-cell {
+  padding: 5px;
+  font-size: 1.3rem;
+}
+.deposit-color {
+  color: var(--deposit-color);
+}
+.expense-color {
+  color: var(--expense-color);
+}
+.transfer-color {
+  color: var(--transfer-color);
+}
+.editable-table .link {
+  display: block;
+  padding: 5px;
+  font-size: 1.3rem;
+  color: var(--primary-color);
+  transition: color var(--transition-quick);
+}
+.editable-table .link:hover {
+  color: var(--primary-color-dark);
+}
+.editable-table tfoot td {
+  border-top: 1px solid #ddd;
+  padding: 5px;
+  text-align: right;
+}
+.editable-table .no-data-column {
+  padding: 20px 5px;
+  font-size: 1.1rem;
+  text-align: center;
+  color: var(--faded-color);
+}
+
+th.sync-icon-cell,
+td.sync-icon-cell {
+  padding: 0;
+  font-size: 1.2rem;
+  color: var(--faded-color);
+}
+.sync-icon-cell i {
+  margin: 0 5px;
+}
+
+.editable-table .link.debt-icon {
+  font-size: 1.4rem;
+}
+.debt-icon .debtor {
+  color: var(--expense-color);
+}
+.debt-icon .lender {
+  color: var(--deposit-color);
+}
+
+.encryption-wrap {
+  margin-top: 5px;
+}
+.encryption-wrap.visible {
+  background: #f1f1f1;
+  border-radius: var(--border-radius);
+  box-shadow: inset var(--box-shadow);
+  padding: 10px 12px;
+  transition: padding var(--transition);
+}
+.viewable-password {
+  position: relative;
+}
+.viewable-password input {
+  width: calc(100% - 64px);
+  padding-right: 52px;
+}
+.password-show-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0 12px;
+  font-size: 1.2rem;
+  line-height: 37px;
+  text-decoration: none;
+  color: var(--faded-color);
+  cursor: pointer;
+}
+.password-show-button i:nth-child(2) {
+  display: none;
+}
+.password-show-button.shown i:nth-child(2) {
+  display: inline-block;
+}
+.password-show-button.shown i:first-child {
+  display: none;
+}
+.decrypt-form {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+}
+.decrypt-form .viewable-password {
+  width: 100%;
+}
+.inline-decrypt-form {
+  display: flex;
+}
+.inline-decrypt-form .viewable-password {
+  width: 100%;
+}
+.decrypt-button {
+  background: var(--green-color);
+  border: none;
+  border-radius: var(--border-radius);
+  outline: none;
+  box-shadow: var(--box-shadow);
+  padding: 0 12px;
+  margin-left: 10px;
+  font-size: 1.2rem;
+  line-height: 37px;
+  text-decoration: none;
+  color: #fff;
+  cursor: pointer;
+}
+.decrypt-button i:nth-child(2) {
+  display: none;
+}
+.decrypt-button.loading i:nth-child(2) {
+  display: inline-block;
+}
+.decrypt-button.loading i:first-child {
+  display: none;
+}
+.erase-button {
+  background: var(--warning-color-dark);
+  border: none;
+  border-radius: var(--border-radius);
+  outline: none;
+  box-shadow: var(--box-shadow);
+  padding: 0 10px;
+  margin-left: 10px;
+  font-size: 1.3rem;
+  line-height: 37px;
+  text-decoration: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.highlighted-row {
+  animation: highlightRow ease-in 2.5s;
+}
+@keyframes highlightRow {
+  0% {
+    background: #e0c8f5;
+  }
+}
+
+@import "./desktop.scss";

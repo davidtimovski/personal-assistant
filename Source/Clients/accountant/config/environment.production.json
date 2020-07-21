@@ -1,0 +1,10 @@
+{
+  "debug": false,
+  "testing": false,
+  "urls": {
+    "authority": "https://personalassistant.site",
+    "host": "https://accountant.personalassistant.site",
+    "api": "https://api.personalassistant.site"
+  },
+  "defaultProfileImageUri": "https://res.cloudinary.com/personalassistant/t_profile_thumbnail/production/defaults/sfmqac.jpg"
+}

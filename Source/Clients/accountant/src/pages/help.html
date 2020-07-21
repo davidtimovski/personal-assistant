@@ -1,0 +1,35 @@
+<template>
+  <div class="au-animate animate-fade-in animate-fade-out">
+    <div class="page-title-wrap">
+      <div class="side inactive">
+        <i class="fas fa-info-circle"></i>
+      </div>
+      <div t="help.help" class="page-title">Help</div>
+      <a route-href="route: dashboard" class="side back">
+        <i class="fas fa-times"></i>
+      </a>
+    </div>
+
+    <div class="content-wrap">
+
+      <div class="share-requests-wrap">
+        <div repeat.for="tooltip of tooltips" class="tooltip-item">
+          <div class="tooltip-header">
+            <a show.bind="!tooltip.isDismissed" click.delegate="dismiss(tooltip)" class="side">
+              <i class="fas fa-eye"></i>
+            </a>
+            <a show.bind="tooltip.isDismissed" click.delegate="retain(tooltip)" class="side">
+              <i class="fas fa-eye-slash"></i>
+            </a>
+            <span class="tooltip-title">${tooltip.title}</span>
+            <a class="side hidden">
+              <i class="fas fa-eye"></i>
+            </a>
+          </div>
+          <hr>
+          <div class="tooltip-answer">${tooltip.answer}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

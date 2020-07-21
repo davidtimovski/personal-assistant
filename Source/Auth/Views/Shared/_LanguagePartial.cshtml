@@ -1,0 +1,34 @@
+﻿@inject IViewLocalizer Localizer
+@{
+    bool showPrompt = Context.Request.Cookies["LanguagePrompt"] == null;
+    var returnUrl = Context.Request.Path;
+}
+
+@if (showPrompt)
+{
+    <div id="language-prompt" class="cell-wrap top">
+        <div class="cell language-prompt-content">
+            <form asp-controller="home" asp-action="change-language" asp-route-returnurl="@returnUrl" method="post" role="form">
+                <div class="available-language-label">@Localizer["AvailableIn"]</div>
+                <div>
+                    <button type="submit">@Localizer["SwitchTo"]</button>
+                    &nbsp;&nbsp;
+                    <a href="javascript:;" id="decline-language-change">@Localizer["NoThanks"]</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        (function () {
+            let button = document.querySelector('#decline-language-change');
+            button.addEventListener('click', () => {
+                const expiryDate = new Date();
+                expiryDate.setFullYear(expiryDate.getFullYear() + 3);
+
+                document.cookie = `LanguagePrompt=false; expires=${expiryDate.toUTCString()}; path=/`;
+                const languagePromptDiv = document.querySelector('#language-prompt');
+                languagePromptDiv.style.display = 'none';
+            }, false);
+        })();
+    </script>
+}
