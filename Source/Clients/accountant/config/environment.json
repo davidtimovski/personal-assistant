@@ -6,5 +6,5 @@
     "host": "http://localhost:8082",
     "api": "http://localhost:5001"
   },
-  "defaultProfileImageUri": "https://res.cloudinary.com/personalassistant/t_profile_thumbnail/development/defaults/sfmqac.jpg"
+  "defaultProfileImageUri": "https://res.cloudinary.com/personalassistant/t_profile_thumbnail/production/defaults/sfmqac.jpg"
 }
