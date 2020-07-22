@@ -487,7 +487,7 @@ export class EditRecipe {
   }
 
   async delete() {
-    if (!this.deleteButtonIsLoading) {
+    if (this.deleteButtonIsLoading) {
       return;
     }
 
