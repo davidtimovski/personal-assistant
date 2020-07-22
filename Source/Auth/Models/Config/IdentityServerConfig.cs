@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using IdentityServer4;
 using IdentityServer4.Models;
 using Microsoft.Extensions.Configuration;
@@ -18,6 +19,15 @@ namespace Auth.Models.Config
             new List<ApiResource>
             {
                 new ApiResource("personal-assistant-api", "Personal Assistant")
+                {
+                    Scopes = { ApiScopes.First().Name }
+                }
+            };
+
+        public static IEnumerable<ApiScope> ApiScopes =>
+            new List<ApiScope>
+            {
+                new ApiScope("personal-assistant-api")
             };
 
         public static IEnumerable<Client> GetClients(IConfiguration config)
