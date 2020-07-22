@@ -54,10 +54,11 @@ export class App {
     }
 
     this.authService.login();
-    this.localStorage.initialize();
 
     this.eventAggregator.subscribeOnce("authenticated", () => {
-      this.currenciesService.loadRates();
+      this.currenciesService.loadRates().then(() => {
+        this.localStorage.initialize();
+      });
 
       Actions.getRecipes(this.recipesService).then(() => {
         this.eventAggregator.publish("get-recipes-finished");
