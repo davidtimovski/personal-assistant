@@ -406,6 +406,13 @@ export class EditRecipe {
     }
   }
 
+  @computedFrom("model.imageUri")
+  get imageIsNotDefault(): boolean {
+    return (
+      this.model.imageUri !== JSON.parse(<any>environment).defaultRecipeImageUri
+    );
+  }
+
   async uploadImage() {
     this.imageIsUploading = true;
     try {

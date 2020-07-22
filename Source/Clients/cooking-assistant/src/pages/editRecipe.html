@@ -43,7 +43,7 @@
           <div show.bind="!imageIsUploading" class="edit-image-buttons">
             <input type="file" id="file-input" accept="image/*" ref="imageInput" change.delegate="uploadImage()">
             <label for="file-input" t="editRecipe.change">Change</label>
-            <button type="button" show.bind="model.imageUri" t="editRecipe.remove"
+            <button type="button" show.bind="imageIsNotDefault" t="editRecipe.remove"
               click.delegate="removeImage()">Remove</button>
           </div>
         </div>
