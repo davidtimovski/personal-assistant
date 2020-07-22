@@ -41,7 +41,7 @@ namespace Api.Controllers.Common
         }
 
         [HttpGet("key/{key}")]
-        public async Task<IActionResult> GetByKey([FromQuery] string key)
+        public async Task<IActionResult> GetByKey(string key)
         {
             int userId;
             try
