@@ -309,6 +309,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
                 newShares.Add(new Share
                 {
+                    ListId = model.ListId,
                     UserId = newShare.UserId,
                     IsAdmin = newShare.IsAdmin,
                     CreatedDate = now,
@@ -321,6 +322,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             {
                 editedShares.Add(new Share
                 {
+                    ListId = model.ListId,
                     UserId = editedShare.UserId,
                     IsAdmin = editedShare.IsAdmin,
                     ModifiedDate = now
@@ -332,6 +334,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             {
                 removedShares.Add(new Share
                 {
+                    ListId = model.ListId,
                     UserId = removedShare.UserId,
                     IsAdmin = removedShare.IsAdmin
                 });
