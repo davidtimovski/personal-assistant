@@ -87,8 +87,8 @@
                 <tooltip key.bind="encryptedDescriptionTooltipKey"></tooltip>
                 <div class="viewable-password">
                   <input type="password" value.bind="model.encryptionPassword & validate" ref="encPasswordInput"
-                    maxlength="100" class.bind="encryptionPasswordIsInvalid ? 'invalid' : ''"
-                    t="[placeholder,aria-label]password">
+                    disabled.bind="!model.encrypt" maxlength="100"
+                    class.bind="encryptionPasswordIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]password">
                   <a click.delegate="toggleEncPasswordShow()"
                     class="password-show-button ${encPasswordShown ? 'shown' : ''}">
                     <i class="fas fa-eye"></i>

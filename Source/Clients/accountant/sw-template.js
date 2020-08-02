@@ -1,4 +1,4 @@
-const CACHE_NAME = "1.10.11";
+const CACHE_NAME = "1.10.12";
 const notificationIconSrc = "/images/icons/app-icon-96x96.png";
 const defaultProfileImageUri =
   "https://res.cloudinary.com/personalassistant/t_profile_thumbnail/production/defaults/sfmqac.jpg";
