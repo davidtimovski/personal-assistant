@@ -231,10 +231,11 @@ export class NewTransaction {
             "newTransaction.debtSettlingSuccessful"
           );
         } else {
-          this.eventAggregator.publish(
-            "alert-success",
-            "newTransaction.submitSuccessful"
-          );
+          const messageKey = this.isExpense
+            ? "newTransaction.expenseSubmitted"
+            : "newTransaction.depositSubmitted";
+
+          this.eventAggregator.publish("alert-success", messageKey);
         }
         this.router.navigateToRoute("dashboard");
       } catch {

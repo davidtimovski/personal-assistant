@@ -61,7 +61,8 @@
     "dateIsRequired": "The Date is required",
     "passwordIsRequired": "The Password is required for encryption",
     "debtSettlingSuccessful": "Debt was successfully settled",
-    "submitSuccessful": "Transaction was successfully submitted"
+    "expenseSubmitted": "Expense was successfully submitted",
+    "depositSubmitted": "Deposit was successfully submitted"
   },
   "transaction": {
     "transaction": "Transaction",

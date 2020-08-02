@@ -61,7 +61,8 @@
     "dateIsRequired": "Датумот е задолжителен",
     "passwordIsRequired": "Лозинката е задолжителна за шифрирање",
     "debtSettlingSuccessful": "Долгот беше успешно расчистен",
-    "submitSuccessful": "Трансакцијата беше успешно поднесена"
+    "expenseSubmitted": "Трошокот беше успешно поднесен",
+    "depositSubmitted": "Депозитот беше успешно поднесен"
   },
   "transaction": {
     "transaction": "Трансакција",
