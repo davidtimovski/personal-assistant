@@ -26,7 +26,7 @@
             cloud.</span>
         </section>
 
-        <form submit.trigger="save()">
+        <form submit.trigger="save()" autocomplete="off">
           <div class="form-control inline">
             <label for="amount" t="amount">Amount</label>
             <compose view-model="../resources/components/amount-input" view="../resources/components/amount-input.html"
@@ -47,7 +47,7 @@
             <input type="date" id="date" value.bind="model.date & validate" max="${maxDate}"
               class.bind="dateIsInvalid ? 'invalid' : ''" required>
           </div>
-          <form if.bind="model.isEncrypted" submit.trigger="decrypt()" class="inline-decrypt-form">
+          <div if.bind="model.isEncrypted" autocomplete="off" class="inline-decrypt-form">
             <div class="viewable-password">
               <input type="password" value.bind="model.decryptionPassword" ref="decPasswordInput" maxlength="100"
                 class.bind="decryptionPasswordIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]password">
@@ -64,7 +64,7 @@
             <a click.delegate="erase()" class="erase-button">
               <i class="fas fa-eraser"></i>
             </a>
-          </form>
+          </div>
           <div else class="form-control">
             <div class="encryption-wrap ${model.encrypt ? 'visible' : ''}">
               <textarea value.bind="model.description" maxlength="250" class="description-textarea"

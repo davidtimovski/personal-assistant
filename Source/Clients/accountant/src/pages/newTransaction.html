@@ -32,7 +32,7 @@
           <span else><span t="newTransaction.settleDebtFrom">Settle debt from</span> ${debtPerson}.</span>
         </section>
 
-        <form submit.trigger="submit()">
+        <form submit.trigger="submit()" autocomplete="off">
           <div class="form-control inline">
             <label for="amount" t="amount">Amount</label>
             <compose view-model="../resources/components/amount-input" view="../resources/components/amount-input.html"
