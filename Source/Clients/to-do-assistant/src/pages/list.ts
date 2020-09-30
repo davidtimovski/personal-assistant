@@ -344,6 +344,10 @@ export class List {
   }
 
   async complete(task: Task) {
+    if (task.rightSideIsLoading) {
+      return;
+    }
+
     if (this.soundsEnabled) {
       this.bleep.play();
     }
@@ -393,6 +397,10 @@ export class List {
   }
 
   async uncomplete(task: Task) {
+    if (task.rightSideIsLoading) {
+      return;
+    }
+
     if (this.soundsEnabled) {
       this.blop.play();
     }
