@@ -136,16 +136,6 @@ export class BarChartReport {
           fromDate.setMonth(fromDate.getMonth() + 1);
         }
 
-        items = items.sort((a: AmountByMonth, b: AmountByMonth) => {
-          if (a.date < b.date) {
-            return -1;
-          }
-          if (a.date > b.date) {
-            return 1;
-          }
-          return 0;
-        });
-
         const labels = new Array<string>();
         const amounts = new Array<number>();
         for (let i = 0; i < items.length; i++) {
