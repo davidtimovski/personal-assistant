@@ -28,7 +28,7 @@
           <label for="category" t="category">Category</label>
           <div class="loadable-select ${categoryOptions ? 'loaded' : ''}">
             <select id="category" value.bind="filters.categoryId" change.delegate="filterChanged()"
-              disabled.bind="!categoryOptions" class="category-select" t="[aria-label]category">
+              disabled.bind="!categoryOptions" class="category-select">
               <option model.bind="category.id" repeat.for="category of categoryOptions">${category.name}</option>
             </select>
             <i class="fas fa-circle-notch fa-spin"></i>
@@ -38,7 +38,7 @@
           <label for="account" t="account">Account</label>
           <div class="loadable-select ${accountOptions ? 'loaded' : ''}">
             <select id="account" value.bind="filters.accountId" change.delegate="filterChanged()"
-              disabled.bind="!accountOptions" class="category-select" t="[aria-label]account">
+              disabled.bind="!accountOptions" class="category-select">
               <option model.bind="account.id" repeat.for="account of accountOptions">${account.name}</option>
             </select>
             <i class="fas fa-circle-notch fa-spin"></i>

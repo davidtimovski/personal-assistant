@@ -37,8 +37,7 @@
           </div>
           <div class="form-control inline">
             <label for="account" t="account">Account</label>
-            <select id="account" value.bind="model.accountId" change.delegate="accountChanged()" class="category-select"
-              t="[aria-label]account">
+            <select id="account" value.bind="model.accountId" change.delegate="accountChanged()" class="category-select">
               <option model.bind="account.id" repeat.for="account of accountOptions">${account.name}</option>
             </select>
           </div>

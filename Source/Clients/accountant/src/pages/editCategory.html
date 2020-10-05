@@ -37,8 +37,7 @@
           </div>
           <div class="form-control inline">
             <label for="type" t="editCategory.type">Type</label>
-            <select id="type" value.bind="category.type" change.delegate="typeChanged()" class="category-select"
-              t="[aria-label]editCategory.type">
+            <select id="type" value.bind="category.type" change.delegate="typeChanged()" class="category-select">
               <option model.bind="type.id" repeat.for="type of typeOptions">${type.name}</option>
             </select>
           </div>

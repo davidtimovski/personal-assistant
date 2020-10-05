@@ -41,8 +41,7 @@
           <div class="form-control inline">
             <label for="category" t="category">Category</label>
             <div class="loadable-select ${categoryOptions ? 'loaded' : ''}">
-              <select id="category" value.bind="model.categoryId" disabled.bind="model.generated || !categoryOptions"
-                t="[aria-label]category" class="category-select">
+              <select id="category" value.bind="model.categoryId" disabled.bind="model.generated || !categoryOptions" class="category-select">
                 <option model.bind="category.id" repeat.for="category of categoryOptions">${category.name}</option>
               </select>
               <i class="fas fa-circle-notch fa-spin"></i>
