@@ -71,6 +71,25 @@ export class TransactionsService extends HttpProxyBase {
     return transactions;
   }
 
+  async getExpensesAndDepositsFromDate(
+    fromDate: string,
+    accountId: number,
+    type: TransactionType,
+    currency: string
+  ): Promise<Array<TransactionModel>> {
+    const transactions = await this.idbHelper.getExpensesAndDepositsFromDate(
+      fromDate,
+      accountId,
+      type
+    );
+
+    transactions.forEach((x: TransactionModel) => {
+      x.amount = this.currenciesService.convert(x.amount, x.currency, currency);
+    });
+
+    return transactions;
+  }
+
   async getExpendituresFrom(
     mainAccountId: number,
     fromDate: Date,

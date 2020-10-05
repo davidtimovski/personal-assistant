@@ -197,6 +197,43 @@ td.sync-icon-cell {
   margin: 0 5px;
 }
 
+.multi-radio-wrap {
+  display: flex;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+.multi-radio-part {
+  flex-grow: 1;
+}
+.multi-radio-wrap input[type="radio"] {
+  display: none;
+}
+.multi-radio-part label {
+  display: block;
+  position: relative;
+  background: #fafafa;
+  padding: 0;
+  text-align: center;
+  font-size: inherit;
+  line-height: 37px;
+  cursor: pointer;
+
+  transition: background var(--transition), color var(--transition);
+}
+.multi-radio-wrap label.selected {
+  background: var(--primary-color);
+  box-shadow: inset var(--box-shadow);
+  color: #fafafa;
+}
+.multi-radio-part:first-child label {
+  border-top-left-radius: var(--border-radius);
+  border-bottom-left-radius: var(--border-radius);
+}
+.multi-radio-part:last-child label {
+  border-top-right-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
+}
+
 .editable-table .link.debt-icon {
   font-size: 1.4rem;
 }

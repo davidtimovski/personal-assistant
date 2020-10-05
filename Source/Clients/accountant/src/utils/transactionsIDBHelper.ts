@@ -109,6 +109,22 @@ export class TransactionsIDBHelper {
     return transactions;
   }
 
+  async getExpensesAndDepositsFromDate(
+    fromDate: string,
+    accountId: number,
+    type: TransactionType
+  ): Promise<Array<TransactionModel>> {
+    const transactions = await this.db.transactions
+      .orderBy("date")
+      .reverse()
+      .filter((t: TransactionModel): boolean =>
+        this.checkAgainstFilters3(t, fromDate, accountId, type)
+      )
+      .toArray();
+
+    return transactions;
+  }
+
   private checkAgainstFilters(
     t: TransactionModel,
     fromDate: string,
@@ -188,6 +204,42 @@ export class TransactionsIDBHelper {
       (!fromDate || new Date(t.date) >= new Date(fromDate)) &&
       (!toDate || new Date(t.date) <= new Date(toDate));
     if (!withinDates) {
+      return false;
+    }
+
+    let inAccount =
+      t.fromAccountId === accountId || t.toAccountId === accountId;
+
+    return inAccount;
+  }
+
+  /**
+   * Finds whether a transaction fits the filters. Ignores Transfer transaction types.
+   * @param t The transaction
+   * @param fromDate
+   * @param accountId
+   * @param type
+   * @returns true if a transaction fits the filters
+   */
+  private checkAgainstFilters3(
+    t: TransactionModel,
+    fromDate: string,
+    accountId: number,
+    type: TransactionType
+  ): boolean {
+    let inType =
+      (type === TransactionType.Any &&
+        !(!!t.fromAccountId && !!t.toAccountId)) || // Ignore Transfers if type is Any
+      (type === TransactionType.Expense &&
+        !!t.fromAccountId &&
+        !t.toAccountId) ||
+      (type === TransactionType.Deposit && !t.fromAccountId && !!t.toAccountId);
+    if (!inType) {
+      return false;
+    }
+
+    const afterDate = new Date(t.date) >= new Date(fromDate);
+    if (!afterDate) {
       return false;
     }
 

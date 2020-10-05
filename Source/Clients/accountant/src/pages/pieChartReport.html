@@ -17,11 +17,11 @@
 
       <form>
         <div class="form-control inline">
-          <label for="from-date" t="transactions.from">From</label>
+          <label for="from-date" t="pieChartReport.from">From</label>
           <input type="date" id="from-date" value.bind="fromDate" change.delegate="loadData()">
         </div>
         <div class="form-control inline">
-          <label for="to-date" t="transactions.to">To</label>
+          <label for="to-date" t="pieChartReport.to">To</label>
           <input type="date" id="to-date" value.bind="toDate" max="${maxDate}" change.delegate="loadData()">
         </div>
         <div class="form-control">
@@ -29,7 +29,7 @@
             <div class="double-radio-side">
               <label class.bind="type === 1 ? 'selected' : ''">
                 <span t="pieChartReport.expenses">Expenses</span>
-                <input type="radio" name="debtorLenderToggle" model.bind="1" checked.bind="type"
+                <input type="radio" name="expensesDepositsToggle" model.bind="1" checked.bind="type"
                   change.delegate="loadData()">
                 <span class="checkbox-icon">
                   <i class="fas fa-check"></i>
@@ -39,7 +39,7 @@
             <div class="double-radio-side">
               <label class.bind="type === 2 ? 'selected' : ''">
                 <span t="pieChartReport.deposits">Deposits</span>
-                <input type="radio" name="debtorLenderToggle" model.bind="2" checked.bind="type"
+                <input type="radio" name="expensesDepositsToggle" model.bind="2" checked.bind="type"
                   change.delegate="loadData()">
                 <span class="checkbox-icon">
                   <i class="fas fa-check"></i>

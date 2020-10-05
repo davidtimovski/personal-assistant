@@ -173,6 +173,16 @@
   },
   "pieChartReport": {
     "pieChart": "Пита извештај",
+    "from": "Од",
+    "to": "До",
+    "expenses": "Одлив",
+    "deposits": "Прилив"
+  },
+  "barChartReport": {
+    "barChart": "Колона извештај",
+    "fromThePast": "Од претходните",
+    "months": "месеци",
+    "balance": "Состојба",
     "expenses": "Одлив",
     "deposits": "Прилив"
   },
@@ -211,6 +221,7 @@
     "balanceAdjustment": "Подесување на состојба",
     "reports": "Извештаи",
     "pieChart": "Пита извештај",
+    "barChart": "Колона извештај",
     "expenditureHeatmap": "Календар на трошоци",
     "export": "Експортирај",
     "totalSync": "Тотална синхронизација",

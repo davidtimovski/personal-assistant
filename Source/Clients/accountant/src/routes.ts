@@ -128,6 +128,11 @@ export default [
     moduleId: PLATFORM.moduleName("./pages/pieChartReport"),
   },
   {
+    route: "bar-chart-report",
+    name: "barChartReport",
+    moduleId: PLATFORM.moduleName("./pages/barChartReport"),
+  },
+  {
     route: "expenditure-heatmap",
     name: "expenditureHeatmap",
     moduleId: PLATFORM.moduleName("./pages/expenditureHeatmap"),

@@ -22,7 +22,7 @@
   transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
 }
 .drawer-button-wrap.open .drawer-content-wrap {
-  max-height: 120px;
+  max-height: 175px;
 }
 .drawer-content {
   padding: 15px 20px;
@@ -30,6 +30,6 @@
 
 @media screen and (min-width: 1200px) {
   .drawer-button-wrap.open .drawer-content-wrap {
-    max-height: 130px;
+    max-height: 185px;
   }
 }

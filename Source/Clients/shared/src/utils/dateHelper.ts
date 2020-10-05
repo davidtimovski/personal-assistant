@@ -5,6 +5,10 @@ export class DateHelper {
       .split("T")[0];
   }
 
+  static formatYYYYMM(date: Date): string {
+    return date.toISOString().substring(0, 7);
+  }
+
   static adjustForTimeZone(date: Date): Date {
     let hoursDiff = date.getHours() - date.getTimezoneOffset() / 60;
     date.setHours(hoursDiff);

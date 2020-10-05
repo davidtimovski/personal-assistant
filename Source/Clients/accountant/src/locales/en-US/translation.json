@@ -173,6 +173,16 @@
   },
   "pieChartReport": {
     "pieChart": "Pie chart",
+    "from": "From",
+    "to": "To",
+    "expenses": "Expenses",
+    "deposits": "Deposits"
+  },
+  "barChartReport": {
+    "barChart": "Bar chart",
+    "fromThePast": "From the past",
+    "months": "months",
+    "balance": "Balance",
     "expenses": "Expenses",
     "deposits": "Deposits"
   },
@@ -211,6 +221,7 @@
     "balanceAdjustment": "Balance adjustment",
     "reports": "Reports",
     "pieChart": "Pie chart",
+    "barChart": "Bar chart",
     "expenditureHeatmap": "Expenditure heatmap",
     "export": "Export",
     "totalSync": "Total sync",
