@@ -102,7 +102,9 @@ namespace PersonalAssistant.Application.Mappings
         public RecipeNutritionSummary Resolve(Recipe source, object dest, RecipeNutritionSummary destMember, ResolutionContext context)
         {
             RecipeIngredient[] validRecipeIngredients = source.RecipeIngredients
-                .Where(x => x.Amount.HasValue && !(!x.Ingredient.ServingSizeIsOneUnit && x.Unit == null)).ToArray();
+                .Where(x => x.Amount.HasValue 
+                    && ((x.Ingredient.ServingSizeIsOneUnit && x.Unit == null) || (!x.Ingredient.ServingSizeIsOneUnit && x.Unit != null)))
+                .ToArray();
 
             var nutritionSummary = new RecipeNutritionSummary();
 
@@ -504,7 +506,8 @@ namespace PersonalAssistant.Application.Mappings
             RecipeIngredient[] validRecipeIngredients = source.RecipeIngredients
                 .Where(x => x.Amount.HasValue
                     && x.Ingredient.Price.HasValue
-                    && !(!x.Ingredient.ProductSizeIsOneUnit && x.Unit == null)).ToArray();
+                    && ((x.Ingredient.ProductSizeIsOneUnit && x.Unit == null) || (!x.Ingredient.ProductSizeIsOneUnit && x.Unit != null)))
+                .ToArray();
 
             var costSummary = new RecipeCostSummary();
             var currency = (string)context.Items["Currency"];
@@ -530,10 +533,6 @@ namespace PersonalAssistant.Application.Mappings
                 if (source.Servings > 1)
                 {
                     costSummary.CostPerServing = costSummary.Cost.Value / source.Servings;
-                }
-                else
-                {
-                    costSummary.CostPerServing = costSummary.Cost;
                 }
             }
 
