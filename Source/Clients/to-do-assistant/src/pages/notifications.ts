@@ -1,9 +1,10 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
+import { I18N } from "aurelia-i18n";
+
 import { NotificationsService } from "services/notificationsService";
 import { Notification } from "models/viewmodels/notification";
 import { LocalStorage } from "utils/localStorage";
-import { I18N } from "aurelia-i18n";
 
 @inject(Router, NotificationsService, LocalStorage, I18N)
 export class Notifications {
@@ -19,14 +20,14 @@ export class Notifications {
     private readonly notificationsService: NotificationsService,
     private readonly localStorage: LocalStorage,
     private readonly i18n: I18N
-  ) {
-    this.language = this.localStorage.getLanguage();
-  }
+  ) {}
 
-  async activate(params: any) {
+  activate(params: any) {
     if (params.id) {
       this.highlightedId = parseInt(params.id, 10);
     }
+
+    this.language = this.localStorage.getLanguage();
   }
 
   attached() {
@@ -40,12 +41,12 @@ export class Notifications {
         }
 
         this.unseenNotifications = allNotifications
-          .filter(notification => {
+          .filter((notification) => {
             return !notification.isSeen;
           })
           .map(this.replacePlaceholders);
         this.seenNotifications = allNotifications
-          .filter(notification => {
+          .filter((notification) => {
             return notification.isSeen;
           })
           .map(this.replacePlaceholders);
@@ -58,7 +59,7 @@ export class Notifications {
     if (notification.listId && notification.taskId) {
       this.router.navigateToRoute("listEdited", {
         id: notification.listId,
-        editedId: notification.taskId
+        editedId: notification.taskId,
       });
     } else if (notification.listId) {
       this.router.navigateToRoute("list", { id: notification.listId });
@@ -84,17 +85,8 @@ export class Notifications {
   formatCreatedDate(createdDateString: string): string {
     const date = new Date(createdDateString);
     const weekday = this.i18n.tr(`weekdays.${date.getDay()}`);
-    const month = this.i18n.tr(`months.${date.getMonth()}`);
+    const time = date.toLocaleTimeString(this.language);
 
-    const now = new Date();
-    if (now.getFullYear() === date.getFullYear()) {
-      return `${weekday}, ${month} ${date.getDate()} ${date
-        .toLocaleTimeString(this.language)
-        .slice(0, -6)}`;
-    }
-
-    return `${weekday}, ${month} ${date.getDate()}, ${date.getFullYear()} ${date
-      .toLocaleTimeString(this.language)
-      .slice(0, -6)}`;
+    return `${weekday}, ${time}`;
   }
 }

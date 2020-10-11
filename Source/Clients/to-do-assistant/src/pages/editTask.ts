@@ -1,9 +1,5 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { TasksService } from "services/tasksService";
-import { ListOption } from "models/viewmodels/listOption";
-import { ListsService } from "services/listsService";
-import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import {
   ValidationController,
   validateTrigger,
@@ -12,9 +8,15 @@ import {
 } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
+
+import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
+import { TasksService } from "services/tasksService";
+import { ListOption } from "models/viewmodels/listOption";
+import { ListsService } from "services/listsService";
 import { EditTaskModel } from "models/viewmodels/editTaskModel";
 import { AssigneeOption } from "models/viewmodels/assigneeOption";
 import * as environment from "../../config/environment.json";
+import * as Actions from "utils/state/actions";
 
 @inject(
   Router,
@@ -154,6 +156,8 @@ export class EditTask {
         await this.tasksService.update(this.model);
         this.nameIsInvalid = false;
 
+        await Actions.getLists(this.listsService);
+
         this.router.navigateToRoute("listEdited", {
           id: this.model.listId,
           editedId: this.model.id,
@@ -176,6 +180,8 @@ export class EditTask {
       this.deleteButtonIsLoading = true;
 
       await this.tasksService.delete(this.model.id);
+
+      await Actions.getLists(this.listsService);
 
       this.eventAggregator.publish(
         "alert-success",

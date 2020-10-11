@@ -9,13 +9,11 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists
 {
     public interface IListService
     {
+        Task<IEnumerable<ListDto>> GetAllAsync(int userId);
         Task<IEnumerable<ToDoListOption>> GetAllAsOptionsAsync(int userId);
-        Task<IEnumerable<ListWithSharingDetails>> GetAllWithTasksAndSharingDetailsAsync(int userId);
-        Task<IEnumerable<ArchivedList>> GetAllArchivedAsync(int userId);
         Task<IEnumerable<AssigneeOption>> GetMembersAsAssigneeOptionsAsync(int id);
         Task<SimpleList> GetAsync(int id);
-        Task<ListDto> GetAsync(int id, int userId);
-        Task<ListWithTasks> GetWithTasksAsync(int id, int userId);
+        Task<EditListDto> GetAsync(int id, int userId);
         Task<ListWithShares> GetWithSharesAsync(int id, int userId);
         Task<IEnumerable<ShareRequest>> GetShareRequestsAsync(int userId);
         Task<int> GetPendingShareRequestsCountAsync(int userId);
@@ -30,7 +28,7 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists
         Task<bool> ExistsAsync(string name, int userId);
         Task<bool> ExistsAsync(int id, string name, int userId);
         Task<int> CountAsync(int userId);
-        Task<CreatedList> CreateAsync(CreateList model, IValidator<CreateList> validator);
+        Task<int> CreateAsync(CreateList model, IValidator<CreateList> validator);
         Task CreateSampleAsync(int userId, Dictionary<string, string> translations);
         Task<UpdateListOriginal> UpdateAsync(UpdateList model, IValidator<UpdateList> validator);
         Task UpdateSharedAsync(UpdateSharedList model, IValidator<UpdateSharedList> validator);

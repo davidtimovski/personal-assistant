@@ -1,12 +1,14 @@
 /// <reference types="aurelia-loader-webpack/src/webpack-hot-interface"/>
 import { Aurelia } from "aurelia-framework";
-import * as environment from "../config/environment.json";
 import { PLATFORM } from "aurelia-pal";
 import { HttpClient } from "aurelia-fetch-client";
 import { Backend, TCustomAttribute } from "aurelia-i18n";
-import { Language } from "../../shared/src/models/enums/language";
-import { LocalStorage } from "utils/localStorage";
 import { UserManager, Log, WebStorageStateStore } from "oidc-client";
+
+import { Language } from "../../shared/src/models/enums/language";
+import * as environment from "../config/environment.json";
+import { LocalStorage } from "utils/localStorage";
+import { initialState } from "utils/state/state";
 
 export function configure(aurelia: Aurelia) {
   const localStorage = new LocalStorage();
@@ -19,6 +21,7 @@ export function configure(aurelia: Aurelia) {
     .standardConfiguration()
     .plugin(PLATFORM.moduleName("aurelia-animator-css"))
     .plugin(PLATFORM.moduleName("aurelia-validation"))
+    .plugin(PLATFORM.moduleName("aurelia-store"), { initialState })
     .plugin(PLATFORM.moduleName("bcx-aurelia-reorderable-repeat"))
     .plugin(PLATFORM.moduleName("aurelia-i18n"), (instance) => {
       const aliases = ["t", "i18n"];

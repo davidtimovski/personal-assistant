@@ -1,44 +1,59 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { List } from "models/entities/list";
-import { ListsService } from "services/listsService";
-import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import {
   ValidationController,
   validateTrigger,
   ValidationRules,
   ControllerValidateResult,
 } from "aurelia-validation";
-import { LocalStorage } from "utils/localStorage";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
-import { ListWithTasks } from "models/viewmodels/listWithTasks";
+import { connectTo } from "aurelia-store";
 
-@inject(
-  Router,
-  ListsService,
-  ValidationController,
-  LocalStorage,
-  I18N,
-  EventAggregator
-)
+import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
+import { List } from "models/entities/list";
+import { ListsService } from "services/listsService";
+import { SharingState } from "models/viewmodels/sharingState";
+import { Task } from "models/entities/task";
+import { State } from "utils/state/state";
+import * as Actions from "utils/state/actions";
+
+@inject(Router, ListsService, ValidationController, I18N, EventAggregator)
+@connectTo()
 export class CopyList {
-  private list: ListWithTasks;
+  private listId: number;
+  private model = new List(
+    0,
+    "",
+    "",
+    false,
+    false,
+    SharingState.NotShared,
+    0,
+    false,
+    [],
+    null,
+    null
+  );
   private nameIsInvalid: boolean;
   private iconOptions = ListsService.getIconOptions();
   private saveButtonIsLoading = false;
   private copyButton: HTMLButtonElement;
   private copyAsTextCompleted = false;
   private listName: string;
+  state: State;
 
   constructor(
     private readonly router: Router,
     private readonly listsService: ListsService,
     private readonly validationController: ValidationController,
-    private readonly localStorage: LocalStorage,
     private readonly i18n: I18N,
     private readonly eventAggregator: EventAggregator
   ) {
+    this.eventAggregator.subscribe("get-lists-finished", () => {
+      this.setModelFromState();
+    });
+
     this.validationController.validateTrigger = validateTrigger.manual;
 
     this.eventAggregator.subscribe("alert-hidden", () => {
@@ -47,36 +62,46 @@ export class CopyList {
   }
 
   async activate(params: any) {
-    this.list = await this.listsService.getWithTasks(params.id);
-    if (this.list === null) {
-      this.router.navigateToRoute("notFound");
-    }
-    this.listName = this.list.name;
-
-    this.list.name = (
-      this.i18n.tr("copyList.copyOf") +
-      " " +
-      this.list.name
-    ).substring(0, 50);
-
-    ValidationRules.ensure((x: List) => x.name)
-      .required()
-      .on(this.list);
+    this.listId = parseInt(params.id, 10);
   }
 
   attached() {
+    if (!this.state.loading) {
+      this.setModelFromState();
+    }
+
     this.copyButton.addEventListener("click", () => {
       this.copyAsText();
     });
   }
 
-  selectIcon(icon: string) {
-    this.list.icon = icon;
+  setModelFromState() {
+    const list = this.state.lists.find((x) => x.id === this.listId);
+    if (this.model === null) {
+      this.router.navigateToRoute("notFound");
+    }
+
+    this.model = JSON.parse(JSON.stringify(list));
+    this.listName = this.model.name;
+
+    this.model.name = (
+      this.i18n.tr("copyList.copyOf") +
+      " " +
+      this.model.name
+    ).substring(0, 50);
+
+    ValidationRules.ensure((x: List) => x.name)
+      .required()
+      .on(this.model);
   }
 
-  @computedFrom("list.name")
+  selectIcon(icon: string) {
+    this.model.icon = icon;
+  }
+
+  @computedFrom("model.name")
   get canSave(): boolean {
-    return !ValidationUtil.isEmptyOrWhitespace(this.list.name);
+    return !ValidationUtil.isEmptyOrWhitespace(this.model.name);
   }
 
   async save() {
@@ -93,11 +118,10 @@ export class CopyList {
 
     if (result.valid) {
       try {
-        const id = await this.listsService.copy(this.list);
+        this.model.id = await this.listsService.copy(this.model);
         this.nameIsInvalid = false;
-        this.list.id = id;
 
-        this.localStorage.setDataLastLoad(new Date(0));
+        await Actions.getLists(this.listsService);
 
         this.eventAggregator.publish(
           "alert-success",
@@ -105,7 +129,7 @@ export class CopyList {
         );
 
         this.router.navigateToRoute("listsEdited", {
-          editedId: this.list.id,
+          editedId: this.model.id,
         });
       } catch (errorFields) {
         this.nameIsInvalid = errorFields.includes("Name");
@@ -119,29 +143,47 @@ export class CopyList {
   copyAsText() {
     let text = this.listName;
 
-    if (this.list.privateTasks.length + this.list.tasks.length > 0) {
+    const tasks = this.model.tasks
+      .filter((x) => !x.isCompleted && !x.isPrivate)
+      .sort((a: Task, b: Task) => {
+        return a.order - b.order;
+      });
+    const privateTasks = this.model.tasks
+      .filter((x) => !x.isCompleted && x.isPrivate)
+      .sort((a: Task, b: Task) => {
+        return a.order - b.order;
+      });
+    const completedTasks = this.model.tasks
+      .filter((x) => x.isCompleted && !x.isPrivate)
+      .sort((a: Task, b: Task) => {
+        return a.order - b.order;
+      });
+    const completedPrivateTasks = this.model.tasks
+      .filter((x) => x.isCompleted && x.isPrivate)
+      .sort((a: Task, b: Task) => {
+        return a.order - b.order;
+      });
+
+    if (privateTasks.length + tasks.length > 0) {
       text += "\n";
 
-      for (let task of this.list.privateTasks) {
+      for (let task of privateTasks) {
         text += `\n${task.name} ☐`;
       }
-      for (let task of this.list.tasks) {
+      for (let task of tasks) {
         text += `\n${task.name} ☐`;
       }
     }
 
-    if (
-      this.list.completedPrivateTasks.length + this.list.completedTasks.length >
-      0
-    ) {
-      if (this.list.tasks.length > 0) {
+    if (completedPrivateTasks.length + completedTasks.length > 0) {
+      if (tasks.length > 0) {
         text += "\n----------";
       }
 
-      for (let task of this.list.completedPrivateTasks) {
+      for (let task of completedPrivateTasks) {
         text += `\n${task.name} 🗹`;
       }
-      for (let task of this.list.completedTasks) {
+      for (let task of completedTasks) {
         text += `\n${task.name} 🗹`;
       }
     }

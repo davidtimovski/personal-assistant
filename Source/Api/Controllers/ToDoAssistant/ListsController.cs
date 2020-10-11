@@ -78,7 +78,7 @@ namespace Api.Controllers.ToDoAssistant
                 return Unauthorized();
             }
 
-            IEnumerable<ListWithSharingDetails> lists = await _listService.GetAllWithTasksAndSharingDetailsAsync(userId);
+            IEnumerable<ListDto> lists = await _listService.GetAllAsync(userId);
 
             return Ok(lists);
         }
@@ -101,24 +101,6 @@ namespace Api.Controllers.ToDoAssistant
             return Ok(options);
         }
 
-        [HttpGet("archived")]
-        public async Task<IActionResult> GetAllArchived()
-        {
-            int userId;
-            try
-            {
-                userId = IdentityHelper.GetUserId(User);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-
-            IEnumerable<ArchivedList> lists = await _listService.GetAllArchivedAsync(userId);
-
-            return Ok(lists);
-        }
-
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -132,29 +114,7 @@ namespace Api.Controllers.ToDoAssistant
                 return Unauthorized();
             }
 
-            ListDto list = await _listService.GetAsync(id, userId);
-            if (list == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(list);
-        }
-
-        [HttpGet("{id}/with-tasks")]
-        public async Task<IActionResult> GetWithTasks(int id)
-        {
-            int userId;
-            try
-            {
-                userId = IdentityHelper.GetUserId(User);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-
-            ListWithTasks list = await _listService.GetWithTasksAsync(id, userId);
+            EditListDto list = await _listService.GetAsync(id, userId);
             if (list == null)
             {
                 return NotFound();
@@ -274,9 +234,9 @@ namespace Api.Controllers.ToDoAssistant
                 return Unauthorized();
             }
 
-            CreatedList createdList = await _listService.CreateAsync(dto, _createValidator);
+            int id = await _listService.CreateAsync(dto, _createValidator);
 
-            return StatusCode(201, createdList);
+            return StatusCode(201, id);
         }
 
         [HttpPut]

@@ -1,12 +1,9 @@
 import { json } from "aurelia-fetch-client";
 import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
-import { IndexedDBHelper } from "../utils/indexedDBHelper";
 import { Task } from "models/entities/task";
 import { EditTaskModel } from "models/viewmodels/editTaskModel";
 
 export class TasksService extends HttpProxyBase {
-  private readonly idbHelper = new IndexedDBHelper();
-
   async get(id: number): Promise<Task> {
     const result = await this.ajax<Task>(`tasks/${id}`);
 
@@ -24,8 +21,8 @@ export class TasksService extends HttpProxyBase {
     name: string,
     isOneTime: boolean,
     isPrivate: boolean
-  ): Promise<Task> {
-    const createdTask = await this.ajax<Task>("tasks", {
+  ): Promise<number> {
+    const id = await this.ajax<number>("tasks", {
       method: "post",
       body: json({
         listId: listId,
@@ -35,9 +32,7 @@ export class TasksService extends HttpProxyBase {
       }),
     });
 
-    this.idbHelper.createTasks(createdTask);
-
-    return createdTask;
+    return id;
   }
 
   async bulkCreate(
@@ -46,7 +41,7 @@ export class TasksService extends HttpProxyBase {
     tasksAreOneTime: boolean,
     tasksArePrivate: boolean
   ): Promise<void> {
-    const createdTasks = await this.ajax<Array<Task>>("tasks/bulk", {
+    await this.ajaxExecute("tasks/bulk", {
       method: "post",
       body: json({
         listId: listId,
@@ -55,8 +50,6 @@ export class TasksService extends HttpProxyBase {
         tasksArePrivate: tasksArePrivate,
       }),
     });
-
-    await this.idbHelper.createTasks(...createdTasks);
   }
 
   async update(editTaskViewModel: EditTaskModel): Promise<void> {
@@ -64,41 +57,20 @@ export class TasksService extends HttpProxyBase {
       method: "put",
       body: json(editTaskViewModel),
     });
-
-    this.idbHelper.createTasks(
-      new Task(
-        editTaskViewModel.id,
-        editTaskViewModel.listId,
-        editTaskViewModel.name,
-        editTaskViewModel.isCompleted,
-        editTaskViewModel.isOneTime,
-        editTaskViewModel.isPrivate,
-        null,
-        editTaskViewModel.order,
-        editTaskViewModel.createdDate,
-        editTaskViewModel.modifiedDate,
-        false,
-        false
-      )
-    );
   }
 
   async delete(id: number): Promise<void> {
     await this.ajaxExecute(`tasks/${id}`, {
       method: "delete",
     });
-
-    this.idbHelper.deleteTask(id);
   }
 
-  async setIsCompleted(task: Task): Promise<void> {
-    this.idbHelper.createTasks(task);
-
+  async setIsCompleted(id: number, isCompleted: boolean): Promise<void> {
     await this.ajaxExecute("tasks/is-completed", {
       method: "put",
       body: json({
-        id: task.id,
-        isCompleted: task.isCompleted,
+        id: id,
+        isCompleted: isCompleted,
       }),
     });
   }

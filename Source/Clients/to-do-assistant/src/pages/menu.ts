@@ -55,21 +55,7 @@ export class Menu {
   }
 
   async logOut() {
-    // Delete indexedDB, cache, and some localStorage data before log out
-    const deleteContextRequest = window.indexedDB.deleteDatabase("IDBContext");
-
-    deleteContextRequest.onsuccess = () => {
-      const deleteDbNamesRequest = window.indexedDB.deleteDatabase("__dbnames");
-
-      deleteDbNamesRequest.onsuccess = async () => {
-        window.localStorage.setItem("dataLastLoad", "1970-01-01T00:00:00.000Z");
-        window.localStorage.setItem(
-          "profileImageUriLastLoad",
-          "1970-01-01T00:00:00.000Z"
-        );
-
-        await this.authService.logout();
-      };
-    };
+    window.localStorage.removeItem("profileImageUriLastLoad");
+    await this.authService.logout();
   }
 }

@@ -48,6 +48,10 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                                                                     LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
                                                                     WHERE t.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
                                                                     new { Id = id, UserId = userId });
+            if (task == null)
+            {
+                return null;
+            }
 
             task.Recipes = (await conn.QueryAsync<string>(@"SELECT r.""Name""
                                                             FROM ""CookingAssistant.Ingredients"" AS i

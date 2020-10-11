@@ -1,9 +1,5 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { List } from "models/entities/list";
-import { ListsService } from "services/listsService";
-import { UsersService } from "services/usersService";
-import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import {
   ValidationController,
   validateTrigger,
@@ -12,8 +8,14 @@ import {
 } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
+
+import { ListsService } from "services/listsService";
+import { UsersService } from "services/usersService";
+import { EditListModel } from "models/viewmodels/editListModel";
+import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import { SharingState } from "models/viewmodels/sharingState";
 import { PreferencesModel } from "models/preferencesModel";
+import * as Actions from "utils/state/actions";
 
 @inject(
   Router,
@@ -24,7 +26,7 @@ import { PreferencesModel } from "models/preferencesModel";
   EventAggregator
 )
 export class EditList {
-  private model: List;
+  private model: EditListModel;
   private originalListJson: string;
   private isNewList: boolean;
   private nameIsInvalid: boolean;
@@ -63,20 +65,15 @@ export class EditList {
     this.isNewList = parseInt(params.id, 10) === 0;
 
     if (this.isNewList) {
-      this.model = new List(
-        0,
+      this.model = new EditListModel(
         0,
         "",
         this.iconOptions[0].icon,
         "",
-        0,
         false,
         false,
         false,
-        SharingState.NotShared,
-        [],
-        new Date(),
-        new Date()
+        SharingState.NotShared
       );
       this.saveButtonText = this.i18n.tr("editList.create");
     } else {
@@ -91,7 +88,7 @@ export class EditList {
 
     this.preferences = await this.usersService.getPreferences();
 
-    ValidationRules.ensure((s: List) => s.name)
+    ValidationRules.ensure((s: EditListModel) => s.name)
       .required()
       .on(this.model);
   }
@@ -157,6 +154,8 @@ export class EditList {
           }
           this.nameIsInvalid = false;
 
+          await Actions.getLists(this.listsService);
+
           const redirectRoute = this.model.isArchived
             ? "archivedListsEdited"
             : "listsEdited";
@@ -176,6 +175,8 @@ export class EditList {
             this.model.tasksText
           );
           this.nameIsInvalid = false;
+
+          await Actions.getLists(this.listsService);
 
           this.router.navigateToRoute("listsEdited", {
             editedId: id,
@@ -200,6 +201,9 @@ export class EditList {
       this.deleteButtonIsLoading = true;
 
       await this.listsService.delete(this.model.id);
+
+      await Actions.getLists(this.listsService);
+
       this.eventAggregator.publish(
         "alert-success",
         "editList.deleteSuccessful"
@@ -220,6 +224,8 @@ export class EditList {
       this.leaveButtonIsLoading = true;
 
       await this.listsService.leave(this.model.id);
+
+      await Actions.getLists(this.listsService);
 
       this.eventAggregator.publish(
         "alert-success",

@@ -1,40 +1,53 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
+import { EventAggregator } from "aurelia-event-aggregator";
+import { connectTo } from "aurelia-store";
+
+import { ConnectionTracker } from "../../../shared/src/utils/connectionTracker";
+import { ProgressBar } from "../../../shared/src/models/progressBar";
+
 import { ListsService } from "services/listsService";
 import { UsersService } from "services/usersService";
-import { IndexedDBHelper } from "utils/indexedDBHelper";
 import { LocalStorage } from "utils/localStorage";
-import { ConnectionTracker } from "../../../shared/src/utils/connectionTracker";
-import { SimpleList } from "models/viewmodels/simpleList";
-import { ProgressBar } from "../../../shared/src/models/progressBar";
+import { List } from "models/entities/list";
+import { State } from "utils/state/state";
+import * as Actions from "utils/state/actions";
 import * as environment from "../../config/environment.json";
 
 @inject(
   Router,
   ListsService,
   UsersService,
-  IndexedDBHelper,
   LocalStorage,
+  EventAggregator,
   ConnectionTracker
 )
+@connectTo()
 export class Lists {
   private imageUri = JSON.parse(<any>environment).defaultProfileImageUri;
   private progressBar = new ProgressBar();
-  private lists = new Array<SimpleList>();
+  private lists: Array<List>;
   private listsLoaded = false;
   private iconOptions = ListsService.getIconOptions();
   private lastEditedId: number;
   private isReordering = false;
   private menuButtonIsLoading = false;
+  state: State;
 
   constructor(
     private readonly router: Router,
     private readonly listsService: ListsService,
     private readonly usersService: UsersService,
-    private readonly indexedDBHelper: IndexedDBHelper,
     private readonly localStorage: LocalStorage,
+    private readonly eventAggregator: EventAggregator,
     private readonly connTracker: ConnectionTracker
-  ) {}
+  ) {
+    this.eventAggregator.subscribe("get-lists-finished", () => {
+      this.setListsFromState();
+      this.listsLoaded = true;
+      this.progressBar.finish();
+    });
+  }
 
   activate(params: any) {
     if (params.editedId) {
@@ -45,29 +58,11 @@ export class Lists {
   }
 
   attached() {
-    this.indexedDBHelper.getLists().then((cachedLists: Array<SimpleList>) => {
-      if (this.lists.length === 0) {
-        this.lists = cachedLists;
-        this.listsLoaded = true;
-      }
-    });
-
-    if (this.localStorage.isStale("data")) {
+    if (this.state.lists) {
+      this.setListsFromState();
+      this.listsLoaded = true;
+    } else {
       this.progressBar.start();
-
-      this.listsService
-        .getAll()
-        .then((lists: Array<SimpleList>) => {
-          if (!this.listsAreSame(this.lists, lists)) {
-            this.lists = lists;
-            this.listsLoaded = true;
-            this.indexedDBHelper.createListsWithTasks(lists);
-          }
-          this.localStorage.setDataLastLoad(new Date());
-        })
-        .finally(() => {
-          this.progressBar.finish();
-        });
     }
 
     if (this.localStorage.isStale("profileImageUri")) {
@@ -79,11 +74,19 @@ export class Lists {
     }
   }
 
+  setListsFromState() {
+    this.lists = this.state.lists
+      .filter((x) => !x.isArchived)
+      .sort((a: List, b: List) => {
+        return a.order - b.order;
+      });
+  }
+
   getClassFromIcon(icon: string): string {
     return this.iconOptions.find((x) => x.icon === icon).cssClass;
   }
 
-  async reorder(changedArray: Array<SimpleList>, newOrder) {
+  async reorder(changedArray: Array<List>, newOrder) {
     const id: number = changedArray[newOrder.toIndex].id;
 
     await this.listsService.reorder(
@@ -93,47 +96,18 @@ export class Lists {
     );
     this.isReordering = false;
 
-    this.listsService.getAll().then((lists: Array<SimpleList>) => {
-      this.indexedDBHelper.createListsWithTasks(lists);
-      this.localStorage.setDataLastLoad(new Date());
-    });
-  }
-
-  listsAreSame(a: Array<SimpleList>, b: Array<SimpleList>): boolean {
-    if (a === undefined || a.length !== b.length) {
-      return false;
-    }
-
-    for (let i = 0; i < a.length; i++) {
-      const areEqual =
-        a[i].id === b[i].id &&
-        a[i].name === b[i].name &&
-        a[i].icon === b[i].icon &&
-        a[i].sharingState === b[i].sharingState &&
-        a[i].order === b[i].order &&
-        JSON.stringify(a[i].tasks) === JSON.stringify(b[i].tasks);
-
-      if (!areEqual) {
-        return false;
-      }
-    }
-
-    return true;
+    await Actions.getLists(this.listsService);
+    this.setListsFromState();
   }
 
   sync() {
     this.progressBar.start();
 
-    this.listsService
-      .getAll()
-      .then((lists: Array<SimpleList>) => {
-        this.lists = lists;
-        this.indexedDBHelper.createListsWithTasks(lists);
-        this.localStorage.setDataLastLoad(new Date());
-      })
-      .finally(() => {
-        this.progressBar.finish();
-      });
+    Actions.getLists(this.listsService).then(() => {
+      this.setListsFromState();
+      this.listsLoaded = true;
+      this.progressBar.finish();
+    });
 
     this.usersService.getProfileImageUri().then((imageUri) => {
       if (this.imageUri !== imageUri) {

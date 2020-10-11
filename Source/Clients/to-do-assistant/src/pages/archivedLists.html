@@ -1,4 +1,5 @@
 <template>
+  <require from="../static/styles/pages/archived-lists.scss"></require>
   <require from="./../resources/elements/empty-list-message.html"></require>
 
   <div class="au-animate animate-fade-in animate-fade-out">
@@ -20,7 +21,7 @@
       </div>
 
       <a repeat.for="list of archivedLists"
-        class="to-do-list ${list.id === getEditedId ? 'highlighted' : ''} ${list.sharingState !== 0 && list.sharingState !== 1 ? 'is-shared' : ''} ${list.sharingState === 1 ? 'will-be-shared' : ''}"
+        class="to-do-list ${list.id === getEditedId ? 'highlighted' : ''} ${list.sharingState !== 0 && list.sharingState !== 1 ? 'is-shared' : ''} ${list.sharingState === 1 ? 'pending-share' : ''}"
         route-href="route: list; params.bind: { id: list.id }">
         <i class="icon ${getClassFromIcon(list.icon)}"></i>
         <span class="name">${list.name}</span>

@@ -1,24 +1,24 @@
 import { json } from "aurelia-fetch-client";
 import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
-import { IndexedDBHelper } from "../utils/indexedDBHelper";
 import { List } from "models/entities/list";
-import { ListWithTasks } from "models/viewmodels/listWithTasks";
 import { ListWithShares } from "models/viewmodels/listWithShares";
 import { Share } from "models/viewmodels/share";
 import { ShareRequest } from "models/viewmodels/shareRequest";
-import { SimpleList } from "models/viewmodels/simpleList";
-import { ArchivedList } from "models/viewmodels/archivedList";
 import { ListOption } from "models/viewmodels/listOption";
 import { CanShareList } from "models/viewmodels/canShareList";
-import { SharingState } from "models/viewmodels/sharingState";
 import { AssigneeOption } from "models/viewmodels/assigneeOption";
 import { ListIcon } from "models/viewmodels/listIcon";
+import { EditListModel } from "models/viewmodels/editListModel";
 
 export class ListsService extends HttpProxyBase {
-  private readonly idbHelper = new IndexedDBHelper();
+  //public loadingLists = false;
 
-  async getAll(): Promise<Array<SimpleList>> {
-    const result = await this.ajax<Array<SimpleList>>("lists");
+  async getAll(): Promise<Array<List>> {
+    //this.loadingLists = true;
+
+    const result = await this.ajax<Array<List>>("lists");
+
+    //this.loadingLists = false;
 
     return result;
   }
@@ -29,33 +29,8 @@ export class ListsService extends HttpProxyBase {
     return result;
   }
 
-  async getAllArchived(): Promise<Array<ArchivedList>> {
-    const result = await this.ajax<Array<ArchivedList>>("lists/archived");
-
-    return result;
-  }
-
-  async get(id: number): Promise<List> {
-    const result = await this.ajax<List>(`lists/${id}`);
-
-    return result;
-  }
-
-  async getWithTasks(
-    id: number,
-    cache: boolean = true
-  ): Promise<ListWithTasks> {
-    const result = await this.ajax<ListWithTasks>(`lists/${id}/with-tasks`);
-
-    if (cache) {
-      this.idbHelper.createTasksInList(
-        result.id,
-        result.tasks
-          .concat(result.privateTasks)
-          .concat(result.completedTasks)
-          .concat(result.completedPrivateTasks)
-      );
-    }
+  async get(id: number): Promise<EditListModel> {
+    const result = await this.ajax<EditListModel>(`lists/${id}`);
 
     return result;
   }
@@ -102,7 +77,7 @@ export class ListsService extends HttpProxyBase {
     isOneTimeToggleDefault: boolean,
     tasksText: string
   ): Promise<number> {
-    const list = await this.ajax<SimpleList>("lists", {
+    const id = await this.ajax<number>("lists", {
       method: "post",
       body: json({
         name: name,
@@ -112,43 +87,17 @@ export class ListsService extends HttpProxyBase {
       }),
     });
 
-    this.idbHelper.createList(
-      new SimpleList(
-        list.id,
-        name.trim(),
-        icon.trim(),
-        isOneTimeToggleDefault,
-        SharingState.NotShared,
-        list.order,
-        []
-      )
-    );
-
-    return list.id;
+    return id;
   }
 
-  async update(list: List): Promise<void> {
+  async update(list: EditListModel): Promise<void> {
     await this.ajaxExecute("lists", {
       method: "put",
       body: json(list),
     });
-
-    if (!list.isArchived) {
-      this.idbHelper.createList(
-        new SimpleList(
-          list.id,
-          list.name.trim(),
-          list.icon.trim(),
-          list.isOneTimeToggleDefault,
-          list.sharingState,
-          list.order,
-          []
-        )
-      );
-    }
   }
 
-  async updateShared(list: List): Promise<void> {
+  async updateShared(list: EditListModel): Promise<void> {
     await this.ajaxExecute("lists/shared", {
       method: "put",
       body: json({
@@ -156,28 +105,12 @@ export class ListsService extends HttpProxyBase {
         notificationsEnabled: list.notificationsEnabled,
       }),
     });
-
-    if (!list.isArchived) {
-      this.idbHelper.createList(
-        new SimpleList(
-          list.id,
-          list.name.trim(),
-          list.icon.trim(),
-          list.isOneTimeToggleDefault,
-          list.sharingState,
-          list.order,
-          []
-        )
-      );
-    }
   }
 
   async delete(id: number): Promise<void> {
     await this.ajaxExecute(`lists/${id}`, {
       method: "delete",
     });
-
-    this.idbHelper.deleteListWithTasks(id);
   }
 
   async canShareListWithUser(email: string): Promise<CanShareList> {
@@ -209,11 +142,9 @@ export class ListsService extends HttpProxyBase {
     await this.ajaxExecute(`lists/${id}/leave`, {
       method: "delete",
     });
-
-    this.idbHelper.deleteListWithTasks(id);
   }
 
-  async copy(list: ListWithTasks): Promise<number> {
+  async copy(list: List): Promise<number> {
     const id = await this.ajax<number>("lists/copy", {
       method: "post",
       body: json({
@@ -234,10 +165,6 @@ export class ListsService extends HttpProxyBase {
         isArchived: isArchived,
       }),
     });
-
-    if (isArchived) {
-      this.idbHelper.deleteListWithTasks(id);
-    }
   }
 
   async setTasksAsNotCompleted(id: number): Promise<void> {

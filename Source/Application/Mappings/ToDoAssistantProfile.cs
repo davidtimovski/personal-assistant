@@ -151,9 +151,9 @@ namespace PersonalAssistant.Application.Mappings
         }
     }
 
-    public class ListNotificationsEnabledResolver : IValueResolver<ToDoList, ListDto, bool>
+    public class ListNotificationsEnabledResolver : IValueResolver<ToDoList, EditListDto, bool>
     {
-        public bool Resolve(ToDoList source, ListDto dest, bool destMember, ResolutionContext context)
+        public bool Resolve(ToDoList source, EditListDto dest, bool destMember, ResolutionContext context)
         {
             var userId = (int)context.Items["UserId"];
 
@@ -193,7 +193,7 @@ namespace PersonalAssistant.Application.Mappings
     {
         public int? Resolve(CreateTask source, ToDoTask dest, int? destMember, ResolutionContext context)
         {
-            return source.IsPrivate.HasValue && source.IsPrivate.Value ? (int?)context.Items["UserId"] : null;
+            return source.IsPrivate.HasValue && source.IsPrivate.Value ? (int?)source.UserId : null;
         }
     }
 
@@ -201,7 +201,7 @@ namespace PersonalAssistant.Application.Mappings
     {
         public int? Resolve(UpdateTask source, ToDoTask dest, int? destMember, ResolutionContext context)
         {
-            return source.IsPrivate.HasValue && source.IsPrivate.Value ? (int?)context.Items["UserId"] : null;
+            return source.IsPrivate.HasValue && source.IsPrivate.Value ? (int?)source.UserId : null;
         }
     }
 

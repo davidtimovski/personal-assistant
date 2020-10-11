@@ -1,10 +1,5 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { ListsService } from "services/listsService";
-import { TasksService } from "services/tasksService";
-import { Task } from "models/entities/task";
-import { ListWithTasks } from "models/viewmodels/listWithTasks";
-import { IndexedDBHelper } from "utils/indexedDBHelper";
 import {
   ValidationController,
   validateTrigger,
@@ -13,28 +8,35 @@ import {
 } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
+import { connectTo } from "aurelia-store";
+
+import { ListsService } from "services/listsService";
+import { TasksService } from "services/tasksService";
+import { Task } from "models/entities/task";
+import { ViewList } from "models/viewmodels/viewList";
 import { LocalStorage } from "utils/localStorage";
 import { SharingState } from "models/viewmodels/sharingState";
+import { State } from "utils/state/state";
+import * as Actions from "utils/state/actions";
 
 @inject(
   Router,
   ListsService,
   TasksService,
-  IndexedDBHelper,
   ValidationController,
   I18N,
   EventAggregator,
   LocalStorage
 )
+@connectTo()
 export class List {
   private listId: number;
-  private model = new ListWithTasks(
+  private model = new ViewList(
     0,
-    "",
     "",
     false,
     SharingState.NotShared,
-    false,
+    null,
     new Array<Task>(),
     new Array<Task>(),
     new Array<Task>(),
@@ -61,23 +63,27 @@ export class List {
   private lastEditedId: number;
   private isReordering = false;
   private isSearching = false;
-  private bleep = new Audio();
-  private blop = new Audio();
+  private bleep = new Audio("/audio/bleep.mp3");
+  private blop = new Audio("/audio/blop.mp3");
   private editListButtonIsLoading = false;
   private addNewPlaceholderText: string;
   private emptyListMessage: string;
   private soundsEnabled = true;
+  state: State;
 
   constructor(
     private readonly router: Router,
     private readonly listsService: ListsService,
     private readonly tasksService: TasksService,
-    private readonly indexedDBHelper: IndexedDBHelper,
     private readonly validationController: ValidationController,
     private readonly i18n: I18N,
     private readonly eventAggregator: EventAggregator,
     private readonly localStorage: LocalStorage
   ) {
+    this.eventAggregator.subscribe("get-lists-finished", () => {
+      this.setModelFromState();
+    });
+
     this.validationController.validateTrigger = validateTrigger.manual;
 
     ValidationRules.ensure("newTaskName").required().on(this);
@@ -100,37 +106,53 @@ export class List {
   }
 
   attached() {
-    this.indexedDBHelper
-      .getListWithTasks(this.listId)
-      .then((cachedList: ListWithTasks) => {
-        if (this.model.id === 0 && cachedList !== null) {
-          this.model = cachedList;
-          this.isOneTime = cachedList.isOneTimeToggleDefault;
-          this.emptyListMessage = this.i18n.tr("list.emptyListMessage");
-          this.shareButtonText =
-            this.model.sharingState === SharingState.NotShared
-              ? this.i18n.tr("list.shareList")
-              : this.i18n.tr("list.members");
-        }
-      });
-
-    this.listsService.getWithTasks(this.listId).then((list: ListWithTasks) => {
-      if (list === null) {
-        this.router.navigateToRoute("notFound");
-      } else if (!this.listsAreSame(this.model, list)) {
-        this.model = list;
-        this.isOneTime = this.model.isOneTimeToggleDefault;
-        this.emptyListMessage = this.i18n.tr("list.emptyListMessage");
-        this.shareButtonText =
-          this.model.sharingState === SharingState.NotShared
-            ? this.i18n.tr("list.shareList")
-            : this.i18n.tr("list.members");
-      }
-    });
-
     if (this.soundsEnabled) {
-      this.bleep.src = "/audio/bleep.mp3";
-      this.blop.src = "/audio/blop.mp3";
+      this.bleep.load();
+      this.blop.load();
+    }
+
+    if (!this.state.loading) {
+      this.setModelFromState();
+    }
+  }
+
+  setModelFromState() {
+    const list = this.state.lists.find((x) => x.id === this.listId);
+    if (list === null) {
+      this.router.navigateToRoute("notFound");
+    } else {
+      this.model.id = list.id;
+      this.model.name = list.name;
+      this.model.isOneTimeToggleDefault = list.isOneTimeToggleDefault;
+      this.model.sharingState = list.sharingState;
+      this.model.isArchived = list.isArchived;
+      this.model.tasks = list.tasks
+        .filter((x) => !x.isCompleted && !x.isPrivate)
+        .sort((a: Task, b: Task) => {
+          return a.order - b.order;
+        });
+      this.model.privateTasks = list.tasks
+        .filter((x) => !x.isCompleted && x.isPrivate)
+        .sort((a: Task, b: Task) => {
+          return a.order - b.order;
+        });
+      this.model.completedTasks = list.tasks
+        .filter((x) => x.isCompleted && !x.isPrivate)
+        .sort((a: Task, b: Task) => {
+          return a.order - b.order;
+        });
+      this.model.completedPrivateTasks = list.tasks
+        .filter((x) => x.isCompleted && x.isPrivate)
+        .sort((a: Task, b: Task) => {
+          return a.order - b.order;
+        });
+
+      this.isOneTime = this.model.isOneTimeToggleDefault;
+      this.emptyListMessage = this.i18n.tr("list.emptyListMessage");
+      this.shareButtonText =
+        this.model.sharingState === SharingState.NotShared
+          ? this.i18n.tr("list.shareList")
+          : this.i18n.tr("list.members");
     }
   }
 
@@ -152,24 +174,10 @@ export class List {
       ++newOrder.fromIndex,
       ++newOrder.toIndex
     );
-    this.listsService.getWithTasks(this.listId);
+
     this.isReordering = false;
-  }
 
-  listsAreSame(a: ListWithTasks, b: ListWithTasks): boolean {
-    if (!a) {
-      return false;
-    }
-
-    const areEqual =
-      a.id === b.id &&
-      a.name === b.name &&
-      a.sharingState === b.sharingState &&
-      a.icon === b.icon &&
-      JSON.stringify(a.tasks) === JSON.stringify(b.tasks) &&
-      JSON.stringify(a.completedTasks) === JSON.stringify(b.completedTasks);
-
-    return areEqual;
+    await Actions.getLists(this.listsService);
   }
 
   isSearchingToggleChanged() {
@@ -314,7 +322,7 @@ export class List {
           this.similarTaskNames = [];
 
           try {
-            const task = await this.tasksService.create(
+            const id = await this.tasksService.create(
               this.model.id,
               this.newTaskName,
               this.isOneTime,
@@ -322,6 +330,11 @@ export class List {
             );
             this.newTaskIsLoading = false;
             this.newTaskName = "";
+
+            await Actions.getLists(this.listsService);
+
+            const list = this.state.lists.find((x) => x.id === this.listId);
+            const task = list.tasks.find((x) => x.id === id);
 
             if (this.isPrivate) {
               this.model.privateTasks.unshift(task);
@@ -361,37 +374,17 @@ export class List {
       }
 
       if (task.isOneTime) {
-        if (task.isPrivate) {
-          this.model.privateTasks.splice(
-            this.model.privateTasks.indexOf(task),
-            1
-          );
-        } else {
-          this.model.tasks.splice(this.model.tasks.indexOf(task), 1);
-        }
+        await this.tasksService.delete(task.id);
+        await Actions.deleteTask(this.listId, task.id);
+        this.setModelFromState();
 
         if (this.soundsEnabled) {
           this.bleep.play();
         }
-
-        await this.tasksService.delete(task.id);
       } else {
-        task.isCompleted = true;
-
-        if (task.isPrivate) {
-          this.model.privateTasks.splice(
-            this.model.privateTasks.indexOf(task),
-            1
-          );
-          task.rightSideIsLoading = false;
-          this.model.completedPrivateTasks.unshift(task);
-        } else {
-          this.model.tasks.splice(this.model.tasks.indexOf(task), 1);
-          task.rightSideIsLoading = false;
-          this.model.completedTasks.unshift(task);
-        }
-
-        await this.tasksService.setIsCompleted(task);
+        await this.tasksService.setIsCompleted(task.id, true);
+        await Actions.completeTask(this.listId, task.id);
+        this.setModelFromState();
       }
     }, 600);
   }
@@ -413,25 +406,9 @@ export class List {
         this.resetSearchFilter();
       }
 
-      task.isCompleted = false;
-
-      if (task.isPrivate) {
-        this.model.completedPrivateTasks.splice(
-          this.model.completedPrivateTasks.indexOf(task),
-          1
-        );
-        task.rightSideIsLoading = false;
-        this.model.privateTasks.push(task);
-      } else {
-        this.model.completedTasks.splice(
-          this.model.completedTasks.indexOf(task),
-          1
-        );
-        task.rightSideIsLoading = false;
-        this.model.tasks.push(task);
-      }
-
-      await this.tasksService.setIsCompleted(task);
+      await this.tasksService.setIsCompleted(task.id, false);
+      await Actions.uncompleteTask(this.listId, task.id);
+      this.setModelFromState();
     }, 600);
   }
 
@@ -455,7 +432,9 @@ export class List {
 
   async restore() {
     await this.listsService.setIsArchived(this.model.id, false);
-    this.localStorage.setDataLastLoad(new Date(0));
+
+    await Actions.getLists(this.listsService);
+
     this.router.navigateToRoute("listsEdited", { editedId: this.model.id });
   }
 

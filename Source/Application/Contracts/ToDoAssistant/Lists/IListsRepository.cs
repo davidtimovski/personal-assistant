@@ -11,11 +11,9 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists
     {
         Task<IEnumerable<ToDoList>> GetAllAsOptionsAsync(int userId);
         Task<IEnumerable<ToDoList>> GetAllWithTasksAndSharingDetailsAsync(int userId);
-        Task<IEnumerable<ToDoList>> GetAllArchivedAsync(int userId);
         Task<IEnumerable<User>> GetMembersAsAssigneeOptionsAsync(int id);
         Task<ToDoList> GetAsync(int id);
         Task<ToDoList> GetAsync(int id, int userId);
-        Task<ToDoList> GetWithTasksAsync(int id, int userId);
         Task<ToDoList> GetWithOwnerAsync(int id, int userId);
         Task<IEnumerable<Share>> GetSharesAsync(int id);
         Task<IEnumerable<Share>> GetShareRequestsAsync(int userId);
@@ -31,7 +29,7 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists
         Task<bool> ExistsAsync(string name, int userId);
         Task<bool> ExistsAsync(int id, string name, int userId);
         Task<int> CountAsync(int userId);
-        Task CreateAsync(ToDoList list);
+        Task<int> CreateAsync(ToDoList list);
         Task<ToDoList> UpdateAsync(ToDoList list);
         Task UpdateSharedAsync(ToDoList list);
         Task<string> DeleteAsync(int id);

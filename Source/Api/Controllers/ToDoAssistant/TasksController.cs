@@ -155,7 +155,7 @@ namespace Api.Controllers.ToDoAssistant
                 }
             }
 
-            return StatusCode(201, createdTask);
+            return StatusCode(201, createdTask.Id);
         }
 
         [HttpPost("bulk")]
@@ -207,7 +207,7 @@ namespace Api.Controllers.ToDoAssistant
                 }
             }
 
-            return StatusCode(201, createdTasks);
+            return StatusCode(201);
         }
 
         [HttpPut]

@@ -16,6 +16,7 @@ import { ListWithShares } from "models/viewmodels/listWithShares";
 import { Share } from "models/viewmodels/share";
 import { CanShareList } from "models/viewmodels/canShareList";
 import { SharingState } from "models/viewmodels/sharingState";
+import * as Actions from "utils/state/actions";
 
 @inject(
   Router,
@@ -40,6 +41,7 @@ export class ShareList {
   private newShares = new Array<Share>();
   private editedShares = new Array<Share>();
   private removedShares = new Array<Share>();
+  private emailPlaceholderText: string;
   private saveButtonIsLoading = false;
   private memberVsAdminTooltipKey = "memberVsAdmin";
 
@@ -54,6 +56,8 @@ export class ShareList {
   ) {
     this.validationController.validateTrigger = validateTrigger.manual;
     this.resetSelectedShare();
+
+    this.emailPlaceholderText = this.i18n.tr("shareList.newMemberEmail");
 
     this.eventAggregator.subscribe("alert-hidden", () => {
       this.emailIsInvalid = false;
@@ -74,6 +78,12 @@ export class ShareList {
     if (this.model.sharingState === SharingState.NotShared) {
       this.emailInput.focus();
     }
+  }
+
+  permissionsToggleChanged() {
+    this.emailPlaceholderText = this.selectedShare.isAdmin
+      ? this.i18n.tr("shareList.newAdminEmail")
+      : this.i18n.tr("shareList.newMemberEmail");
   }
 
   resetSelectedShare() {
@@ -250,7 +260,7 @@ export class ShareList {
       this.removedShares
     );
 
-    this.localStorage.setDataLastLoad(new Date());
+    await Actions.getLists(this.listsService);
 
     if (this.editedShares.length + this.removeShare.length > 0) {
       this.eventAggregator.publish(

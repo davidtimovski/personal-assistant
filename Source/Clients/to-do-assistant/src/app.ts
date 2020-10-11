@@ -8,8 +8,10 @@ import { EventAggregator } from "aurelia-event-aggregator";
 import { I18N } from "aurelia-i18n";
 
 import { AuthService } from "../../shared/src/services/authService";
+import * as Actions from "utils/state/actions";
 import { LocalStorage } from "utils/localStorage";
 import { ConnectionTracker } from "../../shared/src/utils/connectionTracker";
+import { ListsService } from "services/listsService";
 import AuthorizeStep from "../../shared/src/authorize-pipeline-step";
 import routes from "./routes";
 
@@ -17,6 +19,7 @@ import routes from "./routes";
   AuthService,
   LocalStorage,
   ConnectionTracker,
+  ListsService,
   EventAggregator,
   BroadcastChannel,
   I18N
@@ -29,6 +32,7 @@ export class App {
     private readonly authService: AuthService,
     private readonly localStorage: LocalStorage,
     private readonly connTracker: ConnectionTracker,
+    private readonly listsService: ListsService,
     private readonly eventAggregator: EventAggregator,
     private readonly broadcastChannel: BroadcastChannel,
     private readonly i18n: I18N
@@ -47,7 +51,14 @@ export class App {
     }
 
     this.authService.login();
-    this.localStorage.initialize();
+
+    this.eventAggregator.subscribeOnce("authenticated", () => {
+      this.localStorage.initialize();
+
+      Actions.getLists(this.listsService).then(() => {
+        this.eventAggregator.publish("get-lists-finished");
+      });
+    });
   }
 
   configureRouter(config: RouterConfiguration, router: Router): void {

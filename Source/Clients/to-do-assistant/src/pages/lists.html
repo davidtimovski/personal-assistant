@@ -40,7 +40,7 @@
         <div else class="au-stagger">
           <a reorderable-repeat.for="list of lists" reorderable-after-reordering="reorder"
             reorderable-dnd-handler-selector=".sort-handle"
-            class="to-do-list au-animate animate-fade-in ${list.id === getEditedId ? 'highlighted' : ''} ${list.sharingState !== 0 && list.sharingState !== 1 ? 'is-shared' : ''} ${list.sharingState === 1 ? 'will-be-shared' : ''}"
+            class="to-do-list au-animate animate-fade-in ${list.id === getEditedId ? 'highlighted' : ''} ${list.sharingState !== 0 && list.sharingState !== 1 ? 'is-shared' : ''} ${list.sharingState === 1 ? 'pending-share' : ''}"
             route-href="route: list; params.bind: { id: list.id }">
             <i class="icon ${getClassFromIcon(list.icon)}"></i>
             <span class="sort-handle">

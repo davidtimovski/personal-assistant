@@ -43,16 +43,12 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             using DbConnection conn = Connection;
             await conn.OpenAsync();
 
-            var lists = await conn.QueryAsync<ToDoList>(@"SELECT l.""Id"", l.""UserId"", l.""Name"", l.""Icon"", 
-                                                            (CASE WHEN s.""UserId"" IS NOT NULL THEN s.""Order"" ELSE l.""Order"" END), 
-                                                            l.""IsOneTimeToggleDefault"", l.""CreatedDate"", l.""ModifiedDate""
+            var lists = await conn.QueryAsync<ToDoList>(@"SELECT l.*
                                                           FROM ""ToDoAssistant.Lists"" AS l
                                                           LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId"" 
                                                             AND s.""UserId"" = @UserId
                                                             AND s.""IsAccepted"" 
-                                                            AND s.""IsArchived"" = FALSE
-                                                          WHERE l.""IsArchived"" = FALSE 
-                                                            AND (l.""UserId"" = @UserId OR s.""UserId"" = @UserId)",
+                                                          WHERE (l.""UserId"" = @UserId OR s.""UserId"" = @UserId)",
                                                           new { UserId = userId });
 
             var listIds = lists.Select(x => x.Id).ToArray();
@@ -71,28 +67,6 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             }
 
             return lists;
-        }
-
-        public async Task<IEnumerable<ToDoList>> GetAllArchivedAsync(int userId)
-        {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
-
-            var sql = @"SELECT DISTINCT l.*, s.""UserId"", s.""IsAdmin"", s.""IsAccepted""
-                        FROM ""ToDoAssistant.Lists"" AS l
-                        LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                        WHERE l.""IsArchived"" = TRUE AND l.""UserId"" = @UserId 
-                            OR (s.""UserId"" = @UserId AND s.""IsAccepted"" AND s.""IsArchived"")";
-
-            return await conn.QueryAsync<ToDoList, Share, ToDoList>(sql,
-                (list, share) =>
-                {
-                    if (share != null)
-                    {
-                        list.Shares.Add(share);
-                    }
-                    return list;
-                }, new { UserId = userId }, null, true, "UserId");
         }
 
         public async Task<IEnumerable<User>> GetMembersAsAssigneeOptionsAsync(int id)
@@ -136,54 +110,6 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                     }
                     return list;
                 }, new { Id = id, UserId = userId }, null, true, "UserId")).First();
-        }
-
-        public async Task<ToDoList> GetWithTasksAsync(int id, int userId)
-        {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
-
-            var sql = @"SELECT l.*, s.""UserId"", s.""IsAdmin"", s.""IsAccepted"", 
-                            s.""NotificationsEnabled"", s.""IsArchived""
-                        FROM ""ToDoAssistant.Lists"" AS l
-                        LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                        WHERE l.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))";
-
-            var lists = await conn.QueryAsync<ToDoList, Share, ToDoList>(sql,
-                (toDoList, share) =>
-                {
-                    if (share != null)
-                    {
-                        toDoList.Shares.Add(share);
-                    }
-                    return toDoList;
-                }, new { Id = id, UserId = userId }, null, true, "UserId");
-
-            if (!lists.Any())
-            {
-                return null;
-            }
-
-            var list = lists.First();
-
-            var tasksSql = @"SELECT t.*, u.""Id"", u.""ImageUri""
-                            FROM ""ToDoAssistant.Tasks"" AS t
-                            LEFT JOIN ""AspNetUsers"" AS u ON t.""AssignedToUserId"" = u.""Id""
-                            WHERE t.""ListId"" = @ListId AND (t.""PrivateToUserId"" IS NULL OR t.""PrivateToUserId"" = @UserId)";
-
-            var tasks = await conn.QueryAsync<ToDoTask, User, ToDoTask>(tasksSql,
-                (task, user) =>
-                {
-                    if (user != null)
-                    {
-                        task.User = user;
-                    }
-                    return task;
-                }, new { ListId = id, UserId = userId }, null, true);
-
-            list.Tasks.AddRange(tasks);
-
-            return list;
         }
 
         public async Task<ToDoList> GetWithOwnerAsync(int id, int userId)
@@ -397,7 +323,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             return await conn.ExecuteScalarAsync<int>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Lists"" WHERE ""UserId"" = @UserId", new { UserId = userId });
         }
 
-        public async Task CreateAsync(ToDoList list)
+        public async Task<int> CreateAsync(ToDoList list)
         {
             using DbConnection conn = Connection;
             await conn.OpenAsync();
@@ -421,9 +347,11 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             }
 
             await conn.ExecuteAsync(@"INSERT INTO ""ToDoAssistant.Tasks"" (""ListId"", ""Name"", ""IsOneTime"", ""Order"", ""CreatedDate"", ""ModifiedDate"")
-                                        VALUES (@ListId, @Name, @IsOneTime, @Order, @CreatedDate, @ModifiedDate)", list.Tasks, transaction);
+                                      VALUES (@ListId, @Name, @IsOneTime, @Order, @CreatedDate, @ModifiedDate)", list.Tasks, transaction);
 
             transaction.Commit();
+
+            return list.Id;
         }
 
         public async Task<ToDoList> UpdateAsync(ToDoList list)
@@ -618,9 +546,9 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                                                         VALUES (@UserId, @Name, @Icon, @Order, @CreatedDate, @ModifiedDate) returning ""Id""",
                                                         list, transaction)).Single();
             short order = 1;
-            foreach (var task in tasks)
+            foreach (ToDoTask task in tasks)
             {
-                task.ListId = list.Id;
+                task.ListId = id;
                 task.PrivateToUserId = null;
                 task.AssignedToUserId = null;
                 task.Order = order;

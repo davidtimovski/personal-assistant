@@ -13,9 +13,9 @@
     "aurelia-bootstrapper": "^2.3.2",
     "aurelia-fetch-client": "^1.8.2",
     "aurelia-i18n": "^3.0.0-beta.7",
+    "aurelia-store": "^1.6.0",
     "aurelia-validation": "^1.4.0",
     "bcx-aurelia-reorderable-repeat": "1.3.0",
-    "dexie": "^2.0.4",
     "oidc-client": "^1.10.1"
   },
   "devDependencies": {

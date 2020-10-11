@@ -1,11 +1,12 @@
 import { inject } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { ListsService } from "services/listsService";
-import { LocalStorage } from "utils/localStorage";
-import { ShareRequest } from "models/viewmodels/shareRequest";
 import { I18N } from "aurelia-i18n";
 
-@inject(Router, ListsService, LocalStorage, I18N)
+import { ListsService } from "services/listsService";
+import { ShareRequest } from "models/viewmodels/shareRequest";
+import * as Actions from "utils/state/actions";
+
+@inject(Router, ListsService, I18N)
 export class ShareRequests {
   private pendingShareRequests: Array<ShareRequest>;
   private declinedShareRequests: Array<ShareRequest>;
@@ -15,7 +16,6 @@ export class ShareRequests {
   constructor(
     private readonly router: Router,
     private readonly listsService: ListsService,
-    private readonly localStorage: LocalStorage,
     private readonly i18n: I18N
   ) {}
 
@@ -46,7 +46,7 @@ export class ShareRequests {
       1
     );
 
-    this.localStorage.setDataLastLoad(new Date(0));
+    await Actions.getLists(this.listsService);
 
     this.router.navigateToRoute("listsEdited", { editedId: request.listId });
   }

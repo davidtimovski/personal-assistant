@@ -35,30 +35,20 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             _mapper = mapper;
         }
 
+        public async Task<IEnumerable<ListDto>> GetAllAsync(int userId)
+        {
+            IEnumerable<ToDoList> lists = await _listsRepository.GetAllWithTasksAndSharingDetailsAsync(userId);
+
+            var result = lists.Select(x => _mapper.Map<ListDto>(x, opts => { opts.Items["UserId"] = userId; }));
+
+            return result;
+        }
+
         public async Task<IEnumerable<ToDoListOption>> GetAllAsOptionsAsync(int userId)
         {
             IEnumerable<ToDoList> lists = await _listsRepository.GetAllAsOptionsAsync(userId);
 
             var result = lists.Select(x => _mapper.Map<ToDoListOption>(x));
-
-            return result;
-        }
-
-        public async Task<IEnumerable<ListWithSharingDetails>> GetAllWithTasksAndSharingDetailsAsync(int userId)
-        {
-            IEnumerable<ToDoList> lists = await _listsRepository.GetAllWithTasksAndSharingDetailsAsync(userId);
-
-            var result = lists.Select(x => _mapper.Map<ListWithSharingDetails>(x, opts => { opts.Items["UserId"] = userId; }));
-
-            return result.OrderBy(x => x.Order);
-        }
-
-        public async Task<IEnumerable<ArchivedList>> GetAllArchivedAsync(int userId)
-        {
-            IEnumerable<ToDoList> lists = await _listsRepository.GetAllArchivedAsync(userId);
-            lists = lists.OrderByDescending(x => x.ModifiedDate);
-
-            var result = lists.Select(x => _mapper.Map<ArchivedList>(x, opts => { opts.Items["UserId"] = userId; }));
 
             return result;
         }
@@ -81,20 +71,11 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             return result;
         }
 
-        public async Task<ListDto> GetAsync(int id, int userId)
+        public async Task<EditListDto> GetAsync(int id, int userId)
         {
             ToDoList list = await _listsRepository.GetAsync(id, userId);
 
-            var result = _mapper.Map<ListDto>(list, opts => { opts.Items["UserId"] = userId; });
-
-            return result;
-        }
-
-        public async Task<ListWithTasks> GetWithTasksAsync(int id, int userId)
-        {
-            ToDoList list = await _listsRepository.GetWithTasksAsync(id, userId);
-
-            var result = _mapper.Map<ListWithTasks>(list, opts => { opts.Items["UserId"] = userId; });
+            var result = _mapper.Map<EditListDto>(list, opts => { opts.Items["UserId"] = userId; });
 
             return result;
         }
@@ -194,7 +175,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             return _listsRepository.CountAsync(userId);
         }
 
-        public async Task<CreatedList> CreateAsync(CreateList model, IValidator<CreateList> validator)
+        public async Task<int> CreateAsync(CreateList model, IValidator<CreateList> validator)
         {
             ValidateAndThrow(model, validator);
 
@@ -217,11 +198,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
                 ).ToList();
             }
 
-            await _listsRepository.CreateAsync(list);
-
-            var createdList = _mapper.Map<CreatedList>(list, opts => { opts.Items["UserId"] = model.UserId; });
-
-            return createdList;
+            return await _listsRepository.CreateAsync(list);
         }
 
         public async Task CreateSampleAsync(int userId, Dictionary<string, string> translations)
