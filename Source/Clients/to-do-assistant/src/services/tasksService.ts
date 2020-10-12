@@ -65,12 +65,20 @@ export class TasksService extends HttpProxyBase {
     });
   }
 
-  async setIsCompleted(id: number, isCompleted: boolean): Promise<void> {
-    await this.ajaxExecute("tasks/is-completed", {
+  async complete(id: number): Promise<void> {
+    await this.ajaxExecute("tasks/complete", {
       method: "put",
       body: json({
         id: id,
-        isCompleted: isCompleted,
+      }),
+    });
+  }
+
+  async uncomplete(id: number): Promise<void> {
+    await this.ajaxExecute("tasks/uncomplete", {
+      method: "put",
+      body: json({
+        id: id,
       }),
     });
   }

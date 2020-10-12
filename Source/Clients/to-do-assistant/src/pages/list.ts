@@ -382,7 +382,7 @@ export class List {
           this.bleep.play();
         }
       } else {
-        await this.tasksService.setIsCompleted(task.id, true);
+        await this.tasksService.complete(task.id);
         await Actions.completeTask(this.listId, task.id);
         this.setModelFromState();
       }
@@ -406,7 +406,7 @@ export class List {
         this.resetSearchFilter();
       }
 
-      await this.tasksService.setIsCompleted(task.id, false);
+      await this.tasksService.uncomplete(task.id);
       await Actions.uncompleteTask(this.listId, task.id);
       this.setModelFromState();
     }, 600);

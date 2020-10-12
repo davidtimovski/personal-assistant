@@ -20,7 +20,8 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks
         Task<IEnumerable<ToDoTask>> BulkCreateAsync(IEnumerable<ToDoTask> tasks, bool tasksArePrivate, int userId);
         Task UpdateAsync(ToDoTask task, int userId);
         Task<ToDoTask> DeleteAsync(int id, int userId);
-        Task<ToDoTask> SetIsCompletedAsync(int id, bool isDone, int userId);
+        Task<ToDoTask> CompleteAsync(int id, int userId);
+        Task<ToDoTask> UncompleteAsync(int id, int userId);
         Task ReorderAsync(int id, int userId, short oldOrder, short newOrder, DateTime modifiedDate);
     }
 }

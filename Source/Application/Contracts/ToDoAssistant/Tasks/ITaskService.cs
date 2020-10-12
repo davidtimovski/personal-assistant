@@ -19,7 +19,8 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks
         Task<IEnumerable<CreatedTask>> BulkCreateAsync(BulkCreate model, IValidator<BulkCreate> validator);
         Task UpdateAsync(UpdateTask model, IValidator<UpdateTask> validator);
         Task<SimpleTask> DeleteAsync(int id, int userId);
-        Task<SimpleTask> SetIsCompletedAsync(int id, bool isCompleted, int userId);
+        Task<SimpleTask> CompleteAsync(CompleteUncomplete model);
+        Task<SimpleTask> UncompleteAsync(CompleteUncomplete model);
         Task ReorderAsync(ReorderTask model);
     }
 }

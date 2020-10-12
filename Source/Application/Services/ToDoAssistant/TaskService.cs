@@ -174,14 +174,28 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             return result;
         }
 
-        public async Task<SimpleTask> SetIsCompletedAsync(int id, bool isCompleted, int userId)
+        public async Task<SimpleTask> CompleteAsync(CompleteUncomplete model)
         {
-            if (!await ExistsAsync(id, userId))
+            if (!await ExistsAsync(model.Id, model.UserId))
             {
                 throw new ValidationException("Unauthorized");
             }
 
-            ToDoTask originalTask = await _tasksRepository.SetIsCompletedAsync(id, isCompleted, userId);
+            ToDoTask originalTask = await _tasksRepository.CompleteAsync(model.Id, model.UserId);
+
+            var result = _mapper.Map<SimpleTask>(originalTask);
+
+            return result;
+        }
+
+        public async Task<SimpleTask> UncompleteAsync(CompleteUncomplete model)
+        {
+            if (!await ExistsAsync(model.Id, model.UserId))
+            {
+                throw new ValidationException("Unauthorized");
+            }
+
+            ToDoTask originalTask = await _tasksRepository.UncompleteAsync(model.Id, model.UserId);
 
             var result = _mapper.Map<SimpleTask>(originalTask);
 

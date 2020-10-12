@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Api.Config;
-using Api.Models.ToDoAssistant.Tasks;
 using AspNet.Security.OAuth.Introspection;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
@@ -392,49 +391,88 @@ namespace Api.Controllers.ToDoAssistant
             return NoContent();
         }
 
-        [HttpPut("is-completed")]
-        public async Task<IActionResult> SetIsCompleted([FromBody] SetIsCompletedOnTaskDto dto)
+        [HttpPut("complete")]
+        public async Task<IActionResult> Complete([FromBody] CompleteUncomplete dto)
         {
             if (dto == null)
             {
                 return BadRequest();
             }
 
-            int userId;
             try
             {
-                userId = IdentityHelper.GetUserId(User);
+                dto.UserId = IdentityHelper.GetUserId(User);
             }
             catch (UnauthorizedAccessException)
             {
                 return Unauthorized();
             }
 
-            SimpleTask task = await _taskService.SetIsCompletedAsync(dto.Id, dto.IsCompleted, userId);
+            SimpleTask task = await _taskService.CompleteAsync(dto);
 
             // Notify
-            var usersToBeNotified = await _userService.GetToBeNotifiedOfListChangeAsync(task.ListId, userId, task.Id);
+            var usersToBeNotified = await _userService.GetToBeNotifiedOfListChangeAsync(task.ListId, dto.UserId, task.Id);
             if (usersToBeNotified.Any())
             {
-                var currentUser = await _userService.GetAsync(userId);
+                var currentUser = await _userService.GetAsync(dto.UserId);
                 SimpleList list = await _listService.GetAsync(task.ListId);
 
                 foreach (var user in usersToBeNotified)
                 {
                     CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
-                    string message;
+                    string message = _localizer["CompletedTaskNotification", IdentityHelper.GetUserName(User), task.Name, list.Name];
 
-                    if (dto.IsCompleted)
+                    var updateNotificationDto = new CreateOrUpdateNotification(user.Id, dto.UserId, list.Id, task.Id, message);
+                    var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto);
+                    var pushNotification = new PushNotification
                     {
-                        message = _localizer["CompletedTaskNotification", IdentityHelper.GetUserName(User), task.Name, list.Name];
-                    }
-                    else
-                    {
-                        message = _localizer["UncompletedTaskNotification", IdentityHelper.GetUserName(User), task.Name, list.Name];
-                    }
+                        SenderImageUri = currentUser.ImageUri,
+                        UserId = user.Id,
+                        Application = "To Do Assistant",
+                        Message = message,
+                        OpenUrl = GetNotificationsPageUrl(notificationId)
+                    };
 
-                    var createNotificationDto = new CreateOrUpdateNotification(user.Id, userId, list.Id, task.Id, message);
-                    var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                    _senderService.Enqueue(pushNotification);
+                }
+            }
+
+            return NoContent();
+        }
+
+        [HttpPut("uncomplete")]
+        public async Task<IActionResult> Uncomplete([FromBody] CompleteUncomplete dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                dto.UserId = IdentityHelper.GetUserId(User);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+
+            SimpleTask task = await _taskService.UncompleteAsync(dto);
+
+            // Notify
+            var usersToBeNotified = await _userService.GetToBeNotifiedOfListChangeAsync(task.ListId, dto.UserId, task.Id);
+            if (usersToBeNotified.Any())
+            {
+                var currentUser = await _userService.GetAsync(dto.UserId);
+                SimpleList list = await _listService.GetAsync(task.ListId);
+
+                foreach (var user in usersToBeNotified)
+                {
+                    CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
+                    string message = _localizer["UncompletedTaskNotification", IdentityHelper.GetUserName(User), task.Name, list.Name];
+
+                    var updateNotificationDto = new CreateOrUpdateNotification(user.Id, dto.UserId, list.Id, task.Id, message);
+                    var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto);
                     var pushNotification = new PushNotification
                     {
                         SenderImageUri = currentUser.ImageUri,
