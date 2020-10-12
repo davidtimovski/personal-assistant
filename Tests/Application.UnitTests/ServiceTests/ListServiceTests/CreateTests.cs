@@ -39,7 +39,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.ListServiceTests
 
             await _sut.CreateAsync(model, _successfulValidatorMock.Object);
 
-            _successfulValidatorMock.Verify(x => x.Validate(model), Times.Once);
+            _successfulValidatorMock.Verify(x => x.Validate(model));
         }
 
         [Fact]
@@ -79,7 +79,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.ListServiceTests
 
             await _sut.CreateAsync(model, _successfulValidatorMock.Object);
 
-            _listsRepositoryMock.Verify(x => x.CreateAsync(It.IsAny<ToDoList>()), Times.Once);
+            _listsRepositoryMock.Verify(x => x.CreateAsync(It.IsAny<ToDoList>()));
 
             Assert.Equal(expectedTaskCount, resultingTasks.Count);
         }
@@ -102,7 +102,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.ListServiceTests
                 new ToDoTask { Name = "Task 2" }
             };
 
-            _listsRepositoryMock.Verify(x => x.CreateAsync(It.IsAny<ToDoList>()), Times.Once);
+            _listsRepositoryMock.Verify(x => x.CreateAsync(It.IsAny<ToDoList>()));
 
             for (var i = 0; i < expectedTasks.Count; i++)
             {
@@ -121,7 +121,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.ListServiceTests
 
             await _sut.CreateAsync(model, _successfulValidatorMock.Object);
 
-            _listsRepositoryMock.Verify(x => x.CreateAsync(It.IsAny<ToDoList>()), Times.Once);
+            _listsRepositoryMock.Verify(x => x.CreateAsync(It.IsAny<ToDoList>()));
 
             for (var i = 0; i < resultingTasks.Count; i++)
             {

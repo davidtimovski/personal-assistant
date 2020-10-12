@@ -40,7 +40,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
 
             await _sut.UpdateAsync(model, _successfulValidatorMock.Object);
 
-            _successfulValidatorMock.Verify(x => x.Validate(model), Times.Once);
+            _successfulValidatorMock.Verify(x => x.Validate(model));
         }
 
         [Fact]

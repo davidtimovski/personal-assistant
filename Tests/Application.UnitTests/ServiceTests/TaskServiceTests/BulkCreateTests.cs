@@ -39,7 +39,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
 
             await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object);
 
-            _successfulValidatorMock.Verify(x => x.Validate(model), Times.Once);
+            _successfulValidatorMock.Verify(x => x.Validate(model));
         }
 
         [Fact]
@@ -65,7 +65,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
             await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object);
 
             _tasksRepositoryMock.Verify(x => x.BulkCreateAsync(
-                It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>()), Times.Once);
+                It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>()));
 
             Assert.Equal(expectedTaskCount, actualTasks.Count);
         }
@@ -87,7 +87,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
             await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object);
 
             _tasksRepositoryMock.Verify(x => x.BulkCreateAsync(
-                It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>()), Times.Once);
+                It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>()));
 
             for (var i = 0; i < actualTasks.Count; i++)
             {
@@ -114,7 +114,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
             };
 
             _tasksRepositoryMock.Verify(x => x.BulkCreateAsync(
-                It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>()), Times.Once);
+                It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>()));
 
             for (var i = 0; i < expectedTasks.Count; i++)
             {
@@ -139,7 +139,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
             await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object);
 
             _tasksRepositoryMock.Verify(x => x.BulkCreateAsync(
-                It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>()), Times.Once);
+                It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>()));
 
             for (var i = 0; i < actualTasks.Count; i++)
             {
@@ -166,7 +166,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
             int? expectedPrivateToUserId = tasksArePrivate ? userId : (int?)null;
 
             _tasksRepositoryMock.Verify(x => x.BulkCreateAsync(
-                It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>()), Times.Once);
+                It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>()));
 
             for (var i = 0; i < actualTasks.Count; i++)
             {
@@ -188,7 +188,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
             await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object);
 
             _tasksRepositoryMock.Verify(x => x.BulkCreateAsync(
-                It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>()), Times.Once);
+                It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>()));
 
             for (var i = 0; i < actualTasks.Count; i++)
             {
@@ -210,7 +210,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
             await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object);
 
             _tasksRepositoryMock.Verify(x => x.BulkCreateAsync(
-                It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>()), Times.Once);
+                It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>()));
 
             for (var i = 0; i < actualTasks.Count; i++)
             {

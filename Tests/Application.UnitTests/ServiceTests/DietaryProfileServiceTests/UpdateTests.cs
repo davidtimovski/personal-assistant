@@ -34,7 +34,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.DietaryProfileSer
 
             await _sut.UpdateAsync(model, validator.Object);
 
-            validator.Verify(x => x.Validate(model), Times.Once);
+            validator.Verify(x => x.Validate(model));
         }
 
         [Fact]
