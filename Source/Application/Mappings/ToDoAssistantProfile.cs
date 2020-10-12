@@ -109,23 +109,23 @@ namespace PersonalAssistant.Application.Mappings
 
             if (source.Shares.Any())
             {
-                if (source.UserId == userId)
+                bool someRequestsAccepted = source.Shares.Any(x => x.IsAccepted == true);
+                if (someRequestsAccepted)
                 {
-                    return SharingState.Owner;
-                }
-
-                Share share = source.Shares.Single(x => x.UserId == userId);
-                if (share.IsAccepted.HasValue)
-                {
-                    if (share.IsAccepted.Value)
+                    if (source.UserId == userId)
                     {
-                        return share.IsAdmin ? SharingState.Admin : SharingState.Member;
+                        return SharingState.Owner;
                     }
 
-                    return SharingState.NotShared;
+                    Share userShare = source.Shares.Single(x => x.UserId == userId);
+                    return userShare.IsAdmin ? SharingState.Admin : SharingState.Member;
                 }
 
-                return SharingState.PendingShare;
+                bool someRequestsPending = source.Shares.Any(x => !x.IsAccepted.HasValue);
+                if (someRequestsPending)
+                {
+                    return SharingState.PendingShare;
+                }
             }
 
             return SharingState.NotShared;
