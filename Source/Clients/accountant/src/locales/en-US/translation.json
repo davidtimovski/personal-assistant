@@ -90,6 +90,8 @@
     "deposits": "Deposits",
     "transfers": "Transfers",
     "searchByDescription": "Search by description",
+    "first": "First",
+    "last": "Last",
     "previous": "Previous",
     "next": "Next",
     "thereIsNothingHere": "There is nothing here"

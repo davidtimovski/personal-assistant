@@ -206,24 +206,32 @@ export class Transactions {
     this.getTransactions(true);
   }
 
+  first() {
+    this.filters.page = 1;
+
+    Actions.changeFilters(this.filters);
+    this.getTransactions(false);
+  }
+
+  last() {
+    this.filters.page = this.pageCount;
+
+    Actions.changeFilters(this.filters);
+    this.getTransactions(false);
+  }
+
   previous() {
-    if (this.filters.page > 1) {
-      this.filters.page--;
+    this.filters.page--;
 
-      Actions.changeFilters(this.filters);
-
-      this.getTransactions(false);
-    }
+    Actions.changeFilters(this.filters);
+    this.getTransactions(false);
   }
 
   next() {
-    if (this.filters.page < this.pageCount) {
-      this.filters.page++;
+    this.filters.page++;
 
-      Actions.changeFilters(this.filters);
-
-      this.getTransactions(false);
-    }
+    Actions.changeFilters(this.filters);
+    this.getTransactions(false);
   }
 
   viewTransaction(id: number) {

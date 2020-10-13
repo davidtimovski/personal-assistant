@@ -90,6 +90,8 @@
     "deposits": "Прилив",
     "transfers": "Префрлено",
     "searchByDescription": "Пребарај по опис",
+    "first": "Прва",
+    "last": "Последна",
     "previous": "Предходна",
     "next": "Следна",
     "thereIsNothingHere": "Овде нема ништо"
