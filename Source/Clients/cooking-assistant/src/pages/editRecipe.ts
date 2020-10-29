@@ -192,7 +192,7 @@ export class EditRecipe {
               suggestion.group,
               suggestion.name,
               null,
-              suggestion.unit,
+              null,
               !!suggestion.id
             )
           );
@@ -204,7 +204,7 @@ export class EditRecipe {
               null,
               suggestion.name,
               null,
-              suggestion.unit,
+              null,
               !!suggestion.id
             )
           );
