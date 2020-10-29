@@ -7,17 +7,17 @@
         <span if.bind="menuButtonIsLoading" class="page-loading">
           <i class="fas fa-circle-notch fa-spin"></i>
         </span>
-        <div else click.delegate="goToMenu()" class="profile-image-container">
+        <div else click.delegate="goToMenu()" class="profile-image-container" t="[title,aria-label]lists.menu">
           <img src.bind="imageUri" class="profile-image" t="[alt]profilePicture">
         </div>
-        <label class="reorder-toggle ${isReordering ? 'checked' : ''}">
+        <label class="reorder-toggle ${isReordering ? 'checked' : ''}" t="[title,aria-label]lists.reorderLists">
           <input type="checkbox" checked.bind="isReordering">
           <i class="fas fa-random"></i>
         </label>
         <div class="page-title with-buttons">
           <span></span>
         </div>
-        <a click.delegate="sync()" class="side small ${!connTracker.isOnline || progressBar.active ? 'disabled' : ''}">
+        <a click.delegate="sync()" class="side small ${!connTracker.isOnline || progressBar.active ? 'disabled' : ''}" t="[title,aria-label]lists.refresh">
           <i class="fas fa-sync-alt"></i>
         </a>
       </div>
@@ -55,7 +55,7 @@
 
       <div class="centering-wrap">
         <a route-href="route: editList; params.bind: { id: 0 }" class="wide-button new-button"
-          t="[aria-label]lists.addList">
+          t="[title,aria-label]lists.newList">
           <i class="fas fa-plus"></i>
         </a>
       </div>

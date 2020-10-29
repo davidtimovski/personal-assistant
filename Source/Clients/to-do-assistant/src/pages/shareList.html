@@ -28,10 +28,10 @@
             <input type="email" value.bind="selectedShare.email & validate" disabled.bind="!canEditEmail"
               ref="emailInput" maxlength="256" class.bind="emailIsInvalid ? 'invalid' : ''" placeholder="${emailPlaceholderText}"
               aria-label="${emailPlaceholderText}" required>
-            <a if.bind="currentlyEditing" click.delegate="saveShare()">
+            <a if.bind="currentlyEditing" click.delegate="saveShare()" t="[title,aria-label]save">
               <i class="fas fa-save"></i>
             </a>
-            <a else click.delegate="addShare()">
+            <a else click.delegate="addShare()" t="[title,aria-label]shareList.addMember">
               <i class="fas fa-plus-circle"></i>
             </a>
           </div>
@@ -112,7 +112,7 @@
             <i class="fas fa-user-edit"></i>
           </div>
           <span click.delegate="select(share)" class="name">${share.email}</span>
-          <a click.delegate="removeShare(share)" class="side remove-share-button">
+          <a click.delegate="removeShare(share)" class="side remove-share-button" t="[title,aria-label]shareList.removeMember">
             <i class="fas fa-times-circle"></i>
           </a>
         </div>

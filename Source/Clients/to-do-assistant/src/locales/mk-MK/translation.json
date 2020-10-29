@@ -23,9 +23,14 @@
     "6": "Сабота"
   },
   "lists": {
-    "addList": "Додади листа"
+    "menu": "Мени",
+    "reorderLists": "Подреди листи",
+    "refresh": "Освежи",
+    "newList": "Нова листа"
   },
   "list": {
+    "edit": "Промени",
+    "reorderTasks": "Подреди задачи",
     "bulkAddTasks": "Додади повеќе задачи",
     "shareList": "Сподели листа",
     "members": "Членови",
@@ -61,6 +66,8 @@
   },
   "shareList": {
     "share": "Сподели",
+    "addMember": "Додади член",
+    "removeMember": "Отстрани член",
     "newMemberEmail": "Емаил на нов член",
     "newAdminEmail": "Емаил на нов админ",
     "member": "Член",
@@ -121,6 +128,9 @@
   "shareRequests": {
     "shareRequests": "Споделени листи",
     "by": "од",
+    "decline": "Одбиј",
+    "accept": "Прифати",
+    "unblock": "Одблокирај",
     "blockedUsers": "Блокирани корисници",
     "emptyListMessage": "Немате нови споделени листи"
   },

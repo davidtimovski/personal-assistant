@@ -23,9 +23,14 @@
     "6": "Saturday"
   },
   "lists": {
-    "addList": "Add list"
+    "menu": "Menu",
+    "reorderLists": "Reorder lists",
+    "refresh": "Refresh",
+    "newList": "New list"
   },
   "list": {
+    "edit": "Edit",
+    "reorderTasks": "Reorder tasks",
     "bulkAddTasks": "Bulk add tasks",
     "shareList": "Share list",
     "members": "Members",
@@ -59,6 +64,8 @@
   },
   "shareList": {
     "share": "Share",
+    "addMember": "Add member",
+    "removeMember": "Remove member",
     "newMemberEmail": "New member email",
     "newAdminEmail": "New admin email",
     "member": "Member",
@@ -119,6 +126,9 @@
   "shareRequests": {
     "shareRequests": "Share requests",
     "by": "by",
+    "decline": "Decline",
+    "accept": "Accept",
+    "unblock": "Unblock",
     "blockedUsers": "Blocked users",
     "emptyListMessage": "There are no new share requests"
   },
