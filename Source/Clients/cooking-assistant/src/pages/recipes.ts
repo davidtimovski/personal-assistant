@@ -42,7 +42,7 @@ export class Recipes {
     private readonly connTracker: ConnectionTracker
   ) {
     this.eventAggregator.subscribe("get-recipes-finished", () => {
-      this.recipes = this.sortAndMap(this.state.recipes);
+      this.setRecipesFromState();
       this.progressBar.finish();
     });
   }
@@ -57,7 +57,7 @@ export class Recipes {
 
   attached() {
     if (this.state.recipes) {
-      this.recipes = this.sortAndMap(this.state.recipes);
+      this.setRecipesFromState();
     } else {
       this.progressBar.start();
     }
@@ -71,8 +71,8 @@ export class Recipes {
     }
   }
 
-  sortAndMap(recipes: Array<RecipeModel>): Array<RecipeModel> {
-    return recipes
+  setRecipesFromState() {
+    this.recipes = this.state.recipes
       .sort((a: RecipeModel, b: RecipeModel) => {
         const aDate = new Date(a.lastOpenedDate);
         const bDate = new Date(b.lastOpenedDate);
@@ -103,6 +103,7 @@ export class Recipes {
     this.progressBar.start();
 
     Actions.getRecipes(this.recipesService).then(() => {
+      this.setRecipesFromState();
       this.progressBar.finish();
     });
 
