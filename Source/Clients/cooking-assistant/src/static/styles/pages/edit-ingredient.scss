@@ -136,7 +136,7 @@
 }
 .data-size input,
 .data-table-form input {
-  width: 50px;
+  width: 60px;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
   line-height: 37px;
@@ -195,7 +195,6 @@
 .touch-device .link-button:hover {
   color: var(--primary-color);
 }
-
 
 @media screen and (min-width: 1200px) {
   .link-button {
