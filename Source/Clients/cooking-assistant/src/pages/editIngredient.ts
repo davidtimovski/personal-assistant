@@ -117,7 +117,7 @@ export class EditIngredient {
 
         const gTo = 1000;
         const gToLabel = gTo - 1;
-        const mgTo = 10000;
+        const mgTo = 20000;
         const mgToLabel = mgTo - 1;
         ValidationRules.ensure((x: EditIngredientModel) => x.name)
           .required()

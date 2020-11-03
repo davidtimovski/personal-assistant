@@ -73,39 +73,39 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients.M
             });
             RuleFor(dto => dto.NutritionData.Sodium).Must(sodium =>
             {
-                return !sodium.HasValue || (sodium >= 0 && sodium < 10000);
+                return !sodium.HasValue || (sodium >= 0 && sodium < 20000);
             });
             RuleFor(dto => dto.NutritionData.Cholesterol).Must(cholesterol =>
             {
-                return !cholesterol.HasValue || (cholesterol >= 0 && cholesterol < 10000);
+                return !cholesterol.HasValue || (cholesterol >= 0 && cholesterol < 20000);
             });
             RuleFor(dto => dto.NutritionData.VitaminA).Must(vitaminA =>
             {
-                return !vitaminA.HasValue || (vitaminA >= 0 && vitaminA < 10000);
+                return !vitaminA.HasValue || (vitaminA >= 0 && vitaminA < 20000);
             });
             RuleFor(dto => dto.NutritionData.VitaminC).Must(vitaminC =>
             {
-                return !vitaminC.HasValue || (vitaminC >= 0 && vitaminC < 10000);
+                return !vitaminC.HasValue || (vitaminC >= 0 && vitaminC < 20000);
             });
             RuleFor(dto => dto.NutritionData.VitaminD).Must(vitaminD =>
             {
-                return !vitaminD.HasValue || (vitaminD >= 0 && vitaminD < 10000);
+                return !vitaminD.HasValue || (vitaminD >= 0 && vitaminD < 20000);
             });
             RuleFor(dto => dto.NutritionData.Calcium).Must(calcium =>
             {
-                return !calcium.HasValue || (calcium >= 0 && calcium < 10000);
+                return !calcium.HasValue || (calcium >= 0 && calcium < 20000);
             });
             RuleFor(dto => dto.NutritionData.Iron).Must(iron =>
             {
-                return !iron.HasValue || (iron >= 0 && iron < 10000);
+                return !iron.HasValue || (iron >= 0 && iron < 20000);
             });
             RuleFor(dto => dto.NutritionData.Potassium).Must(potassium =>
             {
-                return !potassium.HasValue || (potassium >= 0 && potassium < 10000);
+                return !potassium.HasValue || (potassium >= 0 && potassium < 20000);
             });
             RuleFor(dto => dto.NutritionData.Magnesium).Must(magnesium =>
             {
-                return !magnesium.HasValue || (magnesium >= 0 && magnesium < 10000);
+                return !magnesium.HasValue || (magnesium >= 0 && magnesium < 20000);
             });
 
             RuleFor(dto => dto.PriceData.ProductSize).Must((dto, servingSize) =>
@@ -114,7 +114,7 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients.M
             });
             RuleFor(dto => dto.PriceData.Price).Must(price =>
             {
-                return !price.HasValue || (price > 0 && price < 10000);
+                return !price.HasValue || (price > 0 && price < 20000);
             });
         }
     }
