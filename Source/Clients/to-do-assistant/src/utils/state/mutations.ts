@@ -55,8 +55,6 @@ function completeTask(state: State, listId: number, taskId: number) {
     });
   }
 
-  task.rightSideIsLoading = false;
-
   return newState;
 }
 
@@ -93,7 +91,6 @@ function uncompleteTask(state: State, listId: number, taskId: number) {
 
   task.isCompleted = false;
   task.order = order;
-  task.rightSideIsLoading = false;
 
   return newState;
 }

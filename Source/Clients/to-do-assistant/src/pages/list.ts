@@ -361,6 +361,8 @@ export class List {
       return;
     }
 
+    const startTime = new Date();
+
     if (this.soundsEnabled) {
       this.bleep.play();
     }
@@ -368,31 +370,38 @@ export class List {
     task.rightSideIsLoading = true;
     this.lastEditedId = 0;
 
-    window.setTimeout(async () => {
-      if (this.isSearching) {
-        this.resetSearchFilter();
-      }
+    if (this.isSearching) {
+      this.resetSearchFilter();
+    }
 
-      if (task.isOneTime) {
-        await this.tasksService.delete(task.id);
-        await Actions.deleteTask(this.listId, task.id);
-        this.setModelFromState();
+    if (task.isOneTime) {
+      await this.tasksService.delete(task.id);
+      await Actions.deleteTask(this.listId, task.id);
 
-        if (this.soundsEnabled) {
-          this.bleep.play();
-        }
-      } else {
-        await this.tasksService.complete(task.id);
-        await Actions.completeTask(this.listId, task.id);
+      this.executeAfterDelay(() => {
         this.setModelFromState();
+      }, startTime);
+
+      if (this.soundsEnabled) {
+        this.bleep.play();
       }
-    }, 600);
+    } else {
+      await this.tasksService.complete(task.id);
+      await Actions.completeTask(this.listId, task.id);
+
+      this.executeAfterDelay(() => {
+        task.rightSideIsLoading = false;
+        this.setModelFromState();
+      }, startTime);
+    }
   }
 
   async uncomplete(task: Task) {
     if (task.rightSideIsLoading) {
       return;
     }
+
+    const startTime = new Date();
 
     if (this.soundsEnabled) {
       this.blop.play();
@@ -401,15 +410,28 @@ export class List {
     task.rightSideIsLoading = true;
     this.lastEditedId = 0;
 
-    window.setTimeout(async () => {
-      if (this.isSearching) {
-        this.resetSearchFilter();
-      }
+    if (this.isSearching) {
+      this.resetSearchFilter();
+    }
 
-      await this.tasksService.uncomplete(task.id);
-      await Actions.uncompleteTask(this.listId, task.id);
+    await this.tasksService.uncomplete(task.id);
+    await Actions.uncompleteTask(this.listId, task.id);
+
+    this.executeAfterDelay(() => {
+      task.rightSideIsLoading = false;
       this.setModelFromState();
-    }, 600);
+    }, startTime);
+  }
+
+  // Used to delay UI update if server responds too quickly
+  executeAfterDelay(callback: () => void, startTime: Date) {
+    const delayMs = 600;
+    const timeTaken = new Date().getTime() - startTime.getTime();
+    const sleepTime = delayMs - timeTaken;
+
+    window.setTimeout(() => {
+      callback();
+    }, Math.max(sleepTime, 0));
   }
 
   editList() {
