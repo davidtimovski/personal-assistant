@@ -34,6 +34,7 @@ using PersonalAssistant.Application.Services.Accountant;
 using PersonalAssistant.Application.Services.Common;
 using PersonalAssistant.Application.Services.CookingAssistant;
 using PersonalAssistant.Application.Services.ToDoAssistant;
+using Utility;
 
 namespace PersonalAssistant.Application
 {
@@ -42,6 +43,8 @@ namespace PersonalAssistant.Application
         public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+            services.AddTransient<IConversion, Conversion>();
 
             services.AddTransient<IValidator<CreateList>, CreateListValidator>();
             services.AddTransient<IValidator<UpdateList>, UpdateListValidator>();
@@ -80,7 +83,7 @@ namespace PersonalAssistant.Application
             configuration.Bind("DietaryProfile:ActivityMultiplier", activityMultiplier);
             var dietaryGoalCalories = new Dictionary<string, short>();
             configuration.Bind("DietaryProfile:DietaryGoalCalories", dietaryGoalCalories);
-            services.AddSingleton<IConversionService>(new ConversionService(activityMultiplier, dietaryGoalCalories));
+            services.AddSingleton<IDailyIntakeHelper>(new DailyIntakeHelper(activityMultiplier, dietaryGoalCalories));
 
             return services;
         }

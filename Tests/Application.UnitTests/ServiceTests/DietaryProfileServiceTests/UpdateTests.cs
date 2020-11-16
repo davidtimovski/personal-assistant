@@ -8,6 +8,7 @@ using PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles.M
 using PersonalAssistant.Application.Mappings;
 using PersonalAssistant.Application.Services.CookingAssistant;
 using PersonalAssistant.Application.UnitTests.Builders;
+using Utility;
 using Xunit;
 
 namespace PersonalAssistant.Application.UnitTests.ServiceTests.DietaryProfileServiceTests
@@ -20,7 +21,8 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.DietaryProfileSer
         public UpdateTests()
         {
             _sut = new DietaryProfileService(
-                new Mock<IConversionService>().Object,
+                new Mock<IConversion>().Object,
+                new Mock<IDailyIntakeHelper>().Object,
                 new Mock<IOptions<DailyIntakeReference>>().Object,
                 _dietaryProfilesRepositoryMock.Object,
                 MapperMocker.GetMapper<CookingAssistantProfile>());

@@ -10,23 +10,27 @@ using PersonalAssistant.Application.Contracts.CookingAssistant.Common;
 using PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles;
 using PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles.Models;
 using PersonalAssistant.Domain.Entities.CookingAssistant;
+using Utility;
 
 namespace PersonalAssistant.Application.Services.CookingAssistant
 {
     public class DietaryProfileService : IDietaryProfileService
     {
-        private readonly IConversionService _conversionService;
+        private readonly IConversion _conversion;
+        private readonly IDailyIntakeHelper _dailyIntakeHelper;
         private readonly DailyIntakeReference _dailyIntakeRef;
         private readonly IDietaryProfilesRepository _dietaryProfilesRepository;
         private readonly IMapper _mapper;
 
         public DietaryProfileService(
-            IConversionService conversionService,
+            IConversion conversion,
+            IDailyIntakeHelper dailyIntakeHelper,
             IOptions<DailyIntakeReference> dailyIntakeRef,
             IDietaryProfilesRepository dietaryProfilesRepository,
             IMapper mapper)
         {
-            _conversionService = conversionService;
+            _conversion = conversion;
+            _dailyIntakeHelper = dailyIntakeHelper;
             _dailyIntakeRef = dailyIntakeRef.Value;
             _dietaryProfilesRepository = dietaryProfilesRepository;
             _mapper = mapper;
@@ -54,7 +58,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             if (model.HeightFeet.HasValue && !model.HeightCm.HasValue)
             {
                 short heightInchesValue = model.HeightInches ?? 0;
-                height = _conversionService.ConvertFeetAndInchesToCentimeters(model.HeightFeet.Value, heightInchesValue);
+                height = _conversion.FeetAndInchesToCentimeters(model.HeightFeet.Value, heightInchesValue);
             }
             else
             {
@@ -65,7 +69,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             float weight = 0;
             if (model.WeightLbs.HasValue && !model.WeightKg.HasValue)
             {
-                weight = _conversionService.ConvertPoundsToKilos(model.WeightLbs.Value);
+                weight = _conversion.PoundsToKilos(model.WeightLbs.Value);
             }
             else
             {
@@ -74,7 +78,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
             var recommendedDailyIntake = new RecommendedDailyIntake
             {
-                Calories = _conversionService.DeriveDailyCaloriesIntake(model.GetAge(), model.Gender,
+                Calories = _dailyIntakeHelper.DeriveDailyCaloriesIntake(model.GetAge(), model.Gender,
                     height, weight, model.ActivityLevel, model.Goal),
                 //Fat = intake.Fat,
                 SaturatedFat = intake.SaturatedFatMax,
@@ -106,7 +110,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             if (model.HeightFeet.HasValue && !model.HeightCm.HasValue)
             {
                 short heightInchesValue = model.HeightInches ?? 0;
-                dietaryProfile.Height = _conversionService.ConvertFeetAndInchesToCentimeters(model.HeightFeet.Value, heightInchesValue);
+                dietaryProfile.Height = _conversion.FeetAndInchesToCentimeters(model.HeightFeet.Value, heightInchesValue);
             }
             else
             {
@@ -116,7 +120,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             // Derive weight
             if (model.WeightLbs.HasValue && !model.WeightKg.HasValue)
             {
-                dietaryProfile.Weight = _conversionService.ConvertPoundsToKilos(model.WeightLbs.Value);
+                dietaryProfile.Weight = _conversion.PoundsToKilos(model.WeightLbs.Value);
             }
             else
             {

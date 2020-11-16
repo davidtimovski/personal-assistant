@@ -14,6 +14,7 @@ using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models;
 using PersonalAssistant.Domain.Entities;
 using PersonalAssistant.Domain.Entities.Common;
 using PersonalAssistant.Domain.Entities.CookingAssistant;
+using Utility;
 
 namespace PersonalAssistant.Application.Mappings
 {
@@ -90,12 +91,17 @@ namespace PersonalAssistant.Application.Mappings
 
     public class RecipeNutritionSummaryResolver : IValueResolver<Recipe, object, RecipeNutritionSummary>
     {
-        private readonly IConversionService _conversionService;
+        private readonly IDailyIntakeHelper _dailyIntakeHelper;
+        private readonly IConversion _conversion;
         private readonly DailyIntakeReference _dailyIntakeRef;
 
-        public RecipeNutritionSummaryResolver(IConversionService conversionService, IOptions<DailyIntakeReference> dailyIntakeRef)
+        public RecipeNutritionSummaryResolver(
+            IDailyIntakeHelper dailyIntakeHelper,
+            IConversion conversion,
+            IOptions<DailyIntakeReference> dailyIntakeRef)
         {
-            _conversionService = conversionService;
+            _dailyIntakeHelper = dailyIntakeHelper;
+            _conversion = conversion;
             _dailyIntakeRef = dailyIntakeRef.Value;
         }
 
@@ -228,7 +234,7 @@ namespace PersonalAssistant.Application.Mappings
             {
                 if (intake != null && dietaryProfile.TrackCalories)
                 {
-                    short dailyCalories = dietaryProfile.CustomCalories ?? _conversionService.DeriveDailyCaloriesIntake(dietaryProfile.GetAge(), dietaryProfile.Gender,
+                    short dailyCalories = dietaryProfile.CustomCalories ?? _dailyIntakeHelper.DeriveDailyCaloriesIntake(dietaryProfile.GetAge(), dietaryProfile.Gender,
                             dietaryProfile.Height.Value, dietaryProfile.Weight.Value, dietaryProfile.ActivityLevel, dietaryProfile.Goal);
                     nutritionSummary.CaloriesFromDaily = GetPercentageFromRecommendedDailyIntake(dailyCalories, nutritionSummary.Calories.Value);
                     nutritionSummary.CaloriesFromDailyGrade = GetDailyGrade(nutritionSummary.CaloriesFromDaily.Value, false);
@@ -432,7 +438,7 @@ namespace PersonalAssistant.Application.Mappings
                 return (valueInGrams * amount / servings) + (currentValue ?? 0);
             }
 
-            float amountInGrams = _conversionService.ConvertToGrams(unit, amount);
+            float amountInGrams = _conversion.ToGrams(unit, amount);
             float valuePerGram = valueInGrams / servingSizeGrams;
             return (valuePerGram * amountInGrams / servings) + (currentValue ?? 0);
         }
@@ -444,7 +450,7 @@ namespace PersonalAssistant.Application.Mappings
                 return (valueInMilligrams * amount / servings) + (currentValue ?? 0);
             }
 
-            float amountInMilligrams = _conversionService.ConvertToMilligrams(unit, amount);
+            float amountInMilligrams = _conversion.ToMilligrams(unit, amount);
             float valuePerMilligram = valueInMilligrams / (servingSizeGrams * 1000);
             return (valuePerMilligram * amountInMilligrams / servings) + (currentValue ?? 0);
         }
@@ -492,12 +498,12 @@ namespace PersonalAssistant.Application.Mappings
 
     public class RecipeCostSummaryResolver : IValueResolver<Recipe, object, RecipeCostSummary>
     {
-        private readonly IConversionService _conversionService;
+        private readonly IConversion _conversion;
         private readonly ICurrencyService _currencyService;
 
-        public RecipeCostSummaryResolver(IConversionService conversionService, ICurrencyService currencyService)
+        public RecipeCostSummaryResolver(IConversion conversion, ICurrencyService currencyService)
         {
-            _conversionService = conversionService;
+            _conversion = conversion;
             _currencyService = currencyService;
         }
 
@@ -546,7 +552,7 @@ namespace PersonalAssistant.Application.Mappings
                 return priceInGrams * (decimal)amount + (currentValue ?? 0);
             }
 
-            float amountInGrams = _conversionService.ConvertToGrams(unit, amount);
+            float amountInGrams = _conversion.ToGrams(unit, amount);
             decimal valuePerGram = priceInGrams / productSizeGrams;
             return valuePerGram * (decimal)amountInGrams + (currentValue ?? 0);
         }
@@ -721,19 +727,19 @@ namespace PersonalAssistant.Application.Mappings
 
     public class HeightFeetResolver : IValueResolver<DietaryProfile, object, short?>
     {
-        private readonly IConversionService _conversionService;
+        private readonly IConversion _conversion;
 
-        public HeightFeetResolver(IConversionService conversionService)
+        public HeightFeetResolver(IConversion conversion)
         {
-            _conversionService = conversionService;
+            _conversion = conversion;
         }
 
         public short? Resolve(DietaryProfile source, object dest, short? destMember, ResolutionContext context)
         {
             if (source.Height.HasValue && source.User.ImperialSystem)
             {
-                var (feet, _) = _conversionService.ConvertCentimetersToFeetAndInches(source.Height.Value);
-                return feet;
+                var (feet, _) = _conversion.CentimetersToFeetAndInches(source.Height.Value);
+                return (short?)feet;
             }
 
             return null;
@@ -742,19 +748,19 @@ namespace PersonalAssistant.Application.Mappings
 
     public class HeightInchesResolver : IValueResolver<DietaryProfile, object, short?>
     {
-        private readonly IConversionService _conversionService;
+        private readonly IConversion _conversion;
 
-        public HeightInchesResolver(IConversionService conversionService)
+        public HeightInchesResolver(IConversion conversion)
         {
-            _conversionService = conversionService;
+            _conversion = conversion;
         }
 
         public short? Resolve(DietaryProfile source, object dest, short? destMember, ResolutionContext context)
         {
             if (source.Height.HasValue && source.User.ImperialSystem)
             {
-                var (_, inches) = _conversionService.ConvertCentimetersToFeetAndInches(source.Height.Value);
-                return inches;
+                var (_, inches) = _conversion.CentimetersToFeetAndInches(source.Height.Value);
+                return (short?)inches;
             }
 
             return null;
@@ -776,19 +782,19 @@ namespace PersonalAssistant.Application.Mappings
 
     public class WeightLbsResolver : IValueResolver<DietaryProfile, object, short?>
     {
-        private readonly IConversionService _conversionService;
+        private readonly IConversion _conversion;
 
-        public WeightLbsResolver(IConversionService conversionService)
+        public WeightLbsResolver(IConversion conversion)
         {
-            _conversionService = conversionService;
+            _conversion = conversion;
         }
 
         public short? Resolve(DietaryProfile source, object dest, short? destMember, ResolutionContext context)
         {
             if (source.Weight.HasValue && source.User.ImperialSystem)
             {
-                var pounds = _conversionService.ConvertKilosToPounds(source.Weight.Value);
-                return pounds;
+                var pounds = _conversion.KilosToPounds(source.Weight.Value);
+                return (short?)pounds;
             }
 
             return null;
@@ -797,12 +803,12 @@ namespace PersonalAssistant.Application.Mappings
 
     public class DailyIntakeResolver : IValueResolver<DietaryProfile, object, DailyIntake>
     {
-        private readonly IConversionService _conversionService;
+        private readonly IDailyIntakeHelper _dailyIntakeHelper;
         private readonly DailyIntakeReference _dailyIntakeRef;
 
-        public DailyIntakeResolver(IConversionService conversionService, IOptions<DailyIntakeReference> dailyIntakeRef)
+        public DailyIntakeResolver(IDailyIntakeHelper dailyIntakeHelper, IOptions<DailyIntakeReference> dailyIntakeRef)
         {
-            _conversionService = conversionService;
+            _dailyIntakeHelper = dailyIntakeHelper;
             _dailyIntakeRef = dailyIntakeRef.Value;
         }
 
@@ -814,7 +820,7 @@ namespace PersonalAssistant.Application.Mappings
 
             var dailyIntake = new DailyIntake
             {
-                Calories = _conversionService.DeriveDailyCaloriesIntake(age, source.Gender, source.Height.Value,
+                Calories = _dailyIntakeHelper.DeriveDailyCaloriesIntake(age, source.Gender, source.Height.Value,
                     source.Weight.Value, source.ActivityLevel, source.Goal),
                 CustomCalories = source.CustomCalories,
                 TrackCalories = source.TrackCalories,

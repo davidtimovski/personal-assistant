@@ -22,6 +22,7 @@
     <ProjectReference Include="..\..\Source\Domain\Domain.csproj" />
     <ProjectReference Include="..\..\Source\Application\Application.csproj" />
     <ProjectReference Include="..\..\Source\Infrastructure\Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Source\Utility\Utility.fsproj" />
   </ItemGroup>
 
 </Project>
