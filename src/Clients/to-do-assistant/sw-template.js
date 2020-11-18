@@ -1,16 +1,12 @@
-const CACHE_NAME = "1.8.3";
-const notificationIconUri = "/images/icons/app-icon-96x96.png";
-const defaultProfileImageUri =
-  "https://res.cloudinary.com/personalassistant/t_profile_thumbnail/production/defaults/sfmqac.jpg";
+const CACHE_NAME = "1.8.4";
 const precacheResources = [
   "#SHELL#",
-  "https://fonts.googleapis.com/css?family=Didact+Gothic&display=swap",
+  "#WEBFONTS#",
   "/manifest.json",
   "/robots.txt",
   "/favicon.png?v=7",
-  defaultProfileImageUri,
   "/images/icons/app-icon-48x48.png",
-  notificationIconUri,
+  "/images/icons/app-icon-96x96.png",
   "/images/icons/app-icon-144x144.png",
   "/images/icons/app-icon-192x192.png",
   "/images/icons/app-icon-256x256.png",

@@ -6,14 +6,14 @@ const DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack
 const project = require("./aurelia_project/aurelia.json");
 const {
   AureliaPlugin,
-  ModuleDependenciesPlugin
+  ModuleDependenciesPlugin,
 } = require("aurelia-webpack-plugin");
 const { ProvidePlugin } = require("webpack");
 const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 
 // config helpers:
-const ensureArray = config =>
+const ensureArray = (config) =>
   (config && (Array.isArray(config) ? config : [config])) || [];
 const when = (condition, config, negativeConfig) =>
   condition ? ensureArray(config) : ensureArray(negativeConfig);
@@ -38,11 +38,14 @@ module.exports = (
     // Enforce single aurelia-binding, to avoid v1/v2 duplication due to
     // out-of-date dependencies on 3rd party aurelia plugins
     alias: {
-      "aurelia-binding": path.resolve(__dirname, "node_modules/aurelia-binding")
-    }
+      "aurelia-binding": path.resolve(
+        __dirname,
+        "node_modules/aurelia-binding"
+      ),
+    },
   },
   entry: {
-    app: ["aurelia-bootstrapper"]
+    app: ["aurelia-bootstrapper"],
   },
   mode: production ? "production" : "development",
   output: {
@@ -56,7 +59,7 @@ module.exports = (
       : "[name].[hash].bundle.map",
     chunkFilename: production
       ? "[name].[chunkhash].chunk.js"
-      : "[name].[hash].chunk.js"
+      : "[name].[hash].chunk.js",
   },
   optimization: {
     runtimeChunk: true, // separates the runtime chunk, required for long term cacheability
@@ -103,14 +106,14 @@ module.exports = (
             )[1];
             return `vendor.${packageName.replace("@", "")}`;
           },
-          priority: 20
+          priority: 20,
         },
         vendors: {
           // picks up everything else being used from node_modules that is less than minSize
           test: /[\\/]node_modules[\\/]/,
           name: "vendors",
           priority: 19,
-          enforce: true // create chunk regardless of the size of the chunk
+          enforce: true, // create chunk regardless of the size of the chunk
         },
         // generic 'async' vendor node module splits: separates out larger modules
         vendorAsyncSplit: {
@@ -126,7 +129,7 @@ module.exports = (
           chunks: "async",
           priority: 10,
           reuseExistingChunk: true,
-          minSize: 5000 // only create if 5k or larger
+          minSize: 5000, // only create if 5k or larger
         },
         vendorsAsync: {
           // vendors async chunk, remaining asynchronously used node modules as single chunk file
@@ -135,7 +138,7 @@ module.exports = (
           chunks: "async",
           priority: 9,
           reuseExistingChunk: true,
-          enforce: true // create chunk regardless of the size of the chunk
+          enforce: true, // create chunk regardless of the size of the chunk
         },
         // generic 'async' common module splits: separates out larger modules
         commonAsync: {
@@ -149,7 +152,7 @@ module.exports = (
           chunks: "async",
           priority: 1,
           reuseExistingChunk: true,
-          minSize: 5000 // only create if 5k or larger
+          minSize: 5000, // only create if 5k or larger
         },
         commonsAsync: {
           // commons async chunk, remaining asynchronously used modules as single chunk file
@@ -158,10 +161,10 @@ module.exports = (
           chunks: "async",
           priority: 0,
           reuseExistingChunk: true,
-          enforce: true // create chunk regardless of the size of the chunk
-        }
-      }
-    }
+          enforce: true, // create chunk regardless of the size of the chunk
+        },
+      },
+    },
   },
   performance: { hints: false },
   devServer: {
@@ -170,7 +173,7 @@ module.exports = (
     historyApiFallback: true,
     hot: hmr || project.platform.hmr,
     port: port || project.platform.port,
-    host: host
+    host: host,
   },
   devtool: production ? "nosources-source-map" : "cheap-module-eval-source-map",
   module: {
@@ -183,36 +186,36 @@ module.exports = (
         use: extractCss
           ? [
               {
-                loader: MiniCssExtractPlugin.loader
+                loader: MiniCssExtractPlugin.loader,
               },
-              "css-loader"
+              "css-loader",
             ]
-          : ["style-loader", ...cssRules]
+          : ["style-loader", ...cssRules],
       },
       {
         test: /\.css$/i,
         issuer: [{ test: /\.html$/i }],
         // CSS required in templates cannot be extracted safely
         // because Aurelia would try to require it again in runtime
-        use: cssRules
+        use: cssRules,
       },
       {
         test: /\.scss$/,
         use: extractCss
           ? [
               {
-                loader: MiniCssExtractPlugin.loader
+                loader: MiniCssExtractPlugin.loader,
               },
               ...cssRules,
-              ...sassRules
+              ...sassRules,
             ]
           : ["style-loader", ...cssRules, ...sassRules],
-        issuer: /\.[tj]s$/i
+        issuer: /\.[tj]s$/i,
       },
       {
         test: /\.scss$/,
         use: ["css-loader", "sass-loader"],
-        issuer: /\.html?$/i
+        issuer: /\.html?$/i,
       },
       { test: /\.html$/i, loader: "html-loader" },
       { test: /\.ts$/, loader: "ts-loader" },
@@ -221,7 +224,7 @@ module.exports = (
       {
         test: /\.(png|gif|jpg|cur|webp)$/i,
         loader: "url-loader",
-        options: { limit: 8192, outputPath: "images/" }
+        options: { limit: 8192, outputPath: "images/" },
       },
       {
         test: /\.woff2(\?v=[0-9]\.[0-9]\.[0-9])?$/i,
@@ -229,8 +232,8 @@ module.exports = (
         options: {
           limit: 10000,
           mimetype: "application/font-woff2",
-          outputPath: "webfonts/"
-        }
+          outputPath: "webfonts/",
+        },
       },
       {
         test: /\.woff(\?v=[0-9]\.[0-9]\.[0-9])?$/i,
@@ -238,25 +241,25 @@ module.exports = (
         options: {
           limit: 10000,
           mimetype: "application/font-woff",
-          outputPath: "webfonts/"
-        }
+          outputPath: "webfonts/",
+        },
       },
       // load these fonts normally, as files:
       {
         test: /\.(ttf|eot|svg|otf)(\?v=[0-9]\.[0-9]\.[0-9])?$/i,
         loader: "file-loader",
         options: {
-          outputPath: "webfonts/"
-        }
+          outputPath: "webfonts/",
+        },
       },
       {
         test: /environment\.json$/i,
         use: [
           {
             loader: "app-settings-loader",
-            options: { env: production ? "production" : "development" }
-          }
-        ]
+            options: { env: production ? "production" : "development" },
+          },
+        ],
       },
       ...when(tests, {
         test: /\.[jt]s$/i,
@@ -264,9 +267,9 @@ module.exports = (
         include: srcDir,
         exclude: [/\.(spec|test)\.[jt]s$/i],
         enforce: "post",
-        options: { esModules: true }
-      })
-    ]
+        options: { esModules: true },
+      }),
+    ],
   },
   plugins: [
     ...when(!tests, new DuplicatePackageCheckerPlugin()),
@@ -276,8 +279,8 @@ module.exports = (
       "aurelia-testing": ["./compile-spy", "./view-spy"],
       "aurelia-i18n": [
         { name: "locales/en-US/translation.json", chunk: "en-US" },
-        { name: "locales/mk-MK/translation.json", chunk: "mk-MK" }
-      ]
+        { name: "locales/mk-MK/translation.json", chunk: "mk-MK" },
+      ],
     }),
     new HtmlWebpackPlugin({
       template: "index.ejs",
@@ -293,7 +296,7 @@ module.exports = (
             removeScriptTypeAttributes: true,
             removeStyleLinkTypeAttributes: true,
             ignoreCustomFragments: [/\${.*?}/g],
-            favicon: "favicon.png"
+            favicon: "favicon.png",
           }
         : undefined,
       metadata: {
@@ -302,8 +305,8 @@ module.exports = (
         baseUrl,
         apiUrl: production
           ? "https://api.personalassistant.site"
-          : "http://localhost:5001"
-      }
+          : "http://localhost:5001",
+      },
     }),
     ...when(
       !tests,
@@ -312,7 +315,7 @@ module.exports = (
         { from: "favicon.png", to: "favicon.png" },
         { from: "manifest.json", to: "manifest.json" },
         { from: "src/static/images/icons", to: "images/icons/" },
-        { from: "src/static/audio", to: "audio/" }
+        { from: "src/static/audio", to: "audio/" },
       ])
     ),
     // ref: https://webpack.js.org/plugins/mini-css-extract-plugin/
@@ -325,7 +328,7 @@ module.exports = (
           : "css/[name].[hash].bundle.css",
         chunkFilename: production
           ? "css/[name].[contenthash].chunk.css"
-          : "css/[name].[hash].chunk.css"
+          : "css/[name].[hash].chunk.css",
       })
     ),
     ...when(analyze, new BundleAnalyzerPlugin()),
@@ -335,6 +338,6 @@ module.exports = (
      * remove those before the webpack build. In that case consider disabling the plugin, and instead use something like
      * `del` (https://www.npmjs.com/package/del), or `rimraf` (https://www.npmjs.com/package/rimraf).
      */
-    new CleanWebpackPlugin()
-  ]
+    new CleanWebpackPlugin(),
+  ],
 });

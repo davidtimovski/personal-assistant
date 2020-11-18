@@ -44,6 +44,5 @@ DevOps/.pgpass
 DevOps/crontab.txt
 DevOps/personalassistant-backup.sh
 src/Api/currencyrates.json
-src/Clients/*/sw.js
 **/publish.ps1
 **/Publish.lnk

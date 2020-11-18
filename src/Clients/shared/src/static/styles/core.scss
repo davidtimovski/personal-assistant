@@ -7,6 +7,15 @@
 @import "fontawesome-free-5.10.2/brands";
 @import "animations";
 
+@font-face {
+  font-family: "Didact Gothic";
+  font-style: normal;
+  font-weight: 400;
+  src: local(""),
+    url("../../../../shared/src/static/webfonts/DidactGothic-Regular.ttf")
+      format("truetype");
+}
+
 :root {
   --regular-color: #333;
   --danger-color: #ff2801;

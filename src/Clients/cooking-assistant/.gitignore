@@ -19,3 +19,9 @@ test/cypress/integration/examples
 screenshots
 
 *.code-workspace
+
+### Yarn ###
+yarn-debug.log*
+yarn-error.log*
+
+temporary-sw.js
