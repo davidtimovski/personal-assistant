@@ -9,7 +9,6 @@ namespace PersonalAssistant.Application.Contracts.Common
     public interface ICdnService
     {
         string GetDefaultProfileImageUri();
-        string GetDefaultRecipeUri();
         string ImageUriToThumbnail(string imageUri);
         Task<string> UploadAsync(string filePath, string uploadPath, string template);
         Task<string> UploadTempAsync(UploadTempImage model, IValidator<UploadTempImage> validator);

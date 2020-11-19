@@ -51,8 +51,6 @@ namespace PersonalAssistant.Infrastructure.Cdn
 
         public string GetDefaultProfileImageUri() => _defaultProfileImageUri;
 
-        public string GetDefaultRecipeUri() => _defaultRecipeImageUri;
-
         public string ImageUriToThumbnail(string imageUri)
         {
             string[] parts = imageUri.Split("personalassistant");
@@ -75,6 +73,10 @@ namespace PersonalAssistant.Infrastructure.Cdn
             };
 
             ImageUploadResult uploadResult = await Cloudinary.UploadAsync(uploadParams);
+            if (uploadResult.Error != null)
+            {
+                throw new Exception($"{nameof(CdnService)}.{nameof(CdnService.UploadAsync)}() returned error: {uploadResult.Error.Message}");
+            }
 
             File.Delete(filePath);
 
@@ -123,6 +125,10 @@ namespace PersonalAssistant.Infrastructure.Cdn
             };
 
             ImageUploadResult uploadResult = await Cloudinary.UploadAsync(uploadParams);
+            if (uploadResult.Error != null)
+            {
+                throw new Exception($"{nameof(CdnService)}.{nameof(CdnService.UploadProfileTempAsync)}() returned error: {uploadResult.Error.Message}");
+            }
 
             File.Delete(filePath);
 
@@ -131,7 +137,7 @@ namespace PersonalAssistant.Infrastructure.Cdn
 
         public async Task<string> CopyAndUploadAsync(string tempImagePath, string imageUriToCopy, string uploadPath, string template)
         {
-            if (IsDefaultImage(imageUriToCopy))
+            if (imageUriToCopy == _defaultRecipeImageUri)
             {
                 return imageUriToCopy;
             }
@@ -170,6 +176,10 @@ namespace PersonalAssistant.Infrastructure.Cdn
             };
 
             TagResult tagResult = await Cloudinary.TagAsync(tagParams);
+            if (tagResult.Error != null)
+            {
+                throw new Exception($"{nameof(CdnService)}.{nameof(CdnService.RemoveTempTagAsync)}() returned error: {tagResult.Error.Message}");
+            }
         }
 
         public async Task DeleteAsync(string imageUri)
@@ -185,6 +195,10 @@ namespace PersonalAssistant.Infrastructure.Cdn
             {
                 PublicIds = new List<string>() { publicId }
             });
+            if (deleteResult.Error != null)
+            {
+                throw new Exception($"{nameof(CdnService)}.{nameof(CdnService.DeleteAsync)}() returned error: {deleteResult.Error.Message}");
+            }
         }
 
         public async Task DeleteUserResourcesAsync(int userId, IEnumerable<string> imageUris)
@@ -200,8 +214,16 @@ namespace PersonalAssistant.Infrastructure.Cdn
             {
                 PublicIds = publicIds
             });
+            if (deleteResult.Error != null)
+            {
+                throw new Exception($"{nameof(CdnService)}.{nameof(CdnService.DeleteUserResourcesAsync)}() returned error: {deleteResult.Error.Message}");
+            }
 
             DeleteFolderResult deleteFolderResult = await Cloudinary.DeleteFolderAsync($"{_environment}/users/{userId}");
+            if (deleteFolderResult.Error != null)
+            {
+                throw new Exception($"{nameof(CdnService)}.{nameof(CdnService.DeleteUserResourcesAsync)}() returned error: {deleteFolderResult.Error.Message}");
+            }
         }
 
         public async Task DeleteTemporaryResourcesAsync(DateTime olderThan)
@@ -218,6 +240,10 @@ namespace PersonalAssistant.Infrastructure.Cdn
             {
                 PublicIds = publicIds
             });
+            if (deleteResult.Error != null)
+            {
+                throw new Exception($"{nameof(CdnService)}.{nameof(CdnService.DeleteTemporaryResourcesAsync)}() returned error: {deleteResult.Error.Message}");
+            }
         }
 
         private bool IsDefaultImage(string uri)
@@ -243,6 +269,10 @@ namespace PersonalAssistant.Infrastructure.Cdn
             };
 
             ImageUploadResult uploadResult = await Cloudinary.UploadAsync(uploadParams);
+            if (uploadResult.Error != null)
+            {
+                throw new Exception($"{nameof(CdnService)}.{nameof(CdnService.UploadTempAsync)}() returned error: {uploadResult.Error.Message}");
+            }
 
             File.Delete(filePath);
 
