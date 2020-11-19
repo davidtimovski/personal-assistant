@@ -37,6 +37,14 @@ namespace PersonalAssistant.WorkerService
                     config.AddJsonFile($"appsettings.{environmentName}.json", true, true);
                     config.AddEnvironmentVariables();
                 })
+                .ConfigureLogging((hostContext, logging) =>
+                {
+                    Log.Logger = new LoggerConfiguration()
+                        .ReadFrom.Configuration(hostContext.Configuration)
+                        .CreateLogger();
+
+                    logging.AddSerilog(Log.Logger, dispose: true);
+                })
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddInfrastructure(hostContext.Configuration, hostContext.HostingEnvironment.EnvironmentName);
@@ -56,10 +64,6 @@ namespace PersonalAssistant.WorkerService
                     services.AddTransient<ICategoriesRepository, CategoriesRepository>();
                     services.AddTransient<ITransactionsRepository, TransactionsRepository>();
                     services.AddTransient<ICurrencyRatesRepository, CurrencyRatesRepository>();
-
-                    Log.Logger = new LoggerConfiguration()
-                        .ReadFrom.Configuration(hostContext.Configuration)
-                        .CreateLogger();
 
                     services.AddHostedService<DailyWorker>();
                     services.AddHostedService<MidnightWorker>();

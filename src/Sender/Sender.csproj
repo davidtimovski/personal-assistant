@@ -17,6 +17,7 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.6" />
     <PackageReference Include="RabbitMQ.Client" Version="6.1.0" />
     <PackageReference Include="Sendgrid" Version="9.18.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
     <PackageReference Include="WebPush" Version="1.0.11" />
