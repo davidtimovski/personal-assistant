@@ -1,9 +1,10 @@
 import { inject } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
+
+import { LocalStorageCurrencies } from "../../../shared/src/utils/localStorageCurrencies";
 import { ViewRecipe } from "models/viewmodels/viewRecipe";
 import { RecipesService } from "services/recipesService";
-import { LocalStorageCurrencies } from "../../../shared/src/utils/localStorageCurrencies";
 import { Ingredient } from "models/viewmodels/ingredient";
 
 @inject(Router, I18N, RecipesService, LocalStorageCurrencies)
@@ -64,22 +65,23 @@ export class Recipe {
           );
 
           this.model = model;
-        }
-      })
-      .then(() => {
-        if (this.model.videoUrl) {
-          this.videoIFrameSrc = this.recipesService.videoUrlToEmbedSrc(
-            this.model.videoUrl
-          );
 
-          // Hack for back button iframe issue
-          this.videoIFrame.contentWindow.location.replace(this.videoIFrameSrc);
+          if (this.model.videoUrl) {
+            this.videoIFrameSrc = this.recipesService.videoUrlToEmbedSrc(
+              this.model.videoUrl
+            );
+
+            // Hack for back button iframe issue
+            this.videoIFrame.contentWindow.location.replace(
+              this.videoIFrameSrc
+            );
+          }
+
+          this.copyButton.addEventListener("click", () => {
+            this.copyAsText();
+          });
         }
       });
-
-    this.copyButton.addEventListener("click", () => {
-      this.copyAsText();
-    });
   }
 
   toggleTopDrawer() {

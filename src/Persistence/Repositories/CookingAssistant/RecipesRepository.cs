@@ -44,6 +44,12 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
             using DbConnection conn = Connection;
             await conn.OpenAsync();
 
+            bool exists = await ExistsAsync(id, userId);
+            if (!exists)
+            {
+                return null;
+            }
+
             await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.Recipes"" SET ""LastOpenedDate"" = @LastOpenedDate WHERE ""Id"" = @Id",
                 new { Id = id, LastOpenedDate = DateTime.Now });
 

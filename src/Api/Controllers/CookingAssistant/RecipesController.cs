@@ -480,18 +480,14 @@ namespace Api.Controllers.CookingAssistant
 
             // Copy recipe image if not default
             RecipeToNotify recipe = await _recipeService.GetAsync(importModel.Id);
-            string imageUri = _cdnService.GetDefaultRecipeUri();
-            if (recipe.ImageUri != imageUri)
-            {
-                string tempImagePath = Path.Combine(_webHostEnvironment.ContentRootPath, "TempImages", Guid.NewGuid().ToString());
+            string tempImagePath = Path.Combine(_webHostEnvironment.ContentRootPath, "TempImages", Guid.NewGuid().ToString());
 
-                importModel.ImageUri = await _cdnService.CopyAndUploadAsync(
-                    tempImagePath: tempImagePath,
-                    imageUriToCopy: recipe.ImageUri,
-                    uploadPath: $"users/{importModel.UserId}/recipes",
-                    template: "recipe"
-                );
-            }
+            importModel.ImageUri = await _cdnService.CopyAndUploadAsync(
+                tempImagePath: tempImagePath,
+                imageUriToCopy: recipe.ImageUri,
+                uploadPath: $"users/{importModel.UserId}/recipes",
+                template: "recipe"
+            );
 
             int id = await _recipeService.ImportAsync(importModel, _importRecipeValidator);
 
