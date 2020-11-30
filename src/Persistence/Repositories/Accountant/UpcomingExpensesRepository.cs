@@ -114,9 +114,38 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
         {
             using DbConnection conn = Connection;
             await conn.OpenAsync();
+            var transaction = conn.BeginTransaction();
 
-            await conn.ExecuteAsync(@"DELETE FROM ""Accountant.UpcomingExpenses"" WHERE ""UserId"" = @UserId AND ""Date"" < @Date",
+            var toDelete = await conn.QueryAsync<UpcomingExpense>(@"SELECT * FROM ""Accountant.UpcomingExpenses"" WHERE ""UserId"" = @UserId AND ""Date"" < @Date",
                 new { UserId = userId, Date = before });
+
+            foreach (var upcomingExpense in toDelete)
+            {
+                var deletedEntryExists = await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
+                                                                            FROM ""Accountant.DeletedEntities""
+                                                                            WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""EntityId"" = @EntityId",
+                                                                            new { UserId = userId, EntityType = (short)EntityType.UpcomingExpense, EntityId = upcomingExpense.Id });
+
+                if (deletedEntryExists)
+                {
+                    await conn.QueryAsync<int>(@"UPDATE ""Accountant.DeletedEntities"" SET ""DeletedDate"" = @DeletedDate
+                                                 WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""EntityId"" = @EntityId",
+                                                 new { UserId = userId, EntityType = (short)EntityType.UpcomingExpense, EntityId = upcomingExpense.Id, DeletedDate = DateTime.Now },
+                                                 transaction);
+                }
+                else
+                {
+                    await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.DeletedEntities"" (""UserId"", ""EntityType"", ""EntityId"", ""DeletedDate"")
+                                                 VALUES (@UserId, @EntityType, @EntityId, @DeletedDate)",
+                                                 new { UserId = userId, EntityType = (short)EntityType.UpcomingExpense, EntityId = upcomingExpense.Id, DeletedDate = DateTime.Now },
+                                                 transaction);
+                }
+
+                await conn.ExecuteAsync(@"DELETE FROM ""Accountant.UpcomingExpenses"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
+                    new { upcomingExpense.Id, UserId = userId }, transaction);
+            }
+
+            transaction.Commit();
         }
     }
 }
