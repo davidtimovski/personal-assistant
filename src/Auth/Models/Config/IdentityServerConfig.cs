@@ -50,7 +50,7 @@ namespace Auth.Models.Config
                         IdentityServerConstants.StandardScopes.Email,
                         "personal-assistant-api"
                     },
-                    AccessTokenLifetime = 604800 // 1 week
+                    AccessTokenLifetime = 2592000 // 1 month
                 },
                 new Client
                 {
@@ -68,7 +68,7 @@ namespace Auth.Models.Config
                         IdentityServerConstants.StandardScopes.Email,
                         "personal-assistant-api"
                     },
-                    AccessTokenLifetime = 604800 // 1 week
+                    AccessTokenLifetime = 2592000 // 1 month
                 },
                 new Client
                 {
@@ -86,7 +86,7 @@ namespace Auth.Models.Config
                         IdentityServerConstants.StandardScopes.Email,
                         "personal-assistant-api"
                     },
-                    AccessTokenLifetime = 604800 // 1 week
+                    AccessTokenLifetime = 2592000 // 1 month
                 }
             };
         }
