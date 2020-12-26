@@ -66,7 +66,7 @@
             </a>
           </div>
           <div else class="form-control">
-            <div class="encryption-wrap ${model.encrypt ? 'visible' : ''}">
+            <div class="encryption-box ${model.encrypt ? 'active' : ''}">
               <textarea value.bind="model.description" maxlength="250" class="description-textarea"
                 t="[placeholder,aria-label]description"></textarea>
 
@@ -83,7 +83,7 @@
                   </svg>
                 </div>
               </label>
-              <div show.bind="model.encrypt">
+              <div if.bind="model.encrypt">
                 <tooltip key.bind="encryptedDescriptionTooltipKey"></tooltip>
                 <div class="viewable-password">
                   <input type="password" value.bind="model.encryptionPassword & validate" ref="encPasswordInput"

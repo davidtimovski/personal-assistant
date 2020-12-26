@@ -244,10 +244,10 @@ td.sync-icon-cell {
   color: var(--deposit-color);
 }
 
-.encryption-wrap {
+.encryption-box {
   margin-top: 5px;
 }
-.encryption-wrap.visible {
+.encryption-box.active {
   background: #f1f1f1;
   border-radius: var(--border-radius);
   box-shadow: inset var(--box-shadow);
