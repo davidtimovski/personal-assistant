@@ -38,6 +38,7 @@ An ecosystem of PWAs that cooperate with each other to provide unique functional
 * Track and anticipate upcoming expenses
     * Get automatically generated upcoming expenses every month based on your spending in a given category
 * Manage multiple accounts
+* Manage investment funds
 * Track debt
 * View different types of reports regarding your income and expenditures
 * Encrypt your transactions for privacy

@@ -238,6 +238,8 @@ export class TransactionsService extends HttpProxyBase {
       null,
       null,
       amount,
+      null,
+      null,
       currency,
       description,
       date,

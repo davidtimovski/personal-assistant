@@ -146,6 +146,8 @@
   },
   "accounts": {
     "accounts": "Accounts",
+    "stockPrice": "Stock price",
+    "stocks": "Stocks",
     "transferFunds": "Transfer funds",
     "newAccount": "New account"
   },
@@ -162,6 +164,8 @@
     "edit": "Edit",
     "mainAccount": "This is your main account. It represents your current capital and every new expense or deposit initially goes here.",
     "accountName": "Account name",
+    "investmentFund": "Investment fund",
+    "stockPrice": "Stock price",
     "accountHasTransactions": "This account has transactions.<br>Deleting it will remove them as well.",
     "okayDelete": "Okay, delete",
     "deleteSuccessful": "Account was successfully deleted"

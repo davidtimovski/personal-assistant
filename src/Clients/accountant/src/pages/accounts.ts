@@ -9,8 +9,11 @@ import { AccountItem } from "models/viewmodels/accountItem";
 @inject(Router, AccountsService, LocalStorage, EventAggregator)
 export class Accounts {
   private accounts: Array<AccountItem>;
+  private funds: Array<AccountItem>;
   private sum: number;
   private currency: string;
+  private viewStocks = false;
+  private someAreInvestmentFunds = false;
   private lastEditedId: number;
   private lastEditedId2: number;
   private syncing = false;
@@ -45,13 +48,21 @@ export class Accounts {
       .getAllWithBalance(this.currency)
       .then((accounts: Array<Account>) => {
         const accountItems = new Array<AccountItem>();
+        const fundItems = new Array<AccountItem>();
         let sum = 0;
 
         for (const account of accounts) {
+          if (!!account.stockPrice) {
+            this.someAreInvestmentFunds = true;
+          }
+
           accountItems.push(
             new AccountItem(
               account.id,
               account.name,
+              account.currency,
+              account.stockPrice,
+              account.stocks,
               account.balance,
               account.synced
             )
@@ -61,8 +72,13 @@ export class Accounts {
         }
 
         this.accounts = accountItems;
+        this.funds = fundItems;
         this.sum = sum;
       });
+  }
+
+  toggleViewStocks() {
+    this.viewStocks = !this.viewStocks;
   }
 
   newAccount() {

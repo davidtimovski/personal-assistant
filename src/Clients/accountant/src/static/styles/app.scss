@@ -197,6 +197,10 @@ td.sync-icon-cell {
   margin: 0 5px;
 }
 
+.clickable-cell {
+  cursor: pointer;
+}
+
 .multi-radio-wrap {
   display: flex;
   border-radius: var(--border-radius);

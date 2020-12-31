@@ -16,7 +16,9 @@ namespace PersonalAssistant.Application.Mappings
                 .ForMember(x => x.Id, src => src.Ignore());
             CreateMap<CreateMainAccount, Account>()
                 .ForMember(x => x.Id, src => src.Ignore())
-                .ForMember(x => x.IsMain, opt => opt.MapFrom(src => true));
+                .ForMember(x => x.IsMain, opt => opt.MapFrom(src => true))
+                .ForMember(x => x.Currency, src => src.Ignore())
+                .ForMember(x => x.StockPrice, src => src.Ignore());
             CreateMap<UpdateAccount, Account>()
                 .ForMember(x => x.IsMain, src => src.Ignore());
 

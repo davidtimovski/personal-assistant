@@ -150,12 +150,26 @@ export class TransferFunds {
           return;
         }
 
+        let fromStocks: number = null;
+        const fromAccount = await this.accountsService.get(this.model.fromAccountId);
+        if (fromAccount.stockPrice !== null) {
+          fromStocks = amount / fromAccount.stockPrice;
+        }
+
+        let toStocks: number = null;
+        const toAccount = await this.accountsService.get(this.model.toAccountId);
+        if (toAccount.stockPrice !== null) {
+          toStocks = amount / toAccount.stockPrice;
+        }
+
         const transaction = new TransactionModel(
           null,
           this.model.fromAccountId,
           this.model.toAccountId,
           null,
           amount,
+          fromStocks,
+          toStocks,
           this.model.currency,
           null,
           DateHelper.format(new Date()),

@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Api.Models.Accountant.Sync;
 using AspNet.Security.OAuth.Introspection;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -30,7 +28,6 @@ namespace Api.Controllers.Accountant
     [Route("api/[controller]")]
     public class SyncController : Controller
     {
-        private readonly IMapper _mapper;
         private readonly ISyncService _syncService;
         private readonly ICategoryService _categoryService;
         private readonly IAccountService _accountService;
@@ -39,7 +36,6 @@ namespace Api.Controllers.Accountant
         private readonly IDebtService _debtService;
 
         public SyncController(
-            IMapper mapper,
             ISyncService syncService,
             ICategoryService categoryService,
             IAccountService accountService,
@@ -47,7 +43,6 @@ namespace Api.Controllers.Accountant
             IUpcomingExpenseService upcomingExpenseService,
             IDebtService debtService)
         {
-            _mapper = mapper;
             _syncService = syncService;
             _categoryService = categoryService;
             _accountService = accountService;
@@ -90,15 +85,15 @@ namespace Api.Controllers.Accountant
             {
                 LastSynced = DateTime.Now,
                 DeletedAccountIds = await _accountService.GetDeletedIdsAsync(getDeletedIds),
-                Accounts = accounts.Select(x => _mapper.Map<AccountDto>(x)),
+                Accounts = accounts,
                 DeletedCategoryIds = await _categoryService.GetDeletedIdsAsync(getDeletedIds),
-                Categories = categories.Select(x => _mapper.Map<CategoryDto>(x)),
+                Categories = categories,
                 DeletedTransactionIds = await _transactionService.GetDeletedIdsAsync(getDeletedIds),
-                Transactions = transactions.Select(x => _mapper.Map<TransactionDto>(x)),
+                Transactions = transactions,
                 DeletedUpcomingExpenseIds = await _upcomingExpenseService.GetDeletedIdsAsync(getDeletedIds),
-                UpcomingExpenses = upcomingExpenses.Select(x => _mapper.Map<UpcomingExpenseDto>(x)),
+                UpcomingExpenses = upcomingExpenses,
                 DeletedDebtIds = await _debtService.GetDeletedIdsAsync(getDeletedIds),
-                Debts = debts.Select(x => _mapper.Map<DebtDto>(x))
+                Debts = debts
             };
 
             return Ok(changedVm);

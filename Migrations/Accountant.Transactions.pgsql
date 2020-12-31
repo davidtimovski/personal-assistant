@@ -9,6 +9,8 @@ CREATE TABLE public."Accountant.Transactions"
 	"ToAccountId" integer,
     "CategoryId" integer,
 	"Amount" decimal(10, 2) NOT NULL,
+	"FromStocks" decimal(10, 4),
+	"ToStocks" decimal(10, 4),
 	"Currency" character varying(3) COLLATE pg_catalog."default" NOT NULL DEFAULT 'EUR',
     "Description" character varying(255) COLLATE pg_catalog."default",
 	"Date" date NOT NULL,

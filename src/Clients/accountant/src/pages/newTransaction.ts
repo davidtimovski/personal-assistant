@@ -196,6 +196,8 @@ export class NewTransaction {
           null,
           this.model.categoryId,
           this.model.amount,
+          null,
+          null,
           this.model.currency,
           this.model.description,
           this.model.date,

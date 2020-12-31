@@ -56,7 +56,7 @@ export class Transactions {
   attached() {
     this.filters = this.state.filters;
 
-    const categoryOptionsPromise = new Promise(async (resolve) => {
+    const categoryOptionsPromise = new Promise<void>(async (resolve) => {
       const categoryOptions = [
         new SelectOption(0, this.i18n.tr("transactions.all")),
       ];
@@ -68,7 +68,7 @@ export class Transactions {
       this.categoryOptions = categoryOptions.concat(options);
       resolve();
     });
-    const accountOptionsPromise = new Promise(async (resolve) => {
+    const accountOptionsPromise = new Promise<void>(async (resolve) => {
       const accountOptions = [
         new SelectOption(0, this.i18n.tr("transactions.all")),
       ];

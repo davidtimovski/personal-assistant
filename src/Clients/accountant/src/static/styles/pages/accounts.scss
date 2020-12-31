@@ -1,8 +1,8 @@
-.accounts-table td:nth-child(2) {
+.accounts-table .left-col {
   padding: 5px 15px 5px 0;
   text-align: left;
 }
-.accounts-table td:nth-child(3) {
+.accounts-table .right-col {
   text-align: right;
 }
 .accounts-table td {

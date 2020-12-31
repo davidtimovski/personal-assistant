@@ -90,9 +90,9 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
                 var dbTransaction = conn.BeginTransaction();
 
                 id = (await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.Transactions"" 
-                    (""FromAccountId"", ""ToAccountId"", ""CategoryId"", ""Amount"", ""Currency"", ""Description"", ""Date"", ""IsEncrypted"", ""EncryptedDescription"", ""Salt"", ""Nonce"", ""CreatedDate"", ""ModifiedDate"")
+                    (""FromAccountId"", ""ToAccountId"", ""CategoryId"", ""Amount"", ""FromStocks"", ""ToStocks"", ""Currency"", ""Description"", ""Date"", ""IsEncrypted"", ""EncryptedDescription"", ""Salt"", ""Nonce"", ""CreatedDate"", ""ModifiedDate"")
                     VALUES 
-                    (@FromAccountId, @ToAccountId, @CategoryId, @Amount, @Currency, @Description, @Date, @IsEncrypted, @EncryptedDescription, @Salt, @Nonce, @CreatedDate, @ModifiedDate) returning ""Id""",
+                    (@FromAccountId, @ToAccountId, @CategoryId, @Amount, @FromStocks, @ToStocks, @Currency, @Description, @Date, @IsEncrypted, @EncryptedDescription, @Salt, @Nonce, @CreatedDate, @ModifiedDate) returning ""Id""",
                     transaction, dbTransaction)).Single();
 
                 if (transaction.Amount < 0)
@@ -133,9 +133,9 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
             else
             {
                 id = (await uowConn.QueryAsync<int>(@"INSERT INTO ""Accountant.Transactions"" 
-                    (""FromAccountId"", ""ToAccountId"", ""CategoryId"", ""Amount"", ""Currency"", ""Description"", ""Date"", ""IsEncrypted"", ""EncryptedDescription"", ""Salt"", ""Nonce"", ""CreatedDate"", ""ModifiedDate"")
+                    (""FromAccountId"", ""ToAccountId"", ""CategoryId"", ""Amount"", ""FromStocks"", ""ToStocks"", ""Currency"", ""Description"", ""Date"", ""IsEncrypted"", ""EncryptedDescription"", ""Salt"", ""Nonce"", ""CreatedDate"", ""ModifiedDate"")
                     VALUES 
-                    (@FromAccountId, @ToAccountId, @CategoryId, @Amount, @Currency, @Description, @Date, @IsEncrypted, @EncryptedDescription, @Salt, @Nonce, @CreatedDate, @ModifiedDate) returning ""Id""",
+                    (@FromAccountId, @ToAccountId, @CategoryId, @Amount, @FromStocks, @ToStocks, @Currency, @Description, @Date, @IsEncrypted, @EncryptedDescription, @Salt, @Nonce, @CreatedDate, @ModifiedDate) returning ""Id""",
                     transaction, uowTransaction)).Single();
             }
 
@@ -149,7 +149,8 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
             await conn.ExecuteAsync(@"UPDATE ""Accountant.Transactions"" SET ""FromAccountId"" = @FromAccountId, ""ToAccountId"" = @ToAccountId, 
                                         ""CategoryId"" = @CategoryId, 
-                                        ""Amount"" = @Amount, ""Currency"" = @Currency, ""Description"" = @Description, ""Date"" = @Date, 
+                                        ""Amount"" = @Amount, ""FromStocks"" = @FromStocks, ""ToStocks"" = @ToStocks, 
+                                        ""Currency"" = @Currency, ""Description"" = @Description, ""Date"" = @Date, 
                                         ""IsEncrypted"" = @IsEncrypted, ""EncryptedDescription"" = @EncryptedDescription, ""Salt"" = @Salt,
                                         ""Nonce"" = @Nonce, ""ModifiedDate"" = @ModifiedDate WHERE ""Id"" = @Id",
                                         transaction);

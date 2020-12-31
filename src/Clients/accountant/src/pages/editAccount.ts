@@ -1,8 +1,5 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { AccountsService } from "services/accountsService";
-import { Account } from "models/entities/account";
-import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import {
   ValidationController,
   validateTrigger,
@@ -11,11 +8,17 @@ import {
 } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
+
+import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import { ConnectionTracker } from "../../../shared/src/utils/connectionTracker";
+import { AccountsService } from "services/accountsService";
+import { LocalStorage } from "utils/localStorage";
+import { Account } from "models/entities/account";
 
 @inject(
   Router,
   AccountsService,
+  LocalStorage,
   ValidationController,
   I18N,
   EventAggregator,
@@ -25,8 +28,10 @@ export class EditAccount {
   private accountId: number;
   private account: Account;
   private originalAccountJson: string;
+  private currency: string;
   private isNewAccount: boolean;
   private isMainAccount: boolean;
+  private investmentFund: boolean;
   private nameInput: HTMLInputElement;
   private nameIsInvalid: boolean;
   private saveButtonText: string;
@@ -39,6 +44,7 @@ export class EditAccount {
   constructor(
     private readonly router: Router,
     private readonly accountsService: AccountsService,
+    private readonly localStorage: LocalStorage,
     private readonly validationController: ValidationController,
     private readonly i18n: I18N,
     private readonly eventAggregator: EventAggregator,
@@ -56,8 +62,11 @@ export class EditAccount {
     this.accountId = parseInt(params.id, 10);
     this.isNewAccount = this.accountId === 0;
 
+    this.currency = this.localStorage.getCurrency();
+
     if (this.isNewAccount) {
-      this.account = new Account("", null, null);
+      this.account = new Account("", this.currency, null, null);
+      this.investmentFund = false;
       this.saveButtonText = this.i18n.tr("create");
 
       this.setValidationRules();
@@ -78,6 +87,7 @@ export class EditAccount {
           this.router.navigateToRoute("notFound");
         }
         this.account = account;
+        this.investmentFund = !!account.stockPrice;
 
         this.originalAccountJson = JSON.stringify(this.account);
 
@@ -92,10 +102,27 @@ export class EditAccount {
       .on(this.account);
   }
 
-  @computedFrom("account.name", "account.synced", "connTracker.isOnline")
+  investmentFundToggled() {
+    if (this.investmentFund) {
+      if (!this.account.stockPrice) {
+        this.account.currency = this.currency;
+      }
+    } else {
+      this.account.stockPrice = null;
+    }
+  }
+
+  @computedFrom(
+    "account.name",
+    "account.currency",
+    "account.stockPrice",
+    "account.synced",
+    "connTracker.isOnline"
+  )
   get canSave() {
     return (
       !ValidationUtil.isEmptyOrWhitespace(this.account.name) &&
+      (!this.investmentFund || !!this.account.stockPrice) &&
       JSON.stringify(this.account) !== this.originalAccountJson &&
       !(!this.connTracker.isOnline && this.account.synced)
     );
@@ -142,7 +169,7 @@ export class EditAccount {
   }
 
   async delete() {
-    if (!this.deleteButtonIsLoading) {
+    if (this.deleteButtonIsLoading) {
       return;
     }
 

@@ -5,6 +5,8 @@ export class EditTransactionModel {
     public toAccountId: number,
     public categoryId: number,
     public amount: number,
+    public fromStocks: number,
+    public toStocks: number,
     public currency: string,
     public description: string,
     public date: string,

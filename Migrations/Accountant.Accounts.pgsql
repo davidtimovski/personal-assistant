@@ -8,6 +8,8 @@ CREATE TABLE public."Accountant.Accounts"
 	"UserId" integer NOT NULL,
     "Name" character varying(30) NOT NULL COLLATE pg_catalog."default",
 	"IsMain" boolean NOT NULL DEFAULT FALSE,
+	"Currency" character varying(3) COLLATE pg_catalog."default" NOT NULL DEFAULT 'EUR',
+	"StockPrice" decimal(10, 4),
     "CreatedDate" timestamp without time zone NOT NULL,
     "ModifiedDate" timestamp without time zone NOT NULL,
     CONSTRAINT "PK_Accountant.Accounts" PRIMARY KEY ("Id"),

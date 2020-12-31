@@ -1,6 +1,7 @@
 <template>
   <require from="../static/styles/pages/accounts.scss"></require>
   <require from="./../resources/value-converters/money-format"></require>
+  <require from="./../resources/value-converters/money-precise-format"></require>
 
   <div class="au-animate animate-fade-in animate-fade-out">
     <div class="page-title-wrap">
@@ -23,6 +24,18 @@
 
         <div else>
           <table class="editable-table accounts-table">
+            <thead if.bind="someAreInvestmentFunds">
+              <tr>
+                <th class="type-cell"></th>
+                <th class="left-col" t="name">Name</th>
+                <th click.delegate="toggleViewStocks()" class="right-col clickable-cell">
+                  <span if.bind="viewStocks" t="accounts.stocks">Stocks</span>
+                  <span else t="accounts.stockPrice">Stock price</span>
+                </th>
+                <th class="right-col" t="balance">Balance</th>
+                <th class="sync-icon-cell"></th>
+              </tr>
+            </thead>
             <tbody>
               <tr repeat.for="account of accounts"
                 class.bind="account.id === getEditedId || account.id === getEditedId2 ? 'highlighted-row' : ''">
@@ -31,8 +44,12 @@
                     <i class="fas fa-pencil-alt"></i>
                   </a>
                 </td>
-                <td>${account.name}</td>
-                <td>${account.balance | moneyFormat:currency}</td>
+                <td class="left-col">${account.name}</td>
+                <td class="right-col" if.bind="someAreInvestmentFunds">
+                  <span if.bind="viewStocks">${account.stocks}</span>
+                  <span else>${account.stockPrice | moneyPreciseFormat:currency}</span>
+                </td>
+                <td class="right-col">${account.balance | moneyFormat:currency}</td>
                 <td class="sync-icon-cell">
                   <i if.bind="!account.synced" class="fas fa-sync-alt"></i>
                 </td>

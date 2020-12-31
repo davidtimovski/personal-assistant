@@ -60,14 +60,14 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
                 using DbConnection conn = Connection;
                 await conn.OpenAsync();
 
-                id = (await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.Accounts"" (""UserId"", ""Name"", ""IsMain"", ""CreatedDate"", ""ModifiedDate"")
-                                                   VALUES (@UserId, @Name, @IsMain, @CreatedDate, @ModifiedDate) returning ""Id""",
+                id = (await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.Accounts"" (""UserId"", ""Name"", ""IsMain"", ""Currency"", ""StockPrice"", ""CreatedDate"", ""ModifiedDate"")
+                                                   VALUES (@UserId, @Name, @IsMain, @Currency, @StockPrice, @CreatedDate, @ModifiedDate) returning ""Id""",
                                                        account)).Single();
             }
             else
             {
-                id = (await uowConn.QueryAsync<int>(@"INSERT INTO ""Accountant.Accounts"" (""UserId"", ""Name"", ""IsMain"", ""CreatedDate"", ""ModifiedDate"")
-                                                   VALUES (@UserId, @Name, @IsMain, @CreatedDate, @ModifiedDate) returning ""Id""",
+                id = (await uowConn.QueryAsync<int>(@"INSERT INTO ""Accountant.Accounts"" (""UserId"", ""Name"", ""IsMain"", ""Currency"", ""StockPrice"", ""CreatedDate"", ""ModifiedDate"")
+                                                   VALUES (@UserId, @Name, @IsMain, @Currency, @StockPrice, @CreatedDate, @ModifiedDate) returning ""Id""",
                                                        account, uowTransaction)).Single();
             }
 
@@ -79,7 +79,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
             using DbConnection conn = Connection;
             await conn.OpenAsync();
 
-            await conn.ExecuteAsync(@"UPDATE ""Accountant.Accounts"" SET ""Name"" = @Name, ""ModifiedDate"" = @ModifiedDate WHERE ""Id"" = @Id", account);
+            await conn.ExecuteAsync(@"UPDATE ""Accountant.Accounts"" SET ""Name"" = @Name, ""Currency"" = @Currency, ""StockPrice"" = @StockPrice, ""ModifiedDate"" = @ModifiedDate WHERE ""Id"" = @Id", account);
         }
 
         public async Task DeleteAsync(int id, int userId)

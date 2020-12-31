@@ -12,6 +12,8 @@ namespace PersonalAssistant.Application.Contracts.Accountant.Transactions.Models
         public int? ToAccountId { get; set; }
         public int? CategoryId { get; set; }
         public decimal Amount { get; set; }
+        public decimal? FromStocks { get; set; }
+        public decimal? ToStocks { get; set; }
         public string Currency { get; set; }
         public string Description { get; set; }
         public DateTime Date { get; set; }

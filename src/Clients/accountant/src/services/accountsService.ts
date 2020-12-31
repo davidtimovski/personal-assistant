@@ -42,13 +42,24 @@ export class AccountsService extends HttpProxyBase {
 
     const getBalancePromises = new Array<Promise<void>>();
     for (const account of accounts) {
-      const getBalancePromise = this.getBalance(account.id, currency).then(
-        (balance: number) => {
-          account.balance = balance;
-        }
-      );
-      getBalancePromises.push(getBalancePromise);
+      if (account.stockPrice === null) {
+        const getBalancePromise = this.getBalance(account.id, currency).then(
+          (balance: number) => {
+            account.balance = balance;
+          }
+        );
+        getBalancePromises.push(getBalancePromise);
+      } else {
+        const getBalancePromise = this.getBalanceAndStocks(account, currency).then(
+          ([balance, stocks]) => {
+            account.balance = balance;
+            account.stocks = stocks;
+          }
+        );
+        getBalancePromises.push(getBalancePromise);
+      }
     }
+
     await Promise.all(getBalancePromises);
 
     return accounts;
@@ -88,8 +99,31 @@ export class AccountsService extends HttpProxyBase {
         );
       }
     });
-
+    
     return parseFloat(balance.toFixed(2));
+  }
+
+  async getBalanceAndStocks(account: Account, currency: string): Promise<[number, number]> {
+    const transactions = await this.transactionsIDBHelper.getAllForAccount(account.id);
+
+    let balance = 0;
+    let stocks = 0;
+    transactions.forEach((x: TransactionModel) => {
+      if (account.id === x.fromAccountId) {
+        stocks -= x.fromStocks;
+      } else if (account.id === x.toAccountId) {
+        stocks += x.toStocks;
+      }
+    });
+
+    const amount = stocks * account.stockPrice;
+    balance += this.currenciesService.convert(
+      amount,
+      account.currency,
+      currency
+    );
+    
+    return [parseFloat(balance.toFixed(2)), parseInt(stocks.toString())];
   }
 
   async create(account: Account): Promise<number> {
