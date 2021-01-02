@@ -94,7 +94,7 @@
             <tr>
               <th class="type-cell"></th>
               <th t="amount">Amount</th>
-              <th click.delegate="toggleViewCategory()" class="clickable-cell">
+              <th click.delegate="toggleViewCategory()" class="clickable-cell" t="[title,aria-label]transactions.toggleDescriptionCategory">
                 <span if.bind="viewCategory" t="category">Category</span>
                 <span else t="description">Description</span>
               </th>
@@ -127,19 +127,19 @@
         </table>
 
         <div if.bind="transactions.length > 0" class="transactions-pagination">
-          <div role="button" click.delegate="first()" t="[aria-label]transactions.first" class="transactions-pagination-arrow-wrap left ${filters.page === 1 ? 'hidden' : ''}">
+          <div role="button" click.delegate="first()" t="[title,aria-label]transactions.first" class="transactions-pagination-arrow-wrap left ${filters.page === 1 ? 'hidden' : ''}">
             <i class="fas fa-angle-double-left"></i>
           </div>
-          <div role="button" click.delegate="previous()" t="[aria-label]transactions.previous" class="transactions-pagination-arrow-wrap left ${filters.page === 1 ? 'hidden' : ''}">
+          <div role="button" click.delegate="previous()" t="[title,aria-label]transactions.previous" class="transactions-pagination-arrow-wrap left ${filters.page === 1 ? 'hidden' : ''}">
             <i class="fas fa-angle-left"></i>
           </div>
           <div class="transactions-pagination-numbering">
             <span>${filters.page}</span>/<span>${pageCount}</span>
           </div>
-          <div role="button" click.delegate="next()" t="[aria-label]transactions.next" class="transactions-pagination-arrow-wrap right ${filters.page === pageCount ? 'hidden' : ''}">
+          <div role="button" click.delegate="next()" t="[title,aria-label]transactions.next" class="transactions-pagination-arrow-wrap right ${filters.page === pageCount ? 'hidden' : ''}">
             <i class="fas fa-angle-right"></i>
           </div>
-          <div role="button" click.delegate="last()" t="[aria-label]transactions.last" class="transactions-pagination-arrow-wrap right ${filters.page === pageCount ? 'hidden' : ''}">
+          <div role="button" click.delegate="last()" t="[title,aria-label]transactions.last" class="transactions-pagination-arrow-wrap right ${filters.page === pageCount ? 'hidden' : ''}">
             <i class="fas fa-angle-double-right"></i>
           </div>
         </div>

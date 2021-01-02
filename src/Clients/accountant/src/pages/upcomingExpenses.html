@@ -35,7 +35,7 @@
             <tr repeat.for="upcomingExpense of upcomingExpenses"
               class.bind="upcomingExpense.id === getEditedId ? 'highlighted-row' : ''">
               <td class="edit-link-cell">
-                <a route-href="route: editUpcomingExpense; params.bind: { id: upcomingExpense.id }" class="link">
+                <a route-href="route: editUpcomingExpense; params.bind: { id: upcomingExpense.id }" class="link" t="[title,aria-label]edit">
                   <i class="fas fa-pencil-alt"></i>
                 </a>
               </td>
@@ -55,7 +55,7 @@
 
       <div class="centering-wrap">
         <a click.delegate="newUpcomingExpense()" class="wide-button new-button ${syncing ? 'disabled' : ''}"
-          t="[aria-label]upcomingExpenses.newUpcomingExpense">
+          t="[title,aria-label]upcomingExpenses.newUpcomingExpense">
           <i class="fas fa-plus"></i>
         </a>
       </div>

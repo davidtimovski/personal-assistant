@@ -7,7 +7,7 @@
       <a route-href="route: editTransaction; params.bind: { id: transactionId }" class="side small">
         <i class="fas fa-pencil-alt"></i>
       </a>
-      <div class="page-title" t="transaction.transaction">Transaction</div>
+      <div class="page-title">${model.type}</div>
       <a click.delegate="back()" class="side back">
         <i class="fas fa-times"></i>
       </a>
@@ -30,10 +30,6 @@
             <span t="transaction.originalAmountIn">Original amount in </span>${model.currency}
           </label>
           <span>${model.originalAmount | moneyFormat:model.currency}</span>
-        </div>
-        <div class="form-control inline">
-          <label t="transaction.type">Type</label>
-          <span class.bind="model.typeColorClass">${model.type}</span>
         </div>
         <div class="form-control inline">
           <label>${model.accountLabel}</label>

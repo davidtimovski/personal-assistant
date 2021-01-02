@@ -25,7 +25,7 @@
           <a class="category au-animate animate-fade-in ${category.id === getEditedId ? 'highlighted-row' : ''}"
             route-href="route: editCategory; params.bind: { id: category.id }">
             <span class="name">${category.name}</span>
-            <span class="generate-upcoming-indicator" if.bind="category.generateUpcomingExpense">
+            <span if.bind="category.generateUpcomingExpense" class="generate-upcoming-indicator" t="[title,aria-label]categories.generatingUpcomingExpenses">
               <i class="far fa-calendar-alt"></i>
             </span>
           </a>
@@ -39,7 +39,7 @@
 
       <div class="centering-wrap">
         <a click.delegate="newCategory()" class="wide-button new-button ${syncing ? 'disabled' : ''}"
-          t="[aria-label]categories.newCategory">
+          t="[title,aria-label]categories.newCategory">
           <i class="fas fa-plus"></i>
         </a>
       </div>

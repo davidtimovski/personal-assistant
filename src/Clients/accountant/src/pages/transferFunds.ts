@@ -1,8 +1,5 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { AccountsService } from "services/accountsService";
-import { TransactionsService } from "services/transactionsService";
-import { LocalStorage } from "utils/localStorage";
 import {
   ValidationController,
   validateTrigger,
@@ -10,10 +7,14 @@ import {
   ControllerValidateResult,
 } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
+
+import { DateHelper } from "../../../shared/src/utils/dateHelper";
+import { AccountsService } from "services/accountsService";
+import { TransactionsService } from "services/transactionsService";
+import { LocalStorage } from "utils/localStorage";
 import { EventAggregator } from "aurelia-event-aggregator";
 import { TransferFundsModel } from "models/viewmodels/transferFunds";
 import { TransactionModel } from "models/entities/transaction";
-import { DateHelper } from "../../../shared/src/utils/dateHelper";
 
 @inject(
   Router,
@@ -50,10 +51,10 @@ export class TransferFunds {
     this.model.currency = this.localStorage.getCurrency();
 
     let amountFrom = 0.01;
-    let amountTo = 8000000;
+    let amountTo = 8000001;
     if (this.model.currency === "MKD") {
-      amountFrom = 1;
-      amountTo = 450000000;
+      amountFrom = 0;
+      amountTo = 450000001;
     }
     ValidationRules.ensure((x: TransferFundsModel) => x.amount)
       .between(amountFrom, amountTo)

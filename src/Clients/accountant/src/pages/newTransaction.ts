@@ -1,11 +1,5 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { CategoriesService } from "services/categoriesService";
-import { TransactionsService } from "services/transactionsService";
-import { AccountsService } from "services/accountsService";
-import { DebtsService } from "services/debtsService";
-import { LocalStorage } from "utils/localStorage";
-import { TransactionModel } from "models/entities/transaction";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 import {
@@ -14,12 +8,19 @@ import {
   ValidationRules,
   ControllerValidateResult,
 } from "aurelia-validation";
+
+import { DateHelper } from "../../../shared/src/utils/dateHelper";
+import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
+import { CategoriesService } from "services/categoriesService";
+import { TransactionsService } from "services/transactionsService";
+import { AccountsService } from "services/accountsService";
+import { DebtsService } from "services/debtsService";
+import { LocalStorage } from "utils/localStorage";
+import { TransactionModel } from "models/entities/transaction";
 import { SelectOption } from "models/viewmodels/selectOption";
 import { NewTransactionModel } from "models/viewmodels/newTransactionModel";
 import { CategoryType } from "models/entities/category";
 import { DebtModel } from "models/entities/debt";
-import { DateHelper } from "../../../shared/src/utils/dateHelper";
-import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 
 @inject(
   Router,
@@ -57,6 +58,7 @@ export class NewTransaction {
   private dateIsInvalid: boolean;
   private encryptionPasswordIsInvalid: boolean;
   private submitButtonIsLoading = false;
+  private passwordShowIconLabel: string;
 
   constructor(
     private readonly router: Router,
@@ -72,6 +74,8 @@ export class NewTransaction {
     this.validationController.validateTrigger = validateTrigger.manual;
 
     this.maxDate = this.model.date = DateHelper.format(new Date());
+
+    this.passwordShowIconLabel = this.i18n.tr("showPassword");
 
     this.eventAggregator.subscribe("alert-hidden", () => {
       this.amountIsInvalid = false;
@@ -90,10 +94,10 @@ export class NewTransaction {
     this.model.currency = this.localStorage.getCurrency();
 
     let amountFrom = 0.01;
-    let amountTo = 8000000;
+    let amountTo = 8000001;
     if (this.model.currency === "MKD") {
-      amountFrom = 1;
-      amountTo = 450000000;
+      amountFrom = 0;
+      amountTo = 450000001;
     }
     ValidationRules.ensure((x: NewTransactionModel) => x.amount)
       .between(amountFrom, amountTo)
@@ -154,8 +158,10 @@ export class NewTransaction {
   togglePasswordShow() {
     if (this.passwordShown) {
       this.passwordInput.type = "password";
+      this.passwordShowIconLabel = this.i18n.tr("showPassword");
     } else {
       this.passwordInput.type = "text";
+      this.passwordShowIconLabel = this.i18n.tr("hidePassword");
     }
 
     this.passwordShown = !this.passwordShown;

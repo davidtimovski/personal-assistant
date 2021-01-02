@@ -1,9 +1,5 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { CategoriesService } from "services/categoriesService";
-import { TransactionsService } from "services/transactionsService";
-import { EncryptionService } from "services/encryptionService";
-import { TransactionModel } from "models/entities/transaction";
 import {
   ValidationController,
   validateTrigger,
@@ -12,12 +8,17 @@ import {
 } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
+
 import { ConnectionTracker } from "../../../shared/src/utils/connectionTracker";
+import { DateHelper } from "../../../shared/src/utils/dateHelper";
+import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
+import { CategoriesService } from "services/categoriesService";
+import { TransactionsService } from "services/transactionsService";
+import { EncryptionService } from "services/encryptionService";
+import { TransactionModel } from "models/entities/transaction";
 import { SelectOption } from "models/viewmodels/selectOption";
 import { EditTransactionModel } from "models/viewmodels/editTransactionModel";
 import { CategoryType } from "models/entities/category";
-import { DateHelper } from "../../../shared/src/utils/dateHelper";
-import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 
 @inject(
   Router,
@@ -48,6 +49,7 @@ export class EditTransaction {
   private deleteButtonText: string;
   private saveButtonIsLoading = false;
   private deleteButtonIsLoading = false;
+  private passwordShowIconLabel: string;
 
   constructor(
     private readonly router: Router,
@@ -63,6 +65,8 @@ export class EditTransaction {
     this.deleteButtonText = this.i18n.tr("delete");
 
     this.maxDate = DateHelper.format(new Date());
+
+    this.passwordShowIconLabel = this.i18n.tr("showPassword");
 
     this.eventAggregator.subscribe("alert-hidden", () => {
       this.amountIsInvalid = false;
@@ -117,11 +121,11 @@ export class EditTransaction {
 
         this.originalTransactionJson = JSON.stringify(this.model);
 
-        let amountFrom = -8000000;
-        let amountTo = 8000000;
+        let amountFrom = 0.01;
+        let amountTo = 8000001;
         if (this.model.currency === "MKD") {
-          amountFrom = -450000000;
-          amountTo = 450000000;
+          amountFrom = 0;
+          amountTo = 450000001;
         }
         ValidationRules.ensure((x: EditTransactionModel) => x.amount)
           .between(amountFrom, amountTo)
@@ -156,8 +160,10 @@ export class EditTransaction {
   toggleDecPasswordShow() {
     if (this.decPasswordShown) {
       this.decPasswordInput.type = "password";
+      this.passwordShowIconLabel = this.i18n.tr("showPassword");
     } else {
       this.decPasswordInput.type = "text";
+      this.passwordShowIconLabel = this.i18n.tr("hidePassword");
     }
 
     this.decPasswordShown = !this.decPasswordShown;
@@ -166,8 +172,10 @@ export class EditTransaction {
   toggleEncPasswordShow() {
     if (this.encPasswordShown) {
       this.encPasswordInput.type = "password";
+      this.passwordShowIconLabel = this.i18n.tr("showPassword");
     } else {
       this.encPasswordInput.type = "text";
+      this.passwordShowIconLabel = this.i18n.tr("hidePassword");
     }
 
     this.encPasswordShown = !this.encPasswordShown;

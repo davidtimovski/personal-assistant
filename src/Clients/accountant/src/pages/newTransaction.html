@@ -77,7 +77,7 @@
                   <input type="password" value.bind="model.encryptionPassword & validate" ref="passwordInput"
                     disabled.bind="!model.encrypt" maxlength="100"
                     class.bind="encryptionPasswordIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]password">
-                  <a click.delegate="togglePasswordShow()" class="password-show-button ${passwordShown ? 'shown' : ''}">
+                  <a click.delegate="togglePasswordShow()" class="password-show-button ${passwordShown ? 'shown' : ''}" title="${passwordShowIconLabel}" aria-label="${passwordShowIconLabel}">
                     <i class="fas fa-eye"></i>
                     <i class="fas fa-eye-slash"></i>
                   </a>

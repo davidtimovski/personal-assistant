@@ -9,13 +9,13 @@
         <span if.bind="menuButtonIsLoading" class="page-loading">
           <i class="fas fa-circle-notch fa-spin"></i>
         </span>
-        <div else click.delegate="goToMenu()" class="profile-image-container">
+        <div else click.delegate="goToMenu()" class="profile-image-container" t="[title,aria-label]dashboard.menu">
           <img src.bind="imageUri" class="profile-image" t="[alt]profilePicture">
         </div>
         <div class="page-title reduced">
           <span></span>
         </div>
-        <a click.delegate="sync()" class="side small ${!connTracker.isOnline || progressBar.active ? 'disabled' : ''}">
+        <a click.delegate="sync()" class="side small ${!connTracker.isOnline || progressBar.active ? 'disabled' : ''}" t="[title,aria-label]dashboard.refresh">
           <i class="fas fa-sync-alt"></i>
         </a>
       </div>

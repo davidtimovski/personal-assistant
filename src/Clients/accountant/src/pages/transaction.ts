@@ -1,14 +1,15 @@
 import { inject } from "aurelia-framework";
 import { Router } from "aurelia-router";
+import { I18N } from "aurelia-i18n";
+
+import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import { CategoriesService } from "services/categoriesService";
 import { AccountsService } from "services/accountsService";
 import { TransactionsService } from "services/transactionsService";
 import { EncryptionService } from "services/encryptionService";
 import { LocalStorage } from "utils/localStorage";
-import { I18N } from "aurelia-i18n";
 import { TransactionModel } from "models/entities/transaction";
 import { ViewTransaction } from "models/viewmodels/viewTransaction";
-import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import { TransactionType } from "models/viewmodels/transactionType";
 
 @inject(
@@ -30,7 +31,6 @@ export class Transaction {
   private decryptButtonIsLoading = false;
   private decryptionPasswordIsInvalid: boolean;
   private typeStringLookup: Array<string>;
-  private typeColorClassesLookup: Array<string>;
 
   constructor(
     private readonly router: Router,
@@ -45,11 +45,6 @@ export class Transaction {
       this.i18n.tr("transaction.expense"),
       this.i18n.tr("transaction.deposit"),
       this.i18n.tr("transaction.transfer"),
-    ];
-    this.typeColorClassesLookup = [
-      "expense-color",
-      "deposit-color",
-      "transfer-color",
     ];
   }
 
@@ -71,11 +66,10 @@ export class Transaction {
         const model = new ViewTransaction(
           null,
           null,
+          null,
           transaction.convertedAmount,
           transaction.currency,
           transaction.amount,
-          null,
-          null,
           null,
           null,
           null,
@@ -91,7 +85,6 @@ export class Transaction {
           transaction.toAccountId
         );
         model.type = this.typeStringLookup[type - 1];
-        model.typeColorClass = this.typeColorClassesLookup[type - 1];
 
         if (transaction.categoryId) {
           const category = await this.categoriesService.get(

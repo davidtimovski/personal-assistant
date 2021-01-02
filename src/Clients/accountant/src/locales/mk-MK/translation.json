@@ -9,6 +9,7 @@
   "profilePicture": "Профилна слика",
   "name": "Име",
   "save": "Зачувај",
+  "edit": "Промени",
   "sure": "Сигурно?",
   "delete": "Избриши",
   "cancel": "Откажи",
@@ -26,6 +27,9 @@
   "uncategorized": "Некатегоризирано",
   "deletedAccount": "[избришана сметка]",
   "whileOfflineCannotModify": "Додека сте офлајн неможете да промените податоци кои веќе се синхронизирани со сервер.",
+  "changeCurrency": "Промени валута",
+  "showPassword": "Show password",
+  "hidePassword": "Hide password",
   "months": {
     "0": "Јануари",
     "1": "Февруари",
@@ -41,6 +45,8 @@
     "11": "Декември"
   },
   "dashboard": {
+    "menu": "Мени",
+    "refresh": "Освежи",
     "newExpense": "Нов трошок",
     "newDeposit": "Нов депозит",
     "available": "Расположливи",
@@ -65,9 +71,7 @@
     "depositSubmitted": "Депозитот беше успешно поднесен"
   },
   "transaction": {
-    "transaction": "Трансакција",
     "originalAmountIn": "Оригинална сума во ",
-    "type": "Тип",
     "expense": "Трошок",
     "deposit": "Депозит",
     "transfer": "Префрлање",
@@ -90,6 +94,7 @@
     "deposits": "Прилив",
     "transfers": "Префрлено",
     "searchByDescription": "Пребарај по опис",
+    "toggleDescriptionCategory": "Одбери Опис/Категорија",
     "first": "Прва",
     "last": "Последна",
     "previous": "Предходна",
@@ -113,6 +118,7 @@
   "debt": {
     "debt": "Долгови",
     "person": "Личност",
+    "settleDebt": "Подмири долг",
     "emptyListMessage": "Немате долгови",
     "newDebt": "Нов долг"
   },
@@ -128,6 +134,7 @@
   },
   "categories": {
     "categories": "Категории",
+    "generatingUpcomingExpenses": "Креира идни трошоци",
     "emptyListMessage": "Сеуште немате категории",
     "newCategory": "Нова категорија"
   },
@@ -146,6 +153,7 @@
   },
   "accounts": {
     "accounts": "Сметки",
+    "toggleStockPriceStocks": "Одбери Цена на удел/Удели",
     "stockPrice": "Цена на удел",
     "stocks": "Удели",
     "transferFunds": "Префрли средства",

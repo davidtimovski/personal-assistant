@@ -11,6 +11,6 @@
     <input type="text" class="select-currency-input" ref="selectCurrencyInput" maxlength="3"
       t="[placeholder,aria-label]currency">
     <button type="button" click.delegate="toggleChangeCurrency()"
-      class="selected-currency-button">${model.currency}</button>
+      class="selected-currency-button" t="[title,aria-label]changeCurrency">${model.currency}</button>
   </div>
 </template>

@@ -9,6 +9,7 @@
   "profilePicture": "Profile picture",
   "name": "Name",
   "save": "Save",
+  "edit": "Edit",
   "delete": "Delete",
   "sure": "Sure?",
   "cancel": "Cancel",
@@ -26,6 +27,9 @@
   "uncategorized": "Uncategorized",
   "deletedAccount": "[deleted account]",
   "whileOfflineCannotModify": "While offline you cannot modify data that has already been synced with the cloud.",
+  "changeCurrency": "Change currency",
+  "showPassword": "Покажи лозинка",
+  "hidePassword": "Сокриј лозинка",
   "months": {
     "0": "January",
     "1": "February",
@@ -41,6 +45,8 @@
     "11": "December"
   },
   "dashboard": {
+    "menu": "Menu",
+    "refresh": "Refresh",
     "newExpense": "New expense",
     "newDeposit": "New deposit",
     "available": "Available",
@@ -65,9 +71,7 @@
     "depositSubmitted": "Deposit was successfully submitted"
   },
   "transaction": {
-    "transaction": "Transaction",
     "originalAmountIn": "Original amount in ",
-    "type": "Type",
     "expense": "Expense",
     "deposit": "Deposit",
     "transfer": "Transfer",
@@ -90,6 +94,7 @@
     "deposits": "Deposits",
     "transfers": "Transfers",
     "searchByDescription": "Search by description",
+    "toggleDescriptionCategory": "Toggle Description/Category",
     "first": "First",
     "last": "Last",
     "previous": "Previous",
@@ -113,6 +118,7 @@
   "debt": {
     "debt": "Debt",
     "person": "Person",
+    "settleDebt": "Settle debt",
     "emptyListMessage": "You don't have any debt",
     "newDebt": "New debt"
   },
@@ -128,6 +134,7 @@
   },
   "categories": {
     "categories": "Categories",
+    "generatingUpcomingExpenses": "Generating upcoming expenses",
     "emptyListMessage": "You don't have any categories yet",
     "newCategory": "New category"
   },
@@ -146,6 +153,7 @@
   },
   "accounts": {
     "accounts": "Accounts",
+    "toggleStockPriceStocks": "Toggle Stock price/Stocks",
     "stockPrice": "Stock price",
     "stocks": "Stocks",
     "transferFunds": "Transfer funds",
