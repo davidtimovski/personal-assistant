@@ -1,9 +1,9 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { User } from "oidc-client";
 import {
   ValidationController,
   validateTrigger,
+  ValidationRules,
   ControllerValidateResult,
 } from "aurelia-validation";
 import { EventAggregator } from "aurelia-event-aggregator";
@@ -23,6 +23,7 @@ import { CanSendRecipe } from "models/viewmodels/canSendRecipe";
 )
 export class SendRecipe {
   private model: SendRecipeModel;
+  private recipientEmail: string;
   private emailIsInvalid: boolean;
   private emailInput: HTMLInputElement;
   private currentUserEmail: string;
@@ -37,6 +38,8 @@ export class SendRecipe {
     private readonly eventAggregator: EventAggregator
   ) {
     this.validationController.validateTrigger = validateTrigger.manual;
+
+    ValidationRules.ensure("recipientEmail").required().email().on(this);
 
     this.eventAggregator.subscribe("alert-hidden", () => {
       this.emailIsInvalid = false;
@@ -59,7 +62,7 @@ export class SendRecipe {
   async addRecipient() {
     this.eventAggregator.publish("reset-alert-error");
 
-    const email = this.emailInput.value.trim();
+    const email = this.recipientEmail.trim();
     if (email == this.currentUserEmail) {
       this.emailIsInvalid = true;
       return;
@@ -108,7 +111,7 @@ export class SendRecipe {
           this.recipients.push(
             new Recipient(canSendVM.userId, email, canSendVM.imageUri)
           );
-          this.emailInput.value = "";
+          this.recipientEmail = "";
         }
       }
     }

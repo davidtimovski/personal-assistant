@@ -48,12 +48,17 @@
   "ironBetween": "Iron must be between {{from}} and {{to}} milligrams",
   "potassiumBetween": "Potassium must be between {{from}} and {{to}} milligrams",
   "magnesiumBetween": "Magnesium must be between {{from}} and {{to}} milligrams",
+  "decreaseServings": "Decrease servings",
+  "increaseServings": "Increase servings",
   "recipes": {
+    "menu": "Menu",
+    "refresh": "Refresh",
     "missingIngredient": "missing ingredient",
     "missingIngredients": "missing ingredients",
-    "addRecipe": "Add recipe"
+    "newRecipe": "New recipe"
   },
   "recipe": {
+    "edit": "Промени",
     "sendRecipe": "Send recipe",
     "copyAsText": "Copy as text",
     "prep": "Prep",
@@ -89,13 +94,17 @@
     "ingredients": "Ingredients",
     "ingredient": "Ingredient",
     "ingredientFromTask": "Ingredient from task",
+    "addIngredient": "Add ingredient",
+    "linkedToTask": "Linked to task",
     "amount": "Amount",
+    "toggleUnitOfMeasure": "Toggle unit of measure",
     "g": "g",
     "ml": "ml",
     "oz": "oz",
     "cup": "cups",
     "tbsp": "tbsp",
     "tsp": "tsp",
+    "removeIngredient": "Remove ingredient",
     "instructions": "Instructions",
     "prepDuration": "Prep duration",
     "prepDurationHours": "Prep duration hours",
@@ -110,7 +119,9 @@
   "sendRecipe": {
     "send": "Send",
     "recipientEmail": "Recipient email",
+    "addRecipient": "Add recipient",
     "recipients": "Recipients",
+    "removeRecipient": "Remove recipient",
     "userDoesntExist": "No user with that email exists.",
     "cannotSendToUser": "This user has blocked a send request from you previously. You cannot send recipes to them until they unblock you.",
     "alreadySendToUser": "You have already sent this recipe to this user. Let them know to check their inbox.",
@@ -161,7 +172,10 @@
   "ingredients": {
     "ingredients": "Ingredients",
     "search": "Search",
-    "emptyListMessage": "You don't have any ingredients yet"
+    "emptyListMessage": "You don't have any ingredients yet",
+    "linkedToTask": "Linked to task",
+    "hasNutritionSet": "Has nutrition set",
+    "hasPriceSet": "Has price set"
   },
   "editIngredient": {
     "edit": "Edit",
@@ -188,8 +202,11 @@
   },
   "inbox": {
     "inbox": "Inbox",
+    "decline": "Decline",
     "from": "from",
+    "accept": "Accept",
     "blockedUsers": "Blocked users",
+    "delete": "Delete",
     "emptyListMessage": "There are no new received recipes"
   },
   "reviewIngredients": {

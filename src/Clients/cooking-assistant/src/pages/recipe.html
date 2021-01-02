@@ -11,7 +11,7 @@
       <span if.bind="editRecipeButtonIsLoading" class="page-loading medium">
         <i class="fas fa-circle-notch fa-spin"></i>
       </span>
-      <a else click.delegate="editRecipe()" class="side medium">
+      <a else click.delegate="editRecipe()" class="side medium" t="[title,aria-label]recipe.edit">
         <i class="fas fa-cog"></i>
       </a>
       <div class="page-title reduced">${model.name}</div>

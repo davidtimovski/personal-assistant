@@ -19,9 +19,9 @@
       <form submit.trigger="addRecipient()">
         <div class="form-control">
           <div class="add-input-wrap">
-            <input type="email" ref="emailInput" maxlength="256" class.bind="emailIsInvalid ? 'invalid' : ''"
+            <input type="email" ref="emailInput" value.bind="recipientEmail & validate" maxlength="256" class.bind="emailIsInvalid ? 'invalid' : ''"
               t="[placeholder,aria-label]sendRecipe.recipientEmail" required>
-            <a click.delegate="addRecipient()">
+            <a click.delegate="addRecipient()" t="[title,aria-label]sendRecipe.addRecipient">
               <i class="fas fa-plus-circle"></i>
             </a>
           </div>
@@ -37,7 +37,7 @@
         <img class="send-image" src.bind="recipient.imageUri" t="[alt]profilePicture">
         <div class="send-content">
           <span class="name">${recipient.email}</span>
-          <a click.delegate="removeRecipient(recipient)" class="side">
+          <a click.delegate="removeRecipient(recipient)" class="side" t="[title,aria-label]sendRecipe.removeRecipient">
             <i class="fas fa-times-circle"></i>
           </a>
         </div>

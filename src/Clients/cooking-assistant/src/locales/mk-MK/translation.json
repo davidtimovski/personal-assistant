@@ -48,12 +48,17 @@
   "ironBetween": "Железо мора да биде помеѓу {{from}} и {{to}} милиграми",
   "potassiumBetween": "Калиум мора да биде помеѓу {{from}} и {{to}} милиграми",
   "magnesiumBetween": "Магнезиум мора да биде помеѓу {{from}} и {{to}} милиграми",
+  "decreaseServings": "Намали порции",
+  "increaseServings": "Зголеми порции",
   "recipes": {
+    "menu": "Мени",
+    "refresh": "Освежи",
     "missingIngredient": "состојка недостасува",
     "missingIngredients": "состојки недостасуваат",
-    "addRecipe": "Додади рецепт"
+    "newRecipe": "Нов рецепт"
   },
   "recipe": {
+    "edit": "Edit",
     "sendRecipe": "Испрати рецепт",
     "copyAsText": "Копирај како текст",
     "prep": "Подготовка",
@@ -89,13 +94,17 @@
     "ingredients": "Состојки",
     "ingredient": "Состојка",
     "ingredientFromTask": "Состојка од задача",
+    "addIngredient": "Додади состојка",
+    "linkedToTask": "Поврзана со задача",
     "amount": "Количина",
+    "toggleUnitOfMeasure": "Одбери единица мерка",
     "g": "g",
     "ml": "ml",
     "oz": "oz",
     "cup": "чашки",
     "tbsp": "лажици",
     "tsp": "лажички",
+    "removeIngredient": "Отстрани состојка",
     "instructions": "Инструкции",
     "prepDuration": "Подготовка",
     "prepDurationHours": "Подготовка часови",
@@ -110,7 +119,9 @@
   "sendRecipe": {
     "send": "Испрати",
     "recipientEmail": "Емаил на примател",
+    "addRecipient": "Додади примател",
     "recipients": "Приматели",
+    "removeRecipient": "Отстрани примател",
     "userDoesntExist": "Не постои корисник со таа емаил адреса.",
     "cannotSendToUser": "Овој корисник има блокирано барање за пратка на рецепт од вас. Неможете да споделувате со нив додека не ве одблокираат.",
     "alreadySendToUser": "Веќе го имате испратено овој рецепт на овој корисник. Известете ги да си го проверат сандачето.",
@@ -161,7 +172,10 @@
   "ingredients": {
     "ingredients": "Состојки",
     "search": "Пребарај",
-    "emptyListMessage": "Сеуште немате состојки"
+    "emptyListMessage": "Сеуште немате состојки",
+    "linkedToTask": "Поврзана со задача",
+    "hasNutritionSet": "Има хранлива вредност",
+    "hasPriceSet": "Има цена"
   },
   "editIngredient": {
     "edit": "Промени ја",
@@ -188,8 +202,11 @@
   },
   "inbox": {
     "inbox": "Сандаче",
+    "decline": "Одбиј",
     "from": "од",
+    "accept": "Прифати",
     "blockedUsers": "Блокирани корисници",
+    "delete": "Избриши",
     "emptyListMessage": "Немате нови примени рецепти"
   },
   "reviewIngredients": {

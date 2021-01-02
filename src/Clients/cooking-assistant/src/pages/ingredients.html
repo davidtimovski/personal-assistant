@@ -31,9 +31,9 @@
         route-href="route: editIngredient; params.bind: { id: ingredient.id }">
         <span class="name">${ingredient.name}</span>
         <span class="ingredient-icons-container">
-          <i class="fas fa-link" if.bind="ingredient.taskId"></i>
-          <i class="fas fa-clipboard" if.bind="ingredient.hasNutritionData"></i>
-          <i class="fas fa-tag" if.bind="ingredient.hasPriceData"></i>
+          <i class="fas fa-link" if.bind="ingredient.taskId" t="[title,aria-label]ingredients.linkedToTask"></i>
+          <i class="fas fa-clipboard" if.bind="ingredient.hasNutritionData" t="[title,aria-label]ingredients.hasNutritionSet"></i>
+          <i class="fas fa-tag" if.bind="ingredient.hasPriceData" t="[title,aria-label]ingredients.hasPriceSet"></i>
         </span>
       </a>
 

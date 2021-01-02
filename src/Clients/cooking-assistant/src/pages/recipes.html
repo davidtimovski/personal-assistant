@@ -7,13 +7,13 @@
         <span if.bind="menuButtonIsLoading" class="page-loading">
           <i class="fas fa-circle-notch fa-spin"></i>
         </span>
-        <div else click.delegate="goToMenu()" class="profile-image-container">
+        <div else click.delegate="goToMenu()" class="profile-image-container" t="[title,aria-label]recipes.menu">
           <img src.bind="imageUri" class="profile-image" t="[alt]profilePicture">
         </div>
         <div class="page-title reduced">
           <span></span>
         </div>
-        <a click.delegate="sync()" class="side small ${!connTracker.isOnline || progressBar.active ? 'disabled' : ''}">
+        <a click.delegate="sync()" class="side small ${!connTracker.isOnline || progressBar.active ? 'disabled' : ''}" t="[title,aria-label]recipes.refresh">
           <i class="fas fa-sync-alt"></i>
         </a>
       </div>
@@ -36,7 +36,7 @@
 
       <div class="centering-wrap">
         <a route-href="route: editRecipe; params.bind: { id: 0 }" class="wide-button new-button"
-          t="[aria-label]recipes.addRecipe">
+          t="[title,aria-label]recipes.newRecipe">
           <i class="fas fa-plus"></i>
         </a>
       </div>
