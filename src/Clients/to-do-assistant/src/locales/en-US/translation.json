@@ -52,7 +52,7 @@
   },
   "editList": {
     "newList": "New list",
-    "settings": "settings",
+    "edit": "Edit",
     "icon": "Icon",
     "addTasks": "Add tasks?",
     "eachRow": "Each row will be a new task",

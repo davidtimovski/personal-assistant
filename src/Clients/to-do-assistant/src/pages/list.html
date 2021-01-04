@@ -7,8 +7,8 @@
       <span if.bind="editListButtonIsLoading" class="page-loading medium">
         <i class="fas fa-circle-notch fa-spin"></i>
       </span>
-      <a else click.delegate="editList()" class="side medium" t="[title,aria-label]list.edit">
-        <i class="fas fa-cog"></i>
+      <a else click.delegate="editList()" class="side small" t="[title,aria-label]list.edit">
+        <i class="fas fa-pencil-alt"></i>
       </a>
       <label class="reorder-toggle ${isReordering ? 'checked' : ''}" t="[title,aria-label]list.reorderTasks">
         <input type="checkbox" checked.bind="isReordering">
