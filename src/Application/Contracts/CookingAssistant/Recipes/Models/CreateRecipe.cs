@@ -91,7 +91,7 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Model
                 .MaximumLength(50).WithMessage("Recipes.ModifyRecipe.IngredientNameMaxLength");
 
             RuleFor(dto => dto.Amount)
-                .InclusiveBetween(1, 10000).WithMessage("Recipes.ModifyRecipe.AmountMustBeBetween");
+                .InclusiveBetween(0.1f, 10000).WithMessage("Recipes.ModifyRecipe.AmountMustBeBetween");
 
             RuleFor(dto => dto.Unit)
                 .Must(unit => string.IsNullOrEmpty(unit) || units.Contains(unit)).WithMessage("Recipes.ModifyRecipe.InvalidUnit");

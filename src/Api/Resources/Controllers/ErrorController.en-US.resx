@@ -193,7 +193,7 @@
     <value>User does not exist</value>
   </data>
   <data name="Recipes.ModifyRecipe.AmountMustBeBetween" xml:space="preserve">
-    <value>If an amount is set it must be between 1 and 10000</value>
+    <value>If an amount is set it must be between 0.1 and 10000</value>
   </data>
   <data name="Recipes.ModifyRecipe.CookDurationRange" xml:space="preserve">
     <value>Cook Duration must be between 0 and 120 minutes</value>
