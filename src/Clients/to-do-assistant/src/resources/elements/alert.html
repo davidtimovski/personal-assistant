@@ -1,4 +1,4 @@
-<template show.bind="message" class="alert ${type}">
+<template show.bind="message" click.delegate="hide()" class="alert ${type}">
   <require from="./alert.scss"></require>
 
   <span class="alert-body">
