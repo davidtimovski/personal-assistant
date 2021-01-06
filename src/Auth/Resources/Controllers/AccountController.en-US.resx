@@ -141,6 +141,9 @@
   <data name="MainAccountName" xml:space="preserve">
     <value>Main</value>
   </data>
+  <data name="RegisterDuplicateUserName" xml:space="preserve">
+    <value>An account with that email address already exists</value>
+  </data>
   <data name="ResetPasswordInvalidToken" xml:space="preserve">
     <value>The reset link is no longer valid</value>
   </data>

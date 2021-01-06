@@ -141,6 +141,9 @@
   <data name="MainAccountName" xml:space="preserve">
     <value>Главна</value>
   </data>
+  <data name="RegisterDuplicateUserName" xml:space="preserve">
+    <value>Корисничка сметка со тој емаил веќе постои</value>
+  </data>
   <data name="ResetPasswordInvalidToken" xml:space="preserve">
     <value>Линкот за ресетирање веќе не е валиден</value>
   </data>
