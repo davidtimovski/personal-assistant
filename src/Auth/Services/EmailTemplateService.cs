@@ -138,7 +138,7 @@ namespace Auth.Services
         private static async Task<string> GetTemplateContentsAsync(string templateName, string language)
         {
             var assembly = Assembly.GetEntryAssembly();
-            var resourceStream = assembly.GetManifestResourceStream($"PersonalAssistant.Auth.Resources.EmailTemplates.{language.Replace('-', '_')}.{templateName}");
+            var resourceStream = assembly.GetManifestResourceStream($"Auth.Resources.EmailTemplates.{language.Replace('-', '_')}.{templateName}");
 
             using var reader = new StreamReader(resourceStream, Encoding.UTF8);
             return await reader.ReadToEndAsync();
