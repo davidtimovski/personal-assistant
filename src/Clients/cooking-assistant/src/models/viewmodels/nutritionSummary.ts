@@ -11,7 +11,6 @@ export class NutritionSummary {
     public saturatedFat: number,
     public saturatedFatFromDaily: number,
     public saturatedFatFromDailyGrade: string,
-    public transFat: number,
     public carbohydrate: number,
     public carbohydrateFromDaily: number,
     public carbohydrateFromDailyGrade: string,

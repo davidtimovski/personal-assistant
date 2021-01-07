@@ -6,7 +6,6 @@ export class NutritionData {
     public calories: number,
     public fat: number,
     public saturatedFat: number,
-    public transFat: number,
     public carbohydrate: number,
     public sugars: number,
     public addedSugars: number,

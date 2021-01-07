@@ -8,7 +8,6 @@
         public float? Calories { get; set; }
         public float? Fat { get; set; }
         public float? SaturatedFat { get; set; }
-        public float? TransFat { get; set; }
         public float? Carbohydrate { get; set; }
         public float? Sugars { get; set; }
         public float? AddedSugars { get; set; }

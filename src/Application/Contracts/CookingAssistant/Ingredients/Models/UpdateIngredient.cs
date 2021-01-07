@@ -47,10 +47,6 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients.M
             {
                 return !saturatedFat.HasValue || (saturatedFat >= 0 && saturatedFat < 1000);
             });
-            RuleFor(dto => dto.NutritionData.TransFat).Must(transFat =>
-            {
-                return !transFat.HasValue || (transFat >= 0 && transFat < 1000);
-            });
             RuleFor(dto => dto.NutritionData.Carbohydrate).Must(carbohydrate =>
             {
                 return !carbohydrate.HasValue || (carbohydrate >= 0 && carbohydrate < 1000);

@@ -53,7 +53,6 @@ namespace PersonalAssistant.Application.Mappings
                 .ForMember(x => x.Calories, opt => opt.MapFrom(src => src.NutritionData.Calories))
                 .ForMember(x => x.Fat, opt => opt.MapFrom(src => src.NutritionData.Fat))
                 .ForMember(x => x.SaturatedFat, opt => opt.MapFrom(src => src.NutritionData.SaturatedFat))
-                .ForMember(x => x.TransFat, opt => opt.MapFrom(src => src.NutritionData.TransFat))
                 .ForMember(x => x.Carbohydrate, opt => opt.MapFrom(src => src.NutritionData.Carbohydrate))
                 .ForMember(x => x.Sugars, opt => opt.MapFrom(src => src.NutritionData.Sugars))
                 .ForMember(x => x.AddedSugars, opt => opt.MapFrom(src => src.NutritionData.AddedSugars))
@@ -137,11 +136,6 @@ namespace PersonalAssistant.Application.Mappings
                 {
                     ingredientHasNutritionData = true;
                     nutritionSummary.SaturatedFat = AddGramsValuePerAmountAndServing(nutritionSummary.SaturatedFat, recipeIngredient.Ingredient.SaturatedFat.Value, servingSize, servingSizeIsOneUnit, amount, unit, servings);
-                }
-                if (recipeIngredient.Ingredient.TransFat.HasValue)
-                {
-                    ingredientHasNutritionData = true;
-                    nutritionSummary.TransFat = AddGramsValuePerAmountAndServing(nutritionSummary.TransFat, recipeIngredient.Ingredient.TransFat.Value, servingSize, servingSizeIsOneUnit, amount, unit, servings);
                 }
                 if (recipeIngredient.Ingredient.Carbohydrate.HasValue)
                 {
@@ -256,10 +250,6 @@ namespace PersonalAssistant.Application.Mappings
                 }
 
                 nutritionSummary.SaturatedFat = (float)Math.Round((double)nutritionSummary.SaturatedFat, 2, MidpointRounding.AwayFromZero);
-            }
-            if (nutritionSummary.TransFat.HasValue)
-            {
-                nutritionSummary.TransFat = (float)Math.Round((double)nutritionSummary.TransFat, 2, MidpointRounding.AwayFromZero);
             }
             if (nutritionSummary.Carbohydrate.HasValue)
             {
@@ -412,7 +402,6 @@ namespace PersonalAssistant.Application.Mappings
             nutritionSummary.IsSet = nutritionSummary.Calories.HasValue
                 || nutritionSummary.Fat.HasValue
                 || nutritionSummary.SaturatedFat.HasValue
-                || nutritionSummary.TransFat.HasValue
                 || nutritionSummary.Carbohydrate.HasValue
                 || nutritionSummary.Sugars.HasValue
                 || nutritionSummary.AddedSugars.HasValue
@@ -581,7 +570,6 @@ namespace PersonalAssistant.Application.Mappings
             var hasNutritionData = source.Ingredient.Calories.HasValue
                 || source.Ingredient.Fat.HasValue
                 || source.Ingredient.SaturatedFat.HasValue
-                || source.Ingredient.TransFat.HasValue
                 || source.Ingredient.Carbohydrate.HasValue
                 || source.Ingredient.Sugars.HasValue
                 || source.Ingredient.AddedSugars.HasValue
@@ -616,7 +604,6 @@ namespace PersonalAssistant.Application.Mappings
             var hasNutritionData = source.Calories.HasValue
                 || source.Fat.HasValue
                 || source.SaturatedFat.HasValue
-                || source.TransFat.HasValue
                 || source.Carbohydrate.HasValue
                 || source.Sugars.HasValue
                 || source.AddedSugars.HasValue
@@ -655,7 +642,6 @@ namespace PersonalAssistant.Application.Mappings
                 Calories = source.Calories,
                 Fat = source.Fat,
                 SaturatedFat = source.SaturatedFat,
-                TransFat = source.TransFat,
                 Carbohydrate = source.Carbohydrate,
                 Sugars = source.Sugars,
                 AddedSugars = source.AddedSugars,
@@ -675,7 +661,6 @@ namespace PersonalAssistant.Application.Mappings
             nutritionData.IsSet = source.Calories.HasValue
                 || source.Fat.HasValue
                 || source.SaturatedFat.HasValue
-                || source.TransFat.HasValue
                 || source.Carbohydrate.HasValue
                 || source.Sugars.HasValue
                 || source.AddedSugars.HasValue

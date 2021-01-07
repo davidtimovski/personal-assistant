@@ -68,7 +68,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
             var recipeIngredientsSql = @"SELECT ri.""Amount"", ri.""Unit"", i.""Id"", i.""TaskId"", 
                                                 i.""Name"", i.""ServingSize"", i.""ServingSizeIsOneUnit"", i.""Calories"", 
-                                                i.""Fat"", i.""SaturatedFat"", i.""TransFat"", i.""Carbohydrate"", 
+                                                i.""Fat"", i.""SaturatedFat"", i.""Carbohydrate"", 
                                                 i.""Sugars"", i.""AddedSugars"", i.""Fiber"", i.""Protein"",
                                                 i.""Sodium"", i.""Cholesterol"", 
                                                 i.""VitaminA"", i.""VitaminC"", i.""VitaminD"",
@@ -541,7 +541,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                     if (TransferNutritionData)
                     {
                         nutritionDataQuery = @"""ServingSize"" = @ServingSize, ""ServingSizeIsOneUnit"" = @ServingSizeIsOneUnit, 
-                                                ""Calories"" = @Calories, ""Fat"" = @Fat, ""SaturatedFat"" = @SaturatedFat, ""TransFat"" = @TransFat, 
+                                                ""Calories"" = @Calories, ""Fat"" = @Fat, ""SaturatedFat"" = @SaturatedFat, 
                                                 ""Carbohydrate"" = @Carbohydrate, ""Sugars"" = @Sugars, ""AddedSugars"" = @AddedSugars, 
                                                 ""Fiber"" = @Fiber, ""Protein"" = @Protein, ""Sodium"" = @Sodium, ""Cholesterol"" = @Cholesterol, 
                                                 ""VitaminA"" = @VitaminA, ""VitaminC"" = @VitaminC, ""VitaminD"" = @VitaminD, 
@@ -580,13 +580,13 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                 recipeIngredient.Ingredient.CreatedDate = recipeIngredient.Ingredient.ModifiedDate = now;
                 var ingredientId = (await conn.QueryAsync<int>(@"INSERT INTO ""CookingAssistant.Ingredients"" (""UserId"", ""TaskId"", ""Name"", 
                                                                      ""ServingSize"", ""ServingSizeIsOneUnit"", ""Calories"", ""Fat"", ""SaturatedFat"", 
-                                                                     ""TransFat"", ""Carbohydrate"", ""Sugars"", ""AddedSugars"", ""Fiber"", ""Protein"",                         
+                                                                     ""Carbohydrate"", ""Sugars"", ""AddedSugars"", ""Fiber"", ""Protein"",                         
                                                                      ""Sodium"", ""Cholesterol"", ""VitaminA"", ""VitaminC"", ""VitaminD"",
                                                                      ""Calcium"", ""Iron"", ""Potassium"", ""Magnesium"", 
                                                                      ""ProductSize"", ""ProductSizeIsOneUnit"", ""Price"",
                                                                      ""Currency"", ""CreatedDate"", ""ModifiedDate"")
                                                                      VALUES (@UserId, @TaskId, @Name, @ServingSize, @ServingSizeIsOneUnit, 
-                                                                     @Calories, @Fat, @SaturatedFat, @TransFat, @Carbohydrate, @Sugars, @AddedSugars,
+                                                                     @Calories, @Fat, @SaturatedFat, @Carbohydrate, @Sugars, @AddedSugars,
                                                                      @Fiber, @Protein, @Sodium, @Cholesterol, @VitaminA, @VitaminC, @VitaminD, @Calcium,
                                                                      @Iron, @Potassium, @Magnesium, @ProductSize, @ProductSizeIsOneUnit, 
                                                                      @Price, @Currency, @CreatedDate, @ModifiedDate) returning ""Id""",

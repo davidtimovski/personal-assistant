@@ -13,7 +13,6 @@ CREATE TABLE public."CookingAssistant.Ingredients"
     "Calories" numeric(4, 1),
     "Fat" numeric(4, 1),
     "SaturatedFat" numeric(4, 1),
-    "TransFat" numeric(4, 1),
 	"Carbohydrate" numeric(4, 1),
 	"Sugars" numeric(4, 1),
 	"AddedSugars" numeric(4, 1),

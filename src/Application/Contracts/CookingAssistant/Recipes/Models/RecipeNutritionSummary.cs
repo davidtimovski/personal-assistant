@@ -16,7 +16,6 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Model
         public float? SaturatedFat { get; set; }
         public float? SaturatedFatFromDaily { get; set; }
         public string SaturatedFatFromDailyGrade { get; set; }
-        public float? TransFat { get; set; }
         public float? Carbohydrate { get; set; }
         public float? CarbohydrateFromDaily { get; set; }
         public string CarbohydrateFromDailyGrade { get; set; }

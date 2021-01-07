@@ -37,7 +37,6 @@ export class EditIngredient {
   private caloriesIsInvalid: boolean;
   private fatIsInvalid: boolean;
   private saturatedFatIsInvalid: boolean;
-  private transFatIsInvalid: boolean;
   private carbohydrateIsInvalid: boolean;
   private sugarsIsInvalid: boolean;
   private addedSugarsIsInvalid: boolean;
@@ -75,7 +74,6 @@ export class EditIngredient {
       this.caloriesIsInvalid = false;
       this.fatIsInvalid = false;
       this.saturatedFatIsInvalid = false;
-      this.transFatIsInvalid = false;
       this.carbohydrateIsInvalid = false;
       this.sugarsIsInvalid = false;
       this.addedSugarsIsInvalid = false;
@@ -135,11 +133,6 @@ export class EditIngredient {
           .between(-1, gTo)
           .withMessage(
             this.i18n.tr("saturatedFatBetween", { from: 0, to: gToLabel })
-          )
-          .ensure((x: NutritionData) => x.transFat)
-          .between(-1, gTo)
-          .withMessage(
-            this.i18n.tr("transFatBetween", { from: 0, to: gToLabel })
           )
           .ensure((x: NutritionData) => x.carbohydrate)
           .between(-1, gTo)
@@ -270,7 +263,6 @@ export class EditIngredient {
     this.model.nutritionData.calories = null;
     this.model.nutritionData.fat = null;
     this.model.nutritionData.saturatedFat = null;
-    this.model.nutritionData.transFat = null;
     this.model.nutritionData.carbohydrate = null;
     this.model.nutritionData.sugars = null;
     this.model.nutritionData.addedSugars = null;
@@ -304,7 +296,6 @@ export class EditIngredient {
     "model.nutritionData.calories",
     "model.nutritionData.fat",
     "model.nutritionData.saturatedFat",
-    "model.nutritionData.transFat",
     "model.nutritionData.carbohydrate",
     "model.nutritionData.sugars",
     "model.nutritionData.addedSugars",
@@ -386,11 +377,6 @@ export class EditIngredient {
       this.saturatedFatIsInvalid = this.propertyIsInvalid(
         result.results,
         "saturatedFat",
-        errorMessages
-      );
-      this.transFatIsInvalid = this.propertyIsInvalid(
-        result.results,
-        "transFat",
         errorMessages
       );
       this.carbohydrateIsInvalid = this.propertyIsInvalid(
