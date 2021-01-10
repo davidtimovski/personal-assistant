@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using AspNet.Security.OAuth.Introspection;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
@@ -11,7 +10,7 @@ using PersonalAssistant.Infrastructure.Identity;
 
 namespace Api.Controllers.CookingAssistant
 {
-    [Authorize(AuthenticationSchemes = OAuthIntrospectionDefaults.AuthenticationScheme)]
+    [Authorize]
     [EnableCors("AllowCookingAssistant")]
     [Route("api/[controller]")]
     public class DietaryProfilesController : Controller

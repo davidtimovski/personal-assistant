@@ -2,7 +2,6 @@
 using System.IO;
 using System.Threading.Tasks;
 using Api.Models.Accountant.Transactions;
-using AspNet.Security.OAuth.Introspection;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Hosting;
@@ -14,7 +13,7 @@ using PersonalAssistant.Infrastructure.Identity;
 
 namespace Api.Controllers.Accountant
 {
-    [Authorize(AuthenticationSchemes = OAuthIntrospectionDefaults.AuthenticationScheme)]
+    [Authorize]
     [EnableCors("AllowAccountant")]
     [Route("api/[controller]")]
     public class TransactionsController : Controller

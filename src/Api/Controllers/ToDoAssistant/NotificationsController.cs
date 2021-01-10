@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using AspNet.Security.OAuth.Introspection;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +8,7 @@ using PersonalAssistant.Infrastructure.Identity;
 
 namespace Api.Controllers.ToDoAssistant
 {
-    [Authorize(AuthenticationSchemes = OAuthIntrospectionDefaults.AuthenticationScheme)]
+    [Authorize]
     [EnableCors("AllowToDoAssistant")]
     [Route("api/[controller]")]
     public class NotificationsController : Controller

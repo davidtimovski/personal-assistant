@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using AspNet.Security.OAuth.Introspection;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +9,7 @@ using PersonalAssistant.Infrastructure.Identity;
 
 namespace Api.Controllers.Common
 {
-    [Authorize(AuthenticationSchemes = OAuthIntrospectionDefaults.AuthenticationScheme)]
+    [Authorize]
     [EnableCors("AllowAllApps")]
     [Route("api/[controller]")]
     public class PushSubscriptionsController : Controller

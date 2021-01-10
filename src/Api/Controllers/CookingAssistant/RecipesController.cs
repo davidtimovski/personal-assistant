@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Api.Config;
 using Api.Models.CookingAssistant.Recipes;
-using AspNet.Security.OAuth.Introspection;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
@@ -27,7 +26,7 @@ using PersonalAssistant.Infrastructure.Sender.Models;
 
 namespace Api.Controllers.CookingAssistant
 {
-    [Authorize(AuthenticationSchemes = OAuthIntrospectionDefaults.AuthenticationScheme)]
+    [Authorize]
     [EnableCors("AllowCookingAssistant")]
     [Route("api/[controller]")]
     public class RecipesController : Controller

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Globalization;
 using Api.Config;
-using AspNet.Security.OAuth.Introspection;
 using AutoMapper;
 using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
@@ -35,8 +35,8 @@ namespace Api
             services.AddPersistence(Configuration);
             services.AddApplication(Configuration);
 
-            services.AddAuthentication(OAuthIntrospectionDefaults.AuthenticationScheme)
-                .AddJwtBearer("Bearer", options =>
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
                 {
                     options.Authority = Configuration["Urls:Authority"];
 #if DEBUG

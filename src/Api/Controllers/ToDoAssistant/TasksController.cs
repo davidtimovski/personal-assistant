@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Api.Config;
-using AspNet.Security.OAuth.Introspection;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
@@ -24,7 +23,7 @@ using PersonalAssistant.Infrastructure.Sender.Models;
 
 namespace Api.Controllers.ToDoAssistant
 {
-    [Authorize(AuthenticationSchemes = OAuthIntrospectionDefaults.AuthenticationScheme)]
+    [Authorize]
     [EnableCors("AllowToDoAssistant")]
     [Route("api/[controller]")]
     public class TasksController : Controller
