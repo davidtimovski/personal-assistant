@@ -5,7 +5,6 @@
   "currencyConversionError": "An unexpected error occurred whilst converting currencies",
   "refresh": "Refresh",
   "failedToFetchError": "Please check your internet connection.",
-  "unsuccessfulSync": "Sync was unsuccessful.",
   "profilePicture": "Profile picture",
   "name": "Name",
   "save": "Save",

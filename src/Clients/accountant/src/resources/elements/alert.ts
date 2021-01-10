@@ -9,7 +9,6 @@ export class AlertCustomElement {
   private message: string;
   private fading = false;
   private refreshLink: HTMLAnchorElement;
-  private syncLink: HTMLAnchorElement;
   private hideTimeout = 0;
 
   constructor(
@@ -28,10 +27,6 @@ export class AlertCustomElement {
         if (this.refreshLink) {
           this.refreshLink.style.display =
             translationKey === "unexpectedError" ? "block" : "none";
-        }
-        if (this.syncLink) {
-          this.syncLink.style.display =
-            translationKey === "unsuccessfulSync" ? "block" : "none";
         }
 
         this.message = this.i18n.tr(translationKey);
@@ -62,7 +57,7 @@ export class AlertCustomElement {
   reset() {
     this.message = null;
     this.fading = false;
-    this.refreshLink.style.display = this.syncLink.style.display = "none";
+    this.refreshLink.style.display = "none";
   }
 
   hide() {

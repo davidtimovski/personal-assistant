@@ -3,6 +3,7 @@ import { HttpClient } from "aurelia-fetch-client";
 import { EventAggregator } from "aurelia-event-aggregator";
 
 import { AuthService } from "../../../shared/src/services/authService";
+import { HttpError } from "../models/enums/httpError";
 
 @inject(AuthService, HttpClient, EventAggregator)
 export class HttpProxyBase {
@@ -70,7 +71,7 @@ export class HttpProxyBase {
   protected async HandleErrorCodes(response: Response) {
     if (response.status === 401) {
       await this.authService.signinRedirect();
-      throw [];
+      throw HttpError.Unauthorized;
     } else if (response.status === 404) {
       return null;
     } else if (response.status === 422) {
@@ -100,6 +101,6 @@ export class HttpProxyBase {
     }
 
     this.eventAggregator.publish("alert-error", "unexpectedError");
-    throw [];
+    throw HttpError.Unexpected;
   }
 }
