@@ -29,11 +29,26 @@
             cloud.</span>
         </section>
 
+        <section if.bind="isParent" class="message info">
+          <i class="fas fa-info-circle"></i>
+          <span t="editCategory.thisIsAParentCategory">This is a parent category.</span>
+        </section>
+
         <form submit.trigger="save()">
           <div class="form-control">
             <input type="text" value.bind="category.name & validate" ref="nameInput" maxlength="30"
               class.bind="nameIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]editCategory.categoryName"
               required>
+          </div>
+          <div if.bind="!isParent" class="form-control inline">
+            <label for="parent-category" t="editCategory.parentCategory">Parent category</label>
+            <div class="loadable-select ${parentCategoryOptions ? 'loaded' : ''}">
+              <select id="parent-category" value.bind="category.parentId" disabled.bind="!parentCategoryOptions"
+                class="category-select">
+                <option model.bind="category.id" repeat.for="category of parentCategoryOptions">${category.name}</option>
+              </select>
+              <i class="fas fa-circle-notch fa-spin"></i>
+            </div>
           </div>
           <div class="form-control inline">
             <label for="type" t="editCategory.type">Type</label>

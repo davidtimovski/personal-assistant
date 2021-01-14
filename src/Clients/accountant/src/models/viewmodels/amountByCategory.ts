@@ -1,7 +1,7 @@
 export class AmountByCategory {
-  constructor(
-    public category: string,
-    public amount: number,
-    public color: string
-  ) {}
+  public subItems: Array<AmountByCategory>;
+
+  constructor(public categoryId: number, public parentCategoryId: number, public categoryName: string, public amount: number) {
+    this.subItems = [];
+  }
 }

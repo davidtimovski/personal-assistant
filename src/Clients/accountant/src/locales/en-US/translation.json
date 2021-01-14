@@ -140,7 +140,10 @@
   "editCategory": {
     "newCategory": "New category",
     "edit": "Edit",
+    "thisIsAParentCategory": "This is a parent category.",
     "categoryName": "Category name",
+    "parentCategory": "Parent category",
+    "none": "None",
     "type": "Type",
     "generateUpcomingExpense": "Generate upcoming expense",
     "allTransactions": "All transactions",

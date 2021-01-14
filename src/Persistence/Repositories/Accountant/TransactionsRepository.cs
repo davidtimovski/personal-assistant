@@ -20,20 +20,33 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
             using DbConnection conn = Connection;
             await conn.OpenAsync();
 
-            var sql = @"SELECT t.*, fa.""Id"", fa.""Name"", 
-                            ta.""Id"", ta.""Name"", c.""Id"", c.""Name""
+            var sql = @"SELECT t.*, fa.""Id"", fa.""Name"", ta.""Id"", ta.""Name"", c.""Id"", c.""Name"", pc.""Id"", pc.""Name""
                         FROM ""Accountant.Transactions"" AS t
                         LEFT JOIN ""Accountant.Accounts"" AS fa ON t.""FromAccountId"" = fa.""Id""
                         LEFT JOIN ""Accountant.Accounts"" AS ta ON t.""ToAccountId"" = ta.""Id""
                         LEFT JOIN ""Accountant.Categories"" AS c ON t.""CategoryId"" = c.""Id""
+                        LEFT JOIN ""Accountant.Categories"" AS pc ON c.""ParentId"" = pc.""Id""
                         WHERE fa.""UserId"" = @UserId OR ta.""UserId"" = @UserId ORDER BY ""Date""";
 
-            var transactions = await conn.QueryAsync<Transaction, Account, Account, Category, Transaction>(sql,
-                (transaction, fromAccount, toAccount, category) =>
+            var transactions = await conn.QueryAsync<Transaction, Account, Account, Category, Category, Transaction>(sql,
+                (transaction, fromAccount, toAccount, category, parentCategory) =>
                 {
                     transaction.FromAccount = fromAccount ?? new Account();
                     transaction.ToAccount = toAccount ?? new Account();
-                    transaction.Category = category ?? new Category { Name = uncategorized };
+
+                    if (category == null)
+                    {
+                        transaction.Category = new Category { Name = uncategorized };
+                    }
+                    else
+                    {
+                        if (parentCategory != null)
+                        {
+                            category.Name = $"{parentCategory.Name}/{category.Name}";
+                        }
+                        
+                        transaction.Category = category;
+                    }
 
                     return transaction;
                 }, new { UserId = userId }, null, true);

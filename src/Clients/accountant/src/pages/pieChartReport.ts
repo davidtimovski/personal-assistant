@@ -1,11 +1,12 @@
 import { inject } from "aurelia-framework";
+import { I18N } from "aurelia-i18n";
+import * as Chart from "chart.js";
+
+import { DateHelper } from "../../../shared/src/utils/dateHelper";
 import { TransactionsService } from "services/transactionsService";
 import { AccountsService } from "services/accountsService";
 import { LocalStorage } from "utils/localStorage";
-import { I18N } from "aurelia-i18n";
-import * as Chart from "chart.js";
 import { AmountByCategory } from "models/viewmodels/amountByCategory";
-import { DateHelper } from "../../../shared/src/utils/dateHelper";
 import { TransactionType } from "models/viewmodels/transactionType";
 import { TransactionModel } from "models/entities/transaction";
 
@@ -87,54 +88,38 @@ export class PieChartReport {
     this.items = null;
 
     this.transactionsService
-      .getAllBetweenDates(
+      .getExpendituresAndDepositsByCategory(
         this.fromDate,
         this.toDate,
         this.mainAccountId,
         this.type,
-        this.currency
+        this.currency,
+        this.i18n.tr("uncategorized")
       )
-      .then((transactions: Array<TransactionModel>) => {
-        let items = new Array<AmountByCategory>();
-        const itemGroups = this.groupBy(
-          transactions,
-          (x: TransactionModel) => x.categoryName
-        );
-
-        for (const group of itemGroups) {
-          const item = new AmountByCategory(
-            group[0] || this.i18n.tr("uncategorized"),
-            0,
-            null
-          );
-
-          for (const transaction of group[1]) {
-            item.amount += transaction.amount;
-          }
-          item.amount = parseFloat(item.amount.toFixed(2));
-
-          items.push(item);
-        }
-        items = items.sort((a: AmountByCategory, b: AmountByCategory) => {
-          return b.amount - a.amount;
-        });
-
+      .then((items: Array<AmountByCategory>) => {
         const labels = new Array<string>();
         const amounts = new Array<number>();
         let sum = 0;
-        for (let i = 0; i < items.length; i++) {
-          items[i].color = i < this.colors.length ? this.colors[i] : "#e0e0e0";
 
-          labels.push(items[i].category);
-          amounts.push(items[i].amount);
+        const flatItems = new Array<AmountByCategory>();
+        for (const item of items) {
+          flatItems.push(item);
+          flatItems.push(...item.subItems);
 
-          sum += items[i].amount;
+          sum += item.amount;
         }
 
-        this.items = items;
         this.sum = sum;
+        this.items = items;
 
-        if (items.length > 0) {
+        for (let i = 0; i < flatItems.length; i++) {
+          (<any>flatItems[i]).color = i < this.colors.length ? this.colors[i] : "#e0e0e0";
+
+          labels.push(flatItems[i].categoryName);
+          amounts.push(flatItems[i].amount);
+        }
+
+        if (flatItems.length > 0) {
           this.chart.data.labels = labels;
           this.chart.data.datasets[0].data = amounts;
         } else {

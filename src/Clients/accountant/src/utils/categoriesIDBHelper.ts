@@ -1,4 +1,5 @@
 import { inject } from "aurelia-framework";
+
 import { Category, CategoryType } from "models/entities/category";
 import { CreatedIdPair } from "models/sync/created";
 import { IDBContext } from "./idbContext";
@@ -12,11 +13,18 @@ export class CategoriesIDBHelper {
   }
 
   async getAllAsOptions(type: CategoryType): Promise<Array<Category>> {
-    const categories = await this.db.categories
-      .filter((x: Category): boolean => {
-        return type === 0 || x.type === 0 || x.type === type;
-      })
-      .toArray();
+    let categories = await this.db.categories.toArray();
+
+    for (const category of categories) {
+      if (category.parentId !== null) {
+        const parent = categories.filter(c => c.id === category.parentId)[0];
+        category.name = `${parent.name}/${category.name}`;
+      }
+    }
+
+    categories = categories.filter((x: Category): boolean => {
+      return type === 0 || x.type === 0 || x.type === type;
+    });
 
     const getCountPromises = Array<Promise<void>>();
     for (const category of categories) {
@@ -43,8 +51,34 @@ export class CategoriesIDBHelper {
     });
   }
 
-  get(id: number): Promise<Category> {
-    return this.db.categories.get(id);
+  async getParentAsOptions(): Promise<Array<Category>> {
+    const categories = await this.db.categories
+      .filter(c => c.parentId === null)
+      .toArray();
+
+    return categories.sort((a: Category, b: Category) => {
+      return (a.name > b.name) ? 1 : -1;
+    });
+  }
+
+  async get(id: number): Promise<Category> {
+    const category = await this.db.categories.get(id);
+
+    if (category.parentId !== null) {
+      const parent = await this.db.categories.get(category.parentId);
+      category.parent = parent.name;
+    }
+
+    return category;
+  }
+
+  async isParent(id: number): Promise<boolean> {
+    const subCategories = await this.db.categories
+      .where("parentId")
+      .equals(id)
+      .count();
+
+    return subCategories > 0;
   }
 
   async isSynced(id: number): Promise<boolean> {
@@ -72,6 +106,12 @@ export class CategoriesIDBHelper {
       function* () {
         yield this.db.transactions.where("categoryId").equals(id).delete();
         yield this.db.categories.delete(id);
+
+        const subCategories = yield this.db.categories.where("parentId").equals(id).toArray();
+        for (const subCategory of subCategories) {
+          subCategory.parentId = null;
+          yield this.db.categories.update(subCategory.id, subCategory);
+        }
       }
     );
   }
@@ -120,9 +160,7 @@ export class CategoriesIDBHelper {
     const categories = this.db.categories.toCollection();
 
     return categories
-      .filter((c: Category) => {
-        return !c.synced;
-      })
+      .filter(c => !c.synced)
       .toArray();
   }
 

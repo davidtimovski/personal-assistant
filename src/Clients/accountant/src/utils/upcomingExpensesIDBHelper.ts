@@ -1,4 +1,5 @@
 import { inject } from "aurelia-framework";
+
 import { UpcomingExpense } from "models/entities/upcomingExpense";
 import { CreatedIdPair } from "models/sync/created";
 import { IDBContext } from "./idbContext";
@@ -29,17 +30,21 @@ export class UpcomingExpensesIDBHelper {
 
     const upcomingExpenses = await this.db.upcomingExpenses
       .orderBy("date")
-      .filter((x: UpcomingExpense) => {
-        return new Date(x.date).getMonth() === month;
-      })
+      .filter(x => new Date(x.date).getMonth() === month)
       .toArray();
+
+    const categories = await this.db.categories.toArray();
 
     for (const upcomingExpense of upcomingExpenses) {
       if (upcomingExpense.categoryId) {
-        const category = await this.db.categories.get(
-          upcomingExpense.categoryId
-        );
-        upcomingExpense.categoryName = category.name;
+        const category = categories.find(x => x.id === upcomingExpense.categoryId);
+
+        if (category.parentId) {
+          const parent = categories.find(x => x.id === category.parentId);
+          upcomingExpense.categoryName = `${parent.name}/${category.name}`;
+        } else {
+          upcomingExpense.categoryName = category.name;
+        }
       }
     }
 
@@ -93,9 +98,7 @@ export class UpcomingExpensesIDBHelper {
     const upcomingExpenses = this.db.upcomingExpenses.toCollection();
 
     return upcomingExpenses
-      .filter((u: UpcomingExpense) => {
-        return !u.synced;
-      })
+      .filter(x => !x.synced)
       .toArray();
   }
 
@@ -124,9 +127,7 @@ export class UpcomingExpensesIDBHelper {
     const startOfMonth = new Date(now.getFullYear(), 0, 1, 0, 0, 0);
 
     const upcomingExpensesToDelete = await this.db.upcomingExpenses
-      .filter((x: UpcomingExpense) => {
-        return new Date(x.date) < startOfMonth;
-      })
+      .filter(x => new Date(x.date) < startOfMonth)
       .toArray();
 
     if (upcomingExpensesToDelete.length > 0) {

@@ -1,8 +1,5 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { CategoriesService } from "services/categoriesService";
-import { Category, CategoryType } from "models/entities/category";
-import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import {
   ValidationController,
   validateTrigger,
@@ -11,7 +8,11 @@ import {
 } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
+
+import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import { ConnectionTracker } from "../../../shared/src/utils/connectionTracker";
+import { CategoriesService } from "services/categoriesService";
+import { Category, CategoryType } from "models/entities/category";
 import { SelectOption } from "models/viewmodels/selectOption";
 
 @inject(
@@ -27,6 +28,8 @@ export class EditCategory {
   private category: Category;
   private originalCategoryJson: string;
   private isNewCategory: boolean;
+  private isParent: boolean;
+  private parentCategoryOptions: Array<SelectOption>;
   private typeOptions: Array<SelectOption>;
   private nameInput: HTMLInputElement;
   private nameIsInvalid: boolean;
@@ -74,6 +77,7 @@ export class EditCategory {
 
     if (this.isNewCategory) {
       this.category = new Category(
+        null,
         "",
         CategoryType.AllTransactions,
         false,
@@ -92,6 +96,10 @@ export class EditCategory {
     if (this.isNewCategory) {
       this.nameInput.focus();
     } else {
+      this.categoriesService.isParent(this.categoryId).then((isParent: boolean) => {
+        this.isParent = isParent;
+      });
+
       this.categoriesService.get(this.categoryId).then((category: Category) => {
         if (category === null) {
           this.router.navigateToRoute("notFound");
@@ -103,6 +111,12 @@ export class EditCategory {
         this.setValidationRules();
       });
     }
+
+    this.categoriesService
+      .getParentAsOptions(this.i18n.tr("editCategory.none"), this.categoryId)
+      .then((options) => {
+        this.parentCategoryOptions = options;
+      });
   }
 
   setValidationRules() {
@@ -119,6 +133,7 @@ export class EditCategory {
 
   @computedFrom(
     "category.name",
+    "category.parentId",
     "category.type",
     "category.generateUpcomingExpense",
     "category.synced",
@@ -213,5 +228,6 @@ export class EditCategory {
     }
     this.deleteButtonText = this.i18n.tr("delete");
     this.deleteInProgress = false;
+    this.transactionsWarningVisible = false;
   }
 }

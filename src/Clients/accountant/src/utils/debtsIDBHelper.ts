@@ -1,4 +1,5 @@
 import { inject } from "aurelia-framework";
+
 import { DebtModel } from "models/entities/debt";
 import { CreatedIdPair } from "models/sync/created";
 import { IDBContext } from "./idbContext";
@@ -55,9 +56,7 @@ export class DebtsIDBHelper {
     const debts = this.db.debts.toCollection();
 
     return debts
-      .filter((u: DebtModel) => {
-        return !u.synced;
-      })
+      .filter(d => !d.synced)
       .toArray();
   }
 

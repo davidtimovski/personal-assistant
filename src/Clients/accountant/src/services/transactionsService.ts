@@ -5,19 +5,22 @@ import { EventAggregator } from "aurelia-event-aggregator";
 
 import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
 import { AuthService } from "../../../shared/src/services/authService";
-import { TransactionsIDBHelper } from "../utils/transactionsIDBHelper";
 import { CurrenciesService } from "../../../shared/src/services/currenciesService";
+import { DateHelper } from "../../../shared/src/utils/dateHelper";
+import { TransactionsIDBHelper } from "../utils/transactionsIDBHelper";
 import { TransactionModel } from "models/entities/transaction";
 import { TransactionType } from "models/viewmodels/transactionType";
-import { DateHelper } from "../../../shared/src/utils/dateHelper";
+import { CategoriesService } from "./categoriesService";
 import { EncryptionService } from "./encryptionService";
 import { SearchFilters } from "models/viewmodels/searchFilters";
+import { AmountByCategory } from "models/viewmodels/amountByCategory";
 
 @inject(
   AuthService,
   HttpClient,
   EventAggregator,
   TransactionsIDBHelper,
+  CategoriesService,
   CurrenciesService,
   EncryptionService
 )
@@ -27,6 +30,7 @@ export class TransactionsService extends HttpProxyBase {
     protected readonly httpClient: HttpClient,
     protected readonly eventAggregator: EventAggregator,
     private readonly idbHelper: TransactionsIDBHelper,
+    private readonly categoriesService: CategoriesService,
     private readonly currenciesService: CurrenciesService,
     private readonly encryptionService: EncryptionService
   ) {
@@ -50,25 +54,75 @@ export class TransactionsService extends HttpProxyBase {
     return transactions;
   }
 
-  async getAllBetweenDates(
+  async getByCategory(transactions: Array<TransactionModel>, currency: string, uncategorizedLabel: string): Promise<Array<AmountByCategory>> {
+    transactions.forEach((x: TransactionModel) => {
+      x.amount = this.currenciesService.convert(
+        x.amount,
+        x.currency,
+        currency
+      );
+    });
+
+    const categories = await this.categoriesService.getAll();
+    const expendituresByCategory = new Array<AmountByCategory>();
+
+    for (const category of categories) {
+      const categoryTransactions = transactions.filter(t => t.categoryId === category.id);
+      const expenditure = new AmountByCategory(category.id, category.parentId, null, 0);
+      expenditure.categoryName = category.parentId === null ? category.name : "- " + category.name;
+
+      if (categoryTransactions.length) {
+        for (const transaction of categoryTransactions) {
+          expenditure.amount += transaction.amount;
+        }
+      }
+
+      expendituresByCategory.push(expenditure);
+    }
+
+    for (const expenditure of expendituresByCategory) {
+      const subExpenditures = expendituresByCategory.filter(e => e.amount !== 0 && e.parentCategoryId === expenditure.categoryId);
+
+      if (subExpenditures.length) {
+        expenditure.amount += subExpenditures
+          .map(c => c.amount)
+          .reduce((prev, curr) => prev + curr, 0);
+        expenditure.subItems = subExpenditures.sort((a, b) => b.amount - a.amount);
+      }
+    }
+
+    const uncategorizedTransactions = transactions.filter(t => t.categoryId === null);
+    if (uncategorizedTransactions.length) {
+      const expenditure = new AmountByCategory(null, null, uncategorizedLabel, 0);
+
+      for (const transaction of uncategorizedTransactions) {
+        expenditure.amount += transaction.amount;
+      }
+
+      expendituresByCategory.push(expenditure);
+    }
+
+    return expendituresByCategory
+      .filter(e => e.amount !== 0 && e.parentCategoryId === null)
+      .sort((a, b) => b.amount - a.amount);
+  }
+
+  async getExpendituresAndDepositsByCategory(
     fromDate: string,
     toDate: string,
     accountId: number,
     type: TransactionType,
-    currency: string
-  ): Promise<Array<TransactionModel>> {
-    const transactions = await this.idbHelper.getAllBetweenDates(
+    currency: string,
+    uncategorizedLabel: string
+  ): Promise<Array<AmountByCategory>> {
+    const transactions = await this.idbHelper.getExpendituresAndDepositsBetweenDates(
       fromDate,
       toDate,
       accountId,
       type
     );
 
-    transactions.forEach((x: TransactionModel) => {
-      x.amount = this.currenciesService.convert(x.amount, x.currency, currency);
-    });
-
-    return transactions;
+    return await this.getByCategory(transactions, currency, uncategorizedLabel);
   }
 
   async getExpensesAndDepositsFromDate(

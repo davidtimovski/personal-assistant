@@ -1,18 +1,23 @@
 import { inject } from "aurelia-framework";
+
+import { CurrenciesService } from "../../../shared/src/services/currenciesService";
 import { TransactionsIDBHelper } from "utils/transactionsIDBHelper";
 import { UpcomingExpensesIDBHelper } from "utils/upcomingExpensesIDBHelper";
 import { DebtsIDBHelper } from "utils/debtsIDBHelper";
 import { AccountsService } from "services/accountsService";
-import { CurrenciesService } from "../../../shared/src/services/currenciesService";
 import { Capital } from "models/capital";
 import { TransactionModel } from "models/entities/transaction";
 import { UpcomingExpense } from "models/entities/upcomingExpense";
 import { DebtModel } from "models/entities/debt";
+import { TransactionsService } from "./transactionsService";
+import { UpcomingExpenseDashboard } from "models/viewmodels/upcomingExpenseDashboard";
+import { DebtDashboard } from "models/viewmodels/debtDashboard";
 
 @inject(
   TransactionsIDBHelper,
   UpcomingExpensesIDBHelper,
   DebtsIDBHelper,
+  TransactionsService,
   AccountsService,
   CurrenciesService
 )
@@ -21,11 +26,13 @@ export class CapitalService {
     private readonly transactionsIDBHelper: TransactionsIDBHelper,
     private readonly upcomingExpensesIDBHelper: UpcomingExpensesIDBHelper,
     private readonly debtsIDBHelper: DebtsIDBHelper,
+    private readonly transactionsService: TransactionsService,
     private readonly accountsService: AccountsService,
     private readonly currenciesService: CurrenciesService
   ) {}
 
   async get(
+    uncategorizedLabel: string,
     includeUpcomingExpenses: boolean,
     includeDebt: boolean,
     currency: string
@@ -45,20 +52,14 @@ export class CapitalService {
 
     const expendituresPromise = this.transactionsIDBHelper
       .getExpendituresForCurrentMonth(mainAccountId)
-      .then((monthTransactions: Array<TransactionModel>) => {
-        capital.transactions = monthTransactions;
-
-        capital.transactions.forEach((x: TransactionModel) => {
-          x.amount = this.currenciesService.convert(
-            x.amount,
-            x.currency,
-            currency
-          );
-          capital.spent += x.amount;
-        });
+      .then(async (transactions: Array<TransactionModel>) => {
+        capital.expenditures = await this.transactionsService.getByCategory(transactions, currency, uncategorizedLabel);
+        capital.spent = capital.expenditures
+          .map(e => e.amount)
+          .reduce((prev, curr) => prev + curr, 0);
       });
 
-    const upcomingPromise = new Promise((resolve) => {
+    const upcomingPromise = new Promise<void>((resolve) => {
       if (!includeUpcomingExpenses) {
         resolve();
         return;
@@ -67,9 +68,7 @@ export class CapitalService {
       this.upcomingExpensesIDBHelper
         .getAllForMonth()
         .then((monthUpcomingExpenses: Array<UpcomingExpense>) => {
-          capital.upcomingExpenses = monthUpcomingExpenses;
-
-          capital.upcomingExpenses.forEach((x: UpcomingExpense) => {
+          monthUpcomingExpenses.forEach((x: UpcomingExpense) => {
             x.amount = this.currenciesService.convert(
               x.amount,
               x.currency,
@@ -78,25 +77,58 @@ export class CapitalService {
             capital.upcoming += x.amount;
           });
 
+          const upcomingExpenses = new Array<UpcomingExpenseDashboard>();
+          for (const upcomingExpense of monthUpcomingExpenses) {
+            const trimmedDescription = this.trimDescription(
+              upcomingExpense.description
+            );
+            upcomingExpenses.push(
+              new UpcomingExpenseDashboard(
+                upcomingExpense.categoryName || uncategorizedLabel,
+                trimmedDescription,
+                upcomingExpense.amount
+              )
+            );
+          }
+          capital.upcomingExpenses = upcomingExpenses.sort(
+            (a: UpcomingExpenseDashboard, b: UpcomingExpenseDashboard) => {
+              return b.amount - a.amount;
+            }
+          );
+
           resolve();
         });
     });
 
-    const debtPromise = new Promise(async (resolve) => {
+    const debtPromise = new Promise<void>(async (resolve) => {
       if (!includeDebt) {
         resolve();
         return;
       }
 
       this.debtsIDBHelper.getAll().then((debt: Array<DebtModel>) => {
-        capital.debt = debt;
-
-        capital.debt.forEach((x: DebtModel) => {
+        debt.forEach((x: DebtModel) => {
           x.amount = this.currenciesService.convert(
             x.amount,
             x.currency,
             currency
           );
+        });
+
+        const debtDashboard = new Array<DebtDashboard>();
+        for (const debtItem of debt) {
+          const trimmedDescription = this.trimDescription(debtItem.description);
+          debtDashboard.push(
+            new DebtDashboard(
+              debtItem.person,
+              debtItem.userIsDebtor,
+              trimmedDescription,
+              debtItem.amount
+            )
+          );
+        }
+        capital.debt = debtDashboard.sort((a: DebtDashboard, b: DebtDashboard) => {
+          return b.amount - a.amount;
         });
 
         resolve();
@@ -113,5 +145,18 @@ export class CapitalService {
     capital.available = capital.balance - capital.upcoming;
 
     return capital;
+  }
+
+  private trimDescription(description: string): string {
+    if (!description) {
+      return "";
+    }
+
+    const length = 25;
+    if (description.length <= length) {
+      return description;
+    }
+
+    return description.substring(0, length - 2) + "..";
   }
 }

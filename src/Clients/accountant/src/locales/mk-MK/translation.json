@@ -140,7 +140,10 @@
   "editCategory": {
     "newCategory": "Нова категорија",
     "edit": "Промени ја",
+    "thisIsAParentCategory": "Ова е надкатегорија.",
     "categoryName": "Име на категоријата",
+    "parentCategory": "Надкатегорија",
+    "none": "Ниедна",
     "type": "Тип",
     "generateUpcomingExpense": "Креирај иден трошок",
     "allTransactions": "Сите трансакции",

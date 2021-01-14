@@ -42,6 +42,7 @@ export class Menu {
   }
 
   async logOut() {
+    window.localStorage.removeItem("profileImageUriLastLoad");
     await this.authService.logout();
   }
 }

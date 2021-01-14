@@ -24,7 +24,7 @@ export class TotalSync {
     this.syncButtonIsLoading = true;
 
     try {
-      await this.syncService.removeIndexedDbAndRefresh();
+      await this.syncService.totalSync();
     } catch {
       this.syncButtonIsLoading = false;
     }

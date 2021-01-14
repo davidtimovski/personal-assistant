@@ -5,10 +5,10 @@ import { EventAggregator } from "aurelia-event-aggregator";
 
 import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
 import { AuthService } from "../../../shared/src/services/authService";
+import { DateHelper } from "../../../shared/src/utils/dateHelper";
 import { CategoriesIDBHelper } from "../utils/categoriesIDBHelper";
 import { Category, CategoryType } from "models/entities/category";
 import { SelectOption } from "models/viewmodels/selectOption";
-import { DateHelper } from "../../../shared/src/utils/dateHelper";
 
 @inject(AuthService, HttpClient, EventAggregator, CategoriesIDBHelper)
 export class CategoriesService extends HttpProxyBase {
@@ -34,15 +34,40 @@ export class CategoriesService extends HttpProxyBase {
     const options = new Array<SelectOption>();
     options.push(new SelectOption(null, uncategorizedLabel));
 
-    for (const category of categories) {
-      options.push(new SelectOption(category.id, category.name));
-    }
+    const selectOptions = categories
+      .map(c => new SelectOption(c.id, c.name));
+    options.push(...selectOptions);
 
+    return options;
+  }
+
+  async getParentAsOptions(notSelectedLabel: string, excludeCategoryId: number): Promise<Array<SelectOption>> {
+    const categories = await this.idbHelper.getParentAsOptions();
+
+    const options = new Array<SelectOption>();
+    options.push(new SelectOption(null, notSelectedLabel));
+
+    if (excludeCategoryId === 0) {
+      const selectOptions = categories
+        .map(c => new SelectOption(c.id, c.name));
+      options.push(...selectOptions);
+    } else {
+      const selectOptions = categories
+        .filter(c => c.id !== excludeCategoryId)
+        .map(c => new SelectOption(c.id, c.name));
+
+      options.push(...selectOptions);
+    }
+    
     return options;
   }
 
   async get(id: number): Promise<Category> {
     return this.idbHelper.get(id);
+  }
+
+  async isParent(id: number): Promise<boolean> {
+    return this.idbHelper.isParent(id);
   }
 
   async create(category: Category): Promise<number> {

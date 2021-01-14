@@ -1,4 +1,5 @@
 import { inject } from "aurelia-framework";
+
 import { Account } from "models/entities/account";
 import { CreatedIdPair } from "models/sync/created";
 import { IDBContext } from "./idbContext";
@@ -10,7 +11,7 @@ export class AccountsIDBHelper {
 
   async getMainId(): Promise<number> {
     const account = await this.db.accounts
-      .filter((x: Account) => x.isMain)
+      .filter(a => a.isMain)
       .first();
 
     if (!account) {
@@ -158,9 +159,7 @@ export class AccountsIDBHelper {
     const accounts = this.db.accounts.toCollection();
 
     return accounts
-      .filter((c: Account) => {
-        return !c.synced;
-      })
+      .filter(a => !a.synced)
       .toArray();
   }
 

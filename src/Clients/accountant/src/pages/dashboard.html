@@ -61,12 +61,18 @@
 
       <div else>
         <div if.bind="model.expenditures.length > 0">
-          <div class="key-value-table-title" t="dashboard.expenditures">Expenditures</div>
-          <table class="key-value-table">
-            <tr repeat.for="expenditure of model.expenditures">
-              <td>${expenditure.category}</td>
-              <td class="amount-cell">${expenditure.amount | moneyFormat:currency}</td>
-            </tr>
+          <div class="amount-by-category-table-title" t="dashboard.expenditures">Expenditures</div>
+          <table class="amount-by-category-table">
+            <template repeat.for="expenditure of model.expenditures">
+              <tr>
+                <td>${expenditure.categoryName}</td>
+                <td class="amount-cell">${expenditure.amount | moneyFormat:currency}</td>
+              </tr>
+              <tr repeat.for="expenditure of expenditure.subItems">
+                <td class="sub-category-cell">${expenditure.categoryName}</td>
+                <td class="amount-cell">${expenditure.amount | moneyFormat:currency}</td>
+              </tr>
+            </template>
           </table>
         </div>
 

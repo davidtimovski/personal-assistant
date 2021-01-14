@@ -59,12 +59,18 @@
         <canvas id="chart"></canvas>
       </div>
 
-      <table if.bind="showTable" class="key-value-table au-animate animate-fade-in animate-fade-out">
+      <table if.bind="showTable" class="amount-by-category-table au-animate animate-fade-in animate-fade-out">
         <tbody>
-          <tr repeat.for="item of items">
-            <td><span class="legend-color" css="background: ${item.color};"></span>${item.category}</td>
-            <td class="amount-cell">${item.amount | moneyFormat:currency}</td>
-          </tr>
+          <template repeat.for="item of items">
+            <tr>
+              <td><span class="legend-color" css="background: ${item.color};"></span>${item.categoryName}</td>
+              <td class="amount-cell">${item.amount | moneyFormat:currency}</td>
+            </tr>
+            <tr repeat.for="item of item.subItems">
+              <td class="sub-category-cell"><span class="legend-color" css="background: ${item.color};"></span>${item.categoryName}</td>
+              <td class="amount-cell">${item.amount | moneyFormat:currency}</td>
+            </tr>
+          </template>
         </tbody>
         <tfoot if.bind="items.length > 1">
           <tr>

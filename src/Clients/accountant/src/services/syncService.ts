@@ -100,7 +100,7 @@ export class SyncService extends HttpProxyBase {
     return lastSyncedServer;
   }
 
-  async removeIndexedDbAndRefresh(): Promise<void> {
+  async totalSync(): Promise<void> {
     const deleteContextRequest = window.indexedDB.deleteDatabase(
       "IDBContext"
     );

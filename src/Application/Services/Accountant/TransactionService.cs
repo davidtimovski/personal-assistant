@@ -134,10 +134,12 @@ namespace PersonalAssistant.Application.Services.Accountant
             Map(m => m.Date).Index(0).Name("Date").ConvertUsing(x => x.Date.ToString("dd/MM/yyyy"));
             Map(m => m.Amount).Index(1).Name("Amount");
             Map(m => m.Currency).Index(2).Name("Currency");
-            Map(m => m.Category.Name).Index(3).Name("Category");
-            Map(m => m.Description).Index(4).Name("Description");
-            Map(m => m.FromAccount.Name).Index(5).Name("From Account");
-            Map(m => m.ToAccount.Name).Index(6).Name("To Account");
+            Map(m => m.FromStocks).Index(3).Name("From Stocks");
+            Map(m => m.ToStocks).Index(4).Name("To Stocks");
+            Map(m => m.Category.Name).Index(5).Name("Category");
+            Map(m => m.Description).Index(6).Name("Description");
+            Map(m => m.FromAccount.Name).Index(7).Name("From Account");
+            Map(m => m.ToAccount.Name).Index(8).Name("To Account");
         }
     }
 }

@@ -50,14 +50,14 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
                 using DbConnection conn = Connection;
                 await conn.OpenAsync();
 
-                id = (await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.Categories"" (""UserId"", ""Name"", ""Type"", ""GenerateUpcomingExpense"",""CreatedDate"", ""ModifiedDate"")
-                                                   VALUES (@UserId, @Name, @Type, @GenerateUpcomingExpense, @CreatedDate, @ModifiedDate) returning ""Id""",
+                id = (await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.Categories"" (""ParentId"", ""UserId"", ""Name"", ""Type"", ""GenerateUpcomingExpense"",""CreatedDate"", ""ModifiedDate"")
+                                                   VALUES (@ParentId, @UserId, @Name, @Type, @GenerateUpcomingExpense, @CreatedDate, @ModifiedDate) returning ""Id""",
                                                        category)).Single();
             }
             else
             {
-                id = (await uowConn.QueryAsync<int>(@"INSERT INTO ""Accountant.Categories"" (""UserId"", ""Name"", ""Type"", ""GenerateUpcomingExpense"", ""CreatedDate"", ""ModifiedDate"")
-                                                   VALUES (@UserId, @Name, @Type, @GenerateUpcomingExpense, @CreatedDate, @ModifiedDate) returning ""Id""",
+                id = (await uowConn.QueryAsync<int>(@"INSERT INTO ""Accountant.Categories"" (""ParentId"", ""UserId"", ""Name"", ""Type"", ""GenerateUpcomingExpense"", ""CreatedDate"", ""ModifiedDate"")
+                                                   VALUES (@ParentId, @UserId, @Name, @Type, @GenerateUpcomingExpense, @CreatedDate, @ModifiedDate) returning ""Id""",
                                                        category, uowTransaction)).Single();
             }
 
@@ -69,7 +69,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
             using DbConnection conn = Connection;
             await conn.OpenAsync();
 
-            await conn.ExecuteAsync(@"UPDATE ""Accountant.Categories"" SET ""Name"" = @Name, ""Type"" = @Type, 
+            await conn.ExecuteAsync(@"UPDATE ""Accountant.Categories"" SET ""ParentId"" = @ParentId, ""Name"" = @Name, ""Type"" = @Type, 
                 ""GenerateUpcomingExpense"" = @GenerateUpcomingExpense, ""ModifiedDate"" = @ModifiedDate WHERE ""Id"" = @Id", category);
         }
 

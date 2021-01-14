@@ -15,7 +15,7 @@ export class IDBContext extends Dexie {
   public constructor() {
     super("IDBContext");
     this.version(3).stores({
-      categories: "id,type",
+      categories: "id,parentId,type",
       accounts: "id",
       transactions: "id,fromAccountId,toAccountId,categoryId,date",
       upcomingExpenses: "id,categoryId,date",

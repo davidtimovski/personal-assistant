@@ -1,19 +1,16 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
+import { I18N } from "aurelia-i18n";
+import { EventAggregator } from "aurelia-event-aggregator";
+
+import { ConnectionTracker } from "../../../shared/src/utils/connectionTracker";
+import { ProgressBar } from "../../../shared/src/models/progressBar";
 import { CapitalService } from "services/capitalService";
 import { UsersService } from "services/usersService";
 import { LocalStorage } from "utils/localStorage";
-import { I18N } from "aurelia-i18n";
-import { EventAggregator } from "aurelia-event-aggregator";
-import { ConnectionTracker } from "../../../shared/src/utils/connectionTracker";
 import { Capital } from "models/capital";
-import { ProgressBar } from "../../../shared/src/models/progressBar";
 import * as environment from "../../config/environment.json";
 import { DashboardModel } from "models/viewmodels/dashboard";
-import { TransactionModel } from "models/entities/transaction";
-import { ExpenditureByCategory } from "models/viewmodels/expenditureByCategory";
-import { UpcomingExpenseDashboard } from "models/viewmodels/upcomingExpenseDashboard";
-import { DebtDashboard } from "models/viewmodels/debtDashboard";
 
 @inject(
   Router,
@@ -75,107 +72,18 @@ export class Dashboard {
 
   getCapital() {
     this.capitalService
-      .get(this.showUpcomingExpenses, this.showDebt, this.currency)
+      .get(this.i18n.tr("uncategorized"), this.showUpcomingExpenses, this.showDebt, this.currency)
       .then((capital: Capital) => {
         if (!capital) {
           return;
         }
 
-        const model = new DashboardModel(capital.upcoming, [], [], []);
-
-        const expenditures = new Array<ExpenditureByCategory>();
-        const expenditureGroups = this.groupBy(
-          capital.transactions,
-          (x: TransactionModel) => x.categoryName
-        );
-        for (const group of expenditureGroups) {
-          const expenditure = new ExpenditureByCategory(
-            group[0] || this.i18n.tr("uncategorized"),
-            0
-          );
-
-          for (const transaction of group[1]) {
-            expenditure.amount += transaction.amount;
-          }
-
-          expenditures.push(expenditure);
-        }
-        model.expenditures = expenditures.sort(
-          (a: ExpenditureByCategory, b: ExpenditureByCategory) => {
-            return b.amount - a.amount;
-          }
-        );
-
-        const upcomingExpenses = new Array<UpcomingExpenseDashboard>();
-        for (const upcomingExpense of capital.upcomingExpenses) {
-          const trimmedDescription = this.trimDescription(
-            upcomingExpense.description
-          );
-          upcomingExpenses.push(
-            new UpcomingExpenseDashboard(
-              upcomingExpense.categoryName || this.i18n.tr("uncategorized"),
-              trimmedDescription,
-              upcomingExpense.amount
-            )
-          );
-        }
-        model.upcomingExpenses = upcomingExpenses.sort(
-          (a: UpcomingExpenseDashboard, b: UpcomingExpenseDashboard) => {
-            return b.amount - a.amount;
-          }
-        );
-
-        const debt = new Array<DebtDashboard>();
-        for (const debtItem of capital.debt) {
-          const trimmedDescription = this.trimDescription(debtItem.description);
-          debt.push(
-            new DebtDashboard(
-              debtItem.person,
-              debtItem.userIsDebtor,
-              trimmedDescription,
-              debtItem.amount
-            )
-          );
-        }
-        model.debt = debt.sort((a: DebtDashboard, b: DebtDashboard) => {
-          return b.amount - a.amount;
-        });
-
+        const model = new DashboardModel(capital.upcoming, capital.expenditures, capital.upcomingExpenses, capital.debt);
         this.available = capital.available;
         this.spent = capital.spent;
         this.balance = capital.balance;
         this.model = model;
       });
-  }
-
-  groupBy(
-    list: Array<TransactionModel>,
-    keyGetter: { (x: TransactionModel): string; (arg0: TransactionModel): any }
-  ) {
-    const map = new Map();
-    list.forEach((item) => {
-      const key = keyGetter(item);
-      const collection = map.get(key);
-      if (!collection) {
-        map.set(key, [item]);
-      } else {
-        collection.push(item);
-      }
-    });
-    return map;
-  }
-
-  trimDescription(description: string): string {
-    if (!description) {
-      return "";
-    }
-
-    const length = 25;
-    if (description.length <= length) {
-      return description;
-    }
-
-    return description.substring(0, length - 2) + "..";
   }
 
   newExpense() {

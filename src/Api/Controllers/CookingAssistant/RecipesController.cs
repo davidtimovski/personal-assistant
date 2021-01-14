@@ -259,7 +259,7 @@ namespace Api.Controllers.CookingAssistant
 
             var uploadModel = new UploadTempImage(
                 userId,
-                Path.Combine(_webHostEnvironment.ContentRootPath, "TempImages"),
+                Path.Combine(_webHostEnvironment.ContentRootPath, "temp"),
                 $"users/{userId}/recipes",
                 "recipe"
                 )
@@ -479,7 +479,7 @@ namespace Api.Controllers.CookingAssistant
 
             // Copy recipe image if not default
             RecipeToNotify recipe = await _recipeService.GetAsync(importModel.Id);
-            string tempImagePath = Path.Combine(_webHostEnvironment.ContentRootPath, "TempImages", Guid.NewGuid().ToString());
+            string tempImagePath = Path.Combine(_webHostEnvironment.ContentRootPath, "temp", Guid.NewGuid().ToString());
 
             importModel.ImageUri = await _cdnService.CopyAndUploadAsync(
                 tempImagePath: tempImagePath,

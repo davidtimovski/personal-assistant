@@ -599,7 +599,7 @@ namespace Auth.Controllers
             }
 
             string tempImageName = Guid.NewGuid() + extension;
-            string tempImagePath = Path.Combine(_webHostEnvironment.ContentRootPath, "TempImages", tempImageName);
+            string tempImagePath = Path.Combine(_webHostEnvironment.ContentRootPath, "temp", tempImageName);
 
             if (image.Length > 0)
             {

@@ -1,6 +1,6 @@
-import { TransactionModel } from "./entities/transaction";
-import { UpcomingExpense } from "./entities/upcomingExpense";
-import { DebtModel } from "./entities/debt";
+import { AmountByCategory } from "./viewmodels/amountByCategory";
+import { UpcomingExpenseDashboard } from "./viewmodels/upcomingExpenseDashboard";
+import { DebtDashboard } from "./viewmodels/debtDashboard";
 
 export class Capital {
   constructor(
@@ -8,8 +8,8 @@ export class Capital {
     public spent: number,
     public upcoming: number,
     public available: number,
-    public transactions: Array<TransactionModel>,
-    public upcomingExpenses: Array<UpcomingExpense>,
-    public debt: Array<DebtModel>
+    public expenditures: Array<AmountByCategory>,
+    public upcomingExpenses: Array<UpcomingExpenseDashboard>,
+    public debt: Array<DebtDashboard>
   ) {}
 }
