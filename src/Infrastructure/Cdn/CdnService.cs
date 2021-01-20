@@ -51,6 +51,8 @@ namespace PersonalAssistant.Infrastructure.Cdn
 
         public string GetDefaultProfileImageUri() => _defaultProfileImageUri;
 
+        public string GetDefaultRecipeImageUri() => _defaultRecipeImageUri;
+
         public string ImageUriToThumbnail(string imageUri)
         {
             string[] parts = imageUri.Split("personalassistant");

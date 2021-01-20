@@ -203,13 +203,16 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
         public async Task CreateSampleAsync(int userId, Dictionary<string, string> translations)
         {
+            var now = DateTime.UtcNow;
+
             var list = new ToDoList
             {
                 UserId = userId,
                 Name = translations["SampleListName"],
-                Icon = "list"
+                Icon = "list",
+                CreatedDate = now,
+                ModifiedDate = now
             };
-            list.CreatedDate = list.ModifiedDate = DateTime.Now;
 
             list.Tasks = new List<ToDoTask>
             {

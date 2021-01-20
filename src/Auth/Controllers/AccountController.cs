@@ -716,9 +716,7 @@ namespace Auth.Controllers
             var createMainAccount = new CreateMainAccount
             {
                 UserId = userId,
-                Name = _localizer["MainAccountName"],
-                CreatedDate = now,
-                ModifiedDate = now
+                Name = _localizer["MainAccountName"]
             };
             await _accountService.CreateMainAsync(createMainAccount);
         }

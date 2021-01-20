@@ -45,7 +45,14 @@ namespace PersonalAssistant.Application.Services.Accountant
 
         public async Task CreateMainAsync(CreateMainAccount model)
         {
+            var now = DateTime.UtcNow;
+
             var account = _mapper.Map<Account>(model);
+            account.IsMain = true;
+            account.Currency = "EUR";
+            account.CreatedDate = now;
+            account.ModifiedDate = now;
+
             await _accountsRepository.CreateAsync(account);
         }
 

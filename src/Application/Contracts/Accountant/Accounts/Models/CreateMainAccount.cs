@@ -6,7 +6,5 @@ namespace PersonalAssistant.Application.Contracts.Accountant.Accounts.Models
     {
         public int UserId { get; set; }
         public string Name { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public DateTime ModifiedDate { get; set; }
     }
 }

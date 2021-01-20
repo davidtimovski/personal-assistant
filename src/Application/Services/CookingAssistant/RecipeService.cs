@@ -217,6 +217,8 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
         public async Task CreateSampleAsync(int userId, Dictionary<string, string> translations)
         {
+            var now = DateTime.UtcNow;
+
             var recipe = new Recipe
             {
                 UserId = userId,
@@ -225,9 +227,12 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
                 Instructions = translations["SampleRecipeInstructions"],
                 PrepDuration = TimeSpan.FromMinutes(10),
                 CookDuration = TimeSpan.FromMinutes(15),
-                Servings = 2
+                Servings = 2,
+                ImageUri = _cdnService.GetDefaultRecipeImageUri(),
+                LastOpenedDate = now,
+                CreatedDate = now,
+                ModifiedDate = now
             };
-            recipe.LastOpenedDate = recipe.CreatedDate = recipe.ModifiedDate = DateTime.Now;
 
             recipe.RecipeIngredients = new List<RecipeIngredient>
             {
