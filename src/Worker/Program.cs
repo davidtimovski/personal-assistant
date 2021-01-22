@@ -65,7 +65,6 @@ namespace PersonalAssistant.WorkerService
                     services.AddTransient<ITransactionsRepository, TransactionsRepository>();
                     services.AddTransient<ICurrencyRatesRepository, CurrencyRatesRepository>();
 
-                    services.AddHostedService<DailyWorker>();
                     services.AddHostedService<MidnightWorker>();
                 });
     }
