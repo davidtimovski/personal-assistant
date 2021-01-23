@@ -12,6 +12,7 @@ namespace PersonalAssistant.Application.Contracts.Accountant.Transactions
         Task<IEnumerable<Transaction>> GetAllForExportAsync(int userId, string uncategorized);
         Task<IEnumerable<Transaction>> GetAllAsync(int userId, DateTime fromModifiedDate);
         Task<IEnumerable<Transaction>> GetAllAsync(int userId, int categoryId, DateTime from, DateTime to);
+        Task<bool> AnyAsync(int userId, int categoryId, DateTime from);
         Task<IEnumerable<int>> GetDeletedIdsAsync(int userId, DateTime fromDate);
         Task<int> CreateAsync(Transaction transaction, DbConnection uowConn = null, DbTransaction uowTransaction = null);
         Task UpdateAsync(Transaction transaction);

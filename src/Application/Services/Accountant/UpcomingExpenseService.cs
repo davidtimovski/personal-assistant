@@ -116,8 +116,14 @@ namespace PersonalAssistant.Application.Services.Accountant
                         continue;
                     }
 
-                    var threeMonthsAgo = new DateTime(now.Year, now.Month, 1).AddMonths(-3);
                     var firstOfThisMonth = new DateTime(now.Year, now.Month, 1);
+                    var transactionsExistThisMonth = await _transactionsRepository.AnyAsync(category.UserId, category.Id, firstOfThisMonth);
+                    if (transactionsExistThisMonth)
+                    {
+                        continue;
+                    }
+
+                    var threeMonthsAgo = new DateTime(now.Year, now.Month, 1).AddMonths(-3);
                     var expenses = await _transactionsRepository.GetAllAsync(category.UserId, category.Id, threeMonthsAgo, firstOfThisMonth);
 
                     if (shouldGenerate(expenses))
