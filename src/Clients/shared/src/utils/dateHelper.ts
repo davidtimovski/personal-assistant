@@ -6,7 +6,9 @@ export class DateHelper {
   }
 
   static formatYYYYMM(date: Date): string {
-    return date.toISOString().substring(0, 7);
+    return (new Date(date.getTime() - date.getTimezoneOffset() * 60000))
+      .toISOString()
+      .substring(0, 7);
   }
 
   static adjustForTimeZone(date: Date): Date {

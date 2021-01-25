@@ -128,12 +128,14 @@ export class TransactionsService extends HttpProxyBase {
   async getExpensesAndDepositsFromDate(
     fromDate: string,
     accountId: number,
+    categoryId: number,
     type: TransactionType,
     currency: string
   ): Promise<Array<TransactionModel>> {
     const transactions = await this.idbHelper.getExpensesAndDepositsFromDate(
       fromDate,
       accountId,
+      categoryId,
       type
     );
 

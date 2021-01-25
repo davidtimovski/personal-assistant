@@ -1,28 +1,35 @@
 import { inject } from "aurelia-framework";
-import { TransactionsService } from "services/transactionsService";
-import { AccountsService } from "services/accountsService";
-import { LocalStorage } from "utils/localStorage";
 import { I18N } from "aurelia-i18n";
 import * as Chart from "chart.js";
+
+import { DateHelper } from "../../../shared/src/utils/dateHelper";
+import { TransactionsService } from "services/transactionsService";
+import { CategoriesService } from "services/categoriesService";
+import { AccountsService } from "services/accountsService";
+import { LocalStorage } from "utils/localStorage";
 import { AmountByMonth } from "models/viewmodels/amountByMonth";
 import { FromOption } from "models/viewmodels/fromOption";
-import { DateHelper } from "../../../shared/src/utils/dateHelper";
 import { TransactionType } from "models/viewmodels/transactionType";
 import { TransactionModel } from "models/entities/transaction";
+import { SelectOption } from "models/viewmodels/selectOption";
+import { CategoryType } from "models/entities/category";
 
-@inject(TransactionsService, AccountsService, LocalStorage, I18N)
+@inject(TransactionsService, CategoriesService, AccountsService, LocalStorage, I18N)
 export class BarChartReport {
   private mainAccountId: number;
   private currency: string;
   private chart: Chart;
   private fromOptions: Array<FromOption>;
+  private categoryOptions: Array<SelectOption>;
   private dataLoaded: boolean;
   private canvasCtx: CanvasRenderingContext2D;
   private fromDate: string;
+  private categoryId: number;
   private type = TransactionType.Any;
 
   constructor(
     private readonly transactionsService: TransactionsService,
+    private readonly categoriesService: CategoriesService,
     private readonly accountsService: AccountsService,
     private readonly localStorage: LocalStorage,
     private readonly i18n: I18N
@@ -55,6 +62,15 @@ export class BarChartReport {
   }
 
   async attached() {
+    this.categoriesService
+      .getAllAsOptions(
+        this.i18n.tr("barChartReport.all"),
+        CategoryType.AllTransactions
+      )
+      .then((options) => {
+        this.categoryOptions = options;
+      });
+
     this.canvasCtx = (<HTMLCanvasElement>(
       document.getElementById("chart")
     )).getContext("2d");
@@ -79,6 +95,7 @@ export class BarChartReport {
       .getExpensesAndDepositsFromDate(
         this.fromDate,
         this.mainAccountId,
+        this.categoryId,
         this.type,
         this.currency
       )

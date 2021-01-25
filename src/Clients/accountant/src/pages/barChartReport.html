@@ -22,6 +22,16 @@
             <option model.bind="from.value" repeat.for="from of fromOptions">${from.label}</option>
           </select>
         </div>
+        <div class="form-control inline">
+          <label for="category" t="category">Category</label>
+          <div class="loadable-select ${categoryOptions ? 'loaded' : ''}">
+            <select id="category" value.bind="categoryId" change.delegate="loadData()" disabled.bind="!categoryOptions"
+              class="category-select">
+              <option model.bind="category.id" repeat.for="category of categoryOptions">${category.name}</option>
+            </select>
+            <i class="fas fa-circle-notch fa-spin"></i>
+          </div>
+        </div>
         <div class="form-control">
           <div class="multi-radio-wrap">
             <div class="multi-radio-part">

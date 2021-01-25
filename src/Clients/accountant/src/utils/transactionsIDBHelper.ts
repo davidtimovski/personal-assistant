@@ -30,9 +30,9 @@ export class TransactionsIDBHelper {
           t,
           filters.fromDate,
           filters.toDate,
+          filters.accountId,
           filters.categoryId !== 0,
           categoryIds,
-          filters.accountId,
           filters.type,
           filters.description
         )
@@ -51,9 +51,9 @@ export class TransactionsIDBHelper {
           t,
           filters.fromDate,
           filters.toDate,
+          filters.accountId,
           filters.categoryId !== 0,
           categoryIds,
-          filters.accountId,
           filters.type,
           filters.description
         )
@@ -111,26 +111,48 @@ export class TransactionsIDBHelper {
   async getExpensesAndDepositsFromDate(
     fromDate: string,
     accountId: number,
+    categoryId: number,
     type: TransactionType
   ): Promise<Array<TransactionModel>> {
+    const categoryIds = await this.getWithSubCategoryIds(categoryId);
+
     const transactions = await this.db.transactions
       .orderBy("date")
       .reverse()
       .filter(t =>
-        this.checkAgainstFilters3(t, fromDate, accountId, type)
+        this.checkAgainstFilters3(
+          t, 
+          fromDate, 
+          accountId, 
+          categoryId !== 0,
+          categoryIds,
+          type
+        )
       )
       .toArray();
 
     return transactions;
   }
 
+  /**
+   * Finds whether a transaction fits the filters.
+   * @param t The transaction
+   * @param fromDate
+   * @param toDate
+   * @param accountId
+   * @param searchByCategory False if the all categories option is selected
+   * @param categoryIds The selected category plus any potential child categories
+   * @param type
+   * @param description
+   * @returns true if a transaction matches the filters
+   */
   private checkAgainstFilters(
     t: TransactionModel,
     fromDate: string,
     toDate: string,
+    accountId: number,
     searchByCategory: boolean,
     categoryIds: Array<number>,
-    accountId: number,
     type: TransactionType,
     description: string
   ): boolean {
@@ -164,20 +186,20 @@ export class TransactionsIDBHelper {
       return false;
     }
 
-    if (searchByCategory) {
-      if (categoryIds === null) {
-        return t.categoryId === null;
-      } else {
-        return categoryIds.includes(t.categoryId); 
-      }
-    }
-
     let inAccount =
       accountId === 0 ||
       t.fromAccountId === accountId ||
       t.toAccountId === accountId;
     if (!inAccount) {
       return false;
+    }
+
+    if (searchByCategory) {
+      if (categoryIds === null) {
+        return t.categoryId === null;
+      } else {
+        return categoryIds.includes(t.categoryId); 
+      }
     }
 
     const hasDescription =
@@ -187,6 +209,15 @@ export class TransactionsIDBHelper {
     return hasDescription;
   }
 
+  /**
+   * Finds whether a transaction fits the filters.
+   * @param t The transaction
+   * @param fromDate
+   * @param toDate
+   * @param accountId
+   * @param type
+   * @returns true if a transaction matches the filters
+   */
   private checkAgainstFilters2(
     t: TransactionModel,
     fromDate: string,
@@ -221,13 +252,17 @@ export class TransactionsIDBHelper {
    * @param t The transaction
    * @param fromDate
    * @param accountId
+   * @param searchByCategory False if the all categories option is selected
+   * @param categoryIds The selected category plus any potential child categories
    * @param type
-   * @returns true if a transaction fits the filters
+   * @returns true if a transaction matches the filters
    */
   private checkAgainstFilters3(
     t: TransactionModel,
     fromDate: string,
     accountId: number,
+    searchByCategory: boolean,
+    categoryIds: Array<number>,
     type: TransactionType
   ): boolean {
     let inType =
@@ -248,6 +283,14 @@ export class TransactionsIDBHelper {
 
     let inAccount =
       t.fromAccountId === accountId || t.toAccountId === accountId;
+
+    if (searchByCategory) {
+      if (categoryIds === null) {
+        return t.categoryId === null;
+      } else {
+        return categoryIds.includes(t.categoryId); 
+      }
+    }
 
     return inAccount;
   }

@@ -6,8 +6,8 @@ export class SearchFilters {
     public pageSize: number,
     public fromDate: string,
     public toDate: string,
-    public categoryId: number,
     public accountId: number,
+    public categoryId: number,
     public type: TransactionType,
     public description: string
   ) {}
