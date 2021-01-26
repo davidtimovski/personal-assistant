@@ -62,13 +62,16 @@ export class BarChartReport {
   }
 
   async attached() {
+    const categoryOptions = [
+      new SelectOption(0, this.i18n.tr("barChartReport.all")),
+    ];
     this.categoriesService
       .getAllAsOptions(
-        this.i18n.tr("barChartReport.all"),
+        this.i18n.tr("uncategorized"),
         CategoryType.AllTransactions
       )
       .then((options) => {
-        this.categoryOptions = options;
+        this.categoryOptions = categoryOptions.concat(options);
       });
 
     this.canvasCtx = (<HTMLCanvasElement>(

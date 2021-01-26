@@ -283,6 +283,9 @@ export class TransactionsIDBHelper {
 
     let inAccount =
       t.fromAccountId === accountId || t.toAccountId === accountId;
+    if (!inAccount) {
+      return false;
+    }
 
     if (searchByCategory) {
       if (categoryIds === null) {
@@ -292,7 +295,7 @@ export class TransactionsIDBHelper {
       }
     }
 
-    return inAccount;
+    return true;
   }
 
   async getExpendituresForCurrentMonth(
