@@ -93,17 +93,19 @@
                 <div else class="name-input uneditable">${ingredient.name}</div>
                 <i if.bind="ingredient.taskId" class="fas fa-list" t="[title,aria-label]editRecipe.linkedToTask"></i>
               </div>
-              <div class="ingredient-amount-input-wrap">
-                <input type="text" value.bind="ingredient.amount | nullFormat" class="amount-input"
-                  keyup.trigger="ingredientChanged(ingredient)" maxlength="4"
-                  t="[placeholder,aria-label]editRecipe.amount">
-                <div click.delegate="toggleUnit(ingredient)" class="unit-toggle" t="[title,aria-label]editRecipe.toggleUnitOfMeasure">
-                  <button type="button" show.bind="ingredient.unit" t="editRecipe.${ingredient.unit}"></button>
-                  <i show.bind="!ingredient.unit" class="fas fa-asterisk"></i>
+              <div>
+                <div class="ingredient-amount-input-wrap">
+                  <input type="text" value.bind="ingredient.amount | nullFormat" class="amount-input"
+                    keyup.trigger="ingredientChanged(ingredient)" maxlength="4"
+                    t="[placeholder,aria-label]editRecipe.amount">
+                  <div click.delegate="toggleUnit(ingredient)" class="unit-toggle" t="[title,aria-label]editRecipe.toggleUnitOfMeasure">
+                    <button type="button" show.bind="ingredient.unit" t="editRecipe.${ingredient.unit}"></button>
+                    <i show.bind="!ingredient.unit" class="fas fa-asterisk"></i>
+                  </div>
+                  <a click.delegate="removeIngredient(ingredient)" class="side" t="[title,aria-label]editRecipe.removeIngredient">
+                    <i class="fas fa-times-circle"></i>
+                  </a>
                 </div>
-                <a click.delegate="removeIngredient(ingredient)" class="side" t="[title,aria-label]editRecipe.removeIngredient">
-                  <i class="fas fa-times-circle"></i>
-                </a>
               </div>
             </div>
           </div>

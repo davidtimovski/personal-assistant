@@ -28,7 +28,7 @@
 }
 .recipe-name {
   position: absolute;
-  top: 20px;
+  top: 15px;
   left: -3px;
   background: #fafafa;
   border: 1px solid #eee;
@@ -37,15 +37,15 @@
   border-bottom-right-radius: 15px;
   box-shadow: var(--box-shadow);
   padding: 5px 16px 6px 15px;
-  font-size: 1.1rem;
-  line-height: 1.3rem;
+  font-size: 1rem;
+  line-height: 1.2rem;
   color: inherit;
 }
 .num-ingredients-missing {
   display: none;
   position: absolute;
   right: -3px;
-  bottom: 20px;
+  bottom: 15px;
   background: #fafafa;
   border: 1px solid #eee;
   border-right: 3px solid var(--danger-color);
@@ -55,7 +55,7 @@
   padding: 5px 15px 6px 16px;
   text-align: right;
   font-size: 0.9rem;
-  line-height: 1.1rem;
+  line-height: 1rem;
   color: var(--danger-color);
 }
 .ingredients-missing .num-ingredients-missing {
