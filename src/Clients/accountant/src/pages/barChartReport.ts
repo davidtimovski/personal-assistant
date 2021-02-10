@@ -24,7 +24,7 @@ export class BarChartReport {
   private dataLoaded: boolean;
   private canvasCtx: CanvasRenderingContext2D;
   private fromDate: string;
-  private categoryId: number;
+  private categoryId = 0;
   private type = TransactionType.Any;
 
   constructor(
