@@ -46,7 +46,7 @@
             <span><span if.bind="adjustedBy > 0">+</span>${adjustedBy | numberFormat:currency}</span>
           </div>
           <div class="form-control">
-            <textarea value.bind="model.description" maxlength="250" class="description-textarea"
+            <textarea value.bind="model.description" maxlength="500" class="description-textarea"
               t="[placeholder,aria-label]description"></textarea>
           </div>
         </form>

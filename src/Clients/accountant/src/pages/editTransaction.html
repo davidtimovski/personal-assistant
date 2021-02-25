@@ -67,7 +67,7 @@
           </div>
           <div else class="form-control">
             <div class="encryption-box ${model.encrypt ? 'active' : ''}">
-              <textarea value.bind="model.description" maxlength="250" class="description-textarea"
+              <textarea value.bind="model.description" maxlength="500" class="description-textarea"
                 t="[placeholder,aria-label]description"></textarea>
 
               <label class="toggle ${canEncrypt ? '' : 'disabled'}">

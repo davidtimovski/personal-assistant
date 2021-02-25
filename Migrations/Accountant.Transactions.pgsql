@@ -12,7 +12,7 @@ CREATE TABLE public."Accountant.Transactions"
 	"FromStocks" decimal(10, 4),
 	"ToStocks" decimal(10, 4),
 	"Currency" character varying(3) COLLATE pg_catalog."default" NOT NULL DEFAULT 'EUR',
-    "Description" character varying(255) COLLATE pg_catalog."default",
+    "Description" character varying(500) COLLATE pg_catalog."default",
 	"Date" date NOT NULL,
 	"IsEncrypted" boolean NOT NULL DEFAULT FALSE,
 	"EncryptedDescription" bytea,
