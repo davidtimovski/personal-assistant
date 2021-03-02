@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CsvHelper;
 using CsvHelper.Configuration;
-using PersonalAssistant.Application.Contracts.Accountant;
 using PersonalAssistant.Application.Contracts.Accountant.Accounts;
 using PersonalAssistant.Application.Contracts.Accountant.Common.Models;
 using PersonalAssistant.Application.Contracts.Accountant.Transactions;
@@ -108,12 +107,10 @@ namespace PersonalAssistant.Application.Services.Accountant
                 }
             }
 
-            var config = new CsvConfiguration(CultureInfo.InvariantCulture);
-            config.RegisterClassMap<TransactionMap>();
-
             using (var writer = new StreamWriter(tempFilePath))
-            using (var csv = new CsvWriter(writer, config))
+            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
+                csv.Context.RegisterClassMap<TransactionMap>();
                 csv.WriteRecords(transactions);
             }
 
@@ -131,7 +128,7 @@ namespace PersonalAssistant.Application.Services.Accountant
     {
         public TransactionMap()
         {
-            Map(m => m.Date).Index(0).Name("Date").ConvertUsing(x => x.Date.ToString("dd/MM/yyyy"));
+            Map(m => m.Date).Index(0).Name("Date");
             Map(m => m.Amount).Index(1).Name("Amount");
             Map(m => m.Currency).Index(2).Name("Currency");
             Map(m => m.FromStocks).Index(3).Name("From Stocks");
