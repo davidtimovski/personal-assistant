@@ -194,12 +194,16 @@ export class TransactionsIDBHelper {
       return false;
     }
 
+    let inCategory = true;
     if (searchByCategory) {
       if (categoryIds === null) {
-        return t.categoryId === null;
+        inCategory = t.categoryId === null;
       } else {
-        return categoryIds.includes(t.categoryId); 
+        inCategory = categoryIds.includes(t.categoryId); 
       }
+    }
+    if (!inCategory) {
+      return false;
     }
 
     const hasDescription =
