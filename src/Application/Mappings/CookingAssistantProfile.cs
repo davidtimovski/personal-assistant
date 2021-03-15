@@ -524,11 +524,7 @@ namespace PersonalAssistant.Application.Mappings
             if (costSummary.Cost.HasValue)
             {
                 costSummary.IsSet = true;
-
-                if (source.Servings > 1)
-                {
-                    costSummary.CostPerServing = costSummary.Cost.Value / source.Servings;
-                }
+                costSummary.CostPerServing = costSummary.Cost.Value / source.Servings;
             }
 
             return costSummary;
