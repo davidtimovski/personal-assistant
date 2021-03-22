@@ -16,7 +16,6 @@ namespace Auth
 #if !DEBUG
                 .UseSerilog()
 #endif
-                .UseStartup<Startup>()
-                .UseUrls("http://localhost:5000");
+                .UseStartup<Startup>();
     }
 }

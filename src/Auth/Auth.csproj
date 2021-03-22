@@ -5,6 +5,9 @@
     <ApplicationInsightsResourceId>/subscriptions/438b0478-3c19-4c43-8ac7-51c7a19c4f76/resourcegroups/PersonalAssistant/providers/microsoft.insights/components/PersonalAssistantAuth</ApplicationInsightsResourceId>
     <ApplicationInsightsAnnotationResourceId>/subscriptions/438b0478-3c19-4c43-8ac7-51c7a19c4f76/resourceGroups/PersonalAssistant/providers/microsoft.insights/components/PersonalAssistantAuth</ApplicationInsightsAnnotationResourceId>
     <LangVersion>8.0</LangVersion>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..</DockerfileContext>
+    <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
   <Target Name="CopyCustomContentOnPublish" AfterTargets="Publish">
@@ -34,6 +37,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="5.0.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.2" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />

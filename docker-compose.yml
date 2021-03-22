@@ -1,0 +1,16 @@
+version: '3.4'
+
+services:
+  auth:
+    image: ${DOCKER_REGISTRY-personalassistant}auth:${PLATFORM:-linux}-${TAG:-latest}
+    container_name: personalassistant-auth
+    build:
+      context: .
+      dockerfile: src/Auth/Dockerfile
+    depends_on:
+      - postgres
+  
+  postgres:
+    image: postgres:12
+    container_name: personalassistant-postgres
+    restart: always

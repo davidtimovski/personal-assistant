@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<key id="40109fce-88b3-46dc-90a0-4fda020f2882" version="1">
+  <creationDate>2021-03-22T18:00:41.5269172Z</creationDate>
+  <activationDate>2021-03-22T18:00:41.5101238Z</activationDate>
+  <expirationDate>2021-06-20T18:00:41.5101238Z</expirationDate>
+  <descriptor deserializerType="Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel.AuthenticatedEncryptorDescriptorDeserializer, Microsoft.AspNetCore.DataProtection, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
+    <descriptor>
+      <encryption algorithm="AES_256_CBC" />
+      <validation algorithm="HMACSHA256" />
+      <encryptedSecret decryptorType="Microsoft.AspNetCore.DataProtection.XmlEncryption.EncryptedXmlDecryptor, Microsoft.AspNetCore.DataProtection, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" xmlns="http://schemas.asp.net/2015/03/dataProtection">
+        <EncryptedData Type="http://www.w3.org/2001/04/xmlenc#Element" xmlns="http://www.w3.org/2001/04/xmlenc#">
+          <EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc" />
+          <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+            <EncryptedKey xmlns="http://www.w3.org/2001/04/xmlenc#">
+              <EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-1_5" />
+              <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+                <X509Data>
+                  <X509Certificate>MIIELTCCAxWgAwIBAgIUdc4/XBaZSD21JXS8M7Ktspr/QYEwDQYJKoZIhvcNAQELBQAwgaUxCzAJBgNVBAYTAk1LMRMwEQYDVQQIDApTb21lLVN0YXRlMQ8wDQYDVQQHDAZTa29wamUxGzAZBgNVBAoMElBlcnNvbmFsIEFzc2lzdGFudDERMA8GA1UECwwIU29mdHdhcmUxFzAVBgNVBAMMDkRhdmlkIFRpbW92c2tpMScwJQYJKoZIhvcNAQkBFhhkYXZpZC50aW1vdnNraUBnbWFpbC5jb20wHhcNMjAwNzE4MTQ0NzA1WhcNMjEwNzE4MTQ0NzA1WjCBpTELMAkGA1UEBhMCTUsxEzARBgNVBAgMClNvbWUtU3RhdGUxDzANBgNVBAcMBlNrb3BqZTEbMBkGA1UECgwSUGVyc29uYWwgQXNzaXN0YW50MREwDwYDVQQLDAhTb2Z0d2FyZTEXMBUGA1UEAwwORGF2aWQgVGltb3Zza2kxJzAlBgkqhkiG9w0BCQEWGGRhdmlkLnRpbW92c2tpQGdtYWlsLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMcvJt6FAftMqSm3BS2Gff2sa1x/dkWN/CLgVMWSWsvILYoSO6v1YR8EoGwgiimq+nxPtam3g2fUITZhbQgGCicyXMbkn8x/yG7Cny4uzCoq+ne34DTQVDQNe1LgEEYZ710FzSTyeZsfNp6OtFsWsNfMpGjmRGewxGjVnnOr1BX2r23kjInhZkjWgGFGTd7D2O7TzCVg6kPDs/apqt23QpIyAUrvAM37dy/vXoAyc/jj8Hu2aoSE6X04ux4Z0aR2yr5DcM2MQ+cAFKB577JMRZu/qaLmcTR4xIPNZrLgakCTU5vn2ef/hPN0dUtfazD+8JXgoFScTLkLcmNpkCv2aRECAwEAAaNTMFEwHQYDVR0OBBYEFLoDbG+F31TlaIv9dBiV92OT1G3qMB8GA1UdIwQYMBaAFLoDbG+F31TlaIv9dBiV92OT1G3qMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBABMd3hnsRITgXNOZ00oy98fDnXubxZY/DQBWqPwZxzTiWbCDryyogDBb9+Adf1QfL8M+rI6bg5QQZljb1Ae6hjLrC8Gi6guNc7u/CmL5InbcrTGxlstvaNNVW6VZys8J7S/baCqZ1kRore3B5G3fUrYkgD7uCWaSgsx4AmPmGV/mb2Uk+w5J8UFSytk5+yCPWBAQlMjiTDJLjkQ2f9wBwoiHwppuSDxv6+Br9ccERgvVfW+0HIsekyF4VRaJu23LskZ+XdzdWLek2Nr6gQJigJucPw65kVBGvLP5XYhOEXnAED2YWA2h1iT8Ay10SA2dtsQJMtjvQ8mbs7s5Q5qUQQw=</X509Certificate>
+                </X509Data>
+              </KeyInfo>
+              <CipherData>
+                <CipherValue>GMSl3VpYSqldSmkGi3Uvk/TcIb2sQzjH08azglJM+Jsgmoa3O5qmMnQ/0Lu6g6bFSeE4L1i+1+rxbv4wXR1wPB2/IUuMrEJYdjjJsxhTOkUtG3WT85QlG8VyBtOgxM0lfqvRrZABtyJAC5EPxIt2g7mi1uIHBi9s2qtceU52TZmROGfmDe9tg/zEXMrFPFmLxWLrX+HBXVUfyOlhQ/my0KN/Va0s+7midv780aeV7G9tXgz1aqLd/Qqlzx0Bfgv/oHMT1tfG63suBFMz8HfJScwL5wrov5sKBGyqc0p6eRQKFMuxpSxgJKHaTza+KQNILFylJvwGnXvjONOu64Xtjg==</CipherValue>
+              </CipherData>
+            </EncryptedKey>
+          </KeyInfo>
+          <CipherData>
+            <CipherValue>wSojFF0+d8UGzl2CIMzc8UD7cVsuiDdrtYhckcGxxjXdUjcLWVn85pK7cUJmxR4QwrShdkshqgQrDIjGJmwol2b0RZg92RwigaeoSTrqMvG4npjnQEpNKsnWtysqHkVrqDGBcioOXt0p0bWPwH3rM4DmQixDyyryH5IJo4OPB96oETBEWBFrP+iYxufDu/lK8b8rg9t5bbfNxfVYK3YqM+WL+wj/9isvuynt6nPe8ERHZvle2UbpGws0s6UFDpf0KgoPAlIXQ4L58kaMhdOenFzd97SroVthMXhmI9eDnPkZKkve3CdWuf3+ez8VCDndtqg6+wht0n0MAbCd7DcCLgOI3FtGKnr3pmO27iwj0AT/LH7S0oR8b09S1f+eRktF2F2fjOkZwxyP5Kg0ZzCy7g==</CipherValue>
+          </CipherData>
+        </EncryptedData>
+      </encryptedSecret>
+    </descriptor>
+  </descriptor>
+</key>

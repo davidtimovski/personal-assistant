@@ -52,7 +52,7 @@ namespace Auth
 
             services.AddDbContext<PersonalAssistantAuthContext>(options =>
             {
-                options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"));
+                options.UseNpgsql(Configuration["ConnectionString"]);
             });
 
             services.AddIdentity<ApplicationUser, IdentityRole<int>>(config =>
@@ -82,13 +82,13 @@ namespace Auth
                 .AddConfigurationStore(options =>
                 {
                     options.ConfigureDbContext = builder =>
-                        builder.UseNpgsql(Configuration["ConnectionStrings:DefaultConnection"],
+                        builder.UseNpgsql(Configuration["ConnectionString"],
                             sql => sql.MigrationsAssembly(migrationsAssembly));
                 })
                 .AddOperationalStore(options =>
                 {
                     options.ConfigureDbContext = builder =>
-                        builder.UseNpgsql(Configuration["ConnectionStrings:DefaultConnection"],
+                        builder.UseNpgsql(Configuration["ConnectionString"],
                             sql => sql.MigrationsAssembly(migrationsAssembly));
 
                     // This enables automatic token cleanup. This is optional.
@@ -130,7 +130,7 @@ namespace Auth
             services.AddTransient<IEmailTemplateService, EmailTemplateService>();
 
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
-            services.Configure<DatabaseSettings>(Configuration.GetSection("ConnectionStrings"));
+            services.Configure<DatabaseSettings>(x => x.DefaultConnectionString = Configuration["ConnectionString"]);
         }
 
         public void Configure(IApplicationBuilder app)
