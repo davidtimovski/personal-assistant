@@ -6,9 +6,32 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - ConnectionString=${PERSONAL_ASSISTANT_DB:-Server=postgres;Database=personalassistant;User Id=postgres;Password=postgres;Pooling=true} 
+      - EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
+      - EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
+      - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
       - PORT=80
     ports:
       - "5000:80"
+  
+  api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - ConnectionString=${PERSONAL_ASSISTANT_DB:-Server=postgres;Database=personalassistant;User Id=postgres;Password=postgres;Pooling=true} 
+      - EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
+      - EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
+      - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
+      - PORT=80
+    ports:
+      - "5001:80"
+
+  sender:
+    environment:
+      - ConnectionString=${PERSONAL_ASSISTANT_DB:-Server=postgres;Database=personalassistant;User Id=postgres;Password=postgres;Pooling=true} 
+      - EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
+      - EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
+      - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
+      - SendGridApiKey=${SENDGRID_API_KEY:-replace_me}
 
   postgres:
     ports:
@@ -18,6 +41,15 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     volumes:
       - personalassistant-volume:/var/lib/postgresql/data
+
+  rabbitmq:
+    environment:
+      RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE:-cookie}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-rabbitmq}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-rabbitmq}
+    ports:
+      - "15672:15672"  # Important: In a production environment your should remove the external port
+      - "5672:5672"    # Important: In a production environment your should remove the external port
 
 volumes:
   personalassistant-volume:

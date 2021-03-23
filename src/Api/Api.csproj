@@ -5,6 +5,8 @@
     <ApplicationInsightsResourceId>/subscriptions/438b0478-3c19-4c43-8ac7-51c7a19c4f76/resourcegroups/PersonalAssistant/providers/microsoft.insights/components/PersonalAssistant</ApplicationInsightsResourceId>
     <ApplicationInsightsAnnotationResourceId>/subscriptions/438b0478-3c19-4c43-8ac7-51c7a19c4f76/resourceGroups/PersonalAssistant/providers/microsoft.insights/components/PersonalAssistant</ApplicationInsightsAnnotationResourceId>
     <LangVersion>8.0</LangVersion>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..</DockerfileContext>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,6 +19,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />

@@ -35,7 +35,21 @@ namespace PersonalAssistant.Sender
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            var factory = new ConnectionFactory();
+            var factory = new ConnectionFactory()
+            {
+                HostName = _configuration["EventBusConnection"],
+                //DispatchConsumersAsync = true
+            };
+
+            if (!string.IsNullOrEmpty(_configuration["EventBusUserName"]))
+            {
+                factory.UserName = _configuration["EventBusUserName"];
+            }
+
+            if (!string.IsNullOrEmpty(_configuration["EventBusPassword"]))
+            {
+                factory.Password = _configuration["EventBusPassword"];
+            }
 
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
@@ -75,6 +89,7 @@ namespace PersonalAssistant.Sender
                 try
                 {
                     await client.SendEmailAsync(emailMessage);
+                    _logger.LogDebug($"Sending email to: {to}");
                 }
                 catch (Exception ex)
                 {

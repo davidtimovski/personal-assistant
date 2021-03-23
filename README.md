@@ -45,6 +45,11 @@ An ecosystem of PWAs that cooperate with each other to provide unique functional
 * Offline mode
 * Supports 168 currencies
 
+### Setup
+You will need `.env` file if you want to start it localy with docker
+
+just create a copy of `.env.example` and update the variables with correct values
+
 ## License
 
 This project is licensed under the GNU GPLv3 License - see the [LICENSE](LICENSE) file for details.

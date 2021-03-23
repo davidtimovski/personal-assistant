@@ -42,7 +42,7 @@ namespace PersonalAssistant.Persistence
 
             services.Configure<DatabaseSettings>(options =>
             {
-                options.DefaultConnectionString = configuration["ConnectionStrings:DefaultConnection"];
+                options.DefaultConnectionString = configuration["ConnectionString"];
             });
 
             return services;

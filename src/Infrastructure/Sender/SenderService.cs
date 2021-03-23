@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Infrastructure.Sender.Models;
@@ -9,6 +10,12 @@ namespace PersonalAssistant.Infrastructure.Sender
 {
     public class SenderService : ISenderService
     {
+        private IConfiguration _configuration;
+        public SenderService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         public void Enqueue<T>(T message)
         {
             if (message is Email email)
@@ -27,7 +34,21 @@ namespace PersonalAssistant.Infrastructure.Sender
 
         private void SendToQueue(string queue, object message)
         {
-            var factory = new ConnectionFactory();
+            var factory = new ConnectionFactory()
+            {
+                HostName = _configuration["EventBusConnection"],
+                //DispatchConsumersAsync = true
+            };
+
+            if (!string.IsNullOrEmpty(_configuration["EventBusUserName"]))
+            {
+                factory.UserName = _configuration["EventBusUserName"];
+            }
+
+            if (!string.IsNullOrEmpty(_configuration["EventBusPassword"]))
+            {
+                factory.Password = _configuration["EventBusPassword"];
+            }
 
             using var connection = factory.CreateConnection();
             using var channel = connection.CreateModel();

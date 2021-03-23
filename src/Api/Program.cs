@@ -16,7 +16,6 @@ namespace Api
 #if !DEBUG
                 .UseSerilog()
 #endif
-                .UseStartup<Startup>()
-                .UseUrls("http://localhost:5001");
+                .UseStartup<Startup>();
     }
 }
