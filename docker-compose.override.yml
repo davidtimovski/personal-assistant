@@ -33,6 +33,11 @@ services:
       - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
       - SendGridApiKey=${SENDGRID_API_KEY:-replace_me}
 
+#  midnight-walker:
+#    environment:
+#      - ASPNETCORE_ENVIRONMENT=Development
+#      - ConnectionString=${PERSONAL_ASSISTANT_DB:-Server=postgres;Database=personalassistant;User Id=postgres;Password=postgres;Pooling=true} 
+
   postgres:
     ports:
       - '5444:5432'
@@ -40,7 +45,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     volumes:
-      - personalassistant-volume:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
 
   rabbitmq:
     environment:
@@ -52,4 +57,4 @@ services:
       - "5672:5672"    # Important: In a production environment your should remove the external port
 
 volumes:
-  personalassistant-volume:
+  postgres-data:

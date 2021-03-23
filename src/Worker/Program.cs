@@ -52,7 +52,7 @@ namespace PersonalAssistant.WorkerService
                     services.AddApplication(hostContext.Configuration);
 
                     services.AddOptions();
-                    services.Configure<DatabaseSettings>(hostContext.Configuration.GetSection("ConnectionStrings"));
+                    services.Configure<DatabaseSettings>(x => x.DefaultConnectionString = hostContext.Configuration.GetValue<String>("ConnectionString"));
                     services.AddHttpClient("fixer", c =>
                     {
                         c.BaseAddress = new Uri("http://data.fixer.io/api/");
