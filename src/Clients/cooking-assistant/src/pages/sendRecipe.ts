@@ -9,6 +9,8 @@ import {
 import { EventAggregator } from "aurelia-event-aggregator";
 
 import { AuthService } from "../../../shared/src/services/authService";
+import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+
 import { RecipesService } from "services/recipesService";
 import { SendRecipeModel } from "models/viewmodels/sendRecipeModel";
 import { Recipient } from "models/viewmodels/recipient";
@@ -41,7 +43,7 @@ export class SendRecipe {
 
     ValidationRules.ensure("recipientEmail").required().email().on(this);
 
-    this.eventAggregator.subscribe("alert-hidden", () => {
+    this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.emailIsInvalid = false;
     });
   }
@@ -60,7 +62,7 @@ export class SendRecipe {
   }
 
   async addRecipient() {
-    this.eventAggregator.publish("reset-alert-error");
+    this.eventAggregator.publish(AlertEvents.HideError);
 
     const email = this.recipientEmail.trim();
     if (email == this.currentUserEmail) {
@@ -91,20 +93,20 @@ export class SendRecipe {
       if (canSendVM.userId === 0) {
         this.emailIsInvalid = true;
         this.eventAggregator.publish(
-          "alert-error",
+          AlertEvents.ShowError,
           "sendRecipe.userDoesntExist"
         );
       } else {
         if (!canSendVM.canSend) {
           this.emailIsInvalid = true;
           this.eventAggregator.publish(
-            "alert-error",
+            AlertEvents.ShowError,
             "sendRecipe.cannotSendToUser"
           );
         } else if (canSendVM.alreadySent) {
           this.emailIsInvalid = true;
           this.eventAggregator.publish(
-            "alert-error",
+            AlertEvents.ShowError,
             "sendRecipe.alreadySendToUser"
           );
         } else {
@@ -137,7 +139,7 @@ export class SendRecipe {
     const recipientsIds = this.recipients.map((x) => x.userId);
     await this.recipesService.send(this.model.id, recipientsIds);
 
-    this.eventAggregator.publish("alert-success", "sendRecipe.sendSuccessful");
+    this.eventAggregator.publish(AlertEvents.ShowSuccess, "sendRecipe.sendSuccessful");
 
     this.router.navigateToRoute("recipesEdited", {
       editedId: this.model.id,

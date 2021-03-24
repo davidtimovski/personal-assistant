@@ -1,9 +1,5 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { BulkAddTasksModel } from "models/viewmodels/bulkAddTasksModel";
-import { TasksService } from "services/tasksService";
-import { ListsService } from "services/listsService";
-import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import {
   ValidationController,
   validateTrigger,
@@ -11,6 +7,13 @@ import {
   ControllerValidateResult,
 } from "aurelia-validation";
 import { EventAggregator } from "aurelia-event-aggregator";
+
+import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
+import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+
+import { BulkAddTasksModel } from "models/viewmodels/bulkAddTasksModel";
+import { TasksService } from "services/tasksService";
+import { ListsService } from "services/listsService";
 
 @inject(
   Router,
@@ -36,7 +39,7 @@ export class BulkAddTasks {
   ) {
     this.validationController.validateTrigger = validateTrigger.manual;
 
-    this.eventAggregator.subscribe("alert-hidden", () => {
+    this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.tasksTextIsInvalid = false;
     });
   }
@@ -73,7 +76,7 @@ export class BulkAddTasks {
     }
 
     this.saveButtonIsLoading = true;
-    this.eventAggregator.publish("reset-alert-error");
+    this.eventAggregator.publish(AlertEvents.HideError);
 
     const result: ControllerValidateResult = await this.validationController.validate();
 
@@ -92,7 +95,7 @@ export class BulkAddTasks {
         this.tasksTextIsInvalid = false;
 
         this.eventAggregator.publish(
-          "alert-success",
+          AlertEvents.ShowError,
           "bulkAddTasks.addSuccessful"
         );
 

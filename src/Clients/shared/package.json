@@ -11,9 +11,9 @@
     "aurelia-animator-css": "^1.0.4",
     "aurelia-bootstrapper": "^2.3.2",
     "aurelia-fetch-client": "^1.8.2",
-    "aurelia-i18n": "^3.0.0-beta.7",
-    "dexie": "^2.0.4",
-    "oidc-client": "^1.10.1"
+    "aurelia-i18n": "^3.1.4",
+    "dexie": "^3.0.3",
+    "oidc-client": "^1.11.5"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.117",

@@ -10,6 +10,8 @@ import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
+import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+
 import { TasksService } from "services/tasksService";
 import { ListOption } from "models/viewmodels/listOption";
 import { ListsService } from "services/listsService";
@@ -52,7 +54,7 @@ export class EditTask {
     this.validationController.validateTrigger = validateTrigger.manual;
     this.deleteButtonText = this.i18n.tr("delete");
 
-    this.eventAggregator.subscribe("alert-hidden", () => {
+    this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.nameIsInvalid = false;
     });
   }
@@ -145,7 +147,7 @@ export class EditTask {
     }
 
     this.saveButtonIsLoading = true;
-    this.eventAggregator.publish("reset-alert-error");
+    this.eventAggregator.publish(AlertEvents.HideError);
 
     const result: ControllerValidateResult = await this.validationController.validate();
 
@@ -184,7 +186,7 @@ export class EditTask {
       await Actions.getLists(this.listsService);
 
       this.eventAggregator.publish(
-        "alert-success",
+        AlertEvents.ShowError,
         "editTask.deleteSuccessful"
       );
       this.router.navigateToRoute("list", { id: this.model.listId });

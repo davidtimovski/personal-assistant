@@ -8,12 +8,14 @@ import { EventAggregator } from "aurelia-event-aggregator";
 import { I18N } from "aurelia-i18n";
 
 import { AuthService } from "../../shared/src/services/authService";
-import * as Actions from "utils/state/actions";
+import { AlertEvents } from "../../shared/src/utils/alertEvents";
 import { LocalStorageCurrencies } from "../../shared/src/utils/localStorageCurrencies";
 import { CurrenciesService } from "../../shared/src/services/currenciesService";
 import { ConnectionTracker } from "../../shared/src/utils/connectionTracker";
-import { RecipesService } from "services/recipesService";
 import AuthorizeStep from "../../shared/src/authorize-pipeline-step";
+
+import * as Actions from "utils/state/actions";
+import { RecipesService } from "services/recipesService";
 import routes from "./routes";
 
 @inject(
@@ -42,7 +44,7 @@ export class App {
   ) {
     this.broadcastChannel.addEventListener("message", (event: MessageEvent) => {
       this.eventAggregator.publish(
-        "alert-success",
+        AlertEvents.ShowSuccess,
         this.i18n.tr("versionUpdatedTo", { version: event.data.version })
       );
     });

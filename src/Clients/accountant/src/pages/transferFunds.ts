@@ -9,6 +9,8 @@ import {
 import { I18N } from "aurelia-i18n";
 
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
+import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+
 import { AccountsService } from "services/accountsService";
 import { TransactionsService } from "services/transactionsService";
 import { LocalStorage } from "utils/localStorage";
@@ -42,7 +44,7 @@ export class TransferFunds {
   ) {
     this.validationController.validateTrigger = validateTrigger.manual;
 
-    this.eventAggregator.subscribe("alert-hidden", () => {
+    this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.amountIsInvalid = false;
     });
   }
@@ -106,7 +108,7 @@ export class TransferFunds {
     }
 
     this.transferButtonIsLoading = true;
-    this.eventAggregator.publish("reset-alert-error");
+    this.eventAggregator.publish(AlertEvents.HideError);
 
     const result: ControllerValidateResult = await this.validationController.validate();
 
@@ -142,7 +144,7 @@ export class TransferFunds {
           }
 
           this.eventAggregator.publish(
-            "alert-error",
+            AlertEvents.ShowError,
             this.i18n.tr("transferFunds.accountOnlyHas", {
               account: fromAccount,
               balance: formattedBalance,
@@ -186,7 +188,7 @@ export class TransferFunds {
         this.amountIsInvalid = false;
 
         this.eventAggregator.publish(
-          "alert-success",
+          AlertEvents.ShowSuccess,
           "transferFunds.transferSuccessful"
         );
 

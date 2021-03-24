@@ -10,11 +10,13 @@ import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 import autocomplete, { AutocompleteResult } from "autocompleter";
 
+import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
+import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+
 import * as environment from "../../config/environment.json";
 import { RecipesService } from "services/recipesService";
 import { IngredientsService } from "services/ingredientsService";
 import { UsersService } from "services/usersService";
-import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import { IngredientSuggestions } from "models/viewmodels/ingredientSuggestions";
 import { IngredientSuggestion } from "models/viewmodels/ingredientSuggestion";
 import { EditRecipeModel } from "models/viewmodels/editRecipeModel";
@@ -78,7 +80,7 @@ export class EditRecipe {
     this.deleteButtonText = this.i18n.tr("delete");
     this.addIngredientsInputPlaceholder = this.i18n.tr("editRecipe.ingredient");
 
-    this.eventAggregator.subscribe("alert-hidden", () => {
+    this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.nameIsInvalid = false;
       this.videoUrlIsInvalid = false;
     });
@@ -436,7 +438,7 @@ export class EditRecipe {
     }
 
     this.saveButtonIsLoading = true;
-    this.eventAggregator.publish("reset-alert-error");
+    this.eventAggregator.publish(AlertEvents.HideError);
 
     const result: ControllerValidateResult = await this.validationController.validate();
 
@@ -506,7 +508,7 @@ export class EditRecipe {
       Actions.deleteRecipe(this.model.id);
 
       this.eventAggregator.publish(
-        "alert-success",
+        AlertEvents.ShowSuccess,
         "editRecipe.deleteSuccessful"
       );
       this.router.navigateToRoute("recipes");

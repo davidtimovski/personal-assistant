@@ -3,6 +3,7 @@ import { HttpClient } from "aurelia-fetch-client";
 import { EventAggregator } from "aurelia-event-aggregator";
 
 import { AuthService } from "../../../shared/src/services/authService";
+
 import { HttpError } from "../models/enums/httpError";
 
 @inject(AuthService, HttpClient, EventAggregator)
@@ -26,6 +27,10 @@ export class HttpProxyBase {
     }
 
     if (!this.successCodes.includes(response.status)) {
+      if (this.IsUnauthorized(response.status)) {
+        return;
+      }
+
       return await this.HandleErrorCodes(response);
     }
 
@@ -47,6 +52,10 @@ export class HttpProxyBase {
     }
 
     if (!this.successCodes.includes(response.status)) {
+      if (this.IsUnauthorized(response.status)) {
+        return;
+      }
+
       return await this.HandleErrorCodes(response);
     }
 
@@ -64,15 +73,35 @@ export class HttpProxyBase {
     }
 
     if (!this.successCodes.includes(response.status)) {
+      if (this.IsUnauthorized(response.status)) {
+        return;
+      }
+
       await this.HandleErrorCodes(response);
     }
   }
 
-  protected async HandleErrorCodes(response: Response) {
-    if (response.status === 401) {
+  protected async ajaxUploadFile(uri: string, request: any): Promise<string> {
+    const response: Response = await this.httpClient.fetch(uri, request);
+
+    if (!this.successCodes.includes(response.status)) {
+      return await this.HandleErrorCodes(response);
+    }
+
+    return <string>await response.json();
+  }
+
+  private async IsUnauthorized(statusCode: number) {
+    if (statusCode === 401) {
       await this.authService.signinRedirect();
-      throw HttpError.Unauthorized;
-    } else if (response.status === 404) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private async HandleErrorCodes(response: Response) {
+    if (response.status === 404) {
       return null;
     } else if (response.status === 422) {
       let errors: any;

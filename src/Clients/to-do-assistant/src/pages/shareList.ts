@@ -10,6 +10,8 @@ import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
 import { AuthService } from "../../../shared/src/services/authService";
+import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+
 import { ListsService } from "services/listsService";
 import { LocalStorage } from "utils/localStorage";
 import { ListWithShares } from "models/viewmodels/listWithShares";
@@ -59,7 +61,7 @@ export class ShareList {
 
     this.emailPlaceholderText = this.i18n.tr("shareList.newMemberEmail");
 
-    this.eventAggregator.subscribe("alert-hidden", () => {
+    this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.emailIsInvalid = false;
     });
   }
@@ -104,7 +106,7 @@ export class ShareList {
   }
 
   async addShare() {
-    this.eventAggregator.publish("reset-alert-error");
+    this.eventAggregator.publish(AlertEvents.HideError);
 
     const email = this.selectedShare.email.trim();
 
@@ -130,14 +132,14 @@ export class ShareList {
       if (canShareVM.userId === 0) {
         this.emailIsInvalid = true;
         this.eventAggregator.publish(
-          "alert-error",
+          AlertEvents.ShowError,
           "shareList.userDoesntExist"
         );
       } else {
         if (!canShareVM.canShare) {
           this.emailIsInvalid = true;
           this.eventAggregator.publish(
-            "alert-error",
+            AlertEvents.ShowError,
             "shareList.cannotShareWithUser"
           );
         } else {
@@ -264,17 +266,17 @@ export class ShareList {
 
     if (this.editedShares.length + this.removeShare.length > 0) {
       this.eventAggregator.publish(
-        "alert-success",
+        AlertEvents.ShowError,
         "shareList.sharingDetailsSaved"
       );
     } else if (this.newShares.length === 1) {
       this.eventAggregator.publish(
-        "alert-success",
+        AlertEvents.ShowError,
         "shareList.shareRequestSent"
       );
     } else if (this.newShares.length > 1) {
       this.eventAggregator.publish(
-        "alert-success",
+        AlertEvents.ShowError,
         "shareList.shareRequestsSent"
       );
     }

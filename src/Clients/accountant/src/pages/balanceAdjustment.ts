@@ -1,9 +1,5 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { TransactionsService } from "services/transactionsService";
-import { AccountsService } from "services/accountsService";
-import { LocalStorage } from "utils/localStorage";
-import { TransactionModel } from "models/entities/transaction";
 import {
   ValidationController,
   validateTrigger,
@@ -12,6 +8,12 @@ import {
 } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
+
+import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+
+import { TransactionsService } from "services/transactionsService";
+import { AccountsService } from "services/accountsService";
+import { LocalStorage } from "utils/localStorage";
 import { Adjustment } from "models/viewmodels/adjustmentModel";
 import { SelectOption } from "models/viewmodels/selectOption";
 
@@ -44,7 +46,7 @@ export class BalanceAdjustment {
   ) {
     this.validationController.validateTrigger = validateTrigger.manual;
 
-    this.eventAggregator.subscribe("alert-hidden", () => {
+    this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.balanceIsInvalid = false;
     });
   }
@@ -110,7 +112,7 @@ export class BalanceAdjustment {
     }
 
     this.adjustButtonIsLoading = true;
-    this.eventAggregator.publish("reset-alert-error");
+    this.eventAggregator.publish(AlertEvents.HideError);
 
     const result: ControllerValidateResult = await this.validationController.validate();
 
@@ -128,7 +130,7 @@ export class BalanceAdjustment {
         this.balanceIsInvalid = false;
 
         this.eventAggregator.publish(
-          "alert-success",
+          AlertEvents.ShowSuccess,
           "balanceAdjustment.adjustmentSuccessful"
         );
         this.router.navigateToRoute("dashboard");

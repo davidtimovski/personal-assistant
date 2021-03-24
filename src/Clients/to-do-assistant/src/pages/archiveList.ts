@@ -4,6 +4,8 @@ import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 import { connectTo } from "aurelia-store";
 
+import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+
 import { List } from "models/entities/list";
 import { ListsService } from "services/listsService";
 import { SharingState } from "models/viewmodels/sharingState";
@@ -80,7 +82,7 @@ export class ArchiveList {
       await Actions.getLists(this.listsService);
 
       this.eventAggregator.publish(
-        "alert-success",
+        AlertEvents.ShowError,
         "archiveList.archiveSuccessful"
       );
 

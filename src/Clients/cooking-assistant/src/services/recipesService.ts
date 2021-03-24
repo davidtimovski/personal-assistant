@@ -1,16 +1,17 @@
 import { inject } from "aurelia-framework";
 import { json } from "aurelia-fetch-client";
-import { HttpProxy } from "utils/httpProxy";
 import { HttpClient } from "aurelia-fetch-client";
 import { EventAggregator } from "aurelia-event-aggregator";
 
 import { AuthService } from "../../../shared/src/services/authService";
+import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
+import { LocalStorageCurrencies } from "../../../shared/src/utils/localStorageCurrencies";
+import { Language } from "../../../shared/src/models/enums/language";
+
 import { RecipeModel } from "models/viewmodels/recipeModel";
 import { ViewRecipe } from "models/viewmodels/viewRecipe";
 import { EditRecipeIngredient } from "models/viewmodels/editRecipeIngredient";
 import { EditRecipeModel } from "models/viewmodels/editRecipeModel";
-import { LocalStorageCurrencies } from "../../../shared/src/utils/localStorageCurrencies";
-import { Language } from "../../../shared/src/models/enums/language";
 import { SendRecipeModel } from "models/viewmodels/sendRecipeModel";
 import { CanSendRecipe } from "models/viewmodels/canSendRecipe";
 import { ReceivedRecipe } from "models/viewmodels/receivedRecipe";
@@ -19,7 +20,7 @@ import { IngredientReplacement } from "models/viewmodels/ingredientReplacement";
 import * as Actions from "utils/state/actions";
 
 @inject(AuthService, HttpClient, EventAggregator, LocalStorageCurrencies)
-export class RecipesService extends HttpProxy {
+export class RecipesService extends HttpProxyBase {
   constructor(
     protected readonly authService: AuthService,
     protected readonly httpClient: HttpClient,

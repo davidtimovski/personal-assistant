@@ -1,7 +1,5 @@
 import { inject, computedFrom, NewInstance } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { DietaryProfileService } from "services/dietaryProfileService";
-import { UsersService } from "services/usersService";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 import {
@@ -11,6 +9,11 @@ import {
   ControllerValidateResult,
   ValidateResult,
 } from "aurelia-validation";
+
+import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+
+import { DietaryProfileService } from "services/dietaryProfileService";
+import { UsersService } from "services/usersService";
 import { EditDietaryProfile } from "models/viewmodels/editDietaryProfile";
 import { PreferencesModel } from "models/preferencesModel";
 import { UpdateDietaryProfile } from "models/viewmodels/updateDietaryProfile";
@@ -348,7 +351,7 @@ export class DietaryProfile {
     }
 
     this.saveButtonIsLoading = true;
-    this.eventAggregator.publish("reset-alert-error");
+    this.eventAggregator.publish(AlertEvents.HideError);
 
     const profileResult: ControllerValidateResult = await this.profileValidationController.validate();
     const dailyIntakeResult: ControllerValidateResult = await this.dailyIntakeValidationController.validate();
@@ -360,7 +363,7 @@ export class DietaryProfile {
         this.birthdayIsInvalid = this.heightCmIsInvalid = this.heightFeetIsInvalid = this.weightKgIsInvalid = this.weightLbsIsInvalid = false;
 
         this.eventAggregator.publish(
-          "alert-success",
+          AlertEvents.ShowSuccess,
           "dietaryProfile.updateSuccessful"
         );
         this.router.navigateToRoute("menu");
@@ -471,7 +474,7 @@ export class DietaryProfile {
         errorMessages
       );
 
-      this.eventAggregator.publish("alert-error", errorMessages);
+      this.eventAggregator.publish(AlertEvents.ShowError, errorMessages);
     }
 
     this.saveButtonIsLoading = false;
@@ -586,7 +589,7 @@ export class DietaryProfile {
 
       await this.dietaryProfileService.delete();
       this.eventAggregator.publish(
-        "alert-success",
+        AlertEvents.ShowSuccess,
         "dietaryProfile.resetSuccessful"
       );
       this.router.navigateToRoute("menu");

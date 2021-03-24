@@ -8,10 +8,12 @@ import { EventAggregator } from "aurelia-event-aggregator";
 import { I18N } from "aurelia-i18n";
 
 import { AuthService } from "../../shared/src/services/authService";
-import { SyncService } from "services/syncService";
-import { LocalStorage } from "utils/localStorage";
 import { CurrenciesService } from "../../shared/src/services/currenciesService";
 import AuthorizeStep from "../../shared/src/authorize-pipeline-step";
+import { AlertEvents } from "../../shared/src/utils/alertEvents";
+
+import { SyncService } from "services/syncService";
+import { LocalStorage } from "utils/localStorage";
 import routes from "./routes";
 
 @inject(
@@ -38,7 +40,7 @@ export class App {
   ) {
     this.broadcastChannel.addEventListener("message", (event: MessageEvent) => {
       this.eventAggregator.publish(
-        "alert-success",
+        AlertEvents.ShowSuccess,
         this.i18n.tr("versionUpdatedTo", { version: event.data.version })
       );
     });

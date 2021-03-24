@@ -1,5 +1,7 @@
 import { json } from "aurelia-fetch-client";
+
 import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
+
 import { List } from "models/entities/list";
 import { ListWithShares } from "models/viewmodels/listWithShares";
 import { Share } from "models/viewmodels/share";
@@ -11,14 +13,8 @@ import { ListIcon } from "models/viewmodels/listIcon";
 import { EditListModel } from "models/viewmodels/editListModel";
 
 export class ListsService extends HttpProxyBase {
-  //public loadingLists = false;
-
   async getAll(): Promise<Array<List>> {
-    //this.loadingLists = true;
-
     const result = await this.ajax<Array<List>>("lists");
-
-    //this.loadingLists = false;
 
     return result;
   }

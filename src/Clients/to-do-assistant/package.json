@@ -8,15 +8,14 @@
   },
   "license": "MIT",
   "dependencies": {
-    "acorn": "^7.1.0",
     "aurelia-animator-css": "^1.0.4",
     "aurelia-bootstrapper": "^2.3.2",
     "aurelia-fetch-client": "^1.8.2",
-    "aurelia-i18n": "^3.0.0-beta.7",
+    "aurelia-i18n": "^3.1.4",
     "aurelia-store": "^1.6.0",
     "aurelia-validation": "^1.4.0",
-    "bcx-aurelia-reorderable-repeat": "1.3.0",
-    "oidc-client": "^1.10.1"
+    "bcx-aurelia-reorderable-repeat": "^1.4.0",
+    "oidc-client": "^1.11.5"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.117",

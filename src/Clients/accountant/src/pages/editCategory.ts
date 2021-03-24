@@ -11,6 +11,8 @@ import { EventAggregator } from "aurelia-event-aggregator";
 
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import { ConnectionTracker } from "../../../shared/src/utils/connectionTracker";
+import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+
 import { CategoriesService } from "services/categoriesService";
 import { Category, CategoryType } from "models/entities/category";
 import { SelectOption } from "models/viewmodels/selectOption";
@@ -51,7 +53,7 @@ export class EditCategory {
     this.validationController.validateTrigger = validateTrigger.manual;
     this.deleteButtonText = this.i18n.tr("delete");
 
-    this.eventAggregator.subscribe("alert-hidden", () => {
+    this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.nameIsInvalid = false;
     });
 
@@ -153,7 +155,7 @@ export class EditCategory {
     }
 
     this.saveButtonIsLoading = true;
-    this.eventAggregator.publish("reset-alert-error");
+    this.eventAggregator.publish(AlertEvents.HideError);
 
     const result: ControllerValidateResult = await this.validationController.validate();
 
@@ -198,12 +200,12 @@ export class EditCategory {
       try {
         await this.categoriesService.delete(this.category.id);
         this.eventAggregator.publish(
-          "alert-success",
+          AlertEvents.ShowSuccess,
           "editCategory.deleteSuccessful"
         );
         this.router.navigateToRoute("categories");
       } catch (e) {
-        this.eventAggregator.publish("alert-error", e);
+        this.eventAggregator.publish(AlertEvents.ShowError, e);
 
         this.deleteButtonText = this.i18n.tr("delete");
         this.deleteInProgress = false;

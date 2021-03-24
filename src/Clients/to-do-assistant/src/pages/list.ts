@@ -10,6 +10,8 @@ import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 import { connectTo } from "aurelia-store";
 
+import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+
 import { ListsService } from "services/listsService";
 import { TasksService } from "services/tasksService";
 import { Task } from "models/entities/task";
@@ -90,7 +92,7 @@ export class List {
 
     this.addNewPlaceholderText = this.i18n.tr("list.add");
 
-    this.eventAggregator.subscribe("alert-hidden", () => {
+    this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.newTaskIsInvalid = false;
     });
   }

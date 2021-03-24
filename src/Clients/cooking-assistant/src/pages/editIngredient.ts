@@ -3,7 +3,6 @@ import { Router } from "aurelia-router";
 import { IngredientsService } from "services/ingredientsService";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
-import { LocalStorageCurrencies } from "../../../shared/src/utils/localStorageCurrencies";
 import {
   ValidationController,
   validateTrigger,
@@ -12,6 +11,10 @@ import {
   ValidateResult,
 } from "aurelia-validation";
 import autocomplete, { AutocompleteResult } from "autocompleter";
+
+import { LocalStorageCurrencies } from "../../../shared/src/utils/localStorageCurrencies";
+import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+
 import { EditIngredientModel } from "models/viewmodels/editIngredientModel";
 import { IngredientSuggestion } from "models/viewmodels/ingredientSuggestion";
 import { NutritionData } from "models/viewmodels/nutritionData";
@@ -69,7 +72,7 @@ export class EditIngredient {
     this.validationController.validateTrigger = validateTrigger.manual;
     this.deleteButtonText = this.i18n.tr("delete");
 
-    this.eventAggregator.subscribe("alert-hidden", () => {
+    this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.nameIsInvalid = false;
       this.caloriesIsInvalid = false;
       this.fatIsInvalid = false;
@@ -340,7 +343,7 @@ export class EditIngredient {
     }
 
     this.saveButtonIsLoading = true;
-    this.eventAggregator.publish("reset-alert-error");
+    this.eventAggregator.publish(AlertEvents.HideError);
 
     const result: ControllerValidateResult = await this.validationController.validate();
 
@@ -455,7 +458,7 @@ export class EditIngredient {
         errorMessages
       );
 
-      this.eventAggregator.publish("alert-error", errorMessages);
+      this.eventAggregator.publish(AlertEvents.ShowError, errorMessages);
     }
 
     this.saveButtonIsLoading = false;
@@ -471,7 +474,7 @@ export class EditIngredient {
 
       await this.ingredientsService.delete(this.model.id);
       this.eventAggregator.publish(
-        "alert-success",
+        AlertEvents.ShowSuccess,
         "editIngredient.deleteSuccessful"
       );
       this.router.navigateToRoute("ingredients");

@@ -1,9 +1,5 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { CategoriesService } from "services/categoriesService";
-import { UpcomingExpensesService } from "services/upcomingExpensesService";
-import { LocalStorage } from "utils/localStorage";
-import { UpcomingExpense } from "models/entities/upcomingExpense";
 import {
   ValidationController,
   validateTrigger,
@@ -12,11 +8,18 @@ import {
 } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
+
 import { ConnectionTracker } from "../../../shared/src/utils/connectionTracker";
+import { DateHelper } from "../../../shared/src/utils/dateHelper";
+import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+
+import { CategoriesService } from "services/categoriesService";
+import { UpcomingExpensesService } from "services/upcomingExpensesService";
+import { LocalStorage } from "utils/localStorage";
+import { UpcomingExpense } from "models/entities/upcomingExpense";
 import { SelectOption } from "models/viewmodels/selectOption";
 import { EditUpcomingExpenseModel } from "models/viewmodels/editUpcomingExpenseModel";
 import { CategoryType } from "models/entities/category";
-import { DateHelper } from "../../../shared/src/utils/dateHelper";
 
 @inject(
   Router,
@@ -59,7 +62,7 @@ export class EditUpcomingExpense {
 
     this.todayDate = DateHelper.format(new Date());
 
-    this.eventAggregator.subscribe("alert-hidden", () => {
+    this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.amountIsInvalid = false;
       this.dateIsInvalid = false;
     });
@@ -158,7 +161,7 @@ export class EditUpcomingExpense {
     }
 
     this.saveButtonIsLoading = true;
-    this.eventAggregator.publish("reset-alert-error");
+    this.eventAggregator.publish(AlertEvents.HideError);
 
     const result: ControllerValidateResult = await this.validationController.validate();
 
@@ -227,12 +230,12 @@ export class EditUpcomingExpense {
       try {
         await this.upcomingExpensesService.delete(this.model.id);
         this.eventAggregator.publish(
-          "alert-success",
+          AlertEvents.ShowSuccess,
           "editUpcomingExpense.deleteSuccessful"
         );
         this.router.navigateToRoute("upcomingExpenses");
       } catch (e) {
-        this.eventAggregator.publish("alert-error", e);
+        this.eventAggregator.publish(AlertEvents.ShowError, e);
 
         this.deleteButtonText = this.i18n.tr("delete");
         this.deleteInProgress = false;
