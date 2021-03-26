@@ -95,7 +95,7 @@ export class BulkAddTasks {
         this.tasksTextIsInvalid = false;
 
         this.eventAggregator.publish(
-          AlertEvents.ShowError,
+          AlertEvents.ShowSuccess,
           "bulkAddTasks.addSuccessful"
         );
 

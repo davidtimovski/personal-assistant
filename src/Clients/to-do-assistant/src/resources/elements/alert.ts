@@ -34,7 +34,7 @@ export class AlertCustomElement {
     });
 
     this.eventAggregator.subscribe(
-      AlertEvents.ShowError,
+      AlertEvents.ShowSuccess,
       (translationKey: string) => {
         this.reset();
 

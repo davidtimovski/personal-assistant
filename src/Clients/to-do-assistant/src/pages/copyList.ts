@@ -126,7 +126,7 @@ export class CopyList {
         await Actions.getLists(this.listsService);
 
         this.eventAggregator.publish(
-          AlertEvents.ShowError,
+          AlertEvents.ShowSuccess,
           "copyList.copySuccessful"
         );
 

@@ -207,7 +207,7 @@ export class EditList {
       await Actions.getLists(this.listsService);
 
       this.eventAggregator.publish(
-        AlertEvents.ShowError,
+        AlertEvents.ShowSuccess,
         "editList.deleteSuccessful"
       );
       this.router.navigateToRoute("lists");
@@ -230,7 +230,7 @@ export class EditList {
       await Actions.getLists(this.listsService);
 
       this.eventAggregator.publish(
-        AlertEvents.ShowError,
+        AlertEvents.ShowSuccess,
         "editList.youHaveLeftTheList"
       );
 

@@ -186,7 +186,7 @@ export class EditTask {
       await Actions.getLists(this.listsService);
 
       this.eventAggregator.publish(
-        AlertEvents.ShowError,
+        AlertEvents.ShowSuccess,
         "editTask.deleteSuccessful"
       );
       this.router.navigateToRoute("list", { id: this.model.listId });

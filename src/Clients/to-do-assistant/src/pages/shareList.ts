@@ -266,17 +266,17 @@ export class ShareList {
 
     if (this.editedShares.length + this.removeShare.length > 0) {
       this.eventAggregator.publish(
-        AlertEvents.ShowError,
+        AlertEvents.ShowSuccess,
         "shareList.sharingDetailsSaved"
       );
     } else if (this.newShares.length === 1) {
       this.eventAggregator.publish(
-        AlertEvents.ShowError,
+        AlertEvents.ShowSuccess,
         "shareList.shareRequestSent"
       );
     } else if (this.newShares.length > 1) {
       this.eventAggregator.publish(
-        AlertEvents.ShowError,
+        AlertEvents.ShowSuccess,
         "shareList.shareRequestsSent"
       );
     }

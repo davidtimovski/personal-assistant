@@ -41,7 +41,7 @@ export class App {
   ) {
     this.broadcastChannel.addEventListener("message", (event: MessageEvent) => {
       this.eventAggregator.publish(
-        AlertEvents.ShowError,
+        AlertEvents.ShowSuccess,
         this.i18n.tr("versionUpdatedTo", { version: event.data.version })
       );
     });

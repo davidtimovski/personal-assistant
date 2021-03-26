@@ -82,7 +82,7 @@ export class ArchiveList {
       await Actions.getLists(this.listsService);
 
       this.eventAggregator.publish(
-        AlertEvents.ShowError,
+        AlertEvents.ShowSuccess,
         "archiveList.archiveSuccessful"
       );
 

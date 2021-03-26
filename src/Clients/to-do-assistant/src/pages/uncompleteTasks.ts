@@ -84,7 +84,7 @@ export class UncompleteTasks {
       await Actions.getLists(this.listsService);
 
       this.eventAggregator.publish(
-        AlertEvents.ShowError,
+        AlertEvents.ShowSuccess,
         "uncompleteTasks.uncompleteTasksSuccessful"
       );
 
