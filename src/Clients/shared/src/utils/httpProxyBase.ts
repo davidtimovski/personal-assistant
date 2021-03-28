@@ -5,6 +5,7 @@ import { EventAggregator } from "aurelia-event-aggregator";
 import { AuthService } from "../../../shared/src/services/authService";
 
 import { HttpError } from "../models/enums/httpError";
+import { AlertEvents } from "./alertEvents";
 
 @inject(AuthService, HttpClient, EventAggregator)
 export class HttpProxyBase {
@@ -22,12 +23,12 @@ export class HttpProxyBase {
     try {
       response = await this.httpClient.fetch(uri, request);
     } catch (error) {
-      this.eventAggregator.publish("alert-error", "unexpectedError");
+      this.eventAggregator.publish(AlertEvents.ShowError, "unexpectedError");
       throw [];
     }
 
     if (!this.successCodes.includes(response.status)) {
-      if (this.IsUnauthorized(response.status)) {
+      if (await this.IsUnauthorized(response.status)) {
         return;
       }
 
@@ -47,12 +48,12 @@ export class HttpProxyBase {
     try {
       response = await this.httpClient.fetch(uri, request);
     } catch (error) {
-      this.eventAggregator.publish("alert-error", "unexpectedError");
+      this.eventAggregator.publish(AlertEvents.ShowError, "unexpectedError");
       throw [];
     }
 
     if (!this.successCodes.includes(response.status)) {
-      if (this.IsUnauthorized(response.status)) {
+      if (await this.IsUnauthorized(response.status)) {
         return;
       }
 
@@ -68,12 +69,12 @@ export class HttpProxyBase {
     try {
       response = await this.httpClient.fetch(uri, request);
     } catch (error) {
-      this.eventAggregator.publish("alert-error", "unexpectedError");
+      this.eventAggregator.publish(AlertEvents.ShowError, "unexpectedError");
       throw [];
     }
 
     if (!this.successCodes.includes(response.status)) {
-      if (this.IsUnauthorized(response.status)) {
+      if (await this.IsUnauthorized(response.status)) {
         return;
       }
 
@@ -109,12 +110,12 @@ export class HttpProxyBase {
       try {
         errors = await response.json();
       } catch (_) {
-        this.eventAggregator.publish("alert-error", "unexpectedError");
+        this.eventAggregator.publish(AlertEvents.ShowError, "unexpectedError");
         throw [];
       }
 
       if (errors.message === "Failed to fetch") {
-        this.eventAggregator.publish("alert-error", "failedToFetchError");
+        this.eventAggregator.publish(AlertEvents.ShowError, "failedToFetchError");
         throw [];
       }
 
@@ -124,12 +125,12 @@ export class HttpProxyBase {
         modelErrors.push(errors[key][0]);
         errorFields.push(key);
       }
-      this.eventAggregator.publish("alert-error", modelErrors);
+      this.eventAggregator.publish(AlertEvents.ShowError, modelErrors);
 
       throw errorFields;
     }
 
-    this.eventAggregator.publish("alert-error", "unexpectedError");
+    this.eventAggregator.publish(AlertEvents.ShowError, "unexpectedError");
     throw HttpError.Unexpected;
   }
 }
