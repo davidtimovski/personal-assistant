@@ -13,7 +13,6 @@ import { AuthService } from "../../../shared/src/services/authService";
 import { AlertEvents } from "../../../shared/src/utils/alertEvents";
 
 import { ListsService } from "services/listsService";
-import { LocalStorage } from "utils/localStorage";
 import { ListWithShares } from "models/viewmodels/listWithShares";
 import { Share } from "models/viewmodels/share";
 import { CanShareList } from "models/viewmodels/canShareList";
@@ -26,7 +25,6 @@ import * as Actions from "utils/state/actions";
   ListsService,
   ValidationController,
   I18N,
-  LocalStorage,
   EventAggregator
 )
 export class ShareList {
@@ -53,7 +51,6 @@ export class ShareList {
     private readonly listsService: ListsService,
     private readonly validationController: ValidationController,
     private readonly i18n: I18N,
-    private readonly localStorage: LocalStorage,
     private readonly eventAggregator: EventAggregator
   ) {
     this.validationController.validateTrigger = validateTrigger.manual;
@@ -93,7 +90,7 @@ export class ShareList {
     ValidationRules.ensure((x: Share) => x.email)
       .required()
       .email()
-      .satisfies((email) => email !== this.currentUserEmail)
+      .satisfies((email) => email.trim().toLowerCase() !== this.currentUserEmail)
       .on(this.selectedShare);
   }
 
@@ -264,7 +261,7 @@ export class ShareList {
 
     await Actions.getLists(this.listsService);
 
-    if (this.editedShares.length + this.removeShare.length > 0) {
+    if (this.editedShares.length + this.removedShares.length > 0) {
       this.eventAggregator.publish(
         AlertEvents.ShowSuccess,
         "shareList.sharingDetailsSaved"
