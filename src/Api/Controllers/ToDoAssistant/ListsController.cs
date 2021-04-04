@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Api.Config;
+using Api.Models;
 using Api.Models.ToDoAssistant.Lists;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
@@ -157,7 +158,7 @@ namespace Api.Controllers.ToDoAssistant
                 return Unauthorized();
             }
 
-            IEnumerable<ShareRequest> shareRequests = await _listService.GetShareRequestsAsync(userId);
+            IEnumerable<ShareListRequest> shareRequests = await _listService.GetShareRequestsAsync(userId);
 
             return Ok(shareRequests);
         }

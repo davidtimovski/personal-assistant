@@ -1,11 +1,12 @@
 import { inject, bindable, bindingMode } from "aurelia-framework";
-import { TooltipsService } from "../../../../shared/src/services/tooltipsService";
 import { I18N } from "aurelia-i18n";
+
+import { TooltipsService } from "../../../../shared/src/services/tooltipsService";
 import { Tooltip } from "../../../../shared/src/models/tooltip";
 
 @inject(TooltipsService, I18N)
 export class TooltipCustomElement {
-  @bindable({ defaultBindingMode: bindingMode.oneWay }) key: string;
+  @bindable({ defaultBindingMode: bindingMode.toView }) key: string;
   private tooltip: Tooltip;
   private isVisible = false;
   private isOpen = false;
@@ -18,7 +19,7 @@ export class TooltipCustomElement {
   ) {}
 
   async attached() {
-    this.tooltip = await this.tooltipsService.getByKey(this.key);
+    this.tooltip = await this.tooltipsService.getByKey(this.key, "ToDoAssistant");
     if (!this.tooltip.isDismissed) {
       this.tooltip.question = this.i18n.tr(`tooltips.${this.key}.question`);
       this.tooltip.answer = this.i18n.tr(`tooltips.${this.key}.answer`);
@@ -33,6 +34,6 @@ export class TooltipCustomElement {
 
   async dismiss() {
     this.isDismissed = true;
-    await this.tooltipsService.toggleDismissed(this.tooltip.key, true);
+    await this.tooltipsService.toggleDismissed(this.tooltip.key, "ToDoAssistant", true);
   }
 }

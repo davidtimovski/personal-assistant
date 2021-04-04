@@ -33,6 +33,7 @@ export class DietaryProfile {
   private originalDietaryProfileJson: string;
   private preferences: PreferencesModel;
   private dietaryProfileTooltipKey = "dietaryProfile";
+  private dietInitiallySet = false;
   private dietTabIsVisible = false;
   private dietChanged = false;
   private minBirthdayDate: string;
@@ -86,7 +87,10 @@ export class DietaryProfile {
   async activate() {
     this.model = await this.dietaryProfileService.get();
 
-    if (!this.model) {
+    if (this.model) {
+      this.dietInitiallySet = true;
+      this.dietTabIsVisible = true;
+    } else {
       this.model = new EditDietaryProfile(
         null,
         null,
@@ -97,10 +101,8 @@ export class DietaryProfile {
         null,
         null,
         null,
-        null
+        new DailyIntake()
       );
-    } else {
-      this.dietTabIsVisible = true;
     }
 
     this.originalDietaryProfileJson = JSON.stringify(this.model);
@@ -237,6 +239,25 @@ export class DietaryProfile {
       this.model.dailyIntake.iron = recommended.iron;
       this.model.dailyIntake.potassium = recommended.potassium;
       this.model.dailyIntake.magnesium = recommended.magnesium;
+
+      if (!this.dietInitiallySet) {
+        this.model.dailyIntake.trackCalories = true;
+        //this.dietaryProfile.dailyIntake.trackFat = true;
+        this.model.dailyIntake.trackSaturatedFat = true;
+        this.model.dailyIntake.trackCarbohydrate = true;
+        this.model.dailyIntake.trackAddedSugars = true;
+        this.model.dailyIntake.trackFiber = true;
+        this.model.dailyIntake.trackProtein = true;
+        this.model.dailyIntake.trackSodium = true;
+        this.model.dailyIntake.trackCholesterol = true;
+        this.model.dailyIntake.trackVitaminA = true;
+        this.model.dailyIntake.trackVitaminC = true;
+        this.model.dailyIntake.trackVitaminD = true;
+        this.model.dailyIntake.trackCalcium = true;
+        this.model.dailyIntake.trackIron = true;
+        this.model.dailyIntake.trackPotassium = true;
+        this.model.dailyIntake.trackMagnesium = true;
+      }
 
       this.getRecommendedIntakeInProgress = false;
       this.dietChanged = true;

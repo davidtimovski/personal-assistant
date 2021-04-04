@@ -1,6 +1,6 @@
 ﻿namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models
 {
-    public enum SharingState
+    public enum ListSharingState
     {
         NotShared,
         PendingShare,

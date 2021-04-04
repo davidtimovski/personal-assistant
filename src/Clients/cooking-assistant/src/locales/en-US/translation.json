@@ -57,6 +57,8 @@
   },
   "recipe": {
     "edit": "Промени",
+    "shareRecipe": "Share recipe",
+    "members": "Members",
     "sendRecipe": "Send recipe",
     "copyAsText": "Copy as text",
     "prep": "Prep",
@@ -112,7 +114,25 @@
     "cookDurationMinutes": "Cook duration minutes",
     "recipeIsFor": "This recipe is for",
     "create": "Create",
+    "leave": "Leave",
     "deleteSuccessful": "Recipe was successfully deleted"
+  },
+  "shareRecipe": {
+    "share": "Share",
+    "addMember": "Add member",
+    "removeMember": "Remove member",
+    "newMemberEmail": "New member email",
+    "shareWith": "Share with",
+    "members": "Members",
+    "owner": "Owner",
+    "member": "Member",
+    "newlyAddedMember": "Newly added member",
+    "pendingAccept": "Pending accept",
+    "userDoesntExist": "No user with that email exists.",
+    "cannotShareWithUser": "This user has blocked a share request from you previously. You cannot share with them until they unblock you.",
+    "shareRequestSent": "Share request was successfully sent",
+    "shareRequestsSent": "Share requests were successfully sent",
+    "sharingDetailsSaved": "Sharing details successfully saved"
   },
   "sendRecipe": {
     "send": "Send",
@@ -180,7 +200,7 @@
     "usedInTheseRecipes": "Used in these recipes",
     "notUsed": "This ingredient is not used in any recipe.",
     "ingredientName": "Ingredient name",
-    "thisIngredientIsLinked": "This ingredient is linked to a task in To Do Assistant.",
+    "thisIngredientIsLinked": "This ingredient is linked to the \"{{taskName}}\" task in the \"{{taskList}}\" list in To Do Assistant.",
     "linkToTask": "Link to task in To Do Assistant",
     "unlink": "Unlink",
     "searchTasks": "Search tasks",
@@ -197,6 +217,15 @@
     "price": "Price",
     "priceBetween": "Price must be between 0 and 9999",
     "deleteSuccessful": "Ingredient was successfully deleted"
+  },
+  "shareRequests": {
+    "shareRequests": "Share requests",
+    "by": "by",
+    "decline": "Decline",
+    "accept": "Accept",
+    "unblock": "Unblock",
+    "blockedUsers": "Blocked users",
+    "emptyListMessage": "There are no new share requests"
   },
   "inbox": {
     "inbox": "Inbox",
@@ -227,6 +256,7 @@
     "menu": "Menu",
     "dietaryProfile": "Dietary profile",
     "ingredients": "Ingredients",
+    "shareRequests": "Share requests",
     "inbox": "Inbox",
     "preferences": "Preferences",
     "help": "Help",
@@ -267,6 +297,11 @@
       "title": "Review ingredients",
       "question": "Why should I review the ingredients?",
       "answer": "Reviewing ingredients allows you to replace them with your own - if you already have equivalent ones. Using the ingredients that are already in your inventory provies many benefits. They may already be linked to tasks in To Do Assistant, or they may already have nutrition or price data. If you don't find any equivalent ingredients in your inventory don't worry, new ones will be created."
+    },
+    "shareRequests": {
+      "title": "Share requests",
+      "question": "What is this?",
+      "answer": "Someone wants to share a recipe with you. Shared recipes are a way for multiple users to collaborate. If you decline a share request the user that made it will not be able to further share any more with you."
     },
     "dietaryProfile": {
       "title": "Dietary profile",

@@ -64,7 +64,7 @@ export class SendRecipe {
   async addRecipient() {
     this.eventAggregator.publish(AlertEvents.HideError);
 
-    const email = this.recipientEmail.trim();
+    const email = this.recipientEmail.trim().toLowerCase();
     if (email == this.currentUserEmail) {
       this.emailIsInvalid = true;
       return;

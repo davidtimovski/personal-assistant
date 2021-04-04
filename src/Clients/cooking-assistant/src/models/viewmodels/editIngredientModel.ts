@@ -5,6 +5,7 @@ export class EditIngredientModel {
   constructor(
     public id: number,
     public taskId: number,
+    public taskList: string,
     public name: string,
     public nutritionData: NutritionData,
     public priceData: PriceData,

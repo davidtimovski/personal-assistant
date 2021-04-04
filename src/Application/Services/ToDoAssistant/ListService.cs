@@ -96,11 +96,11 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             return result;
         }
 
-        public async Task<IEnumerable<ShareRequest>> GetShareRequestsAsync(int userId)
+        public async Task<IEnumerable<ShareListRequest>> GetShareRequestsAsync(int userId)
         {
-            IEnumerable<Share> shareRequests = await _listsRepository.GetShareRequestsAsync(userId);
+            IEnumerable<ListShare> shareRequests = await _listsRepository.GetShareRequestsAsync(userId);
 
-            var result = shareRequests.Select(x => _mapper.Map<ShareRequest>(x, opts => { opts.Items["UserId"] = userId; }));
+            var result = shareRequests.Select(x => _mapper.Map<ShareListRequest>(x, opts => { opts.Items["UserId"] = userId; }));
 
             return result;
         }
@@ -140,11 +140,6 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             return _listsRepository.UserOwnsOrSharesAsAdminAsync(id, name.Trim(), userId);
         }
 
-        public Task<bool> UserOwnsAsync(int id, int userId)
-        {
-            return _listsRepository.UserOwnsAsync(id, userId);
-        }
-
         public async Task<bool> IsSharedAsync(int id, int userId)
         {
             if (!await UserOwnsOrSharesAsync(id, userId))
@@ -153,11 +148,6 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             }
 
             return await _listsRepository.IsSharedAsync(id);
-        }
-
-        public Task<bool> UserHasBlockedSharingAsync(int userId, int sharedWithId)
-        {
-            return _listsRepository.UserHasBlockedSharingAsync(userId, sharedWithId);
         }
 
         public Task<bool> ExistsAsync(string name, int userId)
@@ -265,7 +255,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
         public async Task<string> DeleteAsync(int id, int userId)
         {
-            if (!await UserOwnsAsync(id, userId))
+            if (!await _listsRepository.UserOwnsAsync(id, userId))
             {
                 throw new ValidationException("Unauthorized");
             }
@@ -279,15 +269,15 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
             var now = DateTime.Now;
 
-            var newShares = new List<Share>();
+            var newShares = new List<ListShare>();
             foreach (ShareUserAndPermission newShare in model.NewShares)
             {
-                if (await UserHasBlockedSharingAsync(model.UserId, newShare.UserId))
+                if (await _listsRepository.UserHasBlockedSharingAsync(model.UserId, newShare.UserId))
                 {
                     continue;
                 }
 
-                newShares.Add(new Share
+                newShares.Add(new ListShare
                 {
                     ListId = model.ListId,
                     UserId = newShare.UserId,
@@ -297,32 +287,24 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
                 });
             }
 
-            var editedShares = new List<Share>();
-            foreach (ShareUserAndPermission editedShare in model.EditedShares)
+            var editedShares = model.EditedShares.Select(x => new ListShare
             {
-                editedShares.Add(new Share
-                {
-                    ListId = model.ListId,
-                    UserId = editedShare.UserId,
-                    IsAdmin = editedShare.IsAdmin,
-                    ModifiedDate = now
-                });
-            }
+                ListId = model.ListId,
+                UserId = x.UserId,
+                IsAdmin = x.IsAdmin,
+                ModifiedDate = now
+            });
 
-            var removedShares = new List<Share>();
-            foreach (ShareUserAndPermission removedShare in model.RemovedShares)
+            var removedShares = model.RemovedShares.Select(x => new ListShare
             {
-                removedShares.Add(new Share
-                {
-                    ListId = model.ListId,
-                    UserId = removedShare.UserId,
-                    IsAdmin = removedShare.IsAdmin
-                });
-            }
+                ListId = model.ListId,
+                UserId = x.UserId,
+                IsAdmin = x.IsAdmin
+            });
 
             await _listsRepository.SaveSharingDetailsAsync(newShares, editedShares, removedShares);
 
-            foreach (Share share in removedShares)
+            foreach (ListShare share in removedShares)
             {
                 await _notificationsRepository.DeleteForUserAndListAsync(share.UserId, share.ListId);
             }
@@ -330,7 +312,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
         public async Task<bool> LeaveAsync(int id, int userId)
         {
-            Share share = await _listsRepository.LeaveAsync(id, userId);
+            ListShare share = await _listsRepository.LeaveAsync(id, userId);
 
             await _notificationsRepository.DeleteForUserAndListAsync(userId, id);
 

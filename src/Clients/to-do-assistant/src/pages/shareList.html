@@ -70,7 +70,7 @@
       <div class="share-with">
         <img class="share-image" src.bind="model.ownerImageUri" t="[alt]profilePicture">
         <div class="share-content not-editable">
-          <div class="side small inactive">
+          <div class="side small inactive" t="[title,aria-label]shareList.owner">
             <i class="fas fa-crown"></i>
           </div>
           <span class="name">${model.ownerEmail}</span>
@@ -80,10 +80,10 @@
       <div if.bind="model.userShare" class="share-with">
         <img class="share-image" src.bind="model.userShare.imageUri" t="[alt]profilePicture">
         <div class="share-content not-editable">
-          <div if.bind="model.userShare.isAdmin" class="side inactive">
+          <div if.bind="model.userShare.isAdmin" class="side inactive" t="[title,aria-label]shareList.admin">
             <i class="fas fa-user-tie"></i>
           </div>
-          <div else class="side inactive">
+          <div else class="side inactive" t="[title,aria-label]shareList.member">
             <i class="fas fa-user"></i>
           </div>
           <span class="name">${model.userShare.email}</span>
@@ -94,21 +94,21 @@
         <img class="share-image" src.bind="share.imageUri" t="[alt]profilePicture">
         <div class="share-content ${share.email === selectedShare.email ? 'selected' : ''}">
           <div if.bind="share.userId && !share.createdDate && share.userId !== 0 && share.email !== selectedShare.email"
-            class="side inactive">
+            class="side inactive" t="[title,aria-label]shareList.newlyAddedMember">
             <i class="fas fa-user-plus"></i>
           </div>
           <div if.bind="share.isAccepted === null && !!share.createdDate && share.email !== selectedShare.email"
-            class="side inactive">
+            class="side inactive" t="[title,aria-label]shareList.pendingAccept">
             <i class="fas fa-user-clock"></i>
           </div>
           <div if.bind="share.isAccepted && !share.isAdmin && share.email !== selectedShare.email"
-            class="side inactive">
+            class="side inactive" t="[title,aria-label]shareList.member">
             <i class="fas fa-user"></i>
           </div>
-          <div if.bind="share.isAccepted && share.isAdmin && share.email !== selectedShare.email" class="side inactive">
+          <div if.bind="share.isAccepted && share.isAdmin && share.email !== selectedShare.email" class="side inactive" t="[title,aria-label]shareList.admin">
             <i class="fas fa-user-tie"></i>
           </div>
-          <div if.bind="share.email === selectedShare.email" class="side active">
+          <div if.bind="share.email === selectedShare.email" class="side active" t="[title,aria-label]shareList.editing">
             <i class="fas fa-user-edit"></i>
           </div>
           <span click.delegate="select(share)" class="name">${share.email}</span>

@@ -5,7 +5,6 @@ using PersonalAssistant.Application.Contracts.Common.Models;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications.Models;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models;
-using PersonalAssistant.Domain.Entities;
 using PersonalAssistant.Domain.Entities.Common;
 using PersonalAssistant.Domain.Entities.ToDoAssistant;
 
@@ -101,9 +100,9 @@ namespace PersonalAssistant.Application.Mappings
         }
     }
 
-    public class SharingStateResolver : IValueResolver<ToDoList, object, SharingState>
+    public class ListSharingStateResolver : IValueResolver<ToDoList, object, ListSharingState>
     {
-        public SharingState Resolve(ToDoList source, object dest, SharingState destMember, ResolutionContext context)
+        public ListSharingState Resolve(ToDoList source, object dest, ListSharingState destMember, ResolutionContext context)
         {
             var userId = (int)context.Items["UserId"];
 
@@ -114,21 +113,21 @@ namespace PersonalAssistant.Application.Mappings
                 {
                     if (source.UserId == userId)
                     {
-                        return SharingState.Owner;
+                        return ListSharingState.Owner;
                     }
 
-                    Share userShare = source.Shares.Single(x => x.UserId == userId);
-                    return userShare.IsAdmin ? SharingState.Admin : SharingState.Member;
+                    ListShare userShare = source.Shares.Single(x => x.UserId == userId);
+                    return userShare.IsAdmin ? ListSharingState.Admin : ListSharingState.Member;
                 }
 
                 bool someRequestsPending = source.Shares.Any(x => !x.IsAccepted.HasValue);
                 if (someRequestsPending)
                 {
-                    return SharingState.PendingShare;
+                    return ListSharingState.PendingShare;
                 }
             }
 
-            return SharingState.NotShared;
+            return ListSharingState.NotShared;
         }
     }
 
@@ -231,7 +230,7 @@ namespace PersonalAssistant.Application.Mappings
         }
     }
 
-    public class ListWithSharesUserShareResolver : IValueResolver<ToDoList, ListWithShares, ShareDto>
+    public class ListWithSharesUserShareResolver : IValueResolver<ToDoList, ListWithShares, ListShareDto>
     {
         private readonly ICdnService _cdnService;
 
@@ -240,9 +239,9 @@ namespace PersonalAssistant.Application.Mappings
             _cdnService = cdnService;
         }
 
-        public ShareDto Resolve(ToDoList source, ListWithShares dest, ShareDto destMember, ResolutionContext context)
+        public ListShareDto Resolve(ToDoList source, ListWithShares dest, ListShareDto destMember, ResolutionContext context)
         {
-            var shareDto = new ShareDto();
+            var shareDto = new ListShareDto();
             var userId = (int)context.Items["UserId"];
 
             var userShare = source.Shares.FirstOrDefault(x => x.UserId == userId);

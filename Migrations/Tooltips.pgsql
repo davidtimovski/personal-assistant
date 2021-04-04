@@ -25,3 +25,12 @@ CREATE INDEX "IX_Tooltips_Key"
     ON public."Tooltips" USING btree
     ("Key")
     TABLESPACE pg_default;
+	
+-- Index: IX_Tooltips_Application
+
+-- DROP INDEX public."IX_Tooltips_Application";
+
+CREATE INDEX "IX_Tooltips_Application"
+    ON public."Tooltips" USING btree
+    ("Application")
+    TABLESPACE pg_default;

@@ -27,7 +27,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                             WHERE l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")
                             ORDER BY l.""Order""";
 
-            return await conn.QueryAsync<ToDoList, Share, ToDoList>(sql,
+            return await conn.QueryAsync<ToDoList, ListShare, ToDoList>(sql,
                 (list, share) =>
                 {
                     if (share != null && share.IsAccepted != false)
@@ -52,7 +52,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                                                           new { UserId = userId });
 
             var listIds = lists.Select(x => x.Id).ToArray();
-            var shares = await conn.QueryAsync<Share>(@"SELECT * FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = ANY(@ListIds)", new { ListIds = listIds });
+            var shares = await conn.QueryAsync<ListShare>(@"SELECT * FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = ANY(@ListIds)", new { ListIds = listIds });
 
             var tasks = await conn.QueryAsync<ToDoTask>(@"SELECT *
                                                           FROM ""ToDoAssistant.Tasks""
@@ -101,7 +101,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                         LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
                         WHERE l.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))";
 
-            return (await conn.QueryAsync<ToDoList, Share, ToDoList>(sql,
+            return (await conn.QueryAsync<ToDoList, ListShare, ToDoList>(sql,
                 (list, share) =>
                 {
                     if (share != null)
@@ -131,7 +131,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 }, new { Id = id, UserId = userId }, null, true)).FirstOrDefault();
         }
 
-        public async Task<IEnumerable<Share>> GetSharesAsync(int id)
+        public async Task<IEnumerable<ListShare>> GetSharesAsync(int id)
         {
             using DbConnection conn = Connection;
             await conn.OpenAsync();
@@ -142,7 +142,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                         WHERE s.""ListId"" = @ListId AND s.""IsAccepted"" IS NOT FALSE
                         ORDER BY (CASE WHEN s.""IsAccepted"" THEN 1 ELSE 2 END) ASC, s.""CreatedDate""";
 
-            return await conn.QueryAsync<Share, User, Share>(sql,
+            return await conn.QueryAsync<ListShare, User, ListShare>(sql,
                 (share, user) =>
                 {
                     share.User = user;
@@ -150,7 +150,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 }, new { ListId = id }, null, true);
         }
 
-        public async Task<IEnumerable<Share>> GetShareRequestsAsync(int userId)
+        public async Task<IEnumerable<ListShare>> GetShareRequestsAsync(int userId)
         {
             using DbConnection conn = Connection;
             await conn.OpenAsync();
@@ -162,7 +162,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                         WHERE s.""UserId"" = @UserId
                         ORDER BY s.""ModifiedDate"" DESC";
 
-            return await conn.QueryAsync<Share, ToDoList, User, Share>(sql,
+            return await conn.QueryAsync<ListShare, ToDoList, User, ListShare>(sql,
                 (share, list, user) =>
                 {
                     share.List = list;
@@ -427,7 +427,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             return list.Name;
         }
 
-        public async Task SaveSharingDetailsAsync(IEnumerable<Share> newShares, IEnumerable<Share> editedShares, IEnumerable<Share> removedShares)
+        public async Task SaveSharingDetailsAsync(IEnumerable<ListShare> newShares, IEnumerable<ListShare> editedShares, IEnumerable<ListShare> removedShares)
         {
             using DbConnection conn = Connection;
             await conn.OpenAsync();
@@ -446,7 +446,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             transaction.Commit();
         }
 
-        public async Task<Share> LeaveAsync(int id, int userId)
+        public async Task<ListShare> LeaveAsync(int id, int userId)
         {
             using DbConnection conn = Connection;
             await conn.OpenAsync();
@@ -464,7 +464,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                                           new { task.Id, UserId = userId, task.Name, ModifiedDate = DateTime.Now }, transaction);
             }
 
-            var share = await conn.QueryFirstOrDefaultAsync<Share>(@"SELECT * 
+            var share = await conn.QueryFirstOrDefaultAsync<ListShare>(@"SELECT * 
                                                                     FROM ""ToDoAssistant.Shares"" 
                                                                     WHERE ""ListId"" = @ListId AND ""UserId"" = @UserId",
                                                                     new { ListId = id, UserId = userId }, transaction);
@@ -608,7 +608,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             }
             else
             {
-                var share = await conn.QueryFirstOrDefaultAsync<Share>(@"SELECT * FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = @ListId AND ""UserId"" = @UserId",
+                var share = await conn.QueryFirstOrDefaultAsync<ListShare>(@"SELECT * FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = @ListId AND ""UserId"" = @UserId",
                     new { ListId = id, UserId = userId });
 
                 if (isArchived)

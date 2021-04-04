@@ -23,7 +23,8 @@ namespace Auth.Services
 
             var claims = new List<Claim>
             {
-                new Claim("name2", user.Name),
+                new Claim("name", user.Email),
+                new Claim("name2", user.Name)
             };
 
             context.IssuedClaims.AddRange(claims);

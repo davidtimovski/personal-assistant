@@ -51,8 +51,10 @@ export class EditRecipe {
   private confirmationInProgress = false;
   private saveButtonText: string;
   private deleteButtonText: string;
+  private leaveButtonText: string;
   private saveButtonIsLoading = false;
   private deleteButtonIsLoading = false;
+  private leaveButtonIsLoading = false;
   private videoIFrame: HTMLIFrameElement;
   private videoIFrameSrc = "";
   private readonly ingredientFromTaskTooltipKey = "ingredientFromTask";
@@ -78,6 +80,7 @@ export class EditRecipe {
     this.validationController.validateTrigger = validateTrigger.manual;
     this.saveButtonText = this.i18n.tr("save");
     this.deleteButtonText = this.i18n.tr("delete");
+    this.leaveButtonText = this.i18n.tr("editRecipe.leave");
     this.addIngredientsInputPlaceholder = this.i18n.tr("editRecipe.ingredient");
 
     this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
@@ -167,7 +170,7 @@ export class EditRecipe {
 
     this.autocomplete = autocomplete({
       input: this.addIngredientsInput,
-      minLength: 1,
+      minLength: 2,
       fetch: (
         text: string,
         update: (items: IngredientSuggestion[]) => void
@@ -216,7 +219,7 @@ export class EditRecipe {
           (x) => x.id !== suggestion.id
         );
         this.taskSuggestions = this.taskSuggestions.filter(
-          (x) => x.taskId !== suggestion.taskId
+          (x) => x.taskId !== suggestion.taskId && x.id !== suggestion.id
         );
 
         if (this.ingredientSuggestionsComeFromTasks) {
@@ -514,6 +517,30 @@ export class EditRecipe {
       this.router.navigateToRoute("recipes");
     } else {
       this.deleteButtonText = this.i18n.tr("sure");
+      this.confirmationInProgress = true;
+    }
+  }
+
+  async leave() {
+    if (this.leaveButtonIsLoading) {
+      return;
+    }
+
+    if (this.confirmationInProgress) {
+      this.leaveButtonIsLoading = true;
+
+      await this.recipesService.leave(this.model.id);
+
+      await Actions.getRecipes(this.recipesService);
+
+      this.eventAggregator.publish(
+        AlertEvents.ShowSuccess,
+        "editRecipe.youHaveLeftTheRecipe"
+      );
+
+      this.router.navigateToRoute("recipes");
+    } else {
+      this.leaveButtonText = this.i18n.tr("sure");
       this.confirmationInProgress = true;
     }
   }

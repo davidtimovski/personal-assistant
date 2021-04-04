@@ -16,6 +16,6 @@ namespace PersonalAssistant.Domain.Entities.ToDoAssistant
 
         public User User { get; set; }
         public List<ToDoTask> Tasks { get; set; } = new List<ToDoTask>();
-        public List<Share> Shares { get; set; } = new List<Share>();
+        public List<ListShare> Shares { get; set; } = new List<ListShare>();
     }
 }

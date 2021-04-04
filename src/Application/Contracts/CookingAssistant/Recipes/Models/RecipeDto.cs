@@ -21,6 +21,7 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Model
         public DateTime LastOpenedDate { get; set; }
         public RecipeNutritionSummary NutritionSummary { get; set; }
         public RecipeCostSummary CostSummary { get; set; }
+        public RecipeSharingState SharingState { get; set; }
 
         public void Mapping(Profile profile)
         {
@@ -29,7 +30,8 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Model
                 .ForMember(x => x.PrepDuration, opt => opt.MapFrom<DurationResolver, TimeSpan?>(src => src.PrepDuration))
                 .ForMember(x => x.CookDuration, opt => opt.MapFrom<DurationResolver, TimeSpan?>(src => src.CookDuration))
                 .ForMember(x => x.NutritionSummary, opt => opt.MapFrom<RecipeNutritionSummaryResolver>())
-                .ForMember(x => x.CostSummary, opt => opt.MapFrom<RecipeCostSummaryResolver>());
+                .ForMember(x => x.CostSummary, opt => opt.MapFrom<RecipeCostSummaryResolver>())
+                .ForMember(x => x.SharingState, opt => opt.MapFrom<RecipeSharingStateResolver>());
         }
     }
 }

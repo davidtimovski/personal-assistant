@@ -57,9 +57,10 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                                                             FROM ""CookingAssistant.Ingredients"" AS i
                                                             INNER JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
                                                             LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
-                                                            WHERE i.""TaskId"" = @TaskId
+                                                            LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
+                                                            WHERE i.""TaskId"" = @TaskId AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
                                                             ORDER BY r.""Name""",
-                                                            new { TaskId = id })).ToList();
+                                                            new { TaskId = id, UserId = userId })).ToList();
             return task;
         }
 

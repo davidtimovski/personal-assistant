@@ -56,6 +56,7 @@ namespace PersonalAssistant.Application
             services.AddTransient<IValidator<UpdateTask>, UpdateTaskValidator>();
             services.AddTransient<IValidator<CreateRecipe>, CreateRecipeValidator>();
             services.AddTransient<IValidator<UpdateRecipe>, UpdateRecipeValidator>();
+            services.AddTransient<IValidator<ShareRecipe>, ShareRecipeValidator>();
             services.AddTransient<IValidator<CreateSendRequest>, CreateSendRequestValidator>();
             services.AddTransient<IValidator<ImportRecipe>, ImportRecipeValidator>();
             services.AddTransient<IValidator<UpdateIngredient>, UpdateIngredientValidator>();

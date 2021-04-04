@@ -18,6 +18,9 @@ import { ReceivedRecipe } from "models/viewmodels/receivedRecipe";
 import { ReviewIngredientsModel } from "models/viewmodels/reviewIngredientsModel";
 import { IngredientReplacement } from "models/viewmodels/ingredientReplacement";
 import * as Actions from "utils/state/actions";
+import { RecipeWithShares } from "models/viewmodels/recipeWithShares";
+import { CanShareRecipe } from "models/viewmodels/canShareRecipe";
+import { ShareRequest } from "models/viewmodels/shareRequest";
 
 @inject(AuthService, HttpClient, EventAggregator, LocalStorageCurrencies)
 export class RecipesService extends HttpProxyBase {
@@ -46,6 +49,26 @@ export class RecipesService extends HttpProxyBase {
 
   async getForUpdate(id: number): Promise<EditRecipeModel> {
     const result = await this.ajax<EditRecipeModel>(`recipes/${id}/update`);
+
+    return result;
+  }
+
+  async getWithShares(id: number): Promise<RecipeWithShares> {
+    const result = await this.ajax<RecipeWithShares>(`recipes/${id}/with-shares`);
+
+    return result;
+  }
+
+  async getShareRequests(): Promise<Array<ShareRequest>> {
+    const result = await this.ajax<Array<ShareRequest>>("recipes/share-requests");
+
+    return result;
+  }
+
+  async getPendingShareRequestsCount(): Promise<number> {
+    const result = await this.ajax<number>(
+      "recipes/pending-share-requests-count"
+    );
 
     return result;
   }
@@ -166,6 +189,45 @@ export class RecipesService extends HttpProxyBase {
 
   async delete(id: number): Promise<void> {
     await this.ajaxExecute(`recipes/${id}`, {
+      method: "delete",
+    });
+  }
+
+  async canShareRecipeWithUser(email: string): Promise<CanShareRecipe> {
+    const result = await this.ajax<CanShareRecipe>(
+      `recipes/can-share-with-user/${email}`
+    );
+
+    return result;
+  }
+
+  async share(
+    id: number,
+    newShares: Array<number>,
+    removedShares: Array<number>
+  ): Promise<void> {
+    await this.ajaxExecute("recipes/share", {
+      method: "put",
+      body: json({
+        recipeId: id,
+        newShares: newShares,
+        removedShares: removedShares,
+      }),
+    });
+  }
+
+  async setShareIsAccepted(id: number, isAccepted: boolean): Promise<void> {
+    await this.ajaxExecute("recipes/share-is-accepted", {
+      method: "put",
+      body: json({
+        recipeId: id,
+        isAccepted: isAccepted,
+      }),
+    });
+  }
+
+  async leave(id: number): Promise<void> {
+    await this.ajaxExecute(`recipes/${id}/leave`, {
       method: "delete",
     });
   }

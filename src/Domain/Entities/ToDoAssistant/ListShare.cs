@@ -2,7 +2,7 @@
 
 namespace PersonalAssistant.Domain.Entities.ToDoAssistant
 {
-    public class Share : Entity
+    public class ListShare : Entity
     {
         public int ListId { get; set; }
         public int UserId { get; set; }

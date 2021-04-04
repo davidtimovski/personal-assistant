@@ -45,6 +45,11 @@ namespace PersonalAssistant.Application.Services.Common
             return _usersRepository.GetToBeNotifiedOfListChangeAsync(listId, excludeUserId);
         }
 
+        public Task<IEnumerable<User>> GetToBeNotifiedOfRecipeChangeAsync(int recipeId, int excludeUserId)
+        {
+            return _usersRepository.GetToBeNotifiedOfRecipeChangeAsync(recipeId, excludeUserId);
+        }
+
         public async Task<IEnumerable<User>> GetToBeNotifiedOfListChangeAsync(int listId, int excludeUserId, bool isPrivate)
         {
             if (isPrivate)
@@ -70,9 +75,19 @@ namespace PersonalAssistant.Application.Services.Common
             return _usersRepository.CheckIfUserCanBeNotifiedOfListChangeAsync(listId, userId);
         }
 
+        public Task<bool> CheckIfUserCanBeNotifiedOfRecipeChangeAsync(int recipeId, int userId)
+        {
+            return _usersRepository.CheckIfUserCanBeNotifiedOfRecipeChangeAsync(recipeId, userId);
+        }
+
         public Task<IEnumerable<User>> GetToBeNotifiedOfListDeletionAsync(int listId)
         {
             return _usersRepository.GetToBeNotifiedOfListDeletionAsync(listId);
+        }
+
+        public Task<IEnumerable<User>> GetToBeNotifiedOfRecipeDeletionAsync(int recipeId)
+        {
+            return _usersRepository.GetToBeNotifiedOfRecipeDeletionAsync(recipeId);
         }
 
         public Task<IEnumerable<User>> GetToBeNotifiedOfRecipeSentAsync(int recipeId)

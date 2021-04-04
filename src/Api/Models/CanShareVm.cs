@@ -1,4 +1,4 @@
-﻿namespace Api.Models.ToDoAssistant.Lists
+﻿namespace Api.Models
 {
     public class CanShareVm
     {

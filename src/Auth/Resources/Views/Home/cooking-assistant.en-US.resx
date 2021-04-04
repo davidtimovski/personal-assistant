@@ -126,6 +126,13 @@
 &lt;br&gt;
 &lt;ul class="green"&gt;
 &lt;li&gt;Create recipes&lt;/li&gt;
+&lt;li&gt;
+Share recipes with other users
+&lt;ul class="blue"&gt;
+&lt;li&gt;Get notifications in shared recipes&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Send recipes to other users&lt;/li&gt;
 &lt;li&gt;Link ingredients to tasks in To Do Assistant and see whether you have the required ingredients to prepare a meal&lt;/li&gt;
 &lt;li&gt;Set the nutritional values of ingredients and see the nutrition of recipes&lt;/li&gt;
 &lt;li&gt;Set the price of ingredients and see the cost of recipes&lt;/li&gt;

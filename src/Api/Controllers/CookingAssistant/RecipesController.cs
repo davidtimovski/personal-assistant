@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Api.Config;
+using Api.Models;
 using Api.Models.CookingAssistant.Recipes;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
@@ -41,6 +42,7 @@ namespace Api.Controllers.CookingAssistant
         private readonly ISenderService _senderService;
         private readonly IValidator<CreateRecipe> _createRecipeValidator;
         private readonly IValidator<UpdateRecipe> _updateRecipeValidator;
+        private readonly IValidator<ShareRecipe> _shareValidator;
         private readonly IValidator<CreateSendRequest> _createSendRequestValidator;
         private readonly IValidator<ImportRecipe> _importRecipeValidator;
         private readonly IValidator<UploadTempImage> _uploadTempImageValidator;
@@ -57,6 +59,7 @@ namespace Api.Controllers.CookingAssistant
             ISenderService senderService,
             IValidator<CreateRecipe> createRecipeValidator,
             IValidator<UpdateRecipe> updateRecipeValidator,
+            IValidator<ShareRecipe> shareValidator,
             IValidator<CreateSendRequest> createSendRequestValidator,
             IValidator<ImportRecipe> importRecipeValidator,
             IValidator<UploadTempImage> uploadTempImageValidator,
@@ -72,6 +75,7 @@ namespace Api.Controllers.CookingAssistant
             _senderService = senderService;
             _createRecipeValidator = createRecipeValidator;
             _updateRecipeValidator = updateRecipeValidator;
+            _shareValidator = shareValidator;
             _createSendRequestValidator = createSendRequestValidator;
             _importRecipeValidator = importRecipeValidator;
             _uploadTempImageValidator = uploadTempImageValidator;
@@ -138,6 +142,64 @@ namespace Api.Controllers.CookingAssistant
             }
 
             return Ok(recipeDto);
+        }
+
+        [HttpGet("{id}/with-shares")]
+        public async Task<IActionResult> GetWithShares(int id)
+        {
+            int userId;
+            try
+            {
+                userId = IdentityHelper.GetUserId(User);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+
+            RecipeWithShares list = await _recipeService.GetWithSharesAsync(id, userId);
+            if (list == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(list);
+        }
+
+        [HttpGet("share-requests")]
+        public async Task<IActionResult> GetShareRequests()
+        {
+            int userId;
+            try
+            {
+                userId = IdentityHelper.GetUserId(User);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+
+            IEnumerable<ShareRecipeRequest> shareRequests = await _recipeService.GetShareRequestsAsync(userId);
+
+            return Ok(shareRequests);
+        }
+
+        [HttpGet("pending-share-requests-count")]
+        public async Task<IActionResult> GetPendingShareRequestsCount()
+        {
+            int userId;
+            try
+            {
+                userId = IdentityHelper.GetUserId(User);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+
+            int pendingShareRequestsCount = await _recipeService.GetPendingShareRequestsCountAsync(userId);
+
+            return Ok(pendingShareRequestsCount);
         }
 
         [HttpGet("{id}/sending")]
@@ -291,7 +353,30 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            await _recipeService.UpdateAsync(dto, _updateRecipeValidator);
+            RecipeToNotify original = await _recipeService.UpdateAsync(dto, _updateRecipeValidator);
+
+            // Notify
+            var usersToBeNotified = await _userService.GetToBeNotifiedOfRecipeChangeAsync(original.Id, dto.UserId);
+            if (usersToBeNotified.Any())
+            {
+                var currentUser = await _userService.GetAsync(dto.UserId);
+
+                foreach (var user in usersToBeNotified)
+                {
+                    CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
+                    var message = _localizer["UpdatedRecipeNotification", IdentityHelper.GetUserName(User), original.Name];
+
+                    var pushNotification = new PushNotification
+                    {
+                        SenderImageUri = currentUser.ImageUri,
+                        UserId = user.Id,
+                        Application = "Cooking Assistant",
+                        Message = message
+                    };
+
+                    _senderService.Enqueue(pushNotification);
+                }
+            }
 
             return NoContent();
         }
@@ -309,7 +394,199 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            await _recipeService.DeleteAsync(id, userId);
+            var deletedRecipeName = await _recipeService.DeleteAsync(id, userId);
+
+            // Notify
+            var usersToBeNotified = await _userService.GetToBeNotifiedOfRecipeDeletionAsync(id);
+            if (usersToBeNotified.Any())
+            {
+                var currentUser = await _userService.GetAsync(userId);
+
+                foreach (var user in usersToBeNotified)
+                {
+                    CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
+                    var message = _localizer["DeletedRecipeNotification", IdentityHelper.GetUserName(User), deletedRecipeName];
+
+                    var pushNotification = new PushNotification
+                    {
+                        SenderImageUri = currentUser.ImageUri,
+                        UserId = user.Id,
+                        Application = "Cooking Assistant",
+                        Message = message
+                    };
+
+                    _senderService.Enqueue(pushNotification);
+                }
+            }
+
+            return NoContent();
+        }
+
+        [HttpGet("can-share-with-user/{email}")]
+        public async Task<IActionResult> CanShareRecipeWithUser(string email)
+        {
+            int userId;
+            try
+            {
+                userId = IdentityHelper.GetUserId(User);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+
+            var canShareVm = new CanShareVm
+            {
+                CanShare = false
+            };
+
+            var user = await _userService.GetAsync(email);
+
+            if (user != null)
+            {
+                canShareVm.UserId = user.Id;
+                canShareVm.ImageUri = user.ImageUri;
+                canShareVm.CanShare = await _recipeService.CanShareWithUserAsync(user.Id, userId);
+            }
+
+            return Ok(canShareVm);
+        }
+
+        [HttpPut("share")]
+        public async Task<IActionResult> Share([FromBody] ShareRecipe dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                dto.UserId = IdentityHelper.GetUserId(User);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+
+            foreach (int removedUserId in dto.RemovedShares)
+            {
+                // Notify
+                if (await _userService.CheckIfUserCanBeNotifiedOfRecipeChangeAsync(dto.RecipeId, removedUserId))
+                {
+                    var currentUser = await _userService.GetAsync(dto.UserId);
+                    var user = await _userService.GetAsync(removedUserId);
+                    RecipeToNotify recipe = await _recipeService.GetAsync(dto.RecipeId);
+
+                    CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
+                    var message = _localizer["RemovedShareNotification", IdentityHelper.GetUserName(User), recipe.Name];
+
+                    var pushNotification = new PushNotification
+                    {
+                        SenderImageUri = currentUser.ImageUri,
+                        UserId = user.Id,
+                        Application = "Cooking Assistant",
+                        Message = message
+                    };
+
+                    _senderService.Enqueue(pushNotification);
+                }
+            }
+
+            await _recipeService.ShareAsync(dto, _shareValidator);
+
+            return NoContent();
+        }
+
+        [HttpPut("share-is-accepted")]
+        public async Task<IActionResult> SetShareIsAccepted([FromBody] SetShareIsAcceptedDto dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest();
+            }
+
+            int userId;
+            try
+            {
+                userId = IdentityHelper.GetUserId(User);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+
+            await _recipeService.SetShareIsAcceptedAsync(dto.RecipeId, userId, dto.IsAccepted);
+
+            // Notify
+            var usersToBeNotified = await _userService.GetToBeNotifiedOfRecipeChangeAsync(dto.RecipeId, userId);
+            if (usersToBeNotified.Any())
+            {
+                var currentUser = await _userService.GetAsync(userId);
+                RecipeToNotify recipe = await _recipeService.GetAsync(dto.RecipeId);
+                var localizerKey = dto.IsAccepted ? "JoinedRecipeNotification" : "DeclinedShareRequestNotification";
+
+                foreach (var user in usersToBeNotified)
+                {
+                    CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
+                    var message = _localizer[localizerKey, IdentityHelper.GetUserName(User), recipe.Name];
+
+                    var pushNotification = new PushNotification
+                    {
+                        SenderImageUri = currentUser.ImageUri,
+                        UserId = user.Id,
+                        Application = "Cooking Assistant",
+                        Message = message
+                    };
+
+                    _senderService.Enqueue(pushNotification);
+                }
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}/leave")]
+        public async Task<IActionResult> Leave(int id)
+        {
+            int userId;
+            try
+            {
+                userId = IdentityHelper.GetUserId(User);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+
+            bool shareWasAccepted = await _recipeService.LeaveAsync(id, userId);
+
+            // Notify if joined in the first place
+            if (shareWasAccepted)
+            {
+                var usersToBeNotified = await _userService.GetToBeNotifiedOfRecipeChangeAsync(id, userId);
+                if (usersToBeNotified.Any())
+                {
+                    var currentUser = await _userService.GetAsync(userId);
+                    RecipeToNotify recipe = await _recipeService.GetAsync(id);
+
+                    foreach (var user in usersToBeNotified)
+                    {
+                        CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
+                        var message = _localizer["LeftRecipeNotification", IdentityHelper.GetUserName(User), recipe.Name];
+
+                        var pushNotification = new PushNotification
+                        {
+                            SenderImageUri = currentUser.ImageUri,
+                            UserId = user.Id,
+                            Application = "Cooking Assistant",
+                            Message = message
+                        };
+
+                        _senderService.Enqueue(pushNotification);
+                    }
+                }
+            }
 
             return NoContent();
         }

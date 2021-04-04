@@ -4,7 +4,7 @@ using PersonalAssistant.Domain.Entities.ToDoAssistant;
 
 namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models
 {
-    public class ShareRequest : IMapFrom<Share>
+    public class ShareListRequest : IMapFrom<ListShare>
     {
         public int ListId { get; set; }
         public string ListName { get; set; }
@@ -13,7 +13,7 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models
 
         public void Mapping(Profile profile)
         {
-            profile.CreateMap<Share, ShareRequest>()
+            profile.CreateMap<ListShare, ShareListRequest>()
                 .ForMember(x => x.ListName, opt => opt.MapFrom(src => src.List.Name))
                 .ForMember(x => x.ListOwnerName, opt => opt.MapFrom(src => src.User.Name));
         }

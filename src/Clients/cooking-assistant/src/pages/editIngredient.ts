@@ -32,11 +32,12 @@ export class EditIngredient {
   private ingredientId: number;
   private model: EditIngredientModel;
   private originalIngredientJson: string;
-  private nameIsInvalid: boolean;
+  private ingredientLinkedMessage: string;
   private tasksSearchVisible = false;
   private autocomplete: AutocompleteResult;
   private taskSuggestions = new Array<IngredientSuggestion>();
   private pickTaskInput: HTMLInputElement;
+  private nameIsInvalid: boolean;
   private caloriesIsInvalid: boolean;
   private fatIsInvalid: boolean;
   private saturatedFatIsInvalid: boolean;
@@ -109,6 +110,13 @@ export class EditIngredient {
           this.router.navigateToRoute("notFound");
         }
         this.model = ingredient;
+
+        if (this.model.taskId) {
+          this.ingredientLinkedMessage = this.i18n.tr("editIngredient.thisIngredientIsLinked", {
+            taskName: this.model.name,
+            taskList: this.model.taskList
+          });
+        }
 
         if (!this.model.priceData.isSet) {
           this.model.priceData.currency = this.currency;
@@ -224,7 +232,7 @@ export class EditIngredient {
 
     this.autocomplete = autocomplete({
       input: this.pickTaskInput,
-      minLength: 1,
+      minLength: 2,
       fetch: (
         text: string,
         update: (items: IngredientSuggestion[]) => void
@@ -236,6 +244,11 @@ export class EditIngredient {
       },
       onSelect: (suggestion: IngredientSuggestion) => {
         this.nameIsInvalid = false;
+
+        this.ingredientLinkedMessage = this.i18n.tr("editIngredient.thisIngredientIsLinked", {
+          taskName: suggestion.name,
+          taskList: suggestion.group
+        });
 
         this.model.taskId = suggestion.taskId;
         this.model.name = suggestion.name;

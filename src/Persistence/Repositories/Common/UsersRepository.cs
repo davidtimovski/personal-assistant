@@ -73,16 +73,45 @@ namespace PersonalAssistant.Persistence.Repositories.Common
                                             new { ListId = listId, ExcludeUserId = excludeUserId });
         }
 
+        public async Task<IEnumerable<User>> GetToBeNotifiedOfRecipeChangeAsync(int recipeId, int excludeUserId)
+        {
+            using DbConnection conn = Connection;
+            await conn.OpenAsync();
+
+            return await conn.QueryAsync<User>(@"SELECT u.*
+                                                FROM ""AspNetUsers"" AS u
+                                                INNER JOIN ""CookingAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
+                                                WHERE u.""Id"" != @ExcludeUserId AND s.""RecipeId"" = @RecipeId AND s.""IsAccepted"" AND u.""ToDoNotificationsEnabled""
+                                                UNION
+                                                SELECT u.*
+                                                FROM ""AspNetUsers"" AS u
+                                                INNER JOIN ""CookingAssistant.Recipes"" AS r ON u.""Id"" = r.""UserId""
+                                                WHERE u.""Id"" != @ExcludeUserId AND r.""Id"" = @RecipeId AND u.""ToDoNotificationsEnabled""",
+                                            new { RecipeId = recipeId, ExcludeUserId = excludeUserId });
+        }
+
         public async Task<bool> CheckIfUserCanBeNotifiedOfListChangeAsync(int listId, int userId)
         {
             using DbConnection conn = Connection;
             await conn.OpenAsync();
 
             return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                             FROM ""AspNetUsers"" AS u
-                                                             INNER JOIN ""ToDoAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
-                                                             WHERE u.""Id"" = @UserId AND s.""ListId"" = @ListId AND s.""IsAccepted"" AND u.""ToDoNotificationsEnabled"" AND s.""NotificationsEnabled""",
+                                                         FROM ""AspNetUsers"" AS u
+                                                         INNER JOIN ""ToDoAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
+                                                         WHERE u.""Id"" = @UserId AND s.""ListId"" = @ListId AND s.""IsAccepted"" AND u.""ToDoNotificationsEnabled"" AND s.""NotificationsEnabled""",
                                                          new { ListId = listId, UserId = userId });
+        }
+
+        public async Task<bool> CheckIfUserCanBeNotifiedOfRecipeChangeAsync(int recipeId, int userId)
+        {
+            using DbConnection conn = Connection;
+            await conn.OpenAsync();
+
+            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
+                                                         FROM ""AspNetUsers"" AS u
+                                                         INNER JOIN ""CookingAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
+                                                         WHERE u.""Id"" = @UserId AND s.""RecipeId"" = @RecipeId AND s.""IsAccepted"" AND u.""ToDoNotificationsEnabled""",
+                                                         new { RecipeId = recipeId, UserId = userId });
         }
 
         public async Task<IEnumerable<User>> GetToBeNotifiedOfListDeletionAsync(int listId)
@@ -95,6 +124,18 @@ namespace PersonalAssistant.Persistence.Repositories.Common
                                                 INNER JOIN ""ToDoAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
                                                 WHERE s.""ListId"" = @ListId AND s.""IsAccepted"" AND u.""ToDoNotificationsEnabled"" AND s.""NotificationsEnabled""",
                                             new { ListId = listId });
+        }
+
+        public async Task<IEnumerable<User>> GetToBeNotifiedOfRecipeDeletionAsync(int recipeId)
+        {
+            using DbConnection conn = Connection;
+            await conn.OpenAsync();
+
+            return await conn.QueryAsync<User>(@"SELECT u.*
+                                                FROM ""AspNetUsers"" AS u
+                                                INNER JOIN ""CookingAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
+                                                WHERE s.""RecipeId"" = @RecipeId AND s.""IsAccepted"" AND u.""ToDoNotificationsEnabled""",
+                                            new { RecipeId = recipeId });
         }
 
         public async Task<IEnumerable<User>> GetToBeNotifiedOfRecipeSentAsync(int recipeId)

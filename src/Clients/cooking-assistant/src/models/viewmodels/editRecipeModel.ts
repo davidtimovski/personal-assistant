@@ -1,5 +1,6 @@
 import { EditRecipeIngredient } from "./editRecipeIngredient";
 import * as environment from "../../../config/environment.json";
+import { SharingState } from "./sharingState";
 
 export class EditRecipeModel {
   public id: number;
@@ -12,6 +13,7 @@ export class EditRecipeModel {
   public servings: number;
   public imageUri: string;
   public videoUrl: string;
+  public sharingState: SharingState;
 
   constructor() {
     this.id = 0;

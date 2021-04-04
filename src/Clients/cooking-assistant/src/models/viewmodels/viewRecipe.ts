@@ -1,6 +1,7 @@
 import { Ingredient } from "./ingredient";
 import { NutritionSummary } from "./nutritionSummary";
 import { CostSummary } from "./costSummary";
+import { SharingState } from "./sharingState";
 
 export class ViewRecipe {
   constructor(
@@ -16,7 +17,8 @@ export class ViewRecipe {
     public videoUrl: string,
     public lastOpenedDate: Date,
     public nutritionSummary: NutritionSummary,
-    public costSummary: CostSummary
+    public costSummary: CostSummary,
+    public sharingState: SharingState
   ) {
     this.ingredients = ingredients || new Array<Ingredient>();
   }

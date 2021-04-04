@@ -11,6 +11,7 @@ using PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients.Model
 using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
 using PersonalAssistant.Domain.Entities.CookingAssistant;
+using PersonalAssistant.Domain.Entities.ToDoAssistant;
 
 namespace PersonalAssistant.Application.Services.CookingAssistant
 {
@@ -59,9 +60,9 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
         public async Task<IEnumerable<IngredientSuggestion>> GetTaskSuggestionsAsync(int userId)
         {
-            IEnumerable<Ingredient> ingredients = await _ingredientsRepository.GetTaskSuggestionsAsync(userId);
+            IEnumerable<ToDoTask> tasks = await _ingredientsRepository.GetTaskSuggestionsAsync(userId);
 
-            var result = ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x));
+            var result = tasks.Select(x => _mapper.Map<IngredientSuggestion>(x));
             result = result.OrderBy(x => x.Group);
 
             return result;
