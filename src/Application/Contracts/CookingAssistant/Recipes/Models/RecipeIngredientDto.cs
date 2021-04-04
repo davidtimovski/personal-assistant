@@ -21,6 +21,7 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Model
                 .ForMember(x => x.Id, opt => opt.MapFrom(src => src.Ingredient.Id))
                 .ForMember(x => x.TaskId, opt => opt.MapFrom(src => src.Ingredient.TaskId))
                 .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Ingredient.Name))
+                .ForMember(x => x.AmountPerServing, opt => opt.Ignore())
                 .ForMember(x => x.Unit, opt => opt.MapFrom(src => src.Unit))
                 .ForMember(x => x.Missing, opt => opt.MapFrom(src => src.Ingredient.Task != null ? !src.Ingredient.Task.IsCompleted : false));
         }

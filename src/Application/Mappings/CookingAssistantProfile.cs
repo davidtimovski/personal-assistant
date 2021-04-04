@@ -26,6 +26,7 @@ namespace PersonalAssistant.Application.Mappings
                 .ForMember(x => x.ModifiedDate, src => src.Ignore())
                 .ForMember(x => x.User, src => src.Ignore())
                 .ForMember(x => x.RecipeIngredients, opt => opt.MapFrom(src => src.Ingredients))
+                .ForMember(x => x.Shares, opt => opt.Ignore())
                 .ForMember(x => x.IngredientsMissing, src => src.Ignore());
             CreateMap<UpdateRecipe, Recipe>()
                 .ForMember(x => x.LastOpenedDate, src => src.Ignore())
@@ -33,6 +34,7 @@ namespace PersonalAssistant.Application.Mappings
                 .ForMember(x => x.ModifiedDate, src => src.Ignore())
                 .ForMember(x => x.User, src => src.Ignore())
                 .ForMember(x => x.RecipeIngredients, opt => opt.MapFrom(src => src.Ingredients))
+                .ForMember(x => x.Shares, opt => opt.Ignore())
                 .ForMember(x => x.IngredientsMissing, src => src.Ignore());
             CreateMap<UpdateRecipeIngredient, RecipeIngredient>()
                 .ForMember(x => x.RecipeId, src => src.Ignore())
