@@ -1,10 +1,10 @@
 name: Build and push
 
-on: workflow_dispatch
-# on:
-  # push:
+# on: workflow_dispatch
+on:
+  push:
     # branches: [ main ]
-    # branches: [ feature/docker ]
+    branches: [ feature/docker ]
   
 
 env:
