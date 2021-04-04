@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: "Build Api image"
-        run: docker build ./src/Api --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:api-latest
+        run: docker build src/Api --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:api-latest
 
       - name: "Login to Registry"
         uses: docker/login-action@v1.6.0
