@@ -132,6 +132,8 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
             if (recipe != null)
             {
+                recipe.Shares = (await conn.QueryAsync<RecipeShare>(@"SELECT * FROM ""CookingAssistant.Shares"" WHERE ""RecipeId"" = @Id", new { Id = id })).ToList();
+
                 var recipeIngredientsSql = @"SELECT ri.""Amount"", ri.""Unit"", i.""Id"", i.""TaskId"", 
                                                     i.""Name"", t.""Id"", t.""Name"", l.""Id"", l.""Name""
                                                  FROM ""CookingAssistant.RecipesIngredients"" AS ri
@@ -160,9 +162,6 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
                 recipe.RecipeIngredients.AddRange(recipeIngredients);
             }
-
-            await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.Recipes"" SET ""LastOpenedDate"" = @LastOpenedDate WHERE ""Id"" = @Id",
-                new { Id = id, LastOpenedDate = DateTime.UtcNow });
 
             return recipe;
         }
@@ -361,6 +360,15 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
             return await conn.ExecuteScalarAsync<string>(@"SELECT ""ImageUri"" FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @Id",
                 new { Id = id });
+        }
+
+        public async Task<bool> UserOwnsAsync(int id, int userId)
+        {
+            using DbConnection conn = Connection;
+            await conn.OpenAsync();
+
+            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
+                new { Id = id, UserId = userId });
         }
 
         public async Task<bool> ExistsAsync(int id, int userId)

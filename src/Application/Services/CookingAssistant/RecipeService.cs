@@ -403,7 +403,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
         public async Task<string> DeleteAsync(int id, int userId)
         {
-            if (!await ExistsAsync(id, userId))
+            if (!await _recipesRepository.UserOwnsAsync(id, userId))
             {
                 throw new ValidationException("Unauthorized");
             }

@@ -24,6 +24,7 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes
         Task<Recipe> GetForReviewAsync(int id);
         Task<IEnumerable<string>> GetAllImageUrisAsync(int userId);
         Task<string> GetImageUriAsync(int id);
+        Task<bool> UserOwnsAsync(int id, int userId);
         Task<bool> ExistsAsync(int id, int userId);
         Task<bool> ExistsAsync(string name, int userId);
         Task<bool> ExistsAsync(int id, string name, int userId);

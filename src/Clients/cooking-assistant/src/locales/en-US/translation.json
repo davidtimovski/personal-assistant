@@ -115,7 +115,8 @@
     "recipeIsFor": "This recipe is for",
     "create": "Create",
     "leave": "Leave",
-    "deleteSuccessful": "Recipe was successfully deleted"
+    "deleteSuccessful": "Recipe was successfully deleted",
+    "youHaveLeftTheRecipe": "You have left the recipe"
   },
   "shareRecipe": {
     "share": "Share",

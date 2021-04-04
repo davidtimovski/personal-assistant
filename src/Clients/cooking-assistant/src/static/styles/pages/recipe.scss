@@ -87,6 +87,9 @@
 .recipe-ingredients-table tbody tr.missing td {
   color: var(--danger-color);
 }
+.recipe-ingredients-table .ingredient-amount {
+  white-space: nowrap;
+}
 
 .instructions-wrap {
   background: #fafafa;

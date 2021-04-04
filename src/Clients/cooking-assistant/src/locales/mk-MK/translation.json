@@ -115,7 +115,8 @@
     "recipeIsFor": "Овој рецепт е за",
     "create": "Креирај",
     "leave": "Напушти",
-    "deleteSuccessful": "Рецептот беше успешно избришан"
+    "deleteSuccessful": "Рецептот беше успешно избришан",
+    "youHaveLeftTheRecipe": "Го напуштивте рецептот"
   },
   "shareRecipe": {
     "share": "Сподели",
