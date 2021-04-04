@@ -1,9 +1,10 @@
 name: Build and push
 
 on:
-  push:
+  # push:
     # branches: [ main ]
-    branches: [ feature/docker ]
+    # branches: [ feature/docker ]
+  workflow_dispatch:
 
 env:
   REGISTRY_URL: registry.hub.docker.com # ${{ secrets.REGISTRY_URL }}
