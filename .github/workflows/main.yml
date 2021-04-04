@@ -6,7 +6,7 @@ on:
     branches: [ feature/docker ]
 
 env:
-  REGISTRY_URL: https://hub.docker.com/ # ${{ secrets.REGISTRY_URL }}
+  REGISTRY_URL: registry.hub.docker.com # ${{ secrets.REGISTRY_URL }}
   REGISTRY_IMAGE: martinsimonovski/personal-assistant # ${{ secrets.REGISTRY_IMAGE }}
   REGISTRY_USERNAME: martinsimonovski # ${{ secrets.REGISTRY_USERNAME }}
   REGISTRY_TOKEN: 57579ed0-c68d-40b9-9cab-e1f4fae64a9b # ${{ secrets.REGISTRY_TOKEN }}
