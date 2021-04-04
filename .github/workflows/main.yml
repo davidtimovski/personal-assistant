@@ -1,0 +1,33 @@
+name: Build and push
+
+on:
+  push:
+    # branches: [ main ]
+    branches: [ feature/docker ]
+
+env:
+  REGISTRY_URL: https://hub.docker.com/ # ${{ secrets.REGISTRY_URL }}
+  REGISTRY_IMAGE: martinsimonovski/personal-assistant # ${{ secrets.REGISTRY_IMAGE }}
+  REGISTRY_USERNAME: martinsimonovski # ${{ secrets.REGISTRY_USERNAME }}
+  REGISTRY_TOKEN: 57579ed0-c68d-40b9-9cab-e1f4fae64a9b # ${{ secrets.REGISTRY_TOKEN }}
+
+jobs:
+  build:
+    name: "Checkout and build"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v2
+
+      - name: "Build Api image"
+        run: docker build ./src/Api/Dockerfile --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:api-latest
+
+      - name: "Login to Registry"
+        uses: docker/login-action@v1.6.0
+        with:
+          registry: ${{ env.REGISTRY_URL }}
+          username: ${{ env.REGISTRY_USERNAME }}
+          password: ${{ env.REGISTRY_TOKEN }}
+
+      - name: "Publish image"
+        run: docker push ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:api-latest
