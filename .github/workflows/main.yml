@@ -22,6 +22,12 @@ jobs:
       - name: "Build Api image"
         run: docker build -f ./src/Api/Dockerfile . --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:api-latest
 
+      - name: "Build Auth image"
+        run: docker build -f ./src/Auth/Dockerfile . --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:auth-latest
+
+      - name: "Build Sender image"
+        run: docker build -f ./src/Sender/Dockerfile . --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:sender-latest
+
       - name: "Login to Registry"
         uses: docker/login-action@v1.6.0
         with:
@@ -29,5 +35,11 @@ jobs:
           username: ${{ env.REGISTRY_USERNAME }}
           password: ${{ env.REGISTRY_TOKEN }}
 
-      - name: "Publish image"
+      - name: "Publish api image"
         run: docker push ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:api-latest
+      
+      - name: "Publish auth image"
+        run: docker push ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:auth-latest
+
+      - name: "Publish sender image"
+        run: docker push ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:sender-latest
