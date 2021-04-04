@@ -88,14 +88,14 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
             {
                 await conn.QueryAsync<int>(@"UPDATE ""Accountant.DeletedEntities"" SET ""DeletedDate"" = @DeletedDate
                                              WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""EntityId"" = @EntityId",
-                                             new { UserId = userId, EntityType = (short)EntityType.Category, EntityId = id, DeletedDate = DateTime.Now },
+                                             new { UserId = userId, EntityType = (short)EntityType.Category, EntityId = id, DeletedDate = DateTime.UtcNow },
                                              transaction);
             }
             else
             {
                 await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.DeletedEntities"" (""UserId"", ""EntityType"", ""EntityId"", ""DeletedDate"")
                                          VALUES (@UserId, @EntityType, @EntityId, @DeletedDate)",
-                                         new { UserId = userId, EntityType = (short)EntityType.Category, EntityId = id, DeletedDate = DateTime.Now },
+                                         new { UserId = userId, EntityType = (short)EntityType.Category, EntityId = id, DeletedDate = DateTime.UtcNow },
                                          transaction);
             }
 

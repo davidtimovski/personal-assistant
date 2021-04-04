@@ -76,11 +76,11 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
             if (recipe.UserId == userId)
             {
-                await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.Recipes"" SET ""LastOpenedDate"" = @LastOpenedDate WHERE ""Id"" = @Id", new { Id = id, LastOpenedDate = DateTime.Now });
+                await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.Recipes"" SET ""LastOpenedDate"" = @LastOpenedDate WHERE ""Id"" = @Id", new { Id = id, LastOpenedDate = DateTime.UtcNow });
             }
             else
             {
-                await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.Shares"" SET ""LastOpenedDate"" = @LastOpenedDate WHERE ""RecipeId"" = @Id", new { Id = id, LastOpenedDate = DateTime.Now });
+                await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.Shares"" SET ""LastOpenedDate"" = @LastOpenedDate WHERE ""RecipeId"" = @Id", new { Id = id, LastOpenedDate = DateTime.UtcNow });
             }
 
             recipe.Shares = (await conn.QueryAsync<RecipeShare>(@"SELECT * FROM ""CookingAssistant.Shares"" WHERE ""RecipeId"" = @Id", new { Id = id })).ToList();
@@ -162,7 +162,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
             }
 
             await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.Recipes"" SET ""LastOpenedDate"" = @LastOpenedDate WHERE ""Id"" = @Id",
-                new { Id = id, LastOpenedDate = DateTime.Now });
+                new { Id = id, LastOpenedDate = DateTime.UtcNow });
 
             return recipe;
         }
@@ -669,7 +669,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task<int> ImportAsync(int id, IEnumerable<(int Id, int ReplacementId, bool TransferNutritionData, bool TransferPriceData)> ingredientReplacements, string imageUri, int userId)
         {
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             using DbConnection conn = Connection;
             await conn.OpenAsync();

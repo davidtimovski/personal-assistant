@@ -125,7 +125,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
                 ingredient.Name = ingredient.Name.Trim();
             }
 
-            ingredient.ModifiedDate = DateTime.Now;
+            ingredient.ModifiedDate = DateTime.UtcNow;
 
             await _ingredientsRepository.UpdateAsync(ingredient);
         }

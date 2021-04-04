@@ -393,7 +393,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.Ingredients""
                                             SET ""Name"" = @Name, ""ModifiedDate"" = @ModifiedDate
                                             WHERE ""TaskId"" = @Id",
-                                          new { task.Id, task.Name, ModifiedDate = DateTime.Now }, transaction);
+                                          new { task.Id, task.Name, ModifiedDate = DateTime.UtcNow }, transaction);
             }
 
             var list = await conn.QueryFirstOrDefaultAsync<ToDoList>(@"SELECT * FROM ""ToDoAssistant.Lists"" WHERE ""Id"" = @Id", new { Id = id });
@@ -461,7 +461,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.Ingredients""
                                             SET ""Name"" = @Name, ""ModifiedDate"" = @ModifiedDate
                                             WHERE ""TaskId"" = @Id AND ""UserId"" = @UserId",
-                                          new { task.Id, UserId = userId, task.Name, ModifiedDate = DateTime.Now }, transaction);
+                                          new { task.Id, UserId = userId, task.Name, ModifiedDate = DateTime.UtcNow }, transaction);
             }
 
             var share = await conn.QueryFirstOrDefaultAsync<ListShare>(@"SELECT * 

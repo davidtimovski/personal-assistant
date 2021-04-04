@@ -18,16 +18,16 @@ namespace PersonalAssistant.Infrastructure.Currency
             _currencyRatesFilePath = currencyRatesFilePath;
 
             _currencyRatesJson = File.ReadAllText(_currencyRatesFilePath);
-            _lastLoaded = _currencyRatesJson == string.Empty ? DateTime.MinValue : DateTime.Now;
+            _lastLoaded = _currencyRatesJson == string.Empty ? DateTime.MinValue : DateTime.UtcNow;
         }
 
         public async Task<string> GetAllAsJsonAsync()
         {
-            var anHourAgo = DateTime.Now.AddHours(-1);
+            var anHourAgo = DateTime.UtcNow.AddHours(-1);
             if (_lastLoaded < anHourAgo)
             {
                 _currencyRatesJson = await File.ReadAllTextAsync(_currencyRatesFilePath);
-                _lastLoaded = DateTime.Now;
+                _lastLoaded = DateTime.UtcNow;
             }
 
             return _currencyRatesJson;
@@ -56,11 +56,11 @@ namespace PersonalAssistant.Infrastructure.Currency
 
         private Dictionary<string, decimal> GetAllAsDictionary()
         {
-            var anHourAgo = DateTime.Now.AddHours(-1);
+            var anHourAgo = DateTime.UtcNow.AddHours(-1);
             if (_lastLoaded < anHourAgo)
             {
                 _currencyRatesJson = File.ReadAllText(_currencyRatesFilePath);
-                _lastLoaded = DateTime.Now;
+                _lastLoaded = DateTime.UtcNow;
             }
 
             return JsonConvert.DeserializeObject<Dictionary<string, decimal>>(_currencyRatesJson);

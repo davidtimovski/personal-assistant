@@ -104,19 +104,19 @@ namespace PersonalAssistant.WorkerService
 
         private async Task DeleteTemporaryCdnResourcesAsync()
         {
-            var olderThan = DateTime.Now.AddDays(-2);
+            var olderThan = DateTime.UtcNow.AddDays(-2);
             await _cdnService.DeleteTemporaryResourcesAsync(olderThan);
         }
 
         private async Task DeleteOldNotificationsAsync()
         {
-            var aWeekAgo = DateTime.Now.AddDays(-7);
+            var aWeekAgo = DateTime.UtcNow.AddDays(-7);
             await _notificationsRepository.DeleteOldAsync(aWeekAgo);
         }
 
         private async Task DeleteOldDeletedEntityEntriesAsync()
         {
-            var threeMonthsAgo = DateTime.Now.AddMonths(-3);
+            var threeMonthsAgo = DateTime.UtcNow.AddMonths(-3);
             await _deletedEntitiesRepository.DeleteOldAsync(threeMonthsAgo);
         }
 

@@ -48,7 +48,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
             var exists = await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.DietaryProfiles"" WHERE ""UserId"" = @UserId",
                 new { dietaryProfile.UserId });
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             if (exists)
             {

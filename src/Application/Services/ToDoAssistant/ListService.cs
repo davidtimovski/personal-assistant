@@ -172,7 +172,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             var list = _mapper.Map<ToDoList>(model);
 
             list.Name = list.Name.Trim();
-            list.CreatedDate = list.ModifiedDate = DateTime.Now;
+            list.CreatedDate = list.ModifiedDate = DateTime.UtcNow;
 
             if (!string.IsNullOrEmpty(model.TasksText))
             {
@@ -235,7 +235,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             var list = _mapper.Map<ToDoList>(model);
 
             list.Name = list.Name.Trim();
-            list.ModifiedDate = DateTime.Now;
+            list.ModifiedDate = DateTime.UtcNow;
             ToDoList original = await _listsRepository.UpdateAsync(list);
 
             var result = _mapper.Map<UpdateListOriginal>(original);
@@ -249,7 +249,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
             var list = _mapper.Map<ToDoList>(model);
 
-            list.ModifiedDate = DateTime.Now;
+            list.ModifiedDate = DateTime.UtcNow;
             await _listsRepository.UpdateSharedAsync(list);
         }
 
@@ -267,7 +267,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
         {
             ValidateAndThrow(model, validator);
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             var newShares = new List<ListShare>();
             foreach (ShareUserAndPermission newShare in model.NewShares)
@@ -326,7 +326,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             var list = _mapper.Map<ToDoList>(model);
 
             list.Name = list.Name.Trim();
-            list.CreatedDate = list.ModifiedDate = DateTime.Now;
+            list.CreatedDate = list.ModifiedDate = DateTime.UtcNow;
 
             return await _listsRepository.CopyAsync(list);
         }
@@ -338,7 +338,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
                 throw new ValidationException("Unauthorized");
             }
 
-            await _listsRepository.SetIsArchivedAsync(id, userId, isArchived, DateTime.Now);
+            await _listsRepository.SetIsArchivedAsync(id, userId, isArchived, DateTime.UtcNow);
         }
 
         public async Task<bool> SetTasksAsNotCompletedAsync(int id, int userId)
@@ -348,12 +348,12 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
                 throw new ValidationException("Unauthorized");
             }
 
-            return await _listsRepository.SetTasksAsNotCompletedAsync(id, userId, DateTime.Now);
+            return await _listsRepository.SetTasksAsNotCompletedAsync(id, userId, DateTime.UtcNow);
         }
 
         public async Task SetShareIsAcceptedAsync(int id, int userId, bool isAccepted)
         {
-            await _listsRepository.SetShareIsAcceptedAsync(id, userId, isAccepted, DateTime.Now);
+            await _listsRepository.SetShareIsAcceptedAsync(id, userId, isAccepted, DateTime.UtcNow);
         }
 
         public async Task ReorderAsync(int id, int userId, short oldOrder, short newOrder)
@@ -363,7 +363,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
                 throw new ValidationException("Unauthorized");
             }
 
-            await _listsRepository.ReorderAsync(id, userId, oldOrder, newOrder, DateTime.Now);
+            await _listsRepository.ReorderAsync(id, userId, oldOrder, newOrder, DateTime.UtcNow);
         }
 
         private void ValidateAndThrow<T>(T model, IValidator<T> validator)

@@ -24,7 +24,7 @@ namespace PersonalAssistant.Application.Services.Common
                 Endpoint = endpoint,
                 AuthKey = authKey,
                 P256dhKey = p256dhKey,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTime.UtcNow
             };
 
             await _pushSubscriptionsRepository.CreateSubscriptionAsync(subscription);

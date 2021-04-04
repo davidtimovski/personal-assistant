@@ -320,7 +320,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.Ingredients""
                                       SET ""Name"" = @Name, ""ModifiedDate"" = @ModifiedDate
                                       WHERE ""TaskId"" = @Id",
-                                      new { task.Id, task.Name, ModifiedDate = DateTime.Now }, transaction);
+                                      new { task.Id, task.Name, ModifiedDate = DateTime.UtcNow }, transaction);
 
             await conn.ExecuteAsync(@"DELETE FROM ""ToDoAssistant.Tasks"" WHERE ""Id"" = @Id", new { Id = id }, transaction);
 

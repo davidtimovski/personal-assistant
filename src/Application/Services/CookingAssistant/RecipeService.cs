@@ -214,7 +214,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
             var recipe = _mapper.Map<Recipe>(model);
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             recipe.Name = recipe.Name.Trim();
 
@@ -339,7 +339,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
             var recipe = _mapper.Map<Recipe>(model);
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             recipe.Name = recipe.Name.Trim();
 
@@ -424,7 +424,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
         {
             ValidateAndThrow(model, validator);
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             var newShares = new List<RecipeShare>();
             foreach (int userId in model.NewShares)
@@ -454,7 +454,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
         public async Task SetShareIsAcceptedAsync(int id, int userId, bool isAccepted)
         {
-            await _recipesRepository.SetShareIsAcceptedAsync(id, userId, isAccepted, DateTime.Now);
+            await _recipesRepository.SetShareIsAcceptedAsync(id, userId, isAccepted, DateTime.UtcNow);
         }
 
         public async Task<bool> LeaveAsync(int id, int userId)
@@ -485,7 +485,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
                 sendRequests.Add(recipeSendRequest);
             }
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
             foreach (SendRequest request in sendRequests)
             {
                 request.CreatedDate = request.ModifiedDate = now;
@@ -496,7 +496,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
         public async Task DeclineSendRequestAsync(int id, int userId)
         {
-            await _recipesRepository.DeclineSendRequestAsync(id, userId, DateTime.Now);
+            await _recipesRepository.DeclineSendRequestAsync(id, userId, DateTime.UtcNow);
         }
 
         public async Task DeleteSendRequestAsync(int id, int userId)
