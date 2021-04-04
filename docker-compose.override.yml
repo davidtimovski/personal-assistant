@@ -9,6 +9,10 @@ services:
       - EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
       - EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
       - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
+      - AppSettings__Urls__PersonalAssistant=${PERSONAL_ASSISTANT_URL:-http://localhost:80}
+      - AppSettings__Urls__ToDoAssistant=${TODO_ASSISTANT_URL:-http://localhost:8080}
+      - AppSettings__Urls__CookingAssistant=${COOKING_ASSISTANT_URL:-http://localhost:8081}
+      - AppSettings__Urls__Accountant=${ACCOUNTANT_URL:-http://localhost:8082}
       - PORT=80
     ports:
       - "5000:80"
@@ -21,6 +25,10 @@ services:
       - EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
       - EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
       - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
+      - Urls__Authority=${AUTHORITY_URL:-auth:5000}
+      - Urls__ToDoAssistant=${TODO_ASSISTANT_URL:-http://localhost:8080}
+      - Urls__CookingAssistant=${COOKING_ASSISTANT_URL:-http://localhost:8081}
+      - Urls__Accountant=${ACCOUNTANT_URL:-http://localhost:8082}
       - PORT=80
     ports:
       - "5001:80"
@@ -45,16 +53,16 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - personalassistant-volume:/var/lib/postgresql/data
 
   rabbitmq:
     environment:
       RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE:-cookie}
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-rabbitmq}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-rabbitmq}
+      RABBITMQ_DEFAULT_USER: ${EVENT_BUS_USERNAME:-rabbitmq}
+      RABBITMQ_DEFAULT_PASS: ${EVENT_BUS_PASSWORD:-rabbitmq}
     ports:
       - "15672:15672"  # Important: In a production environment your should remove the external port
       - "5672:5672"    # Important: In a production environment your should remove the external port
 
 volumes:
-  postgres-data:
+  personalassistant-volume:
