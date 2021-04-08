@@ -70,7 +70,7 @@ namespace Auth
 
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
 
-            services.AddIdentityServer(options =>
+            var identityServerBuilder = services.AddIdentityServer(options =>
             {
                 options.Events.RaiseErrorEvents = true;
                 options.Events.RaiseInformationEvents = true;
@@ -94,8 +94,20 @@ namespace Auth
                     // This enables automatic token cleanup. This is optional.
                     options.EnableTokenCleanup = true;
                     options.TokenCleanupInterval = 30;
-                })
-                .AddSigningCredential(new X509Certificate2(Directory.GetCurrentDirectory() + "/" + Configuration["Certificate:Name"], Configuration["Certificate:Password"]));
+                });
+
+            var dataProtectionBuilder = services.AddDataProtection()
+                .PersistKeysToFileSystem(new DirectoryInfo(Configuration["AuthKeysDirectory"]));
+
+            if (WebHostEnvironment.EnvironmentName == "Development")
+            {
+                identityServerBuilder.AddDeveloperSigningCredential();
+            }
+            else
+            {
+                identityServerBuilder.AddSigningCredential(new X509Certificate2(Directory.GetCurrentDirectory() + "/" + Configuration["Certificate:Name"], Configuration["Certificate:Password"]));
+                dataProtectionBuilder.ProtectKeysWithCertificate(new X509Certificate2(Directory.GetCurrentDirectory() + "/" + Configuration["Certificate:Name"], Configuration["Certificate:Password"]));
+            }
 
             services.AddDataProtection()
                 .PersistKeysToFileSystem(new DirectoryInfo(Configuration["AuthKeysDirectory"]))
