@@ -11,7 +11,6 @@ on:
     types:
       - completed
   
-
 env:
   REGISTRY_URL: registry.hub.docker.com # ${{ secrets.REGISTRY_URL }}
   REGISTRY_IMAGE: martinsimonovski/personal-assistant # ${{ secrets.REGISTRY_IMAGE }}

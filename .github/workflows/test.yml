@@ -11,8 +11,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest]
-        dotnet: ['5.0.100', '5.0.201']
+        # os: [windows-latest, ubuntu-latest]
+        os: [windows-latest]
+        dotnet: ['5.0', '5.0.100']
       fail-fast: false
     steps:
       - uses: actions/checkout@v2
