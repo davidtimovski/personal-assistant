@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Options;
+using Persistence;
 using PersonalAssistant.Application.Contracts.Accountant.Transactions;
 using PersonalAssistant.Domain.Entities.Accountant;
 
@@ -12,8 +13,8 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 {
     public class TransactionsRepository : BaseRepository, ITransactionsRepository
     {
-        public TransactionsRepository(IOptions<DatabaseSettings> databaseSettings)
-            : base(databaseSettings.Value.DefaultConnectionString) { }
+        public TransactionsRepository(IOptions<DatabaseSettings> databaseSettings, PersonalAssistantContext efContext)
+            : base(databaseSettings.Value.DefaultConnectionString, efContext) { }
 
         public async Task<IEnumerable<Transaction>> GetAllForExportAsync(int userId, string uncategorized)
         {

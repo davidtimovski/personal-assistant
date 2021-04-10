@@ -4,7 +4,9 @@ using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Persistence;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
 using PersonalAssistant.Domain.Entities.Common;
 using PersonalAssistant.Domain.Entities.ToDoAssistant;
@@ -13,8 +15,8 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 {
     public class ListsRepository : BaseRepository, IListsRepository
     {
-        public ListsRepository(IOptions<DatabaseSettings> databaseSettings)
-            : base(databaseSettings.Value.DefaultConnectionString) { }
+        public ListsRepository(IOptions<DatabaseSettings> databaseSettings, PersonalAssistantContext efContext)
+            : base(databaseSettings.Value.DefaultConnectionString, efContext) { }
 
         public async Task<IEnumerable<ToDoList>> GetAllAsOptionsAsync(int userId)
         {
@@ -327,18 +329,16 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
         {
             using DbConnection conn = Connection;
             await conn.OpenAsync();
-            var transaction = conn.BeginTransaction();
 
             var listsCount = await conn.ExecuteScalarAsync<short>(@"SELECT COUNT(*)
                                                                     FROM ""ToDoAssistant.Lists"" AS l
                                                                     LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
                                                                     WHERE l.""IsArchived"" = FALSE AND l.""UserId"" = @UserId 
                                                                         OR (s.""UserId"" = @UserId AND s.""IsAccepted"" AND s.""IsArchived"" = FALSE)",
-                                                                    new { list.UserId }, transaction);
+                                                                    new { list.UserId });
             list.Order = ++listsCount;
 
-            list.Id = (await conn.QueryAsync<int>(@"INSERT INTO ""ToDoAssistant.Lists"" (""UserId"", ""Name"", ""Icon"", ""IsOneTimeToggleDefault"", ""Order"", ""CreatedDate"", ""ModifiedDate"") 
-                                                    VALUES (@UserId, @Name, @Icon, @IsOneTimeToggleDefault, @Order, @CreatedDate, @ModifiedDate) returning ""Id""", list, transaction)).Single();
+            using PersonalAssistantContext db = EFContext;
 
             for (short i = 0; i < list.Tasks.Count(); i++)
             {
@@ -346,36 +346,40 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 list.Tasks[i].Order = (short)(i + 1);
             }
 
-            await conn.ExecuteAsync(@"INSERT INTO ""ToDoAssistant.Tasks"" (""ListId"", ""Name"", ""IsOneTime"", ""Order"", ""CreatedDate"", ""ModifiedDate"")
-                                      VALUES (@ListId, @Name, @IsOneTime, @Order, @CreatedDate, @ModifiedDate)", list.Tasks, transaction);
+            db.Lists.Add(list);
 
-            transaction.Commit();
+            await db.SaveChangesAsync();
 
             return list.Id;
         }
 
         public async Task<ToDoList> UpdateAsync(ToDoList list)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using PersonalAssistantContext db = EFContext;
 
-            var originalList = await conn.QueryFirstOrDefaultAsync<ToDoList>(@"SELECT * FROM ""ToDoAssistant.Lists"" WHERE ""Id"" = @Id", new { list.Id });
+            ToDoList originalList = await db.Lists.AsNoTracking().FirstOrDefaultAsync(x => x.Id == list.Id);
 
-            await conn.ExecuteAsync(@"UPDATE ""ToDoAssistant.Lists"" 
-                                        SET ""Name"" = @Name, ""Icon"" = @Icon, ""IsOneTimeToggleDefault"" = @IsOneTimeToggleDefault, ""NotificationsEnabled"" = @NotificationsEnabled, ""ModifiedDate"" = @ModifiedDate 
-                                        WHERE ""Id"" = @Id", list);
+            ToDoList dbList = await db.Lists.FindAsync(list.Id);
+            dbList.Name = list.Name;
+            dbList.Icon = list.Icon;
+            dbList.IsOneTimeToggleDefault = list.IsOneTimeToggleDefault;
+            dbList.NotificationsEnabled = list.NotificationsEnabled;
+            dbList.ModifiedDate = list.ModifiedDate;
+
+            await db.SaveChangesAsync();
 
             return originalList;
         }
 
         public async Task UpdateSharedAsync(ToDoList list)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using PersonalAssistantContext db = EFContext;
 
-            await conn.ExecuteAsync(@"UPDATE ""ToDoAssistant.Shares"" 
-                                        SET ""NotificationsEnabled"" = @NotificationsEnabled, ""ModifiedDate"" = @ModifiedDate 
-                                        WHERE ""ListId"" = @Id AND ""UserId"" = @UserId", list);
+            ToDoList dbList = await db.Lists.FirstOrDefaultAsync(x => x.Id == list.Id && x.UserId == list.UserId);
+            dbList.NotificationsEnabled = list.NotificationsEnabled;
+            dbList.ModifiedDate = list.ModifiedDate;
+
+            await db.SaveChangesAsync();
         }
 
         public async Task<string> DeleteAsync(int id)

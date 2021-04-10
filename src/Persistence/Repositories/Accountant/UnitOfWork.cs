@@ -1,14 +1,15 @@
 ﻿using System.Data.Common;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using Persistence;
 using PersonalAssistant.Application.Contracts.Accountant.Common;
 
 namespace PersonalAssistant.Persistence.Repositories.Accountant
 {
     public class UnitOfWork : BaseRepository, IUnitOfWork
     {
-        public UnitOfWork(IOptions<DatabaseSettings> databaseSettings)
-            : base(databaseSettings.Value.DefaultConnectionString) { }
+        public UnitOfWork(IOptions<DatabaseSettings> databaseSettings, PersonalAssistantContext efContext)
+            : base(databaseSettings.Value.DefaultConnectionString, efContext) { }
 
         public async Task<(DbConnection conn, DbTransaction transaction)> StartTransactionAsync()
         {

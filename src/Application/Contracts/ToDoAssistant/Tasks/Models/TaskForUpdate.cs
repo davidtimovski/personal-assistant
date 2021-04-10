@@ -22,7 +22,8 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models
         {
             profile.CreateMap<ToDoTask, TaskForUpdate>()
                 .ForMember(x => x.IsPrivate, opt => opt.MapFrom<IsPrivateResolver>())
-                .ForMember(x => x.IsInSharedList, opt => opt.Ignore());
+                .ForMember(x => x.IsInSharedList, opt => opt.Ignore())
+                .ForMember(x => x.Recipes, opt => opt.Ignore());
         }
     }
 }

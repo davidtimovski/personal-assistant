@@ -10,6 +10,7 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks
         Task<ToDoTask> GetAsync(int id);
         Task<ToDoTask> GetAsync(int id, int userId);
         Task<ToDoTask> GetForUpdateAsync(int id, int userId);
+        Task<List<string>> GetRecipesAsync(int id, int userId);
         Task<bool> ExistsAsync(int id, int userId);
         Task<bool> ExistsAsync(string name, int listId, int userId);
         Task<bool> ExistsAsync(List<string> names, int listId, int userId);

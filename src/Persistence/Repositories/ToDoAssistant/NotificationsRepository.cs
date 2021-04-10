@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Options;
+using Persistence;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications;
 using PersonalAssistant.Domain.Entities.Common;
 using PersonalAssistant.Domain.Entities.ToDoAssistant;
@@ -13,8 +14,8 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 {
     public class NotificationsRepository : BaseRepository, INotificationsRepository
     {
-        public NotificationsRepository(IOptions<DatabaseSettings> databaseSettings)
-            : base(databaseSettings.Value.DefaultConnectionString) { }
+        public NotificationsRepository(IOptions<DatabaseSettings> databaseSettings, PersonalAssistantContext efContext)
+            : base(databaseSettings.Value.DefaultConnectionString, efContext) { }
 
         public async Task<IEnumerable<Notification>> GetAllAndFlagUnseenAsync(int userId)
         {

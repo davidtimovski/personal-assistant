@@ -3,6 +3,7 @@ using System.Data.Common;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Options;
+using Persistence;
 using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Domain.Entities.Common;
 
@@ -10,8 +11,8 @@ namespace PersonalAssistant.Persistence.Repositories.Common
 {
     public class CurrencyRatesRepository : BaseRepository, ICurrencyRatesRepository
     {
-        public CurrencyRatesRepository(IOptions<DatabaseSettings> databaseSettings)
-            : base(databaseSettings.Value.DefaultConnectionString) { }
+        public CurrencyRatesRepository(IOptions<DatabaseSettings> databaseSettings, PersonalAssistantContext efContext)
+            : base(databaseSettings.Value.DefaultConnectionString, efContext) { }
 
         public async Task<CurrencyRates> GetAsync(DateTime date)
         {

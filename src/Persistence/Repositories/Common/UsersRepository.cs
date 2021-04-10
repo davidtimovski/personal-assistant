@@ -3,6 +3,7 @@ using System.Data.Common;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Options;
+using Persistence;
 using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Domain.Entities.Common;
 
@@ -10,8 +11,8 @@ namespace PersonalAssistant.Persistence.Repositories.Common
 {
     public class UsersRepository : BaseRepository, IUsersRepository
     {
-        public UsersRepository(IOptions<DatabaseSettings> databaseSettings)
-            : base(databaseSettings.Value.DefaultConnectionString) { }
+        public UsersRepository(IOptions<DatabaseSettings> databaseSettings, PersonalAssistantContext efContext)
+            : base(databaseSettings.Value.DefaultConnectionString, efContext) { }
 
         public async Task<User> GetAsync(int id)
         {

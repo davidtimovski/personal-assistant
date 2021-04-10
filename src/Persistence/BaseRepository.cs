@@ -1,5 +1,6 @@
 ﻿using System.Data.Common;
 using Npgsql;
+using Persistence;
 
 namespace PersonalAssistant.Persistence
 {
@@ -7,17 +8,20 @@ namespace PersonalAssistant.Persistence
     {
         private readonly string _connectionString;
 
-        public BaseRepository(string connectionString)
+        public BaseRepository(string connectionString, PersonalAssistantContext efContext)
         {
             _connectionString = connectionString;
+            EFContext = efContext;
         }
 
-        internal DbConnection Connection
+        protected DbConnection Connection
         {
             get
             {
                 return new NpgsqlConnection(_connectionString);
             }
         }
+
+        protected readonly PersonalAssistantContext EFContext;
     }
 }

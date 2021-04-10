@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Options;
+using Persistence;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
 using PersonalAssistant.Domain.Entities.ToDoAssistant;
 
@@ -13,8 +14,8 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 {
     public class TasksRepository : BaseRepository, ITasksRepository
     {
-        public TasksRepository(IOptions<DatabaseSettings> databaseSettings)
-            : base(databaseSettings.Value.DefaultConnectionString) { }
+        public TasksRepository(IOptions<DatabaseSettings> databaseSettings, PersonalAssistantContext efContext)
+            : base(databaseSettings.Value.DefaultConnectionString, efContext) { }
 
         public async Task<ToDoTask> GetAsync(int id)
         {
@@ -48,20 +49,23 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                                                                     LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
                                                                     WHERE t.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
                                                                     new { Id = id, UserId = userId });
-            if (task == null)
-            {
-                return null;
-            }
 
-            task.Recipes = (await conn.QueryAsync<string>(@"SELECT r.""Name""
-                                                            FROM ""CookingAssistant.Ingredients"" AS i
-                                                            INNER JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
-                                                            LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
-                                                            LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
-                                                            WHERE i.""TaskId"" = @TaskId AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
-                                                            ORDER BY r.""Name""",
-                                                            new { TaskId = id, UserId = userId })).ToList();
             return task;
+        }
+
+        public async Task<List<string>> GetRecipesAsync(int id, int userId)
+        {
+            using DbConnection conn = Connection;
+            await conn.OpenAsync();
+
+            return (await conn.QueryAsync<string>(@"SELECT r.""Name""
+                                                    FROM ""CookingAssistant.Ingredients"" AS i
+                                                    INNER JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
+                                                    LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
+                                                    LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
+                                                    WHERE i.""TaskId"" = @TaskId AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
+                                                    ORDER BY r.""Name""",
+                                                    new { TaskId = id, UserId = userId })).ToList();
         }
 
         public async Task<bool> ExistsAsync(int id, int userId)

@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Persistence;
 using PersonalAssistant.Application.Contracts.Accountant.Accounts;
 using PersonalAssistant.Application.Contracts.Accountant.Categories;
 using PersonalAssistant.Application.Contracts.Accountant.Common;
@@ -43,6 +45,10 @@ namespace PersonalAssistant.Persistence
             services.Configure<DatabaseSettings>(options =>
             {
                 options.DefaultConnectionString = configuration["ConnectionStrings:DefaultConnection"];
+            });
+
+            services.AddDbContext<PersonalAssistantContext>(options => {
+                options.UseNpgsql(configuration["ConnectionStrings:DefaultConnection"]);
             });
 
             return services;

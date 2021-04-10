@@ -63,8 +63,7 @@ namespace PersonalAssistant.Application.Mappings
                 .ForMember(x => x.CreatedDate, src => src.Ignore())
                 .ForMember(x => x.ModifiedDate, src => src.Ignore())
                 .ForMember(x => x.List, src => src.Ignore())
-                .ForMember(x => x.User, src => src.Ignore())
-                .ForMember(x => x.Recipes, src => src.Ignore());
+                .ForMember(x => x.AssignedToUser, src => src.Ignore());
             CreateMap<BulkCreate, ToDoTask>()
                 .ForMember(x => x.Id, src => src.Ignore())
                 .ForMember(x => x.Name, src => src.Ignore())
@@ -76,8 +75,7 @@ namespace PersonalAssistant.Application.Mappings
                 .ForMember(x => x.CreatedDate, src => src.Ignore())
                 .ForMember(x => x.ModifiedDate, src => src.Ignore())
                 .ForMember(x => x.List, src => src.Ignore())
-                .ForMember(x => x.User, src => src.Ignore())
-                .ForMember(x => x.Recipes, src => src.Ignore());
+                .ForMember(x => x.AssignedToUser, src => src.Ignore());
             CreateMap<UpdateTask, ToDoTask>()
                 .ForMember(x => x.IsCompleted, src => src.Ignore())
                 .ForMember(t => t.PrivateToUserId, opt => opt.MapFrom<PrivateToUserIdUpdateResolver>())
@@ -85,8 +83,7 @@ namespace PersonalAssistant.Application.Mappings
                 .ForMember(x => x.CreatedDate, src => src.Ignore())
                 .ForMember(x => x.ModifiedDate, src => src.Ignore())
                 .ForMember(x => x.List, src => src.Ignore())
-                .ForMember(x => x.User, src => src.Ignore())
-                .ForMember(x => x.Recipes, src => src.Ignore());
+                .ForMember(x => x.AssignedToUser, src => src.Ignore());
 
             CreateMap<CreateOrUpdateNotification, Notification>()
                 .ForMember(x => x.Id, src => src.Ignore())
@@ -208,12 +205,12 @@ namespace PersonalAssistant.Application.Mappings
     {
         public AssignedUser Resolve(ToDoTask source, object dest, AssignedUser destMember, ResolutionContext context)
         {
-            if (source.User != null)
+            if (source.AssignedToUser != null)
             {
                 return new AssignedUser
                 {
-                    Id = source.User.Id,
-                    ImageUri = source.User.ImageUri
+                    Id = source.AssignedToUser.Id,
+                    ImageUri = source.AssignedToUser.ImageUri
                 };
             }
 

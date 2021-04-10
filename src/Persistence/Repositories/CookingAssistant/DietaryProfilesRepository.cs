@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Options;
+using Persistence;
 using PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles;
 using PersonalAssistant.Domain.Entities.Common;
 using PersonalAssistant.Domain.Entities.CookingAssistant;
@@ -12,8 +13,8 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 {
     public class DietaryProfilesRepository : BaseRepository, IDietaryProfilesRepository
     {
-        public DietaryProfilesRepository(IOptions<DatabaseSettings> databaseSettings)
-            : base(databaseSettings.Value.DefaultConnectionString) { }
+        public DietaryProfilesRepository(IOptions<DatabaseSettings> databaseSettings, PersonalAssistantContext efContext)
+            : base(databaseSettings.Value.DefaultConnectionString, efContext) { }
 
         public async Task<DietaryProfile> GetAsync(int userId)
         {
