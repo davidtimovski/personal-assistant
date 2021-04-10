@@ -1,10 +1,15 @@
 name: Build and push
 
 # on: workflow_dispatch
-on:
-  push:
+# on:
+  # push:
     # branches: [ main ]
-    branches: [ feature/docker ]
+    # branches: [ feature/docker ]
+on:
+  workflow_run:
+    workflows: ["Testing dotnet"]
+    types:
+      - completed
   
 
 env:
@@ -14,17 +19,6 @@ env:
   REGISTRY_TOKEN: 57579ed0-c68d-40b9-9cab-e1f4fae64a9b # ${{ secrets.REGISTRY_TOKEN }}
 
 jobs:
-  test:
-    name: "Run unit tests"
-    runs-on: ubuntu-latest
-    steps:
-      - name: "Checkout code"
-        uses: actions/checkout@v2
-        with:
-          dotnet-version: "5.0"
-      - run: dotnet build test/Application.UnitTests/Application.UnitTests.csproj
-      - run: dotnet test test/Application.UnitTests/Application.UnitTests.csproj
-
   build:
     name: "Checkout and build"
     runs-on: ubuntu-latest
