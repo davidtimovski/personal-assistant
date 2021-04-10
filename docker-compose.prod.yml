@@ -22,6 +22,7 @@ services:
       - "5000:80"
     volumes:
       - ./certs:/app/certs
+      - ./AuthKeys:/app/AuthKeys
     depends_on:
       - postgres
       - rabbitmq
