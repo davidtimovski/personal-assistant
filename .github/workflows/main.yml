@@ -22,8 +22,8 @@ jobs:
         uses: actions/checkout@v2
         with:
           dotnet-version: "5.0"
-      - run: dotnet build
-      - run: dotnet test
+      - run: dotnet build test/Application.UnitTests/Application.UnitTests.csproj
+      - run: dotnet test test/Application.UnitTests/Application.UnitTests.csproj
 
   build:
     name: "Checkout and build"
