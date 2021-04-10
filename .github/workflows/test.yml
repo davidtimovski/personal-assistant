@@ -13,6 +13,7 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-latest]
         dotnet: ['5.0.100', '5.0.201']
+      fail-fast: false
     steps:
       - uses: actions/checkout@v2
       - name: "Setup .NET Core ${{ matrix.dotnet }} on ${{ matrix.os }}"
