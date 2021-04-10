@@ -1,13 +1,13 @@
 name: Build and push
 
 # manual
-on: workflow_dispatch
+# on: workflow_dispatch
 
 # on every push to specific branch
-# on:
-  # push:
+on:
+  push:
     # branches: [ main ]
-    # branches: [ feature/docker ]
+    branches: [ feature/docker ]
 
 # when `Testing dotnet` finished
 # on:
