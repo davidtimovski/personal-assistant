@@ -8,7 +8,7 @@ on:
 jobs:
   test:
     name: "Run unit tests"
-    runs-on: ubuntu-16.04
+    runs-on: windows-latest
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v2
