@@ -1,15 +1,20 @@
 name: Build and push
 
-# on: workflow_dispatch
+# manual
+on: workflow_dispatch
+
+# on every push to specific branch
 # on:
   # push:
     # branches: [ main ]
     # branches: [ feature/docker ]
-on:
-  workflow_run:
-    workflows: ["Testing dotnet"]
-    types:
-      - completed
+
+# when `Testing dotnet` finished
+# on:
+  # workflow_run:
+    # workflows: ["Testing dotnet"]
+    # types:
+      # - completed
   
 env:
   REGISTRY_URL: registry.hub.docker.com # ${{ secrets.REGISTRY_URL }}
