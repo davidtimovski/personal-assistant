@@ -1,0 +1,91 @@
+version: '3.4'
+
+services:
+  auth: 
+    image: ${DOCKER_REGISTRY}:auth-latest
+    container_name: pa-auth
+    restart: always
+    environment:
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - ConnectionString=${PERSONAL_ASSISTANT_DB} 
+      - EventBusConnection=${EVENT_BUS_HOST}
+      - EventBusUserName=${EVENT_BUS_USERNAME}
+      - EventBusPassword=${EVENT_BUS_PASSWORD}
+      - AppSettings__Urls__PersonalAssistant=${PERSONAL_ASSISTANT_URL}
+      - AppSettings__Urls__ToDoAssistant=${TODO_ASSISTANT_URL}
+      - AppSettings__Urls__CookingAssistant=${COOKING_ASSISTANT_URL}
+      - AppSettings__Urls__Accountant=${ACCOUNTANT_URL}
+      - Certificate__Name=${CERTIFICATE_NAME}
+      - Certificate__Password=${CERTIFICATE_PASSWORD}
+      - PORT=80
+    ports:
+      - "5000:80"
+    volumes:
+      - ./certs:/app/certs
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  api:
+    image: ${DOCKER_REGISTRY}:api-latest
+    container_name: pa-api
+    restart: always
+    environment:
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - ConnectionString=${PERSONAL_ASSISTANT_DB} 
+      - EventBusConnection=${EVENT_BUS_HOST}
+      - EventBusUserName=${EVENT_BUS_USERNAME}
+      - EventBusPassword=${EVENT_BUS_PASSWORD}
+      - Urls__Authority=${AUTHORITY_URL}
+      - Urls__ToDoAssistant=${TODO_ASSISTANT_URL}
+      - Urls__CookingAssistant=${COOKING_ASSISTANT_URL}
+      - Urls__Accountant=${ACCOUNTANT_URL}
+      - PORT=80
+    ports:
+      - "5001:80"
+    volumes:
+      - ./storage:/app/storage
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  sender:
+    image: ${DOCKER_REGISTRY}:sender-latest
+    container_name: pa-sender
+    restart: always
+    environment:
+      - ConnectionString=${PERSONAL_ASSISTANT_DB} 
+      - EventBusConnection=${EVENT_BUS_HOST}
+      - EventBusUserName=${EVENT_BUS_USERNAME}
+      - EventBusPassword=${EVENT_BUS_PASSWORD}
+      - SendGridApiKey=${SENDGRID_API_KEY}
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  postgres:
+    image: postgres:12
+    container_name: pa-postgres
+    restart: always
+    ports:
+      - '5445:5432'
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3.8-management-alpine
+    container_name: pa-rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE}
+      RABBITMQ_DEFAULT_USER: ${EVENT_BUS_USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${EVENT_BUS_PASSWORD}
+    ports:
+      - "15672:15672"  # Important: In a production environment your should remove the external port
+      - "5672:5672"    # Important: In a production environment your should remove the external port
+
+volumes:
+  postgres-data:
