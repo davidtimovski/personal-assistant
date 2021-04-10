@@ -14,6 +14,8 @@ services:
       - AppSettings__Urls__CookingAssistant=${COOKING_ASSISTANT_URL:-http://localhost:8081}
       - AppSettings__Urls__Accountant=${ACCOUNTANT_URL:-http://localhost:8082}
       - PORT=80
+    volumes:
+      - ./certs:/app/certs:z
     ports:
       - "5000:80"
   
@@ -30,6 +32,8 @@ services:
       - Urls__CookingAssistant=${COOKING_ASSISTANT_URL:-http://localhost:8081}
       - Urls__Accountant=${ACCOUNTANT_URL:-http://localhost:8082}
       - PORT=80
+    volumes:
+      - ./src/Api/storage:/app/storage:z
     ports:
       - "5001:80"
 

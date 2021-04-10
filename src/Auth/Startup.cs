@@ -105,13 +105,9 @@ namespace Auth
             }
             else
             {
-                identityServerBuilder.AddSigningCredential(new X509Certificate2(Directory.GetCurrentDirectory() + "/" + Configuration["Certificate:Name"], Configuration["Certificate:Password"]));
-                dataProtectionBuilder.ProtectKeysWithCertificate(new X509Certificate2(Directory.GetCurrentDirectory() + "/" + Configuration["Certificate:Name"], Configuration["Certificate:Password"]));
+                identityServerBuilder.AddSigningCredential(new X509Certificate2(Configuration["Certificate:Directory"] + Configuration["Certificate:Name"], Configuration["Certificate:Password"]));
+                dataProtectionBuilder.ProtectKeysWithCertificate(new X509Certificate2(Configuration["Certificate:Directory"] + Configuration["Certificate:Name"], Configuration["Certificate:Password"]));
             }
-
-            services.AddDataProtection()
-                .PersistKeysToFileSystem(new DirectoryInfo(Configuration["AuthKeysDirectory"]))
-                .ProtectKeysWithCertificate(new X509Certificate2(Directory.GetCurrentDirectory() + "/" + Configuration["Certificate:Name"], Configuration["Certificate:Password"]));
 
             services.AddAuthentication();
 

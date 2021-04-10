@@ -48,5 +48,7 @@ src/Api/temp/
 **/publish.ps1
 **/Publish.lnk
 tempkey.jwk
+src/Api/storage
+src/Auth/certs
 
 .env
