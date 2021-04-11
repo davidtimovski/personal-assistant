@@ -1,4 +1,5 @@
 ﻿using System.Data.Common;
+using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Persistence;
 
@@ -8,9 +9,9 @@ namespace PersonalAssistant.Persistence
     {
         private readonly string _connectionString;
 
-        public BaseRepository(string connectionString, PersonalAssistantContext efContext)
+        public BaseRepository(PersonalAssistantContext efContext)
         {
-            _connectionString = connectionString;
+            _connectionString = efContext.Database.GetConnectionString();
             EFContext = efContext;
         }
 

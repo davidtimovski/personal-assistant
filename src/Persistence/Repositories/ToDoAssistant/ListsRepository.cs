@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Persistence;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
 using PersonalAssistant.Domain.Entities.Common;
@@ -15,8 +14,8 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 {
     public class ListsRepository : BaseRepository, IListsRepository
     {
-        public ListsRepository(IOptions<DatabaseSettings> databaseSettings, PersonalAssistantContext efContext)
-            : base(databaseSettings.Value.DefaultConnectionString, efContext) { }
+        public ListsRepository(PersonalAssistantContext efContext)
+            : base(efContext) { }
 
         public async Task<IEnumerable<ToDoList>> GetAllAsOptionsAsync(int userId)
         {
@@ -56,11 +55,19 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             var listIds = lists.Select(x => x.Id).ToArray();
             var shares = await conn.QueryAsync<ListShare>(@"SELECT * FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = ANY(@ListIds)", new { ListIds = listIds });
 
-            var tasks = await conn.QueryAsync<ToDoTask>(@"SELECT *
-                                                          FROM ""ToDoAssistant.Tasks""
-                                                          WHERE ""ListId"" = ANY(@ListIds)
-                                                            AND (""PrivateToUserId"" IS NULL OR ""PrivateToUserId"" = @UserId)",
-                                                          new { ListIds = listIds, UserId = userId });
+            var tasksSql = @"SELECT t.*, u.""Id"", u.""ImageUri""
+                             FROM ""ToDoAssistant.Tasks"" AS t
+                             LEFT JOIN ""AspNetUsers"" AS u ON t.""AssignedToUserId"" = u.""Id""
+                             WHERE t.""ListId"" = ANY(@ListIds)
+                             AND (t.""PrivateToUserId"" IS NULL OR t.""PrivateToUserId"" = @UserId)";
+
+            var tasks = await conn.QueryAsync<ToDoTask, User, ToDoTask>(tasksSql,
+                (task, user) =>
+                {
+                    task.AssignedToUser = user;
+                    return task;
+                }, new { ListIds = listIds, UserId = userId }, null, true);
+
 
             foreach (var list in lists)
             {

@@ -24,7 +24,7 @@ namespace PersonalAssistant.Persistence
 {
     public static class IoC
     {
-        public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddPersistence(this IServiceCollection services, string connectionString)
         {
             services.AddTransient<IUsersRepository, UsersRepository>();
             services.AddTransient<IPushSubscriptionsRepository, PushSubscriptionsRepository>();
@@ -42,13 +42,8 @@ namespace PersonalAssistant.Persistence
             services.AddTransient<IDebtsRepository, DebtsRepository>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
 
-            services.Configure<DatabaseSettings>(options =>
-            {
-                options.DefaultConnectionString = configuration["ConnectionStrings:DefaultConnection"];
-            });
-
             services.AddDbContext<PersonalAssistantContext>(options => {
-                options.UseNpgsql(configuration["ConnectionStrings:DefaultConnection"]);
+                options.UseNpgsql(connectionString);
             });
 
             return services;

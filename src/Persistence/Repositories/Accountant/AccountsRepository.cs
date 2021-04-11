@@ -4,7 +4,6 @@ using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.Extensions.Options;
 using Persistence;
 using PersonalAssistant.Application.Contracts.Accountant.Accounts;
 using PersonalAssistant.Domain.Entities.Accountant;
@@ -13,8 +12,8 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 {
     public class AccountsRepository : BaseRepository, IAccountsRepository
     {
-        public AccountsRepository(IOptions<DatabaseSettings> databaseSettings, PersonalAssistantContext efContext)
-            : base(databaseSettings.Value.DefaultConnectionString, efContext) { }
+        public AccountsRepository(PersonalAssistantContext efContext)
+            : base(efContext) { }
 
         public async Task<IEnumerable<Account>> GetAllAsync(int userId, DateTime fromModifiedDate)
         {

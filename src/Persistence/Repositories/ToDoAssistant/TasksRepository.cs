@@ -5,7 +5,6 @@ using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.Extensions.Options;
 using Persistence;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
 using PersonalAssistant.Domain.Entities.ToDoAssistant;
@@ -14,8 +13,8 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 {
     public class TasksRepository : BaseRepository, ITasksRepository
     {
-        public TasksRepository(IOptions<DatabaseSettings> databaseSettings, PersonalAssistantContext efContext)
-            : base(databaseSettings.Value.DefaultConnectionString, efContext) { }
+        public TasksRepository(PersonalAssistantContext efContext)
+            : base(efContext) { }
 
         public async Task<ToDoTask> GetAsync(int id)
         {
@@ -35,7 +34,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                                                                     INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
                                                                     LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
                                                                     WHERE t.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
-                                                                new { Id = id, UserId = userId });
+                                                                    new { Id = id, UserId = userId });
         }
 
         public async Task<ToDoTask> GetForUpdateAsync(int id, int userId)
@@ -74,10 +73,10 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             await conn.OpenAsync();
 
             return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                            FROM ""ToDoAssistant.Tasks"" AS t
-                                                            INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                                                            LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                                            WHERE t.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+                                                        FROM ""ToDoAssistant.Tasks"" AS t
+                                                        INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
+                                                        LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
+                                                        WHERE t.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
                                                         new { Id = id, UserId = userId });
         }
 
@@ -87,13 +86,13 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             await conn.OpenAsync();
 
             return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) 
-                                                            FROM ""ToDoAssistant.Tasks"" AS t
-                                                            INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                                                            LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                                            WHERE UPPER(t.""Name"") = UPPER(@Name) 
-                                                            AND t.""ListId"" = @ListId 
-                                                            AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
-                                                            AND (t.""PrivateToUserId"" IS NULL OR t.""PrivateToUserId"" = @UserId)",
+                                                        FROM ""ToDoAssistant.Tasks"" AS t
+                                                        INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
+                                                        LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
+                                                        WHERE UPPER(t.""Name"") = UPPER(@Name) 
+                                                        AND t.""ListId"" = @ListId 
+                                                        AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
+                                                        AND (t.""PrivateToUserId"" IS NULL OR t.""PrivateToUserId"" = @UserId)",
                                                         new { Name = name, ListId = listId, UserId = userId });
         }
 
@@ -103,13 +102,13 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             await conn.OpenAsync();
 
             return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) 
-                                                            FROM ""ToDoAssistant.Tasks"" AS t
-                                                            INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                                                            LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                                            WHERE UPPER(t.""Name"") = ANY(@Names) 
-                                                            AND t.""ListId"" = @ListId 
-                                                            AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
-                                                            AND (t.""PrivateToUserId"" IS NULL OR t.""PrivateToUserId"" = @UserId)",
+                                                        FROM ""ToDoAssistant.Tasks"" AS t
+                                                        INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
+                                                        LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
+                                                        WHERE UPPER(t.""Name"") = ANY(@Names) 
+                                                        AND t.""ListId"" = @ListId 
+                                                        AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
+                                                        AND (t.""PrivateToUserId"" IS NULL OR t.""PrivateToUserId"" = @UserId)",
                                                         new { Names = names, ListId = listId, UserId = userId });
         }
 
@@ -119,12 +118,12 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             await conn.OpenAsync();
 
             return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                            FROM ""ToDoAssistant.Tasks"" AS t
-                                                            INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                                                            WHERE t.""Id"" != @Id 
-                                                            AND UPPER(t.""Name"") = UPPER(@Name) 
-                                                            AND t.""ListId"" = @ListId AND l.""UserId"" = @UserId
-                                                            AND (t.""PrivateToUserId"" IS NULL OR t.""PrivateToUserId"" = @UserId)",
+                                                        FROM ""ToDoAssistant.Tasks"" AS t
+                                                        INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
+                                                        WHERE t.""Id"" != @Id 
+                                                        AND UPPER(t.""Name"") = UPPER(@Name) 
+                                                        AND t.""ListId"" = @ListId AND l.""UserId"" = @UserId
+                                                        AND (t.""PrivateToUserId"" IS NULL OR t.""PrivateToUserId"" = @UserId)",
                 new { Id = id, Name = name, ListId = listId, UserId = userId });
         }
 
@@ -147,70 +146,66 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<int> CreateAsync(ToDoTask task, int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
-            var transaction = conn.BeginTransaction();
+            using PersonalAssistantContext db = EFContext;
 
             if (task.PrivateToUserId.HasValue)
             {
-                // If the task is private increase Order of only the user's private tasks
-                await conn.ExecuteAsync(@"UPDATE ""ToDoAssistant.Tasks""
-                                              SET ""Order"" = ""Order"" + 1 
-                                              WHERE ""ListId"" = @ListId AND ""IsCompleted"" = FALSE AND ""PrivateToUserId"" = @UserId",
-                                          new { task.ListId, UserId = userId }, transaction);
+                var privateTasks = GetPrivateTasks(userId, db).Where(x => x.ListId == task.ListId && !x.IsCompleted);
+                foreach (ToDoTask privateTask in privateTasks)
+                {
+                    privateTask.Order += 1;
+                }
             }
             else
             {
-                await conn.ExecuteAsync(@"UPDATE ""ToDoAssistant.Tasks""
-                                              SET ""Order"" = ""Order"" + 1 
-                                              WHERE ""ListId"" = @ListId AND ""IsCompleted"" = FALSE AND ""PrivateToUserId"" IS NULL",
-                                          new { task.ListId }, transaction);
+                var publicTasks = GetPublicTasks(db).Where(x => x.ListId == task.ListId && !x.IsCompleted);
+                foreach (ToDoTask dbTask in publicTasks)
+                {
+                    dbTask.Order += 1;
+                }
             }
 
+            db.Tasks.Add(task); 
 
-            var id = (await conn.QueryAsync<int>(@"INSERT INTO ""ToDoAssistant.Tasks"" (""ListId"", ""Name"", ""IsOneTime"", ""PrivateToUserId"", ""Order"", ""CreatedDate"", ""ModifiedDate"")
-                                                       VALUES (@ListId, @Name, @IsOneTime, @PrivateToUserId, @Order, @CreatedDate, @ModifiedDate) returning ""Id""",
-                                                   task, transaction)).Single();
+            await db.SaveChangesAsync();
 
-            transaction.Commit();
-
-            return id;
+            return task.Id;
         }
 
         public async Task<IEnumerable<ToDoTask>> BulkCreateAsync(IEnumerable<ToDoTask> tasks, bool tasksArePrivate, int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
-            var transaction = conn.BeginTransaction();
+            using PersonalAssistantContext db = EFContext;
+
+            int listId = tasks.First().ListId;
 
             if (tasksArePrivate)
             {
-                // If the tasks are private increase Order of only the user's private tasks
-                await conn.ExecuteAsync(@"UPDATE ""ToDoAssistant.Tasks""
-                                              SET ""Order"" = ""Order"" + @OrderIncrement 
-                                              WHERE ""ListId"" = @ListId AND ""IsCompleted"" = FALSE AND ""PrivateToUserId"" = @UserId",
-                                          new { tasks.First().ListId, OrderIncrement = tasks.Count(), UserId = userId }, transaction);
+                var privateTasks = GetPrivateTasks(userId, db).Where(x => x.ListId == listId && !x.IsCompleted);
+                foreach (ToDoTask privateTask in privateTasks)
+                {
+                    privateTask.Order += (short)tasks.Count();
+                }
             }
             else
             {
-                await conn.ExecuteAsync(@"UPDATE ""ToDoAssistant.Tasks""
-                                              SET ""Order"" = ""Order"" + @OrderIncrement 
-                                              WHERE ""ListId"" = @ListId AND ""IsCompleted"" = FALSE AND ""PrivateToUserId"" IS NULL",
-                                          new { tasks.First().ListId, OrderIncrement = tasks.Count() }, transaction);
+                var publicTasks = GetPublicTasks(db).Where(x => x.ListId == listId && !x.IsCompleted);
+                foreach (ToDoTask dbTask in publicTasks)
+                {
+                    dbTask.Order += (short)tasks.Count();
+                }
             }
 
-
             short order = 1;
-            foreach (var task in tasks)
+            foreach (ToDoTask task in tasks)
             {
                 task.Order = order;
-                task.Id = (await conn.QueryAsync<int>(@"INSERT INTO ""ToDoAssistant.Tasks"" (""ListId"", ""Name"", ""IsOneTime"", ""PrivateToUserId"", ""Order"", ""CreatedDate"", ""ModifiedDate"")
-                                                        VALUES (@ListId, @Name, @IsOneTime, @PrivateToUserId, @Order, @CreatedDate, @ModifiedDate) returning ""Id""",
-                                                        task, transaction)).Single();
+
+                db.Tasks.Add(task);
+
                 order++;
             }
 
-            transaction.Commit();
+            await db.SaveChangesAsync();
 
             return tasks;
         }
@@ -219,16 +214,17 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
         {
             using DbConnection conn = Connection;
             await conn.OpenAsync();
-            var transaction = conn.BeginTransaction();
 
-            var existingTask = await conn.QueryFirstOrDefaultAsync<ToDoTask>(@"SELECT * FROM ""ToDoAssistant.Tasks"" WHERE ""Id"" = @Id", new { task.Id }, transaction);
+            var existingTask = await conn.QueryFirstOrDefaultAsync<ToDoTask>(@"SELECT * FROM ""ToDoAssistant.Tasks"" WHERE ""Id"" = @Id", new { task.Id });
+
+            using PersonalAssistantContext db = EFContext;
 
             if (existingTask.ListId != task.ListId)
             {
                 var newListIsShared = await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
                                                                             FROM ""ToDoAssistant.Shares""
                                                                             WHERE ""ListId"" = @ListId AND ""IsAccepted"" IS NOT FALSE",
-                                                                            new { task.ListId }, transaction);
+                                                                            new { task.ListId });
 
                 if (!newListIsShared)
                 {
@@ -238,37 +234,32 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
                 if (existingTask.PrivateToUserId.HasValue)
                 {
-                    // If the task was private only reduce the Order of the user's private tasks
-                    await conn.ExecuteAsync(@"UPDATE ""ToDoAssistant.Tasks""
-                                            SET ""Order"" = ""Order"" - 1
-                                            WHERE ""ListId"" = @ListId AND ""IsCompleted"" = @IsCompleted AND ""Order"" > @Order AND ""PrivateToUserId"" = @UserId",
-                                              new { existingTask.ListId, existingTask.IsCompleted, existingTask.Order, UserId = userId }, transaction);
+                    var privateTasks = GetPrivateTasks(userId, db).Where(x => x.ListId == existingTask.ListId && x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
+                    foreach (ToDoTask privateTask in privateTasks)
+                    {
+                        privateTask.Order -= 1;
+                    }
 
                     if (newListIsShared)
                     {
                         // If the task was moved to a shared list calculate the Order by counting the user's private tasks
-                        var tasksCount = await conn.ExecuteScalarAsync<short>(@"SELECT COUNT(*)
-                                                                                FROM ""ToDoAssistant.Tasks""
-                                                                                WHERE ""ListId"" = @ListId AND ""IsCompleted"" = @IsCompleted AND ""PrivateToUserId"" = @UserId",
-                                                                                new { task.ListId, existingTask.IsCompleted, UserId = userId }, transaction);
+                        var tasksCount = GetPrivateTasksCount(task.ListId, existingTask.IsCompleted, userId, conn);
                         task.Order = ++tasksCount;
                     }
                     else
                     {
                         // If the task was moved to a non-shared list calculate the Order by counting the public tasks
-                        var tasksCount = await conn.ExecuteScalarAsync<short>(@"SELECT COUNT(*)
-                                                                                FROM ""ToDoAssistant.Tasks""
-                                                                                WHERE ""ListId"" = @ListId AND ""IsCompleted"" = @IsCompleted AND ""PrivateToUserId"" IS NULL",
-                                                                                new { task.ListId, existingTask.IsCompleted }, transaction);
+                        var tasksCount = GetPublicTasksCount(task.ListId, existingTask.IsCompleted, conn);
                         task.Order = ++tasksCount;
                     }
                 }
                 else
                 {
-                    await conn.ExecuteAsync(@"UPDATE ""ToDoAssistant.Tasks""
-                                              SET ""Order"" = ""Order"" - 1
-                                              WHERE ""ListId"" = @ListId AND ""IsCompleted"" = @IsCompleted AND ""Order"" > @Order AND ""PrivateToUserId"" IS NULL",
-                                              new { existingTask.ListId, existingTask.IsCompleted, existingTask.Order }, transaction);
+                    var publicTasks = GetPublicTasks(db).Where(x => x.ListId == existingTask.ListId && x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
+                    foreach (ToDoTask publicTask in publicTasks)
+                    {
+                        publicTask.Order -= 1;
+                    }
                 }
             }
             else
@@ -278,73 +269,79 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 // If the task was public and it was made private reduce the Order of the public tasks
                 if (!existingTask.PrivateToUserId.HasValue && task.PrivateToUserId.HasValue)
                 {
-                    await conn.ExecuteAsync(@"UPDATE ""ToDoAssistant.Tasks""
-                                              SET ""Order"" = ""Order"" - 1
-                                              WHERE ""ListId"" = @ListId AND ""IsCompleted"" = @IsCompleted AND ""Order"" > @Order AND ""PrivateToUserId"" IS NULL",
-                                              new { existingTask.ListId, existingTask.IsCompleted, existingTask.Order }, transaction);
+                    var publicTasks = GetPublicTasks(db).Where(x => x.ListId == existingTask.ListId && x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
+                    foreach (ToDoTask publicTask in publicTasks)
+                    {
+                        publicTask.Order -= 1;
+                    }
 
-                    var tasksCount = await conn.ExecuteScalarAsync<short>(@"SELECT COUNT(*)
-                                                                            FROM ""ToDoAssistant.Tasks""
-                                                                            WHERE ""ListId"" = @ListId AND ""IsCompleted"" = @IsCompleted AND ""PrivateToUserId"" = @UserId",
-                                                                            new { task.ListId, existingTask.IsCompleted, UserId = userId }, transaction);
+                    var tasksCount = GetPrivateTasksCount(task.ListId, existingTask.IsCompleted, userId, conn);
                     task.Order = ++tasksCount;
                 }
                 // If the task was private and it was made public reduce the Order of only the user's private tasks
                 else if (existingTask.PrivateToUserId.HasValue && !task.PrivateToUserId.HasValue)
                 {
-                    await conn.ExecuteAsync(@"UPDATE ""ToDoAssistant.Tasks""
-                                              SET ""Order"" = ""Order"" - 1
-                                              WHERE ""ListId"" = @ListId AND ""IsCompleted"" = @IsCompleted AND ""Order"" > @Order AND ""PrivateToUserId"" = @UserId",
-                                              new { existingTask.ListId, existingTask.IsCompleted, existingTask.Order, UserId = userId }, transaction);
+                    var privateTasks = GetPrivateTasks(userId, db).Where(x => x.ListId == existingTask.ListId && x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
+                    foreach (ToDoTask privateTask in privateTasks)
+                    {
+                        privateTask.Order -= 1;
+                    }
 
-                    var tasksCount = await conn.ExecuteScalarAsync<short>(@"SELECT COUNT(*)
-                                                                            FROM ""ToDoAssistant.Tasks""
-                                                                            WHERE ""ListId"" = @ListId AND ""IsCompleted"" = @IsCompleted AND ""PrivateToUserId"" IS NULL",
-                                                                            new { task.ListId, existingTask.IsCompleted }, transaction);
+                    var tasksCount = GetPublicTasksCount(task.ListId, existingTask.IsCompleted, conn);
                     task.Order = ++tasksCount;
                 }
             }
 
-            await conn.ExecuteAsync(@"UPDATE ""ToDoAssistant.Tasks"" SET ""Name"" = @Name, ""ListId"" = @ListId, ""IsOneTime"" = @IsOneTime, 
-                                      ""PrivateToUserId"" = @PrivateToUserId, ""AssignedToUserId"" = @AssignedToUserId, 
-                                      ""Order"" = @Order, ""ModifiedDate"" = @ModifiedDate
-                                      WHERE ""Id"" = @Id", task, transaction);
+            ToDoTask dbTask = await db.Tasks.FindAsync(task.Id);
 
-            transaction.Commit();
+            dbTask.Name = task.Name;
+            dbTask.ListId = task.ListId;
+            dbTask.IsOneTime = task.IsOneTime;
+            dbTask.PrivateToUserId = task.PrivateToUserId;
+            dbTask.AssignedToUserId = task.AssignedToUserId;
+            dbTask.Order = task.Order;
+            dbTask.ModifiedDate = task.ModifiedDate;
+
+            await db.SaveChangesAsync();
         }
 
         public async Task<ToDoTask> DeleteAsync(int id, int userId)
         {
             using DbConnection conn = Connection;
             await conn.OpenAsync();
-            var transaction = conn.BeginTransaction();
 
-            var task = await conn.QueryFirstOrDefaultAsync<ToDoTask>(@"SELECT * FROM ""ToDoAssistant.Tasks"" WHERE ""Id"" = @Id", new { Id = id }, transaction);
+            var task = await conn.QueryFirstOrDefaultAsync<ToDoTask>(@"SELECT * FROM ""ToDoAssistant.Tasks"" WHERE ""Id"" = @Id", new { Id = id });
 
-            await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.Ingredients""
-                                      SET ""Name"" = @Name, ""ModifiedDate"" = @ModifiedDate
-                                      WHERE ""TaskId"" = @Id",
-                                      new { task.Id, task.Name, ModifiedDate = DateTime.UtcNow }, transaction);
+            using PersonalAssistantContext db = EFContext;
 
-            await conn.ExecuteAsync(@"DELETE FROM ""ToDoAssistant.Tasks"" WHERE ""Id"" = @Id", new { Id = id }, transaction);
+            var ingredients = db.Ingredients.Where(x => x.TaskId == task.Id);
+            foreach (var ingredient in ingredients)
+            {
+                ingredient.Name = task.Name;
+                ingredient.ModifiedDate = DateTime.UtcNow;
+            }
+
+            db.Tasks.Remove(task);
 
             if (task.PrivateToUserId.HasValue)
             {
                 // If the task was private reduce the Order of only the user's private tasks
-                await conn.ExecuteAsync(@"UPDATE ""ToDoAssistant.Tasks""
-                                          SET ""Order"" = ""Order"" - 1
-                                          WHERE ""ListId"" = @ListId AND ""IsCompleted"" = @IsCompleted AND ""Order"" > @Order AND ""PrivateToUserId"" = @UserId",
-                                          new { task.ListId, task.IsCompleted, task.Order, UserId = userId }, transaction);
+                var privateTasks = GetPrivateTasks(userId, db).Where(x => x.ListId == task.ListId && x.IsCompleted == task.IsCompleted && x.Order > task.Order);
+                foreach (ToDoTask privateTask in privateTasks)
+                {
+                    privateTask.Order -= 1;
+                }
             }
             else
             {
-                await conn.ExecuteAsync(@"UPDATE ""ToDoAssistant.Tasks""
-                                          SET ""Order"" = ""Order"" - 1
-                                          WHERE ""ListId"" = @ListId AND ""IsCompleted"" = @IsCompleted AND ""Order"" > @Order AND ""PrivateToUserId"" IS NULL",
-                                          new { task.ListId, task.IsCompleted, task.Order }, transaction);
+                var publicTasks = GetPublicTasks(db).Where(x => x.ListId == task.ListId && x.IsCompleted == task.IsCompleted && x.Order > task.Order);
+                foreach (ToDoTask publicTask in publicTasks)
+                {
+                    publicTask.Order -= 1;
+                }
             }
 
-            transaction.Commit();
+            await db.SaveChangesAsync();
 
             return task;
         }
@@ -411,18 +408,12 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             if (task.PrivateToUserId.HasValue)
             {
                 // If the task was private calculate the Order from only the user's private tasks
-                var tasksCount = await conn.ExecuteScalarAsync<short>(@"SELECT COUNT(*)
-                                                                        FROM ""ToDoAssistant.Tasks""
-                                                                        WHERE ""ListId"" = @ListId AND ""IsCompleted"" = FALSE AND ""PrivateToUserId"" = @UserId",
-                                                                        new { task.ListId, UserId = userId }, transaction);
+                var tasksCount = GetPrivateTasksCount(task.ListId, false, userId, conn);
                 order = ++tasksCount;
             }
             else
             {
-                var tasksCount = await conn.ExecuteScalarAsync<short>(@"SELECT COUNT(*)
-                                                                        FROM ""ToDoAssistant.Tasks""
-                                                                        WHERE ""ListId"" = @ListId AND ""IsCompleted"" = FALSE AND ""PrivateToUserId"" IS NULL",
-                                                                        new { task.ListId }, transaction);
+                var tasksCount = GetPublicTasksCount(task.ListId, false, conn);
                 order = ++tasksCount;
             }
 
@@ -516,6 +507,32 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                                       new { Id = id, @NewOrder = newOrder, ModifiedDate = modifiedDate }, transaction);
 
             transaction.Commit();
+        }
+
+        private short GetPrivateTasksCount(int listId, bool isCompleted, int userId, DbConnection conn)
+        {
+            return conn.ExecuteScalar<short>(@"SELECT COUNT(*)
+                                               FROM ""ToDoAssistant.Tasks""
+                                               WHERE ""ListId"" = @ListId AND ""IsCompleted"" = @IsCompleted AND ""PrivateToUserId"" = @UserId",
+                                               new { ListId = listId, IsCompleted = isCompleted, UserId = userId });
+        }
+
+        private short GetPublicTasksCount(int listId, bool isCompleted, DbConnection conn)
+        {
+            return conn.ExecuteScalar<short>(@"SELECT COUNT(*)
+                                               FROM ""ToDoAssistant.Tasks""
+                                               WHERE ""ListId"" = @ListId AND ""IsCompleted"" = @IsCompleted AND ""PrivateToUserId"" IS NULL",
+                                               new { ListId = listId, IsCompleted = isCompleted });
+        }
+
+        private IQueryable<ToDoTask> GetPrivateTasks(int userId, PersonalAssistantContext db)
+        {
+            return db.Tasks.Where(x => x.PrivateToUserId == userId);
+        }
+
+        private IQueryable<ToDoTask> GetPublicTasks(PersonalAssistantContext db)
+        {
+            return db.Tasks.Where(x => !x.PrivateToUserId.HasValue);
         }
     }
 }

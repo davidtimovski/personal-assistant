@@ -2,7 +2,6 @@
 using System.Data.Common;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.Extensions.Options;
 using Persistence;
 using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Domain.Entities.Common;
@@ -11,8 +10,8 @@ namespace PersonalAssistant.Persistence.Repositories.Common
 {
     public class TooltipsRepository : BaseRepository, ITooltipsRepository
     {
-        public TooltipsRepository(IOptions<DatabaseSettings> databaseSettings, PersonalAssistantContext efContext)
-            : base(databaseSettings.Value.DefaultConnectionString, efContext) { }
+        public TooltipsRepository(PersonalAssistantContext efContext)
+            : base(efContext) { }
 
         public async Task<IEnumerable<Tooltip>> GetAllAsync(string application, int userId)
         {
