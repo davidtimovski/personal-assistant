@@ -7,6 +7,7 @@ import {
   ControllerValidateResult,
 } from "aurelia-validation";
 import { EventAggregator } from "aurelia-event-aggregator";
+import { connectTo } from "aurelia-store";
 
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import { AlertEvents } from "../../../shared/src/utils/alertEvents";
@@ -14,6 +15,7 @@ import { AlertEvents } from "../../../shared/src/utils/alertEvents";
 import { BulkAddTasksModel } from "models/viewmodels/bulkAddTasksModel";
 import { TasksService } from "services/tasksService";
 import { ListsService } from "services/listsService";
+import * as Actions from "utils/state/actions";
 
 @inject(
   Router,
@@ -22,6 +24,7 @@ import { ListsService } from "services/listsService";
   ValidationController,
   EventAggregator
 )
+@connectTo()
 export class BulkAddTasks {
   private model: BulkAddTasksModel;
   private listIsShared: boolean;
@@ -93,6 +96,8 @@ export class BulkAddTasks {
           this.model.tasksArePrivate
         );
         this.tasksTextIsInvalid = false;
+
+        await Actions.getLists(this.listsService);
 
         this.eventAggregator.publish(
           AlertEvents.ShowSuccess,
