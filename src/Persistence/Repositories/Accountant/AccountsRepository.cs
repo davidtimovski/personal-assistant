@@ -17,37 +17,25 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
         public async Task<IEnumerable<Account>> GetAllAsync(int userId, DateTime fromModifiedDate)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
-
-            return await conn.QueryAsync<Account>(@"SELECT * FROM ""Accountant.Accounts"" WHERE ""UserId"" = @UserId AND ""ModifiedDate"" > @FromModifiedDate",
+            return await Dapper.QueryAsync<Account>(@"SELECT * FROM ""Accountant.Accounts"" WHERE ""UserId"" = @UserId AND ""ModifiedDate"" > @FromModifiedDate",
                 new { UserId = userId, FromModifiedDate = fromModifiedDate });
         }
 
         public async Task<IEnumerable<int>> GetDeletedIdsAsync(int userId, DateTime fromDate)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
-
-            return await conn.QueryAsync<int>(@"SELECT ""EntityId"" FROM ""Accountant.DeletedEntities"" WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""DeletedDate"" > @DeletedDate",
+            return await Dapper.QueryAsync<int>(@"SELECT ""EntityId"" FROM ""Accountant.DeletedEntities"" WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""DeletedDate"" > @DeletedDate",
                 new { UserId = userId, EntityType = (short)EntityType.Account, DeletedDate = fromDate });
         }
 
         public async Task<bool> ExistsAsync(int id, int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
-
-            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""Accountant.Accounts"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
+            return await Dapper.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""Accountant.Accounts"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
                 new { Id = id, UserId = userId });
         }
 
         public async Task<bool> IsMainAsync(int id, int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
-
-            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""Accountant.Accounts"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId AND ""IsMain""",
+            return await Dapper.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""Accountant.Accounts"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId AND ""IsMain""",
                 new { Id = id, UserId = userId });
         }
 
@@ -57,10 +45,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
             if (uowConn == null && uowTransaction == null)
             {
-                using DbConnection conn = Connection;
-                await conn.OpenAsync();
-
-                id = (await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.Accounts"" (""UserId"", ""Name"", ""IsMain"", ""Currency"", ""StockPrice"", ""CreatedDate"", ""ModifiedDate"")
+                id = (await Dapper.QueryAsync<int>(@"INSERT INTO ""Accountant.Accounts"" (""UserId"", ""Name"", ""IsMain"", ""Currency"", ""StockPrice"", ""CreatedDate"", ""ModifiedDate"")
                                                    VALUES (@UserId, @Name, @IsMain, @Currency, @StockPrice, @CreatedDate, @ModifiedDate) returning ""Id""",
                                                        account)).Single();
             }
@@ -76,39 +61,34 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
         public async Task UpdateAsync(Account account)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
-
-            await conn.ExecuteAsync(@"UPDATE ""Accountant.Accounts"" SET ""Name"" = @Name, ""Currency"" = @Currency, ""StockPrice"" = @StockPrice, ""ModifiedDate"" = @ModifiedDate WHERE ""Id"" = @Id", account);
+            await Dapper.ExecuteAsync(@"UPDATE ""Accountant.Accounts"" SET ""Name"" = @Name, ""Currency"" = @Currency, ""StockPrice"" = @StockPrice, ""ModifiedDate"" = @ModifiedDate WHERE ""Id"" = @Id", account);
         }
 
         public async Task DeleteAsync(int id, int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
-            var transaction = conn.BeginTransaction();
+            var transaction = Dapper.BeginTransaction();
 
-            var deletedEntryExists = await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
+            var deletedEntryExists = await Dapper.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
                                                             FROM ""Accountant.DeletedEntities""
                                                             WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""EntityId"" = @EntityId",
                                                             new { UserId = userId, EntityType = (short)EntityType.Account, EntityId = id });
 
             if (deletedEntryExists)
             {
-                await conn.QueryAsync<int>(@"UPDATE ""Accountant.DeletedEntities"" SET ""DeletedDate"" = @DeletedDate
+                await Dapper.QueryAsync<int>(@"UPDATE ""Accountant.DeletedEntities"" SET ""DeletedDate"" = @DeletedDate
                                              WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""EntityId"" = @EntityId",
                                              new { UserId = userId, EntityType = (short)EntityType.Account, EntityId = id, DeletedDate = DateTime.UtcNow },
                                              transaction);
             }
             else
             {
-                await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.DeletedEntities"" (""UserId"", ""EntityType"", ""EntityId"", ""DeletedDate"")
+                await Dapper.QueryAsync<int>(@"INSERT INTO ""Accountant.DeletedEntities"" (""UserId"", ""EntityType"", ""EntityId"", ""DeletedDate"")
                                          VALUES (@UserId, @EntityType, @EntityId, @DeletedDate)",
                                          new { UserId = userId, EntityType = (short)EntityType.Account, EntityId = id, DeletedDate = DateTime.UtcNow },
                                          transaction);
             }
 
-            await conn.ExecuteAsync(@"DELETE FROM ""Accountant.Accounts"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
+            await Dapper.ExecuteAsync(@"DELETE FROM ""Accountant.Accounts"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
                 new { Id = id, UserId = userId }, transaction);
 
             transaction.Commit();

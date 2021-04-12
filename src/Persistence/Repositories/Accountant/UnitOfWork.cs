@@ -10,11 +10,10 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
         public UnitOfWork(PersonalAssistantContext efContext)
             : base(efContext) { }
 
-        public async Task<(DbConnection conn, DbTransaction transaction)> StartTransactionAsync()
+        public (DbConnection conn, DbTransaction transaction) StartTransaction()
         {
-            DbConnection conn = Connection;
+            DbConnection conn = Dapper;
 
-            await conn.OpenAsync();
             var transaction = conn.BeginTransaction();
 
             return (conn, transaction);

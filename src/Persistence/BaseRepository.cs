@@ -15,11 +15,14 @@ namespace PersonalAssistant.Persistence
             EFContext = efContext;
         }
 
-        protected DbConnection Connection
+        protected DbConnection Dapper
         {
             get
             {
-                return new NpgsqlConnection(_connectionString);
+                var conn = new NpgsqlConnection(_connectionString);
+                conn.Open();
+
+                return conn;
             }
         }
 

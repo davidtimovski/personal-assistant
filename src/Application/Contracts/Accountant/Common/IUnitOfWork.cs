@@ -5,7 +5,7 @@ namespace PersonalAssistant.Application.Contracts.Accountant.Common
 {
     public interface IUnitOfWork
     {
-        Task<(DbConnection conn, DbTransaction transaction)> StartTransactionAsync();
+        (DbConnection conn, DbTransaction transaction) StartTransaction();
         Task CommitTransactionAsync(DbConnection conn, DbTransaction transaction);
     }
 }

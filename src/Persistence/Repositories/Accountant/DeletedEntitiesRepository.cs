@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.Common;
 using System.Threading.Tasks;
 using Dapper;
 using Persistence;
@@ -14,10 +13,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
         public async Task DeleteOldAsync(DateTime from)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
-
-            await conn.ExecuteAsync(@"DELETE FROM ""Accountant.DeletedEntities"" WHERE ""DeletedDate"" < @DeleteFrom", new { DeleteFrom = from });
+            await Dapper.ExecuteAsync(@"DELETE FROM ""Accountant.DeletedEntities"" WHERE ""DeletedDate"" < @DeleteFrom", new { DeleteFrom = from });
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
@@ -17,15 +16,12 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task<DietaryProfile> GetAsync(int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
-
             var sql = @"SELECT dp.*, u.""Id"", u.""ImperialSystem""
                             FROM ""CookingAssistant.DietaryProfiles"" AS dp
                             INNER JOIN ""AspNetUsers"" AS u ON dp.""UserId"" = u.""Id""
                             WHERE dp.""UserId"" = @UserId";
 
-            var dietaryProfiles = await conn.QueryAsync<DietaryProfile, User, DietaryProfile>(sql,
+            var dietaryProfiles = await Dapper.QueryAsync<DietaryProfile, User, DietaryProfile>(sql,
                 (detaryProfile, user) =>
                 {
                     detaryProfile.User = user;
@@ -42,10 +38,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task UpdateAsync(DietaryProfile dietaryProfile)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
-
-            var exists = await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.DietaryProfiles"" WHERE ""UserId"" = @UserId",
+            var exists = await Dapper.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.DietaryProfiles"" WHERE ""UserId"" = @UserId",
                 new { dietaryProfile.UserId });
 
             var now = DateTime.UtcNow;
@@ -54,7 +47,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
             {
                 dietaryProfile.ModifiedDate = now;
 
-                await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.DietaryProfiles"" 
+                await Dapper.ExecuteAsync(@"UPDATE ""CookingAssistant.DietaryProfiles"" 
                                               SET ""Birthday"" = @Birthday, ""Gender"" = @Gender, ""Height"" = @Height, ""Weight"" = @Weight, 
                                                 ""ActivityLevel"" = @ActivityLevel, ""Goal"" = @Goal, ""CustomCalories"" = @CustomCalories, 
                                                 ""TrackCalories"" = @TrackCalories, 
@@ -80,7 +73,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
             {
                 dietaryProfile.CreatedDate = dietaryProfile.ModifiedDate = now;
 
-                await conn.ExecuteAsync(@"INSERT INTO ""CookingAssistant.DietaryProfiles"" 
+                await Dapper.ExecuteAsync(@"INSERT INTO ""CookingAssistant.DietaryProfiles"" 
                                             (""UserId"", ""Birthday"", ""Gender"", ""Height"", ""Weight"", ""ActivityLevel"", ""Goal"",
                                             ""CustomCalories"", ""TrackCalories"", ""CustomSaturatedFat"", ""TrackSaturatedFat"",
                                             ""CustomCarbohydrate"", ""TrackCarbohydrate"", ""CustomAddedSugars"", ""TrackAddedSugars"",
@@ -105,10 +98,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task DeleteAsync(int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
-
-            await conn.ExecuteAsync(@"DELETE FROM ""CookingAssistant.DietaryProfiles"" WHERE ""UserId"" = @UserId",
+            await Dapper.ExecuteAsync(@"DELETE FROM ""CookingAssistant.DietaryProfiles"" WHERE ""UserId"" = @UserId",
                 new { UserId = userId });
         }
     }
