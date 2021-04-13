@@ -143,9 +143,9 @@ namespace PersonalAssistant.Application.Mappings
         }
     }
 
-    public class LastOpenedDateResolver : IValueResolver<Recipe, object, DateTime?>
+    public class LastOpenedDateResolver : IValueResolver<Recipe, object, DateTime>
     {
-        public DateTime? Resolve(Recipe source, object dest, DateTime? destMember, ResolutionContext context)
+        public DateTime Resolve(Recipe source, object dest, DateTime destMember, ResolutionContext context)
         {
             var userId = (int)context.Items["UserId"];
 

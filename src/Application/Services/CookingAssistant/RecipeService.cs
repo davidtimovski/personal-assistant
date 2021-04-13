@@ -438,6 +438,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
                 {
                     RecipeId = model.RecipeId,
                     UserId = userId,
+                    LastOpenedDate = now,
                     CreatedDate = now,
                     ModifiedDate = now
                 });

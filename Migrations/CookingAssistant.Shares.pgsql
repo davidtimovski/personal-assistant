@@ -7,7 +7,7 @@ CREATE TABLE public."CookingAssistant.Shares"
     "RecipeId" integer NOT NULL,
     "UserId" integer NOT NULL,
     "IsAccepted" boolean DEFAULT NULL,
-	"LastOpenedDate" timestamp without time zone,
+	"LastOpenedDate" timestamp without time zone NOT NULL,
     "CreatedDate" timestamp without time zone NOT NULL,
     "ModifiedDate" timestamp without time zone NOT NULL,
     CONSTRAINT "PK_CookingAssistant.Shares" PRIMARY KEY ("RecipeId", "UserId"),
