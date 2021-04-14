@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
 using Dapper;
 using Persistence;
@@ -15,7 +16,9 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task<IEnumerable<Ingredient>> GetAllAsync(int userId)
         {
-            return await Dapper.QueryAsync<Ingredient>(@"SELECT DISTINCT i.*,
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.QueryAsync<Ingredient>(@"SELECT DISTINCT i.*,
                                                            CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END
                                                        FROM ""CookingAssistant.Ingredients"" AS i
                                                        LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
@@ -29,7 +32,9 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task<Ingredient> GetAsync(int id, int userId)
         {
-            var ingredient = await Dapper.QueryFirstOrDefaultAsync<Ingredient>(@"SELECT i.*, 
+            using IDbConnection conn = OpenConnection();
+
+            var ingredient = await conn.QueryFirstOrDefaultAsync<Ingredient>(@"SELECT i.*, 
                                                                                    CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END
                                                                                FROM ""CookingAssistant.Ingredients"" AS i
                                                                                LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
@@ -41,7 +46,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
             if (ingredient.TaskId.HasValue)
             {
-                var list = await Dapper.QueryFirstOrDefaultAsync<ToDoList>(@"SELECT l.""Name""
+                var list = await conn.QueryFirstOrDefaultAsync<ToDoList>(@"SELECT l.""Name""
                                                                            FROM ""ToDoAssistant.Tasks"" AS t
                                                                            INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
                                                                            WHERE t.""Id"" = @TaskId", new { TaskId = id });
@@ -51,7 +56,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                 };
             }
 
-            var recipeNames = await Dapper.QueryAsync<string>(@"SELECT ""Name""
+            var recipeNames = await conn.QueryAsync<string>(@"SELECT ""Name""
                                                               FROM ""CookingAssistant.RecipesIngredients"" AS ri
                                                               LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
                                                               WHERE ri.""IngredientId"" = @IngredientId
@@ -71,7 +76,9 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task<IEnumerable<Ingredient>> GetSuggestionsAsync(int recipeId, int userId)
         {
-            return await Dapper.QueryAsync<Ingredient>(@"SELECT DISTINCT i.""Id"", i.""TaskId"", 
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.QueryAsync<Ingredient>(@"SELECT DISTINCT i.""Id"", i.""TaskId"", 
                                                        CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END
                                                        FROM ""CookingAssistant.Ingredients"" AS i
                                                        LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
@@ -87,6 +94,8 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task<IEnumerable<Ingredient>> GetTaskSuggestionsAsync(int recipeId, int userId)
         {
+            using IDbConnection conn = OpenConnection();
+
             var sql = @"SELECT DISTINCT i.""Id"", i.""TaskId"", t.""Name"", l.""Id"", l.""Name""
                         FROM ""ToDoAssistant.Tasks"" AS t
                         INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
@@ -97,7 +106,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                             AND (i.""Id"" IS NULL OR i.""Id"" NOT IN (SELECT ""IngredientId"" FROM ""CookingAssistant.RecipesIngredients"" WHERE ""RecipeId"" = @RecipeId))
                             AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))";
 
-            return await Dapper.QueryAsync<Ingredient, ToDoList, Ingredient>(sql,
+            return await conn.QueryAsync<Ingredient, ToDoList, Ingredient>(sql,
                 (ingredient, list) =>
                 {
                     ingredient.Task = new ToDoTask
@@ -110,6 +119,8 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task<IEnumerable<ToDoTask>> GetTaskSuggestionsAsync(int userId)
         {
+            using IDbConnection conn = OpenConnection();
+
             var sql = @"SELECT DISTINCT t.""Id"", t.""Name"", l.""Id"", l.""Name""
                         FROM ""ToDoAssistant.Tasks"" AS t
                         INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
@@ -118,7 +129,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                         LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri on i.""Id"" = ri.""IngredientId""
                         WHERE l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")";
 
-            return await Dapper.QueryAsync<ToDoTask, ToDoList, ToDoTask>(sql,
+            return await conn.QueryAsync<ToDoTask, ToDoList, ToDoTask>(sql,
                 (task, list) =>
                 {
                     task.List = list;
@@ -128,7 +139,9 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task<IEnumerable<Ingredient>> GetIngredientSuggestionsAsync(int userId)
         {
-            return await Dapper.QueryAsync<Ingredient>(@"SELECT i.*, CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.QueryAsync<Ingredient>(@"SELECT i.*, CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END
                                                        FROM ""CookingAssistant.Ingredients"" AS i
                                                        LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
                                                        WHERE ""UserId"" = @UserId
@@ -138,37 +151,45 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task<bool> ExistsAsync(int id, int userId)
         {
-            return await Dapper.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
                                                          FROM ""CookingAssistant.Ingredients"" AS i
                                                          LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
                                                          LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
                                                          LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
-                                                         WHERE i.""Id"" = @Id AND i.""UserId"" = @UserId AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))", 
+                                                         WHERE i.""Id"" = @Id AND i.""UserId"" = @UserId AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
                                                          new { Id = id, UserId = userId });
         }
 
         public async Task<bool> ExistsAsync(int id, string name, int userId)
         {
-            return await Dapper.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
                                                          FROM ""CookingAssistant.Ingredients"" AS i
                                                          LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
                                                          LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
                                                          LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
-                                                         WHERE i.""Id"" != @Id AND UPPER(i.""Name"") = UPPER(@Name) AND i.""UserId"" = @UserId AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))", 
+                                                         WHERE i.""Id"" != @Id AND UPPER(i.""Name"") = UPPER(@Name) AND i.""UserId"" = @UserId AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
                                                          new { Id = id, Name = name, UserId = userId });
         }
 
         public async Task<bool> ExistsInRecipeAsync(int id, int recipeId)
         {
-            return await Dapper.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
                                                          FROM ""CookingAssistant.RecipesIngredients""
-                                                         WHERE ""RecipeId"" = @RecipeId AND ""IngredientId"" = @IngredientId", 
+                                                         WHERE ""RecipeId"" = @RecipeId AND ""IngredientId"" = @IngredientId",
                                                          new { IngredientId = id, RecipeId = recipeId });
         }
 
         public async Task UpdateAsync(Ingredient ingredient)
         {
-            await Dapper.ExecuteAsync(@"UPDATE ""CookingAssistant.Ingredients"" SET ""TaskId"" = @TaskId, ""Name"" = @Name,  
+            using IDbConnection conn = OpenConnection();
+
+            await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.Ingredients"" SET ""TaskId"" = @TaskId, ""Name"" = @Name,  
                                     ""ServingSize"" = @ServingSize, ""ServingSizeIsOneUnit"" = @ServingSizeIsOneUnit, 
                                     ""Calories"" = @Calories, ""Fat"" = @Fat, ""SaturatedFat"" = @SaturatedFat, 
                                     ""Carbohydrate"" = @Carbohydrate, ""Sugars"" = @Sugars, ""AddedSugars"" = @AddedSugars, 
@@ -182,7 +203,9 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task DeleteAsync(int id)
         {
-            await Dapper.ExecuteAsync(@"DELETE FROM ""CookingAssistant.Ingredients"" WHERE ""Id"" = @Id", new { Id = id });
+            using IDbConnection conn = OpenConnection();
+
+            await conn.ExecuteAsync(@"DELETE FROM ""CookingAssistant.Ingredients"" WHERE ""Id"" = @Id", new { Id = id });
         }
     }
 }

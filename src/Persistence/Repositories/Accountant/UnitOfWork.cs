@@ -1,5 +1,4 @@
-﻿using System.Data.Common;
-using System.Threading.Tasks;
+﻿using System.Data;
 using Persistence;
 using PersonalAssistant.Application.Contracts.Accountant.Common;
 
@@ -10,19 +9,18 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
         public UnitOfWork(PersonalAssistantContext efContext)
             : base(efContext) { }
 
-        public (DbConnection conn, DbTransaction transaction) StartTransaction()
+        public (IDbConnection conn, IDbTransaction transaction) StartTransaction()
         {
-            DbConnection conn = Dapper;
-
+            using IDbConnection conn = OpenConnection();
             var transaction = conn.BeginTransaction();
 
             return (conn, transaction);
         }
 
-        public async Task CommitTransactionAsync(DbConnection conn, DbTransaction transaction)
+        public void CommitTransaction(IDbConnection conn, IDbTransaction transaction)
         {
-            await transaction.CommitAsync();
-            await conn.DisposeAsync();
+            transaction.Commit();
+            conn.Dispose();
         }
     }
 }

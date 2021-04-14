@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
@@ -17,13 +18,15 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<IEnumerable<Notification>> GetAllAndFlagUnseenAsync(int userId)
         {
+            using IDbConnection conn = OpenConnection();
+
             var sql = @"SELECT n.*, u.""Id"", u.""ImageUri""
                             FROM ""ToDoAssistant.Notifications"" AS n
                             INNER JOIN ""AspNetUsers"" AS u ON n.""ActionUserId"" = u.""Id""
                             WHERE ""UserId"" = @UserId
                             ORDER BY ""ModifiedDate"" DESC";
 
-            var notifications = await Dapper.QueryAsync<Notification, User, Notification>(sql,
+            var notifications = await conn.QueryAsync<Notification, User, Notification>(sql,
                 (notification, user) =>
                 {
                     notification.User = user;
@@ -34,7 +37,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             var unseenNotificationIds = notifications.Where(x => !x.IsSeen).Select(x => x.Id).ToList();
             if (unseenNotificationIds.Count > 0)
             {
-                await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Notifications"" SET ""IsSeen"" = TRUE WHERE ""Id"" = ANY(@UnseenNotificationIds)",
+                await conn.ExecuteAsync(@"UPDATE ""ToDoAssistant.Notifications"" SET ""IsSeen"" = TRUE WHERE ""Id"" = ANY(@UnseenNotificationIds)",
                     new { UnseenNotificationIds = unseenNotificationIds });
             }
 
@@ -43,26 +46,34 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task DeleteOldAsync(DateTime from)
         {
-            await Dapper.ExecuteAsync(@"DELETE FROM ""ToDoAssistant.Notifications"" WHERE ""CreatedDate"" < @DeleteFrom", new { DeleteFrom = from });
+            using IDbConnection conn = OpenConnection();
+
+            await conn.ExecuteAsync(@"DELETE FROM ""ToDoAssistant.Notifications"" WHERE ""CreatedDate"" < @DeleteFrom", new { DeleteFrom = from });
         }
 
         public async Task DeleteForUserAndListAsync(int userId, int listId)
         {
-            await Dapper.ExecuteAsync(@"DELETE FROM ""ToDoAssistant.Notifications"" WHERE ""UserId"" = @UserId AND ""ListId"" = @ListId",
+            using IDbConnection conn = OpenConnection();
+
+            await conn.ExecuteAsync(@"DELETE FROM ""ToDoAssistant.Notifications"" WHERE ""UserId"" = @UserId AND ""ListId"" = @ListId",
                 new { UserId = userId, ListId = listId });
         }
 
         public async Task<int> GetUnseenNotificationsCountAsync(int userId)
         {
-            return await Dapper.ExecuteScalarAsync<int>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Notifications"" WHERE ""UserId"" = @UserId AND ""IsSeen"" = FALSE",
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.ExecuteScalarAsync<int>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Notifications"" WHERE ""UserId"" = @UserId AND ""IsSeen"" = FALSE",
                 new { UserId = userId });
         }
 
         public async Task<int> CreateOrUpdateAsync(Notification notification)
         {
-            var id = await Dapper.QueryFirstOrDefaultAsync<int?>(@"SELECT ""Id""
+            using IDbConnection conn = OpenConnection();
+
+            var id = await conn.QueryFirstOrDefaultAsync<int?>(@"SELECT ""Id""
                                                                  FROM ""ToDoAssistant.Notifications"" 
-                                                                 WHERE ""UserId"" = @UserId AND ""Message"" = @Message AND ""IsSeen"" = FALSE", 
+                                                                 WHERE ""UserId"" = @UserId AND ""Message"" = @Message AND ""IsSeen"" = FALSE",
                                                                  new { notification.UserId, notification.Message });
 
             if (id != null)

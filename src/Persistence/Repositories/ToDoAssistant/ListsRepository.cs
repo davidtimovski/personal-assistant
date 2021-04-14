@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.EntityFrameworkCore;
 using Persistence;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
 using PersonalAssistant.Domain.Entities.Common;
@@ -19,13 +19,15 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<IEnumerable<ToDoList>> GetAllAsOptionsAsync(int userId)
         {
+            using IDbConnection conn = OpenConnection();
+
             var sql = @"SELECT DISTINCT l.*, s.""UserId"", s.""IsAccepted""
                             FROM ""ToDoAssistant.Lists"" AS l
                             LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
                             WHERE l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")
                             ORDER BY l.""Order""";
 
-            return await Dapper.QueryAsync<ToDoList, ListShare, ToDoList>(sql,
+            return await conn.QueryAsync<ToDoList, ListShare, ToDoList>(sql,
                 (list, share) =>
                 {
                     if (share != null && share.IsAccepted != false)
@@ -38,7 +40,9 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<IEnumerable<ToDoList>> GetAllWithTasksAndSharingDetailsAsync(int userId)
         {
-            var lists = await Dapper.QueryAsync<ToDoList>(@"SELECT l.*
+            using IDbConnection conn = OpenConnection();
+
+            var lists = await conn.QueryAsync<ToDoList>(@"SELECT l.*
                                                           FROM ""ToDoAssistant.Lists"" AS l
                                                           LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId"" 
                                                             AND s.""UserId"" = @UserId
@@ -47,7 +51,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                                                           new { UserId = userId });
 
             var listIds = lists.Select(x => x.Id).ToArray();
-            var shares = await Dapper.QueryAsync<ListShare>(@"SELECT * FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = ANY(@ListIds)", new { ListIds = listIds });
+            var shares = await conn.QueryAsync<ListShare>(@"SELECT * FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = ANY(@ListIds)", new { ListIds = listIds });
 
             var tasksSql = @"SELECT t.*, u.""Id"", u.""ImageUri""
                              FROM ""ToDoAssistant.Tasks"" AS t
@@ -55,7 +59,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                              WHERE t.""ListId"" = ANY(@ListIds)
                              AND (t.""PrivateToUserId"" IS NULL OR t.""PrivateToUserId"" = @UserId)";
 
-            var tasks = await Dapper.QueryAsync<ToDoTask, User, ToDoTask>(tasksSql,
+            var tasks = await conn.QueryAsync<ToDoTask, User, ToDoTask>(tasksSql,
                 (task, user) =>
                 {
                     task.AssignedToUser = user;
@@ -74,7 +78,9 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<IEnumerable<User>> GetMembersAsAssigneeOptionsAsync(int id)
         {
-            return await Dapper.QueryAsync<User>(@"SELECT DISTINCT u.""Id"", u.""Name"", u.""ImageUri""
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.QueryAsync<User>(@"SELECT DISTINCT u.""Id"", u.""Name"", u.""ImageUri""
                                                 FROM ""AspNetUsers"" AS u
                                                 LEFT JOIN ""ToDoAssistant.Lists"" AS l ON u.""Id"" = l.""UserId""
                                                 LEFT JOIN ""ToDoAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
@@ -84,18 +90,22 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<ToDoList> GetAsync(int id)
         {
-            return await Dapper.QueryFirstOrDefaultAsync<ToDoList>(@"SELECT * FROM ""ToDoAssistant.Lists"" WHERE ""Id"" = @Id", new { Id = id });
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.QueryFirstOrDefaultAsync<ToDoList>(@"SELECT * FROM ""ToDoAssistant.Lists"" WHERE ""Id"" = @Id", new { Id = id });
         }
 
         public async Task<ToDoList> GetAsync(int id, int userId)
         {
+            using IDbConnection conn = OpenConnection();
+
             var sql = @"SELECT l.*, s.""UserId"", s.""IsAdmin"", s.""IsAccepted"", 
                             s.""Order"", s.""NotificationsEnabled"", s.""IsArchived""
                         FROM ""ToDoAssistant.Lists"" AS l
                         LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
                         WHERE l.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))";
 
-            return (await Dapper.QueryAsync<ToDoList, ListShare, ToDoList>(sql,
+            return (await conn.QueryAsync<ToDoList, ListShare, ToDoList>(sql,
                 (list, share) =>
                 {
                     if (share != null)
@@ -108,13 +118,15 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<ToDoList> GetWithOwnerAsync(int id, int userId)
         {
+            using IDbConnection conn = OpenConnection();
+
             var sql = @"SELECT DISTINCT l.*, users.""Id"", users.""Email"", users.""ImageUri""
                         FROM ""ToDoAssistant.Lists"" AS l
                         LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
                         INNER JOIN ""AspNetUsers"" AS users ON l.""UserId"" = users.""Id""
                         WHERE l.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))";
 
-            return (await Dapper.QueryAsync<ToDoList, User, ToDoList>(sql,
+            return (await conn.QueryAsync<ToDoList, User, ToDoList>(sql,
                 (list, user) =>
                 {
                     list.User = user;
@@ -124,13 +136,15 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<IEnumerable<ListShare>> GetSharesAsync(int id)
         {
+            using IDbConnection conn = OpenConnection();
+
             var sql = @"SELECT s.*, u.""Id"", u.""Email"", u.""ImageUri""
                         FROM ""ToDoAssistant.Shares"" AS s
                         INNER JOIN ""AspNetUsers"" AS u ON s.""UserId"" = u.""Id""
                         WHERE s.""ListId"" = @ListId AND s.""IsAccepted"" IS NOT FALSE
                         ORDER BY (CASE WHEN s.""IsAccepted"" THEN 1 ELSE 2 END) ASC, s.""CreatedDate""";
 
-            return await Dapper.QueryAsync<ListShare, User, ListShare>(sql,
+            return await conn.QueryAsync<ListShare, User, ListShare>(sql,
                 (share, user) =>
                 {
                     share.User = user;
@@ -140,6 +154,8 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<IEnumerable<ListShare>> GetShareRequestsAsync(int userId)
         {
+            using IDbConnection conn = OpenConnection();
+
             var sql = @"SELECT s.*, l.""Name"", u.""Name""
                         FROM ""ToDoAssistant.Shares"" AS s
                         INNER JOIN ""ToDoAssistant.Lists"" AS l ON s.""ListId"" = l.""Id""
@@ -147,7 +163,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                         WHERE s.""UserId"" = @UserId
                         ORDER BY s.""ModifiedDate"" DESC";
 
-            return await Dapper.QueryAsync<ListShare, ToDoList, User, ListShare>(sql,
+            return await conn.QueryAsync<ListShare, ToDoList, User, ListShare>(sql,
                 (share, list, user) =>
                 {
                     share.List = list;
@@ -158,13 +174,17 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<int> GetPendingShareRequestsCountAsync(int userId)
         {
-            return await Dapper.ExecuteScalarAsync<int>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Shares"" WHERE ""UserId"" = @UserId AND ""IsAccepted"" IS NULL",
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.ExecuteScalarAsync<int>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Shares"" WHERE ""UserId"" = @UserId AND ""IsAccepted"" IS NULL",
                 new { UserId = userId });
         }
 
         public async Task<bool> CanShareWithUserAsync(int shareWithId, int userId)
         {
-            return !await Dapper.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
+            using IDbConnection conn = OpenConnection();
+
+            return !await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
                                                         FROM ""ToDoAssistant.Lists"" AS l
                                                         INNER JOIN ""ToDoAssistant.Shares"" AS s on l.""Id"" = s.""ListId""
                                                         WHERE l.""UserId"" = @UserId AND s.""UserId"" = @ShareWithId AND s.""IsAccepted"" = FALSE",
@@ -173,7 +193,9 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<bool> UserOwnsOrSharesAsync(int id, int userId)
         {
-            return await Dapper.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
                                                         FROM ""ToDoAssistant.Lists"" AS l
                                                         LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
                                                         WHERE l.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
@@ -182,7 +204,9 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<bool> UserOwnsOrSharesAsPendingAsync(int id, int userId)
         {
-            return await Dapper.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
                                                         FROM ""ToDoAssistant.Lists"" AS l
                                                         LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
                                                         WHERE l.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"" IS NOT FALSE))",
@@ -191,7 +215,9 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<bool> UserOwnsOrSharesAsAdminAsync(int id, int userId)
         {
-            return await Dapper.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
                                                         FROM ""ToDoAssistant.Lists"" AS l
                                                         LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
                                                         WHERE l.""Id"" = @Id AND (l.""UserId"" = @UserId 
@@ -201,7 +227,9 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<bool> UserOwnsOrSharesAsAdminAsync(int id, string name, int userId)
         {
-            return await Dapper.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
                                                         FROM ""ToDoAssistant.Lists"" AS l
                                                         LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
                                                         WHERE l.""Id"" != @Id AND UPPER(l.""Name"") = UPPER(@Name) 
@@ -212,7 +240,9 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<bool> UserOwnsAsync(int id, int userId)
         {
-            return await Dapper.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
                                                         FROM ""ToDoAssistant.Lists""
                                                         WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
                 new { Id = id, UserId = userId });
@@ -220,7 +250,9 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<bool> IsSharedAsync(int id)
         {
-            return await Dapper.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
                                                         FROM ""ToDoAssistant.Shares""
                                                         WHERE ""ListId"" = @ListId AND ""IsAccepted"" IS NOT FALSE",
                 new { ListId = id });
@@ -228,7 +260,9 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<bool> UserHasBlockedSharingAsync(int userId, int sharedWithId)
         {
-            return await Dapper.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
                                                         FROM ""ToDoAssistant.Lists"" AS l
                                                         INNER JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
                                                         WHERE l.""UserId"" = @UserId AND s.""UserId"" = @SharedWithId AND ""IsAccepted"" = FALSE",
@@ -237,7 +271,9 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<bool> ExistsAsync(string name, int userId)
         {
-            return await Dapper.ExecuteScalarAsync<bool>(@"SELECT SUM(total) FROM
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.ExecuteScalarAsync<bool>(@"SELECT SUM(total) FROM
                                                         (
 	                                                        SELECT COUNT(*) AS total
 	                                                        FROM ""ToDoAssistant.Lists""
@@ -253,7 +289,9 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<bool> ExistsAsync(int id, string name, int userId)
         {
-            return await Dapper.ExecuteScalarAsync<bool>(@"SELECT SUM(total) FROM
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.ExecuteScalarAsync<bool>(@"SELECT SUM(total) FROM
                                                         (
 	                                                        SELECT COUNT(*) AS total
 	                                                        FROM ""ToDoAssistant.Lists""
@@ -269,12 +307,16 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<int> CountAsync(int userId)
         {
-            return await Dapper.ExecuteScalarAsync<int>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Lists"" WHERE ""UserId"" = @UserId", new { UserId = userId });
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.ExecuteScalarAsync<int>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Lists"" WHERE ""UserId"" = @UserId", new { UserId = userId });
         }
 
         public async Task<int> CreateAsync(ToDoList list)
         {
-            var listsCount = Dapper.ExecuteScalar<short>(@"SELECT COUNT(*)
+            using IDbConnection conn = OpenConnection();
+
+            var listsCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*)
                                                            FROM ""ToDoAssistant.Lists"" AS l
                                                            LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
                                                            WHERE l.""IsArchived"" = FALSE AND l.""UserId"" = @UserId 
@@ -297,7 +339,9 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<ToDoList> UpdateAsync(ToDoList list)
         {
-            ToDoList originalList = Dapper.QueryFirst<ToDoList>(@"SELECT * FROM ""ToDoAssistant.Lists"" WHERE ""Id"" = @Id", new { Id = list.Id });
+            using IDbConnection conn = OpenConnection();
+
+            ToDoList originalList = conn.QueryFirst<ToDoList>(@"SELECT * FROM ""ToDoAssistant.Lists"" WHERE ""Id"" = @Id", new { Id = list.Id });
 
             ToDoList dbList = EFContext.Lists.Find(list.Id);
             dbList.Name = list.Name;
@@ -338,10 +382,12 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
             ToDoList list = await GetAsync(id);
 
+            using IDbConnection conn = OpenConnection();
+
             var affectedUsers = new List<(int, short?)> {
                 (list.UserId, list.Order)
             };
-            affectedUsers.AddRange(Dapper.Query<(int, short?)>(@"SELECT ""UserId"", ""Order""
+            affectedUsers.AddRange(conn.Query<(int, short?)>(@"SELECT ""UserId"", ""Order""
                                                                  FROM ""ToDoAssistant.Shares""
                                                                  WHERE ""ListId"" = @Id AND ""IsAccepted"" = TRUE", new { Id = id }));
 
@@ -401,7 +447,9 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 ingredient.ModifiedDate = now;
             }
 
-            var share = Dapper.QueryFirst<ListShare>(@"SELECT * 
+            using IDbConnection conn = OpenConnection();
+
+            var share = conn.QueryFirst<ListShare>(@"SELECT * 
                                                        FROM ""ToDoAssistant.Shares"" 
                                                        WHERE ""ListId"" = @ListId AND ""UserId"" = @UserId",
                                                        new { ListId = id, UserId = userId });
@@ -420,7 +468,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 dbShare.Order -= 1;
             }
 
-            var sharesCount = Dapper.ExecuteScalar<short>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = @ListId AND ""IsAccepted"" IS NOT FALSE", new { ListId = id });
+            var sharesCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = @ListId AND ""IsAccepted"" IS NOT FALSE", new { ListId = id });
             if (sharesCount == 1)
             {
                 var uncompletedTasks = EFContext.Tasks.Where(x => x.ListId == id && !x.IsCompleted && !x.PrivateToUserId.HasValue);
@@ -457,12 +505,14 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<int> CopyAsync(ToDoList list)
         {
-            list.Tasks = (Dapper.Query<ToDoTask>(@"SELECT * FROM ""ToDoAssistant.Tasks""
+            using IDbConnection conn = OpenConnection();
+
+            list.Tasks = (conn.Query<ToDoTask>(@"SELECT * FROM ""ToDoAssistant.Tasks""
                                                    WHERE ""ListId"" = @ListId AND (""PrivateToUserId"" IS NULL OR ""PrivateToUserId"" = @UserId)
                                                    ORDER BY ""PrivateToUserId"" NULLS LAST",
                                                    new { ListId = list.Id, list.UserId })).ToList();
 
-            var listsCount = Dapper.ExecuteScalar<short>(@"SELECT COUNT(*)
+            var listsCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*)
                                                            FROM ""ToDoAssistant.Lists"" AS l
                                                            LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
                                                            WHERE l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")",
@@ -513,7 +563,9 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 }
                 else
                 {
-                    var listsCount = Dapper.ExecuteScalar<short>(@"SELECT COUNT(*)
+                    using IDbConnection conn = OpenConnection();
+
+                    var listsCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*)
                                                                    FROM ""ToDoAssistant.Lists"" AS l
                                                                    LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
                                                                    WHERE l.""IsArchived"" = FALSE AND l.""UserId"" = @UserId 
@@ -551,7 +603,9 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 }
                 else
                 {
-                    var listsCount = Dapper.ExecuteScalar<short>(@"SELECT COUNT(*)
+                    using IDbConnection conn = OpenConnection();
+
+                    var listsCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*)
                                                                    FROM ""ToDoAssistant.Lists"" AS l
                                                                    LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
                                                                    WHERE l.""IsArchived"" = FALSE 
@@ -600,10 +654,12 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task SetShareIsAcceptedAsync(int id, int userId, bool isAccepted, DateTime modifiedDate)
         {
+            using IDbConnection conn = OpenConnection();
+
             short? order = null;
             if (isAccepted)
             {
-                var listsCount = Dapper.ExecuteScalar<short>(@"SELECT COUNT(*)
+                var listsCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*)
                                                                FROM ""ToDoAssistant.Lists"" AS l
                                                                LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
                                                                WHERE l.""IsArchived"" = FALSE AND l.""UserId"" = @UserId 
@@ -619,7 +675,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
             if (!isAccepted)
             {
-                var sharesCount = Dapper.ExecuteScalar<short>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = @ListId AND ""IsAccepted"" IS NOT FALSE", new { ListId = id });
+                var sharesCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = @ListId AND ""IsAccepted"" IS NOT FALSE", new { ListId = id });
 
                 // If this is the last share make all private tasks public
                 if (sharesCount == 1)
@@ -666,7 +722,9 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 }
             }
 
-            var userIsOwner = Dapper.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Lists"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId", new { Id = id, UserId = userId });
+            using IDbConnection conn = OpenConnection();
+
+            var userIsOwner = conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Lists"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId", new { Id = id, UserId = userId });
 
             if (userIsOwner)
             {

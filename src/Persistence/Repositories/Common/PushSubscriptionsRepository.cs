@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
 using Dapper;
 using Persistence;
@@ -14,18 +15,24 @@ namespace PersonalAssistant.Persistence.Repositories.Common
 
         public async Task CreateSubscriptionAsync(PushSubscription subscription)
         {
-            await Dapper.ExecuteAsync(@"INSERT INTO ""PushSubscriptions"" (""UserId"", ""Application"", ""Endpoint"", ""AuthKey"", ""P256dhKey"", ""CreatedDate"")
+            using IDbConnection conn = OpenConnection();
+
+            await conn.ExecuteAsync(@"INSERT INTO ""PushSubscriptions"" (""UserId"", ""Application"", ""Endpoint"", ""AuthKey"", ""P256dhKey"", ""CreatedDate"")
                                           VALUES (@UserId, @Application, @Endpoint, @AuthKey, @P256dhKey, @CreatedDate)", subscription);
         }
 
         public async Task DeleteSubscriptionAsync(int id)
         {
-            await Dapper.ExecuteAsync(@"DELETE FROM ""PushSubscriptions"" WHERE ""Id"" = @Id", new { Id = id });
+            using IDbConnection conn = OpenConnection();
+
+            await conn.ExecuteAsync(@"DELETE FROM ""PushSubscriptions"" WHERE ""Id"" = @Id", new { Id = id });
         }
 
         public async Task<IEnumerable<PushSubscription>> GetAllAsync(int userId, string application)
         {
-            return await Dapper.QueryAsync<PushSubscription>(@"SELECT * FROM ""PushSubscriptions"" WHERE ""UserId"" = @UserId AND ""Application"" = @Application",
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.QueryAsync<PushSubscription>(@"SELECT * FROM ""PushSubscriptions"" WHERE ""UserId"" = @UserId AND ""Application"" = @Application",
                 new { UserId = userId, Application = application });
         }
     }

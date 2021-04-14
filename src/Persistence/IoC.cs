@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence;
 using PersonalAssistant.Application.Contracts.Accountant.Accounts;
@@ -42,7 +41,8 @@ namespace PersonalAssistant.Persistence
             services.AddTransient<IDebtsRepository, DebtsRepository>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
 
-            services.AddDbContext<PersonalAssistantContext>(options => {
+            services.AddDbContext<PersonalAssistantContext>(options =>
+            {
                 options.UseNpgsql(connectionString);
             });
 

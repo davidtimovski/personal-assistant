@@ -84,7 +84,7 @@ namespace PersonalAssistant.Application.Services.Accountant
                 debtIds[i] = id;
             }
 
-            await _unitOfWork.CommitTransactionAsync(conn, uowTransaction);
+            _unitOfWork.CommitTransaction(conn, uowTransaction);
 
             return new SyncedEntityIds(accountIds, categoryIds, transactionIds, upcomingExpenseIds, debtIds);
         }

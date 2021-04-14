@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Threading.Tasks;
 using Dapper;
 using Persistence;
@@ -14,31 +15,35 @@ namespace PersonalAssistant.Persistence.Repositories.Common
 
         public async Task<CurrencyRates> GetAsync(DateTime date)
         {
-            var rates = await Dapper.QueryFirstOrDefaultAsync<CurrencyRates>(@"SELECT * FROM ""CurrencyRates"" WHERE ""Date"" = @Date", new { Date = date });
+            using IDbConnection conn = OpenConnection();
+
+            var rates = await conn.QueryFirstOrDefaultAsync<CurrencyRates>(@"SELECT * FROM ""CurrencyRates"" WHERE ""Date"" = @Date", new { Date = date });
             if (rates != null)
             {
                 return rates;
             }
 
-            rates = await Dapper.QueryFirstOrDefaultAsync<CurrencyRates>(@"SELECT * FROM ""CurrencyRates"" WHERE ""Date"" < @Date ORDER BY ""Date"" DESC LIMIT 1", new { Date = date });
+            rates = await conn.QueryFirstOrDefaultAsync<CurrencyRates>(@"SELECT * FROM ""CurrencyRates"" WHERE ""Date"" < @Date ORDER BY ""Date"" DESC LIMIT 1", new { Date = date });
             if (rates != null)
             {
                 return rates;
             }
 
-            return await Dapper.QueryFirstOrDefaultAsync<CurrencyRates>(@"SELECT * FROM ""CurrencyRates"" WHERE ""Date"" > @Date ORDER BY ""Date"" DESC LIMIT 1",
+            return await conn.QueryFirstOrDefaultAsync<CurrencyRates>(@"SELECT * FROM ""CurrencyRates"" WHERE ""Date"" > @Date ORDER BY ""Date"" DESC LIMIT 1",
                 new { Date = date });
         }
 
         public async Task CreateAsync(CurrencyRates rates)
         {
-            var exists = await Dapper.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""CurrencyRates"" WHERE ""Date"" = @Date", new { rates.Date });
+            using IDbConnection conn = OpenConnection();
+
+            var exists = await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""CurrencyRates"" WHERE ""Date"" = @Date", new { rates.Date });
             if (exists)
             {
                 return;
             }
 
-            await Dapper.ExecuteAsync(@"INSERT INTO ""CurrencyRates"" (""Date"", ""Rates"") VALUES (@Date, CAST(@Rates AS json))", rates);
+            await conn.ExecuteAsync(@"INSERT INTO ""CurrencyRates"" (""Date"", ""Rates"") VALUES (@Date, CAST(@Rates AS json))", rates);
         }
     }
 }
