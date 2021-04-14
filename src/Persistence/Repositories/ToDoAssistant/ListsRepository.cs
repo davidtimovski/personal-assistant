@@ -274,12 +274,12 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<int> CreateAsync(ToDoList list)
         {
-            var listsCount = await Dapper.ExecuteScalarAsync<short>(@"SELECT COUNT(*)
-                                                                    FROM ""ToDoAssistant.Lists"" AS l
-                                                                    LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                                                    WHERE l.""IsArchived"" = FALSE AND l.""UserId"" = @UserId 
-                                                                        OR (s.""UserId"" = @UserId AND s.""IsAccepted"" AND s.""IsArchived"" = FALSE)",
-                                                                    new { list.UserId });
+            var listsCount = Dapper.ExecuteScalar<short>(@"SELECT COUNT(*)
+                                                           FROM ""ToDoAssistant.Lists"" AS l
+                                                           LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
+                                                           WHERE l.""IsArchived"" = FALSE AND l.""UserId"" = @UserId 
+                                                               OR (s.""UserId"" = @UserId AND s.""IsAccepted"" AND s.""IsArchived"" = FALSE)",
+                                                           new { list.UserId });
             list.Order = ++listsCount;
 
             for (short i = 0; i < list.Tasks.Count(); i++)
@@ -297,9 +297,9 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<ToDoList> UpdateAsync(ToDoList list)
         {
-            ToDoList originalList = await EFContext.Lists.AsNoTracking().FirstOrDefaultAsync(x => x.Id == list.Id);
+            ToDoList originalList = Dapper.QueryFirst<ToDoList>(@"SELECT * FROM ""ToDoAssistant.Lists"" WHERE ""Id"" = @Id", new { Id = list.Id });
 
-            ToDoList dbList = await EFContext.Lists.FindAsync(list.Id);
+            ToDoList dbList = EFContext.Lists.Find(list.Id);
             dbList.Name = list.Name;
             dbList.Icon = list.Icon;
             dbList.IsOneTimeToggleDefault = list.IsOneTimeToggleDefault;
@@ -313,7 +313,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task UpdateSharedAsync(ToDoList list)
         {
-            ToDoList dbList = await EFContext.Lists.FirstOrDefaultAsync(x => x.Id == list.Id && x.UserId == list.UserId);
+            ToDoList dbList = EFContext.Lists.First(x => x.Id == list.Id && x.UserId == list.UserId);
             dbList.NotificationsEnabled = list.NotificationsEnabled;
             dbList.ModifiedDate = list.ModifiedDate;
 
@@ -324,14 +324,12 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
         {
             var now = DateTime.UtcNow;
 
-            var transaction = Dapper.BeginTransaction();
-
             var tasksLinkedToIngredients = from task in EFContext.Tasks
                                            join ingredient in EFContext.Ingredients on task.Id equals ingredient.TaskId
                                            where task.ListId == id
                                            select task;
 
-            foreach (var task in tasksLinkedToIngredients)
+            foreach (ToDoTask task in tasksLinkedToIngredients)
             {
                 Ingredient ingredient = EFContext.Ingredients.First(x => x.TaskId == task.Id);
                 ingredient.Name = task.Name;
@@ -343,9 +341,9 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             var affectedUsers = new List<(int, short?)> {
                 (list.UserId, list.Order)
             };
-            affectedUsers.AddRange(await Dapper.QueryAsync<(int, short?)>(@"SELECT ""UserId"", ""Order""
-                                                                            FROM ""ToDoAssistant.Shares""
-                                                                            WHERE ""ListId"" = @Id AND ""IsAccepted"" = TRUE", new { Id = id }));
+            affectedUsers.AddRange(Dapper.Query<(int, short?)>(@"SELECT ""UserId"", ""Order""
+                                                                 FROM ""ToDoAssistant.Shares""
+                                                                 WHERE ""ListId"" = @Id AND ""IsAccepted"" = TRUE", new { Id = id }));
 
             EFContext.Lists.Remove(list);
 
@@ -389,93 +387,86 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<ListShare> LeaveAsync(int id, int userId)
         {
-            var transaction = Dapper.BeginTransaction();
+            var now = DateTime.UtcNow;
 
-            var tasksLinkedToIngredients = await Dapper.QueryAsync<ToDoTask>(@"SELECT t.""Id"", t.""Name""
-                                                                            FROM ""ToDoAssistant.Tasks"" AS t
-                                                                            INNER JOIN ""CookingAssistant.Ingredients"" AS i ON t.""Id"" = i.""TaskId""
-                                                                            WHERE ""ListId"" = @ListId", new { ListId = id });
-            foreach (var task in tasksLinkedToIngredients)
+            var tasksLinkedToIngredients = from task in EFContext.Tasks
+                                           join ingredient in EFContext.Ingredients on task.Id equals ingredient.TaskId
+                                           where task.ListId == id
+                                           select task;
+
+            foreach (ToDoTask task in tasksLinkedToIngredients)
             {
-                await Dapper.ExecuteAsync(@"UPDATE ""CookingAssistant.Ingredients""
-                                            SET ""Name"" = @Name, ""ModifiedDate"" = @ModifiedDate
-                                            WHERE ""TaskId"" = @Id AND ""UserId"" = @UserId",
-                                          new { task.Id, UserId = userId, task.Name, ModifiedDate = DateTime.UtcNow }, transaction);
+                Ingredient ingredient = EFContext.Ingredients.First(x => x.TaskId == task.Id);
+                ingredient.Name = task.Name;
+                ingredient.ModifiedDate = now;
             }
 
-            var share = await Dapper.QueryFirstOrDefaultAsync<ListShare>(@"SELECT * 
-                                                                    FROM ""ToDoAssistant.Shares"" 
-                                                                    WHERE ""ListId"" = @ListId AND ""UserId"" = @UserId",
-                                                                    new { ListId = id, UserId = userId }, transaction);
+            var share = Dapper.QueryFirst<ListShare>(@"SELECT * 
+                                                       FROM ""ToDoAssistant.Shares"" 
+                                                       WHERE ""ListId"" = @ListId AND ""UserId"" = @UserId",
+                                                       new { ListId = id, UserId = userId });
 
-            await Dapper.ExecuteAsync(@"DELETE FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = @ListId AND ""UserId"" = @UserId",
-                new { ListId = id, UserId = userId }, transaction);
+            EFContext.ListShares.Remove(share);
 
-            await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Lists""
-                                        SET ""Order"" = ""Order"" - 1
-                                        WHERE ""UserId"" = @UserId AND ""IsArchived"" = FALSE AND ""Order"" > @Order",
-                                      new { UserId = userId, share.Order }, transaction);
-
-            await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Shares"" 
-                                          SET ""Order"" = ""Order"" - 1 
-                                          WHERE ""UserId"" = @UserId AND ""IsAccepted"" = TRUE AND ""IsArchived"" = FALSE AND ""Order"" > @Order",
-                                      new { UserId = userId, share.Order }, transaction);
-
-
-            // If the list is no longer shared make all private tasks public
-            var sharesCount = await Dapper.ExecuteScalarAsync<short>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = @ListId AND ""IsAccepted"" IS NOT FALSE;",
-                                                                     new { ListId = id });
-            if (sharesCount == 0)
+            var lists = NonArchivedLists(userId).Where(x => x.Order > share.Order);
+            foreach (ToDoList dbList in lists)
             {
-                var uncompletedPrivateTaskIds = await Dapper.QueryAsync<int>(@"SELECT ""Id"" FROM ""ToDoAssistant.Tasks"" 
-                                                                            WHERE ""ListId"" = @ListId 
-                                                                                AND ""IsCompleted"" = FALSE 
-                                                                                AND ""PrivateToUserId"" IS NOT NULL",
-                                                                            new { ListId = id });
-                if (uncompletedPrivateTaskIds.Any())
-                {
-                    int orderOffset = uncompletedPrivateTaskIds.Count();
-                    await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Tasks"" SET ""Order"" = ""Order"" + @OrderOffset 
-                                                WHERE ""ListId"" = @ListId AND ""IsCompleted"" = FALSE AND ""PrivateToUserId"" IS NULL",
-                                              new { OrderOffset = orderOffset, ListId = id },
-                                              transaction);
-                }
-
-                var completedPrivateTaskIds = await Dapper.QueryAsync<int>(@"SELECT ""Id"" FROM ""ToDoAssistant.Tasks"" 
-                                                                            WHERE ""ListId"" = @ListId 
-                                                                                AND ""IsCompleted"" 
-                                                                                AND ""PrivateToUserId"" IS NOT NULL",
-                                                                            new { ListId = id });
-                if (completedPrivateTaskIds.Any())
-                {
-                    int orderOffset = completedPrivateTaskIds.Count();
-                    await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Tasks"" SET ""Order"" = ""Order"" + @OrderOffset 
-                                            WHERE ""ListId"" = @ListId AND ""IsCompleted"" AND ""PrivateToUserId"" IS NULL",
-                                              new { OrderOffset = orderOffset, ListId = id },
-                                              transaction);
-                }
-
-                await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Tasks"" SET ""PrivateToUserId"" = NULL WHERE ""ListId"" = @ListId",
-                                          new { ListId = id }, transaction);
+                dbList.Order -= 1;
             }
 
-            transaction.Commit();
+            var shares = AcceptedShares(userId).Where(x => !x.IsArchived && x.Order > share.Order);
+            foreach (ListShare dbShare in shares)
+            {
+                dbShare.Order -= 1;
+            }
+
+            var sharesCount = Dapper.ExecuteScalar<short>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = @ListId AND ""IsAccepted"" IS NOT FALSE", new { ListId = id });
+            if (sharesCount == 1)
+            {
+                var uncompletedTasks = EFContext.Tasks.Where(x => x.ListId == id && !x.IsCompleted && !x.PrivateToUserId.HasValue);
+                var uncompletedOrderOffset = (short)uncompletedTasks.Count();
+                foreach (ToDoTask task in uncompletedTasks)
+                {
+                    task.Order += uncompletedOrderOffset;
+                }
+
+                var completedTasks = EFContext.Tasks.Where(x => x.ListId == id && x.IsCompleted && !x.PrivateToUserId.HasValue);
+                var completedOrderOffset = (short)completedTasks.Count();
+                foreach (ToDoTask task in completedTasks)
+                {
+                    task.Order += completedOrderOffset;
+                }
+
+                var userPrivateTasks = EFContext.Tasks.Where(x => x.ListId == id && x.PrivateToUserId == userId);
+                foreach (ToDoTask task in userPrivateTasks)
+                {
+                    EFContext.Tasks.Remove(task);
+                }
+
+                var privateTasks = EFContext.Tasks.Where(x => x.ListId == id && x.PrivateToUserId.HasValue && x.PrivateToUserId != userId);
+                foreach (ToDoTask task in privateTasks)
+                {
+                    task.PrivateToUserId = null;
+                }
+            }
+
+            await EFContext.SaveChangesAsync();
 
             return share;
         }
 
         public async Task<int> CopyAsync(ToDoList list)
         {
-            list.Tasks = (await Dapper.QueryAsync<ToDoTask>(@"SELECT * FROM ""ToDoAssistant.Tasks""
-                                                              WHERE ""ListId"" = @ListId AND (""PrivateToUserId"" IS NULL OR ""PrivateToUserId"" = @UserId)
-                                                              ORDER BY ""PrivateToUserId"" NULLS LAST",
-                                                              new { ListId = list.Id, list.UserId })).ToList();
+            list.Tasks = (Dapper.Query<ToDoTask>(@"SELECT * FROM ""ToDoAssistant.Tasks""
+                                                   WHERE ""ListId"" = @ListId AND (""PrivateToUserId"" IS NULL OR ""PrivateToUserId"" = @UserId)
+                                                   ORDER BY ""PrivateToUserId"" NULLS LAST",
+                                                   new { ListId = list.Id, list.UserId })).ToList();
 
-            var listsCount = await Dapper.ExecuteScalarAsync<short>(@"SELECT COUNT(*)
-                                                                    FROM ""ToDoAssistant.Lists"" AS l
-                                                                    LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                                                    WHERE l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")",
-                                                                    new { list.UserId });
+            var listsCount = Dapper.ExecuteScalar<short>(@"SELECT COUNT(*)
+                                                           FROM ""ToDoAssistant.Lists"" AS l
+                                                           LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
+                                                           WHERE l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")",
+                                                           new { list.UserId });
             list.Id = default;
             list.Order = ++listsCount;
 
@@ -497,93 +488,95 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task SetIsArchivedAsync(int id, int userId, bool isArchived, DateTime modifiedDate)
         {
-            var transaction = Dapper.BeginTransaction();
-
-            var list = await Dapper.QueryFirstOrDefaultAsync<ToDoList>(@"SELECT * FROM ""ToDoAssistant.Lists"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
-                new { Id = id, UserId = userId });
+            ToDoList list = EFContext.Lists.FirstOrDefault(x => x.Id == id && x.UserId == userId);
 
             if (list != null)
             {
                 if (isArchived)
                 {
-                    await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Lists""
-                                                SET ""Order"" = ""Order"" - 1
-                                                WHERE ""UserId"" = @UserId AND ""IsArchived"" = FALSE AND ""Order"" >= @Order",
-                                              new { UserId = userId, list.Order }, transaction);
+                    var lists = NonArchivedLists(userId).Where(x => x.Order >= list.Order);
+                    foreach (ToDoList dbList in lists)
+                    {
+                        dbList.Order -= 1;
+                    }
 
-                    await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Shares""
-                                                SET ""Order"" = ""Order"" - 1
-                                                WHERE ""UserId"" = @UserId AND ""IsArchived"" = FALSE AND ""Order"" >= @Order",
-                                              new { UserId = userId, list.Order }, transaction);
+                    var shares = NonArchivedShares(userId).Where(x => x.Order >= list.Order);
+                    foreach (ListShare dbShare in shares)
+                    {
+                        dbShare.Order -= 1;
+                    }
 
-                    await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Lists"" SET ""IsArchived"" = TRUE, ""NotificationsEnabled"" = FALSE, ""Order"" = NULL, ""ModifiedDate"" = @ModifiedDate
-                                            WHERE ""Id"" = @Id AND ""UserId"" = @UserId AND ""IsArchived"" = FALSE",
-                                              new { Id = id, UserId = userId, ModifiedDate = modifiedDate }, transaction);
+                    list.IsArchived = true;
+                    list.NotificationsEnabled = false;
+                    list.Order = null;
+                    list.ModifiedDate = modifiedDate;
                 }
                 else
                 {
-                    var listsCount = await Dapper.ExecuteScalarAsync<short>(@"SELECT COUNT(*)
-                                                                            FROM ""ToDoAssistant.Lists"" AS l
-                                                                            LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                                                            WHERE l.""IsArchived"" = FALSE AND l.""UserId"" = @UserId 
-                                                                                OR (s.""UserId"" = @UserId AND s.""IsAccepted"" AND s.""IsArchived"" = FALSE)",
-                                                                            new { UserId = userId }, transaction);
+                    var listsCount = Dapper.ExecuteScalar<short>(@"SELECT COUNT(*)
+                                                                   FROM ""ToDoAssistant.Lists"" AS l
+                                                                   LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
+                                                                   WHERE l.""IsArchived"" = FALSE AND l.""UserId"" = @UserId 
+                                                                       OR (s.""UserId"" = @UserId AND s.""IsAccepted"" AND s.""IsArchived"" = FALSE)",
+                                                                   new { UserId = userId });
 
-                    await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Lists"" SET ""IsArchived"" = FALSE, ""NotificationsEnabled"" = TRUE, ""Order"" = @Order, ""ModifiedDate"" = @ModifiedDate
-                                            WHERE ""Id"" = @Id AND ""UserId"" = @UserId AND ""IsArchived"" = TRUE",
-                                              new { Id = id, UserId = userId, Order = ++listsCount, ModifiedDate = modifiedDate }, transaction);
+                    list.IsArchived = false;
+                    list.NotificationsEnabled = true;
+                    list.Order = ++listsCount;
+                    list.ModifiedDate = modifiedDate;
                 }
             }
             else
             {
-                var share = await Dapper.QueryFirstOrDefaultAsync<ListShare>(@"SELECT * FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = @ListId AND ""UserId"" = @UserId",
-                    new { ListId = id, UserId = userId });
+                ListShare share = EFContext.ListShares.First(x => x.ListId == id && x.UserId == userId);
 
                 if (isArchived)
                 {
-                    await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Lists""
-                                                SET ""Order"" = ""Order"" - 1
-                                                WHERE ""UserId"" = @UserId AND ""IsArchived"" = FALSE AND ""Order"" >= @Order",
-                                              new { UserId = userId, share.Order }, transaction);
+                    var lists = NonArchivedLists(userId).Where(x => x.Order >= share.Order);
+                    foreach (ToDoList dbList in lists)
+                    {
+                        dbList.Order -= 1;
+                    }
 
-                    await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Shares""
-                                                SET ""Order"" = ""Order"" - 1
-                                                WHERE ""UserId"" = @UserId AND ""IsArchived"" = FALSE AND ""Order"" >= @Order",
-                                              new { UserId = userId, share.Order }, transaction);
+                    var shares = NonArchivedShares(userId).Where(x => x.Order >= share.Order);
+                    foreach (ListShare dbShare in shares)
+                    {
+                        dbShare.Order -= 1;
+                    }
 
-                    await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Shares"" SET ""IsArchived"" = TRUE, ""NotificationsEnabled"" = FALSE, ""Order"" = NULL, ""ModifiedDate"" = @ModifiedDate
-                                                WHERE ""ListId"" = @ListId AND ""UserId"" = @UserId AND ""IsArchived"" = FALSE",
-                                              new { ListId = id, UserId = userId, ModifiedDate = modifiedDate }, transaction);
+                    share.IsArchived = true;
+                    share.NotificationsEnabled = false;
+                    share.Order = null;
+                    share.ModifiedDate = modifiedDate;
                 }
                 else
                 {
-                    var listsCount = await Dapper.ExecuteScalarAsync<short>(@"SELECT COUNT(*)
-                                                                            FROM ""ToDoAssistant.Lists"" AS l
-                                                                            LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                                                            WHERE l.""IsArchived"" = FALSE 
-                                                                                AND l.""UserId"" = @UserId 
-                                                                                OR (s.""UserId"" = @UserId AND s.""IsAccepted"" AND s.""IsArchived"" = FALSE)",
-                                                                            new { UserId = userId }, transaction);
+                    var listsCount = Dapper.ExecuteScalar<short>(@"SELECT COUNT(*)
+                                                                   FROM ""ToDoAssistant.Lists"" AS l
+                                                                   LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
+                                                                   WHERE l.""IsArchived"" = FALSE 
+                                                                       AND l.""UserId"" = @UserId 
+                                                                       OR (s.""UserId"" = @UserId AND s.""IsAccepted"" AND s.""IsArchived"" = FALSE)",
+                                                                   new { UserId = userId });
 
-                    await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Shares"" SET ""IsArchived"" = FALSE, ""NotificationsEnabled"" = TRUE, ""Order"" = @Order, ""ModifiedDate"" = @ModifiedDate
-                                                WHERE ""ListId"" = @ListId AND ""UserId"" = @UserId AND ""IsArchived""",
-                                              new { ListId = id, UserId = userId, Order = ++listsCount, ModifiedDate = modifiedDate }, transaction);
+                    share.IsArchived = false;
+                    share.NotificationsEnabled = true;
+                    share.Order = ++listsCount;
+                    share.ModifiedDate = modifiedDate;
                 }
             }
 
-            transaction.Commit();
+            await EFContext.SaveChangesAsync();
         }
 
         public async Task<bool> SetTasksAsNotCompletedAsync(int id, int userId, DateTime modifiedDate)
         {
-            var transaction = Dapper.BeginTransaction();
-
-            IEnumerable<ToDoTask> tasks = await Dapper.QueryAsync<ToDoTask>(@"SELECT * FROM ""ToDoAssistant.Tasks"" WHERE ""ListId"" = @ListId", new { ListId = id });
+            List<ToDoTask> tasks = EFContext.Tasks.Where(x => x.ListId == id).ToList();
             short uncompletedTasksCount = (short)tasks.Where(x => !x.IsCompleted && !x.PrivateToUserId.HasValue).Count();
             short uncompletedPrivateTasksCount = (short)tasks.Where(x => !x.IsCompleted && x.PrivateToUserId.HasValue && x.PrivateToUserId.Value == userId).Count();
 
             // Public tasks
-            List<ToDoTask> completedTasks = tasks.Where(x => x.IsCompleted && !x.PrivateToUserId.HasValue).ToList();
+            IEnumerable<ToDoTask> completedTasks = tasks.Where(x => x.IsCompleted && !x.PrivateToUserId.HasValue);
             foreach (var task in completedTasks)
             {
                 task.IsCompleted = false;
@@ -591,11 +584,8 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 task.ModifiedDate = modifiedDate;
             }
 
-            await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Tasks"" SET ""IsCompleted"" = FALSE, ""Order"" = @Order, ""ModifiedDate"" = @ModifiedDate WHERE ""Id"" = @Id",
-                completedTasks, transaction);
-
             // Private tasks
-            List<ToDoTask> completedPrivateTasks = tasks.Where(x => x.IsCompleted && x.PrivateToUserId.HasValue && x.PrivateToUserId.Value == userId).ToList();
+            IEnumerable<ToDoTask> completedPrivateTasks = tasks.Where(x => x.IsCompleted && x.PrivateToUserId.HasValue && x.PrivateToUserId.Value == userId);
             foreach (var task in completedPrivateTasks)
             {
                 task.IsCompleted = false;
@@ -603,107 +593,110 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 task.ModifiedDate = modifiedDate;
             }
 
-            await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Tasks"" SET ""IsCompleted"" = FALSE, ""Order"" = @Order, ""ModifiedDate"" = @ModifiedDate WHERE ""Id"" = @Id",
-                completedPrivateTasks, transaction);
-
-            transaction.Commit();
+            await EFContext.SaveChangesAsync();
 
             return completedTasks.Any();
         }
 
         public async Task SetShareIsAcceptedAsync(int id, int userId, bool isAccepted, DateTime modifiedDate)
         {
-            var transaction = Dapper.BeginTransaction();
-
             short? order = null;
             if (isAccepted)
             {
-                var listsCount = await Dapper.ExecuteScalarAsync<short>(@"SELECT COUNT(*)
-                                                                    FROM ""ToDoAssistant.Lists"" AS l
-                                                                    LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                                                    WHERE l.""IsArchived"" = FALSE AND l.""UserId"" = @UserId 
-                                                                        OR (s.""UserId"" = @UserId AND s.""IsAccepted"" AND s.""IsArchived"" = FALSE)",
-                                                                        new { UserId = userId }, transaction);
+                var listsCount = Dapper.ExecuteScalar<short>(@"SELECT COUNT(*)
+                                                               FROM ""ToDoAssistant.Lists"" AS l
+                                                               LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
+                                                               WHERE l.""IsArchived"" = FALSE AND l.""UserId"" = @UserId 
+                                                                   OR (s.""UserId"" = @UserId AND s.""IsAccepted"" AND s.""IsArchived"" = FALSE)",
+                                                                   new { UserId = userId });
                 order = ++listsCount;
             }
 
-            await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Shares"" SET ""IsAccepted"" = @IsAccepted, ""Order"" = @Order, ""ModifiedDate"" = @ModifiedDate
-                                     WHERE ""ListId"" = @ListId AND ""UserId"" = @UserId AND ""IsAccepted"" IS NULL",
-                                      new { ListId = id, UserId = userId, IsAccepted = isAccepted, Order = order, ModifiedDate = modifiedDate }, transaction);
+            ListShare share = EFContext.ListShares.First(x => x.ListId == id && x.UserId == userId && !x.IsAccepted.HasValue);
+            share.IsAccepted = isAccepted;
+            share.Order = order;
+            share.ModifiedDate = modifiedDate;
 
-            transaction.Commit();
-
-            // If the list is no longer shared make all private tasks public
             if (!isAccepted)
             {
-                var sharesCount = await Dapper.ExecuteScalarAsync<short>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = @ListId AND ""IsAccepted"" IS NOT FALSE;",
-                                                                         new { ListId = id });
+                var sharesCount = Dapper.ExecuteScalar<short>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = @ListId AND ""IsAccepted"" IS NOT FALSE", new { ListId = id });
 
-                if (sharesCount == 0)
+                // If this is the last share make all private tasks public
+                if (sharesCount == 1)
                 {
-                    await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Tasks"" SET ""PrivateToUserId"" = NULL WHERE ""ListId"" = @ListId",
-                                              new { ListId = id });
+                    var privateTasks = EFContext.Tasks.Where(x => x.ListId == id && x.PrivateToUserId.HasValue);
+                    foreach (ToDoTask task in privateTasks)
+                    {
+                        task.PrivateToUserId = null;
+                    }
                 }
             }
+
+            await EFContext.SaveChangesAsync();
         }
 
         public async Task ReorderAsync(int id, int userId, short oldOrder, short newOrder, DateTime modifiedDate)
         {
-            var transaction = Dapper.BeginTransaction();
-
-            var parameters = new
-            {
-                UserId = userId,
-                OldOrder = oldOrder,
-                NewOrder = newOrder
-            };
-
             if (newOrder > oldOrder)
             {
-                await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Lists""
-                                        SET ""Order"" = ""Order"" - 1
-                                        WHERE ""UserId"" = @UserId AND ""IsArchived"" = FALSE AND ""Order"" >= @OldOrder AND ""Order"" <= @NewOrder",
-                                          parameters, transaction);
+                var lists = NonArchivedLists(userId).Where(x => x.Order <= newOrder);
+                foreach (ToDoList dbList in lists)
+                {
+                    dbList.Order -= 1;
+                }
 
-                await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Shares"" 
-                                        SET ""Order"" = ""Order"" - 1 
-                                        WHERE ""UserId"" = @UserId AND ""IsAccepted"" = TRUE AND ""IsArchived"" = FALSE AND ""Order"" >= @OldOrder AND ""Order"" <= @NewOrder",
-                                          parameters, transaction);
+                var shares = AcceptedShares(userId).Where(x => !x.IsArchived && x.Order >= oldOrder && x.Order <= newOrder);
+                foreach (ListShare dbShare in shares)
+                {
+                    dbShare.Order -= 1;
+                }
             }
             else
             {
-                await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Lists""
-                                        SET ""Order"" = ""Order"" + 1 
-                                        WHERE ""UserId"" = @UserId AND ""IsArchived"" = FALSE AND ""Order"" <= @OldOrder AND ""Order"" >= @NewOrder",
-                                          parameters, transaction);
+                var lists = NonArchivedLists(userId).Where(x => x.Order <= oldOrder && x.Order >= newOrder);
+                foreach (ToDoList dbList in lists)
+                {
+                    dbList.Order += 1;
+                }
 
-                await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Shares"" 
-                                        SET ""Order"" = ""Order"" + 1 
-                                        WHERE ""UserId"" = @UserId AND ""IsAccepted"" = TRUE AND ""IsArchived"" = FALSE AND ""Order"" <= @OldOrder AND ""Order"" >= @NewOrder",
-                                          parameters, transaction);
+                var shares = AcceptedShares(userId).Where(x => !x.IsArchived && x.Order <= oldOrder && x.Order >= newOrder);
+                foreach (ListShare dbShare in shares)
+                {
+                    dbShare.Order += 1;
+                }
             }
 
-            var userIsOwner = await Dapper.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                                FROM ""ToDoAssistant.Lists""
-                                                                WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
-                                                                new { Id = id, UserId = userId }, transaction);
+            var userIsOwner = Dapper.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Lists"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId", new { Id = id, UserId = userId });
 
             if (userIsOwner)
             {
-                await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Lists""
-                                            SET ""Order"" = @NewOrder, ""ModifiedDate"" = @ModifiedDate
-                                            WHERE ""Id"" = @Id",
-                                          new { Id = id, @NewOrder = newOrder, ModifiedDate = modifiedDate }, transaction);
+                ToDoList list = EFContext.Lists.Find(id);
+                list.Order = newOrder;
+                list.ModifiedDate = modifiedDate;
             }
             else
             {
-                await Dapper.ExecuteAsync(@"UPDATE ""ToDoAssistant.Shares""
-                                            SET ""Order"" = @NewOrder, ""ModifiedDate"" = @ModifiedDate
-                                            WHERE ""ListId"" = @Id AND ""UserId"" = @UserId",
-                                          new { Id = id, UserId = userId, @NewOrder = newOrder, ModifiedDate = modifiedDate }, transaction);
+                ListShare share = EFContext.ListShares.First(x => x.ListId == id && x.UserId == userId);
+                share.Order = newOrder;
+                share.ModifiedDate = modifiedDate;
             }
 
-            transaction.Commit();
+            await EFContext.SaveChangesAsync();
+        }
+
+        private IQueryable<ToDoList> NonArchivedLists(int userId)
+        {
+            return EFContext.Lists.Where(x => x.UserId == userId && !x.IsArchived);
+        }
+
+        private IQueryable<ListShare> NonArchivedShares(int userId)
+        {
+            return EFContext.ListShares.Where(x => x.UserId == userId && !x.IsArchived);
+        }
+
+        private IQueryable<ListShare> AcceptedShares(int userId)
+        {
+            return EFContext.ListShares.Where(x => x.UserId == userId && x.IsAccepted == true);
         }
     }
 }

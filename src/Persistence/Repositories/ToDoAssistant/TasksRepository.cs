@@ -117,7 +117,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
         {
             if (task.PrivateToUserId.HasValue)
             {
-                var privateTasks = QueryPrivateTasks(task.ListId, userId).Where(x => !x.IsCompleted);
+                var privateTasks = PrivateTasks(task.ListId, userId).Where(x => !x.IsCompleted);
                 foreach (ToDoTask privateTask in privateTasks)
                 {
                     privateTask.Order += 1;
@@ -125,7 +125,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             }
             else
             {
-                var publicTasks = QueryPublicTasks(task.ListId).Where(x => !x.IsCompleted);
+                var publicTasks = PublicTasks(task.ListId).Where(x => !x.IsCompleted);
                 foreach (ToDoTask publicTask in publicTasks)
                 {
                     publicTask.Order += 1;
@@ -145,7 +145,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
             if (tasksArePrivate)
             {
-                var privateTasks = QueryPrivateTasks(listId, userId).Where(x => !x.IsCompleted);
+                var privateTasks = PrivateTasks(listId, userId).Where(x => !x.IsCompleted);
                 foreach (ToDoTask privateTask in privateTasks)
                 {
                     privateTask.Order += (short)tasks.Count();
@@ -153,7 +153,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             }
             else
             {
-                var publicTasks = QueryPublicTasks(listId).Where(x => !x.IsCompleted);
+                var publicTasks = PublicTasks(listId).Where(x => !x.IsCompleted);
                 foreach (ToDoTask publicTask in publicTasks)
                 {
                     publicTask.Order += (short)tasks.Count();
@@ -181,10 +181,10 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
             if (existingTask.ListId != task.ListId)
             {
-                var newListIsShared = await Dapper.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                                            FROM ""ToDoAssistant.Shares""
-                                                                            WHERE ""ListId"" = @ListId AND ""IsAccepted"" IS NOT FALSE",
-                                                                            new { task.ListId });
+                var newListIsShared = Dapper.ExecuteScalar<bool>(@"SELECT COUNT(*)
+                                                                   FROM ""ToDoAssistant.Shares""
+                                                                   WHERE ""ListId"" = @ListId AND ""IsAccepted"" IS NOT FALSE",
+                                                                   new { task.ListId });
 
                 if (!newListIsShared)
                 {
@@ -194,7 +194,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
                 if (existingTask.PrivateToUserId.HasValue)
                 {
-                    var privateTasks = QueryPrivateTasks(existingTask.ListId, userId).Where(x => x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
+                    var privateTasks = PrivateTasks(existingTask.ListId, userId).Where(x => x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
                     foreach (ToDoTask privateTask in privateTasks)
                     {
                         privateTask.Order -= 1;
@@ -215,7 +215,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 }
                 else
                 {
-                    var publicTasks = QueryPublicTasks(existingTask.ListId).Where(x => x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
+                    var publicTasks = PublicTasks(existingTask.ListId).Where(x => x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
                     foreach (ToDoTask publicTask in publicTasks)
                     {
                         publicTask.Order -= 1;
@@ -229,7 +229,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 // If the task was public and it was made private reduce the Order of the public tasks
                 if (!existingTask.PrivateToUserId.HasValue && task.PrivateToUserId.HasValue)
                 {
-                    var publicTasks = QueryPublicTasks(existingTask.ListId).Where(x => x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
+                    var publicTasks = PublicTasks(existingTask.ListId).Where(x => x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
                     foreach (ToDoTask publicTask in publicTasks)
                     {
                         publicTask.Order -= 1;
@@ -241,7 +241,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 // If the task was private and it was made public reduce the Order of only the user's private tasks
                 else if (existingTask.PrivateToUserId.HasValue && !task.PrivateToUserId.HasValue)
                 {
-                    var privateTasks = QueryPrivateTasks(existingTask.ListId, userId).Where(x => x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
+                    var privateTasks = PrivateTasks(existingTask.ListId, userId).Where(x => x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
                     foreach (ToDoTask privateTask in privateTasks)
                     {
                         privateTask.Order -= 1;
@@ -252,7 +252,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 }
             }
 
-            ToDoTask dbTask = await EFContext.Tasks.FindAsync(task.Id);
+            ToDoTask dbTask = EFContext.Tasks.Find(task.Id);
             dbTask.Name = task.Name;
             dbTask.ListId = task.ListId;
             dbTask.IsOneTime = task.IsOneTime;
@@ -280,7 +280,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             if (task.PrivateToUserId.HasValue)
             {
                 // If the task was private reduce the Order of only the user's private tasks
-                var privateTasks = QueryPrivateTasks(task.ListId, userId).Where(x => x.IsCompleted == task.IsCompleted && x.Order > task.Order);
+                var privateTasks = PrivateTasks(task.ListId, userId).Where(x => x.IsCompleted == task.IsCompleted && x.Order > task.Order);
                 foreach (ToDoTask privateTask in privateTasks)
                 {
                     privateTask.Order -= 1;
@@ -288,7 +288,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             }
             else
             {
-                var publicTasks = QueryPublicTasks(task.ListId).Where(x => x.IsCompleted == task.IsCompleted && x.Order > task.Order);
+                var publicTasks = PublicTasks(task.ListId).Where(x => x.IsCompleted == task.IsCompleted && x.Order > task.Order);
                 foreach (ToDoTask publicTask in publicTasks)
                 {
                     publicTask.Order -= 1;
@@ -308,7 +308,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             if (task.PrivateToUserId.HasValue)
             {
                 // If the task was private increase the Order of only the user's completed private tasks
-                var privateTasks = QueryPrivateTasks(task.ListId, userId).Where(x => x.IsCompleted);
+                var privateTasks = PrivateTasks(task.ListId, userId).Where(x => x.IsCompleted);
                 foreach (ToDoTask privateTask in privateTasks)
                 {
                     privateTask.Order += 1;
@@ -316,21 +316,21 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             }
             else
             {
-                var publicTasks = QueryPublicTasks(task.ListId).Where(x => x.IsCompleted);
+                var publicTasks = PublicTasks(task.ListId).Where(x => x.IsCompleted);
                 foreach (ToDoTask publicTask in publicTasks)
                 {
                     publicTask.Order += 1;
                 }
             }
 
-            ToDoTask dbTask = await EFContext.Tasks.FindAsync(id);
+            ToDoTask dbTask = EFContext.Tasks.Find(id);
             dbTask.IsCompleted = true;
             dbTask.Order = order;
 
             if (task.PrivateToUserId.HasValue)
             {
                 // If the task was private reduce the Order of only the user's private tasks
-                var privateTasks = QueryPrivateTasks(task.ListId, userId).Where(x => !x.IsCompleted && x.Order > task.Order);
+                var privateTasks = PrivateTasks(task.ListId, userId).Where(x => !x.IsCompleted && x.Order > task.Order);
                 foreach (ToDoTask privateTask in privateTasks)
                 {
                     privateTask.Order -= 1;
@@ -338,7 +338,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             }
             else
             {
-                var publicTasks = QueryPublicTasks(task.ListId).Where(x => !x.IsCompleted && x.Order > task.Order);
+                var publicTasks = PublicTasks(task.ListId).Where(x => !x.IsCompleted && x.Order > task.Order);
                 foreach (ToDoTask publicTask in publicTasks)
                 {
                     publicTask.Order -= 1;
@@ -370,7 +370,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             if (task.PrivateToUserId.HasValue)
             {
                 // If the task was private reduce the Order of only the user's private completed tasks
-                var privateTasks = QueryPrivateTasks(task.ListId, userId).Where(x => x.IsCompleted && x.Order > task.Order);
+                var privateTasks = PrivateTasks(task.ListId, userId).Where(x => x.IsCompleted && x.Order > task.Order);
                 foreach (ToDoTask privateTask in privateTasks)
                 {
                     privateTask.Order -= 1;
@@ -378,14 +378,14 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             }
             else
             {
-                var publicTasks = QueryPublicTasks(task.ListId).Where(x => x.IsCompleted && x.Order > task.Order);
+                var publicTasks = PublicTasks(task.ListId).Where(x => x.IsCompleted && x.Order > task.Order);
                 foreach (ToDoTask publicTask in publicTasks)
                 {
                     publicTask.Order -= 1;
                 }
             }
 
-            ToDoTask dbTask = await EFContext.Tasks.FindAsync(id);
+            ToDoTask dbTask = EFContext.Tasks.Find(id);
             dbTask.IsCompleted = false;
             dbTask.Order = order;
 
@@ -403,7 +403,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 // If the task was private reduce/increase the Order of only the user's private tasks
                 if (newOrder > oldOrder)
                 {
-                    var privateTasks = QueryPrivateTasks(task.ListId, userId).Where(x => x.IsCompleted == task.IsCompleted && x.Order >= oldOrder && x.Order <= newOrder);
+                    var privateTasks = PrivateTasks(task.ListId, userId).Where(x => x.IsCompleted == task.IsCompleted && x.Order >= oldOrder && x.Order <= newOrder);
                     foreach (ToDoTask privateTask in privateTasks)
                     {
                         privateTask.Order -= 1;
@@ -411,7 +411,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 }
                 else
                 {
-                    var privateTasks = QueryPrivateTasks(task.ListId, userId).Where(x => x.IsCompleted == task.IsCompleted && x.Order <= oldOrder && x.Order >= newOrder);
+                    var privateTasks = PrivateTasks(task.ListId, userId).Where(x => x.IsCompleted == task.IsCompleted && x.Order <= oldOrder && x.Order >= newOrder);
                     foreach (ToDoTask privateTask in privateTasks)
                     {
                         privateTask.Order += 1;
@@ -422,7 +422,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             {
                 if (newOrder > oldOrder)
                 {
-                    var publicTasks = QueryPublicTasks(task.ListId).Where(x => x.IsCompleted == task.IsCompleted && x.Order >= oldOrder && x.Order <= newOrder);
+                    var publicTasks = PublicTasks(task.ListId).Where(x => x.IsCompleted == task.IsCompleted && x.Order >= oldOrder && x.Order <= newOrder);
                     foreach (ToDoTask publicTask in publicTasks)
                     {
                         publicTask.Order -= 1;
@@ -430,7 +430,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 }
                 else
                 {
-                    var publicTasks = QueryPublicTasks(task.ListId).Where(x => x.IsCompleted == task.IsCompleted && x.Order <= oldOrder && x.Order >= newOrder);
+                    var publicTasks = PublicTasks(task.ListId).Where(x => x.IsCompleted == task.IsCompleted && x.Order <= oldOrder && x.Order >= newOrder);
                     foreach (ToDoTask publicTask in publicTasks)
                     {
                         publicTask.Order += 1;
@@ -438,7 +438,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 }
             }
 
-            ToDoTask dbTask = await EFContext.Tasks.FindAsync(id);
+            ToDoTask dbTask = EFContext.Tasks.Find(id);
             dbTask.Order = newOrder;
             dbTask.ModifiedDate = modifiedDate;
 
@@ -461,12 +461,12 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                                                new { ListId = listId, IsCompleted = isCompleted });
         }
 
-        private IQueryable<ToDoTask> QueryPrivateTasks(int listId, int userId)
+        private IQueryable<ToDoTask> PrivateTasks(int listId, int userId)
         {
             return EFContext.Tasks.Where(x => x.ListId == listId && x.PrivateToUserId == userId);
         }
 
-        private IQueryable<ToDoTask> QueryPublicTasks(int listId)
+        private IQueryable<ToDoTask> PublicTasks(int listId)
         {
             return EFContext.Tasks.Where(x => x.ListId == listId && !x.PrivateToUserId.HasValue);
         }
