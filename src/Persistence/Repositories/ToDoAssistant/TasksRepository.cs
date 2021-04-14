@@ -199,14 +199,43 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
         {
             var existingTask = await GetAsync(task.Id);
 
-            if (existingTask.ListId != task.ListId)
+            if (existingTask.ListId == task.ListId)
+            {
+                task.Order = existingTask.Order;
+
+                // If the task was public and it was made private reduce the Order of the public tasks
+                if (!existingTask.PrivateToUserId.HasValue && task.PrivateToUserId.HasValue)
+                {
+                    var publicTasks = PublicTasks(existingTask.ListId).Where(x => x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
+                    foreach (ToDoTask publicTask in publicTasks)
+                    {
+                        publicTask.Order -= 1;
+                    }
+
+                    var tasksCount = GetPrivateTasksCount(task.ListId, existingTask.IsCompleted, userId);
+                    task.Order = ++tasksCount;
+                }
+                // If the task was private and it was made public reduce the Order of only the user's private tasks
+                else if (existingTask.PrivateToUserId.HasValue && !task.PrivateToUserId.HasValue)
+                {
+                    var privateTasks = PrivateTasks(existingTask.ListId, userId).Where(x => x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
+                    foreach (ToDoTask privateTask in privateTasks)
+                    {
+                        privateTask.Order -= 1;
+                    }
+
+                    var tasksCount = GetPublicTasksCount(task.ListId, existingTask.IsCompleted);
+                    task.Order = ++tasksCount;
+                }
+            }
+            else
             {
                 using IDbConnection conn = OpenConnection();
 
                 var newListIsShared = conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                                                   FROM ""ToDoAssistant.Shares""
-                                                                   WHERE ""ListId"" = @ListId AND ""IsAccepted"" IS NOT FALSE",
-                                                                   new { task.ListId });
+                                                                 FROM ""ToDoAssistant.Shares""
+                                                                 WHERE ""ListId"" = @ListId AND ""IsAccepted"" IS NOT FALSE",
+                                                                 new { task.ListId });
 
                 if (!newListIsShared)
                 {
@@ -244,35 +273,6 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                     }
                 }
             }
-            else
-            {
-                task.Order = existingTask.Order;
-
-                // If the task was public and it was made private reduce the Order of the public tasks
-                if (!existingTask.PrivateToUserId.HasValue && task.PrivateToUserId.HasValue)
-                {
-                    var publicTasks = PublicTasks(existingTask.ListId).Where(x => x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
-                    foreach (ToDoTask publicTask in publicTasks)
-                    {
-                        publicTask.Order -= 1;
-                    }
-
-                    var tasksCount = GetPrivateTasksCount(task.ListId, existingTask.IsCompleted, userId);
-                    task.Order = ++tasksCount;
-                }
-                // If the task was private and it was made public reduce the Order of only the user's private tasks
-                else if (existingTask.PrivateToUserId.HasValue && !task.PrivateToUserId.HasValue)
-                {
-                    var privateTasks = PrivateTasks(existingTask.ListId, userId).Where(x => x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
-                    foreach (ToDoTask privateTask in privateTasks)
-                    {
-                        privateTask.Order -= 1;
-                    }
-
-                    var tasksCount = GetPublicTasksCount(task.ListId, existingTask.IsCompleted);
-                    task.Order = ++tasksCount;
-                }
-            }
 
             ToDoTask dbTask = EFContext.Tasks.Find(task.Id);
             dbTask.Name = task.Name;
@@ -280,7 +280,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             dbTask.IsOneTime = task.IsOneTime;
             dbTask.PrivateToUserId = task.PrivateToUserId;
             dbTask.AssignedToUserId = task.AssignedToUserId;
-            dbTask.Order = task.Order;
+            dbTask.Order = 1;
             dbTask.ModifiedDate = task.ModifiedDate;
 
             await EFContext.SaveChangesAsync();

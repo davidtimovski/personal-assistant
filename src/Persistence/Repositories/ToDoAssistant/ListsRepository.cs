@@ -341,7 +341,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
         {
             using IDbConnection conn = OpenConnection();
 
-            ToDoList originalList = conn.QueryFirst<ToDoList>(@"SELECT * FROM ""ToDoAssistant.Lists"" WHERE ""Id"" = @Id", new { Id = list.Id });
+            ToDoList originalList = conn.QueryFirst<ToDoList>(@"SELECT * FROM ""ToDoAssistant.Lists"" WHERE ""Id"" = @Id", new { list.Id });
 
             ToDoList dbList = EFContext.Lists.Find(list.Id);
             dbList.Name = list.Name;
@@ -388,8 +388,8 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 (list.UserId, list.Order)
             };
             affectedUsers.AddRange(conn.Query<(int, short?)>(@"SELECT ""UserId"", ""Order""
-                                                                 FROM ""ToDoAssistant.Shares""
-                                                                 WHERE ""ListId"" = @Id AND ""IsAccepted"" = TRUE", new { Id = id }));
+                                                               FROM ""ToDoAssistant.Shares""
+                                                               WHERE ""ListId"" = @Id AND ""IsAccepted"" = TRUE", new { Id = id }));
 
             EFContext.Lists.Remove(list);
 
@@ -450,9 +450,9 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             using IDbConnection conn = OpenConnection();
 
             var share = conn.QueryFirst<ListShare>(@"SELECT * 
-                                                       FROM ""ToDoAssistant.Shares"" 
-                                                       WHERE ""ListId"" = @ListId AND ""UserId"" = @UserId",
-                                                       new { ListId = id, UserId = userId });
+                                                     FROM ""ToDoAssistant.Shares"" 
+                                                     WHERE ""ListId"" = @ListId AND ""UserId"" = @UserId",
+                                                     new { ListId = id, UserId = userId });
 
             EFContext.ListShares.Remove(share);
 
@@ -508,17 +508,23 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             using IDbConnection conn = OpenConnection();
 
             list.Tasks = (conn.Query<ToDoTask>(@"SELECT * FROM ""ToDoAssistant.Tasks""
-                                                   WHERE ""ListId"" = @ListId AND (""PrivateToUserId"" IS NULL OR ""PrivateToUserId"" = @UserId)
-                                                   ORDER BY ""PrivateToUserId"" NULLS LAST",
-                                                   new { ListId = list.Id, list.UserId })).ToList();
+                                                 WHERE ""ListId"" = @ListId AND (""PrivateToUserId"" IS NULL OR ""PrivateToUserId"" = @UserId)
+                                                 ORDER BY ""PrivateToUserId"" NULLS LAST",
+                                                 new { ListId = list.Id, list.UserId })).ToList();
 
             var listsCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*)
-                                                           FROM ""ToDoAssistant.Lists"" AS l
-                                                           LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                                           WHERE l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")",
-                                                           new { list.UserId });
+                                                         FROM ""ToDoAssistant.Lists"" AS l
+                                                         LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
+                                                         WHERE l.""IsArchived"" = FALSE AND l.""UserId"" = @UserId 
+                                                             OR (s.""UserId"" = @UserId AND s.""IsAccepted"" AND s.""IsArchived"" = FALSE)",
+                                                         new { list.UserId });
+
+            ToDoList dbList = conn.QueryFirst<ToDoList>(@"SELECT * FROM ""ToDoAssistant.Lists"" WHERE ""Id"" = @Id", new { list.Id });
+
             list.Id = default;
             list.Order = ++listsCount;
+            list.NotificationsEnabled = dbList.NotificationsEnabled;
+            list.IsOneTimeToggleDefault = dbList.IsOneTimeToggleDefault;
 
             foreach (ToDoTask task in list.Tasks)
             {
@@ -566,11 +572,11 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                     using IDbConnection conn = OpenConnection();
 
                     var listsCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*)
-                                                                   FROM ""ToDoAssistant.Lists"" AS l
-                                                                   LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                                                   WHERE l.""IsArchived"" = FALSE AND l.""UserId"" = @UserId 
-                                                                       OR (s.""UserId"" = @UserId AND s.""IsAccepted"" AND s.""IsArchived"" = FALSE)",
-                                                                   new { UserId = userId });
+                                                                 FROM ""ToDoAssistant.Lists"" AS l
+                                                                 LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
+                                                                 WHERE l.""IsArchived"" = FALSE AND l.""UserId"" = @UserId 
+                                                                     OR (s.""UserId"" = @UserId AND s.""IsAccepted"" AND s.""IsArchived"" = FALSE)",
+                                                                 new { UserId = userId });
 
                     list.IsArchived = false;
                     list.NotificationsEnabled = true;
