@@ -33,7 +33,7 @@ namespace PersonalAssistant.Sender
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddPersistence(hostContext.Configuration);
+                    services.AddPersistence(hostContext.Configuration["ConnectionStrings:DefaultConnection"]);
 
                     services.AddOptions();
 

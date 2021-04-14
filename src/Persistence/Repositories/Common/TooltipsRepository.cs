@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Data.Common;
+using System.Data;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.Extensions.Options;
+using Persistence;
 using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Domain.Entities.Common;
 
@@ -10,13 +10,12 @@ namespace PersonalAssistant.Persistence.Repositories.Common
 {
     public class TooltipsRepository : BaseRepository, ITooltipsRepository
     {
-        public TooltipsRepository(IOptions<DatabaseSettings> databaseSettings)
-            : base(databaseSettings.Value.DefaultConnectionString) { }
+        public TooltipsRepository(PersonalAssistantContext efContext)
+            : base(efContext) { }
 
         public async Task<IEnumerable<Tooltip>> GetAllAsync(string application, int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.QueryAsync<Tooltip>(@"SELECT t.*, (td.""UserId"" IS NOT NULL) AS ""IsDismissed""
                                                         FROM ""Tooltips"" AS t
@@ -27,8 +26,7 @@ namespace PersonalAssistant.Persistence.Repositories.Common
 
         public async Task<Tooltip> GetByKeyAsync(int userId, string key, string application)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.QueryFirstOrDefaultAsync<Tooltip>(@"SELECT t.*, (td.""UserId"" IS NOT NULL) AS ""IsDismissed""
                                                                       FROM ""Tooltips"" AS t
@@ -38,8 +36,7 @@ namespace PersonalAssistant.Persistence.Repositories.Common
 
         public async Task ToggleDismissedAsync(int userId, string key, string application, bool isDismissed)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             var id = await conn.ExecuteScalarAsync<int>(@"SELECT ""Id"" FROM ""Tooltips"" WHERE ""Key"" = @Key AND ""Application"" = @Application", new { Key = key, Application = application });
 

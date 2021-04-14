@@ -54,6 +54,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             var result = _mapper.Map<TaskForUpdate>(task, opts => { opts.Items["UserId"] = userId; });
 
             result.IsInSharedList = await _listService.IsSharedAsync(task.ListId, userId);
+            result.Recipes = await _tasksRepository.GetRecipesAsync(id, userId);
 
             return result;
         }

@@ -1,5 +1,7 @@
-﻿using System.Data.Common;
+﻿using System.Data;
+using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using Persistence;
 
 namespace PersonalAssistant.Persistence
 {
@@ -7,17 +9,20 @@ namespace PersonalAssistant.Persistence
     {
         private readonly string _connectionString;
 
-        public BaseRepository(string connectionString)
+        public BaseRepository(PersonalAssistantContext efContext)
         {
-            _connectionString = connectionString;
+            _connectionString = efContext.Database.GetConnectionString();
+            EFContext = efContext;
         }
 
-        internal DbConnection Connection
+        protected IDbConnection OpenConnection()
         {
-            get
-            {
-                return new NpgsqlConnection(_connectionString);
-            }
+            var conn = new NpgsqlConnection(_connectionString);
+            conn.Open();
+
+            return conn;
         }
+
+        protected readonly PersonalAssistantContext EFContext;
     }
 }

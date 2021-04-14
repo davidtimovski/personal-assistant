@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Common;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.Extensions.Options;
+using Persistence;
 using PersonalAssistant.Application.Contracts.Accountant.UpcomingExpenses;
 using PersonalAssistant.Domain.Entities.Accountant;
 
@@ -12,13 +12,12 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 {
     public class UpcomingExpensesRepository : BaseRepository, IUpcomingExpensesRepository
     {
-        public UpcomingExpensesRepository(IOptions<DatabaseSettings> databaseSettings)
-            : base(databaseSettings.Value.DefaultConnectionString) { }
+        public UpcomingExpensesRepository(PersonalAssistantContext efContext)
+            : base(efContext) { }
 
         public async Task<IEnumerable<UpcomingExpense>> GetAllAsync(int userId, DateTime fromModifiedDate)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.QueryAsync<UpcomingExpense>(@"SELECT * FROM ""Accountant.UpcomingExpenses"" WHERE ""UserId"" = @UserId AND ""ModifiedDate"" > @FromModifiedDate",
                 new { UserId = userId, FromModifiedDate = fromModifiedDate });
@@ -26,8 +25,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
         public async Task<IEnumerable<int>> GetDeletedIdsAsync(int userId, DateTime fromDate)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.QueryAsync<int>(@"SELECT ""EntityId"" FROM ""Accountant.DeletedEntities"" WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""DeletedDate"" > @DeletedDate",
                 new { UserId = userId, EntityType = (short)EntityType.UpcomingExpense, DeletedDate = fromDate });
@@ -35,8 +33,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
         public async Task<bool> ExistsAsync(int categoryId, DateTime now)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
                                                         FROM ""Accountant.UpcomingExpenses""
@@ -45,15 +42,14 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
                                                         new { CategoryId = categoryId, Now = now });
         }
 
-        public async Task<int> CreateAsync(UpcomingExpense upcomingExpense, DbConnection uowConn = null, DbTransaction uowTransaction = null)
+        public async Task<int> CreateAsync(UpcomingExpense upcomingExpense, IDbConnection uowConn = null, IDbTransaction uowTransaction = null)
         {
+            using IDbConnection conn = OpenConnection();
+
             int id;
 
             if (uowConn == null && uowTransaction == null)
             {
-                using DbConnection conn = Connection;
-                await conn.OpenAsync();
-
                 id = (await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.UpcomingExpenses"" (""UserId"", ""CategoryId"", ""Amount"", ""Currency"", ""Description"", ""Date"", ""Generated"", ""CreatedDate"", ""ModifiedDate"")
                                                    VALUES (@UserId, @CategoryId, @Amount, @Currency, @Description, @Date, @Generated, @CreatedDate, @ModifiedDate) returning ""Id""",
                                                        upcomingExpense)).Single();
@@ -70,8 +66,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
         public async Task UpdateAsync(UpcomingExpense upcomingExpense)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             await conn.ExecuteAsync(@"UPDATE ""Accountant.UpcomingExpenses"" SET ""CategoryId"" = @CategoryId, ""Amount"" = @Amount, 
                                         ""Currency"" = @Currency, ""Description"" = @Description, ""Date"" = @Date, 
@@ -80,8 +75,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
         public async Task DeleteAsync(int id, int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
             var transaction = conn.BeginTransaction();
 
             var deletedEntryExists = await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
@@ -112,8 +106,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
         public async Task DeleteOldAsync(int userId, DateTime before)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
             var transaction = conn.BeginTransaction();
 
             var toDelete = await conn.QueryAsync<UpcomingExpense>(@"SELECT * FROM ""Accountant.UpcomingExpenses"" WHERE ""UserId"" = @UserId AND ""Date"" < @Date",

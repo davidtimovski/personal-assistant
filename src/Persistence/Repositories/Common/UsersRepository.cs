@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Data.Common;
+using System.Data;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.Extensions.Options;
+using Persistence;
 using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Domain.Entities.Common;
 
@@ -10,21 +10,19 @@ namespace PersonalAssistant.Persistence.Repositories.Common
 {
     public class UsersRepository : BaseRepository, IUsersRepository
     {
-        public UsersRepository(IOptions<DatabaseSettings> databaseSettings)
-            : base(databaseSettings.Value.DefaultConnectionString) { }
+        public UsersRepository(PersonalAssistantContext efContext)
+            : base(efContext) { }
 
         public async Task<User> GetAsync(int id)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.QueryFirstOrDefaultAsync<User>(@"SELECT * FROM ""AspNetUsers"" WHERE ""Id"" = @Id", new { Id = id });
         }
 
         public async Task<User> GetAsync(string email)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.QueryFirstOrDefaultAsync<User>(@"SELECT * FROM ""AspNetUsers""
                                                                 WHERE ""Email"" = @Email AND ""EmailConfirmed"" = TRUE",
@@ -33,8 +31,7 @@ namespace PersonalAssistant.Persistence.Repositories.Common
 
         public async Task<bool> ExistsAsync(int id)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""AspNetUsers"" WHERE ""Id"" = @id",
                 new { Id = id });
@@ -42,24 +39,21 @@ namespace PersonalAssistant.Persistence.Repositories.Common
 
         public async Task<string> GetLanguageAsync(int id)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.QueryFirstOrDefaultAsync<string>(@"SELECT ""Language"" FROM ""AspNetUsers"" WHERE ""Id"" = @Id", new { Id = id });
         }
 
         public async Task<string> GetImageUriAsync(int id)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.QueryFirstOrDefaultAsync<string>(@"SELECT ""ImageUri"" FROM ""AspNetUsers"" WHERE ""Id"" = @Id", new { Id = id });
         }
 
         public async Task<IEnumerable<User>> GetToBeNotifiedOfListChangeAsync(int listId, int excludeUserId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.QueryAsync<User>(@"SELECT u.*
                                                 FROM ""AspNetUsers"" AS u
@@ -75,8 +69,7 @@ namespace PersonalAssistant.Persistence.Repositories.Common
 
         public async Task<IEnumerable<User>> GetToBeNotifiedOfRecipeChangeAsync(int recipeId, int excludeUserId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.QueryAsync<User>(@"SELECT u.*
                                                 FROM ""AspNetUsers"" AS u
@@ -92,8 +85,7 @@ namespace PersonalAssistant.Persistence.Repositories.Common
 
         public async Task<bool> CheckIfUserCanBeNotifiedOfListChangeAsync(int listId, int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
                                                          FROM ""AspNetUsers"" AS u
@@ -104,8 +96,7 @@ namespace PersonalAssistant.Persistence.Repositories.Common
 
         public async Task<bool> CheckIfUserCanBeNotifiedOfRecipeChangeAsync(int recipeId, int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
                                                          FROM ""AspNetUsers"" AS u
@@ -116,8 +107,7 @@ namespace PersonalAssistant.Persistence.Repositories.Common
 
         public async Task<IEnumerable<User>> GetToBeNotifiedOfListDeletionAsync(int listId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.QueryAsync<User>(@"SELECT u.*
                                                 FROM ""AspNetUsers"" AS u
@@ -128,8 +118,7 @@ namespace PersonalAssistant.Persistence.Repositories.Common
 
         public async Task<IEnumerable<User>> GetToBeNotifiedOfRecipeDeletionAsync(int recipeId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.QueryAsync<User>(@"SELECT u.*
                                                 FROM ""AspNetUsers"" AS u
@@ -140,8 +129,7 @@ namespace PersonalAssistant.Persistence.Repositories.Common
 
         public async Task<IEnumerable<User>> GetToBeNotifiedOfRecipeSentAsync(int recipeId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.QueryAsync<User>(@"SELECT u.*
                                                 FROM ""AspNetUsers"" AS u
@@ -152,8 +140,7 @@ namespace PersonalAssistant.Persistence.Repositories.Common
 
         public async Task UpdateToDoNotificationsEnabledAsync(int id, bool enabled)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             await conn.QueryAsync(@"UPDATE ""AspNetUsers""
                                         SET ""ToDoNotificationsEnabled"" = @Enabled
@@ -167,8 +154,7 @@ namespace PersonalAssistant.Persistence.Repositories.Common
 
         public async Task UpdateCookingNotificationsEnabledAsync(int id, bool enabled)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             await conn.QueryAsync(@"UPDATE ""AspNetUsers""
                                         SET ""CookingNotificationsEnabled"" = @Enabled
@@ -182,8 +168,7 @@ namespace PersonalAssistant.Persistence.Repositories.Common
 
         public async Task UpdateImperialSystemAsync(int id, bool imperialSystem)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             await conn.QueryAsync(@"UPDATE ""AspNetUsers""
                                         SET ""ImperialSystem"" = @ImperialSystem

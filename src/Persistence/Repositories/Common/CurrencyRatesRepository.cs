@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Data.Common;
+using System.Data;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.Extensions.Options;
+using Persistence;
 using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Domain.Entities.Common;
 
@@ -10,13 +10,12 @@ namespace PersonalAssistant.Persistence.Repositories.Common
 {
     public class CurrencyRatesRepository : BaseRepository, ICurrencyRatesRepository
     {
-        public CurrencyRatesRepository(IOptions<DatabaseSettings> databaseSettings)
-            : base(databaseSettings.Value.DefaultConnectionString) { }
+        public CurrencyRatesRepository(PersonalAssistantContext efContext)
+            : base(efContext) { }
 
         public async Task<CurrencyRates> GetAsync(DateTime date)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             var rates = await conn.QueryFirstOrDefaultAsync<CurrencyRates>(@"SELECT * FROM ""CurrencyRates"" WHERE ""Date"" = @Date", new { Date = date });
             if (rates != null)
@@ -36,8 +35,7 @@ namespace PersonalAssistant.Persistence.Repositories.Common
 
         public async Task CreateAsync(CurrencyRates rates)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             var exists = await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""CurrencyRates"" WHERE ""Date"" = @Date", new { rates.Date });
             if (exists)
