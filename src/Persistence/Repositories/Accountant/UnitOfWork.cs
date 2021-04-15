@@ -11,7 +11,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
         public (IDbConnection conn, IDbTransaction transaction) StartTransaction()
         {
-            using IDbConnection conn = OpenConnection();
+            IDbConnection conn = OpenConnection();
             var transaction = conn.BeginTransaction();
 
             return (conn, transaction);
