@@ -701,7 +701,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
         {
             if (newOrder > oldOrder)
             {
-                var lists = NonArchivedLists(userId).Where(x => x.Order <= newOrder);
+                var lists = NonArchivedLists(userId).Where(x => x.Order >= oldOrder && x.Order <= newOrder);
                 foreach (ToDoList dbList in lists)
                 {
                     dbList.Order -= 1;

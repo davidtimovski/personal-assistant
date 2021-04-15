@@ -89,9 +89,9 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             }
 
             list.Shares.AddRange(await _listsRepository.GetSharesAsync(id));
-            list.Shares.RemoveAll(x => x.UserId == userId);
 
             var result = _mapper.Map<ListWithShares>(list, opts => { opts.Items["UserId"] = userId; });
+            result.Shares.RemoveAll(x => x.UserId == userId);
 
             return result;
         }

@@ -86,18 +86,21 @@ export class Lists {
     return this.iconOptions.find((x) => x.icon === icon).cssClass;
   }
 
-  async reorder(changedArray: Array<List>, newOrder) {
-    const id: number = changedArray[newOrder.toIndex].id;
+  async reorder(changedArray: Array<List>, data) {
+    const id: number = changedArray[data.toIndex].id;
+
+    const oldOrder = ++data.fromIndex;
+    const newOrder = ++data.toIndex;
 
     await this.listsService.reorder(
       id,
-      ++newOrder.fromIndex,
-      ++newOrder.toIndex
+      oldOrder,
+      newOrder
     );
-    this.isReordering = false;
 
-    await Actions.getLists(this.listsService);
-    this.setListsFromState();
+    await Actions.reorderList(id, oldOrder, newOrder);
+
+    this.isReordering = false;
   }
 
   sync() {

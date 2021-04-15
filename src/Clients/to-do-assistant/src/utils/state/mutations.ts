@@ -14,6 +14,31 @@ function setListsLoading(state: State, loading: boolean) {
   return newState;
 }
 
+function reorderList(state: State, id: number, oldOrder: number, newOrder: number) {
+  const newState = Object.assign({}, state, {});
+  const list = newState.lists.find((x) => x.id === id);
+
+  if (newOrder > oldOrder) {
+    const nonArchivedLists = newState.lists.filter(
+      (x) => !x.isArchived && x.order >= oldOrder && x.order <= newOrder
+    );
+    nonArchivedLists.forEach((list) => {
+      list.order--;
+    });
+  } else {
+    const nonArchivedLists = newState.lists.filter(
+      (x) => !x.isArchived && x.order <= oldOrder && x.order >= newOrder
+    );
+    nonArchivedLists.forEach((list) => {
+      list.order++;
+    });
+  }
+
+  list.order = newOrder;
+
+  return newState;
+}
+
 function completeTask(state: State, listId: number, taskId: number) {
   const newState = Object.assign({}, state, {});
   const list = newState.lists.find((x) => x.id === listId);
@@ -116,10 +141,56 @@ function deleteTask(state: State, listId: number, taskId: number) {
   return newState;
 }
 
+function reorderTask(state: State, listId: number, taskId: number, oldOrder: number, newOrder: number) {
+  const newState = Object.assign({}, state, {});
+  const list = newState.lists.find((x) => x.id === listId);
+  const task = list.tasks.find((x) => x.id === taskId);
+
+  if (task.isPrivate) {
+    if (newOrder > oldOrder) {
+      const privateTasks = list.tasks.filter(
+        (x) => x.isPrivate && x.isCompleted == task.isCompleted && x.order >= oldOrder && x.order <= newOrder
+      );
+      privateTasks.forEach((task) => {
+        task.order--;
+      });
+    } else {
+      const privateTasks = list.tasks.filter(
+        (x) => x.isPrivate && x.isCompleted == task.isCompleted && x.order <= oldOrder && x.order >= newOrder
+      );
+      privateTasks.forEach((task) => {
+        task.order++;
+      });
+    }
+  } else {
+    if (newOrder > oldOrder) {
+      const publicTasks = list.tasks.filter(
+        (x) => !x.isPrivate && x.isCompleted == task.isCompleted && x.order >= oldOrder && x.order <= newOrder
+      );
+      publicTasks.forEach((task) => {
+        task.order--;
+      });
+    } else {
+      const publicTasks = list.tasks.filter(
+        (x) => !x.isPrivate && x.isCompleted == task.isCompleted && x.order <= oldOrder && x.order >= newOrder
+      );
+      publicTasks.forEach((task) => {
+        task.order++;
+      });
+    }
+  }
+
+  task.order = newOrder;
+
+  return newState;
+}
+
 store.registerAction("getLists", getLists);
 store.registerAction("setListsLoading", setListsLoading);
+store.registerAction("reorderList", reorderList);
 store.registerAction("completeTask", completeTask);
 store.registerAction("uncompleteTask", uncompleteTask);
 store.registerAction("deleteTask", deleteTask);
+store.registerAction("reorderTask", reorderTask);
 
-export { getLists, setListsLoading, completeTask, uncompleteTask, deleteTask };
+export { getLists, setListsLoading, reorderList, completeTask, uncompleteTask, deleteTask, reorderTask };

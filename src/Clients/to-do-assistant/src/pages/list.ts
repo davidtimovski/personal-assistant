@@ -168,18 +168,21 @@ export class List {
     }
   }
 
-  async reorder(changedArray: Array<Task>, newOrder) {
-    const id: number = changedArray[newOrder.toIndex].id;
+  async reorder(changedArray: Array<Task>, data) {
+    const id: number = changedArray[data.toIndex].id;
+
+    const oldOrder = ++data.fromIndex;
+    const newOrder = ++data.toIndex;
 
     await this.tasksService.reorder(
       id,
-      ++newOrder.fromIndex,
-      ++newOrder.toIndex
+      oldOrder,
+      newOrder
     );
 
-    this.isReordering = false;
+    await Actions.reorderTask(this.listId, id, oldOrder, newOrder);
 
-    await Actions.getLists(this.listsService);
+    this.isReordering = false;
   }
 
   isSearchingToggleChanged() {
@@ -192,7 +195,7 @@ export class List {
       this.shadowCompletedTasks = this.model.completedTasks.slice();
       this.shadowCompletedPrivateTasks = this.model.completedPrivateTasks.slice();
 
-      this.addNewPlaceholderText = this.i18n.tr("list.search");
+      this.addNewPlaceholderText = this.i18n.tr("list.searchTasks");
       this.filterTasks();
       this.newTaskNameInput.focus();
     } else {

@@ -15,7 +15,7 @@
         <i class="fas fa-random"></i>
       </label>
       <div class="page-title with-buttons">${model.name}</div>
-      <label class="search-toggle ${isSearching ? 'checked' : ''}" t="[title,aria-label]list.search">
+      <label class="search-toggle ${isSearching ? 'checked' : ''}" t="[title,aria-label]list.searchTasks">
         <input type="checkbox" checked.bind="isSearching" change.delegate="isSearchingToggleChanged()">
         <i class="fas fa-search"></i>
       </label>
@@ -87,17 +87,17 @@
               keyup.trigger="newTaskNameInputChanged($event)" placeholder="${addNewPlaceholderText}"
               aria-label="${addNewPlaceholderText}" maxlength="50" class="new-task ${newTaskIsInvalid ? 'invalid' : ''}"
               required>
-            <label class="is-private-toggle ${isPrivate ? 'checked' : ''}">
+            <label class="is-private-toggle ${isPrivate ? 'checked' : ''}" t="[title,aria-label]list.togglePrivateTasks">
               <input type="checkbox" checked.bind="isPrivate" change.delegate="isPrivateToggleChanged()">
               <i class="fas fa-lock"></i>
               <i class="fas fa-unlock"></i>
             </label>
-            <label class="is-one-time-toggle ${isOneTime ? 'checked' : ''}">
+            <label class="is-one-time-toggle ${isOneTime ? 'checked' : ''}" t="[title,aria-label]list.toggleTaskDeletionOnCompletion">
               <input type="checkbox" checked.bind="isOneTime" change.delegate="isOneTimeToggleChanged()">
               <i class="fas fa-trash-alt"></i>
               <i class="far fa-trash-alt"></i>
             </label>
-            <a if.bind="!newTaskIsLoading" click.delegate="create()" class.bind="isSearching ? 'disabled' : ''">
+            <a if.bind="!newTaskIsLoading" click.delegate="create()" class.bind="isSearching ? 'disabled' : ''" t="[title,aria-label]list.add">
               <i class="fas fa-plus-circle"></i>
             </a>
             <div else class="loader">
@@ -117,11 +117,11 @@
               <a route-href="route: editTask; params.bind: { id: task.id }" class="side small left-side" t="[title,aria-label]list.edit">
                 <i class="fas fa-pencil-alt"></i>
               </a>
-              <span class="sort-handle">
+              <span class="sort-handle" t="[title,aria-label]dragToReorder">
                 <i class="reorder-icon fas fa-hand-paper"></i>
               </span>
               <span class="name">${task.name}</span>
-              <a click.delegate="complete(task)" class="side ${task.isOneTime ? 'one-time' : ''}">
+              <a click.delegate="complete(task)" class="side ${task.isOneTime ? 'one-time' : ''}" t="[title,aria-label]list.complete">
                 <i if.bind="!task.rightSideIsLoading" class="far fa-square"></i>
                 <i else class="fas fa-check-square"></i>
                 <i class="fas fa-trash-alt ${task.rightSideIsLoading ? 'loading' : ''}"></i>
@@ -139,11 +139,11 @@
               <a route-href="route: editTask; params.bind: { id: task.id }" class="side small left-side" t="[title,aria-label]list.edit">
                 <i class="fas fa-pencil-alt"></i>
               </a>
-              <span class="sort-handle">
+              <span class="sort-handle" t="[title,aria-label]dragToReorder">
                 <i class="reorder-icon fas fa-hand-paper"></i>
               </span>
               <span class="name">${task.name}</span>
-              <a click.delegate="complete(task)" class="side ${task.isOneTime ? 'one-time' : ''}">
+              <a click.delegate="complete(task)" class="side ${task.isOneTime ? 'one-time' : ''}" t="[title,aria-label]list.complete">
                 <i if.bind="!task.rightSideIsLoading" class="far fa-square"></i>
                 <i else class="fas fa-check-square"></i>
                 <i class="fas fa-trash-alt ${task.rightSideIsLoading ? 'loading' : ''}"></i>
@@ -176,11 +176,11 @@
                   <a route-href="route: editTask; params.bind: { id: task.id }" class="side small left-side" t="[title,aria-label]list.edit">
                     <i class="fas fa-pencil-alt"></i>
                   </a>
-                  <span class="sort-handle">
-                    <i class="reorder-icon fas fa-random"></i>
+                  <span class="sort-handle" t="[title,aria-label]dragToReorder">
+                    <i class="reorder-icon fas fa-hand-paper"></i>
                   </span>
                   <span class="name">${task.name}</span>
-                  <a click.delegate="uncomplete(task)" class="side">
+                  <a click.delegate="uncomplete(task)" class="side" t="[title,aria-label]list.uncomplete">
                     <i if.bind="!task.rightSideIsLoading" class="fas fa-check-square"></i>
                     <i else class="far fa-square"></i>
                   </a>
@@ -197,11 +197,11 @@
                   <a route-href="route: editTask; params.bind: { id: task.id }" class="side small left-side" t="[title,aria-label]list.edit">
                     <i class="fas fa-pencil-alt"></i>
                   </a>
-                  <span class="sort-handle">
-                    <i class="reorder-icon fas fa-random"></i>
+                  <span class="sort-handle" t="[title,aria-label]dragToReorder">
+                    <i class="reorder-icon fas fa-hand-paper"></i>
                   </span>
                   <span class="name">${task.name}</span>
-                  <a click.delegate="uncomplete(task)" class="side">
+                  <a click.delegate="uncomplete(task)" class="side" t="[title,aria-label]list.uncomplete">
                     <i if.bind="!task.rightSideIsLoading" class="fas fa-check-square"></i>
                     <i else class="far fa-square"></i>
                   </a>

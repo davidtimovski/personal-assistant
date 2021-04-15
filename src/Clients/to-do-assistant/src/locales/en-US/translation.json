@@ -13,6 +13,7 @@
   "sure": "Sure?",
   "cancel": "Cancel",
   "deleteOnCompletion": "Delete tasks on completion",
+  "dragToReorder": "Drag to reorder",
   "weekdays": {
     "0": "Sunday",
     "1": "Monday",
@@ -39,7 +40,11 @@
     "archive": "Archive",
     "add": "Add",
     "addPrivate": "Add private",
-    "search": "Search",
+    "togglePrivateTasks": "Toggle private tasks",
+    "toggleTaskDeletionOnCompletion": "Toggle task deletion on completion",
+    "searchTasks": "Search tasks",
+    "complete": "Complete",
+    "uncomplete": "Uncomplete",
     "privateTasks": "Private tasks",
     "showDone": "Show done",
     "hideDone": "Hide done",
@@ -53,6 +58,7 @@
   "editList": {
     "newList": "New list",
     "edit": "Edit",
+    "inOrderToChangeThisList": "In order to change this list you must be an owner or Administrator.",
     "icon": "Icon",
     "addTasks": "Add tasks?",
     "eachRow": "Each row will be a new task",
