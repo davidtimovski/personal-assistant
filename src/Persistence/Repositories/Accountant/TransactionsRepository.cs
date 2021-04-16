@@ -121,8 +121,11 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
                 if (transaction.Amount < 0)
                 {
-                    var relatedUpcomingExpenses = await conn.QueryAsync<UpcomingExpense>(@"SELECT * FROM ""Accountant.UpcomingExpenses"" WHERE ""CategoryId"" = @CategoryId",
-                        new { transaction.CategoryId });
+                    var relatedUpcomingExpenses = conn.Query<UpcomingExpense>(@"SELECT * FROM ""Accountant.UpcomingExpenses""
+                                                                                WHERE ""CategoryId"" = @CategoryId 
+                                                                                    AND EXTRACT(year FROM ""Date"") = @Year
+                                                                                    AND EXTRACT(month FROM ""Date"") = @Month",
+                        new { transaction.CategoryId, transaction.Date.Year, transaction.Date.Month });
 
                     if (relatedUpcomingExpenses.Any())
                     {
@@ -173,15 +176,24 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
         public async Task UpdateAsync(Transaction transaction)
         {
-            using IDbConnection conn = OpenConnection();
+            Transaction dbTransaction = EFContext.Transactions.Find(transaction.Id);
 
-            await conn.ExecuteAsync(@"UPDATE ""Accountant.Transactions"" SET ""FromAccountId"" = @FromAccountId, ""ToAccountId"" = @ToAccountId, 
-                                        ""CategoryId"" = @CategoryId, 
-                                        ""Amount"" = @Amount, ""FromStocks"" = @FromStocks, ""ToStocks"" = @ToStocks, 
-                                        ""Currency"" = @Currency, ""Description"" = @Description, ""Date"" = @Date, 
-                                        ""IsEncrypted"" = @IsEncrypted, ""EncryptedDescription"" = @EncryptedDescription, ""Salt"" = @Salt,
-                                        ""Nonce"" = @Nonce, ""ModifiedDate"" = @ModifiedDate WHERE ""Id"" = @Id",
-                                        transaction);
+            dbTransaction.FromAccountId = transaction.FromAccountId;
+            dbTransaction.ToAccountId = transaction.ToAccountId;
+            dbTransaction.CategoryId = transaction.CategoryId;
+            dbTransaction.Amount = transaction.Amount;
+            dbTransaction.FromStocks = transaction.FromStocks;
+            dbTransaction.ToStocks = transaction.ToStocks;
+            dbTransaction.Currency = transaction.Currency;
+            dbTransaction.Description = transaction.Description;
+            dbTransaction.Date = transaction.Date;
+            dbTransaction.IsEncrypted = transaction.IsEncrypted;
+            dbTransaction.EncryptedDescription = transaction.EncryptedDescription;
+            dbTransaction.Salt = transaction.Salt;
+            dbTransaction.Nonce = transaction.Nonce;
+            dbTransaction.ModifiedDate = transaction.ModifiedDate;
+
+            await EFContext.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id, int userId)

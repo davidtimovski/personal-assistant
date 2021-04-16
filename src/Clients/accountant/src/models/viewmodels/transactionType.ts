@@ -3,4 +3,5 @@ export enum TransactionType {
   Expense,
   Deposit,
   Transfer,
+  Saving
 }

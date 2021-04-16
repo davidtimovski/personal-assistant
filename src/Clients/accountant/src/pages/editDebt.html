@@ -21,11 +21,11 @@
       </div>
 
       <div else>
-        <section show.bind="!connTracker.isOnline && model.synced" class="message warning">
+        <div show.bind="!connTracker.isOnline && model.synced" class="message warning">
           <i class="fas fa-exclamation-triangle"></i>
           <span t="whileOfflineCannotModify">While offline you cannot modify data that has already been synced with the
             cloud.</span>
-        </section>
+        </div>
 
         <form submit.trigger="save()">
           <div class="form-control">

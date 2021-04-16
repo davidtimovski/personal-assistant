@@ -3,6 +3,7 @@ import { I18N } from "aurelia-i18n";
 import * as Chart from "chart.js";
 
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
+
 import { TransactionsService } from "services/transactionsService";
 import { CategoriesService } from "services/categoriesService";
 import { AccountsService } from "services/accountsService";
@@ -139,13 +140,28 @@ export class BarChartReport {
 
             const item = new AmountByMonth(date, monthString, 0);
 
-            for (const transaction of monthTransactions) {
-              if (transaction.fromAccountId) {
-                item.amount -= transaction.amount;
-              } else {
-                item.amount += transaction.amount;
+            switch (this.type) {
+              case TransactionType.Any: {
+                for (const transaction of monthTransactions) {
+                  if (transaction.fromAccountId) {
+                    item.amount -= transaction.amount;
+                  } else {
+                    item.amount += transaction.amount;
+                  }
+                }
               }
+              break;
+              case TransactionType.Expense: {
+                item.amount -= monthTransactions.map(x => x.amount).reduce((a, b) => a + b, 0)
+              }
+              break;
+              case TransactionType.Deposit:
+              case TransactionType.Saving: {
+                item.amount += monthTransactions.map(x => x.amount).reduce((a, b) => a + b, 0)
+              }
+              break;
             }
+            
             item.amount = parseFloat(item.amount.toFixed(2));
 
             items.push(item);
@@ -183,6 +199,7 @@ export class BarChartReport {
               this.chart.data.datasets[0].backgroundColor = expenseColor;
               break;
             case TransactionType.Deposit:
+            case TransactionType.Saving:
               this.chart.data.datasets[0].backgroundColor = depositColor;
               break;
           }

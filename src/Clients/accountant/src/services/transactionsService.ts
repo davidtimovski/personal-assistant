@@ -7,6 +7,7 @@ import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
 import { AuthService } from "../../../shared/src/services/authService";
 import { CurrenciesService } from "../../../shared/src/services/currenciesService";
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
+
 import { TransactionsIDBHelper } from "../utils/transactionsIDBHelper";
 import { TransactionModel } from "models/entities/transaction";
 import { TransactionType } from "models/viewmodels/transactionType";
@@ -127,14 +128,14 @@ export class TransactionsService extends HttpProxyBase {
 
   async getExpensesAndDepositsFromDate(
     fromDate: string,
-    accountId: number,
+    mainAccountId: number,
     categoryId: number,
     type: TransactionType,
     currency: string
   ): Promise<Array<TransactionModel>> {
     const transactions = await this.idbHelper.getExpensesAndDepositsFromDate(
       fromDate,
-      accountId,
+      mainAccountId,
       categoryId,
       type
     );

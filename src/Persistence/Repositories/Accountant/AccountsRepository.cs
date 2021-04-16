@@ -71,9 +71,14 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
         public async Task UpdateAsync(Account account)
         {
-            using IDbConnection conn = OpenConnection();
+            Account dbAccount = EFContext.Accounts.Find(account.Id);
 
-            await conn.ExecuteAsync(@"UPDATE ""Accountant.Accounts"" SET ""Name"" = @Name, ""Currency"" = @Currency, ""StockPrice"" = @StockPrice, ""ModifiedDate"" = @ModifiedDate WHERE ""Id"" = @Id", account);
+            dbAccount.Name = account.Name;
+            dbAccount.Currency = account.Currency;
+            dbAccount.StockPrice = account.StockPrice;
+            dbAccount.ModifiedDate = account.ModifiedDate;
+
+            await EFContext.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id, int userId)
@@ -81,10 +86,10 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
             using IDbConnection conn = OpenConnection();
             var transaction = conn.BeginTransaction();
 
-            var deletedEntryExists = await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                            FROM ""Accountant.DeletedEntities""
-                                                            WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""EntityId"" = @EntityId",
-                                                            new { UserId = userId, EntityType = (short)EntityType.Account, EntityId = id });
+            var deletedEntryExists = conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
+                                                                FROM ""Accountant.DeletedEntities""
+                                                                WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""EntityId"" = @EntityId",
+                                                                new { UserId = userId, EntityType = (short)EntityType.Account, EntityId = id });
 
             if (deletedEntryExists)
             {
@@ -96,9 +101,9 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
             else
             {
                 await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.DeletedEntities"" (""UserId"", ""EntityType"", ""EntityId"", ""DeletedDate"")
-                                         VALUES (@UserId, @EntityType, @EntityId, @DeletedDate)",
-                                         new { UserId = userId, EntityType = (short)EntityType.Account, EntityId = id, DeletedDate = DateTime.UtcNow },
-                                         transaction);
+                                             VALUES (@UserId, @EntityType, @EntityId, @DeletedDate)",
+                                             new { UserId = userId, EntityType = (short)EntityType.Account, EntityId = id, DeletedDate = DateTime.UtcNow },
+                                             transaction);
             }
 
             await conn.ExecuteAsync(@"DELETE FROM ""Accountant.Accounts"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId",

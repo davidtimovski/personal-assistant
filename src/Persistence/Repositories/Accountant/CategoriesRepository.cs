@@ -62,10 +62,15 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
         public async Task UpdateAsync(Category category)
         {
-            using IDbConnection conn = OpenConnection();
+            Category dbCategory = EFContext.Categories.Find(category.Id);
 
-            await conn.ExecuteAsync(@"UPDATE ""Accountant.Categories"" SET ""ParentId"" = @ParentId, ""Name"" = @Name, ""Type"" = @Type, 
-                ""GenerateUpcomingExpense"" = @GenerateUpcomingExpense, ""ModifiedDate"" = @ModifiedDate WHERE ""Id"" = @Id", category);
+            dbCategory.ParentId = category.ParentId;
+            dbCategory.Name = category.Name;
+            dbCategory.Type = category.Type;
+            dbCategory.GenerateUpcomingExpense = category.GenerateUpcomingExpense;
+            dbCategory.ModifiedDate = category.ModifiedDate;
+
+            await EFContext.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id, int userId)

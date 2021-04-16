@@ -1,6 +1,7 @@
 import { inject } from "aurelia-framework";
 
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
+
 import { TransactionModel } from "models/entities/transaction";
 import { CreatedIdPair } from "models/sync/created";
 import { IDBContext } from "./idbContext";
@@ -110,7 +111,7 @@ export class TransactionsIDBHelper {
 
   async getExpensesAndDepositsFromDate(
     fromDate: string,
-    accountId: number,
+    mainAccountId: number,
     categoryId: number,
     type: TransactionType
   ): Promise<Array<TransactionModel>> {
@@ -123,7 +124,7 @@ export class TransactionsIDBHelper {
         this.checkAgainstFilters3(
           t, 
           fromDate, 
-          accountId, 
+          mainAccountId, 
           categoryId !== 0,
           categoryIds,
           type
@@ -160,11 +161,11 @@ export class TransactionsIDBHelper {
     if (!inType) {
       if (!accountId) {
         if (type === TransactionType.Transfer) {
-          inType = !!t.toAccountId && !!t.fromAccountId;
+          inType = this.isTransfer(t.toAccountId, t.fromAccountId);
         } else if (type === TransactionType.Expense) {
-          inType = !!t.fromAccountId && !t.toAccountId;
+          inType = this.isExpense(t.fromAccountId, t.toAccountId);
         } else {
-          inType = !t.fromAccountId && !!t.toAccountId;
+          inType = this.isDeposit(t.fromAccountId, t.toAccountId);
         }
       } else {
         // Based on selected account
@@ -230,10 +231,8 @@ export class TransactionsIDBHelper {
     type: TransactionType
   ): boolean {
     let inType =
-      (type === TransactionType.Expense &&
-        !!t.fromAccountId &&
-        !t.toAccountId) ||
-      (type === TransactionType.Deposit && !t.fromAccountId && !!t.toAccountId);
+      (type === TransactionType.Expense && this.isExpense(t.fromAccountId, t.toAccountId)) ||
+      (type === TransactionType.Deposit && this.isDeposit(t.fromAccountId, t.toAccountId));
     if (!inType) {
       return false;
     }
@@ -255,7 +254,7 @@ export class TransactionsIDBHelper {
    * Finds whether a transaction fits the filters. Ignores Transfer transaction types.
    * @param t The transaction
    * @param fromDate
-   * @param accountId
+   * @param mainAccountId
    * @param searchByCategory False if the all categories option is selected
    * @param categoryIds The selected category plus any potential child categories
    * @param type
@@ -264,30 +263,22 @@ export class TransactionsIDBHelper {
   private checkAgainstFilters3(
     t: TransactionModel,
     fromDate: string,
-    accountId: number,
+    mainAccountId: number,
     searchByCategory: boolean,
     categoryIds: Array<number>,
     type: TransactionType
   ): boolean {
     let inType =
-      (type === TransactionType.Any &&
-        !(!!t.fromAccountId && !!t.toAccountId)) || // Ignore Transfers if type is Any
-      (type === TransactionType.Expense &&
-        !!t.fromAccountId &&
-        !t.toAccountId) ||
-      (type === TransactionType.Deposit && !t.fromAccountId && !!t.toAccountId);
+      (type === TransactionType.Any && !this.isTransfer(t.fromAccountId, t.toAccountId) && (t.fromAccountId === mainAccountId || t.toAccountId === mainAccountId)) || // Ignore Transfers if type is Any
+      (type === TransactionType.Expense && t.fromAccountId === mainAccountId && !t.toAccountId) ||
+      (type === TransactionType.Deposit && !t.fromAccountId && t.toAccountId === mainAccountId) || 
+      (type === TransactionType.Saving && t.fromAccountId === mainAccountId && !!t.toAccountId);
     if (!inType) {
       return false;
     }
 
     const afterDate = new Date(t.date) >= new Date(fromDate);
     if (!afterDate) {
-      return false;
-    }
-
-    let inAccount =
-      t.fromAccountId === accountId || t.toAccountId === accountId;
-    if (!inAccount) {
       return false;
     }
 
@@ -300,6 +291,18 @@ export class TransactionsIDBHelper {
     }
 
     return true;
+  }
+
+  private isExpense(fromAccountId: number, toAccountId: number) {
+    return !!fromAccountId && !toAccountId;
+  }
+
+  private isDeposit(fromAccountId: number, toAccountId: number) {
+    return !fromAccountId && !!toAccountId;
+  }
+
+  private isTransfer(fromAccountId: number, toAccountId: number) {
+    return !!fromAccountId && !!toAccountId;
   }
 
   async getExpendituresForCurrentMonth(
@@ -392,7 +395,9 @@ export class TransactionsIDBHelper {
 
         if (transaction.fromAccountId && !transaction.toAccountId) {
           const relatedUpcomingExpenses = await this.db.upcomingExpenses
-            .filter(x => x.categoryId == transaction.categoryId)
+            .filter(x => x.categoryId == transaction.categoryId 
+              && new Date(x.date).getFullYear() == new Date(transaction.date).getFullYear() 
+              && new Date(x.date).getMonth() == new Date(transaction.date).getMonth())
             .toArray();
 
           if (relatedUpcomingExpenses.length > 0) {

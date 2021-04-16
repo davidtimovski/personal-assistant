@@ -55,11 +55,16 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
         public async Task UpdateAsync(Debt debt)
         {
-            using IDbConnection conn = OpenConnection();
+            Debt dbDebt = EFContext.Debts.Find(debt.Id);
 
-            await conn.ExecuteAsync(@"UPDATE ""Accountant.Debts"" SET ""Person"" = @Person, ""Amount"" = @Amount, 
-                                    ""Currency"" = @Currency, ""Description"" = @Description, ""UserIsDebtor"" = @UserIsDebtor, 
-                                    ""ModifiedDate"" = @ModifiedDate WHERE ""Id"" = @Id", debt);
+            dbDebt.Person = debt.Person;
+            dbDebt.Amount = debt.Amount;
+            dbDebt.Currency = debt.Currency;
+            dbDebt.Description = debt.Description;
+            dbDebt.UserIsDebtor = debt.UserIsDebtor;
+            dbDebt.ModifiedDate = debt.ModifiedDate;
+
+            await EFContext.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id, int userId)

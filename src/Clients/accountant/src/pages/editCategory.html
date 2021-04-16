@@ -23,16 +23,16 @@
       </div>
 
       <div else>
-        <section show.bind="!connTracker.isOnline && category.synced" class="message warning">
+        <div show.bind="!connTracker.isOnline && category.synced" class="message warning">
           <i class="fas fa-exclamation-triangle"></i>
           <span t="whileOfflineCannotModify">While offline you cannot modify data that has already been synced with the
             cloud.</span>
-        </section>
+        </div>
 
-        <section if.bind="isParent" class="message info">
+        <div if.bind="isParent" class="message info">
           <i class="fas fa-info-circle"></i>
           <span t="editCategory.thisIsAParentCategory">This is a parent category.</span>
-        </section>
+        </div>
 
         <form submit.trigger="save()">
           <div class="form-control">

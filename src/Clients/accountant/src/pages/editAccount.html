@@ -23,17 +23,17 @@
       </div>
 
       <div else>
-        <section show.bind="!connTracker.isOnline && account.synced" class="message warning">
+        <div show.bind="!connTracker.isOnline && account.synced" class="message warning">
           <i class="fas fa-exclamation-triangle"></i>
           <span t="whileOfflineCannotModify">While offline you cannot modify data that has already been synced with the
             cloud.</span>
-        </section>
+        </div>
 
-        <section if.bind="isMainAccount" class="message info">
+        <div if.bind="isMainAccount" class="message info">
           <i class="fas fa-info-circle"></i>
           <span t="editAccount.mainAccount">This is your main account. It represents your current capital and every new
             expense or deposit initially goes here.</span>
-        </section>
+        </div>
 
         <form submit.trigger="save()">
           <div class="form-control">

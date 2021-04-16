@@ -66,11 +66,16 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
         public async Task UpdateAsync(UpcomingExpense upcomingExpense)
         {
-            using IDbConnection conn = OpenConnection();
+            UpcomingExpense dbUpcomingExpense = EFContext.UpcomingExpenses.Find(upcomingExpense.Id);
 
-            await conn.ExecuteAsync(@"UPDATE ""Accountant.UpcomingExpenses"" SET ""CategoryId"" = @CategoryId, ""Amount"" = @Amount, 
-                                        ""Currency"" = @Currency, ""Description"" = @Description, ""Date"" = @Date, 
-                                        ""ModifiedDate"" = @ModifiedDate WHERE ""Id"" = @Id", upcomingExpense);
+            dbUpcomingExpense.CategoryId = upcomingExpense.CategoryId;
+            dbUpcomingExpense.Amount = upcomingExpense.Amount;
+            dbUpcomingExpense.Currency = upcomingExpense.Currency;
+            dbUpcomingExpense.Description = upcomingExpense.Description;
+            dbUpcomingExpense.Date = upcomingExpense.Date;
+            dbUpcomingExpense.ModifiedDate = upcomingExpense.ModifiedDate;
+
+            await EFContext.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id, int userId)
