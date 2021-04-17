@@ -63,21 +63,14 @@ export class BarChartReport {
   }
 
   async attached() {
-    const categoryOptions = [
-      new SelectOption(0, this.i18n.tr("barChartReport.all")),
-    ];
+    const categoryOptions = [new SelectOption(0, this.i18n.tr("barChartReport.all"))];
     this.categoriesService
-      .getAllAsOptions(
-        this.i18n.tr("uncategorized"),
-        CategoryType.AllTransactions
-      )
+      .getAllAsOptions(this.i18n.tr("uncategorized"), CategoryType.AllTransactions)
       .then((options) => {
         this.categoryOptions = categoryOptions.concat(options);
       });
 
-    this.canvasCtx = (<HTMLCanvasElement>(
-      document.getElementById("chart")
-    )).getContext("2d");
+    this.canvasCtx = (<HTMLCanvasElement>document.getElementById("chart")).getContext("2d");
     this.chart = new Chart(this.canvasCtx, {
       type: "bar",
       data: {
@@ -96,13 +89,7 @@ export class BarChartReport {
     this.dataLoaded = false;
 
     this.transactionsService
-      .getExpensesAndDepositsFromDate(
-        this.fromDate,
-        this.mainAccountId,
-        this.categoryId,
-        this.type,
-        this.currency
-      )
+      .getExpensesAndDepositsFromDate(this.fromDate, this.mainAccountId, this.categoryId, this.type, this.currency)
       .then((transactions: Array<TransactionModel>) => {
         let itemGroups = this.groupBy(
           transactions,
@@ -112,21 +99,15 @@ export class BarChartReport {
         let fromDate = new Date(this.fromDate);
         const now = new Date();
 
-        const monthsDiff =
-          now.getMonth() -
-          fromDate.getMonth() +
-          12 * (now.getFullYear() - fromDate.getFullYear());
+        const monthsDiff = now.getMonth() - fromDate.getMonth() + 12 * (now.getFullYear() - fromDate.getFullYear());
 
         let items = new Array<AmountByMonth>();
         for (let i = 0; i < monthsDiff; i++) {
           const date = DateHelper.formatYYYYMM(fromDate);
 
-          let monthString = this.i18n
-            .tr(`months.${fromDate.getMonth()}`)
-            .substring(0, 3);
+          let monthString = this.i18n.tr(`months.${fromDate.getMonth()}`).substring(0, 3);
           if (fromDate.getFullYear() < now.getFullYear()) {
-            monthString +=
-              " " + fromDate.getFullYear().toString().substring(2, 4);
+            monthString += " " + fromDate.getFullYear().toString().substring(2, 4);
           }
 
           if (itemGroups.has(date)) {
@@ -141,27 +122,38 @@ export class BarChartReport {
             const item = new AmountByMonth(date, monthString, 0);
 
             switch (this.type) {
-              case TransactionType.Any: {
-                for (const transaction of monthTransactions) {
-                  if (transaction.fromAccountId) {
-                    item.amount -= transaction.amount;
-                  } else {
-                    item.amount += transaction.amount;
+              case TransactionType.Any:
+                {
+                  for (const transaction of monthTransactions) {
+                    if (transaction.fromAccountId) {
+                      item.amount -= transaction.amount;
+                    } else {
+                      item.amount += transaction.amount;
+                    }
                   }
                 }
-              }
-              break;
-              case TransactionType.Expense: {
-                item.amount -= monthTransactions.map(x => x.amount).reduce((a, b) => a + b, 0)
-              }
-              break;
+                break;
+              case TransactionType.Expense:
+                {
+                  item.amount -= monthTransactions.map((x) => x.amount).reduce((a, b) => a + b, 0);
+                }
+                break;
               case TransactionType.Deposit:
-              case TransactionType.Saving: {
-                item.amount += monthTransactions.map(x => x.amount).reduce((a, b) => a + b, 0)
-              }
-              break;
+                {
+                  item.amount += monthTransactions.map((x) => x.amount).reduce((a, b) => a + b, 0);
+                }
+                break;
+              case TransactionType.Saving:
+                {
+                  const movedToOther = monthTransactions.filter((x) => x.fromAccountId === this.mainAccountId);
+                  const movedToMain = monthTransactions.filter((x) => x.toAccountId === this.mainAccountId);
+
+                  item.amount += movedToOther.map((x) => x.amount).reduce((a, b) => a + b, 0);
+                  item.amount -= movedToMain.map((x) => x.amount).reduce((a, b) => a + b, 0);
+                }
+                break;
             }
-            
+
             item.amount = parseFloat(item.amount.toFixed(2));
 
             items.push(item);
@@ -188,18 +180,20 @@ export class BarChartReport {
           const depositColor = "#65c565";
           switch (this.type) {
             case TransactionType.Any:
-              const colors = new Array<string>();
-              for (const amount of amounts) {
-                colors.push(amount < 0 ? expenseColor : depositColor);
-              }
+            case TransactionType.Saving:
+              {
+                const colors = new Array<string>();
+                for (const amount of amounts) {
+                  colors.push(amount < 0 ? expenseColor : depositColor);
+                }
 
-              this.chart.data.datasets[0].backgroundColor = colors;
+                this.chart.data.datasets[0].backgroundColor = colors;
+              }
               break;
             case TransactionType.Expense:
               this.chart.data.datasets[0].backgroundColor = expenseColor;
               break;
             case TransactionType.Deposit:
-            case TransactionType.Saving:
               this.chart.data.datasets[0].backgroundColor = depositColor;
               break;
           }
@@ -214,10 +208,7 @@ export class BarChartReport {
       });
   }
 
-  groupBy(
-    list: Array<TransactionModel>,
-    keyGetter: { (x: TransactionModel): string; (arg0: TransactionModel): any }
-  ) {
+  groupBy(list: Array<TransactionModel>, keyGetter: { (x: TransactionModel): string; (arg0: TransactionModel): any }) {
     const map = new Map();
     list.forEach((item) => {
       const key = keyGetter(item);

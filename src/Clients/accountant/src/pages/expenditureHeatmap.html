@@ -15,7 +15,6 @@
     </div>
 
     <div class="content-wrap">
-
       <div class="heatmap ${loaded ? 'loaded' : ''}">
         <div class="heatmap-cell header" t="expenditureHeatmap.mon">Mon</div>
         <div class="heatmap-cell header" t="expenditureHeatmap.tue">Tue</div>
@@ -25,9 +24,14 @@
         <div class="heatmap-cell header" t="expenditureHeatmap.sat">Sat</div>
         <div class="heatmap-cell header" t="expenditureHeatmap.sun">Sun</div>
 
-        <div repeat.for="day of days" click.delegate="select(day)"
+        <div
+          repeat.for="day of days"
+          click.delegate="select(day)"
           class="heatmap-cell date ${day.isToday ? 'today' : ''} ${day.date === getSelectedDayDate ? 'selected' : ''}"
-          css="background: ${day.backgroundColor}; color: ${day.textColor};">${day.day}</div>
+          css="background: ${day.backgroundColor}; color: ${day.textColor};"
+        >
+          ${day.day}
+        </div>
       </div>
 
       <div if.bind="loaded" class="au-animate animate-fade-in animate-fade-out">
@@ -42,11 +46,13 @@
           </div>
         </div>
 
-        <div class="key-value-table-title">${selectedDay.formattedDate}</div>
-        <table class="key-value-table">
+        <div class="expenditure-heatmap-table-title">${selectedDay.formattedDate}</div>
+        <table class="expenditure-heatmap-table">
           <tbody>
-            <tr repeat.for="expenditure of selectedDay.expenditures"
-              click.delegate="viewTransaction(expenditure.transactionId)" class="clickable">
+            <tr
+              repeat.for="expenditure of selectedDay.expenditures"
+              click.delegate="viewTransaction(expenditure.transactionId)"
+            >
               <td>${expenditure.category}</td>
               <td>${expenditure.description}</td>
               <td class="amount-cell">${expenditure.amount | moneyFormat:currency}</td>
@@ -64,7 +70,6 @@
           </tfoot>
         </table>
       </div>
-
     </div>
   </div>
 </template>

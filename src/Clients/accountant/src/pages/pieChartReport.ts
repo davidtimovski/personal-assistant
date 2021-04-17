@@ -1,16 +1,22 @@
 import { inject } from "aurelia-framework";
+import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 import * as Chart from "chart.js";
+import { connectTo } from "aurelia-store";
 
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
+
 import { TransactionsService } from "services/transactionsService";
 import { AccountsService } from "services/accountsService";
 import { LocalStorage } from "utils/localStorage";
 import { AmountByCategory } from "models/viewmodels/amountByCategory";
 import { TransactionType } from "models/viewmodels/transactionType";
 import { TransactionModel } from "models/entities/transaction";
+import { SearchFilters } from "models/viewmodels/searchFilters";
+import * as Actions from "utils/state/actions";
 
-@inject(TransactionsService, AccountsService, LocalStorage, I18N)
+@inject(Router, TransactionsService, AccountsService, LocalStorage, I18N)
+@connectTo()
 export class PieChartReport {
   private mainAccountId: number;
   private currency: string;
@@ -22,18 +28,11 @@ export class PieChartReport {
   private toDate: string;
   private maxDate: string;
   private type = TransactionType.Expense;
-  private readonly colors = [
-    "#7a79e6",
-    "#dbd829",
-    "#49e09b",
-    "#e88042",
-    "#5aacf1",
-    "#f55551",
-    "#b6ca53",
-  ];
+  private readonly colors = ["#7a79e6", "#dbd829", "#49e09b", "#e88042", "#5aacf1", "#f55551", "#b6ca53"];
   private showTable = false;
 
   constructor(
+    private readonly router: Router,
     private readonly transactionsService: TransactionsService,
     private readonly accountsService: AccountsService,
     private readonly localStorage: LocalStorage,
@@ -55,9 +54,7 @@ export class PieChartReport {
   }
 
   async attached() {
-    this.canvasCtx = (<HTMLCanvasElement>(
-      document.getElementById("chart")
-    )).getContext("2d");
+    this.canvasCtx = (<HTMLCanvasElement>document.getElementById("chart")).getContext("2d");
     this.chart = new Chart(this.canvasCtx, {
       type: "pie",
       data: {
@@ -131,10 +128,13 @@ export class PieChartReport {
       });
   }
 
-  groupBy(
-    list: Array<TransactionModel>,
-    keyGetter: { (x: TransactionModel): string; (arg0: TransactionModel): any }
-  ) {
+  goToTransactions(item: AmountByCategory) {
+    Actions.changeFilters(new SearchFilters(1, 15, this.fromDate, this.toDate, 0, item.categoryId, this.type, null));
+
+    this.router.navigateToRoute("transactions");
+  }
+
+  groupBy(list: Array<TransactionModel>, keyGetter: { (x: TransactionModel): string; (arg0: TransactionModel): any }) {
     const map = new Map();
     list.forEach((item) => {
       const key = keyGetter(item);

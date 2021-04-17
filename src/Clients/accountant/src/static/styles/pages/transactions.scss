@@ -3,32 +3,37 @@
   justify-content: space-between;
   width: 240px;
   margin: 35px auto 0;
-}
-.transactions-pagination-arrow-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  background: var(--primary-color);
-  border-radius: 50%;
-  margin: 4px 0;
-  font-size: 20px;
-  color: #fff;
-  cursor: pointer;
-  transition: background var(--transition);
-}
-.transactions-pagination-arrow-wrap:hover {
-  background: var(--primary-color-dark);
-}
-.transactions-pagination-arrow-wrap.right i {
-  margin-right: -2px;
-}
-.transactions-pagination-arrow-wrap.left i {
-  margin-left: -2px;
-}
-.transactions-pagination-numbering {
-  margin: 0px 10px;
-  font-size: 20px;
-  line-height: 36px;
+
+  .transactions-pagination-arrow-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    margin: 4px 0;
+    font-size: 20px;
+    color: #fff;
+    cursor: pointer;
+    transition: background var(--transition);
+
+    &:hover {
+      background: var(--primary-color-dark);
+    }
+
+    &.right i {
+      margin-right: -2px;
+    }
+
+    &.left i {
+      margin-left: -2px;
+    }
+  }
+
+  .transactions-pagination-numbering {
+    margin: 0px 10px;
+    font-size: 20px;
+    line-height: 36px;
+  }
 }

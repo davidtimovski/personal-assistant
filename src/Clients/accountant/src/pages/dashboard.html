@@ -10,12 +10,16 @@
           <i class="fas fa-circle-notch fa-spin"></i>
         </span>
         <div else click.delegate="goToMenu()" class="profile-image-container" t="[title,aria-label]dashboard.menu">
-          <img src.bind="imageUri" class="profile-image" t="[alt]profilePicture">
+          <img src.bind="imageUri" class="profile-image" t="[alt]profilePicture" />
         </div>
         <div class="page-title reduced">
           <span></span>
         </div>
-        <a click.delegate="sync()" class="side small ${!connTracker.isOnline || progressBar.active ? 'disabled' : ''}" t="[title,aria-label]dashboard.refresh">
+        <a
+          click.delegate="sync()"
+          class="side small ${!connTracker.isOnline || progressBar.active ? 'disabled' : ''}"
+          t="[title,aria-label]dashboard.refresh"
+        >
           <i class="fas fa-sync-alt"></i>
         </a>
       </div>
@@ -25,7 +29,6 @@
     </div>
 
     <div class="content-wrap">
-
       <div class="capital-summary">
         <a route-href="route: transactions" class="summary-item-wrap">
           <div class="summary-item">
@@ -48,10 +51,22 @@
       </div>
 
       <div class="dashboard-buttons">
-        <button type="button" click.delegate="newDeposit()"
-          class="dashboard-button ${progressBar.active ? 'disabled' : ''}" t="dashboard.newDeposit">New deposit</button>
-        <button type="button" click.delegate="newExpense()"
-          class="dashboard-button ${progressBar.active ? 'disabled' : ''}" t="dashboard.newExpense">New expense</button>
+        <button
+          type="button"
+          click.delegate="newDeposit()"
+          class="dashboard-button ${progressBar.active ? 'disabled' : ''}"
+          t="dashboard.newDeposit"
+        >
+          New deposit
+        </button>
+        <button
+          type="button"
+          click.delegate="newExpense()"
+          class="dashboard-button ${progressBar.active ? 'disabled' : ''}"
+          t="dashboard.newExpense"
+        >
+          New expense
+        </button>
       </div>
 
       <div if.bind="!model" class="double-circle-loading">
@@ -61,25 +76,26 @@
 
       <div else>
         <div if.bind="model.expenditures.length > 0">
-          <div class="amount-by-category-table-title" t="dashboard.expenditures">Expenditures</div>
+          <a route-href="route: transactions" class="dashboard-table-title" t="dashboard.expenditures">Expenditures</a>
           <table class="amount-by-category-table">
             <template repeat.for="expenditure of model.expenditures">
-              <tr>
+              <tr click.delegate="goToTransactions(expenditure)">
                 <td>${expenditure.categoryName}</td>
                 <td class="amount-cell">${expenditure.amount | moneyFormat:currency}</td>
               </tr>
-              <tr repeat.for="expenditure of expenditure.subItems">
-                <td class="sub-category-cell">${expenditure.categoryName}</td>
-                <td class="amount-cell">${expenditure.amount | moneyFormat:currency}</td>
+              <tr repeat.for="subExpenditure of expenditure.subItems" click.delegate="goToTransactions(subExpenditure)">
+                <td class="sub-category-cell">${subExpenditure.categoryName}</td>
+                <td class="amount-cell">${subExpenditure.amount | moneyFormat:currency}</td>
               </tr>
             </template>
           </table>
         </div>
 
         <div if.bind="model.upcomingExpenses.length > 0">
-          <a route-href="route: upcomingExpenses" class="key-value-table-title" t="dashboard.upcomingExpenses">Upcoming
-            expenses</a>
-          <table class="key-value-table">
+          <a route-href="route: upcomingExpenses" class="dashboard-table-title" t="dashboard.upcomingExpenses"
+            >Upcoming expenses</a
+          >
+          <table class="dashboard-table">
             <tbody>
               <tr repeat.for="upcomingExpense of model.upcomingExpenses">
                 <td>${upcomingExpense.category}</td>
@@ -111,14 +127,14 @@
                   ${debtItem.person}
                 </td>
                 <td>${debtItem.description}</td>
-                <td class="amount-cell ${debtItem.userIsDebtor ? 'expense-color' : 'deposit-color'}">${debtItem.amount |
-                  moneyFormat:currency}</td>
+                <td class="amount-cell ${debtItem.userIsDebtor ? 'expense-color' : 'deposit-color'}">
+                  ${debtItem.amount | moneyFormat:currency}
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
-
     </div>
   </div>
 </template>

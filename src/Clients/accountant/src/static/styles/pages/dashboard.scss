@@ -8,20 +8,23 @@
   margin-right: 2%;
   text-decoration: none;
   color: #fff;
-}
-.summary-item-wrap:last-child {
-  margin-right: 0;
-}
-.summary-item {
-  padding: 8px 8px 10px;
-}
-.summary-title {
-  font-size: 0.9rem;
-}
-.summary-value {
-  margin-top: 10px;
-  font-size: 1.4rem;
-  line-height: 1.2rem;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  .summary-item {
+    padding: 8px 8px 10px;
+
+    .summary-title {
+      font-size: 0.9rem;
+    }
+    .summary-value {
+      margin-top: 10px;
+      font-size: 1.4rem;
+      line-height: 1.2rem;
+    }
+  }
 }
 
 .dashboard-buttons {
@@ -30,26 +33,60 @@
   border-top: 1px solid #ddd;
   padding-top: 15px;
   margin-top: 20px;
+
+  .dashboard-button {
+    position: relative;
+    width: 48%;
+    background: #fafafa;
+    border: none;
+    border-radius: var(--border-radius);
+    outline: none;
+    box-shadow: var(--box-shadow);
+    font-size: inherit;
+    line-height: 45px;
+    color: var(--primary-color);
+    cursor: pointer;
+
+    &:hover {
+      color: var(--primary-color-dark);
+    }
+  }
 }
-.dashboard-button {
-  position: relative;
-  width: 48%;
-  background: #fafafa;
-  border: none;
-  border-radius: var(--border-radius);
-  outline: none;
-  box-shadow: var(--box-shadow);
-  font-size: inherit;
-  line-height: 45px;
+
+.dashboard-table-title {
+  display: block;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+  margin: 35px 0 10px;
+  text-decoration: none;
   color: var(--primary-color);
-  cursor: pointer;
-  transition: color var(--transition);
 }
-.dashboard-button:hover {
-  color: var(--primary-color-dark);
+.dashboard-table {
+  width: 100%;
+  font-size: 1rem;
+
+  td {
+    padding: 5px 15px 5px 0;
+    line-height: 1.2rem;
+  }
+
+  td:last-child {
+    padding-right: 0;
+    text-align: right;
+  }
+
+  .amount-cell {
+    white-space: nowrap;
+  }
+
+  tfoot tr:last-child td {
+    border-top: 1px solid #ddd;
+    padding: 5px 0;
+    font-size: 1.1rem;
+  }
 }
 
 /* Workaround for sticky :hover on mobile devices */
-.touch-device .dashboard-button:hover {
+.touch-device .dashboard-buttons .dashboard-button:hover {
   color: var(--primary-color);
 }

@@ -3,29 +3,35 @@
   border-radius: 23px;
   box-shadow: var(--box-shadow);
   margin-top: 10px;
-}
-.drawer-button {
-  box-shadow: none;
-  transition: border-radius var(--transition);
-}
-.drawer-button-wrap.open .drawer-button {
-  border-bottom: 1px solid #e6e6e6;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  color: var(--regular-color);
-}
-.drawer-content-wrap {
-  max-height: 0;
-  overflow-y: hidden;
-  transition-property: all;
-  transition-duration: 0.5s;
-  transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
-}
-.drawer-button-wrap.open .drawer-content-wrap {
-  max-height: 175px;
-}
-.drawer-content {
-  padding: 15px 20px;
+
+  .drawer-button {
+    box-shadow: none;
+    transition: border-radius var(--transition);
+  }
+
+  &.open {
+    .drawer-button {
+      border-bottom: 1px solid #e6e6e6;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      color: var(--regular-color);
+    }
+  }
+
+  .drawer-content-wrap {
+    max-height: 0;
+    overflow-y: hidden;
+    transition-property: all;
+    transition-duration: 0.5s;
+    transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+
+    .drawer-content {
+      padding: 15px 20px;
+    }
+  }
+  &.open .drawer-content-wrap {
+    max-height: 175px;
+  }
 }
 
 @media screen and (min-width: 1200px) {
