@@ -5,26 +5,21 @@ label.toggle {
   line-height: 37px;
   cursor: pointer;
   transition: opacity var(--transition);
-}
-label.toggle.disabled {
-  opacity: 0.5;
-  cursor: default;
-}
 
-label.toggle span {
-  line-height: 29px;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  transition: color var(--transition);
-}
-label.toggle.disabled {
-  opacity: 0.5;
-}
+  &.disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
 
-label.toggle:not(.disabled):hover span {
-  color: var(--primary-color);
+  span {
+    line-height: 29px;
+    user-select: none;
+    transition: color var(--transition);
+  }
+
+  &:not(.disabled):hover span {
+    color: var(--primary-color);
+  }
 }
 
 .toggle-content {
@@ -32,87 +27,88 @@ label.toggle:not(.disabled):hover span {
   height: 27px;
   position: relative;
   display: inline-block;
+
+  input[type="checkbox"] {
+    width: 56px;
+    height: 27px;
+    margin: 0;
+    appearance: none;
+    background: #bbc;
+    border-radius: 3px;
+    box-shadow: inset 0 1px 6px 0 rgba(0, 0, 0, 0.1);
+    position: relative;
+    outline: 0;
+    cursor: pointer;
+    transition: all 100ms;
+  }
+
+  input[type="checkbox"]:after {
+    position: absolute;
+    content: "";
+    top: 3px;
+    left: 3px;
+    width: 21px;
+    height: 21px;
+    background: #e5e5e5;
+    z-index: 2;
+    border-radius: 2px;
+    box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.25);
+    transition: all 250ms;
+  }
+
+  svg,
+  i {
+    position: absolute;
+    transform-origin: 50% 50%;
+    fill: #fff;
+    transition: all 250ms;
+    z-index: 1;
+    cursor: pointer;
+  }
+
+  i {
+    font-size: 17px;
+    color: #fff;
+
+    &.is-checked {
+      top: 10px;
+    }
+  }
+
+  .is-checked {
+    width: 18px;
+    top: 11px;
+    left: 7px;
+    transform: translateX(190%) translateY(-30%) scale(0);
+  }
+
+  .is-unchecked {
+    width: 13px;
+    top: 12px;
+    right: 9px;
+    transform: translateX(0) translateY(-30%) scale(1);
+  }
+
+  /* Checked State */
+  input[type="checkbox"]:checked {
+    background: var(--primary-color);
+  }
+
+  input[type="checkbox"]:checked:after {
+    left: calc(100% - 24px);
+  }
+
+  input[type="checkbox"]:checked + .is-checked {
+    transform: translateX(0) translateY(-30%) scale(1);
+  }
+
+  input[type="checkbox"]:checked ~ .is-unchecked {
+    transform: translateX(-190%) translateY(-30%) scale(0);
+  }
 }
 
-.toggle-content input[type="checkbox"] {
-  width: 56px;
-  height: 27px;
-  margin: 0;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background: #bbc;
-  border-radius: 3px;
-  box-shadow: inset 0 1px 6px 0 rgba(0, 0, 0, 0.1);
-  position: relative;
-  outline: 0;
-  cursor: pointer;
-  transition: all 100ms;
-}
 .disabled .toggle-content input[type="checkbox"] {
   cursor: default;
-}
-
-.toggle-content input[type="checkbox"]:after {
-  position: absolute;
-  content: "";
-  top: 3px;
-  left: 3px;
-  width: 21px;
-  height: 21px;
-  background: #e5e5e5;
-  z-index: 2;
-  border-radius: 2px;
-  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.25);
-  transition: all 250ms;
-}
-
-.toggle-content svg,
-.toggle-content i {
-  position: absolute;
-  transform-origin: 50% 50%;
-  fill: #fff;
-  transition: all 250ms;
-  z-index: 1;
-  cursor: pointer;
-}
-.toggle-content i {
-  font-size: 17px;
-  color: #fff;
-}
-
-.toggle-content .is-checked {
-  width: 18px;
-  top: 11px;
-  left: 7px;
-  transform: translateX(190%) translateY(-30%) scale(0);
-}
-.toggle-content i.is-checked {
-  top: 10px;
-}
-
-.toggle-content .is-unchecked {
-  width: 13px;
-  top: 12px;
-  right: 9px;
-  transform: translateX(0) translateY(-30%) scale(1);
-}
-
-/* Checked State */
-.toggle-content input[type="checkbox"]:checked {
-  background: var(--primary-color);
-}
-
-.toggle-content input[type="checkbox"]:checked:after {
-  left: calc(100% - 24px);
-}
-
-.toggle-content input[type="checkbox"]:checked + .is-checked {
-  transform: translateX(0) translateY(-30%) scale(1);
-}
-
-.toggle-content input[type="checkbox"]:checked ~ .is-unchecked {
-  transform: translateX(-190%) translateY(-30%) scale(0);
 }
 
 /* Workaround for sticky :hover on mobile devices */

@@ -1,55 +1,64 @@
 .top-buttons-drawer-container {
   position: relative;
   height: 21px;
-}
-.top-buttons-drawer {
-  position: absolute;
-  top: 0;
-  left: 10%;
-  z-index: 2;
-  width: 80%;
-  background: #f3f3f3;
-  border-bottom-left-radius: 7px;
-  border-bottom-right-radius: 7px;
-  box-shadow: inset var(--box-shadow);
-  transition: box-shadow var(--transition);
-}
-.top-buttons-drawer-wrap {
-  max-height: 0;
-  overflow-y: hidden;
-  transition-property: all;
-  transition-duration: 0.5s;
-  transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
-}
-.top-buttons-drawer-content {
-  padding: 20px 25px 15px;
-}
-.top-buttons-drawer .fa-angle-up {
-  display: none;
-}
-.top-buttons-drawer.open .fa-angle-up {
-  display: inline;
-}
-.top-buttons-drawer.open .fa-angle-down {
-  display: none;
-}
-.top-drawer-handle {
-  border-bottom: 1px solid #ddd;
-  border-bottom-left-radius: 7px;
-  border-bottom-right-radius: 7px;
-  text-align: center;
-  font-size: 16px;
-  line-height: 20px;
-  color: var(--faded-color);
-  cursor: pointer;
 
-  transition: color var(--transition);
-}
-.top-drawer-handle:hover {
-  color: var(--primary-color-dark);
+  .top-buttons-drawer {
+    position: absolute;
+    top: 0;
+    left: 10%;
+    z-index: 2;
+    width: 80%;
+    background: #f3f3f3;
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
+    box-shadow: inset var(--box-shadow);
+    transition: box-shadow var(--transition);
+
+    .top-buttons-drawer-wrap {
+      max-height: 0;
+      overflow-y: hidden;
+      transition-property: all;
+      transition-duration: 0.5s;
+      transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+
+      .top-buttons-drawer-content {
+        padding: 20px 25px 15px;
+      }
+    }
+
+    .fa-angle-up {
+      display: none;
+    }
+
+    &.open {
+      .fa-angle-up {
+        display: inline;
+      }
+
+      .fa-angle-down {
+        display: none;
+      }
+    }
+
+    .top-drawer-handle {
+      border-bottom: 1px solid #ddd;
+      border-bottom-left-radius: 7px;
+      border-bottom-right-radius: 7px;
+      text-align: center;
+      font-size: 16px;
+      line-height: 20px;
+      color: var(--faded-color);
+      cursor: pointer;
+      transition: color var(--transition);
+
+      &:hover {
+        color: var(--primary-color-dark);
+      }
+    }
+  }
 }
 
 /* Workaround for sticky :hover on mobile devices */
-.touch-device .top-drawer-handle:hover {
+.touch-device .top-buttons-drawer-container .top-buttons-drawer .top-drawer-handle:hover {
   color: var(--faded-color);
 }
