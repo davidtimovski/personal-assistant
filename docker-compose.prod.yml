@@ -11,11 +11,8 @@ services:
       - EventBusConnection=${EVENT_BUS_HOST}
       - EventBusUserName=${EVENT_BUS_USERNAME}
       - EventBusPassword=${EVENT_BUS_PASSWORD}
-      - AppSettings__Urls__PersonalAssistant=${PERSONAL_ASSISTANT_URL}
-      - AppSettings__Urls__ToDoAssistant=${TODO_ASSISTANT_URL}
-      - AppSettings__Urls__CookingAssistant=${COOKING_ASSISTANT_URL}
-      - AppSettings__Urls__Accountant=${ACCOUNTANT_URL}
-      - AppSettings__ReCaptchaSecret=${RECAPTCHA_SECRET}
+      - AdminEmail=${ADMIN_EMAIL}
+      - ReCaptchaSecret=${RECAPTCHA_SECRET}
       - Certificate__Name=${CERTIFICATE_NAME}
       - Certificate__Password=${CERTIFICATE_PASSWORD}
       - Cloudinary__ApiKey=${CLOUDINARY_API_KEY}
@@ -26,7 +23,7 @@ services:
       - "5000:80"
     volumes:
       - ./certs:/app/certs
-      - ./session-keys:/app/AuthKeys
+      - ./session-keys:/app/session-keys
     depends_on:
       - postgres
       - rabbitmq
@@ -41,10 +38,6 @@ services:
       - EventBusConnection=${EVENT_BUS_HOST}
       - EventBusUserName=${EVENT_BUS_USERNAME}
       - EventBusPassword=${EVENT_BUS_PASSWORD}
-      - Urls__Authority=${AUTHORITY_URL}
-      - Urls__ToDoAssistant=${TODO_ASSISTANT_URL}
-      - Urls__CookingAssistant=${COOKING_ASSISTANT_URL}
-      - Urls__Accountant=${ACCOUNTANT_URL}
       - Cloudinary__ApiKey=${CLOUDINARY_API_KEY}
       - Cloudinary__ApiSecret=${CLOUDINARY_API_SECRET}
       - ApplicationInsights__InstrumentationKey=${API_APP_INSIGHTS_KEY}

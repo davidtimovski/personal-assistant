@@ -9,11 +9,7 @@ services:
       - EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
       - EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
       - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
-      - AppSettings__Urls__PersonalAssistant=${PERSONAL_ASSISTANT_URL:-http://localhost:80}
-      - AppSettings__Urls__ToDoAssistant=${TODO_ASSISTANT_URL:-http://localhost:8080}
-      - AppSettings__Urls__CookingAssistant=${COOKING_ASSISTANT_URL:-http://localhost:8081}
-      - AppSettings__Urls__Accountant=${ACCOUNTANT_URL:-http://localhost:8082}
-      - IssuerUri=${ISSUER_URI:-http://localhost:5000}
+      - AdminEmail=${ADMIN_EMAIL}
       - PORT=80
     volumes:
       - ./certs:/app/certs:z
@@ -28,10 +24,6 @@ services:
       - EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
       - EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
       - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
-      - Urls__Authority=${AUTHORITY_URL:-http://host.docker.internal:5000}
-      - Urls__ToDoAssistant=${TODO_ASSISTANT_URL:-http://localhost:8080}
-      - Urls__CookingAssistant=${COOKING_ASSISTANT_URL:-http://localhost:8081}
-      - Urls__Accountant=${ACCOUNTANT_URL:-http://localhost:8082}
       - PORT=80
     volumes:
       - ./src/Api/storage:/app/storage:z
@@ -46,9 +38,8 @@ services:
       - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
       - SendGridApiKey=${SENDGRID_API_KEY:-replace_me}
 
-#  midnight-walker:
+#  worker:
 #    environment:
-#      - ASPNETCORE_ENVIRONMENT=Development
 #      - ConnectionString=${PERSONAL_ASSISTANT_DB:-Server=postgres;Database=personalassistant;User Id=postgres;Password=postgres;Pooling=true} 
 
   postgres:

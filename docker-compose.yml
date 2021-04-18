@@ -31,9 +31,9 @@ services:
       - postgres
       - rabbitmq
 
-#  midnight-walker:
-#    image: ${DOCKER_REGISTRY-personalassistant}-midnight-walker:${PLATFORM:-linux}-${TAG:-latest}
-#    container_name: personalassistant-midnight-walker
+#  worker:
+#    image: personalassistant-worker:latest
+#    container_name: personalassistant-worker
 #    build:
 #      context: .
 #      dockerfile: src/Worker/Dockerfile

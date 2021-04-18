@@ -3,10 +3,9 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Auth.Models.Config;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Options;
 using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Infrastructure.Sender.Models;
 
@@ -24,19 +23,22 @@ namespace Auth.Services
     {
         private readonly ISenderService _senderService;
         private readonly IWebHostEnvironment _env;
-        private readonly AppSettings _appSettings;
         private readonly IStringLocalizer<EmailTemplateService> _localizer;
+        private readonly string _applicationName;
+        private readonly string _adminEmail;
 
         public EmailTemplateService(
             ISenderService senderService,
             IWebHostEnvironment env,
-            IOptions<AppSettings> appSettingsOptions,
+            IConfiguration configuration,
             IStringLocalizer<EmailTemplateService> localizer)
         {
             _senderService = senderService;
             _env = env;
-            _appSettings = appSettingsOptions.Value;
             _localizer = localizer;
+
+            _applicationName = configuration["ApplicationName"];
+            _adminEmail = configuration["AdminEmail"];
         }
 
         public async Task EnqueueRegisterConfirmationEmailAsync(string toName, string toEmail, Uri url, string language)
@@ -45,7 +47,7 @@ namespace Auth.Services
             {
                 ToAddress = toEmail,
                 ToName = toName,
-                Subject = _localizer["RegisterConfirmationEmailSubject", _appSettings.ApplicationName]
+                Subject = _localizer["RegisterConfirmationEmailSubject", _applicationName]
             };
 
             string bodyText = await GetTemplateContentsAsync("RegisterConfirmation.txt", language);
@@ -68,7 +70,7 @@ namespace Auth.Services
             {
                 ToAddress = toEmail,
                 ToName = string.Empty,
-                Subject = _localizer["PasswordResetEmailSubject", _appSettings.ApplicationName]
+                Subject = _localizer["PasswordResetEmailSubject", _applicationName]
             };
 
             string bodyText = await GetTemplateContentsAsync("PasswordReset.txt", language);
@@ -89,9 +91,9 @@ namespace Auth.Services
             {
                 var email = new Email
                 {
-                    ToAddress = _appSettings.AdminEmail,
+                    ToAddress = _adminEmail,
                     ToName = "Admin",
-                    Subject = $"New registration on {_appSettings.ApplicationName}"
+                    Subject = $"New registration on {_applicationName}"
                 };
 
                 string bodyText = await GetTemplateContentsAsync("NewRegistration.txt", "admin");
@@ -115,9 +117,9 @@ namespace Auth.Services
             {
                 var email = new Email
                 {
-                    ToAddress = _appSettings.AdminEmail,
+                    ToAddress = _adminEmail,
                     ToName = "Admin",
-                    Subject = $"New email confirmation on {_appSettings.ApplicationName}"
+                    Subject = $"New email confirmation on {_applicationName}"
                 };
 
                 string bodyText = await GetTemplateContentsAsync("NewEmailVerification.txt", "admin");

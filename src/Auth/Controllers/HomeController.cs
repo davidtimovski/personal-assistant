@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
-using Auth.Models.Config;
 using Auth.ViewModels.Home;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Options;
 using PersonalAssistant.Infrastructure.Identity;
 
 namespace Auth.Controllers
@@ -18,16 +17,16 @@ namespace Auth.Controllers
     public class HomeController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly AppSettings _appSettings;
+        private readonly IConfiguration _configuration;
         private readonly IStringLocalizer<HomeController> _localizer;
 
         public HomeController(
             UserManager<ApplicationUser> userManager,
-            IOptions<AppSettings> appSettingsOptions,
+            IConfiguration configuration,
             IStringLocalizer<HomeController> localizer)
         {
             _userManager = userManager;
-            _appSettings = appSettingsOptions.Value;
+            _configuration = configuration;
             _localizer = localizer;
         }
 
@@ -54,9 +53,9 @@ namespace Auth.Controllers
                 UserName = user.Name,
                 Applications = new Dictionary<string, ApplicationVm>
                 {
-                    { "ToDoAssistant", new ApplicationVm("To Do Assistant", new Uri(_appSettings.Urls.ToDoAssistant + $"/{language}"), "to-do-assistant") },
-                    { "CookingAssistant", new ApplicationVm("Cooking Assistant", new Uri(_appSettings.Urls.CookingAssistant + $"/{language}"), "cooking-assistant") },
-                    { "Accountant", new ApplicationVm("Accountant", new Uri(_appSettings.Urls.Accountant + $"/{language}"), "accountant") }
+                    { "ToDoAssistant", new ApplicationVm("To Do Assistant", new Uri(_configuration["Urls:ToDoAssistant"] + $"/{language}"), "to-do-assistant") },
+                    { "CookingAssistant", new ApplicationVm("Cooking Assistant", new Uri(_configuration["Urls:CookingAssistant"] + $"/{language}"), "cooking-assistant") },
+                    { "Accountant", new ApplicationVm("Accountant", new Uri(_configuration["Urls:Accountant"] + $"/{language}"), "accountant") }
                 },
                 Alert = alert
             };

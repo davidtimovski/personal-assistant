@@ -36,7 +36,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BB91D65B-985A-462E-9085-B8C32599AD08}"
 	ProjectSection(SolutionItems) = preProject
 		.dockerignore = .dockerignore
-		.env = .env
 		.env.example = .env.example
 		.gitignore = .gitignore
 		.github\workflows\main.yml = .github\workflows\main.yml

@@ -51,7 +51,7 @@ namespace Api
                     builder.WithOrigins(Configuration["Urls:ToDoAssistant"])
                            .AllowAnyMethod()
                            .AllowAnyHeader()
-                           .SetPreflightMaxAge(TimeSpan.FromSeconds(1728000)); // 20 days
+                           .SetPreflightMaxAge(TimeSpan.FromDays(20));
                 });
 
                 options.AddPolicy("AllowCookingAssistant", builder =>
@@ -59,7 +59,7 @@ namespace Api
                     builder.WithOrigins(Configuration["Urls:CookingAssistant"])
                            .AllowAnyMethod()
                            .AllowAnyHeader()
-                           .SetPreflightMaxAge(TimeSpan.FromSeconds(1728000)); // 20 days
+                           .SetPreflightMaxAge(TimeSpan.FromDays(20));
                 });
 
                 options.AddPolicy("AllowAccountant", builder =>
@@ -67,7 +67,7 @@ namespace Api
                     builder.WithOrigins(Configuration["Urls:Accountant"])
                            .AllowAnyMethod()
                            .AllowAnyHeader()
-                           .SetPreflightMaxAge(TimeSpan.FromSeconds(1728000)); // 20 days
+                           .SetPreflightMaxAge(TimeSpan.FromDays(20));
                 });
 
                 options.AddPolicy("AllowAllApps", builder =>
@@ -77,7 +77,7 @@ namespace Api
                                         Configuration["Urls:Accountant"])
                            .AllowAnyMethod()
                            .AllowAnyHeader()
-                           .SetPreflightMaxAge(TimeSpan.FromSeconds(1728000)); // 20 days
+                           .SetPreflightMaxAge(TimeSpan.FromDays(20));
                 });
             });
 
