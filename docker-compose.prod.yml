@@ -15,14 +15,18 @@ services:
       - AppSettings__Urls__ToDoAssistant=${TODO_ASSISTANT_URL}
       - AppSettings__Urls__CookingAssistant=${COOKING_ASSISTANT_URL}
       - AppSettings__Urls__Accountant=${ACCOUNTANT_URL}
+      - AppSettings__ReCaptchaSecret=${RECAPTCHA_SECRET}
       - Certificate__Name=${CERTIFICATE_NAME}
       - Certificate__Password=${CERTIFICATE_PASSWORD}
+      - Cloudinary__ApiKey=${CLOUDINARY_API_KEY}
+      - Cloudinary__ApiSecret=${CLOUDINARY_API_SECRET}
+      - ApplicationInsights__InstrumentationKey=${AUTH_APP_INSIGHTS_KEY}
       - PORT=80
     ports:
       - "5000:80"
     volumes:
       - ./certs:/app/certs
-      - ./AuthKeys:/app/AuthKeys
+      - ./session-keys:/app/AuthKeys
     depends_on:
       - postgres
       - rabbitmq
@@ -41,6 +45,9 @@ services:
       - Urls__ToDoAssistant=${TODO_ASSISTANT_URL}
       - Urls__CookingAssistant=${COOKING_ASSISTANT_URL}
       - Urls__Accountant=${ACCOUNTANT_URL}
+      - Cloudinary__ApiKey=${CLOUDINARY_API_KEY}
+      - Cloudinary__ApiSecret=${CLOUDINARY_API_SECRET}
+      - ApplicationInsights__InstrumentationKey=${API_APP_INSIGHTS_KEY}
       - PORT=80
     ports:
       - "5001:80"
@@ -60,6 +67,10 @@ services:
       - EventBusUserName=${EVENT_BUS_USERNAME}
       - EventBusPassword=${EVENT_BUS_PASSWORD}
       - SendGridApiKey=${SENDGRID_API_KEY}
+      - ToDoAssistantVapid__PublicKey=${TODO_VAPID_PUBLIC_KEY}
+      - ToDoAssistantVapid__PrivateKey=${TODO_VAPID_PRIVATE_KEY}
+      - CookingAssistantVapid__PublicKey=${COOKING_VAPID_PUBLIC_KEY}
+      - CookingAssistantVapid__PrivateKey=${COOKING_VAPID_PRIVATE_KEY}
     depends_on:
       - postgres
       - rabbitmq
