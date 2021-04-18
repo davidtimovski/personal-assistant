@@ -72,6 +72,7 @@ namespace Auth
 
             var identityServerBuilder = services.AddIdentityServer(options =>
             {
+                options.IssuerUri = Configuration["IssuerUri"];
                 options.Events.RaiseErrorEvents = true;
                 options.Events.RaiseInformationEvents = true;
                 options.Events.RaiseFailureEvents = true;

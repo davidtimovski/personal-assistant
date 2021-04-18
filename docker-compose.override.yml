@@ -13,6 +13,7 @@ services:
       - AppSettings__Urls__ToDoAssistant=${TODO_ASSISTANT_URL:-http://localhost:8080}
       - AppSettings__Urls__CookingAssistant=${COOKING_ASSISTANT_URL:-http://localhost:8081}
       - AppSettings__Urls__Accountant=${ACCOUNTANT_URL:-http://localhost:8082}
+      - IssuerUri=${ISSUER_URI:-http://localhost:5000}
       - PORT=80
     volumes:
       - ./certs:/app/certs:z
@@ -27,7 +28,7 @@ services:
       - EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
       - EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
       - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
-      - Urls__Authority=${AUTHORITY_URL:-auth:5000}
+      - Urls__Authority=${AUTHORITY_URL:-http://host.docker.internal:5000}
       - Urls__ToDoAssistant=${TODO_ASSISTANT_URL:-http://localhost:8080}
       - Urls__CookingAssistant=${COOKING_ASSISTANT_URL:-http://localhost:8081}
       - Urls__Accountant=${ACCOUNTANT_URL:-http://localhost:8082}
