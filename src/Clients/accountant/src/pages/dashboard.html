@@ -78,16 +78,21 @@
         <div if.bind="model.expenditures.length > 0">
           <a route-href="route: transactions" class="dashboard-table-title" t="dashboard.expenditures">Expenditures</a>
           <table class="amount-by-category-table">
-            <template repeat.for="expenditure of model.expenditures">
-              <tr click.delegate="goToTransactions(expenditure)">
-                <td>${expenditure.categoryName}</td>
-                <td class="amount-cell">${expenditure.amount | moneyFormat:currency}</td>
-              </tr>
-              <tr repeat.for="subExpenditure of expenditure.subItems" click.delegate="goToTransactions(subExpenditure)">
-                <td class="sub-category-cell">${subExpenditure.categoryName}</td>
-                <td class="amount-cell">${subExpenditure.amount | moneyFormat:currency}</td>
-              </tr>
-            </template>
+            <tbody>
+              <template repeat.for="expenditure of model.expenditures">
+                <tr click.delegate="goToTransactions(expenditure)">
+                  <td>${expenditure.categoryName}</td>
+                  <td class="amount-cell">${expenditure.amount | moneyFormat:currency}</td>
+                </tr>
+                <tr
+                  repeat.for="subExpenditure of expenditure.subItems"
+                  click.delegate="goToTransactions(subExpenditure)"
+                >
+                  <td class="sub-category-cell">${subExpenditure.categoryName}</td>
+                  <td class="amount-cell">${subExpenditure.amount | moneyFormat:currency}</td>
+                </tr>
+              </template>
+            </tbody>
           </table>
         </div>
 

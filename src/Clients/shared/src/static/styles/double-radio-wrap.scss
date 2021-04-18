@@ -7,16 +7,6 @@
     display: none;
   }
 
-  label.selected {
-    background: var(--primary-color);
-    box-shadow: inset var(--box-shadow);
-    color: #fafafa;
-
-    .checkbox-icon {
-      display: inline;
-    }
-  }
-
   .checkbox-icon {
     display: none;
     position: absolute;
@@ -41,6 +31,16 @@
       cursor: pointer;
 
       transition: background var(--transition), color var(--transition);
+
+      &.selected {
+        background: var(--primary-color);
+        box-shadow: inset var(--box-shadow);
+        color: #fafafa;
+
+        .checkbox-icon {
+          display: inline;
+        }
+      }
     }
 
     &:nth-child(1) label {
