@@ -40,7 +40,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
         {
             IEnumerable<Recipe> recipes = await _recipesRepository.GetAllAsync(userId);
 
-            var result = recipes.Select(x => _mapper.Map<SimpleRecipe>(x));
+            var result = recipes.Select(x => _mapper.Map<SimpleRecipe>(x, opts => { opts.Items["UserId"] = userId; }));
             result = result.OrderBy(x => x.IngredientsMissing).ThenByDescending(x => x.LastOpenedDate);
 
             return result;
@@ -59,7 +59,15 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
         {
             Recipe recipe = await _recipesRepository.GetAsync(id, userId);
 
-            var result = _mapper.Map<RecipeDto>(recipe, opts => { opts.Items["Currency"] = currency; });
+            var result = _mapper.Map<RecipeDto>(recipe, opts => {
+                opts.Items["UserId"] = userId;
+                opts.Items["Currency"] = currency; 
+            });
+
+            foreach (RecipeIngredientDto ingredient in result.Ingredients.Where(x => x.Amount.HasValue))
+            {
+                ingredient.AmountPerServing = ingredient.Amount / result.Servings;
+            }
 
             return result;
         }
@@ -68,9 +76,49 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
         {
             Recipe recipe = await _recipesRepository.GetForUpdateAsync(id, userId);
 
-            var result = _mapper.Map<RecipeForUpdate>(recipe);
+            var result = _mapper.Map<RecipeForUpdate>(recipe, opts => { opts.Items["UserId"] = userId; });
 
             return result;
+        }
+
+        public async Task<RecipeWithShares> GetWithSharesAsync(int id, int userId)
+        {
+            Recipe recipe = await _recipesRepository.GetWithOwnerAsync(id, userId);
+            if (recipe == null)
+            {
+                return null;
+            }
+
+            recipe.Shares.AddRange(await _recipesRepository.GetSharesAsync(id));
+            recipe.Shares.RemoveAll(x => x.UserId == userId);
+
+            var result = _mapper.Map<RecipeWithShares>(recipe, opts => { opts.Items["UserId"] = userId; });
+
+            return result;
+        }
+
+        public async Task<IEnumerable<ShareRecipeRequest>> GetShareRequestsAsync(int userId)
+        {
+            IEnumerable<RecipeShare> shareRequests = await _recipesRepository.GetShareRequestsAsync(userId);
+
+            var result = shareRequests.Select(x => _mapper.Map<ShareRecipeRequest>(x, opts => { opts.Items["UserId"] = userId; }));
+
+            return result;
+        }
+
+        public Task<int> GetPendingShareRequestsCountAsync(int userId)
+        {
+            return _recipesRepository.GetPendingShareRequestsCountAsync(userId);
+        }
+
+        public async Task<bool> CanShareWithUserAsync(int shareWithId, int userId)
+        {
+            if (shareWithId == userId)
+            {
+                return false;
+            }
+
+            return await _recipesRepository.CanShareWithUserAsync(shareWithId, userId);
         }
 
         public async Task<RecipeForSending> GetForSendingAsync(int id, int userId)
@@ -166,7 +214,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
             var recipe = _mapper.Map<Recipe>(model);
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             recipe.Name = recipe.Name.Trim();
 
@@ -283,7 +331,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             await _recipesRepository.CreateAsync(recipe);
         }
 
-        public async Task UpdateAsync(UpdateRecipe model, IValidator<UpdateRecipe> validator)
+        public async Task<RecipeToNotify> UpdateAsync(UpdateRecipe model, IValidator<UpdateRecipe> validator)
         {
             ValidateAndThrow(model, validator);
 
@@ -291,7 +339,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
             var recipe = _mapper.Map<Recipe>(model);
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             recipe.Name = recipe.Name.Trim();
 
@@ -331,7 +379,8 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
             recipe.ModifiedDate = now;
 
-            await _recipesRepository.UpdateAsync(recipe, model.IngredientIdsToRemove);
+            Recipe original = await _recipesRepository.UpdateAsync(recipe, model.IngredientIdsToRemove);
+            var result = _mapper.Map<RecipeToNotify>(original);
 
             // If the recipe image was changed
             if (oldImageUri != model.ImageUri)
@@ -348,23 +397,72 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
                     await _cdnService.RemoveTempTagAsync(model.ImageUri);
                 }
             }
+
+            return result;
         }
 
-        public async Task DeleteAsync(int id, int userId)
+        public async Task<string> DeleteAsync(int id, int userId)
         {
-            if (!await ExistsAsync(id, userId))
+            if (!await _recipesRepository.UserOwnsAsync(id, userId))
             {
                 throw new ValidationException("Unauthorized");
             }
 
             string imageUri = await GetImageUriAsync(id);
 
-            await _recipesRepository.DeleteAsync(id);
+            var recipeName = await _recipesRepository.DeleteAsync(id);
 
             if (imageUri != null)
             {
                 await _cdnService.DeleteAsync($"users/{userId}/recipes/{imageUri}");
             }
+
+            return recipeName;
+        }
+
+        public async Task ShareAsync(ShareRecipe model, IValidator<ShareRecipe> validator)
+        {
+            ValidateAndThrow(model, validator);
+
+            var now = DateTime.UtcNow;
+
+            var newShares = new List<RecipeShare>();
+            foreach (int userId in model.NewShares)
+            {
+                if (await _recipesRepository.UserHasBlockedSharingAsync(model.UserId, userId))
+                {
+                    continue;
+                }
+
+                newShares.Add(new RecipeShare
+                {
+                    RecipeId = model.RecipeId,
+                    UserId = userId,
+                    LastOpenedDate = now,
+                    CreatedDate = now,
+                    ModifiedDate = now
+                });
+            }
+
+            var removedShares = model.RemovedShares.Select(x => new RecipeShare
+            {
+                RecipeId = model.RecipeId,
+                UserId = x
+            });
+
+            await _recipesRepository.SaveSharingDetailsAsync(newShares, removedShares);
+        }
+
+        public async Task SetShareIsAcceptedAsync(int id, int userId, bool isAccepted)
+        {
+            await _recipesRepository.SetShareIsAcceptedAsync(id, userId, isAccepted, DateTime.UtcNow);
+        }
+
+        public async Task<bool> LeaveAsync(int id, int userId)
+        {
+            RecipeShare share = await _recipesRepository.LeaveAsync(id, userId);
+
+            return share.IsAccepted.Value != false;
         }
 
         public async Task SendAsync(CreateSendRequest model, IValidator<CreateSendRequest> validator)
@@ -388,7 +486,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
                 sendRequests.Add(recipeSendRequest);
             }
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
             foreach (SendRequest request in sendRequests)
             {
                 request.CreatedDate = request.ModifiedDate = now;
@@ -399,7 +497,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
         public async Task DeclineSendRequestAsync(int id, int userId)
         {
-            await _recipesRepository.DeclineSendRequestAsync(id, userId, DateTime.Now);
+            await _recipesRepository.DeclineSendRequestAsync(id, userId, DateTime.UtcNow);
         }
 
         public async Task DeleteSendRequestAsync(int id, int userId)

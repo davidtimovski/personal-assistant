@@ -277,7 +277,7 @@ namespace Auth.Controllers
                     CookingNotificationsEnabled = false,
                     ImperialSystem = false,
                     ImageUri = _cdnService.GetDefaultProfileImageUri(),
-                    DateRegistered = DateTime.Now
+                    DateRegistered = DateTime.UtcNow
                 };
                 IdentityResult result = await _userManager.CreateAsync(user, model.Password);
 

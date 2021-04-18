@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Common;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.Extensions.Options;
+using Persistence;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications;
 using PersonalAssistant.Domain.Entities.Common;
 using PersonalAssistant.Domain.Entities.ToDoAssistant;
@@ -13,13 +13,12 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 {
     public class NotificationsRepository : BaseRepository, INotificationsRepository
     {
-        public NotificationsRepository(IOptions<DatabaseSettings> databaseSettings)
-            : base(databaseSettings.Value.DefaultConnectionString) { }
+        public NotificationsRepository(PersonalAssistantContext efContext)
+            : base(efContext) { }
 
         public async Task<IEnumerable<Notification>> GetAllAndFlagUnseenAsync(int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             var sql = @"SELECT n.*, u.""Id"", u.""ImageUri""
                             FROM ""ToDoAssistant.Notifications"" AS n
@@ -47,16 +46,14 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task DeleteOldAsync(DateTime from)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             await conn.ExecuteAsync(@"DELETE FROM ""ToDoAssistant.Notifications"" WHERE ""CreatedDate"" < @DeleteFrom", new { DeleteFrom = from });
         }
 
         public async Task DeleteForUserAndListAsync(int userId, int listId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             await conn.ExecuteAsync(@"DELETE FROM ""ToDoAssistant.Notifications"" WHERE ""UserId"" = @UserId AND ""ListId"" = @ListId",
                 new { UserId = userId, ListId = listId });
@@ -64,8 +61,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<int> GetUnseenNotificationsCountAsync(int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.ExecuteScalarAsync<int>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Notifications"" WHERE ""UserId"" = @UserId AND ""IsSeen"" = FALSE",
                 new { UserId = userId });
@@ -73,25 +69,28 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<int> CreateOrUpdateAsync(Notification notification)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             var id = await conn.QueryFirstOrDefaultAsync<int?>(@"SELECT ""Id""
-                                                                     FROM ""ToDoAssistant.Notifications"" 
-                                                                     WHERE ""UserId"" = @UserId AND ""Message"" = @Message AND ""IsSeen"" = FALSE", notification);
+                                                                 FROM ""ToDoAssistant.Notifications"" 
+                                                                 WHERE ""UserId"" = @UserId AND ""Message"" = @Message AND ""IsSeen"" = FALSE",
+                                                                 new { notification.UserId, notification.Message });
 
             if (id != null)
             {
-                await conn.ExecuteAsync(@"UPDATE ""ToDoAssistant.Notifications""
-                                              SET ""ModifiedDate"" = @ModifiedDate
-                                              WHERE ""Id"" = @Id", new { Id = id, notification.ModifiedDate });
-                return id.Value;
+                notification.Id = id.Value;
+
+                Notification dbNotification = await EFContext.Notifications.FindAsync(id);
+                dbNotification.ModifiedDate = notification.ModifiedDate;
             }
             else
             {
-                return (await conn.QueryAsync<int>(@"INSERT INTO ""ToDoAssistant.Notifications"" (""UserId"", ""ActionUserId"", ""ListId"", ""TaskId"", ""Message"", ""IsSeen"", ""CreatedDate"", ""ModifiedDate"")
-                                                         VALUES (@UserId, @ActionUserId, @ListId, @TaskId, @Message, @IsSeen, @CreatedDate, @ModifiedDate) returning ""Id""", notification)).Single();
+                EFContext.Notifications.Add(notification);
             }
+
+            await EFContext.SaveChangesAsync();
+
+            return notification.Id;
         }
     }
 }

@@ -48,11 +48,10 @@ namespace PersonalAssistant.WorkerService
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddInfrastructure(hostContext.Configuration, hostContext.HostingEnvironment.EnvironmentName);
-                    services.AddPersistence(hostContext.Configuration);
+                    services.AddPersistence(hostContext.Configuration["ConnectionString"]);
                     services.AddApplication(hostContext.Configuration);
 
                     services.AddOptions();
-                    services.Configure<DatabaseSettings>(x => x.DefaultConnectionString = hostContext.Configuration.GetValue<String>("ConnectionString"));
                     services.AddHttpClient("fixer", c =>
                     {
                         c.BaseAddress = new Uri("http://data.fixer.io/api/");

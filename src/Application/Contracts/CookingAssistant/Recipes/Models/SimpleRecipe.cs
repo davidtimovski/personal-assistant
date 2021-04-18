@@ -12,10 +12,13 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Model
         public string ImageUri { get; set; }
         public short IngredientsMissing { get; set; }
         public DateTime LastOpenedDate { get; set; }
+        public RecipeSharingState SharingState { get; set; }
 
         public void Mapping(Profile profile)
         {
-            profile.CreateMap<Recipe, SimpleRecipe>();
+            profile.CreateMap<Recipe, SimpleRecipe>()
+                .ForMember(x => x.LastOpenedDate, opt => opt.MapFrom<LastOpenedDateResolver>())
+                .ForMember(x => x.SharingState, opt => opt.MapFrom<RecipeSharingStateResolver>());
         }
     }
 }

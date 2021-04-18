@@ -22,6 +22,11 @@
 
         <a route-href="route: ingredients" class="wide-button" t="menu.ingredients">Ingredients</a>
 
+        <a route-href="route: shareRequests" class="wide-button with-badge">
+          <span t="menu.shareRequests">Share requests</span>
+          <span if.bind="pendingShareRequestCount > 0" class="badge">${pendingShareRequestCount}</span>
+        </a>
+
         <a click.delegate="goToInbox()" class="wide-button with-badge">
           <span class="button-loader ${inboxButtonIsLoading ? 'loading' : ''}">
             <i class="fas fa-circle-notch fa-spin"></i>

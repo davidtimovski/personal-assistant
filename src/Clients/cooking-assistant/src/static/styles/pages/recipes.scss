@@ -21,6 +21,12 @@
 .recipe:hover {
   color: var(--primary-color-dark);
 }
+.recipe.is-shared .recipe-name .fa-users {
+  display: inline;
+}
+.recipe.pending-share .recipe-name .fa-user-clock {
+  display: inline;
+}
 .recipe img {
   width: 100%;
   border-radius: var(--border-radius);
@@ -40,6 +46,12 @@
   font-size: 1rem;
   line-height: 1.2rem;
   color: inherit;
+
+  i {
+    display: none;
+    margin-right: 5px;
+    color: var(--primary-color);
+  }
 }
 .num-ingredients-missing {
   display: none;

@@ -1,29 +1,26 @@
-﻿using System.Data.Common;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
+﻿using System.Data;
+using Persistence;
 using PersonalAssistant.Application.Contracts.Accountant.Common;
 
 namespace PersonalAssistant.Persistence.Repositories.Accountant
 {
     public class UnitOfWork : BaseRepository, IUnitOfWork
     {
-        public UnitOfWork(IOptions<DatabaseSettings> databaseSettings)
-            : base(databaseSettings.Value.DefaultConnectionString) { }
+        public UnitOfWork(PersonalAssistantContext efContext)
+            : base(efContext) { }
 
-        public async Task<(DbConnection conn, DbTransaction transaction)> StartTransactionAsync()
+        public (IDbConnection conn, IDbTransaction transaction) StartTransaction()
         {
-            DbConnection conn = Connection;
-
-            await conn.OpenAsync();
+            IDbConnection conn = OpenConnection();
             var transaction = conn.BeginTransaction();
 
             return (conn, transaction);
         }
 
-        public async Task CommitTransactionAsync(DbConnection conn, DbTransaction transaction)
+        public void CommitTransaction(IDbConnection conn, IDbTransaction transaction)
         {
-            await transaction.CommitAsync();
-            await conn.DisposeAsync();
+            transaction.Commit();
+            conn.Dispose();
         }
     }
 }

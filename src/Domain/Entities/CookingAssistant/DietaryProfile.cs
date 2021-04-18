@@ -56,7 +56,7 @@ namespace PersonalAssistant.Domain.Entities.CookingAssistant
                 return age;
             }
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
             age = (short)(now.Year - Birthday.Value.Year);
             if (Birthday.Value > now.AddYears(-age))
             {

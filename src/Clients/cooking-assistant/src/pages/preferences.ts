@@ -1,9 +1,12 @@
 import { inject } from "aurelia-framework";
-import { UsersService } from "services/usersService";
-import { NotificationsServiceBase } from "../../../shared/src/services/notificationsServiceBase";
-import { PreferencesModel } from "models/preferencesModel";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
+
+import { NotificationsServiceBase } from "../../../shared/src/services/notificationsServiceBase";
+import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+
+import { UsersService } from "services/usersService";
+import { PreferencesModel } from "models/preferencesModel";
 
 @inject(UsersService, NotificationsServiceBase, I18N, EventAggregator)
 export class Preferences {
@@ -51,7 +54,7 @@ export class Preferences {
 
     if (previousNotificationsPermission === "denied") {
       this.eventAggregator.publish(
-        "alert-error",
+        AlertEvents.ShowError,
         "preferences.notificationsUnpermitted"
       );
     } else {

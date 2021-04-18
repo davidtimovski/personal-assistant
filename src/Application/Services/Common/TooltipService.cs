@@ -32,15 +32,15 @@ namespace PersonalAssistant.Application.Services.Common
             return tooltipDtos;
         }
 
-        public async Task<TooltipDto> GetByKeyAsync(int userId, string key)
+        public async Task<TooltipDto> GetByKeyAsync(int userId, string key, string application)
         {
-            Tooltip tooltip = await _tooltipsRepository.GetByKeyAsync(userId, key);
+            Tooltip tooltip = await _tooltipsRepository.GetByKeyAsync(userId, key, application);
             return _mapper.Map<TooltipDto>(tooltip);
         }
 
-        public async Task ToggleDismissedAsync(int userId, string key, bool isDismissed)
+        public async Task ToggleDismissedAsync(int userId, string key, string application, bool isDismissed)
         {
-            await _tooltipsRepository.ToggleDismissedAsync(userId, key, isDismissed);
+            await _tooltipsRepository.ToggleDismissedAsync(userId, key, application, isDismissed);
         }
     }
 }

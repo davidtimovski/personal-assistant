@@ -26,10 +26,14 @@
 
       <div class="recipes-wrap au-stagger">
         <a repeat.for="recipe of recipes"
-          class="recipe au-animate animate-fade-in ${recipe.id === getEditedId ? 'highlighted' : ''} ${recipe.ingredientsMissing > 0 ? 'ingredients-missing' : ''}"
+          class="recipe au-animate animate-fade-in ${recipe.id === getEditedId ? 'highlighted' : ''} ${recipe.sharingState !== 0 && recipe.sharingState !== 1 ? 'is-shared' : ''} ${recipe.sharingState === 1 ? 'pending-share' : ''} ${recipe.ingredientsMissing > 0 ? 'ingredients-missing' : ''}"
           route-href="route: recipe; params.bind: { id: recipe.id }">
           <img src.bind="recipe.imageUri" alt="${recipe.name}">
-          <div class="recipe-name">${recipe.name}</div>
+          <div class="recipe-name">
+            <i class="fas fa-users"></i>
+            <i class="fas fa-user-clock"></i>
+            <span>${recipe.name}</span>
+          </div>
           <div class="num-ingredients-missing">${recipe.ingredientsMissingLabel}</div>
         </a>
       </div>

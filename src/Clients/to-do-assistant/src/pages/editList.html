@@ -20,6 +20,11 @@
 
     <div class="content-wrap">
 
+      <div show.bind="model.sharingState === 4" class="message warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span t="editList.inOrderToChangeThisList">In order to change this list you must be an owner or Administrator.</span>
+      </div>
+
       <form submit.trigger="save()">
         <div if.bind="model.sharingState !== 4" class="form-control">
           <input type="text" value.bind="model.name & validate" ref="nameInput" maxlength="50"

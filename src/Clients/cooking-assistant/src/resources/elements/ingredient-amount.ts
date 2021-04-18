@@ -4,8 +4,8 @@ import { I18N } from "aurelia-i18n";
 @inject(I18N)
 export class IngredientAmountCustomElement {
   private readonly pluralizableUnits = ["cup", "tbsp", "tsp"];
-  @bindable({ defaultBindingMode: bindingMode.oneWay }) amount: number;
-  @bindable({ defaultBindingMode: bindingMode.oneWay }) unit: string;
+  @bindable({ defaultBindingMode: bindingMode.toView }) amount: number;
+  @bindable({ defaultBindingMode: bindingMode.toView }) unit: string;
 
   constructor(private readonly i18n: I18N) {}
 

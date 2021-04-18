@@ -8,7 +8,7 @@ namespace PersonalAssistant.Application.Contracts.Common
     public interface ITooltipsRepository
     {
         Task<IEnumerable<Tooltip>> GetAllAsync(string application, int userId);
-        Task<Tooltip> GetByKeyAsync(int userId, string key);
-        Task ToggleDismissedAsync(int userId, string key, bool isDismissed);
+        Task<Tooltip> GetByKeyAsync(int userId, string key, string application);
+        Task ToggleDismissedAsync(int userId, string key, string application, bool isDismissed);
     }
 }

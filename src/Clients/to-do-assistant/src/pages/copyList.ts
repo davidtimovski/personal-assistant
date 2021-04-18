@@ -11,6 +11,8 @@ import { EventAggregator } from "aurelia-event-aggregator";
 import { connectTo } from "aurelia-store";
 
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
+import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+
 import { List } from "models/entities/list";
 import { ListsService } from "services/listsService";
 import { SharingState } from "models/viewmodels/sharingState";
@@ -56,7 +58,7 @@ export class CopyList {
 
     this.validationController.validateTrigger = validateTrigger.manual;
 
-    this.eventAggregator.subscribe("alert-hidden", () => {
+    this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.nameIsInvalid = false;
     });
   }
@@ -110,7 +112,7 @@ export class CopyList {
     }
 
     this.saveButtonIsLoading = true;
-    this.eventAggregator.publish("reset-alert-error");
+    this.eventAggregator.publish(AlertEvents.HideError);
 
     const result: ControllerValidateResult = await this.validationController.validate();
 
@@ -124,7 +126,7 @@ export class CopyList {
         await Actions.getLists(this.listsService);
 
         this.eventAggregator.publish(
-          "alert-success",
+          AlertEvents.ShowSuccess,
           "copyList.copySuccessful"
         );
 

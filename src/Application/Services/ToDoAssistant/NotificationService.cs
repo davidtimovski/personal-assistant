@@ -41,7 +41,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
         {
             var notification = _mapper.Map<Notification>(model);
 
-            notification.CreatedDate = notification.ModifiedDate = DateTime.Now;
+            notification.CreatedDate = notification.ModifiedDate = DateTime.UtcNow;
 
             return _notificationsRepository.CreateOrUpdateAsync(notification);
         }

@@ -39,8 +39,8 @@ namespace Api.Controllers.Common
             return Ok(tooltipDtos);
         }
 
-        [HttpGet("key/{key}")]
-        public async Task<IActionResult> GetByKey(string key)
+        [HttpGet("key/{key}/{application}")]
+        public async Task<IActionResult> GetByKey(string key, string application)
         {
             int userId;
             try
@@ -52,7 +52,7 @@ namespace Api.Controllers.Common
                 return Unauthorized();
             }
 
-            var tooltipDto = await _tooltipService.GetByKeyAsync(userId, key);
+            var tooltipDto = await _tooltipService.GetByKeyAsync(userId, key, application);
 
             return Ok(tooltipDto);
         }
@@ -75,7 +75,7 @@ namespace Api.Controllers.Common
                 return Unauthorized();
             }
 
-            await _tooltipService.ToggleDismissedAsync(userId, dto.Key, dto.IsDismissed);
+            await _tooltipService.ToggleDismissedAsync(userId, dto.Key, dto.Application, dto.IsDismissed);
 
             return NoContent();
         }

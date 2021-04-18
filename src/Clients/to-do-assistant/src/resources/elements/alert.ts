@@ -2,6 +2,8 @@ import { inject } from "aurelia-framework";
 import { EventAggregator } from "aurelia-event-aggregator";
 import { I18N } from "aurelia-i18n";
 
+import { AlertEvents } from "../../../../shared/src/utils/alertEvents";
+
 @inject(EventAggregator, I18N)
 export class AlertCustomElement {
   private type: string;
@@ -14,7 +16,7 @@ export class AlertCustomElement {
     private readonly eventAggregator: EventAggregator,
     private readonly i18n: I18N
   ) {
-    this.eventAggregator.subscribe("alert-error", (errors: any) => {
+    this.eventAggregator.subscribe(AlertEvents.ShowError, (errors: any) => {
       this.type = "error";
 
       if (errors.constructor === Array) {
@@ -32,7 +34,7 @@ export class AlertCustomElement {
     });
 
     this.eventAggregator.subscribe(
-      "alert-success",
+      AlertEvents.ShowSuccess,
       (translationKey: string) => {
         this.reset();
 
@@ -45,7 +47,7 @@ export class AlertCustomElement {
       }
     );
 
-    this.eventAggregator.subscribe("reset-alert-error", () => {
+    this.eventAggregator.subscribe(AlertEvents.HideError, () => {
       if (this.type === "error") {
         this.hide();
       }
@@ -65,7 +67,7 @@ export class AlertCustomElement {
     }
 
     this.reset();
-    this.eventAggregator.publish("alert-hidden");
+    this.eventAggregator.publish(AlertEvents.OnHidden);
   }
 
   refresh() {

@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Data.Common;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.Extensions.Options;
+using Persistence;
 using PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles;
 using PersonalAssistant.Domain.Entities.Common;
 using PersonalAssistant.Domain.Entities.CookingAssistant;
@@ -12,13 +12,12 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 {
     public class DietaryProfilesRepository : BaseRepository, IDietaryProfilesRepository
     {
-        public DietaryProfilesRepository(IOptions<DatabaseSettings> databaseSettings)
-            : base(databaseSettings.Value.DefaultConnectionString) { }
+        public DietaryProfilesRepository(PersonalAssistantContext efContext)
+            : base(efContext) { }
 
         public async Task<DietaryProfile> GetAsync(int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             var sql = @"SELECT dp.*, u.""Id"", u.""ImperialSystem""
                             FROM ""CookingAssistant.DietaryProfiles"" AS dp
@@ -42,13 +41,12 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task UpdateAsync(DietaryProfile dietaryProfile)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             var exists = await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.DietaryProfiles"" WHERE ""UserId"" = @UserId",
                 new { dietaryProfile.UserId });
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             if (exists)
             {
@@ -105,8 +103,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task DeleteAsync(int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             await conn.ExecuteAsync(@"DELETE FROM ""CookingAssistant.DietaryProfiles"" WHERE ""UserId"" = @UserId",
                 new { UserId = userId });

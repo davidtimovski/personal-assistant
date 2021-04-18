@@ -5,6 +5,7 @@ export class Ingredient {
     public taskId: number,
     public name: string,
     public amount: number,
+    public amountPerServing: number,
     public unit: string,
     public missing: boolean,
     public nutritionSource: boolean,

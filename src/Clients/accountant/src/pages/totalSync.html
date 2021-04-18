@@ -12,10 +12,10 @@
 
     <div class="content-wrap">
 
-      <section show.bind="!connTracker.isOnline" class="message warning">
+      <div show.bind="!connTracker.isOnline" class="message warning">
         <i class="fas fa-exclamation-triangle"></i>
         <span t="totalSync.offlineText">You have to be online in order to sync.</span>
-      </section>
+      </div>
 
       <div t="totalSync.syncText" class="text-wrap"></div>
 

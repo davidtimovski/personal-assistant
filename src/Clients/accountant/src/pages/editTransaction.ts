@@ -12,6 +12,8 @@ import { EventAggregator } from "aurelia-event-aggregator";
 import { ConnectionTracker } from "../../../shared/src/utils/connectionTracker";
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
+import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+
 import { CategoriesService } from "services/categoriesService";
 import { TransactionsService } from "services/transactionsService";
 import { EncryptionService } from "services/encryptionService";
@@ -68,7 +70,7 @@ export class EditTransaction {
 
     this.passwordShowIconLabel = this.i18n.tr("showPassword");
 
-    this.eventAggregator.subscribe("alert-hidden", () => {
+    this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.amountIsInvalid = false;
       this.dateIsInvalid = false;
     });
@@ -238,7 +240,7 @@ export class EditTransaction {
     }
 
     this.saveButtonIsLoading = true;
-    this.eventAggregator.publish("reset-alert-error");
+    this.eventAggregator.publish(AlertEvents.HideError);
 
     const result: ControllerValidateResult = await this.validationController.validate();
 
@@ -297,7 +299,7 @@ export class EditTransaction {
         this.dateIsInvalid = !!invalidDate;
         this.encryptionPasswordIsInvalid = !!invalidEncryptionPassword;
 
-        this.eventAggregator.publish("alert-error", messages);
+        this.eventAggregator.publish(AlertEvents.ShowError, messages);
       }
 
       this.saveButtonIsLoading = false;
@@ -315,12 +317,12 @@ export class EditTransaction {
       try {
         await this.transactionsService.delete(this.model.id);
         this.eventAggregator.publish(
-          "alert-success",
+          AlertEvents.ShowSuccess,
           "editTransaction.deleteSuccessful"
         );
         this.router.navigateToRoute("transactions");
       } catch (e) {
-        this.eventAggregator.publish("alert-error", e);
+        this.eventAggregator.publish(AlertEvents.ShowError, e);
 
         this.deleteButtonText = this.i18n.tr("delete");
         this.deleteInProgress = false;

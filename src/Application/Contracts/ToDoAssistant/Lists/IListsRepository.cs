@@ -15,8 +15,8 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists
         Task<ToDoList> GetAsync(int id);
         Task<ToDoList> GetAsync(int id, int userId);
         Task<ToDoList> GetWithOwnerAsync(int id, int userId);
-        Task<IEnumerable<Share>> GetSharesAsync(int id);
-        Task<IEnumerable<Share>> GetShareRequestsAsync(int userId);
+        Task<IEnumerable<ListShare>> GetSharesAsync(int id);
+        Task<IEnumerable<ListShare>> GetShareRequestsAsync(int userId);
         Task<int> GetPendingShareRequestsCountAsync(int userId);
         Task<bool> CanShareWithUserAsync(int shareWithId, int userId);
         Task<bool> UserOwnsOrSharesAsync(int id, int userId);
@@ -33,8 +33,8 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists
         Task<ToDoList> UpdateAsync(ToDoList list);
         Task UpdateSharedAsync(ToDoList list);
         Task<string> DeleteAsync(int id);
-        Task SaveSharingDetailsAsync(IEnumerable<Share> newShares, IEnumerable<Share> editedShares, IEnumerable<Share> removedShares);
-        Task<Share> LeaveAsync(int id, int userId);
+        Task SaveSharingDetailsAsync(IEnumerable<ListShare> newShares, IEnumerable<ListShare> editedShares, IEnumerable<ListShare> removedShares);
+        Task<ListShare> LeaveAsync(int id, int userId);
         Task<int> CopyAsync(ToDoList list);
         Task SetIsArchivedAsync(int id, int userId, bool isArchived, DateTime modifiedDate);
         Task<bool> SetTasksAsNotCompletedAsync(int id, int userId, DateTime modifiedDate);

@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using AutoMapper;
-using PersonalAssistant.Application.Contracts.Accountant;
 using PersonalAssistant.Application.Contracts.Accountant.Accounts;
 using PersonalAssistant.Application.Contracts.Accountant.Categories;
 using PersonalAssistant.Application.Contracts.Accountant.Common;
-using PersonalAssistant.Application.Contracts.Accountant.Common.Models;
 using PersonalAssistant.Application.Contracts.Accountant.Debts;
 using PersonalAssistant.Application.Contracts.Accountant.Sync.Models;
 using PersonalAssistant.Application.Contracts.Accountant.Transactions;
@@ -47,7 +41,7 @@ namespace PersonalAssistant.Application.Services.Accountant
 
         public async Task<SyncedEntityIds> SyncEntitiesAsync(SyncEntities model)
         {
-            (var conn, var uowTransaction) = await _unitOfWork.StartTransactionAsync();
+            (var conn, var uowTransaction) = _unitOfWork.StartTransaction();
 
             var accountIds = new int[model.Accounts.Count];
             var categoryIds = new int[model.Categories.Count];
@@ -90,7 +84,7 @@ namespace PersonalAssistant.Application.Services.Accountant
                 debtIds[i] = id;
             }
 
-            await _unitOfWork.CommitTransactionAsync(conn, uowTransaction);
+            _unitOfWork.CommitTransaction(conn, uowTransaction);
 
             return new SyncedEntityIds(accountIds, categoryIds, transactionIds, upcomingExpenseIds, debtIds);
         }

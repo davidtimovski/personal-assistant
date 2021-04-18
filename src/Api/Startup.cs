@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using Api.Config;
-using AutoMapper;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -32,7 +31,7 @@ namespace Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddInfrastructure(Configuration, WebHostEnvironment.EnvironmentName);
-            services.AddPersistence(Configuration);
+            services.AddPersistence(Configuration["ConnectionString"]);
             services.AddApplication(Configuration);
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

@@ -2,25 +2,25 @@ import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
+import { connectTo } from "aurelia-store";
 
 import { ConnectionTracker } from "../../../shared/src/utils/connectionTracker";
 import { ProgressBar } from "../../../shared/src/models/progressBar";
+import { DateHelper } from "../../../shared/src/utils/dateHelper";
+
+import * as environment from "../../config/environment.json";
 import { CapitalService } from "services/capitalService";
 import { UsersService } from "services/usersService";
 import { LocalStorage } from "utils/localStorage";
 import { Capital } from "models/capital";
-import * as environment from "../../config/environment.json";
 import { DashboardModel } from "models/viewmodels/dashboard";
+import { AmountByCategory } from "models/viewmodels/amountByCategory";
+import { SearchFilters } from "models/viewmodels/searchFilters";
+import * as Actions from "utils/state/actions";
+import { TransactionType } from "models/viewmodels/transactionType";
 
-@inject(
-  Router,
-  CapitalService,
-  UsersService,
-  LocalStorage,
-  I18N,
-  EventAggregator,
-  ConnectionTracker
-)
+@inject(Router, CapitalService, UsersService, LocalStorage, I18N, EventAggregator, ConnectionTracker)
+@connectTo()
 export class Dashboard {
   private imageUri = JSON.parse(<any>environment).defaultProfileImageUri;
   private progressBar = new ProgressBar();
@@ -78,7 +78,12 @@ export class Dashboard {
           return;
         }
 
-        const model = new DashboardModel(capital.upcoming, capital.expenditures, capital.upcomingExpenses, capital.debt);
+        const model = new DashboardModel(
+          capital.upcoming,
+          capital.expenditures,
+          capital.upcomingExpenses,
+          capital.debt
+        );
         this.available = capital.available;
         this.spent = capital.spent;
         this.balance = capital.balance;
@@ -96,6 +101,18 @@ export class Dashboard {
     if (!this.progressBar.active) {
       this.router.navigateToRoute("newTransaction", { type: 1 });
     }
+  }
+
+  goToTransactions(item: AmountByCategory) {
+    const from = new Date();
+    from.setDate(1);
+    const fromDate = DateHelper.format(from);
+
+    const toDate = DateHelper.format(new Date());
+
+    Actions.changeFilters(new SearchFilters(1, 15, fromDate, toDate, 0, item.categoryId, TransactionType.Any, null));
+
+    this.router.navigateToRoute("transactions");
   }
 
   sync() {

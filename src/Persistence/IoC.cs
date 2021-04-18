@@ -1,5 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Persistence;
 using PersonalAssistant.Application.Contracts.Accountant.Accounts;
 using PersonalAssistant.Application.Contracts.Accountant.Categories;
 using PersonalAssistant.Application.Contracts.Accountant.Common;
@@ -22,7 +23,7 @@ namespace PersonalAssistant.Persistence
 {
     public static class IoC
     {
-        public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddPersistence(this IServiceCollection services, string connectionString)
         {
             services.AddTransient<IUsersRepository, UsersRepository>();
             services.AddTransient<IPushSubscriptionsRepository, PushSubscriptionsRepository>();
@@ -40,9 +41,9 @@ namespace PersonalAssistant.Persistence
             services.AddTransient<IDebtsRepository, DebtsRepository>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
 
-            services.Configure<DatabaseSettings>(options =>
+            services.AddDbContext<PersonalAssistantContext>(options =>
             {
-                options.DefaultConnectionString = configuration["ConnectionString"];
+                options.UseNpgsql(connectionString);
             });
 
             return services;

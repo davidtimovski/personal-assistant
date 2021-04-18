@@ -1,3 +1,5 @@
+import { SharingState } from "./sharingState";
+
 export class RecipeModel {
   constructor(
     public id: number,
@@ -5,6 +7,7 @@ export class RecipeModel {
     public imageUri: string,
     public ingredientsMissing: number,
     public ingredientsMissingLabel: string,
-    public lastOpenedDate: Date
+    public lastOpenedDate: Date,
+    public sharingState: SharingState
   ) {}
 }

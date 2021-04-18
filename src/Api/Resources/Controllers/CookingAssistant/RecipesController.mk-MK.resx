@@ -123,7 +123,25 @@
   <data name="DeclinedSendRequestNotification" xml:space="preserve">
     <value>#[{0}]# одби да го прими рецептот #[{1}]#.</value>
   </data>
+  <data name="DeclinedShareRequestNotification" xml:space="preserve">
+    <value>#[{0}]# ја одби поканата за споделување на #[{1}]#.</value>
+  </data>
+  <data name="DeletedRecipeNotification" xml:space="preserve">
+    <value>#[{0}]# го избриша #[{1}]#.</value>
+  </data>
+  <data name="JoinedRecipeNotification" xml:space="preserve">
+    <value>#[{0}]# се придружи на #[{1}]#.</value>
+  </data>
+  <data name="LeftRecipeNotification" xml:space="preserve">
+    <value>#[{0}]# го напушти #[{1}]#.</value>
+  </data>
+  <data name="RemovedShareNotification" xml:space="preserve">
+    <value>#[{0}]# ве отстрани од #[{1}]#.</value>
+  </data>
   <data name="SentRecipeNotification" xml:space="preserve">
     <value>#[{0}]# ви го прати рецептот #[{1}]#.</value>
+  </data>
+  <data name="UpdatedRecipeNotification" xml:space="preserve">
+    <value>#[{0}]# го промени #[{1}]#.</value>
   </data>
 </root>

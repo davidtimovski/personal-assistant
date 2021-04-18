@@ -18,7 +18,7 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfil
 
         public short GetAge()
         {
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
             var age = (short)(now.Year - Birthday.Year);
             if (Birthday > now.AddYears(-age))
             {
@@ -41,7 +41,7 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfil
                 .NotEmpty().WithMessage("DietaryProfiles.BirthdayIsRequired")
                 .Must(birthday =>
                 {
-                    var now = DateTime.Now;
+                    var now = DateTime.UtcNow;
                     short age = (short)(now.Year - birthday.Year);
                     if (birthday > now.AddYears(-age))
                     {

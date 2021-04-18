@@ -1,8 +1,5 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { DebtsService } from "services/debtsService";
-import { LocalStorage } from "utils/localStorage";
-import { DebtModel } from "models/entities/debt";
 import {
   ValidationController,
   validateTrigger,
@@ -11,8 +8,14 @@ import {
 } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
+
 import { ConnectionTracker } from "../../../shared/src/utils/connectionTracker";
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
+import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+
+import { DebtsService } from "services/debtsService";
+import { LocalStorage } from "utils/localStorage";
+import { DebtModel } from "models/entities/debt";
 import { EditDebtModel } from "models/viewmodels/editDebtModel";
 
 @inject(
@@ -50,7 +53,7 @@ export class EditDebt {
     this.validationController.validateTrigger = validateTrigger.manual;
     this.deleteButtonText = this.i18n.tr("delete");
 
-    this.eventAggregator.subscribe("alert-hidden", () => {
+    this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.personIsInvalid = false;
       this.amountIsInvalid = false;
     });
@@ -142,7 +145,7 @@ export class EditDebt {
     }
 
     this.saveButtonIsLoading = true;
-    this.eventAggregator.publish("reset-alert-error");
+    this.eventAggregator.publish(AlertEvents.HideError);
 
     const result: ControllerValidateResult = await this.validationController.validate();
 
@@ -209,12 +212,12 @@ export class EditDebt {
       try {
         await this.debtsService.delete(this.model.id);
         this.eventAggregator.publish(
-          "alert-success",
+          AlertEvents.ShowSuccess,
           "editDebt.deleteSuccessful"
         );
         this.router.navigateToRoute("debt");
       } catch (e) {
-        this.eventAggregator.publish("alert-error", e);
+        this.eventAggregator.publish(AlertEvents.ShowError, e);
 
         this.deleteButtonText = this.i18n.tr("delete");
         this.deleteInProgress = false;

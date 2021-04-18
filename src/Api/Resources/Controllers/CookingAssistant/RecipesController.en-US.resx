@@ -123,7 +123,25 @@
   <data name="DeclinedSendRequestNotification" xml:space="preserve">
     <value>#[{0}]# declined to receive the recipe #[{1}]#.</value>
   </data>
+  <data name="DeclinedShareRequestNotification" xml:space="preserve">
+    <value>#[{0}]# declined the invitation to join #[{1}]#.</value>
+  </data>
+  <data name="DeletedRecipeNotification" xml:space="preserve">
+    <value>#[{0}]# deleted #[{1}]#.</value>
+  </data>
+  <data name="JoinedRecipeNotification" xml:space="preserve">
+    <value>#[{0}]# joined #[{1}]#.</value>
+  </data>
+  <data name="LeftRecipeNotification" xml:space="preserve">
+    <value>#[{0}]# left #[{1}]#.</value>
+  </data>
+  <data name="RemovedShareNotification" xml:space="preserve">
+    <value>#[{0}]# removed you from #[{1}]#.</value>
+  </data>
   <data name="SentRecipeNotification" xml:space="preserve">
     <value>#[{0}]# sent you the recipe #[{1}]#.</value>
+  </data>
+  <data name="UpdatedRecipeNotification" xml:space="preserve">
+    <value>#[{0}]# updated #[{1}]#.</value>
   </data>
 </root>

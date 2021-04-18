@@ -32,80 +32,54 @@
   color: var(--faded-color);
 }
 
-.amount-by-category-table-title {
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 5px;
-  margin: 35px 0 10px;
-  color: var(--primary-color);
-}
-a.amount-by-category-table-title {
-  display: block;
-  text-decoration: none;
-}
 .amount-by-category-table {
   width: 100%;
   font-size: 1rem;
-}
-.amount-by-category-table td {
-  padding: 5px 15px 5px 0;
-  line-height: 1.2rem;
-}
-.amount-by-category-table td:last-child {
-  padding-right: 0;
-  text-align: right;
-}
-.amount-by-category-table .amount-cell {
-  white-space: nowrap;
-}
-.amount-by-category-table td.sub-category-cell {
-  padding-left: 10px;
-}
-.amount-by-category-table tfoot tr:last-child td {
-  border-top: 1px solid #ddd;
-  padding: 5px 0;
-  font-size: 1.1rem;
-}
 
-.key-value-table-title {
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 5px;
-  margin: 35px 0 10px;
-  color: var(--primary-color);
-}
-a.key-value-table-title {
-  display: block;
-  text-decoration: none;
-}
-.key-value-table {
-  width: 100%;
-  font-size: 1rem;
-}
-.key-value-table td {
-  padding: 5px 15px 5px 0;
-  line-height: 1.2rem;
-}
-.key-value-table td:last-child {
-  padding-right: 0;
-  text-align: right;
-}
-.key-value-table .amount-cell {
-  white-space: nowrap;
-}
-.key-value-table tfoot tr:last-child td {
-  border-top: 1px solid #ddd;
-  padding: 5px 0;
-  font-size: 1.1rem;
+  tbody tr {
+    cursor: pointer;
+
+    &:hover {
+      color: var(--primary-color-dark);
+    }
+  }
+
+  td {
+    padding: 5px 15px 5px 0;
+    line-height: 1.2rem;
+
+    &:last-child {
+      padding-right: 0;
+      text-align: right;
+    }
+
+    &.sub-category-cell {
+      padding-left: 10px;
+    }
+  }
+
+  .amount-cell {
+    white-space: nowrap;
+  }
+
+  tfoot tr:last-child td {
+    border-top: 1px solid #ddd;
+    padding: 5px 0;
+    font-size: 1.1rem;
+  }
 }
 
 .form-control.inline {
   display: flex;
   justify-content: space-between;
-}
-.form-control.inline label {
-  padding-right: 25px;
-}
-.form-control.inline span:nth-child(2) {
-  text-align: right;
+
+  label {
+    padding-right: 25px;
+  }
+
+  span:nth-child(2) {
+    text-align: right;
+  }
 }
 
 form label:not(.toggle) {
@@ -120,38 +94,46 @@ form select,
 form input[type="date"] {
   line-height: 37px;
 }
-form .amount-input {
-  width: 80px;
-  text-align: center;
-}
-form .category-select {
-  width: 210px;
-  background-position: right 15px top 17px;
-}
-form input[type="date"] {
-  width: 140px;
-  text-align: center;
-}
-form .description-textarea {
-  height: 80px;
-  max-height: 200px;
+form {
+  .amount-input {
+    width: 80px;
+    text-align: center;
+  }
+
+  .category-select {
+    width: 210px;
+    background-position: right 15px top 17px;
+  }
+
+  input[type="date"] {
+    width: 140px;
+    text-align: center;
+  }
+
+  .description-textarea {
+    height: 80px;
+    max-height: 200px;
+  }
 }
 
 .loadable-select {
   position: relative;
-}
-.loadable-select select {
-  transition: opacity var(--transition);
-}
-.loadable-select i {
-  position: absolute;
-  top: 9px;
-  left: 10px;
-  font-size: 1.3rem;
-  color: var(--primary-color);
-}
-.loadable-select.loaded i {
-  display: none;
+
+  select {
+    transition: opacity var(--transition);
+  }
+
+  i {
+    position: absolute;
+    top: 9px;
+    left: 10px;
+    font-size: 1.3rem;
+    color: var(--primary-color);
+  }
+
+  &.loaded i {
+    display: none;
+  }
 }
 
 .content-body {
@@ -161,35 +143,71 @@ form .description-textarea {
 .editable-table {
   width: 100%;
   margin-top: 20px;
+
+  tbody tr:nth-child(odd),
+  tbody tr:hover {
+    background: #f1f1f1;
+  }
+
+  th {
+    padding: 10px 5px;
+    line-height: 24px;
+    font-size: 1rem;
+    color: var(--primary-color-dark);
+  }
+
+  td {
+    padding: 5px;
+    line-height: 24px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 0.9rem;
+  }
+
+  .date-cell {
+    white-space: nowrap;
+  }
+
+  .edit-link-cell {
+    padding: 0 8px 0 0;
+    text-align: left;
+  }
+
+  .type-cell {
+    padding: 5px;
+    font-size: 1.3rem;
+  }
+
+  .link {
+    display: block;
+    padding: 5px;
+    font-size: 1.3rem;
+    color: var(--primary-color);
+    transition: color var(--transition-quick);
+
+    &:hover {
+      color: var(--primary-color-dark);
+    }
+  }
+
+  tfoot td {
+    border-top: 1px solid #ddd;
+    padding: 5px;
+    text-align: right;
+  }
+
+  .no-data-column {
+    padding: 20px 5px;
+    font-size: 1.1rem;
+    text-align: center;
+    color: var(--faded-color);
+  }
+
+  .link.debt-icon {
+    font-size: 1.4rem;
+  }
 }
-.editable-table tbody tr:nth-child(odd),
-.editable-table tbody tr:hover {
-  background: #f1f1f1;
-}
-.editable-table th {
-  padding: 10px 5px;
-  line-height: 24px;
-  font-size: 1rem;
-  color: var(--primary-color-dark);
-}
-.editable-table td {
-  padding: 5px;
-  line-height: 24px;
-  text-align: center;
-  vertical-align: middle;
-  font-size: 0.9rem;
-}
-.editable-table .date-cell {
-  white-space: nowrap;
-}
-.editable-table .edit-link-cell {
-  padding: 0 8px 0 0;
-  text-align: left;
-}
-.editable-table .type-cell {
-  padding: 5px;
-  font-size: 1.3rem;
-}
+
 .deposit-color {
   color: var(--deposit-color);
 }
@@ -198,27 +216,6 @@ form .description-textarea {
 }
 .transfer-color {
   color: var(--transfer-color);
-}
-.editable-table .link {
-  display: block;
-  padding: 5px;
-  font-size: 1.3rem;
-  color: var(--primary-color);
-  transition: color var(--transition-quick);
-}
-.editable-table .link:hover {
-  color: var(--primary-color-dark);
-}
-.editable-table tfoot td {
-  border-top: 1px solid #ddd;
-  padding: 5px;
-  text-align: right;
-}
-.editable-table .no-data-column {
-  padding: 20px 5px;
-  font-size: 1.1rem;
-  text-align: center;
-  color: var(--faded-color);
 }
 
 th.sync-icon-cell,
@@ -242,39 +239,41 @@ td.sync-icon-cell {
 }
 .multi-radio-part {
   flex-grow: 1;
-}
-.multi-radio-wrap input[type="radio"] {
-  display: none;
-}
-.multi-radio-part label {
-  display: block;
-  position: relative;
-  background: #fafafa;
-  padding: 0;
-  text-align: center;
-  font-size: inherit;
-  line-height: 37px;
-  cursor: pointer;
 
-  transition: background var(--transition), color var(--transition);
-}
-.multi-radio-wrap label.selected {
-  background: var(--primary-color);
-  box-shadow: inset var(--box-shadow);
-  color: #fafafa;
-}
-.multi-radio-part:first-child label {
-  border-top-left-radius: var(--border-radius);
-  border-bottom-left-radius: var(--border-radius);
-}
-.multi-radio-part:last-child label {
-  border-top-right-radius: var(--border-radius);
-  border-bottom-right-radius: var(--border-radius);
+  input[type="radio"] {
+    display: none;
+  }
+
+  label {
+    display: block;
+    position: relative;
+    background: #fafafa;
+    padding: 0;
+    text-align: center;
+    font-size: inherit;
+    line-height: 37px;
+    cursor: pointer;
+
+    transition: background var(--transition), color var(--transition);
+
+    &.selected {
+      background: var(--primary-color);
+      box-shadow: inset var(--box-shadow);
+      color: #fafafa;
+    }
+  }
+
+  &:first-child label {
+    border-top-left-radius: var(--border-radius);
+    border-bottom-left-radius: var(--border-radius);
+  }
+
+  &:last-child label {
+    border-top-right-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+  }
 }
 
-.editable-table .link.debt-icon {
-  font-size: 1.4rem;
-}
 .debt-icon .debtor {
   color: var(--expense-color);
 }
@@ -284,20 +283,22 @@ td.sync-icon-cell {
 
 .encryption-box {
   margin-top: 5px;
-}
-.encryption-box.active {
-  background: #f1f1f1;
-  border-radius: var(--border-radius);
-  box-shadow: inset var(--box-shadow);
-  padding: 10px 12px;
-  transition: padding var(--transition);
+
+  &.active {
+    background: #f1f1f1;
+    border-radius: var(--border-radius);
+    box-shadow: inset var(--box-shadow);
+    padding: 10px 12px;
+    transition: padding var(--transition);
+  }
 }
 .viewable-password {
   position: relative;
-}
-.viewable-password input {
-  width: calc(100% - 64px);
-  padding-right: 52px;
+
+  input {
+    width: calc(100% - 64px);
+    padding-right: 52px;
+  }
 }
 .password-show-button {
   position: absolute;
@@ -312,30 +313,39 @@ td.sync-icon-cell {
   text-decoration: none;
   color: var(--faded-color);
   cursor: pointer;
+
+  i:nth-child(2) {
+    display: none;
+  }
+
+  &.shown {
+    i:nth-child(2) {
+      display: inline-block;
+    }
+
+    i:first-child {
+      display: none;
+    }
+  }
 }
-.password-show-button i:nth-child(2) {
-  display: none;
-}
-.password-show-button.shown i:nth-child(2) {
-  display: inline-block;
-}
-.password-show-button.shown i:first-child {
-  display: none;
-}
+
 .decrypt-form {
   display: flex;
   justify-content: space-between;
   margin: 0;
-}
-.decrypt-form .viewable-password {
-  width: 100%;
+
+  .viewable-password {
+    width: 100%;
+  }
 }
 .inline-decrypt-form {
   display: flex;
+
+  .viewable-password {
+    width: 100%;
+  }
 }
-.inline-decrypt-form .viewable-password {
-  width: 100%;
-}
+
 .decrypt-button {
   background: var(--green-color);
   border: none;
@@ -349,16 +359,20 @@ td.sync-icon-cell {
   text-decoration: none;
   color: #fff;
   cursor: pointer;
+
+  i:nth-child(2) {
+    display: none;
+  }
+
+  &.loading i:nth-child(2) {
+    display: inline-block;
+  }
+
+  &.loading i:first-child {
+    display: none;
+  }
 }
-.decrypt-button i:nth-child(2) {
-  display: none;
-}
-.decrypt-button.loading i:nth-child(2) {
-  display: inline-block;
-}
-.decrypt-button.loading i:first-child {
-  display: none;
-}
+
 .erase-button {
   background: var(--warning-color-dark);
   border: none;

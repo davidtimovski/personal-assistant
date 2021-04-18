@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Common;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.Extensions.Options;
+using Persistence;
 using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes;
 using PersonalAssistant.Domain.Entities.Common;
 using PersonalAssistant.Domain.Entities.CookingAssistant;
@@ -14,50 +14,50 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 {
     public class RecipesRepository : BaseRepository, IRecipesRepository
     {
-        public RecipesRepository(IOptions<DatabaseSettings> databaseSettings)
-            : base(databaseSettings.Value.DefaultConnectionString) { }
+        public RecipesRepository(PersonalAssistantContext efContext)
+            : base(efContext) { }
 
         public async Task<IEnumerable<Recipe>> GetAllAsync(int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
-            return await conn.QueryAsync<Recipe>(@"SELECT r.""Id"", r.""UserId"", r.""Name"", r.""ImageUri"", r.""LastOpenedDate"", COUNT(t.""Id"") AS ""IngredientsMissing""
-                                                       FROM ""CookingAssistant.Recipes"" AS r
-                                                       LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON r.""Id"" = ri.""RecipeId""
-                                                       LEFT JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
-                                                       LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id"" AND t.""IsCompleted"" = FALSE
-                                                       WHERE r.""UserId"" = @UserId
-                                                       GROUP BY r.""Id"", r.""Name""", new { UserId = userId });
+            var recipes = await conn.QueryAsync<Recipe>(@"SELECT r.""Id"", r.""UserId"", r.""Name"", r.""ImageUri"", r.""LastOpenedDate"", COUNT(t.""Id"") AS ""IngredientsMissing""
+                                                          FROM ""CookingAssistant.Recipes"" AS r
+                                                          LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON r.""Id"" = ri.""RecipeId""
+                                                          LEFT JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
+                                                          LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id"" AND t.""IsCompleted"" = FALSE
+                                                          LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
+                                                          WHERE r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")
+                                                          GROUP BY r.""Id"", r.""Name""", new { UserId = userId });
+
+            var recipeIds = recipes.Select(x => x.Id).ToArray();
+            var shares = await conn.QueryAsync<RecipeShare>(@"SELECT * FROM ""CookingAssistant.Shares"" WHERE ""RecipeId"" = ANY(@RecipeIds)", new { RecipeIds = recipeIds });
+
+            foreach (var recipe in recipes)
+            {
+                recipe.Shares = shares.Where(x => x.RecipeId == recipe.Id).ToList();
+            }
+
+            return recipes;
         }
 
         public async Task<Recipe> GetAsync(int id)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.QueryFirstOrDefaultAsync<Recipe>(@"SELECT * FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @Id", new { Id = id });
         }
 
         public async Task<Recipe> GetAsync(int id, int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
-
-            bool exists = await ExistsAsync(id, userId);
-            if (!exists)
-            {
-                return null;
-            }
-
-            await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.Recipes"" SET ""LastOpenedDate"" = @LastOpenedDate WHERE ""Id"" = @Id",
-                new { Id = id, LastOpenedDate = DateTime.Now });
+            using IDbConnection conn = OpenConnection();
 
             var recipeSql = @"SELECT r.*, u.""Id"", dp.*
-                                FROM ""CookingAssistant.Recipes"" AS r 
-                                INNER JOIN ""AspNetUsers"" AS u ON r.""UserId"" = u.""Id""
-                                LEFT JOIN ""CookingAssistant.DietaryProfiles"" AS dp ON r.""UserId"" = dp.""UserId""
-                                WHERE r.""Id"" = @Id AND r.""UserId"" = @UserId";
+                              FROM ""CookingAssistant.Recipes"" AS r 
+                              INNER JOIN ""AspNetUsers"" AS u ON r.""UserId"" = u.""Id""
+                              LEFT JOIN ""CookingAssistant.DietaryProfiles"" AS dp ON dp.""UserId"" = @UserId
+                              LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
+                              WHERE r.""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))";
             var recipe = (await conn.QueryAsync<Recipe, User, DietaryProfile, Recipe>(recipeSql,
                 (dbRecipe, user, dietaryProfile) =>
                 {
@@ -66,19 +66,35 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                     return dbRecipe;
                 }, new { Id = id, UserId = userId }, null, true, "Id,UserId")).Single();
 
+            if (recipe == null)
+            {
+                return null;
+            }
+
+            if (recipe.UserId == userId)
+            {
+                await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.Recipes"" SET ""LastOpenedDate"" = @LastOpenedDate WHERE ""Id"" = @Id", new { Id = id, LastOpenedDate = DateTime.UtcNow });
+            }
+            else
+            {
+                await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.Shares"" SET ""LastOpenedDate"" = @LastOpenedDate WHERE ""RecipeId"" = @Id", new { Id = id, LastOpenedDate = DateTime.UtcNow });
+            }
+
+            recipe.Shares = (await conn.QueryAsync<RecipeShare>(@"SELECT * FROM ""CookingAssistant.Shares"" WHERE ""RecipeId"" = @Id", new { Id = id })).ToList();
+
             var recipeIngredientsSql = @"SELECT ri.""Amount"", ri.""Unit"", i.""Id"", i.""TaskId"", 
-                                                i.""Name"", i.""ServingSize"", i.""ServingSizeIsOneUnit"", i.""Calories"", 
-                                                i.""Fat"", i.""SaturatedFat"", i.""Carbohydrate"", 
-                                                i.""Sugars"", i.""AddedSugars"", i.""Fiber"", i.""Protein"",
-                                                i.""Sodium"", i.""Cholesterol"", 
-                                                i.""VitaminA"", i.""VitaminC"", i.""VitaminD"",
-                                                i.""Calcium"", i.""Iron"", i.""Potassium"", i.""Magnesium"",
-                                                i.""ProductSize"", i.""ProductSizeIsOneUnit"", i.""Price"", i.""Currency"",
-                                                tasks.""Id"", tasks.""Name"", tasks.""IsCompleted""
-                                            FROM ""CookingAssistant.RecipesIngredients"" AS ri
-                                            INNER JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
-                                            LEFT JOIN ""ToDoAssistant.Tasks"" AS tasks ON i.""TaskId"" = tasks.""Id""
-                                            WHERE ri.""RecipeId"" = @RecipeId";
+                                             i.""Name"", i.""ServingSize"", i.""ServingSizeIsOneUnit"", i.""Calories"", 
+                                             i.""Fat"", i.""SaturatedFat"", i.""Carbohydrate"", 
+                                             i.""Sugars"", i.""AddedSugars"", i.""Fiber"", i.""Protein"",
+                                             i.""Sodium"", i.""Cholesterol"", 
+                                             i.""VitaminA"", i.""VitaminC"", i.""VitaminD"",
+                                             i.""Calcium"", i.""Iron"", i.""Potassium"", i.""Magnesium"",
+                                             i.""ProductSize"", i.""ProductSizeIsOneUnit"", i.""Price"", i.""Currency"",
+                                             tasks.""Id"", tasks.""Name"", tasks.""IsCompleted""
+                                         FROM ""CookingAssistant.RecipesIngredients"" AS ri
+                                         INNER JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
+                                         LEFT JOIN ""ToDoAssistant.Tasks"" AS tasks ON i.""TaskId"" = tasks.""Id""
+                                         WHERE ri.""RecipeId"" = @RecipeId";
 
             var recipeIngredients = await conn.QueryAsync<RecipeIngredient, Ingredient, ToDoTask, RecipeIngredient>(recipeIngredientsSql,
                 (recipeIngredient, ingredient, task) =>
@@ -102,14 +118,18 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task<Recipe> GetForUpdateAsync(int id, int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
-            var recipe = await conn.QueryFirstOrDefaultAsync<Recipe>(@"SELECT * FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
+            var recipe = await conn.QueryFirstOrDefaultAsync<Recipe>(@"SELECT r.* 
+                                                                       FROM ""CookingAssistant.Recipes"" AS r 
+                                                                       LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
+                                                                       WHERE ""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
                 new { Id = id, UserId = userId });
 
             if (recipe != null)
             {
+                recipe.Shares = (await conn.QueryAsync<RecipeShare>(@"SELECT * FROM ""CookingAssistant.Shares"" WHERE ""RecipeId"" = @Id", new { Id = id })).ToList();
+
                 var recipeIngredientsSql = @"SELECT ri.""Amount"", ri.""Unit"", i.""Id"", i.""TaskId"", 
                                                     i.""Name"", t.""Id"", t.""Name"", l.""Id"", l.""Name""
                                                  FROM ""CookingAssistant.RecipesIngredients"" AS ri
@@ -139,25 +159,98 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                 recipe.RecipeIngredients.AddRange(recipeIngredients);
             }
 
-            await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.Recipes"" SET ""LastOpenedDate"" = @LastOpenedDate WHERE ""Id"" = @Id",
-                new { Id = id, LastOpenedDate = DateTime.Now });
-
             return recipe;
+        }
+
+        public async Task<Recipe> GetWithOwnerAsync(int id, int userId)
+        {
+            using IDbConnection conn = OpenConnection();
+
+            var sql = @"SELECT DISTINCT r.*, users.""Id"", users.""Email"", users.""ImageUri""
+                        FROM ""CookingAssistant.Recipes"" AS r
+                        LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
+                        INNER JOIN ""AspNetUsers"" AS users ON r.""UserId"" = users.""Id""
+                        WHERE r.""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))";
+
+            return (await conn.QueryAsync<Recipe, User, Recipe>(sql,
+                (recipe, user) =>
+                {
+                    recipe.User = user;
+                    return recipe;
+                }, new { Id = id, UserId = userId }, null, true)).FirstOrDefault();
+        }
+
+        public async Task<IEnumerable<RecipeShare>> GetSharesAsync(int id)
+        {
+            using IDbConnection conn = OpenConnection();
+
+            var sql = @"SELECT s.*, u.""Id"", u.""Email"", u.""ImageUri""
+                        FROM ""CookingAssistant.Shares"" AS s
+                        INNER JOIN ""AspNetUsers"" AS u ON s.""UserId"" = u.""Id""
+                        WHERE s.""RecipeId"" = @RecipeId AND s.""IsAccepted"" IS NOT FALSE
+                        ORDER BY (CASE WHEN s.""IsAccepted"" THEN 1 ELSE 2 END) ASC, s.""CreatedDate""";
+
+            return await conn.QueryAsync<RecipeShare, User, RecipeShare>(sql,
+                (share, user) =>
+                {
+                    share.User = user;
+                    return share;
+                }, new { RecipeId = id }, null, true);
+        }
+
+        public async Task<IEnumerable<RecipeShare>> GetShareRequestsAsync(int userId)
+        {
+            using IDbConnection conn = OpenConnection();
+
+            var sql = @"SELECT s.*, r.""Name"", u.""Name""
+                        FROM ""CookingAssistant.Shares"" AS s
+                        INNER JOIN ""CookingAssistant.Recipes"" AS r ON s.""RecipeId"" = r.""Id""
+                        INNER JOIN ""AspNetUsers"" AS u ON r.""UserId"" = u.""Id""
+                        WHERE s.""UserId"" = @UserId
+                        ORDER BY s.""ModifiedDate"" DESC";
+
+            return await conn.QueryAsync<RecipeShare, Recipe, User, RecipeShare>(sql,
+                (share, recipe, user) =>
+                {
+                    share.Recipe = recipe;
+                    share.User = user;
+                    return share;
+                }, new { UserId = userId }, null, true, "Name");
+        }
+
+        public async Task<int> GetPendingShareRequestsCountAsync(int userId)
+        {
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.ExecuteScalarAsync<int>(@"SELECT COUNT(*) FROM ""CookingAssistant.Shares"" WHERE ""UserId"" = @UserId AND ""IsAccepted"" IS NULL",
+                new { UserId = userId });
+        }
+
+        public async Task<bool> CanShareWithUserAsync(int shareWithId, int userId)
+        {
+            using IDbConnection conn = OpenConnection();
+
+            return !await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
+                                                        FROM ""CookingAssistant.Recipes"" AS r
+                                                        INNER JOIN ""CookingAssistant.Shares"" AS s on r.""Id"" = s.""RecipeId""
+                                                        WHERE r.""UserId"" = @UserId AND s.""UserId"" = @ShareWithId AND s.""IsAccepted"" = FALSE",
+                                                          new { ShareWithId = shareWithId, UserId = userId });
         }
 
         public async Task<Recipe> GetForSendingAsync(int id, int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
-            return await conn.QueryFirstOrDefaultAsync<Recipe>(@"SELECT ""Id"", ""Name"" FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
+            return await conn.QueryFirstOrDefaultAsync<Recipe>(@"SELECT r.""Id"", r.""Name""
+                                                                 FROM ""CookingAssistant.Recipes"" AS r
+                                                                 LEFT JOIN ""CookingAssistant.Shares"" AS s on r.""Id"" = s.""RecipeId""
+                                                                 WHERE r.""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
                 new { Id = id, UserId = userId });
         }
 
         public async Task<IEnumerable<SendRequest>> GetSendRequestsAsync(int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             var sql = @"SELECT sr.*, r.""Name"", u.""Name""
                             FROM ""CookingAssistant.SendRequests"" AS sr
@@ -177,8 +270,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task<int> GetPendingSendRequestsCountAsync(int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.ExecuteScalarAsync<int>(@"SELECT COUNT(*) FROM ""CookingAssistant.SendRequests"" WHERE ""UserId"" = @UserId AND ""IsDeclined"" = FALSE",
                 new { UserId = userId });
@@ -186,8 +278,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task<bool> SendRequestExistsAsync(int id, int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.SendRequests"" WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @UserId AND ""IsDeclined"" = FALSE",
                 new { RecipeId = id, UserId = userId });
@@ -195,8 +286,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task<bool> IngredientsReviewIsRequiredAsync(int id, int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             var userHasIngredients = await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.Ingredients"" WHERE ""UserId"" = @UserId",
                 new { UserId = userId });
@@ -209,8 +299,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task<Recipe> GetForReviewAsync(int id)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             var recipe = await conn.QueryFirstOrDefaultAsync<Recipe>(@"SELECT ""Id"", ""UserId"", ""Name"", ""Description"", ""ImageUri"" FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @Id",
                 new { Id = id });
@@ -242,8 +331,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task<IEnumerable<string>> GetAllImageUrisAsync(int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.QueryAsync<string>(@"SELECT ""ImageUri"" FROM ""CookingAssistant.Recipes"" WHERE ""UserId"" = @UserId",
                 new { UserId = userId });
@@ -251,52 +339,74 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task<string> GetImageUriAsync(int id)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.ExecuteScalarAsync<string>(@"SELECT ""ImageUri"" FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @Id",
                 new { Id = id });
         }
 
-        public async Task<bool> ExistsAsync(int id, int userId)
+        public async Task<bool> UserOwnsAsync(int id, int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
                 new { Id = id, UserId = userId });
         }
 
+        public async Task<bool> ExistsAsync(int id, int userId)
+        {
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
+                                                        FROM ""CookingAssistant.Recipes"" AS r
+                                                        LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
+                                                        WHERE r.""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+                new { Id = id, UserId = userId });
+        }
+
         public async Task<bool> ExistsAsync(string name, int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
-            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.Recipes"" WHERE UPPER(""Name"") = UPPER(@Name) AND ""UserId"" = @UserId",
+            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
+                                                         FROM ""CookingAssistant.Recipes"" AS r
+                                                         LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
+                                                         WHERE UPPER(r.""Name"") = UPPER(@Name) AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
                 new { Name = name, UserId = userId });
         }
 
         public async Task<bool> ExistsAsync(int id, string name, int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
-            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.Recipes"" WHERE ""Id"" != @Id AND UPPER(""Name"") = UPPER(@Name) AND ""UserId"" = @UserId",
+            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
+                                                         FROM ""CookingAssistant.Recipes"" AS r
+                                                         LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
+                                                         WHERE r.""Id"" != @Id AND UPPER(r.""Name"") = UPPER(@Name) AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
                 new { Id = id, Name = name, UserId = userId });
         }
 
         public async Task<int> CountAsync(int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.ExecuteScalarAsync<int>(@"SELECT COUNT(*) FROM ""CookingAssistant.Recipes"" WHERE ""UserId"" = @UserId", new { UserId = userId });
         }
 
+        public async Task<bool> UserHasBlockedSharingAsync(int userId, int sharedWithId)
+        {
+            using IDbConnection conn = OpenConnection();
+
+            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
+                                                        FROM ""CookingAssistant.Recipes"" AS r
+                                                        INNER JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
+                                                        WHERE r.""UserId"" = @UserId AND s.""UserId"" = @SharedWithId AND ""IsAccepted"" = FALSE",
+                                                        new { UserId = userId, SharedWithId = sharedWithId });
+        }
+
         public async Task<(bool canSend, bool alreadySent)> CheckSendRequestAsync(int recipeId, int sendToId, int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             bool canSend = !await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
                                                                       FROM ""CookingAssistant.Recipes"" AS r
@@ -314,8 +424,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task<int> CreateAsync(Recipe recipe)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
             var transaction = conn.BeginTransaction();
 
             var existingIngredients = await conn.QueryAsync<Ingredient>(@"SELECT * FROM ""CookingAssistant.Ingredients"" WHERE ""UserId"" = @UserId", new { recipe.UserId });
@@ -372,13 +481,14 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
             return recipeId;
         }
 
-        public async Task UpdateAsync(Recipe recipe, List<int> ingredientIdsToRemove)
+        public async Task<Recipe> UpdateAsync(Recipe recipe, List<int> ingredientIdsToRemove)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
             var transaction = conn.BeginTransaction();
 
             var existingIngredients = await conn.QueryAsync<Ingredient>(@"SELECT * FROM ""CookingAssistant.Ingredients"" WHERE ""UserId"" = @UserId", new { recipe.UserId });
+
+            var originalRecipe = await conn.QueryFirstOrDefaultAsync<Recipe>(@"SELECT * FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @Id", new { recipe.Id });
 
             await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.Recipes"" SET ""Name"" = @Name, ""Description"" = @Description, 
                                         ""Instructions"" = @Instructions, ""PrepDuration"" = @PrepDuration, 
@@ -454,20 +564,62 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                                           VALUES (@RecipeId, @IngredientId, @Amount, @Unit, @CreatedDate, @ModifiedDate)", allRecipeIngredients, transaction);
 
             transaction.Commit();
+
+            return originalRecipe;
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task<string> DeleteAsync(int id)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
+
+            var recipe = await conn.QueryFirstOrDefaultAsync<Recipe>(@"SELECT * FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @Id", new { Id = id });
 
             await conn.ExecuteAsync(@"DELETE FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @Id", new { Id = id });
+
+            return recipe.Name;
+        }
+
+        public async Task SaveSharingDetailsAsync(IEnumerable<RecipeShare> newShares, IEnumerable<RecipeShare> removedShares)
+        {
+            using IDbConnection conn = OpenConnection();
+            var transaction = conn.BeginTransaction();
+
+            await conn.ExecuteAsync(@"DELETE FROM ""CookingAssistant.Shares""
+                                      WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @UserId AND ""IsAccepted"" IS DISTINCT FROM FALSE", removedShares, transaction);
+
+            await conn.ExecuteAsync(@"INSERT INTO ""CookingAssistant.Shares"" (""RecipeId"", ""UserId"", ""LastOpenedDate"", ""CreatedDate"", ""ModifiedDate"") 
+                                      VALUES (@RecipeId, @UserId, @LastOpenedDate, @CreatedDate, @ModifiedDate)", newShares, transaction);
+
+            transaction.Commit();
+        }
+
+        public async Task SetShareIsAcceptedAsync(int id, int userId, bool isAccepted, DateTime modifiedDate)
+        {
+            using IDbConnection conn = OpenConnection();
+
+            await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.Shares"" SET ""IsAccepted"" = @IsAccepted, ""ModifiedDate"" = @ModifiedDate
+                                      WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @UserId AND ""IsAccepted"" IS NULL",
+                                      new { RecipeId = id, UserId = userId, IsAccepted = isAccepted, ModifiedDate = modifiedDate });
+        }
+
+        public async Task<RecipeShare> LeaveAsync(int id, int userId)
+        {
+            using IDbConnection conn = OpenConnection();
+
+            var share = await conn.QueryFirstOrDefaultAsync<RecipeShare>(@"SELECT * 
+                                                                           FROM ""CookingAssistant.Shares"" 
+                                                                           WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @UserId",
+                                                                           new { RecipeId = id, UserId = userId });
+
+            await conn.ExecuteAsync(@"DELETE FROM ""CookingAssistant.Shares"" WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @UserId",
+                new { RecipeId = id, UserId = userId });
+
+            return share;
         }
 
         public async Task CreateSendRequestsAsync(IEnumerable<SendRequest> sendRequests)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             await conn.ExecuteAsync(@"INSERT INTO ""CookingAssistant.SendRequests"" (""RecipeId"", ""UserId"", ""CreatedDate"", ""ModifiedDate"") 
                                           VALUES (@RecipeId, @UserId, @CreatedDate, @ModifiedDate)", sendRequests);
@@ -475,18 +627,16 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task DeclineSendRequestAsync(int id, int userId, DateTime modifiedDate)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.SendRequests"" SET ""IsDeclined"" = TRUE, ""ModifiedDate"" = @ModifiedDate
-                                          WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @UserId AND ""IsDeclined"" = FALSE",
+                                      WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @UserId AND ""IsDeclined"" = FALSE",
                                       new { RecipeId = id, UserId = userId, ModifiedDate = modifiedDate });
         }
 
         public async Task DeleteSendRequestAsync(int id, int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             await conn.ExecuteAsync(@"DELETE FROM ""CookingAssistant.SendRequests"" WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @UserId",
                 new { RecipeId = id, UserId = userId });
@@ -494,15 +644,14 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task<int> ImportAsync(int id, IEnumerable<(int Id, int ReplacementId, bool TransferNutritionData, bool TransferPriceData)> ingredientReplacements, string imageUri, int userId)
         {
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
             var transaction = conn.BeginTransaction();
 
             var recipe = await conn.QueryFirstOrDefaultAsync<Recipe>(@"SELECT * FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @Id", new { Id = id });
 
-            recipe.Name = await CreatePostfixedNameIfDuplicateAsync("Recipes", recipe.Name, userId, conn);
+            recipe.Name = CreatePostfixedNameIfDuplicate("Recipes", recipe.Name, userId);
             recipe.UserId = userId;
             recipe.ImageUri = imageUri;
             recipe.CreatedDate = recipe.ModifiedDate = recipe.LastOpenedDate = now;
@@ -575,7 +724,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                     recipeIngredient.Ingredient.TaskId = null;
                 }
 
-                recipeIngredient.Ingredient.Name = await CreatePostfixedNameIfDuplicateAsync("Ingredients", recipeIngredient.Ingredient.Name, userId, conn);
+                recipeIngredient.Ingredient.Name = CreatePostfixedNameIfDuplicate("Ingredients", recipeIngredient.Ingredient.Name, userId);
                 recipeIngredient.Ingredient.UserId = userId;
                 recipeIngredient.Ingredient.CreatedDate = recipeIngredient.Ingredient.ModifiedDate = now;
                 var ingredientId = (await conn.QueryAsync<int>(@"INSERT INTO ""CookingAssistant.Ingredients"" (""UserId"", ""TaskId"", ""Name"", 
@@ -607,15 +756,17 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
             return createdRecipeId;
         }
 
-        private async Task<string> CreatePostfixedNameIfDuplicateAsync(string table, string name, int userId, DbConnection conn)
+        private string CreatePostfixedNameIfDuplicate(string table, string name, int userId)
         {
+            using IDbConnection conn = OpenConnection();
+
             int postfix = 2;
             var currentName = name;
 
             bool exists;
             do
             {
-                exists = await conn.ExecuteScalarAsync<bool>($@"SELECT COUNT(*) FROM ""CookingAssistant.{table}"" WHERE UPPER(""Name"") = UPPER(@Name) AND ""UserId"" = @UserId",
+                exists = conn.ExecuteScalar<bool>($@"SELECT COUNT(*) FROM ""CookingAssistant.{table}"" WHERE UPPER(""Name"") = UPPER(@Name) AND ""UserId"" = @UserId",
                     new { Name = currentName, UserId = userId });
 
                 if (exists)

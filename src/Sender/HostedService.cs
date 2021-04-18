@@ -35,7 +35,7 @@ namespace PersonalAssistant.Sender
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            var factory = new ConnectionFactory()
+            var factory = new ConnectionFactory
             {
                 HostName = _configuration["EventBusConnection"],
                 //DispatchConsumersAsync = true

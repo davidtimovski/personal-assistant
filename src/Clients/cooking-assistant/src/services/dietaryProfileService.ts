@@ -1,10 +1,12 @@
 import { json } from "aurelia-fetch-client";
-import { HttpProxy } from "utils/httpProxy";
+
+import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
+
 import { EditDietaryProfile } from "models/viewmodels/editDietaryProfile";
 import { UpdateDietaryProfile } from "models/viewmodels/updateDietaryProfile";
 import { RecommendedDailyIntake } from "models/viewmodels/recommendedDailyIntake";
 
-export class DietaryProfileService extends HttpProxy {
+export class DietaryProfileService extends HttpProxyBase {
   async get(): Promise<EditDietaryProfile> {
     const result = await this.ajax<EditDietaryProfile>("dietaryprofiles");
     return result;

@@ -14,8 +14,11 @@ namespace PersonalAssistant.Application.Contracts.Common
         Task<string> GetLanguageAsync(int id);
         Task<string> GetImageUriAsync(int id);
         Task<IEnumerable<User>> GetToBeNotifiedOfListChangeAsync(int listId, int excludeUserId);
+        Task<IEnumerable<User>> GetToBeNotifiedOfRecipeChangeAsync(int recipeId, int excludeUserId);
         Task<bool> CheckIfUserCanBeNotifiedOfListChangeAsync(int listId, int userId);
+        Task<bool> CheckIfUserCanBeNotifiedOfRecipeChangeAsync(int recipeId, int userId);
         Task<IEnumerable<User>> GetToBeNotifiedOfListDeletionAsync(int listId);
+        Task<IEnumerable<User>> GetToBeNotifiedOfRecipeDeletionAsync(int recipeId);
         Task<IEnumerable<User>> GetToBeNotifiedOfRecipeSentAsync(int recipeId);
         Task UpdateToDoNotificationsEnabledAsync(int id, bool enabled);
         Task UpdateCookingNotificationsEnabledAsync(int id, bool enabled);

@@ -1,26 +1,30 @@
 @media screen and (min-width: 1200px) {
-  form label {
-    line-height: 45px;
-  }
-  form input[type="text"],
-  form input[type="number"],
-  form input[type="password"],
-  form select,
-  form input[type="date"] {
-    line-height: 45px;
-  }
-  form input[type="date"] {
-    width: 180px;
-  }
-  form .amount-input {
-    width: 100px;
-  }
-  form .category-select {
-    width: 270px;
-    background-position: right 15px top 20px;
-  }
-  form .description-textarea {
-    height: 100px;
+  form {
+    label,
+    input[type="text"],
+    input[type="number"],
+    input[type="password"],
+    select,
+    input[type="date"] {
+      line-height: 45px;
+    }
+
+    input[type="date"] {
+      width: 180px;
+    }
+
+    .amount-input {
+      width: 100px;
+    }
+
+    .category-select {
+      width: 270px;
+      background-position: right 15px top 20px;
+    }
+
+    .description-textarea {
+      height: 100px;
+    }
   }
 
   .multi-radio-part label {

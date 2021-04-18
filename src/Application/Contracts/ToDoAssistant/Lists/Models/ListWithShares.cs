@@ -10,17 +10,17 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public SharingState SharingState { get; set; }
+        public ListSharingState SharingState { get; set; }
         public string OwnerEmail { get; set; }
         public string OwnerImageUri { get; set; }
-        public ShareDto UserShare { get; set; }
+        public ListShareDto UserShare { get; set; }
 
-        public List<ShareDto> Shares { get; set; } = new List<ShareDto>();
+        public List<ListShareDto> Shares { get; set; } = new List<ListShareDto>();
 
         public void Mapping(Profile profile)
         {
             profile.CreateMap<ToDoList, ListWithShares>()
-                .ForMember(x => x.SharingState, opt => opt.MapFrom<SharingStateResolver>())
+                .ForMember(x => x.SharingState, opt => opt.MapFrom<ListSharingStateResolver>())
                 .ForMember(x => x.OwnerEmail, opt => opt.MapFrom(src => src.User.Email))
                 .ForMember(x => x.OwnerImageUri, opt => opt.MapFrom(src => src.User.ImageUri))
                 .ForMember(x => x.UserShare, opt => opt.MapFrom<ListWithSharesUserShareResolver>());

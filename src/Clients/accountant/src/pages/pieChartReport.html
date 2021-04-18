@@ -14,23 +14,27 @@
     </div>
 
     <div class="content-wrap">
-
       <form>
         <div class="form-control inline">
           <label for="from-date" t="pieChartReport.from">From</label>
-          <input type="date" id="from-date" value.bind="fromDate" change.delegate="loadData()">
+          <input type="date" id="from-date" value.bind="fromDate" change.delegate="loadData()" />
         </div>
         <div class="form-control inline">
           <label for="to-date" t="pieChartReport.to">To</label>
-          <input type="date" id="to-date" value.bind="toDate" max="${maxDate}" change.delegate="loadData()">
+          <input type="date" id="to-date" value.bind="toDate" max="${maxDate}" change.delegate="loadData()" />
         </div>
         <div class="form-control">
           <div class="double-radio-wrap">
             <div class="double-radio-side">
               <label class.bind="type === 1 ? 'selected' : ''">
                 <span t="pieChartReport.expenses">Expenses</span>
-                <input type="radio" name="expensesDepositsToggle" model.bind="1" checked.bind="type"
-                  change.delegate="loadData()">
+                <input
+                  type="radio"
+                  name="expensesDepositsToggle"
+                  model.bind="1"
+                  checked.bind="type"
+                  change.delegate="loadData()"
+                />
                 <span class="checkbox-icon">
                   <i class="fas fa-check"></i>
                 </span>
@@ -39,8 +43,13 @@
             <div class="double-radio-side">
               <label class.bind="type === 2 ? 'selected' : ''">
                 <span t="pieChartReport.deposits">Deposits</span>
-                <input type="radio" name="expensesDepositsToggle" model.bind="2" checked.bind="type"
-                  change.delegate="loadData()">
+                <input
+                  type="radio"
+                  name="expensesDepositsToggle"
+                  model.bind="2"
+                  checked.bind="type"
+                  change.delegate="loadData()"
+                />
                 <span class="checkbox-icon">
                   <i class="fas fa-check"></i>
                 </span>
@@ -62,13 +71,15 @@
       <table if.bind="showTable" class="amount-by-category-table au-animate animate-fade-in animate-fade-out">
         <tbody>
           <template repeat.for="item of items">
-            <tr>
+            <tr click.delegate="goToTransactions(item)">
               <td><span class="legend-color" css="background: ${item.color};"></span>${item.categoryName}</td>
               <td class="amount-cell">${item.amount | moneyFormat:currency}</td>
             </tr>
-            <tr repeat.for="item of item.subItems">
-              <td class="sub-category-cell"><span class="legend-color" css="background: ${item.color};"></span>${item.categoryName}</td>
-              <td class="amount-cell">${item.amount | moneyFormat:currency}</td>
+            <tr repeat.for="subItem of item.subItems" click.delegate="goToTransactions(subItem)">
+              <td class="sub-category-cell">
+                <span class="legend-color" css="background: ${subItem.color};"></span>${subItem.categoryName}
+              </td>
+              <td class="amount-cell">${subItem.amount | moneyFormat:currency}</td>
             </tr>
           </template>
         </tbody>
@@ -83,7 +94,6 @@
           </tr>
         </tfoot>
       </table>
-
     </div>
   </div>
 </template>

@@ -156,12 +156,19 @@
           </span>
           <span>${saveButtonText}</span>
         </a>
-        <a if.bind="!isNewRecipe" click.delegate="delete()"
+        <a if.bind="!isNewRecipe && model.sharingState !== 3" click.delegate="delete()"
           class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${confirmationInProgress ? 'confirm' : ''}">
           <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
             <i class="fas fa-circle-notch fa-spin"></i>
           </span>
           <span>${deleteButtonText}</span>
+        </a>
+        <a if.bind="model.sharingState === 3" click.delegate="leave()"
+          class="button danger-button ${leaveButtonIsLoading ? 'disabled' : ''} ${confirmationInProgress ? 'confirm' : ''}">
+          <span class="button-loader ${leaveButtonIsLoading ? 'loading' : ''}">
+            <i class="fas fa-circle-notch fa-spin"></i>
+          </span>
+          <span>${leaveButtonText}</span>
         </a>
         <button type="button" if.bind="isNewRecipe || confirmationInProgress" click.delegate="cancel()" t="cancel"
           class="button secondary-button">Cancel</button>

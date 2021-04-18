@@ -1,10 +1,14 @@
-.accounts-table .left-col {
-  padding: 5px 15px 5px 0;
-  text-align: left;
-}
-.accounts-table .right-col {
-  text-align: right;
-}
-.accounts-table td {
-  font-size: 1rem;
+.accounts-table {
+  .left-col {
+    padding: 5px 15px 5px 0;
+    text-align: left;
+  }
+
+  .right-col {
+    text-align: right;
+  }
+
+  td {
+    font-size: 1rem;
+  }
 }

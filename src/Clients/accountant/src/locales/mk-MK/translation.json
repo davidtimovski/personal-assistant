@@ -199,7 +199,8 @@
     "all": "Сите",
     "balance": "Состојба",
     "expenses": "Одлив",
-    "deposits": "Прилив"
+    "deposits": "Прилив",
+    "savings": "Штедење"
   },
   "expenditureHeatmap": {
     "expenditureHeatmap": "Календар на трошоци",

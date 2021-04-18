@@ -1,7 +1,5 @@
 import { inject, computedFrom, NewInstance } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { DietaryProfileService } from "services/dietaryProfileService";
-import { UsersService } from "services/usersService";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 import {
@@ -11,6 +9,11 @@ import {
   ControllerValidateResult,
   ValidateResult,
 } from "aurelia-validation";
+
+import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+
+import { DietaryProfileService } from "services/dietaryProfileService";
+import { UsersService } from "services/usersService";
 import { EditDietaryProfile } from "models/viewmodels/editDietaryProfile";
 import { PreferencesModel } from "models/preferencesModel";
 import { UpdateDietaryProfile } from "models/viewmodels/updateDietaryProfile";
@@ -30,6 +33,7 @@ export class DietaryProfile {
   private originalDietaryProfileJson: string;
   private preferences: PreferencesModel;
   private dietaryProfileTooltipKey = "dietaryProfile";
+  private dietInitiallySet = false;
   private dietTabIsVisible = false;
   private dietChanged = false;
   private minBirthdayDate: string;
@@ -83,7 +87,10 @@ export class DietaryProfile {
   async activate() {
     this.model = await this.dietaryProfileService.get();
 
-    if (!this.model) {
+    if (this.model) {
+      this.dietInitiallySet = true;
+      this.dietTabIsVisible = true;
+    } else {
       this.model = new EditDietaryProfile(
         null,
         null,
@@ -94,10 +101,8 @@ export class DietaryProfile {
         null,
         null,
         null,
-        null
+        new DailyIntake()
       );
-    } else {
-      this.dietTabIsVisible = true;
     }
 
     this.originalDietaryProfileJson = JSON.stringify(this.model);
@@ -235,6 +240,25 @@ export class DietaryProfile {
       this.model.dailyIntake.potassium = recommended.potassium;
       this.model.dailyIntake.magnesium = recommended.magnesium;
 
+      if (!this.dietInitiallySet) {
+        this.model.dailyIntake.trackCalories = true;
+        //this.dietaryProfile.dailyIntake.trackFat = true;
+        this.model.dailyIntake.trackSaturatedFat = true;
+        this.model.dailyIntake.trackCarbohydrate = true;
+        this.model.dailyIntake.trackAddedSugars = true;
+        this.model.dailyIntake.trackFiber = true;
+        this.model.dailyIntake.trackProtein = true;
+        this.model.dailyIntake.trackSodium = true;
+        this.model.dailyIntake.trackCholesterol = true;
+        this.model.dailyIntake.trackVitaminA = true;
+        this.model.dailyIntake.trackVitaminC = true;
+        this.model.dailyIntake.trackVitaminD = true;
+        this.model.dailyIntake.trackCalcium = true;
+        this.model.dailyIntake.trackIron = true;
+        this.model.dailyIntake.trackPotassium = true;
+        this.model.dailyIntake.trackMagnesium = true;
+      }
+
       this.getRecommendedIntakeInProgress = false;
       this.dietChanged = true;
     }
@@ -348,7 +372,7 @@ export class DietaryProfile {
     }
 
     this.saveButtonIsLoading = true;
-    this.eventAggregator.publish("reset-alert-error");
+    this.eventAggregator.publish(AlertEvents.HideError);
 
     const profileResult: ControllerValidateResult = await this.profileValidationController.validate();
     const dailyIntakeResult: ControllerValidateResult = await this.dailyIntakeValidationController.validate();
@@ -360,7 +384,7 @@ export class DietaryProfile {
         this.birthdayIsInvalid = this.heightCmIsInvalid = this.heightFeetIsInvalid = this.weightKgIsInvalid = this.weightLbsIsInvalid = false;
 
         this.eventAggregator.publish(
-          "alert-success",
+          AlertEvents.ShowSuccess,
           "dietaryProfile.updateSuccessful"
         );
         this.router.navigateToRoute("menu");
@@ -471,7 +495,7 @@ export class DietaryProfile {
         errorMessages
       );
 
-      this.eventAggregator.publish("alert-error", errorMessages);
+      this.eventAggregator.publish(AlertEvents.ShowError, errorMessages);
     }
 
     this.saveButtonIsLoading = false;
@@ -586,7 +610,7 @@ export class DietaryProfile {
 
       await this.dietaryProfileService.delete();
       this.eventAggregator.publish(
-        "alert-success",
+        AlertEvents.ShowSuccess,
         "dietaryProfile.resetSuccessful"
       );
       this.router.navigateToRoute("menu");

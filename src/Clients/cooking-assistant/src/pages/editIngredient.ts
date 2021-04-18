@@ -3,7 +3,6 @@ import { Router } from "aurelia-router";
 import { IngredientsService } from "services/ingredientsService";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
-import { LocalStorageCurrencies } from "../../../shared/src/utils/localStorageCurrencies";
 import {
   ValidationController,
   validateTrigger,
@@ -12,6 +11,10 @@ import {
   ValidateResult,
 } from "aurelia-validation";
 import autocomplete, { AutocompleteResult } from "autocompleter";
+
+import { LocalStorageCurrencies } from "../../../shared/src/utils/localStorageCurrencies";
+import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+
 import { EditIngredientModel } from "models/viewmodels/editIngredientModel";
 import { IngredientSuggestion } from "models/viewmodels/ingredientSuggestion";
 import { NutritionData } from "models/viewmodels/nutritionData";
@@ -29,11 +32,12 @@ export class EditIngredient {
   private ingredientId: number;
   private model: EditIngredientModel;
   private originalIngredientJson: string;
-  private nameIsInvalid: boolean;
+  private ingredientLinkedMessage: string;
   private tasksSearchVisible = false;
   private autocomplete: AutocompleteResult;
   private taskSuggestions = new Array<IngredientSuggestion>();
   private pickTaskInput: HTMLInputElement;
+  private nameIsInvalid: boolean;
   private caloriesIsInvalid: boolean;
   private fatIsInvalid: boolean;
   private saturatedFatIsInvalid: boolean;
@@ -69,7 +73,7 @@ export class EditIngredient {
     this.validationController.validateTrigger = validateTrigger.manual;
     this.deleteButtonText = this.i18n.tr("delete");
 
-    this.eventAggregator.subscribe("alert-hidden", () => {
+    this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.nameIsInvalid = false;
       this.caloriesIsInvalid = false;
       this.fatIsInvalid = false;
@@ -106,6 +110,13 @@ export class EditIngredient {
           this.router.navigateToRoute("notFound");
         }
         this.model = ingredient;
+
+        if (this.model.taskId) {
+          this.ingredientLinkedMessage = this.i18n.tr("editIngredient.thisIngredientIsLinked", {
+            taskName: this.model.name,
+            taskList: this.model.taskList
+          });
+        }
 
         if (!this.model.priceData.isSet) {
           this.model.priceData.currency = this.currency;
@@ -221,7 +232,7 @@ export class EditIngredient {
 
     this.autocomplete = autocomplete({
       input: this.pickTaskInput,
-      minLength: 1,
+      minLength: 2,
       fetch: (
         text: string,
         update: (items: IngredientSuggestion[]) => void
@@ -233,6 +244,11 @@ export class EditIngredient {
       },
       onSelect: (suggestion: IngredientSuggestion) => {
         this.nameIsInvalid = false;
+
+        this.ingredientLinkedMessage = this.i18n.tr("editIngredient.thisIngredientIsLinked", {
+          taskName: suggestion.name,
+          taskList: suggestion.group
+        });
 
         this.model.taskId = suggestion.taskId;
         this.model.name = suggestion.name;
@@ -340,7 +356,7 @@ export class EditIngredient {
     }
 
     this.saveButtonIsLoading = true;
-    this.eventAggregator.publish("reset-alert-error");
+    this.eventAggregator.publish(AlertEvents.HideError);
 
     const result: ControllerValidateResult = await this.validationController.validate();
 
@@ -455,7 +471,7 @@ export class EditIngredient {
         errorMessages
       );
 
-      this.eventAggregator.publish("alert-error", errorMessages);
+      this.eventAggregator.publish(AlertEvents.ShowError, errorMessages);
     }
 
     this.saveButtonIsLoading = false;
@@ -471,7 +487,7 @@ export class EditIngredient {
 
       await this.ingredientsService.delete(this.model.id);
       this.eventAggregator.publish(
-        "alert-success",
+        AlertEvents.ShowSuccess,
         "editIngredient.deleteSuccessful"
       );
       this.router.navigateToRoute("ingredients");

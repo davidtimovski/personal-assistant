@@ -15,7 +15,7 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models
         public string Icon { get; set; }
         public bool IsOneTimeToggleDefault { get; set; }
         public bool NotificationsEnabled { get; set; }
-        public SharingState SharingState { get; set; }
+        public ListSharingState SharingState { get; set; }
         public short? Order { get; set; }
         public bool IsArchived { get; set; }
         public DateTime CreatedDate { get; set; }
@@ -26,7 +26,7 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models
         public void Mapping(Profile profile)
         {
             profile.CreateMap<ToDoList, ListDto>()
-                .ForMember(x => x.SharingState, opt => opt.MapFrom<SharingStateResolver>())
+                .ForMember(x => x.SharingState, opt => opt.MapFrom<ListSharingStateResolver>())
                 .ForMember(x => x.Order, opt => opt.MapFrom<ListOrderResolver>())
                 .ForMember(x => x.IsArchived, opt => opt.MapFrom<IsArchivedResolver>());
         }

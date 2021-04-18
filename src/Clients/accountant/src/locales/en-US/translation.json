@@ -201,7 +201,8 @@
     "all": "All",
     "balance": "Balance",
     "expenses": "Expenses",
-    "deposits": "Deposits"
+    "deposits": "Deposits",
+    "savings": "Savings"
   },
   "expenditureHeatmap": {
     "expenditureHeatmap": "Expenditure heatmap",

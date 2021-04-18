@@ -1,9 +1,5 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { BulkAddTasksModel } from "models/viewmodels/bulkAddTasksModel";
-import { TasksService } from "services/tasksService";
-import { ListsService } from "services/listsService";
-import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import {
   ValidationController,
   validateTrigger,
@@ -11,6 +7,15 @@ import {
   ControllerValidateResult,
 } from "aurelia-validation";
 import { EventAggregator } from "aurelia-event-aggregator";
+import { connectTo } from "aurelia-store";
+
+import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
+import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+
+import { BulkAddTasksModel } from "models/viewmodels/bulkAddTasksModel";
+import { TasksService } from "services/tasksService";
+import { ListsService } from "services/listsService";
+import * as Actions from "utils/state/actions";
 
 @inject(
   Router,
@@ -19,6 +24,7 @@ import { EventAggregator } from "aurelia-event-aggregator";
   ValidationController,
   EventAggregator
 )
+@connectTo()
 export class BulkAddTasks {
   private model: BulkAddTasksModel;
   private listIsShared: boolean;
@@ -36,7 +42,7 @@ export class BulkAddTasks {
   ) {
     this.validationController.validateTrigger = validateTrigger.manual;
 
-    this.eventAggregator.subscribe("alert-hidden", () => {
+    this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.tasksTextIsInvalid = false;
     });
   }
@@ -73,7 +79,7 @@ export class BulkAddTasks {
     }
 
     this.saveButtonIsLoading = true;
-    this.eventAggregator.publish("reset-alert-error");
+    this.eventAggregator.publish(AlertEvents.HideError);
 
     const result: ControllerValidateResult = await this.validationController.validate();
 
@@ -91,8 +97,10 @@ export class BulkAddTasks {
         );
         this.tasksTextIsInvalid = false;
 
+        await Actions.getLists(this.listsService);
+
         this.eventAggregator.publish(
-          "alert-success",
+          AlertEvents.ShowSuccess,
           "bulkAddTasks.addSuccessful"
         );
 

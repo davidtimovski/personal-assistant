@@ -54,6 +54,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             var result = _mapper.Map<TaskForUpdate>(task, opts => { opts.Items["UserId"] = userId; });
 
             result.IsInSharedList = await _listService.IsSharedAsync(task.ListId, userId);
+            result.Recipes = await _tasksRepository.GetRecipesAsync(id, userId);
 
             return result;
         }
@@ -99,7 +100,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             }
 
             task.Order = 1;
-            task.CreatedDate = task.ModifiedDate = DateTime.Now;
+            task.CreatedDate = task.ModifiedDate = DateTime.UtcNow;
 
             task.Id = await _tasksRepository.CreateAsync(task, model.UserId);
 
@@ -114,7 +115,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
             var task = _mapper.Map<ToDoTask>(model);
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             var tasks = model.TasksText.Split("\n")
                 .Where(task => !string.IsNullOrWhiteSpace(task))
@@ -156,7 +157,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
                 task.AssignedToUserId = null;
             }
 
-            task.ModifiedDate = DateTime.Now;
+            task.ModifiedDate = DateTime.UtcNow;
             await _tasksRepository.UpdateAsync(task, model.UserId);
         }
 
@@ -209,7 +210,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
                 throw new ValidationException("Unauthorized");
             }
 
-            await _tasksRepository.ReorderAsync(model.Id, model.UserId, model.OldOrder, model.NewOrder, DateTime.Now);
+            await _tasksRepository.ReorderAsync(model.Id, model.UserId, model.OldOrder, model.NewOrder, DateTime.UtcNow);
         }
 
         private void ValidateAndThrow<T>(T model, IValidator<T> validator)

@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Microsoft.Extensions.Options;
-using PersonalAssistant.Application.Contracts;
 using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Application.Contracts.Common.Models;
-using PersonalAssistant.Application.Contracts.CookingAssistant;
 using PersonalAssistant.Application.Contracts.CookingAssistant.Common;
 using PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles.Models;
 using PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients.Models;
 using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models;
-using PersonalAssistant.Domain.Entities;
 using PersonalAssistant.Domain.Entities.Common;
 using PersonalAssistant.Domain.Entities.CookingAssistant;
 using Utility;
@@ -29,6 +26,7 @@ namespace PersonalAssistant.Application.Mappings
                 .ForMember(x => x.ModifiedDate, src => src.Ignore())
                 .ForMember(x => x.User, src => src.Ignore())
                 .ForMember(x => x.RecipeIngredients, opt => opt.MapFrom(src => src.Ingredients))
+                .ForMember(x => x.Shares, opt => opt.Ignore())
                 .ForMember(x => x.IngredientsMissing, src => src.Ignore());
             CreateMap<UpdateRecipe, Recipe>()
                 .ForMember(x => x.LastOpenedDate, src => src.Ignore())
@@ -36,6 +34,7 @@ namespace PersonalAssistant.Application.Mappings
                 .ForMember(x => x.ModifiedDate, src => src.Ignore())
                 .ForMember(x => x.User, src => src.Ignore())
                 .ForMember(x => x.RecipeIngredients, opt => opt.MapFrom(src => src.Ingredients))
+                .ForMember(x => x.Shares, opt => opt.Ignore())
                 .ForMember(x => x.IngredientsMissing, src => src.Ignore());
             CreateMap<UpdateRecipeIngredient, RecipeIngredient>()
                 .ForMember(x => x.RecipeId, src => src.Ignore())
@@ -85,6 +84,81 @@ namespace PersonalAssistant.Application.Mappings
 
             CreateMap<User, CookingAssistantPreferences>()
                 .ForMember(x => x.NotificationsEnabled, opt => opt.MapFrom(src => src.CookingNotificationsEnabled));
+        }
+    }
+
+    public class RecipeSharingStateResolver : IValueResolver<Recipe, object, RecipeSharingState>
+    {
+        public RecipeSharingState Resolve(Recipe source, object dest, RecipeSharingState destMember, ResolutionContext context)
+        {
+            var userId = (int)context.Items["UserId"];
+
+            if (source.Shares.Any())
+            {
+                bool someRequestsAccepted = source.Shares.Any(x => x.IsAccepted == true);
+                if (someRequestsAccepted)
+                {
+                    if (source.UserId == userId)
+                    {
+                        return RecipeSharingState.Owner;
+                    }
+
+                    return RecipeSharingState.Member;
+                }
+
+                bool someRequestsPending = source.Shares.Any(x => !x.IsAccepted.HasValue);
+                if (someRequestsPending)
+                {
+                    return RecipeSharingState.PendingShare;
+                }
+            }
+
+            return RecipeSharingState.NotShared;
+        }
+    }
+
+    public class RecipeWithSharesUserShareResolver : IValueResolver<Recipe, RecipeWithShares, RecipeShareDto>
+    {
+        private readonly ICdnService _cdnService;
+
+        public RecipeWithSharesUserShareResolver(ICdnService cdnService)
+        {
+            _cdnService = cdnService;
+        }
+
+        public RecipeShareDto Resolve(Recipe source, RecipeWithShares dest, RecipeShareDto destMember, ResolutionContext context)
+        {
+            var shareDto = new RecipeShareDto();
+            var userId = (int)context.Items["UserId"];
+
+            var userShare = source.Shares.FirstOrDefault(x => x.UserId == userId);
+            if (userShare != null)
+            {
+                shareDto.Email = userShare.User.Email;
+                shareDto.ImageUri = _cdnService.ImageUriToThumbnail(userShare.User.ImageUri);
+                return shareDto;
+            }
+
+            return null;
+        }
+    }
+
+    public class LastOpenedDateResolver : IValueResolver<Recipe, object, DateTime>
+    {
+        public DateTime Resolve(Recipe source, object dest, DateTime destMember, ResolutionContext context)
+        {
+            var userId = (int)context.Items["UserId"];
+
+            if (source.Shares.Any())
+            {
+                var share = source.Shares.First();
+                if (share.UserId == userId)
+                {
+                    return share.LastOpenedDate;
+                }
+            }
+
+            return source.LastOpenedDate;
         }
     }
 

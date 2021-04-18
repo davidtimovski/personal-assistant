@@ -62,7 +62,7 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfil
                 .NotEmpty().WithMessage("DietaryProfiles.BirthdayIsRequired")
                 .Must(birthday =>
                 {
-                    var now = DateTime.Now;
+                    var now = DateTime.UtcNow;
                     short age = (short)(now.Year - birthday.Year);
                     if (birthday > now.AddYears(-age))
                     {

@@ -47,7 +47,7 @@ namespace Auth
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddInfrastructure(Configuration, WebHostEnvironment.EnvironmentName);
-            services.AddPersistence(Configuration);
+            services.AddPersistence(Configuration["ConnectionString"]);
             services.AddApplication(Configuration);
 
             services.AddDbContext<PersonalAssistantAuthContext>(options =>
@@ -138,7 +138,6 @@ namespace Auth
             services.AddTransient<IEmailTemplateService, EmailTemplateService>();
 
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
-            services.Configure<DatabaseSettings>(x => x.DefaultConnectionString = Configuration["ConnectionString"]);
         }
 
         public void Configure(IApplicationBuilder app)

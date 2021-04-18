@@ -1,25 +1,29 @@
 import { inject } from "aurelia-framework";
 import { json } from "aurelia-fetch-client";
-import { HttpProxy } from "utils/httpProxy";
 import { HttpClient } from "aurelia-fetch-client";
 import { EventAggregator } from "aurelia-event-aggregator";
 
 import { AuthService } from "../../../shared/src/services/authService";
+import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
+import { LocalStorageCurrencies } from "../../../shared/src/utils/localStorageCurrencies";
+import { Language } from "../../../shared/src/models/enums/language";
+
 import { RecipeModel } from "models/viewmodels/recipeModel";
 import { ViewRecipe } from "models/viewmodels/viewRecipe";
 import { EditRecipeIngredient } from "models/viewmodels/editRecipeIngredient";
 import { EditRecipeModel } from "models/viewmodels/editRecipeModel";
-import { LocalStorageCurrencies } from "../../../shared/src/utils/localStorageCurrencies";
-import { Language } from "../../../shared/src/models/enums/language";
 import { SendRecipeModel } from "models/viewmodels/sendRecipeModel";
 import { CanSendRecipe } from "models/viewmodels/canSendRecipe";
 import { ReceivedRecipe } from "models/viewmodels/receivedRecipe";
 import { ReviewIngredientsModel } from "models/viewmodels/reviewIngredientsModel";
 import { IngredientReplacement } from "models/viewmodels/ingredientReplacement";
 import * as Actions from "utils/state/actions";
+import { RecipeWithShares } from "models/viewmodels/recipeWithShares";
+import { CanShareRecipe } from "models/viewmodels/canShareRecipe";
+import { ShareRequest } from "models/viewmodels/shareRequest";
 
 @inject(AuthService, HttpClient, EventAggregator, LocalStorageCurrencies)
-export class RecipesService extends HttpProxy {
+export class RecipesService extends HttpProxyBase {
   constructor(
     protected readonly authService: AuthService,
     protected readonly httpClient: HttpClient,
@@ -45,6 +49,26 @@ export class RecipesService extends HttpProxy {
 
   async getForUpdate(id: number): Promise<EditRecipeModel> {
     const result = await this.ajax<EditRecipeModel>(`recipes/${id}/update`);
+
+    return result;
+  }
+
+  async getWithShares(id: number): Promise<RecipeWithShares> {
+    const result = await this.ajax<RecipeWithShares>(`recipes/${id}/with-shares`);
+
+    return result;
+  }
+
+  async getShareRequests(): Promise<Array<ShareRequest>> {
+    const result = await this.ajax<Array<ShareRequest>>("recipes/share-requests");
+
+    return result;
+  }
+
+  async getPendingShareRequestsCount(): Promise<number> {
+    const result = await this.ajax<number>(
+      "recipes/pending-share-requests-count"
+    );
 
     return result;
   }
@@ -165,6 +189,45 @@ export class RecipesService extends HttpProxy {
 
   async delete(id: number): Promise<void> {
     await this.ajaxExecute(`recipes/${id}`, {
+      method: "delete",
+    });
+  }
+
+  async canShareRecipeWithUser(email: string): Promise<CanShareRecipe> {
+    const result = await this.ajax<CanShareRecipe>(
+      `recipes/can-share-with-user/${email}`
+    );
+
+    return result;
+  }
+
+  async share(
+    id: number,
+    newShares: Array<number>,
+    removedShares: Array<number>
+  ): Promise<void> {
+    await this.ajaxExecute("recipes/share", {
+      method: "put",
+      body: json({
+        recipeId: id,
+        newShares: newShares,
+        removedShares: removedShares,
+      }),
+    });
+  }
+
+  async setShareIsAccepted(id: number, isAccepted: boolean): Promise<void> {
+    await this.ajaxExecute("recipes/share-is-accepted", {
+      method: "put",
+      body: json({
+        recipeId: id,
+        isAccepted: isAccepted,
+      }),
+    });
+  }
+
+  async leave(id: number): Promise<void> {
+    await this.ajaxExecute(`recipes/${id}/leave`, {
       method: "delete",
     });
   }

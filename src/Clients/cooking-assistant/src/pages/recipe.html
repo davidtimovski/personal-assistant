@@ -26,6 +26,7 @@
         <div class="top-buttons-drawer ${topDrawerIsOpen ? 'open' : ''}">
           <div class="top-buttons-drawer-wrap">
             <div class="top-buttons-drawer-content horizontal-buttons-wrap">
+              <a route-href="route: shareRecipe; params.bind: { id: recipeId }" class="wide-button">${shareButtonText}</a>
               <a route-href="route: sendRecipe; params.bind: { id: recipeId }" class="wide-button"
                 t="recipe.sendRecipe">Send
                 recipe</a>

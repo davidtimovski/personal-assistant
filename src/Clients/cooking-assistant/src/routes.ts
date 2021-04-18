@@ -28,6 +28,11 @@ export default [
     moduleId: PLATFORM.moduleName("./pages/editRecipe"),
   },
   {
+    route: "share-recipe/:id",
+    name: "shareRecipe",
+    moduleId: PLATFORM.moduleName("./pages/shareRecipe"),
+  },
+  {
     route: "send-recipe/:id",
     name: "sendRecipe",
     moduleId: PLATFORM.moduleName("./pages/sendRecipe"),
@@ -51,6 +56,11 @@ export default [
     route: "edit-ingredient/:id",
     name: "editIngredient",
     moduleId: PLATFORM.moduleName("./pages/editIngredient"),
+  },
+  {
+    route: "share-requests",
+    name: "shareRequests",
+    moduleId: PLATFORM.moduleName("./pages/shareRequests"),
   },
   {
     route: "inbox",

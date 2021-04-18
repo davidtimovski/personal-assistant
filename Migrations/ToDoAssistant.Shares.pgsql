@@ -11,7 +11,6 @@ CREATE TABLE public."ToDoAssistant.Shares"
     "IsArchived" boolean NOT NULL DEFAULT false,
     "Order" smallint,
     "NotificationsEnabled" boolean NOT NULL DEFAULT TRUE,
-    "IsHidden" boolean NOT NULL DEFAULT FALSE,
     "CreatedDate" timestamp without time zone NOT NULL,
     "ModifiedDate" timestamp without time zone NOT NULL,
     CONSTRAINT "PK_ToDoAssistant.Shares" PRIMARY KEY ("ListId", "UserId"),

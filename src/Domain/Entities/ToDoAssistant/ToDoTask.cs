@@ -15,7 +15,6 @@ namespace PersonalAssistant.Domain.Entities.ToDoAssistant
         public short Order { get; set; }
 
         public ToDoList List { get; set; }
-        public User User { get; set; }
-        public List<string> Recipes { get; set; } = new List<string>();
+        public User AssignedToUser { get; set; }
     }
 }

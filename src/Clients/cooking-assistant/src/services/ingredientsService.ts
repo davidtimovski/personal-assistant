@@ -3,8 +3,9 @@ import { json } from "aurelia-fetch-client";
 import { HttpClient } from "aurelia-fetch-client";
 import { EventAggregator } from "aurelia-event-aggregator";
 
-import { HttpProxy } from "utils/httpProxy";
 import { AuthService } from "../../../shared/src/services/authService";
+import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
+
 import { SimpleIngredient } from "models/viewmodels/simpleIngredient";
 import { EditIngredientModel } from "models/viewmodels/editIngredientModel";
 import { IngredientSuggestions } from "models/viewmodels/ingredientSuggestions";
@@ -12,7 +13,7 @@ import { IngredientSuggestion } from "models/viewmodels/ingredientSuggestion";
 import { PriceData } from "models/viewmodels/priceData";
 
 @inject(AuthService, HttpClient, EventAggregator)
-export class IngredientsService extends HttpProxy {
+export class IngredientsService extends HttpProxyBase {
   constructor(
     protected readonly authService: AuthService,
     protected readonly httpClient: HttpClient,

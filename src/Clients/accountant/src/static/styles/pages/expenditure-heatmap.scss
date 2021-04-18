@@ -5,34 +5,127 @@
   row-gap: 3px;
   font-size: 1.15rem;
   line-height: 2.1rem;
+
+  .heatmap-cell {
+    padding: 4px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    color: #999;
+    transition: color var(--transition);
+
+    &.header {
+      font-size: 1rem;
+    }
+
+    &.date {
+      background: linear-gradient(-90deg, #ddd 0%, #f3f3f3 100%);
+      background-size: 400% 400%;
+      animation: heatmapCellLoading 2.5s ease-in-out infinite;
+    }
+
+    &.today {
+      border: 4px solid var(--green-color-dark);
+      padding: 0;
+    }
+
+    &.selected {
+      border: 4px solid var(--primary-color);
+      padding: 0;
+    }
+
+    &:nth-child(8) {
+      border-top-left-radius: 8px;
+    }
+
+    &:nth-child(14) {
+      border-top-right-radius: 8px;
+    }
+
+    &:nth-last-child(7) {
+      border-bottom-left-radius: 8px;
+    }
+
+    &:last-child {
+      border-bottom-right-radius: 8px;
+    }
+  }
+
+  &.loaded .heatmap-cell.header {
+    color: var(--regular-color);
+  }
+
+  &.loaded .date {
+    animation: unset;
+    background-size: initial;
+    transition: background var(--transition), border var(--transition);
+  }
 }
-.heatmap-cell {
-  padding: 4px;
-  text-align: center;
-  cursor: pointer;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  color: #999;
-  transition: color var(--transition);
+
+.heatmap-legend {
+  position: relative;
+  margin-top: 25px;
+
+  &-line {
+    height: 10px;
+    background: linear-gradient(to right, #241432 0%, #6d1f56 20%, #ba1656 40%, #ee523f 60%, #f6a47c 80%, #f9e5d4 100%);
+  }
+
+  &-amounts {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .heatmap-caret-wrap {
+    position: absolute;
+    top: -18px;
+    left: 0;
+    text-align: right;
+    transition: width 400ms ease-out;
+  }
 }
-.heatmap-cell.header {
+
+.expenditure-heatmap-table-title {
+  display: block;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+  margin: 35px 0 10px;
+  text-decoration: none;
+  color: var(--primary-color);
+}
+.expenditure-heatmap-table {
+  width: 100%;
   font-size: 1rem;
+
+  tbody tr {
+    cursor: pointer;
+
+    &:hover {
+      color: var(--primary-color-dark);
+    }
+  }
+
+  td {
+    padding: 5px 15px 5px 0;
+    line-height: 1.2rem;
+
+    &:last-child {
+      padding-right: 0;
+      text-align: right;
+    }
+  }
+
+  .amount-cell {
+    white-space: nowrap;
+  }
+
+  tfoot tr:last-child td {
+    border-top: 1px solid #ddd;
+    padding: 5px 0;
+    font-size: 1.1rem;
+  }
 }
-.heatmap-cell.date {
-  background: linear-gradient(-90deg, #ddd 0%, #f3f3f3 100%);
-  background-size: 400% 400%;
-  animation: heatmapCellLoading 2.5s ease-in-out infinite;
-}
-.heatmap.loaded .heatmap-cell.header {
-  color: var(--regular-color);
-}
-.heatmap.loaded .date {
-  animation: unset;
-  background-size: initial;
-  transition: background var(--transition), border var(--transition);
-}
+
 @keyframes heatmapCellLoading {
   0% {
     background-position: 0% 0%;
@@ -40,52 +133,4 @@
   100% {
     background-position: -100% 0%;
   }
-}
-
-.heatmap-cell.today {
-  border: 4px solid var(--green-color-dark);
-  padding: 0;
-}
-.heatmap-cell.selected {
-  border: 4px solid var(--primary-color);
-  padding: 0;
-}
-.heatmap-cell:nth-child(8) {
-  border-top-left-radius: 8px;
-}
-.heatmap-cell:nth-child(14) {
-  border-top-right-radius: 8px;
-}
-.heatmap-cell:nth-last-child(7) {
-  border-bottom-left-radius: 8px;
-}
-.heatmap-cell:last-child {
-  border-bottom-right-radius: 8px;
-}
-.heatmap-legend {
-  position: relative;
-  margin-top: 25px;
-}
-.heatmap-caret-wrap {
-  position: absolute;
-  top: -18px;
-  left: 0;
-  text-align: right;
-  transition: width 400ms ease-out;
-}
-.heatmap-legend-line {
-  height: 10px;
-  background: linear-gradient(
-    to right,
-    #241432 0%,
-    #6d1f56 20%,
-    #ba1656 40%,
-    #ee523f 60%,
-    #f6a47c 80%,
-    #f9e5d4 100%
-  );
-}
-.heatmap-legend-amounts {
-  display: flex;
-  justify-content: space-between;
 }

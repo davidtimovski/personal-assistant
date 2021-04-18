@@ -55,6 +55,13 @@
                   change.delegate="loadData()">
               </label>
             </div>
+            <div class="multi-radio-part">
+              <label class.bind="type === 4 ? 'selected' : ''">
+                <span t="barChartReport.savings">Savings</span>
+                <input type="radio" name="typeToggle" model.bind="4" checked.bind="type"
+                  change.delegate="loadData()">
+              </label>
+            </div>
           </div>
         </div>
       </form>

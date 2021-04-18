@@ -37,7 +37,7 @@
 
         <section show.bind="model.taskId" class="linked-to-task-alert">
           <i class="fas fa-info-circle"></i>
-          <span t="editIngredient.thisIngredientIsLinked">This ingredient is linked to a task in To Do Assistant.</span>
+          <span>${ingredientLinkedMessage}</span>
           <div class="unlink-button-wrap">
             <button type="button" class="small-button" click.delegate="unlinkFromTask()"
               t="editIngredient.unlink">Unlink</button>

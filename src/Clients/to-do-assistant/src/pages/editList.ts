@@ -9,10 +9,12 @@ import {
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
+import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
+import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+
 import { ListsService } from "services/listsService";
 import { UsersService } from "services/usersService";
 import { EditListModel } from "models/viewmodels/editListModel";
-import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import { SharingState } from "models/viewmodels/sharingState";
 import { PreferencesModel } from "models/preferencesModel";
 import * as Actions from "utils/state/actions";
@@ -56,7 +58,7 @@ export class EditList {
     this.deleteButtonText = this.i18n.tr("delete");
     this.leaveButtonText = this.i18n.tr("editList.leave");
 
-    this.eventAggregator.subscribe("alert-hidden", () => {
+    this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.nameIsInvalid = false;
     });
   }
@@ -138,7 +140,7 @@ export class EditList {
     }
 
     this.saveButtonIsLoading = true;
-    this.eventAggregator.publish("reset-alert-error");
+    this.eventAggregator.publish(AlertEvents.HideError);
 
     const result: ControllerValidateResult = await this.validationController.validate();
 
@@ -205,7 +207,7 @@ export class EditList {
       await Actions.getLists(this.listsService);
 
       this.eventAggregator.publish(
-        "alert-success",
+        AlertEvents.ShowSuccess,
         "editList.deleteSuccessful"
       );
       this.router.navigateToRoute("lists");
@@ -228,7 +230,7 @@ export class EditList {
       await Actions.getLists(this.listsService);
 
       this.eventAggregator.publish(
-        "alert-success",
+        AlertEvents.ShowSuccess,
         "editList.youHaveLeftTheList"
       );
 

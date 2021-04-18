@@ -8,6 +8,7 @@ import { AuthService } from "../../../shared/src/services/authService";
 @inject(Router, RecipesService, AuthService)
 export class Menu {
   private version = "--";
+  private pendingShareRequestCount = 0;
   private pendingSendRequestCount = 0;
   private personalAssistantUrl: string;
   private dietaryProfileButtonIsLoading = false;
@@ -24,6 +25,12 @@ export class Menu {
   }
 
   activate() {
+    this.recipesService
+      .getPendingShareRequestsCount()
+      .then((pendingShareRequestCount) => {
+        this.pendingShareRequestCount = pendingShareRequestCount;
+      });
+
     this.recipesService
       .getPendingSendRequestsCount()
       .then((pendingSendRequestCount) => {

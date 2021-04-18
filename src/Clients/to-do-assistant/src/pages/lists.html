@@ -43,7 +43,7 @@
             class="to-do-list au-animate animate-fade-in ${list.id === getEditedId ? 'highlighted' : ''} ${list.sharingState !== 0 && list.sharingState !== 1 ? 'is-shared' : ''} ${list.sharingState === 1 ? 'pending-share' : ''}"
             route-href="route: list; params.bind: { id: list.id }">
             <i class="icon ${getClassFromIcon(list.icon)}"></i>
-            <span class="sort-handle">
+            <span class="sort-handle" t="[title,aria-label]dragToReorder">
               <i class="reorder-icon fas fa-hand-paper"></i>
             </span>
             <span class="name">${list.name}</span>

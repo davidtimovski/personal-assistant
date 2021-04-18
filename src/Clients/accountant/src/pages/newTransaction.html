@@ -26,11 +26,11 @@
       </div>
 
       <div else>
-        <section if.bind="debtId" class="message info">
+        <div if.bind="debtId" class="message info">
           <i class="fas fa-info-circle"></i>
           <span if.bind="userIsDebtor"><span t="newTransaction.settleDebtTo">Settle debt to</span> ${debtPerson}.</span>
           <span else><span t="newTransaction.settleDebtFrom">Settle debt from</span> ${debtPerson}.</span>
-        </section>
+        </div>
 
         <form submit.trigger="submit()" autocomplete="off">
           <div class="form-control inline">

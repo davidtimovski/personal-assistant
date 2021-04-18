@@ -11,6 +11,8 @@ import {
 
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
+import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+
 import { CategoriesService } from "services/categoriesService";
 import { TransactionsService } from "services/transactionsService";
 import { AccountsService } from "services/accountsService";
@@ -77,7 +79,7 @@ export class NewTransaction {
 
     this.passwordShowIconLabel = this.i18n.tr("showPassword");
 
-    this.eventAggregator.subscribe("alert-hidden", () => {
+    this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.amountIsInvalid = false;
       this.dateIsInvalid = false;
       this.encryptionPasswordIsInvalid = false;
@@ -186,10 +188,10 @@ export class NewTransaction {
     }
 
     this.submitButtonIsLoading = true;
-    this.eventAggregator.publish("reset-alert-error");
+    this.eventAggregator.publish(AlertEvents.HideError);
 
     if (!this.model.mainAccountId) {
-      this.eventAggregator.publish("alert-error", "unexpectedError");
+      this.eventAggregator.publish(AlertEvents.ShowError, "unexpectedError");
       return;
     }
 
@@ -235,7 +237,7 @@ export class NewTransaction {
 
         if (this.debtId) {
           this.eventAggregator.publish(
-            "alert-success",
+            AlertEvents.ShowSuccess,
             "newTransaction.debtSettlingSuccessful"
           );
         } else {
@@ -243,7 +245,7 @@ export class NewTransaction {
             ? "newTransaction.expenseSubmitted"
             : "newTransaction.depositSubmitted";
 
-          this.eventAggregator.publish("alert-success", messageKey);
+          this.eventAggregator.publish(AlertEvents.ShowSuccess, messageKey);
         }
         this.router.navigateToRoute("dashboard");
       } catch {
@@ -278,7 +280,7 @@ export class NewTransaction {
         this.dateIsInvalid = !!invalidDate;
         this.encryptionPasswordIsInvalid = !!invalidEncryptionPassword;
 
-        this.eventAggregator.publish("alert-error", messages);
+        this.eventAggregator.publish(AlertEvents.ShowError, messages);
       }
 
       this.submitButtonIsLoading = false;

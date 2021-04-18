@@ -1,6 +1,7 @@
 import { inject } from "aurelia-framework";
 
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
+
 import { TransactionModel } from "models/entities/transaction";
 import { CreatedIdPair } from "models/sync/created";
 import { IDBContext } from "./idbContext";
@@ -18,14 +19,14 @@ export class TransactionsIDBHelper {
 
   async getAllForAccount(accountId: number): Promise<Array<TransactionModel>> {
     const transactions = await this.db.transactions.toArray();
-    return transactions.filter(t => t.fromAccountId === accountId || t.toAccountId === accountId);
+    return transactions.filter((t) => t.fromAccountId === accountId || t.toAccountId === accountId);
   }
 
   async count(filters: SearchFilters): Promise<number> {
     const categoryIds = await this.getWithSubCategoryIds(filters.categoryId);
 
     return await this.db.transactions
-      .filter(t =>
+      .filter((t) =>
         this.checkAgainstFilters(
           t,
           filters.fromDate,
@@ -46,7 +47,7 @@ export class TransactionsIDBHelper {
     const transactions = await this.db.transactions
       .orderBy("date")
       .reverse()
-      .filter(t =>
+      .filter((t) =>
         this.checkAgainstFilters(
           t,
           filters.fromDate,
@@ -86,31 +87,27 @@ export class TransactionsIDBHelper {
     const transactionsPromise = this.db.transactions
       .orderBy("date")
       .reverse()
-      .filter(t =>
-        this.checkAgainstFilters2(t, fromDate, toDate, accountId, type)
-      )
+      .filter((t) => this.checkAgainstFilters2(t, fromDate, toDate, accountId, type))
       .toArray();
 
     const categoriesPromise = this.db.categories.toArray();
 
     let transactions: Array<TransactionModel>;
-    await Promise.all([transactionsPromise, categoriesPromise]).then(
-      (result) => {
-        transactions = result[0];
-        const categories = result[1];
+    await Promise.all([transactionsPromise, categoriesPromise]).then((result) => {
+      transactions = result[0];
+      const categories = result[1];
 
-        for (const transaction of transactions) {
-          transaction.categoryName = this.getCategoryName(transaction.categoryId, categories);
-        }
+      for (const transaction of transactions) {
+        transaction.categoryName = this.getCategoryName(transaction.categoryId, categories);
       }
-    );
+    });
 
     return transactions;
   }
 
   async getExpensesAndDepositsFromDate(
     fromDate: string,
-    accountId: number,
+    mainAccountId: number,
     categoryId: number,
     type: TransactionType
   ): Promise<Array<TransactionModel>> {
@@ -119,16 +116,7 @@ export class TransactionsIDBHelper {
     const transactions = await this.db.transactions
       .orderBy("date")
       .reverse()
-      .filter(t =>
-        this.checkAgainstFilters3(
-          t, 
-          fromDate, 
-          accountId, 
-          categoryId !== 0,
-          categoryIds,
-          type
-        )
-      )
+      .filter((t) => this.checkAgainstFilters3(t, fromDate, mainAccountId, categoryId !== 0, categoryIds, type))
       .toArray();
 
     return transactions;
@@ -160,11 +148,11 @@ export class TransactionsIDBHelper {
     if (!inType) {
       if (!accountId) {
         if (type === TransactionType.Transfer) {
-          inType = !!t.toAccountId && !!t.fromAccountId;
+          inType = this.isTransfer(t.toAccountId, t.fromAccountId);
         } else if (type === TransactionType.Expense) {
-          inType = !!t.fromAccountId && !t.toAccountId;
+          inType = this.isExpense(t.fromAccountId, t.toAccountId);
         } else {
-          inType = !t.fromAccountId && !!t.toAccountId;
+          inType = this.isDeposit(t.fromAccountId, t.toAccountId);
         }
       } else {
         // Based on selected account
@@ -180,16 +168,12 @@ export class TransactionsIDBHelper {
     }
 
     const withinDates =
-      (!fromDate || new Date(t.date) >= new Date(fromDate)) &&
-      (!toDate || new Date(t.date) <= new Date(toDate));
+      (!fromDate || new Date(t.date) >= new Date(fromDate)) && (!toDate || new Date(t.date) <= new Date(toDate));
     if (!withinDates) {
       return false;
     }
 
-    let inAccount =
-      accountId === 0 ||
-      t.fromAccountId === accountId ||
-      t.toAccountId === accountId;
+    let inAccount = accountId === 0 || t.fromAccountId === accountId || t.toAccountId === accountId;
     if (!inAccount) {
       return false;
     }
@@ -199,16 +183,14 @@ export class TransactionsIDBHelper {
       if (categoryIds === null) {
         inCategory = t.categoryId === null;
       } else {
-        inCategory = categoryIds.includes(t.categoryId); 
+        inCategory = categoryIds.includes(t.categoryId);
       }
     }
     if (!inCategory) {
       return false;
     }
 
-    const hasDescription =
-      !description ||
-      t.description?.toUpperCase().includes(description?.toUpperCase());
+    const hasDescription = !description || t.description?.toUpperCase().includes(description?.toUpperCase());
 
     return hasDescription;
   }
@@ -230,23 +212,19 @@ export class TransactionsIDBHelper {
     type: TransactionType
   ): boolean {
     let inType =
-      (type === TransactionType.Expense &&
-        !!t.fromAccountId &&
-        !t.toAccountId) ||
-      (type === TransactionType.Deposit && !t.fromAccountId && !!t.toAccountId);
+      (type === TransactionType.Expense && this.isExpense(t.fromAccountId, t.toAccountId)) ||
+      (type === TransactionType.Deposit && this.isDeposit(t.fromAccountId, t.toAccountId));
     if (!inType) {
       return false;
     }
 
     const withinDates =
-      (!fromDate || new Date(t.date) >= new Date(fromDate)) &&
-      (!toDate || new Date(t.date) <= new Date(toDate));
+      (!fromDate || new Date(t.date) >= new Date(fromDate)) && (!toDate || new Date(t.date) <= new Date(toDate));
     if (!withinDates) {
       return false;
     }
 
-    let inAccount =
-      t.fromAccountId === accountId || t.toAccountId === accountId;
+    let inAccount = t.fromAccountId === accountId || t.toAccountId === accountId;
 
     return inAccount;
   }
@@ -255,7 +233,7 @@ export class TransactionsIDBHelper {
    * Finds whether a transaction fits the filters. Ignores Transfer transaction types.
    * @param t The transaction
    * @param fromDate
-   * @param accountId
+   * @param mainAccountId
    * @param searchByCategory False if the all categories option is selected
    * @param categoryIds The selected category plus any potential child categories
    * @param type
@@ -264,18 +242,19 @@ export class TransactionsIDBHelper {
   private checkAgainstFilters3(
     t: TransactionModel,
     fromDate: string,
-    accountId: number,
+    mainAccountId: number,
     searchByCategory: boolean,
     categoryIds: Array<number>,
     type: TransactionType
   ): boolean {
     let inType =
       (type === TransactionType.Any &&
-        !(!!t.fromAccountId && !!t.toAccountId)) || // Ignore Transfers if type is Any
-      (type === TransactionType.Expense &&
-        !!t.fromAccountId &&
-        !t.toAccountId) ||
-      (type === TransactionType.Deposit && !t.fromAccountId && !!t.toAccountId);
+        !this.isTransfer(t.fromAccountId, t.toAccountId) &&
+        (t.fromAccountId === mainAccountId || t.toAccountId === mainAccountId)) ||
+      (type === TransactionType.Expense && t.fromAccountId === mainAccountId && !t.toAccountId) ||
+      (type === TransactionType.Deposit && !t.fromAccountId && t.toAccountId === mainAccountId) ||
+      (type === TransactionType.Saving && t.fromAccountId === mainAccountId && !!t.toAccountId) ||
+      (!!t.fromAccountId && t.toAccountId === mainAccountId);
     if (!inType) {
       return false;
     }
@@ -285,26 +264,30 @@ export class TransactionsIDBHelper {
       return false;
     }
 
-    let inAccount =
-      t.fromAccountId === accountId || t.toAccountId === accountId;
-    if (!inAccount) {
-      return false;
-    }
-
     if (searchByCategory) {
       if (categoryIds === null) {
         return t.categoryId === null;
       } else {
-        return categoryIds.includes(t.categoryId); 
+        return categoryIds.includes(t.categoryId);
       }
     }
 
     return true;
   }
 
-  async getExpendituresForCurrentMonth(
-    accountId: number
-  ): Promise<Array<TransactionModel>> {
+  private isExpense(fromAccountId: number, toAccountId: number) {
+    return !!fromAccountId && !toAccountId;
+  }
+
+  private isDeposit(fromAccountId: number, toAccountId: number) {
+    return !fromAccountId && !!toAccountId;
+  }
+
+  private isTransfer(fromAccountId: number, toAccountId: number) {
+    return !!fromAccountId && !!toAccountId;
+  }
+
+  async getExpendituresForCurrentMonth(accountId: number): Promise<Array<TransactionModel>> {
     const now = new Date();
     const from = new Date(now.getFullYear(), now.getMonth(), 1);
     const formatted = DateHelper.format(from);
@@ -312,59 +295,48 @@ export class TransactionsIDBHelper {
     const transactionsPromise = this.db.transactions
       .where("date")
       .aboveOrEqual(formatted)
-      .filter(
-        (t: TransactionModel) => t.fromAccountId === accountId && !t.toAccountId
-      )
+      .filter((t: TransactionModel) => t.fromAccountId === accountId && !t.toAccountId)
       .toArray();
 
     const categoriesPromise = this.db.categories.toArray();
 
     let transactions: Array<TransactionModel>;
-    await Promise.all([transactionsPromise, categoriesPromise]).then(
-      (result) => {
-        transactions = result[0];
-        const categories = result[1];
+    await Promise.all([transactionsPromise, categoriesPromise]).then((result) => {
+      transactions = result[0];
+      const categories = result[1];
 
-        for (const transaction of transactions) {
-          if (transaction.categoryId) {
-            const category = categories.find(x => x.id === transaction.categoryId);
-            transaction.categoryName = category.name;
-          }
+      for (const transaction of transactions) {
+        if (transaction.categoryId) {
+          const category = categories.find((x) => x.id === transaction.categoryId);
+          transaction.categoryName = category.name;
         }
       }
-    );
+    });
 
     return transactions;
   }
 
-  async getExpendituresFrom(
-    mainAccountId: number,
-    fromDate: Date
-  ): Promise<Array<TransactionModel>> {
+  async getExpendituresFrom(mainAccountId: number, fromDate: Date): Promise<Array<TransactionModel>> {
     const transactionsPromise = this.db.transactions
       .orderBy("date")
       .reverse()
       .filter(
         (t: TransactionModel) =>
-          (!fromDate || new Date(t.date) >= new Date(fromDate)) &&
-          t.fromAccountId === mainAccountId &&
-          !t.toAccountId
+          (!fromDate || new Date(t.date) >= new Date(fromDate)) && t.fromAccountId === mainAccountId && !t.toAccountId
       )
       .toArray();
 
     const categoriesPromise = this.db.categories.toArray();
 
     let transactions: Array<TransactionModel>;
-    await Promise.all([transactionsPromise, categoriesPromise]).then(
-      (result) => {
-        transactions = result[0];
-        const categories = result[1];
+    await Promise.all([transactionsPromise, categoriesPromise]).then((result) => {
+      transactions = result[0];
+      const categories = result[1];
 
-        for (const transaction of transactions) {
-          transaction.categoryName = this.getCategoryName(transaction.categoryId, categories);
-        }
+      for (const transaction of transactions) {
+        transaction.categoryName = this.getCategoryName(transaction.categoryId, categories);
       }
-    );
+    });
 
     return transactions;
   }
@@ -383,54 +355,45 @@ export class TransactionsIDBHelper {
       transaction.id = await this.generateId();
     }
 
-    await this.db.transaction(
-      "rw",
-      this.db.transactions,
-      this.db.upcomingExpenses,
-      async () => {
-        await this.db.transactions.add(transaction);
+    await this.db.transaction("rw", this.db.transactions, this.db.upcomingExpenses, async () => {
+      await this.db.transactions.add(transaction);
 
-        if (transaction.fromAccountId && !transaction.toAccountId) {
-          const relatedUpcomingExpenses = await this.db.upcomingExpenses
-            .filter(x => x.categoryId == transaction.categoryId)
-            .toArray();
+      if (transaction.fromAccountId && !transaction.toAccountId) {
+        const relatedUpcomingExpenses = await this.db.upcomingExpenses
+          .filter(
+            (x) =>
+              x.categoryId == transaction.categoryId &&
+              new Date(x.date).getFullYear() == new Date(transaction.date).getFullYear() &&
+              new Date(x.date).getMonth() == new Date(transaction.date).getMonth()
+          )
+          .toArray();
 
-          if (relatedUpcomingExpenses.length > 0) {
-            const transactionHasDescription = !!transaction.description;
+        if (relatedUpcomingExpenses.length > 0) {
+          const transactionHasDescription = !!transaction.description;
 
-            for (var upcomingExpense of relatedUpcomingExpenses) {
-              const upcomingExpenseHasDescription = !!upcomingExpense.description;
-              const bothWithDescriptionsAndTheyMatch =
-                upcomingExpenseHasDescription &&
-                transactionHasDescription &&
-                upcomingExpense.description.toUpperCase() ===
-                  transaction.description.toUpperCase();
+          for (var upcomingExpense of relatedUpcomingExpenses) {
+            const upcomingExpenseHasDescription = !!upcomingExpense.description;
+            const bothWithDescriptionsAndTheyMatch =
+              upcomingExpenseHasDescription &&
+              transactionHasDescription &&
+              upcomingExpense.description.toUpperCase() === transaction.description.toUpperCase();
 
-              if (
-                !upcomingExpenseHasDescription ||
-                bothWithDescriptionsAndTheyMatch
-              ) {
-                if (upcomingExpense.amount > transaction.amount) {
-                  upcomingExpense.amount -= transaction.amount;
-                  upcomingExpense.modifiedDate = new Date();
-                  await this.db.upcomingExpenses.update(
-                    upcomingExpense.id,
-                    upcomingExpense
-                  );
-                } else {
-                  await this.db.upcomingExpenses.delete(upcomingExpense.id);
-                }
+            if (!upcomingExpenseHasDescription || bothWithDescriptionsAndTheyMatch) {
+              if (upcomingExpense.amount > transaction.amount) {
+                upcomingExpense.amount -= transaction.amount;
+                upcomingExpense.modifiedDate = new Date();
+                await this.db.upcomingExpenses.update(upcomingExpense.id, upcomingExpense);
+              } else {
+                await this.db.upcomingExpenses.delete(upcomingExpense.id);
               }
             }
           }
         }
       }
-    );
+    });
   }
 
-  async createMultiple(
-    ...transactions: Array<TransactionModel>
-  ): Promise<void> {
+  async createMultiple(...transactions: Array<TransactionModel>): Promise<void> {
     let id = await this.generateId();
 
     for (const transaction of transactions) {
@@ -451,10 +414,7 @@ export class TransactionsIDBHelper {
     await this.db.transactions.delete(id);
   }
 
-  async sync(
-    deletedTransactionIds: Array<number>,
-    transactions: Array<TransactionModel>
-  ) {
+  async sync(deletedTransactionIds: Array<number>, transactions: Array<TransactionModel>) {
     await this.db.transaction("rw", this.db.transactions, async () => {
       if (deletedTransactionIds.length > 0) {
         await this.db.transactions.bulkDelete(deletedTransactionIds);
@@ -473,9 +433,7 @@ export class TransactionsIDBHelper {
   async getForSyncing(): Promise<Array<TransactionModel>> {
     const transactions = this.db.transactions.toCollection();
 
-    return transactions
-      .filter(t => !t.synced)
-      .toArray();
+    return transactions.filter((t) => !t.synced).toArray();
   }
 
   async consolidate(transactionIdPairs: Array<CreatedIdPair>) {
@@ -485,9 +443,7 @@ export class TransactionsIDBHelper {
 
     await this.db.transaction("rw", this.db.transactions, async () => {
       for (const transactionIdPair of transactionIdPairs) {
-        const transaction = await this.db.transactions.get(
-          transactionIdPair.localId
-        );
+        const transaction = await this.db.transactions.get(transactionIdPair.localId);
 
         await this.db.transactions.delete(transactionIdPair.localId);
 
@@ -511,12 +467,9 @@ export class TransactionsIDBHelper {
     const categoryIds = new Array<number>();
     categoryIds.push(categoryId);
 
-    const subCategories = await this.db.categories
-      .where("parentId")
-      .equals(categoryId)
-      .toArray();
+    const subCategories = await this.db.categories.where("parentId").equals(categoryId).toArray();
 
-    categoryIds.push(...subCategories.map(x => x.id));
+    categoryIds.push(...subCategories.map((x) => x.id));
 
     return categoryIds;
   }
@@ -525,10 +478,10 @@ export class TransactionsIDBHelper {
     if (categoryId === null) {
       return null;
     }
-    
-    const category = categories.find(x => x.id === categoryId);
+
+    const category = categories.find((x) => x.id === categoryId);
     if (category.parentId) {
-      const parent = categories.find(x => x.id === category.parentId);
+      const parent = categories.find((x) => x.id === category.parentId);
       return `${parent.name}/${category.name}`;
     } else {
       return category.name;

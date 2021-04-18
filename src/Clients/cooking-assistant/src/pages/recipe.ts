@@ -6,12 +6,14 @@ import { LocalStorageCurrencies } from "../../../shared/src/utils/localStorageCu
 import { ViewRecipe } from "models/viewmodels/viewRecipe";
 import { RecipesService } from "services/recipesService";
 import { Ingredient } from "models/viewmodels/ingredient";
+import { SharingState } from "models/viewmodels/sharingState";
 
 @inject(Router, I18N, RecipesService, LocalStorageCurrencies)
 export class Recipe {
   private recipeId: number;
   private model: ViewRecipe;
   private topDrawerIsOpen = false;
+  private shareButtonText: string;
   private copyButton: HTMLButtonElement;
   private copyAsTextCompleted = false;
   private editRecipeButtonIsLoading = false;
@@ -42,29 +44,13 @@ export class Recipe {
         if (viewRecipe === null) {
           this.router.navigateToRoute("notFound");
         } else {
-          const model = new ViewRecipe(
-            viewRecipe.id,
-            viewRecipe.name,
-            viewRecipe.description,
-            viewRecipe.ingredients,
-            viewRecipe.instructions,
-            viewRecipe.prepDuration,
-            viewRecipe.cookDuration,
-            viewRecipe.servings,
-            viewRecipe.imageUri,
-            viewRecipe.videoUrl,
-            viewRecipe.lastOpenedDate,
-            viewRecipe.nutritionSummary,
-            viewRecipe.costSummary
-          );
-
-          this.servingsSelectorIsVisible = model.ingredients.some(
+          this.servingsSelectorIsVisible = viewRecipe.ingredients.some(
             (ingredient: Ingredient) => {
               return !!ingredient.amount;
             }
           );
 
-          this.model = model;
+          this.model = viewRecipe;
 
           if (this.model.videoUrl) {
             this.videoIFrameSrc = this.recipesService.videoUrlToEmbedSrc(
@@ -76,6 +62,11 @@ export class Recipe {
               this.videoIFrameSrc
             );
           }
+
+          this.shareButtonText =
+            this.model.sharingState === SharingState.NotShared
+              ? this.i18n.tr("recipe.shareRecipe")
+              : this.i18n.tr("recipe.members");
 
           this.copyButton.addEventListener("click", () => {
             this.copyAsText();

@@ -82,7 +82,7 @@ namespace Api.Controllers.Accountant
 
             var changedVm = new ChangedVm
             {
-                LastSynced = DateTime.Now,
+                LastSynced = DateTime.UtcNow,
                 DeletedAccountIds = await _accountService.GetDeletedIdsAsync(getDeletedIds),
                 Accounts = accounts,
                 DeletedCategoryIds = await _categoryService.GetDeletedIdsAsync(getDeletedIds),

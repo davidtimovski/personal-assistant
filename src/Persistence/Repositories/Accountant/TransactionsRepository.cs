@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Common;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.Extensions.Options;
+using Persistence;
 using PersonalAssistant.Application.Contracts.Accountant.Transactions;
 using PersonalAssistant.Domain.Entities.Accountant;
 
@@ -12,13 +12,12 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 {
     public class TransactionsRepository : BaseRepository, ITransactionsRepository
     {
-        public TransactionsRepository(IOptions<DatabaseSettings> databaseSettings)
-            : base(databaseSettings.Value.DefaultConnectionString) { }
+        public TransactionsRepository(PersonalAssistantContext efContext)
+            : base(efContext) { }
 
         public async Task<IEnumerable<Transaction>> GetAllForExportAsync(int userId, string uncategorized)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             var sql = @"SELECT t.*, fa.""Id"", fa.""Name"", ta.""Id"", ta.""Name"", c.""Id"", c.""Name"", pc.""Id"", pc.""Name""
                         FROM ""Accountant.Transactions"" AS t
@@ -44,7 +43,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
                         {
                             category.Name = $"{parentCategory.Name}/{category.Name}";
                         }
-                        
+
                         transaction.Category = category;
                     }
 
@@ -56,8 +55,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
         public async Task<IEnumerable<Transaction>> GetAllAsync(int userId, DateTime fromModifiedDate)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.QueryAsync<Transaction>(@"SELECT t.* 
                                                         FROM ""Accountant.Transactions"" AS t
@@ -69,8 +67,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
         public async Task<IEnumerable<Transaction>> GetAllAsync(int userId, int categoryId, DateTime from, DateTime to)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.QueryAsync<Transaction>(@"SELECT t.* 
                                                         FROM ""Accountant.Transactions"" AS t 
@@ -85,8 +82,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
         public async Task<bool> AnyAsync(int userId, int categoryId, DateTime from)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) 
                                                         FROM ""Accountant.Transactions"" AS t 
@@ -101,21 +97,20 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
         public async Task<IEnumerable<int>> GetDeletedIdsAsync(int userId, DateTime fromDate)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
 
             return await conn.QueryAsync<int>(@"SELECT ""EntityId"" FROM ""Accountant.DeletedEntities"" WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""DeletedDate"" > @DeletedDate",
                 new { UserId = userId, EntityType = (short)EntityType.Transaction, DeletedDate = fromDate });
         }
 
-        public async Task<int> CreateAsync(Transaction transaction, DbConnection uowConn = null, DbTransaction uowTransaction = null)
+        public async Task<int> CreateAsync(Transaction transaction, IDbConnection uowConn = null, IDbTransaction uowTransaction = null)
         {
+            using IDbConnection conn = OpenConnection();
+
             int id;
 
             if (uowConn == null && uowTransaction == null)
             {
-                using DbConnection conn = Connection;
-                await conn.OpenAsync();
                 var dbTransaction = conn.BeginTransaction();
 
                 id = (await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.Transactions"" 
@@ -126,8 +121,11 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
                 if (transaction.Amount < 0)
                 {
-                    var relatedUpcomingExpenses = await conn.QueryAsync<UpcomingExpense>(@"SELECT * FROM ""Accountant.UpcomingExpenses"" WHERE ""CategoryId"" = @CategoryId",
-                        new { transaction.CategoryId });
+                    var relatedUpcomingExpenses = conn.Query<UpcomingExpense>(@"SELECT * FROM ""Accountant.UpcomingExpenses""
+                                                                                WHERE ""CategoryId"" = @CategoryId 
+                                                                                    AND EXTRACT(year FROM ""Date"") = @Year
+                                                                                    AND EXTRACT(month FROM ""Date"") = @Month",
+                        new { transaction.CategoryId, transaction.Date.Year, transaction.Date.Month });
 
                     if (relatedUpcomingExpenses.Any())
                     {
@@ -154,7 +152,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
                                     await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.DeletedEntities"" (""UserId"", ""EntityType"", ""EntityId"", ""DeletedDate"")
                                          VALUES (@UserId, @EntityType, @EntityId, @DeletedDate)",
-                                         new { UserId = upcomingExpense.UserId, EntityType = (short)EntityType.UpcomingExpense, EntityId = upcomingExpense.Id, DeletedDate = DateTime.Now },
+                                         new { UserId = upcomingExpense.UserId, EntityType = (short)EntityType.UpcomingExpense, EntityId = upcomingExpense.Id, DeletedDate = DateTime.UtcNow },
                                          dbTransaction);
                                 }
                             }
@@ -178,22 +176,29 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
         public async Task UpdateAsync(Transaction transaction)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            Transaction dbTransaction = EFContext.Transactions.Find(transaction.Id);
 
-            await conn.ExecuteAsync(@"UPDATE ""Accountant.Transactions"" SET ""FromAccountId"" = @FromAccountId, ""ToAccountId"" = @ToAccountId, 
-                                        ""CategoryId"" = @CategoryId, 
-                                        ""Amount"" = @Amount, ""FromStocks"" = @FromStocks, ""ToStocks"" = @ToStocks, 
-                                        ""Currency"" = @Currency, ""Description"" = @Description, ""Date"" = @Date, 
-                                        ""IsEncrypted"" = @IsEncrypted, ""EncryptedDescription"" = @EncryptedDescription, ""Salt"" = @Salt,
-                                        ""Nonce"" = @Nonce, ""ModifiedDate"" = @ModifiedDate WHERE ""Id"" = @Id",
-                                        transaction);
+            dbTransaction.FromAccountId = transaction.FromAccountId;
+            dbTransaction.ToAccountId = transaction.ToAccountId;
+            dbTransaction.CategoryId = transaction.CategoryId;
+            dbTransaction.Amount = transaction.Amount;
+            dbTransaction.FromStocks = transaction.FromStocks;
+            dbTransaction.ToStocks = transaction.ToStocks;
+            dbTransaction.Currency = transaction.Currency;
+            dbTransaction.Description = transaction.Description;
+            dbTransaction.Date = transaction.Date;
+            dbTransaction.IsEncrypted = transaction.IsEncrypted;
+            dbTransaction.EncryptedDescription = transaction.EncryptedDescription;
+            dbTransaction.Salt = transaction.Salt;
+            dbTransaction.Nonce = transaction.Nonce;
+            dbTransaction.ModifiedDate = transaction.ModifiedDate;
+
+            await EFContext.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id, int userId)
         {
-            using DbConnection conn = Connection;
-            await conn.OpenAsync();
+            using IDbConnection conn = OpenConnection();
             var transaction = conn.BeginTransaction();
 
             var deletedEntryExists = await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
@@ -205,14 +210,14 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
             {
                 await conn.QueryAsync<int>(@"UPDATE ""Accountant.DeletedEntities"" SET ""DeletedDate"" = @DeletedDate
                                              WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""EntityId"" = @EntityId",
-                                             new { UserId = userId, EntityType = (short)EntityType.Transaction, EntityId = id, DeletedDate = DateTime.Now },
+                                             new { UserId = userId, EntityType = (short)EntityType.Transaction, EntityId = id, DeletedDate = DateTime.UtcNow },
                                              transaction);
             }
             else
             {
                 await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.DeletedEntities"" (""UserId"", ""EntityType"", ""EntityId"", ""DeletedDate"")
                                          VALUES (@UserId, @EntityType, @EntityId, @DeletedDate)",
-                                         new { UserId = userId, EntityType = (short)EntityType.Transaction, EntityId = id, DeletedDate = DateTime.Now },
+                                         new { UserId = userId, EntityType = (short)EntityType.Transaction, EntityId = id, DeletedDate = DateTime.UtcNow },
                                          transaction);
             }
 

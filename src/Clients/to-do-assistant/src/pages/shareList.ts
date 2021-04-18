@@ -10,8 +10,9 @@ import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
 import { AuthService } from "../../../shared/src/services/authService";
+import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+
 import { ListsService } from "services/listsService";
-import { LocalStorage } from "utils/localStorage";
 import { ListWithShares } from "models/viewmodels/listWithShares";
 import { Share } from "models/viewmodels/share";
 import { CanShareList } from "models/viewmodels/canShareList";
@@ -24,7 +25,6 @@ import * as Actions from "utils/state/actions";
   ListsService,
   ValidationController,
   I18N,
-  LocalStorage,
   EventAggregator
 )
 export class ShareList {
@@ -51,7 +51,6 @@ export class ShareList {
     private readonly listsService: ListsService,
     private readonly validationController: ValidationController,
     private readonly i18n: I18N,
-    private readonly localStorage: LocalStorage,
     private readonly eventAggregator: EventAggregator
   ) {
     this.validationController.validateTrigger = validateTrigger.manual;
@@ -59,7 +58,7 @@ export class ShareList {
 
     this.emailPlaceholderText = this.i18n.tr("shareList.newMemberEmail");
 
-    this.eventAggregator.subscribe("alert-hidden", () => {
+    this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.emailIsInvalid = false;
     });
   }
@@ -91,7 +90,7 @@ export class ShareList {
     ValidationRules.ensure((x: Share) => x.email)
       .required()
       .email()
-      .satisfies((email) => email !== this.currentUserEmail)
+      .satisfies((email) => email.trim().toLowerCase() !== this.currentUserEmail)
       .on(this.selectedShare);
   }
 
@@ -104,7 +103,7 @@ export class ShareList {
   }
 
   async addShare() {
-    this.eventAggregator.publish("reset-alert-error");
+    this.eventAggregator.publish(AlertEvents.HideError);
 
     const email = this.selectedShare.email.trim();
 
@@ -130,14 +129,14 @@ export class ShareList {
       if (canShareVM.userId === 0) {
         this.emailIsInvalid = true;
         this.eventAggregator.publish(
-          "alert-error",
+          AlertEvents.ShowError,
           "shareList.userDoesntExist"
         );
       } else {
         if (!canShareVM.canShare) {
           this.emailIsInvalid = true;
           this.eventAggregator.publish(
-            "alert-error",
+            AlertEvents.ShowError,
             "shareList.cannotShareWithUser"
           );
         } else {
@@ -262,19 +261,19 @@ export class ShareList {
 
     await Actions.getLists(this.listsService);
 
-    if (this.editedShares.length + this.removeShare.length > 0) {
+    if (this.editedShares.length + this.removedShares.length > 0) {
       this.eventAggregator.publish(
-        "alert-success",
+        AlertEvents.ShowSuccess,
         "shareList.sharingDetailsSaved"
       );
     } else if (this.newShares.length === 1) {
       this.eventAggregator.publish(
-        "alert-success",
+        AlertEvents.ShowSuccess,
         "shareList.shareRequestSent"
       );
     } else if (this.newShares.length > 1) {
       this.eventAggregator.publish(
-        "alert-success",
+        AlertEvents.ShowSuccess,
         "shareList.shareRequestsSent"
       );
     }
