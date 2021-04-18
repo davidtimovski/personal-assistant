@@ -7,7 +7,7 @@ name: Build and push
 on:
   push:
     # branches: [ main ]
-    branches: [ feature/docker ]
+    branches: [ dev ]
 
 # when `Testing dotnet` finished
 # on:
@@ -17,10 +17,10 @@ on:
       # - completed
   
 env:
-  REGISTRY_URL: registry.hub.docker.com # ${{ secrets.REGISTRY_URL }}
-  REGISTRY_IMAGE: martinsimonovski/personal-assistant # ${{ secrets.REGISTRY_IMAGE }}
-  REGISTRY_USERNAME: martinsimonovski # ${{ secrets.REGISTRY_USERNAME }}
-  REGISTRY_TOKEN: 57579ed0-c68d-40b9-9cab-e1f4fae64a9b # ${{ secrets.REGISTRY_TOKEN }}
+  REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
+  REGISTRY_IMAGE: ${{ secrets.REGISTRY_IMAGE }}
+  REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+  REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
 
 jobs:
   build:
