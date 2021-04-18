@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   auth:
-    image: ${DOCKER_REGISTRY-personalassistant}-auth:${PLATFORM:-linux}-${TAG:-latest}
+    image: personalassistant-auth:latest
     container_name: personalassistant-auth
     build:
       context: .
@@ -12,7 +12,7 @@ services:
       - rabbitmq
 
   api:
-    image: ${DOCKER_REGISTRY-personalassistant}-api:${PLATFORM:-linux}-${TAG:-latest}
+    image: personalassistant-api:latest
     container_name: personalassistant-api
     build:
       context: .
@@ -22,7 +22,7 @@ services:
       - rabbitmq
   
   sender:
-    image: ${DOCKER_REGISTRY-personalassistant}-sender:${PLATFORM:-linux}-${TAG:-latest}
+    image: personalassistant-sender:latest
     container_name: personalassistant-sender
     build:
       context: .
