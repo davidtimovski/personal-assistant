@@ -10,14 +10,7 @@ services:
       - EventBusConnection=${EVENT_BUS_HOST}
       - EventBusUserName=${EVENT_BUS_USERNAME}
       - EventBusPassword=${EVENT_BUS_PASSWORD}
-      - AdminEmail=${ADMIN_EMAIL}
-      - ReCaptchaSecret=${RECAPTCHA_SECRET}
-      - Certificate__Name=${CERTIFICATE_NAME}
-      - Certificate__Password=${CERTIFICATE_PASSWORD}
-      - Cloudinary__ApiKey=${CLOUDINARY_API_KEY}
-      - Cloudinary__ApiSecret=${CLOUDINARY_API_SECRET}
-      - ApplicationInsights__InstrumentationKey=${AUTH_APP_INSIGHTS_KEY}
-      - KeyVault__ClientSecret=${AUTH_KEY_VAULT_SECRET}
+      - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
       - PORT=80
     ports:
       - "5000:80"
@@ -34,13 +27,10 @@ services:
     restart: always
     environment:
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - ConnectionString=${PERSONAL_ASSISTANT_DB} 
       - EventBusConnection=${EVENT_BUS_HOST}
       - EventBusUserName=${EVENT_BUS_USERNAME}
       - EventBusPassword=${EVENT_BUS_PASSWORD}
-      - Cloudinary__ApiKey=${CLOUDINARY_API_KEY}
-      - Cloudinary__ApiSecret=${CLOUDINARY_API_SECRET}
-      - ApplicationInsights__InstrumentationKey=${API_APP_INSIGHTS_KEY}
+      - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
       - PORT=80
     ports:
       - "5001:80"
@@ -55,15 +45,10 @@ services:
     container_name: pa-sender
     restart: always
     environment:
-      - ConnectionString=${PERSONAL_ASSISTANT_DB} 
       - EventBusConnection=${EVENT_BUS_HOST}
       - EventBusUserName=${EVENT_BUS_USERNAME}
       - EventBusPassword=${EVENT_BUS_PASSWORD}
-      - SendGridApiKey=${SENDGRID_API_KEY}
-      - ToDoAssistantVapid__PublicKey=${TODO_VAPID_PUBLIC_KEY}
-      - ToDoAssistantVapid__PrivateKey=${TODO_VAPID_PRIVATE_KEY}
-      - CookingAssistantVapid__PublicKey=${COOKING_VAPID_PUBLIC_KEY}
-      - CookingAssistantVapid__PrivateKey=${COOKING_VAPID_PRIVATE_KEY}
+      - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
     depends_on:
       - postgres
       - rabbitmq
