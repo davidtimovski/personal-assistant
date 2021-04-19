@@ -38,15 +38,10 @@ msbuild.wrn
 
 # My
 **/*.pfx
-DevOps/.pgpass
-DevOps/crontab.txt
-DevOps/personalassistant-backup.sh
+DevOps/
 src/Api/currencyrates.json
 src/Api/temp/
 **/publish.ps1
 **/Publish.lnk
 tempkey.jwk
-src/Api/storage
-src/Auth/certs
-
 .env
