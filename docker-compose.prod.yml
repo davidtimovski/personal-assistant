@@ -7,7 +7,6 @@ services:
     restart: always
     environment:
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - ConnectionString=${PERSONAL_ASSISTANT_DB} 
       - EventBusConnection=${EVENT_BUS_HOST}
       - EventBusUserName=${EVENT_BUS_USERNAME}
       - EventBusPassword=${EVENT_BUS_PASSWORD}
@@ -18,6 +17,7 @@ services:
       - Cloudinary__ApiKey=${CLOUDINARY_API_KEY}
       - Cloudinary__ApiSecret=${CLOUDINARY_API_SECRET}
       - ApplicationInsights__InstrumentationKey=${AUTH_APP_INSIGHTS_KEY}
+      - KeyVault__ClientSecret=${AUTH_KEY_VAULT_SECRET}
       - PORT=80
     ports:
       - "5000:80"

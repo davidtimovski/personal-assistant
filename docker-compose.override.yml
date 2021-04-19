@@ -5,11 +5,11 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - ConnectionString=${PERSONAL_ASSISTANT_DB:-Server=postgres;Database=personalassistant;User Id=postgres;Password=postgres;Pooling=true} 
       - EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
       - EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
       - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
       - AdminEmail=${ADMIN_EMAIL}
+      - KeyVault__ClientSecret=${AUTH_KEY_VAULT_SECRET}
       - PORT=80
     volumes:
       - ./certs:/app/certs:z
