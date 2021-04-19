@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using PersonalAssistant.Application;
 using PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles.Models;
 using PersonalAssistant.Infrastructure;
@@ -99,12 +100,13 @@ namespace Api
 
         public void Configure(IApplicationBuilder app)
         {
-            if (WebHostEnvironment.EnvironmentName == "Development")
+            if (WebHostEnvironment.EnvironmentName == Environments.Development)
             {
                 var telemetryConfiguration = app.ApplicationServices.GetService<TelemetryConfiguration>();
                 telemetryConfiguration.DisableTelemetry = true;
 
                 app.UseDeveloperExceptionPage();
+                app.UseHttpsRedirection();
             }
 
             app.UseExceptionHandler("/error");

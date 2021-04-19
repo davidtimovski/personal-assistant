@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <ApplicationInsightsResourceId>/subscriptions/438b0478-3c19-4c43-8ac7-51c7a19c4f76/resourcegroups/PersonalAssistant/providers/microsoft.insights/components/PersonalAssistant</ApplicationInsightsResourceId>
-    <ApplicationInsightsAnnotationResourceId>/subscriptions/438b0478-3c19-4c43-8ac7-51c7a19c4f76/resourceGroups/PersonalAssistant/providers/microsoft.insights/components/PersonalAssistant</ApplicationInsightsAnnotationResourceId>
     <LangVersion>8.0</LangVersion>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
@@ -87,6 +85,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Connected Services\" />
     <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
 

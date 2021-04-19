@@ -16,10 +16,10 @@ namespace PersonalAssistant.Sender
     {
         static async Task Main()
         {
-            var hostBuilder = new HostBuilder()
-                .ConfigureAppConfiguration((context, config) =>
+            var hostBuilder = Host.CreateDefaultBuilder()
+                .ConfigureAppConfiguration((hostContext, config) =>
                 {
-                    if (context.HostingEnvironment.EnvironmentName == "Production")
+                    if (hostContext.HostingEnvironment.EnvironmentName == Environments.Production)
                     {
                         var builtConfiguration = config.Build();
 
@@ -33,11 +33,6 @@ namespace PersonalAssistant.Sender
                         var client = new SecretClient(new Uri(url), credential);
                         config.AddAzureKeyVault(client, new AzureKeyVaultConfigurationOptions());
                     }
-
-                    config.SetBasePath(Directory.GetCurrentDirectory());
-                    config.AddJsonFile("appsettings.json", false);
-                    config.AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", true, true);
-                    config.AddEnvironmentVariables();
                 })
                 .ConfigureLogging((hostContext, logging) =>
                 {

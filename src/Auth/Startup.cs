@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
 using PersonalAssistant.Application;
 using PersonalAssistant.Infrastructure;
@@ -95,7 +96,7 @@ namespace Auth
                     options.TokenCleanupInterval = 30;
                 });
 
-            if (WebHostEnvironment.EnvironmentName == "Development")
+            if (WebHostEnvironment.EnvironmentName == Environments.Development)
             {
                 identityServerBuilder.AddDeveloperSigningCredential();
             }
@@ -139,11 +140,13 @@ namespace Auth
 
         public void Configure(IApplicationBuilder app)
         {
-            if (WebHostEnvironment.EnvironmentName == "Development")
+            if (WebHostEnvironment.EnvironmentName == Environments.Development)
             {
                 var telemetryConfiguration = app.ApplicationServices.GetService<TelemetryConfiguration>();
                 telemetryConfiguration.DisableTelemetry = true;
+
                 app.UseDeveloperExceptionPage();
+                app.UseHttpsRedirection();
             }
             else
             {

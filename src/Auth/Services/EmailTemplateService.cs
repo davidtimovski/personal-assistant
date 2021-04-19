@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
 using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Infrastructure.Sender.Models;
@@ -87,7 +88,7 @@ namespace Auth.Services
 
         public async Task EnqueueNewRegistrationEmailAsync(string newUserName, string newUserEmail)
         {
-            if (_env.EnvironmentName == "Production")
+            if (_env.EnvironmentName == Environments.Production)
             {
                 var email = new Email
                 {
@@ -113,7 +114,7 @@ namespace Auth.Services
 
         public async Task EnqueueNewEmailVerificationEmailAsync(string newUserName, string newUserEmail)
         {
-            if (_env.EnvironmentName == "Production")
+            if (_env.EnvironmentName == Environments.Production)
             {
                 var email = new Email
                 {

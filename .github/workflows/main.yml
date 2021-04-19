@@ -6,8 +6,7 @@ name: Build and push
 # on every push to specific branch
 on:
   push:
-    # branches: [ main ]
-    branches: [ dev ]
+    branches: [ master ]
 
 # when `Testing dotnet` finished
 # on:

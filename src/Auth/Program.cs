@@ -5,6 +5,7 @@ using Azure.Security.KeyVault.Secrets;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 
 namespace Auth
@@ -20,7 +21,7 @@ namespace Auth
             WebHost.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration((context, config) =>
             {
-                if (context.HostingEnvironment.EnvironmentName == "Production")
+                if (context.HostingEnvironment.EnvironmentName == Environments.Production)
                 {
                     var builtConfiguration = config.Build();
 

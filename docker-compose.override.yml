@@ -23,7 +23,7 @@ services:
       - EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
       - EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
       - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
-      - KeyVault__ClientSecret=${API_KEY_VAULT_SECRET}
+      - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
       - PORT=80
     volumes:
       - ./src/Api/storage:/app/storage:z
@@ -32,14 +32,15 @@ services:
 
   sender:
     environment:
+      - ASPNETCORE_ENVIRONMENT=Development
       - EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
       - EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
       - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
-      - KeyVault__ClientSecret=${SENDER_KEY_VAULT_SECRET}
+      - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
 
 #  worker:
 #    environment:
-#      - ConnectionString=${PERSONAL_ASSISTANT_DB:-Server=postgres;Database=personalassistant;User Id=postgres;Password=postgres;Pooling=true} 
+#      - ASPNETCORE_ENVIRONMENT=Development
 
   postgres:
     ports:
