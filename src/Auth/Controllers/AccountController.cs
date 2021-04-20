@@ -6,7 +6,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Auth.Models;
-using Auth.Models.Config;
 using Auth.Services;
 using Auth.ViewModels.Account;
 using Auth.ViewModels.Home;
@@ -23,9 +22,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using PersonalAssistant.Application.Contracts.Accountant.Accounts;
 using PersonalAssistant.Application.Contracts.Accountant.Accounts.Models;
@@ -50,7 +49,7 @@ namespace Auth.Controllers
         private readonly IRecipeService _recipeService;
         private readonly ICdnService _cdnService;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly AppSettings _appSettings;
+        private readonly IConfiguration _configuration;
         private readonly IStringLocalizer<AccountController> _localizer;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<AccountController> _logger;
@@ -67,7 +66,7 @@ namespace Auth.Controllers
             IRecipeService recipeService,
             ICdnService cdnService,
             IHttpClientFactory httpClientFactory,
-            IOptions<AppSettings> appSettingsOptions,
+            IConfiguration configuration,
             IStringLocalizer<AccountController> localizer,
             IWebHostEnvironment webHostEnvironment,
             ILogger<AccountController> logger)
@@ -83,7 +82,7 @@ namespace Auth.Controllers
             _recipeService = recipeService;
             _cdnService = cdnService;
             _httpClientFactory = httpClientFactory;
-            _appSettings = appSettingsOptions.Value;
+            _configuration = configuration;
             _localizer = localizer;
             _webHostEnvironment = webHostEnvironment;
             _logger = logger;
@@ -162,12 +161,14 @@ namespace Auth.Controllers
                     }
                     return RedirectToAction(nameof(HomeController.Overview), "Home");
                 }
+
                 if (result.IsNotAllowed)
                 {
                     await _events.RaiseAsync(new UserLoginFailureEvent(model.Email, "Email confirmation required", clientId: context?.Client.ClientId));
 
                     return RedirectToAction(nameof(AccountController.Login), new { model.ReturnUrl, alert = LoginAlert.EmailConfirmationRequired });
                 }
+
                 if (result.IsLockedOut)
                 {
                     await _events.RaiseAsync(new UserLoginFailureEvent(model.Email, "Locked out", clientId: context?.Client.ClientId));
@@ -448,12 +449,12 @@ namespace Auth.Controllers
         {
             using var content = new FormUrlEncodedContent(new[]
             {
-                new KeyValuePair<string, string>("secret", _appSettings.ReCaptchaSecret),
+                new KeyValuePair<string, string>("secret", _configuration["ReCaptchaSecret"]),
                 new KeyValuePair<string, string>("response", model.Token)
             });
 
             using HttpClient httpClient = _httpClientFactory.CreateClient();
-            var result = await httpClient.PostAsync(new Uri(_appSettings.ReCaptchaVerificationUrl), content);
+            var result = await httpClient.PostAsync(new Uri(_configuration["ReCaptchaVerificationUrl"]), content);
             var response = JsonConvert.DeserializeObject<ReCaptchaResponse>(await result.Content.ReadAsStringAsync());
 
             return Ok(response.Score);
@@ -523,7 +524,7 @@ namespace Auth.Controllers
                 Language = user.Language,
                 ImageUri = user.ImageUri,
                 DefaultImageUri = _cdnService.GetDefaultProfileImageUri(),
-                BaseUrl = _appSettings.Urls.PersonalAssistant
+                BaseUrl = _configuration["Urls:PersonalAssistant"]
             };
 
             return View(viewProfileViewModel);

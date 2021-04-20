@@ -1,0 +1,66 @@
+version: '3.4'
+
+services:
+  auth:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
+      - EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
+      - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
+      - AdminEmail=${ADMIN_EMAIL}
+      - PORT=80
+    volumes:
+      - ./certs:/app/certs:z
+    ports:
+      - "5000:80"
+  
+  api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
+      - EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
+      - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
+      - PORT=80
+    volumes:
+      - ./src/Api/storage:/app/storage:z
+    ports:
+      - "5001:80"
+
+  sender:
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+      - EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
+      - EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
+      - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
+      - SendGridApiKey=${SENDGRID_API_KEY}
+      - ToDoAssistantVapid__PublicKey=${TODO_VAPID_PUBLIC_KEY}
+      - ToDoAssistantVapid__PrivateKey=${TODO_VAPID_PRIVATE_KEY}
+      - CookingAssistantVapid__PublicKey=${COOKING_VAPID_PUBLIC_KEY}
+      - CookingAssistantVapid__PrivateKey=${COOKING_VAPID_PRIVATE_KEY}
+      
+#  worker:
+#    environment:
+#      - DOTNET_ENVIRONMENT=Development
+
+  postgres:
+    ports:
+      - '5444:5432'
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - personalassistant-volume:/var/lib/postgresql/data
+
+  rabbitmq:
+    environment:
+      RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE:-cookie}
+      RABBITMQ_DEFAULT_USER: ${EVENT_BUS_USERNAME:-rabbitmq}
+      RABBITMQ_DEFAULT_PASS: ${EVENT_BUS_PASSWORD:-rabbitmq}
+    ports:
+      - "15672:15672"  # Important: In a production environment your should remove the external port
+      - "5672:5672"    # Important: In a production environment your should remove the external port
+
+volumes:
+  personalassistant-volume:

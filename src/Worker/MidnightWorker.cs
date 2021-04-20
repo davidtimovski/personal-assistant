@@ -97,6 +97,11 @@ namespace PersonalAssistant.WorkerService
             }
             catch (Exception ex)
             {
+                if (!File.Exists(_currencyRatesFilePath))
+                {
+                    File.Create(_currencyRatesFilePath);
+                }
+
                 _logger.LogError(ex, "GetAndSaveCurrencyRates failed");
                 throw;
             }

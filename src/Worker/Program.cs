@@ -48,7 +48,7 @@ namespace PersonalAssistant.WorkerService
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddInfrastructure(hostContext.Configuration, hostContext.HostingEnvironment.EnvironmentName);
-                    services.AddPersistence(hostContext.Configuration["ConnectionStrings:DefaultConnection"]);
+                    services.AddPersistence(hostContext.Configuration["ConnectionString"]);
                     services.AddApplication(hostContext.Configuration);
 
                     services.AddOptions();

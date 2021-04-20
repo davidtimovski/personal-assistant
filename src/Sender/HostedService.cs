@@ -2,12 +2,13 @@
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using PersonalAssistant.Application.Contracts.Common;
+using Npgsql;
 using PersonalAssistant.Sender.Contracts;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -21,21 +22,31 @@ namespace PersonalAssistant.Sender
     {
         private readonly ILogger<HostedService> _logger;
         private readonly IConfiguration _configuration;
-        private readonly IPushSubscriptionsRepository _pushSubscriptionsRepository;
 
         public HostedService(
             ILogger<HostedService> logger,
-            IConfiguration configuration,
-            IPushSubscriptionsRepository pushSubscriptionsRepository)
+            IConfiguration configuration)
         {
             _logger = logger;
             _configuration = configuration;
-            _pushSubscriptionsRepository = pushSubscriptionsRepository;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            var factory = new ConnectionFactory();
+            var factory = new ConnectionFactory
+            {
+                HostName = _configuration["EventBusConnection"]
+            };
+
+            if (!string.IsNullOrEmpty(_configuration["EventBusUserName"]))
+            {
+                factory.UserName = _configuration["EventBusUserName"];
+            }
+
+            if (!string.IsNullOrEmpty(_configuration["EventBusPassword"]))
+            {
+                factory.Password = _configuration["EventBusPassword"];
+            }
 
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
@@ -75,6 +86,7 @@ namespace PersonalAssistant.Sender
                 try
                 {
                     await client.SendEmailAsync(emailMessage);
+                    _logger.LogDebug($"Sending email to: {to}");
                 }
                 catch (Exception ex)
                 {
@@ -98,7 +110,12 @@ namespace PersonalAssistant.Sender
                 string message = Encoding.UTF8.GetString(body.ToArray());
                 var pushNotification = JsonConvert.DeserializeObject<PushNotification>(message);
 
-                var recipientSubs = await _pushSubscriptionsRepository.GetAllAsync(pushNotification.UserId, pushNotification.Application);
+                var conn = new NpgsqlConnection(_configuration["ConnectionString"]);
+                conn.Open();
+
+                var recipientSubs = conn.Query<Domain.Entities.Common.PushSubscription>(@"SELECT * FROM ""PushSubscriptions"" WHERE ""UserId"" = @UserId AND ""Application"" = @Application",
+                    new { pushNotification.UserId, pushNotification.Application });
+
                 string appVapidConfigPrefix = pushNotification.Application.Replace(" ", string.Empty, StringComparison.Ordinal);
 
                 try
@@ -131,7 +148,7 @@ namespace PersonalAssistant.Sender
                         }
                         catch (WebPushException ex) when (ex.Message == "Subscription no longer valid")
                         {
-                            await _pushSubscriptionsRepository.DeleteSubscriptionAsync(recipientSub.Id);
+                            conn.Execute(@"DELETE FROM ""PushSubscriptions"" WHERE ""Id"" = @Id", new { recipientSub.Id });
                         }
                     }
                 }

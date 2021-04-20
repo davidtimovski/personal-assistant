@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
+using Auth.Models;
+using Auth.Services;
 using FluentValidation.AspNetCore;
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
@@ -11,9 +13,7 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
-#if !DEBUG
 using Microsoft.AspNetCore.HttpOverrides;
-#endif
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,15 +21,13 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
-using Auth.Models;
-using Auth.Models.Config;
+using PersonalAssistant.Application;
 using PersonalAssistant.Infrastructure;
-using Serilog;
 using PersonalAssistant.Infrastructure.Identity;
 using PersonalAssistant.Persistence;
-using PersonalAssistant.Application;
-using Auth.Services;
+using Serilog;
 
 namespace Auth
 {
@@ -47,12 +45,12 @@ namespace Auth
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddInfrastructure(Configuration, WebHostEnvironment.EnvironmentName);
-            services.AddPersistence(Configuration["ConnectionStrings:DefaultConnection"]);
+            services.AddPersistence(Configuration["ConnectionString"]);
             services.AddApplication(Configuration);
 
             services.AddDbContext<PersonalAssistantAuthContext>(options =>
             {
-                options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"));
+                options.UseNpgsql(Configuration["ConnectionString"]);
             });
 
             services.AddIdentity<ApplicationUser, IdentityRole<int>>(config =>
@@ -70,8 +68,10 @@ namespace Auth
 
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
 
-            services.AddIdentityServer(options =>
+            var identityServerBuilder = services.AddIdentityServer(options =>
             {
+                options.IssuerUri = Configuration["Urls:IssuerUri"];
+
                 options.Events.RaiseErrorEvents = true;
                 options.Events.RaiseInformationEvents = true;
                 options.Events.RaiseFailureEvents = true;
@@ -82,24 +82,32 @@ namespace Auth
                 .AddConfigurationStore(options =>
                 {
                     options.ConfigureDbContext = builder =>
-                        builder.UseNpgsql(Configuration["ConnectionStrings:DefaultConnection"],
+                        builder.UseNpgsql(Configuration["ConnectionString"],
                             sql => sql.MigrationsAssembly(migrationsAssembly));
                 })
                 .AddOperationalStore(options =>
                 {
                     options.ConfigureDbContext = builder =>
-                        builder.UseNpgsql(Configuration["ConnectionStrings:DefaultConnection"],
+                        builder.UseNpgsql(Configuration["ConnectionString"],
                             sql => sql.MigrationsAssembly(migrationsAssembly));
 
                     // This enables automatic token cleanup. This is optional.
                     options.EnableTokenCleanup = true;
                     options.TokenCleanupInterval = 30;
-                })
-                .AddSigningCredential(new X509Certificate2(Directory.GetCurrentDirectory() + "/" + Configuration["Certificate:Name"], Configuration["Certificate:Password"]));
+                });
 
-            services.AddDataProtection()
-                .PersistKeysToFileSystem(new DirectoryInfo(Configuration["AuthKeysDirectory"]))
-                .ProtectKeysWithCertificate(new X509Certificate2(Directory.GetCurrentDirectory() + "/" + Configuration["Certificate:Name"], Configuration["Certificate:Password"]));
+            if (WebHostEnvironment.EnvironmentName == Environments.Development)
+            {
+                identityServerBuilder.AddDeveloperSigningCredential();
+            }
+            else
+            {
+                var dataProtectionBuilder = services.AddDataProtection()
+                    .PersistKeysToFileSystem(new DirectoryInfo(Configuration["SessionKeysDirectory"]));
+
+                identityServerBuilder.AddSigningCredential(new X509Certificate2(Configuration["Certificate:Directory"] + Configuration["Certificate:Name"], Configuration["Certificate:Password"]));
+                dataProtectionBuilder.ProtectKeysWithCertificate(new X509Certificate2(Configuration["Certificate:Directory"] + Configuration["Certificate:Name"], Configuration["Certificate:Password"]));
+            }
 
             services.AddAuthentication();
 
@@ -128,31 +136,30 @@ namespace Auth
                 .CreateLogger();
 
             services.AddTransient<IEmailTemplateService, EmailTemplateService>();
-
-            services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
         }
 
         public void Configure(IApplicationBuilder app)
         {
-            if (WebHostEnvironment.EnvironmentName == "Development")
+            if (WebHostEnvironment.EnvironmentName == Environments.Development)
             {
                 var telemetryConfiguration = app.ApplicationServices.GetService<TelemetryConfiguration>();
                 telemetryConfiguration.DisableTelemetry = true;
+
                 app.UseDeveloperExceptionPage();
             }
-
-#if !DEBUG
-            app.Use((context, next) =>
+            else
             {
-                context.Request.Scheme = "https";
-                return next();
-            });
+                app.Use((context, next) =>
+                {
+                    context.Request.Scheme = "https";
+                    return next();
+                });
 
-            app.UseForwardedHeaders(new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            });
-#endif
+                app.UseForwardedHeaders(new ForwardedHeadersOptions
+                {
+                    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+                });
+            }
 
             var supportedCultures = new[] {
                 new CultureInfo("en-US"), // Default
@@ -168,9 +175,9 @@ namespace Auth
             app.UseCors(builder =>
             {
                 builder.WithOrigins(
-                    Configuration["AppSettings:Urls:ToDoAssistant"],
-                    Configuration["AppSettings:Urls:CookingAssistant"],
-                    Configuration["AppSettings:Urls:Accountant"]
+                    Configuration["Urls:ToDoAssistant"],
+                    Configuration["Urls:CookingAssistant"],
+                    Configuration["Urls:Accountant"]
                 );
                 builder.WithMethods("GET");
                 builder.WithHeaders("Authorization");

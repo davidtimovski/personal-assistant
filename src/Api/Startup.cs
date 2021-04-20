@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using PersonalAssistant.Application;
 using PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles.Models;
 using PersonalAssistant.Infrastructure;
@@ -31,7 +32,7 @@ namespace Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddInfrastructure(Configuration, WebHostEnvironment.EnvironmentName);
-            services.AddPersistence(Configuration["ConnectionStrings:DefaultConnection"]);
+            services.AddPersistence(Configuration["ConnectionString"]);
             services.AddApplication(Configuration);
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -51,7 +52,7 @@ namespace Api
                     builder.WithOrigins(Configuration["Urls:ToDoAssistant"])
                            .AllowAnyMethod()
                            .AllowAnyHeader()
-                           .SetPreflightMaxAge(TimeSpan.FromSeconds(1728000)); // 20 days
+                           .SetPreflightMaxAge(TimeSpan.FromDays(20));
                 });
 
                 options.AddPolicy("AllowCookingAssistant", builder =>
@@ -59,7 +60,7 @@ namespace Api
                     builder.WithOrigins(Configuration["Urls:CookingAssistant"])
                            .AllowAnyMethod()
                            .AllowAnyHeader()
-                           .SetPreflightMaxAge(TimeSpan.FromSeconds(1728000)); // 20 days
+                           .SetPreflightMaxAge(TimeSpan.FromDays(20));
                 });
 
                 options.AddPolicy("AllowAccountant", builder =>
@@ -67,7 +68,7 @@ namespace Api
                     builder.WithOrigins(Configuration["Urls:Accountant"])
                            .AllowAnyMethod()
                            .AllowAnyHeader()
-                           .SetPreflightMaxAge(TimeSpan.FromSeconds(1728000)); // 20 days
+                           .SetPreflightMaxAge(TimeSpan.FromDays(20));
                 });
 
                 options.AddPolicy("AllowAllApps", builder =>
@@ -77,7 +78,7 @@ namespace Api
                                         Configuration["Urls:Accountant"])
                            .AllowAnyMethod()
                            .AllowAnyHeader()
-                           .SetPreflightMaxAge(TimeSpan.FromSeconds(1728000)); // 20 days
+                           .SetPreflightMaxAge(TimeSpan.FromDays(20));
                 });
             });
 
@@ -99,7 +100,7 @@ namespace Api
 
         public void Configure(IApplicationBuilder app)
         {
-            if (WebHostEnvironment.EnvironmentName == "Development")
+            if (WebHostEnvironment.EnvironmentName == Environments.Development)
             {
                 var telemetryConfiguration = app.ApplicationServices.GetService<TelemetryConfiguration>();
                 telemetryConfiguration.DisableTelemetry = true;

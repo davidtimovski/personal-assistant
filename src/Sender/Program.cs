@@ -1,10 +1,11 @@
 ﻿using System;
-using System.IO;
 using System.Threading.Tasks;
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PersonalAssistant.Persistence;
 using Serilog;
 
 namespace PersonalAssistant.Sender
@@ -13,15 +14,23 @@ namespace PersonalAssistant.Sender
     {
         static async Task Main()
         {
-            var hostBuilder = new HostBuilder()
-                .ConfigureAppConfiguration((hostingContext, config) =>
+            var hostBuilder = Host.CreateDefaultBuilder()
+                .ConfigureAppConfiguration((hostContext, config) =>
                 {
-                    var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+                    if (hostContext.HostingEnvironment.EnvironmentName == Environments.Production)
+                    {
+                        var builtConfiguration = config.Build();
 
-                    config.SetBasePath(Directory.GetCurrentDirectory());
-                    config.AddJsonFile("appsettings.json", false);
-                    config.AddJsonFile($"appsettings.{environmentName}.json", true, true);
-                    config.AddEnvironmentVariables();
+                        string url = builtConfiguration["KeyVault:Url"];
+                        string tenantId = builtConfiguration["KeyVault:TenantId"];
+                        string clientId = builtConfiguration["KeyVault:ClientId"];
+                        string clientSecret = builtConfiguration["KeyVault:ClientSecret"];
+
+                        var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+
+                        var client = new SecretClient(new Uri(url), credential);
+                        config.AddAzureKeyVault(client, new AzureKeyVaultConfigurationOptions());
+                    }
                 })
                 .ConfigureLogging((hostContext, logging) =>
                 {
@@ -33,8 +42,6 @@ namespace PersonalAssistant.Sender
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddPersistence(hostContext.Configuration["ConnectionStrings:DefaultConnection"]);
-
                     services.AddOptions();
 
                     services.AddHostedService<HostedService>();

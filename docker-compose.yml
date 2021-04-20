@@ -1,0 +1,50 @@
+version: '3.4'
+
+services:
+  auth:
+    image: personalassistant-auth:latest
+    container_name: personalassistant-auth
+    build:
+      context: .
+      dockerfile: src/Auth/Dockerfile
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  api:
+    image: personalassistant-api:latest
+    container_name: personalassistant-api
+    build:
+      context: .
+      dockerfile: src/Api/Dockerfile
+    depends_on:
+      - postgres
+      - rabbitmq
+  
+  sender:
+    image: personalassistant-sender:latest
+    container_name: personalassistant-sender
+    build:
+      context: .
+      dockerfile: src/Sender/Dockerfile
+    depends_on:
+      - postgres
+      - rabbitmq
+
+#  worker:
+#    image: personalassistant-worker:latest
+#    container_name: personalassistant-worker
+#    build:
+#      context: .
+#      dockerfile: src/Worker/Dockerfile
+#    depends_on:
+#      - postgres
+
+  postgres:
+    image: postgres:12
+    container_name: personalassistant-postgres
+    restart: always
+
+  rabbitmq:
+    image: rabbitmq:3.8-management-alpine
+    container_name: personal-assistant-rabbitmq

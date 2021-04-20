@@ -8,7 +8,5 @@ namespace PersonalAssistant.Application.Contracts.Common
     public interface IPushSubscriptionsRepository
     {
         Task CreateSubscriptionAsync(PushSubscription subscription);
-        Task DeleteSubscriptionAsync(int id);
-        Task<IEnumerable<PushSubscription>> GetAllAsync(int userId, string application);
     }
 }

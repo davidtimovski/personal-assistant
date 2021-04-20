@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using IdentityServer4;
 using IdentityServer4.Models;
 using Microsoft.Extensions.Configuration;
 
-namespace Auth.Models.Config
+namespace Auth.Models
 {
     public static class IdentityServerConfig
     {
@@ -42,15 +43,15 @@ namespace Auth.Models.Config
                     RequireConsent = false,
                     RequirePkce = true,
                     RequireClientSecret = false,
-                    RedirectUris = { $"{config["AppSettings:HostApplicationUrls:ToDoAssistant"]}/signin-oidc" },
-                    PostLogoutRedirectUris = { config["AppSettings:HostApplicationUrls:ToDoAssistant"] },
-                    AllowedCorsOrigins = { config["AppSettings:HostApplicationUrls:ToDoAssistant"] },
+                    RedirectUris = { $"{config["Urls:ToDoAssistant"]}/signin-oidc" },
+                    PostLogoutRedirectUris = { config["Urls:ToDoAssistant"] },
+                    AllowedCorsOrigins = { config["Urls:ToDoAssistant"] },
                     AllowedScopes = {
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Email,
                         "personal-assistant-api"
                     },
-                    AccessTokenLifetime = 2592000 // 1 month
+                    AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds
                 },
                 new Client
                 {
@@ -60,15 +61,15 @@ namespace Auth.Models.Config
                     RequireConsent = false,
                     RequirePkce = true,
                     RequireClientSecret = false,
-                    RedirectUris = { $"{config["AppSettings:HostApplicationUrls:CookingAssistant"]}/signin-oidc" },
-                    PostLogoutRedirectUris = { config["AppSettings:HostApplicationUrls:CookingAssistant"] },
-                    AllowedCorsOrigins = { config["AppSettings:HostApplicationUrls:CookingAssistant"] },
+                    RedirectUris = { $"{config["Urls:CookingAssistant"]}/signin-oidc" },
+                    PostLogoutRedirectUris = { config["Urls:CookingAssistant"] },
+                    AllowedCorsOrigins = { config["Urls:CookingAssistant"] },
                     AllowedScopes = {
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Email,
                         "personal-assistant-api"
                     },
-                    AccessTokenLifetime = 2592000 // 1 month
+                    AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds
                 },
                 new Client
                 {
@@ -78,15 +79,15 @@ namespace Auth.Models.Config
                     RequireConsent = false,
                     RequirePkce = true,
                     RequireClientSecret = false,
-                    RedirectUris = { $"{config["AppSettings:HostApplicationUrls:Accountant"]}/signin-oidc" },
-                    PostLogoutRedirectUris = { config["AppSettings:HostApplicationUrls:Accountant"] },
-                    AllowedCorsOrigins = { config["AppSettings:HostApplicationUrls:Accountant"] },
+                    RedirectUris = { $"{config["Urls:Accountant"]}/signin-oidc" },
+                    PostLogoutRedirectUris = { config["Urls:Accountant"] },
+                    AllowedCorsOrigins = { config["Urls:Accountant"] },
                     AllowedScopes = {
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Email,
                         "personal-assistant-api"
                     },
-                    AccessTokenLifetime = 2592000 // 1 month
+                    AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds
                 }
             };
         }

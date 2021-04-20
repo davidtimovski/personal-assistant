@@ -37,13 +37,11 @@ msbuild.wrn
 .vs/
 
 # My
-**/appsettings.Production.json
 **/*.pfx
-AuthKeys/
-DevOps/.pgpass
-DevOps/crontab.txt
-DevOps/personalassistant-backup.sh
+DevOps/
 src/Api/currencyrates.json
 src/Api/temp/
 **/publish.ps1
 **/Publish.lnk
+tempkey.jwk
+.env
