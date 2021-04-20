@@ -9,7 +9,6 @@ services:
       - EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
       - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
       - AdminEmail=${ADMIN_EMAIL}
-      - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
       - PORT=80
     volumes:
       - ./certs:/app/certs:z
@@ -23,7 +22,6 @@ services:
       - EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
       - EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
       - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
-      - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
       - PORT=80
     volumes:
       - ./src/Api/storage:/app/storage:z
@@ -32,15 +30,19 @@ services:
 
   sender:
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - DOTNET_ENVIRONMENT=Development
       - EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
       - EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
       - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
-      - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
-
+      - SendGridApiKey=${SENDGRID_API_KEY}
+      - ToDoAssistantVapid__PublicKey=${TODO_VAPID_PUBLIC_KEY}
+      - ToDoAssistantVapid__PrivateKey=${TODO_VAPID_PRIVATE_KEY}
+      - CookingAssistantVapid__PublicKey=${COOKING_VAPID_PUBLIC_KEY}
+      - CookingAssistantVapid__PrivateKey=${COOKING_VAPID_PRIVATE_KEY}
+      
 #  worker:
 #    environment:
-#      - ASPNETCORE_ENVIRONMENT=Development
+#      - DOTNET_ENVIRONMENT=Development
 
   postgres:
     ports:

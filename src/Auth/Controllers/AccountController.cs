@@ -161,12 +161,14 @@ namespace Auth.Controllers
                     }
                     return RedirectToAction(nameof(HomeController.Overview), "Home");
                 }
+
                 if (result.IsNotAllowed)
                 {
                     await _events.RaiseAsync(new UserLoginFailureEvent(model.Email, "Email confirmation required", clientId: context?.Client.ClientId));
 
                     return RedirectToAction(nameof(AccountController.Login), new { model.ReturnUrl, alert = LoginAlert.EmailConfirmationRequired });
                 }
+
                 if (result.IsLockedOut)
                 {
                     await _events.RaiseAsync(new UserLoginFailureEvent(model.Email, "Locked out", clientId: context?.Client.ClientId));

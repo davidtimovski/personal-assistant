@@ -146,7 +146,6 @@ namespace Auth
                 telemetryConfiguration.DisableTelemetry = true;
 
                 app.UseDeveloperExceptionPage();
-                app.UseHttpsRedirection();
             }
             else
             {

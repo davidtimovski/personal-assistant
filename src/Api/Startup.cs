@@ -106,7 +106,6 @@ namespace Api
                 telemetryConfiguration.DisableTelemetry = true;
 
                 app.UseDeveloperExceptionPage();
-                app.UseHttpsRedirection();
             }
 
             app.UseExceptionHandler("/error");

@@ -1,20 +1,9 @@
 name: Build and push
 
-# manual
-# on: workflow_dispatch
-
-# on every push to specific branch
 on:
   push:
     branches: [ master ]
 
-# when `Testing dotnet` finished
-# on:
-  # workflow_run:
-    # workflows: ["Testing dotnet"]
-    # types:
-      # - completed
-  
 env:
   REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
   REGISTRY_IMAGE: ${{ secrets.REGISTRY_IMAGE }}

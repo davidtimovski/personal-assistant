@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Threading.Tasks;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
@@ -7,7 +6,6 @@ using Azure.Security.KeyVault.Secrets;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PersonalAssistant.Persistence;
 using Serilog;
 
 namespace PersonalAssistant.Sender
@@ -44,8 +42,6 @@ namespace PersonalAssistant.Sender
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddPersistence(hostContext.Configuration["ConnectionString"]);
-
                     services.AddOptions();
 
                     services.AddHostedService<HostedService>();

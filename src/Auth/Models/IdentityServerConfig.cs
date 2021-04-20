@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using IdentityServer4;
 using IdentityServer4.Models;
@@ -50,7 +51,7 @@ namespace Auth.Models
                         IdentityServerConstants.StandardScopes.Email,
                         "personal-assistant-api"
                     },
-                    AccessTokenLifetime = 2592000 // 1 month
+                    AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds
                 },
                 new Client
                 {
@@ -68,7 +69,7 @@ namespace Auth.Models
                         IdentityServerConstants.StandardScopes.Email,
                         "personal-assistant-api"
                     },
-                    AccessTokenLifetime = 2592000 // 1 month
+                    AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds
                 },
                 new Client
                 {
@@ -86,7 +87,7 @@ namespace Auth.Models
                         IdentityServerConstants.StandardScopes.Email,
                         "personal-assistant-api"
                     },
-                    AccessTokenLifetime = 2592000 // 1 month
+                    AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds
                 }
             };
         }
