@@ -10,4 +10,13 @@
     margin-bottom: 5px;
     color: var(--faded-color);
   }
+
+  textarea {
+    width: 100%;
+    height: 100px;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+  }
 }

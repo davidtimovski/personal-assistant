@@ -1,11 +1,6 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import {
-  ValidationController,
-  validateTrigger,
-  ValidationRules,
-  ControllerValidateResult,
-} from "aurelia-validation";
+import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
@@ -82,65 +77,60 @@ export class EditTransaction {
 
   attached() {
     this.categoriesService
-      .getAllAsOptions(
-        this.i18n.tr("uncategorized"),
-        CategoryType.AllTransactions
-      )
+      .getAllAsOptions(this.i18n.tr("uncategorized"), CategoryType.AllTransactions)
       .then((options) => {
         this.categoryOptions = options;
       });
 
-    this.transactionsService
-      .get(this.transactionId)
-      .then(async (transaction: TransactionModel) => {
-        if (transaction === null) {
-          this.router.navigateToRoute("notFound");
-        }
+    this.transactionsService.get(this.transactionId).then(async (transaction: TransactionModel) => {
+      if (transaction === null) {
+        this.router.navigateToRoute("notFound");
+      }
 
-        const model = new EditTransactionModel(
-          transaction.id,
-          transaction.fromAccountId,
-          transaction.toAccountId,
-          transaction.categoryId,
-          transaction.amount,
-          transaction.fromStocks,
-          transaction.toStocks,
-          transaction.currency,
-          transaction.description,
-          transaction.date.slice(0, 10),
-          transaction.isEncrypted,
-          transaction.encryptedDescription,
-          transaction.salt,
-          transaction.nonce,
-          null,
-          transaction.isEncrypted,
-          null,
-          transaction.createdDate,
-          transaction.synced
-        );
+      const model = new EditTransactionModel(
+        transaction.id,
+        transaction.fromAccountId,
+        transaction.toAccountId,
+        transaction.categoryId,
+        transaction.amount,
+        transaction.fromStocks,
+        transaction.toStocks,
+        transaction.currency,
+        transaction.description,
+        transaction.date.slice(0, 10),
+        transaction.isEncrypted,
+        transaction.encryptedDescription,
+        transaction.salt,
+        transaction.nonce,
+        null,
+        transaction.isEncrypted,
+        null,
+        transaction.createdDate,
+        transaction.synced
+      );
 
-        this.model = model;
+      this.model = model;
 
-        this.originalTransactionJson = JSON.stringify(this.model);
+      this.originalTransactionJson = JSON.stringify(this.model);
 
-        let amountFrom = 0.01;
-        let amountTo = 8000001;
-        if (this.model.currency === "MKD") {
-          amountFrom = 0;
-          amountTo = 450000001;
-        }
-        ValidationRules.ensure((x: EditTransactionModel) => x.amount)
-          .between(amountFrom, amountTo)
-          .ensure((x: EditTransactionModel) => x.date)
-          .required()
-          .withMessage(this.i18n.tr("newTransaction.dateIsRequired"))
-          .ensure((x: EditTransactionModel) => x.encryptionPassword)
-          .satisfies((value: string, model: EditTransactionModel) => {
-            return !model.encrypt || !ValidationUtil.isEmptyOrWhitespace(value);
-          })
-          .withMessage(this.i18n.tr("newTransaction.passwordIsRequired"))
-          .on(this.model);
-      });
+      let amountFrom = 0.01;
+      let amountTo = 8000001;
+      if (this.model.currency === "MKD") {
+        amountFrom = 0;
+        amountTo = 450000001;
+      }
+      ValidationRules.ensure((x: EditTransactionModel) => x.amount)
+        .between(amountFrom, amountTo)
+        .ensure((x: EditTransactionModel) => x.date)
+        .required()
+        .withMessage(this.i18n.tr("newTransaction.dateIsRequired"))
+        .ensure((x: EditTransactionModel) => x.encryptionPassword)
+        .satisfies((value: string, model: EditTransactionModel) => {
+          return !model.encrypt || !ValidationUtil.isEmptyOrWhitespace(value);
+        })
+        .withMessage(this.i18n.tr("newTransaction.passwordIsRequired"))
+        .on(this.model);
+    });
   }
 
   encryptChanged() {
@@ -217,6 +207,8 @@ export class EditTransaction {
 
   @computedFrom(
     "model.amount",
+    "model.fromStocks",
+    "model.toStocks",
     "model.currency",
     "model.categoryId",
     "model.date",
@@ -265,10 +257,7 @@ export class EditTransaction {
           null
         );
 
-        await this.transactionsService.update(
-          transaction,
-          this.model.encryptionPassword
-        );
+        await this.transactionsService.update(transaction, this.model.encryptionPassword);
         this.amountIsInvalid = false;
         this.dateIsInvalid = false;
 
@@ -316,10 +305,7 @@ export class EditTransaction {
 
       try {
         await this.transactionsService.delete(this.model.id);
-        this.eventAggregator.publish(
-          AlertEvents.ShowSuccess,
-          "editTransaction.deleteSuccessful"
-        );
+        this.eventAggregator.publish(AlertEvents.ShowSuccess, "editTransaction.deleteSuccessful");
         this.router.navigateToRoute("transactions");
       } catch (e) {
         this.eventAggregator.publish(AlertEvents.ShowError, e);

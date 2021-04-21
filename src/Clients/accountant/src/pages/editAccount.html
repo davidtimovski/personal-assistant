@@ -1,4 +1,6 @@
 <template>
+  <require from="./../resources/elements/stock-price-input"></require>
+
   <div class="au-animate animate-fade-in animate-fade-out">
     <div class="page-title-wrap">
       <div class="side inactive small">
@@ -16,7 +18,6 @@
     </div>
 
     <div class="content-wrap">
-
       <div if.bind="!account" class="double-circle-loading">
         <div class="double-bounce1"></div>
         <div class="double-bounce2"></div>
@@ -25,20 +26,30 @@
       <div else>
         <div show.bind="!connTracker.isOnline && account.synced" class="message warning">
           <i class="fas fa-exclamation-triangle"></i>
-          <span t="whileOfflineCannotModify">While offline you cannot modify data that has already been synced with the
-            cloud.</span>
+          <span t="whileOfflineCannotModify"
+            >While offline you cannot modify data that has already been synced with the cloud.</span
+          >
         </div>
 
         <div if.bind="isMainAccount" class="message info">
           <i class="fas fa-info-circle"></i>
-          <span t="editAccount.mainAccount">This is your main account. It represents your current capital and every new
-            expense or deposit initially goes here.</span>
+          <span t="editAccount.mainAccount"
+            >This is your main account. It represents your current capital and every new expense or deposit initially
+            goes here.</span
+          >
         </div>
 
         <form submit.trigger="save()">
           <div class="form-control">
-            <input type="text" value.bind="account.name & validate" ref="nameInput" maxlength="30"
-              class.bind="nameIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]editAccount.accountName" required>
+            <input
+              type="text"
+              value.bind="account.name & validate"
+              ref="nameInput"
+              maxlength="30"
+              class.bind="nameIsInvalid ? 'invalid' : ''"
+              t="[placeholder,aria-label]editAccount.accountName"
+              required
+            />
           </div>
 
           <div if.bind="!isMainAccount">
@@ -46,29 +57,31 @@
               <label class="toggle">
                 <span t="editAccount.investmentFund">Investment fund</span>
                 <div class="toggle-content">
-                  <input type="checkbox" checked.bind="investmentFund" change.delegate="investmentFundToggled()">
+                  <input type="checkbox" checked.bind="investmentFund" change.delegate="investmentFundToggled()" />
                   <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
                     <path
-                      d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
+                      d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
+                    />
                   </svg>
                   <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
                     <path
                       d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                      fill-rule="evenodd" clip-rule="evenodd" />
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                    />
                   </svg>
                 </div>
               </label>
             </div>
 
             <div if.bind="investmentFund" class="form-control inline">
-              <label for="stock-price" t="editAccount.stockPrice">Stock price</label>
-              <compose view-model="../resources/components/stock-price-input" view="../resources/components/stock-price-input.html"
-                model.bind="account"></compose>
+              <label for="stock" t="editAccount.stockPrice">Stock price</label>
+              <stock-price-input amount.bind="account.stockPrice" currency.bind="account.currency"></stock-price-input>
             </div>
           </div>
         </form>
 
-        <hr>
+        <hr />
 
         <div show.bind="deleteInProgress && transactionsWarningVisible" class="delete-confirmation-alert">
           <i class="fas fa-exclamation-triangle"></i>
@@ -76,25 +89,37 @@
         </div>
 
         <div class="save-delete-wrap">
-          <a if.bind="!deleteInProgress" click.delegate="save()"
-            class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
+          <a
+            if.bind="!deleteInProgress"
+            click.delegate="save()"
+            class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}"
+          >
             <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
               <i class="fas fa-circle-notch fa-spin"></i>
             </span>
             <span>${saveButtonText}</span>
           </a>
-          <a if.bind="!isNewAccount && !isMainAccount" click.delegate="delete()"
-            class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}">
+          <a
+            if.bind="!isNewAccount && !isMainAccount"
+            click.delegate="delete()"
+            class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}"
+          >
             <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
               <i class="fas fa-circle-notch fa-spin"></i>
             </span>
             <span>${deleteButtonText}</span>
           </a>
-          <button type="button" if.bind="isNewAccount || deleteInProgress || isMainAccount" click.delegate="cancel()"
-            t="cancel" class="button secondary-button">Cancel</button>
+          <button
+            type="button"
+            if.bind="isNewAccount || deleteInProgress || isMainAccount"
+            click.delegate="cancel()"
+            t="cancel"
+            class="button secondary-button"
+          >
+            Cancel
+          </button>
         </div>
       </div>
-
     </div>
   </div>
 </template>

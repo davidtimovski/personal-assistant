@@ -1,6 +1,4 @@
 export class MoneyPreciseFormatValueConverter {
-  constructor() {}
-
   toView(value: any, currency: string) {
     if (isNaN(parseFloat(value))) {
       return null;
@@ -16,6 +14,7 @@ export class MoneyPreciseFormatValueConverter {
     return new Intl.NumberFormat("de-DE", {
       style: "currency",
       maximumFractionDigits: 4,
+      currency: currency
     }).format(value);
   }
 }

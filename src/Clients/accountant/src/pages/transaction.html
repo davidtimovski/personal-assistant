@@ -1,20 +1,20 @@
 <template>
   <require from="../static/styles/pages/transaction.scss"></require>
   <require from="./../resources/value-converters/money-format"></require>
+  <require from="./../resources/value-converters/money-precise-format"></require>
 
   <div class="au-animate animate-fade-in animate-fade-out">
     <div class="page-title-wrap">
       <a route-href="route: editTransaction; params.bind: { id: transactionId }" class="side small">
         <i class="fas fa-pencil-alt"></i>
       </a>
-      <div class="page-title">${model.type}</div>
+      <div class="page-title">${model.typeLabel}</div>
       <a click.delegate="back()" class="side back">
         <i class="fas fa-times"></i>
       </a>
     </div>
 
     <div class="content-wrap">
-
       <div if.bind="!model" class="double-circle-loading">
         <div class="double-bounce1"></div>
         <div class="double-bounce2"></div>
@@ -23,17 +23,25 @@
       <div else class="viewing">
         <div class="form-control inline">
           <label t="amount">Amount</label>
-          <span>${model.amount | moneyFormat:currency}</span>
+          <span class="${model.type === 1 ? 'expense-color' : (model.type === 2 ? 'deposit-color' : 'transfer-color')}"
+            >${model.amount | moneyFormat:currency}</span
+          >
         </div>
         <div if.bind="model.currency !== currency" class="form-control inline">
-          <label>
-            <span t="transaction.originalAmountIn">Original amount in </span>${model.currency}
-          </label>
+          <label> <span t="transaction.originalAmountIn">Original amount in </span>${model.currency} </label>
           <span>${model.originalAmount | moneyFormat:model.currency}</span>
         </div>
         <div class="form-control inline">
           <label>${model.accountLabel}</label>
           <span>${model.accountValue}</span>
+        </div>
+        <div if.bind="model.fromStocks" class="form-control inline">
+          <label t="soldStocks">Sold stocks</label>
+          <span class="expense-color">${model.fromStocks | moneyPreciseFormat:model.currency}</span>
+        </div>
+        <div if.bind="model.toStocks" class="form-control inline">
+          <label t="purchasedStocks">Purchased stocks</label>
+          <span class="deposit-color">${model.toStocks | moneyPreciseFormat:model.currency}</span>
         </div>
         <div class="form-control inline">
           <label t="category">Category</label>
@@ -43,10 +51,10 @@
           <label t="date">Date</label>
           <span>${model.date}</span>
         </div>
-        <div if.bind="model.descriptionInHtml" class="form-control">
+        <div if.bind="model.description" class="form-control">
           <div class="description-view">
             <label t="description">Description</label>
-            <div innerhtml.bind="model.descriptionInHtml | sanitizeHTML"></div>
+            <textarea value.bind="model.description" readonly></textarea>
           </div>
         </div>
         <div if.bind="model.isEncrypted" class="form-control">
@@ -55,9 +63,15 @@
 
             <form submit.trigger="decrypt()" class="decrypt-form">
               <div class="viewable-password">
-                <input type="password" value.bind="model.decryptionPassword" ref="passwordInput" maxlength="100"
-                  class.bind="decryptionPasswordIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]password"
-                  required>
+                <input
+                  type="password"
+                  value.bind="model.decryptionPassword"
+                  ref="passwordInput"
+                  maxlength="100"
+                  class.bind="decryptionPasswordIsInvalid ? 'invalid' : ''"
+                  t="[placeholder,aria-label]password"
+                  required
+                />
                 <a click.delegate="togglePasswordShow()" class="password-show-button ${passwordShown ? 'shown' : ''}">
                   <i class="fas fa-eye"></i>
                   <i class="fas fa-eye-slash"></i>
@@ -71,7 +85,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </template>

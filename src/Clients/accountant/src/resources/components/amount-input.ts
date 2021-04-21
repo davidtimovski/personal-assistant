@@ -1,6 +1,7 @@
 import { inject } from "aurelia-framework";
-import { CurrenciesService } from "../../../../shared/src/services/currenciesService";
 import autocomplete, { AutocompleteResult } from "autocompleter";
+
+import { CurrenciesService } from "../../../../shared/src/services/currenciesService";
 import { CurrencySuggestion } from "../../../../shared/src/models/viewmodels/currencySuggestion";
 
 @inject(CurrenciesService)
@@ -28,16 +29,14 @@ export class AmountInput {
       input: this.selectCurrencyInput,
       minLength: 1,
       fetch: (text: string, update: (items: CurrencySuggestion[]) => void) => {
-        const suggestions = this.currencySuggestions.filter(i =>
-          i.name.toUpperCase().startsWith(text.toUpperCase())
-        );
+        const suggestions = this.currencySuggestions.filter((i) => i.name.toUpperCase().startsWith(text.toUpperCase()));
         update(suggestions);
       },
       onSelect: (suggestion: CurrencySuggestion) => {
         this.changing = false;
         this.model.currency = suggestion.name;
       },
-      className: "currency-autocomplete-customizations"
+      className: "currency-autocomplete-customizations",
     });
 
     if (!this.model.id && !this.model.debtId) {

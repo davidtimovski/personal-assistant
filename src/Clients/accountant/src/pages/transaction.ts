@@ -3,6 +3,7 @@ import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
+
 import { CategoriesService } from "services/categoriesService";
 import { AccountsService } from "services/accountsService";
 import { TransactionsService } from "services/transactionsService";
@@ -12,15 +13,7 @@ import { TransactionModel } from "models/entities/transaction";
 import { ViewTransaction } from "models/viewmodels/viewTransaction";
 import { TransactionType } from "models/viewmodels/transactionType";
 
-@inject(
-  Router,
-  CategoriesService,
-  AccountsService,
-  TransactionsService,
-  EncryptionService,
-  LocalStorage,
-  I18N
-)
+@inject(Router, CategoriesService, AccountsService, TransactionsService, EncryptionService, LocalStorage, I18N)
 export class Transaction {
   private transactionId: number;
   private fromExpenditureHeatmap: boolean;
@@ -67,11 +60,14 @@ export class Transaction {
           null,
           null,
           null,
+          null,
           transaction.convertedAmount,
           transaction.currency,
           transaction.amount,
+          transaction.fromStocks,
+          transaction.toStocks,
           null,
-          null,
+          transaction.description,
           null,
           transaction.isEncrypted,
           transaction.encryptedDescription,
@@ -80,16 +76,11 @@ export class Transaction {
           null
         );
 
-        const type = this.getType(
-          transaction.fromAccountId,
-          transaction.toAccountId
-        );
-        model.type = this.typeStringLookup[type - 1];
+        model.type = this.getType(transaction.fromAccountId, transaction.toAccountId);
+        model.typeLabel = this.typeStringLookup[model.type - 1];
 
         if (transaction.categoryId) {
-          const category = await this.categoriesService.get(
-            transaction.categoryId
-          );
+          const category = await this.categoriesService.get(transaction.categoryId);
           if (category.parent) {
             model.category = `${category.parent}/${category.name}`;
           } else {
@@ -99,49 +90,28 @@ export class Transaction {
           model.category = this.i18n.tr("uncategorized");
         }
 
-        if (type === TransactionType.Transfer) {
-          const fromAccount = await this.accountsService.get(
-            transaction.fromAccountId
-          );
-          const toAccount = await this.accountsService.get(
-            transaction.toAccountId
-          );
+        if (model.type === TransactionType.Transfer) {
+          const fromAccount = await this.accountsService.get(transaction.fromAccountId);
+          const toAccount = await this.accountsService.get(transaction.toAccountId);
           model.accountLabel = this.i18n.tr("transaction.accounts");
           model.accountValue = this.i18n.tr("transaction.to", {
             from: fromAccount.name,
             to: toAccount.name,
           });
-        } else if (type === TransactionType.Deposit) {
-          const toAccount = await this.accountsService.get(
-            transaction.toAccountId
-          );
+        } else if (model.type === TransactionType.Deposit) {
+          const toAccount = await this.accountsService.get(transaction.toAccountId);
           model.accountLabel = this.i18n.tr("transaction.toAccount");
           model.accountValue = toAccount.name;
         } else {
-          const fromAccount = await this.accountsService.get(
-            transaction.fromAccountId
-          );
+          const fromAccount = await this.accountsService.get(transaction.fromAccountId);
           model.accountLabel = this.i18n.tr("transaction.fromAccount");
           model.accountValue = fromAccount.name;
         }
 
-        model.descriptionInHtml = this.formatDescription(
-          transaction.description
-        );
         model.date = this.formatOcccurrenceDate(transaction.date);
 
         this.model = model;
       });
-  }
-
-  formatDescription(description: string): string {
-    if (!description) {
-      return null;
-    }
-
-    description = description.replace(/(?:\r\n|\r|\n)/g, "<br>");
-
-    return description;
   }
 
   getType(fromAccountId: number, toAccountId: number): TransactionType {
@@ -195,9 +165,7 @@ export class Transaction {
       );
 
       this.model.isEncrypted = false;
-      this.model.descriptionInHtml = this.formatDescription(
-        decryptedDescription
-      );
+      this.model.description = decryptedDescription;
       this.decryptButtonIsLoading = false;
     } catch {
       this.decryptionPasswordIsInvalid = true;

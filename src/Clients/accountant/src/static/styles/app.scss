@@ -116,6 +116,13 @@ form {
   }
 }
 
+form input[type="text"],
+form input[type="number"],
+form input[type="date"],
+textarea {
+  letter-spacing: unset;
+}
+
 .loadable-select {
   position: relative;
 

@@ -1,22 +1,20 @@
-import { inject } from "aurelia-framework";
-import { CurrenciesService } from "../../../../shared/src/services/currenciesService";
+import { inject, bindable, bindingMode } from "aurelia-framework";
 import autocomplete, { AutocompleteResult } from "autocompleter";
+
+import { CurrenciesService } from "../../../../shared/src/services/currenciesService";
 import { CurrencySuggestion } from "../../../../shared/src/models/viewmodels/currencySuggestion";
 
 @inject(CurrenciesService)
-export class StockPriceInput {
+export class StockPriceInputCustomElement {
+  @bindable({ defaultBindingMode: bindingMode.twoWay }) amount: number;
+  @bindable({ defaultBindingMode: bindingMode.twoWay }) currency: string;
+
   private currencySuggestions: Array<CurrencySuggestion>;
   private changing = false;
   private autocomplete: AutocompleteResult;
   private selectCurrencyInput: HTMLInputElement;
-  private stockPriceInput: HTMLInputElement;
-  private fund: any;
 
   constructor(private readonly currenciesService: CurrenciesService) {}
-
-  activate(fund: any) {
-    this.fund = fund;
-  }
 
   attached() {
     const currencies = this.currenciesService.getCurrencies();
@@ -28,21 +26,15 @@ export class StockPriceInput {
       input: this.selectCurrencyInput,
       minLength: 1,
       fetch: (text: string, update: (items: CurrencySuggestion[]) => void) => {
-        const suggestions = this.currencySuggestions.filter((i) =>
-          i.name.toUpperCase().startsWith(text.toUpperCase())
-        );
+        const suggestions = this.currencySuggestions.filter((i) => i.name.toUpperCase().startsWith(text.toUpperCase()));
         update(suggestions);
       },
       onSelect: (suggestion: CurrencySuggestion) => {
         this.changing = false;
-        this.fund.currency = suggestion.name;
+        this.currency = suggestion.name;
       },
       className: "currency-autocomplete-customizations",
     });
-
-    if (!this.fund.id && !this.fund.debtId) {
-      this.stockPriceInput.focus();
-    }
   }
 
   toggleChangeCurrency() {

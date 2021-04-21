@@ -1,6 +1,7 @@
 <template>
   <require from="../static/styles/pages/transfer-funds.scss"></require>
   <require from="./../resources/value-converters/money-format"></require>
+  <require from="./../resources/value-converters/money-precise-format"></require>
 
   <div class="au-animate animate-fade-in animate-fade-out">
     <div class="page-title-wrap">
@@ -14,42 +15,72 @@
     </div>
 
     <div class="content-wrap">
-
       <form submit.trigger="transfer()">
         <div class="form-control">
-          <label for="from-account" class="transfer-funds-label" t="transferFunds.fromAccount">From account:</label>
+          <label for="from-account" class="transfer-funds-label">${fromAccountLabel}</label>
           <div class="loadable-select ${model.accountOptions ? 'loaded' : ''}">
-            <select id="from-account" value.bind="model.fromAccountId" change.delegate="fromAccountChanged()"
-              disabled.bind="!model.accountOptions">
+            <select
+              id="from-account"
+              value.bind="model.fromAccountId"
+              change.delegate="fromAccountChanged()"
+              disabled.bind="!model.accountOptions"
+            >
               <option model.bind="account.id" repeat.for="account of model.accountOptions">${account.name}</option>
             </select>
             <i class="fas fa-circle-notch fa-spin"></i>
           </div>
+
+          <div if.bind="model.fromAccount.stockPrice" class="account-stock-price-balance-label">
+            <label t="transferFunds.stockPrice">Stock price</label>
+            <span>${model.fromAccount.stockPrice | moneyPreciseFormat:model.currency}</span>
+          </div>
+          <div else class="account-stock-price-balance-label">
+            <label t="balance">Balance</label>
+            <span>${model.fromAccount.balance | moneyFormat:model.currency}</span>
+          </div>
         </div>
 
         <div class="form-control">
-          <label for="to-account" class="transfer-funds-label" t="transferFunds.toAccount">To account:</label>
+          <label for="to-account" class="transfer-funds-label">${toAccountLabel}</label>
           <div class="loadable-select ${model.accountOptions ? 'loaded' : ''}">
-            <select id="to-account" value.bind="model.toAccountId" change.delegate="toAccountChanged()"
-              disabled.bind="!model.accountOptions">
+            <select
+              id="to-account"
+              value.bind="model.toAccountId"
+              change.delegate="toAccountChanged()"
+              disabled.bind="!model.accountOptions"
+            >
               <option model.bind="account.id" repeat.for="account of model.accountOptions">${account.name}</option>
             </select>
             <i class="fas fa-circle-notch fa-spin"></i>
+          </div>
+
+          <div if.bind="model.toAccount.stockPrice" class="account-stock-price-balance-label">
+            <label t="transferFunds.stockPrice">Stock price</label>
+            <span>${model.toAccount.stockPrice | moneyPreciseFormat:model.currency}</span>
+          </div>
+          <div else class="account-stock-price-balance-label">
+            <label t="balance">Balance</label>
+            <span>${model.toAccount.balance | moneyFormat:model.currency}</span>
           </div>
         </div>
 
         <div class="form-control inline transfer-funds-amount-control">
           <label for="amount" class="transfer-funds-label" t="amount">Amount</label>
-          <compose view-model="../resources/components/amount-input" view="../resources/components/amount-input.html"
-            model.bind="model"></compose>
+          <compose
+            view-model="../resources/components/amount-input"
+            view="../resources/components/amount-input.html"
+            model.bind="model"
+          ></compose>
         </div>
       </form>
 
-      <hr>
+      <hr />
 
       <div class="save-delete-wrap">
-        <a click.delegate="transfer()"
-          class="button primary-button ${!canTransfer || transferButtonIsLoading ? 'disabled' : ''}">
+        <a
+          click.delegate="transfer()"
+          class="button primary-button ${!canTransfer || transferButtonIsLoading ? 'disabled' : ''}"
+        >
           <span class="button-loader ${transferButtonIsLoading ? 'loading' : ''}">
             <i class="fas fa-circle-notch fa-spin"></i>
           </span>

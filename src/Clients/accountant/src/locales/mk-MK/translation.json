@@ -27,8 +27,10 @@
   "deletedAccount": "[избришана сметка]",
   "whileOfflineCannotModify": "Додека сте офлајн неможете да промените податоци кои веќе се синхронизирани со сервер.",
   "changeCurrency": "Промени валута",
-  "showPassword": "Show password",
-  "hidePassword": "Hide password",
+  "showPassword": "Покажи лозинка",
+  "hidePassword": "Сокриј лозинка",
+  "purchasedStocks": "Купени удели",
+  "soldStocks": "Продадени удели",
   "months": {
     "0": "Јануари",
     "1": "Февруари",
@@ -164,7 +166,10 @@
   "transferFunds": {
     "transferFunds": "Префрли средства",
     "fromAccount": "Од сметка:",
+    "fromInvestmentFund": "Од инвестициски фонд:",
     "toAccount": "На сметка:",
+    "toInvestmentFund": "На инвестициски фонд:",
+    "stockPrice": "Цена на удел",
     "transfer": "Префрли",
     "accountOnlyHas": "На сметката \"{{account}}\" има само {{balance}}",
     "transferSuccessful": "Средствата беа успешно префрлени"
@@ -174,6 +179,8 @@
     "edit": "Промени ја",
     "mainAccount": "Ова е вашата главна сметка. Го репрезентира вашиот моментален капитал и секој нов трошок или депозит најпрво доаѓа тука.",
     "accountName": "Име на сметката",
+    "investmentFund": "Инвестициски фонд",
+    "stockPrice": "Цена на удел",
     "accountHasTransactions": "Оваа сметка има трансакции.<br>Доколку ја избришете и тие ќе бидат отстранети.",
     "okayDelete": "Во ред, избриши",
     "deleteSuccessful": "Сметката беше успешно избришана"
