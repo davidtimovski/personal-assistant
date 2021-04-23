@@ -3,6 +3,8 @@ name: Build and push
 on:
   push:
     branches: [ master ]
+    paths-ignore:
+      - "src/Clients/**"
 
 env:
   REGISTRY_URL: ${{ secrets.REGISTRY_URL }}

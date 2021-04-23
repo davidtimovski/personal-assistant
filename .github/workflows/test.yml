@@ -3,6 +3,8 @@ name: Testing dotnet
 on:
   push:
     branches: [ master ]
+    paths-ignore:
+      - "src/Clients/**"
 
 jobs:
   build-test:
