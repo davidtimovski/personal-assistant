@@ -8,7 +8,6 @@ namespace PersonalAssistant.Application.Contracts.Accountant.Categories
 {
     public interface ICategoriesRepository
     {
-        Task<IEnumerable<Category>> GetAllWithGenerateAsync();
         Task<IEnumerable<Category>> GetAllAsync(int userId, DateTime fromModifiedDate);
         Task<IEnumerable<int>> GetDeletedIdsAsync(int userId, DateTime fromDate);
         Task<int> CreateAsync(Category category, IDbConnection uowConn = null, IDbTransaction uowTransaction = null);

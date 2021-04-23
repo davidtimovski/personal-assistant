@@ -110,7 +110,7 @@ namespace PersonalAssistant.Sender
                 string message = Encoding.UTF8.GetString(body.ToArray());
                 var pushNotification = JsonConvert.DeserializeObject<PushNotification>(message);
 
-                var conn = new NpgsqlConnection(_configuration["ConnectionString"]);
+                using var conn = new NpgsqlConnection(_configuration["ConnectionString"]);
                 conn.Open();
 
                 var recipientSubs = conn.Query<Domain.Entities.Common.PushSubscription>(@"SELECT * FROM ""PushSubscriptions"" WHERE ""UserId"" = @UserId AND ""Application"" = @Application",

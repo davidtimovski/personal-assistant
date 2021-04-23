@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
@@ -42,13 +41,6 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             }
 
             return notifications;
-        }
-
-        public async Task DeleteOldAsync(DateTime from)
-        {
-            using IDbConnection conn = OpenConnection();
-
-            await conn.ExecuteAsync(@"DELETE FROM ""ToDoAssistant.Notifications"" WHERE ""CreatedDate"" < @DeleteFrom", new { DeleteFrom = from });
         }
 
         public async Task DeleteForUserAndListAsync(int userId, int listId)

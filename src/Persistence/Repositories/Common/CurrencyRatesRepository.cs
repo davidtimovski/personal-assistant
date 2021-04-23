@@ -32,18 +32,5 @@ namespace PersonalAssistant.Persistence.Repositories.Common
             return await conn.QueryFirstOrDefaultAsync<CurrencyRates>(@"SELECT * FROM ""CurrencyRates"" WHERE ""Date"" > @Date ORDER BY ""Date"" DESC LIMIT 1",
                 new { Date = date });
         }
-
-        public async Task CreateAsync(CurrencyRates rates)
-        {
-            using IDbConnection conn = OpenConnection();
-
-            var exists = await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""CurrencyRates"" WHERE ""Date"" = @Date", new { rates.Date });
-            if (exists)
-            {
-                return;
-            }
-
-            await conn.ExecuteAsync(@"INSERT INTO ""CurrencyRates"" (""Date"", ""Rates"") VALUES (@Date, CAST(@Rates AS json))", rates);
-        }
     }
 }

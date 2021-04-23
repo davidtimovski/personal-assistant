@@ -15,13 +15,6 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
         public CategoriesRepository(PersonalAssistantContext efContext)
             : base(efContext) { }
 
-        public async Task<IEnumerable<Category>> GetAllWithGenerateAsync()
-        {
-            using IDbConnection conn = OpenConnection();
-
-            return await conn.QueryAsync<Category>(@"SELECT * FROM ""Accountant.Categories"" WHERE ""GenerateUpcomingExpense""");
-        }
-
         public async Task<IEnumerable<Category>> GetAllAsync(int userId, DateTime fromModifiedDate)
         {
             using IDbConnection conn = OpenConnection();

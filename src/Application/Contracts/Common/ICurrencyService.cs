@@ -1,10 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System;
 
 namespace PersonalAssistant.Application.Contracts.Common
 {
     public interface ICurrencyService
     {
-        Task<string> GetAllAsJsonAsync();
-        decimal Convert(decimal amount, string fromCurrency, string toCurrency);
+        string GetAllAsJson(DateTime date);
+        decimal Convert(decimal amount, string fromCurrency, string toCurrency, DateTime date);
     }
 }

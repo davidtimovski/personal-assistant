@@ -14,6 +14,5 @@ namespace PersonalAssistant.Application.Contracts.Accountant.UpcomingExpenses
         Task UpdateAsync(UpdateUpcomingExpense model);
         Task DeleteAsync(int id, int userId);
         Task DeleteOldAsync(int userId);
-        Task GenerateAsync();
     }
 }

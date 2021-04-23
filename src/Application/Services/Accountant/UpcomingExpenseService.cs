@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using PersonalAssistant.Application.Contracts.Accountant;
 using PersonalAssistant.Application.Contracts.Accountant.Categories;
 using PersonalAssistant.Application.Contracts.Accountant.Common.Models;
 using PersonalAssistant.Application.Contracts.Accountant.Transactions;
@@ -67,94 +66,6 @@ namespace PersonalAssistant.Application.Services.Accountant
         {
             var startOfMonth = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1, 0, 0, 0);
             await _upcomingExpensesRepository.DeleteOldAsync(userId, startOfMonth);
-        }
-
-        public async Task GenerateAsync()
-        {
-            var now = DateTime.UtcNow;
-
-            string getMostFrequentCurrency(IEnumerable<Transaction> expenses)
-            {
-                if (expenses.Count() == 1)
-                {
-                    return expenses.First().Currency;
-                }
-
-                var currency = expenses
-                  .GroupBy(x => x.Currency)
-                  .Where(g => g.Count() > 1)
-                  .OrderByDescending(g => g.Count())
-                  .Select(g => g.Key).First();
-
-                return currency;
-            }
-
-            bool shouldGenerate(IEnumerable<Transaction> expenses)
-            {
-                if (!expenses.Any())
-                {
-                    return false;
-                }
-
-                Transaction earliest = expenses.OrderBy(x => x.Date).First();
-                var twoMonthsAgo = new DateTime(now.Year, now.Month, 1).AddMonths(-2);
-
-                return earliest.Date < twoMonthsAgo;
-            }
-
-            var categories = await _categoriesRepository.GetAllWithGenerateAsync();
-
-            var userGroups = categories.GroupBy(x => x.UserId);
-
-            foreach (var userGroup in userGroups)
-            {
-                foreach (Category category in userGroup)
-                {
-                    var exists = await _upcomingExpensesRepository.ExistsAsync(category.Id, now);
-                    if (exists)
-                    {
-                        continue;
-                    }
-
-                    var firstOfThisMonth = new DateTime(now.Year, now.Month, 1);
-                    var transactionsExistThisMonth = await _transactionsRepository.AnyAsync(category.UserId, category.Id, firstOfThisMonth);
-                    if (transactionsExistThisMonth)
-                    {
-                        continue;
-                    }
-
-                    var threeMonthsAgo = new DateTime(now.Year, now.Month, 1).AddMonths(-3);
-                    var expenses = await _transactionsRepository.GetAllAsync(category.UserId, category.Id, threeMonthsAgo, firstOfThisMonth);
-
-                    if (shouldGenerate(expenses))
-                    {
-                        decimal sum = expenses.Sum(x => x.Amount);
-                        int months = expenses.GroupBy(x => x.Date.ToString("yyyy-MM")).Count();
-                        decimal amount = sum / months;
-                        var currency = getMostFrequentCurrency(expenses);
-                        if (currency == "MKD")
-                        {
-                            amount = Math.Round(amount);
-                            amount -= amount % 10;
-                        }
-                        var date = new DateTime(now.Year, now.Month, 1);
-
-                        var upcomingExpense = new UpcomingExpense
-                        {
-                            UserId = category.UserId,
-                            CategoryId = category.Id,
-                            Amount = amount,
-                            Currency = currency,
-                            Date = date,
-                            Generated = true,
-                            CreatedDate = now,
-                            ModifiedDate = now
-                        };
-
-                        await _upcomingExpensesRepository.CreateAsync(upcomingExpense);
-                    }
-                }
-            }
         }
     }
 }

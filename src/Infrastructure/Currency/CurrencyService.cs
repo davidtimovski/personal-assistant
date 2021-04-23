@@ -1,51 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
+using System.Data;
+using Dapper;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Npgsql;
 using PersonalAssistant.Application.Contracts.Common;
 
 namespace PersonalAssistant.Infrastructure.Currency
 {
     public class CurrencyService : ICurrencyService
     {
-        private readonly string _currencyRatesFilePath;
-        private string _currencyRatesJson;
-        private DateTime _lastLoaded;
+        private string _connectionString;
+        private const int DaysSearchLimit = 14;
 
-        public CurrencyService(string currencyRatesFilePath)
+        public CurrencyService(IConfiguration configuration)
         {
-            _currencyRatesFilePath = currencyRatesFilePath;
-
-            _currencyRatesJson = File.ReadAllText(_currencyRatesFilePath);
-            _lastLoaded = _currencyRatesJson == string.Empty ? DateTime.MinValue : DateTime.UtcNow;
+            _connectionString = configuration["ConnectionString"];
         }
 
-        public async Task<string> GetAllAsJsonAsync()
+        public string GetAllAsJson(DateTime date)
         {
-            var anHourAgo = DateTime.UtcNow.AddHours(-1);
-            if (_lastLoaded < anHourAgo)
-            {
-                _currencyRatesJson = await File.ReadAllTextAsync(_currencyRatesFilePath);
-                _lastLoaded = DateTime.UtcNow;
-            }
+            using var conn = new NpgsqlConnection(_connectionString);
+            conn.Open();
 
-            return _currencyRatesJson;
+            return GetCurrencyRatesAsJson(conn, date, 0);
         }
 
-        public decimal Convert(decimal amount, string fromCurrency, string toCurrency)
+        public decimal Convert(decimal amount, string fromCurrency, string toCurrency, DateTime date)
         {
             if (fromCurrency == toCurrency)
             {
                 return amount;
             }
 
-            var rates = GetAllAsDictionary();
+            using var conn = new NpgsqlConnection(_connectionString);
+            conn.Open();
 
-            decimal fromRate = rates[fromCurrency];
+            string ratesJson = GetCurrencyRatesAsJson(conn, date, 0);
+            if (ratesJson == null)
+            {
+                return 0;
+            }
+
+            var ratesLookup = JsonConvert.DeserializeObject<Dictionary<string, decimal>>(ratesJson);
+
+            decimal fromRate = ratesLookup[fromCurrency];
             decimal eurAmount = amount / fromRate;
 
-            decimal toRate = rates[toCurrency];
+            decimal toRate = ratesLookup[toCurrency];
             if (toCurrency == "MKD")
             {
                 return Math.Round(eurAmount * toRate);
@@ -54,16 +57,23 @@ namespace PersonalAssistant.Infrastructure.Currency
             return eurAmount * toRate;
         }
 
-        private Dictionary<string, decimal> GetAllAsDictionary()
+        private string GetCurrencyRatesAsJson(IDbConnection conn, DateTime date, int daysSearched)
         {
-            var anHourAgo = DateTime.UtcNow.AddHours(-1);
-            if (_lastLoaded < anHourAgo)
+            if (daysSearched == DaysSearchLimit)
             {
-                _currencyRatesJson = File.ReadAllText(_currencyRatesFilePath);
-                _lastLoaded = DateTime.UtcNow;
+                return null;
             }
 
-            return JsonConvert.DeserializeObject<Dictionary<string, decimal>>(_currencyRatesJson);
+            var rates = conn.QueryFirstOrDefault<string>(@"SELECT ""Rates"" FROM ""CurrencyRates"" WHERE ""Date"" = @Date", new { Date = date });
+            if (rates != null)
+            {
+                return rates;
+            }
+
+            DateTime previous = date.AddDays(-1);
+            daysSearched++;
+
+            return GetCurrencyRatesAsJson(conn, previous, daysSearched);
         }
     }
 }

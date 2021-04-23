@@ -89,7 +89,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                                              i.""Sodium"", i.""Cholesterol"", 
                                              i.""VitaminA"", i.""VitaminC"", i.""VitaminD"",
                                              i.""Calcium"", i.""Iron"", i.""Potassium"", i.""Magnesium"",
-                                             i.""ProductSize"", i.""ProductSizeIsOneUnit"", i.""Price"", i.""Currency"",
+                                             i.""ProductSize"", i.""ProductSizeIsOneUnit"", i.""Price"", i.""Currency"", i.""ModifiedDate"",
                                              tasks.""Id"", tasks.""Name"", tasks.""IsCompleted""
                                          FROM ""CookingAssistant.RecipesIngredients"" AS ri
                                          INNER JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""

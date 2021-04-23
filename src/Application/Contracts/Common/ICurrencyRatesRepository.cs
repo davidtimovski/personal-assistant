@@ -8,6 +8,5 @@ namespace PersonalAssistant.Application.Contracts.Common
     public interface ICurrencyRatesRepository
     {
         Task<CurrencyRates> GetAsync(DateTime date);
-        Task CreateAsync(CurrencyRates rates);
     }
 }

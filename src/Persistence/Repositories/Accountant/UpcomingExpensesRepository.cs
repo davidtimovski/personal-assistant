@@ -31,17 +31,6 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
                 new { UserId = userId, EntityType = (short)EntityType.UpcomingExpense, DeletedDate = fromDate });
         }
 
-        public async Task<bool> ExistsAsync(int categoryId, DateTime now)
-        {
-            using IDbConnection conn = OpenConnection();
-
-            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                        FROM ""Accountant.UpcomingExpenses""
-                                                        WHERE ""CategoryId"" = @CategoryId AND ""Generated"" 
-                                                        AND to_char(""CreatedDate"", 'YYYY-MM') = to_char(@Now, 'YYYY-MM')",
-                                                        new { CategoryId = categoryId, Now = now });
-        }
-
         public async Task<int> CreateAsync(UpcomingExpense upcomingExpense, IDbConnection uowConn = null, IDbTransaction uowTransaction = null)
         {
             using IDbConnection conn = OpenConnection();

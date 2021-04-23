@@ -34,16 +34,17 @@ namespace PersonalAssistant.Sender
                 })
                 .ConfigureLogging((hostContext, logging) =>
                 {
-                    Log.Logger = new LoggerConfiguration()
-                        .ReadFrom.Configuration(hostContext.Configuration)
-                        .CreateLogger();
+                    if (hostContext.HostingEnvironment.EnvironmentName == Environments.Production)
+                    {
+                        Log.Logger = new LoggerConfiguration()
+                            .ReadFrom.Configuration(hostContext.Configuration)
+                            .CreateLogger();
 
-                    logging.AddSerilog(Log.Logger, dispose: true);
+                        logging.AddSerilog(Log.Logger, dispose: true);
+                    }
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddOptions();
-
                     services.AddHostedService<HostedService>();
                 });
 

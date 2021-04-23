@@ -65,36 +65,6 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
                 new { UserId = userId, FromModifiedDate = fromModifiedDate });
         }
 
-        public async Task<IEnumerable<Transaction>> GetAllAsync(int userId, int categoryId, DateTime from, DateTime to)
-        {
-            using IDbConnection conn = OpenConnection();
-
-            return await conn.QueryAsync<Transaction>(@"SELECT t.* 
-                                                        FROM ""Accountant.Transactions"" AS t 
-                                                        INNER JOIN ""Accountant.Accounts"" AS a ON a.""Id"" = t.""FromAccountId"" 
-                                                            OR a.""Id"" = t.""ToAccountId"" 
-                                                        WHERE a.""UserId"" = @UserId 
-                                                            AND ""CategoryId"" = @CategoryId 
-                                                            AND ""Date"" >= @From AND ""Date"" < @To 
-                                                            AND ""FromAccountId"" IS NOT NULL AND ""ToAccountId"" IS NULL",
-                                                        new { UserId = userId, CategoryId = categoryId, From = from, To = to });
-        }
-
-        public async Task<bool> AnyAsync(int userId, int categoryId, DateTime from)
-        {
-            using IDbConnection conn = OpenConnection();
-
-            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) 
-                                                        FROM ""Accountant.Transactions"" AS t 
-                                                        INNER JOIN ""Accountant.Accounts"" AS a ON a.""Id"" = t.""FromAccountId"" 
-                                                            OR a.""Id"" = t.""ToAccountId"" 
-                                                        WHERE a.""UserId"" = @UserId 
-                                                            AND ""CategoryId"" = @CategoryId 
-                                                            AND ""Date"" >= @From 
-                                                            AND ""FromAccountId"" IS NOT NULL AND ""ToAccountId"" IS NULL",
-                                                        new { UserId = userId, CategoryId = categoryId, From = from });
-        }
-
         public async Task<IEnumerable<int>> GetDeletedIdsAsync(int userId, DateTime fromDate)
         {
             using IDbConnection conn = OpenConnection();

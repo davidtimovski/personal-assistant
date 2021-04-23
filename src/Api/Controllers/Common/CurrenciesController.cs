@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -20,8 +19,8 @@ namespace Api.Controllers.Common
             _currencyService = currencyService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
+        [HttpGet("{date}")]
+        public IActionResult GetAll(DateTime date)
         {
             int userId;
             try
@@ -33,7 +32,11 @@ namespace Api.Controllers.Common
                 return Unauthorized();
             }
 
-            string currencyRatesJson = await _currencyService.GetAllAsJsonAsync();
+            string currencyRatesJson = _currencyService.GetAllAsJson(date);
+            if (currencyRatesJson == null)
+            {
+                return NotFound();
+            }
 
             return Ok(currencyRatesJson);
         }

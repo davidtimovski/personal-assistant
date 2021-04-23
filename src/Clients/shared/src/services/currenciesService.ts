@@ -5,6 +5,8 @@ import { EventAggregator } from "aurelia-event-aggregator";
 import { HttpProxyBase } from "../utils/httpProxyBase";
 import { AuthService } from "./authService";
 import { LocalStorageCurrencies } from "../utils/localStorageCurrencies";
+import { DateHelper } from "../utils/dateHelper";
+import { AlertEvents } from "../utils/alertEvents";
 
 @inject(AuthService, HttpClient, EventAggregator, LocalStorageCurrencies)
 export class CurrenciesService extends HttpProxyBase {
@@ -20,16 +22,17 @@ export class CurrenciesService extends HttpProxyBase {
   }
 
   async loadRates(): Promise<void> {
-    const result = await this.ajax<string>("currencies");
+    const today = DateHelper.format(new Date());
+
+    const result = await this.ajax<string>(`currencies/${today}`);
     this.currencyRates = JSON.parse(result);
+
     this.localStorage.setCurrencyRates(result);
   }
 
   getCurrencies(): Array<string> {
     const currencies = new Array<string>();
-    const currencyRates = this.currencyRates
-      ? this.currencyRates
-      : JSON.parse(this.localStorage.getCurrencyRates());
+    const currencyRates = this.currencyRates ? this.currencyRates : JSON.parse(this.localStorage.getCurrencyRates());
 
     for (const currency in currencyRates) {
       currencies.push(currency);
@@ -63,7 +66,7 @@ export class CurrenciesService extends HttpProxyBase {
         this.currencyRates = JSON.parse(currencyRates);
         return this.currencyRates[currency];
       } else {
-        this.eventAggregator.publish("alert-error", "currencyConversionError");
+        this.eventAggregator.publish(AlertEvents.ShowError, "currencyConversionError");
       }
     }
     return this.currencyRates[currency];

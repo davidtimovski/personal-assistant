@@ -16,8 +16,11 @@ namespace PersonalAssistant.Infrastructure
             IConfiguration configuration,
             string environmentName)
         {
+            services.AddTransient<ICurrencyService, CurrencyService>();
+
             services.AddSingleton<ISenderService, SenderService>();
-            services.AddSingleton<ICdnService>(new CdnService(
+
+            services.AddSingleton<ICdnService>(new CloudinaryService(
                 cloudinaryAccount: new Account(
                     configuration["Cloudinary:CloudName"],
                     configuration["Cloudinary:ApiKey"],
@@ -26,11 +29,6 @@ namespace PersonalAssistant.Infrastructure
                 configuration["DefaultImageUris:Profile"],
                 configuration["DefaultImageUris:Recipe"],
                 new HttpClient()));
-
-            if (configuration["Currencies:RatesFilePath"] != null)
-            {
-                services.AddSingleton<ICurrencyService>(new CurrencyService(configuration["Currencies:RatesFilePath"]));
-            }
 
             return services;
         }

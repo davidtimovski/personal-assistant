@@ -14,7 +14,7 @@ using PersonalAssistant.Application.Contracts.Common.Models;
 
 namespace PersonalAssistant.Infrastructure.Cdn
 {
-    public class CdnService : ICdnService
+    public class CloudinaryService : ICdnService
     {
         private const string Format = "jpg";
         private readonly string _environment;
@@ -34,7 +34,7 @@ namespace PersonalAssistant.Infrastructure.Cdn
         private Cloudinary Cloudinary { get; set; }
         private readonly HttpClient _httpClient;
 
-        public CdnService(
+        public CloudinaryService(
             Account cloudinaryAccount,
             string environment,
             string defaultProfileImageUri,
@@ -77,7 +77,7 @@ namespace PersonalAssistant.Infrastructure.Cdn
             ImageUploadResult uploadResult = await Cloudinary.UploadAsync(uploadParams);
             if (uploadResult.Error != null)
             {
-                throw new Exception($"{nameof(CdnService)}.{nameof(CdnService.UploadAsync)}() returned error: {uploadResult.Error.Message}");
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.UploadAsync)}() returned error: {uploadResult.Error.Message}");
             }
 
             File.Delete(filePath);
@@ -129,7 +129,7 @@ namespace PersonalAssistant.Infrastructure.Cdn
             ImageUploadResult uploadResult = await Cloudinary.UploadAsync(uploadParams);
             if (uploadResult.Error != null)
             {
-                throw new Exception($"{nameof(CdnService)}.{nameof(CdnService.UploadProfileTempAsync)}() returned error: {uploadResult.Error.Message}");
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.UploadProfileTempAsync)}() returned error: {uploadResult.Error.Message}");
             }
 
             File.Delete(filePath);
@@ -180,7 +180,7 @@ namespace PersonalAssistant.Infrastructure.Cdn
             TagResult tagResult = await Cloudinary.TagAsync(tagParams);
             if (tagResult.Error != null)
             {
-                throw new Exception($"{nameof(CdnService)}.{nameof(CdnService.RemoveTempTagAsync)}() returned error: {tagResult.Error.Message}");
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.RemoveTempTagAsync)}() returned error: {tagResult.Error.Message}");
             }
         }
 
@@ -199,7 +199,7 @@ namespace PersonalAssistant.Infrastructure.Cdn
             });
             if (deleteResult.Error != null)
             {
-                throw new Exception($"{nameof(CdnService)}.{nameof(CdnService.DeleteAsync)}() returned error: {deleteResult.Error.Message}");
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.DeleteAsync)}() returned error: {deleteResult.Error.Message}");
             }
         }
 
@@ -218,13 +218,13 @@ namespace PersonalAssistant.Infrastructure.Cdn
             });
             if (deleteResult.Error != null)
             {
-                throw new Exception($"{nameof(CdnService)}.{nameof(CdnService.DeleteUserResourcesAsync)}() returned error: {deleteResult.Error.Message}");
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.DeleteUserResourcesAsync)}() returned error: {deleteResult.Error.Message}");
             }
 
             DeleteFolderResult deleteFolderResult = await Cloudinary.DeleteFolderAsync($"{_environment}/users/{userId}");
             if (deleteFolderResult.Error != null)
             {
-                throw new Exception($"{nameof(CdnService)}.{nameof(CdnService.DeleteUserResourcesAsync)}() returned error: {deleteFolderResult.Error.Message}");
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.DeleteUserResourcesAsync)}() returned error: {deleteFolderResult.Error.Message}");
             }
         }
 
@@ -244,7 +244,7 @@ namespace PersonalAssistant.Infrastructure.Cdn
             });
             if (deleteResult.Error != null)
             {
-                throw new Exception($"{nameof(CdnService)}.{nameof(CdnService.DeleteTemporaryResourcesAsync)}() returned error: {deleteResult.Error.Message}");
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.DeleteTemporaryResourcesAsync)}() returned error: {deleteResult.Error.Message}");
             }
         }
 
@@ -273,7 +273,7 @@ namespace PersonalAssistant.Infrastructure.Cdn
             ImageUploadResult uploadResult = await Cloudinary.UploadAsync(uploadParams);
             if (uploadResult.Error != null)
             {
-                throw new Exception($"{nameof(CdnService)}.{nameof(CdnService.UploadTempAsync)}() returned error: {uploadResult.Error.Message}");
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.UploadTempAsync)}() returned error: {uploadResult.Error.Message}");
             }
 
             File.Delete(filePath);
