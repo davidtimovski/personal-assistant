@@ -39,8 +39,6 @@ msbuild.wrn
 # My
 **/*.pfx
 DevOps/
-src/Api/currencyrates.json
-src/Api/temp/
 **/publish.ps1
 **/Publish.lnk
 tempkey.jwk

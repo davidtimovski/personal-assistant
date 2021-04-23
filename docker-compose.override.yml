@@ -14,6 +14,7 @@ services:
       - PORT=80
     volumes:
       - ./certs:/app/certs:z
+      - ./src/Auth/storage:/app/storage:z
     ports:
       - "5000:80"
   
@@ -43,10 +44,8 @@ services:
       - ToDoAssistantVapid__PrivateKey=${TODO_VAPID_PRIVATE_KEY}
       - CookingAssistantVapid__PublicKey=${COOKING_VAPID_PUBLIC_KEY}
       - CookingAssistantVapid__PrivateKey=${COOKING_VAPID_PRIVATE_KEY}
-      
-#  worker:
-#    environment:
-#      - DOTNET_ENVIRONMENT=Development
+    volumes:
+      - ./src/Sender/storage:/app/storage:z
 
   postgres:
     ports:

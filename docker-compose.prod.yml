@@ -17,6 +17,7 @@ services:
     volumes:
       - ./certs:/app/certs
       - ./session-keys:/app/session-keys
+      - ./storage:/app/storage
     depends_on:
       - postgres
       - rabbitmq
@@ -49,6 +50,8 @@ services:
       - EventBusUserName=${EVENT_BUS_USERNAME}
       - EventBusPassword=${EVENT_BUS_PASSWORD}
       - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
+    volumes:
+      - ./storage:/app/storage
     depends_on:
       - postgres
       - rabbitmq

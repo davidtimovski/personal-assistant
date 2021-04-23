@@ -112,7 +112,7 @@ namespace Api.Controllers.Accountant
                 return Unauthorized();
             }
 
-            string directory = Path.Combine(_webHostEnvironment.ContentRootPath, "temp");
+            string directory = Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp");
             var exportAsCsvModel = new ExportAsCsv(userId, directory, vm.FileId, _localizer["Uncategorized"], _localizer["Encrypted"]);
 
             FileStream file = await _transactionService.ExportAsCsvAsync(exportAsCsvModel);
@@ -134,7 +134,7 @@ namespace Api.Controllers.Accountant
                 return Unauthorized();
             }
 
-            string directory = Path.Combine(_webHostEnvironment.ContentRootPath, "temp");
+            string directory = Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp");
             var deleteExportedFileModel = new DeleteExportedFile(directory, fileId);
 
             _transactionService.DeleteExportedFile(deleteExportedFileModel);

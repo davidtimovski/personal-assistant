@@ -31,15 +31,6 @@ services:
       - postgres
       - rabbitmq
 
-#  worker:
-#    image: personalassistant-worker:latest
-#    container_name: personalassistant-worker
-#    build:
-#      context: .
-#      dockerfile: src/Worker/Dockerfile
-#    depends_on:
-#      - postgres
-
   postgres:
     image: postgres:12
     container_name: personalassistant-postgres

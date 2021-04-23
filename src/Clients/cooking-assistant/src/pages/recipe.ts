@@ -3,6 +3,7 @@ import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 
 import { LocalStorageCurrencies } from "../../../shared/src/utils/localStorageCurrencies";
+
 import { ViewRecipe } from "models/viewmodels/viewRecipe";
 import { RecipesService } from "services/recipesService";
 import { Ingredient } from "models/viewmodels/ingredient";
@@ -38,41 +39,30 @@ export class Recipe {
   }
 
   async attached() {
-    this.recipesService
-      .get(this.recipeId, this.currency)
-      .then((viewRecipe: ViewRecipe) => {
-        if (viewRecipe === null) {
-          this.router.navigateToRoute("notFound");
-        } else {
-          this.servingsSelectorIsVisible = viewRecipe.ingredients.some(
-            (ingredient: Ingredient) => {
-              return !!ingredient.amount;
-            }
-          );
+    this.recipesService.get(this.recipeId, this.currency).then((viewRecipe: ViewRecipe) => {
+      if (viewRecipe === null) {
+        this.router.navigateToRoute("notFound");
+      } else {
+        this.servingsSelectorIsVisible = viewRecipe.ingredients.some((ingredient: Ingredient) => {
+          return !!ingredient.amount;
+        });
 
-          this.model = viewRecipe;
+        this.model = viewRecipe;
 
-          if (this.model.videoUrl) {
-            this.videoIFrameSrc = this.recipesService.videoUrlToEmbedSrc(
-              this.model.videoUrl
-            );
-
-            // Hack for back button iframe issue
-            this.videoIFrame.contentWindow.location.replace(
-              this.videoIFrameSrc
-            );
-          }
-
-          this.shareButtonText =
-            this.model.sharingState === SharingState.NotShared
-              ? this.i18n.tr("recipe.shareRecipe")
-              : this.i18n.tr("recipe.members");
-
-          this.copyButton.addEventListener("click", () => {
-            this.copyAsText();
-          });
+        if (this.model.videoUrl) {
+          this.videoIFrameSrc = this.recipesService.videoUrlToEmbedSrc(this.model.videoUrl);
         }
-      });
+
+        this.shareButtonText =
+          this.model.sharingState === SharingState.NotShared
+            ? this.i18n.tr("recipe.shareRecipe")
+            : this.i18n.tr("recipe.members");
+
+        this.copyButton.addEventListener("click", () => {
+          this.copyAsText();
+        });
+      }
+    });
   }
 
   toggleTopDrawer() {
@@ -98,9 +88,7 @@ export class Recipe {
       for (let ingredient of this.model.ingredients) {
         text += `\n◾ ${ingredient.name}`;
         if (ingredient.amount) {
-          text += ` - ${
-            ingredient.amount + (ingredient.unit ? " " + ingredient.unit : "")
-          }`;
+          text += ` - ${ingredient.amount + (ingredient.unit ? " " + ingredient.unit : "")}`;
         }
       }
     }
@@ -111,9 +99,7 @@ export class Recipe {
     }
 
     if (this.model.videoUrl) {
-      text += `\n\n${this.i18n.tr("editRecipe.youTubeUrl")}: ${
-        this.model.videoUrl
-      }`;
+      text += `\n\n${this.i18n.tr("editRecipe.youTubeUrl")}: ${this.model.videoUrl}`;
     }
 
     if (this.model.prepDuration || this.model.cookDuration) {
@@ -126,8 +112,7 @@ export class Recipe {
         text += `\n${this.i18n.tr("editRecipe.prepDuration")}: `;
 
         if (parseInt(prepDurationHours, 10) === 0) {
-          text +=
-            parseInt(prepDurationMinutes, 10) + this.i18n.tr("minutesLetter");
+          text += parseInt(prepDurationMinutes, 10) + this.i18n.tr("minutesLetter");
         } else {
           text +=
             parseInt(prepDurationHours, 10) +
@@ -144,8 +129,7 @@ export class Recipe {
         text += `\n${this.i18n.tr("editRecipe.cookDuration")}: `;
 
         if (parseInt(cookDurationHours, 10) === 0) {
-          text +=
-            parseInt(cookDurationMinutes, 10) + this.i18n.tr("minutesLetter");
+          text += parseInt(cookDurationMinutes, 10) + this.i18n.tr("minutesLetter");
         } else {
           text +=
             parseInt(cookDurationHours, 10) +
@@ -196,9 +180,7 @@ export class Recipe {
       }
 
       this.model.ingredients.forEach((ingredient) => {
-        ingredient.nutritionSource = this.model.nutritionSummary.ingredientIds.includes(
-          ingredient.id
-        );
+        ingredient.nutritionSource = this.model.nutritionSummary.ingredientIds.includes(ingredient.id);
       });
 
       this.scrollToIngredientsSection();
@@ -220,9 +202,7 @@ export class Recipe {
       }
 
       this.model.ingredients.forEach((ingredient) => {
-        ingredient.costSource = this.model.costSummary.ingredientIds.includes(
-          ingredient.id
-        );
+        ingredient.costSource = this.model.costSummary.ingredientIds.includes(ingredient.id);
       });
 
       this.scrollToIngredientsSection();
