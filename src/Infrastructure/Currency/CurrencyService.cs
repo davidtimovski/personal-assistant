@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Text.Json;
 using Dapper;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 using Npgsql;
 using PersonalAssistant.Application.Contracts.Common;
 
@@ -19,12 +19,12 @@ namespace PersonalAssistant.Infrastructure.Currency
             _connectionString = configuration["ConnectionString"];
         }
 
-        public string GetAllAsJson(DateTime date)
+        public IDictionary<string, decimal> GetAll(DateTime date)
         {
             using var conn = new NpgsqlConnection(_connectionString);
             conn.Open();
 
-            return GetCurrencyRatesAsJson(conn, date, 0);
+            return GetCurrencyRates(conn, date, 0);
         }
 
         public decimal Convert(decimal amount, string fromCurrency, string toCurrency, DateTime date)
@@ -37,18 +37,16 @@ namespace PersonalAssistant.Infrastructure.Currency
             using var conn = new NpgsqlConnection(_connectionString);
             conn.Open();
 
-            string ratesJson = GetCurrencyRatesAsJson(conn, date, 0);
-            if (ratesJson == null)
+            var rates = GetCurrencyRates(conn, date, 0);
+            if (rates == null)
             {
                 return 0;
             }
 
-            var ratesLookup = JsonConvert.DeserializeObject<Dictionary<string, decimal>>(ratesJson);
-
-            decimal fromRate = ratesLookup[fromCurrency];
+            decimal fromRate = rates[fromCurrency];
             decimal eurAmount = amount / fromRate;
 
-            decimal toRate = ratesLookup[toCurrency];
+            decimal toRate = rates[toCurrency];
             if (toCurrency == "MKD")
             {
                 return Math.Round(eurAmount * toRate);
@@ -57,7 +55,7 @@ namespace PersonalAssistant.Infrastructure.Currency
             return eurAmount * toRate;
         }
 
-        private string GetCurrencyRatesAsJson(IDbConnection conn, DateTime date, int daysSearched)
+        private Dictionary<string, decimal> GetCurrencyRates(IDbConnection conn, DateTime date, int daysSearched)
         {
             if (daysSearched == DaysSearchLimit)
             {
@@ -67,13 +65,13 @@ namespace PersonalAssistant.Infrastructure.Currency
             var rates = conn.QueryFirstOrDefault<string>(@"SELECT ""Rates"" FROM ""CurrencyRates"" WHERE ""Date"" = @Date", new { Date = date });
             if (rates != null)
             {
-                return rates;
+                return JsonSerializer.Deserialize<Dictionary<string, decimal>>(rates);
             }
 
             DateTime previous = date.AddDays(-1);
             daysSearched++;
 
-            return GetCurrencyRatesAsJson(conn, previous, daysSearched);
+            return GetCurrencyRates(conn, previous, daysSearched);
         }
     }
 }

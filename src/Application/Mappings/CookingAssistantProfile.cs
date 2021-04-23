@@ -590,7 +590,7 @@ namespace PersonalAssistant.Application.Mappings
                 float amount = recipeIngredient.Amount.Value;
                 string unit = recipeIngredient.Unit;
 
-                decimal price = _currencyService.Convert(recipeIngredient.Ingredient.Price.Value, recipeIngredient.Ingredient.Currency, currency, DateTime.UtcNow);
+                decimal price = _currencyService.Convert(recipeIngredient.Ingredient.Price.Value, recipeIngredient.Ingredient.Currency, currency, DateTime.UtcNow.Date);
 
                 costSummary.Cost = AddPricePerAmount(costSummary.Cost, price, productSize, productSizeIsOneUnit, amount, unit);
             }

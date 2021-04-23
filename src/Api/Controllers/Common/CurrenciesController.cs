@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -32,13 +33,13 @@ namespace Api.Controllers.Common
                 return Unauthorized();
             }
 
-            string currencyRatesJson = _currencyService.GetAllAsJson(date);
-            if (currencyRatesJson == null)
+            IDictionary<string, decimal> currencyRates = _currencyService.GetAll(date);
+            if (currencyRates == null)
             {
                 return NotFound();
             }
 
-            return Ok(currencyRatesJson);
+            return Json(currencyRates);
         }
     }
 }
