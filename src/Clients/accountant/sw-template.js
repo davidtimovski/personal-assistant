@@ -1,4 +1,4 @@
-const CACHE_NAME = "1.14.4";
+const CACHE_NAME = "1.14.5";
 const precacheResources = [
   "#SHELL#",
   "#WEBFONTS#",

@@ -24,10 +24,9 @@ export class CurrenciesService extends HttpProxyBase {
   async loadRates(): Promise<void> {
     const today = DateHelper.format(new Date());
 
-    const result = await this.ajax<string>(`currencies/${today}`);
-    this.currencyRates = JSON.parse(result);
+    this.currencyRates = await this.ajax<string>(`currencies/${today}`);
 
-    this.localStorage.setCurrencyRates(result);
+    this.localStorage.setCurrencyRates(this.currencyRates);
   }
 
   getCurrencies(): Array<string> {
