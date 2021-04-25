@@ -9,7 +9,7 @@ using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Infrastructure.Cdn;
 using Serilog;
 
-namespace PersonalAssistant.WorkerService
+namespace PersonalAssistant.Worker
 {
     public class Program
     {

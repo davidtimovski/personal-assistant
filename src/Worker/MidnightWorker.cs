@@ -15,7 +15,7 @@ using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Domain.Entities.Accountant;
 using PersonalAssistant.Domain.Entities.Common;
 
-namespace PersonalAssistant.WorkerService
+namespace PersonalAssistant.Worker
 {
     public class MidnightWorker : BackgroundService
     {

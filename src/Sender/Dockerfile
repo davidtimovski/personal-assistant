@@ -7,10 +7,7 @@ EXPOSE 80
 FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
 WORKDIR /src
 COPY ["src/Sender/Sender.csproj", "src/Sender/"]
-COPY ["src/Persistence/Persistence.csproj", "src/Persistence/"]
 COPY ["src/Domain/Domain.csproj", "src/Domain/"]
-COPY ["src/Application/Application.csproj", "src/Application/"]
-COPY ["src/Utility/Utility.fsproj", "src/Utility/"]
 RUN dotnet restore "src/Sender/Sender.csproj"
 COPY . .
 WORKDIR "/src/src/Sender"
