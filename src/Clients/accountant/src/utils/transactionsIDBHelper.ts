@@ -253,8 +253,7 @@ export class TransactionsIDBHelper {
         (t.fromAccountId === mainAccountId || t.toAccountId === mainAccountId)) ||
       (type === TransactionType.Expense && t.fromAccountId === mainAccountId && !t.toAccountId) ||
       (type === TransactionType.Deposit && !t.fromAccountId && t.toAccountId === mainAccountId) ||
-      (type === TransactionType.Saving && t.fromAccountId === mainAccountId && !!t.toAccountId) ||
-      (!!t.fromAccountId && t.toAccountId === mainAccountId);
+      (type === TransactionType.Saving && t.fromAccountId === mainAccountId && !!t.toAccountId);
     if (!inType) {
       return false;
     }

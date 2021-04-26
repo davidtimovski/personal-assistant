@@ -95,6 +95,7 @@
     "deposits": "Прилив",
     "transfers": "Префрлено",
     "searchByDescription": "Пребарај по опис",
+    "clear": "Исчисти",
     "toggleDescriptionCategory": "Одбери Опис/Категорија",
     "first": "Прва",
     "last": "Последна",
@@ -207,7 +208,10 @@
     "balance": "Состојба",
     "expenses": "Одлив",
     "deposits": "Прилив",
-    "savings": "Штедење"
+    "savings": "Штедење",
+    "spent": "Потрошено",
+    "deposited": "Заработено",
+    "saved": "Заштедено"
   },
   "expenditureHeatmap": {
     "expenditureHeatmap": "Календар на трошоци",

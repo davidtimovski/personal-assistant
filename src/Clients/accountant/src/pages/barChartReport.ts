@@ -22,6 +22,10 @@ export class BarChartReport {
   private chart: Chart;
   private fromOptions: Array<FromOption>;
   private categoryOptions: Array<SelectOption>;
+  private balanceAverage: number;
+  private spentAverage: number;
+  private depositedAverage: number;
+  private savedAverage: number;
   private dataLoaded: boolean;
   private canvasCtx: CanvasRenderingContext2D;
   private fromDate: string;
@@ -101,6 +105,11 @@ export class BarChartReport {
 
         const monthsDiff = now.getMonth() - fromDate.getMonth() + 12 * (now.getFullYear() - fromDate.getFullYear());
 
+        let balanceSum = 0;
+        let spentSum = 0;
+        let depositedSum = 0;
+        let savedSum = 0;
+
         let items = new Array<AmountByMonth>();
         for (let i = 0; i < monthsDiff; i++) {
           const date = DateHelper.formatYYYYMM(fromDate);
@@ -127,20 +136,25 @@ export class BarChartReport {
                   for (const transaction of monthTransactions) {
                     if (transaction.fromAccountId) {
                       item.amount -= transaction.amount;
+                      spentSum += transaction.amount;
                     } else {
                       item.amount += transaction.amount;
+                      depositedSum += transaction.amount;
                     }
                   }
+                  balanceSum += item.amount;
                 }
                 break;
               case TransactionType.Expense:
                 {
                   item.amount -= monthTransactions.map((x) => x.amount).reduce((a, b) => a + b, 0);
+                  spentSum += item.amount;
                 }
                 break;
               case TransactionType.Deposit:
                 {
                   item.amount += monthTransactions.map((x) => x.amount).reduce((a, b) => a + b, 0);
+                  depositedSum += item.amount;
                 }
                 break;
               case TransactionType.Saving:
@@ -150,6 +164,8 @@ export class BarChartReport {
 
                   item.amount += movedToOther.map((x) => x.amount).reduce((a, b) => a + b, 0);
                   item.amount -= movedToMain.map((x) => x.amount).reduce((a, b) => a + b, 0);
+
+                  savedSum += item.amount;
                 }
                 break;
             }
@@ -162,6 +178,23 @@ export class BarChartReport {
           }
 
           fromDate.setMonth(fromDate.getMonth() + 1);
+        }
+
+        switch (this.type) {
+          case TransactionType.Any:
+            this.balanceAverage = balanceSum / monthsDiff;
+            this.spentAverage = Math.abs(spentSum) / monthsDiff;
+            this.depositedAverage = depositedSum / monthsDiff;
+            break;
+          case TransactionType.Expense:
+            this.spentAverage = Math.abs(spentSum) / monthsDiff;
+            break;
+          case TransactionType.Deposit:
+            this.depositedAverage = depositedSum / monthsDiff;
+            break;
+          case TransactionType.Saving:
+            this.savedAverage = savedSum / monthsDiff;
+            break;
         }
 
         const labels = new Array<string>();

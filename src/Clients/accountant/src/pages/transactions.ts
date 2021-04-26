@@ -16,25 +16,18 @@ import { State } from "utils/state/state";
 import * as Actions from "utils/state/actions";
 import { SearchFilters } from "models/viewmodels/searchFilters";
 
-@inject(
-  Router,
-  TransactionsService,
-  CategoriesService,
-  AccountsService,
-  LocalStorage,
-  I18N
-)
+@inject(Router, TransactionsService, CategoriesService, AccountsService, LocalStorage, I18N)
 @connectTo()
 export class Transactions {
   private transactions: Array<TransactionItem>;
   private currency: string;
   private lastEditedId: number;
   private viewCategory = false;
-  state: State;
   private filters: SearchFilters;
   private pageCount: number;
   private categoryOptions: Array<SelectOption>;
   private accountOptions: Array<SelectOption>;
+  state: State;
 
   constructor(
     private readonly router: Router,
@@ -57,9 +50,7 @@ export class Transactions {
     this.filters = this.state.filters;
 
     const categoryOptionsPromise = new Promise<void>(async (resolve) => {
-      const categoryOptions = [
-        new SelectOption(0, this.i18n.tr("transactions.all")),
-      ];
+      const categoryOptions = [new SelectOption(0, this.i18n.tr("transactions.all"))];
 
       const options = await this.categoriesService.getAllAsOptions(
         this.i18n.tr("uncategorized"),
@@ -69,9 +60,7 @@ export class Transactions {
       resolve();
     });
     const accountOptionsPromise = new Promise<void>(async (resolve) => {
-      const accountOptions = [
-        new SelectOption(0, this.i18n.tr("transactions.all")),
-      ];
+      const accountOptions = [new SelectOption(0, this.i18n.tr("transactions.all"))];
 
       const options = await this.accountsService.getAllAsOptions();
       this.accountOptions = accountOptions.concat(options);
@@ -90,58 +79,44 @@ export class Transactions {
 
     this.transactions = null;
 
-    const transactionsPromise = this.transactionsService.getAllByPage(
-      this.filters,
-      this.currency
-    );
+    const transactionsPromise = this.transactionsService.getAllByPage(this.filters, this.currency);
     const countPromise = this.transactionsService.count(this.filters);
 
-    Promise.all([transactionsPromise, countPromise]).then(
-      (value: [TransactionModel[], number]) => {
-        const transactions = value[0];
-        const count = value[1];
+    Promise.all([transactionsPromise, countPromise]).then((value: [TransactionModel[], number]) => {
+      const transactions = value[0];
+      const count = value[1];
 
-        const transactionItems = new Array<TransactionItem>();
+      const transactionItems = new Array<TransactionItem>();
 
-        for (const transaction of transactions) {
-          const categoryName = this.categoryOptions.find(
-            (x) => x.id === transaction.categoryId
-          ).name;
+      for (const transaction of transactions) {
+        const categoryName = this.categoryOptions.find((x) => x.id === transaction.categoryId).name;
 
-          transactionItems.push(
-            new TransactionItem(
-              transaction.id,
-              transaction.amount,
-              this.getType(transaction.fromAccountId, transaction.toAccountId),
-              categoryName,
-              this.formatDescription(
-                transaction.description,
-                transaction.isEncrypted
-              ),
-              this.formatDate(transaction.date),
-              transaction.synced
-            )
-          );
-        }
-
-        this.transactions = transactionItems;
-
-        if (filterChanged) {
-          // Scroll to top of table
-          const transactionsTableWrap = document.getElementById(
-            "transactions-table-wrap"
-          );
-          window.scroll({
-            top:
-              transactionsTableWrap.getBoundingClientRect().top +
-              window.scrollY,
-            behavior: "smooth",
-          });
-        }
-
-        this.pageCount = Math.ceil(count / this.filters.pageSize);
+        transactionItems.push(
+          new TransactionItem(
+            transaction.id,
+            transaction.amount,
+            this.getType(transaction.fromAccountId, transaction.toAccountId),
+            categoryName,
+            this.formatDescription(transaction.description, transaction.isEncrypted),
+            this.formatDate(transaction.date),
+            transaction.synced
+          )
+        );
       }
-    );
+
+      this.transactions = transactionItems;
+
+      if (filterChanged) {
+        // Scroll to top of table
+        const transactionsTableWrap = document.getElementById("transactions-table-wrap");
+        window.scroll({
+          top: transactionsTableWrap.getBoundingClientRect().top + window.scrollY,
+          behavior: "smooth",
+        });
+      }
+
+      this.pageCount = Math.ceil(count / this.filters.pageSize);
+    });
   }
 
   getType(fromAccountId: number, toAccountId: number): TransactionType {
@@ -204,6 +179,16 @@ export class Transactions {
   filterChanged() {
     Actions.changeFilters(this.filters);
     this.getTransactions(true);
+  }
+
+  descriptionFilterChanged() {
+    Actions.changeFilters(this.filters);
+    this.getTransactions(true);
+  }
+
+  clearDescriptionFilter() {
+    this.filters.description = "";
+    this.descriptionFilterChanged();
   }
 
   first() {

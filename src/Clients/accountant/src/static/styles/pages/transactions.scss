@@ -1,3 +1,38 @@
+.description-filter-wrap {
+  position: relative;
+
+  input {
+    padding-right: 42px;
+    width: calc(100% - 54px);
+  }
+
+  i {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 10px 13px;
+    color: var(--primary-color);
+    cursor: pointer;
+    transition: color var(--transition);
+
+    &:hover {
+      color: var(--primary-color-dark);
+    }
+  }
+
+  &.searching {
+    input {
+      padding-right: 42px;
+      width: calc(100% - 54px);
+    }
+
+    i {
+      display: inline-block;
+    }
+  }
+}
+
 .transactions-pagination {
   display: flex;
   justify-content: space-between;
@@ -35,5 +70,18 @@
     margin: 0px 10px;
     font-size: 20px;
     line-height: 36px;
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .description-filter-wrap {
+    input {
+      padding-right: 48px;
+      width: calc(100% - 60px);
+    }
+
+    i {
+      padding: 12px 15px;
+    }
   }
 }

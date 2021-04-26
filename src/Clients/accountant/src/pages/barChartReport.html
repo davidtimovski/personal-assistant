@@ -14,7 +14,6 @@
     </div>
 
     <div class="content-wrap">
-
       <form>
         <div class="form-control inline">
           <label for="from-the-past" t="barChartReport.fromThePast">From the past</label>
@@ -25,8 +24,13 @@
         <div class="form-control inline">
           <label for="category" t="category">Category</label>
           <div class="loadable-select ${categoryOptions ? 'loaded' : ''}">
-            <select id="category" value.bind="categoryId" change.delegate="loadData()" disabled.bind="!categoryOptions"
-              class="category-select">
+            <select
+              id="category"
+              value.bind="categoryId"
+              change.delegate="loadData()"
+              disabled.bind="!categoryOptions"
+              class="category-select"
+            >
               <option model.bind="category.id" repeat.for="category of categoryOptions">${category.name}</option>
             </select>
             <i class="fas fa-circle-notch fa-spin"></i>
@@ -37,29 +41,25 @@
             <div class="multi-radio-part">
               <label class.bind="type === 0 ? 'selected' : ''">
                 <span t="barChartReport.balance">Balance</span>
-                <input type="radio" name="typeToggle" model.bind="0" checked.bind="type"
-                  change.delegate="loadData()">
+                <input type="radio" name="typeToggle" model.bind="0" checked.bind="type" change.delegate="loadData()" />
               </label>
             </div>
             <div class="multi-radio-part">
               <label class.bind="type === 1 ? 'selected' : ''">
                 <span t="barChartReport.expenses">Expenses</span>
-                <input type="radio" name="typeToggle" model.bind="1" checked.bind="type"
-                  change.delegate="loadData()">
+                <input type="radio" name="typeToggle" model.bind="1" checked.bind="type" change.delegate="loadData()" />
               </label>
             </div>
             <div class="multi-radio-part">
               <label class.bind="type === 2 ? 'selected' : ''">
                 <span t="barChartReport.deposits">Deposits</span>
-                <input type="radio" name="typeToggle" model.bind="2" checked.bind="type"
-                  change.delegate="loadData()">
+                <input type="radio" name="typeToggle" model.bind="2" checked.bind="type" change.delegate="loadData()" />
               </label>
             </div>
             <div class="multi-radio-part">
               <label class.bind="type === 4 ? 'selected' : ''">
                 <span t="barChartReport.savings">Savings</span>
-                <input type="radio" name="typeToggle" model.bind="4" checked.bind="type"
-                  change.delegate="loadData()">
+                <input type="radio" name="typeToggle" model.bind="4" checked.bind="type" change.delegate="loadData()" />
               </label>
             </div>
           </div>
@@ -71,10 +71,32 @@
         <div class="double-bounce2"></div>
       </div>
 
-      <div show.bind="dataLoaded" class="bar-chart-wrap">
-        <canvas id="chart"></canvas>
-      </div>
+      <div show.bind="dataLoaded">
+        <div class="bar-chart-wrap">
+          <canvas id="chart"></canvas>
+        </div>
 
+        <div class="per-month-table-title">Per month (average)</div>
+
+        <table class="per-month-table">
+          <tr if.bind="type === 0">
+            <td t="balance">Balance</td>
+            <td>${balanceAverage | moneyFormat:currency}</td>
+          </tr>
+          <tr if.bind="type === 0 || type === 1">
+            <td t="barChartReport.spent">Spent</td>
+            <td>${spentAverage | moneyFormat:currency}</td>
+          </tr>
+          <tr if.bind="type === 0 || type === 2">
+            <td t="barChartReport.deposited">Deposited</td>
+            <td>${depositedAverage | moneyFormat:currency}</td>
+          </tr>
+          <tr if.bind="type === 4">
+            <td t="barChartReport.saved">Saved</td>
+            <td>${savedAverage | moneyFormat:currency}</td>
+          </tr>
+        </table>
+      </div>
     </div>
   </div>
 </template>

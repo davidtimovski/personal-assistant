@@ -95,6 +95,7 @@
     "deposits": "Deposits",
     "transfers": "Transfers",
     "searchByDescription": "Search by description",
+    "clear": "Clear",
     "toggleDescriptionCategory": "Toggle Description/Category",
     "first": "First",
     "last": "Last",
@@ -207,7 +208,10 @@
     "balance": "Balance",
     "expenses": "Expenses",
     "deposits": "Deposits",
-    "savings": "Savings"
+    "savings": "Savings",
+    "spent": "Spent",
+    "deposited": "Deposited",
+    "saved": "Saved"
   },
   "expenditureHeatmap": {
     "expenditureHeatmap": "Expenditure heatmap",
