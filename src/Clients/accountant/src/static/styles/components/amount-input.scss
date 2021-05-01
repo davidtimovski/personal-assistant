@@ -1,3 +1,5 @@
+@import "../../../../../shared/src/static/styles/variables";
+
 .input-wrap {
   display: flex;
   line-height: 37px;
@@ -42,7 +44,7 @@
   }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width: $desktop-min) {
   .input-wrap .select-currency-input {
     font-size: 1.2rem;
     line-height: 45px;

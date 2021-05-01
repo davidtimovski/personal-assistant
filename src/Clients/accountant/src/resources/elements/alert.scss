@@ -1,3 +1,5 @@
+@import "../../../../shared/src/static/styles/variables";
+
 .alert {
   position: fixed;
   bottom: 30px;
@@ -55,7 +57,7 @@
   color: var(--danger-color);
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width: $desktop-min) {
   .alert {
     top: 30px;
     bottom: unset;

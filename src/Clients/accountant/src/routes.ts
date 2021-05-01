@@ -138,6 +138,11 @@ export default [
     moduleId: PLATFORM.moduleName("./pages/expenditureHeatmap"),
   },
   {
+    route: "fire-calculator",
+    name: "fireCalculator",
+    moduleId: PLATFORM.moduleName("./pages/fireCalculator"),
+  },
+  {
     route: "export",
     name: "export",
     moduleId: PLATFORM.moduleName("./pages/export"),

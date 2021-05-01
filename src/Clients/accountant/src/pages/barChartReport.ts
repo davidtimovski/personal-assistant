@@ -93,7 +93,7 @@ export class BarChartReport {
     this.dataLoaded = false;
 
     this.transactionsService
-      .getExpensesAndDepositsFromDate(this.fromDate, this.mainAccountId, this.categoryId, this.type, this.currency)
+      .getForBarChart(this.fromDate, this.mainAccountId, this.categoryId, this.type, this.currency)
       .then((transactions: Array<TransactionModel>) => {
         let itemGroups = this.groupBy(
           transactions,
@@ -159,10 +159,10 @@ export class BarChartReport {
                 break;
               case TransactionType.Saving:
                 {
-                  const movedToOther = monthTransactions.filter((x) => x.fromAccountId === this.mainAccountId);
+                  const movedFromMain = monthTransactions.filter((x) => x.fromAccountId === this.mainAccountId);
                   const movedToMain = monthTransactions.filter((x) => x.toAccountId === this.mainAccountId);
 
-                  item.amount += movedToOther.map((x) => x.amount).reduce((a, b) => a + b, 0);
+                  item.amount += movedFromMain.map((x) => x.amount).reduce((a, b) => a + b, 0);
                   item.amount -= movedToMain.map((x) => x.amount).reduce((a, b) => a + b, 0);
 
                   savedSum += item.amount;

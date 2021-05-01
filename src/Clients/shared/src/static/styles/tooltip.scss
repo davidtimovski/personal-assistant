@@ -87,7 +87,7 @@ tooltip {
 }
 
 /* DESKTOP */
-@media screen and (min-width: 1200px) {
+@media screen and (min-width: $desktop-min) {
   tooltip {
     font-size: 1.2rem;
   }

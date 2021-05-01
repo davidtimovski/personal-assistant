@@ -1,4 +1,5 @@
 @import "normalize";
+@import "variables";
 @import "checkbox";
 @import "double-radio-wrap";
 @import "fontawesome-free-5.10.2/fontawesome";
@@ -736,7 +737,7 @@ a.button {
 }
 
 /* DESKTOP */
-@media screen and (min-width: 1200px) {
+@media screen and (min-width: $desktop-min) {
   input[type="text"],
   input[type="email"],
   input[type="number"],
@@ -764,7 +765,7 @@ a.button {
   }
 }
 
-@media screen and (max-width: 1200px) {
+@media screen and (max-width: $desktop-min) {
   body {
     font-size: 17px;
   }

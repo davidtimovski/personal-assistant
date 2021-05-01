@@ -44,14 +44,13 @@ An ecosystem of PWAs that cooperate with each other to provide unique functional
 * Manage investment funds
 * Track debt
 * View different types of reports regarding your income and expenditures
+* Get a [FIRE](https://en.wikipedia.org/wiki/FIRE_movement) calculation based on your personal financial situation
 * Encrypt your transactions for privacy
 * Offline mode
 * Supports 168 currencies
 
-### Setup
-You will need `.env` file if you want to start it localy with docker
-
-just create a copy of `.env.example` and update the variables with correct values
+## Development
+You will need an `.env` file if you want to start it localy with docker. Just create a copy of `.env.example` and update the variables with the appropriate values.
 
 ## License
 

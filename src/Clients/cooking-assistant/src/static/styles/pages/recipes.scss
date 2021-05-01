@@ -17,21 +17,26 @@
   user-select: none;
 
   transition: color var(--transition);
+
+  &:hover {
+    color: var(--primary-color-dark);
+  }
+
+  &.is-shared .recipe-name .fa-users {
+    display: inline;
+  }
+
+  &.pending-share .recipe-name .fa-user-clock {
+    display: inline;
+  }
+
+  img {
+    width: 100%;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+  }
 }
-.recipe:hover {
-  color: var(--primary-color-dark);
-}
-.recipe.is-shared .recipe-name .fa-users {
-  display: inline;
-}
-.recipe.pending-share .recipe-name .fa-user-clock {
-  display: inline;
-}
-.recipe img {
-  width: 100%;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
-}
+
 .recipe-name {
   position: absolute;
   top: 15px;
@@ -53,6 +58,7 @@
     color: var(--primary-color);
   }
 }
+
 .num-ingredients-missing {
   display: none;
   position: absolute;
@@ -73,7 +79,6 @@
 .ingredients-missing .num-ingredients-missing {
   display: block;
 }
-
 
 /* Workaround for sticky :hover on mobile devices */
 .touch-device .recipe:hover {

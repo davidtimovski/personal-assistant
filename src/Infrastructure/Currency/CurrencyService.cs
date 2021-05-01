@@ -59,7 +59,8 @@ namespace PersonalAssistant.Infrastructure.Currency
         {
             if (daysSearched == DaysSearchLimit)
             {
-                return null;
+                var latestRates = conn.QueryFirstOrDefault<string>(@"SELECT ""Rates"" FROM ""CurrencyRates"" ORDER BY ""Date"" DESC LIMIT 1");
+                return JsonSerializer.Deserialize<Dictionary<string, decimal>>(latestRates);
             }
 
             var rates = conn.QueryFirstOrDefault<string>(@"SELECT ""Rates"" FROM ""CurrencyRates"" WHERE ""Date"" = @Date", new { Date = date });

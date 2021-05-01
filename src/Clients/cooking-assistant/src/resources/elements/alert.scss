@@ -1,3 +1,5 @@
+@import "../../../../shared/src/static/styles/variables";
+
 .alert {
   position: fixed;
   bottom: 30px;
@@ -5,40 +7,49 @@
   width: 100%;
   text-align: center;
   font-size: 1rem;
-}
-.alert-body {
-  display: inline-block;
-  border-radius: 6px;
-  box-shadow: var(--box-shadow);
-  padding: 7px 15px;
-  text-align: center;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-.alert.error .alert-message {
-  color: var(--danger-color);
-}
-.alert.error .alert-body {
-  background: #fdd;
-}
-.alert.error .side {
-  color: var(--danger-color);
-}
-.alert.error .side:not(.side-loading):hover {
-  color: var(--danger-color-dark);
-}
-.alert.success .alert-message {
-  color: var(--green-color-dark);
-}
-.alert.success .alert-body {
-  background: #dfd;
-}
-.alert .refresh-link {
-  display: none;
-  margin-top: 10px;
-  text-decoration: underline;
+
+  .alert-body {
+    display: inline-block;
+    border-radius: 6px;
+    box-shadow: var(--box-shadow);
+    padding: 7px 15px;
+    text-align: center;
+    user-select: none;
+
+    .refresh-link {
+      display: none;
+      margin-top: 10px;
+      text-decoration: underline;
+    }
+  }
+
+  &.error {
+    .alert-message {
+      color: var(--danger-color);
+    }
+
+    .alert-body {
+      background: #fdd;
+    }
+
+    .side {
+      color: var(--danger-color);
+
+      &:not(.side-loading):hover {
+        color: var(--danger-color-dark);
+      }
+    }
+  }
+
+  &.success {
+    .alert-message {
+      color: var(--green-color-dark);
+    }
+
+    .alert-body {
+      background: #dfd;
+    }
+  }
 }
 
 /* Workaround for sticky :hover on mobile devices */
@@ -46,7 +57,7 @@
   color: var(--danger-color);
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width: $desktop-min) {
   .alert {
     top: 30px;
     bottom: unset;
@@ -54,9 +65,9 @@
     width: unset;
     font-size: 1.1rem;
     text-align: right;
-  }
 
-  .alert-body {
-    padding: 10px 15px;
+    .alert-body {
+      padding: 10px 15px;
+    }
   }
 }

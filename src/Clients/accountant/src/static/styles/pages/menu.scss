@@ -1,3 +1,5 @@
+@import "../../../../../shared/src/static/styles/variables";
+
 .drawer-button-wrap {
   background: #f1f1f1;
   border-radius: 23px;
@@ -34,7 +36,7 @@
   }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width: $desktop-min) {
   .drawer-button-wrap.open .drawer-content-wrap {
     max-height: 185px;
   }

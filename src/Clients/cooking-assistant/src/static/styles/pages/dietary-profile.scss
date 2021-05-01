@@ -6,29 +6,33 @@
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   margin-bottom: 30px;
+
+  button {
+    width: 50%;
+    border: none;
+    border-bottom: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    outline: none;
+    font-size: inherit;
+    line-height: 45px;
+    color: inherit;
+    cursor: pointer;
+
+    &.active {
+      background: #fafafa;
+      border: 1px solid #ddd;
+      border-bottom: none;
+      color: var(--primary-color-dark);
+    }
+
+    &.inactive {
+      color: var(--faded-color);
+    }
+  }
 }
-.dietary-profile-tabs button {
-  width: 50%;
-  border: none;
-  border-bottom: 1px solid #ddd;
-  border-radius: var(--border-radius);
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  outline: none;
-  font-size: inherit;
-  line-height: 45px;
-  color: inherit;
-  cursor: pointer;
-}
-.dietary-profile-tabs button.active {
-  background: #fafafa;
-  border: 1px solid #ddd;
-  border-bottom: none;
-  color: var(--primary-color-dark);
-}
-.dietary-profile-tabs button.inactive {
-  color: var(--faded-color);
-}
+
 .diet-button.diet-changed {
   background: #dfd;
   color: var(--primary-color-dark);
@@ -37,79 +41,101 @@
 
 .dietary-profile {
   margin-bottom: 30px;
+
+  table {
+    width: 100%;
+
+    td {
+      line-height: 45px;
+
+      &:last-child {
+        text-align: right;
+      }
+    }
+  }
+
+  input[type="number"] {
+    width: 50px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    line-height: 37px;
+    text-align: center;
+  }
+
+  .input-wrap {
+    display: inline-flex;
+    justify-content: end;
+  }
 }
-.dietary-profile table {
-  width: 100%;
-}
-.dietary-profile td {
-  line-height: 45px;
-}
-.dietary-profile td:last-child {
-  text-align: right;
-}
+
 .gender-selector {
   line-height: 37px;
+
+  input[type="radio"] {
+    display: none;
+  }
+
+  label {
+    display: inline-block;
+    border-radius: var(--border-radius);
+    padding: 0 12px;
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition);
+
+    &:not(.selected):hover {
+      color: var(--primary-color);
+    }
+
+    &.selected {
+      background: var(--primary-color);
+      box-shadow: inset var(--box-shadow);
+      color: #fff;
+    }
+  }
 }
-.gender-selector input[type="radio"] {
-  display: none;
-}
-.gender-selector label {
-  display: inline-block;
-  border-radius: var(--border-radius);
-  padding: 0 12px;
-  cursor: pointer;
-  transition: background var(--transition), color var(--transition);
-}
-.gender-selector label:not(.selected):hover {
-  color: var(--primary-color);
-}
-.gender-selector label.selected {
-  background: var(--primary-color);
-  box-shadow: inset var(--box-shadow);
-  color: #fff;
-}
-.dietary-profile input[type="number"] {
-  width: 50px;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  line-height: 37px;
-  text-align: center;
-}
-.dietary-profile .input-wrap {
-  display: inline-flex;
-  justify-content: end;
-}
+
 .detailed-radio-selector-label {
   border-bottom: 1px solid #ddd;
   margin-bottom: 10px;
   line-height: 45px;
 }
-.detailed-radio-selector label {
-  cursor: pointer;
-}
-.detailed-radio-selector input[type="radio"] {
-  display: none;
-}
-.detailed-radio-selector label .title {
-  line-height: 32px;
-}
-.detailed-radio-selector label.selected .title,
-.detailed-radio-selector label.selected .explanation {
-  color: var(--primary-color-dark);
-}
-.detailed-radio-selector label i {
-  display: none;
-  margin-left: 5px;
-  color: var(--primary-color-dark);
-}
-.detailed-radio-selector label.selected i {
-  display: inline;
-}
-.detailed-radio-selector .explanation {
-  margin-bottom: 8px;
-  font-size: 16px;
-  line-height: 22px;
-  color: #888;
+
+.detailed-radio-selector {
+  label {
+    cursor: pointer;
+
+    .title {
+      line-height: 32px;
+    }
+
+    &.selected {
+      .title,
+      .explanation {
+        color: var(--primary-color-dark);
+      }
+
+      i {
+        display: inline;
+      }
+    }
+
+    i {
+      display: none;
+      margin-left: 5px;
+      color: var(--primary-color-dark);
+    }
+  }
+
+  input[type="radio"] {
+    display: none;
+  }
+
+  .explanation {
+    margin-bottom: 8px;
+    font-size: 16px;
+    line-height: 22px;
+    color: #888;
+  }
 }
 
 .intake-wrap {
@@ -122,21 +148,42 @@
 .intake-nutrient {
   padding: 5px 10px 10px;
   transition: opacity var(--transition);
+
+  &.not-tracked {
+    opacity: 0.5;
+  }
+
+  &:nth-child(odd) {
+    background: #eee;
+  }
+
+  label.toggle {
+    padding: 0;
+  }
+
+  .input-wrap {
+    display: inline-flex;
+    justify-content: end;
+  }
+
+  .custom {
+    padding-right: 12px;
+    line-height: 37px;
+  }
+
+  input[type="number"] {
+    width: 50px;
+    border-radius: 0;
+    line-height: 37px;
+    text-align: center;
+  }
 }
-.intake-nutrient.not-tracked {
-  opacity: 0.5;
-}
-.intake-nutrient:nth-child(odd) {
-  background: #eee;
-}
+
 .intake-nutrient-top-row {
   display: flex;
   justify-content: start;
   align-items: center;
   margin-bottom: 5px;
-}
-.intake-nutrient label.toggle {
-  padding: 0;
 }
 .intake-nutrient-bottom-row {
   text-align: right;
@@ -147,33 +194,20 @@
   justify-content: space-between;
   font-size: 1.1rem;
   line-height: 45px;
-}
-.intake-nutrient-data .customized {
-  text-decoration: line-through;
+
+  .customized {
+    text-decoration: line-through;
+  }
 }
 .intake-nutrient-name {
   padding-left: 10px;
 }
-.intake-nutrient .input-wrap {
-  display: inline-flex;
-  justify-content: end;
-}
-.intake-nutrient .custom {
-  padding-right: 12px;
-  line-height: 37px;
-}
-.intake-nutrient input[type="number"] {
-  width: 50px;
-  border-radius: 0;
-  line-height: 37px;
-  text-align: center;
-}
+
 .missing-intake {
   padding: 50px 10px;
   text-align: center;
   color: var(--faded-color);
 }
-
 
 @media screen and (max-width: 450px) {
   .gender-selector,

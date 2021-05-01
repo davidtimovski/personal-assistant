@@ -1,3 +1,5 @@
+@import "../../../../../shared/src/static/styles/variables";
+
 .input-wrap {
   display: inline-flex;
   justify-content: end;
@@ -12,7 +14,7 @@
   padding: 0 12px;
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width: $desktop-min) {
   .unit-input-addon {
     line-height: 45px;
   }

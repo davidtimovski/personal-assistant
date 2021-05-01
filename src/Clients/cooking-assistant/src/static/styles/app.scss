@@ -39,54 +39,60 @@ textarea.small {
 .add-ingredient-wrap {
   display: flex;
   justify-content: space-between;
-}
-.add-ingredient-wrap .toggle-from-tasks {
-  background: #fafafa;
-  border: none;
-  border-radius: var(--border-radius);
-  outline: none;
-  box-shadow: var(--box-shadow);
-  padding: 3px 11px 1px;
-  margin-left: 10px;
-  font-size: 29px;
-  line-height: 40px;
-  text-decoration: none;
-  color: var(--primary-color);
-  cursor: pointer;
 
-  transition: background var(--transition), color var(--transition);
+  .toggle-from-tasks {
+    background: #fafafa;
+    border: none;
+    border-radius: var(--border-radius);
+    outline: none;
+    box-shadow: var(--box-shadow);
+    padding: 3px 11px 1px;
+    margin-left: 10px;
+    font-size: 29px;
+    line-height: 40px;
+    text-decoration: none;
+    color: var(--primary-color);
+    cursor: pointer;
+
+    transition: background var(--transition), color var(--transition);
+
+    &.checked {
+      background: var(--primary-color);
+      color: #fafafa;
+    }
+  }
 }
-.add-ingredient-wrap .toggle-from-tasks.checked {
-  background: var(--primary-color);
-  color: #fafafa;
-}
+
 .add-input-wrap {
   position: relative;
   width: 100%;
-}
-.add-input-wrap input {
-  width: calc(100% - 62px);
-  padding-right: 50px;
-  line-height: 45px;
-}
-.add-input-wrap a {
-  position: absolute;
-  top: 1px;
-  right: 0;
-  background: none;
-  border: none;
-  outline: none;
-  padding: 0 12px;
-  font-size: 23px;
-  line-height: 45px;
-  text-decoration: none;
-  color: var(--primary-color);
-  cursor: pointer;
 
-  transition: color var(--transition);
-}
-.add-input-wrap a:hover {
-  color: var(--primary-color-dark);
+  input {
+    width: calc(100% - 62px);
+    padding-right: 50px;
+    line-height: 45px;
+  }
+
+  a {
+    position: absolute;
+    top: 1px;
+    right: 0;
+    background: none;
+    border: none;
+    outline: none;
+    padding: 0 12px;
+    font-size: 23px;
+    line-height: 45px;
+    text-decoration: none;
+    color: var(--primary-color);
+    cursor: pointer;
+
+    transition: color var(--transition);
+
+    &:hover {
+      color: var(--primary-color-dark);
+    }
+  }
 }
 
 .video-wrap {
@@ -94,26 +100,29 @@ textarea.small {
   width: 100%;
   height: 0;
   padding-bottom: 56.25%;
-}
-.video-iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  box-shadow: var(--box-shadow);
+
+  .video-iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    box-shadow: var(--box-shadow);
+  }
 }
 
 .prep-cook-duration-wrap {
   display: flex;
   justify-content: space-between;
-}
-.prep-cook-duration-wrap .duration-side {
-  width: 48%;
-}
-.prep-cook-duration-wrap .duration-input {
-  width: 26px;
-  text-align: center;
+
+  .duration-side {
+    width: 48%;
+  }
+
+  .duration-input {
+    width: 26px;
+    text-align: center;
+  }
 }
 
 .recipe-wrap .image,
@@ -173,17 +182,20 @@ servings-selector {
   border-bottom-left-radius: var(--border-radius);
   border-bottom-right-radius: var(--border-radius);
   box-shadow: var(--box-shadow);
-}
-.autocomplete-customizations > div {
-  padding: 5px 10px;
-  cursor: pointer;
-}
-.autocomplete-customizations .group {
-  background: var(--primary-color);
-  color: #fafafa;
-}
-.autocomplete-customizations .selected {
-  background: #e1e1e1;
+
+  > div {
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+
+  .group {
+    background: var(--primary-color);
+    color: #fafafa;
+  }
+
+  .selected {
+    background: #e1e1e1;
+  }
 }
 
 .small-button {

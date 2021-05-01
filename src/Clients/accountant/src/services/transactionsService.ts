@@ -42,10 +42,7 @@ export class TransactionsService extends HttpProxyBase {
     return await this.idbHelper.count(filters);
   }
 
-  async getAllByPage(
-    filters: SearchFilters,
-    currency: string
-  ): Promise<Array<TransactionModel>> {
+  async getAllByPage(filters: SearchFilters, currency: string): Promise<Array<TransactionModel>> {
     const transactions = await this.idbHelper.getAllByPage(filters);
 
     transactions.forEach((x: TransactionModel) => {
@@ -55,20 +52,20 @@ export class TransactionsService extends HttpProxyBase {
     return transactions;
   }
 
-  async getByCategory(transactions: Array<TransactionModel>, currency: string, uncategorizedLabel: string): Promise<Array<AmountByCategory>> {
+  async getByCategory(
+    transactions: Array<TransactionModel>,
+    currency: string,
+    uncategorizedLabel: string
+  ): Promise<Array<AmountByCategory>> {
     transactions.forEach((x: TransactionModel) => {
-      x.amount = this.currenciesService.convert(
-        x.amount,
-        x.currency,
-        currency
-      );
+      x.amount = this.currenciesService.convert(x.amount, x.currency, currency);
     });
 
     const categories = await this.categoriesService.getAll();
     const expendituresByCategory = new Array<AmountByCategory>();
 
     for (const category of categories) {
-      const categoryTransactions = transactions.filter(t => t.categoryId === category.id);
+      const categoryTransactions = transactions.filter((t) => t.categoryId === category.id);
       const expenditure = new AmountByCategory(category.id, category.parentId, null, 0);
       expenditure.categoryName = category.parentId === null ? category.name : "- " + category.name;
 
@@ -82,17 +79,17 @@ export class TransactionsService extends HttpProxyBase {
     }
 
     for (const expenditure of expendituresByCategory) {
-      const subExpenditures = expendituresByCategory.filter(e => e.amount !== 0 && e.parentCategoryId === expenditure.categoryId);
+      const subExpenditures = expendituresByCategory.filter(
+        (e) => e.amount !== 0 && e.parentCategoryId === expenditure.categoryId
+      );
 
       if (subExpenditures.length) {
-        expenditure.amount += subExpenditures
-          .map(c => c.amount)
-          .reduce((prev, curr) => prev + curr, 0);
+        expenditure.amount += subExpenditures.map((c) => c.amount).reduce((prev, curr) => prev + curr, 0);
         expenditure.subItems = subExpenditures.sort((a, b) => b.amount - a.amount);
       }
     }
 
-    const uncategorizedTransactions = transactions.filter(t => t.categoryId === null);
+    const uncategorizedTransactions = transactions.filter((t) => t.categoryId === null);
     if (uncategorizedTransactions.length) {
       const expenditure = new AmountByCategory(null, null, uncategorizedLabel, 0);
 
@@ -104,7 +101,7 @@ export class TransactionsService extends HttpProxyBase {
     }
 
     return expendituresByCategory
-      .filter(e => e.amount !== 0 && e.parentCategoryId === null)
+      .filter((e) => e.amount !== 0 && e.parentCategoryId === null)
       .sort((a, b) => b.amount - a.amount);
   }
 
@@ -116,29 +113,19 @@ export class TransactionsService extends HttpProxyBase {
     currency: string,
     uncategorizedLabel: string
   ): Promise<Array<AmountByCategory>> {
-    const transactions = await this.idbHelper.getExpendituresAndDepositsBetweenDates(
-      fromDate,
-      toDate,
-      accountId,
-      type
-    );
+    const transactions = await this.idbHelper.getExpendituresAndDepositsBetweenDates(fromDate, toDate, accountId, type);
 
     return await this.getByCategory(transactions, currency, uncategorizedLabel);
   }
 
-  async getExpensesAndDepositsFromDate(
+  async getForBarChart(
     fromDate: string,
     mainAccountId: number,
     categoryId: number,
     type: TransactionType,
     currency: string
   ): Promise<Array<TransactionModel>> {
-    const transactions = await this.idbHelper.getExpensesAndDepositsFromDate(
-      fromDate,
-      mainAccountId,
-      categoryId,
-      type
-    );
+    const transactions = await this.idbHelper.getForBarChart(fromDate, mainAccountId, categoryId, type);
 
     transactions.forEach((x: TransactionModel) => {
       x.amount = this.currenciesService.convert(x.amount, x.currency, currency);
@@ -147,15 +134,8 @@ export class TransactionsService extends HttpProxyBase {
     return transactions;
   }
 
-  async getExpendituresFrom(
-    mainAccountId: number,
-    fromDate: Date,
-    currency: string
-  ) {
-    const transactions = await this.idbHelper.getExpendituresFrom(
-      mainAccountId,
-      fromDate
-    );
+  async getExpendituresFrom(mainAccountId: number, fromDate: Date, currency: string) {
+    const transactions = await this.idbHelper.getExpendituresFrom(mainAccountId, fromDate);
 
     transactions.forEach((x: TransactionModel) => {
       x.amount = this.currenciesService.convert(x.amount, x.currency, currency);
@@ -178,11 +158,7 @@ export class TransactionsService extends HttpProxyBase {
       return null;
     }
 
-    transaction.convertedAmount = this.currenciesService.convert(
-      transaction.amount,
-      transaction.currency,
-      currency
-    );
+    transaction.convertedAmount = this.currenciesService.convert(transaction.amount, transaction.currency, currency);
     return transaction;
   }
 
@@ -194,16 +170,11 @@ export class TransactionsService extends HttpProxyBase {
     transaction.amount = parseFloat(<any>transaction.amount);
 
     if (transaction.description) {
-      transaction.description = transaction.description
-        .replace(/(\r\n|\r|\n){3,}/g, "$1\n")
-        .trim();
+      transaction.description = transaction.description.replace(/(\r\n|\r|\n){3,}/g, "$1\n").trim();
     }
 
     if (transaction.isEncrypted) {
-      const result = await this.encryptionService.encrypt(
-        transaction.description,
-        password
-      );
+      const result = await this.encryptionService.encrypt(transaction.description, password);
       transaction.encryptedDescription = result.encryptedData;
       transaction.salt = result.salt;
       transaction.nonce = result.nonce;
@@ -232,16 +203,11 @@ export class TransactionsService extends HttpProxyBase {
     transaction.amount = parseFloat(<any>transaction.amount);
 
     if (transaction.description) {
-      transaction.description = transaction.description
-        .replace(/(\r\n|\r|\n){3,}/g, "$1\n")
-        .trim();
+      transaction.description = transaction.description.replace(/(\r\n|\r|\n){3,}/g, "$1\n").trim();
     }
 
     if (transaction.isEncrypted) {
-      const result = await this.encryptionService.encrypt(
-        transaction.description,
-        password
-      );
+      const result = await this.encryptionService.encrypt(transaction.description, password);
       transaction.encryptedDescription = result.encryptedData;
       transaction.salt = result.salt;
       transaction.nonce = result.nonce;
@@ -279,12 +245,7 @@ export class TransactionsService extends HttpProxyBase {
     await this.idbHelper.delete(id);
   }
 
-  async adjust(
-    accountId: number,
-    amount: number,
-    description: string,
-    currency: string
-  ) {
+  async adjust(accountId: number, amount: number, description: string, currency: string) {
     const date = DateHelper.format(DateHelper.adjustForTimeZone(new Date()));
     const isExpense = amount < 0;
     amount = Math.abs(amount);

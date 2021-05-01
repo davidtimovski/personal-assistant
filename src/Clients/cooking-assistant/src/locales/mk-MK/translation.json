@@ -191,6 +191,7 @@
   "ingredients": {
     "ingredients": "Состојки",
     "search": "Пребарај",
+    "clear": "Избриши",
     "emptyListMessage": "Сеуште немате состојки",
     "linkedToTask": "Поврзана со задача",
     "hasNutritionSet": "Има хранлива вредност",

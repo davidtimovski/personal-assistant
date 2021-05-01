@@ -67,7 +67,7 @@
 }
 
 /* DESKTOP */
-@media screen and (min-width: 1200px) {
+@media screen and (min-width: $desktop-min) {
   .currency-selector-wrap,
   .currency-selector-wrap .currency-selector,
   .currency-selector-wrap .currency-selector .search-currencies-input {

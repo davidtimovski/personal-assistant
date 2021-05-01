@@ -2,8 +2,8 @@ import { inject } from "aurelia-framework";
 import { HttpClient } from "aurelia-fetch-client";
 import { EventAggregator } from "aurelia-event-aggregator";
 
-import { HttpProxyBase } from "../utils/httpProxyBase";
 import { AuthService } from "./authService";
+import { HttpProxyBase } from "../utils/httpProxyBase";
 import { LocalStorageCurrencies } from "../utils/localStorageCurrencies";
 import { DateHelper } from "../utils/dateHelper";
 import { AlertEvents } from "../utils/alertEvents";
@@ -26,11 +26,12 @@ export class CurrenciesService extends HttpProxyBase {
 
     this.currencyRates = await this.ajax<string>(`currencies/${today}`);
 
-    this.localStorage.setCurrencyRates(this.currencyRates);
+    this.localStorage.setCurrencyRates(JSON.stringify(this.currencyRates));
   }
 
   getCurrencies(): Array<string> {
     const currencies = new Array<string>();
+
     const currencyRates = this.currencyRates ? this.currencyRates : JSON.parse(this.localStorage.getCurrencyRates());
 
     for (const currency in currencyRates) {

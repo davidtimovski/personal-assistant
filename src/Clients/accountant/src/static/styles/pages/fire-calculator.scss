@@ -1,0 +1,222 @@
+@import "../../../../../shared/src/static/styles/variables";
+
+p {
+  margin: 0 0 15px 0;
+  font-size: 1.1rem;
+  line-height: 28px;
+}
+
+.highlight {
+  color: var(--primary-color);
+}
+
+.fire-button {
+  width: 100px;
+  background: linear-gradient(225deg, #7a46f3, #00a6ed);
+  background-size: 400% 400%;
+  border: none;
+  border-radius: var(--border-radius);
+  outline: none;
+  box-shadow: var(--box-shadow);
+  padding: 6px 0;
+  font-size: inherit;
+  line-height: 27px;
+  color: #fafafa;
+  cursor: pointer;
+  animation: AnimateGradiant 8s ease infinite;
+
+  &.back {
+    background: #fafafa;
+    color: var(--primary-color-dark);
+  }
+
+  &.big {
+    width: 180px;
+  }
+
+  &.start {
+    margin: 20px 0 30px;
+  }
+}
+
+.buttons-wrap {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3rem;
+}
+
+.section-title {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 12px;
+  font-size: 1.25rem;
+  text-align: center;
+}
+
+.question {
+  margin: 35px 0 15px;
+  text-align: center;
+  line-height: 27px;
+
+  &-detail {
+    margin: 20px 0;
+    text-align: center;
+    line-height: 23px;
+    color: var(--primary-color);
+  }
+}
+
+.fire-input-wrap {
+  text-align: center;
+
+  .input-wrap {
+    display: inline-flex;
+
+    input {
+      width: 60px;
+    }
+  }
+
+  .toggle {
+    display: inline-flex;
+  }
+}
+
+.interest-rate-input-wrap {
+  display: inline-flex;
+
+  input {
+    width: 60px;
+    text-align: center;
+  }
+
+  .add-on {
+    background: #ddd;
+    border-radius: var(--border-radius);
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    box-shadow: var(--box-shadow);
+    padding: 0 12px;
+    line-height: 37px;
+  }
+}
+
+.large-upcoming-expenses {
+  margin-top: 15px;
+
+  .large-upcoming-expense {
+    display: flex;
+    margin-top: 10px;
+
+    i {
+      flex-shrink: 0;
+      width: 30px;
+      text-align: center;
+      font-size: 23px;
+      line-height: 37px;
+      color: var(--primary-color);
+
+      &.fa-wallet {
+        font-size: 21px;
+      }
+    }
+
+    &-icon,
+    input[type="text"],
+    .input-wrap {
+      margin-right: 7px;
+    }
+
+    .remove-button {
+      cursor: pointer;
+
+      transition: color var(--transition-quick);
+
+      &:hover {
+        color: var(--primary-color-dark);
+      }
+    }
+  }
+
+  .add-button {
+    background: #fafafa;
+    border-radius: 50%;
+    box-shadow: var(--box-shadow);
+    padding: 8px 15px;
+    margin-top: 30px;
+    line-height: 27px;
+    color: var(--primary-color);
+    cursor: pointer;
+    user-select: none;
+    transition: color var(--transition);
+
+    &:hover {
+      color: var(--primary-color-dark);
+    }
+  }
+}
+
+ul {
+  padding: 0 25px;
+  margin: 20px 0 15px;
+
+  li {
+    margin-bottom: 5px;
+    line-height: 27px;
+
+    ul {
+      margin-top: 10px;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.result-message {
+  margin-top: 25px;
+  line-height: 27px;
+  text-align: center;
+}
+
+.retirement-age {
+  color: var(--primary-color);
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+@media screen and (min-width: $desktop-min) {
+  .section-title {
+    font-size: 1.4rem;
+  }
+
+  .question-detail {
+    line-height: 27px;
+  }
+
+  .fire-input-wrap .input-wrap input {
+    width: 100px;
+  }
+
+  .interest-rate-input-wrap .add-on {
+    line-height: 45px;
+  }
+
+  .large-upcoming-expenses {
+    .large-upcoming-expense i {
+      width: 40px;
+      font-size: 26px;
+      line-height: 45px;
+    }
+
+    &-icon,
+    input[type="text"],
+    .input-wrap {
+      margin-right: 10px;
+    }
+  }
+
+  ul li {
+    margin-bottom: 10px;
+  }
+}

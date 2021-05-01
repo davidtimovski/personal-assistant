@@ -1,0 +1,43 @@
+<template bindable="amount, currency">
+  <require from="../../static/styles/components/amount-input.scss"></require>
+
+  <div class="input-wrap ${changing ? 'changing' : ''}">
+    <input
+      type="number"
+      if.bind="currency === 'MKD'"
+      value.bind="amount"
+      ref="amountInput"
+      min="1"
+      max="100000000"
+      class="amount-input ${invalid ? 'invalid' : ''}"
+      required
+    />
+    <input
+      else
+      type="number"
+      value.bind="amount"
+      ref="amountInput"
+      step="any"
+      min="0.01"
+      max="1500000"
+      class="amount-input ${invalid ? 'invalid' : ''}"
+      required
+    />
+
+    <input
+      type="text"
+      class="select-currency-input"
+      ref="selectCurrencyInput"
+      maxlength="3"
+      t="[placeholder,aria-label]currency"
+    />
+    <button
+      type="button"
+      click.delegate="toggleChangeCurrency()"
+      class="selected-currency-button"
+      t="[title,aria-label]changeCurrency"
+    >
+      ${currency}
+    </button>
+  </div>
+</template>

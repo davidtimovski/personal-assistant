@@ -1,3 +1,5 @@
+@import "../../../../../shared/src/static/styles/variables";
+
 .description-filter-wrap {
   position: relative;
 
@@ -73,7 +75,7 @@
   }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width: $desktop-min) {
   .description-filter-wrap {
     input {
       padding-right: 48px;

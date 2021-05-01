@@ -13,14 +13,7 @@ import { SelectOption } from "models/viewmodels/selectOption";
 import { TransactionModel } from "models/entities/transaction";
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
 
-@inject(
-  AuthService,
-  HttpClient,
-  EventAggregator,
-  AccountsIDBHelper,
-  TransactionsIDBHelper,
-  CurrenciesService
-)
+@inject(AuthService, HttpClient, EventAggregator, AccountsIDBHelper, TransactionsIDBHelper, CurrenciesService)
 export class AccountsService extends HttpProxyBase {
   constructor(
     protected readonly authService: AuthService,
@@ -43,19 +36,15 @@ export class AccountsService extends HttpProxyBase {
     const getBalancePromises = new Array<Promise<void>>();
     for (const account of accounts) {
       if (account.stockPrice === null) {
-        const getBalancePromise = this.getBalance(account.id, currency).then(
-          (balance: number) => {
-            account.balance = balance;
-          }
-        );
+        const getBalancePromise = this.getBalance(account.id, currency).then((balance: number) => {
+          account.balance = balance;
+        });
         getBalancePromises.push(getBalancePromise);
       } else {
-        const getBalancePromise = this.getBalanceAndStocks(account, currency).then(
-          ([balance, stocks]) => {
-            account.balance = balance;
-            account.stocks = stocks;
-          }
-        );
+        const getBalancePromise = this.getBalanceAndStocks(account, currency).then(([balance, stocks]) => {
+          account.balance = balance;
+          account.stocks = stocks;
+        });
         getBalancePromises.push(getBalancePromise);
       }
     }
@@ -86,21 +75,49 @@ export class AccountsService extends HttpProxyBase {
     let balance = 0;
     transactions.forEach((x: TransactionModel) => {
       if (id === x.fromAccountId) {
-        balance -= this.currenciesService.convert(
-          x.amount,
-          x.currency,
-          currency
-        );
+        balance -= this.currenciesService.convert(x.amount, x.currency, currency);
       } else if (id === x.toAccountId) {
-        balance += this.currenciesService.convert(
-          x.amount,
-          x.currency,
-          currency
-        );
+        balance += this.currenciesService.convert(x.amount, x.currency, currency);
       }
     });
-    
+
     return parseFloat(balance.toFixed(2));
+  }
+
+  async getAverageMonthlySavingsFromThePastYear(currency: string) {
+    const mainAccountId = await this.getMainId();
+    const transferTransactions = await this.transactionsIDBHelper.getAllSavingTransactionsInThePastYear(mainAccountId);
+
+    const movedFromMain = transferTransactions.filter((x) => x.fromAccountId === mainAccountId);
+    const movedToMain = transferTransactions.filter((x) => x.toAccountId === mainAccountId);
+
+    let saving = 0;
+
+    saving += movedFromMain
+      .map((x) => this.currenciesService.convert(x.amount, x.currency, currency))
+      .reduce((a, b) => a + b, 0);
+    saving -= movedToMain
+      .map((x) => this.currenciesService.convert(x.amount, x.currency, currency))
+      .reduce((a, b) => a + b, 0);
+
+    const earliestTransaction = transferTransactions.sort((a: TransactionModel, b: TransactionModel) => {
+      const aDate = new Date(a.date);
+      const bDate = new Date(b.date);
+      if (aDate < bDate) return -1;
+      if (aDate > bDate) return 1;
+
+      return 0;
+    })[0];
+
+    const now = new Date();
+    const earliestTransactionDate = new Date(earliestTransaction.date);
+    const monthsPassed =
+      now.getMonth() -
+      earliestTransactionDate.getMonth() +
+      12 * (now.getFullYear() - earliestTransactionDate.getFullYear());
+    const savingsPerMonth = saving / monthsPassed;
+
+    return parseFloat(savingsPerMonth.toFixed(2));
   }
 
   async getBalanceAndStocks(account: Account, currency: string): Promise<[number, number]> {
@@ -117,12 +134,8 @@ export class AccountsService extends HttpProxyBase {
     });
 
     const amount = stocks * account.stockPrice;
-    balance += this.currenciesService.convert(
-      amount,
-      account.currency,
-      currency
-    );
-    
+    balance += this.currenciesService.convert(amount, account.currency, currency);
+
     return [parseFloat(balance.toFixed(2)), parseInt(stocks.toString())];
   }
 

@@ -22,6 +22,21 @@ export class TransactionsIDBHelper {
     return transactions.filter((t) => t.fromAccountId === accountId || t.toAccountId === accountId);
   }
 
+  async getAllSavingTransactionsInThePastYear(mainAccountId: number): Promise<Array<TransactionModel>> {
+    const transactions = await this.db.transactions.toArray();
+
+    const now = new Date();
+    const aYearAgo = new Date(now.getFullYear() - 1, now.getMonth(), 1);
+    const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    return transactions.filter(
+      (t) =>
+        new Date(t.date) >= aYearAgo &&
+        new Date(t.date) < firstOfMonth &&
+        this.isSavingOrWithdrawingFromSavings(t.fromAccountId, t.toAccountId, mainAccountId)
+    );
+  }
+
   async count(filters: SearchFilters): Promise<number> {
     const categoryIds = await this.getWithSubCategoryIds(filters.categoryId);
 
@@ -105,7 +120,7 @@ export class TransactionsIDBHelper {
     return transactions;
   }
 
-  async getExpensesAndDepositsFromDate(
+  async getForBarChart(
     fromDate: string,
     mainAccountId: number,
     categoryId: number,
@@ -113,10 +128,18 @@ export class TransactionsIDBHelper {
   ): Promise<Array<TransactionModel>> {
     const categoryIds = await this.getWithSubCategoryIds(categoryId);
 
+    const now = new Date();
+    const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
     const transactions = await this.db.transactions
       .orderBy("date")
       .reverse()
-      .filter((t) => this.checkAgainstFilters3(t, fromDate, mainAccountId, categoryId !== 0, categoryIds, type))
+      .filter(
+        (t) =>
+          new Date(t.date) >= new Date(fromDate) &&
+          new Date(t.date) < firstOfMonth &&
+          this.checkAgainstFilters3(t, mainAccountId, categoryId !== 0, categoryIds, type)
+      )
       .toArray();
 
     return transactions;
@@ -230,9 +253,8 @@ export class TransactionsIDBHelper {
   }
 
   /**
-   * Finds whether a transaction fits the filters. Ignores Transfer transaction types.
+   * Finds whether a transaction fits the filters.
    * @param t The transaction
-   * @param fromDate
    * @param mainAccountId
    * @param searchByCategory False if the all categories option is selected
    * @param categoryIds The selected category plus any potential child categories
@@ -241,7 +263,6 @@ export class TransactionsIDBHelper {
    */
   private checkAgainstFilters3(
     t: TransactionModel,
-    fromDate: string,
     mainAccountId: number,
     searchByCategory: boolean,
     categoryIds: Array<number>,
@@ -253,22 +274,18 @@ export class TransactionsIDBHelper {
         (t.fromAccountId === mainAccountId || t.toAccountId === mainAccountId)) ||
       (type === TransactionType.Expense && t.fromAccountId === mainAccountId && !t.toAccountId) ||
       (type === TransactionType.Deposit && !t.fromAccountId && t.toAccountId === mainAccountId) ||
-      (type === TransactionType.Saving && t.fromAccountId === mainAccountId && !!t.toAccountId);
+      (type === TransactionType.Saving &&
+        this.isSavingOrWithdrawingFromSavings(t.fromAccountId, t.toAccountId, mainAccountId));
     if (!inType) {
-      return false;
-    }
-
-    const afterDate = new Date(t.date) >= new Date(fromDate);
-    if (!afterDate) {
       return false;
     }
 
     if (searchByCategory) {
       if (categoryIds === null) {
         return t.categoryId === null;
-      } else {
-        return categoryIds.includes(t.categoryId);
       }
+
+      return categoryIds.includes(t.categoryId);
     }
 
     return true;
@@ -284,6 +301,10 @@ export class TransactionsIDBHelper {
 
   private isTransfer(fromAccountId: number, toAccountId: number) {
     return !!fromAccountId && !!toAccountId;
+  }
+
+  private isSavingOrWithdrawingFromSavings(fromAccountId: number, toAccountId: number, mainAccountId: number) {
+    return (fromAccountId === mainAccountId && !!toAccountId) || (toAccountId === mainAccountId && !!fromAccountId);
   }
 
   async getExpendituresForCurrentMonth(accountId: number): Promise<Array<TransactionModel>> {

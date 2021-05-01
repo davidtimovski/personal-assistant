@@ -34,10 +34,6 @@ namespace Api.Controllers.Common
             }
 
             IDictionary<string, decimal> currencyRates = _currencyService.GetAll(date);
-            if (currencyRates == null)
-            {
-                return NotFound();
-            }
 
             return Json(currencyRates);
         }

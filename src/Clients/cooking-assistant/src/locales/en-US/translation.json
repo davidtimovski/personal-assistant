@@ -191,6 +191,7 @@
   "ingredients": {
     "ingredients": "Ingredients",
     "search": "Search",
+    "clear": "Clear",
     "emptyListMessage": "You don't have any ingredients yet",
     "linkedToTask": "Linked to task",
     "hasNutritionSet": "Has nutrition set",
