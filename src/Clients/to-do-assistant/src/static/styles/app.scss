@@ -48,31 +48,36 @@
   padding: 0 10px;
   line-height: 45px;
   color: #888;
-}
-.icon-wrap .placeholder {
-  padding-left: 5px;
-}
-.icon-wrap .placeholder.editing {
-  color: var(--regular-color);
-}
-.icon-wrap .icon-options {
-  display: grid;
-  grid-template-columns: auto auto auto auto auto;
-  padding-bottom: 10px;
-}
-.icon-wrap .icon-option {
-  display: inline-block;
-  border-radius: var(--border-radius);
-  margin: 3px;
-  font-size: 24px;
-  line-height: 37px;
-  text-align: center;
-  cursor: pointer;
 
-  transition: background var(--transition);
-}
-.icon-wrap .icon-option.selected {
-  background: #e1f2ff;
+  .placeholder {
+    padding-left: 5px;
+
+    &.editing {
+      color: var(--regular-color);
+    }
+  }
+
+  .icon-options {
+    display: grid;
+    grid-template-columns: auto auto auto auto auto;
+    padding-bottom: 10px;
+
+    .icon-option {
+      display: inline-block;
+      border-radius: var(--border-radius);
+      margin: 3px;
+      font-size: 24px;
+      line-height: 37px;
+      text-align: center;
+      cursor: pointer;
+
+      transition: background var(--transition);
+
+      &.selected {
+        background: #e1f2ff;
+      }
+    }
+  }
 }
 
 .reorderable-repeat-dragging-me.to-do-list,
@@ -104,16 +109,20 @@
 
   transition: color var(--transition);
   cursor: pointer;
+
+  &.checked {
+    color: var(--primary-color);
+  }
+
+  input {
+    display: none;
+  }
+
+  &:hover {
+    color: var(--primary-color-dark);
+  }
 }
-.reorder-toggle.checked {
-  color: var(--primary-color);
-}
-.reorder-toggle input {
-  display: none;
-}
-.reorder-toggle:hover {
-  color: var(--primary-color-dark);
-}
+
 .sort-handle {
   cursor: grab;
   cursor: -webkit-grab;
@@ -130,13 +139,16 @@
   color: var(--primary-color);
 }
 
-.notifications-wrap.seen .notification:not(.highlighted) {
-  opacity: 0.6;
+.notifications-wrap.seen {
+  .notification:not(.highlighted) {
+    opacity: 0.6;
 
-  transition: opacity var(--transition);
-}
-.notifications-wrap.seen .notification:hover {
-  opacity: 1;
+    transition: opacity var(--transition);
+  }
+
+  .notification:hover {
+    opacity: 1;
+  }
 }
 
 .alert-message {

@@ -3,6 +3,10 @@ import { State } from "./state";
 import { RecipeModel } from "models/viewmodels/recipeModel";
 
 function getRecipes(state: State, recipes: Array<RecipeModel>) {
+  if (!recipes) {
+    return;
+  }
+
   const newState = Object.assign({}, state, { recipes: [...recipes] });
 
   return newState;

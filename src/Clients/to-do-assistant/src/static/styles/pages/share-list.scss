@@ -1,92 +1,98 @@
+@import "../../../../../shared/src/static/styles/variables";
+
 .add-input-wrap {
   position: relative;
-}
 
-.add-input-wrap input {
-  width: calc(100% - 58px);
-  padding-right: 46px;
-  line-height: 45px;
-}
+  input {
+    width: calc(100% - 58px);
+    padding-right: 46px;
+    line-height: 45px;
 
-.add-input-wrap input:disabled {
-  text-align: center;
-}
+    &:disabled {
+      text-align: center;
+    }
+  }
 
-.add-input-wrap a {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background: none;
-  border: none;
-  outline: none;
-  padding: 0 10px;
-  font-size: 23px;
-  line-height: 37px;
-  text-decoration: none;
-  color: var(--primary-color);
-  cursor: pointer;
+  a {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: none;
+    border: none;
+    outline: none;
+    padding: 0 10px;
+    font-size: 23px;
+    line-height: 45px;
+    text-decoration: none;
+    color: var(--primary-color);
+    cursor: pointer;
 
-  transition: color var(--transition);
-}
+    transition: color var(--transition);
 
-.add-input-wrap a {
-  line-height: 45px;
-}
+    &:hover {
+      color: var(--primary-color-dark);
+    }
 
-.add-input-wrap a:hover {
-  color: var(--primary-color-dark);
-}
-
-.add-input-wrap a:disabled {
-  color: var(--faded-color);
-  cursor: default;
+    &:disabled {
+      color: var(--faded-color);
+      cursor: default;
+    }
+  }
 }
 
 .share-with {
   display: flex;
   justify-content: flex-start;
   margin-bottom: 10px;
-}
-.share-image {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  margin: 6px 12px 0 0;
-}
-.share-content {
-  display: flex;
-  justify-content: space-between;
-  width: calc(100% - 46px);
-  background: #fafafa;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
-}
-.share-content .name {
-  width: 100%;
-  padding: 9px 10px 9px 2px;
-  line-height: 27px;
-  text-align: center;
-  word-wrap: anywhere;
-  cursor: pointer;
 
-  transition: var(--transition);
-}
-.share-content.not-editable .name {
-  cursor: default;
-  transition: none;
-}
-.share-content:not(.not-editable):not(.selected) .name:hover {
-  color: var(--primary-color-dark);
-}
-.share-content.selected {
-  background: var(--primary-color);
-  color: #fff;
-}
-.share-content.selected .side {
-  color: #fff;
-}
-.share-content.selected .remove-share-button {
-  visibility: hidden;
+  .share-image {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    margin: 6px 12px 0 0;
+  }
+
+  .share-content {
+    display: flex;
+    justify-content: space-between;
+    width: calc(100% - 46px);
+    background: #fafafa;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+
+    .name {
+      width: 100%;
+      padding: 9px 10px 9px 2px;
+      line-height: 27px;
+      text-align: center;
+      word-wrap: anywhere;
+      cursor: pointer;
+
+      transition: var(--transition);
+    }
+
+    &.not-editable .name {
+      cursor: default;
+      transition: none;
+    }
+
+    &:not(.not-editable):not(.selected) .name:hover {
+      color: var(--primary-color-dark);
+    }
+
+    &.selected {
+      background: var(--primary-color);
+      color: #fff;
+
+      .side {
+        color: #fff;
+      }
+
+      .remove-share-button {
+        visibility: hidden;
+      }
+    }
+  }
 }
 
 /* Workaround for sticky :hover on mobile devices */
@@ -95,7 +101,7 @@
   color: var(--primary-color);
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width: $desktop-min) {
   .add-input-wrap button {
     font-size: 25px;
     line-height: 45px;

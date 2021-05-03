@@ -27,6 +27,8 @@
     "menu": "Menu",
     "reorderLists": "Reorder lists",
     "refresh": "Refresh",
+    "shared": "Shared",
+    "pendingAccept": "Pending accept",
     "newList": "New list"
   },
   "list": {
@@ -147,7 +149,9 @@
     "emptyListMessage": "You haven't archived any lists"
   },
   "help": {
-    "help": "Help"
+    "help": "Help",
+    "hide": "Hide",
+    "show": "Show"
   },
   "menu": {
     "menu": "Menu",

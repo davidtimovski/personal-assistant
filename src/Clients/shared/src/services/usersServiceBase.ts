@@ -3,6 +3,7 @@ import { HttpClient } from "aurelia-fetch-client";
 import { EventAggregator } from "aurelia-event-aggregator";
 
 import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
+
 import { AuthService } from "./authService";
 import { LocalStorageBase } from "../utils/localStorageBase";
 

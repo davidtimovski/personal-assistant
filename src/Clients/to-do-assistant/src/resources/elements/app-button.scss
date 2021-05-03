@@ -8,55 +8,67 @@
   line-height: 45px;
   color: #fafafa;
   cursor: pointer;
+
+  &:hover {
+    border-radius: 23px;
+  }
+
+  &.disabled:hover {
+    border-radius: var(--border-radius);
+  }
+
+  &.primary-button {
+    animation: AnimateGradiant 8s ease infinite;
+
+    &.disabled {
+      background: #fafafa;
+      opacity: 0.7;
+      color: var(--primary-color);
+      cursor: default;
+    }
+  }
+
+  &.secondary-button {
+    background: #fafafa;
+    color: var(--primary-color-dark);
+  }
+
+  &.danger-button {
+    background: #fafafa;
+    color: var(--danger-color);
+
+    &.confirm {
+      background: linear-gradient(225deg, #ed2f00, #f34646);
+      background-size: 400% 400%;
+      color: #fafafa;
+
+      animation: AnimateGradiant 8s ease infinite;
+    }
+
+    &.loading.disabled {
+      background: linear-gradient(225deg, #ed2f00, #f34646);
+      background-size: 400% 400%;
+    }
+  }
+
+  &.loading.disabled {
+    opacity: 1;
+    color: #fafafa;
+  }
 }
+
 .loader {
   display: none;
   animation: fadeIn var(--transition);
-}
-.loader.loading {
-  display: inline;
-}
-.loader .fa-spin {
-  position: absolute;
-  top: 11px;
-  left: 13px;
-  font-size: 25px;
-}
-.button:hover {
-  border-radius: 23px;
-}
-.button.disabled:hover {
-  border-radius: var(--border-radius);
-}
-.button.primary-button {
-  animation: AnimateGradiant 8s ease infinite;
-}
-.button.secondary-button {
-  background: #fafafa;
-  color: var(--primary-color-dark);
-}
-.button.danger-button {
-  background: #fafafa;
-  color: var(--danger-color);
-}
-.button.danger-button.confirm {
-  background: linear-gradient(225deg, #ed2f00, #f34646);
-  background-size: 400% 400%;
-  color: #fafafa;
 
-  animation: AnimateGradiant 8s ease infinite;
-}
-.button.loading.disabled {
-  opacity: 1;
-  color: #fafafa;
-}
-.danger-button.loading.disabled {
-  background: linear-gradient(225deg, #ed2f00, #f34646);
-  background-size: 400% 400%;
-}
-.button.primary-button.disabled {
-  background: #fafafa;
-  opacity: 0.7;
-  color: var(--primary-color);
-  cursor: default;
+  &.loading {
+    display: inline;
+  }
+
+  .fa-spin {
+    position: absolute;
+    top: 11px;
+    left: 13px;
+    font-size: 25px;
+  }
 }

@@ -92,11 +92,7 @@ export class Lists {
     const oldOrder = ++data.fromIndex;
     const newOrder = ++data.toIndex;
 
-    await this.listsService.reorder(
-      id,
-      oldOrder,
-      newOrder
-    );
+    await this.listsService.reorder(id, oldOrder, newOrder);
 
     await Actions.reorderList(id, oldOrder, newOrder);
 

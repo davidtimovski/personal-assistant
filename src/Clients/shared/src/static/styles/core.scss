@@ -673,6 +673,21 @@ a.button {
   .tooltip-header {
     display: flex;
     justify-content: space-between;
+
+    a {
+      width: 54px;
+      padding: 3px 0 1px;
+      font-size: 25px;
+      text-align: center;
+      line-height: 40px;
+      text-decoration: none;
+      color: var(--primary-color);
+      transition: color var(--transition);
+
+      &:hover {
+        color: var(--primary-color-dark);
+      }
+    }
   }
 
   .fa-eye-slash {

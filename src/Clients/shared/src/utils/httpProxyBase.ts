@@ -94,8 +94,8 @@ export class HttpProxyBase {
 
   private async IsUnauthorized(statusCode: number) {
     if (statusCode === 401) {
-      await this.authService.signinRedirect();
-      return true;
+      this.authService.signinRedirect();
+      throw HttpError.Unauthorized;
     }
 
     return false;

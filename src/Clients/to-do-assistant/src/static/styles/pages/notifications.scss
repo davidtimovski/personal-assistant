@@ -4,30 +4,35 @@
   box-shadow: var(--box-shadow);
   padding: 9px 10px;
   margin-bottom: 10px;
-}
-.notification.openable {
-  cursor: pointer;
-}
-.notification-image {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  vertical-align: top;
-}
-.notification-content {
-  display: inline-block;
-  width: calc(100% - 55px);
-  padding-left: 15px;
-}
-.notification .name {
-  line-height: 27px;
-}
-.notification-time {
-  margin-top: 15px;
-  font-size: 16px;
-  line-height: 20px;
-  text-align: right;
-  color: var(--faded-color);
+
+  &.openable {
+    cursor: pointer;
+  }
+
+  &-image {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    vertical-align: top;
+  }
+
+  &-content {
+    display: inline-block;
+    width: calc(100% - 55px);
+    padding-left: 15px;
+  }
+
+  .name {
+    line-height: 27px;
+  }
+
+  &-time {
+    margin-top: 15px;
+    font-size: 16px;
+    line-height: 20px;
+    text-align: right;
+    color: var(--faded-color);
+  }
 }
 
 .show-button {

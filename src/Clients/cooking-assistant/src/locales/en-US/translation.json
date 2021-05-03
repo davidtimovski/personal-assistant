@@ -252,7 +252,9 @@
     "done": "Done!"
   },
   "help": {
-    "help": "Help"
+    "help": "Help",
+    "hide": "Hide",
+    "show": "Show"
   },
   "menu": {
     "menu": "Menu",
