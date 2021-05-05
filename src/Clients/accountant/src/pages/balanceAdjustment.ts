@@ -1,11 +1,6 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import {
-  ValidationController,
-  validateTrigger,
-  ValidationRules,
-  ControllerValidateResult,
-} from "aurelia-validation";
+import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
@@ -17,15 +12,7 @@ import { LocalStorage } from "utils/localStorage";
 import { Adjustment } from "models/viewmodels/adjustmentModel";
 import { SelectOption } from "models/viewmodels/selectOption";
 
-@inject(
-  Router,
-  TransactionsService,
-  AccountsService,
-  LocalStorage,
-  ValidationController,
-  I18N,
-  EventAggregator
-)
+@inject(Router, TransactionsService, AccountsService, LocalStorage, ValidationController, I18N, EventAggregator)
 export class BalanceAdjustment {
   private model: Adjustment;
   private originalBalance: number;
@@ -56,21 +43,14 @@ export class BalanceAdjustment {
   }
 
   attached() {
-    this.accountsService.getAllAsOptions().then(async (options) => {
+    this.accountsService.getNonInvestmentFundsAsOptions().then(async (options) => {
       this.accountOptions = options;
       const mainAccountId = this.accountOptions[0].id;
 
-      const balance = await this.accountsService.getBalance(
-        mainAccountId,
-        this.currency
-      );
+      const balance = await this.accountsService.getBalance(mainAccountId, this.currency);
       this.originalBalance = balance;
 
-      this.model = new Adjustment(
-        mainAccountId,
-        balance,
-        this.i18n.tr("balanceAdjustment.balanceAdjustment")
-      );
+      this.model = new Adjustment(mainAccountId, balance, this.i18n.tr("balanceAdjustment.balanceAdjustment"));
 
       this.originalAdjustmentJson = JSON.stringify(this.model);
 
@@ -85,10 +65,7 @@ export class BalanceAdjustment {
   }
 
   async accountChanged() {
-    const balance = await this.accountsService.getBalance(
-      this.model.accountId,
-      this.currency
-    );
+    const balance = await this.accountsService.getBalance(this.model.accountId, this.currency);
 
     this.originalBalance = this.model.balance = balance;
   }
@@ -100,10 +77,7 @@ export class BalanceAdjustment {
 
   @computedFrom("model.balance")
   get canAdjust() {
-    return (
-      !!this.model.balance &&
-      JSON.stringify(this.model) !== this.originalAdjustmentJson
-    );
+    return !!this.model.balance && JSON.stringify(this.model) !== this.originalAdjustmentJson;
   }
 
   async adjust() {
@@ -118,21 +92,12 @@ export class BalanceAdjustment {
 
     if (result.valid) {
       try {
-        const amount =
-          parseFloat(<any>this.model.balance) - this.originalBalance;
+        const amount = parseFloat(<any>this.model.balance) - this.originalBalance;
 
-        await this.transactionsService.adjust(
-          this.model.accountId,
-          amount,
-          this.model.description,
-          this.currency
-        );
+        await this.transactionsService.adjust(this.model.accountId, amount, this.model.description, this.currency);
         this.balanceIsInvalid = false;
 
-        this.eventAggregator.publish(
-          AlertEvents.ShowSuccess,
-          "balanceAdjustment.adjustmentSuccessful"
-        );
+        this.eventAggregator.publish(AlertEvents.ShowSuccess, "balanceAdjustment.adjustmentSuccessful");
         this.router.navigateToRoute("dashboard");
       } catch {
         this.adjustButtonIsLoading = false;

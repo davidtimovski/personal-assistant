@@ -10,9 +10,7 @@ export class AccountsIDBHelper {
   constructor(private readonly db: IDBContext) {}
 
   async getMainId(): Promise<number> {
-    const account = await this.db.accounts
-      .filter(a => a.isMain)
-      .first();
+    const account = await this.db.accounts.filter((a) => a.isMain).first();
 
     if (!account) {
       return;
@@ -31,17 +29,20 @@ export class AccountsIDBHelper {
     });
   }
 
-  async getAllAsOptions(): Promise<Array<Account>> {
-    const accounts = await this.db.accounts.toArray();
+  async getAllAsOptions(excludeFunds: boolean = false): Promise<Array<Account>> {
+    let accounts: Account[];
+
+    if (excludeFunds) {
+      accounts = await this.db.accounts.filter((x) => !x.stockPrice).toArray();
+    } else {
+      accounts = await this.db.accounts.toArray();
+    }
 
     const getCountPromises = Array<Promise<void>>();
     for (const account of accounts) {
       getCountPromises.push(
         this.db.transactions
-          .filter(
-            (x: TransactionModel) =>
-              x.fromAccountId === account.id || x.toAccountId === account.id
-          )
+          .filter((x: TransactionModel) => x.fromAccountId === account.id || x.toAccountId === account.id)
           .count()
           .then((count: number) => {
             (<any>account).transactionsCount = count;
@@ -83,17 +84,12 @@ export class AccountsIDBHelper {
   }
 
   async delete(id: number): Promise<void> {
-    await this.db.transaction(
-      "rw",
-      this.db.accounts,
-      this.db.transactions,
-      function* () {
-        yield this.db.transactions.where("fromAccountId").equals(id).delete();
-        yield this.db.accounts.delete(id);
-        yield this.db.transactions.where("toAccountId").equals(id).delete();
-        yield this.db.accounts.delete(id);
-      }
-    );
+    await this.db.transaction("rw", this.db.accounts, this.db.transactions, function* () {
+      yield this.db.transactions.where("fromAccountId").equals(id).delete();
+      yield this.db.accounts.delete(id);
+      yield this.db.transactions.where("toAccountId").equals(id).delete();
+      yield this.db.accounts.delete(id);
+    });
   }
 
   async hasTransactions(id: number): Promise<boolean> {
@@ -126,41 +122,28 @@ export class AccountsIDBHelper {
   }
 
   async sync(deletedAccountIds: Array<number>, accounts: Array<Account>) {
-    await this.db.transaction(
-      "rw",
-      this.db.accounts,
-      this.db.transactions,
-      async () => {
-        if (deletedAccountIds.length > 0) {
-          for (const accountId of deletedAccountIds) {
-            await this.db.transactions
-              .where("fromAccountId")
-              .equals(accountId)
-              .delete();
-            await this.db.transactions
-              .where("toAccountId")
-              .equals(accountId)
-              .delete();
-            await this.db.accounts.delete(accountId);
-          }
-        }
-
-        if (accounts.length > 0) {
-          for (const account of accounts) {
-            account.synced = true;
-          }
-          await this.db.accounts.bulkPut(accounts);
+    await this.db.transaction("rw", this.db.accounts, this.db.transactions, async () => {
+      if (deletedAccountIds.length > 0) {
+        for (const accountId of deletedAccountIds) {
+          await this.db.transactions.where("fromAccountId").equals(accountId).delete();
+          await this.db.transactions.where("toAccountId").equals(accountId).delete();
+          await this.db.accounts.delete(accountId);
         }
       }
-    );
+
+      if (accounts.length > 0) {
+        for (const account of accounts) {
+          account.synced = true;
+        }
+        await this.db.accounts.bulkPut(accounts);
+      }
+    });
   }
 
   async getForSyncing(): Promise<Array<Account>> {
     const accounts = this.db.accounts.toCollection();
 
-    return accounts
-      .filter(a => !a.synced)
-      .toArray();
+    return accounts.filter((a) => !a.synced).toArray();
   }
 
   async consolidate(accountIdPairs: Array<CreatedIdPair>) {

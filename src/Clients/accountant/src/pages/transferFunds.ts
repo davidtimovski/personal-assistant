@@ -141,10 +141,6 @@ export class TransferFunds {
       try {
         const amount = parseFloat(<any>this.model.amount);
 
-        // const fromAccountBalance = await this.accountsService.getBalance(
-        //   this.model.fromAccountId,
-        //   this.model.currency
-        // );
         if (this.model.fromAccount.balance < amount) {
           this.amountIsInvalid = true;
           this.transferButtonIsLoading = false;

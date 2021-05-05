@@ -5,13 +5,14 @@ import { EventAggregator } from "aurelia-event-aggregator";
 
 import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
 import { AuthService } from "../../../shared/src/services/authService";
+import { CurrenciesService } from "../../../shared/src/services/currenciesService";
+import { DateHelper } from "../../../shared/src/utils/dateHelper";
+
 import { AccountsIDBHelper } from "../utils/accountsIDBHelper";
 import { TransactionsIDBHelper } from "../utils/transactionsIDBHelper";
-import { CurrenciesService } from "../../../shared/src/services/currenciesService";
 import { Account } from "models/entities/account";
 import { SelectOption } from "models/viewmodels/selectOption";
 import { TransactionModel } from "models/entities/transaction";
-import { DateHelper } from "../../../shared/src/utils/dateHelper";
 
 @inject(AuthService, HttpClient, EventAggregator, AccountsIDBHelper, TransactionsIDBHelper, CurrenciesService)
 export class AccountsService extends HttpProxyBase {
@@ -56,6 +57,17 @@ export class AccountsService extends HttpProxyBase {
 
   async getAllAsOptions(): Promise<Array<SelectOption>> {
     const accounts = await this.idbHelper.getAllAsOptions();
+
+    const options = new Array<SelectOption>();
+    for (const account of accounts) {
+      options.push(new SelectOption(account.id, account.name));
+    }
+
+    return options;
+  }
+
+  async getNonInvestmentFundsAsOptions(): Promise<Array<SelectOption>> {
+    const accounts = await this.idbHelper.getAllAsOptions(true);
 
     const options = new Array<SelectOption>();
     for (const account of accounts) {
@@ -123,7 +135,6 @@ export class AccountsService extends HttpProxyBase {
   async getBalanceAndStocks(account: Account, currency: string): Promise<[number, number]> {
     const transactions = await this.transactionsIDBHelper.getAllForAccount(account.id);
 
-    let balance = 0;
     let stocks = 0;
     transactions.forEach((x: TransactionModel) => {
       if (account.id === x.fromAccountId) {
@@ -134,7 +145,7 @@ export class AccountsService extends HttpProxyBase {
     });
 
     const amount = stocks * account.stockPrice;
-    balance += this.currenciesService.convert(amount, account.currency, currency);
+    const balance = this.currenciesService.convert(amount, account.currency, currency);
 
     return [parseFloat(balance.toFixed(2)), parseInt(stocks.toString())];
   }

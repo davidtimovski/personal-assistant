@@ -169,6 +169,13 @@ export class TransactionsService extends HttpProxyBase {
 
     transaction.amount = parseFloat(<any>transaction.amount);
 
+    if (transaction.fromStocks) {
+      transaction.fromStocks = parseFloat(<any>transaction.fromStocks);
+    }
+    if (transaction.toStocks) {
+      transaction.toStocks = parseFloat(<any>transaction.toStocks);
+    }
+
     if (transaction.description) {
       transaction.description = transaction.description.replace(/(\r\n|\r|\n){3,}/g, "$1\n").trim();
     }
@@ -201,6 +208,13 @@ export class TransactionsService extends HttpProxyBase {
     }
 
     transaction.amount = parseFloat(<any>transaction.amount);
+
+    if (transaction.fromStocks) {
+      transaction.fromStocks = parseFloat(<any>transaction.fromStocks);
+    }
+    if (transaction.toStocks) {
+      transaction.toStocks = parseFloat(<any>transaction.toStocks);
+    }
 
     if (transaction.description) {
       transaction.description = transaction.description.replace(/(\r\n|\r|\n){3,}/g, "$1\n").trim();
