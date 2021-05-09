@@ -9,13 +9,12 @@
         <i class="fas fa-handshake"></i>
       </div>
       <div t="shareRequests.shareRequests" class="page-title">Share requests</div>
-      <a route-href="route: lists" class="side back">
+      <a route-href="route: lists" class="back-button">
         <i class="fas fa-times"></i>
       </a>
     </div>
 
     <div class="content-wrap">
-
       <div if.bind="!pendingShareRequests && !declinedShareRequests" class="double-circle-loading">
         <div class="double-bounce1"></div>
         <div class="double-bounce2"></div>
@@ -24,10 +23,15 @@
       <div else class="share-requests-wrap">
         <tooltip if.bind="pendingShareRequests.length > 0" key.bind="shareRequestsTooltipKey"></tooltip>
         <div repeat.for="request of pendingShareRequests" class="share-request">
-          <a if.bind="!request.leftSideIsLoading" click.delegate="decline(request)" class="side" t="[title,aria-label]shareRequests.decline">
+          <a
+            if.bind="!request.leftSideIsLoading"
+            click.delegate="decline(request)"
+            class="action"
+            t="[title,aria-label]shareRequests.decline"
+          >
             <i class="fas fa-ban"></i>
           </a>
-          <span if.bind="request.leftSideIsLoading" class="side side-loading">
+          <span if.bind="request.leftSideIsLoading" class="action">
             <i class="fas fa-circle-notch fa-spin"></i>
           </span>
           <span class="name">
@@ -35,10 +39,15 @@
             <span t="shareRequests.by">by</span>
             <span class="colored-text">${request.listOwnerName}</span>
           </span>
-          <a if.bind="!request.rightSideIsLoading" click.delegate="accept(request)" class="side" t="[title,aria-label]shareRequests.accept">
+          <a
+            if.bind="!request.rightSideIsLoading"
+            click.delegate="accept(request)"
+            class="action"
+            t="[title,aria-label]shareRequests.accept"
+          >
             <i class="fas fa-check"></i>
           </a>
-          <span if.bind="request.rightSideIsLoading" class="side side-loading">
+          <span if.bind="request.rightSideIsLoading" class="action">
             <i class="fas fa-circle-notch fa-spin"></i>
           </span>
         </div>
@@ -50,25 +59,29 @@
       <div if.bind="declinedShareRequests.length > 0">
         <div class="labeled-separator">
           <div class="labeled-separator-text" t="shareRequests.blockedUsers">Blocked users</div>
-          <hr>
+          <hr />
         </div>
 
         <div class="share-requests-wrap declined">
           <div repeat.for="request of declinedShareRequests" class="share-request">
-            <div class="side inactive">
+            <div class="action inactive">
               <i class="fas fa-ban"></i>
             </div>
             <span class="name">${request.listOwnerName}</span>
-            <a if.bind="!request.rightSideIsLoading" click.delegate="delete(request)" class="side delete" t="[title,aria-label]shareRequests.unblock">
+            <a
+              if.bind="!request.rightSideIsLoading"
+              click.delegate="delete(request)"
+              class="action delete"
+              t="[title,aria-label]shareRequests.unblock"
+            >
               <i class="fas fa-times-circle"></i>
             </a>
-            <span if.bind="request.rightSideIsLoading" class="side side-loading">
+            <span if.bind="request.rightSideIsLoading" class="action">
               <i class="fas fa-circle-notch fa-spin"></i>
             </span>
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </template>

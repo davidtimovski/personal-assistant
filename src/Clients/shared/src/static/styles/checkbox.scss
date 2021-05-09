@@ -14,7 +14,6 @@ label.toggle {
   span {
     line-height: 29px;
     user-select: none;
-    transition: color var(--transition);
   }
 
   &:not(.disabled):hover span {
@@ -35,7 +34,6 @@ label.toggle {
     appearance: none;
     background: #bbc;
     border-radius: 3px;
-    box-shadow: inset 0 1px 6px 0 rgba(0, 0, 0, 0.1);
     position: relative;
     outline: 0;
     cursor: pointer;
@@ -52,7 +50,6 @@ label.toggle {
     background: #e5e5e5;
     z-index: 2;
     border-radius: 2px;
-    box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.25);
     transition: all 250ms;
   }
 

@@ -42,7 +42,7 @@
   "scope": ".",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#fafafa",
+  "background_color": "#fff",
   "theme_color": "#5aacf1",
   "description": "Your very own To Do Assistant.",
   "dir": "ltr",

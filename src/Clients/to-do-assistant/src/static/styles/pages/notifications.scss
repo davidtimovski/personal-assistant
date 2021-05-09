@@ -1,7 +1,18 @@
+.notifications-wrap.seen {
+  margin-top: 15px;
+
+  .notification:not(.highlighted) {
+    opacity: 0.6;
+  }
+
+  .notification:hover {
+    opacity: 1;
+  }
+}
+
 .notification {
-  background: #fafafa;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
+  background: #f4faff;
+  border-radius: 8px;
   padding: 9px 10px;
   margin-bottom: 10px;
 

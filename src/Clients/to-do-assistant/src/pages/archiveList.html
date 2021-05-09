@@ -7,13 +7,12 @@
       <div class="page-title">
         <span t="archiveList.archive">Archive</span>&nbsp;<span class="colored-text">${model.name}</span>?
       </div>
-      <a route-href="route: list; params.bind: { id: model.id }" class="side back">
+      <a route-href="route: list; params.bind: { id: model.id }" class="back-button">
         <i class="fas fa-times"></i>
       </a>
     </div>
 
     <div class="content-wrap">
-
       <div class="text-wrap">${archivingAListText}</div>
 
       <div class="save-delete-wrap">
@@ -25,7 +24,6 @@
         </a>
         <a route-href="route: list; params.bind: { id: model.id }" t="cancel" class="button secondary-button">Cancel</a>
       </div>
-
     </div>
   </div>
 </template>

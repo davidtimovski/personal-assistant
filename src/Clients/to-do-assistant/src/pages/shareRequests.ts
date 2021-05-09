@@ -20,31 +20,23 @@ export class ShareRequests {
   ) {}
 
   attached() {
-    this.listsService
-      .getShareRequests()
-      .then((allShareRequests: Array<ShareRequest>) => {
-        this.pendingShareRequests = allShareRequests.filter(
-          (request: ShareRequest) => {
-            return request.isAccepted === null;
-          }
-        );
-        this.declinedShareRequests = allShareRequests.filter(
-          (request: ShareRequest) => {
-            return request.isAccepted === false;
-          }
-        );
-
-        this.emptyListMessage = this.i18n.tr("shareRequests.emptyListMessage");
+    this.listsService.getShareRequests().then((allShareRequests: Array<ShareRequest>) => {
+      this.pendingShareRequests = allShareRequests.filter((request: ShareRequest) => {
+        return request.isAccepted === null;
       });
+      this.declinedShareRequests = allShareRequests.filter((request: ShareRequest) => {
+        return request.isAccepted === false;
+      });
+
+      this.emptyListMessage = this.i18n.tr("shareRequests.emptyListMessage");
+    });
   }
 
   async accept(request: ShareRequest) {
     request.rightSideIsLoading = true;
+
     await this.listsService.setShareIsAccepted(request.listId, true);
-    this.pendingShareRequests.splice(
-      this.pendingShareRequests.indexOf(request),
-      1
-    );
+    this.pendingShareRequests.splice(this.pendingShareRequests.indexOf(request), 1);
 
     await Actions.getLists(this.listsService);
 
@@ -54,10 +46,7 @@ export class ShareRequests {
   async decline(request: ShareRequest) {
     request.leftSideIsLoading = true;
     await this.listsService.setShareIsAccepted(request.listId, false);
-    this.pendingShareRequests.splice(
-      this.pendingShareRequests.indexOf(request),
-      1
-    );
+    this.pendingShareRequests.splice(this.pendingShareRequests.indexOf(request), 1);
     request.leftSideIsLoading = false;
     this.declinedShareRequests.unshift(request);
   }
@@ -65,10 +54,7 @@ export class ShareRequests {
   async delete(request: ShareRequest) {
     request.rightSideIsLoading = true;
     await this.listsService.leave(request.listId);
-    this.declinedShareRequests.splice(
-      this.declinedShareRequests.indexOf(request),
-      1
-    );
+    this.declinedShareRequests.splice(this.declinedShareRequests.indexOf(request), 1);
     request.rightSideIsLoading = false;
   }
 }

@@ -2,21 +2,22 @@
 
 .assign-to-user {
   display: none;
-  background: #fafafa;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
   padding-bottom: 0;
 
   .assign-to-user-header {
     background: var(--primary-color);
-    border-top-left-radius: var(--border-radius);
-    border-top-right-radius: var(--border-radius);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
     padding: 0 10px;
     text-align: center;
     color: #fff;
   }
 
   .assign-to-user-content {
+    border: 1px solid #ddd;
+    border-top: none;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
     padding: 6px 10px;
 
     .assign-to-user-image {
@@ -42,8 +43,6 @@
     border-radius: var(--border-radius);
     cursor: pointer;
 
-    transition: color var(--transition);
-
     &:hover {
       color: var(--primary-color);
     }
@@ -58,7 +57,7 @@
 
     i {
       display: none;
-      margin-left: 5px;
+      margin-left: 8px;
     }
   }
 

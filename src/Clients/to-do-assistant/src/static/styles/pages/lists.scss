@@ -1,75 +1,124 @@
+.lists-reorder-toggle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 45px;
+  height: 50px;
+  margin-left: 15px;
+  font-size: 25px;
+  text-decoration: none;
+  color: var(--faded-color);
+  cursor: pointer;
+
+  &.checked {
+    color: var(--primary-color);
+  }
+
+  input {
+    display: none;
+  }
+
+  &:hover {
+    color: var(--primary-color-dark);
+  }
+}
+
+.content-wrap.lists {
+  padding-top: 15px;
+}
+
 .to-do-lists-wrap {
   margin-bottom: 30px;
 
   &.reordering .icon {
     display: none;
   }
+}
 
-  .to-do-list {
-    position: relative;
-    display: flex;
-    justify-content: flex-start;
-    border-radius: var(--border-radius);
-    margin: 12px 0;
+.to-do-list {
+  position: relative;
+  display: flex;
+  justify-content: flex-start;
+  background: #e9f4ff;
+  border-radius: 6px;
+  margin: 12px 0;
+  text-decoration: none;
+  user-select: none;
+
+  &:first-child {
+    margin-top: 0;
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &:hover {
+    background: #e1f2ff;
+  }
+
+  .icon {
+    min-width: 37px;
+    height: 37px;
+    background: #fff;
+    border-radius: 6px;
+    margin: 4px;
+    line-height: 37px;
+    text-align: center;
+    font-size: 22px;
+    color: var(--primary-color-dark);
+  }
+
+  .reorder-icon {
+    display: none;
+    width: 45px;
+    line-height: 45px;
+    text-align: center;
+    color: var(--primary-color);
+  }
+
+  .shared-icon {
+    display: none;
+    position: absolute;
+    top: 11px;
+    right: 12px;
+    font-size: 24px;
+    color: var(--primary-color);
+  }
+
+  &.is-shared,
+  &.pending-share {
+    padding-right: 50px;
+  }
+
+  &.is-shared .fa-users {
+    display: inline;
+  }
+  &.pending-share .fa-user-clock {
+    display: inline;
+  }
+
+  .name {
+    padding: 8px 10px;
+    line-height: 27px;
+    font-size: 1.1rem;
     color: var(--regular-color);
-    text-decoration: none;
-    user-select: none;
-
-    &:first-child {
-      margin-top: 0;
-    }
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    &:hover {
-      background: #e1f2ff;
-    }
-
-    .icon {
-      width: 45px;
-      min-width: 45px;
-      height: 45px;
-      line-height: 45px;
-      text-align: center;
-      font-size: 23px;
-      color: var(--faded-color);
-    }
-
-    .shared-icon {
-      display: none;
-      position: absolute;
-      top: 11px;
-      right: 10px;
-      font-size: 24px;
-      color: var(--faded-color);
-    }
-
-    &.is-shared,
-    &.pending-share {
-      padding-right: 50px;
-    }
-
-    &.is-shared .fa-users {
-      display: inline;
-    }
-    &.pending-share .fa-user-clock {
-      display: inline;
-    }
-
-    .name {
-      padding: 8px 10px;
-      line-height: 27px;
-    }
   }
 }
 
+.sort-handle {
+  cursor: grab;
+  cursor: -webkit-grab;
+}
+.reordering .reorder-icon {
+  display: inline-block !important;
+}
+
 .to-do-list-placeholder {
-  background: #eee;
+  background: #e9f4ff;
   border-radius: var(--border-radius);
   padding: 9px 10px;
-  margin: 15px 0;
+  margin: 12px 0;
   line-height: 27px;
   user-select: none;
 

@@ -25,9 +25,9 @@ tooltip {
 
   .answer-wrap {
     display: none;
-    background: #fafafa;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
     margin-bottom: 10px;
 
     &.visible {
@@ -65,7 +65,7 @@ tooltip {
       padding: 0 12px;
       font-size: 1rem;
       line-height: 31px;
-      color: #fafafa;
+      color: #fff;
       cursor: pointer;
 
       animation: AnimateGradiant 8s ease infinite;
@@ -75,9 +75,9 @@ tooltip {
 
   .dismissed-wrap {
     display: none;
-    background: #fafafa;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
     margin: 10px 0;
 
     &.visible {

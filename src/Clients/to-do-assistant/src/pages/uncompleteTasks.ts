@@ -16,19 +16,7 @@ import * as Actions from "utils/state/actions";
 @connectTo()
 export class UncompleteTasks {
   private listId: number;
-  private model = new List(
-    0,
-    "",
-    "",
-    false,
-    false,
-    SharingState.NotShared,
-    0,
-    false,
-    [],
-    null,
-    null
-  );
+  private model = new List(0, "", "", false, false, SharingState.NotShared, 0, false, [], null);
   private uncompleteText: string;
   private uncompleteButtonIsLoading = false;
   state: State;
@@ -65,9 +53,7 @@ export class UncompleteTasks {
     this.model = JSON.parse(JSON.stringify(list));
 
     if (this.model.sharingState !== 0) {
-      this.uncompleteText = this.i18n.tr(
-        "uncompleteTasks.thisWillUncompleteShared"
-      );
+      this.uncompleteText = this.i18n.tr("uncompleteTasks.thisWillUncompleteShared");
     }
   }
 
@@ -83,10 +69,7 @@ export class UncompleteTasks {
 
       await Actions.getLists(this.listsService);
 
-      this.eventAggregator.publish(
-        AlertEvents.ShowSuccess,
-        "uncompleteTasks.uncompleteTasksSuccessful"
-      );
+      this.eventAggregator.publish(AlertEvents.ShowSuccess, "uncompleteTasks.uncompleteTasksSuccessful");
 
       this.router.navigateToRoute("listsEdited", { editedId: this.model.id });
     } catch {

@@ -16,19 +16,7 @@ import * as Actions from "utils/state/actions";
 @connectTo()
 export class ArchiveList {
   private listId: number;
-  private model = new List(
-    0,
-    "",
-    "",
-    false,
-    false,
-    SharingState.NotShared,
-    0,
-    false,
-    [],
-    null,
-    null
-  );
+  private model = new List(0, "", "", false, false, SharingState.NotShared, 0, false, [], null);
   private archiveButtonIsLoading = false;
   state: State;
 
@@ -81,10 +69,7 @@ export class ArchiveList {
 
       await Actions.getLists(this.listsService);
 
-      this.eventAggregator.publish(
-        AlertEvents.ShowSuccess,
-        "archiveList.archiveSuccessful"
-      );
+      this.eventAggregator.publish(AlertEvents.ShowSuccess, "archiveList.archiveSuccessful");
 
       this.router.navigateToRoute("lists");
     } catch {

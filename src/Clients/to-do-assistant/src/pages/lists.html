@@ -4,48 +4,36 @@
   <div class="au-animate animate-fade-in animate-fade-out">
     <div class="page-title-wrap-loader">
       <div class="title-wrap">
-        <span if.bind="menuButtonIsLoading" class="page-loading">
+        <span if.bind="menuButtonIsLoading" class="menu-loader">
           <i class="fas fa-circle-notch fa-spin"></i>
         </span>
-        <div
-          else
-          click.delegate="goToMenu()"
-          class="profile-image-container"
-          t="[title,aria-label]lists.menu"
-        >
-          <img
-            src.bind="imageUri"
-            class="profile-image"
-            t="[alt]profilePicture"
-          />
+        <div else click.delegate="goToMenu()" class="profile-image-container" t="[title,aria-label]lists.menu">
+          <img src.bind="imageUri" class="profile-image" t="[alt]profilePicture" />
         </div>
         <label
-          class="reorder-toggle ${isReordering ? 'checked' : ''}"
+          class="lists-reorder-toggle lists ${isReordering ? 'checked' : ''}"
           t="[title,aria-label]lists.reorderLists"
         >
           <input type="checkbox" checked.bind="isReordering" />
           <i class="fas fa-random"></i>
         </label>
-        <div class="page-title with-buttons">
+        <div class="page-title">
           <span></span>
         </div>
         <a
           click.delegate="sync()"
-          class="side small ${!connTracker.isOnline || progressBar.active ? 'disabled' : ''}"
+          class="sync-button ${!connTracker.isOnline || progressBar.active ? 'disabled' : ''}"
           t="[title,aria-label]lists.refresh"
         >
           <i class="fas fa-sync-alt"></i>
         </a>
       </div>
       <div class="progress-bar">
-        <div
-          class="progress ${progressBar.visible ? 'visible' : ''}"
-          css="width: ${getProgress}%;"
-        ></div>
+        <div class="progress ${progressBar.visible ? 'visible' : ''}" css="width: ${getProgress}%;"></div>
       </div>
     </div>
 
-    <div class="content-wrap">
+    <div class="content-wrap lists">
       <div class="to-do-lists-wrap ${isReordering ? 'reordering' : ''}">
         <div if.bind="!listsLoaded">
           <div class="to-do-list-placeholder">&nbsp;</div>
@@ -68,24 +56,14 @@
               <i class="reorder-icon fas fa-hand-paper"></i>
             </span>
             <span class="name">${list.name}</span>
-            <i
-              class="fas fa-users shared-icon"
-              t="[title,aria-label]lists.shared"
-            ></i>
-            <i
-              class="fas fa-user-clock shared-icon"
-              t="[title,aria-label]lists.pendingAccept"
-            ></i>
+            <i class="fas fa-users shared-icon" t="[title,aria-label]lists.shared"></i>
+            <i class="fas fa-user-clock shared-icon" t="[title,aria-label]lists.pendingAccept"></i>
           </a>
         </div>
       </div>
 
       <div class="centering-wrap">
-        <a
-          route-href="route: editList; params.bind: { id: 0 }"
-          class="wide-button new-button"
-          t="[title,aria-label]lists.newList"
-        >
+        <a route-href="route: editList; params.bind: { id: 0 }" class="new-button" t="[title,aria-label]lists.newList">
           <i class="fas fa-plus"></i>
         </a>
       </div>

@@ -12,7 +12,6 @@ export class List {
     public order: number,
     public isArchived: boolean,
     public tasks: Array<Task>,
-    public createdDate: string,
     public modifiedDate: string
   ) {}
 }

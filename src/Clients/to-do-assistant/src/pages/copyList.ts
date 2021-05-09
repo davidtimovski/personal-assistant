@@ -1,11 +1,6 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import {
-  ValidationController,
-  validateTrigger,
-  ValidationRules,
-  ControllerValidateResult,
-} from "aurelia-validation";
+import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 import { connectTo } from "aurelia-store";
@@ -24,19 +19,7 @@ import * as Actions from "utils/state/actions";
 @connectTo()
 export class CopyList {
   private listId: number;
-  private model = new List(
-    0,
-    "",
-    "",
-    false,
-    false,
-    SharingState.NotShared,
-    0,
-    false,
-    [],
-    null,
-    null
-  );
+  private model = new List(0, "", "", false, false, SharingState.NotShared, 0, false, [], null);
   private nameIsInvalid: boolean;
   private iconOptions = ListsService.getIconOptions();
   private saveButtonIsLoading = false;
@@ -86,11 +69,7 @@ export class CopyList {
     this.model = JSON.parse(JSON.stringify(list));
     this.listName = this.model.name;
 
-    this.model.name = (
-      this.i18n.tr("copyList.copyOf") +
-      " " +
-      this.model.name
-    ).substring(0, 50);
+    this.model.name = (this.i18n.tr("copyList.copyOf") + " " + this.model.name).substring(0, 50);
 
     ValidationRules.ensure((x: List) => x.name)
       .required()
@@ -125,10 +104,7 @@ export class CopyList {
 
         await Actions.getLists(this.listsService);
 
-        this.eventAggregator.publish(
-          AlertEvents.ShowSuccess,
-          "copyList.copySuccessful"
-        );
+        this.eventAggregator.publish(AlertEvents.ShowSuccess, "copyList.copySuccessful");
 
         this.router.navigateToRoute("listsEdited", {
           editedId: this.model.id,

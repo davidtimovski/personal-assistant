@@ -5,16 +5,16 @@
         <i class="fas fa-check-circle"></i>
       </div>
       <div class="page-title">
-        <span t="uncompleteTasks.uncompleteTasksIn">Uncomplete tasks in</span>&nbsp;<span
-          class="colored-text">${model.name}</span>?
+        <span t="uncompleteTasks.uncompleteTasksIn">Uncomplete tasks in</span>&nbsp;<span class="colored-text"
+          >${model.name}</span
+        >?
       </div>
-      <a route-href="route: list; params.bind: { id: model.id }" class="side back">
+      <a route-href="route: list; params.bind: { id: model.id }" class="back-button">
         <i class="fas fa-times"></i>
       </a>
     </div>
 
     <div class="content-wrap">
-
       <div class="text-wrap">${uncompleteText}</div>
 
       <div class="save-delete-wrap">

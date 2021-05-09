@@ -41,7 +41,8 @@
     "uncompleteAllTasks": "Uncomplete all tasks",
     "archive": "Archive",
     "add": "Add",
-    "addPrivate": "Add private",
+    "addNew": "Add new",
+    "addNewPrivate": "Add new private",
     "togglePrivateTasks": "Toggle private tasks",
     "toggleTaskDeletionOnCompletion": "Toggle task deletion on completion",
     "searchTasks": "Search tasks",
@@ -55,6 +56,7 @@
     "alreadyExistsUncomplete": "Already exists. Do you want to uncomplete it?",
     "similarTasksExist": "There are a few similar tasks here: {{taskNames}}. Do you still want to add this task?",
     "archivedList": "This list is archived.<br>Do you want to restore it?",
+    "restore": "Restore",
     "emptyListMessage": "There's nothing here"
   },
   "editList": {

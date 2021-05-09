@@ -1,7 +1,7 @@
 .double-radio-wrap {
   display: flex;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
+  border: 1px solid #ddd;
+  border-radius: 8px;
 
   input[type="radio"] {
     display: none;
@@ -13,7 +13,7 @@
     top: 5px;
     right: 12px;
     font-size: 21px;
-    color: #fafafa;
+    color: #fff;
 
     transition: color var(--transition);
   }
@@ -24,7 +24,7 @@
     label {
       display: block;
       position: relative;
-      background: #fafafa;
+      background: #fff;
       padding: 0 48px 0 15px;
       font-size: inherit;
       line-height: 37px;
@@ -34,8 +34,7 @@
 
       &.selected {
         background: var(--primary-color);
-        box-shadow: inset var(--box-shadow);
-        color: #fafafa;
+        color: #fff;
 
         .checkbox-icon {
           display: inline;
@@ -44,13 +43,13 @@
     }
 
     &:nth-child(1) label {
-      border-top-left-radius: var(--border-radius);
-      border-bottom-left-radius: var(--border-radius);
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
     }
 
     &:nth-child(2) label {
-      border-top-right-radius: var(--border-radius);
-      border-bottom-right-radius: var(--border-radius);
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
     }
 
     span {

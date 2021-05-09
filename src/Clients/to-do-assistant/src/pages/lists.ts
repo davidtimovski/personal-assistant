@@ -14,14 +14,7 @@ import { State } from "utils/state/state";
 import * as Actions from "utils/state/actions";
 import * as environment from "../../config/environment.json";
 
-@inject(
-  Router,
-  ListsService,
-  UsersService,
-  LocalStorage,
-  EventAggregator,
-  ConnectionTracker
-)
+@inject(Router, ListsService, UsersService, LocalStorage, EventAggregator, ConnectionTracker)
 @connectTo()
 export class Lists {
   private imageUri = JSON.parse(<any>environment).defaultProfileImageUri;

@@ -55,14 +55,24 @@
   .share-content {
     display: flex;
     justify-content: space-between;
-    width: calc(100% - 46px);
-    background: #fafafa;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
+    width: calc(100% - 48px);
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+
+    .icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-width: 50px;
+      height: 43px;
+      font-size: 23px;
+      color: var(--faded-color);
+    }
 
     .name {
       width: 100%;
-      padding: 9px 10px 9px 2px;
+      padding: 8px 10px 8px 2px;
       line-height: 27px;
       text-align: center;
       word-wrap: anywhere;
@@ -71,9 +81,28 @@
       transition: var(--transition);
     }
 
-    &.not-editable .name {
-      cursor: default;
-      transition: none;
+    &-button {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-width: 45px;
+      height: 43px;
+      font-size: 23px;
+      color: var(--primary-color);
+
+      &:hover {
+        color: var(--primary-color-dark);
+      }
+    }
+
+    &.not-editable {
+      background: #e9f4ff;
+      border-color: transparent;
+
+      .name {
+        cursor: default;
+        transition: none;
+      }
     }
 
     &:not(.not-editable):not(.selected) .name:hover {
@@ -84,11 +113,11 @@
       background: var(--primary-color);
       color: #fff;
 
-      .side {
+      .share-content-button {
         color: #fff;
       }
 
-      .remove-share-button {
+      .remove-button {
         visibility: hidden;
       }
     }
@@ -96,9 +125,11 @@
 }
 
 /* Workaround for sticky :hover on mobile devices */
-.touch-device .share-with:not(.owner) .name:hover,
-.touch-device .add-input-wrap button:hover {
-  color: var(--primary-color);
+.touch-device {
+  .share-with:not(.owner) .name:hover,
+  .add-input-wrap button:hover {
+    color: var(--primary-color);
+  }
 }
 
 @media screen and (min-width: $desktop-min) {

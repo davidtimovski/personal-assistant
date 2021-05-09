@@ -1,11 +1,6 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import {
-  ValidationController,
-  validateTrigger,
-  ValidationRules,
-  ControllerValidateResult,
-} from "aurelia-validation";
+import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 import { connectTo } from "aurelia-store";
@@ -20,16 +15,9 @@ import { LocalStorage } from "utils/localStorage";
 import { SharingState } from "models/viewmodels/sharingState";
 import { State } from "utils/state/state";
 import * as Actions from "utils/state/actions";
+import { ListTask } from "models/viewmodels/listTask";
 
-@inject(
-  Router,
-  ListsService,
-  TasksService,
-  ValidationController,
-  I18N,
-  EventAggregator,
-  LocalStorage
-)
+@inject(Router, ListsService, TasksService, ValidationController, I18N, EventAggregator, LocalStorage)
 @connectTo()
 export class List {
   private listId: number;
@@ -39,23 +27,23 @@ export class List {
     false,
     SharingState.NotShared,
     null,
-    new Array<Task>(),
-    new Array<Task>(),
-    new Array<Task>(),
-    new Array<Task>()
+    new Array<ListTask>(),
+    new Array<ListTask>(),
+    new Array<ListTask>(),
+    new Array<ListTask>()
   );
   private topDrawerIsOpen = false;
   private shareButtonText: string;
   private completedTasksAreVisible = false;
   private uncompleteDuplicateButtonVisible = false;
   private duplicateTaskMessageText: string;
-  private duplicateTask: Task;
+  private duplicateTask: ListTask;
   private similarTasksMessageText: string;
   private similarTaskNames: string[] = [];
-  private shadowTasks: Task[];
-  private shadowPrivateTasks: Task[];
-  private shadowCompletedTasks: Task[];
-  private shadowCompletedPrivateTasks: Task[];
+  private shadowTasks: ListTask[];
+  private shadowPrivateTasks: ListTask[];
+  private shadowCompletedTasks: ListTask[];
+  private shadowCompletedPrivateTasks: ListTask[];
   private newTaskName = "";
   private isPrivate = false;
   private isOneTime: boolean;
@@ -90,7 +78,7 @@ export class List {
 
     ValidationRules.ensure("newTaskName").required().on(this);
 
-    this.addNewPlaceholderText = this.i18n.tr("list.add");
+    this.addNewPlaceholderText = this.i18n.tr("list.addNew");
 
     this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.newTaskIsInvalid = false;
@@ -128,25 +116,38 @@ export class List {
       this.model.isOneTimeToggleDefault = list.isOneTimeToggleDefault;
       this.model.sharingState = list.sharingState;
       this.model.isArchived = list.isArchived;
+
       this.model.tasks = list.tasks
         .filter((x) => !x.isCompleted && !x.isPrivate)
         .sort((a: Task, b: Task) => {
           return a.order - b.order;
+        })
+        .map((x) => {
+          return ListTask.fromTask(x);
         });
       this.model.privateTasks = list.tasks
         .filter((x) => !x.isCompleted && x.isPrivate)
         .sort((a: Task, b: Task) => {
           return a.order - b.order;
+        })
+        .map((x) => {
+          return ListTask.fromTask(x);
         });
       this.model.completedTasks = list.tasks
         .filter((x) => x.isCompleted && !x.isPrivate)
         .sort((a: Task, b: Task) => {
           return a.order - b.order;
+        })
+        .map((x) => {
+          return ListTask.fromTask(x);
         });
       this.model.completedPrivateTasks = list.tasks
         .filter((x) => x.isCompleted && x.isPrivate)
         .sort((a: Task, b: Task) => {
           return a.order - b.order;
+        })
+        .map((x) => {
+          return ListTask.fromTask(x);
         });
 
       this.isOneTime = this.model.isOneTimeToggleDefault;
@@ -168,17 +169,13 @@ export class List {
     }
   }
 
-  async reorder(changedArray: Array<Task>, data) {
+  async reorder(changedArray: Array<ListTask>, data) {
     const id: number = changedArray[data.toIndex].id;
 
     const oldOrder = ++data.fromIndex;
     const newOrder = ++data.toIndex;
 
-    await this.tasksService.reorder(
-      id,
-      oldOrder,
-      newOrder
-    );
+    await this.tasksService.reorder(id, oldOrder, newOrder);
 
     await Actions.reorderTask(this.listId, id, oldOrder, newOrder);
 
@@ -208,9 +205,7 @@ export class List {
   }
 
   isPrivateToggleChanged() {
-    this.addNewPlaceholderText = this.isPrivate
-      ? this.i18n.tr("list.addPrivate")
-      : this.i18n.tr("list.add");
+    this.addNewPlaceholderText = this.isPrivate ? this.i18n.tr("list.addNewPrivate") : this.i18n.tr("list.addNew");
     this.newTaskNameInput.focus();
   }
 
@@ -224,11 +219,7 @@ export class List {
         this.model.completedTasks = this.shadowCompletedTasks.slice();
         this.model.completedPrivateTasks = this.shadowCompletedPrivateTasks.slice();
       }
-    } else if (
-      event.charCode !== 13 &&
-      event.which !== 13 &&
-      event.key !== "Enter"
-    ) {
+    } else if (event.charCode !== 13 && event.which !== 13 && event.key !== "Enter") {
       this.newTaskIsInvalid = false;
       this.duplicateTask = null;
       this.similarTaskNames = [];
@@ -236,30 +227,18 @@ export class List {
   }
 
   filterTasks() {
-    this.model.tasks = this.shadowTasks.filter((task: Task) => {
-      return task.name
-        .toLowerCase()
-        .includes(this.newTaskName.trim().toLowerCase());
+    this.model.tasks = this.shadowTasks.filter((task: ListTask) => {
+      return task.name.toLowerCase().includes(this.newTaskName.trim().toLowerCase());
     });
-    this.model.privateTasks = this.shadowPrivateTasks.filter((task: Task) => {
-      return task.name
-        .toLowerCase()
-        .includes(this.newTaskName.trim().toLowerCase());
+    this.model.privateTasks = this.shadowPrivateTasks.filter((task: ListTask) => {
+      return task.name.toLowerCase().includes(this.newTaskName.trim().toLowerCase());
     });
-    this.model.completedTasks = this.shadowCompletedTasks.filter(
-      (task: Task) => {
-        return task.name
-          .toLowerCase()
-          .includes(this.newTaskName.trim().toLowerCase());
-      }
-    );
-    this.model.completedPrivateTasks = this.shadowCompletedPrivateTasks.filter(
-      (task: Task) => {
-        return task.name
-          .toLowerCase()
-          .includes(this.newTaskName.trim().toLowerCase());
-      }
-    );
+    this.model.completedTasks = this.shadowCompletedTasks.filter((task: ListTask) => {
+      return task.name.toLowerCase().includes(this.newTaskName.trim().toLowerCase());
+    });
+    this.model.completedPrivateTasks = this.shadowCompletedPrivateTasks.filter((task: ListTask) => {
+      return task.name.toLowerCase().includes(this.newTaskName.trim().toLowerCase());
+    });
   }
 
   resetSearchFilter(resetTaskName: boolean = true) {
@@ -272,7 +251,7 @@ export class List {
     this.model.privateTasks = this.shadowPrivateTasks.slice();
     this.model.completedTasks = this.shadowCompletedTasks.slice();
     this.model.completedPrivateTasks = this.shadowCompletedPrivateTasks.slice();
-    this.addNewPlaceholderText = this.i18n.tr("list.add");
+    this.addNewPlaceholderText = this.i18n.tr("list.addNew");
   }
 
   toggleCompletedTasksAreVisible() {
@@ -297,9 +276,7 @@ export class List {
         this.newTaskIsInvalid = true;
 
         if (this.duplicateTask.isCompleted) {
-          this.duplicateTaskMessageText = this.i18n.tr(
-            "list.alreadyExistsUncomplete"
-          );
+          this.duplicateTaskMessageText = this.i18n.tr("list.alreadyExistsUncomplete");
           this.uncompleteDuplicateButtonVisible = true;
         } else {
           this.duplicateTaskMessageText = this.i18n.tr("list.alreadyExists");
@@ -315,24 +292,16 @@ export class List {
         if (this.similarTaskNames.length) {
           this.newTaskIsLoading = false;
 
-          this.similarTasksMessageText = this.i18n.tr(
-            "list.similarTasksExist",
-            {
-              taskNames: this.similarTaskNames.join(", "),
-            }
-          );
+          this.similarTasksMessageText = this.i18n.tr("list.similarTasksExist", {
+            taskNames: this.similarTaskNames.join(", "),
+          });
         } else {
           this.newTaskIsInvalid = false;
           this.duplicateTask = null;
           this.similarTaskNames = [];
 
           try {
-            const id = await this.tasksService.create(
-              this.model.id,
-              this.newTaskName,
-              this.isOneTime,
-              this.isPrivate
-            );
+            const id = await this.tasksService.create(this.model.id, this.newTaskName, this.isOneTime, this.isPrivate);
             this.newTaskIsLoading = false;
             this.newTaskName = "";
 
@@ -342,9 +311,9 @@ export class List {
             const task = list.tasks.find((x) => x.id === id);
 
             if (this.isPrivate) {
-              this.model.privateTasks.unshift(task);
+              this.model.privateTasks.unshift(ListTask.fromTask(task));
             } else {
-              this.model.tasks.unshift(task);
+              this.model.tasks.unshift(ListTask.fromTask(task));
             }
 
             if (this.soundsEnabled) {
@@ -361,7 +330,7 @@ export class List {
     }
   }
 
-  async complete(task: Task) {
+  async complete(task: ListTask) {
     if (task.rightSideIsLoading) {
       return;
     }
@@ -373,6 +342,7 @@ export class List {
     }
 
     task.rightSideIsLoading = true;
+    task.isDisappearing = true;
     this.lastEditedId = 0;
 
     if (this.isSearching) {
@@ -396,12 +366,13 @@ export class List {
 
       this.executeAfterDelay(() => {
         task.rightSideIsLoading = false;
+        task.isDisappearing = false;
         this.setModelFromState();
       }, startTime);
     }
   }
 
-  async uncomplete(task: Task) {
+  async uncomplete(task: ListTask) {
     if (task.rightSideIsLoading) {
       return;
     }
@@ -413,6 +384,7 @@ export class List {
     }
 
     task.rightSideIsLoading = true;
+    task.isDisappearing = true;
     this.lastEditedId = 0;
 
     if (this.isSearching) {
@@ -424,13 +396,14 @@ export class List {
 
     this.executeAfterDelay(() => {
       task.rightSideIsLoading = false;
+      task.isDisappearing = false;
       this.setModelFromState();
     }, startTime);
   }
 
   // Used to delay UI update if server responds too quickly
   executeAfterDelay(callback: () => void, startTime: Date) {
-    const delayMs = 600;
+    const delayMs = 500;
     const timeTaken = new Date().getTime() - startTime.getTime();
     const sleepTime = delayMs - timeTaken;
 
@@ -489,9 +462,7 @@ export class List {
   }
 
   findSimilarTasks(newTaskName: string): string[] {
-    const newTaskNameWords = newTaskName
-      .split(" ")
-      .filter((word) => word.length > 3);
+    const newTaskNameWords = newTaskName.split(" ").filter((word) => word.length > 3);
     const allTaskNames = this.model.tasks
       .concat(this.model.privateTasks)
       .concat(this.model.completedTasks)

@@ -8,7 +8,7 @@
     left: 10%;
     z-index: 2;
     width: 80%;
-    background: #f3f3f3;
+    background: #fff;
     border-bottom-left-radius: 7px;
     border-bottom-right-radius: 7px;
     box-shadow: inset var(--box-shadow);
@@ -41,15 +41,15 @@
     }
 
     .top-drawer-handle {
-      border-bottom: 1px solid #ddd;
+      border: 1px solid #ddd;
       border-bottom-left-radius: 7px;
       border-bottom-right-radius: 7px;
+      border-top: none;
       text-align: center;
       font-size: 16px;
       line-height: 20px;
       color: var(--faded-color);
       cursor: pointer;
-      transition: color var(--transition);
 
       &:hover {
         color: var(--primary-color-dark);

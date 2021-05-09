@@ -5,13 +5,12 @@
         <i class="fas fa-bars"></i>
       </div>
       <div t="menu.menu" class="page-title">Menu</div>
-      <a route-href="route: lists" class="side back">
+      <a route-href="route: lists" class="back-button">
         <i class="fas fa-times"></i>
       </a>
     </div>
 
     <div class="content-wrap">
-
       <div class="horizontal-buttons-wrap">
         <a route-href="route: notifications" class="wide-button with-badge">
           <span t="menu.notifications">Notifications</span>
@@ -40,18 +39,18 @@
         </a>
       </div>
 
-      <hr>
+      <hr />
 
       <div class="horizontal-buttons-wrap">
-        <a href.bind="personalAssistantUrl" class="wide-button" t="menu.goToPersonalAssistant">Go to Personal
-          Assistant</a>
+        <a href.bind="personalAssistantUrl" class="wide-button" t="menu.goToPersonalAssistant"
+          >Go to Personal Assistant</a
+        >
         <a click.delegate="logOut()" class="wide-button" t="menu.logOut">Log Out</a>
       </div>
 
-      <hr>
+      <hr />
 
       <div class="version"><span t="menu.version">Version</span> ${version}</div>
-
     </div>
   </div>
 </template>

@@ -1,4 +1,4 @@
-import { Task } from "../entities/task";
+import { ListTask } from "./listTask";
 import { SharingState } from "./sharingState";
 
 export class ViewList {
@@ -8,9 +8,9 @@ export class ViewList {
     public isOneTimeToggleDefault: boolean,
     public sharingState: SharingState,
     public isArchived: boolean,
-    public tasks: Array<Task>,
-    public privateTasks: Array<Task>,
-    public completedTasks: Array<Task>,
-    public completedPrivateTasks: Array<Task>
+    public tasks: Array<ListTask>,
+    public privateTasks: Array<ListTask>,
+    public completedTasks: Array<ListTask>,
+    public completedPrivateTasks: Array<ListTask>
   ) {}
 }

@@ -35,9 +35,9 @@
   position: relative;
   display: flex;
   justify-content: flex-start;
-  border-radius: var(--border-radius);
+  background: #e9f4ff;
+  border-radius: 6px;
   margin: 12px 0;
-  color: var(--regular-color);
   text-decoration: none;
   user-select: none;
 
@@ -54,13 +54,15 @@
   }
 
   .icon {
-    width: 45px;
-    min-width: 45px;
-    height: 45px;
-    line-height: 45px;
+    min-width: 37px;
+    height: 37px;
+    background: #fff;
+    border-radius: 6px;
+    margin: 4px;
+    line-height: 37px;
     text-align: center;
-    font-size: 23px;
-    color: var(--faded-color);
+    font-size: 22px;
+    color: var(--primary-color-dark);
   }
 
   .shared-icon {
@@ -69,7 +71,7 @@
     top: 11px;
     right: 10px;
     font-size: 24px;
-    color: var(--faded-color);
+    color: var(--primary-color);
   }
 
   &.is-shared,
@@ -88,5 +90,7 @@
   .name {
     padding: 8px 10px;
     line-height: 27px;
+    font-size: 1.1rem;
+    color: var(--regular-color);
   }
 }
