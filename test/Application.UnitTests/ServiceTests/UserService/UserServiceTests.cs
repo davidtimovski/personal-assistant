@@ -43,8 +43,8 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests
         {
             const bool isPrivate = true;
 
-            _tasksRepositoryMock.Setup(x => x.IsPrivateAsync(It.IsAny<int>(), It.IsAny<int>()))
-                .ReturnsAsync(isPrivate);
+            _tasksRepositoryMock.Setup(x => x.IsPrivate(It.IsAny<int>(), It.IsAny<int>()))
+                .Returns(isPrivate);
             _usersRepositoryMock.Setup(x => x.GetToBeNotifiedOfListChangeAsync(It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(new List<User> { new User() });
 
