@@ -8,7 +8,7 @@
 
   <div class="au-animate animate-fade-in animate-fade-out">
     <div class="page-title-wrap">
-      <span if.bind="editRecipeButtonIsLoading" class="page-loading medium">
+      <span if.bind="editRecipeButtonIsLoading" class="page-loading">
         <i class="fas fa-circle-notch fa-spin"></i>
       </span>
       <a else click.delegate="editRecipe()" class="side small" t="[title,aria-label]recipe.edit">
