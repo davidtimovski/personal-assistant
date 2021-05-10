@@ -13,17 +13,31 @@
   .send-content {
     display: flex;
     justify-content: space-between;
-    width: calc(100% - 46px);
-    background: #fafafa;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
+    width: calc(100% - 48px);
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
 
     .name {
       width: 100%;
-      padding: 9px 10px;
+      padding: 8px 10px;
       line-height: 27px;
       text-align: center;
       word-wrap: anywhere;
+    }
+
+    &-button {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-width: 45px;
+      height: 43px;
+      font-size: 23px;
+      color: var(--primary-color);
+
+      &:hover {
+        color: var(--primary-color-dark);
+      }
     }
   }
 }

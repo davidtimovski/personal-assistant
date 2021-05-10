@@ -4,10 +4,19 @@
 @import "../../../../shared/src/static/styles/currency-selector.scss";
 
 :root {
+  --regular-color: #105d30;
   --primary-color: var(--cooking-assistant-color);
   --primary-color-dark: #08cb6b;
   --primary-color-light: #dcfffb;
   --faded-color: #a8d4bf;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="number"],
+select,
+textarea {
+  background: #f3fff7;
 }
 
 .top-buttons-drawer.open .top-buttons-drawer-wrap {
@@ -36,33 +45,6 @@ textarea.small {
   color: var(--primary-color);
 }
 
-.add-ingredient-wrap {
-  display: flex;
-  justify-content: space-between;
-
-  .toggle-from-tasks {
-    background: #fafafa;
-    border: none;
-    border-radius: var(--border-radius);
-    outline: none;
-    box-shadow: var(--box-shadow);
-    padding: 3px 11px 1px;
-    margin-left: 10px;
-    font-size: 29px;
-    line-height: 40px;
-    text-decoration: none;
-    color: var(--primary-color);
-    cursor: pointer;
-
-    transition: background var(--transition), color var(--transition);
-
-    &.checked {
-      background: var(--primary-color);
-      color: #fafafa;
-    }
-  }
-}
-
 .add-input-wrap {
   position: relative;
   width: 100%;
@@ -75,19 +57,21 @@ textarea.small {
 
   a {
     position: absolute;
-    top: 1px;
+    top: 0;
     right: 0;
+    width: 45px;
+    height: 47px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     background: none;
     border: none;
     outline: none;
-    padding: 0 12px;
     font-size: 23px;
     line-height: 45px;
     text-decoration: none;
     color: var(--primary-color);
     cursor: pointer;
-
-    transition: color var(--transition);
 
     &:hover {
       color: var(--primary-color-dark);
@@ -107,17 +91,12 @@ textarea.small {
     left: 0;
     width: 100%;
     height: 100%;
-    box-shadow: var(--box-shadow);
   }
 }
 
 .prep-cook-duration-wrap {
   display: flex;
   justify-content: space-between;
-
-  .duration-side {
-    width: 48%;
-  }
 
   .duration-input {
     width: 26px;
@@ -129,7 +108,6 @@ textarea.small {
 .review-introduction-wrap .image {
   width: 100%;
   border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
   margin-bottom: 10px;
 }
 section header {
@@ -162,19 +140,31 @@ section header {
 servings-selector {
   display: flex;
   justify-content: space-between;
-  background: #fafafa;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
   margin-bottom: 10px;
-}
-.servings {
-  padding: 9px 5px;
-  line-height: 27px;
-  text-align: center;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+
+  .servings-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 53px;
+    height: 45px;
+    font-size: 22px;
+    text-decoration: none;
+    color: var(--primary-color);
+  }
+
+  .servings {
+    padding: 9px 5px;
+    line-height: 27px;
+    text-align: center;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
 }
 
 .autocomplete-customizations {
@@ -229,8 +219,7 @@ servings-selector {
   border-radius: var(--border-radius);
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-  box-shadow: var(--box-shadow);
-  padding: 6px 12px 7px;
+  padding: 7px 12px 6px;
   font-size: 20px;
   line-height: 23px;
 }

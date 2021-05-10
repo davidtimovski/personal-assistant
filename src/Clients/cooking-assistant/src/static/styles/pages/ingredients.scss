@@ -4,8 +4,7 @@
   position: relative;
   display: flex;
   justify-content: space-between;
-  background: #fafafa;
-  box-shadow: var(--box-shadow);
+  background: #e9fff4;
   border-radius: var(--border-radius);
   margin-bottom: 10px;
   padding: 9px 15px;
@@ -16,8 +15,6 @@
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-
-  transition: color var(--transition-quick);
 
   &:last-child {
     margin-bottom: 0;
@@ -56,7 +53,7 @@
   margin-bottom: 30px;
 
   input.searching {
-    width: calc(100% - 62px);
+    width: calc(100% - 64px);
     padding-right: 50px;
   }
 
@@ -64,10 +61,13 @@
     position: absolute;
     top: 0;
     right: 0;
-    padding: 10px 13px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 39px;
+    width: 45px;
     color: var(--primary-color);
     cursor: pointer;
-    transition: color var(--transition);
 
     &:hover {
       color: var(--primary-color-dark);

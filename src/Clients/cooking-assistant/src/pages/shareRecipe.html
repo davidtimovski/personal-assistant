@@ -10,21 +10,26 @@
         <span if.bind="model.shares.length === 0">
           <span t="shareRecipe.share">Share</span>&nbsp;<span class="colored-text">${model.name}</span>
         </span>
-        <span else>
-          ${model.name}
-        </span>
+        <span else> ${model.name} </span>
       </div>
-      <a route-href="route: recipe; params.bind: { id: model.id }" class="side back">
+      <a route-href="route: recipe; params.bind: { id: model.id }" class="back-button">
         <i class="fas fa-times"></i>
       </a>
     </div>
 
     <div class="content-wrap">
-
       <form if.bind="model.sharingState !== 4" submit.trigger="submit()">
         <div class="form-control">
           <div class="add-input-wrap">
-            <input type="email" value.bind="selectedShare.email & validate" ref="emailInput" maxlength="256" class.bind="emailIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]shareRecipe.newMemberEmail" required>
+            <input
+              type="email"
+              value.bind="selectedShare.email & validate"
+              ref="emailInput"
+              maxlength="256"
+              class.bind="emailIsInvalid ? 'invalid' : ''"
+              t="[placeholder,aria-label]shareRecipe.newMemberEmail"
+              required
+            />
             <a click.delegate="addShare()" t="[title,aria-label]shareRecipe.addMember">
               <i class="fas fa-plus-circle"></i>
             </a>
@@ -34,13 +39,13 @@
 
       <div class="labeled-separator">
         <div class="labeled-separator-text">${sharedWithWrapTitle}</div>
-        <hr>
+        <hr />
       </div>
 
       <div class="share-with">
-        <img class="share-image" src.bind="model.ownerImageUri" t="[alt]profilePicture">
+        <img class="share-image" src.bind="model.ownerImageUri" t="[alt]profilePicture" />
         <div class="share-content">
-          <div class="side small inactive" t="[title]shareRecipe.owner">
+          <div class="icon" t="[title]shareRecipe.owner">
             <i class="fas fa-crown"></i>
           </div>
           <span class="name">${model.ownerEmail}</span>
@@ -48,9 +53,9 @@
       </div>
 
       <div if.bind="model.userShare" class="share-with">
-        <img class="share-image" src.bind="model.userShare.imageUri" t="[alt]profilePicture">
+        <img class="share-image" src.bind="model.userShare.imageUri" t="[alt]profilePicture" />
         <div class="share-content">
-          <div class="side inactive" t="[title,aria-label]shareRecipe.member">
+          <div class="icon" t="[title,aria-label]shareRecipe.member">
             <i class="fas fa-user"></i>
           </div>
           <span class="name">${model.userShare.email}</span>
@@ -58,28 +63,37 @@
       </div>
 
       <div repeat.for="share of model.shares" class="share-with">
-        <img class="share-image" src.bind="share.imageUri" t="[alt]profilePicture">
+        <img class="share-image" src.bind="share.imageUri" t="[alt]profilePicture" />
         <div class="share-content">
-          <div if.bind="share.userId && !share.createdDate && share.userId !== 0"
-            class="side inactive" t="[title,aria-label]shareRecipe.newlyAddedMember">
+          <div
+            if.bind="share.userId && !share.createdDate && share.userId !== 0"
+            class="icon"
+            t="[title,aria-label]shareRecipe.newlyAddedMember"
+          >
             <i class="fas fa-user-plus"></i>
           </div>
-          <div if.bind="share.isAccepted === null && !!share.createdDate"
-            class="side inactive" t="[title,aria-label]shareRecipe.pendingAccept">
+          <div
+            if.bind="share.isAccepted === null && !!share.createdDate"
+            class="icon"
+            t="[title,aria-label]shareRecipe.pendingAccept"
+          >
             <i class="fas fa-user-clock"></i>
           </div>
-          <div if.bind="share.isAccepted"
-            class="side inactive" t="[title,aria-label]shareRecipe.member">
+          <div if.bind="share.isAccepted" class="icon" t="[title,aria-label]shareRecipe.member">
             <i class="fas fa-user"></i>
           </div>
           <span class="name">${share.email}</span>
-          <a click.delegate="removeShare(share)" class="side remove-share-button" t="[title,aria-label]shareRecipe.removeMember">
+          <a
+            click.delegate="removeShare(share)"
+            class="share-content-button"
+            t="[title,aria-label]shareRecipe.removeMember"
+          >
             <i class="fas fa-times-circle"></i>
           </a>
         </div>
       </div>
 
-      <hr>
+      <hr />
 
       <div class="save-delete-wrap">
         <a click.delegate="save()" class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
@@ -88,9 +102,10 @@
           </span>
           <span t="save">Save</span>
         </a>
-        <a route-href="route: recipe; params.bind: { id: model.id }" t="cancel" class="button secondary-button">Cancel</a>
+        <a route-href="route: recipe; params.bind: { id: model.id }" t="cancel" class="button secondary-button"
+          >Cancel</a
+        >
       </div>
-
     </div>
   </div>
 </template>

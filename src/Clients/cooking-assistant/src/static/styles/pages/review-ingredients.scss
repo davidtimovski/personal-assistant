@@ -35,7 +35,6 @@
   font-size: 14px;
   vertical-align: super;
   color: var(--primary-color);
-  transition: color var(--transition);
 
   &:hover {
     color: var(--primary-color-dark);
@@ -51,7 +50,6 @@
   a {
     text-decoration: underline;
     color: var(--primary-color);
-    transition: color var(--transition);
 
     &:hover {
       color: var(--primary-color-dark);
@@ -72,7 +70,6 @@
     font-size: 30px;
     color: var(--primary-color);
     cursor: pointer;
-    transition: color var(--transition);
 
     &:hover {
       color: var(--primary-color-dark);

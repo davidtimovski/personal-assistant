@@ -8,12 +8,16 @@
           <i class="fas fa-circle-notch fa-spin"></i>
         </span>
         <div else click.delegate="goToMenu()" class="profile-image-container" t="[title,aria-label]recipes.menu">
-          <img src.bind="imageUri" class="profile-image" t="[alt]profilePicture">
+          <img src.bind="imageUri" class="profile-image" t="[alt]profilePicture" />
         </div>
         <div class="page-title reduced">
           <span></span>
         </div>
-        <a click.delegate="sync()" class="side small ${!connTracker.isOnline || progressBar.active ? 'disabled' : ''}" t="[title,aria-label]recipes.refresh">
+        <a
+          click.delegate="sync()"
+          class="sync-button ${!connTracker.isOnline || progressBar.active ? 'disabled' : ''}"
+          t="[title,aria-label]recipes.refresh"
+        >
           <i class="fas fa-sync-alt"></i>
         </a>
       </div>
@@ -22,13 +26,14 @@
       </div>
     </div>
 
-    <div class="content-wrap">
-
-      <div class="recipes-wrap au-stagger">
-        <a repeat.for="recipe of recipes"
-          class="recipe au-animate animate-fade-in ${recipe.id === getEditedId ? 'highlighted' : ''} ${recipe.sharingState !== 0 && recipe.sharingState !== 1 ? 'is-shared' : ''} ${recipe.sharingState === 1 ? 'pending-share' : ''} ${recipe.ingredientsMissing > 0 ? 'ingredients-missing' : ''}"
-          route-href="route: recipe; params.bind: { id: recipe.id }">
-          <img src.bind="recipe.imageUri" alt="${recipe.name}">
+    <div class="content-wrap recipes">
+      <div class="recipes-wrap">
+        <a
+          repeat.for="recipe of recipes"
+          class="recipe ${recipe.id === getEditedId ? 'highlighted' : ''} ${recipe.sharingState !== 0 && recipe.sharingState !== 1 ? 'is-shared' : ''} ${recipe.sharingState === 1 ? 'pending-share' : ''} ${recipe.ingredientsMissing > 0 ? 'ingredients-missing' : ''}"
+          route-href="route: recipe; params.bind: { id: recipe.id }"
+        >
+          <img src.bind="recipe.imageUri" alt="${recipe.name}" />
           <div class="recipe-name">
             <i class="fas fa-users"></i>
             <i class="fas fa-user-clock"></i>
@@ -39,12 +44,14 @@
       </div>
 
       <div class="centering-wrap">
-        <a route-href="route: editRecipe; params.bind: { id: 0 }" class="wide-button new-button"
-          t="[title,aria-label]recipes.newRecipe">
+        <a
+          route-href="route: editRecipe; params.bind: { id: 0 }"
+          class="new-button"
+          t="[title,aria-label]recipes.newRecipe"
+        >
           <i class="fas fa-plus"></i>
         </a>
       </div>
-
     </div>
   </div>
 </template>

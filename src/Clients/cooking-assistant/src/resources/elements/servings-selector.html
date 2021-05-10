@@ -1,9 +1,9 @@
 <template bindable="recipe, viewing">
-  <a click.delegate="decrementServings()" class="side" t="[title,aria-label]decreaseServings">
+  <a click.delegate="decrementServings()" class="servings-button" t="[title,aria-label]decreaseServings">
     <i class="fas fa-minus"></i>
   </a>
   <span class="servings">${servingsLabel}</span>
-  <a click.delegate="incrementServings()" class="side" t="[title,aria-label]increaseServings">
+  <a click.delegate="incrementServings()" class="servings-button" t="[title,aria-label]increaseServings">
     <i class="fas fa-plus"></i>
   </a>
 </template>

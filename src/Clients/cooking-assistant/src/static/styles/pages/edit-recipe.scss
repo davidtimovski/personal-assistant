@@ -104,10 +104,36 @@ label.label {
 
   .fa-youtube {
     position: absolute;
-    top: 8px;
+    top: 10px;
     right: 10px;
     font-size: 29px;
     color: var(--faded-color);
+  }
+}
+
+.add-ingredient-wrap {
+  display: flex;
+  justify-content: space-between;
+
+  .toggle-from-tasks {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    outline: none;
+    padding: 3px 11px 1px;
+    margin-left: 10px;
+    font-size: 29px;
+    line-height: 40px;
+    text-decoration: none;
+    color: var(--primary-color);
+    cursor: pointer;
+
+    transition: background var(--transition), color var(--transition);
+
+    &.checked {
+      background: var(--primary-color);
+      color: #fff;
+    }
   }
 }
 
@@ -144,15 +170,15 @@ label.label {
   }
 
   .name-input {
-    box-shadow: var(--box-shadow);
+    border: 1px solid #ddd;
     border-radius: var(--border-radius);
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
+    padding: 10px 12px;
+    line-height: 23px;
 
     &.uneditable {
       background: #eeffee;
-      padding: 10px 12px;
-      line-height: 24px;
       color: var(--primary-color-dark);
     }
   }
@@ -164,8 +190,9 @@ label.label {
   .amount-input {
     width: auto;
     max-width: 55px;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
+    border-left: none;
+    border-radius: 0;
+    line-height: 43px;
   }
 
   .unit-toggle {
@@ -174,41 +201,53 @@ label.label {
 
     > button {
       background: var(--primary-color);
-      border: none;
+      border: 1px solid var(--primary-color);
+      border-left: none;
       border-radius: var(--border-radius);
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
       outline: none;
-      box-shadow: var(--box-shadow);
-      padding: 1px 12px;
+      padding: 0 12px;
       font-size: 22px;
       line-height: 43px;
       color: #fafafa;
       cursor: pointer;
       vertical-align: top;
-
-      transition: background var(--transition);
     }
 
     > .fa-asterisk {
       background: var(--primary-color);
+      border: 1px solid var(--primary-color);
+      border-left: none;
       border-radius: var(--border-radius);
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
-      box-shadow: var(--box-shadow);
       padding: 2px 13px 0;
       font-size: 15px;
-      line-height: 43px;
+      line-height: 41px;
       color: #fafafa;
       cursor: pointer;
       vertical-align: top;
-
-      transition: background var(--transition);
     }
 
     > button:hover,
     > .fa-asterisk:hover {
       background: var(--primary-color-dark);
+    }
+  }
+
+  .remove-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 50px;
+    height: 45px;
+    font-size: 27px;
+    text-decoration: none;
+    color: var(--primary-color);
+
+    &:hover {
+      color: var(--primary-color-dark);
     }
   }
 }
@@ -223,7 +262,7 @@ label.label {
 @media screen and (min-width: $desktop-min) {
   .new-ingredient {
     .name-input.uneditable {
-      padding: 8px 12px;
+      padding: 7px 12px;
       line-height: 29px;
     }
 

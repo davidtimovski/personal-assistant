@@ -88,7 +88,6 @@
 
     &.selected {
       background: var(--primary-color);
-      box-shadow: inset var(--box-shadow);
       color: #fff;
     }
   }
@@ -173,7 +172,8 @@
 
   input[type="number"] {
     width: 50px;
-    border-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
     line-height: 37px;
     text-align: center;
   }

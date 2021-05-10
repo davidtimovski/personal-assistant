@@ -15,21 +15,22 @@
         <i class="fas fa-pencil-alt"></i>
       </a>
       <div class="page-title reduced">${model.name}</div>
-      <a route-href="route: recipes" class="side back">
+      <a route-href="route: recipes" class="back-button">
         <i class="fas fa-times"></i>
       </a>
     </div>
 
     <div class="body">
-
       <div class="top-buttons-drawer-container">
         <div class="top-buttons-drawer ${topDrawerIsOpen ? 'open' : ''}">
           <div class="top-buttons-drawer-wrap">
             <div class="top-buttons-drawer-content horizontal-buttons-wrap">
-              <a route-href="route: shareRecipe; params.bind: { id: recipeId }" class="wide-button">${shareButtonText}</a>
-              <a route-href="route: sendRecipe; params.bind: { id: recipeId }" class="wide-button"
-                t="recipe.sendRecipe">Send
-                recipe</a>
+              <a route-href="route: shareRecipe; params.bind: { id: recipeId }" class="wide-button"
+                >${shareButtonText}</a
+              >
+              <a route-href="route: sendRecipe; params.bind: { id: recipeId }" class="wide-button" t="recipe.sendRecipe"
+                >Send recipe</a
+              >
               <a ref="copyButton" class="wide-button with-badge">
                 <span t="recipe.copyAsText">Copy as text</span>
                 <i class="fas fa-check badge toggled ${copyAsTextCompleted ? 'visible': ''}"></i>
@@ -44,7 +45,6 @@
       </div>
 
       <div class="content-wrap">
-
         <div class="recipe-wrap">
           <div if.bind="!model" class="double-circle-loading">
             <div class="double-bounce1"></div>
@@ -52,21 +52,25 @@
           </div>
 
           <div else>
-            <img src.bind="model.imageUri" class="image" alt="${model.name}">
+            <img src.bind="model.imageUri" class="image" alt="${model.name}" />
 
             <div if.bind="model.description" class="description">${model.description}</div>
 
-            <pre show.bind="videoIFrameSrc.length > 0"
-              class="video-wrap"><iframe ref="videoIFrame" src.bind="videoIFrameSrc" class="video-iframe" allowfullscreen></iframe></pre>
+            <pre
+              show.bind="videoIFrameSrc.length > 0"
+              class="video-wrap"
+            ><iframe ref="videoIFrame" src.bind="videoIFrameSrc" class="video-iframe" allowfullscreen></iframe></pre>
 
             <div if.bind="model.prepDuration || model.cookDuration" class="prep-cook-duration-wrap">
               <div class="duration-side" if.bind="model.prepDuration">
-                <div class="duration-label"><span t="recipe.prep">Prep</span>: <span>${model.prepDuration |
-                    timeFormat}</span></div>
+                <div class="duration-label">
+                  <span t="recipe.prep">Prep</span>: <span>${model.prepDuration | timeFormat}</span>
+                </div>
               </div>
               <div class="duration-side" if.bind="model.cookDuration">
-                <div class="duration-label"><span t="recipe.cook">Cook</span>: <span>${model.cookDuration |
-                    timeFormat}</span></div>
+                <div class="duration-label">
+                  <span t="recipe.cook">Cook</span>: <span>${model.cookDuration | timeFormat}</span>
+                </div>
               </div>
             </div>
 
@@ -77,22 +81,27 @@
                     <th colspan="2" t="recipe.ingredients">Ingredients</th>
                   </tr>
                   <tr if.bind="nutritionInfoVisible" class="au-animate animate-fade-in aurelia-fade-out">
-                    <th colspan="2" class="source-message" t="recipe.nutritionInfoGatheredFrom">Nutrition information
-                      gathered from:</th>
+                    <th colspan="2" class="source-message" t="recipe.nutritionInfoGatheredFrom">
+                      Nutrition information gathered from:
+                    </th>
                   </tr>
                   <tr if.bind="costInfoVisible" class="au-animate animate-fade-in aurelia-fade-out">
-                    <th colspan="2" class="source-message" t="recipe.costInfoGatheredFrom">Cost information gathered
-                      from
+                    <th colspan="2" class="source-message" t="recipe.costInfoGatheredFrom">
+                      Cost information gathered from
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr repeat.for="ingredient of model.ingredients" class="${ingredient.missing ? 'missing' : ''}">
                     <td class="recipe-ingredient-name">
-                      <i if.bind="ingredient.nutritionSource"
-                        class="fas fa-clipboard au-animate animate-fade-in aurelia-fade-out"></i>
-                      <i if.bind="ingredient.costSource"
-                        class="fas fa-tag au-animate animate-fade-in aurelia-fade-out"></i>
+                      <i
+                        if.bind="ingredient.nutritionSource"
+                        class="fas fa-clipboard au-animate animate-fade-in aurelia-fade-out"
+                      ></i>
+                      <i
+                        if.bind="ingredient.costSource"
+                        class="fas fa-tag au-animate animate-fade-in aurelia-fade-out"
+                      ></i>
                       ${ingredient.name}
                     </td>
                     <td>
@@ -114,7 +123,8 @@
 
             <section if.bind="model.nutritionSummary.isSet">
               <header t="recipe.nutritionPerServing" class="nutrition-header" click.delegate="toggleNutritionInfo()">
-                Nutrition per serving</header>
+                Nutrition per serving
+              </header>
 
               <div if.bind="model.nutritionSummary.calories" class="nutrition-row">
                 <div class="nutrition-row-quantity">
@@ -122,9 +132,11 @@
                   <div>${model.nutritionSummary.calories | numberFormat} kcal</div>
                 </div>
                 <div class="nutrition-row-progress-wrap">
-                  <div if.bind="model.nutritionSummary.caloriesFromDaily"
+                  <div
+                    if.bind="model.nutritionSummary.caloriesFromDaily"
                     css="width: ${model.nutritionSummary.caloriesFromDaily}%;"
-                    class="nutrition-row-progress ${model.nutritionSummary.caloriesFromDailyGrade}"></div>
+                    class="nutrition-row-progress ${model.nutritionSummary.caloriesFromDailyGrade}"
+                  ></div>
                 </div>
               </div>
 
@@ -142,10 +154,11 @@
                   <div>${model.nutritionSummary.saturatedFat | numberFormat} g</div>
                 </div>
                 <div class="nutrition-row-progress-wrap">
-                  <div if.bind="model.nutritionSummary.saturatedFatFromDaily"
+                  <div
+                    if.bind="model.nutritionSummary.saturatedFatFromDaily"
                     css="width: ${model.nutritionSummary.saturatedFatFromDaily}%;"
-                    class="nutrition-row-progress ${model.nutritionSummary.saturatedFatFromDailyGrade}">
-                  </div>
+                    class="nutrition-row-progress ${model.nutritionSummary.saturatedFatFromDailyGrade}"
+                  ></div>
                 </div>
               </div>
 
@@ -155,10 +168,11 @@
                   <div>${model.nutritionSummary.carbohydrate | numberFormat} g</div>
                 </div>
                 <div class="nutrition-row-progress-wrap">
-                  <div if.bind="model.nutritionSummary.carbohydrateFromDaily"
+                  <div
+                    if.bind="model.nutritionSummary.carbohydrateFromDaily"
                     css="width: ${model.nutritionSummary.carbohydrateFromDaily}%;"
-                    class="nutrition-row-progress ${model.nutritionSummary.carbohydrateFromDailyGrade}">
-                  </div>
+                    class="nutrition-row-progress ${model.nutritionSummary.carbohydrateFromDailyGrade}"
+                  ></div>
                 </div>
               </div>
 
@@ -168,10 +182,11 @@
                   <div>${model.nutritionSummary.sugars | numberFormat} g</div>
                 </div>
                 <div class="nutrition-row-progress-wrap">
-                  <div if.bind="model.nutritionSummary.sugarsFromDaily"
+                  <div
+                    if.bind="model.nutritionSummary.sugarsFromDaily"
                     css="width: ${model.nutritionSummary.sugarsFromDaily}%;"
-                    class="nutrition-row-progress ${model.nutritionSummary.sugarsFromDailyGrade}">
-                  </div>
+                    class="nutrition-row-progress ${model.nutritionSummary.sugarsFromDailyGrade}"
+                  ></div>
                 </div>
               </div>
 
@@ -181,10 +196,11 @@
                   <div>${model.nutritionSummary.addedSugars | numberFormat} g</div>
                 </div>
                 <div class="nutrition-row-progress-wrap">
-                  <div if.bind="model.nutritionSummary.addedSugarsFromDaily"
+                  <div
+                    if.bind="model.nutritionSummary.addedSugarsFromDaily"
                     css="width: ${model.nutritionSummary.addedSugarsFromDaily}%;"
-                    class="nutrition-row-progress ${model.nutritionSummary.addedSugarsFromDailyGrade}">
-                  </div>
+                    class="nutrition-row-progress ${model.nutritionSummary.addedSugarsFromDailyGrade}"
+                  ></div>
                 </div>
               </div>
 
@@ -194,10 +210,11 @@
                   <div>${model.nutritionSummary.fiber | numberFormat} g</div>
                 </div>
                 <div class="nutrition-row-progress-wrap">
-                  <div if.bind="model.nutritionSummary.fiberFromDaily"
+                  <div
+                    if.bind="model.nutritionSummary.fiberFromDaily"
                     css="width: ${model.nutritionSummary.fiberFromDaily}%;"
-                    class="nutrition-row-progress ${model.nutritionSummary.fiberFromDailyGrade}">
-                  </div>
+                    class="nutrition-row-progress ${model.nutritionSummary.fiberFromDailyGrade}"
+                  ></div>
                 </div>
               </div>
 
@@ -207,10 +224,11 @@
                   <div>${model.nutritionSummary.protein | numberFormat} g</div>
                 </div>
                 <div class="nutrition-row-progress-wrap">
-                  <div if.bind="model.nutritionSummary.proteinFromDaily"
+                  <div
+                    if.bind="model.nutritionSummary.proteinFromDaily"
                     css="width: ${model.nutritionSummary.proteinFromDaily}%;"
-                    class="nutrition-row-progress ${model.nutritionSummary.proteinFromDailyGrade}">
-                  </div>
+                    class="nutrition-row-progress ${model.nutritionSummary.proteinFromDailyGrade}"
+                  ></div>
                 </div>
               </div>
 
@@ -220,10 +238,11 @@
                   <div>${model.nutritionSummary.sodium | numberFormat} mg</div>
                 </div>
                 <div class="nutrition-row-progress-wrap">
-                  <div if.bind="model.nutritionSummary.sodiumFromDaily"
+                  <div
+                    if.bind="model.nutritionSummary.sodiumFromDaily"
                     css="width: ${model.nutritionSummary.sodiumFromDaily}%;"
-                    class="nutrition-row-progress ${model.nutritionSummary.sodiumFromDailyGrade}">
-                  </div>
+                    class="nutrition-row-progress ${model.nutritionSummary.sodiumFromDailyGrade}"
+                  ></div>
                 </div>
               </div>
 
@@ -233,10 +252,11 @@
                   <div>${model.nutritionSummary.cholesterol | numberFormat} mg</div>
                 </div>
                 <div class="nutrition-row-progress-wrap">
-                  <div if.bind="model.nutritionSummary.cholesterolFromDaily"
+                  <div
+                    if.bind="model.nutritionSummary.cholesterolFromDaily"
                     css="width: ${model.nutritionSummary.cholesterolFromDaily}%;"
-                    class="nutrition-row-progress ${model.nutritionSummary.cholesterolFromDailyGrade}">
-                  </div>
+                    class="nutrition-row-progress ${model.nutritionSummary.cholesterolFromDailyGrade}"
+                  ></div>
                 </div>
               </div>
 
@@ -246,10 +266,11 @@
                   <div>${model.nutritionSummary.vitaminA | numberFormat} mg</div>
                 </div>
                 <div class="nutrition-row-progress-wrap">
-                  <div if.bind="model.nutritionSummary.vitaminAFromDaily"
+                  <div
+                    if.bind="model.nutritionSummary.vitaminAFromDaily"
                     css="width: ${model.nutritionSummary.vitaminAFromDaily}%;"
-                    class="nutrition-row-progress ${model.nutritionSummary.vitaminAFromDailyGrade}">
-                  </div>
+                    class="nutrition-row-progress ${model.nutritionSummary.vitaminAFromDailyGrade}"
+                  ></div>
                 </div>
               </div>
 
@@ -259,10 +280,11 @@
                   <div>${model.nutritionSummary.vitaminC | numberFormat} mg</div>
                 </div>
                 <div class="nutrition-row-progress-wrap">
-                  <div if.bind="model.nutritionSummary.vitaminCFromDaily"
+                  <div
+                    if.bind="model.nutritionSummary.vitaminCFromDaily"
                     css="width: ${model.nutritionSummary.vitaminCFromDaily}%;"
-                    class="nutrition-row-progress ${model.nutritionSummary.vitaminCFromDailyGrade}">
-                  </div>
+                    class="nutrition-row-progress ${model.nutritionSummary.vitaminCFromDailyGrade}"
+                  ></div>
                 </div>
               </div>
 
@@ -272,10 +294,11 @@
                   <div>${model.nutritionSummary.vitaminD | numberFormat} mg</div>
                 </div>
                 <div class="nutrition-row-progress-wrap">
-                  <div if.bind="model.nutritionSummary.vitaminDFromDaily"
+                  <div
+                    if.bind="model.nutritionSummary.vitaminDFromDaily"
                     css="width: ${model.nutritionSummary.vitaminDFromDaily}%;"
-                    class="nutrition-row-progress ${model.nutritionSummary.vitaminDFromDailyGrade}">
-                  </div>
+                    class="nutrition-row-progress ${model.nutritionSummary.vitaminDFromDailyGrade}"
+                  ></div>
                 </div>
               </div>
 
@@ -285,10 +308,11 @@
                   <div>${model.nutritionSummary.calcium | numberFormat} mg</div>
                 </div>
                 <div class="nutrition-row-progress-wrap">
-                  <div if.bind="model.nutritionSummary.calciumFromDaily"
+                  <div
+                    if.bind="model.nutritionSummary.calciumFromDaily"
                     css="width: ${model.nutritionSummary.calciumFromDaily}%;"
-                    class="nutrition-row-progress ${model.nutritionSummary.calciumFromDailyGrade}">
-                  </div>
+                    class="nutrition-row-progress ${model.nutritionSummary.calciumFromDailyGrade}"
+                  ></div>
                 </div>
               </div>
 
@@ -298,10 +322,11 @@
                   <div>${model.nutritionSummary.iron | numberFormat} mg</div>
                 </div>
                 <div class="nutrition-row-progress-wrap">
-                  <div if.bind="model.nutritionSummary.ironFromDaily"
+                  <div
+                    if.bind="model.nutritionSummary.ironFromDaily"
                     css="width: ${model.nutritionSummary.ironFromDaily}%;"
-                    class="nutrition-row-progress ${model.nutritionSummary.ironFromDailyGrade}">
-                  </div>
+                    class="nutrition-row-progress ${model.nutritionSummary.ironFromDailyGrade}"
+                  ></div>
                 </div>
               </div>
 
@@ -311,10 +336,11 @@
                   <div>${model.nutritionSummary.potassium | numberFormat} mg</div>
                 </div>
                 <div class="nutrition-row-progress-wrap">
-                  <div if.bind="model.nutritionSummary.potassiumFromDaily"
+                  <div
+                    if.bind="model.nutritionSummary.potassiumFromDaily"
                     css="width: ${model.nutritionSummary.potassiumFromDaily}%;"
-                    class="nutrition-row-progress ${model.nutritionSummary.potassiumFromDailyGrade}">
-                  </div>
+                    class="nutrition-row-progress ${model.nutritionSummary.potassiumFromDailyGrade}"
+                  ></div>
                 </div>
               </div>
 
@@ -324,10 +350,11 @@
                   <div>${model.nutritionSummary.magnesium | numberFormat} mg</div>
                 </div>
                 <div class="nutrition-row-progress-wrap">
-                  <div if.bind="model.nutritionSummary.magnesiumFromDaily"
+                  <div
+                    if.bind="model.nutritionSummary.magnesiumFromDaily"
                     css="width: ${model.nutritionSummary.magnesiumFromDaily}%;"
-                    class="nutrition-row-progress ${model.nutritionSummary.magnesiumFromDailyGrade}">
-                  </div>
+                    class="nutrition-row-progress ${model.nutritionSummary.magnesiumFromDailyGrade}"
+                  ></div>
                 </div>
               </div>
             </section>
@@ -344,10 +371,8 @@
                 </div>
               </div>
             </section>
-
           </div>
         </div>
-
       </div>
 
       <div click.delegate="closeDrawer()" class="body-overlay ${topDrawerIsOpen ? 'visible' : ''}"></div>

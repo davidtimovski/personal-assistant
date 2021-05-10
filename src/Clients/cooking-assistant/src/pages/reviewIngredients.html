@@ -8,28 +8,33 @@
         <i class="fas fa-glasses"></i>
       </div>
       <div class="page-title" t="reviewIngredients.reviewIngredients">Review ingredients</div>
-      <a route-href="route: inbox" class="side back">
+      <a route-href="route: inbox" class="back-button">
         <i class="fas fa-times"></i>
       </a>
     </div>
 
     <div class="content-wrap">
-
       <section show.bind="!reviewing" class="review-introduction-wrap">
         <tooltip key.bind="reviewIngredientsTooltipKey"></tooltip>
 
         <div class="review-image-name-wrap">
           <div class="review-recipe-name-wrap">${model.name}</div>
-          <img src.bind="model.imageUri" class="image" alt="${model.name}">
+          <img src.bind="model.imageUri" class="image" alt="${model.name}" />
         </div>
         <div if.bind="model.description" class="description">${model.description}</div>
 
-        <hr>
+        <hr />
 
         <div class="review-introduction">${introductoryLabel}</div>
         <div class="review-introduction-button-wrap">
-          <button type="button" click.delegate="startReviewing()" class="small-button"
-            t="reviewIngredients.reviewIngredients">Review ingredients</button>
+          <button
+            type="button"
+            click.delegate="startReviewing()"
+            class="small-button"
+            t="reviewIngredients.reviewIngredients"
+          >
+            Review ingredients
+          </button>
         </div>
       </section>
 
@@ -38,33 +43,45 @@
           ${currentIngredient.name}
           <span show.bind="currentIngredient.replacementId">
             <i class="fas fa-long-arrow-alt-right review-replacement-arrow"></i>
-            ${currentIngredient.replacementName}<a click.delegate="revertReplacement()" class="review-revert-icon"
-              t="[aria-label]reviewIngredients.cancelIngredientReplacement">
+            ${currentIngredient.replacementName}<a
+              click.delegate="revertReplacement()"
+              class="review-revert-icon"
+              t="[aria-label]reviewIngredients.cancelIngredientReplacement"
+            >
               <i class="fas fa-times-circle"></i>
             </a>
           </span>
         </div>
 
-        <input type="text" show.bind="!currentIngredient.replacementId" class="review-search-input"
-          ref="pickExistingIngredientInput" t="[placeholder,aria-label]reviewIngredients.searchInventory"
-          maxlength="50">
-        <div show.bind="currentSuggestion" class="review-suggestion"><span
-            t="reviewIngredients.suggestion">Suggestion:</span>
-          <a click.delegate="setReplacement(currentSuggestion)">${currentSuggestion.name}</a></div>
+        <input
+          type="text"
+          show.bind="!currentIngredient.replacementId"
+          class="review-search-input"
+          ref="pickExistingIngredientInput"
+          t="[placeholder,aria-label]reviewIngredients.searchInventory"
+          maxlength="50"
+        />
+        <div show.bind="currentSuggestion" class="review-suggestion">
+          <span t="reviewIngredients.suggestion">Suggestion:</span>
+          <a click.delegate="setReplacement(currentSuggestion)">${currentSuggestion.name}</a>
+        </div>
 
         <div class="review-transfer-data">
           <label class="toggle" show.bind="currentIngredient.replacementId && currentIngredient.hasNutritionData">
             <span t="reviewIngredients.transferNutritionData">Transfer nutrition data</span>
             <div class="toggle-content">
-              <input type="checkbox" checked.bind="currentIngredient.transferNutritionData">
+              <input type="checkbox" checked.bind="currentIngredient.transferNutritionData" />
               <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
                 <path
-                  d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
+                  d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
+                />
               </svg>
               <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
                 <path
                   d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                  fill-rule="evenodd" clip-rule="evenodd" />
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                />
               </svg>
             </div>
           </label>
@@ -72,37 +89,48 @@
           <label class="toggle" show.bind="currentIngredient.replacementId && currentIngredient.hasPriceData">
             <span t="reviewIngredients.transferPriceData">Transfer price data</span>
             <div class="toggle-content">
-              <input type="checkbox" checked.bind="currentIngredient.transferPriceData">
+              <input type="checkbox" checked.bind="currentIngredient.transferPriceData" />
               <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
                 <path
-                  d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
+                  d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
+                />
               </svg>
               <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
                 <path
                   d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                  fill-rule="evenodd" clip-rule="evenodd" />
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                />
               </svg>
             </div>
           </label>
         </div>
 
-        <hr>
+        <hr />
 
         <div class="review-pagination">
-          <i class="fas fa-arrow-alt-circle-left review-pagination-arrow" role="button"
-            click.delegate="previousIngredient()" t="[aria-label]reviewIngredients.previousIngredient"></i>
+          <i
+            class="fas fa-arrow-alt-circle-left review-pagination-arrow"
+            role="button"
+            click.delegate="previousIngredient()"
+            t="[aria-label]reviewIngredients.previousIngredient"
+          ></i>
           <div class="review-pagination-numbering">
-            <span>${currentIngredientNumber}</span>/<span>${model.ingredients.length}</span></div>
-          <i if.bind="currentIngredientNumber < model.ingredients.length"
-            class="fas fa-arrow-alt-circle-right review-pagination-arrow" role="button"
-            click.delegate="nextIngredient()" t="[aria-label]reviewIngredients.nextIngredient"></i>
+            <span>${currentIngredientNumber}</span>/<span>${model.ingredients.length}</span>
+          </div>
+          <i
+            if.bind="currentIngredientNumber < model.ingredients.length"
+            class="fas fa-arrow-alt-circle-right review-pagination-arrow"
+            role="button"
+            click.delegate="nextIngredient()"
+            t="[aria-label]reviewIngredients.nextIngredient"
+          ></i>
           <a else click.delegate="import()" class="review-done-button">
-            <span t="reviewIngredients.done">Done!</span> <i show.bind="doneButtonIsLoading"
-              class="fas fa-circle-notch fa-spin au-animate animate-fade-in"></i></a>
+            <span t="reviewIngredients.done">Done!</span>
+            <i show.bind="doneButtonIsLoading" class="fas fa-circle-notch fa-spin au-animate animate-fade-in"></i
+          ></a>
         </div>
       </section>
-
     </div>
-
   </div>
 </template>

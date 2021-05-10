@@ -1,7 +1,9 @@
 .recipe-wrap .prep-cook-duration-wrap {
-  background: #fafafa;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
+  display: flex;
+  justify-content: space-around;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
   padding: 15px;
   margin-bottom: 10px;
 
@@ -61,7 +63,6 @@
 
 .recipe-ingredients-table {
   width: 100%;
-  box-shadow: var(--box-shadow);
   margin-bottom: 10px;
 
   tr:first-child th {
@@ -82,7 +83,6 @@
     tr td {
       padding: 5px 15px;
       line-height: 28px;
-      transition: color var(--transition-quick);
     }
 
     tr:hover td {

@@ -7,20 +7,26 @@
         <i class="fas fa-paper-plane"></i>
       </div>
       <div class="page-title">
-        <span t="sendRecipe.send">Send</span>&nbsp;<span class="colored-text">${model.name}</span>
+        <span> <span t="sendRecipe.send">Send</span>&nbsp;<span class="colored-text">${model.name}</span> </span>
       </div>
-      <a route-href="route: recipe; params.bind: { id: model.id }" class="side back">
+      <a route-href="route: recipe; params.bind: { id: model.id }" class="back-button">
         <i class="fas fa-times"></i>
       </a>
     </div>
 
     <div class="content-wrap">
-
       <form submit.trigger="addRecipient()">
         <div class="form-control">
           <div class="add-input-wrap">
-            <input type="email" ref="emailInput" value.bind="recipientEmail & validate" maxlength="256" class.bind="emailIsInvalid ? 'invalid' : ''"
-              t="[placeholder,aria-label]sendRecipe.recipientEmail" required>
+            <input
+              type="email"
+              ref="emailInput"
+              value.bind="recipientEmail & validate"
+              maxlength="256"
+              class.bind="emailIsInvalid ? 'invalid' : ''"
+              t="[placeholder,aria-label]sendRecipe.recipientEmail"
+              required
+            />
             <a click.delegate="addRecipient()" t="[title,aria-label]sendRecipe.addRecipient">
               <i class="fas fa-plus-circle"></i>
             </a>
@@ -30,20 +36,24 @@
 
       <div class="labeled-separator">
         <div class="labeled-separator-text" t="sendRecipe.recipients">Recipients</div>
-        <hr>
+        <hr />
       </div>
 
       <div repeat.for="recipient of recipients" class="send-to">
-        <img class="send-image" src.bind="recipient.imageUri" t="[alt]profilePicture">
+        <img class="send-image" src.bind="recipient.imageUri" t="[alt]profilePicture" />
         <div class="send-content">
           <span class="name">${recipient.email}</span>
-          <a click.delegate="removeRecipient(recipient)" class="side" t="[title,aria-label]sendRecipe.removeRecipient">
+          <a
+            click.delegate="removeRecipient(recipient)"
+            class="send-content-button"
+            t="[title,aria-label]sendRecipe.removeRecipient"
+          >
             <i class="fas fa-times-circle"></i>
           </a>
         </div>
       </div>
 
-      <hr>
+      <hr />
 
       <div class="save-delete-wrap">
         <a click.delegate="send()" class="button primary-button ${!canSend || sendButtonIsLoading ? 'disabled' : ''}">
@@ -52,10 +62,10 @@
           </span>
           <span t="sendRecipe.send">Send</span>
         </a>
-        <a route-href="route: recipe; params.bind: { id: model.id }" t="cancel"
-          class="button secondary-button">Cancel</a>
+        <a route-href="route: recipe; params.bind: { id: model.id }" t="cancel" class="button secondary-button"
+          >Cancel</a
+        >
       </div>
-
     </div>
   </div>
 </template>

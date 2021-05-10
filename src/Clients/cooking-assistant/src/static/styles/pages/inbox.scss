@@ -4,8 +4,6 @@
   .send-request {
     opacity: 0.6;
 
-    transition: opacity var(--transition);
-
     &:hover {
       opacity: 1;
     }
@@ -15,10 +13,27 @@
 .send-request {
   display: flex;
   justify-content: space-between;
-  background: #fafafa;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
+  background: #e9fff4;
+  border-radius: 6px;
   margin-bottom: 10px;
+
+  .action {
+    min-width: 45px;
+    font-size: 27px;
+    line-height: 45px;
+    text-decoration: none;
+    text-align: center;
+    color: var(--primary-color);
+
+    &.inactive,
+    &.inactive:hover {
+      color: var(--faded-color);
+    }
+
+    &:not(.inactive):not(.side-loading):hover {
+      color: var(--primary-color-dark);
+    }
+  }
 
   .name {
     width: 100%;
