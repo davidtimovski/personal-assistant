@@ -21,9 +21,9 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models
         {
             RuleFor(dto => dto.UserId)
                 .NotEmpty().WithMessage("Unauthorized")
-                .MustAsync(async (dto, userId, val) => await listService.UserOwnsOrSharesAsAdminAsync(dto.Id, userId)).WithMessage("Unauthorized")
-                .MustAsync(async (dto, userId, val) => !await listService.UserOwnsOrSharesAsAdminAsync(dto.Id, dto.Name, userId)).WithMessage("AlreadyExists")
-                .MustAsync(async (dto, userId, val) => !await listService.ExistsAsync(dto.Id, dto.Name, userId)).WithMessage("AlreadyExists");
+                .Must((dto, userId) => listService.UserOwnsOrSharesAsAdmin(dto.Id, userId)).WithMessage("Unauthorized")
+                .Must((dto, userId) => !listService.UserOwnsOrSharesAsAdmin(dto.Id, dto.Name, userId)).WithMessage("AlreadyExists")
+                .Must((dto, userId) => !listService.Exists(dto.Id, dto.Name, userId)).WithMessage("AlreadyExists");
 
             RuleFor(dto => dto.Name)
                 .NotEmpty().WithMessage("Lists.ModifyList.NameIsRequired")

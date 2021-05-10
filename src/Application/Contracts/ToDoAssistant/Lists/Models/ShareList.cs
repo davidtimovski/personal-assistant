@@ -20,7 +20,7 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models
         {
             RuleFor(dto => dto.UserId)
                 .NotEmpty().WithMessage("Unauthorized")
-                .MustAsync(async (dto, userId, val) => await listService.UserOwnsOrSharesAsAdminAsync(dto.ListId, userId)).WithMessage("Unauthorized");
+                .Must((dto, userId) => listService.UserOwnsOrSharesAsAdmin(dto.ListId, userId)).WithMessage("Unauthorized");
 
             RuleForEach(dto => dto.NewShares).SetValidator(new ShareUserAndPermissionValidator(userService));
             RuleForEach(dto => dto.EditedShares).SetValidator(new ShareUserAndPermissionValidator(userService));

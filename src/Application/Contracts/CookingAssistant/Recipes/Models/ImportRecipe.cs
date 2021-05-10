@@ -29,13 +29,13 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Model
 
             RuleFor(dto => dto.UserId)
                 .NotEmpty().WithMessage("Unauthorized")
-                .MustAsync(async (dto, userId, val) => await recipeService.SendRequestExistsAsync(dto.Id, userId)).WithMessage("Unauthorized");
+                .Must((dto, userId) => recipeService.SendRequestExists(dto.Id, userId)).WithMessage("Unauthorized");
 
-            RuleForEach(dto => dto.IngredientReplacements).MustAsync(async (dto, replacements, val) =>
+            RuleForEach(dto => dto.IngredientReplacements).Must((dto, replacements) =>
             {
                 foreach (IngredientReplacement replacement in dto.IngredientReplacements)
                 {
-                    if (!await ingredientService.ExistsInRecipeAsync(replacement.Id, dto.Id))
+                    if (!ingredientService.ExistsInRecipe(replacement.Id, dto.Id))
                     {
                         return false;
                     }

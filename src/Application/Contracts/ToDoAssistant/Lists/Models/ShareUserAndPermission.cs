@@ -17,7 +17,7 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models
         {
             RuleFor(dto => dto.UserId)
                 .NotEmpty().WithMessage("Unauthorized")
-                .MustAsync(async (userId, val) => await userService.ExistsAsync(userId)).WithMessage($"{prefix}.UserDoesNotExist");
+                .Must(userId => userService.Exists(userId)).WithMessage($"{prefix}.UserDoesNotExist");
         }
     }
 }

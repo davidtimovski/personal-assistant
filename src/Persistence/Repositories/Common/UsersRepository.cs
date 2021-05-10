@@ -29,12 +29,11 @@ namespace PersonalAssistant.Persistence.Repositories.Common
                 new { Email = email });
         }
 
-        public async Task<bool> ExistsAsync(int id)
+        public bool Exists(int id)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""AspNetUsers"" WHERE ""Id"" = @id",
-                new { Id = id });
+            return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM ""AspNetUsers"" WHERE ""Id"" = @id", new { Id = id });
         }
 
         public async Task<string> GetLanguageAsync(int id)

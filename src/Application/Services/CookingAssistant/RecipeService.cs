@@ -111,14 +111,14 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             return _recipesRepository.GetPendingShareRequestsCountAsync(userId);
         }
 
-        public async Task<bool> CanShareWithUserAsync(int shareWithId, int userId)
+        public bool CanShareWithUser(int shareWithId, int userId)
         {
             if (shareWithId == userId)
             {
                 return false;
             }
 
-            return await _recipesRepository.CanShareWithUserAsync(shareWithId, userId);
+            return _recipesRepository.CanShareWithUser(shareWithId, userId);
         }
 
         public async Task<RecipeForSending> GetForSendingAsync(int id, int userId)
@@ -144,19 +144,19 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             return _recipesRepository.GetPendingSendRequestsCountAsync(userId);
         }
 
-        public Task<bool> SendRequestExistsAsync(int id, int userId)
+        public bool SendRequestExists(int id, int userId)
         {
-            return _recipesRepository.SendRequestExistsAsync(id, userId);
+            return _recipesRepository.SendRequestExists(id, userId);
         }
 
-        public Task<bool> IngredientsReviewIsRequiredAsync(int id, int userId)
+        public bool IngredientsReviewIsRequired(int id, int userId)
         {
-            return _recipesRepository.IngredientsReviewIsRequiredAsync(id, userId);
+            return _recipesRepository.IngredientsReviewIsRequired(id, userId);
         }
 
         public async Task<RecipeForReview> GetForReviewAsync(int id, int userId)
         {
-            if (!await SendRequestExistsAsync(id, userId))
+            if (!SendRequestExists(id, userId))
             {
                 return null;
             }
@@ -178,34 +178,34 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             return _recipesRepository.GetImageUriAsync(id);
         }
 
-        public Task<bool> ExistsAsync(int id, int userId)
+        public bool Exists(int id, int userId)
         {
-            return _recipesRepository.ExistsAsync(id, userId);
+            return _recipesRepository.Exists(id, userId);
         }
 
-        public Task<bool> ExistsAsync(string name, int userId)
+        public bool Exists(string name, int userId)
         {
-            return _recipesRepository.ExistsAsync(name.Trim(), userId);
+            return _recipesRepository.Exists(name.Trim(), userId);
         }
 
-        public Task<bool> ExistsAsync(int id, string name, int userId)
+        public bool Exists(int id, string name, int userId)
         {
-            return _recipesRepository.ExistsAsync(id, name.Trim(), userId);
+            return _recipesRepository.Exists(id, name.Trim(), userId);
         }
 
-        public Task<int> CountAsync(int userId)
+        public int Count(int userId)
         {
-            return _recipesRepository.CountAsync(userId);
+            return _recipesRepository.Count(userId);
         }
 
-        public async Task<(bool canSend, bool alreadySent)> CheckSendRequestAsync(int recipeId, int sendToId, int userId)
+        public (bool canSend, bool alreadySent) CheckSendRequest(int recipeId, int sendToId, int userId)
         {
             if (sendToId == userId)
             {
                 return (false, false);
             }
 
-            return await _recipesRepository.CheckSendRequestAsync(recipeId, sendToId, userId);
+            return _recipesRepository.CheckSendRequest(recipeId, sendToId, userId);
         }
 
         public async Task<int> CreateAsync(CreateRecipe model, IValidator<CreateRecipe> validator)
@@ -403,7 +403,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
         public async Task<string> DeleteAsync(int id, int userId)
         {
-            if (!await _recipesRepository.UserOwnsAsync(id, userId))
+            if (!_recipesRepository.UserOwns(id, userId))
             {
                 throw new ValidationException("Unauthorized");
             }
@@ -429,7 +429,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             var newShares = new List<RecipeShare>();
             foreach (int userId in model.NewShares)
             {
-                if (await _recipesRepository.UserHasBlockedSharingAsync(model.UserId, userId))
+                if (_recipesRepository.UserHasBlockedSharing(model.RecipeId, model.UserId, userId))
                 {
                     continue;
                 }
@@ -472,7 +472,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             var sendRequests = new List<SendRequest>();
             foreach (int recipientId in model.RecipientsIds)
             {
-                var (canSend, alreadySent) = await CheckSendRequestAsync(model.RecipeId, recipientId, model.UserId);
+                var (canSend, alreadySent) = CheckSendRequest(model.RecipeId, recipientId, model.UserId);
                 if (!canSend || alreadySent)
                 {
                     continue;

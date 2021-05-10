@@ -20,25 +20,23 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models
         {
             RuleFor(dto => dto.UserId)
                 .NotEmpty().WithMessage("Unauthorized")
-                .MustAsync(async (dto, userId, val) => await listService.UserOwnsOrSharesAsync(dto.ListId, userId)).WithMessage("Unauthorized");
+                .Must((dto, userId) => listService.UserOwnsOrShares(dto.ListId, userId)).WithMessage("Unauthorized");
 
             RuleFor(dto => dto.ListId)
-                .MustAsync(async (dto, listId, val) =>
+                .Must((dto, listId) =>
                 {
-                    var existingTasksCount = await taskService.CountAsync(listId);
                     var taskNames = dto.TasksText.Split("\n").Where(x => !string.IsNullOrWhiteSpace(x));
-                    return existingTasksCount + taskNames.Count() <= 250;
+                    return taskService.Count(listId) + taskNames.Count() <= 250;
                 }).WithMessage("TasksPerListLimitReached");
 
             RuleFor(dto => dto.TasksText).NotEmpty().WithMessage("Tasks.BulkCreate.TextIsRequired").Must(tasksText =>
             {
                 var tasks = tasksText.Split("\n").Where(x => !string.IsNullOrWhiteSpace(x));
                 return tasks.Any();
-            }).WithMessage("Tasks.BulkCreate.NoTasks").MustAsync(async (dto, tasksText, val) =>
+            }).WithMessage("Tasks.BulkCreate.NoTasks").Must((dto, tasksText) =>
             {
                 IEnumerable<string> taskNames = tasksText.Split("\n").Where(x => !string.IsNullOrWhiteSpace(x));
-                bool someAlreadyExist = await taskService.ExistsAsync(taskNames, dto.ListId, dto.UserId);
-                return !someAlreadyExist;
+                return !taskService.Exists(taskNames, dto.ListId, dto.UserId);
             }).WithMessage("Tasks.BulkCreate.SomeTasksAlreadyExist").Must(tasksText =>
             {
                 var tasks = tasksText.Split("\n").Where(x => !string.IsNullOrWhiteSpace(x));

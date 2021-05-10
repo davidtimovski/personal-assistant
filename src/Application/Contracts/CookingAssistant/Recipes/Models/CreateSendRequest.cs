@@ -18,15 +18,15 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Model
         {
             RuleFor(dto => dto.UserId)
                 .NotEmpty().WithMessage("Unauthorized")
-                .MustAsync(async (dto, userId, val) => await recipeService.ExistsAsync(dto.RecipeId, userId)).WithMessage("Unauthorized")
-                .MustAsync(async (userId, val) => (await recipeService.CountAsync(userId)) < 250).WithMessage("RecipeLimitReached");
+                .Must((dto, userId) => recipeService.Exists(dto.RecipeId, userId)).WithMessage("Unauthorized")
+                .Must(userId => recipeService.Count(userId) < 250).WithMessage("RecipeLimitReached");
 
             RuleFor(dto => dto.RecipientsIds)
                 .Must(recipientIds =>
                 {
                     return recipientIds.Count == recipientIds.Distinct().Count();
                 }).WithMessage("AnErrorOccurred")
-                .Must((dto, recipientIds, val) =>
+                .Must((dto, recipientIds) =>
                 {
                     return !recipientIds.Any(id => id == dto.UserId);
                 }).WithMessage("AnErrorOccurred");

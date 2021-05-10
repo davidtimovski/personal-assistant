@@ -15,7 +15,7 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models
         {
             RuleFor(dto => dto.UserId)
                 .NotEmpty().WithMessage("Unauthorized")
-                .MustAsync(async (dto, userId, val) => await listService.UserOwnsOrSharesAsAdminAsync(dto.Id, userId)).WithMessage("Unauthorized");
+                .Must((dto, userId) => listService.UserOwnsOrSharesAsAdmin(dto.Id, userId)).WithMessage("Unauthorized");
         }
     }
 }

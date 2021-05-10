@@ -226,15 +226,15 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                 new { UserId = userId });
         }
 
-        public async Task<bool> CanShareWithUserAsync(int shareWithId, int userId)
+        public bool CanShareWithUser(int shareWithId, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return !await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                        FROM ""CookingAssistant.Recipes"" AS r
-                                                        INNER JOIN ""CookingAssistant.Shares"" AS s on r.""Id"" = s.""RecipeId""
-                                                        WHERE r.""UserId"" = @UserId AND s.""UserId"" = @ShareWithId AND s.""IsAccepted"" = FALSE",
-                                                          new { ShareWithId = shareWithId, UserId = userId });
+            return !conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
+                                               FROM ""CookingAssistant.Recipes"" AS r
+                                               INNER JOIN ""CookingAssistant.Shares"" AS s on r.""Id"" = s.""RecipeId""
+                                               WHERE r.""UserId"" = @UserId AND s.""UserId"" = @ShareWithId AND s.""IsAccepted"" = FALSE",
+                                               new { ShareWithId = shareWithId, UserId = userId });
         }
 
         public async Task<Recipe> GetForSendingAsync(int id, int userId)
@@ -276,22 +276,22 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                 new { UserId = userId });
         }
 
-        public async Task<bool> SendRequestExistsAsync(int id, int userId)
+        public bool SendRequestExists(int id, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.SendRequests"" WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @UserId AND ""IsDeclined"" = FALSE",
+            return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.SendRequests"" WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @UserId AND ""IsDeclined"" = FALSE",
                 new { RecipeId = id, UserId = userId });
         }
 
-        public async Task<bool> IngredientsReviewIsRequiredAsync(int id, int userId)
+        public bool IngredientsReviewIsRequired(int id, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            var userHasIngredients = await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.Ingredients"" WHERE ""UserId"" = @UserId",
+            var userHasIngredients = conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.Ingredients"" WHERE ""UserId"" = @UserId",
                 new { UserId = userId });
 
-            var recipeHasIngredients = await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.RecipesIngredients"" WHERE ""RecipeId"" = @RecipeId",
+            var recipeHasIngredients = conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.RecipesIngredients"" WHERE ""RecipeId"" = @RecipeId",
                 new { RecipeId = id });
 
             return userHasIngredients && recipeHasIngredients;
@@ -345,79 +345,77 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                 new { Id = id });
         }
 
-        public async Task<bool> UserOwnsAsync(int id, int userId)
+        public bool UserOwns(int id, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
+            return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
                 new { Id = id, UserId = userId });
         }
 
-        public async Task<bool> ExistsAsync(int id, int userId)
+        public bool Exists(int id, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                        FROM ""CookingAssistant.Recipes"" AS r
-                                                        LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
-                                                        WHERE r.""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+            return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
+                                              FROM ""CookingAssistant.Recipes"" AS r
+                                              LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
+                                              WHERE r.""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
                 new { Id = id, UserId = userId });
         }
 
-        public async Task<bool> ExistsAsync(string name, int userId)
+        public bool Exists(string name, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                         FROM ""CookingAssistant.Recipes"" AS r
-                                                         LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
-                                                         WHERE UPPER(r.""Name"") = UPPER(@Name) AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+            return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
+                                              FROM ""CookingAssistant.Recipes"" AS r
+                                              LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
+                                              WHERE UPPER(r.""Name"") = UPPER(@Name) AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
                 new { Name = name, UserId = userId });
         }
 
-        public async Task<bool> ExistsAsync(int id, string name, int userId)
+        public bool Exists(int id, string name, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                         FROM ""CookingAssistant.Recipes"" AS r
-                                                         LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
-                                                         WHERE r.""Id"" != @Id AND UPPER(r.""Name"") = UPPER(@Name) AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+            return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
+                                              FROM ""CookingAssistant.Recipes"" AS r
+                                              LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
+                                              WHERE r.""Id"" != @Id AND UPPER(r.""Name"") = UPPER(@Name) AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
                 new { Id = id, Name = name, UserId = userId });
         }
 
-        public async Task<int> CountAsync(int userId)
+        public int Count(int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.ExecuteScalarAsync<int>(@"SELECT COUNT(*) FROM ""CookingAssistant.Recipes"" WHERE ""UserId"" = @UserId", new { UserId = userId });
+            return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM ""CookingAssistant.Recipes"" WHERE ""UserId"" = @UserId", new { UserId = userId });
         }
 
-        public async Task<bool> UserHasBlockedSharingAsync(int userId, int sharedWithId)
+        public bool UserHasBlockedSharing(int recipeId, int userId, int sharedWithId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                        FROM ""CookingAssistant.Recipes"" AS r
-                                                        INNER JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
-                                                        WHERE r.""UserId"" = @UserId AND s.""UserId"" = @SharedWithId AND ""IsAccepted"" = FALSE",
-                                                        new { UserId = userId, SharedWithId = sharedWithId });
+            return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
+                                              FROM ""CookingAssistant.Shares""
+                                              WHERE ""UserId"" = @SharedWithId AND ""IsAccepted"" = FALSE AND (SELECT ""UserId"" FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @RecipeId) = @SharerId",
+                                              new { SharedWithId = sharedWithId, SharerId = userId, RecipeId = recipeId });
         }
 
-        public async Task<(bool canSend, bool alreadySent)> CheckSendRequestAsync(int recipeId, int sendToId, int userId)
+        public (bool canSend, bool alreadySent) CheckSendRequest(int recipeId, int sendToId, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            bool canSend = !await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                                      FROM ""CookingAssistant.Recipes"" AS r
-                                                                      INNER JOIN ""CookingAssistant.SendRequests"" AS sr on r.""Id"" = sr.""RecipeId""
-                                                                      WHERE r.""UserId"" = @UserId AND sr.""UserId"" = @SendToId AND sr.""IsDeclined"" = TRUE",
-                                                                  new { SendToId = sendToId, UserId = userId });
+            bool canSend = !conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
+                                                       FROM ""CookingAssistant.SendRequests""
+                                                       WHERE ""UserId"" = @SendToId AND ""IsDeclined"" = TRUE AND (SELECT ""UserId"" FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @RecipeId) = @SenderId",
+                                                       new { SendToId = sendToId, SenderId = userId, RecipeId = recipeId });
 
-            bool alreadySent = await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                                         FROM ""CookingAssistant.SendRequests""
-                                                                         WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @SendToId",
-                                                                     new { RecipeId = recipeId, SendToId = sendToId });
+            bool alreadySent = conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
+                                                          FROM ""CookingAssistant.SendRequests""
+                                                          WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @SendToId",
+                                                          new { RecipeId = recipeId, SendToId = sendToId });
 
             return (canSend, alreadySent);
         }

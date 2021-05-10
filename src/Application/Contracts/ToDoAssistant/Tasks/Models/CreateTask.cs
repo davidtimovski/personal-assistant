@@ -20,9 +20,9 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models
         {
             RuleFor(dto => dto.UserId)
                 .NotEmpty().WithMessage("Unauthorized")
-                .MustAsync(async (dto, userId, val) => await listService.UserOwnsOrSharesAsync(dto.ListId, userId)).WithMessage("Unauthorized")
-                .MustAsync(async (dto, userId, val) => !await taskService.ExistsAsync(dto.Name, dto.ListId, userId)).WithMessage("AlreadyExists")
-                .MustAsync(async (dto, userId, val) => await taskService.CountAsync(dto.ListId) < 250).WithMessage("TasksPerListLimitReached");
+                .Must((dto, userId) => listService.UserOwnsOrShares(dto.ListId, userId)).WithMessage("Unauthorized")
+                .Must((dto, userId) => !taskService.Exists(dto.Name, dto.ListId, userId)).WithMessage("AlreadyExists")
+                .Must((dto, userId) => taskService.Count(dto.ListId) < 250).WithMessage("TasksPerListLimitReached");
 
             RuleFor(dto => dto.Name)
                 .NotEmpty().WithMessage("Tasks.ModifyTask.NameIsRequired")

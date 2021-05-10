@@ -10,7 +10,7 @@ namespace PersonalAssistant.Application.Contracts.Common
     {
         Task<User> GetAsync(int id);
         Task<User> GetAsync(string email);
-        Task<bool> ExistsAsync(int id);
+        bool Exists(int id);
         Task<string> GetLanguageAsync(int id);
         Task<string> GetImageUriAsync(int id);
         Task<IEnumerable<User>> GetToBeNotifiedOfListChangeAsync(int listId, int excludeUserId);

@@ -26,8 +26,8 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Model
         {
             RuleFor(dto => dto.UserId)
                 .NotEmpty().WithMessage("Unauthorized")
-                .MustAsync(async (dto, userId, val) => !await recipeService.ExistsAsync(dto.Name, userId)).WithMessage("AlreadyExists")
-                .MustAsync(async (userId, val) => (await recipeService.CountAsync(userId)) < 250).WithMessage("Recipes.RecipeLimitReached");
+                .Must((dto, userId) => !recipeService.Exists(dto.Name, userId)).WithMessage("AlreadyExists")
+                .Must(userId => recipeService.Count(userId) < 250).WithMessage("Recipes.RecipeLimitReached");
 
             RuleFor(dto => dto.Name)
                 .NotEmpty().WithMessage("Recipes.ModifyRecipe.NameIsRequired")
@@ -48,12 +48,12 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Model
                 }
                 return true;
             }).WithMessage("Recipes.ModifyRecipe.DuplicateIngredients")
-            .MustAsync(async (dto, ingredients, val) =>
+            .Must((dto, ingredients) =>
             {
                 var ingredientsLinkedToTasks = ingredients.Where(x => x.TaskId.HasValue);
                 foreach (UpdateRecipeIngredient ingredient in ingredientsLinkedToTasks)
                 {
-                    if (!await taskService.ExistsAsync(ingredient.TaskId.Value, dto.UserId))
+                    if (!taskService.Exists(ingredient.TaskId.Value, dto.UserId))
                     {
                         return false;
                     }

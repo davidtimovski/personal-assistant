@@ -20,8 +20,8 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models
         {
             RuleFor(dto => dto.UserId)
                 .NotEmpty().WithMessage("Unauthorized")
-                .MustAsync(async (dto, userId, val) => !await listService.ExistsAsync(dto.Name, userId)).WithMessage("AlreadyExists")
-                .MustAsync(async (userId, val) => (await listService.CountAsync(userId)) < 50).WithMessage("Lists.ListLimitReached");
+                .Must((dto, userId) => !listService.Exists(dto.Name, userId)).WithMessage("AlreadyExists")
+                .Must((dto, userId) => listService.Count(userId) < 50).WithMessage("Lists.ListLimitReached");
 
             RuleFor(dto => dto.Name)
                 .NotEmpty().WithMessage("Lists.ModifyList.NameIsRequired")

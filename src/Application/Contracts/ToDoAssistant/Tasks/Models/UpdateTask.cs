@@ -20,7 +20,7 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models
         {
             RuleFor(dto => dto.UserId)
                 .NotEmpty().WithMessage("Unauthorized")
-                .MustAsync(async (dto, userId, val) => !await taskService.ExistsAsync(dto.Id, dto.Name, dto.ListId, userId)).WithMessage("AlreadyExists");
+                .Must((dto, userId) => !taskService.Exists(dto.Id, dto.Name, dto.ListId, userId)).WithMessage("AlreadyExists");
 
             RuleFor(dto => dto.ListId)
                 .MustAsync(async (dto, listId, val) =>
@@ -28,7 +28,7 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models
                     SimpleTask originalTask = await taskService.GetAsync(dto.Id);
                     bool listChanged = listId != originalTask.ListId;
 
-                    if (listChanged && await taskService.CountAsync(dto.ListId) == 250)
+                    if (listChanged && taskService.Count(dto.ListId) == 250)
                     {
                         return false;
                     }
@@ -37,10 +37,9 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models
                 }).WithMessage("Tasks.UpdateTask.SelectedListAlreadyContainsMaxTasks");
 
             RuleFor(dto => dto.AssignedToUserId)
-                .MustAsync(async (dto, assignedToUserId, val) =>
+                .Must((dto, assignedToUserId) =>
                 {
-                    if (dto.AssignedToUserId.HasValue
-                        && !await listService.UserOwnsOrSharesAsPendingAsync(dto.ListId, assignedToUserId.Value))
+                    if (dto.AssignedToUserId.HasValue && !listService.UserOwnsOrSharesAsPending(dto.ListId, assignedToUserId.Value))
                     {
                         return false;
                     }

@@ -149,40 +149,40 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                 new { UserId = userId });
         }
 
-        public async Task<bool> ExistsAsync(int id, int userId)
+        public bool Exists(int id, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                         FROM ""CookingAssistant.Ingredients"" AS i
-                                                         LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
-                                                         LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
-                                                         LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
-                                                         WHERE i.""Id"" = @Id AND i.""UserId"" = @UserId AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
-                                                         new { Id = id, UserId = userId });
+            return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
+                                              FROM ""CookingAssistant.Ingredients"" AS i
+                                              LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
+                                              LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
+                                              LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
+                                              WHERE i.""Id"" = @Id AND i.""UserId"" = @UserId AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+                                              new { Id = id, UserId = userId });
         }
 
-        public async Task<bool> ExistsAsync(int id, string name, int userId)
+        public bool Exists(int id, string name, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                         FROM ""CookingAssistant.Ingredients"" AS i
-                                                         LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
-                                                         LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
-                                                         LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
-                                                         WHERE i.""Id"" != @Id AND UPPER(i.""Name"") = UPPER(@Name) AND i.""UserId"" = @UserId AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
-                                                         new { Id = id, Name = name, UserId = userId });
+            return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
+                                              FROM ""CookingAssistant.Ingredients"" AS i
+                                              LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
+                                              LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
+                                              LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
+                                              WHERE i.""Id"" != @Id AND UPPER(i.""Name"") = UPPER(@Name) AND i.""UserId"" = @UserId AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+                                              new { Id = id, Name = name, UserId = userId });
         }
 
-        public async Task<bool> ExistsInRecipeAsync(int id, int recipeId)
+        public bool ExistsInRecipe(int id, int recipeId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                         FROM ""CookingAssistant.RecipesIngredients""
-                                                         WHERE ""RecipeId"" = @RecipeId AND ""IngredientId"" = @IngredientId",
-                                                         new { IngredientId = id, RecipeId = recipeId });
+            return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
+                                              FROM ""CookingAssistant.RecipesIngredients""
+                                              WHERE ""RecipeId"" = @RecipeId AND ""IngredientId"" = @IngredientId",
+                                              new { IngredientId = id, RecipeId = recipeId });
         }
 
         public async Task UpdateAsync(Ingredient ingredient)

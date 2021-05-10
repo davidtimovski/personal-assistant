@@ -19,11 +19,11 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients.M
         {
             RuleFor(dto => dto.UserId)
                 .NotEmpty().WithMessage("Unauthorized")
-                .MustAsync(async (dto, userId, val) => await ingredientService.ExistsAsync(dto.Id, userId)).WithMessage("Unauthorized")
-                .MustAsync(async (dto, userId, val) => !await ingredientService.ExistsAsync(dto.Id, dto.Name, userId)).WithMessage("AlreadyExists");
+                .Must((dto, userId) => ingredientService.Exists(dto.Id, userId)).WithMessage("Unauthorized")
+                .Must((dto, userId) => !ingredientService.Exists(dto.Id, dto.Name, userId)).WithMessage("AlreadyExists");
 
             RuleFor(dto => dto.TaskId)
-                .MustAsync(async (dto, taskId, val) => !taskId.HasValue || await taskService.ExistsAsync(taskId.Value, dto.UserId)).WithMessage("IsLinkedToNonExistentTask");
+                .Must((dto, taskId) => !taskId.HasValue || taskService.Exists(taskId.Value, dto.UserId)).WithMessage("IsLinkedToNonExistentTask");
 
             RuleFor(dto => dto.Name).Must((dto, name) =>
             {

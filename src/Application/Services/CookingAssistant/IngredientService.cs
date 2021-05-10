@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
-using PersonalAssistant.Application.Contracts;
 using PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients;
 using PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients.Models;
 using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models;
@@ -95,19 +94,19 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             return result;
         }
 
-        public Task<bool> ExistsAsync(int id, int userId)
+        public bool Exists(int id, int userId)
         {
-            return _ingredientsRepository.ExistsAsync(id, userId);
+            return _ingredientsRepository.Exists(id, userId);
         }
 
-        public Task<bool> ExistsAsync(int id, string name, int userId)
+        public bool Exists(int id, string name, int userId)
         {
-            return _ingredientsRepository.ExistsAsync(id, name.Trim(), userId);
+            return _ingredientsRepository.Exists(id, name.Trim(), userId);
         }
 
-        public Task<bool> ExistsInRecipeAsync(int id, int recipeId)
+        public bool ExistsInRecipe(int id, int recipeId)
         {
-            return _ingredientsRepository.ExistsInRecipeAsync(id, recipeId);
+            return _ingredientsRepository.ExistsInRecipe(id, recipeId);
         }
 
         public async Task UpdateAsync(UpdateIngredient model, IValidator<UpdateIngredient> validator)
@@ -132,7 +131,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
         public async Task DeleteAsync(int id, int userId)
         {
-            if (!await ExistsAsync(id, userId))
+            if (!Exists(id, userId))
             {
                 throw new ValidationException("Unauthorized");
             }

@@ -445,7 +445,7 @@ namespace Api.Controllers.CookingAssistant
             {
                 canShareVm.UserId = user.Id;
                 canShareVm.ImageUri = user.ImageUri;
-                canShareVm.CanShare = await _recipeService.CanShareWithUserAsync(user.Id, userId);
+                canShareVm.CanShare = _recipeService.CanShareWithUser(user.Id, userId);
             }
 
             return Ok(canShareVm);
@@ -611,7 +611,7 @@ namespace Api.Controllers.CookingAssistant
                 canSendDto.UserId = user.Id;
                 canSendDto.ImageUri = user.ImageUri;
 
-                var (canSend, alreadySent) = await _recipeService.CheckSendRequestAsync(recipeId, user.Id, userId);
+                var (canSend, alreadySent) = _recipeService.CheckSendRequest(recipeId, user.Id, userId);
                 canSendDto.CanSend = canSend;
                 canSendDto.AlreadySent = alreadySent;
             }
@@ -744,8 +744,7 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            if (dto.CheckIfReviewRequired
-                && await _recipeService.IngredientsReviewIsRequiredAsync(dto.Id, importModel.UserId))
+            if (dto.CheckIfReviewRequired && _recipeService.IngredientsReviewIsRequired(dto.Id, importModel.UserId))
             {
                 return Ok(0);
             }

@@ -19,24 +19,24 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Model
         {
             RuleFor(dto => dto.UserId)
                 .NotEmpty().WithMessage("Unauthorized")
-                .MustAsync(async (dto, userId, val) => await recipeService.ExistsAsync(dto.RecipeId, userId)).WithMessage("Unauthorized");
+                .Must((dto, userId) => recipeService.Exists(dto.RecipeId, userId)).WithMessage("Unauthorized");
 
-            RuleFor(dto => dto.NewShares).MustAsync(async (dto, newShares, val) =>
+            RuleFor(dto => dto.NewShares).Must((dto, newShares) =>
             {
                 foreach (var userId in newShares)
                 {
-                    if (!await userService.ExistsAsync(userId))
+                    if (!userService.Exists(userId))
                     {
                         return false;
                     }
                 }
                 return true;
             }).WithMessage("AnErrorOccurred");
-            RuleFor(dto => dto.RemovedShares).MustAsync(async (dto, removedShares, val) =>
+            RuleFor(dto => dto.RemovedShares).Must((dto, removedShares) =>
             {
                 foreach (var userId in removedShares)
                 {
-                    if (!await userService.ExistsAsync(userId))
+                    if (!userService.Exists(userId))
                     {
                         return false;
                     }

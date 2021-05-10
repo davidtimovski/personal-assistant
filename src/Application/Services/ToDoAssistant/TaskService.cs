@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
-using PersonalAssistant.Application.Contracts.ToDoAssistant;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models;
@@ -53,36 +52,36 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
             var result = _mapper.Map<TaskForUpdate>(task, opts => { opts.Items["UserId"] = userId; });
 
-            result.IsInSharedList = await _listService.IsSharedAsync(task.ListId, userId);
+            result.IsInSharedList = _listService.IsShared(task.ListId, userId);
             result.Recipes = await _tasksRepository.GetRecipesAsync(id, userId);
 
             return result;
         }
 
-        public Task<bool> ExistsAsync(int id, int userId)
+        public bool Exists(int id, int userId)
         {
-            return _tasksRepository.ExistsAsync(id, userId);
+            return _tasksRepository.Exists(id, userId);
         }
 
-        public Task<bool> ExistsAsync(string name, int listId, int userId)
+        public bool Exists(string name, int listId, int userId)
         {
-            return _tasksRepository.ExistsAsync(name.Trim(), listId, userId);
+            return _tasksRepository.Exists(name.Trim(), listId, userId);
         }
 
-        public Task<bool> ExistsAsync(IEnumerable<string> names, int listId, int userId)
+        public bool Exists(IEnumerable<string> names, int listId, int userId)
         {
             var upperCaseNames = names.Select(name => name.ToUpperInvariant()).ToList();
-            return _tasksRepository.ExistsAsync(upperCaseNames, listId, userId);
+            return _tasksRepository.Exists(upperCaseNames, listId, userId);
         }
 
-        public Task<bool> ExistsAsync(int id, string name, int listId, int userId)
+        public bool Exists(int id, string name, int listId, int userId)
         {
-            return _tasksRepository.ExistsAsync(id, name.Trim(), listId, userId);
+            return _tasksRepository.Exists(id, name.Trim(), listId, userId);
         }
 
-        public Task<int> CountAsync(int listId)
+        public int Count(int listId)
         {
-            return _tasksRepository.CountAsync(listId);
+            return _tasksRepository.Count(listId);
         }
 
         public async Task<CreatedTask> CreateAsync(CreateTask model, IValidator<CreateTask> validator)
@@ -93,7 +92,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
             task.Name = task.Name.Trim();
 
-            if (!await _listService.IsSharedAsync(task.ListId, model.UserId))
+            if (!_listService.IsShared(task.ListId, model.UserId))
             {
                 task.PrivateToUserId = null;
                 task.AssignedToUserId = null;
@@ -151,7 +150,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
                 task.AssignedToUserId = null;
             }
 
-            if (!await _listService.IsSharedAsync(task.ListId, model.UserId))
+            if (!_listService.IsShared(task.ListId, model.UserId))
             {
                 task.PrivateToUserId = null;
                 task.AssignedToUserId = null;
@@ -163,7 +162,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
         public async Task<SimpleTask> DeleteAsync(int id, int userId)
         {
-            if (!await ExistsAsync(id, userId))
+            if (!Exists(id, userId))
             {
                 throw new ValidationException("Unauthorized");
             }
@@ -177,7 +176,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
         public async Task<SimpleTask> CompleteAsync(CompleteUncomplete model)
         {
-            if (!await ExistsAsync(model.Id, model.UserId))
+            if (!Exists(model.Id, model.UserId))
             {
                 throw new ValidationException("Unauthorized");
             }
@@ -191,7 +190,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
         public async Task<SimpleTask> UncompleteAsync(CompleteUncomplete model)
         {
-            if (!await ExistsAsync(model.Id, model.UserId))
+            if (!Exists(model.Id, model.UserId))
             {
                 throw new ValidationException("Unauthorized");
             }
@@ -205,7 +204,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
         public async Task ReorderAsync(ReorderTask model)
         {
-            if (!await ExistsAsync(model.Id, model.UserId))
+            if (!Exists(model.Id, model.UserId))
             {
                 throw new ValidationException("Unauthorized");
             }

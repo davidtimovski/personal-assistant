@@ -182,7 +182,7 @@ namespace Api.Controllers.ToDoAssistant
         }
 
         [HttpGet("{id}/shared")]
-        public async Task<IActionResult> GetIsShared(int id)
+        public IActionResult GetIsShared(int id)
         {
             int userId;
             try
@@ -194,7 +194,7 @@ namespace Api.Controllers.ToDoAssistant
                 return Unauthorized();
             }
 
-            bool isShared = await _listService.IsSharedAsync(id, userId);
+            bool isShared = _listService.IsShared(id, userId);
 
             return Ok(isShared);
         }
@@ -391,7 +391,7 @@ namespace Api.Controllers.ToDoAssistant
             {
                 canShareVm.UserId = user.Id;
                 canShareVm.ImageUri = user.ImageUri;
-                canShareVm.CanShare = await _listService.CanShareWithUserAsync(user.Id, userId);
+                canShareVm.CanShare = _listService.CanShareWithUser(user.Id, userId);
             }
 
             return Ok(canShareVm);

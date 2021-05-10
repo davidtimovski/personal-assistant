@@ -75,7 +75,7 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfil
                 .NotEmpty().WithMessage("DietaryProfiles.GenderIsRequired")
                 .Must(gender => genders.Contains(gender)).WithMessage("DietaryProfiles.GenderIsInvalid");
 
-            RuleFor(dto => dto.HeightCm).Must((dto, heightCm, val) =>
+            RuleFor(dto => dto.HeightCm).Must((dto, heightCm) =>
             {
                 if (!dto.HeightFeet.HasValue && !dto.HeightInches.HasValue)
                 {
@@ -84,7 +84,7 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfil
                 return true;
             }).WithMessage("DietaryProfiles.HeightIsRequired");
 
-            RuleFor(dto => dto.HeightFeet).Must((dto, heightFeet, val) =>
+            RuleFor(dto => dto.HeightFeet).Must((dto, heightFeet) =>
             {
                 if (!dto.HeightCm.HasValue)
                 {
@@ -93,7 +93,7 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfil
                 return true;
             }).WithMessage("DietaryProfiles.HeightIsRequired");
 
-            RuleFor(dto => dto.WeightKg).Must((dto, weightKg, val) =>
+            RuleFor(dto => dto.WeightKg).Must((dto, weightKg) =>
             {
                 if (!dto.WeightLbs.HasValue)
                 {
@@ -102,7 +102,7 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfil
                 return true;
             }).WithMessage("DietaryProfiles.WeightIsRequired");
 
-            RuleFor(dto => dto.WeightLbs).Must((dto, weightLbs, val) =>
+            RuleFor(dto => dto.WeightLbs).Must((dto, weightLbs) =>
             {
                 if (!dto.WeightKg.HasValue)
                 {

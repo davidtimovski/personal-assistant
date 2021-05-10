@@ -62,7 +62,7 @@ namespace PersonalAssistant.Application.Services.Common
 
         public async Task<IEnumerable<User>> GetToBeNotifiedOfListChangeAsync(int listId, int excludeUserId, int taskId)
         {
-            if (await _tasksRepository.IsPrivateAsync(taskId, excludeUserId))
+            if (_tasksRepository.IsPrivate(taskId, excludeUserId))
             {
                 return new List<User>();
             }
@@ -95,9 +95,9 @@ namespace PersonalAssistant.Application.Services.Common
             return _usersRepository.GetToBeNotifiedOfRecipeSentAsync(recipeId);
         }
 
-        public Task<bool> ExistsAsync(int id)
+        public bool Exists(int id)
         {
-            return _usersRepository.ExistsAsync(id);
+            return _usersRepository.Exists(id);
         }
 
         public Task<string> GetLanguageAsync(int id)

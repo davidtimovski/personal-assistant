@@ -10,11 +10,11 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks
         Task<SimpleTask> GetAsync(int id);
         Task<TaskDto> GetAsync(int id, int userId);
         Task<TaskForUpdate> GetForUpdateAsync(int id, int userId);
-        Task<bool> ExistsAsync(int id, int userId);
-        Task<bool> ExistsAsync(string name, int listId, int userId);
-        Task<bool> ExistsAsync(IEnumerable<string> names, int listId, int userId);
-        Task<bool> ExistsAsync(int id, string name, int listId, int userId);
-        Task<int> CountAsync(int listId);
+        bool Exists(int id, int userId);
+        bool Exists(string name, int listId, int userId);
+        bool Exists(IEnumerable<string> names, int listId, int userId);
+        bool Exists(int id, string name, int listId, int userId);
+        int Count(int listId);
         Task<CreatedTask> CreateAsync(CreateTask model, IValidator<CreateTask> validator);
         Task<IEnumerable<CreatedTask>> BulkCreateAsync(BulkCreate model, IValidator<BulkCreate> validator);
         Task UpdateAsync(UpdateTask model, IValidator<UpdateTask> validator);

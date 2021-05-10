@@ -13,9 +13,9 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients
         Task<IEnumerable<ToDoTask>> GetTaskSuggestionsAsync(int userId);
         Task<IEnumerable<Ingredient>> GetTaskSuggestionsAsync(int recipeId, int userId);
         Task<IEnumerable<Ingredient>> GetIngredientSuggestionsAsync(int userId);
-        Task<bool> ExistsAsync(int id, int userId);
-        Task<bool> ExistsAsync(int id, string name, int userId);
-        Task<bool> ExistsInRecipeAsync(int id, int recipeId);
+        bool Exists(int id, int userId);
+        bool Exists(int id, string name, int userId);
+        bool ExistsInRecipe(int id, int recipeId);
         Task UpdateAsync(Ingredient ingredient);
         Task DeleteAsync(int id);
     }

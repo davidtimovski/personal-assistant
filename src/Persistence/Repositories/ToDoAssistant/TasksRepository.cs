@@ -62,75 +62,75 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                                                     new { TaskId = id, UserId = userId })).ToList();
         }
 
-        public async Task<bool> ExistsAsync(int id, int userId)
+        public bool Exists(int id, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                        FROM ""ToDoAssistant.Tasks"" AS t
-                                                        INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                                                        LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                                        WHERE t.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
-                                                        new { Id = id, UserId = userId });
+            return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
+                                              FROM ""ToDoAssistant.Tasks"" AS t
+                                              INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
+                                              LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
+                                              WHERE t.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+                                              new { Id = id, UserId = userId });
         }
 
-        public async Task<bool> ExistsAsync(string name, int listId, int userId)
+        public bool Exists(string name, int listId, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) 
-                                                        FROM ""ToDoAssistant.Tasks"" AS t
-                                                        INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                                                        LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                                        WHERE UPPER(t.""Name"") = UPPER(@Name) 
-                                                        AND t.""ListId"" = @ListId 
-                                                        AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
-                                                        AND (t.""PrivateToUserId"" IS NULL OR t.""PrivateToUserId"" = @UserId)",
-                                                        new { Name = name, ListId = listId, UserId = userId });
+            return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) 
+                                              FROM ""ToDoAssistant.Tasks"" AS t
+                                              INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
+                                              LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
+                                              WHERE UPPER(t.""Name"") = UPPER(@Name) 
+                                              AND t.""ListId"" = @ListId 
+                                              AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
+                                              AND (t.""PrivateToUserId"" IS NULL OR t.""PrivateToUserId"" = @UserId)",
+                                              new { Name = name, ListId = listId, UserId = userId });
         }
 
-        public async Task<bool> ExistsAsync(List<string> names, int listId, int userId)
+        public bool Exists(List<string> names, int listId, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) 
-                                                        FROM ""ToDoAssistant.Tasks"" AS t
-                                                        INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                                                        LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                                        WHERE UPPER(t.""Name"") = ANY(@Names) 
-                                                        AND t.""ListId"" = @ListId 
-                                                        AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
-                                                        AND (t.""PrivateToUserId"" IS NULL OR t.""PrivateToUserId"" = @UserId)",
-                                                        new { Names = names, ListId = listId, UserId = userId });
+            return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) 
+                                              FROM ""ToDoAssistant.Tasks"" AS t
+                                              INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
+                                              LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
+                                              WHERE UPPER(t.""Name"") = ANY(@Names) 
+                                              AND t.""ListId"" = @ListId 
+                                              AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
+                                              AND (t.""PrivateToUserId"" IS NULL OR t.""PrivateToUserId"" = @UserId)",
+                                              new { Names = names, ListId = listId, UserId = userId });
         }
 
-        public async Task<bool> ExistsAsync(int id, string name, int listId, int userId)
+        public bool Exists(int id, string name, int listId, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                        FROM ""ToDoAssistant.Tasks"" AS t
-                                                        INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                                                        WHERE t.""Id"" != @Id 
-                                                        AND UPPER(t.""Name"") = UPPER(@Name) 
-                                                        AND t.""ListId"" = @ListId AND l.""UserId"" = @UserId
-                                                        AND (t.""PrivateToUserId"" IS NULL OR t.""PrivateToUserId"" = @UserId)",
+            return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
+                                              FROM ""ToDoAssistant.Tasks"" AS t
+                                              INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
+                                              WHERE t.""Id"" != @Id 
+                                              AND UPPER(t.""Name"") = UPPER(@Name) 
+                                              AND t.""ListId"" = @ListId AND l.""UserId"" = @UserId
+                                              AND (t.""PrivateToUserId"" IS NULL OR t.""PrivateToUserId"" = @UserId)",
                 new { Id = id, Name = name, ListId = listId, UserId = userId });
         }
 
-        public async Task<bool> IsPrivateAsync(int id, int userId)
+        public bool IsPrivate(int id, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Tasks"" WHERE ""Id"" = @Id AND ""PrivateToUserId"" = @UserId",
-                                                         new { Id = id, UserId = userId });
+            return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Tasks"" WHERE ""Id"" = @Id AND ""PrivateToUserId"" = @UserId",
+                                              new { Id = id, UserId = userId });
         }
 
-        public async Task<int> CountAsync(int listId)
+        public int Count(int listId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.ExecuteScalarAsync<int>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Tasks"" WHERE ""ListId"" = @ListId", new { ListId = listId });
+            return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Tasks"" WHERE ""ListId"" = @ListId", new { ListId = listId });
         }
 
         public async Task<int> CreateAsync(ToDoTask task, int userId)

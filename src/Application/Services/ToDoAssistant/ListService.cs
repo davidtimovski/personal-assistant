@@ -6,11 +6,9 @@ using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
 using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Application.Contracts.ToDoAssistant;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications;
-using PersonalAssistant.Domain.Entities;
 using PersonalAssistant.Domain.Entities.Common;
 using PersonalAssistant.Domain.Entities.ToDoAssistant;
 
@@ -110,59 +108,59 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             return _listsRepository.GetPendingShareRequestsCountAsync(userId);
         }
 
-        public async Task<bool> CanShareWithUserAsync(int shareWithId, int userId)
+        public bool CanShareWithUser(int shareWithId, int userId)
         {
             if (shareWithId == userId)
             {
                 return false;
             }
 
-            return await _listsRepository.CanShareWithUserAsync(shareWithId, userId);
+            return _listsRepository.CanShareWithUser(shareWithId, userId);
         }
 
-        public Task<bool> UserOwnsOrSharesAsync(int id, int userId)
+        public bool UserOwnsOrShares(int id, int userId)
         {
-            return _listsRepository.UserOwnsOrSharesAsync(id, userId);
+            return _listsRepository.UserOwnsOrShares(id, userId);
         }
 
-        public Task<bool> UserOwnsOrSharesAsPendingAsync(int id, int userId)
+        public bool UserOwnsOrSharesAsPending(int id, int userId)
         {
-            return _listsRepository.UserOwnsOrSharesAsPendingAsync(id, userId);
+            return _listsRepository.UserOwnsOrSharesAsPending(id, userId);
         }
 
-        public Task<bool> UserOwnsOrSharesAsAdminAsync(int id, int userId)
+        public bool UserOwnsOrSharesAsAdmin(int id, int userId)
         {
-            return _listsRepository.UserOwnsOrSharesAsAdminAsync(id, userId);
+            return _listsRepository.UserOwnsOrSharesAsAdmin(id, userId);
         }
 
-        public Task<bool> UserOwnsOrSharesAsAdminAsync(int id, string name, int userId)
+        public bool UserOwnsOrSharesAsAdmin(int id, string name, int userId)
         {
-            return _listsRepository.UserOwnsOrSharesAsAdminAsync(id, name.Trim(), userId);
+            return _listsRepository.UserOwnsOrSharesAsAdmin(id, name.Trim(), userId);
         }
 
-        public async Task<bool> IsSharedAsync(int id, int userId)
+        public bool IsShared(int id, int userId)
         {
-            if (!await UserOwnsOrSharesAsync(id, userId))
+            if (!UserOwnsOrShares(id, userId))
             {
                 throw new ValidationException("Unauthorized");
             }
 
-            return await _listsRepository.IsSharedAsync(id);
+            return _listsRepository.IsShared(id);
         }
 
-        public Task<bool> ExistsAsync(string name, int userId)
+        public bool Exists(string name, int userId)
         {
-            return _listsRepository.ExistsAsync(name.Trim(), userId);
+            return _listsRepository.Exists(name.Trim(), userId);
         }
 
-        public Task<bool> ExistsAsync(int id, string name, int userId)
+        public bool Exists(int id, string name, int userId)
         {
-            return _listsRepository.ExistsAsync(id, name.Trim(), userId);
+            return _listsRepository.Exists(id, name.Trim(), userId);
         }
 
-        public Task<int> CountAsync(int userId)
+        public int Count(int userId)
         {
-            return _listsRepository.CountAsync(userId);
+            return _listsRepository.Count(userId);
         }
 
         public async Task<int> CreateAsync(CreateList model, IValidator<CreateList> validator)
@@ -255,7 +253,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
         public async Task<string> DeleteAsync(int id, int userId)
         {
-            if (!await _listsRepository.UserOwnsAsync(id, userId))
+            if (!_listsRepository.UserOwns(id, userId))
             {
                 throw new ValidationException("Unauthorized");
             }
@@ -272,7 +270,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             var newShares = new List<ListShare>();
             foreach (ShareUserAndPermission newShare in model.NewShares)
             {
-                if (await _listsRepository.UserHasBlockedSharingAsync(model.UserId, newShare.UserId))
+                if (_listsRepository.UserHasBlockedSharing(model.ListId, model.UserId, newShare.UserId))
                 {
                     continue;
                 }
@@ -333,7 +331,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
         public async Task SetIsArchivedAsync(int id, int userId, bool isArchived)
         {
-            if (!await UserOwnsOrSharesAsync(id, userId))
+            if (!UserOwnsOrShares(id, userId))
             {
                 throw new ValidationException("Unauthorized");
             }
@@ -343,7 +341,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
         public async Task<bool> SetTasksAsNotCompletedAsync(int id, int userId)
         {
-            if (!await UserOwnsOrSharesAsync(id, userId))
+            if (!UserOwnsOrShares(id, userId))
             {
                 throw new ValidationException("Unauthorized");
             }
@@ -358,7 +356,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
         public async Task ReorderAsync(int id, int userId, short oldOrder, short newOrder)
         {
-            if (!await UserOwnsOrSharesAsync(id, userId))
+            if (!UserOwnsOrShares(id, userId))
             {
                 throw new ValidationException("Unauthorized");
             }

@@ -11,12 +11,12 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks
         Task<ToDoTask> GetAsync(int id, int userId);
         Task<ToDoTask> GetForUpdateAsync(int id, int userId);
         Task<List<string>> GetRecipesAsync(int id, int userId);
-        Task<bool> ExistsAsync(int id, int userId);
-        Task<bool> ExistsAsync(string name, int listId, int userId);
-        Task<bool> ExistsAsync(List<string> names, int listId, int userId);
-        Task<bool> ExistsAsync(int id, string name, int listId, int userId);
-        Task<bool> IsPrivateAsync(int id, int userId);
-        Task<int> CountAsync(int listId);
+        bool Exists(int id, int userId);
+        bool Exists(string name, int listId, int userId);
+        bool Exists(List<string> names, int listId, int userId);
+        bool Exists(int id, string name, int listId, int userId);
+        bool IsPrivate(int id, int userId);
+        int Count(int listId);
         Task<int> CreateAsync(ToDoTask task, int userId);
         Task<IEnumerable<ToDoTask>> BulkCreateAsync(IEnumerable<ToDoTask> tasks, bool tasksArePrivate, int userId);
         Task UpdateAsync(ToDoTask task, int userId);

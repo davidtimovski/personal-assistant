@@ -2,8 +2,6 @@
 using System.Threading.Tasks;
 using FluentValidation;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models;
-using PersonalAssistant.Domain.Entities;
-using PersonalAssistant.Domain.Entities.ToDoAssistant;
 
 namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists
 {
@@ -17,15 +15,15 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists
         Task<ListWithShares> GetWithSharesAsync(int id, int userId);
         Task<IEnumerable<ShareListRequest>> GetShareRequestsAsync(int userId);
         Task<int> GetPendingShareRequestsCountAsync(int userId);
-        Task<bool> CanShareWithUserAsync(int shareWithId, int userId);
-        Task<bool> UserOwnsOrSharesAsync(int id, int userId);
-        Task<bool> UserOwnsOrSharesAsPendingAsync(int id, int userId);
-        Task<bool> UserOwnsOrSharesAsAdminAsync(int id, int userId);
-        Task<bool> UserOwnsOrSharesAsAdminAsync(int id, string name, int userId);
-        Task<bool> IsSharedAsync(int id, int userId);
-        Task<bool> ExistsAsync(string name, int userId);
-        Task<bool> ExistsAsync(int id, string name, int userId);
-        Task<int> CountAsync(int userId);
+        bool CanShareWithUser(int shareWithId, int userId);
+        bool UserOwnsOrShares(int id, int userId);
+        bool UserOwnsOrSharesAsPending(int id, int userId);
+        bool UserOwnsOrSharesAsAdmin(int id, int userId);
+        bool UserOwnsOrSharesAsAdmin(int id, string name, int userId);
+        bool IsShared(int id, int userId);
+        bool Exists(string name, int userId);
+        bool Exists(int id, string name, int userId);
+        int Count(int userId);
         Task<int> CreateAsync(CreateList model, IValidator<CreateList> validator);
         Task CreateSampleAsync(int userId, Dictionary<string, string> translations);
         Task<UpdateListOriginal> UpdateAsync(UpdateList model, IValidator<UpdateList> validator);
