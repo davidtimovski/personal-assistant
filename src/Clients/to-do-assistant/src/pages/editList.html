@@ -8,7 +8,7 @@
       </div>
       <div class="page-title">
         <span if.bind="isNewList" t="editList.newList">New list</span>
-        <span else> <span t="editList.edit">Edit</span>&nbsp;<span class="colored-text">${model.name}</span> </span>
+        <span else><span t="editList.edit">Edit</span>&nbsp;<span class="colored-text">${model.name}</span></span>
       </div>
       <a click.delegate="back()" class="back-button">
         <i class="fas fa-times"></i>
@@ -126,7 +126,20 @@
         <a
           if.bind="!isNewList && model.sharingState === 0 || model.sharingState === 1 || model.sharingState === 2"
           click.delegate="delete()"
-          class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${confirmationInProgress ? 'confirm' : ''}"
+          class="
+            button
+            danger-button
+            ${deleteButtonIsLoading
+            ?
+            'disabled'
+            :
+            ''}
+            ${confirmationInProgress
+            ?
+            'confirm'
+            :
+            ''}
+          "
         >
           <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
             <i class="fas fa-circle-notch fa-spin"></i>
@@ -136,7 +149,20 @@
         <a
           if.bind="model.sharingState === 3 || model.sharingState === 4"
           click.delegate="leave()"
-          class="button danger-button ${leaveButtonIsLoading ? 'disabled' : ''} ${confirmationInProgress ? 'confirm' : ''}"
+          class="
+            button
+            danger-button
+            ${leaveButtonIsLoading
+            ?
+            'disabled'
+            :
+            ''}
+            ${confirmationInProgress
+            ?
+            'confirm'
+            :
+            ''}
+          "
         >
           <span class="button-loader ${leaveButtonIsLoading ? 'loading' : ''}">
             <i class="fas fa-circle-notch fa-spin"></i>

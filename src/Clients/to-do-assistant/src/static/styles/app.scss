@@ -63,8 +63,12 @@ textarea {
   color: transparent; /* hide text */
 }
 
-.labeled-separator-text i {
-  margin-right: 5px;
+.labeled-separator-text {
+  padding-top: 8px;
+
+  i {
+    margin-right: 5px;
+  }
 }
 
 .icon-wrap {

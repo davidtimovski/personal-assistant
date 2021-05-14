@@ -115,7 +115,6 @@
   display: flex;
   justify-content: flex-start;
   margin-bottom: 7px;
-  transition: opacity 500ms;
 
   &:last-child {
     margin-bottom: 0;
@@ -130,7 +129,8 @@
   }
 
   &.disappearing {
-    opacity: 0;
+    transition: opacity 500ms;
+    opacity: 0 !important;
   }
 
   &-assignee-image {
@@ -262,7 +262,8 @@
 }
 
 .toggle-completed-visible {
-  padding: 13% 10% 3%;
+  padding: 3% 10% 3%;
+  margin-top: 10%;
   color: var(--faded-color);
   user-select: none;
   text-align: center;
@@ -371,8 +372,14 @@
     color: var(--faded-color);
   }
 
-  .toggle-completed-visible:hover {
-    color: #888;
+  .toggle-completed-visible {
+    &:hover {
+      color: #888;
+    }
+
+    &:active {
+      background: transparent;
+    }
   }
 }
 
