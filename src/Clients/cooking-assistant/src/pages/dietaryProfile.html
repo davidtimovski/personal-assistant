@@ -2,976 +2,731 @@
   <require from="../static/styles/pages/dietary-profile.scss"></require>
   <require from="./../resources/elements/tooltip"></require>
 
-  <div class="au-animate animate-fade-in animate-fade-out">
-    <div class="page-title-wrap">
-      <div class="side inactive medium">
-        <i class="fas fa-clipboard"></i>
-      </div>
-      <div t="dietaryProfile.dietaryProfile" class="page-title">Dietary profile</div>
-      <a route-href="route: recipes" class="back-button">
-        <i class="fas fa-times"></i>
-      </a>
-    </div>
-
-    <div class="content-wrap">
-      <tooltip key.bind="dietaryProfileTooltipKey"></tooltip>
-
-      <div class="dietary-profile-tabs">
-        <button
-          type="button"
-          class.bind="dietTabIsVisible ? '' : 'active'"
-          click.delegate="viewProfileTab()"
-          t="dietaryProfile.profile"
-        >
-          Profile
-        </button>
-        <button
-          type="button"
-          class="diet-button ${dietTabIsVisible ? 'active' : ''} ${dietChanged ? 'diet-changed' : ''}"
-          click.delegate="viewDietTab()"
-          t="dietaryProfile.diet"
-        >
-          Diet
-        </button>
+  <div class="container">
+    <div class="au-animate animate-fade-in animate-fade-out">
+      <div class="page-title-wrap">
+        <div class="side inactive medium">
+          <i class="fas fa-clipboard"></i>
+        </div>
+        <div t="dietaryProfile.dietaryProfile" class="page-title">Dietary profile</div>
+        <a route-href="route: recipes" class="back-button">
+          <i class="fas fa-times"></i>
+        </a>
       </div>
 
-      <section if.bind="!dietTabIsVisible" class="au-animate animate-fade-in animate-fade-out">
-        <form class="dietary-profile">
-          <table>
-            <tr>
-              <td t="dietaryProfile.birthday">Birthday</td>
-              <td>
-                <input
-                  type="date"
-                  value.bind="model.birthday & validate"
-                  min="${minBirthdayDate}"
-                  max="${maxBirthdayDate}"
-                  change.delegate="getAndUpdateRecommendedIntake()"
-                  class.bind="birthdayIsInvalid ? 'invalid' : ''"
-                />
-              </td>
-            </tr>
-            <tr>
-              <td t="dietaryProfile.gender">Gender</td>
-              <td>
-                <div class="gender-selector">
-                  <label class.bind="model.gender === 'Male' ? 'selected' : ''">
-                    <span t="dietaryProfile.male">Male</span>
-                    <input
-                      type="radio"
-                      name="genderToggle"
-                      value="Male"
-                      checked.bind="model.gender"
-                      change.delegate="getAndUpdateRecommendedIntake()"
-                    />
-                  </label>
-                  <label class.bind="model.gender === 'Female' ? 'selected' : ''">
-                    <span t="dietaryProfile.female">Female</span>
-                    <input
-                      type="radio"
-                      name="genderToggle"
-                      value="Female"
-                      checked.bind="model.gender"
-                      change.delegate="getAndUpdateRecommendedIntake()"
-                    />
-                  </label>
-                </div>
-              </td>
-            </tr>
-            <tr if.bind="preferences.imperialSystem">
-              <td t="dietaryProfile.height">Height</td>
-              <td>
-                <div class="input-wrap inline">
-                  <input
-                    type="number"
-                    max="7"
-                    value.bind="model.heightFeet & validate"
-                    change.delegate="getAndUpdateRecommendedIntake()"
-                    class.bind="heightFeetIsInvalid ? 'invalid' : ''"
-                  />
-                  <div class="unit-input-addon" t="dietaryProfile.feet">feet</div>
-                </div>
-                <div class="input-wrap inline">
-                  <input
-                    type="number"
-                    max="99"
-                    value.bind="model.heightInches & validate"
-                    change.delegate="getAndUpdateRecommendedIntake()"
-                    class.bind="heightInchesIsInvalid ? 'invalid' : ''"
-                  />
-                  <div class="unit-input-addon" t="dietaryProfile.inches">inches</div>
-                </div>
-              </td>
-            </tr>
-            <tr else>
-              <td t="dietaryProfile.height">Height</td>
-              <td>
-                <div class="input-wrap">
-                  <input
-                    type="number"
-                    min="100"
-                    max="245"
-                    value.bind="model.heightCm & validate"
-                    change.delegate="getAndUpdateRecommendedIntake()"
-                    class.bind="heightCmIsInvalid ? 'invalid' : ''"
-                  />
-                  <div class="unit-input-addon">cm</div>
-                </div>
-              </td>
-            </tr>
-            <tr if.bind="preferences.imperialSystem">
-              <td t="dietaryProfile.weight">Weight</td>
-              <td>
-                <div class="input-wrap">
-                  <input
-                    type="number"
-                    min="34"
-                    max="1000"
-                    value.bind="model.weightLbs & validate"
-                    change.delegate="getAndUpdateRecommendedIntake()"
-                    class.bind="weightLbsIsInvalid ? 'invalid' : ''"
-                  />
-                  <div class="unit-input-addon">lbs</div>
-                </div>
-              </td>
-            </tr>
-            <tr else>
-              <td t="dietaryProfile.weight">Weight</td>
-              <td>
-                <div class="input-wrap">
-                  <input
-                    type="number"
-                    min="15"
-                    max="500"
-                    value.bind="model.weightKg & validate"
-                    change.delegate="getAndUpdateRecommendedIntake()"
-                    class.bind="weightKgIsInvalid ? 'invalid' : ''"
-                  />
-                  <div class="unit-input-addon">kg</div>
-                </div>
-              </td>
-            </tr>
-          </table>
+      <div class="content-wrap">
+        <tooltip key.bind="dietaryProfileTooltipKey"></tooltip>
 
-          <div class="detailed-radio-selector">
-            <div class="detailed-radio-selector-label" t="dietaryProfile.activityLevel">Activity level</div>
-
-            <label class="${model.activityLevel === 'Sedentary' ? 'selected' : ''}">
-              <div class="title">
-                <span t="dietaryProfile.sedentary">Sedentary</span>
-                <i class="fas fa-check"></i>
-              </div>
-              <input
-                type="radio"
-                name="activityLevelToggle"
-                value="Sedentary"
-                checked.bind="model.activityLevel"
-                change.delegate="getAndUpdateRecommendedIntake()"
-              />
-              <div class="explanation" t="dietaryProfile.sedentaryLabel">Little or no exercise</div>
-            </label>
-            <label class="${model.activityLevel === 'Light' ? 'selected' : ''}">
-              <div class="title">
-                <span t="dietaryProfile.light">Light</span>
-                <i class="fas fa-check"></i>
-              </div>
-              <input
-                type="radio"
-                name="activityLevelToggle"
-                value="Light"
-                checked.bind="model.activityLevel"
-                change.delegate="getAndUpdateRecommendedIntake()"
-              />
-              <div class="explanation" t="dietaryProfile.lightLabel">Exercise 1-3 times per week</div>
-            </label>
-            <label class="${model.activityLevel === 'Moderate' ? 'selected' : ''}">
-              <div class="title">
-                <span t="dietaryProfile.moderate">Moderate</span>
-                <i class="fas fa-check"></i>
-              </div>
-              <input
-                type="radio"
-                name="activityLevelToggle"
-                value="Moderate"
-                checked.bind="model.activityLevel"
-                change.delegate="getAndUpdateRecommendedIntake()"
-              />
-              <div class="explanation" t="dietaryProfile.moderateLabel">Exercise 4-5 times per week</div>
-            </label>
-            <label class="${model.activityLevel === 'Active' ? 'selected' : ''}">
-              <div class="title">
-                <span t="dietaryProfile.active">Active</span>
-                <i class="fas fa-check"></i>
-              </div>
-              <input
-                type="radio"
-                name="activityLevelToggle"
-                value="Active"
-                checked.bind="model.activityLevel"
-                change.delegate="getAndUpdateRecommendedIntake()"
-              />
-              <div class="explanation" t="dietaryProfile.activeLabel">
-                Daily exercise or intense exercise 4-5 times per week
-              </div>
-            </label>
-            <label class="${model.activityLevel === 'VeryActive' ? 'selected' : ''}">
-              <div class="title">
-                <span t="dietaryProfile.veryActive">Very active</span>
-                <i class="fas fa-check"></i>
-              </div>
-              <input
-                type="radio"
-                name="activityLevelToggle"
-                value="VeryActive"
-                checked.bind="model.activityLevel"
-                change.delegate="getAndUpdateRecommendedIntake()"
-              />
-              <div class="explanation" t="dietaryProfile.veryActiveLabel">Intense exercise 6-7 times per week</div>
-            </label>
-          </div>
-
-          <div class="detailed-radio-selector">
-            <div class="detailed-radio-selector-label" t="dietaryProfile.goal">Goal</div>
-
-            <label class="${model.goal === 'None' ? 'selected' : ''}">
-              <div class="title">
-                <span t="dietaryProfile.none">None</span>
-                <i class="fas fa-check"></i>
-              </div>
-              <input
-                type="radio"
-                name="goalToggle"
-                value="None"
-                checked.bind="model.goal"
-                change.delegate="getAndUpdateRecommendedIntake()"
-              />
-            </label>
-            <label class="${model.goal === 'MildWeightLoss' ? 'selected' : ''}">
-              <div class="title">
-                <span t="dietaryProfile.mildWeightLoss">Mild weight loss</span>
-                <i class="fas fa-check"></i>
-              </div>
-              <input
-                type="radio"
-                name="goalToggle"
-                value="MildWeightLoss"
-                checked.bind="model.goal"
-                change.delegate="getAndUpdateRecommendedIntake()"
-              />
-            </label>
-            <label class="${model.goal === 'WeightLoss' ? 'selected' : ''}">
-              <div class="title">
-                <span t="dietaryProfile.weightLoss">Weight loss</span>
-                <i class="fas fa-check"></i>
-              </div>
-              <input
-                type="radio"
-                name="goalToggle"
-                value="WeightLoss"
-                checked.bind="model.goal"
-                change.delegate="getAndUpdateRecommendedIntake()"
-              />
-            </label>
-            <label class="${model.goal === 'MildWeightGain' ? 'selected' : ''}">
-              <div class="title">
-                <span t="dietaryProfile.mildWeightGain">Mild weight gain</span>
-                <i class="fas fa-check"></i>
-              </div>
-              <input
-                type="radio"
-                name="goalToggle"
-                value="MildWeightGain"
-                checked.bind="model.goal"
-                change.delegate="getAndUpdateRecommendedIntake()"
-              />
-            </label>
-            <label class="${model.goal === 'WeightGain' ? 'selected' : ''}">
-              <div class="title">
-                <span t="dietaryProfile.weightGain">Weight gain</span>
-                <i class="fas fa-check"></i>
-              </div>
-              <input
-                type="radio"
-                name="goalToggle"
-                value="WeightGain"
-                checked.bind="model.goal"
-                change.delegate="getAndUpdateRecommendedIntake()"
-              />
-            </label>
-          </div>
-        </form>
-      </section>
-
-      <section else class="intake-wrap au-animate animate-fade-in animate-fade-out">
-        <div class="intake-header" t="dietaryProfile.dailyIntakeRecommendation">Daily intake recommendation</div>
-
-        <div if.bind="dietaryProfileIsSet" class="intake-body">
-          <div class="intake-nutrient ${!model.dailyIntake.trackCalories ? 'not-tracked' : ''}">
-            <div class="intake-nutrient-top-row">
-              <label class="toggle">
-                <div class="toggle-content">
-                  <input type="checkbox" checked.bind="model.dailyIntake.trackCalories" />
-                  <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                    <path
-                      d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
-                    />
-                  </svg>
-                  <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                    <path
-                      d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </label>
-              <div class="intake-nutrient-data">
-                <span class="intake-nutrient-name" t="calories">Calories</span>
-                <span class.bind="model.dailyIntake.customCalories ? 'customized' : ''"
-                  >${model.dailyIntake.calories} kcal</span
-                >
-              </div>
-            </div>
-            <div class="intake-nutrient-bottom-row">
-              <div class="input-wrap">
-                <span class="custom" t="dietaryProfile.custom">Custom:</span>
-                <input
-                  type="number"
-                  value.bind="model.dailyIntake.customCalories & validate"
-                  class.bind="customCaloriesIsInvalid ? 'invalid' : ''"
-                  step="any"
-                  min="300"
-                  max="9999"
-                />
-                <div class="unit-input-addon">kcal</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="intake-nutrient ${!model.dailyIntake.trackSaturatedFat ? 'not-tracked' : ''}">
-            <div class="intake-nutrient-top-row">
-              <label class="toggle">
-                <div class="toggle-content">
-                  <input type="checkbox" checked.bind="model.dailyIntake.trackSaturatedFat" />
-                  <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                    <path
-                      d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
-                    />
-                  </svg>
-                  <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                    <path
-                      d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </label>
-              <div class="intake-nutrient-data">
-                <span class="intake-nutrient-name" t="saturatedFat">Saturated fat</span>
-                <span class.bind="model.dailyIntake.customSaturatedFat ? 'customized' : ''"
-                  >${model.dailyIntake.saturatedFat} g</span
-                >
-              </div>
-            </div>
-            <div class="intake-nutrient-bottom-row">
-              <div class="input-wrap">
-                <span class="custom" t="dietaryProfile.custom">Custom:</span>
-                <input
-                  type="number"
-                  value.bind="model.dailyIntake.customSaturatedFat & validate"
-                  class.bind="customSaturatedFatIsInvalid ? 'invalid' : ''"
-                  step="any"
-                  min="1"
-                  max="99"
-                />
-                <div class="unit-input-addon">g</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="intake-nutrient ${!model.dailyIntake.trackCarbohydrate ? 'not-tracked' : ''}">
-            <div class="intake-nutrient-top-row">
-              <label class="toggle">
-                <div class="toggle-content">
-                  <input type="checkbox" checked.bind="model.dailyIntake.trackCarbohydrate" />
-                  <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                    <path
-                      d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
-                    />
-                  </svg>
-                  <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                    <path
-                      d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </label>
-              <div class="intake-nutrient-data">
-                <span class="intake-nutrient-name" t="carbohydrate">Carbohydrate</span>
-                <span class.bind="model.dailyIntake.customCarbohydrate ? 'customized' : ''"
-                  >${model.dailyIntake.carbohydrate} g</span
-                >
-              </div>
-            </div>
-            <div class="intake-nutrient-bottom-row">
-              <div class="input-wrap">
-                <span class="custom" t="dietaryProfile.custom">Custom:</span>
-                <input
-                  type="number"
-                  value.bind="model.dailyIntake.customCarbohydrate & validate"
-                  class.bind="customCarbohydrateIsInvalid ? 'invalid' : ''"
-                  step="any"
-                  min="1"
-                  max="1299"
-                />
-                <div class="unit-input-addon">g</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="intake-nutrient ${!model.dailyIntake.trackAddedSugars ? 'not-tracked' : ''}">
-            <div class="intake-nutrient-top-row">
-              <label class="toggle">
-                <div class="toggle-content">
-                  <input type="checkbox" checked.bind="model.dailyIntake.trackAddedSugars" />
-                  <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                    <path
-                      d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
-                    />
-                  </svg>
-                  <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                    <path
-                      d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </label>
-              <div class="intake-nutrient-data">
-                <span class="intake-nutrient-name" t="addedSugars">Added sugars</span>
-                <span class.bind="model.dailyIntake.customAddedSugars ? 'customized' : ''"
-                  >${model.dailyIntake.addedSugars} g</span
-                >
-              </div>
-            </div>
-            <div class="intake-nutrient-bottom-row">
-              <div class="input-wrap">
-                <span class="custom" t="dietaryProfile.custom">Custom:</span>
-                <input
-                  type="number"
-                  value.bind="model.dailyIntake.customAddedSugars & validate"
-                  class.bind="customAddedSugarsIsInvalid ? 'invalid' : ''"
-                  step="any"
-                  min="1"
-                  max="99"
-                />
-                <div class="unit-input-addon">g</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="intake-nutrient ${!model.dailyIntake.trackFiber ? 'not-tracked' : ''}">
-            <div class="intake-nutrient-top-row">
-              <label class="toggle">
-                <div class="toggle-content">
-                  <input type="checkbox" checked.bind="model.dailyIntake.trackFiber" />
-                  <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                    <path
-                      d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
-                    />
-                  </svg>
-                  <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                    <path
-                      d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </label>
-              <div class="intake-nutrient-data">
-                <span class="intake-nutrient-name" t="fiber">Fiber</span>
-                <span class.bind="model.dailyIntake.customFiber ? 'customized' : ''">${model.dailyIntake.fiber} g</span>
-              </div>
-            </div>
-            <div class="intake-nutrient-bottom-row">
-              <div class="input-wrap">
-                <span class="custom" t="dietaryProfile.custom">Custom:</span>
-                <input
-                  type="number"
-                  value.bind="model.dailyIntake.customFiber & validate"
-                  class.bind="customFiberIsInvalid ? 'invalid' : ''"
-                  step="any"
-                  min="1"
-                  max="229"
-                />
-                <div class="unit-input-addon">g</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="intake-nutrient ${!model.dailyIntake.trackProtein ? 'not-tracked' : ''}">
-            <div class="intake-nutrient-top-row">
-              <label class="toggle">
-                <div class="toggle-content">
-                  <input type="checkbox" checked.bind="model.dailyIntake.trackProtein" />
-                  <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                    <path
-                      d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
-                    />
-                  </svg>
-                  <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                    <path
-                      d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </label>
-              <div class="intake-nutrient-data">
-                <span class="intake-nutrient-name" t="protein">Protein</span>
-                <span class.bind="model.dailyIntake.customProtein ? 'customized' : ''"
-                  >${model.dailyIntake.protein} g</span
-                >
-              </div>
-            </div>
-            <div class="intake-nutrient-bottom-row">
-              <div class="input-wrap">
-                <span class="custom" t="dietaryProfile.custom">Custom:</span>
-                <input
-                  type="number"
-                  value.bind="model.dailyIntake.customProtein & validate"
-                  class.bind="customProteinIsInvalid ? 'invalid' : ''"
-                  step="any"
-                  min="1"
-                  max="559"
-                />
-                <div class="unit-input-addon">g</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="intake-nutrient ${!model.dailyIntake.trackSodium ? 'not-tracked' : ''}">
-            <div class="intake-nutrient-top-row">
-              <label class="toggle">
-                <div class="toggle-content">
-                  <input type="checkbox" checked.bind="model.dailyIntake.trackSodium" />
-                  <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                    <path
-                      d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
-                    />
-                  </svg>
-                  <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                    <path
-                      d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </label>
-              <div class="intake-nutrient-data">
-                <span class="intake-nutrient-name" t="sodium">Sodium</span>
-                <span class.bind="model.dailyIntake.customSodium ? 'customized' : ''"
-                  >${model.dailyIntake.sodium} mg</span
-                >
-              </div>
-            </div>
-            <div class="intake-nutrient-bottom-row">
-              <div class="input-wrap">
-                <span class="custom" t="dietaryProfile.custom">Custom:</span>
-                <input
-                  type="number"
-                  value.bind="model.dailyIntake.customSodium & validate"
-                  class.bind="customSodiumIsInvalid ? 'invalid' : ''"
-                  step="any"
-                  min="1"
-                  max="22999"
-                />
-                <div class="unit-input-addon">mg</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="intake-nutrient ${!model.dailyIntake.trackCholesterol ? 'not-tracked' : ''}">
-            <div class="intake-nutrient-top-row">
-              <label class="toggle">
-                <div class="toggle-content">
-                  <input type="checkbox" checked.bind="model.dailyIntake.trackCholesterol" />
-                  <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                    <path
-                      d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
-                    />
-                  </svg>
-                  <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                    <path
-                      d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </label>
-              <div class="intake-nutrient-data">
-                <span class="intake-nutrient-name" t="cholesterol">Cholesterol</span>
-                <span class.bind="model.dailyIntake.customCholesterol ? 'customized' : ''"
-                  >${model.dailyIntake.cholesterol} mg</span
-                >
-              </div>
-            </div>
-            <div class="intake-nutrient-bottom-row">
-              <div class="input-wrap">
-                <span class="custom" t="dietaryProfile.custom">Custom:</span>
-                <input
-                  type="number"
-                  value.bind="model.dailyIntake.customCholesterol & validate"
-                  class.bind="customCholesterolIsInvalid ? 'invalid' : ''"
-                  step="any"
-                  min="1"
-                  max="2999"
-                />
-                <div class="unit-input-addon">mg</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="intake-nutrient ${!model.dailyIntake.trackVitaminA ? 'not-tracked' : ''}">
-            <div class="intake-nutrient-top-row">
-              <label class="toggle">
-                <div class="toggle-content">
-                  <input type="checkbox" checked.bind="model.dailyIntake.trackVitaminA" />
-                  <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                    <path
-                      d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
-                    />
-                  </svg>
-                  <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                    <path
-                      d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </label>
-              <div class="intake-nutrient-data">
-                <span class="intake-nutrient-name" t="vitaminA">Vitamin A</span>
-                <span class.bind="model.dailyIntake.customVitaminA ? 'customized' : ''"
-                  >${model.dailyIntake.vitaminA} mg</span
-                >
-              </div>
-            </div>
-            <div class="intake-nutrient-bottom-row">
-              <div class="input-wrap">
-                <span class="custom" t="dietaryProfile.custom">Custom:</span>
-                <input
-                  type="number"
-                  value.bind="model.dailyIntake.customVitaminA & validate"
-                  class.bind="customVitaminAIsInvalid ? 'invalid' : ''"
-                  step="any"
-                  min="1"
-                  max="8999"
-                />
-                <div class="unit-input-addon">mg</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="intake-nutrient ${!model.dailyIntake.trackVitaminC ? 'not-tracked' : ''}">
-            <div class="intake-nutrient-top-row">
-              <label class="toggle">
-                <div class="toggle-content">
-                  <input type="checkbox" checked.bind="model.dailyIntake.trackVitaminC" />
-                  <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                    <path
-                      d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
-                    />
-                  </svg>
-                  <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                    <path
-                      d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </label>
-              <div class="intake-nutrient-data">
-                <span class="intake-nutrient-name" t="vitaminC">Vitamin C</span>
-                <span class.bind="model.dailyIntake.customVitaminC ? 'customized' : ''"
-                  >${model.dailyIntake.vitaminC} mg</span
-                >
-              </div>
-            </div>
-            <div class="intake-nutrient-bottom-row">
-              <div class="input-wrap">
-                <span class="custom" t="dietaryProfile.custom">Custom:</span>
-                <input
-                  type="number"
-                  value.bind="model.dailyIntake.customVitaminC & validate"
-                  class.bind="customVitaminCIsInvalid ? 'invalid' : ''"
-                  step="any"
-                  min="1"
-                  max="899"
-                />
-                <div class="unit-input-addon">mg</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="intake-nutrient ${!model.dailyIntake.trackVitaminD ? 'not-tracked' : ''}">
-            <div class="intake-nutrient-top-row">
-              <label class="toggle">
-                <div class="toggle-content">
-                  <input type="checkbox" checked.bind="model.dailyIntake.trackVitaminD" />
-                  <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                    <path
-                      d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
-                    />
-                  </svg>
-                  <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                    <path
-                      d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </label>
-              <div class="intake-nutrient-data">
-                <span class="intake-nutrient-name" t="vitaminD">Vitamin D</span>
-                <span class.bind="model.dailyIntake.customVitaminD ? 'customized' : ''"
-                  >${model.dailyIntake.vitaminD} mg</span
-                >
-              </div>
-            </div>
-            <div class="intake-nutrient-bottom-row">
-              <div class="input-wrap">
-                <span class="custom" t="dietaryProfile.custom">Custom:</span>
-                <input
-                  type="number"
-                  value.bind="model.dailyIntake.customVitaminD & validate"
-                  class.bind="customVitaminDIsInvalid ? 'invalid' : ''"
-                  step="any"
-                  min="1"
-                  max="5999"
-                />
-                <div class="unit-input-addon">mg</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="intake-nutrient ${!model.dailyIntake.trackCalcium ? 'not-tracked' : ''}">
-            <div class="intake-nutrient-top-row">
-              <label class="toggle">
-                <div class="toggle-content">
-                  <input type="checkbox" checked.bind="model.dailyIntake.trackCalcium" />
-                  <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                    <path
-                      d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
-                    />
-                  </svg>
-                  <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                    <path
-                      d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </label>
-              <div class="intake-nutrient-data">
-                <span class="intake-nutrient-name" t="calcium">Calcium</span>
-                <span class.bind="model.dailyIntake.customCalcium ? 'customized' : ''"
-                  >${model.dailyIntake.calcium} mg</span
-                >
-              </div>
-            </div>
-            <div class="intake-nutrient-bottom-row">
-              <div class="input-wrap">
-                <span class="custom" t="dietaryProfile.custom">Custom:</span>
-                <input
-                  type="number"
-                  value.bind="model.dailyIntake.customCalcium & validate"
-                  class.bind="customCalciumIsInvalid ? 'invalid' : ''"
-                  step="any"
-                  min="1"
-                  max="9999"
-                />
-                <div class="unit-input-addon">mg</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="intake-nutrient ${!model.dailyIntake.trackIron ? 'not-tracked' : ''}">
-            <div class="intake-nutrient-top-row">
-              <label class="toggle">
-                <div class="toggle-content">
-                  <input type="checkbox" checked.bind="model.dailyIntake.trackIron" />
-                  <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                    <path
-                      d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
-                    />
-                  </svg>
-                  <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                    <path
-                      d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </label>
-              <div class="intake-nutrient-data">
-                <span class="intake-nutrient-name" t="iron">Iron</span>
-                <span class.bind="model.dailyIntake.customIron ? 'customized' : ''">${model.dailyIntake.iron} mg</span>
-              </div>
-            </div>
-            <div class="intake-nutrient-bottom-row">
-              <div class="input-wrap">
-                <span class="custom" t="dietaryProfile.custom">Custom:</span>
-                <input
-                  type="number"
-                  value.bind="model.dailyIntake.customIron & validate"
-                  class.bind="customIronIsInvalid ? 'invalid' : ''"
-                  step="any"
-                  min="1"
-                  max="2999"
-                />
-                <div class="unit-input-addon">mg</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="intake-nutrient ${!model.dailyIntake.trackPotassium ? 'not-tracked' : ''}">
-            <div class="intake-nutrient-top-row">
-              <label class="toggle">
-                <div class="toggle-content">
-                  <input type="checkbox" checked.bind="model.dailyIntake.trackPotassium" />
-                  <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                    <path
-                      d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
-                    />
-                  </svg>
-                  <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                    <path
-                      d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </label>
-              <div class="intake-nutrient-data">
-                <span class="intake-nutrient-name" t="potassium">Potassium</span>
-                <span class.bind="model.dailyIntake.customPotassium ? 'customized' : ''"
-                  >${model.dailyIntake.potassium} mg</span
-                >
-              </div>
-            </div>
-            <div class="intake-nutrient-bottom-row">
-              <div class="input-wrap">
-                <span class="custom" t="dietaryProfile.custom">Custom:</span>
-                <input
-                  type="number"
-                  value.bind="model.dailyIntake.customPotassium & validate"
-                  class.bind="customPotassiumIsInvalid ? 'invalid' : ''"
-                  step="any"
-                  min="1"
-                  max="2999"
-                />
-                <div class="unit-input-addon">mg</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="intake-nutrient ${!model.dailyIntake.trackMagnesium ? 'not-tracked' : ''}">
-            <div class="intake-nutrient-top-row">
-              <label class="toggle">
-                <div class="toggle-content">
-                  <input type="checkbox" checked.bind="model.dailyIntake.trackMagnesium" />
-                  <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                    <path
-                      d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
-                    />
-                  </svg>
-                  <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                    <path
-                      d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </label>
-              <div class="intake-nutrient-data">
-                <span class="intake-nutrient-name" t="magnesium">Magnesium</span>
-                <span class.bind="model.dailyIntake.customMagnesium ? 'customized' : ''"
-                  >${model.dailyIntake.magnesium} mg</span
-                >
-              </div>
-            </div>
-            <div class="intake-nutrient-bottom-row">
-              <div class="input-wrap">
-                <span class="custom" t="dietaryProfile.custom">Custom:</span>
-                <input
-                  type="number"
-                  value.bind="model.dailyIntake.customMagnesium & validate"
-                  class.bind="customMagnesiumIsInvalid ? 'invalid' : ''"
-                  step="any"
-                  min="1"
-                  max="2999"
-                />
-                <div class="unit-input-addon">mg</div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            if.bind="getRecommendedIntakeInProgress"
-            class="intake-form-overlay au-animate animate-fade-in animate-fade-out"
-          ></div>
+        <div class="dietary-profile-tabs">
+          <button type="button" class.bind="dietTabIsVisible ? '' : 'active'" click.delegate="viewProfileTab()"
+            t="dietaryProfile.profile">
+            Profile
+          </button>
+          <button type="button"
+            class="diet-button ${dietTabIsVisible ? 'active' : ''} ${dietChanged ? 'diet-changed' : ''}"
+            click.delegate="viewDietTab()" t="dietaryProfile.diet">
+            Diet
+          </button>
         </div>
 
-        <div else class="missing-intake" t="dietaryProfile.setUpProfile">Set up your profile first</div>
-      </section>
+        <section if.bind="!dietTabIsVisible" class="au-animate animate-fade-in animate-fade-out">
+          <form class="dietary-profile">
+            <table>
+              <tr>
+                <td t="dietaryProfile.birthday">Birthday</td>
+                <td>
+                  <input type="date" value.bind="model.birthday & validate" min="${minBirthdayDate}"
+                    max="${maxBirthdayDate}" change.delegate="getAndUpdateRecommendedIntake()"
+                    class.bind="birthdayIsInvalid ? 'invalid' : ''" />
+                </td>
+              </tr>
+              <tr>
+                <td t="dietaryProfile.gender">Gender</td>
+                <td>
+                  <div class="gender-selector">
+                    <label class.bind="model.gender === 'Male' ? 'selected' : ''">
+                      <span t="dietaryProfile.male">Male</span>
+                      <input type="radio" name="genderToggle" value="Male" checked.bind="model.gender"
+                        change.delegate="getAndUpdateRecommendedIntake()" />
+                    </label>
+                    <label class.bind="model.gender === 'Female' ? 'selected' : ''">
+                      <span t="dietaryProfile.female">Female</span>
+                      <input type="radio" name="genderToggle" value="Female" checked.bind="model.gender"
+                        change.delegate="getAndUpdateRecommendedIntake()" />
+                    </label>
+                  </div>
+                </td>
+              </tr>
+              <tr if.bind="preferences.imperialSystem">
+                <td t="dietaryProfile.height">Height</td>
+                <td>
+                  <div class="input-wrap inline">
+                    <input type="number" max="7" value.bind="model.heightFeet & validate"
+                      change.delegate="getAndUpdateRecommendedIntake()"
+                      class.bind="heightFeetIsInvalid ? 'invalid' : ''" />
+                    <div class="unit-input-addon" t="dietaryProfile.feet">feet</div>
+                  </div>
+                  <div class="input-wrap inline">
+                    <input type="number" max="99" value.bind="model.heightInches & validate"
+                      change.delegate="getAndUpdateRecommendedIntake()"
+                      class.bind="heightInchesIsInvalid ? 'invalid' : ''" />
+                    <div class="unit-input-addon" t="dietaryProfile.inches">inches</div>
+                  </div>
+                </td>
+              </tr>
+              <tr else>
+                <td t="dietaryProfile.height">Height</td>
+                <td>
+                  <div class="input-wrap">
+                    <input type="number" min="100" max="245" value.bind="model.heightCm & validate"
+                      change.delegate="getAndUpdateRecommendedIntake()"
+                      class.bind="heightCmIsInvalid ? 'invalid' : ''" />
+                    <div class="unit-input-addon">cm</div>
+                  </div>
+                </td>
+              </tr>
+              <tr if.bind="preferences.imperialSystem">
+                <td t="dietaryProfile.weight">Weight</td>
+                <td>
+                  <div class="input-wrap">
+                    <input type="number" min="34" max="1000" value.bind="model.weightLbs & validate"
+                      change.delegate="getAndUpdateRecommendedIntake()"
+                      class.bind="weightLbsIsInvalid ? 'invalid' : ''" />
+                    <div class="unit-input-addon">lbs</div>
+                  </div>
+                </td>
+              </tr>
+              <tr else>
+                <td t="dietaryProfile.weight">Weight</td>
+                <td>
+                  <div class="input-wrap">
+                    <input type="number" min="15" max="500" value.bind="model.weightKg & validate"
+                      change.delegate="getAndUpdateRecommendedIntake()"
+                      class.bind="weightKgIsInvalid ? 'invalid' : ''" />
+                    <div class="unit-input-addon">kg</div>
+                  </div>
+                </td>
+              </tr>
+            </table>
 
-      <hr />
+            <div class="detailed-radio-selector">
+              <div class="detailed-radio-selector-label" t="dietaryProfile.activityLevel">Activity level</div>
 
-      <div class="save-delete-wrap">
-        <a
-          if.bind="!resetInProgress"
-          click.delegate="save()"
-          class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}"
-        >
-          <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
-            <i class="fas fa-circle-notch fa-spin"></i>
-          </span>
-          <span t="save">Save</span>
-        </a>
-        <a
-          click.delegate="reset()"
-          class="button danger-button ${resetButtonIsLoading ? 'disabled' : ''} ${resetInProgress ? 'confirm' : ''}"
-        >
-          <span class="button-loader ${resetButtonIsLoading ? 'loading' : ''}">
-            <i class="fas fa-circle-notch fa-spin"></i>
-          </span>
-          <span>${resetButtonText}</span>
-        </a>
-        <button
-          type="button"
-          if.bind="resetInProgress"
-          click.delegate="cancel()"
-          t="cancel"
-          class="button secondary-button"
-        >
-          Cancel
-        </button>
+              <label class="${model.activityLevel === 'Sedentary' ? 'selected' : ''}">
+                <div class="title">
+                  <span t="dietaryProfile.sedentary">Sedentary</span>
+                  <i class="fas fa-check"></i>
+                </div>
+                <input type="radio" name="activityLevelToggle" value="Sedentary" checked.bind="model.activityLevel"
+                  change.delegate="getAndUpdateRecommendedIntake()" />
+                <div class="explanation" t="dietaryProfile.sedentaryLabel">Little or no exercise</div>
+              </label>
+              <label class="${model.activityLevel === 'Light' ? 'selected' : ''}">
+                <div class="title">
+                  <span t="dietaryProfile.light">Light</span>
+                  <i class="fas fa-check"></i>
+                </div>
+                <input type="radio" name="activityLevelToggle" value="Light" checked.bind="model.activityLevel"
+                  change.delegate="getAndUpdateRecommendedIntake()" />
+                <div class="explanation" t="dietaryProfile.lightLabel">Exercise 1-3 times per week</div>
+              </label>
+              <label class="${model.activityLevel === 'Moderate' ? 'selected' : ''}">
+                <div class="title">
+                  <span t="dietaryProfile.moderate">Moderate</span>
+                  <i class="fas fa-check"></i>
+                </div>
+                <input type="radio" name="activityLevelToggle" value="Moderate" checked.bind="model.activityLevel"
+                  change.delegate="getAndUpdateRecommendedIntake()" />
+                <div class="explanation" t="dietaryProfile.moderateLabel">Exercise 4-5 times per week</div>
+              </label>
+              <label class="${model.activityLevel === 'Active' ? 'selected' : ''}">
+                <div class="title">
+                  <span t="dietaryProfile.active">Active</span>
+                  <i class="fas fa-check"></i>
+                </div>
+                <input type="radio" name="activityLevelToggle" value="Active" checked.bind="model.activityLevel"
+                  change.delegate="getAndUpdateRecommendedIntake()" />
+                <div class="explanation" t="dietaryProfile.activeLabel">
+                  Daily exercise or intense exercise 4-5 times per week
+                </div>
+              </label>
+              <label class="${model.activityLevel === 'VeryActive' ? 'selected' : ''}">
+                <div class="title">
+                  <span t="dietaryProfile.veryActive">Very active</span>
+                  <i class="fas fa-check"></i>
+                </div>
+                <input type="radio" name="activityLevelToggle" value="VeryActive" checked.bind="model.activityLevel"
+                  change.delegate="getAndUpdateRecommendedIntake()" />
+                <div class="explanation" t="dietaryProfile.veryActiveLabel">Intense exercise 6-7 times per week</div>
+              </label>
+            </div>
+
+            <div class="detailed-radio-selector">
+              <div class="detailed-radio-selector-label" t="dietaryProfile.goal">Goal</div>
+
+              <label class="${model.goal === 'None' ? 'selected' : ''}">
+                <div class="title">
+                  <span t="dietaryProfile.none">None</span>
+                  <i class="fas fa-check"></i>
+                </div>
+                <input type="radio" name="goalToggle" value="None" checked.bind="model.goal"
+                  change.delegate="getAndUpdateRecommendedIntake()" />
+              </label>
+              <label class="${model.goal === 'MildWeightLoss' ? 'selected' : ''}">
+                <div class="title">
+                  <span t="dietaryProfile.mildWeightLoss">Mild weight loss</span>
+                  <i class="fas fa-check"></i>
+                </div>
+                <input type="radio" name="goalToggle" value="MildWeightLoss" checked.bind="model.goal"
+                  change.delegate="getAndUpdateRecommendedIntake()" />
+              </label>
+              <label class="${model.goal === 'WeightLoss' ? 'selected' : ''}">
+                <div class="title">
+                  <span t="dietaryProfile.weightLoss">Weight loss</span>
+                  <i class="fas fa-check"></i>
+                </div>
+                <input type="radio" name="goalToggle" value="WeightLoss" checked.bind="model.goal"
+                  change.delegate="getAndUpdateRecommendedIntake()" />
+              </label>
+              <label class="${model.goal === 'MildWeightGain' ? 'selected' : ''}">
+                <div class="title">
+                  <span t="dietaryProfile.mildWeightGain">Mild weight gain</span>
+                  <i class="fas fa-check"></i>
+                </div>
+                <input type="radio" name="goalToggle" value="MildWeightGain" checked.bind="model.goal"
+                  change.delegate="getAndUpdateRecommendedIntake()" />
+              </label>
+              <label class="${model.goal === 'WeightGain' ? 'selected' : ''}">
+                <div class="title">
+                  <span t="dietaryProfile.weightGain">Weight gain</span>
+                  <i class="fas fa-check"></i>
+                </div>
+                <input type="radio" name="goalToggle" value="WeightGain" checked.bind="model.goal"
+                  change.delegate="getAndUpdateRecommendedIntake()" />
+              </label>
+            </div>
+          </form>
+        </section>
+
+        <section else class="intake-wrap au-animate animate-fade-in animate-fade-out">
+          <div class="intake-header" t="dietaryProfile.dailyIntakeRecommendation">Daily intake recommendation</div>
+
+          <div if.bind="dietaryProfileIsSet" class="intake-body">
+            <div class="intake-nutrient ${!model.dailyIntake.trackCalories ? 'not-tracked' : ''}">
+              <div class="intake-nutrient-top-row">
+                <label class="toggle">
+                  <div class="toggle-content">
+                    <input type="checkbox" checked.bind="model.dailyIntake.trackCalories" />
+                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
+                      <path
+                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
+                    </svg>
+                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
+                      <path
+                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
+                        fill-rule="evenodd" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                </label>
+                <div class="intake-nutrient-data">
+                  <span class="intake-nutrient-name" t="calories">Calories</span>
+                  <span class.bind="model.dailyIntake.customCalories ? 'customized' : ''">${model.dailyIntake.calories}
+                    kcal</span>
+                </div>
+              </div>
+              <div class="intake-nutrient-bottom-row">
+                <div class="input-wrap">
+                  <span class="custom" t="dietaryProfile.custom">Custom:</span>
+                  <input type="number" value.bind="model.dailyIntake.customCalories & validate"
+                    class.bind="customCaloriesIsInvalid ? 'invalid' : ''" step="any" min="300" max="9999" />
+                  <div class="unit-input-addon">kcal</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="intake-nutrient ${!model.dailyIntake.trackSaturatedFat ? 'not-tracked' : ''}">
+              <div class="intake-nutrient-top-row">
+                <label class="toggle">
+                  <div class="toggle-content">
+                    <input type="checkbox" checked.bind="model.dailyIntake.trackSaturatedFat" />
+                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
+                      <path
+                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
+                    </svg>
+                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
+                      <path
+                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
+                        fill-rule="evenodd" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                </label>
+                <div class="intake-nutrient-data">
+                  <span class="intake-nutrient-name" t="saturatedFat">Saturated fat</span>
+                  <span
+                    class.bind="model.dailyIntake.customSaturatedFat ? 'customized' : ''">${model.dailyIntake.saturatedFat}
+                    g</span>
+                </div>
+              </div>
+              <div class="intake-nutrient-bottom-row">
+                <div class="input-wrap">
+                  <span class="custom" t="dietaryProfile.custom">Custom:</span>
+                  <input type="number" value.bind="model.dailyIntake.customSaturatedFat & validate"
+                    class.bind="customSaturatedFatIsInvalid ? 'invalid' : ''" step="any" min="1" max="99" />
+                  <div class="unit-input-addon">g</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="intake-nutrient ${!model.dailyIntake.trackCarbohydrate ? 'not-tracked' : ''}">
+              <div class="intake-nutrient-top-row">
+                <label class="toggle">
+                  <div class="toggle-content">
+                    <input type="checkbox" checked.bind="model.dailyIntake.trackCarbohydrate" />
+                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
+                      <path
+                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
+                    </svg>
+                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
+                      <path
+                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
+                        fill-rule="evenodd" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                </label>
+                <div class="intake-nutrient-data">
+                  <span class="intake-nutrient-name" t="carbohydrate">Carbohydrate</span>
+                  <span
+                    class.bind="model.dailyIntake.customCarbohydrate ? 'customized' : ''">${model.dailyIntake.carbohydrate}
+                    g</span>
+                </div>
+              </div>
+              <div class="intake-nutrient-bottom-row">
+                <div class="input-wrap">
+                  <span class="custom" t="dietaryProfile.custom">Custom:</span>
+                  <input type="number" value.bind="model.dailyIntake.customCarbohydrate & validate"
+                    class.bind="customCarbohydrateIsInvalid ? 'invalid' : ''" step="any" min="1" max="1299" />
+                  <div class="unit-input-addon">g</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="intake-nutrient ${!model.dailyIntake.trackAddedSugars ? 'not-tracked' : ''}">
+              <div class="intake-nutrient-top-row">
+                <label class="toggle">
+                  <div class="toggle-content">
+                    <input type="checkbox" checked.bind="model.dailyIntake.trackAddedSugars" />
+                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
+                      <path
+                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
+                    </svg>
+                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
+                      <path
+                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
+                        fill-rule="evenodd" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                </label>
+                <div class="intake-nutrient-data">
+                  <span class="intake-nutrient-name" t="addedSugars">Added sugars</span>
+                  <span
+                    class.bind="model.dailyIntake.customAddedSugars ? 'customized' : ''">${model.dailyIntake.addedSugars}
+                    g</span>
+                </div>
+              </div>
+              <div class="intake-nutrient-bottom-row">
+                <div class="input-wrap">
+                  <span class="custom" t="dietaryProfile.custom">Custom:</span>
+                  <input type="number" value.bind="model.dailyIntake.customAddedSugars & validate"
+                    class.bind="customAddedSugarsIsInvalid ? 'invalid' : ''" step="any" min="1" max="99" />
+                  <div class="unit-input-addon">g</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="intake-nutrient ${!model.dailyIntake.trackFiber ? 'not-tracked' : ''}">
+              <div class="intake-nutrient-top-row">
+                <label class="toggle">
+                  <div class="toggle-content">
+                    <input type="checkbox" checked.bind="model.dailyIntake.trackFiber" />
+                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
+                      <path
+                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
+                    </svg>
+                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
+                      <path
+                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
+                        fill-rule="evenodd" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                </label>
+                <div class="intake-nutrient-data">
+                  <span class="intake-nutrient-name" t="fiber">Fiber</span>
+                  <span class.bind="model.dailyIntake.customFiber ? 'customized' : ''">${model.dailyIntake.fiber}
+                    g</span>
+                </div>
+              </div>
+              <div class="intake-nutrient-bottom-row">
+                <div class="input-wrap">
+                  <span class="custom" t="dietaryProfile.custom">Custom:</span>
+                  <input type="number" value.bind="model.dailyIntake.customFiber & validate"
+                    class.bind="customFiberIsInvalid ? 'invalid' : ''" step="any" min="1" max="229" />
+                  <div class="unit-input-addon">g</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="intake-nutrient ${!model.dailyIntake.trackProtein ? 'not-tracked' : ''}">
+              <div class="intake-nutrient-top-row">
+                <label class="toggle">
+                  <div class="toggle-content">
+                    <input type="checkbox" checked.bind="model.dailyIntake.trackProtein" />
+                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
+                      <path
+                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
+                    </svg>
+                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
+                      <path
+                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
+                        fill-rule="evenodd" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                </label>
+                <div class="intake-nutrient-data">
+                  <span class="intake-nutrient-name" t="protein">Protein</span>
+                  <span class.bind="model.dailyIntake.customProtein ? 'customized' : ''">${model.dailyIntake.protein}
+                    g</span>
+                </div>
+              </div>
+              <div class="intake-nutrient-bottom-row">
+                <div class="input-wrap">
+                  <span class="custom" t="dietaryProfile.custom">Custom:</span>
+                  <input type="number" value.bind="model.dailyIntake.customProtein & validate"
+                    class.bind="customProteinIsInvalid ? 'invalid' : ''" step="any" min="1" max="559" />
+                  <div class="unit-input-addon">g</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="intake-nutrient ${!model.dailyIntake.trackSodium ? 'not-tracked' : ''}">
+              <div class="intake-nutrient-top-row">
+                <label class="toggle">
+                  <div class="toggle-content">
+                    <input type="checkbox" checked.bind="model.dailyIntake.trackSodium" />
+                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
+                      <path
+                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
+                    </svg>
+                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
+                      <path
+                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
+                        fill-rule="evenodd" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                </label>
+                <div class="intake-nutrient-data">
+                  <span class="intake-nutrient-name" t="sodium">Sodium</span>
+                  <span class.bind="model.dailyIntake.customSodium ? 'customized' : ''">${model.dailyIntake.sodium}
+                    mg</span>
+                </div>
+              </div>
+              <div class="intake-nutrient-bottom-row">
+                <div class="input-wrap">
+                  <span class="custom" t="dietaryProfile.custom">Custom:</span>
+                  <input type="number" value.bind="model.dailyIntake.customSodium & validate"
+                    class.bind="customSodiumIsInvalid ? 'invalid' : ''" step="any" min="1" max="22999" />
+                  <div class="unit-input-addon">mg</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="intake-nutrient ${!model.dailyIntake.trackCholesterol ? 'not-tracked' : ''}">
+              <div class="intake-nutrient-top-row">
+                <label class="toggle">
+                  <div class="toggle-content">
+                    <input type="checkbox" checked.bind="model.dailyIntake.trackCholesterol" />
+                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
+                      <path
+                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
+                    </svg>
+                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
+                      <path
+                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
+                        fill-rule="evenodd" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                </label>
+                <div class="intake-nutrient-data">
+                  <span class="intake-nutrient-name" t="cholesterol">Cholesterol</span>
+                  <span
+                    class.bind="model.dailyIntake.customCholesterol ? 'customized' : ''">${model.dailyIntake.cholesterol}
+                    mg</span>
+                </div>
+              </div>
+              <div class="intake-nutrient-bottom-row">
+                <div class="input-wrap">
+                  <span class="custom" t="dietaryProfile.custom">Custom:</span>
+                  <input type="number" value.bind="model.dailyIntake.customCholesterol & validate"
+                    class.bind="customCholesterolIsInvalid ? 'invalid' : ''" step="any" min="1" max="2999" />
+                  <div class="unit-input-addon">mg</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="intake-nutrient ${!model.dailyIntake.trackVitaminA ? 'not-tracked' : ''}">
+              <div class="intake-nutrient-top-row">
+                <label class="toggle">
+                  <div class="toggle-content">
+                    <input type="checkbox" checked.bind="model.dailyIntake.trackVitaminA" />
+                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
+                      <path
+                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
+                    </svg>
+                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
+                      <path
+                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
+                        fill-rule="evenodd" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                </label>
+                <div class="intake-nutrient-data">
+                  <span class="intake-nutrient-name" t="vitaminA">Vitamin A</span>
+                  <span class.bind="model.dailyIntake.customVitaminA ? 'customized' : ''">${model.dailyIntake.vitaminA}
+                    mg</span>
+                </div>
+              </div>
+              <div class="intake-nutrient-bottom-row">
+                <div class="input-wrap">
+                  <span class="custom" t="dietaryProfile.custom">Custom:</span>
+                  <input type="number" value.bind="model.dailyIntake.customVitaminA & validate"
+                    class.bind="customVitaminAIsInvalid ? 'invalid' : ''" step="any" min="1" max="8999" />
+                  <div class="unit-input-addon">mg</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="intake-nutrient ${!model.dailyIntake.trackVitaminC ? 'not-tracked' : ''}">
+              <div class="intake-nutrient-top-row">
+                <label class="toggle">
+                  <div class="toggle-content">
+                    <input type="checkbox" checked.bind="model.dailyIntake.trackVitaminC" />
+                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
+                      <path
+                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
+                    </svg>
+                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
+                      <path
+                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
+                        fill-rule="evenodd" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                </label>
+                <div class="intake-nutrient-data">
+                  <span class="intake-nutrient-name" t="vitaminC">Vitamin C</span>
+                  <span class.bind="model.dailyIntake.customVitaminC ? 'customized' : ''">${model.dailyIntake.vitaminC}
+                    mg</span>
+                </div>
+              </div>
+              <div class="intake-nutrient-bottom-row">
+                <div class="input-wrap">
+                  <span class="custom" t="dietaryProfile.custom">Custom:</span>
+                  <input type="number" value.bind="model.dailyIntake.customVitaminC & validate"
+                    class.bind="customVitaminCIsInvalid ? 'invalid' : ''" step="any" min="1" max="899" />
+                  <div class="unit-input-addon">mg</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="intake-nutrient ${!model.dailyIntake.trackVitaminD ? 'not-tracked' : ''}">
+              <div class="intake-nutrient-top-row">
+                <label class="toggle">
+                  <div class="toggle-content">
+                    <input type="checkbox" checked.bind="model.dailyIntake.trackVitaminD" />
+                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
+                      <path
+                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
+                    </svg>
+                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
+                      <path
+                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
+                        fill-rule="evenodd" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                </label>
+                <div class="intake-nutrient-data">
+                  <span class="intake-nutrient-name" t="vitaminD">Vitamin D</span>
+                  <span class.bind="model.dailyIntake.customVitaminD ? 'customized' : ''">${model.dailyIntake.vitaminD}
+                    mg</span>
+                </div>
+              </div>
+              <div class="intake-nutrient-bottom-row">
+                <div class="input-wrap">
+                  <span class="custom" t="dietaryProfile.custom">Custom:</span>
+                  <input type="number" value.bind="model.dailyIntake.customVitaminD & validate"
+                    class.bind="customVitaminDIsInvalid ? 'invalid' : ''" step="any" min="1" max="5999" />
+                  <div class="unit-input-addon">mg</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="intake-nutrient ${!model.dailyIntake.trackCalcium ? 'not-tracked' : ''}">
+              <div class="intake-nutrient-top-row">
+                <label class="toggle">
+                  <div class="toggle-content">
+                    <input type="checkbox" checked.bind="model.dailyIntake.trackCalcium" />
+                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
+                      <path
+                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
+                    </svg>
+                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
+                      <path
+                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
+                        fill-rule="evenodd" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                </label>
+                <div class="intake-nutrient-data">
+                  <span class="intake-nutrient-name" t="calcium">Calcium</span>
+                  <span class.bind="model.dailyIntake.customCalcium ? 'customized' : ''">${model.dailyIntake.calcium}
+                    mg</span>
+                </div>
+              </div>
+              <div class="intake-nutrient-bottom-row">
+                <div class="input-wrap">
+                  <span class="custom" t="dietaryProfile.custom">Custom:</span>
+                  <input type="number" value.bind="model.dailyIntake.customCalcium & validate"
+                    class.bind="customCalciumIsInvalid ? 'invalid' : ''" step="any" min="1" max="9999" />
+                  <div class="unit-input-addon">mg</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="intake-nutrient ${!model.dailyIntake.trackIron ? 'not-tracked' : ''}">
+              <div class="intake-nutrient-top-row">
+                <label class="toggle">
+                  <div class="toggle-content">
+                    <input type="checkbox" checked.bind="model.dailyIntake.trackIron" />
+                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
+                      <path
+                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
+                    </svg>
+                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
+                      <path
+                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
+                        fill-rule="evenodd" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                </label>
+                <div class="intake-nutrient-data">
+                  <span class="intake-nutrient-name" t="iron">Iron</span>
+                  <span class.bind="model.dailyIntake.customIron ? 'customized' : ''">${model.dailyIntake.iron}
+                    mg</span>
+                </div>
+              </div>
+              <div class="intake-nutrient-bottom-row">
+                <div class="input-wrap">
+                  <span class="custom" t="dietaryProfile.custom">Custom:</span>
+                  <input type="number" value.bind="model.dailyIntake.customIron & validate"
+                    class.bind="customIronIsInvalid ? 'invalid' : ''" step="any" min="1" max="2999" />
+                  <div class="unit-input-addon">mg</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="intake-nutrient ${!model.dailyIntake.trackPotassium ? 'not-tracked' : ''}">
+              <div class="intake-nutrient-top-row">
+                <label class="toggle">
+                  <div class="toggle-content">
+                    <input type="checkbox" checked.bind="model.dailyIntake.trackPotassium" />
+                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
+                      <path
+                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
+                    </svg>
+                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
+                      <path
+                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
+                        fill-rule="evenodd" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                </label>
+                <div class="intake-nutrient-data">
+                  <span class="intake-nutrient-name" t="potassium">Potassium</span>
+                  <span
+                    class.bind="model.dailyIntake.customPotassium ? 'customized' : ''">${model.dailyIntake.potassium}
+                    mg</span>
+                </div>
+              </div>
+              <div class="intake-nutrient-bottom-row">
+                <div class="input-wrap">
+                  <span class="custom" t="dietaryProfile.custom">Custom:</span>
+                  <input type="number" value.bind="model.dailyIntake.customPotassium & validate"
+                    class.bind="customPotassiumIsInvalid ? 'invalid' : ''" step="any" min="1" max="2999" />
+                  <div class="unit-input-addon">mg</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="intake-nutrient ${!model.dailyIntake.trackMagnesium ? 'not-tracked' : ''}">
+              <div class="intake-nutrient-top-row">
+                <label class="toggle">
+                  <div class="toggle-content">
+                    <input type="checkbox" checked.bind="model.dailyIntake.trackMagnesium" />
+                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
+                      <path
+                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
+                    </svg>
+                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
+                      <path
+                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
+                        fill-rule="evenodd" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                </label>
+                <div class="intake-nutrient-data">
+                  <span class="intake-nutrient-name" t="magnesium">Magnesium</span>
+                  <span
+                    class.bind="model.dailyIntake.customMagnesium ? 'customized' : ''">${model.dailyIntake.magnesium}
+                    mg</span>
+                </div>
+              </div>
+              <div class="intake-nutrient-bottom-row">
+                <div class="input-wrap">
+                  <span class="custom" t="dietaryProfile.custom">Custom:</span>
+                  <input type="number" value.bind="model.dailyIntake.customMagnesium & validate"
+                    class.bind="customMagnesiumIsInvalid ? 'invalid' : ''" step="any" min="1" max="2999" />
+                  <div class="unit-input-addon">mg</div>
+                </div>
+              </div>
+            </div>
+
+            <div if.bind="getRecommendedIntakeInProgress"
+              class="intake-form-overlay au-animate animate-fade-in animate-fade-out"></div>
+          </div>
+
+          <div else class="missing-intake" t="dietaryProfile.setUpProfile">Set up your profile first</div>
+        </section>
+
+        <hr />
+
+        <div class="save-delete-wrap">
+          <a if.bind="!resetInProgress" click.delegate="save()"
+            class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
+            <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
+              <i class="fas fa-circle-notch fa-spin"></i>
+            </span>
+            <span t="save">Save</span>
+          </a>
+          <a click.delegate="reset()"
+            class="button danger-button ${resetButtonIsLoading ? 'disabled' : ''} ${resetInProgress ? 'confirm' : ''}">
+            <span class="button-loader ${resetButtonIsLoading ? 'loading' : ''}">
+              <i class="fas fa-circle-notch fa-spin"></i>
+            </span>
+            <span>${resetButtonText}</span>
+          </a>
+          <button type="button" if.bind="resetInProgress" click.delegate="cancel()" t="cancel"
+            class="button secondary-button">
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   </div>

@@ -2,58 +2,47 @@
   <require from="../static/styles/pages/ingredients.scss"></require>
   <require from="./../resources/elements/empty-list-message.html"></require>
 
-  <div class="au-animate animate-fade-in animate-fade-out">
-    <div class="page-title-wrap">
-      <div class="side inactive">
-        <i class="fas fa-carrot"></i>
-      </div>
-      <div t="ingredients.ingredients" class="page-title">Ingredients</div>
-      <a route-href="route: recipes" class="back-button">
-        <i class="fas fa-times"></i>
-      </a>
-    </div>
-
-    <div class="content-wrap">
-      <div if.bind="shadowIngredients.length > 0" class="ingredients-search-wrap">
-        <input
-          type="text"
-          value.bind="search"
-          keyup.delegate="searchInputChanged() & throttle:1000"
-          class="${search.length > 0 ? 'searching' : ''}"
-          t="[placeholder,aria-label]ingredients.search"
-          maxlength="50"
-        />
-        <i
-          class="fas fa-times"
-          show.bind="clearSearchButtonIsVisible"
-          click.delegate="clearSearch()"
-          t="[title,aria-label]ingredients.clear"
-        ></i>
+  <div class="container">
+    <div class="au-animate animate-fade-in animate-fade-out">
+      <div class="page-title-wrap">
+        <div class="side inactive">
+          <i class="fas fa-carrot"></i>
+        </div>
+        <div t="ingredients.ingredients" class="page-title">Ingredients</div>
+        <a route-href="route: recipes" class="back-button">
+          <i class="fas fa-times"></i>
+        </a>
       </div>
 
-      <div if.bind="!ingredients" class="double-circle-loading">
-        <div class="double-bounce1"></div>
-        <div class="double-bounce2"></div>
+      <div class="content-wrap">
+        <div if.bind="shadowIngredients.length > 0" class="ingredients-search-wrap">
+          <input type="text" value.bind="search" keyup.delegate="searchInputChanged() & throttle:1000"
+            class="${search.length > 0 ? 'searching' : ''}" t="[placeholder,aria-label]ingredients.search"
+            maxlength="50" />
+          <i class="fas fa-times" show.bind="clearSearchButtonIsVisible" click.delegate="clearSearch()"
+            t="[title,aria-label]ingredients.clear"></i>
+        </div>
+
+        <div if.bind="!ingredients" class="double-circle-loading">
+          <div class="double-bounce1"></div>
+          <div class="double-bounce2"></div>
+        </div>
+
+        <a repeat.for="ingredient of ingredients"
+          class="ingredient au-animate animate-fade-in ${ingredient.id === getEditedId ? 'highlighted' : ''}"
+          route-href="route: editIngredient; params.bind: { id: ingredient.id }">
+          <span class="name">${ingredient.name}</span>
+          <span class="ingredient-icons-container">
+            <i class="fas fa-link" if.bind="ingredient.taskId" t="[title,aria-label]ingredients.linkedToTask"></i>
+            <i class="fas fa-clipboard" if.bind="ingredient.hasNutritionData"
+              t="[title,aria-label]ingredients.hasNutritionSet"></i>
+            <i class="fas fa-tag" if.bind="ingredient.hasPriceData" t="[title,aria-label]ingredients.hasPriceSet"></i>
+          </span>
+        </a>
+
+        <empty-list-message if.bind="shadowIngredients.length === 0" message.bind="emptyListMessage">
+        </empty-list-message>
       </div>
-
-      <a
-        repeat.for="ingredient of ingredients"
-        class="ingredient au-animate animate-fade-in ${ingredient.id === getEditedId ? 'highlighted' : ''}"
-        route-href="route: editIngredient; params.bind: { id: ingredient.id }"
-      >
-        <span class="name">${ingredient.name}</span>
-        <span class="ingredient-icons-container">
-          <i class="fas fa-link" if.bind="ingredient.taskId" t="[title,aria-label]ingredients.linkedToTask"></i>
-          <i
-            class="fas fa-clipboard"
-            if.bind="ingredient.hasNutritionData"
-            t="[title,aria-label]ingredients.hasNutritionSet"
-          ></i>
-          <i class="fas fa-tag" if.bind="ingredient.hasPriceData" t="[title,aria-label]ingredients.hasPriceSet"></i>
-        </span>
-      </a>
-
-      <empty-list-message if.bind="shadowIngredients.length === 0" message.bind="emptyListMessage"></empty-list-message>
     </div>
   </div>
 </template>
