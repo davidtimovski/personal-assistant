@@ -50,7 +50,7 @@ An ecosystem of PWAs that cooperate with each other to provide unique functional
 * Supports 168 currencies
 
 ## Development
-You will need an `.env` file if you want to start it localy with docker. Just create a copy of `.env.example` and update the variables with the appropriate values.
+You will need an `.env` file if you want to start it locally with Docker. Just create a copy of `.env.example` and update the variables with the appropriate values.
 
 ## License
 
