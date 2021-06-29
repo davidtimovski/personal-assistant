@@ -2,155 +2,134 @@
   <require from="../static/styles/pages/edit-task.scss"></require>
   <require from="./../resources/elements/tooltip"></require>
 
-  <div class="au-animate animate-fade-in animate-fade-out">
-    <div class="page-title-wrap">
-      <div class="side inactive small">
-        <i class="fas fa-pencil-alt"></i>
-      </div>
-      <div class="page-title">
-        <span><span t="editTask.edit">Edit</span>&nbsp;<span class="colored-text">${model.name}</span></span>
-      </div>
-      <a if.bind="!model" route-href="route: lists" class="back-button">
-        <i class="fas fa-times"></i>
-      </a>
-      <a else route-href="route: list; params.bind: { id: model.listId }" class="back-button">
-        <i class="fas fa-times"></i>
-      </a>
-    </div>
-
-    <div class="content-wrap">
-      <div if.bind="!model" class="double-circle-loading">
-        <div class="double-bounce1"></div>
-        <div class="double-bounce2"></div>
+  <div class="container">
+    <div class="au-animate animate-fade-in animate-fade-out">
+      <div class="page-title-wrap">
+        <div class="side inactive small">
+          <i class="fas fa-pencil-alt"></i>
+        </div>
+        <div class="page-title">
+          <span><span t="editTask.edit">Edit</span>&nbsp;<span class="colored-text">${model.name}</span></span>
+        </div>
+        <a if.bind="!model" route-href="route: lists" class="back-button">
+          <i class="fas fa-times"></i>
+        </a>
+        <a else route-href="route: list; params.bind: { id: model.listId }" class="back-button">
+          <i class="fas fa-times"></i>
+        </a>
       </div>
 
-      <div else>
-        <form submit.trigger="save()">
-          <div class="form-control">
-            <input
-              type="text"
-              value.bind="model.name & validate"
-              maxlength="50"
-              class.bind="nameIsInvalid ? 'invalid' : ''"
-              t="[placeholder,aria-label]name"
-              required
-            />
-          </div>
-          <div class="form-control">
-            <select value.bind="model.listId" change.delegate="listChanged()" t="[aria-label]editTask.list">
-              <option model.bind="list.id" repeat.for="list of listOptions">${list.name}</option>
-            </select>
-          </div>
-          <div class="form-control">
-            <label class="toggle">
-              <span t="editTask.deleteWhenDone">Delete when done</span>
-              <div class="toggle-content">
-                <input type="checkbox" checked.bind="model.isOneTime" />
-                <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                  <path
-                    d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
-                  />
-                </svg>
-                <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                  <path
-                    d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </div>
-            </label>
-          </div>
+      <div class="content-wrap">
+        <div if.bind="!model" class="double-circle-loading">
+          <div class="double-bounce1"></div>
+          <div class="double-bounce2"></div>
+        </div>
 
-          <div if.bind="model.isInSharedList">
+        <div else>
+          <form submit.trigger="save()">
+            <div class="form-control">
+              <input type="text" value.bind="model.name & validate" maxlength="50"
+                class.bind="nameIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]name" required />
+            </div>
+            <div class="form-control">
+              <select value.bind="model.listId" change.delegate="listChanged()" t="[aria-label]editTask.list">
+                <option model.bind="list.id" repeat.for="list of listOptions">${list.name}</option>
+              </select>
+            </div>
             <div class="form-control">
               <label class="toggle">
-                <span t="editTask.taskIsPrivate">Task is private</span>
+                <span t="editTask.deleteWhenDone">Delete when done</span>
                 <div class="toggle-content">
-                  <input type="checkbox" checked.bind="model.isPrivate" change.delegate="isPrivateChanged()" />
+                  <input type="checkbox" checked.bind="model.isOneTime" />
                   <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
                     <path
-                      d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
-                    />
+                      d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
                   </svg>
                   <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
                     <path
                       d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                    />
+                      fill-rule="evenodd" clip-rule="evenodd" />
                   </svg>
                 </div>
               </label>
-
-              <tooltip key.bind="privateTasksTooltipKey"></tooltip>
             </div>
 
-            <div class="assign-to-user ${assignToUserIsVisible ? 'visible' : ''}">
-              <div class="assign-to-user-header">${assignToUserLabel}</div>
-              <div class="assign-to-user-content">
-                <label class="radio ${!model.assignedToUserId ? 'selected' : ''}">
-                  <img src.bind="nobodyImageUri" class="assign-to-user-image" t="[alt]profilePicture" />
-                  <div class="assign-to-user-item">
-                    <span t="editTask.nobody">Nobody</span>
-                    <input type="radio" name="assign" model.bind="null" checked.bind="model.assignedToUserId" />
+            <div if.bind="model.isInSharedList">
+              <div class="form-control">
+                <label class="toggle">
+                  <span t="editTask.taskIsPrivate">Task is private</span>
+                  <div class="toggle-content">
+                    <input type="checkbox" checked.bind="model.isPrivate" change.delegate="isPrivateChanged()" />
+                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
+                      <path
+                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
+                    </svg>
+                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
+                      <path
+                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
+                        fill-rule="evenodd" clip-rule="evenodd" />
+                    </svg>
                   </div>
                 </label>
-                <label
-                  repeat.for="assigneeOption of assigneeOptions"
-                  class="radio ${model.assignedToUserId === assigneeOption.id ? 'selected' : ''}"
-                >
-                  <img src.bind="assigneeOption.imageUri" class="assign-to-user-image" t="[alt]profilePicture" />
-                  <div class="assign-to-user-item">
-                    <span>${assigneeOption.name} <i class="fas fa-check"></i></span>
-                    <input
-                      type="radio"
-                      name="assign"
-                      model.bind="assigneeOption.id"
-                      checked.bind="model.assignedToUserId"
-                    />
-                  </div>
-                </label>
+
+                <tooltip key.bind="privateTasksTooltipKey"></tooltip>
+              </div>
+
+              <div class="assign-to-user ${assignToUserIsVisible ? 'visible' : ''}">
+                <div class="assign-to-user-header">${assignToUserLabel}</div>
+                <div class="assign-to-user-content">
+                  <label class="radio ${!model.assignedToUserId ? 'selected' : ''}">
+                    <img src.bind="nobodyImageUri" class="assign-to-user-image" t="[alt]profilePicture" />
+                    <div class="assign-to-user-item">
+                      <span t="editTask.nobody">Nobody</span>
+                      <input type="radio" name="assign" model.bind="null" checked.bind="model.assignedToUserId" />
+                    </div>
+                  </label>
+                  <label repeat.for="assigneeOption of assigneeOptions"
+                    class="radio ${model.assignedToUserId === assigneeOption.id ? 'selected' : ''}">
+                    <img src.bind="assigneeOption.imageUri" class="assign-to-user-image" t="[alt]profilePicture" />
+                    <div class="assign-to-user-item">
+                      <span>${assigneeOption.name} <i class="fas fa-check"></i></span>
+                      <input type="radio" name="assign" model.bind="assigneeOption.id"
+                        checked.bind="model.assignedToUserId" />
+                    </div>
+                  </label>
+                </div>
               </div>
             </div>
+          </form>
+
+          <hr />
+
+          <div show.bind="deleteInProgress && model.recipes.length > 0" class="delete-confirmation-alert">
+            <span t="[html]editTask.taskUsedAsIngredientInRecipes"></span>
+            <br />
+            <br />
+            <span innerhtml="${recipesText | sanitizeHTML}"></span>.
+            <br />
+            <br />
+            <span t="[html]editTask.deletingItWillUnlinkIt"></span>
           </div>
-        </form>
 
-        <hr />
-
-        <div show.bind="deleteInProgress && model.recipes.length > 0" class="delete-confirmation-alert">
-          <span t="[html]editTask.taskUsedAsIngredientInRecipes"></span>
-          <br />
-          <br />
-          <span innerhtml="${recipesText | sanitizeHTML}"></span>.
-          <br />
-          <br />
-          <span t="[html]editTask.deletingItWillUnlinkIt"></span>
-        </div>
-
-        <div class="save-delete-wrap">
-          <a
-            if.bind="!deleteInProgress"
-            click.delegate="save()"
-            class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}"
-          >
-            <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
-              <i class="fas fa-circle-notch fa-spin"></i>
-            </span>
-            <span t="save">Save</span>
-          </a>
-          <a
-            click.delegate="delete()"
-            class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}"
-          >
-            <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
-              <i class="fas fa-circle-notch fa-spin"></i>
-            </span>
-            <span>${deleteButtonText}</span>
-          </a>
-          <button type="button" else click.delegate="cancel()" t="cancel" class="button secondary-button">
-            Cancel
-          </button>
+          <div class="save-delete-wrap">
+            <a if.bind="!deleteInProgress" click.delegate="save()"
+              class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
+              <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
+                <i class="fas fa-circle-notch fa-spin"></i>
+              </span>
+              <span t="save">Save</span>
+            </a>
+            <a click.delegate="delete()"
+              class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}">
+              <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
+                <i class="fas fa-circle-notch fa-spin"></i>
+              </span>
+              <span>${deleteButtonText}</span>
+            </a>
+            <button type="button" else click.delegate="cancel()" t="cancel" class="button secondary-button">
+              Cancel
+            </button>
+          </div>
         </div>
       </div>
     </div>

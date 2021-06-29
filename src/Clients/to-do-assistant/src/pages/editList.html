@@ -1,132 +1,105 @@
 <template>
   <require from="./../resources/elements/tooltip"></require>
 
-  <div class="au-animate animate-fade-in animate-fade-out">
-    <div class="page-title-wrap">
-      <div class="side inactive small">
-        <i class="fas fa-pencil-alt"></i>
-      </div>
-      <div class="page-title">
-        <span if.bind="isNewList" t="editList.newList">New list</span>
-        <span else><span t="editList.edit">Edit</span>&nbsp;<span class="colored-text">${model.name}</span></span>
-      </div>
-      <a click.delegate="back()" class="back-button">
-        <i class="fas fa-times"></i>
-      </a>
-    </div>
-
-    <div class="content-wrap">
-      <div show.bind="model.sharingState === 4" class="message warning">
-        <i class="fas fa-exclamation-triangle"></i>
-        <span t="editList.inOrderToChangeThisList"
-          >In order to change this list you must be an owner or Administrator.</span
-        >
+  <div class="container">
+    <div class="au-animate animate-fade-in animate-fade-out">
+      <div class="page-title-wrap">
+        <div class="side inactive small">
+          <i class="fas fa-pencil-alt"></i>
+        </div>
+        <div class="page-title">
+          <span if.bind="isNewList" t="editList.newList">New list</span>
+          <span else><span t="editList.edit">Edit</span>&nbsp;<span class="colored-text">${model.name}</span></span>
+        </div>
+        <a click.delegate="back()" class="back-button">
+          <i class="fas fa-times"></i>
+        </a>
       </div>
 
-      <form submit.trigger="save()">
-        <div if.bind="model.sharingState !== 4" class="form-control">
-          <input
-            type="text"
-            value.bind="model.name & validate"
-            ref="nameInput"
-            maxlength="50"
-            class.bind="nameIsInvalid ? 'invalid' : ''"
-            t="[placeholder,aria-label]listName"
-            required
-          />
+      <div class="content-wrap">
+        <div show.bind="model.sharingState === 4" class="message warning">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span t="editList.inOrderToChangeThisList">In order to change this list you must be an owner or
+            Administrator.</span>
         </div>
 
-        <div if.bind="isNewList" class="form-control">
-          <div
-            if.bind="!tasksInputIsVisible"
-            click.delegate="showTasksTextarea()"
-            class="horizontal-buttons-wrap au-animate animate-fade-in animate-fade-out"
-          >
-            <a class="wide-button" t="editList.addTasks">Add tasks?</a>
+        <form submit.trigger="save()">
+          <div if.bind="model.sharingState !== 4" class="form-control">
+            <input type="text" value.bind="model.name & validate" ref="nameInput" maxlength="50"
+              class.bind="nameIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]listName" required />
           </div>
-          <textarea
-            else
-            value.bind="model.tasksText & validate"
-            class="au-animate animate-fade-in animate-fade-out ${tasksTextIsInvalid ? 'invalid' : ''}"
-            t="[placeholder,aria-label]editList.eachRow"
-          ></textarea>
-        </div>
 
-        <div if.bind="model.sharingState !== 4" class="form-control">
-          <div class="icon-wrap">
-            <span class="placeholder ${!isNewList ? 'editing' : ''}" t="editList.icon">Icon</span>
-            <div class="icon-options">
-              <div
-                repeat.for="icon of iconOptions"
-                click.delegate="selectIcon(icon.icon)"
-                class="${model.icon === icon.icon ? 'selected' : ''} icon-option"
-              >
-                <i class="${icon.cssClass}"></i>
+          <div if.bind="isNewList" class="form-control">
+            <div if.bind="!tasksInputIsVisible" click.delegate="showTasksTextarea()"
+              class="horizontal-buttons-wrap au-animate animate-fade-in animate-fade-out">
+              <a class="wide-button" t="editList.addTasks">Add tasks?</a>
+            </div>
+            <textarea else value.bind="model.tasksText & validate"
+              class="au-animate animate-fade-in animate-fade-out ${tasksTextIsInvalid ? 'invalid' : ''}"
+              t="[placeholder,aria-label]editList.eachRow"></textarea>
+          </div>
+
+          <div if.bind="model.sharingState !== 4" class="form-control">
+            <div class="icon-wrap">
+              <span class="placeholder ${!isNewList ? 'editing' : ''}" t="editList.icon">Icon</span>
+              <div class="icon-options">
+                <div repeat.for="icon of iconOptions" click.delegate="selectIcon(icon.icon)"
+                  class="${model.icon === icon.icon ? 'selected' : ''} icon-option">
+                  <i class="${icon.cssClass}"></i>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div if.bind="notificationsEnabledCheckboxVisible" class="form-control">
-          <label class="toggle">
-            <span t="editList.notifications">Notifications</span>
-            <div class="toggle-content">
-              <input type="checkbox" checked.bind="model.notificationsEnabled" />
-              <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                <path
-                  d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
-                />
-              </svg>
-              <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                <path
-                  d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                />
-              </svg>
-            </div>
-          </label>
-        </div>
-        <div if.bind="model.sharingState !== 4" class="form-control">
-          <label class="toggle">
-            <span t="deleteOnCompletion">Delete tasks on completion</span>
-            <div class="toggle-content">
-              <input type="checkbox" checked.bind="model.isOneTimeToggleDefault" />
-              <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                <path
-                  d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z"
-                />
-              </svg>
-              <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                <path
-                  d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                />
-              </svg>
-            </div>
-          </label>
+          <div if.bind="notificationsEnabledCheckboxVisible" class="form-control">
+            <label class="toggle">
+              <span t="editList.notifications">Notifications</span>
+              <div class="toggle-content">
+                <input type="checkbox" checked.bind="model.notificationsEnabled" />
+                <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
+                  <path
+                    d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
+                </svg>
+                <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
+                  <path
+                    d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
+                    fill-rule="evenodd" clip-rule="evenodd" />
+                </svg>
+              </div>
+            </label>
+          </div>
+          <div if.bind="model.sharingState !== 4" class="form-control">
+            <label class="toggle">
+              <span t="deleteOnCompletion">Delete tasks on completion</span>
+              <div class="toggle-content">
+                <input type="checkbox" checked.bind="model.isOneTimeToggleDefault" />
+                <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
+                  <path
+                    d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
+                </svg>
+                <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
+                  <path
+                    d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
+                    fill-rule="evenodd" clip-rule="evenodd" />
+                </svg>
+              </div>
+            </label>
 
-          <tooltip key.bind="oneTimeTasksTooltipKey"></tooltip>
-        </div>
-      </form>
+            <tooltip key.bind="oneTimeTasksTooltipKey"></tooltip>
+          </div>
+        </form>
 
-      <hr />
+        <hr />
 
-      <div class="save-delete-wrap">
-        <a
-          if.bind="!confirmationInProgress"
-          click.delegate="save()"
-          class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}"
-        >
-          <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
-            <i class="fas fa-circle-notch fa-spin"></i>
-          </span>
-          <span>${saveButtonText}</span>
-        </a>
-        <a
-          if.bind="!isNewList && model.sharingState === 0 || model.sharingState === 1 || model.sharingState === 2"
-          click.delegate="delete()"
-          class="
+        <div class="save-delete-wrap">
+          <a if.bind="!confirmationInProgress" click.delegate="save()"
+            class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
+            <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
+              <i class="fas fa-circle-notch fa-spin"></i>
+            </span>
+            <span>${saveButtonText}</span>
+          </a>
+          <a if.bind="!isNewList && model.sharingState === 0 || model.sharingState === 1 || model.sharingState === 2"
+            click.delegate="delete()" class="
             button
             danger-button
             ${deleteButtonIsLoading
@@ -139,17 +112,13 @@
             'confirm'
             :
             ''}
-          "
-        >
-          <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
-            <i class="fas fa-circle-notch fa-spin"></i>
-          </span>
-          <span>${deleteButtonText}</span>
-        </a>
-        <a
-          if.bind="model.sharingState === 3 || model.sharingState === 4"
-          click.delegate="leave()"
-          class="
+          ">
+            <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
+              <i class="fas fa-circle-notch fa-spin"></i>
+            </span>
+            <span>${deleteButtonText}</span>
+          </a>
+          <a if.bind="model.sharingState === 3 || model.sharingState === 4" click.delegate="leave()" class="
             button
             danger-button
             ${leaveButtonIsLoading
@@ -162,22 +131,17 @@
             'confirm'
             :
             ''}
-          "
-        >
-          <span class="button-loader ${leaveButtonIsLoading ? 'loading' : ''}">
-            <i class="fas fa-circle-notch fa-spin"></i>
-          </span>
-          <span>${leaveButtonText}</span>
-        </a>
-        <button
-          type="button"
-          if.bind="isNewList || confirmationInProgress"
-          click.delegate="cancel()"
-          t="cancel"
-          class="button secondary-button"
-        >
-          Cancel
-        </button>
+          ">
+            <span class="button-loader ${leaveButtonIsLoading ? 'loading' : ''}">
+              <i class="fas fa-circle-notch fa-spin"></i>
+            </span>
+            <span>${leaveButtonText}</span>
+          </a>
+          <button type="button" if.bind="isNewList || confirmationInProgress" click.delegate="cancel()" t="cancel"
+            class="button secondary-button">
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   </div>

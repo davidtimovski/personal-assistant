@@ -167,8 +167,7 @@ table {
   }
 }
 
-router-view {
-  display: block;
+.container {
   background: #fff;
   border-radius: 6px 6px 18px 18px;
   box-shadow: var(--box-shadow);
@@ -875,7 +874,7 @@ a.button {
     padding: 0;
   }
 
-  router-view {
+  .container {
     background: none;
     border-radius: 0;
     box-shadow: none;

@@ -2,170 +2,138 @@
   <require from="../static/styles/pages/share-list.scss"></require>
   <require from="./../resources/elements/tooltip"></require>
 
-  <div class="au-animate animate-fade-in animate-fade-out">
-    <div class="page-title-wrap">
-      <div class="side inactive small">
-        <i class="fas fa-handshake"></i>
-      </div>
-      <div class="page-title">
-        <span if.bind="model.shares.length === 0">
-          <span t="shareList.share">Share</span>&nbsp;<span class="colored-text">${model.name}</span>
-        </span>
-        <span else> ${model.name} </span>
-      </div>
-      <a route-href="route: list; params.bind: { id: model.id }" class="back-button">
-        <i class="fas fa-times"></i>
-      </a>
-    </div>
-
-    <div class="content-wrap">
-      <form if.bind="model.sharingState !== 4" submit.trigger="submit()">
-        <div class="form-control">
-          <div class="add-input-wrap">
-            <input
-              type="email"
-              value.bind="selectedShare.email & validate"
-              disabled.bind="!canEditEmail"
-              ref="emailInput"
-              maxlength="256"
-              class.bind="emailIsInvalid ? 'invalid' : ''"
-              placeholder="${emailPlaceholderText}"
-              aria-label="${emailPlaceholderText}"
-              required
-            />
-            <a if.bind="currentlyEditing" click.delegate="saveShare()" t="[title,aria-label]save">
-              <i class="fas fa-save"></i>
-            </a>
-            <a else click.delegate="addShare()" t="[title,aria-label]shareList.addMember">
-              <i class="fas fa-plus-circle"></i>
-            </a>
-          </div>
+  <div class="container">
+    <div class="au-animate animate-fade-in animate-fade-out">
+      <div class="page-title-wrap">
+        <div class="side inactive small">
+          <i class="fas fa-handshake"></i>
         </div>
-        <div class="form-control">
-          <div class="double-radio-wrap permissions">
-            <div class="double-radio-side">
-              <label class="${!selectedShare.isAdmin ? 'selected' : ''}">
-                <span t="shareList.member">Member</span>
-                <input
-                  type="radio"
-                  name="permissionsToggle"
-                  model.bind="false"
-                  checked.bind="selectedShare.isAdmin"
-                  change.delegate="permissionsToggleChanged()"
-                />
-                <span class="checkbox-icon">
-                  <i class="fas fa-user"></i>
-                </span>
-              </label>
-            </div>
-            <div class="double-radio-side">
-              <label class="${selectedShare.isAdmin ? 'selected' : ''}">
-                <span t="shareList.admin">Admin</span>
-                <input
-                  type="radio"
-                  name="permissionsToggle"
-                  model.bind="true"
-                  checked.bind="selectedShare.isAdmin"
-                  change.delegate="permissionsToggleChanged()"
-                />
-                <span class="checkbox-icon">
-                  <i class="fas fa-user-tie"></i>
-                </span>
-              </label>
-            </div>
-          </div>
-
-          <tooltip key.bind="memberVsAdminTooltipKey"></tooltip>
-        </div>
-      </form>
-
-      <div class="labeled-separator">
-        <div class="labeled-separator-text">${sharedWithWrapTitle}</div>
-        <hr />
-      </div>
-
-      <div class="share-with">
-        <img class="share-image" src.bind="model.ownerImageUri" t="[alt]profilePicture" />
-        <div class="share-content not-editable">
-          <div class="icon" t="[title,aria-label]shareList.owner">
-            <i class="fas fa-crown"></i>
-          </div>
-          <span class="name">${model.ownerEmail}</span>
-        </div>
-      </div>
-
-      <div if.bind="model.userShare" class="share-with">
-        <img class="share-image" src.bind="model.userShare.imageUri" t="[alt]profilePicture" />
-        <div class="share-content not-editable">
-          <div if.bind="model.userShare.isAdmin" class="icon" t="[title,aria-label]shareList.admin">
-            <i class="fas fa-user-tie"></i>
-          </div>
-          <div else class="icon" t="[title,aria-label]shareList.member">
-            <i class="fas fa-user"></i>
-          </div>
-          <span class="name">${model.userShare.email}</span>
-        </div>
-      </div>
-
-      <div repeat.for="share of model.shares" class="share-with">
-        <img class="share-image" src.bind="share.imageUri" t="[alt]profilePicture" />
-        <div class="share-content ${share.email === selectedShare.email ? 'selected' : ''}">
-          <div
-            if.bind="share.userId && !share.createdDate && share.userId !== 0 && share.email !== selectedShare.email"
-            class="icon"
-            t="[title,aria-label]shareList.newlyAddedMember"
-          >
-            <i class="fas fa-user-plus"></i>
-          </div>
-          <div
-            if.bind="share.isAccepted === null && !!share.createdDate && share.email !== selectedShare.email"
-            class="icon"
-            t="[title,aria-label]shareList.pendingAccept"
-          >
-            <i class="fas fa-user-clock"></i>
-          </div>
-          <div
-            if.bind="share.isAccepted && !share.isAdmin && share.email !== selectedShare.email"
-            class="icon"
-            t="[title,aria-label]shareList.member"
-          >
-            <i class="fas fa-user"></i>
-          </div>
-          <div
-            if.bind="share.isAccepted && share.isAdmin && share.email !== selectedShare.email"
-            class="icon"
-            t="[title,aria-label]shareList.admin"
-          >
-            <i class="fas fa-user-tie"></i>
-          </div>
-          <div
-            if.bind="share.email === selectedShare.email"
-            class="share-content-button"
-            t="[title,aria-label]shareList.editing"
-          >
-            <i class="fas fa-user-edit"></i>
-          </div>
-          <span click.delegate="select(share)" class="name">${share.email}</span>
-          <a
-            click.delegate="removeShare(share)"
-            class="share-content-button remove-button"
-            t="[title,aria-label]shareList.removeMember"
-          >
-            <i class="fas fa-times-circle"></i>
-          </a>
-        </div>
-      </div>
-
-      <hr />
-
-      <div class="save-delete-wrap">
-        <a click.delegate="save()" class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
-          <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
-            <i class="fas fa-circle-notch fa-spin"></i>
+        <div class="page-title">
+          <span if.bind="model.shares.length === 0">
+            <span t="shareList.share">Share</span>&nbsp;<span class="colored-text">${model.name}</span>
           </span>
-          <span t="save">Save</span>
+          <span else> ${model.name} </span>
+        </div>
+        <a route-href="route: list; params.bind: { id: model.id }" class="back-button">
+          <i class="fas fa-times"></i>
         </a>
-        <a route-href="route: list; params.bind: { id: model.id }" t="cancel" class="button secondary-button">Cancel</a>
+      </div>
+
+      <div class="content-wrap">
+        <form if.bind="model.sharingState !== 4" submit.trigger="submit()">
+          <div class="form-control">
+            <div class="add-input-wrap">
+              <input type="email" value.bind="selectedShare.email & validate" disabled.bind="!canEditEmail"
+                ref="emailInput" maxlength="256" class.bind="emailIsInvalid ? 'invalid' : ''"
+                placeholder="${emailPlaceholderText}" aria-label="${emailPlaceholderText}" required />
+              <a if.bind="currentlyEditing" click.delegate="saveShare()" t="[title,aria-label]save">
+                <i class="fas fa-save"></i>
+              </a>
+              <a else click.delegate="addShare()" t="[title,aria-label]shareList.addMember">
+                <i class="fas fa-plus-circle"></i>
+              </a>
+            </div>
+          </div>
+          <div class="form-control">
+            <div class="double-radio-wrap permissions">
+              <div class="double-radio-side">
+                <label class="${!selectedShare.isAdmin ? 'selected' : ''}">
+                  <span t="shareList.member">Member</span>
+                  <input type="radio" name="permissionsToggle" model.bind="false" checked.bind="selectedShare.isAdmin"
+                    change.delegate="permissionsToggleChanged()" />
+                  <span class="checkbox-icon">
+                    <i class="fas fa-user"></i>
+                  </span>
+                </label>
+              </div>
+              <div class="double-radio-side">
+                <label class="${selectedShare.isAdmin ? 'selected' : ''}">
+                  <span t="shareList.admin">Admin</span>
+                  <input type="radio" name="permissionsToggle" model.bind="true" checked.bind="selectedShare.isAdmin"
+                    change.delegate="permissionsToggleChanged()" />
+                  <span class="checkbox-icon">
+                    <i class="fas fa-user-tie"></i>
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <tooltip key.bind="memberVsAdminTooltipKey"></tooltip>
+          </div>
+        </form>
+
+        <div class="labeled-separator">
+          <div class="labeled-separator-text">${sharedWithWrapTitle}</div>
+          <hr />
+        </div>
+
+        <div class="share-with">
+          <img class="share-image" src.bind="model.ownerImageUri" t="[alt]profilePicture" />
+          <div class="share-content not-editable">
+            <div class="icon" t="[title,aria-label]shareList.owner">
+              <i class="fas fa-crown"></i>
+            </div>
+            <span class="name">${model.ownerEmail}</span>
+          </div>
+        </div>
+
+        <div if.bind="model.userShare" class="share-with">
+          <img class="share-image" src.bind="model.userShare.imageUri" t="[alt]profilePicture" />
+          <div class="share-content not-editable">
+            <div if.bind="model.userShare.isAdmin" class="icon" t="[title,aria-label]shareList.admin">
+              <i class="fas fa-user-tie"></i>
+            </div>
+            <div else class="icon" t="[title,aria-label]shareList.member">
+              <i class="fas fa-user"></i>
+            </div>
+            <span class="name">${model.userShare.email}</span>
+          </div>
+        </div>
+
+        <div repeat.for="share of model.shares" class="share-with">
+          <img class="share-image" src.bind="share.imageUri" t="[alt]profilePicture" />
+          <div class="share-content ${share.email === selectedShare.email ? 'selected' : ''}">
+            <div
+              if.bind="share.userId && !share.createdDate && share.userId !== 0 && share.email !== selectedShare.email"
+              class="icon" t="[title,aria-label]shareList.newlyAddedMember">
+              <i class="fas fa-user-plus"></i>
+            </div>
+            <div if.bind="share.isAccepted === null && !!share.createdDate && share.email !== selectedShare.email"
+              class="icon" t="[title,aria-label]shareList.pendingAccept">
+              <i class="fas fa-user-clock"></i>
+            </div>
+            <div if.bind="share.isAccepted && !share.isAdmin && share.email !== selectedShare.email" class="icon"
+              t="[title,aria-label]shareList.member">
+              <i class="fas fa-user"></i>
+            </div>
+            <div if.bind="share.isAccepted && share.isAdmin && share.email !== selectedShare.email" class="icon"
+              t="[title,aria-label]shareList.admin">
+              <i class="fas fa-user-tie"></i>
+            </div>
+            <div if.bind="share.email === selectedShare.email" class="share-content-button"
+              t="[title,aria-label]shareList.editing">
+              <i class="fas fa-user-edit"></i>
+            </div>
+            <span click.delegate="select(share)" class="name">${share.email}</span>
+            <a click.delegate="removeShare(share)" class="share-content-button remove-button"
+              t="[title,aria-label]shareList.removeMember">
+              <i class="fas fa-times-circle"></i>
+            </a>
+          </div>
+        </div>
+
+        <hr />
+
+        <div class="save-delete-wrap">
+          <a click.delegate="save()" class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
+            <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
+              <i class="fas fa-circle-notch fa-spin"></i>
+            </span>
+            <span t="save">Save</span>
+          </a>
+          <a route-href="route: list; params.bind: { id: model.id }" t="cancel"
+            class="button secondary-button">Cancel</a>
+        </div>
       </div>
     </div>
   </div>

@@ -1,60 +1,54 @@
 <template>
-  <div class="au-animate animate-fade-in animate-fade-out">
-    <div class="page-title-wrap">
-      <div class="side inactive small">
-        <i class="fas fa-copy"></i>
-      </div>
-      <div class="page-title">${model.name}</div>
-      <a route-href="route: list; params.bind: { id: model.id }" class="back-button">
-        <i class="fas fa-times"></i>
-      </a>
-    </div>
-
-    <div class="content-wrap">
-      <form submit.trigger="save()">
-        <div class="form-control">
-          <input
-            type="text"
-            value.bind="model.name & validate"
-            maxlength="50"
-            class.bind="nameIsInvalid ? 'invalid' : ''"
-            t="[placeholder,aria-label]listName"
-            required
-          />
+  <div class="container">
+    <div class="au-animate animate-fade-in animate-fade-out">
+      <div class="page-title-wrap">
+        <div class="side inactive small">
+          <i class="fas fa-copy"></i>
         </div>
-        <div class="form-control">
-          <div class="icon-wrap">
-            <span class="placeholder editing" t="editList.icon">Icon</span>
-            <div class="icon-options">
-              <div
-                repeat.for="icon of iconOptions"
-                click.delegate="selectIcon(icon.icon)"
-                class="${model.icon === icon.icon ? 'selected' : ''} icon-option"
-              >
-                <i class="${icon.cssClass}"></i>
+        <div class="page-title">${model.name}</div>
+        <a route-href="route: list; params.bind: { id: model.id }" class="back-button">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+
+      <div class="content-wrap">
+        <form submit.trigger="save()">
+          <div class="form-control">
+            <input type="text" value.bind="model.name & validate" maxlength="50"
+              class.bind="nameIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]listName" required />
+          </div>
+          <div class="form-control">
+            <div class="icon-wrap">
+              <span class="placeholder editing" t="editList.icon">Icon</span>
+              <div class="icon-options">
+                <div repeat.for="icon of iconOptions" click.delegate="selectIcon(icon.icon)"
+                  class="${model.icon === icon.icon ? 'selected' : ''} icon-option">
+                  <i class="${icon.cssClass}"></i>
+                </div>
               </div>
             </div>
           </div>
+        </form>
+
+        <div class="save-delete-wrap">
+          <a click.delegate="save()" class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
+            <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
+              <i class="fas fa-circle-notch fa-spin"></i>
+            </span>
+            <span t="copyList.createCopy">Create copy</span>
+          </a>
+          <a route-href="route: list; params.bind: { id: model.id }" t="cancel"
+            class="button secondary-button">Cancel</a>
         </div>
-      </form>
 
-      <div class="save-delete-wrap">
-        <a click.delegate="save()" class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
-          <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
-            <i class="fas fa-circle-notch fa-spin"></i>
-          </span>
-          <span t="copyList.createCopy">Create copy</span>
-        </a>
-        <a route-href="route: list; params.bind: { id: model.id }" t="cancel" class="button secondary-button">Cancel</a>
-      </div>
+        <hr />
 
-      <hr />
-
-      <div class="horizontal-buttons-wrap">
-        <a ref="copyButton" class="wide-button with-badge">
-          <span t="copyList.copyAsText">Copy as text</span>
-          <i class="fas fa-check badge toggled ${copyAsTextCompleted ? 'visible': ''}"></i>
-        </a>
+        <div class="horizontal-buttons-wrap">
+          <a ref="copyButton" class="wide-button with-badge">
+            <span t="copyList.copyAsText">Copy as text</span>
+            <i class="fas fa-check badge toggled ${copyAsTextCompleted ? 'visible': ''}"></i>
+          </a>
+        </div>
       </div>
     </div>
   </div>

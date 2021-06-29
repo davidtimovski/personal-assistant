@@ -1,21 +1,23 @@
 <template>
-  <div class="au-animate animate-fade-in animate-fade-out">
-    <div class="page-title-wrap">
-      <div class="side inactive">
-        <i class="fas fa-exclamation-circle"></i>
+  <div class="container">
+    <div class="au-animate animate-fade-in animate-fade-out">
+      <div class="page-title-wrap">
+        <div class="side inactive">
+          <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <div class="page-title">404</div>
+        <div class="side inactive">
+          <i class="fas fa-exclamation-circle"></i>
+        </div>
       </div>
-      <div class="page-title">404</div>
-      <div class="side inactive">
-        <i class="fas fa-exclamation-circle"></i>
+
+      <div class="content-wrap">
+
+        <div class="text-wrap not-found-message" t="notFound.youSeemLost">You seem lost..</div>
+
+        <a href="/" class="wide-button" t="notFound.takeMeHome">Take me home</a>
+
       </div>
-    </div>
-
-    <div class="content-wrap">
-
-      <div class="text-wrap not-found-message" t="notFound.youSeemLost">You seem lost..</div>
-
-      <a href="/" class="wide-button" t="notFound.takeMeHome">Take me home</a>
-
     </div>
   </div>
 </template>
