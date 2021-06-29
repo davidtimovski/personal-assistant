@@ -1,77 +1,73 @@
 <template>
   <require from="../static/styles/pages/menu.scss"></require>
 
-  <div class="au-animate animate-fade-in animate-fade-out">
-    <div class="page-title-wrap">
-      <div class="side inactive">
-        <i class="fas fa-bars"></i>
+  <div class="container">
+    <div class="au-animate animate-fade-in animate-fade-out">
+      <div class="page-title-wrap">
+        <div class="side inactive">
+          <i class="fas fa-bars"></i>
+        </div>
+        <div t="menu.menu" class="page-title">Menu</div>
+        <a route-href="route: dashboard" class="back-button">
+          <i class="fas fa-times"></i>
+        </a>
       </div>
-      <div t="menu.menu" class="page-title">Menu</div>
-      <a route-href="route: dashboard" class="side back">
-        <i class="fas fa-times"></i>
-      </a>
-    </div>
 
-    <div class="content-wrap">
-      <div class="horizontal-buttons-wrap">
-        <a route-href="route: transactions" class="wide-button" t="menu.transactions">Transactions</a>
-        <a route-href="route: upcomingExpenses" class="wide-button" t="menu.upcomingExpenses">Upcoming expenses</a>
-        <a route-href="route: debt" class="wide-button" t="menu.debt">Debt</a>
-        <a route-href="route: categories" class="wide-button" t="menu.categories">Categories</a>
-        <a route-href="route: accounts" class="wide-button" t="menu.accounts">Accounts</a>
-        <a route-href="route: balanceAdjustment" class="wide-button" t="menu.balanceAdjustment">Balance adjustment</a>
+      <div class="content-wrap">
+        <div class="horizontal-buttons-wrap">
+          <a route-href="route: transactions" class="wide-button" t="menu.transactions">Transactions</a>
+          <a route-href="route: upcomingExpenses" class="wide-button" t="menu.upcomingExpenses">Upcoming expenses</a>
+          <a route-href="route: debt" class="wide-button" t="menu.debt">Debt</a>
+          <a route-href="route: categories" class="wide-button" t="menu.categories">Categories</a>
+          <a route-href="route: accounts" class="wide-button" t="menu.accounts">Accounts</a>
+          <a route-href="route: balanceAdjustment" class="wide-button" t="menu.balanceAdjustment">Balance adjustment</a>
 
-        <div class="drawer-button-wrap ${reportsDrawerIsOpen ? 'open' : ''}">
-          <button
-            type="button"
-            click.delegate="toggleReportsDrawer()"
-            class="wide-button drawer-button"
-            t="menu.reports"
-          >
-            Reports
-          </button>
-          <div class="drawer-content-wrap">
-            <div class="drawer-content">
-              <a route-href="route: pieChartReport" class="wide-button" t="menu.pieChart">Pie chart</a>
-              <a route-href="route: barChartReport" class="wide-button" t="menu.barChart">Bar chart</a>
-              <a route-href="route: expenditureHeatmap" class="wide-button" t="menu.expenditureHeatmap"
-                >Expenditure heatmap</a
-              >
+          <div class="drawer-button-wrap ${reportsDrawerIsOpen ? 'open' : ''}">
+            <button type="button" click.delegate="toggleReportsDrawer()" class="wide-button drawer-button"
+              t="menu.reports">
+              Reports
+            </button>
+            <div class="drawer-content-wrap">
+              <div class="drawer-content">
+                <a route-href="route: pieChartReport" class="wide-button" t="menu.pieChart">Pie chart</a>
+                <a route-href="route: barChartReport" class="wide-button" t="menu.barChart">Bar chart</a>
+                <a route-href="route: expenditureHeatmap" class="wide-button" t="menu.expenditureHeatmap">Expenditure
+                  heatmap</a>
+              </div>
             </div>
           </div>
+
+          <a route-href="route: fireCalculator" class="wide-button" t="menu.fireCalculator">FIRE calculator</a>
+          <a route-href="route: export" class="wide-button" t="menu.export">Export</a>
+          <a route-href="route: totalSync" class="wide-button" t="menu.totalSync">Total sync</a>
+
+          <a click.delegate="goToPreferences()" class="wide-button with-badge">
+            <span class="button-loader ${preferencesButtonIsLoading ? 'loading' : ''}">
+              <i class="fas fa-circle-notch fa-spin"></i>
+            </span>
+            <span t="menu.preferences">Preferences</span>
+          </a>
+
+          <a click.delegate="goToHelp()" class="wide-button with-badge">
+            <span class="button-loader ${helpButtonIsLoading ? 'loading' : ''}">
+              <i class="fas fa-circle-notch fa-spin"></i>
+            </span>
+            <span t="menu.help">Help</span>
+          </a>
         </div>
 
-        <a route-href="route: fireCalculator" class="wide-button" t="menu.fireCalculator">FIRE calculator</a>
-        <a route-href="route: export" class="wide-button" t="menu.export">Export</a>
-        <a route-href="route: totalSync" class="wide-button" t="menu.totalSync">Total sync</a>
+        <hr />
 
-        <a click.delegate="goToPreferences()" class="wide-button with-badge">
-          <span class="button-loader ${preferencesButtonIsLoading ? 'loading' : ''}">
-            <i class="fas fa-circle-notch fa-spin"></i>
-          </span>
-          <span t="menu.preferences">Preferences</span>
-        </a>
+        <div class="horizontal-buttons-wrap">
+          <a href.bind="personalAssistantUrl" class="wide-button" t="menu.goToPersonalAssistant">Go to Personal
+            Assistant</a>
+          <a click.delegate="logOut()" class="wide-button" t="menu.logOut">Log Out</a>
+        </div>
 
-        <a click.delegate="goToHelp()" class="wide-button with-badge">
-          <span class="button-loader ${helpButtonIsLoading ? 'loading' : ''}">
-            <i class="fas fa-circle-notch fa-spin"></i>
-          </span>
-          <span t="menu.help">Help</span>
-        </a>
+        <hr />
+
+        <div class="version"><span t="menu.version">Version</span> ${version}</div>
       </div>
-
-      <hr />
-
-      <div class="horizontal-buttons-wrap">
-        <a href.bind="personalAssistantUrl" class="wide-button" t="menu.goToPersonalAssistant"
-          >Go to Personal Assistant</a
-        >
-        <a click.delegate="logOut()" class="wide-button" t="menu.logOut">Log Out</a>
-      </div>
-
-      <hr />
-
-      <div class="version"><span t="menu.version">Version</span> ${version}</div>
     </div>
   </div>
 </template>

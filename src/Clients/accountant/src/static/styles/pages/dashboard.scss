@@ -1,3 +1,7 @@
+.content-wrap.dashboard {
+  padding-top: 15px;
+}
+
 .capital-summary {
   display: flex;
 }
@@ -14,7 +18,7 @@
   }
 
   .summary-item {
-    padding: 8px 8px 10px;
+    padding: 8px 10px 10px;
 
     .summary-title {
       font-size: 0.9rem;
@@ -37,11 +41,12 @@
   .dashboard-button {
     position: relative;
     width: 48%;
-    background: #fafafa;
-    border: none;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-left: 3px solid var(--primary-color);
+    border-right: 3px solid var(--primary-color);
     border-radius: var(--border-radius);
     outline: none;
-    box-shadow: var(--box-shadow);
     font-size: inherit;
     line-height: 45px;
     color: var(--primary-color);

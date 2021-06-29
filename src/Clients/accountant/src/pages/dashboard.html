@@ -3,141 +3,131 @@
   <require from="./../resources/value-converters/number-format"></require>
   <require from="./../resources/value-converters/money-format"></require>
 
-  <div class="au-animate animate-fade-in animate-fade-out">
-    <div class="page-title-wrap-loader">
-      <div class="title-wrap">
-        <span if.bind="menuButtonIsLoading" class="page-loading">
-          <i class="fas fa-circle-notch fa-spin"></i>
-        </span>
-        <div else click.delegate="goToMenu()" class="profile-image-container" t="[title,aria-label]dashboard.menu">
-          <img src.bind="imageUri" class="profile-image" t="[alt]profilePicture" />
+  <div class="container">
+    <div class="au-animate animate-fade-in animate-fade-out">
+      <div class="page-title-wrap-loader">
+        <div class="title-wrap">
+          <span if.bind="menuButtonIsLoading" class="menu-loader">
+            <i class="fas fa-circle-notch fa-spin"></i>
+          </span>
+          <div else click.delegate="goToMenu()" class="profile-image-container" t="[title,aria-label]dashboard.menu">
+            <img src.bind="imageUri" class="profile-image" t="[alt]profilePicture" />
+          </div>
+          <div class="page-title reduced">
+            <span></span>
+          </div>
+          <a click.delegate="sync()"
+            class="sync-button ${!connTracker.isOnline || progressBar.active ? 'disabled' : ''}"
+            t="[title,aria-label]dashboard.refresh">
+            <i class="fas fa-sync-alt"></i>
+          </a>
         </div>
-        <div class="page-title reduced">
-          <span></span>
+        <div class="progress-bar">
+          <div class="progress ${progressBar.visible ? 'visible' : ''}" css="width: ${getProgress}%;"></div>
         </div>
-        <a
-          click.delegate="sync()"
-          class="side small ${!connTracker.isOnline || progressBar.active ? 'disabled' : ''}"
-          t="[title,aria-label]dashboard.refresh"
-        >
-          <i class="fas fa-sync-alt"></i>
-        </a>
       </div>
-      <div class="progress-bar">
-        <div class="progress ${progressBar.visible ? 'visible' : ''}" css="width: ${getProgress}%;"></div>
-      </div>
-    </div>
 
-    <div class="content-wrap">
-      <div class="capital-summary">
-        <a route-href="route: transactions" class="summary-item-wrap">
-          <div class="summary-item">
-            <div class="summary-title" t="dashboard.available">Available</div>
-            <div class="summary-value">${available | numberFormat:currency}</div>
+      <div class="content-wrap dashboard">
+        <div class="capital-summary">
+          <a route-href="route: transactions" class="summary-item-wrap">
+            <div class="summary-item">
+              <div class="summary-title" t="dashboard.available">Available</div>
+              <div class="summary-value">${available | numberFormat:currency}</div>
+            </div>
+          </a>
+          <a route-href="route: transactions" class="summary-item-wrap">
+            <div class="summary-item">
+              <div class="summary-title" t="dashboard.spent">Spent</div>
+              <div class="summary-value">${spent | numberFormat:currency}</div>
+            </div>
+          </a>
+          <a route-href="route: transactions" class="summary-item-wrap">
+            <div class="summary-item">
+              <div class="summary-title" t="balance">Balance</div>
+              <div class="summary-value">${balance | numberFormat:currency}</div>
+            </div>
+          </a>
+        </div>
+
+        <div class="dashboard-buttons">
+          <button type="button" click.delegate="newDeposit()"
+            class="dashboard-button ${progressBar.active ? 'disabled' : ''}" t="dashboard.newDeposit">
+            New deposit
+          </button>
+          <button type="button" click.delegate="newExpense()"
+            class="dashboard-button ${progressBar.active ? 'disabled' : ''}" t="dashboard.newExpense">
+            New expense
+          </button>
+        </div>
+
+        <div if.bind="!model" class="double-circle-loading">
+          <div class="double-bounce1"></div>
+          <div class="double-bounce2"></div>
+        </div>
+
+        <div else>
+          <div if.bind="model.expenditures.length > 0">
+            <a route-href="route: transactions" class="dashboard-table-title"
+              t="dashboard.expenditures">Expenditures</a>
+            <table class="amount-by-category-table">
+              <tbody>
+                <template repeat.for="expenditure of model.expenditures">
+                  <tr click.delegate="goToTransactions(expenditure)">
+                    <td>${expenditure.categoryName}</td>
+                    <td class="amount-cell">${expenditure.amount | moneyFormat:currency}</td>
+                  </tr>
+                  <tr repeat.for="subExpenditure of expenditure.subItems"
+                    click.delegate="goToTransactions(subExpenditure)">
+                    <td class="sub-category-cell">${subExpenditure.categoryName}</td>
+                    <td class="amount-cell">${subExpenditure.amount | moneyFormat:currency}</td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
           </div>
-        </a>
-        <a route-href="route: transactions" class="summary-item-wrap">
-          <div class="summary-item">
-            <div class="summary-title" t="dashboard.spent">Spent</div>
-            <div class="summary-value">${spent | numberFormat:currency}</div>
-          </div>
-        </a>
-        <a route-href="route: transactions" class="summary-item-wrap">
-          <div class="summary-item">
-            <div class="summary-title" t="balance">Balance</div>
-            <div class="summary-value">${balance | numberFormat:currency}</div>
-          </div>
-        </a>
-      </div>
 
-      <div class="dashboard-buttons">
-        <button
-          type="button"
-          click.delegate="newDeposit()"
-          class="dashboard-button ${progressBar.active ? 'disabled' : ''}"
-          t="dashboard.newDeposit"
-        >
-          New deposit
-        </button>
-        <button
-          type="button"
-          click.delegate="newExpense()"
-          class="dashboard-button ${progressBar.active ? 'disabled' : ''}"
-          t="dashboard.newExpense"
-        >
-          New expense
-        </button>
-      </div>
-
-      <div if.bind="!model" class="double-circle-loading">
-        <div class="double-bounce1"></div>
-        <div class="double-bounce2"></div>
-      </div>
-
-      <div else>
-        <div if.bind="model.expenditures.length > 0">
-          <a route-href="route: transactions" class="dashboard-table-title" t="dashboard.expenditures">Expenditures</a>
-          <table class="amount-by-category-table">
-            <tbody>
-              <template repeat.for="expenditure of model.expenditures">
-                <tr click.delegate="goToTransactions(expenditure)">
-                  <td>${expenditure.categoryName}</td>
-                  <td class="amount-cell">${expenditure.amount | moneyFormat:currency}</td>
+          <div if.bind="model.upcomingExpenses.length > 0">
+            <a route-href="route: upcomingExpenses" class="dashboard-table-title"
+              t="dashboard.upcomingExpenses">Upcoming expenses</a>
+            <table class="dashboard-table">
+              <tbody>
+                <tr repeat.for="upcomingExpense of model.upcomingExpenses">
+                  <td>${upcomingExpense.category}</td>
+                  <td>${upcomingExpense.description}</td>
+                  <td class="amount-cell">${upcomingExpense.amount | moneyFormat:currency}</td>
                 </tr>
-                <tr
-                  repeat.for="subExpenditure of expenditure.subItems"
-                  click.delegate="goToTransactions(subExpenditure)"
-                >
-                  <td class="sub-category-cell">${subExpenditure.categoryName}</td>
-                  <td class="amount-cell">${subExpenditure.amount | moneyFormat:currency}</td>
+              </tbody>
+              <tfoot if.bind="model.upcomingExpenses.length > 1">
+                <tr>
+                  <td colspan="3">
+                    <!-- Space taker -->
+                  </td>
                 </tr>
-              </template>
-            </tbody>
-          </table>
-        </div>
+                <tr>
+                  <td colspan="3">${model.upcomingSum | moneyFormat:currency}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
 
-        <div if.bind="model.upcomingExpenses.length > 0">
-          <a route-href="route: upcomingExpenses" class="dashboard-table-title" t="dashboard.upcomingExpenses"
-            >Upcoming expenses</a
-          >
-          <table class="dashboard-table">
-            <tbody>
-              <tr repeat.for="upcomingExpense of model.upcomingExpenses">
-                <td>${upcomingExpense.category}</td>
-                <td>${upcomingExpense.description}</td>
-                <td class="amount-cell">${upcomingExpense.amount | moneyFormat:currency}</td>
-              </tr>
-            </tbody>
-            <tfoot if.bind="model.upcomingExpenses.length > 1">
-              <tr>
-                <td colspan="3">
-                  <!-- Space taker -->
-                </td>
-              </tr>
-              <tr>
-                <td colspan="3">${model.upcomingSum | moneyFormat:currency}</td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-
-        <div if.bind="model.debt.length > 0">
-          <a route-href="route: debt" class="dashboard-table-title" t="dashboard.debt">Debt</a>
-          <table class="dashboard-table">
-            <tbody>
-              <tr repeat.for="debtItem of model.debt">
-                <td>
-                  <span if.bind="debtItem.userIsDebtor" t="dashboard.to">To</span>
-                  <span else t="dashboard.from">From</span>
-                  ${debtItem.person}
-                </td>
-                <td>${debtItem.description}</td>
-                <td class="amount-cell ${debtItem.userIsDebtor ? 'expense-color' : 'deposit-color'}">
-                  ${debtItem.amount | moneyFormat:currency}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div if.bind="model.debt.length > 0">
+            <a route-href="route: debt" class="dashboard-table-title" t="dashboard.debt">Debt</a>
+            <table class="dashboard-table">
+              <tbody>
+                <tr repeat.for="debtItem of model.debt">
+                  <td>
+                    <span if.bind="debtItem.userIsDebtor" t="dashboard.to">To</span>
+                    <span else t="dashboard.from">From</span>
+                    ${debtItem.person}
+                  </td>
+                  <td>${debtItem.description}</td>
+                  <td class="amount-cell ${debtItem.userIsDebtor ? 'expense-color' : 'deposit-color'}">
+                    ${debtItem.amount | moneyFormat:currency}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

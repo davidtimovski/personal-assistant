@@ -14,10 +14,9 @@ p {
   width: 100px;
   background: linear-gradient(225deg, #7a46f3, #00a6ed);
   background-size: 400% 400%;
-  border: none;
+  border: 1px solid transparent;
   border-radius: var(--border-radius);
   outline: none;
-  box-shadow: var(--box-shadow);
   padding: 6px 0;
   font-size: inherit;
   line-height: 27px;
@@ -26,7 +25,8 @@ p {
   animation: AnimateGradiant 8s ease infinite;
 
   &.back {
-    background: #fafafa;
+    background: #fff;
+    border-color: #ddd;
     color: var(--primary-color-dark);
   }
 
@@ -86,6 +86,9 @@ p {
 
   input {
     width: 60px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
     text-align: center;
   }
 
@@ -94,7 +97,6 @@ p {
     border-radius: var(--border-radius);
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
-    box-shadow: var(--box-shadow);
     padding: 0 12px;
     line-height: 37px;
   }
@@ -121,15 +123,13 @@ p {
     }
 
     &-icon,
-    input[type="text"],
+    input[type="text"]:not(.select-currency-input),
     .input-wrap {
       margin-right: 7px;
     }
 
     .remove-button {
       cursor: pointer;
-
-      transition: color var(--transition-quick);
 
       &:hover {
         color: var(--primary-color-dark);
@@ -147,7 +147,6 @@ p {
     color: var(--primary-color);
     cursor: pointer;
     user-select: none;
-    transition: color var(--transition);
 
     &:hover {
       color: var(--primary-color-dark);
@@ -210,7 +209,7 @@ ul {
     }
 
     &-icon,
-    input[type="text"],
+    input[type="text"]:not(.select-currency-input),
     .input-wrap {
       margin-right: 10px;
     }

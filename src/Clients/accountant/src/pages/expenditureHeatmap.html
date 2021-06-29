@@ -3,72 +3,69 @@
   <require from="./../resources/value-converters/number-format"></require>
   <require from="./../resources/value-converters/money-format"></require>
 
-  <div class="au-animate animate-fade-in animate-fade-out">
-    <div class="page-title-wrap">
-      <div class="side inactive medium">
-        <i class="fas fa-th"></i>
-      </div>
-      <div t="expenditureHeatmap.expenditureHeatmap" class="page-title">Expenditure heatmap</div>
-      <a route-href="route: dashboard" class="side back">
-        <i class="fas fa-times"></i>
-      </a>
-    </div>
-
-    <div class="content-wrap">
-      <div class="heatmap ${loaded ? 'loaded' : ''}">
-        <div class="heatmap-cell header" t="expenditureHeatmap.mon">Mon</div>
-        <div class="heatmap-cell header" t="expenditureHeatmap.tue">Tue</div>
-        <div class="heatmap-cell header" t="expenditureHeatmap.wed">Wed</div>
-        <div class="heatmap-cell header" t="expenditureHeatmap.thu">Thu</div>
-        <div class="heatmap-cell header" t="expenditureHeatmap.fri">Fri</div>
-        <div class="heatmap-cell header" t="expenditureHeatmap.sat">Sat</div>
-        <div class="heatmap-cell header" t="expenditureHeatmap.sun">Sun</div>
-
-        <div
-          repeat.for="day of days"
-          click.delegate="select(day)"
-          class="heatmap-cell date ${day.isToday ? 'today' : ''} ${day.date === getSelectedDayDate ? 'selected' : ''}"
-          css="background: ${day.backgroundColor}; color: ${day.textColor};"
-        >
-          ${day.day}
+  <div class="container">
+    <div class="au-animate animate-fade-in animate-fade-out">
+      <div class="page-title-wrap">
+        <div class="side inactive medium">
+          <i class="fas fa-th"></i>
         </div>
+        <div t="expenditureHeatmap.expenditureHeatmap" class="page-title">Expenditure heatmap</div>
+        <a route-href="route: dashboard" class="back-button">
+          <i class="fas fa-times"></i>
+        </a>
       </div>
 
-      <div if.bind="loaded" class="au-animate animate-fade-in animate-fade-out">
-        <div class="heatmap-legend">
-          <div css="width: ${selectedExpenditureCaret}%;" class="heatmap-caret-wrap">
-            <i class="fas fa-caret-down"></i>
-          </div>
-          <div class="heatmap-legend-line"></div>
-          <div class="heatmap-legend-amounts">
-            <span>${minSpent | numberFormat:currency}</span>
-            <span>${maxSpent | numberFormat:currency}</span>
+      <div class="content-wrap">
+        <div class="heatmap ${loaded ? 'loaded' : ''}">
+          <div class="heatmap-cell header" t="expenditureHeatmap.mon">Mon</div>
+          <div class="heatmap-cell header" t="expenditureHeatmap.tue">Tue</div>
+          <div class="heatmap-cell header" t="expenditureHeatmap.wed">Wed</div>
+          <div class="heatmap-cell header" t="expenditureHeatmap.thu">Thu</div>
+          <div class="heatmap-cell header" t="expenditureHeatmap.fri">Fri</div>
+          <div class="heatmap-cell header" t="expenditureHeatmap.sat">Sat</div>
+          <div class="heatmap-cell header" t="expenditureHeatmap.sun">Sun</div>
+
+          <div repeat.for="day of days" click.delegate="select(day)"
+            class="heatmap-cell date ${day.isToday ? 'today' : ''} ${day.date === getSelectedDayDate ? 'selected' : ''}"
+            css="background: ${day.backgroundColor}; color: ${day.textColor};">
+            ${day.day}
           </div>
         </div>
 
-        <div class="expenditure-heatmap-table-title">${selectedDay.formattedDate}</div>
-        <table class="expenditure-heatmap-table">
-          <tbody>
-            <tr
-              repeat.for="expenditure of selectedDay.expenditures"
-              click.delegate="viewTransaction(expenditure.transactionId)"
-            >
-              <td>${expenditure.category}</td>
-              <td>${expenditure.description}</td>
-              <td class="amount-cell">${expenditure.amount | moneyFormat:currency}</td>
-            </tr>
-          </tbody>
-          <tfoot if.bind="selectedDay.expenditures.length > 1">
-            <tr>
-              <td colspan="3">
-                <!-- Space taker -->
-              </td>
-            </tr>
-            <tr>
-              <td colspan="3">${selectedDay.spent | moneyFormat:currency}</td>
-            </tr>
-          </tfoot>
-        </table>
+        <div if.bind="loaded" class="au-animate animate-fade-in animate-fade-out">
+          <div class="heatmap-legend">
+            <div css="width: ${selectedExpenditureCaret}%;" class="heatmap-caret-wrap">
+              <i class="fas fa-caret-down"></i>
+            </div>
+            <div class="heatmap-legend-line"></div>
+            <div class="heatmap-legend-amounts">
+              <span>${minSpent | numberFormat:currency}</span>
+              <span>${maxSpent | numberFormat:currency}</span>
+            </div>
+          </div>
+
+          <div class="expenditure-heatmap-table-title">${selectedDay.formattedDate}</div>
+          <table class="expenditure-heatmap-table">
+            <tbody>
+              <tr repeat.for="expenditure of selectedDay.expenditures"
+                click.delegate="viewTransaction(expenditure.transactionId)">
+                <td>${expenditure.category}</td>
+                <td>${expenditure.description}</td>
+                <td class="amount-cell">${expenditure.amount | moneyFormat:currency}</td>
+              </tr>
+            </tbody>
+            <tfoot if.bind="selectedDay.expenditures.length > 1">
+              <tr>
+                <td colspan="3">
+                  <!-- Space taker -->
+                </td>
+              </tr>
+              <tr>
+                <td colspan="3">${selectedDay.spent | moneyFormat:currency}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
       </div>
     </div>
   </div>

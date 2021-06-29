@@ -29,6 +29,7 @@
       font-size: inherit;
       line-height: 37px;
       cursor: pointer;
+      user-select: none;
 
       transition: background var(--transition), color var(--transition);
 

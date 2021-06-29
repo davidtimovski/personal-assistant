@@ -3,80 +3,84 @@
   <require from="./../resources/value-converters/money-format"></require>
   <require from="./../resources/value-converters/money-precise-format"></require>
 
-  <div class="au-animate animate-fade-in animate-fade-out">
-    <div class="page-title-wrap">
-      <div class="side inactive small">
-        <i class="fas fa-money-check-alt"></i>
-      </div>
-      <div t="accounts.accounts" class="page-title">Accounts</div>
-      <a route-href="route: dashboard" class="side back">
-        <i class="fas fa-times"></i>
-      </a>
-    </div>
-
-    <div class="content-wrap">
-
-      <div class="content-body">
-        <div if.bind="!accounts" class="double-circle-loading">
-          <div class="double-bounce1"></div>
-          <div class="double-bounce2"></div>
+  <div class="container">
+    <div class="au-animate animate-fade-in animate-fade-out">
+      <div class="page-title-wrap">
+        <div class="side inactive small">
+          <i class="fas fa-money-check-alt"></i>
         </div>
-
-        <div else>
-          <table class="editable-table accounts-table">
-            <thead if.bind="someAreInvestmentFunds">
-              <tr>
-                <th class="type-cell"></th>
-                <th class="left-col" t="name">Name</th>
-                <th click.delegate="toggleViewStocks()" class="right-col clickable-cell" t="[title,aria-label]accounts.toggleStockPriceStocks">
-                  <span if.bind="viewStocks" t="accounts.stocks">Stocks</span>
-                  <span else t="accounts.stockPrice">Stock price</span>
-                </th>
-                <th class="right-col" t="balance">Balance</th>
-                <th class="sync-icon-cell"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr repeat.for="account of accounts"
-                class.bind="account.id === getEditedId || account.id === getEditedId2 ? 'highlighted-row' : ''">
-                <td class="edit-link-cell">
-                  <a route-href="route: editAccount; params.bind: { id: account.id }" class="link" t="[title,aria-label]edit">
-                    <i class="fas fa-pencil-alt"></i>
-                  </a>
-                </td>
-                <td class="left-col">${account.name}</td>
-                <td class="right-col" if.bind="someAreInvestmentFunds">
-                  <span if.bind="viewStocks">${account.stocks}</span>
-                  <span else>${account.stockPrice | moneyPreciseFormat:currency}</span>
-                </td>
-                <td class="right-col">${account.balance | moneyFormat:currency}</td>
-                <td class="sync-icon-cell">
-                  <i if.bind="!account.synced" class="fas fa-sync-alt"></i>
-                </td>
-              </tr>
-            </tbody>
-            <tfoot if.bind="accounts.length > 1">
-              <tr>
-                <td colspan="4">${sum | moneyFormat:currency}</td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-      </div>
-
-      <div class="centering-wrap">
-        <a click.delegate="newAccount()" class="wide-button new-button ${syncing ? 'disabled' : ''}"
-          t="[title,aria-label]accounts.newAccount">
-          <i class="fas fa-plus"></i>
+        <div t="accounts.accounts" class="page-title">Accounts</div>
+        <a route-href="route: dashboard" class="back-button">
+          <i class="fas fa-times"></i>
         </a>
       </div>
 
-      <div if.bind="accounts && accounts.length > 0">
-        <hr>
+      <div class="content-wrap">
 
-        <a route-href="route: transferFunds" class="wide-button" t="accounts.transferFunds">Transfer funds</a>
+        <div class="content-body">
+          <div if.bind="!accounts" class="double-circle-loading">
+            <div class="double-bounce1"></div>
+            <div class="double-bounce2"></div>
+          </div>
+
+          <div else>
+            <table class="editable-table accounts-table">
+              <thead if.bind="someAreInvestmentFunds">
+                <tr>
+                  <th class="type-cell"></th>
+                  <th class="left-col" t="name">Name</th>
+                  <th click.delegate="toggleViewStocks()" class="right-col clickable-cell"
+                    t="[title,aria-label]accounts.toggleStockPriceStocks">
+                    <span if.bind="viewStocks" t="accounts.stocks">Stocks</span>
+                    <span else t="accounts.stockPrice">Stock price</span>
+                  </th>
+                  <th class="right-col" t="balance">Balance</th>
+                  <th class="sync-icon-cell"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr repeat.for="account of accounts"
+                  class.bind="account.id === getEditedId || account.id === getEditedId2 ? 'highlighted-row' : ''">
+                  <td class="edit-link-cell">
+                    <a route-href="route: editAccount; params.bind: { id: account.id }" class="link"
+                      t="[title,aria-label]edit">
+                      <i class="fas fa-pencil-alt"></i>
+                    </a>
+                  </td>
+                  <td class="left-col">${account.name}</td>
+                  <td class="right-col" if.bind="someAreInvestmentFunds">
+                    <span if.bind="viewStocks">${account.stocks}</span>
+                    <span else>${account.stockPrice | moneyPreciseFormat:currency}</span>
+                  </td>
+                  <td class="right-col">${account.balance | moneyFormat:currency}</td>
+                  <td class="sync-icon-cell">
+                    <i if.bind="!account.synced" class="fas fa-sync-alt"></i>
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot if.bind="accounts.length > 1">
+                <tr>
+                  <td colspan="4">${sum | moneyFormat:currency}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        <div class="centering-wrap">
+          <a click.delegate="newAccount()" class="new-button ${syncing ? 'disabled' : ''}"
+            t="[title,aria-label]accounts.newAccount">
+            <i class="fas fa-plus"></i>
+          </a>
+        </div>
+
+        <div if.bind="accounts && accounts.length > 0">
+          <hr>
+
+          <a route-href="route: transferFunds" class="wide-button" t="accounts.transferFunds">Transfer funds</a>
+        </div>
+
       </div>
-
     </div>
   </div>
 </template>

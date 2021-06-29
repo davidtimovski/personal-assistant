@@ -2,64 +2,67 @@
   <require from="./../resources/elements/empty-list-message.html"></require>
   <require from="./../resources/value-converters/number-format"></require>
 
-  <div class="au-animate animate-fade-in animate-fade-out">
-    <div class="page-title-wrap">
-      <div class="side inactive medium">
-        <i class="far fa-calendar-alt"></i>
-      </div>
-      <div t="upcomingExpenses.upcomingExpenses" class="page-title">Upcoming expenses</div>
-      <a route-href="route: dashboard" class="side back">
-        <i class="fas fa-times"></i>
-      </a>
-    </div>
-
-    <div class="content-wrap">
-
-      <div class="content-body">
-        <div if.bind="!upcomingExpenses" class="double-circle-loading">
-          <div class="double-bounce1"></div>
-          <div class="double-bounce2"></div>
+  <div class="container">
+    <div class="au-animate animate-fade-in animate-fade-out">
+      <div class="page-title-wrap">
+        <div class="side inactive medium">
+          <i class="far fa-calendar-alt"></i>
         </div>
-
-        <table if.bind="upcomingExpenses && upcomingExpenses.length > 0" class="editable-table">
-          <thead>
-            <tr>
-              <th class="edit-link-cell"></th>
-              <th t="upcomingExpenses.month">Month</th>
-              <th t="amount">Amount</th>
-              <th t="category">Category</th>
-              <th class="sync-icon-cell"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr repeat.for="upcomingExpense of upcomingExpenses"
-              class.bind="upcomingExpense.id === getEditedId ? 'highlighted-row' : ''">
-              <td class="edit-link-cell">
-                <a route-href="route: editUpcomingExpense; params.bind: { id: upcomingExpense.id }" class="link" t="[title,aria-label]edit">
-                  <i class="fas fa-pencil-alt"></i>
-                </a>
-              </td>
-              <td>${upcomingExpense.date}</td>
-              <td>${upcomingExpense.amount | numberFormat:currency}</td>
-              <td>${upcomingExpense.category}</td>
-              <td class="sync-icon-cell">
-                <i if.bind="!upcomingExpense.synced" class="fas fa-sync-alt"></i>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <empty-list-message if.bind="upcomingExpenses.length === 0" message.bind="emptyListMessage">
-        </empty-list-message>
-      </div>
-
-      <div class="centering-wrap">
-        <a click.delegate="newUpcomingExpense()" class="wide-button new-button ${syncing ? 'disabled' : ''}"
-          t="[title,aria-label]upcomingExpenses.newUpcomingExpense">
-          <i class="fas fa-plus"></i>
+        <div t="upcomingExpenses.upcomingExpenses" class="page-title">Upcoming expenses</div>
+        <a route-href="route: dashboard" class="back-button">
+          <i class="fas fa-times"></i>
         </a>
       </div>
 
+      <div class="content-wrap">
+
+        <div class="content-body">
+          <div if.bind="!upcomingExpenses" class="double-circle-loading">
+            <div class="double-bounce1"></div>
+            <div class="double-bounce2"></div>
+          </div>
+
+          <table if.bind="upcomingExpenses && upcomingExpenses.length > 0" class="editable-table">
+            <thead>
+              <tr>
+                <th class="edit-link-cell"></th>
+                <th t="upcomingExpenses.month">Month</th>
+                <th t="amount">Amount</th>
+                <th t="category">Category</th>
+                <th class="sync-icon-cell"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr repeat.for="upcomingExpense of upcomingExpenses"
+                class.bind="upcomingExpense.id === getEditedId ? 'highlighted-row' : ''">
+                <td class="edit-link-cell">
+                  <a route-href="route: editUpcomingExpense; params.bind: { id: upcomingExpense.id }" class="link"
+                    t="[title,aria-label]edit">
+                    <i class="fas fa-pencil-alt"></i>
+                  </a>
+                </td>
+                <td>${upcomingExpense.date}</td>
+                <td>${upcomingExpense.amount | numberFormat:currency}</td>
+                <td>${upcomingExpense.category}</td>
+                <td class="sync-icon-cell">
+                  <i if.bind="!upcomingExpense.synced" class="fas fa-sync-alt"></i>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <empty-list-message if.bind="upcomingExpenses.length === 0" message.bind="emptyListMessage">
+          </empty-list-message>
+        </div>
+
+        <div class="centering-wrap">
+          <a click.delegate="newUpcomingExpense()" class="new-button ${syncing ? 'disabled' : ''}"
+            t="[title,aria-label]upcomingExpenses.newUpcomingExpense">
+            <i class="fas fa-plus"></i>
+          </a>
+        </div>
+
+      </div>
     </div>
   </div>
 </template>

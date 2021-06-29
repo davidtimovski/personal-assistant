@@ -2,66 +2,70 @@
   <require from="../static/styles/pages/categories.scss"></require>
   <require from="./../resources/elements/empty-list-message.html"></require>
 
-  <div class="au-animate animate-fade-in animate-fade-out">
-    <div class="page-title-wrap">
-      <div class="side inactive medium">
-        <i class="fas fa-inbox"></i>
-      </div>
-      <div t="categories.categories" class="page-title">Categories</div>
-      <a route-href="route: dashboard" class="side back">
-        <i class="fas fa-times"></i>
-      </a>
-    </div>
-
-    <div class="content-wrap">
-
-      <div class="content-body">
-        <div if.bind="!categories" class="double-circle-loading">
-          <div class="double-bounce1"></div>
-          <div class="double-bounce2"></div>
+  <div class="container">
+    <div class="au-animate animate-fade-in animate-fade-out">
+      <div class="page-title-wrap">
+        <div class="side inactive medium">
+          <i class="fas fa-inbox"></i>
         </div>
-
-        <div repeat.for="category of categories">
-          <div class="category-wrap">
-            <a class="category au-animate animate-fade-in ${category.id === getEditedId ? 'highlighted-row' : ''}"
-              route-href="route: editCategory; params.bind: { id: category.id }">
-              <span class="name">${category.name}</span>
-              <span if.bind="category.generateUpcomingExpense" class="generate-upcoming-indicator" t="[title,aria-label]categories.generatingUpcomingExpenses">
-                <i class="far fa-calendar-alt"></i>
-              </span>
-            </a>
-
-            <div class="sync">
-              <i if.bind="!category.synced" class="fas fa-sync-alt"></i>
-            </div>
-          </div>
-
-          <!-- SUB -->
-          <div repeat.for="sub of category.subCategories" class="subcategory-wrap">
-            <a class="category au-animate animate-fade-in ${sub.id === getEditedId ? 'highlighted-row' : ''}"
-              route-href="route: editCategory; params.bind: { id: sub.id }">
-              <span class="name">${sub.name}</span>
-              <span if.bind="sub.generateUpcomingExpense" class="generate-upcoming-indicator" t="[title,aria-label]categories.generatingUpcomingExpenses">
-                <i class="far fa-calendar-alt"></i>
-              </span>
-            </a>
-
-            <div class="sync">
-              <i if.bind="!sub.synced" class="fas fa-sync-alt"></i>
-            </div>
-          </div>
-        </div>
-
-        <empty-list-message if.bind="categories.length === 0" message.bind="emptyListMessage"></empty-list-message>
-      </div>
-
-      <div class="centering-wrap">
-        <a click.delegate="newCategory()" class="wide-button new-button ${syncing ? 'disabled' : ''}"
-          t="[title,aria-label]categories.newCategory">
-          <i class="fas fa-plus"></i>
+        <div t="categories.categories" class="page-title">Categories</div>
+        <a route-href="route: dashboard" class="back-button">
+          <i class="fas fa-times"></i>
         </a>
       </div>
 
+      <div class="content-wrap">
+
+        <div class="content-body">
+          <div if.bind="!categories" class="double-circle-loading">
+            <div class="double-bounce1"></div>
+            <div class="double-bounce2"></div>
+          </div>
+
+          <div repeat.for="category of categories">
+            <div class="category-wrap">
+              <a class="category au-animate animate-fade-in ${category.id === getEditedId ? 'highlighted-row' : ''}"
+                route-href="route: editCategory; params.bind: { id: category.id }">
+                <span class="name">${category.name}</span>
+                <span if.bind="category.generateUpcomingExpense" class="generate-upcoming-indicator"
+                  t="[title,aria-label]categories.generatingUpcomingExpenses">
+                  <i class="far fa-calendar-alt"></i>
+                </span>
+              </a>
+
+              <div class="sync">
+                <i if.bind="!category.synced" class="fas fa-sync-alt"></i>
+              </div>
+            </div>
+
+            <!-- SUB -->
+            <div repeat.for="sub of category.subCategories" class="subcategory-wrap">
+              <a class="category au-animate animate-fade-in ${sub.id === getEditedId ? 'highlighted-row' : ''}"
+                route-href="route: editCategory; params.bind: { id: sub.id }">
+                <span class="name">${sub.name}</span>
+                <span if.bind="sub.generateUpcomingExpense" class="generate-upcoming-indicator"
+                  t="[title,aria-label]categories.generatingUpcomingExpenses">
+                  <i class="far fa-calendar-alt"></i>
+                </span>
+              </a>
+
+              <div class="sync">
+                <i if.bind="!sub.synced" class="fas fa-sync-alt"></i>
+              </div>
+            </div>
+          </div>
+
+          <empty-list-message if.bind="categories.length === 0" message.bind="emptyListMessage"></empty-list-message>
+        </div>
+
+        <div class="centering-wrap">
+          <a click.delegate="newCategory()" class="new-button ${syncing ? 'disabled' : ''}"
+            t="[title,aria-label]categories.newCategory">
+            <i class="fas fa-plus"></i>
+          </a>
+        </div>
+
+      </div>
     </div>
   </div>
 </template>

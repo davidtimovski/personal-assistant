@@ -5,7 +5,7 @@
 
   input {
     padding-right: 42px;
-    width: calc(100% - 54px);
+    width: calc(100% - 56px);
   }
 
   i {
@@ -13,10 +13,9 @@
     position: absolute;
     top: 0;
     right: 0;
-    padding: 10px 13px;
+    padding: 11px 13px;
     color: var(--primary-color);
     cursor: pointer;
-    transition: color var(--transition);
 
     &:hover {
       color: var(--primary-color-dark);
@@ -53,7 +52,6 @@
     font-size: 20px;
     color: #fff;
     cursor: pointer;
-    transition: background var(--transition);
 
     &:hover {
       background: var(--primary-color-dark);
@@ -79,11 +77,11 @@
   .description-filter-wrap {
     input {
       padding-right: 48px;
-      width: calc(100% - 60px);
+      width: calc(100% - 62px);
     }
 
     i {
-      padding: 12px 15px;
+      padding: 13px 15px;
     }
   }
 }

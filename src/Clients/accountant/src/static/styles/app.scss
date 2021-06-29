@@ -149,7 +149,6 @@ textarea {
 
 .editable-table {
   width: 100%;
-  margin-top: 20px;
 
   tbody tr:nth-child(odd),
   tbody tr:hover {
@@ -190,7 +189,6 @@ textarea {
     padding: 5px;
     font-size: 1.3rem;
     color: var(--primary-color);
-    transition: color var(--transition-quick);
 
     &:hover {
       color: var(--primary-color-dark);
@@ -242,7 +240,7 @@ td.sync-icon-cell {
 .multi-radio-wrap {
   display: flex;
   border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
+  border: 1px solid #ddd;
 }
 .multi-radio-part {
   flex-grow: 1;
@@ -254,12 +252,13 @@ td.sync-icon-cell {
   label {
     display: block;
     position: relative;
-    background: #fafafa;
+    background: #fff;
     padding: 0;
     text-align: center;
     font-size: inherit;
     line-height: 37px;
     cursor: pointer;
+    user-select: none;
 
     transition: background var(--transition), color var(--transition);
 

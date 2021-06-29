@@ -1,108 +1,112 @@
 <template>
-  <div class="au-animate animate-fade-in animate-fade-out">
-    <div class="page-title-wrap">
-      <div class="side inactive small">
-        <i class="fas fa-pencil-alt"></i>
-      </div>
-      <div class="page-title">
-        <span if.bind="isNewCategory" t="editCategory.newCategory"></span>
-        <span else>
-          <span t="editCategory.edit">Edit</span>&nbsp;<span class="colored-text">${category.name}</span>
-        </span>
-      </div>
-      <a route-href="route: categories" class="side back">
-        <i class="fas fa-times"></i>
-      </a>
-    </div>
-
-    <div class="content-wrap">
-
-      <div if.bind="!category" class="double-circle-loading">
-        <div class="double-bounce1"></div>
-        <div class="double-bounce2"></div>
+  <div class="container">
+    <div class="au-animate animate-fade-in animate-fade-out">
+      <div class="page-title-wrap">
+        <div class="side inactive small">
+          <i class="fas fa-pencil-alt"></i>
+        </div>
+        <div class="page-title">
+          <span if.bind="isNewCategory" t="editCategory.newCategory"></span>
+          <span else>
+            <span t="editCategory.edit">Edit</span>&nbsp;<span class="colored-text">${category.name}</span>
+          </span>
+        </div>
+        <a route-href="route: categories" class="back-button">
+          <i class="fas fa-times"></i>
+        </a>
       </div>
 
-      <div else>
-        <div show.bind="!connTracker.isOnline && category.synced" class="message warning">
-          <i class="fas fa-exclamation-triangle"></i>
-          <span t="whileOfflineCannotModify">While offline you cannot modify data that has already been synced with the
-            cloud.</span>
+      <div class="content-wrap">
+
+        <div if.bind="!category" class="double-circle-loading">
+          <div class="double-bounce1"></div>
+          <div class="double-bounce2"></div>
         </div>
 
-        <div if.bind="isParent" class="message info">
-          <i class="fas fa-info-circle"></i>
-          <span t="editCategory.thisIsAParentCategory">This is a parent category.</span>
-        </div>
-
-        <form submit.trigger="save()">
-          <div class="form-control">
-            <input type="text" value.bind="category.name & validate" ref="nameInput" maxlength="30"
-              class.bind="nameIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]editCategory.categoryName"
-              required>
+        <div else>
+          <div show.bind="!connTracker.isOnline && category.synced" class="message warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span t="whileOfflineCannotModify">While offline you cannot modify data that has already been synced with
+              the
+              cloud.</span>
           </div>
-          <div if.bind="!isParent" class="form-control inline">
-            <label for="parent-category" t="editCategory.parentCategory">Parent category</label>
-            <div class="loadable-select ${parentCategoryOptions ? 'loaded' : ''}">
-              <select id="parent-category" value.bind="category.parentId" disabled.bind="!parentCategoryOptions"
-                class="category-select">
-                <option model.bind="category.id" repeat.for="category of parentCategoryOptions">${category.name}</option>
-              </select>
-              <i class="fas fa-circle-notch fa-spin"></i>
+
+          <div if.bind="isParent" class="message info">
+            <i class="fas fa-info-circle"></i>
+            <span t="editCategory.thisIsAParentCategory">This is a parent category.</span>
+          </div>
+
+          <form submit.trigger="save()">
+            <div class="form-control">
+              <input type="text" value.bind="category.name & validate" ref="nameInput" maxlength="30"
+                class.bind="nameIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]editCategory.categoryName"
+                required>
             </div>
-          </div>
-          <div class="form-control inline">
-            <label for="type" t="editCategory.type">Type</label>
-            <select id="type" value.bind="category.type" change.delegate="typeChanged()" class="category-select">
-              <option model.bind="type.id" repeat.for="type of typeOptions">${type.name}</option>
-            </select>
-          </div>
-          <div class="form-control">
-            <label class="toggle ${category.type === 1 ? 'disabled' : ''}">
-              <span t="editCategory.generateUpcomingExpense">Generate upcoming expense</span>
-              <div class="toggle-content">
-                <input type="checkbox" checked.bind="category.generateUpcomingExpense"
-                  disabled.bind="category.type === 1">
-                <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                  <path
-                    d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
-                </svg>
-                <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                  <path
-                    d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                    fill-rule="evenodd" clip-rule="evenodd" />
-                </svg>
+            <div if.bind="!isParent" class="form-control inline">
+              <label for="parent-category" t="editCategory.parentCategory">Parent category</label>
+              <div class="loadable-select ${parentCategoryOptions ? 'loaded' : ''}">
+                <select id="parent-category" value.bind="category.parentId" disabled.bind="!parentCategoryOptions"
+                  class="category-select">
+                  <option model.bind="category.id" repeat.for="category of parentCategoryOptions">${category.name}
+                  </option>
+                </select>
+                <i class="fas fa-circle-notch fa-spin"></i>
               </div>
-            </label>
+            </div>
+            <div class="form-control inline">
+              <label for="type" t="editCategory.type">Type</label>
+              <select id="type" value.bind="category.type" change.delegate="typeChanged()" class="category-select">
+                <option model.bind="type.id" repeat.for="type of typeOptions">${type.name}</option>
+              </select>
+            </div>
+            <div class="form-control">
+              <label class="toggle ${category.type === 1 ? 'disabled' : ''}">
+                <span t="editCategory.generateUpcomingExpense">Generate upcoming expense</span>
+                <div class="toggle-content">
+                  <input type="checkbox" checked.bind="category.generateUpcomingExpense"
+                    disabled.bind="category.type === 1">
+                  <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
+                    <path
+                      d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
+                  </svg>
+                  <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
+                    <path
+                      d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
+                      fill-rule="evenodd" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              </label>
+            </div>
+          </form>
+
+          <hr>
+
+          <div show.bind="deleteInProgress && transactionsWarningVisible" class="delete-confirmation-alert">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span t="[html]editCategory.categoryHasTransactions"></span>
           </div>
-        </form>
 
-        <hr>
-
-        <div show.bind="deleteInProgress && transactionsWarningVisible" class="delete-confirmation-alert">
-          <i class="fas fa-exclamation-triangle"></i>
-          <span t="[html]editCategory.categoryHasTransactions"></span>
+          <div class="save-delete-wrap">
+            <a if.bind="!deleteInProgress" click.delegate="save()"
+              class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
+              <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
+                <i class="fas fa-circle-notch fa-spin"></i>
+              </span>
+              <span>${saveButtonText}</span>
+            </a>
+            <a if.bind="!isNewCategory" click.delegate="delete()"
+              class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}">
+              <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
+                <i class="fas fa-circle-notch fa-spin"></i>
+              </span>
+              <span>${deleteButtonText}</span>
+            </a>
+            <button type="button" if.bind="isNewCategory || deleteInProgress" click.delegate="cancel()" t="cancel"
+              class="button secondary-button">Cancel</button>
+          </div>
         </div>
 
-        <div class="save-delete-wrap">
-          <a if.bind="!deleteInProgress" click.delegate="save()"
-            class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
-            <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
-              <i class="fas fa-circle-notch fa-spin"></i>
-            </span>
-            <span>${saveButtonText}</span>
-          </a>
-          <a if.bind="!isNewCategory" click.delegate="delete()"
-            class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}">
-            <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
-              <i class="fas fa-circle-notch fa-spin"></i>
-            </span>
-            <span>${deleteButtonText}</span>
-          </a>
-          <button type="button" if.bind="isNewCategory || deleteInProgress" click.delegate="cancel()" t="cancel"
-            class="button secondary-button">Cancel</button>
-        </div>
       </div>
-
     </div>
   </div>
 </template>

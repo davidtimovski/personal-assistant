@@ -1,94 +1,97 @@
 <template>
-  <div class="au-animate animate-fade-in animate-fade-out">
-    <div class="page-title-wrap">
-      <div class="side inactive small">
-        <i class="fas fa-pencil-alt"></i>
-      </div>
-      <div class="page-title">
-        <span if.bind="isNewDebt" t="editDebt.newDebt"></span>
-        <span else t="editDebt.editDebt"></span>
-      </div>
-      <a route-href="route: debt" class="side back">
-        <i class="fas fa-times"></i>
-      </a>
-    </div>
-
-    <div class="content-wrap">
-
-      <div if.bind="!model" class="double-circle-loading">
-        <div class="double-bounce1"></div>
-        <div class="double-bounce2"></div>
+  <div class="container">
+    <div class="au-animate animate-fade-in animate-fade-out">
+      <div class="page-title-wrap">
+        <div class="side inactive small">
+          <i class="fas fa-pencil-alt"></i>
+        </div>
+        <div class="page-title">
+          <span if.bind="isNewDebt" t="editDebt.newDebt"></span>
+          <span else t="editDebt.editDebt"></span>
+        </div>
+        <a route-href="route: debt" class="back-button">
+          <i class="fas fa-times"></i>
+        </a>
       </div>
 
-      <div else>
-        <div show.bind="!connTracker.isOnline && model.synced" class="message warning">
-          <i class="fas fa-exclamation-triangle"></i>
-          <span t="whileOfflineCannotModify">While offline you cannot modify data that has already been synced with the
-            cloud.</span>
+      <div class="content-wrap">
+
+        <div if.bind="!model" class="double-circle-loading">
+          <div class="double-bounce1"></div>
+          <div class="double-bounce2"></div>
         </div>
 
-        <form submit.trigger="save()">
-          <div class="form-control">
-            <input type="text" value.bind="model.person & validate" ref="personInput" maxlength="20"
-              class.bind="personIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]editDebt.person" required>
+        <div else>
+          <div show.bind="!connTracker.isOnline && model.synced" class="message warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span t="whileOfflineCannotModify">While offline you cannot modify data that has already been synced with
+              the
+              cloud.</span>
           </div>
-          <div class="form-control inline">
-            <label for="amount" t="amount">Amount</label>
-            <compose view-model="../resources/components/amount-input" view="../resources/components/amount-input.html"
-              model.bind="model"></compose>
-          </div>
-          <div class="form-control with-descriptor">
-            <div class="setting-descriptor" t="editDebt.iAmThe">I am a..</div>
 
-            <div class="double-radio-wrap">
-              <div class="double-radio-side">
-                <label class.bind="!model.userIsDebtor ? 'selected' : ''">
-                  <span t="editDebt.lender">Lender</span>
-                  <input type="radio" name="debtorLenderToggle" model.bind="false" checked.bind="model.userIsDebtor">
-                  <span class="checkbox-icon">
-                    <i class="fas fa-check"></i>
-                  </span>
-                </label>
-              </div>
-              <div class="double-radio-side">
-                <label class.bind="model.userIsDebtor ? 'selected' : ''">
-                  <span t="editDebt.debtor">Debtor</span>
-                  <input type="radio" name="debtorLenderToggle" model.bind="true" checked.bind="model.userIsDebtor">
-                  <span class="checkbox-icon">
-                    <i class="fas fa-check"></i>
-                  </span>
-                </label>
+          <form submit.trigger="save()">
+            <div class="form-control">
+              <input type="text" value.bind="model.person & validate" ref="personInput" maxlength="20"
+                class.bind="personIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]editDebt.person" required>
+            </div>
+            <div class="form-control inline">
+              <label for="amount" t="amount">Amount</label>
+              <compose view-model="../resources/components/amount-input"
+                view="../resources/components/amount-input.html" model.bind="model"></compose>
+            </div>
+            <div class="form-control with-descriptor">
+              <div class="setting-descriptor" t="editDebt.iAmThe">I am a..</div>
+
+              <div class="double-radio-wrap">
+                <div class="double-radio-side">
+                  <label class.bind="!model.userIsDebtor ? 'selected' : ''">
+                    <span t="editDebt.lender">Lender</span>
+                    <input type="radio" name="debtorLenderToggle" model.bind="false" checked.bind="model.userIsDebtor">
+                    <span class="checkbox-icon">
+                      <i class="fas fa-check"></i>
+                    </span>
+                  </label>
+                </div>
+                <div class="double-radio-side">
+                  <label class.bind="model.userIsDebtor ? 'selected' : ''">
+                    <span t="editDebt.debtor">Debtor</span>
+                    <input type="radio" name="debtorLenderToggle" model.bind="true" checked.bind="model.userIsDebtor">
+                    <span class="checkbox-icon">
+                      <i class="fas fa-check"></i>
+                    </span>
+                  </label>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="form-control">
-            <textarea value.bind="model.description" maxlength="250" class="description-textarea"
-              t="[placeholder,aria-label]description"></textarea>
-          </div>
-        </form>
+            <div class="form-control">
+              <textarea value.bind="model.description" maxlength="250" class="description-textarea"
+                t="[placeholder,aria-label]description"></textarea>
+            </div>
+          </form>
 
-        <hr>
+          <hr>
 
-        <div class="save-delete-wrap">
-          <a if.bind="!deleteInProgress" click.delegate="save()"
-            class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
-            <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
-              <i class="fas fa-circle-notch fa-spin"></i>
-            </span>
-            <span>${saveButtonText}</span>
-          </a>
-          <a if.bind="!isNewDebt" click.delegate="delete()"
-            class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}">
-            <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
-              <i class="fas fa-circle-notch fa-spin"></i>
-            </span>
-            <span>${deleteButtonText}</span>
-          </a>
-          <button type="button" if.bind="isNewDebt || deleteInProgress" click.delegate="cancel()" t="cancel"
-            class="button secondary-button">Cancel</button>
+          <div class="save-delete-wrap">
+            <a if.bind="!deleteInProgress" click.delegate="save()"
+              class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
+              <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
+                <i class="fas fa-circle-notch fa-spin"></i>
+              </span>
+              <span>${saveButtonText}</span>
+            </a>
+            <a if.bind="!isNewDebt" click.delegate="delete()"
+              class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}">
+              <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
+                <i class="fas fa-circle-notch fa-spin"></i>
+              </span>
+              <span>${deleteButtonText}</span>
+            </a>
+            <button type="button" if.bind="isNewDebt || deleteInProgress" click.delegate="cancel()" t="cancel"
+              class="button secondary-button">Cancel</button>
+          </div>
         </div>
-      </div>
 
+      </div>
     </div>
   </div>
 </template>
