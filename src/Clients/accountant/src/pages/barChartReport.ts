@@ -1,6 +1,6 @@
 import { inject } from "aurelia-framework";
 import { I18N } from "aurelia-i18n";
-import * as Chart from "chart.js";
+import { BarController, BarElement, CategoryScale, Chart, LinearScale } from "chart.js";
 
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
 
@@ -44,9 +44,8 @@ export class BarChartReport {
     from.setDate(1);
     this.fromDate = DateHelper.format(from);
 
-    Chart.defaults.global.defaultFontFamily = '"Didact Gothic", sans-serif';
-    Chart.defaults.global.legend.display = false;
-    Chart.defaults.global.animation.duration = 800;
+    Chart.register(BarController, BarElement, CategoryScale, LinearScale);
+    Chart.defaults.font.family = '"Didact Gothic", sans-serif';
   }
 
   activate() {
@@ -78,7 +77,7 @@ export class BarChartReport {
     this.chart = new Chart(this.canvasCtx, {
       type: "bar",
       data: {
-        datasets: [{}],
+        datasets: [{ data: [] }],
       },
     });
 

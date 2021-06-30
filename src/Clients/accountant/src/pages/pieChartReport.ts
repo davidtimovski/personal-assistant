@@ -1,7 +1,7 @@
 import { inject } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
-import * as Chart from "chart.js";
+import { ArcElement, Chart, PieController } from "chart.js";
 import { connectTo } from "aurelia-store";
 
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
@@ -44,9 +44,8 @@ export class PieChartReport {
 
     this.toDate = this.maxDate = DateHelper.format(new Date());
 
-    Chart.defaults.global.defaultFontFamily = '"Didact Gothic", sans-serif';
-    Chart.defaults.global.legend.display = false;
-    Chart.defaults.global.animation.duration = 800;
+    Chart.register(ArcElement, PieController);
+    Chart.defaults.font.family = '"Didact Gothic", sans-serif';
   }
 
   activate() {
@@ -60,7 +59,8 @@ export class PieChartReport {
       data: {
         datasets: [
           {
-            backgroundColor: this.colors,
+            data: [],
+            backgroundColor: []
           },
         ],
       },
@@ -110,7 +110,10 @@ export class PieChartReport {
         this.items = items;
 
         for (let i = 0; i < flatItems.length; i++) {
-          (<any>flatItems[i]).color = i < this.colors.length ? this.colors[i] : "#e0e0e0";
+          const color = i < this.colors.length ? this.colors[i] : "#e0e0e0";
+
+          (<any>flatItems[i]).color = color;
+          this.chart.data.datasets[0].backgroundColor[i] = color;
 
           labels.push(flatItems[i].categoryName);
           amounts.push(flatItems[i].amount);
