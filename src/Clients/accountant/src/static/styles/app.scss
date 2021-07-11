@@ -12,6 +12,14 @@
   --transfer-color: #6597f5;
 }
 
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+  background: #f9f8fe;
+}
+
 .double-bounce1,
 .double-bounce2 {
   background-color: #bb8aff;
@@ -97,6 +105,9 @@ form input[type="date"] {
 form {
   .amount-input {
     width: 80px;
+    border-right: none;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
     text-align: center;
   }
 
@@ -291,7 +302,7 @@ td.sync-icon-cell {
   margin-top: 5px;
 
   &.active {
-    background: #f1f1f1;
+    background: #f6f6f6;
     border-radius: var(--border-radius);
     box-shadow: inset var(--box-shadow);
     padding: 10px 12px;
