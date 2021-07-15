@@ -403,7 +403,7 @@ export class List {
 
   // Used to delay UI update if server responds too quickly
   executeAfterDelay(callback: () => void, startTime: Date) {
-    const delayMs = 500;
+    const delayMs = 600;
     const timeTaken = new Date().getTime() - startTime.getTime();
     const sleepTime = delayMs - timeTaken;
 

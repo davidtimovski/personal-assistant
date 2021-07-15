@@ -130,7 +130,12 @@
 
   &.disappearing {
     transition: opacity 500ms;
+    transition-delay: 300ms;
     opacity: 0 !important;
+
+    &:not(.completed) .name {
+      text-decoration: line-through;
+    }
   }
 
   &-assignee-image {

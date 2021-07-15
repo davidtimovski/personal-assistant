@@ -1,11 +1,6 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import {
-  ValidationController,
-  validateTrigger,
-  ValidationRules,
-  ControllerValidateResult,
-} from "aurelia-validation";
+import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
@@ -20,14 +15,7 @@ import { AssigneeOption } from "models/viewmodels/assigneeOption";
 import * as environment from "../../config/environment.json";
 import * as Actions from "utils/state/actions";
 
-@inject(
-  Router,
-  TasksService,
-  ListsService,
-  ValidationController,
-  I18N,
-  EventAggregator
-)
+@inject(Router, TasksService, ListsService, ValidationController, I18N, EventAggregator)
 export class EditTask {
   private taskId: number;
   private model: EditTaskModel;
@@ -73,11 +61,9 @@ export class EditTask {
       this.originalTaskJson = JSON.stringify(this.model);
 
       if (this.model.isInSharedList) {
-        this.listsService
-          .getMembersAsAssigneeOptions(this.model.listId)
-          .then((assigneeOptions) => {
-            this.assigneeOptions = assigneeOptions;
-          });
+        this.listsService.getMembersAsAssigneeOptions(this.model.listId).then((assigneeOptions) => {
+          this.assigneeOptions = assigneeOptions;
+        });
       }
 
       this.recipesText = this.model.recipes.join(", ");
@@ -98,25 +84,14 @@ export class EditTask {
     }
   }
 
-  @computedFrom(
-    "model.name",
-    "model.listId",
-    "model.isOneTime",
-    "model.isPrivate",
-    "model.assignedToUserId"
-  )
+  @computedFrom("model.name", "model.listId", "model.isOneTime", "model.isPrivate", "model.assignedToUserId")
   get canSave() {
-    return (
-      !ValidationUtil.isEmptyOrWhitespace(this.model.name) &&
-      JSON.stringify(this.model) !== this.originalTaskJson
-    );
+    return !ValidationUtil.isEmptyOrWhitespace(this.model.name) && JSON.stringify(this.model) !== this.originalTaskJson;
   }
 
   @computedFrom("model.assignedToUserId")
   get assignToUserLabel() {
-    return this.model.assignedToUserId
-      ? this.i18n.tr("editTask.assignedToUser")
-      : this.i18n.tr("editTask.assignToUser");
+    return this.model.assignedToUserId ? this.i18n.tr("editTask.assignedTo") : this.i18n.tr("editTask.assignToUser");
   }
 
   @computedFrom("model.listId", "model.isPrivate")
@@ -125,17 +100,13 @@ export class EditTask {
   }
 
   listChanged() {
-    const selectedList = this.listOptions.find(
-      (x) => x.id === this.model.listId
-    );
+    const selectedList = this.listOptions.find((x) => x.id === this.model.listId);
     this.model.isInSharedList = selectedList.isShared;
 
     if (this.model.isInSharedList) {
-      this.listsService
-        .getMembersAsAssigneeOptions(this.model.listId)
-        .then((assigneeOptions) => {
-          this.assigneeOptions = assigneeOptions;
-        });
+      this.listsService.getMembersAsAssigneeOptions(this.model.listId).then((assigneeOptions) => {
+        this.assigneeOptions = assigneeOptions;
+      });
     } else {
       this.assigneeOptions = [];
     }
@@ -185,10 +156,7 @@ export class EditTask {
 
       await Actions.getLists(this.listsService);
 
-      this.eventAggregator.publish(
-        AlertEvents.ShowSuccess,
-        "editTask.deleteSuccessful"
-      );
+      this.eventAggregator.publish(AlertEvents.ShowSuccess, "editTask.deleteSuccessful");
       this.router.navigateToRoute("list", { id: this.model.listId });
     } else {
       if (this.model.recipes.length > 0) {

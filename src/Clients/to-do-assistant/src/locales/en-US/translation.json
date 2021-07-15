@@ -124,7 +124,7 @@
     "deleteWhenDone": "Delete when done",
     "taskIsPrivate": "Task is private",
     "assignToUser": "Assign to user",
-    "assignedToUser": "Assigned to user",
+    "assignedTo": "Assigned to",
     "nobody": "Nobody",
     "taskUsedAsIngredientInRecipes": "This task is used as an ingredient in the following recipes in <span class=\"cooking-assistant-color\">Cooking Assistant</span>: ",
     "deletingItWillUnlinkIt": "Deleting it will unlink it from <span class=\"cooking-assistant-color\">Cooking Assistant</span>.",

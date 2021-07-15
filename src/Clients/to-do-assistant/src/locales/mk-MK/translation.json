@@ -126,7 +126,7 @@
     "deleteWhenDone": "Избриши при завршување",
     "taskIsPrivate": "Задачата е приватна",
     "assignToUser": "Додели на корисник",
-    "assignedToUser": "Доделена на корисник",
+    "assignedTo": "Доделена на",
     "nobody": "Никој",
     "taskUsedAsIngredientInRecipes": "Оваа задача се користи како состојка во следните рецепти во <span class=\"cooking-assistant-color\">Cooking Assistant</span>: ",
     "deletingItWillUnlinkIt": "Доколку ја избришете ќе биде откачена од <span class=\"cooking-assistant-color\">Cooking Assistant</span>.",
