@@ -17,7 +17,7 @@ input[type="number"],
 input[type="date"],
 select,
 textarea {
-  background: #f9f8fe;
+  background-color: #f9f8fe;
 }
 
 .double-bounce1,
@@ -163,7 +163,7 @@ textarea {
 
   tbody tr:nth-child(odd),
   tbody tr:hover {
-    background: #f1f1f1;
+    background: #f4f3f9;
   }
 
   th {
@@ -210,6 +210,10 @@ textarea {
     border-top: 1px solid #ddd;
     padding: 5px;
     text-align: right;
+  }
+
+  tfoot tr:last-child td {
+    font-size: 1.1rem;
   }
 
   .no-data-column {

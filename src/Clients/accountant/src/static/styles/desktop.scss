@@ -1,6 +1,21 @@
 @import "../../../../shared/src/static/styles/variables";
 
 @media screen and (min-width: $desktop-min) {
+  table tr td,
+  .editable-table tr td {
+    font-size: 1rem;
+    line-height: 26px;
+  }
+
+  .editable-table tr th {
+    font-size: 1.1rem;
+  }
+
+  .amount-by-category-table td {
+    font-size: 1.1rem;
+    line-height: 1.3rem;
+  }
+
   form {
     label,
     input[type="text"],
