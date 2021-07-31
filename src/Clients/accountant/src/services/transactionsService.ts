@@ -169,10 +169,10 @@ export class TransactionsService extends HttpProxyBase {
 
     transaction.amount = parseFloat(<any>transaction.amount);
 
-    if (transaction.fromStocks) {
+    if (transaction.fromStocks && typeof transaction.fromStocks === "string") {
       transaction.fromStocks = parseFloat(<any>transaction.fromStocks);
     }
-    if (transaction.toStocks) {
+    if (transaction.toStocks && typeof transaction.toStocks === "string") {
       transaction.toStocks = parseFloat(<any>transaction.toStocks);
     }
 
@@ -209,10 +209,10 @@ export class TransactionsService extends HttpProxyBase {
 
     transaction.amount = parseFloat(<any>transaction.amount);
 
-    if (transaction.fromStocks) {
+    if (transaction.fromStocks && typeof transaction.fromStocks === "string") {
       transaction.fromStocks = parseFloat(<any>transaction.fromStocks);
     }
-    if (transaction.toStocks) {
+    if (transaction.toStocks && typeof transaction.toStocks === "string") {
       transaction.toStocks = parseFloat(<any>transaction.toStocks);
     }
 

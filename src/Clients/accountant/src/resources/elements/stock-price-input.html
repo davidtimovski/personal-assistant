@@ -1,42 +1,16 @@
 <template bindable="amount, currency">
-  <require from="../../static/styles/components/amount-input.scss"></require>
+  <require from="./stock-price-input.scss"></require>
 
-  <div class="input-wrap ${changing ? 'changing' : ''}">
-    <input
-      type="number"
-      if.bind="currency === 'MKD'"
-      id="stock"
-      value.bind="amount & validate"
-      min="0.0001"
-      max="100000"
-      class="amount-input ${amountIsInvalid ? 'invalid' : ''}"
-      required
-    />
-    <input
-      else
-      type="number"
-      id="stock"
-      value.bind="amount & validate"
-      step="any"
-      min="0.0001"
-      max="100000"
-      class="amount-input ${amountIsInvalid ? 'invalid' : ''}"
-      required
-    />
+  <div class="amount-input-wrap ${changing ? 'changing' : ''}">
+    <input type="number" if.bind="currency === 'MKD'" id="stock" value.bind="amount & validate" min="0.0001"
+      max="100000" class="${amountIsInvalid ? 'invalid' : ''}" required />
+    <input else type="number" id="stock" value.bind="amount & validate" step="any" min="0.0001" max="100000"
+      class="${amountIsInvalid ? 'invalid' : ''}" required />
 
-    <input
-      type="text"
-      class="select-currency-input"
-      ref="selectCurrencyInput"
-      maxlength="3"
-      t="[placeholder,aria-label]currency"
-    />
-    <button
-      type="button"
-      click.delegate="toggleChangeCurrency()"
-      class="selected-currency-button"
-      t="[title,aria-label]changeCurrency"
-    >
+    <input type="text" class="select-currency-input" ref="selectCurrencyInput" maxlength="3"
+      t="[placeholder,aria-label]currency" />
+    <button type="button" click.delegate="toggleChangeCurrency()" class="selected-currency-button"
+      t="[title,aria-label]changeCurrency">
       ${currency}
     </button>
   </div>

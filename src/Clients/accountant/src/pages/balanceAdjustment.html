@@ -1,5 +1,6 @@
 <template>
   <require from="../static/styles/pages/balance-adjustment.scss"></require>
+  <require from="./../resources/elements/amount-input"></require>
   <require from="./../resources/value-converters/number-format"></require>
 
   <div class="container">
@@ -25,16 +26,9 @@
           <form submit.trigger="adjust()">
             <div class="form-control inline">
               <label for="balance" t="balance">Balance</label>
-              <div if.bind="currency === 'MKD'" class="input-wrap">
-                <input type="number" id="balance" value.bind="model.balance & validate" min="1" max="10000000"
-                  class="amount-input ${balanceIsInvalid ? 'invalid' : ''}" required>
-                <div class="unit-input-addon">${currency}</div>
-              </div>
-              <div else class="input-wrap">
-                <input type="number" id="balance" value.bind="model.balance & validate" step="any" min="0.01"
-                  max="8000000" class="amount-input ${balanceIsInvalid ? 'invalid' : ''}" required>
-                <div class="unit-input-addon">${currency}</div>
-              </div>
+              <amount-input amount.bind="model.balance" currency.bind="currency" invalid.bind="balanceIsInvalid"
+                input-id.bind="'balance'">
+              </amount-input>
             </div>
             <div class="form-control inline">
               <label for="account" t="account">Account</label>

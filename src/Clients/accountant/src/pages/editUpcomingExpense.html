@@ -1,4 +1,6 @@
 <template>
+  <require from="./../resources/elements/amount-input"></require>
+
   <div class="container">
     <div class="au-animate animate-fade-in animate-fade-out">
       <div class="page-title-wrap">
@@ -37,8 +39,8 @@
           <form submit.trigger="save()">
             <div class="form-control inline">
               <label for="amount" t="amount">Amount</label>
-              <compose view-model="../resources/components/amount-input"
-                view="../resources/components/amount-input.html" model.bind="model"></compose>
+              <amount-input amount.bind="model.amount" currency.bind="model.currency" invalid.bind="amountIsInvalid">
+              </amount-input>
             </div>
             <div class="form-control inline">
               <label for="category" t="category">Category</label>

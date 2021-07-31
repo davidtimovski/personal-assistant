@@ -1,4 +1,5 @@
 <template>
+  <require from="./../resources/elements/amount-input"></require>
   <require from="./../resources/elements/tooltip"></require>
 
   <div class="container">
@@ -37,8 +38,9 @@
           <form submit.trigger="submit()" autocomplete="off">
             <div class="form-control inline">
               <label for="amount" t="amount">Amount</label>
-              <compose view-model="../resources/components/amount-input"
-                view="../resources/components/amount-input.html" model.bind="model"></compose>
+              <amount-input amount.bind="model.amount" currency.bind="model.currency" invalid.bind="amountIsInvalid"
+                focus-on-init.bind="true">
+              </amount-input>
             </div>
             <div class="form-control inline">
               <label for="category" t="category">Category</label>

@@ -173,13 +173,13 @@ export class TransferFunds {
         let fromStocks: number = null;
         const fromAccount = this.accounts.find((x) => x.id === this.model.fromAccountId);
         if (fromAccount.stockPrice !== null) {
-          fromStocks = amount / fromAccount.stockPrice;
+          fromStocks = parseFloat((amount / fromAccount.stockPrice).toFixed(4));
         }
 
         let toStocks: number = null;
         const toAccount = this.accounts.find((x) => x.id === this.model.toAccountId);
         if (toAccount.stockPrice !== null) {
-          toStocks = amount / toAccount.stockPrice;
+          toStocks = parseFloat((amount / toAccount.stockPrice).toFixed(4));
         }
 
         const transaction = new TransactionModel(

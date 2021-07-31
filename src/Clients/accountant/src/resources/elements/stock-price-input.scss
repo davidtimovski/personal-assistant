@@ -1,0 +1,67 @@
+@import "../../../../shared/src/static/styles/variables";
+
+.amount-input-wrap {
+  display: flex;
+  line-height: 37px;
+
+  input[type="number"] {
+    width: 80px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+    text-align: center;
+  }
+
+  .select-currency-input {
+    display: none;
+    width: 80px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+    font-size: 1rem;
+    line-height: 37px;
+  }
+
+  .selected-currency-button {
+    background: #ddd;
+    border: none;
+    border-radius: var(--border-radius);
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: none;
+    outline: none;
+    padding: 0 12px;
+    font-size: inherit;
+    line-height: 27px;
+    color: inherit;
+    cursor: pointer;
+    transition: background var(--transition-quick), box-shadow var(--transition-quick), color var(--transition-quick);
+  }
+
+  &.changing {
+    input[type="number"] {
+      display: none;
+    }
+
+    .select-currency-input {
+      display: inline-block;
+    }
+
+    .selected-currency-button {
+      background: var(--primary-color);
+      box-shadow: inset var(--box-shadow);
+      color: #fff;
+    }
+  }
+}
+
+@media screen and (min-width: $desktop-min) {
+  .amount-input-wrap input[type="number"] {
+    width: 100px;
+  }
+
+  .amount-input-wrap .select-currency-input {
+    font-size: 1.2rem;
+    line-height: 45px;
+  }
+}

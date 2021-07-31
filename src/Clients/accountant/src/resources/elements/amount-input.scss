@@ -1,13 +1,15 @@
-@import "../../../../../shared/src/static/styles/variables";
+@import "../../../../shared/src/static/styles/variables";
 
-.input-wrap {
+.amount-input-wrap {
   display: flex;
   line-height: 37px;
 
   input[type="number"] {
+    width: 80px;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     border-right: none;
+    text-align: center;
   }
 
   .select-currency-input {
@@ -37,7 +39,7 @@
   }
 
   &.changing {
-    .amount-input {
+    input[type="number"] {
       display: none;
     }
 
@@ -54,7 +56,11 @@
 }
 
 @media screen and (min-width: $desktop-min) {
-  .input-wrap .select-currency-input {
+  .amount-input-wrap input[type="number"] {
+    width: 100px;
+  }
+
+  .amount-input-wrap .select-currency-input {
     font-size: 1.2rem;
     line-height: 45px;
   }

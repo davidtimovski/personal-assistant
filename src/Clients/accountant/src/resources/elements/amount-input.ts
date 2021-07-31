@@ -9,6 +9,8 @@ export class AmountInputCustomElement {
   @bindable({ defaultBindingMode: bindingMode.twoWay }) amount: number;
   @bindable({ defaultBindingMode: bindingMode.twoWay }) currency: string;
   @bindable({ defaultBindingMode: bindingMode.toView }) invalid: boolean;
+  @bindable({ defaultBindingMode: bindingMode.toView }) inputId: string = "amount";
+  @bindable({ defaultBindingMode: bindingMode.toView }) focusOnInit: boolean;
 
   private currencySuggestions: Array<CurrencySuggestion>;
   private changing = false;
@@ -43,6 +45,10 @@ export class AmountInputCustomElement {
       },
       className: "currency-autocomplete-customizations",
     });
+
+    if (this.focusOnInit) {
+      this.amountInput.focus();
+    }
   }
 
   toggleChangeCurrency() {

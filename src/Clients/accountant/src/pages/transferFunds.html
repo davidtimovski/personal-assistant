@@ -1,5 +1,6 @@
 <template>
   <require from="../static/styles/pages/transfer-funds.scss"></require>
+  <require from="./../resources/elements/amount-input"></require>
   <require from="./../resources/value-converters/money-format"></require>
   <require from="./../resources/value-converters/money-precise-format"></require>
 
@@ -59,8 +60,8 @@
 
           <div class="form-control inline transfer-funds-amount-control">
             <label for="amount" class="transfer-funds-label" t="amount">Amount</label>
-            <compose view-model="../resources/components/amount-input" view="../resources/components/amount-input.html"
-              model.bind="model"></compose>
+            <amount-input amount.bind="model.amount" currency.bind="model.currency" invalid.bind="amountIsInvalid">
+            </amount-input>
           </div>
         </form>
 
