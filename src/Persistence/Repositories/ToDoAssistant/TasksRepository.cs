@@ -271,6 +271,9 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                     {
                         publicTask.Order -= 1;
                     }
+
+                    var tasksCount = GetPublicTasksCount(task.ListId, existingTask.IsCompleted);
+                    task.Order = ++tasksCount;
                 }
             }
 
@@ -280,7 +283,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             dbTask.IsOneTime = task.IsOneTime;
             dbTask.PrivateToUserId = task.PrivateToUserId;
             dbTask.AssignedToUserId = task.AssignedToUserId;
-            dbTask.Order = 1;
+            dbTask.Order = task.Order;
             dbTask.ModifiedDate = task.ModifiedDate;
 
             await EFContext.SaveChangesAsync();
