@@ -89,7 +89,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
                     (@FromAccountId, @ToAccountId, @CategoryId, @Amount, @FromStocks, @ToStocks, @Currency, @Description, @Date, @IsEncrypted, @EncryptedDescription, @Salt, @Nonce, @CreatedDate, @ModifiedDate) returning ""Id""",
                     transaction, dbTransaction)).Single();
 
-                if (transaction.Amount < 0)
+                if (transaction.FromAccountId.HasValue && !transaction.ToAccountId.HasValue)
                 {
                     var relatedUpcomingExpenses = conn.Query<UpcomingExpense>(@"SELECT * FROM ""Accountant.UpcomingExpenses""
                                                                                 WHERE ""CategoryId"" = @CategoryId 
@@ -112,8 +112,8 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
                             {
                                 if (upcomingExpense.Amount > transaction.Amount)
                                 {
-                                    await conn.ExecuteAsync(@"UPDATE ""Accountant.UpcomingExpenses"" SET ""Amount"" = ""Amount"" - @Amount WHERE ""Id"" = @Id",
-                                        new { upcomingExpense.Id, transaction.Amount }, dbTransaction);
+                                    await conn.ExecuteAsync(@"UPDATE ""Accountant.UpcomingExpenses"" SET ""Amount"" = ""Amount"" - @Amount, ""ModifiedDate"" = @ModifiedDate WHERE ""Id"" = @Id",
+                                        new { upcomingExpense.Id, transaction.Amount, ModifiedDate = DateTime.UtcNow }, dbTransaction);
                                 }
                                 else
                                 {
