@@ -20,7 +20,7 @@ export class ShareRequests {
   ) {}
 
   attached() {
-    this.listsService.getShareRequests().then((allShareRequests: Array<ShareRequest>) => {
+    this.listsService.getShareRequests().then((allShareRequests: ShareRequest[]) => {
       this.pendingShareRequests = allShareRequests.filter((request: ShareRequest) => {
         return request.isAccepted === null;
       });
@@ -38,7 +38,7 @@ export class ShareRequests {
     await this.listsService.setShareIsAccepted(request.listId, true);
     this.pendingShareRequests.splice(this.pendingShareRequests.indexOf(request), 1);
 
-    await Actions.getLists(this.listsService);
+    await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
 
     this.router.navigateToRoute("listsEdited", { editedId: request.listId });
   }

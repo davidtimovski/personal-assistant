@@ -6,15 +6,12 @@ export class LocalStorage extends LocalStorageBase {
 
     const soundsEnabled = window.localStorage.getItem("soundsEnabled");
     if (!soundsEnabled) {
-      this.setSoundsEnabled(true);
+      window.localStorage.setItem("soundsEnabled", "true");
     }
-  }
 
-  getSoundsEnabled(): boolean {
-    const soundsEnabled = window.localStorage.getItem("soundsEnabled");
-    return soundsEnabled === "true";
-  }
-  setSoundsEnabled(soundsEnabled: boolean) {
-    window.localStorage.setItem("soundsEnabled", soundsEnabled.toString());
+    const highPriorityListEnabled = window.localStorage.getItem("highPriorityListEnabled");
+    if (!highPriorityListEnabled) {
+      window.localStorage.setItem("highPriorityListEnabled", "true");
+    }
   }
 }

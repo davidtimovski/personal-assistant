@@ -11,6 +11,7 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models
         public string Name { get; set; }
         public bool IsCompleted { get; set; }
         public bool IsOneTime { get; set; }
+        public bool IsHighPriority { get; set; }
         public bool IsPrivate { get; set; }
         public AssignedUser AssignedUser { get; set; }
         public short Order { get; set; }

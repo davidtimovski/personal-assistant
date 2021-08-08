@@ -14,6 +14,7 @@
   "cancel": "Cancel",
   "deleteOnCompletion": "Delete tasks on completion",
   "dragToReorder": "Drag to reorder",
+  "highPriority": "High Priority",
   "weekdays": {
     "0": "Sunday",
     "1": "Monday",
@@ -58,6 +59,12 @@
     "archivedList": "This list is archived.<br>Do you want to restore it?",
     "restore": "Restore",
     "emptyListMessage": "There's nothing here"
+  },
+  "computedList": {
+    "searchTasks": "Search tasks",
+    "clear": "Clear",
+    "complete": "Complete",
+    "privateTasks": "Private tasks"
   },
   "editList": {
     "newList": "New list",
@@ -122,6 +129,7 @@
     "edit": "Edit",
     "list": "List",
     "deleteWhenDone": "Delete when done",
+    "highPriority": "High priority",
     "taskIsPrivate": "Task is private",
     "assignToUser": "Assign to user",
     "assignedTo": "Assigned to",
@@ -172,7 +180,8 @@
     "notificationsPermission": "You must first give notifications permission to the app.",
     "notificationsWereEnabled": "Notifications were successfully enabled.",
     "notificationsUnpermitted": "Notifications are currently unpermitted. Please permit Notifications for To Do Assistant in your browser first.",
-    "sounds": "Sounds"
+    "sounds": "Sounds",
+    "showHighPriorityList": "Show High Priority list"
   },
   "notFound": {
     "youSeemLost": "You seem lost..",

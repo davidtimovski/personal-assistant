@@ -14,6 +14,7 @@
   "cancel": "Откажи",
   "deleteOnCompletion": "Бриши задачи при комплетирање",
   "dragToReorder": "Влечи за подредување",
+  "highPriority": "Висок Приоритет",
   "weekdays": {
     "0": "Недела",
     "1": "Понеделник",
@@ -58,6 +59,12 @@
     "archivedList": "Оваа листа е архивирана.<br>Дали сакате да ја вратите?",
     "restore": "Врати",
     "emptyListMessage": "Нема ништо овде"
+  },
+  "computedList": {
+    "searchTasks": "Пребарај задачи",
+    "clear": "Исчисти",
+    "complete": "Заврши",
+    "privateTasks": "Приватни задачи"
   },
   "editList": {
     "newList": "Нова листа",
@@ -124,6 +131,7 @@
     "edit": "Промени ја",
     "list": "Листа",
     "deleteWhenDone": "Избриши при завршување",
+    "highPriority": "Висок приоритет",
     "taskIsPrivate": "Задачата е приватна",
     "assignToUser": "Додели на корисник",
     "assignedTo": "Доделена на",
@@ -174,7 +182,8 @@
     "notificationsPermission": "Мора прво да дадете дозвола за известувања на апликацијата.",
     "notificationsWereEnabled": "Известувањата беа успешно вклучени.",
     "notificationsUnpermitted": "Известувањата моментално се забранети. Дадете дозвола за известувања на To Do Assistant во вашиот пребарувач прво.",
-    "sounds": "Звуци"
+    "sounds": "Звуци",
+    "showHighPriorityList": "Прикажи листа од Висок Приоритет"
   },
   "notFound": {
     "youSeemLost": "Се изгубивте?",

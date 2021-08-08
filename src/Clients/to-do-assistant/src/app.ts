@@ -1,8 +1,4 @@
-import {
-  NavigationInstruction,
-  Router,
-  RouterConfiguration,
-} from "aurelia-router";
+import { NavigationInstruction, Router, RouterConfiguration } from "aurelia-router";
 import { inject } from "aurelia-framework";
 import { EventAggregator } from "aurelia-event-aggregator";
 import { I18N } from "aurelia-i18n";
@@ -17,15 +13,7 @@ import { LocalStorage } from "utils/localStorage";
 import { ListsService } from "services/listsService";
 import routes from "./routes";
 
-@inject(
-  AuthService,
-  LocalStorage,
-  ConnectionTracker,
-  ListsService,
-  EventAggregator,
-  BroadcastChannel,
-  I18N
-)
+@inject(AuthService, LocalStorage, ConnectionTracker, ListsService, EventAggregator, BroadcastChannel, I18N)
 export class App {
   private isTouchDevice = false;
   router: Router;
@@ -57,7 +45,7 @@ export class App {
     this.eventAggregator.subscribeOnce("authenticated", () => {
       this.localStorage.initialize();
 
-      Actions.getLists(this.listsService).then(() => {
+      Actions.getLists(this.listsService, this.i18n.tr("highPriority")).then(() => {
         this.eventAggregator.publish("get-lists-finished");
       });
     });
@@ -86,22 +74,15 @@ export class App {
           await this.authService.signinRedirect();
         };
 
-        const navigationInstruction = () =>
-          this.redirectAfterCallback(instruction, "/");
+        const navigationInstruction = () => this.redirectAfterCallback(instruction, "/");
 
-        return this.runHandlerAndCompleteNavigationInstruction(
-          callbackHandler,
-          navigationInstruction
-        );
+        return this.runHandlerAndCompleteNavigationInstruction(callbackHandler, navigationInstruction);
       },
       route: "login-callback",
     });
   }
 
-  private redirectAfterCallback(
-    instruction: NavigationInstruction,
-    route: string
-  ) {
+  private redirectAfterCallback(instruction: NavigationInstruction, route: string) {
     window.history.pushState({}, "", route);
     instruction.queryString = "";
     instruction.config.redirect = route;

@@ -125,7 +125,15 @@
 &lt;br&gt;
 &lt;br&gt;
 &lt;ul class="blue"&gt;
-&lt;li&gt;Create lists and tasks&lt;/li&gt;
+&lt;li&gt;
+Create lists and tasks
+&lt;ul class="blue"&gt;
+&lt;li&gt;Delete tasks upon completion&lt;/li&gt;
+&lt;li&gt;Flag tasks as high priority&lt;/li&gt;
+&lt;li&gt;Search tasks within list&lt;/li&gt;
+&lt;li&gt;Get hints for duplicate and similar tasks&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
 &lt;li&gt;
 Share lists with other users
 &lt;ul class="blue"&gt;
@@ -137,10 +145,7 @@ Share lists with other users
 &lt;li&gt;Reorder lists and tasks&lt;/li&gt;
 &lt;li&gt;Copy lists&lt;/li&gt;
 &lt;li&gt;Archive unused lists&lt;/li&gt;
-&lt;li&gt;Search tasks within list&lt;/li&gt;
 &lt;li&gt;Easily create multiple tasks from text&lt;/li&gt;
-&lt;li&gt;Delete tasks upon completion&lt;/li&gt;
-&lt;li&gt;Get hints for duplicate and similar tasks&lt;/li&gt;
 &lt;/ul&gt;</value>
   </data>
 </root>

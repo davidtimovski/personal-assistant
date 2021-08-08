@@ -10,6 +10,7 @@ namespace PersonalAssistant.Domain.Entities.ToDoAssistant
         public string Name { get; set; }
         public bool IsCompleted { get; set; }
         public bool IsOneTime { get; set; }
+        public bool IsHighPriority { get; set; }
         public int? PrivateToUserId { get; set; }
         public int? AssignedToUserId { get; set; }
         public short Order { get; set; }

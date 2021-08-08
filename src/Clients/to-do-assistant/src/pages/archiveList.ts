@@ -16,7 +16,7 @@ import * as Actions from "utils/state/actions";
 @connectTo()
 export class ArchiveList {
   private listId: number;
-  private model = new List(0, "", "", false, false, SharingState.NotShared, 0, false, [], null);
+  private model = new List(0, "", "", false, false, SharingState.NotShared, 0, false, null, [], null);
   private archiveButtonIsLoading = false;
   state: State;
 
@@ -43,7 +43,7 @@ export class ArchiveList {
 
   setModelFromState() {
     const list = this.state.lists.find((x) => x.id === this.listId);
-    if (list === null) {
+    if (!list) {
       this.router.navigateToRoute("notFound");
     }
 
@@ -67,7 +67,7 @@ export class ArchiveList {
     try {
       await this.listsService.setIsArchived(this.model.id, true);
 
-      await Actions.getLists(this.listsService);
+      await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
 
       this.eventAggregator.publish(AlertEvents.ShowSuccess, "archiveList.archiveSuccessful");
 

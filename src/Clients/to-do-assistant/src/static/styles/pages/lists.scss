@@ -30,7 +30,7 @@
 .to-do-lists-wrap {
   margin-bottom: 30px;
 
-  &.reordering .icon {
+  &.reordering .to-do-list:not(.computed-list) .icon {
     display: none;
   }
 }
@@ -86,6 +86,14 @@
     color: var(--primary-color);
   }
 
+  &.computed-list {
+    margin-bottom: 25px;
+
+    i {
+      color: var(--danger-color);
+    }
+  }
+
   &.is-shared,
   &.pending-share {
     padding-right: 50px;
@@ -110,7 +118,7 @@
   cursor: grab;
   cursor: -webkit-grab;
 }
-.reordering .reorder-icon {
+.reordering .to-do-list:not(.computed-list) .reorder-icon {
   display: inline-block !important;
 }
 

@@ -1,11 +1,6 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import {
-  ValidationController,
-  validateTrigger,
-  ValidationRules,
-  ControllerValidateResult,
-} from "aurelia-validation";
+import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
@@ -19,17 +14,10 @@ import { CanShareList } from "models/viewmodels/canShareList";
 import { SharingState } from "models/viewmodels/sharingState";
 import * as Actions from "utils/state/actions";
 
-@inject(
-  Router,
-  AuthService,
-  ListsService,
-  ValidationController,
-  I18N,
-  EventAggregator
-)
+@inject(Router, AuthService, ListsService, ValidationController, I18N, EventAggregator)
 export class ShareList {
   private model: ListWithShares;
-  private originalShares: Array<Share>;
+  private originalShares: Share[];
   private selectedShare: Share;
   private originalSelectedShareJson: string;
   private emailIsInvalid: boolean;
@@ -96,8 +84,7 @@ export class ShareList {
 
   @computedFrom("model.shares.length")
   get sharedWithWrapTitle() {
-    return JSON.stringify(this.originalShares) !==
-      JSON.stringify(this.model.shares)
+    return JSON.stringify(this.originalShares) !== JSON.stringify(this.model.shares)
       ? this.i18n.tr("shareList.shareWith")
       : this.i18n.tr("shareList.members");
   }
@@ -122,33 +109,22 @@ export class ShareList {
     this.emailIsInvalid = !result.valid;
 
     if (result.valid) {
-      const canShareVM: CanShareList = await this.listsService.canShareListWithUser(
-        email
-      );
+      const canShareVM: CanShareList = await this.listsService.canShareListWithUser(email);
 
       if (canShareVM.userId === 0) {
         this.emailIsInvalid = true;
-        this.eventAggregator.publish(
-          AlertEvents.ShowError,
-          "shareList.userDoesntExist"
-        );
+        this.eventAggregator.publish(AlertEvents.ShowError, "shareList.userDoesntExist");
       } else {
         if (!canShareVM.canShare) {
           this.emailIsInvalid = true;
-          this.eventAggregator.publish(
-            AlertEvents.ShowError,
-            "shareList.cannotShareWithUser"
-          );
+          this.eventAggregator.publish(AlertEvents.ShowError, "shareList.cannotShareWithUser");
         } else {
           this.selectedShare.userId = canShareVM.userId;
           this.selectedShare.imageUri = canShareVM.imageUri;
           this.model.shares.push(this.selectedShare);
 
           if (this.shareExistedPreviously(this.selectedShare)) {
-            this.removedShares.splice(
-              this.removedShares.indexOf(this.selectedShare),
-              1
-            );
+            this.removedShares.splice(this.removedShares.indexOf(this.selectedShare), 1);
             this.editedShares.push(this.selectedShare);
           } else {
             this.newShares.push(this.selectedShare);
@@ -169,15 +145,11 @@ export class ShareList {
       });
       this.selectedShare.userId = null;
 
-      const canShareVM: CanShareList = await this.listsService.canShareListWithUser(
-        email
-      );
+      const canShareVM: CanShareList = await this.listsService.canShareListWithUser(email);
 
       this.selectedShare.userId = selectedShare.userId = canShareVM.userId;
 
-      if (
-        this.originalSelectedShareJson !== JSON.stringify(this.selectedShare)
-      ) {
+      if (this.originalSelectedShareJson !== JSON.stringify(this.selectedShare)) {
         this.newShares.push(this.selectedShare);
       }
       this.evaluateCanSave();
@@ -237,11 +209,7 @@ export class ShareList {
   }
 
   evaluateCanSave(): void {
-    this.canSave =
-      this.newShares.length +
-        this.editedShares.length +
-        this.removedShares.length >
-      0;
+    this.canSave = this.newShares.length + this.editedShares.length + this.removedShares.length > 0;
   }
 
   async save() {
@@ -252,30 +220,16 @@ export class ShareList {
     this.saveButtonIsLoading = true;
     this.emailIsInvalid = false;
 
-    await this.listsService.share(
-      this.model.id,
-      this.newShares,
-      this.editedShares,
-      this.removedShares
-    );
+    await this.listsService.share(this.model.id, this.newShares, this.editedShares, this.removedShares);
 
-    await Actions.getLists(this.listsService);
+    await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
 
     if (this.editedShares.length + this.removedShares.length > 0) {
-      this.eventAggregator.publish(
-        AlertEvents.ShowSuccess,
-        "shareList.sharingDetailsSaved"
-      );
+      this.eventAggregator.publish(AlertEvents.ShowSuccess, "shareList.sharingDetailsSaved");
     } else if (this.newShares.length === 1) {
-      this.eventAggregator.publish(
-        AlertEvents.ShowSuccess,
-        "shareList.shareRequestSent"
-      );
+      this.eventAggregator.publish(AlertEvents.ShowSuccess, "shareList.shareRequestSent");
     } else if (this.newShares.length > 1) {
-      this.eventAggregator.publish(
-        AlertEvents.ShowSuccess,
-        "shareList.shareRequestsSent"
-      );
+      this.eventAggregator.publish(AlertEvents.ShowSuccess, "shareList.shareRequestsSent");
     }
 
     this.router.navigateToRoute("listsEdited", { editedId: this.model.id });

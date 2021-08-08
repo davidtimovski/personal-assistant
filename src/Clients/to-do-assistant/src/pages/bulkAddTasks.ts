@@ -1,11 +1,7 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import {
-  ValidationController,
-  validateTrigger,
-  ValidationRules,
-  ControllerValidateResult,
-} from "aurelia-validation";
+import { I18N } from "aurelia-i18n";
+import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { EventAggregator } from "aurelia-event-aggregator";
 import { connectTo } from "aurelia-store";
 
@@ -17,13 +13,7 @@ import { TasksService } from "services/tasksService";
 import { ListsService } from "services/listsService";
 import * as Actions from "utils/state/actions";
 
-@inject(
-  Router,
-  TasksService,
-  ListsService,
-  ValidationController,
-  EventAggregator
-)
+@inject(Router, TasksService, ListsService, I18N, ValidationController, EventAggregator)
 @connectTo()
 export class BulkAddTasks {
   private model: BulkAddTasksModel;
@@ -37,6 +27,7 @@ export class BulkAddTasks {
     private readonly router: Router,
     private readonly tasksService: TasksService,
     private readonly listsService: ListsService,
+    private readonly i18n: I18N,
     private readonly validationController: ValidationController,
     private readonly eventAggregator: EventAggregator
   ) {
@@ -48,16 +39,9 @@ export class BulkAddTasks {
   }
 
   async activate(params: any) {
-    this.listIsShared = await this.listsService.getIsShared(
-      parseInt(params.id, 10)
-    );
+    this.listIsShared = await this.listsService.getIsShared(parseInt(params.id, 10));
 
-    this.model = new BulkAddTasksModel(
-      parseInt(params.id, 10),
-      "",
-      false,
-      false
-    );
+    this.model = new BulkAddTasksModel(parseInt(params.id, 10), "", false, false);
 
     ValidationRules.ensure((x: BulkAddTasksModel) => x.tasksText)
       .required()
@@ -84,8 +68,7 @@ export class BulkAddTasks {
     const result: ControllerValidateResult = await this.validationController.validate();
 
     if (!result.valid) {
-      this.tasksTextIsInvalid =
-        !this.model.tasksText || !this.model.tasksText.trim();
+      this.tasksTextIsInvalid = !this.model.tasksText || !this.model.tasksText.trim();
       this.saveButtonIsLoading = false;
     } else {
       try {
@@ -97,12 +80,9 @@ export class BulkAddTasks {
         );
         this.tasksTextIsInvalid = false;
 
-        await Actions.getLists(this.listsService);
+        await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
 
-        this.eventAggregator.publish(
-          AlertEvents.ShowSuccess,
-          "bulkAddTasks.addSuccessful"
-        );
+        this.eventAggregator.publish(AlertEvents.ShowSuccess, "bulkAddTasks.addSuccessful");
 
         this.router.navigateToRoute("list", { id: this.model.listId });
       } catch (errorFields) {

@@ -11,6 +11,7 @@ export class List {
     public sharingState: SharingState,
     public order: number,
     public isArchived: boolean,
+    public computedListType: string,
     public tasks: Array<Task>,
     public modifiedDate: string
   ) {}

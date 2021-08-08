@@ -11,27 +11,16 @@ import { ListsService } from "services/listsService";
 import { TasksService } from "services/tasksService";
 import { Task } from "models/entities/task";
 import { ViewList } from "models/viewmodels/viewList";
-import { LocalStorage } from "utils/localStorage";
 import { SharingState } from "models/viewmodels/sharingState";
 import { State } from "utils/state/state";
 import * as Actions from "utils/state/actions";
 import { ListTask } from "models/viewmodels/listTask";
 
-@inject(Router, ListsService, TasksService, ValidationController, I18N, EventAggregator, LocalStorage)
+@inject(Router, ListsService, TasksService, ValidationController, I18N, EventAggregator)
 @connectTo()
 export class List {
   private listId: number;
-  private model = new ViewList(
-    0,
-    "",
-    false,
-    SharingState.NotShared,
-    null,
-    new Array<ListTask>(),
-    new Array<ListTask>(),
-    new Array<ListTask>(),
-    new Array<ListTask>()
-  );
+  private model = new ViewList(0, "", false, SharingState.NotShared, null, null, [], [], [], []);
   private topDrawerIsOpen = false;
   private shareButtonText: string;
   private completedTasksAreVisible = false;
@@ -58,7 +47,6 @@ export class List {
   private editListButtonIsLoading = false;
   private addNewPlaceholderText: string;
   private emptyListMessage: string;
-  private soundsEnabled = true;
   state: State;
 
   constructor(
@@ -67,8 +55,7 @@ export class List {
     private readonly tasksService: TasksService,
     private readonly validationController: ValidationController,
     private readonly i18n: I18N,
-    private readonly eventAggregator: EventAggregator,
-    private readonly localStorage: LocalStorage
+    private readonly eventAggregator: EventAggregator
   ) {
     this.eventAggregator.subscribe("get-lists-finished", () => {
       this.setModelFromState();
@@ -91,12 +78,10 @@ export class List {
     if (params.editedId) {
       this.lastEditedId = parseInt(params.editedId, 10);
     }
-
-    this.soundsEnabled = this.localStorage.getSoundsEnabled();
   }
 
   attached() {
-    if (this.soundsEnabled) {
+    if (this.state.soundsEnabled) {
       this.bleep.load();
       this.blop.load();
     }
@@ -108,7 +93,7 @@ export class List {
 
   setModelFromState() {
     const list = this.state.lists.find((x) => x.id === this.listId);
-    if (list === null) {
+    if (!list) {
       this.router.navigateToRoute("notFound");
     } else {
       this.model.id = list.id;
@@ -116,6 +101,7 @@ export class List {
       this.model.isOneTimeToggleDefault = list.isOneTimeToggleDefault;
       this.model.sharingState = list.sharingState;
       this.model.isArchived = list.isArchived;
+      this.model.computedListType = list.computedListType;
 
       this.model.tasks = list.tasks
         .filter((x) => !x.isCompleted && !x.isPrivate)
@@ -169,7 +155,7 @@ export class List {
     }
   }
 
-  async reorder(changedArray: Array<ListTask>, data) {
+  async reorder(changedArray: ListTask[], data) {
     const id: number = changedArray[data.toIndex].id;
 
     const oldOrder = ++data.fromIndex;
@@ -305,7 +291,7 @@ export class List {
             this.newTaskIsLoading = false;
             this.newTaskName = "";
 
-            await Actions.getLists(this.listsService);
+            await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
 
             const list = this.state.lists.find((x) => x.id === this.listId);
             const task = list.tasks.find((x) => x.id === id);
@@ -316,7 +302,7 @@ export class List {
               this.model.tasks.unshift(ListTask.fromTask(task));
             }
 
-            if (this.soundsEnabled) {
+            if (this.state.soundsEnabled) {
               this.blop.play();
             }
           } catch {
@@ -337,7 +323,7 @@ export class List {
 
     const startTime = new Date();
 
-    if (this.soundsEnabled) {
+    if (this.state.soundsEnabled) {
       this.bleep.play();
     }
 
@@ -351,18 +337,18 @@ export class List {
 
     if (task.isOneTime) {
       await this.tasksService.delete(task.id);
-      await Actions.deleteTask(this.listId, task.id);
+      await Actions.deleteTask(task.id);
 
       this.executeAfterDelay(() => {
         this.setModelFromState();
       }, startTime);
 
-      if (this.soundsEnabled) {
+      if (this.state.soundsEnabled) {
         this.bleep.play();
       }
     } else {
       await this.tasksService.complete(task.id);
-      await Actions.completeTask(this.listId, task.id);
+      await Actions.completeTask(task.id);
 
       this.executeAfterDelay(() => {
         task.rightSideIsLoading = false;
@@ -379,7 +365,7 @@ export class List {
 
     const startTime = new Date();
 
-    if (this.soundsEnabled) {
+    if (this.state.soundsEnabled) {
       this.blop.play();
     }
 
@@ -392,7 +378,7 @@ export class List {
     }
 
     await this.tasksService.uncomplete(task.id);
-    await Actions.uncompleteTask(this.listId, task.id);
+    await Actions.uncompleteTask(task.id);
 
     this.executeAfterDelay(() => {
       task.rightSideIsLoading = false;
@@ -433,7 +419,7 @@ export class List {
   async restore() {
     await this.listsService.setIsArchived(this.model.id, false);
 
-    await Actions.getLists(this.listsService);
+    await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
 
     this.router.navigateToRoute("listsEdited", { editedId: this.model.id });
   }

@@ -281,6 +281,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             dbTask.Name = task.Name;
             dbTask.ListId = task.ListId;
             dbTask.IsOneTime = task.IsOneTime;
+            dbTask.IsHighPriority = task.IsHighPriority;
             dbTask.PrivateToUserId = task.PrivateToUserId;
             dbTask.AssignedToUserId = task.AssignedToUserId;
             dbTask.Order = task.Order;

@@ -74,18 +74,13 @@ textarea {
 .icon-wrap {
   width: calc(100% - 20px);
   background: #fff;
-  border: 1px solid #ddd;
   border-radius: 8px;
   padding: 0 10px;
   line-height: 45px;
   color: #888;
 
   .placeholder {
-    padding-left: 5px;
-
-    &.editing {
-      color: var(--regular-color);
-    }
+    color: var(--regular-color);
   }
 
   .icon-options {

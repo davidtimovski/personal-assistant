@@ -25,6 +25,11 @@ export default [
     moduleId: PLATFORM.moduleName("./pages/list"),
   },
   {
+    route: "computed-list/:type",
+    name: "computedList",
+    moduleId: PLATFORM.moduleName("./pages/computedList"),
+  },
+  {
     route: "edit-list/:id",
     name: "editList",
     moduleId: PLATFORM.moduleName("./pages/editList"),

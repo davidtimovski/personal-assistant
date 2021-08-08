@@ -13,6 +13,7 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models
         public bool IsCompleted { get; set; }
         public bool IsOneTime { get; set; }
         public bool IsPrivate { get; set; }
+        public bool IsHighPriority { get; set; }
         public int? AssignedToUserId { get; set; }
         public bool IsInSharedList { get; set; }
         public short Order { get; set; }

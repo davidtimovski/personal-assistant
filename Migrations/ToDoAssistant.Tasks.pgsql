@@ -9,6 +9,7 @@ CREATE TABLE public."ToDoAssistant.Tasks"
     "Name" character varying(50) NOT NULL COLLATE pg_catalog."default",
     "IsCompleted" boolean NOT NULL DEFAULT FALSE,
     "IsOneTime" boolean NOT NULL DEFAULT FALSE,
+    "IsHighPriority" boolean NOT NULL DEFAULT FALSE,
     "PrivateToUserId" integer,
     "AssignedToUserId" integer,
     "Order" smallint NOT NULL,

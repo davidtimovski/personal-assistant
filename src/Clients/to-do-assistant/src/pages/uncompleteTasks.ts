@@ -16,7 +16,7 @@ import * as Actions from "utils/state/actions";
 @connectTo()
 export class UncompleteTasks {
   private listId: number;
-  private model = new List(0, "", "", false, false, SharingState.NotShared, 0, false, [], null);
+  private model = new List(0, "", "", false, false, SharingState.NotShared, 0, false, null, [], null);
   private uncompleteText: string;
   private uncompleteButtonIsLoading = false;
   state: State;
@@ -46,14 +46,14 @@ export class UncompleteTasks {
 
   setModelFromState() {
     const list = this.state.lists.find((x) => x.id === this.listId);
-    if (list === null) {
+    if (!list) {
       this.router.navigateToRoute("notFound");
-    }
+    } else {
+      this.model = JSON.parse(JSON.stringify(list));
 
-    this.model = JSON.parse(JSON.stringify(list));
-
-    if (this.model.sharingState !== 0) {
-      this.uncompleteText = this.i18n.tr("uncompleteTasks.thisWillUncompleteShared");
+      if (this.model.sharingState !== 0) {
+        this.uncompleteText = this.i18n.tr("uncompleteTasks.thisWillUncompleteShared");
+      }
     }
   }
 
@@ -67,7 +67,7 @@ export class UncompleteTasks {
     try {
       await this.listsService.setTasksAsNotCompleted(this.model.id);
 
-      await Actions.getLists(this.listsService);
+      await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
 
       this.eventAggregator.publish(AlertEvents.ShowSuccess, "uncompleteTasks.uncompleteTasksSuccessful");
 

@@ -1,11 +1,6 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import {
-  ValidationController,
-  validateTrigger,
-  ValidationRules,
-  ControllerValidateResult,
-} from "aurelia-validation";
+import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
@@ -19,14 +14,7 @@ import { SharingState } from "models/viewmodels/sharingState";
 import { PreferencesModel } from "models/preferencesModel";
 import * as Actions from "utils/state/actions";
 
-@inject(
-  Router,
-  ListsService,
-  UsersService,
-  ValidationController,
-  I18N,
-  EventAggregator
-)
+@inject(Router, ListsService, UsersService, ValidationController, I18N, EventAggregator)
 export class EditList {
   private model: EditListModel;
   private originalListJson: string;
@@ -67,16 +55,7 @@ export class EditList {
     this.isNewList = parseInt(params.id, 10) === 0;
 
     if (this.isNewList) {
-      this.model = new EditListModel(
-        0,
-        "",
-        this.iconOptions[0].icon,
-        "",
-        false,
-        false,
-        false,
-        SharingState.NotShared
-      );
+      this.model = new EditListModel(0, "", this.iconOptions[0].icon, "", false, false, false, SharingState.NotShared);
       this.saveButtonText = this.i18n.tr("editList.create");
     } else {
       this.saveButtonText = this.i18n.tr("save");
@@ -101,29 +80,18 @@ export class EditList {
     }
   }
 
-  @computedFrom(
-    "model.name",
-    "model.icon",
-    "model.isOneTimeToggleDefault",
-    "model.notificationsEnabled"
-  )
+  @computedFrom("model.name", "model.icon", "model.isOneTimeToggleDefault", "model.notificationsEnabled")
   get canSave(): boolean {
     if (this.isNewList) {
       return !ValidationUtil.isEmptyOrWhitespace(this.model.name);
     }
 
-    return (
-      !ValidationUtil.isEmptyOrWhitespace(this.model.name) &&
-      JSON.stringify(this.model) !== this.originalListJson
-    );
+    return !ValidationUtil.isEmptyOrWhitespace(this.model.name) && JSON.stringify(this.model) !== this.originalListJson;
   }
 
   @computedFrom("model.sharingState", "profile.notificationsEnabled")
   get notificationsEnabledCheckboxVisible() {
-    return (
-      this.model.sharingState !== SharingState.NotShared &&
-      this.preferences.notificationsEnabled
-    );
+    return this.model.sharingState !== SharingState.NotShared && this.preferences.notificationsEnabled;
   }
 
   showTasksTextarea() {
@@ -156,11 +124,9 @@ export class EditList {
           }
           this.nameIsInvalid = false;
 
-          await Actions.getLists(this.listsService);
+          await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
 
-          const redirectRoute = this.model.isArchived
-            ? "archivedListsEdited"
-            : "listsEdited";
+          const redirectRoute = this.model.isArchived ? "archivedListsEdited" : "listsEdited";
           this.router.navigateToRoute(redirectRoute, {
             editedId: this.model.id,
           });
@@ -178,7 +144,7 @@ export class EditList {
           );
           this.nameIsInvalid = false;
 
-          await Actions.getLists(this.listsService);
+          await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
 
           this.router.navigateToRoute("listsEdited", {
             editedId: id,
@@ -204,12 +170,9 @@ export class EditList {
 
       await this.listsService.delete(this.model.id);
 
-      await Actions.getLists(this.listsService);
+      await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
 
-      this.eventAggregator.publish(
-        AlertEvents.ShowSuccess,
-        "editList.deleteSuccessful"
-      );
+      this.eventAggregator.publish(AlertEvents.ShowSuccess, "editList.deleteSuccessful");
       this.router.navigateToRoute("lists");
     } else {
       this.deleteButtonText = this.i18n.tr("sure");
@@ -227,12 +190,9 @@ export class EditList {
 
       await this.listsService.leave(this.model.id);
 
-      await Actions.getLists(this.listsService);
+      await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
 
-      this.eventAggregator.publish(
-        AlertEvents.ShowSuccess,
-        "editList.youHaveLeftTheList"
-      );
+      this.eventAggregator.publish(AlertEvents.ShowSuccess, "editList.youHaveLeftTheList");
 
       this.router.navigateToRoute("lists");
     } else {

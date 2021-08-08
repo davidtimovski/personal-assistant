@@ -12,6 +12,10 @@ An ecosystem of PWAs that cooperate with each other to provide unique functional
 
 #### To Do Assistant
 * Create lists and tasks
+    * Delete tasks upon completion
+    * Flag tasks as high priority
+    * Search tasks within list
+    * Get hints for duplicate and similar tasks
 * Share lists with other users
     * Get notifications in shared lists
     * Set permissions of shared list members
@@ -19,10 +23,7 @@ An ecosystem of PWAs that cooperate with each other to provide unique functional
 * Reorder lists and tasks
 * Copy lists
 * Archive unused lists
-* Search tasks within list
 * Easily create multiple tasks from text
-* Delete tasks upon completion
-* Get hints for duplicate and similar tasks
 
 #### Cooking Assistant
 * Create recipes

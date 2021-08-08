@@ -5,22 +5,27 @@
   <div class="container">
     <div class="au-animate animate-fade-in animate-fade-out">
       <div class="page-title-wrap">
+
         <span if.bind="editListButtonIsLoading" class="page-loading">
           <i class="fas fa-circle-notch fa-spin"></i>
         </span>
         <a else click.delegate="editList()" class="edit-button" t="[title,aria-label]list.edit">
           <i class="fas fa-pencil-alt"></i>
         </a>
+
         <label class="tasks-reorder-toggle tasks ${isReordering ? 'checked' : ''}"
           t="[title,aria-label]list.reorderTasks">
           <input type="checkbox" checked.bind="isReordering" />
           <i class="fas fa-random"></i>
         </label>
+
         <div class="page-title tasks">${model.name}</div>
+
         <label class="search-toggle ${isSearching ? 'checked' : ''}" t="[title,aria-label]list.searchTasks">
           <input type="checkbox" checked.bind="isSearching" change.delegate="isSearchingToggleChanged()" />
           <i class="fas fa-search"></i>
         </label>
+
         <a click.delegate="back()" class="back-button">
           <i class="fas fa-times"></i>
         </a>
@@ -119,7 +124,7 @@
 
             <div reorderable-repeat.for="task of model.privateTasks" reorderable-after-reordering="reorder"
               reorderable-dnd-handler-selector=".sort-handle"
-              class="to-do-task ${task.isDisappearing ? 'disappearing' : ''}">
+              class="to-do-task ${model.computedListType !== 'high-priority' && task.isHighPriority ? 'high-priority' : ''} ${task.isDisappearing ? 'disappearing' : ''}">
               <div class="to-do-task-content ${task.id === getEditedId ? 'highlighted' : ''}">
                 <a route-href="route: editTask; params.bind: { id: task.id }" class="left-button"
                   t="[title,aria-label]list.edit">
@@ -142,7 +147,7 @@
           <div class="to-do-tasks-wrap ${isReordering ? 'reordering' : ''}">
             <div reorderable-repeat.for="task of model.tasks" reorderable-after-reordering="reorder"
               reorderable-dnd-handler-selector=".sort-handle"
-              class="to-do-task ${task.isDisappearing ? 'disappearing' : ''}">
+              class="to-do-task ${model.computedListType !== 'high-priority' && task.isHighPriority ? 'high-priority' : ''} ${task.isDisappearing ? 'disappearing' : ''}">
               <img if.bind="task.assignedUser" src.bind="task.assignedUser.imageUri" class="to-do-task-assignee-image"
                 t="[alt]profilePicture" />
               <div class="to-do-task-content ${task.id === getEditedId ? 'highlighted' : ''}">

@@ -6,6 +6,7 @@ export class EditTaskModel {
     public isCompleted: boolean,
     public isOneTime: boolean,
     public isPrivate: boolean,
+    public isHighPriority: boolean,
     public assignedToUserId: number,
     public isInSharedList: boolean,
     public order: number,

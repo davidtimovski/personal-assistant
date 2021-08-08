@@ -10,6 +10,7 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models
         public int ListId { get; set; }
         public string Name { get; set; }
         public bool IsOneTime { get; set; }
+        public bool IsHighPriority { get; set; }
         public bool? IsPrivate { get; set; }
         public int? AssignedToUserId { get; set; }
     }

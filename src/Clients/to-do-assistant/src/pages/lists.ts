@@ -1,6 +1,7 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { EventAggregator } from "aurelia-event-aggregator";
+import { I18N } from "aurelia-i18n";
 import { connectTo } from "aurelia-store";
 
 import { ConnectionTracker } from "../../../shared/src/utils/connectionTracker";
@@ -14,12 +15,13 @@ import { State } from "utils/state/state";
 import * as Actions from "utils/state/actions";
 import * as environment from "../../config/environment.json";
 
-@inject(Router, ListsService, UsersService, LocalStorage, EventAggregator, ConnectionTracker)
+@inject(Router, ListsService, UsersService, LocalStorage, EventAggregator, I18N, ConnectionTracker)
 @connectTo()
 export class Lists {
   private imageUri = JSON.parse(<any>environment).defaultProfileImageUri;
   private progressBar = new ProgressBar();
-  private lists: Array<List>;
+  private computedLists: List[];
+  private lists: List[];
   private listsLoaded = false;
   private iconOptions = ListsService.getIconOptions();
   private lastEditedId: number;
@@ -33,6 +35,7 @@ export class Lists {
     private readonly usersService: UsersService,
     private readonly localStorage: LocalStorage,
     private readonly eventAggregator: EventAggregator,
+    private readonly i18n: I18N,
     private readonly connTracker: ConnectionTracker
   ) {
     this.eventAggregator.subscribe("get-lists-finished", () => {
@@ -68,18 +71,24 @@ export class Lists {
   }
 
   setListsFromState() {
+    this.computedLists = this.state.lists.filter((x) => x.computedListType);
+
     this.lists = this.state.lists
-      .filter((x) => !x.isArchived)
+      .filter((x) => !x.isArchived && !x.computedListType)
       .sort((a: List, b: List) => {
         return a.order - b.order;
       });
+  }
+
+  getComputedListIconClass(computedListType: string): string {
+    return ListsService.getComputedListIconClass(computedListType);
   }
 
   getClassFromIcon(icon: string): string {
     return this.iconOptions.find((x) => x.icon === icon).cssClass;
   }
 
-  async reorder(changedArray: Array<List>, data) {
+  async reorder(changedArray: List[], data) {
     const id: number = changedArray[data.toIndex].id;
 
     const oldOrder = ++data.fromIndex;
@@ -95,7 +104,7 @@ export class Lists {
   sync() {
     this.progressBar.start();
 
-    Actions.getLists(this.listsService).then(() => {
+    Actions.getLists(this.listsService, this.i18n.tr("highPriority")).then(() => {
       this.setListsFromState();
       this.listsLoaded = true;
       this.progressBar.finish();

@@ -8,6 +8,7 @@ export class ViewList {
     public isOneTimeToggleDefault: boolean,
     public sharingState: SharingState,
     public isArchived: boolean,
+    public computedListType: string,
     public tasks: Array<ListTask>,
     public privateTasks: Array<ListTask>,
     public completedTasks: Array<ListTask>,

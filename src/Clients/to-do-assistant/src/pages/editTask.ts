@@ -20,8 +20,8 @@ export class EditTask {
   private taskId: number;
   private model: EditTaskModel;
   private originalTaskJson: string;
-  private listOptions: Array<ListOption>;
-  private assigneeOptions: Array<AssigneeOption>;
+  private listOptions: ListOption[];
+  private assigneeOptions: AssigneeOption[];
   private nobodyImageUri = JSON.parse(<any>environment).defaultProfileImageUri;
   private nameIsInvalid: boolean;
   private recipesText: string;
@@ -84,7 +84,14 @@ export class EditTask {
     }
   }
 
-  @computedFrom("model.name", "model.listId", "model.isOneTime", "model.isPrivate", "model.assignedToUserId")
+  @computedFrom(
+    "model.name",
+    "model.listId",
+    "model.isOneTime",
+    "model.isHighPriority",
+    "model.isPrivate",
+    "model.assignedToUserId"
+  )
   get canSave() {
     return !ValidationUtil.isEmptyOrWhitespace(this.model.name) && JSON.stringify(this.model) !== this.originalTaskJson;
   }
@@ -129,7 +136,7 @@ export class EditTask {
         await this.tasksService.update(this.model);
         this.nameIsInvalid = false;
 
-        await Actions.getLists(this.listsService);
+        await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
 
         this.router.navigateToRoute("listEdited", {
           id: this.model.listId,
@@ -154,7 +161,7 @@ export class EditTask {
 
       await this.tasksService.delete(this.model.id);
 
-      await Actions.getLists(this.listsService);
+      await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
 
       this.eventAggregator.publish(AlertEvents.ShowSuccess, "editTask.deleteSuccessful");
       this.router.navigateToRoute("list", { id: this.model.listId });

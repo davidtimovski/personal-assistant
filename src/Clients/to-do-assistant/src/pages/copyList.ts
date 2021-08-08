@@ -19,7 +19,7 @@ import * as Actions from "utils/state/actions";
 @connectTo()
 export class CopyList {
   private listId: number;
-  private model = new List(0, "", "", false, false, SharingState.NotShared, 0, false, [], null);
+  private model = new List(0, "", "", false, false, SharingState.NotShared, 0, false, null, [], null);
   private nameIsInvalid: boolean;
   private iconOptions = ListsService.getIconOptions();
   private saveButtonIsLoading = false;
@@ -62,18 +62,18 @@ export class CopyList {
 
   setModelFromState() {
     const list = this.state.lists.find((x) => x.id === this.listId);
-    if (this.model === null) {
+    if (!list) {
       this.router.navigateToRoute("notFound");
+    } else {
+      this.model = JSON.parse(JSON.stringify(list));
+      this.listName = this.model.name;
+
+      this.model.name = (this.i18n.tr("copyList.copyOf") + " " + this.model.name).substring(0, 50);
+
+      ValidationRules.ensure((x: List) => x.name)
+        .required()
+        .on(this.model);
     }
-
-    this.model = JSON.parse(JSON.stringify(list));
-    this.listName = this.model.name;
-
-    this.model.name = (this.i18n.tr("copyList.copyOf") + " " + this.model.name).substring(0, 50);
-
-    ValidationRules.ensure((x: List) => x.name)
-      .required()
-      .on(this.model);
   }
 
   selectIcon(icon: string) {
@@ -102,7 +102,7 @@ export class CopyList {
         this.model.id = await this.listsService.copy(this.model);
         this.nameIsInvalid = false;
 
-        await Actions.getLists(this.listsService);
+        await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
 
         this.eventAggregator.publish(AlertEvents.ShowSuccess, "copyList.copySuccessful");
 

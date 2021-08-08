@@ -7,6 +7,7 @@ export class Task {
     public name: string,
     public isCompleted: boolean,
     public isOneTime: boolean,
+    public isHighPriority: boolean,
     public isPrivate: boolean,
     public assignedUser: AssignedUser,
     public order: number

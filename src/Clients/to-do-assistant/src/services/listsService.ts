@@ -13,14 +13,14 @@ import { ListIcon } from "models/viewmodels/listIcon";
 import { EditListModel } from "models/viewmodels/editListModel";
 
 export class ListsService extends HttpProxyBase {
-  async getAll(): Promise<Array<List>> {
-    const result = await this.ajax<Array<List>>("lists");
+  async getAll(): Promise<List[]> {
+    const result = await this.ajax<List[]>("lists");
 
     return result;
   }
 
-  async getAllAsOptions(): Promise<Array<ListOption>> {
-    const result = await this.ajax<Array<ListOption>>("lists/options");
+  async getAllAsOptions(): Promise<ListOption[]> {
+    const result = await this.ajax<ListOption[]>("lists/options");
 
     return result;
   }
@@ -37,16 +37,14 @@ export class ListsService extends HttpProxyBase {
     return result;
   }
 
-  async getShareRequests(): Promise<Array<ShareRequest>> {
-    const result = await this.ajax<Array<ShareRequest>>("lists/share-requests");
+  async getShareRequests(): Promise<ShareRequest[]> {
+    const result = await this.ajax<ShareRequest[]>("lists/share-requests");
 
     return result;
   }
 
   async getPendingShareRequestsCount(): Promise<number> {
-    const result = await this.ajax<number>(
-      "lists/pending-share-requests-count"
-    );
+    const result = await this.ajax<number>("lists/pending-share-requests-count");
 
     return result;
   }
@@ -57,22 +55,13 @@ export class ListsService extends HttpProxyBase {
     return result;
   }
 
-  async getMembersAsAssigneeOptions(
-    id: number
-  ): Promise<Array<AssigneeOption>> {
-    const result = await this.ajax<Array<AssigneeOption>>(
-      `lists/${id}/members`
-    );
+  async getMembersAsAssigneeOptions(id: number): Promise<AssigneeOption[]> {
+    const result = await this.ajax<AssigneeOption[]>(`lists/${id}/members`);
 
     return result;
   }
 
-  async create(
-    name: string,
-    icon: string,
-    isOneTimeToggleDefault: boolean,
-    tasksText: string
-  ): Promise<number> {
+  async create(name: string, icon: string, isOneTimeToggleDefault: boolean, tasksText: string): Promise<number> {
     const id = await this.ajax<number>("lists", {
       method: "post",
       body: json({
@@ -110,19 +99,12 @@ export class ListsService extends HttpProxyBase {
   }
 
   async canShareListWithUser(email: string): Promise<CanShareList> {
-    const result = await this.ajax<CanShareList>(
-      `lists/can-share-with-user/${email}`
-    );
+    const result = await this.ajax<CanShareList>(`lists/can-share-with-user/${email}`);
 
     return result;
   }
 
-  async share(
-    id: number,
-    newShares: Array<Share>,
-    editedShares: Array<Share>,
-    removedShares: Array<Share>
-  ): Promise<void> {
+  async share(id: number, newShares: Share[], editedShares: Share[], removedShares: Share[]): Promise<void> {
     await this.ajaxExecute("lists/share", {
       method: "put",
       body: json({
@@ -193,7 +175,7 @@ export class ListsService extends HttpProxyBase {
     });
   }
 
-  static getIconOptions(): Array<ListIcon> {
+  static getIconOptions(): ListIcon[] {
     return [
       new ListIcon("list", "fas fa-list"),
       new ListIcon("shopping", "fas fa-shopping-cart"),
@@ -221,5 +203,15 @@ export class ListsService extends HttpProxyBase {
       new ListIcon("book", "fas fa-book"),
       new ListIcon("mountain", "fas fa-mountain"),
     ];
+  }
+
+  public static highPriorityComputedListMoniker = "high-priority";
+
+  static getComputedListIconClass(type: string): string {
+    if (type === this.highPriorityComputedListMoniker) {
+      return "fas fa-exclamation-triangle";
+    }
+
+    throw "No such computed list type";
   }
 }
