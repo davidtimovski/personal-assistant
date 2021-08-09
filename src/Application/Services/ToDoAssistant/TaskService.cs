@@ -162,6 +162,12 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
         public async Task<SimpleTask> DeleteAsync(int id, int userId)
         {
+            ToDoTask task = await _tasksRepository.GetAsync(id);
+            if (task == null)
+            {
+                return null;
+            }
+
             if (!Exists(id, userId))
             {
                 throw new ValidationException("Unauthorized");
@@ -181,6 +187,12 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
                 throw new ValidationException("Unauthorized");
             }
 
+            ToDoTask task = await _tasksRepository.GetAsync(model.Id);
+            if (task.IsCompleted)
+            {
+                return null;
+            }
+
             ToDoTask originalTask = await _tasksRepository.CompleteAsync(model.Id, model.UserId);
 
             var result = _mapper.Map<SimpleTask>(originalTask);
@@ -193,6 +205,12 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             if (!Exists(model.Id, model.UserId))
             {
                 throw new ValidationException("Unauthorized");
+            }
+
+            ToDoTask task = await _tasksRepository.GetAsync(model.Id);
+            if (!task.IsCompleted)
+            {
+                return null;
             }
 
             ToDoTask originalTask = await _tasksRepository.UncompleteAsync(model.Id, model.UserId);

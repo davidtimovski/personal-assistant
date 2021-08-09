@@ -16,7 +16,6 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
     {
         private readonly Mock<IValidator<UpdateTask>> _successfulValidatorMock;
         private readonly Mock<ITasksRepository> _tasksRepositoryMock = new Mock<ITasksRepository>();
-        private readonly Mock<IListService> _listServiceMock = new Mock<IListService>();
         private readonly ITaskService _sut;
 
         public UpdateTests()
@@ -25,7 +24,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
 
             _sut = new TaskService(
                 _tasksRepositoryMock.Object,
-                _listServiceMock.Object,
+                new Mock<IListService>().Object,
                 MapperMocker.GetMapper<ToDoAssistantProfile>());
         }
 

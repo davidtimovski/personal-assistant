@@ -359,6 +359,10 @@ namespace Api.Controllers.ToDoAssistant
             }
 
             SimpleTask deletedTask = await _taskService.DeleteAsync(id, userId);
+            if (deletedTask == null)
+            {
+                return NoContent();
+            }
 
             // Notify
             var usersToBeNotified = await _userService.GetToBeNotifiedOfListChangeAsync(deletedTask.ListId, userId, deletedTask.PrivateToUserId == userId);
@@ -408,6 +412,10 @@ namespace Api.Controllers.ToDoAssistant
             }
 
             SimpleTask task = await _taskService.CompleteAsync(dto);
+            if (task == null)
+            {
+                return NoContent();
+            }
 
             // Notify
             var usersToBeNotified = await _userService.GetToBeNotifiedOfListChangeAsync(task.ListId, dto.UserId, task.Id);
@@ -457,6 +465,10 @@ namespace Api.Controllers.ToDoAssistant
             }
 
             SimpleTask task = await _taskService.UncompleteAsync(dto);
+            if (task == null)
+            {
+                return NoContent();
+            }
 
             // Notify
             var usersToBeNotified = await _userService.GetToBeNotifiedOfListChangeAsync(task.ListId, dto.UserId, task.Id);

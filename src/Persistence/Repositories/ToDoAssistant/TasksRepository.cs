@@ -292,7 +292,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<ToDoTask> DeleteAsync(int id, int userId)
         {
-            var task = await GetAsync(id);
+            ToDoTask task = await GetAsync(id);
 
             var ingredients = EFContext.Ingredients.Where(x => x.TaskId == task.Id);
             foreach (var ingredient in ingredients)
@@ -328,7 +328,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<ToDoTask> CompleteAsync(int id, int userId)
         {
-            var task = await GetAsync(id);
+            ToDoTask task = await GetAsync(id);
 
             short order = 1;
             if (task.PrivateToUserId.HasValue)
@@ -378,7 +378,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task<ToDoTask> UncompleteAsync(int id, int userId)
         {
-            var task = await GetAsync(id);
+            ToDoTask task = await GetAsync(id);
 
             short order;
             if (task.PrivateToUserId.HasValue)
@@ -422,7 +422,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task ReorderAsync(int id, int userId, short oldOrder, short newOrder, DateTime modifiedDate)
         {
-            var task = await GetAsync(id);
+            ToDoTask task = await GetAsync(id);
 
             if (task.PrivateToUserId.HasValue)
             {

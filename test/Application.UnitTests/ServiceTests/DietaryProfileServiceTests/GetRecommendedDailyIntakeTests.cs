@@ -16,7 +16,6 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.DietaryProfileSer
     public class GetRecommendedDailyIntakeTests
     {
         private readonly Mock<IOptions<DailyIntakeReference>> _dailyIntakeRefOptionsMock = new Mock<IOptions<DailyIntakeReference>>();
-        private readonly Mock<IDietaryProfilesRepository> _dietaryProfilesRepositoryMock = new Mock<IDietaryProfilesRepository>();
         private readonly IDietaryProfileService _sut;
 
         public GetRecommendedDailyIntakeTests()
@@ -28,7 +27,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.DietaryProfileSer
                 new Mock<IConversion>().Object,
                 new Mock<IDailyIntakeHelper>().Object,
                 _dailyIntakeRefOptionsMock.Object,
-                _dietaryProfilesRepositoryMock.Object,
+                new Mock<IDietaryProfilesRepository>().Object,
                 GetMapper());
         }
 
