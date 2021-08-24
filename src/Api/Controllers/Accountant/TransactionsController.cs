@@ -95,7 +95,7 @@ namespace Api.Controllers.Accountant
         }
 
         [HttpPost("export")]
-        public async Task<IActionResult> Export([FromBody] ExportVm vm)
+        public IActionResult Export([FromBody] ExportVm vm)
         {
             if (vm == null)
             {
@@ -115,7 +115,7 @@ namespace Api.Controllers.Accountant
             string directory = Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp");
             var exportAsCsvModel = new ExportAsCsv(userId, directory, vm.FileId, _localizer["Uncategorized"], _localizer["Encrypted"]);
 
-            FileStream file = await _transactionService.ExportAsCsvAsync(exportAsCsvModel);
+            FileStream file = _transactionService.ExportAsCsv(exportAsCsvModel);
 
             Response.Headers.Add("Content-Disposition", "attachment; filename=\"transactions.csv\"");
             return new FileStreamResult(file, "text/csv");

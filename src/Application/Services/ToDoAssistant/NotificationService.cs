@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using PersonalAssistant.Application.Contracts.ToDoAssistant;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications.Models;
 using PersonalAssistant.Domain.Entities.ToDoAssistant;
@@ -23,18 +22,18 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<NotificationDto>> GetAllAndFlagUnseenAsync(int userId)
+        public IEnumerable<NotificationDto> GetAllAndFlagUnseen(int userId)
         {
-            IEnumerable<Notification> notifications = await _notificationsRepository.GetAllAndFlagUnseenAsync(userId);
+            IEnumerable<Notification> notifications = _notificationsRepository.GetAllAndFlagUnseen(userId);
 
             var result = notifications.Select(x => _mapper.Map<NotificationDto>(x));
 
             return result;
         }
 
-        public Task<int> GetUnseenNotificationsCountAsync(int userId)
+        public int GetUnseenNotificationsCount(int userId)
         {
-            return _notificationsRepository.GetUnseenNotificationsCountAsync(userId);
+            return _notificationsRepository.GetUnseenNotificationsCount(userId);
         }
 
         public Task<int> CreateOrUpdateAsync(CreateOrUpdateNotification model)

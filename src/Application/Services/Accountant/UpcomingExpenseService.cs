@@ -31,18 +31,18 @@ namespace PersonalAssistant.Application.Services.Accountant
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<UpcomingExpenseDto>> GetAllAsync(GetAll model)
+        public IEnumerable<UpcomingExpenseDto> GetAll(GetAll model)
         {
-            var upcomingExpenses = await _upcomingExpensesRepository.GetAllAsync(model.UserId, model.FromModifiedDate);
+            var upcomingExpenses = _upcomingExpensesRepository.GetAll(model.UserId, model.FromModifiedDate);
 
             var upcomingExpenseDtos = upcomingExpenses.Select(x => _mapper.Map<UpcomingExpenseDto>(x));
 
             return upcomingExpenseDtos;
         }
 
-        public Task<IEnumerable<int>> GetDeletedIdsAsync(GetDeletedIds model)
+        public IEnumerable<int> GetDeletedIds(GetDeletedIds model)
         {
-            return _upcomingExpensesRepository.GetDeletedIdsAsync(model.UserId, model.FromDate);
+            return _upcomingExpensesRepository.GetDeletedIds(model.UserId, model.FromDate);
         }
 
         public Task<int> CreateAsync(CreateUpcomingExpense model)

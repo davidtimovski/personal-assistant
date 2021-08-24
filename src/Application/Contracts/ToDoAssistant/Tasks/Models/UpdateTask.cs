@@ -24,9 +24,9 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models
                 .Must((dto, userId) => !taskService.Exists(dto.Id, dto.Name, dto.ListId, userId)).WithMessage("AlreadyExists");
 
             RuleFor(dto => dto.ListId)
-                .MustAsync(async (dto, listId, val) =>
+                .Must((dto, listId) =>
                 {
-                    SimpleTask originalTask = await taskService.GetAsync(dto.Id);
+                    SimpleTask originalTask = taskService.Get(dto.Id);
                     bool listChanged = listId != originalTask.ListId;
 
                     if (listChanged && taskService.Count(dto.ListId) == 250)

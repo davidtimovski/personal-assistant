@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Moq;
+using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
 using PersonalAssistant.Application.Mappings;
@@ -17,16 +18,18 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
         public DeleteTests()
         {
             _sut = new TaskService(
-                _tasksRepositoryMock.Object,
+                new Mock<IUserService>().Object,
                 new Mock<IListService>().Object,
+                _tasksRepositoryMock.Object,
+                new Mock<IListsRepository>().Object,
                 MapperMocker.GetMapper<ToDoAssistantProfile>());
         }
 
         [Fact]
         public async Task DoesNothingIfTaskAlreadyDeleted()
         {
-            _tasksRepositoryMock.Setup(x => x.GetAsync(It.IsAny<int>()))
-                .ReturnsAsync((ToDoTask)null);
+            _tasksRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
+                .Returns((ToDoTask)null);
 
             await _sut.DeleteAsync(It.IsAny<int>(), It.IsAny<int>());
 

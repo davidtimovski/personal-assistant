@@ -17,7 +17,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
         public ListsRepository(PersonalAssistantContext efContext)
             : base(efContext) { }
 
-        public async Task<IEnumerable<ToDoList>> GetAllAsOptionsAsync(int userId)
+        public IEnumerable<ToDoList> GetAllAsOptions(int userId)
         {
             using IDbConnection conn = OpenConnection();
 
@@ -27,7 +27,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                             WHERE l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")
                             ORDER BY l.""Order""";
 
-            return await conn.QueryAsync<ToDoList, ListShare, ToDoList>(sql,
+            return conn.Query<ToDoList, ListShare, ToDoList>(sql,
                 (list, share) =>
                 {
                     if (share != null && share.IsAccepted != false)
@@ -38,20 +38,20 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 }, new { UserId = userId }, null, true, "UserId");
         }
 
-        public async Task<IEnumerable<ToDoList>> GetAllWithTasksAndSharingDetailsAsync(int userId)
+        public IEnumerable<ToDoList> GetAllWithTasksAndSharingDetails(int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            var lists = await conn.QueryAsync<ToDoList>(@"SELECT l.*
-                                                          FROM ""ToDoAssistant.Lists"" AS l
-                                                          LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId"" 
-                                                            AND s.""UserId"" = @UserId
-                                                            AND s.""IsAccepted"" 
-                                                          WHERE (l.""UserId"" = @UserId OR s.""UserId"" = @UserId)",
-                                                          new { UserId = userId });
+            var lists = conn.Query<ToDoList>(@"SELECT l.*
+                                                FROM ""ToDoAssistant.Lists"" AS l
+                                                LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId"" 
+                                                AND s.""UserId"" = @UserId
+                                                AND s.""IsAccepted"" 
+                                                WHERE (l.""UserId"" = @UserId OR s.""UserId"" = @UserId)",
+                                                new { UserId = userId });
 
             var listIds = lists.Select(x => x.Id).ToArray();
-            var shares = await conn.QueryAsync<ListShare>(@"SELECT * FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = ANY(@ListIds)", new { ListIds = listIds });
+            var shares = conn.Query<ListShare>(@"SELECT * FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = ANY(@ListIds)", new { ListIds = listIds });
 
             var tasksSql = @"SELECT t.*, u.""Id"", u.""ImageUri""
                              FROM ""ToDoAssistant.Tasks"" AS t
@@ -59,7 +59,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                              WHERE t.""ListId"" = ANY(@ListIds)
                              AND (t.""PrivateToUserId"" IS NULL OR t.""PrivateToUserId"" = @UserId)";
 
-            var tasks = await conn.QueryAsync<ToDoTask, User, ToDoTask>(tasksSql,
+            var tasks = conn.Query<ToDoTask, User, ToDoTask>(tasksSql,
                 (task, user) =>
                 {
                     task.AssignedToUser = user;
@@ -76,26 +76,26 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             return lists;
         }
 
-        public async Task<IEnumerable<User>> GetMembersAsAssigneeOptionsAsync(int id)
+        public IEnumerable<User> GetMembersAsAssigneeOptions(int id)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.QueryAsync<User>(@"SELECT DISTINCT u.""Id"", u.""Name"", u.""ImageUri""
-                                                FROM ""AspNetUsers"" AS u
-                                                LEFT JOIN ""ToDoAssistant.Lists"" AS l ON u.""Id"" = l.""UserId""
-                                                LEFT JOIN ""ToDoAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
-                                                WHERE l.""Id"" = @ListId OR (s.""ListId"" = @ListId AND s.""IsAccepted"" IS NOT FALSE)
-                                                ORDER BY u.""Name""", new { ListId = id });
+            return conn.Query<User>(@"SELECT DISTINCT u.""Id"", u.""Name"", u.""ImageUri""
+                                    FROM ""AspNetUsers"" AS u
+                                    LEFT JOIN ""ToDoAssistant.Lists"" AS l ON u.""Id"" = l.""UserId""
+                                    LEFT JOIN ""ToDoAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
+                                    WHERE l.""Id"" = @ListId OR (s.""ListId"" = @ListId AND s.""IsAccepted"" IS NOT FALSE)
+                                    ORDER BY u.""Name""", new { ListId = id });
         }
 
-        public async Task<ToDoList> GetAsync(int id)
+        public ToDoList Get(int id)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.QueryFirstOrDefaultAsync<ToDoList>(@"SELECT * FROM ""ToDoAssistant.Lists"" WHERE ""Id"" = @Id", new { Id = id });
+            return conn.QueryFirstOrDefault<ToDoList>(@"SELECT * FROM ""ToDoAssistant.Lists"" WHERE ""Id"" = @Id", new { Id = id });
         }
 
-        public async Task<ToDoList> GetAsync(int id, int userId)
+        public ToDoList Get(int id, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
@@ -105,7 +105,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                         LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
                         WHERE l.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))";
 
-            return (await conn.QueryAsync<ToDoList, ListShare, ToDoList>(sql,
+            return conn.Query<ToDoList, ListShare, ToDoList>(sql,
                 (list, share) =>
                 {
                     if (share != null)
@@ -113,10 +113,10 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                         list.Shares.Add(share);
                     }
                     return list;
-                }, new { Id = id, UserId = userId }, null, true, "UserId")).First();
+                }, new { Id = id, UserId = userId }, null, true, "UserId").First();
         }
 
-        public async Task<ToDoList> GetWithOwnerAsync(int id, int userId)
+        public ToDoList GetWithOwner(int id, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
@@ -126,15 +126,15 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                         INNER JOIN ""AspNetUsers"" AS users ON l.""UserId"" = users.""Id""
                         WHERE l.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))";
 
-            return (await conn.QueryAsync<ToDoList, User, ToDoList>(sql,
+            return conn.Query<ToDoList, User, ToDoList>(sql,
                 (list, user) =>
                 {
                     list.User = user;
                     return list;
-                }, new { Id = id, UserId = userId }, null, true)).FirstOrDefault();
+                }, new { Id = id, UserId = userId }, null, true).FirstOrDefault();
         }
 
-        public async Task<IEnumerable<ListShare>> GetSharesAsync(int id)
+        public IEnumerable<ListShare> GetShares(int id)
         {
             using IDbConnection conn = OpenConnection();
 
@@ -144,7 +144,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                         WHERE s.""ListId"" = @ListId AND s.""IsAccepted"" IS NOT FALSE
                         ORDER BY (CASE WHEN s.""IsAccepted"" THEN 1 ELSE 2 END) ASC, s.""CreatedDate""";
 
-            return await conn.QueryAsync<ListShare, User, ListShare>(sql,
+            return conn.Query<ListShare, User, ListShare>(sql,
                 (share, user) =>
                 {
                     share.User = user;
@@ -152,7 +152,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 }, new { ListId = id }, null, true);
         }
 
-        public async Task<IEnumerable<ListShare>> GetShareRequestsAsync(int userId)
+        public IEnumerable<ListShare> GetShareRequests(int userId)
         {
             using IDbConnection conn = OpenConnection();
 
@@ -163,7 +163,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                         WHERE s.""UserId"" = @UserId
                         ORDER BY s.""ModifiedDate"" DESC";
 
-            return await conn.QueryAsync<ListShare, ToDoList, User, ListShare>(sql,
+            return conn.Query<ListShare, ToDoList, User, ListShare>(sql,
                 (share, list, user) =>
                 {
                     share.List = list;
@@ -172,11 +172,11 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 }, new { UserId = userId }, null, true, "Name");
         }
 
-        public async Task<int> GetPendingShareRequestsCountAsync(int userId)
+        public int GetPendingShareRequestsCount(int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.ExecuteScalarAsync<int>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Shares"" WHERE ""UserId"" = @UserId AND ""IsAccepted"" IS NULL",
+            return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Shares"" WHERE ""UserId"" = @UserId AND ""IsAccepted"" IS NULL",
                 new { UserId = userId });
         }
 
@@ -311,6 +311,44 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Lists"" WHERE ""UserId"" = @UserId", new { UserId = userId });
         }
 
+        public IEnumerable<User> GetUsersToBeNotifiedOfChange(int id, int excludeUserId)
+        {
+            using IDbConnection conn = OpenConnection();
+
+            return conn.Query<User>(@"SELECT u.*
+                                        FROM ""AspNetUsers"" AS u
+                                        INNER JOIN ""ToDoAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
+                                        WHERE u.""Id"" != @ExcludeUserId AND s.""ListId"" = @ListId AND s.""IsAccepted"" AND u.""ToDoNotificationsEnabled"" AND s.""NotificationsEnabled""
+                                        UNION
+                                        SELECT u.*
+                                        FROM ""AspNetUsers"" AS u
+                                        INNER JOIN ""ToDoAssistant.Lists"" AS l ON u.""Id"" = l.""UserId""
+                                        WHERE u.""Id"" != @ExcludeUserId AND l.""Id"" = @ListId AND u.""ToDoNotificationsEnabled"" AND l.""NotificationsEnabled""",
+                                    new { ListId = id, ExcludeUserId = excludeUserId });
+        }
+
+        public IEnumerable<User> GetUsersToBeNotifiedOfDeletion(int id)
+        {
+            using IDbConnection conn = OpenConnection();
+
+            return conn.Query<User>(@"SELECT u.*
+                                    FROM ""AspNetUsers"" AS u
+                                    INNER JOIN ""ToDoAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
+                                    WHERE s.""ListId"" = @ListId AND s.""IsAccepted"" AND u.""ToDoNotificationsEnabled"" AND s.""NotificationsEnabled""",
+                                new { ListId = id });
+        }
+
+        public bool CheckIfUserCanBeNotifiedOfChange(int id, int userId)
+        {
+            using IDbConnection conn = OpenConnection();
+
+            return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
+                                            FROM ""AspNetUsers"" AS u
+                                            INNER JOIN ""ToDoAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
+                                            WHERE u.""Id"" = @UserId AND s.""ListId"" = @ListId AND s.""IsAccepted"" AND u.""ToDoNotificationsEnabled"" AND s.""NotificationsEnabled""",
+                                            new { ListId = id, UserId = userId });
+        }
+
         public async Task<int> CreateAsync(ToDoList list)
         {
             using IDbConnection conn = OpenConnection();
@@ -336,7 +374,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             return list.Id;
         }
 
-        public async Task<ToDoList> UpdateAsync(ToDoList list)
+        public async Task<ToDoList> UpdateAsync(ToDoList list, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
@@ -346,8 +384,18 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             dbList.Name = list.Name;
             dbList.Icon = list.Icon;
             dbList.IsOneTimeToggleDefault = list.IsOneTimeToggleDefault;
-            dbList.NotificationsEnabled = list.NotificationsEnabled;
             dbList.ModifiedDate = list.ModifiedDate;
+
+            if (dbList.UserId == userId)
+            {
+                dbList.NotificationsEnabled = list.NotificationsEnabled;
+            }
+            else
+            {
+                ListShare share = EFContext.ListShares.First(x => x.ListId == list.Id && x.UserId == userId);
+                share.NotificationsEnabled = list.NotificationsEnabled;
+                share.ModifiedDate = list.ModifiedDate;
+            }
 
             await EFContext.SaveChangesAsync();
 
@@ -379,7 +427,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 ingredient.ModifiedDate = now;
             }
 
-            ToDoList list = await GetAsync(id);
+            ToDoList list = Get(id);
 
             using IDbConnection conn = OpenConnection();
 
@@ -631,11 +679,10 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
         public async Task<bool> SetTasksAsNotCompletedAsync(int id, int userId, DateTime modifiedDate)
         {
             List<ToDoTask> tasks = EFContext.Tasks.Where(x => x.ListId == id).ToList();
-            short uncompletedTasksCount = (short)tasks.Where(x => !x.IsCompleted && !x.PrivateToUserId.HasValue).Count();
-            short uncompletedPrivateTasksCount = (short)tasks.Where(x => !x.IsCompleted && x.PrivateToUserId.HasValue && x.PrivateToUserId.Value == userId).Count();
 
             // Public tasks
-            IEnumerable<ToDoTask> completedTasks = tasks.Where(x => x.IsCompleted && !x.PrivateToUserId.HasValue);
+            List<ToDoTask> completedTasks = tasks.Where(x => x.IsCompleted && !x.PrivateToUserId.HasValue).ToList();
+            short uncompletedTasksCount = (short)tasks.Where(x => !x.IsCompleted && !x.PrivateToUserId.HasValue).Count();
             foreach (var task in completedTasks)
             {
                 task.IsCompleted = false;
@@ -644,7 +691,8 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             }
 
             // Private tasks
-            IEnumerable<ToDoTask> completedPrivateTasks = tasks.Where(x => x.IsCompleted && x.PrivateToUserId.HasValue && x.PrivateToUserId.Value == userId);
+            List<ToDoTask> completedPrivateTasks = tasks.Where(x => x.IsCompleted && x.PrivateToUserId.HasValue && x.PrivateToUserId.Value == userId).ToList();
+            short uncompletedPrivateTasksCount = (short)tasks.Where(x => !x.IsCompleted && x.PrivateToUserId.HasValue && x.PrivateToUserId.Value == userId).Count();
             foreach (var task in completedPrivateTasks)
             {
                 task.IsCompleted = false;

@@ -15,7 +15,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
         public TransactionsRepository(PersonalAssistantContext efContext)
             : base(efContext) { }
 
-        public async Task<IEnumerable<Transaction>> GetAllForExportAsync(int userId, string uncategorized)
+        public IEnumerable<Transaction> GetAllForExport(int userId, string uncategorized)
         {
             using IDbConnection conn = OpenConnection();
 
@@ -27,7 +27,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
                         LEFT JOIN ""Accountant.Categories"" AS pc ON c.""ParentId"" = pc.""Id""
                         WHERE fa.""UserId"" = @UserId OR ta.""UserId"" = @UserId ORDER BY ""Date""";
 
-            var transactions = await conn.QueryAsync<Transaction, Account, Account, Category, Category, Transaction>(sql,
+            var transactions = conn.Query<Transaction, Account, Account, Category, Category, Transaction>(sql,
                 (transaction, fromAccount, toAccount, category, parentCategory) =>
                 {
                     transaction.FromAccount = fromAccount ?? new Account();
@@ -53,23 +53,23 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
             return transactions;
         }
 
-        public async Task<IEnumerable<Transaction>> GetAllAsync(int userId, DateTime fromModifiedDate)
+        public IEnumerable<Transaction> GetAll(int userId, DateTime fromModifiedDate)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.QueryAsync<Transaction>(@"SELECT t.* 
-                                                        FROM ""Accountant.Transactions"" AS t
-                                                        INNER JOIN ""Accountant.Accounts"" AS a ON a.""Id"" = t.""FromAccountId"" 
-                                                            OR a.""Id"" = t.""ToAccountId"" 
-                                                        WHERE a.""UserId"" = @UserId AND t.""ModifiedDate"" > @FromModifiedDate",
+            return conn.Query<Transaction>(@"SELECT t.* 
+                                            FROM ""Accountant.Transactions"" AS t
+                                            INNER JOIN ""Accountant.Accounts"" AS a ON a.""Id"" = t.""FromAccountId"" 
+                                                OR a.""Id"" = t.""ToAccountId"" 
+                                            WHERE a.""UserId"" = @UserId AND t.""ModifiedDate"" > @FromModifiedDate",
                 new { UserId = userId, FromModifiedDate = fromModifiedDate });
         }
 
-        public async Task<IEnumerable<int>> GetDeletedIdsAsync(int userId, DateTime fromDate)
+        public IEnumerable<int> GetDeletedIds(int userId, DateTime fromDate)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.QueryAsync<int>(@"SELECT ""EntityId"" FROM ""Accountant.DeletedEntities"" WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""DeletedDate"" > @DeletedDate",
+            return conn.Query<int>(@"SELECT ""EntityId"" FROM ""Accountant.DeletedEntities"" WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""DeletedDate"" > @DeletedDate",
                 new { UserId = userId, EntityType = (short)EntityType.Transaction, DeletedDate = fromDate });
         }
 

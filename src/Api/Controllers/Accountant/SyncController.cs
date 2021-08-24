@@ -72,26 +72,26 @@ namespace Api.Controllers.Accountant
 
             var getAll = new GetAll(userId, vm.LastSynced);
 
-            IEnumerable<CategoryDto> categories = await _categoryService.GetAllAsync(getAll);
-            IEnumerable<AccountDto> accounts = await _accountService.GetAllAsync(getAll);
-            IEnumerable<TransactionDto> transactions = await _transactionService.GetAllAsync(getAll);
-            IEnumerable<UpcomingExpenseDto> upcomingExpenses = await _upcomingExpenseService.GetAllAsync(getAll);
-            IEnumerable<DebtDto> debts = await _debtService.GetAllAsync(getAll);
+            IEnumerable<CategoryDto> categories = _categoryService.GetAll(getAll);
+            IEnumerable<AccountDto> accounts = _accountService.GetAll(getAll);
+            IEnumerable<TransactionDto> transactions = _transactionService.GetAll(getAll);
+            IEnumerable<UpcomingExpenseDto> upcomingExpenses = _upcomingExpenseService.GetAll(getAll);
+            IEnumerable<DebtDto> debts = _debtService.GetAll(getAll);
 
             var getDeletedIds = new GetDeletedIds(userId, vm.LastSynced);
 
             var changedVm = new ChangedVm
             {
                 LastSynced = DateTime.UtcNow,
-                DeletedAccountIds = await _accountService.GetDeletedIdsAsync(getDeletedIds),
+                DeletedAccountIds = _accountService.GetDeletedIds(getDeletedIds),
                 Accounts = accounts,
-                DeletedCategoryIds = await _categoryService.GetDeletedIdsAsync(getDeletedIds),
+                DeletedCategoryIds = _categoryService.GetDeletedIds(getDeletedIds),
                 Categories = categories,
-                DeletedTransactionIds = await _transactionService.GetDeletedIdsAsync(getDeletedIds),
+                DeletedTransactionIds = _transactionService.GetDeletedIds(getDeletedIds),
                 Transactions = transactions,
-                DeletedUpcomingExpenseIds = await _upcomingExpenseService.GetDeletedIdsAsync(getDeletedIds),
+                DeletedUpcomingExpenseIds = _upcomingExpenseService.GetDeletedIds(getDeletedIds),
                 UpcomingExpenses = upcomingExpenses,
-                DeletedDebtIds = await _debtService.GetDeletedIdsAsync(getDeletedIds),
+                DeletedDebtIds = _debtService.GetDeletedIds(getDeletedIds),
                 Debts = debts
             };
 

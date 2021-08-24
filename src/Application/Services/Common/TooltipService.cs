@@ -2,10 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using PersonalAssistant.Application.Contracts;
 using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Application.Contracts.Common.Models;
-using PersonalAssistant.Domain.Entities;
 using PersonalAssistant.Domain.Entities.Common;
 
 namespace PersonalAssistant.Application.Services.Common
@@ -23,18 +21,18 @@ namespace PersonalAssistant.Application.Services.Common
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<TooltipDto>> GetAllAsync(string application, int userId)
+        public IEnumerable<TooltipDto> GetAll(string application, int userId)
         {
-            var tooltips = await _tooltipsRepository.GetAllAsync(application, userId);
+            var tooltips = _tooltipsRepository.GetAll(application, userId);
 
             var tooltipDtos = tooltips.Select(x => _mapper.Map<TooltipDto>(x));
 
             return tooltipDtos;
         }
 
-        public async Task<TooltipDto> GetByKeyAsync(int userId, string key, string application)
+        public TooltipDto GetByKey(int userId, string key, string application)
         {
-            Tooltip tooltip = await _tooltipsRepository.GetByKeyAsync(userId, key, application);
+            Tooltip tooltip = _tooltipsRepository.GetByKey(userId, key, application);
             return _mapper.Map<TooltipDto>(tooltip);
         }
 

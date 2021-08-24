@@ -7,10 +7,10 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks
 {
     public interface ITasksRepository
     {
-        Task<ToDoTask> GetAsync(int id);
-        Task<ToDoTask> GetAsync(int id, int userId);
-        Task<ToDoTask> GetForUpdateAsync(int id, int userId);
-        Task<List<string>> GetRecipesAsync(int id, int userId);
+        ToDoTask Get(int id);
+        ToDoTask Get(int id, int userId);
+        ToDoTask GetForUpdate(int id, int userId);
+        List<string> GetRecipes(int id, int userId);
         bool Exists(int id, int userId);
         bool Exists(string name, int listId, int userId);
         bool Exists(List<string> names, int listId, int userId);
@@ -20,9 +20,9 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks
         Task<int> CreateAsync(ToDoTask task, int userId);
         Task<IEnumerable<ToDoTask>> BulkCreateAsync(IEnumerable<ToDoTask> tasks, bool tasksArePrivate, int userId);
         Task UpdateAsync(ToDoTask task, int userId);
-        Task<ToDoTask> DeleteAsync(int id, int userId);
-        Task<ToDoTask> CompleteAsync(int id, int userId);
-        Task<ToDoTask> UncompleteAsync(int id, int userId);
+        Task DeleteAsync(int id, int userId);
+        Task CompleteAsync(int id, int userId);
+        Task UncompleteAsync(int id, int userId);
         Task ReorderAsync(int id, int userId, short oldOrder, short newOrder, DateTime modifiedDate);
     }
 }

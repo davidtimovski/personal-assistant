@@ -22,7 +22,7 @@ namespace Api.Controllers.Common
         }
 
         [HttpGet("application/{application}")]
-        public async Task<IActionResult> GetAll(string application)
+        public IActionResult GetAll(string application)
         {
             int userId;
             try
@@ -34,13 +34,13 @@ namespace Api.Controllers.Common
                 return Unauthorized();
             }
 
-            var tooltipDtos = await _tooltipService.GetAllAsync(application, userId);
+            var tooltipDtos = _tooltipService.GetAll(application, userId);
 
             return Ok(tooltipDtos);
         }
 
         [HttpGet("key/{key}/{application}")]
-        public async Task<IActionResult> GetByKey(string key, string application)
+        public IActionResult GetByKey(string key, string application)
         {
             int userId;
             try
@@ -52,7 +52,7 @@ namespace Api.Controllers.Common
                 return Unauthorized();
             }
 
-            var tooltipDto = await _tooltipService.GetByKeyAsync(userId, key, application);
+            var tooltipDto = _tooltipService.GetByKey(userId, key, application);
 
             return Ok(tooltipDto);
         }

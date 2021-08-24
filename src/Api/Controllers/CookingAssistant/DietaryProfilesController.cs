@@ -30,7 +30,7 @@ namespace Api.Controllers.CookingAssistant
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public IActionResult Get()
         {
             int userId;
             try
@@ -42,7 +42,7 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            EditDietaryProfile dto = await _dietaryProfileService.GetAsync(userId);
+            EditDietaryProfile dto = _dietaryProfileService.Get(userId);
 
             return Ok(dto);
         }

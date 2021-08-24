@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using FluentValidation;
 using Moq;
+using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models;
@@ -16,6 +17,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
     {
         private readonly Mock<IValidator<UpdateTask>> _successfulValidatorMock;
         private readonly Mock<ITasksRepository> _tasksRepositoryMock = new Mock<ITasksRepository>();
+        private readonly Mock<IListsRepository> _listsRepositoryMock = new Mock<IListsRepository>();
         private readonly ITaskService _sut;
 
         public UpdateTests()
@@ -23,14 +25,21 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
             _successfulValidatorMock = ValidatorMocker.GetSuccessful<UpdateTask>();
 
             _sut = new TaskService(
-                _tasksRepositoryMock.Object,
+                new Mock<IUserService>().Object,
                 new Mock<IListService>().Object,
+                _tasksRepositoryMock.Object,
+                _listsRepositoryMock.Object,
                 MapperMocker.GetMapper<ToDoAssistantProfile>());
         }
 
         [Fact]
         public async Task ValidatesModel()
         {
+            _tasksRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
+                .Returns(new ToDoTask());
+            _listsRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
+                .Returns(new ToDoList());
+
             UpdateTask model = new TaskBuilder().BuildUpdateModel();
 
             await _sut.UpdateAsync(model, _successfulValidatorMock.Object);
@@ -53,6 +62,11 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
             string actualName = null;
             _tasksRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<ToDoTask>(), It.IsAny<int>()))
                 .Callback<ToDoTask, int>((t, i) => actualName = t.Name);
+
+            _tasksRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
+                .Returns(new ToDoTask());
+            _listsRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
+                .Returns(new ToDoList());
 
             UpdateTask model = new TaskBuilder().WithName(" Task name ").BuildUpdateModel();
 

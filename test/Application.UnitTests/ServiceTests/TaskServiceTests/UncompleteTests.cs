@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Moq;
+using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models;
@@ -18,8 +19,10 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
         public UncompleteTests()
         {
             _sut = new TaskService(
-                _tasksRepositoryMock.Object,
+                new Mock<IUserService>().Object,
                 new Mock<IListService>().Object,
+                _tasksRepositoryMock.Object,
+                new Mock<IListsRepository>().Object,
                 MapperMocker.GetMapper<ToDoAssistantProfile>());
         }
 
@@ -29,8 +32,8 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
             _tasksRepositoryMock.Setup(x => x.Exists(It.IsAny<int>(), It.IsAny<int>()))
                 .Returns(true);
 
-            _tasksRepositoryMock.Setup(x => x.GetAsync(It.IsAny<int>()))
-                .ReturnsAsync(new ToDoTask { IsCompleted = false });
+            _tasksRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
+                .Returns(new ToDoTask { IsCompleted = false });
 
             await _sut.UncompleteAsync(new CompleteUncomplete());
 

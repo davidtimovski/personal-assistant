@@ -36,9 +36,9 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             _mapper = mapper;
         }
 
-        public async Task<EditDietaryProfile> GetAsync(int userId)
+        public EditDietaryProfile Get(int userId)
         {
-            DietaryProfile profile = await _dietaryProfilesRepository.GetAsync(userId);
+            DietaryProfile profile = _dietaryProfilesRepository.Get(userId);
 
             var result = _mapper.Map<EditDietaryProfile>(profile);
 

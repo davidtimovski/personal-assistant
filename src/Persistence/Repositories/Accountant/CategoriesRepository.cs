@@ -15,19 +15,19 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
         public CategoriesRepository(PersonalAssistantContext efContext)
             : base(efContext) { }
 
-        public async Task<IEnumerable<Category>> GetAllAsync(int userId, DateTime fromModifiedDate)
+        public IEnumerable<Category> GetAll(int userId, DateTime fromModifiedDate)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.QueryAsync<Category>(@"SELECT * FROM ""Accountant.Categories"" WHERE ""UserId"" = @UserId AND ""ModifiedDate"" > @FromModifiedDate",
+            return conn.Query<Category>(@"SELECT * FROM ""Accountant.Categories"" WHERE ""UserId"" = @UserId AND ""ModifiedDate"" > @FromModifiedDate",
                 new { UserId = userId, FromModifiedDate = fromModifiedDate });
         }
 
-        public async Task<IEnumerable<int>> GetDeletedIdsAsync(int userId, DateTime fromDate)
+        public IEnumerable<int> GetDeletedIds(int userId, DateTime fromDate)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.QueryAsync<int>(@"SELECT ""EntityId"" FROM ""Accountant.DeletedEntities"" WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""DeletedDate"" > @DeletedDate",
+            return conn.Query<int>(@"SELECT ""EntityId"" FROM ""Accountant.DeletedEntities"" WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""DeletedDate"" > @DeletedDate",
                 new { UserId = userId, EntityType = (short)EntityType.Category, DeletedDate = fromDate });
         }
 

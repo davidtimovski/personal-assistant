@@ -14,53 +14,53 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
         public IngredientsRepository(PersonalAssistantContext efContext)
             : base(efContext) { }
 
-        public async Task<IEnumerable<Ingredient>> GetAllAsync(int userId)
+        public IEnumerable<Ingredient> GetAll(int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.QueryAsync<Ingredient>(@"SELECT DISTINCT i.*,
-                                                           CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END
-                                                       FROM ""CookingAssistant.Ingredients"" AS i
-                                                       LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
-                                                       LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
-                                                       LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
-                                                       LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
-                                                       WHERE i.""UserId"" = @UserId OR (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
-                                                       ORDER BY i.""ModifiedDate"" DESC, i.""Name""",
+            return conn.Query<Ingredient>(@"SELECT DISTINCT i.*,
+                                                CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END
+                                            FROM ""CookingAssistant.Ingredients"" AS i
+                                            LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
+                                            LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
+                                            LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
+                                            LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
+                                            WHERE i.""UserId"" = @UserId OR (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
+                                            ORDER BY i.""ModifiedDate"" DESC, i.""Name""",
                 new { UserId = userId });
         }
 
-        public async Task<Ingredient> GetAsync(int id, int userId)
+        public Ingredient Get(int id, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            var ingredient = await conn.QueryFirstOrDefaultAsync<Ingredient>(@"SELECT i.*, 
-                                                                                   CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END
-                                                                               FROM ""CookingAssistant.Ingredients"" AS i
-                                                                               LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
-                                                                               LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
-                                                                               LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
-                                                                               LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
-                                                                               WHERE i.""Id"" = @Id AND (i.""UserId"" = @UserId OR (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")))",
-                                                                               new { Id = id, UserId = userId });
+            var ingredient = conn.QueryFirstOrDefault<Ingredient>(@"SELECT i.*, 
+                                                                        CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END
+                                                                    FROM ""CookingAssistant.Ingredients"" AS i
+                                                                    LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
+                                                                    LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
+                                                                    LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
+                                                                    LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
+                                                                    WHERE i.""Id"" = @Id AND (i.""UserId"" = @UserId OR (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")))",
+                                                                    new { Id = id, UserId = userId });
 
             if (ingredient.TaskId.HasValue)
             {
-                var list = await conn.QueryFirstOrDefaultAsync<ToDoList>(@"SELECT l.""Name""
-                                                                           FROM ""ToDoAssistant.Tasks"" AS t
-                                                                           INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                                                                           WHERE t.""Id"" = @TaskId", new { TaskId = id });
+                var list = conn.QueryFirstOrDefault<ToDoList>(@"SELECT l.""Name""
+                                                                FROM ""ToDoAssistant.Tasks"" AS t
+                                                                INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
+                                                                WHERE t.""Id"" = @TaskId", new { TaskId = id });
                 ingredient.Task = new ToDoTask
                 {
                     List = list
                 };
             }
 
-            var recipeNames = await conn.QueryAsync<string>(@"SELECT ""Name""
-                                                              FROM ""CookingAssistant.RecipesIngredients"" AS ri
-                                                              LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
-                                                              WHERE ri.""IngredientId"" = @IngredientId
-                                                              ORDER BY r.""Name""",
+            var recipeNames = conn.Query<string>(@"SELECT ""Name""
+                                                    FROM ""CookingAssistant.RecipesIngredients"" AS ri
+                                                    LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
+                                                    WHERE ri.""IngredientId"" = @IngredientId
+                                                    ORDER BY r.""Name""",
                 new { IngredientId = id });
 
             foreach (var recipeName in recipeNames)
@@ -74,25 +74,25 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
             return ingredient;
         }
 
-        public async Task<IEnumerable<Ingredient>> GetSuggestionsAsync(int recipeId, int userId)
+        public IEnumerable<Ingredient> GetSuggestions(int recipeId, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.QueryAsync<Ingredient>(@"SELECT DISTINCT i.""Id"", i.""TaskId"", 
-                                                       CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END
-                                                       FROM ""CookingAssistant.Ingredients"" AS i
-                                                       LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
-                                                       WHERE (i.""UserId"" = @UserId OR i.""Id"" IN (
-	                                                       SELECT ""IngredientId""
-	                                                       FROM ""CookingAssistant.RecipesIngredients"" AS ri
-	                                                       INNER JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
-	                                                       INNER JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
-	                                                       WHERE r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")
-                                                       )) AND i.""Id"" NOT IN (SELECT ""IngredientId"" FROM ""CookingAssistant.RecipesIngredients"" WHERE ""RecipeId"" = @RecipeId)",
-                                                   new { RecipeId = recipeId, UserId = userId });
+            return conn.Query<Ingredient>(@"SELECT DISTINCT i.""Id"", i.""TaskId"", 
+                                            CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END
+                                            FROM ""CookingAssistant.Ingredients"" AS i
+                                            LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
+                                            WHERE (i.""UserId"" = @UserId OR i.""Id"" IN (
+	                                            SELECT ""IngredientId""
+	                                            FROM ""CookingAssistant.RecipesIngredients"" AS ri
+	                                            INNER JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
+	                                            INNER JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
+	                                            WHERE r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")
+                                            )) AND i.""Id"" NOT IN (SELECT ""IngredientId"" FROM ""CookingAssistant.RecipesIngredients"" WHERE ""RecipeId"" = @RecipeId)",
+                                        new { RecipeId = recipeId, UserId = userId });
         }
 
-        public async Task<IEnumerable<Ingredient>> GetTaskSuggestionsAsync(int recipeId, int userId)
+        public IEnumerable<Ingredient> GetTaskSuggestions(int recipeId, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
@@ -106,7 +106,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                             AND (i.""Id"" IS NULL OR i.""Id"" NOT IN (SELECT ""IngredientId"" FROM ""CookingAssistant.RecipesIngredients"" WHERE ""RecipeId"" = @RecipeId))
                             AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))";
 
-            return await conn.QueryAsync<Ingredient, ToDoList, Ingredient>(sql,
+            return conn.Query<Ingredient, ToDoList, Ingredient>(sql,
                 (ingredient, list) =>
                 {
                     ingredient.Task = new ToDoTask
@@ -117,7 +117,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                 }, new { RecipeId = recipeId, UserId = userId }, null, true);
         }
 
-        public async Task<IEnumerable<ToDoTask>> GetTaskSuggestionsAsync(int userId)
+        public IEnumerable<ToDoTask> GetTaskSuggestions(int userId)
         {
             using IDbConnection conn = OpenConnection();
 
@@ -129,7 +129,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                         LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri on i.""Id"" = ri.""IngredientId""
                         WHERE l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")";
 
-            return await conn.QueryAsync<ToDoTask, ToDoList, ToDoTask>(sql,
+            return conn.Query<ToDoTask, ToDoList, ToDoTask>(sql,
                 (task, list) =>
                 {
                     task.List = list;
@@ -137,15 +137,15 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                 }, new { UserId = userId }, null, true);
         }
 
-        public async Task<IEnumerable<Ingredient>> GetIngredientSuggestionsAsync(int userId)
+        public IEnumerable<Ingredient> GetIngredientSuggestions(int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.QueryAsync<Ingredient>(@"SELECT i.*, CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END
-                                                       FROM ""CookingAssistant.Ingredients"" AS i
-                                                       LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
-                                                       WHERE ""UserId"" = @UserId
-                                                       ORDER BY i.""Name""",
+            return conn.Query<Ingredient>(@"SELECT i.*, CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END
+                                            FROM ""CookingAssistant.Ingredients"" AS i
+                                            LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
+                                            WHERE ""UserId"" = @UserId
+                                            ORDER BY i.""Name""",
                 new { UserId = userId });
         }
 

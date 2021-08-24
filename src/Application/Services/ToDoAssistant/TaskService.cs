@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
+using PersonalAssistant.Application.Contracts.Common;
+using PersonalAssistant.Application.Contracts.Common.Models;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models;
@@ -14,46 +16,52 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 {
     public class TaskService : ITaskService
     {
-        private readonly ITasksRepository _tasksRepository;
+        private readonly IUserService _userService;
         private readonly IListService _listService;
+        private readonly ITasksRepository _tasksRepository;
+        private readonly IListsRepository _listsRepository;
         private readonly IMapper _mapper;
 
         public TaskService(
-            ITasksRepository tasksRepository,
+            IUserService userService,
             IListService listService,
+            ITasksRepository tasksRepository,
+            IListsRepository listsRepository,
             IMapper mapper)
         {
-            _tasksRepository = tasksRepository;
+            _userService = userService;
             _listService = listService;
+            _tasksRepository = tasksRepository;
+            _listsRepository = listsRepository;
             _mapper = mapper;
         }
 
-        public async Task<SimpleTask> GetAsync(int id)
+        public SimpleTask Get(int id)
         {
-            ToDoTask task = await _tasksRepository.GetAsync(id);
+            ToDoTask task = _tasksRepository.Get(id);
 
             var result = _mapper.Map<SimpleTask>(task);
 
             return result;
         }
 
-        public async Task<TaskDto> GetAsync(int id, int userId)
+        public TaskDto Get(int id, int userId)
         {
-            ToDoTask task = await _tasksRepository.GetAsync(id, userId);
+            ToDoTask task = _tasksRepository.Get(id, userId);
 
             var result = _mapper.Map<TaskDto>(task);
 
             return result;
         }
 
-        public async Task<TaskForUpdate> GetForUpdateAsync(int id, int userId)
+        public TaskForUpdate GetForUpdate(int id, int userId)
         {
-            ToDoTask task = await _tasksRepository.GetForUpdateAsync(id, userId);
+            ToDoTask task = _tasksRepository.GetForUpdate(id, userId);
 
             var result = _mapper.Map<TaskForUpdate>(task, opts => { opts.Items["UserId"] = userId; });
 
             result.IsInSharedList = _listService.IsShared(task.ListId, userId);
-            result.Recipes = await _tasksRepository.GetRecipesAsync(id, userId);
+            result.Recipes = _tasksRepository.GetRecipes(id, userId);
 
             return result;
         }
@@ -84,7 +92,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             return _tasksRepository.Count(listId);
         }
 
-        public async Task<CreatedTask> CreateAsync(CreateTask model, IValidator<CreateTask> validator)
+        public async Task<CreatedTaskResult> CreateAsync(CreateTask model, IValidator<CreateTask> validator)
         {
             ValidateAndThrow(model, validator);
 
@@ -101,14 +109,29 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             task.Order = 1;
             task.CreatedDate = task.ModifiedDate = DateTime.UtcNow;
 
-            task.Id = await _tasksRepository.CreateAsync(task, model.UserId);
+            var id = await _tasksRepository.CreateAsync(task, model.UserId);
 
-            var result = _mapper.Map<CreatedTask>(task);
+            var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(model.ListId, model.UserId, model.IsPrivate == true);
+            if (!usersToBeNotified.Any())
+            {
+                return new CreatedTaskResult { TaskId = id };
+            }
+
+            ToDoList list = _listsRepository.Get(model.ListId);
+
+            var result = new CreatedTaskResult
+            {
+                TaskId = id,
+                TaskName = task.Name,
+                ListName = list.Name,
+                ActionUserImageUri = _userService.GetImageUri(model.UserId),
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+            };
 
             return result;
         }
 
-        public async Task<IEnumerable<CreatedTask>> BulkCreateAsync(BulkCreate model, IValidator<BulkCreate> validator)
+        public async Task<BulkCreateResult> BulkCreateAsync(BulkCreate model, IValidator<BulkCreate> validator)
         {
             ValidateAndThrow(model, validator);
 
@@ -132,12 +155,30 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
             IEnumerable<ToDoTask> createdTasks = await _tasksRepository.BulkCreateAsync(tasks, model.TasksArePrivate, model.UserId);
 
-            var result = createdTasks.Select(x => _mapper.Map<CreatedTask>(x));
+            var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(model.ListId, model.UserId, model.TasksArePrivate);
+            if (!usersToBeNotified.Any())
+            {
+                return new BulkCreateResult();
+            }
+
+            ToDoList list = _listsRepository.Get(model.ListId);
+
+            var result = new BulkCreateResult
+            {
+                ListName = list.Name,
+                CreatedTasks = createdTasks.Select(x => new BulkCreatedTask
+                {
+                    Id = x.Id,
+                    Name = x.Name
+                }),
+                ActionUserImageUri = _userService.GetImageUri(model.UserId),
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+            };
 
             return result;
         }
 
-        public async Task UpdateAsync(UpdateTask model, IValidator<UpdateTask> validator)
+        public async Task<UpdateTaskResult> UpdateAsync(UpdateTask model, IValidator<UpdateTask> validator)
         {
             ValidateAndThrow(model, validator);
 
@@ -156,16 +197,62 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
                 task.AssignedToUserId = null;
             }
 
+            ToDoTask originalTask = _tasksRepository.Get(model.Id);
+
             task.ModifiedDate = DateTime.UtcNow;
             await _tasksRepository.UpdateAsync(task, model.UserId);
+
+            ToDoList list = _listsRepository.Get(model.ListId);
+
+            var result = new UpdateTaskResult
+            {
+                OriginalTaskName = originalTask.Name,
+                ListId = model.ListId,
+                ListName = list.Name
+            };
+
+            if (model.ListId == originalTask.ListId)
+            {
+                var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(model.ListId, model.UserId, model.Id);
+                result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language });
+            }
+            else
+            {
+                ToDoList oldList = _listsRepository.Get(originalTask.ListId);
+
+                result.OldListId = originalTask.ListId;
+                result.OldListName = oldList.Name;
+
+                var usersToBeNotifiedOfRemoval = _listService.GetUsersToBeNotifiedOfChange(oldList.Id, model.UserId, model.Id);
+                result.RemovedNotificationRecipients = usersToBeNotifiedOfRemoval.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language });
+
+                var usersToBeNotifiedOfCreation = _listService.GetUsersToBeNotifiedOfChange(model.ListId, model.UserId, model.Id);
+                result.CreatedNotificationRecipients = usersToBeNotifiedOfCreation.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language });
+            }
+
+            if (model.AssignedToUserId.HasValue
+                && model.AssignedToUserId.Value != originalTask.AssignedToUserId
+                && model.AssignedToUserId.Value != model.UserId
+                && _listService.CheckIfUserCanBeNotifiedOfChange(model.ListId, model.AssignedToUserId.Value))
+            {
+                var assignedUser = _userService.Get(model.AssignedToUserId.Value);
+                result.AssignedNotificationRecipient = new NotificationRecipient { Id = assignedUser.Id, Language = assignedUser.Language };
+            }
+
+            if (result.Notify())
+            {
+                result.ActionUserImageUri = _userService.GetImageUri(model.UserId);
+            }
+
+            return result;
         }
 
-        public async Task<SimpleTask> DeleteAsync(int id, int userId)
+        public async Task<DeleteTaskResult> DeleteAsync(int id, int userId)
         {
-            ToDoTask task = await _tasksRepository.GetAsync(id);
+            ToDoTask task = _tasksRepository.Get(id);
             if (task == null)
             {
-                return null;
+                return new DeleteTaskResult();
             }
 
             if (!Exists(id, userId))
@@ -173,49 +260,94 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
                 throw new ValidationException("Unauthorized");
             }
 
-            ToDoTask originalTask = await _tasksRepository.DeleteAsync(id, userId);
+            await _tasksRepository.DeleteAsync(id, userId);
 
-            var result = _mapper.Map<SimpleTask>(originalTask);
+            var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(task.ListId, userId, task.PrivateToUserId == userId);
+            if (!usersToBeNotified.Any())
+            {
+                return new DeleteTaskResult();
+            }
+
+            ToDoList list = _listsRepository.Get(task.ListId);
+
+            var result = new DeleteTaskResult
+            {
+                TaskName = task.Name,
+                ListId = task.ListId,
+                ListName = list.Name,
+                ActionUserImageUri = _userService.GetImageUri(userId),
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+            };
 
             return result;
         }
 
-        public async Task<SimpleTask> CompleteAsync(CompleteUncomplete model)
+        public async Task<CompleteUncompleteTaskResult> CompleteAsync(CompleteUncomplete model)
         {
             if (!Exists(model.Id, model.UserId))
             {
                 throw new ValidationException("Unauthorized");
             }
 
-            ToDoTask task = await _tasksRepository.GetAsync(model.Id);
+            ToDoTask task = _tasksRepository.Get(model.Id);
             if (task.IsCompleted)
             {
-                return null;
+                return new CompleteUncompleteTaskResult();
             }
 
-            ToDoTask originalTask = await _tasksRepository.CompleteAsync(model.Id, model.UserId);
+            await _tasksRepository.CompleteAsync(model.Id, model.UserId);
 
-            var result = _mapper.Map<SimpleTask>(originalTask);
+            var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(task.ListId, model.UserId, model.Id);
+            if (!usersToBeNotified.Any())
+            {
+                return new CompleteUncompleteTaskResult();
+            }
+
+            ToDoList list = _listsRepository.Get(task.ListId);
+
+            var result = new CompleteUncompleteTaskResult
+            {
+                TaskName = task.Name,
+                ListId = task.ListId,
+                ListName = list.Name,
+                ActionUserImageUri = _userService.GetImageUri(model.UserId),
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+            };
 
             return result;
         }
 
-        public async Task<SimpleTask> UncompleteAsync(CompleteUncomplete model)
+        public async Task<CompleteUncompleteTaskResult> UncompleteAsync(CompleteUncomplete model)
         {
             if (!Exists(model.Id, model.UserId))
             {
                 throw new ValidationException("Unauthorized");
             }
 
-            ToDoTask task = await _tasksRepository.GetAsync(model.Id);
+            ToDoTask task = _tasksRepository.Get(model.Id);
             if (!task.IsCompleted)
             {
                 return null;
             }
 
-            ToDoTask originalTask = await _tasksRepository.UncompleteAsync(model.Id, model.UserId);
+            await _tasksRepository.UncompleteAsync(model.Id, model.UserId);
 
-            var result = _mapper.Map<SimpleTask>(originalTask);
+            var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(task.ListId, model.UserId, model.Id);
+            if (!usersToBeNotified.Any())
+            {
+                return new CompleteUncompleteTaskResult();
+            }
+
+            ToDoList list = _listsRepository.Get(task.ListId);
+
+            var result = new CompleteUncompleteTaskResult
+            {
+                TaskName = task.Name,
+                ListId = task.ListId,
+                ListName = list.Name,
+                ActionUserImageUri = _userService.GetImageUri(model.UserId),
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+            };
 
             return result;
         }

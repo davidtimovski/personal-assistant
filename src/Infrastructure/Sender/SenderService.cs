@@ -36,8 +36,7 @@ namespace PersonalAssistant.Infrastructure.Sender
         {
             var factory = new ConnectionFactory()
             {
-                HostName = _configuration["EventBusConnection"],
-                //DispatchConsumersAsync = true
+                HostName = _configuration["EventBusConnection"]
             };
 
             if (!string.IsNullOrEmpty(_configuration["EventBusUserName"]))

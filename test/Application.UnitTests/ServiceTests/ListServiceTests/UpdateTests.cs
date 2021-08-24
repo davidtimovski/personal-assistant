@@ -5,6 +5,7 @@ using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications;
+using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
 using PersonalAssistant.Application.Mappings;
 using PersonalAssistant.Application.Services.ToDoAssistant;
 using PersonalAssistant.Application.UnitTests.Builders;
@@ -26,6 +27,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.ListServiceTests
             _sut = new ListService(
                 new Mock<IUserService>().Object,
                 _listsRepositoryMock.Object,
+                new Mock<ITasksRepository>().Object,
                 new Mock<INotificationsRepository>().Object,
                 MapperMocker.GetMapper<ToDoAssistantProfile>());
         }
@@ -33,6 +35,9 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.ListServiceTests
         [Fact]
         public async Task ValidatesModel()
         {
+            _listsRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<ToDoList>(), It.IsAny<int>()))
+                .ReturnsAsync(new ToDoList());
+
             UpdateList model = new ListBuilder().BuildUpdateModel();
 
             await _sut.UpdateAsync(model, _successfulValidatorMock.Object);
@@ -53,8 +58,9 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.ListServiceTests
         public async Task TrimsListName()
         {
             string actualName = null;
-            _listsRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<ToDoList>()))
-                .Callback<ToDoList>((l) => actualName = l.Name);
+            _listsRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<ToDoList>(), It.IsAny<int>()))
+                .Callback<ToDoList, int>((l, id) => actualName = l.Name)
+                .ReturnsAsync(new ToDoList());
 
             UpdateList model = new ListBuilder().WithName(" List name ").BuildUpdateModel();
 

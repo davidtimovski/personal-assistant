@@ -15,7 +15,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
         public DietaryProfilesRepository(PersonalAssistantContext efContext)
             : base(efContext) { }
 
-        public async Task<DietaryProfile> GetAsync(int userId)
+        public DietaryProfile Get(int userId)
         {
             using IDbConnection conn = OpenConnection();
 
@@ -24,7 +24,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                             INNER JOIN ""AspNetUsers"" AS u ON dp.""UserId"" = u.""Id""
                             WHERE dp.""UserId"" = @UserId";
 
-            var dietaryProfiles = await conn.QueryAsync<DietaryProfile, User, DietaryProfile>(sql,
+            var dietaryProfiles = conn.Query<DietaryProfile, User, DietaryProfile>(sql,
                 (detaryProfile, user) =>
                 {
                     detaryProfile.User = user;

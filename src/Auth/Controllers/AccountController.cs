@@ -488,7 +488,7 @@ namespace Auth.Controllers
                             filePaths.Add($"users/{user.Id}/{user.ImageUri}");
                         }
 
-                        var recipeUris = await _recipeService.GetAllImageUrisAsync(user.Id);
+                        var recipeUris = _recipeService.GetAllImageUris(user.Id);
                         if (recipeUris.Any())
                         {
                             filePaths.AddRange(recipeUris.Select(uri => $"users/{user.Id}/recipes/{uri}"));

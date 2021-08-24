@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentValidation;
 using Moq;
+using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models;
@@ -26,8 +27,10 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
             _successfulValidatorMock = ValidatorMocker.GetSuccessful<BulkCreate>();
 
             _sut = new TaskService(
-                _tasksRepositoryMock.Object,
+                new Mock<IUserService>().Object,
                 new Mock<IListService>().Object,
+                _tasksRepositoryMock.Object,
+                new Mock<IListsRepository>().Object,
                 MapperMocker.GetMapper<ToDoAssistantProfile>());
         }
 

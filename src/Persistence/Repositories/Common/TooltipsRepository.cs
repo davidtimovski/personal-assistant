@@ -13,25 +13,25 @@ namespace PersonalAssistant.Persistence.Repositories.Common
         public TooltipsRepository(PersonalAssistantContext efContext)
             : base(efContext) { }
 
-        public async Task<IEnumerable<Tooltip>> GetAllAsync(string application, int userId)
+        public IEnumerable<Tooltip> GetAll(string application, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.QueryAsync<Tooltip>(@"SELECT t.*, (td.""UserId"" IS NOT NULL) AS ""IsDismissed""
-                                                        FROM ""Tooltips"" AS t
-                                                        LEFT JOIN ""TooltipsDismissed"" AS td ON t.""Id"" = td.""TooltipId"" AND td.""UserId"" = @UserId
-                                                        WHERE ""Application"" = @Application",
-                                                    new { Application = application, UserId = userId });
+            return conn.Query<Tooltip>(@"SELECT t.*, (td.""UserId"" IS NOT NULL) AS ""IsDismissed""
+                                            FROM ""Tooltips"" AS t
+                                            LEFT JOIN ""TooltipsDismissed"" AS td ON t.""Id"" = td.""TooltipId"" AND td.""UserId"" = @UserId
+                                            WHERE ""Application"" = @Application",
+                                        new { Application = application, UserId = userId });
         }
 
-        public async Task<Tooltip> GetByKeyAsync(int userId, string key, string application)
+        public Tooltip GetByKey(int userId, string key, string application)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.QueryFirstOrDefaultAsync<Tooltip>(@"SELECT t.*, (td.""UserId"" IS NOT NULL) AS ""IsDismissed""
-                                                                      FROM ""Tooltips"" AS t
-                                                                      LEFT JOIN ""TooltipsDismissed"" AS td ON t.""Id"" = td.""TooltipId"" AND td.""UserId"" = @UserId
-                                                                      WHERE t.""Key"" = @Key AND t.""Application"" = @Application", new { UserId = userId, Key = key, Application = application });
+            return conn.QueryFirstOrDefault<Tooltip>(@"SELECT t.*, (td.""UserId"" IS NOT NULL) AS ""IsDismissed""
+                                                        FROM ""Tooltips"" AS t
+                                                        LEFT JOIN ""TooltipsDismissed"" AS td ON t.""Id"" = td.""TooltipId"" AND td.""UserId"" = @UserId
+                                                        WHERE t.""Key"" = @Key AND t.""Application"" = @Application", new { UserId = userId, Key = key, Application = application });
         }
 
         public async Task ToggleDismissedAsync(int userId, string key, string application, bool isDismissed)

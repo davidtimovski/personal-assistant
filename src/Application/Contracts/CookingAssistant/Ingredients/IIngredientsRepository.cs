@@ -7,12 +7,12 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients
 {
     public interface IIngredientsRepository
     {
-        Task<IEnumerable<Ingredient>> GetAllAsync(int userId);
-        Task<Ingredient> GetAsync(int id, int userId);
-        Task<IEnumerable<Ingredient>> GetSuggestionsAsync(int recipeId, int userId);
-        Task<IEnumerable<ToDoTask>> GetTaskSuggestionsAsync(int userId);
-        Task<IEnumerable<Ingredient>> GetTaskSuggestionsAsync(int recipeId, int userId);
-        Task<IEnumerable<Ingredient>> GetIngredientSuggestionsAsync(int userId);
+        IEnumerable<Ingredient> GetAll(int userId);
+        Ingredient Get(int id, int userId);
+        IEnumerable<Ingredient> GetSuggestions(int recipeId, int userId);
+        IEnumerable<ToDoTask> GetTaskSuggestions(int userId);
+        IEnumerable<Ingredient> GetTaskSuggestions(int recipeId, int userId);
+        IEnumerable<Ingredient> GetIngredientSuggestions(int userId);
         bool Exists(int id, int userId);
         bool Exists(int id, string name, int userId);
         bool ExistsInRecipe(int id, int recipeId);

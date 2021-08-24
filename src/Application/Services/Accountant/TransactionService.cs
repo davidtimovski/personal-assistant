@@ -31,18 +31,18 @@ namespace PersonalAssistant.Application.Services.Accountant
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<TransactionDto>> GetAllAsync(GetAll model)
+        public IEnumerable<TransactionDto> GetAll(GetAll model)
         {
-            var transactions = await _transactionsRepository.GetAllAsync(model.UserId, model.FromModifiedDate);
+            var transactions = _transactionsRepository.GetAll(model.UserId, model.FromModifiedDate);
 
             var transactionDtos = transactions.Select(x => _mapper.Map<TransactionDto>(x));
 
             return transactionDtos;
         }
 
-        public Task<IEnumerable<int>> GetDeletedIdsAsync(GetDeletedIds model)
+        public IEnumerable<int> GetDeletedIds(GetDeletedIds model)
         {
-            return _transactionsRepository.GetDeletedIdsAsync(model.UserId, model.FromDate);
+            return _transactionsRepository.GetDeletedIds(model.UserId, model.FromDate);
         }
 
         public async Task<int> CreateAsync(CreateTransaction model)
@@ -53,13 +53,13 @@ namespace PersonalAssistant.Application.Services.Accountant
             }
 
             if (model.FromAccountId.HasValue &&
-                !(await _accountsRepository.ExistsAsync(model.FromAccountId.Value, model.UserId)))
+                !(_accountsRepository.Exists(model.FromAccountId.Value, model.UserId)))
             {
                 throw new ArgumentException("FromAccount doesn't belong to user with specified userId.");
             }
 
             if (model.ToAccountId.HasValue &&
-                !(await _accountsRepository.ExistsAsync(model.ToAccountId.Value, model.UserId)))
+                !(_accountsRepository.Exists(model.ToAccountId.Value, model.UserId)))
             {
                 throw new ArgumentException("ToAccount doesn't belong to user with specified userId.");
             }
@@ -72,13 +72,13 @@ namespace PersonalAssistant.Application.Services.Accountant
         public async Task UpdateAsync(UpdateTransaction model)
         {
             if (model.FromAccountId.HasValue &&
-                !(await _accountsRepository.ExistsAsync(model.FromAccountId.Value, model.UserId)))
+                !(_accountsRepository.Exists(model.FromAccountId.Value, model.UserId)))
             {
                 throw new ArgumentException("FromAccount doesn't belong to user with specified userId.");
             }
 
             if (model.ToAccountId.HasValue &&
-                !(await _accountsRepository.ExistsAsync(model.ToAccountId.Value, model.UserId)))
+                !(_accountsRepository.Exists(model.ToAccountId.Value, model.UserId)))
             {
                 throw new ArgumentException("ToAccount doesn't belong to user with specified userId.");
             }
@@ -93,12 +93,12 @@ namespace PersonalAssistant.Application.Services.Accountant
             await _transactionsRepository.DeleteAsync(id, userId);
         }
 
-        public async Task<FileStream> ExportAsCsvAsync(ExportAsCsv model)
+        public FileStream ExportAsCsv(ExportAsCsv model)
         {
             string fileName = model.FileId + ".csv";
             string tempFilePath = Path.Combine(model.Directory, fileName);
 
-            IEnumerable<Transaction> transactions = await _transactionsRepository.GetAllForExportAsync(model.UserId, model.Uncategorized);
+            IEnumerable<Transaction> transactions = _transactionsRepository.GetAllForExport(model.UserId, model.Uncategorized);
             foreach (var transaction in transactions)
             {
                 if (transaction.IsEncrypted)

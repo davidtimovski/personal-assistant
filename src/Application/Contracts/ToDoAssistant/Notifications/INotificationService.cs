@@ -6,8 +6,8 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications
 {
     public interface INotificationService
     {
-        Task<IEnumerable<NotificationDto>> GetAllAndFlagUnseenAsync(int userId);
-        Task<int> GetUnseenNotificationsCountAsync(int userId);
+        IEnumerable<NotificationDto> GetAllAndFlagUnseen(int userId);
+        int GetUnseenNotificationsCount(int userId);
         Task<int> CreateOrUpdateAsync(CreateOrUpdateNotification model);
     }
 }

@@ -30,36 +30,36 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<IngredientDto>> GetAllAsync(int userId)
+        public IEnumerable<IngredientDto> GetAll(int userId)
         {
-            IEnumerable<Ingredient> ingredients = await _ingredientsRepository.GetAllAsync(userId);
+            IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetAll(userId);
 
             var result = ingredients.Select(x => _mapper.Map<IngredientDto>(x));
 
             return result;
         }
 
-        public async Task<EditIngredient> GetAsync(int id, int userId)
+        public EditIngredient Get(int id, int userId)
         {
-            Ingredient ingredient = await _ingredientsRepository.GetAsync(id, userId);
+            Ingredient ingredient = _ingredientsRepository.Get(id, userId);
 
             var result = _mapper.Map<EditIngredient>(ingredient);
 
             return result;
         }
 
-        public async Task<IEnumerable<IngredientSuggestion>> GetSuggestionsAsync(int recipeId, int userId)
+        public IEnumerable<IngredientSuggestion> GetSuggestions(int recipeId, int userId)
         {
-            IEnumerable<Ingredient> ingredients = await _ingredientsRepository.GetSuggestionsAsync(recipeId, userId);
+            IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetSuggestions(recipeId, userId);
 
             var result = ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x));
 
             return result;
         }
 
-        public async Task<IEnumerable<IngredientSuggestion>> GetTaskSuggestionsAsync(int userId)
+        public IEnumerable<IngredientSuggestion> GetTaskSuggestions(int userId)
         {
-            IEnumerable<ToDoTask> tasks = await _ingredientsRepository.GetTaskSuggestionsAsync(userId);
+            IEnumerable<ToDoTask> tasks = _ingredientsRepository.GetTaskSuggestions(userId);
 
             var result = tasks.Select(x => _mapper.Map<IngredientSuggestion>(x));
             result = result.OrderBy(x => x.Group);
@@ -67,27 +67,27 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             return result;
         }
 
-        public async Task<IEnumerable<IngredientSuggestion>> GetTaskSuggestionsAsync(int recipeId, int userId)
+        public IEnumerable<IngredientSuggestion> GetTaskSuggestions(int recipeId, int userId)
         {
-            IEnumerable<Ingredient> ingredients = await _ingredientsRepository.GetTaskSuggestionsAsync(recipeId, userId);
+            IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetTaskSuggestions(recipeId, userId);
 
             var result = ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x));
 
             return result;
         }
 
-        public async Task<IEnumerable<IngredientSuggestion>> GetIngredientSuggestionsAsync(int userId)
+        public IEnumerable<IngredientSuggestion> GetIngredientSuggestions(int userId)
         {
-            IEnumerable<Ingredient> ingredients = await _ingredientsRepository.GetIngredientSuggestionsAsync(userId);
+            IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetIngredientSuggestions(userId);
 
             var result = ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x));
 
             return result;
         }
 
-        public async Task<IEnumerable<IngredientReviewSuggestion>> GetIngredientReviewSuggestionsAsync(int userId)
+        public IEnumerable<IngredientReviewSuggestion> GetIngredientReviewSuggestions(int userId)
         {
-            IEnumerable<Ingredient> ingredients = await _ingredientsRepository.GetIngredientSuggestionsAsync(userId);
+            IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetIngredientSuggestions(userId);
 
             var result = ingredients.Select(x => _mapper.Map<IngredientReviewSuggestion>(x));
 

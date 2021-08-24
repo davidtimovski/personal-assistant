@@ -23,18 +23,18 @@ namespace PersonalAssistant.Application.Services.Accountant
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<AccountDto>> GetAllAsync(GetAll model)
+        public IEnumerable<AccountDto> GetAll(GetAll model)
         {
-            var accounts = await _accountsRepository.GetAllAsync(model.UserId, model.FromModifiedDate);
+            var accounts = _accountsRepository.GetAll(model.UserId, model.FromModifiedDate);
 
             var accountDtos = accounts.Select(x => _mapper.Map<AccountDto>(x));
 
             return accountDtos;
         }
 
-        public Task<IEnumerable<int>> GetDeletedIdsAsync(GetDeletedIds model)
+        public IEnumerable<int> GetDeletedIds(GetDeletedIds model)
         {
-            return _accountsRepository.GetDeletedIdsAsync(model.UserId, model.FromDate);
+            return _accountsRepository.GetDeletedIds(model.UserId, model.FromDate);
         }
 
         public Task<int> CreateAsync(CreateAccount model)
@@ -64,7 +64,7 @@ namespace PersonalAssistant.Application.Services.Accountant
 
         public async Task DeleteAsync(int id, int userId)
         {
-            if (await _accountsRepository.IsMainAsync(id, userId))
+            if (_accountsRepository.IsMain(id, userId))
             {
                 throw new ArgumentException("Cannot delete main account.");
             }

@@ -52,36 +52,31 @@ namespace PersonalAssistant.Application.Services.Accountant
             for (var i = 0; i < accountIds.Length; i++)
             {
                 var account = _mapper.Map<Account>(model.Accounts[i]);
-                int id = await _accountsRepository.CreateAsync(account, conn, uowTransaction);
-                accountIds[i] = id;
+                accountIds[i] = await _accountsRepository.CreateAsync(account, conn, uowTransaction);
             }
 
             for (var i = 0; i < categoryIds.Length; i++)
             {
                 var category = _mapper.Map<Category>(model.Categories[i]);
-                int id = await _categoriesRepository.CreateAsync(category, conn, uowTransaction);
-                categoryIds[i] = id;
+                categoryIds[i] = await _categoriesRepository.CreateAsync(category, conn, uowTransaction);
             }
 
             for (var i = 0; i < transactionIds.Length; i++)
             {
                 var transaction = _mapper.Map<Transaction>(model.Transactions[i]);
-                int id = await _transactionsRepository.CreateAsync(transaction, conn, uowTransaction);
-                transactionIds[i] = id;
+                transactionIds[i] = await _transactionsRepository.CreateAsync(transaction, conn, uowTransaction);
             }
 
             for (var i = 0; i < upcomingExpenseIds.Length; i++)
             {
                 var upcomingExpense = _mapper.Map<UpcomingExpense>(model.UpcomingExpenses[i]);
-                int id = await _upcomingExpensesRepository.CreateAsync(upcomingExpense, conn, uowTransaction);
-                upcomingExpenseIds[i] = id;
+                upcomingExpenseIds[i] = await _upcomingExpensesRepository.CreateAsync(upcomingExpense, conn, uowTransaction);
             }
 
             for (var i = 0; i < debtIds.Length; i++)
             {
                 var debt = _mapper.Map<Debt>(model.Debts[i]);
-                int id = await _debtsRepository.CreateAsync(debt, conn, uowTransaction);
-                debtIds[i] = id;
+                debtIds[i] = await _debtsRepository.CreateAsync(debt, conn, uowTransaction);
             }
 
             _unitOfWork.CommitTransaction(conn, uowTransaction);

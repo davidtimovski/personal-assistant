@@ -15,35 +15,35 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
         public AccountsRepository(PersonalAssistantContext efContext)
             : base(efContext) { }
 
-        public async Task<IEnumerable<Account>> GetAllAsync(int userId, DateTime fromModifiedDate)
+        public IEnumerable<Account> GetAll(int userId, DateTime fromModifiedDate)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.QueryAsync<Account>(@"SELECT * FROM ""Accountant.Accounts"" WHERE ""UserId"" = @UserId AND ""ModifiedDate"" > @FromModifiedDate",
+            return conn.Query<Account>(@"SELECT * FROM ""Accountant.Accounts"" WHERE ""UserId"" = @UserId AND ""ModifiedDate"" > @FromModifiedDate",
                 new { UserId = userId, FromModifiedDate = fromModifiedDate });
         }
 
-        public async Task<IEnumerable<int>> GetDeletedIdsAsync(int userId, DateTime fromDate)
+        public IEnumerable<int> GetDeletedIds(int userId, DateTime fromDate)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.QueryAsync<int>(@"SELECT ""EntityId"" FROM ""Accountant.DeletedEntities"" WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""DeletedDate"" > @DeletedDate",
+            return conn.Query<int>(@"SELECT ""EntityId"" FROM ""Accountant.DeletedEntities"" WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""DeletedDate"" > @DeletedDate",
                 new { UserId = userId, EntityType = (short)EntityType.Account, DeletedDate = fromDate });
         }
 
-        public async Task<bool> ExistsAsync(int id, int userId)
+        public bool Exists(int id, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""Accountant.Accounts"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
+            return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM ""Accountant.Accounts"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
                 new { Id = id, UserId = userId });
         }
 
-        public async Task<bool> IsMainAsync(int id, int userId)
+        public bool IsMain(int id, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM ""Accountant.Accounts"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId AND ""IsMain""",
+            return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM ""Accountant.Accounts"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId AND ""IsMain""",
                 new { Id = id, UserId = userId });
         }
 

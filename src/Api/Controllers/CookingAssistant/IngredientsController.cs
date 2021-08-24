@@ -29,7 +29,7 @@ namespace Api.Controllers.CookingAssistant
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public IActionResult GetAll()
         {
             int userId;
             try
@@ -41,13 +41,13 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            IEnumerable<IngredientDto> ingredientDtos = await _ingredientService.GetAllAsync(userId);
+            IEnumerable<IngredientDto> ingredientDtos = _ingredientService.GetAll(userId);
 
             return Ok(ingredientDtos);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        public IActionResult Get(int id)
         {
             int userId;
             try
@@ -59,7 +59,7 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            EditIngredient editIngredientDto = await _ingredientService.GetAsync(id, userId);
+            EditIngredient editIngredientDto = _ingredientService.Get(id, userId);
             if (editIngredientDto == null)
             {
                 return NotFound();
@@ -69,7 +69,7 @@ namespace Api.Controllers.CookingAssistant
         }
 
         [HttpGet("suggestions/{recipeId}")]
-        public async Task<IActionResult> GetSuggestions(int recipeId)
+        public IActionResult GetSuggestions(int recipeId)
         {
             int userId;
             try
@@ -83,15 +83,15 @@ namespace Api.Controllers.CookingAssistant
 
             var ingredientSuggestionsVm = new IngredientSuggestionsVm
             {
-                Suggestions = await _ingredientService.GetSuggestionsAsync(recipeId, userId),
-                TaskSuggestions = await _ingredientService.GetTaskSuggestionsAsync(recipeId, userId)
+                Suggestions = _ingredientService.GetSuggestions(recipeId, userId),
+                TaskSuggestions = _ingredientService.GetTaskSuggestions(recipeId, userId)
             };
 
             return Ok(ingredientSuggestionsVm);
         }
 
         [HttpGet("task-suggestions")]
-        public async Task<IActionResult> GetTaskSuggestions()
+        public IActionResult GetTaskSuggestions()
         {
             int userId;
             try
@@ -103,7 +103,7 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            IEnumerable<IngredientSuggestion> taskSuggestions = await _ingredientService.GetTaskSuggestionsAsync(userId);
+            IEnumerable<IngredientSuggestion> taskSuggestions = _ingredientService.GetTaskSuggestions(userId);
 
             return Ok(taskSuggestions);
         }

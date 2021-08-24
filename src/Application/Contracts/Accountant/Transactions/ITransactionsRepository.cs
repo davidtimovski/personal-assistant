@@ -9,9 +9,9 @@ namespace PersonalAssistant.Application.Contracts.Accountant.Transactions
 {
     public interface ITransactionsRepository
     {
-        Task<IEnumerable<Transaction>> GetAllForExportAsync(int userId, string uncategorized);
-        Task<IEnumerable<Transaction>> GetAllAsync(int userId, DateTime fromModifiedDate);
-        Task<IEnumerable<int>> GetDeletedIdsAsync(int userId, DateTime fromDate);
+        IEnumerable<Transaction> GetAllForExport(int userId, string uncategorized);
+        IEnumerable<Transaction> GetAll(int userId, DateTime fromModifiedDate);
+        IEnumerable<int> GetDeletedIds(int userId, DateTime fromDate);
         Task<int> CreateAsync(Transaction transaction, IDbConnection uowConn = null, IDbTransaction uowTransaction = null);
         Task UpdateAsync(Transaction transaction);
         Task DeleteAsync(int id, int userId);

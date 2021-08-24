@@ -30,69 +30,14 @@ namespace PersonalAssistant.Application.Services.Common
             _mapper = mapper;
         }
 
-        public Task<User> GetAsync(int id)
+        public User Get(int id)
         {
-            return _usersRepository.GetAsync(id);
+            return _usersRepository.Get(id);
         }
 
-        public Task<User> GetAsync(string email)
+        public User Get(string email)
         {
-            return _usersRepository.GetAsync(email.Trim());
-        }
-
-        public Task<IEnumerable<User>> GetToBeNotifiedOfListChangeAsync(int listId, int excludeUserId)
-        {
-            return _usersRepository.GetToBeNotifiedOfListChangeAsync(listId, excludeUserId);
-        }
-
-        public Task<IEnumerable<User>> GetToBeNotifiedOfRecipeChangeAsync(int recipeId, int excludeUserId)
-        {
-            return _usersRepository.GetToBeNotifiedOfRecipeChangeAsync(recipeId, excludeUserId);
-        }
-
-        public async Task<IEnumerable<User>> GetToBeNotifiedOfListChangeAsync(int listId, int excludeUserId, bool isPrivate)
-        {
-            if (isPrivate)
-            {
-                return new List<User>();
-            }
-
-            return await _usersRepository.GetToBeNotifiedOfListChangeAsync(listId, excludeUserId);
-        }
-
-        public async Task<IEnumerable<User>> GetToBeNotifiedOfListChangeAsync(int listId, int excludeUserId, int taskId)
-        {
-            if (_tasksRepository.IsPrivate(taskId, excludeUserId))
-            {
-                return new List<User>();
-            }
-
-            return await _usersRepository.GetToBeNotifiedOfListChangeAsync(listId, excludeUserId);
-        }
-
-        public Task<bool> CheckIfUserCanBeNotifiedOfListChangeAsync(int listId, int userId)
-        {
-            return _usersRepository.CheckIfUserCanBeNotifiedOfListChangeAsync(listId, userId);
-        }
-
-        public Task<bool> CheckIfUserCanBeNotifiedOfRecipeChangeAsync(int recipeId, int userId)
-        {
-            return _usersRepository.CheckIfUserCanBeNotifiedOfRecipeChangeAsync(recipeId, userId);
-        }
-
-        public Task<IEnumerable<User>> GetToBeNotifiedOfListDeletionAsync(int listId)
-        {
-            return _usersRepository.GetToBeNotifiedOfListDeletionAsync(listId);
-        }
-
-        public Task<IEnumerable<User>> GetToBeNotifiedOfRecipeDeletionAsync(int recipeId)
-        {
-            return _usersRepository.GetToBeNotifiedOfRecipeDeletionAsync(recipeId);
-        }
-
-        public Task<IEnumerable<User>> GetToBeNotifiedOfRecipeSentAsync(int recipeId)
-        {
-            return _usersRepository.GetToBeNotifiedOfRecipeSentAsync(recipeId);
+            return _usersRepository.Get(email.Trim());
         }
 
         public bool Exists(int id)
@@ -100,26 +45,26 @@ namespace PersonalAssistant.Application.Services.Common
             return _usersRepository.Exists(id);
         }
 
-        public Task<string> GetLanguageAsync(int id)
+        public string GetLanguage(int id)
         {
-            return _usersRepository.GetLanguageAsync(id);
+            return _usersRepository.GetLanguage(id);
         }
 
-        public async Task<string> GetImageUriAsync(int id)
+        public string GetImageUri(int id)
         {
-            string imageUri = await _usersRepository.GetImageUriAsync(id);
+            string imageUri = _usersRepository.GetImageUri(id);
             return _cdnService.ImageUriToThumbnail(imageUri);
         }
 
-        public async Task<ToDoAssistantPreferences> GetToDoAssistantPreferencesAsync(int id)
+        public ToDoAssistantPreferences GetToDoAssistantPreferences(int id)
         {
-            User user = await _usersRepository.GetAsync(id);
+            User user = _usersRepository.Get(id);
             return _mapper.Map<ToDoAssistantPreferences>(user);
         }
 
-        public async Task<CookingAssistantPreferences> GetCookingAssistantPreferencesAsync(int id)
+        public CookingAssistantPreferences GetCookingAssistantPreferences(int id)
         {
-            User user = await _usersRepository.GetAsync(id);
+            User user = _usersRepository.Get(id);
             return _mapper.Map<CookingAssistantPreferences>(user);
         }
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +20,7 @@ namespace Api.Controllers.ToDoAssistant
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public IActionResult GetAll()
         {
             int userId;
             try
@@ -33,13 +32,13 @@ namespace Api.Controllers.ToDoAssistant
                 return Unauthorized();
             }
 
-            var notificationDtos = await _notificationService.GetAllAndFlagUnseenAsync(userId);
+            var notificationDtos = _notificationService.GetAllAndFlagUnseen(userId);
 
             return Ok(notificationDtos);
         }
 
         [HttpGet("unseen-notifications-count")]
-        public async Task<IActionResult> GetUnseenNotificationsCount()
+        public IActionResult GetUnseenNotificationsCount()
         {
             int userId;
             try
@@ -51,7 +50,7 @@ namespace Api.Controllers.ToDoAssistant
                 return Unauthorized();
             }
 
-            int unseenNotificationsCount = await _notificationService.GetUnseenNotificationsCountAsync(userId);
+            int unseenNotificationsCount = _notificationService.GetUnseenNotificationsCount(userId);
 
             return Ok(unseenNotificationsCount);
         }

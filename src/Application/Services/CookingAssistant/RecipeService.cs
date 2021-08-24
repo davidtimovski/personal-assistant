@@ -7,9 +7,11 @@ using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
 using PersonalAssistant.Application.Contracts.Common;
+using PersonalAssistant.Application.Contracts.Common.Models;
 using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes;
 using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
+using PersonalAssistant.Domain.Entities.Common;
 using PersonalAssistant.Domain.Entities.CookingAssistant;
 
 namespace PersonalAssistant.Application.Services.CookingAssistant
@@ -36,9 +38,9 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<SimpleRecipe>> GetAllAsync(int userId)
+        public IEnumerable<SimpleRecipe> GetAll(int userId)
         {
-            IEnumerable<Recipe> recipes = await _recipesRepository.GetAllAsync(userId);
+            IEnumerable<Recipe> recipes = _recipesRepository.GetAll(userId);
 
             var result = recipes.Select(x => _mapper.Map<SimpleRecipe>(x, opts => { opts.Items["UserId"] = userId; }));
             result = result.OrderBy(x => x.IngredientsMissing).ThenByDescending(x => x.LastOpenedDate);
@@ -46,18 +48,18 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             return result;
         }
 
-        public async Task<RecipeToNotify> GetAsync(int id)
+        public RecipeToNotify Get(int id)
         {
-            Recipe recipe = await _recipesRepository.GetAsync(id);
+            Recipe recipe = _recipesRepository.Get(id);
 
             var result = _mapper.Map<RecipeToNotify>(recipe);
 
             return result;
         }
 
-        public async Task<RecipeDto> GetAsync(int id, int userId, string currency)
+        public RecipeDto Get(int id, int userId, string currency)
         {
-            Recipe recipe = await _recipesRepository.GetAsync(id, userId);
+            Recipe recipe = _recipesRepository.Get(id, userId);
 
             var result = _mapper.Map<RecipeDto>(recipe, opts => {
                 opts.Items["UserId"] = userId;
@@ -72,24 +74,24 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             return result;
         }
 
-        public async Task<RecipeForUpdate> GetForUpdateAsync(int id, int userId)
+        public RecipeForUpdate GetForUpdate(int id, int userId)
         {
-            Recipe recipe = await _recipesRepository.GetForUpdateAsync(id, userId);
+            Recipe recipe = _recipesRepository.GetForUpdate(id, userId);
 
             var result = _mapper.Map<RecipeForUpdate>(recipe, opts => { opts.Items["UserId"] = userId; });
 
             return result;
         }
 
-        public async Task<RecipeWithShares> GetWithSharesAsync(int id, int userId)
+        public RecipeWithShares GetWithShares(int id, int userId)
         {
-            Recipe recipe = await _recipesRepository.GetWithOwnerAsync(id, userId);
+            Recipe recipe = _recipesRepository.GetWithOwner(id, userId);
             if (recipe == null)
             {
                 return null;
             }
 
-            recipe.Shares.AddRange(await _recipesRepository.GetSharesAsync(id));
+            recipe.Shares.AddRange(_recipesRepository.GetShares(id));
             recipe.Shares.RemoveAll(x => x.UserId == userId);
 
             var result = _mapper.Map<RecipeWithShares>(recipe, opts => { opts.Items["UserId"] = userId; });
@@ -97,18 +99,18 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             return result;
         }
 
-        public async Task<IEnumerable<ShareRecipeRequest>> GetShareRequestsAsync(int userId)
+        public IEnumerable<ShareRecipeRequest> GetShareRequests(int userId)
         {
-            IEnumerable<RecipeShare> shareRequests = await _recipesRepository.GetShareRequestsAsync(userId);
+            IEnumerable<RecipeShare> shareRequests = _recipesRepository.GetShareRequests(userId);
 
             var result = shareRequests.Select(x => _mapper.Map<ShareRecipeRequest>(x, opts => { opts.Items["UserId"] = userId; }));
 
             return result;
         }
 
-        public Task<int> GetPendingShareRequestsCountAsync(int userId)
+        public int GetPendingShareRequestsCount(int userId)
         {
-            return _recipesRepository.GetPendingShareRequestsCountAsync(userId);
+            return _recipesRepository.GetPendingShareRequestsCount(userId);
         }
 
         public bool CanShareWithUser(int shareWithId, int userId)
@@ -121,27 +123,27 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             return _recipesRepository.CanShareWithUser(shareWithId, userId);
         }
 
-        public async Task<RecipeForSending> GetForSendingAsync(int id, int userId)
+        public RecipeForSending GetForSending(int id, int userId)
         {
-            Recipe recipe = await _recipesRepository.GetForSendingAsync(id, userId);
+            Recipe recipe = _recipesRepository.GetForSending(id, userId);
 
             var result = _mapper.Map<RecipeForSending>(recipe);
 
             return result;
         }
 
-        public async Task<IEnumerable<SendRequestDto>> GetSendRequestsAsync(int userId)
+        public IEnumerable<SendRequestDto> GetSendRequests(int userId)
         {
-            IEnumerable<SendRequest> sendRequests = await _recipesRepository.GetSendRequestsAsync(userId);
+            IEnumerable<SendRequest> sendRequests = _recipesRepository.GetSendRequests(userId);
 
             var result = sendRequests.Select(x => _mapper.Map<SendRequestDto>(x));
 
             return result;
         }
 
-        public Task<int> GetPendingSendRequestsCountAsync(int userId)
+        public int GetPendingSendRequestsCount(int userId)
         {
-            return _recipesRepository.GetPendingSendRequestsCountAsync(userId);
+            return _recipesRepository.GetPendingSendRequestsCount(userId);
         }
 
         public bool SendRequestExists(int id, int userId)
@@ -154,28 +156,28 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             return _recipesRepository.IngredientsReviewIsRequired(id, userId);
         }
 
-        public async Task<RecipeForReview> GetForReviewAsync(int id, int userId)
+        public RecipeForReview GetForReview(int id, int userId)
         {
             if (!SendRequestExists(id, userId))
             {
                 return null;
             }
 
-            Recipe recipe = await _recipesRepository.GetForReviewAsync(id);
+            Recipe recipe = _recipesRepository.GetForReview(id);
 
             var result = _mapper.Map<RecipeForReview>(recipe);
 
             return result;
         }
 
-        public Task<IEnumerable<string>> GetAllImageUrisAsync(int userId)
+        public IEnumerable<string> GetAllImageUris(int userId)
         {
-            return _recipesRepository.GetAllImageUrisAsync(userId);
+            return _recipesRepository.GetAllImageUris(userId);
         }
 
-        public Task<string> GetImageUriAsync(int id)
+        public string GetImageUri(int id)
         {
-            return _recipesRepository.GetImageUriAsync(id);
+            return _recipesRepository.GetImageUri(id);
         }
 
         public bool Exists(int id, int userId)
@@ -206,6 +208,26 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             }
 
             return _recipesRepository.CheckSendRequest(recipeId, sendToId, userId);
+        }
+
+        public IEnumerable<User> GetUsersToBeNotifiedOfRecipeChange(int id, int excludeUserId)
+        {
+            return _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(id, excludeUserId);
+        }
+
+        public bool CheckIfUserCanBeNotifiedOfRecipeChange(int id, int userId)
+        {
+            return _recipesRepository.CheckIfUserCanBeNotifiedOfRecipeChange(id, userId);
+        }
+
+        public IEnumerable<User> GetUsersToBeNotifiedOfRecipeDeletion(int id)
+        {
+            return _recipesRepository.GetUsersToBeNotifiedOfRecipeDeletion(id);
+        }
+
+        public IEnumerable<User> GetUsersToBeNotifiedOfRecipeSent(int id)
+        {
+            return _recipesRepository.GetUsersToBeNotifiedOfRecipeSent(id);
         }
 
         public async Task<int> CreateAsync(CreateRecipe model, IValidator<CreateRecipe> validator)
@@ -331,11 +353,11 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             await _recipesRepository.CreateAsync(recipe);
         }
 
-        public async Task<RecipeToNotify> UpdateAsync(UpdateRecipe model, IValidator<UpdateRecipe> validator)
+        public async Task<UpdateRecipeResult> UpdateAsync(UpdateRecipe model, IValidator<UpdateRecipe> validator)
         {
             ValidateAndThrow(model, validator);
 
-            string oldImageUri = await GetImageUriAsync(model.Id);
+            string oldImageUri = GetImageUri(model.Id);
 
             var recipe = _mapper.Map<Recipe>(model);
 
@@ -380,7 +402,6 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             recipe.ModifiedDate = now;
 
             Recipe original = await _recipesRepository.UpdateAsync(recipe, model.IngredientIdsToRemove);
-            var result = _mapper.Map<RecipeToNotify>(original);
 
             // If the recipe image was changed
             if (oldImageUri != model.ImageUri)
@@ -398,17 +419,30 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
                 }
             }
 
+            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(model.Id, model.UserId);
+            if (!usersToBeNotified.Any())
+            {
+                return new UpdateRecipeResult();
+            }
+
+            var result = new UpdateRecipeResult
+            {
+                RecipeName = original.Name,
+                ActionUserImageUri = _userService.GetImageUri(model.UserId),
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+            };
+
             return result;
         }
 
-        public async Task<string> DeleteAsync(int id, int userId)
+        public async Task<DeleteRecipeResult> DeleteAsync(int id, int userId)
         {
             if (!_recipesRepository.UserOwns(id, userId))
             {
                 throw new ValidationException("Unauthorized");
             }
 
-            string imageUri = await GetImageUriAsync(id);
+            string imageUri = GetImageUri(id);
 
             var recipeName = await _recipesRepository.DeleteAsync(id);
 
@@ -417,7 +451,20 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
                 await _cdnService.DeleteAsync($"users/{userId}/recipes/{imageUri}");
             }
 
-            return recipeName;
+            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeDeletion(id);
+            if (!usersToBeNotified.Any())
+            {
+                return new DeleteRecipeResult();
+            }
+
+            var result = new DeleteRecipeResult
+            {
+                RecipeName = recipeName,
+                ActionUserImageUri = _userService.GetImageUri(userId),
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+            };
+
+            return result;
         }
 
         public async Task ShareAsync(ShareRecipe model, IValidator<ShareRecipe> validator)
@@ -453,26 +500,63 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             await _recipesRepository.SaveSharingDetailsAsync(newShares, removedShares);
         }
 
-        public async Task SetShareIsAcceptedAsync(int id, int userId, bool isAccepted)
+        public async Task<SetShareIsAcceptedResult> SetShareIsAcceptedAsync(int id, int userId, bool isAccepted)
         {
             await _recipesRepository.SetShareIsAcceptedAsync(id, userId, isAccepted, DateTime.UtcNow);
+
+            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(id, userId);
+            if (!usersToBeNotified.Any())
+            {
+                return new SetShareIsAcceptedResult();
+            }
+
+            Recipe recipe = _recipesRepository.Get(id);
+
+            var result = new SetShareIsAcceptedResult
+            {
+                RecipeName = recipe.Name,
+                ActionUserImageUri = _userService.GetImageUri(userId),
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+            };
+
+            return result;
         }
 
-        public async Task<bool> LeaveAsync(int id, int userId)
+        public async Task<LeaveRecipeResult> LeaveAsync(int id, int userId)
         {
             RecipeShare share = await _recipesRepository.LeaveAsync(id, userId);
 
-            return share.IsAccepted.Value != false;
+            if (share.IsAccepted == false)
+            {
+                return new LeaveRecipeResult();
+            }
+
+            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(id, userId);
+            if (!usersToBeNotified.Any())
+            {
+                return new LeaveRecipeResult();
+            }
+
+            Recipe recipe = _recipesRepository.Get(id);
+
+            var result = new LeaveRecipeResult
+            {
+                RecipeName = recipe.Name,
+                ActionUserImageUri = _userService.GetImageUri(userId),
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+            };
+
+            return result;
         }
 
-        public async Task SendAsync(CreateSendRequest model, IValidator<CreateSendRequest> validator)
+        public async Task<SendRecipeResult> SendAsync(CreateSendRequest model, IValidator<CreateSendRequest> validator)
         {
             ValidateAndThrow(model, validator);
 
             var sendRequests = new List<SendRequest>();
             foreach (int recipientId in model.RecipientsIds)
             {
-                var (canSend, alreadySent) = CheckSendRequest(model.RecipeId, recipientId, model.UserId);
+                var (canSend, alreadySent) = CheckSendRequest(model.Id, recipientId, model.UserId);
                 if (!canSend || alreadySent)
                 {
                     continue;
@@ -481,7 +565,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
                 var recipeSendRequest = new SendRequest
                 {
                     UserId = recipientId,
-                    RecipeId = model.RecipeId
+                    RecipeId = model.Id
                 };
                 sendRequests.Add(recipeSendRequest);
             }
@@ -493,11 +577,40 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             }
 
             await _recipesRepository.CreateSendRequestsAsync(sendRequests);
+
+            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeSent(model.Id);
+            if (!usersToBeNotified.Any())
+            {
+                return new SendRecipeResult();
+            }
+
+            Recipe recipe = _recipesRepository.Get(model.Id);
+
+            var result = new SendRecipeResult
+            {
+                RecipeName = recipe.Name,
+                ActionUserImageUri = _userService.GetImageUri(model.UserId),
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+            };
+
+            return result;
         }
 
-        public async Task DeclineSendRequestAsync(int id, int userId)
+        public async Task<DeclineSendRequestResult> DeclineSendRequestAsync(int id, int userId)
         {
             await _recipesRepository.DeclineSendRequestAsync(id, userId, DateTime.UtcNow);
+
+            Recipe recipe = _recipesRepository.Get(id);
+            var userToBeNotified = _userService.Get(recipe.UserId);
+           
+            var result = new DeclineSendRequestResult
+            {
+                RecipeName = recipe.Name,
+                ActionUserImageUri = _userService.GetImageUri(userId),
+                NotificationRecipients = new List<NotificationRecipient> { new NotificationRecipient { Id = userToBeNotified.Id, Language = userToBeNotified.Language } }
+            };
+
+            return result;
         }
 
         public async Task DeleteSendRequestAsync(int id, int userId)

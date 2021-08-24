@@ -7,7 +7,6 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Model
 {
     public class RecipeToNotify : IMapFrom<Recipe>
     {
-        public int Id { get; set; }
         public int UserId { get; set; }
         public string Name { get; set; }
         public string ImageUri { get; set; }

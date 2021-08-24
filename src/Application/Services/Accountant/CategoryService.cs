@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using PersonalAssistant.Application.Contracts.Accountant;
 using PersonalAssistant.Application.Contracts.Accountant.Categories;
 using PersonalAssistant.Application.Contracts.Accountant.Categories.Models;
 using PersonalAssistant.Application.Contracts.Accountant.Common.Models;
-using PersonalAssistant.Domain.Entities;
 using PersonalAssistant.Domain.Entities.Accountant;
 
 namespace PersonalAssistant.Application.Services.Accountant
@@ -25,18 +22,18 @@ namespace PersonalAssistant.Application.Services.Accountant
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<CategoryDto>> GetAllAsync(GetAll model)
+        public IEnumerable<CategoryDto> GetAll(GetAll model)
         {
-            var categories = await _categoriesRepository.GetAllAsync(model.UserId, model.FromModifiedDate);
+            var categories = _categoriesRepository.GetAll(model.UserId, model.FromModifiedDate);
 
             var categoryDtos = categories.Select(x => _mapper.Map<CategoryDto>(x));
 
             return categoryDtos;
         }
 
-        public Task<IEnumerable<int>> GetDeletedIdsAsync(GetDeletedIds model)
+        public IEnumerable<int> GetDeletedIds(GetDeletedIds model)
         {
-            return _categoriesRepository.GetDeletedIdsAsync(model.UserId, model.FromDate);
+            return _categoriesRepository.GetDeletedIds(model.UserId, model.FromDate);
         }
 
         public Task<int> CreateAsync(CreateCategory model)

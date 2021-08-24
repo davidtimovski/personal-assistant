@@ -8,8 +8,8 @@ namespace PersonalAssistant.Application.Contracts.Accountant.Accounts
 {
     public interface IAccountService
     {
-        Task<IEnumerable<AccountDto>> GetAllAsync(GetAll model);
-        Task<IEnumerable<int>> GetDeletedIdsAsync(GetDeletedIds model);
+        IEnumerable<AccountDto> GetAll(GetAll model);
+        IEnumerable<int> GetDeletedIds(GetDeletedIds model);
         Task<int> CreateAsync(CreateAccount model);
         Task CreateMainAsync(CreateMainAccount model);
         Task UpdateAsync(UpdateAccount model);

@@ -34,7 +34,6 @@ namespace Api.Controllers.CookingAssistant
     {
         private readonly IRecipeService _recipeService;
         private readonly IIngredientService _ingredientService;
-        private readonly ITaskService _tasksService;
         private readonly IStringLocalizer<RecipesController> _localizer;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ICdnService _cdnService;
@@ -67,7 +66,6 @@ namespace Api.Controllers.CookingAssistant
         {
             _recipeService = recipeService;
             _ingredientService = ingredientService;
-            _tasksService = tasksService;
             _localizer = localizer;
             _webHostEnvironment = webHostEnvironment;
             _cdnService = cdnService;
@@ -83,7 +81,7 @@ namespace Api.Controllers.CookingAssistant
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public IActionResult GetAll()
         {
             int userId;
             try
@@ -95,13 +93,13 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            IEnumerable<SimpleRecipe> recipeDtos = await _recipeService.GetAllAsync(userId);
+            IEnumerable<SimpleRecipe> recipeDtos = _recipeService.GetAll(userId);
 
             return Ok(recipeDtos);
         }
 
         [HttpGet("{id}/{currency}")]
-        public async Task<IActionResult> Get(int id, string currency)
+        public IActionResult Get(int id, string currency)
         {
             int userId;
             try
@@ -113,7 +111,7 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            RecipeDto recipeDto = await _recipeService.GetAsync(id, userId, currency);
+            RecipeDto recipeDto = _recipeService.Get(id, userId, currency);
             if (recipeDto == null)
             {
                 return NotFound();
@@ -123,7 +121,7 @@ namespace Api.Controllers.CookingAssistant
         }
 
         [HttpGet("{id}/update")]
-        public async Task<IActionResult> GetForUpdate(int id)
+        public IActionResult GetForUpdate(int id)
         {
             int userId;
             try
@@ -135,7 +133,7 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            RecipeForUpdate recipeDto = await _recipeService.GetForUpdateAsync(id, userId);
+            RecipeForUpdate recipeDto = _recipeService.GetForUpdate(id, userId);
             if (recipeDto == null)
             {
                 return NotFound();
@@ -145,7 +143,7 @@ namespace Api.Controllers.CookingAssistant
         }
 
         [HttpGet("{id}/with-shares")]
-        public async Task<IActionResult> GetWithShares(int id)
+        public IActionResult GetWithShares(int id)
         {
             int userId;
             try
@@ -157,7 +155,7 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            RecipeWithShares list = await _recipeService.GetWithSharesAsync(id, userId);
+            RecipeWithShares list = _recipeService.GetWithShares(id, userId);
             if (list == null)
             {
                 return NotFound();
@@ -167,7 +165,7 @@ namespace Api.Controllers.CookingAssistant
         }
 
         [HttpGet("share-requests")]
-        public async Task<IActionResult> GetShareRequests()
+        public IActionResult GetShareRequests()
         {
             int userId;
             try
@@ -179,13 +177,13 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            IEnumerable<ShareRecipeRequest> shareRequests = await _recipeService.GetShareRequestsAsync(userId);
+            IEnumerable<ShareRecipeRequest> shareRequests = _recipeService.GetShareRequests(userId);
 
             return Ok(shareRequests);
         }
 
         [HttpGet("pending-share-requests-count")]
-        public async Task<IActionResult> GetPendingShareRequestsCount()
+        public IActionResult GetPendingShareRequestsCount()
         {
             int userId;
             try
@@ -197,13 +195,13 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            int pendingShareRequestsCount = await _recipeService.GetPendingShareRequestsCountAsync(userId);
+            int pendingShareRequestsCount = _recipeService.GetPendingShareRequestsCount(userId);
 
             return Ok(pendingShareRequestsCount);
         }
 
         [HttpGet("{id}/sending")]
-        public async Task<IActionResult> GetForSending(int id)
+        public IActionResult GetForSending(int id)
         {
             int userId;
             try
@@ -215,7 +213,7 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            RecipeForSending recipeDto = await _recipeService.GetForSendingAsync(id, userId);
+            RecipeForSending recipeDto = _recipeService.GetForSending(id, userId);
             if (recipeDto == null)
             {
                 return NotFound();
@@ -225,7 +223,7 @@ namespace Api.Controllers.CookingAssistant
         }
 
         [HttpGet("send-requests")]
-        public async Task<IActionResult> GetSendRequests()
+        public IActionResult GetSendRequests()
         {
             int userId;
             try
@@ -237,13 +235,13 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            IEnumerable<SendRequestDto> sendRequestDtos = await _recipeService.GetSendRequestsAsync(userId);
+            IEnumerable<SendRequestDto> sendRequestDtos = _recipeService.GetSendRequests(userId);
 
             return Ok(sendRequestDtos);
         }
 
         [HttpGet("pending-send-requests-count")]
-        public async Task<IActionResult> GetPendingSendRequestsCount()
+        public IActionResult GetPendingSendRequestsCount()
         {
             int userId;
             try
@@ -255,13 +253,13 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            int pendingSendRequestsCount = await _recipeService.GetPendingSendRequestsCountAsync(userId);
+            int pendingSendRequestsCount =  _recipeService.GetPendingSendRequestsCount(userId);
 
             return Ok(pendingSendRequestsCount);
         }
 
         [HttpGet("{id}/review")]
-        public async Task<IActionResult> GetForReview(int id)
+        public IActionResult GetForReview(int id)
         {
             int userId;
             try
@@ -273,13 +271,13 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            RecipeForReview recipeDto = await _recipeService.GetForReviewAsync(id, userId);
+            RecipeForReview recipeDto = _recipeService.GetForReview(id, userId);
             if (recipeDto == null)
             {
                 return NotFound();
             }
 
-            recipeDto.IngredientSuggestions = await _ingredientService.GetIngredientReviewSuggestionsAsync(userId);
+            recipeDto.IngredientSuggestions = _ingredientService.GetIngredientReviewSuggestions(userId);
 
             return Ok(recipeDto);
         }
@@ -352,29 +350,22 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            RecipeToNotify original = await _recipeService.UpdateAsync(dto, _updateRecipeValidator);
+            UpdateRecipeResult result = await _recipeService.UpdateAsync(dto, _updateRecipeValidator);
 
-            // Notify
-            var usersToBeNotified = await _userService.GetToBeNotifiedOfRecipeChangeAsync(original.Id, dto.UserId);
-            if (usersToBeNotified.Any())
+            foreach (var recipient in result.NotificationRecipients)
             {
-                var currentUser = await _userService.GetAsync(dto.UserId);
+                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+                var message = _localizer["UpdatedRecipeNotification", IdentityHelper.GetUserName(User), result.RecipeName];
 
-                foreach (var user in usersToBeNotified)
+                var pushNotification = new PushNotification
                 {
-                    CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
-                    var message = _localizer["UpdatedRecipeNotification", IdentityHelper.GetUserName(User), original.Name];
+                    SenderImageUri = result.ActionUserImageUri,
+                    UserId = recipient.Id,
+                    Application = "Cooking Assistant",
+                    Message = message
+                };
 
-                    var pushNotification = new PushNotification
-                    {
-                        SenderImageUri = currentUser.ImageUri,
-                        UserId = user.Id,
-                        Application = "Cooking Assistant",
-                        Message = message
-                    };
-
-                    _senderService.Enqueue(pushNotification);
-                }
+                _senderService.Enqueue(pushNotification);
             }
 
             return NoContent();
@@ -393,36 +384,29 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            var deletedRecipeName = await _recipeService.DeleteAsync(id, userId);
+            DeleteRecipeResult result = await _recipeService.DeleteAsync(id, userId);
 
-            // Notify
-            var usersToBeNotified = await _userService.GetToBeNotifiedOfRecipeDeletionAsync(id);
-            if (usersToBeNotified.Any())
+            foreach (var recipient in result.NotificationRecipients)
             {
-                var currentUser = await _userService.GetAsync(userId);
+                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+                var message = _localizer["DeletedRecipeNotification", IdentityHelper.GetUserName(User), result.RecipeName];
 
-                foreach (var user in usersToBeNotified)
+                var pushNotification = new PushNotification
                 {
-                    CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
-                    var message = _localizer["DeletedRecipeNotification", IdentityHelper.GetUserName(User), deletedRecipeName];
+                    SenderImageUri = result.ActionUserImageUri,
+                    UserId = recipient.Id,
+                    Application = "Cooking Assistant",
+                    Message = message
+                };
 
-                    var pushNotification = new PushNotification
-                    {
-                        SenderImageUri = currentUser.ImageUri,
-                        UserId = user.Id,
-                        Application = "Cooking Assistant",
-                        Message = message
-                    };
-
-                    _senderService.Enqueue(pushNotification);
-                }
+                _senderService.Enqueue(pushNotification);
             }
 
             return NoContent();
         }
 
         [HttpGet("can-share-with-user/{email}")]
-        public async Task<IActionResult> CanShareRecipeWithUser(string email)
+        public IActionResult CanShareRecipeWithUser(string email)
         {
             int userId;
             try
@@ -439,7 +423,7 @@ namespace Api.Controllers.CookingAssistant
                 CanShare = false
             };
 
-            var user = await _userService.GetAsync(email);
+            var user = _userService.Get(email);
 
             if (user != null)
             {
@@ -471,11 +455,11 @@ namespace Api.Controllers.CookingAssistant
             foreach (int removedUserId in dto.RemovedShares)
             {
                 // Notify
-                if (await _userService.CheckIfUserCanBeNotifiedOfRecipeChangeAsync(dto.RecipeId, removedUserId))
+                if (_recipeService.CheckIfUserCanBeNotifiedOfRecipeChange(dto.RecipeId, removedUserId))
                 {
-                    var currentUser = await _userService.GetAsync(dto.UserId);
-                    var user = await _userService.GetAsync(removedUserId);
-                    RecipeToNotify recipe = await _recipeService.GetAsync(dto.RecipeId);
+                    var currentUser = _userService.Get(dto.UserId);
+                    var user = _userService.Get(removedUserId);
+                    RecipeToNotify recipe = _recipeService.Get(dto.RecipeId);
 
                     CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
                     var message = _localizer["RemovedShareNotification", IdentityHelper.GetUserName(User), recipe.Name];
@@ -515,31 +499,27 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            await _recipeService.SetShareIsAcceptedAsync(dto.RecipeId, userId, dto.IsAccepted);
-
-            // Notify
-            var usersToBeNotified = await _userService.GetToBeNotifiedOfRecipeChangeAsync(dto.RecipeId, userId);
-            if (usersToBeNotified.Any())
+            SetShareIsAcceptedResult result = await _recipeService.SetShareIsAcceptedAsync(dto.RecipeId, userId, dto.IsAccepted);
+            if (!result.Notify())
             {
-                var currentUser = await _userService.GetAsync(userId);
-                RecipeToNotify recipe = await _recipeService.GetAsync(dto.RecipeId);
-                var localizerKey = dto.IsAccepted ? "JoinedRecipeNotification" : "DeclinedShareRequestNotification";
+                return NoContent();
+            }
 
-                foreach (var user in usersToBeNotified)
+            var localizerKey = dto.IsAccepted ? "JoinedRecipeNotification" : "DeclinedShareRequestNotification";
+            foreach (var recipient in result.NotificationRecipients)
+            {
+                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+                var message = _localizer[localizerKey, IdentityHelper.GetUserName(User), result.RecipeName];
+
+                var pushNotification = new PushNotification
                 {
-                    CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
-                    var message = _localizer[localizerKey, IdentityHelper.GetUserName(User), recipe.Name];
+                    SenderImageUri = result.ActionUserImageUri,
+                    UserId = recipient.Id,
+                    Application = "Cooking Assistant",
+                    Message = message
+                };
 
-                    var pushNotification = new PushNotification
-                    {
-                        SenderImageUri = currentUser.ImageUri,
-                        UserId = user.Id,
-                        Application = "Cooking Assistant",
-                        Message = message
-                    };
-
-                    _senderService.Enqueue(pushNotification);
-                }
+                _senderService.Enqueue(pushNotification);
             }
 
             return NoContent();
@@ -558,40 +538,29 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            bool shareWasAccepted = await _recipeService.LeaveAsync(id, userId);
+            LeaveRecipeResult result = await _recipeService.LeaveAsync(id, userId);
 
-            // Notify if joined in the first place
-            if (shareWasAccepted)
+            foreach (var recipient in result.NotificationRecipients)
             {
-                var usersToBeNotified = await _userService.GetToBeNotifiedOfRecipeChangeAsync(id, userId);
-                if (usersToBeNotified.Any())
+                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+                var message = _localizer["LeftRecipeNotification", IdentityHelper.GetUserName(User), result.RecipeName];
+
+                var pushNotification = new PushNotification
                 {
-                    var currentUser = await _userService.GetAsync(userId);
-                    RecipeToNotify recipe = await _recipeService.GetAsync(id);
+                    SenderImageUri = result.ActionUserImageUri,
+                    UserId = recipient.Id,
+                    Application = "Cooking Assistant",
+                    Message = message
+                };
 
-                    foreach (var user in usersToBeNotified)
-                    {
-                        CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
-                        var message = _localizer["LeftRecipeNotification", IdentityHelper.GetUserName(User), recipe.Name];
-
-                        var pushNotification = new PushNotification
-                        {
-                            SenderImageUri = currentUser.ImageUri,
-                            UserId = user.Id,
-                            Application = "Cooking Assistant",
-                            Message = message
-                        };
-
-                        _senderService.Enqueue(pushNotification);
-                    }
-                }
+                _senderService.Enqueue(pushNotification);
             }
 
             return NoContent();
         }
 
         [HttpGet("can-send-recipe-to-user/{email}/{recipeId}")]
-        public async Task<IActionResult> CanSendRecipeToUser(string email, int recipeId)
+        public IActionResult CanSendRecipeToUser(string email, int recipeId)
         {
             int userId;
             try
@@ -605,7 +574,7 @@ namespace Api.Controllers.CookingAssistant
 
             var canSendDto = new CanSendDto();
 
-            var user = await _userService.GetAsync(email);
+            var user = _userService.Get(email);
             if (user != null)
             {
                 canSendDto.UserId = user.Id;
@@ -636,31 +605,23 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            await _recipeService.SendAsync(dto, _createSendRequestValidator);
+            SendRecipeResult result = await _recipeService.SendAsync(dto, _createSendRequestValidator);
 
-            // Notify
-            var usersToBeNotified = await _userService.GetToBeNotifiedOfRecipeSentAsync(dto.RecipeId);
-            if (usersToBeNotified.Any())
+            foreach (var recipient in result.NotificationRecipients)
             {
-                var currentUser = await _userService.GetAsync(dto.UserId);
-                RecipeToNotify recipe = await _recipeService.GetAsync(dto.RecipeId);
+                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+                var message = _localizer["SentRecipeNotification", IdentityHelper.GetUserName(User), result.RecipeName];
 
-                foreach (var user in usersToBeNotified)
+                var pushNotification = new PushNotification
                 {
-                    CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
-                    var message = _localizer["SentRecipeNotification", IdentityHelper.GetUserName(User), recipe.Name];
+                    SenderImageUri = result.ActionUserImageUri,
+                    UserId = recipient.Id,
+                    Application = "Cooking Assistant",
+                    Message = message,
+                    OpenUrl = $"{_urls.CookingAssistant}/inbox"
+                };
 
-                    var pushNotification = new PushNotification
-                    {
-                        SenderImageUri = currentUser.ImageUri,
-                        UserId = user.Id,
-                        Application = "Cooking Assistant",
-                        Message = message,
-                        OpenUrl = $"{_urls.CookingAssistant}/inbox"
-                    };
-
-                    _senderService.Enqueue(pushNotification);
-                }
+                _senderService.Enqueue(pushNotification);
             }
 
             return StatusCode(201, null);
@@ -684,20 +645,20 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            await _recipeService.DeclineSendRequestAsync(dto.RecipeId, userId);
+            DeclineSendRequestResult result = await _recipeService.DeclineSendRequestAsync(dto.RecipeId, userId);
+            if (!result.Notify())
+            {
+                return NoContent();
+            }
 
-            // Notify
-            var currentUser = await _userService.GetAsync(userId);
-            RecipeToNotify recipe = await _recipeService.GetAsync(dto.RecipeId);
-            var recipeUser = await _userService.GetAsync(recipe.UserId);
-
-            CultureInfo.CurrentCulture = new CultureInfo(recipeUser.Language, false);
-            var message = _localizer["DeclinedSendRequestNotification", IdentityHelper.GetUserName(User), recipe.Name];
+            NotificationRecipient recipient = result.NotificationRecipients.First();
+            CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+            var message = _localizer["DeclinedSendRequestNotification", IdentityHelper.GetUserName(User), result.RecipeName];
 
             var pushNotification = new PushNotification
             {
-                SenderImageUri = currentUser.ImageUri,
-                UserId = recipeUser.Id,
+                SenderImageUri = result.ActionUserImageUri,
+                UserId = recipient.Id,
                 Application = "Cooking Assistant",
                 Message = message
             };
@@ -753,7 +714,7 @@ namespace Api.Controllers.CookingAssistant
             importModel.IngredientReplacements = dto.IngredientReplacements;
 
             // Copy recipe image if not default
-            RecipeToNotify recipe = await _recipeService.GetAsync(importModel.Id);
+            RecipeToNotify recipe = _recipeService.Get(importModel.Id);
             string tempImagePath = Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp", Guid.NewGuid().ToString());
 
             importModel.ImageUri = await _cdnService.CopyAndUploadAsync(
@@ -766,8 +727,8 @@ namespace Api.Controllers.CookingAssistant
             int id = await _recipeService.ImportAsync(importModel, _importRecipeValidator);
 
             // Notify
-            User currentUser = await _userService.GetAsync(importModel.UserId);
-            User recipeUser = await _userService.GetAsync(recipe.UserId);
+            User currentUser = _userService.Get(importModel.UserId);
+            User recipeUser = _userService.Get(recipe.UserId);
 
             CultureInfo.CurrentCulture = new CultureInfo(recipeUser.Language, false);
             var message = _localizer["AcceptedSendRequestNotification", IdentityHelper.GetUserName(User), recipe.Name];

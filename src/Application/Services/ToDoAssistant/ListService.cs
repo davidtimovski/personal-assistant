@@ -6,9 +6,11 @@ using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
 using PersonalAssistant.Application.Contracts.Common;
+using PersonalAssistant.Application.Contracts.Common.Models;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications;
+using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
 using PersonalAssistant.Domain.Entities.Common;
 using PersonalAssistant.Domain.Entities.ToDoAssistant;
 
@@ -18,75 +20,78 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
     {
         private readonly IUserService _userService;
         private readonly IListsRepository _listsRepository;
+        private readonly ITasksRepository _tasksRepository;
         private readonly INotificationsRepository _notificationsRepository;
         private readonly IMapper _mapper;
 
         public ListService(
             IUserService userService,
             IListsRepository listsRepository,
+            ITasksRepository tasksRepository,
             INotificationsRepository notificationsRepository,
             IMapper mapper)
         {
             _userService = userService;
             _listsRepository = listsRepository;
+            _tasksRepository = tasksRepository;
             _notificationsRepository = notificationsRepository;
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ListDto>> GetAllAsync(int userId)
+        public IEnumerable<ListDto> GetAll(int userId)
         {
-            IEnumerable<ToDoList> lists = await _listsRepository.GetAllWithTasksAndSharingDetailsAsync(userId);
+            IEnumerable<ToDoList> lists = _listsRepository.GetAllWithTasksAndSharingDetails(userId);
 
             var result = lists.Select(x => _mapper.Map<ListDto>(x, opts => { opts.Items["UserId"] = userId; }));
 
             return result;
         }
 
-        public async Task<IEnumerable<ToDoListOption>> GetAllAsOptionsAsync(int userId)
+        public IEnumerable<ToDoListOption> GetAllAsOptions(int userId)
         {
-            IEnumerable<ToDoList> lists = await _listsRepository.GetAllAsOptionsAsync(userId);
+            IEnumerable<ToDoList> lists = _listsRepository.GetAllAsOptions(userId);
 
             var result = lists.Select(x => _mapper.Map<ToDoListOption>(x));
 
             return result;
         }
 
-        public async Task<IEnumerable<AssigneeOption>> GetMembersAsAssigneeOptionsAsync(int id)
+        public IEnumerable<AssigneeOption> GetMembersAsAssigneeOptions(int id)
         {
-            IEnumerable<User> members = await _listsRepository.GetMembersAsAssigneeOptionsAsync(id);
+            IEnumerable<User> members = _listsRepository.GetMembersAsAssigneeOptions(id);
 
             var result = members.Select(x => _mapper.Map<AssigneeOption>(x));
 
             return result;
         }
 
-        public async Task<SimpleList> GetAsync(int id)
+        public SimpleList Get(int id)
         {
-            ToDoList list = await _listsRepository.GetAsync(id);
+            ToDoList list = _listsRepository.Get(id);
 
             var result = _mapper.Map<SimpleList>(list);
 
             return result;
         }
 
-        public async Task<EditListDto> GetAsync(int id, int userId)
+        public EditListDto Get(int id, int userId)
         {
-            ToDoList list = await _listsRepository.GetAsync(id, userId);
+            ToDoList list = _listsRepository.Get(id, userId);
 
             var result = _mapper.Map<EditListDto>(list, opts => { opts.Items["UserId"] = userId; });
 
             return result;
         }
 
-        public async Task<ListWithShares> GetWithSharesAsync(int id, int userId)
+        public ListWithShares GetWithShares(int id, int userId)
         {
-            ToDoList list = await _listsRepository.GetWithOwnerAsync(id, userId);
+            ToDoList list = _listsRepository.GetWithOwner(id, userId);
             if (list == null)
             {
                 return null;
             }
 
-            list.Shares.AddRange(await _listsRepository.GetSharesAsync(id));
+            list.Shares.AddRange(_listsRepository.GetShares(id));
 
             var result = _mapper.Map<ListWithShares>(list, opts => { opts.Items["UserId"] = userId; });
             result.Shares.RemoveAll(x => x.UserId == userId);
@@ -94,18 +99,18 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             return result;
         }
 
-        public async Task<IEnumerable<ShareListRequest>> GetShareRequestsAsync(int userId)
+        public IEnumerable<ShareListRequest> GetShareRequests(int userId)
         {
-            IEnumerable<ListShare> shareRequests = await _listsRepository.GetShareRequestsAsync(userId);
+            IEnumerable<ListShare> shareRequests = _listsRepository.GetShareRequests(userId);
 
             var result = shareRequests.Select(x => _mapper.Map<ShareListRequest>(x, opts => { opts.Items["UserId"] = userId; }));
 
             return result;
         }
 
-        public Task<int> GetPendingShareRequestsCountAsync(int userId)
+        public int GetPendingShareRequestsCount(int userId)
         {
-            return _listsRepository.GetPendingShareRequestsCountAsync(userId);
+            return _listsRepository.GetPendingShareRequestsCount(userId);
         }
 
         public bool CanShareWithUser(int shareWithId, int userId)
@@ -161,6 +166,31 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
         public int Count(int userId)
         {
             return _listsRepository.Count(userId);
+        }
+
+        public IEnumerable<User> GetUsersToBeNotifiedOfChange(int id, int excludeUserId, bool isPrivate)
+        {
+            if (isPrivate)
+            {
+                return new List<User>();
+            }
+
+            return _listsRepository.GetUsersToBeNotifiedOfChange(id, excludeUserId);
+        }
+
+        public IEnumerable<User> GetUsersToBeNotifiedOfChange(int id, int excludeUserId, int taskId)
+        {
+            if (_tasksRepository.IsPrivate(taskId, excludeUserId))
+            {
+                return new List<User>();
+            }
+
+            return _listsRepository.GetUsersToBeNotifiedOfChange(id, excludeUserId);
+        }
+
+        public bool CheckIfUserCanBeNotifiedOfChange(int id, int userId)
+        {
+            return _listsRepository.CheckIfUserCanBeNotifiedOfChange(id, userId);
         }
 
         public async Task<int> CreateAsync(CreateList model, IValidator<CreateList> validator)
@@ -226,7 +256,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             await _listsRepository.CreateAsync(list);
         }
 
-        public async Task<UpdateListOriginal> UpdateAsync(UpdateList model, IValidator<UpdateList> validator)
+        public async Task<UpdateListResult> UpdateAsync(UpdateList model, IValidator<UpdateList> validator)
         {
             ValidateAndThrow(model, validator);
 
@@ -234,9 +264,36 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
             list.Name = list.Name.Trim();
             list.ModifiedDate = DateTime.UtcNow;
-            ToDoList original = await _listsRepository.UpdateAsync(list);
 
-            var result = _mapper.Map<UpdateListOriginal>(original);
+            ToDoList original = await _listsRepository.UpdateAsync(list, model.UserId);
+
+            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(model.Id, model.UserId);
+            if (!usersToBeNotified.Any())
+            {
+                return new UpdateListResult();
+            }
+
+            ListNotificationType notificationType;
+            if (model.Name != original.Name && model.Icon == original.Icon)
+            {
+                notificationType = ListNotificationType.NameUpdated;
+            }
+            else if (model.Name == original.Name && model.Icon != original.Icon)
+            {
+                notificationType = ListNotificationType.IconUpdated;
+            }
+            else
+            {
+                notificationType = ListNotificationType.Other;
+            }
+
+            var result = new UpdateListResult
+            {
+                Type = notificationType,
+                OriginalListName = original.Name,
+                ActionUserImageUri = _userService.GetImageUri(model.UserId),
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+            };
 
             return result;
         }
@@ -251,14 +308,30 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             await _listsRepository.UpdateSharedAsync(list);
         }
 
-        public async Task<string> DeleteAsync(int id, int userId)
+        public async Task<DeleteListResult> DeleteAsync(int id, int userId)
         {
             if (!_listsRepository.UserOwns(id, userId))
             {
                 throw new ValidationException("Unauthorized");
             }
 
-            return await _listsRepository.DeleteAsync(id);
+            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfDeletion(id);
+
+            string deletedListName = await _listsRepository.DeleteAsync(id);
+
+            if (!usersToBeNotified.Any())
+            {
+                return new DeleteListResult();
+            }
+
+            var result = new DeleteListResult
+            {
+                DeletedListName = deletedListName,
+                ActionUserImageUri = _userService.GetImageUri(userId),
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+            };
+
+            return result;
         }
 
         public async Task ShareAsync(ShareList model, IValidator<ShareList> validator)
@@ -308,13 +381,33 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             }
         }
 
-        public async Task<bool> LeaveAsync(int id, int userId)
+        public async Task<LeaveListResult> LeaveAsync(int id, int userId)
         {
             ListShare share = await _listsRepository.LeaveAsync(id, userId);
 
+            if (share.IsAccepted == false)
+            {
+                return new LeaveListResult();
+            }
+
             await _notificationsRepository.DeleteForUserAndListAsync(userId, id);
 
-            return share.IsAccepted.Value != false;
+            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(id, userId);
+            if (!usersToBeNotified.Any())
+            {
+                return new LeaveListResult();
+            }
+
+            ToDoList list = _listsRepository.Get(id);
+
+            var result = new LeaveListResult
+            {
+                ListName = list.Name,
+                ActionUserImageUri = _userService.GetImageUri(userId),
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+            };
+
+            return result;
         }
 
         public async Task<int> CopyAsync(CopyList model, IValidator<CopyList> validator)
@@ -339,19 +432,57 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             await _listsRepository.SetIsArchivedAsync(id, userId, isArchived, DateTime.UtcNow);
         }
 
-        public async Task<bool> SetTasksAsNotCompletedAsync(int id, int userId)
+        public async Task<SetTasksAsNotCompletedResult> SetTasksAsNotCompletedAsync(int id, int userId)
         {
             if (!UserOwnsOrShares(id, userId))
             {
                 throw new ValidationException("Unauthorized");
             }
 
-            return await _listsRepository.SetTasksAsNotCompletedAsync(id, userId, DateTime.UtcNow);
+            bool nonPrivateTasksWereUncompleted = await _listsRepository.SetTasksAsNotCompletedAsync(id, userId, DateTime.UtcNow);
+            if (!nonPrivateTasksWereUncompleted)
+            {
+                return new SetTasksAsNotCompletedResult();
+            }
+
+            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(id, userId);
+            if (!usersToBeNotified.Any())
+            {
+                return new SetTasksAsNotCompletedResult();
+            }
+
+            ToDoList list = _listsRepository.Get(id);
+
+            var result = new SetTasksAsNotCompletedResult
+            {
+                ListName = list.Name,
+                ActionUserImageUri = _userService.GetImageUri(userId),
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+            };
+
+            return result;
         }
 
-        public async Task SetShareIsAcceptedAsync(int id, int userId, bool isAccepted)
+        public async Task<SetShareIsAcceptedResult> SetShareIsAcceptedAsync(int id, int userId, bool isAccepted)
         {
             await _listsRepository.SetShareIsAcceptedAsync(id, userId, isAccepted, DateTime.UtcNow);
+
+            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(id, userId);
+            if (!usersToBeNotified.Any())
+            {
+                return new SetShareIsAcceptedResult();
+            }
+
+            ToDoList list = _listsRepository.Get(id);
+
+            var result = new SetShareIsAcceptedResult
+            {
+                ListName = list.Name,
+                ActionUserImageUri = _userService.GetImageUri(userId),
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+            };
+
+            return result;
         }
 
         public async Task ReorderAsync(int id, int userId, short oldOrder, short newOrder)

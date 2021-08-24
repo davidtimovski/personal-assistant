@@ -9,15 +9,15 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists
 {
     public interface IListsRepository
     {
-        Task<IEnumerable<ToDoList>> GetAllAsOptionsAsync(int userId);
-        Task<IEnumerable<ToDoList>> GetAllWithTasksAndSharingDetailsAsync(int userId);
-        Task<IEnumerable<User>> GetMembersAsAssigneeOptionsAsync(int id);
-        Task<ToDoList> GetAsync(int id);
-        Task<ToDoList> GetAsync(int id, int userId);
-        Task<ToDoList> GetWithOwnerAsync(int id, int userId);
-        Task<IEnumerable<ListShare>> GetSharesAsync(int id);
-        Task<IEnumerable<ListShare>> GetShareRequestsAsync(int userId);
-        Task<int> GetPendingShareRequestsCountAsync(int userId);
+        IEnumerable<ToDoList> GetAllAsOptions(int userId);
+        IEnumerable<ToDoList> GetAllWithTasksAndSharingDetails(int userId);
+        IEnumerable<User> GetMembersAsAssigneeOptions(int id);
+        ToDoList Get(int id);
+        ToDoList Get(int id, int userId);
+        ToDoList GetWithOwner(int id, int userId);
+        IEnumerable<ListShare> GetShares(int id);
+        IEnumerable<ListShare> GetShareRequests(int userId);
+        int GetPendingShareRequestsCount(int userId);
         bool CanShareWithUser(int shareWithId, int userId);
         bool UserOwnsOrShares(int id, int userId);
         bool UserOwnsOrSharesAsPending(int id, int userId);
@@ -29,8 +29,11 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists
         bool Exists(string name, int userId);
         bool Exists(int id, string name, int userId);
         int Count(int userId);
+        IEnumerable<User> GetUsersToBeNotifiedOfChange(int id, int excludeUserId);
+        IEnumerable<User> GetUsersToBeNotifiedOfDeletion(int id);
+        bool CheckIfUserCanBeNotifiedOfChange(int id, int userId);
         Task<int> CreateAsync(ToDoList list);
-        Task<ToDoList> UpdateAsync(ToDoList list);
+        Task<ToDoList> UpdateAsync(ToDoList list, int userId);
         Task UpdateSharedAsync(ToDoList list);
         Task<string> DeleteAsync(int id);
         Task SaveSharingDetailsAsync(IEnumerable<ListShare> newShares, IEnumerable<ListShare> editedShares, IEnumerable<ListShare> removedShares);

@@ -15,7 +15,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
         public NotificationsRepository(PersonalAssistantContext efContext)
             : base(efContext) { }
 
-        public async Task<IEnumerable<Notification>> GetAllAndFlagUnseenAsync(int userId)
+        public IEnumerable<Notification> GetAllAndFlagUnseen(int userId)
         {
             using IDbConnection conn = OpenConnection();
 
@@ -25,7 +25,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                             WHERE ""UserId"" = @UserId
                             ORDER BY ""ModifiedDate"" DESC";
 
-            var notifications = await conn.QueryAsync<Notification, User, Notification>(sql,
+            var notifications = conn.Query<Notification, User, Notification>(sql,
                 (notification, user) =>
                 {
                     notification.User = user;
@@ -36,11 +36,19 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             var unseenNotificationIds = notifications.Where(x => !x.IsSeen).Select(x => x.Id).ToList();
             if (unseenNotificationIds.Count > 0)
             {
-                await conn.ExecuteAsync(@"UPDATE ""ToDoAssistant.Notifications"" SET ""IsSeen"" = TRUE WHERE ""Id"" = ANY(@UnseenNotificationIds)",
+                conn.Execute(@"UPDATE ""ToDoAssistant.Notifications"" SET ""IsSeen"" = TRUE WHERE ""Id"" = ANY(@UnseenNotificationIds)",
                     new { UnseenNotificationIds = unseenNotificationIds });
             }
 
             return notifications;
+        }
+
+        public int GetUnseenNotificationsCount(int userId)
+        {
+            using IDbConnection conn = OpenConnection();
+
+            return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Notifications"" WHERE ""UserId"" = @UserId AND ""IsSeen"" = FALSE",
+                new { UserId = userId });
         }
 
         public async Task DeleteForUserAndListAsync(int userId, int listId)
@@ -49,14 +57,6 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
             await conn.ExecuteAsync(@"DELETE FROM ""ToDoAssistant.Notifications"" WHERE ""UserId"" = @UserId AND ""ListId"" = @ListId",
                 new { UserId = userId, ListId = listId });
-        }
-
-        public async Task<int> GetUnseenNotificationsCountAsync(int userId)
-        {
-            using IDbConnection conn = OpenConnection();
-
-            return await conn.ExecuteScalarAsync<int>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Notifications"" WHERE ""UserId"" = @UserId AND ""IsSeen"" = FALSE",
-                new { UserId = userId });
         }
 
         public async Task<int> CreateOrUpdateAsync(Notification notification)

@@ -26,7 +26,7 @@ namespace Api.Controllers.Common
         }
 
         [HttpGet("language")]
-        public async Task<IActionResult> GetLanguage()
+        public IActionResult GetLanguage()
         {
             int userId;
             try
@@ -38,13 +38,13 @@ namespace Api.Controllers.Common
                 return Unauthorized();
             }
 
-            string language = await _userService.GetLanguageAsync(userId);
+            string language = _userService.GetLanguage(userId);
 
             return Ok(language);
         }
 
         [HttpGet("profile-image-uri")]
-        public async Task<IActionResult> GetProfileImageUri()
+        public IActionResult GetProfileImageUri()
         {
             int userId;
             try
@@ -56,13 +56,13 @@ namespace Api.Controllers.Common
                 return Unauthorized();
             }
 
-            string imageUri = await _userService.GetImageUriAsync(userId);
+            string imageUri = _userService.GetImageUri(userId);
 
             return Ok(imageUri);
         }
 
         [HttpGet("to-do-preferences")]
-        public async Task<IActionResult> GetToDoPreferences()
+        public IActionResult GetToDoPreferences()
         {
             int userId;
             try
@@ -74,13 +74,13 @@ namespace Api.Controllers.Common
                 return Unauthorized();
             }
 
-            ToDoAssistantPreferences preferences = await _userService.GetToDoAssistantPreferencesAsync(userId);
+            ToDoAssistantPreferences preferences = _userService.GetToDoAssistantPreferences(userId);
 
             return Ok(preferences);
         }
 
         [HttpGet("cooking-preferences")]
-        public async Task<IActionResult> GetCookingPreferences()
+        public IActionResult GetCookingPreferences()
         {
             int userId;
             try
@@ -92,7 +92,7 @@ namespace Api.Controllers.Common
                 return Unauthorized();
             }
 
-            CookingAssistantPreferences preferences = await _userService.GetCookingAssistantPreferencesAsync(userId);
+            CookingAssistantPreferences preferences = _userService.GetCookingAssistantPreferences(userId);
 
             return Ok(preferences);
         }

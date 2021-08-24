@@ -15,51 +15,51 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
         public TasksRepository(PersonalAssistantContext efContext)
             : base(efContext) { }
 
-        public async Task<ToDoTask> GetAsync(int id)
+        public ToDoTask Get(int id)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.QueryFirstOrDefaultAsync<ToDoTask>(@"SELECT * FROM ""ToDoAssistant.Tasks"" WHERE ""Id"" = @Id", new { Id = id });
+            return conn.QueryFirstOrDefault<ToDoTask>(@"SELECT * FROM ""ToDoAssistant.Tasks"" WHERE ""Id"" = @Id", new { Id = id });
         }
 
-        public async Task<ToDoTask> GetAsync(int id, int userId)
+        public ToDoTask Get(int id, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return await conn.QueryFirstOrDefaultAsync<ToDoTask>(@"SELECT t.* 
-                                                                   FROM ""ToDoAssistant.Tasks"" AS t
-                                                                   INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                                                                   LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                                                   WHERE t.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
-                                                                   new { Id = id, UserId = userId });
+            return conn.QueryFirstOrDefault<ToDoTask>(@"SELECT t.* 
+                                                        FROM ""ToDoAssistant.Tasks"" AS t
+                                                        INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
+                                                        LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
+                                                        WHERE t.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+                                                        new { Id = id, UserId = userId });
         }
 
-        public async Task<ToDoTask> GetForUpdateAsync(int id, int userId)
+        public  ToDoTask GetForUpdate(int id, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            var task = await conn.QueryFirstOrDefaultAsync<ToDoTask>(@"SELECT t.* 
-                                                                       FROM ""ToDoAssistant.Tasks"" AS t
-                                                                       INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                                                                       LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                                                       WHERE t.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
-                                                                       new { Id = id, UserId = userId });
+            var task = conn.QueryFirstOrDefault<ToDoTask>(@"SELECT t.* 
+                                                            FROM ""ToDoAssistant.Tasks"" AS t
+                                                            INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
+                                                            LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
+                                                            WHERE t.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+                                                            new { Id = id, UserId = userId });
 
             return task;
         }
 
-        public async Task<List<string>> GetRecipesAsync(int id, int userId)
+        public List<string> GetRecipes(int id, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            return (await conn.QueryAsync<string>(@"SELECT r.""Name""
-                                                    FROM ""CookingAssistant.Ingredients"" AS i
-                                                    INNER JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
-                                                    LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
-                                                    LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
-                                                    WHERE i.""TaskId"" = @TaskId AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
-                                                    ORDER BY r.""Name""",
-                                                    new { TaskId = id, UserId = userId })).ToList();
+            return conn.Query<string>(@"SELECT r.""Name""
+                                        FROM ""CookingAssistant.Ingredients"" AS i
+                                        INNER JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
+                                        LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
+                                        LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
+                                        WHERE i.""TaskId"" = @TaskId AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
+                                        ORDER BY r.""Name""",
+                                        new { TaskId = id, UserId = userId }).ToList();
         }
 
         public bool Exists(int id, int userId)
@@ -197,7 +197,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
         public async Task UpdateAsync(ToDoTask task, int userId)
         {
-            var existingTask = await GetAsync(task.Id);
+            var existingTask = Get(task.Id);
 
             if (existingTask.ListId == task.ListId)
             {
@@ -290,9 +290,9 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             await EFContext.SaveChangesAsync();
         }
 
-        public async Task<ToDoTask> DeleteAsync(int id, int userId)
+        public async Task DeleteAsync(int id, int userId)
         {
-            ToDoTask task = await GetAsync(id);
+            ToDoTask task = Get(id);
 
             var ingredients = EFContext.Ingredients.Where(x => x.TaskId == task.Id);
             foreach (var ingredient in ingredients)
@@ -322,13 +322,11 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             }
 
             await EFContext.SaveChangesAsync();
-
-            return task;
         }
 
-        public async Task<ToDoTask> CompleteAsync(int id, int userId)
+        public async Task CompleteAsync(int id, int userId)
         {
-            ToDoTask task = await GetAsync(id);
+            ToDoTask task = Get(id);
 
             short order = 1;
             if (task.PrivateToUserId.HasValue)
@@ -372,13 +370,11 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             }
 
             await EFContext.SaveChangesAsync();
-
-            return task;
         }
 
-        public async Task<ToDoTask> UncompleteAsync(int id, int userId)
+        public async Task UncompleteAsync(int id, int userId)
         {
-            ToDoTask task = await GetAsync(id);
+            ToDoTask task = Get(id);
 
             short order;
             if (task.PrivateToUserId.HasValue)
@@ -416,13 +412,11 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             dbTask.Order = order;
 
             await EFContext.SaveChangesAsync();
-
-            return task;
         }
 
         public async Task ReorderAsync(int id, int userId, short oldOrder, short newOrder, DateTime modifiedDate)
         {
-            ToDoTask task = await GetAsync(id);
+            ToDoTask task = Get(id);
 
             if (task.PrivateToUserId.HasValue)
             {

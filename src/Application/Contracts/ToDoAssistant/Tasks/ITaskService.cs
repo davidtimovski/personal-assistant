@@ -7,20 +7,20 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks
 {
     public interface ITaskService
     {
-        Task<SimpleTask> GetAsync(int id);
-        Task<TaskDto> GetAsync(int id, int userId);
-        Task<TaskForUpdate> GetForUpdateAsync(int id, int userId);
+        SimpleTask Get(int id);
+        TaskDto Get(int id, int userId);
+        TaskForUpdate GetForUpdate(int id, int userId);
         bool Exists(int id, int userId);
         bool Exists(string name, int listId, int userId);
         bool Exists(IEnumerable<string> names, int listId, int userId);
         bool Exists(int id, string name, int listId, int userId);
         int Count(int listId);
-        Task<CreatedTask> CreateAsync(CreateTask model, IValidator<CreateTask> validator);
-        Task<IEnumerable<CreatedTask>> BulkCreateAsync(BulkCreate model, IValidator<BulkCreate> validator);
-        Task UpdateAsync(UpdateTask model, IValidator<UpdateTask> validator);
-        Task<SimpleTask> DeleteAsync(int id, int userId);
-        Task<SimpleTask> CompleteAsync(CompleteUncomplete model);
-        Task<SimpleTask> UncompleteAsync(CompleteUncomplete model);
+        Task<CreatedTaskResult> CreateAsync(CreateTask model, IValidator<CreateTask> validator);
+        Task<BulkCreateResult> BulkCreateAsync(BulkCreate model, IValidator<BulkCreate> validator);
+        Task<UpdateTaskResult> UpdateAsync(UpdateTask model, IValidator<UpdateTask> validator);
+        Task<DeleteTaskResult> DeleteAsync(int id, int userId);
+        Task<CompleteUncompleteTaskResult> CompleteAsync(CompleteUncomplete model);
+        Task<CompleteUncompleteTaskResult> UncompleteAsync(CompleteUncomplete model);
         Task ReorderAsync(ReorderTask model);
     }
 }

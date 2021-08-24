@@ -7,6 +7,7 @@ using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications;
+using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
 using PersonalAssistant.Application.Mappings;
 using PersonalAssistant.Application.Services.ToDoAssistant;
 using PersonalAssistant.Application.UnitTests.Builders;
@@ -28,6 +29,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.ListServiceTests
             _sut = new ListService(
                 new Mock<IUserService>().Object,
                 _listsRepositoryMock.Object,
+                new Mock<ITasksRepository>().Object,
                 new Mock<INotificationsRepository>().Object,
                 MapperMocker.GetMapper<ToDoAssistantProfile>());
         }

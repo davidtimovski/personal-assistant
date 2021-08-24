@@ -1,29 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using PersonalAssistant.Domain.Entities.Common;
 using PersonalAssistant.Domain.Entities.CookingAssistant;
 
 namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes
 {
     public interface IRecipesRepository
     {
-        Task<IEnumerable<Recipe>> GetAllAsync(int userId);
-        Task<Recipe> GetAsync(int id);
-        Task<Recipe> GetAsync(int id, int userId);
-        Task<Recipe> GetForUpdateAsync(int id, int userId);
-        Task<Recipe> GetWithOwnerAsync(int id, int userId);
-        Task<IEnumerable<RecipeShare>> GetSharesAsync(int id);
-        Task<IEnumerable<RecipeShare>> GetShareRequestsAsync(int userId);
-        Task<int> GetPendingShareRequestsCountAsync(int userId);
+        IEnumerable<Recipe> GetAll(int userId);
+        Recipe Get(int id);
+        Recipe Get(int id, int userId);
+        Recipe GetForUpdate(int id, int userId);
+        Recipe GetWithOwner(int id, int userId);
+        IEnumerable<RecipeShare> GetShares(int id);
+        IEnumerable<RecipeShare> GetShareRequests(int userId);
+        int GetPendingShareRequestsCount(int userId);
         bool CanShareWithUser(int shareWithId, int userId);
-        Task<Recipe> GetForSendingAsync(int id, int userId);
-        Task<IEnumerable<SendRequest>> GetSendRequestsAsync(int userId);
-        Task<int> GetPendingSendRequestsCountAsync(int userId);
+        Recipe GetForSending(int id, int userId);
+        IEnumerable<SendRequest> GetSendRequests(int userId);
+        int GetPendingSendRequestsCount(int userId);
         bool SendRequestExists(int id, int userId);
         bool IngredientsReviewIsRequired(int id, int userId);
-        Task<Recipe> GetForReviewAsync(int id);
-        Task<IEnumerable<string>> GetAllImageUrisAsync(int userId);
-        Task<string> GetImageUriAsync(int id);
+        Recipe GetForReview(int id);
+        IEnumerable<string> GetAllImageUris(int userId);
+        string GetImageUri(int id);
         bool UserOwns(int id, int userId);
         bool Exists(int id, int userId);
         bool Exists(string name, int userId);
@@ -31,6 +32,10 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes
         int Count(int userId);
         bool UserHasBlockedSharing(int recipeId, int userId, int sharedWithId);
         (bool canSend, bool alreadySent) CheckSendRequest(int recipeId, int sendToId, int userId);
+        IEnumerable<User> GetUsersToBeNotifiedOfRecipeChange(int id, int excludeUserId);
+        bool CheckIfUserCanBeNotifiedOfRecipeChange(int id, int userId);
+        IEnumerable<User> GetUsersToBeNotifiedOfRecipeDeletion(int id);
+        IEnumerable<User> GetUsersToBeNotifiedOfRecipeSent(int id);
         Task<int> CreateAsync(Recipe recipe);
         Task<Recipe> UpdateAsync(Recipe recipe, List<int> ingredientIdsToRemove);
         Task<string> DeleteAsync(int id);

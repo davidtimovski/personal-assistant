@@ -5,7 +5,7 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfil
 {
     public interface IDietaryProfilesRepository
     {
-        Task<DietaryProfile> GetAsync(int userId);
+        DietaryProfile Get(int userId);
         Task UpdateAsync(DietaryProfile dietaryProfile);
         Task DeleteAsync(int userId);
     }
