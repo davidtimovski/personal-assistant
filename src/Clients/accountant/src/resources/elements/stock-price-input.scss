@@ -1,7 +1,7 @@
 @import "../../../../shared/src/static/styles/variables";
 
 .amount-input-wrap {
-  display: flex;
+  display: inline-flex;
   line-height: 37px;
 
   input[type="number"] {

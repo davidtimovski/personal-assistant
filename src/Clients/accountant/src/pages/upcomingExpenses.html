@@ -51,7 +51,8 @@
             </tbody>
           </table>
 
-          <empty-list-message if.bind="upcomingExpenses.length === 0" message.bind="emptyListMessage">
+          <empty-list-message if.bind="upcomingExpenses.length === 0"
+            message-key.bind="'upcomingExpenses.emptyListMessage'">
           </empty-list-message>
         </div>
 

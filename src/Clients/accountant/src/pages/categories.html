@@ -55,7 +55,8 @@
             </div>
           </div>
 
-          <empty-list-message if.bind="categories.length === 0" message.bind="emptyListMessage"></empty-list-message>
+          <empty-list-message if.bind="categories.length === 0" message-key.bind="'categories.emptyListMessage'">
+          </empty-list-message>
         </div>
 
         <div class="centering-wrap">

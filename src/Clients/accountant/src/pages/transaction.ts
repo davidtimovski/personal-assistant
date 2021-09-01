@@ -9,7 +9,6 @@ import { AccountsService } from "services/accountsService";
 import { TransactionsService } from "services/transactionsService";
 import { EncryptionService } from "services/encryptionService";
 import { LocalStorage } from "utils/localStorage";
-import { TransactionModel } from "models/entities/transaction";
 import { ViewTransaction } from "models/viewmodels/viewTransaction";
 import { TransactionType } from "models/viewmodels/transactionType";
 
@@ -48,70 +47,67 @@ export class Transaction {
     this.currency = this.localStorage.getCurrency();
   }
 
-  attached() {
-    this.transactionsService
-      .getForViewing(this.transactionId, this.currency)
-      .then(async (transaction: TransactionModel) => {
-        if (transaction === null) {
-          this.router.navigateToRoute("notFound");
-        }
+  async attached() {
+    const transaction = await this.transactionsService.getForViewing(this.transactionId, this.currency);
+    if (transaction === null) {
+      this.router.navigateToRoute("notFound");
+    }
 
-        const model = new ViewTransaction(
-          null,
-          null,
-          null,
-          null,
-          transaction.convertedAmount,
-          transaction.currency,
-          transaction.amount,
-          transaction.fromStocks,
-          transaction.toStocks,
-          null,
-          transaction.description,
-          null,
-          transaction.isEncrypted,
-          transaction.encryptedDescription,
-          transaction.salt,
-          transaction.nonce,
-          null
-        );
+    const model = new ViewTransaction(
+      null,
+      null,
+      null,
+      null,
+      transaction.convertedAmount,
+      transaction.currency,
+      transaction.amount,
+      transaction.fromStocks,
+      transaction.toStocks,
+      null,
+      transaction.description,
+      null,
+      transaction.isEncrypted,
+      transaction.encryptedDescription,
+      transaction.salt,
+      transaction.nonce,
+      null
+    );
 
-        model.type = this.getType(transaction.fromAccountId, transaction.toAccountId);
-        model.typeLabel = this.typeStringLookup[model.type - 1];
+    model.type = this.getType(transaction.fromAccountId, transaction.toAccountId);
+    model.typeLabel = this.typeStringLookup[model.type - 1];
 
-        if (transaction.categoryId) {
-          const category = await this.categoriesService.get(transaction.categoryId);
-          if (category.parent) {
-            model.category = `${category.parent}/${category.name}`;
-          } else {
-            model.category = category.name;
-          }
-        } else {
-          model.category = this.i18n.tr("uncategorized");
-        }
+    if (transaction.categoryId) {
+      const category = await this.categoriesService.get(transaction.categoryId);
+      if (category.parent) {
+        model.category = `${category.parent}/${category.name}`;
+      } else {
+        model.category = category.name;
+      }
+    } else {
+      model.category = this.i18n.tr("uncategorized");
+    }
 
-        if (model.type === TransactionType.Transfer) {
-          const fromAccount = await this.accountsService.get(transaction.fromAccountId);
-          const toAccount = await this.accountsService.get(transaction.toAccountId);
-          model.accountLabel = this.i18n.tr("transaction.accounts");
-          model.accountValue = this.i18n.tr("transaction.to", {
-            from: fromAccount.name,
-            to: toAccount.name,
-          });
-        } else if (model.type === TransactionType.Deposit) {
-          const toAccount = await this.accountsService.get(transaction.toAccountId);
-          model.accountLabel = this.i18n.tr("transaction.toAccount");
-          model.accountValue = toAccount.name;
-        } else {
-          const fromAccount = await this.accountsService.get(transaction.fromAccountId);
-          model.accountLabel = this.i18n.tr("transaction.fromAccount");
-          model.accountValue = fromAccount.name;
-        }
-
-        model.date = this.formatOcccurrenceDate(transaction.date);
-
-        this.model = model;
+    if (model.type === TransactionType.Transfer) {
+      const fromAccount = await this.accountsService.get(transaction.fromAccountId);
+      const toAccount = await this.accountsService.get(transaction.toAccountId);
+      model.accountLabel = this.i18n.tr("transaction.accounts");
+      model.accountValue = this.i18n.tr("transaction.to", {
+        from: fromAccount.name,
+        to: toAccount.name,
       });
+    } else if (model.type === TransactionType.Deposit) {
+      const toAccount = await this.accountsService.get(transaction.toAccountId);
+      model.accountLabel = this.i18n.tr("transaction.toAccount");
+      model.accountValue = toAccount.name;
+    } else {
+      const fromAccount = await this.accountsService.get(transaction.fromAccountId);
+      model.accountLabel = this.i18n.tr("transaction.fromAccount");
+      model.accountValue = fromAccount.name;
+    }
+
+    model.date = this.formatOcccurrenceDate(transaction.date);
+
+    this.model = model;
   }
 
   getType(fromAccountId: number, toAccountId: number): TransactionType {

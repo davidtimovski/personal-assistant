@@ -12,7 +12,6 @@ export class UpcomingExpenses {
   private upcomingExpenses: Array<UpcomingExpenseItem>;
   private currency: string;
   private lastEditedId: number;
-  private emptyListMessage: string;
   private syncing = false;
 
   constructor(
@@ -38,30 +37,24 @@ export class UpcomingExpenses {
     this.currency = this.localStorage.getCurrency();
   }
 
-  attached() {
-    this.upcomingExpensesService
-      .getAll(this.currency)
-      .then((upcomingExpenses: Array<UpcomingExpense>) => {
-        const upcomingExpenseItems = new Array<UpcomingExpenseItem>();
+  async attached() {
+    const upcomingExpenses = await this.upcomingExpensesService.getAll(this.currency);
 
-        for (const upcomingExpense of upcomingExpenses) {
-          upcomingExpenseItems.push(
-            new UpcomingExpenseItem(
-              upcomingExpense.id,
-              upcomingExpense.amount,
-              upcomingExpense.categoryName || this.i18n.tr("uncategorized"),
-              this.formatDate(upcomingExpense.date),
-              upcomingExpense.synced
-            )
-          );
-        }
+    const upcomingExpenseItems = new Array<UpcomingExpenseItem>();
 
-        this.upcomingExpenses = upcomingExpenseItems;
+    for (const upcomingExpense of upcomingExpenses) {
+      upcomingExpenseItems.push(
+        new UpcomingExpenseItem(
+          upcomingExpense.id,
+          upcomingExpense.amount,
+          upcomingExpense.categoryName || this.i18n.tr("uncategorized"),
+          this.formatDate(upcomingExpense.date),
+          upcomingExpense.synced
+        )
+      );
+    }
 
-        this.emptyListMessage = this.i18n.tr(
-          "upcomingExpenses.emptyListMessage"
-        );
-      });
+    this.upcomingExpenses = upcomingExpenseItems;
   }
 
   formatDate(dateString: string): string {

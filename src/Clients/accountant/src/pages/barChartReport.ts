@@ -30,6 +30,7 @@ export class BarChartReport {
   private canvasCtx: CanvasRenderingContext2D;
   private fromDate: string;
   private categoryId = 0;
+  private categoryType = CategoryType.AllTransactions;
   private type = TransactionType.Any;
 
   constructor(
@@ -91,153 +92,170 @@ export class BarChartReport {
     this.chart.update();
     this.dataLoaded = false;
 
-    this.transactionsService
-      .getForBarChart(this.fromDate, this.mainAccountId, this.categoryId, this.type, this.currency)
-      .then((transactions: Array<TransactionModel>) => {
-        let itemGroups = this.groupBy(
-          transactions,
-          (x: TransactionModel) => x.date.substring(0, 7) // yyyy-MM
-        );
+    if (this.categoryId) {
+      const category = await this.categoriesService.get(this.categoryId);
+      this.categoryType = category.type;
 
-        let fromDate = new Date(this.fromDate);
-        const now = new Date();
+      if (category.type === CategoryType.DepositOnly) {
+        this.type = TransactionType.Deposit;
+      } else if (category.type === CategoryType.ExpenseOnly) {
+        this.type = TransactionType.Expense;
+      }
+    } else {
+      this.categoryType = CategoryType.AllTransactions;
+    }
 
-        const monthsDiff = now.getMonth() - fromDate.getMonth() + 12 * (now.getFullYear() - fromDate.getFullYear());
+    const transactions = await this.transactionsService.getForBarChart(
+      this.fromDate,
+      this.mainAccountId,
+      this.categoryId,
+      this.type,
+      this.currency
+    );
 
-        let balanceSum = 0;
-        let spentSum = 0;
-        let depositedSum = 0;
-        let savedSum = 0;
+    let itemGroups = this.groupBy(
+      transactions,
+      (x: TransactionModel) => x.date.substring(0, 7) // yyyy-MM
+    );
 
-        let items = new Array<AmountByMonth>();
-        for (let i = 0; i < monthsDiff; i++) {
-          const date = DateHelper.formatYYYYMM(fromDate);
+    let fromDate = new Date(this.fromDate);
+    const now = new Date();
 
-          let monthString = this.i18n.tr(`months.${fromDate.getMonth()}`).substring(0, 3);
-          if (fromDate.getFullYear() < now.getFullYear()) {
-            monthString += " " + fromDate.getFullYear().toString().substring(2, 4);
+    const monthsDiff = now.getMonth() - fromDate.getMonth() + 12 * (now.getFullYear() - fromDate.getFullYear());
+
+    let balanceSum = 0;
+    let spentSum = 0;
+    let depositedSum = 0;
+    let savedSum = 0;
+
+    let items = new Array<AmountByMonth>();
+    for (let i = 0; i < monthsDiff; i++) {
+      const date = DateHelper.formatYYYYMM(fromDate);
+
+      let monthString = this.i18n.tr(`months.${fromDate.getMonth()}`).substring(0, 3);
+      if (fromDate.getFullYear() < now.getFullYear()) {
+        monthString += " " + fromDate.getFullYear().toString().substring(2, 4);
+      }
+
+      if (itemGroups.has(date)) {
+        let monthTransactions: Array<TransactionModel>;
+        for (let key of itemGroups.keys()) {
+          if (key === date) {
+            monthTransactions = itemGroups.get(key);
+            break;
           }
-
-          if (itemGroups.has(date)) {
-            let monthTransactions: Array<TransactionModel>;
-            for (let key of itemGroups.keys()) {
-              if (key === date) {
-                monthTransactions = itemGroups.get(key);
-                break;
-              }
-            }
-
-            const item = new AmountByMonth(date, monthString, 0);
-
-            switch (this.type) {
-              case TransactionType.Any:
-                {
-                  for (const transaction of monthTransactions) {
-                    if (transaction.fromAccountId) {
-                      item.amount -= transaction.amount;
-                      spentSum += transaction.amount;
-                    } else {
-                      item.amount += transaction.amount;
-                      depositedSum += transaction.amount;
-                    }
-                  }
-                  balanceSum += item.amount;
-                }
-                break;
-              case TransactionType.Expense:
-                {
-                  item.amount -= monthTransactions.map((x) => x.amount).reduce((a, b) => a + b, 0);
-                  spentSum += item.amount;
-                }
-                break;
-              case TransactionType.Deposit:
-                {
-                  item.amount += monthTransactions.map((x) => x.amount).reduce((a, b) => a + b, 0);
-                  depositedSum += item.amount;
-                }
-                break;
-              case TransactionType.Saving:
-                {
-                  const movedFromMain = monthTransactions.filter((x) => x.fromAccountId === this.mainAccountId);
-                  const movedToMain = monthTransactions.filter((x) => x.toAccountId === this.mainAccountId);
-
-                  item.amount += movedFromMain.map((x) => x.amount).reduce((a, b) => a + b, 0);
-                  item.amount -= movedToMain.map((x) => x.amount).reduce((a, b) => a + b, 0);
-
-                  savedSum += item.amount;
-                }
-                break;
-            }
-
-            item.amount = parseFloat(item.amount.toFixed(2));
-
-            items.push(item);
-          } else {
-            items.push(new AmountByMonth(date, monthString, 0));
-          }
-
-          fromDate.setMonth(fromDate.getMonth() + 1);
         }
+
+        const item = new AmountByMonth(date, monthString, 0);
 
         switch (this.type) {
           case TransactionType.Any:
-            this.balanceAverage = balanceSum / monthsDiff;
-            this.spentAverage = Math.abs(spentSum) / monthsDiff;
-            this.depositedAverage = depositedSum / monthsDiff;
+            {
+              for (const transaction of monthTransactions) {
+                if (transaction.fromAccountId) {
+                  item.amount -= transaction.amount;
+                  spentSum += transaction.amount;
+                } else {
+                  item.amount += transaction.amount;
+                  depositedSum += transaction.amount;
+                }
+              }
+              balanceSum += item.amount;
+            }
             break;
           case TransactionType.Expense:
-            this.spentAverage = Math.abs(spentSum) / monthsDiff;
+            {
+              item.amount -= monthTransactions.map((x) => x.amount).reduce((a, b) => a + b, 0);
+              spentSum += item.amount;
+            }
             break;
           case TransactionType.Deposit:
-            this.depositedAverage = depositedSum / monthsDiff;
+            {
+              item.amount += monthTransactions.map((x) => x.amount).reduce((a, b) => a + b, 0);
+              depositedSum += item.amount;
+            }
             break;
           case TransactionType.Saving:
-            this.savedAverage = savedSum / monthsDiff;
+            {
+              const movedFromMain = monthTransactions.filter((x) => x.fromAccountId === this.mainAccountId);
+              const movedToMain = monthTransactions.filter((x) => x.toAccountId === this.mainAccountId);
+
+              item.amount += movedFromMain.map((x) => x.amount).reduce((a, b) => a + b, 0);
+              item.amount -= movedToMain.map((x) => x.amount).reduce((a, b) => a + b, 0);
+
+              savedSum += item.amount;
+            }
             break;
         }
 
-        const labels = new Array<string>();
-        const amounts = new Array<number>();
-        for (let i = 0; i < items.length; i++) {
-          labels.push(items[i].month);
-          amounts.push(items[i].amount);
-        }
+        item.amount = parseFloat(item.amount.toFixed(2));
 
-        this.dataLoaded = true;
+        items.push(item);
+      } else {
+        items.push(new AmountByMonth(date, monthString, 0));
+      }
 
-        if (labels.length > 0) {
-          this.chart.data.labels = labels;
+      fromDate.setMonth(fromDate.getMonth() + 1);
+    }
 
-          const expenseColor = "#f55551";
-          const depositColor = "#65c565";
-          switch (this.type) {
-            case TransactionType.Any:
-            case TransactionType.Saving:
-              {
-                const colors = new Array<string>();
-                for (const amount of amounts) {
-                  colors.push(amount < 0 ? expenseColor : depositColor);
-                }
+    switch (this.type) {
+      case TransactionType.Any:
+        this.balanceAverage = balanceSum / monthsDiff;
+        this.spentAverage = Math.abs(spentSum) / monthsDiff;
+        this.depositedAverage = depositedSum / monthsDiff;
+        break;
+      case TransactionType.Expense:
+        this.spentAverage = Math.abs(spentSum) / monthsDiff;
+        break;
+      case TransactionType.Deposit:
+        this.depositedAverage = depositedSum / monthsDiff;
+        break;
+      case TransactionType.Saving:
+        this.savedAverage = savedSum / monthsDiff;
+        break;
+    }
 
-                this.chart.data.datasets[0].backgroundColor = colors;
-              }
-              break;
-            case TransactionType.Expense:
-              this.chart.data.datasets[0].backgroundColor = expenseColor;
-              break;
-            case TransactionType.Deposit:
-              this.chart.data.datasets[0].backgroundColor = depositColor;
-              break;
+    const labels = new Array<string>();
+    const amounts = new Array<number>();
+    for (let i = 0; i < items.length; i++) {
+      labels.push(items[i].month);
+      amounts.push(items[i].amount);
+    }
+
+    this.dataLoaded = true;
+
+    if (labels.length > 0) {
+      this.chart.data.labels = labels;
+
+      const expenseColor = "#f55551";
+      const depositColor = "#65c565";
+      switch (this.type) {
+        case TransactionType.Any:
+        case TransactionType.Saving:
+          {
+            const colors = new Array<string>();
+            for (const amount of amounts) {
+              colors.push(amount < 0 ? expenseColor : depositColor);
+            }
+
+            this.chart.data.datasets[0].backgroundColor = colors;
           }
+          break;
+        case TransactionType.Expense:
+          this.chart.data.datasets[0].backgroundColor = expenseColor;
+          break;
+        case TransactionType.Deposit:
+          this.chart.data.datasets[0].backgroundColor = depositColor;
+          break;
+      }
 
-          this.chart.data.datasets[0].data = amounts;
-        } else {
-          this.chart.data.labels = [];
-          this.chart.data.datasets[0].data = [];
-        }
+      this.chart.data.datasets[0].data = amounts;
+    } else {
+      this.chart.data.labels = [];
+      this.chart.data.datasets[0].data = [];
+    }
 
-        this.chart.update();
-      });
+    this.chart.update();
   }
 
   groupBy(list: Array<TransactionModel>, keyGetter: { (x: TransactionModel): string; (arg0: TransactionModel): any }) {

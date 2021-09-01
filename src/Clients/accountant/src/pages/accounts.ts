@@ -43,38 +43,36 @@ export class Accounts {
     this.currency = this.localStorage.getCurrency();
   }
 
-  attached() {
-    this.accountsService
-      .getAllWithBalance(this.currency)
-      .then((accounts: Array<Account>) => {
-        const accountItems = new Array<AccountItem>();
-        const fundItems = new Array<AccountItem>();
-        let sum = 0;
+  async attached() {
+    const accounts = await this.accountsService.getAllWithBalance(this.currency);
 
-        for (const account of accounts) {
-          if (!!account.stockPrice) {
-            this.someAreInvestmentFunds = true;
-          }
+    const accountItems = new Array<AccountItem>();
+    const fundItems = new Array<AccountItem>();
+    let sum = 0;
 
-          accountItems.push(
-            new AccountItem(
-              account.id,
-              account.name,
-              account.currency,
-              account.stockPrice,
-              account.stocks,
-              account.balance,
-              account.synced
-            )
-          );
+    for (const account of accounts) {
+      if (!!account.stockPrice) {
+        this.someAreInvestmentFunds = true;
+      }
 
-          sum += account.balance;
-        }
+      accountItems.push(
+        new AccountItem(
+          account.id,
+          account.name,
+          account.currency,
+          account.stockPrice,
+          account.stocks,
+          account.balance,
+          account.synced
+        )
+      );
 
-        this.accounts = accountItems;
-        this.funds = fundItems;
-        this.sum = sum;
-      });
+      sum += account.balance;
+    }
+
+    this.accounts = accountItems;
+    this.funds = fundItems;
+    this.sum = sum;
   }
 
   toggleViewStocks() {

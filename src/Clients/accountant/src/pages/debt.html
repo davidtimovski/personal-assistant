@@ -1,6 +1,6 @@
 <template>
   <require from="./../resources/elements/empty-list-message.html"></require>
-  <require from="./../resources/value-converters/money-format"></require>
+  <require from="./../resources/value-converters/number-format"></require>
 
   <div class="container">
     <div class="au-animate animate-fade-in animate-fade-out">
@@ -45,7 +45,7 @@
                     <i class="fas fa-hand-holding-usd ${debt.userIsDebtor ? 'debtor' : 'lender'}"></i>
                   </a>
                 </td>
-                <td>${debt.amount | moneyFormat:debt.currency}</td>
+                <td>${debt.amount | numberFormat:debt.currency}</td>
                 <td>${debt.person}</td>
                 <td class="sync-icon-cell">
                   <i if.bind="!debt.synced" class="fas fa-sync-alt"></i>
@@ -54,7 +54,7 @@
             </tbody>
           </table>
 
-          <empty-list-message if.bind="debts.length === 0" message.bind="emptyListMessage">
+          <empty-list-message if.bind="debts.length === 0" message-key.bind="'debt.emptyListMessage'">
           </empty-list-message>
         </div>
 

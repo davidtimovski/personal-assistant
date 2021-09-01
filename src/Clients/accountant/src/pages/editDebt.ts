@@ -1,11 +1,6 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import {
-  ValidationController,
-  validateTrigger,
-  ValidationRules,
-  ControllerValidateResult,
-} from "aurelia-validation";
+import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
@@ -18,15 +13,7 @@ import { LocalStorage } from "utils/localStorage";
 import { DebtModel } from "models/entities/debt";
 import { EditDebtModel } from "models/viewmodels/editDebtModel";
 
-@inject(
-  Router,
-  DebtsService,
-  LocalStorage,
-  ValidationController,
-  I18N,
-  EventAggregator,
-  ConnectionTracker
-)
+@inject(Router, DebtsService, LocalStorage, ValidationController, I18N, EventAggregator, ConnectionTracker)
 export class EditDebt {
   private debtId: number;
   private model: EditDebtModel;
@@ -66,16 +53,7 @@ export class EditDebt {
     if (this.isNewDebt) {
       const currency = this.localStorage.getCurrency();
 
-      this.model = new EditDebtModel(
-        null,
-        null,
-        null,
-        currency,
-        null,
-        false,
-        null,
-        false
-      );
+      this.model = new EditDebtModel(null, null, null, currency, null, false, null, false);
 
       this.saveButtonText = this.i18n.tr("create");
 
@@ -85,29 +63,29 @@ export class EditDebt {
     }
   }
 
-  attached() {
+  async attached() {
     if (this.isNewDebt) {
       this.personInput.focus();
     } else {
-      this.debtsService.get(this.debtId).then((debt: DebtModel) => {
-        if (debt === null) {
-          this.router.navigateToRoute("notFound");
-        }
-        this.model = new EditDebtModel(
-          debt.id,
-          debt.person,
-          debt.amount,
-          debt.currency,
-          debt.description,
-          debt.userIsDebtor,
-          debt.createdDate,
-          debt.synced
-        );
+      const debt = await this.debtsService.get(this.debtId);
+      if (debt === null) {
+        this.router.navigateToRoute("notFound");
+      }
 
-        this.originalDebtJson = JSON.stringify(this.model);
+      this.model = new EditDebtModel(
+        debt.id,
+        debt.person,
+        debt.amount,
+        debt.currency,
+        debt.description,
+        debt.userIsDebtor,
+        debt.createdDate,
+        debt.synced
+      );
 
-        this.setValidationRules();
-      });
+      this.originalDebtJson = JSON.stringify(this.model);
+
+      this.setValidationRules();
     }
   }
 
@@ -211,10 +189,7 @@ export class EditDebt {
 
       try {
         await this.debtsService.delete(this.model.id);
-        this.eventAggregator.publish(
-          AlertEvents.ShowSuccess,
-          "editDebt.deleteSuccessful"
-        );
+        this.eventAggregator.publish(AlertEvents.ShowSuccess, "editDebt.deleteSuccessful");
         this.router.navigateToRoute("debt");
       } catch (e) {
         this.eventAggregator.publish(AlertEvents.ShowError, e);

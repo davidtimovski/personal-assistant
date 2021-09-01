@@ -60,7 +60,7 @@ export class PieChartReport {
         datasets: [
           {
             data: [],
-            backgroundColor: []
+            backgroundColor: [],
           },
         ],
       },
@@ -84,51 +84,49 @@ export class PieChartReport {
     this.chart.update();
     this.items = null;
 
-    this.transactionsService
-      .getExpendituresAndDepositsByCategory(
-        this.fromDate,
-        this.toDate,
-        this.mainAccountId,
-        this.type,
-        this.currency,
-        this.i18n.tr("uncategorized")
-      )
-      .then((items: Array<AmountByCategory>) => {
-        const labels = new Array<string>();
-        const amounts = new Array<number>();
-        let sum = 0;
+    const items = await this.transactionsService.getExpendituresAndDepositsByCategory(
+      this.fromDate,
+      this.toDate,
+      this.mainAccountId,
+      this.type,
+      this.currency,
+      this.i18n.tr("uncategorized")
+    );
 
-        const flatItems = new Array<AmountByCategory>();
-        for (const item of items) {
-          flatItems.push(item);
-          flatItems.push(...item.subItems);
+    const labels = new Array<string>();
+    const amounts = new Array<number>();
+    let sum = 0;
 
-          sum += item.amount;
-        }
+    const flatItems = new Array<AmountByCategory>();
+    for (const item of items) {
+      flatItems.push(item);
+      flatItems.push(...item.subItems);
 
-        this.sum = sum;
-        this.items = items;
+      sum += item.amount;
+    }
 
-        for (let i = 0; i < flatItems.length; i++) {
-          const color = i < this.colors.length ? this.colors[i] : "#e0e0e0";
+    this.sum = sum;
+    this.items = items;
 
-          (<any>flatItems[i]).color = color;
-          this.chart.data.datasets[0].backgroundColor[i] = color;
+    for (let i = 0; i < flatItems.length; i++) {
+      const color = i < this.colors.length ? this.colors[i] : "#e0e0e0";
 
-          labels.push(flatItems[i].categoryName);
-          amounts.push(flatItems[i].amount);
-        }
+      (<any>flatItems[i]).color = color;
+      this.chart.data.datasets[0].backgroundColor[i] = color;
 
-        if (flatItems.length > 0) {
-          this.chart.data.labels = labels;
-          this.chart.data.datasets[0].data = amounts;
-        } else {
-          this.chart.data.labels = [];
-          this.chart.data.datasets[0].data = [];
-        }
+      labels.push(flatItems[i].categoryName);
+      amounts.push(flatItems[i].amount);
+    }
 
-        this.chart.update();
-      });
+    if (flatItems.length > 0) {
+      this.chart.data.labels = labels;
+      this.chart.data.datasets[0].data = amounts;
+    } else {
+      this.chart.data.labels = [];
+      this.chart.data.datasets[0].data = [];
+    }
+
+    this.chart.update();
   }
 
   goToTransactions(item: AmountByCategory) {

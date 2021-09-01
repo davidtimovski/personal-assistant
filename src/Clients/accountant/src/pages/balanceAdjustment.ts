@@ -42,26 +42,24 @@ export class BalanceAdjustment {
     this.currency = this.localStorage.getCurrency();
   }
 
-  attached() {
-    this.accountsService.getNonInvestmentFundsAsOptions().then(async (options) => {
-      this.accountOptions = options;
-      const mainAccountId = this.accountOptions[0].id;
+  async attached() {
+    this.accountOptions = await this.accountsService.getNonInvestmentFundsAsOptions();
+    const mainAccountId = this.accountOptions[0].id;
 
-      const balance = await this.accountsService.getBalance(mainAccountId, this.currency);
-      this.originalBalance = balance;
+    const balance = await this.accountsService.getBalance(mainAccountId, this.currency);
+    this.originalBalance = balance;
 
-      this.model = new Adjustment(mainAccountId, balance, this.i18n.tr("balanceAdjustment.balanceAdjustment"));
+    this.model = new Adjustment(mainAccountId, balance, this.i18n.tr("balanceAdjustment.balanceAdjustment"));
 
-      this.originalAdjustmentJson = JSON.stringify(this.model);
+    this.originalAdjustmentJson = JSON.stringify(this.model);
 
-      let min = 0.01;
-      if (this.currency === "MKD") {
-        min = 1;
-      }
-      ValidationRules.ensure((x: Adjustment) => Math.abs(x.balance))
-        .min(min)
-        .on(this.model);
-    });
+    let min = 0.01;
+    if (this.currency === "MKD") {
+      min = 1;
+    }
+    ValidationRules.ensure((x: Adjustment) => Math.abs(x.balance))
+      .min(min)
+      .on(this.model);
   }
 
   async accountChanged() {

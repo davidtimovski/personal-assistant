@@ -34,28 +34,28 @@
           </div>
           <div class="form-control">
             <div class="multi-radio-wrap">
-              <div class="multi-radio-part">
+              <div if.bind="categoryType === 0" class="multi-radio-part">
                 <label class.bind="type === 0 ? 'selected' : ''">
                   <span t="barChartReport.balance">Balance</span>
                   <input type="radio" name="typeToggle" model.bind="0" checked.bind="type"
                     change.delegate="loadData()" />
                 </label>
               </div>
-              <div class="multi-radio-part">
+              <div if.bind="categoryType !== 1" class="multi-radio-part">
                 <label class.bind="type === 1 ? 'selected' : ''">
                   <span t="barChartReport.expenses">Expenses</span>
                   <input type="radio" name="typeToggle" model.bind="1" checked.bind="type"
                     change.delegate="loadData()" />
                 </label>
               </div>
-              <div class="multi-radio-part">
+              <div if.bind="categoryType !== 2" class="multi-radio-part">
                 <label class.bind="type === 2 ? 'selected' : ''">
                   <span t="barChartReport.deposits">Deposits</span>
                   <input type="radio" name="typeToggle" model.bind="2" checked.bind="type"
                     change.delegate="loadData()" />
                 </label>
               </div>
-              <div class="multi-radio-part">
+              <div if.bind="categoryType === 0" class="multi-radio-part">
                 <label class.bind="type === 4 ? 'selected' : ''">
                   <span t="barChartReport.savings">Savings</span>
                   <input type="radio" name="typeToggle" model.bind="4" checked.bind="type"

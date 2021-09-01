@@ -1,12 +1,13 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
+import { I18N } from "aurelia-i18n";
+
+import { DateHelper } from "../../../shared/src/utils/dateHelper";
+
 import { TransactionsService } from "services/transactionsService";
 import { AccountsService } from "services/accountsService";
-import { I18N } from "aurelia-i18n";
 import { LocalStorage } from "utils/localStorage";
 import { HeatmapDay } from "models/viewmodels/heatmapDay";
-import { TransactionModel } from "models/entities/transaction";
-import { DateHelper } from "../../../shared/src/utils/dateHelper";
 import { HeatmapExpense } from "models/viewmodels/heatmapExpense";
 
 @inject(Router, TransactionsService, AccountsService, I18N, LocalStorage)
@@ -94,11 +95,7 @@ export class ExpenditureHeatmap {
       aMonthAgo.setDate(aMonthAgo.getDate() - diff);
     }
 
-    const fromDate = new Date(
-      aMonthAgo.getFullYear(),
-      aMonthAgo.getMonth(),
-      aMonthAgo.getDate()
-    );
+    const fromDate = new Date(aMonthAgo.getFullYear(), aMonthAgo.getMonth(), aMonthAgo.getDate());
 
     const todayString = DateHelper.format(now);
 
@@ -136,53 +133,46 @@ export class ExpenditureHeatmap {
       return;
     }
 
-    this.transactionsService
-      .getExpendituresFrom(mainAccountId, fromDate, this.currency)
-      .then((transactions: Array<TransactionModel>) => {
-        let maxSpent = 0;
-        let minSpent = 10000000;
+    let maxSpent = 0;
+    let minSpent = 10000000;
 
-        for (const day of this.days) {
-          transactions.forEach((x) => {
-            if (day.date === x.date.slice(0, 10)) {
-              const category = x.categoryName || this.i18n.tr("uncategorized");
-              const trimmedDescription = this.formatDescription(
-                x.description,
-                x.isEncrypted
-              );
+    const transactions = await this.transactionsService.getExpendituresFrom(mainAccountId, fromDate, this.currency);
 
-              day.spent += x.amount;
-              day.expenditures.push(
-                new HeatmapExpense(x.id, category, trimmedDescription, x.amount)
-              );
-            }
-          });
+    for (const day of this.days) {
+      transactions.forEach((x) => {
+        if (day.date === x.date.slice(0, 10)) {
+          const category = x.categoryName || this.i18n.tr("uncategorized");
+          const trimmedDescription = this.formatDescription(x.description, x.isEncrypted);
 
-          if (day.spent > maxSpent) {
-            maxSpent = day.spent;
-          }
-          if (day.spent < minSpent) {
-            minSpent = day.spent;
-          }
+          day.spent += x.amount;
+          day.expenditures.push(new HeatmapExpense(x.id, category, trimmedDescription, x.amount));
         }
-
-        for (const day of this.days) {
-          day.spentPercentage = (day.spent / maxSpent) * 100;
-
-          if (day.spent === maxSpent) {
-            day.backgroundColor = this.colors[49];
-            day.textColor = "initial";
-          } else {
-            const index = Math.floor(day.spentPercentage / 2);
-            day.backgroundColor = this.colors[index];
-            day.textColor = index < 30 ? "#eee" : "initial";
-          }
-        }
-
-        this.maxSpent = maxSpent;
-        this.minSpent = minSpent;
-        this.loaded = true;
       });
+
+      if (day.spent > maxSpent) {
+        maxSpent = day.spent;
+      }
+      if (day.spent < minSpent) {
+        minSpent = day.spent;
+      }
+    }
+
+    for (const day of this.days) {
+      day.spentPercentage = (day.spent / maxSpent) * 100;
+
+      if (day.spent === maxSpent) {
+        day.backgroundColor = this.colors[49];
+        day.textColor = "initial";
+      } else {
+        const index = Math.floor(day.spentPercentage / 2);
+        day.backgroundColor = this.colors[index];
+        day.textColor = index < 30 ? "#eee" : "initial";
+      }
+    }
+
+    this.maxSpent = maxSpent;
+    this.minSpent = minSpent;
+    this.loaded = true;
   }
 
   formatDate(date: Date): string {

@@ -55,9 +55,11 @@ export class TransferFunds {
   }
 
   async attached() {
-    this.mainAccountId = await this.accountsService.getMainId();
+    this.accountsService.getMainId().then(async (mainAccountId: number) => {
+      this.mainAccountId = mainAccountId;
 
-    this.accountsService.getAllAsOptions().then((options) => {
+      const options = await this.accountsService.getAllAsOptions();
+
       this.model.fromAccountId = this.mainAccountId;
       this.setFromAccount();
 

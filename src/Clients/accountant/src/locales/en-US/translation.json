@@ -137,7 +137,7 @@
   "categories": {
     "categories": "Categories",
     "generatingUpcomingExpenses": "Generating upcoming expenses",
-    "emptyListMessage": "You don't have any categories yet",
+    "emptyListMessage": "You haven't created any categories yet.<br><br>Some good examples for expense categories are: Bills, Shopping, Rent, Groceries, Car, Going Out, Vacation, etc.<br>Good examples for deposit categories are: Paycheck, Dividends, etc.",
     "newCategory": "New category"
   },
   "editCategory": {

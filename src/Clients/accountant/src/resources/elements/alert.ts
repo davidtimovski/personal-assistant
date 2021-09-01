@@ -1,11 +1,10 @@
 import { inject } from "aurelia-framework";
-import { Router } from "aurelia-router";
 import { EventAggregator } from "aurelia-event-aggregator";
 import { I18N } from "aurelia-i18n";
 
 import { AlertEvents } from "../../../../shared/src/utils/alertEvents";
 
-@inject(Router, EventAggregator, I18N)
+@inject(EventAggregator, I18N)
 export class AlertCustomElement {
   private type: string;
   private message: string;
@@ -13,11 +12,7 @@ export class AlertCustomElement {
   private refreshLink: HTMLAnchorElement;
   private hideTimeout = 0;
 
-  constructor(
-    private readonly router: Router,
-    private readonly eventAggregator: EventAggregator,
-    private readonly i18n: I18N
-  ) {
+  constructor(private readonly eventAggregator: EventAggregator, private readonly i18n: I18N) {
     this.eventAggregator.subscribe(AlertEvents.ShowError, (errors: any) => {
       this.type = "error";
 
@@ -27,27 +22,23 @@ export class AlertCustomElement {
         const translationKey = errors;
 
         if (this.refreshLink) {
-          this.refreshLink.style.display =
-            translationKey === "unexpectedError" ? "block" : "none";
+          this.refreshLink.style.display = translationKey === "unexpectedError" ? "block" : "none";
         }
 
         this.message = this.i18n.tr(translationKey);
       }
     });
 
-    this.eventAggregator.subscribe(
-      AlertEvents.ShowSuccess,
-      (translationKey: string) => {
-        this.reset();
+    this.eventAggregator.subscribe(AlertEvents.ShowSuccess, (translationKey: string) => {
+      this.reset();
 
-        this.type = "success";
-        this.message = this.i18n.tr(translationKey);
+      this.type = "success";
+      this.message = this.i18n.tr(translationKey);
 
-        this.hideTimeout = window.setTimeout(() => {
-          this.hide();
-        }, 5000);
-      }
-    );
+      this.hideTimeout = window.setTimeout(() => {
+        this.hide();
+      }, 5000);
+    });
 
     this.eventAggregator.subscribe(AlertEvents.HideError, () => {
       if (this.type === "error") {
@@ -74,10 +65,5 @@ export class AlertCustomElement {
 
   refresh() {
     window.location.reload();
-  }
-
-  totalSync() {
-    this.reset();
-    this.router.navigateToRoute("totalSync");
   }
 }

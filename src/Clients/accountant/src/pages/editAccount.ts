@@ -1,11 +1,6 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import {
-  ValidationController,
-  validateTrigger,
-  ValidationRules,
-  ControllerValidateResult,
-} from "aurelia-validation";
+import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
@@ -17,15 +12,7 @@ import { AccountsService } from "services/accountsService";
 import { LocalStorage } from "utils/localStorage";
 import { Account } from "models/entities/account";
 
-@inject(
-  Router,
-  AccountsService,
-  LocalStorage,
-  ValidationController,
-  I18N,
-  EventAggregator,
-  ConnectionTracker
-)
+@inject(Router, AccountsService, LocalStorage, ValidationController, I18N, EventAggregator, ConnectionTracker)
 export class EditAccount {
   private accountId: number;
   private account: Account;
@@ -84,17 +71,17 @@ export class EditAccount {
       const mainId = await this.accountsService.getMainId();
       this.isMainAccount = this.accountId === mainId;
 
-      this.accountsService.get(this.accountId).then((account: Account) => {
-        if (account === null) {
-          this.router.navigateToRoute("notFound");
-        }
-        this.account = account;
-        this.investmentFund = !!account.stockPrice;
+      const account = await this.accountsService.get(this.accountId);
+      if (account === null) {
+        this.router.navigateToRoute("notFound");
+      }
 
-        this.originalAccountJson = JSON.stringify(this.account);
+      this.account = account;
+      this.investmentFund = !!account.stockPrice;
 
-        this.setValidationRules();
-      });
+      this.originalAccountJson = JSON.stringify(this.account);
+
+      this.setValidationRules();
     }
   }
 
@@ -114,13 +101,7 @@ export class EditAccount {
     }
   }
 
-  @computedFrom(
-    "account.name",
-    "account.currency",
-    "account.stockPrice",
-    "account.synced",
-    "connTracker.isOnline"
-  )
+  @computedFrom("account.name", "account.currency", "account.stockPrice", "account.synced", "connTracker.isOnline")
   get canSave() {
     return (
       !ValidationUtil.isEmptyOrWhitespace(this.account.name) &&
@@ -180,10 +161,7 @@ export class EditAccount {
 
       try {
         await this.accountsService.delete(this.account.id);
-        this.eventAggregator.publish(
-          AlertEvents.ShowSuccess,
-          "editAccount.deleteSuccessful"
-        );
+        this.eventAggregator.publish(AlertEvents.ShowSuccess, "editAccount.deleteSuccessful");
         this.router.navigateToRoute("accounts");
       } catch (e) {
         this.eventAggregator.publish(AlertEvents.ShowError, e);
