@@ -11,7 +11,6 @@ export class ShareRequests {
   private pendingShareRequests: Array<ShareRequest>;
   private declinedShareRequests: Array<ShareRequest>;
   private shareRequestsTooltipKey = "shareRequests";
-  private emptyListMessage: string;
 
   constructor(
     private readonly router: Router,
@@ -27,8 +26,6 @@ export class ShareRequests {
       this.declinedShareRequests = allShareRequests.filter((request: ShareRequest) => {
         return request.isAccepted === false;
       });
-
-      this.emptyListMessage = this.i18n.tr("shareRequests.emptyListMessage");
     });
   }
 

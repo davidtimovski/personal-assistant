@@ -12,7 +12,6 @@ export class Notifications {
   private unseenNotifications: Array<Notification>;
   private seenNotifications: Array<Notification>;
   private language: string;
-  private emptyListMessage: string;
   private seenNotificationsVisible = false;
 
   constructor(
@@ -31,28 +30,22 @@ export class Notifications {
   }
 
   attached() {
-    this.notificationsService
-      .getAll()
-      .then((allNotifications: Array<Notification>) => {
-        for (let notification of allNotifications) {
-          notification.formattedCreatedDate = this.formatCreatedDate(
-            notification.createdDate
-          );
-        }
+    this.notificationsService.getAll().then((allNotifications: Array<Notification>) => {
+      for (let notification of allNotifications) {
+        notification.formattedCreatedDate = this.formatCreatedDate(notification.createdDate);
+      }
 
-        this.unseenNotifications = allNotifications
-          .filter((notification) => {
-            return !notification.isSeen;
-          })
-          .map(this.replacePlaceholders);
-        this.seenNotifications = allNotifications
-          .filter((notification) => {
-            return notification.isSeen;
-          })
-          .map(this.replacePlaceholders);
-
-        this.emptyListMessage = this.i18n.tr("notifications.emptyListMessage");
-      });
+      this.unseenNotifications = allNotifications
+        .filter((notification) => {
+          return !notification.isSeen;
+        })
+        .map(this.replacePlaceholders);
+      this.seenNotifications = allNotifications
+        .filter((notification) => {
+          return notification.isSeen;
+        })
+        .map(this.replacePlaceholders);
+    });
   }
 
   open(notification: Notification) {

@@ -46,7 +46,6 @@ export class List {
   private blop = new Audio("/audio/blop.mp3");
   private editListButtonIsLoading = false;
   private addNewPlaceholderText: string;
-  private emptyListMessage: string;
   state: State;
 
   constructor(
@@ -137,7 +136,6 @@ export class List {
         });
 
       this.isOneTime = this.model.isOneTimeToggleDefault;
-      this.emptyListMessage = this.i18n.tr("list.emptyListMessage");
       this.shareButtonText =
         this.model.sharingState === SharingState.NotShared
           ? this.i18n.tr("list.shareList")

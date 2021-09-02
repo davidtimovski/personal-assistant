@@ -235,7 +235,7 @@
           </div>
 
           <empty-list-message if.bind="model.tasks.length === 0 && model.completedTasks.length === 0"
-            message.bind="emptyListMessage"></empty-list-message>
+            message-key.bind="'list.emptyListMessage'"></empty-list-message>
         </div>
 
         <div click.delegate="closeDrawer()" class="body-overlay ${topDrawerIsOpen ? 'visible' : ''}"></div>

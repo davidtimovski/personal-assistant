@@ -1,6 +1,5 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { EventAggregator } from "aurelia-event-aggregator";
-import { I18N } from "aurelia-i18n";
 import { connectTo } from "aurelia-store";
 
 import { ListsService } from "services/listsService";
@@ -8,19 +7,15 @@ import { List } from "models/entities/list";
 import { ArchivedList } from "models/viewmodels/archivedList";
 import { State } from "utils/state/state";
 
-@inject(EventAggregator, I18N)
+@inject(EventAggregator)
 @connectTo()
 export class ArchivedLists {
   private archivedLists: Array<ArchivedList>;
   private iconOptions = ListsService.getIconOptions();
   private lastEditedId: number;
-  private emptyListMessage: string;
   state: State;
 
-  constructor(
-    private readonly eventAggregator: EventAggregator,
-    private readonly i18n: I18N
-  ) {
+  constructor(private readonly eventAggregator: EventAggregator) {
     this.eventAggregator.subscribe("get-lists-finished", () => {
       this.setListsFromState();
     });
@@ -36,8 +31,6 @@ export class ArchivedLists {
     if (!this.state.loading) {
       this.setListsFromState();
     }
-
-    this.emptyListMessage = this.i18n.tr("archivedLists.emptyListMessage");
   }
 
   setListsFromState() {

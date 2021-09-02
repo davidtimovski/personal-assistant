@@ -1,5 +1,5 @@
 import { bindable, bindingMode } from "aurelia-framework";
 
 export class EmptyListMessageCustomElement {
-  @bindable({ defaultBindingMode: bindingMode.toView }) message: string;
+  @bindable({ defaultBindingMode: bindingMode.toView }) messageKey: string;
 }

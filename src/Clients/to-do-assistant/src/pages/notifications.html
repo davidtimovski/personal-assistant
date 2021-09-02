@@ -30,7 +30,8 @@
             </div>
           </div>
 
-          <empty-list-message if.bind="unseenNotifications.length === 0" message.bind="emptyListMessage">
+          <empty-list-message if.bind="unseenNotifications.length === 0"
+            message-key.bind="'notifications.emptyListMessage'">
           </empty-list-message>
         </div>
 

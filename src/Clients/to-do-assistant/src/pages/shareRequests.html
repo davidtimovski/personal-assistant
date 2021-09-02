@@ -45,7 +45,8 @@
             </span>
           </div>
 
-          <empty-list-message if.bind="pendingShareRequests.length === 0" message.bind="emptyListMessage">
+          <empty-list-message if.bind="pendingShareRequests.length === 0"
+            message-key.bind="'shareRequests.emptyListMessage'">
           </empty-list-message>
         </div>
 
