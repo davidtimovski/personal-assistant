@@ -1,12 +1,12 @@
 {
   "name": "cooking-assistant",
   "description": "Your very own Cooking Assistant.",
-  "version": "1.0.0",
+  "version": "1.11.3",
   "repository": {
     "type": "???",
     "url": "???"
   },
-  "license": "MIT",
+  "license": "GPL-3.0",
   "dependencies": {
     "aurelia-animator-css": "^1.0.4",
     "aurelia-bootstrapper": "^2.3.2",
