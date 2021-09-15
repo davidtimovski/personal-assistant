@@ -1,13 +1,9 @@
-import { inject } from 'aurelia-dependency-injection';
-import { Project, ProjectItem, CLIOptions, UI } from 'aurelia-cli';
+import {inject} from 'aurelia-dependency-injection';
+import {Project, ProjectItem, CLIOptions, UI} from 'aurelia-cli';
 
 @inject(Project, CLIOptions, UI)
 export default class AttributeGenerator {
-  constructor(
-    private project: Project,
-    private options: CLIOptions,
-    private ui: UI
-  ) {}
+  constructor(private project: Project, private options: CLIOptions, private ui: UI) { }
 
   async execute() {
     const name = await this.ui.ensureAnswer(
