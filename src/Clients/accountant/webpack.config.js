@@ -4,19 +4,14 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack-plugin");
 const project = require("./aurelia_project/aurelia.json");
-const {
-  AureliaPlugin,
-  ModuleDependenciesPlugin,
-} = require("aurelia-webpack-plugin");
+const { AureliaPlugin, ModuleDependenciesPlugin } = require("aurelia-webpack-plugin");
 const { ProvidePlugin } = require("webpack");
 const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
-const CleanWebpackPlugin = require("clean-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 // config helpers:
-const ensureArray = (config) =>
-  (config && (Array.isArray(config) ? config : [config])) || [];
-const when = (condition, config, negativeConfig) =>
-  condition ? ensureArray(config) : ensureArray(negativeConfig);
+const ensureArray = (config) => (config && (Array.isArray(config) ? config : [config])) || [];
+const when = (condition, config, negativeConfig) => (condition ? ensureArray(config) : ensureArray(negativeConfig));
 
 // primary config:
 const title = "Accountant";
@@ -28,20 +23,14 @@ const baseUrl = "/";
 const cssRules = [{ loader: "css-loader" }];
 const sassRules = [{ loader: "sass-loader" }];
 
-module.exports = (
-  { production } = {},
-  { extractCss, analyze, tests, hmr, port, host } = {}
-) => ({
+module.exports = ({ production } = {}, { extractCss, analyze, tests, hmr, port, host } = {}) => ({
   resolve: {
     extensions: [".ts", ".js"],
     modules: [srcDir, nodeModulesDir],
     // Enforce single aurelia-binding, to avoid v1/v2 duplication due to
     // out-of-date dependencies on 3rd party aurelia plugins
     alias: {
-      "aurelia-binding": path.resolve(
-        __dirname,
-        "node_modules/aurelia-binding"
-      ),
+      "aurelia-binding": path.resolve(__dirname, "node_modules/aurelia-binding"),
     },
   },
   entry: {
@@ -51,15 +40,9 @@ module.exports = (
   output: {
     path: outDir,
     publicPath: baseUrl,
-    filename: production
-      ? "[name].[chunkhash].bundle.js"
-      : "[name].[hash].bundle.js",
-    sourceMapFilename: production
-      ? "[name].[chunkhash].bundle.map"
-      : "[name].[hash].bundle.map",
-    chunkFilename: production
-      ? "[name].[chunkhash].chunk.js"
-      : "[name].[hash].chunk.js",
+    filename: production ? "[name].[chunkhash].bundle.js" : "[name].[hash].bundle.js",
+    sourceMapFilename: production ? "[name].[chunkhash].bundle.map" : "[name].[hash].bundle.map",
+    chunkFilename: production ? "[name].[chunkhash].chunk.js" : "[name].[hash].chunk.js",
   },
   optimization: {
     runtimeChunk: true, // separates the runtime chunk, required for long term cacheability
@@ -101,9 +84,7 @@ module.exports = (
           test: /[\\/]node_modules[\\/]/,
           name(module) {
             // Extract the name of the package from the path segment after node_modules
-            const packageName = module.context.match(
-              /[\\/]node_modules[\\/](.*?)([\\/]|$)/
-            )[1];
+            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
             return `vendor.${packageName.replace("@", "")}`;
           },
           priority: 20,
@@ -121,9 +102,7 @@ module.exports = (
           test: /[\\/]node_modules[\\/]/,
           name(module) {
             // Extract the name of the package from the path segment after node_modules
-            const packageName = module.context.match(
-              /[\\/]node_modules[\\/](.*?)([\\/]|$)/
-            )[1];
+            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
             return `vendor.async.${packageName.replace("@", "")}`;
           },
           chunks: "async",
@@ -303,9 +282,7 @@ module.exports = (
         // available in index.ejs //
         title,
         baseUrl,
-        apiUrl: production
-          ? "https://api.personalassistant.site"
-          : "http://localhost:5001",
+        apiUrl: production ? "https://api.personalassistant.site" : "http://localhost:5001",
       },
     }),
     ...when(
@@ -322,12 +299,8 @@ module.exports = (
       extractCss,
       new MiniCssExtractPlugin({
         // updated to match the naming conventions for the js files
-        filename: production
-          ? "css/[name].[contenthash].bundle.css"
-          : "css/[name].[hash].bundle.css",
-        chunkFilename: production
-          ? "css/[name].[contenthash].chunk.css"
-          : "css/[name].[hash].chunk.css",
+        filename: production ? "css/[name].[contenthash].bundle.css" : "css/[name].[hash].bundle.css",
+        chunkFilename: production ? "css/[name].[contenthash].chunk.css" : "css/[name].[hash].chunk.css",
       })
     ),
     ...when(analyze, new BundleAnalyzerPlugin()),
