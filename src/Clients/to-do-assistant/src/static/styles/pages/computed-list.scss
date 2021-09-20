@@ -37,7 +37,7 @@
   }
 }
 
-.to-do-tasks-wrap {
+.computed-to-do-tasks-wrap {
   margin-top: 35px;
 
   &.private {
@@ -60,10 +60,10 @@
       margin-bottom: 0;
     }
 
-    &.disappearing {
-      transition: opacity 500ms;
-      transition-delay: 300ms;
-      opacity: 0 !important;
+    &.fading {
+      transition: color 500ms;
+      transition-delay: 200ms;
+      color: #bbb;
 
       &:not(.completed) .name {
         text-decoration: line-through;
@@ -75,19 +75,6 @@
       height: 34px;
       border-radius: 50%;
       margin: 6px 9px 0 0;
-    }
-
-    .left-button {
-      min-width: 45px;
-      font-size: 23px;
-      line-height: 45px;
-      text-decoration: none;
-      text-align: center;
-      color: var(--primary-color);
-
-      &:hover {
-        color: var(--primary-color-dark);
-      }
     }
 
     .right-button {
@@ -128,6 +115,9 @@
         line-height: 27px;
         text-align: center;
         cursor: default;
+      }
+      &.assigned .name {
+        padding: 9px 48px 9px 50px;
       }
 
       .fa-square,

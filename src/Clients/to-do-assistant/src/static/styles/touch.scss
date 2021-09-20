@@ -1,9 +1,11 @@
 .touch-device {
-  .reorder-toggle.checked:hover {
+  .lists-reorder-toggle.checked:hover,
+  .tasks-reorder-toggle.checked:hover {
     color: var(--primary-color);
   }
 
-  .reorder-toggle:hover {
+  .lists-reorder-toggle:hover,
+  .tasks-reorder-toggle:hover {
     color: var(--faded-color);
   }
 }

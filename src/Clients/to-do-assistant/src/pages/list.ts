@@ -211,18 +211,46 @@ export class List {
   }
 
   filterTasks() {
-    this.model.tasks = this.shadowTasks.filter((task: ListTask) => {
-      return task.name.toLowerCase().includes(this.newTaskName.trim().toLowerCase());
-    });
-    this.model.privateTasks = this.shadowPrivateTasks.filter((task: ListTask) => {
-      return task.name.toLowerCase().includes(this.newTaskName.trim().toLowerCase());
-    });
-    this.model.completedTasks = this.shadowCompletedTasks.filter((task: ListTask) => {
-      return task.name.toLowerCase().includes(this.newTaskName.trim().toLowerCase());
-    });
-    this.model.completedPrivateTasks = this.shadowCompletedPrivateTasks.filter((task: ListTask) => {
-      return task.name.toLowerCase().includes(this.newTaskName.trim().toLowerCase());
-    });
+    const searchText = this.newTaskName.trim().toLowerCase();
+
+    const mapFunction = (task: ListTask) => {
+      const index = task.name.toLowerCase().indexOf(searchText);
+      if (index >= 0) {
+        return { task: task, index: index };
+      }
+
+      return null;
+    };
+
+    const substringPositionThenOrder = (a: { task: ListTask; index: number }, b: { task: ListTask; index: number }) => {
+      if (a.index < b.index) return -1;
+      if (a.index > b.index) return 1;
+      return a.task.order - b.task.order;
+    };
+
+    this.model.tasks = this.shadowTasks
+      .map(mapFunction)
+      .filter((x) => x)
+      .sort(substringPositionThenOrder)
+      .map((x) => x.task);
+
+    this.model.privateTasks = this.shadowPrivateTasks
+      .map(mapFunction)
+      .filter((x) => x)
+      .sort(substringPositionThenOrder)
+      .map((x) => x.task);
+
+    this.model.completedTasks = this.shadowCompletedTasks
+      .map(mapFunction)
+      .filter((x) => x)
+      .sort(substringPositionThenOrder)
+      .map((x) => x.task);
+
+    this.model.completedPrivateTasks = this.shadowCompletedPrivateTasks
+      .map(mapFunction)
+      .filter((x) => x)
+      .sort(substringPositionThenOrder)
+      .map((x) => x.task);
   }
 
   resetSearchFilter(resetTaskName: boolean = true) {
@@ -326,7 +354,7 @@ export class List {
     }
 
     task.rightSideIsLoading = true;
-    task.isDisappearing = true;
+    task.isFading = true;
     this.lastEditedId = 0;
 
     if (this.isSearching) {
@@ -350,7 +378,7 @@ export class List {
 
       this.executeAfterDelay(() => {
         task.rightSideIsLoading = false;
-        task.isDisappearing = false;
+        task.isFading = false;
         this.setModelFromState();
       }, startTime);
     }
@@ -368,7 +396,7 @@ export class List {
     }
 
     task.rightSideIsLoading = true;
-    task.isDisappearing = true;
+    task.isFading = true;
     this.lastEditedId = 0;
 
     if (this.isSearching) {
@@ -380,7 +408,7 @@ export class List {
 
     this.executeAfterDelay(() => {
       task.rightSideIsLoading = false;
-      task.isDisappearing = false;
+      task.isFading = false;
       this.setModelFromState();
     }, startTime);
   }

@@ -147,10 +147,10 @@
       color: var(--danger-color-dark);
     }
 
-    &.disappearing {
-      transition: opacity 500ms;
-      transition-delay: 300ms;
-      opacity: 0 !important;
+    &.fading {
+      transition: color 500ms;
+      transition-delay: 200ms;
+      color: #bbb;
 
       &:not(.completed) .name {
         text-decoration: line-through;
@@ -161,7 +161,7 @@
       width: 34px;
       height: 34px;
       border-radius: 50%;
-      margin: 6px 9px 0 0;
+      margin: 6px 9px 0 4px;
     }
 
     .left-button {
@@ -215,6 +215,9 @@
         line-height: 27px;
         text-align: center;
         cursor: default;
+      }
+      &.assigned .name {
+        padding: 9px 52px 9px 5px;
       }
 
       .fa-square,

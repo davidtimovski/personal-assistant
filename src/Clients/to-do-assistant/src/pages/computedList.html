@@ -24,14 +24,13 @@
             </div>
           </form>
 
-          <div show.bind="model.privateTasks.length > 0" class="to-do-tasks-wrap private">
+          <div show.bind="model.privateTasks.length > 0" class="computed-to-do-tasks-wrap private">
             <div class="private-tasks-label">
               <i class="fas fa-key"></i>
               <span t="computedList.privateTasks">Private tasks</span>
             </div>
 
-            <div repeat.for="task of model.privateTasks"
-              class="to-do-task ${task.isDisappearing ? 'disappearing' : ''}">
+            <div repeat.for="task of model.privateTasks" class="to-do-task ${task.isFading ? 'fading' : ''}">
               <div class="to-do-task-content ${task.id === getEditedId ? 'highlighted' : ''}">
                 <span class="name">${task.name}</span>
                 <a click.delegate="complete(task)" class="right-button ${task.isOneTime ? 'one-time' : ''}"
@@ -44,11 +43,12 @@
             </div>
           </div>
 
-          <div class="to-do-tasks-wrap">
-            <div repeat.for="task of model.tasks" class="to-do-task ${task.isDisappearing ? 'disappearing' : ''}">
+          <div class="computed-to-do-tasks-wrap">
+            <div repeat.for="task of model.tasks" class="to-do-task ${task.isFading ? 'fading' : ''}">
               <img if.bind="task.assignedUser" src.bind="task.assignedUser.imageUri" class="to-do-task-assignee-image"
                 t="[alt]profilePicture" />
-              <div class="to-do-task-content ${task.id === getEditedId ? 'highlighted' : ''}">
+              <div
+                class="to-do-task-content ${task.id === getEditedId ? 'highlighted' : ''} ${task.assignedUser ? 'assigned' : ''}">
                 <span class="name">${task.name}</span>
                 <a click.delegate="complete(task)" class="right-button ${task.isOneTime ? 'one-time' : ''}"
                   t="[title,aria-label]computedList.complete">

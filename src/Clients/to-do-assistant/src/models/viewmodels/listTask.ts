@@ -13,7 +13,7 @@ export class ListTask {
     public assignedUser: AssignedUser,
     public order: number,
     public rightSideIsLoading: boolean,
-    public isDisappearing: boolean
+    public isFading: boolean
   ) {}
 
   static fromTask(task: Task) {

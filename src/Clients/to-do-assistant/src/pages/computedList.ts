@@ -127,7 +127,7 @@ export class ComputedList {
     }
 
     task.rightSideIsLoading = true;
-    task.isDisappearing = true;
+    task.isFading = true;
 
     if (this.searchTasksText.length > 0) {
       this.resetSearchFilter();
@@ -154,7 +154,7 @@ export class ComputedList {
 
       this.executeAfterDelay(() => {
         task.rightSideIsLoading = false;
-        task.isDisappearing = false;
+        task.isFading = false;
 
         if (this.model.tasks.length + this.model.privateTasks.length === 1) {
           this.router.navigateToRoute("lists");

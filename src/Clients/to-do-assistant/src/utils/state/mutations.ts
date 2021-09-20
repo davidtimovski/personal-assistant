@@ -10,9 +10,11 @@ function getLists(state: State, lists: List[], highPriorityText: string) {
   }
 
   if (state.highPriorityListEnabled) {
-    const allTasks: Task[] = lists.reduce((a, b) => {
-      return a.concat(b.tasks);
-    }, []);
+    const allTasks: Task[] = lists
+      .filter((x) => !x.isArchived)
+      .reduce((a, b) => {
+        return a.concat(b.tasks);
+      }, []);
 
     const uncompletedHighPriorityTasks = allTasks.filter((x) => !x.isCompleted && x.isHighPriority);
     if (uncompletedHighPriorityTasks.length > 0) {

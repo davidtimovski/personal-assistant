@@ -124,7 +124,7 @@
 
             <div reorderable-repeat.for="task of model.privateTasks" reorderable-after-reordering="reorder"
               reorderable-dnd-handler-selector=".sort-handle"
-              class="to-do-task ${model.computedListType !== 'high-priority' && task.isHighPriority ? 'high-priority' : ''} ${task.isDisappearing ? 'disappearing' : ''}">
+              class="to-do-task ${model.computedListType !== 'high-priority' && task.isHighPriority ? 'high-priority' : ''} ${task.isFading ? 'fading' : ''}">
               <div class="to-do-task-content ${task.id === getEditedId ? 'highlighted' : ''}">
                 <a route-href="route: editTask; params.bind: { id: task.id }" class="left-button"
                   t="[title,aria-label]list.edit">
@@ -147,10 +147,9 @@
           <div class="to-do-tasks-wrap ${isReordering ? 'reordering' : ''}">
             <div reorderable-repeat.for="task of model.tasks" reorderable-after-reordering="reorder"
               reorderable-dnd-handler-selector=".sort-handle"
-              class="to-do-task ${model.computedListType !== 'high-priority' && task.isHighPriority ? 'high-priority' : ''} ${task.isDisappearing ? 'disappearing' : ''}">
-              <img if.bind="task.assignedUser" src.bind="task.assignedUser.imageUri" class="to-do-task-assignee-image"
-                t="[alt]profilePicture" />
-              <div class="to-do-task-content ${task.id === getEditedId ? 'highlighted' : ''}">
+              class="to-do-task ${model.computedListType !== 'high-priority' && task.isHighPriority ? 'high-priority' : ''} ${task.isFading ? 'fading' : ''}">
+              <div
+                class="to-do-task-content ${task.id === getEditedId ? 'highlighted' : ''} ${task.assignedUser ? 'assigned' : ''}">
                 <a route-href="route: editTask; params.bind: { id: task.id }" class="left-button"
                   t="[title,aria-label]list.edit">
                   <i class="fas fa-pencil-alt"></i>
@@ -158,6 +157,8 @@
                 <span class="sort-handle" t="[title,aria-label]dragToReorder">
                   <i class="reorder-icon fas fa-hand-paper"></i>
                 </span>
+                <img if.bind="task.assignedUser" src.bind="task.assignedUser.imageUri" class="to-do-task-assignee-image"
+                  t="[alt]profilePicture" />
                 <span class="name">${task.name}</span>
                 <a click.delegate="complete(task)" class="right-button ${task.isOneTime ? 'one-time' : ''}"
                   t="[title,aria-label]list.complete">
@@ -191,7 +192,7 @@
 
                 <div reorderable-repeat.for="task of model.completedPrivateTasks" reorderable-after-reordering="reorder"
                   reorderable-dnd-handler-selector=".sort-handle"
-                  class="to-do-task completed ${task.isDisappearing ? 'disappearing' : ''}">
+                  class="to-do-task completed ${task.isFading ? 'fading' : ''}">
                   <div class="to-do-task-content ${task.id === getEditedId ? 'highlighted' : ''}">
                     <a route-href="route: editTask; params.bind: { id: task.id }" class="left-button"
                       t="[title,aria-label]list.edit">
@@ -212,10 +213,9 @@
               <div class="to-do-tasks-wrap ${isReordering ? 'reordering' : ''}">
                 <div reorderable-repeat.for="task of model.completedTasks" reorderable-after-reordering="reorder"
                   reorderable-dnd-handler-selector=".sort-handle"
-                  class="to-do-task completed ${task.isDisappearing ? 'disappearing' : ''}">
-                  <img if.bind="task.assignedUser" src.bind="task.assignedUser.imageUri"
-                    class="to-do-task-assignee-image" t="[alt]profilePicture" />
-                  <div class="to-do-task-content ${task.id === getEditedId ? 'highlighted' : ''}">
+                  class="to-do-task completed ${task.isFading ? 'fading' : ''}">
+                  <div
+                    class="to-do-task-content ${task.id === getEditedId ? 'highlighted' : ''} ${task.assignedUser ? 'assigned' : ''}">
                     <a route-href="route: editTask; params.bind: { id: task.id }" class="left-button"
                       t="[title,aria-label]list.edit">
                       <i class="fas fa-pencil-alt"></i>
@@ -223,6 +223,8 @@
                     <span class="sort-handle" t="[title,aria-label]dragToReorder">
                       <i class="reorder-icon fas fa-hand-paper"></i>
                     </span>
+                    <img if.bind="task.assignedUser" src.bind="task.assignedUser.imageUri"
+                      class="to-do-task-assignee-image" t="[alt]profilePicture" />
                     <span class="name">${task.name}</span>
                     <a click.delegate="uncomplete(task)" class="right-button" t="[title,aria-label]list.uncomplete">
                       <i if.bind="!task.rightSideIsLoading" class="fas fa-check-square"></i>
