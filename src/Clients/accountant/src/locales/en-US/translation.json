@@ -113,6 +113,7 @@
     "newUpcomingExpense": "New upcoming expense",
     "editUpcomingExpense": "Edit upcoming expense",
     "generatedAlert": "This upcoming expense has been automatically generated.",
+    "month": "Month",
     "description": "Description. Leave empty if you want it to target all expenses in the category.",
     "saveSuccessful": "Upcoming expense was successfully saved",
     "deleteSuccessful": "Upcoming expense was successfully deleted"
@@ -137,6 +138,8 @@
   "categories": {
     "categories": "Categories",
     "generatingUpcomingExpenses": "Generating upcoming expenses",
+    "depositOnly": "Deposit only",
+    "expenseOnly": "Expense only",
     "emptyListMessage": "You haven't created any categories yet.<br><br>Some good examples for expense categories are: Bills, Shopping, Rent, Groceries, Car, Going Out, Vacation, etc.<br>Good examples for deposit categories are: Paycheck, Dividends, etc.",
     "newCategory": "New category"
   },
@@ -172,6 +175,9 @@
     "toInvestmentFund": "To investment fund:",
     "stockPrice": "Stock price",
     "transfer": "Transfer",
+    "transferStock": "Transfer stock",
+    "buyStock": "Buy stock",
+    "sellStock": "Sell stock",
     "accountOnlyHas": "There is only {{balance}} on the \"{{account}}\" account",
     "transferSuccessful": "Funds were successfully transferred"
   },

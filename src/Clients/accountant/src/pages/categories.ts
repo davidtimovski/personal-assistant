@@ -55,6 +55,7 @@ export class Categories {
     return new CategoryItem(
       category.id,
       category.name,
+      category.type,
       category.generateUpcomingExpense,
       category.synced,
       subCategories.map((c: Category) => {

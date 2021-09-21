@@ -1,5 +1,6 @@
 <template>
   <require from="./../resources/elements/amount-input"></require>
+  <require from="./../resources/elements/month-selector"></require>
 
   <div class="container">
     <div class="au-animate animate-fade-in animate-fade-out">
@@ -53,9 +54,9 @@
               </div>
             </div>
             <div class="form-control inline">
-              <label for="date" t="date">Date</label>
-              <input type="date" id="date" value.bind="model.date" disabled.bind="model.generated" min="${todayDate}"
-                class.bind="dateIsInvalid ? 'invalid' : ''" required>
+              <label t="editUpcomingExpense.month">Month</label>
+              <month-selector month.bind="model.month" year.bind="model.year" disabled.bind="model.generated">
+              </month-selector>
             </div>
             <div class="form-control">
               <textarea value.bind="model.description" maxlength="250" class="description-textarea"

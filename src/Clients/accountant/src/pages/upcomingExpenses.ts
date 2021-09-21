@@ -1,9 +1,9 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { UpcomingExpensesService } from "services/upcomingExpensesService";
-import { UpcomingExpense } from "models/entities/upcomingExpense";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
+
+import { UpcomingExpensesService } from "services/upcomingExpensesService";
 import { LocalStorage } from "utils/localStorage";
 import { UpcomingExpenseItem } from "models/viewmodels/upcomingExpenseItem";
 

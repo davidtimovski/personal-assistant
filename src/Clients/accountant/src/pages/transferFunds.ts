@@ -22,6 +22,7 @@ export class TransferFunds {
   private fromAccountLabel: string;
   private toAccountLabel: string;
   private amountIsInvalid: boolean;
+  private transferButtonLabel: string;
   private transferButtonIsLoading = false;
 
   constructor(
@@ -66,6 +67,8 @@ export class TransferFunds {
       this.model.toAccountId = options[1].id;
       this.setToAccount();
 
+      this.setTransferButtonLabel();
+
       this.model.accountOptions = options;
     });
 
@@ -88,6 +91,8 @@ export class TransferFunds {
         this.setToAccount();
       }
     }
+
+    this.setTransferButtonLabel();
   }
 
   toAccountChanged() {
@@ -104,6 +109,8 @@ export class TransferFunds {
         this.setFromAccount();
       }
     }
+
+    this.setTransferButtonLabel();
   }
 
   private setFromAccount() {
@@ -120,6 +127,18 @@ export class TransferFunds {
       this.model.toAccount.stockPrice === null
         ? this.i18n.tr("transferFunds.toAccount")
         : this.i18n.tr("transferFunds.toInvestmentFund");
+  }
+
+  private setTransferButtonLabel() {
+    if (this.model.fromAccount.stockPrice === null && this.model.toAccount.stockPrice === null) {
+      this.transferButtonLabel = this.i18n.tr("transferFunds.transfer");
+    } else if (this.model.fromAccount.stockPrice !== null && this.model.toAccount.stockPrice !== null) {
+      this.transferButtonLabel = this.i18n.tr("transferFunds.transferStock");
+    } else if (this.model.fromAccount.stockPrice === null && this.model.toAccount.stockPrice !== null) {
+      this.transferButtonLabel = this.i18n.tr("transferFunds.buyStock");
+    } else if (this.model.fromAccount.stockPrice !== null && this.model.toAccount.stockPrice === null) {
+      this.transferButtonLabel = this.i18n.tr("transferFunds.sellStock");
+    }
   }
 
   @computedFrom("model.amount")

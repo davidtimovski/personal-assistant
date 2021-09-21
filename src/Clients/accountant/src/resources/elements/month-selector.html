@@ -1,0 +1,12 @@
+<template bindable="month, year, disabled">
+  <require from="./month-selector.scss"></require>
+
+  <div class="month-selector">
+    <select value.bind="month" disabled.bind="disabled" class="month-select">
+      <option model.bind="monthOption.id" repeat.for="monthOption of monthOptions">${monthOption.name}</option>
+    </select>
+    <select value.bind="year" change.delegate="yearChanged()" disabled.bind="disabled" class="year-select">
+      <option model.bind="yearOption" repeat.for="yearOption of yearOptions">${yearOption}</option>
+    </select>
+  </div>
+</template>

@@ -1,16 +1,10 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import {
-  ValidationController,
-  validateTrigger,
-  ValidationRules,
-  ControllerValidateResult,
-} from "aurelia-validation";
+import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
 import { ConnectionTracker } from "../../../shared/src/utils/connectionTracker";
-import { DateHelper } from "../../../shared/src/utils/dateHelper";
 import { AlertEvents } from "../../../shared/src/utils/alertEvents";
 
 import { CategoriesService } from "services/categoriesService";
@@ -37,7 +31,6 @@ export class EditUpcomingExpense {
   private categoryOptions: Array<SelectOption>;
   private originalUpcomingExpenseJson: string;
   private isNewUpcomingExpense: boolean;
-  private todayDate: string;
   private amountInput: HTMLInputElement;
   private amountIsInvalid: boolean;
   private dateIsInvalid: boolean;
@@ -60,8 +53,6 @@ export class EditUpcomingExpense {
     this.validationController.validateTrigger = validateTrigger.manual;
     this.deleteButtonText = this.i18n.tr("delete");
 
-    this.todayDate = DateHelper.format(new Date());
-
     this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.amountIsInvalid = false;
       this.dateIsInvalid = false;
@@ -75,17 +66,7 @@ export class EditUpcomingExpense {
     if (this.isNewUpcomingExpense) {
       const currency = this.localStorage.getCurrency();
 
-      this.model = new EditUpcomingExpenseModel(
-        null,
-        null,
-        null,
-        currency,
-        null,
-        this.todayDate,
-        false,
-        null,
-        false
-      );
+      this.model = new EditUpcomingExpenseModel(null, null, null, currency, null, null, false, null, false);
 
       this.saveButtonText = this.i18n.tr("create");
 
@@ -96,35 +77,32 @@ export class EditUpcomingExpense {
   }
 
   attached() {
-    this.categoriesService
-      .getAllAsOptions(this.i18n.tr("uncategorized"), CategoryType.ExpenseOnly)
-      .then((options) => {
-        this.categoryOptions = options;
-      });
+    this.categoriesService.getAllAsOptions(this.i18n.tr("uncategorized"), CategoryType.ExpenseOnly).then((options) => {
+      this.categoryOptions = options;
+    });
 
     if (!this.isNewUpcomingExpense) {
-      this.upcomingExpensesService
-        .get(this.upcomingExpenseId)
-        .then((upcomingExpense: UpcomingExpense) => {
-          if (upcomingExpense === null) {
-            this.router.navigateToRoute("notFound");
-          }
-          this.model = new EditUpcomingExpenseModel(
-            upcomingExpense.id,
-            upcomingExpense.categoryId,
-            upcomingExpense.amount,
-            upcomingExpense.currency,
-            upcomingExpense.description,
-            upcomingExpense.date.slice(0, 10),
-            upcomingExpense.generated,
-            upcomingExpense.createdDate,
-            upcomingExpense.synced
-          );
+      this.upcomingExpensesService.get(this.upcomingExpenseId).then((upcomingExpense: UpcomingExpense) => {
+        if (upcomingExpense === null) {
+          this.router.navigateToRoute("notFound");
+        }
 
-          this.originalUpcomingExpenseJson = JSON.stringify(this.model);
+        this.model = new EditUpcomingExpenseModel(
+          upcomingExpense.id,
+          upcomingExpense.categoryId,
+          upcomingExpense.amount,
+          upcomingExpense.currency,
+          upcomingExpense.description,
+          upcomingExpense.date,
+          upcomingExpense.generated,
+          upcomingExpense.createdDate,
+          upcomingExpense.synced
+        );
 
-          this.setValidationRules();
-        });
+        this.originalUpcomingExpenseJson = JSON.stringify(this.model);
+
+        this.setValidationRules();
+      });
     }
   }
 
@@ -142,7 +120,8 @@ export class EditUpcomingExpense {
     "model.amount",
     "model.currency",
     "model.categoryId",
-    "model.date",
+    "model.month",
+    "model.year",
     "model.description",
     "model.synced",
     "connTracker.isOnline"
@@ -174,7 +153,7 @@ export class EditUpcomingExpense {
             this.model.amount,
             this.model.currency,
             this.model.description,
-            this.model.date,
+            this.model.getDate(),
             false,
             null,
             null
@@ -197,7 +176,7 @@ export class EditUpcomingExpense {
             this.model.amount,
             this.model.currency,
             this.model.description,
-            this.model.date,
+            this.model.getDate(),
             this.model.generated,
             this.model.createdDate,
             null
@@ -229,10 +208,7 @@ export class EditUpcomingExpense {
 
       try {
         await this.upcomingExpensesService.delete(this.model.id);
-        this.eventAggregator.publish(
-          AlertEvents.ShowSuccess,
-          "editUpcomingExpense.deleteSuccessful"
-        );
+        this.eventAggregator.publish(AlertEvents.ShowSuccess, "editUpcomingExpense.deleteSuccessful");
         this.router.navigateToRoute("upcomingExpenses");
       } catch (e) {
         this.eventAggregator.publish(AlertEvents.ShowError, e);

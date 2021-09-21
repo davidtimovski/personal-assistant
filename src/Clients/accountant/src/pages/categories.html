@@ -27,9 +27,19 @@
               <a class="category au-animate animate-fade-in ${category.id === getEditedId ? 'highlighted-row' : ''}"
                 route-href="route: editCategory; params.bind: { id: category.id }">
                 <span class="name">${category.name}</span>
-                <span if.bind="category.generateUpcomingExpense" class="generate-upcoming-indicator"
-                  t="[title,aria-label]categories.generatingUpcomingExpenses">
-                  <i class="far fa-calendar-alt"></i>
+                <span>
+                  <span if.bind="category.generateUpcomingExpense" class="category-indicator"
+                    t="[title,aria-label]categories.generatingUpcomingExpenses">
+                    <i class="far fa-calendar-alt"></i>
+                  </span>
+                  <span if.bind="category.type === 1" class="category-indicator"
+                    t="[title,aria-label]categories.depositOnly">
+                    <i class="fas fa-donate"></i>
+                  </span>
+                  <span if.bind="category.type === 2" class="category-indicator"
+                    t="[title,aria-label]categories.expenseOnly">
+                    <i class="fas fa-wallet"></i>
+                  </span>
                 </span>
               </a>
 
@@ -43,9 +53,19 @@
               <a class="category au-animate animate-fade-in ${sub.id === getEditedId ? 'highlighted-row' : ''}"
                 route-href="route: editCategory; params.bind: { id: sub.id }">
                 <span class="name">${sub.name}</span>
-                <span if.bind="sub.generateUpcomingExpense" class="generate-upcoming-indicator"
-                  t="[title,aria-label]categories.generatingUpcomingExpenses">
-                  <i class="far fa-calendar-alt"></i>
+                <span>
+                  <span if.bind="sub.generateUpcomingExpense" class="category-indicator"
+                    t="[title,aria-label]categories.generatingUpcomingExpenses">
+                    <i class="far fa-calendar-alt"></i>
+                  </span>
+                  <span if.bind="category.type === 1" class="category-indicator"
+                    t="[title,aria-label]categories.depositOnly">
+                    <i class="fas fa-donate"></i>
+                  </span>
+                  <span if.bind="category.type === 2" class="category-indicator"
+                    t="[title,aria-label]categories.expenseOnly">
+                    <i class="fas fa-wallet"></i>
+                  </span>
                 </span>
               </a>
 

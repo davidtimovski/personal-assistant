@@ -1,0 +1,25 @@
+@import "../../../../shared/src/static/styles/variables";
+
+.month-selector {
+  display: flex;
+
+  .month-select {
+    width: 150px;
+    margin-right: 10px;
+  }
+
+  .year-select {
+    width: 100px;
+  }
+}
+
+@media screen and (min-width: $desktop-min) {
+  .month-selector {
+    .month-select {
+      width: 170px;
+    }
+    .year-select {
+      width: 120px;
+    }
+  }
+}
