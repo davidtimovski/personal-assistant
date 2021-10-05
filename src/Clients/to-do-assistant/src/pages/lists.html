@@ -49,6 +49,7 @@
 
             <a reorderable-repeat.for="list of lists" reorderable-after-reordering="reorder"
               reorderable-dnd-handler-selector=".sort-handle" class="to-do-list au-animate animate-fade-in 
+              ${list.isEmpty ? 'empty' : ''}
               ${list.id === getEditedId ? 'highlighted' : ''}
               ${list.sharingState !== 0 && list.sharingState !== 1 ? 'is-shared' : ''}
               ${list.sharingState === 1 ? 'pending-share' : ''}"

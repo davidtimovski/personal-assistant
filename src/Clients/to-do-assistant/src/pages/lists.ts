@@ -11,6 +11,7 @@ import { ListsService } from "services/listsService";
 import { UsersService } from "services/usersService";
 import { LocalStorage } from "utils/localStorage";
 import { List } from "models/entities/list";
+import { ListModel } from "models/viewmodels/listModel";
 import { State } from "utils/state/state";
 import * as Actions from "utils/state/actions";
 import * as environment from "../../config/environment.json";
@@ -20,8 +21,8 @@ import * as environment from "../../config/environment.json";
 export class Lists {
   private imageUri = JSON.parse(<any>environment).defaultProfileImageUri;
   private progressBar = new ProgressBar();
-  private computedLists: List[];
-  private lists: List[];
+  private computedLists: ListModel[];
+  private lists: ListModel[];
   private listsLoaded = false;
   private iconOptions = ListsService.getIconOptions();
   private lastEditedId: number;
@@ -71,13 +72,16 @@ export class Lists {
   }
 
   setListsFromState() {
-    this.computedLists = this.state.lists.filter((x) => x.computedListType);
+    this.computedLists = this.state.lists
+      .filter((x) => x.computedListType)
+      .map((x) => new ListModel(x.id, x.name, x.icon, x.sharingState, x.order, x.computedListType, x.tasks));
 
     this.lists = this.state.lists
       .filter((x) => !x.isArchived && !x.computedListType)
       .sort((a: List, b: List) => {
         return a.order - b.order;
-      });
+      })
+      .map((x) => new ListModel(x.id, x.name, x.icon, x.sharingState, x.order, x.computedListType, x.tasks));
   }
 
   getComputedListIconClass(computedListType: string): string {
@@ -88,7 +92,7 @@ export class Lists {
     return this.iconOptions.find((x) => x.icon === icon).cssClass;
   }
 
-  async reorder(changedArray: List[], data) {
+  async reorder(changedArray: List[], data: any) {
     const id: number = changedArray[data.toIndex].id;
 
     const oldOrder = ++data.fromIndex;
