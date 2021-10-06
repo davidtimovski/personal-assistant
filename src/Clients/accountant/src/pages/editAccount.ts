@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { inject, computedFrom, observable } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
@@ -20,7 +20,6 @@ export class EditAccount {
   private currency: string;
   private isNewAccount: boolean;
   private isMainAccount: boolean;
-  private investmentFund: boolean;
   private nameInput: HTMLInputElement;
   private nameIsInvalid: boolean;
   private saveButtonText: string;
@@ -29,6 +28,9 @@ export class EditAccount {
   private deleteButtonText: string;
   private saveButtonIsLoading = false;
   private deleteButtonIsLoading = false;
+
+  @observable()
+  private investmentFund: boolean;
 
   constructor(
     private readonly router: Router,
@@ -91,7 +93,7 @@ export class EditAccount {
       .on(this.account);
   }
 
-  investmentFundToggled() {
+  investmentFundChanged() {
     if (this.investmentFund) {
       if (!this.account.stockPrice) {
         this.account.currency = this.currency;

@@ -1,10 +1,10 @@
-import { inject } from "aurelia-framework";
+import { inject, observable } from "aurelia-framework";
 import { LocalStorage } from "utils/localStorage";
 
 @inject(LocalStorage)
 export class Preferences {
-  private showUpcomingExpensesOnDashboard: boolean;
-  private showDebtOnDashboard: boolean;
+  @observable() private showUpcomingExpensesOnDashboard: boolean;
+  @observable() private showDebtOnDashboard: boolean;
 
   constructor(private readonly localStorage: LocalStorage) {}
 
@@ -14,9 +14,7 @@ export class Preferences {
   }
 
   showUpcomingExpensesOnDashboardChanged() {
-    this.localStorage.setShowUpcomingExpensesOnDashboard(
-      this.showUpcomingExpensesOnDashboard
-    );
+    this.localStorage.setShowUpcomingExpensesOnDashboard(this.showUpcomingExpensesOnDashboard);
   }
 
   showDebtOnDashboardChanged() {

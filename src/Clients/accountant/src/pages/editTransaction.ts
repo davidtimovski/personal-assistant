@@ -32,7 +32,8 @@ export class EditTransaction {
   private model: EditTransactionModel;
   private categoryOptions: Array<SelectOption>;
   private originalTransactionJson: string;
-  private maxDate: string;
+  private readonly maxDate: string;
+  private readonly encryptedDescriptionTooltipKey = "encryptedDescription";
   private decPasswordInput: HTMLInputElement;
   private decPasswordShown = false;
   private encPasswordInput: HTMLInputElement;
@@ -131,12 +132,6 @@ export class EditTransaction {
         .withMessage(this.i18n.tr("newTransaction.passwordIsRequired"))
         .on(this.model);
     });
-  }
-
-  encryptChanged() {
-    if (this.model.encrypt) {
-      this.encPasswordInput.focus();
-    }
   }
 
   @computedFrom("model.description")

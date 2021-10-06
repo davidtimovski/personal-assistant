@@ -1,6 +1,7 @@
 <template>
   <require from="./../resources/elements/amount-input"></require>
   <require from="./../resources/elements/tooltip"></require>
+  <require from="./../resources/elements/checkbox"></require>
 
   <div class="container">
     <div class="au-animate animate-fade-in animate-fade-out">
@@ -62,19 +63,9 @@
                 <textarea value.bind="model.description" maxlength="500" class="description-textarea"
                   t="[placeholder,aria-label]description"></textarea>
 
-                <label class="toggle ${canEncrypt ? '' : 'disabled'}">
-                  <span t="newTransaction.encryptDescription">Encrypt description</span>
-                  <div class="toggle-content">
-                    <input type="checkbox" checked.bind="model.encrypt" change.delegate="encryptChanged()"
-                      disabled.bind="!canEncrypt">
-                    <i class="fas fa-lock is-checked"></i>
-                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                      <path
-                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                        fill-rule="evenodd" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                </label>
+                <checkbox label-key.bind="'newTransaction.encryptDescription'" value.bind="model.encrypt"
+                  disabled.bind="!canEncrypt"></checkbox>
+
                 <div if.bind="model.encrypt">
                   <tooltip key.bind="encryptedDescriptionTooltipKey"></tooltip>
                   <div class="viewable-password">

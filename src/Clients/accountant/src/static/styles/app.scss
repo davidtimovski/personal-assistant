@@ -90,7 +90,7 @@ textarea {
   }
 }
 
-form label:not(.toggle) {
+form label:not(.checkbox-toggle) {
   display: block;
 }
 form.viewing label {
@@ -364,7 +364,6 @@ td.sync-icon-cell {
   border: none;
   border-radius: var(--border-radius);
   outline: none;
-  box-shadow: var(--box-shadow);
   padding: 0 12px;
   margin-left: 10px;
   font-size: 1.2rem;
@@ -391,7 +390,6 @@ td.sync-icon-cell {
   border: none;
   border-radius: var(--border-radius);
   outline: none;
-  box-shadow: var(--box-shadow);
   padding: 0 10px;
   margin-left: 10px;
   font-size: 1.3rem;

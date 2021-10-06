@@ -83,6 +83,9 @@
   },
   "editTransaction": {
     "editTransaction": "Ажурирај трансакција",
+    "encryptDescription": "Шифрирај опис",
+    "decryptDescription": "Дешифрирај опис",
+    "resetDescription": "Ресетирај опис",
     "saveSuccessful": "Трансакцијата беше успешно зачувана",
     "deleteSuccessful": "Трансакцијата беше успешно избришана"
   },

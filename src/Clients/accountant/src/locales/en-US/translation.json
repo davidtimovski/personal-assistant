@@ -83,6 +83,9 @@
   },
   "editTransaction": {
     "editTransaction": "Edit transaction",
+    "encryptDescription": "Encrypt description",
+    "decryptDescription": "Decrypt description",
+    "resetDescription": "Reset description",
     "saveSuccessful": "Transaction was successfully saved",
     "deleteSuccessful": "Transaction was successfully deleted"
   },

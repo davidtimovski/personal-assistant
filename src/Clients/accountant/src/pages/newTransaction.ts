@@ -2,12 +2,7 @@ import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
-import {
-  ValidationController,
-  validateTrigger,
-  ValidationRules,
-  ControllerValidateResult,
-} from "aurelia-validation";
+import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
@@ -36,23 +31,14 @@ import { DebtModel } from "models/entities/debt";
   EventAggregator
 )
 export class NewTransaction {
-  private model = new NewTransactionModel(
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    false,
-    null
-  );
+  private model = new NewTransactionModel(null, null, null, null, null, null, false, null);
   private isExpense: boolean;
   private debtId: number;
   private userIsDebtor: boolean;
   private debtPerson: string;
   private categoryOptions: Array<SelectOption>;
   private originalTransactionJson: string;
-  private maxDate: string;
+  private readonly maxDate: string;
   private readonly encryptedDescriptionTooltipKey = "encryptedDescription";
   private passwordInput: HTMLInputElement;
   private passwordShown = false;
@@ -103,9 +89,7 @@ export class NewTransaction {
     }
     ValidationRules.ensure((x: NewTransactionModel) => x.amount)
       .between(amountFrom, amountTo)
-      .withMessage(
-        this.i18n.tr("amountBetween", { from: amountFrom, to: amountTo })
-      )
+      .withMessage(this.i18n.tr("amountBetween", { from: amountFrom, to: amountTo }))
       .ensure((x: NewTransactionModel) => x.date)
       .required()
       .withMessage(this.i18n.tr("newTransaction.dateIsRequired"))
@@ -118,19 +102,15 @@ export class NewTransaction {
   }
 
   attached() {
-    const categoryType = this.isExpense
-      ? CategoryType.ExpenseOnly
-      : CategoryType.DepositOnly;
+    const categoryType = this.isExpense ? CategoryType.ExpenseOnly : CategoryType.DepositOnly;
 
     this.accountsService.getMainId().then((id: number) => {
       this.model.mainAccountId = id;
     });
 
-    this.categoriesService
-      .getAllAsOptions(this.i18n.tr("uncategorized"), categoryType)
-      .then((options) => {
-        this.categoryOptions = options;
-      });
+    this.categoriesService.getAllAsOptions(this.i18n.tr("uncategorized"), categoryType).then((options) => {
+      this.categoryOptions = options;
+    });
 
     if (this.debtId) {
       this.debtsService.get(this.debtId).then((debt: DebtModel) => {
@@ -138,12 +118,6 @@ export class NewTransaction {
         this.debtPerson = debt.person;
         this.model.amount = debt.amount;
       });
-    }
-  }
-
-  encryptChanged() {
-    if (this.model.encrypt) {
-      this.passwordInput.focus();
     }
   }
 
@@ -169,17 +143,9 @@ export class NewTransaction {
     this.passwordShown = !this.passwordShown;
   }
 
-  @computedFrom(
-    "model.amount",
-    "model.categoryId",
-    "model.date",
-    "model.description"
-  )
+  @computedFrom("model.amount", "model.categoryId", "model.date", "model.description")
   get canSubmit() {
-    return (
-      !!this.model.amount &&
-      JSON.stringify(this.model) !== this.originalTransactionJson
-    );
+    return !!this.model.amount && JSON.stringify(this.model) !== this.originalTransactionJson;
   }
 
   async submit() {
@@ -223,10 +189,7 @@ export class NewTransaction {
           transaction.toAccountId = this.model.mainAccountId;
         }
 
-        await this.transactionsService.create(
-          transaction,
-          this.model.encryptionPassword
-        );
+        await this.transactionsService.create(transaction, this.model.encryptionPassword);
 
         if (this.debtId) {
           await this.debtsService.delete(this.debtId);
@@ -236,14 +199,9 @@ export class NewTransaction {
         this.dateIsInvalid = false;
 
         if (this.debtId) {
-          this.eventAggregator.publish(
-            AlertEvents.ShowSuccess,
-            "newTransaction.debtSettlingSuccessful"
-          );
+          this.eventAggregator.publish(AlertEvents.ShowSuccess, "newTransaction.debtSettlingSuccessful");
         } else {
-          const messageKey = this.isExpense
-            ? "newTransaction.expenseSubmitted"
-            : "newTransaction.depositSubmitted";
+          const messageKey = this.isExpense ? "newTransaction.expenseSubmitted" : "newTransaction.depositSubmitted";
 
           this.eventAggregator.publish(AlertEvents.ShowSuccess, messageKey);
         }

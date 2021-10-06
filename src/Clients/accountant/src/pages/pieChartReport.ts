@@ -26,7 +26,7 @@ export class PieChartReport {
   private canvasCtx: CanvasRenderingContext2D;
   private fromDate: string;
   private toDate: string;
-  private maxDate: string;
+  private readonly maxDate: string;
   private type = TransactionType.Expense;
   private readonly colors = ["#7a79e6", "#dbd829", "#49e09b", "#e88042", "#5aacf1", "#f55551", "#b6ca53"];
   private showTable = false;
