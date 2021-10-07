@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { inject, computedFrom, observable } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
@@ -78,12 +78,6 @@ export class EditTask {
     });
   }
 
-  isPrivateChanged() {
-    if (this.model.isPrivate) {
-      this.model.assignedToUserId = null;
-    }
-  }
-
   @computedFrom(
     "model.name",
     "model.listId",
@@ -93,6 +87,10 @@ export class EditTask {
     "model.assignedToUserId"
   )
   get canSave() {
+    if (this.model.isPrivate) {
+      this.model.assignedToUserId = null;
+    }
+
     return !ValidationUtil.isEmptyOrWhitespace(this.model.name) && JSON.stringify(this.model) !== this.originalTaskJson;
   }
 

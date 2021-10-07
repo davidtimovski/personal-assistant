@@ -1,4 +1,4 @@
-import { inject } from "aurelia-framework";
+import { inject, observable } from "aurelia-framework";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 import { connectTo } from "aurelia-store";
@@ -8,30 +8,29 @@ import { AlertEvents } from "../../../shared/src/utils/alertEvents";
 import { UsersService } from "services/usersService";
 import { NotificationsService } from "services/notificationsService";
 import { ListsService } from "services/listsService";
-import { LocalStorage } from "utils/localStorage";
 import { PreferencesModel } from "models/preferencesModel";
 import { State } from "utils/state/state";
 import * as Actions from "utils/state/actions";
 
-@inject(UsersService, NotificationsService, ListsService, LocalStorage, I18N, EventAggregator)
+@inject(UsersService, NotificationsService, ListsService, I18N, EventAggregator)
 @connectTo()
 export class Preferences {
   private readonly notificationsVapidKey =
     "BCL8HRDvXuYjw011VypF_TtfmklYFmqXAADY7pV3WB9vL609d8wNK0zTUs4hB0V3uAnCTpzOd2pANBmsMQoUhD0";
   private preferences: PreferencesModel;
   private notificationsState: string;
-  private notificationsCheckboxChecked = false;
   private readonly notificationIconSrc = "/images/icons/app-icon-96x96.png";
   private notificationsAreSupported = false;
-  private soundsEnabled: boolean;
-  private highPriorityListEnabled: boolean;
   state: State;
+
+  @observable() private notificationsCheckboxChecked = false;
+  @observable() private soundsEnabled: boolean;
+  @observable() private highPriorityListEnabled: boolean;
 
   constructor(
     private readonly usersService: UsersService,
     private readonly notificationsService: NotificationsService,
     private readonly listsService: ListsService,
-    private readonly localStorage: LocalStorage,
     private readonly i18n: I18N,
     private readonly eventAggregator: EventAggregator
   ) {}
@@ -63,7 +62,7 @@ export class Preferences {
     this.highPriorityListEnabled = this.state.highPriorityListEnabled;
   }
 
-  async notificationsChanged() {
+  async notificationsCheckboxCheckedChanged() {
     const previousNotificationsPermission = (Notification as any).permission;
 
     if (previousNotificationsPermission === "denied") {
@@ -126,7 +125,7 @@ export class Preferences {
     }
   }
 
-  soundsChanged() {
+  soundsEnabledChanged() {
     Actions.updatePreferences(this.soundsEnabled, this.highPriorityListEnabled);
 
     if (this.soundsEnabled) {
@@ -134,7 +133,7 @@ export class Preferences {
     }
   }
 
-  showHighPriorityListChanged() {
+  highPriorityListEnabledChanged() {
     Actions.updatePreferences(this.soundsEnabled, this.highPriorityListEnabled);
 
     Actions.getLists(this.listsService, this.i18n.tr("highPriority"));

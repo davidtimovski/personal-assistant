@@ -78,7 +78,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
         public bool Exists(IEnumerable<string> names, int listId, int userId)
         {
-            var upperCaseNames = names.Select(name => name.ToUpperInvariant()).ToList();
+            var upperCaseNames = names.Select(name => name.Trim().ToUpperInvariant()).ToList();
             return _tasksRepository.Exists(upperCaseNames, listId, userId);
         }
 

@@ -14,7 +14,7 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models
 
         public bool Notify()
         {
-            return CreatedTasks.Any() && NotificationRecipients.Any();
+            return NotificationRecipients.Any() && CreatedTasks.Any();
         }
     }
 
