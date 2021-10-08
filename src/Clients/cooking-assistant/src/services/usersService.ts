@@ -7,9 +7,7 @@ export class UsersService extends UsersServiceBase {
 
   async getPreferences(): Promise<PreferencesModel> {
     if (!this.preferences) {
-      this.preferences = await this.ajax<PreferencesModel>(
-        "users/cooking-preferences"
-      );
+      this.preferences = await this.ajax<PreferencesModel>("users/cooking-preferences");
     }
 
     return this.preferences;
@@ -30,7 +28,7 @@ export class UsersService extends UsersServiceBase {
     await this.ajaxExecute("users/imperial-system", {
       method: "put",
       body: json({
-        cookingNotificationsEnabled: imperialSystem,
+        imperialSystem: imperialSystem,
       }),
     });
 

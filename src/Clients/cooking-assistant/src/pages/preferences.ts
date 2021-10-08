@@ -1,4 +1,4 @@
-import { inject } from "aurelia-framework";
+import { inject, observable } from "aurelia-framework";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
@@ -14,9 +14,11 @@ export class Preferences {
     "BIWWy4ZjIrLMVBxYwsq4rlixA3miMGeMw0yCqldR5Cpv5mozBw1oQxEbbp5q1I9SL9_zUjaLfYheoqb578becPY";
   private preferences: PreferencesModel;
   private notificationsState: string;
-  private notificationsCheckboxChecked = false;
   private readonly notificationIconSrc = "/images/icons/app-icon-96x96.png";
   private notificationsAreSupported = false;
+
+  @observable() private notificationsCheckboxChecked = false;
+  @observable() private imperialSystem;
 
   constructor(
     private readonly usersService: UsersService,
@@ -27,15 +29,14 @@ export class Preferences {
 
   async activate() {
     this.preferences = await this.usersService.getPreferences();
+    this.imperialSystem = this.preferences.imperialSystem;
 
     if ("Notification" in window) {
       this.notificationsAreSupported = true;
 
       switch ((Notification as any).permission) {
         case "granted":
-          this.notificationsState = this.preferences.notificationsEnabled
-            ? "checked"
-            : "unchecked";
+          this.notificationsState = this.preferences.notificationsEnabled ? "checked" : "unchecked";
           if (this.preferences.notificationsEnabled) {
             this.notificationsCheckboxChecked = true;
           }
@@ -49,14 +50,15 @@ export class Preferences {
     }
   }
 
-  async notificationsChanged() {
+  async notificationsCheckboxCheckedChanged() {
+    if (!this.preferences) {
+      return;
+    }
+
     const previousNotificationsPermission = (Notification as any).permission;
 
     if (previousNotificationsPermission === "denied") {
-      this.eventAggregator.publish(
-        AlertEvents.ShowError,
-        "preferences.notificationsUnpermitted"
-      );
+      this.eventAggregator.publish(AlertEvents.ShowError, "preferences.notificationsUnpermitted");
     } else {
       await Notification.requestPermission(async (result) => {
         switch (result) {
@@ -64,11 +66,8 @@ export class Preferences {
             const previousNotificationState = this.notificationsState;
 
             if (previousNotificationsPermission === "granted") {
-              this.preferences.notificationsEnabled = !this.preferences
-                .notificationsEnabled;
-              this.notificationsState = this.preferences.notificationsEnabled
-                ? "checked"
-                : "unchecked";
+              this.preferences.notificationsEnabled = !this.preferences.notificationsEnabled;
+              this.notificationsState = this.preferences.notificationsEnabled ? "checked" : "unchecked";
             } else {
               this.preferences.notificationsEnabled = this.notificationsCheckboxChecked = true;
               this.notificationsState = "checked";
@@ -94,9 +93,7 @@ export class Preferences {
         }
       });
 
-      await this.usersService.updateNotificationsEnabled(
-        this.preferences.notificationsEnabled
-      );
+      await this.usersService.updateNotificationsEnabled(this.preferences.notificationsEnabled);
     }
   }
 
@@ -107,15 +104,10 @@ export class Preferences {
     if (sub === null) {
       const newSub = await swReg.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: NotificationsServiceBase.getApplicationServerKey(
-          this.notificationsVapidKey
-        ),
+        applicationServerKey: NotificationsServiceBase.getApplicationServerKey(this.notificationsVapidKey),
       });
 
-      await this.notificationsService.createSubscription(
-        "Cooking Assistant",
-        newSub
-      );
+      await this.notificationsService.createSubscription("Cooking Assistant", newSub);
 
       await swReg.showNotification("Cooking Assistant", {
         body: this.i18n.tr("preferences.notificationsWereEnabled"),
@@ -126,8 +118,10 @@ export class Preferences {
   }
 
   async imperialSystemChanged() {
-    await this.usersService.updateImperialSystem(
-      this.preferences.imperialSystem
-    );
+    if (!this.preferences) {
+      return;
+    }
+
+    await this.usersService.updateImperialSystem(this.imperialSystem);
   }
 }

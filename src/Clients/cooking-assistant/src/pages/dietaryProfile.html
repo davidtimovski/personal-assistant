@@ -1,6 +1,7 @@
 <template>
   <require from="../static/styles/pages/dietary-profile.scss"></require>
   <require from="./../resources/elements/tooltip"></require>
+  <require from="./../resources/elements/checkbox"></require>
 
   <div class="container">
     <div class="au-animate animate-fade-in animate-fade-out">
@@ -214,20 +215,8 @@
           <div if.bind="dietaryProfileIsSet" class="intake-body">
             <div class="intake-nutrient ${!model.dailyIntake.trackCalories ? 'not-tracked' : ''}">
               <div class="intake-nutrient-top-row">
-                <label class="toggle">
-                  <div class="toggle-content">
-                    <input type="checkbox" checked.bind="model.dailyIntake.trackCalories" />
-                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                      <path
-                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
-                    </svg>
-                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                      <path
-                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                        fill-rule="evenodd" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                </label>
+                <checkbox value.bind="model.dailyIntake.trackCalories"></checkbox>
+
                 <div class="intake-nutrient-data">
                   <span class="intake-nutrient-name" t="calories">Calories</span>
                   <span class.bind="model.dailyIntake.customCalories ? 'customized' : ''">${model.dailyIntake.calories}
@@ -246,20 +235,8 @@
 
             <div class="intake-nutrient ${!model.dailyIntake.trackSaturatedFat ? 'not-tracked' : ''}">
               <div class="intake-nutrient-top-row">
-                <label class="toggle">
-                  <div class="toggle-content">
-                    <input type="checkbox" checked.bind="model.dailyIntake.trackSaturatedFat" />
-                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                      <path
-                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
-                    </svg>
-                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                      <path
-                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                        fill-rule="evenodd" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                </label>
+                <checkbox value.bind="model.dailyIntake.trackSaturatedFat"></checkbox>
+
                 <div class="intake-nutrient-data">
                   <span class="intake-nutrient-name" t="saturatedFat">Saturated fat</span>
                   <span
@@ -279,20 +256,8 @@
 
             <div class="intake-nutrient ${!model.dailyIntake.trackCarbohydrate ? 'not-tracked' : ''}">
               <div class="intake-nutrient-top-row">
-                <label class="toggle">
-                  <div class="toggle-content">
-                    <input type="checkbox" checked.bind="model.dailyIntake.trackCarbohydrate" />
-                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                      <path
-                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
-                    </svg>
-                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                      <path
-                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                        fill-rule="evenodd" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                </label>
+                <checkbox value.bind="model.dailyIntake.trackCarbohydrate"></checkbox>
+
                 <div class="intake-nutrient-data">
                   <span class="intake-nutrient-name" t="carbohydrate">Carbohydrate</span>
                   <span
@@ -312,20 +277,8 @@
 
             <div class="intake-nutrient ${!model.dailyIntake.trackAddedSugars ? 'not-tracked' : ''}">
               <div class="intake-nutrient-top-row">
-                <label class="toggle">
-                  <div class="toggle-content">
-                    <input type="checkbox" checked.bind="model.dailyIntake.trackAddedSugars" />
-                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                      <path
-                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
-                    </svg>
-                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                      <path
-                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                        fill-rule="evenodd" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                </label>
+                <checkbox value.bind="model.dailyIntake.trackAddedSugars"></checkbox>
+
                 <div class="intake-nutrient-data">
                   <span class="intake-nutrient-name" t="addedSugars">Added sugars</span>
                   <span
@@ -345,20 +298,8 @@
 
             <div class="intake-nutrient ${!model.dailyIntake.trackFiber ? 'not-tracked' : ''}">
               <div class="intake-nutrient-top-row">
-                <label class="toggle">
-                  <div class="toggle-content">
-                    <input type="checkbox" checked.bind="model.dailyIntake.trackFiber" />
-                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                      <path
-                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
-                    </svg>
-                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                      <path
-                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                        fill-rule="evenodd" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                </label>
+                <checkbox value.bind="model.dailyIntake.trackFiber"></checkbox>
+
                 <div class="intake-nutrient-data">
                   <span class="intake-nutrient-name" t="fiber">Fiber</span>
                   <span class.bind="model.dailyIntake.customFiber ? 'customized' : ''">${model.dailyIntake.fiber}
@@ -377,20 +318,8 @@
 
             <div class="intake-nutrient ${!model.dailyIntake.trackProtein ? 'not-tracked' : ''}">
               <div class="intake-nutrient-top-row">
-                <label class="toggle">
-                  <div class="toggle-content">
-                    <input type="checkbox" checked.bind="model.dailyIntake.trackProtein" />
-                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                      <path
-                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
-                    </svg>
-                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                      <path
-                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                        fill-rule="evenodd" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                </label>
+                <checkbox value.bind="model.dailyIntake.trackProtein"></checkbox>
+
                 <div class="intake-nutrient-data">
                   <span class="intake-nutrient-name" t="protein">Protein</span>
                   <span class.bind="model.dailyIntake.customProtein ? 'customized' : ''">${model.dailyIntake.protein}
@@ -409,20 +338,8 @@
 
             <div class="intake-nutrient ${!model.dailyIntake.trackSodium ? 'not-tracked' : ''}">
               <div class="intake-nutrient-top-row">
-                <label class="toggle">
-                  <div class="toggle-content">
-                    <input type="checkbox" checked.bind="model.dailyIntake.trackSodium" />
-                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                      <path
-                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
-                    </svg>
-                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                      <path
-                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                        fill-rule="evenodd" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                </label>
+                <checkbox value.bind="model.dailyIntake.trackSodium"></checkbox>
+
                 <div class="intake-nutrient-data">
                   <span class="intake-nutrient-name" t="sodium">Sodium</span>
                   <span class.bind="model.dailyIntake.customSodium ? 'customized' : ''">${model.dailyIntake.sodium}
@@ -441,20 +358,8 @@
 
             <div class="intake-nutrient ${!model.dailyIntake.trackCholesterol ? 'not-tracked' : ''}">
               <div class="intake-nutrient-top-row">
-                <label class="toggle">
-                  <div class="toggle-content">
-                    <input type="checkbox" checked.bind="model.dailyIntake.trackCholesterol" />
-                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                      <path
-                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
-                    </svg>
-                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                      <path
-                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                        fill-rule="evenodd" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                </label>
+                <checkbox value.bind="model.dailyIntake.trackCholesterol"></checkbox>
+
                 <div class="intake-nutrient-data">
                   <span class="intake-nutrient-name" t="cholesterol">Cholesterol</span>
                   <span
@@ -474,20 +379,8 @@
 
             <div class="intake-nutrient ${!model.dailyIntake.trackVitaminA ? 'not-tracked' : ''}">
               <div class="intake-nutrient-top-row">
-                <label class="toggle">
-                  <div class="toggle-content">
-                    <input type="checkbox" checked.bind="model.dailyIntake.trackVitaminA" />
-                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                      <path
-                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
-                    </svg>
-                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                      <path
-                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                        fill-rule="evenodd" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                </label>
+                <checkbox value.bind="model.dailyIntake.trackVitaminA"></checkbox>
+
                 <div class="intake-nutrient-data">
                   <span class="intake-nutrient-name" t="vitaminA">Vitamin A</span>
                   <span class.bind="model.dailyIntake.customVitaminA ? 'customized' : ''">${model.dailyIntake.vitaminA}
@@ -506,20 +399,8 @@
 
             <div class="intake-nutrient ${!model.dailyIntake.trackVitaminC ? 'not-tracked' : ''}">
               <div class="intake-nutrient-top-row">
-                <label class="toggle">
-                  <div class="toggle-content">
-                    <input type="checkbox" checked.bind="model.dailyIntake.trackVitaminC" />
-                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                      <path
-                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
-                    </svg>
-                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                      <path
-                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                        fill-rule="evenodd" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                </label>
+                <checkbox value.bind="model.dailyIntake.trackVitaminC"></checkbox>
+
                 <div class="intake-nutrient-data">
                   <span class="intake-nutrient-name" t="vitaminC">Vitamin C</span>
                   <span class.bind="model.dailyIntake.customVitaminC ? 'customized' : ''">${model.dailyIntake.vitaminC}
@@ -538,20 +419,8 @@
 
             <div class="intake-nutrient ${!model.dailyIntake.trackVitaminD ? 'not-tracked' : ''}">
               <div class="intake-nutrient-top-row">
-                <label class="toggle">
-                  <div class="toggle-content">
-                    <input type="checkbox" checked.bind="model.dailyIntake.trackVitaminD" />
-                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                      <path
-                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
-                    </svg>
-                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                      <path
-                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                        fill-rule="evenodd" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                </label>
+                <checkbox value.bind="model.dailyIntake.trackVitaminD"></checkbox>
+
                 <div class="intake-nutrient-data">
                   <span class="intake-nutrient-name" t="vitaminD">Vitamin D</span>
                   <span class.bind="model.dailyIntake.customVitaminD ? 'customized' : ''">${model.dailyIntake.vitaminD}
@@ -570,20 +439,8 @@
 
             <div class="intake-nutrient ${!model.dailyIntake.trackCalcium ? 'not-tracked' : ''}">
               <div class="intake-nutrient-top-row">
-                <label class="toggle">
-                  <div class="toggle-content">
-                    <input type="checkbox" checked.bind="model.dailyIntake.trackCalcium" />
-                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                      <path
-                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
-                    </svg>
-                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                      <path
-                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                        fill-rule="evenodd" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                </label>
+                <checkbox value.bind="model.dailyIntake.trackCalcium"></checkbox>
+
                 <div class="intake-nutrient-data">
                   <span class="intake-nutrient-name" t="calcium">Calcium</span>
                   <span class.bind="model.dailyIntake.customCalcium ? 'customized' : ''">${model.dailyIntake.calcium}
@@ -602,20 +459,8 @@
 
             <div class="intake-nutrient ${!model.dailyIntake.trackIron ? 'not-tracked' : ''}">
               <div class="intake-nutrient-top-row">
-                <label class="toggle">
-                  <div class="toggle-content">
-                    <input type="checkbox" checked.bind="model.dailyIntake.trackIron" />
-                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                      <path
-                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
-                    </svg>
-                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                      <path
-                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                        fill-rule="evenodd" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                </label>
+                <checkbox value.bind="model.dailyIntake.trackIron"></checkbox>
+
                 <div class="intake-nutrient-data">
                   <span class="intake-nutrient-name" t="iron">Iron</span>
                   <span class.bind="model.dailyIntake.customIron ? 'customized' : ''">${model.dailyIntake.iron}
@@ -634,20 +479,8 @@
 
             <div class="intake-nutrient ${!model.dailyIntake.trackPotassium ? 'not-tracked' : ''}">
               <div class="intake-nutrient-top-row">
-                <label class="toggle">
-                  <div class="toggle-content">
-                    <input type="checkbox" checked.bind="model.dailyIntake.trackPotassium" />
-                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                      <path
-                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
-                    </svg>
-                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                      <path
-                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                        fill-rule="evenodd" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                </label>
+                <checkbox value.bind="model.dailyIntake.trackPotassium"></checkbox>
+
                 <div class="intake-nutrient-data">
                   <span class="intake-nutrient-name" t="potassium">Potassium</span>
                   <span
@@ -667,20 +500,8 @@
 
             <div class="intake-nutrient ${!model.dailyIntake.trackMagnesium ? 'not-tracked' : ''}">
               <div class="intake-nutrient-top-row">
-                <label class="toggle">
-                  <div class="toggle-content">
-                    <input type="checkbox" checked.bind="model.dailyIntake.trackMagnesium" />
-                    <svg class="is-checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426.67 426.67">
-                      <path
-                        d="M153.504 366.84c-8.657 0-17.323-3.303-23.927-9.912L9.914 237.265c-13.218-13.218-13.218-34.645 0-47.863 13.218-13.218 34.645-13.218 47.863 0l95.727 95.727 215.39-215.387c13.218-13.214 34.65-13.218 47.86 0 13.22 13.218 13.22 34.65 0 47.863L177.435 356.928c-6.61 6.605-15.27 9.91-23.932 9.91z" />
-                    </svg>
-                    <svg class="is-unchecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212.982 212.982">
-                      <path
-                        d="M131.804 106.49l75.936-75.935c6.99-6.99 6.99-18.323 0-25.312-6.99-6.99-18.322-6.99-25.312 0L106.49 81.18 30.555 5.242c-6.99-6.99-18.322-6.99-25.312 0-6.99 6.99-6.99 18.323 0 25.312L81.18 106.49 5.24 182.427c-6.99 6.99-6.99 18.323 0 25.312 6.99 6.99 18.322 6.99 25.312 0L106.49 131.8l75.938 75.937c6.99 6.99 18.322 6.99 25.312 0 6.99-6.99 6.99-18.323 0-25.313l-75.936-75.936z"
-                        fill-rule="evenodd" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                </label>
+                <checkbox value.bind="model.dailyIntake.trackMagnesium"></checkbox>
+
                 <div class="intake-nutrient-data">
                   <span class="intake-nutrient-name" t="magnesium">Magnesium</span>
                   <span

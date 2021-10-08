@@ -53,8 +53,8 @@
   margin-bottom: 30px;
 
   input.searching {
-    width: calc(100% - 64px);
-    padding-right: 50px;
+    width: calc(100% - 70px);
+    padding-right: 56px;
   }
 
   .fa-times {
@@ -77,6 +77,7 @@
 
 @media screen and (min-width: $desktop-min) {
   .ingredients-search-wrap .fa-times {
-    padding: 12px 15px;
+    height: 47px;
+    width: 50px;
   }
 }

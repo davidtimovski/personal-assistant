@@ -1,6 +1,5 @@
 @import "normalize";
 @import "variables";
-@import "checkbox";
 @import "double-radio-wrap";
 @import "fontawesome-free-5.10.2/fontawesome";
 @import "fontawesome-free-5.10.2/regular";
@@ -893,7 +892,7 @@ a.button {
 .touch-device .side.inactive:hover {
   color: var(--faded-color);
 }
-.touch-device label.checkbox:hover {
+.touch-device .toggle-checkbox:hover {
   color: var(--regular-color);
 }
 .touch-device .profile-image:hover {
