@@ -1,5 +1,6 @@
 <template>
   <require from="../static/styles/pages/preferences.scss"></require>
+  <require from="./../resources/elements/currency-selector"></require>
   <require from="./../resources/elements/checkbox"></require>
 
   <div class="container">
@@ -18,17 +19,17 @@
 
         <form onsubmit="return false;">
           <div class="form-control">
-            <compose view-model="../resources/components/currency-selector"
-              view="../resources/components/currency-selector.html"></compose>
+            <currency-selector></currency-selector>
           </div>
+
           <div class="form-control-group">
             <div class="setting-descriptor" t="preferences.showOnDashboard">Show on dashboard</div>
             <div class="form-control">
-              <checkbox label-key.bind="'preferences.upcomingExpenses'" value.bind="showUpcomingExpensesOnDashboard">
+              <checkbox label-key="preferences.upcomingExpenses" value.bind="showUpcomingExpensesOnDashboard">
               </checkbox>
             </div>
             <div class="form-control">
-              <checkbox label-key.bind="'preferences.debt'" value.bind="showDebtOnDashboard"></checkbox>
+              <checkbox label-key="preferences.debt" value.bind="showDebtOnDashboard"></checkbox>
             </div>
           </div>
         </form>

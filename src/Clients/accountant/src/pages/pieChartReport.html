@@ -1,5 +1,6 @@
 <template>
   <require from="../static/styles/pages/pie-chart-report.scss"></require>
+  <require from="./../resources/elements/double-radio"></require>
   <require from="./../resources/value-converters/money-format"></require>
 
   <div class="container">
@@ -25,28 +26,9 @@
             <input type="date" id="to-date" value.bind="toDate" max="${maxDate}" change.delegate="loadData()" />
           </div>
           <div class="form-control">
-            <div class="double-radio-wrap">
-              <div class="double-radio-side">
-                <label class.bind="type === 1 ? 'selected' : ''">
-                  <span t="pieChartReport.expenses">Expenses</span>
-                  <input type="radio" name="expensesDepositsToggle" model.bind="1" checked.bind="type"
-                    change.delegate="loadData()" />
-                  <span class="checkbox-icon">
-                    <i class="fas fa-check"></i>
-                  </span>
-                </label>
-              </div>
-              <div class="double-radio-side">
-                <label class.bind="type === 2 ? 'selected' : ''">
-                  <span t="pieChartReport.deposits">Deposits</span>
-                  <input type="radio" name="expensesDepositsToggle" model.bind="2" checked.bind="type"
-                    change.delegate="loadData()" />
-                  <span class="checkbox-icon">
-                    <i class="fas fa-check"></i>
-                  </span>
-                </label>
-              </div>
-            </div>
+            <double-radio name="expensesDepositsToggle" left-label-key="pieChartReport.expenses"
+              right-label-key="pieChartReport.deposits" left-value.bind="1" right-value.bind="2" bind-to.bind="type">
+            </double-radio>
           </div>
         </form>
 

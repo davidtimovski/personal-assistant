@@ -21,10 +21,10 @@
               t="[placeholder,aria-label]bulkAddTasks.eachRow"></textarea>
           </div>
           <div class="form-control">
-            <checkbox label-key.bind="'deleteOnCompletion'" value.bind="model.tasksAreOneTime"></checkbox>
+            <checkbox label-key="deleteOnCompletion" value.bind="model.tasksAreOneTime"></checkbox>
           </div>
           <div if.bind="listIsShared" class="form-control">
-            <checkbox label-key.bind="'bulkAddTasks.tasksWillBePrivate'" value.bind="model.tasksArePrivate"></checkbox>
+            <checkbox label-key="bulkAddTasks.tasksWillBePrivate" value.bind="model.tasksArePrivate"></checkbox>
           </div>
         </form>
 

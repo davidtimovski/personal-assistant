@@ -1,6 +1,7 @@
 <template>
   <require from="./../resources/elements/checkbox"></require>
   <require from="./../resources/elements/double-radio"></require>
+  <require from="./../resources/elements/currency-selector"></require>
 
   <div class="container">
     <div class="au-animate animate-fade-in animate-fade-out">
@@ -15,6 +16,7 @@
       </div>
 
       <div class="content-wrap">
+
         <form onsubmit="return false;">
           <div if.bind="notificationsAreSupported" class="form-control">
             <div show.bind="notificationsState === 'denied'" class="setting-descriptor no-bottom-margin"
@@ -34,10 +36,8 @@
               bind-to.bind="imperialSystem"></double-radio>
           </div>
 
-          <div class="form-control">
-            <compose view-model="../resources/components/currency-selector"
-              view="../resources/components/currency-selector.html"></compose>
-          </div>
+          <currency-selector></currency-selector>
+
         </form>
       </div>
     </div>

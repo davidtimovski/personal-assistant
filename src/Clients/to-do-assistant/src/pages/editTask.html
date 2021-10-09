@@ -40,18 +40,18 @@
             </div>
 
             <div class="form-control">
-              <checkbox label-key.bind="'editTask.deleteWhenDone'" value.bind="model.isOneTime"></checkbox>
+              <checkbox label-key="editTask.deleteWhenDone" value.bind="model.isOneTime"></checkbox>
             </div>
 
             <div class="form-control">
-              <checkbox label-key.bind="'editTask.highPriority'" value.bind="model.isHighPriority"></checkbox>
+              <checkbox label-key="editTask.highPriority" value.bind="model.isHighPriority"></checkbox>
             </div>
 
             <div if.bind="model.isInSharedList">
               <div class="form-control">
-                <checkbox label-key.bind="'editTask.taskIsPrivate'" value.bind="model.isPrivate"></checkbox>
+                <checkbox label-key="editTask.taskIsPrivate" value.bind="model.isPrivate"></checkbox>
 
-                <tooltip key.bind="privateTasksTooltipKey"></tooltip>
+                <tooltip key="privateTasks"></tooltip>
               </div>
 
               <div class="assign-to-user ${assignToUserIsVisible ? 'visible' : ''}">

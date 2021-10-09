@@ -33,7 +33,6 @@ export class EditTransaction {
   private categoryOptions: Array<SelectOption>;
   private originalTransactionJson: string;
   private readonly maxDate: string;
-  private readonly encryptedDescriptionTooltipKey = "encryptedDescription";
   private decPasswordInput: HTMLInputElement;
   private decPasswordShown = false;
   private encPasswordInput: HTMLInputElement;

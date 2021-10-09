@@ -1,11 +1,12 @@
 import { inject } from "aurelia-framework";
+import autocomplete, { AutocompleteResult } from "autocompleter";
+
 import { CurrenciesService } from "../../../../shared/src/services/currenciesService";
 import { LocalStorageCurrencies } from "../../../../shared/src/utils/localStorageCurrencies";
-import autocomplete, { AutocompleteResult } from "autocompleter";
 import { CurrencySuggestion } from "../../../../shared/src/models/viewmodels/currencySuggestion";
 
 @inject(CurrenciesService, LocalStorageCurrencies)
-export class CurrencySelector {
+export class CurrencySelectorCustomElement {
   private currency: string;
   private currencySuggestions: Array<CurrencySuggestion>;
   private changing = false;
@@ -15,14 +16,13 @@ export class CurrencySelector {
   constructor(
     private readonly currenciesService: CurrenciesService,
     private readonly localStorage: LocalStorageCurrencies
-  ) {}
-
-  activate() {
+  ) {
     this.currency = this.localStorage.getCurrency();
   }
 
   attached() {
     const currencies = this.currenciesService.getCurrencies();
+
     this.currencySuggestions = currencies.map((currency: string) => {
       return new CurrencySuggestion(currency, currency, null);
     });
@@ -31,9 +31,7 @@ export class CurrencySelector {
       input: this.selectCurrencyInput,
       minLength: 1,
       fetch: (text: string, update: (items: CurrencySuggestion[]) => void) => {
-        const suggestions = this.currencySuggestions.filter((i) =>
-          i.name.toUpperCase().startsWith(text.toUpperCase())
-        );
+        const suggestions = this.currencySuggestions.filter((i) => i.name.toUpperCase().startsWith(text.toUpperCase()));
         update(suggestions);
       },
       onSelect: (suggestion: CurrencySuggestion) => {

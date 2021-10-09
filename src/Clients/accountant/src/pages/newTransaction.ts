@@ -39,7 +39,6 @@ export class NewTransaction {
   private categoryOptions: Array<SelectOption>;
   private originalTransactionJson: string;
   private readonly maxDate: string;
-  private readonly encryptedDescriptionTooltipKey = "encryptedDescription";
   private passwordInput: HTMLInputElement;
   private passwordShown = false;
   private amountIsInvalid: boolean;

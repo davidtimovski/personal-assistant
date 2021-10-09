@@ -16,7 +16,7 @@ import { EditDebtModel } from "models/viewmodels/editDebtModel";
 @inject(Router, DebtsService, LocalStorage, ValidationController, I18N, EventAggregator, ConnectionTracker)
 export class EditDebt {
   private debtId: number;
-  private model: EditDebtModel;
+  private model = new EditDebtModel(null, null, null, null, null, false, null, false);
   private originalDebtJson: string;
   private isNewDebt: boolean;
   private personInput: HTMLInputElement;
@@ -51,9 +51,7 @@ export class EditDebt {
     this.isNewDebt = this.debtId === 0;
 
     if (this.isNewDebt) {
-      const currency = this.localStorage.getCurrency();
-
-      this.model = new EditDebtModel(null, null, null, currency, null, false, null, false);
+      this.model.currency = this.localStorage.getCurrency();
 
       this.saveButtonText = this.i18n.tr("create");
 

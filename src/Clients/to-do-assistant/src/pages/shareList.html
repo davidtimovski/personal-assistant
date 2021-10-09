@@ -1,5 +1,6 @@
 <template>
   <require from="../static/styles/pages/share-list.scss"></require>
+  <require from="./../resources/elements/double-radio"></require>
   <require from="./../resources/elements/tooltip"></require>
 
   <div class="container">
@@ -35,30 +36,11 @@
             </div>
           </div>
           <div class="form-control">
-            <div class="double-radio-wrap permissions">
-              <div class="double-radio-side">
-                <label class="${!selectedShare.isAdmin ? 'selected' : ''}">
-                  <span t="shareList.member">Member</span>
-                  <input type="radio" name="permissionsToggle" model.bind="false" checked.bind="selectedShare.isAdmin"
-                    change.delegate="permissionsToggleChanged()" />
-                  <span class="checkbox-icon">
-                    <i class="fas fa-user"></i>
-                  </span>
-                </label>
-              </div>
-              <div class="double-radio-side">
-                <label class="${selectedShare.isAdmin ? 'selected' : ''}">
-                  <span t="shareList.admin">Admin</span>
-                  <input type="radio" name="permissionsToggle" model.bind="true" checked.bind="selectedShare.isAdmin"
-                    change.delegate="permissionsToggleChanged()" />
-                  <span class="checkbox-icon">
-                    <i class="fas fa-user-tie"></i>
-                  </span>
-                </label>
-              </div>
-            </div>
+            <double-radio name="permissionsToggle" left-label-key="shareList.member" right-label-key="shareList.admin"
+              left-value.bind="false" right-value.bind="true" bind-to.bind="selectedShare.isAdmin">
+            </double-radio>
 
-            <tooltip key.bind="memberVsAdminTooltipKey"></tooltip>
+            <tooltip key="memberVsAdmin"></tooltip>
           </div>
         </form>
 

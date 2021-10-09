@@ -118,7 +118,7 @@ export class Preferences {
   }
 
   async imperialSystemChanged() {
-    if (!this.preferences) {
+    if (!this.preferences || this.preferences.imperialSystem === this.imperialSystem) {
       return;
     }
 

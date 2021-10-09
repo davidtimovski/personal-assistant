@@ -1,4 +1,4 @@
-import { inject } from "aurelia-framework";
+import { inject, observable } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 import { ArcElement, Chart, PieController } from "chart.js";
@@ -27,9 +27,11 @@ export class PieChartReport {
   private fromDate: string;
   private toDate: string;
   private readonly maxDate: string;
-  private type = TransactionType.Expense;
   private readonly colors = ["#7a79e6", "#dbd829", "#49e09b", "#e88042", "#5aacf1", "#f55551", "#b6ca53"];
   private showTable = false;
+
+  @observable({ changeHandler: "loadData" })
+  private type = TransactionType.Expense;
 
   constructor(
     private readonly router: Router,
@@ -78,6 +80,10 @@ export class PieChartReport {
   }
 
   async loadData() {
+    if (!this.chart) {
+      return;
+    }
+
     this.showTable = false;
     this.chart.data.labels = [];
     this.chart.data.datasets[0].data = [];

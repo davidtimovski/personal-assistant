@@ -1,5 +1,6 @@
 <template>
   <require from="./../resources/elements/amount-input"></require>
+  <require from="./../resources/elements/double-radio"></require>
 
   <div class="container">
     <div class="au-animate animate-fade-in animate-fade-out">
@@ -44,56 +45,40 @@
             <div class="form-control with-descriptor">
               <div class="setting-descriptor" t="editDebt.iAmThe">I am a..</div>
 
-              <div class="double-radio-wrap">
-                <div class="double-radio-side">
-                  <label class.bind="!model.userIsDebtor ? 'selected' : ''">
-                    <span t="editDebt.lender">Lender</span>
-                    <input type="radio" name="debtorLenderToggle" model.bind="false" checked.bind="model.userIsDebtor">
-                    <span class="checkbox-icon">
-                      <i class="fas fa-check"></i>
-                    </span>
-                  </label>
-                </div>
-                <div class="double-radio-side">
-                  <label class.bind="model.userIsDebtor ? 'selected' : ''">
-                    <span t="editDebt.debtor">Debtor</span>
-                    <input type="radio" name="debtorLenderToggle" model.bind="true" checked.bind="model.userIsDebtor">
-                    <span class="checkbox-icon">
-                      <i class="fas fa-check"></i>
-                    </span>
-                  </label>
-                </div>
-              </div>
+              <double-radio name="debtorLenderToggle" left-label-key="editDebt.lender" right-label-key="editDebt.debtor"
+                left-value.bind="false" right-value.bind="true" bind-to.bind="model.userIsDebtor">
+              </double-radio>
             </div>
-            <div class="form-control">
-              <textarea value.bind="model.description" maxlength="250" class="description-textarea"
-                t="[placeholder,aria-label]description"></textarea>
-            </div>
-          </form>
-
-          <hr>
-
-          <div class="save-delete-wrap">
-            <a if.bind="!deleteInProgress" click.delegate="save()"
-              class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
-              <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
-                <i class="fas fa-circle-notch fa-spin"></i>
-              </span>
-              <span>${saveButtonText}</span>
-            </a>
-            <a if.bind="!isNewDebt" click.delegate="delete()"
-              class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}">
-              <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
-                <i class="fas fa-circle-notch fa-spin"></i>
-              </span>
-              <span>${deleteButtonText}</span>
-            </a>
-            <button type="button" if.bind="isNewDebt || deleteInProgress" click.delegate="cancel()" t="cancel"
-              class="button secondary-button">Cancel</button>
-          </div>
         </div>
+        <div class="form-control">
+          <textarea value.bind="model.description" maxlength="250" class="description-textarea"
+            t="[placeholder,aria-label]description"></textarea>
+        </div>
+        </form>
 
+        <hr>
+
+        <div class="save-delete-wrap">
+          <a if.bind="!deleteInProgress" click.delegate="save()"
+            class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
+            <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
+              <i class="fas fa-circle-notch fa-spin"></i>
+            </span>
+            <span>${saveButtonText}</span>
+          </a>
+          <a if.bind="!isNewDebt" click.delegate="delete()"
+            class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}">
+            <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
+              <i class="fas fa-circle-notch fa-spin"></i>
+            </span>
+            <span>${deleteButtonText}</span>
+          </a>
+          <button type="button" if.bind="isNewDebt || deleteInProgress" click.delegate="cancel()" t="cancel"
+            class="button secondary-button">Cancel</button>
+        </div>
       </div>
+
     </div>
+  </div>
   </div>
 </template>

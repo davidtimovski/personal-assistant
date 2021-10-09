@@ -22,7 +22,7 @@
         </div>
 
         <div else class="share-requests-wrap">
-          <tooltip if.bind="pendingShareRequests.length > 0" key.bind="shareRequestsTooltipKey"></tooltip>
+          <tooltip if.bind="pendingShareRequests.length > 0" key="shareRequests"></tooltip>
           <div repeat.for="request of pendingShareRequests" class="share-request">
             <a if.bind="!request.leftSideIsLoading" click.delegate="decline(request)" class="action"
               t="[title,aria-label]shareRequests.decline">
@@ -45,8 +45,7 @@
             </span>
           </div>
 
-          <empty-list-message if.bind="pendingShareRequests.length === 0"
-            message-key.bind="'shareRequests.emptyListMessage'">
+          <empty-list-message if.bind="pendingShareRequests.length === 0" message-key="shareRequests.emptyListMessage">
           </empty-list-message>
         </div>
 

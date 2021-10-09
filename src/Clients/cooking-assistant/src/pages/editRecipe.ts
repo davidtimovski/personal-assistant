@@ -1,11 +1,6 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import {
-  ValidationController,
-  validateTrigger,
-  ValidationRules,
-  ControllerValidateResult,
-} from "aurelia-validation";
+import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 import autocomplete, { AutocompleteResult } from "autocompleter";
@@ -23,15 +18,7 @@ import { EditRecipeModel } from "models/viewmodels/editRecipeModel";
 import { EditRecipeIngredient } from "models/viewmodels/editRecipeIngredient";
 import * as Actions from "utils/state/actions";
 
-@inject(
-  Router,
-  RecipesService,
-  IngredientsService,
-  UsersService,
-  ValidationController,
-  I18N,
-  EventAggregator
-)
+@inject(Router, RecipesService, IngredientsService, UsersService, ValidationController, I18N, EventAggregator)
 export class EditRecipe {
   private model: EditRecipeModel;
   private originalRecipeJson: string;
@@ -57,7 +44,6 @@ export class EditRecipe {
   private leaveButtonIsLoading = false;
   private videoIFrame: HTMLIFrameElement;
   private videoIFrameSrc = "";
-  private readonly ingredientFromTaskTooltipKey = "ingredientFromTask";
   private ingredientIdsToRemove = new Array<number>();
   private autocomplete: AutocompleteResult;
   private suggestions = new Array<IngredientSuggestion>();
@@ -103,9 +89,7 @@ export class EditRecipe {
       this.originalRecipeJson = JSON.stringify(this.model);
 
       if (this.model.videoUrl) {
-        this.videoIFrameSrc = this.recipesService.videoUrlToEmbedSrc(
-          this.model.videoUrl
-        );
+        this.videoIFrameSrc = this.recipesService.videoUrlToEmbedSrc(this.model.videoUrl);
       }
 
       if (this.model.prepDuration) {
@@ -149,9 +133,7 @@ export class EditRecipe {
     }
 
     try {
-      this.videoIFrameSrc = this.recipesService.videoUrlToEmbedSrc(
-        this.model.videoUrl
-      );
+      this.videoIFrameSrc = this.recipesService.videoUrlToEmbedSrc(this.model.videoUrl);
 
       // Hack for back button iframe issue
       this.videoIFrame.contentWindow.location.replace(this.videoIFrameSrc);
@@ -171,13 +153,8 @@ export class EditRecipe {
     this.autocomplete = autocomplete({
       input: this.addIngredientsInput,
       minLength: 2,
-      fetch: (
-        text: string,
-        update: (items: IngredientSuggestion[]) => void
-      ) => {
-        const suggestions = ingredientSuggestions.filter((i) =>
-          i.name.toUpperCase().startsWith(text.toUpperCase())
-        );
+      fetch: (text: string, update: (items: IngredientSuggestion[]) => void) => {
+        const suggestions = ingredientSuggestions.filter((i) => i.name.toUpperCase().startsWith(text.toUpperCase()));
         update(suggestions);
       },
       onSelect: (suggestion: IngredientSuggestion) => {
@@ -215,9 +192,7 @@ export class EditRecipe {
           );
         }
 
-        this.suggestions = this.suggestions.filter(
-          (x) => x.id !== suggestion.id
-        );
+        this.suggestions = this.suggestions.filter((x) => x.id !== suggestion.id);
         this.taskSuggestions = this.taskSuggestions.filter(
           (x) => x.taskId !== suggestion.taskId && x.id !== suggestion.id
         );
@@ -292,10 +267,7 @@ export class EditRecipe {
   )
   get canSave(): boolean {
     if (this.isNewRecipe) {
-      return (
-        !ValidationUtil.isEmptyOrWhitespace(this.model.name) &&
-        !this.videoUrlIsInvalid
-      );
+      return !ValidationUtil.isEmptyOrWhitespace(this.model.name) && !this.videoUrlIsInvalid;
     }
 
     return (
@@ -314,18 +286,13 @@ export class EditRecipe {
     this.autocomplete.destroy();
     this.ingredientNameIsInvalid = false;
 
-    this.ingredientSuggestionsComeFromTasks = !this
-      .ingredientSuggestionsComeFromTasks;
+    this.ingredientSuggestionsComeFromTasks = !this.ingredientSuggestionsComeFromTasks;
 
     if (this.ingredientSuggestionsComeFromTasks) {
-      this.addIngredientsInputPlaceholder = this.i18n.tr(
-        "editRecipe.ingredientFromTask"
-      );
+      this.addIngredientsInputPlaceholder = this.i18n.tr("editRecipe.ingredientFromTask");
       this.attachAutocomplete(this.taskSuggestions);
     } else {
-      this.addIngredientsInputPlaceholder = this.i18n.tr(
-        "editRecipe.ingredient"
-      );
+      this.addIngredientsInputPlaceholder = this.i18n.tr("editRecipe.ingredient");
       this.attachAutocomplete(this.suggestions);
     }
 
@@ -333,24 +300,12 @@ export class EditRecipe {
   }
 
   addNewIngredient() {
-    this.ingredientNameIsInvalid = ValidationUtil.isEmptyOrWhitespace(
-      this.ingredientName
-    );
+    this.ingredientNameIsInvalid = ValidationUtil.isEmptyOrWhitespace(this.ingredientName);
     if (!this.ingredientNameIsInvalid) {
       if (this.existsInIngredients(this.ingredientName)) {
         this.ingredientNameIsInvalid = true;
       } else {
-        this.model.ingredients.push(
-          new EditRecipeIngredient(
-            null,
-            null,
-            null,
-            this.ingredientName,
-            null,
-            null,
-            false
-          )
-        );
+        this.model.ingredients.push(new EditRecipeIngredient(null, null, null, this.ingredientName, null, null, false));
         this.ingredientName = "";
       }
     }
@@ -358,9 +313,7 @@ export class EditRecipe {
 
   existsInIngredients(ingredientName: string): boolean {
     const duplicates = this.model.ingredients.filter((i) => {
-      return (
-        i.name.trim().toUpperCase() === ingredientName.trim().toUpperCase()
-      );
+      return i.name.trim().toUpperCase() === ingredientName.trim().toUpperCase();
     });
     return duplicates.length > 0;
   }
@@ -368,9 +321,7 @@ export class EditRecipe {
   toggleUnit(ingredient: EditRecipeIngredient) {
     const index = this.measuringUnits.indexOf(ingredient.unit);
     ingredient.unit =
-      index === this.measuringUnits.length - 1
-        ? this.measuringUnits[0]
-        : this.measuringUnits[index + 1];
+      index === this.measuringUnits.length - 1 ? this.measuringUnits[0] : this.measuringUnits[index + 1];
 
     // Hack to activate the this.canSave() getter
     if (this.model.instructions) {
@@ -386,10 +337,7 @@ export class EditRecipe {
     if (ingredient.id) {
       this.ingredientIdsToRemove.push(ingredient.id);
     }
-    this.model.ingredients.splice(
-      this.model.ingredients.indexOf(ingredient),
-      1
-    );
+    this.model.ingredients.splice(this.model.ingredients.indexOf(ingredient), 1);
 
     const ingredientSuggestion = new IngredientSuggestion(
       ingredient.id,
@@ -413,17 +361,13 @@ export class EditRecipe {
 
   @computedFrom("model.imageUri")
   get imageIsNotDefault(): boolean {
-    return (
-      this.model.imageUri !== JSON.parse(<any>environment).defaultRecipeImageUri
-    );
+    return this.model.imageUri !== JSON.parse(<any>environment).defaultRecipeImageUri;
   }
 
   async uploadImage() {
     this.imageIsUploading = true;
     try {
-      const data = await this.recipesService.uploadTempImage(
-        this.imageInput.files[0]
-      );
+      const data = await this.recipesService.uploadTempImage(this.imageInput.files[0]);
       this.model.imageUri = data.tempImageUri;
     } catch (e) {
       this.saveButtonIsLoading = false;
@@ -450,10 +394,7 @@ export class EditRecipe {
     if (result.valid) {
       if (!this.isNewRecipe) {
         try {
-          await this.recipesService.update(
-            this.model,
-            this.ingredientIdsToRemove
-          );
+          await this.recipesService.update(this.model, this.ingredientIdsToRemove);
 
           this.nameIsInvalid = false;
 
@@ -510,10 +451,7 @@ export class EditRecipe {
 
       Actions.deleteRecipe(this.model.id);
 
-      this.eventAggregator.publish(
-        AlertEvents.ShowSuccess,
-        "editRecipe.deleteSuccessful"
-      );
+      this.eventAggregator.publish(AlertEvents.ShowSuccess, "editRecipe.deleteSuccessful");
       this.router.navigateToRoute("recipes");
     } else {
       this.deleteButtonText = this.i18n.tr("sure");
@@ -533,10 +471,7 @@ export class EditRecipe {
 
       await Actions.getRecipes(this.recipesService);
 
-      this.eventAggregator.publish(
-        AlertEvents.ShowSuccess,
-        "editRecipe.youHaveLeftTheRecipe"
-      );
+      this.eventAggregator.publish(AlertEvents.ShowSuccess, "editRecipe.youHaveLeftTheRecipe");
 
       this.router.navigateToRoute("recipes");
     } else {
@@ -568,16 +503,13 @@ export class EditRecipe {
       const imperialUnits = ["oz", "cup"];
 
       if (preferences.imperialSystem) {
-        const hasMetricUnitIngredients =
-          this.model.ingredients.filter((x) => metricUnits.includes(x.unit))
-            .length > 0;
+        const hasMetricUnitIngredients = this.model.ingredients.filter((x) => metricUnits.includes(x.unit)).length > 0;
         if (hasMetricUnitIngredients) {
           measuringUnits.push(...metricUnits);
         }
       } else {
         const hasImperialUnitIngredients =
-          this.model.ingredients.filter((x) => imperialUnits.includes(x.unit))
-            .length > 0;
+          this.model.ingredients.filter((x) => imperialUnits.includes(x.unit)).length > 0;
         if (hasImperialUnitIngredients) {
           measuringUnits.push(...imperialUnits);
         }

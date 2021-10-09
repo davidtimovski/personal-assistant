@@ -21,16 +21,16 @@
               You must first give notifications permission to the app.
             </div>
 
-            <checkbox label-key.bind="'preferences.notifications'" value.bind="notificationsCheckboxChecked"
+            <checkbox label-key="preferences.notifications" value.bind="notificationsCheckboxChecked"
               disabled.bind="notificationsState === 'denied'"></checkbox>
           </div>
 
           <div class="form-control">
-            <checkbox label-key.bind="'preferences.sounds'" value.bind="soundsEnabled"></checkbox>
+            <checkbox label-key="preferences.sounds" value.bind="soundsEnabled"></checkbox>
           </div>
 
           <div class="form-control">
-            <checkbox label-key.bind="'preferences.showHighPriorityList'" value.bind="highPriorityListEnabled">
+            <checkbox label-key="preferences.showHighPriorityList" value.bind="highPriorityListEnabled">
             </checkbox>
           </div>
         </form>

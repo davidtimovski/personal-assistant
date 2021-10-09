@@ -17,7 +17,7 @@
 
       <div class="content-wrap">
         <div class="send-requests-wrap">
-          <tooltip if.bind="pendingReceivedRecipes.length > 0" key.bind="receivedRecipesTooltipKey"></tooltip>
+          <tooltip if.bind="pendingReceivedRecipes.length > 0" key="receivedRecipes"></tooltip>
 
           <div repeat.for="receivedRecipe of pendingReceivedRecipes" class="send-request">
             <a if.bind="!receivedRecipe.leftSideIsLoading" click.delegate="decline(receivedRecipe)" class="action"
@@ -41,7 +41,7 @@
             </span>
           </div>
 
-          <empty-list-message if.bind="pendingReceivedRecipes.length === 0" message-key.bind="'inbox.emptyListMessage'">
+          <empty-list-message if.bind="pendingReceivedRecipes.length === 0" message-key="inbox.emptyListMessage">
           </empty-list-message>
         </div>
 

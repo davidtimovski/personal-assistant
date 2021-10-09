@@ -1,0 +1,24 @@
+<template bindable="name, leftLabelKey, rightLabelKey, leftValue, rightValue, bindTo">
+  <require from="./double-radio.scss"></require>
+
+  <div class="double-radio-wrap">
+    <div class="double-radio-side">
+      <label class.bind="bindTo === leftValue ? 'selected' : ''">
+        <span t="${leftLabelKey}"></span>
+        <input type="radio" name="${name}" model.bind="leftValue" checked.bind="bindTo" />
+        <span class="checkbox-icon">
+          <i class="fas fa-check"></i>
+        </span>
+      </label>
+    </div>
+    <div class="double-radio-side">
+      <label class.bind="bindTo === rightValue ? 'selected' : ''">
+        <span t="${rightLabelKey}"></span>
+        <input type="radio" name="${name}" model.bind="rightValue" checked.bind="bindTo" />
+        <span class="checkbox-icon">
+          <i class="fas fa-check"></i>
+        </span>
+      </label>
+    </div>
+  </div>
+</template>

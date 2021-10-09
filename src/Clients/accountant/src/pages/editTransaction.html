@@ -84,11 +84,11 @@
                 <textarea value.bind="model.description" maxlength="500" class="description-textarea"
                   t="[placeholder,aria-label]description"></textarea>
 
-                <checkbox label-key.bind="'editTransaction.encryptDescription'" value.bind="model.encrypt"
+                <checkbox label-key="editTransaction.encryptDescription" value.bind="model.encrypt"
                   disabled.bind="!canEncrypt"></checkbox>
 
                 <div if.bind="model.encrypt">
-                  <tooltip key.bind="encryptedDescriptionTooltipKey"></tooltip>
+                  <tooltip key="encryptedDescription"></tooltip>
                   <div class="viewable-password">
                     <input type="password" value.bind="model.encryptionPassword & validate" ref="encPasswordInput"
                       disabled.bind="!model.encrypt" maxlength="100"

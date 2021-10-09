@@ -9,7 +9,6 @@ import * as Actions from "utils/state/actions";
 export class ShareRequests {
   private pendingShareRequests: Array<ShareRequest>;
   private declinedShareRequests: Array<ShareRequest>;
-  private shareRequestsTooltipKey = "shareRequests";
 
   constructor(private readonly router: Router, private readonly recipesService: RecipesService) {}
 

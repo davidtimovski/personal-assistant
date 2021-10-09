@@ -7,7 +7,6 @@ import { ReceivedRecipe } from "models/viewmodels/receivedRecipe";
 export class Inbox {
   private pendingReceivedRecipes: Array<ReceivedRecipe>;
   private declinedReceivedRecipes: Array<ReceivedRecipe>;
-  private receivedRecipesTooltipKey = "receivedRecipes";
 
   constructor(private readonly router: Router, private readonly recipesService: RecipesService) {}
 

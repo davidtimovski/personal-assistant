@@ -29,7 +29,6 @@ export class EditTask {
   private deleteButtonText: string;
   private saveButtonIsLoading = false;
   private deleteButtonIsLoading = false;
-  private privateTasksTooltipKey = "privateTasks";
 
   constructor(
     private readonly router: Router,

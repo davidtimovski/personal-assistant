@@ -13,7 +13,6 @@ import * as Actions from "utils/state/actions";
 export class ReviewIngredients {
   private model: ReviewIngredientsModel;
   private reviewing = false;
-  private reviewIngredientsTooltipKey = "reviewIngredients";
   private introductoryLabel: string;
   private currentIngredient: ReviewIngredient;
   private pickExistingIngredientInput: HTMLInputElement;
@@ -48,13 +47,8 @@ export class ReviewIngredients {
     autocomplete({
       input: this.pickExistingIngredientInput,
       minLength: 1,
-      fetch: (
-        text: string,
-        update: (items: IngredientReviewSuggestion[]) => void
-      ) => {
-        const suggestions = ingredientSuggestions.filter((i) =>
-          i.name.toUpperCase().startsWith(text.toUpperCase())
-        );
+      fetch: (text: string, update: (items: IngredientReviewSuggestion[]) => void) => {
+        const suggestions = ingredientSuggestions.filter((i) => i.name.toUpperCase().startsWith(text.toUpperCase()));
         update(suggestions);
       },
       onSelect: (suggestion: IngredientReviewSuggestion) => {
@@ -77,14 +71,9 @@ export class ReviewIngredients {
 
   findCurrentSuggestion() {
     if (!this.currentIngredient.replacementId) {
-      this.currentSuggestion = this.model.ingredientSuggestions.find(
-        (suggestion: IngredientReviewSuggestion) => {
-          return (
-            suggestion.name.toUpperCase() ===
-            this.currentIngredient.name.toUpperCase()
-          );
-        }
-      );
+      this.currentSuggestion = this.model.ingredientSuggestions.find((suggestion: IngredientReviewSuggestion) => {
+        return suggestion.name.toUpperCase() === this.currentIngredient.name.toUpperCase();
+      });
     }
   }
 
@@ -93,8 +82,7 @@ export class ReviewIngredients {
     this.currentIngredient.replacementName = suggestion.name;
     this.currentIngredient.transferNutritionData =
       this.currentIngredient.hasNutritionData && !suggestion.hasNutritionData;
-    this.currentIngredient.transferPriceData =
-      this.currentIngredient.hasPriceData && !suggestion.hasPriceData;
+    this.currentIngredient.transferPriceData = this.currentIngredient.hasPriceData && !suggestion.hasPriceData;
     this.currentSuggestion = undefined;
   }
 
@@ -141,11 +129,7 @@ export class ReviewIngredients {
         );
       });
 
-    const recipeId = await this.recipesService.tryImport(
-      this.model.id,
-      ingredientReplacements,
-      false
-    );
+    const recipeId = await this.recipesService.tryImport(this.model.id, ingredientReplacements, false);
 
     await Actions.getRecipes(this.recipesService);
 

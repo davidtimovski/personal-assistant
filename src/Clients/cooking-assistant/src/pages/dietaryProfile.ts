@@ -32,7 +32,6 @@ export class DietaryProfile {
   private model: EditDietaryProfile;
   private originalDietaryProfileJson: string;
   private preferences: PreferencesModel;
-  private dietaryProfileTooltipKey = "dietaryProfile";
   private dietInitiallySet = false;
   private dietTabIsVisible = false;
   private dietChanged = false;
@@ -91,18 +90,7 @@ export class DietaryProfile {
       this.dietInitiallySet = true;
       this.dietTabIsVisible = true;
     } else {
-      this.model = new EditDietaryProfile(
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        new DailyIntake()
-      );
+      this.model = new EditDietaryProfile(null, null, null, null, null, null, null, null, null, new DailyIntake());
     }
 
     this.originalDietaryProfileJson = JSON.stringify(this.model);
@@ -110,13 +98,10 @@ export class DietaryProfile {
     this.preferences = await this.usersService.getPreferences();
 
     this.profileValidationController.validateTrigger = validateTrigger.manual;
-    this.dailyIntakeValidationController.validateTrigger =
-      validateTrigger.manual;
+    this.dailyIntakeValidationController.validateTrigger = validateTrigger.manual;
     this.resetButtonText = this.i18n.tr("dietaryProfile.reset");
 
-    const profileValidation = ValidationRules.ensure(
-      (x: EditDietaryProfile) => x.birthday
-    )
+    const profileValidation = ValidationRules.ensure((x: EditDietaryProfile) => x.birthday)
       .required()
       .withMessage(this.i18n.tr("dietaryProfile.birthdayRequired"))
       .ensure((x: EditDietaryProfile) => x.gender)
@@ -146,14 +131,9 @@ export class DietaryProfile {
         .required()
         .withMessage(this.i18n.tr("dietaryProfile.weightRequired"));
     }
-    this.profileValidationController.addObject(
-      this.model,
-      profileValidation.rules
-    );
+    this.profileValidationController.addObject(this.model, profileValidation.rules);
 
-    const dailyIntakeValidation = ValidationRules.ensure(
-      (x: DailyIntake) => x.customCalories
-    )
+    const dailyIntakeValidation = ValidationRules.ensure((x: DailyIntake) => x.customCalories)
       .between(299, 10000)
       .withMessage(this.i18n.tr("caloriesBetween", { from: 300, to: 9999 }))
       .ensure((x: DailyIntake) => x.customSaturatedFat)
@@ -198,10 +178,7 @@ export class DietaryProfile {
       .ensure((x: DailyIntake) => x.customMagnesium)
       .between(0, 4000)
       .withMessage(this.i18n.tr("magnesiumBetween", { from: 1, to: 3999 }));
-    this.dailyIntakeValidationController.addObject(
-      this.model.dailyIntake,
-      dailyIntakeValidation.rules
-    );
+    this.dailyIntakeValidationController.addObject(this.model.dailyIntake, dailyIntakeValidation.rules);
   }
 
   viewProfileTab() {
@@ -219,9 +196,7 @@ export class DietaryProfile {
     if (result.valid) {
       this.getRecommendedIntakeInProgress = true;
 
-      const recommended = await this.dietaryProfileService.getDailyIntake(
-        this.model
-      );
+      const recommended = await this.dietaryProfileService.getDailyIntake(this.model);
 
       this.model.dailyIntake.calories = recommended.calories;
       //this.dietaryProfile.dailyIntake.fat = recommended.fat;
@@ -276,11 +251,7 @@ export class DietaryProfile {
     "model.goal"
   )
   get dietaryProfileIsSet() {
-    let valid =
-      !!this.model.birthday &&
-      !!this.model.gender &&
-      !!this.model.activityLevel &&
-      !!this.model.goal;
+    let valid = !!this.model.birthday && !!this.model.gender && !!this.model.activityLevel && !!this.model.goal;
 
     if (this.preferences.imperialSystem) {
       valid = valid && !!this.model.heightFeet && !!this.model.weightLbs;
@@ -333,11 +304,7 @@ export class DietaryProfile {
     "model.dailyIntake.trackMagnesium"
   )
   get canSave() {
-    let valid =
-      !!this.model.birthday &&
-      !!this.model.gender &&
-      !!this.model.activityLevel &&
-      !!this.model.goal;
+    let valid = !!this.model.birthday && !!this.model.gender && !!this.model.activityLevel && !!this.model.goal;
 
     if (this.preferences.imperialSystem) {
       valid = valid && !!this.model.heightFeet && !!this.model.weightLbs;
@@ -345,16 +312,10 @@ export class DietaryProfile {
       valid = valid && !!this.model.heightCm && !!this.model.weightKg;
     }
 
-    return (
-      valid && JSON.stringify(this.model) !== this.originalDietaryProfileJson
-    );
+    return valid && JSON.stringify(this.model) !== this.originalDietaryProfileJson;
   }
 
-  propertyIsInvalid(
-    properties: ValidateResult[],
-    property: string,
-    errorMessages: Array<string>
-  ): boolean {
+  propertyIsInvalid(properties: ValidateResult[], property: string, errorMessages: Array<string>): boolean {
     let invalidProperty = properties.find((p) => {
       return p.propertyName === property && !p.valid;
     });
@@ -381,12 +342,14 @@ export class DietaryProfile {
       try {
         await this.dietaryProfileService.update(this.toUpdateModel());
 
-        this.birthdayIsInvalid = this.heightCmIsInvalid = this.heightFeetIsInvalid = this.weightKgIsInvalid = this.weightLbsIsInvalid = false;
+        this.birthdayIsInvalid =
+          this.heightCmIsInvalid =
+          this.heightFeetIsInvalid =
+          this.weightKgIsInvalid =
+          this.weightLbsIsInvalid =
+            false;
 
-        this.eventAggregator.publish(
-          AlertEvents.ShowSuccess,
-          "dietaryProfile.updateSuccessful"
-        );
+        this.eventAggregator.publish(AlertEvents.ShowSuccess, "dietaryProfile.updateSuccessful");
         this.router.navigateToRoute("menu");
       } catch {
         this.saveButtonIsLoading = false;
@@ -394,16 +357,8 @@ export class DietaryProfile {
     } else {
       let errorMessages = new Array<string>();
 
-      this.birthdayIsInvalid = this.propertyIsInvalid(
-        profileResult.results,
-        "birthday",
-        errorMessages
-      );
-      this.customCaloriesIsInvalid = this.propertyIsInvalid(
-        dailyIntakeResult.results,
-        "customCalories",
-        errorMessages
-      );
+      this.birthdayIsInvalid = this.propertyIsInvalid(profileResult.results, "birthday", errorMessages);
+      this.customCaloriesIsInvalid = this.propertyIsInvalid(dailyIntakeResult.results, "customCalories", errorMessages);
       this.customSaturatedFatIsInvalid = this.propertyIsInvalid(
         dailyIntakeResult.results,
         "customSaturatedFat",
@@ -419,51 +374,19 @@ export class DietaryProfile {
         "customAddedSugars",
         errorMessages
       );
-      this.customFiberIsInvalid = this.propertyIsInvalid(
-        dailyIntakeResult.results,
-        "customFiber",
-        errorMessages
-      );
-      this.customProteinIsInvalid = this.propertyIsInvalid(
-        dailyIntakeResult.results,
-        "customProtein",
-        errorMessages
-      );
-      this.customSodiumIsInvalid = this.propertyIsInvalid(
-        dailyIntakeResult.results,
-        "customSodium",
-        errorMessages
-      );
+      this.customFiberIsInvalid = this.propertyIsInvalid(dailyIntakeResult.results, "customFiber", errorMessages);
+      this.customProteinIsInvalid = this.propertyIsInvalid(dailyIntakeResult.results, "customProtein", errorMessages);
+      this.customSodiumIsInvalid = this.propertyIsInvalid(dailyIntakeResult.results, "customSodium", errorMessages);
       this.customCholesterolIsInvalid = this.propertyIsInvalid(
         dailyIntakeResult.results,
         "customCholesterol",
         errorMessages
       );
-      this.customVitaminAIsInvalid = this.propertyIsInvalid(
-        dailyIntakeResult.results,
-        "customVitaminA",
-        errorMessages
-      );
-      this.customVitaminCIsInvalid = this.propertyIsInvalid(
-        dailyIntakeResult.results,
-        "customVitaminC",
-        errorMessages
-      );
-      this.customVitaminDIsInvalid = this.propertyIsInvalid(
-        dailyIntakeResult.results,
-        "customVitaminD",
-        errorMessages
-      );
-      this.customCalciumIsInvalid = this.propertyIsInvalid(
-        dailyIntakeResult.results,
-        "customCalcium",
-        errorMessages
-      );
-      this.customIronIsInvalid = this.propertyIsInvalid(
-        dailyIntakeResult.results,
-        "customIron",
-        errorMessages
-      );
+      this.customVitaminAIsInvalid = this.propertyIsInvalid(dailyIntakeResult.results, "customVitaminA", errorMessages);
+      this.customVitaminCIsInvalid = this.propertyIsInvalid(dailyIntakeResult.results, "customVitaminC", errorMessages);
+      this.customVitaminDIsInvalid = this.propertyIsInvalid(dailyIntakeResult.results, "customVitaminD", errorMessages);
+      this.customCalciumIsInvalid = this.propertyIsInvalid(dailyIntakeResult.results, "customCalcium", errorMessages);
+      this.customIronIsInvalid = this.propertyIsInvalid(dailyIntakeResult.results, "customIron", errorMessages);
       this.customPotassiumIsInvalid = this.propertyIsInvalid(
         dailyIntakeResult.results,
         "customPotassium",
@@ -474,26 +397,10 @@ export class DietaryProfile {
         "customMagnesium",
         errorMessages
       );
-      this.heightCmIsInvalid = this.propertyIsInvalid(
-        profileResult.results,
-        "heightCm",
-        errorMessages
-      );
-      this.heightFeetIsInvalid = this.propertyIsInvalid(
-        profileResult.results,
-        "heightFeet",
-        errorMessages
-      );
-      this.weightKgIsInvalid = this.propertyIsInvalid(
-        profileResult.results,
-        "weightKg",
-        errorMessages
-      );
-      this.weightLbsIsInvalid = this.propertyIsInvalid(
-        profileResult.results,
-        "weightLbs",
-        errorMessages
-      );
+      this.heightCmIsInvalid = this.propertyIsInvalid(profileResult.results, "heightCm", errorMessages);
+      this.heightFeetIsInvalid = this.propertyIsInvalid(profileResult.results, "heightFeet", errorMessages);
+      this.weightKgIsInvalid = this.propertyIsInvalid(profileResult.results, "weightKg", errorMessages);
+      this.weightLbsIsInvalid = this.propertyIsInvalid(profileResult.results, "weightLbs", errorMessages);
 
       this.eventAggregator.publish(AlertEvents.ShowError, errorMessages);
     }
@@ -522,80 +429,35 @@ export class DietaryProfile {
       this.model.weightLbs,
       this.model.activityLevel,
       this.model.goal,
-      this.returnIfAdjusted(
-        this.model.dailyIntake.customCalories,
-        this.model.dailyIntake.calories
-      ),
+      this.returnIfAdjusted(this.model.dailyIntake.customCalories, this.model.dailyIntake.calories),
       this.model.dailyIntake.trackCalories,
-      this.returnIfAdjusted(
-        this.model.dailyIntake.customSaturatedFat,
-        this.model.dailyIntake.saturatedFat
-      ),
+      this.returnIfAdjusted(this.model.dailyIntake.customSaturatedFat, this.model.dailyIntake.saturatedFat),
       this.model.dailyIntake.trackSaturatedFat,
-      this.returnIfAdjusted(
-        this.model.dailyIntake.customCarbohydrate,
-        this.model.dailyIntake.carbohydrate
-      ),
+      this.returnIfAdjusted(this.model.dailyIntake.customCarbohydrate, this.model.dailyIntake.carbohydrate),
       this.model.dailyIntake.trackCarbohydrate,
-      this.returnIfAdjusted(
-        this.model.dailyIntake.customAddedSugars,
-        this.model.dailyIntake.addedSugars
-      ),
+      this.returnIfAdjusted(this.model.dailyIntake.customAddedSugars, this.model.dailyIntake.addedSugars),
       this.model.dailyIntake.trackAddedSugars,
-      this.returnIfAdjusted(
-        this.model.dailyIntake.customFiber,
-        this.model.dailyIntake.fiber
-      ),
+      this.returnIfAdjusted(this.model.dailyIntake.customFiber, this.model.dailyIntake.fiber),
       this.model.dailyIntake.trackFiber,
-      this.returnIfAdjusted(
-        this.model.dailyIntake.customProtein,
-        this.model.dailyIntake.protein
-      ),
+      this.returnIfAdjusted(this.model.dailyIntake.customProtein, this.model.dailyIntake.protein),
       this.model.dailyIntake.trackProtein,
-      this.returnIfAdjusted(
-        this.model.dailyIntake.customSodium,
-        this.model.dailyIntake.sodium
-      ),
+      this.returnIfAdjusted(this.model.dailyIntake.customSodium, this.model.dailyIntake.sodium),
       this.model.dailyIntake.trackSodium,
-      this.returnIfAdjusted(
-        this.model.dailyIntake.customCholesterol,
-        this.model.dailyIntake.cholesterol
-      ),
+      this.returnIfAdjusted(this.model.dailyIntake.customCholesterol, this.model.dailyIntake.cholesterol),
       this.model.dailyIntake.trackCholesterol,
-      this.returnIfAdjusted(
-        this.model.dailyIntake.customVitaminA,
-        this.model.dailyIntake.vitaminA
-      ),
+      this.returnIfAdjusted(this.model.dailyIntake.customVitaminA, this.model.dailyIntake.vitaminA),
       this.model.dailyIntake.trackVitaminA,
-      this.returnIfAdjusted(
-        this.model.dailyIntake.customVitaminC,
-        this.model.dailyIntake.vitaminC
-      ),
+      this.returnIfAdjusted(this.model.dailyIntake.customVitaminC, this.model.dailyIntake.vitaminC),
       this.model.dailyIntake.trackVitaminC,
-      this.returnIfAdjusted(
-        this.model.dailyIntake.customVitaminD,
-        this.model.dailyIntake.vitaminD
-      ),
+      this.returnIfAdjusted(this.model.dailyIntake.customVitaminD, this.model.dailyIntake.vitaminD),
       this.model.dailyIntake.trackVitaminD,
-      this.returnIfAdjusted(
-        this.model.dailyIntake.customCalcium,
-        this.model.dailyIntake.calcium
-      ),
+      this.returnIfAdjusted(this.model.dailyIntake.customCalcium, this.model.dailyIntake.calcium),
       this.model.dailyIntake.trackCalcium,
-      this.returnIfAdjusted(
-        this.model.dailyIntake.customIron,
-        this.model.dailyIntake.iron
-      ),
+      this.returnIfAdjusted(this.model.dailyIntake.customIron, this.model.dailyIntake.iron),
       this.model.dailyIntake.trackIron,
-      this.returnIfAdjusted(
-        this.model.dailyIntake.customPotassium,
-        this.model.dailyIntake.potassium
-      ),
+      this.returnIfAdjusted(this.model.dailyIntake.customPotassium, this.model.dailyIntake.potassium),
       this.model.dailyIntake.trackPotassium,
-      this.returnIfAdjusted(
-        this.model.dailyIntake.customMagnesium,
-        this.model.dailyIntake.magnesium
-      ),
+      this.returnIfAdjusted(this.model.dailyIntake.customMagnesium, this.model.dailyIntake.magnesium),
       this.model.dailyIntake.trackMagnesium
     );
   }
@@ -609,10 +471,7 @@ export class DietaryProfile {
       this.resetButtonIsLoading = true;
 
       await this.dietaryProfileService.delete();
-      this.eventAggregator.publish(
-        AlertEvents.ShowSuccess,
-        "dietaryProfile.resetSuccessful"
-      );
+      this.eventAggregator.publish(AlertEvents.ShowSuccess, "dietaryProfile.resetSuccessful");
       this.router.navigateToRoute("menu");
     } else {
       this.resetButtonText = this.i18n.tr("sure");

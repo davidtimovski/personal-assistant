@@ -29,9 +29,7 @@ export class ShareList {
   private newShares = new Array<Share>();
   private editedShares = new Array<Share>();
   private removedShares = new Array<Share>();
-  private emailPlaceholderText: string;
   private saveButtonIsLoading = false;
-  private memberVsAdminTooltipKey = "memberVsAdmin";
 
   constructor(
     private readonly router: Router,
@@ -43,8 +41,6 @@ export class ShareList {
   ) {
     this.validationController.validateTrigger = validateTrigger.manual;
     this.resetSelectedShare();
-
-    this.emailPlaceholderText = this.i18n.tr("shareList.newMemberEmail");
 
     this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.emailIsInvalid = false;
@@ -67,8 +63,9 @@ export class ShareList {
     }
   }
 
-  permissionsToggleChanged() {
-    this.emailPlaceholderText = this.selectedShare.isAdmin
+  @computedFrom("selectedShare.isAdmin")
+  get emailPlaceholderText() {
+    return this.selectedShare.isAdmin
       ? this.i18n.tr("shareList.newAdminEmail")
       : this.i18n.tr("shareList.newMemberEmail");
   }

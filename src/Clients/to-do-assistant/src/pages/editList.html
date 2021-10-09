@@ -52,12 +52,12 @@
             </div>
           </div>
           <div if.bind="notificationsEnabledCheckboxVisible" class="form-control">
-            <checkbox label-key.bind="'editList.notifications'" value.bind="model.notificationsEnabled"></checkbox>
+            <checkbox label-key="editList.notifications" value.bind="model.notificationsEnabled"></checkbox>
           </div>
           <div if.bind="model.sharingState !== 4" class="form-control">
-            <checkbox label-key.bind="'deleteOnCompletion'" value.bind="model.isOneTimeToggleDefault"></checkbox>
+            <checkbox label-key="deleteOnCompletion" value.bind="model.isOneTimeToggleDefault"></checkbox>
 
-            <tooltip key.bind="oneTimeTasksTooltipKey"></tooltip>
+            <tooltip key="oneTimeTasks"></tooltip>
           </div>
         </form>
 

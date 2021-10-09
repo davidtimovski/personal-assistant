@@ -32,7 +32,6 @@ export class EditList {
   private saveButtonIsLoading = false;
   private deleteButtonIsLoading = false;
   private leaveButtonIsLoading = false;
-  private oneTimeTasksTooltipKey = "oneTimeTasks";
 
   constructor(
     private readonly router: Router,

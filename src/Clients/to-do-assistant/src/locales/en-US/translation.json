@@ -198,7 +198,7 @@
     "memberVsAdmin": {
       "title": "List member VS admin",
       "question": "What is the difference?",
-      "answer": "Members can only change tasks whereas Adminis can change the list itself as well as share it with other users."
+      "answer": "Members can only change tasks whereas Admins can change the list itself as well as share it with other users."
     },
     "shareRequests": {
       "title": "Share requests",
