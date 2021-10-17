@@ -556,7 +556,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             var sendRequests = new List<SendRequest>();
             foreach (int recipientId in model.RecipientsIds)
             {
-                var (canSend, alreadySent) = CheckSendRequest(model.Id, recipientId, model.UserId);
+                var (canSend, alreadySent) = CheckSendRequest(model.RecipeId, recipientId, model.UserId);
                 if (!canSend || alreadySent)
                 {
                     continue;
@@ -565,7 +565,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
                 var recipeSendRequest = new SendRequest
                 {
                     UserId = recipientId,
-                    RecipeId = model.Id
+                    RecipeId = model.RecipeId
                 };
                 sendRequests.Add(recipeSendRequest);
             }
@@ -578,13 +578,13 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
             await _recipesRepository.CreateSendRequestsAsync(sendRequests);
 
-            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeSent(model.Id);
+            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeSent(model.RecipeId);
             if (!usersToBeNotified.Any())
             {
                 return new SendRecipeResult();
             }
 
-            Recipe recipe = _recipesRepository.Get(model.Id);
+            Recipe recipe = _recipesRepository.Get(model.RecipeId);
 
             var result = new SendRecipeResult
             {

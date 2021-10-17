@@ -25,7 +25,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                                             LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
                                             LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
                                             LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
-                                            WHERE i.""UserId"" = @UserId OR (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
+                                            WHERE r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")
                                             ORDER BY i.""ModifiedDate"" DESC, i.""Name""",
                 new { UserId = userId });
         }
@@ -41,7 +41,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                                                                     LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
                                                                     LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
                                                                     LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
-                                                                    WHERE i.""Id"" = @Id AND (i.""UserId"" = @UserId OR (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")))",
+                                                                    WHERE i.""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
                                                                     new { Id = id, UserId = userId });
 
             if (ingredient.TaskId.HasValue)
@@ -158,7 +158,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                                               LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
                                               LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
                                               LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
-                                              WHERE i.""Id"" = @Id AND i.""UserId"" = @UserId AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+                                              WHERE i.""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
                                               new { Id = id, UserId = userId });
         }
 
@@ -171,7 +171,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                                               LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
                                               LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
                                               LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
-                                              WHERE i.""Id"" != @Id AND UPPER(i.""Name"") = UPPER(@Name) AND i.""UserId"" = @UserId AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+                                              WHERE i.""Id"" != @Id AND UPPER(i.""Name"") = UPPER(@Name) AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
                                               new { Id = id, Name = name, UserId = userId });
         }
 

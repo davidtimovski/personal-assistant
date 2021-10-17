@@ -7,7 +7,7 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Model
 {
     public class CreateSendRequest
     {
-        public int Id { get; set; }
+        public int RecipeId { get; set; }
         public int UserId { get; set; }
         public List<int> RecipientsIds { get; set; }
     }
@@ -18,7 +18,7 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Model
         {
             RuleFor(dto => dto.UserId)
                 .NotEmpty().WithMessage("Unauthorized")
-                .Must((dto, userId) => recipeService.Exists(dto.Id, userId)).WithMessage("Unauthorized")
+                .Must((dto, userId) => recipeService.Exists(dto.RecipeId, userId)).WithMessage("Unauthorized")
                 .Must(userId => recipeService.Count(userId) < 250).WithMessage("RecipeLimitReached");
 
             RuleFor(dto => dto.RecipientsIds)
