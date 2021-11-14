@@ -36,18 +36,16 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
             using IDbConnection conn = OpenConnection();
 
             int id;
+            var query = @"INSERT INTO ""Accountant.UpcomingExpenses"" (""UserId"", ""CategoryId"", ""Amount"", ""Currency"", ""Description"", ""Date"", ""Generated"", ""CreatedDate"", ""ModifiedDate"")
+                          VALUES (@UserId, @CategoryId, @Amount, @Currency, @Description, @Date, @Generated, @CreatedDate, @ModifiedDate) returning ""Id""";
 
             if (uowConn == null && uowTransaction == null)
             {
-                id = (await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.UpcomingExpenses"" (""UserId"", ""CategoryId"", ""Amount"", ""Currency"", ""Description"", ""Date"", ""Generated"", ""CreatedDate"", ""ModifiedDate"")
-                                                   VALUES (@UserId, @CategoryId, @Amount, @Currency, @Description, @Date, @Generated, @CreatedDate, @ModifiedDate) returning ""Id""",
-                                                       upcomingExpense)).Single();
+                id = (await conn.QueryAsync<int>(query, upcomingExpense)).Single();
             }
             else
             {
-                id = (await uowConn.QueryAsync<int>(@"INSERT INTO ""Accountant.UpcomingExpenses"" (""UserId"", ""CategoryId"", ""Amount"", ""Currency"", ""Description"", ""Date"", ""Generated"", ""CreatedDate"", ""ModifiedDate"")
-                                                   VALUES (@UserId, @CategoryId, @Amount, @Currency, @Description, @Date, @Generated, @CreatedDate, @ModifiedDate) returning ""Id""",
-                                                       upcomingExpense, uowTransaction)).Single();
+                id = (await uowConn.QueryAsync<int>(query, upcomingExpense, uowTransaction)).Single();
             }
 
             return id;

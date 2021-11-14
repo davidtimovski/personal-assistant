@@ -8,19 +8,12 @@ import { IDBContext } from "./idbContext";
 export class CategoriesIDBHelper {
   constructor(private readonly db: IDBContext) {}
 
-  getAll(): Promise<Array<Category>> {
+  getAll(): Promise<Category[]> {
     return this.db.categories.toArray();
   }
 
-  async getAllAsOptions(type: CategoryType): Promise<Array<Category>> {
+  async getAllAsOptions(type: CategoryType): Promise<Category[]> {
     let categories = await this.db.categories.toArray();
-
-    for (const category of categories) {
-      if (category.parentId !== null) {
-        const parent = categories.filter(c => c.id === category.parentId)[0];
-        category.name = `${parent.name}/${category.name}`;
-      }
-    }
 
     categories = categories.filter((x: Category): boolean => {
       return type === 0 || x.type === 0 || x.type === type;
@@ -51,13 +44,11 @@ export class CategoriesIDBHelper {
     });
   }
 
-  async getParentAsOptions(): Promise<Array<Category>> {
-    const categories = await this.db.categories
-      .filter(c => c.parentId === null)
-      .toArray();
+  async getParentAsOptions(): Promise<Category[]> {
+    let categories = await this.db.categories.filter((c) => c.parentId === null).toArray();
 
     return categories.sort((a: Category, b: Category) => {
-      return (a.name > b.name) ? 1 : -1;
+      return a.name > b.name ? 1 : -1;
     });
   }
 
@@ -65,18 +56,14 @@ export class CategoriesIDBHelper {
     const category = await this.db.categories.get(id);
 
     if (category.parentId !== null) {
-      const parent = await this.db.categories.get(category.parentId);
-      category.parent = parent.name;
+      category.parent = await this.db.categories.get(category.parentId);
     }
 
     return category;
   }
 
   async isParent(id: number): Promise<boolean> {
-    const subCategories = await this.db.categories
-      .where("parentId")
-      .equals(id)
-      .count();
+    const subCategories = await this.db.categories.where("parentId").equals(id).count();
 
     return subCategories > 0;
   }
@@ -99,69 +86,47 @@ export class CategoriesIDBHelper {
   }
 
   async delete(id: number): Promise<void> {
-    await this.db.transaction(
-      "rw",
-      this.db.categories,
-      this.db.transactions,
-      function* () {
-        yield this.db.transactions.where("categoryId").equals(id).delete();
-        yield this.db.categories.delete(id);
+    await this.db.transaction("rw", this.db.categories, this.db.transactions, function* () {
+      yield this.db.transactions.where("categoryId").equals(id).delete();
+      yield this.db.categories.delete(id);
 
-        const subCategories = yield this.db.categories.where("parentId").equals(id).toArray();
-        for (const subCategory of subCategories) {
-          subCategory.parentId = null;
-          yield this.db.categories.update(subCategory.id, subCategory);
-        }
+      const subCategories = yield this.db.categories.where("parentId").equals(id).toArray();
+      for (const subCategory of subCategories) {
+        subCategory.parentId = null;
+        yield this.db.categories.update(subCategory.id, subCategory);
       }
-    );
+    });
   }
 
   async hasTransactions(id: number): Promise<boolean> {
-    const transactionsCount = await this.db.transactions
-      .where("categoryId")
-      .equals(id)
-      .count();
+    const transactionsCount = await this.db.transactions.where("categoryId").equals(id).count();
 
     return transactionsCount > 0;
   }
 
-  async sync(deletedCategoryIds: Array<number>, categories: Array<Category>) {
-    await this.db.transaction(
-      "rw",
-      this.db.categories,
-      this.db.transactions,
-      this.db.upcomingExpenses,
-      async () => {
-        if (deletedCategoryIds.length > 0) {
-          for (const categoryId of deletedCategoryIds) {
-            await this.db.transactions
-              .where("categoryId")
-              .equals(categoryId)
-              .delete();
-            await this.db.upcomingExpenses
-              .where("categoryId")
-              .equals(categoryId)
-              .delete();
-            await this.db.categories.delete(categoryId);
-          }
-        }
-
-        if (categories.length > 0) {
-          for (const category of categories) {
-            category.synced = true;
-          }
-          await this.db.categories.bulkPut(categories);
+  async sync(deletedCategoryIds: Array<number>, categories: Category[]) {
+    await this.db.transaction("rw", this.db.categories, this.db.transactions, this.db.upcomingExpenses, async () => {
+      if (deletedCategoryIds.length > 0) {
+        for (const categoryId of deletedCategoryIds) {
+          await this.db.transactions.where("categoryId").equals(categoryId).delete();
+          await this.db.upcomingExpenses.where("categoryId").equals(categoryId).delete();
+          await this.db.categories.delete(categoryId);
         }
       }
-    );
+
+      if (categories.length > 0) {
+        for (const category of categories) {
+          category.synced = true;
+        }
+        await this.db.categories.bulkPut(categories);
+      }
+    });
   }
 
-  async getForSyncing(): Promise<Array<Category>> {
+  async getForSyncing(): Promise<Category[]> {
     const categories = this.db.categories.toCollection();
 
-    return categories
-      .filter(c => !c.synced)
-      .toArray();
+    return categories.filter((c) => !c.synced).toArray();
   }
 
   async consolidate(categoryIdPairs: Array<CreatedIdPair>) {

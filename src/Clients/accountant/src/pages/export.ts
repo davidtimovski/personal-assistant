@@ -1,9 +1,11 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { TransactionsService } from "services/transactionsService";
 import { I18N } from "aurelia-i18n";
+
 import { ConnectionTracker } from "../../../shared/src/utils/connectionTracker";
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
+
+import { TransactionsService } from "services/transactionsService";
 
 @inject(Router, TransactionsService, I18N, ConnectionTracker)
 export class Export {
@@ -36,10 +38,7 @@ export class Export {
     a.style.display = "none";
     document.body.appendChild(a);
     a.href = window.URL.createObjectURL(fileName);
-    a.setAttribute(
-      "download",
-      `${this.i18n.tr("export.transactions")}-${date}.csv`
-    );
+    a.setAttribute("download", `${this.i18n.tr("export.transactions")}-${date}.csv`);
     a.click();
 
     window.URL.revokeObjectURL(a.href);

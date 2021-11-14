@@ -78,16 +78,16 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
             using IDbConnection conn = OpenConnection();
 
             int id;
+            var insertQuery = @"INSERT INTO ""Accountant.Transactions"" 
+                                (""FromAccountId"", ""ToAccountId"", ""CategoryId"", ""Amount"", ""FromStocks"", ""ToStocks"", ""Currency"", ""Description"", ""Date"", ""IsEncrypted"", ""EncryptedDescription"", ""Salt"", ""Nonce"", ""CreatedDate"", ""ModifiedDate"")
+                                VALUES 
+                                (@FromAccountId, @ToAccountId, @CategoryId, @Amount, @FromStocks, @ToStocks, @Currency, @Description, @Date, @IsEncrypted, @EncryptedDescription, @Salt, @Nonce, @CreatedDate, @ModifiedDate) returning ""Id""";
 
             if (uowConn == null && uowTransaction == null)
             {
                 var dbTransaction = conn.BeginTransaction();
 
-                id = (await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.Transactions"" 
-                    (""FromAccountId"", ""ToAccountId"", ""CategoryId"", ""Amount"", ""FromStocks"", ""ToStocks"", ""Currency"", ""Description"", ""Date"", ""IsEncrypted"", ""EncryptedDescription"", ""Salt"", ""Nonce"", ""CreatedDate"", ""ModifiedDate"")
-                    VALUES 
-                    (@FromAccountId, @ToAccountId, @CategoryId, @Amount, @FromStocks, @ToStocks, @Currency, @Description, @Date, @IsEncrypted, @EncryptedDescription, @Salt, @Nonce, @CreatedDate, @ModifiedDate) returning ""Id""",
-                    transaction, dbTransaction)).Single();
+                id = (await conn.QueryAsync<int>(insertQuery, transaction, dbTransaction)).Single();
 
                 if (transaction.FromAccountId.HasValue && !transaction.ToAccountId.HasValue)
                 {
@@ -134,11 +134,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
             }
             else
             {
-                id = (await uowConn.QueryAsync<int>(@"INSERT INTO ""Accountant.Transactions"" 
-                    (""FromAccountId"", ""ToAccountId"", ""CategoryId"", ""Amount"", ""FromStocks"", ""ToStocks"", ""Currency"", ""Description"", ""Date"", ""IsEncrypted"", ""EncryptedDescription"", ""Salt"", ""Nonce"", ""CreatedDate"", ""ModifiedDate"")
-                    VALUES 
-                    (@FromAccountId, @ToAccountId, @CategoryId, @Amount, @FromStocks, @ToStocks, @Currency, @Description, @Date, @IsEncrypted, @EncryptedDescription, @Salt, @Nonce, @CreatedDate, @ModifiedDate) returning ""Id""",
-                    transaction, uowTransaction)).Single();
+                id = (await uowConn.QueryAsync<int>(insertQuery, transaction, uowTransaction)).Single();
             }
 
             return id;

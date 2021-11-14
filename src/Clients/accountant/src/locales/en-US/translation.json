@@ -155,6 +155,7 @@
     "none": "None",
     "type": "Type",
     "generateUpcomingExpense": "Generate upcoming expense",
+    "tax": "Tax",
     "allTransactions": "All transactions",
     "depositOnly": "Deposit only",
     "expenseOnly": "Expense only",
@@ -346,6 +347,11 @@
       "title": "Encrypted description",
       "question": "What does this do?",
       "answer": "If you encrypt the Description it will not be visible without a password. When encrypting, it is highly advisable that you use a password that you will not forget (like for example your Personal Assistant password). If you forget the password you will be no longer able to decrypt the Description, only reset/change it."
+    },
+    "taxCategories": {
+      "title": "Tax categories",
+      "question": "What does it mean?",
+      "answer": "Transactions made within a tax category will be not be considered as regular expenses and will simply be exempted from all expenditure sums like in the dashboard, Bar chart, and Expenditure heatmap pages."
     }
   }
 }

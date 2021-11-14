@@ -50,20 +50,18 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
         public async Task<int> CreateAsync(Account account, IDbConnection uowConn = null, IDbTransaction uowTransaction = null)
         {
             int id;
+            var query = @"INSERT INTO ""Accountant.Accounts"" (""UserId"", ""Name"", ""IsMain"", ""Currency"", ""StockPrice"", ""CreatedDate"", ""ModifiedDate"")
+                          VALUES (@UserId, @Name, @IsMain, @Currency, @StockPrice, @CreatedDate, @ModifiedDate) returning ""Id""";
 
             if (uowConn == null && uowTransaction == null)
             {
                 using IDbConnection conn = OpenConnection();
 
-                id = (await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.Accounts"" (""UserId"", ""Name"", ""IsMain"", ""Currency"", ""StockPrice"", ""CreatedDate"", ""ModifiedDate"")
-                                                   VALUES (@UserId, @Name, @IsMain, @Currency, @StockPrice, @CreatedDate, @ModifiedDate) returning ""Id""",
-                                                   account)).Single();
+                id = (await conn.QueryAsync<int>(query, account)).Single();
             }
             else
             {
-                id = (await uowConn.QueryAsync<int>(@"INSERT INTO ""Accountant.Accounts"" (""UserId"", ""Name"", ""IsMain"", ""Currency"", ""StockPrice"", ""CreatedDate"", ""ModifiedDate"")
-                                                      VALUES (@UserId, @Name, @IsMain, @Currency, @StockPrice, @CreatedDate, @ModifiedDate) returning ""Id""",
-                                                      account, uowTransaction)).Single();
+                id = (await uowConn.QueryAsync<int>(query, account, uowTransaction)).Single();
             }
 
             return id;

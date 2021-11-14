@@ -53,8 +53,8 @@ export class Dashboard {
 
   activate() {
     this.imageUri = this.localStorage.getProfileImageUri();
-    this.showUpcomingExpenses = this.localStorage.getShowUpcomingExpensesOnDashboard();
-    this.showDebt = this.localStorage.getShowDebtOnDashboard();
+    this.showUpcomingExpenses = this.localStorage.showUpcomingExpensesOnDashboard;
+    this.showDebt = this.localStorage.showDebtOnDashboard;
     this.currency = this.localStorage.getCurrency();
   }
 

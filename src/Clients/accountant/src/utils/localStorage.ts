@@ -11,22 +11,18 @@ export class LocalStorage extends LocalStorageCurrencies {
       this.setLastSynced(this.defaultLastSynced);
     }
 
-    const showUpcomingExpensesOnDashboard = window.localStorage.getItem(
-      "showUpcomingExpensesOnDashboard"
-    );
+    const showUpcomingExpensesOnDashboard = window.localStorage.getItem("showUpcomingExpensesOnDashboard");
     if (!showUpcomingExpensesOnDashboard) {
       this.setShowUpcomingExpensesOnDashboard(true);
     }
 
-    const showDebtOnDashboard = window.localStorage.getItem(
-      "showDebtOnDashboard"
-    );
+    const showDebtOnDashboard = window.localStorage.getItem("showDebtOnDashboard");
     if (!showDebtOnDashboard) {
       this.setShowDebtOnDashboard(true);
     }
   }
 
-  getLastSynced(): string {
+  get lastSynced(): string {
     const lasySynced = window.localStorage.getItem("lastSynced");
     return lasySynced ? lasySynced : this.defaultLastSynced;
   }
@@ -34,29 +30,19 @@ export class LocalStorage extends LocalStorageCurrencies {
     window.localStorage.setItem("lastSynced", lastSynced);
   }
 
-  getShowUpcomingExpensesOnDashboard(): boolean {
-    const showUpcomingExpensesOnDashboard = window.localStorage.getItem(
-      "showUpcomingExpensesOnDashboard"
-    );
+  get showUpcomingExpensesOnDashboard(): boolean {
+    const showUpcomingExpensesOnDashboard = window.localStorage.getItem("showUpcomingExpensesOnDashboard");
     return showUpcomingExpensesOnDashboard === "true";
   }
   setShowUpcomingExpensesOnDashboard(showUpcomingExpensesOnDashboard: boolean) {
-    window.localStorage.setItem(
-      "showUpcomingExpensesOnDashboard",
-      showUpcomingExpensesOnDashboard.toString()
-    );
+    window.localStorage.setItem("showUpcomingExpensesOnDashboard", showUpcomingExpensesOnDashboard.toString());
   }
 
-  getShowDebtOnDashboard(): boolean {
-    const showDebtOnDashboard = window.localStorage.getItem(
-      "showDebtOnDashboard"
-    );
+  get showDebtOnDashboard(): boolean {
+    const showDebtOnDashboard = window.localStorage.getItem("showDebtOnDashboard");
     return showDebtOnDashboard === "true";
   }
   setShowDebtOnDashboard(showDebtOnDashboard: boolean) {
-    window.localStorage.setItem(
-      "showDebtOnDashboard",
-      showDebtOnDashboard.toString()
-    );
+    window.localStorage.setItem("showDebtOnDashboard", showDebtOnDashboard.toString());
   }
 }

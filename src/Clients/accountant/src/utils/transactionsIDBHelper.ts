@@ -13,16 +13,16 @@ import { Category } from "models/entities/category";
 export class TransactionsIDBHelper {
   constructor(private readonly db: IDBContext) {}
 
-  async getAll(): Promise<Array<TransactionModel>> {
+  getAll(): Promise<TransactionModel[]> {
     return this.db.transactions.toArray();
   }
 
-  async getAllForAccount(accountId: number): Promise<Array<TransactionModel>> {
+  async getAllForAccount(accountId: number): Promise<TransactionModel[]> {
     const transactions = await this.db.transactions.toArray();
     return transactions.filter((t) => t.fromAccountId === accountId || t.toAccountId === accountId);
   }
 
-  async getAllSavingTransactionsInThePastYear(mainAccountId: number): Promise<Array<TransactionModel>> {
+  async getAllSavingTransactionsInThePastYear(mainAccountId: number): Promise<TransactionModel[]> {
     const transactions = await this.db.transactions.toArray();
 
     const now = new Date();
@@ -56,7 +56,7 @@ export class TransactionsIDBHelper {
       .count();
   }
 
-  async getAllByPage(filters: SearchFilters): Promise<Array<TransactionModel>> {
+  async getAllByPage(filters: SearchFilters): Promise<TransactionModel[]> {
     const categoryIds = await this.getWithSubCategoryIds(filters.categoryId);
 
     const transactions = await this.db.transactions
@@ -98,7 +98,7 @@ export class TransactionsIDBHelper {
     toDate: string,
     accountId: number,
     type: TransactionType
-  ): Promise<Array<TransactionModel>> {
+  ): Promise<TransactionModel[]> {
     const transactionsPromise = this.db.transactions
       .orderBy("date")
       .reverse()
@@ -107,13 +107,13 @@ export class TransactionsIDBHelper {
 
     const categoriesPromise = this.db.categories.toArray();
 
-    let transactions: Array<TransactionModel>;
+    let transactions: TransactionModel[];
     await Promise.all([transactionsPromise, categoriesPromise]).then((result) => {
       transactions = result[0];
       const categories = result[1];
 
       for (const transaction of transactions) {
-        transaction.categoryName = this.getCategoryName(transaction.categoryId, categories);
+        transaction.category = this.getCategoryWithParent(transaction.categoryId, categories);
       }
     });
 
@@ -125,13 +125,13 @@ export class TransactionsIDBHelper {
     mainAccountId: number,
     categoryId: number,
     type: TransactionType
-  ): Promise<Array<TransactionModel>> {
+  ): Promise<TransactionModel[]> {
     const categoryIds = await this.getWithSubCategoryIds(categoryId);
 
     const now = new Date();
     const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    const transactions = await this.db.transactions
+    const transactionsPromise = this.db.transactions
       .orderBy("date")
       .reverse()
       .filter(
@@ -141,6 +141,18 @@ export class TransactionsIDBHelper {
           this.checkAgainstFilters3(t, mainAccountId, categoryId !== 0, categoryIds, type)
       )
       .toArray();
+
+    const categoriesPromise = this.db.categories.toArray();
+
+    let transactions: TransactionModel[];
+    await Promise.all([transactionsPromise, categoriesPromise]).then((result) => {
+      transactions = result[0];
+      const categories = result[1];
+
+      for (const transaction of transactions) {
+        transaction.category = this.getCategoryWithParent(transaction.categoryId, categories);
+      }
+    });
 
     return transactions;
   }
@@ -307,7 +319,7 @@ export class TransactionsIDBHelper {
     return (fromAccountId === mainAccountId && !!toAccountId) || (toAccountId === mainAccountId && !!fromAccountId);
   }
 
-  async getExpendituresForCurrentMonth(accountId: number): Promise<Array<TransactionModel>> {
+  async getExpendituresForCurrentMonth(accountId: number): Promise<TransactionModel[]> {
     const now = new Date();
     const from = new Date(now.getFullYear(), now.getMonth(), 1);
     const formatted = DateHelper.format(from);
@@ -315,28 +327,25 @@ export class TransactionsIDBHelper {
     const transactionsPromise = this.db.transactions
       .where("date")
       .aboveOrEqual(formatted)
-      .filter((t: TransactionModel) => t.fromAccountId === accountId && !t.toAccountId)
+      .and((t: TransactionModel) => t.fromAccountId === accountId && !t.toAccountId)
       .toArray();
 
     const categoriesPromise = this.db.categories.toArray();
 
-    let transactions: Array<TransactionModel>;
+    let transactions: TransactionModel[];
     await Promise.all([transactionsPromise, categoriesPromise]).then((result) => {
       transactions = result[0];
       const categories = result[1];
 
       for (const transaction of transactions) {
-        if (transaction.categoryId) {
-          const category = categories.find((x) => x.id === transaction.categoryId);
-          transaction.categoryName = category.name;
-        }
+        transaction.category = this.getCategoryWithParent(transaction.categoryId, categories);
       }
     });
 
     return transactions;
   }
 
-  async getExpendituresFrom(mainAccountId: number, fromDate: Date): Promise<Array<TransactionModel>> {
+  async getExpendituresFrom(mainAccountId: number, fromDate: Date): Promise<TransactionModel[]> {
     const transactionsPromise = this.db.transactions
       .orderBy("date")
       .reverse()
@@ -348,13 +357,13 @@ export class TransactionsIDBHelper {
 
     const categoriesPromise = this.db.categories.toArray();
 
-    let transactions: Array<TransactionModel>;
+    let transactions: TransactionModel[];
     await Promise.all([transactionsPromise, categoriesPromise]).then((result) => {
       transactions = result[0];
       const categories = result[1];
 
       for (const transaction of transactions) {
-        transaction.categoryName = this.getCategoryName(transaction.categoryId, categories);
+        transaction.category = this.getCategoryWithParent(transaction.categoryId, categories);
       }
     });
 
@@ -413,7 +422,7 @@ export class TransactionsIDBHelper {
     });
   }
 
-  async createMultiple(...transactions: Array<TransactionModel>): Promise<void> {
+  async createMultiple(...transactions: TransactionModel[]): Promise<void> {
     let id = await this.generateId();
 
     for (const transaction of transactions) {
@@ -434,7 +443,7 @@ export class TransactionsIDBHelper {
     await this.db.transactions.delete(id);
   }
 
-  async sync(deletedTransactionIds: Array<number>, transactions: Array<TransactionModel>) {
+  async sync(deletedTransactionIds: Array<number>, transactions: TransactionModel[]) {
     await this.db.transaction("rw", this.db.transactions, async () => {
       if (deletedTransactionIds.length > 0) {
         await this.db.transactions.bulkDelete(deletedTransactionIds);
@@ -450,7 +459,7 @@ export class TransactionsIDBHelper {
     });
   }
 
-  async getForSyncing(): Promise<Array<TransactionModel>> {
+  async getForSyncing(): Promise<TransactionModel[]> {
     const transactions = this.db.transactions.toCollection();
 
     return transactions.filter((t) => !t.synced).toArray();
@@ -494,18 +503,17 @@ export class TransactionsIDBHelper {
     return categoryIds;
   }
 
-  private getCategoryName(categoryId: number, categories: Array<Category>): string {
+  private getCategoryWithParent(categoryId: number, categories: Array<Category>): Category {
     if (categoryId === null) {
       return null;
     }
 
     const category = categories.find((x) => x.id === categoryId);
     if (category.parentId) {
-      const parent = categories.find((x) => x.id === category.parentId);
-      return `${parent.name}/${category.name}`;
-    } else {
-      return category.name;
+      category.parent = categories.find((x) => x.id === category.parentId);
     }
+
+    return category;
   }
 
   private async generateId(): Promise<number> {

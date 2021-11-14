@@ -9,8 +9,8 @@ export class Preferences {
   constructor(private readonly localStorage: LocalStorage) {}
 
   activate() {
-    this.showUpcomingExpensesOnDashboard = this.localStorage.getShowUpcomingExpensesOnDashboard();
-    this.showDebtOnDashboard = this.localStorage.getShowDebtOnDashboard();
+    this.showUpcomingExpensesOnDashboard = this.localStorage.showUpcomingExpensesOnDashboard;
+    this.showDebtOnDashboard = this.localStorage.showDebtOnDashboard;
   }
 
   showUpcomingExpensesOnDashboardChanged() {

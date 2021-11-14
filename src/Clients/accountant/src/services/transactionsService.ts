@@ -125,7 +125,19 @@ export class TransactionsService extends HttpProxyBase {
     type: TransactionType,
     currency: string
   ): Promise<Array<TransactionModel>> {
-    const transactions = await this.idbHelper.getForBarChart(fromDate, mainAccountId, categoryId, type);
+    let transactions = await this.idbHelper.getForBarChart(fromDate, mainAccountId, categoryId, type);
+
+    let filterOutTaxTransactions = true;
+    if (categoryId) {
+      const category = await this.categoriesService.get(categoryId);
+      if (category.isTax) {
+        filterOutTaxTransactions = false;
+      }
+    }
+
+    if (filterOutTaxTransactions) {
+      transactions = transactions.filter((x) => !x.isTax);
+    }
 
     transactions.forEach((x: TransactionModel) => {
       x.amount = this.currenciesService.convert(x.amount, x.currency, currency);
@@ -135,7 +147,9 @@ export class TransactionsService extends HttpProxyBase {
   }
 
   async getExpendituresFrom(mainAccountId: number, fromDate: Date, currency: string) {
-    const transactions = await this.idbHelper.getExpendituresFrom(mainAccountId, fromDate);
+    let transactions = await this.idbHelper.getExpendituresFrom(mainAccountId, fromDate);
+
+    transactions = transactions.filter((x) => !x.isTax);
 
     transactions.forEach((x: TransactionModel) => {
       x.amount = this.currenciesService.convert(x.amount, x.currency, currency);

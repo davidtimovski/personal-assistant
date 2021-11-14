@@ -1,4 +1,5 @@
 import Dexie from "dexie";
+
 import { Category } from "models/entities/category";
 import { Account } from "models/entities/account";
 import { TransactionModel } from "models/entities/transaction";
@@ -14,7 +15,7 @@ export class IDBContext extends Dexie {
 
   public constructor() {
     super("IDBContext");
-    this.version(3).stores({
+    this.version(4).stores({
       categories: "id,parentId,type",
       accounts: "id",
       transactions: "id,fromAccountId,toAccountId,categoryId,date",
@@ -22,8 +23,12 @@ export class IDBContext extends Dexie {
       debts: "id",
     });
     this.categories = this.table("categories");
+    this.categories.mapToClass(Category);
+
     this.accounts = this.table("accounts");
     this.transactions = this.table("transactions");
+    this.transactions.mapToClass(TransactionModel);
+
     this.upcomingExpenses = this.table("upcomingExpenses");
     this.debts = this.table("debts");
   }

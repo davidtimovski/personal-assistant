@@ -6,6 +6,7 @@ import { EventAggregator } from "aurelia-event-aggregator";
 import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
 import { AuthService } from "../../../shared/src/services/authService";
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
+
 import { CategoriesIDBHelper } from "../utils/categoriesIDBHelper";
 import { Category, CategoryType } from "models/entities/category";
 import { SelectOption } from "models/viewmodels/selectOption";
@@ -25,17 +26,13 @@ export class CategoriesService extends HttpProxyBase {
     return this.idbHelper.getAll();
   }
 
-  async getAllAsOptions(
-    uncategorizedLabel: string,
-    type: CategoryType
-  ): Promise<Array<SelectOption>> {
+  async getAllAsOptions(uncategorizedLabel: string, type: CategoryType): Promise<Array<SelectOption>> {
     const categories = await this.idbHelper.getAllAsOptions(type);
 
     const options = new Array<SelectOption>();
     options.push(new SelectOption(null, uncategorizedLabel));
 
-    const selectOptions = categories
-      .map(c => new SelectOption(c.id, c.name));
+    const selectOptions = categories.map((c) => new SelectOption(c.id, c.fullName));
     options.push(...selectOptions);
 
     return options;
@@ -48,17 +45,16 @@ export class CategoriesService extends HttpProxyBase {
     options.push(new SelectOption(null, notSelectedLabel));
 
     if (excludeCategoryId === 0) {
-      const selectOptions = categories
-        .map(c => new SelectOption(c.id, c.name));
+      const selectOptions = categories.map((c) => new SelectOption(c.id, c.name));
       options.push(...selectOptions);
     } else {
       const selectOptions = categories
-        .filter(c => c.id !== excludeCategoryId)
-        .map(c => new SelectOption(c.id, c.name));
+        .filter((c) => c.id !== excludeCategoryId)
+        .map((c) => new SelectOption(c.id, c.name));
 
       options.push(...selectOptions);
     }
-    
+
     return options;
   }
 

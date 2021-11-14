@@ -34,20 +34,18 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
         public async Task<int> CreateAsync(Debt debt, IDbConnection uowConn = null, IDbTransaction uowTransaction = null)
         {
             int id;
+            var query = @"INSERT INTO ""Accountant.Debts"" (""UserId"", ""Person"", ""Amount"", ""Currency"", ""Description"", ""UserIsDebtor"", ""CreatedDate"", ""ModifiedDate"")
+                          VALUES (@UserId, @Person, @Amount, @Currency, @Description, @UserIsDebtor, @CreatedDate, @ModifiedDate) returning ""Id""";
 
             if (uowConn == null && uowTransaction == null)
             {
                 using IDbConnection conn = OpenConnection();
 
-                id = (await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.Debts"" (""UserId"", ""Person"", ""Amount"", ""Currency"", ""Description"", ""UserIsDebtor"", ""CreatedDate"", ""ModifiedDate"")
-                                                   VALUES (@UserId, @Person, @Amount, @Currency, @Description, @UserIsDebtor, @CreatedDate, @ModifiedDate) returning ""Id""",
-                                                       debt)).Single();
+                id = (await conn.QueryAsync<int>(query, debt)).Single();
             }
             else
             {
-                id = (await uowConn.QueryAsync<int>(@"INSERT INTO ""Accountant.Debts"" (""UserId"", ""Person"", ""Amount"", ""Currency"", ""Description"", ""UserIsDebtor"", ""CreatedDate"", ""ModifiedDate"")
-                                                      VALUES (@UserId, @Person, @Amount, @Currency, @Description, @UserIsDebtor, @CreatedDate, @ModifiedDate) returning ""Id""",
-                                                      debt, uowTransaction)).Single();
+                id = (await uowConn.QueryAsync<int>(query, debt, uowTransaction)).Single();
             }
 
             return id;

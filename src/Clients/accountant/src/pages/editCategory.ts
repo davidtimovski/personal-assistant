@@ -1,11 +1,6 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import {
-  ValidationController,
-  validateTrigger,
-  ValidationRules,
-  ControllerValidateResult,
-} from "aurelia-validation";
+import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
@@ -17,14 +12,7 @@ import { CategoriesService } from "services/categoriesService";
 import { Category, CategoryType } from "models/entities/category";
 import { SelectOption } from "models/viewmodels/selectOption";
 
-@inject(
-  Router,
-  CategoriesService,
-  ValidationController,
-  I18N,
-  EventAggregator,
-  ConnectionTracker
-)
+@inject(Router, CategoriesService, ValidationController, I18N, EventAggregator, ConnectionTracker)
 export class EditCategory {
   private categoryId: number;
   private category: Category;
@@ -58,18 +46,9 @@ export class EditCategory {
     });
 
     this.typeOptions = [
-      new SelectOption(
-        CategoryType.AllTransactions,
-        this.i18n.tr("editCategory.allTransactions")
-      ),
-      new SelectOption(
-        CategoryType.ExpenseOnly,
-        this.i18n.tr("editCategory.expenseOnly")
-      ),
-      new SelectOption(
-        CategoryType.DepositOnly,
-        this.i18n.tr("editCategory.depositOnly")
-      ),
+      new SelectOption(CategoryType.AllTransactions, this.i18n.tr("editCategory.allTransactions")),
+      new SelectOption(CategoryType.DepositOnly, this.i18n.tr("editCategory.depositOnly")),
+      new SelectOption(CategoryType.ExpenseOnly, this.i18n.tr("editCategory.expenseOnly")),
     ];
   }
 
@@ -78,14 +57,7 @@ export class EditCategory {
     this.isNewCategory = this.categoryId === 0;
 
     if (this.isNewCategory) {
-      this.category = new Category(
-        null,
-        "",
-        CategoryType.AllTransactions,
-        false,
-        null,
-        null
-      );
+      this.category = new Category(0, null, "", CategoryType.AllTransactions, false, false, null, null);
       this.saveButtonText = this.i18n.tr("create");
 
       this.setValidationRules();
@@ -114,11 +86,9 @@ export class EditCategory {
       });
     }
 
-    this.categoriesService
-      .getParentAsOptions(this.i18n.tr("editCategory.none"), this.categoryId)
-      .then((options) => {
-        this.parentCategoryOptions = options;
-      });
+    this.categoriesService.getParentAsOptions(this.i18n.tr("editCategory.none"), this.categoryId).then((options) => {
+      this.parentCategoryOptions = options;
+    });
   }
 
   setValidationRules() {
@@ -128,8 +98,9 @@ export class EditCategory {
   }
 
   typeChanged() {
-    if (this.category.type === CategoryType.DepositOnly) {
+    if (this.category.type !== CategoryType.ExpenseOnly) {
       this.category.generateUpcomingExpense = false;
+      this.category.isTax = false;
     }
   }
 
@@ -138,6 +109,7 @@ export class EditCategory {
     "category.parentId",
     "category.type",
     "category.generateUpcomingExpense",
+    "category.isTax",
     "category.synced",
     "connTracker.isOnline"
   )
@@ -199,10 +171,7 @@ export class EditCategory {
 
       try {
         await this.categoriesService.delete(this.category.id);
-        this.eventAggregator.publish(
-          AlertEvents.ShowSuccess,
-          "editCategory.deleteSuccessful"
-        );
+        this.eventAggregator.publish(AlertEvents.ShowSuccess, "editCategory.deleteSuccessful");
         this.router.navigateToRoute("categories");
       } catch (e) {
         this.eventAggregator.publish(AlertEvents.ShowError, e);

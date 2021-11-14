@@ -141,11 +141,11 @@ export class ExpenditureHeatmap {
     for (const day of this.days) {
       transactions.forEach((x) => {
         if (day.date === x.date.slice(0, 10)) {
-          const category = x.categoryName || this.i18n.tr("uncategorized");
+          const categoryName = x.category ? x.category.fullName : this.i18n.tr("uncategorized");
           const trimmedDescription = this.formatDescription(x.description, x.isEncrypted);
 
           day.spent += x.amount;
-          day.expenditures.push(new HeatmapExpense(x.id, category, trimmedDescription, x.amount));
+          day.expenditures.push(new HeatmapExpense(x.id, categoryName, trimmedDescription, x.amount));
         }
       });
 

@@ -1,8 +1,9 @@
 import { Syncable } from "models/sync/syncable";
+import { Category } from "./category";
 
 export class TransactionModel implements Syncable {
   public accountName: string;
-  public categoryName: string;
+  public category: Category;
   public convertedAmount: number;
   public synced = false;
 
@@ -24,4 +25,8 @@ export class TransactionModel implements Syncable {
     public createdDate: Date,
     public modifiedDate: Date
   ) {}
+
+  get isTax() {
+    return this.category?.isTax;
+  }
 }

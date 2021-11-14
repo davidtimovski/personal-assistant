@@ -2,7 +2,6 @@ import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { AccountsService } from "services/accountsService";
 import { LocalStorage } from "utils/localStorage";
-import { Account } from "models/entities/account";
 import { EventAggregator } from "aurelia-event-aggregator";
 import { AccountItem } from "models/viewmodels/accountItem";
 

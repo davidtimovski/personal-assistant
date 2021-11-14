@@ -10,6 +10,7 @@ CREATE TABLE public."Accountant.Categories"
     "Name" character varying(30) NOT NULL COLLATE pg_catalog."default",
 	"Type" smallint NOT NULL,
 	"GenerateUpcomingExpense" boolean NOT NULL DEFAULT FALSE,
+	"IsTax" boolean NOT NULL DEFAULT FALSE,
     "CreatedDate" timestamp without time zone NOT NULL,
     "ModifiedDate" timestamp without time zone NOT NULL,
     CONSTRAINT "PK_Accountant.Categories" PRIMARY KEY ("Id"),

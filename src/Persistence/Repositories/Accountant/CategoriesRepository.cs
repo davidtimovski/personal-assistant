@@ -34,20 +34,18 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
         public async Task<int> CreateAsync(Category category, IDbConnection uowConn = null, IDbTransaction uowTransaction = null)
         {
             int id;
+            var query = @"INSERT INTO ""Accountant.Categories"" (""ParentId"", ""UserId"", ""Name"", ""Type"", ""GenerateUpcomingExpense"", ""IsTax"", ""CreatedDate"", ""ModifiedDate"")
+                          VALUES (@ParentId, @UserId, @Name, @Type, @GenerateUpcomingExpense, @IsTax, @CreatedDate, @ModifiedDate) returning ""Id""";
 
             if (uowConn == null && uowTransaction == null)
             {
                 using IDbConnection conn = OpenConnection();
 
-                id = (await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.Categories"" (""ParentId"", ""UserId"", ""Name"", ""Type"", ""GenerateUpcomingExpense"",""CreatedDate"", ""ModifiedDate"")
-                                                   VALUES (@ParentId, @UserId, @Name, @Type, @GenerateUpcomingExpense, @CreatedDate, @ModifiedDate) returning ""Id""",
-                                                       category)).Single();
+                id = (await conn.QueryAsync<int>(query, category)).Single();
             }
             else
             {
-                id = (await uowConn.QueryAsync<int>(@"INSERT INTO ""Accountant.Categories"" (""ParentId"", ""UserId"", ""Name"", ""Type"", ""GenerateUpcomingExpense"", ""CreatedDate"", ""ModifiedDate"")
-                                                   VALUES (@ParentId, @UserId, @Name, @Type, @GenerateUpcomingExpense, @CreatedDate, @ModifiedDate) returning ""Id""",
-                                                       category, uowTransaction)).Single();
+                id = (await uowConn.QueryAsync<int>(@query, category, uowTransaction)).Single();
             }
 
             return id;
@@ -61,6 +59,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
             dbCategory.Name = category.Name;
             dbCategory.Type = category.Type;
             dbCategory.GenerateUpcomingExpense = category.GenerateUpcomingExpense;
+            dbCategory.IsTax = category.IsTax;
             dbCategory.ModifiedDate = category.ModifiedDate;
 
             await EFContext.SaveChangesAsync();

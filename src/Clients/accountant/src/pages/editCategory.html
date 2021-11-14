@@ -1,5 +1,6 @@
 <template>
   <require from="./../resources/elements/checkbox"></require>
+  <require from="./../resources/elements/tooltip"></require>
 
   <div class="container">
     <div class="au-animate animate-fade-in animate-fade-out">
@@ -63,8 +64,12 @@
             </div>
             <div class="form-control">
               <checkbox label-key="editCategory.generateUpcomingExpense" value.bind="category.generateUpcomingExpense"
-                disabled.bind="category.type === 1">
+                disabled.bind="category.type !== 2">
               </checkbox>
+            </div>
+            <div class="form-control">
+              <checkbox label-key="editCategory.tax" value.bind="category.isTax" disabled.bind="category.type !== 2"></checkbox>
+              <tooltip key="taxCategories"></tooltip>
             </div>
           </form>
 
