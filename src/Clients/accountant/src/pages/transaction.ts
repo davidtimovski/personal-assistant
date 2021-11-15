@@ -78,11 +78,7 @@ export class Transaction {
 
     if (transaction.categoryId) {
       const category = await this.categoriesService.get(transaction.categoryId);
-      if (category.parent) {
-        model.category = `${category.parent}/${category.name}`;
-      } else {
-        model.category = category.name;
-      }
+      model.category = category.fullName;
     } else {
       model.category = this.i18n.tr("uncategorized");
     }

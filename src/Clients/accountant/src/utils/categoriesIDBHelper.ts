@@ -21,15 +21,18 @@ export class CategoriesIDBHelper {
 
     const getCountPromises = Array<Promise<void>>();
     for (const category of categories) {
-      getCountPromises.push(
-        this.db.transactions
-          .where("categoryId")
-          .equals(category.id)
-          .count()
-          .then((count: number) => {
-            (<any>category).transactionsCount = count;
-          })
-      );
+      if (category.parentId !== null) {
+        category.parent = categories.find((x) => x.id === category.parentId);
+      }
+
+      const getCountPromise = this.db.transactions
+        .where("categoryId")
+        .equals(category.id)
+        .count()
+        .then((count: number) => {
+          (<any>category).transactionsCount = count;
+        });
+      getCountPromises.push(getCountPromise);
     }
 
     await Promise.all(getCountPromises);
