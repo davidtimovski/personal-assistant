@@ -22,7 +22,15 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: ${{ matrix.dotnet }}
-      - name: Build with dotnet
-        run: |
+      - name: Build Api.UnitTests
+        run:
+          dotnet build test/Api.UnitTests/Api.UnitTests.csproj
+      - name: Test Api.UnitTests
+        run:
+          dotnet test test/Api.UnitTests/Api.UnitTests.csproj
+      - name: Build Application.UnitTests
+        run:
           dotnet build test/Application.UnitTests/Application.UnitTests.csproj
+      - name: Test Application.UnitTests
+        run:
           dotnet test test/Application.UnitTests/Application.UnitTests.csproj
