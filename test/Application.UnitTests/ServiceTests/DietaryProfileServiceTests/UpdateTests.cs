@@ -15,7 +15,6 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.DietaryProfileSer
 {
     public class UpdateTests
     {
-        private readonly Mock<IDietaryProfilesRepository> _dietaryProfilesRepositoryMock = new Mock<IDietaryProfilesRepository>();
         private readonly IDietaryProfileService _sut;
 
         public UpdateTests()
@@ -24,7 +23,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.DietaryProfileSer
                 new Mock<IConversion>().Object,
                 new Mock<IDailyIntakeHelper>().Object,
                 new Mock<IOptions<DailyIntakeReference>>().Object,
-                _dietaryProfilesRepositoryMock.Object,
+                new Mock<IDietaryProfilesRepository>().Object,
                 MapperMocker.GetMapper<CookingAssistantProfile>());
         }
 
@@ -40,7 +39,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.DietaryProfileSer
         }
 
         [Fact]
-        public async Task ValidateThrowsIfInvalidModel()
+        public async Task Validate_Throws_IfInvalidModel()
         {
             UpdateDietaryProfile model = new DietaryProfileBuilder().BuildUpdateModel();
             var failedValidator = ValidatorMocker.GetFailed<UpdateDietaryProfile>();

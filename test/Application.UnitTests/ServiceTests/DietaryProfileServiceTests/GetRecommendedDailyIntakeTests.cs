@@ -15,19 +15,20 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.DietaryProfileSer
 {
     public class GetRecommendedDailyIntakeTests
     {
-        private readonly Mock<IOptions<DailyIntakeReference>> _dailyIntakeRefOptionsMock = new Mock<IOptions<DailyIntakeReference>>();
         private readonly IDietaryProfileService _sut;
 
         public GetRecommendedDailyIntakeTests()
         {
             DailyIntakeReference intakeRefModel = new DietaryProfileBuilder().BuildDailyIntakeReference();
-            _dailyIntakeRefOptionsMock.Setup(x => x.Value).Returns(intakeRefModel);
+
+            var dailyIntakeRefOptionsMock = new Mock<IOptions<DailyIntakeReference>>();
+            dailyIntakeRefOptionsMock.Setup(x => x.Value).Returns(intakeRefModel);
 
             _sut = new DietaryProfileService(
                 new Mock<IConversion>().Object,
                 new Mock<IDailyIntakeHelper>().Object,
-                _dailyIntakeRefOptionsMock.Object,
-                new Mock<IDietaryProfilesRepository>().Object,
+                dailyIntakeRefOptionsMock.Object,
+                null,
                 GetMapper());
         }
 
@@ -43,7 +44,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.DietaryProfileSer
         }
 
         [Fact]
-        public void ValidateThrowsIfInvalidModel()
+        public void Validate_Throws_IfInvalidModel()
         {
             GetRecommendedDailyIntake model = new DietaryProfileBuilder().BuildGetRecommendedModel();
             var failedValidator = ValidatorMocker.GetFailed<GetRecommendedDailyIntake>();

@@ -1,5 +1,5 @@
-﻿using Api.Controllers.CookingAssistant;
-using FluentValidation;
+﻿using System.Threading.Tasks;
+using Api.Controllers.CookingAssistant;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using PersonalAssistant.Api.UnitTests.Builders;
@@ -16,16 +16,14 @@ namespace PersonalAssistant.Api.UnitTests.Controllers.CookingAssistant
 
         public IngredientsControllerTests()
         {
-            _sut = new IngredientsController(
-                _ingredientServiceMock.Object,
-                new Mock<IValidator<UpdateIngredient>>().Object)
+            _sut = new IngredientsController(_ingredientServiceMock.Object, null)
             {
                 ControllerContext = new ControllerContextBuilder().Build()
             };
         }
 
         [Fact]
-        public void GetReturns404IfNotFound()
+        public void Get_Returns404_IfNotFound()
         {
             _ingredientServiceMock.Setup(x => x.Get(It.IsAny<int>(), It.IsAny<int>()))
                 .Returns((EditIngredient)null);
@@ -33,6 +31,13 @@ namespace PersonalAssistant.Api.UnitTests.Controllers.CookingAssistant
             var result = _sut.Get(It.IsAny<int>());
 
             Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Update_Returns400_IfBodyMissing()
+        {
+            var result = await _sut.Update(null);
+            Assert.IsType<BadRequestResult>(result);
         }
     }
 }

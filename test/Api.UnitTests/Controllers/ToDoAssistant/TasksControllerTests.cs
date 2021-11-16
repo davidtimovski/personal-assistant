@@ -1,14 +1,10 @@
-﻿using Api.Config;
+﻿using System.Threading.Tasks;
+using Api.Config;
 using Api.Controllers.ToDoAssistant;
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Moq;
 using PersonalAssistant.Api.UnitTests.Builders;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models;
 using Xunit;
@@ -24,14 +20,7 @@ namespace PersonalAssistant.Api.UnitTests.Controllers.ToDoAssistant
         {
             _sut = new TasksController(
                 _taskServiceMock.Object,
-                new Mock<IListService>().Object,
-                new Mock<IUserService>().Object,
-                new Mock<INotificationService>().Object,
-                new Mock<ISenderService>().Object,
-                new Mock<IValidator<CreateTask>>().Object,
-                new Mock<IValidator<BulkCreate>>().Object,
-                new Mock<IValidator<UpdateTask>>().Object,
-                new Mock<IStringLocalizer<TasksController>>().Object,
+                null, null, null, null, null, null, null, null,
                 new Mock<IOptions<Urls>>().Object)
             {
                 ControllerContext = new ControllerContextBuilder().Build()
@@ -39,7 +28,7 @@ namespace PersonalAssistant.Api.UnitTests.Controllers.ToDoAssistant
         }
 
         [Fact]
-        public void GetReturns404IfNotFound()
+        public void Get_Returns404_IfNotFound()
         {
             _taskServiceMock.Setup(x => x.Get(It.IsAny<int>(), It.IsAny<int>()))
                 .Returns((TaskDto)null);
@@ -50,7 +39,7 @@ namespace PersonalAssistant.Api.UnitTests.Controllers.ToDoAssistant
         }
 
         [Fact]
-        public void GetForUpdateReturns404IfNotFound()
+        public void GetForUpdate_Returns404_IfNotFound()
         {
             _taskServiceMock.Setup(x => x.GetForUpdate(It.IsAny<int>(), It.IsAny<int>()))
                 .Returns((TaskForUpdate)null);
@@ -58,6 +47,48 @@ namespace PersonalAssistant.Api.UnitTests.Controllers.ToDoAssistant
             var result = _sut.GetForUpdate(It.IsAny<int>());
 
             Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Create_Returns400_IfBodyMissing()
+        {
+            var result = await _sut.Create(null);
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public async Task BulkCreate_Returns400_IfBodyMissing()
+        {
+            var result = await _sut.BulkCreate(null);
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public async Task Update_Returns400_IfBodyMissing()
+        {
+            var result = await _sut.Update(null);
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public async Task Complete_Returns400_IfBodyMissing()
+        {
+            var result = await _sut.Complete(null);
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public async Task Uncomplete_Returns400_IfBodyMissing()
+        {
+            var result = await _sut.Uncomplete(null);
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public async Task Reorder_Returns400_IfBodyMissing()
+        {
+            var result = await _sut.Reorder(null);
+            Assert.IsType<BadRequestResult>(result);
         }
     }
 }

@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using FluentValidation;
 using Moq;
-using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models;
@@ -25,10 +24,10 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
             _successfulValidatorMock = ValidatorMocker.GetSuccessful<CreateTask>();
 
             _sut = new TaskService(
-                new Mock<IUserService>().Object,
+                null,
                 new Mock<IListService>().Object,
                 _tasksRepositoryMock.Object,
-                new Mock<IListsRepository>().Object,
+                null,
                 MapperMocker.GetMapper<ToDoAssistantProfile>());
         }
 
@@ -43,7 +42,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
         }
 
         [Fact]
-        public async Task ValidateThrowsIfInvalidModel()
+        public async Task Validate_Throws_IfInvalidModel()
         {
             CreateTask model = new TaskBuilder().BuildCreateModel();
             var failedValidator = ValidatorMocker.GetFailed<CreateTask>();

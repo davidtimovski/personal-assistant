@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentValidation;
 using Moq;
-using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
 using PersonalAssistant.Application.Mappings;
 using PersonalAssistant.Application.Services.ToDoAssistant;
 using PersonalAssistant.Application.UnitTests.Builders;
@@ -27,10 +24,10 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.ListServiceTests
             _successfulValidatorMock = ValidatorMocker.GetSuccessful<CreateList>();
 
             _sut = new ListService(
-                new Mock<IUserService>().Object,
+                null,
                 _listsRepositoryMock.Object,
-                new Mock<ITasksRepository>().Object,
-                new Mock<INotificationsRepository>().Object,
+                null,
+                null,
                 MapperMocker.GetMapper<ToDoAssistantProfile>());
         }
 
@@ -45,7 +42,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.ListServiceTests
         }
 
         [Fact]
-        public async Task ValidateThrowsIfInvalidModel()
+        public async Task Validate_Throws_IfInvalidModel()
         {
             CreateList model = new ListBuilder().BuildCreateModel();
             var failedValidator = ValidatorMocker.GetFailed<CreateList>();

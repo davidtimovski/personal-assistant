@@ -3,7 +3,6 @@ using FluentValidation;
 using Moq;
 using PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients;
 using PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients.Models;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
 using PersonalAssistant.Application.Mappings;
 using PersonalAssistant.Application.Services.CookingAssistant;
 using PersonalAssistant.Application.UnitTests.Builders;
@@ -23,7 +22,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.IngredientService
             _successfulValidatorMock = ValidatorMocker.GetSuccessful<UpdateIngredient>();
 
             _sut = new IngredientService(
-                new Mock<ITaskService>().Object,
+                null,
                 _ingredientsRepositoryMock.Object,
                 MapperMocker.GetMapper<CookingAssistantProfile>());
         }
@@ -39,7 +38,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.IngredientService
         }
 
         [Fact]
-        public async Task ValidateThrowsIfInvalidModel()
+        public async Task Validate_Throws_IfInvalidModel()
         {
             UpdateIngredient model = new IngredientBuilder().BuildUpdateModel();
             var failedValidator = ValidatorMocker.GetFailed<UpdateIngredient>();
@@ -48,7 +47,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.IngredientService
         }
 
         [Fact]
-        public async Task TrimsNameIfItsNotLinkedToTask()
+        public async Task TrimsName_IfItsNotLinkedToTask()
         {
             string actualName = null;
             _ingredientsRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Ingredient>()))
@@ -63,7 +62,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.IngredientService
         }
 
         [Fact]
-        public async Task NullsNameIfItsLinkedToTask()
+        public async Task NullsName_IfItsLinkedToTask()
         {
             string actualName = null;
             _ingredientsRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Ingredient>()))

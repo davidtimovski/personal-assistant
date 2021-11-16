@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using Moq;
-using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
 using PersonalAssistant.Application.Mappings;
 using PersonalAssistant.Application.Services.ToDoAssistant;
@@ -20,15 +18,15 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.ListServiceTests
         public NotificationTests()
         {
             _sut = new ListService(
-                new Mock<IUserService>().Object,
+                null,
                 _listsRepositoryMock.Object,
                 _tasksRepositoryMock.Object,
-                new Mock<INotificationsRepository>().Object,
+                null,
                 MapperMocker.GetMapper<ToDoAssistantProfile>());
         }
 
         [Fact]
-        public void GetUsersToBeNotifiedOfChangeReturnsEmptyListIfIsPrivateIsTrue()
+        public void GetUsersToBeNotifiedOfChange_ReturnsEmptyList_IfIsPrivateIsTrue()
         {
             const bool isPrivate = true;
 
@@ -41,7 +39,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.ListServiceTests
         }
 
         [Fact]
-        public void GetUsersToBeNotifiedOfChangeReturnsEmptyListIfIsPrivateCheckReturnsTrue()
+        public void GetUsersToBeNotifiedOfChange_ReturnsEmptyList_IfIsPrivateCheckReturnsTrue()
         {
             const bool isPrivate = true;
 

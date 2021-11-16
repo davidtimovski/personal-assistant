@@ -1,15 +1,12 @@
-﻿using Api.Config;
+﻿using System.Threading.Tasks;
+using Api.Config;
 using Api.Controllers.ToDoAssistant;
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Moq;
 using PersonalAssistant.Api.UnitTests.Builders;
-using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications;
 using Xunit;
 
 namespace PersonalAssistant.Api.UnitTests.Controllers.ToDoAssistant
@@ -23,15 +20,7 @@ namespace PersonalAssistant.Api.UnitTests.Controllers.ToDoAssistant
         {
             _sut = new ListsController(
                 _listServiceMock.Object,
-                new Mock<INotificationService>().Object,
-                new Mock<ISenderService>().Object,
-                new Mock<IUserService>().Object,
-                new Mock<IValidator<CreateList>>().Object,
-                new Mock<IValidator<UpdateList>>().Object,
-                new Mock<IValidator<UpdateSharedList>>().Object,
-                new Mock<IValidator<ShareList>>().Object,
-                new Mock<IValidator<CopyList>>().Object,
-                new Mock<IStringLocalizer<ListsController>>().Object,
+                null, null, null, null, null, null, null, null, null,
                 new Mock<IOptions<Urls>>().Object)
             {
                 ControllerContext = new ControllerContextBuilder().Build()
@@ -39,7 +28,7 @@ namespace PersonalAssistant.Api.UnitTests.Controllers.ToDoAssistant
         }
 
         [Fact]
-        public void GetReturns404IfNotFound()
+        public void Get_Returns404_IfNotFound()
         {
             _listServiceMock.Setup(x => x.Get(It.IsAny<int>(), It.IsAny<int>()))
                 .Returns((EditListDto)null);
@@ -50,7 +39,7 @@ namespace PersonalAssistant.Api.UnitTests.Controllers.ToDoAssistant
         }
 
         [Fact]
-        public void GetWithSharesReturns404IfNotFound()
+        public void GetWithShares_Returns404_IfNotFound()
         {
             _listServiceMock.Setup(x => x.GetWithShares(It.IsAny<int>(), It.IsAny<int>()))
                 .Returns((ListWithShares)null);
@@ -58,6 +47,69 @@ namespace PersonalAssistant.Api.UnitTests.Controllers.ToDoAssistant
             var result = _sut.GetWithShares(It.IsAny<int>());
 
             Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Create_Returns400_IfBodyMissing()
+        {
+            var result = await _sut.Create(null);
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public async Task Update_Returns400_IfBodyMissing()
+        {
+            var result = await _sut.Update(null);
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public async Task UpdateShared_Returns400_IfBodyMissing()
+        {
+            var result = await _sut.UpdateShared(null);
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public async Task Share_Returns400_IfBodyMissing()
+        {
+            var result = await _sut.Share(null);
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public async Task Copy_Returns400_IfBodyMissing()
+        {
+            var result = await _sut.Copy(null);
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public async Task SetIsArchived_Returns400_IfBodyMissing()
+        {
+            var result = await _sut.SetIsArchived(null);
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public async Task SetTasksAsNotCompleted_Returns400_IfBodyMissing()
+        {
+            var result = await _sut.SetTasksAsNotCompleted(null);
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public async Task SetShareIsAccepted_Returns400_IfBodyMissing()
+        {
+            var result = await _sut.SetShareIsAccepted(null);
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public async Task ReorderReturns_BadRequest_IfBodyMissing()
+        {
+            var result = await _sut.Reorder(null);
+            Assert.IsType<BadRequestResult>(result);
         }
     }
 }

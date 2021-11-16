@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentValidation;
 using Moq;
-using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes;
 using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
 using PersonalAssistant.Application.Mappings;
 using PersonalAssistant.Application.Services.CookingAssistant;
 using PersonalAssistant.Application.UnitTests.Builders;
@@ -25,10 +23,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         {
             _successfulValidatorMock = ValidatorMocker.GetSuccessful<UpdateRecipe>();
 
-            _sut = new RecipeService(
-                new Mock<ITaskService>().Object,
-                new Mock<ICdnService>().Object,
-                new Mock<IUserService>().Object,
+            _sut = new RecipeService(null, null, null,
                 _recipesRepositoryMock.Object,
                 MapperMocker.GetMapper<CookingAssistantProfile>());
         }
@@ -44,7 +39,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         }
 
         [Fact]
-        public async Task ValidateThrowsIfInvalidModel()
+        public async Task Validate_Throws_IfInvalidModel()
         {
             UpdateRecipe model = new RecipeBuilder().BuildUpdateModel();
             var failedValidator = ValidatorMocker.GetFailed<UpdateRecipe>();
@@ -68,7 +63,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         }
 
         [Fact]
-        public async Task TrimsDescriptionIfPresent()
+        public async Task TrimsDescription_IfPresent()
         {
             string actualDescription = null;
             _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<List<int>>()))
@@ -83,7 +78,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         }
 
         [Fact]
-        public async Task TrimsRecipeIngredientNamesIfTheyAreNotLinkedToTasks()
+        public async Task TrimsRecipeIngredientNames_IfTheyAreNotLinkedToTasks()
         {
             List<RecipeIngredient> actualRecipeIngredients = null;
             _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<List<int>>()))
@@ -107,7 +102,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         }
 
         [Fact]
-        public async Task NullsRecipeIngredientNamesIfTheyAreLinkedToTasks()
+        public async Task NullsRecipeIngredientNames_IfTheyAreLinkedToTasks()
         {
             List<RecipeIngredient> actualRecipeIngredients = null;
             _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<List<int>>()))
@@ -124,7 +119,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         }
 
         [Fact]
-        public async Task SetsAmountOfRecipeIngredientsToNullIfAmountIsZero()
+        public async Task SetsAmountOfRecipeIngredientsToNull_IfAmountIsZero()
         {
             List<RecipeIngredient> actualRecipeIngredients = null;
             _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<List<int>>()))
@@ -141,7 +136,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         }
 
         [Fact]
-        public async Task SetsUnitOfRecipeIngredientsToNullIfAmountIsZero()
+        public async Task SetsUnitOfRecipeIngredientsToNull_IfAmountIsZero()
         {
             List<RecipeIngredient> actualRecipeIngredients = null;
             _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<List<int>>()))
@@ -158,7 +153,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         }
 
         [Fact]
-        public async Task SetsUnitOfRecipeIngredientsToNullIfAmountIsNull()
+        public async Task SetsUnitOfRecipeIngredientsToNull_IfAmountIsNull()
         {
             List<RecipeIngredient> actualRecipeIngredients = null;
             _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<List<int>>()))
@@ -192,7 +187,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         }
 
         [Fact]
-        public async Task TrimsInstructionsIfPresent()
+        public async Task TrimsInstructions_IfPresent()
         {
             string actualInstructions = null;
             _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<List<int>>()))
@@ -207,7 +202,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         }
 
         [Fact]
-        public async Task SetsPrepDurationToNullIfLowerThanOneMinute()
+        public async Task SetsPrepDurationToNull_IfLowerThanOneMinute()
         {
             TimeSpan? actualPrepDuration = null;
             _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<List<int>>()))
@@ -221,7 +216,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         }
 
         [Fact]
-        public async Task SetsCookDurationToNullIfLowerThanOneMinute()
+        public async Task SetsCookDurationToNull_IfLowerThanOneMinute()
         {
             TimeSpan? actualCookDuration = null;
             _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<List<int>>()))

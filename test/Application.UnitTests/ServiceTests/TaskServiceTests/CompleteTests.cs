@@ -1,7 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Moq;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models;
 using PersonalAssistant.Application.Mappings;
@@ -19,15 +17,15 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
         public CompleteTests()
         {
             _sut = new TaskService(
-                new Mock<IUserService>().Object,
-                new Mock<IListService>().Object,
+                null,
+                null,
                 _tasksRepositoryMock.Object,
-                new Mock<IListsRepository>().Object,
+                null,
                 MapperMocker.GetMapper<ToDoAssistantProfile>());
         }
 
         [Fact]
-        public async Task DoesNothingIfTaskAlreadyCompleted()
+        public async Task DoesNothing_IfTaskAlreadyCompleted()
         {
             _tasksRepositoryMock.Setup(x => x.Exists(It.IsAny<int>(), It.IsAny<int>()))
                 .Returns(true);
