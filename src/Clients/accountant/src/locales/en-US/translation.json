@@ -351,7 +351,7 @@
     "taxCategories": {
       "title": "Tax categories",
       "question": "What does it mean?",
-      "answer": "Transactions made within a tax category will be not be considered as regular expenses and will simply be exempted from all expenditure sums like in the dashboard, Bar chart, and Expenditure heatmap pages."
+      "answer": "Transactions made within a tax category will be not be considered as regular expenses and will simply be exempted from all expenditure sums like in the dashboard page, Pie chart, Bar chart, and Expenditure heatmap."
     }
   }
 }

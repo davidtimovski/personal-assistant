@@ -411,4 +411,20 @@ td.sync-icon-cell {
   }
 }
 
+.currency-autocomplete-customizations {
+  background: #fafafa;
+  border-radius: var(--border-radius);
+
+  > div {
+    border-radius: var(--border-radius);
+    padding: 5px 10px;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+
+  .selected {
+    background: #e1e1e1;
+  }
+}
+
 @import "./desktop.scss";

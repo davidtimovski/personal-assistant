@@ -113,7 +113,11 @@ export class TransactionsService extends HttpProxyBase {
     currency: string,
     uncategorizedLabel: string
   ): Promise<Array<AmountByCategory>> {
-    const transactions = await this.idbHelper.getExpendituresAndDepositsBetweenDates(fromDate, toDate, accountId, type);
+    let transactions = await this.idbHelper.getExpendituresAndDepositsBetweenDates(fromDate, toDate, accountId, type);
+
+    if (type === TransactionType.Expense) {
+      transactions = transactions.filter((x) => !x.isTax);
+    }
 
     return await this.getByCategory(transactions, currency, uncategorizedLabel);
   }

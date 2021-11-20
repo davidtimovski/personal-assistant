@@ -48,27 +48,6 @@
   }
 }
 
-.currency-autocomplete-customizations {
-  background: #fafafa;
-  border-radius: var(--border-radius);
-
-  > div {
-    border-radius: var(--border-radius);
-    padding: 5px 10px;
-    font-size: 1rem;
-    cursor: pointer;
-  }
-
-  .group {
-    background: var(--primary-color);
-    color: #fafafa;
-  }
-
-  .selected {
-    background: #e1e1e1;
-  }
-}
-
 /* DESKTOP */
 @media screen and (min-width: $desktop-min) {
   .currency-selector-wrap,
