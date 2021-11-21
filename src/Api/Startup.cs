@@ -89,8 +89,7 @@ namespace Api
                 {
                     options.EnableEndpointRouting = false;
                 })
-                .AddNewtonsoftJson()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+                .AddNewtonsoftJson();
             services.AddHttpClient();
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 

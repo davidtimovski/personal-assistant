@@ -125,7 +125,6 @@ namespace Auth
                 {
                     options.EnableEndpointRouting = false;
                 })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddViewLocalization()
                 .AddFluentValidation(x => x.RegisterValidatorsFromAssemblyContaining<Startup>());
             services.AddHttpClient();
