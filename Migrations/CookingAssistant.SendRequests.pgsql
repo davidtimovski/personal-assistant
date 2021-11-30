@@ -7,8 +7,8 @@ CREATE TABLE public."CookingAssistant.SendRequests"
     "RecipeId" integer NOT NULL,
     "UserId" integer NOT NULL,
     "IsDeclined" boolean NOT NULL DEFAULT FALSE,
-    "CreatedDate" timestamp without time zone NOT NULL,
-    "ModifiedDate" timestamp without time zone NOT NULL,
+    "CreatedDate" timestamp with time zone NOT NULL,
+    "ModifiedDate" timestamp with time zone NOT NULL,
     CONSTRAINT "PK_CookingAssistant.SendRequests" PRIMARY KEY ("RecipeId", "UserId"),
     CONSTRAINT "FK_CA.SendRequests_CA.Recipes_RecipeId" FOREIGN KEY ("RecipeId")
     REFERENCES public."CookingAssistant.Recipes" ("Id") MATCH SIMPLE

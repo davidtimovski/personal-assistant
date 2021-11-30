@@ -13,8 +13,8 @@ CREATE TABLE public."ToDoAssistant.Tasks"
     "PrivateToUserId" integer,
     "AssignedToUserId" integer,
     "Order" smallint NOT NULL,
-    "CreatedDate" timestamp without time zone NOT NULL,
-    "ModifiedDate" timestamp without time zone NOT NULL,
+    "CreatedDate" timestamp with time zone NOT NULL,
+    "ModifiedDate" timestamp with time zone NOT NULL,
     CONSTRAINT "PK_ToDoAssistant.Tasks" PRIMARY KEY ("Id"),
     CONSTRAINT "FK_ToDoAssistant.Tasks_ToDoAssistant.Lists_ListId" FOREIGN KEY ("ListId")
     REFERENCES public."ToDoAssistant.Lists" ("Id") MATCH SIMPLE

@@ -10,8 +10,8 @@ CREATE TABLE public."Accountant.Accounts"
 	"IsMain" boolean NOT NULL DEFAULT FALSE,
 	"Currency" character varying(3) COLLATE pg_catalog."default" NOT NULL DEFAULT 'EUR',
 	"StockPrice" decimal(10, 4),
-    "CreatedDate" timestamp without time zone NOT NULL,
-    "ModifiedDate" timestamp without time zone NOT NULL,
+    "CreatedDate" timestamp with time zone NOT NULL,
+    "ModifiedDate" timestamp with time zone NOT NULL,
     CONSTRAINT "PK_Accountant.Accounts" PRIMARY KEY ("Id"),
 	CONSTRAINT "FK_Accountant.Accounts_AspNetUsers_UserId" FOREIGN KEY ("UserId")
     REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE

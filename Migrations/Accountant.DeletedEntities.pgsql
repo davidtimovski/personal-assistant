@@ -7,7 +7,7 @@ CREATE TABLE public."Accountant.DeletedEntities"
 	"UserId" integer NOT NULL,
 	"EntityType" smallint NOT NULL,
 	"EntityId" integer NOT NULL,
-    "DeletedDate" timestamp without time zone NOT NULL,
+    "DeletedDate" timestamp with time zone NOT NULL,
     CONSTRAINT "PK_Accountant.DeletedEntities" PRIMARY KEY ("UserId", "EntityType", "EntityId"),
 	CONSTRAINT "FK_Accountant.DeletedEntities_AspNetUsers_UserId" FOREIGN KEY ("UserId")
     REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE

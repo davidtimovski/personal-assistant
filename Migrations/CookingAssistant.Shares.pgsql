@@ -7,9 +7,9 @@ CREATE TABLE public."CookingAssistant.Shares"
     "RecipeId" integer NOT NULL,
     "UserId" integer NOT NULL,
     "IsAccepted" boolean DEFAULT NULL,
-	"LastOpenedDate" timestamp without time zone NOT NULL,
-    "CreatedDate" timestamp without time zone NOT NULL,
-    "ModifiedDate" timestamp without time zone NOT NULL,
+	"LastOpenedDate" timestamp with time zone NOT NULL,
+    "CreatedDate" timestamp with time zone NOT NULL,
+    "ModifiedDate" timestamp with time zone NOT NULL,
     CONSTRAINT "PK_CookingAssistant.Shares" PRIMARY KEY ("RecipeId", "UserId"),
     CONSTRAINT "FK_CookingAssistant.Shares_CookingAssistant.Recipes_RecipeId" FOREIGN KEY ("RecipeId")
     REFERENCES public."CookingAssistant.Recipes" ("Id") MATCH SIMPLE

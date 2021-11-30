@@ -11,8 +11,8 @@ CREATE TABLE public."Accountant.Categories"
 	"Type" smallint NOT NULL,
 	"GenerateUpcomingExpense" boolean NOT NULL DEFAULT FALSE,
 	"IsTax" boolean NOT NULL DEFAULT FALSE,
-    "CreatedDate" timestamp without time zone NOT NULL,
-    "ModifiedDate" timestamp without time zone NOT NULL,
+    "CreatedDate" timestamp with time zone NOT NULL,
+    "ModifiedDate" timestamp with time zone NOT NULL,
     CONSTRAINT "PK_Accountant.Categories" PRIMARY KEY ("Id"),
 	CONSTRAINT "FK_Accountant.Categories_Accountant.Categories_ParentId" FOREIGN KEY ("ParentId")
     REFERENCES public."Accountant.Categories" ("Id") MATCH SIMPLE

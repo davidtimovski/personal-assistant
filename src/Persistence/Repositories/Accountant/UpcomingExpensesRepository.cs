@@ -59,7 +59,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
             dbUpcomingExpense.Amount = upcomingExpense.Amount;
             dbUpcomingExpense.Currency = upcomingExpense.Currency;
             dbUpcomingExpense.Description = upcomingExpense.Description;
-            dbUpcomingExpense.Date = upcomingExpense.Date;
+            dbUpcomingExpense.Date = upcomingExpense.Date.ToUniversalTime();
             dbUpcomingExpense.ModifiedDate = upcomingExpense.ModifiedDate;
 
             await EFContext.SaveChangesAsync();

@@ -14,9 +14,9 @@ CREATE TABLE public."CookingAssistant.Recipes"
     "Servings" smallint NOT NULL,
     "ImageUri" character varying(255) NOT NULL COLLATE pg_catalog."default",
     "VideoSrc" character varying(1024) COLLATE pg_catalog."default",
-    "LastOpenedDate" timestamp without time zone NOT NULL,
-    "CreatedDate" timestamp without time zone NOT NULL,
-    "ModifiedDate" timestamp without time zone NOT NULL,
+    "LastOpenedDate" timestamp with time zone NOT NULL,
+    "CreatedDate" timestamp with time zone NOT NULL,
+    "ModifiedDate" timestamp with time zone NOT NULL,
     CONSTRAINT "PK_CookingAssistant.Recipes" PRIMARY KEY ("Id"),
     CONSTRAINT "FK_CookingAssistant.Recipes_AspNetUsers_UserId" FOREIGN KEY ("UserId")
     REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE

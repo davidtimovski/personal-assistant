@@ -152,7 +152,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
             dbTransaction.ToStocks = transaction.ToStocks;
             dbTransaction.Currency = transaction.Currency;
             dbTransaction.Description = transaction.Description;
-            dbTransaction.Date = transaction.Date;
+            dbTransaction.Date = transaction.Date.ToUniversalTime();
             dbTransaction.IsEncrypted = transaction.IsEncrypted;
             dbTransaction.EncryptedDescription = transaction.EncryptedDescription;
             dbTransaction.Salt = transaction.Salt;

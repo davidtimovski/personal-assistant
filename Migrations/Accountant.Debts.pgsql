@@ -11,8 +11,8 @@ CREATE TABLE public."Accountant.Debts"
 	  "Currency" character varying(3) COLLATE pg_catalog."default" NOT NULL DEFAULT 'EUR',
     "Description" character varying(255) COLLATE pg_catalog."default",
 	  "UserIsDebtor" boolean NOT NULL DEFAULT FALSE,
-    "CreatedDate" timestamp without time zone NOT NULL,
-    "ModifiedDate" timestamp without time zone NOT NULL,
+    "CreatedDate" timestamp with time zone NOT NULL,
+    "ModifiedDate" timestamp with time zone NOT NULL,
     CONSTRAINT "PK_Accountant.Debts" PRIMARY KEY ("Id"),
 	  CONSTRAINT "FK_Accountant.Debts_AspNetUsers_UserId" FOREIGN KEY ("UserId")
     REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE

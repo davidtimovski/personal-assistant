@@ -41,8 +41,8 @@ CREATE TABLE public."CookingAssistant.DietaryProfiles"
 	"TrackPotassium" boolean NOT NULL DEFAULT TRUE,
 	"CustomMagnesium" smallint,
 	"TrackMagnesium" boolean NOT NULL DEFAULT TRUE,
-    "CreatedDate" timestamp without time zone NOT NULL,
-    "ModifiedDate" timestamp without time zone NOT NULL,
+    "CreatedDate" timestamp with time zone NOT NULL,
+    "ModifiedDate" timestamp with time zone NOT NULL,
     CONSTRAINT "PK_CookingAssistant.DietaryProfiles" PRIMARY KEY ("UserId"),
     CONSTRAINT "FK_CookingAssistant.DietaryProfiles_AspNetUsers_UserId" FOREIGN KEY ("UserId")
     REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE

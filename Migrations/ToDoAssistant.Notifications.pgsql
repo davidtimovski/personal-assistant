@@ -11,8 +11,8 @@ CREATE TABLE public."ToDoAssistant.Notifications"
     "TaskId" integer,
     "Message" character varying(255) NOT NULL COLLATE pg_catalog."default",
     "IsSeen" boolean NOT NULL DEFAULT false,
-    "CreatedDate" timestamp without time zone NOT NULL,
-    "ModifiedDate" timestamp without time zone NOT NULL,
+    "CreatedDate" timestamp with time zone NOT NULL,
+    "ModifiedDate" timestamp with time zone NOT NULL,
     CONSTRAINT "PK_ToDoAssistant.Notifications" PRIMARY KEY ("Id"),
     CONSTRAINT "FK_ToDoAssistant.Notifications_AspNetUsers_UserId" FOREIGN KEY ("UserId")
     REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE

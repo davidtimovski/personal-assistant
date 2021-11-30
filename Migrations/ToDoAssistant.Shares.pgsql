@@ -11,8 +11,8 @@ CREATE TABLE public."ToDoAssistant.Shares"
     "IsArchived" boolean NOT NULL DEFAULT false,
     "Order" smallint,
     "NotificationsEnabled" boolean NOT NULL DEFAULT TRUE,
-    "CreatedDate" timestamp without time zone NOT NULL,
-    "ModifiedDate" timestamp without time zone NOT NULL,
+    "CreatedDate" timestamp with time zone NOT NULL,
+    "ModifiedDate" timestamp with time zone NOT NULL,
     CONSTRAINT "PK_ToDoAssistant.Shares" PRIMARY KEY ("ListId", "UserId"),
     CONSTRAINT "FK_ToDoAssistant.Shares_ToDoAssistant.Lists_ListId" FOREIGN KEY ("ListId")
     REFERENCES public."ToDoAssistant.Lists" ("Id") MATCH SIMPLE

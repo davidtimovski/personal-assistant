@@ -19,8 +19,8 @@ CREATE TABLE public."Accountant.Transactions"
 	"Salt" bytea,
 	"Nonce" bytea,
 	"EncryptionHint" character varying(100) COLLATE pg_catalog."default",
-    "CreatedDate" timestamp without time zone NOT NULL,
-    "ModifiedDate" timestamp without time zone NOT NULL,
+    "CreatedDate" timestamp with time zone NOT NULL,
+    "ModifiedDate" timestamp with time zone NOT NULL,
     CONSTRAINT "FK_Accountant.Transactions_Accountant.Accounts_ToAccountId" FOREIGN KEY ("ToAccountId")
     REFERENCES public."Accountant.Accounts" ("Id") MATCH SIMPLE
     ON UPDATE NO ACTION

@@ -12,8 +12,8 @@ CREATE TABLE public."ToDoAssistant.Lists"
     "NotificationsEnabled" boolean NOT NULL DEFAULT TRUE,
     "IsOneTimeToggleDefault" boolean NOT NULL DEFAULT FALSE,
     "IsArchived" boolean NOT NULL DEFAULT FALSE,
-    "CreatedDate" timestamp without time zone NOT NULL,
-    "ModifiedDate" timestamp without time zone NOT NULL,
+    "CreatedDate" timestamp with time zone NOT NULL,
+    "ModifiedDate" timestamp with time zone NOT NULL,
     CONSTRAINT "PK_ToDoAssistant.Lists" PRIMARY KEY ("Id"),
     CONSTRAINT "FK_ToDoAssistant.Lists_AspNetUsers_UserId" FOREIGN KEY ("UserId")
     REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE

@@ -8,8 +8,8 @@ CREATE TABLE public."CookingAssistant.RecipesIngredients"
     "IngredientId" integer NOT NULL,
     "Amount" decimal(7,2),
     "Unit" character varying(4) COLLATE pg_catalog."default",
-    "CreatedDate" timestamp without time zone NOT NULL,
-    "ModifiedDate" timestamp without time zone NOT NULL,
+    "CreatedDate" timestamp with time zone NOT NULL,
+    "ModifiedDate" timestamp with time zone NOT NULL,
     CONSTRAINT "PK_CA.RecipesIngredients" PRIMARY KEY ("RecipeId", "IngredientId"),
     CONSTRAINT "FK_CA.RecipesIngredients_CA.Recipes_RecipeId" FOREIGN KEY ("RecipeId")
     REFERENCES public."CookingAssistant.Recipes" ("Id") MATCH SIMPLE
