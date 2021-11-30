@@ -26,9 +26,9 @@ namespace PersonalAssistant.Api.UnitTests.Controllers.CookingAssistant
         }
 
         [Fact]
-        public async Task Update_Returns400_IfBodyMissing()
+        public async Task CreateOrUpdate_Returns400_IfBodyMissing()
         {
-            var result = await _sut.Update(null);
+            var result = await _sut.CreateOrUpdate(null);
             Assert.IsType<BadRequestResult>(result);
         }
     }

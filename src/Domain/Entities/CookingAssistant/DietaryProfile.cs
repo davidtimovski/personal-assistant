@@ -5,8 +5,6 @@ namespace PersonalAssistant.Domain.Entities.CookingAssistant
 {
     public class DietaryProfile : Entity
     {
-        private short age;
-
         public int UserId { get; set; }
         public DateTime? Birthday { get; set; }
         public string Gender { get; set; }
@@ -49,21 +47,19 @@ namespace PersonalAssistant.Domain.Entities.CookingAssistant
 
         public User User { get; set; }
 
-        public short GetAge()
+        public short PersonAge
         {
-            if (age != 0)
+            get
             {
+                var now = DateTime.UtcNow;
+                var age = (short)(now.Year - Birthday.Value.Year);
+                if (Birthday.Value > now.AddYears(-age))
+                {
+                    age--;
+                }
+
                 return age;
             }
-
-            var now = DateTime.UtcNow;
-            age = (short)(now.Year - Birthday.Value.Year);
-            if (Birthday.Value > now.AddYears(-age))
-            {
-                age--;
-            }
-
-            return age;
         }
     }
 }

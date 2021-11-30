@@ -40,11 +40,11 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes
         Task<Recipe> UpdateAsync(Recipe recipe, List<int> ingredientIdsToRemove);
         Task<string> DeleteAsync(int id);
         Task SaveSharingDetailsAsync(IEnumerable<RecipeShare> newShares, IEnumerable<RecipeShare> removedShares);
-        Task SetShareIsAcceptedAsync(int id, int userId, bool isAccepted, DateTime modifiedDate);
+        Task SetShareIsAcceptedAsync(int recipeId, int userId, bool isAccepted, DateTime modifiedDate);
         Task<RecipeShare> LeaveAsync(int id, int userId);
         Task CreateSendRequestsAsync(IEnumerable<SendRequest> sendRequests);
-        Task DeclineSendRequestAsync(int id, int userId, DateTime modifiedDate);
-        Task DeleteSendRequestAsync(int id, int userId);
+        Task DeclineSendRequestAsync(int recipeId, int userId, DateTime modifiedDate);
+        Task DeleteSendRequestAsync(int recipeId, int userId);
         Task<int> ImportAsync(int id, IEnumerable<(int Id, int ReplacementId, bool TransferNutritionData, bool TransferPriceData)> ingredientReplacements, string imageUri, int userId);
     }
 }

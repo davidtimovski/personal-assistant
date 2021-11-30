@@ -38,11 +38,11 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes
         Task<UpdateRecipeResult> UpdateAsync(UpdateRecipe model, IValidator<UpdateRecipe> validator);
         Task<DeleteRecipeResult> DeleteAsync(int id, int userId);
         Task ShareAsync(ShareRecipe model, IValidator<ShareRecipe> validator);
-        Task<SetShareIsAcceptedResult> SetShareIsAcceptedAsync(int id, int userId, bool isAccepted);
+        Task<SetShareIsAcceptedResult> SetShareIsAcceptedAsync(int recipeId, int userId, bool isAccepted);
         Task<LeaveRecipeResult> LeaveAsync(int id, int userId);
         Task<SendRecipeResult> SendAsync(CreateSendRequest model, IValidator<CreateSendRequest> validator);
-        Task<DeclineSendRequestResult> DeclineSendRequestAsync(int id, int userId);
-        Task DeleteSendRequestAsync(int id, int userId);
+        Task<DeclineSendRequestResult> DeclineSendRequestAsync(int recipeId, int userId);
+        Task DeleteSendRequestAsync(int recipeId, int userId);
         Task<int> ImportAsync(ImportRecipe model, IValidator<ImportRecipe> validator);
     }
 }

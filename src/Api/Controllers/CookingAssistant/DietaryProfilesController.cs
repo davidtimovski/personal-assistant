@@ -71,7 +71,7 @@ namespace Api.Controllers.CookingAssistant
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] UpdateDietaryProfile dto)
+        public async Task<IActionResult> CreateOrUpdate([FromBody] UpdateDietaryProfile dto)
         {
             if (dto == null)
             {
@@ -87,7 +87,7 @@ namespace Api.Controllers.CookingAssistant
                 return Unauthorized();
             }
 
-            await _dietaryProfileService.UpdateAsync(dto, _updateDietaryProfileValidator);
+            await _dietaryProfileService.CreateOrUpdateAsync(dto, _updateDietaryProfileValidator);
 
             return NoContent();
         }

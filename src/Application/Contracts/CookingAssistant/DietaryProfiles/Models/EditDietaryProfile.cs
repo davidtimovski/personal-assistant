@@ -26,7 +26,7 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfil
                 .ForMember(x => x.HeightInches, opt => opt.MapFrom<HeightInchesResolver>())
                 .ForMember(x => x.WeightKg, opt => opt.MapFrom<WeightKgResolver>())
                 .ForMember(x => x.WeightLbs, opt => opt.MapFrom<WeightLbsResolver>())
-                .ForMember(x => x.DailyIntake, opt => opt.MapFrom<DailyIntakeResolver>());
+                .ForMember(x => x.DailyIntake, opt => opt.Ignore());
         }
     }
 }

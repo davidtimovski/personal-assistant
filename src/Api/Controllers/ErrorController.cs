@@ -35,7 +35,7 @@ namespace Api.Controllers
                 return new UnprocessableEntityObjectResult(ModelState);
             }
 
-            _logger.LogError("An unexpected exception was caught by ErrorController", context.Error);
+            _logger.LogError($"An unexpected exception was caught by {nameof(ErrorController)}", context.Error);
 
             return StatusCode(500);
         }

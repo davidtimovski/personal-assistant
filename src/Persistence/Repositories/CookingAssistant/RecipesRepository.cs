@@ -22,13 +22,13 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
             using IDbConnection conn = OpenConnection();
 
             var recipes = conn.Query<Recipe>(@"SELECT r.""Id"", r.""UserId"", r.""Name"", r.""ImageUri"", r.""LastOpenedDate"", COUNT(t.""Id"") AS ""IngredientsMissing""
-                                                FROM ""CookingAssistant.Recipes"" AS r
-                                                LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON r.""Id"" = ri.""RecipeId""
-                                                LEFT JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
-                                                LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id"" AND t.""IsCompleted"" = FALSE
-                                                LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
-                                                WHERE r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")
-                                                GROUP BY r.""Id"", r.""Name""", new { UserId = userId });
+                                               FROM ""CookingAssistant.Recipes"" AS r
+                                               LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON r.""Id"" = ri.""RecipeId""
+                                               LEFT JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
+                                               LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id"" AND t.""IsCompleted"" = FALSE
+                                               LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
+                                               WHERE r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")
+                                               GROUP BY r.""Id"", r.""Name""", new { UserId = userId });
 
             var recipeIds = recipes.Select(x => x.Id).ToArray();
             var shares = conn.Query<RecipeShare>(@"SELECT * FROM ""CookingAssistant.Shares"" WHERE ""RecipeId"" = ANY(@RecipeIds)", new { RecipeIds = recipeIds });
@@ -131,12 +131,12 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                 recipe.Shares = conn.Query<RecipeShare>(@"SELECT * FROM ""CookingAssistant.Shares"" WHERE ""RecipeId"" = @Id", new { Id = id }).ToList();
 
                 var recipeIngredientsSql = @"SELECT ri.""Amount"", ri.""Unit"", i.""Id"", i.""TaskId"", 
-                                                    i.""Name"", t.""Id"", t.""Name"", l.""Id"", l.""Name""
-                                                 FROM ""CookingAssistant.RecipesIngredients"" AS ri
-                                                 INNER JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
-                                                 LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
-                                                 LEFT JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                                                 WHERE ri.""RecipeId"" = @RecipeId";
+                                                i.""Name"", t.""Id"", t.""Name"", l.""Id"", l.""Name""
+                                             FROM ""CookingAssistant.RecipesIngredients"" AS ri
+                                             INNER JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
+                                             LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
+                                             LEFT JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
+                                             WHERE ri.""RecipeId"" = @RecipeId";
 
                 var recipeIngredients = conn.Query<RecipeIngredient, Ingredient, ToDoTask, ToDoList, RecipeIngredient>(recipeIngredientsSql,
                     (recipeIngredient, ingredient, task, list) =>
@@ -242,9 +242,9 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
             using IDbConnection conn = OpenConnection();
 
             return conn.QueryFirstOrDefault<Recipe>(@"SELECT r.""Id"", r.""Name""
-                                                                 FROM ""CookingAssistant.Recipes"" AS r
-                                                                 LEFT JOIN ""CookingAssistant.Shares"" AS s on r.""Id"" = s.""RecipeId""
-                                                                 WHERE r.""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+                                                      FROM ""CookingAssistant.Recipes"" AS r
+                                                      LEFT JOIN ""CookingAssistant.Shares"" AS s on r.""Id"" = s.""RecipeId""
+                                                      WHERE r.""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
                 new { Id = id, UserId = userId });
         }
 
@@ -253,11 +253,11 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
             using IDbConnection conn = OpenConnection();
 
             var sql = @"SELECT sr.*, r.""Name"", u.""Name""
-                            FROM ""CookingAssistant.SendRequests"" AS sr
-                            INNER JOIN ""CookingAssistant.Recipes"" AS r ON sr.""RecipeId"" = r.""Id""
-                            INNER JOIN ""AspNetUsers"" AS u ON r.""UserId"" = u.""Id""
-                            WHERE sr.""UserId"" = @UserId
-                            ORDER BY sr.""ModifiedDate"" DESC";
+                        FROM ""CookingAssistant.SendRequests"" AS sr
+                        INNER JOIN ""CookingAssistant.Recipes"" AS r ON sr.""RecipeId"" = r.""Id""
+                        INNER JOIN ""AspNetUsers"" AS u ON r.""UserId"" = u.""Id""
+                        WHERE sr.""UserId"" = @UserId
+                        ORDER BY sr.""ModifiedDate"" DESC";
 
             return conn.Query<SendRequest, Recipe, User, SendRequest>(sql,
                 (sendRequest, recipe, user) =>
@@ -451,10 +451,10 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
             using IDbConnection conn = OpenConnection();
 
             return conn.Query<User>(@"SELECT u.*
-                                        FROM ""AspNetUsers"" AS u
-                                        INNER JOIN ""CookingAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
-                                        WHERE s.""RecipeId"" = @RecipeId AND s.""IsAccepted"" AND u.""ToDoNotificationsEnabled""",
-                                    new { RecipeId = id });
+                                      FROM ""AspNetUsers"" AS u
+                                      INNER JOIN ""CookingAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
+                                      WHERE s.""RecipeId"" = @RecipeId AND s.""IsAccepted"" AND u.""ToDoNotificationsEnabled""",
+                                      new { RecipeId = id });
         }
 
         public IEnumerable<User> GetUsersToBeNotifiedOfRecipeSent(int id)
@@ -462,10 +462,10 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
             using IDbConnection conn = OpenConnection();
 
             return conn.Query<User>(@"SELECT u.*
-                                        FROM ""AspNetUsers"" AS u
-                                        INNER JOIN ""CookingAssistant.SendRequests"" AS sr ON u.""Id"" = sr.""UserId""
-                                        WHERE sr.""RecipeId"" = @RecipeId AND u.""CookingNotificationsEnabled""",
-                                    new { RecipeId = id });
+                                      FROM ""AspNetUsers"" AS u
+                                      INNER JOIN ""CookingAssistant.SendRequests"" AS sr ON u.""Id"" = sr.""UserId""
+                                      WHERE sr.""RecipeId"" = @RecipeId AND u.""CookingNotificationsEnabled""",
+                                      new { RecipeId = id });
         }
 
         public async Task<int> CreateAsync(Recipe recipe)
@@ -473,10 +473,10 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
             using IDbConnection conn = OpenConnection();
             var transaction = conn.BeginTransaction();
 
-            var existingIngredients = await conn.QueryAsync<Ingredient>(@"SELECT * FROM ""CookingAssistant.Ingredients"" WHERE ""UserId"" = @UserId", new { recipe.UserId });
+            var existingIngredients = conn.Query<Ingredient>(@"SELECT * FROM ""CookingAssistant.Ingredients"" WHERE ""UserId"" = @UserId", new { recipe.UserId });
 
             var recipeId = (await conn.QueryAsync<int>(@"INSERT INTO ""CookingAssistant.Recipes"" (""UserId"", ""Name"", ""Description"", ""Instructions"", ""PrepDuration"", ""CookDuration"", ""Servings"", ""ImageUri"", ""VideoUrl"", ""LastOpenedDate"", ""CreatedDate"", ""ModifiedDate"") 
-                                                        VALUES (@UserId, @Name, @Description, @Instructions, @PrepDuration, @CookDuration, @Servings, @ImageUri, @VideoUrl, @LastOpenedDate, @CreatedDate, @ModifiedDate) returning ""Id""", recipe, transaction)).Single();
+                                                         VALUES (@UserId, @Name, @Description, @Instructions, @PrepDuration, @CookDuration, @Servings, @ImageUri, @VideoUrl, @LastOpenedDate, @CreatedDate, @ModifiedDate) returning ""Id""", recipe, transaction)).Single();
 
             var existingRecipeIngredients = new List<RecipeIngredient>();
             var newRecipeIngredients = new List<RecipeIngredient>();
@@ -495,15 +495,15 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                         string.Equals(x.Name, recipeIngredient.Ingredient.Name, StringComparison.OrdinalIgnoreCase));
                 }
 
-                if (existingIngredient != null)
-                {
-                    recipeIngredient.IngredientId = existingIngredient.Id;
-                    existingRecipeIngredients.Add(recipeIngredient);
-                }
-                else
+                if (existingIngredient == null)
                 {
                     recipeIngredient.Ingredient.CreatedDate = recipeIngredient.Ingredient.ModifiedDate = recipe.CreatedDate;
                     newRecipeIngredients.Add(recipeIngredient);
+                }
+                else
+                {
+                    recipeIngredient.IngredientId = existingIngredient.Id;
+                    existingRecipeIngredients.Add(recipeIngredient);
                 }
             }
 
@@ -513,14 +513,14 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                 newRecipeIngredient.Ingredient.UserId = recipe.UserId;
                 newRecipeIngredient.Ingredient.CreatedDate = newRecipeIngredient.Ingredient.ModifiedDate = recipe.CreatedDate;
                 newRecipeIngredient.IngredientId = (await conn.QueryAsync<int>(@"INSERT INTO ""CookingAssistant.Ingredients"" (""UserId"", ""TaskId"", ""Name"", ""CreatedDate"", ""ModifiedDate"")
-                                                                                VALUES (@UserId, @TaskId, @Name, @CreatedDate, @ModifiedDate) returning ""Id""",
+                                                                                 VALUES (@UserId, @TaskId, @Name, @CreatedDate, @ModifiedDate) returning ""Id""",
                                                                                  newRecipeIngredient.Ingredient, transaction)).Single();
             }
 
             // Add recipe ingredients
             var allRecipeIngredients = existingRecipeIngredients.Concat(newRecipeIngredients);
             await conn.ExecuteAsync(@"INSERT INTO ""CookingAssistant.RecipesIngredients"" (""RecipeId"", ""IngredientId"", ""Amount"", ""Unit"", ""CreatedDate"", ""ModifiedDate"")
-                                    VALUES (@RecipeId, @IngredientId, @Amount, @Unit, @CreatedDate, @ModifiedDate)", allRecipeIngredients, transaction);
+                                      VALUES (@RecipeId, @IngredientId, @Amount, @Unit, @CreatedDate, @ModifiedDate)", allRecipeIngredients, transaction);
 
             transaction.Commit();
 
@@ -532,9 +532,23 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
             using IDbConnection conn = OpenConnection();
             var transaction = conn.BeginTransaction();
 
-            var existingIngredients = await conn.QueryAsync<Ingredient>(@"SELECT * FROM ""CookingAssistant.Ingredients"" WHERE ""UserId"" = @UserId", new { recipe.UserId });
+            IEnumerable<Ingredient> existingIngredients;
+            var recipeIsShared = conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.Shares"" WHERE ""RecipeId"" = @RecipeId AND ""IsAccepted""", new { RecipeId = recipe.Id });
+            if (recipeIsShared)
+            {
+                // Include shared ingredients
+                existingIngredients = conn.Query<Ingredient>(@"SELECT i.*
+                                                               FROM ""CookingAssistant.Ingredients"" AS i 
+                                                               LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
+                                                               LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
+                                                               WHERE i.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")", new { recipe.UserId });
+            }
+            else
+            {
+                existingIngredients = conn.Query<Ingredient>(@"SELECT * FROM ""CookingAssistant.Ingredients"" WHERE ""UserId"" = @UserId", new { recipe.UserId });
+            }
 
-            var originalRecipe = await conn.QueryFirstOrDefaultAsync<Recipe>(@"SELECT * FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @Id", new { recipe.Id });
+            var originalRecipe = conn.QueryFirstOrDefault<Recipe>(@"SELECT * FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @Id", new { recipe.Id });
 
             await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.Recipes"" SET ""Name"" = @Name, ""Description"" = @Description, 
                                         ""Instructions"" = @Instructions, ""PrepDuration"" = @PrepDuration, 
@@ -560,15 +574,15 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                         string.Equals(x.Name, recipeIngredient.Ingredient.Name, StringComparison.OrdinalIgnoreCase));
                 }
 
-                if (existingIngredient != null)
-                {
-                    recipeIngredient.IngredientId = existingIngredient.Id;
-                    existingRecipeIngredients.Add(recipeIngredient);
-                }
-                else
+                if (existingIngredient == null)
                 {
                     recipeIngredient.Ingredient.CreatedDate = recipeIngredient.Ingredient.ModifiedDate = recipe.CreatedDate;
                     newRecipeIngredients.Add(recipeIngredient);
+                }
+                else
+                {
+                    recipeIngredient.IngredientId = existingIngredient.Id;
+                    existingRecipeIngredients.Add(recipeIngredient);
                 }
             }
 
@@ -580,7 +594,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                 // Delete all ingredients that aren't used in any other recipes
                 foreach (var ingredientId in ingredientIdsToRemove)
                 {
-                    var count = await conn.ExecuteScalarAsync<int>(@"SELECT COUNT(*) FROM ""CookingAssistant.RecipesIngredients"" WHERE ""IngredientId"" = @Id",
+                    var count = conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM ""CookingAssistant.RecipesIngredients"" WHERE ""IngredientId"" = @Id",
                         new { Id = ingredientId }, transaction);
 
                     if (count == 0)
@@ -597,7 +611,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                 newRecipeIngredient.Ingredient.UserId = recipe.UserId;
                 newRecipeIngredient.Ingredient.CreatedDate = newRecipeIngredient.Ingredient.ModifiedDate = recipe.ModifiedDate;
                 newRecipeIngredient.IngredientId = (await conn.QueryAsync<int>(@"INSERT INTO ""CookingAssistant.Ingredients"" (""UserId"", ""TaskId"", ""Name"", ""CreatedDate"", ""ModifiedDate"")
-                                                                                     VALUES (@UserId, @TaskId, @Name, @CreatedDate, @ModifiedDate) returning ""Id""",
+                                                                                 VALUES (@UserId, @TaskId, @Name, @CreatedDate, @ModifiedDate) returning ""Id""",
                                                                                  newRecipeIngredient.Ingredient, transaction)).Single();
             }
 
@@ -607,7 +621,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
             // Add recipe ingredients
             var allRecipeIngredients = existingRecipeIngredients.Concat(newRecipeIngredients);
             await conn.ExecuteAsync(@"INSERT INTO ""CookingAssistant.RecipesIngredients"" (""RecipeId"", ""IngredientId"", ""Amount"", ""Unit"", ""CreatedDate"", ""ModifiedDate"")
-                                          VALUES (@RecipeId, @IngredientId, @Amount, @Unit, @CreatedDate, @ModifiedDate)", allRecipeIngredients, transaction);
+                                      VALUES (@RecipeId, @IngredientId, @Amount, @Unit, @CreatedDate, @ModifiedDate)", allRecipeIngredients, transaction);
 
             transaction.Commit();
 
@@ -616,11 +630,10 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task<string> DeleteAsync(int id)
         {
-            using IDbConnection conn = OpenConnection();
+            Recipe recipe = EFContext.Recipes.Find(id);
+            EFContext.Recipes.Remove(recipe);
 
-            var recipe = await conn.QueryFirstOrDefaultAsync<Recipe>(@"SELECT * FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @Id", new { Id = id });
-
-            await conn.ExecuteAsync(@"DELETE FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @Id", new { Id = id });
+            await EFContext.SaveChangesAsync();
 
             return recipe.Name;
         }
@@ -639,13 +652,13 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
             transaction.Commit();
         }
 
-        public async Task SetShareIsAcceptedAsync(int id, int userId, bool isAccepted, DateTime modifiedDate)
+        public async Task SetShareIsAcceptedAsync(int recipeId, int userId, bool isAccepted, DateTime modifiedDate)
         {
-            using IDbConnection conn = OpenConnection();
+            RecipeShare recipeShare = EFContext.RecipeShares.First(x => x.RecipeId == recipeId && x.UserId == userId && x.IsAccepted == null);
+            recipeShare.IsAccepted = isAccepted;
+            recipeShare.ModifiedDate = modifiedDate;
 
-            await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.Shares"" SET ""IsAccepted"" = @IsAccepted, ""ModifiedDate"" = @ModifiedDate
-                                      WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @UserId AND ""IsAccepted"" IS NULL",
-                                      new { RecipeId = id, UserId = userId, IsAccepted = isAccepted, ModifiedDate = modifiedDate });
+            await EFContext.SaveChangesAsync();
         }
 
         public async Task<RecipeShare> LeaveAsync(int id, int userId)
@@ -657,35 +670,39 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                                                                            WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @UserId",
                                                                            new { RecipeId = id, UserId = userId });
 
-            await conn.ExecuteAsync(@"DELETE FROM ""CookingAssistant.Shares"" WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @UserId",
-                new { RecipeId = id, UserId = userId });
+            RecipeShare recipeShare = EFContext.RecipeShares.First(x => x.RecipeId == id && x.UserId == userId);
+            EFContext.RecipeShares.Remove(recipeShare);
+
+            await EFContext.SaveChangesAsync();
 
             return share;
         }
 
         public async Task CreateSendRequestsAsync(IEnumerable<SendRequest> sendRequests)
         {
-            using IDbConnection conn = OpenConnection();
+            foreach (SendRequest sendRequest in sendRequests)
+            {
+                EFContext.Add(sendRequest);
+            }
 
-            await conn.ExecuteAsync(@"INSERT INTO ""CookingAssistant.SendRequests"" (""RecipeId"", ""UserId"", ""CreatedDate"", ""ModifiedDate"") 
-                                          VALUES (@RecipeId, @UserId, @CreatedDate, @ModifiedDate)", sendRequests);
+            await EFContext.SaveChangesAsync();
         }
 
-        public async Task DeclineSendRequestAsync(int id, int userId, DateTime modifiedDate)
+        public async Task DeclineSendRequestAsync(int recipeId, int userId, DateTime modifiedDate)
         {
-            using IDbConnection conn = OpenConnection();
+            SendRequest sendRequest = EFContext.SendRequests.First(x => x.RecipeId == recipeId && x.UserId == userId);
+            sendRequest.IsDeclined = true;
+            sendRequest.ModifiedDate = modifiedDate;
 
-            await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.SendRequests"" SET ""IsDeclined"" = TRUE, ""ModifiedDate"" = @ModifiedDate
-                                      WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @UserId AND ""IsDeclined"" = FALSE",
-                                      new { RecipeId = id, UserId = userId, ModifiedDate = modifiedDate });
+            await EFContext.SaveChangesAsync();
         }
 
-        public async Task DeleteSendRequestAsync(int id, int userId)
+        public async Task DeleteSendRequestAsync(int recipeId, int userId)
         {
-            using IDbConnection conn = OpenConnection();
+            SendRequest sendRequest = EFContext.SendRequests.First(x => x.RecipeId == recipeId && x.UserId == userId);
+            EFContext.SendRequests.Remove(sendRequest);
 
-            await conn.ExecuteAsync(@"DELETE FROM ""CookingAssistant.SendRequests"" WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @UserId",
-                new { RecipeId = id, UserId = userId });
+            await EFContext.SaveChangesAsync();
         }
 
         public async Task<int> ImportAsync(int id, IEnumerable<(int Id, int ReplacementId, bool TransferNutritionData, bool TransferPriceData)> ingredientReplacements, string imageUri, int userId)
@@ -703,13 +720,13 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
             recipe.CreatedDate = recipe.ModifiedDate = recipe.LastOpenedDate = now;
 
             var createdRecipeId = (await conn.QueryAsync<int>(@"INSERT INTO ""CookingAssistant.Recipes"" (""UserId"", ""Name"", ""Description"", ""Instructions"", ""PrepDuration"", ""CookDuration"", ""Servings"", ""ImageUri"", ""VideoUrl"", ""LastOpenedDate"", ""CreatedDate"", ""ModifiedDate"") 
-                                                                    VALUES (@UserId, @Name, @Description, @Instructions, @PrepDuration, @CookDuration, @Servings, @ImageUri, @VideoUrl, @LastOpenedDate, @CreatedDate, @ModifiedDate) returning ""Id""", recipe, transaction)).Single();
+                                                                VALUES (@UserId, @Name, @Description, @Instructions, @PrepDuration, @CookDuration, @Servings, @ImageUri, @VideoUrl, @LastOpenedDate, @CreatedDate, @ModifiedDate) returning ""Id""", recipe, transaction)).Single();
 
             var recipeIngredientsSql = @"SELECT ri.*, i.*, t.""Name"" 
-                                            FROM ""CookingAssistant.RecipesIngredients"" AS ri
-                                            INNER JOIN ""CookingAssistant.Ingredients"" AS i ON i.""Id"" = ri.""IngredientId""
-                                            LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
-                                            WHERE ""RecipeId"" = @RecipeId";
+                                         FROM ""CookingAssistant.RecipesIngredients"" AS ri
+                                         INNER JOIN ""CookingAssistant.Ingredients"" AS i ON i.""Id"" = ri.""IngredientId""
+                                         LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
+                                         WHERE ""RecipeId"" = @RecipeId";
 
             var recipeIngredients = (await conn.QueryAsync<RecipeIngredient, Ingredient, ToDoTask, RecipeIngredient>(recipeIngredientsSql,
                     (recipeIngredient, ingredient, task) =>
@@ -745,17 +762,16 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
                     if (TransferPriceData)
                     {
-                        priceDataQuery = @"""ProductSize"" = @ProductSize, ""ProductSizeIsOneUnit"" = @ProductSizeIsOneUnit, 
-                                                ""Price"" = @Price, ""Currency"" = @Currency,";
+                        priceDataQuery = @"""ProductSize"" = @ProductSize, ""ProductSizeIsOneUnit"" = @ProductSizeIsOneUnit, ""Price"" = @Price, ""Currency"" = @Currency,";
                     }
 
                     recipeIngredient.Ingredient.ModifiedDate = now;
 
                     await conn.ExecuteAsync($@"UPDATE ""CookingAssistant.Ingredients"" SET 
-                                                {nutritionDataQuery}
-                                                {priceDataQuery}
-                                                ""ModifiedDate"" = @ModifiedDate
-                                                WHERE ""Id"" = @Id", recipeIngredient.Ingredient, transaction);
+                                               {nutritionDataQuery}
+                                               {priceDataQuery}
+                                               ""ModifiedDate"" = @ModifiedDate
+                                               WHERE ""Id"" = @Id", recipeIngredient.Ingredient, transaction);
                 }
 
                 recipeIngredient.Ingredient = null;
@@ -792,7 +808,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
             }
 
             await conn.ExecuteAsync(@"INSERT INTO ""CookingAssistant.RecipesIngredients"" (""RecipeId"", ""IngredientId"", ""Amount"", ""Unit"", ""CreatedDate"", ""ModifiedDate"")
-                                          VALUES (@RecipeId, @IngredientId, @Amount, @Unit, @CreatedDate, @ModifiedDate)", recipeIngredients, transaction);
+                                      VALUES (@RecipeId, @IngredientId, @Amount, @Unit, @CreatedDate, @ModifiedDate)", recipeIngredients, transaction);
 
             await conn.ExecuteAsync(@"DELETE FROM ""CookingAssistant.SendRequests"" WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @UserId",
                 new { RecipeId = id, UserId = userId }, transaction);

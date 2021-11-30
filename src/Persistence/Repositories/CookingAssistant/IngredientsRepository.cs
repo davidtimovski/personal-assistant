@@ -34,7 +34,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
         {
             using IDbConnection conn = OpenConnection();
 
-            var ingredient = conn.QueryFirstOrDefault<Ingredient>(@"SELECT i.*, 
+            var ingredient = conn.QueryFirstOrDefault<Ingredient>(@"SELECT DISTINCT i.*, 
                                                                         CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END
                                                                     FROM ""CookingAssistant.Ingredients"" AS i
                                                                     LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
@@ -49,7 +49,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                 var list = conn.QueryFirstOrDefault<ToDoList>(@"SELECT l.""Name""
                                                                 FROM ""ToDoAssistant.Tasks"" AS t
                                                                 INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                                                                WHERE t.""Id"" = @TaskId", new { TaskId = id });
+                                                                WHERE t.""Id"" = @TaskId", new { TaskId = ingredient.TaskId.Value });
                 ingredient.Task = new ToDoTask
                 {
                     List = list
@@ -57,13 +57,13 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
             }
 
             var recipeNames = conn.Query<string>(@"SELECT ""Name""
-                                                    FROM ""CookingAssistant.RecipesIngredients"" AS ri
-                                                    LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
-                                                    WHERE ri.""IngredientId"" = @IngredientId
-                                                    ORDER BY r.""Name""",
+                                                   FROM ""CookingAssistant.RecipesIngredients"" AS ri
+                                                   LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
+                                                   WHERE ri.""IngredientId"" = @IngredientId
+                                                   ORDER BY r.""Name""",
                 new { IngredientId = id });
 
-            foreach (var recipeName in recipeNames)
+            foreach (string recipeName in recipeNames)
             {
                 ingredient.Recipes.Add(new Recipe
                 {
@@ -187,25 +187,44 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 
         public async Task UpdateAsync(Ingredient ingredient)
         {
-            using IDbConnection conn = OpenConnection();
+            Ingredient dbIngredient = EFContext.Ingredients.Find(ingredient.Id);
 
-            await conn.ExecuteAsync(@"UPDATE ""CookingAssistant.Ingredients"" SET ""TaskId"" = @TaskId, ""Name"" = @Name,  
-                                    ""ServingSize"" = @ServingSize, ""ServingSizeIsOneUnit"" = @ServingSizeIsOneUnit, 
-                                    ""Calories"" = @Calories, ""Fat"" = @Fat, ""SaturatedFat"" = @SaturatedFat, 
-                                    ""Carbohydrate"" = @Carbohydrate, ""Sugars"" = @Sugars, ""AddedSugars"" = @AddedSugars, 
-                                    ""Fiber"" = @Fiber, ""Protein"" = @Protein, ""Sodium"" = @Sodium,  
-                                    ""Cholesterol"" = @Cholesterol, ""VitaminA"" = @VitaminA, ""VitaminC"" = @VitaminC, ""VitaminD"" = @VitaminD, 
-                                    ""Calcium"" = @Calcium, ""Iron"" = @Iron, ""Potassium"" = @Potassium, ""Magnesium"" = @Magnesium, 
-                                    ""ProductSize"" = @ProductSize, ""ProductSizeIsOneUnit"" = @ProductSizeIsOneUnit, 
-                                    ""Price"" = @Price, ""Currency"" = @Currency, ""ModifiedDate"" = @ModifiedDate
-                                    WHERE ""Id"" = @Id", ingredient);
+            dbIngredient.TaskId = ingredient.TaskId;
+            dbIngredient.Name = ingredient.Name;
+            dbIngredient.ServingSize = ingredient.ServingSize;
+            dbIngredient.ServingSizeIsOneUnit = ingredient.ServingSizeIsOneUnit;
+            dbIngredient.Calories = ingredient.Calories;
+            dbIngredient.Fat = ingredient.Fat;
+            dbIngredient.SaturatedFat = ingredient.SaturatedFat;
+            dbIngredient.Carbohydrate = ingredient.Carbohydrate;
+            dbIngredient.Sugars = ingredient.Sugars;
+            dbIngredient.AddedSugars = ingredient.AddedSugars;
+            dbIngredient.Fiber = ingredient.Fiber;
+            dbIngredient.Protein = ingredient.Protein;
+            dbIngredient.Sodium = ingredient.Sodium;
+            dbIngredient.Cholesterol = ingredient.Cholesterol;
+            dbIngredient.VitaminA = ingredient.VitaminA;
+            dbIngredient.VitaminC = ingredient.VitaminC;
+            dbIngredient.VitaminD = ingredient.VitaminD;
+            dbIngredient.Calcium = ingredient.Calcium;
+            dbIngredient.Iron = ingredient.Iron;
+            dbIngredient.Potassium = ingredient.Potassium;
+            dbIngredient.Magnesium = ingredient.Magnesium;
+            dbIngredient.ProductSize = ingredient.ProductSize;
+            dbIngredient.ProductSizeIsOneUnit = ingredient.ProductSizeIsOneUnit;
+            dbIngredient.Price = ingredient.Price;
+            dbIngredient.Currency = ingredient.Currency;
+            dbIngredient.ModifiedDate = ingredient.ModifiedDate;
+
+            await EFContext.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id)
         {
-            using IDbConnection conn = OpenConnection();
+            Ingredient ingredient = EFContext.Ingredients.Find(id);
+            EFContext.Ingredients.Remove(ingredient);
 
-            await conn.ExecuteAsync(@"DELETE FROM ""CookingAssistant.Ingredients"" WHERE ""Id"" = @Id", new { Id = id });
+            await EFContext.SaveChangesAsync();
         }
     }
 }

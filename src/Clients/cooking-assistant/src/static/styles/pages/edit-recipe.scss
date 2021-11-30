@@ -127,6 +127,7 @@ label.label {
     text-decoration: none;
     color: var(--primary-color);
     cursor: pointer;
+    user-select: none;
 
     transition: background var(--transition), color var(--transition);
 

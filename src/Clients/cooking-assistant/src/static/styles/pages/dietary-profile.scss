@@ -1,7 +1,6 @@
 .dietary-profile-tabs {
   display: flex;
   justify-content: space-between;
-  background: #efefef;
   border-radius: var(--border-radius);
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
@@ -9,6 +8,7 @@
 
   button {
     width: 50%;
+    background: #f5f5f5;
     border: none;
     border-bottom: 1px solid #ddd;
     border-radius: var(--border-radius);
@@ -21,7 +21,7 @@
     cursor: pointer;
 
     &.active {
-      background: #fafafa;
+      background: #fff;
       border: 1px solid #ddd;
       border-bottom: none;
       color: var(--primary-color-dark);

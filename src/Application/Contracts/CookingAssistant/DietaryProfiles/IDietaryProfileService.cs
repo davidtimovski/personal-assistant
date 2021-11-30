@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
 using FluentValidation;
 using PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles.Models;
+using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models;
+using PersonalAssistant.Domain.Entities.CookingAssistant;
 
 namespace PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles
 {
@@ -8,7 +10,8 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfil
     {
         EditDietaryProfile Get(int userId);
         RecommendedDailyIntake GetRecommendedDailyIntake(GetRecommendedDailyIntake model, IValidator<GetRecommendedDailyIntake> validator);
-        Task UpdateAsync(UpdateDietaryProfile model, IValidator<UpdateDietaryProfile> validator);
+        RecipeNutritionSummary CalculateNutritionSummary(Recipe recipe);
+        Task CreateOrUpdateAsync(UpdateDietaryProfile model, IValidator<UpdateDietaryProfile> validator);
         Task DeleteAsync(int userId);
     }
 }

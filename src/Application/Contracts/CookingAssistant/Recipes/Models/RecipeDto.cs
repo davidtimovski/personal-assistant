@@ -29,9 +29,9 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Model
                 .ForMember(x => x.Ingredients, opt => opt.MapFrom(src => src.RecipeIngredients))
                 .ForMember(x => x.PrepDuration, opt => opt.MapFrom<DurationResolver, TimeSpan?>(src => src.PrepDuration))
                 .ForMember(x => x.CookDuration, opt => opt.MapFrom<DurationResolver, TimeSpan?>(src => src.CookDuration))
-                .ForMember(x => x.NutritionSummary, opt => opt.MapFrom<RecipeNutritionSummaryResolver>())
-                .ForMember(x => x.CostSummary, opt => opt.MapFrom<RecipeCostSummaryResolver>())
-                .ForMember(x => x.SharingState, opt => opt.MapFrom<RecipeSharingStateResolver>());
+                .ForMember(x => x.NutritionSummary, opt => opt.Ignore())
+                .ForMember(x => x.CostSummary, opt => opt.Ignore())
+                .ForMember(x => x.SharingState, opt => opt.Ignore());
         }
     }
 }

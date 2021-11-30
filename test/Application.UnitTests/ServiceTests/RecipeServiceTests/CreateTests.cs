@@ -23,7 +23,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         {
             _successfulValidatorMock = ValidatorMocker.GetSuccessful<CreateRecipe>();
 
-            _sut = new RecipeService(null, null, null,
+            _sut = new RecipeService(null, null, null, null, null, null,
                 _recipesRepositoryMock.Object,
                 MapperMocker.GetMapper<CookingAssistantProfile>());
         }

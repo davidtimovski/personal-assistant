@@ -18,7 +18,7 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Model
         {
             profile.CreateMap<Recipe, SimpleRecipe>()
                 .ForMember(x => x.LastOpenedDate, opt => opt.MapFrom<LastOpenedDateResolver>())
-                .ForMember(x => x.SharingState, opt => opt.MapFrom<RecipeSharingStateResolver>());
+                .ForMember(x => x.SharingState, opt => opt.Ignore());
         }
     }
 }

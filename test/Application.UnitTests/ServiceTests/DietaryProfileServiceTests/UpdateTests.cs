@@ -33,7 +33,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.DietaryProfileSer
             UpdateDietaryProfile model = new DietaryProfileBuilder().BuildUpdateModel();
             var validator = ValidatorMocker.GetSuccessful<UpdateDietaryProfile>();
 
-            await _sut.UpdateAsync(model, validator.Object);
+            await _sut.CreateOrUpdateAsync(model, validator.Object);
 
             validator.Verify(x => x.Validate(model));
         }
@@ -44,7 +44,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.DietaryProfileSer
             UpdateDietaryProfile model = new DietaryProfileBuilder().BuildUpdateModel();
             var failedValidator = ValidatorMocker.GetFailed<UpdateDietaryProfile>();
 
-            await Assert.ThrowsAsync<ValidationException>(() => _sut.UpdateAsync(model, failedValidator.Object));
+            await Assert.ThrowsAsync<ValidationException>(() => _sut.CreateOrUpdateAsync(model, failedValidator.Object));
         }
     }
 }

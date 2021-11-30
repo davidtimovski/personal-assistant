@@ -8,17 +8,22 @@ using FluentValidation;
 using FluentValidation.Results;
 using PersonalAssistant.Application.Contracts.Common;
 using PersonalAssistant.Application.Contracts.Common.Models;
+using PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles;
 using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes;
 using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models;
 using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
 using PersonalAssistant.Domain.Entities.Common;
 using PersonalAssistant.Domain.Entities.CookingAssistant;
+using Utility;
 
 namespace PersonalAssistant.Application.Services.CookingAssistant
 {
     public class RecipeService : IRecipeService
     {
         private readonly ITaskService _taskService;
+        private readonly IDietaryProfileService _dietaryProfileService;
+        private readonly IConversion _conversion;
+        private readonly ICurrencyService _currencyService;
         private readonly ICdnService _cdnService;
         private readonly IUserService _userService;
         private readonly IRecipesRepository _recipesRepository;
@@ -26,12 +31,18 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
         public RecipeService(
             ITaskService taskService,
+            IDietaryProfileService dietaryProfileService,
+            IConversion conversion,
+            ICurrencyService currencyService,
             ICdnService cdnService,
             IUserService userService,
             IRecipesRepository recipesRepository,
             IMapper mapper)
         {
             _taskService = taskService;
+            _dietaryProfileService = dietaryProfileService;
+            _conversion = conversion;
+            _currencyService = currencyService;
             _cdnService = cdnService;
             _userService = userService;
             _recipesRepository = recipesRepository;
@@ -42,10 +53,16 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
         {
             IEnumerable<Recipe> recipes = _recipesRepository.GetAll(userId);
 
-            var result = recipes.Select(x => _mapper.Map<SimpleRecipe>(x, opts => { opts.Items["UserId"] = userId; }));
-            result = result.OrderBy(x => x.IngredientsMissing).ThenByDescending(x => x.LastOpenedDate);
+            var result = new List<SimpleRecipe>(recipes.Count());
+            foreach (Recipe recipe in recipes)
+            {
+                var simpleRecipe = _mapper.Map<SimpleRecipe>(recipe, opts => { opts.Items["UserId"] = userId; });
+                simpleRecipe.SharingState = GetSharingState(recipe, userId);
 
-            return result;
+                result.Add(simpleRecipe);
+            }
+
+            return result.OrderBy(x => x.IngredientsMissing).ThenByDescending(x => x.LastOpenedDate);
         }
 
         public RecipeToNotify Get(int id)
@@ -61,10 +78,11 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
         {
             Recipe recipe = _recipesRepository.Get(id, userId);
 
-            var result = _mapper.Map<RecipeDto>(recipe, opts => {
-                opts.Items["UserId"] = userId;
-                opts.Items["Currency"] = currency; 
-            });
+            var result = _mapper.Map<RecipeDto>(recipe);
+
+            result.NutritionSummary = _dietaryProfileService.CalculateNutritionSummary(recipe);
+            result.CostSummary = CalculateCostSummary(recipe, currency);
+            result.SharingState = GetSharingState(recipe, userId);
 
             foreach (RecipeIngredientDto ingredient in result.Ingredients.Where(x => x.Amount.HasValue))
             {
@@ -78,7 +96,9 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
         {
             Recipe recipe = _recipesRepository.GetForUpdate(id, userId);
 
-            var result = _mapper.Map<RecipeForUpdate>(recipe, opts => { opts.Items["UserId"] = userId; });
+            var result = _mapper.Map<RecipeForUpdate>(recipe);
+
+            result.SharingState = GetSharingState(recipe, userId);
 
             return result;
         }
@@ -95,6 +115,8 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             recipe.Shares.RemoveAll(x => x.UserId == userId);
 
             var result = _mapper.Map<RecipeWithShares>(recipe, opts => { opts.Items["UserId"] = userId; });
+
+            result.SharingState = GetSharingState(recipe, userId);
 
             return result;
         }
@@ -500,17 +522,17 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             await _recipesRepository.SaveSharingDetailsAsync(newShares, removedShares);
         }
 
-        public async Task<SetShareIsAcceptedResult> SetShareIsAcceptedAsync(int id, int userId, bool isAccepted)
+        public async Task<SetShareIsAcceptedResult> SetShareIsAcceptedAsync(int recipeId, int userId, bool isAccepted)
         {
-            await _recipesRepository.SetShareIsAcceptedAsync(id, userId, isAccepted, DateTime.UtcNow);
+            await _recipesRepository.SetShareIsAcceptedAsync(recipeId, userId, isAccepted, DateTime.UtcNow);
 
-            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(id, userId);
+            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(recipeId, userId);
             if (!usersToBeNotified.Any())
             {
                 return new SetShareIsAcceptedResult();
             }
 
-            Recipe recipe = _recipesRepository.Get(id);
+            Recipe recipe = _recipesRepository.Get(recipeId);
 
             var result = new SetShareIsAcceptedResult
             {
@@ -596,11 +618,11 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             return result;
         }
 
-        public async Task<DeclineSendRequestResult> DeclineSendRequestAsync(int id, int userId)
+        public async Task<DeclineSendRequestResult> DeclineSendRequestAsync(int recipeId, int userId)
         {
-            await _recipesRepository.DeclineSendRequestAsync(id, userId, DateTime.UtcNow);
+            await _recipesRepository.DeclineSendRequestAsync(recipeId, userId, DateTime.UtcNow);
 
-            Recipe recipe = _recipesRepository.Get(id);
+            Recipe recipe = _recipesRepository.Get(recipeId);
             var userToBeNotified = _userService.Get(recipe.UserId);
            
             var result = new DeclineSendRequestResult
@@ -613,9 +635,9 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             return result;
         }
 
-        public async Task DeleteSendRequestAsync(int id, int userId)
+        public async Task DeleteSendRequestAsync(int recipeId, int userId)
         {
-            await _recipesRepository.DeleteSendRequestAsync(id, userId);
+            await _recipesRepository.DeleteSendRequestAsync(recipeId, userId);
         }
 
         public async Task<int> ImportAsync(ImportRecipe model, IValidator<ImportRecipe> validator)
@@ -624,6 +646,76 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
                 .Select(x => (x.Id, x.ReplacementId, x.TransferNutritionData, x.TransferPriceData));
 
             return await _recipesRepository.ImportAsync(model.Id, ingredientReplacements, model.ImageUri, model.UserId);
+        }
+
+        private RecipeSharingState GetSharingState(Recipe recipe, int userId)
+        {
+            if (recipe.Shares.Any())
+            {
+                bool someRequestsAccepted = recipe.Shares.Any(x => x.IsAccepted == true);
+                if (someRequestsAccepted)
+                {
+                    if (recipe.UserId == userId)
+                    {
+                        return RecipeSharingState.Owner;
+                    }
+
+                    return RecipeSharingState.Member;
+                }
+
+                bool someRequestsPending = recipe.Shares.Any(x => !x.IsAccepted.HasValue);
+                if (someRequestsPending)
+                {
+                    return RecipeSharingState.PendingShare;
+                }
+            }
+
+            return RecipeSharingState.NotShared;
+        }
+
+        private RecipeCostSummary CalculateCostSummary(Recipe recipe, string currency)
+        {
+            decimal? addPricePerAmount(decimal? currentValue, decimal priceInGrams, short productSizeGrams, bool productSizeIsOneUnit, float amount, string unit)
+            {
+                if (productSizeIsOneUnit)
+                {
+                    return priceInGrams * (decimal)amount + (currentValue ?? 0);
+                }
+
+                float amountInGrams = _conversion.ToGrams(unit, amount);
+                decimal valuePerGram = priceInGrams / productSizeGrams;
+                return valuePerGram * (decimal)amountInGrams + (currentValue ?? 0);
+            }
+
+            RecipeIngredient[] validRecipeIngredients = recipe.RecipeIngredients
+                .Where(x => x.Amount.HasValue
+                    && x.Ingredient.Price.HasValue
+                    && ((x.Ingredient.ProductSizeIsOneUnit && x.Unit == null) || (!x.Ingredient.ProductSizeIsOneUnit && x.Unit != null)))
+                .ToArray();
+
+            var costSummary = new RecipeCostSummary();
+
+            foreach (var recipeIngredient in validRecipeIngredients)
+            {
+                costSummary.IngredientIds.Add(recipeIngredient.Ingredient.Id);
+
+                short productSize = recipeIngredient.Ingredient.ProductSize;
+                bool productSizeIsOneUnit = recipeIngredient.Ingredient.ProductSizeIsOneUnit;
+                float amount = recipeIngredient.Amount.Value;
+                string unit = recipeIngredient.Unit;
+
+                decimal price = _currencyService.Convert(recipeIngredient.Ingredient.Price.Value, recipeIngredient.Ingredient.Currency, currency, DateTime.UtcNow.Date);
+
+                costSummary.Cost = addPricePerAmount(costSummary.Cost, price, productSize, productSizeIsOneUnit, amount, unit);
+            }
+
+            if (costSummary.Cost.HasValue)
+            {
+                costSummary.IsSet = true;
+                costSummary.CostPerServing = costSummary.Cost.Value / recipe.Servings;
+            }
+
+            return costSummary;
         }
 
         private void ValidateAndThrow<T>(T model, IValidator<T> validator)
