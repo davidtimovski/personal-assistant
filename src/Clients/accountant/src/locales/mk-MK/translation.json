@@ -63,6 +63,8 @@
     "newDeposit": "Нов депозит",
     "settleDebtTo": "Расчисти го долгот со",
     "settleDebtFrom": "Расчисти го долгот од",
+    "considerUsingYesterday1": "Моментално е",
+    "considerUsingYesterday2": "после полноќ. Можеби треба да го користите вчерашниот датум.",
     "encryptDescription": "Шифрирај опис",
     "submit": "Поднеси",
     "dateIsRequired": "Датумот е задолжителен",

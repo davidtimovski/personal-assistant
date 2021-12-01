@@ -120,6 +120,26 @@ export class NewTransaction {
     }
   }
 
+  @computedFrom("model.date")
+  get pastMidnight() {
+    const now = new Date();
+    const selectedDate = new Date(this.model.date);
+
+    const isToday =
+      selectedDate.getDate() == now.getDate() &&
+      selectedDate.getMonth() == now.getMonth() &&
+      selectedDate.getFullYear() == now.getFullYear();
+
+    if (isToday) {
+      const hour = now.getHours();
+      if (hour < 4) {
+        return DateHelper.formatHoursMinutes(now);
+      }
+    }
+
+    return null;
+  }
+
   @computedFrom("model.description")
   get canEncrypt() {
     const canEncrypt = this.model.description?.trim().length > 0;

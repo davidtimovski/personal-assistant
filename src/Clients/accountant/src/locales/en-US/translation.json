@@ -63,6 +63,8 @@
     "newDeposit": "New deposit",
     "settleDebtTo": "Settle debt to",
     "settleDebtFrom": "Settle debt from",
+    "considerUsingYesterday1": "It's currently",
+    "considerUsingYesterday2": "past midnight. Consider using yesterday's date.",
     "encryptDescription": "Encrypt description",
     "submit": "Submit",
     "dateIsRequired": "The Date is required",

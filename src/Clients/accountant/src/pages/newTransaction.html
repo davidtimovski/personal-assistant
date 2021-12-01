@@ -36,6 +36,11 @@
             <span else><span t="newTransaction.settleDebtFrom">Settle debt from</span> ${debtPerson}.</span>
           </div>
 
+          <div if.bind="pastMidnight" class="message info">
+            <i class="far fa-moon"></i>
+            <span t="newTransaction.considerUsingYesterday1">Currently it's</span> <span>${pastMidnight}</span> <span t="newTransaction.considerUsingYesterday2">past midnight. Consider using yesterday's date.</span>
+          </div>
+
           <form submit.trigger="submit()" autocomplete="off">
             <div class="form-control inline">
               <label for="amount" t="amount">Amount</label>
