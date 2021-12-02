@@ -11,7 +11,5 @@ namespace PersonalAssistant.Domain.Entities.Common
         public string AuthKey { get; set; }
         public string P256dhKey { get; set; }
         public DateTime CreatedDate { get; set; }
-
-        public User User { get; set; }
     }
 }

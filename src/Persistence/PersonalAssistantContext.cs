@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PersonalAssistant.Domain.Entities.Accountant;
+using PersonalAssistant.Domain.Entities.Common;
 using PersonalAssistant.Domain.Entities.CookingAssistant;
 using PersonalAssistant.Domain.Entities.ToDoAssistant;
 
@@ -26,6 +27,9 @@ namespace Persistence
         public DbSet<Category> Categories { get; set; }
         public DbSet<UpcomingExpense> UpcomingExpenses { get; set; }
         public DbSet<Debt> Debts { get; set; }
+
+        public DbSet<PushSubscription> PushSubscriptions { get; set; }
+        public DbSet<TooltipDismissed> TooltipsDismissed { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -95,6 +99,12 @@ namespace Persistence
             modelBuilder.Entity<Debt>(x =>
             {
                 x.ToTable("Accountant.Debts");
+            });
+
+            modelBuilder.Entity<TooltipDismissed>(x =>
+            {
+                x.ToTable("TooltipsDismissed");
+                x.HasKey(x => new { x.TooltipId, x.UserId });
             });
         }
     }

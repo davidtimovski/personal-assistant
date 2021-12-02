@@ -23,15 +23,14 @@ namespace PersonalAssistant.Persistence.Repositories.Common
         {
             using IDbConnection conn = OpenConnection();
 
-            return conn.QueryFirstOrDefault<User>(@"SELECT * FROM ""AspNetUsers"" WHERE ""Email"" = @Email AND ""EmailConfirmed"" = TRUE",
-                new { Email = email });
+            return conn.QueryFirstOrDefault<User>(@"SELECT * FROM ""AspNetUsers"" WHERE ""Email"" = @Email AND ""EmailConfirmed"" = TRUE", new { Email = email });
         }
 
         public bool Exists(int id)
         {
             using IDbConnection conn = OpenConnection();
 
-            return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM ""AspNetUsers"" WHERE ""Id"" = @id", new { Id = id });
+            return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM ""AspNetUsers"" WHERE ""Id"" = @Id", new { Id = id });
         }
 
         public string GetLanguage(int id)

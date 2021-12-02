@@ -18,10 +18,10 @@ namespace PersonalAssistant.Persistence.Repositories.Common
             using IDbConnection conn = OpenConnection();
 
             return conn.Query<Tooltip>(@"SELECT t.*, (td.""UserId"" IS NOT NULL) AS ""IsDismissed""
-                                            FROM ""Tooltips"" AS t
-                                            LEFT JOIN ""TooltipsDismissed"" AS td ON t.""Id"" = td.""TooltipId"" AND td.""UserId"" = @UserId
-                                            WHERE ""Application"" = @Application",
-                                        new { Application = application, UserId = userId });
+                                         FROM ""Tooltips"" AS t
+                                         LEFT JOIN ""TooltipsDismissed"" AS td ON t.""Id"" = td.""TooltipId"" AND td.""UserId"" = @UserId
+                                         WHERE ""Application"" = @Application",
+                                         new { Application = application, UserId = userId });
         }
 
         public Tooltip GetByKey(int userId, string key, string application)
@@ -29,9 +29,9 @@ namespace PersonalAssistant.Persistence.Repositories.Common
             using IDbConnection conn = OpenConnection();
 
             return conn.QueryFirstOrDefault<Tooltip>(@"SELECT t.*, (td.""UserId"" IS NOT NULL) AS ""IsDismissed""
-                                                        FROM ""Tooltips"" AS t
-                                                        LEFT JOIN ""TooltipsDismissed"" AS td ON t.""Id"" = td.""TooltipId"" AND td.""UserId"" = @UserId
-                                                        WHERE t.""Key"" = @Key AND t.""Application"" = @Application", new { UserId = userId, Key = key, Application = application });
+                                                       FROM ""Tooltips"" AS t
+                                                       LEFT JOIN ""TooltipsDismissed"" AS td ON t.""Id"" = td.""TooltipId"" AND td.""UserId"" = @UserId
+                                                       WHERE t.""Key"" = @Key AND t.""Application"" = @Application", new { UserId = userId, Key = key, Application = application });
         }
 
         public async Task ToggleDismissedAsync(int userId, string key, string application, bool isDismissed)
@@ -40,16 +40,22 @@ namespace PersonalAssistant.Persistence.Repositories.Common
 
             var id = await conn.ExecuteScalarAsync<int>(@"SELECT ""Id"" FROM ""Tooltips"" WHERE ""Key"" = @Key AND ""Application"" = @Application", new { Key = key, Application = application });
 
+            var dismissedTooltip = new TooltipDismissed
+            { 
+                TooltipId = id,
+                UserId = userId
+            };
+
             if (isDismissed)
             {
-                await conn.QueryAsync(@"INSERT INTO ""TooltipsDismissed"" (""TooltipId"", ""UserId"") 
-                                        VALUES (@TooltipId, @UserId)", new { TooltipId = id, UserId = userId });
+                EFContext.TooltipsDismissed.Add(dismissedTooltip);
             }
             else
             {
-                await conn.QueryAsync<int>(@"DELETE FROM ""TooltipsDismissed"" WHERE ""TooltipId"" = @TooltipId AND ""UserId"" = @UserId",
-                    new { TooltipId = id, UserId = userId });
+                EFContext.TooltipsDismissed.Remove(dismissedTooltip);
             }
+
+            await EFContext.SaveChangesAsync();
         }
     }
 }
