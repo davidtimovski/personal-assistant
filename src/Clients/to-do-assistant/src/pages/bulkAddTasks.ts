@@ -1,19 +1,18 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { I18N } from "aurelia-i18n";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { EventAggregator } from "aurelia-event-aggregator";
 import { connectTo } from "aurelia-store";
 
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
-import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 
 import { BulkAddTasksModel } from "models/viewmodels/bulkAddTasksModel";
 import { TasksService } from "services/tasksService";
 import { ListsService } from "services/listsService";
 import * as Actions from "utils/state/actions";
 
-@inject(Router, TasksService, ListsService, I18N, ValidationController, EventAggregator)
+@inject(Router, TasksService, ListsService, ValidationController, EventAggregator)
 @connectTo()
 export class BulkAddTasks {
   private model: BulkAddTasksModel;
@@ -27,7 +26,6 @@ export class BulkAddTasks {
     private readonly router: Router,
     private readonly tasksService: TasksService,
     private readonly listsService: ListsService,
-    private readonly i18n: I18N,
     private readonly validationController: ValidationController,
     private readonly eventAggregator: EventAggregator
   ) {
@@ -80,7 +78,7 @@ export class BulkAddTasks {
         );
         this.tasksTextIsInvalid = false;
 
-        await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
+        await Actions.getLists(this.listsService);
 
         this.eventAggregator.publish(AlertEvents.ShowSuccess, "bulkAddTasks.addSuccessful");
 

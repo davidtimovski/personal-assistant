@@ -7,6 +7,15 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models
 {
     public class BulkCreateResult : INotificationResult
     {
+        public BulkCreateResult(int listId, bool notifySignalR)
+        {
+            ListId = listId;
+            NotifySignalR = notifySignalR;
+        }
+
+        public int ListId { get; }
+        public bool NotifySignalR { get; }
+
         public string ListName { get; set; }
         public IEnumerable<BulkCreatedTask> CreatedTasks { get; set; }
         public string ActionUserImageUri { get; set; }

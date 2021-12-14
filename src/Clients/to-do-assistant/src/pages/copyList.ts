@@ -6,7 +6,7 @@ import { EventAggregator } from "aurelia-event-aggregator";
 import { connectTo } from "aurelia-store";
 
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
-import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 
 import { List } from "models/entities/list";
 import { ListsService } from "services/listsService";
@@ -14,6 +14,7 @@ import { SharingState } from "models/viewmodels/sharingState";
 import { Task } from "models/entities/task";
 import { State } from "utils/state/state";
 import * as Actions from "utils/state/actions";
+import { AppEvents } from "models/appEvents";
 
 @inject(Router, ListsService, ValidationController, I18N, EventAggregator)
 @connectTo()
@@ -35,7 +36,7 @@ export class CopyList {
     private readonly i18n: I18N,
     private readonly eventAggregator: EventAggregator
   ) {
-    this.eventAggregator.subscribe("get-lists-finished", () => {
+    this.eventAggregator.subscribe(AppEvents.ListsChanged, () => {
       this.setModelFromState();
     });
 
@@ -102,7 +103,7 @@ export class CopyList {
         this.model.id = await this.listsService.copy(this.model);
         this.nameIsInvalid = false;
 
-        await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
+        await Actions.getLists(this.listsService);
 
         this.eventAggregator.publish(AlertEvents.ShowSuccess, "copyList.copySuccessful");
 

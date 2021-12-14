@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentValidation;
 using Moq;
@@ -17,17 +18,23 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
     {
         private readonly Mock<IValidator<CreateTask>> _successfulValidatorMock;
         private readonly Mock<ITasksRepository> _tasksRepositoryMock = new Mock<ITasksRepository>();
+        private readonly Mock<IListsRepository> _listsRepositoryMock = new Mock<IListsRepository>();
         private readonly ITaskService _sut;
 
         public CreateTests()
         {
             _successfulValidatorMock = ValidatorMocker.GetSuccessful<CreateTask>();
 
+            _listsRepositoryMock.Setup(x => x.GetWithShares(It.IsAny<int>(), It.IsAny<int>())).Returns(new ToDoList
+            {
+                Shares = new List<ListShare>()
+            });
+
             _sut = new TaskService(
                 null,
                 new Mock<IListService>().Object,
                 _tasksRepositoryMock.Object,
-                null,
+                _listsRepositoryMock.Object,
                 MapperMocker.GetMapper<ToDoAssistantProfile>());
         }
 

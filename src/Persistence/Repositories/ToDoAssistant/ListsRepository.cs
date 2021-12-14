@@ -38,6 +38,16 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 }, new { UserId = userId }, null, true, "UserId");
         }
 
+        public IEnumerable<int> GetNonArchivedSharedListIds(int userId)
+        {
+            using IDbConnection conn = OpenConnection();
+
+            return conn.Query<int>(@"SELECT ""Id"" FROM ""ToDoAssistant.Lists"" WHERE ""UserId"" = @UserId AND ""IsArchived"" = FALSE
+                                     UNION ALL
+                                     SELECT ""ListId"" FROM ""ToDoAssistant.Shares"" WHERE ""UserId"" = @UserId AND ""IsArchived"" = FALSE AND ""IsAccepted""",
+                                     new { UserId = userId });
+        }
+
         public IEnumerable<ToDoList> GetAllWithTasksAndSharingDetails(int userId)
         {
             using IDbConnection conn = OpenConnection();
@@ -95,7 +105,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             return conn.QueryFirstOrDefault<ToDoList>(@"SELECT * FROM ""ToDoAssistant.Lists"" WHERE ""Id"" = @Id", new { Id = id });
         }
 
-        public ToDoList Get(int id, int userId)
+        public ToDoList GetWithShares(int id, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
@@ -316,15 +326,15 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
             using IDbConnection conn = OpenConnection();
 
             return conn.Query<User>(@"SELECT u.*
-                                        FROM ""AspNetUsers"" AS u
-                                        INNER JOIN ""ToDoAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
-                                        WHERE u.""Id"" != @ExcludeUserId AND s.""ListId"" = @ListId AND s.""IsAccepted"" AND u.""ToDoNotificationsEnabled"" AND s.""NotificationsEnabled""
-                                        UNION
-                                        SELECT u.*
-                                        FROM ""AspNetUsers"" AS u
-                                        INNER JOIN ""ToDoAssistant.Lists"" AS l ON u.""Id"" = l.""UserId""
-                                        WHERE u.""Id"" != @ExcludeUserId AND l.""Id"" = @ListId AND u.""ToDoNotificationsEnabled"" AND l.""NotificationsEnabled""",
-                                    new { ListId = id, ExcludeUserId = excludeUserId });
+                                      FROM ""AspNetUsers"" AS u
+                                      INNER JOIN ""ToDoAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
+                                      WHERE u.""Id"" != @ExcludeUserId AND s.""ListId"" = @ListId AND s.""IsAccepted"" AND u.""ToDoNotificationsEnabled"" AND s.""NotificationsEnabled""
+                                      UNION
+                                      SELECT u.*
+                                      FROM ""AspNetUsers"" AS u
+                                      INNER JOIN ""ToDoAssistant.Lists"" AS l ON u.""Id"" = l.""UserId""
+                                      WHERE u.""Id"" != @ExcludeUserId AND l.""Id"" = @ListId AND u.""ToDoNotificationsEnabled"" AND l.""NotificationsEnabled""",
+                                      new { ListId = id, ExcludeUserId = excludeUserId });
         }
 
         public IEnumerable<User> GetUsersToBeNotifiedOfDeletion(int id)

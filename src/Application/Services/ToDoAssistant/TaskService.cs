@@ -57,6 +57,10 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
         public TaskForUpdate GetForUpdate(int id, int userId)
         {
             ToDoTask task = _tasksRepository.GetForUpdate(id, userId);
+            if (task == null)
+            {
+                return null;
+            }
 
             var result = _mapper.Map<TaskForUpdate>(task, opts => { opts.Items["UserId"] = userId; });
 
@@ -111,22 +115,21 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
             var id = await _tasksRepository.CreateAsync(task, model.UserId);
 
+            ToDoList list = _listsRepository.GetWithShares(model.ListId, model.UserId);
+
+            var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
+            var result = new CreatedTaskResult(id, task.ListId, notifySignalR);
+
             var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(model.ListId, model.UserId, model.IsPrivate == true);
             if (!usersToBeNotified.Any())
             {
-                return new CreatedTaskResult { TaskId = id };
+                return result;
             }
 
-            ToDoList list = _listsRepository.Get(model.ListId);
-
-            var result = new CreatedTaskResult
-            {
-                TaskId = id,
-                TaskName = task.Name,
-                ListName = list.Name,
-                ActionUserImageUri = _userService.GetImageUri(model.UserId),
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
-            };
+            result.TaskName = task.Name;
+            result.ListName = list.Name;
+            result.ActionUserImageUri = _userService.GetImageUri(model.UserId);
+            result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language });
 
             return result;
         }
@@ -134,8 +137,6 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
         public async Task<BulkCreateResult> BulkCreateAsync(BulkCreate model, IValidator<BulkCreate> validator)
         {
             ValidateAndThrow(model, validator);
-
-            var task = _mapper.Map<ToDoTask>(model);
 
             var now = DateTime.UtcNow;
 
@@ -155,25 +156,26 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
             IEnumerable<ToDoTask> createdTasks = await _tasksRepository.BulkCreateAsync(tasks, model.TasksArePrivate, model.UserId);
 
+            ToDoList list = _listsRepository.GetWithShares(model.ListId, model.UserId);
+
             var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(model.ListId, model.UserId, model.TasksArePrivate);
+
+            var notifySignalR = !tasks[0].PrivateToUserId.HasValue && list.IsShared;
+            var result = new BulkCreateResult(list.Id, notifySignalR);
+
             if (!usersToBeNotified.Any())
             {
-                return new BulkCreateResult();
+                return result;
             }
 
-            ToDoList list = _listsRepository.Get(model.ListId);
-
-            var result = new BulkCreateResult
+            result.ListName = list.Name;
+            result.CreatedTasks = createdTasks.Select(x => new BulkCreatedTask
             {
-                ListName = list.Name,
-                CreatedTasks = createdTasks.Select(x => new BulkCreatedTask
-                {
-                    Id = x.Id,
-                    Name = x.Name
-                }),
-                ActionUserImageUri = _userService.GetImageUri(model.UserId),
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
-            };
+                Id = x.Id,
+                Name = x.Name
+            });
+            result.ActionUserImageUri = _userService.GetImageUri(model.UserId);
+            result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language });
 
             return result;
         }
@@ -202,14 +204,10 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             task.ModifiedDate = DateTime.UtcNow;
             await _tasksRepository.UpdateAsync(task, model.UserId);
 
-            ToDoList list = _listsRepository.Get(model.ListId);
+            ToDoList list = _listsRepository.GetWithShares(model.ListId, model.UserId);
 
-            var result = new UpdateTaskResult
-            {
-                OriginalTaskName = originalTask.Name,
-                ListId = model.ListId,
-                ListName = list.Name
-            };
+            var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
+            var result = new UpdateTaskResult(originalTask.Name, list.Id, list.Name, notifySignalR);
 
             if (model.ListId == originalTask.ListId)
             {
@@ -252,7 +250,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             ToDoTask task = _tasksRepository.Get(id);
             if (task == null)
             {
-                return new DeleteTaskResult();
+                return new DeleteTaskResult(false);
             }
 
             if (!Exists(id, userId))
@@ -262,22 +260,22 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
             await _tasksRepository.DeleteAsync(id, userId);
 
+            ToDoList list = _listsRepository.GetWithShares(task.ListId, userId);
+
             var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(task.ListId, userId, task.PrivateToUserId == userId);
+
+            var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
+            var result = new DeleteTaskResult(task.ListId, notifySignalR);
+
             if (!usersToBeNotified.Any())
             {
-                return new DeleteTaskResult();
+                return result;
             }
 
-            ToDoList list = _listsRepository.Get(task.ListId);
-
-            var result = new DeleteTaskResult
-            {
-                TaskName = task.Name,
-                ListId = task.ListId,
-                ListName = list.Name,
-                ActionUserImageUri = _userService.GetImageUri(userId),
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
-            };
+            result.TaskName = task.Name;
+            result.ListName = list.Name;
+            result.ActionUserImageUri = _userService.GetImageUri(userId);
+            result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language });
 
             return result;
         }
@@ -292,27 +290,27 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             ToDoTask task = _tasksRepository.Get(model.Id);
             if (task.IsCompleted)
             {
-                return new CompleteUncompleteTaskResult();
+                return new CompleteUncompleteTaskResult(false);
             }
 
             await _tasksRepository.CompleteAsync(model.Id, model.UserId);
 
+            ToDoList list = _listsRepository.GetWithShares(task.ListId, model.UserId);
+
             var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(task.ListId, model.UserId, model.Id);
+
+            var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
+            var result = new CompleteUncompleteTaskResult(task.ListId, notifySignalR: notifySignalR);
+
             if (!usersToBeNotified.Any())
             {
-                return new CompleteUncompleteTaskResult();
+                return result;
             }
 
-            ToDoList list = _listsRepository.Get(task.ListId);
-
-            var result = new CompleteUncompleteTaskResult
-            {
-                TaskName = task.Name,
-                ListId = task.ListId,
-                ListName = list.Name,
-                ActionUserImageUri = _userService.GetImageUri(model.UserId),
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
-            };
+            result.TaskName = task.Name;
+            result.ListName = list.Name;
+            result.ActionUserImageUri = _userService.GetImageUri(model.UserId);
+            result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language });
 
             return result;
         }
@@ -327,32 +325,32 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             ToDoTask task = _tasksRepository.Get(model.Id);
             if (!task.IsCompleted)
             {
-                return null;
+                return new CompleteUncompleteTaskResult(false);
             }
 
             await _tasksRepository.UncompleteAsync(model.Id, model.UserId);
 
+            ToDoList list = _listsRepository.GetWithShares(task.ListId, model.UserId);
+
             var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(task.ListId, model.UserId, model.Id);
+
+            var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
+            var result = new CompleteUncompleteTaskResult(task.ListId, notifySignalR);
+
             if (!usersToBeNotified.Any())
             {
-                return new CompleteUncompleteTaskResult();
+                return result;
             }
 
-            ToDoList list = _listsRepository.Get(task.ListId);
-
-            var result = new CompleteUncompleteTaskResult
-            {
-                TaskName = task.Name,
-                ListId = task.ListId,
-                ListName = list.Name,
-                ActionUserImageUri = _userService.GetImageUri(model.UserId),
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
-            };
+            result.TaskName = task.Name;
+            result.ListName = list.Name;
+            result.ActionUserImageUri = _userService.GetImageUri(model.UserId);
+            result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language });
 
             return result;
         }
 
-        public async Task ReorderAsync(ReorderTask model)
+        public async Task<ReorderTaskResult> ReorderAsync(ReorderTask model)
         {
             if (!Exists(model.Id, model.UserId))
             {
@@ -360,6 +358,12 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             }
 
             await _tasksRepository.ReorderAsync(model.Id, model.UserId, model.OldOrder, model.NewOrder, DateTime.UtcNow);
+
+            ToDoTask task = _tasksRepository.Get(model.Id);
+            ToDoList list = _listsRepository.GetWithShares(task.ListId, model.UserId);
+
+            var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
+            return new ReorderTaskResult(list.Id, notifySignalR);
         }
 
         private void ValidateAndThrow<T>(T model, IValidator<T> validator)

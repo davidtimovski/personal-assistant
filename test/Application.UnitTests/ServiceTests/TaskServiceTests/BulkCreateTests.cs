@@ -19,17 +19,23 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
     {
         private readonly Mock<IValidator<BulkCreate>> _successfulValidatorMock;
         private readonly Mock<ITasksRepository> _tasksRepositoryMock = new Mock<ITasksRepository>();
+        private readonly Mock<IListsRepository> _listsRepositoryMock = new Mock<IListsRepository>();
         private readonly ITaskService _sut;
 
         public BulkCreateTests()
         {
             _successfulValidatorMock = ValidatorMocker.GetSuccessful<BulkCreate>();
 
+            _listsRepositoryMock.Setup(x => x.GetWithShares(It.IsAny<int>(), It.IsAny<int>())).Returns(new ToDoList
+            {
+                Shares = new List<ListShare>()
+            });
+
             _sut = new TaskService(
                 null,
                 new Mock<IListService>().Object,
                 _tasksRepositoryMock.Object,
-                null,
+                _listsRepositoryMock.Object,
                 MapperMocker.GetMapper<ToDoAssistantProfile>());
         }
 
@@ -204,7 +210,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
             _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<IEnumerable<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>()))
                 .Callback<IEnumerable<ToDoTask>, bool, int>((t, p, u) => actualTasks = t.ToList());
 
-            BulkCreate model = new TaskBuilder()
+             BulkCreate model = new TaskBuilder()
                 .WithTasksText("Task 1\nTask 2")
                 .BuildBulkCreateModel();
 

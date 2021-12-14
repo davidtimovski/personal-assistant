@@ -2,10 +2,12 @@
 using System.Globalization;
 using System.Threading.Tasks;
 using Api.Config;
+using Api.Hubs;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using PersonalAssistant.Application.Contracts.Common;
@@ -24,6 +26,7 @@ namespace Api.Controllers.ToDoAssistant
     [Route("api/[controller]")]
     public class TasksController : Controller
     {
+        private readonly IHubContext<ToDoAssistantHub> _hubContext;
         private readonly ITaskService _taskService;
         private readonly IListService _listService;
         private readonly IUserService _userService;
@@ -36,6 +39,7 @@ namespace Api.Controllers.ToDoAssistant
         private readonly Urls _urls;
 
         public TasksController(
+            IHubContext<ToDoAssistantHub> hubContext,
             ITaskService taskService,
             IListService listService,
             IUserService userService,
@@ -47,6 +51,7 @@ namespace Api.Controllers.ToDoAssistant
             IStringLocalizer<TasksController> localizer,
             IOptions<Urls> urls)
         {
+            _hubContext = hubContext;
             _taskService = taskService;
             _listService = listService;
             _userService = userService;
@@ -122,6 +127,11 @@ namespace Api.Controllers.ToDoAssistant
 
             CreatedTaskResult result = await _taskService.CreateAsync(dto, _createValidator);
 
+            if (result.NotifySignalR)
+            {
+                await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", dto.UserId);
+            }
+
             foreach (var recipient in result.NotificationRecipients)
             {
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
@@ -129,16 +139,15 @@ namespace Api.Controllers.ToDoAssistant
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, dto.ListId, result.TaskId, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-                var pushNotification = new PushNotification
+                var ToDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
                     UserId = recipient.Id,
-                    Application = "To Do Assistant",
                     Message = message,
                     OpenUrl = GetNotificationsPageUrl(notificationId)
                 };
 
-                _senderService.Enqueue(pushNotification);
+                _senderService.Enqueue(ToDoAssistantPushNotification);
             }
 
             return StatusCode(201, result.TaskId);
@@ -162,6 +171,12 @@ namespace Api.Controllers.ToDoAssistant
             }
 
             BulkCreateResult result = await _taskService.BulkCreateAsync(dto, _bulkCreateValidator);
+
+            if (result.NotifySignalR)
+            {
+                await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", dto.UserId);
+            }
+
             if (!result.Notify())
             {
                 return StatusCode(201);
@@ -176,16 +191,15 @@ namespace Api.Controllers.ToDoAssistant
 
                     var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, dto.ListId, task.Id, message);
                     var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-                    var pushNotification = new PushNotification
+                    var ToDoAssistantPushNotification = new ToDoAssistantPushNotification
                     {
                         SenderImageUri = result.ActionUserImageUri,
                         UserId = recipient.Id,
-                        Application = "To Do Assistant",
                         Message = message,
                         OpenUrl = GetNotificationsPageUrl(notificationId)
                     };
 
-                    _senderService.Enqueue(pushNotification);
+                    _senderService.Enqueue(ToDoAssistantPushNotification);
                 }
             }
 
@@ -210,6 +224,12 @@ namespace Api.Controllers.ToDoAssistant
             }
 
             UpdateTaskResult result = await _taskService.UpdateAsync(dto, _updateValidator);
+
+            if (result.NotifySignalR)
+            {
+                await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", dto.UserId);
+            }
+
             if (!result.Notify())
             {
                 return NoContent();
@@ -222,16 +242,15 @@ namespace Api.Controllers.ToDoAssistant
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-                var pushNotification = new PushNotification
+                var ToDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
                     UserId = recipient.Id,
-                    Application = "To Do Assistant",
                     Message = message,
                     OpenUrl = GetNotificationsPageUrl(notificationId)
                 };
 
-                _senderService.Enqueue(pushNotification);
+                _senderService.Enqueue(ToDoAssistantPushNotification);
             }
 
             foreach (var recipient in result.RemovedNotificationRecipients)
@@ -241,16 +260,15 @@ namespace Api.Controllers.ToDoAssistant
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.OldListId, null, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-                var pushNotification = new PushNotification
+                var ToDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
                     UserId = recipient.Id,
-                    Application = "To Do Assistant",
                     Message = message,
                     OpenUrl = GetNotificationsPageUrl(notificationId)
                 };
 
-                _senderService.Enqueue(pushNotification);
+                _senderService.Enqueue(ToDoAssistantPushNotification);
             }
 
             foreach (var recipient in result.CreatedNotificationRecipients)
@@ -260,16 +278,15 @@ namespace Api.Controllers.ToDoAssistant
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-                var pushNotification = new PushNotification
+                var ToDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
                     UserId = recipient.Id,
-                    Application = "To Do Assistant",
                     Message = message,
                     OpenUrl = GetNotificationsPageUrl(notificationId)
                 };
 
-                _senderService.Enqueue(pushNotification);
+                _senderService.Enqueue(ToDoAssistantPushNotification);
             }
 
             if (result.AssignedNotificationRecipient != null)
@@ -279,16 +296,15 @@ namespace Api.Controllers.ToDoAssistant
 
                 var createNotificationDto = new CreateOrUpdateNotification(result.AssignedNotificationRecipient.Id, dto.UserId, result.ListId, dto.Id, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-                var pushNotification = new PushNotification
+                var ToDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
                     UserId = result.AssignedNotificationRecipient.Id,
-                    Application = "To Do Assistant",
                     Message = message,
                     OpenUrl = GetNotificationsPageUrl(notificationId)
                 };
 
-                _senderService.Enqueue(pushNotification);
+                _senderService.Enqueue(ToDoAssistantPushNotification);
             }
 
             return NoContent();
@@ -309,6 +325,11 @@ namespace Api.Controllers.ToDoAssistant
 
             DeleteTaskResult result = await _taskService.DeleteAsync(id, userId);
 
+            if (result.NotifySignalR)
+            {
+                await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskDeleted", userId, id, result.ListId);
+            }
+
             foreach (var recipient in result.NotificationRecipients)
             {
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
@@ -316,16 +337,15 @@ namespace Api.Controllers.ToDoAssistant
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, userId, result.ListId, null, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-                var pushNotification = new PushNotification
+                var ToDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
                     UserId = recipient.Id,
-                    Application = "To Do Assistant",
                     Message = message,
                     OpenUrl = GetNotificationsPageUrl(notificationId)
                 };
 
-                _senderService.Enqueue(pushNotification);
+                _senderService.Enqueue(ToDoAssistantPushNotification);
             }
 
             return NoContent();
@@ -350,6 +370,11 @@ namespace Api.Controllers.ToDoAssistant
 
             CompleteUncompleteTaskResult result = await _taskService.CompleteAsync(dto);
 
+            if (result.NotifySignalR)
+            {
+                await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskCompletedChanged", dto.UserId, dto.Id, result.ListId, true);
+            }
+
             foreach (var recipient in result.NotificationRecipients)
             {
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
@@ -357,16 +382,15 @@ namespace Api.Controllers.ToDoAssistant
 
                 var updateNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto);
-                var pushNotification = new PushNotification
+                var ToDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
                     UserId = recipient.Id,
-                    Application = "To Do Assistant",
                     Message = message,
                     OpenUrl = GetNotificationsPageUrl(notificationId)
                 };
 
-                _senderService.Enqueue(pushNotification);
+                _senderService.Enqueue(ToDoAssistantPushNotification);
             }
 
             return NoContent();
@@ -390,7 +414,12 @@ namespace Api.Controllers.ToDoAssistant
             }
 
             CompleteUncompleteTaskResult result = await _taskService.UncompleteAsync(dto);
-  
+
+            if (result.NotifySignalR)
+            {
+                await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskCompletedChanged", dto.UserId, dto.Id, result.ListId, false);
+            }
+
             foreach (var recipient in result.NotificationRecipients)
             {
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
@@ -398,16 +427,15 @@ namespace Api.Controllers.ToDoAssistant
 
                 var updateNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto);
-                var pushNotification = new PushNotification
+                var ToDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
                     UserId = recipient.Id,
-                    Application = "To Do Assistant",
                     Message = message,
                     OpenUrl = GetNotificationsPageUrl(notificationId)
                 };
 
-                _senderService.Enqueue(pushNotification);
+                _senderService.Enqueue(ToDoAssistantPushNotification);
             }
 
             return NoContent();
@@ -430,7 +458,12 @@ namespace Api.Controllers.ToDoAssistant
                 return Unauthorized();
             }
 
-            await _taskService.ReorderAsync(dto);
+            ReorderTaskResult result = await _taskService.ReorderAsync(dto);
+
+            if (result.NotifySignalR)
+            {
+                await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskReordered", dto.UserId, dto.Id, result.ListId, dto.OldOrder, dto.NewOrder);
+            }
 
             return NoContent();
         }

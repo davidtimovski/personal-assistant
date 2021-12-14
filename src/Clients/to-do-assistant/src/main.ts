@@ -6,6 +6,7 @@ import { Backend, TCustomAttribute } from "aurelia-i18n";
 import { UserManager, Log, WebStorageStateStore } from "oidc-client";
 
 import { Language } from "../../shared/src/models/enums/language";
+
 import * as environment from "../config/environment.json";
 import { LocalStorage } from "utils/localStorage";
 import { initialState } from "utils/state/state";
@@ -80,12 +81,7 @@ export function configure(aurelia: Aurelia) {
     })
   );
 
-  container.registerInstance(
-    BroadcastChannel,
-    new BroadcastChannel("sw-version-updates")
-  );
+  container.registerInstance(BroadcastChannel, new BroadcastChannel("sw-version-updates"));
 
-  return aurelia
-    .start()
-    .then(() => aurelia.setRoot(PLATFORM.moduleName("app")));
+  return aurelia.start().then(() => aurelia.setRoot(PLATFORM.moduleName("app")));
 }

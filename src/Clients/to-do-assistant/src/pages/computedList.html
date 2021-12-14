@@ -33,11 +33,11 @@
             <div repeat.for="task of model.privateTasks" class="to-do-task ${task.isFading ? 'fading' : ''}">
               <div class="to-do-task-content ${task.id === getEditedId ? 'highlighted' : ''}">
                 <span class="name">${task.name}</span>
-                <a click.delegate="complete(task)" class="right-button ${task.isOneTime ? 'one-time' : ''}"
+                <a click.delegate="complete(task)" class="check-button ${task.isOneTime ? 'one-time' : ''}"
                   t="[title,aria-label]computedList.complete">
-                  <i if.bind="!task.rightSideIsLoading" class="far fa-square"></i>
+                  <i if.bind="!task.isChecked" class="far fa-square"></i>
                   <i else class="fas fa-check-square"></i>
-                  <i class="fas fa-trash-alt ${task.rightSideIsLoading ? 'loading' : ''}"></i>
+                  <i class="fas fa-trash-alt ${task.isChecked ? 'loading' : ''}"></i>
                 </a>
               </div>
             </div>
@@ -50,11 +50,11 @@
               <div
                 class="to-do-task-content ${task.id === getEditedId ? 'highlighted' : ''} ${task.assignedUser ? 'assigned' : ''}">
                 <span class="name">${task.name}</span>
-                <a click.delegate="complete(task)" class="right-button ${task.isOneTime ? 'one-time' : ''}"
+                <a click.delegate="complete(task)" class="check-button ${task.isOneTime ? 'one-time' : ''}"
                   t="[title,aria-label]computedList.complete">
-                  <i if.bind="!task.rightSideIsLoading" class="far fa-square"></i>
+                  <i if.bind="!task.isChecked" class="far fa-square"></i>
                   <i else class="fas fa-check-square"></i>
-                  <i class="fas fa-trash-alt ${task.rightSideIsLoading ? 'loading' : ''}"></i>
+                  <i class="fas fa-trash-alt ${task.isChecked ? 'loading' : ''}"></i>
                 </a>
               </div>
             </div>

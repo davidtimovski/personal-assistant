@@ -30,7 +30,7 @@ namespace PersonalAssistant.Api.UnitTests.Controllers.ToDoAssistant
         [Fact]
         public void Get_Returns404_IfNotFound()
         {
-            _listServiceMock.Setup(x => x.Get(It.IsAny<int>(), It.IsAny<int>()))
+            _listServiceMock.Setup(x => x.GetForEdit(It.IsAny<int>(), It.IsAny<int>()))
                 .Returns((EditListDto)null);
 
             var result = _sut.Get(It.IsAny<int>());

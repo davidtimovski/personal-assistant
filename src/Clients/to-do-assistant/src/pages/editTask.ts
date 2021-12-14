@@ -1,11 +1,11 @@
-import { inject, computedFrom, observable } from "aurelia-framework";
+import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
-import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 
 import { TasksService } from "services/tasksService";
 import { ListOption } from "models/viewmodels/listOption";
@@ -133,7 +133,7 @@ export class EditTask {
         await this.tasksService.update(this.model);
         this.nameIsInvalid = false;
 
-        await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
+        await Actions.getLists(this.listsService);
 
         this.router.navigateToRoute("listEdited", {
           id: this.model.listId,
@@ -156,9 +156,7 @@ export class EditTask {
     if (this.deleteInProgress) {
       this.deleteButtonIsLoading = true;
 
-      await this.tasksService.delete(this.model.id);
-
-      await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
+      await this.tasksService.delete(this.model.id, this.model.listId);
 
       this.eventAggregator.publish(AlertEvents.ShowSuccess, "editTask.deleteSuccessful");
       this.router.navigateToRoute("list", { id: this.model.listId });

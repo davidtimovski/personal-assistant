@@ -15,6 +15,7 @@ import { ListModel } from "models/viewmodels/listModel";
 import { State } from "utils/state/state";
 import * as Actions from "utils/state/actions";
 import * as environment from "../../config/environment.json";
+import { AppEvents } from "models/appEvents";
 
 @inject(Router, ListsService, UsersService, LocalStorage, EventAggregator, I18N, ConnectionTracker)
 @connectTo()
@@ -28,6 +29,7 @@ export class Lists {
   private lastEditedId: number;
   private isReordering = false;
   private menuButtonIsLoading = false;
+  private computedListNameLookup;
   state: State;
 
   constructor(
@@ -39,11 +41,15 @@ export class Lists {
     private readonly i18n: I18N,
     private readonly connTracker: ConnectionTracker
   ) {
-    this.eventAggregator.subscribe("get-lists-finished", () => {
+    this.eventAggregator.subscribe(AppEvents.ListsChanged, () => {
       this.setListsFromState();
       this.listsLoaded = true;
       this.progressBar.finish();
     });
+
+    this.computedListNameLookup = {
+      "high-priority": this.i18n.tr("highPriority"),
+    };
   }
 
   activate(params: any) {
@@ -69,19 +75,65 @@ export class Lists {
         }
       });
     }
+
+    this.eventAggregator.subscribe(AppEvents.TaskCompletedChangedRemotely, (data: any) => {
+      this.setComputedListsFromState();
+      this.setTaskCompletion(data.listId, data.isCompleted);
+    });
+
+    this.eventAggregator.subscribe(AppEvents.TaskDeletedRemotely, (data: any) => {
+      this.setComputedListsFromState();
+      this.setTaskCompletion(data.listId, true);
+    });
   }
 
   setListsFromState() {
-    this.computedLists = this.state.lists
-      .filter((x) => x.computedListType)
-      .map((x) => new ListModel(x.id, x.name, x.icon, x.sharingState, x.order, x.computedListType, x.tasks));
+    this.setComputedListsFromState();
 
     this.lists = this.state.lists
       .filter((x) => !x.isArchived && !x.computedListType)
       .sort((a: List, b: List) => {
         return a.order - b.order;
       })
-      .map((x) => new ListModel(x.id, x.name, x.icon, x.sharingState, x.order, x.computedListType, x.tasks));
+      .map(
+        (x) =>
+          new ListModel(
+            x.id,
+            x.name,
+            x.icon,
+            x.sharingState,
+            x.order,
+            x.computedListType,
+            x.tasks.filter((x) => !x.isCompleted).length
+          )
+      );
+  }
+
+  setComputedListsFromState() {
+    this.computedLists = this.state.lists
+      .filter((x) => x.computedListType)
+      .map(
+        (x) =>
+          new ListModel(
+            x.id,
+            this.computedListNameLookup[x.computedListType],
+            x.icon,
+            x.sharingState,
+            x.order,
+            x.computedListType,
+            x.tasks.filter((x) => !x.isCompleted).length
+          )
+      );
+  }
+
+  setTaskCompletion(listId: number, isCompleted: boolean) {
+    const list = this.lists.find((x) => x.id === listId);
+
+    if (isCompleted) {
+      list.uncompletedTaskCount--;
+    } else {
+      list.uncompletedTaskCount++;
+    }
   }
 
   getComputedListIconClass(computedListType: string): string {
@@ -108,7 +160,7 @@ export class Lists {
   sync() {
     this.progressBar.start();
 
-    Actions.getLists(this.listsService, this.i18n.tr("highPriority")).then(() => {
+    Actions.getLists(this.listsService).then(() => {
       this.setListsFromState();
       this.listsLoaded = true;
       this.progressBar.finish();

@@ -4,24 +4,37 @@ import { List } from "models/entities/list";
 import { Task } from "models/entities/task";
 import { ListsService } from "services/listsService";
 
-function getLists(state: State, lists: List[], highPriorityText: string) {
+function getLists(state: State, lists: List[]) {
   if (!lists) {
     return;
   }
 
-  if (state.highPriorityListEnabled) {
-    const allTasks: Task[] = lists
-      .filter((x) => !x.isArchived)
-      .reduce((a, b) => {
-        return a.concat(b.tasks);
-      }, []);
+  return Object.assign({}, state, { lists: [...lists] });
+}
 
-    const uncompletedHighPriorityTasks = allTasks.filter((x) => !x.isCompleted && x.isHighPriority);
-    if (uncompletedHighPriorityTasks.length > 0) {
-      lists.push(
+function generateComputedLists(state: State) {
+  if (!state.highPriorityListEnabled) {
+    return;
+  }
+
+  const newState = Object.assign({}, state, {});
+
+  const allTasks: Task[] = newState.lists
+    .filter((x) => !x.isArchived && !x.computedListType)
+    .reduce((a, b) => {
+      return a.concat(b.tasks);
+    }, []);
+
+  const uncompletedHighPriorityTasks = allTasks.filter((x) => !x.isCompleted && x.isHighPriority);
+  const highPriorityList = newState.lists.find((x) => x.computedListType);
+  if (uncompletedHighPriorityTasks.length > 0) {
+    if (highPriorityList) {
+      highPriorityList.tasks = uncompletedHighPriorityTasks;
+    } else {
+      newState.lists.push(
         new List(
           0,
-          highPriorityText,
+          null,
           null,
           false,
           false,
@@ -34,17 +47,16 @@ function getLists(state: State, lists: List[], highPriorityText: string) {
         )
       );
     }
+  } else if (highPriorityList) {
+    const index = newState.lists.indexOf(highPriorityList);
+    newState.lists.splice(index, 1);
   }
-
-  const newState = Object.assign({}, state, { lists: [...lists] });
 
   return newState;
 }
 
 function setListsLoading(state: State, loading: boolean) {
-  const newState = Object.assign({}, state, { loading: loading });
-
-  return newState;
+  return Object.assign({}, state, { loading: loading });
 }
 
 function reorderList(state: State, id: number, oldOrder: number, newOrder: number) {
@@ -68,13 +80,11 @@ function reorderList(state: State, id: number, oldOrder: number, newOrder: numbe
   return newState;
 }
 
-function completeTask(state: State, taskId: number) {
+function completeTask(state: State, id: number, listId: number) {
   const newState = Object.assign({}, state, {});
-  const allTasks: Task[] = newState.lists.reduce((a, b) => {
-    return a.concat(b.tasks);
-  }, []);
-  const task = allTasks.find((x) => x.id === taskId);
-  const list = newState.lists.find((x) => x.id === task.listId);
+
+  const list = newState.lists.find((x) => x.id === listId);
+  const task = list.tasks.find((x) => x.id === id);
 
   if (task.isPrivate) {
     const completedPrivateTasks = list.tasks.filter((x) => x.isCompleted && x.isPrivate);
@@ -104,31 +114,14 @@ function completeTask(state: State, taskId: number) {
     });
   }
 
-  if (task.isHighPriority) {
-    const highPriorityList = newState.lists.find(
-      (x) => x.computedListType === ListsService.highPriorityComputedListMoniker
-    );
-
-    const index = highPriorityList.tasks.indexOf(task);
-    highPriorityList.tasks.splice(index, 1);
-
-    if (highPriorityList.tasks.length === 0) {
-      newState.lists = newState.lists.filter(
-        (x) => x.computedListType !== ListsService.highPriorityComputedListMoniker
-      );
-    }
-  }
-
   return newState;
 }
 
-function uncompleteTask(state: State, taskId: number) {
+function uncompleteTask(state: State, id: number, listId: number) {
   const newState = Object.assign({}, state, {});
-  const allTasks: Task[] = newState.lists.reduce((a, b) => {
-    return a.concat(b.tasks);
-  }, []);
-  const task = allTasks.find((x) => x.id === taskId);
-  const list = newState.lists.find((x) => x.id === task.listId);
+
+  const list = newState.lists.find((x) => x.id === listId);
+  const task = list.tasks.find((x) => x.id === id);
 
   let order: number;
 
@@ -153,40 +146,14 @@ function uncompleteTask(state: State, taskId: number) {
   task.isCompleted = false;
   task.order = order;
 
-  if (task.isHighPriority) {
-    let highPriorityList = newState.lists.find(
-      (x) => x.computedListType === ListsService.highPriorityComputedListMoniker
-    );
-    if (highPriorityList) {
-      highPriorityList.tasks.push(task);
-    } else {
-      highPriorityList = new List(
-        0,
-        "High Priority",
-        null,
-        false,
-        false,
-        null,
-        0,
-        false,
-        ListsService.highPriorityComputedListMoniker,
-        [task],
-        null
-      );
-      newState.lists.push(highPriorityList);
-    }
-  }
-
   return newState;
 }
 
-function deleteTask(state: State, taskId: number) {
+function deleteTask(state: State, id: number, listId: number) {
   const newState = Object.assign({}, state, {});
-  const allTasks: Task[] = newState.lists.reduce((a, b) => {
-    return a.concat(b.tasks);
-  }, []);
-  const task = allTasks.find((x) => x.id === taskId);
-  const list = newState.lists.find((x) => x.id === task.listId);
+
+  const list = newState.lists.find((x) => x.id === listId);
+  const task = list.tasks.find((x) => x.id === id);
 
   const tasks = list.tasks.filter(
     (x) => x.isCompleted === task.isCompleted && x.isPrivate === task.isPrivate && x.order > task.order
@@ -198,28 +165,14 @@ function deleteTask(state: State, taskId: number) {
   const index = list.tasks.indexOf(task);
   list.tasks.splice(index, 1);
 
-  if (task.isHighPriority) {
-    const highPriorityList = newState.lists.find(
-      (x) => x.computedListType === ListsService.highPriorityComputedListMoniker
-    );
-
-    const index = highPriorityList.tasks.indexOf(task);
-    highPriorityList.tasks.splice(index, 1);
-
-    if (highPriorityList.tasks.length === 0) {
-      newState.lists = newState.lists.filter(
-        (x) => x.computedListType !== ListsService.highPriorityComputedListMoniker
-      );
-    }
-  }
-
   return newState;
 }
 
-function reorderTask(state: State, listId: number, taskId: number, oldOrder: number, newOrder: number) {
+function reorderTask(state: State, id: number, listId: number, oldOrder: number, newOrder: number) {
   const newState = Object.assign({}, state, {});
+
   const list = newState.lists.find((x) => x.id === listId);
-  const task = list.tasks.find((x) => x.id === taskId);
+  const task = list.tasks.find((x) => x.id === id);
 
   if (task.isPrivate) {
     if (newOrder > oldOrder) {
@@ -260,34 +213,34 @@ function reorderTask(state: State, listId: number, taskId: number, oldOrder: num
   return newState;
 }
 
-function updatePreferences(state: State, soundsEnabled: boolean, highPriorityListEnabled: boolean) {
+function updatePreference(state: State, preference: string, enabled: boolean) {
   const newState = Object.assign({}, state, {});
 
-  window.localStorage.setItem("soundsEnabled", soundsEnabled.toString());
-  window.localStorage.setItem("highPriorityListEnabled", highPriorityListEnabled.toString());
+  window.localStorage.setItem(preference, enabled.toString());
 
-  newState.soundsEnabled = soundsEnabled;
-  newState.highPriorityListEnabled = highPriorityListEnabled;
+  newState[preference] = enabled;
 
   return newState;
 }
 
 store.registerAction("getLists", getLists);
+store.registerAction("generateComputedLists", generateComputedLists);
 store.registerAction("setListsLoading", setListsLoading);
 store.registerAction("reorderList", reorderList);
 store.registerAction("completeTask", completeTask);
 store.registerAction("uncompleteTask", uncompleteTask);
 store.registerAction("deleteTask", deleteTask);
 store.registerAction("reorderTask", reorderTask);
-store.registerAction("updatePreferences", updatePreferences);
+store.registerAction("updatePreference", updatePreference);
 
 export {
   getLists,
+  generateComputedLists,
   setListsLoading,
   reorderList,
   completeTask,
   uncompleteTask,
   deleteTask,
   reorderTask,
-  updatePreferences,
+  updatePreference,
 };

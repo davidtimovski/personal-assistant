@@ -5,7 +5,7 @@ import { EventAggregator } from "aurelia-event-aggregator";
 import { AuthService } from "../../../shared/src/services/authService";
 
 import { HttpError } from "../models/enums/httpError";
-import { AlertEvents } from "./alertEvents";
+import { AlertEvents } from "../models/enums/alertEvents";
 
 @inject(AuthService, HttpClient, EventAggregator)
 export class HttpProxyBase {

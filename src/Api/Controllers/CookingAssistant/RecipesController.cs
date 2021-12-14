@@ -357,11 +357,10 @@ namespace Api.Controllers.CookingAssistant
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
                 var message = _localizer["UpdatedRecipeNotification", IdentityHelper.GetUserName(User), result.RecipeName];
 
-                var pushNotification = new PushNotification
+                var pushNotification = new CookingAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
                     UserId = recipient.Id,
-                    Application = "Cooking Assistant",
                     Message = message
                 };
 
@@ -391,11 +390,10 @@ namespace Api.Controllers.CookingAssistant
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
                 var message = _localizer["DeletedRecipeNotification", IdentityHelper.GetUserName(User), result.RecipeName];
 
-                var pushNotification = new PushNotification
+                var pushNotification = new CookingAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
                     UserId = recipient.Id,
-                    Application = "Cooking Assistant",
                     Message = message
                 };
 
@@ -464,11 +462,10 @@ namespace Api.Controllers.CookingAssistant
                     CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
                     var message = _localizer["RemovedShareNotification", IdentityHelper.GetUserName(User), recipe.Name];
 
-                    var pushNotification = new PushNotification
+                    var pushNotification = new CookingAssistantPushNotification
                     {
                         SenderImageUri = currentUser.ImageUri,
                         UserId = user.Id,
-                        Application = "Cooking Assistant",
                         Message = message
                     };
 
@@ -511,11 +508,10 @@ namespace Api.Controllers.CookingAssistant
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
                 var message = _localizer[localizerKey, IdentityHelper.GetUserName(User), result.RecipeName];
 
-                var pushNotification = new PushNotification
+                var pushNotification = new CookingAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
                     UserId = recipient.Id,
-                    Application = "Cooking Assistant",
                     Message = message
                 };
 
@@ -545,11 +541,10 @@ namespace Api.Controllers.CookingAssistant
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
                 var message = _localizer["LeftRecipeNotification", IdentityHelper.GetUserName(User), result.RecipeName];
 
-                var pushNotification = new PushNotification
+                var pushNotification = new CookingAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
                     UserId = recipient.Id,
-                    Application = "Cooking Assistant",
                     Message = message
                 };
 
@@ -612,11 +607,10 @@ namespace Api.Controllers.CookingAssistant
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
                 var message = _localizer["SentRecipeNotification", IdentityHelper.GetUserName(User), result.RecipeName];
 
-                var pushNotification = new PushNotification
+                var pushNotification = new CookingAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
                     UserId = recipient.Id,
-                    Application = "Cooking Assistant",
                     Message = message,
                     OpenUrl = $"{_urls.CookingAssistant}/inbox"
                 };
@@ -655,11 +649,10 @@ namespace Api.Controllers.CookingAssistant
             CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
             var message = _localizer["DeclinedSendRequestNotification", IdentityHelper.GetUserName(User), result.RecipeName];
 
-            var pushNotification = new PushNotification
+            var pushNotification = new CookingAssistantPushNotification
             {
                 SenderImageUri = result.ActionUserImageUri,
                 UserId = recipient.Id,
-                Application = "Cooking Assistant",
                 Message = message
             };
 
@@ -733,11 +726,10 @@ namespace Api.Controllers.CookingAssistant
             CultureInfo.CurrentCulture = new CultureInfo(recipeUser.Language, false);
             var message = _localizer["AcceptedSendRequestNotification", IdentityHelper.GetUserName(User), recipe.Name];
 
-            var pushNotification = new PushNotification
+            var pushNotification = new CookingAssistantPushNotification
             {
                 SenderImageUri = currentUser.ImageUri,
                 UserId = recipeUser.Id,
-                Application = "Cooking Assistant",
                 Message = message
             };
 

@@ -6,6 +6,7 @@ import { ListsService } from "services/listsService";
 import { List } from "models/entities/list";
 import { ArchivedList } from "models/viewmodels/archivedList";
 import { State } from "utils/state/state";
+import { AppEvents } from "models/appEvents";
 
 @inject(EventAggregator)
 @connectTo()
@@ -16,7 +17,7 @@ export class ArchivedLists {
   state: State;
 
   constructor(private readonly eventAggregator: EventAggregator) {
-    this.eventAggregator.subscribe("get-lists-finished", () => {
+    this.eventAggregator.subscribe(AppEvents.ListsChanged, () => {
       this.setListsFromState();
     });
   }

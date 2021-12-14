@@ -10,10 +10,11 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists
     public interface IListsRepository
     {
         IEnumerable<ToDoList> GetAllAsOptions(int userId);
+        IEnumerable<int> GetNonArchivedSharedListIds(int userId);
         IEnumerable<ToDoList> GetAllWithTasksAndSharingDetails(int userId);
         IEnumerable<User> GetMembersAsAssigneeOptions(int id);
         ToDoList Get(int id);
-        ToDoList Get(int id, int userId);
+        ToDoList GetWithShares(int id, int userId);
         ToDoList GetWithOwner(int id, int userId);
         IEnumerable<ListShare> GetShares(int id);
         IEnumerable<ListShare> GetShareRequests(int userId);

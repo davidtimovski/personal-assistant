@@ -74,9 +74,9 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             return result;
         }
 
-        public EditListDto Get(int id, int userId)
+        public EditListDto GetForEdit(int id, int userId)
         {
-            ToDoList list = _listsRepository.Get(id, userId);
+            ToDoList list = _listsRepository.GetWithShares(id, userId);
 
             var result = _mapper.Map<EditListDto>(list, opts => { opts.Items["UserId"] = userId; });
 

@@ -2,6 +2,9 @@ import { Task } from "models/entities/task";
 import { AssignedUser } from "../viewmodels/assignedUser";
 
 export class ListTask {
+  public isChecked = false;
+  public isFading = false;
+
   constructor(
     public id: number,
     public listId: number,
@@ -11,9 +14,7 @@ export class ListTask {
     public isHighPriority: boolean,
     public isPrivate: boolean,
     public assignedUser: AssignedUser,
-    public order: number,
-    public rightSideIsLoading: boolean,
-    public isFading: boolean
+    public order: number
   ) {}
 
   static fromTask(task: Task) {
@@ -26,9 +27,7 @@ export class ListTask {
       task.isHighPriority,
       task.isPrivate,
       task.assignedUser,
-      task.order,
-      false,
-      false
+      task.order
     );
   }
 }

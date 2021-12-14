@@ -3,6 +3,8 @@ import { User, UserManager } from "oidc-client";
 import { HttpClient } from "aurelia-fetch-client";
 import { EventAggregator } from "aurelia-event-aggregator";
 
+import { AuthEvents } from "../models/enums/authEvents";
+
 @inject(UserManager, HttpClient, EventAggregator)
 export class AuthService {
   private user: User;
@@ -15,6 +17,14 @@ export class AuthService {
 
   get currentUser(): User {
     return this.user;
+  }
+
+  get currentUserId(): number {
+    if (!this.user) {
+      return null;
+    }
+
+    return parseInt(this.user.profile.sub, 10);
   }
 
   get authenticated(): boolean {
@@ -35,11 +45,9 @@ export class AuthService {
       }
     }
 
-    this.httpClient.defaults.headers[
-      "Authorization"
-    ] = `Bearer ${this.user.access_token}`;
+    this.httpClient.defaults.headers["Authorization"] = `Bearer ${this.user.access_token}`;
 
-    this.eventAggregator.publish("authenticated");
+    this.eventAggregator.publish(AuthEvents.Authenticated);
   }
 
   async login() {

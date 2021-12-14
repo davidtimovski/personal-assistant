@@ -19,6 +19,7 @@ namespace PersonalAssistant.Api.UnitTests.Controllers.ToDoAssistant
         public TasksControllerTests()
         {
             _sut = new TasksController(
+                null,
                 _taskServiceMock.Object,
                 null, null, null, null, null, null, null, null,
                 new Mock<IOptions<Urls>>().Object)

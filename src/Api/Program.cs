@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Globalization;
+using System.Threading.Tasks;
 using Api.Config;
+using Api.Hubs;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
@@ -47,10 +49,27 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
     {
         options.Authority = builder.Configuration["Urls:Authority"];
+        options.Audience = "personal-assistant-api";
+
 #if DEBUG
         options.RequireHttpsMetadata = false;
 #endif
-        options.Audience = "personal-assistant-api";
+
+        // For SignalR
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/toDoAssistantHub")))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            }
+        };
     });
 
 builder.Services.AddCors(options =>
@@ -64,6 +83,7 @@ builder.Services.AddCors(options =>
         builder.WithOrigins(toDoAssistantUrl)
                .AllowAnyMethod()
                .AllowAnyHeader()
+               .AllowCredentials() // For SignalR
                .SetPreflightMaxAge(TimeSpan.FromDays(20));
     });
 
@@ -94,7 +114,8 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddApplicationInsightsTelemetry()
     .AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies())
-    .AddLocalization(options => options.ResourcesPath = "Resources");
+    .AddLocalization(options => options.ResourcesPath = "Resources")
+    .AddSignalR();
 
 builder.Services.AddMvc(options =>
 {
@@ -127,7 +148,8 @@ app.UseCors("AllowAllApps");
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.UseMvc();
+
+app.MapHub<ToDoAssistantHub>("/toDoAssistantHub");
 
 app.Run();

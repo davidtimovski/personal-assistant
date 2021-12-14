@@ -1,6 +1,4 @@
-import { Loadable } from "../loadable";
-
-export class ShareRequest implements Loadable {
+export class ShareRequest {
   constructor(
     public listId: number,
     public listName: string,

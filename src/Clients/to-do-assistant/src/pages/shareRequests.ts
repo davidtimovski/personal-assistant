@@ -34,7 +34,7 @@ export class ShareRequests {
     await this.listsService.setShareIsAccepted(request.listId, true);
     this.pendingShareRequests.splice(this.pendingShareRequests.indexOf(request), 1);
 
-    await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
+    await Actions.getLists(this.listsService);
 
     this.router.navigateToRoute("listsEdited", { editedId: request.listId });
   }

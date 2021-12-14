@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using PersonalAssistant.Domain.Entities.Common;
 
 namespace PersonalAssistant.Domain.Entities.ToDoAssistant
@@ -17,5 +18,13 @@ namespace PersonalAssistant.Domain.Entities.ToDoAssistant
         public User User { get; set; }
         public List<ToDoTask> Tasks { get; set; } = new List<ToDoTask>();
         public List<ListShare> Shares { get; set; } = new List<ListShare>();
+
+        public bool IsShared
+        {
+            get 
+            {
+                return Shares.Any(x => x.IsAccepted == true);
+            }
+        }
     }
 }

@@ -1,42 +1,42 @@
 import { inject } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { ValidationController, validateTrigger, ValidationRules } from "aurelia-validation";
+import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 import { connectTo } from "aurelia-store";
 
 import { ListsService } from "services/listsService";
 import { TasksService } from "services/tasksService";
-import { Task } from "models/entities/task";
 import { ViewComputedList } from "models/viewmodels/viewComputedList";
 import { State } from "utils/state/state";
-import * as Actions from "utils/state/actions";
 import { ListTask } from "models/viewmodels/listTask";
+import { AppEvents } from "models/appEvents";
 
-@inject(Router, TasksService, ValidationController, EventAggregator)
+@inject(Router, TasksService, I18N, EventAggregator)
 @connectTo()
 export class ComputedList {
   private type: string;
-  private model = new ViewComputedList(0, "", null, [], []);
+  private model = new ViewComputedList(0, "", null);
   private shadowTasks: ListTask[];
   private shadowPrivateTasks: ListTask[];
   private searchTasksText = "";
   private bleep = new Audio("/audio/bleep.mp3");
   private blop = new Audio("/audio/blop.mp3");
+  private computedListNameLookup;
   state: State;
 
   constructor(
     private readonly router: Router,
     private readonly tasksService: TasksService,
-    private readonly validationController: ValidationController,
+    private readonly i18n: I18N,
     private readonly eventAggregator: EventAggregator
   ) {
-    this.eventAggregator.subscribe("get-lists-finished", () => {
+    this.eventAggregator.subscribe(AppEvents.ListsChanged, () => {
       this.setModelFromState();
     });
 
-    this.validationController.validateTrigger = validateTrigger.manual;
-
-    ValidationRules.ensure("newTaskName").required().on(this);
+    this.computedListNameLookup = {
+      "high-priority": this.i18n.tr("highPriority"),
+    };
   }
 
   activate(params: any) {
@@ -52,6 +52,30 @@ export class ComputedList {
     if (!this.state.loading) {
       this.setModelFromState();
     }
+
+    this.eventAggregator.subscribe(AppEvents.TaskCompletedChangedRemotely, (data: any) => {
+      if (data.isCompleted) {
+        const allTasks = this.model.tasks.concat(this.model.privateTasks);
+        const task = allTasks.find((x) => x.id === data.id);
+        this.complete(task, true);
+      } else {
+        const list = this.state.lists.find((x) => x.computedListType === this.type);
+        const task = list.tasks.find((x) => x.id === data.id);
+
+        if (task.isPrivate) {
+          this.model.setPrivateTasks(list.tasks);
+        } else {
+          this.model.setTasks(list.tasks);
+        }
+      }
+    });
+
+    this.eventAggregator.subscribe(AppEvents.TaskDeletedRemotely, (data: any) => {
+      const allTasks = this.model.tasks.concat(this.model.privateTasks);
+      const task = allTasks.find((x) => x.id === data.id);
+
+      this.complete(task, true);
+    });
   }
 
   setModelFromState() {
@@ -60,26 +84,12 @@ export class ComputedList {
       this.router.navigateToRoute("lists");
     } else {
       this.model.id = list.id;
-      this.model.name = list.name;
+      this.model.name = this.computedListNameLookup[list.computedListType];
       this.model.computedListType = list.computedListType;
       this.model.iconClass = ListsService.getComputedListIconClass(this.model.computedListType);
 
-      this.model.tasks = list.tasks
-        .filter((x) => !x.isCompleted && !x.isPrivate)
-        .sort((a: Task, b: Task) => {
-          return a.order - b.order;
-        })
-        .map((x) => {
-          return ListTask.fromTask(x);
-        });
-      this.model.privateTasks = list.tasks
-        .filter((x) => !x.isCompleted && x.isPrivate)
-        .sort((a: Task, b: Task) => {
-          return a.order - b.order;
-        })
-        .map((x) => {
-          return ListTask.fromTask(x);
-        });
+      this.model.setTasks(list.tasks);
+      this.model.setPrivateTasks(list.tasks);
 
       this.shadowTasks = this.model.tasks.slice();
       this.shadowPrivateTasks = this.model.privateTasks.slice();
@@ -115,57 +125,65 @@ export class ComputedList {
     this.model.privateTasks = this.shadowPrivateTasks.slice();
   }
 
-  async complete(task: ListTask) {
-    if (task.rightSideIsLoading) {
+  async complete(task: ListTask, remote = false) {
+    if (task.isChecked) {
       return;
     }
 
     const startTime = new Date();
 
-    if (this.state.soundsEnabled) {
+    if (!remote && this.state.soundsEnabled) {
       this.bleep.play();
     }
 
-    task.rightSideIsLoading = true;
+    task.isChecked = true;
     task.isFading = true;
 
     if (this.searchTasksText.length > 0) {
       this.resetSearchFilter();
     }
 
+    const list = this.state.lists.find((x) => x.computedListType === this.type);
+
     if (task.isOneTime) {
-      await this.tasksService.delete(task.id);
-      await Actions.deleteTask(task.id);
+      if (!remote) {
+        await this.tasksService.delete(task.id, task.listId);
+      }
 
       this.executeAfterDelay(() => {
         if (this.model.tasks.length + this.model.privateTasks.length === 1) {
           this.router.navigateToRoute("lists");
         } else {
-          this.setModelFromState();
+          if (task.isPrivate) {
+            this.model.setPrivateTasks(list.tasks);
+          } else {
+            this.model.setTasks(list.tasks);
+          }
         }
       }, startTime);
-
-      if (this.state.soundsEnabled) {
-        this.bleep.play();
-      }
     } else {
-      await this.tasksService.complete(task.id);
-      await Actions.completeTask(task.id);
+      if (!remote) {
+        await this.tasksService.complete(task.id, task.listId);
+      }
 
       this.executeAfterDelay(() => {
-        task.rightSideIsLoading = false;
+        task.isChecked = false;
         task.isFading = false;
 
         if (this.model.tasks.length + this.model.privateTasks.length === 1) {
           this.router.navigateToRoute("lists");
         } else {
-          this.setModelFromState();
+          if (task.isPrivate) {
+            this.model.setPrivateTasks(list.tasks);
+          } else {
+            this.model.setTasks(list.tasks);
+          }
         }
       }, startTime);
     }
   }
 
-  // Used to delay UI update if server responds too quickly
+  /** Used to delay UI update if server responds too quickly */
   executeAfterDelay(callback: () => void, startTime: Date) {
     const delayMs = 600;
     const timeTaken = new Date().getTime() - startTime.getTime();

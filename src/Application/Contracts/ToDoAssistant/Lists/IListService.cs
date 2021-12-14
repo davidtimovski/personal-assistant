@@ -12,7 +12,7 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists
         IEnumerable<ToDoListOption> GetAllAsOptions(int userId);
         IEnumerable<AssigneeOption> GetMembersAsAssigneeOptions(int id);
         SimpleList Get(int id);
-        EditListDto Get(int id, int userId);
+        EditListDto GetForEdit(int id, int userId);
         ListWithShares GetWithShares(int id, int userId);
         IEnumerable<ShareListRequest> GetShareRequests(int userId);
         int GetPendingShareRequestsCount(int userId);

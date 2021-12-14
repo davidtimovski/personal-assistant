@@ -6,14 +6,26 @@ import { I18N } from "aurelia-i18n";
 import { AuthService } from "../../shared/src/services/authService";
 import { ConnectionTracker } from "../../shared/src/utils/connectionTracker";
 import AuthorizeStep from "../../shared/src/authorize-pipeline-step";
-import { AlertEvents } from "../../shared/src/utils/alertEvents";
+import { AuthEvents } from "../../shared/src/models/enums/authEvents";
+import { AlertEvents } from "../../shared/src/models/enums/alertEvents";
 
 import * as Actions from "utils/state/actions";
 import { LocalStorage } from "utils/localStorage";
+import { SignalRClient } from "utils/signalRClient";
 import { ListsService } from "services/listsService";
+import { AppEvents } from "models/appEvents";
 import routes from "./routes";
 
-@inject(AuthService, LocalStorage, ConnectionTracker, ListsService, EventAggregator, BroadcastChannel, I18N)
+@inject(
+  AuthService,
+  LocalStorage,
+  ConnectionTracker,
+  ListsService,
+  SignalRClient,
+  EventAggregator,
+  BroadcastChannel,
+  I18N
+)
 export class App {
   private isTouchDevice = false;
   router: Router;
@@ -23,6 +35,7 @@ export class App {
     private readonly localStorage: LocalStorage,
     private readonly connTracker: ConnectionTracker,
     private readonly listsService: ListsService,
+    private readonly signalRClient: SignalRClient,
     private readonly eventAggregator: EventAggregator,
     private readonly broadcastChannel: BroadcastChannel,
     private readonly i18n: I18N
@@ -40,15 +53,16 @@ export class App {
       navigator.serviceWorker.register("/sw.js");
     }
 
-    this.authService.login();
-
-    this.eventAggregator.subscribeOnce("authenticated", () => {
+    this.eventAggregator.subscribeOnce(AuthEvents.Authenticated, async () => {
       this.localStorage.initialize();
 
-      Actions.getLists(this.listsService, this.i18n.tr("highPriority")).then(() => {
-        this.eventAggregator.publish("get-lists-finished");
-      });
+      await Actions.getLists(this.listsService);
+      this.eventAggregator.publish(AppEvents.ListsChanged);
+
+      this.signalRClient.initialize(this.authService.currentUser.access_token, this.authService.currentUserId);
     });
+
+    this.authService.login();
   }
 
   configureRouter(config: RouterConfiguration, router: Router): void {

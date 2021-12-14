@@ -5,7 +5,7 @@ import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
-import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 
 import { ListsService } from "services/listsService";
 import { UsersService } from "services/usersService";
@@ -123,7 +123,7 @@ export class EditList {
           }
           this.nameIsInvalid = false;
 
-          await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
+          await Actions.getLists(this.listsService);
 
           const redirectRoute = this.model.isArchived ? "archivedListsEdited" : "listsEdited";
           this.router.navigateToRoute(redirectRoute, {
@@ -143,7 +143,7 @@ export class EditList {
           );
           this.nameIsInvalid = false;
 
-          await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
+          await Actions.getLists(this.listsService);
 
           this.router.navigateToRoute("listsEdited", {
             editedId: id,
@@ -169,7 +169,7 @@ export class EditList {
 
       await this.listsService.delete(this.model.id);
 
-      await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
+      await Actions.getLists(this.listsService);
 
       this.eventAggregator.publish(AlertEvents.ShowSuccess, "editList.deleteSuccessful");
       this.router.navigateToRoute("lists");
@@ -189,7 +189,7 @@ export class EditList {
 
       await this.listsService.leave(this.model.id);
 
-      await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
+      await Actions.getLists(this.listsService);
 
       this.eventAggregator.publish(AlertEvents.ShowSuccess, "editList.youHaveLeftTheList");
 

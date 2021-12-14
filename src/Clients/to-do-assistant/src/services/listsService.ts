@@ -205,7 +205,7 @@ export class ListsService extends HttpProxyBase {
     ];
   }
 
-  public static highPriorityComputedListMoniker = "high-priority";
+  static highPriorityComputedListMoniker = "high-priority";
 
   static getComputedListIconClass(type: string): string {
     if (type === this.highPriorityComputedListMoniker) {

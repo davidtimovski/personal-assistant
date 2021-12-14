@@ -5,7 +5,7 @@ import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
 import { AuthService } from "../../../shared/src/services/authService";
-import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 
 import { ListsService } from "services/listsService";
 import { ListWithShares } from "models/viewmodels/listWithShares";
@@ -219,7 +219,7 @@ export class ShareList {
 
     await this.listsService.share(this.model.id, this.newShares, this.editedShares, this.removedShares);
 
-    await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
+    await Actions.getLists(this.listsService);
 
     if (this.editedShares.length + this.removedShares.length > 0) {
       this.eventAggregator.publish(AlertEvents.ShowSuccess, "shareList.sharingDetailsSaved");

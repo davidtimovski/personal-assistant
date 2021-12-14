@@ -1,4 +1,3 @@
-import { Task } from "../entities/task";
 import { SharingState } from "../viewmodels/sharingState";
 
 export class ListModel {
@@ -9,10 +8,10 @@ export class ListModel {
     public sharingState: SharingState,
     public order: number,
     public computedListType: string,
-    public tasks: Array<Task>
+    public uncompletedTaskCount: number
   ) {}
 
   public get isEmpty() {
-    return this.tasks.every((x) => x.isCompleted);
+    return this.uncompletedTaskCount === 0;
   }
 }

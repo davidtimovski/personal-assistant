@@ -7,7 +7,17 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models
 {
     public class CreatedTaskResult : INotificationResult
     {
-        public int TaskId { get; set; }
+        public CreatedTaskResult(int taskId, int listId, bool notifySignalR)
+        {
+            TaskId = taskId;
+            ListId = listId;
+            NotifySignalR = notifySignalR;
+        }
+
+        public int TaskId { get; }
+        public int ListId { get; }
+        public bool NotifySignalR { get; }
+
         public string TaskName { get; set; }
         public string ListName { get; set; }
         public string ActionUserImageUri { get; set; }

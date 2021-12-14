@@ -121,7 +121,7 @@
     padding: 15px;
   }
 
-  &.reordering .left-button {
+  &.reordering .edit-button {
     display: none;
   }
 
@@ -164,7 +164,7 @@
       margin: 6px 9px 0 4px;
     }
 
-    .left-button {
+    .edit-button {
       min-width: 45px;
       font-size: 23px;
       line-height: 45px;
@@ -177,7 +177,7 @@
       }
     }
 
-    .right-button {
+    .check-button {
       min-width: 45px;
       font-size: 27px;
       line-height: 45px;

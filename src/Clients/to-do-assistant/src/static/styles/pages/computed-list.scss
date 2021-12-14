@@ -47,10 +47,6 @@
     padding: 15px;
   }
 
-  &.reordering .left-button {
-    display: none;
-  }
-
   .to-do-task {
     display: flex;
     justify-content: flex-start;
@@ -77,7 +73,7 @@
       margin: 6px 9px 0 0;
     }
 
-    .right-button {
+    .check-button {
       min-width: 45px;
       font-size: 27px;
       line-height: 45px;

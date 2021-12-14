@@ -21,6 +21,6 @@ namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks
         Task<DeleteTaskResult> DeleteAsync(int id, int userId);
         Task<CompleteUncompleteTaskResult> CompleteAsync(CompleteUncomplete model);
         Task<CompleteUncompleteTaskResult> UncompleteAsync(CompleteUncomplete model);
-        Task ReorderAsync(ReorderTask model);
+        Task<ReorderTaskResult> ReorderAsync(ReorderTask model);
     }
 }

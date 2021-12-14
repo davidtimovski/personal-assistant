@@ -5,22 +5,22 @@ import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 import { connectTo } from "aurelia-store";
 
-import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 
 import { ListsService } from "services/listsService";
 import { TasksService } from "services/tasksService";
-import { Task } from "models/entities/task";
 import { ViewList } from "models/viewmodels/viewList";
 import { SharingState } from "models/viewmodels/sharingState";
 import { State } from "utils/state/state";
 import * as Actions from "utils/state/actions";
 import { ListTask } from "models/viewmodels/listTask";
+import { AppEvents } from "models/appEvents";
 
 @inject(Router, ListsService, TasksService, ValidationController, I18N, EventAggregator)
 @connectTo()
 export class List {
   private listId: number;
-  private model = new ViewList(0, "", false, SharingState.NotShared, null, null, [], [], [], []);
+  private model = new ViewList(0, "", false, SharingState.NotShared, null, null);
   private topDrawerIsOpen = false;
   private shareButtonText: string;
   private completedTasksAreVisible = false;
@@ -56,7 +56,7 @@ export class List {
     private readonly i18n: I18N,
     private readonly eventAggregator: EventAggregator
   ) {
-    this.eventAggregator.subscribe("get-lists-finished", () => {
+    this.eventAggregator.subscribe(AppEvents.ListsChanged, () => {
       this.setModelFromState();
     });
 
@@ -88,6 +88,41 @@ export class List {
     if (!this.state.loading) {
       this.setModelFromState();
     }
+
+    this.eventAggregator.subscribe(AppEvents.TaskCompletedChangedRemotely, (data: any) => {
+      const allTasks = this.model.tasks
+        .concat(this.model.privateTasks)
+        .concat(this.model.completedTasks)
+        .concat(this.model.completedPrivateTasks);
+      const task = allTasks.find((x) => x.id === data.id);
+
+      if (data.isCompleted) {
+        this.complete(task, true);
+      } else {
+        this.uncomplete(task, true);
+      }
+    });
+
+    this.eventAggregator.subscribe(AppEvents.TaskDeletedRemotely, (data: any) => {
+      const allTasks = this.model.tasks
+        .concat(this.model.privateTasks)
+        .concat(this.model.completedTasks)
+        .concat(this.model.completedPrivateTasks);
+      const task = allTasks.find((x) => x.id === data.id);
+
+      this.complete(task, true);
+    });
+
+    this.eventAggregator.subscribe(AppEvents.TaskReorderedRemotely, (data: any) => {
+      const list = this.state.lists.find((x) => x.id === data.listId);
+      const task = list.tasks.find((x) => x.id === data.id);
+
+      if (task.isCompleted) {
+        this.model.setCompletedTasks(list.tasks);
+      } else {
+        this.model.setTasks(list.tasks);
+      }
+    });
   }
 
   setModelFromState() {
@@ -102,38 +137,10 @@ export class List {
       this.model.isArchived = list.isArchived;
       this.model.computedListType = list.computedListType;
 
-      this.model.tasks = list.tasks
-        .filter((x) => !x.isCompleted && !x.isPrivate)
-        .sort((a: Task, b: Task) => {
-          return a.order - b.order;
-        })
-        .map((x) => {
-          return ListTask.fromTask(x);
-        });
-      this.model.privateTasks = list.tasks
-        .filter((x) => !x.isCompleted && x.isPrivate)
-        .sort((a: Task, b: Task) => {
-          return a.order - b.order;
-        })
-        .map((x) => {
-          return ListTask.fromTask(x);
-        });
-      this.model.completedTasks = list.tasks
-        .filter((x) => x.isCompleted && !x.isPrivate)
-        .sort((a: Task, b: Task) => {
-          return a.order - b.order;
-        })
-        .map((x) => {
-          return ListTask.fromTask(x);
-        });
-      this.model.completedPrivateTasks = list.tasks
-        .filter((x) => x.isCompleted && x.isPrivate)
-        .sort((a: Task, b: Task) => {
-          return a.order - b.order;
-        })
-        .map((x) => {
-          return ListTask.fromTask(x);
-        });
+      this.model.setTasks(list.tasks);
+      this.model.setPrivateTasks(list.tasks);
+      this.model.setCompletedTasks(list.tasks);
+      this.model.setCompletedPrivateTasks(list.tasks);
 
       this.isOneTime = this.model.isOneTimeToggleDefault;
       this.shareButtonText =
@@ -159,9 +166,7 @@ export class List {
     const oldOrder = ++data.fromIndex;
     const newOrder = ++data.toIndex;
 
-    await this.tasksService.reorder(id, oldOrder, newOrder);
-
-    await Actions.reorderTask(this.listId, id, oldOrder, newOrder);
+    await this.tasksService.reorder(id, this.listId, oldOrder, newOrder);
 
     this.isReordering = false;
   }
@@ -317,7 +322,7 @@ export class List {
             this.newTaskIsLoading = false;
             this.newTaskName = "";
 
-            await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
+            await Actions.getLists(this.listsService);
 
             const list = this.state.lists.find((x) => x.id === this.listId);
             const task = list.tasks.find((x) => x.id === id);
@@ -342,18 +347,18 @@ export class List {
     }
   }
 
-  async complete(task: ListTask) {
-    if (task.rightSideIsLoading) {
+  async complete(task: ListTask, remote = false) {
+    if (task.isChecked) {
       return;
     }
 
     const startTime = new Date();
 
-    if (this.state.soundsEnabled) {
+    if (!remote && this.state.soundsEnabled) {
       this.bleep.play();
     }
 
-    task.rightSideIsLoading = true;
+    task.isChecked = true;
     task.isFading = true;
     this.lastEditedId = 0;
 
@@ -361,41 +366,52 @@ export class List {
       this.resetSearchFilter();
     }
 
+    const list = this.state.lists.find((x) => x.id === this.listId);
+
     if (task.isOneTime) {
-      await this.tasksService.delete(task.id);
-      await Actions.deleteTask(task.id);
-
-      this.executeAfterDelay(() => {
-        this.setModelFromState();
-      }, startTime);
-
-      if (this.state.soundsEnabled) {
-        this.bleep.play();
+      if (!remote) {
+        await this.tasksService.delete(task.id, this.listId);
       }
-    } else {
-      await this.tasksService.complete(task.id);
-      await Actions.completeTask(task.id);
 
       this.executeAfterDelay(() => {
-        task.rightSideIsLoading = false;
+        if (task.isPrivate) {
+          this.model.setPrivateTasks(list.tasks);
+        } else {
+          this.model.setTasks(list.tasks);
+        }
+      }, startTime);
+    } else {
+      if (!remote) {
+        await this.tasksService.complete(task.id, this.listId);
+      }
+
+      this.executeAfterDelay(() => {
+        task.isChecked = false;
         task.isFading = false;
-        this.setModelFromState();
+
+        if (task.isPrivate) {
+          this.model.setPrivateTasks(list.tasks);
+          this.model.setCompletedPrivateTasks(list.tasks);
+        } else {
+          this.model.setTasks(list.tasks);
+          this.model.setCompletedTasks(list.tasks);
+        }
       }, startTime);
     }
   }
 
-  async uncomplete(task: ListTask) {
-    if (task.rightSideIsLoading) {
+  async uncomplete(task: ListTask, remote = false) {
+    if (task.isChecked) {
       return;
     }
 
     const startTime = new Date();
 
-    if (this.state.soundsEnabled) {
+    if (!remote && this.state.soundsEnabled) {
       this.blop.play();
     }
 
-    task.rightSideIsLoading = true;
+    task.isChecked = true;
     task.isFading = true;
     this.lastEditedId = 0;
 
@@ -403,17 +419,27 @@ export class List {
       this.resetSearchFilter();
     }
 
-    await this.tasksService.uncomplete(task.id);
-    await Actions.uncompleteTask(task.id);
+    if (!remote) {
+      await this.tasksService.uncomplete(task.id, this.listId);
+    }
 
     this.executeAfterDelay(() => {
-      task.rightSideIsLoading = false;
+      task.isChecked = false;
       task.isFading = false;
-      this.setModelFromState();
+
+      const list = this.state.lists.find((x) => x.id === this.listId);
+
+      if (task.isPrivate) {
+        this.model.setCompletedPrivateTasks(list.tasks);
+        this.model.setPrivateTasks(list.tasks);
+      } else {
+        this.model.setCompletedTasks(list.tasks);
+        this.model.setTasks(list.tasks);
+      }
     }, startTime);
   }
 
-  // Used to delay UI update if server responds too quickly
+  /** Used to delay UI update if server responds too quickly */
   executeAfterDelay(callback: () => void, startTime: Date) {
     const delayMs = 600;
     const timeTaken = new Date().getTime() - startTime.getTime();
@@ -445,7 +471,7 @@ export class List {
   async restore() {
     await this.listsService.setIsArchived(this.model.id, false);
 
-    await Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
+    await Actions.getLists(this.listsService);
 
     this.router.navigateToRoute("listsEdited", { editedId: this.model.id });
   }

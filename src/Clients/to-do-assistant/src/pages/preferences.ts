@@ -3,7 +3,7 @@ import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 import { connectTo } from "aurelia-store";
 
-import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 
 import { UsersService } from "services/usersService";
 import { NotificationsService } from "services/notificationsService";
@@ -63,6 +63,10 @@ export class Preferences {
   }
 
   async notificationsCheckboxCheckedChanged() {
+    if (!this.preferences) {
+      return;
+    }
+
     const previousNotificationsPermission = (Notification as any).permission;
 
     if (previousNotificationsPermission === "denied") {
@@ -126,7 +130,7 @@ export class Preferences {
   }
 
   soundsEnabledChanged() {
-    Actions.updatePreferences(this.soundsEnabled, this.highPriorityListEnabled);
+    Actions.updatePreference("soundsEnabled", this.soundsEnabled);
 
     if (this.soundsEnabled) {
       new Audio("/audio/bleep.mp3").play();
@@ -134,8 +138,8 @@ export class Preferences {
   }
 
   highPriorityListEnabledChanged() {
-    Actions.updatePreferences(this.soundsEnabled, this.highPriorityListEnabled);
+    Actions.updatePreference("highPriorityListEnabled", this.highPriorityListEnabled);
 
-    Actions.getLists(this.listsService, this.i18n.tr("highPriority"));
+    Actions.getLists(this.listsService);
   }
 }
