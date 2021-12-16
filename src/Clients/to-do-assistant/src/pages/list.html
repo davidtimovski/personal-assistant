@@ -90,9 +90,9 @@
           <form submit.trigger="create()">
             <div class="add-input-wrap ${model.sharingState !== 0 && !isSearching ? 'with-private-toggle' : ''}">
               <input type="text" value.bind="newTaskName & validate" ref="newTaskNameInput"
-                keyup.trigger="newTaskNameInputChanged($event)" placeholder="${addNewPlaceholderText}"
-                aria-label="${addNewPlaceholderText}" maxlength="50"
-                class="new-task ${newTaskIsInvalid ? 'invalid' : ''}" required />
+                keyup.trigger="newTaskNameInputChanged($event)" class="new-task ${newTaskIsInvalid ? 'invalid' : ''}"
+                placeholder="${addNewPlaceholderText}" aria-label="${addNewPlaceholderText}"
+                readonly.bind="newTaskIsLoading" maxlength="50" required />
               <label class="is-private-toggle ${isPrivate ? 'checked' : ''}"
                 t="[title,aria-label]list.togglePrivateTasks">
                 <input type="checkbox" checked.bind="isPrivate" change.delegate="isPrivateToggleChanged()" />

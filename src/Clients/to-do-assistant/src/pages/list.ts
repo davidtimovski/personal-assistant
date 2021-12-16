@@ -118,9 +118,9 @@ export class List {
       const task = list.tasks.find((x) => x.id === data.id);
 
       if (task.isCompleted) {
-        this.model.setCompletedTasks(list.tasks);
+        this.model.setCompletedTasksFromState(list.tasks);
       } else {
-        this.model.setTasks(list.tasks);
+        this.model.setTasksFromState(list.tasks);
       }
     });
   }
@@ -137,10 +137,10 @@ export class List {
       this.model.isArchived = list.isArchived;
       this.model.computedListType = list.computedListType;
 
-      this.model.setTasks(list.tasks);
-      this.model.setPrivateTasks(list.tasks);
-      this.model.setCompletedTasks(list.tasks);
-      this.model.setCompletedPrivateTasks(list.tasks);
+      this.model.setTasksFromState(list.tasks);
+      this.model.setPrivateTasksFromState(list.tasks);
+      this.model.setCompletedTasksFromState(list.tasks);
+      this.model.setCompletedPrivateTasksFromState(list.tasks);
 
       this.isOneTime = this.model.isOneTimeToggleDefault;
       this.shareButtonText =
@@ -318,19 +318,18 @@ export class List {
           this.similarTaskNames = [];
 
           try {
-            const id = await this.tasksService.create(this.model.id, this.newTaskName, this.isOneTime, this.isPrivate);
+            await this.tasksService.create(this.model.id, this.newTaskName, this.isOneTime, this.isPrivate);
             this.newTaskIsLoading = false;
             this.newTaskName = "";
 
             await Actions.getLists(this.listsService);
 
             const list = this.state.lists.find((x) => x.id === this.listId);
-            const task = list.tasks.find((x) => x.id === id);
 
             if (this.isPrivate) {
-              this.model.privateTasks.unshift(ListTask.fromTask(task));
+              this.model.setPrivateTasksFromState(list.tasks);
             } else {
-              this.model.tasks.unshift(ListTask.fromTask(task));
+              this.model.setTasksFromState(list.tasks);
             }
 
             if (this.state.soundsEnabled) {
@@ -375,9 +374,9 @@ export class List {
 
       this.executeAfterDelay(() => {
         if (task.isPrivate) {
-          this.model.setPrivateTasks(list.tasks);
+          this.model.setPrivateTasksFromState(list.tasks);
         } else {
-          this.model.setTasks(list.tasks);
+          this.model.setTasksFromState(list.tasks);
         }
       }, startTime);
     } else {
@@ -390,11 +389,11 @@ export class List {
         task.isFading = false;
 
         if (task.isPrivate) {
-          this.model.setPrivateTasks(list.tasks);
-          this.model.setCompletedPrivateTasks(list.tasks);
+          this.model.setPrivateTasksFromState(list.tasks);
+          this.model.setCompletedPrivateTasksFromState(list.tasks);
         } else {
-          this.model.setTasks(list.tasks);
-          this.model.setCompletedTasks(list.tasks);
+          this.model.setTasksFromState(list.tasks);
+          this.model.setCompletedTasksFromState(list.tasks);
         }
       }, startTime);
     }
@@ -430,11 +429,11 @@ export class List {
       const list = this.state.lists.find((x) => x.id === this.listId);
 
       if (task.isPrivate) {
-        this.model.setCompletedPrivateTasks(list.tasks);
-        this.model.setPrivateTasks(list.tasks);
+        this.model.setCompletedPrivateTasksFromState(list.tasks);
+        this.model.setPrivateTasksFromState(list.tasks);
       } else {
-        this.model.setCompletedTasks(list.tasks);
-        this.model.setTasks(list.tasks);
+        this.model.setCompletedTasksFromState(list.tasks);
+        this.model.setTasksFromState(list.tasks);
       }
     }, startTime);
   }

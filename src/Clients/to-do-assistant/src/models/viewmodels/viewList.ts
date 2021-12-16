@@ -17,7 +17,7 @@ export class ViewList {
     public computedListType: string
   ) {}
 
-  public setTasks(tasks: Task[]) {
+  public setTasksFromState(tasks: Task[]) {
     this.tasks = tasks
       .filter((x) => !x.isCompleted && !x.isPrivate)
       .sort((a: Task, b: Task) => {
@@ -28,7 +28,7 @@ export class ViewList {
       });
   }
 
-  public setPrivateTasks(tasks: Task[]) {
+  public setPrivateTasksFromState(tasks: Task[]) {
     this.privateTasks = tasks
       .filter((x) => !x.isCompleted && x.isPrivate)
       .sort((a: Task, b: Task) => {
@@ -39,7 +39,7 @@ export class ViewList {
       });
   }
 
-  public setCompletedTasks(tasks: Task[]) {
+  public setCompletedTasksFromState(tasks: Task[]) {
     this.completedTasks = tasks
       .filter((x) => x.isCompleted && !x.isPrivate)
       .sort((a: Task, b: Task) => {
@@ -50,7 +50,7 @@ export class ViewList {
       });
   }
 
-  public setCompletedPrivateTasks(tasks: Task[]) {
+  public setCompletedPrivateTasksFromState(tasks: Task[]) {
     this.completedPrivateTasks = tasks
       .filter((x) => x.isCompleted && x.isPrivate)
       .sort((a: Task, b: Task) => {

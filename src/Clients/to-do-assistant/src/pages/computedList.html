@@ -18,7 +18,7 @@
         <div class="content-wrap">
           <form>
             <div class="search-tasks-wrap ${searchTasksText.length > 0 ? 'searching' : ''}">
-              <input type="text" value.bind="searchTasksText & validate" keyup.trigger="searchTasksInputChanged($event)"
+              <input type="text" value.bind="searchTasksText" keyup.trigger="searchTasksInputChanged($event)"
                 t="[placeholder,aria-label]computedList.searchTasks" maxlength="50" />
               <i class="fas fa-times" click.delegate="clearFilter()" t="[title,aria-label]computedList.clear"></i>
             </div>
