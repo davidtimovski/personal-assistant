@@ -6,7 +6,7 @@ import { AuthService } from "./authService";
 import { HttpProxyBase } from "../utils/httpProxyBase";
 import { LocalStorageCurrencies } from "../utils/localStorageCurrencies";
 import { DateHelper } from "../utils/dateHelper";
-import { AlertEvents } from "../utils/alertEvents";
+import { AlertEvents } from "../models/enums/alertEvents";
 
 @inject(AuthService, HttpClient, EventAggregator, LocalStorageCurrencies)
 export class CurrenciesService extends HttpProxyBase {

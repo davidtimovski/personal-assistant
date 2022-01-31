@@ -13,6 +13,7 @@ import { ProgressBar } from "../../../shared/src/models/progressBar";
 import * as environment from "../../config/environment.json";
 import { State } from "utils/state/state";
 import * as Actions from "utils/state/actions";
+import { AppEvents } from "models/appEvents";
 
 @inject(
   Router,
@@ -41,7 +42,7 @@ export class Recipes {
     private readonly eventAggregator: EventAggregator,
     private readonly connTracker: ConnectionTracker
   ) {
-    this.eventAggregator.subscribe("get-recipes-finished", () => {
+    this.eventAggregator.subscribe(AppEvents.RecipesLoaded, () => {
       this.setRecipesFromState();
       this.progressBar.finish();
     });

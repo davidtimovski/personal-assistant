@@ -8,7 +8,8 @@ import { EventAggregator } from "aurelia-event-aggregator";
 import { I18N } from "aurelia-i18n";
 
 import { AuthService } from "../../shared/src/services/authService";
-import { AlertEvents } from "../../shared/src/utils/alertEvents";
+import { AlertEvents } from "../../shared/src/models/enums/alertEvents";
+import { AuthEvents } from "../../shared/src/models/enums/authEvents";
 import { LocalStorageCurrencies } from "../../shared/src/utils/localStorageCurrencies";
 import { CurrenciesService } from "../../shared/src/services/currenciesService";
 import { ConnectionTracker } from "../../shared/src/utils/connectionTracker";
@@ -17,6 +18,7 @@ import AuthorizeStep from "../../shared/src/authorize-pipeline-step";
 import * as Actions from "utils/state/actions";
 import { RecipesService } from "services/recipesService";
 import routes from "./routes";
+import { AppEvents } from "models/appEvents";
 
 @inject(
   AuthService,
@@ -57,13 +59,13 @@ export class App {
 
     this.authService.login();
 
-    this.eventAggregator.subscribeOnce("authenticated", () => {
+    this.eventAggregator.subscribeOnce(AuthEvents.Authenticated, () => {
       this.currenciesService.loadRates().then(() => {
         this.localStorage.initialize();
       });
 
       Actions.getRecipes(this.recipesService).then(() => {
-        this.eventAggregator.publish("get-recipes-finished");
+        this.eventAggregator.publish(AppEvents.RecipesLoaded);
       });
     });
   }

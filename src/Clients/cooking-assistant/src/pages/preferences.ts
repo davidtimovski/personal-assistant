@@ -3,7 +3,7 @@ import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
 import { NotificationsServiceBase } from "../../../shared/src/services/notificationsServiceBase";
-import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 
 import { UsersService } from "services/usersService";
 import { PreferencesModel } from "models/preferencesModel";

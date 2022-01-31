@@ -9,7 +9,7 @@ import {
 import { EventAggregator } from "aurelia-event-aggregator";
 
 import { AuthService } from "../../../shared/src/services/authService";
-import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 
 import { RecipesService } from "services/recipesService";
 import { SendRecipeModel } from "models/viewmodels/sendRecipeModel";

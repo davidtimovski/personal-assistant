@@ -19,6 +19,7 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Model
         public string ImageUri { get; set; }
         public string VideoUrl { get; set; }
         public RecipeSharingState SharingState { get; set; }
+        public bool UserIsOwner { get; set; }
 
         public void Mapping(Profile profile)
         {

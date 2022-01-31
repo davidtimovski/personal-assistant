@@ -164,8 +164,7 @@ export class RecipesService extends HttpProxyBase {
   }
 
   async update(
-    recipe: EditRecipeModel,
-    ingredientIdsToRemove: Array<number>
+    recipe: EditRecipeModel
   ): Promise<void> {
     const parsedIngredients = this.parseIngredientsAmount(recipe.ingredients);
 
@@ -181,8 +180,7 @@ export class RecipesService extends HttpProxyBase {
         cookDuration: recipe.cookDuration,
         servings: recipe.servings,
         imageUri: recipe.imageUri,
-        videoUrl: recipe.videoUrl,
-        ingredientIdsToRemove: ingredientIdsToRemove,
+        videoUrl: recipe.videoUrl
       }),
     });
   }
