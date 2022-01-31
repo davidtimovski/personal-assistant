@@ -22,10 +22,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                                                 CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END
                                             FROM ""CookingAssistant.Ingredients"" AS i
                                             LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
-                                            LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
-                                            LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
-                                            LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
-                                            WHERE r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")
+                                            WHERE i.""UserId"" = @UserId
                                             ORDER BY i.""ModifiedDate"" DESC, i.""Name""",
                 new { UserId = userId });
         }
@@ -35,14 +32,16 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
             using IDbConnection conn = OpenConnection();
 
             var ingredient = conn.QueryFirstOrDefault<Ingredient>(@"SELECT DISTINCT i.*, 
-                                                                        CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END
+	                                                                    CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END
                                                                     FROM ""CookingAssistant.Ingredients"" AS i
                                                                     LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
-                                                                    LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
-                                                                    LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
-                                                                    LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
-                                                                    WHERE i.""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+                                                                    WHERE i.""Id"" = @Id AND i.""UserId"" = @UserId",
                                                                     new { Id = id, UserId = userId });
+
+            if (ingredient == null)
+            {
+                return null;
+            }
 
             if (ingredient.TaskId.HasValue)
             {
@@ -79,16 +78,10 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
             using IDbConnection conn = OpenConnection();
 
             return conn.Query<Ingredient>(@"SELECT DISTINCT i.""Id"", i.""TaskId"", 
-                                            CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END
+                                                CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END
                                             FROM ""CookingAssistant.Ingredients"" AS i
                                             LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
-                                            WHERE (i.""UserId"" = @UserId OR i.""Id"" IN (
-	                                            SELECT ""IngredientId""
-	                                            FROM ""CookingAssistant.RecipesIngredients"" AS ri
-	                                            INNER JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
-	                                            INNER JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
-	                                            WHERE r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")
-                                            )) AND i.""Id"" NOT IN (SELECT ""IngredientId"" FROM ""CookingAssistant.RecipesIngredients"" WHERE ""RecipeId"" = @RecipeId)",
+                                            WHERE i.""UserId"" = @UserId AND (@RecipeId = 0 OR i.""Id"" NOT IN (SELECT ""IngredientId"" FROM ""CookingAssistant.RecipesIngredients"" WHERE ""RecipeId"" = @RecipeId))",
                                         new { RecipeId = recipeId, UserId = userId });
         }
 
@@ -96,15 +89,14 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
         {
             using IDbConnection conn = OpenConnection();
 
-            var sql = @"SELECT DISTINCT i.""Id"", i.""TaskId"", t.""Name"", l.""Id"", l.""Name""
+            var sql = @"SELECT DISTINCT i.""Id"", CASE WHEN i.""TaskId"" IS NULL THEN t.""Id"" ELSE i.""TaskId"" END, t.""Name"", l.""Id"", l.""Name""
                         FROM ""ToDoAssistant.Tasks"" AS t
                         INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
                         LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
                         LEFT JOIN ""CookingAssistant.Ingredients"" AS i ON t.""Id"" = i.""TaskId""
-                        LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri on i.""Id"" = ri.""IngredientId""
-                        WHERE (@RecipeId = 0 OR ri.""RecipeId"" IS NULL OR ri.""RecipeId"" != @RecipeId) 
-                            AND (i.""Id"" IS NULL OR i.""Id"" NOT IN (SELECT ""IngredientId"" FROM ""CookingAssistant.RecipesIngredients"" WHERE ""RecipeId"" = @RecipeId))
-                            AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))";
+                        WHERE (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
+	                        AND (i.""Id"" IS NULL OR (i.""UserId"" = @UserId
+		                        AND (@RecipeId = 0 OR i.""Id"" NOT IN (SELECT ""IngredientId"" FROM ""CookingAssistant.RecipesIngredients"" WHERE ""RecipeId"" = @RecipeId))))";
 
             return conn.Query<Ingredient, ToDoList, Ingredient>(sql,
                 (ingredient, list) =>
@@ -153,13 +145,8 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
         {
             using IDbConnection conn = OpenConnection();
 
-            return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                              FROM ""CookingAssistant.Ingredients"" AS i
-                                              LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
-                                              LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
-                                              LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
-                                              WHERE i.""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
-                                              new { Id = id, UserId = userId });
+            return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.Ingredients"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
+                new { Id = id, UserId = userId });
         }
 
         public bool Exists(int id, string name, int userId)
@@ -167,11 +154,8 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
             using IDbConnection conn = OpenConnection();
 
             return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                              FROM ""CookingAssistant.Ingredients"" AS i
-                                              LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
-                                              LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
-                                              LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
-                                              WHERE i.""Id"" != @Id AND UPPER(i.""Name"") = UPPER(@Name) AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+                                              FROM ""CookingAssistant.Ingredients""
+                                              WHERE ""Id"" != @Id AND UPPER(""Name"") = UPPER(@Name) AND ""UserId"" = @UserId",
                                               new { Id = id, Name = name, UserId = userId });
         }
 

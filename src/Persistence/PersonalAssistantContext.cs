@@ -36,6 +36,7 @@ namespace Persistence
             modelBuilder.Entity<ToDoList>(x =>
             {
                 x.ToTable("ToDoAssistant.Lists");
+                x.Ignore(x => x.IsShared);
             });
             modelBuilder.Entity<ToDoTask>(x =>
             {
@@ -54,10 +55,13 @@ namespace Persistence
             modelBuilder.Entity<Recipe>(x =>
             {
                 x.ToTable("CookingAssistant.Recipes");
+                x.Ignore(x => x.IngredientsMissing);
             });
             modelBuilder.Entity<Ingredient>(x =>
             {
                 x.ToTable("CookingAssistant.Ingredients");
+                x.Ignore(x => x.Recipes);
+                x.Ignore(x => x.Task);
             });
             modelBuilder.Entity<RecipeIngredient>(x =>
             {

@@ -10,7 +10,7 @@ import {
   ValidateResult,
 } from "aurelia-validation";
 
-import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 
 import { DietaryProfileService } from "services/dietaryProfileService";
 import { UsersService } from "services/usersService";

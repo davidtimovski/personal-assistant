@@ -13,7 +13,7 @@ import {
 import autocomplete, { AutocompleteResult } from "autocompleter";
 
 import { LocalStorageCurrencies } from "../../../shared/src/utils/localStorageCurrencies";
-import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 
 import { EditIngredientModel } from "models/viewmodels/editIngredientModel";
 import { IngredientSuggestion } from "models/viewmodels/ingredientSuggestion";

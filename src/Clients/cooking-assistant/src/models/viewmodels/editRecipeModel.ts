@@ -14,6 +14,7 @@ export class EditRecipeModel {
   public imageUri: string;
   public videoUrl: string;
   public sharingState: SharingState;
+  public userIsOwner: boolean;
 
   constructor() {
     this.id = 0;

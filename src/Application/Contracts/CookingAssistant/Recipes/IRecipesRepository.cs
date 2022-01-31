@@ -37,7 +37,13 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes
         IEnumerable<User> GetUsersToBeNotifiedOfRecipeDeletion(int id);
         IEnumerable<User> GetUsersToBeNotifiedOfRecipeSent(int id);
         Task<int> CreateAsync(Recipe recipe);
-        Task<Recipe> UpdateAsync(Recipe recipe, List<int> ingredientIdsToRemove);
+        /// <remarks>
+        /// If the recipe does not belong to the user
+        /// it does not change the ingredients, only their Amount and Unit.
+        /// </remarks>
+        /// <returns>The Name of the original recipe</returns>
+        Task<string> UpdateAsync(Recipe recipe, int userId);
+        /// <returns>The Name of the deleted recipe</returns>
         Task<string> DeleteAsync(int id);
         Task SaveSharingDetailsAsync(IEnumerable<RecipeShare> newShares, IEnumerable<RecipeShare> removedShares);
         Task SetShareIsAcceptedAsync(int recipeId, int userId, bool isAccepted, DateTime modifiedDate);

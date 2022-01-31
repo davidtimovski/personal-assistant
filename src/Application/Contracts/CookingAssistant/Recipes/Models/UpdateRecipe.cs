@@ -19,7 +19,6 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Model
         public byte Servings { get; set; }
         public string ImageUri { get; set; }
         public string VideoUrl { get; set; }
-        public List<int> IngredientIdsToRemove { get; set; }
     }
 
     public class UpdateRecipeValidator : AbstractValidator<UpdateRecipe>

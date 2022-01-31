@@ -40,9 +40,12 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
         public EditDietaryProfile Get(int userId)
         {
             DietaryProfile profile = _dietaryProfilesRepository.Get(userId);
+            if (profile == null)
+            {
+                return null;
+            }
 
             var result = _mapper.Map<EditDietaryProfile>(profile);
-
             result.DailyIntake = CalculateDailyIntake(profile);
 
             return result;

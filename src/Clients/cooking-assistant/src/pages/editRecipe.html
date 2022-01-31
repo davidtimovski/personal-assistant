@@ -66,7 +66,7 @@
 
             <tooltip key="ingredientFromTask"></tooltip>
 
-            <div class="add-ingredient-wrap">
+            <div if.bind="model.userIsOwner" class="add-ingredient-wrap">
               <div class="add-input-wrap">
                 <input type="text" value.bind="ingredientName" ref="addIngredientsInput"
                   placeholder="${addIngredientsInputPlaceholder}" aria-label="${addIngredientsInputPlaceholder}"
@@ -101,7 +101,7 @@
                       <button type="button" show.bind="ingredient.unit" t="editRecipe.${ingredient.unit}"></button>
                       <i show.bind="!ingredient.unit" class="fas fa-asterisk"></i>
                     </div>
-                    <a click.delegate="removeIngredient(ingredient)" class="remove-button"
+                    <a if.bind="model.userIsOwner" click.delegate="removeIngredient(ingredient)" class="remove-button"
                       t="[title,aria-label]editRecipe.removeIngredient">
                       <i class="fas fa-times-circle"></i>
                     </a>

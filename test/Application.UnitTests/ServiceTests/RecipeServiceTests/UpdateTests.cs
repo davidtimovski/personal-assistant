@@ -51,8 +51,8 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         public async Task TrimsName()
         {
             string actualName = null;
-            _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<List<int>>()))
-                .Callback<Recipe, List<int>>((r, ids) => actualName = r.Name);
+            _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<int>()))
+                .Callback<Recipe, int>((r, i) => actualName = r.Name);
 
             UpdateRecipe model = new RecipeBuilder().WithName(" Recipe name ").BuildUpdateModel();
 
@@ -66,8 +66,8 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         public async Task TrimsDescription_IfPresent()
         {
             string actualDescription = null;
-            _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<List<int>>()))
-                .Callback<Recipe, List<int>>((r, ids) => actualDescription = r.Description);
+            _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<int>()))
+                .Callback<Recipe, int>((r, i) => actualDescription = r.Description);
 
             UpdateRecipe model = new RecipeBuilder().WithDescription(" Description ").BuildUpdateModel();
 
@@ -81,8 +81,8 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         public async Task TrimsRecipeIngredientNames_IfTheyAreNotLinkedToTasks()
         {
             List<RecipeIngredient> actualRecipeIngredients = null;
-            _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<List<int>>()))
-                .Callback<Recipe, List<int>>((r, ids) => actualRecipeIngredients = r.RecipeIngredients);
+            _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<int>()))
+                .Callback<Recipe, int>((r, i) => actualRecipeIngredients = r.RecipeIngredients);
 
             UpdateRecipe model = new RecipeBuilder()
                 .WithRecipeIngredients(" Ingredient 1", "Ingredient 2 ", " Ingredient 3 ").BuildUpdateModel();
@@ -105,8 +105,8 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         public async Task NullsRecipeIngredientNames_IfTheyAreLinkedToTasks()
         {
             List<RecipeIngredient> actualRecipeIngredients = null;
-            _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<List<int>>()))
-                .Callback<Recipe, List<int>>((r, ids) => actualRecipeIngredients = r.RecipeIngredients);
+            _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<int>()))
+                .Callback<Recipe, int>((r, i) => actualRecipeIngredients = r.RecipeIngredients);
 
             UpdateRecipe model = new RecipeBuilder().WithRecipeIngredientsLinkedToTasks().BuildUpdateModel();
 
@@ -122,8 +122,8 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         public async Task SetsAmountOfRecipeIngredientsToNull_IfAmountIsZero()
         {
             List<RecipeIngredient> actualRecipeIngredients = null;
-            _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<List<int>>()))
-                .Callback<Recipe, List<int>>((r, ids) => actualRecipeIngredients = r.RecipeIngredients);
+            _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<int>()))
+                .Callback<Recipe, int>((r, i) => actualRecipeIngredients = r.RecipeIngredients);
 
             UpdateRecipe model = new RecipeBuilder().WithRecipeIngredientsWithAmounts(0, 0).BuildUpdateModel();
 
@@ -139,8 +139,8 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         public async Task SetsUnitOfRecipeIngredientsToNull_IfAmountIsZero()
         {
             List<RecipeIngredient> actualRecipeIngredients = null;
-            _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<List<int>>()))
-                .Callback<Recipe, List<int>>((r, ids) => actualRecipeIngredients = r.RecipeIngredients);
+            _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<int>()))
+                .Callback<Recipe, int>((r, i) => actualRecipeIngredients = r.RecipeIngredients);
 
             UpdateRecipe model = new RecipeBuilder().WithRecipeIngredientsWithAmounts(0, 0).BuildUpdateModel();
 
@@ -156,8 +156,8 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         public async Task SetsUnitOfRecipeIngredientsToNull_IfAmountIsNull()
         {
             List<RecipeIngredient> actualRecipeIngredients = null;
-            _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<List<int>>()))
-                .Callback<Recipe, List<int>>((r, ids) => actualRecipeIngredients = r.RecipeIngredients);
+            _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<int>()))
+                .Callback<Recipe, int>((r, i) => actualRecipeIngredients = r.RecipeIngredients);
 
             UpdateRecipe model = new RecipeBuilder().WithRecipeIngredientsWithAmounts(null, null).BuildUpdateModel();
 
@@ -176,8 +176,8 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         public async Task CollapsesNewlinesInInstructionsToAtMostTwo(string instructions, string expected)
         {
             string actualInstructions = null;
-            _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<List<int>>()))
-                .Callback<Recipe, List<int>>((r, ids) => actualInstructions = r.Instructions);
+            _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<int>()))
+                .Callback<Recipe, int>((r, i) => actualInstructions = r.Instructions);
 
             UpdateRecipe model = new RecipeBuilder().WithInstructions(instructions).BuildUpdateModel();
 
@@ -190,8 +190,8 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         public async Task TrimsInstructions_IfPresent()
         {
             string actualInstructions = null;
-            _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<List<int>>()))
-                .Callback<Recipe, List<int>>((r, ids) => actualInstructions = r.Instructions);
+            _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<int>()))
+                .Callback<Recipe, int>((r, i) => actualInstructions = r.Instructions);
 
             UpdateRecipe model = new RecipeBuilder().WithInstructions(" Instructions ").BuildUpdateModel();
 
@@ -205,8 +205,8 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         public async Task SetsPrepDurationToNull_IfLowerThanOneMinute()
         {
             TimeSpan? actualPrepDuration = null;
-            _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<List<int>>()))
-                .Callback<Recipe, List<int>>((r, ids) => actualPrepDuration = r.PrepDuration);
+            _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<int>()))
+                .Callback<Recipe, int>((r, i) => actualPrepDuration = r.PrepDuration);
 
             UpdateRecipe model = new RecipeBuilder().WithPrepDuration(TimeSpan.FromSeconds(59)).BuildUpdateModel();
 
@@ -219,8 +219,8 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         public async Task SetsCookDurationToNull_IfLowerThanOneMinute()
         {
             TimeSpan? actualCookDuration = null;
-            _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<List<int>>()))
-                .Callback<Recipe, List<int>>((r, ids) => actualCookDuration = r.CookDuration);
+            _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<int>()))
+                .Callback<Recipe, int>((r, i) => actualCookDuration = r.CookDuration);
 
             UpdateRecipe model = new RecipeBuilder().WithCookDuration(TimeSpan.FromSeconds(59)).BuildUpdateModel();
 

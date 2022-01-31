@@ -19,6 +19,7 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Model
         public string ImageUri { get; set; }
         public string VideoUrl { get; set; }
         public RecipeSharingState SharingState { get; set; }
+        public bool UserIsOwner { get; set; }
 
         public void Mapping(Profile profile)
         {
@@ -26,7 +27,8 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Model
                 .ForMember(x => x.Ingredients, opt => opt.MapFrom(src => src.RecipeIngredients))
                 .ForMember(x => x.PrepDuration, opt => opt.MapFrom<DurationResolver, TimeSpan?>(src => src.PrepDuration))
                 .ForMember(x => x.CookDuration, opt => opt.MapFrom<DurationResolver, TimeSpan?>(src => src.CookDuration))
-                .ForMember(x => x.SharingState, opt => opt.Ignore());
+                .ForMember(x => x.SharingState, opt => opt.Ignore())
+                .ForMember(x => x.UserIsOwner, opt => opt.Ignore());
         }
     }
 }

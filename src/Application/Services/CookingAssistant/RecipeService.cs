@@ -99,6 +99,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             var result = _mapper.Map<RecipeForUpdate>(recipe);
 
             result.SharingState = GetSharingState(recipe, userId);
+            result.UserIsOwner = recipe.UserId == userId;
 
             return result;
         }
@@ -112,9 +113,9 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             }
 
             recipe.Shares.AddRange(_recipesRepository.GetShares(id));
-            recipe.Shares.RemoveAll(x => x.UserId == userId);
 
             var result = _mapper.Map<RecipeWithShares>(recipe, opts => { opts.Items["UserId"] = userId; });
+            result.Shares.RemoveAll(x => x.UserId == userId);
 
             result.SharingState = GetSharingState(recipe, userId);
 
@@ -282,6 +283,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
                 {
                     recipeIngredient.Unit = null;
                 }
+
                 recipeIngredient.CreatedDate = recipeIngredient.ModifiedDate = now;
                 recipeIngredient.Ingredient.CreatedDate = recipeIngredient.Ingredient.ModifiedDate = now;
             }
@@ -407,6 +409,8 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
                 {
                     recipeIngredient.Unit = null;
                 }
+
+                recipeIngredient.RecipeId = recipe.Id;
                 recipeIngredient.CreatedDate = recipeIngredient.ModifiedDate = now;
                 recipeIngredient.Ingredient.CreatedDate = recipeIngredient.Ingredient.ModifiedDate = now;
             }
@@ -423,7 +427,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
             recipe.ModifiedDate = now;
 
-            Recipe original = await _recipesRepository.UpdateAsync(recipe, model.IngredientIdsToRemove);
+            string originalName = await _recipesRepository.UpdateAsync(recipe, model.UserId);
 
             // If the recipe image was changed
             if (oldImageUri != model.ImageUri)
@@ -449,7 +453,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
             var result = new UpdateRecipeResult
             {
-                RecipeName = original.Name,
+                RecipeName = originalName,
                 ActionUserImageUri = _userService.GetImageUri(model.UserId),
                 NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
             };

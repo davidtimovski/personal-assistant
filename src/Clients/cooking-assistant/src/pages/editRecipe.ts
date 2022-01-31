@@ -6,7 +6,7 @@ import { EventAggregator } from "aurelia-event-aggregator";
 import autocomplete, { AutocompleteResult } from "autocompleter";
 
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
-import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 
 import * as environment from "../../config/environment.json";
 import { RecipesService } from "services/recipesService";
@@ -44,7 +44,6 @@ export class EditRecipe {
   private leaveButtonIsLoading = false;
   private videoIFrame: HTMLIFrameElement;
   private videoIFrameSrc = "";
-  private ingredientIdsToRemove = new Array<number>();
   private autocomplete: AutocompleteResult;
   private suggestions = new Array<IngredientSuggestion>();
   private taskSuggestions = new Array<IngredientSuggestion>();
@@ -116,14 +115,16 @@ export class EditRecipe {
       this.nameInput.focus();
     }
 
-    this.ingredientsService
-      .getSuggestionsForRecipe(this.model.id)
-      .then((ingredientSuggestionsVM: IngredientSuggestions) => {
-        this.suggestions = ingredientSuggestionsVM.suggestions;
-        this.taskSuggestions = ingredientSuggestionsVM.taskSuggestions;
+    if (this.model.userIsOwner) {
+      this.ingredientsService
+        .getSuggestionsForRecipe(this.model.id)
+        .then((ingredientSuggestionsVM: IngredientSuggestions) => {
+          this.suggestions = ingredientSuggestionsVM.suggestions;
+          this.taskSuggestions = ingredientSuggestionsVM.taskSuggestions;
 
-        this.attachAutocomplete(this.suggestions);
-      });
+          this.attachAutocomplete(this.suggestions);
+        });
+    }
   }
 
   videoUrlChanged() {
@@ -169,7 +170,7 @@ export class EditRecipe {
         if (suggestion.taskId) {
           this.model.ingredients.push(
             new EditRecipeIngredient(
-              null,
+              suggestion.id,
               suggestion.taskId,
               suggestion.group,
               suggestion.name,
@@ -334,9 +335,6 @@ export class EditRecipe {
   }
 
   removeIngredient(ingredient: EditRecipeIngredient) {
-    if (ingredient.id) {
-      this.ingredientIdsToRemove.push(ingredient.id);
-    }
     this.model.ingredients.splice(this.model.ingredients.indexOf(ingredient), 1);
 
     const ingredientSuggestion = new IngredientSuggestion(
@@ -394,7 +392,7 @@ export class EditRecipe {
     if (result.valid) {
       if (!this.isNewRecipe) {
         try {
-          await this.recipesService.update(this.model, this.ingredientIdsToRemove);
+          await this.recipesService.update(this.model);
 
           this.nameIsInvalid = false;
 
