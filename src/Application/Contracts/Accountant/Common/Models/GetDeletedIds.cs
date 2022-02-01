@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PersonalAssistant.Application.Contracts.Accountant.Common.Models
+namespace Application.Contracts.Accountant.Common.Models
 {
     public class GetDeletedIds
     {

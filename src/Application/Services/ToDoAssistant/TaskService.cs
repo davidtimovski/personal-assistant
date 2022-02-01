@@ -5,14 +5,14 @@ using System.Threading.Tasks;
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Application.Contracts.Common.Models;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models;
-using PersonalAssistant.Domain.Entities.ToDoAssistant;
+using Application.Contracts.Common;
+using Application.Contracts.Common.Models;
+using Application.Contracts.ToDoAssistant.Lists;
+using Application.Contracts.ToDoAssistant.Tasks;
+using Application.Contracts.ToDoAssistant.Tasks.Models;
+using Domain.Entities.ToDoAssistant;
 
-namespace PersonalAssistant.Application.Services.ToDoAssistant
+namespace Application.Services.ToDoAssistant
 {
     public class TaskService : ITaskService
     {
@@ -120,7 +120,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
             var result = new CreatedTaskResult(id, task.ListId, notifySignalR);
 
-            var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(model.ListId, model.UserId, model.IsPrivate == true);
+            var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(model.ListId, model.UserId, model.IsPrivate == true).ToList();
             if (!usersToBeNotified.Any())
             {
                 return result;
@@ -147,7 +147,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
                     ListId = model.ListId,
                     Name = task.Trim(),
                     IsOneTime = model.TasksAreOneTime,
-                    PrivateToUserId = model.TasksArePrivate ? model.UserId : (int?)null,
+                    PrivateToUserId = model.TasksArePrivate ? model.UserId : null,
                     AssignedToUserId = null,
                     CreatedDate = now,
                     ModifiedDate = now
@@ -158,7 +158,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
             ToDoList list = _listsRepository.GetWithShares(model.ListId, model.UserId);
 
-            var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(model.ListId, model.UserId, model.TasksArePrivate);
+            var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(model.ListId, model.UserId, model.TasksArePrivate).ToList();
 
             var notifySignalR = !tasks[0].PrivateToUserId.HasValue && list.IsShared;
             var result = new BulkCreateResult(list.Id, notifySignalR);
@@ -262,7 +262,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
             ToDoList list = _listsRepository.GetWithShares(task.ListId, userId);
 
-            var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(task.ListId, userId, task.PrivateToUserId == userId);
+            var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(task.ListId, userId, task.PrivateToUserId == userId).ToList();
 
             var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
             var result = new DeleteTaskResult(task.ListId, notifySignalR);
@@ -297,7 +297,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
             ToDoList list = _listsRepository.GetWithShares(task.ListId, model.UserId);
 
-            var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(task.ListId, model.UserId, model.Id);
+            var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(task.ListId, model.UserId, model.Id).ToList();
 
             var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
             var result = new CompleteUncompleteTaskResult(task.ListId, notifySignalR: notifySignalR);
@@ -332,7 +332,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
             ToDoList list = _listsRepository.GetWithShares(task.ListId, model.UserId);
 
-            var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(task.ListId, model.UserId, model.Id);
+            var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(task.ListId, model.UserId, model.Id).ToList();
 
             var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
             var result = new CompleteUncompleteTaskResult(task.ListId, notifySignalR);
@@ -366,7 +366,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             return new ReorderTaskResult(list.Id, notifySignalR);
         }
 
-        private void ValidateAndThrow<T>(T model, IValidator<T> validator)
+        private static void ValidateAndThrow<T>(T model, IValidator<T> validator)
         {
             ValidationResult result = validator.Validate(model);
             if (!result.IsValid)

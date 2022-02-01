@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace PersonalAssistant.Application.Contracts.Accountant.Sync.Models
+namespace Application.Contracts.Accountant.Sync.Models
 {
     public class SyncedEntityIds
     {

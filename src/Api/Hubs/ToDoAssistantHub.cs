@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.SignalR;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
-using PersonalAssistant.Infrastructure.Identity;
+using Application.Contracts.ToDoAssistant.Lists;
+using Infrastructure.Identity;
 
 namespace Api.Hubs
 {

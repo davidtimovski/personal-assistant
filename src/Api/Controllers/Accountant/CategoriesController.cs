@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using PersonalAssistant.Application.Contracts.Accountant.Categories;
-using PersonalAssistant.Application.Contracts.Accountant.Categories.Models;
-using PersonalAssistant.Infrastructure.Identity;
+using Application.Contracts.Accountant.Categories;
+using Application.Contracts.Accountant.Categories.Models;
+using Infrastructure.Identity;
 
 namespace Api.Controllers.Accountant
 {

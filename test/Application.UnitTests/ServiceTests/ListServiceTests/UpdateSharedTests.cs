@@ -1,19 +1,19 @@
 ﻿using System.Threading.Tasks;
 using FluentValidation;
 using Moq;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models;
-using PersonalAssistant.Application.Mappings;
-using PersonalAssistant.Application.Services.ToDoAssistant;
-using PersonalAssistant.Application.UnitTests.Builders;
+using Application.Contracts.ToDoAssistant.Lists;
+using Application.Contracts.ToDoAssistant.Lists.Models;
+using Application.Mappings;
+using Application.Services.ToDoAssistant;
+using Application.UnitTests.Builders;
 using Xunit;
 
-namespace PersonalAssistant.Application.UnitTests.ServiceTests.ListServiceTests
+namespace Application.UnitTests.ServiceTests.ListServiceTests
 {
     public class UpdateSharedTests
     {
         private readonly Mock<IValidator<UpdateSharedList>> _successfulValidatorMock;
-        private readonly Mock<IListsRepository> _listsRepositoryMock = new Mock<IListsRepository>();
+        private readonly Mock<IListsRepository> _listsRepositoryMock = new();
         private readonly IListService _sut;
 
         public UpdateSharedTests()

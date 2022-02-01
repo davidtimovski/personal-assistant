@@ -1,13 +1,12 @@
-﻿using PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients.Models;
+﻿using Application.Contracts.CookingAssistant.Ingredients.Models;
 
-namespace PersonalAssistant.Application.UnitTests.Builders
+namespace Application.UnitTests.Builders
 {
     public class IngredientBuilder
     {
         private string name;
         private int? taskId;
-        private decimal? price;
-
+ 
         public IngredientBuilder()
         {
             name = "Dummy name";
@@ -25,19 +24,13 @@ namespace PersonalAssistant.Application.UnitTests.Builders
             return this;
         }
 
-        public IngredientBuilder WithPrice(double newPrice)
-        {
-            price = (decimal)newPrice;
-            return this;
-        }
-
         public UpdateIngredient BuildUpdateModel()
         {
             return new UpdateIngredient
             {
                 Name = name,
                 TaskId = taskId,
-                PriceData = new IngredientPriceData { Price = price }
+                PriceData = new IngredientPriceData()
             };
         }
     }

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using AutoMapper;
-using PersonalAssistant.Application.Mappings;
-using PersonalAssistant.Domain.Entities.CookingAssistant;
+using Application.Mappings;
+using Domain.Entities.CookingAssistant;
 
-namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models
+namespace Application.Contracts.CookingAssistant.Recipes.Models
 {
     public class RecipeDto : IMapFrom<Recipe>
     {

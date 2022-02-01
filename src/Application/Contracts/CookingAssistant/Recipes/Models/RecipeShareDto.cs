@@ -1,10 +1,10 @@
 ﻿using System;
 using AutoMapper;
-using PersonalAssistant.Application.Mappings;
-using PersonalAssistant.Domain.Entities.Common;
-using PersonalAssistant.Domain.Entities.CookingAssistant;
+using Application.Mappings;
+using Domain.Entities.Common;
+using Domain.Entities.CookingAssistant;
 
-namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models
+namespace Application.Contracts.CookingAssistant.Recipes.Models
 {
     public class RecipeShareDto : IMapFrom<RecipeShare>
     {

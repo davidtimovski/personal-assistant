@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
-using PersonalAssistant.Application.Contracts.Common.Models;
-using PersonalAssistant.Domain.Entities.Common;
+using Application.Contracts.Common.Models;
+using Domain.Entities.Common;
 
-namespace PersonalAssistant.Application.Contracts.Common
+namespace Application.Contracts.Common
 {
     public interface IUserService
     {

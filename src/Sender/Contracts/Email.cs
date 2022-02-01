@@ -1,4 +1,4 @@
-﻿namespace PersonalAssistant.Sender.Contracts
+﻿namespace Sender.Contracts
 {
     internal class Email
     {

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using FluentValidation;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
+using Application.Contracts.ToDoAssistant.Tasks;
 
-namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models
+namespace Application.Contracts.CookingAssistant.Recipes.Models
 {
     public class CreateRecipe
     {

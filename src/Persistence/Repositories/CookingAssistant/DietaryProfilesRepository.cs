@@ -3,12 +3,11 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Persistence;
-using PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles;
-using PersonalAssistant.Domain.Entities.Common;
-using PersonalAssistant.Domain.Entities.CookingAssistant;
+using Application.Contracts.CookingAssistant.DietaryProfiles;
+using Domain.Entities.Common;
+using Domain.Entities.CookingAssistant;
 
-namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
+namespace Persistence.Repositories.CookingAssistant
 {
     public class DietaryProfilesRepository : BaseRepository, IDietaryProfilesRepository
     {
@@ -19,17 +18,17 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
         {
             using IDbConnection conn = OpenConnection();
 
-            var sql = @"SELECT dp.*, u.""Id"", u.""ImperialSystem""
+            const string query = @"SELECT dp.*, u.""Id"", u.""ImperialSystem""
                         FROM ""CookingAssistant.DietaryProfiles"" AS dp
                         INNER JOIN ""AspNetUsers"" AS u ON dp.""UserId"" = u.""Id""
                         WHERE dp.""UserId"" = @UserId";
 
-            var dietaryProfiles = conn.Query<DietaryProfile, User, DietaryProfile>(sql,
+            var dietaryProfiles = conn.Query<DietaryProfile, User, DietaryProfile>(query,
                 (detaryProfile, user) =>
                 {
                     detaryProfile.User = user;
                     return detaryProfile;
-                }, new { UserId = userId }, null, true);
+                }, new { UserId = userId });
 
             if (!dietaryProfiles.Any())
             {

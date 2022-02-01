@@ -2,11 +2,11 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Application.Contracts.Common.Models;
-using PersonalAssistant.Domain.Entities.Common;
+using Application.Contracts.Common;
+using Application.Contracts.Common.Models;
+using Domain.Entities.Common;
 
-namespace PersonalAssistant.Application.Services.Common
+namespace Application.Services.Common
 {
     public class TooltipService : ITooltipService
     {

@@ -4,16 +4,16 @@ using Api.Controllers.ToDoAssistant;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
-using PersonalAssistant.Api.UnitTests.Builders;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models;
+using Api.UnitTests.Builders;
+using Application.Contracts.ToDoAssistant.Tasks;
+using Application.Contracts.ToDoAssistant.Tasks.Models;
 using Xunit;
 
-namespace PersonalAssistant.Api.UnitTests.Controllers.ToDoAssistant
+namespace Api.UnitTests.Controllers.ToDoAssistant
 {
     public class TasksControllerTests
     {
-        private readonly Mock<ITaskService> _taskServiceMock = new Mock<ITaskService>();
+        private readonly Mock<ITaskService> _taskServiceMock = new();
         private readonly TasksController _sut;
 
         public TasksControllerTests()
@@ -21,7 +21,7 @@ namespace PersonalAssistant.Api.UnitTests.Controllers.ToDoAssistant
             _sut = new TasksController(
                 null,
                 _taskServiceMock.Object,
-                null, null, null, null, null, null, null, null,
+                null, null, null, null, null, null,
                 new Mock<IOptions<Urls>>().Object)
             {
                 ControllerContext = new ControllerContextBuilder().Build()

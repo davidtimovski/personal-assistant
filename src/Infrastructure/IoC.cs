@@ -2,12 +2,12 @@
 using CloudinaryDotNet;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Infrastructure.Cdn;
-using PersonalAssistant.Infrastructure.Currency;
-using PersonalAssistant.Infrastructure.Sender;
+using Application.Contracts.Common;
+using Infrastructure.Cdn;
+using Infrastructure.Currency;
+using Infrastructure.Sender;
 
-namespace PersonalAssistant.Infrastructure
+namespace Infrastructure
 {
     public static class IoC
     {

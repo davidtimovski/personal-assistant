@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PersonalAssistant.Application.Contracts.Accountant.Accounts.Models
+namespace Application.Contracts.Accountant.Accounts.Models
 {
     public class CreateAccount
     {

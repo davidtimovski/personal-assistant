@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles.Models
+namespace Application.Contracts.CookingAssistant.DietaryProfiles.Models
 {
     public class DailyIntakeReference
     {

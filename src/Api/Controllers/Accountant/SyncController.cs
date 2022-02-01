@@ -5,20 +5,20 @@ using Api.Models.Accountant.Sync;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using PersonalAssistant.Application.Contracts.Accountant.Accounts;
-using PersonalAssistant.Application.Contracts.Accountant.Accounts.Models;
-using PersonalAssistant.Application.Contracts.Accountant.Categories;
-using PersonalAssistant.Application.Contracts.Accountant.Categories.Models;
-using PersonalAssistant.Application.Contracts.Accountant.Common;
-using PersonalAssistant.Application.Contracts.Accountant.Common.Models;
-using PersonalAssistant.Application.Contracts.Accountant.Debts;
-using PersonalAssistant.Application.Contracts.Accountant.Debts.Models;
-using PersonalAssistant.Application.Contracts.Accountant.Sync.Models;
-using PersonalAssistant.Application.Contracts.Accountant.Transactions;
-using PersonalAssistant.Application.Contracts.Accountant.Transactions.Models;
-using PersonalAssistant.Application.Contracts.Accountant.UpcomingExpenses;
-using PersonalAssistant.Application.Contracts.Accountant.UpcomingExpenses.Models;
-using PersonalAssistant.Infrastructure.Identity;
+using Application.Contracts.Accountant.Accounts;
+using Application.Contracts.Accountant.Accounts.Models;
+using Application.Contracts.Accountant.Categories;
+using Application.Contracts.Accountant.Categories.Models;
+using Application.Contracts.Accountant.Common.Models;
+using Application.Contracts.Accountant.Debts;
+using Application.Contracts.Accountant.Debts.Models;
+using Application.Contracts.Accountant.Sync;
+using Application.Contracts.Accountant.Sync.Models;
+using Application.Contracts.Accountant.Transactions;
+using Application.Contracts.Accountant.Transactions.Models;
+using Application.Contracts.Accountant.UpcomingExpenses;
+using Application.Contracts.Accountant.UpcomingExpenses.Models;
+using Infrastructure.Identity;
 
 namespace Api.Controllers.Accountant
 {

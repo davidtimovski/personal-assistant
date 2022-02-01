@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentValidation;
 using Moq;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models;
-using PersonalAssistant.Application.Mappings;
-using PersonalAssistant.Application.Services.ToDoAssistant;
-using PersonalAssistant.Application.UnitTests.Builders;
-using PersonalAssistant.Domain.Entities.ToDoAssistant;
+using Application.Contracts.ToDoAssistant.Lists;
+using Application.Contracts.ToDoAssistant.Lists.Models;
+using Application.Mappings;
+using Application.Services.ToDoAssistant;
+using Application.UnitTests.Builders;
+using Domain.Entities.ToDoAssistant;
 using Xunit;
 
-namespace PersonalAssistant.Application.UnitTests.ServiceTests.ListServiceTests
+namespace Application.UnitTests.ServiceTests.ListServiceTests
 {
     public class CreateTests
     {
         private readonly Mock<IValidator<CreateList>> _successfulValidatorMock;
-        private readonly Mock<IListsRepository> _listsRepositoryMock = new Mock<IListsRepository>();
+        private readonly Mock<IListsRepository> _listsRepositoryMock = new();
         private readonly IListService _sut;
 
         public CreateTests()
@@ -55,7 +55,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.ListServiceTests
         {
             string actualName = null;
             _listsRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoList>()))
-                .Callback<ToDoList>((l) => actualName = l.Name);
+                .Callback<ToDoList>(l => actualName = l.Name);
 
             CreateList model = new ListBuilder().WithName(" List name ").BuildCreateModel();
 
@@ -72,7 +72,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.ListServiceTests
         {
             var resultingTasks = new List<ToDoTask>();
             _listsRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoList>()))
-                .Callback<ToDoList>((l) => resultingTasks = l.Tasks);
+                .Callback<ToDoList>(l => resultingTasks = l.Tasks);
 
             CreateList model = new ListBuilder().WithTasksText(tasksText).BuildCreateModel();
 
@@ -92,7 +92,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.ListServiceTests
 
             var resultingTasks = new List<ToDoTask>();
             _listsRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoList>()))
-                .Callback<ToDoList>((l) => resultingTasks = l.Tasks);
+                .Callback<ToDoList>(l => resultingTasks = l.Tasks);
 
             await _sut.CreateAsync(model, _successfulValidatorMock.Object);
             var expectedTasks = new List<ToDoTask>
@@ -114,7 +114,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.ListServiceTests
         {
             var resultingTasks = new List<ToDoTask>();
             _listsRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoList>()))
-                .Callback<ToDoList>((l) => resultingTasks = l.Tasks);
+                .Callback<ToDoList>(l => resultingTasks = l.Tasks);
 
             CreateList model = new ListBuilder().WithTasksText("Task 1\nTask 2").BuildCreateModel();
 
@@ -133,7 +133,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.ListServiceTests
         {
             var actualCreatedDate = new DateTime();
             _listsRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoList>()))
-                .Callback<ToDoList>((l) => actualCreatedDate = l.CreatedDate);
+                .Callback<ToDoList>(l => actualCreatedDate = l.CreatedDate);
 
             CreateList model = new ListBuilder().BuildCreateModel();
 
@@ -147,7 +147,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.ListServiceTests
         {
             var actualModifiedDate = new DateTime();
             _listsRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoList>()))
-                .Callback<ToDoList>((l) => actualModifiedDate = l.ModifiedDate);
+                .Callback<ToDoList>(l => actualModifiedDate = l.ModifiedDate);
 
             CreateList model = new ListBuilder().BuildCreateModel();
 

@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications;
-using PersonalAssistant.Infrastructure.Identity;
+using Application.Contracts.ToDoAssistant.Notifications;
+using Infrastructure.Identity;
 
 namespace Api.Controllers.ToDoAssistant
 {

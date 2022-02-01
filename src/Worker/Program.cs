@@ -5,11 +5,11 @@ using CloudinaryDotNet;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Infrastructure.Cdn;
+using Application.Contracts.Common;
+using Infrastructure.Cdn;
 using Serilog;
 
-namespace PersonalAssistant.Worker
+namespace Worker
 {
     public class Program
     {

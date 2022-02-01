@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using PersonalAssistant.Application.Mappings;
-using PersonalAssistant.Domain.Entities.ToDoAssistant;
+using Application.Mappings;
+using Domain.Entities.ToDoAssistant;
 
-namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models
+namespace Application.Contracts.ToDoAssistant.Lists.Models
 {
     public class EditListDto : IMapFrom<ToDoList>
     {

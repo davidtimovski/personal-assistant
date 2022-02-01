@@ -1,7 +1,7 @@
 ﻿using System;
-using PersonalAssistant.Domain.Entities.Accountant;
+using Domain.Entities.Accountant;
 
-namespace PersonalAssistant.Application.Contracts.Accountant.Categories.Models
+namespace Application.Contracts.Accountant.Categories.Models
 {
     public class UpdateCategory : CreateCategory
     {

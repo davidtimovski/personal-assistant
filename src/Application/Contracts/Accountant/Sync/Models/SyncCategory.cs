@@ -1,7 +1,7 @@
 ﻿using System;
-using PersonalAssistant.Domain.Entities.Accountant;
+using Domain.Entities.Accountant;
 
-namespace PersonalAssistant.Application.Contracts.Accountant.Sync.Models
+namespace Application.Contracts.Accountant.Sync.Models
 {
     public class SyncCategory
     {

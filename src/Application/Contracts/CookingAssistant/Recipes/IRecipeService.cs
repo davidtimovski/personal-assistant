@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentValidation;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models;
-using PersonalAssistant.Domain.Entities.Common;
+using Application.Contracts.CookingAssistant.Recipes.Models;
+using Domain.Entities.Common;
 
-namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes
+namespace Application.Contracts.CookingAssistant.Recipes
 {
     public interface IRecipeService
     {
@@ -23,16 +23,12 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes
         bool IngredientsReviewIsRequired(int id, int userId);
         RecipeForReview GetForReview(int id, int userId);
         IEnumerable<string> GetAllImageUris(int userId);
-        string GetImageUri(int id);
         bool Exists(int id, int userId);
         bool Exists(string name, int userId);
         bool Exists(int id, string name, int userId);
         int Count(int userId);
         (bool canSend, bool alreadySent) CheckSendRequest(int recipeId, int sendToId, int userId);
-        IEnumerable<User> GetUsersToBeNotifiedOfRecipeChange(int id, int excludeUserId);
         bool CheckIfUserCanBeNotifiedOfRecipeChange(int id, int userId);
-        IEnumerable<User> GetUsersToBeNotifiedOfRecipeDeletion(int id);
-        IEnumerable<User> GetUsersToBeNotifiedOfRecipeSent(int id);
         Task<int> CreateAsync(CreateRecipe model, IValidator<CreateRecipe> validator);
         Task CreateSampleAsync(int userId, Dictionary<string, string> translations);
         Task<UpdateRecipeResult> UpdateAsync(UpdateRecipe model, IValidator<UpdateRecipe> validator);

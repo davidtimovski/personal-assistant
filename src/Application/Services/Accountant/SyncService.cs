@@ -1,15 +1,16 @@
 ﻿using System.Threading.Tasks;
 using AutoMapper;
-using PersonalAssistant.Application.Contracts.Accountant.Accounts;
-using PersonalAssistant.Application.Contracts.Accountant.Categories;
-using PersonalAssistant.Application.Contracts.Accountant.Common;
-using PersonalAssistant.Application.Contracts.Accountant.Debts;
-using PersonalAssistant.Application.Contracts.Accountant.Sync.Models;
-using PersonalAssistant.Application.Contracts.Accountant.Transactions;
-using PersonalAssistant.Application.Contracts.Accountant.UpcomingExpenses;
-using PersonalAssistant.Domain.Entities.Accountant;
+using Application.Contracts.Accountant.Accounts;
+using Application.Contracts.Accountant.Categories;
+using Application.Contracts.Accountant.Common;
+using Application.Contracts.Accountant.Debts;
+using Application.Contracts.Accountant.Sync;
+using Application.Contracts.Accountant.Sync.Models;
+using Application.Contracts.Accountant.Transactions;
+using Application.Contracts.Accountant.UpcomingExpenses;
+using Domain.Entities.Accountant;
 
-namespace PersonalAssistant.Application.Services.Accountant
+namespace Application.Services.Accountant
 {
     public class SyncService : ISyncService
     {
@@ -41,7 +42,7 @@ namespace PersonalAssistant.Application.Services.Accountant
 
         public async Task<SyncedEntityIds> SyncEntitiesAsync(SyncEntities model)
         {
-            (var conn, var uowTransaction) = _unitOfWork.StartTransaction();
+            var (conn, uowTransaction) = _unitOfWork.StartTransaction();
 
             var accountIds = new int[model.Accounts.Count];
             var categoryIds = new int[model.Categories.Count];

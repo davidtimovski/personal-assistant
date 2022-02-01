@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using PersonalAssistant.Application.Contracts.Accountant.Common.Models;
-using PersonalAssistant.Application.Contracts.Accountant.UpcomingExpenses.Models;
+using Application.Contracts.Accountant.Common.Models;
+using Application.Contracts.Accountant.UpcomingExpenses.Models;
 
-namespace PersonalAssistant.Application.Contracts.Accountant.UpcomingExpenses
+namespace Application.Contracts.Accountant.UpcomingExpenses
 {
     public interface IUpcomingExpenseService
     {

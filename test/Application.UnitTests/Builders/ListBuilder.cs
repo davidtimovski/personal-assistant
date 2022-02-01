@@ -1,11 +1,10 @@
-﻿using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models;
+﻿using Application.Contracts.ToDoAssistant.Lists.Models;
 
-namespace PersonalAssistant.Application.UnitTests.Builders
+namespace Application.UnitTests.Builders
 {
     public class ListBuilder
     {
         private string name;
-        private bool isOneTimeToggleDefault;
         private string tasksText;
 
         public ListBuilder()
@@ -16,12 +15,6 @@ namespace PersonalAssistant.Application.UnitTests.Builders
         public ListBuilder WithName(string newName)
         {
             name = newName;
-            return this;
-        }
-
-        public ListBuilder WithIsOneTimeToggleDefault(bool newIsOneTimeToggleDefault)
-        {
-            isOneTimeToggleDefault = newIsOneTimeToggleDefault;
             return this;
         }
 
@@ -36,7 +29,6 @@ namespace PersonalAssistant.Application.UnitTests.Builders
             return new CreateList
             {
                 Name = name,
-                IsOneTimeToggleDefault = isOneTimeToggleDefault,
                 TasksText = tasksText
             };
         }
@@ -45,8 +37,7 @@ namespace PersonalAssistant.Application.UnitTests.Builders
         {
             return new UpdateList
             {
-                Name = name,
-                IsOneTimeToggleDefault = isOneTimeToggleDefault
+                Name = name
             };
         }
 

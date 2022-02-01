@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PersonalAssistant.Application.Contracts.Accountant.Sync.Models
+namespace Application.Contracts.Accountant.Sync.Models
 {
     public class SyncDebt
     {

@@ -1,4 +1,4 @@
-﻿namespace PersonalAssistant.Domain.Entities.Common
+﻿namespace Domain.Entities.Common
 {
     public class TooltipDismissed
     {

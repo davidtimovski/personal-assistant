@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 using FluentValidation;
-using PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles.Models;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models;
-using PersonalAssistant.Domain.Entities.CookingAssistant;
+using Application.Contracts.CookingAssistant.DietaryProfiles.Models;
+using Application.Contracts.CookingAssistant.Recipes.Models;
+using Domain.Entities.CookingAssistant;
 
-namespace PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles
+namespace Application.Contracts.CookingAssistant.DietaryProfiles
 {
     public interface IDietaryProfileService
     {

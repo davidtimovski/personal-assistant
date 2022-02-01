@@ -5,13 +5,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes;
-using PersonalAssistant.Domain.Entities.Common;
-using PersonalAssistant.Domain.Entities.CookingAssistant;
-using PersonalAssistant.Domain.Entities.ToDoAssistant;
+using Application.Contracts.CookingAssistant.Recipes;
+using Domain.Entities.Common;
+using Domain.Entities.CookingAssistant;
+using Domain.Entities.ToDoAssistant;
 
-namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
+namespace Persistence.Repositories.CookingAssistant
 {
     public class RecipesRepository : BaseRepository, IRecipesRepository
     {
@@ -29,7 +28,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                                                LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id"" AND t.""IsCompleted"" = FALSE
                                                LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
                                                WHERE r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")
-                                               GROUP BY r.""Id"", r.""Name""", new { UserId = userId });
+                                               GROUP BY r.""Id"", r.""Name""", new { UserId = userId }).ToList();
 
             var recipeIds = recipes.Select(x => x.Id).ToArray();
             var shares = conn.Query<RecipeShare>(@"SELECT * FROM ""CookingAssistant.Shares"" WHERE ""RecipeId"" = ANY(@RecipeIds)", new { RecipeIds = recipeIds });
@@ -167,50 +166,50 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
         {
             using IDbConnection conn = OpenConnection();
 
-            var sql = @"SELECT DISTINCT r.*, users.""Id"", users.""Email"", users.""ImageUri""
+            const string query = @"SELECT DISTINCT r.*, users.""Id"", users.""Email"", users.""ImageUri""
                         FROM ""CookingAssistant.Recipes"" AS r
                         LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
                         INNER JOIN ""AspNetUsers"" AS users ON r.""UserId"" = users.""Id""
                         WHERE r.""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))";
 
-            return conn.Query<Recipe, User, Recipe>(sql,
+            return conn.Query<Recipe, User, Recipe>(query,
                 (recipe, user) =>
                 {
                     recipe.User = user;
                     return recipe;
-                }, new { Id = id, UserId = userId }, null, true).FirstOrDefault();
+                }, new { Id = id, UserId = userId }).FirstOrDefault();
         }
 
         public IEnumerable<RecipeShare> GetShares(int id)
         {
             using IDbConnection conn = OpenConnection();
 
-            var sql = @"SELECT s.*, u.""Id"", u.""Email"", u.""ImageUri""
+            const string query = @"SELECT s.*, u.""Id"", u.""Email"", u.""ImageUri""
                         FROM ""CookingAssistant.Shares"" AS s
                         INNER JOIN ""AspNetUsers"" AS u ON s.""UserId"" = u.""Id""
                         WHERE s.""RecipeId"" = @RecipeId AND s.""IsAccepted"" IS NOT FALSE
                         ORDER BY (CASE WHEN s.""IsAccepted"" THEN 1 ELSE 2 END) ASC, s.""CreatedDate""";
 
-            return conn.Query<RecipeShare, User, RecipeShare>(sql,
+            return conn.Query<RecipeShare, User, RecipeShare>(query,
                 (share, user) =>
                 {
                     share.User = user;
                     return share;
-                }, new { RecipeId = id }, null, true);
+                }, new { RecipeId = id });
         }
 
         public IEnumerable<RecipeShare> GetShareRequests(int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            var sql = @"SELECT s.*, r.""Name"", u.""Name""
+            const string query = @"SELECT s.*, r.""Name"", u.""Name""
                         FROM ""CookingAssistant.Shares"" AS s
                         INNER JOIN ""CookingAssistant.Recipes"" AS r ON s.""RecipeId"" = r.""Id""
                         INNER JOIN ""AspNetUsers"" AS u ON r.""UserId"" = u.""Id""
                         WHERE s.""UserId"" = @UserId
                         ORDER BY s.""ModifiedDate"" DESC";
 
-            return conn.Query<RecipeShare, Recipe, User, RecipeShare>(sql,
+            return conn.Query<RecipeShare, Recipe, User, RecipeShare>(query,
                 (share, recipe, user) =>
                 {
                     share.Recipe = recipe;
@@ -253,14 +252,14 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
         {
             using IDbConnection conn = OpenConnection();
 
-            var sql = @"SELECT sr.*, r.""Name"", u.""Name""
+            const string query = @"SELECT sr.*, r.""Name"", u.""Name""
                         FROM ""CookingAssistant.SendRequests"" AS sr
                         INNER JOIN ""CookingAssistant.Recipes"" AS r ON sr.""RecipeId"" = r.""Id""
                         INNER JOIN ""AspNetUsers"" AS u ON r.""UserId"" = u.""Id""
                         WHERE sr.""UserId"" = @UserId
                         ORDER BY sr.""ModifiedDate"" DESC";
 
-            return conn.Query<SendRequest, Recipe, User, SendRequest>(sql,
+            return conn.Query<SendRequest, Recipe, User, SendRequest>(query,
                 (sendRequest, recipe, user) =>
                 {
                     sendRequest.Recipe = recipe;

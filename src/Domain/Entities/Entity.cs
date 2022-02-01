@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PersonalAssistant.Domain.Entities
+namespace Domain.Entities
 {
     public class Entity
     {

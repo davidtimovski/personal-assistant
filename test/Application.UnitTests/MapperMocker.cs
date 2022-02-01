@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using PersonalAssistant.Application.Mappings;
+using Application.Mappings;
 
-namespace PersonalAssistant.Application.UnitTests
+namespace Application.UnitTests
 {
     public static class MapperMocker
     {

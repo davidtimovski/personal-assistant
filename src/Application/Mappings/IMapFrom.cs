@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 
-namespace PersonalAssistant.Application.Mappings
+namespace Application.Mappings
 {
     public interface IMapFrom<T>
     {

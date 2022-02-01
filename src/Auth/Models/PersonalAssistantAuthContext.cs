@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using PersonalAssistant.Infrastructure.Identity;
+using Infrastructure.Identity;
 
 namespace Auth.Models
 {

@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
-using PersonalAssistant.Application.Mappings;
-using PersonalAssistant.Domain.Entities.CookingAssistant;
-using PersonalAssistant.Domain.Entities.ToDoAssistant;
+using Application.Mappings;
+using Domain.Entities.CookingAssistant;
+using Domain.Entities.ToDoAssistant;
 
-namespace PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients.Models
+namespace Application.Contracts.CookingAssistant.Ingredients.Models
 {
     public class IngredientSuggestion : IMapFrom<Ingredient>, IMapFrom<ToDoTask>
     {

@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Infrastructure.Sender.Models;
+using Application.Contracts.Common;
+using Infrastructure.Sender.Models;
 
 namespace Auth.Services
 {

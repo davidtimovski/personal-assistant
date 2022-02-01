@@ -4,11 +4,10 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Persistence;
-using PersonalAssistant.Application.Contracts.Accountant.Accounts;
-using PersonalAssistant.Domain.Entities.Accountant;
+using Application.Contracts.Accountant.Accounts;
+using Domain.Entities.Accountant;
 
-namespace PersonalAssistant.Persistence.Repositories.Accountant
+namespace Persistence.Repositories.Accountant
 {
     public class AccountsRepository : BaseRepository, IAccountsRepository
     {
@@ -50,8 +49,8 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
         public async Task<int> CreateAsync(Account account, IDbConnection uowConn = null, IDbTransaction uowTransaction = null)
         {
             int id;
-            var query = @"INSERT INTO ""Accountant.Accounts"" (""UserId"", ""Name"", ""IsMain"", ""Currency"", ""StockPrice"", ""CreatedDate"", ""ModifiedDate"")
-                          VALUES (@UserId, @Name, @IsMain, @Currency, @StockPrice, @CreatedDate, @ModifiedDate) returning ""Id""";
+            const string query = @"INSERT INTO ""Accountant.Accounts"" (""UserId"", ""Name"", ""IsMain"", ""Currency"", ""StockPrice"", ""CreatedDate"", ""ModifiedDate"")
+                                   VALUES (@UserId, @Name, @IsMain, @Currency, @StockPrice, @CreatedDate, @ModifiedDate) returning ""Id""";
 
             if (uowConn == null && uowTransaction == null)
             {

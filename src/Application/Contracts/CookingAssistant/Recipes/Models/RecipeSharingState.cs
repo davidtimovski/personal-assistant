@@ -1,4 +1,4 @@
-﻿namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models
+﻿namespace Application.Contracts.CookingAssistant.Recipes.Models
 {
     public enum RecipeSharingState
     {

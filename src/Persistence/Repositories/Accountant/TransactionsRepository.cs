@@ -4,11 +4,10 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Persistence;
-using PersonalAssistant.Application.Contracts.Accountant.Transactions;
-using PersonalAssistant.Domain.Entities.Accountant;
+using Application.Contracts.Accountant.Transactions;
+using Domain.Entities.Accountant;
 
-namespace PersonalAssistant.Persistence.Repositories.Accountant
+namespace Persistence.Repositories.Accountant
 {
     public class TransactionsRepository : BaseRepository, ITransactionsRepository
     {
@@ -19,7 +18,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
         {
             using IDbConnection conn = OpenConnection();
 
-            var sql = @"SELECT t.*, fa.""Id"", fa.""Name"", ta.""Id"", ta.""Name"", c.""Id"", c.""Name"", pc.""Id"", pc.""Name""
+            const string query = @"SELECT t.*, fa.""Id"", fa.""Name"", ta.""Id"", ta.""Name"", c.""Id"", c.""Name"", pc.""Id"", pc.""Name""
                         FROM ""Accountant.Transactions"" AS t
                         LEFT JOIN ""Accountant.Accounts"" AS fa ON t.""FromAccountId"" = fa.""Id""
                         LEFT JOIN ""Accountant.Accounts"" AS ta ON t.""ToAccountId"" = ta.""Id""
@@ -27,7 +26,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
                         LEFT JOIN ""Accountant.Categories"" AS pc ON c.""ParentId"" = pc.""Id""
                         WHERE fa.""UserId"" = @UserId OR ta.""UserId"" = @UserId ORDER BY ""Date""";
 
-            var transactions = conn.Query<Transaction, Account, Account, Category, Category, Transaction>(sql,
+            var transactions = conn.Query<Transaction, Account, Account, Category, Category, Transaction>(query,
                 (transaction, fromAccount, toAccount, category, parentCategory) =>
                 {
                     transaction.FromAccount = fromAccount ?? new Account();
@@ -48,7 +47,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
                     }
 
                     return transaction;
-                }, new { UserId = userId }, null, true);
+                }, new { UserId = userId });
 
             return transactions;
         }
@@ -95,7 +94,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
                                                                                 WHERE ""CategoryId"" = @CategoryId 
                                                                                     AND EXTRACT(year FROM ""Date"") = @Year
                                                                                     AND EXTRACT(month FROM ""Date"") = @Month",
-                        new { transaction.CategoryId, transaction.Date.Year, transaction.Date.Month });
+                        new { transaction.CategoryId, transaction.Date.Year, transaction.Date.Month }).ToList();
 
                     if (relatedUpcomingExpenses.Any())
                     {
@@ -122,7 +121,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
 
                                     await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.DeletedEntities"" (""UserId"", ""EntityType"", ""EntityId"", ""DeletedDate"")
                                          VALUES (@UserId, @EntityType, @EntityId, @DeletedDate)",
-                                         new { UserId = upcomingExpense.UserId, EntityType = (short)EntityType.UpcomingExpense, EntityId = upcomingExpense.Id, DeletedDate = DateTime.UtcNow },
+                                         new { upcomingExpense.UserId, EntityType = (short)EntityType.UpcomingExpense, EntityId = upcomingExpense.Id, DeletedDate = DateTime.UtcNow },
                                          dbTransaction);
                                 }
                             }

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using PersonalAssistant.Domain.Entities.Common;
+using Domain.Entities.Common;
 
-namespace PersonalAssistant.Domain.Entities.ToDoAssistant
+namespace Domain.Entities.ToDoAssistant
 {
     public class ToDoList : Entity
     {

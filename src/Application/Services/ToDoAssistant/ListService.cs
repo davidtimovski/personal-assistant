@@ -5,16 +5,16 @@ using System.Threading.Tasks;
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Application.Contracts.Common.Models;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
-using PersonalAssistant.Domain.Entities.Common;
-using PersonalAssistant.Domain.Entities.ToDoAssistant;
+using Application.Contracts.Common;
+using Application.Contracts.Common.Models;
+using Application.Contracts.ToDoAssistant.Lists;
+using Application.Contracts.ToDoAssistant.Lists.Models;
+using Application.Contracts.ToDoAssistant.Notifications;
+using Application.Contracts.ToDoAssistant.Tasks;
+using Domain.Entities.Common;
+using Domain.Entities.ToDoAssistant;
 
-namespace PersonalAssistant.Application.Services.ToDoAssistant
+namespace Application.Services.ToDoAssistant
 {
     public class ListService : IListService
     {
@@ -267,7 +267,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
             ToDoList original = await _listsRepository.UpdateAsync(list, model.UserId);
 
-            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(model.Id, model.UserId);
+            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(model.Id, model.UserId).ToList();
             if (!usersToBeNotified.Any())
             {
                 return new UpdateListResult();
@@ -315,7 +315,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
                 throw new ValidationException("Unauthorized");
             }
 
-            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfDeletion(id);
+            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfDeletion(id).ToList();
 
             string deletedListName = await _listsRepository.DeleteAsync(id);
 
@@ -392,7 +392,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
 
             await _notificationsRepository.DeleteForUserAndListAsync(userId, id);
 
-            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(id, userId);
+            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(id, userId).ToList();
             if (!usersToBeNotified.Any())
             {
                 return new LeaveListResult();
@@ -445,7 +445,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
                 return new SetTasksAsNotCompletedResult();
             }
 
-            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(id, userId);
+            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(id, userId).ToList();
             if (!usersToBeNotified.Any())
             {
                 return new SetTasksAsNotCompletedResult();
@@ -467,7 +467,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
         {
             await _listsRepository.SetShareIsAcceptedAsync(id, userId, isAccepted, DateTime.UtcNow);
 
-            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(id, userId);
+            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(id, userId).ToList();
             if (!usersToBeNotified.Any())
             {
                 return new SetShareIsAcceptedResult();
@@ -495,7 +495,7 @@ namespace PersonalAssistant.Application.Services.ToDoAssistant
             await _listsRepository.ReorderAsync(id, userId, oldOrder, newOrder, DateTime.UtcNow);
         }
 
-        private void ValidateAndThrow<T>(T model, IValidator<T> validator)
+        private static void ValidateAndThrow<T>(T model, IValidator<T> validator)
         {
             ValidationResult result = validator.Validate(model);
             if (!result.IsValid)

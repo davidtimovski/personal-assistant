@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
-using PersonalAssistant.Domain.Entities.Accountant;
+using Domain.Entities.Accountant;
 
-namespace PersonalAssistant.Application.Contracts.Accountant.Categories
+namespace Application.Contracts.Accountant.Categories
 {
     public interface ICategoriesRepository
     {

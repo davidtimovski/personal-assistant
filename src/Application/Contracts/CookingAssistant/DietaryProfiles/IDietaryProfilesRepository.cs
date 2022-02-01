@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using PersonalAssistant.Domain.Entities.CookingAssistant;
+using Domain.Entities.CookingAssistant;
 
-namespace PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles
+namespace Application.Contracts.CookingAssistant.DietaryProfiles
 {
     public interface IDietaryProfilesRepository
     {

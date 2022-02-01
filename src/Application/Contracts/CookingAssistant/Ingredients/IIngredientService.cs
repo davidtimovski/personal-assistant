@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentValidation;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients.Models;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models;
+using Application.Contracts.CookingAssistant.Ingredients.Models;
+using Application.Contracts.CookingAssistant.Recipes.Models;
 
-namespace PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients
+namespace Application.Contracts.CookingAssistant.Ingredients
 {
     public interface IIngredientService
     {
@@ -13,7 +13,6 @@ namespace PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients
         IEnumerable<IngredientSuggestion> GetSuggestions(int recipeId, int userId);
         IEnumerable<IngredientSuggestion> GetTaskSuggestions(int userId);
         IEnumerable<IngredientSuggestion> GetTaskSuggestions(int recipeId, int userId);
-        IEnumerable<IngredientSuggestion> GetIngredientSuggestions(int userId);
         IEnumerable<IngredientReviewSuggestion> GetIngredientReviewSuggestions(int userId);
         bool Exists(int id, int userId);
         bool Exists(int id, string name, int userId);

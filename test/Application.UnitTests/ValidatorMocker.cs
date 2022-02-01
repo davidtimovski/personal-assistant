@@ -3,7 +3,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using Moq;
 
-namespace PersonalAssistant.Application.UnitTests
+namespace Application.UnitTests
 {
     public static class ValidatorMocker
     {

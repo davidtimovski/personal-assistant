@@ -1,4 +1,4 @@
-﻿namespace PersonalAssistant.Domain.Entities.CookingAssistant
+﻿namespace Domain.Entities.CookingAssistant
 {
     public class RecipeIngredient : Entity
     {

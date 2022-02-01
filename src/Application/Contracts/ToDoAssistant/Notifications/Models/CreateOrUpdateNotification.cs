@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications.Models
+namespace Application.Contracts.ToDoAssistant.Notifications.Models
 {
     public class CreateOrUpdateNotification
     {

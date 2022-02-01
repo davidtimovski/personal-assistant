@@ -1,4 +1,4 @@
-﻿namespace PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients.Models
+﻿namespace Application.Contracts.CookingAssistant.Ingredients.Models
 {
     public class IngredientNutritionData
     {

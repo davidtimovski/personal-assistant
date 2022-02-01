@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Application.Contracts.Common.Models;
-using PersonalAssistant.Infrastructure.Identity;
+using Application.Contracts.Common;
+using Application.Contracts.Common.Models;
+using Infrastructure.Identity;
 
 namespace Api.Controllers.Common
 {

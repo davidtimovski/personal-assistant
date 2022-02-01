@@ -1,6 +1,6 @@
-﻿using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models;
+﻿using Application.Contracts.ToDoAssistant.Tasks.Models;
 
-namespace PersonalAssistant.Application.UnitTests.Builders
+namespace Application.UnitTests.Builders
 {
     public class TaskBuilder
     {

@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using AutoMapper;
 
-namespace PersonalAssistant.Application.Mappings
+namespace Application.Mappings
 {
     public class MappingProfile : Profile
     {

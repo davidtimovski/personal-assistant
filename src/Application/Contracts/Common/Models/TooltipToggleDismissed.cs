@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace PersonalAssistant.Application.Contracts.Common.Models
+namespace Application.Contracts.Common.Models
 {
     public class TooltipToggleDismissed
     {

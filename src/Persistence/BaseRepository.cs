@@ -1,15 +1,14 @@
 ﻿using System.Data;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
-using Persistence;
 
-namespace PersonalAssistant.Persistence
+namespace Persistence
 {
     public abstract class BaseRepository
     {
         private readonly string _connectionString;
 
-        public BaseRepository(PersonalAssistantContext efContext)
+        protected BaseRepository(PersonalAssistantContext efContext)
         {
             _connectionString = efContext.Database.GetConnectionString();
             EFContext = efContext;

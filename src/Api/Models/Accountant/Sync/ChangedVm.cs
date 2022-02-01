@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using PersonalAssistant.Application.Contracts.Accountant.Accounts.Models;
-using PersonalAssistant.Application.Contracts.Accountant.Categories.Models;
-using PersonalAssistant.Application.Contracts.Accountant.Debts.Models;
-using PersonalAssistant.Application.Contracts.Accountant.Transactions.Models;
-using PersonalAssistant.Application.Contracts.Accountant.UpcomingExpenses.Models;
+using Application.Contracts.Accountant.Accounts.Models;
+using Application.Contracts.Accountant.Categories.Models;
+using Application.Contracts.Accountant.Debts.Models;
+using Application.Contracts.Accountant.Transactions.Models;
+using Application.Contracts.Accountant.UpcomingExpenses.Models;
 
 namespace Api.Models.Accountant.Sync
 {

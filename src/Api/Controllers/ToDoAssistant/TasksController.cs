@@ -10,14 +10,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications.Models;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models;
-using PersonalAssistant.Infrastructure.Identity;
-using PersonalAssistant.Infrastructure.Sender.Models;
+using Application.Contracts.Common;
+using Application.Contracts.ToDoAssistant.Notifications;
+using Application.Contracts.ToDoAssistant.Notifications.Models;
+using Application.Contracts.ToDoAssistant.Tasks;
+using Application.Contracts.ToDoAssistant.Tasks.Models;
+using Infrastructure.Identity;
+using Infrastructure.Sender.Models;
 
 namespace Api.Controllers.ToDoAssistant
 {
@@ -28,8 +27,6 @@ namespace Api.Controllers.ToDoAssistant
     {
         private readonly IHubContext<ToDoAssistantHub> _hubContext;
         private readonly ITaskService _taskService;
-        private readonly IListService _listService;
-        private readonly IUserService _userService;
         private readonly INotificationService _notificationService;
         private readonly ISenderService _senderService;
         private readonly IValidator<CreateTask> _createValidator;
@@ -41,8 +38,6 @@ namespace Api.Controllers.ToDoAssistant
         public TasksController(
             IHubContext<ToDoAssistantHub> hubContext,
             ITaskService taskService,
-            IListService listService,
-            IUserService userService,
             INotificationService notificationService,
             ISenderService senderService,
             IValidator<CreateTask> createValidator,
@@ -53,8 +48,6 @@ namespace Api.Controllers.ToDoAssistant
         {
             _hubContext = hubContext;
             _taskService = taskService;
-            _listService = listService;
-            _userService = userService;
             _notificationService = notificationService;
             _senderService = senderService;
             _createValidator = createValidator;
@@ -139,7 +132,7 @@ namespace Api.Controllers.ToDoAssistant
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, dto.ListId, result.TaskId, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-                var ToDoAssistantPushNotification = new ToDoAssistantPushNotification
+                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
                     UserId = recipient.Id,
@@ -147,7 +140,7 @@ namespace Api.Controllers.ToDoAssistant
                     OpenUrl = GetNotificationsPageUrl(notificationId)
                 };
 
-                _senderService.Enqueue(ToDoAssistantPushNotification);
+                _senderService.Enqueue(toDoAssistantPushNotification);
             }
 
             return StatusCode(201, result.TaskId);
@@ -191,7 +184,7 @@ namespace Api.Controllers.ToDoAssistant
 
                     var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, dto.ListId, task.Id, message);
                     var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-                    var ToDoAssistantPushNotification = new ToDoAssistantPushNotification
+                    var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                     {
                         SenderImageUri = result.ActionUserImageUri,
                         UserId = recipient.Id,
@@ -199,7 +192,7 @@ namespace Api.Controllers.ToDoAssistant
                         OpenUrl = GetNotificationsPageUrl(notificationId)
                     };
 
-                    _senderService.Enqueue(ToDoAssistantPushNotification);
+                    _senderService.Enqueue(toDoAssistantPushNotification);
                 }
             }
 
@@ -242,7 +235,7 @@ namespace Api.Controllers.ToDoAssistant
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-                var ToDoAssistantPushNotification = new ToDoAssistantPushNotification
+                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
                     UserId = recipient.Id,
@@ -250,7 +243,7 @@ namespace Api.Controllers.ToDoAssistant
                     OpenUrl = GetNotificationsPageUrl(notificationId)
                 };
 
-                _senderService.Enqueue(ToDoAssistantPushNotification);
+                _senderService.Enqueue(toDoAssistantPushNotification);
             }
 
             foreach (var recipient in result.RemovedNotificationRecipients)
@@ -260,7 +253,7 @@ namespace Api.Controllers.ToDoAssistant
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.OldListId, null, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-                var ToDoAssistantPushNotification = new ToDoAssistantPushNotification
+                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
                     UserId = recipient.Id,
@@ -268,7 +261,7 @@ namespace Api.Controllers.ToDoAssistant
                     OpenUrl = GetNotificationsPageUrl(notificationId)
                 };
 
-                _senderService.Enqueue(ToDoAssistantPushNotification);
+                _senderService.Enqueue(toDoAssistantPushNotification);
             }
 
             foreach (var recipient in result.CreatedNotificationRecipients)
@@ -278,7 +271,7 @@ namespace Api.Controllers.ToDoAssistant
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-                var ToDoAssistantPushNotification = new ToDoAssistantPushNotification
+                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
                     UserId = recipient.Id,
@@ -286,7 +279,7 @@ namespace Api.Controllers.ToDoAssistant
                     OpenUrl = GetNotificationsPageUrl(notificationId)
                 };
 
-                _senderService.Enqueue(ToDoAssistantPushNotification);
+                _senderService.Enqueue(toDoAssistantPushNotification);
             }
 
             if (result.AssignedNotificationRecipient != null)
@@ -296,7 +289,7 @@ namespace Api.Controllers.ToDoAssistant
 
                 var createNotificationDto = new CreateOrUpdateNotification(result.AssignedNotificationRecipient.Id, dto.UserId, result.ListId, dto.Id, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-                var ToDoAssistantPushNotification = new ToDoAssistantPushNotification
+                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
                     UserId = result.AssignedNotificationRecipient.Id,
@@ -304,7 +297,7 @@ namespace Api.Controllers.ToDoAssistant
                     OpenUrl = GetNotificationsPageUrl(notificationId)
                 };
 
-                _senderService.Enqueue(ToDoAssistantPushNotification);
+                _senderService.Enqueue(toDoAssistantPushNotification);
             }
 
             return NoContent();
@@ -337,7 +330,7 @@ namespace Api.Controllers.ToDoAssistant
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, userId, result.ListId, null, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-                var ToDoAssistantPushNotification = new ToDoAssistantPushNotification
+                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
                     UserId = recipient.Id,
@@ -345,7 +338,7 @@ namespace Api.Controllers.ToDoAssistant
                     OpenUrl = GetNotificationsPageUrl(notificationId)
                 };
 
-                _senderService.Enqueue(ToDoAssistantPushNotification);
+                _senderService.Enqueue(toDoAssistantPushNotification);
             }
 
             return NoContent();
@@ -382,7 +375,7 @@ namespace Api.Controllers.ToDoAssistant
 
                 var updateNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto);
-                var ToDoAssistantPushNotification = new ToDoAssistantPushNotification
+                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
                     UserId = recipient.Id,
@@ -390,7 +383,7 @@ namespace Api.Controllers.ToDoAssistant
                     OpenUrl = GetNotificationsPageUrl(notificationId)
                 };
 
-                _senderService.Enqueue(ToDoAssistantPushNotification);
+                _senderService.Enqueue(toDoAssistantPushNotification);
             }
 
             return NoContent();
@@ -427,7 +420,7 @@ namespace Api.Controllers.ToDoAssistant
 
                 var updateNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto);
-                var ToDoAssistantPushNotification = new ToDoAssistantPushNotification
+                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
                     UserId = recipient.Id,
@@ -435,7 +428,7 @@ namespace Api.Controllers.ToDoAssistant
                     OpenUrl = GetNotificationsPageUrl(notificationId)
                 };
 
-                _senderService.Enqueue(ToDoAssistantPushNotification);
+                _senderService.Enqueue(toDoAssistantPushNotification);
             }
 
             return NoContent();

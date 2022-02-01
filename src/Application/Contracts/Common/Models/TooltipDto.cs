@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
-using PersonalAssistant.Application.Mappings;
-using PersonalAssistant.Domain.Entities;
-using PersonalAssistant.Domain.Entities.Common;
+using Application.Mappings;
+using Domain.Entities;
+using Domain.Entities.Common;
 
-namespace PersonalAssistant.Application.Contracts.Common.Models
+namespace Application.Contracts.Common.Models
 {
     public class TooltipDto : IMapFrom<Tooltip>
     {

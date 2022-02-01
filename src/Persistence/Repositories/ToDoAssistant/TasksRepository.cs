@@ -4,11 +4,10 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Persistence;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
-using PersonalAssistant.Domain.Entities.ToDoAssistant;
+using Application.Contracts.ToDoAssistant.Tasks;
+using Domain.Entities.ToDoAssistant;
 
-namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
+namespace Persistence.Repositories.ToDoAssistant
 {
     public class TasksRepository : BaseRepository, ITasksRepository
     {
@@ -34,7 +33,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                                                         new { Id = id, UserId = userId });
         }
 
-        public  ToDoTask GetForUpdate(int id, int userId)
+        public ToDoTask GetForUpdate(int id, int userId)
         {
             using IDbConnection conn = OpenConnection();
 
@@ -327,8 +326,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
         public async Task CompleteAsync(int id, int userId)
         {
             ToDoTask task = Get(id);
-
-            short order = 1;
+            
             if (task.PrivateToUserId.HasValue)
             {
                 // If the task was private increase the Order of only the user's completed private tasks
@@ -349,7 +347,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
             ToDoTask dbTask = EFContext.Tasks.Find(id);
             dbTask.IsCompleted = true;
-            dbTask.Order = order;
+            dbTask.Order = 1;
 
             if (task.PrivateToUserId.HasValue)
             {

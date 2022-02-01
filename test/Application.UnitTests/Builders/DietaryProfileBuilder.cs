@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles.Models;
+using Application.Contracts.CookingAssistant.DietaryProfiles.Models;
 
-namespace PersonalAssistant.Application.UnitTests.Builders
+namespace Application.UnitTests.Builders
 {
     public class DietaryProfileBuilder
     {

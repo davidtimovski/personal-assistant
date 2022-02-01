@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PersonalAssistant.Domain.Entities.Accountant
+namespace Domain.Entities.Accountant
 {
     public class UpcomingExpense : Entity
     {

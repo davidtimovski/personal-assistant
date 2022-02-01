@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models
+namespace Application.Contracts.CookingAssistant.Recipes.Models
 {
     public class RecipeCostSummary
     {

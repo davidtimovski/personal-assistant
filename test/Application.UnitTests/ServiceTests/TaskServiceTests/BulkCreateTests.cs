@@ -4,22 +4,22 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentValidation;
 using Moq;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models;
-using PersonalAssistant.Application.Mappings;
-using PersonalAssistant.Application.Services.ToDoAssistant;
-using PersonalAssistant.Application.UnitTests.Builders;
-using PersonalAssistant.Domain.Entities.ToDoAssistant;
+using Application.Contracts.ToDoAssistant.Lists;
+using Application.Contracts.ToDoAssistant.Tasks;
+using Application.Contracts.ToDoAssistant.Tasks.Models;
+using Application.Mappings;
+using Application.Services.ToDoAssistant;
+using Application.UnitTests.Builders;
+using Domain.Entities.ToDoAssistant;
 using Xunit;
 
-namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
+namespace Application.UnitTests.ServiceTests.TaskServiceTests
 {
     public class BulkCreateTests
     {
         private readonly Mock<IValidator<BulkCreate>> _successfulValidatorMock;
-        private readonly Mock<ITasksRepository> _tasksRepositoryMock = new Mock<ITasksRepository>();
-        private readonly Mock<IListsRepository> _listsRepositoryMock = new Mock<IListsRepository>();
+        private readonly Mock<ITasksRepository> _tasksRepositoryMock = new();
+        private readonly Mock<IListsRepository> _listsRepositoryMock = new();
         private readonly ITaskService _sut;
 
         public BulkCreateTests()
@@ -116,8 +116,8 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
             await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object);
             var expectedTasks = new List<ToDoTask>
             {
-                new ToDoTask { Name = "Task 1" },
-                new ToDoTask { Name = "Task 2" }
+                new() { Name = "Task 1" },
+                new() { Name = "Task 2" }
             };
 
             _tasksRepositoryMock.Verify(x => x.BulkCreateAsync(
@@ -148,9 +148,9 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
             _tasksRepositoryMock.Verify(x => x.BulkCreateAsync(
                 It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>()));
 
-            for (var i = 0; i < actualTasks.Count; i++)
+            foreach (var task in actualTasks)
             {
-                Assert.Equal(tasksAreOneTime, actualTasks[i].IsOneTime);
+                Assert.Equal(tasksAreOneTime, task.IsOneTime);
             }
         }
 
@@ -170,14 +170,14 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
                 .BuildBulkCreateModel();
 
             await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object);
-            int? expectedPrivateToUserId = tasksArePrivate ? userId : (int?)null;
+            int? expectedPrivateToUserId = tasksArePrivate ? userId : null;
 
             _tasksRepositoryMock.Verify(x => x.BulkCreateAsync(
                 It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>()));
 
-            for (var i = 0; i < actualTasks.Count; i++)
+            foreach (var task in actualTasks)
             {
-                Assert.Equal(expectedPrivateToUserId, actualTasks[i].PrivateToUserId);
+                Assert.Equal(expectedPrivateToUserId, task.PrivateToUserId);
             }
         }
 
@@ -197,9 +197,9 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
             _tasksRepositoryMock.Verify(x => x.BulkCreateAsync(
                 It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>()));
 
-            for (var i = 0; i < actualTasks.Count; i++)
+            foreach (var task in actualTasks)
             {
-                Assert.NotEqual(DateTime.MinValue, actualTasks[i].CreatedDate);
+                Assert.NotEqual(DateTime.MinValue, task.CreatedDate);
             }
         }
 
@@ -219,9 +219,9 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
             _tasksRepositoryMock.Verify(x => x.BulkCreateAsync(
                 It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>()));
 
-            for (var i = 0; i < actualTasks.Count; i++)
+            foreach (var task in actualTasks)
             {
-                Assert.NotEqual(DateTime.MinValue, actualTasks[i].ModifiedDate);
+                Assert.NotEqual(DateTime.MinValue, task.ModifiedDate);
             }
         }
     }

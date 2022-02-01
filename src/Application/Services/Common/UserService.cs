@@ -1,32 +1,24 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using AutoMapper;
-using Microsoft.Extensions.Configuration;
-using PersonalAssistant.Application.Contracts;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Application.Contracts.Common.Models;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
-using PersonalAssistant.Domain.Entities;
-using PersonalAssistant.Domain.Entities.Common;
+using Application.Contracts.Common;
+using Application.Contracts.Common.Models;
+using Domain.Entities.Common;
 
-namespace PersonalAssistant.Application.Services.Common
+namespace Application.Services.Common
 {
     public class UserService : IUserService
     {
         private readonly ICdnService _cdnService;
         private readonly IUsersRepository _usersRepository;
-        private readonly ITasksRepository _tasksRepository;
         private readonly IMapper _mapper;
 
         public UserService(
             ICdnService cdnService,
             IUsersRepository usersRepository,
-            ITasksRepository tasksRepository,
             IMapper mapper)
         {
             _cdnService = cdnService;
             _usersRepository = usersRepository;
-            _tasksRepository = tasksRepository;
             _mapper = mapper;
         }
 

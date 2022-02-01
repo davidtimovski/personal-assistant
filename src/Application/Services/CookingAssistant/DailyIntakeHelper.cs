@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Common;
+using Application.Contracts.CookingAssistant.Common;
 
-namespace PersonalAssistant.Application.Services.CookingAssistant
+namespace Application.Services.CookingAssistant
 {
     public class DailyIntakeHelper : IDailyIntakeHelper
     {

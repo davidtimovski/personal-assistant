@@ -15,15 +15,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Application.Contracts.Common.Models;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
-using PersonalAssistant.Domain.Entities.Common;
-using PersonalAssistant.Infrastructure.Identity;
-using PersonalAssistant.Infrastructure.Sender.Models;
+using Application.Contracts.Common;
+using Application.Contracts.Common.Models;
+using Application.Contracts.CookingAssistant.Ingredients;
+using Application.Contracts.CookingAssistant.Recipes;
+using Application.Contracts.CookingAssistant.Recipes.Models;
+using Domain.Entities.Common;
+using Infrastructure.Identity;
+using Infrastructure.Sender.Models;
 
 namespace Api.Controllers.CookingAssistant
 {
@@ -50,7 +49,6 @@ namespace Api.Controllers.CookingAssistant
         public RecipesController(
             IRecipeService recipeService,
             IIngredientService ingredientService,
-            ITaskService tasksService,
             IStringLocalizer<RecipesController> localizer,
             IWebHostEnvironment webHostEnvironment,
             ICdnService cdnService,

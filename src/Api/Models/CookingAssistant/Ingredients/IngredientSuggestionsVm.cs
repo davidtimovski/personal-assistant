@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients.Models;
+using Application.Contracts.CookingAssistant.Ingredients.Models;
 
 namespace Api.Models.CookingAssistant.Ingredients
 {

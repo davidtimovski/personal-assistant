@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using PersonalAssistant.Application.Contracts.Accountant.Common.Models;
-using PersonalAssistant.Application.Contracts.Accountant.Transactions.Models;
+using Application.Contracts.Accountant.Common.Models;
+using Application.Contracts.Accountant.Transactions.Models;
 
-namespace PersonalAssistant.Application.Contracts.Accountant.Transactions
+namespace Application.Contracts.Accountant.Transactions
 {
     public interface ITransactionService
     {

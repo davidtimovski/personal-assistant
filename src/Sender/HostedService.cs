@@ -9,14 +9,14 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Npgsql;
-using PersonalAssistant.Sender.Contracts;
+using Sender.Contracts;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using WebPush;
 
-namespace PersonalAssistant.Sender
+namespace Sender
 {
     public sealed class HostedService : IHostedService, IDisposable
     {
@@ -72,7 +72,7 @@ namespace PersonalAssistant.Sender
 
         private void SetupEmailQueue(IModel channel)
         {
-            async void received(object model, BasicDeliverEventArgs ea)
+            async void Received(object model, BasicDeliverEventArgs ea)
             {
                 var body = ea.Body;
                 var message = Encoding.UTF8.GetString(body.ToArray());
@@ -99,12 +99,12 @@ namespace PersonalAssistant.Sender
                 }
             }
 
-            SetupQueue("email_queue", received, channel);
+            SetupQueue("email_queue", Received, channel);
         }
 
         private void SetupPushNotificationQueue(IModel channel)
         {
-            async void received(object model, BasicDeliverEventArgs ea)
+            async void Received(object model, BasicDeliverEventArgs ea)
             {
                 var body = ea.Body;
                 string message = Encoding.UTF8.GetString(body.ToArray());
@@ -163,7 +163,7 @@ namespace PersonalAssistant.Sender
                 }
             }
 
-            SetupQueue("push_notification_queue", received, channel);
+            SetupQueue("push_notification_queue", Received, channel);
         }
 
         private static void SetupQueue(string queue, EventHandler<BasicDeliverEventArgs> received, IModel channel)

@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using FluentValidation;
 
-namespace PersonalAssistant.Application.Contracts.Common.Models
+namespace Application.Contracts.Common.Models
 {
     public class UploadTempImage
     {

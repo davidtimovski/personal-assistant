@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace PersonalAssistant.Auth.Migrations.IdentityServer.ConfigurationDb
+namespace Auth.Migrations.IdentityServer.ConfigurationDb
 {
     [DbContext(typeof(ConfigurationDbContext))]
     [Migration("20200516192503_InitialIdentityServerConfigurationDbMigration")]

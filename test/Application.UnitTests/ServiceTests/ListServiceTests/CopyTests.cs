@@ -1,20 +1,20 @@
 ﻿using System.Threading.Tasks;
 using FluentValidation;
 using Moq;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models;
-using PersonalAssistant.Application.Mappings;
-using PersonalAssistant.Application.Services.ToDoAssistant;
-using PersonalAssistant.Application.UnitTests.Builders;
-using PersonalAssistant.Domain.Entities.ToDoAssistant;
+using Application.Contracts.ToDoAssistant.Lists;
+using Application.Contracts.ToDoAssistant.Lists.Models;
+using Application.Mappings;
+using Application.Services.ToDoAssistant;
+using Application.UnitTests.Builders;
+using Domain.Entities.ToDoAssistant;
 using Xunit;
 
-namespace PersonalAssistant.Application.UnitTests.ServiceTests.ListServiceTests
+namespace Application.UnitTests.ServiceTests.ListServiceTests
 {
     public class CopyTests
     {
         private readonly Mock<IValidator<CopyList>> _successfulValidatorMock;
-        private readonly Mock<IListsRepository> _listsRepositoryMock = new Mock<IListsRepository>();
+        private readonly Mock<IListsRepository> _listsRepositoryMock = new();
         private readonly IListService _sut;
 
         public CopyTests()
@@ -53,7 +53,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.ListServiceTests
         {
             string actualName = null;
             _listsRepositoryMock.Setup(x => x.CopyAsync(It.IsAny<ToDoList>()))
-                .Callback<ToDoList>((l) => actualName = l.Name);
+                .Callback<ToDoList>(l => actualName = l.Name);
 
             CopyList model = new ListBuilder().WithName(" List name ").BuildCopyModel();
 

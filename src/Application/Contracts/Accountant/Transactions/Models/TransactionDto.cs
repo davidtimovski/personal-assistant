@@ -1,9 +1,9 @@
 ﻿using System;
 using AutoMapper;
-using PersonalAssistant.Application.Mappings;
-using PersonalAssistant.Domain.Entities.Accountant;
+using Application.Mappings;
+using Domain.Entities.Accountant;
 
-namespace PersonalAssistant.Application.Contracts.Accountant.Transactions.Models
+namespace Application.Contracts.Accountant.Transactions.Models
 {
     public class TransactionDto : IMapFrom<Transaction>
     {

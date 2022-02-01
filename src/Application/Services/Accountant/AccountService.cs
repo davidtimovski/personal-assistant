@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using PersonalAssistant.Application.Contracts.Accountant.Accounts;
-using PersonalAssistant.Application.Contracts.Accountant.Accounts.Models;
-using PersonalAssistant.Application.Contracts.Accountant.Common.Models;
-using PersonalAssistant.Domain.Entities.Accountant;
+using Application.Contracts.Accountant.Accounts;
+using Application.Contracts.Accountant.Accounts.Models;
+using Application.Contracts.Accountant.Common.Models;
+using Domain.Entities.Accountant;
 
-namespace PersonalAssistant.Application.Services.Accountant
+namespace Application.Services.Accountant
 {
     public class AccountService : IAccountService
     {

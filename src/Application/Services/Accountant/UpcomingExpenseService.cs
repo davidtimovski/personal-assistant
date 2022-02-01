@@ -3,31 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using PersonalAssistant.Application.Contracts.Accountant.Categories;
-using PersonalAssistant.Application.Contracts.Accountant.Common.Models;
-using PersonalAssistant.Application.Contracts.Accountant.Transactions;
-using PersonalAssistant.Application.Contracts.Accountant.UpcomingExpenses;
-using PersonalAssistant.Application.Contracts.Accountant.UpcomingExpenses.Models;
-using PersonalAssistant.Domain.Entities.Accountant;
+using Application.Contracts.Accountant.Categories;
+using Application.Contracts.Accountant.Common.Models;
+using Application.Contracts.Accountant.Transactions;
+using Application.Contracts.Accountant.UpcomingExpenses;
+using Application.Contracts.Accountant.UpcomingExpenses.Models;
+using Domain.Entities.Accountant;
 
-namespace PersonalAssistant.Application.Services.Accountant
+namespace Application.Services.Accountant
 {
     public class UpcomingExpenseService : IUpcomingExpenseService
     {
         private readonly IUpcomingExpensesRepository _upcomingExpensesRepository;
-        private readonly ICategoriesRepository _categoriesRepository;
-        private readonly ITransactionsRepository _transactionsRepository;
         private readonly IMapper _mapper;
 
         public UpcomingExpenseService(
             IUpcomingExpensesRepository upcomingExpensesRepository,
-            ICategoriesRepository categoriesRepository,
-            ITransactionsRepository transactionsRepository,
             IMapper mapper)
         {
             _upcomingExpensesRepository = upcomingExpensesRepository;
-            _categoriesRepository = categoriesRepository;
-            _transactionsRepository = transactionsRepository;
             _mapper = mapper;
         }
 

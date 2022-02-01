@@ -1,6 +1,6 @@
-﻿using PersonalAssistant.Domain.Entities.CookingAssistant;
+﻿using Domain.Entities.CookingAssistant;
 
-namespace PersonalAssistant.Domain.Entities.Common
+namespace Domain.Entities.Common
 {
     public class User
     {

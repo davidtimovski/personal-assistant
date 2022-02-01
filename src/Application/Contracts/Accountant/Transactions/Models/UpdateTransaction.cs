@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PersonalAssistant.Application.Contracts.Accountant.Transactions.Models
+namespace Application.Contracts.Accountant.Transactions.Models
 {
     public class UpdateTransaction : CreateTransaction
     {

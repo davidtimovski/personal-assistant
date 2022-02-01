@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CsvHelper;
 using CsvHelper.Configuration;
-using PersonalAssistant.Application.Contracts.Accountant.Accounts;
-using PersonalAssistant.Application.Contracts.Accountant.Common.Models;
-using PersonalAssistant.Application.Contracts.Accountant.Transactions;
-using PersonalAssistant.Application.Contracts.Accountant.Transactions.Models;
-using PersonalAssistant.Domain.Entities.Accountant;
+using Application.Contracts.Accountant.Accounts;
+using Application.Contracts.Accountant.Common.Models;
+using Application.Contracts.Accountant.Transactions;
+using Application.Contracts.Accountant.Transactions.Models;
+using Domain.Entities.Accountant;
 
-namespace PersonalAssistant.Application.Services.Accountant
+namespace Application.Services.Accountant
 {
     public class TransactionService : ITransactionService
     {
@@ -53,13 +53,13 @@ namespace PersonalAssistant.Application.Services.Accountant
             }
 
             if (model.FromAccountId.HasValue &&
-                !(_accountsRepository.Exists(model.FromAccountId.Value, model.UserId)))
+                !_accountsRepository.Exists(model.FromAccountId.Value, model.UserId))
             {
                 throw new ArgumentException("FromAccount doesn't belong to user with specified userId.");
             }
 
             if (model.ToAccountId.HasValue &&
-                !(_accountsRepository.Exists(model.ToAccountId.Value, model.UserId)))
+                !_accountsRepository.Exists(model.ToAccountId.Value, model.UserId))
             {
                 throw new ArgumentException("ToAccount doesn't belong to user with specified userId.");
             }
@@ -72,13 +72,13 @@ namespace PersonalAssistant.Application.Services.Accountant
         public async Task UpdateAsync(UpdateTransaction model)
         {
             if (model.FromAccountId.HasValue &&
-                !(_accountsRepository.Exists(model.FromAccountId.Value, model.UserId)))
+                !_accountsRepository.Exists(model.FromAccountId.Value, model.UserId))
             {
                 throw new ArgumentException("FromAccount doesn't belong to user with specified userId.");
             }
 
             if (model.ToAccountId.HasValue &&
-                !(_accountsRepository.Exists(model.ToAccountId.Value, model.UserId)))
+                !_accountsRepository.Exists(model.ToAccountId.Value, model.UserId))
             {
                 throw new ArgumentException("ToAccount doesn't belong to user with specified userId.");
             }
@@ -98,7 +98,7 @@ namespace PersonalAssistant.Application.Services.Accountant
             string fileName = model.FileId + ".csv";
             string tempFilePath = Path.Combine(model.Directory, fileName);
 
-            IEnumerable<Transaction> transactions = _transactionsRepository.GetAllForExport(model.UserId, model.Uncategorized);
+            IEnumerable<Transaction> transactions = _transactionsRepository.GetAllForExport(model.UserId, model.Uncategorized).ToList();
             foreach (var transaction in transactions)
             {
                 if (transaction.IsEncrypted)

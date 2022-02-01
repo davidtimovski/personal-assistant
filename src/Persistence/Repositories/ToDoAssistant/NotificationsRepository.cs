@@ -3,12 +3,11 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Persistence;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications;
-using PersonalAssistant.Domain.Entities.Common;
-using PersonalAssistant.Domain.Entities.ToDoAssistant;
+using Application.Contracts.ToDoAssistant.Notifications;
+using Domain.Entities.Common;
+using Domain.Entities.ToDoAssistant;
 
-namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
+namespace Persistence.Repositories.ToDoAssistant
 {
     public class NotificationsRepository : BaseRepository, INotificationsRepository
     {
@@ -19,18 +18,18 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
         {
             using IDbConnection conn = OpenConnection();
 
-            var sql = @"SELECT n.*, u.""Id"", u.""ImageUri""
+            const string query = @"SELECT n.*, u.""Id"", u.""ImageUri""
                             FROM ""ToDoAssistant.Notifications"" AS n
                             INNER JOIN ""AspNetUsers"" AS u ON n.""ActionUserId"" = u.""Id""
                             WHERE ""UserId"" = @UserId
                             ORDER BY ""ModifiedDate"" DESC";
 
-            var notifications = conn.Query<Notification, User, Notification>(sql,
+            var notifications = conn.Query<Notification, User, Notification>(query,
                 (notification, user) =>
                 {
                     notification.User = user;
                     return notification;
-                }, new { UserId = userId }, null, true);
+                }, new { UserId = userId }).ToList();
 
             // Flag unseen as seen
             var unseenNotificationIds = notifications.Where(x => !x.IsSeen).Select(x => x.Id).ToList();

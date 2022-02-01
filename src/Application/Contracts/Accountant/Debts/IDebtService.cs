@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using PersonalAssistant.Application.Contracts.Accountant.Common.Models;
-using PersonalAssistant.Application.Contracts.Accountant.Debts.Models;
+using Application.Contracts.Accountant.Common.Models;
+using Application.Contracts.Accountant.Debts.Models;
 
-namespace PersonalAssistant.Application.Contracts.Accountant.Debts
+namespace Application.Contracts.Accountant.Debts
 {
     public interface IDebtService
     {

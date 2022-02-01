@@ -4,16 +4,16 @@ using Api.Controllers.ToDoAssistant;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
-using PersonalAssistant.Api.UnitTests.Builders;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models;
+using Api.UnitTests.Builders;
+using Application.Contracts.ToDoAssistant.Lists;
+using Application.Contracts.ToDoAssistant.Lists.Models;
 using Xunit;
 
-namespace PersonalAssistant.Api.UnitTests.Controllers.ToDoAssistant
+namespace Api.UnitTests.Controllers.ToDoAssistant
 {
     public class ListsControllerTests
     {
-        private readonly Mock<IListService> _listServiceMock = new Mock<IListService>();
+        private readonly Mock<IListService> _listServiceMock = new();
         private readonly ListsController _sut;
 
         public ListsControllerTests()

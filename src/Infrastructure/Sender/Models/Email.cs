@@ -1,4 +1,4 @@
-﻿namespace PersonalAssistant.Infrastructure.Sender.Models
+﻿namespace Infrastructure.Sender.Models
 {
     public class Email
     {

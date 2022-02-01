@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PersonalAssistant.Application.Contracts.Accountant.UpcomingExpenses.Models
+namespace Application.Contracts.Accountant.UpcomingExpenses.Models
 {
     public class CreateUpcomingExpense
     {

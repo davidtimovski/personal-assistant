@@ -2,7 +2,7 @@
 using System.Data.Common;
 using System.Threading.Tasks;
 
-namespace PersonalAssistant.Application.Contracts.Accountant.Common
+namespace Application.Contracts.Accountant.Common
 {
     public interface IUnitOfWork
     {

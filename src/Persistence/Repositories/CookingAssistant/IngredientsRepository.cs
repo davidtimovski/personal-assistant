@@ -2,12 +2,11 @@
 using System.Data;
 using System.Threading.Tasks;
 using Dapper;
-using Persistence;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients;
-using PersonalAssistant.Domain.Entities.CookingAssistant;
-using PersonalAssistant.Domain.Entities.ToDoAssistant;
+using Application.Contracts.CookingAssistant.Ingredients;
+using Domain.Entities.CookingAssistant;
+using Domain.Entities.ToDoAssistant;
 
-namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
+namespace Persistence.Repositories.CookingAssistant
 {
     public class IngredientsRepository : BaseRepository, IIngredientsRepository
     {
@@ -89,7 +88,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
         {
             using IDbConnection conn = OpenConnection();
 
-            var sql = @"SELECT DISTINCT i.""Id"", CASE WHEN i.""TaskId"" IS NULL THEN t.""Id"" ELSE i.""TaskId"" END, t.""Name"", l.""Id"", l.""Name""
+            const string query = @"SELECT DISTINCT i.""Id"", CASE WHEN i.""TaskId"" IS NULL THEN t.""Id"" ELSE i.""TaskId"" END, t.""Name"", l.""Id"", l.""Name""
                         FROM ""ToDoAssistant.Tasks"" AS t
                         INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
                         LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
@@ -98,7 +97,7 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
 	                        AND (i.""Id"" IS NULL OR (i.""UserId"" = @UserId
 		                        AND (@RecipeId = 0 OR i.""Id"" NOT IN (SELECT ""IngredientId"" FROM ""CookingAssistant.RecipesIngredients"" WHERE ""RecipeId"" = @RecipeId))))";
 
-            return conn.Query<Ingredient, ToDoList, Ingredient>(sql,
+            return conn.Query<Ingredient, ToDoList, Ingredient>(query,
                 (ingredient, list) =>
                 {
                     ingredient.Task = new ToDoTask
@@ -106,14 +105,14 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                         List = list
                     };
                     return ingredient;
-                }, new { RecipeId = recipeId, UserId = userId }, null, true);
+                }, new { RecipeId = recipeId, UserId = userId });
         }
 
         public IEnumerable<ToDoTask> GetTaskSuggestions(int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            var sql = @"SELECT DISTINCT t.""Id"", t.""Name"", l.""Id"", l.""Name""
+            const string query = @"SELECT DISTINCT t.""Id"", t.""Name"", l.""Id"", l.""Name""
                         FROM ""ToDoAssistant.Tasks"" AS t
                         INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
                         LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
@@ -121,12 +120,12 @@ namespace PersonalAssistant.Persistence.Repositories.CookingAssistant
                         LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri on i.""Id"" = ri.""IngredientId""
                         WHERE l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")";
 
-            return conn.Query<ToDoTask, ToDoList, ToDoTask>(sql,
+            return conn.Query<ToDoTask, ToDoList, ToDoTask>(query,
                 (task, list) =>
                 {
                     task.List = list;
                     return task;
-                }, new { UserId = userId }, null, true);
+                }, new { UserId = userId });
         }
 
         public IEnumerable<Ingredient> GetIngredientSuggestions(int userId)

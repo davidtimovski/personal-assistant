@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using PersonalAssistant.Application.Contracts.Accountant.UpcomingExpenses;
-using PersonalAssistant.Application.Contracts.Accountant.UpcomingExpenses.Models;
-using PersonalAssistant.Infrastructure.Identity;
+using Application.Contracts.Accountant.UpcomingExpenses;
+using Application.Contracts.Accountant.UpcomingExpenses.Models;
+using Infrastructure.Identity;
 
 namespace Api.Controllers.Accountant
 {

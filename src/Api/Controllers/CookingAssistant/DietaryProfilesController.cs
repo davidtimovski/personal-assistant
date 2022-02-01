@@ -4,9 +4,9 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles;
-using PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles.Models;
-using PersonalAssistant.Infrastructure.Identity;
+using Application.Contracts.CookingAssistant.DietaryProfiles;
+using Application.Contracts.CookingAssistant.DietaryProfiles.Models;
+using Infrastructure.Identity;
 
 namespace Api.Controllers.CookingAssistant
 {
@@ -53,16 +53,6 @@ namespace Api.Controllers.CookingAssistant
             if (dto == null)
             {
                 return BadRequest();
-            }
-
-            int userId;
-            try
-            {
-                userId = IdentityHelper.GetUserId(User);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
             }
 
             RecommendedDailyIntake recommended = _dietaryProfileService.GetRecommendedDailyIntake(dto, _getRecommendedDailyIntakeValidator);

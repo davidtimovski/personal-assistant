@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models;
+using Application.Contracts.CookingAssistant.Recipes.Models;
 
-namespace PersonalAssistant.Application.UnitTests.Builders
+namespace Application.UnitTests.Builders
 {
     public class RecipeBuilder
     {
         private string name;
         private string description;
-        private List<UpdateRecipeIngredient> recipeIngredients = new List<UpdateRecipeIngredient>();
+        private List<UpdateRecipeIngredient> recipeIngredients = new();
         private string instructions;
         private TimeSpan? prepDuration;
         private TimeSpan? cookDuration;
@@ -28,11 +28,6 @@ namespace PersonalAssistant.Application.UnitTests.Builders
         {
             description = newDescription;
             return this;
-        }
-
-        public RecipeBuilder WithRecipeIngredients()
-        {
-            return WithRecipeIngredients("Dummy 1", "Dummy 2");
         }
 
         public RecipeBuilder WithRecipeIngredients(params string[] ingredientNames)

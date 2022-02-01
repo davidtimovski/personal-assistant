@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Identity;
 
-namespace PersonalAssistant.Infrastructure.Identity
+namespace Infrastructure.Identity
 {
     public class ApplicationUser : IdentityUser<int>
     {

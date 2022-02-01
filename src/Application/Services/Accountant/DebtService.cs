@@ -2,12 +2,12 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using PersonalAssistant.Application.Contracts.Accountant.Common.Models;
-using PersonalAssistant.Application.Contracts.Accountant.Debts;
-using PersonalAssistant.Application.Contracts.Accountant.Debts.Models;
-using PersonalAssistant.Domain.Entities.Accountant;
+using Application.Contracts.Accountant.Common.Models;
+using Application.Contracts.Accountant.Debts;
+using Application.Contracts.Accountant.Debts.Models;
+using Domain.Entities.Accountant;
 
-namespace PersonalAssistant.Application.Services.Accountant
+namespace Application.Services.Accountant
 {
     public class DebtService : IDebtService
     {

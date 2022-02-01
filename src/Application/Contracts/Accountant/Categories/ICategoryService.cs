@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using PersonalAssistant.Application.Contracts.Accountant.Categories.Models;
-using PersonalAssistant.Application.Contracts.Accountant.Common.Models;
+using Application.Contracts.Accountant.Categories.Models;
+using Application.Contracts.Accountant.Common.Models;
 
-namespace PersonalAssistant.Application.Contracts.Accountant.Categories
+namespace Application.Contracts.Accountant.Categories
 {
     public interface ICategoryService
     {

@@ -1,17 +1,17 @@
 ﻿using System.Threading.Tasks;
 using Moq;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models;
-using PersonalAssistant.Application.Mappings;
-using PersonalAssistant.Application.Services.ToDoAssistant;
-using PersonalAssistant.Domain.Entities.ToDoAssistant;
+using Application.Contracts.ToDoAssistant.Tasks;
+using Application.Contracts.ToDoAssistant.Tasks.Models;
+using Application.Mappings;
+using Application.Services.ToDoAssistant;
+using Domain.Entities.ToDoAssistant;
 using Xunit;
 
-namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
+namespace Application.UnitTests.ServiceTests.TaskServiceTests
 {
     public class UncompleteTests
     {
-        private readonly Mock<ITasksRepository> _tasksRepositoryMock = new Mock<ITasksRepository>();
+        private readonly Mock<ITasksRepository> _tasksRepositoryMock = new();
         private readonly ITaskService _sut;
 
         public UncompleteTests()

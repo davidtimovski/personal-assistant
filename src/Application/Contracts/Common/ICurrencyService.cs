@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace PersonalAssistant.Application.Contracts.Common
+namespace Application.Contracts.Common
 {
     public interface ICurrencyService
     {

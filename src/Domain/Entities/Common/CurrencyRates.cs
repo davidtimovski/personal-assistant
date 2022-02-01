@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PersonalAssistant.Domain.Entities.Common
+namespace Domain.Entities.Common
 {
     public class CurrencyRates
     {

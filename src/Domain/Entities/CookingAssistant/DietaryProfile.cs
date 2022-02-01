@@ -1,7 +1,7 @@
 ﻿using System;
-using PersonalAssistant.Domain.Entities.Common;
+using Domain.Entities.Common;
 
-namespace PersonalAssistant.Domain.Entities.CookingAssistant
+namespace Domain.Entities.CookingAssistant
 {
     public class DietaryProfile : Entity
     {

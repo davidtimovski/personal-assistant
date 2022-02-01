@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
-using PersonalAssistant.Infrastructure.Identity;
+using Infrastructure.Identity;
 
 namespace Auth.Services
 {

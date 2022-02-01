@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using PersonalAssistant.Application.Contracts.Accountant.Sync.Models;
+using Application.Contracts.Accountant.Sync.Models;
 
-namespace PersonalAssistant.Application.Contracts.Accountant.Common
+namespace Application.Contracts.Accountant.Sync
 {
     public interface ISyncService
     {

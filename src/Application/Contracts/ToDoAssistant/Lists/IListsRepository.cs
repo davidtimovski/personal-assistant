@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PersonalAssistant.Domain.Entities;
-using PersonalAssistant.Domain.Entities.Common;
-using PersonalAssistant.Domain.Entities.ToDoAssistant;
+using Domain.Entities;
+using Domain.Entities.Common;
+using Domain.Entities.ToDoAssistant;
 
-namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists
+namespace Application.Contracts.ToDoAssistant.Lists
 {
     public interface IListsRepository
     {

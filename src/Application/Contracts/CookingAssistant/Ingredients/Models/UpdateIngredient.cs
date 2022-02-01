@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
+using Application.Contracts.ToDoAssistant.Tasks;
 
-namespace PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients.Models
+namespace Application.Contracts.CookingAssistant.Ingredients.Models
 {
     public class UpdateIngredient
     {

@@ -4,11 +4,10 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Persistence;
-using PersonalAssistant.Application.Contracts.Accountant.Categories;
-using PersonalAssistant.Domain.Entities.Accountant;
+using Application.Contracts.Accountant.Categories;
+using Domain.Entities.Accountant;
 
-namespace PersonalAssistant.Persistence.Repositories.Accountant
+namespace Persistence.Repositories.Accountant
 {
     public class CategoriesRepository : BaseRepository, ICategoriesRepository
     {
@@ -34,7 +33,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
         public async Task<int> CreateAsync(Category category, IDbConnection uowConn = null, IDbTransaction uowTransaction = null)
         {
             int id;
-            var query = @"INSERT INTO ""Accountant.Categories"" (""ParentId"", ""UserId"", ""Name"", ""Type"", ""GenerateUpcomingExpense"", ""IsTax"", ""CreatedDate"", ""ModifiedDate"")
+            const string query = @"INSERT INTO ""Accountant.Categories"" (""ParentId"", ""UserId"", ""Name"", ""Type"", ""GenerateUpcomingExpense"", ""IsTax"", ""CreatedDate"", ""ModifiedDate"")
                           VALUES (@ParentId, @UserId, @Name, @Type, @GenerateUpcomingExpense, @IsTax, @CreatedDate, @ModifiedDate) returning ""Id""";
 
             if (uowConn == null && uowTransaction == null)

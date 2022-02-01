@@ -6,9 +6,9 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients.Models;
-using PersonalAssistant.Infrastructure.Identity;
+using Application.Contracts.CookingAssistant.Ingredients;
+using Application.Contracts.CookingAssistant.Ingredients.Models;
+using Infrastructure.Identity;
 
 namespace Api.Controllers.CookingAssistant
 {

@@ -1,7 +1,7 @@
-﻿using PersonalAssistant.Domain.Entities.ToDoAssistant;
+﻿using Domain.Entities.ToDoAssistant;
 using System.Collections.Generic;
 
-namespace PersonalAssistant.Domain.Entities.CookingAssistant
+namespace Domain.Entities.CookingAssistant
 {
     public class Ingredient : Entity
     {

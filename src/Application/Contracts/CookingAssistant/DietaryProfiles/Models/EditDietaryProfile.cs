@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using PersonalAssistant.Application.Mappings;
-using PersonalAssistant.Domain.Entities.CookingAssistant;
+using Application.Mappings;
+using Domain.Entities.CookingAssistant;
 
-namespace PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles.Models
+namespace Application.Contracts.CookingAssistant.DietaryProfiles.Models
 {
     public class EditDietaryProfile : IMapFrom<DietaryProfile>
     {

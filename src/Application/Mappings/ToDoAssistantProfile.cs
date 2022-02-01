@@ -1,14 +1,14 @@
 ﻿using System.Linq;
 using AutoMapper;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Application.Contracts.Common.Models;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications.Models;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models;
-using PersonalAssistant.Domain.Entities.Common;
-using PersonalAssistant.Domain.Entities.ToDoAssistant;
+using Application.Contracts.Common;
+using Application.Contracts.Common.Models;
+using Application.Contracts.ToDoAssistant.Lists.Models;
+using Application.Contracts.ToDoAssistant.Notifications.Models;
+using Application.Contracts.ToDoAssistant.Tasks.Models;
+using Domain.Entities.Common;
+using Domain.Entities.ToDoAssistant;
 
-namespace PersonalAssistant.Application.Mappings
+namespace Application.Mappings
 {
     public class ToDoAssistantProfile : Profile
     {

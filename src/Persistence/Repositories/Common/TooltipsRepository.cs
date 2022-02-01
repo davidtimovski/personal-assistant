@@ -2,11 +2,10 @@
 using System.Data;
 using System.Threading.Tasks;
 using Dapper;
-using Persistence;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Domain.Entities.Common;
+using Application.Contracts.Common;
+using Domain.Entities.Common;
 
-namespace PersonalAssistant.Persistence.Repositories.Common
+namespace Persistence.Repositories.Common
 {
     public class TooltipsRepository : BaseRepository, ITooltipsRepository
     {

@@ -2,16 +2,16 @@
 using FluentValidation;
 using Microsoft.Extensions.Options;
 using Moq;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Common;
-using PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles;
-using PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles.Models;
-using PersonalAssistant.Application.Mappings;
-using PersonalAssistant.Application.Services.CookingAssistant;
-using PersonalAssistant.Application.UnitTests.Builders;
+using Application.Contracts.CookingAssistant.Common;
+using Application.Contracts.CookingAssistant.DietaryProfiles;
+using Application.Contracts.CookingAssistant.DietaryProfiles.Models;
+using Application.Mappings;
+using Application.Services.CookingAssistant;
+using Application.UnitTests.Builders;
 using Utility;
 using Xunit;
 
-namespace PersonalAssistant.Application.UnitTests.ServiceTests.DietaryProfileServiceTests
+namespace Application.UnitTests.ServiceTests.DietaryProfileServiceTests
 {
     public class GetRecommendedDailyIntakeTests
     {

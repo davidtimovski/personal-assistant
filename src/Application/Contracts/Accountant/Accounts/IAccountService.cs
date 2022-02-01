@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using PersonalAssistant.Application.Contracts.Accountant.Accounts.Models;
-using PersonalAssistant.Application.Contracts.Accountant.Common.Models;
+using Application.Contracts.Accountant.Accounts.Models;
+using Application.Contracts.Accountant.Common.Models;
 
-namespace PersonalAssistant.Application.Contracts.Accountant.Accounts
+namespace Application.Contracts.Accountant.Accounts
 {
     public interface IAccountService
     {

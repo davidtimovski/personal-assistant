@@ -2,12 +2,12 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using PersonalAssistant.Application.Contracts.Accountant.Categories;
-using PersonalAssistant.Application.Contracts.Accountant.Categories.Models;
-using PersonalAssistant.Application.Contracts.Accountant.Common.Models;
-using PersonalAssistant.Domain.Entities.Accountant;
+using Application.Contracts.Accountant.Categories;
+using Application.Contracts.Accountant.Categories.Models;
+using Application.Contracts.Accountant.Common.Models;
+using Domain.Entities.Accountant;
 
-namespace PersonalAssistant.Application.Services.Accountant
+namespace Application.Services.Accountant
 {
     public class CategoryService : ICategoryService
     {

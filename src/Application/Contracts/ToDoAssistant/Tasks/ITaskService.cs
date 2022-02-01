@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentValidation;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models;
+using Application.Contracts.ToDoAssistant.Tasks.Models;
 
-namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks
+namespace Application.Contracts.ToDoAssistant.Tasks
 {
     public interface ITaskService
     {

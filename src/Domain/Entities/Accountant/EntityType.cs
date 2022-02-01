@@ -1,4 +1,4 @@
-﻿namespace PersonalAssistant.Domain.Entities.Accountant
+﻿namespace Domain.Entities.Accountant
 {
     public enum EntityType
     {

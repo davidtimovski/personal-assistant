@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PersonalAssistant.Application.Contracts.CookingAssistant.Common
+﻿namespace Application.Contracts.CookingAssistant.Common
 {
     public interface IDailyIntakeHelper
     {

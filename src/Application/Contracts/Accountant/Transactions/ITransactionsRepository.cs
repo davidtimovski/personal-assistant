@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
-using PersonalAssistant.Domain.Entities.Accountant;
-using PersonalAssistant.Domain.Entities.Common;
+using Domain.Entities.Accountant;
+using Domain.Entities.Common;
 
-namespace PersonalAssistant.Application.Contracts.Accountant.Transactions
+namespace Application.Contracts.Accountant.Transactions
 {
     public interface ITransactionsRepository
     {

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using PersonalAssistant.Application.Mappings;
+using Application.Mappings;
 
-namespace PersonalAssistant.Application.UnitTests.Mappings
+namespace Application.UnitTests.Mappings
 {
     public class MappingTestsFixture
     {

@@ -1,8 +1,7 @@
 ﻿using System.Data;
-using Persistence;
-using PersonalAssistant.Application.Contracts.Accountant.Common;
+using Application.Contracts.Accountant.Common;
 
-namespace PersonalAssistant.Persistence.Repositories.Accountant
+namespace Persistence.Repositories.Accountant
 {
     public class UnitOfWork : BaseRepository, IUnitOfWork
     {

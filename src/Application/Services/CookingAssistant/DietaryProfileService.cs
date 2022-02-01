@@ -6,14 +6,14 @@ using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.Extensions.Options;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Common;
-using PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles;
-using PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles.Models;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models;
-using PersonalAssistant.Domain.Entities.CookingAssistant;
+using Application.Contracts.CookingAssistant.Common;
+using Application.Contracts.CookingAssistant.DietaryProfiles;
+using Application.Contracts.CookingAssistant.DietaryProfiles.Models;
+using Application.Contracts.CookingAssistant.Recipes.Models;
+using Domain.Entities.CookingAssistant;
 using Utility;
 
-namespace PersonalAssistant.Application.Services.CookingAssistant
+namespace Application.Services.CookingAssistant
 {
     public class DietaryProfileService : IDietaryProfileService
     {
@@ -581,7 +581,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             }
         }
 
-        private void ValidateAndThrow<T>(T model, IValidator<T> validator)
+        private static void ValidateAndThrow<T>(T model, IValidator<T> validator)
         {
             ValidationResult result = validator.Validate(model);
             if (!result.IsValid)

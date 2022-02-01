@@ -11,11 +11,11 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Npgsql;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Domain.Entities.Accountant;
-using PersonalAssistant.Domain.Entities.Common;
+using Application.Contracts.Common;
+using Domain.Entities.Accountant;
+using Domain.Entities.Common;
 
-namespace PersonalAssistant.Worker
+namespace Worker
 {
     public class MidnightWorker : BackgroundService
     {
@@ -44,22 +44,24 @@ namespace PersonalAssistant.Worker
             while (!stoppingToken.IsCancellationRequested)
             {
                 var currentTime = DateTime.UtcNow;
-                if (currentTime.Hour == 0 && currentTime.Minute == 0)
+                if (currentTime.Hour != 0 || currentTime.Minute != 0)
                 {
-                    await GetAndSaveCurrencyRates(currentTime);
+                    continue;
+                }
+                
+                await GetAndSaveCurrencyRates(currentTime);
 
 #if !DEBUG
                     await DeleteTemporaryCdnResourcesAsync();
 #endif
 
-                    await DeleteOldNotificationsAsync();
-                    await DeleteOldDeletedEntityEntriesAsync();
-                    await GenerateUpcomingExpenses();
+                await DeleteOldNotificationsAsync();
+                await DeleteOldDeletedEntityEntriesAsync();
+                await GenerateUpcomingExpenses();
 
-                    _logger.LogInformation("Midnight worker run successful.");
+                _logger.LogInformation("Midnight worker run successful.");
 
-                    await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
-                }
+                await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
             }
         }
 
@@ -145,7 +147,7 @@ namespace PersonalAssistant.Worker
                 return currency;
             }
 
-            bool shouldGenerate(IEnumerable<Transaction> expenses)
+            bool ShouldGenerate(IReadOnlyCollection<Transaction> expenses)
             {
                 if (!expenses.Any())
                 {
@@ -203,9 +205,9 @@ namespace PersonalAssistant.Worker
                                                                  AND ""CategoryId"" = @CategoryId 
                                                                  AND ""Date"" >= @From AND ""Date"" < @To 
                                                                  AND ""FromAccountId"" IS NOT NULL AND ""ToAccountId"" IS NULL",
-                                                             new { category.UserId, CategoryId = category.Id, From = threeMonthsAgo, To = firstOfThisMonth });
+                                                             new { category.UserId, CategoryId = category.Id, From = threeMonthsAgo, To = firstOfThisMonth }).ToList();
 
-                    if (shouldGenerate(expenses))
+                    if (ShouldGenerate(expenses))
                     {
                         decimal sum = expenses.Sum(x => x.Amount);
                         int months = expenses.GroupBy(x => x.Date.ToString("yyyy-MM")).Count();

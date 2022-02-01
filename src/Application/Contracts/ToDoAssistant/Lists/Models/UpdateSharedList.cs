@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models
+namespace Application.Contracts.ToDoAssistant.Lists.Models
 {
     public class UpdateSharedList
     {

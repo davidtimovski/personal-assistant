@@ -1,20 +1,20 @@
 ﻿using System.Threading.Tasks;
 using FluentValidation;
 using Moq;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients.Models;
-using PersonalAssistant.Application.Mappings;
-using PersonalAssistant.Application.Services.CookingAssistant;
-using PersonalAssistant.Application.UnitTests.Builders;
-using PersonalAssistant.Domain.Entities.CookingAssistant;
+using Application.Contracts.CookingAssistant.Ingredients;
+using Application.Contracts.CookingAssistant.Ingredients.Models;
+using Application.Mappings;
+using Application.Services.CookingAssistant;
+using Application.UnitTests.Builders;
+using Domain.Entities.CookingAssistant;
 using Xunit;
 
-namespace PersonalAssistant.Application.UnitTests.ServiceTests.IngredientServiceTests
+namespace Application.UnitTests.ServiceTests.IngredientServiceTests
 {
     public class UpdateTests
     {
         private readonly Mock<IValidator<UpdateIngredient>> _successfulValidatorMock;
-        private readonly Mock<IIngredientsRepository> _ingredientsRepositoryMock = new Mock<IIngredientsRepository>();
+        private readonly Mock<IIngredientsRepository> _ingredientsRepositoryMock = new();
         private readonly IIngredientService _sut;
 
         public UpdateTests()
@@ -22,7 +22,6 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.IngredientService
             _successfulValidatorMock = ValidatorMocker.GetSuccessful<UpdateIngredient>();
 
             _sut = new IngredientService(
-                null,
                 _ingredientsRepositoryMock.Object,
                 MapperMocker.GetMapper<CookingAssistantProfile>());
         }
@@ -51,7 +50,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.IngredientService
         {
             string actualName = null;
             _ingredientsRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Ingredient>()))
-                .Callback<Ingredient>((i) => actualName = i.Name);
+                .Callback<Ingredient>(i => actualName = i.Name);
 
             UpdateIngredient model = new IngredientBuilder().WithName(" Ingredient name ").BuildUpdateModel();
 
@@ -66,7 +65,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.IngredientService
         {
             string actualName = null;
             _ingredientsRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Ingredient>()))
-                .Callback<Ingredient>((i) => actualName = i.Name);
+                .Callback<Ingredient>(i => actualName = i.Name);
 
             UpdateIngredient model = new IngredientBuilder().WithTaskId().BuildUpdateModel();
 

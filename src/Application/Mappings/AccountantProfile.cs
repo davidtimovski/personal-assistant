@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
-using PersonalAssistant.Application.Contracts.Accountant.Accounts.Models;
-using PersonalAssistant.Application.Contracts.Accountant.Categories.Models;
-using PersonalAssistant.Application.Contracts.Accountant.Debts.Models;
-using PersonalAssistant.Application.Contracts.Accountant.Transactions.Models;
-using PersonalAssistant.Application.Contracts.Accountant.UpcomingExpenses.Models;
-using PersonalAssistant.Domain.Entities.Accountant;
+using Application.Contracts.Accountant.Accounts.Models;
+using Application.Contracts.Accountant.Categories.Models;
+using Application.Contracts.Accountant.Debts.Models;
+using Application.Contracts.Accountant.Transactions.Models;
+using Application.Contracts.Accountant.UpcomingExpenses.Models;
+using Domain.Entities.Accountant;
 
-namespace PersonalAssistant.Application.Mappings
+namespace Application.Mappings
 {
     public class AccountantProfile : Profile
     {

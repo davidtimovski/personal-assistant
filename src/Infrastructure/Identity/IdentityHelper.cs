@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Claims;
 
-namespace PersonalAssistant.Infrastructure.Identity
+namespace Infrastructure.Identity
 {
     public static class IdentityHelper
     {

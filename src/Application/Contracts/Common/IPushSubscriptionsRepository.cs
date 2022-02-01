@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using PersonalAssistant.Domain.Entities;
-using PersonalAssistant.Domain.Entities.Common;
+﻿using System.Threading.Tasks;
+using Domain.Entities.Common;
 
-namespace PersonalAssistant.Application.Contracts.Common
+namespace Application.Contracts.Common
 {
     public interface IPushSubscriptionsRepository
     {

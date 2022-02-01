@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentValidation;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models;
-using PersonalAssistant.Domain.Entities.Common;
+using Application.Contracts.ToDoAssistant.Lists.Models;
+using Domain.Entities.Common;
 
-namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists
+namespace Application.Contracts.ToDoAssistant.Lists
 {
     public interface IListService
     {

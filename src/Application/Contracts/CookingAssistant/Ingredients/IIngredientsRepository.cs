@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using PersonalAssistant.Domain.Entities.CookingAssistant;
-using PersonalAssistant.Domain.Entities.ToDoAssistant;
+using Domain.Entities.CookingAssistant;
+using Domain.Entities.ToDoAssistant;
 
-namespace PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients
+namespace Application.Contracts.CookingAssistant.Ingredients
 {
     public interface IIngredientsRepository
     {

@@ -6,21 +6,18 @@ using System.Threading.Tasks;
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Application.Contracts.Common.Models;
-using PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
-using PersonalAssistant.Domain.Entities.Common;
-using PersonalAssistant.Domain.Entities.CookingAssistant;
+using Application.Contracts.Common;
+using Application.Contracts.Common.Models;
+using Application.Contracts.CookingAssistant.DietaryProfiles;
+using Application.Contracts.CookingAssistant.Recipes;
+using Application.Contracts.CookingAssistant.Recipes.Models;
+using Domain.Entities.CookingAssistant;
 using Utility;
 
-namespace PersonalAssistant.Application.Services.CookingAssistant
+namespace Application.Services.CookingAssistant
 {
     public class RecipeService : IRecipeService
     {
-        private readonly ITaskService _taskService;
         private readonly IDietaryProfileService _dietaryProfileService;
         private readonly IConversion _conversion;
         private readonly ICurrencyService _currencyService;
@@ -30,7 +27,6 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
         private readonly IMapper _mapper;
 
         public RecipeService(
-            ITaskService taskService,
             IDietaryProfileService dietaryProfileService,
             IConversion conversion,
             ICurrencyService currencyService,
@@ -39,7 +35,6 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             IRecipesRepository recipesRepository,
             IMapper mapper)
         {
-            _taskService = taskService;
             _dietaryProfileService = dietaryProfileService;
             _conversion = conversion;
             _currencyService = currencyService;
@@ -51,9 +46,9 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
         public IEnumerable<SimpleRecipe> GetAll(int userId)
         {
-            IEnumerable<Recipe> recipes = _recipesRepository.GetAll(userId);
+            List<Recipe> recipes = _recipesRepository.GetAll(userId).ToList();
 
-            var result = new List<SimpleRecipe>(recipes.Count());
+            var result = new List<SimpleRecipe>(recipes.Count);
             foreach (Recipe recipe in recipes)
             {
                 var simpleRecipe = _mapper.Map<SimpleRecipe>(recipe, opts => { opts.Items["UserId"] = userId; });
@@ -197,12 +192,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
         {
             return _recipesRepository.GetAllImageUris(userId);
         }
-
-        public string GetImageUri(int id)
-        {
-            return _recipesRepository.GetImageUri(id);
-        }
-
+        
         public bool Exists(int id, int userId)
         {
             return _recipesRepository.Exists(id, userId);
@@ -233,24 +223,9 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             return _recipesRepository.CheckSendRequest(recipeId, sendToId, userId);
         }
 
-        public IEnumerable<User> GetUsersToBeNotifiedOfRecipeChange(int id, int excludeUserId)
-        {
-            return _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(id, excludeUserId);
-        }
-
         public bool CheckIfUserCanBeNotifiedOfRecipeChange(int id, int userId)
         {
             return _recipesRepository.CheckIfUserCanBeNotifiedOfRecipeChange(id, userId);
-        }
-
-        public IEnumerable<User> GetUsersToBeNotifiedOfRecipeDeletion(int id)
-        {
-            return _recipesRepository.GetUsersToBeNotifiedOfRecipeDeletion(id);
-        }
-
-        public IEnumerable<User> GetUsersToBeNotifiedOfRecipeSent(int id)
-        {
-            return _recipesRepository.GetUsersToBeNotifiedOfRecipeSent(id);
         }
 
         public async Task<int> CreateAsync(CreateRecipe model, IValidator<CreateRecipe> validator)
@@ -445,7 +420,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
                 }
             }
 
-            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(model.Id, model.UserId);
+            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(model.Id, model.UserId).ToList();
             if (!usersToBeNotified.Any())
             {
                 return new UpdateRecipeResult();
@@ -477,7 +452,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
                 await _cdnService.DeleteAsync($"users/{userId}/recipes/{imageUri}");
             }
 
-            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeDeletion(id);
+            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeDeletion(id).ToList();;
             if (!usersToBeNotified.Any())
             {
                 return new DeleteRecipeResult();
@@ -530,7 +505,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
         {
             await _recipesRepository.SetShareIsAcceptedAsync(recipeId, userId, isAccepted, DateTime.UtcNow);
 
-            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(recipeId, userId);
+            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(recipeId, userId).ToList();;
             if (!usersToBeNotified.Any())
             {
                 return new SetShareIsAcceptedResult();
@@ -557,7 +532,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
                 return new LeaveRecipeResult();
             }
 
-            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(id, userId);
+            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(id, userId).ToList();;
             if (!usersToBeNotified.Any())
             {
                 return new LeaveRecipeResult();
@@ -604,7 +579,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
             await _recipesRepository.CreateSendRequestsAsync(sendRequests);
 
-            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeSent(model.RecipeId);
+            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeSent(model.RecipeId).ToList();;
             if (!usersToBeNotified.Any())
             {
                 return new SendRecipeResult();
@@ -646,6 +621,8 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
         public async Task<int> ImportAsync(ImportRecipe model, IValidator<ImportRecipe> validator)
         {
+            ValidateAndThrow(model, validator);
+            
             var ingredientReplacements = model.IngredientReplacements
                 .Select(x => (x.Id, x.ReplacementId, x.TransferNutritionData, x.TransferPriceData));
 
@@ -679,7 +656,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
         private RecipeCostSummary CalculateCostSummary(Recipe recipe, string currency)
         {
-            decimal? addPricePerAmount(decimal? currentValue, decimal priceInGrams, short productSizeGrams, bool productSizeIsOneUnit, float amount, string unit)
+            decimal? AddPricePerAmount(decimal? currentValue, decimal priceInGrams, short productSizeGrams, bool productSizeIsOneUnit, float amount, string unit)
             {
                 if (productSizeIsOneUnit)
                 {
@@ -710,7 +687,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
                 decimal price = _currencyService.Convert(recipeIngredient.Ingredient.Price.Value, recipeIngredient.Ingredient.Currency, currency, DateTime.UtcNow.Date);
 
-                costSummary.Cost = addPricePerAmount(costSummary.Cost, price, productSize, productSizeIsOneUnit, amount, unit);
+                costSummary.Cost = AddPricePerAmount(costSummary.Cost, price, productSize, productSizeIsOneUnit, amount, unit);
             }
 
             if (costSummary.Cost.HasValue)
@@ -721,8 +698,13 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
 
             return costSummary;
         }
+        
+        private string GetImageUri(int id)
+        {
+            return _recipesRepository.GetImageUri(id);
+        }
 
-        private void ValidateAndThrow<T>(T model, IValidator<T> validator)
+        private static void ValidateAndThrow<T>(T model, IValidator<T> validator)
         {
             ValidationResult result = validator.Validate(model);
             if (!result.IsValid)

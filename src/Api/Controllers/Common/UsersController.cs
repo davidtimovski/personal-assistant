@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Application.Contracts.Common.Models;
-using PersonalAssistant.Infrastructure.Identity;
+using Application.Contracts.Common;
+using Application.Contracts.Common.Models;
+using Infrastructure.Identity;
 
 namespace Api.Controllers.Common
 {
@@ -15,14 +15,10 @@ namespace Api.Controllers.Common
     public class UsersController : Controller
     {
         private readonly IUserService _userService;
-        private readonly ICdnService _cdnService;
 
-        public UsersController(
-            IUserService userService,
-            ICdnService cdnService)
+        public UsersController(IUserService userService)
         {
             _userService = userService;
-            _cdnService = cdnService;
         }
 
         [HttpGet("language")]

@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Api.Controllers.CookingAssistant;
 using Microsoft.AspNetCore.Mvc;
-using PersonalAssistant.Api.UnitTests.Builders;
+using Api.UnitTests.Builders;
 using Xunit;
 
-namespace PersonalAssistant.Api.UnitTests.Controllers.CookingAssistant
+namespace Api.UnitTests.Controllers.CookingAssistant
 {
     public class DietaryProfilesControllerTests
     {

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using AutoMapper;
-using PersonalAssistant.Application.Mappings;
-using PersonalAssistant.Domain.Entities.CookingAssistant;
+using Application.Mappings;
+using Domain.Entities.CookingAssistant;
 
-namespace PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients.Models
+namespace Application.Contracts.CookingAssistant.Ingredients.Models
 {
     public class EditIngredient : IMapFrom<Ingredient>
     {

@@ -5,27 +5,23 @@ using System.Threading.Tasks;
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients.Models;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
-using PersonalAssistant.Domain.Entities.CookingAssistant;
-using PersonalAssistant.Domain.Entities.ToDoAssistant;
+using Application.Contracts.CookingAssistant.Ingredients;
+using Application.Contracts.CookingAssistant.Ingredients.Models;
+using Application.Contracts.CookingAssistant.Recipes.Models;
+using Domain.Entities.CookingAssistant;
+using Domain.Entities.ToDoAssistant;
 
-namespace PersonalAssistant.Application.Services.CookingAssistant
+namespace Application.Services.CookingAssistant
 {
     public class IngredientService : IIngredientService
     {
-        private readonly ITaskService _taskService;
         private readonly IIngredientsRepository _ingredientsRepository;
         private readonly IMapper _mapper;
 
         public IngredientService(
-            ITaskService taskService,
             IIngredientsRepository ingredientsRepository,
             IMapper mapper)
         {
-            _taskService = taskService;
             _ingredientsRepository = ingredientsRepository;
             _mapper = mapper;
         }
@@ -70,15 +66,6 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
         public IEnumerable<IngredientSuggestion> GetTaskSuggestions(int recipeId, int userId)
         {
             IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetTaskSuggestions(recipeId, userId);
-
-            var result = ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x));
-
-            return result;
-        }
-
-        public IEnumerable<IngredientSuggestion> GetIngredientSuggestions(int userId)
-        {
-            IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetIngredientSuggestions(userId);
 
             var result = ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x));
 
@@ -139,7 +126,7 @@ namespace PersonalAssistant.Application.Services.CookingAssistant
             await _ingredientsRepository.DeleteAsync(id);
         }
 
-        private void ValidateAndThrow<T>(T model, IValidator<T> validator)
+        private static void ValidateAndThrow<T>(T model, IValidator<T> validator)
         {
             ValidationResult result = validator.Validate(model);
             if (!result.IsValid)

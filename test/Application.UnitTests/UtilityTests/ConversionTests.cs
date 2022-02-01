@@ -1,13 +1,13 @@
 ﻿using Utility;
 using Xunit;
 
-namespace PersonalAssistant.Application.UnitTests.ServiceTests
+namespace Application.UnitTests.UtilityTests
 {
-    public class ConvertionTests
+    public class ConversionTests
     {
         private readonly IConversion _sut;
 
-        public ConvertionTests()
+        public ConversionTests()
         {
             _sut = new Conversion();
         }

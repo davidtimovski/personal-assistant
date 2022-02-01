@@ -29,7 +29,7 @@ type Conversion() =
     let centimetersPerInch = 2.54f<cm/inch>
 
     interface IConversion with
-        member __.ToGrams(unit: string, amount: float32) =
+        member _.ToGrams(unit: string, amount: float32) =
             match unit with
             | "oz" -> (gramsPerOunce * amount) |> float32
             | "cup" -> (gramsPerCup * amount) |> float32
@@ -37,7 +37,7 @@ type Conversion() =
             | "tsp" -> (gramsPerTeaspoon * amount) |> float32
             | _ -> amount
 
-        member __.ToMilligrams(unit: string, amount: float32) =
+        member _.ToMilligrams(unit: string, amount: float32) =
             match unit with
             | "oz" -> (gramsPerOunce * amount * 1000f) |> float32
             | "cup" -> (gramsPerCup * amount * 1000f) |> float32
@@ -45,20 +45,20 @@ type Conversion() =
             | "tsp" -> (gramsPerTeaspoon * amount * 1000f) |> float32
             | _ -> amount * 1000f
 
-        member __.FeetAndInchesToCentimeters(feet: float32, inches: float32) =
+        member _.FeetAndInchesToCentimeters(feet: float32, inches: float32) =
             let feetInCm = (feet * centimetersPerFoot) |> float32
             let inchesInCm = (inches * centimetersPerInch) |> float32
             feetInCm + inchesInCm
 
-        member __.CentimetersToFeetAndInches(centimeters: float32) =
+        member _.CentimetersToFeetAndInches(centimeters: float32) =
             let totalInches = floor ((centimeters / centimetersPerInch) |> float32)
             let feet = (totalInches - totalInches % 12f) / 12f
             let inches = totalInches % 12f
             (feet, inches)
 
-        member __.PoundsToKilos(pounds: float32) =
+        member _.PoundsToKilos(pounds: float32) =
             (pounds / poundsPerKilo) |> float32
 
-        member __.KilosToPounds(kilos: float32) =
+        member _.KilosToPounds(kilos: float32) =
             let pounds = (kilos * poundsPerKilo) |> float32
             round pounds

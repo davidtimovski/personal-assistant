@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using PersonalAssistant.Application.Contracts.Common.Models;
+using Application.Contracts.Common.Models;
 
-namespace PersonalAssistant.Application.Contracts.Common
+namespace Application.Contracts.Common
 {
     public interface ITooltipService
     {

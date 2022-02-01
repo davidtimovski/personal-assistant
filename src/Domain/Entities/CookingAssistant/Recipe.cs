@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using PersonalAssistant.Domain.Entities.Common;
+using Domain.Entities.Common;
 
-namespace PersonalAssistant.Domain.Entities.CookingAssistant
+namespace Domain.Entities.CookingAssistant
 {
     public class Recipe
     {

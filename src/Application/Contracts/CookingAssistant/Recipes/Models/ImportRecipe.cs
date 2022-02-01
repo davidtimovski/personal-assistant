@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using FluentValidation;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients;
+using Application.Contracts.CookingAssistant.Ingredients;
 
-namespace PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models
+namespace Application.Contracts.CookingAssistant.Recipes.Models
 {
     public class ImportRecipe
     {

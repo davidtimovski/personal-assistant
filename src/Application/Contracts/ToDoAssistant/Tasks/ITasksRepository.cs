@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PersonalAssistant.Domain.Entities.ToDoAssistant;
+using Domain.Entities.ToDoAssistant;
 
-namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks
+namespace Application.Contracts.ToDoAssistant.Tasks
 {
     public interface ITasksRepository
     {

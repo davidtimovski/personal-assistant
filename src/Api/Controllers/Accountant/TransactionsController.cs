@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using PersonalAssistant.Application.Contracts.Accountant.Transactions;
-using PersonalAssistant.Application.Contracts.Accountant.Transactions.Models;
-using PersonalAssistant.Infrastructure.Identity;
+using Application.Contracts.Accountant.Transactions;
+using Application.Contracts.Accountant.Transactions.Models;
+using Infrastructure.Identity;
 
 namespace Api.Controllers.Accountant
 {
@@ -124,16 +124,6 @@ namespace Api.Controllers.Accountant
         [HttpDelete("exported-file/{fileId}")]
         public IActionResult DeleteExportedFile(Guid fileId)
         {
-            int userId;
-            try
-            {
-                userId = IdentityHelper.GetUserId(User);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-
             string directory = Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp");
             var deleteExportedFileModel = new DeleteExportedFile(directory, fileId);
 

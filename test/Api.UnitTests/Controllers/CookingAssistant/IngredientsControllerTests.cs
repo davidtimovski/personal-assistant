@@ -2,16 +2,16 @@
 using Api.Controllers.CookingAssistant;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using PersonalAssistant.Api.UnitTests.Builders;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients.Models;
+using Api.UnitTests.Builders;
+using Application.Contracts.CookingAssistant.Ingredients;
+using Application.Contracts.CookingAssistant.Ingredients.Models;
 using Xunit;
 
-namespace PersonalAssistant.Api.UnitTests.Controllers.CookingAssistant
+namespace Api.UnitTests.Controllers.CookingAssistant
 {
     public class IngredientsControllerTests
     {
-        private readonly Mock<IIngredientService> _ingredientServiceMock = new Mock<IIngredientService>();
+        private readonly Mock<IIngredientService> _ingredientServiceMock = new();
         private readonly IngredientsController _sut;
 
         public IngredientsControllerTests()

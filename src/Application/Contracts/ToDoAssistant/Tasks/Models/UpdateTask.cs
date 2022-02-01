@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
+using Application.Contracts.ToDoAssistant.Lists;
 
-namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models
+namespace Application.Contracts.ToDoAssistant.Tasks.Models
 {
     public class UpdateTask
     {

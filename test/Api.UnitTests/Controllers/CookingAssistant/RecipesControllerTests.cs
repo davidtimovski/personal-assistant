@@ -4,22 +4,22 @@ using Api.Controllers.CookingAssistant;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
-using PersonalAssistant.Api.UnitTests.Builders;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models;
+using Api.UnitTests.Builders;
+using Application.Contracts.CookingAssistant.Recipes;
+using Application.Contracts.CookingAssistant.Recipes.Models;
 using Xunit;
 
-namespace PersonalAssistant.Api.UnitTests.Controllers.CookingAssistant
+namespace Api.UnitTests.Controllers.CookingAssistant
 {
     public class RecipesControllerTests
     {
-        private readonly Mock<IRecipeService> _recipeServiceMock = new Mock<IRecipeService>();
+        private readonly Mock<IRecipeService> _recipeServiceMock = new();
         private readonly RecipesController _sut;
 
         public RecipesControllerTests()
         {
             _sut = new RecipesController(_recipeServiceMock.Object,
-                null, null, null, null, null, null, null, null, null, 
+                null, null, null, null, null, null, null, null, 
                 null, null, null, null, new Mock<IOptions<Urls>>().Object)
             {
                 ControllerContext = new ControllerContextBuilder().Build()

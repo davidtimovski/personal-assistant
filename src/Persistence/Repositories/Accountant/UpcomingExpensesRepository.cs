@@ -4,11 +4,10 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Persistence;
-using PersonalAssistant.Application.Contracts.Accountant.UpcomingExpenses;
-using PersonalAssistant.Domain.Entities.Accountant;
+using Application.Contracts.Accountant.UpcomingExpenses;
+using Domain.Entities.Accountant;
 
-namespace PersonalAssistant.Persistence.Repositories.Accountant
+namespace Persistence.Repositories.Accountant
 {
     public class UpcomingExpensesRepository : BaseRepository, IUpcomingExpensesRepository
     {
@@ -36,7 +35,7 @@ namespace PersonalAssistant.Persistence.Repositories.Accountant
             using IDbConnection conn = OpenConnection();
 
             int id;
-            var query = @"INSERT INTO ""Accountant.UpcomingExpenses"" (""UserId"", ""CategoryId"", ""Amount"", ""Currency"", ""Description"", ""Date"", ""Generated"", ""CreatedDate"", ""ModifiedDate"")
+            const string query = @"INSERT INTO ""Accountant.UpcomingExpenses"" (""UserId"", ""CategoryId"", ""Amount"", ""Currency"", ""Description"", ""Date"", ""Generated"", ""CreatedDate"", ""ModifiedDate"")
                           VALUES (@UserId, @CategoryId, @Amount, @Currency, @Description, @Date, @Generated, @CreatedDate, @ModifiedDate) returning ""Id""";
 
             if (uowConn == null && uowTransaction == null)

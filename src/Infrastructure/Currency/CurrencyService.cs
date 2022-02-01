@@ -5,13 +5,13 @@ using System.Text.Json;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
-using PersonalAssistant.Application.Contracts.Common;
+using Application.Contracts.Common;
 
-namespace PersonalAssistant.Infrastructure.Currency
+namespace Infrastructure.Currency
 {
     public class CurrencyService : ICurrencyService
     {
-        private string _connectionString;
+        private readonly string _connectionString;
         private const int DaysSearchLimit = 14;
 
         public CurrencyService(IConfiguration configuration)

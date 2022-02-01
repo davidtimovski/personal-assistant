@@ -1,4 +1,4 @@
-﻿namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models
+﻿namespace Application.Contracts.ToDoAssistant.Tasks.Models
 {
     public class ReorderTask
     {

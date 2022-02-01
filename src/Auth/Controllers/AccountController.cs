@@ -14,7 +14,6 @@ using IdentityServer4.Events;
 using IdentityServer4.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
-using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -26,12 +25,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using PersonalAssistant.Application.Contracts.Accountant.Accounts;
-using PersonalAssistant.Application.Contracts.Accountant.Accounts.Models;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
-using PersonalAssistant.Infrastructure.Identity;
+using Application.Contracts.Accountant.Accounts;
+using Application.Contracts.Accountant.Accounts.Models;
+using Application.Contracts.Common;
+using Application.Contracts.CookingAssistant.Recipes;
+using Application.Contracts.ToDoAssistant.Lists;
+using Infrastructure.Identity;
 
 namespace Auth.Controllers
 {
@@ -41,7 +40,6 @@ namespace Auth.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IIdentityServerInteractionService _interaction;
-        private readonly IClientStore _clientStore;
         private readonly IEventService _events;
         private readonly IEmailTemplateService _emailTemplateService;
         private readonly IAccountService _accountService;
@@ -58,7 +56,6 @@ namespace Auth.Controllers
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IIdentityServerInteractionService interaction,
-            IClientStore clientStore,
             IEventService events,
             IEmailTemplateService emailTemplateService,
             IAccountService accountService,
@@ -74,7 +71,6 @@ namespace Auth.Controllers
             _userManager = userManager;
             _signInManager = signInManager;
             _interaction = interaction;
-            _clientStore = clientStore;
             _events = events;
             _emailTemplateService = emailTemplateService;
             _accountService = accountService;
@@ -96,8 +92,6 @@ namespace Auth.Controllers
             {
                 return RedirectToAction(nameof(HomeController.Overview));
             }
-
-            var language = CultureInfo.CurrentCulture.Name;
 
             var viewModel = new LoginViewModel
             {
@@ -129,68 +123,66 @@ namespace Auth.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                // Check if we are in the context of an authorization request
-                AuthorizationRequest context = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
+                return View(nameof(Login), model);
+            }
+            
+            // Check if we are in the context of an authorization request
+            AuthorizationRequest context = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
 
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, true, lockoutOnFailure: true);
-                if (result.Succeeded)
-                {
-                    // Set language cookie
-                    ApplicationUser user = await _userManager.FindByEmailAsync(model.Email);
+            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, true, lockoutOnFailure: true);
+            if (result.Succeeded)
+            {
+                // Set language cookie
+                ApplicationUser user = await _userManager.FindByEmailAsync(model.Email);
 
-                    await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id.ToString(), user.UserName, clientId: context?.Client.ClientId));
+                await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id.ToString(), user.UserName, clientId: context?.Client.ClientId));
 
-                    Response.Cookies.Append(
-                        CookieRequestCultureProvider.DefaultCookieName,
-                        CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(user.Language)),
-                        new CookieOptions
-                        {
-                            Expires = DateTimeOffset.UtcNow.AddYears(1),
-                            IsEssential = true,
-                            Path = "/",
-                            HttpOnly = false,
-                            SameSite = SameSiteMode.Strict
-                        }
-                    );
-
-                    if (model.ReturnUrl != null)
+                Response.Cookies.Append(
+                    CookieRequestCultureProvider.DefaultCookieName,
+                    CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(user.Language)),
+                    new CookieOptions
                     {
-                        return RedirectToLocal(model.ReturnUrl);
+                        Expires = DateTimeOffset.UtcNow.AddYears(1),
+                        IsEssential = true,
+                        Path = "/",
+                        HttpOnly = false,
+                        SameSite = SameSiteMode.Strict
                     }
-                    return RedirectToAction(nameof(HomeController.Overview), "Home");
-                }
+                );
 
-                if (result.IsNotAllowed)
+                if (model.ReturnUrl != null)
                 {
-                    await _events.RaiseAsync(new UserLoginFailureEvent(model.Email, "Email confirmation required", clientId: context?.Client.ClientId));
-
-                    return RedirectToAction(nameof(AccountController.Login), new { model.ReturnUrl, alert = LoginAlert.EmailConfirmationRequired });
+                    return RedirectToLocal(model.ReturnUrl);
                 }
-
-                if (result.IsLockedOut)
-                {
-                    await _events.RaiseAsync(new UserLoginFailureEvent(model.Email, "Locked out", clientId: context?.Client.ClientId));
-
-                    ApplicationUser user = await _userManager.FindByEmailAsync(model.Email);
-                    var lockoutEnd = (DateTimeOffset)await _userManager.GetLockoutEndDateAsync(user);
-                    var lockoutViewModel = new LockoutViewModel
-                    {
-                        LockoutEndMinutes = (int)(lockoutEnd.UtcDateTime - DateTime.UtcNow).TotalMinutes + 1
-                    };
-                    return View("Lockout", lockoutViewModel);
-                }
-                else
-                {
-                    await _events.RaiseAsync(new UserLoginFailureEvent(model.Email, "Invalid credentials", clientId: context?.Client.ClientId));
-
-                    ModelState.AddModelError(string.Empty, _localizer["InvalidLoginAttempt"]);
-                    return View(nameof(AccountController.Login), model);
-                }
+                return RedirectToAction(nameof(HomeController.Overview), "Home");
             }
 
-            return View(nameof(AccountController.Login), model);
+            if (result.IsNotAllowed)
+            {
+                await _events.RaiseAsync(new UserLoginFailureEvent(model.Email, "Email confirmation required", clientId: context?.Client.ClientId));
+
+                return RedirectToAction(nameof(Login), new { model.ReturnUrl, alert = LoginAlert.EmailConfirmationRequired });
+            }
+
+            if (result.IsLockedOut)
+            {
+                await _events.RaiseAsync(new UserLoginFailureEvent(model.Email, "Locked out", clientId: context?.Client.ClientId));
+
+                ApplicationUser user = await _userManager.FindByEmailAsync(model.Email);
+                var lockoutEnd = (DateTimeOffset)await _userManager.GetLockoutEndDateAsync(user);
+                var lockoutViewModel = new LockoutViewModel
+                {
+                    LockoutEndMinutes = (int)(lockoutEnd.UtcDateTime - DateTime.UtcNow).TotalMinutes + 1
+                };
+                return View("Lockout", lockoutViewModel);
+            }
+
+            await _events.RaiseAsync(new UserLoginFailureEvent(model.Email, "Invalid credentials", clientId: context?.Client.ClientId));
+            ModelState.AddModelError(string.Empty, _localizer["InvalidLoginAttempt"]);
+            
+            return View(nameof(Login), model);
         }
 
         /// <summary>
@@ -264,40 +256,42 @@ namespace Auth.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl)
         {
-            ViewData["ReturnUrl"] = returnUrl;
-
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var user = new ApplicationUser
-                {
-                    Name = model.Name.Trim(),
-                    UserName = model.Email.Trim(),
-                    Email = model.Email.Trim(),
-                    Language = model.Language,
-                    ToDoNotificationsEnabled = false,
-                    CookingNotificationsEnabled = false,
-                    ImperialSystem = false,
-                    ImageUri = _cdnService.GetDefaultProfileImageUri(),
-                    DateRegistered = DateTime.UtcNow
-                };
-                IdentityResult result = await _userManager.CreateAsync(user, model.Password);
-
-                if (result.Succeeded)
-                {
-                    string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    var callbackUrl = Url.Action("confirm-email", "Account", new { userId = user.Id, token, returnUrl }, HttpContext.Request.Scheme);
-                    await _emailTemplateService.EnqueueRegisterConfirmationEmailAsync(user.Name, user.Email, new Uri(callbackUrl), model.Language);
-
-                    // Notify admin
-                    _ = _emailTemplateService.EnqueueNewRegistrationEmailAsync(user.Name, user.Email);
-
-                    SetLanguageCookie(model.Language);
-
-                    return RedirectToAction(nameof(AccountController.Login), new { alert = GenerateLoginAlertFromRegistrationEmail(user.Email) });
-                }
-
-                AddIdentityErrors(result, nameof(AccountController.Register));
+                return View(model);
             }
+            
+            ViewData["ReturnUrl"] = returnUrl;
+            
+            var user = new ApplicationUser
+            {
+                Name = model.Name.Trim(),
+                UserName = model.Email.Trim(),
+                Email = model.Email.Trim(),
+                Language = model.Language,
+                ToDoNotificationsEnabled = false,
+                CookingNotificationsEnabled = false,
+                ImperialSystem = false,
+                ImageUri = _cdnService.GetDefaultProfileImageUri(),
+                DateRegistered = DateTime.UtcNow
+            };
+            IdentityResult result = await _userManager.CreateAsync(user, model.Password);
+
+            if (result.Succeeded)
+            {
+                string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var callbackUrl = Url.Action("confirm-email", "Account", new { userId = user.Id, token, returnUrl }, HttpContext.Request.Scheme);
+                await _emailTemplateService.EnqueueRegisterConfirmationEmailAsync(user.Name, user.Email, new Uri(callbackUrl), model.Language);
+
+                // Notify admin
+                _ = _emailTemplateService.EnqueueNewRegistrationEmailAsync(user.Name, user.Email);
+
+                SetLanguageCookie(model.Language);
+
+                return RedirectToAction(nameof(Login), new { alert = GenerateLoginAlertFromRegistrationEmail(user.Email) });
+            }
+
+            AddIdentityErrors(result, nameof(Register));
 
             return View(model);
         }
@@ -310,13 +304,13 @@ namespace Auth.Controllers
             ApplicationUser user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null)
             {
-                return RedirectToAction(nameof(AccountController.Login));
+                return RedirectToAction(nameof(Login));
             }
 
             IdentityResult confirmEmailResult = await _userManager.ConfirmEmailAsync(user, token);
             if (!confirmEmailResult.Succeeded)
             {
-                return RedirectToAction(nameof(AccountController.Login));
+                return RedirectToAction(nameof(Login));
             }
 
             await CreateRequiredDataAsync(user.Id);
@@ -325,7 +319,7 @@ namespace Auth.Controllers
             // Notify admin
             _ = _emailTemplateService.EnqueueNewEmailVerificationEmailAsync(user.Name, user.Email);
 
-            return RedirectToAction(nameof(AccountController.Login), new { returnUrl, alert = LoginAlert.RegistrationConfirmed });
+            return RedirectToAction(nameof(Login), new { returnUrl, alert = LoginAlert.RegistrationConfirmed });
         }
 
         [HttpGet]
@@ -340,21 +334,21 @@ namespace Auth.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                ApplicationUser user = await _userManager.GetUserAsync(User);
+                return View(model);
+            }
+            
+            ApplicationUser user = await _userManager.GetUserAsync(User);
 
-                IdentityResult changePasswordResult = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
-                if (!changePasswordResult.Succeeded)
-                {
-                    ModelState.AddModelError(string.Empty, _localizer["IncorrectCurrentPassword"]);
-                    return View(model);
-                }
-
-                return RedirectToAction(nameof(HomeController.Overview), "Home", new { alert = OverviewAlert.PasswordChanged });
+            IdentityResult changePasswordResult = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+            if (!changePasswordResult.Succeeded)
+            {
+                ModelState.AddModelError(string.Empty, _localizer["IncorrectCurrentPassword"]);
+                return View(model);
             }
 
-            return View(model);
+            return RedirectToAction(nameof(HomeController.Overview), "Home", new { alert = OverviewAlert.PasswordChanged });
         }
 
         [HttpGet]
@@ -376,27 +370,29 @@ namespace Auth.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                ApplicationUser user = await _userManager.FindByNameAsync(model.Email);
-                if (user == null)
-                {
-                    // Don't reveal that the user does not exist or is not confirmed
-                    return RedirectToAction(nameof(AccountController.Login), new { alert = LoginAlert.PasswordResetEmailSent });
-                }
+                return View();
+            }
+            
+            ApplicationUser user = await _userManager.FindByNameAsync(model.Email);
+            if (user == null)
+            {
+                // Don't reveal that the user does not exist or is not confirmed
+                return RedirectToAction(nameof(Login), new { alert = LoginAlert.PasswordResetEmailSent });
+            }
 
-                bool emailIsConfirmed = await _userManager.IsEmailConfirmedAsync(user);
-                bool userHasPassword = await _userManager.HasPasswordAsync(user);
+            bool emailIsConfirmed = await _userManager.IsEmailConfirmedAsync(user);
+            bool userHasPassword = await _userManager.HasPasswordAsync(user);
 
-                if (emailIsConfirmed && userHasPassword)
-                {
-                    string token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                    string callbackUrl = Url.Action("reset-password", "Account", new { userId = user.Id, token }, protocol: HttpContext.Request.Scheme);
-                    string language = CultureInfo.CurrentCulture.Name;
+            if (emailIsConfirmed && userHasPassword)
+            {
+                string token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                string callbackUrl = Url.Action("reset-password", "Account", new { userId = user.Id, token }, protocol: HttpContext.Request.Scheme);
+                string language = CultureInfo.CurrentCulture.Name;
 
-                    await _emailTemplateService.EnqueuePasswordResetEmailAsync(user.Email, new Uri(callbackUrl), language);
-                    return RedirectToAction(nameof(AccountController.Login), new { alert = GenerateLoginAlertFromPasswordResetEmail(user.Email) });
-                }
+                await _emailTemplateService.EnqueuePasswordResetEmailAsync(user.Email, new Uri(callbackUrl), language);
+                return RedirectToAction(nameof(Login), new { alert = GenerateLoginAlertFromPasswordResetEmail(user.Email) });
             }
 
             return View();
@@ -421,23 +417,25 @@ namespace Auth.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                ApplicationUser user = await _userManager.FindByIdAsync(model.UserId.ToString());
-                if (user == null)
-                {
-                    // Don't reveal that the user does not exist
-                    return RedirectToAction(nameof(AccountController.Login), new { alert = LoginAlert.PasswordReset });
-                }
-
-                IdentityResult result = await _userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
-                if (result.Succeeded)
-                {
-                    return RedirectToAction(nameof(AccountController.Login), new { alert = LoginAlert.PasswordReset });
-                }
-
-                AddIdentityErrors(result, nameof(AccountController.ResetPassword));
+                return View(model);
             }
+            
+            ApplicationUser user = await _userManager.FindByIdAsync(model.UserId.ToString());
+            if (user == null)
+            {
+                // Don't reveal that the user does not exist
+                return RedirectToAction(nameof(Login), new { alert = LoginAlert.PasswordReset });
+            }
+
+            IdentityResult result = await _userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
+            if (result.Succeeded)
+            {
+                return RedirectToAction(nameof(Login), new { alert = LoginAlert.PasswordReset });
+            }
+
+            AddIdentityErrors(result, nameof(ResetPassword));
 
             return View(model);
         }
@@ -470,43 +468,43 @@ namespace Auth.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(DeleteViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                ApplicationUser user = await _userManager.GetUserAsync(User);
+                return View(model);
+            }
+            
+            ApplicationUser user = await _userManager.GetUserAsync(User);
 
-                var passwordIsValid = await _userManager.CheckPasswordAsync(user, model.Password);
-                if (passwordIsValid)
+            var passwordIsValid = await _userManager.CheckPasswordAsync(user, model.Password);
+            if (passwordIsValid)
+            {
+                await _signInManager.SignOutAsync();
+
+                IdentityResult result = await _userManager.DeleteAsync(user);
+                if (result.Succeeded)
                 {
-                    await _signInManager.SignOutAsync();
-
-                    IdentityResult result = await _userManager.DeleteAsync(user);
-                    if (result.Succeeded)
+                    var filePaths = new List<string>();
+                    if (user.ImageUri != null)
                     {
-                        var filePaths = new List<string>();
-                        if (user.ImageUri != null)
-                        {
-                            filePaths.Add($"users/{user.Id}/{user.ImageUri}");
-                        }
-
-                        var recipeUris = _recipeService.GetAllImageUris(user.Id);
-                        if (recipeUris.Any())
-                        {
-                            filePaths.AddRange(recipeUris.Select(uri => $"users/{user.Id}/recipes/{uri}"));
-
-                            await _cdnService.DeleteUserResourcesAsync(user.Id, filePaths);
-                        }
-
-                        return RedirectToAction(nameof(AccountController.Login), new { alert = LoginAlert.AccountDeleted });
+                        filePaths.Add($"users/{user.Id}/{user.ImageUri}");
                     }
-                    else
+
+                    var recipeUris = _recipeService.GetAllImageUris(user.Id);
+                    if (recipeUris.Any())
                     {
-                        ModelState.AddModelError(string.Empty, _localizer["AnErrorOccurred"]);
+                        filePaths.AddRange(recipeUris.Select(uri => $"users/{user.Id}/recipes/{uri}"));
+
+                        await _cdnService.DeleteUserResourcesAsync(user.Id, filePaths);
                     }
+
+                    return RedirectToAction(nameof(Login), new { alert = LoginAlert.AccountDeleted });
                 }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, _localizer["IncorrectPassword"]);
-                }
+
+                ModelState.AddModelError(string.Empty, _localizer["AnErrorOccurred"]);
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, _localizer["IncorrectPassword"]);
             }
 
             return View(model);
@@ -535,50 +533,66 @@ namespace Auth.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditProfile(EditProfileViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                ApplicationUser user = await _userManager.GetUserAsync(User);
-                string userCurrentLanguage = user.Language;
-                user.Name = model.Name.Trim();
-                user.Language = model.Language;
-                string oldImageUri = user.ImageUri;
-                user.ImageUri = string.IsNullOrEmpty(model.ImageUri) ? null : model.ImageUri;
-
-                IdentityResult updateProfileResult = await _userManager.UpdateAsync(user);
-                if (!updateProfileResult.Succeeded)
+                return View(new ViewProfileViewModel
                 {
-                    ModelState.AddModelError(string.Empty, _localizer["AnErrorOccurred"]);
-                    return View(model);
-                }
+                    Name = model.Name,
+                    Language = model.Language,
+                    ImageUri = model.ImageUri,
+                    DefaultImageUri = _cdnService.GetDefaultProfileImageUri(),
+                    BaseUrl = _configuration["Urls:PersonalAssistant"]
+                });
+            }
+                
+            ApplicationUser user = await _userManager.GetUserAsync(User);
+            string userCurrentLanguage = user.Language;
+            user.Name = model.Name.Trim();
+            user.Language = model.Language;
+            string oldImageUri = user.ImageUri;
+            user.ImageUri = string.IsNullOrEmpty(model.ImageUri) ? null : model.ImageUri;
 
-                // If the user changed his image
-                if (oldImageUri != model.ImageUri)
+            IdentityResult updateProfileResult = await _userManager.UpdateAsync(user);
+            if (!updateProfileResult.Succeeded)
+            {
+                ModelState.AddModelError(string.Empty, _localizer["AnErrorOccurred"]);
+
+                return View(new ViewProfileViewModel
                 {
-                    // and had a previous one, delete it
-                    if (oldImageUri != null)
-                    {
-                        await _cdnService.DeleteAsync(oldImageUri);
-                    }
-
-                    // and has a new one, remove its temp tag
-                    if (user.ImageUri != null)
-                    {
-                        await _cdnService.RemoveTempTagAsync(user.ImageUri);
-                    }
-                }
-
-                SetLanguageCookie(model.Language);
-
-                if (model.Language != userCurrentLanguage)
-                {
-                    await _signInManager.SignOutAsync();
-                    return RedirectToAction(nameof(AccountController.Login), new { alert = LoginAlert.LanguageChanged });
-                }
-
-                return RedirectToAction(nameof(HomeController.Overview), "Home", new { alert = OverviewAlert.ProfileUpdated });
+                    Name = model.Name,
+                    Language = model.Language,
+                    ImageUri = model.ImageUri,
+                    DefaultImageUri = _cdnService.GetDefaultProfileImageUri(),
+                    BaseUrl = _configuration["Urls:PersonalAssistant"]
+                });
             }
 
-            return View(model);
+            // If the user changed his image
+            if (oldImageUri != model.ImageUri)
+            {
+                // and had a previous one, delete it
+                if (oldImageUri != null)
+                {
+                    await _cdnService.DeleteAsync(oldImageUri);
+                }
+
+                // and has a new one, remove its temp tag
+                if (user.ImageUri != null)
+                {
+                    await _cdnService.RemoveTempTagAsync(user.ImageUri);
+                }
+            }
+
+            SetLanguageCookie(model.Language);
+
+            if (model.Language != userCurrentLanguage)
+            {
+                await _signInManager.SignOutAsync();
+                return RedirectToAction(nameof(Login), new { alert = LoginAlert.LanguageChanged });
+            }
+
+            return RedirectToAction(nameof(HomeController.Overview), "Home", new { alert = OverviewAlert.ProfileUpdated });
+
         }
 
         [HttpPost]
@@ -593,7 +607,7 @@ namespace Auth.Controllers
 
             string extension = Path.GetExtension(image.FileName);
 
-            if (!new string[] { ".JPG", ".PNG", ".JPEG" }.Contains(extension.ToUpperInvariant()))
+            if (!new [] { ".JPG", ".PNG", ".JPEG" }.Contains(extension.ToUpperInvariant()))
             {
                 ModelState.AddModelError(string.Empty, _localizer["InvalidImageFormat"]);
                 return new UnprocessableEntityObjectResult(ModelState);
@@ -614,7 +628,6 @@ namespace Auth.Controllers
                     ApplicationUser user = await _userManager.GetUserAsync(User);
 
                     string imageUri = await _cdnService.UploadProfileTempAsync(
-                        user.Id,
                         filePath: tempImagePath,
                         uploadPath: $"users/{user.Id}",
                         template: "profile"
@@ -624,7 +637,7 @@ namespace Auth.Controllers
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, nameof(AccountController.UploadProfileImage));
+                    _logger.LogError(ex, nameof(UploadProfileImage));
                     throw;
                 }
             }
@@ -713,7 +726,6 @@ namespace Auth.Controllers
 
         private async Task CreateRequiredDataAsync(int userId)
         {
-            var now = DateTime.UtcNow;
             var createMainAccount = new CreateMainAccount
             {
                 UserId = userId,
@@ -724,7 +736,8 @@ namespace Auth.Controllers
 
         private async Task CreateSamplesAsync(int userId)
         {
-            var sampleListTranslations = new Dictionary<string, string> {
+            var sampleListTranslations = new Dictionary<string, string>
+            {
                 { "SampleListName", _localizer["SampleListName"] },
                 { "SampleListTask1", _localizer["SampleListTask1"] },
                 { "SampleListTask2", _localizer["SampleListTask2"] },
@@ -732,7 +745,8 @@ namespace Auth.Controllers
             };
             await _listService.CreateSampleAsync(userId, sampleListTranslations);
 
-            var sampleRecipeTranslations = new Dictionary<string, string> {
+            var sampleRecipeTranslations = new Dictionary<string, string>
+            {
                 { "SampleRecipeName", _localizer["SampleRecipeName"] },
                 { "SampleRecipeDescription", _localizer["SampleRecipeDescription"] },
                 { "SampleRecipeInstructions", _localizer["SampleRecipeInstructions"] },
@@ -795,10 +809,8 @@ namespace Auth.Controllers
             {
                 return Redirect(returnUrl);
             }
-            else
-            {
-                return RedirectToAction(nameof(HomeController.Index));
-            }
+
+            return RedirectToAction(nameof(HomeController.Index));
         }
 
         #endregion

@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Infrastructure.Identity;
+using Application.Contracts.Common;
 
 namespace Api.Controllers.Common
 {
@@ -23,16 +22,6 @@ namespace Api.Controllers.Common
         [HttpGet("{date}")]
         public IActionResult GetAll(DateTime date)
         {
-            int userId;
-            try
-            {
-                userId = IdentityHelper.GetUserId(User);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-
             IDictionary<string, decimal> currencyRates = _currencyService.GetAll(date);
 
             return Json(currencyRates);

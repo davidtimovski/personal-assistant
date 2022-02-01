@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Application.Contracts.Common.Models;
-using PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles.Models;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Ingredients.Models;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models;
-using PersonalAssistant.Domain.Entities.Common;
-using PersonalAssistant.Domain.Entities.CookingAssistant;
+using Application.Contracts.Common;
+using Application.Contracts.Common.Models;
+using Application.Contracts.CookingAssistant.DietaryProfiles.Models;
+using Application.Contracts.CookingAssistant.Ingredients.Models;
+using Application.Contracts.CookingAssistant.Recipes.Models;
+using Domain.Entities.Common;
+using Domain.Entities.CookingAssistant;
 using Utility;
 
-namespace PersonalAssistant.Application.Mappings
+namespace Application.Mappings
 {
     public class CookingAssistantProfile : Profile
     {

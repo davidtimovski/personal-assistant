@@ -9,10 +9,10 @@ using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using FluentValidation;
 using FluentValidation.Results;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Application.Contracts.Common.Models;
+using Application.Contracts.Common;
+using Application.Contracts.Common.Models;
 
-namespace PersonalAssistant.Infrastructure.Cdn
+namespace Infrastructure.Cdn
 {
     public class CloudinaryService : ICdnService
     {
@@ -21,17 +21,17 @@ namespace PersonalAssistant.Infrastructure.Cdn
         private readonly string _defaultProfileImageUri;
         private readonly string _defaultRecipeImageUri;
         private readonly string _baseUrl;
-        private readonly Dictionary<string, Transformation> _templates = new Dictionary<string, Transformation>
+        private readonly Dictionary<string, Transformation> _templates = new()
         {
             { "profile", new Transformation().Width(400).Height(400).Crop("lfill").FetchFormat(Format) },
             { "recipe", new Transformation().Width(640).Height(320).Crop("lfill").FetchFormat(Format) }
         };
-        private readonly Dictionary<string, List<Transformation>> _eagerTransformTemplates = new Dictionary<string, List<Transformation>>
+        private readonly Dictionary<string, List<Transformation>> _eagerTransformTemplates = new()
         {
             { "profile", new List<Transformation> { new Transformation().Named("profile_thumbnail") } },
             { "recipe", new List<Transformation>() }
         };
-        private Cloudinary Cloudinary { get; set; }
+        private Cloudinary Cloudinary { get; }
         private readonly HttpClient _httpClient;
 
         public CloudinaryService(
@@ -77,7 +77,7 @@ namespace PersonalAssistant.Infrastructure.Cdn
             ImageUploadResult uploadResult = await Cloudinary.UploadAsync(uploadParams);
             if (uploadResult.Error != null)
             {
-                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.UploadAsync)}() returned error: {uploadResult.Error.Message}");
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(UploadAsync)}() returned error: {uploadResult.Error.Message}");
             }
 
             File.Delete(filePath);
@@ -110,7 +110,7 @@ namespace PersonalAssistant.Infrastructure.Cdn
             return imageUri;
         }
 
-        public async Task<string> UploadProfileTempAsync(int userId, string filePath, string uploadPath, string template)
+        public async Task<string> UploadProfileTempAsync(string filePath, string uploadPath, string template)
         {
             string uri = GenerateRandomString();
             Transformation transformation = _templates[template];
@@ -129,7 +129,7 @@ namespace PersonalAssistant.Infrastructure.Cdn
             ImageUploadResult uploadResult = await Cloudinary.UploadAsync(uploadParams);
             if (uploadResult.Error != null)
             {
-                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.UploadProfileTempAsync)}() returned error: {uploadResult.Error.Message}");
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(UploadProfileTempAsync)}() returned error: {uploadResult.Error.Message}");
             }
 
             File.Delete(filePath);
@@ -180,7 +180,7 @@ namespace PersonalAssistant.Infrastructure.Cdn
             TagResult tagResult = await Cloudinary.TagAsync(tagParams);
             if (tagResult.Error != null)
             {
-                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.RemoveTempTagAsync)}() returned error: {tagResult.Error.Message}");
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(RemoveTempTagAsync)}() returned error: {tagResult.Error.Message}");
             }
         }
 
@@ -195,11 +195,11 @@ namespace PersonalAssistant.Infrastructure.Cdn
 
             DelResResult deleteResult = await Cloudinary.DeleteResourcesAsync(new DelResParams
             {
-                PublicIds = new List<string>() { publicId }
+                PublicIds = new List<string> { publicId }
             });
             if (deleteResult.Error != null)
             {
-                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.DeleteAsync)}() returned error: {deleteResult.Error.Message}");
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(DeleteAsync)}() returned error: {deleteResult.Error.Message}");
             }
         }
 
@@ -218,13 +218,13 @@ namespace PersonalAssistant.Infrastructure.Cdn
             });
             if (deleteResult.Error != null)
             {
-                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.DeleteUserResourcesAsync)}() returned error: {deleteResult.Error.Message}");
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(DeleteUserResourcesAsync)}() returned error: {deleteResult.Error.Message}");
             }
 
             DeleteFolderResult deleteFolderResult = await Cloudinary.DeleteFolderAsync($"{_environment}/users/{userId}");
             if (deleteFolderResult.Error != null)
             {
-                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.DeleteUserResourcesAsync)}() returned error: {deleteFolderResult.Error.Message}");
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(DeleteUserResourcesAsync)}() returned error: {deleteFolderResult.Error.Message}");
             }
         }
 
@@ -244,13 +244,13 @@ namespace PersonalAssistant.Infrastructure.Cdn
             });
             if (deleteResult.Error != null)
             {
-                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.DeleteTemporaryResourcesAsync)}() returned error: {deleteResult.Error.Message}");
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(DeleteTemporaryResourcesAsync)}() returned error: {deleteResult.Error.Message}");
             }
         }
 
         private bool IsDefaultImage(string uri)
         {
-            var defaults = new string[] { _defaultProfileImageUri, _defaultRecipeImageUri };
+            var defaults = new[] { _defaultProfileImageUri, _defaultRecipeImageUri };
             return defaults.Contains(uri);
         }
 
@@ -273,7 +273,7 @@ namespace PersonalAssistant.Infrastructure.Cdn
             ImageUploadResult uploadResult = await Cloudinary.UploadAsync(uploadParams);
             if (uploadResult.Error != null)
             {
-                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.UploadTempAsync)}() returned error: {uploadResult.Error.Message}");
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(UploadTempAsync)}() returned error: {uploadResult.Error.Message}");
             }
 
             File.Delete(filePath);
@@ -293,7 +293,7 @@ namespace PersonalAssistant.Infrastructure.Cdn
             return $"{_environment}/{path}";
         }
 
-        private string GenerateRandomString()
+        private static string GenerateRandomString()
         {
             const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
             var random = new Random();
@@ -302,7 +302,7 @@ namespace PersonalAssistant.Infrastructure.Cdn
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
-        private void ValidateAndThrow<T>(T model, IValidator<T> validator)
+        private static void ValidateAndThrow<T>(T model, IValidator<T> validator)
         {
             ValidationResult result = validator.Validate(model);
             if (!result.IsValid)

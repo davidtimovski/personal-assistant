@@ -3,22 +3,22 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentValidation;
 using Moq;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models;
-using PersonalAssistant.Application.Mappings;
-using PersonalAssistant.Application.Services.ToDoAssistant;
-using PersonalAssistant.Application.UnitTests.Builders;
-using PersonalAssistant.Domain.Entities.ToDoAssistant;
+using Application.Contracts.ToDoAssistant.Lists;
+using Application.Contracts.ToDoAssistant.Tasks;
+using Application.Contracts.ToDoAssistant.Tasks.Models;
+using Application.Mappings;
+using Application.Services.ToDoAssistant;
+using Application.UnitTests.Builders;
+using Domain.Entities.ToDoAssistant;
 using Xunit;
 
-namespace PersonalAssistant.Application.UnitTests.ServiceTests.TaskServiceTests
+namespace Application.UnitTests.ServiceTests.TaskServiceTests
 {
     public class CreateTests
     {
         private readonly Mock<IValidator<CreateTask>> _successfulValidatorMock;
-        private readonly Mock<ITasksRepository> _tasksRepositoryMock = new Mock<ITasksRepository>();
-        private readonly Mock<IListsRepository> _listsRepositoryMock = new Mock<IListsRepository>();
+        private readonly Mock<ITasksRepository> _tasksRepositoryMock = new();
+        private readonly Mock<IListsRepository> _listsRepositoryMock = new();
         private readonly ITaskService _sut;
 
         public CreateTests()

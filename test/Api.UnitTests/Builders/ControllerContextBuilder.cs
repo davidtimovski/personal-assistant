@@ -2,21 +2,15 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace PersonalAssistant.Api.UnitTests.Builders
+namespace Api.UnitTests.Builders
 {
     public class ControllerContextBuilder
     {
-        private int userId;
+        private readonly int _userId;
 
         public ControllerContextBuilder()
         {
-            userId = 1;
-        }
-
-        public ControllerContextBuilder WithUserId(int newUserId)
-        {
-            userId = newUserId;
-            return this;
+            _userId = 1;
         }
 
         public ControllerContext Build()
@@ -26,9 +20,9 @@ namespace PersonalAssistant.Api.UnitTests.Builders
                 HttpContext = new DefaultHttpContext
                 {
                     User = new ClaimsPrincipal(new ClaimsIdentity(
-                        new Claim[]
+                        new[]
                         {
-                            new Claim(ClaimTypes.NameIdentifier, userId.ToString())
+                            new Claim(ClaimTypes.NameIdentifier, _userId.ToString())
                         }, "mock"))
                 }
             };

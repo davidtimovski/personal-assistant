@@ -4,13 +4,12 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Persistence;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists;
-using PersonalAssistant.Domain.Entities.Common;
-using PersonalAssistant.Domain.Entities.CookingAssistant;
-using PersonalAssistant.Domain.Entities.ToDoAssistant;
+using Application.Contracts.ToDoAssistant.Lists;
+using Domain.Entities.Common;
+using Domain.Entities.CookingAssistant;
+using Domain.Entities.ToDoAssistant;
 
-namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
+namespace Persistence.Repositories.ToDoAssistant
 {
     public class ListsRepository : BaseRepository, IListsRepository
     {
@@ -21,13 +20,13 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
         {
             using IDbConnection conn = OpenConnection();
 
-            var sql = @"SELECT DISTINCT l.*, s.""UserId"", s.""IsAccepted""
+            const string query = @"SELECT DISTINCT l.*, s.""UserId"", s.""IsAccepted""
                             FROM ""ToDoAssistant.Lists"" AS l
                             LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
                             WHERE l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")
                             ORDER BY l.""Order""";
 
-            return conn.Query<ToDoList, ListShare, ToDoList>(sql,
+            return conn.Query<ToDoList, ListShare, ToDoList>(query,
                 (list, share) =>
                 {
                     if (share != null && share.IsAccepted != false)
@@ -58,12 +57,12 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                                                 AND s.""UserId"" = @UserId
                                                 AND s.""IsAccepted"" 
                                                 WHERE (l.""UserId"" = @UserId OR s.""UserId"" = @UserId)",
-                                                new { UserId = userId });
+                                                new { UserId = userId }).ToList();
 
             var listIds = lists.Select(x => x.Id).ToArray();
-            var shares = conn.Query<ListShare>(@"SELECT * FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = ANY(@ListIds)", new { ListIds = listIds });
+            var shares = conn.Query<ListShare>(@"SELECT * FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = ANY(@ListIds)", new { ListIds = listIds }).ToList();
 
-            var tasksSql = @"SELECT t.*, u.""Id"", u.""ImageUri""
+            const string tasksSql = @"SELECT t.*, u.""Id"", u.""ImageUri""
                              FROM ""ToDoAssistant.Tasks"" AS t
                              LEFT JOIN ""AspNetUsers"" AS u ON t.""AssignedToUserId"" = u.""Id""
                              WHERE t.""ListId"" = ANY(@ListIds)
@@ -74,7 +73,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                 {
                     task.AssignedToUser = user;
                     return task;
-                }, new { ListIds = listIds, UserId = userId }, null, true);
+                }, new { ListIds = listIds, UserId = userId }).ToList();
 
 
             foreach (var list in lists)
@@ -109,13 +108,13 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
         {
             using IDbConnection conn = OpenConnection();
 
-            var sql = @"SELECT l.*, s.""UserId"", s.""IsAdmin"", s.""IsAccepted"", 
+            const string query = @"SELECT l.*, s.""UserId"", s.""IsAdmin"", s.""IsAccepted"", 
                             s.""Order"", s.""NotificationsEnabled"", s.""IsArchived""
                         FROM ""ToDoAssistant.Lists"" AS l
                         LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
                         WHERE l.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))";
 
-            return conn.Query<ToDoList, ListShare, ToDoList>(sql,
+            return conn.Query<ToDoList, ListShare, ToDoList>(query,
                 (list, share) =>
                 {
                     if (share != null)
@@ -130,50 +129,50 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
         {
             using IDbConnection conn = OpenConnection();
 
-            var sql = @"SELECT DISTINCT l.*, users.""Id"", users.""Email"", users.""ImageUri""
+            const string query = @"SELECT DISTINCT l.*, users.""Id"", users.""Email"", users.""ImageUri""
                         FROM ""ToDoAssistant.Lists"" AS l
                         LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
                         INNER JOIN ""AspNetUsers"" AS users ON l.""UserId"" = users.""Id""
                         WHERE l.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))";
 
-            return conn.Query<ToDoList, User, ToDoList>(sql,
+            return conn.Query<ToDoList, User, ToDoList>(query,
                 (list, user) =>
                 {
                     list.User = user;
                     return list;
-                }, new { Id = id, UserId = userId }, null, true).FirstOrDefault();
+                }, new { Id = id, UserId = userId }).FirstOrDefault();
         }
 
         public IEnumerable<ListShare> GetShares(int id)
         {
             using IDbConnection conn = OpenConnection();
 
-            var sql = @"SELECT s.*, u.""Id"", u.""Email"", u.""ImageUri""
+            const string query = @"SELECT s.*, u.""Id"", u.""Email"", u.""ImageUri""
                         FROM ""ToDoAssistant.Shares"" AS s
                         INNER JOIN ""AspNetUsers"" AS u ON s.""UserId"" = u.""Id""
                         WHERE s.""ListId"" = @ListId AND s.""IsAccepted"" IS NOT FALSE
                         ORDER BY (CASE WHEN s.""IsAccepted"" THEN 1 ELSE 2 END) ASC, s.""CreatedDate""";
 
-            return conn.Query<ListShare, User, ListShare>(sql,
+            return conn.Query<ListShare, User, ListShare>(query,
                 (share, user) =>
                 {
                     share.User = user;
                     return share;
-                }, new { ListId = id }, null, true);
+                }, new { ListId = id });
         }
 
         public IEnumerable<ListShare> GetShareRequests(int userId)
         {
             using IDbConnection conn = OpenConnection();
 
-            var sql = @"SELECT s.*, l.""Name"", u.""Name""
+            const string query = @"SELECT s.*, l.""Name"", u.""Name""
                         FROM ""ToDoAssistant.Shares"" AS s
                         INNER JOIN ""ToDoAssistant.Lists"" AS l ON s.""ListId"" = l.""Id""
                         INNER JOIN ""AspNetUsers"" AS u ON l.""UserId"" = u.""Id""
                         WHERE s.""UserId"" = @UserId
                         ORDER BY s.""ModifiedDate"" DESC";
 
-            return conn.Query<ListShare, ToDoList, User, ListShare>(sql,
+            return conn.Query<ListShare, ToDoList, User, ListShare>(query,
                 (share, list, user) =>
                 {
                     share.List = list;
@@ -371,7 +370,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
                                                            new { list.UserId });
             list.Order = ++listsCount;
 
-            for (short i = 0; i < list.Tasks.Count(); i++)
+            for (short i = 0; i < list.Tasks.Count; i++)
             {
                 list.Tasks[i].ListId = list.Id;
                 list.Tasks[i].Order = (short)(i + 1);
@@ -452,8 +451,6 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
             foreach (var affectedUser in affectedUsers)
             {
-                var parameters = new { UserId = affectedUser.Item1, Order = affectedUser.Item2 };
-
                 var lists = EFContext.Lists.Where(x => x.UserId == affectedUser.Item1 && !x.IsArchived && x.Order > affectedUser.Item2);
                 foreach (ToDoList dbList in lists)
                 {
@@ -564,10 +561,10 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
         {
             using IDbConnection conn = OpenConnection();
 
-            list.Tasks = (conn.Query<ToDoTask>(@"SELECT * FROM ""ToDoAssistant.Tasks""
+            list.Tasks = conn.Query<ToDoTask>(@"SELECT * FROM ""ToDoAssistant.Tasks""
                                                  WHERE ""ListId"" = @ListId AND (""PrivateToUserId"" IS NULL OR ""PrivateToUserId"" = @UserId)
                                                  ORDER BY ""PrivateToUserId"" NULLS LAST",
-                                                 new { ListId = list.Id, list.UserId })).ToList();
+                                                 new { ListId = list.Id, list.UserId }).ToList();
 
             var listsCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*)
                                                          FROM ""ToDoAssistant.Lists"" AS l
@@ -692,7 +689,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
             // Public tasks
             List<ToDoTask> completedTasks = tasks.Where(x => x.IsCompleted && !x.PrivateToUserId.HasValue).ToList();
-            short uncompletedTasksCount = (short)tasks.Where(x => !x.IsCompleted && !x.PrivateToUserId.HasValue).Count();
+            short uncompletedTasksCount = (short)tasks.Count(x => !x.IsCompleted && !x.PrivateToUserId.HasValue);
             foreach (var task in completedTasks)
             {
                 task.IsCompleted = false;
@@ -702,7 +699,7 @@ namespace PersonalAssistant.Persistence.Repositories.ToDoAssistant
 
             // Private tasks
             List<ToDoTask> completedPrivateTasks = tasks.Where(x => x.IsCompleted && x.PrivateToUserId.HasValue && x.PrivateToUserId.Value == userId).ToList();
-            short uncompletedPrivateTasksCount = (short)tasks.Where(x => !x.IsCompleted && x.PrivateToUserId.HasValue && x.PrivateToUserId.Value == userId).Count();
+            short uncompletedPrivateTasksCount = (short)tasks.Count(x => !x.IsCompleted && x.PrivateToUserId.HasValue && x.PrivateToUserId.Value == userId);
             foreach (var task in completedPrivateTasks)
             {
                 task.IsCompleted = false;

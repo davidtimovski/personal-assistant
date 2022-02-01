@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FluentValidation;
-using PersonalAssistant.Application.Contracts.Common;
+using Application.Contracts.Common;
 
-namespace PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models
+namespace Application.Contracts.ToDoAssistant.Lists.Models
 {
     public class ShareList
     {

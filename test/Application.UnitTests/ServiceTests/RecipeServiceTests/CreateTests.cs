@@ -3,27 +3,27 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentValidation;
 using Moq;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes;
-using PersonalAssistant.Application.Contracts.CookingAssistant.Recipes.Models;
-using PersonalAssistant.Application.Mappings;
-using PersonalAssistant.Application.Services.CookingAssistant;
-using PersonalAssistant.Application.UnitTests.Builders;
-using PersonalAssistant.Domain.Entities.CookingAssistant;
+using Application.Contracts.CookingAssistant.Recipes;
+using Application.Contracts.CookingAssistant.Recipes.Models;
+using Application.Mappings;
+using Application.Services.CookingAssistant;
+using Application.UnitTests.Builders;
+using Domain.Entities.CookingAssistant;
 using Xunit;
 
-namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTests
+namespace Application.UnitTests.ServiceTests.RecipeServiceTests
 {
     public class CreateTests
     {
         private readonly Mock<IValidator<CreateRecipe>> _successfulValidatorMock;
-        private readonly Mock<IRecipesRepository> _recipesRepositoryMock = new Mock<IRecipesRepository>();
+        private readonly Mock<IRecipesRepository> _recipesRepositoryMock = new();
         private readonly IRecipeService _sut;
 
         public CreateTests()
         {
             _successfulValidatorMock = ValidatorMocker.GetSuccessful<CreateRecipe>();
 
-            _sut = new RecipeService(null, null, null, null, null, null,
+            _sut = new RecipeService(null, null, null, null, null,
                 _recipesRepositoryMock.Object,
                 MapperMocker.GetMapper<CookingAssistantProfile>());
         }
@@ -52,7 +52,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         {
             string actualName = null;
             _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-                .Callback<Recipe>((r) => actualName = r.Name);
+                .Callback<Recipe>(r => actualName = r.Name);
 
             CreateRecipe model = new RecipeBuilder().WithName(" Recipe name ").BuildCreateModel();
 
@@ -67,7 +67,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         {
             string actualDescription = null;
             _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-                .Callback<Recipe>((r) => actualDescription = r.Description);
+                .Callback<Recipe>(r => actualDescription = r.Description);
 
             CreateRecipe model = new RecipeBuilder().WithDescription(" Description ").BuildCreateModel();
 
@@ -82,7 +82,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         {
             List<RecipeIngredient> actualRecipeIngredients = null;
             _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-                .Callback<Recipe>((r) => actualRecipeIngredients = r.RecipeIngredients);
+                .Callback<Recipe>(r => actualRecipeIngredients = r.RecipeIngredients);
 
             CreateRecipe model = new RecipeBuilder()
                 .WithRecipeIngredients(" Ingredient 1", "Ingredient 2 ", " Ingredient 3 ").BuildCreateModel();
@@ -90,9 +90,9 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
             await _sut.CreateAsync(model, _successfulValidatorMock.Object);
             var expectedRecipeIngredients = new List<RecipeIngredient>
             {
-                new RecipeIngredient { Ingredient = new Ingredient { Name = "Ingredient 1" } },
-                new RecipeIngredient { Ingredient = new Ingredient { Name = "Ingredient 2" } },
-                new RecipeIngredient { Ingredient = new Ingredient { Name = "Ingredient 3" } }
+                new() { Ingredient = new Ingredient { Name = "Ingredient 1" } },
+                new() { Ingredient = new Ingredient { Name = "Ingredient 2" } },
+                new() { Ingredient = new Ingredient { Name = "Ingredient 3" } }
             };
 
             for (var i = 0; i < expectedRecipeIngredients.Count; i++)
@@ -106,7 +106,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         {
             List<RecipeIngredient> actualRecipeIngredients = null;
             _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-                .Callback<Recipe>((r) => actualRecipeIngredients = r.RecipeIngredients);
+                .Callback<Recipe>(r => actualRecipeIngredients = r.RecipeIngredients);
 
             CreateRecipe model = new RecipeBuilder().WithRecipeIngredientsLinkedToTasks().BuildCreateModel();
 
@@ -123,7 +123,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         {
             List<RecipeIngredient> actualRecipeIngredients = null;
             _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-                .Callback<Recipe>((r) => actualRecipeIngredients = r.RecipeIngredients);
+                .Callback<Recipe>(r => actualRecipeIngredients = r.RecipeIngredients);
 
             CreateRecipe model = new RecipeBuilder().WithRecipeIngredientsWithAmounts(0, 0).BuildCreateModel();
 
@@ -140,7 +140,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         {
             List<RecipeIngredient> actualRecipeIngredients = null;
             _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-                .Callback<Recipe>((r) => actualRecipeIngredients = r.RecipeIngredients);
+                .Callback<Recipe>(r => actualRecipeIngredients = r.RecipeIngredients);
 
             CreateRecipe model = new RecipeBuilder().WithRecipeIngredientsWithAmounts(0, 0).BuildCreateModel();
 
@@ -157,7 +157,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         {
             List<RecipeIngredient> actualRecipeIngredients = null;
             _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-                .Callback<Recipe>((r) => actualRecipeIngredients = r.RecipeIngredients);
+                .Callback<Recipe>(r => actualRecipeIngredients = r.RecipeIngredients);
 
             CreateRecipe model = new RecipeBuilder().WithRecipeIngredientsWithAmounts(null, null).BuildCreateModel();
 
@@ -177,7 +177,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         {
             string actualInstructions = null;
             _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-                .Callback<Recipe>((r) => actualInstructions = r.Instructions);
+                .Callback<Recipe>(r => actualInstructions = r.Instructions);
 
             CreateRecipe model = new RecipeBuilder().WithInstructions(instructions).BuildCreateModel();
 
@@ -191,7 +191,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         {
             string actualInstructions = null;
             _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-                .Callback<Recipe>((r) => actualInstructions = r.Instructions);
+                .Callback<Recipe>(r => actualInstructions = r.Instructions);
 
             CreateRecipe model = new RecipeBuilder().WithInstructions(" Instructions ").BuildCreateModel();
 
@@ -206,7 +206,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         {
             TimeSpan? actualPrepDuration = null;
             _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-                .Callback<Recipe>((r) => actualPrepDuration = r.PrepDuration);
+                .Callback<Recipe>(r => actualPrepDuration = r.PrepDuration);
 
             CreateRecipe model = new RecipeBuilder().WithPrepDuration(TimeSpan.FromSeconds(59)).BuildCreateModel();
 
@@ -220,7 +220,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         {
             TimeSpan? actualCookDuration = null;
             _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-                .Callback<Recipe>((r) => actualCookDuration = r.CookDuration);
+                .Callback<Recipe>(r => actualCookDuration = r.CookDuration);
 
             CreateRecipe model = new RecipeBuilder().WithCookDuration(TimeSpan.FromSeconds(59)).BuildCreateModel();
 
@@ -234,7 +234,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         {
             var actualCreatedDate = new DateTime();
             _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-                .Callback<Recipe>((r) => actualCreatedDate = r.CreatedDate);
+                .Callback<Recipe>(r => actualCreatedDate = r.CreatedDate);
 
             CreateRecipe model = new RecipeBuilder().BuildCreateModel();
 
@@ -248,7 +248,7 @@ namespace PersonalAssistant.Application.UnitTests.ServiceTests.RecipeServiceTest
         {
             var actualModifiedDate = new DateTime();
             _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-                .Callback<Recipe>((r) => actualModifiedDate = r.ModifiedDate);
+                .Callback<Recipe>(r => actualModifiedDate = r.ModifiedDate);
 
             CreateRecipe model = new RecipeBuilder().BuildCreateModel();
 

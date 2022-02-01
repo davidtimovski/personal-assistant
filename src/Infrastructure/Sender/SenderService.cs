@@ -2,15 +2,15 @@
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Infrastructure.Sender.Models;
+using Application.Contracts.Common;
+using Infrastructure.Sender.Models;
 using RabbitMQ.Client;
 
-namespace PersonalAssistant.Infrastructure.Sender
+namespace Infrastructure.Sender
 {
     public class SenderService : ISenderService
     {
-        private IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
         public SenderService(IConfiguration configuration)
         {
             _configuration = configuration;
@@ -18,23 +18,22 @@ namespace PersonalAssistant.Infrastructure.Sender
 
         public void Enqueue<T>(T message)
         {
-            if (message is Email email)
+            switch (message)
             {
-                SendToQueue("email_queue", email);
-            }
-            else if (message is PushNotification pushNotification)
-            {
-                SendToQueue("push_notification_queue", pushNotification);
-            }
-            else
-            {
-                throw new ArgumentException("The message parameter type is not valid.");
+                case Email email:
+                    SendToQueue("email_queue", email);
+                    break;
+                case PushNotification pushNotification:
+                    SendToQueue("push_notification_queue", pushNotification);
+                    break;
+                default:
+                    throw new ArgumentException("The message parameter type is not valid.");
             }
         }
 
         private void SendToQueue(string queue, object message)
         {
-            var factory = new ConnectionFactory()
+            var factory = new ConnectionFactory
             {
                 HostName = _configuration["EventBusConnection"]
             };

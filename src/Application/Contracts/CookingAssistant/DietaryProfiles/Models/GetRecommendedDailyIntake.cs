@@ -2,7 +2,7 @@
 using System.Linq;
 using FluentValidation;
 
-namespace PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles.Models
+namespace Application.Contracts.CookingAssistant.DietaryProfiles.Models
 {
     public class GetRecommendedDailyIntake
     {

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Xunit;
 
-namespace PersonalAssistant.Application.UnitTests.Mappings
+namespace Application.UnitTests.Mappings
 {
     public class MappingTests : IClassFixture<MappingTestsFixture>
     {

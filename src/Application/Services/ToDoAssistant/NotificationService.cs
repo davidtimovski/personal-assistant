@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications.Models;
-using PersonalAssistant.Domain.Entities.ToDoAssistant;
+using Application.Contracts.ToDoAssistant.Notifications;
+using Application.Contracts.ToDoAssistant.Notifications.Models;
+using Domain.Entities.ToDoAssistant;
 
-namespace PersonalAssistant.Application.Services.ToDoAssistant
+namespace Application.Services.ToDoAssistant
 {
     public class NotificationService : INotificationService
     {

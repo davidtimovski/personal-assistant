@@ -9,8 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Localization;
-using PersonalAssistant.Infrastructure.Identity;
+using Infrastructure.Identity;
 
 namespace Auth.Controllers
 {
@@ -18,16 +17,13 @@ namespace Auth.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
-        private readonly IStringLocalizer<HomeController> _localizer;
 
         public HomeController(
             UserManager<ApplicationUser> userManager,
-            IConfiguration configuration,
-            IStringLocalizer<HomeController> localizer)
+            IConfiguration configuration)
         {
             _userManager = userManager;
             _configuration = configuration;
-            _localizer = localizer;
         }
 
         [HttpGet]
@@ -35,7 +31,7 @@ namespace Auth.Controllers
         {
             if (User?.Identity.IsAuthenticated == true)
             {
-                return RedirectToAction(nameof(HomeController.Overview));
+                return RedirectToAction(nameof(Overview));
             }
 
             return RedirectToAction(nameof(AccountController.Login), "Account");
@@ -135,7 +131,7 @@ namespace Auth.Controllers
                 return RedirectToLocal(returnUrl);
             }
 
-            return RedirectToAction(nameof(HomeController.Index));
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
@@ -154,10 +150,8 @@ namespace Auth.Controllers
             {
                 return Redirect(returnUrl);
             }
-            else
-            {
-                return RedirectToAction(nameof(HomeController.Index));
-            }
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

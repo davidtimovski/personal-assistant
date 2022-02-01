@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Api.Controllers.Common;
 using Microsoft.AspNetCore.Mvc;
-using PersonalAssistant.Api.UnitTests.Builders;
+using Api.UnitTests.Builders;
 using Xunit;
 
-namespace PersonalAssistant.Api.UnitTests.Controllers.Common
+namespace Api.UnitTests.Controllers.Common
 {
     public class PushSubscriptionsControllerTests
     {

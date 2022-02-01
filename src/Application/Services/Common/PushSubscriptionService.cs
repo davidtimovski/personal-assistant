@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using PersonalAssistant.Application.Contracts;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Domain.Entities.Common;
+using Application.Contracts;
+using Application.Contracts.Common;
+using Domain.Entities.Common;
 
-namespace PersonalAssistant.Application.Services.Common
+namespace Application.Services.Common
 {
     public class PushSubscriptionService : IPushSubscriptionService
     {
