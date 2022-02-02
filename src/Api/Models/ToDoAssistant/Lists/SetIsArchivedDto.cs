@@ -1,8 +1,7 @@
-﻿namespace Api.Models.ToDoAssistant.Lists
+﻿namespace Api.Models.ToDoAssistant.Lists;
+
+public class SetIsArchivedDto
 {
-    public class SetIsArchivedDto
-    {
-        public int ListId { get; set; }
-        public bool IsArchived { get; set; }
-    }
+    public int ListId { get; set; }
+    public bool IsArchived { get; set; }
 }

@@ -1,7 +1,6 @@
-﻿namespace Auth.ViewModels.Home
+﻿namespace Auth.ViewModels.Home;
+
+public class ErrorViewModel
 {
-    public class ErrorViewModel
-    {
-        public int ErrorCode { get; set; }
-    }
+    public int ErrorCode { get; set; }
 }

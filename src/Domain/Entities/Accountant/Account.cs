@@ -1,12 +1,11 @@
-﻿namespace Domain.Entities.Accountant
+﻿namespace Domain.Entities.Accountant;
+
+public class Account : Entity
 {
-    public class Account : Entity
-    {
-        public int Id { get; set; }
-        public int UserId { get; set; }
-        public string Name { get; set; }
-        public bool IsMain { get; set; }
-        public string Currency { get; set; }
-        public decimal? StockPrice { get; set; }
-    }
+    public int Id { get; set; }
+    public int UserId { get; set; }
+    public string Name { get; set; }
+    public bool IsMain { get; set; }
+    public string Currency { get; set; }
+    public decimal? StockPrice { get; set; }
 }

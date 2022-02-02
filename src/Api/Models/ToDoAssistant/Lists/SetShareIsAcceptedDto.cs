@@ -1,8 +1,7 @@
-﻿namespace Api.Models.ToDoAssistant.Lists
+﻿namespace Api.Models.ToDoAssistant.Lists;
+
+public class SetShareIsAcceptedDto
 {
-    public class SetShareIsAcceptedDto
-    {
-        public int ListId { get; set; }
-        public bool IsAccepted { get; set; }
-    }
+    public int ListId { get; set; }
+    public bool IsAccepted { get; set; }
 }

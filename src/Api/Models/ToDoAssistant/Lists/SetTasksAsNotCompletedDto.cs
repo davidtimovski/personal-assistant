@@ -1,7 +1,6 @@
-﻿namespace Api.Models.ToDoAssistant.Lists
+﻿namespace Api.Models.ToDoAssistant.Lists;
+
+public class SetTasksAsNotCompletedDto
 {
-    public class SetTasksAsNotCompletedDto
-    {
-        public int ListId { get; set; }
-    }
+    public int ListId { get; set; }
 }

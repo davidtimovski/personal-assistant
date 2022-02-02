@@ -7,159 +7,158 @@ using Application.Contracts.Common;
 using Application.Contracts.Common.Models;
 using Infrastructure.Identity;
 
-namespace Api.Controllers.Common
+namespace Api.Controllers.Common;
+
+[Authorize]
+[EnableCors("AllowAllApps")]
+[Route("api/[controller]")]
+public class UsersController : Controller
 {
-    [Authorize]
-    [EnableCors("AllowAllApps")]
-    [Route("api/[controller]")]
-    public class UsersController : Controller
+    private readonly IUserService _userService;
+
+    public UsersController(IUserService userService)
     {
-        private readonly IUserService _userService;
+        _userService = userService;
+    }
 
-        public UsersController(IUserService userService)
+    [HttpGet("language")]
+    public IActionResult GetLanguage()
+    {
+        int userId;
+        try
         {
-            _userService = userService;
+            userId = IdentityHelper.GetUserId(User);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
         }
 
-        [HttpGet("language")]
-        public IActionResult GetLanguage()
+        string language = _userService.GetLanguage(userId);
+
+        return Ok(language);
+    }
+
+    [HttpGet("profile-image-uri")]
+    public IActionResult GetProfileImageUri()
+    {
+        int userId;
+        try
         {
-            int userId;
-            try
-            {
-                userId = IdentityHelper.GetUserId(User);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-
-            string language = _userService.GetLanguage(userId);
-
-            return Ok(language);
+            userId = IdentityHelper.GetUserId(User);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
         }
 
-        [HttpGet("profile-image-uri")]
-        public IActionResult GetProfileImageUri()
+        string imageUri = _userService.GetImageUri(userId);
+
+        return Ok(imageUri);
+    }
+
+    [HttpGet("to-do-preferences")]
+    public IActionResult GetToDoPreferences()
+    {
+        int userId;
+        try
         {
-            int userId;
-            try
-            {
-                userId = IdentityHelper.GetUserId(User);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-
-            string imageUri = _userService.GetImageUri(userId);
-
-            return Ok(imageUri);
+            userId = IdentityHelper.GetUserId(User);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
         }
 
-        [HttpGet("to-do-preferences")]
-        public IActionResult GetToDoPreferences()
+        ToDoAssistantPreferences preferences = _userService.GetToDoAssistantPreferences(userId);
+
+        return Ok(preferences);
+    }
+
+    [HttpGet("cooking-preferences")]
+    public IActionResult GetCookingPreferences()
+    {
+        int userId;
+        try
         {
-            int userId;
-            try
-            {
-                userId = IdentityHelper.GetUserId(User);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-
-            ToDoAssistantPreferences preferences = _userService.GetToDoAssistantPreferences(userId);
-
-            return Ok(preferences);
+            userId = IdentityHelper.GetUserId(User);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
         }
 
-        [HttpGet("cooking-preferences")]
-        public IActionResult GetCookingPreferences()
+        CookingAssistantPreferences preferences = _userService.GetCookingAssistantPreferences(userId);
+
+        return Ok(preferences);
+    }
+
+    [HttpPut("to-do-notifications-enabled")]
+    public async Task<IActionResult> UpdateToDoNotificationsEnabled([FromBody] UpdateUser dto)
+    {
+        if (dto == null)
         {
-            int userId;
-            try
-            {
-                userId = IdentityHelper.GetUserId(User);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-
-            CookingAssistantPreferences preferences = _userService.GetCookingAssistantPreferences(userId);
-
-            return Ok(preferences);
+            return BadRequest();
         }
 
-        [HttpPut("to-do-notifications-enabled")]
-        public async Task<IActionResult> UpdateToDoNotificationsEnabled([FromBody] UpdateUser dto)
+        int userId;
+        try
         {
-            if (dto == null)
-            {
-                return BadRequest();
-            }
-
-            int userId;
-            try
-            {
-                userId = IdentityHelper.GetUserId(User);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-
-            await _userService.UpdateToDoNotificationsEnabledAsync(userId, dto.ToDoNotificationsEnabled);
-
-            return NoContent();
+            userId = IdentityHelper.GetUserId(User);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
         }
 
-        [HttpPut("cooking-notifications-enabled")]
-        public async Task<IActionResult> UpdateCookingNotificationsEnabled([FromBody] UpdateUser dto)
+        await _userService.UpdateToDoNotificationsEnabledAsync(userId, dto.ToDoNotificationsEnabled);
+
+        return NoContent();
+    }
+
+    [HttpPut("cooking-notifications-enabled")]
+    public async Task<IActionResult> UpdateCookingNotificationsEnabled([FromBody] UpdateUser dto)
+    {
+        if (dto == null)
         {
-            if (dto == null)
-            {
-                return BadRequest();
-            }
-
-            int userId;
-            try
-            {
-                userId = IdentityHelper.GetUserId(User);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-
-            await _userService.UpdateCookingNotificationsEnabledAsync(userId, dto.CookingNotificationsEnabled);
-
-            return NoContent();
+            return BadRequest();
         }
 
-        [HttpPut("imperial-system")]
-        public async Task<IActionResult> UpdateImperialSystem([FromBody] UpdateUser dto)
+        int userId;
+        try
         {
-            if (dto == null)
-            {
-                return BadRequest();
-            }
-
-            int userId;
-            try
-            {
-                userId = IdentityHelper.GetUserId(User);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-
-            await _userService.UpdateImperialSystemAsync(userId, dto.ImperialSystem);
-
-            return NoContent();
+            userId = IdentityHelper.GetUserId(User);
         }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
+        }
+
+        await _userService.UpdateCookingNotificationsEnabledAsync(userId, dto.CookingNotificationsEnabled);
+
+        return NoContent();
+    }
+
+    [HttpPut("imperial-system")]
+    public async Task<IActionResult> UpdateImperialSystem([FromBody] UpdateUser dto)
+    {
+        if (dto == null)
+        {
+            return BadRequest();
+        }
+
+        int userId;
+        try
+        {
+            userId = IdentityHelper.GetUserId(User);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
+        }
+
+        await _userService.UpdateImperialSystemAsync(userId, dto.ImperialSystem);
+
+        return NoContent();
     }
 }

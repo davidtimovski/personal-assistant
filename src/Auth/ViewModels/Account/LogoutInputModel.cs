@@ -1,7 +1,6 @@
-﻿namespace Auth.ViewModels.Account
+﻿namespace Auth.ViewModels.Account;
+
+public class LogoutInputModel
 {
-    public class LogoutInputModel
-    {
-        public string LogoutId { get; set; }
-    }
+    public string LogoutId { get; set; }
 }

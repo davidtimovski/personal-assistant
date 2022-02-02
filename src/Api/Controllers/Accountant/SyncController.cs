@@ -20,134 +20,133 @@ using Application.Contracts.Accountant.UpcomingExpenses;
 using Application.Contracts.Accountant.UpcomingExpenses.Models;
 using Infrastructure.Identity;
 
-namespace Api.Controllers.Accountant
+namespace Api.Controllers.Accountant;
+
+[Authorize]
+[EnableCors("AllowAccountant")]
+[Route("api/[controller]")]
+public class SyncController : Controller
 {
-    [Authorize]
-    [EnableCors("AllowAccountant")]
-    [Route("api/[controller]")]
-    public class SyncController : Controller
+    private readonly ISyncService _syncService;
+    private readonly ICategoryService _categoryService;
+    private readonly IAccountService _accountService;
+    private readonly ITransactionService _transactionService;
+    private readonly IUpcomingExpenseService _upcomingExpenseService;
+    private readonly IDebtService _debtService;
+
+    public SyncController(
+        ISyncService syncService,
+        ICategoryService categoryService,
+        IAccountService accountService,
+        ITransactionService transactionService,
+        IUpcomingExpenseService upcomingExpenseService,
+        IDebtService debtService)
     {
-        private readonly ISyncService _syncService;
-        private readonly ICategoryService _categoryService;
-        private readonly IAccountService _accountService;
-        private readonly ITransactionService _transactionService;
-        private readonly IUpcomingExpenseService _upcomingExpenseService;
-        private readonly IDebtService _debtService;
+        _syncService = syncService;
+        _categoryService = categoryService;
+        _accountService = accountService;
+        _transactionService = transactionService;
+        _upcomingExpenseService = upcomingExpenseService;
+        _debtService = debtService;
+    }
 
-        public SyncController(
-            ISyncService syncService,
-            ICategoryService categoryService,
-            IAccountService accountService,
-            ITransactionService transactionService,
-            IUpcomingExpenseService upcomingExpenseService,
-            IDebtService debtService)
+    [HttpPost("changes")]
+    public async Task<IActionResult> GetChanges([FromBody] GetChangesVm vm)
+    {
+        if (vm == null)
         {
-            _syncService = syncService;
-            _categoryService = categoryService;
-            _accountService = accountService;
-            _transactionService = transactionService;
-            _upcomingExpenseService = upcomingExpenseService;
-            _debtService = debtService;
+            return BadRequest();
         }
 
-        [HttpPost("changes")]
-        public async Task<IActionResult> GetChanges([FromBody] GetChangesVm vm)
+        int userId;
+        try
         {
-            if (vm == null)
-            {
-                return BadRequest();
-            }
-
-            int userId;
-            try
-            {
-                userId = IdentityHelper.GetUserId(User);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-
-            await _upcomingExpenseService.DeleteOldAsync(userId);
-
-            var getAll = new GetAll(userId, vm.LastSynced);
-
-            IEnumerable<CategoryDto> categories = _categoryService.GetAll(getAll);
-            IEnumerable<AccountDto> accounts = _accountService.GetAll(getAll);
-            IEnumerable<TransactionDto> transactions = _transactionService.GetAll(getAll);
-            IEnumerable<UpcomingExpenseDto> upcomingExpenses = _upcomingExpenseService.GetAll(getAll);
-            IEnumerable<DebtDto> debts = _debtService.GetAll(getAll);
-
-            var getDeletedIds = new GetDeletedIds(userId, vm.LastSynced);
-
-            var changedVm = new ChangedVm
-            {
-                LastSynced = DateTime.UtcNow,
-                DeletedAccountIds = _accountService.GetDeletedIds(getDeletedIds),
-                Accounts = accounts,
-                DeletedCategoryIds = _categoryService.GetDeletedIds(getDeletedIds),
-                Categories = categories,
-                DeletedTransactionIds = _transactionService.GetDeletedIds(getDeletedIds),
-                Transactions = transactions,
-                DeletedUpcomingExpenseIds = _upcomingExpenseService.GetDeletedIds(getDeletedIds),
-                UpcomingExpenses = upcomingExpenses,
-                DeletedDebtIds = _debtService.GetDeletedIds(getDeletedIds),
-                Debts = debts
-            };
-
-            return Ok(changedVm);
+            userId = IdentityHelper.GetUserId(User);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
         }
 
-        [HttpPost("create-entities")]
-        public async Task<IActionResult> CreateEntities([FromBody] SyncEntities dto)
+        await _upcomingExpenseService.DeleteOldAsync(userId);
+
+        var getAll = new GetAll(userId, vm.LastSynced);
+
+        IEnumerable<CategoryDto> categories = _categoryService.GetAll(getAll);
+        IEnumerable<AccountDto> accounts = _accountService.GetAll(getAll);
+        IEnumerable<TransactionDto> transactions = _transactionService.GetAll(getAll);
+        IEnumerable<UpcomingExpenseDto> upcomingExpenses = _upcomingExpenseService.GetAll(getAll);
+        IEnumerable<DebtDto> debts = _debtService.GetAll(getAll);
+
+        var getDeletedIds = new GetDeletedIds(userId, vm.LastSynced);
+
+        var changedVm = new ChangedVm
         {
-            if (dto == null)
-            {
-                return BadRequest();
-            }
+            LastSynced = DateTime.UtcNow,
+            DeletedAccountIds = _accountService.GetDeletedIds(getDeletedIds),
+            Accounts = accounts,
+            DeletedCategoryIds = _categoryService.GetDeletedIds(getDeletedIds),
+            Categories = categories,
+            DeletedTransactionIds = _transactionService.GetDeletedIds(getDeletedIds),
+            Transactions = transactions,
+            DeletedUpcomingExpenseIds = _upcomingExpenseService.GetDeletedIds(getDeletedIds),
+            UpcomingExpenses = upcomingExpenses,
+            DeletedDebtIds = _debtService.GetDeletedIds(getDeletedIds),
+            Debts = debts
+        };
 
-            int userId;
-            try
-            {
-                userId = IdentityHelper.GetUserId(User);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
+        return Ok(changedVm);
+    }
 
-            dto.Accounts.ForEach(x => { x.UserId = userId; });
-            dto.Categories.ForEach(x => { x.UserId = userId; });
-            dto.Transactions.ForEach(x => { x.UserId = userId; });
-            dto.UpcomingExpenses.ForEach(x => { x.UserId = userId; });
-            dto.Debts.ForEach(x => { x.UserId = userId; });
-
-            var syncedEntityIds = await _syncService.SyncEntitiesAsync(dto);
-
-            var createdEntitiesVm = new CreatedEntityIdsVm();
-
-            for (var i = 0; i < syncedEntityIds.AccountIds.Length; i++)
-            {
-                createdEntitiesVm.AccountIdPairs.Add(new CreatedEntityIdPair(dto.Accounts[i].Id, syncedEntityIds.AccountIds[i]));
-            }
-            for (var i = 0; i < syncedEntityIds.CategoryIds.Length; i++)
-            {
-                createdEntitiesVm.CategoryIdPairs.Add(new CreatedEntityIdPair(dto.Categories[i].Id, syncedEntityIds.CategoryIds[i]));
-            }
-            for (var i = 0; i < syncedEntityIds.TransactionIds.Length; i++)
-            {
-                createdEntitiesVm.TransactionIdPairs.Add(new CreatedEntityIdPair(dto.Transactions[i].Id, syncedEntityIds.TransactionIds[i]));
-            }
-            for (var i = 0; i < syncedEntityIds.UpcomingExpenseIds.Length; i++)
-            {
-                createdEntitiesVm.UpcomingExpenseIdPairs.Add(new CreatedEntityIdPair(dto.UpcomingExpenses[i].Id, syncedEntityIds.UpcomingExpenseIds[i]));
-            }
-            for (var i = 0; i < syncedEntityIds.DebtIds.Length; i++)
-            {
-                createdEntitiesVm.DebtIdPairs.Add(new CreatedEntityIdPair(dto.Debts[i].Id, syncedEntityIds.DebtIds[i]));
-            }
-
-            return StatusCode(201, createdEntitiesVm);
+    [HttpPost("create-entities")]
+    public async Task<IActionResult> CreateEntities([FromBody] SyncEntities dto)
+    {
+        if (dto == null)
+        {
+            return BadRequest();
         }
+
+        int userId;
+        try
+        {
+            userId = IdentityHelper.GetUserId(User);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
+        }
+
+        dto.Accounts.ForEach(x => { x.UserId = userId; });
+        dto.Categories.ForEach(x => { x.UserId = userId; });
+        dto.Transactions.ForEach(x => { x.UserId = userId; });
+        dto.UpcomingExpenses.ForEach(x => { x.UserId = userId; });
+        dto.Debts.ForEach(x => { x.UserId = userId; });
+
+        var syncedEntityIds = await _syncService.SyncEntitiesAsync(dto);
+
+        var createdEntitiesVm = new CreatedEntityIdsVm();
+
+        for (var i = 0; i < syncedEntityIds.AccountIds.Length; i++)
+        {
+            createdEntitiesVm.AccountIdPairs.Add(new CreatedEntityIdPair(dto.Accounts[i].Id, syncedEntityIds.AccountIds[i]));
+        }
+        for (var i = 0; i < syncedEntityIds.CategoryIds.Length; i++)
+        {
+            createdEntitiesVm.CategoryIdPairs.Add(new CreatedEntityIdPair(dto.Categories[i].Id, syncedEntityIds.CategoryIds[i]));
+        }
+        for (var i = 0; i < syncedEntityIds.TransactionIds.Length; i++)
+        {
+            createdEntitiesVm.TransactionIdPairs.Add(new CreatedEntityIdPair(dto.Transactions[i].Id, syncedEntityIds.TransactionIds[i]));
+        }
+        for (var i = 0; i < syncedEntityIds.UpcomingExpenseIds.Length; i++)
+        {
+            createdEntitiesVm.UpcomingExpenseIdPairs.Add(new CreatedEntityIdPair(dto.UpcomingExpenses[i].Id, syncedEntityIds.UpcomingExpenseIds[i]));
+        }
+        for (var i = 0; i < syncedEntityIds.DebtIds.Length; i++)
+        {
+            createdEntitiesVm.DebtIdPairs.Add(new CreatedEntityIdPair(dto.Debts[i].Id, syncedEntityIds.DebtIds[i]));
+        }
+
+        return StatusCode(201, createdEntitiesVm);
     }
 }

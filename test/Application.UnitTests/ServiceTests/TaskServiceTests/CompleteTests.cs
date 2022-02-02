@@ -7,35 +7,34 @@ using Application.Services.ToDoAssistant;
 using Domain.Entities.ToDoAssistant;
 using Xunit;
 
-namespace Application.UnitTests.ServiceTests.TaskServiceTests
+namespace Application.UnitTests.ServiceTests.TaskServiceTests;
+
+public class CompleteTests
 {
-    public class CompleteTests
+    private readonly Mock<ITasksRepository> _tasksRepositoryMock = new();
+    private readonly ITaskService _sut;
+
+    public CompleteTests()
     {
-        private readonly Mock<ITasksRepository> _tasksRepositoryMock = new();
-        private readonly ITaskService _sut;
+        _sut = new TaskService(
+            null,
+            null,
+            _tasksRepositoryMock.Object,
+            null,
+            MapperMocker.GetMapper<ToDoAssistantProfile>());
+    }
 
-        public CompleteTests()
-        {
-            _sut = new TaskService(
-                null,
-                null,
-                _tasksRepositoryMock.Object,
-                null,
-                MapperMocker.GetMapper<ToDoAssistantProfile>());
-        }
+    [Fact]
+    public async Task DoesNothing_IfTaskAlreadyCompleted()
+    {
+        _tasksRepositoryMock.Setup(x => x.Exists(It.IsAny<int>(), It.IsAny<int>()))
+            .Returns(true);
 
-        [Fact]
-        public async Task DoesNothing_IfTaskAlreadyCompleted()
-        {
-            _tasksRepositoryMock.Setup(x => x.Exists(It.IsAny<int>(), It.IsAny<int>()))
-                .Returns(true);
+        _tasksRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
+            .Returns(new ToDoTask { IsCompleted = true });
 
-            _tasksRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
-                .Returns(new ToDoTask { IsCompleted = true });
+        await _sut.CompleteAsync(new CompleteUncomplete());
 
-            await _sut.CompleteAsync(new CompleteUncomplete());
-
-            _tasksRepositoryMock.Verify(x => x.CompleteAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
-        }
+        _tasksRepositoryMock.Verify(x => x.CompleteAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
     }
 }

@@ -2,17 +2,16 @@
 using Application.Contracts.Common;
 using Application.Contracts.Common.Models;
 
-namespace Application.Contracts.CookingAssistant.Recipes.Models
-{
-    public class DeclineSendRequestResult : INotificationResult
-    {
-        public string RecipeName { get; set; }
-        public string ActionUserImageUri { get; set; }
-        public IEnumerable<NotificationRecipient> NotificationRecipients { get; set; }
+namespace Application.Contracts.CookingAssistant.Recipes.Models;
 
-        public bool Notify()
-        {
-            return true;
-        }
+public class DeclineSendRequestResult : INotificationResult
+{
+    public string RecipeName { get; set; }
+    public string ActionUserImageUri { get; set; }
+    public IEnumerable<NotificationRecipient> NotificationRecipients { get; set; }
+
+    public bool Notify()
+    {
+        return true;
     }
 }

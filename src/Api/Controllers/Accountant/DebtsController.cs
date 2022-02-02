@@ -7,80 +7,79 @@ using Application.Contracts.Accountant.Debts;
 using Application.Contracts.Accountant.Debts.Models;
 using Infrastructure.Identity;
 
-namespace Api.Controllers.Accountant
+namespace Api.Controllers.Accountant;
+
+[Authorize]
+[EnableCors("AllowAccountant")]
+[Route("api/[controller]")]
+public class DebtsController : Controller
 {
-    [Authorize]
-    [EnableCors("AllowAccountant")]
-    [Route("api/[controller]")]
-    public class DebtsController : Controller
+    private readonly IDebtService _debtService;
+
+    public DebtsController(IDebtService debtService)
     {
-        private readonly IDebtService _debtService;
+        _debtService = debtService;
+    }
 
-        public DebtsController(IDebtService debtService)
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] CreateDebt dto)
+    {
+        if (dto == null)
         {
-            _debtService = debtService;
+            return BadRequest();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateDebt dto)
+        try
         {
-            if (dto == null)
-            {
-                return BadRequest();
-            }
-
-            try
-            {
-                dto.UserId = IdentityHelper.GetUserId(User);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-
-            int id = await _debtService.CreateAsync(dto);
-
-            return StatusCode(201, id);
+            dto.UserId = IdentityHelper.GetUserId(User);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
         }
 
-        [HttpPut]
-        public async Task<IActionResult> Update([FromBody] UpdateDebt dto)
+        int id = await _debtService.CreateAsync(dto);
+
+        return StatusCode(201, id);
+    }
+
+    [HttpPut]
+    public async Task<IActionResult> Update([FromBody] UpdateDebt dto)
+    {
+        if (dto == null)
         {
-            if (dto == null)
-            {
-                return BadRequest();
-            }
-
-            try
-            {
-                dto.UserId = IdentityHelper.GetUserId(User);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-
-            await _debtService.UpdateAsync(dto);
-
-            return NoContent();
+            return BadRequest();
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        try
         {
-            int userId;
-            try
-            {
-                userId = IdentityHelper.GetUserId(User);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-
-            await _debtService.DeleteAsync(id, userId);
-
-            return NoContent();
+            dto.UserId = IdentityHelper.GetUserId(User);
         }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
+        }
+
+        await _debtService.UpdateAsync(dto);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        int userId;
+        try
+        {
+            userId = IdentityHelper.GetUserId(User);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
+        }
+
+        await _debtService.DeleteAsync(id, userId);
+
+        return NoContent();
     }
 }

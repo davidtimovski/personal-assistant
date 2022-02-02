@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Application.Contracts.Accountant.UpcomingExpenses.Models
+namespace Application.Contracts.Accountant.UpcomingExpenses.Models;
+
+public class UpdateUpcomingExpense : CreateUpcomingExpense
 {
-    public class UpdateUpcomingExpense : CreateUpcomingExpense
-    {
-        public int Id { get; set; }
-    }
+    public int Id { get; set; }
 }

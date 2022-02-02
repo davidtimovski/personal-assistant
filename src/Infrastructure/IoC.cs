@@ -7,30 +7,29 @@ using Infrastructure.Cdn;
 using Infrastructure.Currency;
 using Infrastructure.Sender;
 
-namespace Infrastructure
+namespace Infrastructure;
+
+public static class IoC
 {
-    public static class IoC
+    public static IServiceCollection AddInfrastructure(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        string environmentName)
     {
-        public static IServiceCollection AddInfrastructure(
-            this IServiceCollection services,
-            IConfiguration configuration,
-            string environmentName)
-        {
-            services.AddTransient<ICurrencyService, CurrencyService>();
+        services.AddTransient<ICurrencyService, CurrencyService>();
 
-            services.AddSingleton<ISenderService, SenderService>();
+        services.AddSingleton<ISenderService, SenderService>();
 
-            services.AddSingleton<ICdnService>(new CloudinaryService(
-                cloudinaryAccount: new Account(
-                    configuration["Cloudinary:CloudName"],
-                    configuration["Cloudinary:ApiKey"],
-                    configuration["Cloudinary:ApiSecret"]),
-                environmentName,
-                configuration["DefaultImageUris:Profile"],
-                configuration["DefaultImageUris:Recipe"],
-                new HttpClient()));
+        services.AddSingleton<ICdnService>(new CloudinaryService(
+            cloudinaryAccount: new Account(
+                configuration["Cloudinary:CloudName"],
+                configuration["Cloudinary:ApiKey"],
+                configuration["Cloudinary:ApiSecret"]),
+            environmentName,
+            configuration["DefaultImageUris:Profile"],
+            configuration["DefaultImageUris:Recipe"],
+            new HttpClient()));
 
-            return services;
-        }
+        return services;
     }
 }

@@ -1,11 +1,10 @@
-﻿namespace Sender.Contracts
+﻿namespace Sender.Contracts;
+
+internal class PushNotification
 {
-    internal class PushNotification
-    {
-        public string Application { get; set; }
-        public string SenderImageUri { get; set; }
-        public int UserId { get; set; }
-        public string Message { get; set; }
-        public string OpenUrl { get; set; }
-    }
+    public string Application { get; set; }
+    public string SenderImageUri { get; set; }
+    public int UserId { get; set; }
+    public string Message { get; set; }
+    public string OpenUrl { get; set; }
 }

@@ -4,30 +4,29 @@ using Application.Contracts;
 using Application.Contracts.Common;
 using Domain.Entities.Common;
 
-namespace Application.Services.Common
+namespace Application.Services.Common;
+
+public class PushSubscriptionService : IPushSubscriptionService
 {
-    public class PushSubscriptionService : IPushSubscriptionService
+    private readonly IPushSubscriptionsRepository _pushSubscriptionsRepository;
+
+    public PushSubscriptionService(IPushSubscriptionsRepository pushSubscriptionsRepository)
     {
-        private readonly IPushSubscriptionsRepository _pushSubscriptionsRepository;
+        _pushSubscriptionsRepository = pushSubscriptionsRepository;
+    }
 
-        public PushSubscriptionService(IPushSubscriptionsRepository pushSubscriptionsRepository)
+    public async Task CreateSubscriptionAsync(int userId, string application, string endpoint, string authKey, string p256dhKey)
+    {
+        var subscription = new PushSubscription
         {
-            _pushSubscriptionsRepository = pushSubscriptionsRepository;
-        }
+            UserId = userId,
+            Application = application,
+            Endpoint = endpoint,
+            AuthKey = authKey,
+            P256dhKey = p256dhKey,
+            CreatedDate = DateTime.UtcNow
+        };
 
-        public async Task CreateSubscriptionAsync(int userId, string application, string endpoint, string authKey, string p256dhKey)
-        {
-            var subscription = new PushSubscription
-            {
-                UserId = userId,
-                Application = application,
-                Endpoint = endpoint,
-                AuthKey = authKey,
-                P256dhKey = p256dhKey,
-                CreatedDate = DateTime.UtcNow
-            };
-
-            await _pushSubscriptionsRepository.CreateSubscriptionAsync(subscription);
-        }
+        await _pushSubscriptionsRepository.CreateSubscriptionAsync(subscription);
     }
 }

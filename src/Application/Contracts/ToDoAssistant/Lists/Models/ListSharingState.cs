@@ -1,11 +1,10 @@
-﻿namespace Application.Contracts.ToDoAssistant.Lists.Models
+﻿namespace Application.Contracts.ToDoAssistant.Lists.Models;
+
+public enum ListSharingState
 {
-    public enum ListSharingState
-    {
-        NotShared,
-        PendingShare,
-        Owner,
-        Admin,
-        Member
-    }
+    NotShared,
+    PendingShare,
+    Owner,
+    Admin,
+    Member
 }

@@ -1,11 +1,10 @@
-﻿namespace Domain.Entities.Accountant
+﻿namespace Domain.Entities.Accountant;
+
+public enum EntityType
 {
-    public enum EntityType
-    {
-        Category,
-        Account,
-        Transaction,
-        UpcomingExpense,
-        Debt
-    }
+    Category,
+    Account,
+    Transaction,
+    UpcomingExpense,
+    Debt
 }

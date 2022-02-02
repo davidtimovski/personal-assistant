@@ -1,57 +1,56 @@
 ﻿using Application.Contracts.ToDoAssistant.Lists.Models;
 
-namespace Application.UnitTests.Builders
+namespace Application.UnitTests.Builders;
+
+public class ListBuilder
 {
-    public class ListBuilder
+    private string name;
+    private string tasksText;
+
+    public ListBuilder()
     {
-        private string name;
-        private string tasksText;
+        name = "Dummy name";
+    }
 
-        public ListBuilder()
-        {
-            name = "Dummy name";
-        }
+    public ListBuilder WithName(string newName)
+    {
+        name = newName;
+        return this;
+    }
 
-        public ListBuilder WithName(string newName)
-        {
-            name = newName;
-            return this;
-        }
+    public ListBuilder WithTasksText(string newTasksText)
+    {
+        tasksText = newTasksText;
+        return this;
+    }
 
-        public ListBuilder WithTasksText(string newTasksText)
+    public CreateList BuildCreateModel()
+    {
+        return new CreateList
         {
-            tasksText = newTasksText;
-            return this;
-        }
+            Name = name,
+            TasksText = tasksText
+        };
+    }
 
-        public CreateList BuildCreateModel()
+    public UpdateList BuildUpdateModel()
+    {
+        return new UpdateList
         {
-            return new CreateList
-            {
-                Name = name,
-                TasksText = tasksText
-            };
-        }
+            Name = name
+        };
+    }
 
-        public UpdateList BuildUpdateModel()
-        {
-            return new UpdateList
-            {
-                Name = name
-            };
-        }
+    public UpdateSharedList BuildUpdateSharedModel()
+    {
+        return new UpdateSharedList();
+    }
 
-        public UpdateSharedList BuildUpdateSharedModel()
+    public CopyList BuildCopyModel()
+    {
+        return new CopyList
         {
-            return new UpdateSharedList();
-        }
-
-        public CopyList BuildCopyModel()
-        {
-            return new CopyList
-            {
-                Name = name
-            };
-        }
+            Name = name
+        };
     }
 }

@@ -6,66 +6,65 @@ using Application.Contracts.Common;
 using Infrastructure.Sender.Models;
 using RabbitMQ.Client;
 
-namespace Infrastructure.Sender
+namespace Infrastructure.Sender;
+
+public class SenderService : ISenderService
 {
-    public class SenderService : ISenderService
+    private readonly IConfiguration _configuration;
+    public SenderService(IConfiguration configuration)
     {
-        private readonly IConfiguration _configuration;
-        public SenderService(IConfiguration configuration)
+        _configuration = configuration;
+    }
+
+    public void Enqueue<T>(T message)
+    {
+        switch (message)
         {
-            _configuration = configuration;
+            case Email email:
+                SendToQueue("email_queue", email);
+                break;
+            case PushNotification pushNotification:
+                SendToQueue("push_notification_queue", pushNotification);
+                break;
+            default:
+                throw new ArgumentException("The message parameter type is not valid.");
+        }
+    }
+
+    private void SendToQueue(string queue, object message)
+    {
+        var factory = new ConnectionFactory
+        {
+            HostName = _configuration["EventBusConnection"]
+        };
+
+        if (!string.IsNullOrEmpty(_configuration["EventBusUserName"]))
+        {
+            factory.UserName = _configuration["EventBusUserName"];
         }
 
-        public void Enqueue<T>(T message)
+        if (!string.IsNullOrEmpty(_configuration["EventBusPassword"]))
         {
-            switch (message)
-            {
-                case Email email:
-                    SendToQueue("email_queue", email);
-                    break;
-                case PushNotification pushNotification:
-                    SendToQueue("push_notification_queue", pushNotification);
-                    break;
-                default:
-                    throw new ArgumentException("The message parameter type is not valid.");
-            }
+            factory.Password = _configuration["EventBusPassword"];
         }
 
-        private void SendToQueue(string queue, object message)
-        {
-            var factory = new ConnectionFactory
-            {
-                HostName = _configuration["EventBusConnection"]
-            };
+        using var connection = factory.CreateConnection();
+        using var channel = connection.CreateModel();
 
-            if (!string.IsNullOrEmpty(_configuration["EventBusUserName"]))
-            {
-                factory.UserName = _configuration["EventBusUserName"];
-            }
+        var properties = channel.CreateBasicProperties();
+        properties.Persistent = true;
 
-            if (!string.IsNullOrEmpty(_configuration["EventBusPassword"]))
-            {
-                factory.Password = _configuration["EventBusPassword"];
-            }
+        channel.QueueDeclare(queue: queue,
+            durable: true,
+            exclusive: false,
+            autoDelete: false,
+            arguments: null);
 
-            using var connection = factory.CreateConnection();
-            using var channel = connection.CreateModel();
+        byte[] body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
 
-            var properties = channel.CreateBasicProperties();
-            properties.Persistent = true;
-
-            channel.QueueDeclare(queue: queue,
-                                 durable: true,
-                                 exclusive: false,
-                                 autoDelete: false,
-                                 arguments: null);
-
-            byte[] body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
-
-            channel.BasicPublish(exchange: string.Empty,
-                                 routingKey: queue,
-                                 basicProperties: properties,
-                                 body: body);
-        }
+        channel.BasicPublish(exchange: string.Empty,
+            routingKey: queue,
+            basicProperties: properties,
+            body: body);
     }
 }

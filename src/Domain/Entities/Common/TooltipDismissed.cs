@@ -1,8 +1,7 @@
-﻿namespace Domain.Entities.Common
+﻿namespace Domain.Entities.Common;
+
+public class TooltipDismissed
 {
-    public class TooltipDismissed
-    {
-        public int TooltipId { get; set; }
-        public int UserId { get; set; }
-    }
+    public int TooltipId { get; set; }
+    public int UserId { get; set; }
 }

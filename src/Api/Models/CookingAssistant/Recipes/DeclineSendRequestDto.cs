@@ -1,7 +1,6 @@
-namespace Api.Models.CookingAssistant.Recipes
+namespace Api.Models.CookingAssistant.Recipes;
+
+public class DeclineSendRequestDto
 {
-    public class DeclineSendRequestDto
-    {
-        public int RecipeId { get; set; }
-    }
+    public int RecipeId { get; set; }
 }

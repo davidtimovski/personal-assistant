@@ -7,35 +7,34 @@ using Application.Services.ToDoAssistant;
 using Domain.Entities.ToDoAssistant;
 using Xunit;
 
-namespace Application.UnitTests.ServiceTests.TaskServiceTests
+namespace Application.UnitTests.ServiceTests.TaskServiceTests;
+
+public class UncompleteTests
 {
-    public class UncompleteTests
+    private readonly Mock<ITasksRepository> _tasksRepositoryMock = new();
+    private readonly ITaskService _sut;
+
+    public UncompleteTests()
     {
-        private readonly Mock<ITasksRepository> _tasksRepositoryMock = new();
-        private readonly ITaskService _sut;
+        _sut = new TaskService(
+            null,
+            null,
+            _tasksRepositoryMock.Object,
+            null,
+            MapperMocker.GetMapper<ToDoAssistantProfile>());
+    }
 
-        public UncompleteTests()
-        {
-            _sut = new TaskService(
-                null,
-                null,
-                _tasksRepositoryMock.Object,
-                null,
-                MapperMocker.GetMapper<ToDoAssistantProfile>());
-        }
+    [Fact]
+    public async Task DoesNothing_IfTaskAlreadyUncompleted()
+    {
+        _tasksRepositoryMock.Setup(x => x.Exists(It.IsAny<int>(), It.IsAny<int>()))
+            .Returns(true);
 
-        [Fact]
-        public async Task DoesNothing_IfTaskAlreadyUncompleted()
-        {
-            _tasksRepositoryMock.Setup(x => x.Exists(It.IsAny<int>(), It.IsAny<int>()))
-                .Returns(true);
+        _tasksRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
+            .Returns(new ToDoTask { IsCompleted = false });
 
-            _tasksRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
-                .Returns(new ToDoTask { IsCompleted = false });
+        await _sut.UncompleteAsync(new CompleteUncomplete());
 
-            await _sut.UncompleteAsync(new CompleteUncomplete());
-
-            _tasksRepositoryMock.Verify(x => x.UncompleteAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
-        }
+        _tasksRepositoryMock.Verify(x => x.UncompleteAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
     }
 }

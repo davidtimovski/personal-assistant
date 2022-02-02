@@ -5,28 +5,27 @@ using Microsoft.AspNetCore.SignalR;
 using Application.Contracts.ToDoAssistant.Lists;
 using Infrastructure.Identity;
 
-namespace Api.Hubs
+namespace Api.Hubs;
+
+[Authorize]
+[EnableCors("AllowToDoAssistant")]
+public class ToDoAssistantHub : Hub
 {
-    [Authorize]
-    [EnableCors("AllowToDoAssistant")]
-    public class ToDoAssistantHub : Hub
+    private readonly IListsRepository _listsRepository;
+
+    public ToDoAssistantHub(IListsRepository listsRepository)
     {
-        private readonly IListsRepository _listsRepository;
+        _listsRepository = listsRepository;
+    }
 
-        public ToDoAssistantHub(IListsRepository listsRepository)
+    public async Task JoinGroups()
+    {
+        int userId = IdentityHelper.GetUserId(Context.User);
+        var listIds = _listsRepository.GetNonArchivedSharedListIds(userId);
+
+        foreach (var listId in listIds)
         {
-            _listsRepository = listsRepository;
-        }
-
-        public async Task JoinGroups()
-        {
-            int userId = IdentityHelper.GetUserId(Context.User);
-            var listIds = _listsRepository.GetNonArchivedSharedListIds(userId);
-
-            foreach (var listId in listIds)
-            {
-                await Groups.AddToGroupAsync(Context.ConnectionId, listId.ToString());
-            }
+            await Groups.AddToGroupAsync(Context.ConnectionId, listId.ToString());
         }
     }
 }

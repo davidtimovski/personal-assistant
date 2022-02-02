@@ -1,21 +1,20 @@
 ﻿using FluentValidation;
 
-namespace Application.Contracts.ToDoAssistant.Lists.Models
-{
-    public class UpdateSharedList
-    {
-        public int Id { get; set; }
-        public int UserId { get; set; }
-        public bool NotificationsEnabled { get; set; }
-    }
+namespace Application.Contracts.ToDoAssistant.Lists.Models;
 
-    public class UpdateSharedListValidator : AbstractValidator<UpdateSharedList>
+public class UpdateSharedList
+{
+    public int Id { get; set; }
+    public int UserId { get; set; }
+    public bool NotificationsEnabled { get; set; }
+}
+
+public class UpdateSharedListValidator : AbstractValidator<UpdateSharedList>
+{
+    public UpdateSharedListValidator(IListService listService)
     {
-        public UpdateSharedListValidator(IListService listService)
-        {
-            RuleFor(dto => dto.UserId)
-                .NotEmpty().WithMessage("Unauthorized")
-                .Must((dto, userId) => listService.UserOwnsOrSharesAsAdmin(dto.Id, userId)).WithMessage("Unauthorized");
-        }
+        RuleFor(dto => dto.UserId)
+            .NotEmpty().WithMessage("Unauthorized")
+            .Must((dto, userId) => listService.UserOwnsOrSharesAsAdmin(dto.Id, userId)).WithMessage("Unauthorized");
     }
 }

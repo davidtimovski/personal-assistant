@@ -6,32 +6,31 @@ using Application.Services.ToDoAssistant;
 using Domain.Entities.ToDoAssistant;
 using Xunit;
 
-namespace Application.UnitTests.ServiceTests.TaskServiceTests
+namespace Application.UnitTests.ServiceTests.TaskServiceTests;
+
+public class DeleteTests
 {
-    public class DeleteTests
+    private readonly Mock<ITasksRepository> _tasksRepositoryMock = new();
+    private readonly ITaskService _sut;
+
+    public DeleteTests()
     {
-        private readonly Mock<ITasksRepository> _tasksRepositoryMock = new();
-        private readonly ITaskService _sut;
+        _sut = new TaskService(
+            null,
+            null,
+            _tasksRepositoryMock.Object,
+            null,
+            MapperMocker.GetMapper<ToDoAssistantProfile>());
+    }
 
-        public DeleteTests()
-        {
-            _sut = new TaskService(
-                null,
-                null,
-                _tasksRepositoryMock.Object,
-                null,
-                MapperMocker.GetMapper<ToDoAssistantProfile>());
-        }
+    [Fact]
+    public async Task DoesNothing_IfTaskAlreadyDeleted()
+    {
+        _tasksRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
+            .Returns((ToDoTask)null);
 
-        [Fact]
-        public async Task DoesNothing_IfTaskAlreadyDeleted()
-        {
-            _tasksRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
-                .Returns((ToDoTask)null);
+        await _sut.DeleteAsync(It.IsAny<int>(), It.IsAny<int>());
 
-            await _sut.DeleteAsync(It.IsAny<int>(), It.IsAny<int>());
-
-            _tasksRepositoryMock.Verify(x => x.DeleteAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
-        }
+        _tasksRepositoryMock.Verify(x => x.DeleteAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
     }
 }

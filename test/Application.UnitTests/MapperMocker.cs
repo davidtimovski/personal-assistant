@@ -1,18 +1,17 @@
 ﻿using AutoMapper;
 using Application.Mappings;
 
-namespace Application.UnitTests
+namespace Application.UnitTests;
+
+public static class MapperMocker
 {
-    public static class MapperMocker
+    public static IMapper GetMapper<TProfile>() where TProfile : Profile, new()
     {
-        public static IMapper GetMapper<TProfile>() where TProfile : Profile, new()
+        var configurationProvider = new MapperConfiguration(cfg =>
         {
-            var configurationProvider = new MapperConfiguration(cfg =>
-            {
-                cfg.AddProfile<MappingProfile>();
-                cfg.AddProfile<TProfile>();
-            });
-            return configurationProvider.CreateMapper();
-        }
+            cfg.AddProfile<MappingProfile>();
+            cfg.AddProfile<TProfile>();
+        });
+        return configurationProvider.CreateMapper();
     }
 }

@@ -8,96 +8,95 @@ using Application.Contracts.CookingAssistant.DietaryProfiles;
 using Application.Contracts.CookingAssistant.DietaryProfiles.Models;
 using Infrastructure.Identity;
 
-namespace Api.Controllers.CookingAssistant
+namespace Api.Controllers.CookingAssistant;
+
+[Authorize]
+[EnableCors("AllowCookingAssistant")]
+[Route("api/[controller]")]
+public class DietaryProfilesController : Controller
 {
-    [Authorize]
-    [EnableCors("AllowCookingAssistant")]
-    [Route("api/[controller]")]
-    public class DietaryProfilesController : Controller
+    private readonly IDietaryProfileService _dietaryProfileService;
+    private readonly IValidator<GetRecommendedDailyIntake> _getRecommendedDailyIntakeValidator;
+    private readonly IValidator<UpdateDietaryProfile> _updateDietaryProfileValidator;
+
+    public DietaryProfilesController(
+        IDietaryProfileService dietaryProfileService,
+        IValidator<GetRecommendedDailyIntake> getRecommendedDailyIntakeValidator,
+        IValidator<UpdateDietaryProfile> updateDietaryProfileValidator)
     {
-        private readonly IDietaryProfileService _dietaryProfileService;
-        private readonly IValidator<GetRecommendedDailyIntake> _getRecommendedDailyIntakeValidator;
-        private readonly IValidator<UpdateDietaryProfile> _updateDietaryProfileValidator;
+        _dietaryProfileService = dietaryProfileService;
+        _getRecommendedDailyIntakeValidator = getRecommendedDailyIntakeValidator;
+        _updateDietaryProfileValidator = updateDietaryProfileValidator;
+    }
 
-        public DietaryProfilesController(
-            IDietaryProfileService dietaryProfileService,
-            IValidator<GetRecommendedDailyIntake> getRecommendedDailyIntakeValidator,
-            IValidator<UpdateDietaryProfile> updateDietaryProfileValidator)
+    [HttpGet]
+    public IActionResult Get()
+    {
+        int userId;
+        try
         {
-            _dietaryProfileService = dietaryProfileService;
-            _getRecommendedDailyIntakeValidator = getRecommendedDailyIntakeValidator;
-            _updateDietaryProfileValidator = updateDietaryProfileValidator;
+            userId = IdentityHelper.GetUserId(User);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
         }
 
-        [HttpGet]
-        public IActionResult Get()
+        EditDietaryProfile dto = _dietaryProfileService.Get(userId);
+
+        return Ok(dto);
+    }
+
+    [HttpPost]
+    public IActionResult GetDailyIntake([FromBody] GetRecommendedDailyIntake dto)
+    {
+        if (dto == null)
         {
-            int userId;
-            try
-            {
-                userId = IdentityHelper.GetUserId(User);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-
-            EditDietaryProfile dto = _dietaryProfileService.Get(userId);
-
-            return Ok(dto);
+            return BadRequest();
         }
 
-        [HttpPost]
-        public IActionResult GetDailyIntake([FromBody] GetRecommendedDailyIntake dto)
+        RecommendedDailyIntake recommended = _dietaryProfileService.GetRecommendedDailyIntake(dto, _getRecommendedDailyIntakeValidator);
+
+        return Ok(recommended);
+    }
+
+    [HttpPut]
+    public async Task<IActionResult> CreateOrUpdate([FromBody] UpdateDietaryProfile dto)
+    {
+        if (dto == null)
         {
-            if (dto == null)
-            {
-                return BadRequest();
-            }
-
-            RecommendedDailyIntake recommended = _dietaryProfileService.GetRecommendedDailyIntake(dto, _getRecommendedDailyIntakeValidator);
-
-            return Ok(recommended);
+            return BadRequest();
         }
 
-        [HttpPut]
-        public async Task<IActionResult> CreateOrUpdate([FromBody] UpdateDietaryProfile dto)
+        try
         {
-            if (dto == null)
-            {
-                return BadRequest();
-            }
-
-            try
-            {
-                dto.UserId = IdentityHelper.GetUserId(User);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-
-            await _dietaryProfileService.CreateOrUpdateAsync(dto, _updateDietaryProfileValidator);
-
-            return NoContent();
+            dto.UserId = IdentityHelper.GetUserId(User);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> Delete()
+        await _dietaryProfileService.CreateOrUpdateAsync(dto, _updateDietaryProfileValidator);
+
+        return NoContent();
+    }
+
+    [HttpDelete]
+    public async Task<IActionResult> Delete()
+    {
+        int userId;
+        try
         {
-            int userId;
-            try
-            {
-                userId = IdentityHelper.GetUserId(User);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-
-            await _dietaryProfileService.DeleteAsync(userId);
-
-            return NoContent();
+            userId = IdentityHelper.GetUserId(User);
         }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
+        }
+
+        await _dietaryProfileService.DeleteAsync(userId);
+
+        return NoContent();
     }
 }

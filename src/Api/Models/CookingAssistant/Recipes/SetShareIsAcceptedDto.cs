@@ -1,8 +1,7 @@
-﻿namespace Api.Models.CookingAssistant.Recipes
+﻿namespace Api.Models.CookingAssistant.Recipes;
+
+public class SetShareIsAcceptedDto
 {
-    public class SetShareIsAcceptedDto
-    {
-        public int RecipeId { get; set; }
-        public bool IsAccepted { get; set; }
-    }
+    public int RecipeId { get; set; }
+    public bool IsAccepted { get; set; }
 }

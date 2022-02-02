@@ -1,7 +1,6 @@
-﻿namespace Auth.ViewModels.Account
+﻿namespace Auth.ViewModels.Account;
+
+public class VerifyReCaptchaViewModel
 {
-    public class VerifyReCaptchaViewModel
-    {
-        public string Token { get; set; }
-    }
+    public string Token { get; set; }
 }

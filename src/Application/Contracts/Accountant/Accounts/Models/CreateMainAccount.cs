@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace Application.Contracts.Accountant.Accounts.Models
+namespace Application.Contracts.Accountant.Accounts.Models;
+
+public class CreateMainAccount
 {
-    public class CreateMainAccount
-    {
-        public int UserId { get; set; }
-        public string Name { get; set; }
-    }
+    public int UserId { get; set; }
+    public string Name { get; set; }
 }

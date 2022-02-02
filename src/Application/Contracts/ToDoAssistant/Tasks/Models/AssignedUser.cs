@@ -1,8 +1,7 @@
-﻿namespace Application.Contracts.ToDoAssistant.Tasks.Models
+﻿namespace Application.Contracts.ToDoAssistant.Tasks.Models;
+
+public class AssignedUser
 {
-    public class AssignedUser
-    {
-        public int Id { get; set; }
-        public string ImageUri { get; set; }
-    }
+    public int Id { get; set; }
+    public string ImageUri { get; set; }
 }

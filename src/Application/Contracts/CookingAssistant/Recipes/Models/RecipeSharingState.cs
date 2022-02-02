@@ -1,10 +1,9 @@
-﻿namespace Application.Contracts.CookingAssistant.Recipes.Models
+﻿namespace Application.Contracts.CookingAssistant.Recipes.Models;
+
+public enum RecipeSharingState
 {
-    public enum RecipeSharingState
-    {
-        NotShared,
-        PendingShare,
-        Owner,
-        Member
-    }
+    NotShared,
+    PendingShare,
+    Owner,
+    Member
 }

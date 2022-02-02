@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Application.Contracts.Accountant.Transactions.Models
+namespace Application.Contracts.Accountant.Transactions.Models;
+
+public class UpdateTransaction : CreateTransaction
 {
-    public class UpdateTransaction : CreateTransaction
-    {
-        public int Id { get; set; }
-    }
+    public int Id { get; set; }
 }

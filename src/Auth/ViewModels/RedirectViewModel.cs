@@ -1,7 +1,6 @@
-namespace Auth.ViewModels
+namespace Auth.ViewModels;
+
+public class RedirectViewModel
 {
-    public class RedirectViewModel
-    {
-        public string RedirectUrl { get; set; }
-    }
+    public string RedirectUrl { get; set; }
 }

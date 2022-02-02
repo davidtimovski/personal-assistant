@@ -29,57 +29,56 @@ using Application.Services.CookingAssistant;
 using Application.Services.ToDoAssistant;
 using Utility;
 
-namespace Application
+namespace Application;
+
+public static class IoC
 {
-    public static class IoC
+    public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
     {
-        public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.AddAutoMapper(Assembly.GetExecutingAssembly());
+        services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
-            services.AddTransient<IConversion, Conversion>();
+        services.AddTransient<IConversion, Conversion>();
 
-            services.AddTransient<IValidator<CreateList>, CreateListValidator>();
-            services.AddTransient<IValidator<UpdateList>, UpdateListValidator>();
-            services.AddTransient<IValidator<ShareList>, ShareListValidator>();
-            services.AddTransient<IValidator<CopyList>, CopyListValidator>();
-            services.AddTransient<IValidator<UpdateSharedList>, UpdateSharedListValidator>();
-            services.AddTransient<IValidator<CreateTask>, CreateTaskValidator>();
-            services.AddTransient<IValidator<BulkCreate>, BulkCreateValidator>();
-            services.AddTransient<IValidator<UpdateTask>, UpdateTaskValidator>();
-            services.AddTransient<IValidator<CreateRecipe>, CreateRecipeValidator>();
-            services.AddTransient<IValidator<UpdateRecipe>, UpdateRecipeValidator>();
-            services.AddTransient<IValidator<ShareRecipe>, ShareRecipeValidator>();
-            services.AddTransient<IValidator<CreateSendRequest>, CreateSendRequestValidator>();
-            services.AddTransient<IValidator<ImportRecipe>, ImportRecipeValidator>();
-            services.AddTransient<IValidator<UpdateIngredient>, UpdateIngredientValidator>();
-            services.AddTransient<IValidator<GetRecommendedDailyIntake>, GetRecommendedDailyIntakeValidator>();
-            services.AddTransient<IValidator<UpdateDietaryProfile>, UpdateDietaryProfileValidator>();
-            services.AddTransient<IValidator<UploadTempImage>, UploadTempImageValidator>();
+        services.AddTransient<IValidator<CreateList>, CreateListValidator>();
+        services.AddTransient<IValidator<UpdateList>, UpdateListValidator>();
+        services.AddTransient<IValidator<ShareList>, ShareListValidator>();
+        services.AddTransient<IValidator<CopyList>, CopyListValidator>();
+        services.AddTransient<IValidator<UpdateSharedList>, UpdateSharedListValidator>();
+        services.AddTransient<IValidator<CreateTask>, CreateTaskValidator>();
+        services.AddTransient<IValidator<BulkCreate>, BulkCreateValidator>();
+        services.AddTransient<IValidator<UpdateTask>, UpdateTaskValidator>();
+        services.AddTransient<IValidator<CreateRecipe>, CreateRecipeValidator>();
+        services.AddTransient<IValidator<UpdateRecipe>, UpdateRecipeValidator>();
+        services.AddTransient<IValidator<ShareRecipe>, ShareRecipeValidator>();
+        services.AddTransient<IValidator<CreateSendRequest>, CreateSendRequestValidator>();
+        services.AddTransient<IValidator<ImportRecipe>, ImportRecipeValidator>();
+        services.AddTransient<IValidator<UpdateIngredient>, UpdateIngredientValidator>();
+        services.AddTransient<IValidator<GetRecommendedDailyIntake>, GetRecommendedDailyIntakeValidator>();
+        services.AddTransient<IValidator<UpdateDietaryProfile>, UpdateDietaryProfileValidator>();
+        services.AddTransient<IValidator<UploadTempImage>, UploadTempImageValidator>();
 
-            services.AddTransient<IUserService, UserService>();
-            services.AddTransient<IPushSubscriptionService, PushSubscriptionService>();
-            services.AddTransient<ITooltipService, TooltipService>();
-            services.AddTransient<IListService, ListService>();
-            services.AddTransient<ITaskService, TaskService>();
-            services.AddTransient<INotificationService, NotificationService>();
-            services.AddTransient<IRecipeService, RecipeService>();
-            services.AddTransient<IIngredientService, IngredientService>();
-            services.AddTransient<IDietaryProfileService, DietaryProfileService>();
-            services.AddTransient<IAccountService, AccountService>();
-            services.AddTransient<ICategoryService, CategoryService>();
-            services.AddTransient<ITransactionService, TransactionService>();
-            services.AddTransient<IUpcomingExpenseService, UpcomingExpenseService>();
-            services.AddTransient<IDebtService, DebtService>();
-            services.AddTransient<ISyncService, SyncService>();
+        services.AddTransient<IUserService, UserService>();
+        services.AddTransient<IPushSubscriptionService, PushSubscriptionService>();
+        services.AddTransient<ITooltipService, TooltipService>();
+        services.AddTransient<IListService, ListService>();
+        services.AddTransient<ITaskService, TaskService>();
+        services.AddTransient<INotificationService, NotificationService>();
+        services.AddTransient<IRecipeService, RecipeService>();
+        services.AddTransient<IIngredientService, IngredientService>();
+        services.AddTransient<IDietaryProfileService, DietaryProfileService>();
+        services.AddTransient<IAccountService, AccountService>();
+        services.AddTransient<ICategoryService, CategoryService>();
+        services.AddTransient<ITransactionService, TransactionService>();
+        services.AddTransient<IUpcomingExpenseService, UpcomingExpenseService>();
+        services.AddTransient<IDebtService, DebtService>();
+        services.AddTransient<ISyncService, SyncService>();
 
-            var activityMultiplier = new Dictionary<string, float>();
-            configuration.Bind("DietaryProfile:ActivityMultiplier", activityMultiplier);
-            var dietaryGoalCalories = new Dictionary<string, short>();
-            configuration.Bind("DietaryProfile:DietaryGoalCalories", dietaryGoalCalories);
-            services.AddSingleton<IDailyIntakeHelper>(new DailyIntakeHelper(activityMultiplier, dietaryGoalCalories));
+        var activityMultiplier = new Dictionary<string, float>();
+        configuration.Bind("DietaryProfile:ActivityMultiplier", activityMultiplier);
+        var dietaryGoalCalories = new Dictionary<string, short>();
+        configuration.Bind("DietaryProfile:DietaryGoalCalories", dietaryGoalCalories);
+        services.AddSingleton<IDailyIntakeHelper>(new DailyIntakeHelper(activityMultiplier, dietaryGoalCalories));
 
-            return services;
-        }
+        return services;
     }
 }

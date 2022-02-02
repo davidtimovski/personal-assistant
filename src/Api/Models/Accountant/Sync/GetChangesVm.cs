@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Api.Models.Accountant.Sync
+namespace Api.Models.Accountant.Sync;
+
+public class GetChangesVm
 {
-    public class GetChangesVm
-    {
-        public DateTime LastSynced { get; set; }
-    }
+    public DateTime LastSynced { get; set; }
 }

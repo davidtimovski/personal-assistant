@@ -3,28 +3,27 @@ using FluentValidation;
 using FluentValidation.Results;
 using Moq;
 
-namespace Application.UnitTests
+namespace Application.UnitTests;
+
+public static class ValidatorMocker
 {
-    public static class ValidatorMocker
+    public static Mock<IValidator<T>> GetSuccessful<T>()
     {
-        public static Mock<IValidator<T>> GetSuccessful<T>()
-        {
-            var validatorMock = new Mock<IValidator<T>>();
+        var validatorMock = new Mock<IValidator<T>>();
 
-            validatorMock.Setup(x => x.Validate(It.IsAny<T>())).Returns(new ValidationResult());
+        validatorMock.Setup(x => x.Validate(It.IsAny<T>())).Returns(new ValidationResult());
 
-            return validatorMock;
-        }
+        return validatorMock;
+    }
 
-        public static Mock<IValidator<T>> GetFailed<T>()
-        {
-            var validatorMock = new Mock<IValidator<T>>();
+    public static Mock<IValidator<T>> GetFailed<T>()
+    {
+        var validatorMock = new Mock<IValidator<T>>();
 
-            validatorMock.Setup(x => x.Validate(It.IsAny<T>()))
-                .Returns(new ValidationResult(
-                    new List<ValidationFailure> { new ValidationFailure("mock", "mock") }));
+        validatorMock.Setup(x => x.Validate(It.IsAny<T>()))
+            .Returns(new ValidationResult(
+                new List<ValidationFailure> { new ValidationFailure("mock", "mock") }));
 
-            return validatorMock;
-        }
+        return validatorMock;
     }
 }

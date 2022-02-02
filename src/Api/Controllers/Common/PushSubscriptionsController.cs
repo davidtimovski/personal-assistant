@@ -7,46 +7,45 @@ using Application.Contracts.Common;
 using Application.Contracts.Common.Models;
 using Infrastructure.Identity;
 
-namespace Api.Controllers.Common
+namespace Api.Controllers.Common;
+
+[Authorize]
+[EnableCors("AllowAllApps")]
+[Route("api/[controller]")]
+public class PushSubscriptionsController : Controller
 {
-    [Authorize]
-    [EnableCors("AllowAllApps")]
-    [Route("api/[controller]")]
-    public class PushSubscriptionsController : Controller
+    private readonly IPushSubscriptionService _pushSubscriptionService;
+
+    public PushSubscriptionsController(
+        IPushSubscriptionService pushSubscriptionService)
     {
-        private readonly IPushSubscriptionService _pushSubscriptionService;
+        _pushSubscriptionService = pushSubscriptionService;
+    }
 
-        public PushSubscriptionsController(
-            IPushSubscriptionService pushSubscriptionService)
+    [HttpPost]
+    public async Task<IActionResult> CreateSubscription([FromBody] PushNotificationsSubscription dto)
+    {
+        if (dto == null)
         {
-            _pushSubscriptionService = pushSubscriptionService;
+            return BadRequest();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateSubscription([FromBody] PushNotificationsSubscription dto)
+        int userId;
+        try
         {
-            if (dto == null)
-            {
-                return BadRequest();
-            }
-
-            int userId;
-            try
-            {
-                userId = IdentityHelper.GetUserId(User);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-
-            await _pushSubscriptionService.CreateSubscriptionAsync(userId,
-                dto.Application,
-                dto.Subscription.Endpoint,
-                dto.Subscription.Keys["auth"],
-                dto.Subscription.Keys["p256dh"]);
-
-            return StatusCode(201);
+            userId = IdentityHelper.GetUserId(User);
         }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
+        }
+
+        await _pushSubscriptionService.CreateSubscriptionAsync(userId,
+            dto.Application,
+            dto.Subscription.Endpoint,
+            dto.Subscription.Keys["auth"],
+            dto.Subscription.Keys["p256dh"]);
+
+        return StatusCode(201);
     }
 }

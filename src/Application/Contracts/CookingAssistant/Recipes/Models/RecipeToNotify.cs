@@ -3,17 +3,16 @@ using AutoMapper;
 using Application.Mappings;
 using Domain.Entities.CookingAssistant;
 
-namespace Application.Contracts.CookingAssistant.Recipes.Models
-{
-    public class RecipeToNotify : IMapFrom<Recipe>
-    {
-        public int UserId { get; set; }
-        public string Name { get; set; }
-        public string ImageUri { get; set; }
+namespace Application.Contracts.CookingAssistant.Recipes.Models;
 
-        public void Mapping(Profile profile)
-        {
-            profile.CreateMap<Recipe, RecipeToNotify>();
-        }
+public class RecipeToNotify : IMapFrom<Recipe>
+{
+    public int UserId { get; set; }
+    public string Name { get; set; }
+    public string ImageUri { get; set; }
+
+    public void Mapping(Profile profile)
+    {
+        profile.CreateMap<Recipe, RecipeToNotify>();
     }
 }

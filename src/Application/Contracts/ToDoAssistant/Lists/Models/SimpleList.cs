@@ -2,17 +2,16 @@
 using Application.Mappings;
 using Domain.Entities.ToDoAssistant;
 
-namespace Application.Contracts.ToDoAssistant.Lists.Models
-{
-    public class SimpleList : IMapFrom<ToDoList>
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Icon { get; set; }
+namespace Application.Contracts.ToDoAssistant.Lists.Models;
 
-        public void Mapping(Profile profile)
-        {
-            profile.CreateMap<ToDoList, SimpleList>();
-        }
+public class SimpleList : IMapFrom<ToDoList>
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Icon { get; set; }
+
+    public void Mapping(Profile profile)
+    {
+        profile.CreateMap<ToDoList, SimpleList>();
     }
 }

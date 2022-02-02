@@ -1,84 +1,83 @@
 ﻿using Application.Contracts.ToDoAssistant.Tasks.Models;
 
-namespace Application.UnitTests.Builders
+namespace Application.UnitTests.Builders;
+
+public class TaskBuilder
 {
-    public class TaskBuilder
+    private string name;
+    private int userId;
+    private int listId;
+    private string tasksText;
+    private bool tasksAreOneTime;
+    private bool tasksArePrivate;
+
+    public TaskBuilder()
     {
-        private string name;
-        private int userId;
-        private int listId;
-        private string tasksText;
-        private bool tasksAreOneTime;
-        private bool tasksArePrivate;
+        name = "Dummy name";
+        tasksText = "Dummy tasks text";
+    }
 
-        public TaskBuilder()
-        {
-            name = "Dummy name";
-            tasksText = "Dummy tasks text";
-        }
+    public TaskBuilder WithName(string newName)
+    {
+        name = newName;
+        return this;
+    }
 
-        public TaskBuilder WithName(string newName)
-        {
-            name = newName;
-            return this;
-        }
+    public TaskBuilder WithUserId(int newUserId)
+    {
+        userId = newUserId;
+        return this;
+    }
 
-        public TaskBuilder WithUserId(int newUserId)
-        {
-            userId = newUserId;
-            return this;
-        }
+    public TaskBuilder WithListId(int newListId)
+    {
+        listId = newListId;
+        return this;
+    }
 
-        public TaskBuilder WithListId(int newListId)
-        {
-            listId = newListId;
-            return this;
-        }
+    public TaskBuilder WithTasksText(string newTasksText)
+    {
+        tasksText = newTasksText;
+        return this;
+    }
 
-        public TaskBuilder WithTasksText(string newTasksText)
-        {
-            tasksText = newTasksText;
-            return this;
-        }
+    public TaskBuilder WithTasksAreOneTime(bool newTasksAreOneTime)
+    {
+        tasksAreOneTime = newTasksAreOneTime;
+        return this;
+    }
 
-        public TaskBuilder WithTasksAreOneTime(bool newTasksAreOneTime)
-        {
-            tasksAreOneTime = newTasksAreOneTime;
-            return this;
-        }
+    public TaskBuilder WithTasksArePrivate(bool newTasksArePrivate)
+    {
+        tasksArePrivate = newTasksArePrivate;
+        return this;
+    }
 
-        public TaskBuilder WithTasksArePrivate(bool newTasksArePrivate)
+    public CreateTask BuildCreateModel()
+    {
+        return new CreateTask
         {
-            tasksArePrivate = newTasksArePrivate;
-            return this;
-        }
+            Name = name
+        };
+    }
 
-        public CreateTask BuildCreateModel()
+    public BulkCreate BuildBulkCreateModel()
+    {
+        return new BulkCreate
         {
-            return new CreateTask
-            {
-                Name = name
-            };
-        }
+            UserId = userId,
+            ListId = listId,
+            TasksText = tasksText,
+            TasksAreOneTime = tasksAreOneTime,
+            TasksArePrivate = tasksArePrivate
+        };
+    }
 
-        public BulkCreate BuildBulkCreateModel()
+    public UpdateTask BuildUpdateModel()
+    {
+        return new UpdateTask
         {
-            return new BulkCreate
-            {
-                UserId = userId,
-                ListId = listId,
-                TasksText = tasksText,
-                TasksAreOneTime = tasksAreOneTime,
-                TasksArePrivate = tasksArePrivate
-            };
-        }
-
-        public UpdateTask BuildUpdateModel()
-        {
-            return new UpdateTask
-            {
-                Name = name
-            };
-        }
+            Name = name
+        };
     }
 }
