@@ -21,5 +21,6 @@ export class EditRecipeModel {
     this.ingredients = new Array<EditRecipeIngredient>();
     this.servings = 1;
     this.imageUri = JSON.parse(<any>environment).defaultRecipeImageUri;
+    this.userIsOwner = true;
   }
 }

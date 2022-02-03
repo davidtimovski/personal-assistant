@@ -1,9 +1,8 @@
-﻿namespace Api.Models
+﻿namespace Api.Models;
+
+public class CanShareVm
 {
-    public class CanShareVm
-    {
-        public int UserId { get; set; }
-        public string ImageUri { get; set; }
-        public bool CanShare { get; set; }
-    }
+    public int UserId { get; set; }
+    public string ImageUri { get; set; }
+    public bool CanShare { get; set; }
 }

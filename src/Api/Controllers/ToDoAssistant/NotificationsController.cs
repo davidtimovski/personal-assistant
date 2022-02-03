@@ -2,57 +2,56 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications;
-using PersonalAssistant.Infrastructure.Identity;
+using Application.Contracts.ToDoAssistant.Notifications;
+using Infrastructure.Identity;
 
-namespace Api.Controllers.ToDoAssistant
+namespace Api.Controllers.ToDoAssistant;
+
+[Authorize]
+[EnableCors("AllowToDoAssistant")]
+[Route("api/[controller]")]
+public class NotificationsController : Controller
 {
-    [Authorize]
-    [EnableCors("AllowToDoAssistant")]
-    [Route("api/[controller]")]
-    public class NotificationsController : Controller
+    private readonly INotificationService _notificationService;
+
+    public NotificationsController(INotificationService notificationService)
     {
-        private readonly INotificationService _notificationService;
+        _notificationService = notificationService;
+    }
 
-        public NotificationsController(INotificationService notificationService)
+    [HttpGet]
+    public IActionResult GetAll()
+    {
+        int userId;
+        try
         {
-            _notificationService = notificationService;
+            userId = IdentityHelper.GetUserId(User);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
         }
 
-        [HttpGet]
-        public IActionResult GetAll()
+        var notificationDtos = _notificationService.GetAllAndFlagUnseen(userId);
+
+        return Ok(notificationDtos);
+    }
+
+    [HttpGet("unseen-notifications-count")]
+    public IActionResult GetUnseenNotificationsCount()
+    {
+        int userId;
+        try
         {
-            int userId;
-            try
-            {
-                userId = IdentityHelper.GetUserId(User);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-
-            var notificationDtos = _notificationService.GetAllAndFlagUnseen(userId);
-
-            return Ok(notificationDtos);
+            userId = IdentityHelper.GetUserId(User);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
         }
 
-        [HttpGet("unseen-notifications-count")]
-        public IActionResult GetUnseenNotificationsCount()
-        {
-            int userId;
-            try
-            {
-                userId = IdentityHelper.GetUserId(User);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
+        int unseenNotificationsCount = _notificationService.GetUnseenNotificationsCount(userId);
 
-            int unseenNotificationsCount = _notificationService.GetUnseenNotificationsCount(userId);
-
-            return Ok(unseenNotificationsCount);
-        }
+        return Ok(unseenNotificationsCount);
     }
 }

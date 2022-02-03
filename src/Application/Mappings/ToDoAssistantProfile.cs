@@ -1,258 +1,257 @@
 ﻿using System.Linq;
 using AutoMapper;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Application.Contracts.Common.Models;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Notifications.Models;
-using PersonalAssistant.Application.Contracts.ToDoAssistant.Tasks.Models;
-using PersonalAssistant.Domain.Entities.Common;
-using PersonalAssistant.Domain.Entities.ToDoAssistant;
+using Application.Contracts.Common;
+using Application.Contracts.Common.Models;
+using Application.Contracts.ToDoAssistant.Lists.Models;
+using Application.Contracts.ToDoAssistant.Notifications.Models;
+using Application.Contracts.ToDoAssistant.Tasks.Models;
+using Domain.Entities.Common;
+using Domain.Entities.ToDoAssistant;
 
-namespace PersonalAssistant.Application.Mappings
+namespace Application.Mappings;
+
+public class ToDoAssistantProfile : Profile
 {
-    public class ToDoAssistantProfile : Profile
+    public ToDoAssistantProfile()
     {
-        public ToDoAssistantProfile()
-        {
-            CreateMap<CreateList, ToDoList>()
-                .ForMember(x => x.Id, src => src.Ignore())
-                .ForMember(x => x.Order, src => src.Ignore())
-                .ForMember(x => x.NotificationsEnabled, src => src.Ignore())
-                .ForMember(x => x.IsArchived, src => src.Ignore())
-                .ForMember(x => x.CreatedDate, src => src.Ignore())
-                .ForMember(x => x.ModifiedDate, src => src.Ignore())
-                .ForMember(x => x.User, src => src.Ignore())
-                .ForMember(x => x.Tasks, src => src.Ignore())
-                .ForMember(x => x.Shares, src => src.Ignore());
-            CreateMap<UpdateList, ToDoList>()
-                .ForMember(x => x.Order, src => src.Ignore())
-                .ForMember(x => x.IsArchived, src => src.Ignore())
-                .ForMember(x => x.CreatedDate, src => src.Ignore())
-                .ForMember(x => x.ModifiedDate, src => src.Ignore())
-                .ForMember(x => x.User, src => src.Ignore())
-                .ForMember(x => x.Tasks, src => src.Ignore())
-                .ForMember(x => x.Shares, src => src.Ignore());
-            CreateMap<UpdateSharedList, ToDoList>()
-                .ForMember(x => x.Name, src => src.Ignore())
-                .ForMember(x => x.Icon, src => src.Ignore())
-                .ForMember(x => x.Order, src => src.Ignore())
-                .ForMember(x => x.IsOneTimeToggleDefault, src => src.Ignore())
-                .ForMember(x => x.IsArchived, src => src.Ignore())
-                .ForMember(x => x.CreatedDate, src => src.Ignore())
-                .ForMember(x => x.ModifiedDate, src => src.Ignore())
-                .ForMember(x => x.User, src => src.Ignore())
-                .ForMember(x => x.Tasks, src => src.Ignore())
-                .ForMember(x => x.Shares, src => src.Ignore());
-            CreateMap<CopyList, ToDoList>()
-                .ForMember(x => x.Order, src => src.Ignore())
-                .ForMember(x => x.NotificationsEnabled, src => src.Ignore())
-                .ForMember(x => x.IsOneTimeToggleDefault, src => src.Ignore())
-                .ForMember(x => x.IsArchived, src => src.Ignore())
-                .ForMember(x => x.CreatedDate, src => src.Ignore())
-                .ForMember(x => x.ModifiedDate, src => src.Ignore())
-                .ForMember(x => x.User, src => src.Ignore())
-                .ForMember(x => x.Tasks, src => src.Ignore())
-                .ForMember(x => x.Shares, src => src.Ignore());
+        CreateMap<CreateList, ToDoList>()
+            .ForMember(x => x.Id, src => src.Ignore())
+            .ForMember(x => x.Order, src => src.Ignore())
+            .ForMember(x => x.NotificationsEnabled, src => src.Ignore())
+            .ForMember(x => x.IsArchived, src => src.Ignore())
+            .ForMember(x => x.CreatedDate, src => src.Ignore())
+            .ForMember(x => x.ModifiedDate, src => src.Ignore())
+            .ForMember(x => x.User, src => src.Ignore())
+            .ForMember(x => x.Tasks, src => src.Ignore())
+            .ForMember(x => x.Shares, src => src.Ignore());
+        CreateMap<UpdateList, ToDoList>()
+            .ForMember(x => x.Order, src => src.Ignore())
+            .ForMember(x => x.IsArchived, src => src.Ignore())
+            .ForMember(x => x.CreatedDate, src => src.Ignore())
+            .ForMember(x => x.ModifiedDate, src => src.Ignore())
+            .ForMember(x => x.User, src => src.Ignore())
+            .ForMember(x => x.Tasks, src => src.Ignore())
+            .ForMember(x => x.Shares, src => src.Ignore());
+        CreateMap<UpdateSharedList, ToDoList>()
+            .ForMember(x => x.Name, src => src.Ignore())
+            .ForMember(x => x.Icon, src => src.Ignore())
+            .ForMember(x => x.Order, src => src.Ignore())
+            .ForMember(x => x.IsOneTimeToggleDefault, src => src.Ignore())
+            .ForMember(x => x.IsArchived, src => src.Ignore())
+            .ForMember(x => x.CreatedDate, src => src.Ignore())
+            .ForMember(x => x.ModifiedDate, src => src.Ignore())
+            .ForMember(x => x.User, src => src.Ignore())
+            .ForMember(x => x.Tasks, src => src.Ignore())
+            .ForMember(x => x.Shares, src => src.Ignore());
+        CreateMap<CopyList, ToDoList>()
+            .ForMember(x => x.Order, src => src.Ignore())
+            .ForMember(x => x.NotificationsEnabled, src => src.Ignore())
+            .ForMember(x => x.IsOneTimeToggleDefault, src => src.Ignore())
+            .ForMember(x => x.IsArchived, src => src.Ignore())
+            .ForMember(x => x.CreatedDate, src => src.Ignore())
+            .ForMember(x => x.ModifiedDate, src => src.Ignore())
+            .ForMember(x => x.User, src => src.Ignore())
+            .ForMember(x => x.Tasks, src => src.Ignore())
+            .ForMember(x => x.Shares, src => src.Ignore());
 
-            CreateMap<CreateTask, ToDoTask>()
-                .ForMember(x => x.Id, src => src.Ignore())
-                .ForMember(x => x.IsCompleted, src => src.Ignore())
-                .ForMember(x => x.IsHighPriority, src => src.Ignore())
-                .ForMember(t => t.PrivateToUserId, opt => opt.MapFrom<PrivateToUserIdCreateResolver>())
-                .ForMember(x => x.AssignedToUserId, src => src.Ignore())
-                .ForMember(x => x.Order, src => src.Ignore())
-                .ForMember(x => x.CreatedDate, src => src.Ignore())
-                .ForMember(x => x.ModifiedDate, src => src.Ignore())
-                .ForMember(x => x.List, src => src.Ignore())
-                .ForMember(x => x.AssignedToUser, src => src.Ignore());
-            CreateMap<BulkCreate, ToDoTask>()
-                .ForMember(x => x.Id, src => src.Ignore())
-                .ForMember(x => x.Name, src => src.Ignore())
-                .ForMember(x => x.IsCompleted, src => src.Ignore())
-                .ForMember(x => x.IsOneTime, src => src.Ignore())
-                .ForMember(x => x.IsHighPriority, src => src.Ignore())
-                .ForMember(t => t.PrivateToUserId, opt => opt.Ignore())
-                .ForMember(x => x.AssignedToUserId, src => src.Ignore())
-                .ForMember(x => x.Order, src => src.Ignore())
-                .ForMember(x => x.CreatedDate, src => src.Ignore())
-                .ForMember(x => x.ModifiedDate, src => src.Ignore())
-                .ForMember(x => x.List, src => src.Ignore())
-                .ForMember(x => x.AssignedToUser, src => src.Ignore());
-            CreateMap<UpdateTask, ToDoTask>()
-                .ForMember(x => x.IsCompleted, src => src.Ignore())
-                .ForMember(t => t.PrivateToUserId, opt => opt.MapFrom<PrivateToUserIdUpdateResolver>())
-                .ForMember(x => x.Order, src => src.Ignore())
-                .ForMember(x => x.CreatedDate, src => src.Ignore())
-                .ForMember(x => x.ModifiedDate, src => src.Ignore())
-                .ForMember(x => x.List, src => src.Ignore())
-                .ForMember(x => x.AssignedToUser, src => src.Ignore());
+        CreateMap<CreateTask, ToDoTask>()
+            .ForMember(x => x.Id, src => src.Ignore())
+            .ForMember(x => x.IsCompleted, src => src.Ignore())
+            .ForMember(x => x.IsHighPriority, src => src.Ignore())
+            .ForMember(t => t.PrivateToUserId, opt => opt.MapFrom<PrivateToUserIdCreateResolver>())
+            .ForMember(x => x.AssignedToUserId, src => src.Ignore())
+            .ForMember(x => x.Order, src => src.Ignore())
+            .ForMember(x => x.CreatedDate, src => src.Ignore())
+            .ForMember(x => x.ModifiedDate, src => src.Ignore())
+            .ForMember(x => x.List, src => src.Ignore())
+            .ForMember(x => x.AssignedToUser, src => src.Ignore());
+        CreateMap<BulkCreate, ToDoTask>()
+            .ForMember(x => x.Id, src => src.Ignore())
+            .ForMember(x => x.Name, src => src.Ignore())
+            .ForMember(x => x.IsCompleted, src => src.Ignore())
+            .ForMember(x => x.IsOneTime, src => src.Ignore())
+            .ForMember(x => x.IsHighPriority, src => src.Ignore())
+            .ForMember(t => t.PrivateToUserId, opt => opt.Ignore())
+            .ForMember(x => x.AssignedToUserId, src => src.Ignore())
+            .ForMember(x => x.Order, src => src.Ignore())
+            .ForMember(x => x.CreatedDate, src => src.Ignore())
+            .ForMember(x => x.ModifiedDate, src => src.Ignore())
+            .ForMember(x => x.List, src => src.Ignore())
+            .ForMember(x => x.AssignedToUser, src => src.Ignore());
+        CreateMap<UpdateTask, ToDoTask>()
+            .ForMember(x => x.IsCompleted, src => src.Ignore())
+            .ForMember(t => t.PrivateToUserId, opt => opt.MapFrom<PrivateToUserIdUpdateResolver>())
+            .ForMember(x => x.Order, src => src.Ignore())
+            .ForMember(x => x.CreatedDate, src => src.Ignore())
+            .ForMember(x => x.ModifiedDate, src => src.Ignore())
+            .ForMember(x => x.List, src => src.Ignore())
+            .ForMember(x => x.AssignedToUser, src => src.Ignore());
 
-            CreateMap<CreateOrUpdateNotification, Notification>()
-                .ForMember(x => x.Id, src => src.Ignore())
-                .ForMember(x => x.IsSeen, src => src.Ignore())
-                .ForMember(x => x.User, src => src.Ignore())
-                .ForMember(x => x.CreatedDate, src => src.Ignore())
-                .ForMember(x => x.ModifiedDate, src => src.Ignore());
+        CreateMap<CreateOrUpdateNotification, Notification>()
+            .ForMember(x => x.Id, src => src.Ignore())
+            .ForMember(x => x.IsSeen, src => src.Ignore())
+            .ForMember(x => x.User, src => src.Ignore())
+            .ForMember(x => x.CreatedDate, src => src.Ignore())
+            .ForMember(x => x.ModifiedDate, src => src.Ignore());
 
-            CreateMap<User, ToDoAssistantPreferences>()
-                .ForMember(x => x.NotificationsEnabled, opt => opt.MapFrom(src => src.ToDoNotificationsEnabled));
-        }
+        CreateMap<User, ToDoAssistantPreferences>()
+            .ForMember(x => x.NotificationsEnabled, opt => opt.MapFrom(src => src.ToDoNotificationsEnabled));
     }
+}
 
-    public class ListSharingStateResolver : IValueResolver<ToDoList, object, ListSharingState>
+public class ListSharingStateResolver : IValueResolver<ToDoList, object, ListSharingState>
+{
+    public ListSharingState Resolve(ToDoList source, object dest, ListSharingState destMember, ResolutionContext context)
     {
-        public ListSharingState Resolve(ToDoList source, object dest, ListSharingState destMember, ResolutionContext context)
+        var userId = (int)context.Items["UserId"];
+
+        if (source.Shares.Any())
         {
-            var userId = (int)context.Items["UserId"];
-
-            if (source.Shares.Any())
+            bool someRequestsAccepted = source.Shares.Any(x => x.IsAccepted == true);
+            if (someRequestsAccepted)
             {
-                bool someRequestsAccepted = source.Shares.Any(x => x.IsAccepted == true);
-                if (someRequestsAccepted)
+                if (source.UserId == userId)
                 {
-                    if (source.UserId == userId)
-                    {
-                        return ListSharingState.Owner;
-                    }
-
-                    ListShare userShare = source.Shares.Single(x => x.UserId == userId);
-                    return userShare.IsAdmin ? ListSharingState.Admin : ListSharingState.Member;
+                    return ListSharingState.Owner;
                 }
 
-                bool someRequestsPending = source.Shares.Any(x => !x.IsAccepted.HasValue);
-                if (someRequestsPending)
-                {
-                    return ListSharingState.PendingShare;
-                }
+                ListShare userShare = source.Shares.Single(x => x.UserId == userId);
+                return userShare.IsAdmin ? ListSharingState.Admin : ListSharingState.Member;
             }
 
-            return ListSharingState.NotShared;
-        }
-    }
-
-    public class ListOrderResolver : IValueResolver<ToDoList, object, short?>
-    {
-        public short? Resolve(ToDoList source, object dest, short? destMember, ResolutionContext context)
-        {
-            var userId = (int)context.Items["UserId"];
-
-            if (source.Shares.Any())
+            bool someRequestsPending = source.Shares.Any(x => !x.IsAccepted.HasValue);
+            if (someRequestsPending)
             {
-                var share = source.Shares.First();
-                if (share.UserId == userId)
-                {
-                    return share.Order;
-                }
+                return ListSharingState.PendingShare;
             }
-
-            return source.Order;
         }
+
+        return ListSharingState.NotShared;
     }
+}
 
-    public class ListNotificationsEnabledResolver : IValueResolver<ToDoList, EditListDto, bool>
+public class ListOrderResolver : IValueResolver<ToDoList, object, short?>
+{
+    public short? Resolve(ToDoList source, object dest, short? destMember, ResolutionContext context)
     {
-        public bool Resolve(ToDoList source, EditListDto dest, bool destMember, ResolutionContext context)
-        {
-            var userId = (int)context.Items["UserId"];
+        var userId = (int)context.Items["UserId"];
 
-            if (source.Shares.Any())
+        if (source.Shares.Any())
+        {
+            var share = source.Shares.First();
+            if (share.UserId == userId)
             {
-                var share = source.Shares.First();
-                if (share.UserId == userId)
-                {
-                    return share.NotificationsEnabled;
-                }
+                return share.Order;
             }
-
-            return source.NotificationsEnabled;
         }
+
+        return source.Order;
     }
+}
 
-    public class IsArchivedResolver : IValueResolver<ToDoList, object, bool>
+public class ListNotificationsEnabledResolver : IValueResolver<ToDoList, EditListDto, bool>
+{
+    public bool Resolve(ToDoList source, EditListDto dest, bool destMember, ResolutionContext context)
     {
-        public bool Resolve(ToDoList source, object dest, bool destMember, ResolutionContext context)
-        {
-            var userId = (int)context.Items["UserId"];
+        var userId = (int)context.Items["UserId"];
 
-            if (source.Shares.Any())
+        if (source.Shares.Any())
+        {
+            var share = source.Shares.First();
+            if (share.UserId == userId)
             {
-                var share = source.Shares.First();
-                if (share.UserId == userId)
-                {
-                    return share.IsArchived;
-                }
+                return share.NotificationsEnabled;
             }
-
-            return source.IsArchived;
         }
-    }
 
-    public class PrivateToUserIdCreateResolver : IValueResolver<CreateTask, ToDoTask, int?>
-    {
-        public int? Resolve(CreateTask source, ToDoTask dest, int? destMember, ResolutionContext context)
-        {
-            return source.IsPrivate.HasValue && source.IsPrivate.Value ? (int?)source.UserId : null;
-        }
+        return source.NotificationsEnabled;
     }
+}
 
-    public class PrivateToUserIdUpdateResolver : IValueResolver<UpdateTask, ToDoTask, int?>
+public class IsArchivedResolver : IValueResolver<ToDoList, object, bool>
+{
+    public bool Resolve(ToDoList source, object dest, bool destMember, ResolutionContext context)
     {
-        public int? Resolve(UpdateTask source, ToDoTask dest, int? destMember, ResolutionContext context)
-        {
-            return source.IsPrivate.HasValue && source.IsPrivate.Value ? (int?)source.UserId : null;
-        }
-    }
+        var userId = (int)context.Items["UserId"];
 
-    public class TaskAssignedUserResolver : IValueResolver<ToDoTask, object, AssignedUser>
-    {
-        public AssignedUser Resolve(ToDoTask source, object dest, AssignedUser destMember, ResolutionContext context)
+        if (source.Shares.Any())
         {
-            if (source.AssignedToUser != null)
+            var share = source.Shares.First();
+            if (share.UserId == userId)
             {
-                return new AssignedUser
-                {
-                    Id = source.AssignedToUser.Id,
-                    ImageUri = source.AssignedToUser.ImageUri
-                };
+                return share.IsArchived;
             }
-
-            return null;
         }
+
+        return source.IsArchived;
     }
+}
 
-    public class IsPrivateResolver : IValueResolver<ToDoTask, TaskForUpdate, bool>
+public class PrivateToUserIdCreateResolver : IValueResolver<CreateTask, ToDoTask, int?>
+{
+    public int? Resolve(CreateTask source, ToDoTask dest, int? destMember, ResolutionContext context)
     {
-        public bool Resolve(ToDoTask source, TaskForUpdate dest, bool destMember, ResolutionContext context)
-        {
-            var userId = (int)context.Items["UserId"];
-            return source.PrivateToUserId.HasValue && source.PrivateToUserId == userId ? true : false;
-        }
+        return source.IsPrivate.HasValue && source.IsPrivate.Value ? (int?)source.UserId : null;
     }
+}
 
-    public class ListWithSharesUserShareResolver : IValueResolver<ToDoList, ListWithShares, ListShareDto>
+public class PrivateToUserIdUpdateResolver : IValueResolver<UpdateTask, ToDoTask, int?>
+{
+    public int? Resolve(UpdateTask source, ToDoTask dest, int? destMember, ResolutionContext context)
     {
-        private readonly ICdnService _cdnService;
+        return source.IsPrivate.HasValue && source.IsPrivate.Value ? (int?)source.UserId : null;
+    }
+}
 
-        public ListWithSharesUserShareResolver(ICdnService cdnService)
+public class TaskAssignedUserResolver : IValueResolver<ToDoTask, object, AssignedUser>
+{
+    public AssignedUser Resolve(ToDoTask source, object dest, AssignedUser destMember, ResolutionContext context)
+    {
+        if (source.AssignedToUser != null)
         {
-            _cdnService = cdnService;
-        }
-
-        public ListShareDto Resolve(ToDoList source, ListWithShares dest, ListShareDto destMember, ResolutionContext context)
-        {
-            var shareDto = new ListShareDto();
-            var userId = (int)context.Items["UserId"];
-
-            var userShare = source.Shares.FirstOrDefault(x => x.UserId == userId);
-            if (userShare != null)
+            return new AssignedUser
             {
-                shareDto.Email = userShare.User.Email;
-                shareDto.ImageUri = _cdnService.ImageUriToThumbnail(userShare.User.ImageUri);
-                shareDto.IsAdmin = userShare.IsAdmin;
-                return shareDto;
-            }
-
-            return null;
+                Id = source.AssignedToUser.Id,
+                ImageUri = source.AssignedToUser.ImageUri
+            };
         }
+
+        return null;
+    }
+}
+
+public class IsPrivateResolver : IValueResolver<ToDoTask, TaskForUpdate, bool>
+{
+    public bool Resolve(ToDoTask source, TaskForUpdate dest, bool destMember, ResolutionContext context)
+    {
+        var userId = (int)context.Items["UserId"];
+        return source.PrivateToUserId.HasValue && source.PrivateToUserId == userId ? true : false;
+    }
+}
+
+public class ListWithSharesUserShareResolver : IValueResolver<ToDoList, ListWithShares, ListShareDto>
+{
+    private readonly ICdnService _cdnService;
+
+    public ListWithSharesUserShareResolver(ICdnService cdnService)
+    {
+        _cdnService = cdnService;
+    }
+
+    public ListShareDto Resolve(ToDoList source, ListWithShares dest, ListShareDto destMember, ResolutionContext context)
+    {
+        var shareDto = new ListShareDto();
+        var userId = (int)context.Items["UserId"];
+
+        var userShare = source.Shares.FirstOrDefault(x => x.UserId == userId);
+        if (userShare != null)
+        {
+            shareDto.Email = userShare.User.Email;
+            shareDto.ImageUri = _cdnService.ImageUriToThumbnail(userShare.User.ImageUri);
+            shareDto.IsAdmin = userShare.IsAdmin;
+            return shareDto;
+        }
+
+        return null;
     }
 }

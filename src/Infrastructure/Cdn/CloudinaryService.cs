@@ -9,306 +9,305 @@ using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using FluentValidation;
 using FluentValidation.Results;
-using PersonalAssistant.Application.Contracts.Common;
-using PersonalAssistant.Application.Contracts.Common.Models;
+using Application.Contracts.Common;
+using Application.Contracts.Common.Models;
 
-namespace PersonalAssistant.Infrastructure.Cdn
+namespace Infrastructure.Cdn;
+
+public class CloudinaryService : ICdnService
 {
-    public class CloudinaryService : ICdnService
+    private const string Format = "jpg";
+    private readonly string _environment;
+    private readonly string _defaultProfileImageUri;
+    private readonly string _defaultRecipeImageUri;
+    private readonly string _baseUrl;
+    private readonly Dictionary<string, Transformation> _templates = new()
     {
-        private const string Format = "jpg";
-        private readonly string _environment;
-        private readonly string _defaultProfileImageUri;
-        private readonly string _defaultRecipeImageUri;
-        private readonly string _baseUrl;
-        private readonly Dictionary<string, Transformation> _templates = new Dictionary<string, Transformation>
+        { "profile", new Transformation().Width(400).Height(400).Crop("lfill").FetchFormat(Format) },
+        { "recipe", new Transformation().Width(640).Height(320).Crop("lfill").FetchFormat(Format) }
+    };
+    private readonly Dictionary<string, List<Transformation>> _eagerTransformTemplates = new()
+    {
+        { "profile", new List<Transformation> { new Transformation().Named("profile_thumbnail") } },
+        { "recipe", new List<Transformation>() }
+    };
+    private Cloudinary Cloudinary { get; }
+    private readonly HttpClient _httpClient;
+
+    public CloudinaryService(
+        Account cloudinaryAccount,
+        string environment,
+        string defaultProfileImageUri,
+        string defaultRecipeImageUri,
+        HttpClient httpClient)
+    {
+        _environment = environment.ToLowerInvariant();
+        _defaultProfileImageUri = defaultProfileImageUri;
+        _defaultRecipeImageUri = defaultRecipeImageUri;
+        _baseUrl = $"https://res.cloudinary.com/personalassistant/{_environment}/";
+        Cloudinary = new Cloudinary(cloudinaryAccount);
+        _httpClient = httpClient;
+    }
+
+    public string GetDefaultProfileImageUri() => _defaultProfileImageUri;
+
+    public string GetDefaultRecipeImageUri() => _defaultRecipeImageUri;
+
+    public string ImageUriToThumbnail(string imageUri)
+    {
+        string[] parts = imageUri.Split("personalassistant");
+        return parts[0] + "personalassistant/t_profile_thumbnail" + parts[1];
+    }
+
+    public async Task<string> UploadAsync(string filePath, string uploadPath, string template)
+    {
+        string uri = GenerateRandomString();
+        Transformation transformation = _templates[template];
+        List<Transformation> eagerTransforms = _eagerTransformTemplates[template];
+
+        var uploadParams = new ImageUploadParams
         {
-            { "profile", new Transformation().Width(400).Height(400).Crop("lfill").FetchFormat(Format) },
-            { "recipe", new Transformation().Width(640).Height(320).Crop("lfill").FetchFormat(Format) }
+            File = new FileDescription(filePath),
+            Folder = $"{_environment}/{uploadPath}/",
+            PublicId = uri,
+            Transformation = transformation,
+            EagerTransforms = eagerTransforms
         };
-        private readonly Dictionary<string, List<Transformation>> _eagerTransformTemplates = new Dictionary<string, List<Transformation>>
+
+        ImageUploadResult uploadResult = await Cloudinary.UploadAsync(uploadParams);
+        if (uploadResult.Error != null)
         {
-            { "profile", new List<Transformation> { new Transformation().Named("profile_thumbnail") } },
-            { "recipe", new List<Transformation>() }
+            throw new Exception($"{nameof(CloudinaryService)}.{nameof(UploadAsync)}() returned error: {uploadResult.Error.Message}");
+        }
+
+        File.Delete(filePath);
+
+        return _baseUrl + $"{uploadPath}/{uri}.{Format}";
+    }
+
+    public async Task<string> UploadTempAsync(UploadTempImage model, IValidator<UploadTempImage> validator)
+    {
+        ValidateAndThrow(model, validator);
+
+        string extension = Path.GetExtension(model.FileName);
+
+        string tempImageName = Guid.NewGuid() + extension;
+        string tempImagePath = Path.Combine(model.LocalTempPath, tempImageName);
+
+        using (var stream = new FileStream(tempImagePath, FileMode.Create))
+        {
+            model.File.Position = 0;
+            await model.File.CopyToAsync(stream);
+            await stream.FlushAsync();
+        }
+
+        string imageUri = await UploadTempAsync(
+            filePath: tempImagePath,
+            uploadPath: model.UploadPath,
+            template: model.TransformationTemplate
+        );
+
+        return imageUri;
+    }
+
+    public async Task<string> UploadProfileTempAsync(string filePath, string uploadPath, string template)
+    {
+        string uri = GenerateRandomString();
+        Transformation transformation = _templates[template];
+        List<Transformation> eagerTransforms = _eagerTransformTemplates[template];
+
+        var uploadParams = new ImageUploadParams
+        {
+            File = new FileDescription(filePath),
+            Folder = $"{_environment}/{uploadPath}/",
+            PublicId = uri,
+            Transformation = transformation,
+            EagerTransforms = eagerTransforms,
+            Tags = "temp"
         };
-        private Cloudinary Cloudinary { get; set; }
-        private readonly HttpClient _httpClient;
 
-        public CloudinaryService(
-            Account cloudinaryAccount,
-            string environment,
-            string defaultProfileImageUri,
-            string defaultRecipeImageUri,
-            HttpClient httpClient)
+        ImageUploadResult uploadResult = await Cloudinary.UploadAsync(uploadParams);
+        if (uploadResult.Error != null)
         {
-            _environment = environment.ToLowerInvariant();
-            _defaultProfileImageUri = defaultProfileImageUri;
-            _defaultRecipeImageUri = defaultRecipeImageUri;
-            _baseUrl = $"https://res.cloudinary.com/personalassistant/{_environment}/";
-            Cloudinary = new Cloudinary(cloudinaryAccount);
-            _httpClient = httpClient;
+            throw new Exception($"{nameof(CloudinaryService)}.{nameof(UploadProfileTempAsync)}() returned error: {uploadResult.Error.Message}");
         }
 
-        public string GetDefaultProfileImageUri() => _defaultProfileImageUri;
+        File.Delete(filePath);
 
-        public string GetDefaultRecipeImageUri() => _defaultRecipeImageUri;
+        return _baseUrl + $"{uploadPath}/{uri}.{Format}";
+    }
 
-        public string ImageUriToThumbnail(string imageUri)
+    public async Task<string> CopyAndUploadAsync(string tempImagePath, string imageUriToCopy, string uploadPath, string template)
+    {
+        if (imageUriToCopy == _defaultRecipeImageUri)
         {
-            string[] parts = imageUri.Split("personalassistant");
-            return parts[0] + "personalassistant/t_profile_thumbnail" + parts[1];
+            return imageUriToCopy;
         }
 
-        public async Task<string> UploadAsync(string filePath, string uploadPath, string template)
+        var result = await _httpClient.GetAsync(new Uri(imageUriToCopy));
+
+        using (var stream = new FileStream(tempImagePath, FileMode.Create))
+        using (Stream image = await result.Content.ReadAsStreamAsync())
         {
-            string uri = GenerateRandomString();
-            Transformation transformation = _templates[template];
-            List<Transformation> eagerTransforms = _eagerTransformTemplates[template];
-
-            var uploadParams = new ImageUploadParams
-            {
-                File = new FileDescription(filePath),
-                Folder = $"{_environment}/{uploadPath}/",
-                PublicId = uri,
-                Transformation = transformation,
-                EagerTransforms = eagerTransforms
-            };
-
-            ImageUploadResult uploadResult = await Cloudinary.UploadAsync(uploadParams);
-            if (uploadResult.Error != null)
-            {
-                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.UploadAsync)}() returned error: {uploadResult.Error.Message}");
-            }
-
-            File.Delete(filePath);
-
-            return _baseUrl + $"{uploadPath}/{uri}.{Format}";
+            await image.CopyToAsync(stream);
         }
 
-        public async Task<string> UploadTempAsync(UploadTempImage model, IValidator<UploadTempImage> validator)
+        string imageUri = await UploadAsync(
+            filePath: tempImagePath,
+            uploadPath: uploadPath,
+            template: template
+        );
+
+        return imageUri;
+    }
+
+    public async Task RemoveTempTagAsync(string imageUri)
+    {
+        if (IsDefaultImage(imageUri))
         {
-            ValidateAndThrow(model, validator);
-
-            string extension = Path.GetExtension(model.FileName);
-
-            string tempImageName = Guid.NewGuid() + extension;
-            string tempImagePath = Path.Combine(model.LocalTempPath, tempImageName);
-
-            using (var stream = new FileStream(tempImagePath, FileMode.Create))
-            {
-                model.File.Position = 0;
-                await model.File.CopyToAsync(stream);
-                await stream.FlushAsync();
-            }
-
-            string imageUri = await UploadTempAsync(
-                filePath: tempImagePath,
-                uploadPath: model.UploadPath,
-                template: model.TransformationTemplate
-            );
-
-            return imageUri;
+            return;
         }
 
-        public async Task<string> UploadProfileTempAsync(int userId, string filePath, string uploadPath, string template)
+        string publicId = GetPublicIdFromUri(imageUri);
+
+        var tagParams = new TagParams
         {
-            string uri = GenerateRandomString();
-            Transformation transformation = _templates[template];
-            List<Transformation> eagerTransforms = _eagerTransformTemplates[template];
+            PublicIds = new List<string> { publicId },
+            Tag = "temp",
+            Command = TagCommand.Remove
+        };
 
-            var uploadParams = new ImageUploadParams
-            {
-                File = new FileDescription(filePath),
-                Folder = $"{_environment}/{uploadPath}/",
-                PublicId = uri,
-                Transformation = transformation,
-                EagerTransforms = eagerTransforms,
-                Tags = "temp"
-            };
+        TagResult tagResult = await Cloudinary.TagAsync(tagParams);
+        if (tagResult.Error != null)
+        {
+            throw new Exception($"{nameof(CloudinaryService)}.{nameof(RemoveTempTagAsync)}() returned error: {tagResult.Error.Message}");
+        }
+    }
 
-            ImageUploadResult uploadResult = await Cloudinary.UploadAsync(uploadParams);
-            if (uploadResult.Error != null)
-            {
-                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.UploadProfileTempAsync)}() returned error: {uploadResult.Error.Message}");
-            }
-
-            File.Delete(filePath);
-
-            return _baseUrl + $"{uploadPath}/{uri}.{Format}";
+    public async Task DeleteAsync(string imageUri)
+    {
+        if (IsDefaultImage(imageUri))
+        {
+            return;
         }
 
-        public async Task<string> CopyAndUploadAsync(string tempImagePath, string imageUriToCopy, string uploadPath, string template)
+        string publicId = GetPublicIdFromUri(imageUri);
+
+        DelResResult deleteResult = await Cloudinary.DeleteResourcesAsync(new DelResParams
         {
-            if (imageUriToCopy == _defaultRecipeImageUri)
-            {
-                return imageUriToCopy;
-            }
+            PublicIds = new List<string> { publicId }
+        });
+        if (deleteResult.Error != null)
+        {
+            throw new Exception($"{nameof(CloudinaryService)}.{nameof(DeleteAsync)}() returned error: {deleteResult.Error.Message}");
+        }
+    }
 
-            var result = await _httpClient.GetAsync(new Uri(imageUriToCopy));
-
-            using (var stream = new FileStream(tempImagePath, FileMode.Create))
-            using (Stream image = await result.Content.ReadAsStreamAsync())
-            {
-                await image.CopyToAsync(stream);
-            }
-
-            string imageUri = await UploadAsync(
-                filePath: tempImagePath,
-                uploadPath: uploadPath,
-                template: template
-            );
-
-            return imageUri;
+    public async Task DeleteUserResourcesAsync(int userId, IEnumerable<string> imageUris)
+    {
+        var publicIds = new List<string>();
+        foreach (string uri in imageUris)
+        {
+            string publicId = GetPublicIdFromUri(uri);
+            publicIds.Add(publicId);
         }
 
-        public async Task RemoveTempTagAsync(string imageUri)
+        DelResResult deleteResult = await Cloudinary.DeleteResourcesAsync(new DelResParams
         {
-            if (IsDefaultImage(imageUri))
-            {
-                return;
-            }
-
-            string publicId = GetPublicIdFromUri(imageUri);
-
-            var tagParams = new TagParams
-            {
-                PublicIds = new List<string> { publicId },
-                Tag = "temp",
-                Command = TagCommand.Remove
-            };
-
-            TagResult tagResult = await Cloudinary.TagAsync(tagParams);
-            if (tagResult.Error != null)
-            {
-                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.RemoveTempTagAsync)}() returned error: {tagResult.Error.Message}");
-            }
+            PublicIds = publicIds
+        });
+        if (deleteResult.Error != null)
+        {
+            throw new Exception($"{nameof(CloudinaryService)}.{nameof(DeleteUserResourcesAsync)}() returned error: {deleteResult.Error.Message}");
         }
 
-        public async Task DeleteAsync(string imageUri)
+        DeleteFolderResult deleteFolderResult = await Cloudinary.DeleteFolderAsync($"{_environment}/users/{userId}");
+        if (deleteFolderResult.Error != null)
         {
-            if (IsDefaultImage(imageUri))
-            {
-                return;
-            }
+            throw new Exception($"{nameof(CloudinaryService)}.{nameof(DeleteUserResourcesAsync)}() returned error: {deleteFolderResult.Error.Message}");
+        }
+    }
 
-            string publicId = GetPublicIdFromUri(imageUri);
-
-            DelResResult deleteResult = await Cloudinary.DeleteResourcesAsync(new DelResParams
-            {
-                PublicIds = new List<string>() { publicId }
-            });
-            if (deleteResult.Error != null)
-            {
-                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.DeleteAsync)}() returned error: {deleteResult.Error.Message}");
-            }
+    public async Task DeleteTemporaryResourcesAsync(DateTime olderThan)
+    {
+        var searchResult = Cloudinary.ListResourcesByTag("temp");
+        if (!searchResult.Resources.Any())
+        {
+            return;
         }
 
-        public async Task DeleteUserResourcesAsync(int userId, IEnumerable<string> imageUris)
+        var publicIds = searchResult.Resources.Where(x => DateTime.Parse(x.CreatedAt) < olderThan).Select(x => x.PublicId).ToList();
+
+        DelResResult deleteResult = await Cloudinary.DeleteResourcesAsync(new DelResParams
         {
-            var publicIds = new List<string>();
-            foreach (string uri in imageUris)
-            {
-                string publicId = GetPublicIdFromUri(uri);
-                publicIds.Add(publicId);
-            }
+            PublicIds = publicIds
+        });
+        if (deleteResult.Error != null)
+        {
+            throw new Exception($"{nameof(CloudinaryService)}.{nameof(DeleteTemporaryResourcesAsync)}() returned error: {deleteResult.Error.Message}");
+        }
+    }
 
-            DelResResult deleteResult = await Cloudinary.DeleteResourcesAsync(new DelResParams
-            {
-                PublicIds = publicIds
-            });
-            if (deleteResult.Error != null)
-            {
-                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.DeleteUserResourcesAsync)}() returned error: {deleteResult.Error.Message}");
-            }
+    private bool IsDefaultImage(string uri)
+    {
+        var defaults = new[] { _defaultProfileImageUri, _defaultRecipeImageUri };
+        return defaults.Contains(uri);
+    }
 
-            DeleteFolderResult deleteFolderResult = await Cloudinary.DeleteFolderAsync($"{_environment}/users/{userId}");
-            if (deleteFolderResult.Error != null)
-            {
-                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.DeleteUserResourcesAsync)}() returned error: {deleteFolderResult.Error.Message}");
-            }
+    private async Task<string> UploadTempAsync(string filePath, string uploadPath, string template)
+    {
+        string uri = GenerateRandomString();
+        Transformation transformation = _templates[template];
+        List<Transformation> eagerTransforms = _eagerTransformTemplates[template];
+
+        var uploadParams = new ImageUploadParams
+        {
+            File = new FileDescription(filePath),
+            Folder = $"{_environment}/{uploadPath}/",
+            PublicId = uri,
+            Transformation = transformation,
+            EagerTransforms = eagerTransforms,
+            Tags = "temp"
+        };
+
+        ImageUploadResult uploadResult = await Cloudinary.UploadAsync(uploadParams);
+        if (uploadResult.Error != null)
+        {
+            throw new Exception($"{nameof(CloudinaryService)}.{nameof(UploadTempAsync)}() returned error: {uploadResult.Error.Message}");
         }
 
-        public async Task DeleteTemporaryResourcesAsync(DateTime olderThan)
+        File.Delete(filePath);
+
+        return _baseUrl + $"{uploadPath}/{uri}.{Format}";
+    }
+
+    private string GetPublicIdFromUri(string uri)
+    {
+        var pathRegex = new Regex(@"users/.+");
+        Match match = pathRegex.Match(uri);
+        string path = match.Value;
+
+        int periodIndex = path.LastIndexOf('.');
+        path = path.Substring(0, periodIndex);
+
+        return $"{_environment}/{path}";
+    }
+
+    private static string GenerateRandomString()
+    {
+        const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+        var random = new Random();
+
+        return new string(Enumerable.Repeat(chars, 6)
+            .Select(s => s[random.Next(s.Length)]).ToArray());
+    }
+
+    private static void ValidateAndThrow<T>(T model, IValidator<T> validator)
+    {
+        ValidationResult result = validator.Validate(model);
+        if (!result.IsValid)
         {
-            var searchResult = Cloudinary.ListResourcesByTag("temp");
-            if (!searchResult.Resources.Any())
-            {
-                return;
-            }
-
-            var publicIds = searchResult.Resources.Where(x => DateTime.Parse(x.CreatedAt) < olderThan).Select(x => x.PublicId).ToList();
-
-            DelResResult deleteResult = await Cloudinary.DeleteResourcesAsync(new DelResParams
-            {
-                PublicIds = publicIds
-            });
-            if (deleteResult.Error != null)
-            {
-                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.DeleteTemporaryResourcesAsync)}() returned error: {deleteResult.Error.Message}");
-            }
-        }
-
-        private bool IsDefaultImage(string uri)
-        {
-            var defaults = new string[] { _defaultProfileImageUri, _defaultRecipeImageUri };
-            return defaults.Contains(uri);
-        }
-
-        private async Task<string> UploadTempAsync(string filePath, string uploadPath, string template)
-        {
-            string uri = GenerateRandomString();
-            Transformation transformation = _templates[template];
-            List<Transformation> eagerTransforms = _eagerTransformTemplates[template];
-
-            var uploadParams = new ImageUploadParams
-            {
-                File = new FileDescription(filePath),
-                Folder = $"{_environment}/{uploadPath}/",
-                PublicId = uri,
-                Transformation = transformation,
-                EagerTransforms = eagerTransforms,
-                Tags = "temp"
-            };
-
-            ImageUploadResult uploadResult = await Cloudinary.UploadAsync(uploadParams);
-            if (uploadResult.Error != null)
-            {
-                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CloudinaryService.UploadTempAsync)}() returned error: {uploadResult.Error.Message}");
-            }
-
-            File.Delete(filePath);
-
-            return _baseUrl + $"{uploadPath}/{uri}.{Format}";
-        }
-
-        private string GetPublicIdFromUri(string uri)
-        {
-            var pathRegex = new Regex(@"users/.+");
-            Match match = pathRegex.Match(uri);
-            string path = match.Value;
-
-            int periodIndex = path.LastIndexOf('.');
-            path = path.Substring(0, periodIndex);
-
-            return $"{_environment}/{path}";
-        }
-
-        private string GenerateRandomString()
-        {
-            const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-            var random = new Random();
-
-            return new string(Enumerable.Repeat(chars, 6)
-              .Select(s => s[random.Next(s.Length)]).ToArray());
-        }
-
-        private void ValidateAndThrow<T>(T model, IValidator<T> validator)
-        {
-            ValidationResult result = validator.Validate(model);
-            if (!result.IsValid)
-            {
-                throw new ValidationException(result.Errors);
-            }
+            throw new ValidationException(result.Errors);
         }
     }
 }

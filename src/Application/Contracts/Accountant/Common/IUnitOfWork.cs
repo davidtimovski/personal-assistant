@@ -2,11 +2,10 @@
 using System.Data.Common;
 using System.Threading.Tasks;
 
-namespace PersonalAssistant.Application.Contracts.Accountant.Common
+namespace Application.Contracts.Accountant.Common;
+
+public interface IUnitOfWork
 {
-    public interface IUnitOfWork
-    {
-        (IDbConnection conn, IDbTransaction transaction) StartTransaction();
-        void CommitTransaction(IDbConnection conn, IDbTransaction transaction);
-    }
+    (IDbConnection conn, IDbTransaction transaction) StartTransaction();
+    void CommitTransaction(IDbConnection conn, IDbTransaction transaction);
 }

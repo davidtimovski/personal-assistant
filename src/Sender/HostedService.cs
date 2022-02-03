@@ -9,179 +9,178 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Npgsql;
-using PersonalAssistant.Sender.Contracts;
+using Sender.Contracts;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using WebPush;
 
-namespace PersonalAssistant.Sender
+namespace Sender;
+
+public sealed class HostedService : IHostedService, IDisposable
 {
-    public sealed class HostedService : IHostedService, IDisposable
+    private readonly ILogger<HostedService> _logger;
+    private readonly IConfiguration _configuration;
+
+    public HostedService(
+        ILogger<HostedService> logger,
+        IConfiguration configuration)
     {
-        private readonly ILogger<HostedService> _logger;
-        private readonly IConfiguration _configuration;
+        _logger = logger;
+        _configuration = configuration;
+    }
 
-        public HostedService(
-            ILogger<HostedService> logger,
-            IConfiguration configuration)
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        var factory = new ConnectionFactory
         {
-            _logger = logger;
-            _configuration = configuration;
+            HostName = _configuration["EventBusConnection"]
+        };
+
+        if (!string.IsNullOrEmpty(_configuration["EventBusUserName"]))
+        {
+            factory.UserName = _configuration["EventBusUserName"];
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        if (!string.IsNullOrEmpty(_configuration["EventBusPassword"]))
         {
-            var factory = new ConnectionFactory
-            {
-                HostName = _configuration["EventBusConnection"]
-            };
+            factory.Password = _configuration["EventBusPassword"];
+        }
 
-            if (!string.IsNullOrEmpty(_configuration["EventBusUserName"]))
+        using (var connection = factory.CreateConnection())
+        using (var channel = connection.CreateModel())
+        {
+            SetupEmailQueue(channel);
+            SetupPushNotificationQueue(channel);
+
+            Thread.Sleep(Timeout.Infinite);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+    }
+
+    private void SetupEmailQueue(IModel channel)
+    {
+        async void Received(object model, BasicDeliverEventArgs ea)
+        {
+            var body = ea.Body;
+            var message = Encoding.UTF8.GetString(body.ToArray());
+            var email = JsonConvert.DeserializeObject<Email>(message);
+
+            var client = new SendGridClient(_configuration["SendGridApiKey"]);
+            var from = new EmailAddress(_configuration["SystemEmail"], _configuration["ApplicationName"]);
+            var to = new EmailAddress(email.ToAddress, email.ToName);
+            var emailMessage = MailHelper.CreateSingleEmail(from, to, email.Subject, email.BodyText, email.BodyHtml);
+
+            try
             {
-                factory.UserName = _configuration["EventBusUserName"];
+                await client.SendEmailAsync(emailMessage);
+                _logger.LogDebug($"Sending email to: {to}");
             }
-
-            if (!string.IsNullOrEmpty(_configuration["EventBusPassword"]))
+            catch (Exception ex)
             {
-                factory.Password = _configuration["EventBusPassword"];
+                _logger.LogError(ex, "Email sending failed");
+                throw;
             }
-
-            using (var connection = factory.CreateConnection())
-            using (var channel = connection.CreateModel())
+            finally
             {
-                SetupEmailQueue(channel);
-                SetupPushNotificationQueue(channel);
-
-                Thread.Sleep(Timeout.Infinite);
+                channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
             }
-
-            return Task.CompletedTask;
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
+        SetupQueue("email_queue", Received, channel);
+    }
 
-        public void Dispose()
+    private void SetupPushNotificationQueue(IModel channel)
+    {
+        async void Received(object model, BasicDeliverEventArgs ea)
         {
-            GC.SuppressFinalize(this);
-        }
+            var body = ea.Body;
+            string message = Encoding.UTF8.GetString(body.ToArray());
+            var pushNotification = JsonConvert.DeserializeObject<PushNotification>(message);
 
-        private void SetupEmailQueue(IModel channel)
-        {
-            async void received(object model, BasicDeliverEventArgs ea)
+            using var conn = new NpgsqlConnection(_configuration["ConnectionString"]);
+            conn.Open();
+
+            var recipientSubs = conn.Query<Domain.Entities.Common.PushSubscription>(@"SELECT * FROM ""PushSubscriptions"" WHERE ""UserId"" = @UserId AND ""Application"" = @Application",
+                new { pushNotification.UserId, pushNotification.Application });
+
+            string appVapidConfigPrefix = pushNotification.Application.Replace(" ", string.Empty, StringComparison.Ordinal);
+
+            try
             {
-                var body = ea.Body;
-                var message = Encoding.UTF8.GetString(body.ToArray());
-                var email = JsonConvert.DeserializeObject<Email>(message);
-
-                var client = new SendGridClient(_configuration["SendGridApiKey"]);
-                var from = new EmailAddress(_configuration["SystemEmail"], _configuration["ApplicationName"]);
-                var to = new EmailAddress(email.ToAddress, email.ToName);
-                var emailMessage = MailHelper.CreateSingleEmail(from, to, email.Subject, email.BodyText, email.BodyHtml);
-
-                try
+                foreach (var recipientSub in recipientSubs)
                 {
-                    await client.SendEmailAsync(emailMessage);
-                    _logger.LogDebug($"Sending email to: {to}");
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Email sending failed");
-                    throw;
-                }
-                finally
-                {
-                    channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-                }
-            }
+                    var subscription = new PushSubscription(recipientSub.Endpoint, recipientSub.P256dhKey, recipientSub.AuthKey);
+                    var vapidDetails = new VapidDetails(
+                        subject: "mailto:david.timovski@gmail.com",
+                        publicKey: _configuration[$"{appVapidConfigPrefix}Vapid:PublicKey"],
+                        privateKey: _configuration[$"{appVapidConfigPrefix}Vapid:PrivateKey"]);
 
-            SetupQueue("email_queue", received, channel);
-        }
-
-        private void SetupPushNotificationQueue(IModel channel)
-        {
-            async void received(object model, BasicDeliverEventArgs ea)
-            {
-                var body = ea.Body;
-                string message = Encoding.UTF8.GetString(body.ToArray());
-                var pushNotification = JsonConvert.DeserializeObject<PushNotification>(message);
-
-                using var conn = new NpgsqlConnection(_configuration["ConnectionString"]);
-                conn.Open();
-
-                var recipientSubs = conn.Query<Domain.Entities.Common.PushSubscription>(@"SELECT * FROM ""PushSubscriptions"" WHERE ""UserId"" = @UserId AND ""Application"" = @Application",
-                    new { pushNotification.UserId, pushNotification.Application });
-
-                string appVapidConfigPrefix = pushNotification.Application.Replace(" ", string.Empty, StringComparison.Ordinal);
-
-                try
-                {
-                    foreach (var recipientSub in recipientSubs)
+                    var webPushClient = new WebPushClient();
+                    try
                     {
-                        var subscription = new PushSubscription(recipientSub.Endpoint, recipientSub.P256dhKey, recipientSub.AuthKey);
-                        var vapidDetails = new VapidDetails(
-                            subject: "mailto:david.timovski@gmail.com",
-                            publicKey: _configuration[$"{appVapidConfigPrefix}Vapid:PublicKey"],
-                            privateKey: _configuration[$"{appVapidConfigPrefix}Vapid:PrivateKey"]);
-
-                        var webPushClient = new WebPushClient();
-                        try
-                        {
-                            await webPushClient.SendNotificationAsync(
-                                subscription,
-                                JsonConvert.SerializeObject(
-                                    new PushNotificationMessage(
-                                        pushNotification.SenderImageUri,
-                                        pushNotification.Application,
-                                        pushNotification.Message,
-                                        pushNotification.OpenUrl
-                                    ),
-                                    new JsonSerializerSettings
-                                    {
-                                        ContractResolver = new CamelCasePropertyNamesContractResolver()
-                                    }
-                                ), vapidDetails);
-                        }
-                        catch (WebPushException ex) when (ex.Message == "Subscription no longer valid")
-                        {
-                            conn.Execute(@"DELETE FROM ""PushSubscriptions"" WHERE ""Id"" = @Id", new { recipientSub.Id });
-                        }
+                        await webPushClient.SendNotificationAsync(
+                            subscription,
+                            JsonConvert.SerializeObject(
+                                new PushNotificationMessage(
+                                    pushNotification.SenderImageUri,
+                                    pushNotification.Application,
+                                    pushNotification.Message,
+                                    pushNotification.OpenUrl
+                                ),
+                                new JsonSerializerSettings
+                                {
+                                    ContractResolver = new CamelCasePropertyNamesContractResolver()
+                                }
+                            ), vapidDetails);
+                    }
+                    catch (WebPushException ex) when (ex.Message == "Subscription no longer valid")
+                    {
+                        conn.Execute(@"DELETE FROM ""PushSubscriptions"" WHERE ""Id"" = @Id", new { recipientSub.Id });
                     }
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Push notification sending failed");
-                    throw;
-                }
-                finally
-                {
-                    channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-                }
             }
-
-            SetupQueue("push_notification_queue", received, channel);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Push notification sending failed");
+                throw;
+            }
+            finally
+            {
+                channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+            }
         }
 
-        private static void SetupQueue(string queue, EventHandler<BasicDeliverEventArgs> received, IModel channel)
-        {
-            channel.QueueDeclare(queue: queue,
-                                 durable: true,
-                                 exclusive: false,
-                                 autoDelete: false,
-                                 arguments: null);
+        SetupQueue("push_notification_queue", Received, channel);
+    }
 
-            channel.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
+    private static void SetupQueue(string queue, EventHandler<BasicDeliverEventArgs> received, IModel channel)
+    {
+        channel.QueueDeclare(queue: queue,
+            durable: true,
+            exclusive: false,
+            autoDelete: false,
+            arguments: null);
 
-            var consumer = new EventingBasicConsumer(channel);
-            consumer.Received += received;
+        channel.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
 
-            channel.BasicConsume(queue: queue,
-                                 autoAck: false,
-                                 consumer: consumer);
-        }
+        var consumer = new EventingBasicConsumer(channel);
+        consumer.Received += received;
+
+        channel.BasicConsume(queue: queue,
+            autoAck: false,
+            consumer: consumer);
     }
 }

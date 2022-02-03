@@ -1,7 +1,6 @@
-﻿namespace PersonalAssistant.Application.Contracts.Common
+﻿namespace Application.Contracts.Common;
+
+public interface ISenderService
 {
-    public interface ISenderService
-    {
-        void Enqueue<T>(T message);
-    }
+    void Enqueue<T>(T message);
 }

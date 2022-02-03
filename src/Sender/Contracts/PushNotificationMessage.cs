@@ -1,25 +1,24 @@
 ﻿using System;
 
-namespace PersonalAssistant.Sender.Contracts
+namespace Sender.Contracts;
+
+internal class PushNotificationMessage
 {
-    internal class PushNotificationMessage
+    internal PushNotificationMessage(string senderImageUri, string title, string message, string openUrl)
     {
-        internal PushNotificationMessage(string senderImageUri, string title, string message, string openUrl)
-        {
-            SenderImageUri = senderImageUri;
-            Title = title;
-            Body = TrimMessagePlaceholders(message);
-            OpenUrl = openUrl;
-        }
+        SenderImageUri = senderImageUri;
+        Title = title;
+        Body = TrimMessagePlaceholders(message);
+        OpenUrl = openUrl;
+    }
 
-        public string SenderImageUri { get; set; }
-        public string Title { get; set; }
-        public string Body { get; set; }
-        public string OpenUrl { get; set; }
+    public string SenderImageUri { get; }
+    public string Title { get; }
+    public string Body { get; }
+    public string OpenUrl { get; }
 
-        private static string TrimMessagePlaceholders(string message)
-        {
-            return message.Replace("#[", string.Empty, StringComparison.Ordinal).Replace("]#", string.Empty, StringComparison.Ordinal);
-        }
+    private static string TrimMessagePlaceholders(string message)
+    {
+        return message.Replace("#[", string.Empty, StringComparison.Ordinal).Replace("]#", string.Empty, StringComparison.Ordinal);
     }
 }

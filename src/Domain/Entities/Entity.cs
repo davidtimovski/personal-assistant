@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace PersonalAssistant.Domain.Entities
+namespace Domain.Entities;
+
+public class Entity
 {
-    public class Entity
-    {
-        public DateTime CreatedDate { get; set; }
-        public DateTime ModifiedDate { get; set; }
-    }
+    public DateTime CreatedDate { get; set; }
+    public DateTime ModifiedDate { get; set; }
 }

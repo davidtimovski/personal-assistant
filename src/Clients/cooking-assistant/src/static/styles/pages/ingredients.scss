@@ -24,6 +24,10 @@
     color: var(--primary-color-dark);
   }
 
+  &.unused {
+    background: #f5f5f5;
+  }
+
   .name {
     padding-right: 15px;
   }

@@ -13,10 +13,10 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PersonalAssistant.Application;
-using PersonalAssistant.Application.Contracts.CookingAssistant.DietaryProfiles.Models;
-using PersonalAssistant.Infrastructure;
-using PersonalAssistant.Persistence;
+using Application;
+using Application.Contracts.CookingAssistant.DietaryProfiles.Models;
+using Infrastructure;
+using Persistence;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,9 +41,10 @@ builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
 builder.Host.UseSerilog();
 #endif
 
-builder.Services.AddInfrastructure(builder.Configuration, builder.Environment.EnvironmentName);
-builder.Services.AddPersistence(builder.Configuration["ConnectionString"]);
-builder.Services.AddApplication(builder.Configuration);
+builder.Services
+    .AddInfrastructure(builder.Configuration, builder.Environment.EnvironmentName)
+    .AddPersistence(builder.Configuration["ConnectionString"])
+    .AddApplication(builder.Configuration);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>

@@ -1,7 +1,6 @@
-﻿namespace Auth.Models
+﻿namespace Auth.Models;
+
+public class ReCaptchaResponse
 {
-    public class ReCaptchaResponse
-    {
-        public float Score { get; set; }
-    }
+    public float Score { get; set; }
 }

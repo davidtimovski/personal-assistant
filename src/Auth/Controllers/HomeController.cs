@@ -9,155 +9,148 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Localization;
-using PersonalAssistant.Infrastructure.Identity;
+using Infrastructure.Identity;
 
-namespace Auth.Controllers
+namespace Auth.Controllers;
+
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IConfiguration _configuration;
+
+    public HomeController(
+        UserManager<ApplicationUser> userManager,
+        IConfiguration configuration)
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IConfiguration _configuration;
-        private readonly IStringLocalizer<HomeController> _localizer;
+        _userManager = userManager;
+        _configuration = configuration;
+    }
 
-        public HomeController(
-            UserManager<ApplicationUser> userManager,
-            IConfiguration configuration,
-            IStringLocalizer<HomeController> localizer)
+    [HttpGet]
+    public IActionResult Index()
+    {
+        if (User?.Identity.IsAuthenticated == true)
         {
-            _userManager = userManager;
-            _configuration = configuration;
-            _localizer = localizer;
+            return RedirectToAction(nameof(Overview));
         }
 
-        [HttpGet]
-        public IActionResult Index()
+        return RedirectToAction(nameof(AccountController.Login), "Account");
+    }
+
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> Overview(OverviewAlert alert = OverviewAlert.None)
+    {
+        ApplicationUser user = await _userManager.GetUserAsync(User);
+        var language = CultureInfo.CurrentCulture.Name;
+
+        var model = new OverviewViewModel
         {
-            if (User?.Identity.IsAuthenticated == true)
+            UserName = user.Name,
+            Applications = new Dictionary<string, ApplicationVm>
             {
-                return RedirectToAction(nameof(HomeController.Overview));
+                { "ToDoAssistant", new ApplicationVm("To Do Assistant", new Uri(_configuration["Urls:ToDoAssistant"] + $"/{language}"), "to-do-assistant") },
+                { "CookingAssistant", new ApplicationVm("Cooking Assistant", new Uri(_configuration["Urls:CookingAssistant"] + $"/{language}"), "cooking-assistant") },
+                { "Accountant", new ApplicationVm("Accountant", new Uri(_configuration["Urls:Accountant"] + $"/{language}"), "accountant") }
+            },
+            Alert = alert
+        };
+
+        return View(model);
+    }
+
+    [HttpGet]
+    [ActionName("privacy-policy")]
+    public IActionResult PrivacyPolicy()
+    {
+        return View();
+    }
+
+    [HttpGet]
+    [ActionName("about")]
+    public IActionResult About()
+    {
+        return View();
+    }
+
+    [HttpGet]
+    [ActionName("to-do-assistant")]
+    public IActionResult ToDoAssistant()
+    {
+        return View();
+    }
+
+    [HttpGet]
+    [ActionName("cooking-assistant")]
+    public IActionResult CookingAssistant()
+    {
+        return View();
+    }
+
+    [HttpGet]
+    [ActionName("accountant")]
+    public IActionResult Accountant()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    [ActionName("change-language")]
+    [ValidateAntiForgeryToken]
+    public IActionResult ChangeLanguage(string returnUrl)
+    {
+        var otherLanguage = CultureInfo.CurrentCulture.Name == "en-US" ? "mk-MK" : "en-US";
+
+        Response.Cookies.Append(
+            CookieRequestCultureProvider.DefaultCookieName,
+            CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(otherLanguage)),
+            new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddYears(3),
+                IsEssential = true,
+                Path = "/",
+                HttpOnly = false,
+                SameSite = SameSiteMode.Strict
             }
-
-            return RedirectToAction(nameof(AccountController.Login), "Account");
-        }
-
-        [HttpGet]
-        [Authorize]
-        public async Task<IActionResult> Overview(OverviewAlert alert = OverviewAlert.None)
-        {
-            ApplicationUser user = await _userManager.GetUserAsync(User);
-            var language = CultureInfo.CurrentCulture.Name;
-
-            var model = new OverviewViewModel
+        );
+        Response.Cookies.Append(
+            "LanguagePrompt",
+            "false",
+            new CookieOptions
             {
-                UserName = user.Name,
-                Applications = new Dictionary<string, ApplicationVm>
-                {
-                    { "ToDoAssistant", new ApplicationVm("To Do Assistant", new Uri(_configuration["Urls:ToDoAssistant"] + $"/{language}"), "to-do-assistant") },
-                    { "CookingAssistant", new ApplicationVm("Cooking Assistant", new Uri(_configuration["Urls:CookingAssistant"] + $"/{language}"), "cooking-assistant") },
-                    { "Accountant", new ApplicationVm("Accountant", new Uri(_configuration["Urls:Accountant"] + $"/{language}"), "accountant") }
-                },
-                Alert = alert
-            };
-
-            return View(model);
-        }
-
-        [HttpGet]
-        [ActionName("privacy-policy")]
-        public IActionResult PrivacyPolicy()
-        {
-            return View();
-        }
-
-        [HttpGet]
-        [ActionName("about")]
-        public IActionResult About()
-        {
-            return View();
-        }
-
-        [HttpGet]
-        [ActionName("to-do-assistant")]
-        public IActionResult ToDoAssistant()
-        {
-            return View();
-        }
-
-        [HttpGet]
-        [ActionName("cooking-assistant")]
-        public IActionResult CookingAssistant()
-        {
-            return View();
-        }
-
-        [HttpGet]
-        [ActionName("accountant")]
-        public IActionResult Accountant()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [ActionName("change-language")]
-        [ValidateAntiForgeryToken]
-        public IActionResult ChangeLanguage(string returnUrl)
-        {
-            var otherLanguage = CultureInfo.CurrentCulture.Name == "en-US" ? "mk-MK" : "en-US";
-
-            Response.Cookies.Append(
-                CookieRequestCultureProvider.DefaultCookieName,
-                CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(otherLanguage)),
-                new CookieOptions
-                {
-                    Expires = DateTimeOffset.UtcNow.AddYears(3),
-                    IsEssential = true,
-                    Path = "/",
-                    HttpOnly = false,
-                    SameSite = SameSiteMode.Strict
-                }
-            );
-            Response.Cookies.Append(
-                "LanguagePrompt",
-                "false",
-                new CookieOptions
-                {
-                    Expires = DateTimeOffset.UtcNow.AddYears(3),
-                    IsEssential = true,
-                    Path = "/",
-                    HttpOnly = false,
-                    SameSite = SameSiteMode.Strict
-                }
-            );
-
-            if (returnUrl != null)
-            {
-                return RedirectToLocal(returnUrl);
+                Expires = DateTimeOffset.UtcNow.AddYears(3),
+                IsEssential = true,
+                Path = "/",
+                HttpOnly = false,
+                SameSite = SameSiteMode.Strict
             }
+        );
 
-            return RedirectToAction(nameof(HomeController.Index));
-        }
-
-        [HttpGet]
-        public IActionResult Error(int code)
+        if (returnUrl != null)
         {
-            var model = new ErrorViewModel
-            {
-                ErrorCode = code
-            };
-            return View(model);
+            return RedirectToLocal(returnUrl);
         }
 
-        private IActionResult RedirectToLocal(string returnUrl)
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public IActionResult Error(int code)
+    {
+        var model = new ErrorViewModel
         {
-            if (Url.IsLocalUrl(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
-            else
-            {
-                return RedirectToAction(nameof(HomeController.Index));
-            }
+            ErrorCode = code
+        };
+        return View(model);
+    }
+
+    private IActionResult RedirectToLocal(string returnUrl)
+    {
+        if (Url.IsLocalUrl(returnUrl))
+        {
+            return Redirect(returnUrl);
         }
+
+        return RedirectToAction(nameof(Index));
     }
 }

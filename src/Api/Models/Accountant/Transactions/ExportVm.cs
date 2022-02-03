@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Api.Models.Accountant.Transactions
+namespace Api.Models.Accountant.Transactions;
+
+public class ExportVm
 {
-    public class ExportVm
-    {
-        public Guid FileId { get; set; }
-    }
+    public Guid FileId { get; set; }
 }

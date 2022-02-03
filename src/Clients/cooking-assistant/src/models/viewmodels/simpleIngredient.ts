@@ -4,6 +4,7 @@ export class SimpleIngredient {
     public taskId: number,
     public name: string,
     public hasNutritionData: boolean,
-    public hasPriceData: boolean
+    public hasPriceData: boolean,
+    public unused: boolean
   ) {}
 }

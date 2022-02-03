@@ -1,16 +1,15 @@
 ﻿using System;
 
-namespace PersonalAssistant.Application.Contracts.Accountant.Common.Models
-{
-    public class GetDeletedIds
-    {
-        public GetDeletedIds(int userId, DateTime fromDate)
-        {
-            UserId = userId;
-            FromDate = fromDate;
-        }
+namespace Application.Contracts.Accountant.Common.Models;
 
-        public int UserId { get; set; }
-        public DateTime FromDate { get; set; }
+public class GetDeletedIds
+{
+    public GetDeletedIds(int userId, DateTime fromDate)
+    {
+        UserId = userId;
+        FromDate = fromDate;
     }
+
+    public int UserId { get; set; }
+    public DateTime FromDate { get; set; }
 }

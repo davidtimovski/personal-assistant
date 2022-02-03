@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace PersonalAssistant.Application.Contracts.Accountant.Accounts.Models
+namespace Application.Contracts.Accountant.Accounts.Models;
+
+public class UpdateAccount : CreateAccount
 {
-    public class UpdateAccount : CreateAccount
-    {
-        public int Id { get; set; }
-    }
+    public int Id { get; set; }
 }

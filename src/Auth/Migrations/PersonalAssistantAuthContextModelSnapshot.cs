@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Auth.Models;
 
-namespace PersonalAssistant.Auth.Migrations
+namespace Auth.Migrations
 {
     [DbContext(typeof(PersonalAssistantAuthContext))]
     partial class PersonalAssistantAuthContextModelSnapshot : ModelSnapshot

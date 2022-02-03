@@ -1,7 +1,6 @@
-﻿namespace PersonalAssistant.Application.Contracts.Common.Models
+﻿namespace Application.Contracts.Common.Models;
+
+public class ToDoAssistantPreferences
 {
-    public class ToDoAssistantPreferences
-    {
-        public bool NotificationsEnabled { get; set; }
-    }
+    public bool NotificationsEnabled { get; set; }
 }

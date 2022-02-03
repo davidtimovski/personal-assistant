@@ -1,24 +1,23 @@
 ﻿using System;
 using AutoMapper;
-using PersonalAssistant.Application.Mappings;
-using PersonalAssistant.Domain.Entities.Accountant;
+using Application.Mappings;
+using Domain.Entities.Accountant;
 
-namespace PersonalAssistant.Application.Contracts.Accountant.Categories.Models
+namespace Application.Contracts.Accountant.Categories.Models;
+
+public class CategoryDto : IMapFrom<Category>
 {
-    public class CategoryDto : IMapFrom<Category>
-    {
-        public int Id { get; set; }
-        public int? ParentId { get; set; }
-        public string Name { get; set; }
-        public CategoryType Type { get; set; }
-        public bool GenerateUpcomingExpense { get; set; }
-        public bool IsTax { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public DateTime ModifiedDate { get; set; }
+    public int Id { get; set; }
+    public int? ParentId { get; set; }
+    public string Name { get; set; }
+    public CategoryType Type { get; set; }
+    public bool GenerateUpcomingExpense { get; set; }
+    public bool IsTax { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public DateTime ModifiedDate { get; set; }
 
-        public void Mapping(Profile profile)
-        {
-            profile.CreateMap<Category, CategoryDto>();
-        }
+    public void Mapping(Profile profile)
+    {
+        profile.CreateMap<Category, CategoryDto>();
     }
 }

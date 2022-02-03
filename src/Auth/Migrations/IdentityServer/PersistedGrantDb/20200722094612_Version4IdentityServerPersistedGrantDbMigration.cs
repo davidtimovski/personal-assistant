@@ -1,72 +1,71 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Auth.Migrations.IdentityServer.PersistedGrantDb
+namespace Auth.Migrations.IdentityServer.PersistedGrantDb;
+
+public partial class Version4IdentityServerPersistedGrantDbMigration : Migration
 {
-    public partial class Version4IdentityServerPersistedGrantDbMigration : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.AddColumn<DateTime>(
-                name: "ConsumedTime",
-                table: "PersistedGrants",
-                nullable: true);
+        migrationBuilder.AddColumn<DateTime>(
+            name: "ConsumedTime",
+            table: "PersistedGrants",
+            nullable: true);
 
-            migrationBuilder.AddColumn<string>(
-                name: "Description",
-                table: "PersistedGrants",
-                maxLength: 200,
-                nullable: true);
+        migrationBuilder.AddColumn<string>(
+            name: "Description",
+            table: "PersistedGrants",
+            maxLength: 200,
+            nullable: true);
 
-            migrationBuilder.AddColumn<string>(
-                name: "SessionId",
-                table: "PersistedGrants",
-                maxLength: 100,
-                nullable: true);
+        migrationBuilder.AddColumn<string>(
+            name: "SessionId",
+            table: "PersistedGrants",
+            maxLength: 100,
+            nullable: true);
 
-            migrationBuilder.AddColumn<string>(
-                name: "Description",
-                table: "DeviceCodes",
-                maxLength: 200,
-                nullable: true);
+        migrationBuilder.AddColumn<string>(
+            name: "Description",
+            table: "DeviceCodes",
+            maxLength: 200,
+            nullable: true);
 
-            migrationBuilder.AddColumn<string>(
-                name: "SessionId",
-                table: "DeviceCodes",
-                maxLength: 100,
-                nullable: true);
+        migrationBuilder.AddColumn<string>(
+            name: "SessionId",
+            table: "DeviceCodes",
+            maxLength: 100,
+            nullable: true);
 
-            migrationBuilder.CreateIndex(
-                name: "IX_PersistedGrants_SubjectId_SessionId_Type",
-                table: "PersistedGrants",
-                columns: new[] { "SubjectId", "SessionId", "Type" });
-        }
+        migrationBuilder.CreateIndex(
+            name: "IX_PersistedGrants_SubjectId_SessionId_Type",
+            table: "PersistedGrants",
+            columns: new[] { "SubjectId", "SessionId", "Type" });
+    }
 
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropIndex(
-                name: "IX_PersistedGrants_SubjectId_SessionId_Type",
-                table: "PersistedGrants");
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.DropIndex(
+            name: "IX_PersistedGrants_SubjectId_SessionId_Type",
+            table: "PersistedGrants");
 
-            migrationBuilder.DropColumn(
-                name: "ConsumedTime",
-                table: "PersistedGrants");
+        migrationBuilder.DropColumn(
+            name: "ConsumedTime",
+            table: "PersistedGrants");
 
-            migrationBuilder.DropColumn(
-                name: "Description",
-                table: "PersistedGrants");
+        migrationBuilder.DropColumn(
+            name: "Description",
+            table: "PersistedGrants");
 
-            migrationBuilder.DropColumn(
-                name: "SessionId",
-                table: "PersistedGrants");
+        migrationBuilder.DropColumn(
+            name: "SessionId",
+            table: "PersistedGrants");
 
-            migrationBuilder.DropColumn(
-                name: "Description",
-                table: "DeviceCodes");
+        migrationBuilder.DropColumn(
+            name: "Description",
+            table: "DeviceCodes");
 
-            migrationBuilder.DropColumn(
-                name: "SessionId",
-                table: "DeviceCodes");
-        }
+        migrationBuilder.DropColumn(
+            name: "SessionId",
+            table: "DeviceCodes");
     }
 }

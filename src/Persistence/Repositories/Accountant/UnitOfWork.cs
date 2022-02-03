@@ -1,26 +1,24 @@
 ﻿using System.Data;
-using Persistence;
-using PersonalAssistant.Application.Contracts.Accountant.Common;
+using Application.Contracts.Accountant.Common;
 
-namespace PersonalAssistant.Persistence.Repositories.Accountant
+namespace Persistence.Repositories.Accountant;
+
+public class UnitOfWork : BaseRepository, IUnitOfWork
 {
-    public class UnitOfWork : BaseRepository, IUnitOfWork
+    public UnitOfWork(PersonalAssistantContext efContext)
+        : base(efContext) { }
+
+    public (IDbConnection conn, IDbTransaction transaction) StartTransaction()
     {
-        public UnitOfWork(PersonalAssistantContext efContext)
-            : base(efContext) { }
+        IDbConnection conn = OpenConnection();
+        var transaction = conn.BeginTransaction();
 
-        public (IDbConnection conn, IDbTransaction transaction) StartTransaction()
-        {
-            IDbConnection conn = OpenConnection();
-            var transaction = conn.BeginTransaction();
+        return (conn, transaction);
+    }
 
-            return (conn, transaction);
-        }
-
-        public void CommitTransaction(IDbConnection conn, IDbTransaction transaction)
-        {
-            transaction.Commit();
-            conn.Dispose();
-        }
+    public void CommitTransaction(IDbConnection conn, IDbTransaction transaction)
+    {
+        transaction.Commit();
+        conn.Dispose();
     }
 }

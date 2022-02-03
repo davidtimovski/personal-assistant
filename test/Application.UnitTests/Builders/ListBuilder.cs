@@ -1,66 +1,56 @@
-﻿using PersonalAssistant.Application.Contracts.ToDoAssistant.Lists.Models;
+﻿using Application.Contracts.ToDoAssistant.Lists.Models;
 
-namespace PersonalAssistant.Application.UnitTests.Builders
+namespace Application.UnitTests.Builders;
+
+public class ListBuilder
 {
-    public class ListBuilder
+    private string name;
+    private string tasksText;
+
+    public ListBuilder()
     {
-        private string name;
-        private bool isOneTimeToggleDefault;
-        private string tasksText;
+        name = "Dummy name";
+    }
 
-        public ListBuilder()
-        {
-            name = "Dummy name";
-        }
+    public ListBuilder WithName(string newName)
+    {
+        name = newName;
+        return this;
+    }
 
-        public ListBuilder WithName(string newName)
-        {
-            name = newName;
-            return this;
-        }
+    public ListBuilder WithTasksText(string newTasksText)
+    {
+        tasksText = newTasksText;
+        return this;
+    }
 
-        public ListBuilder WithIsOneTimeToggleDefault(bool newIsOneTimeToggleDefault)
+    public CreateList BuildCreateModel()
+    {
+        return new CreateList
         {
-            isOneTimeToggleDefault = newIsOneTimeToggleDefault;
-            return this;
-        }
+            Name = name,
+            TasksText = tasksText
+        };
+    }
 
-        public ListBuilder WithTasksText(string newTasksText)
+    public UpdateList BuildUpdateModel()
+    {
+        return new UpdateList
         {
-            tasksText = newTasksText;
-            return this;
-        }
+            Name = name
+        };
+    }
 
-        public CreateList BuildCreateModel()
-        {
-            return new CreateList
-            {
-                Name = name,
-                IsOneTimeToggleDefault = isOneTimeToggleDefault,
-                TasksText = tasksText
-            };
-        }
+    public UpdateSharedList BuildUpdateSharedModel()
+    {
+        return new UpdateSharedList();
+    }
 
-        public UpdateList BuildUpdateModel()
+    public CopyList BuildCopyModel()
+    {
+        return new CopyList
         {
-            return new UpdateList
-            {
-                Name = name,
-                IsOneTimeToggleDefault = isOneTimeToggleDefault
-            };
-        }
-
-        public UpdateSharedList BuildUpdateSharedModel()
-        {
-            return new UpdateSharedList();
-        }
-
-        public CopyList BuildCopyModel()
-        {
-            return new CopyList
-            {
-                Name = name
-            };
-        }
+            Name = name
+        };
     }
 }

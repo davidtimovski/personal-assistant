@@ -1,17 +1,16 @@
 ﻿using System;
-using PersonalAssistant.Domain.Entities.Accountant;
+using Domain.Entities.Accountant;
 
-namespace PersonalAssistant.Application.Contracts.Accountant.Categories.Models
+namespace Application.Contracts.Accountant.Categories.Models;
+
+public class CreateCategory
 {
-    public class CreateCategory
-    {
-        public int? ParentId { get; set; }
-        public int UserId { get; set; }
-        public string Name { get; set; }
-        public CategoryType Type { get; set; }
-        public bool GenerateUpcomingExpense { get; set; }
-        public bool IsTax { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public DateTime ModifiedDate { get; set; }
-    }
+    public int? ParentId { get; set; }
+    public int UserId { get; set; }
+    public string Name { get; set; }
+    public CategoryType Type { get; set; }
+    public bool GenerateUpcomingExpense { get; set; }
+    public bool IsTax { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public DateTime ModifiedDate { get; set; }
 }
