@@ -37,13 +37,16 @@ public class PersonalAssistantContext : DbContext
         modelBuilder.Entity<ToDoList>(x =>
         {
             x.ToTable("ToDoAssistant.Lists");
+            x.Property(e => e.Icon).HasDefaultValue("Regular");
+            x.Property(e => e.NotificationsEnabled).HasDefaultValue(true);
             x.Ignore(e => e.IsShared);
         });
         modelBuilder.Entity<ToDoTask>(x => { x.ToTable("ToDoAssistant.Tasks"); });
         modelBuilder.Entity<ListShare>(x =>
         {
             x.ToTable("ToDoAssistant.Shares");
-            x.HasKey(e => new {e.ListId, e.UserId});
+            x.HasKey(e => new { e.ListId, e.UserId });
+            x.Property(e => e.NotificationsEnabled).HasDefaultValue(true);
         });
         modelBuilder.Entity<Notification>(x => { x.ToTable("ToDoAssistant.Notifications"); });
 
@@ -55,23 +58,26 @@ public class PersonalAssistantContext : DbContext
         modelBuilder.Entity<Ingredient>(x =>
         {
             x.ToTable("CookingAssistant.Ingredients");
+            x.Property(e => e.ServingSize).HasDefaultValue(100);
+            x.Property(e => e.ProductSize).HasDefaultValue(100);
             x.Ignore(e => e.Recipes);
             x.Ignore(e => e.Task);
+            x.Ignore(e => e.RecipeCount);
         });
         modelBuilder.Entity<RecipeIngredient>(x =>
         {
             x.ToTable("CookingAssistant.RecipesIngredients");
-            x.HasKey(e => new {e.RecipeId, e.IngredientId});
+            x.HasKey(e => new { e.RecipeId, e.IngredientId });
         });
         modelBuilder.Entity<RecipeShare>(x =>
         {
             x.ToTable("CookingAssistant.Shares");
-            x.HasKey(e => new {e.RecipeId, e.UserId});
+            x.HasKey(e => new { e.RecipeId, e.UserId });
         });
         modelBuilder.Entity<SendRequest>(x =>
         {
             x.ToTable("CookingAssistant.SendRequests");
-            x.HasKey(e => new {e.RecipeId, e.UserId});
+            x.HasKey(e => new { e.RecipeId, e.UserId });
         });
         modelBuilder.Entity<DietaryProfile>(x =>
         {
@@ -88,7 +94,7 @@ public class PersonalAssistantContext : DbContext
         modelBuilder.Entity<TooltipDismissed>(x =>
         {
             x.ToTable("TooltipsDismissed");
-            x.HasKey(e => new {e.TooltipId, e.UserId});
+            x.HasKey(e => new { e.TooltipId, e.UserId });
         });
     }
 }

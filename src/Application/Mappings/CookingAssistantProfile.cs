@@ -72,7 +72,8 @@ public class CookingAssistantProfile : Profile
             .ForMember(x => x.CreatedDate, src => src.Ignore())
             .ForMember(x => x.ModifiedDate, src => src.Ignore())
             .ForMember(x => x.Recipes, src => src.Ignore())
-            .ForMember(x => x.Task, src => src.Ignore());
+            .ForMember(x => x.Task, src => src.Ignore())
+            .ForMember(x => x.RecipeCount, src => src.Ignore());
 
         CreateMap<UpdateDietaryProfile, DietaryProfile>()
             .ForMember(x => x.Height, src => src.Ignore())

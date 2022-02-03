@@ -35,4 +35,6 @@ public class Ingredient : Entity
 
     public List<Recipe> Recipes { get; set; } = new List<Recipe>();
     public ToDoTask Task { get; set; }
+
+    public int RecipeCount { get; set; }
 }

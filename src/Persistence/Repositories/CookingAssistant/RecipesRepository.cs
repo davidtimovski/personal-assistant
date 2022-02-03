@@ -562,8 +562,8 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                     {
                         UserId = userId,
                         TaskId = recipeIngredient.Ingredient.TaskId.Value,
-                        CreatedDate = recipe.CreatedDate,
-                        ModifiedDate = recipe.CreatedDate
+                        CreatedDate = recipe.ModifiedDate,
+                        ModifiedDate = recipe.ModifiedDate
                     };
                 }
                 else
@@ -576,7 +576,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                 if (ingredient == null)
                 {
                     recipeIngredient.Ingredient.UserId = userId;
-                    recipeIngredient.Ingredient.CreatedDate = recipeIngredient.Ingredient.ModifiedDate = recipe.CreatedDate;
+                    recipeIngredient.Ingredient.CreatedDate = recipeIngredient.Ingredient.ModifiedDate = recipe.ModifiedDate;
                 }
                 else
                 {

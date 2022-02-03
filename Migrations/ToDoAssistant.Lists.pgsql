@@ -7,7 +7,7 @@ CREATE TABLE public."ToDoAssistant.Lists"
     "Id" serial NOT NULL,
     "UserId" integer NOT NULL,
     "Name" character varying(50) NOT NULL COLLATE pg_catalog."default",
-    "Type" character varying(15) COLLATE pg_catalog."default" NOT NULL DEFAULT 'Regular'::character varying,
+    "Icon" character varying(15) COLLATE pg_catalog."default" NOT NULL DEFAULT 'Regular'::character varying,
     "Order" smallint,
     "NotificationsEnabled" boolean NOT NULL DEFAULT TRUE,
     "IsOneTimeToggleDefault" boolean NOT NULL DEFAULT FALSE,

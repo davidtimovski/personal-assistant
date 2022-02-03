@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
 using Application.Contracts.CookingAssistant.Ingredients;
+using Dapper;
 using Domain.Entities.CookingAssistant;
 using Domain.Entities.ToDoAssistant;
 
@@ -17,12 +18,13 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.Query<Ingredient>(@"SELECT DISTINCT i.*,
-                                                CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END
-                                            FROM ""CookingAssistant.Ingredients"" AS i
-                                            LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
-                                            WHERE i.""UserId"" = @UserId
-                                            ORDER BY i.""ModifiedDate"" DESC, i.""Name""",
+        return conn.Query<Ingredient>(@"SELECT i.*, CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END, COUNT(ri) AS ""RecipeCount""
+                                        FROM ""CookingAssistant.Ingredients"" AS i
+                                        LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
+                                        LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
+                                        WHERE i.""UserId"" = @UserId
+                                        GROUP BY i.""Id"", CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END
+                                        ORDER BY i.""ModifiedDate"" DESC, i.""Name""",
             new { UserId = userId });
     }
 
@@ -61,13 +63,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
                                                    ORDER BY r.""Name""",
             new { IngredientId = id });
 
-        foreach (string recipeName in recipeNames)
-        {
-            ingredient.Recipes.Add(new Recipe
-            {
-                Name = recipeName
-            });
-        }
+        ingredient.Recipes.AddRange(recipeNames.Select(x => new Recipe { Name = x }));
 
         return ingredient;
     }
@@ -92,10 +88,9 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
                         FROM ""ToDoAssistant.Tasks"" AS t
                         INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
                         LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                        LEFT JOIN ""CookingAssistant.Ingredients"" AS i ON t.""Id"" = i.""TaskId""
+                        LEFT JOIN ""CookingAssistant.Ingredients"" AS i ON t.""Id"" = i.""TaskId"" AND i.""UserId"" = @UserId
                         WHERE (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
-	                        AND (i.""Id"" IS NULL OR (i.""UserId"" = @UserId
-		                        AND (@RecipeId = 0 OR i.""Id"" NOT IN (SELECT ""IngredientId"" FROM ""CookingAssistant.RecipesIngredients"" WHERE ""RecipeId"" = @RecipeId))))";
+	                        AND (i.""Id"" IS NULL OR (@RecipeId = 0 OR i.""Id"" NOT IN (SELECT ""IngredientId"" FROM ""CookingAssistant.RecipesIngredients"" WHERE ""RecipeId"" = @RecipeId)))";
 
         return conn.Query<Ingredient, ToDoList, Ingredient>(query,
             (ingredient, list) =>

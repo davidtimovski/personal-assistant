@@ -29,7 +29,7 @@
         </div>
 
         <a repeat.for="ingredient of ingredients"
-          class="ingredient au-animate animate-fade-in ${ingredient.id === getEditedId ? 'highlighted' : ''}"
+          class="ingredient au-animate animate-fade-in ${ingredient.unused ? 'unused' : ''} ${ingredient.id === getEditedId ? 'highlighted' : ''}"
           route-href="route: editIngredient; params.bind: { id: ingredient.id }">
           <span class="name">${ingredient.name}</span>
           <span class="ingredient-icons-container">
