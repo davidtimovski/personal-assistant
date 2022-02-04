@@ -61,9 +61,10 @@ CREATE INDEX "IX_CookingAssistant.Ingredients_UserId"
 
 -- Index: IX_CookingAssistant.Ingredients_TaskId
 
--- DROP INDEX public."IX_CookingAssistant.Ingredients_TTaskId";
+-- DROP INDEX public."IX_CookingAssistant.Ingredients_TaskId";
 
 CREATE INDEX "IX_CookingAssistant.Ingredients_TaskId"
     ON public."CookingAssistant.Ingredients" USING btree
     ("TaskId")
     TABLESPACE pg_default;
+	
