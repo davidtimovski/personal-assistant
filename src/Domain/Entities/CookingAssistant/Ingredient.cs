@@ -1,14 +1,17 @@
-﻿using Domain.Entities.ToDoAssistant;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Domain.Entities.ToDoAssistant;
 
 namespace Domain.Entities.CookingAssistant;
 
 public class Ingredient : Entity
 {
     public int Id { get; set; }
+    public int ParentId { get; set; }
+    public int FoodCategoryId { get; set; }
     public int UserId { get; set; }
     public int? TaskId { get; set; }
     public string Name { get; set; }
+    public MeasurementType MeasurementType { get; set; }
     public short ServingSize { get; set; }
     public bool ServingSizeIsOneUnit { get; set; }
     public float? Calories { get; set; }
@@ -37,4 +40,13 @@ public class Ingredient : Entity
     public ToDoTask Task { get; set; }
 
     public int RecipeCount { get; set; }
+}
+
+public enum MeasurementType
+{
+    Amount,
+    Weight,
+    Volume,
+    Spoon,
+    Pinch
 }

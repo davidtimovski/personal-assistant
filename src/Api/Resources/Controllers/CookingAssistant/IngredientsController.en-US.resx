@@ -1,0 +1,753 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="active_dry_yeast" xml:space="preserve">
+    <value>Active dry yeast</value>
+  </data>
+  <data name="all_purpose_flour" xml:space="preserve">
+    <value>All-purpose flour</value>
+  </data>
+  <data name="almonds" xml:space="preserve">
+    <value>Almonds</value>
+  </data>
+  <data name="apples" xml:space="preserve">
+    <value>Apples</value>
+  </data>
+  <data name="apple_cider_vinegar" xml:space="preserve">
+    <value>Apple cider vinegar</value>
+  </data>
+  <data name="apricot" xml:space="preserve">
+    <value>Apricot</value>
+  </data>
+  <data name="asparagus" xml:space="preserve">
+    <value>Asparagus</value>
+  </data>
+  <data name="avocado" xml:space="preserve">
+    <value>Avocado</value>
+  </data>
+  <data name="bacon" xml:space="preserve">
+    <value>Bacon</value>
+  </data>
+  <data name="baking_chocolate" xml:space="preserve">
+    <value>Baking chocolate</value>
+  </data>
+  <data name="baking_powder" xml:space="preserve">
+    <value>Baking powder</value>
+  </data>
+  <data name="baking_soda" xml:space="preserve">
+    <value>Baking soda</value>
+  </data>
+  <data name="balsamic_vinegar" xml:space="preserve">
+    <value>Balsamic vinegar</value>
+  </data>
+  <data name="bananas" xml:space="preserve">
+    <value>Bananas</value>
+  </data>
+  <data name="barbeque_sauce" xml:space="preserve">
+    <value>Barbeque sauce</value>
+  </data>
+  <data name="basil" xml:space="preserve">
+    <value>Basil</value>
+  </data>
+  <data name="beans" xml:space="preserve">
+    <value>Beans</value>
+  </data>
+  <data name="beef" xml:space="preserve">
+    <value>Beef</value>
+  </data>
+  <data name="beer" xml:space="preserve">
+    <value>Beer</value>
+  </data>
+  <data name="beetroot" xml:space="preserve">
+    <value>Beetroot</value>
+  </data>
+  <data name="biscuits" xml:space="preserve">
+    <value>Biscuits</value>
+  </data>
+  <data name="blackberries" xml:space="preserve">
+    <value>Blackberries</value>
+  </data>
+  <data name="black_olives" xml:space="preserve">
+    <value>Black olives</value>
+  </data>
+  <data name="black_pepper" xml:space="preserve">
+    <value>Black pepper</value>
+  </data>
+  <data name="blueberries" xml:space="preserve">
+    <value>Blueberries</value>
+  </data>
+  <data name="bow_tie_pasta" xml:space="preserve">
+    <value>Bow tie pasta</value>
+  </data>
+  <data name="bread" xml:space="preserve">
+    <value>Bread</value>
+  </data>
+  <data name="bread_crumbs" xml:space="preserve">
+    <value>Bread crumbs</value>
+  </data>
+  <data name="broccoli" xml:space="preserve">
+    <value>Broccoli</value>
+  </data>
+  <data name="brown_rice" xml:space="preserve">
+    <value>Brown rice</value>
+  </data>
+  <data name="brown_sugar" xml:space="preserve">
+    <value>Brown sugar</value>
+  </data>
+  <data name="brussel_sprout" xml:space="preserve">
+    <value>Brussel sprout</value>
+  </data>
+  <data name="butter" xml:space="preserve">
+    <value>Butter</value>
+  </data>
+  <data name="cabbage" xml:space="preserve">
+    <value>Cabbage</value>
+  </data>
+  <data name="canola_oil" xml:space="preserve">
+    <value>Canola oil</value>
+  </data>
+  <data name="carrots" xml:space="preserve">
+    <value>Carrots</value>
+  </data>
+  <data name="cashew_nuts" xml:space="preserve">
+    <value>Cashew nuts</value>
+  </data>
+  <data name="cauliflower" xml:space="preserve">
+    <value>Cauliflower</value>
+  </data>
+  <data name="cayenne_peppers" xml:space="preserve">
+    <value>Cayenne peppers</value>
+  </data>
+  <data name="cayenne_pepper_powder" xml:space="preserve">
+    <value>Cayenne pepper powder</value>
+  </data>
+  <data name="celery" xml:space="preserve">
+    <value>Celery</value>
+  </data>
+  <data name="cheddar_cheese" xml:space="preserve">
+    <value>Cheddar cheese</value>
+  </data>
+  <data name="cherries" xml:space="preserve">
+    <value>Cherries</value>
+  </data>
+  <data name="chia_seeds" xml:space="preserve">
+    <value>Chia seeds</value>
+  </data>
+  <data name="chicken" xml:space="preserve">
+    <value>Chicken</value>
+  </data>
+  <data name="chicken_bouillon_cube" xml:space="preserve">
+    <value>Chicken bouillon cube</value>
+  </data>
+  <data name="chicken_breast" xml:space="preserve">
+    <value>Chicken breast</value>
+  </data>
+  <data name="chicken_broth" xml:space="preserve">
+    <value>Chicken broth</value>
+  </data>
+  <data name="chicken_wings" xml:space="preserve">
+    <value>Chicken wings</value>
+  </data>
+  <data name="chickpeas" xml:space="preserve">
+    <value>Chickpeas</value>
+  </data>
+  <data name="chili_peppers" xml:space="preserve">
+    <value>Chili peppers</value>
+  </data>
+  <data name="chili_powder" xml:space="preserve">
+    <value>Chili powder</value>
+  </data>
+  <data name="chocolate_chips" xml:space="preserve">
+    <value>Chocolate chips</value>
+  </data>
+  <data name="cinnamon" xml:space="preserve">
+    <value>Cinnamon</value>
+  </data>
+  <data name="cocoa_powder" xml:space="preserve">
+    <value>Cocoa powder</value>
+  </data>
+  <data name="coconut" xml:space="preserve">
+    <value>Coconut</value>
+  </data>
+  <data name="coffee" xml:space="preserve">
+    <value>Coffee</value>
+  </data>
+  <data name="conchiglie_pasta" xml:space="preserve">
+    <value>Conchiglie pasta</value>
+  </data>
+  <data name="condensed_chicken_soup" xml:space="preserve">
+    <value>Condensed chicken soup</value>
+  </data>
+  <data name="condensed_milk" xml:space="preserve">
+    <value>Condensed milk</value>
+  </data>
+  <data name="corn" xml:space="preserve">
+    <value>Corn</value>
+  </data>
+  <data name="cornmeal" xml:space="preserve">
+    <value>Cornmeal</value>
+  </data>
+  <data name="corn_starch" xml:space="preserve">
+    <value>Corn starch</value>
+  </data>
+  <data name="cow_cheese" xml:space="preserve">
+    <value>Cow cheese</value>
+  </data>
+  <data name="cranberries" xml:space="preserve">
+    <value>Cranberries</value>
+  </data>
+  <data name="cucumbers" xml:space="preserve">
+    <value>Cucumbers</value>
+  </data>
+  <data name="cumin" xml:space="preserve">
+    <value>Cumin</value>
+  </data>
+  <data name="curry_powder" xml:space="preserve">
+    <value>Curry powder</value>
+  </data>
+  <data name="curry_sauce" xml:space="preserve">
+    <value>Curry sauce</value>
+  </data>
+  <data name="dry_white_wine" xml:space="preserve">
+    <value>Dry white wine</value>
+  </data>
+  <data name="eggplant" xml:space="preserve">
+    <value>Eggplant</value>
+  </data>
+  <data name="eggs" xml:space="preserve">
+    <value>Eggs</value>
+  </data>
+  <data name="egg_whites" xml:space="preserve">
+    <value>Egg whites</value>
+  </data>
+  <data name="egg_yolks" xml:space="preserve">
+    <value>Egg yolks</value>
+  </data>
+  <data name="farfalle_pasta" xml:space="preserve">
+    <value>Farfalle pasta</value>
+  </data>
+  <data name="feta_cheese" xml:space="preserve">
+    <value>Feta cheese</value>
+  </data>
+  <data name="fettuccine" xml:space="preserve">
+    <value>Fettuccine</value>
+  </data>
+  <data name="flour" xml:space="preserve">
+    <value>Flour</value>
+  </data>
+  <data name="fusilli" xml:space="preserve">
+    <value>Fusilli</value>
+  </data>
+  <data name="garam_masala" xml:space="preserve">
+    <value>Garam masala</value>
+  </data>
+  <data name="garlic" xml:space="preserve">
+    <value>Garlic</value>
+  </data>
+  <data name="garlic_clove" xml:space="preserve">
+    <value>Garlic clove</value>
+  </data>
+  <data name="garlic_powder" xml:space="preserve">
+    <value>Garlic powder</value>
+  </data>
+  <data name="ginger" xml:space="preserve">
+    <value>Ginger</value>
+  </data>
+  <data name="gnocchi" xml:space="preserve">
+    <value>Gnocchi</value>
+  </data>
+  <data name="grapefruit" xml:space="preserve">
+    <value>Grapefruit</value>
+  </data>
+  <data name="grapes" xml:space="preserve">
+    <value>Grapes</value>
+  </data>
+  <data name="green_olives" xml:space="preserve">
+    <value>Green olives</value>
+  </data>
+  <data name="green_peas" xml:space="preserve">
+    <value>Green peas</value>
+  </data>
+  <data name="green_peppers" xml:space="preserve">
+    <value>Green peppers</value>
+  </data>
+  <data name="hake" xml:space="preserve">
+    <value>Hake</value>
+  </data>
+  <data name="ham" xml:space="preserve">
+    <value>Ham</value>
+  </data>
+  <data name="hamburger_bun" xml:space="preserve">
+    <value>Hamburger bun</value>
+  </data>
+  <data name="hazelnuts" xml:space="preserve">
+    <value>Hazelnuts</value>
+  </data>
+  <data name="heavy_cream" xml:space="preserve">
+    <value>Heavy cream</value>
+  </data>
+  <data name="himalayan_salt" xml:space="preserve">
+    <value>Himalayan salt</value>
+  </data>
+  <data name="hoisin_sauce" xml:space="preserve">
+    <value>Hoisin sauce</value>
+  </data>
+  <data name="honey" xml:space="preserve">
+    <value>Honey</value>
+  </data>
+  <data name="italian_seasoning" xml:space="preserve">
+    <value>Italian seasoning</value>
+  </data>
+  <data name="ketchup" xml:space="preserve">
+    <value>Ketchup</value>
+  </data>
+  <data name="kiwis" xml:space="preserve">
+    <value>Kiwis</value>
+  </data>
+  <data name="kosher_salt" xml:space="preserve">
+    <value>Kosher salt</value>
+  </data>
+  <data name="lamb" xml:space="preserve">
+    <value>Lamb</value>
+  </data>
+  <data name="lemons" xml:space="preserve">
+    <value>Lemons</value>
+  </data>
+  <data name="lentils" xml:space="preserve">
+    <value>Lentils</value>
+  </data>
+  <data name="lettuce" xml:space="preserve">
+    <value>Lettuce</value>
+  </data>
+  <data name="lima_beans" xml:space="preserve">
+    <value>Lima beans</value>
+  </data>
+  <data name="limes" xml:space="preserve">
+    <value>Limes</value>
+  </data>
+  <data name="liver" xml:space="preserve">
+    <value>Liver</value>
+  </data>
+  <data name="macaroni" xml:space="preserve">
+    <value>Macaroni</value>
+  </data>
+  <data name="mandarins" xml:space="preserve">
+    <value>Mandarins</value>
+  </data>
+  <data name="maple_syrup" xml:space="preserve">
+    <value>Maple syrup</value>
+  </data>
+  <data name="margarine" xml:space="preserve">
+    <value>Margarine</value>
+  </data>
+  <data name="mayonnaise" xml:space="preserve">
+    <value>Mayonnaise</value>
+  </data>
+  <data name="melon" xml:space="preserve">
+    <value>Melon</value>
+  </data>
+  <data name="milk" xml:space="preserve">
+    <value>Milk</value>
+  </data>
+  <data name="mozzarella_cheese" xml:space="preserve">
+    <value>Mozzarella cheese</value>
+  </data>
+  <data name="muesli" xml:space="preserve">
+    <value>Muesli</value>
+  </data>
+  <data name="mushrooms" xml:space="preserve">
+    <value>Mushrooms</value>
+  </data>
+  <data name="mushroom_soup" xml:space="preserve">
+    <value>Mushroom soup</value>
+  </data>
+  <data name="mustard" xml:space="preserve">
+    <value>Mustard</value>
+  </data>
+  <data name="noodles" xml:space="preserve">
+    <value>Noodles</value>
+  </data>
+  <data name="nutmeg" xml:space="preserve">
+    <value>Nutmeg</value>
+  </data>
+  <data name="oats" xml:space="preserve">
+    <value>Oats</value>
+  </data>
+  <data name="oil" xml:space="preserve">
+    <value>Oil</value>
+  </data>
+  <data name="olives" xml:space="preserve">
+    <value>Olives</value>
+  </data>
+  <data name="olive_oil" xml:space="preserve">
+    <value>Olive oil</value>
+  </data>
+  <data name="onions" xml:space="preserve">
+    <value>Onions</value>
+  </data>
+  <data name="onion_powder" xml:space="preserve">
+    <value>Onion powder</value>
+  </data>
+  <data name="oranges" xml:space="preserve">
+    <value>Oranges</value>
+  </data>
+  <data name="oregano" xml:space="preserve">
+    <value>Oregano</value>
+  </data>
+  <data name="paprika" xml:space="preserve">
+    <value>Paprika</value>
+  </data>
+  <data name="parmesan" xml:space="preserve">
+    <value>Parmesan</value>
+  </data>
+  <data name="parsnip" xml:space="preserve">
+    <value>Parsnip</value>
+  </data>
+  <data name="pasta" xml:space="preserve">
+    <value>Pasta</value>
+  </data>
+  <data name="peaches" xml:space="preserve">
+    <value>Peaches</value>
+  </data>
+  <data name="peanuts" xml:space="preserve">
+    <value>Peanuts</value>
+  </data>
+  <data name="peanut_butter" xml:space="preserve">
+    <value>Peanut butter</value>
+  </data>
+  <data name="pears" xml:space="preserve">
+    <value>Pears</value>
+  </data>
+  <data name="peas" xml:space="preserve">
+    <value>Peas</value>
+  </data>
+  <data name="penne_pasta" xml:space="preserve">
+    <value>Penne pasta</value>
+  </data>
+  <data name="peppers" xml:space="preserve">
+    <value>Peppers</value>
+  </data>
+  <data name="pickles" xml:space="preserve">
+    <value>Pickles</value>
+  </data>
+  <data name="pineapple" xml:space="preserve">
+    <value>Pineapple</value>
+  </data>
+  <data name="pistachios" xml:space="preserve">
+    <value>Pistachios</value>
+  </data>
+  <data name="plums" xml:space="preserve">
+    <value>Plums</value>
+  </data>
+  <data name="pomegranate" xml:space="preserve">
+    <value>Pomegranate</value>
+  </data>
+  <data name="pork" xml:space="preserve">
+    <value>Pork</value>
+  </data>
+  <data name="potatoes" xml:space="preserve">
+    <value>Potatoes</value>
+  </data>
+  <data name="powdered_sugar" xml:space="preserve">
+    <value>Powdered sugar</value>
+  </data>
+  <data name="provolone_cheese" xml:space="preserve">
+    <value>Provolone cheese</value>
+  </data>
+  <data name="pumpkin" xml:space="preserve">
+    <value>Pumpkin</value>
+  </data>
+  <data name="radish" xml:space="preserve">
+    <value>Radish</value>
+  </data>
+  <data name="raisins" xml:space="preserve">
+    <value>Raisins</value>
+  </data>
+  <data name="ranch_dressing" xml:space="preserve">
+    <value>Ranch dressing</value>
+  </data>
+  <data name="raspberries" xml:space="preserve">
+    <value>Raspberries</value>
+  </data>
+  <data name="red_peppers" xml:space="preserve">
+    <value>Red peppers</value>
+  </data>
+  <data name="red_vinegar" xml:space="preserve">
+    <value>Red vinegar</value>
+  </data>
+  <data name="red_wine" xml:space="preserve">
+    <value>Red wine</value>
+  </data>
+  <data name="rice" xml:space="preserve">
+    <value>Rice</value>
+  </data>
+  <data name="rice_vinegar" xml:space="preserve">
+    <value>Rice vinegar</value>
+  </data>
+  <data name="ricotta_cheese" xml:space="preserve">
+    <value>Ricotta cheese</value>
+  </data>
+  <data name="rosemary" xml:space="preserve">
+    <value>Rosemary</value>
+  </data>
+  <data name="rum" xml:space="preserve">
+    <value>Rum</value>
+  </data>
+  <data name="salsa" xml:space="preserve">
+    <value>Salsa</value>
+  </data>
+  <data name="salt" xml:space="preserve">
+    <value>Salt</value>
+  </data>
+  <data name="salted_butter" xml:space="preserve">
+    <value>Salted butter</value>
+  </data>
+  <data name="sardines" xml:space="preserve">
+    <value>Sardines</value>
+  </data>
+  <data name="sausage" xml:space="preserve">
+    <value>Sausage</value>
+  </data>
+  <data name="sea_salt" xml:space="preserve">
+    <value>Sea salt</value>
+  </data>
+  <data name="sesame_seeds" xml:space="preserve">
+    <value>Sesame seeds</value>
+  </data>
+  <data name="sheep_cheese" xml:space="preserve">
+    <value>Sheep cheese</value>
+  </data>
+  <data name="shrimp" xml:space="preserve">
+    <value>Shrimp</value>
+  </data>
+  <data name="sirloin_steak" xml:space="preserve">
+    <value>Sirloin steak</value>
+  </data>
+  <data name="skim_milk" xml:space="preserve">
+    <value>Skim milk</value>
+  </data>
+  <data name="sour_cream" xml:space="preserve">
+    <value>Sour cream</value>
+  </data>
+  <data name="soy_sauce" xml:space="preserve">
+    <value>Soy sauce</value>
+  </data>
+  <data name="spaghetti" xml:space="preserve">
+    <value>Spaghetti</value>
+  </data>
+  <data name="spinach" xml:space="preserve">
+    <value>Spinach</value>
+  </data>
+  <data name="stewed_tomatoes" xml:space="preserve">
+    <value>Stewed tomatoes</value>
+  </data>
+  <data name="strawberries" xml:space="preserve">
+    <value>Strawberries</value>
+  </data>
+  <data name="sugar" xml:space="preserve">
+    <value>Sugar</value>
+  </data>
+  <data name="sunflower_oil" xml:space="preserve">
+    <value>Sunflower oil</value>
+  </data>
+  <data name="sunflower_seeds" xml:space="preserve">
+    <value>Sunflower seeds</value>
+  </data>
+  <data name="sweet_pickle_relish" xml:space="preserve">
+    <value>Sweet pickle relish</value>
+  </data>
+  <data name="swiss_cheese" xml:space="preserve">
+    <value>Swiss cheese</value>
+  </data>
+  <data name="tartar_sauce" xml:space="preserve">
+    <value>Тартар сос</value>
+  </data>
+  <data name="thyme" xml:space="preserve">
+    <value>Мајчина душица</value>
+  </data>
+  <data name="tofu" xml:space="preserve">
+    <value>Тофу</value>
+  </data>
+  <data name="tomatoes" xml:space="preserve">
+    <value>Домати</value>
+  </data>
+  <data name="tomato_paste" xml:space="preserve">
+    <value>Доматна паста</value>
+  </data>
+  <data name="tomato_sauce" xml:space="preserve">
+    <value>Доматен сос</value>
+  </data>
+  <data name="tuna" xml:space="preserve">
+    <value>Туна</value>
+  </data>
+  <data name="turmeric" xml:space="preserve">
+    <value>Куркума</value>
+  </data>
+  <data name="turnip" xml:space="preserve">
+    <value>Репка</value>
+  </data>
+  <data name="unsalted_butter" xml:space="preserve">
+    <value>Путер без сол</value>
+  </data>
+  <data name="vanilla_extract" xml:space="preserve">
+    <value>Екстракт од ванила</value>
+  </data>
+  <data name="vegetable_oil" xml:space="preserve">
+    <value>Растително масло</value>
+  </data>
+  <data name="vinegar" xml:space="preserve">
+    <value>Оцет</value>
+  </data>
+  <data name="walnuts" xml:space="preserve">
+    <value>Ореви</value>
+  </data>
+  <data name="water" xml:space="preserve">
+    <value>Вода</value>
+  </data>
+  <data name="watermelon" xml:space="preserve">
+    <value>Лубеница</value>
+  </data>
+  <data name="white_rice" xml:space="preserve">
+    <value>Бел ориз</value>
+  </data>
+  <data name="white_vinegar" xml:space="preserve">
+    <value>Бел оцет</value>
+  </data>
+  <data name="white_wine" xml:space="preserve">
+    <value>Бело вино</value>
+  </data>
+  <data name="whole_milk" xml:space="preserve">
+    <value>Млеко (масно)</value>
+  </data>
+  <data name="wiener" xml:space="preserve">
+    <value>Виршла</value>
+  </data>
+  <data name="wine" xml:space="preserve">
+    <value>Вино</value>
+  </data>
+  <data name="worcestershire_sauce" xml:space="preserve">
+    <value>Востер сос</value>
+  </data>
+  <data name="yogurt" xml:space="preserve">
+    <value>Јогурт</value>
+  </data>
+  <data name="zucchini" xml:space="preserve">
+    <value>Тиквичка</value>
+  </data>
+</root>
