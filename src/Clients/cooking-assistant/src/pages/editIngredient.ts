@@ -16,7 +16,6 @@ import { LocalStorageCurrencies } from "../../../shared/src/utils/localStorageCu
 import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 
 import { EditIngredientModel } from "models/viewmodels/editIngredientModel";
-import { IngredientSuggestion } from "models/viewmodels/ingredientSuggestion";
 import { NutritionData } from "models/viewmodels/nutritionData";
 import { PriceData } from "models/viewmodels/priceData";
 
@@ -35,7 +34,7 @@ export class EditIngredient {
   private ingredientLinkedMessage: string;
   private tasksSearchVisible = false;
   private autocomplete: AutocompleteResult;
-  private taskSuggestions = new Array<IngredientSuggestion>();
+  //private taskSuggestions = new Array<IngredientSuggestion>();
   private pickTaskInput: HTMLInputElement;
   private nameIsInvalid: boolean;
   private caloriesIsInvalid: boolean;
@@ -219,45 +218,45 @@ export class EditIngredient {
   }
 
   async linkToTask() {
-    this.taskSuggestions = await this.ingredientsService.getTaskSuggestions();
-    this.tasksSearchVisible = true;
+    // this.taskSuggestions = await this.ingredientsService.getTaskSuggestions();
+    // this.tasksSearchVisible = true;
 
-    this.attachAutocomplete(this.taskSuggestions);
+    // this.attachAutocomplete(this.taskSuggestions);
   }
 
-  attachAutocomplete(ingredientSuggestions: IngredientSuggestion[]) {
-    if (this.autocomplete) {
-      this.autocomplete.destroy();
-    }
+  // attachAutocomplete(ingredientSuggestions: IngredientSuggestion[]) {
+  //   if (this.autocomplete) {
+  //     this.autocomplete.destroy();
+  //   }
 
-    this.autocomplete = autocomplete({
-      input: this.pickTaskInput,
-      minLength: 2,
-      fetch: (
-        text: string,
-        update: (items: IngredientSuggestion[]) => void
-      ) => {
-        const suggestions = ingredientSuggestions.filter((i) =>
-          i.name.toUpperCase().startsWith(text.toUpperCase())
-        );
-        update(suggestions);
-      },
-      onSelect: (suggestion: IngredientSuggestion) => {
-        this.nameIsInvalid = false;
+  //   this.autocomplete = autocomplete({
+  //     input: this.pickTaskInput,
+  //     minLength: 2,
+  //     fetch: (
+  //       text: string,
+  //       update: (items: IngredientSuggestion[]) => void
+  //     ) => {
+  //       const suggestions = ingredientSuggestions.filter((i) =>
+  //         i.name.toUpperCase().startsWith(text.toUpperCase())
+  //       );
+  //       update(suggestions);
+  //     },
+  //     onSelect: (suggestion: IngredientSuggestion) => {
+  //       this.nameIsInvalid = false;
 
-        this.ingredientLinkedMessage = this.i18n.tr("editIngredient.thisIngredientIsLinked", {
-          taskName: suggestion.name,
-          taskList: suggestion.group
-        });
+  //       this.ingredientLinkedMessage = this.i18n.tr("editIngredient.thisIngredientIsLinked", {
+  //         taskName: suggestion.name,
+  //         taskList: suggestion.group
+  //       });
 
-        this.model.taskId = suggestion.taskId;
-        this.model.name = suggestion.name;
+  //       this.model.taskId = suggestion.taskId;
+  //       this.model.name = suggestion.name;
 
-        this.pickTaskInput.value = "";
-      },
-      className: "autocomplete-customizations",
-    });
-  }
+  //       this.pickTaskInput.value = "";
+  //     },
+  //     className: "autocomplete-customizations",
+  //   });
+  // }
 
   unlinkFromTask() {
     this.model.taskId = null;

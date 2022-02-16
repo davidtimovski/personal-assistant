@@ -6,7 +6,7 @@ CREATE TABLE public."CookingAssistant.Ingredients"
 (
     "Id" serial NOT NULL,
 	"ParentId" integer,
-    "FoodCategoryId" integer,
+    "CategoryId" integer,
     "UserId" integer NOT NULL,
     "TaskId" integer,
     "Name" character varying(50) COLLATE pg_catalog."default",
@@ -41,8 +41,8 @@ CREATE TABLE public."CookingAssistant.Ingredients"
     REFERENCES public."CookingAssistant.Ingredients" ("Id") MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE,
-    CONSTRAINT "FK_CookingAssistant.Ingredients_CookingAssistant.FoodCategories_FoodCategoryId" FOREIGN KEY (FoodCategoryId)
-    REFERENCES public."CookingAssistant.FoodCategories" ("Id") MATCH SIMPLE
+    CONSTRAINT "FK_CookingAssistant.Ingredients_CookingAssistant.IngredientCategories_CategoryId" FOREIGN KEY (FoodCategoryId)
+    REFERENCES public."CookingAssistant.IngredientCategories" ("Id") MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE,
     CONSTRAINT "FK_CookingAssistant.Ingredients_AspNetUsers_UserId" FOREIGN KEY ("UserId")
@@ -83,7 +83,7 @@ CREATE INDEX "IX_CookingAssistant.Ingredients_TaskId"
 	
 -- Seed public ingredients
 
-INSERT INTO public."CookingAssistant.Ingredients"("ParentId", "FoodCategoryId", "UserId", "Name", "MeasurementType", "CreatedDate", "ModifiedDate", "ServingSize", "ServingSizeIsOneUnit") VALUES
+INSERT INTO public."CookingAssistant.Ingredients"("ParentId", "CategoryId", "UserId", "Name", "MeasurementType", "CreatedDate", "ModifiedDate", "ServingSize", "ServingSizeIsOneUnit") VALUES
 
 -- Grain
 (NULL, 1, 1, 'flour', 1, NOW(), NOW(), 100, FALSE),
@@ -104,9 +104,8 @@ INSERT INTO public."CookingAssistant.Ingredients"("ParentId", "FoodCategoryId", 
     (NULL, 1, 1, 'noodles', NULL, NOW(), NOW(), 100, FALSE),
 (NULL, 1, 1, 'corn_starch', NULL, NOW(), NOW(), 100, FALSE),
 (NULL, 1, 1, 'cornmeal', NULL, NOW(), NOW(), 100, FALSE),
--- Grain/Cereal
-(NULL, 10, 1, 'muesli', NULL, NOW(), NOW(), 100, FALSE),
-(NULL, 10, 1, 'oats', NULL, NOW(), NOW(), 100, FALSE),
+(NULL, 1, 1, 'muesli', NULL, NOW(), NOW(), 100, FALSE),
+(NULL, 1, 1, 'oats', NULL, NOW(), NOW(), 100, FALSE),
 
 -- Vegetables
 (NULL, 2, 1, 'potatoes', NULL, NOW(), NOW(), 100, FALSE),
@@ -189,15 +188,15 @@ INSERT INTO public."CookingAssistant.Ingredients"("ParentId", "FoodCategoryId", 
     (NULL, 4, 1, 'condensed_milk', 2, NOW(), NOW(), 100, FALSE),
 (NULL, 4, 1, 'yogurt', 2, NOW(), NOW(), 100, FALSE),
 -- Dairy/Cheese
-(NULL, 11, 1, 'sheep_cheese', NULL, NOW(), NOW(), 100, FALSE),
-(NULL, 11, 1, 'parmesan', NULL, NOW(), NOW(), 100, FALSE),
-(NULL, 11, 1, 'cow_cheese', NULL, NOW(), NOW(), 100, FALSE),
-(NULL, 11, 1, 'feta_cheese', NULL, NOW(), NOW(), 100, FALSE),
-(NULL, 11, 1, 'cheddar_cheese', NULL, NOW(), NOW(), 100, FALSE),
-(NULL, 11, 1, 'mozzarella_cheese', NULL, NOW(), NOW(), 100, FALSE),
-(NULL, 11, 1, 'provolone_cheese', NULL, NOW(), NOW(), 100, FALSE),
-(NULL, 11, 1, 'swiss_cheese', NULL, NOW(), NOW(), 100, FALSE),
-(NULL, 11, 1, 'ricotta_cheese', NULL, NOW(), NOW(), 100, FALSE),
+(NULL, 10, 1, 'sheep_cheese', NULL, NOW(), NOW(), 100, FALSE),
+(NULL, 10, 1, 'parmesan', NULL, NOW(), NOW(), 100, FALSE),
+(NULL, 10, 1, 'cow_cheese', NULL, NOW(), NOW(), 100, FALSE),
+(NULL, 10, 1, 'feta_cheese', NULL, NOW(), NOW(), 100, FALSE),
+(NULL, 10, 1, 'cheddar_cheese', NULL, NOW(), NOW(), 100, FALSE),
+(NULL, 10, 1, 'mozzarella_cheese', NULL, NOW(), NOW(), 100, FALSE),
+(NULL, 10, 1, 'provolone_cheese', NULL, NOW(), NOW(), 100, FALSE),
+(NULL, 10, 1, 'swiss_cheese', NULL, NOW(), NOW(), 100, FALSE),
+(NULL, 10, 1, 'ricotta_cheese', NULL, NOW(), NOW(), 100, FALSE),
 
 -- Protein
 (NULL, 5, 1, 'chicken', 1, NOW(), NOW(), 100, FALSE),
@@ -217,10 +216,10 @@ INSERT INTO public."CookingAssistant.Ingredients"("ParentId", "FoodCategoryId", 
     (NULL, 5, 1, 'egg_yolks', 0, NOW(), NOW(), 100, FALSE),
 (NULL, 5, 1, 'tofu', 1, NOW(), NOW(), 100, FALSE),
 -- Protein/Seafood
-(NULL, 12, 1, 'shrimp', 1, NOW(), NOW(), 100, FALSE),
-(NULL, 12, 1, 'hake', 1, NOW(), NOW(), 100, FALSE),
-(NULL, 12, 1, 'sardines', 1, NOW(), NOW(), 100, FALSE),
-(NULL, 12, 1, 'tuna', 1, NOW(), NOW(), 100, FALSE),
+(NULL, 11, 1, 'shrimp', 1, NOW(), NOW(), 100, FALSE),
+(NULL, 11, 1, 'hake', 1, NOW(), NOW(), 100, FALSE),
+(NULL, 11, 1, 'sardines', 1, NOW(), NOW(), 100, FALSE),
+(NULL, 11, 1, 'tuna', 1, NOW(), NOW(), 100, FALSE),
 
 -- Nuts/legumes
 (NULL, 6, 1, 'almonds', 1, NOW(), NOW(), 100, FALSE),

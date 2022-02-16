@@ -1,0 +1,12 @@
+<template bindable="ingredient">
+  <require from="./public-ingredient-suggestion.scss"></require>
+  <require from="./public-ingredient-suggestion"></require>
+
+  <div if.bind="ingredient.matched" class="public-ingredient">
+    <button type="button" click.delegate="ingredientClicked()" disabled.bind="ingredient.selected" class="ingredient ${ingredient.selected ? 'selected' : ''}">${ingredient.name}</button>
+
+    <div repeat.for="childIngredient of ingredient.children" class="children">
+      <public-ingredient-suggestion ingredient.bind="childIngredient"></public-ingredient-suggestion>
+    </div>
+  </div>
+</template>

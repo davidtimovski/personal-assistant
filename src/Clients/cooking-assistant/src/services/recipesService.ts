@@ -289,11 +289,11 @@ export class RecipesService extends HttpProxyBase {
       const parsedIngredient = new EditRecipeIngredient(
         ingredient.id,
         ingredient.taskId,
-        null,
         ingredient.name,
         ingredient.amount,
         ingredient.unit,
-        false
+        false,
+        null
       );
 
       if (

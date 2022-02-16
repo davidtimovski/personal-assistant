@@ -81,13 +81,9 @@ public class IngredientsController : Controller
             return Unauthorized();
         }
 
-        var ingredientSuggestionsVm = new IngredientSuggestionsVm
-        {
-            Suggestions = _ingredientService.GetSuggestions(recipeId, userId),
-            TaskSuggestions = _ingredientService.GetTaskSuggestions(recipeId, userId)
-        };
+        var suggestions = _ingredientService.GetSuggestions(recipeId, userId);
 
-        return Ok(ingredientSuggestionsVm);
+        return Ok(suggestions);
     }
 
     [HttpGet("task-suggestions")]

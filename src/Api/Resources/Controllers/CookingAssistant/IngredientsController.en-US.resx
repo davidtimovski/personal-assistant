@@ -120,6 +120,9 @@
   <data name="active_dry_yeast" xml:space="preserve">
     <value>Active dry yeast</value>
   </data>
+  <data name="alcohol" xml:space="preserve">
+    <value>Алкохол</value>
+  </data>
   <data name="all_purpose_flour" xml:space="preserve">
     <value>All-purpose flour</value>
   </data>
@@ -243,6 +246,9 @@
   <data name="cheddar_cheese" xml:space="preserve">
     <value>Cheddar cheese</value>
   </data>
+  <data name="cheese" xml:space="preserve">
+    <value>Сирење</value>
+  </data>
   <data name="cherries" xml:space="preserve">
     <value>Cherries</value>
   </data>
@@ -324,6 +330,9 @@
   <data name="curry_sauce" xml:space="preserve">
     <value>Curry sauce</value>
   </data>
+  <data name="dairy" xml:space="preserve">
+    <value>Млечни</value>
+  </data>
   <data name="dry_white_wine" xml:space="preserve">
     <value>Dry white wine</value>
   </data>
@@ -351,6 +360,9 @@
   <data name="flour" xml:space="preserve">
     <value>Flour</value>
   </data>
+  <data name="fruit" xml:space="preserve">
+    <value>Овошје</value>
+  </data>
   <data name="fusilli" xml:space="preserve">
     <value>Fusilli</value>
   </data>
@@ -371,6 +383,9 @@
   </data>
   <data name="gnocchi" xml:space="preserve">
     <value>Gnocchi</value>
+  </data>
+  <data name="grain" xml:space="preserve">
+    <value>Житарици</value>
   </data>
   <data name="grapefruit" xml:space="preserve">
     <value>Grapefruit</value>
@@ -486,6 +501,9 @@
   <data name="nutmeg" xml:space="preserve">
     <value>Nutmeg</value>
   </data>
+  <data name="nuts_legumes" xml:space="preserve">
+    <value>Легуми</value>
+  </data>
   <data name="oats" xml:space="preserve">
     <value>Oats</value>
   </data>
@@ -567,6 +585,9 @@
   <data name="powdered_sugar" xml:space="preserve">
     <value>Powdered sugar</value>
   </data>
+  <data name="protein" xml:space="preserve">
+    <value>Протеин</value>
+  </data>
   <data name="provolone_cheese" xml:space="preserve">
     <value>Provolone cheese</value>
   </data>
@@ -623,6 +644,12 @@
   </data>
   <data name="sausage" xml:space="preserve">
     <value>Sausage</value>
+  </data>
+  <data name="seafood" xml:space="preserve">
+    <value>Морска храна</value>
+  </data>
+  <data name="seasoning" xml:space="preserve">
+    <value>Зачини</value>
   </data>
   <data name="sea_salt" xml:space="preserve">
     <value>Sea salt</value>
@@ -707,6 +734,9 @@
   </data>
   <data name="vanilla_extract" xml:space="preserve">
     <value>Екстракт од ванила</value>
+  </data>
+  <data name="vegetables" xml:space="preserve">
+    <value>Зеленчук</value>
   </data>
   <data name="vegetable_oil" xml:space="preserve">
     <value>Растително масло</value>

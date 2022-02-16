@@ -3,7 +3,6 @@ import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
-import autocomplete, { AutocompleteResult } from "autocompleter";
 
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
@@ -12,8 +11,7 @@ import * as environment from "../../config/environment.json";
 import { RecipesService } from "services/recipesService";
 import { IngredientsService } from "services/ingredientsService";
 import { UsersService } from "services/usersService";
-import { IngredientSuggestions } from "models/viewmodels/ingredientSuggestions";
-import { IngredientSuggestion } from "models/viewmodels/ingredientSuggestion";
+import { IngredientAutocompleteEvents, IngredientCategory, IngredientSuggestion, IngredientSuggestions, PublicIngredientSuggestions } from "models/viewmodels/ingredientSuggestions";
 import { EditRecipeModel } from "models/viewmodels/editRecipeModel";
 import { EditRecipeIngredient } from "models/viewmodels/editRecipeIngredient";
 import * as Actions from "utils/state/actions";
@@ -28,7 +26,7 @@ export class EditRecipe {
   private nameInput: HTMLInputElement;
   private nameIsInvalid: boolean;
   private videoUrlIsInvalid: boolean;
-  private ingredientName: string;
+  private ingredientName = "";
   private ingredientNameIsInvalid: boolean;
   private prepDurationHours = "00";
   private prepDurationMinutes = "00";
@@ -44,11 +42,8 @@ export class EditRecipe {
   private leaveButtonIsLoading = false;
   private videoIFrame: HTMLIFrameElement;
   private videoIFrameSrc = "";
-  private autocomplete: AutocompleteResult;
-  private suggestions = new Array<IngredientSuggestion>();
-  private taskSuggestions = new Array<IngredientSuggestion>();
-  private removedSuggestions = new Array<IngredientSuggestion>();
-  private ingredientSuggestionsComeFromTasks = false;
+  private suggestions: IngredientSuggestions;
+  private suggestionsMatched = false;
   private addIngredientsInput: HTMLInputElement;
   private addIngredientsInputPlaceholder: string;
   private measuringUnits: string[];
@@ -72,6 +67,80 @@ export class EditRecipe {
       this.nameIsInvalid = false;
       this.videoUrlIsInvalid = false;
     });
+
+    this.eventAggregator.subscribe(IngredientAutocompleteEvents.Selected, (ingredient: IngredientSuggestion) => {
+      this.ingredientName = '';
+      this.ingredientNameIsInvalid = false;
+      this.resetIngredientMatches();
+
+      if (ingredient.taskId) {
+        this.model.ingredients.push(
+          new EditRecipeIngredient(
+            ingredient.id,
+            ingredient.taskId,
+            ingredient.name,
+            null,
+            ingredient.unit,
+            !!ingredient.id,
+            ingredient
+          )
+        );
+      } else {
+        this.model.ingredients.push(
+          new EditRecipeIngredient(
+            ingredient.id,
+            ingredient.taskId,
+            ingredient.name,
+            null,
+            ingredient.unit,
+            !!ingredient.id,
+            ingredient
+          )
+        );
+      }
+    });
+
+    this.suggestions = new IngredientSuggestions();
+    this.suggestions.userIngredients = [
+      new IngredientSuggestion(1, null, 'banani', 'g'),
+      new IngredientSuggestion(2, null, 'morkovi', 'g'),
+    ];
+    this.suggestions.publicIngredients = new PublicIngredientSuggestions();
+    this.suggestions.publicIngredients.uncategorized = [
+      new IngredientSuggestion(3, null, 'Med', 'tsp'),
+      new IngredientSuggestion(4, null, 'Biskviti', null)
+    ];
+
+    let dairy = new IngredientCategory();
+    dairy.name = 'Dairy';
+    let milk = new IngredientSuggestion(5, null, 'Mleko', 'ml');
+    milk.children = [
+      new IngredientSuggestion(10, null, 'Whole milk', 'ml'),
+      new IngredientSuggestion(11, null, 'Condensed milk', 'ml'),
+    ];
+    dairy.ingredients = [
+      milk,
+      new IngredientSuggestion(6, null, 'Jogurt', 'ml')
+    ];
+    let cheese = new IngredientCategory();
+    cheese.name = 'Cheese';
+    cheese.ingredients = [
+      new IngredientSuggestion(7, null, 'Parmezan', 'g'),
+      new IngredientSuggestion(8, null, 'Mocarela', 'g')
+    ];
+    cheese.subcategories = [];
+    dairy.subcategories = [cheese];
+
+    let grain = new IngredientCategory();
+    grain.name = 'Grain';
+    grain.ingredients = [
+      new IngredientSuggestion(9, null, 'Musli', 'g')
+    ];
+    grain.subcategories = [];
+    this.suggestions.publicIngredients.categories = [
+      dairy,
+      grain
+    ];
   }
 
   async activate(params: any) {
@@ -118,11 +187,8 @@ export class EditRecipe {
     if (this.model.userIsOwner) {
       this.ingredientsService
         .getSuggestionsForRecipe(this.model.id)
-        .then((ingredientSuggestionsVM: IngredientSuggestions) => {
-          this.suggestions = ingredientSuggestionsVM.suggestions;
-          this.taskSuggestions = ingredientSuggestionsVM.taskSuggestions;
-
-          this.attachAutocomplete(this.suggestions);
+        .then((suggestions: IngredientSuggestions) => {
+          //this.suggestions = suggestions;
         });
     }
   }
@@ -146,69 +212,76 @@ export class EditRecipe {
     }
   }
 
-  attachAutocomplete(ingredientSuggestions: IngredientSuggestion[]) {
-    if (this.autocomplete) {
-      this.autocomplete.destroy();
+  resetIngredientMatches() {
+    this.suggestions.userIngredients.forEach(x => this.matchIngredient(x, false));
+    this.suggestions.publicIngredients.uncategorized.forEach(x => this.matchIngredient(x, false));
+    this.suggestions.publicIngredients.categories.forEach(x => this.matchCategory(x, false));
+
+    this.suggestionsMatched = false;
+  }
+
+  matchIngredient(ingredient: IngredientSuggestion, matched: boolean) {
+    ingredient.matched = matched;
+    ingredient.children.forEach(x => this.matchIngredient(x, matched));
+  }
+
+  searchIngredient(ingredient: IngredientSuggestion, search: string) {
+    ingredient.matched = ingredient.name.toUpperCase().includes(search);
+
+    if (ingredient.matched) {
+      this.matchIngredient(ingredient, true);
+      this.suggestionsMatched = true;
+    } else {
+      for (const child of ingredient.children) {
+        if (this.searchIngredient(child, search)) {
+          ingredient.matched = true;
+        }
+      }
     }
 
-    this.autocomplete = autocomplete({
-      input: this.addIngredientsInput,
-      minLength: 2,
-      fetch: (text: string, update: (items: IngredientSuggestion[]) => void) => {
-        const suggestions = ingredientSuggestions.filter((i) => i.name.toUpperCase().startsWith(text.toUpperCase()));
-        update(suggestions);
-      },
-      onSelect: (suggestion: IngredientSuggestion) => {
-        this.ingredientNameIsInvalid = false;
+    return ingredient.matched;
+  }
 
-        if (this.existsInIngredients(suggestion.name)) {
-          this.ingredientName = suggestion.name;
-          this.ingredientNameIsInvalid = true;
-          return;
+  matchCategory(category: IngredientCategory, matched: boolean) {
+    category.matched = matched;
+    category.ingredients.forEach(x => this.matchIngredient(x, matched));
+    category.subcategories.forEach(x => this.matchCategory(x, matched));
+  }
+
+  searchCategory(category: IngredientCategory, search: string) {
+    category.matched = category.name.toUpperCase().includes(search);
+
+    if (category.matched) {
+      this.matchCategory(category, true);
+      this.suggestionsMatched = true;
+    } else {
+      for (const ingredient of category.ingredients) {
+        if (this.searchIngredient(ingredient, search)) {
+          category.matched = true;
         }
+      }
 
-        if (suggestion.taskId) {
-          this.model.ingredients.push(
-            new EditRecipeIngredient(
-              suggestion.id,
-              suggestion.taskId,
-              suggestion.group,
-              suggestion.name,
-              null,
-              null,
-              !!suggestion.id
-            )
-          );
-        } else {
-          this.model.ingredients.push(
-            new EditRecipeIngredient(
-              suggestion.id,
-              suggestion.taskId,
-              null,
-              suggestion.name,
-              null,
-              null,
-              !!suggestion.id
-            )
-          );
+      for (const subcategory of category.subcategories) {
+        if (this.searchCategory(subcategory, search)) {
+          category.matched = true;
         }
+      }
+    }
 
-        this.suggestions = this.suggestions.filter((x) => x.id !== suggestion.id);
-        this.taskSuggestions = this.taskSuggestions.filter(
-          (x) => x.taskId !== suggestion.taskId && x.id !== suggestion.id
-        );
+    return category.matched;
+  }
 
-        if (this.ingredientSuggestionsComeFromTasks) {
-          this.attachAutocomplete(this.taskSuggestions);
-        } else {
-          this.attachAutocomplete(this.suggestions);
-        }
+  ingredientInputChanged() {
+    this.resetIngredientMatches();
 
-        this.ingredientName = "";
-        this.removedSuggestions.push(suggestion);
-      },
-      className: "autocomplete-customizations",
-    });
+    const search = this.ingredientName.trim().toUpperCase();
+    if (!search || search.length < 2) {
+      return;
+    }
+
+    this.suggestions.userIngredients.forEach(x => this.searchIngredient(x, search));
+    this.suggestions.publicIngredients.uncategorized.forEach(x => this.searchIngredient(x, search));
+    this.suggestions.publicIngredients.categories.forEach(x => this.searchCategory(x, search));
   }
 
   ingredientChanged() {
@@ -283,33 +356,19 @@ export class EditRecipe {
     return this.model.ingredients.length;
   }
 
-  changeIngredientSuggestionsSource() {
-    this.autocomplete.destroy();
-    this.ingredientNameIsInvalid = false;
-
-    this.ingredientSuggestionsComeFromTasks = !this.ingredientSuggestionsComeFromTasks;
-
-    if (this.ingredientSuggestionsComeFromTasks) {
-      this.addIngredientsInputPlaceholder = this.i18n.tr("editRecipe.ingredientFromTask");
-      this.attachAutocomplete(this.taskSuggestions);
-    } else {
-      this.addIngredientsInputPlaceholder = this.i18n.tr("editRecipe.ingredient");
-      this.attachAutocomplete(this.suggestions);
-    }
-
-    this.addIngredientsInput.focus();
-  }
-
   addNewIngredient() {
     this.ingredientNameIsInvalid = ValidationUtil.isEmptyOrWhitespace(this.ingredientName);
+
     if (!this.ingredientNameIsInvalid) {
       if (this.existsInIngredients(this.ingredientName)) {
         this.ingredientNameIsInvalid = true;
       } else {
-        this.model.ingredients.push(new EditRecipeIngredient(null, null, null, this.ingredientName, null, null, false));
+        this.model.ingredients.push(new EditRecipeIngredient(null, null, this.ingredientName, null, null, false, null));
         this.ingredientName = "";
       }
     }
+
+    this.resetIngredientMatches();
   }
 
   existsInIngredients(ingredientName: string): boolean {
@@ -335,26 +394,11 @@ export class EditRecipe {
   }
 
   removeIngredient(ingredient: EditRecipeIngredient) {
+    if (ingredient.suggestion) {
+      ingredient.suggestion.selected = false;
+    }
+    
     this.model.ingredients.splice(this.model.ingredients.indexOf(ingredient), 1);
-
-    const ingredientSuggestion = new IngredientSuggestion(
-      ingredient.id,
-      ingredient.taskId,
-      ingredient.name,
-      ingredient.unit,
-      ingredient.name,
-      ingredient.taskList
-    );
-    this.suggestions.push(ingredientSuggestion);
-    if (ingredient.taskId) {
-      this.taskSuggestions.push(ingredientSuggestion);
-    }
-
-    if (this.ingredientSuggestionsComeFromTasks) {
-      this.attachAutocomplete(this.taskSuggestions);
-    } else {
-      this.attachAutocomplete(this.suggestions);
-    }
   }
 
   @computedFrom("model.imageUri")

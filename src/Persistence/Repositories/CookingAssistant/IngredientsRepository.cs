@@ -68,7 +68,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
         return ingredient;
     }
 
-    public IEnumerable<Ingredient> GetSuggestions(int recipeId, int userId)
+    public IEnumerable<Ingredient> GetUserSuggestions(int recipeId, int userId)
     {
         using IDbConnection conn = OpenConnection();
 
@@ -80,27 +80,32 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
             new { RecipeId = recipeId, UserId = userId });
     }
 
-    public IEnumerable<Ingredient> GetTaskSuggestions(int recipeId, int userId)
+    public IEnumerable<Ingredient> GetPublicSuggestions()
     {
         using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT DISTINCT i.""Id"", CASE WHEN i.""TaskId"" IS NULL THEN t.""Id"" ELSE i.""TaskId"" END, t.""Name"", l.""Id"", l.""Name""
-                        FROM ""ToDoAssistant.Tasks"" AS t
-                        INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                        LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                        LEFT JOIN ""CookingAssistant.Ingredients"" AS i ON t.""Id"" = i.""TaskId"" AND i.""UserId"" = @UserId
-                        WHERE (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
-	                        AND (i.""Id"" IS NULL OR (@RecipeId = 0 OR i.""Id"" NOT IN (SELECT ""IngredientId"" FROM ""CookingAssistant.RecipesIngredients"" WHERE ""RecipeId"" = @RecipeId)))";
+        var categories = conn.Query<IngredientCategory>(@"");
 
-        return conn.Query<Ingredient, ToDoList, Ingredient>(query,
-            (ingredient, list) =>
-            {
-                ingredient.Task = new ToDoTask
-                {
-                    List = list
-                };
-                return ingredient;
-            }, new { RecipeId = recipeId, UserId = userId });
+        var ingredients = conn.Query<Ingredient>(@"SELECT DISTINCT i.""Id"", i.""TaskId"", 
+                                                    CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END
+                                                FROM ""CookingAssistant.Ingredients"" AS i
+                                                LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
+                                                WHERE i.""UserId"" = @UserId AND (@RecipeId = 0 OR i.""Id"" NOT IN (SELECT ""IngredientId"" FROM ""CookingAssistant.RecipesIngredients"" WHERE ""RecipeId"" = @RecipeId))");
+
+
+        return new List<Ingredient>();
+    }
+
+    public IEnumerable<Ingredient> GetSuggestions(int recipeId, int userId)
+    {
+        using IDbConnection conn = OpenConnection();
+
+        return conn.Query<Ingredient>(@"SELECT DISTINCT i.""Id"", i.""TaskId"", 
+                                                CASE WHEN i.""Name"" IS NULL THEN t.""Name"" ELSE i.""Name"" END
+                                            FROM ""CookingAssistant.Ingredients"" AS i
+                                            LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
+                                            WHERE i.""UserId"" = @UserId AND (@RecipeId = 0 OR i.""Id"" NOT IN (SELECT ""IngredientId"" FROM ""CookingAssistant.RecipesIngredients"" WHERE ""RecipeId"" = @RecipeId))",
+            new { RecipeId = recipeId, UserId = userId });
     }
 
     public IEnumerable<ToDoTask> GetTaskSuggestions(int userId)

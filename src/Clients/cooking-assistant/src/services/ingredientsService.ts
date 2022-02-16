@@ -8,8 +8,7 @@ import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
 
 import { SimpleIngredient } from "models/viewmodels/simpleIngredient";
 import { EditIngredientModel } from "models/viewmodels/editIngredientModel";
-import { IngredientSuggestions } from "models/viewmodels/ingredientSuggestions";
-import { IngredientSuggestion } from "models/viewmodels/ingredientSuggestion";
+import { IngredientSuggestion, IngredientSuggestions } from "models/viewmodels/ingredientSuggestions";
 import { PriceData } from "models/viewmodels/priceData";
 
 @inject(AuthService, HttpClient, EventAggregator)

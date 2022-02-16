@@ -46,7 +46,7 @@ public class IngredientService : IIngredientService
 
     public IEnumerable<IngredientSuggestion> GetSuggestions(int recipeId, int userId)
     {
-        IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetSuggestions(recipeId, userId);
+        IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetUserSuggestions(recipeId, userId);
 
         var result = ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x));
 
@@ -59,15 +59,6 @@ public class IngredientService : IIngredientService
 
         var result = tasks.Select(x => _mapper.Map<IngredientSuggestion>(x));
         result = result.OrderBy(x => x.Group);
-
-        return result;
-    }
-
-    public IEnumerable<IngredientSuggestion> GetTaskSuggestions(int recipeId, int userId)
-    {
-        IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetTaskSuggestions(recipeId, userId);
-
-        var result = ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x));
 
         return result;
     }

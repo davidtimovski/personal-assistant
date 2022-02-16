@@ -9,9 +9,9 @@ public interface IIngredientsRepository
 {
     IEnumerable<Ingredient> GetAll(int userId);
     Ingredient Get(int id, int userId);
-    IEnumerable<Ingredient> GetSuggestions(int recipeId, int userId);
+    IEnumerable<Ingredient> GetUserSuggestions(int recipeId, int userId);
+    IEnumerable<Ingredient> GetPublicSuggestions();
     IEnumerable<ToDoTask> GetTaskSuggestions(int userId);
-    IEnumerable<Ingredient> GetTaskSuggestions(int recipeId, int userId);
     IEnumerable<Ingredient> GetIngredientSuggestions(int userId);
     bool Exists(int id, int userId);
     bool Exists(int id, string name, int userId);

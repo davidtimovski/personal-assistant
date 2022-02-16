@@ -6,8 +6,8 @@ namespace Domain.Entities.CookingAssistant;
 public class Ingredient : Entity
 {
     public int Id { get; set; }
-    public int ParentId { get; set; }
-    public int FoodCategoryId { get; set; }
+    public int? ParentId { get; set; }
+    public int? CategoryId { get; set; }
     public int UserId { get; set; }
     public int? TaskId { get; set; }
     public string Name { get; set; }
@@ -36,6 +36,8 @@ public class Ingredient : Entity
     public decimal? Price { get; set; }
     public string Currency { get; set; }
 
+    public Ingredient Parent { get; set; }
+    public IngredientCategory Category { get; set; }
     public List<Recipe> Recipes { get; set; } = new List<Recipe>();
     public ToDoTask Task { get; set; }
 

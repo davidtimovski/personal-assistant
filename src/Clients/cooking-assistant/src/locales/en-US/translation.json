@@ -93,7 +93,6 @@
     "youTubeUrl": "YouTube URL",
     "ingredients": "Ingredients",
     "ingredient": "Ingredient",
-    "ingredientFromTask": "Ingredient from task",
     "addIngredient": "Add ingredient",
     "linkedToTask": "Linked to task",
     "amount": "Amount",
@@ -287,11 +286,6 @@
   "tooltips": {
     "okayUnderstood": "Okay, understood",
     "tooltipWillNoLongerShow": "This tooltip will no longer show. If you wish to retain it, go to the Menu page and click the \"Help\" button.",
-    "ingredientFromTask": {
-      "title": "Ingredient from task",
-      "question": "What does the button to the right do?",
-      "answer": "You can use tasks from (perhaps) your shopping list in To Do Assistant as ingredients. That way if a task not been completed in To Do Assistant it will appear as a missing ingredient in the recipes page, giving you a good indication on which recipes you already have the ingredients for."
-    },
     "receivedRecipes": {
       "title": "Received recipes",
       "question": "What is this?",

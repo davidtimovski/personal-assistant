@@ -1,6 +1,7 @@
 <template>
   <require from="../static/styles/pages/edit-recipe.scss"></require>
-  <require from="./../resources/elements/tooltip"></require>
+  <require from="./../resources/elements/public-ingredient-suggestion"></require>
+  <require from="./../resources/elements/public-category-suggestion"></require>
   <require from="./../resources/value-converters/null-format"></require>
   <require from="./../resources/elements/servings-selector"></require>
 
@@ -64,21 +65,35 @@
               <span t="editRecipe.ingredients">Ingredients</span>: <span>${getIngredientsCount}</span>
             </label>
 
-            <tooltip key="ingredientFromTask"></tooltip>
-
             <div if.bind="model.userIsOwner" class="add-ingredient-wrap">
-              <div class="add-input-wrap">
-                <input type="text" value.bind="ingredientName" ref="addIngredientsInput"
-                  placeholder="${addIngredientsInputPlaceholder}" aria-label="${addIngredientsInputPlaceholder}"
-                  maxlength="50" class.bind="ingredientNameIsInvalid ? 'invalid' : ''" />
+              <div class="input-wrap">
+                <input type="text" value.bind="ingredientName" keyup.delegate="ingredientInputChanged() & throttle:250" ref="addIngredientsInput"
+                  class.bind="ingredientNameIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]editRecipe.ingredient" maxlength="50" />
                 <a click.delegate="addNewIngredient()" t="[title,aria-label]editRecipe.addIngredient">
                   <i class="fas fa-plus-circle"></i>
                 </a>
               </div>
-              <a click.delegate="changeIngredientSuggestionsSource()"
-                class="toggle-from-tasks ${ingredientSuggestionsComeFromTasks ? 'checked' : ''}">
-                <i class="fas fa-list"></i>
-              </a>
+              <div if.bind="suggestionsMatched" class="suggestions">
+                <div class="my-ingredients">
+                  <div>My ingredients</div>
+
+                  <div repeat.for="ingredient of suggestions.userIngredients">
+                    <public-ingredient-suggestion ingredient.bind="ingredient"></public-ingredient-suggestion>
+                  </div>
+                </div>
+
+                <div if.bind="suggestions.publicIngredients" class="public-ingredients">
+                  <div class="ingredients">
+                    <div repeat.for="ingredient of suggestions.publicIngredients.uncategorized">
+                      <public-ingredient-suggestion ingredient.bind="ingredient"></public-ingredient-suggestion>
+                    </div>
+                  </div>
+
+                  <div repeat.for="category of suggestions.publicIngredients.categories" class="category">
+                    <public-category-suggestion category.bind="category"></public-category-suggestion>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div show.bind="model.ingredients.length > 0" class="new-ingredients-wrap">
@@ -87,7 +102,7 @@
                 <div class="ingredient-name-wrap">
                   <input type="text" if.bind="!ingredient.existing && !ingredient.taskId"
                     value.bind="ingredient.name | nullFormat" keyup.trigger="ingredientChanged(ingredient)"
-                    maxlength="50" class="name-input" />
+                    maxlength="50" class="name-input"  />
                   <div else class="name-input uneditable">${ingredient.name}</div>
                   <i if.bind="ingredient.taskId" class="fas fa-list" t="[title,aria-label]editRecipe.linkedToTask"></i>
                 </div>

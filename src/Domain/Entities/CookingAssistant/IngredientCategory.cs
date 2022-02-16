@@ -1,10 +1,10 @@
 ﻿namespace Domain.Entities.CookingAssistant;
 
-public class FoodCategory : Entity
+public class IngredientCategory : Entity
 {
     public int Id { get; set; }
     public int ParentId { get; set; }
     public string Name { get; set; }
 
-    public FoodCategory ParentCategory { get; set; }
+    public IngredientCategory Parent { get; set; }
 }

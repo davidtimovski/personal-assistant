@@ -112,28 +112,50 @@ label.label {
 }
 
 .add-ingredient-wrap {
-  display: flex;
-  justify-content: space-between;
+  .input-wrap {
+    position: relative;
+    width: 100%;
+  
+    input {
+      width: calc(100% - 62px);
+      padding-right: 50px;
+      line-height: 45px;
+    }
+  
+    a {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 45px;
+      height: 47px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: none;
+      border: none;
+      outline: none;
+      font-size: 23px;
+      line-height: 45px;
+      text-decoration: none;
+      color: var(--primary-color);
+      cursor: pointer;
+  
+      &:hover {
+        color: var(--primary-color-dark);
+      }
+    }
+  }
 
-  .toggle-from-tasks {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: var(--border-radius);
-    outline: none;
-    padding: 3px 11px 1px;
-    margin-left: 10px;
-    font-size: 29px;
-    line-height: 40px;
-    text-decoration: none;
-    color: var(--primary-color);
-    cursor: pointer;
-    user-select: none;
+  .suggestions {
+    margin-top: 10px;
 
-    transition: background var(--transition), color var(--transition);
+    .my-ingredients {
+      background: lightblue;
+      padding: 10px 10px;
+    }
 
-    &.checked {
-      background: var(--primary-color);
-      color: #fff;
+    .public-ingredients {
+      padding: 10px 10px;
     }
   }
 }
@@ -155,14 +177,6 @@ label.label {
     right: 10px;
     font-size: 27px;
     color: var(--primary-color);
-  }
-
-  &.from-task .fa-list {
-    display: block;
-  }
-
-  &.from-task .name-input {
-    padding-right: 50px;
   }
 
   .ingredient-name-wrap {

@@ -1,0 +1,13 @@
+.public-ingredient {
+  .ingredient {
+    display: block;
+
+    &.selected {
+      text-decoration: line-through;
+    }
+  }
+  
+  .children {
+    padding-left: 15px;
+  }
+}

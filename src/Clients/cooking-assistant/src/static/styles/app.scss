@@ -166,27 +166,6 @@ servings-selector {
   }
 }
 
-.autocomplete-customizations {
-  background: #fafafa;
-  border-bottom-left-radius: var(--border-radius);
-  border-bottom-right-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
-
-  > div {
-    padding: 5px 10px;
-    cursor: pointer;
-  }
-
-  .group {
-    background: var(--primary-color);
-    color: #fafafa;
-  }
-
-  .selected {
-    background: #e1e1e1;
-  }
-}
-
 .small-button {
   background: linear-gradient(225deg, #00eda6, #7a46f3);
   background-size: 400% 400%;
