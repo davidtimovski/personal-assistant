@@ -9,9 +9,8 @@ public class Ingredient : Entity
     public int? ParentId { get; set; }
     public int? CategoryId { get; set; }
     public int UserId { get; set; }
-    public int? TaskId { get; set; }
     public string Name { get; set; }
-    public MeasurementType MeasurementType { get; set; }
+    public MeasurementType? MeasurementType { get; set; }
     public short ServingSize { get; set; }
     public bool ServingSizeIsOneUnit { get; set; }
     public float? Calories { get; set; }
@@ -41,6 +40,7 @@ public class Ingredient : Entity
     public List<Recipe> Recipes { get; set; } = new List<Recipe>();
     public ToDoTask Task { get; set; }
 
+    public int? TaskId { get; set; }
     public int RecipeCount { get; set; }
 }
 

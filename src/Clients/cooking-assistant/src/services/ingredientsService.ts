@@ -8,8 +8,9 @@ import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
 
 import { SimpleIngredient } from "models/viewmodels/simpleIngredient";
 import { EditIngredientModel } from "models/viewmodels/editIngredientModel";
-import { IngredientSuggestion, IngredientSuggestions } from "models/viewmodels/ingredientSuggestions";
+import { IngredientSuggestions } from "models/viewmodels/ingredientSuggestions";
 import { PriceData } from "models/viewmodels/priceData";
+import { TaskSuggestion } from "models/viewmodels/taskSuggestion";
 
 @inject(AuthService, HttpClient, EventAggregator)
 export class IngredientsService extends HttpProxyBase {
@@ -60,8 +61,8 @@ export class IngredientsService extends HttpProxyBase {
     });
   }
 
-  async getTaskSuggestions(): Promise<Array<IngredientSuggestion>> {
-    const result = await this.ajax<Array<IngredientSuggestion>>(
+  async getTaskSuggestions(): Promise<Array<TaskSuggestion>> {
+    const result = await this.ajax<Array<TaskSuggestion>>(
       "ingredients/task-suggestions"
     );
 

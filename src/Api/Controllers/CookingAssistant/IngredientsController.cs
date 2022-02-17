@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Api.Models.CookingAssistant.Ingredients;
+using Application.Contracts.CookingAssistant.Ingredients;
+using Application.Contracts.CookingAssistant.Ingredients.Models;
 using FluentValidation;
+using Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Application.Contracts.CookingAssistant.Ingredients;
-using Application.Contracts.CookingAssistant.Ingredients.Models;
-using Infrastructure.Identity;
 
 namespace Api.Controllers.CookingAssistant;
 
@@ -69,7 +68,7 @@ public class IngredientsController : Controller
     }
 
     [HttpGet("suggestions/{recipeId}")]
-    public IActionResult GetSuggestions(int recipeId)
+    public async Task<IActionResult> GetSuggestions(int recipeId)
     {
         int userId;
         try
@@ -81,9 +80,9 @@ public class IngredientsController : Controller
             return Unauthorized();
         }
 
-        var suggestions = _ingredientService.GetSuggestions(recipeId, userId);
+        var suggestionsDto = await _ingredientService.GetSuggestionsAsync(recipeId, userId);
 
-        return Ok(suggestions);
+        return Ok(suggestionsDto);
     }
 
     [HttpGet("task-suggestions")]
@@ -99,7 +98,7 @@ public class IngredientsController : Controller
             return Unauthorized();
         }
 
-        IEnumerable<IngredientSuggestion> taskSuggestions = _ingredientService.GetTaskSuggestions(userId);
+        IEnumerable<TaskSuggestion> taskSuggestions = _ingredientService.GetTaskSuggestions(userId);
 
         return Ok(taskSuggestions);
     }

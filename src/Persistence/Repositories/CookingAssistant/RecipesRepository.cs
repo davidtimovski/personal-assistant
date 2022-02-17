@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
-using Microsoft.EntityFrameworkCore;
 using Application.Contracts.CookingAssistant.Recipes;
+using Dapper;
 using Domain.Entities.Common;
 using Domain.Entities.CookingAssistant;
 using Domain.Entities.ToDoAssistant;
+using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Repositories.CookingAssistant;
 
@@ -22,13 +22,14 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         var recipes = conn.Query<Recipe>(@"SELECT r.""Id"", r.""UserId"", r.""Name"", r.""ImageUri"", r.""LastOpenedDate"", COUNT(t.""Id"") AS ""IngredientsMissing""
-                                               FROM ""CookingAssistant.Recipes"" AS r
-                                               LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON r.""Id"" = ri.""RecipeId""
-                                               LEFT JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
-                                               LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id"" AND t.""IsCompleted"" = FALSE
-                                               LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
-                                               WHERE r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")
-                                               GROUP BY r.""Id"", r.""Name""", new { UserId = userId }).ToList();
+                                           FROM ""CookingAssistant.Recipes"" AS r
+                                           LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON r.""Id"" = ri.""RecipeId""
+                                           LEFT JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
+                                           LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
+                                           LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON it.""TaskId"" = t.""Id"" AND t.""IsCompleted"" = FALSE
+                                           LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
+                                           WHERE r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")
+                                           GROUP BY r.""Id"", r.""Name""", new { UserId = userId }).ToList();
 
         var recipeIds = recipes.Select(x => x.Id).ToArray();
         var shares = conn.Query<RecipeShare>(@"SELECT * FROM ""CookingAssistant.Shares"" WHERE ""RecipeId"" = ANY(@RecipeIds)", new { RecipeIds = recipeIds });
@@ -82,19 +83,20 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
 
         recipe.Shares = conn.Query<RecipeShare>(@"SELECT * FROM ""CookingAssistant.Shares"" WHERE ""RecipeId"" = @Id", new { Id = id }).ToList();
 
-        var recipeIngredientsSql = @"SELECT ri.""Amount"", ri.""Unit"", i.""Id"", i.""TaskId"", 
-                                             i.""Name"", i.""ServingSize"", i.""ServingSizeIsOneUnit"", i.""Calories"", 
-                                             i.""Fat"", i.""SaturatedFat"", i.""Carbohydrate"", 
-                                             i.""Sugars"", i.""AddedSugars"", i.""Fiber"", i.""Protein"",
-                                             i.""Sodium"", i.""Cholesterol"", 
-                                             i.""VitaminA"", i.""VitaminC"", i.""VitaminD"",
-                                             i.""Calcium"", i.""Iron"", i.""Potassium"", i.""Magnesium"",
-                                             i.""ProductSize"", i.""ProductSizeIsOneUnit"", i.""Price"", i.""Currency"", i.""ModifiedDate"",
-                                             tasks.""Id"", tasks.""Name"", tasks.""IsCompleted""
-                                         FROM ""CookingAssistant.RecipesIngredients"" AS ri
-                                         INNER JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
-                                         LEFT JOIN ""ToDoAssistant.Tasks"" AS tasks ON i.""TaskId"" = tasks.""Id""
-                                         WHERE ri.""RecipeId"" = @RecipeId";
+        var recipeIngredientsSql = @"SELECT ri.""Amount"", ri.""Unit"", i.""Id"", i.""Name"", 
+	                                     i.""ServingSize"", i.""ServingSizeIsOneUnit"", i.""Calories"", 
+	                                     i.""Fat"", i.""SaturatedFat"", i.""Carbohydrate"", 
+	                                     i.""Sugars"", i.""AddedSugars"", i.""Fiber"", i.""Protein"",
+	                                     i.""Sodium"", i.""Cholesterol"", 
+	                                     i.""VitaminA"", i.""VitaminC"", i.""VitaminD"",
+	                                     i.""Calcium"", i.""Iron"", i.""Potassium"", i.""Magnesium"",
+	                                     i.""ProductSize"", i.""ProductSizeIsOneUnit"", i.""Price"", i.""Currency"", i.""ModifiedDate"", it.""TaskId"",
+	                                     t.""Id"", t.""Name"", t.""IsCompleted""
+                                     FROM ""CookingAssistant.RecipesIngredients"" AS ri
+                                     INNER JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
+                                     LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
+                                     LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON it.""TaskId"" = t.""Id""
+                                     WHERE ri.""RecipeId"" = @RecipeId";
 
         var recipeIngredients = conn.Query<RecipeIngredient, Ingredient, ToDoTask, RecipeIngredient>(recipeIngredientsSql,
             (recipeIngredient, ingredient, task) =>
@@ -109,7 +111,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                 }
                 recipeIngredient.Ingredient = ingredient;
                 return recipeIngredient;
-            }, new { RecipeId = id }, null, true, "Id,Id");
+            }, new { RecipeId = id, UserId = userId }, null, true, "Id,Id");
 
         recipe.RecipeIngredients.AddRange(recipeIngredients);
 
@@ -121,22 +123,22 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         var recipe = conn.QueryFirstOrDefault<Recipe>(@"SELECT r.* 
-                                                            FROM ""CookingAssistant.Recipes"" AS r 
-                                                            LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
-                                                            WHERE ""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+                                                        FROM ""CookingAssistant.Recipes"" AS r 
+                                                        LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
+                                                        WHERE ""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
             new { Id = id, UserId = userId });
 
         if (recipe != null)
         {
             recipe.Shares = conn.Query<RecipeShare>(@"SELECT * FROM ""CookingAssistant.Shares"" WHERE ""RecipeId"" = @Id", new { Id = id }).ToList();
 
-            var recipeIngredientsSql = @"SELECT ri.""Amount"", ri.""Unit"", i.""Id"", i.""TaskId"", 
-                                                i.""Name"", t.""Id"", t.""Name"", l.""Id"", l.""Name""
-                                             FROM ""CookingAssistant.RecipesIngredients"" AS ri
-                                             INNER JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
-                                             LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
-                                             LEFT JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                                             WHERE ri.""RecipeId"" = @RecipeId";
+            const string recipeIngredientsSql = @"SELECT ri.""Amount"", ri.""Unit"", i.""Id"", i.""Name"", it.""TaskId"", t.""Id"", t.""Name"", l.""Id"", l.""Name""
+                                                  FROM ""CookingAssistant.RecipesIngredients"" AS ri
+                                                  INNER JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
+                                                  LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
+                                                  LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON it.""TaskId"" = t.""Id""
+                                                  LEFT JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
+                                                  WHERE ri.""RecipeId"" = @RecipeId";
 
             var recipeIngredients = conn.Query<RecipeIngredient, Ingredient, ToDoTask, ToDoList, RecipeIngredient>(recipeIngredientsSql,
                 (recipeIngredient, ingredient, task, list) =>
@@ -154,7 +156,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                     }
                     recipeIngredient.Ingredient = ingredient;
                     return recipeIngredient;
-                }, new { RecipeId = id }, null, true, "Id,Id,Id");
+                }, new { RecipeId = id, UserId = userId }, null, true, "Id,Id,Id");
 
             recipe.RecipeIngredients.AddRange(recipeIngredients);
         }
@@ -167,10 +169,10 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         const string query = @"SELECT DISTINCT r.*, users.""Id"", users.""Email"", users.""ImageUri""
-                        FROM ""CookingAssistant.Recipes"" AS r
-                        LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
-                        INNER JOIN ""AspNetUsers"" AS users ON r.""UserId"" = users.""Id""
-                        WHERE r.""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))";
+                               FROM ""CookingAssistant.Recipes"" AS r
+                               LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
+                               INNER JOIN ""AspNetUsers"" AS users ON r.""UserId"" = users.""Id""
+                               WHERE r.""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))";
 
         return conn.Query<Recipe, User, Recipe>(query,
             (recipe, user) =>
@@ -185,10 +187,10 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         const string query = @"SELECT s.*, u.""Id"", u.""Email"", u.""ImageUri""
-                        FROM ""CookingAssistant.Shares"" AS s
-                        INNER JOIN ""AspNetUsers"" AS u ON s.""UserId"" = u.""Id""
-                        WHERE s.""RecipeId"" = @RecipeId AND s.""IsAccepted"" IS NOT FALSE
-                        ORDER BY (CASE WHEN s.""IsAccepted"" THEN 1 ELSE 2 END) ASC, s.""CreatedDate""";
+                               FROM ""CookingAssistant.Shares"" AS s
+                               INNER JOIN ""AspNetUsers"" AS u ON s.""UserId"" = u.""Id""
+                               WHERE s.""RecipeId"" = @RecipeId AND s.""IsAccepted"" IS NOT FALSE
+                               ORDER BY (CASE WHEN s.""IsAccepted"" THEN 1 ELSE 2 END) ASC, s.""CreatedDate""";
 
         return conn.Query<RecipeShare, User, RecipeShare>(query,
             (share, user) =>
@@ -203,11 +205,11 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         const string query = @"SELECT s.*, r.""Name"", u.""Name""
-                        FROM ""CookingAssistant.Shares"" AS s
-                        INNER JOIN ""CookingAssistant.Recipes"" AS r ON s.""RecipeId"" = r.""Id""
-                        INNER JOIN ""AspNetUsers"" AS u ON r.""UserId"" = u.""Id""
-                        WHERE s.""UserId"" = @UserId
-                        ORDER BY s.""ModifiedDate"" DESC";
+                               FROM ""CookingAssistant.Shares"" AS s
+                               INNER JOIN ""CookingAssistant.Recipes"" AS r ON s.""RecipeId"" = r.""Id""
+                               INNER JOIN ""AspNetUsers"" AS u ON r.""UserId"" = u.""Id""
+                               WHERE s.""UserId"" = @UserId
+                               ORDER BY s.""ModifiedDate"" DESC";
 
         return conn.Query<RecipeShare, Recipe, User, RecipeShare>(query,
             (share, recipe, user) =>
@@ -231,9 +233,9 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         return !conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                               FROM ""CookingAssistant.Recipes"" AS r
-                                               INNER JOIN ""CookingAssistant.Shares"" AS s on r.""Id"" = s.""RecipeId""
-                                               WHERE r.""UserId"" = @UserId AND s.""UserId"" = @ShareWithId AND s.""IsAccepted"" = FALSE",
+                                           FROM ""CookingAssistant.Recipes"" AS r
+                                           INNER JOIN ""CookingAssistant.Shares"" AS s on r.""Id"" = s.""RecipeId""
+                                           WHERE r.""UserId"" = @UserId AND s.""UserId"" = @ShareWithId AND s.""IsAccepted"" = FALSE",
             new { ShareWithId = shareWithId, UserId = userId });
     }
 
@@ -242,9 +244,9 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.QueryFirstOrDefault<Recipe>(@"SELECT r.""Id"", r.""Name""
-                                                      FROM ""CookingAssistant.Recipes"" AS r
-                                                      LEFT JOIN ""CookingAssistant.Shares"" AS s on r.""Id"" = s.""RecipeId""
-                                                      WHERE r.""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+                                                  FROM ""CookingAssistant.Recipes"" AS r
+                                                  LEFT JOIN ""CookingAssistant.Shares"" AS s on r.""Id"" = s.""RecipeId""
+                                                  WHERE r.""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
             new { Id = id, UserId = userId });
     }
 
@@ -253,11 +255,11 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         const string query = @"SELECT sr.*, r.""Name"", u.""Name""
-                        FROM ""CookingAssistant.SendRequests"" AS sr
-                        INNER JOIN ""CookingAssistant.Recipes"" AS r ON sr.""RecipeId"" = r.""Id""
-                        INNER JOIN ""AspNetUsers"" AS u ON r.""UserId"" = u.""Id""
-                        WHERE sr.""UserId"" = @UserId
-                        ORDER BY sr.""ModifiedDate"" DESC";
+                               FROM ""CookingAssistant.SendRequests"" AS sr
+                               INNER JOIN ""CookingAssistant.Recipes"" AS r ON sr.""RecipeId"" = r.""Id""
+                               INNER JOIN ""AspNetUsers"" AS u ON r.""UserId"" = u.""Id""
+                               WHERE sr.""UserId"" = @UserId
+                               ORDER BY sr.""ModifiedDate"" DESC";
 
         return conn.Query<SendRequest, Recipe, User, SendRequest>(query,
             (sendRequest, recipe, user) =>
@@ -306,11 +308,12 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
 
         if (recipe != null)
         {
-            var recipeIngredientsSql = @"SELECT ri.""IngredientId"", i.*, t.""Id"", t.""Name""
-                                            FROM ""CookingAssistant.RecipesIngredients"" AS ri
-                                            INNER JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
-                                            LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
-                                            WHERE ri.""RecipeId"" = @RecipeId";
+            const string recipeIngredientsSql = @"SELECT ri.""IngredientId"", i.*, t.""Id"", t.""Name""
+                                                  FROM ""CookingAssistant.RecipesIngredients"" AS ri
+                                                  INNER JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
+                                                  LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
+                                                  LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON it.""TaskId"" = t.""Id""
+                                                  WHERE ri.""RecipeId"" = @RecipeId";
 
             var recipeIngredients = conn.Query<RecipeIngredient, Ingredient, ToDoTask, RecipeIngredient>(recipeIngredientsSql,
                 (recipeIngredient, ingredient, task) =>
@@ -321,7 +324,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                     }
                     recipeIngredient.Ingredient = ingredient;
                     return recipeIngredient;
-                }, new { RecipeId = id }, null, true, "Id,Id");
+                }, new { RecipeId = id, recipe.UserId }, null, true, "Id,Id");
 
             recipe.RecipeIngredients.AddRange(recipeIngredients);
         }
@@ -358,9 +361,9 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                              FROM ""CookingAssistant.Recipes"" AS r
-                                              LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
-                                              WHERE r.""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+                                          FROM ""CookingAssistant.Recipes"" AS r
+                                          LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
+                                          WHERE r.""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
             new { Id = id, UserId = userId });
     }
 
@@ -369,9 +372,9 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                              FROM ""CookingAssistant.Recipes"" AS r
-                                              LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
-                                              WHERE UPPER(r.""Name"") = UPPER(@Name) AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+                                          FROM ""CookingAssistant.Recipes"" AS r
+                                          LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
+                                          WHERE UPPER(r.""Name"") = UPPER(@Name) AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
             new { Name = name, UserId = userId });
     }
 
@@ -380,9 +383,9 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                              FROM ""CookingAssistant.Recipes"" AS r
-                                              LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
-                                              WHERE r.""Id"" != @Id AND UPPER(r.""Name"") = UPPER(@Name) AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+                                          FROM ""CookingAssistant.Recipes"" AS r
+                                          LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
+                                          WHERE r.""Id"" != @Id AND UPPER(r.""Name"") = UPPER(@Name) AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
             new { Id = id, Name = name, UserId = userId });
     }
 
@@ -398,8 +401,8 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                              FROM ""CookingAssistant.Shares""
-                                              WHERE ""UserId"" = @SharedWithId AND ""IsAccepted"" = FALSE AND (SELECT ""UserId"" FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @RecipeId) = @SharerId",
+                                          FROM ""CookingAssistant.Shares""
+                                          WHERE ""UserId"" = @SharedWithId AND ""IsAccepted"" = FALSE AND (SELECT ""UserId"" FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @RecipeId) = @SharerId",
             new { SharedWithId = sharedWithId, SharerId = userId, RecipeId = recipeId });
     }
 
@@ -408,13 +411,13 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         bool canSend = !conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                                       FROM ""CookingAssistant.SendRequests""
-                                                       WHERE ""UserId"" = @SendToId AND ""IsDeclined"" = TRUE AND (SELECT ""UserId"" FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @RecipeId) = @SenderId",
+                                                   FROM ""CookingAssistant.SendRequests""
+                                                   WHERE ""UserId"" = @SendToId AND ""IsDeclined"" = TRUE AND (SELECT ""UserId"" FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @RecipeId) = @SenderId",
             new { SendToId = sendToId, SenderId = userId, RecipeId = recipeId });
 
         bool alreadySent = conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                                          FROM ""CookingAssistant.SendRequests""
-                                                          WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @SendToId",
+                                                      FROM ""CookingAssistant.SendRequests""
+                                                      WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @SendToId",
             new { RecipeId = recipeId, SendToId = sendToId });
 
         return (canSend, alreadySent);
@@ -425,14 +428,14 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.Query<User>(@"SELECT u.*
-                                        FROM ""AspNetUsers"" AS u
-                                        INNER JOIN ""CookingAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
-                                        WHERE u.""Id"" != @ExcludeUserId AND s.""RecipeId"" = @RecipeId AND s.""IsAccepted"" AND u.""ToDoNotificationsEnabled""
-                                        UNION
-                                        SELECT u.*
-                                        FROM ""AspNetUsers"" AS u
-                                        INNER JOIN ""CookingAssistant.Recipes"" AS r ON u.""Id"" = r.""UserId""
-                                        WHERE u.""Id"" != @ExcludeUserId AND r.""Id"" = @RecipeId AND u.""ToDoNotificationsEnabled""",
+                                  FROM ""AspNetUsers"" AS u
+                                  INNER JOIN ""CookingAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
+                                  WHERE u.""Id"" != @ExcludeUserId AND s.""RecipeId"" = @RecipeId AND s.""IsAccepted"" AND u.""ToDoNotificationsEnabled""
+                                  UNION
+                                  SELECT u.*
+                                  FROM ""AspNetUsers"" AS u
+                                  INNER JOIN ""CookingAssistant.Recipes"" AS r ON u.""Id"" = r.""UserId""
+                                  WHERE u.""Id"" != @ExcludeUserId AND r.""Id"" = @RecipeId AND u.""ToDoNotificationsEnabled""",
             new { RecipeId = id, ExcludeUserId = excludeUserId });
     }
     public bool CheckIfUserCanBeNotifiedOfRecipeChange(int id, int userId)
@@ -440,9 +443,9 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                            FROM ""AspNetUsers"" AS u
-                                            INNER JOIN ""CookingAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
-                                            WHERE u.""Id"" = @UserId AND s.""RecipeId"" = @RecipeId AND s.""IsAccepted"" AND u.""ToDoNotificationsEnabled""",
+                                          FROM ""AspNetUsers"" AS u
+                                          INNER JOIN ""CookingAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
+                                          WHERE u.""Id"" = @UserId AND s.""RecipeId"" = @RecipeId AND s.""IsAccepted"" AND u.""ToDoNotificationsEnabled""",
             new { RecipeId = id, UserId = userId });
     }
 
@@ -451,9 +454,9 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.Query<User>(@"SELECT u.*
-                                      FROM ""AspNetUsers"" AS u
-                                      INNER JOIN ""CookingAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
-                                      WHERE s.""RecipeId"" = @RecipeId AND s.""IsAccepted"" AND u.""ToDoNotificationsEnabled""",
+                                  FROM ""AspNetUsers"" AS u
+                                  INNER JOIN ""CookingAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
+                                  WHERE s.""RecipeId"" = @RecipeId AND s.""IsAccepted"" AND u.""ToDoNotificationsEnabled""",
             new { RecipeId = id });
     }
 
@@ -462,9 +465,9 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.Query<User>(@"SELECT u.*
-                                      FROM ""AspNetUsers"" AS u
-                                      INNER JOIN ""CookingAssistant.SendRequests"" AS sr ON u.""Id"" = sr.""UserId""
-                                      WHERE sr.""RecipeId"" = @RecipeId AND u.""CookingNotificationsEnabled""",
+                                  FROM ""AspNetUsers"" AS u
+                                  INNER JOIN ""CookingAssistant.SendRequests"" AS sr ON u.""Id"" = sr.""UserId""
+                                  WHERE sr.""RecipeId"" = @RecipeId AND u.""CookingNotificationsEnabled""",
             new { RecipeId = id });
     }
 
@@ -498,7 +501,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
             {
                 // Try to find existing by name
                 ingredient = userIngredients.FirstOrDefault(x =>
-                    string.Equals(x.Name, recipeIngredient.Ingredient.Name, StringComparison.OrdinalIgnoreCase));
+                string.Equals(x.Name, recipeIngredient.Ingredient.Name, StringComparison.OrdinalIgnoreCase));
             }
 
             if (ingredient == null)
@@ -570,7 +573,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                 {
                     // Try to find existing by name
                     ingredient = userIngredients.FirstOrDefault(x =>
-                        string.Equals(x.Name, recipeIngredient.Ingredient.Name, StringComparison.OrdinalIgnoreCase));
+                    string.Equals(x.Name, recipeIngredient.Ingredient.Name, StringComparison.OrdinalIgnoreCase));
                 }
 
                 if (ingredient == null)
@@ -623,10 +626,10 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         var transaction = conn.BeginTransaction();
 
         await conn.ExecuteAsync(@"DELETE FROM ""CookingAssistant.Shares""
-                                      WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @UserId AND ""IsAccepted"" IS DISTINCT FROM FALSE", removedShares, transaction);
+                                  WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @UserId AND ""IsAccepted"" IS DISTINCT FROM FALSE", removedShares, transaction);
 
         await conn.ExecuteAsync(@"INSERT INTO ""CookingAssistant.Shares"" (""RecipeId"", ""UserId"", ""LastOpenedDate"", ""CreatedDate"", ""ModifiedDate"") 
-                                      VALUES (@RecipeId, @UserId, @LastOpenedDate, @CreatedDate, @ModifiedDate)", newShares, transaction);
+                                  VALUES (@RecipeId, @UserId, @LastOpenedDate, @CreatedDate, @ModifiedDate)", newShares, transaction);
 
         transaction.Commit();
     }
@@ -644,9 +647,9 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        var share = await conn.QueryFirstOrDefaultAsync<RecipeShare>(@"SELECT * 
-                                                                           FROM ""CookingAssistant.Shares"" 
-                                                                           WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @UserId",
+        var share = conn.QueryFirstOrDefault<RecipeShare>(@"SELECT * 
+                                                            FROM ""CookingAssistant.Shares"" 
+                                                            WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @UserId",
             new { RecipeId = id, UserId = userId });
 
         RecipeShare recipeShare = EFContext.RecipeShares.First(x => x.RecipeId == id && x.UserId == userId);
@@ -689,6 +692,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         var transaction = conn.BeginTransaction();
 
         var recipe = await conn.QueryFirstOrDefaultAsync<Recipe>(@"SELECT * FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @Id", new { Id = id });
+        int recipeOwnerUserId = recipe.UserId;
 
         recipe.Name = CreatePostfixedNameIfDuplicate("Recipes", recipe.Name, userId);
         recipe.UserId = userId;
@@ -696,13 +700,14 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         recipe.CreatedDate = recipe.ModifiedDate = recipe.LastOpenedDate = now;
 
         var createdRecipeId = (await conn.QueryAsync<int>(@"INSERT INTO ""CookingAssistant.Recipes"" (""UserId"", ""Name"", ""Description"", ""Instructions"", ""PrepDuration"", ""CookDuration"", ""Servings"", ""ImageUri"", ""VideoUrl"", ""LastOpenedDate"", ""CreatedDate"", ""ModifiedDate"") 
-                                                                VALUES (@UserId, @Name, @Description, @Instructions, @PrepDuration, @CookDuration, @Servings, @ImageUri, @VideoUrl, @LastOpenedDate, @CreatedDate, @ModifiedDate) returning ""Id""", recipe, transaction)).Single();
+                                                            VALUES (@UserId, @Name, @Description, @Instructions, @PrepDuration, @CookDuration, @Servings, @ImageUri, @VideoUrl, @LastOpenedDate, @CreatedDate, @ModifiedDate) returning ""Id""", recipe, transaction)).Single();
 
-        var recipeIngredientsSql = @"SELECT ri.*, i.*, t.""Name"" 
-                                         FROM ""CookingAssistant.RecipesIngredients"" AS ri
-                                         INNER JOIN ""CookingAssistant.Ingredients"" AS i ON i.""Id"" = ri.""IngredientId""
-                                         LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON i.""TaskId"" = t.""Id""
-                                         WHERE ""RecipeId"" = @RecipeId";
+        const string recipeIngredientsSql = @"SELECT ri.*, i.*, t.""Name"" 
+                                              FROM ""CookingAssistant.RecipesIngredients"" AS ri
+                                              INNER JOIN ""CookingAssistant.Ingredients"" AS i ON i.""Id"" = ri.""IngredientId""
+                                              LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
+                                              LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON it.""TaskId"" = t.""Id""
+                                              WHERE ""RecipeId"" = @RecipeId";
 
         var recipeIngredients = (await conn.QueryAsync<RecipeIngredient, Ingredient, ToDoTask, RecipeIngredient>(recipeIngredientsSql,
             (recipeIngredient, ingredient, task) =>
@@ -710,7 +715,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                 ingredient.Task = task;
                 recipeIngredient.Ingredient = ingredient;
                 return recipeIngredient;
-            }, new { RecipeId = id }, null, true, "Id,Name")).ToList();
+            }, new { RecipeId = id, UserId = recipeOwnerUserId }, null, true, "Id,Name")).ToList();
 
         recipeIngredients.ForEach(recipeIngredient =>
         {
@@ -729,11 +734,11 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                 if (TransferNutritionData)
                 {
                     nutritionDataQuery = @"""ServingSize"" = @ServingSize, ""ServingSizeIsOneUnit"" = @ServingSizeIsOneUnit, 
-                                                ""Calories"" = @Calories, ""Fat"" = @Fat, ""SaturatedFat"" = @SaturatedFat, 
-                                                ""Carbohydrate"" = @Carbohydrate, ""Sugars"" = @Sugars, ""AddedSugars"" = @AddedSugars, 
-                                                ""Fiber"" = @Fiber, ""Protein"" = @Protein, ""Sodium"" = @Sodium, ""Cholesterol"" = @Cholesterol, 
-                                                ""VitaminA"" = @VitaminA, ""VitaminC"" = @VitaminC, ""VitaminD"" = @VitaminD, 
-                                                ""Calcium"" = @Calcium, ""Iron"" = @Iron, ""Potassium"" = @Potassium, ""Magnesium"" = @Magnesium,";
+                                           ""Calories"" = @Calories, ""Fat"" = @Fat, ""SaturatedFat"" = @SaturatedFat, 
+                                           ""Carbohydrate"" = @Carbohydrate, ""Sugars"" = @Sugars, ""AddedSugars"" = @AddedSugars, 
+                                           ""Fiber"" = @Fiber, ""Protein"" = @Protein, ""Sodium"" = @Sodium, ""Cholesterol"" = @Cholesterol, 
+                                           ""VitaminA"" = @VitaminA, ""VitaminC"" = @VitaminC, ""VitaminD"" = @VitaminD, 
+                                           ""Calcium"" = @Calcium, ""Iron"" = @Iron, ""Potassium"" = @Potassium, ""Magnesium"" = @Magnesium,";
                 }
 
                 if (TransferPriceData)
@@ -766,17 +771,17 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
             recipeIngredient.Ingredient.UserId = userId;
             recipeIngredient.Ingredient.CreatedDate = recipeIngredient.Ingredient.ModifiedDate = now;
             var ingredientId = (await conn.QueryAsync<int>(@"INSERT INTO ""CookingAssistant.Ingredients"" (""UserId"", ""TaskId"", ""Name"", 
-                                                                     ""ServingSize"", ""ServingSizeIsOneUnit"", ""Calories"", ""Fat"", ""SaturatedFat"", 
-                                                                     ""Carbohydrate"", ""Sugars"", ""AddedSugars"", ""Fiber"", ""Protein"",                         
-                                                                     ""Sodium"", ""Cholesterol"", ""VitaminA"", ""VitaminC"", ""VitaminD"",
-                                                                     ""Calcium"", ""Iron"", ""Potassium"", ""Magnesium"", 
-                                                                     ""ProductSize"", ""ProductSizeIsOneUnit"", ""Price"",
-                                                                     ""Currency"", ""CreatedDate"", ""ModifiedDate"")
-                                                                     VALUES (@UserId, @TaskId, @Name, @ServingSize, @ServingSizeIsOneUnit, 
-                                                                     @Calories, @Fat, @SaturatedFat, @Carbohydrate, @Sugars, @AddedSugars,
-                                                                     @Fiber, @Protein, @Sodium, @Cholesterol, @VitaminA, @VitaminC, @VitaminD, @Calcium,
-                                                                     @Iron, @Potassium, @Magnesium, @ProductSize, @ProductSizeIsOneUnit, 
-                                                                     @Price, @Currency, @CreatedDate, @ModifiedDate) returning ""Id""",
+                                                                ""ServingSize"", ""ServingSizeIsOneUnit"", ""Calories"", ""Fat"", ""SaturatedFat"", 
+                                                                ""Carbohydrate"", ""Sugars"", ""AddedSugars"", ""Fiber"", ""Protein"",                         
+                                                                ""Sodium"", ""Cholesterol"", ""VitaminA"", ""VitaminC"", ""VitaminD"",
+                                                                ""Calcium"", ""Iron"", ""Potassium"", ""Magnesium"", 
+                                                                ""ProductSize"", ""ProductSizeIsOneUnit"", ""Price"",
+                                                                ""Currency"", ""CreatedDate"", ""ModifiedDate"")
+                                                                VALUES (@UserId, @TaskId, @Name, @ServingSize, @ServingSizeIsOneUnit, 
+                                                                @Calories, @Fat, @SaturatedFat, @Carbohydrate, @Sugars, @AddedSugars,
+                                                                @Fiber, @Protein, @Sodium, @Cholesterol, @VitaminA, @VitaminC, @VitaminD, @Calcium,
+                                                                @Iron, @Potassium, @Magnesium, @ProductSize, @ProductSizeIsOneUnit, 
+                                                                @Price, @Currency, @CreatedDate, @ModifiedDate) returning ""Id""",
                 recipeIngredient.Ingredient, transaction)).Single();
 
             recipeIngredient.IngredientId = ingredientId;
@@ -784,7 +789,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         }
 
         await conn.ExecuteAsync(@"INSERT INTO ""CookingAssistant.RecipesIngredients"" (""RecipeId"", ""IngredientId"", ""Amount"", ""Unit"", ""CreatedDate"", ""ModifiedDate"")
-                                      VALUES (@RecipeId, @IngredientId, @Amount, @Unit, @CreatedDate, @ModifiedDate)", recipeIngredients, transaction);
+                                  VALUES (@RecipeId, @IngredientId, @Amount, @Unit, @CreatedDate, @ModifiedDate)", recipeIngredients, transaction);
 
         await conn.ExecuteAsync(@"DELETE FROM ""CookingAssistant.SendRequests"" WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @UserId",
             new { RecipeId = id, UserId = userId }, transaction);

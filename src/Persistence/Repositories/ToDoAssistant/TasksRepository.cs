@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
 using Application.Contracts.ToDoAssistant.Tasks;
+using Dapper;
 using Domain.Entities.ToDoAssistant;
 
 namespace Persistence.Repositories.ToDoAssistant;
@@ -26,10 +26,10 @@ public class TasksRepository : BaseRepository, ITasksRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.QueryFirstOrDefault<ToDoTask>(@"SELECT t.* 
-                                                        FROM ""ToDoAssistant.Tasks"" AS t
-                                                        INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                                                        LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                                        WHERE t.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+                                                    FROM ""ToDoAssistant.Tasks"" AS t
+                                                    INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
+                                                    LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
+                                                    WHERE t.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
             new { Id = id, UserId = userId });
     }
 
@@ -38,10 +38,10 @@ public class TasksRepository : BaseRepository, ITasksRepository
         using IDbConnection conn = OpenConnection();
 
         var task = conn.QueryFirstOrDefault<ToDoTask>(@"SELECT t.* 
-                                                            FROM ""ToDoAssistant.Tasks"" AS t
-                                                            INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                                                            LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                                            WHERE t.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+                                                        FROM ""ToDoAssistant.Tasks"" AS t
+                                                        INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
+                                                        LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
+                                                        WHERE t.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
             new { Id = id, UserId = userId });
 
         return task;
@@ -52,12 +52,13 @@ public class TasksRepository : BaseRepository, ITasksRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.Query<string>(@"SELECT r.""Name""
-                                        FROM ""CookingAssistant.Ingredients"" AS i
-                                        INNER JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
-                                        LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
-                                        LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
-                                        WHERE i.""TaskId"" = @TaskId AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
-                                        ORDER BY r.""Name""",
+                                    FROM ""CookingAssistant.Ingredients"" AS i
+                                    INNER JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
+                                    INNER JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
+                                    LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
+                                    LEFT JOIN ""CookingAssistant.Shares"" AS s ON ri.""RecipeId"" = s.""RecipeId""
+                                    WHERE it.""TaskId"" = @TaskId AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
+                                    ORDER BY r.""Name""",
             new { TaskId = id, UserId = userId }).ToList();
     }
 
@@ -66,10 +67,10 @@ public class TasksRepository : BaseRepository, ITasksRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                              FROM ""ToDoAssistant.Tasks"" AS t
-                                              INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                                              LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                              WHERE t.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+                                          FROM ""ToDoAssistant.Tasks"" AS t
+                                          INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
+                                          LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
+                                          WHERE t.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
             new { Id = id, UserId = userId });
     }
 
@@ -78,13 +79,13 @@ public class TasksRepository : BaseRepository, ITasksRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) 
-                                              FROM ""ToDoAssistant.Tasks"" AS t
-                                              INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                                              LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                              WHERE UPPER(t.""Name"") = UPPER(@Name) 
-                                              AND t.""ListId"" = @ListId 
-                                              AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
-                                              AND (t.""PrivateToUserId"" IS NULL OR t.""PrivateToUserId"" = @UserId)",
+                                          FROM ""ToDoAssistant.Tasks"" AS t
+                                          INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
+                                          LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
+                                          WHERE UPPER(t.""Name"") = UPPER(@Name) 
+                                          AND t.""ListId"" = @ListId 
+                                          AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
+                                          AND (t.""PrivateToUserId"" IS NULL OR t.""PrivateToUserId"" = @UserId)",
             new { Name = name, ListId = listId, UserId = userId });
     }
 
@@ -93,13 +94,13 @@ public class TasksRepository : BaseRepository, ITasksRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) 
-                                              FROM ""ToDoAssistant.Tasks"" AS t
-                                              INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                                              LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                              WHERE UPPER(t.""Name"") = ANY(@Names) 
-                                              AND t.""ListId"" = @ListId 
-                                              AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
-                                              AND (t.""PrivateToUserId"" IS NULL OR t.""PrivateToUserId"" = @UserId)",
+                                          FROM ""ToDoAssistant.Tasks"" AS t
+                                          INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
+                                          LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
+                                          WHERE UPPER(t.""Name"") = ANY(@Names) 
+                                          AND t.""ListId"" = @ListId 
+                                          AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))
+                                          AND (t.""PrivateToUserId"" IS NULL OR t.""PrivateToUserId"" = @UserId)",
             new { Names = names, ListId = listId, UserId = userId });
     }
 
@@ -108,12 +109,12 @@ public class TasksRepository : BaseRepository, ITasksRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                              FROM ""ToDoAssistant.Tasks"" AS t
-                                              INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                                              WHERE t.""Id"" != @Id 
-                                              AND UPPER(t.""Name"") = UPPER(@Name) 
-                                              AND t.""ListId"" = @ListId AND l.""UserId"" = @UserId
-                                              AND (t.""PrivateToUserId"" IS NULL OR t.""PrivateToUserId"" = @UserId)",
+                                          FROM ""ToDoAssistant.Tasks"" AS t
+                                          INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
+                                          WHERE t.""Id"" != @Id 
+                                          AND UPPER(t.""Name"") = UPPER(@Name) 
+                                          AND t.""ListId"" = @ListId AND l.""UserId"" = @UserId
+                                          AND (t.""PrivateToUserId"" IS NULL OR t.""PrivateToUserId"" = @UserId)",
             new { Id = id, Name = name, ListId = listId, UserId = userId });
     }
 
@@ -232,8 +233,8 @@ public class TasksRepository : BaseRepository, ITasksRepository
             using IDbConnection conn = OpenConnection();
 
             var newListIsShared = conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                                                 FROM ""ToDoAssistant.Shares""
-                                                                 WHERE ""ListId"" = @ListId AND ""IsAccepted"" IS NOT FALSE",
+                                                             FROM ""ToDoAssistant.Shares""
+                                                             WHERE ""ListId"" = @ListId AND ""IsAccepted"" IS NOT FALSE",
                 new { task.ListId });
 
             if (!newListIsShared)
@@ -326,7 +327,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
     public async Task CompleteAsync(int id, int userId)
     {
         ToDoTask task = Get(id);
-            
+
         if (task.PrivateToUserId.HasValue)
         {
             // If the task was private increase the Order of only the user's completed private tasks
@@ -468,8 +469,8 @@ public class TasksRepository : BaseRepository, ITasksRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<short>(@"SELECT COUNT(*)
-                                               FROM ""ToDoAssistant.Tasks""
-                                               WHERE ""ListId"" = @ListId AND ""IsCompleted"" = @IsCompleted AND ""PrivateToUserId"" = @UserId",
+                                           FROM ""ToDoAssistant.Tasks""
+                                           WHERE ""ListId"" = @ListId AND ""IsCompleted"" = @IsCompleted AND ""PrivateToUserId"" = @UserId",
             new { ListId = listId, IsCompleted = isCompleted, UserId = userId });
     }
 
@@ -478,8 +479,8 @@ public class TasksRepository : BaseRepository, ITasksRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<short>(@"SELECT COUNT(*)
-                                               FROM ""ToDoAssistant.Tasks""
-                                               WHERE ""ListId"" = @ListId AND ""IsCompleted"" = @IsCompleted AND ""PrivateToUserId"" IS NULL",
+                                           FROM ""ToDoAssistant.Tasks""
+                                           WHERE ""ListId"" = @ListId AND ""IsCompleted"" = @IsCompleted AND ""PrivateToUserId"" IS NULL",
             new { ListId = listId, IsCompleted = isCompleted });
     }
 

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using AutoMapper;
 using Application.Mappings;
+using AutoMapper;
 using Domain.Entities.CookingAssistant;
 
 namespace Application.Contracts.CookingAssistant.Ingredients.Models;

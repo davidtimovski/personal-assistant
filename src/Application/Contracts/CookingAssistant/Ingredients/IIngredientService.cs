@@ -10,8 +10,8 @@ public interface IIngredientService
 {
     IEnumerable<IngredientDto> GetAll(int userId);
     EditIngredient Get(int id, int userId);
-    IEnumerable<IngredientSuggestion> GetSuggestions(int recipeId, int userId);
-    IEnumerable<IngredientSuggestion> GetTaskSuggestions(int userId);
+    Task<IngredientSuggestionsDto> GetSuggestionsAsync(int recipeId, int userId);
+    IEnumerable<TaskSuggestion> GetTaskSuggestions(int userId);
     IEnumerable<IngredientReviewSuggestion> GetIngredientReviewSuggestions(int userId);
     bool Exists(int id, int userId);
     bool Exists(int id, string name, int userId);

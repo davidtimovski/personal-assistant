@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-using Application.Mappings;
+﻿using Application.Mappings;
+using AutoMapper;
 using Domain.Entities.CookingAssistant;
 
 namespace Application.Contracts.CookingAssistant.Recipes.Models;

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
 using Application.Contracts.Common;
 using Application.Contracts.Common.Models;
 using Application.Contracts.CookingAssistant.DietaryProfiles.Models;
 using Application.Contracts.CookingAssistant.Ingredients.Models;
 using Application.Contracts.CookingAssistant.Recipes.Models;
+using AutoMapper;
 using Domain.Entities.Common;
 using Domain.Entities.CookingAssistant;
 using Utility;

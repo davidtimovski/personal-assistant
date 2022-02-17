@@ -188,7 +188,7 @@ export class EditRecipe {
       this.ingredientsService
         .getSuggestionsForRecipe(this.model.id)
         .then((suggestions: IngredientSuggestions) => {
-          //this.suggestions = suggestions;
+          this.suggestions = suggestions;
         });
     }
   }

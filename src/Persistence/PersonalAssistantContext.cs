@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Domain.Entities.Accountant;
+﻿using Domain.Entities.Accountant;
 using Domain.Entities.Common;
 using Domain.Entities.CookingAssistant;
 using Domain.Entities.ToDoAssistant;
+using Microsoft.EntityFrameworkCore;
 
 namespace Persistence;
 
@@ -19,6 +19,7 @@ public class PersonalAssistantContext : DbContext
 
     public DbSet<Recipe> Recipes { get; set; }
     public DbSet<Ingredient> Ingredients { get; set; }
+    public DbSet<IngredientTask> IngredientsTasks { get; set; }
     public DbSet<RecipeShare> RecipeShares { get; set; }
     public DbSet<SendRequest> SendRequests { get; set; }
     public DbSet<DietaryProfile> DietaryProfiles { get; set; }
@@ -62,12 +63,18 @@ public class PersonalAssistantContext : DbContext
             x.Property(e => e.ProductSize).HasDefaultValue(100);
             x.Ignore(e => e.Recipes);
             x.Ignore(e => e.Task);
+            x.Ignore(e => e.TaskId);
             x.Ignore(e => e.RecipeCount);
         });
         modelBuilder.Entity<RecipeIngredient>(x =>
         {
             x.ToTable("CookingAssistant.RecipesIngredients");
             x.HasKey(e => new { e.RecipeId, e.IngredientId });
+        });
+        modelBuilder.Entity<IngredientTask>(x =>
+        {
+            x.ToTable("CookingAssistant.IngredientsTasks");
+            x.HasKey(e => new { e.IngredientId, e.TaskId });
         });
         modelBuilder.Entity<RecipeShare>(x =>
         {
