@@ -294,13 +294,6 @@ public class TasksRepository : BaseRepository, ITasksRepository
     {
         ToDoTask task = Get(id);
 
-        var ingredients = EFContext.Ingredients.Where(x => x.TaskId == task.Id);
-        foreach (var ingredient in ingredients)
-        {
-            ingredient.Name = task.Name;
-            ingredient.ModifiedDate = DateTime.UtcNow;
-        }
-
         EFContext.Tasks.Remove(task);
 
         if (task.PrivateToUserId.HasValue)

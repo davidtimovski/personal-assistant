@@ -79,7 +79,7 @@ public class CreateRecipeValidator : AbstractValidator<CreateRecipe>
 
 public class UpdateRecipeIngredientValidator : AbstractValidator<UpdateRecipeIngredient>
 {
-    private readonly string[] units = new string[] { "g", "ml", "oz", "cup", "tbsp", "tsp" };
+    private readonly string[] units = new string[] { "g", "ml", "oz", "cup", "tbsp", "tsp", "pinch" };
 
     public UpdateRecipeIngredientValidator()
     {

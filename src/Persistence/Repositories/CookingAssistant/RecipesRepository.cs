@@ -83,15 +83,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
 
         recipe.Shares = conn.Query<RecipeShare>(@"SELECT * FROM ""CookingAssistant.Shares"" WHERE ""RecipeId"" = @Id", new { Id = id }).ToList();
 
-        var recipeIngredientsSql = @"SELECT ri.""Amount"", ri.""Unit"", i.""Id"", i.""Name"", 
-	                                     i.""ServingSize"", i.""ServingSizeIsOneUnit"", i.""Calories"", 
-	                                     i.""Fat"", i.""SaturatedFat"", i.""Carbohydrate"", 
-	                                     i.""Sugars"", i.""AddedSugars"", i.""Fiber"", i.""Protein"",
-	                                     i.""Sodium"", i.""Cholesterol"", 
-	                                     i.""VitaminA"", i.""VitaminC"", i.""VitaminD"",
-	                                     i.""Calcium"", i.""Iron"", i.""Potassium"", i.""Magnesium"",
-	                                     i.""ProductSize"", i.""ProductSizeIsOneUnit"", i.""Price"", i.""Currency"", i.""ModifiedDate"", it.""TaskId"",
-	                                     t.""Id"", t.""Name"", t.""IsCompleted""
+        var recipeIngredientsSql = @"SELECT ri.""Amount"", ri.""Unit"", i.*, it.""TaskId"", t.""Id"", t.""IsCompleted""
                                      FROM ""CookingAssistant.RecipesIngredients"" AS ri
                                      INNER JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
                                      LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
@@ -132,7 +124,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         {
             recipe.Shares = conn.Query<RecipeShare>(@"SELECT * FROM ""CookingAssistant.Shares"" WHERE ""RecipeId"" = @Id", new { Id = id }).ToList();
 
-            const string recipeIngredientsSql = @"SELECT ri.""Amount"", ri.""Unit"", i.""Id"", i.""Name"", it.""TaskId"", t.""Id"", t.""Name"", l.""Id"", l.""Name""
+            const string recipeIngredientsSql = @"SELECT ri.""Amount"", ri.""Unit"", i.""Id"", i.""Name"", it.""TaskId"", t.""Id"", l.""Id"", l.""Name""
                                                   FROM ""CookingAssistant.RecipesIngredients"" AS ri
                                                   INNER JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
                                                   LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
@@ -308,20 +300,14 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
 
         if (recipe != null)
         {
-            const string recipeIngredientsSql = @"SELECT ri.""IngredientId"", i.*, t.""Id"", t.""Name""
+            const string recipeIngredientsSql = @"SELECT ri.""IngredientId"", i.*
                                                   FROM ""CookingAssistant.RecipesIngredients"" AS ri
                                                   INNER JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
-                                                  LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
-                                                  LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON it.""TaskId"" = t.""Id""
                                                   WHERE ri.""RecipeId"" = @RecipeId";
 
-            var recipeIngredients = conn.Query<RecipeIngredient, Ingredient, ToDoTask, RecipeIngredient>(recipeIngredientsSql,
-                (recipeIngredient, ingredient, task) =>
+            var recipeIngredients = conn.Query<RecipeIngredient, Ingredient, RecipeIngredient>(recipeIngredientsSql,
+                (recipeIngredient, ingredient) =>
                 {
-                    if (task != null)
-                    {
-                        ingredient.Name = task.Name;
-                    }
                     recipeIngredient.Ingredient = ingredient;
                     return recipeIngredient;
                 }, new { RecipeId = id, recipe.UserId }, null, true, "Id,Id");
@@ -702,7 +688,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         var createdRecipeId = (await conn.QueryAsync<int>(@"INSERT INTO ""CookingAssistant.Recipes"" (""UserId"", ""Name"", ""Description"", ""Instructions"", ""PrepDuration"", ""CookDuration"", ""Servings"", ""ImageUri"", ""VideoUrl"", ""LastOpenedDate"", ""CreatedDate"", ""ModifiedDate"") 
                                                             VALUES (@UserId, @Name, @Description, @Instructions, @PrepDuration, @CookDuration, @Servings, @ImageUri, @VideoUrl, @LastOpenedDate, @CreatedDate, @ModifiedDate) returning ""Id""", recipe, transaction)).Single();
 
-        const string recipeIngredientsSql = @"SELECT ri.*, i.*, t.""Name"" 
+        const string recipeIngredientsSql = @"SELECT ri.*, i.*, it.""TaskId"", t.""Name"" 
                                               FROM ""CookingAssistant.RecipesIngredients"" AS ri
                                               INNER JOIN ""CookingAssistant.Ingredients"" AS i ON i.""Id"" = ri.""IngredientId""
                                               LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
@@ -770,14 +756,14 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
             recipeIngredient.Ingredient.Name = CreatePostfixedNameIfDuplicate("Ingredients", recipeIngredient.Ingredient.Name, userId);
             recipeIngredient.Ingredient.UserId = userId;
             recipeIngredient.Ingredient.CreatedDate = recipeIngredient.Ingredient.ModifiedDate = now;
-            var ingredientId = (await conn.QueryAsync<int>(@"INSERT INTO ""CookingAssistant.Ingredients"" (""UserId"", ""TaskId"", ""Name"", 
+            var ingredientId = (await conn.QueryAsync<int>(@"INSERT INTO ""CookingAssistant.Ingredients"" (""UserId"", ""Name"", 
                                                                 ""ServingSize"", ""ServingSizeIsOneUnit"", ""Calories"", ""Fat"", ""SaturatedFat"", 
                                                                 ""Carbohydrate"", ""Sugars"", ""AddedSugars"", ""Fiber"", ""Protein"",                         
                                                                 ""Sodium"", ""Cholesterol"", ""VitaminA"", ""VitaminC"", ""VitaminD"",
                                                                 ""Calcium"", ""Iron"", ""Potassium"", ""Magnesium"", 
                                                                 ""ProductSize"", ""ProductSizeIsOneUnit"", ""Price"",
                                                                 ""Currency"", ""CreatedDate"", ""ModifiedDate"")
-                                                                VALUES (@UserId, @TaskId, @Name, @ServingSize, @ServingSizeIsOneUnit, 
+                                                                VALUES (@UserId, @Name, @ServingSize, @ServingSizeIsOneUnit, 
                                                                 @Calories, @Fat, @SaturatedFat, @Carbohydrate, @Sugars, @AddedSugars,
                                                                 @Fiber, @Protein, @Sodium, @Cholesterol, @VitaminA, @VitaminC, @VitaminD, @Calcium,
                                                                 @Iron, @Potassium, @Magnesium, @ProductSize, @ProductSizeIsOneUnit, 

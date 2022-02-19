@@ -113,7 +113,7 @@ export class EditIngredient {
 
         if (this.model.taskId) {
           this.ingredientLinkedMessage = this.i18n.tr("editIngredient.thisIngredientIsLinked", {
-            taskName: this.model.name,
+            taskName: this.model.taskName,
             taskList: this.model.taskList
           });
         }
@@ -225,7 +225,7 @@ export class EditIngredient {
     this.attachAutocomplete(this.taskSuggestions);
   }
 
-  attachAutocomplete(ingredientSuggestions: TaskSuggestion[]) {
+  attachAutocomplete(taskSuggestions: TaskSuggestion[]) {
     if (this.autocomplete) {
       this.autocomplete.destroy();
     }
@@ -237,8 +237,8 @@ export class EditIngredient {
         text: string,
         update: (items: TaskSuggestion[]) => void
       ) => {
-        const suggestions = ingredientSuggestions.filter((i) =>
-          i.name.toUpperCase().startsWith(text.toUpperCase())
+        const suggestions = taskSuggestions.filter((i) =>
+          i.label.toUpperCase().startsWith(text.toUpperCase())
         );
         update(suggestions);
       },
@@ -246,12 +246,11 @@ export class EditIngredient {
         this.nameIsInvalid = false;
 
         this.ingredientLinkedMessage = this.i18n.tr("editIngredient.thisIngredientIsLinked", {
-          taskName: suggestion.name,
+          taskName: suggestion.label,
           taskList: suggestion.group
         });
 
         this.model.taskId = suggestion.id;
-        this.model.name = suggestion.name;
 
         this.pickTaskInput.value = "";
       },
@@ -262,11 +261,6 @@ export class EditIngredient {
   unlinkFromTask() {
     this.model.taskId = null;
     this.tasksSearchVisible = false;
-
-    const originalName = JSON.parse(this.originalIngredientJson).name;
-    if (this.model.name !== originalName) {
-      this.model.name = originalName;
-    }
   }
 
   setNutritionData() {

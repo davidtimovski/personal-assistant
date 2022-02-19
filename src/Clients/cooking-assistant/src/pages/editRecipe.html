@@ -108,12 +108,11 @@
                 </div>
                 <div>
                   <div class="ingredient-amount-input-wrap">
-                    <input type="text" value.bind="ingredient.amount | nullFormat" class="amount-input"
-                      keyup.trigger="ingredientChanged(ingredient)" maxlength="4"
-                      t="[placeholder,aria-label]editRecipe.amount" />
+                    <input type="text" value.bind="ingredient.amount | nullFormat" keyup.trigger="ingredientChanged(ingredient)" 
+                      show.bind="ingredient.unit !== 'pinch'" class="amount-input"maxlength="4" t="[placeholder,aria-label]editRecipe.amount" />
                     <div click.delegate="toggleUnit(ingredient)" class="unit-toggle"
                       t="[title,aria-label]editRecipe.toggleUnitOfMeasure">
-                      <button type="button" show.bind="ingredient.unit" t="editRecipe.${ingredient.unit}"></button>
+                      <button type="button" show.bind="ingredient.unit" t="${ingredient.unit}"></button>
                       <i show.bind="!ingredient.unit" class="fas fa-asterisk"></i>
                     </div>
                     <a if.bind="model.userIsOwner" click.delegate="removeIngredient(ingredient)" class="remove-button"

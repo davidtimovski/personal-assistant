@@ -9,7 +9,7 @@ public interface IIngredientsRepository
 {
     IEnumerable<Ingredient> GetAll(int userId);
     Ingredient Get(int id, int userId);
-    Task<IEnumerable<int>> GetIngredientIdsInRecipeAsync(int recipeId);
+    IEnumerable<int> GetIngredientIdsInRecipe(int recipeId);
     Task<IEnumerable<Ingredient>> GetPublicAndUserIngredientsAsync(int userId);
     Task<IEnumerable<IngredientCategory>> GetIngredientCategoriesAsync();
     IEnumerable<ToDoTask> GetTaskSuggestions(int userId);

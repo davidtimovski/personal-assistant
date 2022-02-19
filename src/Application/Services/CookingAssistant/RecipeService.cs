@@ -253,6 +253,10 @@ public class RecipeService : IRecipeService
                     recipeIngredient.Amount = null;
                     recipeIngredient.Unit = null;
                 }
+                else if (recipeIngredient.Unit == "pinch")
+                {
+                    recipeIngredient.Amount = null;
+                }
             }
             else
             {
@@ -378,6 +382,10 @@ public class RecipeService : IRecipeService
                 {
                     recipeIngredient.Amount = null;
                     recipeIngredient.Unit = null;
+                }
+                else if (recipeIngredient.Unit == "pinch")
+                {
+                    recipeIngredient.Amount = null;
                 }
             }
             else

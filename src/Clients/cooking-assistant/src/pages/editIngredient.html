@@ -47,19 +47,21 @@
           </section>
 
           <form>
-            <div if.bind="!model.taskId" class="form-control">
+            <div class="form-control">
               <input type="text" value.bind="model.name & validate" maxlength="50"
                 class.bind="nameIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]editIngredient.ingredientName" />
 
-              <div show.bind="!tasksSearchVisible" class="link-button-wrap">
-                <button type="button" class="link-button" click.delegate="linkToTask()" t="editIngredient.linkToTask">
-                  Link to task in To Do Assistant
-                </button>
-              </div>
-
-              <div class="search-tasks-wrap" show.bind="tasksSearchVisible">
-                <input type="text" ref="pickTaskInput" t="[placeholder,aria-label]editIngredient.searchTasks"
-                  maxlength="50" />
+              <div if.bind="!model.taskId">
+                <div show.bind="!tasksSearchVisible" class="link-button-wrap">
+                  <button type="button" class="link-button" click.delegate="linkToTask()" t="editIngredient.linkToTask">
+                    Link to task in To Do Assistant
+                  </button>
+                </div>
+  
+                <div class="search-tasks-wrap" show.bind="tasksSearchVisible">
+                  <input type="text" ref="pickTaskInput" t="[placeholder,aria-label]editIngredient.searchTasks"
+                    maxlength="50" />
+                </div>
               </div>
             </div>
 

@@ -46,6 +46,9 @@ public class CookingAssistantProfile : Profile
             .ForMember(x => x.Recipe, src => src.Ignore());
 
         CreateMap<UpdateIngredient, Ingredient>()
+            .ForMember(x => x.ParentId, src => src.Ignore())
+            .ForMember(x => x.CategoryId, src => src.Ignore())
+            .ForMember(x => x.MeasurementType, src => src.Ignore())
             .ForMember(x => x.ServingSize, opt => opt.MapFrom(src => src.NutritionData.ServingSize))
             .ForMember(x => x.ServingSizeIsOneUnit, opt => opt.MapFrom(src => src.NutritionData.ServingSizeIsOneUnit))
             .ForMember(x => x.Calories, opt => opt.MapFrom(src => src.NutritionData.Calories))
@@ -71,6 +74,8 @@ public class CookingAssistantProfile : Profile
             .ForMember(x => x.Currency, opt => opt.MapFrom(src => src.PriceData.Currency))
             .ForMember(x => x.CreatedDate, src => src.Ignore())
             .ForMember(x => x.ModifiedDate, src => src.Ignore())
+            .ForMember(x => x.Parent, src => src.Ignore())
+            .ForMember(x => x.Category, src => src.Ignore())
             .ForMember(x => x.Recipes, src => src.Ignore())
             .ForMember(x => x.Task, src => src.Ignore())
             .ForMember(x => x.RecipeCount, src => src.Ignore());

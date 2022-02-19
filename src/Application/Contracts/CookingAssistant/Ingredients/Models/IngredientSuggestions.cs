@@ -37,7 +37,9 @@ public class IngredientCategoryDto : IMapFrom<IngredientCategory>
 
     public void Mapping(Profile profile)
     {
-        profile.CreateMap<IngredientCategory, IngredientCategoryDto>();
+        profile.CreateMap<IngredientCategory, IngredientCategoryDto>()
+            .ForMember(x => x.Ingredients, opt => opt.Ignore())
+            .ForMember(x => x.Subcategories, opt => opt.Ignore());
     }
 }
 

@@ -57,7 +57,7 @@ public class IngredientService : IIngredientService
         // Set selected ingredients
         if (recipeId > 0)
         {
-            var ingredientIdsInRecipe = await _ingredientsRepository.GetIngredientIdsInRecipeAsync(recipeId);
+            var ingredientIdsInRecipe = _ingredientsRepository.GetIngredientIdsInRecipe(recipeId);
 
             foreach (var ingredient in result.UserIngredients.Where(x => ingredientIdsInRecipe.Contains(x.Id)))
             {
@@ -128,16 +128,7 @@ public class IngredientService : IIngredientService
         ValidateAndThrow(model, validator);
 
         var ingredient = _mapper.Map<Ingredient>(model);
-
-        if (ingredient.TaskId.HasValue)
-        {
-            ingredient.Name = null;
-        }
-        else
-        {
-            ingredient.Name = ingredient.Name.Trim();
-        }
-
+        ingredient.Name = ingredient.Name.Trim();
         ingredient.ModifiedDate = DateTime.UtcNow;
 
         await _ingredientsRepository.UpdateAsync(ingredient);

@@ -38,11 +38,17 @@ public class PersonalAssistantContext : DbContext
         modelBuilder.Entity<ToDoList>(x =>
         {
             x.ToTable("ToDoAssistant.Lists");
+
+            x.Property(e => e.Name).IsRequired();
             x.Property(e => e.Icon).HasDefaultValue("Regular");
             x.Property(e => e.NotificationsEnabled).HasDefaultValue(true);
             x.Ignore(e => e.IsShared);
         });
-        modelBuilder.Entity<ToDoTask>(x => { x.ToTable("ToDoAssistant.Tasks"); });
+        modelBuilder.Entity<ToDoTask>(x => { 
+            x.ToTable("ToDoAssistant.Tasks");
+
+            x.Property(e => e.Name).IsRequired();
+        });
         modelBuilder.Entity<ListShare>(x =>
         {
             x.ToTable("ToDoAssistant.Shares");
@@ -54,11 +60,15 @@ public class PersonalAssistantContext : DbContext
         modelBuilder.Entity<Recipe>(x =>
         {
             x.ToTable("CookingAssistant.Recipes");
+
+            x.Property(e => e.Name).IsRequired();
             x.Ignore(e => e.IngredientsMissing);
         });
         modelBuilder.Entity<Ingredient>(x =>
         {
             x.ToTable("CookingAssistant.Ingredients");
+
+            x.Property(e => e.Name).IsRequired();
             x.Property(e => e.ServingSize).HasDefaultValue(100);
             x.Property(e => e.ProductSize).HasDefaultValue(100);
             x.Ignore(e => e.Recipes);
@@ -69,12 +79,14 @@ public class PersonalAssistantContext : DbContext
         modelBuilder.Entity<RecipeIngredient>(x =>
         {
             x.ToTable("CookingAssistant.RecipesIngredients");
+
             x.HasKey(e => new { e.RecipeId, e.IngredientId });
+            x.Property(e => e.Unit).HasMaxLength(5);
         });
         modelBuilder.Entity<IngredientTask>(x =>
         {
             x.ToTable("CookingAssistant.IngredientsTasks");
-            x.HasKey(e => new { e.IngredientId, e.TaskId });
+            x.HasKey(e => new { e.IngredientId, e.UserId });
         });
         modelBuilder.Entity<RecipeShare>(x =>
         {

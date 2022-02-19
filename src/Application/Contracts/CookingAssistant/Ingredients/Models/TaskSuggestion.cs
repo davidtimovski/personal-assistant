@@ -7,7 +7,6 @@ namespace Application.Contracts.CookingAssistant.Ingredients.Models;
 public class TaskSuggestion : IMapFrom<ToDoTask>
 {
     public int Id { get; set; }
-    public string Name { get; set; }
     public string Label { get; set; }
     public string Group { get; set; }
 

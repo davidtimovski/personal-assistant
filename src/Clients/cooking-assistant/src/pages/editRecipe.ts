@@ -537,8 +537,8 @@ export class EditRecipe {
   async getMeasuringUnits(): Promise<Array<string>> {
     const preferences = await this.usersService.getPreferences();
     const measuringUnits = preferences.imperialSystem
-      ? [null, "oz", "cup", "tbsp", "tsp"]
-      : [null, "g", "ml", "tbsp", "tsp"];
+      ? [null, "oz", "cup", "tbsp", "tsp", "pinch"]
+      : [null, "g", "ml", "tbsp", "tsp", "pinch"];
 
     if (!this.isNewRecipe) {
       const metricUnits = ["g", "ml"];

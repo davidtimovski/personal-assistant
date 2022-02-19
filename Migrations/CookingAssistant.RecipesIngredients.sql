@@ -7,7 +7,7 @@ CREATE TABLE public."CookingAssistant.RecipesIngredients"
     "RecipeId" integer NOT NULL,
     "IngredientId" integer NOT NULL,
     "Amount" decimal(7,2),
-    "Unit" character varying(4) COLLATE pg_catalog."default",
+    "Unit" character varying(5) COLLATE pg_catalog."default",
     "CreatedDate" timestamp with time zone NOT NULL,
     "ModifiedDate" timestamp with time zone NOT NULL,
     CONSTRAINT "PK_CA.RecipesIngredients" PRIMARY KEY ("RecipeId", "IngredientId"),
