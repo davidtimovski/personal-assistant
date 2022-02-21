@@ -44,47 +44,43 @@ public class IngredientService : IIngredientService
         return result;
     }
 
-    public async Task<IngredientSuggestionsDto> GetSuggestionsAsync(int recipeId, int userId)
+    public IEnumerable<IngredientSuggestion> GetUserSuggestions(int userId)
     {
-        var result = new IngredientSuggestionsDto();
+        IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetSuggestions(userId);
+        return ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x));
+    }
 
-        IEnumerable<Ingredient> ingredients = await _ingredientsRepository.GetPublicAndUserIngredientsAsync(userId);
-        IEnumerable<IngredientCategory> categories = await _ingredientsRepository.GetIngredientCategoriesAsync();
+    public PublicIngredientSuggestions GetPublicSuggestions()
+    {
+        var result = new PublicIngredientSuggestions();
 
-        result.UserIngredients = ingredients.Where(x => x.UserId == userId).Select(x => _mapper.Map<IngredientSuggestion>(x));
-        List<IngredientSuggestion> publicSuggestions = ingredients.Where(x => x.UserId == 1).Select(x => _mapper.Map<IngredientSuggestion>(x)).ToList();
+        IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetSuggestions(1);
+        IEnumerable<IngredientCategory> categories = _ingredientsRepository.GetIngredientCategories();
+
+        List<IngredientSuggestion> publicSuggestions = ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x)).ToList();
         
-        // Set selected ingredients
-        if (recipeId > 0)
+        // Create public ingredient hierarchy
+        foreach (var ingredient in publicSuggestions)
         {
-            var ingredientIdsInRecipe = _ingredientsRepository.GetIngredientIdsInRecipe(recipeId);
-
-            foreach (var ingredient in result.UserIngredients.Where(x => ingredientIdsInRecipe.Contains(x.Id)))
-            {
-                ingredient.Selected = true;
-            }
-
-            foreach (var ingredient in publicSuggestions.Where(x => ingredientIdsInRecipe.Contains(x.Id)))
-            {
-                ingredient.Selected = true;
-            }
+            ingredient.Children = publicSuggestions.Where(x => x.ParentId == ingredient.Id).ToList();
         }
 
-        result.PublicIngredients.Uncategorized = publicSuggestions.Where(x => !x.CategoryId.HasValue);
+        result.Uncategorized = publicSuggestions.Where(x => !x.CategoryId.HasValue && !x.ParentId.HasValue).ToList();
+
         var categorizedPublicSuggestions = publicSuggestions.Where(x => x.CategoryId.HasValue);
+        result.Categories = categories.Select(x => _mapper.Map<IngredientCategoryDto>(x)).ToList();
 
-        var categoryDtos = categories.Select(x => _mapper.Map<IngredientCategoryDto>(x));
-
-        foreach (var category in categoryDtos)
+        foreach (var category in result.Categories)
         {
-            category.Ingredients = publicSuggestions.Where(x => x.CategoryId == category.Id);
-            category.Subcategories = categoryDtos.Where(x => x.ParentId == category.Id);
+            category.Ingredients = publicSuggestions.Where(x => x.CategoryId == category.Id && !x.ParentId.HasValue).ToList();
+            category.Subcategories = result.Categories.Where(x => x.ParentId == category.Id).ToList();
 
             foreach (var subcategory in category.Subcategories)
             {
-                subcategory.Ingredients = publicSuggestions.Where(x => x.CategoryId == category.Id);
+                subcategory.Ingredients = publicSuggestions.Where(x => x.CategoryId == category.Id && !x.ParentId.HasValue).ToList();
             }
         }
+        result.Categories.RemoveAll(x => x.ParentId.HasValue);
 
         return result;
     }

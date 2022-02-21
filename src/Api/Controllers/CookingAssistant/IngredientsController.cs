@@ -67,8 +67,8 @@ public class IngredientsController : Controller
         return Ok(editIngredientDto);
     }
 
-    [HttpGet("suggestions/{recipeId}")]
-    public async Task<IActionResult> GetSuggestions(int recipeId)
+    [HttpGet("user-suggestions")]
+    public IActionResult GetUserSuggestions()
     {
         int userId;
         try
@@ -80,7 +80,27 @@ public class IngredientsController : Controller
             return Unauthorized();
         }
 
-        var suggestionsDto = await _ingredientService.GetSuggestionsAsync(recipeId, userId);
+        var suggestionsDtos = _ingredientService.GetUserSuggestions(userId);
+
+        return Ok(suggestionsDtos);
+    }
+
+    // TODO: Use Output caching in future (possibly .NET 7)
+    [ResponseCache(Duration = 60 * 60 * 24)]
+    [HttpGet("public-suggestions")]
+    public IActionResult GetPublicSuggestions()
+    {
+        int userId;
+        try
+        {
+            userId = IdentityHelper.GetUserId(User);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
+        }
+
+        var suggestionsDto = _ingredientService.GetPublicSuggestions();
 
         return Ok(suggestionsDto);
     }

@@ -8,7 +8,7 @@ import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
 
 import { SimpleIngredient } from "models/viewmodels/simpleIngredient";
 import { EditIngredientModel } from "models/viewmodels/editIngredientModel";
-import { IngredientSuggestions } from "models/viewmodels/ingredientSuggestions";
+import { IngredientSuggestion, PublicIngredientSuggestions } from "models/viewmodels/ingredientSuggestions";
 import { PriceData } from "models/viewmodels/priceData";
 import { TaskSuggestion } from "models/viewmodels/taskSuggestion";
 
@@ -69,11 +69,17 @@ export class IngredientsService extends HttpProxyBase {
     return result;
   }
 
-  async getSuggestionsForRecipe(
-    recipeId: number
-  ): Promise<IngredientSuggestions> {
-    const result = await this.ajax<IngredientSuggestions>(
-      `ingredients/suggestions/${recipeId}`
+  async getUserIngredientSuggestions(): Promise<Array<IngredientSuggestion>> {
+    const result = await this.ajax<Array<IngredientSuggestion>>(
+      'ingredients/user-suggestions'
+    );
+
+    return result;
+  }
+
+  async getPublicIngredientSuggestions(): Promise<PublicIngredientSuggestions> {
+    const result = await this.ajax<PublicIngredientSuggestions>(
+      'ingredients/public-suggestions'
     );
 
     return result;

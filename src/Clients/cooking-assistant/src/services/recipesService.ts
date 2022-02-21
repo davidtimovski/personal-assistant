@@ -288,12 +288,10 @@ export class RecipesService extends HttpProxyBase {
     return ingredients.map((ingredient: EditRecipeIngredient) => {
       const parsedIngredient = new EditRecipeIngredient(
         ingredient.id,
-        ingredient.taskId,
         ingredient.name,
         ingredient.amount,
         ingredient.unit,
-        false,
-        null
+        false
       );
 
       if (

@@ -73,74 +73,16 @@ export class EditRecipe {
       this.ingredientNameIsInvalid = false;
       this.resetIngredientMatches();
 
-      if (ingredient.taskId) {
-        this.model.ingredients.push(
-          new EditRecipeIngredient(
-            ingredient.id,
-            ingredient.taskId,
-            ingredient.name,
-            null,
-            ingredient.unit,
-            !!ingredient.id,
-            ingredient
-          )
-        );
-      } else {
-        this.model.ingredients.push(
-          new EditRecipeIngredient(
-            ingredient.id,
-            ingredient.taskId,
-            ingredient.name,
-            null,
-            ingredient.unit,
-            !!ingredient.id,
-            ingredient
-          )
-        );
-      }
+      this.model.ingredients.push(
+        new EditRecipeIngredient(
+          ingredient.id,
+          ingredient.name,
+          null,
+          ingredient.unit,
+          false
+        )
+      );
     });
-
-    this.suggestions = new IngredientSuggestions();
-    this.suggestions.userIngredients = [
-      new IngredientSuggestion(1, null, 'banani', 'g'),
-      new IngredientSuggestion(2, null, 'morkovi', 'g'),
-    ];
-    this.suggestions.publicIngredients = new PublicIngredientSuggestions();
-    this.suggestions.publicIngredients.uncategorized = [
-      new IngredientSuggestion(3, null, 'Med', 'tsp'),
-      new IngredientSuggestion(4, null, 'Biskviti', null)
-    ];
-
-    let dairy = new IngredientCategory();
-    dairy.name = 'Dairy';
-    let milk = new IngredientSuggestion(5, null, 'Mleko', 'ml');
-    milk.children = [
-      new IngredientSuggestion(10, null, 'Whole milk', 'ml'),
-      new IngredientSuggestion(11, null, 'Condensed milk', 'ml'),
-    ];
-    dairy.ingredients = [
-      milk,
-      new IngredientSuggestion(6, null, 'Jogurt', 'ml')
-    ];
-    let cheese = new IngredientCategory();
-    cheese.name = 'Cheese';
-    cheese.ingredients = [
-      new IngredientSuggestion(7, null, 'Parmezan', 'g'),
-      new IngredientSuggestion(8, null, 'Mocarela', 'g')
-    ];
-    cheese.subcategories = [];
-    dairy.subcategories = [cheese];
-
-    let grain = new IngredientCategory();
-    grain.name = 'Grain';
-    grain.ingredients = [
-      new IngredientSuggestion(9, null, 'Musli', 'g')
-    ];
-    grain.subcategories = [];
-    this.suggestions.publicIngredients.categories = [
-      dairy,
-      grain
-    ];
   }
 
   async activate(params: any) {
@@ -154,6 +96,7 @@ export class EditRecipe {
       if (this.model === null) {
         this.router.navigateToRoute("notFound");
       }
+
       this.originalRecipeJson = JSON.stringify(this.model);
 
       if (this.model.videoUrl) {
@@ -185,11 +128,25 @@ export class EditRecipe {
     }
 
     if (this.model.userIsOwner) {
-      this.ingredientsService
-        .getSuggestionsForRecipe(this.model.id)
-        .then((suggestions: IngredientSuggestions) => {
-          this.suggestions = suggestions;
-        });
+      const userSuggestionsPromise = this.ingredientsService
+        .getUserIngredientSuggestions();
+
+      const publicSuggestionsPromise = this.ingredientsService
+        .getPublicIngredientSuggestions();
+
+      Promise.all([userSuggestionsPromise, publicSuggestionsPromise]).then((suggestions) => {
+        this.suggestions = new IngredientSuggestions(suggestions[0], suggestions[1]);
+
+        if (!this.isNewRecipe) {
+          // Set selected ingredient suggestions
+          const ingredientIdsInRecipe: number[] = this.model.ingredients.map(x => x.id);
+
+          for (const id of ingredientIdsInRecipe) {
+            const suggestion = this.findSuggestion(id);
+            suggestion.selected = true;
+          }
+        }
+      });
     }
   }
 
@@ -275,7 +232,7 @@ export class EditRecipe {
     this.resetIngredientMatches();
 
     const search = this.ingredientName.trim().toUpperCase();
-    if (!search || search.length < 2) {
+    if (!search || search.length < 3) {
       return;
     }
 
@@ -363,7 +320,7 @@ export class EditRecipe {
       if (this.existsInIngredients(this.ingredientName)) {
         this.ingredientNameIsInvalid = true;
       } else {
-        this.model.ingredients.push(new EditRecipeIngredient(null, null, this.ingredientName, null, null, false, null));
+        this.model.ingredients.push(new EditRecipeIngredient(null, this.ingredientName, null, null, true));
         this.ingredientName = "";
       }
     }
@@ -394,8 +351,9 @@ export class EditRecipe {
   }
 
   removeIngredient(ingredient: EditRecipeIngredient) {
-    if (ingredient.suggestion) {
-      ingredient.suggestion.selected = false;
+    if (!ingredient.isNew) {
+      const suggestion = this.findSuggestion(ingredient.id);
+      suggestion.selected = false;    
     }
     
     this.model.ingredients.splice(this.model.ingredients.indexOf(ingredient), 1);
@@ -532,6 +490,52 @@ export class EditRecipe {
     }
     this.deleteButtonText = this.i18n.tr("delete");
     this.confirmationInProgress = false;
+  }
+
+  findSuggestion(ingredientId: number) {
+    let foundSuggestion = this.suggestions.userIngredients.find(x => x.id === ingredientId);
+    if (foundSuggestion) {
+      return foundSuggestion;
+    }
+
+    for (const suggestion of this.suggestions.publicIngredients.uncategorized) {
+      foundSuggestion = this.findInIngredientRecursive(suggestion, ingredientId);
+      if (foundSuggestion) {
+        return foundSuggestion;
+      }
+    }
+
+    for (const category of this.suggestions.publicIngredients.categories) {
+      for (const suggestion of category.ingredients) {
+        foundSuggestion = this.findInIngredientRecursive(suggestion, ingredientId);
+        if (foundSuggestion) {
+          return foundSuggestion;
+        }
+      }
+
+      for (const subcategory of category.subcategories) {
+        for (const suggestion of subcategory.ingredients) {
+          foundSuggestion = this.findInIngredientRecursive(suggestion, ingredientId);
+          if (foundSuggestion) {
+            return foundSuggestion;
+          }
+        }
+      }
+    }
+
+    throw 'Could not find suggestion';
+  }
+
+  findInIngredientRecursive(ingredient: IngredientSuggestion, ingredientId: number) {
+    if (ingredient.id === ingredientId) {
+      return ingredient;
+    }
+
+    let result = null;
+    for (let i = 0; result == null && i < ingredient.children.length; i++){
+      result = this.findInIngredientRecursive(ingredient.children[i], ingredientId);
+    }
+    return result;
   }
 
   async getMeasuringUnits(): Promise<Array<string>> {

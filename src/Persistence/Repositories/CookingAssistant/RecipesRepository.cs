@@ -532,7 +532,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         {
             dbRecipe.RecipeIngredients.RemoveAll(x => true);
 
-            IEnumerable<Ingredient> userIngredients = EFContext.Ingredients.Where(x => x.UserId == userId).ToArray();
+            IEnumerable<Ingredient> userIngredients = EFContext.Ingredients.Where(x => x.UserId == userId || x.UserId == 1).ToArray();
 
             foreach (var recipeIngredient in existingRecipeIngredients)
             {

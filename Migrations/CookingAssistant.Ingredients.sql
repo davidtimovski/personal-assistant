@@ -6,8 +6,8 @@ CREATE TABLE public."CookingAssistant.Ingredients"
 (
     "Id" serial NOT NULL,
 	"ParentId" integer,
-    "CategoryId" integer,
     "UserId" integer NOT NULL,
+	"CategoryId" integer,
     "Name" character varying(50) COLLATE pg_catalog."default",
     "MeasurementType" smallint,
     "ServingSize" smallint NOT NULL DEFAULT 100,
@@ -40,14 +40,14 @@ CREATE TABLE public."CookingAssistant.Ingredients"
     REFERENCES public."CookingAssistant.Ingredients" ("Id") MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE,
+	CONSTRAINT "FK_CookingAssistant.Ingredients_AspNetUsers_UserId" FOREIGN KEY ("UserId")
+    REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE CASCADE,
     CONSTRAINT "FK_CookingAssistant.Ingredients_CookingAssistant.IngredientCategories_CategoryId" FOREIGN KEY ("CategoryId")
     REFERENCES public."CookingAssistant.IngredientCategories" ("Id") MATCH SIMPLE
     ON UPDATE NO ACTION
-    ON DELETE SET NULL,
-    CONSTRAINT "FK_CookingAssistant.Ingredients_AspNetUsers_UserId" FOREIGN KEY ("UserId")
-    REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE CASCADE
+    ON DELETE SET NULL   
 )
 WITH (
     OIDS = FALSE
@@ -64,13 +64,4 @@ ALTER TABLE public."CookingAssistant.Ingredients"
 CREATE INDEX "IX_CookingAssistant.Ingredients_UserId"
     ON public."CookingAssistant.Ingredients" USING btree
     ("UserId")
-    TABLESPACE pg_default;
-
--- Index: IX_CookingAssistant.Ingredients_TaskId
-
--- DROP INDEX public."IX_CookingAssistant.Ingredients_TaskId";
-
-CREATE INDEX "IX_CookingAssistant.Ingredients_TaskId"
-    ON public."CookingAssistant.Ingredients" USING btree
-    ("TaskId")
     TABLESPACE pg_default;

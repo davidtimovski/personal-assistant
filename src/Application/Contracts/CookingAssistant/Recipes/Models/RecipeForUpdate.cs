@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using AutoMapper;
 using Application.Mappings;
+using AutoMapper;
 using Domain.Entities.CookingAssistant;
 
 namespace Application.Contracts.CookingAssistant.Recipes.Models;
@@ -29,5 +29,23 @@ public class RecipeForUpdate : IMapFrom<Recipe>
             .ForMember(x => x.CookDuration, opt => opt.MapFrom<DurationResolver, TimeSpan?>(src => src.CookDuration))
             .ForMember(x => x.SharingState, opt => opt.Ignore())
             .ForMember(x => x.UserIsOwner, opt => opt.Ignore());
+    }
+}
+
+public class RecipeForUpdateIngredient : IMapFrom<RecipeIngredient>
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public float? Amount { get; set; }
+    public string Unit { get; set; }
+    public bool IsNew { get; set; }
+
+    public void Mapping(Profile profile)
+    {
+        profile.CreateMap<RecipeIngredient, RecipeForUpdateIngredient>()
+            .ForMember(x => x.Id, opt => opt.MapFrom(src => src.Ingredient.Id))
+            .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Ingredient.Name))
+            .ForMember(x => x.Unit, opt => opt.MapFrom(src => src.Unit))
+            .ForMember(x => x.IsNew, opt => opt.Ignore());
     }
 }

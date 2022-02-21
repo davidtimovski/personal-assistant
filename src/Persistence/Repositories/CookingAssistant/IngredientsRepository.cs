@@ -68,28 +68,18 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
         return ingredient;
     }
 
-    public IEnumerable<int> GetIngredientIdsInRecipe(int recipeId)
+    public IEnumerable<Ingredient> GetSuggestions(int userId)
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.Query<int>(@"SELECT ""IngredientId"" FROM ""CookingAssistant.RecipesIngredients"" WHERE ""RecipeId"" = @RecipeId", new { RecipeId = recipeId });
+        return conn.Query<Ingredient>(@"SELECT ""Id"", ""ParentId"", ""CategoryId"", ""Name"" FROM ""CookingAssistant.Ingredients"" WHERE ""UserId"" = @UserId", new { UserId = userId });
     }
 
-    public async Task<IEnumerable<Ingredient>> GetPublicAndUserIngredientsAsync(int userId)
+    public IEnumerable<IngredientCategory> GetIngredientCategories()
     {
         using IDbConnection conn = OpenConnection();
 
-        return await conn.QueryAsync<Ingredient>(@"SELECT DISTINCT i.""Id"", i.""Name"", it.""TaskId""
-                                             FROM ""CookingAssistant.Ingredients"" AS i
-                                             LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
-                                             WHERE i.""UserId"" = @UserId OR i.""UserId"" = 1", new { UserId = userId });
-    }
-
-    public async Task<IEnumerable<IngredientCategory>> GetIngredientCategoriesAsync()
-    {
-        using IDbConnection conn = OpenConnection();
-
-        return await conn.QueryAsync<IngredientCategory>(@"SELECT * FROM ""CookingAssistant.IngredientCategories""");
+        return conn.Query<IngredientCategory>(@"SELECT * FROM ""CookingAssistant.IngredientCategories""");
     }
 
     public IEnumerable<ToDoTask> GetTaskSuggestions(int userId)

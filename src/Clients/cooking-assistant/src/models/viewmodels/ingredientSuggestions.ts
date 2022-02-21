@@ -24,8 +24,9 @@ export class PublicIngredientSuggestions {
 }
 
 export class IngredientSuggestions {
-  userIngredients: Array<IngredientSuggestion>;
-  publicIngredients: PublicIngredientSuggestions;
+  constructor(
+    public userIngredients: Array<IngredientSuggestion>,
+    public publicIngredients: PublicIngredientSuggestions) {}
 }
 
 export enum IngredientAutocompleteEvents {

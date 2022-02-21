@@ -68,7 +68,7 @@
             <div if.bind="model.userIsOwner" class="add-ingredient-wrap">
               <div class="input-wrap">
                 <input type="text" value.bind="ingredientName" keyup.delegate="ingredientInputChanged() & throttle:250" ref="addIngredientsInput"
-                  class.bind="ingredientNameIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]editRecipe.ingredient" maxlength="50" />
+                  disabled.bind="!suggestions" class.bind="ingredientNameIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]editRecipe.ingredient" maxlength="50" />
                 <a click.delegate="addNewIngredient()" t="[title,aria-label]editRecipe.addIngredient">
                   <i class="fas fa-plus-circle"></i>
                 </a>
@@ -98,13 +98,11 @@
 
             <div show.bind="model.ingredients.length > 0" class="new-ingredients-wrap">
               <div repeat.for="ingredient of model.ingredients"
-                class="new-ingredient au-animate animate-fade-in ${ingredient.taskId ? 'from-task' : ''}">
+                class="new-ingredient au-animate animate-fade-in">
                 <div class="ingredient-name-wrap">
-                  <input type="text" if.bind="!ingredient.existing && !ingredient.taskId"
-                    value.bind="ingredient.name | nullFormat" keyup.trigger="ingredientChanged(ingredient)"
-                    maxlength="50" class="name-input"  />
+                  <input type="text" if.bind="ingredient.isNew" value.bind="ingredient.name | nullFormat" 
+                    keyup.trigger="ingredientChanged(ingredient)" maxlength="50" class="name-input" />
                   <div else class="name-input uneditable">${ingredient.name}</div>
-                  <i if.bind="ingredient.taskId" class="fas fa-list" t="[title,aria-label]editRecipe.linkedToTask"></i>
                 </div>
                 <div>
                   <div class="ingredient-amount-input-wrap">
