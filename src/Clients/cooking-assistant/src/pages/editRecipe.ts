@@ -9,14 +9,13 @@ import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 
 import * as environment from "../../config/environment.json";
 import { RecipesService } from "services/recipesService";
-import { IngredientsService } from "services/ingredientsService";
 import { UsersService } from "services/usersService";
-import { IngredientAutocompleteEvents, IngredientCategory, IngredientSuggestion, IngredientSuggestions, PublicIngredientSuggestions } from "models/viewmodels/ingredientSuggestions";
+import { IngredientPickerEvents, IngredientSuggestion } from "models/viewmodels/ingredientSuggestions";
 import { EditRecipeModel } from "models/viewmodels/editRecipeModel";
 import { EditRecipeIngredient } from "models/viewmodels/editRecipeIngredient";
 import * as Actions from "utils/state/actions";
 
-@inject(Router, RecipesService, IngredientsService, UsersService, ValidationController, I18N, EventAggregator)
+@inject(Router, RecipesService, UsersService, ValidationController, I18N, EventAggregator)
 export class EditRecipe {
   private model: EditRecipeModel;
   private originalRecipeJson: string;
@@ -26,8 +25,7 @@ export class EditRecipe {
   private nameInput: HTMLInputElement;
   private nameIsInvalid: boolean;
   private videoUrlIsInvalid: boolean;
-  private ingredientName = "";
-  private ingredientNameIsInvalid: boolean;
+  private recipeIngredientIds = new Array<number>();
   private prepDurationHours = "00";
   private prepDurationMinutes = "00";
   private cookDurationHours = "00";
@@ -42,8 +40,6 @@ export class EditRecipe {
   private leaveButtonIsLoading = false;
   private videoIFrame: HTMLIFrameElement;
   private videoIFrameSrc = "";
-  private suggestions: IngredientSuggestions;
-  private suggestionsMatched = false;
   private addIngredientsInput: HTMLInputElement;
   private addIngredientsInputPlaceholder: string;
   private measuringUnits: string[];
@@ -51,7 +47,6 @@ export class EditRecipe {
   constructor(
     private readonly router: Router,
     private readonly recipesService: RecipesService,
-    private readonly ingredientsService: IngredientsService,
     private readonly usersService: UsersService,
     private readonly validationController: ValidationController,
     private readonly i18n: I18N,
@@ -68,19 +63,17 @@ export class EditRecipe {
       this.videoUrlIsInvalid = false;
     });
 
-    this.eventAggregator.subscribe(IngredientAutocompleteEvents.Selected, (ingredient: IngredientSuggestion) => {
-      this.ingredientName = '';
-      this.ingredientNameIsInvalid = false;
-      this.resetIngredientMatches();
+    this.eventAggregator.subscribe(IngredientPickerEvents.Added, (ingredientName: string) => {
+      if (this.existsInIngredients(ingredientName)) {
+        return;
+      }
 
+      this.model.ingredients.push(new EditRecipeIngredient(null, ingredientName, null, null, true));
+    });
+
+    this.eventAggregator.subscribe(IngredientPickerEvents.Selected, (ingredient: IngredientSuggestion) => {
       this.model.ingredients.push(
-        new EditRecipeIngredient(
-          ingredient.id,
-          ingredient.name,
-          null,
-          ingredient.unit,
-          false
-        )
+        new EditRecipeIngredient(ingredient.id, ingredient.name, null, ingredient.unit, false)
       );
     });
   }
@@ -98,6 +91,8 @@ export class EditRecipe {
       }
 
       this.originalRecipeJson = JSON.stringify(this.model);
+
+      this.recipeIngredientIds = this.model.ingredients.map((x) => x.id);
 
       if (this.model.videoUrl) {
         this.videoIFrameSrc = this.recipesService.videoUrlToEmbedSrc(this.model.videoUrl);
@@ -126,28 +121,6 @@ export class EditRecipe {
     if (this.isNewRecipe) {
       this.nameInput.focus();
     }
-
-    if (this.model.userIsOwner) {
-      const userSuggestionsPromise = this.ingredientsService
-        .getUserIngredientSuggestions();
-
-      const publicSuggestionsPromise = this.ingredientsService
-        .getPublicIngredientSuggestions();
-
-      Promise.all([userSuggestionsPromise, publicSuggestionsPromise]).then((suggestions) => {
-        this.suggestions = new IngredientSuggestions(suggestions[0], suggestions[1]);
-
-        if (!this.isNewRecipe) {
-          // Set selected ingredient suggestions
-          const ingredientIdsInRecipe: number[] = this.model.ingredients.map(x => x.id);
-
-          for (const id of ingredientIdsInRecipe) {
-            const suggestion = this.findSuggestion(id);
-            suggestion.selected = true;
-          }
-        }
-      });
-    }
   }
 
   videoUrlChanged() {
@@ -167,78 +140,6 @@ export class EditRecipe {
       this.videoUrlIsInvalid = true;
       this.videoIFrameSrc = null;
     }
-  }
-
-  resetIngredientMatches() {
-    this.suggestions.userIngredients.forEach(x => this.matchIngredient(x, false));
-    this.suggestions.publicIngredients.uncategorized.forEach(x => this.matchIngredient(x, false));
-    this.suggestions.publicIngredients.categories.forEach(x => this.matchCategory(x, false));
-
-    this.suggestionsMatched = false;
-  }
-
-  matchIngredient(ingredient: IngredientSuggestion, matched: boolean) {
-    ingredient.matched = matched;
-    ingredient.children.forEach(x => this.matchIngredient(x, matched));
-  }
-
-  searchIngredient(ingredient: IngredientSuggestion, search: string) {
-    ingredient.matched = ingredient.name.toUpperCase().includes(search);
-
-    if (ingredient.matched) {
-      this.matchIngredient(ingredient, true);
-      this.suggestionsMatched = true;
-    } else {
-      for (const child of ingredient.children) {
-        if (this.searchIngredient(child, search)) {
-          ingredient.matched = true;
-        }
-      }
-    }
-
-    return ingredient.matched;
-  }
-
-  matchCategory(category: IngredientCategory, matched: boolean) {
-    category.matched = matched;
-    category.ingredients.forEach(x => this.matchIngredient(x, matched));
-    category.subcategories.forEach(x => this.matchCategory(x, matched));
-  }
-
-  searchCategory(category: IngredientCategory, search: string) {
-    category.matched = category.name.toUpperCase().includes(search);
-
-    if (category.matched) {
-      this.matchCategory(category, true);
-      this.suggestionsMatched = true;
-    } else {
-      for (const ingredient of category.ingredients) {
-        if (this.searchIngredient(ingredient, search)) {
-          category.matched = true;
-        }
-      }
-
-      for (const subcategory of category.subcategories) {
-        if (this.searchCategory(subcategory, search)) {
-          category.matched = true;
-        }
-      }
-    }
-
-    return category.matched;
-  }
-
-  ingredientInputChanged() {
-    this.resetIngredientMatches();
-
-    const search = this.ingredientName.trim().toUpperCase();
-    if (!search || search.length < 3) {
-      return;
-    }
-
-    this.suggestions.userIngredients.forEach(x => this.searchIngredient(x, search));
-    this.suggestions.publicIngredients.uncategorized.forEach(x => this.searchIngredient(x, search));
-    this.suggestions.publicIngredients.categories.forEach(x => this.searchCategory(x, search));
   }
 
   ingredientChanged() {
@@ -313,21 +214,6 @@ export class EditRecipe {
     return this.model.ingredients.length;
   }
 
-  addNewIngredient() {
-    this.ingredientNameIsInvalid = ValidationUtil.isEmptyOrWhitespace(this.ingredientName);
-
-    if (!this.ingredientNameIsInvalid) {
-      if (this.existsInIngredients(this.ingredientName)) {
-        this.ingredientNameIsInvalid = true;
-      } else {
-        this.model.ingredients.push(new EditRecipeIngredient(null, this.ingredientName, null, null, true));
-        this.ingredientName = "";
-      }
-    }
-
-    this.resetIngredientMatches();
-  }
-
   existsInIngredients(ingredientName: string): boolean {
     const duplicates = this.model.ingredients.filter((i) => {
       return i.name.trim().toUpperCase() === ingredientName.trim().toUpperCase();
@@ -352,10 +238,9 @@ export class EditRecipe {
 
   removeIngredient(ingredient: EditRecipeIngredient) {
     if (!ingredient.isNew) {
-      const suggestion = this.findSuggestion(ingredient.id);
-      suggestion.selected = false;    
+      this.eventAggregator.publish(IngredientPickerEvents.Unselect, ingredient.id);
     }
-    
+
     this.model.ingredients.splice(this.model.ingredients.indexOf(ingredient), 1);
   }
 
@@ -490,52 +375,6 @@ export class EditRecipe {
     }
     this.deleteButtonText = this.i18n.tr("delete");
     this.confirmationInProgress = false;
-  }
-
-  findSuggestion(ingredientId: number) {
-    let foundSuggestion = this.suggestions.userIngredients.find(x => x.id === ingredientId);
-    if (foundSuggestion) {
-      return foundSuggestion;
-    }
-
-    for (const suggestion of this.suggestions.publicIngredients.uncategorized) {
-      foundSuggestion = this.findInIngredientRecursive(suggestion, ingredientId);
-      if (foundSuggestion) {
-        return foundSuggestion;
-      }
-    }
-
-    for (const category of this.suggestions.publicIngredients.categories) {
-      for (const suggestion of category.ingredients) {
-        foundSuggestion = this.findInIngredientRecursive(suggestion, ingredientId);
-        if (foundSuggestion) {
-          return foundSuggestion;
-        }
-      }
-
-      for (const subcategory of category.subcategories) {
-        for (const suggestion of subcategory.ingredients) {
-          foundSuggestion = this.findInIngredientRecursive(suggestion, ingredientId);
-          if (foundSuggestion) {
-            return foundSuggestion;
-          }
-        }
-      }
-    }
-
-    throw 'Could not find suggestion';
-  }
-
-  findInIngredientRecursive(ingredient: IngredientSuggestion, ingredientId: number) {
-    if (ingredient.id === ingredientId) {
-      return ingredient;
-    }
-
-    let result = null;
-    for (let i = 0; result == null && i < ingredient.children.length; i++){
-      result = this.findInIngredientRecursive(ingredient.children[i], ingredientId);
-    }
-    return result;
   }
 
   async getMeasuringUnits(): Promise<Array<string>> {

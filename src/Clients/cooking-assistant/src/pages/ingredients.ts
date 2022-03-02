@@ -1,8 +1,10 @@
 import { inject, computedFrom } from "aurelia-framework";
+import { Router } from "aurelia-router";
+
 import { IngredientsService } from "services/ingredientsService";
 import { SimpleIngredient } from "models/viewmodels/simpleIngredient";
 
-@inject(IngredientsService)
+@inject(Router, IngredientsService)
 export class Ingredients {
   private ingredients: Array<SimpleIngredient>;
   private shadowIngredients: Array<SimpleIngredient>;
@@ -10,7 +12,10 @@ export class Ingredients {
   private search = "";
   private clearSearchButtonIsVisible = false;
 
-  constructor(private readonly ingredientsService: IngredientsService) {}
+  constructor(
+    private readonly router: Router,
+    private readonly ingredientsService: IngredientsService
+    ) {}
 
   activate(params: any) {
     if (params.editedId) {
@@ -18,11 +23,10 @@ export class Ingredients {
     }
   }
 
-  attached() {
-    this.ingredientsService.getAll().then((ingredients: Array<SimpleIngredient>) => {
-      this.ingredients = ingredients;
-      this.shadowIngredients = ingredients.slice();
-    });
+  async attached() {
+    const ingredients = await this.ingredientsService.getAll();
+    this.ingredients = ingredients;
+    this.shadowIngredients = ingredients.slice();
   }
 
   searchInputChanged() {
@@ -41,6 +45,11 @@ export class Ingredients {
     this.search = "";
     this.ingredients = this.shadowIngredients.slice();
     this.clearSearchButtonIsVisible = false;
+  }
+
+  ingredientClicked(id: number, isPublic: boolean) {
+    const route = isPublic ? "viewIngredient" : "editIngredient";
+    this.router.navigateToRoute(route, { id: id });
   }
 
   @computedFrom("lastEditedId")

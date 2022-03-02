@@ -186,6 +186,7 @@
     "search": "Search",
     "clear": "Clear",
     "emptyListMessage": "You don't have any ingredients yet",
+    "myIngredient": "My ingredient",
     "linkedToTask": "Linked to task",
     "hasNutritionSet": "Has nutrition set",
     "hasPriceSet": "Has price set"
@@ -211,6 +212,25 @@
     "removePriceData": "Remove price data",
     "price": "Price",
     "priceBetween": "Price must be between 0 and 9999",
+    "updateSuccessful": "Ingredient was successfully updated",
+    "deleteSuccessful": "Ingredient was successfully deleted"
+  },
+  "viewIngredient": {
+    "usedInTheseRecipes": "Used in these recipes",
+    "notUsed": "This ingredient is not used in any recipe.",
+    "thisIngredientIsLinked": "This ingredient is linked to the \"{{taskName}}\" task in the \"{{taskList}}\" list in To Do Assistant.",
+    "linkToTask": "Link to task in To Do Assistant",
+    "unlink": "Unlink",
+    "searchTasks": "Search tasks",
+    "amount": "Amount",
+    "oneUnit": "One unit (ex. Egg)",
+    "nutrition": "Nutrition",
+    "ingredientUsedInRecipes": "This ingredient is used in the recipes mentioned above.",
+    "areYouSureYouWantToDelete": "Are you sure you want to delete it?",
+    "yesImSure": "Yes, I'm sure",
+    "price": "Price",
+    "priceBetween": "Price must be between 0 and 9999",
+    "updateSuccessful": "Ingredient was successfully updated",
     "deleteSuccessful": "Ingredient was successfully deleted"
   },
   "shareRequests": {
@@ -232,16 +252,17 @@
     "emptyListMessage": "There are no new received recipes"
   },
   "reviewIngredients": {
-    "reviewIngredients": "Review ingredients",
-    "introductoryLabel": "This recipe has one ingredient. Let's see if you already have it in your inventory.",
-    "introductoryLabelPlural": "This recipe has {{ingredients}} ingredients. Let's review them and see if you already have some in your inventory.",
+    "reviewCustomIngredients": "Review custom ingredients",
+    "review": "Review",
+    "introductoryLabel": "This recipe has one custom ingredient. Let's see if you already have it in your inventory.",
+    "introductoryLabelPlural": "This recipe has {{ingredients}} custom ingredients. Let's review them and see if you have equivalent ones in your inventory.",
     "cancelIngredientReplacement": "Cancel ingredient replacement",
     "searchInventory": "Search inventory",
     "suggestion": "Suggestion:",
     "transferNutritionData": "Transfer nutrition data",
     "transferPriceData": "Transfer price data",
     "previousIngredient": "Previous ingredient",
-    "nextIngredient": "Previous ingredient",
+    "nextIngredient": "Next ingredient",
     "done": "Done!"
   },
   "help": {
@@ -287,8 +308,8 @@
     },
     "reviewIngredients": {
       "title": "Review ingredients",
-      "question": "Why should I review the ingredients?",
-      "answer": "Reviewing ingredients allows you to replace them with your own - if you already have equivalent ones. Using the ingredients that are already in your inventory provies many benefits. They may already be linked to tasks in To Do Assistant, or they may already have nutrition or price data. If you don't find any equivalent ingredients in your inventory don't worry, new ones will be created."
+      "question": "Why should I review custom ingredients?",
+      "answer": "You might have equivalent personal ingredients or they might match up with public ones. Reviewing a recipe's custom ingredients allows you to choose how they match up so you don't end up with duplicates. If you don't find any equivalent ingredients don't worry, they will just copy over."
     },
     "shareRequests": {
       "title": "Share requests",

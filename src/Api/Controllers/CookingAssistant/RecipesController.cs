@@ -275,8 +275,6 @@ public class RecipesController : Controller
             return NotFound();
         }
 
-        recipeDto.IngredientSuggestions = _ingredientService.GetIngredientReviewSuggestions(userId);
-
         return Ok(recipeDto);
     }
 
@@ -706,10 +704,9 @@ public class RecipesController : Controller
 
         // Copy recipe image if not default
         RecipeToNotify recipe = _recipeService.Get(importModel.Id);
-        string tempImagePath = Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp", Guid.NewGuid().ToString());
 
         importModel.ImageUri = await _cdnService.CopyAndUploadAsync(
-            tempImagePath: tempImagePath,
+            localTempPath: Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp"),
             imageUriToCopy: recipe.ImageUri,
             uploadPath: $"users/{importModel.UserId}/recipes",
             template: "recipe"

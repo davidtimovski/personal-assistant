@@ -1,0 +1,48 @@
+.ingredient-picker {
+  .input-wrap {
+    position: relative;
+    width: 100%;
+
+    input {
+      width: calc(100% - 62px);
+      padding-right: 50px;
+      line-height: 45px;
+    }
+
+    a {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 45px;
+      height: 47px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: none;
+      border: none;
+      outline: none;
+      font-size: 23px;
+      line-height: 45px;
+      text-decoration: none;
+      color: var(--primary-color);
+      cursor: pointer;
+
+      &:hover {
+        color: var(--primary-color-dark);
+      }
+    }
+  }
+
+  .suggestions {
+    margin-top: 10px;
+
+    .my-ingredients {
+      background: lightblue;
+      padding: 10px 10px;
+    }
+
+    .public-ingredients {
+      padding: 10px 10px;
+    }
+  }
+}

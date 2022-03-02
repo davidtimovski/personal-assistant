@@ -39,30 +39,29 @@ export class Recipe {
   }
 
   async attached() {
-    this.recipesService.get(this.recipeId, this.currency).then((viewRecipe: ViewRecipe) => {
-      if (viewRecipe === null) {
-        this.router.navigateToRoute("notFound");
-      } else {
-        this.servingsSelectorIsVisible = viewRecipe.ingredients.some((ingredient: Ingredient) => {
-          return !!ingredient.amount;
-        });
+    const viewRecipe = await this.recipesService.get(this.recipeId, this.currency);
+    if (viewRecipe === null) {
+      this.router.navigateToRoute("notFound");
+    } else {
+      this.servingsSelectorIsVisible = viewRecipe.ingredients.some((ingredient: Ingredient) => {
+        return !!ingredient.amount;
+      });
 
-        this.model = viewRecipe;
+      this.model = viewRecipe;
 
-        if (this.model.videoUrl) {
-          this.videoIFrameSrc = this.recipesService.videoUrlToEmbedSrc(this.model.videoUrl);
-        }
-
-        this.shareButtonText =
-          this.model.sharingState === SharingState.NotShared
-            ? this.i18n.tr("recipe.shareRecipe")
-            : this.i18n.tr("recipe.members");
-
-        this.copyButton.addEventListener("click", () => {
-          this.copyAsText();
-        });
+      if (this.model.videoUrl) {
+        this.videoIFrameSrc = this.recipesService.videoUrlToEmbedSrc(this.model.videoUrl);
       }
-    });
+
+      this.shareButtonText =
+        this.model.sharingState === SharingState.NotShared
+          ? this.i18n.tr("recipe.shareRecipe")
+          : this.i18n.tr("recipe.members");
+
+      this.copyButton.addEventListener("click", () => {
+        this.copyAsText();
+      });
+    }
   }
 
   toggleTopDrawer() {

@@ -19,6 +19,7 @@ public class PersonalAssistantContext : DbContext
 
     public DbSet<Recipe> Recipes { get; set; }
     public DbSet<Ingredient> Ingredients { get; set; }
+    public DbSet<RecipeIngredient> RecipesIngredients { get; set; }
     public DbSet<IngredientTask> IngredientsTasks { get; set; }
     public DbSet<RecipeShare> RecipeShares { get; set; }
     public DbSet<SendRequest> SendRequests { get; set; }

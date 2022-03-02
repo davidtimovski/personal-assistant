@@ -12,6 +12,8 @@ public class IngredientSuggestion : IMapFrom<Ingredient>
     public int? CategoryId { get; set; }
     public string Name { get; set; }
     public string Unit { get; set; }
+    public bool HasNutritionData { get; set; }
+    public bool HasPriceData { get; set; }
 
     public List<IngredientSuggestion> Children { get; set; } = new List<IngredientSuggestion>();
 
@@ -19,7 +21,9 @@ public class IngredientSuggestion : IMapFrom<Ingredient>
     {
         profile.CreateMap<Ingredient, IngredientSuggestion>()
             .ForMember(x => x.Unit, opt => opt.Ignore())
-            .ForMember(x => x.Children, opt => opt.Ignore());
+            .ForMember(x => x.Children, opt => opt.Ignore())
+            .ForMember(x => x.HasNutritionData, opt => opt.MapFrom<RecipeIngredientHasNutritionDataResolver>())
+            .ForMember(x => x.HasPriceData, opt => opt.MapFrom<RecipeIngredientHasPriceDataResolver>());
     }
 }
 

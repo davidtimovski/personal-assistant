@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Application.Contracts.CookingAssistant.Ingredients;
 using Application.Contracts.CookingAssistant.Ingredients.Models;
-using Application.Contracts.CookingAssistant.Recipes.Models;
 using AutoMapper;
 using Domain.Entities.CookingAssistant;
 using Domain.Entities.ToDoAssistant;
@@ -26,27 +25,36 @@ public class IngredientService : IIngredientService
         _mapper = mapper;
     }
 
-    public IEnumerable<IngredientDto> GetAll(int userId)
+    public List<IngredientDto> GetUserAndUsedPublicIngredients(int userId)
     {
-        IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetAll(userId);
+        IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetUserAndUsedPublicIngredients(userId);
 
-        var result = ingredients.Select(x => _mapper.Map<IngredientDto>(x));
+        var result = ingredients.Select(x => _mapper.Map<IngredientDto>(x)).ToList();
 
         return result;
     }
 
-    public EditIngredient Get(int id, int userId)
+    public EditIngredient GetForUpdate(int id, int userId)
     {
-        Ingredient ingredient = _ingredientsRepository.Get(id, userId);
+        Ingredient ingredient = _ingredientsRepository.GetForUpdate(id, userId);
 
         var result = _mapper.Map<EditIngredient>(ingredient);
 
         return result;
     }
 
+    public ViewIngredient GetPublic(int id, int userId)
+    {
+        Ingredient ingredient = _ingredientsRepository.GetPublic(id, userId);
+
+        var result = _mapper.Map<ViewIngredient>(ingredient);
+
+        return result;
+    }
+
     public IEnumerable<IngredientSuggestion> GetUserSuggestions(int userId)
     {
-        IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetSuggestions(userId);
+        IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetAll(userId);
         return ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x));
     }
 
@@ -54,7 +62,7 @@ public class IngredientService : IIngredientService
     {
         var result = new PublicIngredientSuggestions();
 
-        IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetSuggestions(1);
+        IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetAll(1);
         IEnumerable<IngredientCategory> categories = _ingredientsRepository.GetIngredientCategories();
 
         List<IngredientSuggestion> publicSuggestions = ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x)).ToList();
@@ -95,15 +103,6 @@ public class IngredientService : IIngredientService
         return result;
     }
 
-    public IEnumerable<IngredientReviewSuggestion> GetIngredientReviewSuggestions(int userId)
-    {
-        IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetIngredientSuggestions(userId);
-
-        var result = ingredients.Select(x => _mapper.Map<IngredientReviewSuggestion>(x));
-
-        return result;
-    }
-
     public bool Exists(int id, int userId)
     {
         return _ingredientsRepository.Exists(id, userId);
@@ -130,14 +129,23 @@ public class IngredientService : IIngredientService
         await _ingredientsRepository.UpdateAsync(ingredient);
     }
 
-    public async Task DeleteAsync(int id, int userId)
+    public async Task UpdateAsync(UpdatePublicIngredient model, IValidator<UpdatePublicIngredient> validator)
     {
-        if (!Exists(id, userId))
-        {
-            throw new ValidationException("Unauthorized");
-        }
+        ValidateAndThrow(model, validator);
+        await _ingredientsRepository.UpdatePublicAsync(model.Id, model.TaskId, model.UserId, DateTime.UtcNow);
+    }
 
-        await _ingredientsRepository.DeleteAsync(id);
+    public async Task DeleteOrRemoveFromRecipesAsync(int id, int userId)
+    {
+        var ingredient = _ingredientsRepository.Get(id);
+        if (ingredient.UserId == 1)
+        {
+            await _ingredientsRepository.RemoveFromRecipesAsync(id, userId);
+        }
+        else if (ingredient.UserId == userId)
+        {
+            await _ingredientsRepository.DeleteAsync(id);
+        }
     }
 
     private static void ValidateAndThrow<T>(T model, IValidator<T> validator)

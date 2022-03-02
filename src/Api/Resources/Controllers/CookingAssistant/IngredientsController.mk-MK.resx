@@ -121,7 +121,7 @@
     <value>Квасец</value>
   </data>
   <data name="alcohol" xml:space="preserve">
-    <value>Alcohol</value>
+    <value>Алкохол</value>
   </data>
   <data name="all_purpose_flour" xml:space="preserve">
     <value>Брашно (секаква намена)</value>
@@ -176,9 +176,6 @@
   </data>
   <data name="beer" xml:space="preserve">
     <value>Пиво</value>
-  </data>
-  <data name="beet" xml:space="preserve">
-    <value>Цвекло</value>
   </data>
   <data name="beetroot" xml:space="preserve">
     <value>Beetroot</value>
@@ -250,7 +247,7 @@
     <value>Чедар сирење</value>
   </data>
   <data name="cheese" xml:space="preserve">
-    <value>Cheese</value>
+    <value>Сирење</value>
   </data>
   <data name="cherries" xml:space="preserve">
     <value>Цреши</value>
@@ -334,7 +331,7 @@
     <value>Кари сос</value>
   </data>
   <data name="dairy" xml:space="preserve">
-    <value>Dairy</value>
+    <value>Млечни</value>
   </data>
   <data name="dry_white_wine" xml:space="preserve">
     <value>Суво бело вино</value>
@@ -358,19 +355,19 @@
     <value>Фета сирење</value>
   </data>
   <data name="fettuccine" xml:space="preserve">
-    <value>Fettuccine</value>
+    <value>Фетучини</value>
   </data>
   <data name="flour" xml:space="preserve">
     <value>Брашно</value>
   </data>
   <data name="fruit" xml:space="preserve">
-    <value>Fruit</value>
+    <value>Овошје</value>
   </data>
   <data name="fusilli" xml:space="preserve">
-    <value>Fusilli</value>
+    <value>Фусили</value>
   </data>
   <data name="garam_masala" xml:space="preserve">
-    <value>Garam masala</value>
+    <value>Гарам масала</value>
   </data>
   <data name="garlic" xml:space="preserve">
     <value>Лук</value>
@@ -388,7 +385,7 @@
     <value>Њоки</value>
   </data>
   <data name="grain" xml:space="preserve">
-    <value>Grain</value>
+    <value>Житарици</value>
   </data>
   <data name="grapefruit" xml:space="preserve">
     <value>Грејпфрут</value>
@@ -424,7 +421,7 @@
     <value>Хималајска сол</value>
   </data>
   <data name="hoisin_sauce" xml:space="preserve">
-    <value>Hoisin сос</value>
+    <value>Хојзин сос</value>
   </data>
   <data name="honey" xml:space="preserve">
     <value>Мед</value>
@@ -505,7 +502,7 @@
     <value>Морско оревче</value>
   </data>
   <data name="nuts_legumes" xml:space="preserve">
-    <value>Nuts &amp; legumes</value>
+    <value>Легуми</value>
   </data>
   <data name="oats" xml:space="preserve">
     <value>Овесни снегулки</value>
@@ -589,7 +586,7 @@
     <value>Шеќер во прав</value>
   </data>
   <data name="protein" xml:space="preserve">
-    <value>Protein</value>
+    <value>Протеин</value>
   </data>
   <data name="provolone_cheese" xml:space="preserve">
     <value>Проволоне сирење</value>
@@ -649,10 +646,10 @@
     <value>Колбас</value>
   </data>
   <data name="seafood" xml:space="preserve">
-    <value>Seafood</value>
+    <value>Морска храна</value>
   </data>
   <data name="seasoning" xml:space="preserve">
-    <value>Seasoning</value>
+    <value>Зачини</value>
   </data>
   <data name="sea_salt" xml:space="preserve">
     <value>Морска сол</value>
@@ -706,81 +703,81 @@
     <value>Швајцарско сирење</value>
   </data>
   <data name="tartar_sauce" xml:space="preserve">
-    <value>Tartar sauce</value>
+    <value>Тартар сос</value>
   </data>
   <data name="thyme" xml:space="preserve">
-    <value>Thyme</value>
+    <value>Мајчина душица</value>
   </data>
   <data name="tofu" xml:space="preserve">
-    <value>Tofu</value>
+    <value>Тофу</value>
   </data>
   <data name="tomatoes" xml:space="preserve">
-    <value>Tomatoes</value>
+    <value>Домати</value>
   </data>
   <data name="tomato_paste" xml:space="preserve">
-    <value>Tomato paste</value>
+    <value>Доматна паста</value>
   </data>
   <data name="tomato_sauce" xml:space="preserve">
-    <value>Tomato sauce</value>
+    <value>Доматен сос</value>
   </data>
   <data name="tuna" xml:space="preserve">
-    <value>Tuna</value>
+    <value>Туна</value>
   </data>
   <data name="turmeric" xml:space="preserve">
-    <value>Turmeric</value>
+    <value>Куркума</value>
   </data>
   <data name="turnip" xml:space="preserve">
-    <value>Turnip</value>
+    <value>Репка</value>
   </data>
   <data name="unsalted_butter" xml:space="preserve">
-    <value>Unsalted butter</value>
+    <value>Путер без сол</value>
   </data>
   <data name="vanilla_extract" xml:space="preserve">
-    <value>Vanilla extract</value>
+    <value>Екстракт од ванила</value>
   </data>
   <data name="vegetables" xml:space="preserve">
-    <value>Vegetables</value>
+    <value>Зеленчук</value>
   </data>
   <data name="vegetable_oil" xml:space="preserve">
-    <value>Vegetable oil</value>
+    <value>Растително масло</value>
   </data>
   <data name="vinegar" xml:space="preserve">
-    <value>Vinegar</value>
+    <value>Оцет</value>
   </data>
   <data name="walnuts" xml:space="preserve">
-    <value>Walnuts</value>
+    <value>Ореви</value>
   </data>
   <data name="water" xml:space="preserve">
-    <value>Water</value>
+    <value>Вода</value>
   </data>
   <data name="watermelon" xml:space="preserve">
-    <value>Watermelon</value>
+    <value>Лубеница</value>
   </data>
   <data name="white_rice" xml:space="preserve">
-    <value>White rice</value>
+    <value>Бел ориз</value>
   </data>
   <data name="white_vinegar" xml:space="preserve">
-    <value>White vinegar</value>
+    <value>Бел оцет</value>
   </data>
   <data name="white_wine" xml:space="preserve">
-    <value>White wine</value>
+    <value>Бело вино</value>
   </data>
   <data name="whole_milk" xml:space="preserve">
-    <value>Whole milk</value>
+    <value>Млеко (масно)</value>
   </data>
   <data name="wiener" xml:space="preserve">
-    <value>Wiener</value>
+    <value>Виршла</value>
   </data>
   <data name="wine" xml:space="preserve">
-    <value>wine</value>
+    <value>Вино</value>
   </data>
   <data name="worcestershire_sauce" xml:space="preserve">
-    <value>Worcestershire sauce</value>
+    <value>Востер сос</value>
   </data>
   <data name="yogurt" xml:space="preserve">
-    <value>Yogurt</value>
+    <value>Јогурт</value>
   </data>
   <data name="zucchini" xml:space="preserve">
-    <value>Zucchini</value>
+    <value>Тиквичка</value>
   </data>
 </root>

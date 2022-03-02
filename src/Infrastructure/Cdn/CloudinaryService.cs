@@ -91,9 +91,12 @@ public class CloudinaryService : ICdnService
 
         string extension = Path.GetExtension(model.FileName);
 
-        string tempImageName = Guid.NewGuid() + extension;
-        string tempImagePath = Path.Combine(model.LocalTempPath, tempImageName);
+        if (!Directory.Exists(model.LocalTempPath))
+        {
+            Directory.CreateDirectory(model.LocalTempPath);
+        }
 
+        string tempImagePath = Path.Combine(model.LocalTempPath, Guid.NewGuid() + extension);
         using (var stream = new FileStream(tempImagePath, FileMode.Create))
         {
             model.File.Position = 0;
@@ -137,7 +140,7 @@ public class CloudinaryService : ICdnService
         return _baseUrl + $"{uploadPath}/{uri}.{Format}";
     }
 
-    public async Task<string> CopyAndUploadAsync(string tempImagePath, string imageUriToCopy, string uploadPath, string template)
+    public async Task<string> CopyAndUploadAsync(string localTempPath, string imageUriToCopy, string uploadPath, string template)
     {
         if (imageUriToCopy == _defaultRecipeImageUri)
         {
@@ -145,6 +148,13 @@ public class CloudinaryService : ICdnService
         }
 
         var result = await _httpClient.GetAsync(new Uri(imageUriToCopy));
+
+        if (!Directory.Exists(localTempPath))
+        {
+            Directory.CreateDirectory(localTempPath);
+        }
+
+        string tempImagePath = Path.Combine(localTempPath, Guid.NewGuid().ToString());
 
         using (var stream = new FileStream(tempImagePath, FileMode.Create))
         using (Stream image = await result.Content.ReadAsStreamAsync())

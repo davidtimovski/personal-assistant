@@ -42,8 +42,8 @@ public class ListsRepository : BaseRepository, IListsRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.Query<int>(@"SELECT ""Id"" FROM ""ToDoAssistant.Lists"" WHERE ""UserId"" = @UserId AND ""IsArchived"" = FALSE
-                                     UNION ALL
-                                     SELECT ""ListId"" FROM ""ToDoAssistant.Shares"" WHERE ""UserId"" = @UserId AND ""IsArchived"" = FALSE AND ""IsAccepted""",
+                                 UNION ALL
+                                 SELECT ""ListId"" FROM ""ToDoAssistant.Shares"" WHERE ""UserId"" = @UserId AND ""IsArchived"" = FALSE AND ""IsAccepted""",
             new { UserId = userId });
     }
 
@@ -52,11 +52,11 @@ public class ListsRepository : BaseRepository, IListsRepository
         using IDbConnection conn = OpenConnection();
 
         var lists = conn.Query<ToDoList>(@"SELECT l.*
-                                                FROM ""ToDoAssistant.Lists"" AS l
-                                                LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId"" 
-                                                AND s.""UserId"" = @UserId
-                                                AND s.""IsAccepted"" 
-                                                WHERE (l.""UserId"" = @UserId OR s.""UserId"" = @UserId)",
+                                           FROM ""ToDoAssistant.Lists"" AS l
+                                           LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId"" 
+                                           AND s.""UserId"" = @UserId
+                                           AND s.""IsAccepted"" 
+                                           WHERE (l.""UserId"" = @UserId OR s.""UserId"" = @UserId)",
             new { UserId = userId }).ToList();
 
         var listIds = lists.Select(x => x.Id).ToArray();
@@ -110,9 +110,9 @@ public class ListsRepository : BaseRepository, IListsRepository
 
         const string query = @"SELECT l.*, s.""UserId"", s.""IsAdmin"", s.""IsAccepted"", 
                             s.""Order"", s.""NotificationsEnabled"", s.""IsArchived""
-                        FROM ""ToDoAssistant.Lists"" AS l
-                        LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                        WHERE l.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))";
+                            FROM ""ToDoAssistant.Lists"" AS l
+                            LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
+                            WHERE l.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))";
 
         return conn.Query<ToDoList, ListShare, ToDoList>(query,
             (list, share) =>

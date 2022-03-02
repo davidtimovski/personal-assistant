@@ -282,38 +282,40 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        var userHasIngredients = conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.Ingredients"" WHERE ""UserId"" = @UserId",
-            new { UserId = userId });
+        var userThatsImportingHasIngredients = conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.Ingredients"" WHERE ""UserId"" = @UserId", new { UserId = userId });
 
-        var recipeHasIngredients = conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.RecipesIngredients"" WHERE ""RecipeId"" = @RecipeId",
-            new { RecipeId = id });
+        var recipeHasCustomIngredients = conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
+                                                                    FROM ""CookingAssistant.RecipesIngredients"" AS ri
+                                                                    INNER JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
+                                                                    WHERE ""RecipeId"" = @RecipeId AND ""UserId"" != 1", new { RecipeId = id });
 
-        return userHasIngredients && recipeHasIngredients;
+        return userThatsImportingHasIngredients && recipeHasCustomIngredients;
     }
 
     public Recipe GetForReview(int id)
     {
         using IDbConnection conn = OpenConnection();
 
-        var recipe = conn.QueryFirstOrDefault<Recipe>(@"SELECT ""Id"", ""UserId"", ""Name"", ""Description"", ""ImageUri"" FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @Id",
-            new { Id = id });
+        var recipe = conn.QueryFirstOrDefault<Recipe>(@"SELECT ""Id"", ""UserId"", ""Name"", ""Description"", ""ImageUri"" FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @Id", new { Id = id });
 
-        if (recipe != null)
+        if (recipe == null)
         {
-            const string recipeIngredientsSql = @"SELECT ri.""IngredientId"", i.*
-                                                  FROM ""CookingAssistant.RecipesIngredients"" AS ri
-                                                  INNER JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
-                                                  WHERE ri.""RecipeId"" = @RecipeId";
-
-            var recipeIngredients = conn.Query<RecipeIngredient, Ingredient, RecipeIngredient>(recipeIngredientsSql,
-                (recipeIngredient, ingredient) =>
-                {
-                    recipeIngredient.Ingredient = ingredient;
-                    return recipeIngredient;
-                }, new { RecipeId = id, recipe.UserId }, null, true, "Id,Id");
-
-            recipe.RecipeIngredients.AddRange(recipeIngredients);
+            return null;
         }
+
+        const string recipeIngredientsSql = @"SELECT ri.""IngredientId"", i.*
+                                              FROM ""CookingAssistant.RecipesIngredients"" AS ri
+                                              INNER JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
+                                              WHERE ri.""RecipeId"" = @RecipeId AND i.""UserId"" = @UserId";
+
+        var recipeIngredients = conn.Query<RecipeIngredient, Ingredient, RecipeIngredient>(recipeIngredientsSql,
+            (recipeIngredient, ingredient) =>
+            {
+                recipeIngredient.Ingredient = ingredient;
+                return recipeIngredient;
+            }, new { RecipeId = id, recipe.UserId });
+
+        recipe.RecipeIngredients.AddRange(recipeIngredients);
 
         return recipe;
     }
@@ -780,7 +782,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         await conn.ExecuteAsync(@"DELETE FROM ""CookingAssistant.SendRequests"" WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @UserId",
             new { RecipeId = id, UserId = userId }, transaction);
 
-        transaction.Commit();
+        //transaction.Commit();
 
         return createdRecipeId;
     }

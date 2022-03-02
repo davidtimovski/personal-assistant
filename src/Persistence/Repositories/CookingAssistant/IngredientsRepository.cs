@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,20 +15,35 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
     public IngredientsRepository(PersonalAssistantContext efContext)
         : base(efContext) { }
 
-    public IEnumerable<Ingredient> GetAll(int userId)
+    public IEnumerable<Ingredient> GetUserAndUsedPublicIngredients(int userId)
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.Query<Ingredient>(@"SELECT i.*, it.""TaskId"", COUNT(ri) AS ""RecipeCount""
-                                        FROM ""CookingAssistant.Ingredients"" AS i
-                                        LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
-                                        LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
-                                        WHERE i.""UserId"" = @UserId
-                                        GROUP BY i.""Id"", it.""TaskId""
-                                        ORDER BY i.""ModifiedDate"" DESC, i.""Name""", new { UserId = userId });
+        return conn.Query<Ingredient>(@"SELECT * FROM (
+	                                        SELECT i.*, it.""TaskId"", COUNT(ri) AS ""RecipeCount""
+	                                        FROM ""CookingAssistant.Ingredients"" AS i
+	                                        LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
+	                                        LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
+	                                        WHERE i.""UserId"" = @UserId
+	                                        GROUP BY i.""Id"", it.""TaskId""
+	                                        UNION ALL
+	                                        SELECT i.*, it.""TaskId"", COUNT(ri) AS ""RecipeCount""
+	                                        FROM ""CookingAssistant.Ingredients"" AS i
+	                                        INNER JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
+	                                        LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
+	                                        WHERE i.""UserId"" = 1
+	                                        GROUP BY i.""Id"", it.""TaskId""
+                                        ) t
+                                        ORDER BY t.""ModifiedDate"" DESC, t.""Name""", new { UserId = userId });
     }
 
-    public Ingredient Get(int id, int userId)
+    public Ingredient Get(int id)
+    {
+        using IDbConnection conn = OpenConnection();
+        return conn.QueryFirstOrDefault<Ingredient>(@"SELECT * FROM ""CookingAssistant.Ingredients"" WHERE ""Id"" = @Id", new { Id = id });
+    }
+
+    public Ingredient GetForUpdate(int id, int userId)
     {
         using IDbConnection conn = OpenConnection();
 
@@ -68,11 +84,52 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
         return ingredient;
     }
 
-    public IEnumerable<Ingredient> GetSuggestions(int userId)
+    public Ingredient GetPublic(int id, int userId)
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.Query<Ingredient>(@"SELECT ""Id"", ""ParentId"", ""CategoryId"", ""Name"" FROM ""CookingAssistant.Ingredients"" WHERE ""UserId"" = @UserId", new { UserId = userId });
+        var ingredient = conn.QueryFirstOrDefault<Ingredient>(@"SELECT DISTINCT i.*, it.""TaskId""
+                                                                FROM ""CookingAssistant.Ingredients"" AS i
+                                                                LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
+                                                                WHERE i.""Id"" = @Id AND i.""UserId"" = 1", new { Id = id, UserId = userId });
+
+        if (ingredient == null)
+        {
+            return null;
+        }
+
+        if (ingredient.TaskId.HasValue)
+        {
+            const string taskQuery = @"SELECT t.""Id"", t.""Name"", l.""Id"", l.""Name""
+                                       FROM ""ToDoAssistant.Tasks"" AS t
+                                       INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
+                                       WHERE t.""Id"" = @TaskId";
+
+            var task = conn.Query<ToDoTask, ToDoList, ToDoTask>(taskQuery, (task, list) =>
+            {
+                task.List = list;
+                return task;
+            }, new { TaskId = ingredient.TaskId.Value }).First();
+
+            ingredient.Task = task;
+        }
+
+        var recipeNames = conn.Query<string>(@"SELECT ""Name""
+                                               FROM ""CookingAssistant.RecipesIngredients"" AS ri
+                                               LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
+                                               WHERE ri.""IngredientId"" = @IngredientId
+                                               ORDER BY r.""Name""", new { IngredientId = id });
+
+        ingredient.Recipes.AddRange(recipeNames.Select(x => new Recipe { Name = x }));
+
+        return ingredient;
+    }
+
+    public IEnumerable<Ingredient> GetAll(int userId)
+    {
+        using IDbConnection conn = OpenConnection();
+
+        return conn.Query<Ingredient>(@"SELECT * FROM ""CookingAssistant.Ingredients"" WHERE ""UserId"" = @UserId", new { UserId = userId });
     }
 
     public IEnumerable<IngredientCategory> GetIngredientCategories()
@@ -101,17 +158,6 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
                 task.List = list;
                 return task;
             }, new { UserId = userId });
-    }
-
-    public IEnumerable<Ingredient> GetIngredientSuggestions(int userId)
-    {
-        using IDbConnection conn = OpenConnection();
-
-        return conn.Query<Ingredient>(@"SELECT i.*
-                                        FROM ""CookingAssistant.Ingredients"" AS i
-                                        LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
-                                        WHERE i.""UserId"" = @UserId
-                                        ORDER BY i.""Name""", new { UserId = userId });
     }
 
     public bool Exists(int id, int userId)
@@ -182,8 +228,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
                     IngredientId = ingredient.Id,
                     UserId = ingredient.UserId,
                     TaskId = ingredient.TaskId.Value, 
-                    CreatedDate = ingredient.ModifiedDate,
-                    ModifiedDate = ingredient.ModifiedDate
+                    CreatedDate = ingredient.ModifiedDate
                 });
             }
             else if (ingredientTask.TaskId != ingredient.TaskId.Value)
@@ -195,8 +240,43 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
                     IngredientId = ingredient.Id,
                     UserId = ingredient.UserId,
                     TaskId = ingredient.TaskId.Value,
-                    CreatedDate = ingredient.ModifiedDate,
-                    ModifiedDate = ingredient.ModifiedDate
+                    CreatedDate = ingredient.ModifiedDate
+                });
+            }
+        }
+        else if (ingredientTask != null)
+        {
+            EFContext.IngredientsTasks.Remove(ingredientTask);
+        }
+
+        await EFContext.SaveChangesAsync();
+    }
+
+    public async Task UpdatePublicAsync(int id, int? taskId, int userId, DateTime createdDate)
+    {
+        IngredientTask ingredientTask = EFContext.IngredientsTasks.FirstOrDefault(x => x.IngredientId == id && x.UserId == userId);
+        if (taskId.HasValue)
+        {
+            if (ingredientTask == null)
+            {
+                EFContext.IngredientsTasks.Add(new IngredientTask
+                {
+                    IngredientId = id,
+                    UserId = userId,
+                    TaskId = taskId.Value,
+                    CreatedDate = createdDate
+                });
+            }
+            else if (ingredientTask.TaskId != taskId.Value)
+            {
+                EFContext.IngredientsTasks.Remove(ingredientTask);
+
+                EFContext.IngredientsTasks.Add(new IngredientTask
+                {
+                    IngredientId = id,
+                    UserId = userId,
+                    TaskId = taskId.Value,
+                    CreatedDate = createdDate
                 });
             }
         }
@@ -212,6 +292,22 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
     {
         Ingredient ingredient = EFContext.Ingredients.Find(id);
         EFContext.Ingredients.Remove(ingredient);
+
+        await EFContext.SaveChangesAsync();
+    }
+
+    public async Task RemoveFromRecipesAsync(int id, int userId)
+    {
+        int[] userRecipeIds = EFContext.Recipes.Where(x => x.UserId == userId).Select(x => x.Id).ToArray();
+
+        var recipeIngredients = EFContext.RecipesIngredients.Where(x => x.IngredientId == id && userRecipeIds.Contains(x.RecipeId));
+        EFContext.RecipesIngredients.RemoveRange(recipeIngredients);
+
+        IngredientTask ingredientTask = EFContext.IngredientsTasks.FirstOrDefault(x => x.IngredientId == id && x.UserId == userId);
+        if (ingredientTask != null)
+        {
+            EFContext.IngredientsTasks.Remove(ingredientTask);
+        }        
 
         await EFContext.SaveChangesAsync();
     }

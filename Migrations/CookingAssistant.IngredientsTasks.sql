@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS public."CookingAssistant.IngredientsTasks"
 	"UserId" integer NOT NULL,
     "TaskId" integer NOT NULL,
     "CreatedDate" timestamp with time zone NOT NULL,
-    "ModifiedDate" timestamp with time zone NOT NULL,
     CONSTRAINT "PK_CA.IngredientsTasks" PRIMARY KEY ("IngredientId", "UserId"),
 	CONSTRAINT "FK_CA.IngredientsTasks_CA.Ingredients_IngredientId" FOREIGN KEY ("IngredientId")
         REFERENCES public."CookingAssistant.Ingredients" ("Id") MATCH SIMPLE

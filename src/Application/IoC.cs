@@ -53,6 +53,7 @@ public static class IoC
         services.AddTransient<IValidator<CreateSendRequest>, CreateSendRequestValidator>();
         services.AddTransient<IValidator<ImportRecipe>, ImportRecipeValidator>();
         services.AddTransient<IValidator<UpdateIngredient>, UpdateIngredientValidator>();
+        services.AddTransient<IValidator<UpdatePublicIngredient>, UpdatePublicIngredientValidator>();
         services.AddTransient<IValidator<GetRecommendedDailyIntake>, GetRecommendedDailyIntakeValidator>();
         services.AddTransient<IValidator<UpdateDietaryProfile>, UpdateDietaryProfileValidator>();
         services.AddTransient<IValidator<UploadTempImage>, UploadTempImageValidator>();
