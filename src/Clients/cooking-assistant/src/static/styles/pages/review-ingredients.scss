@@ -22,33 +22,23 @@
   }
 }
 .review-ingredient-name {
+  margin-bottom: 25px;
   text-align: center;
-}
-.review-replacement-arrow {
-  margin: 0 8px;
-  font-size: 28px;
-  vertical-align: text-bottom;
-  color: var(--primary-color);
-}
-.review-revert-icon {
-  padding: 6px 6px 6px 3px;
-  font-size: 14px;
-  vertical-align: super;
-  color: var(--primary-color);
 
-  &:hover {
-    color: var(--primary-color-dark);
+  .replacement-name {
+    font-weight: bold;
   }
-}
-.review-search-input {
-  margin-top: 25px;
-}
-.review-suggestion {
-  padding: 9px 6px 0;
-  line-height: 30px;
 
-  a {
-    text-decoration: underline;
+  .review-replacement-arrow {
+    margin: 0 8px;
+    font-size: 28px;
+    vertical-align: text-bottom;
+    color: var(--primary-color);
+  }
+  .review-revert-icon {
+    padding: 6px 6px 6px 3px;
+    font-size: 14px;
+    vertical-align: super;
     color: var(--primary-color);
 
     &:hover {

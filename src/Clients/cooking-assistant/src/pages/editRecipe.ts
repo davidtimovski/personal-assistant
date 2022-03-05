@@ -14,6 +14,7 @@ import { IngredientPickerEvents, IngredientSuggestion } from "models/viewmodels/
 import { EditRecipeModel } from "models/viewmodels/editRecipeModel";
 import { EditRecipeIngredient } from "models/viewmodels/editRecipeIngredient";
 import * as Actions from "utils/state/actions";
+import { PreferencesModel } from "models/preferencesModel";
 
 @inject(Router, RecipesService, UsersService, ValidationController, I18N, EventAggregator)
 export class EditRecipe {
@@ -40,9 +41,9 @@ export class EditRecipe {
   private leaveButtonIsLoading = false;
   private videoIFrame: HTMLIFrameElement;
   private videoIFrameSrc = "";
-  private addIngredientsInput: HTMLInputElement;
   private addIngredientsInputPlaceholder: string;
   private measuringUnits: string[];
+  private imperialSystem: boolean;
 
   constructor(
     private readonly router: Router,
@@ -72,9 +73,8 @@ export class EditRecipe {
     });
 
     this.eventAggregator.subscribe(IngredientPickerEvents.Selected, (ingredient: IngredientSuggestion) => {
-      this.model.ingredients.push(
-        new EditRecipeIngredient(ingredient.id, ingredient.name, null, ingredient.unit, false)
-      );
+      const unit = this.imperialSystem ? ingredient.unitImperial : ingredient.unit;
+      this.model.ingredients.push(new EditRecipeIngredient(ingredient.id, ingredient.name, null, unit, false));
     });
   }
 
@@ -112,7 +112,32 @@ export class EditRecipe {
       .required()
       .on(this.model);
 
-    this.getMeasuringUnits().then((measuringUnits: string[]) => {
+    this.usersService.getPreferences().then((preferences: PreferencesModel) => {
+      this.imperialSystem = preferences.imperialSystem;
+
+      const measuringUnits = preferences.imperialSystem
+        ? [null, "oz", "cup", "tbsp", "tsp", "pinch"]
+        : [null, "g", "ml", "tbsp", "tsp", "pinch"];
+
+      if (!this.isNewRecipe) {
+        const metricUnits = ["g", "ml"];
+        const imperialUnits = ["oz", "cup"];
+
+        if (preferences.imperialSystem) {
+          const hasMetricUnitIngredients =
+            this.model.ingredients.filter((x) => metricUnits.includes(x.unit)).length > 0;
+          if (hasMetricUnitIngredients) {
+            measuringUnits.push(...metricUnits);
+          }
+        } else {
+          const hasImperialUnitIngredients =
+            this.model.ingredients.filter((x) => imperialUnits.includes(x.unit)).length > 0;
+          if (hasImperialUnitIngredients) {
+            measuringUnits.push(...imperialUnits);
+          }
+        }
+      }
+
       this.measuringUnits = measuringUnits;
     });
   }
@@ -375,32 +400,5 @@ export class EditRecipe {
     }
     this.deleteButtonText = this.i18n.tr("delete");
     this.confirmationInProgress = false;
-  }
-
-  async getMeasuringUnits(): Promise<Array<string>> {
-    const preferences = await this.usersService.getPreferences();
-    const measuringUnits = preferences.imperialSystem
-      ? [null, "oz", "cup", "tbsp", "tsp", "pinch"]
-      : [null, "g", "ml", "tbsp", "tsp", "pinch"];
-
-    if (!this.isNewRecipe) {
-      const metricUnits = ["g", "ml"];
-      const imperialUnits = ["oz", "cup"];
-
-      if (preferences.imperialSystem) {
-        const hasMetricUnitIngredients = this.model.ingredients.filter((x) => metricUnits.includes(x.unit)).length > 0;
-        if (hasMetricUnitIngredients) {
-          measuringUnits.push(...metricUnits);
-        }
-      } else {
-        const hasImperialUnitIngredients =
-          this.model.ingredients.filter((x) => imperialUnits.includes(x.unit)).length > 0;
-        if (hasImperialUnitIngredients) {
-          measuringUnits.push(...imperialUnits);
-        }
-      }
-    }
-
-    return measuringUnits;
   }
 }

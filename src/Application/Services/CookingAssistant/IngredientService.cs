@@ -54,38 +54,51 @@ public class IngredientService : IIngredientService
 
     public IEnumerable<IngredientSuggestion> GetUserSuggestions(int userId)
     {
-        IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetAll(userId);
-        return ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x));
+        IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetForSuggestions(userId);
+
+        var suggestions = ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x)).ToList();
+
+        // Derive units
+        var recipeIngredientsLookup = ingredients.ToDictionary(x => x.Id, x => x.RecipesIngredients);
+        foreach (var suggestion in suggestions)
+        {
+            DeriveAndSetUnit(suggestion, recipeIngredientsLookup[suggestion.Id]);
+        }
+
+        return suggestions;
     }
 
     public PublicIngredientSuggestions GetPublicSuggestions()
     {
         var result = new PublicIngredientSuggestions();
 
-        IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetAll(1);
+        IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetForSuggestions(1);
         IEnumerable<IngredientCategory> categories = _ingredientsRepository.GetIngredientCategories();
 
-        List<IngredientSuggestion> publicSuggestions = ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x)).ToList();
-        
-        // Create public ingredient hierarchy
-        foreach (var ingredient in publicSuggestions)
+        List<IngredientSuggestion> suggestions = ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x)).ToList();
+
+        // Create public ingredient hierarchy, derive units
+        var recipeIngredientsLookup = ingredients.ToDictionary(x => x.Id, x => x.RecipesIngredients);
+        foreach (var suggestion in suggestions)
         {
-            ingredient.Children = publicSuggestions.Where(x => x.ParentId == ingredient.Id).ToList();
+            suggestion.Children = suggestions.Where(x => x.ParentId == suggestion.Id).ToList();
+
+            DeriveAndSetUnit(suggestion, recipeIngredientsLookup[suggestion.Id]);
         }
 
-        result.Uncategorized = publicSuggestions.Where(x => !x.CategoryId.HasValue && !x.ParentId.HasValue).ToList();
+        result.Uncategorized = suggestions.Where(x => !x.CategoryId.HasValue && !x.ParentId.HasValue).ToList();
 
-        var categorizedPublicSuggestions = publicSuggestions.Where(x => x.CategoryId.HasValue);
+        var categorizedPublicSuggestions = suggestions.Where(x => x.CategoryId.HasValue);
         result.Categories = categories.Select(x => _mapper.Map<IngredientCategoryDto>(x)).ToList();
 
         foreach (var category in result.Categories)
         {
-            category.Ingredients = publicSuggestions.Where(x => x.CategoryId == category.Id && !x.ParentId.HasValue).ToList();
+            category.Ingredients = suggestions.Where(x => x.CategoryId == category.Id && !x.ParentId.HasValue).ToList();
             category.Subcategories = result.Categories.Where(x => x.ParentId == category.Id).ToList();
 
             foreach (var subcategory in category.Subcategories)
             {
-                subcategory.Ingredients = publicSuggestions.Where(x => x.CategoryId == category.Id && !x.ParentId.HasValue).ToList();
+                subcategory.Ingredients = suggestions.Where(x => x.CategoryId == category.Id && !x.ParentId.HasValue).ToList();
             }
         }
         result.Categories.RemoveAll(x => x.ParentId.HasValue);
@@ -145,6 +158,38 @@ public class IngredientService : IIngredientService
         else if (ingredient.UserId == userId)
         {
             await _ingredientsRepository.DeleteAsync(id);
+        }
+    }
+
+    private static void DeriveAndSetUnit(IngredientSuggestion suggestion, List<RecipeIngredient> recipesIngredients)
+    {
+        if (!recipesIngredients.Any())
+        {
+            return;
+        }
+
+        var metricUnits = new string[] { "g", "ml", "tbsp", "tsp", "pinch" };
+        var metric = recipesIngredients.Where(x => metricUnits.Contains(x.Unit)).ToList();
+        if (metric.Any())
+        {
+            var metricGrouped = metric.GroupBy(x => x.Unit);
+            if (metricGrouped.Count() > 1)
+            {
+                metricGrouped = metricGrouped.OrderByDescending(x => x.Count());
+            }
+            suggestion.Unit = metricGrouped.First().Key;
+        }
+
+        var imperialUnits = new string[] { "oz", "cup", "tbsp", "tsp", "pinch" };
+        var imperial = recipesIngredients.Where(x => imperialUnits.Contains(x.Unit)).ToList();
+        if (imperial.Any())
+        {
+            var imperialGrouped = imperial.GroupBy(x => x.Unit);
+            if (imperialGrouped.Count() > 1)
+            {
+                imperialGrouped = imperialGrouped.OrderByDescending(x => x.Count());
+            }
+            suggestion.UnitImperial = imperialGrouped.First().Key;
         }
     }
 

@@ -5,6 +5,7 @@ export class ReviewIngredient {
   hasPriceData: boolean;
   replacementId: number;
   replacementName: string;
+  replacementIsPublic: boolean;
   transferNutritionData: boolean;
   transferPriceData: boolean;
 }

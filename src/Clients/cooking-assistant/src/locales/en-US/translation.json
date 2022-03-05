@@ -55,6 +55,7 @@
   "magnesiumBetween": "Magnesium must be between {{from}} and {{to}} milligrams",
   "decreaseServings": "Decrease servings",
   "increaseServings": "Increase servings",
+  "addIngredient": "Add ingredient",
   "recipes": {
     "menu": "Menu",
     "refresh": "Refresh",
@@ -94,7 +95,6 @@
     "youTubeUrl": "YouTube URL",
     "ingredients": "Ingredients",
     "ingredient": "Ingredient",
-    "addIngredient": "Add ingredient",
     "amount": "Amount",
     "toggleUnitOfMeasure": "Toggle unit of measure",
     "removeIngredient": "Remove ingredient",
@@ -257,7 +257,7 @@
     "introductoryLabel": "This recipe has one custom ingredient. Let's see if you already have it in your inventory.",
     "introductoryLabelPlural": "This recipe has {{ingredients}} custom ingredients. Let's review them and see if you have equivalent ones in your inventory.",
     "cancelIngredientReplacement": "Cancel ingredient replacement",
-    "searchInventory": "Search inventory",
+    "search": "Search",
     "suggestion": "Suggestion:",
     "transferNutritionData": "Transfer nutrition data",
     "transferPriceData": "Transfer price data",
@@ -309,7 +309,7 @@
     "reviewIngredients": {
       "title": "Review ingredients",
       "question": "Why should I review custom ingredients?",
-      "answer": "You might have equivalent personal ingredients or they might match up with public ones. Reviewing a recipe's custom ingredients allows you to choose how they match up so you don't end up with duplicates. If you don't find any equivalent ingredients don't worry, they will just copy over."
+      "answer": "When you аccept a sent recipe it is imported and if it has custom ingredients they copy over. Reviewing them allows you to swap them out with your personal equivalent ones or public ingredients. This way you avoid ending up with duplicates. If you don't find any equivalent ingredients don't worry, they will just copy over."
     },
     "shareRequests": {
       "title": "Share requests",

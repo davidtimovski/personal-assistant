@@ -163,8 +163,7 @@
   }
 }
 
-.data-size input,
-.data-table-form input {
+.data-size input {
   width: 60px;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
@@ -199,16 +198,11 @@
   tbody tr td {
     padding: 4px 15px;
     vertical-align: middle;
-    line-height: 23px;
+    line-height: 37px;
   }
 
-  .input-wrap {
-    display: flex;
-    justify-content: end;
-  }
-
-  input.price-input {
-    width: 75px;
+  tbody tr td:nth-child(2) {
+    text-align: right;
   }
 }
 
@@ -238,8 +232,7 @@
 }
 
 @media screen and (max-width: 600px) {
-  .data-size input,
-  .data-table-form input {
+  .data-size ::-webkit-inner-spin-button {
     width: 40px;
   }
   .data-size-selectors {

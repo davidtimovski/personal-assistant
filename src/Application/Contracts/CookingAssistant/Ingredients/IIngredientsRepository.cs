@@ -12,7 +12,7 @@ public interface IIngredientsRepository
     Ingredient Get(int id);
     Ingredient GetForUpdate(int id, int userId);
     Ingredient GetPublic(int id, int userId);
-    IEnumerable<Ingredient> GetAll(int userId);
+    IEnumerable<Ingredient> GetForSuggestions(int userId);
     IEnumerable<IngredientCategory> GetIngredientCategories();
     IEnumerable<ToDoTask> GetTaskSuggestions(int userId);
     bool Exists(int id, int userId);

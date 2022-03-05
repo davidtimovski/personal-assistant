@@ -24,18 +24,29 @@ export class Recipe {
   private nutritionInfoVisible = false;
   private costInfoVisible = false;
   private currency: string;
+  private wakeLockSupported: boolean;
+  private wakeLock: any;
 
   constructor(
     private readonly router: Router,
     private readonly i18n: I18N,
     private readonly recipesService: RecipesService,
     private readonly localStorage: LocalStorageCurrencies
-  ) {}
+  ) {
+    this.wakeLockSupported = "wakeLock" in navigator;
+  }
 
   activate(params: any) {
     this.recipeId = parseInt(params.id, 10);
 
     this.currency = this.localStorage.getCurrency();
+  }
+
+  deactivate() {
+    if (this.wakeLockSupported && this.wakeLock) {
+      this.wakeLock.release();
+      this.wakeLock = null;
+    }
   }
 
   async attached() {
@@ -61,6 +72,12 @@ export class Recipe {
       this.copyButton.addEventListener("click", () => {
         this.copyAsText();
       });
+
+      if (this.wakeLockSupported) {
+        (<any>navigator).wakeLock.request("screen").then((wakeLock) => {
+          this.wakeLock = wakeLock;
+        });
+      }
     }
   }
 

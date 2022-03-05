@@ -124,7 +124,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         {
             recipe.Shares = conn.Query<RecipeShare>(@"SELECT * FROM ""CookingAssistant.Shares"" WHERE ""RecipeId"" = @Id", new { Id = id }).ToList();
 
-            const string recipeIngredientsSql = @"SELECT ri.""Amount"", ri.""Unit"", i.""Id"", i.""Name"", it.""TaskId"", t.""Id"", l.""Id"", l.""Name""
+            const string recipeIngredientsSql = @"SELECT ri.""Amount"", ri.""Unit"", i.""Id"", i.""UserId"", i.""Name"", it.""TaskId"", l.""Id"", l.""Name""
                                                   FROM ""CookingAssistant.RecipesIngredients"" AS ri
                                                   INNER JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
                                                   LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
@@ -132,13 +132,9 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                                                   LEFT JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
                                                   WHERE ri.""RecipeId"" = @RecipeId";
 
-            var recipeIngredients = conn.Query<RecipeIngredient, Ingredient, ToDoTask, ToDoList, RecipeIngredient>(recipeIngredientsSql,
-                (recipeIngredient, ingredient, task, list) =>
+            var recipeIngredients = conn.Query<RecipeIngredient, Ingredient, ToDoList, RecipeIngredient>(recipeIngredientsSql,
+                (recipeIngredient, ingredient, list) =>
                 {
-                    if (task != null)
-                    {
-                        ingredient.Name = task.Name;
-                    }
                     if (list != null)
                     {
                         ingredient.Task = new ToDoTask
@@ -148,7 +144,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                     }
                     recipeIngredient.Ingredient = ingredient;
                     return recipeIngredient;
-                }, new { RecipeId = id, UserId = userId }, null, true, "Id,Id,Id");
+                }, new { RecipeId = id, UserId = userId }, null, true, "Id,Id");
 
             recipe.RecipeIngredients.AddRange(recipeIngredients);
         }
@@ -676,115 +672,131 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
     {
         var now = DateTime.UtcNow;
 
-        using IDbConnection conn = OpenConnection();
-        var transaction = conn.BeginTransaction();
+        var recipeToImport = EFContext.Recipes.Find(id);
 
-        var recipe = await conn.QueryFirstOrDefaultAsync<Recipe>(@"SELECT * FROM ""CookingAssistant.Recipes"" WHERE ""Id"" = @Id", new { Id = id });
-        int recipeOwnerUserId = recipe.UserId;
-
-        recipe.Name = CreatePostfixedNameIfDuplicate("Recipes", recipe.Name, userId);
-        recipe.UserId = userId;
-        recipe.ImageUri = imageUri;
-        recipe.CreatedDate = recipe.ModifiedDate = recipe.LastOpenedDate = now;
-
-        var createdRecipeId = (await conn.QueryAsync<int>(@"INSERT INTO ""CookingAssistant.Recipes"" (""UserId"", ""Name"", ""Description"", ""Instructions"", ""PrepDuration"", ""CookDuration"", ""Servings"", ""ImageUri"", ""VideoUrl"", ""LastOpenedDate"", ""CreatedDate"", ""ModifiedDate"") 
-                                                            VALUES (@UserId, @Name, @Description, @Instructions, @PrepDuration, @CookDuration, @Servings, @ImageUri, @VideoUrl, @LastOpenedDate, @CreatedDate, @ModifiedDate) returning ""Id""", recipe, transaction)).Single();
-
-        const string recipeIngredientsSql = @"SELECT ri.*, i.*, it.""TaskId"", t.""Name"" 
-                                              FROM ""CookingAssistant.RecipesIngredients"" AS ri
-                                              INNER JOIN ""CookingAssistant.Ingredients"" AS i ON i.""Id"" = ri.""IngredientId""
-                                              LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
-                                              LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON it.""TaskId"" = t.""Id""
-                                              WHERE ""RecipeId"" = @RecipeId";
-
-        var recipeIngredients = (await conn.QueryAsync<RecipeIngredient, Ingredient, ToDoTask, RecipeIngredient>(recipeIngredientsSql,
-            (recipeIngredient, ingredient, task) =>
-            {
-                ingredient.Task = task;
-                recipeIngredient.Ingredient = ingredient;
-                return recipeIngredient;
-            }, new { RecipeId = id, UserId = recipeOwnerUserId }, null, true, "Id,Name")).ToList();
-
-        recipeIngredients.ForEach(recipeIngredient =>
+        var recipe = new Recipe
         {
-            recipeIngredient.RecipeId = createdRecipeId;
-        });
+            UserId = userId,
+            Name = CreatePostfixedNameIfDuplicate("Recipes", recipeToImport.Name, userId),
+            Description = recipeToImport.Description,
+            Instructions = recipeToImport.Instructions,
+            PrepDuration = recipeToImport.PrepDuration,
+            CookDuration = recipeToImport.CookDuration,
+            Servings = recipeToImport.Servings,
+            ImageUri = imageUri,
+            VideoUrl = recipeToImport.VideoUrl,
+            LastOpenedDate = now,
+            CreatedDate = now,
+            ModifiedDate = now
+        };
 
-        foreach (var (Id, ReplacementId, TransferNutritionData, TransferPriceData) in ingredientReplacements)
+        recipe.RecipeIngredients.AddRange(EFContext.RecipesIngredients.Where(x => x.RecipeId == id).Select(x => new RecipeIngredient
         {
-            RecipeIngredient recipeIngredient = recipeIngredients.FirstOrDefault(x => x.IngredientId == Id);
-            recipeIngredient.IngredientId = recipeIngredient.Ingredient.Id = ReplacementId;
+            IngredientId = x.IngredientId,
+            Amount = x.Amount,
+            Unit = x.Unit,
+            CreatedDate = now,
+            ModifiedDate = now
+        }));
 
-            if (TransferNutritionData || TransferPriceData)
+        foreach (var recipeIngredient in recipe.RecipeIngredients)
+        {
+            var replacement = ingredientReplacements.FirstOrDefault(x => x.Id == recipeIngredient.IngredientId);
+            if (replacement == default)
             {
-                string nutritionDataQuery = string.Empty, priceDataQuery = string.Empty;
-
-                if (TransferNutritionData)
+                var original = EFContext.Ingredients.Find(recipeIngredient.IngredientId);
+                if (original.UserId == 1)
                 {
-                    nutritionDataQuery = @"""ServingSize"" = @ServingSize, ""ServingSizeIsOneUnit"" = @ServingSizeIsOneUnit, 
-                                           ""Calories"" = @Calories, ""Fat"" = @Fat, ""SaturatedFat"" = @SaturatedFat, 
-                                           ""Carbohydrate"" = @Carbohydrate, ""Sugars"" = @Sugars, ""AddedSugars"" = @AddedSugars, 
-                                           ""Fiber"" = @Fiber, ""Protein"" = @Protein, ""Sodium"" = @Sodium, ""Cholesterol"" = @Cholesterol, 
-                                           ""VitaminA"" = @VitaminA, ""VitaminC"" = @VitaminC, ""VitaminD"" = @VitaminD, 
-                                           ""Calcium"" = @Calcium, ""Iron"" = @Iron, ""Potassium"" = @Potassium, ""Magnesium"" = @Magnesium,";
+                    recipeIngredient.Ingredient = original;
+                    continue;
                 }
 
-                if (TransferPriceData)
+                recipeIngredient.Ingredient = new Ingredient
                 {
-                    priceDataQuery = @"""ProductSize"" = @ProductSize, ""ProductSizeIsOneUnit"" = @ProductSizeIsOneUnit, ""Price"" = @Price, ""Currency"" = @Currency,";
+                    UserId = userId,
+                    Name = CreatePostfixedNameIfDuplicate("Ingredients", original.Name, userId),
+                    ServingSize = original.ServingSize,
+                    ServingSizeIsOneUnit = original.ServingSizeIsOneUnit,
+                    Calories = original.Calories,
+                    Fat = original.Fat,
+                    SaturatedFat = original.SaturatedFat,
+                    Carbohydrate = original.Carbohydrate,
+                    Sugars = original.Sugars,
+                    AddedSugars = original.AddedSugars,
+                    Fiber = original.Fiber,
+                    Protein = original.Protein,
+                    Sodium = original.Sodium,
+                    Cholesterol = original.Cholesterol,
+                    VitaminA = original.VitaminA,
+                    VitaminC = original.VitaminC,
+                    VitaminD = original.VitaminD,
+                    Calcium = original.Calcium,
+                    Iron = original.Iron,
+                    Potassium = original.Potassium,
+                    Magnesium = original.Magnesium,
+                    ProductSize = original.ProductSize,
+                    ProductSizeIsOneUnit = original.ProductSizeIsOneUnit,
+                    Price = original.Price,
+                    Currency = original.Currency,
+                    CreatedDate = now,
+                    ModifiedDate = now
+                };
+            }
+            else
+            {
+                recipeIngredient.IngredientId = replacement.ReplacementId;
+                recipeIngredient.Ingredient = EFContext.Ingredients.Find(replacement.ReplacementId);
+                if (recipeIngredient.Ingredient.UserId == 1)
+                {
+                    continue;
                 }
 
-                recipeIngredient.Ingredient.ModifiedDate = now;
+                if (replacement.TransferNutritionData || replacement.TransferPriceData)
+                {
+                    var original = EFContext.Ingredients.Find(recipeIngredient.IngredientId);
 
-                await conn.ExecuteAsync($@"UPDATE ""CookingAssistant.Ingredients"" SET 
-                                               {nutritionDataQuery}
-                                               {priceDataQuery}
-                                               ""ModifiedDate"" = @ModifiedDate
-                                               WHERE ""Id"" = @Id", recipeIngredient.Ingredient, transaction);
+                    if (replacement.TransferNutritionData)
+                    {
+                        recipeIngredient.Ingredient.ServingSize = original.ServingSize;
+                        recipeIngredient.Ingredient.ServingSizeIsOneUnit = original.ServingSizeIsOneUnit;
+                        recipeIngredient.Ingredient.Calories = original.Calories;
+                        recipeIngredient.Ingredient.Fat = original.Fat;
+                        recipeIngredient.Ingredient.SaturatedFat = original.SaturatedFat;
+                        recipeIngredient.Ingredient.Carbohydrate = original.Carbohydrate;
+                        recipeIngredient.Ingredient.Sugars = original.Sugars;
+                        recipeIngredient.Ingredient.AddedSugars = original.AddedSugars;
+                        recipeIngredient.Ingredient.Fiber = original.Fiber;
+                        recipeIngredient.Ingredient.Protein = original.Protein;
+                        recipeIngredient.Ingredient.Sodium = original.Sodium;
+                        recipeIngredient.Ingredient.Cholesterol = original.Cholesterol;
+                        recipeIngredient.Ingredient.VitaminA = original.VitaminA;
+                        recipeIngredient.Ingredient.VitaminC = original.VitaminC;
+                        recipeIngredient.Ingredient.VitaminD = original.VitaminD;
+                        recipeIngredient.Ingredient.Calcium = original.Calcium;
+                        recipeIngredient.Ingredient.Iron = original.Iron;
+                        recipeIngredient.Ingredient.Potassium = original.Potassium;
+                        recipeIngredient.Ingredient.Magnesium = original.Magnesium;
+                    }
+
+                    if (replacement.TransferPriceData)
+                    {
+                        recipeIngredient.Ingredient.ProductSize = original.ProductSize;
+                        recipeIngredient.Ingredient.ProductSizeIsOneUnit = original.ProductSizeIsOneUnit;
+                        recipeIngredient.Ingredient.Price = original.Price;
+                        recipeIngredient.Ingredient.Currency = original.Currency;
+                    }
+                }
             }
-
-            recipeIngredient.Ingredient = null;
         }
 
-        RecipeIngredient[] toCreate = recipeIngredients.Where(x => x.Ingredient != null).ToArray();
-        foreach (RecipeIngredient recipeIngredient in toCreate)
-        {
-            if (recipeIngredient.Ingredient.TaskId.HasValue)
-            {
-                recipeIngredient.Ingredient.Name = recipeIngredient.Ingredient.Task.Name;
-                recipeIngredient.Ingredient.TaskId = null;
-            }
+        EFContext.Recipes.Add(recipe);
 
-            recipeIngredient.Ingredient.Name = CreatePostfixedNameIfDuplicate("Ingredients", recipeIngredient.Ingredient.Name, userId);
-            recipeIngredient.Ingredient.UserId = userId;
-            recipeIngredient.Ingredient.CreatedDate = recipeIngredient.Ingredient.ModifiedDate = now;
-            var ingredientId = (await conn.QueryAsync<int>(@"INSERT INTO ""CookingAssistant.Ingredients"" (""UserId"", ""Name"", 
-                                                                ""ServingSize"", ""ServingSizeIsOneUnit"", ""Calories"", ""Fat"", ""SaturatedFat"", 
-                                                                ""Carbohydrate"", ""Sugars"", ""AddedSugars"", ""Fiber"", ""Protein"",                         
-                                                                ""Sodium"", ""Cholesterol"", ""VitaminA"", ""VitaminC"", ""VitaminD"",
-                                                                ""Calcium"", ""Iron"", ""Potassium"", ""Magnesium"", 
-                                                                ""ProductSize"", ""ProductSizeIsOneUnit"", ""Price"",
-                                                                ""Currency"", ""CreatedDate"", ""ModifiedDate"")
-                                                                VALUES (@UserId, @Name, @ServingSize, @ServingSizeIsOneUnit, 
-                                                                @Calories, @Fat, @SaturatedFat, @Carbohydrate, @Sugars, @AddedSugars,
-                                                                @Fiber, @Protein, @Sodium, @Cholesterol, @VitaminA, @VitaminC, @VitaminD, @Calcium,
-                                                                @Iron, @Potassium, @Magnesium, @ProductSize, @ProductSizeIsOneUnit, 
-                                                                @Price, @Currency, @CreatedDate, @ModifiedDate) returning ""Id""",
-                recipeIngredient.Ingredient, transaction)).Single();
+        var sendRequest = EFContext.SendRequests.First(x => x.RecipeId == id && x.UserId == userId);
+        EFContext.SendRequests.Remove(sendRequest);
 
-            recipeIngredient.IngredientId = ingredientId;
-            recipeIngredient.CreatedDate = recipeIngredient.ModifiedDate = now;
-        }
+        await EFContext.SaveChangesAsync();
 
-        await conn.ExecuteAsync(@"INSERT INTO ""CookingAssistant.RecipesIngredients"" (""RecipeId"", ""IngredientId"", ""Amount"", ""Unit"", ""CreatedDate"", ""ModifiedDate"")
-                                  VALUES (@RecipeId, @IngredientId, @Amount, @Unit, @CreatedDate, @ModifiedDate)", recipeIngredients, transaction);
-
-        await conn.ExecuteAsync(@"DELETE FROM ""CookingAssistant.SendRequests"" WHERE ""RecipeId"" = @RecipeId AND ""UserId"" = @UserId",
-            new { RecipeId = id, UserId = userId }, transaction);
-
-        //transaction.Commit();
-
-        return createdRecipeId;
+        return recipe.Id;
     }
 
     private string CreatePostfixedNameIfDuplicate(string table, string name, int userId)

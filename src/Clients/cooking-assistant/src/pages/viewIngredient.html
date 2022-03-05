@@ -1,5 +1,6 @@
 <template>
   <require from="../static/styles/pages/view-ingredient.scss"></require>
+  <require from="./../resources/value-converters/number-format"></require>
 
   <div class="container">
     <div class="au-animate animate-fade-in animate-fade-out">
@@ -7,7 +8,10 @@
         <div class="side inactive">
           <i class="fas fa-carrot"></i>
         </div>
-        <div class="page-title">${model.name}</div>
+        <div class="page-title">
+          <span if.bind="model.brandName">(${model.brandName}) ${model.name}</span>
+          <span else>${model.name}</span>
+        </div>
         <a route-href="route: ingredients" class="back-button">
           <i class="fas fa-times"></i>
         </a>
@@ -92,155 +96,120 @@
                         <tr>
                           <td t="calories">Calories</td>
                           <td>
-                            <div class="input-wrap">
-                              <input type="number" value.bind="model.nutritionData.calories" readonly />
-                              <div class="unit-input-addon">kcal</div>
-                            </div>
+                            <span if.bind="model.nutritionData.calories">${model.nutritionData.calories | numberFormat} kcal</span>
+                            <span else>-</span>
                           </td>
                         </tr>
                         <tr>
                           <td t="fat">Fat</td>
                           <td>
-                            <div class="input-wrap">
-                              <input type="number" value.bind="model.nutritionData.fat" readonly />
-                              <div class="unit-input-addon">g</div>
-                            </div>
+                            <span if.bind="model.nutritionData.calories">${model.nutritionData.fat | numberFormat} g</span>
+                            <span else>-</span>
                           </td>
                         </tr>
                         <tr>
                           <td t="saturatedFat">Saturated fat</td>
                           <td>
-                            <div class="input-wrap">
-                              <input type="number" value.bind="model.nutritionData.saturatedFat" readonly />
-                              <div class="unit-input-addon">g</div>
-                            </div>
+                            <span if.bind="model.nutritionData.calories">${model.nutritionData.saturatedFat | numberFormat} g</span>
+                            <span else>-</span>
                           </td>
                         </tr>
                         <tr>
                           <td t="carbohydrate">Carbohydrate</td>
                           <td>
-                            <div class="input-wrap">
-                              <input type="number" value.bind="model.nutritionData.carbohydrate" readonly />
-                              <div class="unit-input-addon">g</div>
-                            </div>
+                            <span if.bind="model.nutritionData.calories">${model.nutritionData.carbohydrate | numberFormat} g</span>
+                            <span else>-</span>
                           </td>
                         </tr>
                         <tr>
                           <td t="sugars">Sugars</td>
                           <td>
-                            <div class="input-wrap">
-                              <input type="number" value.bind="model.nutritionData.sugars" readonly />
-                              <div class="unit-input-addon">g</div>
-                            </div>
+                            <span if.bind="model.nutritionData.calories">${model.nutritionData.sugars | numberFormat} g</span>
+                            <span else>-</span>
                           </td>
                         </tr>
                         <tr>
                           <td t="addedSugars">Added sugars</td>
                           <td>
-                            <div class="input-wrap">
-                              <input type="number" value.bind="model.nutritionData.addedSugars" readonly />
-                              <div class="unit-input-addon">g</div>
-                            </div>
+                            <span if.bind="model.nutritionData.calories">${model.nutritionData.addedSugars | numberFormat} g</span>
+                            <span else>-</span>
                           </td>
                         </tr>
                         <tr>
                           <td t="fiber">Fiber</td>
                           <td>
-                            <div class="input-wrap">
-                              <input type="number" value.bind="model.nutritionData.fiber" readonly />
-                              <div class="unit-input-addon">g</div>
-                            </div>
+                            <span if.bind="model.nutritionData.calories">${model.nutritionData.fiber | numberFormat} g</span>
+                            <span else>-</span>
                           </td>
                         </tr>
-
                         <tr>
                           <td t="protein">Protein</td>
                           <td>
-                            <div class="input-wrap">
-                              <input type="number" value.bind="model.nutritionData.protein" readonly />
-                              <div class="unit-input-addon">g</div>
-                            </div>
+                            <span if.bind="model.nutritionData.calories">${model.nutritionData.protein | numberFormat} g</span>
+                            <span else>-</span>
                           </td>
                         </tr>
                         <tr>
                           <td t="sodium">Sodium</td>
                           <td>
-                            <div class="input-wrap">
-                              <input type="number" value.bind="model.nutritionData.sodium" readonly />
-                              <div class="unit-input-addon">mg</div>
-                            </div>
+                            <span if.bind="model.nutritionData.calories">${model.nutritionData.sodium | numberFormat} mg</span>
+                            <span else>-</span>
                           </td>
                         </tr>
                         <tr>
                           <td t="cholesterol">Cholesterol</td>
                           <td>
-                            <div class="input-wrap">
-                              <input type="number" value.bind="model.nutritionData.cholesterol" readonly />
-                              <div class="unit-input-addon">mg</div>
-                            </div>
+                            <span if.bind="model.nutritionData.calories">${model.nutritionData.cholesterol | numberFormat} mg</span>
+                            <span else>-</span>
                           </td>
                         </tr>
                         <tr>
                           <td t="vitaminA">Vitamin A</td>
                           <td>
-                            <div class="input-wrap">
-                              <input type="number" value.bind="model.nutritionData.vitaminA" readonly />
-                              <div class="unit-input-addon">mg</div>
-                            </div>
+                            <span if.bind="model.nutritionData.calories">${model.nutritionData.vitaminA | numberFormat} mg</span>
+                            <span else>-</span>
                           </td>
                         </tr>
                         <tr>
                           <td t="vitaminC">Vitamin C</td>
                           <td>
-                            <div class="input-wrap">
-                              <input type="number" value.bind="model.nutritionData.vitaminC" readonly />
-                              <div class="unit-input-addon">mg</div>
-                            </div>
+                            <span if.bind="model.nutritionData.calories">${model.nutritionData.vitaminC | numberFormat} mg</span>
+                            <span else>-</span>
                           </td>
                         </tr>
                         <tr>
                           <td t="vitaminD">Vitamin D</td>
                           <td>
-                            <div class="input-wrap">
-                              <input type="number" value.bind="model.nutritionData.vitaminD" readonly />
-                              <div class="unit-input-addon">mg</div>
-                            </div>
+                            <span if.bind="model.nutritionData.calories">${model.nutritionData.vitaminD | numberFormat} mg</span>
+                            <span else>-</span>
                           </td>
                         </tr>
                         <tr>
                           <td t="calcium">Calcium</td>
                           <td>
-                            <div class="input-wrap">
-                              <input type="number" value.bind="model.nutritionData.calcium" readonly />
-                              <div class="unit-input-addon">mg</div>
-                            </div>
+                            <span if.bind="model.nutritionData.calories">${model.nutritionData.calcium | numberFormat} mg</span>
+                            <span else>-</span>
                           </td>
                         </tr>
                         <tr>
                           <td t="iron">Iron</td>
                           <td>
-                            <div class="input-wrap">
-                              <input type="number" value.bind="model.nutritionData.iron" readonly />
-                              <div class="unit-input-addon">mg</div>
-                            </div>
+                            <span if.bind="model.nutritionData.calories">${model.nutritionData.iron | numberFormat} mg</span>
+                            <span else>-</span>
                           </td>
                         </tr>
                         <tr>
                           <td t="potassium">Potassium</td>
                           <td>
-                            <div class="input-wrap">
-                              <input type="number" value.bind="model.nutritionData.potassium" readonly />
-                              <div class="unit-input-addon">mg</div>
-                            </div>
+                            <span if.bind="model.nutritionData.calories">${model.nutritionData.potassium | numberFormat} mg</span>
+                            <span else>-</span>
                           </td>
                         </tr>
                         <tr>
                           <td t="magnesium">Magnesium</td>
                           <td>
-                            <div class="input-wrap">
-                              <input type="number" value.bind="model.nutritionData.magnesium" readonly />
-                              <div class="unit-input-addon">mg</div>
-                            </div>
+                            <span if.bind="model.nutritionData.calories">${model.nutritionData.magnesium | numberFormat} mg</span>
+                            <span else>-</span>
                           </td>
                         </tr>
                       </tbody>
@@ -280,10 +249,8 @@
                         <tr>
                           <td t="viewIngredient.price">Price</td>
                           <td>
-                            <div class="input-wrap">
-                              <input type="number" value.bind="model.priceData.price" readonly />
-                              <div class="unit-input-addon">${model.priceData.currency}</div>
-                            </div>
+                            <span if.bind="model.nutritionData.calories">${model.priceData.price} ${model.priceData.currency}</span>
+                            <span else>-</span>
                           </td>
                         </tr>
                       </tbody>

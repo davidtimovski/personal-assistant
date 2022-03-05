@@ -38,6 +38,7 @@ public class RecipeForUpdateIngredient : IMapFrom<RecipeIngredient>
     public string Name { get; set; }
     public float? Amount { get; set; }
     public string Unit { get; set; }
+    public bool IsPublic { get; set; }
     public bool IsNew { get; set; }
 
     public void Mapping(Profile profile)
@@ -46,6 +47,7 @@ public class RecipeForUpdateIngredient : IMapFrom<RecipeIngredient>
             .ForMember(x => x.Id, opt => opt.MapFrom(src => src.Ingredient.Id))
             .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Ingredient.Name))
             .ForMember(x => x.Unit, opt => opt.MapFrom(src => src.Unit))
+            .ForMember(x => x.IsPublic, opt => opt.MapFrom(src => src.Ingredient.UserId == 1))
             .ForMember(x => x.IsNew, opt => opt.Ignore());
     }
 }

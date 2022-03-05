@@ -65,7 +65,7 @@
             </label>
 
             <div if.bind="model.userIsOwner">
-              <ingredient-picker adding-enabled.bind="true" recipe-ingredient-ids.bind="recipeIngredientIds"></ingredient-picker>
+              <ingredient-picker input-placeholder.bind="addIngredientsInputPlaceholder" adding-enabled.bind="true" recipe-ingredient-ids.bind="recipeIngredientIds"></ingredient-picker>
             </div>
 
             <div show.bind="model.ingredients.length > 0" class="new-ingredients-wrap">

@@ -1,11 +1,16 @@
 export class IngredientSuggestion {
+  id: number;
+  taskId: number;
+  brandName: string;
+  name: string;
+  unit: string;
+  unitImperial: string;
   selected: boolean;
   matched: boolean;
   hasNutritionData: boolean;
   hasPriceData: boolean;
+  isPublic: boolean;
   children = new Array<IngredientSuggestion>();
-
-  constructor(public id: number, public taskId: number, public name: string, public unit: string) {}
 }
 
 export class IngredientCategory {

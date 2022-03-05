@@ -1,4 +1,3 @@
-/// <reference types="aurelia-loader-webpack/src/webpack-hot-interface"/>
 import { Aurelia } from "aurelia-framework";
 import { PLATFORM } from "aurelia-pal";
 import { HttpClient } from "aurelia-fetch-client";
@@ -78,12 +77,7 @@ export function configure(aurelia: Aurelia) {
     })
   );
 
-  container.registerInstance(
-    BroadcastChannel,
-    new BroadcastChannel("sw-version-updates")
-  );
+  container.registerInstance(BroadcastChannel, new BroadcastChannel("sw-version-updates"));
 
-  return aurelia
-    .start()
-    .then(() => aurelia.setRoot(PLATFORM.moduleName("app")));
+  return aurelia.start().then(() => aurelia.setRoot(PLATFORM.moduleName("app")));
 }

@@ -18,6 +18,7 @@ export class IngredientPicker {
   private suggestions: IngredientSuggestions;
   private suggestionsMatched = false;
 
+  @bindable({ defaultBindingMode: bindingMode.toView }) inputPlaceholder: string;
   @bindable({ defaultBindingMode: bindingMode.toView }) addingEnabled: boolean;
   @bindable({ defaultBindingMode: bindingMode.toView }) recipeIngredientIds: number[];
 

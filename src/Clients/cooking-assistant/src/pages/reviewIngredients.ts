@@ -1,15 +1,16 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
+import { EventAggregator } from "aurelia-event-aggregator";
 
 import { RecipesService } from "services/recipesService";
 import { ReviewIngredientsModel } from "models/viewmodels/reviewIngredientsModel";
 import { ReviewIngredient } from "models/viewmodels/reviewIngredient";
 import { IngredientReplacement } from "models/viewmodels/ingredientReplacement";
-import { IngredientSuggestion } from "models/viewmodels/ingredientSuggestions";
+import { IngredientPickerEvents, IngredientSuggestion } from "models/viewmodels/ingredientSuggestions";
 import * as Actions from "utils/state/actions";
 
-@inject(Router, RecipesService, I18N)
+@inject(Router, RecipesService, I18N, EventAggregator)
 export class ReviewIngredients {
   private model: ReviewIngredientsModel;
   private reviewing = false;
@@ -17,12 +18,20 @@ export class ReviewIngredients {
   private currentIngredient: ReviewIngredient;
   private pickExistingIngredientInput: HTMLInputElement;
   private doneButtonIsLoading = false;
+  private addIngredientsInputPlaceholder: string;
 
   constructor(
     private readonly router: Router,
     private readonly recipesService: RecipesService,
-    private readonly i18n: I18N
-  ) {}
+    private readonly i18n: I18N,
+    private readonly eventAggregator: EventAggregator
+  ) {
+    this.addIngredientsInputPlaceholder = this.i18n.tr("reviewIngredients.search");
+
+    this.eventAggregator.subscribe(IngredientPickerEvents.Selected, (ingredient: IngredientSuggestion) => {
+      this.setReplacement(ingredient);
+    });
+  }
 
   async activate(params: any) {
     this.model = await this.recipesService.getForReview(params.id);
@@ -50,12 +59,19 @@ export class ReviewIngredients {
   setReplacement(suggestion: IngredientSuggestion) {
     this.currentIngredient.replacementId = suggestion.id;
     this.currentIngredient.replacementName = suggestion.name;
-    this.currentIngredient.transferNutritionData =
-      this.currentIngredient.hasNutritionData && !suggestion.hasNutritionData;
-    this.currentIngredient.transferPriceData = this.currentIngredient.hasPriceData && !suggestion.hasPriceData;
+    this.currentIngredient.replacementIsPublic = suggestion.isPublic;
+
+    if (this.currentIngredient.replacementIsPublic) {
+      this.currentIngredient.transferNutritionData = this.currentIngredient.transferPriceData = false;
+    } else {
+      this.currentIngredient.transferNutritionData =
+        this.currentIngredient.hasNutritionData && !suggestion.hasNutritionData;
+      this.currentIngredient.transferPriceData = this.currentIngredient.hasPriceData && !suggestion.hasPriceData;
+    }
   }
 
   revertReplacement() {
+    this.eventAggregator.publish(IngredientPickerEvents.Unselect, this.currentIngredient.replacementId);
     this.currentIngredient.replacementId = this.currentIngredient.replacementName = null;
   }
 

@@ -9,8 +9,8 @@ public class Ingredient : Entity
     public int? ParentId { get; set; }
     public int UserId { get; set; }
     public int? CategoryId { get; set; }
+    public int? BrandId { get; set; }
     public string Name { get; set; }
-    public MeasurementType? MeasurementType { get; set; }
     public short ServingSize { get; set; }
     public bool ServingSizeIsOneUnit { get; set; }
     public float? Calories { get; set; }
@@ -37,18 +37,11 @@ public class Ingredient : Entity
 
     public Ingredient Parent { get; set; }
     public IngredientCategory Category { get; set; }
+    public IngredientBrand Brand { get; set; }
     public List<Recipe> Recipes { get; set; } = new List<Recipe>();
+    public List<RecipeIngredient> RecipesIngredients { get; set; } = new List<RecipeIngredient>();
     public ToDoTask Task { get; set; }
 
     public int? TaskId { get; set; }
     public int RecipeCount { get; set; }
-}
-
-public enum MeasurementType
-{
-    Amount,
-    Weight,
-    Volume,
-    Spoon,
-    Pinch
 }

@@ -7,6 +7,7 @@ using Application.Contracts.CookingAssistant.Ingredients;
 using Dapper;
 using Domain.Entities.CookingAssistant;
 using Domain.Entities.ToDoAssistant;
+using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Repositories.CookingAssistant;
 
@@ -88,10 +89,17 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        var ingredient = conn.QueryFirstOrDefault<Ingredient>(@"SELECT DISTINCT i.*, it.""TaskId""
-                                                                FROM ""CookingAssistant.Ingredients"" AS i
-                                                                LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
-                                                                WHERE i.""Id"" = @Id AND i.""UserId"" = 1", new { Id = id, UserId = userId });
+        const string query = @"SELECT DISTINCT i.*, it.""TaskId"", b.""Id"", b.""Name""
+                               FROM ""CookingAssistant.Ingredients"" AS i
+                               LEFT JOIN ""CookingAssistant.IngredientBrands"" AS b ON i.""BrandId"" = b.""Id""
+                               LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
+                               WHERE i.""Id"" = @Id AND i.""UserId"" = 1";
+
+        var ingredient = conn.Query<Ingredient, IngredientBrand, Ingredient>(query, (ingredient, brand) =>
+        {
+            ingredient.Brand = brand;
+            return ingredient;
+        }, new { Id = id, UserId = userId }).FirstOrDefault();
 
         if (ingredient == null)
         {
@@ -125,11 +133,13 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
         return ingredient;
     }
 
-    public IEnumerable<Ingredient> GetAll(int userId)
+    public IEnumerable<Ingredient> GetForSuggestions(int userId)
     {
-        using IDbConnection conn = OpenConnection();
-
-        return conn.Query<Ingredient>(@"SELECT * FROM ""CookingAssistant.Ingredients"" WHERE ""UserId"" = @UserId", new { UserId = userId });
+        return EFContext.Ingredients.AsNoTracking()
+            .Where(x => x.UserId == userId)
+            .Include(x => x.Brand)
+            .Include(x => x.RecipesIngredients.Where(x => x.Unit != null))
+            .ToList();
     }
 
     public IEnumerable<IngredientCategory> GetIngredientCategories()

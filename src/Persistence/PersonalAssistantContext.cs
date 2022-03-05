@@ -77,6 +77,11 @@ public class PersonalAssistantContext : DbContext
             x.Ignore(e => e.TaskId);
             x.Ignore(e => e.RecipeCount);
         });
+        modelBuilder.Entity<IngredientBrand>(x =>
+        {
+            x.ToTable("CookingAssistant.IngredientBrands");
+            x.Property(e => e.Name).IsRequired();
+        });
         modelBuilder.Entity<RecipeIngredient>(x =>
         {
             x.ToTable("CookingAssistant.RecipesIngredients");

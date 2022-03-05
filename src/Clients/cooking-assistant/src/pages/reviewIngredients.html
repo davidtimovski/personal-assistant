@@ -40,26 +40,29 @@
             ${currentIngredient.name}
             <span show.bind="currentIngredient.replacementId">
               <i class="fas fa-long-arrow-alt-right review-replacement-arrow"></i>
-              ${currentIngredient.replacementName}<a click.delegate="revertReplacement()" class="review-revert-icon"
-                t="[aria-label]reviewIngredients.cancelIngredientReplacement">
+              <span class="replacement-name">${currentIngredient.replacementName}</span><a click.delegate="revertReplacement()" class="review-revert-icon"
+                t="[title,aria-label]reviewIngredients.cancelIngredientReplacement">
                 <i class="fas fa-times-circle"></i>
               </a>
             </span>
           </div>
 
-          <ingredient-picker adding-enabled.bind="false"></ingredient-picker>
+          <div show.bind="!currentIngredient.replacementId">
+            <ingredient-picker input-placeholder.bind="addIngredientsInputPlaceholder" adding-enabled.bind="false"></ingredient-picker>
+          </div>
+          
 
           <!-- <input type="text" show.bind="!currentIngredient.replacementId" class="review-search-input"
             ref="pickExistingIngredientInput" t="[placeholder,aria-label]reviewIngredients.searchInventory"
             maxlength="50" /> -->
 
-          <div class="review-transfer-data">
-            <div show.bind="currentIngredient.replacementId && currentIngredient.hasNutritionData">
+          <div show.bind="currentIngredient.replacementId && !currentIngredient.replacementIsPublic" class="review-transfer-data">
+            <div show.bind="currentIngredient.hasNutritionData">
               <checkbox label-key="reviewIngredients.transferNutritionData"
                 value.bind="currentIngredient.transferNutritionData"></checkbox>
             </div>
 
-            <div show.bind="currentIngredient.replacementId && currentIngredient.hasPriceData">
+            <div show.bind="currentIngredient.hasPriceData">
               <checkbox label-key="reviewIngredients.transferPriceData"
                 value.bind="currentIngredient.transferPriceData"></checkbox>
             </div>
