@@ -5,13 +5,13 @@
 
   <div if.bind="category.matched">
     <div class="category-name">${category.name}</div>
-    <div class="ingredients">
+
+    <div class="category-body">
       <div repeat.for="ingredient of category.ingredients">
         <public-ingredient-suggestion ingredient.bind="ingredient"></public-ingredient-suggestion>
       </div>
-    </div>
-    <div class="subcategories">
-      <div repeat.for="subcategory of category.subcategories" class="category">
+  
+      <div repeat.for="subcategory of category.subcategories" class="subcategory-suggestion">
         <public-category-suggestion category.bind="subcategory"></public-category-suggestion>
       </div>
     </div>

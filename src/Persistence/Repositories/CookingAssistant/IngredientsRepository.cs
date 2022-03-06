@@ -146,7 +146,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.Query<IngredientCategory>(@"SELECT * FROM ""CookingAssistant.IngredientCategories""");
+        return conn.Query<IngredientCategory>(@"SELECT * FROM ""CookingAssistant.IngredientCategories"" ORDER BY ""Id""");
     }
 
     public IEnumerable<ToDoTask> GetTaskSuggestions(int userId)

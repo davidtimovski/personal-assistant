@@ -9,7 +9,7 @@
           <i class="fas fa-carrot"></i>
         </div>
         <div class="page-title">
-          <span if.bind="model.brandName">(${model.brandName}) ${model.name}</span>
+          <span if.bind="model.brandName">${model.name} (${model.brandName})</span>
           <span else>${model.name}</span>
         </div>
         <a route-href="route: ingredients" class="back-button">
@@ -48,218 +48,131 @@
             </div>
           </section>
 
-          <form>
-            <div class="form-control">
-              <div if.bind="!model.taskId">
-                <div show.bind="!tasksSearchVisible" class="link-button-wrap">
-                  <button type="button" class="link-button" click.delegate="linkToTask()" t="viewIngredient.linkToTask">
-                    Link to task in To Do Assistant
-                  </button>
+          <section if.bind="!model.taskId">
+            <button type="button" show.bind="!tasksSearchVisible" click.delegate="linkToTask()"
+                class="wide-button au-animate animate-fade-in animate-fade-out" t="viewIngredient.linkToTask">
+              Link to task in To Do Assistant
+            </button>
+
+            <div class="search-tasks-wrap" show.bind="tasksSearchVisible">
+              <input type="text" ref="pickTaskInput" t="[placeholder,aria-label]editIngredient.searchTasks"
+                maxlength="50" />
+            </div>
+          </section>
+
+          <div if.bind="model.nutritionData.isSet" class="nutrition-price-data-wrap">
+            <div class="nutrition-price-data-container">
+              <div class="nutrition-price-data au-animate animate-fade-in animate-fade-out">
+                <div class="nutrition-price-data-header">
+                  <i class="fas fa-clipboard"></i>
+                  <span t="viewIngredient.nutrition">Nutrition</span>
                 </div>
-  
-                <div class="search-tasks-wrap" show.bind="tasksSearchVisible">
-                  <input type="text" ref="pickTaskInput" t="[placeholder,aria-label]editIngredient.searchTasks"
-                    maxlength="50" />
+                <div class="nutrition-price-data-content">
+                  <div class="nutrition-price-data-legend">
+                    <span t="viewIngredient.nutritionalValuePer">Nutritional value per</span>
+                    <span if.bind="model.nutritionData.servingSizeIsOneUnit" t="viewIngredient.oneUnit">one unit</span>
+                    <span else>${model.nutritionData.servingSize} g</span>
+                  </div>
+
+                  <table class="view-ingredient-data-table nutrition">
+                    <tbody>
+                      <tr if.bind="model.nutritionData.calories">
+                        <td t="calories">Calories</td>
+                        <td>${model.nutritionData.calories | numberFormat} kcal</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.fat">
+                        <td t="fat">Fat</td>
+                        <td>${model.nutritionData.fat | numberFormat} g</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.saturatedFat">
+                        <td t="saturatedFat">Saturated fat</td>
+                        <td>${model.nutritionData.saturatedFat | numberFormat} g</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.carbohydrate">
+                        <td t="carbohydrate">Carbohydrate</td>
+                        <td>${model.nutritionData.carbohydrate | numberFormat} g</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.sugars">
+                        <td t="sugars">Sugars</td>
+                        <td>${model.nutritionData.sugars | numberFormat} g</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.addedSugars">
+                        <td t="addedSugars">Added sugars</td>
+                        <td>${model.nutritionData.addedSugars | numberFormat} g</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.fiber">
+                        <td t="fiber">Fiber</td>
+                        <td>${model.nutritionData.fiber | numberFormat} g</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.protein">
+                        <td t="protein">Protein</td>
+                        <td>${model.nutritionData.protein | numberFormat} g</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.sodium">
+                        <td t="sodium">Sodium</td>
+                        <td>${model.nutritionData.sodium | numberFormat} mg</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.cholesterol">
+                        <td t="cholesterol">Cholesterol</td>
+                        <td>${model.nutritionData.cholesterol | numberFormat} mg</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.vitaminA">
+                        <td t="vitaminA">Vitamin A</td>
+                        <td>${model.nutritionData.vitaminA | numberFormat} mg</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.vitaminC">
+                        <td t="vitaminC">Vitamin C</td>
+                        <td>${model.nutritionData.vitaminC | numberFormat} mg</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.vitaminD">
+                        <td t="vitaminD">Vitamin D</td>
+                        <td>${model.nutritionData.vitaminD | numberFormat} mg</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.calcium">
+                        <td t="calcium">Calcium</td>
+                        <td>${model.nutritionData.calcium | numberFormat} mg</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.iron">
+                        <td t="iron">Iron</td>
+                        <td>${model.nutritionData.iron | numberFormat} mg</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.potassium">
+                        <td t="potassium">Potassium</td>
+                        <td>${model.nutritionData.potassium | numberFormat} mg</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.magnesium">
+                        <td t="magnesium">Magnesium</td>
+                        <td>${model.nutritionData.magnesium | numberFormat} mg</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
 
-            <div class="nutrition-price-data-wrap">
-              <div class="data-wrap">
-                <div class="data-content-wrap au-animate animate-fade-in animate-fade-out">
-                  <div class="data-content">
-                    <div class="data-header">
-                      <i class="fas fa-clipboard"></i>
-                      <span t="viewIngredient.nutrition">Nutrition</span>
-                    </div>
-                    <div class="data-size-selectors">
-                      <label class="data-size ${model.nutritionData.servingSizeIsOneUnit ? '' : 'selected'}">
-                        <input type="radio" name="servingSizeToggle" model.bind="false" disabled
-                          checked.bind="model.nutritionData.servingSizeIsOneUnit" />
-                        <span t="viewIngredient.amount">Amount</span>
-                        &nbsp;
-                        <input type="number" value.bind="model.nutritionData.servingSize" readonly />
-                        <div class="unit-input-addon">g</div>
-                        <i class="fas fa-check"></i>
-                      </label>
-                      <div class="data-size-separator"></div>
-                      <label class="is-one-unit-wrap ${model.nutritionData.servingSizeIsOneUnit ? 'selected' : ''}">
-                        <input type="radio" name="servingSizeToggle" model.bind="true" disabled
-                          checked.bind="model.nutritionData.servingSizeIsOneUnit" />
-                        <span t="viewIngredient.oneUnit">One unit (ex. Egg)</span>
-                        <i class="fas fa-check"></i>
-                      </label>
-                    </div>
-
-                    <table class="data-table-form">
-                      <tbody>
-                        <tr>
-                          <td t="calories">Calories</td>
-                          <td>
-                            <span if.bind="model.nutritionData.calories">${model.nutritionData.calories | numberFormat} kcal</span>
-                            <span else>-</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td t="fat">Fat</td>
-                          <td>
-                            <span if.bind="model.nutritionData.calories">${model.nutritionData.fat | numberFormat} g</span>
-                            <span else>-</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td t="saturatedFat">Saturated fat</td>
-                          <td>
-                            <span if.bind="model.nutritionData.calories">${model.nutritionData.saturatedFat | numberFormat} g</span>
-                            <span else>-</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td t="carbohydrate">Carbohydrate</td>
-                          <td>
-                            <span if.bind="model.nutritionData.calories">${model.nutritionData.carbohydrate | numberFormat} g</span>
-                            <span else>-</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td t="sugars">Sugars</td>
-                          <td>
-                            <span if.bind="model.nutritionData.calories">${model.nutritionData.sugars | numberFormat} g</span>
-                            <span else>-</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td t="addedSugars">Added sugars</td>
-                          <td>
-                            <span if.bind="model.nutritionData.calories">${model.nutritionData.addedSugars | numberFormat} g</span>
-                            <span else>-</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td t="fiber">Fiber</td>
-                          <td>
-                            <span if.bind="model.nutritionData.calories">${model.nutritionData.fiber | numberFormat} g</span>
-                            <span else>-</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td t="protein">Protein</td>
-                          <td>
-                            <span if.bind="model.nutritionData.calories">${model.nutritionData.protein | numberFormat} g</span>
-                            <span else>-</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td t="sodium">Sodium</td>
-                          <td>
-                            <span if.bind="model.nutritionData.calories">${model.nutritionData.sodium | numberFormat} mg</span>
-                            <span else>-</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td t="cholesterol">Cholesterol</td>
-                          <td>
-                            <span if.bind="model.nutritionData.calories">${model.nutritionData.cholesterol | numberFormat} mg</span>
-                            <span else>-</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td t="vitaminA">Vitamin A</td>
-                          <td>
-                            <span if.bind="model.nutritionData.calories">${model.nutritionData.vitaminA | numberFormat} mg</span>
-                            <span else>-</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td t="vitaminC">Vitamin C</td>
-                          <td>
-                            <span if.bind="model.nutritionData.calories">${model.nutritionData.vitaminC | numberFormat} mg</span>
-                            <span else>-</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td t="vitaminD">Vitamin D</td>
-                          <td>
-                            <span if.bind="model.nutritionData.calories">${model.nutritionData.vitaminD | numberFormat} mg</span>
-                            <span else>-</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td t="calcium">Calcium</td>
-                          <td>
-                            <span if.bind="model.nutritionData.calories">${model.nutritionData.calcium | numberFormat} mg</span>
-                            <span else>-</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td t="iron">Iron</td>
-                          <td>
-                            <span if.bind="model.nutritionData.calories">${model.nutritionData.iron | numberFormat} mg</span>
-                            <span else>-</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td t="potassium">Potassium</td>
-                          <td>
-                            <span if.bind="model.nutritionData.calories">${model.nutritionData.potassium | numberFormat} mg</span>
-                            <span else>-</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td t="magnesium">Magnesium</td>
-                          <td>
-                            <span if.bind="model.nutritionData.calories">${model.nutritionData.magnesium | numberFormat} mg</span>
-                            <span else>-</span>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
+            <div if.bind="model.priceData.isSet" class="nutrition-price-data-container">
+              <div class="nutrition-price-data au-animate animate-fade-in animate-fade-out">
+                <div class="nutrition-price-data-header">
+                  <i class="fas fa-tag"></i>
+                  <span t="viewIngredient.price">Price</span>
                 </div>
-              </div>
-
-              <div class="data-wrap">
-                <div class="data-content-wrap au-animate animate-fade-in animate-fade-out">
-                  <div class="data-content">
-                    <div class="data-header">
-                      <i class="fas fa-tag"></i>
-                      <span t="viewIngredient.price">Price</span>
-                    </div>
-                    <div class="data-size-selectors">
-                      <label class="data-size ${model.priceData.productSizeIsOneUnit ? '' : 'selected'}">
-                        <input type="radio" name="productSizeToggle" model.bind="false" disabled
-                          checked.bind="model.priceData.productSizeIsOneUnit" />
-                        <span t="viewIngredient.amount">Amount</span>
-                        &nbsp;
-                        <input type="number" value.bind="model.priceData.productSize" readonly />
-                        <div class="unit-input-addon">g</div>
-                        <i class="fas fa-check"></i>
-                      </label>
-                      <div class="data-size-separator"></div>
-                      <label class="is-one-unit-wrap ${model.priceData.productSizeIsOneUnit ? 'selected' : ''}">
-                        <input type="radio" name="productSizeToggle" model.bind="true" disabled
-                          checked.bind="model.priceData.productSizeIsOneUnit" />
-                        <span t="viewIngredient.oneUnit">One unit (ex. Egg)</span>
-                        <i class="fas fa-check"></i>
-                      </label>
-                    </div>
-
-                    <table class="data-table-form">
-                      <tbody>
-                        <tr>
-                          <td t="viewIngredient.price">Price</td>
-                          <td>
-                            <span if.bind="model.nutritionData.calories">${model.priceData.price} ${model.priceData.currency}</span>
-                            <span else>-</span>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
+                <div class="nutrition-price-data-content">
+                  <table class="view-ingredient-data-table">
+                    <tbody>
+                      <tr>
+                        <td>
+                          <span t="viewIngredient.pricePer">Price per</span>
+                          <span if.bind="model.priceData.productSizeIsOneUnit" t="viewIngredient.oneUnit">one unit</span>
+                          <span else>${model.priceData.productSize} g</span>
+                        </td>
+                        <td>${model.priceData.price} ${model.priceData.currency}</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
-          </form>
+          </div>
 
           <hr />
 

@@ -1,13 +1,45 @@
-.public-ingredient {
-  .ingredient {
-    display: block;
+.ingredient-suggestion {
+  padding: 0 15px;
+  cursor: pointer;
 
-    &.selected {
-      background-color: red;
+  &.selected {
+    color: var(--primary-color-dark);
+    cursor: default;
+
+    .fa-check {
+      display: inline;
     }
   }
-  
-  .children {
-    padding-left: 15px;
+
+  &:hover {
+    color: var(--primary-color-dark);
   }
+
+  &-icons {
+    margin-left: 7px;
+
+    i {
+      margin-right: 4px;
+      font-size: 16px;
+      color: var(--primary-color);
+
+      &.fa-tag {
+        font-size: 15px;
+      }
+    }
+
+    .fa-check {
+      display: none;
+      font-size: 17px;
+    }
+  }
+}
+
+.ingredient-suggestion-children {
+  padding-left: 15px;
+}
+
+/* Workaround for sticky :hover on mobile devices */
+.touch-device .ingredient-suggestion:hover {
+  color: var(--primary-color);
 }

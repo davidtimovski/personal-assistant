@@ -32,11 +32,11 @@
           class="ingredient au-animate animate-fade-in ${ingredient.unused ? 'unused' : ''} ${ingredient.id === getEditedId ? 'highlighted' : ''}">
           <span class="name">${ingredient.name}</span>
           <span class="ingredient-icons-container">
-            <i class="fas fa-user" if.bind="!ingredient.isPublic" t="[title,aria-label]ingredients.myIngredient"></i>
+            <i class="fas fa-user" if.bind="!ingredient.isPublic" t="[title,aria-label]ingredients.mine"></i>
             <i class="fas fa-link" if.bind="ingredient.taskId" t="[title,aria-label]ingredients.linkedToTask"></i>
             <i class="fas fa-clipboard" if.bind="ingredient.hasNutritionData"
-              t="[title,aria-label]ingredients.hasNutritionSet"></i>
-            <i class="fas fa-tag" if.bind="ingredient.hasPriceData" t="[title,aria-label]ingredients.hasPriceSet"></i>
+              t="[title,aria-label]hasNutritionSet"></i>
+            <i class="fas fa-tag" if.bind="ingredient.hasPriceData" t="[title,aria-label]hasPriceSet"></i>
           </span>
         </div>
 

@@ -11,17 +11,11 @@ import { IngredientsService } from "services/ingredientsService";
 import { ViewIngredientModel } from "models/viewmodels/viewIngredientModel";
 import { TaskSuggestion } from "models/viewmodels/taskSuggestion";
 
-@inject(
-  Router,
-  IngredientsService,
-  I18N,
-  EventAggregator,
-  LocalStorageCurrencies
-)
+@inject(Router, IngredientsService, I18N, EventAggregator, LocalStorageCurrencies)
 export class ViewIngredient {
   private ingredientId: number;
   private model: ViewIngredientModel;
-  private originalIngredientJson: string;
+  private originalIngredientTaskId: number;
   private ingredientLinkedMessage: string;
   private tasksSearchVisible = false;
   private autocomplete: AutocompleteResult;
@@ -60,13 +54,15 @@ export class ViewIngredient {
     if (this.model.taskId) {
       this.ingredientLinkedMessage = this.i18n.tr("editIngredient.thisIngredientIsLinked", {
         taskName: this.model.taskName,
-        taskList: this.model.taskList
+        taskList: this.model.taskList,
       });
     }
 
     if (!this.model.priceData.isSet) {
       this.model.priceData.currency = this.currency;
     }
+
+    this.originalIngredientTaskId = this.model.taskId;
   }
 
   async linkToTask() {
@@ -84,19 +80,14 @@ export class ViewIngredient {
     this.autocomplete = autocomplete({
       input: this.pickTaskInput,
       minLength: 2,
-      fetch: (
-        text: string,
-        update: (items: TaskSuggestion[]) => void
-      ) => {
-        const suggestions = taskSuggestions.filter((i) =>
-          i.label.toUpperCase().startsWith(text.toUpperCase())
-        );
+      fetch: (text: string, update: (items: TaskSuggestion[]) => void) => {
+        const suggestions = taskSuggestions.filter((i) => i.label.toUpperCase().startsWith(text.toUpperCase()));
         update(suggestions);
       },
       onSelect: (suggestion: TaskSuggestion) => {
         this.ingredientLinkedMessage = this.i18n.tr("editIngredient.thisIngredientIsLinked", {
           taskName: suggestion.label,
-          taskList: suggestion.group
+          taskList: suggestion.group,
         });
 
         this.model.taskId = suggestion.id;
@@ -114,7 +105,7 @@ export class ViewIngredient {
 
   @computedFrom("model.taskId")
   get canSave() {
-    return JSON.stringify(this.model) !== this.originalIngredientJson;
+    return this.model.taskId !== this.originalIngredientTaskId;
   }
 
   async save() {
@@ -145,10 +136,7 @@ export class ViewIngredient {
 
       await this.ingredientsService.delete(this.model.id);
 
-      this.eventAggregator.publish(
-        AlertEvents.ShowSuccess,
-        "editIngredient.deleteSuccessful"
-      );
+      this.eventAggregator.publish(AlertEvents.ShowSuccess, "editIngredient.deleteSuccessful");
       this.router.navigateToRoute("ingredients");
     } else if (this.model.recipes.length > 0) {
       this.deleteButtonText = this.i18n.tr("editIngredient.yesImSure");

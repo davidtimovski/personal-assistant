@@ -111,6 +111,25 @@ label.label {
   }
 }
 
+.edit-recipe-form {
+  .prep-cook-duration-wrap {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 10px;
+
+    .duration-side label {
+      padding: 0;
+      margin-bottom: 5px;
+      text-align: center;
+    }
+
+    .duration-input {
+      width: 26px;
+      text-align: center;
+    }
+  }
+}
+
 .new-ingredients-wrap {
   margin-top: 10px;
 }

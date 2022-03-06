@@ -56,6 +56,8 @@
   "decreaseServings": "Decrease servings",
   "increaseServings": "Increase servings",
   "addIngredient": "Add ingredient",
+  "hasNutritionSet": "Has nutrition set",
+  "hasPriceSet": "Has price set",
   "recipes": {
     "menu": "Menu",
     "refresh": "Refresh",
@@ -186,10 +188,8 @@
     "search": "Search",
     "clear": "Clear",
     "emptyListMessage": "You don't have any ingredients yet",
-    "myIngredient": "My ingredient",
-    "linkedToTask": "Linked to task",
-    "hasNutritionSet": "Has nutrition set",
-    "hasPriceSet": "Has price set"
+    "mine": "Mine",
+    "linkedToTask": "Linked to task"
   },
   "editIngredient": {
     "edit": "Edit",
@@ -223,13 +223,14 @@
     "unlink": "Unlink",
     "searchTasks": "Search tasks",
     "amount": "Amount",
-    "oneUnit": "One unit (ex. Egg)",
     "nutrition": "Nutrition",
+    "nutritionalValuePer": "Nutritional value per",
+    "oneUnit": "one unit",
     "ingredientUsedInRecipes": "This ingredient is used in the recipes mentioned above.",
     "areYouSureYouWantToDelete": "Are you sure you want to delete it?",
     "yesImSure": "Yes, I'm sure",
     "price": "Price",
-    "priceBetween": "Price must be between 0 and 9999",
+    "pricePer": "Price per",
     "updateSuccessful": "Ingredient was successfully updated",
     "deleteSuccessful": "Ingredient was successfully deleted"
   },
@@ -252,7 +253,7 @@
     "emptyListMessage": "There are no new received recipes"
   },
   "reviewIngredients": {
-    "reviewCustomIngredients": "Review custom ingredients",
+    "reviewPersonalIngredients": "Review personal ingredients",
     "review": "Review",
     "introductoryLabel": "This recipe has one custom ingredient. Let's see if you already have it in your inventory.",
     "introductoryLabelPlural": "This recipe has {{ingredients}} custom ingredients. Let's review them and see if you have equivalent ones in your inventory.",
@@ -308,8 +309,8 @@
     },
     "reviewIngredients": {
       "title": "Review ingredients",
-      "question": "Why should I review custom ingredients?",
-      "answer": "When you аccept a sent recipe it is imported and if it has custom ingredients they copy over. Reviewing them allows you to swap them out with your personal equivalent ones or public ingredients. This way you avoid ending up with duplicates. If you don't find any equivalent ingredients don't worry, they will just copy over."
+      "question": "Why should I review personal ingredients?",
+      "answer": "When you аccept a sent recipe it is imported and if it has personal ingredients they copy over. Reviewing them allows you to swap them out with your personal equivalent ones or public ingredients. This way you avoid ending up with duplicates. If you don't find any equivalent ingredients don't worry, they will just copy over."
     },
     "shareRequests": {
       "title": "Share requests",

@@ -11,23 +11,28 @@
         <i class="fas fa-plus-circle"></i>
       </a>
     </div>
-    <div if.bind="suggestionsMatched" class="suggestions">
-      <div class="my-ingredients">
-        <div>My ingredients</div>
 
-        <div repeat.for="ingredient of suggestions.userIngredients">
-          <public-ingredient-suggestion ingredient.bind="ingredient"></public-ingredient-suggestion>
+    <div if.bind="suggestionsMatched">
+      <div class="suggestions">
+        <div class="suggestions-header">Personal</div>
+
+        <div class="suggestions-body">
+          <div repeat.for="ingredient of suggestions.userIngredients">
+            <public-ingredient-suggestion ingredient.bind="ingredient"></public-ingredient-suggestion>
+          </div>
         </div>
       </div>
 
-      <div if.bind="suggestions.publicIngredients" class="public-ingredients">
+      <div class="suggestions">
+        <div class="suggestions-header">Public</div>
+
         <div class="ingredients">
           <div repeat.for="ingredient of suggestions.publicIngredients.uncategorized">
             <public-ingredient-suggestion ingredient.bind="ingredient"></public-ingredient-suggestion>
           </div>
         </div>
 
-        <div repeat.for="category of suggestions.publicIngredients.categories" class="category">
+        <div repeat.for="category of suggestions.publicIngredients.categories" class="category-suggestion">
           <public-category-suggestion category.bind="category"></public-category-suggestion>
         </div>
       </div>

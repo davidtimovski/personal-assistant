@@ -34,15 +34,15 @@
   }
 
   .suggestions {
+    border: 1px solid #ddd;
+    border-radius: 6px;
     margin-top: 10px;
 
-    .my-ingredients {
-      background: lightblue;
-      padding: 10px 10px;
-    }
-
-    .public-ingredients {
-      padding: 10px 10px;
+    &-header {
+      background: var(--primary-color);
+      text-align: center;
+      line-height: 37px;
+      color: #fff;
     }
   }
 }

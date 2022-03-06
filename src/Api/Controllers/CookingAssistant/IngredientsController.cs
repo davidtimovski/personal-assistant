@@ -122,7 +122,6 @@ public class IngredientsController : Controller
         return Ok(suggestionsDtos);
     }
 
-    // TODO: Use Output caching in future (possibly .NET 7)
     [ResponseCache(Duration = 60 * 60 * 24)]
     [HttpGet("public-suggestions")]
     public IActionResult GetPublicSuggestions()

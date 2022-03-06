@@ -81,24 +81,24 @@ public class IngredientService : IIngredientService
         var recipeIngredientsLookup = ingredients.ToDictionary(x => x.Id, x => x.RecipesIngredients);
         foreach (var suggestion in suggestions)
         {
-            suggestion.Children = suggestions.Where(x => x.ParentId == suggestion.Id).ToList();
+            suggestion.Children = suggestions.Where(x => x.ParentId == suggestion.Id).OrderBy(x => x.Name).ToList();
 
             DeriveAndSetUnit(suggestion, recipeIngredientsLookup[suggestion.Id]);
         }
 
-        result.Uncategorized = suggestions.Where(x => !x.CategoryId.HasValue && !x.ParentId.HasValue).ToList();
+        result.Uncategorized = suggestions.Where(x => !x.CategoryId.HasValue && !x.ParentId.HasValue).OrderBy(x => x.Name).ToList();
 
         var categorizedPublicSuggestions = suggestions.Where(x => x.CategoryId.HasValue);
         result.Categories = categories.Select(x => _mapper.Map<IngredientCategoryDto>(x)).ToList();
 
         foreach (var category in result.Categories)
         {
-            category.Ingredients = suggestions.Where(x => x.CategoryId == category.Id && !x.ParentId.HasValue).ToList();
-            category.Subcategories = result.Categories.Where(x => x.ParentId == category.Id).ToList();
+            category.Ingredients = suggestions.Where(x => x.CategoryId == category.Id && !x.ParentId.HasValue).OrderBy(x => x.Name).ToList();
+            category.Subcategories = result.Categories.Where(x => x.ParentId == category.Id).OrderBy(x => x.Id).ToList();
 
             foreach (var subcategory in category.Subcategories)
             {
-                subcategory.Ingredients = suggestions.Where(x => x.CategoryId == category.Id && !x.ParentId.HasValue).ToList();
+                subcategory.Ingredients = suggestions.Where(x => x.CategoryId == category.Id && !x.ParentId.HasValue).OrderBy(x => x.Name).ToList();
             }
         }
         result.Categories.RemoveAll(x => x.ParentId.HasValue);

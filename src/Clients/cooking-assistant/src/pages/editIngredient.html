@@ -46,40 +46,42 @@
             </div>
           </section>
 
+          <section if.bind="!model.taskId">
+            <button type="button" show.bind="!tasksSearchVisible" click.delegate="linkToTask()"
+                class="wide-button link-to-task-button au-animate animate-fade-in animate-fade-out" t="editIngredient.linkToTask">
+              Link to task in To Do Assistant
+            </button>
+
+            <div class="search-tasks-wrap" show.bind="tasksSearchVisible">
+              <input type="text" ref="pickTaskInput" t="[placeholder,aria-label]editIngredient.searchTasks"
+                maxlength="50" />
+            </div>
+          </section>
+
           <form>
             <div class="form-control">
               <input type="text" value.bind="model.name & validate" maxlength="50"
                 class.bind="nameIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]editIngredient.ingredientName" />
-
-              <div if.bind="!model.taskId">
-                <div show.bind="!tasksSearchVisible" class="link-button-wrap">
-                  <button type="button" class="link-button" click.delegate="linkToTask()" t="editIngredient.linkToTask">
-                    Link to task in To Do Assistant
-                  </button>
-                </div>
-  
-                <div class="search-tasks-wrap" show.bind="tasksSearchVisible">
-                  <input type="text" ref="pickTaskInput" t="[placeholder,aria-label]editIngredient.searchTasks"
-                    maxlength="50" />
-                </div>
-              </div>
             </div>
 
             <div class="nutrition-price-data-wrap">
-              <div class="data-wrap">
+              <div class="nutrition-price-data-container">
                 <button type="button" if.bind="!model.nutritionData.isSet" click.delegate="setNutritionData()"
                   class="wide-button au-animate animate-fade-in animate-fade-out" t="editIngredient.setNutritionData">
                   Set nutrition data
                 </button>
 
-                <div else class="data-content-wrap au-animate animate-fade-in animate-fade-out">
-                  <div class="data-content">
-                    <div class="data-header">
-                      <i class="fas fa-clipboard"></i>
-                      <span t="editIngredient.nutrition">Nutrition</span>
-                    </div>
-                    <div class="data-size-selectors">
-                      <label class="data-size ${model.nutritionData.servingSizeIsOneUnit ? '' : 'selected'}">
+                <div else class="nutrition-price-data au-animate animate-fade-in animate-fade-out">
+                  <div class="nutrition-price-data-header">
+                    <i class="fas fa-clipboard"></i>
+                    <span t="editIngredient.nutrition">Nutrition</span>
+                    <a click.delegate="removeNutritionData()" t="[title,aria-label]editIngredient.removeNutritionData">
+                      <i class="fas fa-times"></i>
+                    </a>
+                  </div>
+                  <div class="nutrition-price-data-content">
+                    <div class="nutrition-price-data-size-selectors">
+                      <label class="nutrition-price-data-size ${model.nutritionData.servingSizeIsOneUnit ? '' : 'selected'}">
                         <input type="radio" name="servingSizeToggle" model.bind="false"
                           checked.bind="model.nutritionData.servingSizeIsOneUnit" />
                         <span t="editIngredient.amount">Amount</span>
@@ -89,7 +91,7 @@
                         <div class="unit-input-addon">g</div>
                         <i class="fas fa-check"></i>
                       </label>
-                      <div class="data-size-separator"></div>
+                      <div class="nutrition-price-data-size-separator"></div>
                       <label class="is-one-unit-wrap ${model.nutritionData.servingSizeIsOneUnit ? 'selected' : ''}">
                         <input type="radio" name="servingSizeToggle" model.bind="true"
                           checked.bind="model.nutritionData.servingSizeIsOneUnit" />
@@ -98,7 +100,7 @@
                       </label>
                     </div>
 
-                    <table class="data-table-form">
+                    <table class="edit-ingredient-form-table">
                       <tbody>
                         <tr>
                           <td t="calories">Calories</td>
@@ -273,31 +275,27 @@
                         </tr>
                       </tbody>
                     </table>
-
-                    <div class="link-button-wrap">
-                      <button type="button" click.delegate="removeNutritionData()" class="link-button"
-                        t="editIngredient.removeNutritionData">
-                        Remove nutrition data
-                      </button>
-                    </div>
                   </div>
                 </div>
               </div>
 
-              <div class="data-wrap">
+              <div class="nutrition-price-data-container">
                 <button type="button" if.bind="!model.priceData.isSet" click.delegate="setPriceData()"
                   class="wide-button au-animate animate-fade-in animate-fade-out" t="editIngredient.setPriceData">
                   Set price data
                 </button>
 
-                <div else class="data-content-wrap au-animate animate-fade-in animate-fade-out">
-                  <div class="data-content">
-                    <div class="data-header">
-                      <i class="fas fa-tag"></i>
-                      <span t="editIngredient.price">Price</span>
-                    </div>
-                    <div class="data-size-selectors">
-                      <label class="data-size ${model.priceData.productSizeIsOneUnit ? '' : 'selected'}">
+                <div else class="nutrition-price-data au-animate animate-fade-in animate-fade-out">
+                  <div class="nutrition-price-data-header">
+                    <i class="fas fa-tag"></i>
+                    <span t="editIngredient.price">Price</span>
+                    <a click.delegate="removePriceData()" t="[title,aria-label]editIngredient.removePriceData">
+                      <i class="fas fa-times"></i>
+                    </a>
+                  </div>
+                  <div class="nutrition-price-data-content">
+                    <div class="nutrition-price-data-size-selectors">
+                      <label class="nutrition-price-data-size ${model.priceData.productSizeIsOneUnit ? '' : 'selected'}">
                         <input type="radio" name="productSizeToggle" model.bind="false"
                           checked.bind="model.priceData.productSizeIsOneUnit" />
                         <span t="editIngredient.amount">Amount</span>
@@ -307,7 +305,7 @@
                         <div class="unit-input-addon">g</div>
                         <i class="fas fa-check"></i>
                       </label>
-                      <div class="data-size-separator"></div>
+                      <div class="nutrition-price-data-size-separator"></div>
                       <label class="is-one-unit-wrap ${model.priceData.productSizeIsOneUnit ? 'selected' : ''}">
                         <input type="radio" name="productSizeToggle" model.bind="true"
                           checked.bind="model.priceData.productSizeIsOneUnit" />
@@ -316,7 +314,7 @@
                       </label>
                     </div>
 
-                    <table class="data-table-form">
+                    <table class="edit-ingredient-form-table">
                       <tbody>
                         <tr>
                           <td t="editIngredient.price">Price</td>
@@ -330,13 +328,6 @@
                         </tr>
                       </tbody>
                     </table>
-
-                    <div class="link-button-wrap">
-                      <button type="button" click.delegate="removePriceData()" class="link-button"
-                        t="editIngredient.removePriceData">
-                        Remove price data
-                      </button>
-                    </div>
                   </div>
                 </div>
               </div>
