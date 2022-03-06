@@ -1,54 +1,52 @@
 export class NutritionSummary {
-  constructor(
-    public isSet: boolean,
-    public servingSize: number,
-    public servingSizeIsOneUnit: boolean,
-    public calories: number,
-    public caloriesFromDaily: number,
-    public caloriesFromDailyGrade: string,
-    public fat: number,
-    public fatFromDaily: number,
-    public saturatedFat: number,
-    public saturatedFatFromDaily: number,
-    public saturatedFatFromDailyGrade: string,
-    public carbohydrate: number,
-    public carbohydrateFromDaily: number,
-    public carbohydrateFromDailyGrade: string,
-    public sugars: number,
-    public addedSugars: number,
-    public addedSugarsFromDaily: number,
-    public addedSugarsFromDailyGrade: string,
-    public fiber: number,
-    public fiberFromDaily: number,
-    public protein: number,
-    public proteinFromDaily: number,
-    public proteinFromDailyGrade: string,
-    public sodium: number,
-    public sodiumFromDaily: number,
-    public cholesterol: number,
-    public cholesterolFromDaily: number,
-    public cholesterolFromDailyGrade: string,
-    public vitaminA: number,
-    public vitaminAFromDaily: number,
-    public vitaminAFromDailyGrade: string,
-    public vitaminC: number,
-    public vitaminCFromDaily: number,
-    public vitaminCFromDailyGrade: string,
-    public vitaminD: number,
-    public vitaminDFromDaily: number,
-    public vitaminDFromDailyGrade: string,
-    public calcium: number,
-    public calciumFromDaily: number,
-    public calciumFromDailyGrade: string,
-    public iron: number,
-    public ironFromDaily: number,
-    public ironFromDailyGrade: string,
-    public potassium: number,
-    public potassiumFromDaily: number,
-    public potassiumFromDailyGrade: string,
-    public magnesium: number,
-    public magnesiumFromDaily: number,
-    public magnesiumFromDailyGrade: string,
-    public ingredientIds: Array<number>
-  ) {}
+  isSet: boolean;
+  servingSize: number;
+  servingSizeIsOneUnit: boolean;
+  calories: number;
+  caloriesFromDaily: number;
+  caloriesFromDailyGrade: string;
+  fat: number;
+  fatFromDaily: number;
+  saturatedFat: number;
+  saturatedFatFromDaily: number;
+  saturatedFatFromDailyGrade: string;
+  carbohydrate: number;
+  carbohydrateFromDaily: number;
+  carbohydrateFromDailyGrade: string;
+  sugars: number;
+  addedSugars: number;
+  addedSugarsFromDaily: number;
+  addedSugarsFromDailyGrade: string;
+  fiber: number;
+  fiberFromDaily: number;
+  protein: number;
+  proteinFromDaily: number;
+  proteinFromDailyGrade: string;
+  sodium: number;
+  sodiumFromDaily: number;
+  cholesterol: number;
+  cholesterolFromDaily: number;
+  cholesterolFromDailyGrade: string;
+  vitaminA: number;
+  vitaminAFromDaily: number;
+  vitaminAFromDailyGrade: string;
+  vitaminC: number;
+  vitaminCFromDaily: number;
+  vitaminCFromDailyGrade: string;
+  vitaminD: number;
+  vitaminDFromDaily: number;
+  vitaminDFromDailyGrade: string;
+  calcium: number;
+  calciumFromDaily: number;
+  calciumFromDailyGrade: string;
+  iron: number;
+  ironFromDaily: number;
+  ironFromDailyGrade: string;
+  potassium: number;
+  potassiumFromDaily: number;
+  potassiumFromDailyGrade: string;
+  magnesium: number;
+  magnesiumFromDaily: number;
+  magnesiumFromDailyGrade: string;
+  ingredientIds: Array<number>;
 }

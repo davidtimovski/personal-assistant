@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Domain.Entities.Accountant;
+﻿using Domain.Entities.Accountant;
 using Domain.Entities.Common;
 using Domain.Entities.CookingAssistant;
 using Domain.Entities.ToDoAssistant;
+using Microsoft.EntityFrameworkCore;
 
 namespace Persistence;
 
@@ -19,6 +19,8 @@ public class PersonalAssistantContext : DbContext
 
     public DbSet<Recipe> Recipes { get; set; }
     public DbSet<Ingredient> Ingredients { get; set; }
+    public DbSet<RecipeIngredient> RecipesIngredients { get; set; }
+    public DbSet<IngredientTask> IngredientsTasks { get; set; }
     public DbSet<RecipeShare> RecipeShares { get; set; }
     public DbSet<SendRequest> SendRequests { get; set; }
     public DbSet<DietaryProfile> DietaryProfiles { get; set; }
@@ -37,11 +39,17 @@ public class PersonalAssistantContext : DbContext
         modelBuilder.Entity<ToDoList>(x =>
         {
             x.ToTable("ToDoAssistant.Lists");
+
+            x.Property(e => e.Name).IsRequired();
             x.Property(e => e.Icon).HasDefaultValue("Regular");
             x.Property(e => e.NotificationsEnabled).HasDefaultValue(true);
             x.Ignore(e => e.IsShared);
         });
-        modelBuilder.Entity<ToDoTask>(x => { x.ToTable("ToDoAssistant.Tasks"); });
+        modelBuilder.Entity<ToDoTask>(x => { 
+            x.ToTable("ToDoAssistant.Tasks");
+
+            x.Property(e => e.Name).IsRequired();
+        });
         modelBuilder.Entity<ListShare>(x =>
         {
             x.ToTable("ToDoAssistant.Shares");
@@ -53,21 +61,38 @@ public class PersonalAssistantContext : DbContext
         modelBuilder.Entity<Recipe>(x =>
         {
             x.ToTable("CookingAssistant.Recipes");
+
+            x.Property(e => e.Name).IsRequired();
             x.Ignore(e => e.IngredientsMissing);
         });
         modelBuilder.Entity<Ingredient>(x =>
         {
             x.ToTable("CookingAssistant.Ingredients");
+
+            x.Property(e => e.Name).IsRequired();
             x.Property(e => e.ServingSize).HasDefaultValue(100);
             x.Property(e => e.ProductSize).HasDefaultValue(100);
             x.Ignore(e => e.Recipes);
             x.Ignore(e => e.Task);
+            x.Ignore(e => e.TaskId);
             x.Ignore(e => e.RecipeCount);
+        });
+        modelBuilder.Entity<IngredientBrand>(x =>
+        {
+            x.ToTable("CookingAssistant.IngredientBrands");
+            x.Property(e => e.Name).IsRequired();
         });
         modelBuilder.Entity<RecipeIngredient>(x =>
         {
             x.ToTable("CookingAssistant.RecipesIngredients");
+
             x.HasKey(e => new { e.RecipeId, e.IngredientId });
+            x.Property(e => e.Unit).HasMaxLength(5);
+        });
+        modelBuilder.Entity<IngredientTask>(x =>
+        {
+            x.ToTable("CookingAssistant.IngredientsTasks");
+            x.HasKey(e => new { e.IngredientId, e.UserId });
         });
         modelBuilder.Entity<RecipeShare>(x =>
         {

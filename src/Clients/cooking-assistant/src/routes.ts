@@ -58,6 +58,11 @@ export default [
     moduleId: PLATFORM.moduleName("./pages/editIngredient"),
   },
   {
+    route: "view-ingredient/:id",
+    name: "viewIngredient",
+    moduleId: PLATFORM.moduleName("./pages/viewIngredient"),
+  },
+  {
     route: "share-requests",
     name: "shareRequests",
     moduleId: PLATFORM.moduleName("./pages/shareRequests"),

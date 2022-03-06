@@ -1,0 +1,783 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="active_dry_yeast" xml:space="preserve">
+    <value>Квасец</value>
+  </data>
+  <data name="alcohol" xml:space="preserve">
+    <value>Алкохол</value>
+  </data>
+  <data name="all_purpose_flour" xml:space="preserve">
+    <value>Брашно (секаква намена)</value>
+  </data>
+  <data name="almonds" xml:space="preserve">
+    <value>Бадеми</value>
+  </data>
+  <data name="apples" xml:space="preserve">
+    <value>Јаболка</value>
+  </data>
+  <data name="apple_cider_vinegar" xml:space="preserve">
+    <value>Јаболков оцет</value>
+  </data>
+  <data name="apricot" xml:space="preserve">
+    <value>Кајсија</value>
+  </data>
+  <data name="asparagus" xml:space="preserve">
+    <value>Аспарагус</value>
+  </data>
+  <data name="avocado" xml:space="preserve">
+    <value>Авокадо</value>
+  </data>
+  <data name="bacon" xml:space="preserve">
+    <value>Сланина</value>
+  </data>
+  <data name="baking_chocolate" xml:space="preserve">
+    <value>Чоколадо за готвење</value>
+  </data>
+  <data name="baking_powder" xml:space="preserve">
+    <value>Прав за печење</value>
+  </data>
+  <data name="baking_soda" xml:space="preserve">
+    <value>Сода бикарбона</value>
+  </data>
+  <data name="balsamic_vinegar" xml:space="preserve">
+    <value>Балсамиски оцет</value>
+  </data>
+  <data name="bananas" xml:space="preserve">
+    <value>Банани</value>
+  </data>
+  <data name="barbeque_sauce" xml:space="preserve">
+    <value>Сос од скара</value>
+  </data>
+  <data name="basil" xml:space="preserve">
+    <value>Босилек</value>
+  </data>
+  <data name="beans" xml:space="preserve">
+    <value>Грав</value>
+  </data>
+  <data name="beef" xml:space="preserve">
+    <value>Телешко</value>
+  </data>
+  <data name="beer" xml:space="preserve">
+    <value>Пиво</value>
+  </data>
+  <data name="beetroot" xml:space="preserve">
+    <value>Beetroot</value>
+  </data>
+  <data name="biscuits" xml:space="preserve">
+    <value>Бисквити</value>
+  </data>
+  <data name="blackberries" xml:space="preserve">
+    <value>Капини</value>
+  </data>
+  <data name="black_olives" xml:space="preserve">
+    <value>Црни маслинки</value>
+  </data>
+  <data name="black_pepper" xml:space="preserve">
+    <value>Црн пипер</value>
+  </data>
+  <data name="blueberries" xml:space="preserve">
+    <value>Боровница</value>
+  </data>
+  <data name="bow_tie_pasta" xml:space="preserve">
+    <value>Машна тестенини</value>
+  </data>
+  <data name="bread" xml:space="preserve">
+    <value>Леб</value>
+  </data>
+  <data name="bread_crumbs" xml:space="preserve">
+    <value>Лебни трошки</value>
+  </data>
+  <data name="broccoli" xml:space="preserve">
+    <value>Брокули</value>
+  </data>
+  <data name="brown_rice" xml:space="preserve">
+    <value>Интегрален ориз</value>
+  </data>
+  <data name="brown_sugar" xml:space="preserve">
+    <value>Кафеав шеќер</value>
+  </data>
+  <data name="brussel_sprout" xml:space="preserve">
+    <value>Бриселско зелје</value>
+  </data>
+  <data name="butter" xml:space="preserve">
+    <value>Путер</value>
+  </data>
+  <data name="cabbage" xml:space="preserve">
+    <value>Зелка</value>
+  </data>
+  <data name="canola_oil" xml:space="preserve">
+    <value>Масло од канола</value>
+  </data>
+  <data name="carrots" xml:space="preserve">
+    <value>Моркови</value>
+  </data>
+  <data name="cashew_nuts" xml:space="preserve">
+    <value>Индиски ореви</value>
+  </data>
+  <data name="cauliflower" xml:space="preserve">
+    <value>Карфиол</value>
+  </data>
+  <data name="cayenne_peppers" xml:space="preserve">
+    <value>Кајенска пиперка</value>
+  </data>
+  <data name="cayenne_pepper_powder" xml:space="preserve">
+    <value>Прав од кајенска пиперка</value>
+  </data>
+  <data name="celery" xml:space="preserve">
+    <value>Целер</value>
+  </data>
+  <data name="cheddar_cheese" xml:space="preserve">
+    <value>Чедар сирење</value>
+  </data>
+  <data name="cheese" xml:space="preserve">
+    <value>Сирење</value>
+  </data>
+  <data name="cherries" xml:space="preserve">
+    <value>Цреши</value>
+  </data>
+  <data name="chia_seeds" xml:space="preserve">
+    <value>Чиа семиња</value>
+  </data>
+  <data name="chicken" xml:space="preserve">
+    <value>Пилешко</value>
+  </data>
+  <data name="chicken_bouillon_cube" xml:space="preserve">
+    <value>Коцка за супа</value>
+  </data>
+  <data name="chicken_breast" xml:space="preserve">
+    <value>Пилешки гради</value>
+  </data>
+  <data name="chicken_broth" xml:space="preserve">
+    <value>Пилешка супа</value>
+  </data>
+  <data name="chicken_wings" xml:space="preserve">
+    <value>Пилешки крилца</value>
+  </data>
+  <data name="chickpeas" xml:space="preserve">
+    <value>Леблебии</value>
+  </data>
+  <data name="chili_peppers" xml:space="preserve">
+    <value>Чили пиперчиња</value>
+  </data>
+  <data name="chili_powder" xml:space="preserve">
+    <value>Чили прав</value>
+  </data>
+  <data name="chocolate_chips" xml:space="preserve">
+    <value>Чоколадни чипови</value>
+  </data>
+  <data name="cinnamon" xml:space="preserve">
+    <value>Цимет</value>
+  </data>
+  <data name="cocoa_powder" xml:space="preserve">
+    <value>Какао прав</value>
+  </data>
+  <data name="coconut" xml:space="preserve">
+    <value>Кокос</value>
+  </data>
+  <data name="coffee" xml:space="preserve">
+    <value>Кафе</value>
+  </data>
+  <data name="conchiglie_pasta" xml:space="preserve">
+    <value>Conchiglie тестенини</value>
+  </data>
+  <data name="condensed_chicken_soup" xml:space="preserve">
+    <value>Спакувана пичешка супа</value>
+  </data>
+  <data name="condensed_milk" xml:space="preserve">
+    <value>Кондензирано млеко</value>
+  </data>
+  <data name="corn" xml:space="preserve">
+    <value>Пченка</value>
+  </data>
+  <data name="cornmeal" xml:space="preserve">
+    <value>Пченкарно брашно</value>
+  </data>
+  <data name="corn_starch" xml:space="preserve">
+    <value>Пченкарен скроб</value>
+  </data>
+  <data name="cow_cheese" xml:space="preserve">
+    <value>Бело сирење</value>
+  </data>
+  <data name="cranberries" xml:space="preserve">
+    <value>Брусница</value>
+  </data>
+  <data name="cucumbers" xml:space="preserve">
+    <value>Краставици</value>
+  </data>
+  <data name="cumin" xml:space="preserve">
+    <value>Ким</value>
+  </data>
+  <data name="curry_powder" xml:space="preserve">
+    <value>Кари прав</value>
+  </data>
+  <data name="curry_sauce" xml:space="preserve">
+    <value>Кари сос</value>
+  </data>
+  <data name="dairy" xml:space="preserve">
+    <value>Млечни</value>
+  </data>
+  <data name="dry_white_wine" xml:space="preserve">
+    <value>Суво бело вино</value>
+  </data>
+  <data name="eggplant" xml:space="preserve">
+    <value>Модар патлиџан</value>
+  </data>
+  <data name="eggs" xml:space="preserve">
+    <value>Јајца</value>
+  </data>
+  <data name="egg_whites" xml:space="preserve">
+    <value>Белки од јајце</value>
+  </data>
+  <data name="egg_yolks" xml:space="preserve">
+    <value>Жолчки од јајце</value>
+  </data>
+  <data name="farfalle_pasta" xml:space="preserve">
+    <value>Farfalle тестенини</value>
+  </data>
+  <data name="feta_cheese" xml:space="preserve">
+    <value>Фета сирење</value>
+  </data>
+  <data name="fettuccine" xml:space="preserve">
+    <value>Фетучини</value>
+  </data>
+  <data name="flour" xml:space="preserve">
+    <value>Брашно</value>
+  </data>
+  <data name="fruit" xml:space="preserve">
+    <value>Овошје</value>
+  </data>
+  <data name="fusilli" xml:space="preserve">
+    <value>Фусили</value>
+  </data>
+  <data name="garam_masala" xml:space="preserve">
+    <value>Гарам масала</value>
+  </data>
+  <data name="garlic" xml:space="preserve">
+    <value>Лук</value>
+  </data>
+  <data name="garlic_clove" xml:space="preserve">
+    <value>Глава лук</value>
+  </data>
+  <data name="garlic_powder" xml:space="preserve">
+    <value>Лук во прав</value>
+  </data>
+  <data name="ginger" xml:space="preserve">
+    <value>Ѓумбир</value>
+  </data>
+  <data name="gnocchi" xml:space="preserve">
+    <value>Њоки</value>
+  </data>
+  <data name="grain" xml:space="preserve">
+    <value>Житарици</value>
+  </data>
+  <data name="grapefruit" xml:space="preserve">
+    <value>Грејпфрут</value>
+  </data>
+  <data name="grapes" xml:space="preserve">
+    <value>Грозје</value>
+  </data>
+  <data name="green_olives" xml:space="preserve">
+    <value>Зелени маслинки</value>
+  </data>
+  <data name="green_peas" xml:space="preserve">
+    <value>Грашок</value>
+  </data>
+  <data name="green_peppers" xml:space="preserve">
+    <value>Зелени пиперки</value>
+  </data>
+  <data name="hake" xml:space="preserve">
+    <value>Ослиќ</value>
+  </data>
+  <data name="ham" xml:space="preserve">
+    <value>Шунка</value>
+  </data>
+  <data name="hamburger_bun" xml:space="preserve">
+    <value>Лепче за хамбургер</value>
+  </data>
+  <data name="hazelnuts" xml:space="preserve">
+    <value>Лешници</value>
+  </data>
+  <data name="heavy_cream" xml:space="preserve">
+    <value>Павлака за готвење</value>
+  </data>
+  <data name="himalayan_salt" xml:space="preserve">
+    <value>Хималајска сол</value>
+  </data>
+  <data name="hoisin_sauce" xml:space="preserve">
+    <value>Хојзин сос</value>
+  </data>
+  <data name="honey" xml:space="preserve">
+    <value>Мед</value>
+  </data>
+  <data name="italian_seasoning" xml:space="preserve">
+    <value>Италијански зачин</value>
+  </data>
+  <data name="ketchup" xml:space="preserve">
+    <value>Кечап</value>
+  </data>
+  <data name="kiwis" xml:space="preserve">
+    <value>Киви</value>
+  </data>
+  <data name="kosher_salt" xml:space="preserve">
+    <value>Кошер сол</value>
+  </data>
+  <data name="lamb" xml:space="preserve">
+    <value>Јагнешко</value>
+  </data>
+  <data name="lemons" xml:space="preserve">
+    <value>Лимони</value>
+  </data>
+  <data name="lentils" xml:space="preserve">
+    <value>Леќа</value>
+  </data>
+  <data name="lettuce" xml:space="preserve">
+    <value>Марула</value>
+  </data>
+  <data name="lima_beans" xml:space="preserve">
+    <value>Грав лима</value>
+  </data>
+  <data name="limes" xml:space="preserve">
+    <value>Зелен лимон</value>
+  </data>
+  <data name="liver" xml:space="preserve">
+    <value>Џигер</value>
+  </data>
+  <data name="macaroni" xml:space="preserve">
+    <value>Макарони</value>
+  </data>
+  <data name="mandarins" xml:space="preserve">
+    <value>Мандарини</value>
+  </data>
+  <data name="maple_syrup" xml:space="preserve">
+    <value>Јаворов сируп</value>
+  </data>
+  <data name="margarine" xml:space="preserve">
+    <value>Маргарин</value>
+  </data>
+  <data name="mayonnaise" xml:space="preserve">
+    <value>Мајонез</value>
+  </data>
+  <data name="melon" xml:space="preserve">
+    <value>Диња</value>
+  </data>
+  <data name="milk" xml:space="preserve">
+    <value>Млеко</value>
+  </data>
+  <data name="mozzarella_cheese" xml:space="preserve">
+    <value>Моцарела сирење</value>
+  </data>
+  <data name="muesli" xml:space="preserve">
+    <value>Мусли</value>
+  </data>
+  <data name="mushrooms" xml:space="preserve">
+    <value>Печурки</value>
+  </data>
+  <data name="mushroom_soup" xml:space="preserve">
+    <value>Супа од печурки</value>
+  </data>
+  <data name="mustard" xml:space="preserve">
+    <value>Сенф</value>
+  </data>
+  <data name="noodles" xml:space="preserve">
+    <value>Нудли</value>
+  </data>
+  <data name="nutmeg" xml:space="preserve">
+    <value>Морско оревче</value>
+  </data>
+  <data name="nuts_legumes" xml:space="preserve">
+    <value>Легуми</value>
+  </data>
+  <data name="oats" xml:space="preserve">
+    <value>Овесни снегулки</value>
+  </data>
+  <data name="oil" xml:space="preserve">
+    <value>Масло</value>
+  </data>
+  <data name="olives" xml:space="preserve">
+    <value>Маслинки</value>
+  </data>
+  <data name="olive_oil" xml:space="preserve">
+    <value>Маслиново масло</value>
+  </data>
+  <data name="onions" xml:space="preserve">
+    <value>Кромид</value>
+  </data>
+  <data name="onion_powder" xml:space="preserve">
+    <value>Кромид во прав</value>
+  </data>
+  <data name="oranges" xml:space="preserve">
+    <value>Портокали</value>
+  </data>
+  <data name="oregano" xml:space="preserve">
+    <value>Оригано</value>
+  </data>
+  <data name="paprika" xml:space="preserve">
+    <value>Црвен пипер</value>
+  </data>
+  <data name="parmesan" xml:space="preserve">
+    <value>Пармезан</value>
+  </data>
+  <data name="parsnip" xml:space="preserve">
+    <value>Магдонос</value>
+  </data>
+  <data name="pasta" xml:space="preserve">
+    <value>Тестенини</value>
+  </data>
+  <data name="peaches" xml:space="preserve">
+    <value>Праски</value>
+  </data>
+  <data name="peanuts" xml:space="preserve">
+    <value>Кикирики</value>
+  </data>
+  <data name="peanut_butter" xml:space="preserve">
+    <value>Путер од кикирики</value>
+  </data>
+  <data name="pears" xml:space="preserve">
+    <value>Круши</value>
+  </data>
+  <data name="peas" xml:space="preserve">
+    <value>Грашок</value>
+  </data>
+  <data name="penne_pasta" xml:space="preserve">
+    <value>Penne тестенини</value>
+  </data>
+  <data name="peppers" xml:space="preserve">
+    <value>Пиперки</value>
+  </data>
+  <data name="pickles" xml:space="preserve">
+    <value>Кисели краставички</value>
+  </data>
+  <data name="pineapple" xml:space="preserve">
+    <value>Ананас</value>
+  </data>
+  <data name="pistachios" xml:space="preserve">
+    <value>Ф'стаци</value>
+  </data>
+  <data name="plums" xml:space="preserve">
+    <value>Сливи</value>
+  </data>
+  <data name="pomegranate" xml:space="preserve">
+    <value>Калинка</value>
+  </data>
+  <data name="pork" xml:space="preserve">
+    <value>Свинско</value>
+  </data>
+  <data name="potatoes" xml:space="preserve">
+    <value>Компири</value>
+  </data>
+  <data name="powdered_sugar" xml:space="preserve">
+    <value>Шеќер во прав</value>
+  </data>
+  <data name="protein" xml:space="preserve">
+    <value>Протеин</value>
+  </data>
+  <data name="provolone_cheese" xml:space="preserve">
+    <value>Проволоне сирење</value>
+  </data>
+  <data name="pumpkin" xml:space="preserve">
+    <value>Тиква</value>
+  </data>
+  <data name="radish" xml:space="preserve">
+    <value>Ротквица</value>
+  </data>
+  <data name="raisins" xml:space="preserve">
+    <value>Суво грозје</value>
+  </data>
+  <data name="ranch_dressing" xml:space="preserve">
+    <value>Ранч сос</value>
+  </data>
+  <data name="raspberries" xml:space="preserve">
+    <value>Малини</value>
+  </data>
+  <data name="red_peppers" xml:space="preserve">
+    <value>Црвени пиперки</value>
+  </data>
+  <data name="red_vinegar" xml:space="preserve">
+    <value>Црвен оцет</value>
+  </data>
+  <data name="red_wine" xml:space="preserve">
+    <value>Црвено вино</value>
+  </data>
+  <data name="rice" xml:space="preserve">
+    <value>Ориз</value>
+  </data>
+  <data name="rice_vinegar" xml:space="preserve">
+    <value>Оризов оцет</value>
+  </data>
+  <data name="ricotta_cheese" xml:space="preserve">
+    <value>Рикота сирење</value>
+  </data>
+  <data name="rosemary" xml:space="preserve">
+    <value>Рузмарин</value>
+  </data>
+  <data name="rum" xml:space="preserve">
+    <value>Рум</value>
+  </data>
+  <data name="salsa" xml:space="preserve">
+    <value>Салса</value>
+  </data>
+  <data name="salt" xml:space="preserve">
+    <value>Сол</value>
+  </data>
+  <data name="salted_butter" xml:space="preserve">
+    <value>Солен путер</value>
+  </data>
+  <data name="sardines" xml:space="preserve">
+    <value>Сардини</value>
+  </data>
+  <data name="sausage" xml:space="preserve">
+    <value>Колбас</value>
+  </data>
+  <data name="seafood" xml:space="preserve">
+    <value>Морска храна</value>
+  </data>
+  <data name="seasoning" xml:space="preserve">
+    <value>Зачини</value>
+  </data>
+  <data name="sea_salt" xml:space="preserve">
+    <value>Морска сол</value>
+  </data>
+  <data name="sesame_seeds" xml:space="preserve">
+    <value>Сусам</value>
+  </data>
+  <data name="sheep_cheese" xml:space="preserve">
+    <value>Овчо сирење</value>
+  </data>
+  <data name="shrimp" xml:space="preserve">
+    <value>Ракчиња</value>
+  </data>
+  <data name="sirloin_steak" xml:space="preserve">
+    <value>Филе од бифтек</value>
+  </data>
+  <data name="skim_milk" xml:space="preserve">
+    <value>Обезмастено млеко</value>
+  </data>
+  <data name="sour_cream" xml:space="preserve">
+    <value>Павлака</value>
+  </data>
+  <data name="soy_sauce" xml:space="preserve">
+    <value>Соја сос</value>
+  </data>
+  <data name="spaghetti" xml:space="preserve">
+    <value>Шпагети</value>
+  </data>
+  <data name="spinach" xml:space="preserve">
+    <value>Спанаќ</value>
+  </data>
+  <data name="stewed_tomatoes" xml:space="preserve">
+    <value>Пелати</value>
+  </data>
+  <data name="strawberries" xml:space="preserve">
+    <value>Јагоди</value>
+  </data>
+  <data name="sugar" xml:space="preserve">
+    <value>Шеќер</value>
+  </data>
+  <data name="sunflower_oil" xml:space="preserve">
+    <value>Сончогледов зејтин</value>
+  </data>
+  <data name="sunflower_seeds" xml:space="preserve">
+    <value>Сончоглед</value>
+  </data>
+  <data name="sweet_pickle_relish" xml:space="preserve">
+    <value>Sweet pickle relish</value>
+  </data>
+  <data name="swiss_cheese" xml:space="preserve">
+    <value>Швајцарско сирење</value>
+  </data>
+  <data name="tartar_sauce" xml:space="preserve">
+    <value>Тартар сос</value>
+  </data>
+  <data name="thyme" xml:space="preserve">
+    <value>Мајчина душица</value>
+  </data>
+  <data name="tofu" xml:space="preserve">
+    <value>Тофу</value>
+  </data>
+  <data name="tomatoes" xml:space="preserve">
+    <value>Домати</value>
+  </data>
+  <data name="tomato_paste" xml:space="preserve">
+    <value>Доматна паста</value>
+  </data>
+  <data name="tomato_sauce" xml:space="preserve">
+    <value>Доматен сос</value>
+  </data>
+  <data name="tuna" xml:space="preserve">
+    <value>Туна</value>
+  </data>
+  <data name="turmeric" xml:space="preserve">
+    <value>Куркума</value>
+  </data>
+  <data name="turnip" xml:space="preserve">
+    <value>Репка</value>
+  </data>
+  <data name="unsalted_butter" xml:space="preserve">
+    <value>Путер без сол</value>
+  </data>
+  <data name="vanilla_extract" xml:space="preserve">
+    <value>Екстракт од ванила</value>
+  </data>
+  <data name="vegetables" xml:space="preserve">
+    <value>Зеленчук</value>
+  </data>
+  <data name="vegetable_oil" xml:space="preserve">
+    <value>Растително масло</value>
+  </data>
+  <data name="vinegar" xml:space="preserve">
+    <value>Оцет</value>
+  </data>
+  <data name="walnuts" xml:space="preserve">
+    <value>Ореви</value>
+  </data>
+  <data name="water" xml:space="preserve">
+    <value>Вода</value>
+  </data>
+  <data name="watermelon" xml:space="preserve">
+    <value>Лубеница</value>
+  </data>
+  <data name="white_rice" xml:space="preserve">
+    <value>Бел ориз</value>
+  </data>
+  <data name="white_vinegar" xml:space="preserve">
+    <value>Бел оцет</value>
+  </data>
+  <data name="white_wine" xml:space="preserve">
+    <value>Бело вино</value>
+  </data>
+  <data name="whole_milk" xml:space="preserve">
+    <value>Млеко (масно)</value>
+  </data>
+  <data name="wiener" xml:space="preserve">
+    <value>Виршла</value>
+  </data>
+  <data name="wine" xml:space="preserve">
+    <value>Вино</value>
+  </data>
+  <data name="worcestershire_sauce" xml:space="preserve">
+    <value>Востер сос</value>
+  </data>
+  <data name="yogurt" xml:space="preserve">
+    <value>Јогурт</value>
+  </data>
+  <data name="zucchini" xml:space="preserve">
+    <value>Тиквичка</value>
+  </data>
+</root>

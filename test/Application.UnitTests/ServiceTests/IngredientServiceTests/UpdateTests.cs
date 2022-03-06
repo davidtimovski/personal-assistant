@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
-using FluentValidation;
-using Moq;
 using Application.Contracts.CookingAssistant.Ingredients;
 using Application.Contracts.CookingAssistant.Ingredients.Models;
 using Application.Mappings;
 using Application.Services.CookingAssistant;
 using Application.UnitTests.Builders;
 using Domain.Entities.CookingAssistant;
+using FluentValidation;
+using Moq;
 using Xunit;
 
 namespace Application.UnitTests.ServiceTests.IngredientServiceTests;
@@ -58,19 +58,5 @@ public class UpdateTests
         const string expected = "Ingredient name";
 
         Assert.Equal(expected, actualName);
-    }
-
-    [Fact]
-    public async Task NullsName_IfItsLinkedToTask()
-    {
-        string actualName = null;
-        _ingredientsRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Ingredient>()))
-            .Callback<Ingredient>(i => actualName = i.Name);
-
-        UpdateIngredient model = new IngredientBuilder().WithTaskId().BuildUpdateModel();
-
-        await _sut.UpdateAsync(model, _successfulValidatorMock.Object);
-
-        Assert.Null(actualName);
     }
 }

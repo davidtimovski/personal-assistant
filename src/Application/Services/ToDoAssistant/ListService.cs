@@ -56,8 +56,13 @@ public class ListService : IListService
         return result;
     }
 
-    public IEnumerable<AssigneeOption> GetMembersAsAssigneeOptions(int id)
+    public IEnumerable<AssigneeOption> GetMembersAsAssigneeOptions(int id, int userId)
     {
+        if (!_listsRepository.UserOwnsOrShares(id, userId))
+        {
+            throw new ValidationException("Unauthorized");
+        }
+
         IEnumerable<User> members = _listsRepository.GetMembersAsAssigneeOptions(id);
 
         var result = members.Select(x => _mapper.Map<AssigneeOption>(x));

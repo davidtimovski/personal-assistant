@@ -8,9 +8,10 @@ import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
 
 import { SimpleIngredient } from "models/viewmodels/simpleIngredient";
 import { EditIngredientModel } from "models/viewmodels/editIngredientModel";
-import { IngredientSuggestions } from "models/viewmodels/ingredientSuggestions";
-import { IngredientSuggestion } from "models/viewmodels/ingredientSuggestion";
+import { IngredientSuggestion, PublicIngredientSuggestions } from "models/viewmodels/ingredientSuggestions";
 import { PriceData } from "models/viewmodels/priceData";
+import { TaskSuggestion } from "models/viewmodels/taskSuggestion";
+import { ViewIngredientModel } from "models/viewmodels/viewIngredientModel";
 
 @inject(AuthService, HttpClient, EventAggregator)
 export class IngredientsService extends HttpProxyBase {
@@ -27,8 +28,13 @@ export class IngredientsService extends HttpProxyBase {
     return result;
   }
 
-  async get(id: number): Promise<EditIngredientModel> {
-    const result = await this.ajax<EditIngredientModel>(`ingredients/${id}`);
+  async getForUpdate(id: number): Promise<EditIngredientModel> {
+    const result = await this.ajax<EditIngredientModel>(`ingredients/${id}/update`);
+    return result;
+  }
+
+  async getPublic(id: number): Promise<ViewIngredientModel> {
+    const result = await this.ajax<ViewIngredientModel>(`ingredients/${id}/public`);
     return result;
   }
 
@@ -55,25 +61,41 @@ export class IngredientsService extends HttpProxyBase {
     });
   }
 
+  async updatePublic(id: number, taskId: number): Promise<void> {
+    await this.ajaxExecute("ingredients/public", {
+      method: "put",
+      body: json({
+        id: id,
+        taskId: taskId
+      }),
+    });
+  }
+
   async delete(id: number): Promise<void> {
     await this.ajaxExecute(`ingredients/${id}`, {
       method: "delete",
     });
   }
 
-  async getTaskSuggestions(): Promise<Array<IngredientSuggestion>> {
-    const result = await this.ajax<Array<IngredientSuggestion>>(
+  async getTaskSuggestions(): Promise<Array<TaskSuggestion>> {
+    const result = await this.ajax<Array<TaskSuggestion>>(
       "ingredients/task-suggestions"
     );
 
     return result;
   }
 
-  async getSuggestionsForRecipe(
-    recipeId: number
-  ): Promise<IngredientSuggestions> {
-    const result = await this.ajax<IngredientSuggestions>(
-      `ingredients/suggestions/${recipeId}`
+  async getUserIngredientSuggestions(): Promise<Array<IngredientSuggestion>> {
+    const result = await this.ajax<Array<IngredientSuggestion>>(
+      'ingredients/user-suggestions'
+    );
+
+    return result;
+  }
+
+  async getPublicIngredientSuggestions(): Promise<PublicIngredientSuggestions> {
+    const result = await this.ajax<PublicIngredientSuggestions>(
+      'ingredients/public-suggestions'
     );
 
     return result;

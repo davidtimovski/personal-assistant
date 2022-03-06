@@ -111,29 +111,21 @@ label.label {
   }
 }
 
-.add-ingredient-wrap {
-  display: flex;
-  justify-content: space-between;
+.edit-recipe-form {
+  .prep-cook-duration-wrap {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 10px;
 
-  .toggle-from-tasks {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: var(--border-radius);
-    outline: none;
-    padding: 3px 11px 1px;
-    margin-left: 10px;
-    font-size: 29px;
-    line-height: 40px;
-    text-decoration: none;
-    color: var(--primary-color);
-    cursor: pointer;
-    user-select: none;
+    .duration-side label {
+      padding: 0;
+      margin-bottom: 5px;
+      text-align: center;
+    }
 
-    transition: background var(--transition), color var(--transition);
-
-    &.checked {
-      background: var(--primary-color);
-      color: #fff;
+    .duration-input {
+      width: 26px;
+      text-align: center;
     }
   }
 }
@@ -155,14 +147,6 @@ label.label {
     right: 10px;
     font-size: 27px;
     color: var(--primary-color);
-  }
-
-  &.from-task .fa-list {
-    display: block;
-  }
-
-  &.from-task .name-input {
-    padding-right: 50px;
   }
 
   .ingredient-name-wrap {

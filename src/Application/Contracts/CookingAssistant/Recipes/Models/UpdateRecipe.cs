@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FluentValidation;
+using Application.Contracts.Common;
+using Application.Contracts.Common.Models;
 using Application.Contracts.ToDoAssistant.Tasks;
+using FluentValidation;
 
 namespace Application.Contracts.CookingAssistant.Recipes.Models;
 
@@ -78,5 +80,26 @@ public class UpdateRecipeValidator : AbstractValidator<UpdateRecipe>
             .Must(videoUrl => string.IsNullOrEmpty(videoUrl)
                               || videoUrl.Contains("youtube.com", StringComparison.OrdinalIgnoreCase)
                               || videoUrl.Contains("youtu.be", StringComparison.OrdinalIgnoreCase)).WithMessage("Recipes.ModifyRecipe.OnlyYouTubeVideosAreCurrentlySupported");
+    }
+}
+
+public class UpdateRecipeIngredient
+{
+    public int? Id { get; set; }
+    public string Name { get; set; }
+    public int? TaskId { get; set; }
+    public float? Amount { get; set; }
+    public string Unit { get; set; }
+}
+
+public class UpdateRecipeResult : INotificationResult
+{
+    public string RecipeName { get; set; }
+    public string ActionUserImageUri { get; set; }
+    public IEnumerable<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
+
+    public bool Notify()
+    {
+        return NotificationRecipients.Any();
     }
 }

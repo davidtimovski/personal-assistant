@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
 using Application.Contracts.Common;
 using Application.Contracts.Common.Models;
 using Application.Contracts.CookingAssistant.DietaryProfiles.Models;
 using Application.Contracts.CookingAssistant.Ingredients.Models;
 using Application.Contracts.CookingAssistant.Recipes.Models;
+using AutoMapper;
 using Domain.Entities.Common;
 using Domain.Entities.CookingAssistant;
 using Utility;
@@ -46,6 +46,9 @@ public class CookingAssistantProfile : Profile
             .ForMember(x => x.Recipe, src => src.Ignore());
 
         CreateMap<UpdateIngredient, Ingredient>()
+            .ForMember(x => x.ParentId, src => src.Ignore())
+            .ForMember(x => x.CategoryId, src => src.Ignore())
+            .ForMember(x => x.BrandId, src => src.Ignore())
             .ForMember(x => x.ServingSize, opt => opt.MapFrom(src => src.NutritionData.ServingSize))
             .ForMember(x => x.ServingSizeIsOneUnit, opt => opt.MapFrom(src => src.NutritionData.ServingSizeIsOneUnit))
             .ForMember(x => x.Calories, opt => opt.MapFrom(src => src.NutritionData.Calories))
@@ -71,7 +74,11 @@ public class CookingAssistantProfile : Profile
             .ForMember(x => x.Currency, opt => opt.MapFrom(src => src.PriceData.Currency))
             .ForMember(x => x.CreatedDate, src => src.Ignore())
             .ForMember(x => x.ModifiedDate, src => src.Ignore())
+            .ForMember(x => x.Parent, src => src.Ignore())
+            .ForMember(x => x.Category, src => src.Ignore())
+            .ForMember(x => x.Brand, src => src.Ignore())
             .ForMember(x => x.Recipes, src => src.Ignore())
+            .ForMember(x => x.RecipesIngredients, src => src.Ignore())
             .ForMember(x => x.Task, src => src.Ignore())
             .ForMember(x => x.RecipeCount, src => src.Ignore());
 
@@ -148,37 +155,37 @@ public class RecipeNameResolver : IMemberValueResolver<object, object, List<Reci
     }
 }
 
-public class RecipeIngredientHasNutritionDataResolver : IValueResolver<RecipeIngredient, object, bool>
+public class RecipeIngredientHasNutritionDataResolver : IValueResolver<Ingredient, object, bool>
 {
-    public bool Resolve(RecipeIngredient source, object dest, bool destMember, ResolutionContext context)
+    public bool Resolve(Ingredient source, object dest, bool destMember, ResolutionContext context)
     {
-        var hasNutritionData = source.Ingredient.Calories.HasValue
-                               || source.Ingredient.Fat.HasValue
-                               || source.Ingredient.SaturatedFat.HasValue
-                               || source.Ingredient.Carbohydrate.HasValue
-                               || source.Ingredient.Sugars.HasValue
-                               || source.Ingredient.AddedSugars.HasValue
-                               || source.Ingredient.Fiber.HasValue
-                               || source.Ingredient.Protein.HasValue
-                               || source.Ingredient.Sodium.HasValue
-                               || source.Ingredient.Cholesterol.HasValue
-                               || source.Ingredient.VitaminA.HasValue
-                               || source.Ingredient.VitaminC.HasValue
-                               || source.Ingredient.VitaminD.HasValue
-                               || source.Ingredient.Calcium.HasValue
-                               || source.Ingredient.Iron.HasValue
-                               || source.Ingredient.Potassium.HasValue
-                               || source.Ingredient.Magnesium.HasValue;
+        var hasNutritionData = source.Calories.HasValue
+                               || source.Fat.HasValue
+                               || source.SaturatedFat.HasValue
+                               || source.Carbohydrate.HasValue
+                               || source.Sugars.HasValue
+                               || source.AddedSugars.HasValue
+                               || source.Fiber.HasValue
+                               || source.Protein.HasValue
+                               || source.Sodium.HasValue
+                               || source.Cholesterol.HasValue
+                               || source.VitaminA.HasValue
+                               || source.VitaminC.HasValue
+                               || source.VitaminD.HasValue
+                               || source.Calcium.HasValue
+                               || source.Iron.HasValue
+                               || source.Potassium.HasValue
+                               || source.Magnesium.HasValue;
 
         return hasNutritionData;
     }
 }
 
-public class RecipeIngredientHasPriceDataResolver : IValueResolver<RecipeIngredient, object, bool>
+public class RecipeIngredientHasPriceDataResolver : IValueResolver<Ingredient, object, bool>
 {
-    public bool Resolve(RecipeIngredient source, object dest, bool destMember, ResolutionContext context)
+    public bool Resolve(Ingredient source, object dest, bool destMember, ResolutionContext context)
     {
-        return source.Ingredient.Price.HasValue;
+        return source.Price.HasValue;
     }
 }
 

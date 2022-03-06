@@ -1,10 +1,8 @@
 export class SimpleIngredient {
-  constructor(
-    public id: number,
-    public taskId: number,
-    public name: string,
-    public hasNutritionData: boolean,
-    public hasPriceData: boolean,
-    public unused: boolean
-  ) {}
+  id: number;
+  taskId: number;
+  name: string;
+  hasNutritionData: boolean;
+  hasPriceData: boolean;
+  unused: boolean;
 }

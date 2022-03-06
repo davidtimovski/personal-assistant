@@ -210,10 +210,8 @@ public class ListsController : Controller
         {
             return Unauthorized();
         }
-            
-        // TODO: Verify user has access to list
 
-        var assigneeOptions = _listService.GetMembersAsAssigneeOptions(id);
+        var assigneeOptions = _listService.GetMembersAsAssigneeOptions(id, userId);
 
         return Ok(assigneeOptions);
     }

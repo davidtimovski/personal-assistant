@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Api.Models.CookingAssistant.Ingredients;
+using Application.Contracts.CookingAssistant.Ingredients;
+using Application.Contracts.CookingAssistant.Ingredients.Models;
 using FluentValidation;
+using Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Application.Contracts.CookingAssistant.Ingredients;
-using Application.Contracts.CookingAssistant.Ingredients.Models;
-using Infrastructure.Identity;
+using Microsoft.Extensions.Localization;
 
 namespace Api.Controllers.CookingAssistant;
 
@@ -18,14 +19,20 @@ namespace Api.Controllers.CookingAssistant;
 public class IngredientsController : Controller
 {
     private readonly IIngredientService _ingredientService;
+    private readonly IStringLocalizer<IngredientsController> _localizer;
     private readonly IValidator<UpdateIngredient> _updateValidator;
+    private readonly IValidator<UpdatePublicIngredient> _updatePublicValidator;
 
     public IngredientsController(
         IIngredientService ingredientService,
-        IValidator<UpdateIngredient> updateValidator)
+        IStringLocalizer<IngredientsController> localizer,
+        IValidator<UpdateIngredient> updateValidator,
+        IValidator<UpdatePublicIngredient> updatePublicValidator)
     {
         _ingredientService = ingredientService;
+        _localizer = localizer;
         _updateValidator = updateValidator;
+        _updatePublicValidator = updatePublicValidator;
     }
 
     [HttpGet]
@@ -41,13 +48,18 @@ public class IngredientsController : Controller
             return Unauthorized();
         }
 
-        IEnumerable<IngredientDto> ingredientDtos = _ingredientService.GetAll(userId);
+        var ingredientDtos = _ingredientService.GetUserAndUsedPublicIngredients(userId);
+
+        foreach (var ingredient in ingredientDtos.Where(x => x.IsPublic))
+        {
+            ingredient.Name = _localizer[ingredient.Name];
+        }
 
         return Ok(ingredientDtos);
     }
 
-    [HttpGet("{id}")]
-    public IActionResult Get(int id)
+    [HttpGet("{id}/update")]
+    public IActionResult GetForUpdate(int id)
     {
         int userId;
         try
@@ -59,7 +71,7 @@ public class IngredientsController : Controller
             return Unauthorized();
         }
 
-        EditIngredient editIngredientDto = _ingredientService.Get(id, userId);
+        EditIngredient editIngredientDto = _ingredientService.GetForUpdate(id, userId);
         if (editIngredientDto == null)
         {
             return NotFound();
@@ -68,8 +80,8 @@ public class IngredientsController : Controller
         return Ok(editIngredientDto);
     }
 
-    [HttpGet("suggestions/{recipeId}")]
-    public IActionResult GetSuggestions(int recipeId)
+    [HttpGet("{id}/public")]
+    public IActionResult GetPublic(int id)
     {
         int userId;
         try
@@ -81,13 +93,65 @@ public class IngredientsController : Controller
             return Unauthorized();
         }
 
-        var ingredientSuggestionsVm = new IngredientSuggestionsVm
+        ViewIngredient viewIngredientDto = _ingredientService.GetPublic(id, userId);
+        if (viewIngredientDto == null)
         {
-            Suggestions = _ingredientService.GetSuggestions(recipeId, userId),
-            TaskSuggestions = _ingredientService.GetTaskSuggestions(recipeId, userId)
-        };
+            return NotFound();
+        }
 
-        return Ok(ingredientSuggestionsVm);
+        viewIngredientDto.Name = _localizer[viewIngredientDto.Name];
+
+        return Ok(viewIngredientDto);
+    }
+
+    [HttpGet("user-suggestions")]
+    public IActionResult GetUserSuggestions()
+    {
+        int userId;
+        try
+        {
+            userId = IdentityHelper.GetUserId(User);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
+        }
+
+        var suggestionsDtos = _ingredientService.GetUserSuggestions(userId);
+
+        return Ok(suggestionsDtos);
+    }
+
+    [ResponseCache(Duration = 60 * 60 * 24)]
+    [HttpGet("public-suggestions")]
+    public IActionResult GetPublicSuggestions()
+    {
+        var suggestionsDto = _ingredientService.GetPublicSuggestions();
+
+        suggestionsDto.Uncategorized.ForEach(suggestion =>
+        { 
+            TranslateSuggestion(suggestion);
+        });
+
+        foreach (var category in suggestionsDto.Categories)
+        {
+            category.Name = _localizer[category.Name];
+            category.Ingredients.ForEach(suggestion =>
+            {
+                TranslateSuggestion(suggestion);
+            });
+
+            foreach (var subcategory in category.Subcategories)
+            {
+                subcategory.Name = _localizer[subcategory.Name];
+                subcategory.Ingredients.ForEach(suggestion =>
+                {
+                    TranslateSuggestion(suggestion);
+                });
+            }
+        }
+
+        return Ok(suggestionsDto);
     }
 
     [HttpGet("task-suggestions")]
@@ -103,7 +167,7 @@ public class IngredientsController : Controller
             return Unauthorized();
         }
 
-        IEnumerable<IngredientSuggestion> taskSuggestions = _ingredientService.GetTaskSuggestions(userId);
+        IEnumerable<TaskSuggestion> taskSuggestions = _ingredientService.GetTaskSuggestions(userId);
 
         return Ok(taskSuggestions);
     }
@@ -130,8 +194,30 @@ public class IngredientsController : Controller
         return NoContent();
     }
 
+    [HttpPut("public")]
+    public async Task<IActionResult> UpdatePublic([FromBody] UpdatePublicIngredient dto)
+    {
+        if (dto == null)
+        {
+            return BadRequest();
+        }
+
+        try
+        {
+            dto.UserId = IdentityHelper.GetUserId(User);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
+        }
+
+        await _ingredientService.UpdateAsync(dto, _updatePublicValidator);
+
+        return NoContent();
+    }
+
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> DeleteOrRemoveFromRecipesAsync(int id)
     {
         int userId;
         try
@@ -143,8 +229,18 @@ public class IngredientsController : Controller
             return Unauthorized();
         }
 
-        await _ingredientService.DeleteAsync(id, userId);
+        await _ingredientService.DeleteOrRemoveFromRecipesAsync(id, userId);
 
         return NoContent();
+    }
+
+    private void TranslateSuggestion(IngredientSuggestion suggestion)
+    {
+        suggestion.Name = _localizer[suggestion.Name];
+
+        foreach (var child in suggestion.Children)
+        {
+            TranslateSuggestion(child);
+        }
     }
 }

@@ -5,8 +5,10 @@
 CREATE TABLE public."CookingAssistant.Ingredients"
 (
     "Id" serial NOT NULL,
+	"ParentId" integer,
     "UserId" integer NOT NULL,
-    "TaskId" integer,
+	"CategoryId" integer,
+	"BrandId" integer,
     "Name" character varying(50) COLLATE pg_catalog."default",
     "ServingSize" smallint NOT NULL DEFAULT 100,
     "ServingSizeIsOneUnit" boolean NOT NULL DEFAULT FALSE,
@@ -33,12 +35,21 @@ CREATE TABLE public."CookingAssistant.Ingredients"
     "CreatedDate" timestamp with time zone NOT NULL,
     "ModifiedDate" timestamp with time zone NOT NULL,
     CONSTRAINT "PK_CookingAssistant.Ingredients" PRIMARY KEY ("Id"),
-    CONSTRAINT "FK_CookingAssistant.Ingredients_AspNetUsers_UserId" FOREIGN KEY ("UserId")
+    CONSTRAINT "UQ_CA.Ingredients_Name_Type" UNIQUE ("Name", "Type"),
+	CONSTRAINT "FK_CA.Ingredients_CA.Ingredients_ParentId" FOREIGN KEY ("ParentId")
+    REFERENCES public."CookingAssistant.Ingredients" ("Id") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE CASCADE,
+	CONSTRAINT "FK_CA.Ingredients_AspNetUsers_UserId" FOREIGN KEY ("UserId")
     REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE,
-    CONSTRAINT "FK_CookingAssistant.Ingredients_ToDoAssistant.Tasks_TaskId" FOREIGN KEY ("TaskId")
-    REFERENCES public."ToDoAssistant.Tasks" ("Id") MATCH SIMPLE
+    CONSTRAINT "FK_CA.Ingredients_CA.IngredientCategories_CategoryId" FOREIGN KEY ("CategoryId")
+    REFERENCES public."CookingAssistant.IngredientCategories" ("Id") MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE SET NULL,
+    CONSTRAINT "FK_CA.Ingredients_CA.IngredientCategories_BrandId" FOREIGN KEY ("BrandId")
+    REFERENCES public."CookingAssistant.IngredientCategories" ("Id") MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE SET NULL
 )
@@ -58,13 +69,3 @@ CREATE INDEX "IX_CookingAssistant.Ingredients_UserId"
     ON public."CookingAssistant.Ingredients" USING btree
     ("UserId")
     TABLESPACE pg_default;
-
--- Index: IX_CookingAssistant.Ingredients_TaskId
-
--- DROP INDEX public."IX_CookingAssistant.Ingredients_TaskId";
-
-CREATE INDEX "IX_CookingAssistant.Ingredients_TaskId"
-    ON public."CookingAssistant.Ingredients" USING btree
-    ("TaskId")
-    TABLESPACE pg_default;
-	

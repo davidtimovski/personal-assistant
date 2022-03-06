@@ -56,7 +56,7 @@ export class Recipes {
     this.imageUri = this.localStorage.getProfileImageUri();
   }
 
-  attached() {
+  async attached() {
     if (this.state.recipes) {
       this.setRecipesFromState();
     } else {
@@ -64,11 +64,10 @@ export class Recipes {
     }
 
     if (this.localStorage.isStale("profileImageUri")) {
-      this.usersService.getProfileImageUri().then((imageUri) => {
-        if (this.imageUri !== imageUri) {
-          this.imageUri = imageUri;
-        }
-      });
+      const imageUri = await this.usersService.getProfileImageUri();
+      if (this.imageUri !== imageUri) {
+        this.imageUri = imageUri;
+      }
     }
   }
 

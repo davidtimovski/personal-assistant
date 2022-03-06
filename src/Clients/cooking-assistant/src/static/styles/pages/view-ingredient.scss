@@ -1,0 +1,138 @@
+@import "../../../../../shared/src/static/styles/variables";
+
+.used-in-recipes-section {
+  margin-bottom: 30px;
+}
+
+.ingredient-recipes {
+  background: #fafafa;
+  border-radius: var(--border-radius);
+  margin-bottom: 10px;
+
+  ul {
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: var(--border-radius);
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    list-style-type: none;
+
+    li {
+      padding: 10px 15px;
+      line-height: 24px;
+
+      &:nth-child(even) {
+        background: #eee;
+      }
+    }
+  }
+}
+
+.search-tasks-wrap {
+  margin-top: 7px;
+}
+
+.linked-to-task-alert {
+  background: var(--primary-color-light);
+  border-radius: var(--border-radius);
+  padding: 7px 12px;
+  margin-bottom: 20px;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  color: var(--primary-color-dark);
+
+  .fa-info-circle {
+    margin-right: 5px;
+    color: var(--primary-color-dark);
+  }
+
+  .unlink-button-wrap {
+    margin: 8px 0 3px;
+    text-align: right;
+  }
+}
+
+.nutrition-price-data-wrap {
+  margin: 35px 0;
+
+  .nutrition-price-data-container {
+    margin-top: 15px;
+
+    .nutrition-price-data {
+      margin: 30px 0;
+
+      .nutrition-price-data-header {
+        position: relative;
+        background: var(--primary-color);
+        border-top-left-radius: var(--border-radius);
+        border-top-right-radius: var(--border-radius);
+        padding: 5px;
+        line-height: 27px;
+        text-align: center;
+        color: #fff;
+
+        i.fa-clipboard {
+          position: absolute;
+          top: 8px;
+          left: 14px;
+          font-size: 22px;
+        }
+
+        i.fa-tag {
+          position: absolute;
+          top: 10px;
+          left: 14px;
+          font-size: 20px;
+        }
+      }
+
+      .nutrition-price-data-content {
+        border: 1px solid #ddd;
+        border-top: none;
+        border-radius: var(--border-radius);
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+
+        .nutrition-price-data-legend {
+          border-bottom-left-radius: var(--border-radius);
+          border-bottom-right-radius: var(--border-radius);
+          padding: 15px;
+          text-align: center;
+        }
+      }
+    }
+  }
+}
+
+.view-ingredient-data-table {
+  width: 100%;
+
+  tbody tr td {
+    padding: 4px 15px;
+    vertical-align: middle;
+    line-height: 37px;
+  }
+
+  tbody tr td:nth-child(2) {
+    text-align: right;
+  }
+
+  &.nutrition tbody tr:nth-child(odd) {
+    background: #eee;
+  }
+}
+
+@media screen and (min-width: $desktop-min) {
+  .nutrition-price-data-wrap .nutrition-price-data-container .nutrition-price-data .nutrition-price-data-header {
+    padding: 9px 5px;
+
+    i.fa-clipboard {
+      top: 12px;
+    }
+
+    i.fa-tag {
+      top: 13px;
+      font-size: 22px;
+    }
+  }
+}

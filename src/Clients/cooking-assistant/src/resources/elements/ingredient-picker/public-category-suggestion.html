@@ -1,0 +1,19 @@
+<template bindable="category">
+  <require from="./public-category-suggestion.scss"></require>
+  <require from="./public-category-suggestion"></require>
+  <require from="./public-ingredient-suggestion"></require>
+
+  <div if.bind="category.matched">
+    <div class="category-name">${category.name}</div>
+
+    <div class="category-body">
+      <div repeat.for="ingredient of category.ingredients">
+        <public-ingredient-suggestion ingredient.bind="ingredient"></public-ingredient-suggestion>
+      </div>
+  
+      <div repeat.for="subcategory of category.subcategories" class="subcategory-suggestion">
+        <public-category-suggestion category.bind="subcategory"></public-category-suggestion>
+      </div>
+    </div>
+  </div>
+</template>

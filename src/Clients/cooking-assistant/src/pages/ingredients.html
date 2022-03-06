@@ -16,7 +16,7 @@
 
       <div class="content-wrap">
         <div if.bind="shadowIngredients.length > 0" class="ingredients-search-wrap">
-          <input type="text" value.bind="search" keyup.delegate="searchInputChanged() & throttle:1000"
+          <input type="text" value.bind="search" keyup.delegate="searchInputChanged() & throttle:250"
             class="${search.length > 0 ? 'searching' : ''}" t="[placeholder,aria-label]ingredients.search"
             maxlength="50" />
           <i class="fas fa-times" show.bind="clearSearchButtonIsVisible" click.delegate="clearSearch()"
@@ -28,17 +28,17 @@
           <div class="double-bounce2"></div>
         </div>
 
-        <a repeat.for="ingredient of ingredients"
-          class="ingredient au-animate animate-fade-in ${ingredient.unused ? 'unused' : ''} ${ingredient.id === getEditedId ? 'highlighted' : ''}"
-          route-href="route: editIngredient; params.bind: { id: ingredient.id }">
+        <div repeat.for="ingredient of ingredients" click.delegate="ingredientClicked(ingredient.id, ingredient.isPublic)"
+          class="ingredient au-animate animate-fade-in ${ingredient.unused ? 'unused' : ''} ${ingredient.id === getEditedId ? 'highlighted' : ''}">
           <span class="name">${ingredient.name}</span>
           <span class="ingredient-icons-container">
+            <i class="fas fa-user" if.bind="!ingredient.isPublic" t="[title,aria-label]ingredients.mine"></i>
             <i class="fas fa-link" if.bind="ingredient.taskId" t="[title,aria-label]ingredients.linkedToTask"></i>
             <i class="fas fa-clipboard" if.bind="ingredient.hasNutritionData"
-              t="[title,aria-label]ingredients.hasNutritionSet"></i>
-            <i class="fas fa-tag" if.bind="ingredient.hasPriceData" t="[title,aria-label]ingredients.hasPriceSet"></i>
+              t="[title,aria-label]hasNutritionSet"></i>
+            <i class="fas fa-tag" if.bind="ingredient.hasPriceData" t="[title,aria-label]hasPriceSet"></i>
           </span>
-        </a>
+        </div>
 
         <empty-list-message if.bind="shadowIngredients.length === 0" message-key="ingredients.emptyListMessage">
         </empty-list-message>

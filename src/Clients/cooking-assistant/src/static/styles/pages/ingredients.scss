@@ -10,11 +10,11 @@
   padding: 9px 15px;
   color: var(--regular-color);
   line-height: 27px;
-  text-decoration: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  cursor: pointer;
 
   &:last-child {
     margin-bottom: 0;
