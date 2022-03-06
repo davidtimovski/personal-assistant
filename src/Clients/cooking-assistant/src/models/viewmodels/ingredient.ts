@@ -1,14 +1,12 @@
 export class Ingredient {
-  constructor(
-    public id: number,
-    public recipeId: number,
-    public taskId: number,
-    public name: string,
-    public amount: number,
-    public amountPerServing: number,
-    public unit: string,
-    public missing: boolean,
-    public nutritionSource: boolean,
-    public costSource: boolean
-  ) {}
+  id: number;
+  recipeId: number;
+  taskId: number;
+  name: string;
+  amount: number;
+  amountPerServing: number;
+  unit: string;
+  missing: boolean;
+  nutritionSource: boolean;
+  costSource: boolean;
 }

@@ -1,6 +1,6 @@
 <template>
   <require from="../static/styles/pages/edit-recipe.scss"></require>
-  <require from="./../resources/elements/tooltip"></require>
+  <require from="./../resources/elements/ingredient-picker/ingredient-picker"></require>
   <require from="./../resources/value-converters/null-format"></require>
   <require from="./../resources/elements/servings-selector"></require>
 
@@ -64,41 +64,25 @@
               <span t="editRecipe.ingredients">Ingredients</span>: <span>${getIngredientsCount}</span>
             </label>
 
-            <tooltip key="ingredientFromTask"></tooltip>
-
-            <div if.bind="model.userIsOwner" class="add-ingredient-wrap">
-              <div class="add-input-wrap">
-                <input type="text" value.bind="ingredientName" ref="addIngredientsInput"
-                  placeholder="${addIngredientsInputPlaceholder}" aria-label="${addIngredientsInputPlaceholder}"
-                  maxlength="50" class.bind="ingredientNameIsInvalid ? 'invalid' : ''" />
-                <a click.delegate="addNewIngredient()" t="[title,aria-label]editRecipe.addIngredient">
-                  <i class="fas fa-plus-circle"></i>
-                </a>
-              </div>
-              <a click.delegate="changeIngredientSuggestionsSource()"
-                class="toggle-from-tasks ${ingredientSuggestionsComeFromTasks ? 'checked' : ''}">
-                <i class="fas fa-list"></i>
-              </a>
+            <div if.bind="model.userIsOwner">
+              <ingredient-picker input-placeholder.bind="addIngredientsInputPlaceholder" adding-enabled.bind="true" recipe-ingredient-ids.bind="recipeIngredientIds"></ingredient-picker>
             </div>
 
             <div show.bind="model.ingredients.length > 0" class="new-ingredients-wrap">
               <div repeat.for="ingredient of model.ingredients"
-                class="new-ingredient au-animate animate-fade-in ${ingredient.taskId ? 'from-task' : ''}">
+                class="new-ingredient au-animate animate-fade-in">
                 <div class="ingredient-name-wrap">
-                  <input type="text" if.bind="!ingredient.existing && !ingredient.taskId"
-                    value.bind="ingredient.name | nullFormat" keyup.trigger="ingredientChanged(ingredient)"
-                    maxlength="50" class="name-input" />
+                  <input type="text" if.bind="ingredient.isNew" value.bind="ingredient.name | nullFormat" 
+                    keyup.trigger="ingredientChanged(ingredient)" maxlength="50" class="name-input" />
                   <div else class="name-input uneditable">${ingredient.name}</div>
-                  <i if.bind="ingredient.taskId" class="fas fa-list" t="[title,aria-label]editRecipe.linkedToTask"></i>
                 </div>
                 <div>
                   <div class="ingredient-amount-input-wrap">
-                    <input type="text" value.bind="ingredient.amount | nullFormat" class="amount-input"
-                      keyup.trigger="ingredientChanged(ingredient)" maxlength="4"
-                      t="[placeholder,aria-label]editRecipe.amount" />
+                    <input type="text" value.bind="ingredient.amount | nullFormat" keyup.trigger="ingredientChanged(ingredient)" 
+                      show.bind="ingredient.unit !== 'pinch'" class="amount-input"maxlength="4" t="[placeholder,aria-label]editRecipe.amount" />
                     <div click.delegate="toggleUnit(ingredient)" class="unit-toggle"
                       t="[title,aria-label]editRecipe.toggleUnitOfMeasure">
-                      <button type="button" show.bind="ingredient.unit" t="editRecipe.${ingredient.unit}"></button>
+                      <button type="button" show.bind="ingredient.unit" t="${ingredient.unit}"></button>
                       <i show.bind="!ingredient.unit" class="fas fa-asterisk"></i>
                     </div>
                     <a if.bind="model.userIsOwner" click.delegate="removeIngredient(ingredient)" class="remove-button"

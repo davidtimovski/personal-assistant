@@ -1,0 +1,41 @@
+<template bindable="inputPlaceholder, addingEnabled, recipeIngredientIds">
+  <require from="./ingredient-picker.scss"></require>
+  <require from="./public-category-suggestion"></require>
+  <require from="./public-ingredient-suggestion"></require>
+
+  <div class="ingredient-picker">
+    <div class="input-wrap">
+      <input type="text" value.bind="ingredientName" keyup.delegate="ingredientInputChanged() & throttle:250"
+        disabled.bind="!suggestions" class.bind="ingredientNameIsInvalid ? 'invalid' : ''" placeholder="${inputPlaceholder}" aria-label="{inputPlaceholder}" maxlength="50" />
+      <a if.bind="addingEnabled" click.delegate="addNewIngredient()" t="[title,aria-label]addIngredient">
+        <i class="fas fa-plus-circle"></i>
+      </a>
+    </div>
+
+    <div if.bind="suggestionsMatched">
+      <div class="suggestions">
+        <div class="suggestions-header">Personal</div>
+
+        <div class="suggestions-body">
+          <div repeat.for="ingredient of suggestions.userIngredients">
+            <public-ingredient-suggestion ingredient.bind="ingredient"></public-ingredient-suggestion>
+          </div>
+        </div>
+      </div>
+
+      <div class="suggestions">
+        <div class="suggestions-header">Public</div>
+
+        <div class="ingredients">
+          <div repeat.for="ingredient of suggestions.publicIngredients.uncategorized">
+            <public-ingredient-suggestion ingredient.bind="ingredient"></public-ingredient-suggestion>
+          </div>
+        </div>
+
+        <div repeat.for="category of suggestions.publicIngredients.categories" class="category-suggestion">
+          <public-category-suggestion category.bind="category"></public-category-suggestion>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

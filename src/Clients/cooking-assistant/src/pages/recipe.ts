@@ -24,13 +24,17 @@ export class Recipe {
   private nutritionInfoVisible = false;
   private costInfoVisible = false;
   private currency: string;
+  private wakeLockSupported: boolean;
+  private wakeLock: any;
 
   constructor(
     private readonly router: Router,
     private readonly i18n: I18N,
     private readonly recipesService: RecipesService,
     private readonly localStorage: LocalStorageCurrencies
-  ) {}
+  ) {
+    this.wakeLockSupported = "wakeLock" in navigator;
+  }
 
   activate(params: any) {
     this.recipeId = parseInt(params.id, 10);
@@ -38,31 +42,43 @@ export class Recipe {
     this.currency = this.localStorage.getCurrency();
   }
 
+  deactivate() {
+    if (this.wakeLockSupported && this.wakeLock) {
+      this.wakeLock.release();
+      this.wakeLock = null;
+    }
+  }
+
   async attached() {
-    this.recipesService.get(this.recipeId, this.currency).then((viewRecipe: ViewRecipe) => {
-      if (viewRecipe === null) {
-        this.router.navigateToRoute("notFound");
-      } else {
-        this.servingsSelectorIsVisible = viewRecipe.ingredients.some((ingredient: Ingredient) => {
-          return !!ingredient.amount;
-        });
+    const viewRecipe = await this.recipesService.get(this.recipeId, this.currency);
+    if (viewRecipe === null) {
+      this.router.navigateToRoute("notFound");
+    } else {
+      this.servingsSelectorIsVisible = viewRecipe.ingredients.some((ingredient: Ingredient) => {
+        return !!ingredient.amount;
+      });
 
-        this.model = viewRecipe;
+      this.model = viewRecipe;
 
-        if (this.model.videoUrl) {
-          this.videoIFrameSrc = this.recipesService.videoUrlToEmbedSrc(this.model.videoUrl);
-        }
+      if (this.model.videoUrl) {
+        this.videoIFrameSrc = this.recipesService.videoUrlToEmbedSrc(this.model.videoUrl);
+      }
 
-        this.shareButtonText =
-          this.model.sharingState === SharingState.NotShared
-            ? this.i18n.tr("recipe.shareRecipe")
-            : this.i18n.tr("recipe.members");
+      this.shareButtonText =
+        this.model.sharingState === SharingState.NotShared
+          ? this.i18n.tr("recipe.shareRecipe")
+          : this.i18n.tr("recipe.members");
 
-        this.copyButton.addEventListener("click", () => {
-          this.copyAsText();
+      this.copyButton.addEventListener("click", () => {
+        this.copyAsText();
+      });
+
+      if (this.wakeLockSupported) {
+        (<any>navigator).wakeLock.request("screen").then((wakeLock) => {
+          this.wakeLock = wakeLock;
         });
       }
-    });
+    }
   }
 
   toggleTopDrawer() {

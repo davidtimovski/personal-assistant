@@ -1,0 +1,210 @@
+<template>
+  <require from="../static/styles/pages/view-ingredient.scss"></require>
+  <require from="./../resources/value-converters/number-format"></require>
+
+  <div class="container">
+    <div class="au-animate animate-fade-in animate-fade-out">
+      <div class="page-title-wrap">
+        <div class="side inactive">
+          <i class="fas fa-carrot"></i>
+        </div>
+        <div class="page-title">
+          <span if.bind="model.brandName">${model.name} (${model.brandName})</span>
+          <span else>${model.name}</span>
+        </div>
+        <a route-href="route: ingredients" class="back-button">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+
+      <div class="content-wrap edit-ingredient">
+        <div if.bind="!model" class="double-circle-loading">
+          <div class="double-bounce1"></div>
+          <div class="double-bounce2"></div>
+        </div>
+
+        <div else>
+          <section if.bind="model.recipes.length === 0" class="message warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span t="viewIngredient.notUsed">This ingredient is not used in any recipe.</span>
+          </section>
+
+          <section else class="used-in-recipes-section">
+            <div class="ingredient-recipes">
+              <header t="viewIngredient.usedInTheseRecipes">Used in these recipes</header>
+              <ul>
+                <li repeat.for="recipe of model.recipes">${recipe}</li>
+              </ul>
+            </div>
+          </section>
+
+          <section show.bind="model.taskId" class="linked-to-task-alert">
+            <i class="fas fa-info-circle"></i>
+            <span>${ingredientLinkedMessage}</span>
+            <div class="unlink-button-wrap">
+              <button type="button" class="small-button" click.delegate="unlinkFromTask()" t="viewIngredient.unlink">
+                Unlink
+              </button>
+            </div>
+          </section>
+
+          <section if.bind="!model.taskId">
+            <button type="button" show.bind="!tasksSearchVisible" click.delegate="linkToTask()"
+                class="wide-button au-animate animate-fade-in animate-fade-out" t="viewIngredient.linkToTask">
+              Link to task in To Do Assistant
+            </button>
+
+            <div class="search-tasks-wrap" show.bind="tasksSearchVisible">
+              <input type="text" ref="pickTaskInput" t="[placeholder,aria-label]editIngredient.searchTasks"
+                maxlength="50" />
+            </div>
+          </section>
+
+          <div if.bind="model.nutritionData.isSet" class="nutrition-price-data-wrap">
+            <div class="nutrition-price-data-container">
+              <div class="nutrition-price-data au-animate animate-fade-in animate-fade-out">
+                <div class="nutrition-price-data-header">
+                  <i class="fas fa-clipboard"></i>
+                  <span t="viewIngredient.nutrition">Nutrition</span>
+                </div>
+                <div class="nutrition-price-data-content">
+                  <div class="nutrition-price-data-legend">
+                    <span t="viewIngredient.nutritionalValuePer">Nutritional value per</span>
+                    <span if.bind="model.nutritionData.servingSizeIsOneUnit" t="viewIngredient.oneUnit">one unit</span>
+                    <span else>${model.nutritionData.servingSize} g</span>
+                  </div>
+
+                  <table class="view-ingredient-data-table nutrition">
+                    <tbody>
+                      <tr if.bind="model.nutritionData.calories">
+                        <td t="calories">Calories</td>
+                        <td>${model.nutritionData.calories | numberFormat} kcal</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.fat">
+                        <td t="fat">Fat</td>
+                        <td>${model.nutritionData.fat | numberFormat} g</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.saturatedFat">
+                        <td t="saturatedFat">Saturated fat</td>
+                        <td>${model.nutritionData.saturatedFat | numberFormat} g</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.carbohydrate">
+                        <td t="carbohydrate">Carbohydrate</td>
+                        <td>${model.nutritionData.carbohydrate | numberFormat} g</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.sugars">
+                        <td t="sugars">Sugars</td>
+                        <td>${model.nutritionData.sugars | numberFormat} g</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.addedSugars">
+                        <td t="addedSugars">Added sugars</td>
+                        <td>${model.nutritionData.addedSugars | numberFormat} g</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.fiber">
+                        <td t="fiber">Fiber</td>
+                        <td>${model.nutritionData.fiber | numberFormat} g</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.protein">
+                        <td t="protein">Protein</td>
+                        <td>${model.nutritionData.protein | numberFormat} g</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.sodium">
+                        <td t="sodium">Sodium</td>
+                        <td>${model.nutritionData.sodium | numberFormat} mg</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.cholesterol">
+                        <td t="cholesterol">Cholesterol</td>
+                        <td>${model.nutritionData.cholesterol | numberFormat} mg</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.vitaminA">
+                        <td t="vitaminA">Vitamin A</td>
+                        <td>${model.nutritionData.vitaminA | numberFormat} mg</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.vitaminC">
+                        <td t="vitaminC">Vitamin C</td>
+                        <td>${model.nutritionData.vitaminC | numberFormat} mg</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.vitaminD">
+                        <td t="vitaminD">Vitamin D</td>
+                        <td>${model.nutritionData.vitaminD | numberFormat} mg</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.calcium">
+                        <td t="calcium">Calcium</td>
+                        <td>${model.nutritionData.calcium | numberFormat} mg</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.iron">
+                        <td t="iron">Iron</td>
+                        <td>${model.nutritionData.iron | numberFormat} mg</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.potassium">
+                        <td t="potassium">Potassium</td>
+                        <td>${model.nutritionData.potassium | numberFormat} mg</td>
+                      </tr>
+                      <tr if.bind="model.nutritionData.magnesium">
+                        <td t="magnesium">Magnesium</td>
+                        <td>${model.nutritionData.magnesium | numberFormat} mg</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div if.bind="model.priceData.isSet" class="nutrition-price-data-container">
+              <div class="nutrition-price-data au-animate animate-fade-in animate-fade-out">
+                <div class="nutrition-price-data-header">
+                  <i class="fas fa-tag"></i>
+                  <span t="viewIngredient.price">Price</span>
+                </div>
+                <div class="nutrition-price-data-content">
+                  <table class="view-ingredient-data-table">
+                    <tbody>
+                      <tr>
+                        <td>
+                          <span t="viewIngredient.pricePer">Price per</span>
+                          <span if.bind="model.priceData.productSizeIsOneUnit" t="viewIngredient.oneUnit">one unit</span>
+                          <span else>${model.priceData.productSize} g</span>
+                        </td>
+                        <td>${model.priceData.price} ${model.priceData.currency}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr />
+
+          <div show.bind="model.recipes.length > 0 && deleteInProgress" class="delete-confirmation-alert">
+            <span t="viewIngredient.ingredientUsedInRecipes">This ingredient is used in the recipes mentioned
+              above.</span>
+            <br />
+            <span t="viewIngredient.areYouSureYouWantToDelete">Are you sure you want to delete it?</span>
+          </div>
+
+          <div class="save-delete-wrap">
+            <a if.bind="!deleteInProgress" click.delegate="save()"
+              class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
+              <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
+                <i class="fas fa-circle-notch fa-spin"></i>
+              </span>
+              <span t="save">Save</span>
+            </a>
+            <a click.delegate="delete()"
+              class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}">
+              <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
+                <i class="fas fa-circle-notch fa-spin"></i>
+              </span>
+              <span>${deleteButtonText}</span>
+            </a>
+            <button type="button" if.bind="deleteInProgress" click.delegate="cancel()" t="cancel"
+              class="button secondary-button">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

@@ -1,0 +1,20 @@
+<template bindable="ingredient">
+  <require from="./public-ingredient-suggestion.scss"></require>
+  <require from="./public-ingredient-suggestion"></require>
+
+  <div if.bind="ingredient.matched">
+    <div click.delegate="ingredientClicked()" disabled.bind="ingredient.selected" class="ingredient-suggestion ${ingredient.selected ? 'selected' : ''}" role="button">
+      <span if.bind="ingredient.brandName">${ingredient.name} (${ingredient.brandName})</span>
+      <span else>${ingredient.name}</span>
+      <span class="ingredient-suggestion-icons">
+        <i class="fas fa-clipboard" if.bind="ingredient.hasNutritionData" t="[title,aria-label]hasNutritionSet"></i>
+        <i class="fas fa-tag" if.bind="ingredient.hasPriceData" t="[title,aria-label]hasPriceSet"></i>
+        <i class="fas fa-check"></i>
+      </span>
+    </div>
+
+    <div repeat.for="childIngredient of ingredient.children" class="ingredient-suggestion-children">
+      <public-ingredient-suggestion ingredient.bind="childIngredient"></public-ingredient-suggestion>
+    </div>
+  </div>
+</template>

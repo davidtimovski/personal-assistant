@@ -7,7 +7,15 @@ using System.Threading.Tasks;
 using Api.Config;
 using Api.Models;
 using Api.Models.CookingAssistant.Recipes;
+using Application.Contracts.Common;
+using Application.Contracts.Common.Models;
+using Application.Contracts.CookingAssistant.Ingredients;
+using Application.Contracts.CookingAssistant.Recipes;
+using Application.Contracts.CookingAssistant.Recipes.Models;
+using Domain.Entities.Common;
 using FluentValidation;
+using Infrastructure.Identity;
+using Infrastructure.Sender.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Hosting;
@@ -15,14 +23,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
-using Application.Contracts.Common;
-using Application.Contracts.Common.Models;
-using Application.Contracts.CookingAssistant.Ingredients;
-using Application.Contracts.CookingAssistant.Recipes;
-using Application.Contracts.CookingAssistant.Recipes.Models;
-using Domain.Entities.Common;
-using Infrastructure.Identity;
-using Infrastructure.Sender.Models;
 
 namespace Api.Controllers.CookingAssistant;
 
@@ -34,6 +34,7 @@ public class RecipesController : Controller
     private readonly IRecipeService _recipeService;
     private readonly IIngredientService _ingredientService;
     private readonly IStringLocalizer<RecipesController> _localizer;
+    private readonly IStringLocalizer<IngredientsController> _ingredientsLocalizer;
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly ICdnService _cdnService;
     private readonly IUserService _userService;
@@ -50,6 +51,7 @@ public class RecipesController : Controller
         IRecipeService recipeService,
         IIngredientService ingredientService,
         IStringLocalizer<RecipesController> localizer,
+        IStringLocalizer<IngredientsController> ingredientsLocalizer,
         IWebHostEnvironment webHostEnvironment,
         ICdnService cdnService,
         IUserService userService,
@@ -65,6 +67,7 @@ public class RecipesController : Controller
         _recipeService = recipeService;
         _ingredientService = ingredientService;
         _localizer = localizer;
+        _ingredientsLocalizer = ingredientsLocalizer;
         _webHostEnvironment = webHostEnvironment;
         _cdnService = cdnService;
         _userService = userService;
@@ -115,6 +118,11 @@ public class RecipesController : Controller
             return NotFound();
         }
 
+        foreach (var ingredient in recipeDto.Ingredients.Where(x => x.IsPublic))
+        {
+            ingredient.Name = _ingredientsLocalizer[ingredient.Name];
+        }
+
         return Ok(recipeDto);
     }
 
@@ -137,6 +145,11 @@ public class RecipesController : Controller
             return NotFound();
         }
 
+        foreach (var ingredient in recipeDto.Ingredients.Where(x => x.IsPublic))
+        {
+            ingredient.Name = _ingredientsLocalizer[ingredient.Name];
+        }
+
         return Ok(recipeDto);
     }
 
@@ -153,13 +166,13 @@ public class RecipesController : Controller
             return Unauthorized();
         }
 
-        RecipeWithShares list = _recipeService.GetWithShares(id, userId);
-        if (list == null)
+        RecipeWithShares recipeDto = _recipeService.GetWithShares(id, userId);
+        if (recipeDto == null)
         {
             return NotFound();
         }
 
-        return Ok(list);
+        return Ok(recipeDto);
     }
 
     [HttpGet("share-requests")]
@@ -274,8 +287,6 @@ public class RecipesController : Controller
         {
             return NotFound();
         }
-
-        recipeDto.IngredientSuggestions = _ingredientService.GetIngredientReviewSuggestions(userId);
 
         return Ok(recipeDto);
     }
@@ -706,10 +717,9 @@ public class RecipesController : Controller
 
         // Copy recipe image if not default
         RecipeToNotify recipe = _recipeService.Get(importModel.Id);
-        string tempImagePath = Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp", Guid.NewGuid().ToString());
 
         importModel.ImageUri = await _cdnService.CopyAndUploadAsync(
-            tempImagePath: tempImagePath,
+            localTempPath: Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp"),
             imageUriToCopy: recipe.ImageUri,
             uploadPath: $"users/{importModel.UserId}/recipes",
             template: "recipe"

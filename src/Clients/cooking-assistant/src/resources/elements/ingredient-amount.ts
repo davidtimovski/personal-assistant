@@ -11,6 +11,10 @@ export class IngredientAmountCustomElement {
 
   @computedFrom("amount", "unit")
   get amountLabel(): string {
+    if (this.unit === "pinch") {
+      return "pinch";
+    }
+
     if (!this.amount) {
       return "";
     }
@@ -23,7 +27,7 @@ export class IngredientAmountCustomElement {
     const unit =
       this.amount > 1 && this.pluralizableUnits.includes(this.unit)
         ? this.i18n.tr(`recipe.${this.unit}Plural`)
-        : this.i18n.tr(`recipe.${this.unit}`);
+        : this.i18n.tr(this.unit);
 
     return amount + " " + unit;
   }
@@ -70,9 +74,9 @@ export class IngredientAmountCustomElement {
     if (fraction) {
       if (integerPart >= 1) {
         return integerPart + " " + fraction;
-      } else {
-        return fraction;
       }
+      
+      return fraction;
     }
 
     return new Intl.NumberFormat().format(number).toString();

@@ -12,6 +12,13 @@
   "cancel": "Cancel",
   "hoursLetter": "h",
   "minutesLetter": "m",
+  "g": "g",
+  "ml": "ml",
+  "oz": "oz",
+  "cup": "cups",
+  "tbsp": "tbsp",
+  "tsp": "tsp",
+  "pinch": "pinch",
   "calories": "Calories",
   "fat": "Fat",
   "saturatedFat": "Saturated fat",
@@ -48,6 +55,9 @@
   "magnesiumBetween": "Magnesium must be between {{from}} and {{to}} milligrams",
   "decreaseServings": "Decrease servings",
   "increaseServings": "Increase servings",
+  "addIngredient": "Add ingredient",
+  "hasNutritionSet": "Has nutrition set",
+  "hasPriceSet": "Has price set",
   "recipes": {
     "menu": "Menu",
     "refresh": "Refresh",
@@ -64,14 +74,8 @@
     "prep": "Prep",
     "cook": "Cook",
     "ingredients": "Ingredients",
-    "g": "g",
-    "ml": "ml",
-    "oz": "oz",
-    "cup": "cup",
     "cupPlural": "cups",
-    "tbsp": "tbsp",
     "tbspPlural": "tbsp",
-    "tsp": "tsp",
     "tspPlural": "tsp",
     "instructions": "Instructions",
     "oneServing": "1 serving",
@@ -93,17 +97,8 @@
     "youTubeUrl": "YouTube URL",
     "ingredients": "Ingredients",
     "ingredient": "Ingredient",
-    "ingredientFromTask": "Ingredient from task",
-    "addIngredient": "Add ingredient",
-    "linkedToTask": "Linked to task",
     "amount": "Amount",
     "toggleUnitOfMeasure": "Toggle unit of measure",
-    "g": "g",
-    "ml": "ml",
-    "oz": "oz",
-    "cup": "cups",
-    "tbsp": "tbsp",
-    "tsp": "tsp",
     "removeIngredient": "Remove ingredient",
     "instructions": "Instructions",
     "prepDuration": "Prep duration",
@@ -193,9 +188,8 @@
     "search": "Search",
     "clear": "Clear",
     "emptyListMessage": "You don't have any ingredients yet",
-    "linkedToTask": "Linked to task",
-    "hasNutritionSet": "Has nutrition set",
-    "hasPriceSet": "Has price set"
+    "mine": "Mine",
+    "linkedToTask": "Linked to task"
   },
   "editIngredient": {
     "edit": "Edit",
@@ -218,6 +212,26 @@
     "removePriceData": "Remove price data",
     "price": "Price",
     "priceBetween": "Price must be between 0 and 9999",
+    "updateSuccessful": "Ingredient was successfully updated",
+    "deleteSuccessful": "Ingredient was successfully deleted"
+  },
+  "viewIngredient": {
+    "usedInTheseRecipes": "Used in these recipes",
+    "notUsed": "This ingredient is not used in any recipe.",
+    "thisIngredientIsLinked": "This ingredient is linked to the \"{{taskName}}\" task in the \"{{taskList}}\" list in To Do Assistant.",
+    "linkToTask": "Link to task in To Do Assistant",
+    "unlink": "Unlink",
+    "searchTasks": "Search tasks",
+    "amount": "Amount",
+    "nutrition": "Nutrition",
+    "nutritionalValuePer": "Nutritional value per",
+    "oneUnit": "one unit",
+    "ingredientUsedInRecipes": "This ingredient is used in the recipes mentioned above.",
+    "areYouSureYouWantToDelete": "Are you sure you want to delete it?",
+    "yesImSure": "Yes, I'm sure",
+    "price": "Price",
+    "pricePer": "Price per",
+    "updateSuccessful": "Ingredient was successfully updated",
     "deleteSuccessful": "Ingredient was successfully deleted"
   },
   "shareRequests": {
@@ -239,16 +253,17 @@
     "emptyListMessage": "There are no new received recipes"
   },
   "reviewIngredients": {
-    "reviewIngredients": "Review ingredients",
-    "introductoryLabel": "This recipe has one ingredient. Let's see if you already have it in your inventory.",
-    "introductoryLabelPlural": "This recipe has {{ingredients}} ingredients. Let's review them and see if you already have some in your inventory.",
+    "reviewPersonalIngredients": "Review personal ingredients",
+    "review": "Review",
+    "introductoryLabel": "This recipe has one custom ingredient. Let's see if you already have it in your inventory.",
+    "introductoryLabelPlural": "This recipe has {{ingredients}} custom ingredients. Let's review them and see if you have equivalent ones in your inventory.",
     "cancelIngredientReplacement": "Cancel ingredient replacement",
-    "searchInventory": "Search inventory",
+    "search": "Search",
     "suggestion": "Suggestion:",
     "transferNutritionData": "Transfer nutrition data",
     "transferPriceData": "Transfer price data",
     "previousIngredient": "Previous ingredient",
-    "nextIngredient": "Previous ingredient",
+    "nextIngredient": "Next ingredient",
     "done": "Done!"
   },
   "help": {
@@ -287,11 +302,6 @@
   "tooltips": {
     "okayUnderstood": "Okay, understood",
     "tooltipWillNoLongerShow": "This tooltip will no longer show. If you wish to retain it, go to the Menu page and click the \"Help\" button.",
-    "ingredientFromTask": {
-      "title": "Ingredient from task",
-      "question": "What does the button to the right do?",
-      "answer": "You can use tasks from (perhaps) your shopping list in To Do Assistant as ingredients. That way if a task not been completed in To Do Assistant it will appear as a missing ingredient in the recipes page, giving you a good indication on which recipes you already have the ingredients for."
-    },
     "receivedRecipes": {
       "title": "Received recipes",
       "question": "What is this?",
@@ -299,8 +309,8 @@
     },
     "reviewIngredients": {
       "title": "Review ingredients",
-      "question": "Why should I review the ingredients?",
-      "answer": "Reviewing ingredients allows you to replace them with your own - if you already have equivalent ones. Using the ingredients that are already in your inventory provies many benefits. They may already be linked to tasks in To Do Assistant, or they may already have nutrition or price data. If you don't find any equivalent ingredients in your inventory don't worry, new ones will be created."
+      "question": "Why should I review personal ingredients?",
+      "answer": "When you аccept a sent recipe it is imported and if it has personal ingredients they copy over. Reviewing them allows you to swap them out with your personal equivalent ones or public ingredients. This way you avoid ending up with duplicates. If you don't find any equivalent ingredients don't worry, they will just copy over."
     },
     "shareRequests": {
       "title": "Share requests",

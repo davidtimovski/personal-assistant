@@ -1,3 +1,3 @@
 export enum AppEvents {
-  RecipesLoaded = "app:recipes-loaded"
+  RecipesLoaded = "app:recipes-loaded",
 }

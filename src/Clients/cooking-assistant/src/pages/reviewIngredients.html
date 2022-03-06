@@ -1,5 +1,6 @@
 <template>
   <require from="../static/styles/pages/review-ingredients.scss"></require>
+  <require from="./../resources/elements/ingredient-picker/ingredient-picker"></require>
   <require from="./../resources/elements/tooltip"></require>
   <require from="./../resources/elements/checkbox"></require>
 
@@ -9,7 +10,7 @@
         <div class="side inactive">
           <i class="fas fa-glasses"></i>
         </div>
-        <div class="page-title" t="reviewIngredients.reviewIngredients">Review ingredients</div>
+        <div class="page-title" t="reviewIngredients.reviewPersonalIngredients">Review personal ingredients</div>
         <a route-href="route: inbox" class="back-button">
           <i class="fas fa-times"></i>
         </a>
@@ -30,9 +31,7 @@
           <div class="review-introduction">${introductoryLabel}</div>
           <div class="review-introduction-button-wrap">
             <button type="button" click.delegate="startReviewing()" class="small-button"
-              t="reviewIngredients.reviewIngredients">
-              Review ingredients
-            </button>
+              t="reviewIngredients.review">Review</button>
           </div>
         </section>
 
@@ -41,28 +40,24 @@
             ${currentIngredient.name}
             <span show.bind="currentIngredient.replacementId">
               <i class="fas fa-long-arrow-alt-right review-replacement-arrow"></i>
-              ${currentIngredient.replacementName}<a click.delegate="revertReplacement()" class="review-revert-icon"
-                t="[aria-label]reviewIngredients.cancelIngredientReplacement">
+              <span class="replacement-name">${currentIngredient.replacementName}</span><a click.delegate="revertReplacement()" class="review-revert-icon"
+                t="[title,aria-label]reviewIngredients.cancelIngredientReplacement">
                 <i class="fas fa-times-circle"></i>
               </a>
             </span>
           </div>
 
-          <input type="text" show.bind="!currentIngredient.replacementId" class="review-search-input"
-            ref="pickExistingIngredientInput" t="[placeholder,aria-label]reviewIngredients.searchInventory"
-            maxlength="50" />
-          <div show.bind="currentSuggestion" class="review-suggestion">
-            <span t="reviewIngredients.suggestion">Suggestion:</span>
-            <a click.delegate="setReplacement(currentSuggestion)">${currentSuggestion.name}</a>
+          <div show.bind="!currentIngredient.replacementId">
+            <ingredient-picker input-placeholder.bind="addIngredientsInputPlaceholder" adding-enabled.bind="false"></ingredient-picker>
           </div>
 
-          <div class="review-transfer-data">
-            <div show.bind="currentIngredient.replacementId && currentIngredient.hasNutritionData">
+          <div show.bind="currentIngredient.replacementId && !currentIngredient.replacementIsPublic" class="review-transfer-data">
+            <div show.bind="currentIngredient.hasNutritionData">
               <checkbox label-key="reviewIngredients.transferNutritionData"
                 value.bind="currentIngredient.transferNutritionData"></checkbox>
             </div>
 
-            <div show.bind="currentIngredient.replacementId && currentIngredient.hasPriceData">
+            <div show.bind="currentIngredient.hasPriceData">
               <checkbox label-key="reviewIngredients.transferPriceData"
                 value.bind="currentIngredient.transferPriceData"></checkbox>
             </div>
@@ -72,13 +67,13 @@
 
           <div class="review-pagination">
             <i class="fas fa-arrow-alt-circle-left review-pagination-arrow" role="button"
-              click.delegate="previousIngredient()" t="[aria-label]reviewIngredients.previousIngredient"></i>
+              click.delegate="previousIngredient()" t="[title,aria-label]reviewIngredients.previousIngredient"></i>
             <div class="review-pagination-numbering">
               <span>${currentIngredientNumber}</span>/<span>${model.ingredients.length}</span>
             </div>
             <i if.bind="currentIngredientNumber < model.ingredients.length"
               class="fas fa-arrow-alt-circle-right review-pagination-arrow" role="button"
-              click.delegate="nextIngredient()" t="[aria-label]reviewIngredients.nextIngredient"></i>
+              click.delegate="nextIngredient()" t="[title,aria-label]reviewIngredients.nextIngredient"></i>
             <a else click.delegate="import()" class="review-done-button">
               <span t="reviewIngredients.done">Done!</span>
               <i show.bind="doneButtonIsLoading" class="fas fa-circle-notch fa-spin au-animate animate-fade-in"></i></a>

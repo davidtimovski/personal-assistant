@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using AutoMapper;
-using FluentValidation;
-using FluentValidation.Results;
 using Application.Contracts.Common;
 using Application.Contracts.Common.Models;
 using Application.Contracts.CookingAssistant.DietaryProfiles;
 using Application.Contracts.CookingAssistant.Recipes;
 using Application.Contracts.CookingAssistant.Recipes.Models;
+using AutoMapper;
 using Domain.Entities.CookingAssistant;
+using FluentValidation;
+using FluentValidation.Results;
 using Utility;
 
 namespace Application.Services.CookingAssistant;
@@ -253,6 +253,10 @@ public class RecipeService : IRecipeService
                     recipeIngredient.Amount = null;
                     recipeIngredient.Unit = null;
                 }
+                else if (recipeIngredient.Unit == "pinch")
+                {
+                    recipeIngredient.Amount = null;
+                }
             }
             else
             {
@@ -378,6 +382,10 @@ public class RecipeService : IRecipeService
                 {
                     recipeIngredient.Amount = null;
                     recipeIngredient.Unit = null;
+                }
+                else if (recipeIngredient.Unit == "pinch")
+                {
+                    recipeIngredient.Amount = null;
                 }
             }
             else

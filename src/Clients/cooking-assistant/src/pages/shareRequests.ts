@@ -12,14 +12,14 @@ export class ShareRequests {
 
   constructor(private readonly router: Router, private readonly recipesService: RecipesService) {}
 
-  attached() {
-    this.recipesService.getShareRequests().then((allShareRequests: Array<ShareRequest>) => {
-      this.pendingShareRequests = allShareRequests.filter((request: ShareRequest) => {
-        return request.isAccepted === null;
-      });
-      this.declinedShareRequests = allShareRequests.filter((request: ShareRequest) => {
-        return request.isAccepted === false;
-      });
+  async attached() {
+    const allShareRequests = await this.recipesService.getShareRequests();
+    
+    this.pendingShareRequests = allShareRequests.filter((request: ShareRequest) => {
+      return request.isAccepted === null;
+    });
+    this.declinedShareRequests = allShareRequests.filter((request: ShareRequest) => {
+      return request.isAccepted === false;
     });
   }
 

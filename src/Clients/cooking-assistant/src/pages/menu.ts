@@ -38,12 +38,11 @@ export class Menu {
       });
   }
 
-  attached() {
-    caches.keys().then((cacheNames) => {
-      if (cacheNames.length > 0) {
-        this.version = cacheNames.sort().reverse()[0];
-      }
-    });
+  async attached() {
+    const cacheNames = await caches.keys();
+    if (cacheNames.length > 0) {
+      this.version = cacheNames.sort().reverse()[0];
+    }
   }
 
   goToDietaryProfile() {

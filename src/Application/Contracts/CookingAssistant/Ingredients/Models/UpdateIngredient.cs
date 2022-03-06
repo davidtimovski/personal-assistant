@@ -1,5 +1,5 @@
-﻿using FluentValidation;
-using Application.Contracts.ToDoAssistant.Tasks;
+﻿using Application.Contracts.ToDoAssistant.Tasks;
+using FluentValidation;
 
 namespace Application.Contracts.CookingAssistant.Ingredients.Models;
 

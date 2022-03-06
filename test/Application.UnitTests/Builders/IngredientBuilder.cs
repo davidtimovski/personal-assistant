@@ -1,4 +1,7 @@
-﻿using Application.Contracts.CookingAssistant.Ingredients.Models;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Application.Contracts.CookingAssistant.Ingredients.Models;
+using Domain.Entities.CookingAssistant;
 
 namespace Application.UnitTests.Builders;
 
@@ -6,7 +9,9 @@ public class IngredientBuilder
 {
     private string name;
     private int? taskId;
- 
+    private List<RecipeIngredient> recipesIngredients;
+
+
     public IngredientBuilder()
     {
         name = "Dummy name";
@@ -22,6 +27,21 @@ public class IngredientBuilder
     {
         taskId = 1;
         return this;
+    }
+
+    public IngredientBuilder WithRecipeIngredientUnits(string[] units)
+    {
+        recipesIngredients = units.Select(x => new RecipeIngredient { Unit = x }).ToList();
+        return this;
+    }
+
+    public Ingredient BuildModel()
+    {
+        return new Ingredient
+        {
+            Id = 1,
+            RecipesIngredients = recipesIngredients
+        };
     }
 
     public UpdateIngredient BuildUpdateModel()

@@ -10,7 +10,7 @@ public interface IListService
 {
     IEnumerable<ListDto> GetAll(int userId);
     IEnumerable<ToDoListOption> GetAllAsOptions(int userId);
-    IEnumerable<AssigneeOption> GetMembersAsAssigneeOptions(int id);
+    IEnumerable<AssigneeOption> GetMembersAsAssigneeOptions(int id, int userId);
     SimpleList Get(int id);
     EditListDto GetForEdit(int id, int userId);
     ListWithShares GetWithShares(int id, int userId);

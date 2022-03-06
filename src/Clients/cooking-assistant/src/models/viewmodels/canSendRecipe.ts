@@ -1,8 +1,6 @@
 export class CanSendRecipe {
-  constructor(
-    public userId: number,
-    public imageUri: string,
-    public canSend: boolean,
-    public alreadySent: boolean
-  ) {}
+  userId: number;
+  imageUri: string;
+  canSend: boolean;
+  alreadySent: boolean;
 }

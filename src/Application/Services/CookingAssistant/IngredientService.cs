@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
-using FluentValidation;
-using FluentValidation.Results;
 using Application.Contracts.CookingAssistant.Ingredients;
 using Application.Contracts.CookingAssistant.Ingredients.Models;
-using Application.Contracts.CookingAssistant.Recipes.Models;
+using AutoMapper;
 using Domain.Entities.CookingAssistant;
 using Domain.Entities.ToDoAssistant;
+using FluentValidation;
+using FluentValidation.Results;
 
 namespace Application.Services.CookingAssistant;
 
@@ -26,57 +25,93 @@ public class IngredientService : IIngredientService
         _mapper = mapper;
     }
 
-    public IEnumerable<IngredientDto> GetAll(int userId)
+    public List<IngredientDto> GetUserAndUsedPublicIngredients(int userId)
     {
-        IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetAll(userId);
+        IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetUserAndUsedPublicIngredients(userId);
 
-        var result = ingredients.Select(x => _mapper.Map<IngredientDto>(x));
+        var result = ingredients.Select(x => _mapper.Map<IngredientDto>(x)).ToList();
 
         return result;
     }
 
-    public EditIngredient Get(int id, int userId)
+    public EditIngredient GetForUpdate(int id, int userId)
     {
-        Ingredient ingredient = _ingredientsRepository.Get(id, userId);
+        Ingredient ingredient = _ingredientsRepository.GetForUpdate(id, userId);
 
         var result = _mapper.Map<EditIngredient>(ingredient);
 
         return result;
     }
 
-    public IEnumerable<IngredientSuggestion> GetSuggestions(int recipeId, int userId)
+    public ViewIngredient GetPublic(int id, int userId)
     {
-        IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetSuggestions(recipeId, userId);
+        Ingredient ingredient = _ingredientsRepository.GetPublic(id, userId);
 
-        var result = ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x));
+        var result = _mapper.Map<ViewIngredient>(ingredient);
 
         return result;
     }
 
-    public IEnumerable<IngredientSuggestion> GetTaskSuggestions(int userId)
+    public IEnumerable<IngredientSuggestion> GetUserSuggestions(int userId)
+    {
+        IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetForSuggestions(userId);
+
+        var suggestions = ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x)).ToList();
+
+        // Derive units
+        var recipeIngredientsLookup = ingredients.ToDictionary(x => x.Id, x => x.RecipesIngredients);
+        foreach (var suggestion in suggestions)
+        {
+            DeriveAndSetUnit(suggestion, recipeIngredientsLookup[suggestion.Id]);
+        }
+
+        return suggestions;
+    }
+
+    public PublicIngredientSuggestions GetPublicSuggestions()
+    {
+        var result = new PublicIngredientSuggestions();
+
+        IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetForSuggestions(1);
+        IEnumerable<IngredientCategory> categories = _ingredientsRepository.GetIngredientCategories();
+
+        List<IngredientSuggestion> suggestions = ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x)).ToList();
+
+        // Create public ingredient hierarchy, derive units
+        var recipeIngredientsLookup = ingredients.ToDictionary(x => x.Id, x => x.RecipesIngredients);
+        foreach (var suggestion in suggestions)
+        {
+            suggestion.Children = suggestions.Where(x => x.ParentId == suggestion.Id).OrderBy(x => x.Name).ToList();
+
+            DeriveAndSetUnit(suggestion, recipeIngredientsLookup[suggestion.Id]);
+        }
+
+        result.Uncategorized = suggestions.Where(x => !x.CategoryId.HasValue && !x.ParentId.HasValue).OrderBy(x => x.Name).ToList();
+
+        var categorizedPublicSuggestions = suggestions.Where(x => x.CategoryId.HasValue);
+        result.Categories = categories.Select(x => _mapper.Map<IngredientCategoryDto>(x)).ToList();
+
+        foreach (var category in result.Categories)
+        {
+            category.Ingredients = suggestions.Where(x => x.CategoryId == category.Id && !x.ParentId.HasValue).OrderBy(x => x.Name).ToList();
+            category.Subcategories = result.Categories.Where(x => x.ParentId == category.Id).OrderBy(x => x.Id).ToList();
+
+            foreach (var subcategory in category.Subcategories)
+            {
+                subcategory.Ingredients = suggestions.Where(x => x.CategoryId == category.Id && !x.ParentId.HasValue).OrderBy(x => x.Name).ToList();
+            }
+        }
+        result.Categories.RemoveAll(x => x.ParentId.HasValue);
+
+        return result;
+    }
+
+    public IEnumerable<TaskSuggestion> GetTaskSuggestions(int userId)
     {
         IEnumerable<ToDoTask> tasks = _ingredientsRepository.GetTaskSuggestions(userId);
 
-        var result = tasks.Select(x => _mapper.Map<IngredientSuggestion>(x));
+        var result = tasks.Select(x => _mapper.Map<TaskSuggestion>(x));
         result = result.OrderBy(x => x.Group);
-
-        return result;
-    }
-
-    public IEnumerable<IngredientSuggestion> GetTaskSuggestions(int recipeId, int userId)
-    {
-        IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetTaskSuggestions(recipeId, userId);
-
-        var result = ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x));
-
-        return result;
-    }
-
-    public IEnumerable<IngredientReviewSuggestion> GetIngredientReviewSuggestions(int userId)
-    {
-        IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetIngredientSuggestions(userId);
-
-        var result = ingredients.Select(x => _mapper.Map<IngredientReviewSuggestion>(x));
 
         return result;
     }
@@ -101,29 +136,61 @@ public class IngredientService : IIngredientService
         ValidateAndThrow(model, validator);
 
         var ingredient = _mapper.Map<Ingredient>(model);
-
-        if (ingredient.TaskId.HasValue)
-        {
-            ingredient.Name = null;
-        }
-        else
-        {
-            ingredient.Name = ingredient.Name.Trim();
-        }
-
+        ingredient.Name = ingredient.Name.Trim();
         ingredient.ModifiedDate = DateTime.UtcNow;
 
         await _ingredientsRepository.UpdateAsync(ingredient);
     }
 
-    public async Task DeleteAsync(int id, int userId)
+    public async Task UpdateAsync(UpdatePublicIngredient model, IValidator<UpdatePublicIngredient> validator)
     {
-        if (!Exists(id, userId))
+        ValidateAndThrow(model, validator);
+        await _ingredientsRepository.UpdatePublicAsync(model.Id, model.TaskId, model.UserId, DateTime.UtcNow);
+    }
+
+    public async Task DeleteOrRemoveFromRecipesAsync(int id, int userId)
+    {
+        var ingredient = _ingredientsRepository.Get(id);
+        if (ingredient.UserId == 1)
         {
-            throw new ValidationException("Unauthorized");
+            await _ingredientsRepository.RemoveFromRecipesAsync(id, userId);
+        }
+        else if (ingredient.UserId == userId)
+        {
+            await _ingredientsRepository.DeleteAsync(id);
+        }
+    }
+
+    private static void DeriveAndSetUnit(IngredientSuggestion suggestion, List<RecipeIngredient> recipesIngredients)
+    {
+        if (!recipesIngredients.Any())
+        {
+            return;
         }
 
-        await _ingredientsRepository.DeleteAsync(id);
+        var metricUnits = new string[] { "g", "ml", "tbsp", "tsp", "pinch" };
+        var metric = recipesIngredients.Where(x => metricUnits.Contains(x.Unit)).ToList();
+        if (metric.Any())
+        {
+            var metricGrouped = metric.GroupBy(x => x.Unit);
+            if (metricGrouped.Count() > 1)
+            {
+                metricGrouped = metricGrouped.OrderByDescending(x => x.Count());
+            }
+            suggestion.Unit = metricGrouped.First().Key;
+        }
+
+        var imperialUnits = new string[] { "oz", "cup", "tbsp", "tsp", "pinch" };
+        var imperial = recipesIngredients.Where(x => imperialUnits.Contains(x.Unit)).ToList();
+        if (imperial.Any())
+        {
+            var imperialGrouped = imperial.GroupBy(x => x.Unit);
+            if (imperialGrouped.Count() > 1)
+            {
+                imperialGrouped = imperialGrouped.OrderByDescending(x => x.Count());
+            }
+            suggestion.UnitImperial = imperialGrouped.First().Key;
+        }
     }
 
     private static void ValidateAndThrow<T>(T model, IValidator<T> validator)
