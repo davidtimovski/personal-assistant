@@ -50,11 +50,6 @@
           <div show.bind="!currentIngredient.replacementId">
             <ingredient-picker input-placeholder.bind="addIngredientsInputPlaceholder" adding-enabled.bind="false"></ingredient-picker>
           </div>
-          
-
-          <!-- <input type="text" show.bind="!currentIngredient.replacementId" class="review-search-input"
-            ref="pickExistingIngredientInput" t="[placeholder,aria-label]reviewIngredients.searchInventory"
-            maxlength="50" /> -->
 
           <div show.bind="currentIngredient.replacementId && !currentIngredient.replacementIsPublic" class="review-transfer-data">
             <div show.bind="currentIngredient.hasNutritionData">
