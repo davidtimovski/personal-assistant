@@ -9,7 +9,7 @@ CREATE TABLE public."CookingAssistant.Ingredients"
     "UserId" integer NOT NULL,
 	"CategoryId" integer,
 	"BrandId" integer,
-    "Name" character varying(50) COLLATE pg_catalog."default",
+    "Name" character varying(50) COLLATE pg_catalog."default" NOT NULL,
     "ServingSize" smallint NOT NULL DEFAULT 100,
     "ServingSizeIsOneUnit" boolean NOT NULL DEFAULT FALSE,
     "Calories" numeric(4, 1),

@@ -1,11 +1,6 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import {
-  ValidationController,
-  validateTrigger,
-  ValidationRules,
-  ControllerValidateResult,
-} from "aurelia-validation";
+import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { EventAggregator } from "aurelia-event-aggregator";
 
 import { AuthService } from "../../../shared/src/services/authService";
@@ -16,16 +11,10 @@ import { SendRecipeModel } from "models/viewmodels/sendRecipeModel";
 import { Recipient } from "models/viewmodels/recipient";
 import { CanSendRecipe } from "models/viewmodels/canSendRecipe";
 
-@inject(
-  Router,
-  AuthService,
-  RecipesService,
-  ValidationController,
-  EventAggregator
-)
+@inject(Router, AuthService, RecipesService, ValidationController, EventAggregator)
 export class SendRecipe {
   private model: SendRecipeModel;
-  private recipientEmail: string;
+  private recipientEmail = "";
   private emailIsInvalid: boolean;
   private emailInput: HTMLInputElement;
   private currentUserEmail: string;
@@ -40,8 +29,10 @@ export class SendRecipe {
     private readonly eventAggregator: EventAggregator
   ) {
     this.validationController.validateTrigger = validateTrigger.manual;
-
-    ValidationRules.ensure("recipientEmail").required().email().on(this);
+    ValidationRules.ensure((x: SendRecipe) => x.recipientEmail)
+      .required()
+      .email()
+      .on(this);
 
     this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.emailIsInvalid = false;
@@ -85,34 +76,20 @@ export class SendRecipe {
     this.emailIsInvalid = !result.valid;
 
     if (result.valid) {
-      const canSendVM: CanSendRecipe = await this.recipesService.canSendRecipeToUser(
-        email,
-        this.model.id
-      );
+      const canSendVM: CanSendRecipe = await this.recipesService.canSendRecipeToUser(email, this.model.id);
 
       if (canSendVM.userId === 0) {
         this.emailIsInvalid = true;
-        this.eventAggregator.publish(
-          AlertEvents.ShowError,
-          "sendRecipe.userDoesntExist"
-        );
+        this.eventAggregator.publish(AlertEvents.ShowError, "sendRecipe.userDoesntExist");
       } else {
         if (!canSendVM.canSend) {
           this.emailIsInvalid = true;
-          this.eventAggregator.publish(
-            AlertEvents.ShowError,
-            "sendRecipe.cannotSendToUser"
-          );
+          this.eventAggregator.publish(AlertEvents.ShowError, "sendRecipe.cannotSendToUser");
         } else if (canSendVM.alreadySent) {
           this.emailIsInvalid = true;
-          this.eventAggregator.publish(
-            AlertEvents.ShowError,
-            "sendRecipe.alreadySendToUser"
-          );
+          this.eventAggregator.publish(AlertEvents.ShowError, "sendRecipe.alreadySendToUser");
         } else {
-          this.recipients.push(
-            new Recipient(canSendVM.userId, email, canSendVM.imageUri)
-          );
+          this.recipients.push(new Recipient(canSendVM.userId, email, canSendVM.imageUri));
           this.recipientEmail = "";
         }
       }

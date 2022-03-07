@@ -8,19 +8,19 @@ import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
 import { LocalStorageCurrencies } from "../../../shared/src/utils/localStorageCurrencies";
 import { Language } from "../../../shared/src/models/enums/language";
 
-import { RecipeModel } from "models/viewmodels/recipeModel";
-import { ViewRecipe } from "models/viewmodels/viewRecipe";
-import { EditRecipeIngredient } from "models/viewmodels/editRecipeIngredient";
-import { EditRecipeModel } from "models/viewmodels/editRecipeModel";
-import { SendRecipeModel } from "models/viewmodels/sendRecipeModel";
-import { CanSendRecipe } from "models/viewmodels/canSendRecipe";
-import { ReceivedRecipe } from "models/viewmodels/receivedRecipe";
-import { ReviewIngredientsModel } from "models/viewmodels/reviewIngredientsModel";
-import { IngredientReplacement } from "models/viewmodels/ingredientReplacement";
-import * as Actions from "utils/state/actions";
-import { RecipeWithShares } from "models/viewmodels/recipeWithShares";
-import { CanShareRecipe } from "models/viewmodels/canShareRecipe";
-import { ShareRequest } from "models/viewmodels/shareRequest";
+import { RecipeModel } from "../models/viewmodels/recipeModel";
+import { ViewRecipe } from "../models/viewmodels/viewRecipe";
+import { EditRecipeIngredient } from "../models/viewmodels/editRecipeIngredient";
+import { EditRecipeModel } from "../models/viewmodels/editRecipeModel";
+import { SendRecipeModel } from "../models/viewmodels/sendRecipeModel";
+import { CanSendRecipe } from "../models/viewmodels/canSendRecipe";
+import { ReceivedRecipe } from "../models/viewmodels/receivedRecipe";
+import { ReviewIngredientsModel } from "../models/viewmodels/reviewIngredientsModel";
+import { IngredientReplacement } from "../models/viewmodels/ingredientReplacement";
+import * as Actions from "../utils/state/actions";
+import { RecipeWithShares } from "../models/viewmodels/recipeWithShares";
+import { CanShareRecipe } from "../models/viewmodels/canShareRecipe";
+import { ShareRequest } from "../models/viewmodels/shareRequest";
 
 @inject(AuthService, HttpClient, EventAggregator, LocalStorageCurrencies)
 export class RecipesService extends HttpProxyBase {
@@ -66,9 +66,7 @@ export class RecipesService extends HttpProxyBase {
   }
 
   async getPendingShareRequestsCount(): Promise<number> {
-    const result = await this.ajax<number>(
-      "recipes/pending-share-requests-count"
-    );
+    const result = await this.ajax<number>("recipes/pending-share-requests-count");
 
     return result;
   }
@@ -80,17 +78,13 @@ export class RecipesService extends HttpProxyBase {
   }
 
   async getSendRequests(): Promise<Array<ReceivedRecipe>> {
-    const result = await this.ajax<Array<ReceivedRecipe>>(
-      "recipes/send-requests"
-    );
+    const result = await this.ajax<Array<ReceivedRecipe>>("recipes/send-requests");
 
     return result;
   }
 
   async getPendingSendRequestsCount(): Promise<number> {
-    const result = await this.ajax<number>(
-      "recipes/pending-send-requests-count"
-    );
+    const result = await this.ajax<number>("recipes/pending-send-requests-count");
 
     return result;
   }
@@ -113,9 +107,7 @@ export class RecipesService extends HttpProxyBase {
   }
 
   async getForReview(id: number): Promise<ReviewIngredientsModel> {
-    const result = await this.ajax<ReviewIngredientsModel>(
-      `recipes/${id}/review`
-    );
+    const result = await this.ajax<ReviewIngredientsModel>(`recipes/${id}/review`);
 
     return result;
   }
@@ -163,9 +155,7 @@ export class RecipesService extends HttpProxyBase {
     return data;
   }
 
-  async update(
-    recipe: EditRecipeModel
-  ): Promise<void> {
+  async update(recipe: EditRecipeModel): Promise<void> {
     const parsedIngredients = this.parseIngredientsAmount(recipe.ingredients);
 
     await this.ajaxExecute("recipes", {
@@ -180,7 +170,7 @@ export class RecipesService extends HttpProxyBase {
         cookDuration: recipe.cookDuration,
         servings: recipe.servings,
         imageUri: recipe.imageUri,
-        videoUrl: recipe.videoUrl
+        videoUrl: recipe.videoUrl,
       }),
     });
   }
@@ -192,18 +182,12 @@ export class RecipesService extends HttpProxyBase {
   }
 
   async canShareRecipeWithUser(email: string): Promise<CanShareRecipe> {
-    const result = await this.ajax<CanShareRecipe>(
-      `recipes/can-share-with-user/${email}`
-    );
+    const result = await this.ajax<CanShareRecipe>(`recipes/can-share-with-user/${email}`);
 
     return result;
   }
 
-  async share(
-    id: number,
-    newShares: Array<number>,
-    removedShares: Array<number>
-  ): Promise<void> {
+  async share(id: number, newShares: Array<number>, removedShares: Array<number>): Promise<void> {
     await this.ajaxExecute("recipes/share", {
       method: "put",
       body: json({
@@ -230,13 +214,8 @@ export class RecipesService extends HttpProxyBase {
     });
   }
 
-  async canSendRecipeToUser(
-    email: string,
-    recipeId: number
-  ): Promise<CanSendRecipe> {
-    const result = await this.ajax<CanSendRecipe>(
-      `recipes/can-send-recipe-to-user/${email}/${recipeId}`
-    );
+  async canSendRecipeToUser(email: string, recipeId: number): Promise<CanSendRecipe> {
+    const result = await this.ajax<CanSendRecipe>(`recipes/can-send-recipe-to-user/${email}/${recipeId}`);
 
     return result;
   }
@@ -300,9 +279,7 @@ export class RecipesService extends HttpProxyBase {
         parsedIngredient.amount.includes("/")
       ) {
         const fractions = parsedIngredient.amount.split("/");
-        parsedIngredient.amount = (
-          parseInt(fractions[0], 10) / parseInt(fractions[1], 10)
-        ).toFixed(2);
+        parsedIngredient.amount = (parseInt(fractions[0], 10) / parseInt(fractions[1], 10)).toFixed(2);
       }
 
       return parsedIngredient;

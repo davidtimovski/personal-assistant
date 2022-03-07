@@ -2,9 +2,9 @@ import { json } from "aurelia-fetch-client";
 
 import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
 
-import { EditDietaryProfile } from "models/viewmodels/editDietaryProfile";
-import { UpdateDietaryProfile } from "models/viewmodels/updateDietaryProfile";
-import { RecommendedDailyIntake } from "models/viewmodels/recommendedDailyIntake";
+import { EditDietaryProfile } from "../models/viewmodels/editDietaryProfile";
+import { UpdateDietaryProfile } from "../models/viewmodels/updateDietaryProfile";
+import { RecommendedDailyIntake } from "../models/viewmodels/recommendedDailyIntake";
 
 export class DietaryProfileService extends HttpProxyBase {
   async get(): Promise<EditDietaryProfile> {
@@ -12,9 +12,7 @@ export class DietaryProfileService extends HttpProxyBase {
     return result;
   }
 
-  async getDailyIntake(
-    getRecommendedIntake: EditDietaryProfile
-  ): Promise<RecommendedDailyIntake> {
+  async getDailyIntake(getRecommendedIntake: EditDietaryProfile): Promise<RecommendedDailyIntake> {
     const result = await this.ajax<RecommendedDailyIntake>("dietaryprofiles", {
       method: "post",
       body: json({

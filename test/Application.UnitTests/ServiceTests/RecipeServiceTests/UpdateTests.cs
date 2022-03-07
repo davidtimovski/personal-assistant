@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using FluentValidation;
-using Moq;
 using Application.Contracts.CookingAssistant.Recipes;
 using Application.Contracts.CookingAssistant.Recipes.Models;
 using Application.Mappings;
 using Application.Services.CookingAssistant;
 using Application.UnitTests.Builders;
 using Domain.Entities.CookingAssistant;
+using FluentValidation;
+using Moq;
 using Xunit;
 
 namespace Application.UnitTests.ServiceTests.RecipeServiceTests;
@@ -98,23 +98,6 @@ public class UpdateTests
         for (var i = 0; i < expectedRecipeIngredients.Count; i++)
         {
             Assert.Equal(expectedRecipeIngredients[i].Ingredient.Name, actualRecipeIngredients[i].Ingredient.Name);
-        }
-    }
-
-    [Fact]
-    public async Task NullsRecipeIngredientNames_IfTheyAreLinkedToTasks()
-    {
-        List<RecipeIngredient> actualRecipeIngredients = null;
-        _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<int>()))
-            .Callback<Recipe, int>((r, i) => actualRecipeIngredients = r.RecipeIngredients);
-
-        UpdateRecipe model = new RecipeBuilder().WithRecipeIngredientsLinkedToTasks().BuildUpdateModel();
-
-        await _sut.UpdateAsync(model, _successfulValidatorMock.Object);
-
-        foreach (RecipeIngredient recipeIngredient in actualRecipeIngredients)
-        {
-            Assert.Null(recipeIngredient.Ingredient.Name);
         }
     }
 

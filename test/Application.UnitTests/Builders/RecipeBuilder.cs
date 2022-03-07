@@ -43,19 +43,6 @@ public class RecipeBuilder
         return this;
     }
 
-    public RecipeBuilder WithRecipeIngredientsLinkedToTasks()
-    {
-        recipeIngredients = new List<UpdateRecipeIngredient>();
-        for (var i = 1; i < 4; i++)
-        {
-            recipeIngredients.Add(new UpdateRecipeIngredient
-            {
-                TaskId = i
-            });
-        }
-        return this;
-    }
-
     public RecipeBuilder WithRecipeIngredientsWithAmounts(params float?[] amounts)
     {
         recipeIngredients = new List<UpdateRecipeIngredient>();

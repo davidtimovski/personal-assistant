@@ -95,10 +95,6 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
             {
                 if (task != null)
                 {
-                    ingredient.Name = task.Name;
-                }
-                if (task != null)
-                {
                     ingredient.Task = task;
                 }
                 recipeIngredient.Ingredient = ingredient;
@@ -457,48 +453,33 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
 
     public async Task<int> CreateAsync(Recipe recipe)
     {
-        var userIngredients = EFContext.Ingredients.Where(x => x.UserId == recipe.UserId).ToArray();
+        var userAndPublicIngredients = EFContext.Ingredients.Where(x => x.UserId == recipe.UserId || x.UserId == 1).ToArray();
 
         var existingRecipeIngredients = recipe.RecipeIngredients.Where(x => x.IngredientId != 0).ToArray();
         foreach (var recipeIngredient in existingRecipeIngredients)
         {
-            recipeIngredient.Ingredient = userIngredients.First(x => x.Id == recipeIngredient.IngredientId);
+            recipeIngredient.Ingredient = userAndPublicIngredients.First(x => x.Id == recipeIngredient.IngredientId);
             recipe.RecipeIngredients.Add(recipeIngredient);
         }
 
         var newRecipeIngredients = recipe.RecipeIngredients.Where(x => x.IngredientId == 0).ToArray();
-        foreach (var recipeIngredient in newRecipeIngredients)
+        foreach (var newRecipeIngredient in newRecipeIngredients)
         {
-            Ingredient ingredient;
+            Ingredient existingUserIngredient = userAndPublicIngredients.FirstOrDefault(x =>
+                x.UserId == recipe.UserId &&
+                string.Equals(x.Name, newRecipeIngredient.Ingredient.Name, StringComparison.OrdinalIgnoreCase));
 
-            if (recipeIngredient.Ingredient.TaskId.HasValue)
+            if (existingUserIngredient == null)
             {
-                ingredient = new Ingredient
-                {
-                    UserId = recipe.UserId,
-                    TaskId = recipeIngredient.Ingredient.TaskId.Value,
-                    CreatedDate = recipe.CreatedDate,
-                    ModifiedDate = recipe.CreatedDate
-                };
+                newRecipeIngredient.Ingredient.UserId = recipe.UserId;
+                newRecipeIngredient.Ingredient.CreatedDate = newRecipeIngredient.Ingredient.ModifiedDate = recipe.CreatedDate;
             }
             else
             {
-                // Try to find existing by name
-                ingredient = userIngredients.FirstOrDefault(x =>
-                string.Equals(x.Name, recipeIngredient.Ingredient.Name, StringComparison.OrdinalIgnoreCase));
+                newRecipeIngredient.Ingredient = existingUserIngredient;
             }
 
-            if (ingredient == null)
-            {
-                recipeIngredient.Ingredient.UserId = recipe.UserId;
-                recipeIngredient.Ingredient.CreatedDate = recipeIngredient.Ingredient.ModifiedDate = recipe.CreatedDate;
-            }
-            else
-            {
-                recipeIngredient.Ingredient = ingredient;
-            }
-
-            recipe.RecipeIngredients.Add(recipeIngredient);
+            recipe.RecipeIngredients.Add(newRecipeIngredient);
         }
 
         EFContext.Add(recipe);
@@ -523,70 +504,35 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         dbRecipe.ImageUri = recipe.ImageUri;
         dbRecipe.VideoUrl = recipe.VideoUrl;
         dbRecipe.ModifiedDate = recipe.ModifiedDate;
+        dbRecipe.RecipeIngredients.RemoveAll(x => true);
 
-        var existingRecipeIngredients = recipe.RecipeIngredients.Where(x => x.IngredientId != 0).ToArray();
+        IEnumerable<Ingredient> ownerAndPublicIngredients = EFContext.Ingredients.Where(x => x.UserId == dbRecipe.UserId || x.UserId == 1).ToList();
 
-        if (dbRecipe.UserId == userId)
+        var existingRecipeIngredients = recipe.RecipeIngredients.Where(x => x.IngredientId != 0).ToList();
+        foreach (var recipeIngredient in existingRecipeIngredients)
         {
-            dbRecipe.RecipeIngredients.RemoveAll(x => true);
-
-            IEnumerable<Ingredient> userIngredients = EFContext.Ingredients.Where(x => x.UserId == userId || x.UserId == 1).ToArray();
-
-            foreach (var recipeIngredient in existingRecipeIngredients)
-            {
-                recipeIngredient.Ingredient = userIngredients.First(x => x.Id == recipeIngredient.IngredientId);
-                dbRecipe.RecipeIngredients.Add(recipeIngredient);
-            }
-
-            var newRecipeIngredients = recipe.RecipeIngredients.Where(x => x.IngredientId == 0).ToArray();
-            foreach (var recipeIngredient in newRecipeIngredients)
-            {
-                Ingredient ingredient;
-
-                if (recipeIngredient.Ingredient.TaskId.HasValue)
-                {
-                    ingredient = new Ingredient
-                    {
-                        UserId = userId,
-                        TaskId = recipeIngredient.Ingredient.TaskId.Value,
-                        CreatedDate = recipe.ModifiedDate,
-                        ModifiedDate = recipe.ModifiedDate
-                    };
-                }
-                else
-                {
-                    // Try to find existing by name
-                    ingredient = userIngredients.FirstOrDefault(x =>
-                    string.Equals(x.Name, recipeIngredient.Ingredient.Name, StringComparison.OrdinalIgnoreCase));
-                }
-
-                if (ingredient == null)
-                {
-                    recipeIngredient.Ingredient.UserId = userId;
-                    recipeIngredient.Ingredient.CreatedDate = recipeIngredient.Ingredient.ModifiedDate = recipe.ModifiedDate;
-                }
-                else
-                {
-                    recipeIngredient.Ingredient = ingredient;
-                }
-
-                dbRecipe.RecipeIngredients.Add(recipeIngredient);
-            }
+            recipeIngredient.Ingredient = ownerAndPublicIngredients.First(x => x.Id == recipeIngredient.IngredientId);
+            dbRecipe.RecipeIngredients.Add(recipeIngredient);
         }
-        else
-        {
-            foreach (var recipeIngredient in existingRecipeIngredients)
-            {
-                var dbRecipeIngredient = dbRecipe.RecipeIngredients.FirstOrDefault(x => x.RecipeId == recipeIngredient.RecipeId && x.IngredientId == recipeIngredient.IngredientId);
-                if (dbRecipeIngredient == null)
-                {
-                    continue;
-                }
 
-                dbRecipeIngredient.Amount = recipeIngredient.Amount;
-                dbRecipeIngredient.Unit = recipeIngredient.Unit;
-                dbRecipeIngredient.ModifiedDate = recipe.ModifiedDate;
+        var newRecipeIngredients = recipe.RecipeIngredients.Where(x => x.IngredientId == 0).ToList();
+        foreach (var newRecipeIngredient in newRecipeIngredients)
+        {
+            Ingredient existingUserIngredient = ownerAndPublicIngredients.FirstOrDefault(x =>
+                x.UserId == dbRecipe.UserId &&
+                string.Equals(x.Name, newRecipeIngredient.Ingredient.Name, StringComparison.OrdinalIgnoreCase));
+
+            if (existingUserIngredient == null)
+            {
+                newRecipeIngredient.Ingredient.UserId = dbRecipe.UserId;
+                newRecipeIngredient.Ingredient.CreatedDate = newRecipeIngredient.Ingredient.ModifiedDate = recipe.ModifiedDate;
             }
+            else
+            {
+                newRecipeIngredient.Ingredient = existingUserIngredient;
+            }
+
+            dbRecipe.RecipeIngredients.Add(newRecipeIngredient);
         }
 
         await EFContext.SaveChangesAsync();

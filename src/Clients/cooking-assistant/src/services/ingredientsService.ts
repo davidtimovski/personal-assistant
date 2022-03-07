@@ -6,12 +6,12 @@ import { EventAggregator } from "aurelia-event-aggregator";
 import { AuthService } from "../../../shared/src/services/authService";
 import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
 
-import { SimpleIngredient } from "models/viewmodels/simpleIngredient";
-import { EditIngredientModel } from "models/viewmodels/editIngredientModel";
-import { IngredientSuggestion, PublicIngredientSuggestions } from "models/viewmodels/ingredientSuggestions";
-import { PriceData } from "models/viewmodels/priceData";
-import { TaskSuggestion } from "models/viewmodels/taskSuggestion";
-import { ViewIngredientModel } from "models/viewmodels/viewIngredientModel";
+import { SimpleIngredient } from "../models/viewmodels/simpleIngredient";
+import { EditIngredientModel } from "../models/viewmodels/editIngredientModel";
+import { IngredientSuggestion, PublicIngredientSuggestions } from "../models/viewmodels/ingredientSuggestions";
+import { PriceData } from "../models/viewmodels/priceData";
+import { TaskSuggestion } from "../models/viewmodels/taskSuggestion";
+import { ViewIngredientModel } from "../models/viewmodels/viewIngredientModel";
 
 @inject(AuthService, HttpClient, EventAggregator)
 export class IngredientsService extends HttpProxyBase {
@@ -44,9 +44,7 @@ export class IngredientsService extends HttpProxyBase {
       ingredient.priceData.productSize,
       ingredient.priceData.productSizeIsOneUnit,
       ingredient.priceData.price,
-      ingredient.priceData.isSet && ingredient.priceData.price
-        ? ingredient.priceData.currency
-        : null
+      ingredient.priceData.isSet && ingredient.priceData.price ? ingredient.priceData.currency : null
     );
 
     await this.ajaxExecute("ingredients", {
@@ -66,7 +64,7 @@ export class IngredientsService extends HttpProxyBase {
       method: "put",
       body: json({
         id: id,
-        taskId: taskId
+        taskId: taskId,
       }),
     });
   }
@@ -78,25 +76,19 @@ export class IngredientsService extends HttpProxyBase {
   }
 
   async getTaskSuggestions(): Promise<Array<TaskSuggestion>> {
-    const result = await this.ajax<Array<TaskSuggestion>>(
-      "ingredients/task-suggestions"
-    );
+    const result = await this.ajax<Array<TaskSuggestion>>("ingredients/task-suggestions");
 
     return result;
   }
 
   async getUserIngredientSuggestions(): Promise<Array<IngredientSuggestion>> {
-    const result = await this.ajax<Array<IngredientSuggestion>>(
-      'ingredients/user-suggestions'
-    );
+    const result = await this.ajax<Array<IngredientSuggestion>>("ingredients/user-suggestions");
 
     return result;
   }
 
   async getPublicIngredientSuggestions(): Promise<PublicIngredientSuggestions> {
-    const result = await this.ajax<PublicIngredientSuggestions>(
-      'ingredients/public-suggestions'
-    );
+    const result = await this.ajax<PublicIngredientSuggestions>("ingredients/public-suggestions");
 
     return result;
   }

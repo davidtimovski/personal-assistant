@@ -72,11 +72,10 @@
               </div>
 
               <section if.bind="model.ingredients.length > 0" id="ingredients-section">
+                <header t="recipe.ingredients">Ingredients</header>
+
                 <table class="recipe-ingredients-table">
                   <thead>
-                    <tr>
-                      <th colspan="2" t="recipe.ingredients">Ingredients</th>
-                    </tr>
                     <tr if.bind="nutritionInfoVisible" class="au-animate animate-fade-in aurelia-fade-out">
                       <th colspan="2" class="source-message" t="recipe.nutritionInfoGatheredFrom">
                         Nutrition information gathered from:

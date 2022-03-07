@@ -1,6 +1,6 @@
 import { json } from "aurelia-fetch-client";
 import { UsersServiceBase } from "../../../shared/src/services/usersServiceBase";
-import { PreferencesModel } from "models/preferencesModel";
+import { PreferencesModel } from "../models/preferencesModel";
 
 export class UsersService extends UsersServiceBase {
   private preferences: PreferencesModel;

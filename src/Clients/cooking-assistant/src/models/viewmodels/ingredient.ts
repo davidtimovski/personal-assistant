@@ -1,7 +1,6 @@
 export class Ingredient {
   id: number;
   recipeId: number;
-  taskId: number;
   name: string;
   amount: number;
   amountPerServing: number;

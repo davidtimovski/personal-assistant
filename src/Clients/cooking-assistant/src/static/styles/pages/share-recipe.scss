@@ -1,5 +1,3 @@
-@import "../../../../../shared/src/static/styles/variables";
-
 .share-with {
   display: flex;
   justify-content: flex-start;
@@ -58,11 +56,4 @@
 .touch-device .share-with:not(.owner) .name:hover,
 .touch-device .add-input-wrap button:hover {
   color: var(--primary-color);
-}
-
-@media screen and (min-width: $desktop-min) {
-  .add-input-wrap button {
-    font-size: 25px;
-    line-height: 45px;
-  }
 }

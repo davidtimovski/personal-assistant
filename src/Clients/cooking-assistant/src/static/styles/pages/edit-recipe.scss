@@ -22,6 +22,38 @@ label.label {
     box-shadow: var(--box-shadow);
   }
 
+  .image-loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: var(--border-radius);
+    opacity: 0;
+
+    transition: opacity var(--transition);
+
+    i {
+      font-size: 50px;
+      color: var(--primary-color);
+    }
+
+    &.uploading {
+      opacity: 1;
+    }
+  }
+
+  .edit-image-buttons {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    font-size: 0;
+  }
+
   input[type="file"] {
     display: none;
   }
@@ -31,9 +63,9 @@ label.label {
     background: var(--primary-color);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
-    padding: 0 12px;
+    padding: 5px 12px;
     font-size: 1.2rem;
-    line-height: 2rem;
+    line-height: 1.5rem;
     color: #fafafa;
     cursor: pointer;
     white-space: nowrap;
@@ -45,10 +77,10 @@ label.label {
     border: none;
     outline: none;
     border-radius: var(--border-radius);
-    padding: 0 12px;
-    margin-left: 8px;
+    padding: 5px 12px;
+    margin-left: 10px;
     font-size: 1.2rem;
-    line-height: 2rem;
+    line-height: 1.5rem;
     color: #fafafa;
     cursor: pointer;
     transition: background var(--transition);
@@ -57,38 +89,6 @@ label.label {
   label:hover,
   button:hover {
     background: var(--primary-color-dark);
-  }
-}
-
-.edit-image-buttons {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  font-size: 0;
-}
-
-.image-loader {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  border-radius: var(--border-radius);
-  opacity: 0;
-
-  transition: opacity var(--transition);
-
-  i {
-    font-size: 50px;
-    color: var(--primary-color);
-  }
-
-  &.uploading {
-    opacity: 1;
   }
 }
 
@@ -115,7 +115,7 @@ label.label {
   .prep-cook-duration-wrap {
     display: flex;
     justify-content: space-around;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 
     .duration-side label {
       padding: 0;
@@ -132,107 +132,108 @@ label.label {
 
 .new-ingredients-wrap {
   margin-top: 10px;
-}
-.new-ingredient {
-  display: flex;
 
-  &:nth-child(n + 2) {
-    margin-top: 5px;
-  }
-
-  .fa-list {
-    display: none;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 27px;
-    color: var(--primary-color);
-  }
-
-  .ingredient-name-wrap {
-    position: relative;
-    width: 100%;
-  }
-
-  .name-input {
-    border: 1px solid #ddd;
-    border-radius: var(--border-radius);
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    padding: 7px 12px;
-    line-height: 29px;
-
-    &.uneditable {
-      background: #eeffee;
-      color: var(--primary-color-dark);
-    }
-  }
-
-  .ingredient-amount-input-wrap {
+  .new-ingredient {
     display: flex;
-  }
 
-  .amount-input {
-    width: auto;
-    max-width: 55px;
-    border-left: none;
-    border-radius: 0;
-    line-height: 43px;
-  }
+    &:nth-child(n + 2) {
+      margin-top: 5px;
+    }
 
-  .unit-toggle {
-    text-align: center;
-    color: var(--primary-color);
+    .fa-list {
+      display: none;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 27px;
+      color: var(--primary-color);
+    }
 
-    > button {
-      background: var(--primary-color);
-      border: 1px solid var(--primary-color);
-      border-left: none;
+    .ingredient-name-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    .name-input {
+      border: 1px solid #ddd;
       border-radius: var(--border-radius);
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
-      outline: none;
-      padding: 0 12px;
-      font-size: 22px;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      padding: 7px 12px;
+      line-height: 29px;
+
+      &.uneditable {
+        background: #eeffee;
+        color: var(--primary-color-dark);
+      }
+    }
+
+    .ingredient-amount-input-wrap {
+      display: flex;
+    }
+
+    .amount-input {
+      width: auto;
+      max-width: 55px;
+      border-left: none;
+      border-radius: 0;
       line-height: 43px;
-      color: #fafafa;
-      cursor: pointer;
-      vertical-align: top;
     }
 
-    > .fa-asterisk {
-      background: var(--primary-color);
-      border: 1px solid var(--primary-color);
-      border-left: none;
-      border-radius: var(--border-radius);
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
-      padding: 2px 13px 0;
-      font-size: 15px;
-      line-height: 41px;
-      color: #fafafa;
-      cursor: pointer;
-      vertical-align: top;
+    .unit-toggle {
+      text-align: center;
+      color: var(--primary-color);
+
+      > button {
+        background: var(--primary-color);
+        border: 1px solid var(--primary-color);
+        border-left: none;
+        border-radius: var(--border-radius);
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        outline: none;
+        padding: 0 12px;
+        font-size: 22px;
+        line-height: 43px;
+        color: #fafafa;
+        cursor: pointer;
+        vertical-align: top;
+      }
+
+      > .fa-asterisk {
+        background: var(--primary-color);
+        border: 1px solid var(--primary-color);
+        border-left: none;
+        border-radius: var(--border-radius);
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        padding: 2px 13px 0;
+        font-size: 15px;
+        line-height: 41px;
+        color: #fafafa;
+        cursor: pointer;
+        vertical-align: top;
+      }
+
+      > button:hover,
+      > .fa-asterisk:hover {
+        background: var(--primary-color-dark);
+      }
     }
 
-    > button:hover,
-    > .fa-asterisk:hover {
-      background: var(--primary-color-dark);
-    }
-  }
+    .remove-button {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-width: 50px;
+      height: 45px;
+      font-size: 27px;
+      text-decoration: none;
+      color: var(--primary-color);
 
-  .remove-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-width: 50px;
-    height: 45px;
-    font-size: 27px;
-    text-decoration: none;
-    color: var(--primary-color);
-
-    &:hover {
-      color: var(--primary-color-dark);
+      &:hover {
+        color: var(--primary-color-dark);
+      }
     }
   }
 }
@@ -245,7 +246,7 @@ label.label {
 }
 
 @media screen and (min-width: $desktop-min) {
-  .new-ingredient {
+  .new-ingredients-wrap .new-ingredient {
     .name-input.uneditable {
       padding: 7px 12px;
       line-height: 29px;

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using FluentValidation;
-using Application.Contracts.ToDoAssistant.Tasks;
 
 namespace Application.Contracts.CookingAssistant.Recipes.Models;
 
@@ -22,7 +21,7 @@ public class CreateRecipe
 
 public class CreateRecipeValidator : AbstractValidator<CreateRecipe>
 {
-    public CreateRecipeValidator(IRecipeService recipeService, ITaskService taskService)
+    public CreateRecipeValidator(IRecipeService recipeService)
     {
         RuleFor(dto => dto.UserId)
             .NotEmpty().WithMessage("Unauthorized")
@@ -47,19 +46,7 @@ public class CreateRecipeValidator : AbstractValidator<CreateRecipe>
                     }
                 }
                 return true;
-            }).WithMessage("Recipes.ModifyRecipe.DuplicateIngredients")
-            .Must((dto, ingredients) =>
-            {
-                var ingredientsLinkedToTasks = ingredients.Where(x => x.TaskId.HasValue);
-                foreach (UpdateRecipeIngredient ingredient in ingredientsLinkedToTasks)
-                {
-                    if (!taskService.Exists(ingredient.TaskId.Value, dto.UserId))
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }).WithMessage("Recipes.ModifyRecipe.IngredientIsLinkedToNonExistentTask");
+            }).WithMessage("Recipes.ModifyRecipe.DuplicateIngredients");
 
         RuleFor(dto => dto.Instructions).MaximumLength(5000).WithMessage("Recipes.ModifyRecipe.InstructionsMaxLength");
 
@@ -84,10 +71,7 @@ public class UpdateRecipeIngredientValidator : AbstractValidator<UpdateRecipeIng
     public UpdateRecipeIngredientValidator()
     {
         RuleFor(dto => dto.Name)
-            .Must((dto, name) =>
-            {
-                return dto.TaskId.HasValue ? true : !string.IsNullOrWhiteSpace(name);
-            }).WithMessage("Recipes.ModifyRecipe.IngredientNameIsRequired")
+            .NotEmpty().WithMessage("Recipes.ModifyRecipe.IngredientNameIsRequired")
             .MaximumLength(50).WithMessage("Recipes.ModifyRecipe.IngredientNameMaxLength");
 
         RuleFor(dto => dto.Amount)

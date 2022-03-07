@@ -1,11 +1,6 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import {
-  ValidationController,
-  validateTrigger,
-  ValidationRules,
-  ControllerValidateResult,
-} from "aurelia-validation";
+import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
@@ -19,14 +14,7 @@ import { CanShareRecipe } from "models/viewmodels/canShareRecipe";
 import { SharingState } from "models/viewmodels/sharingState";
 import * as Actions from "utils/state/actions";
 
-@inject(
-  Router,
-  AuthService,
-  RecipesService,
-  ValidationController,
-  I18N,
-  EventAggregator
-)
+@inject(Router, AuthService, RecipesService, ValidationController, I18N, EventAggregator)
 export class ShareRecipe {
   private model: RecipeWithShares;
   private originalShares: Array<Share>;
@@ -57,7 +45,7 @@ export class ShareRecipe {
 
   async activate(params: any) {
     this.currentUserEmail = this.authService.currentUser.profile.name;
-    
+
     this.model = await this.recipesService.getWithShares(params.id);
     if (this.model === null) {
       this.router.navigateToRoute("notFound");
@@ -82,8 +70,7 @@ export class ShareRecipe {
 
   @computedFrom("model.shares.length")
   get sharedWithWrapTitle() {
-    return JSON.stringify(this.originalShares) !==
-      JSON.stringify(this.model.shares)
+    return JSON.stringify(this.originalShares) !== JSON.stringify(this.model.shares)
       ? this.i18n.tr("shareRecipe.shareWith")
       : this.i18n.tr("shareRecipe.members");
   }
@@ -103,39 +90,27 @@ export class ShareRecipe {
       return;
     }
 
-    console.log(this.currentUserEmail);
     const result: ControllerValidateResult = await this.validationController.validate();
 
     this.emailIsInvalid = !result.valid;
 
     if (result.valid) {
-      const canShareVM: CanShareRecipe = await this.recipesService.canShareRecipeWithUser(
-        email
-      );
+      const canShareVM: CanShareRecipe = await this.recipesService.canShareRecipeWithUser(email);
 
       if (canShareVM.userId === 0) {
         this.emailIsInvalid = true;
-        this.eventAggregator.publish(
-          AlertEvents.ShowError,
-          "shareRecipe.userDoesntExist"
-        );
+        this.eventAggregator.publish(AlertEvents.ShowError, "shareRecipe.userDoesntExist");
       } else {
         if (!canShareVM.canShare) {
           this.emailIsInvalid = true;
-          this.eventAggregator.publish(
-            AlertEvents.ShowError,
-            "shareRecipe.cannotShareWithUser"
-          );
+          this.eventAggregator.publish(AlertEvents.ShowError, "shareRecipe.cannotShareWithUser");
         } else {
           this.selectedShare.userId = canShareVM.userId;
           this.selectedShare.imageUri = canShareVM.imageUri;
           this.model.shares.push(this.selectedShare);
 
           if (this.shareExistedPreviously(this.selectedShare)) {
-            this.removedShares.splice(
-              this.removedShares.indexOf(this.selectedShare.userId),
-              1
-            );
+            this.removedShares.splice(this.removedShares.indexOf(this.selectedShare.userId), 1);
           } else {
             this.newShares.push(this.selectedShare.userId);
           }
@@ -166,10 +141,7 @@ export class ShareRecipe {
   }
 
   evaluateCanSave(): void {
-    this.canSave =
-      this.newShares.length +
-      this.removedShares.length >
-      0;
+    this.canSave = this.newShares.length + this.removedShares.length > 0;
   }
 
   async save() {
@@ -180,29 +152,16 @@ export class ShareRecipe {
     this.saveButtonIsLoading = true;
     this.emailIsInvalid = false;
 
-    await this.recipesService.share(
-      this.model.id,
-      this.newShares,
-      this.removedShares
-    );
+    await this.recipesService.share(this.model.id, this.newShares, this.removedShares);
 
     await Actions.getRecipes(this.recipesService);
 
     if (this.removedShares.length > 0) {
-      this.eventAggregator.publish(
-        AlertEvents.ShowSuccess,
-        "shareRecipe.sharingDetailsSaved"
-      );
+      this.eventAggregator.publish(AlertEvents.ShowSuccess, "shareRecipe.sharingDetailsSaved");
     } else if (this.newShares.length === 1) {
-      this.eventAggregator.publish(
-        AlertEvents.ShowSuccess,
-        "shareRecipe.shareRequestSent"
-      );
+      this.eventAggregator.publish(AlertEvents.ShowSuccess, "shareRecipe.shareRequestSent");
     } else if (this.newShares.length > 1) {
-      this.eventAggregator.publish(
-        AlertEvents.ShowSuccess,
-        "shareRecipe.shareRequestsSent"
-      );
+      this.eventAggregator.publish(AlertEvents.ShowSuccess, "shareRecipe.shareRequestsSent");
     }
 
     this.router.navigateToRoute("recipesEdited", { editedId: this.model.id });

@@ -64,9 +64,7 @@
               <span t="editRecipe.ingredients">Ingredients</span>: <span>${getIngredientsCount}</span>
             </label>
 
-            <div if.bind="model.userIsOwner">
-              <ingredient-picker input-placeholder.bind="addIngredientsInputPlaceholder" adding-enabled.bind="true" recipe-ingredient-ids.bind="recipeIngredientIds"></ingredient-picker>
-            </div>
+            <ingredient-picker input-placeholder.bind="addIngredientsInputPlaceholder" adding-enabled.bind="true" user-ingredients-allowed.bind="model.userIsOwner" recipe-ingredient-ids.bind="recipeIngredientIds"></ingredient-picker>
 
             <div show.bind="model.ingredients.length > 0" class="new-ingredients-wrap">
               <div repeat.for="ingredient of model.ingredients"
@@ -85,7 +83,7 @@
                       <button type="button" show.bind="ingredient.unit" t="${ingredient.unit}"></button>
                       <i show.bind="!ingredient.unit" class="fas fa-asterisk"></i>
                     </div>
-                    <a if.bind="model.userIsOwner" click.delegate="removeIngredient(ingredient)" class="remove-button"
+                    <a click.delegate="removeIngredient(ingredient)" class="remove-button"
                       t="[title,aria-label]editRecipe.removeIngredient">
                       <i class="fas fa-times-circle"></i>
                     </a>
@@ -124,7 +122,6 @@
           </div>
 
           <div class="form-control">
-            <label class="label" t="editRecipe.recipeIsFor">This recipe is for</label>
             <servings-selector if.bind="model.servings" recipe.bind="model" viewing.bind="false"></servings-selector>
           </div>
         </form>

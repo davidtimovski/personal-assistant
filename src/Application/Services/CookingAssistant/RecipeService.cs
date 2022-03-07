@@ -232,10 +232,9 @@ public class RecipeService : IRecipeService
     {
         ValidateAndThrow(model, validator);
 
-        var recipe = _mapper.Map<Recipe>(model);
-
         var now = DateTime.UtcNow;
 
+        var recipe = _mapper.Map<Recipe>(model);
         recipe.Name = recipe.Name.Trim();
 
         if (!string.IsNullOrEmpty(recipe.Description))
@@ -245,7 +244,7 @@ public class RecipeService : IRecipeService
 
         foreach (var recipeIngredient in recipe.RecipeIngredients)
         {
-            recipeIngredient.Ingredient.Name = recipeIngredient.Ingredient.TaskId.HasValue ? null : recipeIngredient.Ingredient.Name.Trim();
+            recipeIngredient.Ingredient.Name = recipeIngredient.Ingredient.Name.Trim();
             if (recipeIngredient.Amount.HasValue)
             {
                 if (recipeIngredient.Amount.Value == 0)
@@ -360,12 +359,11 @@ public class RecipeService : IRecipeService
     {
         ValidateAndThrow(model, validator);
 
+        var now = DateTime.UtcNow;
+
         string oldImageUri = GetImageUri(model.Id);
 
         var recipe = _mapper.Map<Recipe>(model);
-
-        var now = DateTime.UtcNow;
-
         recipe.Name = recipe.Name.Trim();
 
         if (!string.IsNullOrEmpty(recipe.Description))
@@ -375,7 +373,7 @@ public class RecipeService : IRecipeService
 
         foreach (var recipeIngredient in recipe.RecipeIngredients)
         {
-            recipeIngredient.Ingredient.Name = recipeIngredient.Ingredient.TaskId.HasValue ? null : recipeIngredient.Ingredient.Name.Trim();
+            recipeIngredient.Ingredient.Name = recipeIngredient.Ingredient.Name.Trim();
             if (recipeIngredient.Amount.HasValue)
             {
                 if (recipeIngredient.Amount.Value == 0)

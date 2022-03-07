@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Application.Contracts.ToDoAssistant.Lists;
 using Dapper;
 using Domain.Entities.Common;
-using Domain.Entities.CookingAssistant;
 using Domain.Entities.ToDoAssistant;
 
 namespace Persistence.Repositories.ToDoAssistant;
@@ -424,18 +423,6 @@ public class ListsRepository : BaseRepository, IListsRepository
     {
         var now = DateTime.UtcNow;
 
-        var tasksLinkedToIngredients = from task in EFContext.Tasks
-                                       join ingredient in EFContext.Ingredients on task.Id equals ingredient.TaskId
-                                       where task.ListId == id
-                                       select task;
-
-        foreach (ToDoTask task in tasksLinkedToIngredients)
-        {
-            Ingredient ingredient = EFContext.Ingredients.First(x => x.TaskId == task.Id);
-            ingredient.Name = task.Name;
-            ingredient.ModifiedDate = now;
-        }
-
         ToDoList list = Get(id);
 
         using IDbConnection conn = OpenConnection();
@@ -488,18 +475,6 @@ public class ListsRepository : BaseRepository, IListsRepository
     public async Task<ListShare> LeaveAsync(int id, int userId)
     {
         var now = DateTime.UtcNow;
-
-        var tasksLinkedToIngredients = from task in EFContext.Tasks
-                                       join ingredient in EFContext.Ingredients on task.Id equals ingredient.TaskId
-                                       where task.ListId == id
-                                       select task;
-
-        foreach (ToDoTask task in tasksLinkedToIngredients)
-        {
-            Ingredient ingredient = EFContext.Ingredients.First(x => x.TaskId == task.Id);
-            ingredient.Name = task.Name;
-            ingredient.ModifiedDate = now;
-        }
 
         using IDbConnection conn = OpenConnection();
 

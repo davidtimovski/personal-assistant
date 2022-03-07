@@ -1,26 +1,37 @@
-.review-image-name-wrap {
-  position: relative;
-}
-.review-recipe-name-wrap {
-  position: absolute;
-  width: 100%;
-  background: rgba(73, 224, 155, 0.85);
-  border-top-left-radius: var(--border-radius);
-  border-top-right-radius: var(--border-radius);
-  padding: 8px 0;
-  line-height: 28px;
-  text-align: center;
-  color: #fff;
-}
-.review-introduction {
-  margin-bottom: 25px;
-  line-height: 30px;
-  text-align: center;
+.review-introduction-wrap {
+  .review-image-name-wrap {
+    position: relative;
 
-  &-button-wrap {
+    .review-recipe-name-wrap {
+      position: absolute;
+      width: 100%;
+      background: rgba(73, 224, 155, 0.85);
+      border-top-left-radius: var(--border-radius);
+      border-top-right-radius: var(--border-radius);
+      padding: 8px 0;
+      line-height: 28px;
+      text-align: center;
+      color: #fff;
+    }
+
+    .image {
+      width: 100%;
+      border-radius: var(--border-radius);
+      margin-bottom: 10px;
+    }
+  }
+
+  .review-introduction {
+    margin-bottom: 25px;
+    line-height: 30px;
     text-align: center;
+
+    &-button-wrap {
+      text-align: center;
+    }
   }
 }
+
 .review-ingredient-name {
   margin-bottom: 25px;
   text-align: center;

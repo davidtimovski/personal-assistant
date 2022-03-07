@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Application.Contracts.Common;
 using Application.Contracts.Common.Models;
-using Application.Contracts.ToDoAssistant.Tasks;
 using FluentValidation;
 
 namespace Application.Contracts.CookingAssistant.Recipes.Models;
@@ -25,7 +24,7 @@ public class UpdateRecipe
 
 public class UpdateRecipeValidator : AbstractValidator<UpdateRecipe>
 {
-    public UpdateRecipeValidator(IRecipeService recipeService, ITaskService taskService)
+    public UpdateRecipeValidator(IRecipeService recipeService)
     {
         RuleFor(dto => dto.UserId)
             .NotEmpty().WithMessage("Unauthorized")
@@ -51,19 +50,7 @@ public class UpdateRecipeValidator : AbstractValidator<UpdateRecipe>
                     }
                 }
                 return true;
-            }).WithMessage("Recipes.ModifyRecipe.DuplicateIngredients")
-            .Must((dto, ingredients) =>
-            {
-                var ingredientsLinkedToTasks = ingredients.Where(x => x.TaskId.HasValue);
-                foreach (UpdateRecipeIngredient ingredient in ingredientsLinkedToTasks)
-                {
-                    if (!taskService.Exists(ingredient.TaskId.Value, dto.UserId))
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }).WithMessage("Recipes.ModifyRecipe.IngredientIsLinkedToNonExistentTask");
+            }).WithMessage("Recipes.ModifyRecipe.DuplicateIngredients");
 
         RuleFor(dto => dto.Instructions).MaximumLength(5000).WithMessage("Recipes.ModifyRecipe.InstructionsMaxLength");
 
@@ -87,7 +74,6 @@ public class UpdateRecipeIngredient
 {
     public int? Id { get; set; }
     public string Name { get; set; }
-    public int? TaskId { get; set; }
     public float? Amount { get; set; }
     public string Unit { get; set; }
 }

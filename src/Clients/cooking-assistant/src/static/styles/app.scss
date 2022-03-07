@@ -93,17 +93,11 @@ textarea.small {
   }
 }
 
-.recipe-wrap .image,
-.review-introduction-wrap .image {
-  width: 100%;
-  border-radius: var(--border-radius);
-  margin-bottom: 10px;
-}
 section header {
   background: var(--primary-color);
   border-top-left-radius: var(--border-radius);
   border-top-right-radius: var(--border-radius);
-  padding: 6px 5px;
+  padding: 5px;
   line-height: 26px;
   text-align: center;
   color: #fff;
@@ -121,11 +115,6 @@ section header {
   color: var(--faded-color);
 }
 
-.instructions {
-  padding: 15px;
-  font-size: 1rem;
-  line-height: 1.5rem;
-}
 servings-selector {
   display: flex;
   justify-content: space-between;
@@ -138,16 +127,15 @@ servings-selector {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-width: 53px;
-    height: 45px;
+    min-width: 47px;
+    height: 39px;
     font-size: 22px;
     text-decoration: none;
     color: var(--primary-color);
   }
 
   .servings {
-    padding: 9px 5px;
-    line-height: 27px;
+    line-height: 37px;
     text-align: center;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -219,4 +207,24 @@ servings-selector {
   }
 }
 
-@import "./desktop.scss";
+@media screen and (min-width: $desktop-min) {
+  section header {
+    padding: 9px 5px;
+  }
+
+  .add-input-wrap button {
+    font-size: 25px;
+    line-height: 45px;
+  }
+
+  servings-selector {
+    .servings-button {
+      min-width: 53px;
+      height: 45px;
+    }
+
+    .servings {
+      line-height: 43px;
+    }
+  }
+}
