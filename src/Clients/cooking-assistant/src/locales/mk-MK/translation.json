@@ -58,6 +58,8 @@
   "addIngredient": "Додади состојка",
   "hasNutritionSet": "Има хранлива вредност",
   "hasPriceSet": "Има цена",
+  "mine": "Мои",
+  "public": "Јавни",
   "recipes": {
     "menu": "Мени",
     "refresh": "Освежи",
@@ -107,7 +109,6 @@
     "cookDuration": "Готвење",
     "cookDurationHours": "Готвење часови",
     "cookDurationMinutes": "Готвење минути",
-    "recipeIsFor": "Овој рецепт е за",
     "create": "Креирај",
     "leave": "Напушти",
     "deleteSuccessful": "Рецептот беше успешно избришан",
@@ -188,7 +189,6 @@
     "search": "Пребарај",
     "clear": "Избриши",
     "emptyListMessage": "Сеуште немате состојки",
-    "mine": "Моја",
     "linkedToTask": "Поврзана со задача"
   },
   "editIngredient": {
@@ -241,7 +241,7 @@
     "accept": "Прифати",
     "unblock": "Одблокирај",
     "blockedUsers": "Блокирани корисници",
-    "emptyListMessage": "Немате нови споделени рецепти"
+    "emptyListMessage": "Никој не споделил рецепти со вам"
   },
   "inbox": {
     "inbox": "Сандаче",
@@ -250,7 +250,7 @@
     "accept": "Прифати",
     "blockedUsers": "Блокирани корисници",
     "delete": "Избриши",
-    "emptyListMessage": "Немате нови примени рецепти"
+    "emptyListMessage": "Никој ви нема пратено рецепти"
   },
   "reviewIngredients": {
     "reviewPersonalIngredients": "Прегледај персонални состојки",

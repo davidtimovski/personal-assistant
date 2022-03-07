@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
+using Application;
 using Auth.Models;
 using Auth.Services;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using FluentValidation.AspNetCore;
-using IdentityServer4.EntityFramework.DbContexts;
-using IdentityServer4.EntityFramework.Mappers;
+using Infrastructure;
+using Infrastructure.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -23,9 +23,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
-using Application;
-using Infrastructure;
-using Infrastructure.Identity;
 using Persistence;
 using Serilog;
 
@@ -206,50 +203,4 @@ app.UseStatusCodePagesWithReExecute("/error", "?code={0}");
 
 app.UseMvcWithDefaultRoute();
 
-//InitializeDatabase(app);
-
 app.Run();
-
-void InitializeDatabase(IApplicationBuilder app)
-{
-    using var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope();
-    serviceScope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.Migrate();
-
-    var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
-    context.Database.Migrate();
-    if (!context.Clients.Any())
-    {
-        foreach (var client in IdentityServerConfig.GetClients(builder.Configuration))
-        {
-            context.Clients.Add(client.ToEntity());
-        }
-        context.SaveChanges();
-    }
-
-    if (!context.IdentityResources.Any())
-    {
-        foreach (var resource in IdentityServerConfig.IdentityResources)
-        {
-            context.IdentityResources.Add(resource.ToEntity());
-        }
-        context.SaveChanges();
-    }
-
-    if (!context.ApiResources.Any())
-    {
-        foreach (var resource in IdentityServerConfig.ApiResources)
-        {
-            context.ApiResources.Add(resource.ToEntity());
-        }
-        context.SaveChanges();
-    }
-
-    if (!context.ApiScopes.Any())
-    {
-        foreach (var scope in IdentityServerConfig.ApiScopes)
-        {
-            context.ApiScopes.Add(scope.ToEntity());
-        }
-        context.SaveChanges();
-    }
-}

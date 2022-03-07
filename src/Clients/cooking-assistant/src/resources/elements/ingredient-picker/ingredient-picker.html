@@ -1,4 +1,4 @@
-<template bindable="inputPlaceholder, addingEnabled, recipeIngredientIds">
+<template bindable="inputPlaceholder, addingEnabled, userIngredientsAllowed, recipeIngredientIds">
   <require from="./ingredient-picker.scss"></require>
   <require from="./public-category-suggestion"></require>
   <require from="./public-ingredient-suggestion"></require>
@@ -13,8 +13,8 @@
     </div>
 
     <div if.bind="suggestionsMatched">
-      <div class="suggestions">
-        <div class="suggestions-header">Personal</div>
+      <div if.bind="userIngredientsAllowed" class="suggestions">
+        <div class="suggestions-header" t="mine">Mine</div>
 
         <div class="suggestions-body">
           <div repeat.for="ingredient of suggestions.userIngredients">
@@ -24,7 +24,7 @@
       </div>
 
       <div class="suggestions">
-        <div class="suggestions-header">Public</div>
+        <div class="suggestions-header" t="public">Public</div>
 
         <div class="ingredients">
           <div repeat.for="ingredient of suggestions.publicIngredients.uncategorized">

@@ -1,11 +1,21 @@
-.recipe-wrap .prep-cook-duration-wrap {
-  display: flex;
-  justify-content: space-around;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 15px;
-  margin-bottom: 10px;
+@import "../../../../../shared/src/static/styles/variables";
+
+.recipe-wrap {
+  .prep-cook-duration-wrap {
+    display: flex;
+    justify-content: space-around;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 10px;
+  }
+
+  .image {
+    width: 100%;
+    border-radius: var(--border-radius);
+    margin-bottom: 10px;
+  }
 
   .duration-label {
     padding-left: 0;
@@ -108,10 +118,18 @@
 }
 
 .instructions-wrap {
-  background: #fafafa;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
   margin-bottom: 10px;
+
+  .instructions {
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-top: none;
+    padding: 15px;
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
 }
 
 .cost-wrap {
@@ -134,4 +152,11 @@
   line-height: 2rem;
   text-align: center;
   color: var(--primary-color-dark);
+}
+
+@media screen and (min-width: $desktop-min) {
+  .instructions-wrap .instructions {
+    font-size: 1.2rem;
+    line-height: 1.7rem;
+  }
 }

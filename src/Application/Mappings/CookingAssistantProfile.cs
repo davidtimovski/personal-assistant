@@ -38,7 +38,6 @@ public class CookingAssistantProfile : Profile
         CreateMap<UpdateRecipeIngredient, RecipeIngredient>()
             .ForMember(x => x.RecipeId, src => src.Ignore())
             .ForMember(x => x.IngredientId, opt => opt.MapFrom(src => src.Id.HasValue ? src.Id.Value : 0))
-            .ForPath(x => x.Ingredient.TaskId, opt => opt.MapFrom(src => src.TaskId))
             .ForPath(x => x.Ingredient.Name, opt => opt.MapFrom(src => src.Name))
             .ForPath(x => x.Unit, opt => opt.MapFrom(src => src.Unit))
             .ForMember(x => x.CreatedDate, src => src.Ignore())

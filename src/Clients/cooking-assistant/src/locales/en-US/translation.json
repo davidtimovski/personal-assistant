@@ -58,6 +58,8 @@
   "addIngredient": "Add ingredient",
   "hasNutritionSet": "Has nutrition set",
   "hasPriceSet": "Has price set",
+  "mine": "Mine",
+  "public": "Public",
   "recipes": {
     "menu": "Menu",
     "refresh": "Refresh",
@@ -107,7 +109,6 @@
     "cookDuration": "Cook duration",
     "cookDurationHours": "Cook duration hours",
     "cookDurationMinutes": "Cook duration minutes",
-    "recipeIsFor": "This recipe is for",
     "create": "Create",
     "leave": "Leave",
     "deleteSuccessful": "Recipe was successfully deleted",
@@ -188,7 +189,6 @@
     "search": "Search",
     "clear": "Clear",
     "emptyListMessage": "You don't have any ingredients yet",
-    "mine": "Mine",
     "linkedToTask": "Linked to task"
   },
   "editIngredient": {
@@ -241,7 +241,7 @@
     "accept": "Accept",
     "unblock": "Unblock",
     "blockedUsers": "Blocked users",
-    "emptyListMessage": "There are no new share requests"
+    "emptyListMessage": "No one has shared any recipes with you"
   },
   "inbox": {
     "inbox": "Inbox",
@@ -250,7 +250,7 @@
     "accept": "Accept",
     "blockedUsers": "Blocked users",
     "delete": "Delete",
-    "emptyListMessage": "There are no new received recipes"
+    "emptyListMessage": "No one has sent you any recipes"
   },
   "reviewIngredients": {
     "reviewPersonalIngredients": "Review personal ingredients",

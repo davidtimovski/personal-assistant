@@ -3,13 +3,13 @@ import { EventAggregator } from "aurelia-event-aggregator";
 
 import { ValidationUtil } from "../../../../../shared/src/utils/validationUtil";
 
-import { IngredientsService } from "services/ingredientsService";
+import { IngredientsService } from "../../../services/ingredientsService";
 import {
   IngredientCategory,
   IngredientPickerEvents,
   IngredientSuggestion,
   IngredientSuggestions,
-} from "models/viewmodels/ingredientSuggestions";
+} from "../../../models/viewmodels/ingredientSuggestions";
 
 @inject(IngredientsService, EventAggregator)
 export class IngredientPicker {
@@ -20,6 +20,7 @@ export class IngredientPicker {
 
   @bindable({ defaultBindingMode: bindingMode.toView }) inputPlaceholder: string;
   @bindable({ defaultBindingMode: bindingMode.toView }) addingEnabled: boolean;
+  @bindable({ defaultBindingMode: bindingMode.toView }) userIngredientsAllowed = true;
   @bindable({ defaultBindingMode: bindingMode.toView }) recipeIngredientIds: number[];
 
   constructor(
@@ -43,7 +44,15 @@ export class IngredientPicker {
   }
 
   attached() {
-    const userSuggestionsPromise = this.ingredientsService.getUserIngredientSuggestions();
+    let userSuggestionsPromise;
+    if (this.userIngredientsAllowed) {
+      userSuggestionsPromise = this.ingredientsService.getUserIngredientSuggestions();
+    } else {
+      userSuggestionsPromise = new Promise((resolve) => {
+        resolve([]);
+      });
+    }
+
     const publicSuggestionsPromise = this.ingredientsService.getPublicIngredientSuggestions();
 
     Promise.all([userSuggestionsPromise, publicSuggestionsPromise]).then((suggestions) => {
