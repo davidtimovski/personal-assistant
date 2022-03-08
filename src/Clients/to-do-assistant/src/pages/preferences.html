@@ -14,7 +14,7 @@
       </div>
 
       <div class="content-wrap">
-        <form>
+        <form onsubmit="return false;">
           <div if.bind="notificationsAreSupported" class="form-control">
             <div show.bind="notificationsState === 'denied'" class="setting-descriptor no-bottom-margin"
               t="preferences.notificationsPermission">

@@ -20,7 +20,7 @@ CREATE TABLE public."CookingAssistant.Ingredients"
 	"AddedSugars" numeric(4, 1),
 	"Fiber" numeric(4, 1),
 	"Protein" numeric(4, 1),
-    "Sodium" smallint,
+    "Sodium" integer,
     "Cholesterol" smallint,
     "VitaminA" smallint,
     "VitaminC" smallint,

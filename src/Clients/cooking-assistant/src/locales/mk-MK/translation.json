@@ -56,8 +56,8 @@
   "decreaseServings": "Намали порции",
   "increaseServings": "Зголеми порции",
   "addIngredient": "Додади состојка",
-  "hasNutritionSet": "Има хранлива вредност",
-  "hasPriceSet": "Има цена",
+  "hasNutrition": "Има хранлива вредност",
+  "hasPrice": "Има цена",
   "mine": "Мои",
   "public": "Јавни",
   "recipes": {

@@ -16,6 +16,7 @@ export class Preferences {
   private notificationsState: string;
   private readonly notificationIconSrc = "/images/icons/app-icon-96x96.png";
   private notificationsAreSupported = false;
+  private notificationsCheckboxReady = false;
 
   @observable() private notificationsCheckboxChecked = false;
   @observable() private imperialSystem;
@@ -48,10 +49,12 @@ export class Preferences {
           this.notificationsState = "default";
       }
     }
+
+    this.notificationsCheckboxReady = true;
   }
 
   async notificationsCheckboxCheckedChanged() {
-    if (!this.preferences) {
+    if (!this.notificationsCheckboxReady) {
       return;
     }
 

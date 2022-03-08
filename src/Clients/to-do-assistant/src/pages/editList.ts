@@ -89,7 +89,7 @@ export class EditList {
   }
 
   @computedFrom("model.sharingState", "profile.notificationsEnabled")
-  get notificationsEnabledCheckboxVisible() {
+  get notificationsCheckboxEnabled() {
     return this.model.sharingState !== SharingState.NotShared && this.preferences.notificationsEnabled;
   }
 

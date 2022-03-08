@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
+using Application.Contracts.ToDoAssistant.Lists;
+using Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.SignalR;
-using Application.Contracts.ToDoAssistant.Lists;
-using Infrastructure.Identity;
 
 namespace Api.Hubs;
 

@@ -18,8 +18,8 @@ label.label {
 
   .image {
     width: 100%;
+    border: 1px solid #ddd;
     border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
   }
 
   .image-loader {

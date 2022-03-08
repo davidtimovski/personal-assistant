@@ -113,5 +113,25 @@ textarea {
   text-align: center;
 }
 
-@import "./desktop.scss";
-@import "./touch.scss";
+/* Workaround for sticky :hover on mobile devices */
+.touch-device {
+  .lists-reorder-toggle.checked:hover,
+  .tasks-reorder-toggle.checked:hover {
+    color: var(--primary-color);
+  }
+
+  .lists-reorder-toggle:hover,
+  .tasks-reorder-toggle:hover {
+    color: var(--faded-color);
+  }
+}
+
+@media screen and (min-width: $desktop-min) {
+  .body {
+    min-height: initial;
+  }
+  .body-overlay {
+    border-bottom-left-radius: 18px;
+    border-bottom-right-radius: 18px;
+  }
+}

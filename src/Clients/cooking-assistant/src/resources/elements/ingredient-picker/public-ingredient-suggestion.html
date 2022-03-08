@@ -7,8 +7,8 @@
       <span if.bind="ingredient.brandName">${ingredient.name} (${ingredient.brandName})</span>
       <span else>${ingredient.name}</span>
       <span class="ingredient-suggestion-icons">
-        <i class="fas fa-clipboard" if.bind="ingredient.hasNutritionData" t="[title,aria-label]hasNutritionSet"></i>
-        <i class="fas fa-tag" if.bind="ingredient.hasPriceData" t="[title,aria-label]hasPriceSet"></i>
+        <i class="fas fa-clipboard" if.bind="ingredient.hasNutritionData" t="[title,aria-label]hasNutrition"></i>
+        <i class="fas fa-tag" if.bind="ingredient.hasPriceData" t="[title,aria-label]hasPrice"></i>
         <i class="fas fa-check"></i>
       </span>
     </div>
