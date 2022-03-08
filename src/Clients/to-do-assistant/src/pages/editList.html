@@ -51,8 +51,8 @@
               </div>
             </div>
           </div>
-          <div if.bind="notificationsEnabledCheckboxVisible" class="form-control">
-            <checkbox label-key="editList.notifications" value.bind="model.notificationsEnabled"></checkbox>
+          <div class="form-control">
+            <checkbox label-key="editList.notifications" value.bind="model.notificationsEnabled" disabled.bind="!notificationsCheckboxEnabled"></checkbox>
           </div>
           <div if.bind="model.sharingState !== 4" class="form-control">
             <checkbox label-key="deleteOnCompletion" value.bind="model.isOneTimeToggleDefault"></checkbox>

@@ -6,6 +6,7 @@ export class SignalRClientBase {
   async connect(url: string, accessToken: string) {
     this.connection = new signalR.HubConnectionBuilder()
       .withUrl(url, { accessTokenFactory: () => accessToken })
+      .withAutomaticReconnect()
       .build();
 
     return this.connection.start();

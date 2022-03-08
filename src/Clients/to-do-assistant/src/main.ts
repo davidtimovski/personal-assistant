@@ -1,4 +1,3 @@
-/// <reference types="aurelia-loader-webpack/src/webpack-hot-interface"/>
 import { Aurelia } from "aurelia-framework";
 import { PLATFORM } from "aurelia-pal";
 import { HttpClient } from "aurelia-fetch-client";

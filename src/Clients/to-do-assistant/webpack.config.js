@@ -214,15 +214,6 @@ module.exports = ({ production } = {}, { extractCss, analyze, tests, hmr, port, 
           outputPath: "webfonts/",
         },
       },
-      {
-        test: /\.woff(\?v=[0-9]\.[0-9]\.[0-9])?$/i,
-        loader: "url-loader",
-        options: {
-          limit: 10000,
-          mimetype: "application/font-woff",
-          outputPath: "webfonts/",
-        },
-      },
       // load these fonts normally, as files:
       {
         test: /\.(ttf|eot|svg|otf)(\?v=[0-9]\.[0-9]\.[0-9])?$/i,

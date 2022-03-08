@@ -56,8 +56,8 @@
   "decreaseServings": "Decrease servings",
   "increaseServings": "Increase servings",
   "addIngredient": "Add ingredient",
-  "hasNutritionSet": "Has nutrition set",
-  "hasPriceSet": "Has price set",
+  "hasNutrition": "Has nutrition",
+  "hasPrice": "Has price",
   "mine": "Mine",
   "public": "Public",
   "recipes": {

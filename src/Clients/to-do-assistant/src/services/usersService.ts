@@ -7,9 +7,7 @@ export class UsersService extends UsersServiceBase {
 
   async getPreferences(): Promise<PreferencesModel> {
     if (!this.preferences) {
-      this.preferences = await this.ajax<PreferencesModel>(
-        "users/to-do-preferences"
-      );
+      this.preferences = await this.ajax<PreferencesModel>("users/to-do-preferences");
     }
     return this.preferences;
   }

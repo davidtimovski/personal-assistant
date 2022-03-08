@@ -120,24 +120,14 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         {
             recipe.Shares = conn.Query<RecipeShare>(@"SELECT * FROM ""CookingAssistant.Shares"" WHERE ""RecipeId"" = @Id", new { Id = id }).ToList();
 
-            const string recipeIngredientsSql = @"SELECT ri.""Amount"", ri.""Unit"", i.""Id"", i.""UserId"", i.""Name"", it.""TaskId"", l.""Id"", l.""Name""
+            const string recipeIngredientsSql = @"SELECT ri.""Amount"", ri.""Unit"", i.""Id"", i.""UserId"", i.""Name""
                                                   FROM ""CookingAssistant.RecipesIngredients"" AS ri
                                                   INNER JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
-                                                  LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
-                                                  LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON it.""TaskId"" = t.""Id""
-                                                  LEFT JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
                                                   WHERE ri.""RecipeId"" = @RecipeId";
 
-            var recipeIngredients = conn.Query<RecipeIngredient, Ingredient, ToDoList, RecipeIngredient>(recipeIngredientsSql,
-                (recipeIngredient, ingredient, list) =>
+            var recipeIngredients = conn.Query<RecipeIngredient, Ingredient, RecipeIngredient>(recipeIngredientsSql,
+                (recipeIngredient, ingredient) =>
                 {
-                    if (list != null)
-                    {
-                        ingredient.Task = new ToDoTask
-                        {
-                            List = list
-                        };
-                    }
                     recipeIngredient.Ingredient = ingredient;
                     return recipeIngredient;
                 }, new { RecipeId = id, UserId = userId }, null, true, "Id,Id");

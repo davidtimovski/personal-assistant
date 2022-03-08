@@ -17,14 +17,14 @@ export class ShareRequests {
     private readonly i18n: I18N
   ) {}
 
-  attached() {
-    this.listsService.getShareRequests().then((allShareRequests: ShareRequest[]) => {
-      this.pendingShareRequests = allShareRequests.filter((request: ShareRequest) => {
-        return request.isAccepted === null;
-      });
-      this.declinedShareRequests = allShareRequests.filter((request: ShareRequest) => {
-        return request.isAccepted === false;
-      });
+  async attached() {
+    const allShareRequests = await this.listsService.getShareRequests();
+
+    this.pendingShareRequests = allShareRequests.filter((request: ShareRequest) => {
+      return request.isAccepted === null;
+    });
+    this.declinedShareRequests = allShareRequests.filter((request: ShareRequest) => {
+      return request.isAccepted === false;
     });
   }
 

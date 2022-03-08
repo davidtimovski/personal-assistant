@@ -19,6 +19,11 @@ export class SignalRClient extends SignalRClientBase {
 
     await this.connect(`${envConfig.urls.api}/toDoAssistantHub`, accessToken);
 
+    this.connection.onreconnected(async () => {
+      await Actions.getLists(this.listsService);
+      this.eventAggregator.publish(AppEvents.ListsChanged);
+    });
+
     await this.connection.invoke("JoinGroups");
 
     this.on("TaskCompletedChanged", async (userId: number, id: number, listId: number, isCompleted: boolean) => {

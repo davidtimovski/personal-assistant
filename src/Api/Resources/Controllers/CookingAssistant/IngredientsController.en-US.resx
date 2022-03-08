@@ -318,6 +318,9 @@
   <data name="cranberries" xml:space="preserve">
     <value>Cranberries</value>
   </data>
+  <data name="cream_cheese_spread" xml:space="preserve">
+    <value>Cream cheese spread</value>
+  </data>
   <data name="cucumbers" xml:space="preserve">
     <value>Cucumbers</value>
   </data>
@@ -681,6 +684,9 @@
   <data name="spinach" xml:space="preserve">
     <value>Spinach</value>
   </data>
+  <data name="spread" xml:space="preserve">
+    <value>Spread</value>
+  </data>
   <data name="stewed_tomatoes" xml:space="preserve">
     <value>Stewed tomatoes</value>
   </data>
@@ -698,6 +704,9 @@
   </data>
   <data name="sweet_pickle_relish" xml:space="preserve">
     <value>Sweet pickle relish</value>
+  </data>
+  <data name="sweet_spread" xml:space="preserve">
+    <value>Sweet spread</value>
   </data>
   <data name="swiss_cheese" xml:space="preserve">
     <value>Swiss cheese</value>

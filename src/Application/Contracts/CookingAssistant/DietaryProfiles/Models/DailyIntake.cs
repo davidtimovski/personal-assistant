@@ -23,7 +23,7 @@ public class DailyIntake
     public short Protein { get; set; }
     public short? CustomProtein { get; set; }
     public bool TrackProtein { get; set; } = true;
-    public short Sodium { get; set; }
+    public int Sodium { get; set; }
     public short? CustomSodium { get; set; }
     public bool TrackSodium { get; set; } = true;
     public short Cholesterol { get; set; }

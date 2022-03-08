@@ -1,10 +1,8 @@
 export class ShareRequest {
-  constructor(
-    public listId: number,
-    public listName: string,
-    public listOwnerName: string,
-    public isAccepted: boolean,
-    public leftSideIsLoading: boolean,
-    public rightSideIsLoading: boolean
-  ) {}
+  listId: number;
+  listName: string;
+  listOwnerName: string;
+  isAccepted: boolean;
+  leftSideIsLoading: boolean;
+  rightSideIsLoading: boolean;
 }

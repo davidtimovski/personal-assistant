@@ -1,3 +1,4 @@
 export class ListOption {
-  constructor(public id: number, public isShared: boolean) {}
+  id: number;
+  isShared: boolean;
 }

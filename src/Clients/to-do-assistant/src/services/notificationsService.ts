@@ -9,9 +9,7 @@ export class NotificationsService extends NotificationsServiceBase {
   }
 
   async getUnseenNotificationsCount(): Promise<number> {
-    const result = await this.ajax<number>(
-      "notifications/unseen-notifications-count"
-    );
+    const result = await this.ajax<number>("notifications/unseen-notifications-count");
 
     return result;
   }
