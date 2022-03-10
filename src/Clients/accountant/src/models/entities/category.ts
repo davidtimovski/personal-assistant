@@ -1,8 +1,8 @@
 import { Syncable } from "models/sync/syncable";
 
 export class Category implements Syncable {
-  public synced = false;
-  public parent: Category;
+  synced = false;
+  parent: Category;
 
   constructor(
     public id: number,

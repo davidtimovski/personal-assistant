@@ -6,7 +6,7 @@ import { ValidationController, validateTrigger, ValidationRules, ControllerValid
 
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
-import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 
 import { CategoriesService } from "services/categoriesService";
 import { TransactionsService } from "services/transactionsService";

@@ -1,5 +1,5 @@
 export class AmountByCategory {
-  public subItems: Array<AmountByCategory>;
+  subItems: Array<AmountByCategory>;
 
   constructor(
     public categoryId: number,

@@ -5,7 +5,7 @@ import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
 import { ConnectionTracker } from "../../../shared/src/utils/connectionTracker";
-import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 
 import { CategoriesService } from "services/categoriesService";
 import { UpcomingExpensesService } from "services/upcomingExpensesService";

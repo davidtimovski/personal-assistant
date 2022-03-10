@@ -30,6 +30,7 @@ public class PersonalAssistantContext : DbContext
     public DbSet<Category> Categories { get; set; }
     public DbSet<UpcomingExpense> UpcomingExpenses { get; set; }
     public DbSet<Debt> Debts { get; set; }
+    public DbSet<DeletedEntity> DeletedEntities { get; set; }
 
     public DbSet<PushSubscription> PushSubscriptions { get; set; }
     public DbSet<TooltipDismissed> TooltipsDismissed { get; set; }
@@ -115,6 +116,11 @@ public class PersonalAssistantContext : DbContext
         modelBuilder.Entity<Category>(x => { x.ToTable("Accountant.Categories"); });
         modelBuilder.Entity<UpcomingExpense>(x => { x.ToTable("Accountant.UpcomingExpenses"); });
         modelBuilder.Entity<Debt>(x => { x.ToTable("Accountant.Debts"); });
+        modelBuilder.Entity<DeletedEntity>(x =>
+        { 
+            x.ToTable("Accountant.DeletedEntities");
+            x.HasKey(e => new { e.UserId, e.EntityType, e.EntityId });
+        });
 
         modelBuilder.Entity<TooltipDismissed>(x =>
         {

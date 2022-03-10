@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
 using Application.Contracts.Accountant.Debts;
+using Dapper;
 using Domain.Entities.Accountant;
 
 namespace Persistence.Repositories.Accountant;
@@ -30,24 +30,11 @@ public class DebtsRepository : BaseRepository, IDebtsRepository
             new { UserId = userId, EntityType = (short)EntityType.Debt, DeletedDate = fromDate });
     }
 
-    public async Task<int> CreateAsync(Debt debt, IDbConnection uowConn = null, IDbTransaction uowTransaction = null)
+    public async Task<int> CreateAsync(Debt debt)
     {
-        int id;
-        const string query = @"INSERT INTO ""Accountant.Debts"" (""UserId"", ""Person"", ""Amount"", ""Currency"", ""Description"", ""UserIsDebtor"", ""CreatedDate"", ""ModifiedDate"")
-                          VALUES (@UserId, @Person, @Amount, @Currency, @Description, @UserIsDebtor, @CreatedDate, @ModifiedDate) returning ""Id""";
-
-        if (uowConn == null && uowTransaction == null)
-        {
-            using IDbConnection conn = OpenConnection();
-
-            id = (await conn.QueryAsync<int>(query, debt)).Single();
-        }
-        else
-        {
-            id = (await uowConn.QueryAsync<int>(query, debt, uowTransaction)).Single();
-        }
-
-        return id;
+        EFContext.Debts.Add(debt);
+        await EFContext.SaveChangesAsync();
+        return debt.Id;
     }
 
     public async Task UpdateAsync(Debt debt)
@@ -66,32 +53,25 @@ public class DebtsRepository : BaseRepository, IDebtsRepository
 
     public async Task DeleteAsync(int id, int userId)
     {
-        using IDbConnection conn = OpenConnection();
-        var transaction = conn.BeginTransaction();
-
-        var deletedEntryExists = await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                            FROM ""Accountant.DeletedEntities""
-                                                            WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""EntityId"" = @EntityId",
-            new { UserId = userId, EntityType = (short)EntityType.Debt, EntityId = id });
-
-        if (deletedEntryExists)
+        var deletedEntity = EFContext.DeletedEntities.FirstOrDefault(x => x.UserId == userId && x.EntityType == EntityType.Debt && x.EntityId == id);
+        if (deletedEntity == null)
         {
-            await conn.QueryAsync<int>(@"UPDATE ""Accountant.DeletedEntities"" SET ""DeletedDate"" = @DeletedDate
-                                             WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""EntityId"" = @EntityId",
-                new { UserId = userId, EntityType = (short)EntityType.Debt, EntityId = id, DeletedDate = DateTime.UtcNow },
-                transaction);
+            EFContext.DeletedEntities.Add(new DeletedEntity
+            {
+                UserId = userId,
+                EntityType = EntityType.Debt,
+                EntityId = id,
+                DeletedDate = DateTime.UtcNow
+            });
         }
         else
         {
-            await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.DeletedEntities"" (""UserId"", ""EntityType"", ""EntityId"", ""DeletedDate"")
-                                         VALUES (@UserId, @EntityType, @EntityId, @DeletedDate)",
-                new { UserId = userId, EntityType = (short)EntityType.Debt, EntityId = id, DeletedDate = DateTime.UtcNow },
-                transaction);
+            deletedEntity.DeletedDate = DateTime.UtcNow;
         }
 
-        await conn.ExecuteAsync(@"DELETE FROM ""Accountant.Debts"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
-            new { Id = id, UserId = userId }, transaction);
+        var debt = EFContext.Debts.First(x => x.Id == id && x.UserId == userId);
+        EFContext.Debts.Remove(debt);
 
-        transaction.Commit();
+        await EFContext.SaveChangesAsync();
     }
 }

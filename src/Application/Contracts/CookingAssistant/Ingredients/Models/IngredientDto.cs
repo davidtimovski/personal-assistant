@@ -9,6 +9,7 @@ public class IngredientDto : IMapFrom<Ingredient>
     public int Id { get; set; }
     public int? TaskId { get; set; }
     public string Name { get; set; }
+    public bool IsProduct { get; set; }
     public bool HasNutritionData { get; set; }
     public bool HasPriceData { get; set; }
     public bool Unused { get; set; }

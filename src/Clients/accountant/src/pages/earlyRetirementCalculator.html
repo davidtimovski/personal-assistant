@@ -1,0 +1,282 @@
+<template>
+  <require from="../static/styles/pages/early-retirement-calculator.scss"></require>
+  <require from="./../resources/elements/amount-input"></require>
+  <require from="./../resources/elements/checkbox"></require>
+  <require from="./../resources/value-converters/money-format"></require>
+
+  <div class="container">
+    <div class="au-animate animate-fade-in animate-fade-out">
+      <div class="page-title-wrap">
+        <div class="side inactive medium">
+          <i class="fas fa-piggy-bank"></i>
+        </div>
+        <div t="earlyRetirementCalculator.earlyRetirementCalculator" class="page-title">Early retirement calculator</div>
+        <a route-href="route: dashboard" class="back-button">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+
+      <div class="content-wrap">
+        <section show.bind="currentSection === 'start'">
+          <p class="er-calc-explanation" t="earlyRetirementCalculator.explanation">
+            Many people wish to retire earlier than usual. This calculator allows you to find when you'll be able to retire depending on your personal financial situation. You will need to answer some questions to help us determine where you are
+            now financially, how much you save or invest, what upcoming expenses you're expecting, and how much money you will need to live comfortably in retirement.
+          </p>
+
+          <div class="centering-wrap">
+            <button type="button" click.delegate="start()" class="er-calc-button big start" t="earlyRetirementCalculator.start">
+              Start
+            </button>
+          </div>
+        </section>
+
+        <section show.bind="currentSection === 'age'">
+          <div class="section-title" t="earlyRetirementCalculator.age">Age</div>
+
+          <div class="question" t="earlyRetirementCalculator.whatIsYourAge">What is your age?</div>
+          <div class="er-calc-input-wrap">
+            <div class="interest-rate-input-wrap">
+              <input type="number" value.bind="answers.age" class="${ageIsInvalid ? 'invalid' : ''}" min="10" max="99"
+                required />
+              <span class="add-on" t="earlyRetirementCalculator.years">years</span>
+            </div>
+          </div>
+
+          <div class="buttons-wrap">
+            <button type="button" click.delegate="back()" class="er-calc-button back" t="earlyRetirementCalculator.back">Back</button>
+            <button type="button" click.delegate="goToCapital()" class="er-calc-button"
+              t="earlyRetirementCalculator.next">Next</button>
+          </div>
+        </section>
+
+        <section show.bind="currentSection === 'capital'">
+          <div class="section-title" t="earlyRetirementCalculator.capital">Capital</div>
+
+          <div class="question" t="earlyRetirementCalculator.howMuchMoneyCapital">How much money do you have saved right now?</div>
+          <div class="question-detail" t="earlyRetirementCalculator.weHavePrepopulatedCapital">
+            We have prepopulated the field based on the total funds that you have on all of your accounts.
+          </div>
+          <div class="er-calc-input-wrap">
+            <amount-input amount.bind="answers.capital.amount" currency.bind="answers.capital.currency"></amount-input>
+          </div>
+
+          <div class="buttons-wrap">
+            <button type="button" click.delegate="back()" class="er-calc-button back" t="earlyRetirementCalculator.back">Back</button>
+            <button type="button" click.delegate="goToSaving()" class="er-calc-button"
+              t="earlyRetirementCalculator.next">Next</button>
+          </div>
+        </section>
+
+        <section show.bind="currentSection === 'saving'">
+          <div class="section-title" t="earlyRetirementCalculator.saving">Saving</div>
+
+          <div class="question" t="earlyRetirementCalculator.howMuchMoneySaved">
+            How much money do you put aside in savings per month?
+          </div>
+          <div class="question-detail" t="earlyRetirementCalculator.weHavePrepopulatedSaving">
+            We have prepopulated the field based on your average saving per month from the past year.
+          </div>
+          <div class="er-calc-input-wrap">
+            <amount-input amount.bind="answers.savedPerMonth.amount" currency.bind="answers.savedPerMonth.currency">
+            </amount-input>
+          </div>
+
+          <div class="question" t="earlyRetirementCalculator.interestRateSavings">
+            What is the interest rate on your savings account or fund?
+          </div>
+          <div class="er-calc-input-wrap">
+            <div class="interest-rate-input-wrap">
+              <input type="number" value.bind="answers.savingInterestRate" step="0.1" min="0" max="20" />
+              <span class="add-on" t="earlyRetirementCalculator.percentPerYear">% per year</span>
+            </div>
+          </div>
+
+          <div class="buttons-wrap">
+            <button type="button" click.delegate="back()" class="er-calc-button back" t="earlyRetirementCalculator.back">Back</button>
+            <button type="button" click.delegate="goToPensionEligibility()" class="er-calc-button" t="earlyRetirementCalculator.next">
+              Next
+            </button>
+          </div>
+        </section>
+
+        <section show.bind="currentSection === 'pension-eligibility'">
+          <div class="section-title" t="earlyRetirementCalculator.pension">Pension</div>
+
+          <div class="question" t="earlyRetirementCalculator.eligibleForPension">Are you eligible for pension?</div>
+          <div class="er-calc-input-wrap">
+            <checkbox value.bind="answers.eligibleForPension"></checkbox>
+          </div>
+
+          <div class="buttons-wrap">
+            <button type="button" click.delegate="back()" class="er-calc-button back" t="earlyRetirementCalculator.back">Back</button>
+            <button type="button" click.delegate="goToPension()" class="er-calc-button"
+              t="earlyRetirementCalculator.next">Next</button>
+          </div>
+        </section>
+
+        <section show.bind="currentSection === 'pension'">
+          <div class="section-title" t="earlyRetirementCalculator.pensionDetails">Pension details</div>
+
+          <div class="question" t="earlyRetirementCalculator.pensionEligibilityAge">
+            At what age do you become eligible for pension?
+          </div>
+          <div class="er-calc-input-wrap">
+            <div class="interest-rate-input-wrap">
+              <input type="number" value.bind="answers.pensionAge" class="${pensionAgeIsInvalid ? 'invalid' : ''}"
+                min="50" max="99" />
+              <span class="add-on" t="earlyRetirementCalculator.years">years</span>
+            </div>
+          </div>
+
+          <div class="question" t="earlyRetirementCalculator.pensionIncome">
+            How much would you estimate your net pension income per month will be?
+          </div>
+          <div class="er-calc-input-wrap">
+            <amount-input amount.bind="answers.pensionPerMonth.amount" currency.bind="answers.pensionPerMonth.currency"
+              invalid.bind="pensionPerMonthIsInvalid"></amount-input>
+          </div>
+
+          <div class="buttons-wrap">
+            <button type="button" click.delegate="back()" class="er-calc-button back" t="earlyRetirementCalculator.back">Back</button>
+            <button type="button" click.delegate="goToHaveLifeInsurance()" class="er-calc-button" t="earlyRetirementCalculator.next">
+              Next
+            </button>
+          </div>
+        </section>
+
+        <section show.bind="currentSection === 'have-life-insurance'">
+          <div class="section-title" t="earlyRetirementCalculator.lifeInsurance">Life insurance</div>
+
+          <div class="question" t="earlyRetirementCalculator.haveLifeInsurance">
+            Do you have life insurance with an investment option?
+          </div>
+          <div class="er-calc-input-wrap">
+            <checkbox value.bind="answers.hasLifeInsurance"></checkbox>
+          </div>
+
+          <div class="buttons-wrap">
+            <button type="button" click.delegate="back()" class="er-calc-button back" t="earlyRetirementCalculator.back">Back</button>
+            <button type="button" click.delegate="goToLifeInsurance()" class="er-calc-button" t="earlyRetirementCalculator.next">
+              Next
+            </button>
+          </div>
+        </section>
+
+        <section show.bind="currentSection === 'life-insurance'">
+          <div class="section-title" t="earlyRetirementCalculator.lifeInsuranceDetails">Life insurance details</div>
+
+          <div class="question" t="earlyRetirementCalculator.lifeInsuranceAge">
+            How old will you be when your life insurance yields?
+          </div>
+          <div class="er-calc-input-wrap">
+            <div class="interest-rate-input-wrap">
+              <input type="number" value.bind="answers.lifeInsuranceAge"
+                class="${lifeInsuranceAgeIsInvalid ? 'invalid' : ''}" min="30" max="99" />
+              <span class="add-on">years</span>
+            </div>
+          </div>
+
+          <div class="question" t="earlyRetirementCalculator.lifeInsuranceReturn">
+            What is the return amount on your life insurance?
+          </div>
+          <div class="er-calc-input-wrap">
+            <amount-input amount.bind="answers.lifeInsuranceReturn.amount"
+              currency.bind="answers.lifeInsuranceReturn.currency" invalid.bind="lifeInsuranceReturnIsInvalid">
+            </amount-input>
+          </div>
+
+          <div class="buttons-wrap">
+            <button type="button" click.delegate="back()" class="er-calc-button back" t="earlyRetirementCalculator.back">Back</button>
+            <button type="button" click.delegate="goToUpcomingExpenses()" class="er-calc-button" t="earlyRetirementCalculator.next">
+              Next
+            </button>
+          </div>
+        </section>
+
+        <section show.bind="currentSection === 'upcoming-expenses'">
+          <div class="section-title" t="earlyRetirementCalculator.upcomingExpenses">Upcoming expenses</div>
+
+          <div class="question" t="earlyRetirementCalculator.listAnyUpcomingExpenses">
+            List any large expenses that you're anticipating before you retire.
+          </div>
+          <div class="er-calc-input-wrap">
+            <div class="large-upcoming-expenses">
+              <div repeat.for="expense of answers.upcomingExpenses" class="large-upcoming-expense">
+                <i class="large-upcoming-expense-icon ${expense.iconClass}"></i>
+                <input type="text" value.bind="expense.name" />
+                <amount-input amount.bind="expense.amount" currency.bind="expense.currency"></amount-input>
+                <i click.delegate="removeUpcomingExpense(expense)" class="fas fa-times-circle remove-button"
+                  t="[title,aria-label]earlyRetirementCalculator.removeExpense"></i>
+              </div>
+
+              <i class="fas fa-plus add-button" click.delegate="addUpcomingExpense()"
+                t="[title,aria-label]earlyRetirementCalculator.addExpense"></i>
+            </div>
+          </div>
+
+          <div class="buttons-wrap">
+            <button type="button" click.delegate="back()" class="er-calc-button back" t="earlyRetirementCalculator.back">Back</button>
+            <button type="button" click.delegate="goToRetirementIncome()" class="er-calc-button" t="earlyRetirementCalculator.next">
+              Next
+            </button>
+          </div>
+        </section>
+
+        <section show.bind="currentSection === 'retirement-income'">
+          <div class="section-title" t="earlyRetirementCalculator.retirement">Retirement</div>
+
+          <div class="question" t="earlyRetirementCalculator.retirementIncome">
+            What monthly net income would you consider enough for you to live comfortably in retirement?
+          </div>
+          <div class="er-calc-input-wrap">
+            <amount-input amount.bind="answers.retirementIncome.amount"
+              currency.bind="answers.retirementIncome.currency" invalid.bind="preferredRetirementIncomeIsInvalid">
+            </amount-input>
+          </div>
+
+          <div class="buttons-wrap">
+            <button type="button" click.delegate="back()" class="er-calc-button back" t="earlyRetirementCalculator.back">Back</button>
+            <button type="button" click.delegate="goToSummary()" class="er-calc-button"
+              t="earlyRetirementCalculator.next">Next</button>
+          </div>
+        </section>
+
+        <section show.bind="currentSection === 'summary'">
+          <div class="section-title" t="earlyRetirementCalculator.summary">Summary</div>
+
+          <ul>
+            <li repeat.for="summaryItem of summaryItems">
+              <span innerhtml.bind="summaryItem.contentHtml"></span>
+
+              <ul if.bind="summaryItem.children.length > 0">
+                <li repeat.for="childItem of summaryItem.children" innerhtml.bind="childItem.contentHtml"></li>
+              </ul>
+            </li>
+          </ul>
+
+          <div class="buttons-wrap">
+            <button type="button" click.delegate="back()" class="er-calc-button back" t="earlyRetirementCalculator.back">Back</button>
+            <button type="button" click.delegate="calculate()" class="er-calc-button big" t="earlyRetirementCalculator.calculate">
+              Calculate
+            </button>
+          </div>
+        </section>
+
+        <section show.bind="currentSection === 'result'">
+          <div class="section-title" t="earlyRetirementCalculator.result">Result</div>
+
+          <div class="result-message">
+            <span if.bind="earlyRetirementAge < 85" t="[html]earlyRetirementCalculator.consideringTheAnswers"
+              t-params.bind="{ earlyRetirementAge: earlyRetirementAge }"></span>
+            <span else t="earlyRetirementCalculator.notLikelyToRetire">You are not likely to retire at a reasonable age given the
+              parameters you specified.</span>
+          </div>
+
+          <div class="buttons-wrap">
+            <button type="button" click.delegate="back()" class="er-calc-button back" t="earlyRetirementCalculator.back">Back</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</template>

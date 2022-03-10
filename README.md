@@ -45,7 +45,7 @@ An ecosystem of PWAs that cooperate with each other to provide unique functional
 * Manage investment funds
 * Track debt
 * View different types of reports regarding your income and expenditures
-* Get a [FIRE](https://en.wikipedia.org/wiki/FIRE_movement) calculation based on your personal financial situation
+* Get an early retirement calculation based on your personal financial situation
 * Encrypt your transactions for privacy
 * Offline mode
 * Supports 168 currencies

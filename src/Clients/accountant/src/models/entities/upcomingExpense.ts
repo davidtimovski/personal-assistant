@@ -1,8 +1,8 @@
 import { Syncable } from "models/sync/syncable";
 
 export class UpcomingExpense implements Syncable {
-  public categoryName: string;
-  public synced = false;
+  categoryName: string;
+  synced = false;
 
   constructor(
     public id: number,

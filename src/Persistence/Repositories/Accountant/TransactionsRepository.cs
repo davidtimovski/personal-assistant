@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
 using Application.Contracts.Accountant.Transactions;
+using Dapper;
 using Domain.Entities.Accountant;
+using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Repositories.Accountant;
 
@@ -72,7 +73,7 @@ public class TransactionsRepository : BaseRepository, ITransactionsRepository
             new { UserId = userId, EntityType = (short)EntityType.Transaction, DeletedDate = fromDate });
     }
 
-    public async Task<int> CreateAsync(Transaction transaction, IDbConnection uowConn = null, IDbTransaction uowTransaction = null)
+    public async Task<int> CreateAsync(Transaction transaction)
     {
         using IDbConnection conn = OpenConnection();
 
@@ -82,59 +83,52 @@ public class TransactionsRepository : BaseRepository, ITransactionsRepository
                                 VALUES 
                                 (@FromAccountId, @ToAccountId, @CategoryId, @Amount, @FromStocks, @ToStocks, @Currency, @Description, @Date, @IsEncrypted, @EncryptedDescription, @Salt, @Nonce, @CreatedDate, @ModifiedDate) returning ""Id""";
 
-        if (uowConn == null && uowTransaction == null)
+        var dbTransaction = conn.BeginTransaction();
+
+        id = (await conn.QueryAsync<int>(insertQuery, transaction, dbTransaction)).Single();
+
+        if (transaction.FromAccountId.HasValue && !transaction.ToAccountId.HasValue)
         {
-            var dbTransaction = conn.BeginTransaction();
-
-            id = (await conn.QueryAsync<int>(insertQuery, transaction, dbTransaction)).Single();
-
-            if (transaction.FromAccountId.HasValue && !transaction.ToAccountId.HasValue)
-            {
-                var relatedUpcomingExpenses = conn.Query<UpcomingExpense>(@"SELECT * FROM ""Accountant.UpcomingExpenses""
+            var relatedUpcomingExpenses = conn.Query<UpcomingExpense>(@"SELECT * FROM ""Accountant.UpcomingExpenses""
                                                                                 WHERE ""CategoryId"" = @CategoryId 
                                                                                     AND EXTRACT(year FROM ""Date"") = @Year
                                                                                     AND EXTRACT(month FROM ""Date"") = @Month",
-                    new { transaction.CategoryId, transaction.Date.Year, transaction.Date.Month }).ToList();
+                new { transaction.CategoryId, transaction.Date.Year, transaction.Date.Month }).ToList();
 
-                if (relatedUpcomingExpenses.Any())
+            if (relatedUpcomingExpenses.Any())
+            {
+                bool transactionHasDescription = !string.IsNullOrEmpty(transaction.Description);
+
+                foreach (var upcomingExpense in relatedUpcomingExpenses)
                 {
-                    bool transactionHasDescription = !string.IsNullOrEmpty(transaction.Description);
+                    bool upcomingExpenseHasDescription = !string.IsNullOrEmpty(upcomingExpense.Description);
+                    bool bothWithDescriptionsAndTheyMatch = upcomingExpenseHasDescription
+                                                            && transactionHasDescription
+                                                            && string.Equals(upcomingExpense.Description, transaction.Description.Trim(), StringComparison.OrdinalIgnoreCase);
 
-                    foreach (var upcomingExpense in relatedUpcomingExpenses)
+                    if (!upcomingExpenseHasDescription || bothWithDescriptionsAndTheyMatch)
                     {
-                        bool upcomingExpenseHasDescription = !string.IsNullOrEmpty(upcomingExpense.Description);
-                        bool bothWithDescriptionsAndTheyMatch = upcomingExpenseHasDescription
-                                                                && transactionHasDescription
-                                                                && string.Equals(upcomingExpense.Description, transaction.Description.Trim(), StringComparison.OrdinalIgnoreCase);
-
-                        if (!upcomingExpenseHasDescription || bothWithDescriptionsAndTheyMatch)
+                        if (upcomingExpense.Amount > transaction.Amount)
                         {
-                            if (upcomingExpense.Amount > transaction.Amount)
-                            {
-                                await conn.ExecuteAsync(@"UPDATE ""Accountant.UpcomingExpenses"" SET ""Amount"" = ""Amount"" - @Amount, ""ModifiedDate"" = @ModifiedDate WHERE ""Id"" = @Id",
-                                    new { upcomingExpense.Id, transaction.Amount, ModifiedDate = DateTime.UtcNow }, dbTransaction);
-                            }
-                            else
-                            {
-                                await conn.ExecuteAsync(@"DELETE FROM ""Accountant.UpcomingExpenses"" WHERE ""Id"" = @Id",
-                                    new { upcomingExpense.Id }, dbTransaction);
+                            await conn.ExecuteAsync(@"UPDATE ""Accountant.UpcomingExpenses"" SET ""Amount"" = ""Amount"" - @Amount, ""ModifiedDate"" = @ModifiedDate WHERE ""Id"" = @Id",
+                                new { upcomingExpense.Id, transaction.Amount, ModifiedDate = DateTime.UtcNow }, dbTransaction);
+                        }
+                        else
+                        {
+                            await conn.ExecuteAsync(@"DELETE FROM ""Accountant.UpcomingExpenses"" WHERE ""Id"" = @Id",
+                                new { upcomingExpense.Id }, dbTransaction);
 
-                                await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.DeletedEntities"" (""UserId"", ""EntityType"", ""EntityId"", ""DeletedDate"")
+                            await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.DeletedEntities"" (""UserId"", ""EntityType"", ""EntityId"", ""DeletedDate"")
                                          VALUES (@UserId, @EntityType, @EntityId, @DeletedDate)",
-                                    new { upcomingExpense.UserId, EntityType = (short)EntityType.UpcomingExpense, EntityId = upcomingExpense.Id, DeletedDate = DateTime.UtcNow },
-                                    dbTransaction);
-                            }
+                                new { upcomingExpense.UserId, EntityType = (short)EntityType.UpcomingExpense, EntityId = upcomingExpense.Id, DeletedDate = DateTime.UtcNow },
+                                dbTransaction);
                         }
                     }
                 }
             }
+        }
 
-            dbTransaction.Commit();
-        }
-        else
-        {
-            id = (await uowConn.QueryAsync<int>(insertQuery, transaction, uowTransaction)).Single();
-        }
+        dbTransaction.Commit();
 
         return id;
     }
@@ -163,40 +157,28 @@ public class TransactionsRepository : BaseRepository, ITransactionsRepository
 
     public async Task DeleteAsync(int id, int userId)
     {
-        using IDbConnection conn = OpenConnection();
-        var transaction = conn.BeginTransaction();
-
-        var deletedEntryExists = await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                            FROM ""Accountant.DeletedEntities""
-                                                            WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""EntityId"" = @EntityId",
-            new { UserId = userId, EntityType = (short)EntityType.Transaction, EntityId = id });
-
-        if (deletedEntryExists)
+        var deletedEntity = EFContext.DeletedEntities.FirstOrDefault(x => x.UserId == userId && x.EntityType == EntityType.Transaction && x.EntityId == id);
+        if (deletedEntity == null)
         {
-            await conn.QueryAsync<int>(@"UPDATE ""Accountant.DeletedEntities"" SET ""DeletedDate"" = @DeletedDate
-                                             WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""EntityId"" = @EntityId",
-                new { UserId = userId, EntityType = (short)EntityType.Transaction, EntityId = id, DeletedDate = DateTime.UtcNow },
-                transaction);
+            EFContext.DeletedEntities.Add(new DeletedEntity
+            {
+                UserId = userId,
+                EntityType = EntityType.Transaction,
+                EntityId = id,
+                DeletedDate = DateTime.UtcNow
+            });
         }
         else
         {
-            await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.DeletedEntities"" (""UserId"", ""EntityType"", ""EntityId"", ""DeletedDate"")
-                                         VALUES (@UserId, @EntityType, @EntityId, @DeletedDate)",
-                new { UserId = userId, EntityType = (short)EntityType.Transaction, EntityId = id, DeletedDate = DateTime.UtcNow },
-                transaction);
+            deletedEntity.DeletedDate = DateTime.UtcNow;
         }
 
-        await conn.ExecuteAsync(@"DELETE 
-                                    FROM 
-                                            ""Accountant.Transactions"" AS t 
-                                    USING 
-                                            ""Accountant.Accounts"" AS a
-                                    WHERE 
-  	                                    (a.""Id"" = t.""FromAccountId"" 
-	                                    OR a.""Id"" = t.""ToAccountId"")
-	                                    AND t.""Id"" = @Id AND a.""UserId"" = @UserId",
-            new { Id = id, UserId = userId }, transaction);
+        var transaction = EFContext.Transactions.First(x => x.Id == id 
+            && !x.FromAccountId.HasValue || x.FromAccount.UserId == userId
+            && !x.ToAccountId.HasValue || x.ToAccount.UserId == userId);
 
-        transaction.Commit();
+        EFContext.Transactions.Remove(transaction);
+
+        await EFContext.SaveChangesAsync();
     }
 }

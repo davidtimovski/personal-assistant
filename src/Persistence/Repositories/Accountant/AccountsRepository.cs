@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
 using Application.Contracts.Accountant.Accounts;
+using Dapper;
 using Domain.Entities.Accountant;
 
 namespace Persistence.Repositories.Accountant;
@@ -46,24 +46,11 @@ public class AccountsRepository : BaseRepository, IAccountsRepository
             new { Id = id, UserId = userId });
     }
 
-    public async Task<int> CreateAsync(Account account, IDbConnection uowConn = null, IDbTransaction uowTransaction = null)
+    public async Task<int> CreateAsync(Account account)
     {
-        int id;
-        const string query = @"INSERT INTO ""Accountant.Accounts"" (""UserId"", ""Name"", ""IsMain"", ""Currency"", ""StockPrice"", ""CreatedDate"", ""ModifiedDate"")
-                                   VALUES (@UserId, @Name, @IsMain, @Currency, @StockPrice, @CreatedDate, @ModifiedDate) returning ""Id""";
-
-        if (uowConn == null && uowTransaction == null)
-        {
-            using IDbConnection conn = OpenConnection();
-
-            id = (await conn.QueryAsync<int>(query, account)).Single();
-        }
-        else
-        {
-            id = (await uowConn.QueryAsync<int>(query, account, uowTransaction)).Single();
-        }
-
-        return id;
+        EFContext.Accounts.Add(account);
+        await EFContext.SaveChangesAsync();
+        return account.Id;
     }
 
     public async Task UpdateAsync(Account account)
@@ -80,32 +67,25 @@ public class AccountsRepository : BaseRepository, IAccountsRepository
 
     public async Task DeleteAsync(int id, int userId)
     {
-        using IDbConnection conn = OpenConnection();
-        var transaction = conn.BeginTransaction();
-
-        var deletedEntryExists = conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                                                FROM ""Accountant.DeletedEntities""
-                                                                WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""EntityId"" = @EntityId",
-            new { UserId = userId, EntityType = (short)EntityType.Account, EntityId = id });
-
-        if (deletedEntryExists)
+        var deletedEntity = EFContext.DeletedEntities.FirstOrDefault(x => x.UserId == userId && x.EntityType == EntityType.Account && x.EntityId == id);
+        if (deletedEntity == null)
         {
-            await conn.QueryAsync<int>(@"UPDATE ""Accountant.DeletedEntities"" SET ""DeletedDate"" = @DeletedDate
-                                             WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""EntityId"" = @EntityId",
-                new { UserId = userId, EntityType = (short)EntityType.Account, EntityId = id, DeletedDate = DateTime.UtcNow },
-                transaction);
+            EFContext.DeletedEntities.Add(new DeletedEntity
+            {
+                UserId = userId,
+                EntityType = EntityType.Account,
+                EntityId = id,
+                DeletedDate = DateTime.UtcNow
+            });
         }
         else
         {
-            await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.DeletedEntities"" (""UserId"", ""EntityType"", ""EntityId"", ""DeletedDate"")
-                                             VALUES (@UserId, @EntityType, @EntityId, @DeletedDate)",
-                new { UserId = userId, EntityType = (short)EntityType.Account, EntityId = id, DeletedDate = DateTime.UtcNow },
-                transaction);
+            deletedEntity.DeletedDate = DateTime.UtcNow;
         }
 
-        await conn.ExecuteAsync(@"DELETE FROM ""Accountant.Accounts"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
-            new { Id = id, UserId = userId }, transaction);
+        var account = EFContext.Accounts.First(x => x.Id == id && x.UserId == userId);
+        EFContext.Accounts.Remove(account);
 
-        transaction.Commit();
+        await EFContext.SaveChangesAsync();
     }
 }

@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Api.Models.Accountant.Sync;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Mvc;
 using Application.Contracts.Accountant.Accounts;
 using Application.Contracts.Accountant.Accounts.Models;
 using Application.Contracts.Accountant.Categories;
@@ -19,6 +16,9 @@ using Application.Contracts.Accountant.Transactions.Models;
 using Application.Contracts.Accountant.UpcomingExpenses;
 using Application.Contracts.Accountant.UpcomingExpenses.Models;
 using Infrastructure.Identity;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers.Accountant;
 
@@ -118,7 +118,6 @@ public class SyncController : Controller
 
         dto.Accounts.ForEach(x => { x.UserId = userId; });
         dto.Categories.ForEach(x => { x.UserId = userId; });
-        dto.Transactions.ForEach(x => { x.UserId = userId; });
         dto.UpcomingExpenses.ForEach(x => { x.UserId = userId; });
         dto.Debts.ForEach(x => { x.UserId = userId; });
 

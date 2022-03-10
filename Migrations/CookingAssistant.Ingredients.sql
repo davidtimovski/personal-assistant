@@ -28,6 +28,7 @@ CREATE TABLE public."CookingAssistant.Ingredients"
     "Calcium" smallint,
     "Iron" smallint,
     "Potassium" smallint,
+	"IsProduct" boolean NOT NULL,
 	"ProductSize" smallint NOT NULL DEFAULT 100,
     "ProductSizeIsOneUnit" boolean NOT NULL DEFAULT FALSE,
 	"Price" numeric(6, 2),

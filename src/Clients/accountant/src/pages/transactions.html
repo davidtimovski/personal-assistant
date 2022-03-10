@@ -67,7 +67,7 @@
                     change.delegate="filterChanged()" />
                 </label>
               </div>
-              <div class="multi-radio-part">
+              <div show.bind="filters.accountId === 0" class="multi-radio-part">
                 <label class.bind="filters.type === 3 ? 'selected' : ''">
                   <span t="transactions.transfers">Transfers</span>
                   <input type="radio" name="typeToggle" model.bind="3" checked.bind="filters.type"
@@ -122,7 +122,7 @@
                 </td>
                 <td class="date-cell">${transaction.date}</td>
                 <td class="sync-icon-cell">
-                  <i if.bind="!transaction.synced" class="fas fa-sync-alt"></i>
+                  <i if.bind="!transaction.synced" class="fas fa-sync-alt" t="[title,aria-label]notSynced"></i>
                 </td>
               </tr>
             </tbody>

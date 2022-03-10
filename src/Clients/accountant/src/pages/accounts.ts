@@ -1,9 +1,11 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
+
 import { AccountsService } from "services/accountsService";
 import { LocalStorage } from "utils/localStorage";
 import { EventAggregator } from "aurelia-event-aggregator";
 import { AccountItem } from "models/viewmodels/accountItem";
+import { AppEvents } from "models/appEvents";
 
 @inject(Router, AccountsService, LocalStorage, EventAggregator)
 export class Accounts {
@@ -23,10 +25,10 @@ export class Accounts {
     private readonly localStorage: LocalStorage,
     private readonly eventAggregator: EventAggregator
   ) {
-    this.eventAggregator.subscribe("sync-started", () => {
+    this.eventAggregator.subscribe(AppEvents.SyncStarted, () => {
       this.syncing = true;
     });
-    this.eventAggregator.subscribe("sync-finished", () => {
+    this.eventAggregator.subscribe(AppEvents.SyncFinished, () => {
       this.syncing = false;
     });
   }

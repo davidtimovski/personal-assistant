@@ -4,7 +4,7 @@ import { ValidationController, validateTrigger, ValidationRules, ControllerValid
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
-import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 
 import { TransactionsService } from "services/transactionsService";
 import { AccountsService } from "services/accountsService";

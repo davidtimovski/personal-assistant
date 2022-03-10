@@ -336,6 +336,9 @@
   <data name="dairy" xml:space="preserve">
     <value>Млечни</value>
   </data>
+  <data name="dry_parsley" xml:space="preserve">
+    <value>Сув магдонос</value>
+  </data>
   <data name="dry_white_wine" xml:space="preserve">
     <value>Суво бело вино</value>
   </data>
@@ -383,6 +386,9 @@
   </data>
   <data name="ginger" xml:space="preserve">
     <value>Ѓумбир</value>
+  </data>
+  <data name="ginger_spice" xml:space="preserve">
+    <value>Ѓумбир зачин</value>
   </data>
   <data name="gnocchi" xml:space="preserve">
     <value>Њоки</value>
@@ -492,9 +498,6 @@
   <data name="mushrooms" xml:space="preserve">
     <value>Печурки</value>
   </data>
-  <data name="mushroom_soup" xml:space="preserve">
-    <value>Супа од печурки</value>
-  </data>
   <data name="mustard" xml:space="preserve">
     <value>Сенф</value>
   </data>
@@ -536,6 +539,9 @@
   </data>
   <data name="parmesan" xml:space="preserve">
     <value>Пармезан</value>
+  </data>
+  <data name="parsley" xml:space="preserve">
+    <value>Магдонос</value>
   </data>
   <data name="parsnip" xml:space="preserve">
     <value>Магдонос</value>
@@ -584,6 +590,12 @@
   </data>
   <data name="potatoes" xml:space="preserve">
     <value>Компири</value>
+  </data>
+  <data name="powdered_sauce" xml:space="preserve">
+    <value>Сос во прав</value>
+  </data>
+  <data name="powdered_soup" xml:space="preserve">
+    <value>Супа во прав</value>
   </data>
   <data name="powdered_sugar" xml:space="preserve">
     <value>Шеќер во прав</value>

@@ -1,9 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Application.Contracts.Accountant.Accounts;
+﻿using Application.Contracts.Accountant.Accounts;
 using Application.Contracts.Accountant.Categories;
-using Application.Contracts.Accountant.Common;
 using Application.Contracts.Accountant.Debts;
+using Application.Contracts.Accountant.Sync;
 using Application.Contracts.Accountant.Transactions;
 using Application.Contracts.Accountant.UpcomingExpenses;
 using Application.Contracts.Common;
@@ -13,6 +11,8 @@ using Application.Contracts.CookingAssistant.Recipes;
 using Application.Contracts.ToDoAssistant.Lists;
 using Application.Contracts.ToDoAssistant.Notifications;
 using Application.Contracts.ToDoAssistant.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Persistence.Repositories.Accountant;
 using Persistence.Repositories.Common;
 using Persistence.Repositories.CookingAssistant;
@@ -38,7 +38,7 @@ public static class IoC
         services.AddTransient<ITransactionsRepository, TransactionsRepository>();
         services.AddTransient<IUpcomingExpensesRepository, UpcomingExpensesRepository>();
         services.AddTransient<IDebtsRepository, DebtsRepository>();
-        services.AddTransient<IUnitOfWork, UnitOfWork>();
+        services.AddTransient<ISyncRepository, SyncRepository>();
 
         services.AddDbContext<PersonalAssistantContext>(options =>
         {

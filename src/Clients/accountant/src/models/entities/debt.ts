@@ -1,7 +1,7 @@
 import { Syncable } from "models/sync/syncable";
 
 export class DebtModel implements Syncable {
-  public synced = false;
+  synced = false;
 
   constructor(
     public id: number,

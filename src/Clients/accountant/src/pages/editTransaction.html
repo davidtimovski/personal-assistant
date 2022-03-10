@@ -10,7 +10,11 @@
         <div class="side inactive small">
           <i class="fas fa-pencil-alt"></i>
         </div>
-        <div class="page-title" t="editTransaction.editTransaction">Edit transaction</div>
+        <div class="page-title">
+          <span if.bind="type === 1" t="editTransaction.editExpense">Edit expense</span>
+          <span if.bind="type === 2" t="editTransaction.editDeposit">Edit deposit</span>
+          <span if.bind="type !== 1 && type !== 2" t="editTransaction.editTransaction">Edit transaction</span>
+        </div>
         <a route-href="route: transaction; params.bind: { id: transactionId }" class="back-button">
           <i class="fas fa-times"></i>
         </a>

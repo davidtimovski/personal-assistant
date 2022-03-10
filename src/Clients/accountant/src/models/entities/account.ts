@@ -1,17 +1,12 @@
 import { Syncable } from "models/sync/syncable";
 
 export class Account implements Syncable {
-  public id: number;
-  public isMain: boolean;
-  public stockPrice: number;
-  public stocks: number;
-  public balance: number;
-  public synced = false;
+  id: number;
+  isMain: boolean;
+  stockPrice: number;
+  stocks: number;
+  balance: number;
+  synced = false;
 
-  constructor(
-    public name: string,
-    public currency: string,
-    public createdDate: Date,
-    public modifiedDate: Date
-  ) {}
+  constructor(public name: string, public currency: string, public createdDate: Date, public modifiedDate: Date) {}
 }

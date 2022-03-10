@@ -1,16 +1,16 @@
-export class FireAnswers {
-  public age: number;
-  public capital: AmountModel;
-  public savedPerMonth: AmountModel;
-  public savingInterestRate: number;
-  public eligibleForPension = false;
-  public pensionAge: number;
-  public pensionPerMonth: AmountModel;
-  public hasLifeInsurance = false;
-  public lifeInsuranceAge: number;
-  public lifeInsuranceReturn: AmountModel;
-  public upcomingExpenses: Array<LargeUpcomingExpense>;
-  public retirementIncome: AmountModel;
+export class EarlyRetirementAnswers {
+  age: number;
+  capital: AmountModel;
+  savedPerMonth: AmountModel;
+  savingInterestRate: number;
+  eligibleForPension = false;
+  pensionAge: number;
+  pensionPerMonth: AmountModel;
+  hasLifeInsurance = false;
+  lifeInsuranceAge: number;
+  lifeInsuranceReturn: AmountModel;
+  upcomingExpenses: Array<LargeUpcomingExpense>;
+  retirementIncome: AmountModel;
 
   constructor(upcomingExpenses: LargeUpcomingExpense[], currency: string) {
     this.capital = new AmountModel(currency);
@@ -23,19 +23,19 @@ export class FireAnswers {
 }
 
 export class LargeUpcomingExpense {
-  public amount: number;
+  amount: number;
 
   constructor(public name: string, public iconClass: string, public currency: string) {}
 }
 
 export class AmountModel {
-  public amount: number;
+  amount: number;
 
   constructor(public currency: string) {}
 }
 
 export class SummaryItem {
-  public children: SummaryItem[] = [];
+  children: SummaryItem[] = [];
 
   constructor(public contentHtml: string) {}
 }

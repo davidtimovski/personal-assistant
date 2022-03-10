@@ -12,19 +12,15 @@ export class Menu {
   private preferencesButtonIsLoading = false;
   private helpButtonIsLoading = false;
 
-  constructor(
-    private readonly router: Router,
-    private readonly authService: AuthService
-  ) {
+  constructor(private readonly router: Router, private readonly authService: AuthService) {
     this.personalAssistantUrl = JSON.parse(<any>environment).urls.authority;
   }
 
-  attached() {
-    caches.keys().then((cacheNames) => {
-      if (cacheNames.length > 0) {
-        this.version = cacheNames.sort().reverse()[0];
-      }
-    });
+  async attached() {
+    const cacheNames = await caches.keys();
+    if (cacheNames.length > 0) {
+      this.version = cacheNames.sort().reverse()[0];
+    }
   }
 
   toggleReportsDrawer() {

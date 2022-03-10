@@ -7,7 +7,7 @@ import { EventAggregator } from "aurelia-event-aggregator";
 import { ConnectionTracker } from "../../../shared/src/utils/connectionTracker";
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
-import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 
 import { CategoriesService } from "services/categoriesService";
 import { TransactionsService } from "services/transactionsService";
@@ -16,6 +16,7 @@ import { TransactionModel } from "models/entities/transaction";
 import { SelectOption } from "models/viewmodels/selectOption";
 import { EditTransactionModel } from "models/viewmodels/editTransactionModel";
 import { CategoryType } from "models/entities/category";
+import { TransactionType } from "models/viewmodels/transactionType";
 
 @inject(
   Router,
@@ -30,6 +31,7 @@ import { CategoryType } from "models/entities/category";
 export class EditTransaction {
   private transactionId: number;
   private model: EditTransactionModel;
+  private type: TransactionType;
   private categoryOptions: Array<SelectOption>;
   private originalTransactionJson: string;
   private readonly maxDate: string;
@@ -87,7 +89,7 @@ export class EditTransaction {
         this.router.navigateToRoute("notFound");
       }
 
-      const model = new EditTransactionModel(
+      this.model = new EditTransactionModel(
         transaction.id,
         transaction.fromAccountId,
         transaction.toAccountId,
@@ -109,7 +111,7 @@ export class EditTransaction {
         transaction.synced
       );
 
-      this.model = model;
+      this.type = TransactionsService.getType(transaction.fromAccountId, transaction.toAccountId);
 
       this.originalTransactionJson = JSON.stringify(this.model);
 

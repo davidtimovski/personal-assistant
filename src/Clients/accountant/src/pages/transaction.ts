@@ -73,7 +73,7 @@ export class Transaction {
       null
     );
 
-    model.type = this.getType(transaction.fromAccountId, transaction.toAccountId);
+    model.type = TransactionsService.getType(transaction.fromAccountId, transaction.toAccountId);
     model.typeLabel = this.typeStringLookup[model.type - 1];
 
     if (transaction.categoryId) {
@@ -104,18 +104,6 @@ export class Transaction {
     model.date = this.formatOcccurrenceDate(transaction.date);
 
     this.model = model;
-  }
-
-  getType(fromAccountId: number, toAccountId: number): TransactionType {
-    if (fromAccountId && toAccountId) {
-      return TransactionType.Transfer;
-    }
-
-    if (fromAccountId && !toAccountId) {
-      return TransactionType.Expense;
-    }
-
-    return TransactionType.Deposit;
   }
 
   formatOcccurrenceDate(occcurrenceDateString: string): string {

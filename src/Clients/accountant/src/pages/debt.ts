@@ -1,10 +1,11 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { DebtsService } from "services/debtsService";
-import { DebtModel } from "models/entities/debt";
 import { EventAggregator } from "aurelia-event-aggregator";
+
+import { DebtsService } from "services/debtsService";
 import { LocalStorage } from "utils/localStorage";
 import { DebtItem } from "models/viewmodels/debtItem";
+import { AppEvents } from "models/appEvents";
 
 @inject(Router, DebtsService, EventAggregator, LocalStorage)
 export class Debt {
@@ -19,10 +20,10 @@ export class Debt {
     private readonly eventAggregator: EventAggregator,
     private readonly localStorage: LocalStorage
   ) {
-    this.eventAggregator.subscribe("sync-started", () => {
+    this.eventAggregator.subscribe(AppEvents.SyncStarted, () => {
       this.syncing = true;
     });
-    this.eventAggregator.subscribe("sync-finished", () => {
+    this.eventAggregator.subscribe(AppEvents.SyncFinished, () => {
       this.syncing = false;
     });
   }
