@@ -30,6 +30,7 @@ public class Ingredient : Entity
     public float? Iron { get; set; }
     public float? Potassium { get; set; }
     public float? Magnesium { get; set; }
+    public bool IsProduct { get; set; }
     public short ProductSize { get; set; }
     public bool ProductSizeIsOneUnit { get; set; }
     public decimal? Price { get; set; }

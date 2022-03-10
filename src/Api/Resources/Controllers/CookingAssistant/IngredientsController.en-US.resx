@@ -336,6 +336,9 @@
   <data name="dairy" xml:space="preserve">
     <value>Dairy</value>
   </data>
+  <data name="dry_parsley" xml:space="preserve">
+    <value>Dry parsley</value>
+  </data>
   <data name="dry_white_wine" xml:space="preserve">
     <value>Dry white wine</value>
   </data>
@@ -383,6 +386,9 @@
   </data>
   <data name="ginger" xml:space="preserve">
     <value>Ginger</value>
+  </data>
+  <data name="ginger_spice" xml:space="preserve">
+    <value>Ginger spice</value>
   </data>
   <data name="gnocchi" xml:space="preserve">
     <value>Gnocchi</value>
@@ -492,9 +498,6 @@
   <data name="mushrooms" xml:space="preserve">
     <value>Mushrooms</value>
   </data>
-  <data name="mushroom_soup" xml:space="preserve">
-    <value>Mushroom soup</value>
-  </data>
   <data name="mustard" xml:space="preserve">
     <value>Mustard</value>
   </data>
@@ -536,6 +539,9 @@
   </data>
   <data name="parmesan" xml:space="preserve">
     <value>Parmesan</value>
+  </data>
+  <data name="parsley" xml:space="preserve">
+    <value>Parsley</value>
   </data>
   <data name="parsnip" xml:space="preserve">
     <value>Parsnip</value>
@@ -584,6 +590,12 @@
   </data>
   <data name="potatoes" xml:space="preserve">
     <value>Potatoes</value>
+  </data>
+  <data name="powdered_sauce" xml:space="preserve">
+    <value>Powdered sauce</value>
+  </data>
+  <data name="powdered_soup" xml:space="preserve">
+    <value>Powdered soup</value>
   </data>
   <data name="powdered_sugar" xml:space="preserve">
     <value>Powdered sugar</value>

@@ -1,6 +1,6 @@
 export class EditUpcomingExpenseModel {
-  public month: number;
-  public year: number;
+  month: number;
+  year: number;
 
   constructor(
     public id: number,

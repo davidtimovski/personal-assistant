@@ -48,7 +48,7 @@
                 <td>${debt.amount | numberFormat:debt.currency}</td>
                 <td>${debt.person}</td>
                 <td class="sync-icon-cell">
-                  <i if.bind="!debt.synced" class="fas fa-sync-alt"></i>
+                  <i if.bind="!debt.synced" class="fas fa-sync-alt" t="[title,aria-label]notSynced"></i>
                 </td>
               </tr>
             </tbody>

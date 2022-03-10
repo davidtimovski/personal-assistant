@@ -31,6 +31,7 @@
   "hidePassword": "Hide password",
   "purchasedStocks": "Purchased stocks",
   "soldStocks": "Sold stocks",
+  "notSynced": "Not synced",
   "months": {
     "0": "January",
     "1": "February",
@@ -84,6 +85,8 @@
     "fromAccount": "From account"
   },
   "editTransaction": {
+    "editExpense": "Edit expense",
+    "editDeposit": "Edit deposit",
     "editTransaction": "Edit transaction",
     "encryptDescription": "Encrypt description",
     "decryptDescription": "Decrypt description",
@@ -235,11 +238,9 @@
     "sat": "Sat",
     "sun": "Sun"
   },
-  "fireCalculator": {
-    "fireCalculator": "FIRE calculator",
-    "fireExplanationP1": "is a moniker for Financial Independence, Retire Early. It's the title of a movement that revolves around living modestly whilst saving as much as possible in order to retire sooner than most.",
-    "fireExplanationP2": "One of the pillars of this movement is the 4% rule (or 25x rule). The rule goes: if you invest your money into the right mix of stocks and bonds you can withdraw 4% of it each year without ever running out. Based on this \"safe\" withdrawal percentage you can calculate the required size of your portfolio to be 25 times your annual spending. The point at which you manage to save that amount of money you can comfortably retire.",
-    "fireExplanationP3": "This calculator allows you to find how long it would take you to reach the retirement point given your personal financial situation. You will need to answer some questions to help us determine where you are now financially, how much you save or invest, and what upcoming expenses you're expecting.",
+  "earlyRetirementCalculator": {
+    "earlyRetirementCalculator": "Early retirement calculator",
+    "explanation": "Many people wish to retire earlier than usual. This calculator allows you to find when you'll be able to retire depending on your personal financial situation. You will need to answer some questions to help us determine where you are now financially, how much you save or invest, what upcoming expenses you're expecting, and how much money you will need to live comfortably in retirement.",
     "start": "Start",
     "age": "Age",
     "whatIsYourAge": "What is your age?",
@@ -285,11 +286,11 @@
     "summaryItem5b": "You don't have a life insurance policy with an investment option",
     "summaryItem6": "You have the following upcoming expenses to take into consideration:",
     "summaryItem6a": "<span class=\"highlight\">{{amount}}</span> for <span class=\"highlight\">{{expense}}</span>",
-    "summaryItem7": "You estimate that you'll need <span class=\"highlight\">{{retirementIncome}}</span> per month in net income to live comfortably in retirement",
-    "summaryItem8": "The calculation will assume a flat yearly inflation rate of 1.7%",
+    "summaryItem7": "You estimate that you'll need <span class=\"highlight\">{{retirementIncome}}</span> per month to live comfortably in retirement",
+    "summaryItem8": "The calculation will assume a flat yearly inflation rate of {{inflation}}%",
     "calculate": "Calculate",
     "result": "Result",
-    "consideringTheAnswers": "Considering the answers you provided you will be able to retire at age <span class=\"retirement-age highlight\">{{fireRetirementAge}}</span>.",
+    "consideringTheAnswers": "Considering the answers you provided you will be able to retire at age <span class=\"retirement-age highlight\">{{earlyRetirementAge}}</span>.",
     "notLikelyToRetire": "You are not likely to retire at a reasonable age considering the answers you provided."
   },
   "export": {
@@ -321,7 +322,7 @@
     "pieChart": "Pie chart",
     "barChart": "Bar chart",
     "expenditureHeatmap": "Expenditure heatmap",
-    "fireCalculator": "FIRE calculator",
+    "earlyRetirementCalculator": "Early retirement calculator",
     "export": "Export",
     "totalSync": "Total sync",
     "preferences": "Preferences",

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
 using Application.Contracts.Accountant.Categories;
+using Dapper;
 using Domain.Entities.Accountant;
 
 namespace Persistence.Repositories.Accountant;
@@ -30,24 +30,11 @@ public class CategoriesRepository : BaseRepository, ICategoriesRepository
             new { UserId = userId, EntityType = (short)EntityType.Category, DeletedDate = fromDate });
     }
 
-    public async Task<int> CreateAsync(Category category, IDbConnection uowConn = null, IDbTransaction uowTransaction = null)
+    public async Task<int> CreateAsync(Category category)
     {
-        int id;
-        const string query = @"INSERT INTO ""Accountant.Categories"" (""ParentId"", ""UserId"", ""Name"", ""Type"", ""GenerateUpcomingExpense"", ""IsTax"", ""CreatedDate"", ""ModifiedDate"")
-                          VALUES (@ParentId, @UserId, @Name, @Type, @GenerateUpcomingExpense, @IsTax, @CreatedDate, @ModifiedDate) returning ""Id""";
-
-        if (uowConn == null && uowTransaction == null)
-        {
-            using IDbConnection conn = OpenConnection();
-
-            id = (await conn.QueryAsync<int>(query, category)).Single();
-        }
-        else
-        {
-            id = (await uowConn.QueryAsync<int>(@query, category, uowTransaction)).Single();
-        }
-
-        return id;
+        EFContext.Categories.Add(category);
+        await EFContext.SaveChangesAsync();
+        return category.Id;
     }
 
     public async Task UpdateAsync(Category category)
@@ -66,32 +53,25 @@ public class CategoriesRepository : BaseRepository, ICategoriesRepository
 
     public async Task DeleteAsync(int id, int userId)
     {
-        using IDbConnection conn = OpenConnection();
-        var transaction = conn.BeginTransaction();
-
-        var deletedEntryExists = await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                            FROM ""Accountant.DeletedEntities""
-                                                            WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""EntityId"" = @EntityId",
-            new { UserId = userId, EntityType = (short)EntityType.Category, EntityId = id });
-
-        if (deletedEntryExists)
+        var deletedEntity = EFContext.DeletedEntities.FirstOrDefault(x => x.UserId == userId && x.EntityType == EntityType.Category && x.EntityId == id);
+        if (deletedEntity == null)
         {
-            await conn.QueryAsync<int>(@"UPDATE ""Accountant.DeletedEntities"" SET ""DeletedDate"" = @DeletedDate
-                                             WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""EntityId"" = @EntityId",
-                new { UserId = userId, EntityType = (short)EntityType.Category, EntityId = id, DeletedDate = DateTime.UtcNow },
-                transaction);
+            EFContext.DeletedEntities.Add(new DeletedEntity
+            {
+                UserId = userId,
+                EntityType = EntityType.Category,
+                EntityId = id,
+                DeletedDate = DateTime.UtcNow
+            });
         }
         else
         {
-            await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.DeletedEntities"" (""UserId"", ""EntityType"", ""EntityId"", ""DeletedDate"")
-                                         VALUES (@UserId, @EntityType, @EntityId, @DeletedDate)",
-                new { UserId = userId, EntityType = (short)EntityType.Category, EntityId = id, DeletedDate = DateTime.UtcNow },
-                transaction);
+            deletedEntity.DeletedDate = DateTime.UtcNow;
         }
 
-        await conn.ExecuteAsync(@"DELETE FROM ""Accountant.Categories"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
-            new { Id = id, UserId = userId }, transaction);
+        var category = EFContext.Categories.First(x => x.Id == id && x.UserId == userId);
+        EFContext.Categories.Remove(category);
 
-        transaction.Commit();
+        await EFContext.SaveChangesAsync();
     }
 }

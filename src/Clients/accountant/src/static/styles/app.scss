@@ -427,4 +427,59 @@ td.sync-icon-cell {
   }
 }
 
-@import "./desktop.scss";
+@media screen and (min-width: $desktop-min) {
+  table tr td,
+  .editable-table tr td {
+    font-size: 1rem;
+    line-height: 26px;
+  }
+
+  .editable-table tr th {
+    font-size: 1.1rem;
+  }
+
+  .amount-by-category-table td {
+    font-size: 1.1rem;
+    line-height: 1.3rem;
+  }
+
+  form {
+    label,
+    input[type="text"],
+    input[type="number"],
+    input[type="password"],
+    select,
+    input[type="date"] {
+      line-height: 45px;
+    }
+
+    input[type="date"] {
+      width: 180px;
+    }
+
+    .category-select {
+      width: 270px;
+      background-position: right 15px top 20px;
+    }
+
+    .description-textarea {
+      height: 100px;
+    }
+  }
+
+  .multi-radio-part label {
+    line-height: 45px;
+  }
+
+  .password-show-button,
+  .decrypt-button,
+  .erase-button {
+    line-height: 45px;
+  }
+
+  .loadable-select i {
+    top: 11px;
+    left: 13px;
+    font-size: 1.5rem;
+  }
+}

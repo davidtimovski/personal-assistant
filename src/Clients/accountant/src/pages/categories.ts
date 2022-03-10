@@ -5,6 +5,7 @@ import { EventAggregator } from "aurelia-event-aggregator";
 import { CategoriesService } from "services/categoriesService";
 import { Category } from "models/entities/category";
 import { CategoryItem } from "models/viewmodels/categoryItem";
+import { AppEvents } from "models/appEvents";
 
 @inject(Router, CategoriesService, EventAggregator)
 export class Categories {
@@ -17,10 +18,10 @@ export class Categories {
     private readonly categoriesService: CategoriesService,
     private readonly eventAggregator: EventAggregator
   ) {
-    this.eventAggregator.subscribe("sync-started", () => {
+    this.eventAggregator.subscribe(AppEvents.SyncStarted, () => {
       this.syncing = true;
     });
-    this.eventAggregator.subscribe("sync-finished", () => {
+    this.eventAggregator.subscribe(AppEvents.SyncFinished, () => {
       this.syncing = false;
     });
   }

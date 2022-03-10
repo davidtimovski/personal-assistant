@@ -5,7 +5,7 @@ import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
-import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 
 import { AccountsService } from "services/accountsService";
 import { TransactionsService } from "services/transactionsService";

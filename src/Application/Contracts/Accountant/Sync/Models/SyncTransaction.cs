@@ -5,11 +5,12 @@ namespace Application.Contracts.Accountant.Sync.Models;
 public class SyncTransaction
 {
     public int Id { get; set; }
-    public int UserId { get; set; }
     public int? FromAccountId { get; set; }
     public int? ToAccountId { get; set; }
     public int? CategoryId { get; set; }
     public decimal Amount { get; set; }
+    public decimal? FromStocks { get; set; }
+    public decimal? ToStocks { get; set; }
     public string Currency { get; set; }
     public string Description { get; set; }
     public DateTime Date { get; set; }

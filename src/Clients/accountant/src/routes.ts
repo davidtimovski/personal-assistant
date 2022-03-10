@@ -138,9 +138,9 @@ export default [
     moduleId: PLATFORM.moduleName("./pages/expenditureHeatmap"),
   },
   {
-    route: "fire-calculator",
-    name: "fireCalculator",
-    moduleId: PLATFORM.moduleName("./pages/fireCalculator"),
+    route: "early-retirement-calculator",
+    name: "earlyRetirementCalculator",
+    moduleId: PLATFORM.moduleName("./pages/earlyRetirementCalculator"),
   },
   {
     route: "export",

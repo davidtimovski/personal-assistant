@@ -4,13 +4,18 @@ import { I18N } from "aurelia-i18n";
 import { CurrenciesService } from "../../../shared/src/services/currenciesService";
 
 import { LocalStorage } from "utils/localStorage";
-import { AmountModel, FireAnswers, LargeUpcomingExpense, SummaryItem } from "models/viewmodels/fireAnswers";
+import {
+  AmountModel,
+  EarlyRetirementAnswers,
+  LargeUpcomingExpense,
+  SummaryItem,
+} from "models/viewmodels/earlyRetirementAnswers";
 import { MoneyFormattingHelper } from "utils/moneyFormattingHelper";
 import { AccountsService } from "services/accountsService";
 
 @inject(LocalStorage, I18N, CurrenciesService, AccountsService)
-export class FireCalculator {
-  private answers: FireAnswers;
+export class EarlyRetirementCalculator {
+  private answers: EarlyRetirementAnswers;
   private currentSection = "start";
   private sections = [
     "start",
@@ -33,8 +38,10 @@ export class FireCalculator {
   private lifeInsuranceAgeIsInvalid: boolean;
   private lifeInsuranceReturnIsInvalid: boolean;
   private preferredRetirementIncomeIsInvalid: boolean;
-  private fireRetirementAge: number;
+  private earlyRetirementAge: number;
   private summaryItems: SummaryItem[];
+  private readonly ageOfDeath = 85;
+  private readonly inflation = 0.02;
 
   constructor(
     private readonly localStorage: LocalStorage,
@@ -44,11 +51,11 @@ export class FireCalculator {
   ) {
     this.currency = this.localStorage.getCurrency();
 
-    this.answers = new FireAnswers(
+    this.answers = new EarlyRetirementAnswers(
       [
-        new LargeUpcomingExpense(this.i18n.tr("fireCalculator.home"), "fas fa-home", this.currency),
-        new LargeUpcomingExpense(this.i18n.tr("fireCalculator.car"), "fas fa-car", this.currency),
-        new LargeUpcomingExpense(this.i18n.tr("fireCalculator.kids"), "fas fa-baby", this.currency),
+        new LargeUpcomingExpense(this.i18n.tr("earlyRetirementCalculator.home"), "fas fa-home", this.currency),
+        new LargeUpcomingExpense(this.i18n.tr("earlyRetirementCalculator.car"), "fas fa-car", this.currency),
+        new LargeUpcomingExpense(this.i18n.tr("earlyRetirementCalculator.kids"), "fas fa-baby", this.currency),
       ],
       this.currency
     );
@@ -160,24 +167,26 @@ export class FireCalculator {
 
     this.summaryItems = [];
 
-    this.summaryItems.push(new SummaryItem(this.i18n.tr("fireCalculator.summaryItem1", { age: this.answers.age })));
+    this.summaryItems.push(
+      new SummaryItem(this.i18n.tr("earlyRetirementCalculator.summaryItem1", { age: this.answers.age }))
+    );
 
     if (this.answers.capital.amount && parseFloat(this.answers.capital.amount.toString()) > 0) {
       this.summaryItems.push(
         new SummaryItem(
-          this.i18n.tr("fireCalculator.summaryItem2a", {
+          this.i18n.tr("earlyRetirementCalculator.summaryItem2a", {
             capital: MoneyFormattingHelper.format(this.answers.capital.amount, this.answers.capital.currency),
           })
         )
       );
     } else {
-      this.summaryItems.push(new SummaryItem(this.i18n.tr("fireCalculator.summaryItem2b")));
+      this.summaryItems.push(new SummaryItem(this.i18n.tr("earlyRetirementCalculator.summaryItem2b")));
     }
 
     if (this.answers.savedPerMonth.amount && parseFloat(this.answers.savedPerMonth.amount.toString()) > 0) {
       this.summaryItems.push(
         new SummaryItem(
-          this.i18n.tr("fireCalculator.summaryItem3a", {
+          this.i18n.tr("earlyRetirementCalculator.summaryItem3a", {
             savedPerMonth: MoneyFormattingHelper.format(
               this.answers.savedPerMonth.amount,
               this.answers.savedPerMonth.currency
@@ -187,13 +196,13 @@ export class FireCalculator {
         )
       );
     } else {
-      this.summaryItems.push(new SummaryItem(this.i18n.tr("fireCalculator.summaryItem3b")));
+      this.summaryItems.push(new SummaryItem(this.i18n.tr("earlyRetirementCalculator.summaryItem3b")));
     }
 
     if (this.answers.eligibleForPension) {
       this.summaryItems.push(
         new SummaryItem(
-          this.i18n.tr("fireCalculator.summaryItem4a", {
+          this.i18n.tr("earlyRetirementCalculator.summaryItem4a", {
             pensionAge: this.answers.pensionAge,
             pensionPerMonth: MoneyFormattingHelper.format(
               this.answers.pensionPerMonth.amount,
@@ -203,13 +212,13 @@ export class FireCalculator {
         )
       );
     } else {
-      this.summaryItems.push(new SummaryItem(this.i18n.tr("fireCalculator.summaryItem4b")));
+      this.summaryItems.push(new SummaryItem(this.i18n.tr("earlyRetirementCalculator.summaryItem4b")));
     }
 
     if (this.answers.hasLifeInsurance) {
       this.summaryItems.push(
         new SummaryItem(
-          this.i18n.tr("fireCalculator.summaryItem5a", {
+          this.i18n.tr("earlyRetirementCalculator.summaryItem5a", {
             lifeInsuranceReturn: MoneyFormattingHelper.format(
               this.answers.lifeInsuranceReturn.amount,
               this.answers.lifeInsuranceReturn.currency
@@ -219,16 +228,16 @@ export class FireCalculator {
         )
       );
     } else {
-      this.summaryItems.push(new SummaryItem(this.i18n.tr("fireCalculator.summaryItem5b")));
+      this.summaryItems.push(new SummaryItem(this.i18n.tr("earlyRetirementCalculator.summaryItem5b")));
     }
 
     if (this.answers.upcomingExpenses.length > 0) {
-      const expensesSummaryItem = new SummaryItem(this.i18n.tr("fireCalculator.summaryItem6"));
+      const expensesSummaryItem = new SummaryItem(this.i18n.tr("earlyRetirementCalculator.summaryItem6"));
 
       for (const expense of this.answers.upcomingExpenses) {
         expensesSummaryItem.children.push(
           new SummaryItem(
-            this.i18n.tr("fireCalculator.summaryItem6a", {
+            this.i18n.tr("earlyRetirementCalculator.summaryItem6a", {
               amount: MoneyFormattingHelper.format(expense.amount, expense.currency),
               expense: expense.name,
             })
@@ -241,7 +250,7 @@ export class FireCalculator {
 
     this.summaryItems.push(
       new SummaryItem(
-        this.i18n.tr("fireCalculator.summaryItem7", {
+        this.i18n.tr("earlyRetirementCalculator.summaryItem7", {
           retirementIncome: MoneyFormattingHelper.format(
             this.answers.retirementIncome.amount,
             this.answers.retirementIncome.currency
@@ -250,7 +259,9 @@ export class FireCalculator {
       )
     );
 
-    this.summaryItems.push(new SummaryItem(this.i18n.tr("fireCalculator.summaryItem8")));
+    this.summaryItems.push(
+      new SummaryItem(this.i18n.tr("earlyRetirementCalculator.summaryItem8", { inflation: this.inflation * 100 }))
+    );
 
     this.currentSection = "summary";
   }
@@ -283,24 +294,30 @@ export class FireCalculator {
   }
 
   calculate() {
-    const retirementIncomeX25 = this.getConvertedValueOrZero(this.answers.retirementIncome) * 12 * 25;
     const largeUpcomingExpensesSum = this.answers.upcomingExpenses
       .map((x) => this.getConvertedValueOrZero(x))
       .reduce((a: number, b: number) => a + b, 0);
-    const requiredCapital = retirementIncomeX25 + largeUpcomingExpensesSum;
 
-    const pensionAge = this.getIntValueOrZero(this.answers.pensionAge);
-    const pensionPerMonth = this.getConvertedValueOrZero(this.answers.pensionPerMonth);
+    let pensionSum = 0;
+    if (this.answers.eligibleForPension) {
+      const yearsTakingPension = this.ageOfDeath - this.getIntValueOrZero(this.answers.pensionAge);
+      const pension = this.getConvertedValueOrZero(this.answers.pensionPerMonth);
+      pensionSum = yearsTakingPension * 12 * pension;
+    }
 
     const lifeInsuranceAge = this.getIntValueOrZero(this.answers.lifeInsuranceAge);
-    const lifeInsuranceReturn = this.getConvertedValueOrZero(this.answers.lifeInsuranceReturn);
+    let lifeInsuranceReturn = this.answers.hasLifeInsurance
+      ? this.getConvertedValueOrZero(this.answers.lifeInsuranceReturn)
+      : 0;
 
-    const monthlyInflationFactor = 1 - 0.017 / 12;
+    const monthlyInflationFactor = 1 - this.inflation / 12;
     const savingInterestMonthlyFactor = 1 + this.getFloatValueOrZero(this.answers.savingInterestRate) / 100 / 12;
     const savedPerMonth = this.getConvertedValueOrZero(this.answers.savedPerMonth);
 
     let currentAge = parseInt(this.answers.age.toString(), 10);
     let saved = this.getConvertedValueOrZero(this.answers.capital);
+
+    let requiredCapital = this.sumRequiredCapital(currentAge, largeUpcomingExpensesSum, pensionSum);
 
     while (true) {
       if (saved >= requiredCapital) {
@@ -308,30 +325,41 @@ export class FireCalculator {
       }
 
       for (let i = 0; i < 12; i++) {
-        if (this.answers.eligibleForPension && currentAge >= pensionAge) {
-          saved += pensionPerMonth;
-        }
-
-        if (this.answers.hasLifeInsurance && currentAge === lifeInsuranceAge) {
-          saved += lifeInsuranceReturn;
-        }
-
         saved *= monthlyInflationFactor;
         saved *= savingInterestMonthlyFactor;
         saved += savedPerMonth;
       }
 
-      currentAge++;
+      if (this.answers.hasLifeInsurance && currentAge === lifeInsuranceAge) {
+        saved += lifeInsuranceReturn;
+      }
 
-      if (currentAge === 100) {
+      currentAge++;
+      if (currentAge === this.ageOfDeath) {
         break;
       }
+
+      requiredCapital = this.sumRequiredCapital(currentAge, largeUpcomingExpensesSum, pensionSum);
     }
 
-    this.fireRetirementAge = currentAge;
+    this.earlyRetirementAge = currentAge;
 
     const currentIndex = this.sections.indexOf(this.currentSection);
     this.currentSection = this.sections[currentIndex + 1];
+  }
+
+  private sumRequiredCapital(currentAge: number, largeUpcomingExpensesSum: number, pensionSum: number) {
+    const monthsInRetirement = (this.ageOfDeath - currentAge) * 12;
+    const retirementIncome = this.getConvertedValueOrZero(this.answers.retirementIncome);
+    const monthlyInflation = this.inflation / 12;
+
+    let retirementAmountNeeded = 0;
+    for (let i = 0; i < monthsInRetirement; i++) {
+      retirementAmountNeeded += retirementIncome;
+      retirementAmountNeeded *= 1 + monthlyInflation;
+    }
+
+    return retirementAmountNeeded + largeUpcomingExpensesSum - pensionSum;
   }
 
   private getIntValueOrZero(value: number): number {

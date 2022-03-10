@@ -1,16 +1,13 @@
 @import "../../../../../shared/src/static/styles/variables";
 
-p {
+.er-calc-explanation {
   margin: 0 0 15px 0;
   font-size: 1.1rem;
   line-height: 28px;
+  text-align: center;
 }
 
-.highlight {
-  color: var(--primary-color);
-}
-
-.fire-button {
+.er-calc-button {
   width: 100px;
   background: linear-gradient(225deg, #7a46f3, #00a6ed);
   background-size: 400% 400%;
@@ -65,7 +62,7 @@ p {
   }
 }
 
-.fire-input-wrap {
+.er-calc-input-wrap {
   text-align: center;
 
   .input-wrap {
@@ -193,7 +190,7 @@ ul {
     line-height: 27px;
   }
 
-  .fire-input-wrap .input-wrap input {
+  .er-calc-input-wrap .input-wrap input {
     width: 100px;
   }
 

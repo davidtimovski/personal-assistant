@@ -6,11 +6,13 @@ import { I18N } from "aurelia-i18n";
 import { AuthService } from "../../shared/src/services/authService";
 import { CurrenciesService } from "../../shared/src/services/currenciesService";
 import AuthorizeStep from "../../shared/src/authorize-pipeline-step";
-import { AlertEvents } from "../../shared/src/utils/alertEvents";
+import { AlertEvents } from "../../shared/src/models/enums/alertEvents";
 
 import { SyncService } from "services/syncService";
 import { LocalStorage } from "utils/localStorage";
 import routes from "./routes";
+import { AppEvents } from "models/appEvents";
+import { AuthEvents } from "../../shared/src/models/enums/authEvents";
 
 @inject(AuthService, EventAggregator, SyncService, LocalStorage, CurrenciesService, BroadcastChannel, I18N)
 export class App {
@@ -45,17 +47,17 @@ export class App {
     window.addEventListener("online", () => {
       this.sync();
     });
-    this.eventAggregator.subscribe("sync", () => {
+    this.eventAggregator.subscribe(AppEvents.Sync, () => {
       this.sync();
     });
-    this.eventAggregator.subscribeOnce("authenticated", () => {
+    this.eventAggregator.subscribeOnce(AuthEvents.Authenticated, () => {
       this.sync();
     });
   }
 
   sync() {
     if (navigator.onLine) {
-      this.eventAggregator.publish("sync-started");
+      this.eventAggregator.publish(AppEvents.SyncStarted);
       const syncPromises = new Array<Promise<any>>();
 
       const lastSynced = this.localStorage.lastSynced;
@@ -69,7 +71,7 @@ export class App {
       syncPromises.push(ratesPromise);
 
       Promise.all(syncPromises).then(() => {
-        this.eventAggregator.publish("sync-finished");
+        this.eventAggregator.publish(AppEvents.SyncFinished);
       });
     }
   }

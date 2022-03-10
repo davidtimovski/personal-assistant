@@ -50,7 +50,7 @@ public class IngredientsController : Controller
 
         var ingredientDtos = _ingredientService.GetUserAndUsedPublicIngredients(userId);
 
-        foreach (var ingredient in ingredientDtos.Where(x => x.IsPublic))
+        foreach (var ingredient in ingredientDtos.Where(x => x.IsPublic && !x.IsProduct))
         {
             ingredient.Name = _localizer[ingredient.Name];
         }
@@ -99,7 +99,10 @@ public class IngredientsController : Controller
             return NotFound();
         }
 
-        viewIngredientDto.Name = _localizer[viewIngredientDto.Name];
+        if (!viewIngredientDto.IsProduct)
+        {
+            viewIngredientDto.Name = _localizer[viewIngredientDto.Name];
+        }
 
         return Ok(viewIngredientDto);
     }
@@ -236,6 +239,11 @@ public class IngredientsController : Controller
 
     private void TranslateSuggestion(IngredientSuggestion suggestion)
     {
+        if (suggestion.IsProduct)
+        {
+            return;
+        }
+
         suggestion.Name = _localizer[suggestion.Name];
 
         foreach (var child in suggestion.Children)

@@ -18,6 +18,7 @@ import { AmountByCategory } from "models/viewmodels/amountByCategory";
 import { SearchFilters } from "models/viewmodels/searchFilters";
 import * as Actions from "utils/state/actions";
 import { TransactionType } from "models/viewmodels/transactionType";
+import { AppEvents } from "models/appEvents";
 
 @inject(Router, CapitalService, UsersService, LocalStorage, I18N, EventAggregator, ConnectionTracker)
 @connectTo()
@@ -42,10 +43,10 @@ export class Dashboard {
     private readonly eventAggregator: EventAggregator,
     private readonly connTracker: ConnectionTracker
   ) {
-    this.eventAggregator.subscribe("sync-started", () => {
+    this.eventAggregator.subscribe(AppEvents.SyncStarted, () => {
       this.progressBar.start();
     });
-    this.eventAggregator.subscribe("sync-finished", () => {
+    this.eventAggregator.subscribe(AppEvents.SyncFinished, () => {
       this.progressBar.finish();
       this.getCapital();
     });
@@ -117,7 +118,7 @@ export class Dashboard {
 
   sync() {
     if (!this.progressBar.active) {
-      this.eventAggregator.publish("sync");
+      this.eventAggregator.publish(AppEvents.Sync);
 
       this.usersService.getProfileImageUri().then((imageUri) => {
         if (this.imageUri !== imageUri) {

@@ -12,6 +12,7 @@ public class IngredientSuggestion : IMapFrom<Ingredient>
     public int? CategoryId { get; set; }
     public string BrandName { get; set; }
     public string Name { get; set; }
+    public bool IsProduct { get; set; }
     public string Unit { get; set; }
     public string UnitImperial { get; set; }
     public bool HasNutritionData { get; set; }

@@ -6,7 +6,7 @@ import { EventAggregator } from "aurelia-event-aggregator";
 
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import { ConnectionTracker } from "../../../shared/src/utils/connectionTracker";
-import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 
 import { CategoriesService } from "services/categoriesService";
 import { Category, CategoryType } from "models/entities/category";

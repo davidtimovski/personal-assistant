@@ -37,17 +37,17 @@
 .transactions-pagination {
   display: flex;
   justify-content: space-between;
-  width: 240px;
+  width: 280px;
   margin: 35px auto 0;
 
   .transactions-pagination-arrow-wrap {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 30px;
+    width: 42px;
     height: 30px;
     background: var(--primary-color);
-    border-radius: 50%;
+    border-radius: var(--border-radius);
     margin: 4px 0;
     font-size: 20px;
     color: #fff;

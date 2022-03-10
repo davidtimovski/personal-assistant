@@ -327,4 +327,16 @@ export class TransactionsService extends HttpProxyBase {
       method: "delete",
     });
   }
+
+  static getType(fromAccountId: number, toAccountId: number): TransactionType {
+    if (fromAccountId && toAccountId) {
+      return TransactionType.Transfer;
+    }
+
+    if (fromAccountId && !toAccountId) {
+      return TransactionType.Expense;
+    }
+
+    return TransactionType.Deposit;
+  }
 }

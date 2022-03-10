@@ -5,17 +5,15 @@ import { UpcomingExpense } from "models/entities/upcomingExpense";
 import { DebtModel } from "models/entities/debt";
 
 export class Changed {
-  constructor(
-    public lastSynced: string,
-    public deletedAccountIds: Array<number>,
-    public accounts: Array<Account>,
-    public deletedCategoryIds: Array<number>,
-    public categories: Array<Category>,
-    public deletedTransactionIds: Array<number>,
-    public transactions: Array<TransactionModel>,
-    public deletedUpcomingExpenseIds: Array<number>,
-    public upcomingExpenses: Array<UpcomingExpense>,
-    public deletedDebtIds: Array<number>,
-    public debts: Array<DebtModel>
-  ) {}
+  lastSynced: string;
+  deletedAccountIds: Array<number>;
+  accounts: Array<Account>;
+  deletedCategoryIds: Array<number>;
+  categories: Array<Category>;
+  deletedTransactionIds: Array<number>;
+  transactions: Array<TransactionModel>;
+  deletedUpcomingExpenseIds: Array<number>;
+  upcomingExpenses: Array<UpcomingExpense>;
+  deletedDebtIds: Array<number>;
+  debts: Array<DebtModel>;
 }

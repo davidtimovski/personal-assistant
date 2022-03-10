@@ -2,10 +2,10 @@ import { Syncable } from "models/sync/syncable";
 import { Category } from "./category";
 
 export class TransactionModel implements Syncable {
-  public accountName: string;
-  public category: Category;
-  public convertedAmount: number;
-  public synced = false;
+  accountName: string;
+  category: Category;
+  convertedAmount: number;
+  synced = false;
 
   constructor(
     public id: number,

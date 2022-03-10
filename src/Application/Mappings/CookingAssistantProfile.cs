@@ -67,6 +67,7 @@ public class CookingAssistantProfile : Profile
             .ForMember(x => x.Iron, opt => opt.MapFrom(src => src.NutritionData.Iron))
             .ForMember(x => x.Potassium, opt => opt.MapFrom(src => src.NutritionData.Potassium))
             .ForMember(x => x.Magnesium, opt => opt.MapFrom(src => src.NutritionData.Magnesium))
+            .ForMember(x => x.IsProduct, src => src.Ignore())
             .ForMember(x => x.ProductSize, opt => opt.MapFrom(src => src.PriceData.ProductSize))
             .ForMember(x => x.ProductSizeIsOneUnit, opt => opt.MapFrom(src => src.PriceData.ProductSizeIsOneUnit))
             .ForMember(x => x.Price, opt => opt.MapFrom(src => src.PriceData.Price))

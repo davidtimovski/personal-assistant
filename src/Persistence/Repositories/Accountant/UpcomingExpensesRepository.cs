@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
 using Application.Contracts.Accountant.UpcomingExpenses;
+using Dapper;
 using Domain.Entities.Accountant;
 
 namespace Persistence.Repositories.Accountant;
@@ -30,24 +30,11 @@ public class UpcomingExpensesRepository : BaseRepository, IUpcomingExpensesRepos
             new { UserId = userId, EntityType = (short)EntityType.UpcomingExpense, DeletedDate = fromDate });
     }
 
-    public async Task<int> CreateAsync(UpcomingExpense upcomingExpense, IDbConnection uowConn = null, IDbTransaction uowTransaction = null)
+    public async Task<int> CreateAsync(UpcomingExpense upcomingExpense)
     {
-        using IDbConnection conn = OpenConnection();
-
-        int id;
-        const string query = @"INSERT INTO ""Accountant.UpcomingExpenses"" (""UserId"", ""CategoryId"", ""Amount"", ""Currency"", ""Description"", ""Date"", ""Generated"", ""CreatedDate"", ""ModifiedDate"")
-                          VALUES (@UserId, @CategoryId, @Amount, @Currency, @Description, @Date, @Generated, @CreatedDate, @ModifiedDate) returning ""Id""";
-
-        if (uowConn == null && uowTransaction == null)
-        {
-            id = (await conn.QueryAsync<int>(query, upcomingExpense)).Single();
-        }
-        else
-        {
-            id = (await uowConn.QueryAsync<int>(query, upcomingExpense, uowTransaction)).Single();
-        }
-
-        return id;
+        EFContext.UpcomingExpenses.Add(upcomingExpense);
+        await EFContext.SaveChangesAsync();
+        return upcomingExpense.Id;
     }
 
     public async Task UpdateAsync(UpcomingExpense upcomingExpense)
@@ -66,33 +53,26 @@ public class UpcomingExpensesRepository : BaseRepository, IUpcomingExpensesRepos
 
     public async Task DeleteAsync(int id, int userId)
     {
-        using IDbConnection conn = OpenConnection();
-        var transaction = conn.BeginTransaction();
-
-        var deletedEntryExists = await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                            FROM ""Accountant.DeletedEntities""
-                                                            WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""EntityId"" = @EntityId",
-            new { UserId = userId, EntityType = (short)EntityType.UpcomingExpense, EntityId = id });
-
-        if (deletedEntryExists)
+        var deletedEntity = EFContext.DeletedEntities.FirstOrDefault(x => x.UserId == userId && x.EntityType == EntityType.UpcomingExpense && x.EntityId == id);
+        if (deletedEntity == null)
         {
-            await conn.QueryAsync<int>(@"UPDATE ""Accountant.DeletedEntities"" SET ""DeletedDate"" = @DeletedDate
-                                             WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""EntityId"" = @EntityId",
-                new { UserId = userId, EntityType = (short)EntityType.UpcomingExpense, EntityId = id, DeletedDate = DateTime.UtcNow },
-                transaction);
+            EFContext.DeletedEntities.Add(new DeletedEntity
+            {
+                UserId = userId,
+                EntityType = EntityType.UpcomingExpense,
+                EntityId = id,
+                DeletedDate = DateTime.UtcNow
+            });
         }
         else
         {
-            await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.DeletedEntities"" (""UserId"", ""EntityType"", ""EntityId"", ""DeletedDate"")
-                                         VALUES (@UserId, @EntityType, @EntityId, @DeletedDate)",
-                new { UserId = userId, EntityType = (short)EntityType.UpcomingExpense, EntityId = id, DeletedDate = DateTime.UtcNow },
-                transaction);
+            deletedEntity.DeletedDate = DateTime.UtcNow;
         }
 
-        await conn.ExecuteAsync(@"DELETE FROM ""Accountant.UpcomingExpenses"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
-            new { Id = id, UserId = userId }, transaction);
+        var upcomingExpense = EFContext.UpcomingExpenses.First(x => x.Id == id && x.UserId == userId);
+        EFContext.UpcomingExpenses.Remove(upcomingExpense);
 
-        transaction.Commit();
+        await EFContext.SaveChangesAsync();
     }
 
     public async Task DeleteOldAsync(int userId, DateTime before)

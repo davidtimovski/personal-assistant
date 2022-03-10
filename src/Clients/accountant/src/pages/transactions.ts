@@ -77,6 +77,10 @@ export class Transactions {
       this.filters.page = 1;
     }
 
+    if (this.filters.accountId !== 0 && this.filters.type === 3) {
+      this.filters.type = 0;
+    }
+
     this.transactions = null;
 
     const transactionsPromise = this.transactionsService.getAllByPage(this.filters, this.currency);
@@ -132,15 +136,7 @@ export class Transactions {
       return TransactionType.Deposit;
     }
 
-    if (fromAccountId && toAccountId) {
-      return TransactionType.Transfer;
-    }
-
-    if (fromAccountId && !toAccountId) {
-      return TransactionType.Expense;
-    }
-
-    return TransactionType.Deposit;
+    return TransactionsService.getType(fromAccountId, toAccountId);
   }
 
   formatDescription(description: string, isEncrypted: boolean): string {

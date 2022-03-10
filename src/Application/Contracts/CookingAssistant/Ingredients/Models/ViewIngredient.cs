@@ -13,6 +13,7 @@ public class ViewIngredient : IMapFrom<Ingredient>
     public string TaskList { get; set; }
     public string BrandName { get; set; }
     public string Name { get; set; }
+    public bool IsProduct { get; set; }
     public IngredientNutritionData NutritionData { get; set; } = new IngredientNutritionData();
     public IngredientPriceData PriceData { get; set; } = new IngredientPriceData();
     public List<string> Recipes { get; set; } = new List<string>();

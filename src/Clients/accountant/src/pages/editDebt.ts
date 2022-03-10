@@ -6,7 +6,7 @@ import { EventAggregator } from "aurelia-event-aggregator";
 
 import { ConnectionTracker } from "../../../shared/src/utils/connectionTracker";
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
-import { AlertEvents } from "../../../shared/src/utils/alertEvents";
+import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 
 import { DebtsService } from "services/debtsService";
 import { LocalStorage } from "utils/localStorage";

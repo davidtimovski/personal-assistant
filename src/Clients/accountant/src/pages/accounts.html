@@ -54,7 +54,7 @@
                   </td>
                   <td class="right-col">${account.balance | moneyFormat:currency}</td>
                   <td class="sync-icon-cell">
-                    <i if.bind="!account.synced" class="fas fa-sync-alt"></i>
+                    <i if.bind="!account.synced" class="fas fa-sync-alt" t="[title,aria-label]notSynced"></i>
                   </td>
                 </tr>
               </tbody>
