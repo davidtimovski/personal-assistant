@@ -3,12 +3,12 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Application.Contracts.Common;
+using Infrastructure.Sender.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
-using Application.Contracts.Common;
-using Infrastructure.Sender.Models;
 
 namespace Auth.Services;
 
@@ -25,7 +25,6 @@ public class EmailTemplateService : IEmailTemplateService
     private readonly ISenderService _senderService;
     private readonly IWebHostEnvironment _env;
     private readonly IStringLocalizer<EmailTemplateService> _localizer;
-    private readonly string _applicationName;
     private readonly string _adminEmail;
 
     public EmailTemplateService(
@@ -37,8 +36,6 @@ public class EmailTemplateService : IEmailTemplateService
         _senderService = senderService;
         _env = env;
         _localizer = localizer;
-
-        _applicationName = configuration["ApplicationName"];
         _adminEmail = configuration["AdminEmail"];
     }
 
@@ -48,7 +45,7 @@ public class EmailTemplateService : IEmailTemplateService
         {
             ToAddress = toEmail,
             ToName = toName,
-            Subject = _localizer["RegisterConfirmationEmailSubject", _applicationName]
+            Subject = _localizer["RegisterConfirmationEmailSubject"]
         };
 
         string bodyText = await GetTemplateContentsAsync("RegisterConfirmation.txt", language);
@@ -71,7 +68,7 @@ public class EmailTemplateService : IEmailTemplateService
         {
             ToAddress = toEmail,
             ToName = string.Empty,
-            Subject = _localizer["PasswordResetEmailSubject", _applicationName]
+            Subject = _localizer["PasswordResetEmailSubject"]
         };
 
         string bodyText = await GetTemplateContentsAsync("PasswordReset.txt", language);
@@ -94,7 +91,7 @@ public class EmailTemplateService : IEmailTemplateService
             {
                 ToAddress = _adminEmail,
                 ToName = "Admin",
-                Subject = $"New registration on {_applicationName}"
+                Subject = "New registration on Personal Assistant"
             };
 
             string bodyText = await GetTemplateContentsAsync("NewRegistration.txt", "admin");
@@ -120,7 +117,7 @@ public class EmailTemplateService : IEmailTemplateService
             {
                 ToAddress = _adminEmail,
                 ToName = "Admin",
-                Subject = $"New email confirmation on {_applicationName}"
+                Subject = "New email confirmation on Personal Assistant"
             };
 
             string bodyText = await GetTemplateContentsAsync("NewEmailVerification.txt", "admin");

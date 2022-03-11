@@ -71,8 +71,14 @@
                 class="new-ingredient au-animate animate-fade-in">
                 <div class="ingredient-name-wrap">
                   <input type="text" if.bind="ingredient.isNew" value.bind="ingredient.name | nullFormat" 
-                    keyup.trigger="ingredientChanged(ingredient)" maxlength="50" class="name-input" />
-                  <div else class="name-input uneditable">${ingredient.name}</div>
+                    keyup.trigger="ingredientChanged(ingredient)" maxlength="50" class="ingredient-name" />
+                  <div else class="ingredient-name">
+                    ${ingredient.name}
+                    <span class="icons-container">
+                      <i if.bind="ingredient.hasNutritionData" class="fas fa-clipboard" t="[title,aria-label]hasNutrition"></i>
+                      <i if.bind="ingredient.hasPriceData" class="fas fa-tag" t="[title,aria-label]hasPrice"></i>
+                    </span>
+                  </div>
                 </div>
                 <div>
                   <div class="ingredient-amount-input-wrap">

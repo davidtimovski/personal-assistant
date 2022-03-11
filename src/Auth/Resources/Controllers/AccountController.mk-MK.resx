@@ -162,15 +162,6 @@
   <data name="SampleRecipeDescription" xml:space="preserve">
     <value>Вкусен оброк</value>
   </data>
-  <data name="SampleRecipeIngredient1" xml:space="preserve">
-    <value>Пилешки стек</value>
-  </data>
-  <data name="SampleRecipeIngredient2" xml:space="preserve">
-    <value>Компири</value>
-  </data>
-  <data name="SampleRecipeIngredient3" xml:space="preserve">
-    <value>Моркови</value>
-  </data>
   <data name="SampleRecipeInstructions" xml:space="preserve">
     <value>Исечкај го нештото. Изрендај го другото. Стави се во тавче и готви во рерна 15 минути на 200 степени. Сол и бибер по вкус.</value>
   </data>

@@ -5,6 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Application.Contracts.Accountant.Accounts;
+using Application.Contracts.Accountant.Accounts.Models;
+using Application.Contracts.Common;
+using Application.Contracts.CookingAssistant.Recipes;
+using Application.Contracts.ToDoAssistant.Lists;
 using Auth.Models;
 using Auth.Services;
 using Auth.ViewModels.Account;
@@ -14,6 +19,7 @@ using IdentityServer4.Events;
 using IdentityServer4.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
+using Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -25,12 +31,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Application.Contracts.Accountant.Accounts;
-using Application.Contracts.Accountant.Accounts.Models;
-using Application.Contracts.Common;
-using Application.Contracts.CookingAssistant.Recipes;
-using Application.Contracts.ToDoAssistant.Lists;
-using Infrastructure.Identity;
 
 namespace Auth.Controllers;
 
@@ -275,25 +275,24 @@ public class AccountController : Controller
             ImageUri = _cdnService.GetDefaultProfileImageUri(),
             DateRegistered = DateTime.UtcNow
         };
+
         IdentityResult result = await _userManager.CreateAsync(user, model.Password);
-
-        if (result.Succeeded)
+        if (!result.Succeeded)
         {
-            string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var callbackUrl = Url.Action("confirm-email", "Account", new { userId = user.Id, token, returnUrl }, HttpContext.Request.Scheme);
-            await _emailTemplateService.EnqueueRegisterConfirmationEmailAsync(user.Name, user.Email, new Uri(callbackUrl), model.Language);
-
-            // Notify admin
-            _ = _emailTemplateService.EnqueueNewRegistrationEmailAsync(user.Name, user.Email);
-
-            SetLanguageCookie(model.Language);
-
-            return RedirectToAction(nameof(Login), new { alert = GenerateLoginAlertFromRegistrationEmail(user.Email) });
+            AddIdentityErrors(result, nameof(Register));
+            return View(model);
         }
 
-        AddIdentityErrors(result, nameof(Register));
+        string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        var callbackUrl = Url.Action("confirm-email", "Account", new { userId = user.Id, token, returnUrl }, HttpContext.Request.Scheme);
+        await _emailTemplateService.EnqueueRegisterConfirmationEmailAsync(user.Name, user.Email, new Uri(callbackUrl), model.Language);
 
-        return View(model);
+        // Notify admin
+        _ = _emailTemplateService.EnqueueNewRegistrationEmailAsync(user.Name, user.Email);
+
+        SetLanguageCookie(model.Language);
+
+        return RedirectToAction(nameof(Login), new { alert = GenerateLoginAlertFromRegistrationEmail(user.Email) });
     }
 
     [HttpGet]
@@ -749,10 +748,7 @@ public class AccountController : Controller
         {
             { "SampleRecipeName", _localizer["SampleRecipeName"] },
             { "SampleRecipeDescription", _localizer["SampleRecipeDescription"] },
-            { "SampleRecipeInstructions", _localizer["SampleRecipeInstructions"] },
-            { "SampleRecipeIngredient1", _localizer["SampleRecipeIngredient1"] },
-            { "SampleRecipeIngredient2", _localizer["SampleRecipeIngredient2"] },
-            { "SampleRecipeIngredient3", _localizer["SampleRecipeIngredient3"] }
+            { "SampleRecipeInstructions", _localizer["SampleRecipeInstructions"] }
         };
         await _recipeService.CreateSampleAsync(userId, sampleRecipeTranslations);
     }

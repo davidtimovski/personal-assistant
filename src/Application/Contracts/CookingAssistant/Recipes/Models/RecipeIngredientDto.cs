@@ -7,11 +7,12 @@ namespace Application.Contracts.CookingAssistant.Recipes.Models;
 public class RecipeIngredientDto : IMapFrom<RecipeIngredient>
 {
     public int Id { get; set; }
-    public int RecipeId { get; set; }
     public string Name { get; set; }
     public float? Amount { get; set; }
     public float? AmountPerServing { get; set; }
     public string Unit { get; set; }
+    public bool HasNutritionData { get; set; }
+    public bool HasPriceData { get; set; }
     public bool Missing { get; set; }
     public bool IsPublic { get; set; }
 
@@ -21,7 +22,8 @@ public class RecipeIngredientDto : IMapFrom<RecipeIngredient>
             .ForMember(x => x.Id, opt => opt.MapFrom(src => src.Ingredient.Id))
             .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Ingredient.Name))
             .ForMember(x => x.AmountPerServing, opt => opt.Ignore())
-            .ForMember(x => x.Unit, opt => opt.MapFrom(src => src.Unit))
+            .ForMember(x => x.HasNutritionData, opt => opt.MapFrom<RecipeIngredientHasNutritionDataResolver>())
+            .ForMember(x => x.HasPriceData, opt => opt.MapFrom<RecipeIngredientHasNutritionDataResolver>())
             .ForMember(x => x.Missing, opt => opt.MapFrom(src => src.Ingredient.Task != null ? !src.Ingredient.Task.IsCompleted : false))
             .ForMember(x => x.IsPublic, opt => opt.MapFrom(src => src.Ingredient.UserId == 1));
     }

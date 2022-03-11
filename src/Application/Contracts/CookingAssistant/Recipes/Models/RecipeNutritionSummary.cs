@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Application.Contracts.CookingAssistant.Recipes.Models;
+﻿namespace Application.Contracts.CookingAssistant.Recipes.Models;
 
 public class RecipeNutritionSummary
 {
@@ -56,5 +54,4 @@ public class RecipeNutritionSummary
     public float? Magnesium { get; set; }
     public float? MagnesiumFromDaily { get; set; }
     public string MagnesiumFromDailyGrade { get; set; }
-    public List<int> IngredientIds { get; set; } = new List<int>();
 }

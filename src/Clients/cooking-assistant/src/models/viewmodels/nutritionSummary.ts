@@ -48,5 +48,4 @@ export class NutritionSummary {
   magnesium: number;
   magnesiumFromDaily: number;
   magnesiumFromDailyGrade: string;
-  ingredientIds: Array<number>;
 }

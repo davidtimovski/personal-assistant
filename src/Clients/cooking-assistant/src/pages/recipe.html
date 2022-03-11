@@ -71,37 +71,23 @@
                 </div>
               </div>
 
-              <section if.bind="model.ingredients.length > 0" id="ingredients-section">
+              <section if.bind="model.ingredients.length > 0">
                 <header t="recipe.ingredients">Ingredients</header>
 
                 <table class="recipe-ingredients-table">
-                  <thead>
-                    <tr if.bind="nutritionInfoVisible" class="au-animate animate-fade-in aurelia-fade-out">
-                      <th colspan="2" class="source-message" t="recipe.nutritionInfoGatheredFrom">
-                        Nutrition information gathered from:
-                      </th>
-                    </tr>
-                    <tr if.bind="costInfoVisible" class="au-animate animate-fade-in aurelia-fade-out">
-                      <th colspan="2" class="source-message" t="recipe.costInfoGatheredFrom">
-                        Cost information gathered from
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr repeat.for="ingredient of model.ingredients" class="${ingredient.missing ? 'missing' : ''}">
-                      <td class="recipe-ingredient-name">
-                        <i if.bind="ingredient.nutritionSource"
-                          class="fas fa-clipboard au-animate animate-fade-in aurelia-fade-out"></i>
-                        <i if.bind="ingredient.costSource"
-                          class="fas fa-tag au-animate animate-fade-in aurelia-fade-out"></i>
-                        ${ingredient.name}
-                      </td>
-                      <td>
-                        <ingredient-amount amount.bind="ingredient.amount" unit.bind="ingredient.unit">
-                        </ingredient-amount>
-                      </td>
-                    </tr>
-                  </tbody>
+                  <tr repeat.for="ingredient of model.ingredients" class="${ingredient.missing ? 'missing' : ''}">
+                    <td class="recipe-ingredient-name">
+                      ${ingredient.name}
+                      <span class="icons-container">
+                        <i if.bind="ingredient.hasNutritionData" class="fas fa-clipboard" t="[title,aria-label]hasNutrition"></i>
+                        <i if.bind="ingredient.hasPriceData" class="fas fa-tag" t="[title,aria-label]hasPrice"></i>
+                      </span>
+                    </td>
+                    <td>
+                      <ingredient-amount amount.bind="ingredient.amount" unit.bind="ingredient.unit">
+                      </ingredient-amount>
+                    </td>
+                  </tr>
                 </table>
               </section>
 
@@ -114,7 +100,7 @@
               </servings-selector>
 
               <section if.bind="model.nutritionSummary.isSet">
-                <header t="recipe.nutritionPerServing" class="nutrition-header" click.delegate="toggleNutritionInfo()">
+                <header t="recipe.nutritionPerServing">
                   Nutrition per serving
                 </header>
 
@@ -319,7 +305,7 @@
                 </div>
               </section>
 
-              <section if.bind="model.costSummary.isSet" class="cost-wrap" click.delegate="toggleCostInfo()">
+              <section if.bind="model.costSummary.isSet" class="cost-wrap">
                 <div class="cost-content">
                   <div>
                     <span t="recipe.cost">Cost:</span>

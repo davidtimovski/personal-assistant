@@ -53,24 +53,27 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        var recipeSql = @"SELECT r.*, u.""Id"", dp.*
-                              FROM ""CookingAssistant.Recipes"" AS r 
-                              INNER JOIN ""AspNetUsers"" AS u ON r.""UserId"" = u.""Id""
-                              LEFT JOIN ""CookingAssistant.DietaryProfiles"" AS dp ON dp.""UserId"" = @UserId
-                              LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
-                              WHERE r.""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))";
-        var recipe = conn.Query<Recipe, User, DietaryProfile, Recipe>(recipeSql,
+        const string recipeSql = @"SELECT r.*, u.""Id"", dp.*
+                                   FROM ""CookingAssistant.Recipes"" AS r 
+                                   INNER JOIN ""AspNetUsers"" AS u ON r.""UserId"" = u.""Id""
+                                   LEFT JOIN ""CookingAssistant.DietaryProfiles"" AS dp ON dp.""UserId"" = @UserId
+                                   LEFT JOIN ""CookingAssistant.Shares"" AS s ON r.""Id"" = s.""RecipeId""
+                                   WHERE r.""Id"" = @Id AND (r.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))";
+
+        var recipes = conn.Query<Recipe, User, DietaryProfile, Recipe>(recipeSql,
             (dbRecipe, user, dietaryProfile) =>
             {
                 user.DietaryProfile = dietaryProfile;
                 dbRecipe.User = user;
                 return dbRecipe;
-            }, new { Id = id, UserId = userId }, null, true, "Id,UserId").Single();
+            }, new { Id = id, UserId = userId }, null, true, "Id,UserId");
 
-        if (recipe == null)
+        if (!recipes.Any())
         {
             return null;
         }
+
+        var recipe = recipes.First();
 
         if (recipe.UserId == userId)
         {
@@ -83,12 +86,12 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
 
         recipe.Shares = conn.Query<RecipeShare>(@"SELECT * FROM ""CookingAssistant.Shares"" WHERE ""RecipeId"" = @Id", new { Id = id }).ToList();
 
-        var recipeIngredientsSql = @"SELECT ri.""Amount"", ri.""Unit"", i.*, it.""TaskId"", t.""Id"", t.""IsCompleted""
-                                     FROM ""CookingAssistant.RecipesIngredients"" AS ri
-                                     INNER JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
-                                     LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
-                                     LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON it.""TaskId"" = t.""Id""
-                                     WHERE ri.""RecipeId"" = @RecipeId";
+        const string recipeIngredientsSql = @"SELECT ri.""Amount"", ri.""Unit"", i.*, it.""TaskId"", t.""Id"", t.""IsCompleted""
+                                              FROM ""CookingAssistant.RecipesIngredients"" AS ri
+                                              INNER JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
+                                              LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
+                                              LEFT JOIN ""ToDoAssistant.Tasks"" AS t ON it.""TaskId"" = t.""Id""
+                                              WHERE ri.""RecipeId"" = @RecipeId";
 
         var recipeIngredients = conn.Query<RecipeIngredient, Ingredient, ToDoTask, RecipeIngredient>(recipeIngredientsSql,
             (recipeIngredient, ingredient, task) =>
@@ -120,7 +123,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         {
             recipe.Shares = conn.Query<RecipeShare>(@"SELECT * FROM ""CookingAssistant.Shares"" WHERE ""RecipeId"" = @Id", new { Id = id }).ToList();
 
-            const string recipeIngredientsSql = @"SELECT ri.""Amount"", ri.""Unit"", i.""Id"", i.""UserId"", i.""Name""
+            const string recipeIngredientsSql = @"SELECT ri.""Amount"", ri.""Unit"", i.*
                                                   FROM ""CookingAssistant.RecipesIngredients"" AS ri
                                                   INNER JOIN ""CookingAssistant.Ingredients"" AS i ON ri.""IngredientId"" = i.""Id""
                                                   WHERE ri.""RecipeId"" = @RecipeId";

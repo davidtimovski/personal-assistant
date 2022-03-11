@@ -30,10 +30,6 @@
   }
 }
 
-.nutrition-header {
-  cursor: pointer;
-}
-
 .nutrition-row {
   margin: 5px 0;
 }
@@ -85,9 +81,17 @@
     color: #fff;
   }
 
-  i {
-    margin-right: 5px;
-    color: var(--faded-color);
+  .icons-container {
+    margin-left: 5px;
+
+    i {
+      margin-left: 4px;
+      color: var(--faded-color);
+
+      &.fa-tag {
+        font-size: 18px;
+      }
+    }
   }
 
   tbody {
@@ -139,7 +143,6 @@
 
   .cost-content {
     text-align: right;
-    cursor: pointer;
 
     .cost {
       color: var(--primary-color);
@@ -147,15 +150,11 @@
   }
 }
 
-.source-message {
-  background: #fafafa;
-  padding: 10px 15px;
-  line-height: 2rem;
-  text-align: center;
-  color: var(--primary-color-dark);
-}
-
 @media screen and (min-width: $desktop-min) {
+  .recipe-ingredients-table .icons-container i.fa-tag {
+    font-size: 22px;
+  }
+
   .instructions-wrap .instructions {
     font-size: 1.2rem;
     line-height: 1.7rem;

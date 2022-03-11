@@ -33,7 +33,7 @@ public class IngredientForReview : IMapFrom<Ingredient>
         profile.CreateMap<Ingredient, IngredientForReview>()
             .ForMember(x => x.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Name))
-            .ForMember(x => x.HasNutritionData, opt => opt.MapFrom<RecipeIngredientHasNutritionDataResolver>())
-            .ForMember(x => x.HasPriceData, opt => opt.MapFrom<RecipeIngredientHasPriceDataResolver>());
+            .ForMember(x => x.HasNutritionData, opt => opt.MapFrom<IngredientHasNutritionDataResolver>())
+            .ForMember(x => x.HasPriceData, opt => opt.MapFrom<IngredientHasPriceDataResolver>());
     }
 }

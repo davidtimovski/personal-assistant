@@ -270,6 +270,8 @@ export class RecipesService extends HttpProxyBase {
         ingredient.name,
         ingredient.amount,
         ingredient.unit,
+        ingredient.hasNutritionData,
+        ingredient.hasPriceData,
         false
       );
 

@@ -162,15 +162,6 @@
   <data name="SampleRecipeDescription" xml:space="preserve">
     <value>A tasty meal</value>
   </data>
-  <data name="SampleRecipeIngredient1" xml:space="preserve">
-    <value>Chicken steak</value>
-  </data>
-  <data name="SampleRecipeIngredient2" xml:space="preserve">
-    <value>Potatoes</value>
-  </data>
-  <data name="SampleRecipeIngredient3" xml:space="preserve">
-    <value>Carrots</value>
-  </data>
   <data name="SampleRecipeInstructions" xml:space="preserve">
     <value>Chop up the thingy. Slice the stuff. Put it all in a pan and cook it in the oven for 15 minutes at 200C. Salt and pepper to taste.</value>
   </data>
