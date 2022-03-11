@@ -69,12 +69,22 @@ export class EditRecipe {
         return;
       }
 
-      this.model.ingredients.push(new EditRecipeIngredient(null, ingredientName, null, null, true));
+      this.model.ingredients.push(new EditRecipeIngredient(null, ingredientName, null, null, false, false, true));
     });
 
     this.eventAggregator.subscribe(IngredientPickerEvents.Selected, (ingredient: IngredientSuggestion) => {
       const unit = this.imperialSystem ? ingredient.unitImperial : ingredient.unit;
-      this.model.ingredients.push(new EditRecipeIngredient(ingredient.id, ingredient.name, null, unit, false));
+      this.model.ingredients.push(
+        new EditRecipeIngredient(
+          ingredient.id,
+          ingredient.name,
+          null,
+          unit,
+          ingredient.hasNutritionData,
+          ingredient.hasPriceData,
+          false
+        )
+      );
     });
   }
 

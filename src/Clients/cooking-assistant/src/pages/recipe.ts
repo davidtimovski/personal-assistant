@@ -21,8 +21,6 @@ export class Recipe {
   private videoIFrame: HTMLIFrameElement;
   private videoIFrameSrc = "";
   private servingsSelectorIsVisible = false;
-  private nutritionInfoVisible = false;
-  private costInfoVisible = false;
   private currency: string;
   private wakeLockSupported: boolean;
   private wakeLock: any;
@@ -186,60 +184,8 @@ export class Recipe {
     return this.model.instructions.replace(/(?:\r\n|\r|\n)/g, "<br>");
   }
 
-  toggleNutritionInfo() {
-    if (!this.nutritionInfoVisible) {
-      if (this.costInfoVisible) {
-        this.model.ingredients.forEach((ingredient) => {
-          ingredient.costSource = false;
-        });
-        this.costInfoVisible = false;
-      }
-
-      this.model.ingredients.forEach((ingredient) => {
-        ingredient.nutritionSource = this.model.nutritionSummary.ingredientIds.includes(ingredient.id);
-      });
-
-      this.scrollToIngredientsSection();
-    } else {
-      this.model.ingredients.forEach((ingredient) => {
-        ingredient.nutritionSource = false;
-      });
-    }
-    this.nutritionInfoVisible = !this.nutritionInfoVisible;
-  }
-
-  toggleCostInfo() {
-    if (!this.costInfoVisible) {
-      if (this.nutritionInfoVisible) {
-        this.model.ingredients.forEach((ingredient) => {
-          ingredient.nutritionSource = false;
-        });
-        this.nutritionInfoVisible = false;
-      }
-
-      this.model.ingredients.forEach((ingredient) => {
-        ingredient.costSource = this.model.costSummary.ingredientIds.includes(ingredient.id);
-      });
-
-      this.scrollToIngredientsSection();
-    } else {
-      this.model.ingredients.forEach((ingredient) => {
-        ingredient.costSource = false;
-      });
-    }
-    this.costInfoVisible = !this.costInfoVisible;
-  }
-
   editRecipe() {
     this.editRecipeButtonIsLoading = true;
     this.router.navigateToRoute("editRecipe", { id: this.model.id });
-  }
-
-  private scrollToIngredientsSection() {
-    const ingredientsSection = document.getElementById("ingredients-section");
-    window.scroll({
-      top: ingredientsSection.getBoundingClientRect().top + window.scrollY,
-      behavior: "smooth",
-    });
   }
 }

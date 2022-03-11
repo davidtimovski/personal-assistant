@@ -1,12 +1,13 @@
 .ingredient-suggestion {
-  padding: 0 15px;
+  padding: 5px 15px;
+  line-height: 27px;
   cursor: pointer;
 
   &.selected {
     color: var(--primary-color-dark);
     cursor: default;
 
-    .fa-check {
+    .icons-container .fa-check {
       display: inline;
     }
   }
@@ -15,13 +16,17 @@
     color: var(--primary-color-dark);
   }
 
-  &-icons {
-    margin-left: 7px;
+  .icons-container {
+    margin-left: 5px;
 
     i {
-      margin-right: 4px;
+      margin-left: 4px;
       font-size: 16px;
       color: var(--primary-color);
+
+      &.fa-tag {
+        font-size: 17px;
+      }
     }
 
     .fa-check {

@@ -6,7 +6,7 @@
     <div click.delegate="ingredientClicked()" disabled.bind="ingredient.selected" class="ingredient-suggestion ${ingredient.selected ? 'selected' : ''}" role="button">
       <span if.bind="ingredient.brandName">${ingredient.name} (${ingredient.brandName})</span>
       <span else>${ingredient.name}</span>
-      <span class="ingredient-suggestion-icons">
+      <span class="icons-container">
         <i class="fas fa-clipboard" if.bind="ingredient.hasNutritionData" t="[title,aria-label]hasNutrition"></i>
         <i class="fas fa-tag" if.bind="ingredient.hasPriceData" t="[title,aria-label]hasPrice"></i>
         <i class="fas fa-check"></i>

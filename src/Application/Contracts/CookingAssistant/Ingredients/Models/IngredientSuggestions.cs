@@ -28,8 +28,8 @@ public class IngredientSuggestion : IMapFrom<Ingredient>
             .ForMember(x => x.Unit, opt => opt.Ignore())
             .ForMember(x => x.UnitImperial, opt => opt.Ignore())
             .ForMember(x => x.Children, opt => opt.Ignore())
-            .ForMember(x => x.HasNutritionData, opt => opt.MapFrom<RecipeIngredientHasNutritionDataResolver>())
-            .ForMember(x => x.HasPriceData, opt => opt.MapFrom<RecipeIngredientHasPriceDataResolver>())
+            .ForMember(x => x.HasNutritionData, opt => opt.MapFrom<IngredientHasNutritionDataResolver>())
+            .ForMember(x => x.HasPriceData, opt => opt.MapFrom<IngredientHasPriceDataResolver>())
             .ForMember(x => x.IsPublic, opt => opt.MapFrom(src => src.UserId == 1));
     }
 }

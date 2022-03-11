@@ -9,9 +9,9 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Npgsql;
-using Sender.Contracts;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using Sender.Contracts;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using WebPush;
@@ -79,7 +79,7 @@ public sealed class HostedService : IHostedService, IDisposable
             var email = JsonConvert.DeserializeObject<Email>(message);
 
             var client = new SendGridClient(_configuration["SendGridApiKey"]);
-            var from = new EmailAddress(_configuration["SystemEmail"], _configuration["ApplicationName"]);
+            var from = new EmailAddress(_configuration["SystemEmail"], "Personal Assistant");
             var to = new EmailAddress(email.ToAddress, email.ToName);
             var emailMessage = MailHelper.CreateSingleEmail(from, to, email.Subject, email.BodyText, email.BodyHtml);
 

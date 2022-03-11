@@ -83,10 +83,8 @@
     "oneServing": "1 порција",
     "servings": "{{servings}} порции",
     "nutritionPerServing": "Хранлива вредност по порција",
-    "nutritionInfoGatheredFrom": "Хранлива вредност собрана од:",
     "cost": "Цена:",
-    "perServing": "По порција:",
-    "costInfoGatheredFrom": "Податоци за цена собрани од:"
+    "perServing": "По порција:"
   },
   "editRecipe": {
     "newRecipe": "Нов рецепт",
@@ -224,8 +222,8 @@
     "searchTasks": "Пребарај задачи",
     "amount": "Количина",
     "nutrition": "Хранлива вредност",
-    "nutritionalValuePer": "Хранлива вредност во",
-    "oneUnit": "една единица",
+    "nutritionalValuePer": "Хранлива вредност по",
+    "unit": "единица",
     "ingredientUsedInRecipes": "Оваа состојка се користи во рецептите споменати горе.",
     "areYouSureYouWantToDelete": "Сигурно сакате да ја избришете?",
     "yesImSure": "Да",

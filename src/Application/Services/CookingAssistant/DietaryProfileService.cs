@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
-using FluentValidation;
-using FluentValidation.Results;
-using Microsoft.Extensions.Options;
 using Application.Contracts.CookingAssistant.Common;
 using Application.Contracts.CookingAssistant.DietaryProfiles;
 using Application.Contracts.CookingAssistant.DietaryProfiles.Models;
 using Application.Contracts.CookingAssistant.Recipes.Models;
+using AutoMapper;
 using Domain.Entities.CookingAssistant;
+using FluentValidation;
+using FluentValidation.Results;
+using Microsoft.Extensions.Options;
 using Utility;
 
 namespace Application.Services.CookingAssistant;
@@ -208,11 +208,6 @@ public class DietaryProfileService : IDietaryProfileService
             {
                 ingredientHasNutritionData = true;
                 nutritionSummary.Magnesium = AddMilligramsValuePerAmountAndServing(nutritionSummary.Magnesium, recipeIngredient.Ingredient.Magnesium.Value, servingSize, servingSizeIsOneUnit, amount, unit, servings);
-            }
-
-            if (ingredientHasNutritionData)
-            {
-                nutritionSummary.IngredientIds.Add(recipeIngredient.Ingredient.Id);
             }
         }
 

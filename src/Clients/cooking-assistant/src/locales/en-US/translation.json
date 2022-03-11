@@ -83,10 +83,8 @@
     "oneServing": "1 serving",
     "servings": "{{servings}} servings",
     "nutritionPerServing": "Nutrition per serving",
-    "nutritionInfoGatheredFrom": "Nutrition information gathered from:",
     "cost": "Cost:",
-    "perServing": "Per serving:",
-    "costInfoGatheredFrom": "Cost information gathered from:"
+    "perServing": "Per serving:"
   },
   "editRecipe": {
     "newRecipe": "New recipe",
@@ -225,7 +223,7 @@
     "amount": "Amount",
     "nutrition": "Nutrition",
     "nutritionalValuePer": "Nutritional value per",
-    "oneUnit": "one unit",
+    "unit": "unit",
     "ingredientUsedInRecipes": "This ingredient is used in the recipes mentioned above.",
     "areYouSureYouWantToDelete": "Are you sure you want to delete it?",
     "yesImSure": "Yes, I'm sure",

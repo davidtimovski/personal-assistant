@@ -72,6 +72,10 @@ public class RecipeService : IRecipeService
     public RecipeDto Get(int id, int userId, string currency)
     {
         Recipe recipe = _recipesRepository.Get(id, userId);
+        if (recipe == null)
+        {
+            return null;
+        }
 
         var result = _mapper.Map<RecipeDto>(recipe);
 
@@ -90,6 +94,10 @@ public class RecipeService : IRecipeService
     public RecipeForUpdate GetForUpdate(int id, int userId)
     {
         Recipe recipe = _recipesRepository.GetForUpdate(id, userId);
+        if (recipe == null)
+        {
+            return null;
+        }
 
         var result = _mapper.Map<RecipeForUpdate>(recipe);
 
@@ -310,45 +318,25 @@ public class RecipeService : IRecipeService
         {
             new RecipeIngredient
             {
-                Amount = 300,
+                Amount = 400,
                 Unit = "g",
-                CreatedDate = recipe.CreatedDate,
-                ModifiedDate = recipe.CreatedDate,
-                Ingredient = new Ingredient
-                {
-                    UserId = userId,
-                    Name = translations["SampleRecipeIngredient1"],
-                    CreatedDate = recipe.CreatedDate,
-                    ModifiedDate = recipe.CreatedDate
-                }
+                CreatedDate = now,
+                ModifiedDate = now,
+                IngredientId = 606 // chicken_breast
             },
             new RecipeIngredient
             {
-                Amount = 300,
-                Unit = "g",
-                CreatedDate = recipe.CreatedDate,
-                ModifiedDate = recipe.CreatedDate,
-                Ingredient = new Ingredient
-                {
-                    UserId = userId,
-                    Name = translations["SampleRecipeIngredient2"],
-                    CreatedDate = recipe.CreatedDate,
-                    ModifiedDate = recipe.CreatedDate
-                }
+                Amount = 3,
+                CreatedDate = now,
+                ModifiedDate = now,
+                IngredientId = 426 // potatoes
             },
             new RecipeIngredient
             {
-                Amount = 100,
-                Unit = "g",
-                CreatedDate = recipe.CreatedDate,
-                ModifiedDate = recipe.CreatedDate,
-                Ingredient = new Ingredient
-                {
-                    UserId = userId,
-                    Name = translations["SampleRecipeIngredient3"],
-                    CreatedDate = recipe.CreatedDate,
-                    ModifiedDate = recipe.CreatedDate
-                }
+                Amount = 2,
+                CreatedDate = now,
+                ModifiedDate = now,
+                IngredientId = 427 // carrots
             }
         };
 
@@ -684,8 +672,6 @@ public class RecipeService : IRecipeService
 
         foreach (var recipeIngredient in validRecipeIngredients)
         {
-            costSummary.IngredientIds.Add(recipeIngredient.Ingredient.Id);
-
             short productSize = recipeIngredient.Ingredient.ProductSize;
             bool productSizeIsOneUnit = recipeIngredient.Ingredient.ProductSizeIsOneUnit;
             float amount = recipeIngredient.Amount.Value;

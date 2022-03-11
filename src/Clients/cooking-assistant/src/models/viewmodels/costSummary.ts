@@ -5,5 +5,4 @@ export class CostSummary {
   cost: number;
   costPerServing: number;
   currency: string;
-  ingredientIds: Array<number>;
 }

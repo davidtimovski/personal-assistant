@@ -4,6 +4,8 @@ export class EditRecipeIngredient {
     public name: string,
     public amount: string,
     public unit: string,
+    public hasNutritionData: boolean,
+    public hasPriceData: boolean,
     public isNew: boolean
   ) {}
 }

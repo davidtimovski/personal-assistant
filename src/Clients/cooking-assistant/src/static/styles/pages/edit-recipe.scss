@@ -154,17 +154,29 @@ label.label {
       width: 100%;
     }
 
-    .name-input {
+    .ingredient-name {
       border: 1px solid #ddd;
       border-radius: var(--border-radius);
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
       padding: 7px 12px;
       line-height: 29px;
+    }
+    div.ingredient-name {
+      background: #eeffee;
+      color: var(--primary-color-dark);
 
-      &.uneditable {
-        background: #eeffee;
-        color: var(--primary-color-dark);
+      .icons-container {
+        margin-left: 5px;
+
+        i {
+          margin-left: 4px;
+          color: var(--faded-color);
+
+          &.fa-tag {
+            font-size: 18px;
+          }
+        }
       }
     }
 
@@ -247,9 +259,13 @@ label.label {
 
 @media screen and (min-width: $desktop-min) {
   .new-ingredients-wrap .new-ingredient {
-    .name-input.uneditable {
+    div.ingredient-name {
       padding: 7px 12px;
       line-height: 29px;
+
+      .icons-container i.fa-tag {
+        font-size: 22px;
+      }
     }
 
     .amount-input {

@@ -27,10 +27,16 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
 	                                        LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
 	                                        WHERE i.""UserId"" = @UserId
 	                                        GROUP BY i.""Id"", it.""TaskId""
+	
 	                                        UNION ALL
+	
 	                                        SELECT i.*, it.""TaskId"", COUNT(ri) AS ""RecipeCount""
 	                                        FROM ""CookingAssistant.Ingredients"" AS i
-	                                        INNER JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
+	                                        INNER JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId"" AND ri.""RecipeId"" IN (
+                                                SELECT ""Id"" FROM ""CookingAssistant.Recipes"" WHERE ""UserId"" = @UserId
+		                                        UNION ALL
+		                                        SELECT ""RecipeId"" FROM ""CookingAssistant.Shares"" WHERE ""UserId"" = @UserId AND ""IsAccepted""
+                                            )
 	                                        LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
 	                                        WHERE i.""UserId"" = 1
 	                                        GROUP BY i.""Id"", it.""TaskId""

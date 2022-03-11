@@ -5,7 +5,7 @@ export class Ingredient {
   amount: number;
   amountPerServing: number;
   unit: string;
+  hasNutritionData: boolean;
+  hasPriceData: boolean;
   missing: boolean;
-  nutritionSource: boolean;
-  costSource: boolean;
 }
