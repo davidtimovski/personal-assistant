@@ -31,7 +31,9 @@
             <div class="ingredient-recipes">
               <header t="editIngredient.usedInTheseRecipes">Used in these recipes</header>
               <ul>
-                <li repeat.for="recipe of model.recipes">${recipe}</li>
+                <li repeat.for="recipe of model.recipes">
+                  <a route-href="route: recipe; params.bind: { id: recipe.id }">${recipe.name}</a>
+                </li>
               </ul>
             </div>
           </section>

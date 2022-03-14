@@ -1,7 +1,7 @@
 {
   "name": "cooking-assistant",
   "description": "Your very own Cooking Assistant.",
-  "version": "1.13.3",
+  "version": "1.13.4",
   "repository": {
     "type": "git",
     "url": "https://github.com/davidtimovski/personal-assistant"
