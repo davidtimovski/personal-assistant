@@ -96,7 +96,7 @@
     "description": "Description",
     "youTubeUrl": "YouTube URL",
     "ingredients": "Ingredients",
-    "ingredient": "Ingredient",
+    "searchAndAddIngredients": "Search and add ingredients",
     "amount": "Amount",
     "toggleUnitOfMeasure": "Toggle unit of measure",
     "removeIngredient": "Remove ingredient",

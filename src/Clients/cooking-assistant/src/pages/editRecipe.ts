@@ -57,7 +57,7 @@ export class EditRecipe {
     this.saveButtonText = this.i18n.tr("save");
     this.deleteButtonText = this.i18n.tr("delete");
     this.leaveButtonText = this.i18n.tr("editRecipe.leave");
-    this.addIngredientsInputPlaceholder = this.i18n.tr("editRecipe.ingredient");
+    this.addIngredientsInputPlaceholder = this.i18n.tr("editRecipe.searchAndAddIngredients");
 
     this.eventAggregator.subscribe(AlertEvents.OnHidden, () => {
       this.nameIsInvalid = false;

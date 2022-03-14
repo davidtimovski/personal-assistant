@@ -141,6 +141,9 @@
   <data name="Password" xml:space="preserve">
     <value>Password</value>
   </data>
+  <data name="PleaseSelectLanguage" xml:space="preserve">
+    <value>Please select language</value>
+  </data>
   <data name="Register" xml:space="preserve">
     <value>Register</value>
   </data>

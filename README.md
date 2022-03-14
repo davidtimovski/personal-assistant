@@ -31,8 +31,7 @@ An ecosystem of PWAs that cooperate with each other to provide unique functional
     * Get notifications in shared recipes
 * Send recipes to other users
 * Link ingredients to tasks in To Do Assistant and see whether you have the required ingredients to prepare a meal
-* Set the nutritional values of ingredients and see the nutrition of recipes
-* Set the price of ingredients and see the cost of recipes
+* See the nutrition and cost of recipes
 * Create a dietary profile and track your daily nutrient intake
 
 #### Accountant

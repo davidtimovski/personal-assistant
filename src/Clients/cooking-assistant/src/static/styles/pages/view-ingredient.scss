@@ -17,12 +17,19 @@
     border-top-right-radius: 0;
     list-style-type: none;
 
-    li {
+    li a {
+      display: block;
       padding: 10px 15px;
       line-height: 24px;
+      text-decoration: none;
+      color: var(--regular-color);
 
       &:nth-child(even) {
         background: #eee;
+      }
+
+      &:hover {
+        color: var(--primary-color-dark);
       }
     }
   }

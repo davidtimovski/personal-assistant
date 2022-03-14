@@ -1,5 +1,6 @@
 import { NutritionData } from "./nutritionData";
 import { PriceData } from "./priceData";
+import { SimpleRecipe } from "./simpleRecipe";
 
 export class ViewIngredientModel {
   id: number;
@@ -9,5 +10,5 @@ export class ViewIngredientModel {
   name: string;
   nutritionData: NutritionData;
   priceData: PriceData;
-  recipes: Array<string>;
+  recipes: Array<SimpleRecipe>;
 }

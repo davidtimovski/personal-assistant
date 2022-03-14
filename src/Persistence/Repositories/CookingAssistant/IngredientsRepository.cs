@@ -80,13 +80,16 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
             ingredient.Task = task;
         }
 
-        var recipeNames = conn.Query<string>(@"SELECT ""Name""
-                                               FROM ""CookingAssistant.RecipesIngredients"" AS ri
-                                               LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
-                                               WHERE ri.""IngredientId"" = @IngredientId
-                                               ORDER BY r.""Name""", new { IngredientId = id });
-
-        ingredient.Recipes.AddRange(recipeNames.Select(x => new Recipe { Name = x }));
+        var recipes = conn.Query<Recipe>(@"SELECT ""Id"", ""Name""
+                                           FROM ""CookingAssistant.RecipesIngredients"" AS ri
+                                           INNER JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
+                                           WHERE ri.""IngredientId"" = @IngredientId AND ri.""RecipeId"" IN (
+	                                           SELECT ""Id"" FROM ""CookingAssistant.Recipes"" WHERE ""UserId"" = @UserId
+	                                           UNION ALL
+	                                           SELECT ""RecipeId"" FROM ""CookingAssistant.Shares"" WHERE ""UserId"" = @UserId AND ""IsAccepted""
+                                           )
+                                           ORDER BY r.""Name""", new { IngredientId = id, UserId = userId });
+        ingredient.Recipes.AddRange(recipes);
 
         return ingredient;
     }
@@ -128,13 +131,16 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
             ingredient.Task = task;
         }
 
-        var recipeNames = conn.Query<string>(@"SELECT ""Name""
-                                               FROM ""CookingAssistant.RecipesIngredients"" AS ri
-                                               LEFT JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
-                                               WHERE ri.""IngredientId"" = @IngredientId
-                                               ORDER BY r.""Name""", new { IngredientId = id });
-
-        ingredient.Recipes.AddRange(recipeNames.Select(x => new Recipe { Name = x }));
+        var recipes = conn.Query<Recipe>(@"SELECT ""Id"", ""Name""
+                                           FROM ""CookingAssistant.RecipesIngredients"" AS ri
+                                           INNER JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
+                                           WHERE ri.""IngredientId"" = @IngredientId AND ri.""RecipeId"" IN (
+	                                           SELECT ""Id"" FROM ""CookingAssistant.Recipes"" WHERE ""UserId"" = @UserId
+	                                           UNION ALL
+	                                           SELECT ""RecipeId"" FROM ""CookingAssistant.Shares"" WHERE ""UserId"" = @UserId AND ""IsAccepted""
+                                           )
+                                           ORDER BY r.""Name""", new { IngredientId = id, UserId = userId });
+        ingredient.Recipes.AddRange(recipes);
 
         return ingredient;
     }

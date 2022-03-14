@@ -195,6 +195,9 @@
   <data name="blueberries" xml:space="preserve">
     <value>Blueberries</value>
   </data>
+  <data name="blue_cheese" xml:space="preserve">
+    <value>Blue cheese</value>
+  </data>
   <data name="bow_tie_pasta" xml:space="preserve">
     <value>Bow tie pasta</value>
   </data>
@@ -608,6 +611,9 @@
   </data>
   <data name="pumpkin" xml:space="preserve">
     <value>Pumpkin</value>
+  </data>
+  <data name="pâté" xml:space="preserve">
+    <value>Pâté</value>
   </data>
   <data name="radish" xml:space="preserve">
     <value>Radish</value>

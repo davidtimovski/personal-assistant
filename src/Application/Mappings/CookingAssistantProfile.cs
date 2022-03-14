@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Application.Contracts.Common;
 using Application.Contracts.Common.Models;
@@ -144,14 +143,6 @@ public class DurationResolver : IMemberValueResolver<object, object, TimeSpan?, 
     public string Resolve(object source, object destination, TimeSpan? sourceMember, string destinationMember, ResolutionContext context)
     {
         return sourceMember.HasValue ? sourceMember.Value.ToString(@"hh\:mm") : string.Empty;
-    }
-}
-
-public class RecipeNameResolver : IMemberValueResolver<object, object, List<Recipe>, List<string>>
-{
-    public List<string> Resolve(object source, object destination, List<Recipe> sourceMember, List<string> destinationMember, ResolutionContext context)
-    {
-        return sourceMember.Select(x => x.Name).ToList();
     }
 }
 

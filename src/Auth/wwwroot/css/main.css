@@ -152,17 +152,7 @@ main {
         background: rgba(255, 255, 255, 0.9);
         border-radius: 4px;
         box-shadow: var(--box-shadow);
-        animation: cellFadeIn 1s ease;
     }
-@keyframes cellFadeIn {
-    60% {
-        opacity: 0;
-    }
-
-    100% {
-        opacity: 0.9;
-    }
-}
 
 .cell-wrap .in-development-label {
     color: #aaa;
@@ -252,17 +242,6 @@ main {
     padding: 12% 10%;
     border-radius: 4px;
     box-shadow: var(--box-shadow);
-    animation: fadeIn 1s ease;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
 }
 
 #cookie-consent {
@@ -277,7 +256,7 @@ main {
     background-size: 400% 400%;
     border-radius: var(--border-radius);
     padding: 15px;
-    margin: 30px;
+    margin: 0 30px 30px;
     line-height: 26px;
     text-align: center;
     color: #fff;

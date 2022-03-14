@@ -195,6 +195,9 @@
   <data name="blueberries" xml:space="preserve">
     <value>Боровница</value>
   </data>
+  <data name="blue_cheese" xml:space="preserve">
+    <value>Сино сирење</value>
+  </data>
   <data name="bow_tie_pasta" xml:space="preserve">
     <value>Машна тестенини</value>
   </data>
@@ -608,6 +611,9 @@
   </data>
   <data name="pumpkin" xml:space="preserve">
     <value>Тиква</value>
+  </data>
+  <data name="pâté" xml:space="preserve">
+    <value>Паштета</value>
   </data>
   <data name="radish" xml:space="preserve">
     <value>Ротквица</value>

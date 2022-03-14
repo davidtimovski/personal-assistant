@@ -141,6 +141,9 @@
   <data name="Password" xml:space="preserve">
     <value>Лозинка</value>
   </data>
+  <data name="PleaseSelectLanguage" xml:space="preserve">
+    <value>Изберете јазик</value>
+  </data>
   <data name="Register" xml:space="preserve">
     <value>Регистрирај се</value>
   </data>

@@ -96,7 +96,7 @@
     "description": "Опис",
     "youTubeUrl": "YouTube линк",
     "ingredients": "Состојки",
-    "ingredient": "Состојка",
+    "searchAndAddIngredients": "Пребарај и додади состојки",
     "amount": "Количина",
     "toggleUnitOfMeasure": "Одбери единица мерка",
     "removeIngredient": "Отстрани состојка",
