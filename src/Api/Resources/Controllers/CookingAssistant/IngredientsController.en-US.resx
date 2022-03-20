@@ -225,6 +225,9 @@
   <data name="cabbage" xml:space="preserve">
     <value>Cabbage</value>
   </data>
+  <data name="caesar_sauce" xml:space="preserve">
+    <value>Caesar sauce</value>
+  </data>
   <data name="canola_oil" xml:space="preserve">
     <value>Canola oil</value>
   </data>
@@ -269,6 +272,9 @@
   </data>
   <data name="chicken_broth" xml:space="preserve">
     <value>Chicken broth</value>
+  </data>
+  <data name="chicken_thigh" xml:space="preserve">
+    <value>Chicken thigh</value>
   </data>
   <data name="chicken_wings" xml:space="preserve">
     <value>Chicken wings</value>
@@ -492,6 +498,9 @@
   <data name="milk" xml:space="preserve">
     <value>Milk</value>
   </data>
+  <data name="mixed_meat" xml:space="preserve">
+    <value>Mixed meat</value>
+  </data>
   <data name="mozzarella_cheese" xml:space="preserve">
     <value>Mozzarella cheese</value>
   </data>
@@ -665,6 +674,9 @@
   </data>
   <data name="sausage" xml:space="preserve">
     <value>Sausage</value>
+  </data>
+  <data name="scallions" xml:space="preserve">
+    <value>Scallions</value>
   </data>
   <data name="seafood" xml:space="preserve">
     <value>Seafood</value>

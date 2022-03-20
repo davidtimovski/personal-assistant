@@ -50,7 +50,7 @@ public class RecipeForUpdateIngredient : IMapFrom<RecipeIngredient>
             .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Ingredient.Name))
             .ForMember(x => x.Unit, opt => opt.MapFrom(src => src.Unit))
             .ForMember(x => x.HasNutritionData, opt => opt.MapFrom<RecipeIngredientHasNutritionDataResolver>())
-            .ForMember(x => x.HasPriceData, opt => opt.MapFrom<RecipeIngredientHasNutritionDataResolver>())
+            .ForMember(x => x.HasPriceData, opt => opt.MapFrom<RecipeIngredientHasPriceDataResolver>())
             .ForMember(x => x.IsPublic, opt => opt.MapFrom(src => src.Ingredient.UserId == 1))
             .ForMember(x => x.IsNew, opt => opt.Ignore());
     }

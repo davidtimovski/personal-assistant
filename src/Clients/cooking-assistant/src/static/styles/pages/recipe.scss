@@ -12,7 +12,7 @@
   }
 
   .image {
-    width: 100%;
+    width: calc(100% - 2px);
     border: 1px solid #ddd;
     border-radius: var(--border-radius);
     margin-bottom: 10px;
