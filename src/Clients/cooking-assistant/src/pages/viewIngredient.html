@@ -1,6 +1,7 @@
 <template>
   <require from="../static/styles/pages/view-ingredient.scss"></require>
-  <require from="./../resources/value-converters/number-format"></require>
+  <require from="./../resources/value-converters/grams-number-format"></require>
+  <require from="./../resources/value-converters/milligrams-number-format"></require>
 
   <div class="container">
     <div class="au-animate animate-fade-in animate-fade-out">
@@ -80,71 +81,71 @@
                     <tbody>
                       <tr if.bind="model.nutritionData.calories">
                         <td t="calories">Calories</td>
-                        <td>${model.nutritionData.calories | numberFormat} kcal</td>
+                        <td>${model.nutritionData.calories | gramsNumberFormat} kcal</td>
                       </tr>
                       <tr if.bind="model.nutritionData.fat">
                         <td t="fat">Fat</td>
-                        <td>${model.nutritionData.fat | numberFormat} g</td>
+                        <td>${model.nutritionData.fat | gramsNumberFormat} g</td>
                       </tr>
                       <tr if.bind="model.nutritionData.saturatedFat">
                         <td t="saturatedFat">Saturated fat</td>
-                        <td>${model.nutritionData.saturatedFat | numberFormat} g</td>
+                        <td>${model.nutritionData.saturatedFat | gramsNumberFormat} g</td>
                       </tr>
                       <tr if.bind="model.nutritionData.carbohydrate">
                         <td t="carbohydrate">Carbohydrate</td>
-                        <td>${model.nutritionData.carbohydrate | numberFormat} g</td>
+                        <td>${model.nutritionData.carbohydrate | gramsNumberFormat} g</td>
                       </tr>
                       <tr if.bind="model.nutritionData.sugars">
                         <td t="sugars">Sugars</td>
-                        <td>${model.nutritionData.sugars | numberFormat} g</td>
+                        <td>${model.nutritionData.sugars | gramsNumberFormat} g</td>
                       </tr>
                       <tr if.bind="model.nutritionData.addedSugars">
                         <td t="addedSugars">Added sugars</td>
-                        <td>${model.nutritionData.addedSugars | numberFormat} g</td>
+                        <td>${model.nutritionData.addedSugars | gramsNumberFormat} g</td>
                       </tr>
                       <tr if.bind="model.nutritionData.fiber">
                         <td t="fiber">Fiber</td>
-                        <td>${model.nutritionData.fiber | numberFormat} g</td>
+                        <td>${model.nutritionData.fiber | gramsNumberFormat} g</td>
                       </tr>
                       <tr if.bind="model.nutritionData.protein">
                         <td t="protein">Protein</td>
-                        <td>${model.nutritionData.protein | numberFormat} g</td>
+                        <td>${model.nutritionData.protein | gramsNumberFormat} g</td>
                       </tr>
                       <tr if.bind="model.nutritionData.sodium">
                         <td t="sodium">Sodium</td>
-                        <td>${model.nutritionData.sodium | numberFormat} mg</td>
+                        <td>${model.nutritionData.sodium | milligramsNumberFormat} mg</td>
                       </tr>
                       <tr if.bind="model.nutritionData.cholesterol">
                         <td t="cholesterol">Cholesterol</td>
-                        <td>${model.nutritionData.cholesterol | numberFormat} mg</td>
+                        <td>${model.nutritionData.cholesterol | milligramsNumberFormat} mg</td>
                       </tr>
                       <tr if.bind="model.nutritionData.vitaminA">
                         <td t="vitaminA">Vitamin A</td>
-                        <td>${model.nutritionData.vitaminA | numberFormat} mg</td>
+                        <td>${model.nutritionData.vitaminA | milligramsNumberFormat} mg</td>
                       </tr>
                       <tr if.bind="model.nutritionData.vitaminC">
                         <td t="vitaminC">Vitamin C</td>
-                        <td>${model.nutritionData.vitaminC | numberFormat} mg</td>
+                        <td>${model.nutritionData.vitaminC | milligramsNumberFormat} mg</td>
                       </tr>
                       <tr if.bind="model.nutritionData.vitaminD">
                         <td t="vitaminD">Vitamin D</td>
-                        <td>${model.nutritionData.vitaminD | numberFormat} mg</td>
+                        <td>${model.nutritionData.vitaminD | milligramsNumberFormat} mg</td>
                       </tr>
                       <tr if.bind="model.nutritionData.calcium">
                         <td t="calcium">Calcium</td>
-                        <td>${model.nutritionData.calcium | numberFormat} mg</td>
+                        <td>${model.nutritionData.calcium | milligramsNumberFormat} mg</td>
                       </tr>
                       <tr if.bind="model.nutritionData.iron">
                         <td t="iron">Iron</td>
-                        <td>${model.nutritionData.iron | numberFormat} mg</td>
+                        <td>${model.nutritionData.iron | milligramsNumberFormat} mg</td>
                       </tr>
                       <tr if.bind="model.nutritionData.potassium">
                         <td t="potassium">Potassium</td>
-                        <td>${model.nutritionData.potassium | numberFormat} mg</td>
+                        <td>${model.nutritionData.potassium | milligramsNumberFormat} mg</td>
                       </tr>
                       <tr if.bind="model.nutritionData.magnesium">
                         <td t="magnesium">Magnesium</td>
-                        <td>${model.nutritionData.magnesium | numberFormat} mg</td>
+                        <td>${model.nutritionData.magnesium | milligramsNumberFormat} mg</td>
                       </tr>
                     </tbody>
                   </table>

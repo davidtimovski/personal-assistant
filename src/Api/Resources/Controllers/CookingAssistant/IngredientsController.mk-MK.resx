@@ -225,6 +225,9 @@
   <data name="cabbage" xml:space="preserve">
     <value>Зелка</value>
   </data>
+  <data name="caesar_sauce" xml:space="preserve">
+    <value>Цезар сос</value>
+  </data>
   <data name="canola_oil" xml:space="preserve">
     <value>Масло од канола</value>
   </data>
@@ -269,6 +272,9 @@
   </data>
   <data name="chicken_broth" xml:space="preserve">
     <value>Пилешка супа</value>
+  </data>
+  <data name="chicken_thigh" xml:space="preserve">
+    <value>Пилешки бут/копан</value>
   </data>
   <data name="chicken_wings" xml:space="preserve">
     <value>Пилешки крилца</value>
@@ -492,6 +498,9 @@
   <data name="milk" xml:space="preserve">
     <value>Млеко</value>
   </data>
+  <data name="mixed_meat" xml:space="preserve">
+    <value>Мешано месо</value>
+  </data>
   <data name="mozzarella_cheese" xml:space="preserve">
     <value>Моцарела сирење</value>
   </data>
@@ -665,6 +674,9 @@
   </data>
   <data name="sausage" xml:space="preserve">
     <value>Колбас</value>
+  </data>
+  <data name="scallions" xml:space="preserve">
+    <value>Млад кромид</value>
   </data>
   <data name="seafood" xml:space="preserve">
     <value>Морска храна</value>

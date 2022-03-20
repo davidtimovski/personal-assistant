@@ -32,6 +32,8 @@ public class UpcomingExpensesRepository : BaseRepository, IUpcomingExpensesRepos
 
     public async Task<int> CreateAsync(UpcomingExpense upcomingExpense)
     {
+        upcomingExpense.Date = upcomingExpense.Date.ToUniversalTime();
+
         EFContext.UpcomingExpenses.Add(upcomingExpense);
         await EFContext.SaveChangesAsync();
         return upcomingExpense.Id;

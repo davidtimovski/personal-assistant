@@ -1,7 +1,8 @@
 <template>
   <require from="../static/styles/pages/recipe.scss"></require>
   <require from="./../resources/value-converters/time-format"></require>
-  <require from="./../resources/value-converters/number-format"></require>
+  <require from="./../resources/value-converters/grams-number-format"></require>
+  <require from="./../resources/value-converters/milligrams-number-format"></require>
   <require from="./../resources/value-converters/money-format"></require>
   <require from="./../resources/elements/ingredient-amount"></require>
   <require from="./../resources/elements/servings-selector"></require>
@@ -107,7 +108,7 @@
                 <div if.bind="model.nutritionSummary.calories" class="nutrition-row">
                   <div class="nutrition-row-quantity">
                     <div t="calories">Calories</div>
-                    <div>${model.nutritionSummary.calories | numberFormat} kcal</div>
+                    <div>${model.nutritionSummary.calories | gramsNumberFormat} kcal</div>
                   </div>
                   <div class="nutrition-row-progress-wrap">
                     <div if.bind="model.nutritionSummary.caloriesFromDaily"
@@ -119,7 +120,7 @@
                 <div if.bind="model.nutritionSummary.fat" class="nutrition-row">
                   <div class="nutrition-row-quantity">
                     <div t="fat">Fat</div>
-                    <div>${model.nutritionSummary.fat | numberFormat} g</div>
+                    <div>${model.nutritionSummary.fat | gramsNumberFormat} g</div>
                   </div>
                   <div class="nutrition-row-progress-wrap"></div>
                 </div>
@@ -127,7 +128,7 @@
                 <div if.bind="model.nutritionSummary.saturatedFat" class="nutrition-row">
                   <div class="nutrition-row-quantity">
                     <div t="saturatedFat">Saturated fat</div>
-                    <div>${model.nutritionSummary.saturatedFat | numberFormat} g</div>
+                    <div>${model.nutritionSummary.saturatedFat | gramsNumberFormat} g</div>
                   </div>
                   <div class="nutrition-row-progress-wrap">
                     <div if.bind="model.nutritionSummary.saturatedFatFromDaily"
@@ -139,7 +140,7 @@
                 <div if.bind="model.nutritionSummary.carbohydrate" class="nutrition-row">
                   <div class="nutrition-row-quantity">
                     <div t="carbohydrate">Carbohydrate</div>
-                    <div>${model.nutritionSummary.carbohydrate | numberFormat} g</div>
+                    <div>${model.nutritionSummary.carbohydrate | gramsNumberFormat} g</div>
                   </div>
                   <div class="nutrition-row-progress-wrap">
                     <div if.bind="model.nutritionSummary.carbohydrateFromDaily"
@@ -151,7 +152,7 @@
                 <div if.bind="model.nutritionSummary.sugars" class="nutrition-row">
                   <div class="nutrition-row-quantity">
                     <div t="sugars">Sugars</div>
-                    <div>${model.nutritionSummary.sugars | numberFormat} g</div>
+                    <div>${model.nutritionSummary.sugars | gramsNumberFormat} g</div>
                   </div>
                   <div class="nutrition-row-progress-wrap">
                     <div if.bind="model.nutritionSummary.sugarsFromDaily"
@@ -163,7 +164,7 @@
                 <div if.bind="model.nutritionSummary.addedSugars" class="nutrition-row">
                   <div class="nutrition-row-quantity">
                     <div t="addedSugars">Added sugars</div>
-                    <div>${model.nutritionSummary.addedSugars | numberFormat} g</div>
+                    <div>${model.nutritionSummary.addedSugars | gramsNumberFormat} g</div>
                   </div>
                   <div class="nutrition-row-progress-wrap">
                     <div if.bind="model.nutritionSummary.addedSugarsFromDaily"
@@ -175,7 +176,7 @@
                 <div if.bind="model.nutritionSummary.fiber" class="nutrition-row">
                   <div class="nutrition-row-quantity">
                     <div t="fiber">Fiber</div>
-                    <div>${model.nutritionSummary.fiber | numberFormat} g</div>
+                    <div>${model.nutritionSummary.fiber | gramsNumberFormat} g</div>
                   </div>
                   <div class="nutrition-row-progress-wrap">
                     <div if.bind="model.nutritionSummary.fiberFromDaily"
@@ -187,7 +188,7 @@
                 <div if.bind="model.nutritionSummary.protein" class="nutrition-row">
                   <div class="nutrition-row-quantity">
                     <div t="protein">Protein</div>
-                    <div>${model.nutritionSummary.protein | numberFormat} g</div>
+                    <div>${model.nutritionSummary.protein | gramsNumberFormat} g</div>
                   </div>
                   <div class="nutrition-row-progress-wrap">
                     <div if.bind="model.nutritionSummary.proteinFromDaily"
@@ -199,7 +200,7 @@
                 <div if.bind="model.nutritionSummary.sodium" class="nutrition-row">
                   <div class="nutrition-row-quantity">
                     <div t="sodium">Sodium</div>
-                    <div>${model.nutritionSummary.sodium | numberFormat} mg</div>
+                    <div>${model.nutritionSummary.sodium | milligramsNumberFormat} mg</div>
                   </div>
                   <div class="nutrition-row-progress-wrap">
                     <div if.bind="model.nutritionSummary.sodiumFromDaily"
@@ -211,7 +212,7 @@
                 <div if.bind="model.nutritionSummary.cholesterol" class="nutrition-row">
                   <div class="nutrition-row-quantity">
                     <div t="cholesterol">Cholesterol</div>
-                    <div>${model.nutritionSummary.cholesterol | numberFormat} mg</div>
+                    <div>${model.nutritionSummary.cholesterol | milligramsNumberFormat} mg</div>
                   </div>
                   <div class="nutrition-row-progress-wrap">
                     <div if.bind="model.nutritionSummary.cholesterolFromDaily"
@@ -223,7 +224,7 @@
                 <div if.bind="model.nutritionSummary.vitaminA" class="nutrition-row">
                   <div class="nutrition-row-quantity">
                     <div t="vitaminA">Vitamin A</div>
-                    <div>${model.nutritionSummary.vitaminA | numberFormat} mg</div>
+                    <div>${model.nutritionSummary.vitaminA | milligramsNumberFormat} mg</div>
                   </div>
                   <div class="nutrition-row-progress-wrap">
                     <div if.bind="model.nutritionSummary.vitaminAFromDaily"
@@ -235,7 +236,7 @@
                 <div if.bind="model.nutritionSummary.vitaminC" class="nutrition-row">
                   <div class="nutrition-row-quantity">
                     <div t="vitaminC">Vitamin C</div>
-                    <div>${model.nutritionSummary.vitaminC | numberFormat} mg</div>
+                    <div>${model.nutritionSummary.vitaminC | milligramsNumberFormat} mg</div>
                   </div>
                   <div class="nutrition-row-progress-wrap">
                     <div if.bind="model.nutritionSummary.vitaminCFromDaily"
@@ -247,7 +248,7 @@
                 <div if.bind="model.nutritionSummary.vitaminD" class="nutrition-row">
                   <div class="nutrition-row-quantity">
                     <div t="vitaminD">Vitamin D</div>
-                    <div>${model.nutritionSummary.vitaminD | numberFormat} mg</div>
+                    <div>${model.nutritionSummary.vitaminD | milligramsNumberFormat} mg</div>
                   </div>
                   <div class="nutrition-row-progress-wrap">
                     <div if.bind="model.nutritionSummary.vitaminDFromDaily"
@@ -259,7 +260,7 @@
                 <div if.bind="model.nutritionSummary.calcium" class="nutrition-row">
                   <div class="nutrition-row-quantity">
                     <div t="calcium">Calcium</div>
-                    <div>${model.nutritionSummary.calcium | numberFormat} mg</div>
+                    <div>${model.nutritionSummary.calcium | milligramsNumberFormat} mg</div>
                   </div>
                   <div class="nutrition-row-progress-wrap">
                     <div if.bind="model.nutritionSummary.calciumFromDaily"
@@ -271,7 +272,7 @@
                 <div if.bind="model.nutritionSummary.iron" class="nutrition-row">
                   <div class="nutrition-row-quantity">
                     <div t="iron">Iron</div>
-                    <div>${model.nutritionSummary.iron | numberFormat} mg</div>
+                    <div>${model.nutritionSummary.iron | milligramsNumberFormat} mg</div>
                   </div>
                   <div class="nutrition-row-progress-wrap">
                     <div if.bind="model.nutritionSummary.ironFromDaily"
@@ -283,7 +284,7 @@
                 <div if.bind="model.nutritionSummary.potassium" class="nutrition-row">
                   <div class="nutrition-row-quantity">
                     <div t="potassium">Potassium</div>
-                    <div>${model.nutritionSummary.potassium | numberFormat} mg</div>
+                    <div>${model.nutritionSummary.potassium | milligramsNumberFormat} mg</div>
                   </div>
                   <div class="nutrition-row-progress-wrap">
                     <div if.bind="model.nutritionSummary.potassiumFromDaily"
@@ -295,7 +296,7 @@
                 <div if.bind="model.nutritionSummary.magnesium" class="nutrition-row">
                   <div class="nutrition-row-quantity">
                     <div t="magnesium">Magnesium</div>
-                    <div>${model.nutritionSummary.magnesium | numberFormat} mg</div>
+                    <div>${model.nutritionSummary.magnesium | milligramsNumberFormat} mg</div>
                   </div>
                   <div class="nutrition-row-progress-wrap">
                     <div if.bind="model.nutritionSummary.magnesiumFromDaily"

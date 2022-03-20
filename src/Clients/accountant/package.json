@@ -1,7 +1,7 @@
 {
   "name": "accountant",
   "description": "Your very own Accountant.",
-  "version": "1.18.4",
+  "version": "1.18.5",
   "repository": {
     "type": "git",
     "url": "https://github.com/davidtimovski/personal-assistant"
