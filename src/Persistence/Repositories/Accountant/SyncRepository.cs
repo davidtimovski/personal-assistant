@@ -14,7 +14,17 @@ public class SyncRepository : BaseRepository, ISyncRepository
     {
         EFContext.Accounts.AddRange(accounts);
         EFContext.Categories.AddRange(categories);
+
+        foreach (var transaction in transactions)
+        {
+            transaction.Date = transaction.Date.ToUniversalTime();
+        }
         EFContext.Transactions.AddRange(transactions);
+
+        foreach (var upcomingExpense in upcomingExpenses)
+        {
+            upcomingExpense.Date = upcomingExpense.Date.ToUniversalTime();
+        }
         EFContext.UpcomingExpenses.AddRange(upcomingExpenses);
         EFContext.Debts.AddRange(debts);
 

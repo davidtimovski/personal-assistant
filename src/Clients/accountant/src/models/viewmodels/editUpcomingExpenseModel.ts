@@ -1,3 +1,5 @@
+import { DateHelper } from "../../../../shared/src/utils/dateHelper";
+
 export class EditUpcomingExpenseModel {
   month: number;
   year: number;
@@ -20,6 +22,6 @@ export class EditUpcomingExpenseModel {
   }
 
   getDate() {
-    return `${this.year}-${this.month + 1}-01`;
+    return DateHelper.format(new Date(this.year, this.month, 1));
   }
 }
