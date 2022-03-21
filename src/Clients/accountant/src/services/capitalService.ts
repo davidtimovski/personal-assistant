@@ -109,9 +109,7 @@ export class CapitalService {
             new DebtDashboard(debtItem.person, debtItem.userIsDebtor, trimmedDescription, debtItem.amount)
           );
         }
-        capital.debt = debtDashboard.sort((a: DebtDashboard, b: DebtDashboard) => {
-          return b.amount - a.amount;
-        });
+        capital.debt = debtDashboard;
 
         resolve();
       });

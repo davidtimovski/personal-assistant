@@ -9,7 +9,11 @@ export class DebtsIDBHelper {
   constructor(private readonly db: IDBContext) {}
 
   async getAll(): Promise<Array<DebtModel>> {
-    return await this.db.debts.toArray();
+    const debts = await this.db.debts.toArray();
+
+    return debts.sort((a: DebtModel, b: DebtModel) => {
+      return b.amount - a.amount;
+    });
   }
 
   async get(id: number): Promise<DebtModel> {
@@ -55,9 +59,7 @@ export class DebtsIDBHelper {
   async getForSyncing(): Promise<Array<DebtModel>> {
     const debts = this.db.debts.toCollection();
 
-    return debts
-      .filter(d => !d.synced)
-      .toArray();
+    return debts.filter((d) => !d.synced).toArray();
   }
 
   async consolidate(debtIdPairs: Array<CreatedIdPair>) {

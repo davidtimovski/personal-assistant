@@ -9,38 +9,40 @@ export class UpcomingExpensesIDBHelper {
   constructor(private readonly db: IDBContext) {}
 
   async getAll(): Promise<Array<UpcomingExpense>> {
-    const upcomingExpenses = await this.db.upcomingExpenses
-      .orderBy("date")
-      .toArray();
+    const upcomingExpenses = await this.db.upcomingExpenses.toArray();
 
     for (const upcomingExpense of upcomingExpenses) {
       if (upcomingExpense.categoryId) {
-        const category = await this.db.categories.get(
-          upcomingExpense.categoryId
-        );
+        const category = await this.db.categories.get(upcomingExpense.categoryId);
         upcomingExpense.categoryName = category.name;
       }
     }
 
-    return upcomingExpenses;
+    return upcomingExpenses.sort((a: UpcomingExpense, b: UpcomingExpense) => {
+      const aDate = new Date(a.date);
+      const bDate = new Date(b.date);
+      if (aDate > bDate) return 1;
+      if (aDate < bDate) return -1;
+
+      return b.amount - a.amount;
+    });
   }
 
   async getAllForMonth(): Promise<Array<UpcomingExpense>> {
     const month = new Date().getMonth();
 
     const upcomingExpenses = await this.db.upcomingExpenses
-      .orderBy("date")
-      .filter(x => new Date(x.date).getMonth() === month)
+      .filter((x) => new Date(x.date).getMonth() === month)
       .toArray();
 
     const categories = await this.db.categories.toArray();
 
     for (const upcomingExpense of upcomingExpenses) {
       if (upcomingExpense.categoryId) {
-        const category = categories.find(x => x.id === upcomingExpense.categoryId);
+        const category = categories.find((x) => x.id === upcomingExpense.categoryId);
 
         if (category.parentId) {
-          const parent = categories.find(x => x.id === category.parentId);
+          const parent = categories.find((x) => x.id === category.parentId);
           upcomingExpense.categoryName = `${parent.name}/${category.name}`;
         } else {
           upcomingExpense.categoryName = category.name;
@@ -76,10 +78,7 @@ export class UpcomingExpensesIDBHelper {
     await this.db.upcomingExpenses.delete(id);
   }
 
-  async sync(
-    deletedUpcomingExpenseIds: Array<number>,
-    upcomingExpenses: Array<UpcomingExpense>
-  ) {
+  async sync(deletedUpcomingExpenseIds: Array<number>, upcomingExpenses: Array<UpcomingExpense>) {
     await this.db.transaction("rw", this.db.upcomingExpenses, async () => {
       if (deletedUpcomingExpenseIds.length > 0) {
         await this.db.upcomingExpenses.bulkDelete(deletedUpcomingExpenseIds);
@@ -87,6 +86,7 @@ export class UpcomingExpensesIDBHelper {
 
       if (upcomingExpenses.length > 0) {
         for (const upcomingExpense of upcomingExpenses) {
+          upcomingExpense.date = upcomingExpense.date.split("T")[0];
           upcomingExpense.synced = true;
         }
         await this.db.upcomingExpenses.bulkPut(upcomingExpenses);
@@ -97,9 +97,7 @@ export class UpcomingExpensesIDBHelper {
   async getForSyncing(): Promise<Array<UpcomingExpense>> {
     const upcomingExpenses = this.db.upcomingExpenses.toCollection();
 
-    return upcomingExpenses
-      .filter(x => !x.synced)
-      .toArray();
+    return upcomingExpenses.filter((x) => !x.synced).toArray();
   }
 
   async consolidate(upcomingExpenseIdPairs: Array<CreatedIdPair>) {
@@ -109,13 +107,12 @@ export class UpcomingExpensesIDBHelper {
 
     await this.db.transaction("rw", this.db.upcomingExpenses, async () => {
       for (const upcomingExpenseIdPair of upcomingExpenseIdPairs) {
-        const upcomingExpense = await this.db.upcomingExpenses.get(
-          upcomingExpenseIdPair.localId
-        );
+        const upcomingExpense = await this.db.upcomingExpenses.get(upcomingExpenseIdPair.localId);
 
         await this.db.upcomingExpenses.delete(upcomingExpenseIdPair.localId);
 
         upcomingExpense.id = upcomingExpenseIdPair.id;
+        upcomingExpense.date = upcomingExpense.date.split("T")[0];
         upcomingExpense.synced = true;
         await this.db.upcomingExpenses.add(upcomingExpense);
       }
@@ -127,16 +124,14 @@ export class UpcomingExpensesIDBHelper {
     const startOfMonth = new Date(now.getFullYear(), 0, 1, 0, 0, 0);
 
     const upcomingExpensesToDelete = await this.db.upcomingExpenses
-      .filter(x => new Date(x.date) < startOfMonth)
+      .filter((x) => new Date(x.date) < startOfMonth)
       .toArray();
 
     if (upcomingExpensesToDelete.length > 0) {
       await this.db.transaction("rw", this.db.upcomingExpenses, async () => {
         const deletePromises = Array<Promise<void>>();
         for (const upcomingExpense of upcomingExpensesToDelete) {
-          deletePromises.push(
-            this.db.upcomingExpenses.delete(upcomingExpense.id)
-          );
+          deletePromises.push(this.db.upcomingExpenses.delete(upcomingExpense.id));
         }
         await Promise.all(deletePromises);
       });
