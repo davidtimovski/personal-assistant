@@ -16,7 +16,7 @@
     "aurelia-validation": "^1.4.0",
     "autocompleter": "^6.1.2",
     "chart.js": "^3.5.1",
-    "dexie": "^3.0.3",
+    "dexie": "^3.2.2",
     "oidc-client": "^1.11.5"
   },
   "devDependencies": {
