@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
-using FluentValidation;
-using FluentValidation.Results;
 using Application.Contracts.Common;
 using Application.Contracts.Common.Models;
 using Application.Contracts.ToDoAssistant.Lists;
 using Application.Contracts.ToDoAssistant.Tasks;
 using Application.Contracts.ToDoAssistant.Tasks.Models;
+using Application.Utils;
+using AutoMapper;
 using Domain.Entities.ToDoAssistant;
+using FluentValidation;
 
 namespace Application.Services.ToDoAssistant;
 
@@ -98,7 +98,7 @@ public class TaskService : ITaskService
 
     public async Task<CreatedTaskResult> CreateAsync(CreateTask model, IValidator<CreateTask> validator)
     {
-        ValidateAndThrow(model, validator);
+        ValidationUtil.ValidOrThrow(model, validator);
 
         var task = _mapper.Map<ToDoTask>(model);
 
@@ -136,7 +136,7 @@ public class TaskService : ITaskService
 
     public async Task<BulkCreateResult> BulkCreateAsync(BulkCreate model, IValidator<BulkCreate> validator)
     {
-        ValidateAndThrow(model, validator);
+        ValidationUtil.ValidOrThrow(model, validator);
 
         var now = DateTime.UtcNow;
 
@@ -182,7 +182,7 @@ public class TaskService : ITaskService
 
     public async Task<UpdateTaskResult> UpdateAsync(UpdateTask model, IValidator<UpdateTask> validator)
     {
-        ValidateAndThrow(model, validator);
+        ValidationUtil.ValidOrThrow(model, validator);
 
         var task = _mapper.Map<ToDoTask>(model);
 
@@ -364,14 +364,5 @@ public class TaskService : ITaskService
 
         var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
         return new ReorderTaskResult(list.Id, notifySignalR);
-    }
-
-    private static void ValidateAndThrow<T>(T model, IValidator<T> validator)
-    {
-        ValidationResult result = validator.Validate(model);
-        if (!result.IsValid)
-        {
-            throw new ValidationException(result.Errors);
-        }
     }
 }

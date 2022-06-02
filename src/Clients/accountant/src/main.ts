@@ -21,6 +21,7 @@ export function configure(aurelia: Aurelia) {
     .plugin(PLATFORM.moduleName("aurelia-animator-css"))
     .plugin(PLATFORM.moduleName("aurelia-validation"))
     .plugin(PLATFORM.moduleName("aurelia-store"), { initialState })
+    .plugin(PLATFORM.moduleName("@appex/aurelia-dompurify"))
     .plugin(PLATFORM.moduleName("aurelia-i18n"), (instance) => {
       const aliases = ["t", "i18n"];
 

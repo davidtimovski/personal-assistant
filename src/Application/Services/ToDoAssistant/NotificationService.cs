@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using Application.Contracts.ToDoAssistant.Notifications;
 using Application.Contracts.ToDoAssistant.Notifications.Models;
+using AutoMapper;
 using Domain.Entities.ToDoAssistant;
 
 namespace Application.Services.ToDoAssistant;

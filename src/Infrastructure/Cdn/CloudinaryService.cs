@@ -5,12 +5,12 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Application.Contracts.Common;
+using Application.Contracts.Common.Models;
+using Application.Utils;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using FluentValidation;
-using FluentValidation.Results;
-using Application.Contracts.Common;
-using Application.Contracts.Common.Models;
 
 namespace Infrastructure.Cdn;
 
@@ -87,7 +87,7 @@ public class CloudinaryService : ICdnService
 
     public async Task<string> UploadTempAsync(UploadTempImage model, IValidator<UploadTempImage> validator)
     {
-        ValidateAndThrow(model, validator);
+        ValidationUtil.ValidOrThrow(model, validator);
 
         string extension = Path.GetExtension(model.FileName);
 
@@ -310,14 +310,5 @@ public class CloudinaryService : ICdnService
 
         return new string(Enumerable.Repeat(chars, 6)
             .Select(s => s[random.Next(s.Length)]).ToArray());
-    }
-
-    private static void ValidateAndThrow<T>(T model, IValidator<T> validator)
-    {
-        ValidationResult result = validator.Validate(model);
-        if (!result.IsValid)
-        {
-            throw new ValidationException(result.Errors);
-        }
     }
 }

@@ -287,7 +287,6 @@ public class AccountController : Controller
         var callbackUrl = Url.Action("confirm-email", "Account", new { userId = user.Id, token, returnUrl }, HttpContext.Request.Scheme);
         await _emailTemplateService.EnqueueRegisterConfirmationEmailAsync(user.Name, user.Email, new Uri(callbackUrl), model.Language);
 
-        // Notify admin
         _ = _emailTemplateService.EnqueueNewRegistrationEmailAsync(user.Name, user.Email);
 
         SetLanguageCookie(model.Language);
@@ -315,7 +314,6 @@ public class AccountController : Controller
         await CreateRequiredDataAsync(user.Id);
         await CreateSamplesAsync(user.Id);
 
-        // Notify admin
         _ = _emailTemplateService.EnqueueNewEmailVerificationEmailAsync(user.Name, user.Email);
 
         return RedirectToAction(nameof(Login), new { returnUrl, alert = LoginAlert.RegistrationConfirmed });

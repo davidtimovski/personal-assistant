@@ -246,10 +246,10 @@
 
           <ul>
             <li repeat.for="summaryItem of summaryItems">
-              <span innerhtml.bind="summaryItem.contentHtml"></span>
+              <span innerHTML.bind="summaryItem.contentHtml | dompurify"></span>
 
               <ul if.bind="summaryItem.children.length > 0">
-                <li repeat.for="childItem of summaryItem.children" innerhtml.bind="childItem.contentHtml"></li>
+                <li repeat.for="childItem of summaryItem.children" innerHTML.bind="childItem.contentHtml | dompurify"></li>
               </ul>
             </li>
           </ul>

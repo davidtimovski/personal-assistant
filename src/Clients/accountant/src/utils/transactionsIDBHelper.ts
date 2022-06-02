@@ -422,19 +422,6 @@ export class TransactionsIDBHelper {
     });
   }
 
-  async createMultiple(...transactions: TransactionModel[]): Promise<void> {
-    let id = await this.generateId();
-
-    for (const transaction of transactions) {
-      if (!transaction.synced) {
-        transaction.id = id;
-        id++;
-      }
-    }
-
-    await this.db.transactions.bulkAdd(transactions);
-  }
-
   async update(transaction: TransactionModel): Promise<void> {
     await this.db.transactions.update(transaction.id, transaction);
   }

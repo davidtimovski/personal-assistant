@@ -6,10 +6,10 @@ using Application.Contracts.CookingAssistant.Common;
 using Application.Contracts.CookingAssistant.DietaryProfiles;
 using Application.Contracts.CookingAssistant.DietaryProfiles.Models;
 using Application.Contracts.CookingAssistant.Recipes.Models;
+using Application.Utils;
 using AutoMapper;
 using Domain.Entities.CookingAssistant;
 using FluentValidation;
-using FluentValidation.Results;
 using Microsoft.Extensions.Options;
 using Utility;
 
@@ -53,7 +53,7 @@ public class DietaryProfileService : IDietaryProfileService
 
     public RecommendedDailyIntake GetRecommendedDailyIntake(GetRecommendedDailyIntake model, IValidator<GetRecommendedDailyIntake> validator)
     {
-        ValidateAndThrow(model, validator);
+        ValidationUtil.ValidOrThrow(model, validator);
 
         IEnumerable<DailyIntakeAgeGroup> intakeByGender = model.Gender == "Male" ? _dailyIntakeRef.Male : _dailyIntakeRef.Female;
         short age = model.GetAge();
@@ -418,7 +418,7 @@ public class DietaryProfileService : IDietaryProfileService
 
     public async Task CreateOrUpdateAsync(UpdateDietaryProfile model, IValidator<UpdateDietaryProfile> validator)
     {
-        ValidateAndThrow(model, validator);
+        ValidationUtil.ValidOrThrow(model, validator);
 
         var dietaryProfile = _mapper.Map<DietaryProfile>(model);
 
@@ -573,15 +573,6 @@ public class DietaryProfileService : IDietaryProfileService
             }
 
             return "terrible";
-        }
-    }
-
-    private static void ValidateAndThrow<T>(T model, IValidator<T> validator)
-    {
-        ValidationResult result = validator.Validate(model);
-        if (!result.IsValid)
-        {
-            throw new ValidationException(result.Errors);
         }
     }
 }

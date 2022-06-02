@@ -461,25 +461,26 @@ public class RecipesController : Controller
 
         foreach (int removedUserId in dto.RemovedShares)
         {
-            // Notify
-            if (_recipeService.CheckIfUserCanBeNotifiedOfRecipeChange(dto.RecipeId, removedUserId))
+            if (!_recipeService.CheckIfUserCanBeNotifiedOfRecipeChange(dto.RecipeId, removedUserId))
             {
-                var currentUser = _userService.Get(dto.UserId);
-                var user = _userService.Get(removedUserId);
-                RecipeToNotify recipe = _recipeService.Get(dto.RecipeId);
-
-                CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
-                var message = _localizer["RemovedShareNotification", IdentityHelper.GetUserName(User), recipe.Name];
-
-                var pushNotification = new CookingAssistantPushNotification
-                {
-                    SenderImageUri = currentUser.ImageUri,
-                    UserId = user.Id,
-                    Message = message
-                };
-
-                _senderService.Enqueue(pushNotification);
+                continue;
             }
+
+            var currentUser = _userService.Get(dto.UserId);
+            var user = _userService.Get(removedUserId);
+            RecipeToNotify recipe = _recipeService.Get(dto.RecipeId);
+
+            CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
+            var message = _localizer["RemovedShareNotification", IdentityHelper.GetUserName(User), recipe.Name];
+
+            var pushNotification = new CookingAssistantPushNotification
+            {
+                SenderImageUri = currentUser.ImageUri,
+                UserId = user.Id,
+                Message = message
+            };
+
+            _senderService.Enqueue(pushNotification);
         }
 
         await _recipeService.ShareAsync(dto, _shareValidator);

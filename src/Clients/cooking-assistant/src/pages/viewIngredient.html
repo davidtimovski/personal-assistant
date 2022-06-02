@@ -165,7 +165,7 @@
                       <tr>
                         <td>
                           <span t="viewIngredient.pricePer">Price per</span>
-                          <span if.bind="model.priceData.productSizeIsOneUnit" t="viewIngredient.oneUnit">one unit</span>
+                          <span if.bind="model.priceData.productSizeIsOneUnit" t="viewIngredient.unit">unit</span>
                           <span else>${model.priceData.productSize} g</span>
                         </td>
                         <td>${model.priceData.price} ${model.priceData.currency}</td>

@@ -81,7 +81,7 @@
             <span class="side inactive">
               <i class="fas fa-info-circle"></i>
             </span>
-            <div class="alert-message danger" innerhtml="${similarTasksMessageText | sanitizeHTML}"></div>
+            <div class="alert-message danger" innerHTML.bind="similarTasksMessageText | dompurify"></div>
             <a click.delegate="create()" class="side" t="[title,aria-label]list.add">
               <i class="fas fa-check-circle"></i>
             </a>

@@ -84,7 +84,7 @@
             <span t="[html]editTask.taskUsedAsIngredientInRecipes"></span>
             <br />
             <br />
-            <span innerhtml="${recipesText | sanitizeHTML}"></span>.
+            <span innerHTML.bind="recipesText | dompurify"></span>.
             <br />
             <br />
             <span t="[html]editTask.deletingItWillUnlinkIt"></span>

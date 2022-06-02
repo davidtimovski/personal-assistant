@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
-using FluentValidation;
-using FluentValidation.Results;
 using Application.Contracts.Common;
 using Application.Contracts.Common.Models;
 using Application.Contracts.ToDoAssistant.Lists;
 using Application.Contracts.ToDoAssistant.Lists.Models;
 using Application.Contracts.ToDoAssistant.Notifications;
 using Application.Contracts.ToDoAssistant.Tasks;
+using Application.Utils;
+using AutoMapper;
 using Domain.Entities.Common;
 using Domain.Entities.ToDoAssistant;
+using FluentValidation;
 
 namespace Application.Services.ToDoAssistant;
 
@@ -200,7 +200,7 @@ public class ListService : IListService
 
     public async Task<int> CreateAsync(CreateList model, IValidator<CreateList> validator)
     {
-        ValidateAndThrow(model, validator);
+        ValidationUtil.ValidOrThrow(model, validator);
 
         var list = _mapper.Map<ToDoList>(model);
 
@@ -263,7 +263,7 @@ public class ListService : IListService
 
     public async Task<UpdateListResult> UpdateAsync(UpdateList model, IValidator<UpdateList> validator)
     {
-        ValidateAndThrow(model, validator);
+        ValidationUtil.ValidOrThrow(model, validator);
 
         var list = _mapper.Map<ToDoList>(model);
 
@@ -305,7 +305,7 @@ public class ListService : IListService
 
     public async Task UpdateSharedAsync(UpdateSharedList model, IValidator<UpdateSharedList> validator)
     {
-        ValidateAndThrow(model, validator);
+        ValidationUtil.ValidOrThrow(model, validator);
 
         var list = _mapper.Map<ToDoList>(model);
 
@@ -341,7 +341,7 @@ public class ListService : IListService
 
     public async Task ShareAsync(ShareList model, IValidator<ShareList> validator)
     {
-        ValidateAndThrow(model, validator);
+        ValidationUtil.ValidOrThrow(model, validator);
 
         var now = DateTime.UtcNow;
 
@@ -417,7 +417,7 @@ public class ListService : IListService
 
     public async Task<int> CopyAsync(CopyList model, IValidator<CopyList> validator)
     {
-        ValidateAndThrow(model, validator);
+        ValidationUtil.ValidOrThrow(model, validator);
 
         var list = _mapper.Map<ToDoList>(model);
 
@@ -498,14 +498,5 @@ public class ListService : IListService
         }
 
         await _listsRepository.ReorderAsync(id, userId, oldOrder, newOrder, DateTime.UtcNow);
-    }
-
-    private static void ValidateAndThrow<T>(T model, IValidator<T> validator)
-    {
-        ValidationResult result = validator.Validate(model);
-        if (!result.IsValid)
-        {
-            throw new ValidationException(result.Errors);
-        }
     }
 }
