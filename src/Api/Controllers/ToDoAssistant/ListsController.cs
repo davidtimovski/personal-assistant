@@ -401,30 +401,31 @@ public class ListsController : Controller
             return Unauthorized();
         }
 
-        // Notify
         foreach (ShareUserAndPermission removedShare in dto.RemovedShares)
         {
-            if (_listService.CheckIfUserCanBeNotifiedOfChange(dto.ListId, removedShare.UserId))
+            if (!_listService.CheckIfUserCanBeNotifiedOfChange(dto.ListId, removedShare.UserId))
             {
-                var currentUser = _userService.Get(dto.UserId);
-                var user = _userService.Get(removedShare.UserId);
-                SimpleList list = _listService.Get(dto.ListId);
-
-                CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
-                var message = _localizer["RemovedShareNotification", IdentityHelper.GetUserName(User), list.Name];
-
-                var createNotificationDto = new CreateOrUpdateNotification(user.Id, dto.UserId, null, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
-                {
-                    SenderImageUri = currentUser.ImageUri,
-                    UserId = user.Id,
-                    Message = message,
-                    OpenUrl = GetNotificationsPageUrl(notificationId)
-                };
-
-                _senderService.Enqueue(toDoAssistantPushNotification);
+                continue;
             }
+
+            var currentUser = _userService.Get(dto.UserId);
+            var user = _userService.Get(removedShare.UserId);
+            SimpleList list = _listService.Get(dto.ListId);
+
+            CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
+            var message = _localizer["RemovedShareNotification", IdentityHelper.GetUserName(User), list.Name];
+
+            var createNotificationDto = new CreateOrUpdateNotification(user.Id, dto.UserId, null, null, message);
+            var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+            var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+            {
+                SenderImageUri = currentUser.ImageUri,
+                UserId = user.Id,
+                Message = message,
+                OpenUrl = GetNotificationsPageUrl(notificationId)
+            };
+
+            _senderService.Enqueue(toDoAssistantPushNotification);
         }
 
         await _listService.ShareAsync(dto, _shareValidator);

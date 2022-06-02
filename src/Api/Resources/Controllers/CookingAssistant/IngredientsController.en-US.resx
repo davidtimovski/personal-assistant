@@ -444,6 +444,9 @@
   <data name="honey" xml:space="preserve">
     <value>Honey</value>
   </data>
+  <data name="hot_dog_bun" xml:space="preserve">
+    <value>Hot dog bun</value>
+  </data>
   <data name="italian_seasoning" xml:space="preserve">
     <value>Italian seasoning</value>
   </data>

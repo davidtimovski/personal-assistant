@@ -25,7 +25,7 @@
             class="notification ${notification.id === getHighlightedId ? 'highlighted' : ''} ${notification.listId ? 'openable' : ''}">
             <img class="notification-image" src.bind="notification.userImageUri" t="[alt]profilePicture" />
             <div class="notification-content">
-              <div class="name" innerhtml.bind="notification.message"></div>
+              <div class="name" innerHTML.bind="notification.message | dompurify"></div>
               <div class="notification-time">${notification.formattedCreatedDate}</div>
             </div>
           </div>
@@ -53,7 +53,7 @@
                 class="notification ${notification.id === getHighlightedId ? 'highlighted' : ''} ${notification.listId ? 'openable' : ''}">
                 <img class="notification-image" src.bind="notification.userImageUri" t="[alt]profilePicture" />
                 <div class="notification-content">
-                  <div class="name" innerhtml.bind="notification.message"></div>
+                  <div class="name" innerHTML.bind="notification.message | dompurify"></div>
                   <div class="notification-time">${notification.formattedCreatedDate}</div>
                 </div>
               </div>

@@ -8,10 +8,10 @@ using Application.Contracts.Common.Models;
 using Application.Contracts.CookingAssistant.DietaryProfiles;
 using Application.Contracts.CookingAssistant.Recipes;
 using Application.Contracts.CookingAssistant.Recipes.Models;
+using Application.Utils;
 using AutoMapper;
 using Domain.Entities.CookingAssistant;
 using FluentValidation;
-using FluentValidation.Results;
 using Utility;
 
 namespace Application.Services.CookingAssistant;
@@ -238,7 +238,7 @@ public class RecipeService : IRecipeService
 
     public async Task<int> CreateAsync(CreateRecipe model, IValidator<CreateRecipe> validator)
     {
-        ValidateAndThrow(model, validator);
+        ValidationUtil.ValidOrThrow(model, validator);
 
         var now = DateTime.UtcNow;
 
@@ -345,7 +345,7 @@ public class RecipeService : IRecipeService
 
     public async Task<UpdateRecipeResult> UpdateAsync(UpdateRecipe model, IValidator<UpdateRecipe> validator)
     {
-        ValidateAndThrow(model, validator);
+        ValidationUtil.ValidOrThrow(model, validator);
 
         var now = DateTime.UtcNow;
 
@@ -464,7 +464,7 @@ public class RecipeService : IRecipeService
 
     public async Task ShareAsync(ShareRecipe model, IValidator<ShareRecipe> validator)
     {
-        ValidateAndThrow(model, validator);
+        ValidationUtil.ValidOrThrow(model, validator);
 
         var now = DateTime.UtcNow;
 
@@ -546,7 +546,7 @@ public class RecipeService : IRecipeService
 
     public async Task<SendRecipeResult> SendAsync(CreateSendRequest model, IValidator<CreateSendRequest> validator)
     {
-        ValidateAndThrow(model, validator);
+        ValidationUtil.ValidOrThrow(model, validator);
 
         var sendRequests = new List<SendRequest>();
         foreach (int recipientId in model.RecipientsIds)
@@ -615,7 +615,7 @@ public class RecipeService : IRecipeService
 
     public async Task<int> ImportAsync(ImportRecipe model, IValidator<ImportRecipe> validator)
     {
-        ValidateAndThrow(model, validator);
+        ValidationUtil.ValidOrThrow(model, validator);
             
         var ingredientReplacements = model.IngredientReplacements
             .Select(x => (x.Id, x.ReplacementId, x.TransferNutritionData, x.TransferPriceData));
@@ -694,14 +694,5 @@ public class RecipeService : IRecipeService
     private string GetImageUri(int id)
     {
         return _recipesRepository.GetImageUri(id);
-    }
-
-    private static void ValidateAndThrow<T>(T model, IValidator<T> validator)
-    {
-        ValidationResult result = validator.Validate(model);
-        if (!result.IsValid)
-        {
-            throw new ValidationException(result.Errors);
-        }
     }
 }

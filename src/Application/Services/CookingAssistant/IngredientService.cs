@@ -4,11 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Application.Contracts.CookingAssistant.Ingredients;
 using Application.Contracts.CookingAssistant.Ingredients.Models;
+using Application.Utils;
 using AutoMapper;
 using Domain.Entities.CookingAssistant;
 using Domain.Entities.ToDoAssistant;
 using FluentValidation;
-using FluentValidation.Results;
 
 namespace Application.Services.CookingAssistant;
 
@@ -133,7 +133,7 @@ public class IngredientService : IIngredientService
 
     public async Task UpdateAsync(UpdateIngredient model, IValidator<UpdateIngredient> validator)
     {
-        ValidateAndThrow(model, validator);
+        ValidationUtil.ValidOrThrow(model, validator);
 
         var ingredient = _mapper.Map<Ingredient>(model);
         ingredient.Name = ingredient.Name.Trim();
@@ -144,7 +144,7 @@ public class IngredientService : IIngredientService
 
     public async Task UpdateAsync(UpdatePublicIngredient model, IValidator<UpdatePublicIngredient> validator)
     {
-        ValidateAndThrow(model, validator);
+        ValidationUtil.ValidOrThrow(model, validator);
         await _ingredientsRepository.UpdatePublicAsync(model.Id, model.TaskId, model.UserId, DateTime.UtcNow);
     }
 
@@ -190,15 +190,6 @@ public class IngredientService : IIngredientService
                 imperialGrouped = imperialGrouped.OrderByDescending(x => x.Count());
             }
             suggestion.UnitImperial = imperialGrouped.First().Key;
-        }
-    }
-
-    private static void ValidateAndThrow<T>(T model, IValidator<T> validator)
-    {
-        ValidationResult result = validator.Validate(model);
-        if (!result.IsValid)
-        {
-            throw new ValidationException(result.Errors);
         }
     }
 }

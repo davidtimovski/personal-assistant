@@ -94,7 +94,7 @@
 
               <section if.bind="model.instructions" class="instructions-wrap">
                 <header t="recipe.instructions">Instructions</header>
-                <div class="instructions" innerhtml.bind="instructionsInHtml | sanitizeHTML"></div>
+                <div class="instructions" innerhtml.bind="instructionsInHtml | dompurify"></div>
               </section>
 
               <servings-selector if.bind="servingsSelectorIsVisible" recipe.bind="model" viewing.bind="true">
