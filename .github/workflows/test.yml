@@ -1,16 +1,11 @@
-name: Testing dotnet
+name: Run unit tests
 
 on:
-  push:
-    branches:
-      - master
-      - dev
-    paths-ignore:
-      - "src/Clients/**"
+  workflow_call:
 
 jobs:
-  build-test:
-    name: test
+  test:
+    name: Run unit tests
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
