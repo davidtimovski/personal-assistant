@@ -78,14 +78,14 @@ export class ShareRecipe {
   async addShare() {
     this.eventAggregator.publish(AlertEvents.HideError);
 
-    const email = this.selectedShare.email.trim();
+    this.selectedShare.email = this.selectedShare.email.trim();
 
     const duplicateEmails = this.model.shares.filter((share) => {
-      if (share.email === email) {
+      if (share.email === this.selectedShare.email) {
         return share;
       }
     });
-    if (duplicateEmails.length > 0 || this.model.ownerEmail === email) {
+    if (duplicateEmails.length > 0 || this.model.ownerEmail === this.selectedShare.email) {
       this.emailIsInvalid = true;
       return;
     }
@@ -95,7 +95,7 @@ export class ShareRecipe {
     this.emailIsInvalid = !result.valid;
 
     if (result.valid) {
-      const canShareVM: CanShareRecipe = await this.recipesService.canShareRecipeWithUser(email);
+      const canShareVM: CanShareRecipe = await this.recipesService.canShareRecipeWithUser(this.selectedShare.email);
 
       if (canShareVM.userId === 0) {
         this.emailIsInvalid = true;

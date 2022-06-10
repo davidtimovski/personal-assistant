@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Application.Mappings;
+using Application.Services.CookingAssistant;
 using AutoMapper;
 using Domain.Entities.CookingAssistant;
 
@@ -21,7 +22,7 @@ public class EditIngredient : IMapFrom<Ingredient>
         profile.CreateMap<Ingredient, EditIngredient>()
             .ForMember(x => x.TaskName, opt => opt.MapFrom(src => src.TaskId.HasValue ? src.Task.Name : null))
             .ForMember(x => x.TaskList, opt => opt.MapFrom(src => src.TaskId.HasValue ? src.Task.List.Name : null))
-            .ForMember(x => x.NutritionData, opt => opt.MapFrom<NutritionDataResolver>())
-            .ForMember(x => x.PriceData, opt => opt.MapFrom<PriceDataResolver>());
+            .ForMember(x => x.NutritionData, opt => opt.MapFrom(src => src))
+            .ForMember(x => x.PriceData, opt => opt.MapFrom(src => src));
     }
 }

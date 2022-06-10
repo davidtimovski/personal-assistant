@@ -63,9 +63,9 @@
             </div>
           </section>
 
-          <div if.bind="model.nutritionData.isSet" class="nutrition-price-data-wrap">
-            <div class="nutrition-price-data-container">
-              <div class="nutrition-price-data au-animate animate-fade-in animate-fade-out">
+          <div class="nutrition-price-data-wrap">
+            <div if.bind="model.nutritionData.isSet" class="nutrition-price-data-container au-animate animate-fade-in animate-fade-out">
+              <div class="nutrition-price-data">
                 <div class="nutrition-price-data-header">
                   <i class="fas fa-clipboard"></i>
                   <span t="viewIngredient.nutrition">Nutrition</span>
@@ -153,8 +153,8 @@
               </div>
             </div>
 
-            <div if.bind="model.priceData.isSet" class="nutrition-price-data-container">
-              <div class="nutrition-price-data au-animate animate-fade-in animate-fade-out">
+            <div if.bind="model.priceData.isSet" class="nutrition-price-data-container au-animate animate-fade-in animate-fade-out">
+              <div class="nutrition-price-data">
                 <div class="nutrition-price-data-header">
                   <i class="fas fa-tag"></i>
                   <span t="viewIngredient.price">Price</span>
