@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Application.Mappings;
+using Application.Services.CookingAssistant;
 using AutoMapper;
 using Domain.Entities.CookingAssistant;
 
@@ -28,8 +29,8 @@ public class IngredientSuggestion : IMapFrom<Ingredient>
             .ForMember(x => x.Unit, opt => opt.Ignore())
             .ForMember(x => x.UnitImperial, opt => opt.Ignore())
             .ForMember(x => x.Children, opt => opt.Ignore())
-            .ForMember(x => x.HasNutritionData, opt => opt.MapFrom<IngredientHasNutritionDataResolver>())
-            .ForMember(x => x.HasPriceData, opt => opt.MapFrom<IngredientHasPriceDataResolver>())
+            .ForMember(x => x.HasNutritionData, opt => opt.MapFrom(src => NutritionDataHelper.Has(src)))
+            .ForMember(x => x.HasPriceData, opt => opt.MapFrom(src => src.Price.HasValue))
             .ForMember(x => x.IsPublic, opt => opt.MapFrom(src => src.UserId == 1));
     }
 }

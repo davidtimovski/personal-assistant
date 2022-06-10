@@ -117,7 +117,6 @@ public class DietaryProfileService : IDietaryProfileService
 
         foreach (var recipeIngredient in validRecipeIngredients)
         {
-            bool ingredientHasNutritionData = false;
             short servingSize = recipeIngredient.Ingredient.ServingSize;
             bool servingSizeIsOneUnit = recipeIngredient.Ingredient.ServingSizeIsOneUnit;
             float amount = recipeIngredient.Amount.Value;
@@ -126,87 +125,70 @@ public class DietaryProfileService : IDietaryProfileService
 
             if (recipeIngredient.Ingredient.Calories.HasValue)
             {
-                ingredientHasNutritionData = true;
                 nutritionSummary.Calories = AddGramsValuePerAmountAndServing(nutritionSummary.Calories, recipeIngredient.Ingredient.Calories.Value, servingSize, servingSizeIsOneUnit, amount, unit, servings);
             }
             if (recipeIngredient.Ingredient.Fat.HasValue)
             {
-                ingredientHasNutritionData = true;
                 nutritionSummary.Fat = AddGramsValuePerAmountAndServing(nutritionSummary.Fat, recipeIngredient.Ingredient.Fat.Value, servingSize, servingSizeIsOneUnit, amount, unit, servings);
             }
             if (recipeIngredient.Ingredient.SaturatedFat.HasValue)
             {
-                ingredientHasNutritionData = true;
                 nutritionSummary.SaturatedFat = AddGramsValuePerAmountAndServing(nutritionSummary.SaturatedFat, recipeIngredient.Ingredient.SaturatedFat.Value, servingSize, servingSizeIsOneUnit, amount, unit, servings);
             }
             if (recipeIngredient.Ingredient.Carbohydrate.HasValue)
             {
-                ingredientHasNutritionData = true;
                 nutritionSummary.Carbohydrate = AddGramsValuePerAmountAndServing(nutritionSummary.Carbohydrate, recipeIngredient.Ingredient.Carbohydrate.Value, servingSize, servingSizeIsOneUnit, amount, unit, servings);
             }
             if (recipeIngredient.Ingredient.Sugars.HasValue)
             {
-                ingredientHasNutritionData = true;
                 nutritionSummary.Sugars = AddGramsValuePerAmountAndServing(nutritionSummary.Sugars, recipeIngredient.Ingredient.Sugars.Value, servingSize, servingSizeIsOneUnit, amount, unit, servings);
             }
             if (recipeIngredient.Ingredient.AddedSugars.HasValue)
             {
-                ingredientHasNutritionData = true;
                 nutritionSummary.AddedSugars = AddGramsValuePerAmountAndServing(nutritionSummary.AddedSugars, recipeIngredient.Ingredient.AddedSugars.Value, servingSize, servingSizeIsOneUnit, amount, unit, servings);
             }
             if (recipeIngredient.Ingredient.Fiber.HasValue)
             {
-                ingredientHasNutritionData = true;
                 nutritionSummary.Fiber = AddGramsValuePerAmountAndServing(nutritionSummary.Fiber, recipeIngredient.Ingredient.Fiber.Value, servingSize, servingSizeIsOneUnit, amount, unit, servings);
             }
             if (recipeIngredient.Ingredient.Protein.HasValue)
             {
-                ingredientHasNutritionData = true;
                 nutritionSummary.Protein = AddGramsValuePerAmountAndServing(nutritionSummary.Protein, recipeIngredient.Ingredient.Protein.Value, servingSize, servingSizeIsOneUnit, amount, unit, servings);
             }
             if (recipeIngredient.Ingredient.Sodium.HasValue)
             {
-                ingredientHasNutritionData = true;
                 nutritionSummary.Sodium = AddMilligramsValuePerAmountAndServing(nutritionSummary.Sodium, recipeIngredient.Ingredient.Sodium.Value, servingSize, servingSizeIsOneUnit, amount, unit, servings);
             }
             if (recipeIngredient.Ingredient.Cholesterol.HasValue)
             {
-                ingredientHasNutritionData = true;
                 nutritionSummary.Cholesterol = AddMilligramsValuePerAmountAndServing(nutritionSummary.Cholesterol, recipeIngredient.Ingredient.Cholesterol.Value, servingSize, servingSizeIsOneUnit, amount, unit, servings);
             }
             if (recipeIngredient.Ingredient.VitaminA.HasValue)
             {
-                ingredientHasNutritionData = true;
                 nutritionSummary.VitaminA = AddMilligramsValuePerAmountAndServing(nutritionSummary.VitaminA, recipeIngredient.Ingredient.VitaminA.Value, servingSize, servingSizeIsOneUnit, amount, unit, servings);
             }
             if (recipeIngredient.Ingredient.VitaminC.HasValue)
             {
-                ingredientHasNutritionData = true;
                 nutritionSummary.VitaminC = AddMilligramsValuePerAmountAndServing(nutritionSummary.VitaminC, recipeIngredient.Ingredient.VitaminC.Value, servingSize, servingSizeIsOneUnit, amount, unit, servings);
             }
             if (recipeIngredient.Ingredient.VitaminD.HasValue)
             {
-                ingredientHasNutritionData = true;
                 nutritionSummary.VitaminD = AddMilligramsValuePerAmountAndServing(nutritionSummary.VitaminD, recipeIngredient.Ingredient.VitaminD.Value, servingSize, servingSizeIsOneUnit, amount, unit, servings);
             }
             if (recipeIngredient.Ingredient.Calcium.HasValue)
             {
-                ingredientHasNutritionData = true;
                 nutritionSummary.Calcium = AddMilligramsValuePerAmountAndServing(nutritionSummary.Calcium, recipeIngredient.Ingredient.Calcium.Value, servingSize, servingSizeIsOneUnit, amount, unit, servings);
             }
             if (recipeIngredient.Ingredient.Iron.HasValue)
             {
-                ingredientHasNutritionData = true;
                 nutritionSummary.Iron = AddMilligramsValuePerAmountAndServing(nutritionSummary.Iron, recipeIngredient.Ingredient.Iron.Value, servingSize, servingSizeIsOneUnit, amount, unit, servings);
             }
             if (recipeIngredient.Ingredient.Potassium.HasValue)
             {
-                ingredientHasNutritionData = true;
                 nutritionSummary.Potassium = AddMilligramsValuePerAmountAndServing(nutritionSummary.Potassium, recipeIngredient.Ingredient.Potassium.Value, servingSize, servingSizeIsOneUnit, amount, unit, servings);
             }
             if (recipeIngredient.Ingredient.Magnesium.HasValue)
             {
-                ingredientHasNutritionData = true;
                 nutritionSummary.Magnesium = AddMilligramsValuePerAmountAndServing(nutritionSummary.Magnesium, recipeIngredient.Ingredient.Magnesium.Value, servingSize, servingSizeIsOneUnit, amount, unit, servings);
             }
         }

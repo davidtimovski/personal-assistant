@@ -265,7 +265,7 @@ public class RecipeService : IRecipeService
                     recipeIngredient.Amount = null;
                 }
             }
-            else
+            else if (recipeIngredient.Unit != "pinch")
             {
                 recipeIngredient.Unit = null;
             }
@@ -374,7 +374,7 @@ public class RecipeService : IRecipeService
                     recipeIngredient.Amount = null;
                 }
             }
-            else
+            else if (recipeIngredient.Unit != "pinch")
             {
                 recipeIngredient.Unit = null;
             }
@@ -446,7 +446,7 @@ public class RecipeService : IRecipeService
             await _cdnService.DeleteAsync($"users/{userId}/recipes/{imageUri}");
         }
 
-        var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeDeletion(id).ToList();;
+        var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeDeletion(id).ToList();
         if (!usersToBeNotified.Any())
         {
             return new DeleteRecipeResult();
@@ -499,7 +499,7 @@ public class RecipeService : IRecipeService
     {
         await _recipesRepository.SetShareIsAcceptedAsync(recipeId, userId, isAccepted, DateTime.UtcNow);
 
-        var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(recipeId, userId).ToList();;
+        var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(recipeId, userId).ToList();
         if (!usersToBeNotified.Any())
         {
             return new SetShareIsAcceptedResult();
@@ -526,7 +526,7 @@ public class RecipeService : IRecipeService
             return new LeaveRecipeResult();
         }
 
-        var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(id, userId).ToList();;
+        var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(id, userId).ToList();
         if (!usersToBeNotified.Any())
         {
             return new LeaveRecipeResult();
@@ -573,7 +573,7 @@ public class RecipeService : IRecipeService
 
         await _recipesRepository.CreateSendRequestsAsync(sendRequests);
 
-        var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeSent(model.RecipeId).ToList();;
+        var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeSent(model.RecipeId).ToList();
         if (!usersToBeNotified.Any())
         {
             return new SendRecipeResult();

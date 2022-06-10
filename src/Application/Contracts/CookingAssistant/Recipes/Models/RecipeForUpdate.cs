@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Application.Mappings;
+using Application.Services.CookingAssistant;
 using AutoMapper;
 using Domain.Entities.CookingAssistant;
 
@@ -25,8 +26,8 @@ public class RecipeForUpdate : IMapFrom<Recipe>
     {
         profile.CreateMap<Recipe, RecipeForUpdate>()
             .ForMember(x => x.Ingredients, opt => opt.MapFrom(src => src.RecipeIngredients))
-            .ForMember(x => x.PrepDuration, opt => opt.MapFrom<DurationResolver, TimeSpan?>(src => src.PrepDuration))
-            .ForMember(x => x.CookDuration, opt => opt.MapFrom<DurationResolver, TimeSpan?>(src => src.CookDuration))
+            .ForMember(x => x.PrepDuration, opt => opt.MapFrom(src => src.PrepDuration.HasValue ? src.PrepDuration.Value.ToString(@"hh\:mm") : string.Empty))
+            .ForMember(x => x.CookDuration, opt => opt.MapFrom(src => src.CookDuration.HasValue ? src.CookDuration.Value.ToString(@"hh\:mm") : string.Empty))
             .ForMember(x => x.SharingState, opt => opt.Ignore())
             .ForMember(x => x.UserIsOwner, opt => opt.Ignore());
     }
@@ -49,8 +50,8 @@ public class RecipeForUpdateIngredient : IMapFrom<RecipeIngredient>
             .ForMember(x => x.Id, opt => opt.MapFrom(src => src.Ingredient.Id))
             .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Ingredient.Name))
             .ForMember(x => x.Unit, opt => opt.MapFrom(src => src.Unit))
-            .ForMember(x => x.HasNutritionData, opt => opt.MapFrom<RecipeIngredientHasNutritionDataResolver>())
-            .ForMember(x => x.HasPriceData, opt => opt.MapFrom<RecipeIngredientHasPriceDataResolver>())
+            .ForMember(x => x.HasNutritionData, opt => opt.MapFrom(src => NutritionDataHelper.Has(src.Ingredient)))
+            .ForMember(x => x.HasPriceData, opt => opt.MapFrom(src => src.Ingredient.Price.HasValue))
             .ForMember(x => x.IsPublic, opt => opt.MapFrom(src => src.Ingredient.UserId == 1))
             .ForMember(x => x.IsNew, opt => opt.Ignore());
     }

@@ -34,6 +34,10 @@
       line-height: 27px;
       text-align: center;
       word-wrap: anywhere;
+
+      &.owner {
+        padding-right: 55px;
+      }
     }
 
     &-button {

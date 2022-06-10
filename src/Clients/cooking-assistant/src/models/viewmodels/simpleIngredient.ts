@@ -5,4 +5,5 @@ export class SimpleIngredient {
   hasNutritionData: boolean;
   hasPriceData: boolean;
   unused: boolean;
+  isPublic: boolean;
 }
