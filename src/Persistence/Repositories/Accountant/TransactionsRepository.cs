@@ -19,13 +19,13 @@ public class TransactionsRepository : BaseRepository, ITransactionsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT t.*, fa.""Id"", fa.""Name"", ta.""Id"", ta.""Name"", c.""Id"", c.""Name"", pc.""Id"", pc.""Name""
-                        FROM ""Accountant.Transactions"" AS t
-                        LEFT JOIN ""Accountant.Accounts"" AS fa ON t.""FromAccountId"" = fa.""Id""
-                        LEFT JOIN ""Accountant.Accounts"" AS ta ON t.""ToAccountId"" = ta.""Id""
-                        LEFT JOIN ""Accountant.Categories"" AS c ON t.""CategoryId"" = c.""Id""
-                        LEFT JOIN ""Accountant.Categories"" AS pc ON c.""ParentId"" = pc.""Id""
-                        WHERE fa.""UserId"" = @UserId OR ta.""UserId"" = @UserId ORDER BY ""Date""";
+        const string query = @"SELECT t.*, fa.id, fa.name, ta.id, ta.name, c.id, c.name, pc.id, pc.name
+                        FROM accountant_transactions AS t
+                        LEFT JOIN accountant_accounts AS fa ON t.from_account_id = fa.id
+                        LEFT JOIN accountant_accounts AS ta ON t.to_account_id = ta.id
+                        LEFT JOIN accountant_categories AS c ON t.category_id = c.id
+                        LEFT JOIN accountant_categories AS pc ON c.parent_id = pc.id
+                        WHERE fa.user_id = @UserId OR ta.user_id = @UserId ORDER BY date";
 
         var transactions = conn.Query<Transaction, Account, Account, Category, Category, Transaction>(query,
             (transaction, fromAccount, toAccount, category, parentCategory) =>
@@ -58,10 +58,10 @@ public class TransactionsRepository : BaseRepository, ITransactionsRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.Query<Transaction>(@"SELECT t.* 
-                                            FROM ""Accountant.Transactions"" AS t
-                                            INNER JOIN ""Accountant.Accounts"" AS a ON a.""Id"" = t.""FromAccountId"" 
-                                                OR a.""Id"" = t.""ToAccountId"" 
-                                            WHERE a.""UserId"" = @UserId AND t.""ModifiedDate"" > @FromModifiedDate",
+                                         FROM accountant_transactions AS t
+                                         INNER JOIN accountant_accounts AS a ON a.id = t.from_account_id 
+                                             OR a.id = t.to_account_id 
+                                         WHERE a.user_id = @UserId AND t.modified_date > @FromModifiedDate",
             new { UserId = userId, FromModifiedDate = fromModifiedDate });
     }
 
@@ -69,7 +69,7 @@ public class TransactionsRepository : BaseRepository, ITransactionsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.Query<int>(@"SELECT ""EntityId"" FROM ""Accountant.DeletedEntities"" WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""DeletedDate"" > @DeletedDate",
+        return conn.Query<int>(@"SELECT entity_id FROM accountant_deleted_entities WHERE user_id = @UserId AND entity_type = @EntityType AND deleted_date > @DeletedDate",
             new { UserId = userId, EntityType = (short)EntityType.Transaction, DeletedDate = fromDate });
     }
 
@@ -78,10 +78,10 @@ public class TransactionsRepository : BaseRepository, ITransactionsRepository
         using IDbConnection conn = OpenConnection();
 
         int id;
-        var insertQuery = @"INSERT INTO ""Accountant.Transactions"" 
-                                (""FromAccountId"", ""ToAccountId"", ""CategoryId"", ""Amount"", ""FromStocks"", ""ToStocks"", ""Currency"", ""Description"", ""Date"", ""IsEncrypted"", ""EncryptedDescription"", ""Salt"", ""Nonce"", ""CreatedDate"", ""ModifiedDate"")
+        var insertQuery = @"INSERT INTO accountant_transactions 
+                                (from_account_id, to_account_id, category_id, amount, from_stocks, to_stocks, currency, description, date, is_encrypted, encrypted_description, salt, nonce, created_date, modified_date)
                                 VALUES 
-                                (@FromAccountId, @ToAccountId, @CategoryId, @Amount, @FromStocks, @ToStocks, @Currency, @Description, @Date, @IsEncrypted, @EncryptedDescription, @Salt, @Nonce, @CreatedDate, @ModifiedDate) returning ""Id""";
+                                (@FromAccountId, @ToAccountId, @CategoryId, @Amount, @FromStocks, @ToStocks, @Currency, @Description, @Date, @IsEncrypted, @EncryptedDescription, @Salt, @Nonce, @CreatedDate, @ModifiedDate) returning id";
 
         var dbTransaction = conn.BeginTransaction();
 
@@ -89,10 +89,10 @@ public class TransactionsRepository : BaseRepository, ITransactionsRepository
 
         if (transaction.FromAccountId.HasValue && !transaction.ToAccountId.HasValue)
         {
-            var relatedUpcomingExpenses = conn.Query<UpcomingExpense>(@"SELECT * FROM ""Accountant.UpcomingExpenses""
-                                                                                WHERE ""CategoryId"" = @CategoryId 
-                                                                                    AND EXTRACT(year FROM ""Date"") = @Year
-                                                                                    AND EXTRACT(month FROM ""Date"") = @Month",
+            var relatedUpcomingExpenses = conn.Query<UpcomingExpense>(@"SELECT * FROM accountant_upcoming_expenses
+                                                                        WHERE category_id = @CategoryId 
+                                                                            AND EXTRACT(year FROM date) = @Year
+                                                                            AND EXTRACT(month FROM date) = @Month",
                 new { transaction.CategoryId, transaction.Date.Year, transaction.Date.Month }).ToList();
 
             if (relatedUpcomingExpenses.Any())
@@ -110,16 +110,16 @@ public class TransactionsRepository : BaseRepository, ITransactionsRepository
                     {
                         if (upcomingExpense.Amount > transaction.Amount)
                         {
-                            await conn.ExecuteAsync(@"UPDATE ""Accountant.UpcomingExpenses"" SET ""Amount"" = ""Amount"" - @Amount, ""ModifiedDate"" = @ModifiedDate WHERE ""Id"" = @Id",
+                            await conn.ExecuteAsync(@"UPDATE accountant_upcoming_expenses SET amount = amount - @Amount, modified_date = @ModifiedDate WHERE id = @Id",
                                 new { upcomingExpense.Id, transaction.Amount, ModifiedDate = DateTime.UtcNow }, dbTransaction);
                         }
                         else
                         {
-                            await conn.ExecuteAsync(@"DELETE FROM ""Accountant.UpcomingExpenses"" WHERE ""Id"" = @Id",
+                            await conn.ExecuteAsync(@"DELETE FROM accountant_upcoming_expenses WHERE id = @Id",
                                 new { upcomingExpense.Id }, dbTransaction);
 
-                            await conn.QueryAsync<int>(@"INSERT INTO ""Accountant.DeletedEntities"" (""UserId"", ""EntityType"", ""EntityId"", ""DeletedDate"")
-                                         VALUES (@UserId, @EntityType, @EntityId, @DeletedDate)",
+                            await conn.QueryAsync<int>(@"INSERT INTO accountant_deleted_entities (user_id, entity_type, entity_id, deleted_date)
+                                                         VALUES (@UserId, @EntityType, @EntityId, @DeletedDate)",
                                 new { upcomingExpense.UserId, EntityType = (short)EntityType.UpcomingExpense, EntityId = upcomingExpense.Id, DeletedDate = DateTime.UtcNow },
                                 dbTransaction);
                         }

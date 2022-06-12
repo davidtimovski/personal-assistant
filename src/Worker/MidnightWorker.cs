@@ -4,16 +4,16 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Contracts.Common;
 using Dapper;
+using Domain.Entities.Accountant;
+using Domain.Entities.Common;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Npgsql;
-using Application.Contracts.Common;
-using Domain.Entities.Accountant;
-using Domain.Entities.Common;
 
 namespace Worker;
 
@@ -86,13 +86,13 @@ public class MidnightWorker : BackgroundService
                 Rates = ratesData
             };
 
-            var exists = conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM ""CurrencyRates"" WHERE ""Date"" = @Date", new { parameters.Date });
+            var exists = conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM currency_rates WHERE date = @Date", new { parameters.Date });
             if (exists)
             {
                 return;
             }
 
-            await conn.ExecuteAsync(@"INSERT INTO ""CurrencyRates"" (""Date"", ""Rates"") VALUES (@Date, CAST(@Rates AS json))", parameters);
+            await conn.ExecuteAsync(@"INSERT INTO currency_rates (date, rates) VALUES (@Date, CAST(@Rates AS json))", parameters);
         }
         catch (Exception ex)
         {
@@ -114,7 +114,7 @@ public class MidnightWorker : BackgroundService
         using var conn = new NpgsqlConnection(_connectionString);
         conn.Open();
 
-        await conn.ExecuteAsync(@"DELETE FROM ""ToDoAssistant.Notifications"" WHERE ""CreatedDate"" < @DeleteFrom", new { DeleteFrom = aWeekAgo });
+        await conn.ExecuteAsync(@"DELETE FROM todo_notifications WHERE created_date < @DeleteFrom", new { DeleteFrom = aWeekAgo });
     }
 
     private async Task DeleteOldDeletedEntityEntriesAsync()
@@ -124,7 +124,7 @@ public class MidnightWorker : BackgroundService
         using var conn = new NpgsqlConnection(_connectionString);
         conn.Open();
 
-        await conn.ExecuteAsync(@"DELETE FROM ""Accountant.DeletedEntities"" WHERE ""DeletedDate"" < @DeleteFrom", new { DeleteFrom = threeMonthsAgo });
+        await conn.ExecuteAsync(@"DELETE FROM accountant_deleted_entities WHERE deleted_date < @DeleteFrom", new { DeleteFrom = threeMonthsAgo });
     }
 
     private async Task GenerateUpcomingExpenses()
@@ -163,7 +163,7 @@ public class MidnightWorker : BackgroundService
         using var conn = new NpgsqlConnection(_connectionString);
         conn.Open();
 
-        var categories = conn.Query<Category>(@"SELECT * FROM ""Accountant.Categories"" WHERE ""GenerateUpcomingExpense""");
+        var categories = conn.Query<Category>(@"SELECT * FROM accountant_categories WHERE generate_upcoming_expense");
 
         var userGroups = categories.GroupBy(x => x.UserId);
 
@@ -172,9 +172,9 @@ public class MidnightWorker : BackgroundService
             foreach (Category category in userGroup)
             {
                 var exists = conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                                            FROM ""Accountant.UpcomingExpenses""
-                                                            WHERE ""CategoryId"" = @CategoryId AND ""Generated"" 
-                                                            AND to_char(""CreatedDate"", 'YYYY-MM') = to_char(@Now, 'YYYY-MM')",
+                                                        FROM accountant_upcoming_expenses
+                                                        WHERE category_id = @CategoryId AND generated 
+                                                        AND to_char(created_date, 'YYYY-MM') = to_char(@Now, 'YYYY-MM')",
                     new { CategoryId = category.Id, Now = now });
                 if (exists)
                 {
@@ -183,13 +183,13 @@ public class MidnightWorker : BackgroundService
 
                 var firstOfThisMonth = new DateTime(now.Year, now.Month, 1);
                 var transactionsExistThisMonth = conn.ExecuteScalar<bool>(@"SELECT COUNT(*) 
-                                                                                FROM ""Accountant.Transactions"" AS t 
-                                                                                INNER JOIN ""Accountant.Accounts"" AS a ON a.""Id"" = t.""FromAccountId"" 
-                                                                                    OR a.""Id"" = t.""ToAccountId"" 
-                                                                                WHERE a.""UserId"" = @UserId 
-                                                                                    AND ""CategoryId"" = @CategoryId 
-                                                                                    AND ""Date"" >= @From 
-                                                                                    AND ""FromAccountId"" IS NOT NULL AND ""ToAccountId"" IS NULL",
+                                                                            FROM accountant_transactions AS t 
+                                                                            INNER JOIN accountant_accounts AS a ON a.id = t.from_account_id 
+                                                                                OR a.id = t.to_account_id 
+                                                                            WHERE a.user_id = @UserId 
+                                                                                AND category_id = @CategoryId 
+                                                                                AND date >= @From 
+                                                                                AND from_account_id IS NOT NULL AND to_account_id IS NULL",
                     new { category.UserId, CategoryId = category.Id, From = firstOfThisMonth });
                 if (transactionsExistThisMonth)
                 {
@@ -198,13 +198,13 @@ public class MidnightWorker : BackgroundService
 
                 var threeMonthsAgo = new DateTime(now.Year, now.Month, 1).AddMonths(-3);
                 var expenses = conn.Query<Transaction>(@"SELECT t.* 
-                                                             FROM ""Accountant.Transactions"" AS t 
-                                                             INNER JOIN ""Accountant.Accounts"" AS a ON a.""Id"" = t.""FromAccountId"" 
-                                                                 OR a.""Id"" = t.""ToAccountId"" 
-                                                             WHERE a.""UserId"" = @UserId 
-                                                                 AND ""CategoryId"" = @CategoryId 
-                                                                 AND ""Date"" >= @From AND ""Date"" < @To 
-                                                                 AND ""FromAccountId"" IS NOT NULL AND ""ToAccountId"" IS NULL",
+                                                        FROM accountant_transactions AS t 
+                                                        INNER JOIN accountant_accounts AS a ON a.id = t.from_account_id 
+                                                            OR a.id = t.to_account_id 
+                                                        WHERE a.user_id = @UserId 
+                                                            AND category_id = @CategoryId 
+                                                            AND date >= @From AND date < @To 
+                                                            AND from_account_id IS NOT NULL AND to_account_id IS NULL",
                     new { category.UserId, CategoryId = category.Id, From = threeMonthsAgo, To = firstOfThisMonth }).ToList();
 
                 if (ShouldGenerate(expenses))
@@ -232,8 +232,8 @@ public class MidnightWorker : BackgroundService
                         ModifiedDate = now
                     };
 
-                    await conn.ExecuteAsync(@"INSERT INTO ""Accountant.UpcomingExpenses"" (""UserId"", ""CategoryId"", ""Amount"", ""Currency"", ""Description"", ""Date"", ""Generated"", ""CreatedDate"", ""ModifiedDate"")
-                                                  VALUES (@UserId, @CategoryId, @Amount, @Currency, @Description, @Date, @Generated, @CreatedDate, @ModifiedDate)", upcomingExpense);
+                    await conn.ExecuteAsync(@"INSERT INTO accountant_upcoming_expenses (user_id, category_id, amount, currency, description, date, generated, created_date, modified_date)
+                                              VALUES (@UserId, @CategoryId, @Amount, @Currency, @Description, @Date, @Generated, @CreatedDate, @ModifiedDate)", upcomingExpense);
                 }
             }
         }

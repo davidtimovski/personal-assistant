@@ -18,7 +18,7 @@ public class AccountsRepository : BaseRepository, IAccountsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.Query<Account>(@"SELECT * FROM ""Accountant.Accounts"" WHERE ""UserId"" = @UserId AND ""ModifiedDate"" > @FromModifiedDate",
+        return conn.Query<Account>(@"SELECT * FROM accountant_accounts WHERE user_id = @UserId AND modified_date > @FromModifiedDate",
             new { UserId = userId, FromModifiedDate = fromModifiedDate });
     }
 
@@ -26,7 +26,7 @@ public class AccountsRepository : BaseRepository, IAccountsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.Query<int>(@"SELECT ""EntityId"" FROM ""Accountant.DeletedEntities"" WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""DeletedDate"" > @DeletedDate",
+        return conn.Query<int>(@"SELECT entity_id FROM accountant_deleted_entities WHERE user_id = @UserId AND entity_type = @EntityType AND deleted_date > @DeletedDate",
             new { UserId = userId, EntityType = (short)EntityType.Account, DeletedDate = fromDate });
     }
 
@@ -34,7 +34,7 @@ public class AccountsRepository : BaseRepository, IAccountsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM ""Accountant.Accounts"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
+        return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM accountant_accounts WHERE id = @Id AND user_id = @UserId",
             new { Id = id, UserId = userId });
     }
 
@@ -42,7 +42,7 @@ public class AccountsRepository : BaseRepository, IAccountsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM ""Accountant.Accounts"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId AND ""IsMain""",
+        return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM accountant_accounts WHERE id = @Id AND user_id = @UserId AND is_main",
             new { Id = id, UserId = userId });
     }
 

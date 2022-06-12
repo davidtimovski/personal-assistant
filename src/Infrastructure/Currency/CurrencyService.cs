@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Text.Json;
+using Application.Contracts.Common;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
-using Application.Contracts.Common;
 
 namespace Infrastructure.Currency;
 
@@ -59,11 +59,11 @@ public class CurrencyService : ICurrencyService
     {
         if (daysSearched == DaysSearchLimit)
         {
-            var latestRates = conn.QueryFirstOrDefault<string>(@"SELECT ""Rates"" FROM ""CurrencyRates"" ORDER BY ""Date"" DESC LIMIT 1");
+            var latestRates = conn.QueryFirstOrDefault<string>(@"SELECT rates FROM currency_rates ORDER BY date DESC LIMIT 1");
             return JsonSerializer.Deserialize<Dictionary<string, decimal>>(latestRates);
         }
 
-        var rates = conn.QueryFirstOrDefault<string>(@"SELECT ""Rates"" FROM ""CurrencyRates"" WHERE ""Date"" = @Date", new { Date = date });
+        var rates = conn.QueryFirstOrDefault<string>(@"SELECT rates FROM currency_rates WHERE date = @Date", new { Date = date });
         if (rates != null)
         {
             return JsonSerializer.Deserialize<Dictionary<string, decimal>>(rates);

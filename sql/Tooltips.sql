@@ -1,36 +1,24 @@
--- Table: public."Tooltips"
-
--- DROP TABLE public."Tooltips";
-
-CREATE TABLE public."Tooltips"
+CREATE TABLE public.tooltips
 (
-    "Id" serial NOT NULL,
-	"Application" character varying(20) NOT NULL COLLATE pg_catalog."default",
-    "Key" character varying(30) NOT NULL COLLATE pg_catalog."default",
-    CONSTRAINT "PK_Tooltips" PRIMARY KEY ("Id")
+    id serial NOT NULL,
+	application character varying(20) NOT NULL COLLATE pg_catalog."default",
+    key character varying(30) NOT NULL COLLATE pg_catalog."default",
+    CONSTRAINT pk_tooltips PRIMARY KEY (id)
 )
 WITH (
     OIDS = FALSE
 )
 TABLESPACE pg_default;
 
-ALTER TABLE public."Tooltips"
+ALTER TABLE public.tooltips
     OWNER to personalassistant;
 
--- Index: IX_Tooltips_Key
-
--- DROP INDEX public."IX_Tooltips_Key";
-
-CREATE INDEX "IX_Tooltips_Key"
-    ON public."Tooltips" USING btree
-    ("Key")
+CREATE INDEX ix_tooltips_key
+    ON public.tooltips USING btree
+    (key)
     TABLESPACE pg_default;
 	
--- Index: IX_Tooltips_Application
-
--- DROP INDEX public."IX_Tooltips_Application";
-
-CREATE INDEX "IX_Tooltips_Application"
-    ON public."Tooltips" USING btree
-    ("Application")
+CREATE INDEX ix_tooltips_application
+    ON public.tooltips USING btree
+    (application)
     TABLESPACE pg_default;

@@ -24,6 +24,8 @@ public static class IoC
 {
     public static IServiceCollection AddPersistence(this IServiceCollection services, string connectionString)
     {
+        Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
         services.AddTransient<IUsersRepository, UsersRepository>();
         services.AddTransient<IPushSubscriptionsRepository, PushSubscriptionsRepository>();
         services.AddTransient<ITooltipsRepository, TooltipsRepository>();
@@ -42,7 +44,8 @@ public static class IoC
 
         services.AddDbContext<PersonalAssistantContext>(options =>
         {
-            options.UseNpgsql(connectionString);
+            options.UseNpgsql(connectionString)
+                   .UseSnakeCaseNamingConvention();
         });
 
         return services;
