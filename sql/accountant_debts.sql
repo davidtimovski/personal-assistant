@@ -1,16 +1,16 @@
 CREATE TABLE public.accountant_debts
 (
     id serial NOT NULL,
-	user_id integer NOT NULL,
+    user_id integer NOT NULL,
     person character varying(20) COLLATE pg_catalog."default" NOT NULL,
-	amount decimal(10, 2) NOT NULL,
-	currency character varying(3) COLLATE pg_catalog."default" NOT NULL DEFAULT 'EUR',
+    amount decimal(10, 2) NOT NULL,
+    currency character varying(3) COLLATE pg_catalog."default" NOT NULL DEFAULT 'EUR',
     description character varying(255) COLLATE pg_catalog."default",
-	user_is_debtor boolean NOT NULL DEFAULT FALSE,
+    user_is_debtor boolean NOT NULL DEFAULT FALSE,
     created_date timestamp with time zone NOT NULL,
     modified_date timestamp with time zone NOT NULL,
     CONSTRAINT pk_accountant_debts PRIMARY KEY (id),
-	CONSTRAINT fk_accountant_debts_aspnetusers_user_id FOREIGN KEY (user_id)
+    CONSTRAINT fk_accountant_debts_aspnetusers_user_id FOREIGN KEY (user_id)
     REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE

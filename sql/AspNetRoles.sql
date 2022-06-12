@@ -1,7 +1,3 @@
--- Table: public."AspNetRoles"
-
--- DROP TABLE public."AspNetRoles";
-
 CREATE TABLE public."AspNetRoles"
 (
     "Id" serial NOT NULL,
@@ -17,10 +13,6 @@ TABLESPACE pg_default;
 
 ALTER TABLE public."AspNetRoles"
     OWNER to personalassistant;
-
--- Index: RoleNameIndex
-
--- DROP INDEX public."RoleNameIndex";
 
 CREATE UNIQUE INDEX "RoleNameIndex"
     ON public."AspNetRoles" USING btree

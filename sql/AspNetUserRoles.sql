@@ -1,7 +1,3 @@
--- Table: public."AspNetUserRoles"
-
--- DROP TABLE public."AspNetUserRoles";
-
 CREATE TABLE public."AspNetUserRoles"
 (
     "UserId" integer NOT NULL,
@@ -23,10 +19,6 @@ TABLESPACE pg_default;
 
 ALTER TABLE public."AspNetUserRoles"
     OWNER to personalassistant;
-
--- Index: IX_AspNetUserRoles_RoleId
-
--- DROP INDEX public."IX_AspNetUserRoles_RoleId";
 
 CREATE INDEX "IX_AspNetUserRoles_RoleId"
     ON public."AspNetUserRoles" USING btree

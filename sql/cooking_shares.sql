@@ -3,7 +3,7 @@ CREATE TABLE public.cooking_shares
     recipe_id integer NOT NULL,
     user_id integer NOT NULL,
     is_accepted boolean DEFAULT NULL,
-	last_opened_date timestamp with time zone NOT NULL,
+    last_opened_date timestamp with time zone NOT NULL,
     created_date timestamp with time zone NOT NULL,
     modified_date timestamp with time zone NOT NULL,
     CONSTRAINT pk_cooking_shares PRIMARY KEY (recipe_id, user_id),
