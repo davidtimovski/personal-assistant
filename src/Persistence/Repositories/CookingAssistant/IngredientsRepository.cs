@@ -21,43 +21,43 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.Query<Ingredient>(@"SELECT * FROM (
-	                                        SELECT i.*, it.""TaskId"", COUNT(ri) AS ""RecipeCount""
-	                                        FROM ""CookingAssistant.Ingredients"" AS i
-	                                        LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
-	                                        LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId""
-	                                        WHERE i.""UserId"" = @UserId
-	                                        GROUP BY i.""Id"", it.""TaskId""
+	                                        SELECT i.*, it.task_id, COUNT(ri) AS recipe_count
+	                                        FROM cooking_ingredients AS i
+	                                        LEFT JOIN cooking_ingredients_tasks AS it ON i.id = it.ingredient_id AND it.user_id = @UserId
+	                                        LEFT JOIN cooking_recipes_ingredients AS ri ON i.id = ri.ingredient_id
+	                                        WHERE i.user_id = @UserId
+	                                        GROUP BY i.id, it.task_id
 	
 	                                        UNION ALL
 	
-	                                        SELECT i.*, it.""TaskId"", COUNT(ri) AS ""RecipeCount""
-	                                        FROM ""CookingAssistant.Ingredients"" AS i
-	                                        INNER JOIN ""CookingAssistant.RecipesIngredients"" AS ri ON i.""Id"" = ri.""IngredientId"" AND ri.""RecipeId"" IN (
-                                                SELECT ""Id"" FROM ""CookingAssistant.Recipes"" WHERE ""UserId"" = @UserId
+	                                        SELECT i.*, it.task_id, COUNT(ri) AS recipe_count
+	                                        FROM cooking_ingredients AS i
+	                                        INNER JOIN cooking_recipes_ingredients AS ri ON i.id = ri.ingredient_id AND ri.recipe_id IN (
+                                                SELECT id FROM cooking_recipes WHERE user_id = @UserId
 		                                        UNION ALL
-		                                        SELECT ""RecipeId"" FROM ""CookingAssistant.Shares"" WHERE ""UserId"" = @UserId AND ""IsAccepted""
+		                                        SELECT recipe_id FROM cooking_shares WHERE user_id = @UserId AND is_accepted
                                             )
-	                                        LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
-	                                        WHERE i.""UserId"" = 1
-	                                        GROUP BY i.""Id"", it.""TaskId""
+	                                        LEFT JOIN cooking_ingredients_tasks AS it ON i.id = it.ingredient_id AND it.user_id = @UserId
+	                                        WHERE i.user_id = 1
+	                                        GROUP BY i.id, it.task_id
                                         ) t
-                                        ORDER BY t.""ModifiedDate"" DESC, t.""Name""", new { UserId = userId });
+                                        ORDER BY t.modified_date DESC, t.name", new { UserId = userId });
     }
 
     public Ingredient Get(int id)
     {
         using IDbConnection conn = OpenConnection();
-        return conn.QueryFirstOrDefault<Ingredient>(@"SELECT * FROM ""CookingAssistant.Ingredients"" WHERE ""Id"" = @Id", new { Id = id });
+        return conn.QueryFirstOrDefault<Ingredient>(@"SELECT * FROM cooking_ingredients WHERE id = @Id", new { Id = id });
     }
 
     public Ingredient GetForUpdate(int id, int userId)
     {
         using IDbConnection conn = OpenConnection();
 
-        var ingredient = conn.QueryFirstOrDefault<Ingredient>(@"SELECT DISTINCT i.*, it.""TaskId""
-                                                                FROM ""CookingAssistant.Ingredients"" AS i
-                                                                LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
-                                                                WHERE i.""Id"" = @Id AND i.""UserId"" = @UserId", new { Id = id, UserId = userId });
+        var ingredient = conn.QueryFirstOrDefault<Ingredient>(@"SELECT DISTINCT i.*, it.task_id
+                                                                FROM cooking_ingredients AS i
+                                                                LEFT JOIN cooking_ingredients_tasks AS it ON i.id = it.ingredient_id AND it.user_id = @UserId
+                                                                WHERE i.id = @Id AND i.user_id = @UserId", new { Id = id, UserId = userId });
 
         if (ingredient == null)
         {
@@ -66,10 +66,10 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
 
         if (ingredient.TaskId.HasValue)
         {
-            const string taskQuery = @"SELECT t.""Id"", t.""Name"", l.""Id"", l.""Name""
-                                       FROM ""ToDoAssistant.Tasks"" AS t
-                                       INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                                       WHERE t.""Id"" = @TaskId";
+            const string taskQuery = @"SELECT t.id, t.name, l.id, l.name
+                                       FROM todo_tasks AS t
+                                       INNER JOIN todo_lists AS l ON t.list_id = l.id
+                                       WHERE t.id = @TaskId";
 
             var task = conn.Query<ToDoTask, ToDoList, ToDoTask>(taskQuery, (task, list) =>
             {
@@ -80,15 +80,15 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
             ingredient.Task = task;
         }
 
-        var recipes = conn.Query<Recipe>(@"SELECT ""Id"", ""Name""
-                                           FROM ""CookingAssistant.RecipesIngredients"" AS ri
-                                           INNER JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
-                                           WHERE ri.""IngredientId"" = @IngredientId AND ri.""RecipeId"" IN (
-	                                           SELECT ""Id"" FROM ""CookingAssistant.Recipes"" WHERE ""UserId"" = @UserId
+        var recipes = conn.Query<Recipe>(@"SELECT id, name
+                                           FROM cooking_recipes_ingredients AS ri
+                                           INNER JOIN cooking_recipes AS r ON ri.recipe_id = r.id
+                                           WHERE ri.ingredient_id = @IngredientId AND ri.recipe_id IN (
+	                                           SELECT id FROM cooking_recipes WHERE user_id = @UserId
 	                                           UNION ALL
-	                                           SELECT ""RecipeId"" FROM ""CookingAssistant.Shares"" WHERE ""UserId"" = @UserId AND ""IsAccepted""
+	                                           SELECT recipe_id FROM cooking_shares WHERE user_id = @UserId AND is_accepted
                                            )
-                                           ORDER BY r.""Name""", new { IngredientId = id, UserId = userId });
+                                           ORDER BY r.name", new { IngredientId = id, UserId = userId });
         ingredient.Recipes.AddRange(recipes);
 
         return ingredient;
@@ -98,11 +98,11 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT DISTINCT i.*, it.""TaskId"", b.""Id"", b.""Name""
-                               FROM ""CookingAssistant.Ingredients"" AS i
-                               LEFT JOIN ""CookingAssistant.IngredientBrands"" AS b ON i.""BrandId"" = b.""Id""
-                               LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON i.""Id"" = it.""IngredientId"" AND it.""UserId"" = @UserId
-                               WHERE i.""Id"" = @Id AND i.""UserId"" = 1";
+        const string query = @"SELECT DISTINCT i.*, it.task_id, b.id, b.name
+                               FROM cooking_ingredients AS i
+                               LEFT JOIN cooking_ingredient_brands AS b ON i.brand_id = b.id
+                               LEFT JOIN cooking_ingredients_tasks AS it ON i.id = it.ingredient_id AND it.user_id = @UserId
+                               WHERE i.id = @Id AND i.user_id = 1";
 
         var ingredient = conn.Query<Ingredient, IngredientBrand, Ingredient>(query, (ingredient, brand) =>
         {
@@ -117,10 +117,10 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
 
         if (ingredient.TaskId.HasValue)
         {
-            const string taskQuery = @"SELECT t.""Id"", t.""Name"", l.""Id"", l.""Name""
-                                       FROM ""ToDoAssistant.Tasks"" AS t
-                                       INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                                       WHERE t.""Id"" = @TaskId";
+            const string taskQuery = @"SELECT t.id, t.name, l.id, l.name
+                                       FROM todo_tasks AS t
+                                       INNER JOIN todo_lists AS l ON t.list_id = l.id
+                                       WHERE t.id = @TaskId";
 
             var task = conn.Query<ToDoTask, ToDoList, ToDoTask>(taskQuery, (task, list) =>
             {
@@ -131,15 +131,15 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
             ingredient.Task = task;
         }
 
-        var recipes = conn.Query<Recipe>(@"SELECT ""Id"", ""Name""
-                                           FROM ""CookingAssistant.RecipesIngredients"" AS ri
-                                           INNER JOIN ""CookingAssistant.Recipes"" AS r ON ri.""RecipeId"" = r.""Id""
-                                           WHERE ri.""IngredientId"" = @IngredientId AND ri.""RecipeId"" IN (
-	                                           SELECT ""Id"" FROM ""CookingAssistant.Recipes"" WHERE ""UserId"" = @UserId
+        var recipes = conn.Query<Recipe>(@"SELECT id, name
+                                           FROM cooking_recipes_ingredients AS ri
+                                           INNER JOIN cooking_recipes AS r ON ri.recipe_id = r.id
+                                           WHERE ri.ingredient_id = @IngredientId AND ri.recipe_id IN (
+	                                           SELECT id FROM cooking_recipes WHERE user_id = @UserId
 	                                           UNION ALL
-	                                           SELECT ""RecipeId"" FROM ""CookingAssistant.Shares"" WHERE ""UserId"" = @UserId AND ""IsAccepted""
+	                                           SELECT recipe_id FROM cooking_shares WHERE user_id = @UserId AND is_accepted
                                            )
-                                           ORDER BY r.""Name""", new { IngredientId = id, UserId = userId });
+                                           ORDER BY r.name", new { IngredientId = id, UserId = userId });
         ingredient.Recipes.AddRange(recipes);
 
         return ingredient;
@@ -158,21 +158,21 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.Query<IngredientCategory>(@"SELECT * FROM ""CookingAssistant.IngredientCategories"" ORDER BY ""Id""");
+        return conn.Query<IngredientCategory>(@"SELECT * FROM cooking_ingredient_categories ORDER BY id");
     }
 
     public IEnumerable<ToDoTask> GetTaskSuggestions(int userId)
     {
         using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT DISTINCT t.""Id"", t.""Name"", l.""Id"", l.""Name""
-                               FROM ""ToDoAssistant.Tasks"" AS t
-                               INNER JOIN ""ToDoAssistant.Lists"" AS l ON t.""ListId"" = l.""Id""
-                               LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                               LEFT JOIN ""CookingAssistant.IngredientsTasks"" AS it ON t.""Id"" = it.""TaskId"" AND it.""UserId"" = @UserId
-                               LEFT JOIN ""CookingAssistant.Ingredients"" AS i ON t.""Id"" = it.""TaskId""
-                               LEFT JOIN ""CookingAssistant.RecipesIngredients"" AS ri on i.""Id"" = ri.""IngredientId""
-                               WHERE l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")";
+        const string query = @"SELECT DISTINCT t.id, t.name, l.id, l.name
+                               FROM todo_tasks AS t
+                               INNER JOIN todo_lists AS l ON t.list_id = l.id
+                               LEFT JOIN todo_shares AS s ON l.id = s.list_id
+                               LEFT JOIN cooking_ingredients_tasks AS it ON t.id = it.task_id AND it.user_id = @UserId
+                               LEFT JOIN cooking_ingredients AS i ON t.id = it.task_id
+                               LEFT JOIN cooking_recipes_ingredients AS ri on i.id = ri.ingredient_id
+                               WHERE l.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted)";
 
         return conn.Query<ToDoTask, ToDoList, ToDoTask>(query,
             (task, list) =>
@@ -186,7 +186,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM ""CookingAssistant.Ingredients"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
+        return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM cooking_ingredients WHERE id = @Id AND user_id = @UserId",
             new { Id = id, UserId = userId });
     }
 
@@ -195,8 +195,8 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                          FROM ""CookingAssistant.Ingredients""
-                                          WHERE ""Id"" != @Id AND UPPER(""Name"") = UPPER(@Name) AND ""UserId"" = @UserId",
+                                          FROM cooking_ingredients
+                                          WHERE id != @Id AND UPPER(name) = UPPER(@Name) AND user_id = @UserId",
             new { Id = id, Name = name, UserId = userId });
     }
 
@@ -205,8 +205,8 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                          FROM ""CookingAssistant.RecipesIngredients""
-                                          WHERE ""RecipeId"" = @RecipeId AND ""IngredientId"" = @IngredientId",
+                                          FROM cooking_recipes_ingredients
+                                          WHERE recipe_id = @RecipeId AND ingredient_id = @IngredientId",
             new { IngredientId = id, RecipeId = recipeId });
     }
 

@@ -43,5 +43,7 @@ builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
         services.AddHostedService<HostedService>();
     });
 
+Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
 var app = builder.Build();
 await app.RunAsync();

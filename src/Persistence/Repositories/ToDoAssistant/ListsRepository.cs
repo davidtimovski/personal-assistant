@@ -19,11 +19,11 @@ public class ListsRepository : BaseRepository, IListsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT DISTINCT l.*, s.""UserId"", s.""IsAccepted""
-                            FROM ""ToDoAssistant.Lists"" AS l
-                            LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                            WHERE l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"")
-                            ORDER BY l.""Order""";
+        const string query = @"SELECT DISTINCT l.*, s.user_id, s.is_accepted
+                               FROM todo_lists AS l
+                               LEFT JOIN todo_shares AS s ON l.id = s.list_id
+                               WHERE l.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted)
+                               ORDER BY l.order";
 
         return conn.Query<ToDoList, ListShare, ToDoList>(query,
             (list, share) =>
@@ -33,16 +33,16 @@ public class ListsRepository : BaseRepository, IListsRepository
                     list.Shares.Add(share);
                 }
                 return list;
-            }, new { UserId = userId }, null, true, "UserId");
+            }, new { UserId = userId }, null, true, "user_id");
     }
 
     public IEnumerable<int> GetNonArchivedSharedListIds(int userId)
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.Query<int>(@"SELECT ""Id"" FROM ""ToDoAssistant.Lists"" WHERE ""UserId"" = @UserId AND ""IsArchived"" = FALSE
+        return conn.Query<int>(@"SELECT id FROM todo_lists WHERE user_id = @UserId AND is_archived = FALSE
                                  UNION ALL
-                                 SELECT ""ListId"" FROM ""ToDoAssistant.Shares"" WHERE ""UserId"" = @UserId AND ""IsArchived"" = FALSE AND ""IsAccepted""",
+                                 SELECT list_id FROM todo_shares WHERE user_id = @UserId AND is_archived = FALSE AND is_accepted",
             new { UserId = userId });
     }
 
@@ -51,21 +51,21 @@ public class ListsRepository : BaseRepository, IListsRepository
         using IDbConnection conn = OpenConnection();
 
         var lists = conn.Query<ToDoList>(@"SELECT l.*
-                                           FROM ""ToDoAssistant.Lists"" AS l
-                                           LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId"" 
-                                           AND s.""UserId"" = @UserId
-                                           AND s.""IsAccepted"" 
-                                           WHERE (l.""UserId"" = @UserId OR s.""UserId"" = @UserId)",
+                                           FROM todo_lists AS l
+                                           LEFT JOIN todo_shares AS s ON l.id = s.list_id 
+                                           AND s.user_id = @UserId
+                                           AND s.is_accepted 
+                                           WHERE (l.user_id = @UserId OR s.user_id = @UserId)",
             new { UserId = userId }).ToList();
 
         var listIds = lists.Select(x => x.Id).ToArray();
-        var shares = conn.Query<ListShare>(@"SELECT * FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = ANY(@ListIds)", new { ListIds = listIds }).ToList();
+        var shares = conn.Query<ListShare>(@"SELECT * FROM todo_shares WHERE list_id = ANY(@ListIds)", new { ListIds = listIds }).ToList();
 
         const string tasksSql = @"SELECT t.*, u.""Id"", u.""ImageUri""
-                             FROM ""ToDoAssistant.Tasks"" AS t
-                             LEFT JOIN ""AspNetUsers"" AS u ON t.""AssignedToUserId"" = u.""Id""
-                             WHERE t.""ListId"" = ANY(@ListIds)
-                             AND (t.""PrivateToUserId"" IS NULL OR t.""PrivateToUserId"" = @UserId)";
+                                  FROM todo_tasks AS t
+                                  LEFT JOIN ""AspNetUsers"" AS u ON t.assigned_to_user_id = u.""Id""
+                                  WHERE t.list_id = ANY(@ListIds)
+                                  AND (t.private_to_user_id IS NULL OR t.private_to_user_id = @UserId)";
 
         var tasks = conn.Query<ToDoTask, User, ToDoTask>(tasksSql,
             (task, user) =>
@@ -90,9 +90,9 @@ public class ListsRepository : BaseRepository, IListsRepository
 
         return conn.Query<User>(@"SELECT DISTINCT u.""Id"", u.""Name"", u.""ImageUri""
                                   FROM ""AspNetUsers"" AS u
-                                  LEFT JOIN ""ToDoAssistant.Lists"" AS l ON u.""Id"" = l.""UserId""
-                                  LEFT JOIN ""ToDoAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
-                                  WHERE l.""Id"" = @ListId OR (s.""ListId"" = @ListId AND s.""IsAccepted"" IS NOT FALSE)
+                                  LEFT JOIN todo_lists AS l ON u.""Id"" = l.user_id
+                                  LEFT JOIN todo_shares AS s ON u.""Id"" = s.user_id
+                                  WHERE l.id = @ListId OR (s.list_id = @ListId AND s.is_accepted IS NOT FALSE)
                                   ORDER BY u.""Name""", new { ListId = id });
     }
 
@@ -100,18 +100,18 @@ public class ListsRepository : BaseRepository, IListsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.QueryFirstOrDefault<ToDoList>(@"SELECT * FROM ""ToDoAssistant.Lists"" WHERE ""Id"" = @Id", new { Id = id });
+        return conn.QueryFirstOrDefault<ToDoList>(@"SELECT * FROM todo_lists WHERE id = @Id", new { Id = id });
     }
 
     public ToDoList GetWithShares(int id, int userId)
     {
         using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT l.*, s.""UserId"", s.""IsAdmin"", s.""IsAccepted"", 
-                            s.""Order"", s.""NotificationsEnabled"", s.""IsArchived""
-                            FROM ""ToDoAssistant.Lists"" AS l
-                            LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                            WHERE l.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))";
+        const string query = @"SELECT l.*, s.user_id, s.is_admin, s.is_accepted, 
+                               s.order, s.notifications_enabled, s.is_archived
+                               FROM todo_lists AS l
+                               LEFT JOIN todo_shares AS s ON l.id = s.list_id
+                               WHERE l.id = @Id AND (l.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))";
 
         return conn.Query<ToDoList, ListShare, ToDoList>(query,
             (list, share) =>
@@ -121,18 +121,18 @@ public class ListsRepository : BaseRepository, IListsRepository
                     list.Shares.Add(share);
                 }
                 return list;
-            }, new { Id = id, UserId = userId }, null, true, "UserId").First();
+            }, new { Id = id, UserId = userId }, null, true, "user_id").First();
     }
 
     public ToDoList GetWithOwner(int id, int userId)
     {
         using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT DISTINCT l.*, users.""Id"", users.""Email"", users.""ImageUri""
-                               FROM ""ToDoAssistant.Lists"" AS l
-                               LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                               INNER JOIN ""AspNetUsers"" AS users ON l.""UserId"" = users.""Id""
-                               WHERE l.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))";
+        const string query = @"SELECT DISTINCT l.*, u.""Id"", u.""Email"", u.""ImageUri""
+                               FROM todo_lists AS l
+                               LEFT JOIN todo_shares AS s ON l.id = s.list_id
+                               INNER JOIN ""AspNetUsers"" AS u ON l.user_id = u.""Id""
+                               WHERE l.id = @Id AND (l.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))";
 
         return conn.Query<ToDoList, User, ToDoList>(query,
             (list, user) =>
@@ -147,10 +147,10 @@ public class ListsRepository : BaseRepository, IListsRepository
         using IDbConnection conn = OpenConnection();
 
         const string query = @"SELECT s.*, u.""Id"", u.""Email"", u.""ImageUri""
-                               FROM ""ToDoAssistant.Shares"" AS s
-                               INNER JOIN ""AspNetUsers"" AS u ON s.""UserId"" = u.""Id""
-                               WHERE s.""ListId"" = @ListId AND s.""IsAccepted"" IS NOT FALSE
-                               ORDER BY (CASE WHEN s.""IsAccepted"" THEN 1 ELSE 2 END) ASC, s.""CreatedDate""";
+                               FROM todo_shares AS s
+                               INNER JOIN ""AspNetUsers"" AS u ON s.user_id = u.""Id""
+                               WHERE s.list_id = @ListId AND s.is_accepted IS NOT FALSE
+                               ORDER BY (CASE WHEN s.is_accepted THEN 1 ELSE 2 END) ASC, s.created_date";
 
         return conn.Query<ListShare, User, ListShare>(query,
             (share, user) =>
@@ -164,12 +164,12 @@ public class ListsRepository : BaseRepository, IListsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT s.*, l.""Name"", u.""Name""
-                               FROM ""ToDoAssistant.Shares"" AS s
-                               INNER JOIN ""ToDoAssistant.Lists"" AS l ON s.""ListId"" = l.""Id""
-                               INNER JOIN ""AspNetUsers"" AS u ON l.""UserId"" = u.""Id""
-                               WHERE s.""UserId"" = @UserId
-                               ORDER BY s.""ModifiedDate"" DESC";
+        const string query = @"SELECT s.*, l.name, u.""Name""
+                               FROM todo_shares AS s
+                               INNER JOIN todo_lists AS l ON s.list_id = l.id
+                               INNER JOIN ""AspNetUsers"" AS u ON l.user_id = u.""Id""
+                               WHERE s.user_id = @UserId
+                               ORDER BY s.modified_date DESC";
 
         return conn.Query<ListShare, ToDoList, User, ListShare>(query,
             (share, list, user) =>
@@ -177,14 +177,14 @@ public class ListsRepository : BaseRepository, IListsRepository
                 share.List = list;
                 share.User = user;
                 return share;
-            }, new { UserId = userId }, null, true, "Name");
+            }, new { UserId = userId }, null, true, "name,Name");
     }
 
     public int GetPendingShareRequestsCount(int userId)
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Shares"" WHERE ""UserId"" = @UserId AND ""IsAccepted"" IS NULL",
+        return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM todo_shares WHERE user_id = @UserId AND is_accepted IS NULL",
             new { UserId = userId });
     }
 
@@ -193,9 +193,9 @@ public class ListsRepository : BaseRepository, IListsRepository
         using IDbConnection conn = OpenConnection();
 
         return !conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                           FROM ""ToDoAssistant.Lists"" AS l
-                                           INNER JOIN ""ToDoAssistant.Shares"" AS s on l.""Id"" = s.""ListId""
-                                           WHERE l.""UserId"" = @UserId AND s.""UserId"" = @ShareWithId AND s.""IsAccepted"" = FALSE",
+                                           FROM todo_lists AS l
+                                           INNER JOIN todo_shares AS s on l.id = s.list_id
+                                           WHERE l.user_id = @UserId AND s.user_id = @ShareWithId AND s.is_accepted = FALSE",
             new { ShareWithId = shareWithId, UserId = userId });
     }
 
@@ -204,9 +204,9 @@ public class ListsRepository : BaseRepository, IListsRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                          FROM ""ToDoAssistant.Lists"" AS l
-                                          LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                          WHERE l.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted""))",
+                                          FROM todo_lists AS l
+                                          LEFT JOIN todo_shares AS s ON l.id = s.list_id
+                                          WHERE l.id = @Id AND (l.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))",
             new { Id = id, UserId = userId });
     }
 
@@ -215,9 +215,9 @@ public class ListsRepository : BaseRepository, IListsRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                          FROM ""ToDoAssistant.Lists"" AS l
-                                          LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                          WHERE l.""Id"" = @Id AND (l.""UserId"" = @UserId OR (s.""UserId"" = @UserId AND s.""IsAccepted"" IS NOT FALSE))",
+                                          FROM todo_lists AS l
+                                          LEFT JOIN todo_shares AS s ON l.id = s.list_id
+                                          WHERE l.id = @Id AND (l.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted IS NOT FALSE))",
             new { Id = id, UserId = userId });
     }
 
@@ -226,10 +226,10 @@ public class ListsRepository : BaseRepository, IListsRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                          FROM ""ToDoAssistant.Lists"" AS l
-                                          LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                          WHERE l.""Id"" = @Id AND (l.""UserId"" = @UserId 
-                                              OR (s.""UserId"" = @UserId AND s.""IsAccepted"" AND s.""IsAdmin"" = TRUE))",
+                                          FROM todo_lists AS l
+                                          LEFT JOIN todo_shares AS s ON l.id = s.list_id
+                                          WHERE l.id = @Id AND (l.user_id = @UserId 
+                                              OR (s.user_id = @UserId AND s.is_accepted AND s.is_admin = TRUE))",
             new { Id = id, UserId = userId });
     }
 
@@ -238,11 +238,11 @@ public class ListsRepository : BaseRepository, IListsRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                          FROM ""ToDoAssistant.Lists"" AS l
-                                          LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                          WHERE l.""Id"" != @Id AND UPPER(l.""Name"") = UPPER(@Name) 
-                                              AND (l.""UserId"" = @UserId 
-                                              OR (s.""UserId"" = @UserId AND s.""IsAccepted"" AND s.""IsAdmin"" = TRUE))",
+                                          FROM todo_lists AS l
+                                          LEFT JOIN todo_shares AS s ON l.id = s.list_id
+                                          WHERE l.id != @Id AND UPPER(l.name) = UPPER(@Name) 
+                                              AND (l.user_id = @UserId 
+                                              OR (s.user_id = @UserId AND s.is_accepted AND s.is_admin = TRUE))",
             new { Id = id, Name = name, UserId = userId });
     }
 
@@ -251,8 +251,8 @@ public class ListsRepository : BaseRepository, IListsRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                          FROM ""ToDoAssistant.Lists""
-                                          WHERE ""Id"" = @Id AND ""UserId"" = @UserId",
+                                          FROM todo_lists
+                                          WHERE id = @Id AND user_id = @UserId",
             new { Id = id, UserId = userId });
     }
 
@@ -261,8 +261,8 @@ public class ListsRepository : BaseRepository, IListsRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                          FROM ""ToDoAssistant.Shares""
-                                          WHERE ""ListId"" = @ListId AND ""IsAccepted"" IS NOT FALSE",
+                                          FROM todo_shares
+                                          WHERE list_id = @ListId AND is_accepted IS NOT FALSE",
             new { ListId = id });
     }
 
@@ -271,8 +271,8 @@ public class ListsRepository : BaseRepository, IListsRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                          FROM ""ToDoAssistant.Shares""
-                                          WHERE ""UserId"" = @SharedWithId AND ""IsAccepted"" = FALSE AND (SELECT ""UserId"" FROM ""ToDoAssistant.Lists"" WHERE ""Id"" = @ListId) = @SharerId",
+                                          FROM todo_shares
+                                          WHERE user_id = @SharedWithId AND is_accepted = FALSE AND (SELECT user_id FROM todo_lists WHERE id = @ListId) = @SharerId",
             new { SharedWithId = sharedWithId, SharerId = userId, ListId = listId });
     }
 
@@ -283,13 +283,13 @@ public class ListsRepository : BaseRepository, IListsRepository
         return conn.ExecuteScalar<bool>(@"SELECT SUM(total) FROM
                                           (
 	                                          SELECT COUNT(*) AS total
-	                                          FROM ""ToDoAssistant.Lists""
-	                                          WHERE UPPER(""Name"") = UPPER(@Name) AND ""UserId"" = @UserId
+	                                          FROM todo_lists
+	                                          WHERE UPPER(name) = UPPER(@Name) AND user_id = @UserId
 	                                          UNION ALL
 	                                          SELECT COUNT(*) AS total
-	                                          FROM ""ToDoAssistant.Lists"" AS lists
-	                                          LEFT JOIN ""ToDoAssistant.Shares"" AS shares ON shares.""UserId"" = @UserId
-	                                          WHERE UPPER(lists.""Name"") = UPPER(@Name) AND lists.""UserId"" = @UserId
+	                                          FROM todo_lists AS l
+	                                          LEFT JOIN todo_shares AS s ON s.user_id = @UserId
+	                                          WHERE UPPER(l.name) = UPPER(@Name) AND l.user_id = @UserId
                                           ) AS sumTotal",
             new { Name = name, UserId = userId });
     }
@@ -301,13 +301,13 @@ public class ListsRepository : BaseRepository, IListsRepository
         return conn.ExecuteScalar<bool>(@"SELECT SUM(total) FROM
                                           (
 	                                          SELECT COUNT(*) AS total
-	                                          FROM ""ToDoAssistant.Lists""
-	                                          WHERE ""Id"" != @Id AND UPPER(""Name"") = UPPER(@Name) AND ""UserId"" = @UserId
+	                                          FROM todo_lists
+	                                          WHERE id != @Id AND UPPER(name) = UPPER(@Name) AND user_id = @UserId
 	                                          UNION ALL
 	                                          SELECT COUNT(*) AS total
-	                                          FROM ""ToDoAssistant.Lists"" AS lists
-	                                          LEFT JOIN ""ToDoAssistant.Shares"" AS shares ON shares.""UserId"" = @UserId
-	                                          WHERE ""Id"" != @Id AND UPPER(lists.""Name"") = UPPER(@Name) AND lists.""UserId"" = @UserId
+	                                          FROM todo_lists AS l
+	                                          LEFT JOIN todo_shares AS s ON s.user_id = @UserId
+	                                          WHERE id != @Id AND UPPER(l.name) = UPPER(@Name) AND l.user_id = @UserId
                                           ) AS sumTotal",
             new { Id = id, Name = name, UserId = userId });
     }
@@ -316,7 +316,7 @@ public class ListsRepository : BaseRepository, IListsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Lists"" WHERE ""UserId"" = @UserId", new { UserId = userId });
+        return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM todo_lists WHERE user_id = @UserId", new { UserId = userId });
     }
 
     public IEnumerable<User> GetUsersToBeNotifiedOfChange(int id, int excludeUserId)
@@ -325,13 +325,13 @@ public class ListsRepository : BaseRepository, IListsRepository
 
         return conn.Query<User>(@"SELECT u.*
                                   FROM ""AspNetUsers"" AS u
-                                  INNER JOIN ""ToDoAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
-                                  WHERE u.""Id"" != @ExcludeUserId AND s.""ListId"" = @ListId AND s.""IsAccepted"" AND u.""ToDoNotificationsEnabled"" AND s.""NotificationsEnabled""
+                                  INNER JOIN todo_shares AS s ON u.""Id"" = s.user_id
+                                  WHERE u.""Id"" != @ExcludeUserId AND s.list_id = @ListId AND s.is_accepted AND u.""ToDoNotificationsEnabled"" AND s.notifications_enabled
                                   UNION
                                   SELECT u.*
                                   FROM ""AspNetUsers"" AS u
-                                  INNER JOIN ""ToDoAssistant.Lists"" AS l ON u.""Id"" = l.""UserId""
-                                  WHERE u.""Id"" != @ExcludeUserId AND l.""Id"" = @ListId AND u.""ToDoNotificationsEnabled"" AND l.""NotificationsEnabled""",
+                                  INNER JOIN todo_lists AS l ON u.""Id"" = l.user_id
+                                  WHERE u.""Id"" != @ExcludeUserId AND l.id = @ListId AND u.""ToDoNotificationsEnabled"" AND l.notifications_enabled",
             new { ListId = id, ExcludeUserId = excludeUserId });
     }
 
@@ -341,8 +341,8 @@ public class ListsRepository : BaseRepository, IListsRepository
 
         return conn.Query<User>(@"SELECT u.*
                                   FROM ""AspNetUsers"" AS u
-                                  INNER JOIN ""ToDoAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
-                                  WHERE s.""ListId"" = @ListId AND s.""IsAccepted"" AND u.""ToDoNotificationsEnabled"" AND s.""NotificationsEnabled""",
+                                  INNER JOIN todo_shares AS s ON u.""Id"" = s.user_id
+                                  WHERE s.list_id = @ListId AND s.is_accepted AND u.""ToDoNotificationsEnabled"" AND s.notifications_enabled",
             new { ListId = id });
     }
 
@@ -352,8 +352,8 @@ public class ListsRepository : BaseRepository, IListsRepository
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
                                           FROM ""AspNetUsers"" AS u
-                                          INNER JOIN ""ToDoAssistant.Shares"" AS s ON u.""Id"" = s.""UserId""
-                                          WHERE u.""Id"" = @UserId AND s.""ListId"" = @ListId AND s.""IsAccepted"" AND u.""ToDoNotificationsEnabled"" AND s.""NotificationsEnabled""",
+                                          INNER JOIN todo_shares AS s ON u.""Id"" = s.user_id
+                                          WHERE u.""Id"" = @UserId AND s.list_id = @ListId AND s.is_accepted AND u.""ToDoNotificationsEnabled"" AND s.notifications_enabled",
             new { ListId = id, UserId = userId });
     }
 
@@ -362,10 +362,10 @@ public class ListsRepository : BaseRepository, IListsRepository
         using IDbConnection conn = OpenConnection();
 
         var listsCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*)
-                                                     FROM ""ToDoAssistant.Lists"" AS l
-                                                     LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                                     WHERE l.""IsArchived"" = FALSE AND l.""UserId"" = @UserId 
-                                                         OR (s.""UserId"" = @UserId AND s.""IsAccepted"" AND s.""IsArchived"" = FALSE)",
+                                                     FROM todo_lists AS l
+                                                     LEFT JOIN todo_shares AS s ON l.id = s.list_id
+                                                     WHERE l.is_archived = FALSE AND l.user_id = @UserId 
+                                                         OR (s.user_id = @UserId AND s.is_accepted AND s.is_archived = FALSE)",
             new { list.UserId });
         list.Order = ++listsCount;
 
@@ -386,7 +386,7 @@ public class ListsRepository : BaseRepository, IListsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        ToDoList originalList = conn.QueryFirst<ToDoList>(@"SELECT * FROM ""ToDoAssistant.Lists"" WHERE ""Id"" = @Id", new { list.Id });
+        var originalList = conn.QueryFirst<ToDoList>(@"SELECT * FROM todo_lists WHERE id = @Id", new { list.Id });
 
         ToDoList dbList = EFContext.Lists.Find(list.Id);
         dbList.Name = list.Name;
@@ -430,9 +430,9 @@ public class ListsRepository : BaseRepository, IListsRepository
         var affectedUsers = new List<(int, short?)> {
             (list.UserId, list.Order)
         };
-        affectedUsers.AddRange(conn.Query<(int, short?)>(@"SELECT ""UserId"", ""Order""
-                                                           FROM ""ToDoAssistant.Shares""
-                                                           WHERE ""ListId"" = @Id AND ""IsAccepted"" = TRUE", new { Id = id }));
+        affectedUsers.AddRange(conn.Query<(int, short?)>(@"SELECT user_id, ""order""
+                                                           FROM todo_shares
+                                                           WHERE list_id = @Id AND is_accepted = TRUE", new { Id = id }));
 
         EFContext.Lists.Remove(list);
 
@@ -479,8 +479,8 @@ public class ListsRepository : BaseRepository, IListsRepository
         using IDbConnection conn = OpenConnection();
 
         var share = conn.QueryFirst<ListShare>(@"SELECT * 
-                                                 FROM ""ToDoAssistant.Shares"" 
-                                                 WHERE ""ListId"" = @ListId AND ""UserId"" = @UserId",
+                                                 FROM todo_shares 
+                                                 WHERE list_id = @ListId AND user_id = @UserId",
             new { ListId = id, UserId = userId });
 
         EFContext.ListShares.Remove(share);
@@ -497,7 +497,7 @@ public class ListsRepository : BaseRepository, IListsRepository
             dbShare.Order -= 1;
         }
 
-        var sharesCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = @ListId AND ""IsAccepted"" IS NOT FALSE", new { ListId = id });
+        var sharesCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*) FROM todo_shares WHERE list_id = @ListId AND is_accepted IS NOT FALSE", new { ListId = id });
         if (sharesCount == 1)
         {
             var uncompletedTasks = EFContext.Tasks.Where(x => x.ListId == id && !x.IsCompleted && !x.PrivateToUserId.HasValue);
@@ -536,19 +536,19 @@ public class ListsRepository : BaseRepository, IListsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        list.Tasks = conn.Query<ToDoTask>(@"SELECT * FROM ""ToDoAssistant.Tasks""
-                                            WHERE ""ListId"" = @ListId AND (""PrivateToUserId"" IS NULL OR ""PrivateToUserId"" = @UserId)
-                                            ORDER BY ""PrivateToUserId"" NULLS LAST",
+        list.Tasks = conn.Query<ToDoTask>(@"SELECT * FROM todo_tasks
+                                            WHERE list_id = @ListId AND (private_to_user_id IS NULL OR private_to_user_id = @UserId)
+                                            ORDER BY private_to_user_id NULLS LAST",
             new { ListId = list.Id, list.UserId }).ToList();
 
         var listsCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*)
-                                                     FROM ""ToDoAssistant.Lists"" AS l
-                                                     LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                                     WHERE l.""IsArchived"" = FALSE AND l.""UserId"" = @UserId 
-                                                         OR (s.""UserId"" = @UserId AND s.""IsAccepted"" AND s.""IsArchived"" = FALSE)",
+                                                     FROM todo_lists AS l
+                                                     LEFT JOIN todo_shares AS s ON l.id = s.list_id
+                                                     WHERE l.is_archived = FALSE AND l.user_id = @UserId 
+                                                         OR (s.user_id = @UserId AND s.is_accepted AND s.is_archived = FALSE)",
             new { list.UserId });
 
-        ToDoList dbList = conn.QueryFirst<ToDoList>(@"SELECT * FROM ""ToDoAssistant.Lists"" WHERE ""Id"" = @Id", new { list.Id });
+        ToDoList dbList = conn.QueryFirst<ToDoList>(@"SELECT * FROM todo_lists WHERE id = @Id", new { list.Id });
 
         list.Id = default;
         list.Order = ++listsCount;
@@ -601,10 +601,10 @@ public class ListsRepository : BaseRepository, IListsRepository
                 using IDbConnection conn = OpenConnection();
 
                 var listsCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*)
-                                                             FROM ""ToDoAssistant.Lists"" AS l
-                                                             LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                                             WHERE l.""IsArchived"" = FALSE AND l.""UserId"" = @UserId 
-                                                                 OR (s.""UserId"" = @UserId AND s.""IsAccepted"" AND s.""IsArchived"" = FALSE)",
+                                                             FROM todo_lists AS l
+                                                             LEFT JOIN todo_shares AS s ON l.id = s.list_id
+                                                             WHERE l.is_archived = FALSE AND l.user_id = @UserId 
+                                                                 OR (s.user_id = @UserId AND s.is_accepted AND s.is_archived = FALSE)",
                     new { UserId = userId });
 
                 list.IsArchived = false;
@@ -641,11 +641,11 @@ public class ListsRepository : BaseRepository, IListsRepository
                 using IDbConnection conn = OpenConnection();
 
                 var listsCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*)
-                                                             FROM ""ToDoAssistant.Lists"" AS l
-                                                             LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                                             WHERE l.""IsArchived"" = FALSE 
-                                                                 AND l.""UserId"" = @UserId 
-                                                                 OR (s.""UserId"" = @UserId AND s.""IsAccepted"" AND s.""IsArchived"" = FALSE)",
+                                                             FROM todo_lists AS l
+                                                             LEFT JOIN todo_shares AS s ON l.id = s.list_id
+                                                             WHERE l.is_archived = FALSE 
+                                                                 AND l.user_id = @UserId 
+                                                                 OR (s.user_id = @UserId AND s.is_accepted AND s.is_archived = FALSE)",
                     new { UserId = userId });
 
                 share.IsArchived = false;
@@ -695,10 +695,10 @@ public class ListsRepository : BaseRepository, IListsRepository
         if (isAccepted)
         {
             var listsCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*)
-                                                         FROM ""ToDoAssistant.Lists"" AS l
-                                                         LEFT JOIN ""ToDoAssistant.Shares"" AS s ON l.""Id"" = s.""ListId""
-                                                         WHERE l.""IsArchived"" = FALSE AND l.""UserId"" = @UserId 
-                                                            OR (s.""UserId"" = @UserId AND s.""IsAccepted"" AND s.""IsArchived"" = FALSE)",
+                                                         FROM todo_lists AS l
+                                                         LEFT JOIN todo_shares AS s ON l.id = s.list_id
+                                                         WHERE l.is_archived = FALSE AND l.user_id = @UserId 
+                                                            OR (s.user_id = @UserId AND s.is_accepted AND s.is_archived = FALSE)",
                 new { UserId = userId });
             order = ++listsCount;
         }
@@ -710,7 +710,7 @@ public class ListsRepository : BaseRepository, IListsRepository
 
         if (!isAccepted)
         {
-            var sharesCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Shares"" WHERE ""ListId"" = @ListId AND ""IsAccepted"" IS NOT FALSE", new { ListId = id });
+            var sharesCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*) FROM todo_shares WHERE list_id = @ListId AND is_accepted IS NOT FALSE", new { ListId = id });
 
             // If this is the last share make all private tasks public
             if (sharesCount == 1)
@@ -759,7 +759,7 @@ public class ListsRepository : BaseRepository, IListsRepository
 
         using IDbConnection conn = OpenConnection();
 
-        var userIsOwner = conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Lists"" WHERE ""Id"" = @Id AND ""UserId"" = @UserId", new { Id = id, UserId = userId });
+        var userIsOwner = conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM todo_lists WHERE id = @Id AND user_id = @UserId", new { Id = id, UserId = userId });
 
         if (userIsOwner)
         {

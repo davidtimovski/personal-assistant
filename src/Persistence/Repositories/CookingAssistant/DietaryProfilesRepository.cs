@@ -2,8 +2,8 @@
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
 using Application.Contracts.CookingAssistant.DietaryProfiles;
+using Dapper;
 using Domain.Entities.Common;
 using Domain.Entities.CookingAssistant;
 
@@ -19,9 +19,9 @@ public class DietaryProfilesRepository : BaseRepository, IDietaryProfilesReposit
         using IDbConnection conn = OpenConnection();
 
         const string query = @"SELECT dp.*, u.""Id"", u.""ImperialSystem""
-                        FROM ""CookingAssistant.DietaryProfiles"" AS dp
-                        INNER JOIN ""AspNetUsers"" AS u ON dp.""UserId"" = u.""Id""
-                        WHERE dp.""UserId"" = @UserId";
+                               FROM cooking_dietary_profiles AS dp
+                               INNER JOIN ""AspNetUsers"" AS u ON dp.user_id = u.""Id""
+                               WHERE dp.user_id = @UserId";
 
         var dietaryProfiles = conn.Query<DietaryProfile, User, DietaryProfile>(query,
             (detaryProfile, user) =>

@@ -39,36 +39,45 @@ public class PersonalAssistantContext : DbContext
     {
         modelBuilder.Entity<ToDoList>(x =>
         {
-            x.ToTable("ToDoAssistant.Lists");
+            x.ToTable("todo_lists");
 
+            x.Property(e => e.UserId).IsRequired();
             x.Property(e => e.Name).IsRequired();
             x.Property(e => e.Icon).HasDefaultValue("Regular");
             x.Property(e => e.NotificationsEnabled).HasDefaultValue(true);
+
             x.Ignore(e => e.IsShared);
         });
-        modelBuilder.Entity<ToDoTask>(x => { 
-            x.ToTable("ToDoAssistant.Tasks");
+        modelBuilder.Entity<ToDoTask>(x =>
+        { 
+            x.ToTable("todo_tasks");
 
+            x.Property(e => e.ListId).IsRequired();
             x.Property(e => e.Name).IsRequired();
         });
         modelBuilder.Entity<ListShare>(x =>
         {
-            x.ToTable("ToDoAssistant.Shares");
+            x.ToTable("todo_shares");
+
             x.HasKey(e => new { e.ListId, e.UserId });
+
             x.Property(e => e.NotificationsEnabled).HasDefaultValue(true);
         });
-        modelBuilder.Entity<Notification>(x => { x.ToTable("ToDoAssistant.Notifications"); });
+        modelBuilder.Entity<Notification>(x =>
+        { 
+            x.ToTable("todo_notifications");
+        });
 
         modelBuilder.Entity<Recipe>(x =>
         {
-            x.ToTable("CookingAssistant.Recipes");
+            x.ToTable("cooking_recipes");
 
             x.Property(e => e.Name).IsRequired();
             x.Ignore(e => e.IngredientsMissing);
         });
         modelBuilder.Entity<Ingredient>(x =>
         {
-            x.ToTable("CookingAssistant.Ingredients");
+            x.ToTable("cooking_ingredients");
 
             x.Property(e => e.Name).IsRequired();
             x.Property(e => e.ServingSize).HasDefaultValue(100);
@@ -80,51 +89,52 @@ public class PersonalAssistantContext : DbContext
         });
         modelBuilder.Entity<IngredientBrand>(x =>
         {
-            x.ToTable("CookingAssistant.IngredientBrands");
+            x.ToTable("cooking_ingredient_brands");
             x.Property(e => e.Name).IsRequired();
         });
         modelBuilder.Entity<RecipeIngredient>(x =>
         {
-            x.ToTable("CookingAssistant.RecipesIngredients");
+            x.ToTable("cooking_recipes_ingredients");
 
             x.HasKey(e => new { e.RecipeId, e.IngredientId });
             x.Property(e => e.Unit).HasMaxLength(5);
         });
         modelBuilder.Entity<IngredientTask>(x =>
         {
-            x.ToTable("CookingAssistant.IngredientsTasks");
+            x.ToTable("cooking_ingredients_tasks");
             x.HasKey(e => new { e.IngredientId, e.UserId });
         });
         modelBuilder.Entity<RecipeShare>(x =>
         {
-            x.ToTable("CookingAssistant.Shares");
+            x.ToTable("cooking_shares");
             x.HasKey(e => new { e.RecipeId, e.UserId });
         });
         modelBuilder.Entity<SendRequest>(x =>
         {
-            x.ToTable("CookingAssistant.SendRequests");
+            x.ToTable("cooking_send_requests");
             x.HasKey(e => new { e.RecipeId, e.UserId });
         });
         modelBuilder.Entity<DietaryProfile>(x =>
         {
-            x.ToTable("CookingAssistant.DietaryProfiles");
+            x.ToTable("cooking_dietary_profiles");
             x.HasKey(e => e.UserId);
         });
 
-        modelBuilder.Entity<Account>(x => { x.ToTable("Accountant.Accounts"); });
-        modelBuilder.Entity<Transaction>(x => { x.ToTable("Accountant.Transactions"); });
-        modelBuilder.Entity<Category>(x => { x.ToTable("Accountant.Categories"); });
-        modelBuilder.Entity<UpcomingExpense>(x => { x.ToTable("Accountant.UpcomingExpenses"); });
-        modelBuilder.Entity<Debt>(x => { x.ToTable("Accountant.Debts"); });
+        modelBuilder.Entity<Account>(x => { x.ToTable("accountant_accounts"); });
+        modelBuilder.Entity<Transaction>(x => { x.ToTable("accountant_transactions"); });
+        modelBuilder.Entity<Category>(x => { x.ToTable("accountant_categories"); });
+        modelBuilder.Entity<UpcomingExpense>(x => { x.ToTable("accountant_upcoming_expenses"); });
+        modelBuilder.Entity<Debt>(x => { x.ToTable("accountant_debts"); });
         modelBuilder.Entity<DeletedEntity>(x =>
         { 
-            x.ToTable("Accountant.DeletedEntities");
+            x.ToTable("accountant_deleted_entities");
             x.HasKey(e => new { e.UserId, e.EntityType, e.EntityId });
         });
 
+        modelBuilder.Entity<Tooltip>(x => { x.ToTable("tooltips"); });
         modelBuilder.Entity<TooltipDismissed>(x =>
         {
-            x.ToTable("TooltipsDismissed");
+            x.ToTable("tooltips_dismissed");
             x.HasKey(e => new { e.TooltipId, e.UserId });
         });
     }

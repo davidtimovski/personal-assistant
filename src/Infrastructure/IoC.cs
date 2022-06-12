@@ -1,11 +1,11 @@
 ﻿using System.Net.Http;
-using CloudinaryDotNet;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Application.Contracts.Common;
+using CloudinaryDotNet;
 using Infrastructure.Cdn;
 using Infrastructure.Currency;
 using Infrastructure.Sender;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure;
 

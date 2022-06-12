@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Text;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 using Application.Contracts.Common;
 using Infrastructure.Sender.Models;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 
 namespace Infrastructure.Sender;

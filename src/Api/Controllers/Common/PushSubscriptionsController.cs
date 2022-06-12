@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Mvc;
 using Application.Contracts.Common;
 using Application.Contracts.Common.Models;
 using Infrastructure.Identity;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers.Common;
 

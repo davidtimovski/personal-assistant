@@ -113,7 +113,7 @@ public sealed class HostedService : IHostedService, IDisposable
             using var conn = new NpgsqlConnection(_configuration["ConnectionString"]);
             conn.Open();
 
-            var recipientSubs = conn.Query<Domain.Entities.Common.PushSubscription>(@"SELECT * FROM ""PushSubscriptions"" WHERE ""UserId"" = @UserId AND ""Application"" = @Application",
+            var recipientSubs = conn.Query<Domain.Entities.Common.PushSubscription>(@"SELECT * FROM push_subscriptions WHERE user_id = @UserId AND application = @Application",
                 new { pushNotification.UserId, pushNotification.Application });
 
             string appVapidConfigPrefix = pushNotification.Application.Replace(" ", string.Empty, StringComparison.Ordinal);
@@ -148,7 +148,7 @@ public sealed class HostedService : IHostedService, IDisposable
                     }
                     catch (WebPushException ex) when (ex.Message == "Subscription no longer valid")
                     {
-                        conn.Execute(@"DELETE FROM ""PushSubscriptions"" WHERE ""Id"" = @Id", new { recipientSub.Id });
+                        conn.Execute(@"DELETE FROM push_subscriptions WHERE id = @Id", new { recipientSub.Id });
                     }
                 }
             }

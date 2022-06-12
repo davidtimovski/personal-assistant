@@ -2,8 +2,8 @@
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
 using Application.Contracts.ToDoAssistant.Notifications;
+using Dapper;
 using Domain.Entities.Common;
 using Domain.Entities.ToDoAssistant;
 
@@ -19,10 +19,10 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
         using IDbConnection conn = OpenConnection();
 
         const string query = @"SELECT n.*, u.""Id"", u.""ImageUri""
-                            FROM ""ToDoAssistant.Notifications"" AS n
-                            INNER JOIN ""AspNetUsers"" AS u ON n.""ActionUserId"" = u.""Id""
-                            WHERE ""UserId"" = @UserId
-                            ORDER BY ""ModifiedDate"" DESC";
+                               FROM todo_notifications AS n
+                               INNER JOIN ""AspNetUsers"" AS u ON n.action_user_id = u.""Id""
+                               WHERE user_id = @UserId
+                               ORDER BY modified_date DESC";
 
         var notifications = conn.Query<Notification, User, Notification>(query,
             (notification, user) =>
@@ -35,7 +35,7 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
         var unseenNotificationIds = notifications.Where(x => !x.IsSeen).Select(x => x.Id).ToList();
         if (unseenNotificationIds.Count > 0)
         {
-            conn.Execute(@"UPDATE ""ToDoAssistant.Notifications"" SET ""IsSeen"" = TRUE WHERE ""Id"" = ANY(@UnseenNotificationIds)",
+            conn.Execute(@"UPDATE todo_notifications SET is_seen = TRUE WHERE id = ANY(@UnseenNotificationIds)",
                 new { UnseenNotificationIds = unseenNotificationIds });
         }
 
@@ -46,7 +46,7 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM ""ToDoAssistant.Notifications"" WHERE ""UserId"" = @UserId AND ""IsSeen"" = FALSE",
+        return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM todo_notifications WHERE user_id = @UserId AND is_seen = FALSE",
             new { UserId = userId });
     }
 
@@ -54,7 +54,7 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        await conn.ExecuteAsync(@"DELETE FROM ""ToDoAssistant.Notifications"" WHERE ""UserId"" = @UserId AND ""ListId"" = @ListId",
+        await conn.ExecuteAsync(@"DELETE FROM todo_notifications WHERE user_id = @UserId AND list_id = @ListId",
             new { UserId = userId, ListId = listId });
     }
 
@@ -62,9 +62,9 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        var id = await conn.QueryFirstOrDefaultAsync<int?>(@"SELECT ""Id""
-                                                                 FROM ""ToDoAssistant.Notifications"" 
-                                                                 WHERE ""UserId"" = @UserId AND ""Message"" = @Message AND ""IsSeen"" = FALSE",
+        var id = await conn.QueryFirstOrDefaultAsync<int?>(@"SELECT id
+                                                             FROM todo_notifications 
+                                                             WHERE user_id = @UserId AND message = @Message AND is_seen = FALSE",
             new { notification.UserId, notification.Message });
 
         if (id != null)

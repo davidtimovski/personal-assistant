@@ -18,7 +18,7 @@ public class CategoriesRepository : BaseRepository, ICategoriesRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.Query<Category>(@"SELECT * FROM ""Accountant.Categories"" WHERE ""UserId"" = @UserId AND ""ModifiedDate"" > @FromModifiedDate",
+        return conn.Query<Category>(@"SELECT * FROM accountant_categories WHERE user_id = @UserId AND modified_date > @FromModifiedDate",
             new { UserId = userId, FromModifiedDate = fromModifiedDate });
     }
 
@@ -26,7 +26,7 @@ public class CategoriesRepository : BaseRepository, ICategoriesRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.Query<int>(@"SELECT ""EntityId"" FROM ""Accountant.DeletedEntities"" WHERE ""UserId"" = @UserId AND ""EntityType"" = @EntityType AND ""DeletedDate"" > @DeletedDate",
+        return conn.Query<int>(@"SELECT entity_id FROM accountant_deleted_entities WHERE user_id = @UserId AND entity_type = @EntityType AND deleted_date > @DeletedDate",
             new { UserId = userId, EntityType = (short)EntityType.Category, DeletedDate = fromDate });
     }
 

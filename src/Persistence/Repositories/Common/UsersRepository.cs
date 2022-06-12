@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.Threading.Tasks;
-using Dapper;
 using Application.Contracts.Common;
+using Dapper;
 using Domain.Entities.Common;
 
 namespace Persistence.Repositories.Common;
@@ -51,8 +51,8 @@ public class UsersRepository : BaseRepository, IUsersRepository
         using IDbConnection conn = OpenConnection();
 
         await conn.QueryAsync(@"UPDATE ""AspNetUsers""
-                                        SET ""ToDoNotificationsEnabled"" = @Enabled
-                                        WHERE ""Id"" = @Id",
+                                SET ""ToDoNotificationsEnabled"" = @Enabled
+                                WHERE ""Id"" = @Id",
             new
             {
                 Id = id,
@@ -65,8 +65,8 @@ public class UsersRepository : BaseRepository, IUsersRepository
         using IDbConnection conn = OpenConnection();
 
         await conn.QueryAsync(@"UPDATE ""AspNetUsers""
-                                        SET ""CookingNotificationsEnabled"" = @Enabled
-                                        WHERE ""Id"" = @Id",
+                                SET ""CookingNotificationsEnabled"" = @Enabled
+                                WHERE ""Id"" = @Id",
             new
             {
                 Id = id,
@@ -79,8 +79,8 @@ public class UsersRepository : BaseRepository, IUsersRepository
         using IDbConnection conn = OpenConnection();
 
         await conn.QueryAsync(@"UPDATE ""AspNetUsers""
-                                        SET ""ImperialSystem"" = @ImperialSystem
-                                        WHERE ""Id"" = @Id",
+                                SET ""ImperialSystem"" = @ImperialSystem
+                                WHERE ""Id"" = @Id",
             new
             {
                 Id = id,
