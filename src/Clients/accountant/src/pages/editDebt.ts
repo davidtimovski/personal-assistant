@@ -138,7 +138,7 @@ export class EditDebt {
             null,
             null
           );
-          const id = await this.debtsService.create(debt);
+          const id = await this.debtsService.createOrMerge(debt, this.localStorage.mergeDebtPerPerson);
           this.personIsInvalid = false;
           this.amountIsInvalid = false;
 

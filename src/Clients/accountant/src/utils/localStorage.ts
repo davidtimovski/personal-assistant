@@ -20,6 +20,11 @@ export class LocalStorage extends LocalStorageCurrencies {
     if (!showDebtOnDashboard) {
       this.setShowDebtOnDashboard(true);
     }
+
+    const mergeDebtPerPerson = window.localStorage.getItem("mergeDebtPerPerson");
+    if (!mergeDebtPerPerson) {
+      this.setMergeDebtPerPerson(true);
+    }
   }
 
   get lastSynced(): string {
@@ -44,5 +49,13 @@ export class LocalStorage extends LocalStorageCurrencies {
   }
   setShowDebtOnDashboard(showDebtOnDashboard: boolean) {
     window.localStorage.setItem("showDebtOnDashboard", showDebtOnDashboard.toString());
+  }
+
+  get mergeDebtPerPerson(): boolean {
+    const mergeDebtPerPerson = window.localStorage.getItem("mergeDebtPerPerson");
+    return mergeDebtPerPerson === "true";
+  }
+  setMergeDebtPerPerson(mergeDebtPerPerson: boolean) {
+    window.localStorage.setItem("mergeDebtPerPerson", mergeDebtPerPerson.toString());
   }
 }

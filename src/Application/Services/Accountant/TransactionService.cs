@@ -66,6 +66,11 @@ public class TransactionService : ITransactionService
 
         var transaction = _mapper.Map<Transaction>(model);
 
+        if (transaction.Description != null)
+        {
+            transaction.Description = transaction.Description.Trim();
+        }
+
         return await _transactionsRepository.CreateAsync(transaction);
     }
 
@@ -84,6 +89,11 @@ public class TransactionService : ITransactionService
         }
 
         var transaction = _mapper.Map<Transaction>(model);
+
+        if (transaction.Description != null)
+        {
+            transaction.Description = transaction.Description.Trim();
+        }
 
         await _transactionsRepository.UpdateAsync(transaction);
     }

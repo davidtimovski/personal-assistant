@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using Application.Contracts.Accountant.Common.Models;
 using Application.Contracts.Accountant.Debts;
 using Application.Contracts.Accountant.Debts.Models;
+using AutoMapper;
 using Domain.Entities.Accountant;
 
 namespace Application.Services.Accountant;
@@ -39,12 +39,39 @@ public class DebtService : IDebtService
     public Task<int> CreateAsync(CreateDebt model)
     {
         var debt = _mapper.Map<Debt>(model);
+
+        debt.Person = debt.Person.Trim();
+        if (debt.Description != null)
+        {
+            debt.Description = debt.Description.Trim();
+        }
+
         return _debtsRepository.CreateAsync(debt);
+    }
+
+    public Task<int> CreateMergedAsync(CreateDebt model)
+    {
+        var debt = _mapper.Map<Debt>(model);
+
+        debt.Person = debt.Person.Trim();
+        if (debt.Description != null)
+        {
+            debt.Description = debt.Description.Trim();
+        }
+
+        return _debtsRepository.CreateMergedAsync(debt);
     }
 
     public async Task UpdateAsync(UpdateDebt model)
     {
         var debt = _mapper.Map<Debt>(model);
+
+        debt.Person = debt.Person.Trim();
+        if (debt.Description != null)
+        {
+            debt.Description = debt.Description.Trim();
+        }
+
         await _debtsRepository.UpdateAsync(debt);
     }
 

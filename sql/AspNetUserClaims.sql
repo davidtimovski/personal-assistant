@@ -1,7 +1,3 @@
--- Table: public."AspNetUserClaims"
-
--- DROP TABLE public."AspNetUserClaims";
-
 CREATE TABLE public."AspNetUserClaims"
 (
     "Id" serial NOT NULL,
@@ -21,10 +17,6 @@ TABLESPACE pg_default;
 
 ALTER TABLE public."AspNetUserClaims"
     OWNER to personalassistant;
-
--- Index: IX_AspNetUserClaims_UserId
-
--- DROP INDEX public."IX_AspNetUserClaims_UserId";
 
 CREATE INDEX "IX_AspNetUserClaims_UserId"
     ON public."AspNetUserClaims" USING btree

@@ -37,6 +37,19 @@ public class DebtsRepository : BaseRepository, IDebtsRepository
         return debt.Id;
     }
 
+    public async Task<int> CreateMergedAsync(Debt debt)
+    {
+        var otherDebtWithPerson = EFContext.Debts.Where(x => x.Person.ToLower() == debt.Person.ToLower());
+        foreach (var otherDebt in otherDebtWithPerson)
+        {
+            EFContext.Debts.Remove(otherDebt);
+        }
+
+        EFContext.Debts.Add(debt);
+        await EFContext.SaveChangesAsync();
+        return debt.Id;
+    }
+
     public async Task UpdateAsync(Debt debt)
     {
         Debt dbDebt = EFContext.Debts.Find(debt.Id);

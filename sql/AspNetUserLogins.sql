@@ -1,7 +1,3 @@
--- Table: public."AspNetUserLogins"
-
--- DROP TABLE public."AspNetUserLogins";
-
 CREATE TABLE public."AspNetUserLogins"
 (
     "LoginProvider" text COLLATE pg_catalog."default" NOT NULL,
@@ -21,10 +17,6 @@ TABLESPACE pg_default;
 
 ALTER TABLE public."AspNetUserLogins"
     OWNER to personalassistant;
-
--- Index: IX_AspNetUserLogins_UserId
-
--- DROP INDEX public."IX_AspNetUserLogins_UserId";
 
 CREATE INDEX "IX_AspNetUserLogins_UserId"
     ON public."AspNetUserLogins" USING btree

@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Api.Controllers.Accountant;
-using Microsoft.AspNetCore.Mvc;
 using Api.UnitTests.Builders;
+using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
 namespace Api.UnitTests.Controllers.Accountant;
@@ -22,6 +22,13 @@ public class DebtsControllerTests
     public async Task Create_Returns400_IfBodyMissing()
     {
         var result = await _sut.Create(null);
+        Assert.IsType<BadRequestResult>(result);
+    }
+
+    [Fact]
+    public async Task CreateMerged_Returns400_IfBodyMissing()
+    {
+        var result = await _sut.CreateMerged(null);
         Assert.IsType<BadRequestResult>(result);
     }
 

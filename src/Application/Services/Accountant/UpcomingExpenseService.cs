@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
-using Application.Contracts.Accountant.Categories;
 using Application.Contracts.Accountant.Common.Models;
-using Application.Contracts.Accountant.Transactions;
 using Application.Contracts.Accountant.UpcomingExpenses;
 using Application.Contracts.Accountant.UpcomingExpenses.Models;
+using AutoMapper;
 using Domain.Entities.Accountant;
 
 namespace Application.Services.Accountant;
@@ -42,12 +40,24 @@ public class UpcomingExpenseService : IUpcomingExpenseService
     public Task<int> CreateAsync(CreateUpcomingExpense model)
     {
         var upcomingExpense = _mapper.Map<UpcomingExpense>(model);
+
+        if (upcomingExpense.Description != null)
+        {
+            upcomingExpense.Description = upcomingExpense.Description.Trim();
+        }
+
         return _upcomingExpensesRepository.CreateAsync(upcomingExpense);
     }
 
     public async Task UpdateAsync(UpdateUpcomingExpense model)
     {
         var upcomingExpense = _mapper.Map<UpcomingExpense>(model);
+
+        if (upcomingExpense.Description != null)
+        {
+            upcomingExpense.Description = upcomingExpense.Description.Trim();
+        }
+
         await _upcomingExpensesRepository.UpdateAsync(upcomingExpense);
     }
 

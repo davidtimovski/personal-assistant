@@ -43,6 +43,28 @@ public class DebtsController : Controller
         return StatusCode(201, id);
     }
 
+    [HttpPost("merged")]
+    public async Task<IActionResult> CreateMerged([FromBody] CreateDebt dto)
+    {
+        if (dto == null)
+        {
+            return BadRequest();
+        }
+
+        try
+        {
+            dto.UserId = IdentityHelper.GetUserId(User);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
+        }
+
+        int id = await _debtService.CreateMergedAsync(dto);
+
+        return StatusCode(201, id);
+    }
+
     [HttpPut]
     public async Task<IActionResult> Update([FromBody] UpdateDebt dto)
     {

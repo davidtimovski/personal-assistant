@@ -1,7 +1,3 @@
--- Table: public."AspNetUserTokens"
-
--- DROP TABLE public."AspNetUserTokens";
-
 CREATE TABLE public."AspNetUserTokens"
 (
     "UserId" integer NOT NULL,
