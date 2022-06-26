@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using Application.Contracts.Accountant.Accounts;
 using Application.Contracts.Accountant.Accounts.Models;
 using Application.Contracts.Accountant.Common.Models;
+using AutoMapper;
 using Domain.Entities.Accountant;
 
 namespace Application.Services.Accountant;
@@ -40,6 +40,9 @@ public class AccountService : IAccountService
     public Task<int> CreateAsync(CreateAccount model)
     {
         var account = _mapper.Map<Account>(model);
+
+        account.Name = account.Name.Trim();
+
         return _accountsRepository.CreateAsync(account);
     }
 
@@ -59,6 +62,9 @@ public class AccountService : IAccountService
     public async Task UpdateAsync(UpdateAccount model)
     {
         var account = _mapper.Map<Account>(model);
+
+        account.Name = account.Name.Trim();
+
         await _accountsRepository.UpdateAsync(account);
     }
 

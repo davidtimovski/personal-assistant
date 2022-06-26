@@ -337,7 +337,8 @@
     "change": "Change",
     "showOnDashboard": "Show on dashboard",
     "upcomingExpenses": "Upcoming expenses",
-    "debt": "Debt"
+    "debt": "Debt",
+    "mergeDebtPerPerson": "Merge debt per person"
   },
   "notFound": {
     "youSeemLost": "You seem lost..",

@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using Application.Contracts.Accountant.Categories;
 using Application.Contracts.Accountant.Categories.Models;
 using Application.Contracts.Accountant.Common.Models;
+using AutoMapper;
 using Domain.Entities.Accountant;
 
 namespace Application.Services.Accountant;
@@ -45,6 +45,8 @@ public class CategoryService : ICategoryService
 
         var category = _mapper.Map<Category>(model);
 
+        category.Name = category.Name.Trim();
+
         return _categoriesRepository.CreateAsync(category);
     }
 
@@ -56,6 +58,8 @@ public class CategoryService : ICategoryService
         }
 
         var category = _mapper.Map<Category>(model);
+
+        category.Name = category.Name.Trim();
 
         await _categoriesRepository.UpdateAsync(category);
     }

@@ -20,6 +20,18 @@ export class DebtsIDBHelper {
     return await this.db.debts.get(id);
   }
 
+  async getByPerson(person: string): Promise<DebtModel[]> {
+    const debtWithPerson = await this.db.debts.filter((x) => x.person.toLowerCase() === person).toArray();
+    return debtWithPerson.sort((a: DebtModel, b: DebtModel) => {
+      const aDate = new Date(a.createdDate);
+      const bDate = new Date(b.createdDate);
+      if (aDate < bDate) return -1;
+      if (aDate > bDate) return 1;
+
+      return 0;
+    });
+  }
+
   async isSynced(id: number): Promise<boolean> {
     const debt = await this.db.debts.get(id);
     return debt && debt.synced;
@@ -31,6 +43,17 @@ export class DebtsIDBHelper {
     }
 
     await this.db.debts.add(debt);
+  }
+
+  async createMerged(debt: DebtModel, idsToDelete: number[]): Promise<void> {
+    if (!debt.synced) {
+      debt.id = await this.generateId();
+    }
+
+    await this.db.transaction("rw", this.db.debts, async () => {
+      await this.db.debts.add(debt);
+      await this.db.debts.bulkDelete(idsToDelete);
+    });
   }
 
   async update(debt: DebtModel): Promise<void> {
