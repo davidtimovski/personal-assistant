@@ -173,9 +173,9 @@ public class TransactionsRepository : BaseRepository, ITransactionsRepository
             deletedEntity.DeletedDate = DateTime.UtcNow;
         }
 
-        var transaction = EFContext.Transactions.First(x => x.Id == id 
-            && !x.FromAccountId.HasValue || x.FromAccount.UserId == userId
-            && !x.ToAccountId.HasValue || x.ToAccount.UserId == userId);
+        var transaction = EFContext.Transactions.Single(x => x.Id == id 
+            && (!x.FromAccountId.HasValue || x.FromAccount.UserId == userId)
+            && (!x.ToAccountId.HasValue || x.ToAccount.UserId == userId));
 
         EFContext.Transactions.Remove(transaction);
 

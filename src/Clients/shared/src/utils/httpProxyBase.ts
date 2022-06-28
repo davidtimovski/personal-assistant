@@ -1,5 +1,5 @@
 import { inject } from "aurelia-framework";
-import { HttpClient } from "aurelia-fetch-client";
+import { HttpClient, RequestInit } from "aurelia-fetch-client";
 import { EventAggregator } from "aurelia-event-aggregator";
 
 import { AuthService } from "../../../shared/src/services/authService";
@@ -17,11 +17,11 @@ export class HttpProxyBase {
     protected readonly eventAggregator: EventAggregator
   ) {}
 
-  protected async ajax<T>(uri: string, request?: any): Promise<T> {
+  protected async ajax<T>(uri: string, requestInit?: RequestInit): Promise<T> {
     let response: Response;
 
     try {
-      response = await this.httpClient.fetch(uri, request);
+      response = await this.httpClient.fetch(uri, requestInit);
     } catch (error) {
       this.eventAggregator.publish(AlertEvents.ShowError, "unexpectedError");
       throw [];
@@ -29,24 +29,24 @@ export class HttpProxyBase {
 
     if (!this.successCodes.includes(response.status)) {
       if (await this.IsUnauthorized(response.status)) {
-        return;
+        throw HttpError.Unauthorized;
       }
 
       return await this.HandleErrorCodes(response);
     }
 
     if (response.status === 204) {
-      return null;
+      throw HttpError.Unexpected;
     }
 
     return <T>await response.json();
   }
 
-  protected async ajaxBlob(uri: string, request?: any): Promise<Blob> {
+  protected async ajaxBlob(uri: string, requestInit?: RequestInit): Promise<Blob> {
     let response: Response;
 
     try {
-      response = await this.httpClient.fetch(uri, request);
+      response = await this.httpClient.fetch(uri, requestInit);
     } catch (error) {
       this.eventAggregator.publish(AlertEvents.ShowError, "unexpectedError");
       throw [];
@@ -54,7 +54,7 @@ export class HttpProxyBase {
 
     if (!this.successCodes.includes(response.status)) {
       if (await this.IsUnauthorized(response.status)) {
-        return;
+        throw HttpError.Unauthorized;
       }
 
       return await this.HandleErrorCodes(response);
@@ -63,11 +63,11 @@ export class HttpProxyBase {
     return response.blob();
   }
 
-  protected async ajaxExecute(uri: string, request?: any): Promise<void> {
+  protected async ajaxExecute(uri: string, requestInit?: RequestInit): Promise<void> {
     let response: Response;
 
     try {
-      response = await this.httpClient.fetch(uri, request);
+      response = await this.httpClient.fetch(uri, requestInit);
     } catch (error) {
       this.eventAggregator.publish(AlertEvents.ShowError, "unexpectedError");
       throw [];
@@ -75,17 +75,21 @@ export class HttpProxyBase {
 
     if (!this.successCodes.includes(response.status)) {
       if (await this.IsUnauthorized(response.status)) {
-        return;
+        throw HttpError.Unauthorized;
       }
 
       await this.HandleErrorCodes(response);
     }
   }
 
-  protected async ajaxUploadFile(uri: string, request: any): Promise<string> {
-    const response: Response = await this.httpClient.fetch(uri, request);
+  protected async ajaxUploadFile(uri: string, requestInit?: RequestInit): Promise<string> {
+    const response: Response = await this.httpClient.fetch(uri, requestInit);
 
     if (!this.successCodes.includes(response.status)) {
+      if (await this.IsUnauthorized(response.status)) {
+        throw HttpError.Unauthorized;
+      }
+
       return await this.HandleErrorCodes(response);
     }
 
@@ -95,7 +99,7 @@ export class HttpProxyBase {
   private async IsUnauthorized(statusCode: number) {
     if (statusCode === 401) {
       this.authService.signinRedirect();
-      throw HttpError.Unauthorized;
+      return true;
     }
 
     return false;

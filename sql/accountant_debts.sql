@@ -5,7 +5,7 @@ CREATE TABLE public.accountant_debts
     person character varying(20) COLLATE pg_catalog."default" NOT NULL,
     amount decimal(10, 2) NOT NULL,
     currency character varying(3) COLLATE pg_catalog."default" NOT NULL DEFAULT 'EUR',
-    description character varying(255) COLLATE pg_catalog."default",
+    description character varying(2000) COLLATE pg_catalog."default",
     user_is_debtor boolean NOT NULL DEFAULT FALSE,
     created_date timestamp with time zone NOT NULL,
     modified_date timestamp with time zone NOT NULL,

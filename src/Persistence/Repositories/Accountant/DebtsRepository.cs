@@ -39,10 +39,26 @@ public class DebtsRepository : BaseRepository, IDebtsRepository
 
     public async Task<int> CreateMergedAsync(Debt debt)
     {
-        var otherDebtWithPerson = EFContext.Debts.Where(x => x.Person.ToLower() == debt.Person.ToLower());
+        var otherDebtWithPerson = EFContext.Debts.Where(x => x.UserId == debt.UserId && x.Person.ToLower() == debt.Person.ToLower()).ToList();
         foreach (var otherDebt in otherDebtWithPerson)
         {
             EFContext.Debts.Remove(otherDebt);
+
+            var deletedEntity = EFContext.DeletedEntities.FirstOrDefault(x => x.UserId == debt.UserId && x.EntityType == EntityType.Debt && x.EntityId == otherDebt.Id);
+            if (deletedEntity == null)
+            {
+                EFContext.DeletedEntities.Add(new DeletedEntity
+                {
+                    UserId = debt.UserId,
+                    EntityType = EntityType.Debt,
+                    EntityId = otherDebt.Id,
+                    DeletedDate = debt.CreatedDate
+                });
+            }
+            else
+            {
+                deletedEntity.DeletedDate = debt.CreatedDate;
+            }
         }
 
         EFContext.Debts.Add(debt);
@@ -52,7 +68,7 @@ public class DebtsRepository : BaseRepository, IDebtsRepository
 
     public async Task UpdateAsync(Debt debt)
     {
-        Debt dbDebt = EFContext.Debts.Find(debt.Id);
+        Debt dbDebt = EFContext.Debts.First(x => x.Id == debt.Id && x.UserId == debt.UserId);
 
         dbDebt.Person = debt.Person;
         dbDebt.Amount = debt.Amount;

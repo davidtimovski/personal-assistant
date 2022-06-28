@@ -9,7 +9,8 @@ import { LocalStorageBase } from "../utils/localStorageBase";
 
 @inject(AuthService, HttpClient, EventAggregator, LocalStorageBase)
 export class UsersServiceBase extends HttpProxyBase {
-  private readonly profileImageThumbRegex = /res.cloudinary.com\/personalassistant\/t_profile_thumbnail\/(development|production)\/users/g;
+  private readonly profileImageThumbRegex =
+    /res.cloudinary.com\/personalassistant\/t_profile_thumbnail\/(development|production)\/users/g;
 
   constructor(
     protected readonly authService: AuthService,
@@ -27,9 +28,7 @@ export class UsersServiceBase extends HttpProxyBase {
       return currentSrc;
     }
 
-    const src = await this.ajax<string>("users/profile-image-uri", {
-      method: "get",
-    });
+    const src = await this.ajax<string>("users/profile-image-uri");
     this.localStorageBase.setProfileImageUriLastLoad(new Date());
 
     if (src !== currentSrc) {
