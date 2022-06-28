@@ -41,7 +41,7 @@ public class UpcomingExpensesRepository : BaseRepository, IUpcomingExpensesRepos
 
     public async Task UpdateAsync(UpcomingExpense upcomingExpense)
     {
-        UpcomingExpense dbUpcomingExpense = EFContext.UpcomingExpenses.Find(upcomingExpense.Id);
+        UpcomingExpense dbUpcomingExpense = EFContext.UpcomingExpenses.First(x => x.Id == upcomingExpense.Id && x.UserId == upcomingExpense.UserId);
 
         dbUpcomingExpense.CategoryId = upcomingExpense.CategoryId;
         dbUpcomingExpense.Amount = upcomingExpense.Amount;

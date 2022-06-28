@@ -55,7 +55,7 @@ public class AccountsRepository : BaseRepository, IAccountsRepository
 
     public async Task UpdateAsync(Account account)
     {
-        Account dbAccount = EFContext.Accounts.Find(account.Id);
+        Account dbAccount = EFContext.Accounts.First(x => x.Id == account.Id && x.UserId == account.UserId);
 
         dbAccount.Name = account.Name;
         dbAccount.Currency = account.Currency;

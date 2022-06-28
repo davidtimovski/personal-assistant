@@ -4,6 +4,11 @@ export class DateHelper {
     return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().split("T")[0];
   }
 
+  /** Format as dd/MM/yyyy. */
+  static formatForReading(date: Date): string {
+    return date.toLocaleDateString("en-GB");
+  }
+
   /** Format as yyyy-MM. */
   static formatYYYYMM(date: Date): string {
     return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().substring(0, 7);

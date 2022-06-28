@@ -12,6 +12,8 @@ import { DateHelper } from "../../../shared/src/utils/dateHelper";
 
 @inject(AuthService, HttpClient, EventAggregator, DebtsIDBHelper, CurrenciesService)
 export class DebtsService extends HttpProxyBase {
+  private readonly mergedDebtSeparator = "----------";
+
   constructor(
     protected readonly authService: AuthService,
     protected readonly httpClient: HttpClient,
@@ -50,37 +52,34 @@ export class DebtsService extends HttpProxyBase {
       let descriptionsArray = new Array<string>();
       let balance = 0;
       for (let otherDebt of otherDebtWithPerson) {
-        const amount = this.currenciesService.convert(otherDebt.amount, otherDebt.currency, debt.currency);
+        const convertedAmount = this.currenciesService.convert(otherDebt.amount, otherDebt.currency, debt.currency);
         if (otherDebt.userIsDebtor) {
-          balance -= amount;
+          balance -= convertedAmount;
         } else {
-          balance += amount;
+          balance += convertedAmount;
         }
 
-        if (otherDebt.description) {
-          let amountPrefix = "";
-          if (!otherDebt.description.includes("--------")) {
-            amountPrefix = otherDebt.userIsDebtor ? `-${amount}${debt.currency} - ` : `${amount}${debt.currency} - `;
-          }
-
-          descriptionsArray.push(amountPrefix + otherDebt.description);
-        }
+        let desc = this.getMergedDebtDescription(
+          convertedAmount,
+          debt.currency,
+          otherDebt.userIsDebtor,
+          otherDebt.createdDate,
+          otherDebt.description
+        );
+        descriptionsArray.push(desc);
       }
 
-      if (debt.description) {
-        debt.description = debt.description.replace(/(\r\n|\r|\n){3,}/g, "$1\n").trim();
-
-        const amountPrefix = debt.userIsDebtor
-          ? `-${debt.amount}${debt.currency} - `
-          : `${debt.amount}${debt.currency} - `;
-        descriptionsArray.push(amountPrefix + debt.description);
-      }
       if (debt.userIsDebtor) {
         balance -= debt.amount;
       } else {
         balance += debt.amount;
       }
-      const description = descriptionsArray.length > 0 ? descriptionsArray.join("\n--------\n") : null;
+
+      let newDesc = this.getMergedDebtDescription(debt.amount, debt.currency, debt.userIsDebtor, now, debt.description);
+      descriptionsArray.push(newDesc);
+
+      const description =
+        descriptionsArray.length > 0 ? descriptionsArray.join(`\n${this.mergedDebtSeparator}\n`) : null;
 
       const mergedDebt = new DebtModel(null, debt.person, balance, debt.currency, description, balance < 0, now, now);
 
@@ -114,6 +113,33 @@ export class DebtsService extends HttpProxyBase {
 
       return debt.id;
     }
+  }
+
+  private getMergedDebtDescription(
+    amount: number,
+    currency: string,
+    userIsDebtor: boolean,
+    createdDate: Date,
+    description: string
+  ) {
+    const date = DateHelper.formatForReading(createdDate);
+
+    // start with date
+    let result = date + " | ";
+
+    // add amount (positive or negative) and currency
+    result += userIsDebtor ? "-" + amount + currency : amount + currency;
+
+    if (description) {
+      if (description.includes(this.mergedDebtSeparator)) {
+        // use existing description if the debt is already a merged one
+        result = description;
+      } else {
+        result += ` | ${description}`;
+      }
+    }
+
+    return result;
   }
 
   async update(debt: DebtModel): Promise<void> {

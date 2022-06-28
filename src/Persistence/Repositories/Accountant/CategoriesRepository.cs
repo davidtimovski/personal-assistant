@@ -39,7 +39,7 @@ public class CategoriesRepository : BaseRepository, ICategoriesRepository
 
     public async Task UpdateAsync(Category category)
     {
-        Category dbCategory = EFContext.Categories.Find(category.Id);
+        Category dbCategory = EFContext.Categories.First(x => x.Id == category.Id && x.UserId == category.UserId);
 
         dbCategory.ParentId = category.ParentId;
         dbCategory.Name = category.Name;
