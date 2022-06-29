@@ -1,18 +1,16 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Application.Contracts.Common;
+using Application.Contracts.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Application.Contracts.Common;
-using Application.Contracts.Common.Models;
-using Infrastructure.Identity;
 
 namespace Api.Controllers.Common;
 
 [Authorize]
 [EnableCors("AllowAllApps")]
 [Route("api/[controller]")]
-public class TooltipsController : Controller
+public class TooltipsController : BaseController
 {
     private readonly ITooltipService _tooltipService;
 
@@ -24,17 +22,7 @@ public class TooltipsController : Controller
     [HttpGet("application/{application}")]
     public IActionResult GetAll(string application)
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        var tooltipDtos = _tooltipService.GetAll(application, userId);
+        var tooltipDtos = _tooltipService.GetAll(application, CurrentUserId);
 
         return Ok(tooltipDtos);
     }
@@ -42,17 +30,7 @@ public class TooltipsController : Controller
     [HttpGet("key/{key}/{application}")]
     public IActionResult GetByKey(string key, string application)
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        var tooltipDto = _tooltipService.GetByKey(userId, key, application);
+        var tooltipDto = _tooltipService.GetByKey(CurrentUserId, key, application);
 
         return Ok(tooltipDto);
     }
@@ -65,17 +43,7 @@ public class TooltipsController : Controller
             return BadRequest();
         }
 
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        await _tooltipService.ToggleDismissedAsync(userId, dto.Key, dto.Application, dto.IsDismissed);
+        await _tooltipService.ToggleDismissedAsync(CurrentUserId, dto.Key, dto.Application, dto.IsDismissed);
 
         return NoContent();
     }

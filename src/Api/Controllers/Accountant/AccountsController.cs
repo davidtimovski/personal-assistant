@@ -1,18 +1,16 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Application.Contracts.Accountant.Accounts;
+using Application.Contracts.Accountant.Accounts.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Application.Contracts.Accountant.Accounts;
-using Application.Contracts.Accountant.Accounts.Models;
-using Infrastructure.Identity;
 
 namespace Api.Controllers.Accountant;
 
 [Authorize]
 [EnableCors("AllowAccountant")]
 [Route("api/[controller]")]
-public class AccountsController : Controller
+public class AccountsController : BaseController
 {
     private readonly IAccountService _accountService;
 
@@ -29,14 +27,7 @@ public class AccountsController : Controller
             return BadRequest();
         }
 
-        try
-        {
-            dto.UserId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        dto.UserId = CurrentUserId;
 
         int id = await _accountService.CreateAsync(dto);
 
@@ -51,14 +42,7 @@ public class AccountsController : Controller
             return BadRequest();
         }
 
-        try
-        {
-            dto.UserId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        dto.UserId = CurrentUserId;
 
         await _accountService.UpdateAsync(dto);
 
@@ -68,17 +52,7 @@ public class AccountsController : Controller
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        await _accountService.DeleteAsync(id, userId);
+        await _accountService.DeleteAsync(id, CurrentUserId);
 
         return NoContent();
     }

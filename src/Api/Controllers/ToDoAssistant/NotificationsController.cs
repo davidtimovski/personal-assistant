@@ -1,16 +1,14 @@
-﻿using System;
+﻿using Application.Contracts.ToDoAssistant.Notifications;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Application.Contracts.ToDoAssistant.Notifications;
-using Infrastructure.Identity;
 
 namespace Api.Controllers.ToDoAssistant;
 
 [Authorize]
 [EnableCors("AllowToDoAssistant")]
 [Route("api/[controller]")]
-public class NotificationsController : Controller
+public class NotificationsController : BaseController
 {
     private readonly INotificationService _notificationService;
 
@@ -22,17 +20,7 @@ public class NotificationsController : Controller
     [HttpGet]
     public IActionResult GetAll()
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        var notificationDtos = _notificationService.GetAllAndFlagUnseen(userId);
+        var notificationDtos = _notificationService.GetAllAndFlagUnseen(CurrentUserId);
 
         return Ok(notificationDtos);
     }
@@ -40,17 +28,7 @@ public class NotificationsController : Controller
     [HttpGet("unseen-notifications-count")]
     public IActionResult GetUnseenNotificationsCount()
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        int unseenNotificationsCount = _notificationService.GetUnseenNotificationsCount(userId);
+        int unseenNotificationsCount = _notificationService.GetUnseenNotificationsCount(CurrentUserId);
 
         return Ok(unseenNotificationsCount);
     }

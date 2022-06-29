@@ -1,18 +1,16 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Application.Contracts.Accountant.Categories;
+using Application.Contracts.Accountant.Categories.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Application.Contracts.Accountant.Categories;
-using Application.Contracts.Accountant.Categories.Models;
-using Infrastructure.Identity;
 
 namespace Api.Controllers.Accountant;
 
 [Authorize]
 [EnableCors("AllowAccountant")]
 [Route("api/[controller]")]
-public class CategoriesController : Controller
+public class CategoriesController : BaseController
 {
     private readonly ICategoryService _categoryService;
 
@@ -29,14 +27,7 @@ public class CategoriesController : Controller
             return BadRequest();
         }
 
-        try
-        {
-            dto.UserId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        dto.UserId = CurrentUserId;
 
         int id = await _categoryService.CreateAsync(dto);
 
@@ -51,14 +42,7 @@ public class CategoriesController : Controller
             return BadRequest();
         }
 
-        try
-        {
-            dto.UserId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        dto.UserId = CurrentUserId;
 
         await _categoryService.UpdateAsync(dto);
 
@@ -68,17 +52,7 @@ public class CategoriesController : Controller
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        await _categoryService.DeleteAsync(id, userId);
+        await _categoryService.DeleteAsync(id, CurrentUserId);
 
         return NoContent();
     }

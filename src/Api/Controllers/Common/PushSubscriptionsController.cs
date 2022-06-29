@@ -1,8 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Application.Contracts.Common;
 using Application.Contracts.Common.Models;
-using Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +10,7 @@ namespace Api.Controllers.Common;
 [Authorize]
 [EnableCors("AllowAllApps")]
 [Route("api/[controller]")]
-public class PushSubscriptionsController : Controller
+public class PushSubscriptionsController : BaseController
 {
     private readonly IPushSubscriptionService _pushSubscriptionService;
 
@@ -30,17 +28,7 @@ public class PushSubscriptionsController : Controller
             return BadRequest();
         }
 
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        await _pushSubscriptionService.CreateSubscriptionAsync(userId,
+        await _pushSubscriptionService.CreateSubscriptionAsync(CurrentUserId,
             dto.Application,
             dto.Subscription.Endpoint,
             dto.Subscription.Keys["auth"],

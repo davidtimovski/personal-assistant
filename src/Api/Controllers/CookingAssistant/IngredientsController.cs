@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Contracts.CookingAssistant.Ingredients;
 using Application.Contracts.CookingAssistant.Ingredients.Models;
 using FluentValidation;
-using Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +14,7 @@ namespace Api.Controllers.CookingAssistant;
 [Authorize]
 [EnableCors("AllowCookingAssistant")]
 [Route("api/[controller]")]
-public class IngredientsController : Controller
+public class IngredientsController : BaseController
 {
     private readonly IIngredientService _ingredientService;
     private readonly IStringLocalizer<IngredientsController> _localizer;
@@ -38,17 +36,7 @@ public class IngredientsController : Controller
     [HttpGet]
     public IActionResult GetAll()
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        var ingredientDtos = _ingredientService.GetUserAndUsedPublicIngredients(userId);
+        var ingredientDtos = _ingredientService.GetUserAndUsedPublicIngredients(CurrentUserId);
 
         foreach (var ingredient in ingredientDtos.Where(x => x.IsPublic && !x.IsProduct))
         {
@@ -61,17 +49,7 @@ public class IngredientsController : Controller
     [HttpGet("{id}/update")]
     public IActionResult GetForUpdate(int id)
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        EditIngredient editIngredientDto = _ingredientService.GetForUpdate(id, userId);
+        EditIngredient editIngredientDto = _ingredientService.GetForUpdate(id, CurrentUserId);
         if (editIngredientDto == null)
         {
             return NotFound();
@@ -83,17 +61,7 @@ public class IngredientsController : Controller
     [HttpGet("{id}/public")]
     public IActionResult GetPublic(int id)
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        ViewIngredient viewIngredientDto = _ingredientService.GetPublic(id, userId);
+        ViewIngredient viewIngredientDto = _ingredientService.GetPublic(id, CurrentUserId);
         if (viewIngredientDto == null)
         {
             return NotFound();
@@ -110,17 +78,7 @@ public class IngredientsController : Controller
     [HttpGet("user-suggestions")]
     public IActionResult GetUserSuggestions()
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        var suggestionsDtos = _ingredientService.GetUserSuggestions(userId);
+        var suggestionsDtos = _ingredientService.GetUserSuggestions(CurrentUserId);
 
         return Ok(suggestionsDtos);
     }
@@ -160,17 +118,7 @@ public class IngredientsController : Controller
     [HttpGet("task-suggestions")]
     public IActionResult GetTaskSuggestions()
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        IEnumerable<TaskSuggestion> taskSuggestions = _ingredientService.GetTaskSuggestions(userId);
+        IEnumerable<TaskSuggestion> taskSuggestions = _ingredientService.GetTaskSuggestions(CurrentUserId);
 
         return Ok(taskSuggestions);
     }
@@ -183,14 +131,7 @@ public class IngredientsController : Controller
             return BadRequest();
         }
 
-        try
-        {
-            dto.UserId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        dto.UserId = CurrentUserId;
 
         await _ingredientService.UpdateAsync(dto, _updateValidator);
 
@@ -205,14 +146,7 @@ public class IngredientsController : Controller
             return BadRequest();
         }
 
-        try
-        {
-            dto.UserId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        dto.UserId = CurrentUserId;
 
         await _ingredientService.UpdateAsync(dto, _updatePublicValidator);
 
@@ -222,17 +156,7 @@ public class IngredientsController : Controller
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteOrRemoveFromRecipesAsync(int id)
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        await _ingredientService.DeleteOrRemoveFromRecipesAsync(id, userId);
+        await _ingredientService.DeleteOrRemoveFromRecipesAsync(id, CurrentUserId);
 
         return NoContent();
     }
