@@ -93,7 +93,6 @@ function completeTask(state: State, id: number, listId: number) {
     });
 
     task.isCompleted = true;
-    task.order = 1;
 
     const privateTasks = list.tasks.filter((x) => !x.isCompleted && x.isPrivate && x.order > task.order);
     privateTasks.forEach((task) => {
@@ -106,13 +105,14 @@ function completeTask(state: State, id: number, listId: number) {
     });
 
     task.isCompleted = true;
-    task.order = 1;
 
     const tasks = list.tasks.filter((x) => !x.isCompleted && !x.isPrivate && x.order > task.order);
     tasks.forEach((task) => {
       task.order--;
     });
   }
+
+  task.order = 1;
 
   return newState;
 }
@@ -123,11 +123,11 @@ function uncompleteTask(state: State, id: number, listId: number) {
   const list = newState.lists.find((x) => x.id === listId);
   const task = list.tasks.find((x) => x.id === id);
 
-  let order: number;
+  let newOrder: number;
 
   if (task.isPrivate) {
     const privateTasks = list.tasks.filter((x) => !x.isCompleted && x.isPrivate);
-    order = ++privateTasks.length;
+    newOrder = ++privateTasks.length;
 
     const completedPrivateTasks = list.tasks.filter((x) => x.isCompleted && x.isPrivate && x.order > task.order);
     completedPrivateTasks.forEach((task) => {
@@ -135,7 +135,7 @@ function uncompleteTask(state: State, id: number, listId: number) {
     });
   } else {
     const tasks = list.tasks.filter((x) => !x.isCompleted && !x.isPrivate);
-    order = ++tasks.length;
+    newOrder = ++tasks.length;
 
     const completedTasks = list.tasks.filter((x) => x.isCompleted && !x.isPrivate && x.order > task.order);
     completedTasks.forEach((task) => {
@@ -144,7 +144,7 @@ function uncompleteTask(state: State, id: number, listId: number) {
   }
 
   task.isCompleted = false;
-  task.order = order;
+  task.order = newOrder;
 
   return newState;
 }

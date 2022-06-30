@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Application.Contracts.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Application.Contracts.Common;
 
 namespace Api.Controllers.Common;
 

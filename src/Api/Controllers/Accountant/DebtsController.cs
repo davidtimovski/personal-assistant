@@ -1,18 +1,16 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Application.Contracts.Accountant.Debts;
+using Application.Contracts.Accountant.Debts.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Application.Contracts.Accountant.Debts;
-using Application.Contracts.Accountant.Debts.Models;
-using Infrastructure.Identity;
 
 namespace Api.Controllers.Accountant;
 
 [Authorize]
 [EnableCors("AllowAccountant")]
 [Route("api/[controller]")]
-public class DebtsController : Controller
+public class DebtsController : BaseController
 {
     private readonly IDebtService _debtService;
 
@@ -29,14 +27,7 @@ public class DebtsController : Controller
             return BadRequest();
         }
 
-        try
-        {
-            dto.UserId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        dto.UserId = CurrentUserId;
 
         int id = await _debtService.CreateAsync(dto);
 
@@ -51,14 +42,7 @@ public class DebtsController : Controller
             return BadRequest();
         }
 
-        try
-        {
-            dto.UserId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        dto.UserId = CurrentUserId;
 
         int id = await _debtService.CreateMergedAsync(dto);
 
@@ -73,14 +57,7 @@ public class DebtsController : Controller
             return BadRequest();
         }
 
-        try
-        {
-            dto.UserId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        dto.UserId = CurrentUserId;
 
         await _debtService.UpdateAsync(dto);
 
@@ -90,17 +67,7 @@ public class DebtsController : Controller
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        await _debtService.DeleteAsync(id, userId);
+        await _debtService.DeleteAsync(id, CurrentUserId);
 
         return NoContent();
     }

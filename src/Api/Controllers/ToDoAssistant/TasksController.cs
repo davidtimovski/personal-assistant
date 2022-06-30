@@ -1,29 +1,27 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Threading.Tasks;
 using Api.Config;
 using Api.Hubs;
+using Application.Contracts.Common;
+using Application.Contracts.ToDoAssistant.Notifications;
+using Application.Contracts.ToDoAssistant.Notifications.Models;
+using Application.Contracts.ToDoAssistant.Tasks;
+using Application.Contracts.ToDoAssistant.Tasks.Models;
 using FluentValidation;
+using Infrastructure.Sender.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
-using Application.Contracts.Common;
-using Application.Contracts.ToDoAssistant.Notifications;
-using Application.Contracts.ToDoAssistant.Notifications.Models;
-using Application.Contracts.ToDoAssistant.Tasks;
-using Application.Contracts.ToDoAssistant.Tasks.Models;
-using Infrastructure.Identity;
-using Infrastructure.Sender.Models;
 
 namespace Api.Controllers.ToDoAssistant;
 
 [Authorize]
 [EnableCors("AllowToDoAssistant")]
 [Route("api/[controller]")]
-public class TasksController : Controller
+public class TasksController : BaseController
 {
     private readonly IHubContext<ToDoAssistantHub> _hubContext;
     private readonly ITaskService _taskService;
@@ -60,17 +58,7 @@ public class TasksController : Controller
     [HttpGet("{id}")]
     public IActionResult Get(int id)
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        TaskDto taskDto = _taskService.Get(id, userId);
+        TaskDto taskDto = _taskService.Get(id, CurrentUserId);
         if (taskDto == null)
         {
             return NotFound();
@@ -82,17 +70,7 @@ public class TasksController : Controller
     [HttpGet("{id}/update")]
     public IActionResult GetForUpdate(int id)
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        TaskForUpdate taskDto = _taskService.GetForUpdate(id, userId);
+        TaskForUpdate taskDto = _taskService.GetForUpdate(id, CurrentUserId);
         if (taskDto == null)
         {
             return NotFound();
@@ -109,14 +87,7 @@ public class TasksController : Controller
             return BadRequest();
         }
 
-        try
-        {
-            dto.UserId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        dto.UserId = CurrentUserId;
 
         CreatedTaskResult result = await _taskService.CreateAsync(dto, _createValidator);
 
@@ -128,7 +99,7 @@ public class TasksController : Controller
         foreach (var recipient in result.NotificationRecipients)
         {
             CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer["CreatedTaskNotification", IdentityHelper.GetUserName(User), result.TaskName, result.ListName];
+            var message = _localizer["CreatedTaskNotification", CurrentUserName, result.TaskName, result.ListName];
 
             var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, dto.ListId, result.TaskId, message);
             var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
@@ -154,14 +125,7 @@ public class TasksController : Controller
             return BadRequest();
         }
 
-        try
-        {
-            dto.UserId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        dto.UserId = CurrentUserId;
 
         BulkCreateResult result = await _taskService.BulkCreateAsync(dto, _bulkCreateValidator);
 
@@ -180,7 +144,7 @@ public class TasksController : Controller
             foreach (var recipient in result.NotificationRecipients)
             {
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-                var message = _localizer["CreatedTaskNotification", IdentityHelper.GetUserName(User), task.Name, result.ListName];
+                var message = _localizer["CreatedTaskNotification", CurrentUserName, task.Name, result.ListName];
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, dto.ListId, task.Id, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
@@ -207,14 +171,7 @@ public class TasksController : Controller
             return BadRequest();
         }
 
-        try
-        {
-            dto.UserId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        dto.UserId = CurrentUserId;
 
         UpdateTaskResult result = await _taskService.UpdateAsync(dto, _updateValidator);
 
@@ -231,7 +188,7 @@ public class TasksController : Controller
         foreach (var recipient in result.NotificationRecipients)
         {
             CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer["UpdatedTaskNotification", IdentityHelper.GetUserName(User), result.OriginalTaskName, result.ListName];
+            var message = _localizer["UpdatedTaskNotification", CurrentUserName, result.OriginalTaskName, result.ListName];
 
             var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
             var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
@@ -249,7 +206,7 @@ public class TasksController : Controller
         foreach (var recipient in result.RemovedNotificationRecipients)
         {
             CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer["RemovedTaskNotification", IdentityHelper.GetUserName(User), result.OriginalTaskName, result.OldListName];
+            var message = _localizer["RemovedTaskNotification", CurrentUserName, result.OriginalTaskName, result.OldListName];
 
             var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.OldListId, null, message);
             var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
@@ -267,7 +224,7 @@ public class TasksController : Controller
         foreach (var recipient in result.CreatedNotificationRecipients)
         {
             CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer["CreatedTaskNotification", IdentityHelper.GetUserName(User), dto.Name, result.ListName];
+            var message = _localizer["CreatedTaskNotification", CurrentUserName, dto.Name, result.ListName];
 
             var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
             var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
@@ -285,7 +242,7 @@ public class TasksController : Controller
         if (result.AssignedNotificationRecipient != null)
         {
             CultureInfo.CurrentCulture = new CultureInfo(result.AssignedNotificationRecipient.Language, false);
-            var message = _localizer["AssignedTaskNotification", IdentityHelper.GetUserName(User), result.OriginalTaskName, result.ListName];
+            var message = _localizer["AssignedTaskNotification", CurrentUserName, result.OriginalTaskName, result.ListName];
 
             var createNotificationDto = new CreateOrUpdateNotification(result.AssignedNotificationRecipient.Id, dto.UserId, result.ListId, dto.Id, message);
             var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
@@ -306,29 +263,19 @@ public class TasksController : Controller
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        DeleteTaskResult result = await _taskService.DeleteAsync(id, userId);
+        DeleteTaskResult result = await _taskService.DeleteAsync(id, CurrentUserId);
 
         if (result.NotifySignalR)
         {
-            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskDeleted", userId, id, result.ListId);
+            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskDeleted", CurrentUserId, id, result.ListId);
         }
 
         foreach (var recipient in result.NotificationRecipients)
         {
             CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer["RemovedTaskNotification", IdentityHelper.GetUserName(User), result.TaskName, result.ListName];
+            var message = _localizer["RemovedTaskNotification", CurrentUserName, result.TaskName, result.ListName];
 
-            var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, userId, result.ListId, null, message);
+            var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, CurrentUserId, result.ListId, null, message);
             var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
             var toDoAssistantPushNotification = new ToDoAssistantPushNotification
             {
@@ -352,14 +299,7 @@ public class TasksController : Controller
             return BadRequest();
         }
 
-        try
-        {
-            dto.UserId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        dto.UserId = CurrentUserId;
 
         CompleteUncompleteTaskResult result = await _taskService.CompleteAsync(dto);
 
@@ -371,7 +311,7 @@ public class TasksController : Controller
         foreach (var recipient in result.NotificationRecipients)
         {
             CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            string message = _localizer["CompletedTaskNotification", IdentityHelper.GetUserName(User), result.TaskName, result.ListName];
+            string message = _localizer["CompletedTaskNotification", CurrentUserName, result.TaskName, result.ListName];
 
             var updateNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
             var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto);
@@ -397,14 +337,7 @@ public class TasksController : Controller
             return BadRequest();
         }
 
-        try
-        {
-            dto.UserId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        dto.UserId = CurrentUserId;
 
         CompleteUncompleteTaskResult result = await _taskService.UncompleteAsync(dto);
 
@@ -416,7 +349,7 @@ public class TasksController : Controller
         foreach (var recipient in result.NotificationRecipients)
         {
             CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            string message = _localizer["UncompletedTaskNotification", IdentityHelper.GetUserName(User), result.TaskName, result.ListName];
+            string message = _localizer["UncompletedTaskNotification", CurrentUserName, result.TaskName, result.ListName];
 
             var updateNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
             var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto);
@@ -442,14 +375,7 @@ public class TasksController : Controller
             return BadRequest();
         }
 
-        try
-        {
-            dto.UserId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        dto.UserId = CurrentUserId;
 
         ReorderTaskResult result = await _taskService.ReorderAsync(dto);
 

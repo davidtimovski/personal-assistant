@@ -1,6 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Security.Claims;
+using System.Threading.Tasks;
 using Application.Contracts.ToDoAssistant.Lists;
-using Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.SignalR;
@@ -18,10 +18,18 @@ public class ToDoAssistantHub : Hub
         _listsRepository = listsRepository;
     }
 
+    private int CurrentUserId
+    {
+        get
+        {
+            string id = Context.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            return int.Parse(id);
+        }
+    }
+
     public async Task JoinGroups()
     {
-        int userId = IdentityHelper.GetUserId(Context.User);
-        var listIds = _listsRepository.GetNonArchivedSharedListIds(userId);
+        var listIds = _listsRepository.GetNonArchivedSharedListIds(CurrentUserId);
 
         foreach (var listId in listIds)
         {

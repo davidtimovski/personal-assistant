@@ -14,15 +14,24 @@
       <div class="content-wrap">
         <form submit.trigger="save()">
           <div class="form-control">
-            <input type="text" value.bind="model.name & validate" maxlength="50"
-              class.bind="nameIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]listName" required />
+            <input
+              type="text"
+              value.bind="model.name & validate"
+              maxlength="50"
+              class.bind="nameIsInvalid ? 'invalid' : ''"
+              t="[placeholder,aria-label]listName"
+              required
+            />
           </div>
           <div class="form-control">
             <div class="icon-wrap">
               <span class="placeholder" t="editList.icon">Icon</span>
               <div class="icon-options">
-                <div repeat.for="icon of iconOptions" click.delegate="selectIcon(icon.icon)"
-                  class="${model.icon === icon.icon ? 'selected' : ''} icon-option">
+                <div
+                  repeat.for="icon of iconOptions"
+                  click.delegate="selectIcon(icon.icon)"
+                  class="${model.icon === icon.icon ? 'selected' : ''} icon-option"
+                >
                   <i class="${icon.cssClass}"></i>
                 </div>
               </div>
@@ -37,8 +46,9 @@
             </span>
             <span t="copyList.createCopy">Create copy</span>
           </a>
-          <a route-href="route: list; params.bind: { id: model.id }" t="cancel"
-            class="button secondary-button">Cancel</a>
+          <a route-href="route: list; params.bind: { id: model.id }" t="cancel" class="button secondary-button"
+            >Cancel</a
+          >
         </div>
 
         <hr />

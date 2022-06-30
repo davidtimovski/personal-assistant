@@ -1,30 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using Api.Config;
 using Api.Models;
 using Api.Models.ToDoAssistant.Lists;
-using FluentValidation;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Options;
 using Application.Contracts.Common;
 using Application.Contracts.ToDoAssistant.Lists;
 using Application.Contracts.ToDoAssistant.Lists.Models;
 using Application.Contracts.ToDoAssistant.Notifications;
 using Application.Contracts.ToDoAssistant.Notifications.Models;
-using Infrastructure.Identity;
+using FluentValidation;
 using Infrastructure.Sender.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 
 namespace Api.Controllers.ToDoAssistant;
 
 [Authorize]
 [EnableCors("AllowToDoAssistant")]
 [Route("api/[controller]")]
-public class ListsController : Controller
+public class ListsController : BaseController
 {
     private readonly IListService _listService;
     private readonly INotificationService _notificationService;
@@ -67,17 +65,7 @@ public class ListsController : Controller
     [HttpGet]
     public IActionResult GetAll()
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        IEnumerable<ListDto> lists = _listService.GetAll(userId);
+        IEnumerable<ListDto> lists = _listService.GetAll(CurrentUserId);
 
         return Ok(lists);
     }
@@ -85,17 +73,7 @@ public class ListsController : Controller
     [HttpGet("options")]
     public IActionResult GetAllAsOptions()
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        IEnumerable<ToDoListOption> options = _listService.GetAllAsOptions(userId);
+        IEnumerable<ToDoListOption> options = _listService.GetAllAsOptions(CurrentUserId);
 
         return Ok(options);
     }
@@ -103,17 +81,7 @@ public class ListsController : Controller
     [HttpGet("{id}")]
     public IActionResult Get(int id)
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        EditListDto list = _listService.GetForEdit(id, userId);
+        EditListDto list = _listService.GetForEdit(id, CurrentUserId);
         if (list == null)
         {
             return NotFound();
@@ -125,17 +93,7 @@ public class ListsController : Controller
     [HttpGet("{id}/with-shares")]
     public IActionResult GetWithShares(int id)
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        ListWithShares list = _listService.GetWithShares(id, userId);
+        ListWithShares list = _listService.GetWithShares(id, CurrentUserId);
         if (list == null)
         {
             return NotFound();
@@ -147,17 +105,7 @@ public class ListsController : Controller
     [HttpGet("share-requests")]
     public IActionResult GetShareRequests()
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        IEnumerable<ShareListRequest> shareRequests = _listService.GetShareRequests(userId);
+        IEnumerable<ShareListRequest> shareRequests = _listService.GetShareRequests(CurrentUserId);
 
         return Ok(shareRequests);
     }
@@ -165,17 +113,7 @@ public class ListsController : Controller
     [HttpGet("pending-share-requests-count")]
     public IActionResult GetPendingShareRequestsCount()
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        int pendingShareRequestsCount = _listService.GetPendingShareRequestsCount(userId);
+        int pendingShareRequestsCount = _listService.GetPendingShareRequestsCount(CurrentUserId);
 
         return Ok(pendingShareRequestsCount);
     }
@@ -183,17 +121,7 @@ public class ListsController : Controller
     [HttpGet("{id}/shared")]
     public IActionResult GetIsShared(int id)
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        bool isShared = _listService.IsShared(id, userId);
+        bool isShared = _listService.IsShared(id, CurrentUserId);
 
         return Ok(isShared);
     }
@@ -201,17 +129,7 @@ public class ListsController : Controller
     [HttpGet("{id}/members")]
     public IActionResult GetMembersAsAssigneeOptions(int id)
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        var assigneeOptions = _listService.GetMembersAsAssigneeOptions(id, userId);
+        var assigneeOptions = _listService.GetMembersAsAssigneeOptions(id, CurrentUserId);
 
         return Ok(assigneeOptions);
     }
@@ -224,14 +142,7 @@ public class ListsController : Controller
             return BadRequest();
         }
 
-        try
-        {
-            dto.UserId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        dto.UserId = CurrentUserId;
 
         int id = await _listService.CreateAsync(dto, _createValidator);
 
@@ -246,14 +157,7 @@ public class ListsController : Controller
             return BadRequest();
         }
 
-        try
-        {
-            dto.UserId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        dto.UserId = CurrentUserId;
 
         UpdateListResult result = await _listService.UpdateAsync(dto, _updateValidator);
         if (!result.Notify())
@@ -278,7 +182,7 @@ public class ListsController : Controller
         foreach (var recipient in result.NotificationRecipients)
         {
             CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer[resourceKey, IdentityHelper.GetUserName(User), result.OriginalListName];
+            var message = _localizer[resourceKey, CurrentUserName, result.OriginalListName];
 
             var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, dto.Id, null, message);
             var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
@@ -304,14 +208,7 @@ public class ListsController : Controller
             return BadRequest();
         }
 
-        try
-        {
-            dto.UserId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        dto.UserId = CurrentUserId;
 
         await _listService.UpdateSharedAsync(dto, _updateSharedValidator);
 
@@ -321,24 +218,14 @@ public class ListsController : Controller
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        DeleteListResult result = await _listService.DeleteAsync(id, userId);
+        DeleteListResult result = await _listService.DeleteAsync(id, CurrentUserId);
 
         foreach (var recipient in result.NotificationRecipients)
         {
             CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer["DeletedListNotification", IdentityHelper.GetUserName(User), result.DeletedListName];
+            var message = _localizer["DeletedListNotification", CurrentUserName, result.DeletedListName];
 
-            var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, userId, null, null, message);
+            var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, CurrentUserId, null, null, message);
             var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
             var toDoAssistantPushNotification = new ToDoAssistantPushNotification
             {
@@ -357,16 +244,6 @@ public class ListsController : Controller
     [HttpGet("can-share-with-user/{email}")]
     public IActionResult CanShareListWithUser(string email)
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
         var canShareVm = new CanShareVm
         {
             CanShare = false
@@ -378,7 +255,7 @@ public class ListsController : Controller
         {
             canShareVm.UserId = user.Id;
             canShareVm.ImageUri = user.ImageUri;
-            canShareVm.CanShare = _listService.CanShareWithUser(user.Id, userId);
+            canShareVm.CanShare = _listService.CanShareWithUser(user.Id, CurrentUserId);
         }
 
         return Ok(canShareVm);
@@ -392,14 +269,7 @@ public class ListsController : Controller
             return BadRequest();
         }
 
-        try
-        {
-            dto.UserId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        dto.UserId = CurrentUserId;
 
         foreach (ShareUserAndPermission removedShare in dto.RemovedShares)
         {
@@ -413,7 +283,7 @@ public class ListsController : Controller
             SimpleList list = _listService.Get(dto.ListId);
 
             CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
-            var message = _localizer["RemovedShareNotification", IdentityHelper.GetUserName(User), list.Name];
+            var message = _localizer["RemovedShareNotification", CurrentUserName, list.Name];
 
             var createNotificationDto = new CreateOrUpdateNotification(user.Id, dto.UserId, null, null, message);
             var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
@@ -436,24 +306,14 @@ public class ListsController : Controller
     [HttpDelete("{id}/leave")]
     public async Task<IActionResult> Leave(int id)
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        LeaveListResult result = await _listService.LeaveAsync(id, userId);
+        LeaveListResult result = await _listService.LeaveAsync(id, CurrentUserId);
 
         foreach (var recipient in result.NotificationRecipients)
         {
             CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer["LeftListNotification", IdentityHelper.GetUserName(User), result.ListName];
+            var message = _localizer["LeftListNotification", CurrentUserName, result.ListName];
 
-            var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, userId, id, null, message);
+            var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, CurrentUserId, id, null, message);
             var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
             var toDoAssistantPushNotification = new ToDoAssistantPushNotification
             {
@@ -477,14 +337,7 @@ public class ListsController : Controller
             return BadRequest();
         }
 
-        try
-        {
-            dto.UserId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        dto.UserId = CurrentUserId;
 
         int id = await _listService.CopyAsync(dto, _copyValidator);
 
@@ -499,17 +352,7 @@ public class ListsController : Controller
             return BadRequest();
         }
 
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        await _listService.SetIsArchivedAsync(dto.ListId, userId, dto.IsArchived);
+        await _listService.SetIsArchivedAsync(dto.ListId, CurrentUserId, dto.IsArchived);
 
         return NoContent();
     }
@@ -522,24 +365,14 @@ public class ListsController : Controller
             return BadRequest();
         }
 
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        SetTasksAsNotCompletedResult result = await _listService.SetTasksAsNotCompletedAsync(dto.ListId, userId);
+        SetTasksAsNotCompletedResult result = await _listService.SetTasksAsNotCompletedAsync(dto.ListId, CurrentUserId);
 
         foreach (var recipient in result.NotificationRecipients)
         {
             CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer["UncompletedAllTasksNotification", IdentityHelper.GetUserName(User), result.ListName];
+            var message = _localizer["UncompletedAllTasksNotification", CurrentUserName, result.ListName];
 
-            var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, userId, dto.ListId, null, message);
+            var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, CurrentUserId, dto.ListId, null, message);
             var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
             var toDoAssistantPushNotification = new ToDoAssistantPushNotification
             {
@@ -563,17 +396,7 @@ public class ListsController : Controller
             return BadRequest();
         }
 
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        SetShareIsAcceptedResult result = await _listService.SetShareIsAcceptedAsync(dto.ListId, userId, dto.IsAccepted);
+        SetShareIsAcceptedResult result = await _listService.SetShareIsAcceptedAsync(dto.ListId, CurrentUserId, dto.IsAccepted);
         if (!result.Notify())
         {
             return NoContent();
@@ -583,9 +406,9 @@ public class ListsController : Controller
         foreach (var recipient in result.NotificationRecipients)
         {
             CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer[localizerKey, IdentityHelper.GetUserName(User), result.ListName];
+            var message = _localizer[localizerKey, CurrentUserName, result.ListName];
 
-            var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, userId, dto.ListId, null, message);
+            var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, CurrentUserId, dto.ListId, null, message);
             var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
             var toDoAssistantPushNotification = new ToDoAssistantPushNotification
             {
@@ -609,17 +432,7 @@ public class ListsController : Controller
             return BadRequest();
         }
 
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        await _listService.ReorderAsync(dto.Id, userId, dto.OldOrder, dto.NewOrder);
+        await _listService.ReorderAsync(dto.Id, CurrentUserId, dto.OldOrder, dto.NewOrder);
 
         return NoContent();
     }

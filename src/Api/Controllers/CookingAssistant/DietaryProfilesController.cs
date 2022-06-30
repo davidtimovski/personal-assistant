@@ -1,19 +1,17 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Application.Contracts.CookingAssistant.DietaryProfiles;
+using Application.Contracts.CookingAssistant.DietaryProfiles.Models;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Application.Contracts.CookingAssistant.DietaryProfiles;
-using Application.Contracts.CookingAssistant.DietaryProfiles.Models;
-using Infrastructure.Identity;
 
 namespace Api.Controllers.CookingAssistant;
 
 [Authorize]
 [EnableCors("AllowCookingAssistant")]
 [Route("api/[controller]")]
-public class DietaryProfilesController : Controller
+public class DietaryProfilesController : BaseController
 {
     private readonly IDietaryProfileService _dietaryProfileService;
     private readonly IValidator<GetRecommendedDailyIntake> _getRecommendedDailyIntakeValidator;
@@ -32,17 +30,7 @@ public class DietaryProfilesController : Controller
     [HttpGet]
     public IActionResult Get()
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        EditDietaryProfile dto = _dietaryProfileService.Get(userId);
+        EditDietaryProfile dto = _dietaryProfileService.Get(CurrentUserId);
 
         return Ok(dto);
     }
@@ -68,14 +56,7 @@ public class DietaryProfilesController : Controller
             return BadRequest();
         }
 
-        try
-        {
-            dto.UserId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        dto.UserId = CurrentUserId;
 
         await _dietaryProfileService.CreateOrUpdateAsync(dto, _updateDietaryProfileValidator);
 
@@ -85,17 +66,7 @@ public class DietaryProfilesController : Controller
     [HttpDelete]
     public async Task<IActionResult> Delete()
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        await _dietaryProfileService.DeleteAsync(userId);
+        await _dietaryProfileService.DeleteAsync(CurrentUserId);
 
         return NoContent();
     }

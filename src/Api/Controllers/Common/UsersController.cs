@@ -1,18 +1,16 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Application.Contracts.Common;
+using Application.Contracts.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Application.Contracts.Common;
-using Application.Contracts.Common.Models;
-using Infrastructure.Identity;
 
 namespace Api.Controllers.Common;
 
 [Authorize]
 [EnableCors("AllowAllApps")]
 [Route("api/[controller]")]
-public class UsersController : Controller
+public class UsersController : BaseController
 {
     private readonly IUserService _userService;
 
@@ -24,17 +22,7 @@ public class UsersController : Controller
     [HttpGet("language")]
     public IActionResult GetLanguage()
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        string language = _userService.GetLanguage(userId);
+        string language = _userService.GetLanguage(CurrentUserId);
 
         return Ok(language);
     }
@@ -42,17 +30,7 @@ public class UsersController : Controller
     [HttpGet("profile-image-uri")]
     public IActionResult GetProfileImageUri()
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        string imageUri = _userService.GetImageUri(userId);
+        string imageUri = _userService.GetImageUri(CurrentUserId);
 
         return Ok(imageUri);
     }
@@ -60,17 +38,7 @@ public class UsersController : Controller
     [HttpGet("to-do-preferences")]
     public IActionResult GetToDoPreferences()
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        ToDoAssistantPreferences preferences = _userService.GetToDoAssistantPreferences(userId);
+        ToDoAssistantPreferences preferences = _userService.GetToDoAssistantPreferences(CurrentUserId);
 
         return Ok(preferences);
     }
@@ -78,17 +46,7 @@ public class UsersController : Controller
     [HttpGet("cooking-preferences")]
     public IActionResult GetCookingPreferences()
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        CookingAssistantPreferences preferences = _userService.GetCookingAssistantPreferences(userId);
+        CookingAssistantPreferences preferences = _userService.GetCookingAssistantPreferences(CurrentUserId);
 
         return Ok(preferences);
     }
@@ -101,17 +59,7 @@ public class UsersController : Controller
             return BadRequest();
         }
 
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        await _userService.UpdateToDoNotificationsEnabledAsync(userId, dto.ToDoNotificationsEnabled);
+        await _userService.UpdateToDoNotificationsEnabledAsync(CurrentUserId, dto.ToDoNotificationsEnabled);
 
         return NoContent();
     }
@@ -124,17 +72,7 @@ public class UsersController : Controller
             return BadRequest();
         }
 
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        await _userService.UpdateCookingNotificationsEnabledAsync(userId, dto.CookingNotificationsEnabled);
+        await _userService.UpdateCookingNotificationsEnabledAsync(CurrentUserId, dto.CookingNotificationsEnabled);
 
         return NoContent();
     }
@@ -147,17 +85,7 @@ public class UsersController : Controller
             return BadRequest();
         }
 
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        await _userService.UpdateImperialSystemAsync(userId, dto.ImperialSystem);
+        await _userService.UpdateImperialSystemAsync(CurrentUserId, dto.ImperialSystem);
 
         return NoContent();
     }

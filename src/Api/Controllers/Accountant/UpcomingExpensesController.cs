@@ -1,18 +1,16 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Application.Contracts.Accountant.UpcomingExpenses;
+using Application.Contracts.Accountant.UpcomingExpenses.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Application.Contracts.Accountant.UpcomingExpenses;
-using Application.Contracts.Accountant.UpcomingExpenses.Models;
-using Infrastructure.Identity;
 
 namespace Api.Controllers.Accountant;
 
 [Authorize]
 [EnableCors("AllowAccountant")]
 [Route("api/[controller]")]
-public class UpcomingExpensesController : Controller
+public class UpcomingExpensesController : BaseController
 {
     private readonly IUpcomingExpenseService _upcomingExpenseService;
 
@@ -29,14 +27,7 @@ public class UpcomingExpensesController : Controller
             return BadRequest();
         }
 
-        try
-        {
-            dto.UserId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        dto.UserId = CurrentUserId;
 
         int id = await _upcomingExpenseService.CreateAsync(dto);
 
@@ -51,14 +42,7 @@ public class UpcomingExpensesController : Controller
             return BadRequest();
         }
 
-        try
-        {
-            dto.UserId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        dto.UserId = CurrentUserId;
 
         await _upcomingExpenseService.UpdateAsync(dto);
 
@@ -68,17 +52,7 @@ public class UpcomingExpensesController : Controller
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        await _upcomingExpenseService.DeleteAsync(id, userId);
+        await _upcomingExpenseService.DeleteAsync(id, CurrentUserId);
 
         return NoContent();
     }

@@ -140,7 +140,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
             var privateTasks = PrivateTasks(task.ListId, userId).Where(x => !x.IsCompleted);
             foreach (ToDoTask privateTask in privateTasks)
             {
-                privateTask.Order += 1;
+                privateTask.Order++;
             }
         }
         else
@@ -148,7 +148,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
             var publicTasks = PublicTasks(task.ListId).Where(x => !x.IsCompleted);
             foreach (ToDoTask publicTask in publicTasks)
             {
-                publicTask.Order += 1;
+                publicTask.Order--;
             }
         }
 
@@ -209,7 +209,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
                 var publicTasks = PublicTasks(existingTask.ListId).Where(x => x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
                 foreach (ToDoTask publicTask in publicTasks)
                 {
-                    publicTask.Order -= 1;
+                    publicTask.Order--;
                 }
 
                 var tasksCount = GetPrivateTasksCount(task.ListId, existingTask.IsCompleted, userId);
@@ -221,7 +221,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
                 var privateTasks = PrivateTasks(existingTask.ListId, userId).Where(x => x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
                 foreach (ToDoTask privateTask in privateTasks)
                 {
-                    privateTask.Order -= 1;
+                    privateTask.Order--;
                 }
 
                 var tasksCount = GetPublicTasksCount(task.ListId, existingTask.IsCompleted);
@@ -248,7 +248,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
                 var privateTasks = PrivateTasks(existingTask.ListId, userId).Where(x => x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
                 foreach (ToDoTask privateTask in privateTasks)
                 {
-                    privateTask.Order -= 1;
+                    privateTask.Order--;
                 }
 
                 if (newListIsShared)
@@ -269,7 +269,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
                 var publicTasks = PublicTasks(existingTask.ListId).Where(x => x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
                 foreach (ToDoTask publicTask in publicTasks)
                 {
-                    publicTask.Order -= 1;
+                    publicTask.Order--;
                 }
 
                 var tasksCount = GetPublicTasksCount(task.ListId, existingTask.IsCompleted);
@@ -292,8 +292,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
 
     public async Task DeleteAsync(int id, int userId)
     {
-        ToDoTask task = Get(id);
-
+        ToDoTask task = EFContext.Tasks.Find(id);
         EFContext.Tasks.Remove(task);
 
         if (task.PrivateToUserId.HasValue)
@@ -302,7 +301,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
             var privateTasks = PrivateTasks(task.ListId, userId).Where(x => x.IsCompleted == task.IsCompleted && x.Order > task.Order);
             foreach (ToDoTask privateTask in privateTasks)
             {
-                privateTask.Order -= 1;
+                privateTask.Order--;
             }
         }
         else
@@ -310,7 +309,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
             var publicTasks = PublicTasks(task.ListId).Where(x => x.IsCompleted == task.IsCompleted && x.Order > task.Order);
             foreach (ToDoTask publicTask in publicTasks)
             {
-                publicTask.Order -= 1;
+                publicTask.Order--;
             }
         }
 
@@ -319,89 +318,76 @@ public class TasksRepository : BaseRepository, ITasksRepository
 
     public async Task CompleteAsync(int id, int userId)
     {
-        ToDoTask task = Get(id);
+        ToDoTask task = EFContext.Tasks.Find(id);
 
         if (task.PrivateToUserId.HasValue)
         {
-            // If the task was private increase the Order of only the user's completed private tasks
-            var privateTasks = PrivateTasks(task.ListId, userId).Where(x => x.IsCompleted);
-            foreach (ToDoTask privateTask in privateTasks)
+            var completedPrivateTasks = PrivateTasks(task.ListId, userId).Where(x => x.IsCompleted);
+            foreach (ToDoTask privateTask in completedPrivateTasks)
             {
-                privateTask.Order += 1;
+                privateTask.Order++;
             }
-        }
-        else
-        {
-            var publicTasks = PublicTasks(task.ListId).Where(x => x.IsCompleted);
-            foreach (ToDoTask publicTask in publicTasks)
-            {
-                publicTask.Order += 1;
-            }
-        }
 
-        ToDoTask dbTask = EFContext.Tasks.Find(id);
-        dbTask.IsCompleted = true;
-        dbTask.Order = 1;
+            task.IsCompleted = true;
 
-        if (task.PrivateToUserId.HasValue)
-        {
-            // If the task was private reduce the Order of only the user's private tasks
             var privateTasks = PrivateTasks(task.ListId, userId).Where(x => !x.IsCompleted && x.Order > task.Order);
             foreach (ToDoTask privateTask in privateTasks)
             {
-                privateTask.Order -= 1;
+                privateTask.Order--;
             }
         }
         else
         {
+            var completedPublicTasks = PublicTasks(task.ListId).Where(x => x.IsCompleted);
+            foreach (ToDoTask publicTask in completedPublicTasks)
+            {
+                publicTask.Order++;
+            }
+
+            task.IsCompleted = true;
+
             var publicTasks = PublicTasks(task.ListId).Where(x => !x.IsCompleted && x.Order > task.Order);
             foreach (ToDoTask publicTask in publicTasks)
             {
-                publicTask.Order -= 1;
+                publicTask.Order--;
             }
         }
+
+        task.Order = 1;
 
         await EFContext.SaveChangesAsync();
     }
 
     public async Task UncompleteAsync(int id, int userId)
     {
-        ToDoTask task = Get(id);
+        ToDoTask task = EFContext.Tasks.Find(id);
 
-        short order;
+        short newOrder;
         if (task.PrivateToUserId.HasValue)
         {
-            // If the task was private calculate the Order from only the user's private tasks
             var tasksCount = GetPrivateTasksCount(task.ListId, false, userId);
-            order = ++tasksCount;
+            newOrder = ++tasksCount;
+
+            var completedPrivateTasks = PrivateTasks(task.ListId, userId).Where(x => x.IsCompleted && x.Order > task.Order);
+            foreach (ToDoTask privateTask in completedPrivateTasks)
+            {
+                privateTask.Order--;
+            }
         }
         else
         {
             var tasksCount = GetPublicTasksCount(task.ListId, false);
-            order = ++tasksCount;
-        }
+            newOrder = ++tasksCount;
 
-        if (task.PrivateToUserId.HasValue)
-        {
-            // If the task was private reduce the Order of only the user's private completed tasks
-            var privateTasks = PrivateTasks(task.ListId, userId).Where(x => x.IsCompleted && x.Order > task.Order);
-            foreach (ToDoTask privateTask in privateTasks)
+            var completedPublicTasks = PublicTasks(task.ListId).Where(x => x.IsCompleted && x.Order > task.Order);
+            foreach (ToDoTask publicTask in completedPublicTasks)
             {
-                privateTask.Order -= 1;
-            }
-        }
-        else
-        {
-            var publicTasks = PublicTasks(task.ListId).Where(x => x.IsCompleted && x.Order > task.Order);
-            foreach (ToDoTask publicTask in publicTasks)
-            {
-                publicTask.Order -= 1;
+                publicTask.Order--;
             }
         }
 
-        ToDoTask dbTask = EFContext.Tasks.Find(id);
-        dbTask.IsCompleted = false;
-        dbTask.Order = order;
+        task.IsCompleted = false;
+        task.Order = newOrder;
 
         await EFContext.SaveChangesAsync();
     }
@@ -418,7 +404,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
                 var privateTasks = PrivateTasks(task.ListId, userId).Where(x => x.IsCompleted == task.IsCompleted && x.Order >= oldOrder && x.Order <= newOrder);
                 foreach (ToDoTask privateTask in privateTasks)
                 {
-                    privateTask.Order -= 1;
+                    privateTask.Order--;
                 }
             }
             else
@@ -426,7 +412,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
                 var privateTasks = PrivateTasks(task.ListId, userId).Where(x => x.IsCompleted == task.IsCompleted && x.Order <= oldOrder && x.Order >= newOrder);
                 foreach (ToDoTask privateTask in privateTasks)
                 {
-                    privateTask.Order += 1;
+                    privateTask.Order++;
                 }
             }
         }
@@ -437,7 +423,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
                 var publicTasks = PublicTasks(task.ListId).Where(x => x.IsCompleted == task.IsCompleted && x.Order >= oldOrder && x.Order <= newOrder);
                 foreach (ToDoTask publicTask in publicTasks)
                 {
-                    publicTask.Order -= 1;
+                    publicTask.Order--;
                 }
             }
             else
@@ -445,7 +431,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
                 var publicTasks = PublicTasks(task.ListId).Where(x => x.IsCompleted == task.IsCompleted && x.Order <= oldOrder && x.Order >= newOrder);
                 foreach (ToDoTask publicTask in publicTasks)
                 {
-                    publicTask.Order += 1;
+                    publicTask.Order++;
                 }
             }
         }

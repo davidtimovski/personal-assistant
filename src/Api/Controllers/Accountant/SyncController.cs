@@ -15,7 +15,6 @@ using Application.Contracts.Accountant.Transactions;
 using Application.Contracts.Accountant.Transactions.Models;
 using Application.Contracts.Accountant.UpcomingExpenses;
 using Application.Contracts.Accountant.UpcomingExpenses.Models;
-using Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +24,7 @@ namespace Api.Controllers.Accountant;
 [Authorize]
 [EnableCors("AllowAccountant")]
 [Route("api/[controller]")]
-public class SyncController : Controller
+public class SyncController : BaseController
 {
     private readonly ISyncService _syncService;
     private readonly ICategoryService _categoryService;
@@ -58,19 +57,9 @@ public class SyncController : Controller
             return BadRequest();
         }
 
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
+        await _upcomingExpenseService.DeleteOldAsync(CurrentUserId);
 
-        await _upcomingExpenseService.DeleteOldAsync(userId);
-
-        var getAll = new GetAll(userId, vm.LastSynced);
+        var getAll = new GetAll(CurrentUserId, vm.LastSynced);
 
         IEnumerable<CategoryDto> categories = _categoryService.GetAll(getAll);
         IEnumerable<AccountDto> accounts = _accountService.GetAll(getAll);
@@ -78,7 +67,7 @@ public class SyncController : Controller
         IEnumerable<UpcomingExpenseDto> upcomingExpenses = _upcomingExpenseService.GetAll(getAll);
         IEnumerable<DebtDto> debts = _debtService.GetAll(getAll);
 
-        var getDeletedIds = new GetDeletedIds(userId, vm.LastSynced);
+        var getDeletedIds = new GetDeletedIds(CurrentUserId, vm.LastSynced);
 
         var changedVm = new ChangedVm
         {
@@ -106,20 +95,10 @@ public class SyncController : Controller
             return BadRequest();
         }
 
-        int userId;
-        try
-        {
-            userId = IdentityHelper.GetUserId(User);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Unauthorized();
-        }
-
-        dto.Accounts.ForEach(x => { x.UserId = userId; });
-        dto.Categories.ForEach(x => { x.UserId = userId; });
-        dto.UpcomingExpenses.ForEach(x => { x.UserId = userId; });
-        dto.Debts.ForEach(x => { x.UserId = userId; });
+        dto.Accounts.ForEach(x => { x.UserId = CurrentUserId; });
+        dto.Categories.ForEach(x => { x.UserId = CurrentUserId; });
+        dto.UpcomingExpenses.ForEach(x => { x.UserId = CurrentUserId; });
+        dto.Debts.ForEach(x => { x.UserId = CurrentUserId; });
 
         var syncedEntityIds = await _syncService.SyncEntitiesAsync(dto);
 
