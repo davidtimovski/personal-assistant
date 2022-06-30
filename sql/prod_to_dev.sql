@@ -8,6 +8,8 @@ UPDATE "ClientPostLogoutRedirectUris" SET "PostLogoutRedirectUri" = 'http://loca
 UPDATE "ClientPostLogoutRedirectUris" SET "PostLogoutRedirectUri" = 'http://localhost:8081' WHERE "ClientId" = 2;
 UPDATE "ClientPostLogoutRedirectUris" SET "PostLogoutRedirectUri" = 'http://localhost:8082' WHERE "ClientId" = 3;
 
+DELETE FROM push_subscriptions;
+
 
 -- Scramble user data
 
