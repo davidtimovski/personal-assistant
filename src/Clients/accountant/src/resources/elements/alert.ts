@@ -8,16 +8,17 @@ import { AlertEvents } from "../../../../shared/src/models/enums/alertEvents";
 export class AlertCustomElement {
   private type: string;
   private message: string;
-  private fading = false;
   private refreshLink: HTMLAnchorElement;
+  private shown = false;
   private hideTimeout = 0;
+  private resetMessageTimeout = 0;
 
   constructor(private readonly eventAggregator: EventAggregator, private readonly i18n: I18N) {
     this.eventAggregator.subscribe(AlertEvents.ShowError, (errors: any) => {
-      this.type = "error";
+      let message: string;
 
       if (errors.constructor === Array) {
-        this.message = errors.join("<br>");
+        message = errors.join("<br>");
       } else {
         const translationKey = errors;
 
@@ -25,19 +26,14 @@ export class AlertCustomElement {
           this.refreshLink.style.display = translationKey === "unexpectedError" ? "block" : "none";
         }
 
-        this.message = this.i18n.tr(translationKey);
+        message = this.i18n.tr(translationKey);
       }
+
+      this.show("error", message);
     });
 
     this.eventAggregator.subscribe(AlertEvents.ShowSuccess, (translationKey: string) => {
-      this.reset();
-
-      this.type = "success";
-      this.message = this.i18n.tr(translationKey);
-
-      this.hideTimeout = window.setTimeout(() => {
-        this.hide();
-      }, 5000);
+      this.showTemporary("success", this.i18n.tr(translationKey));
     });
 
     this.eventAggregator.subscribe(AlertEvents.HideError, () => {
@@ -47,20 +43,44 @@ export class AlertCustomElement {
     });
   }
 
-  reset() {
-    this.message = null;
-    this.fading = false;
-    this.refreshLink.style.display = "none";
+  show(type: string, message: string) {
+    if (this.resetMessageTimeout) {
+      window.clearTimeout(this.resetMessageTimeout);
+      this.resetMessageTimeout = 0;
+    }
+
+    this.type = type;
+    this.message = message;
+    this.shown = true;
   }
 
-  hide() {
-    if (this.hideTimeout !== 0) {
+  showTemporary(type: string, message: string) {
+    this.show(type, message);
+
+    if (this.hideTimeout) {
       window.clearTimeout(this.hideTimeout);
       this.hideTimeout = 0;
     }
 
-    this.reset();
+    this.hideTimeout = window.setTimeout(() => {
+      this.hide();
+    }, 5000);
+  }
+
+  hide() {
+    this.shown = false;
+
+    this.resetMessageTimeout = window.setTimeout(() => {
+      this.reset();
+    }, 1000);
+
     this.eventAggregator.publish(AlertEvents.OnHidden);
+  }
+
+  reset() {
+    this.type = null;
+    this.message = null;
+    this.refreshLink.style.display = "none";
   }
 
   refresh() {

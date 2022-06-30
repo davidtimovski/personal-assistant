@@ -11,6 +11,7 @@ import { ListsService } from "services/listsService";
 import { PreferencesModel } from "models/preferencesModel";
 import { State } from "utils/state/state";
 import * as Actions from "utils/state/actions";
+import { SoundPlayer } from "utils/soundPlayer";
 
 @inject(UsersService, NotificationsService, ListsService, I18N, EventAggregator)
 @connectTo()
@@ -21,7 +22,8 @@ export class Preferences {
   private notificationsState: string;
   private readonly notificationIconSrc = "/images/icons/app-icon-96x96.png";
   private notificationsAreSupported = false;
-  private notificationsCheckboxReady = false;
+  private readonly soundPlayer = new SoundPlayer();
+  private preferencesInitialized = false;
   state: State;
 
   @observable() private notificationsCheckboxChecked;
@@ -56,17 +58,16 @@ export class Preferences {
           this.notificationsState = "default";
       }
     }
-
-    this.notificationsCheckboxReady = true;
   }
 
   attached() {
     this.soundsEnabled = this.state.soundsEnabled;
     this.highPriorityListEnabled = this.state.highPriorityListEnabled;
+    this.preferencesInitialized = true;
   }
 
   async notificationsCheckboxCheckedChanged() {
-    if (!this.notificationsCheckboxReady) {
+    if (!this.preferencesInitialized) {
       return;
     }
 
@@ -132,15 +133,24 @@ export class Preferences {
     }
   }
 
-  soundsEnabledChanged() {
+  async soundsEnabledChanged() {
+    if (!this.preferencesInitialized) {
+      return;
+    }
+
     Actions.updatePreference("soundsEnabled", this.soundsEnabled);
 
     if (this.soundsEnabled) {
-      new Audio("/audio/bleep.mp3").play();
+      await this.soundPlayer.initialize();
+      this.soundPlayer.playBleep();
     }
   }
 
   highPriorityListEnabledChanged() {
+    if (!this.preferencesInitialized) {
+      return;
+    }
+
     Actions.updatePreference("highPriorityListEnabled", this.highPriorityListEnabled);
 
     Actions.getLists(this.listsService);

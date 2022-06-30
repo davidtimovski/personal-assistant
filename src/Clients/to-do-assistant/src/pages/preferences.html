@@ -16,13 +16,19 @@
       <div class="content-wrap">
         <form onsubmit="return false;">
           <div if.bind="notificationsAreSupported" class="form-control">
-            <div show.bind="notificationsState === 'denied'" class="setting-descriptor no-bottom-margin"
-              t="preferences.notificationsPermission">
+            <div
+              show.bind="notificationsState === 'denied'"
+              class="setting-descriptor no-bottom-margin"
+              t="preferences.notificationsPermission"
+            >
               You must first give notifications permission to the app.
             </div>
 
-            <checkbox label-key="preferences.notifications" value.bind="notificationsCheckboxChecked"
-              disabled.bind="notificationsState === 'denied'"></checkbox>
+            <checkbox
+              label-key="preferences.notifications"
+              value.bind="notificationsCheckboxChecked"
+              disabled.bind="notificationsState === 'denied'"
+            ></checkbox>
           </div>
 
           <div class="form-control">
@@ -30,8 +36,7 @@
           </div>
 
           <div class="form-control">
-            <checkbox label-key="preferences.showHighPriorityList" value.bind="highPriorityListEnabled">
-            </checkbox>
+            <checkbox label-key="preferences.showHighPriorityList" value.bind="highPriorityListEnabled"> </checkbox>
           </div>
         </form>
       </div>

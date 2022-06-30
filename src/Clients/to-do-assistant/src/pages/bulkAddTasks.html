@@ -16,9 +16,12 @@
       <div class="content-wrap">
         <form submit.trigger="save()">
           <div class="form-control">
-            <textarea value.bind="model.tasksText & validate" ref="tasksTextInput"
+            <textarea
+              value.bind="model.tasksText & validate"
+              ref="tasksTextInput"
               class.bind="tasksTextIsInvalid ? 'invalid' : ''"
-              t="[placeholder,aria-label]bulkAddTasks.eachRow"></textarea>
+              t="[placeholder,aria-label]bulkAddTasks.eachRow"
+            ></textarea>
           </div>
           <div class="form-control">
             <checkbox label-key="deleteOnCompletion" value.bind="model.tasksAreOneTime"></checkbox>
@@ -29,8 +32,11 @@
         </form>
 
         <div class="save-delete-wrap">
-          <a if.bind="!confirmationInProgress" click.delegate="save()"
-            class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
+          <a
+            if.bind="!confirmationInProgress"
+            click.delegate="save()"
+            class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}"
+          >
             <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
               <i class="fas fa-circle-notch fa-spin"></i>
             </span>

@@ -15,12 +15,13 @@ import { State } from "utils/state/state";
 import * as Actions from "utils/state/actions";
 import { ListTask } from "models/viewmodels/listTask";
 import { AppEvents } from "models/appEvents";
+import { SoundPlayer } from "utils/soundPlayer";
 
 @inject(Router, ListsService, TasksService, ValidationController, I18N, EventAggregator)
 @connectTo()
 export class List {
   private listId: number;
-  private model = new ViewList(0, "", false, SharingState.NotShared, null, null);
+  private readonly model = new ViewList(0, "", false, SharingState.NotShared, null, null);
   private topDrawerIsOpen = false;
   private shareButtonText: string;
   private completedTasksAreVisible = false;
@@ -42,8 +43,7 @@ export class List {
   private lastEditedId: number;
   private isReordering = false;
   private isSearching = false;
-  private bleep = new Audio("/audio/bleep.mp3");
-  private blop = new Audio("/audio/blop.mp3");
+  private readonly soundPlayer = new SoundPlayer();
   private editListButtonIsLoading = false;
   private addNewPlaceholderText: string;
   state: State;
@@ -81,8 +81,7 @@ export class List {
 
   attached() {
     if (this.state.soundsEnabled) {
-      this.bleep.load();
-      this.blop.load();
+      this.soundPlayer.initialize();
     }
 
     if (!this.state.loading) {
@@ -333,7 +332,7 @@ export class List {
             }
 
             if (this.state.soundsEnabled) {
-              this.blop.play();
+              this.soundPlayer.playBlop();
             }
           } catch {
             this.newTaskIsLoading = false;
@@ -354,7 +353,7 @@ export class List {
     const startTime = new Date();
 
     if (!remote && this.state.soundsEnabled) {
-      this.bleep.play();
+      this.soundPlayer.playBleep();
     }
 
     task.isChecked = true;
@@ -407,7 +406,7 @@ export class List {
     const startTime = new Date();
 
     if (!remote && this.state.soundsEnabled) {
-      this.blop.play();
+      this.soundPlayer.playBlop();
     }
 
     task.isChecked = true;

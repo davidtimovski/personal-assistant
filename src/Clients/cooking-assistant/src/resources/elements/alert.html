@@ -1,8 +1,8 @@
-<template show.bind="message" click.delegate="hide()" class="alert ${type}">
+<template click.delegate="hide()" class="alert ${shown ? 'shown' : ''} ${type}">
   <require from="./alert.scss"></require>
 
   <span class="alert-body">
-    <span class="alert-message" innerhtml.bind="message | dompurify"></span>
+    <span class="alert-message" innerHTML.bind="message | dompurify"></span>
     <a ref="refreshLink" click.delegate="refresh()" class="refresh-link" t="refresh">Refresh</a>
   </span>
 </template>

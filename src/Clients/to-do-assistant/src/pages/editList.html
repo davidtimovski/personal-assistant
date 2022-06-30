@@ -20,39 +20,60 @@
       <div class="content-wrap">
         <div show.bind="model.sharingState === 4" class="message warning">
           <i class="fas fa-exclamation-triangle"></i>
-          <span t="editList.inOrderToChangeThisList">In order to change this list you must be an owner or
-            Administrator.</span>
+          <span t="editList.inOrderToChangeThisList"
+            >In order to change this list you must be an owner or Administrator.</span
+          >
         </div>
 
         <form submit.trigger="save()">
           <div if.bind="model.sharingState !== 4" class="form-control">
-            <input type="text" value.bind="model.name & validate" ref="nameInput" maxlength="50"
-              class.bind="nameIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]listName" required />
+            <input
+              type="text"
+              value.bind="model.name & validate"
+              ref="nameInput"
+              maxlength="50"
+              class.bind="nameIsInvalid ? 'invalid' : ''"
+              t="[placeholder,aria-label]listName"
+              required
+            />
           </div>
 
           <div if.bind="isNewList" class="form-control">
-            <div if.bind="!tasksInputIsVisible" click.delegate="showTasksTextarea()"
-              class="horizontal-buttons-wrap au-animate animate-fade-in animate-fade-out">
+            <div
+              if.bind="!tasksInputIsVisible"
+              click.delegate="showTasksTextarea()"
+              class="horizontal-buttons-wrap au-animate animate-fade-in animate-fade-out"
+            >
               <a class="wide-button" t="editList.addTasks">Add tasks?</a>
             </div>
-            <textarea else value.bind="model.tasksText & validate"
+            <textarea
+              else
+              value.bind="model.tasksText & validate"
               class="au-animate animate-fade-in animate-fade-out ${tasksTextIsInvalid ? 'invalid' : ''}"
-              t="[placeholder,aria-label]editList.eachRow"></textarea>
+              t="[placeholder,aria-label]editList.eachRow"
+            ></textarea>
           </div>
 
           <div if.bind="model.sharingState !== 4" class="form-control">
             <div class="icon-wrap">
               <span class="placeholder" t="editList.icon">Icon</span>
               <div class="icon-options">
-                <div repeat.for="icon of iconOptions" click.delegate="selectIcon(icon.icon)"
-                  class="${model.icon === icon.icon ? 'selected' : ''} icon-option">
+                <div
+                  repeat.for="icon of iconOptions"
+                  click.delegate="selectIcon(icon.icon)"
+                  class="${model.icon === icon.icon ? 'selected' : ''} icon-option"
+                >
                   <i class="${icon.cssClass}"></i>
                 </div>
               </div>
             </div>
           </div>
           <div class="form-control">
-            <checkbox label-key="editList.notifications" value.bind="model.notificationsEnabled" disabled.bind="!notificationsCheckboxEnabled"></checkbox>
+            <checkbox
+              label-key="editList.notifications"
+              value.bind="model.notificationsEnabled"
+              disabled.bind="!notificationsCheckboxEnabled"
+            ></checkbox>
           </div>
           <div if.bind="model.sharingState !== 4" class="form-control">
             <checkbox label-key="deleteOnCompletion" value.bind="model.isOneTimeToggleDefault"></checkbox>
@@ -64,54 +85,43 @@
         <hr />
 
         <div class="save-delete-wrap">
-          <a if.bind="!confirmationInProgress" click.delegate="save()"
-            class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
+          <a
+            if.bind="!confirmationInProgress"
+            click.delegate="save()"
+            class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}"
+          >
             <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
               <i class="fas fa-circle-notch fa-spin"></i>
             </span>
             <span>${saveButtonText}</span>
           </a>
-          <a if.bind="!isNewList && model.sharingState === 0 || model.sharingState === 1 || model.sharingState === 2"
-            click.delegate="delete()" class="
-            button
-            danger-button
-            ${deleteButtonIsLoading
-            ?
-            'disabled'
-            :
-            ''}
-            ${confirmationInProgress
-            ?
-            'confirm'
-            :
-            ''}
-          ">
+          <a
+            if.bind="!isNewList && model.sharingState === 0 || model.sharingState === 1 || model.sharingState === 2"
+            click.delegate="delete()"
+            class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${confirmationInProgress ? 'confirm' : ''}"
+          >
             <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
               <i class="fas fa-circle-notch fa-spin"></i>
             </span>
             <span>${deleteButtonText}</span>
           </a>
-          <a if.bind="model.sharingState === 3 || model.sharingState === 4" click.delegate="leave()" class="
-            button
-            danger-button
-            ${leaveButtonIsLoading
-            ?
-            'disabled'
-            :
-            ''}
-            ${confirmationInProgress
-            ?
-            'confirm'
-            :
-            ''}
-          ">
+          <a
+            if.bind="model.sharingState === 3 || model.sharingState === 4"
+            click.delegate="leave()"
+            class="button danger-button ${leaveButtonIsLoading ? 'disabled' : ''} ${confirmationInProgress ? 'confirm' : ''}"
+          >
             <span class="button-loader ${leaveButtonIsLoading ? 'loading' : ''}">
               <i class="fas fa-circle-notch fa-spin"></i>
             </span>
             <span>${leaveButtonText}</span>
           </a>
-          <button type="button" if.bind="isNewList || confirmationInProgress" click.delegate="cancel()" t="cancel"
-            class="button secondary-button">
+          <button
+            type="button"
+            if.bind="isNewList || confirmationInProgress"
+            click.delegate="cancel()"
+            t="cancel"
+            class="button secondary-button"
+          >
             Cancel
           </button>
         </div>

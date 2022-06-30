@@ -2,11 +2,16 @@
 
 .alert {
   position: fixed;
-  bottom: 30px;
+  bottom: -45px;
   z-index: 1;
   width: 100%;
   text-align: center;
   font-size: 1rem;
+  transition: bottom 700ms ease-in-out, top 700ms ease-in-out;
+
+  &.shown {
+    bottom: 30px;
+  }
 
   .alert-body {
     display: inline-block;
@@ -59,12 +64,16 @@
 
 @media screen and (min-width: $desktop-min) {
   .alert {
-    top: 30px;
+    top: -50px;
     bottom: unset;
     right: 30px;
     width: unset;
     font-size: 1.1rem;
     text-align: right;
+
+    &.shown {
+      top: 30px;
+    }
 
     .alert-body {
       padding: 10px 15px;

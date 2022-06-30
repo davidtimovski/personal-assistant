@@ -10,6 +10,7 @@ import { ViewComputedList } from "models/viewmodels/viewComputedList";
 import { State } from "utils/state/state";
 import { ListTask } from "models/viewmodels/listTask";
 import { AppEvents } from "models/appEvents";
+import { SoundPlayer } from "utils/soundPlayer";
 
 @inject(Router, TasksService, I18N, EventAggregator)
 @connectTo()
@@ -19,9 +20,8 @@ export class ComputedList {
   private shadowTasks: ListTask[];
   private shadowPrivateTasks: ListTask[];
   private searchTasksText = "";
-  private bleep = new Audio("/audio/bleep.mp3");
-  private blop = new Audio("/audio/blop.mp3");
-  private computedListNameLookup;
+  private readonly soundPlayer = new SoundPlayer();
+  private readonly computedListNameLookup;
   state: State;
 
   constructor(
@@ -45,8 +45,7 @@ export class ComputedList {
 
   attached() {
     if (this.state.soundsEnabled) {
-      this.bleep.load();
-      this.blop.load();
+      this.soundPlayer.initialize();
     }
 
     if (!this.state.loading) {
@@ -133,7 +132,7 @@ export class ComputedList {
     const startTime = new Date();
 
     if (!remote && this.state.soundsEnabled) {
-      this.bleep.play();
+      this.soundPlayer.playBleep();
     }
 
     task.isChecked = true;

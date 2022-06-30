@@ -22,7 +22,7 @@ export class CopyList {
   private listId: number;
   private model = new List(0, "", "", false, false, SharingState.NotShared, 0, false, null, [], null);
   private nameIsInvalid: boolean;
-  private iconOptions = ListsService.getIconOptions();
+  private readonly iconOptions = ListsService.getIconOptions();
   private saveButtonIsLoading = false;
   private copyButton: HTMLButtonElement;
   private copyAsTextCompleted = false;

@@ -24,8 +24,12 @@
         <div else class="share-requests-wrap">
           <tooltip if.bind="pendingShareRequests.length > 0" key="shareRequests"></tooltip>
           <div repeat.for="request of pendingShareRequests" class="share-request">
-            <a if.bind="!request.leftSideIsLoading" click.delegate="decline(request)" class="action"
-              t="[title,aria-label]shareRequests.decline">
+            <a
+              if.bind="!request.leftSideIsLoading"
+              click.delegate="decline(request)"
+              class="action"
+              t="[title,aria-label]shareRequests.decline"
+            >
               <i class="fas fa-ban"></i>
             </a>
             <span if.bind="request.leftSideIsLoading" class="action">
@@ -36,8 +40,12 @@
               <span t="shareRequests.by">by</span>
               <span class="colored-text">${request.listOwnerName}</span>
             </span>
-            <a if.bind="!request.rightSideIsLoading" click.delegate="accept(request)" class="action"
-              t="[title,aria-label]shareRequests.accept">
+            <a
+              if.bind="!request.rightSideIsLoading"
+              click.delegate="accept(request)"
+              class="action"
+              t="[title,aria-label]shareRequests.accept"
+            >
               <i class="fas fa-check"></i>
             </a>
             <span if.bind="request.rightSideIsLoading" class="action">
@@ -61,8 +69,12 @@
                 <i class="fas fa-ban"></i>
               </div>
               <span class="name">${request.listOwnerName}</span>
-              <a if.bind="!request.rightSideIsLoading" click.delegate="delete(request)" class="action delete"
-                t="[title,aria-label]shareRequests.unblock">
+              <a
+                if.bind="!request.rightSideIsLoading"
+                click.delegate="delete(request)"
+                class="action delete"
+                t="[title,aria-label]shareRequests.unblock"
+              >
                 <i class="fas fa-times-circle"></i>
               </a>
               <span if.bind="request.rightSideIsLoading" class="action">
