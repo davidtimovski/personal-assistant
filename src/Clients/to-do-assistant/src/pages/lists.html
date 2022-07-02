@@ -8,7 +8,13 @@
           <span if.bind="menuButtonIsLoading" class="menu-loader">
             <i class="fas fa-circle-notch fa-spin"></i>
           </span>
-          <div else click.delegate="goToMenu()" class="profile-image-container" t="[title,aria-label]lists.menu">
+          <div
+            else
+            click.delegate="goToMenu()"
+            class="profile-image-container"
+            role="button"
+            t="[title,aria-label]lists.menu"
+          >
             <img src.bind="imageUri" class="profile-image" t="[alt]profilePicture" />
           </div>
           <label
@@ -24,6 +30,7 @@
           <a
             click.delegate="sync()"
             class="sync-button ${!connTracker.isOnline || progressBar.active ? 'disabled' : ''}"
+            role="button"
             t="[title,aria-label]lists.refresh"
           >
             <i class="fas fa-sync-alt"></i>

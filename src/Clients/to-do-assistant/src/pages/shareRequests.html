@@ -28,6 +28,7 @@
               if.bind="!request.leftSideIsLoading"
               click.delegate="decline(request)"
               class="action"
+              role="button"
               t="[title,aria-label]shareRequests.decline"
             >
               <i class="fas fa-ban"></i>
@@ -44,6 +45,7 @@
               if.bind="!request.rightSideIsLoading"
               click.delegate="accept(request)"
               class="action"
+              role="button"
               t="[title,aria-label]shareRequests.accept"
             >
               <i class="fas fa-check"></i>
@@ -73,6 +75,7 @@
                 if.bind="!request.rightSideIsLoading"
                 click.delegate="delete(request)"
                 class="action delete"
+                role="button"
                 t="[title,aria-label]shareRequests.unblock"
               >
                 <i class="fas fa-times-circle"></i>

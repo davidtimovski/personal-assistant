@@ -119,12 +119,12 @@ public class MidnightWorker : BackgroundService
 
     private async Task DeleteOldDeletedEntityEntriesAsync()
     {
-        var threeMonthsAgo = DateTime.UtcNow.AddMonths(-3);
+        var sixMonthsAgo = DateTime.UtcNow.AddMonths(-6);
 
         using var conn = new NpgsqlConnection(_connectionString);
         conn.Open();
 
-        await conn.ExecuteAsync(@"DELETE FROM accountant_deleted_entities WHERE deleted_date < @DeleteFrom", new { DeleteFrom = threeMonthsAgo });
+        await conn.ExecuteAsync(@"DELETE FROM accountant_deleted_entities WHERE deleted_date < @DeleteFrom", new { DeleteFrom = sixMonthsAgo });
     }
 
     private async Task GenerateUpcomingExpenses()
