@@ -3,39 +3,88 @@
   "short_name": "To Do",
   "icons": [
     {
-      "src": "/images/icons/app-icon-48x48.png",
+      "src": "/images/icons/app-icon-x48m.png",
       "type": "image/png",
-      "sizes": "48x48"
+      "sizes": "48x48",
+      "purpose": "maskable"
     },
     {
-      "src": "/images/icons/app-icon-96x96.png",
+      "src": "/images/icons/app-icon-x48.png",
       "type": "image/png",
-      "sizes": "96x96"
+      "sizes": "48x48",
+      "purpose": "any"
     },
     {
-      "src": "/images/icons/app-icon-144x144.png",
+      "src": "/images/icons/app-icon-x72m.png",
       "type": "image/png",
-      "sizes": "144x144"
+      "sizes": "72x72",
+      "purpose": "maskable"
     },
     {
-      "src": "/images/icons/app-icon-192x192.png",
+      "src": "/images/icons/app-icon-x72.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "72x72",
+      "purpose": "any"
     },
     {
-      "src": "/images/icons/app-icon-256x256.png",
+      "src": "/images/icons/app-icon-x96m.png",
       "type": "image/png",
-      "sizes": "256x256"
+      "sizes": "96x96",
+      "purpose": "maskable"
     },
     {
-      "src": "/images/icons/app-icon-384x384.png",
+      "src": "/images/icons/app-icon-x96.png",
       "type": "image/png",
-      "sizes": "384x384"
+      "sizes": "96x96",
+      "purpose": "any"
     },
     {
-      "src": "/images/icons/app-icon-512x512.png",
+      "src": "/images/icons/app-icon-x128m.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "128x128",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/images/icons/app-icon-x128.png",
+      "type": "image/png",
+      "sizes": "128x128",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/icons/app-icon-x192m.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/images/icons/app-icon-x192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/icons/app-icon-x384m.png",
+      "type": "image/png",
+      "sizes": "384x384",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/images/icons/app-icon-x384.png",
+      "type": "image/png",
+      "sizes": "384x384",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/icons/app-icon-x512m.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/images/icons/app-icon-x512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
     }
   ],
   "start_url": "/",
@@ -43,7 +92,7 @@
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#fff",
-  "theme_color": "#5aacf1",
+  "theme_color": "#097cdc",
   "description": "Your very own To Do Assistant.",
   "dir": "ltr",
   "lang": "en-US"

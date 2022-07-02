@@ -35,10 +35,10 @@
                 aria-label="${emailPlaceholderText}"
                 required
               />
-              <a if.bind="currentlyEditing" click.delegate="saveShare()" t="[title,aria-label]save">
+              <a if.bind="currentlyEditing" click.delegate="saveShare()" role="button" t="[title,aria-label]save">
                 <i class="fas fa-save"></i>
               </a>
-              <a else click.delegate="addShare()" t="[title,aria-label]shareList.addMember">
+              <a else click.delegate="addShare()" role="button" t="[title,aria-label]shareList.addMember">
                 <i class="fas fa-plus-circle"></i>
               </a>
             </div>

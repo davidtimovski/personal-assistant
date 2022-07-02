@@ -24,7 +24,12 @@
                 t="[placeholder,aria-label]computedList.searchTasks"
                 maxlength="50"
               />
-              <i class="fas fa-times" click.delegate="clearFilter()" t="[title,aria-label]computedList.clear"></i>
+              <i
+                class="fas fa-times"
+                click.delegate="clearFilter()"
+                role="button"
+                t="[title,aria-label]computedList.clear"
+              ></i>
             </div>
           </form>
 
@@ -40,6 +45,7 @@
                 <a
                   click.delegate="complete(task)"
                   class="check-button ${task.isOneTime ? 'one-time' : ''}"
+                  role="button"
                   t="[title,aria-label]computedList.complete"
                 >
                   <i if.bind="!task.isChecked" class="far fa-square"></i>
@@ -65,6 +71,7 @@
                 <a
                   click.delegate="complete(task)"
                   class="check-button ${task.isOneTime ? 'one-time' : ''}"
+                  role="button"
                   t="[title,aria-label]computedList.complete"
                 >
                   <i if.bind="!task.isChecked" class="far fa-square"></i>

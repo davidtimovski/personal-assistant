@@ -8,7 +8,7 @@
         <span if.bind="editListButtonIsLoading" class="page-loading">
           <i class="fas fa-circle-notch fa-spin"></i>
         </span>
-        <a else click.delegate="editList()" class="edit-button" t="[title,aria-label]list.edit">
+        <a else click.delegate="editList()" class="edit-button" role="button" t="[title,aria-label]list.edit">
           <i class="fas fa-pencil-alt"></i>
         </a>
 
@@ -75,7 +75,7 @@
             <div class="alert-message" t="[html]list.archivedList">
               This list is archived.<br />Do you wish to restore it?
             </div>
-            <a click.delegate="restore()" class="side" t="[title,aria-label]list.restore">
+            <a click.delegate="restore()" class="side" role="button" t="[title,aria-label]list.restore">
               <i class="fas fa-check-circle"></i>
             </a>
           </div>
@@ -88,6 +88,7 @@
             <a
               click.delegate="uncompleteDuplicate()"
               class="side ${uncompleteDuplicateButtonVisible ? '' : 'hidden'}"
+              role="button"
               t="[title,aria-label]list.uncomplete"
             >
               <i class="fas fa-check-circle"></i>
@@ -99,7 +100,7 @@
               <i class="fas fa-info-circle"></i>
             </span>
             <div class="alert-message danger" innerHTML.bind="similarTasksMessageText | dompurify"></div>
-            <a click.delegate="create()" class="side" t="[title,aria-label]list.add">
+            <a click.delegate="create()" class="side" role="button" t="[title,aria-label]list.add">
               <i class="fas fa-check-circle"></i>
             </a>
           </div>
@@ -138,6 +139,7 @@
                 if.bind="!newTaskIsLoading"
                 click.delegate="create()"
                 class.bind="isSearching ? 'disabled' : ''"
+                role="button"
                 t="[title,aria-label]list.add"
               >
                 <i class="fas fa-plus-circle"></i>
@@ -178,6 +180,7 @@
                 <a
                   click.delegate="complete(task)"
                   class="check-button ${task.isOneTime ? 'one-time' : ''}"
+                  role="button"
                   t="[title,aria-label]list.complete"
                 >
                   <i if.bind="!task.isChecked" class="far fa-square"></i>
@@ -218,6 +221,7 @@
                 <a
                   click.delegate="complete(task)"
                   class="check-button ${task.isOneTime ? 'one-time' : ''}"
+                  role="button"
                   t="[title,aria-label]list.complete"
                 >
                   <i if.bind="!task.isChecked" class="far fa-square"></i>
@@ -269,7 +273,12 @@
                       <i class="reorder-icon fas fa-hand-paper"></i>
                     </span>
                     <span class="name">${task.name}</span>
-                    <a click.delegate="uncomplete(task)" class="check-button" t="[title,aria-label]list.uncomplete">
+                    <a
+                      click.delegate="uncomplete(task)"
+                      class="check-button"
+                      role="button"
+                      t="[title,aria-label]list.uncomplete"
+                    >
                       <i if.bind="!task.isChecked" class="fas fa-check-square"></i>
                       <i else class="far fa-square"></i>
                     </a>
@@ -304,7 +313,12 @@
                       t="[alt]profilePicture"
                     />
                     <span class="name">${task.name}</span>
-                    <a click.delegate="uncomplete(task)" class="check-button" t="[title,aria-label]list.uncomplete">
+                    <a
+                      click.delegate="uncomplete(task)"
+                      class="check-button"
+                      role="button"
+                      t="[title,aria-label]list.uncomplete"
+                    >
                       <i if.bind="!task.isChecked" class="fas fa-check-square"></i>
                       <i else class="far fa-square"></i>
                     </a>
