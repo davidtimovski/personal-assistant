@@ -8,14 +8,11 @@ import { Tooltip } from "../../../shared/src/models/tooltip";
 export class Help {
   private tooltips: Array<Tooltip>;
 
-  constructor(
-    private readonly tooltipsService: TooltipsService,
-    private readonly i18n: I18N
-  ) {}
+  constructor(private readonly tooltipsService: TooltipsService, private readonly i18n: I18N) {}
 
   async activate() {
     const tooltips = await this.tooltipsService.getAll("Accountant");
-    for (let tooltip of tooltips) {
+    for (const tooltip of tooltips) {
       tooltip.title = this.i18n.tr(`tooltips.${tooltip.key}.title`);
       tooltip.answer = this.i18n.tr(`tooltips.${tooltip.key}.answer`);
     }

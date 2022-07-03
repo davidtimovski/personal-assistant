@@ -146,6 +146,12 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Services.AddTransient<IEmailTemplateService, EmailTemplateService>();
 
+if (builder.Environment.EnvironmentName == Environments.Development)
+{
+    // SameSite cookie workaround for Chrome
+    builder.Services.ConfigureNonBreakingSameSiteCookies();
+}
+
 var app = builder.Build();
 
 if (builder.Environment.EnvironmentName == Environments.Production)

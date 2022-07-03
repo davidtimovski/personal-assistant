@@ -118,7 +118,7 @@ export class BarChartReport {
       (x: TransactionModel) => x.date.substring(0, 7) // yyyy-MM
     );
 
-    let fromDate = new Date(this.fromDate);
+    const fromDate = new Date(this.fromDate);
     const now = new Date();
 
     const monthsDiff = now.getMonth() - fromDate.getMonth() + 12 * (now.getFullYear() - fromDate.getFullYear());
@@ -139,7 +139,7 @@ export class BarChartReport {
 
       if (itemGroups.has(date)) {
         let monthTransactions: Array<TransactionModel>;
-        for (let key of itemGroups.keys()) {
+        for (const key of itemGroups.keys()) {
           if (key === date) {
             monthTransactions = itemGroups.get(key);
             break;

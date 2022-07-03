@@ -5,18 +5,13 @@ import { EventAggregator } from "aurelia-event-aggregator";
 
 import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
 import { AuthService } from "../../../shared/src/services/authService";
-import { UpcomingExpensesIDBHelper } from "../utils/upcomingExpensesIDBHelper";
 import { CurrenciesService } from "../../../shared/src/services/currenciesService";
-import { UpcomingExpense } from "models/entities/upcomingExpense";
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
 
-@inject(
-  AuthService,
-  HttpClient,
-  EventAggregator,
-  UpcomingExpensesIDBHelper,
-  CurrenciesService
-)
+import { UpcomingExpensesIDBHelper } from "../utils/upcomingExpensesIDBHelper";
+import { UpcomingExpense } from "models/entities/upcomingExpense";
+
+@inject(AuthService, HttpClient, EventAggregator, UpcomingExpensesIDBHelper, CurrenciesService)
 export class UpcomingExpensesService extends HttpProxyBase {
   constructor(
     protected readonly authService: AuthService,
@@ -51,9 +46,7 @@ export class UpcomingExpensesService extends HttpProxyBase {
     upcomingExpense.amount = parseFloat(<any>upcomingExpense.amount);
 
     if (upcomingExpense.description) {
-      upcomingExpense.description = upcomingExpense.description
-        .replace(/(\r\n|\r|\n){3,}/g, "$1\n")
-        .trim();
+      upcomingExpense.description = upcomingExpense.description.replace(/(\r\n|\r|\n){3,}/g, "$1\n").trim();
     }
     const now = DateHelper.adjustForTimeZone(new Date());
     upcomingExpense.createdDate = upcomingExpense.modifiedDate = now;
@@ -75,9 +68,7 @@ export class UpcomingExpensesService extends HttpProxyBase {
     upcomingExpense.amount = parseFloat(<any>upcomingExpense.amount);
 
     if (upcomingExpense.description) {
-      upcomingExpense.description = upcomingExpense.description
-        .replace(/(\r\n|\r|\n){3,}/g, "$1\n")
-        .trim();
+      upcomingExpense.description = upcomingExpense.description.replace(/(\r\n|\r|\n){3,}/g, "$1\n").trim();
     }
     upcomingExpense.modifiedDate = DateHelper.adjustForTimeZone(new Date());
 

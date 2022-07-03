@@ -7,10 +7,10 @@ import { connectTo } from "aurelia-store";
 import { ConnectionTracker } from "../../../shared/src/utils/connectionTracker";
 import { ProgressBar } from "../../../shared/src/models/progressBar";
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
+import { UsersServiceBase } from "../../../shared/src/services/usersServiceBase";
 
 import * as environment from "../../config/environment.json";
 import { CapitalService } from "services/capitalService";
-import { UsersService } from "services/usersService";
 import { LocalStorage } from "utils/localStorage";
 import { Capital } from "models/capital";
 import { DashboardModel } from "models/viewmodels/dashboard";
@@ -20,7 +20,7 @@ import * as Actions from "utils/state/actions";
 import { TransactionType } from "models/viewmodels/transactionType";
 import { AppEvents } from "models/appEvents";
 
-@inject(Router, CapitalService, UsersService, LocalStorage, I18N, EventAggregator, ConnectionTracker)
+@inject(Router, CapitalService, UsersServiceBase, LocalStorage, I18N, EventAggregator, ConnectionTracker)
 @connectTo()
 export class Dashboard {
   private imageUri = JSON.parse(<any>environment).defaultProfileImageUri;
@@ -37,7 +37,7 @@ export class Dashboard {
   constructor(
     private readonly router: Router,
     private readonly capitalService: CapitalService,
-    private readonly usersService: UsersService,
+    private readonly usersService: UsersServiceBase,
     private readonly localStorage: LocalStorage,
     private readonly i18n: I18N,
     private readonly eventAggregator: EventAggregator,
