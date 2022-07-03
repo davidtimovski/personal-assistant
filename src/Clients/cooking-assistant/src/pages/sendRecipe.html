@@ -19,10 +19,16 @@
         <form submit.trigger="addRecipient()">
           <div class="form-control">
             <div class="add-input-wrap">
-              <input type="email" ref="emailInput" value.bind="recipientEmail & validate" maxlength="256"
-                class.bind="emailIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]sendRecipe.recipientEmail"
-                required />
-              <a click.delegate="addRecipient()" t="[title,aria-label]sendRecipe.addRecipient">
+              <input
+                type="email"
+                ref="emailInput"
+                value.bind="recipientEmail & validate"
+                maxlength="256"
+                class.bind="emailIsInvalid ? 'invalid' : ''"
+                t="[placeholder,aria-label]sendRecipe.recipientEmail"
+                required
+              />
+              <a click.delegate="addRecipient()" role="button" t="[title,aria-label]sendRecipe.addRecipient">
                 <i class="fas fa-plus-circle"></i>
               </a>
             </div>
@@ -38,8 +44,12 @@
           <img class="send-image" src.bind="recipient.imageUri" t="[alt]profilePicture" />
           <div class="send-content">
             <span class="name">${recipient.email}</span>
-            <a click.delegate="removeRecipient(recipient)" class="send-content-button"
-              t="[title,aria-label]sendRecipe.removeRecipient">
+            <a
+              click.delegate="removeRecipient(recipient)"
+              class="send-content-button"
+              role="button"
+              t="[title,aria-label]sendRecipe.removeRecipient"
+            >
               <i class="fas fa-times-circle"></i>
             </a>
           </div>
@@ -54,8 +64,9 @@
             </span>
             <span t="sendRecipe.send">Send</span>
           </a>
-          <a route-href="route: recipe; params.bind: { id: model.id }" t="cancel"
-            class="button secondary-button">Cancel</a>
+          <a route-href="route: recipe; params.bind: { id: model.id }" t="cancel" class="button secondary-button"
+            >Cancel</a
+          >
         </div>
       </div>
     </div>

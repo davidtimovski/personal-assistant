@@ -16,11 +16,21 @@
 
       <div class="content-wrap">
         <div if.bind="shadowIngredients.length > 0" class="ingredients-search-wrap">
-          <input type="text" value.bind="search" keyup.delegate="searchInputChanged() & throttle:250"
-            class="${search.length > 0 ? 'searching' : ''}" t="[placeholder,aria-label]ingredients.search"
-            maxlength="50" />
-          <i class="fas fa-times" show.bind="clearSearchButtonIsVisible" click.delegate="clearSearch()"
-            t="[title,aria-label]ingredients.clear"></i>
+          <input
+            type="text"
+            value.bind="search"
+            keyup.delegate="searchInputChanged() & throttle:250"
+            class="${search.length > 0 ? 'searching' : ''}"
+            t="[placeholder,aria-label]ingredients.search"
+            maxlength="50"
+          />
+          <i
+            class="fas fa-times"
+            show.bind="clearSearchButtonIsVisible"
+            click.delegate="clearSearch()"
+            role="button"
+            t="[title,aria-label]ingredients.clear"
+          ></i>
         </div>
 
         <div if.bind="!ingredients" class="double-circle-loading">
@@ -28,8 +38,11 @@
           <div class="double-bounce2"></div>
         </div>
 
-        <div repeat.for="ingredient of ingredients" click.delegate="ingredientClicked(ingredient.id, ingredient.isPublic)"
-          class="ingredient au-animate animate-fade-in ${ingredient.unused ? 'unused' : ''} ${ingredient.id === getEditedId ? 'highlighted' : ''}">
+        <div
+          repeat.for="ingredient of ingredients"
+          click.delegate="ingredientClicked(ingredient.id, ingredient.isPublic)"
+          class="ingredient au-animate animate-fade-in ${ingredient.unused ? 'unused' : ''} ${ingredient.id === getEditedId ? 'highlighted' : ''}"
+        >
           <span class="name">${ingredient.name}</span>
           <span class="ingredient-icons-container">
             <i class="fas fa-user" if.bind="!ingredient.isPublic" t="[title,aria-label]mine"></i>

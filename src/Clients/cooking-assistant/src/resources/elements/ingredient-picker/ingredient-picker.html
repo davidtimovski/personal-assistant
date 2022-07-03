@@ -5,9 +5,17 @@
 
   <div class="ingredient-picker">
     <div class="input-wrap">
-      <input type="text" value.bind="ingredientName" keyup.delegate="ingredientInputChanged() & throttle:250"
-        disabled.bind="!suggestions" class.bind="ingredientNameIsInvalid ? 'invalid' : ''" placeholder="${inputPlaceholder}" aria-label="{inputPlaceholder}" maxlength="50" />
-      <a if.bind="addingEnabled" click.delegate="addNewIngredient()" t="[title,aria-label]addIngredient">
+      <input
+        type="text"
+        value.bind="ingredientName"
+        keyup.delegate="ingredientInputChanged() & throttle:250"
+        disabled.bind="!suggestions"
+        class.bind="ingredientNameIsInvalid ? 'invalid' : ''"
+        placeholder="${inputPlaceholder}"
+        aria-label="{inputPlaceholder}"
+        maxlength="50"
+      />
+      <a if.bind="addingEnabled" click.delegate="addNewIngredient()" role="button" t="[title,aria-label]addIngredient">
         <i class="fas fa-plus-circle"></i>
       </a>
     </div>

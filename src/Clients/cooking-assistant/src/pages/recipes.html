@@ -8,15 +8,24 @@
           <span if.bind="menuButtonIsLoading" class="menu-loader">
             <i class="fas fa-circle-notch fa-spin"></i>
           </span>
-          <div else click.delegate="goToMenu()" class="profile-image-container" t="[title,aria-label]recipes.menu">
+          <div
+            else
+            click.delegate="goToMenu()"
+            class="profile-image-container"
+            role="button"
+            t="[title,aria-label]recipes.menu"
+          >
             <img src.bind="imageUri" class="profile-image" t="[alt]profilePicture" />
           </div>
           <div class="page-title reduced">
             <span></span>
           </div>
-          <a click.delegate="sync()"
+          <a
+            click.delegate="sync()"
             class="sync-button ${!connTracker.isOnline || progressBar.active ? 'disabled' : ''}"
-            t="[title,aria-label]recipes.refresh">
+            role="button"
+            t="[title,aria-label]recipes.refresh"
+          >
             <i class="fas fa-sync-alt"></i>
           </a>
         </div>
@@ -27,9 +36,11 @@
 
       <div class="content-wrap recipes">
         <div class="recipes-wrap">
-          <a repeat.for="recipe of recipes"
+          <a
+            repeat.for="recipe of recipes"
             class="recipe ${recipe.id === getEditedId ? 'highlighted' : ''} ${recipe.sharingState !== 0 && recipe.sharingState !== 1 ? 'is-shared' : ''} ${recipe.sharingState === 1 ? 'pending-share' : ''} ${recipe.ingredientsMissing > 0 ? 'ingredients-missing' : ''}"
-            route-href="route: recipe; params.bind: { id: recipe.id }">
+            route-href="route: recipe; params.bind: { id: recipe.id }"
+          >
             <img src.bind="recipe.imageUri" alt="${recipe.name}" />
             <div class="recipe-name">
               <i class="fas fa-users"></i>
@@ -41,8 +52,12 @@
         </div>
 
         <div class="centering-wrap">
-          <a route-href="route: editRecipe; params.bind: { id: 0 }" class="new-button"
-            t="[title,aria-label]recipes.newRecipe">
+          <a
+            route-href="route: editRecipe; params.bind: { id: 0 }"
+            class="new-button"
+            role="button"
+            t="[title,aria-label]recipes.newRecipe"
+          >
             <i class="fas fa-plus"></i>
           </a>
         </div>
