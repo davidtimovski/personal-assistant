@@ -6,6 +6,6 @@
     "host": "http://localhost:8081",
     "api": "http://localhost:5001"
   },
-  "defaultProfileImageUri": "https://res.cloudinary.com/personalassistant/t_profile_thumbnail/production/defaults/sfmqac.jpg",
-  "defaultRecipeImageUri": "https://res.cloudinary.com/personalassistant/production/defaults/qwpokq.jpg"
+  "defaultProfileImageUri": "https://res.cloudinary.com/personalassistant/t_profile_thumbnail/production/defaults/sfmqac.webp",
+  "defaultRecipeImageUri": "https://res.cloudinary.com/personalassistant/production/defaults/fbwpmh.webp"
 }

@@ -27,8 +27,13 @@
           <div class="form-control inline">
             <label for="category" t="category">Category</label>
             <div class="loadable-select ${categoryOptions ? 'loaded' : ''}">
-              <select id="category" value.bind="filters.categoryId" change.delegate="filterChanged()"
-                disabled.bind="!categoryOptions" class="category-select">
+              <select
+                id="category"
+                value.bind="filters.categoryId"
+                change.delegate="filterChanged()"
+                disabled.bind="!categoryOptions"
+                class="category-select"
+              >
                 <option model.bind="category.id" repeat.for="category of categoryOptions">${category.name}</option>
               </select>
               <i class="fas fa-circle-notch fa-spin"></i>
@@ -37,8 +42,13 @@
           <div class="form-control inline">
             <label for="account" t="account">Account</label>
             <div class="loadable-select ${accountOptions ? 'loaded' : ''}">
-              <select id="account" value.bind="filters.accountId" change.delegate="filterChanged()"
-                disabled.bind="!accountOptions" class="category-select">
+              <select
+                id="account"
+                value.bind="filters.accountId"
+                change.delegate="filterChanged()"
+                disabled.bind="!accountOptions"
+                class="category-select"
+              >
                 <option model.bind="account.id" repeat.for="account of accountOptions">${account.name}</option>
               </select>
               <i class="fas fa-circle-notch fa-spin"></i>
@@ -49,40 +59,68 @@
               <div class="multi-radio-part">
                 <label class.bind="filters.type === 0 ? 'selected' : ''">
                   <span t="transactions.all">All</span>
-                  <input type="radio" name="typeToggle" model.bind="0" checked.bind="filters.type"
-                    change.delegate="filterChanged()" />
+                  <input
+                    type="radio"
+                    name="typeToggle"
+                    model.bind="0"
+                    checked.bind="filters.type"
+                    change.delegate="filterChanged()"
+                  />
                 </label>
               </div>
               <div class="multi-radio-part">
                 <label class.bind="filters.type === 1 ? 'selected' : ''">
                   <span t="transactions.expenses">Expenses</span>
-                  <input type="radio" name="typeToggle" model.bind="1" checked.bind="filters.type"
-                    change.delegate="filterChanged()" />
+                  <input
+                    type="radio"
+                    name="typeToggle"
+                    model.bind="1"
+                    checked.bind="filters.type"
+                    change.delegate="filterChanged()"
+                  />
                 </label>
               </div>
               <div class="multi-radio-part">
                 <label class.bind="filters.type === 2 ? 'selected' : ''">
                   <span t="transactions.deposits">Deposits</span>
-                  <input type="radio" name="typeToggle" model.bind="2" checked.bind="filters.type"
-                    change.delegate="filterChanged()" />
+                  <input
+                    type="radio"
+                    name="typeToggle"
+                    model.bind="2"
+                    checked.bind="filters.type"
+                    change.delegate="filterChanged()"
+                  />
                 </label>
               </div>
               <div show.bind="filters.accountId === 0" class="multi-radio-part">
                 <label class.bind="filters.type === 3 ? 'selected' : ''">
                   <span t="transactions.transfers">Transfers</span>
-                  <input type="radio" name="typeToggle" model.bind="3" checked.bind="filters.type"
-                    change.delegate="filterChanged()" />
+                  <input
+                    type="radio"
+                    name="typeToggle"
+                    model.bind="3"
+                    checked.bind="filters.type"
+                    change.delegate="filterChanged()"
+                  />
                 </label>
               </div>
             </div>
           </div>
           <div class="form-control">
             <div class="description-filter-wrap ${filters.description.length > 0 ? 'searching' : ''}">
-              <input type="text" value.bind="filters.description"
-                keyup.delegate="descriptionFilterChanged() & throttle:1000" maxlength="30"
-                t="[placeholder,aria-label]transactions.searchByDescription" />
-              <i class="fas fa-times" click.delegate="clearDescriptionFilter()"
-                t="[title,aria-label]transactions.clear"></i>
+              <input
+                type="text"
+                value.bind="filters.description"
+                keyup.delegate="descriptionFilterChanged() & throttle:1000"
+                maxlength="30"
+                t="[placeholder,aria-label]transactions.searchByDescription"
+              />
+              <i
+                class="fas fa-times"
+                click.delegate="clearDescriptionFilter()"
+                role="button"
+                t="[title,aria-label]transactions.clear"
+              ></i>
             </div>
           </div>
         </form>
@@ -98,8 +136,12 @@
               <tr>
                 <th class="type-cell"></th>
                 <th t="amount">Amount</th>
-                <th click.delegate="toggleViewCategory()" class="clickable-cell"
-                  t="[title,aria-label]transactions.toggleDescriptionCategory">
+                <th
+                  click.delegate="toggleViewCategory()"
+                  class="clickable-cell"
+                  role="button"
+                  t="[title,aria-label]transactions.toggleDescriptionCategory"
+                >
                   <span if.bind="viewCategory" t="category">Category</span>
                   <span else t="description">Description</span>
                 </th>
@@ -108,8 +150,11 @@
               </tr>
             </thead>
             <tbody if.bind="transactions.length > 0">
-              <tr repeat.for="transaction of transactions" click.delegate="viewTransaction(transaction.id)"
-                class="clickable ${transaction.id === getEditedId ? 'highlighted-row' : ''}">
+              <tr
+                repeat.for="transaction of transactions"
+                click.delegate="viewTransaction(transaction.id)"
+                class="clickable ${transaction.id === getEditedId ? 'highlighted-row' : ''}"
+              >
                 <td class="type-cell">
                   <i if.bind="transaction.type === 1" class="fas fa-wallet expense-color"></i>
                   <i if.bind="transaction.type === 2" class="fas fa-donate deposit-color"></i>
@@ -132,21 +177,37 @@
           </table>
 
           <div if.bind="transactions.length > 0" class="transactions-pagination">
-            <div role="button" click.delegate="first()" t="[title,aria-label]transactions.first"
-              class="transactions-pagination-arrow-wrap left ${filters.page === 1 ? 'hidden' : ''}">
+            <div
+              role="button"
+              click.delegate="first()"
+              t="[title,aria-label]transactions.first"
+              class="transactions-pagination-arrow-wrap left ${filters.page === 1 ? 'hidden' : ''}"
+            >
               <i class="fas fa-angle-double-left"></i>
             </div>
-            <div role="button" click.delegate="previous()" t="[title,aria-label]transactions.previous"
-              class="transactions-pagination-arrow-wrap left ${filters.page === 1 ? 'hidden' : ''}">
+            <div
+              role="button"
+              click.delegate="previous()"
+              t="[title,aria-label]transactions.previous"
+              class="transactions-pagination-arrow-wrap left ${filters.page === 1 ? 'hidden' : ''}"
+            >
               <i class="fas fa-angle-left"></i>
             </div>
             <div class="transactions-pagination-numbering"><span>${filters.page}</span>/<span>${pageCount}</span></div>
-            <div role="button" click.delegate="next()" t="[title,aria-label]transactions.next"
-              class="transactions-pagination-arrow-wrap right ${filters.page === pageCount ? 'hidden' : ''}">
+            <div
+              role="button"
+              click.delegate="next()"
+              t="[title,aria-label]transactions.next"
+              class="transactions-pagination-arrow-wrap right ${filters.page === pageCount ? 'hidden' : ''}"
+            >
               <i class="fas fa-angle-right"></i>
             </div>
-            <div role="button" click.delegate="last()" t="[title,aria-label]transactions.last"
-              class="transactions-pagination-arrow-wrap right ${filters.page === pageCount ? 'hidden' : ''}">
+            <div
+              role="button"
+              click.delegate="last()"
+              t="[title,aria-label]transactions.last"
+              class="transactions-pagination-arrow-wrap right ${filters.page === pageCount ? 'hidden' : ''}"
+            >
               <i class="fas fa-angle-double-right"></i>
             </div>
           </div>

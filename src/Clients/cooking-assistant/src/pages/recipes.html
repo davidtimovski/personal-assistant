@@ -15,7 +15,7 @@
             role="button"
             t="[title,aria-label]recipes.menu"
           >
-            <img src.bind="imageUri" class="profile-image" t="[alt]profilePicture" />
+            <img src.bind="imageUri" class="profile-image" width="40" height="40" t="[alt]profilePicture" />
           </div>
           <div class="page-title reduced">
             <span></span>
@@ -35,13 +35,18 @@
       </div>
 
       <div class="content-wrap recipes">
-        <div class="recipes-wrap">
+        <div class="recipes-wrap" ref="recipesContainer">
           <a
             repeat.for="recipe of recipes"
             class="recipe ${recipe.id === getEditedId ? 'highlighted' : ''} ${recipe.sharingState !== 0 && recipe.sharingState !== 1 ? 'is-shared' : ''} ${recipe.sharingState === 1 ? 'pending-share' : ''} ${recipe.ingredientsMissing > 0 ? 'ingredients-missing' : ''}"
             route-href="route: recipe; params.bind: { id: recipe.id }"
           >
-            <img src.bind="recipe.imageUri" alt="${recipe.name}" />
+            <img
+              src="${recipe.imageUri}"
+              width="${$parent.imageWidth}"
+              height="${$parent.imageHeight}"
+              alt="${recipe.name}"
+            />
             <div class="recipe-name">
               <i class="fas fa-users"></i>
               <i class="fas fa-user-clock"></i>
@@ -55,7 +60,6 @@
           <a
             route-href="route: editRecipe; params.bind: { id: 0 }"
             class="new-button"
-            role="button"
             t="[title,aria-label]recipes.newRecipe"
           >
             <i class="fas fa-plus"></i>

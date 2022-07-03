@@ -29,8 +29,9 @@
         <div else>
           <div show.bind="!connTracker.isOnline && model.synced" class="message warning">
             <i class="fas fa-exclamation-triangle"></i>
-            <span t="whileOfflineCannotModify">While offline you cannot modify data that has already been synced with
-              the cloud.</span>
+            <span t="whileOfflineCannotModify"
+              >While offline you cannot modify data that has already been synced with the cloud.</span
+            >
           </div>
 
           <form submit.trigger="save()" autocomplete="off">
@@ -41,19 +42,39 @@
             </div>
             <div if.bind="model.fromStocks !== null" class="form-control inline">
               <label for="sold-stocks" t="soldStocks">Sold stocks</label>
-              <input type="number" id="sold-stocks" value.bind="model.fromStocks" min="0.0001" max="100000"
-                step="0.0001" class="stocks-input" required />
+              <input
+                type="number"
+                id="sold-stocks"
+                value.bind="model.fromStocks"
+                min="0.0001"
+                max="100000"
+                step="0.0001"
+                class="stocks-input"
+                required
+              />
             </div>
             <div if.bind="model.toStocks !== null" class="form-control inline">
               <label for="purchased-stocks" t="purchasedStocks">Purchased stocks</label>
-              <input type="number" id="purchased-stocks" value.bind="model.toStocks" min="0.0001" max="100000"
-                step="0.0001" class="stocks-input" required />
+              <input
+                type="number"
+                id="purchased-stocks"
+                value.bind="model.toStocks"
+                min="0.0001"
+                max="100000"
+                step="0.0001"
+                class="stocks-input"
+                required
+              />
             </div>
             <div class="form-control inline">
               <label for="category" t="category">Category</label>
               <div class="loadable-select ${categoryOptions ? 'loaded' : ''}">
-                <select id="category" value.bind="model.categoryId" disabled.bind="!categoryOptions"
-                  class="category-select">
+                <select
+                  id="category"
+                  value.bind="model.categoryId"
+                  disabled.bind="!categoryOptions"
+                  class="category-select"
+                >
                   <option model.bind="category.id" repeat.for="category of categoryOptions">${category.name}</option>
                 </select>
                 <i class="fas fa-circle-notch fa-spin"></i>
@@ -61,45 +82,84 @@
             </div>
             <div class="form-control inline">
               <label for="date" t="date">Date</label>
-              <input type="date" id="date" value.bind="model.date & validate" max="${maxDate}"
-                class.bind="dateIsInvalid ? 'invalid' : ''" required />
+              <input
+                type="date"
+                id="date"
+                value.bind="model.date & validate"
+                max="${maxDate}"
+                class.bind="dateIsInvalid ? 'invalid' : ''"
+                required
+              />
             </div>
             <div if.bind="model.isEncrypted" autocomplete="off" class="inline-decrypt-form">
               <div class="viewable-password">
-                <input type="password" value.bind="model.decryptionPassword" ref="decPasswordInput" maxlength="100"
-                  class.bind="decryptionPasswordIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]password" />
-                <a click.delegate="toggleDecPasswordShow()"
-                  class="password-show-button ${decPasswordShown ? 'shown' : ''}">
+                <input
+                  type="password"
+                  value.bind="model.decryptionPassword"
+                  ref="decPasswordInput"
+                  maxlength="100"
+                  class.bind="decryptionPasswordIsInvalid ? 'invalid' : ''"
+                  t="[placeholder,aria-label]password"
+                />
+                <a
+                  click.delegate="toggleDecPasswordShow()"
+                  class="password-show-button ${decPasswordShown ? 'shown' : ''}"
+                >
                   <i class="fas fa-eye"></i>
                   <i class="fas fa-eye-slash"></i>
                 </a>
               </div>
-              <a click.delegate="decrypt()" class="decrypt-button ${decryptButtonIsLoading ? 'loading' : ''}"
-                t="[title,aria-label]editTransaction.decryptDescription">
+              <a
+                click.delegate="decrypt()"
+                class="decrypt-button ${decryptButtonIsLoading ? 'loading' : ''}"
+                role="button"
+                t="[title,aria-label]editTransaction.decryptDescription"
+              >
                 <i class="fas fa-unlock"></i>
                 <i class="fas fa-circle-notch fa-spin"></i>
               </a>
-              <a click.delegate="erase()" class="erase-button" t="[title,aria-label]editTransaction.resetDescription">
+              <a
+                click.delegate="erase()"
+                class="erase-button"
+                role="button"
+                t="[title,aria-label]editTransaction.resetDescription"
+              >
                 <i class="fas fa-eraser"></i>
               </a>
             </div>
             <div else class="form-control">
               <div class="encryption-box ${model.encrypt ? 'active' : ''}">
-                <textarea value.bind="model.description" maxlength="500" class="description-textarea"
-                  t="[placeholder,aria-label]description"></textarea>
+                <textarea
+                  value.bind="model.description"
+                  maxlength="500"
+                  class="description-textarea"
+                  t="[placeholder,aria-label]description"
+                ></textarea>
 
-                <checkbox label-key="editTransaction.encryptDescription" value.bind="model.encrypt"
-                  disabled.bind="!canEncrypt"></checkbox>
+                <checkbox
+                  label-key="editTransaction.encryptDescription"
+                  value.bind="model.encrypt"
+                  disabled.bind="!canEncrypt"
+                ></checkbox>
 
                 <div if.bind="model.encrypt">
                   <tooltip key="encryptedDescription"></tooltip>
                   <div class="viewable-password">
-                    <input type="password" value.bind="model.encryptionPassword & validate" ref="encPasswordInput"
-                      disabled.bind="!model.encrypt" maxlength="100"
-                      class.bind="encryptionPasswordIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]password" />
-                    <a click.delegate="toggleEncPasswordShow()"
-                      class="password-show-button ${encPasswordShown ? 'shown' : ''}" title="${passwordShowIconLabel}"
-                      aria-label="${passwordShowIconLabel}">
+                    <input
+                      type="password"
+                      value.bind="model.encryptionPassword & validate"
+                      ref="encPasswordInput"
+                      disabled.bind="!model.encrypt"
+                      maxlength="100"
+                      class.bind="encryptionPasswordIsInvalid ? 'invalid' : ''"
+                      t="[placeholder,aria-label]password"
+                    />
+                    <a
+                      click.delegate="toggleEncPasswordShow()"
+                      class="password-show-button ${encPasswordShown ? 'shown' : ''}"
+                      title="${passwordShowIconLabel}"
+                      aria-label="${passwordShowIconLabel}"
+                    >
                       <i class="fas fa-eye"></i>
                       <i class="fas fa-eye-slash"></i>
                     </a>
@@ -112,22 +172,32 @@
           <hr />
 
           <div class="save-delete-wrap">
-            <a if.bind="!deleteInProgress" click.delegate="save()"
-              class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
+            <a
+              if.bind="!deleteInProgress"
+              click.delegate="save()"
+              class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}"
+            >
               <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
                 <i class="fas fa-circle-notch fa-spin"></i>
               </span>
               <span t="save">Save</span>
             </a>
-            <a click.delegate="delete()"
-              class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}">
+            <a
+              click.delegate="delete()"
+              class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}"
+            >
               <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
                 <i class="fas fa-circle-notch fa-spin"></i>
               </span>
               <span>${deleteButtonText}</span>
             </a>
-            <button type="button" if.bind="deleteInProgress" click.delegate="cancel()" t="cancel"
-              class="button secondary-button">
+            <button
+              type="button"
+              if.bind="deleteInProgress"
+              click.delegate="cancel()"
+              t="cancel"
+              class="button secondary-button"
+            >
               Cancel
             </button>
           </div>

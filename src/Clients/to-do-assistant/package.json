@@ -1,7 +1,7 @@
 {
   "name": "to-do-assistant",
   "description": "Your very own To Do Assistant.",
-  "version": "1.13.1",
+  "version": "1.13.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/davidtimovski/personal-assistant"

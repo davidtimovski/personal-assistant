@@ -16,7 +16,7 @@ namespace Infrastructure.Cdn;
 
 public class CloudinaryService : ICdnService
 {
-    private const string Format = "jpg";
+    private const string Format = "webp";
     private readonly string _environment;
     private readonly string _defaultProfileImageUri;
     private readonly string _defaultRecipeImageUri;

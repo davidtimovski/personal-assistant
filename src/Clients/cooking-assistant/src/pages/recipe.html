@@ -50,14 +50,20 @@
         </div>
 
         <div class="content-wrap">
-          <div class="recipe-wrap">
+          <div class="recipe-wrap" ref="recipeContainer">
             <div if.bind="!model" class="double-circle-loading">
               <div class="double-bounce1"></div>
               <div class="double-bounce2"></div>
             </div>
 
             <div else>
-              <img src.bind="model.imageUri" class="image" alt="${model.name}" />
+              <img
+                src="${model.imageUri}"
+                class="image"
+                width="${model.imageWidth}"
+                height="${model.imageHeight}"
+                alt="${model.name}"
+              />
 
               <div if.bind="model.description" class="description">${model.description}</div>
 

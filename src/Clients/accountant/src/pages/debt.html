@@ -15,7 +15,6 @@
       </div>
 
       <div class="content-wrap">
-
         <div class="content-body">
           <div if.bind="!debts" class="double-circle-loading">
             <div class="double-bounce1"></div>
@@ -40,8 +39,12 @@
                   </a>
                 </td>
                 <td class="edit-link-cell">
-                  <a click.delegate="settleDebt(debt.id, debt.userIsDebtor)" class="link debt-icon"
-                    t="[title,aria-label]debt.settleDebt">
+                  <a
+                    click.delegate="settleDebt(debt.id, debt.userIsDebtor)"
+                    class="link debt-icon"
+                    role="button"
+                    t="[title,aria-label]debt.settleDebt"
+                  >
                     <i class="fas fa-hand-holding-usd ${debt.userIsDebtor ? 'debtor' : 'lender'}"></i>
                   </a>
                 </td>
@@ -54,17 +57,19 @@
             </tbody>
           </table>
 
-          <empty-list-message if.bind="debts.length === 0" message-key="debt.emptyListMessage">
-          </empty-list-message>
+          <empty-list-message if.bind="debts.length === 0" message-key="debt.emptyListMessage"> </empty-list-message>
         </div>
 
         <div class="centering-wrap">
-          <a click.delegate="newDebt()" class="new-button ${syncing ? 'disabled' : ''}"
-            t="[title,aria-label]debt.newDebt">
+          <a
+            click.delegate="newDebt()"
+            class="new-button ${syncing ? 'disabled' : ''}"
+            role="button"
+            t="[title,aria-label]debt.newDebt"
+          >
             <i class="fas fa-plus"></i>
           </a>
         </div>
-
       </div>
     </div>
   </div>
