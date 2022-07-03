@@ -5,10 +5,11 @@ import { EventAggregator } from "aurelia-event-aggregator";
 
 import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
 import { AuthService } from "../../../shared/src/services/authService";
-import { DebtsIDBHelper } from "../utils/debtsIDBHelper";
 import { CurrenciesService } from "../../../shared/src/services/currenciesService";
-import { DebtModel } from "models/entities/debt";
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
+
+import { DebtsIDBHelper } from "../utils/debtsIDBHelper";
+import { DebtModel } from "models/entities/debt";
 
 @inject(AuthService, HttpClient, EventAggregator, DebtsIDBHelper, CurrenciesService)
 export class DebtsService extends HttpProxyBase {
@@ -49,9 +50,9 @@ export class DebtsService extends HttpProxyBase {
 
     const otherDebtWithPerson = await this.idbHelper.getByPerson(debt.person.trim().toLowerCase());
     if (mergeDebtPerPerson && otherDebtWithPerson.length > 0) {
-      let descriptionsArray = new Array<string>();
+      const descriptionsArray = new Array<string>();
       let balance = 0;
-      for (let otherDebt of otherDebtWithPerson) {
+      for (const otherDebt of otherDebtWithPerson) {
         const convertedAmount = this.currenciesService.convert(otherDebt.amount, otherDebt.currency, debt.currency);
         if (otherDebt.userIsDebtor) {
           balance -= convertedAmount;
@@ -59,11 +60,11 @@ export class DebtsService extends HttpProxyBase {
           balance += convertedAmount;
         }
 
-        let desc = this.getMergedDebtDescription(
+        const desc = this.getMergedDebtDescription(
           convertedAmount,
           debt.currency,
           otherDebt.userIsDebtor,
-          otherDebt.createdDate,
+          new Date(otherDebt.createdDate),
           otherDebt.description
         );
         descriptionsArray.push(desc);
@@ -75,7 +76,13 @@ export class DebtsService extends HttpProxyBase {
         balance += debt.amount;
       }
 
-      let newDesc = this.getMergedDebtDescription(debt.amount, debt.currency, debt.userIsDebtor, now, debt.description);
+      const newDesc = this.getMergedDebtDescription(
+        debt.amount,
+        debt.currency,
+        debt.userIsDebtor,
+        now,
+        debt.description
+      );
       descriptionsArray.push(newDesc);
 
       const description =
