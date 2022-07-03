@@ -15,7 +15,6 @@
       </div>
 
       <div class="content-wrap">
-
         <div class="content-body">
           <div if.bind="!categories" class="double-circle-loading">
             <div class="double-bounce1"></div>
@@ -24,20 +23,31 @@
 
           <div repeat.for="category of categories">
             <div class="category-wrap">
-              <a class="category au-animate animate-fade-in ${category.id === getEditedId ? 'highlighted-row' : ''}"
-                route-href="route: editCategory; params.bind: { id: category.id }">
+              <a
+                class="category au-animate animate-fade-in ${category.id === getEditedId ? 'highlighted-row' : ''}"
+                route-href="route: editCategory; params.bind: { id: category.id }"
+              >
                 <span class="name">${category.name}</span>
                 <span>
-                  <span if.bind="category.generateUpcomingExpense" class="category-indicator"
-                    t="[title,aria-label]categories.generatingUpcomingExpenses">
+                  <span
+                    if.bind="category.generateUpcomingExpense"
+                    class="category-indicator"
+                    t="[title,aria-label]categories.generatingUpcomingExpenses"
+                  >
                     <i class="far fa-calendar-alt"></i>
                   </span>
-                  <span if.bind="category.type === 1" class="category-indicator"
-                    t="[title,aria-label]categories.depositOnly">
+                  <span
+                    if.bind="category.type === 1"
+                    class="category-indicator"
+                    t="[title,aria-label]categories.depositOnly"
+                  >
                     <i class="fas fa-donate"></i>
                   </span>
-                  <span if.bind="category.type === 2" class="category-indicator"
-                    t="[title,aria-label]categories.expenseOnly">
+                  <span
+                    if.bind="category.type === 2"
+                    class="category-indicator"
+                    t="[title,aria-label]categories.expenseOnly"
+                  >
                     <i class="fas fa-wallet"></i>
                   </span>
                 </span>
@@ -50,20 +60,31 @@
 
             <!-- SUB -->
             <div repeat.for="sub of category.subCategories" class="subcategory-wrap">
-              <a class="category au-animate animate-fade-in ${sub.id === getEditedId ? 'highlighted-row' : ''}"
-                route-href="route: editCategory; params.bind: { id: sub.id }">
+              <a
+                class="category au-animate animate-fade-in ${sub.id === getEditedId ? 'highlighted-row' : ''}"
+                route-href="route: editCategory; params.bind: { id: sub.id }"
+              >
                 <span class="name">${sub.name}</span>
                 <span>
-                  <span if.bind="sub.generateUpcomingExpense" class="category-indicator"
-                    t="[title,aria-label]categories.generatingUpcomingExpenses">
+                  <span
+                    if.bind="sub.generateUpcomingExpense"
+                    class="category-indicator"
+                    t="[title,aria-label]categories.generatingUpcomingExpenses"
+                  >
                     <i class="far fa-calendar-alt"></i>
                   </span>
-                  <span if.bind="category.type === 1" class="category-indicator"
-                    t="[title,aria-label]categories.depositOnly">
+                  <span
+                    if.bind="category.type === 1"
+                    class="category-indicator"
+                    t="[title,aria-label]categories.depositOnly"
+                  >
                     <i class="fas fa-donate"></i>
                   </span>
-                  <span if.bind="category.type === 2" class="category-indicator"
-                    t="[title,aria-label]categories.expenseOnly">
+                  <span
+                    if.bind="category.type === 2"
+                    class="category-indicator"
+                    t="[title,aria-label]categories.expenseOnly"
+                  >
                     <i class="fas fa-wallet"></i>
                   </span>
                 </span>
@@ -80,12 +101,15 @@
         </div>
 
         <div class="centering-wrap">
-          <a click.delegate="newCategory()" class="new-button ${syncing ? 'disabled' : ''}"
-            t="[title,aria-label]categories.newCategory">
+          <a
+            click.delegate="newCategory()"
+            class="new-button ${syncing ? 'disabled' : ''}"
+            role="button"
+            t="[title,aria-label]categories.newCategory"
+          >
             <i class="fas fa-plus"></i>
           </a>
         </div>
-
       </div>
     </div>
   </div>

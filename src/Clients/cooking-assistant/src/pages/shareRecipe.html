@@ -22,10 +22,16 @@
         <form if.bind="model.sharingState !== 4" submit.trigger="submit()">
           <div class="form-control">
             <div class="add-input-wrap">
-              <input type="email" value.bind="selectedShare.email & validate" ref="emailInput" maxlength="256"
-                class.bind="emailIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]shareRecipe.newMemberEmail"
-                required />
-              <a click.delegate="addShare()" t="[title,aria-label]shareRecipe.addMember">
+              <input
+                type="email"
+                value.bind="selectedShare.email & validate"
+                ref="emailInput"
+                maxlength="256"
+                class.bind="emailIsInvalid ? 'invalid' : ''"
+                t="[placeholder,aria-label]shareRecipe.newMemberEmail"
+                required
+              />
+              <a click.delegate="addShare()" role="button" t="[title,aria-label]shareRecipe.addMember">
                 <i class="fas fa-plus-circle"></i>
               </a>
             </div>
@@ -60,20 +66,29 @@
         <div repeat.for="share of model.shares" class="share-with">
           <img class="share-image" src.bind="share.imageUri" t="[alt]profilePicture" />
           <div class="share-content">
-            <div if.bind="share.userId && !share.createdDate && share.userId !== 0" class="icon"
-              t="[title,aria-label]shareRecipe.newlyAddedMember">
+            <div
+              if.bind="share.userId && !share.createdDate && share.userId !== 0"
+              class="icon"
+              t="[title,aria-label]shareRecipe.newlyAddedMember"
+            >
               <i class="fas fa-user-plus"></i>
             </div>
-            <div if.bind="share.isAccepted === null && !!share.createdDate" class="icon"
-              t="[title,aria-label]shareRecipe.pendingAccept">
+            <div
+              if.bind="share.isAccepted === null && !!share.createdDate"
+              class="icon"
+              t="[title,aria-label]shareRecipe.pendingAccept"
+            >
               <i class="fas fa-user-clock"></i>
             </div>
             <div if.bind="share.isAccepted" class="icon" t="[title,aria-label]shareRecipe.member">
               <i class="fas fa-user"></i>
             </div>
             <span class="name">${share.email}</span>
-            <a click.delegate="removeShare(share)" class="share-content-button"
-              t="[title,aria-label]shareRecipe.removeMember">
+            <a
+              click.delegate="removeShare(share)"
+              class="share-content-button"
+              t="[title,aria-label]shareRecipe.removeMember"
+            >
               <i class="fas fa-times-circle"></i>
             </a>
           </div>
@@ -88,8 +103,9 @@
             </span>
             <span t="save">Save</span>
           </a>
-          <a route-href="route: recipe; params.bind: { id: model.id }" t="cancel"
-            class="button secondary-button">Cancel</a>
+          <a route-href="route: recipe; params.bind: { id: model.id }" t="cancel" class="button secondary-button"
+            >Cancel</a
+          >
         </div>
       </div>
     </div>

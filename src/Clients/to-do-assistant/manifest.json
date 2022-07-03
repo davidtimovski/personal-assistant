@@ -92,7 +92,7 @@
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#fff",
-  "theme_color": "#097cdc",
+  "theme_color": "#5aacf1",
   "description": "Your very own To Do Assistant.",
   "dir": "ltr",
   "lang": "en-US"

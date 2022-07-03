@@ -15,10 +15,20 @@
         <div class="share-requests-wrap">
           <div repeat.for="tooltip of tooltips" class="tooltip-item">
             <div class="tooltip-header">
-              <a show.bind="!tooltip.isDismissed" click.delegate="dismiss(tooltip)" t="[title,aria-label]help.hide">
+              <a
+                show.bind="!tooltip.isDismissed"
+                click.delegate="dismiss(tooltip)"
+                role="button"
+                t="[title,aria-label]help.hide"
+              >
                 <i class="fas fa-eye"></i>
               </a>
-              <a show.bind="tooltip.isDismissed" click.delegate="retain(tooltip)" t="[title,aria-label]help.show">
+              <a
+                show.bind="tooltip.isDismissed"
+                click.delegate="retain(tooltip)"
+                role="button"
+                t="[title,aria-label]help.show"
+              >
                 <i class="fas fa-eye-slash"></i>
               </a>
               <span class="tooltip-title">${tooltip.title}</span>

@@ -18,6 +18,8 @@ export class Recipe {
   private copyButton: HTMLButtonElement;
   private copyAsTextCompleted = false;
   private editRecipeButtonIsLoading = false;
+  private recipeContainer: HTMLDivElement;
+  private resizeObserver: ResizeObserver;
   private videoIFrame: HTMLIFrameElement;
   private videoIFrameSrc = "";
   private servingsSelectorIsVisible = false;
@@ -45,6 +47,7 @@ export class Recipe {
       this.wakeLock.release();
       this.wakeLock = null;
     }
+    this.resizeObserver.disconnect();
   }
 
   async attached() {
@@ -57,6 +60,12 @@ export class Recipe {
       });
 
       this.model = viewRecipe;
+
+      this.resizeObserver = new ResizeObserver(() => {
+        this.model.imageWidth = this.recipeContainer.offsetWidth - 2;
+        this.model.imageHeight = (this.recipeContainer.offsetWidth - 2) / 2;
+      });
+      this.resizeObserver.observe(document.body);
 
       if (this.model.videoUrl) {
         this.videoIFrameSrc = this.recipesService.videoUrlToEmbedSrc(this.model.videoUrl);

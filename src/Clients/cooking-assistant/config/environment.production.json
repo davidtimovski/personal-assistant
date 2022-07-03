@@ -6,6 +6,6 @@
     "host": "https://cooking.personalassistant.site",
     "api": "https://api.personalassistant.site"
   },
-  "defaultProfileImageUri": "https://res.cloudinary.com/personalassistant/t_profile_thumbnail/production/defaults/sfmqac.jpg",
-  "defaultRecipeImageUri": "https://res.cloudinary.com/personalassistant/production/defaults/qwpokq.jpg"
+  "defaultProfileImageUri": "https://res.cloudinary.com/personalassistant/t_profile_thumbnail/production/defaults/sfmqac.webp",
+  "defaultRecipeImageUri": "https://res.cloudinary.com/personalassistant/production/defaults/fbwpmh.webp"
 }

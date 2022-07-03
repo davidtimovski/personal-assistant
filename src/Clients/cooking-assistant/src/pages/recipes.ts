@@ -2,28 +2,21 @@ import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 import { connectTo } from "aurelia-store";
+import { EventAggregator } from "aurelia-event-aggregator";
 
+import { LocalStorageCurrencies } from "../../../shared/src/utils/localStorageCurrencies";
+import { ConnectionTracker } from "../../../shared/src/utils/connectionTracker";
+import { ProgressBar } from "../../../shared/src/models/progressBar";
+
+import * as environment from "../../config/environment.json";
 import { RecipesService } from "services/recipesService";
 import { UsersService } from "services/usersService";
 import { RecipeModel } from "models/viewmodels/recipeModel";
-import { LocalStorageCurrencies } from "../../../shared/src/utils/localStorageCurrencies";
-import { ConnectionTracker } from "../../../shared/src/utils/connectionTracker";
-import { EventAggregator } from "aurelia-event-aggregator";
-import { ProgressBar } from "../../../shared/src/models/progressBar";
-import * as environment from "../../config/environment.json";
 import { State } from "utils/state/state";
 import * as Actions from "utils/state/actions";
 import { AppEvents } from "models/appEvents";
 
-@inject(
-  Router,
-  RecipesService,
-  UsersService,
-  I18N,
-  LocalStorageCurrencies,
-  EventAggregator,
-  ConnectionTracker
-)
+@inject(Router, RecipesService, UsersService, I18N, LocalStorageCurrencies, EventAggregator, ConnectionTracker)
 @connectTo()
 export class Recipes {
   private imageUri = JSON.parse(<any>environment).defaultProfileImageUri;
@@ -31,6 +24,10 @@ export class Recipes {
   private recipes: Array<RecipeModel>;
   private lastEditedId: number;
   private menuButtonIsLoading = false;
+  private recipesContainer: HTMLDivElement;
+  private imageWidth: number;
+  private imageHeight: number;
+  private resizeObserver: ResizeObserver;
   state: State;
 
   constructor(
@@ -56,7 +53,17 @@ export class Recipes {
     this.imageUri = this.localStorage.getProfileImageUri();
   }
 
+  deactivate() {
+    this.resizeObserver.disconnect();
+  }
+
   async attached() {
+    this.resizeObserver = new ResizeObserver(() => {
+      this.imageWidth = this.recipesContainer.offsetWidth;
+      this.imageHeight = this.recipesContainer.offsetWidth / 2;
+    });
+    this.resizeObserver.observe(document.body);
+
     if (this.state.recipes) {
       this.setRecipesFromState();
     } else {
@@ -87,14 +94,10 @@ export class Recipes {
       .map((recipe: RecipeModel) => {
         if (recipe.ingredientsMissing !== 0) {
           const missingIngredientsKey =
-            recipe.ingredientsMissing > 1
-              ? "recipes.missingIngredients"
-              : "recipes.missingIngredient";
-          recipe.ingredientsMissingLabel =
-            recipe.ingredientsMissing +
-            " " +
-            this.i18n.tr(missingIngredientsKey);
+            recipe.ingredientsMissing > 1 ? "recipes.missingIngredients" : "recipes.missingIngredient";
+          recipe.ingredientsMissingLabel = recipe.ingredientsMissing + " " + this.i18n.tr(missingIngredientsKey);
         }
+
         return recipe;
       });
   }

@@ -18,6 +18,8 @@ export class ViewRecipe {
   nutritionSummary: NutritionSummary;
   costSummary: CostSummary;
   sharingState: SharingState;
+  imageWidth: number;
+  imageHeight: number;
 
   constructor(ingredients: Array<Ingredient>) {
     this.ingredients = ingredients || new Array<Ingredient>();

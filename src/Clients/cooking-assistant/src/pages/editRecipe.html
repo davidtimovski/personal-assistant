@@ -25,8 +25,14 @@
       <div class="content-wrap">
         <form class="edit-recipe-form">
           <div class="form-control">
-            <input type="text" value.bind="model.name & validate" ref="nameInput" maxlength="50"
-              class.bind="nameIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]editRecipe.recipeName" />
+            <input
+              type="text"
+              value.bind="model.name & validate"
+              ref="nameInput"
+              maxlength="50"
+              class.bind="nameIsInvalid ? 'invalid' : ''"
+              t="[placeholder,aria-label]editRecipe.recipeName"
+            />
           </div>
 
           <div class="edit-image-wrap">
@@ -44,19 +50,30 @@
           </div>
 
           <div class="form-control">
-            <textarea value.bind="model.description" class="small" maxlength="250"
-              t="[placeholder,aria-label]editRecipe.description"></textarea>
+            <textarea
+              value.bind="model.description"
+              class="small"
+              maxlength="250"
+              t="[placeholder,aria-label]editRecipe.description"
+            ></textarea>
           </div>
 
           <div class="form-control">
             <div class="video-url-input-wrap">
-              <input type="text" value.bind="model.videoUrl" change.delegate="videoUrlChanged()"
-                class.bind="videoUrlIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]editRecipe.youTubeUrl" />
+              <input
+                type="text"
+                value.bind="model.videoUrl"
+                change.delegate="videoUrlChanged()"
+                class.bind="videoUrlIsInvalid ? 'invalid' : ''"
+                t="[placeholder,aria-label]editRecipe.youTubeUrl"
+              />
               <i class="fab fa-youtube"></i>
             </div>
 
-            <pre show.bind="videoIFrameSrc.length > 0"
-              class="video-wrap"><iframe ref="videoIFrame" src.bind="videoIFrameSrc" class="video-iframe" allowfullscreen></iframe></pre>
+            <pre
+              show.bind="videoIFrameSrc.length > 0"
+              class="video-wrap"
+            ><iframe ref="videoIFrame" src.bind="videoIFrameSrc" class="video-iframe" allowfullscreen></iframe></pre>
           </div>
 
           <div class="form-control">
@@ -64,33 +81,61 @@
               <span t="editRecipe.ingredients">Ingredients</span>: <span>${getIngredientsCount}</span>
             </label>
 
-            <ingredient-picker input-placeholder.bind="addIngredientsInputPlaceholder" adding-enabled.bind="true" user-ingredients-allowed.bind="model.userIsOwner" recipe-ingredient-ids.bind="recipeIngredientIds"></ingredient-picker>
+            <ingredient-picker
+              input-placeholder.bind="addIngredientsInputPlaceholder"
+              adding-enabled.bind="true"
+              user-ingredients-allowed.bind="model.userIsOwner"
+              recipe-ingredient-ids.bind="recipeIngredientIds"
+            ></ingredient-picker>
 
             <div show.bind="model.ingredients.length > 0" class="new-ingredients-wrap">
-              <div repeat.for="ingredient of model.ingredients"
-                class="new-ingredient au-animate animate-fade-in">
+              <div repeat.for="ingredient of model.ingredients" class="new-ingredient au-animate animate-fade-in">
                 <div class="ingredient-name-wrap">
-                  <input type="text" if.bind="ingredient.isNew" value.bind="ingredient.name | nullFormat" 
-                    keyup.trigger="ingredientChanged(ingredient)" maxlength="50" class="ingredient-name" />
+                  <input
+                    type="text"
+                    if.bind="ingredient.isNew"
+                    value.bind="ingredient.name | nullFormat"
+                    keyup.trigger="ingredientChanged(ingredient)"
+                    maxlength="50"
+                    class="ingredient-name"
+                  />
                   <div else class="ingredient-name">
                     ${ingredient.name}
                     <span class="icons-container">
-                      <i if.bind="ingredient.hasNutritionData" class="fas fa-clipboard" t="[title,aria-label]hasNutrition"></i>
+                      <i
+                        if.bind="ingredient.hasNutritionData"
+                        class="fas fa-clipboard"
+                        t="[title,aria-label]hasNutrition"
+                      ></i>
                       <i if.bind="ingredient.hasPriceData" class="fas fa-tag" t="[title,aria-label]hasPrice"></i>
                     </span>
                   </div>
                 </div>
                 <div>
                   <div class="ingredient-amount-input-wrap">
-                    <input type="text" value.bind="ingredient.amount | nullFormat" keyup.trigger="ingredientChanged(ingredient)" 
-                      show.bind="ingredient.unit !== 'pinch'" class="amount-input"maxlength="4" t="[placeholder,aria-label]editRecipe.amount" />
-                    <div click.delegate="toggleUnit(ingredient)" class="unit-toggle"
-                      t="[title,aria-label]editRecipe.toggleUnitOfMeasure">
+                    <input
+                      type="text"
+                      value.bind="ingredient.amount | nullFormat"
+                      keyup.trigger="ingredientChanged(ingredient)"
+                      show.bind="ingredient.unit !== 'pinch'"
+                      class="amount-input"
+                      maxlength="4"
+                      t="[placeholder,aria-label]editRecipe.amount"
+                    />
+                    <div
+                      click.delegate="toggleUnit(ingredient)"
+                      class="unit-toggle"
+                      t="[title,aria-label]editRecipe.toggleUnitOfMeasure"
+                    >
                       <button type="button" show.bind="ingredient.unit" t="${ingredient.unit}"></button>
                       <i show.bind="!ingredient.unit" class="fas fa-asterisk"></i>
                     </div>
-                    <a click.delegate="removeIngredient(ingredient)" class="remove-button"
-                      t="[title,aria-label]editRecipe.removeIngredient">
+                    <a
+                      click.delegate="removeIngredient(ingredient)"
+                      class="remove-button"
+                      role="button"
+                      t="[title,aria-label]editRecipe.removeIngredient"
+                    >
                       <i class="fas fa-times-circle"></i>
                     </a>
                   </div>
@@ -100,28 +145,59 @@
           </div>
 
           <div class="form-control">
-            <textarea value.bind="model.instructions" maxlength="5000"
-              t="[placeholder,aria-label]editRecipe.instructions"></textarea>
+            <textarea
+              value.bind="model.instructions"
+              maxlength="5000"
+              t="[placeholder,aria-label]editRecipe.instructions"
+            ></textarea>
           </div>
 
           <div class="form-control">
             <div class="prep-cook-duration-wrap">
               <div class="duration-side">
                 <label class="label" t="editRecipe.prepDuration">Prep duration</label>
-                <input type="number" value.bind="prepDurationHours" keyup.trigger="prepDurationChanged()" min="0"
-                  max="23" class="duration-input hours" t="[aria-label]editRecipe.prepDurationHours" />
+                <input
+                  type="number"
+                  value.bind="prepDurationHours"
+                  keyup.trigger="prepDurationChanged()"
+                  min="0"
+                  max="23"
+                  class="duration-input hours"
+                  t="[aria-label]editRecipe.prepDurationHours"
+                />
                 <span t="hoursLetter">h</span>&nbsp;
-                <input type="number" value.bind="prepDurationMinutes" keyup.trigger="prepDurationChanged()" min="0"
-                  max="59" class="duration-input minutes" t="[aria-label]editRecipe.prepDurationMinutes" />
+                <input
+                  type="number"
+                  value.bind="prepDurationMinutes"
+                  keyup.trigger="prepDurationChanged()"
+                  min="0"
+                  max="59"
+                  class="duration-input minutes"
+                  t="[aria-label]editRecipe.prepDurationMinutes"
+                />
                 <span t="minutesLetter">m</span>
               </div>
               <div class="duration-side">
                 <label class="label" t="editRecipe.cookDuration">Cook duration</label>
-                <input type="number" value.bind="cookDurationHours" keyup.trigger="cookDurationChanged()" min="0"
-                  max="23" class="duration-input hours" t="[aria-label]editRecipe.cookDurationHours" />
+                <input
+                  type="number"
+                  value.bind="cookDurationHours"
+                  keyup.trigger="cookDurationChanged()"
+                  min="0"
+                  max="23"
+                  class="duration-input hours"
+                  t="[aria-label]editRecipe.cookDurationHours"
+                />
                 <span t="hoursLetter">h</span>&nbsp;
-                <input type="number" value.bind="cookDurationMinutes" keyup.trigger="cookDurationChanged()" min="0"
-                  max="59" class="duration-input minutes" t="[aria-label]editRecipe.cookDurationMinutes" />
+                <input
+                  type="number"
+                  value.bind="cookDurationMinutes"
+                  keyup.trigger="cookDurationChanged()"
+                  min="0"
+                  max="59"
+                  class="duration-input minutes"
+                  t="[aria-label]editRecipe.cookDurationMinutes"
+                />
                 <span t="minutesLetter">m</span>
               </div>
             </div>
@@ -135,29 +211,43 @@
         <hr />
 
         <div class="save-delete-wrap">
-          <a if.bind="!confirmationInProgress" click.delegate="save()"
-            class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
+          <a
+            if.bind="!confirmationInProgress"
+            click.delegate="save()"
+            class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}"
+          >
             <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
               <i class="fas fa-circle-notch fa-spin"></i>
             </span>
             <span>${saveButtonText}</span>
           </a>
-          <a if.bind="!isNewRecipe && model.sharingState !== 3" click.delegate="delete()"
-            class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${confirmationInProgress ? 'confirm' : ''}">
+          <a
+            if.bind="!isNewRecipe && model.sharingState !== 3"
+            click.delegate="delete()"
+            class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${confirmationInProgress ? 'confirm' : ''}"
+          >
             <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
               <i class="fas fa-circle-notch fa-spin"></i>
             </span>
             <span>${deleteButtonText}</span>
           </a>
-          <a if.bind="model.sharingState === 3" click.delegate="leave()"
-            class="button danger-button ${leaveButtonIsLoading ? 'disabled' : ''} ${confirmationInProgress ? 'confirm' : ''}">
+          <a
+            if.bind="model.sharingState === 3"
+            click.delegate="leave()"
+            class="button danger-button ${leaveButtonIsLoading ? 'disabled' : ''} ${confirmationInProgress ? 'confirm' : ''}"
+          >
             <span class="button-loader ${leaveButtonIsLoading ? 'loading' : ''}">
               <i class="fas fa-circle-notch fa-spin"></i>
             </span>
             <span>${leaveButtonText}</span>
           </a>
-          <button type="button" if.bind="isNewRecipe || confirmationInProgress" click.delegate="cancel()" t="cancel"
-            class="button secondary-button">
+          <button
+            type="button"
+            if.bind="isNewRecipe || confirmationInProgress"
+            click.delegate="cancel()"
+            t="cancel"
+            class="button secondary-button"
+          >
             Cancel
           </button>
         </div>

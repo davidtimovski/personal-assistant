@@ -16,7 +16,6 @@
       </div>
 
       <div class="content-wrap">
-
         <div class="content-body">
           <div if.bind="!accounts" class="double-circle-loading">
             <div class="double-bounce1"></div>
@@ -29,8 +28,12 @@
                 <tr>
                   <th class="type-cell"></th>
                   <th class="left-col" t="name">Name</th>
-                  <th click.delegate="toggleViewStocks()" class="right-col clickable-cell"
-                    t="[title,aria-label]accounts.toggleStockPriceStocks">
+                  <th
+                    click.delegate="toggleViewStocks()"
+                    class="right-col clickable-cell"
+                    role="button"
+                    t="[title,aria-label]accounts.toggleStockPriceStocks"
+                  >
                     <span if.bind="viewStocks" t="accounts.stocks">Stocks</span>
                     <span else t="accounts.stockPrice">Stock price</span>
                   </th>
@@ -39,11 +42,16 @@
                 </tr>
               </thead>
               <tbody>
-                <tr repeat.for="account of accounts"
-                  class.bind="account.id === getEditedId || account.id === getEditedId2 ? 'highlighted-row' : ''">
+                <tr
+                  repeat.for="account of accounts"
+                  class.bind="account.id === getEditedId || account.id === getEditedId2 ? 'highlighted-row' : ''"
+                >
                   <td class="edit-link-cell">
-                    <a route-href="route: editAccount; params.bind: { id: account.id }" class="link"
-                      t="[title,aria-label]edit">
+                    <a
+                      route-href="route: editAccount; params.bind: { id: account.id }"
+                      class="link"
+                      t="[title,aria-label]edit"
+                    >
                       <i class="fas fa-pencil-alt"></i>
                     </a>
                   </td>
@@ -68,18 +76,21 @@
         </div>
 
         <div class="centering-wrap">
-          <a click.delegate="newAccount()" class="new-button ${syncing ? 'disabled' : ''}"
-            t="[title,aria-label]accounts.newAccount">
+          <a
+            click.delegate="newAccount()"
+            class="new-button ${syncing ? 'disabled' : ''}"
+            role="button"
+            t="[title,aria-label]accounts.newAccount"
+          >
             <i class="fas fa-plus"></i>
           </a>
         </div>
 
         <div if.bind="accounts && accounts.length > 0">
-          <hr>
+          <hr />
 
           <a route-href="route: transferFunds" class="wide-button" t="accounts.transferFunds">Transfer funds</a>
         </div>
-
       </div>
     </div>
   </div>

@@ -6,5 +6,5 @@
     "host": "https://accountant.personalassistant.site",
     "api": "https://api.personalassistant.site"
   },
-  "defaultProfileImageUri": "https://res.cloudinary.com/personalassistant/t_profile_thumbnail/production/defaults/sfmqac.jpg"
+  "defaultProfileImageUri": "https://res.cloudinary.com/personalassistant/t_profile_thumbnail/production/defaults/sfmqac.webp"
 }

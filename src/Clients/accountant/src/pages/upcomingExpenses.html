@@ -15,7 +15,6 @@
       </div>
 
       <div class="content-wrap">
-
         <div class="content-body">
           <div if.bind="!upcomingExpenses" class="double-circle-loading">
             <div class="double-bounce1"></div>
@@ -33,11 +32,16 @@
               </tr>
             </thead>
             <tbody>
-              <tr repeat.for="upcomingExpense of upcomingExpenses"
-                class.bind="upcomingExpense.id === getEditedId ? 'highlighted-row' : ''">
+              <tr
+                repeat.for="upcomingExpense of upcomingExpenses"
+                class.bind="upcomingExpense.id === getEditedId ? 'highlighted-row' : ''"
+              >
                 <td class="edit-link-cell">
-                  <a route-href="route: editUpcomingExpense; params.bind: { id: upcomingExpense.id }" class="link"
-                    t="[title,aria-label]edit">
+                  <a
+                    route-href="route: editUpcomingExpense; params.bind: { id: upcomingExpense.id }"
+                    class="link"
+                    t="[title,aria-label]edit"
+                  >
                     <i class="fas fa-pencil-alt"></i>
                   </a>
                 </td>
@@ -56,12 +60,15 @@
         </div>
 
         <div class="centering-wrap">
-          <a click.delegate="newUpcomingExpense()" class="new-button ${syncing ? 'disabled' : ''}"
-            t="[title,aria-label]upcomingExpenses.newUpcomingExpense">
+          <a
+            click.delegate="newUpcomingExpense()"
+            class="new-button ${syncing ? 'disabled' : ''}"
+            role="button"
+            t="[title,aria-label]upcomingExpenses.newUpcomingExpense"
+          >
             <i class="fas fa-plus"></i>
           </a>
         </div>
-
       </div>
     </div>
   </div>
