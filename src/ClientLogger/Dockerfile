@@ -6,14 +6,14 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0.100-bullseye-slim-amd64 AS build
 WORKDIR /src
-COPY ["src/ClientLogger/ClientLogger.csproj", "src/ClientLogger/"]
-RUN dotnet restore "src/ClientLogger/ClientLogger.csproj"
+COPY ["src/ClientLogger/ClientLogger.fsproj", "src/ClientLogger/"]
+RUN dotnet restore "src/ClientLogger/ClientLogger.fsproj"
 COPY . .
 WORKDIR "/src/src/ClientLogger"
-RUN dotnet build "ClientLogger.csproj" -c Release -o /app/build
+RUN dotnet build "ClientLogger.fsproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "ClientLogger.csproj" -c Release -o /app/publish
+RUN dotnet publish "ClientLogger.fsproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
