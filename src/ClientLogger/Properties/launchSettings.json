@@ -1,11 +1,11 @@
 {
   "profiles": {
-    "Api": {
+    "ClientLoggerApi": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:5001"
+      "applicationUrl": "http://localhost:5002"
     },
     "Docker": {
       "commandName": "Docker",

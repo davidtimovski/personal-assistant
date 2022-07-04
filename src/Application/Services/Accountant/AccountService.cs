@@ -48,6 +48,11 @@ public class AccountService : IAccountService
 
     public async Task CreateMainAsync(CreateMainAccount model)
     {
+        if (_accountsRepository.HasMain(model.UserId))
+        {
+            throw new ArgumentException("User already has a main account.");
+        }
+
         var now = DateTime.UtcNow;
 
         var account = _mapper.Map<Account>(model);

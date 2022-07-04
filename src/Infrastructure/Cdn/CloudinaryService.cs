@@ -247,6 +247,10 @@ public class CloudinaryService : ICdnService
         }
 
         var publicIds = searchResult.Resources.Where(x => DateTime.Parse(x.CreatedAt) < olderThan).Select(x => x.PublicId).ToList();
+        if (!publicIds.Any())
+        {
+            return;
+        }
 
         DelResResult deleteResult = await Cloudinary.DeleteResourcesAsync(new DelResParams
         {
