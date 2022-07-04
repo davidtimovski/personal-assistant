@@ -47,6 +47,7 @@ services:
     restart: always
     environment:
       - ASPNETCORE_URLS=http://0.0.0.0:80
+      - ConnectionString=${CONNECTION_STRING}
       - PORT=80
     ports:
       - "5002:80"
