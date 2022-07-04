@@ -25,5 +25,8 @@
     <None Include="Dockerfile" />
   </ItemGroup>
 
-  <ItemGroup />
+  <ItemGroup>
+	<None Include="appsettings.json" CopyToPublishDirectory="Always" />
+    <None Include="appsettings.Production.json" CopyToPublishDirectory="Always" />
+  </ItemGroup>
 </Project>

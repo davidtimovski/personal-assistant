@@ -37,6 +37,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
+      - ConnectionString=${CONNECTION_STRING}
       - PORT=80
     volumes:
       - ./src/ClientLogger/storage:/app/storage:z
