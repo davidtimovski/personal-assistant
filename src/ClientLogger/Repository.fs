@@ -16,7 +16,7 @@ let createError (error : LogError) (connectionString : string) =
         "@user_id", Sql.int error.UserId
         "@message", Sql.string error.Message
         "@stack_trace", Sql.string error.StackTrace
-        "@occurred", Sql.timestamptz error.Occurred
+        "@occurred", Sql.timestamptz (error.Occurred.ToUniversalTime())
         "@created_date", Sql.timestamptz DateTime.UtcNow
     ]
     |> Sql.executeNonQuery
