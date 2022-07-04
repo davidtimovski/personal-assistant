@@ -44,8 +44,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.env.prod.example = .env.prod.example
 		.gitignore = .gitignore
 		.github\workflows\ci.yml = .github\workflows\ci.yml
-		.github\workflows\deploy.yml = .github\workflows\deploy.yml
 		.github\workflows\test.yml = .github\workflows\test.yml
+		.github\workflows\deployment.yml = .github\workflows\deployment.yml
 	EndProjectSection
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{A1987576-C974-4672-AA1E-868237023E5F}"
@@ -64,6 +64,10 @@ Global
 		{AE2034B1-3EA8-4E83-941F-44A8B75E2B02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE2034B1-3EA8-4E83-941F-44A8B75E2B02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE2034B1-3EA8-4E83-941F-44A8B75E2B02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9814A06E-212A-4DE4-B893-212EAD9F1850}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9814A06E-212A-4DE4-B893-212EAD9F1850}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9814A06E-212A-4DE4-B893-212EAD9F1850}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9814A06E-212A-4DE4-B893-212EAD9F1850}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CE0CCF73-58A9-4CB0-AA35-3B8866EE9A9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CE0CCF73-58A9-4CB0-AA35-3B8866EE9A9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE0CCF73-58A9-4CB0-AA35-3B8866EE9A9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -104,10 +108,6 @@ Global
 		{A1987576-C974-4672-AA1E-868237023E5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1987576-C974-4672-AA1E-868237023E5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1987576-C974-4672-AA1E-868237023E5F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9814A06E-212A-4DE4-B893-212EAD9F1850}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9814A06E-212A-4DE4-B893-212EAD9F1850}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9814A06E-212A-4DE4-B893-212EAD9F1850}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9814A06E-212A-4DE4-B893-212EAD9F1850}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -115,6 +115,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{590E7C9A-87D9-4226-851F-397E5825AC89} = {577BCF93-9D25-4060-A201-FA11AC92DD26}
 		{AE2034B1-3EA8-4E83-941F-44A8B75E2B02} = {577BCF93-9D25-4060-A201-FA11AC92DD26}
+		{9814A06E-212A-4DE4-B893-212EAD9F1850} = {577BCF93-9D25-4060-A201-FA11AC92DD26}
 		{CE0CCF73-58A9-4CB0-AA35-3B8866EE9A9B} = {C1098B33-586C-4024-9BF4-F71CED6654D9}
 		{0460E980-3C25-4D97-A11F-03DE87434BB0} = {4D1DD8B8-7BE5-46E4-8032-9D45823E76A5}
 		{CE8059EA-4799-4E38-999D-BE7D599FAD04} = {382B70F6-DD40-4B18-8D04-9D8813C7501E}
@@ -124,7 +125,6 @@ Global
 		{A50F7C88-8397-41E2-BE82-D5F49F8F039D} = {4D1DD8B8-7BE5-46E4-8032-9D45823E76A5}
 		{94B9AA32-4784-409B-B5C8-34C0FE45E19C} = {C1098B33-586C-4024-9BF4-F71CED6654D9}
 		{CEE41C39-726C-45DB-9B9E-7786D25981C4} = {4D1DD8B8-7BE5-46E4-8032-9D45823E76A5}
-		{9814A06E-212A-4DE4-B893-212EAD9F1850} = {577BCF93-9D25-4060-A201-FA11AC92DD26}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1296A1BD-7B9D-40F2-9873-972EB471C47D}
