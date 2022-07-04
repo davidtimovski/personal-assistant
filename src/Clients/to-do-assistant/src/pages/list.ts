@@ -207,7 +207,7 @@ export class List {
         this.model.completedTasks = this.shadowCompletedTasks.slice();
         this.model.completedPrivateTasks = this.shadowCompletedPrivateTasks.slice();
       }
-    } else if (event.charCode !== 13 && event.which !== 13 && event.key !== "Enter") {
+    } else if (event.key !== "Enter") {
       this.newTaskIsInvalid = false;
       this.duplicateTask = null;
       this.similarTaskNames = [];

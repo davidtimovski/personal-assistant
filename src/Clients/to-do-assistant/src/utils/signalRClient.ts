@@ -3,9 +3,9 @@ import { EventAggregator } from "aurelia-event-aggregator";
 
 import { SignalRClientBase } from "../../../shared/src/utils/signalRClientBase";
 
+import * as environment from "../../config/environment.json";
 import { ListsService } from "services/listsService";
 import * as Actions from "utils/state/actions";
-import * as environment from "../../config/environment.json";
 import { AppEvents } from "models/appEvents";
 
 @inject(ListsService, EventAggregator)
@@ -17,7 +17,7 @@ export class SignalRClient extends SignalRClientBase {
   async initialize(accessToken: string, currentUserId: number) {
     const envConfig = JSON.parse(<any>environment);
 
-    await this.connect(`${envConfig.urls.api}/toDoAssistantHub`, accessToken);
+    await this.connect(`${envConfig.urls.api}/toDoAssistantHub`, accessToken, envConfig.debug);
 
     this.connection.onreconnected(async () => {
       await Actions.getLists(this.listsService);

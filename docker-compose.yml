@@ -20,6 +20,15 @@ services:
     depends_on:
       - postgres
       - rabbitmq
+
+  clientlogger:
+    image: personalassistant-clientlogger:latest
+    container_name: personalassistant-clientlogger
+    build:
+      context: .
+      dockerfile: src/ClientLogger/Dockerfile
+    depends_on:
+      - postgres
   
   sender:
     image: personalassistant-sender:latest

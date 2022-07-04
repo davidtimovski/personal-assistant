@@ -305,6 +305,11 @@ public class AccountController : Controller
             return RedirectToAction(nameof(Login));
         }
 
+        if (user.EmailConfirmed)
+        {
+            return RedirectToAction(nameof(Login));
+        }
+
         IdentityResult confirmEmailResult = await _userManager.ConfirmEmailAsync(user, token);
         if (!confirmEmailResult.Succeeded)
         {

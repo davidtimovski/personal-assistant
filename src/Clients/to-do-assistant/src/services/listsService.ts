@@ -1,6 +1,7 @@
 import { json } from "aurelia-fetch-client";
 
 import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
+import { ErrorLogger } from "../../../shared/src/services/errorLogger";
 
 import { List } from "models/entities/list";
 import { ListWithShares } from "models/viewmodels/listWithShares";
@@ -11,8 +12,11 @@ import { CanShareList } from "models/viewmodels/canShareList";
 import { AssigneeOption } from "models/viewmodels/assigneeOption";
 import { ListIcon } from "models/viewmodels/listIcon";
 import { EditListModel } from "models/viewmodels/editListModel";
+import * as environment from "../../config/environment.json";
 
 export class ListsService extends HttpProxyBase {
+  private readonly logger = new ErrorLogger(JSON.parse(<any>environment).urls.clientLogger, this.authService);
+
   async getAll(): Promise<List[]> {
     const result = await this.ajax<List[]>("lists");
 
@@ -62,40 +66,60 @@ export class ListsService extends HttpProxyBase {
   }
 
   async create(name: string, icon: string, isOneTimeToggleDefault: boolean, tasksText: string): Promise<number> {
-    const id = await this.ajax<number>("lists", {
-      method: "post",
-      body: json({
-        name: name,
-        icon: icon,
-        isOneTimeToggleDefault: isOneTimeToggleDefault,
-        tasksText: tasksText,
-      }),
-    });
+    try {
+      const id = await this.ajax<number>("lists", {
+        method: "post",
+        body: json({
+          name: name,
+          icon: icon,
+          isOneTimeToggleDefault: isOneTimeToggleDefault,
+          tasksText: tasksText,
+        }),
+      });
 
-    return id;
+      return id;
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   async update(list: EditListModel): Promise<void> {
-    await this.ajaxExecute("lists", {
-      method: "put",
-      body: json(list),
-    });
+    try {
+      await this.ajaxExecute("lists", {
+        method: "put",
+        body: json(list),
+      });
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   async updateShared(list: EditListModel): Promise<void> {
-    await this.ajaxExecute("lists/shared", {
-      method: "put",
-      body: json({
-        id: list.id,
-        notificationsEnabled: list.notificationsEnabled,
-      }),
-    });
+    try {
+      await this.ajaxExecute("lists/shared", {
+        method: "put",
+        body: json({
+          id: list.id,
+          notificationsEnabled: list.notificationsEnabled,
+        }),
+      });
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   async delete(id: number): Promise<void> {
-    await this.ajaxExecute(`lists/${id}`, {
-      method: "delete",
-    });
+    try {
+      await this.ajaxExecute(`lists/${id}`, {
+        method: "delete",
+      });
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   async canShareListWithUser(email: string): Promise<CanShareList> {
@@ -105,74 +129,109 @@ export class ListsService extends HttpProxyBase {
   }
 
   async share(id: number, newShares: Share[], editedShares: Share[], removedShares: Share[]): Promise<void> {
-    await this.ajaxExecute("lists/share", {
-      method: "put",
-      body: json({
-        listId: id,
-        newShares: newShares,
-        editedShares: editedShares,
-        removedShares: removedShares,
-      }),
-    });
+    try {
+      await this.ajaxExecute("lists/share", {
+        method: "put",
+        body: json({
+          listId: id,
+          newShares: newShares,
+          editedShares: editedShares,
+          removedShares: removedShares,
+        }),
+      });
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   async leave(id: number): Promise<void> {
-    await this.ajaxExecute(`lists/${id}/leave`, {
-      method: "delete",
-    });
+    try {
+      await this.ajaxExecute(`lists/${id}/leave`, {
+        method: "delete",
+      });
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   async copy(list: List): Promise<number> {
-    const id = await this.ajax<number>("lists/copy", {
-      method: "post",
-      body: json({
-        id: list.id,
-        name: list.name,
-        icon: list.icon,
-      }),
-    });
+    try {
+      const id = await this.ajax<number>("lists/copy", {
+        method: "post",
+        body: json({
+          id: list.id,
+          name: list.name,
+          icon: list.icon,
+        }),
+      });
 
-    return id;
+      return id;
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   async setIsArchived(id: number, isArchived: boolean): Promise<void> {
-    await this.ajaxExecute("lists/is-archived", {
-      method: "put",
-      body: json({
-        listId: id,
-        isArchived: isArchived,
-      }),
-    });
+    try {
+      await this.ajaxExecute("lists/is-archived", {
+        method: "put",
+        body: json({
+          listId: id,
+          isArchived: isArchived,
+        }),
+      });
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   async setTasksAsNotCompleted(id: number): Promise<void> {
-    await this.ajaxExecute("lists/set-tasks-as-not-completed", {
-      method: "put",
-      body: json({
-        listId: id,
-      }),
-    });
+    try {
+      await this.ajaxExecute("lists/set-tasks-as-not-completed", {
+        method: "put",
+        body: json({
+          listId: id,
+        }),
+      });
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   async setShareIsAccepted(id: number, isAccepted: boolean): Promise<void> {
-    await this.ajaxExecute("lists/share-is-accepted", {
-      method: "put",
-      body: json({
-        listId: id,
-        isAccepted: isAccepted,
-      }),
-    });
+    try {
+      await this.ajaxExecute("lists/share-is-accepted", {
+        method: "put",
+        body: json({
+          listId: id,
+          isAccepted: isAccepted,
+        }),
+      });
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   async reorder(id: number, oldOrder: number, newOrder: number): Promise<void> {
-    await this.ajaxExecute("lists/reorder", {
-      method: "put",
-      body: json({
-        id: id,
-        oldOrder: oldOrder,
-        newOrder: newOrder,
-      }),
-    });
+    try {
+      await this.ajaxExecute("lists/reorder", {
+        method: "put",
+        body: json({
+          id: id,
+          oldOrder: oldOrder,
+          newOrder: newOrder,
+        }),
+      });
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   static getIconOptions(): ListIcon[] {

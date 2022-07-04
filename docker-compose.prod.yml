@@ -41,6 +41,20 @@ services:
       - postgres
       - rabbitmq
 
+  clientlogger:
+    image: ${DOCKER_REGISTRY}:clientlogger-latest
+    container_name: pa-clientlogger
+    restart: always
+    environment:
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - PORT=80
+    ports:
+      - "5002:80"
+    volumes:
+      - ./storage:/app/storage
+    depends_on:
+      - postgres
+
   sender:
     image: ${DOCKER_REGISTRY}:sender-latest
     container_name: pa-sender

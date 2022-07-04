@@ -38,6 +38,13 @@ public class AccountsRepository : BaseRepository, IAccountsRepository
             new { Id = id, UserId = userId });
     }
 
+    public bool HasMain(int userId)
+    {
+        using IDbConnection conn = OpenConnection();
+
+        return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM accountant_accounts WHERE user_id = @UserId AND is_main", new { UserId = userId });
+    }
+
     public bool IsMain(int id, int userId)
     {
         using IDbConnection conn = OpenConnection();

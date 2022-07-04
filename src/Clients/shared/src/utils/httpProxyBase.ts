@@ -28,9 +28,7 @@ export class HttpProxyBase {
     }
 
     if (!this.successCodes.includes(response.status)) {
-      if (await this.IsUnauthorized(response.status)) {
-        throw HttpError.Unauthorized;
-      }
+      this.redirectIfUnauthorized(response.status);
 
       return await this.HandleErrorCodes(response);
     }
@@ -53,9 +51,7 @@ export class HttpProxyBase {
     }
 
     if (!this.successCodes.includes(response.status)) {
-      if (await this.IsUnauthorized(response.status)) {
-        throw HttpError.Unauthorized;
-      }
+      this.redirectIfUnauthorized(response.status);
 
       return await this.HandleErrorCodes(response);
     }
@@ -74,9 +70,7 @@ export class HttpProxyBase {
     }
 
     if (!this.successCodes.includes(response.status)) {
-      if (await this.IsUnauthorized(response.status)) {
-        throw HttpError.Unauthorized;
-      }
+      this.redirectIfUnauthorized(response.status);
 
       await this.HandleErrorCodes(response);
     }
@@ -86,9 +80,7 @@ export class HttpProxyBase {
     const response: Response = await this.httpClient.fetch(uri, requestInit);
 
     if (!this.successCodes.includes(response.status)) {
-      if (await this.IsUnauthorized(response.status)) {
-        throw HttpError.Unauthorized;
-      }
+      this.redirectIfUnauthorized(response.status);
 
       return await this.HandleErrorCodes(response);
     }
@@ -96,13 +88,11 @@ export class HttpProxyBase {
     return <string>await response.json();
   }
 
-  private async IsUnauthorized(statusCode: number) {
+  private redirectIfUnauthorized(statusCode: number) {
     if (statusCode === 401) {
       this.authService.signinRedirect();
-      return true;
+      throw HttpError.Unauthorized;
     }
-
-    return false;
   }
 
   private async HandleErrorCodes(response: Response) {
@@ -115,7 +105,7 @@ export class HttpProxyBase {
         errors = await response.json();
       } catch (_) {
         this.eventAggregator.publish(AlertEvents.ShowError, "unexpectedError");
-        throw [];
+        throw HttpError.Unexpected;
       }
 
       if (errors.message === "Failed to fetch") {

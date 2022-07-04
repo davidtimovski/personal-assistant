@@ -3,9 +3,10 @@ import * as signalR from "@microsoft/signalr";
 export class SignalRClientBase {
   protected connection: signalR.HubConnection;
 
-  async connect(url: string, accessToken: string) {
+  async connect(url: string, accessToken: string, debug: boolean) {
     this.connection = new signalR.HubConnectionBuilder()
       .withUrl(url, { accessTokenFactory: () => accessToken })
+      .configureLogging(debug ? signalR.LogLevel.Information : signalR.LogLevel.Error)
       .withAutomaticReconnect()
       .build();
 
