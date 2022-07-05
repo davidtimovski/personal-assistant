@@ -13,7 +13,6 @@ import { UsersService } from "services/usersService";
 import { IngredientPickerEvents, IngredientSuggestion } from "models/viewmodels/ingredientSuggestions";
 import { EditRecipeModel } from "models/viewmodels/editRecipeModel";
 import { EditRecipeIngredient } from "models/viewmodels/editRecipeIngredient";
-import * as Actions from "utils/state/actions";
 import { PreferencesModel } from "models/preferencesModel";
 
 @inject(Router, RecipesService, UsersService, ValidationController, I18N, EventAggregator)
@@ -287,8 +286,7 @@ export class EditRecipe {
   async uploadImage() {
     this.imageIsUploading = true;
     try {
-      const data = await this.recipesService.uploadTempImage(this.imageInput.files[0]);
-      this.model.imageUri = data.tempImageUri;
+      this.model.imageUri = await this.recipesService.uploadTempImage(this.imageInput.files[0]);
     } catch (e) {
       this.saveButtonIsLoading = false;
     }
@@ -318,8 +316,6 @@ export class EditRecipe {
 
           this.nameIsInvalid = false;
 
-          await Actions.getRecipes(this.recipesService);
-
           this.router.navigateToRoute("recipesEdited", {
             editedId: this.model.id,
           });
@@ -344,8 +340,6 @@ export class EditRecipe {
           this.nameIsInvalid = false;
           this.model.id = id;
 
-          await Actions.getRecipes(this.recipesService);
-
           this.router.navigateToRoute("recipesEdited", {
             editedId: this.model.id,
           });
@@ -369,8 +363,6 @@ export class EditRecipe {
 
       await this.recipesService.delete(this.model.id);
 
-      Actions.deleteRecipe(this.model.id);
-
       this.eventAggregator.publish(AlertEvents.ShowSuccess, "editRecipe.deleteSuccessful");
       this.router.navigateToRoute("recipes");
     } else {
@@ -389,10 +381,7 @@ export class EditRecipe {
 
       await this.recipesService.leave(this.model.id);
 
-      await Actions.getRecipes(this.recipesService);
-
       this.eventAggregator.publish(AlertEvents.ShowSuccess, "editRecipe.youHaveLeftTheRecipe");
-
       this.router.navigateToRoute("recipes");
     } else {
       this.leaveButtonText = this.i18n.tr("sure");

@@ -6,7 +6,7 @@ export class EditRecipeModel {
   id: number;
   name: string;
   description: string;
-  ingredients: Array<EditRecipeIngredient>;
+  ingredients: EditRecipeIngredient[];
   instructions: string;
   prepDuration: string;
   cookDuration: string;

@@ -19,7 +19,7 @@ export class ViewIngredient {
   private ingredientLinkedMessage: string;
   private tasksSearchVisible = false;
   private autocomplete: AutocompleteResult;
-  private taskSuggestions: Array<TaskSuggestion>;
+  private taskSuggestions: TaskSuggestion[];
   private pickTaskInput: HTMLInputElement;
   private currency: string;
   private deleteInProgress = false;

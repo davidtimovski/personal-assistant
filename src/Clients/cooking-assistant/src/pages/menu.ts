@@ -10,7 +10,7 @@ export class Menu {
   private version = "--";
   private pendingShareRequestCount = 0;
   private pendingSendRequestCount = 0;
-  private personalAssistantUrl: string;
+  private readonly personalAssistantUrl: string;
   private dietaryProfileButtonIsLoading = false;
   private inboxButtonIsLoading = false;
   private preferencesButtonIsLoading = false;
@@ -25,17 +25,13 @@ export class Menu {
   }
 
   activate() {
-    this.recipesService
-      .getPendingShareRequestsCount()
-      .then((pendingShareRequestCount) => {
-        this.pendingShareRequestCount = pendingShareRequestCount;
-      });
+    this.recipesService.getPendingShareRequestsCount().then((pendingShareRequestCount) => {
+      this.pendingShareRequestCount = pendingShareRequestCount;
+    });
 
-    this.recipesService
-      .getPendingSendRequestsCount()
-      .then((pendingSendRequestCount) => {
-        this.pendingSendRequestCount = pendingSendRequestCount;
-      });
+    this.recipesService.getPendingSendRequestsCount().then((pendingSendRequestCount) => {
+      this.pendingSendRequestCount = pendingSendRequestCount;
+    });
   }
 
   async attached() {

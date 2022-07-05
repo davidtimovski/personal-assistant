@@ -1,15 +1,18 @@
 import { json } from "aurelia-fetch-client";
 
 import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
+import { ErrorLogger } from "../../../shared/src/services/errorLogger";
 
 import { EditDietaryProfile } from "../models/viewmodels/editDietaryProfile";
 import { UpdateDietaryProfile } from "../models/viewmodels/updateDietaryProfile";
 import { RecommendedDailyIntake } from "../models/viewmodels/recommendedDailyIntake";
+import * as environment from "../../config/environment.json";
 
 export class DietaryProfileService extends HttpProxyBase {
-  async get(): Promise<EditDietaryProfile> {
-    const result = await this.ajax<EditDietaryProfile>("dietaryprofiles");
-    return result;
+  private readonly logger = new ErrorLogger(JSON.parse(<any>environment).urls.clientLogger, this.authService);
+
+  get(): Promise<EditDietaryProfile> {
+    return this.ajax<EditDietaryProfile>("dietaryprofiles");
   }
 
   async getDailyIntake(getRecommendedIntake: EditDietaryProfile): Promise<RecommendedDailyIntake> {
@@ -31,15 +34,25 @@ export class DietaryProfileService extends HttpProxyBase {
   }
 
   async update(updateDietaryProfile: UpdateDietaryProfile): Promise<void> {
-    await this.ajaxExecute("dietaryprofiles", {
-      method: "put",
-      body: json(updateDietaryProfile),
-    });
+    try {
+      await this.ajaxExecute("dietaryprofiles", {
+        method: "put",
+        body: json(updateDietaryProfile),
+      });
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   async delete(): Promise<void> {
-    await this.ajaxExecute("dietaryprofiles", {
-      method: "delete",
-    });
+    try {
+      await this.ajaxExecute("dietaryprofiles", {
+        method: "delete",
+      });
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 }

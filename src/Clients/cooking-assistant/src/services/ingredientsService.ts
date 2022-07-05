@@ -5,6 +5,7 @@ import { EventAggregator } from "aurelia-event-aggregator";
 
 import { AuthService } from "../../../shared/src/services/authService";
 import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
+import { ErrorLogger } from "../../../shared/src/services/errorLogger";
 
 import { SimpleIngredient } from "../models/viewmodels/simpleIngredient";
 import { EditIngredientModel } from "../models/viewmodels/editIngredientModel";
@@ -12,9 +13,12 @@ import { IngredientSuggestion, PublicIngredientSuggestions } from "../models/vie
 import { PriceData } from "../models/viewmodels/priceData";
 import { TaskSuggestion } from "../models/viewmodels/taskSuggestion";
 import { ViewIngredientModel } from "../models/viewmodels/viewIngredientModel";
+import * as environment from "../../config/environment.json";
 
 @inject(AuthService, HttpClient, EventAggregator)
 export class IngredientsService extends HttpProxyBase {
+  private readonly logger = new ErrorLogger(JSON.parse(<any>environment).urls.clientLogger, this.authService);
+
   constructor(
     protected readonly authService: AuthService,
     protected readonly httpClient: HttpClient,
@@ -23,73 +27,79 @@ export class IngredientsService extends HttpProxyBase {
     super(authService, httpClient, eventAggregator);
   }
 
-  async getAll(): Promise<Array<SimpleIngredient>> {
-    const result = await this.ajax<Array<SimpleIngredient>>("ingredients");
-    return result;
+  getAll(): Promise<SimpleIngredient[]> {
+    return this.ajax<SimpleIngredient[]>("ingredients");
   }
 
-  async getForUpdate(id: number): Promise<EditIngredientModel> {
-    const result = await this.ajax<EditIngredientModel>(`ingredients/${id}/update`);
-    return result;
+  getForUpdate(id: number): Promise<EditIngredientModel> {
+    return this.ajax<EditIngredientModel>(`ingredients/${id}/update`);
   }
 
-  async getPublic(id: number): Promise<ViewIngredientModel> {
-    const result = await this.ajax<ViewIngredientModel>(`ingredients/${id}/public`);
-    return result;
+  getPublic(id: number): Promise<ViewIngredientModel> {
+    return this.ajax<ViewIngredientModel>(`ingredients/${id}/public`);
   }
 
   async update(ingredient: EditIngredientModel): Promise<void> {
-    const priceDataToSend = new PriceData(
-      ingredient.priceData.isSet,
-      ingredient.priceData.productSize,
-      ingredient.priceData.productSizeIsOneUnit,
-      ingredient.priceData.price,
-      ingredient.priceData.isSet && ingredient.priceData.price ? ingredient.priceData.currency : null
-    );
+    try {
+      const priceDataToSend = new PriceData(
+        ingredient.priceData.isSet,
+        ingredient.priceData.productSize,
+        ingredient.priceData.productSizeIsOneUnit,
+        ingredient.priceData.price,
+        ingredient.priceData.isSet && ingredient.priceData.price ? ingredient.priceData.currency : null
+      );
 
-    await this.ajaxExecute("ingredients", {
-      method: "put",
-      body: json({
-        id: ingredient.id,
-        taskId: ingredient.taskId,
-        name: ingredient.name,
-        nutritionData: ingredient.nutritionData,
-        priceData: priceDataToSend,
-      }),
-    });
+      await this.ajaxExecute("ingredients", {
+        method: "put",
+        body: json({
+          id: ingredient.id,
+          taskId: ingredient.taskId,
+          name: ingredient.name,
+          nutritionData: ingredient.nutritionData,
+          priceData: priceDataToSend,
+        }),
+      });
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   async updatePublic(id: number, taskId: number): Promise<void> {
-    await this.ajaxExecute("ingredients/public", {
-      method: "put",
-      body: json({
-        id: id,
-        taskId: taskId,
-      }),
-    });
+    try {
+      await this.ajaxExecute("ingredients/public", {
+        method: "put",
+        body: json({
+          id: id,
+          taskId: taskId,
+        }),
+      });
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   async delete(id: number): Promise<void> {
-    await this.ajaxExecute(`ingredients/${id}`, {
-      method: "delete",
-    });
+    try {
+      await this.ajaxExecute(`ingredients/${id}`, {
+        method: "delete",
+      });
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
-  async getTaskSuggestions(): Promise<Array<TaskSuggestion>> {
-    const result = await this.ajax<Array<TaskSuggestion>>("ingredients/task-suggestions");
-
-    return result;
+  getTaskSuggestions(): Promise<TaskSuggestion[]> {
+    return this.ajax<TaskSuggestion[]>("ingredients/task-suggestions");
   }
 
-  async getUserIngredientSuggestions(): Promise<Array<IngredientSuggestion>> {
-    const result = await this.ajax<Array<IngredientSuggestion>>("ingredients/user-suggestions");
-
-    return result;
+  getUserIngredientSuggestions(): Promise<IngredientSuggestion[]> {
+    return this.ajax<IngredientSuggestion[]>("ingredients/user-suggestions");
   }
 
-  async getPublicIngredientSuggestions(): Promise<PublicIngredientSuggestions> {
-    const result = await this.ajax<PublicIngredientSuggestions>("ingredients/public-suggestions");
-
-    return result;
+  getPublicIngredientSuggestions(): Promise<PublicIngredientSuggestions> {
+    return this.ajax<PublicIngredientSuggestions>("ingredients/public-suggestions");
   }
 }

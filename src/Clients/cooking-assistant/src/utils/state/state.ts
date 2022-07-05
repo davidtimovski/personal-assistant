@@ -1,7 +1,7 @@
 import { RecipeModel } from "models/viewmodels/recipeModel";
 
 export interface State {
-  recipes: Array<RecipeModel>;
+  recipes: RecipeModel[];
 }
 
 export const initialState: State = {

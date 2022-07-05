@@ -5,5 +5,5 @@ export class ReviewIngredientsModel {
   name: string;
   description: string;
   imageUri: string;
-  ingredients: Array<ReviewIngredient>;
+  ingredients: ReviewIngredient[];
 }

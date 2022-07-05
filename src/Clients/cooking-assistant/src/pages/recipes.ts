@@ -21,7 +21,7 @@ import { AppEvents } from "models/appEvents";
 export class Recipes {
   private imageUri = JSON.parse(<any>environment).defaultProfileImageUri;
   private progressBar = new ProgressBar();
-  private recipes: Array<RecipeModel>;
+  private recipes: RecipeModel[];
   private lastEditedId: number;
   private menuButtonIsLoading = false;
   private recipesContainer: HTMLDivElement;
@@ -58,6 +58,7 @@ export class Recipes {
   }
 
   async attached() {
+    // Set images width and height to avoid reflows
     this.resizeObserver = new ResizeObserver(() => {
       this.imageWidth = this.recipesContainer.offsetWidth;
       this.imageHeight = this.recipesContainer.offsetWidth / 2;

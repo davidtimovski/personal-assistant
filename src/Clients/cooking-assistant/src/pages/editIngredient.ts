@@ -20,14 +20,7 @@ import { NutritionData } from "models/viewmodels/nutritionData";
 import { PriceData } from "models/viewmodels/priceData";
 import { TaskSuggestion } from "models/viewmodels/taskSuggestion";
 
-@inject(
-  Router,
-  IngredientsService,
-  ValidationController,
-  I18N,
-  EventAggregator,
-  LocalStorageCurrencies
-)
+@inject(Router, IngredientsService, ValidationController, I18N, EventAggregator, LocalStorageCurrencies)
 export class EditIngredient {
   private ingredientId: number;
   private model: EditIngredientModel;
@@ -107,13 +100,13 @@ export class EditIngredient {
     if (ingredient === null) {
       this.router.navigateToRoute("notFound");
     }
-    
+
     this.model = ingredient;
 
     if (this.model.taskId) {
       this.ingredientLinkedMessage = this.i18n.tr("editIngredient.thisIngredientIsLinked", {
         taskName: this.model.taskName,
-        taskList: this.model.taskList
+        taskList: this.model.taskList,
       });
     }
 
@@ -133,81 +126,55 @@ export class EditIngredient {
 
     ValidationRules.ensure((x: NutritionData) => x.calories)
       .between(-1, gTo)
-      .withMessage(
-        this.i18n.tr("caloriesBetween", { from: 0, to: gToLabel })
-      )
+      .withMessage(this.i18n.tr("caloriesBetween", { from: 0, to: gToLabel }))
       .ensure((x: NutritionData) => x.fat)
       .between(-1, gTo)
       .withMessage(this.i18n.tr("fatBetween", { from: 0, to: gToLabel }))
       .ensure((x: NutritionData) => x.saturatedFat)
       .between(-1, gTo)
-      .withMessage(
-        this.i18n.tr("saturatedFatBetween", { from: 0, to: gToLabel })
-      )
+      .withMessage(this.i18n.tr("saturatedFatBetween", { from: 0, to: gToLabel }))
       .ensure((x: NutritionData) => x.carbohydrate)
       .between(-1, gTo)
-      .withMessage(
-        this.i18n.tr("carbohydrateBetween", { from: 0, to: gToLabel })
-      )
+      .withMessage(this.i18n.tr("carbohydrateBetween", { from: 0, to: gToLabel }))
       .ensure((x: NutritionData) => x.sugars)
       .between(-1, gTo)
       .withMessage(this.i18n.tr("sugarsBetween", { from: 0, to: gToLabel }))
       .ensure((x: NutritionData) => x.addedSugars)
       .between(-1, gTo)
-      .withMessage(
-        this.i18n.tr("addedSugarsBetween", { from: 0, to: gToLabel })
-      )
+      .withMessage(this.i18n.tr("addedSugarsBetween", { from: 0, to: gToLabel }))
       .ensure((x: NutritionData) => x.fiber)
       .between(-1, gTo)
       .withMessage(this.i18n.tr("fiberBetween", { from: 0, to: gToLabel }))
       .ensure((x: NutritionData) => x.protein)
       .between(-1, gTo)
-      .withMessage(
-        this.i18n.tr("proteinBetween", { from: 0, to: gToLabel })
-      )
+      .withMessage(this.i18n.tr("proteinBetween", { from: 0, to: gToLabel }))
       .ensure((x: NutritionData) => x.sodium)
       .between(-1, mgTo)
-      .withMessage(
-        this.i18n.tr("sodiumBetween", { from: 0, to: mgToLabel })
-      )
+      .withMessage(this.i18n.tr("sodiumBetween", { from: 0, to: mgToLabel }))
       .ensure((x: NutritionData) => x.cholesterol)
       .between(-1, mgTo)
-      .withMessage(
-        this.i18n.tr("cholesterolBetween", { from: 0, to: mgToLabel })
-      )
+      .withMessage(this.i18n.tr("cholesterolBetween", { from: 0, to: mgToLabel }))
       .ensure((x: NutritionData) => x.vitaminA)
       .between(-1, mgTo)
-      .withMessage(
-        this.i18n.tr("vitaminABetween", { from: 0, to: mgToLabel })
-      )
+      .withMessage(this.i18n.tr("vitaminABetween", { from: 0, to: mgToLabel }))
       .ensure((x: NutritionData) => x.vitaminC)
       .between(-1, mgTo)
-      .withMessage(
-        this.i18n.tr("vitaminCBetween", { from: 0, to: mgToLabel })
-      )
+      .withMessage(this.i18n.tr("vitaminCBetween", { from: 0, to: mgToLabel }))
       .ensure((x: NutritionData) => x.vitaminD)
       .between(-1, mgTo)
-      .withMessage(
-        this.i18n.tr("vitaminDBetween", { from: 0, to: mgToLabel })
-      )
+      .withMessage(this.i18n.tr("vitaminDBetween", { from: 0, to: mgToLabel }))
       .ensure((x: NutritionData) => x.calcium)
       .between(-1, mgTo)
-      .withMessage(
-        this.i18n.tr("calciumBetween", { from: 0, to: mgToLabel })
-      )
+      .withMessage(this.i18n.tr("calciumBetween", { from: 0, to: mgToLabel }))
       .ensure((x: NutritionData) => x.iron)
       .between(-1, mgTo)
       .withMessage(this.i18n.tr("ironBetween", { from: 0, to: mgToLabel }))
       .ensure((x: NutritionData) => x.potassium)
       .between(-1, mgTo)
-      .withMessage(
-        this.i18n.tr("potassiumBetween", { from: 0, to: mgToLabel })
-      )
+      .withMessage(this.i18n.tr("potassiumBetween", { from: 0, to: mgToLabel }))
       .ensure((x: NutritionData) => x.magnesium)
       .between(-1, mgTo)
-      .withMessage(
-        this.i18n.tr("magnesiumBetween", { from: 0, to: mgToLabel })
-      )
+      .withMessage(this.i18n.tr("magnesiumBetween", { from: 0, to: mgToLabel }))
       .on(this.model.nutritionData);
 
     ValidationRules.ensure((x: PriceData) => x.price)
@@ -231,13 +198,8 @@ export class EditIngredient {
     this.autocomplete = autocomplete({
       input: this.pickTaskInput,
       minLength: 2,
-      fetch: (
-        text: string,
-        update: (items: TaskSuggestion[]) => void
-      ) => {
-        const suggestions = taskSuggestions.filter((i) =>
-          i.label.toUpperCase().startsWith(text.toUpperCase())
-        );
+      fetch: (text: string, update: (items: TaskSuggestion[]) => void) => {
+        const suggestions = taskSuggestions.filter((i) => i.label.toUpperCase().startsWith(text.toUpperCase()));
         update(suggestions);
       },
       onSelect: (suggestion: TaskSuggestion) => {
@@ -245,7 +207,7 @@ export class EditIngredient {
 
         this.ingredientLinkedMessage = this.i18n.tr("editIngredient.thisIngredientIsLinked", {
           taskName: suggestion.label,
-          taskList: suggestion.group
+          taskList: suggestion.group,
         });
 
         this.model.taskId = suggestion.id;
@@ -326,11 +288,7 @@ export class EditIngredient {
     return JSON.stringify(this.model) !== this.originalIngredientJson;
   }
 
-  propertyIsInvalid(
-    properties: ValidateResult[],
-    property: string,
-    errorMessages: Array<string>
-  ): boolean {
+  propertyIsInvalid(properties: ValidateResult[], property: string, errorMessages: string[]): boolean {
     let invalidProperty = properties.find((p) => {
       return p.propertyName === property && !p.valid;
     });
@@ -368,101 +326,25 @@ export class EditIngredient {
     } else {
       let errorMessages = new Array<string>();
 
-      this.nameIsInvalid = this.propertyIsInvalid(
-        result.results,
-        "name",
-        errorMessages
-      );
-      this.caloriesIsInvalid = this.propertyIsInvalid(
-        result.results,
-        "calories",
-        errorMessages
-      );
-      this.fatIsInvalid = this.propertyIsInvalid(
-        result.results,
-        "fat",
-        errorMessages
-      );
-      this.saturatedFatIsInvalid = this.propertyIsInvalid(
-        result.results,
-        "saturatedFat",
-        errorMessages
-      );
-      this.carbohydrateIsInvalid = this.propertyIsInvalid(
-        result.results,
-        "carbohydrate",
-        errorMessages
-      );
-      this.sugarsIsInvalid = this.propertyIsInvalid(
-        result.results,
-        "sugars",
-        errorMessages
-      );
-      this.addedSugarsIsInvalid = this.propertyIsInvalid(
-        result.results,
-        "addedSugars",
-        errorMessages
-      );
-      this.fiberIsInvalid = this.propertyIsInvalid(
-        result.results,
-        "fiber",
-        errorMessages
-      );
-      this.proteinIsInvalid = this.propertyIsInvalid(
-        result.results,
-        "protein",
-        errorMessages
-      );
-      this.sodiumIsInvalid = this.propertyIsInvalid(
-        result.results,
-        "sodium",
-        errorMessages
-      );
-      this.cholesterolIsInvalid = this.propertyIsInvalid(
-        result.results,
-        "cholesterol",
-        errorMessages
-      );
-      this.vitaminAIsInvalid = this.propertyIsInvalid(
-        result.results,
-        "vitaminA",
-        errorMessages
-      );
-      this.vitaminCIsInvalid = this.propertyIsInvalid(
-        result.results,
-        "vitaminC",
-        errorMessages
-      );
-      this.vitaminDIsInvalid = this.propertyIsInvalid(
-        result.results,
-        "vitaminD",
-        errorMessages
-      );
-      this.calciumIsInvalid = this.propertyIsInvalid(
-        result.results,
-        "calcium",
-        errorMessages
-      );
-      this.ironIsInvalid = this.propertyIsInvalid(
-        result.results,
-        "iron",
-        errorMessages
-      );
-      this.potassiumIsInvalid = this.propertyIsInvalid(
-        result.results,
-        "potassium",
-        errorMessages
-      );
-      this.magnesiumIsInvalid = this.propertyIsInvalid(
-        result.results,
-        "magnesium",
-        errorMessages
-      );
-      this.priceIsInvalid = this.propertyIsInvalid(
-        result.results,
-        "price",
-        errorMessages
-      );
+      this.nameIsInvalid = this.propertyIsInvalid(result.results, "name", errorMessages);
+      this.caloriesIsInvalid = this.propertyIsInvalid(result.results, "calories", errorMessages);
+      this.fatIsInvalid = this.propertyIsInvalid(result.results, "fat", errorMessages);
+      this.saturatedFatIsInvalid = this.propertyIsInvalid(result.results, "saturatedFat", errorMessages);
+      this.carbohydrateIsInvalid = this.propertyIsInvalid(result.results, "carbohydrate", errorMessages);
+      this.sugarsIsInvalid = this.propertyIsInvalid(result.results, "sugars", errorMessages);
+      this.addedSugarsIsInvalid = this.propertyIsInvalid(result.results, "addedSugars", errorMessages);
+      this.fiberIsInvalid = this.propertyIsInvalid(result.results, "fiber", errorMessages);
+      this.proteinIsInvalid = this.propertyIsInvalid(result.results, "protein", errorMessages);
+      this.sodiumIsInvalid = this.propertyIsInvalid(result.results, "sodium", errorMessages);
+      this.cholesterolIsInvalid = this.propertyIsInvalid(result.results, "cholesterol", errorMessages);
+      this.vitaminAIsInvalid = this.propertyIsInvalid(result.results, "vitaminA", errorMessages);
+      this.vitaminCIsInvalid = this.propertyIsInvalid(result.results, "vitaminC", errorMessages);
+      this.vitaminDIsInvalid = this.propertyIsInvalid(result.results, "vitaminD", errorMessages);
+      this.calciumIsInvalid = this.propertyIsInvalid(result.results, "calcium", errorMessages);
+      this.ironIsInvalid = this.propertyIsInvalid(result.results, "iron", errorMessages);
+      this.potassiumIsInvalid = this.propertyIsInvalid(result.results, "potassium", errorMessages);
+      this.magnesiumIsInvalid = this.propertyIsInvalid(result.results, "magnesium", errorMessages);
+      this.priceIsInvalid = this.propertyIsInvalid(result.results, "price", errorMessages);
 
       this.eventAggregator.publish(AlertEvents.ShowError, errorMessages);
     }
@@ -480,10 +362,7 @@ export class EditIngredient {
 
       await this.ingredientsService.delete(this.model.id);
 
-      this.eventAggregator.publish(
-        AlertEvents.ShowSuccess,
-        "editIngredient.deleteSuccessful"
-      );
+      this.eventAggregator.publish(AlertEvents.ShowSuccess, "editIngredient.deleteSuccessful");
       this.router.navigateToRoute("ingredients");
     } else if (this.model.recipes.length > 0) {
       this.deleteButtonText = this.i18n.tr("editIngredient.yesImSure");

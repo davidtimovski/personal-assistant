@@ -6,16 +6,13 @@ import { SimpleIngredient } from "models/viewmodels/simpleIngredient";
 
 @inject(Router, IngredientsService)
 export class Ingredients {
-  private ingredients: Array<SimpleIngredient>;
-  private shadowIngredients: Array<SimpleIngredient>;
+  private ingredients: SimpleIngredient[];
+  private shadowIngredients: SimpleIngredient[];
   private lastEditedId: number;
   private search = "";
   private clearSearchButtonIsVisible = false;
 
-  constructor(
-    private readonly router: Router,
-    private readonly ingredientsService: IngredientsService
-    ) {}
+  constructor(private readonly router: Router, private readonly ingredientsService: IngredientsService) {}
 
   activate(params: any) {
     if (params.editedId) {

@@ -6,6 +6,7 @@ import { EventAggregator } from "aurelia-event-aggregator";
 import { AuthService } from "../../../shared/src/services/authService";
 import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
 import { LocalStorageCurrencies } from "../../../shared/src/utils/localStorageCurrencies";
+import { ErrorLogger } from "../../../shared/src/services/errorLogger";
 import { Language } from "../../../shared/src/models/enums/language";
 
 import { RecipeModel } from "../models/viewmodels/recipeModel";
@@ -17,13 +18,16 @@ import { CanSendRecipe } from "../models/viewmodels/canSendRecipe";
 import { ReceivedRecipe } from "../models/viewmodels/receivedRecipe";
 import { ReviewIngredientsModel } from "../models/viewmodels/reviewIngredientsModel";
 import { IngredientReplacement } from "../models/viewmodels/ingredientReplacement";
-import * as Actions from "../utils/state/actions";
 import { RecipeWithShares } from "../models/viewmodels/recipeWithShares";
 import { CanShareRecipe } from "../models/viewmodels/canShareRecipe";
 import { ShareRequest } from "../models/viewmodels/shareRequest";
+import * as Actions from "../utils/state/actions";
+import * as environment from "../../config/environment.json";
 
 @inject(AuthService, HttpClient, EventAggregator, LocalStorageCurrencies)
 export class RecipesService extends HttpProxyBase {
+  private readonly logger = new ErrorLogger(JSON.parse(<any>environment).urls.clientLogger, this.authService);
+
   constructor(
     protected readonly authService: AuthService,
     protected readonly httpClient: HttpClient,
@@ -33,10 +37,8 @@ export class RecipesService extends HttpProxyBase {
     super(authService, httpClient, eventAggregator);
   }
 
-  async getAll(): Promise<Array<RecipeModel>> {
-    const result = await this.ajax<Array<RecipeModel>>("recipes");
-
-    return result;
+  getAll(): Promise<RecipeModel[]> {
+    return this.ajax<RecipeModel[]>("recipes");
   }
 
   async get(id: number, currency: string): Promise<ViewRecipe> {
@@ -47,75 +49,66 @@ export class RecipesService extends HttpProxyBase {
     return result;
   }
 
-  async getForUpdate(id: number): Promise<EditRecipeModel> {
-    const result = await this.ajax<EditRecipeModel>(`recipes/${id}/update`);
-
-    return result;
+  getForUpdate(id: number): Promise<EditRecipeModel> {
+    return this.ajax<EditRecipeModel>(`recipes/${id}/update`);
   }
 
-  async getWithShares(id: number): Promise<RecipeWithShares> {
-    const result = await this.ajax<RecipeWithShares>(`recipes/${id}/with-shares`);
-
-    return result;
+  getWithShares(id: number): Promise<RecipeWithShares> {
+    return this.ajax<RecipeWithShares>(`recipes/${id}/with-shares`);
   }
 
-  async getShareRequests(): Promise<Array<ShareRequest>> {
-    const result = await this.ajax<Array<ShareRequest>>("recipes/share-requests");
-
-    return result;
+  getShareRequests(): Promise<ShareRequest[]> {
+    return this.ajax<ShareRequest[]>("recipes/share-requests");
   }
 
-  async getPendingShareRequestsCount(): Promise<number> {
-    const result = await this.ajax<number>("recipes/pending-share-requests-count");
-
-    return result;
+  getPendingShareRequestsCount(): Promise<number> {
+    return this.ajax<number>("recipes/pending-share-requests-count");
   }
 
-  async getForSending(id: number): Promise<SendRecipeModel> {
-    const result = await this.ajax<SendRecipeModel>(`recipes/${id}/sending`);
-
-    return result;
+  getForSending(id: number): Promise<SendRecipeModel> {
+    return this.ajax<SendRecipeModel>(`recipes/${id}/sending`);
   }
 
-  async getSendRequests(): Promise<Array<ReceivedRecipe>> {
-    const result = await this.ajax<Array<ReceivedRecipe>>("recipes/send-requests");
-
-    return result;
+  getSendRequests(): Promise<ReceivedRecipe[]> {
+    return this.ajax<ReceivedRecipe[]>("recipes/send-requests");
   }
 
-  async getPendingSendRequestsCount(): Promise<number> {
-    const result = await this.ajax<number>("recipes/pending-send-requests-count");
-
-    return result;
+  getPendingSendRequestsCount(): Promise<number> {
+    return this.ajax<number>("recipes/pending-send-requests-count");
   }
 
   async tryImport(
     id: number,
-    ingredientReplacements: Array<IngredientReplacement>,
+    ingredientReplacements: IngredientReplacement[],
     checkIfReviewRequired: boolean
   ): Promise<number> {
-    const result = await this.ajax<number>(`recipes/try-import`, {
-      method: "post",
-      body: json({
-        id: id,
-        ingredientReplacements: ingredientReplacements,
-        checkIfReviewRequired: checkIfReviewRequired,
-      }),
-    });
+    try {
+      const result = await this.ajax<number>(`recipes/try-import`, {
+        method: "post",
+        body: json({
+          id: id,
+          ingredientReplacements: ingredientReplacements,
+          checkIfReviewRequired: checkIfReviewRequired,
+        }),
+      });
 
-    return result;
+      await Actions.getRecipes(this);
+
+      return result;
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
-  async getForReview(id: number): Promise<ReviewIngredientsModel> {
-    const result = await this.ajax<ReviewIngredientsModel>(`recipes/${id}/review`);
-
-    return result;
+  getForReview(id: number): Promise<ReviewIngredientsModel> {
+    return this.ajax<ReviewIngredientsModel>(`recipes/${id}/review`);
   }
 
   async create(
     name: string,
     description: string,
-    ingredients: Array<EditRecipeIngredient>,
+    ingredients: EditRecipeIngredient[],
     instructions: string,
     prepDuration: string,
     cookDuration: string,
@@ -123,147 +116,299 @@ export class RecipesService extends HttpProxyBase {
     imageUri: string,
     videoUrl: string
   ): Promise<number> {
-    const parsedIngredients = this.parseIngredientsAmount(ingredients);
+    try {
+      const parsedIngredients = this.parseIngredientsAmount(ingredients);
 
-    const id = await this.ajax<number>("recipes", {
-      method: "post",
-      body: json({
-        name: name,
-        description: description,
-        ingredients: parsedIngredients,
-        instructions: instructions,
-        prepDuration: prepDuration,
-        cookDuration: cookDuration,
-        servings: servings,
-        imageUri: imageUri,
-        videoUrl: videoUrl,
-      }),
-    });
+      const id = await this.ajax<number>("recipes", {
+        method: "post",
+        body: json({
+          name: name,
+          description: description,
+          ingredients: parsedIngredients,
+          instructions: instructions,
+          prepDuration: prepDuration,
+          cookDuration: cookDuration,
+          servings: servings,
+          imageUri: imageUri,
+          videoUrl: videoUrl,
+        }),
+      });
 
-    return id;
+      await Actions.getRecipes(this);
+
+      return id;
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
-  async uploadTempImage(image: File): Promise<any> {
-    const formData = new FormData();
-    formData.append("image", image);
+  async uploadTempImage(image: File): Promise<string> {
+    try {
+      const formData = new FormData();
+      formData.append("image", image);
 
-    const data = await this.ajaxUploadFile("recipes/upload-temp-image", {
-      method: "post",
-      body: formData,
-    });
+      const data: any = await this.ajaxUploadFile("recipes/upload-temp-image", {
+        method: "post",
+        body: formData,
+      });
 
-    return data;
+      return data.tempImageUri;
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   async update(recipe: EditRecipeModel): Promise<void> {
-    const parsedIngredients = this.parseIngredientsAmount(recipe.ingredients);
+    try {
+      const parsedIngredients = this.parseIngredientsAmount(recipe.ingredients);
 
-    await this.ajaxExecute("recipes", {
-      method: "put",
-      body: json({
-        id: recipe.id,
-        name: recipe.name,
-        description: recipe.description,
-        ingredients: parsedIngredients,
-        instructions: recipe.instructions,
-        prepDuration: recipe.prepDuration,
-        cookDuration: recipe.cookDuration,
-        servings: recipe.servings,
-        imageUri: recipe.imageUri,
-        videoUrl: recipe.videoUrl,
-      }),
-    });
+      await this.ajaxExecute("recipes", {
+        method: "put",
+        body: json({
+          id: recipe.id,
+          name: recipe.name,
+          description: recipe.description,
+          ingredients: parsedIngredients,
+          instructions: recipe.instructions,
+          prepDuration: recipe.prepDuration,
+          cookDuration: recipe.cookDuration,
+          servings: recipe.servings,
+          imageUri: recipe.imageUri,
+          videoUrl: recipe.videoUrl,
+        }),
+      });
+
+      await Actions.getRecipes(this);
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   async delete(id: number): Promise<void> {
-    await this.ajaxExecute(`recipes/${id}`, {
-      method: "delete",
-    });
+    try {
+      await this.ajaxExecute(`recipes/${id}`, {
+        method: "delete",
+      });
+
+      Actions.deleteRecipe(id);
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
-  async canShareRecipeWithUser(email: string): Promise<CanShareRecipe> {
-    const result = await this.ajax<CanShareRecipe>(`recipes/can-share-with-user/${email}`);
-
-    return result;
+  canShareRecipeWithUser(email: string): Promise<CanShareRecipe> {
+    return this.ajax<CanShareRecipe>(`recipes/can-share-with-user/${email}`);
   }
 
-  async share(id: number, newShares: Array<number>, removedShares: Array<number>): Promise<void> {
-    await this.ajaxExecute("recipes/share", {
-      method: "put",
-      body: json({
-        recipeId: id,
-        newShares: newShares,
-        removedShares: removedShares,
-      }),
-    });
+  async share(id: number, newShares: number[], removedShares: number[]): Promise<void> {
+    try {
+      await this.ajaxExecute("recipes/share", {
+        method: "put",
+        body: json({
+          recipeId: id,
+          newShares: newShares,
+          removedShares: removedShares,
+        }),
+      });
+
+      await Actions.getRecipes(this);
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   async setShareIsAccepted(id: number, isAccepted: boolean): Promise<void> {
-    await this.ajaxExecute("recipes/share-is-accepted", {
-      method: "put",
-      body: json({
-        recipeId: id,
-        isAccepted: isAccepted,
-      }),
-    });
+    try {
+      await this.ajaxExecute("recipes/share-is-accepted", {
+        method: "put",
+        body: json({
+          recipeId: id,
+          isAccepted: isAccepted,
+        }),
+      });
+
+      await Actions.getRecipes(this);
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   async leave(id: number): Promise<void> {
-    await this.ajaxExecute(`recipes/${id}/leave`, {
-      method: "delete",
-    });
+    try {
+      await this.ajaxExecute(`recipes/${id}/leave`, {
+        method: "delete",
+      });
+
+      await Actions.getRecipes(this);
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
-  async canSendRecipeToUser(email: string, recipeId: number): Promise<CanSendRecipe> {
-    const result = await this.ajax<CanSendRecipe>(`recipes/can-send-recipe-to-user/${email}/${recipeId}`);
-
-    return result;
+  canSendRecipeToUser(email: string, recipeId: number): Promise<CanSendRecipe> {
+    return this.ajax<CanSendRecipe>(`recipes/can-send-recipe-to-user/${email}/${recipeId}`);
   }
 
-  async send(id: number, recipientsIds: Array<number>): Promise<void> {
-    await this.ajaxExecute("recipes/send", {
-      method: "post",
-      body: json({
-        recipeId: id,
-        recipientsIds: recipientsIds,
-      }),
-    });
+  async send(id: number, recipientsIds: number[]): Promise<void> {
+    try {
+      await this.ajaxExecute("recipes/send", {
+        method: "post",
+        body: json({
+          recipeId: id,
+          recipientsIds: recipientsIds,
+        }),
+      });
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   async declineSendRequest(id: number): Promise<void> {
-    await this.ajaxExecute("recipes/decline-send-request", {
-      method: "put",
-      body: json({
-        recipeId: id,
-      }),
-    });
+    try {
+      await this.ajaxExecute("recipes/decline-send-request", {
+        method: "put",
+        body: json({
+          recipeId: id,
+        }),
+      });
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   async deleteSendRequest(id: number): Promise<void> {
-    await this.ajaxExecute(`recipes/${id}/send-request`, {
-      method: "delete",
-    });
+    try {
+      await this.ajaxExecute(`recipes/${id}/send-request`, {
+        method: "delete",
+      });
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
+  }
+
+  copyAsText(
+    recipe: ViewRecipe,
+    ingredientsLabel: string,
+    instructionsLabel: string,
+    youTubeUrlLabel: string,
+    prepDurationLabel: string,
+    minutesLetter: string,
+    hoursLetter: string,
+    cookDurationLabel: string,
+    servingsLabel: string
+  ) {
+    try {
+      let text = recipe.name + "\n----------";
+
+      if (recipe.description) {
+        text += "\n\n" + recipe.description;
+      }
+
+      if (recipe.ingredients.length > 0) {
+        text += `\n\n${ingredientsLabel}:`;
+
+        for (let ingredient of recipe.ingredients) {
+          text += `\n◾ ${ingredient.name}`;
+          if (ingredient.amount) {
+            text += ` - ${ingredient.amount + (ingredient.unit ? " " + ingredient.unit : "")}`;
+          }
+        }
+      }
+
+      if (recipe.instructions) {
+        text += `\n\n${instructionsLabel}:`;
+        text += "\n----------\n" + recipe.instructions + "\n----------";
+      }
+
+      if (recipe.videoUrl) {
+        text += `\n\n${youTubeUrlLabel}: ${recipe.videoUrl}`;
+      }
+
+      if (recipe.prepDuration || recipe.cookDuration) {
+        text += "\n";
+
+        if (recipe.prepDuration) {
+          const prepDurationHours = recipe.prepDuration.substring(0, 2);
+          const prepDurationMinutes = recipe.prepDuration.substring(3, 5);
+
+          text += `\n${prepDurationLabel}: `;
+
+          if (parseInt(prepDurationHours, 10) === 0) {
+            text += parseInt(prepDurationMinutes, 10) + minutesLetter;
+          } else {
+            text +=
+              parseInt(prepDurationHours, 10) + hoursLetter + " " + parseInt(prepDurationMinutes, 10) + minutesLetter;
+          }
+        }
+        if (recipe.cookDuration) {
+          const cookDurationHours = recipe.cookDuration.substring(0, 2);
+          const cookDurationMinutes = recipe.cookDuration.substring(3, 5);
+
+          text += `\n${cookDurationLabel}: `;
+
+          if (parseInt(cookDurationHours, 10) === 0) {
+            text += parseInt(cookDurationMinutes, 10) + minutesLetter;
+          } else {
+            text +=
+              parseInt(cookDurationHours, 10) + hoursLetter + " " + parseInt(cookDurationMinutes, 10) + minutesLetter;
+          }
+        }
+      }
+
+      if (recipe.servings > 1) {
+        text += "\n\n" + servingsLabel;
+      }
+
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed"; // avoid scrolling to bottom
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      document.execCommand("copy");
+
+      document.body.removeChild(textArea);
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   videoUrlToEmbedSrc(videoUrl: string): string {
-    if (videoUrl.includes("youtube.com") || videoUrl.includes("youtu.be")) {
-      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-      const match = videoUrl.match(regExp);
+    try {
+      if (videoUrl.includes("youtube.com") || videoUrl.includes("youtu.be")) {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = videoUrl.match(regExp);
 
-      if (match && match[2].length == 11) {
-        const id = match[2];
+        if (match && match[2].length == 11) {
+          const id = match[2];
 
-        const language = this.localStorage.getLanguage();
-        const hl = language == Language.English ? "en" : "mk";
+          const language = this.localStorage.getLanguage();
+          const hl = language == Language.English ? "en" : "mk";
 
-        return `//www.youtube.com/embed/${id}?disablekb=1&hl=${hl}&iv_load_policy=3&loop=1&modestbranding=1&rel=0`;
+          return `//www.youtube.com/embed/${id}?disablekb=1&hl=${hl}&iv_load_policy=3&loop=1&modestbranding=1&rel=0`;
+        }
       }
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
     }
 
     throw "Invalid url";
   }
 
-  private parseIngredientsAmount(ingredients: Array<EditRecipeIngredient>) {
+  private parseIngredientsAmount(ingredients: EditRecipeIngredient[]) {
     return ingredients.map((ingredient: EditRecipeIngredient) => {
       const parsedIngredient = new EditRecipeIngredient(
         ingredient.id,

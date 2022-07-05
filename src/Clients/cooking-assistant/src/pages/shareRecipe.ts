@@ -12,12 +12,11 @@ import { RecipeWithShares } from "models/viewmodels/recipeWithShares";
 import { Share } from "models/viewmodels/share";
 import { CanShareRecipe } from "models/viewmodels/canShareRecipe";
 import { SharingState } from "models/viewmodels/sharingState";
-import * as Actions from "utils/state/actions";
 
 @inject(Router, AuthService, RecipesService, ValidationController, I18N, EventAggregator)
 export class ShareRecipe {
   private model: RecipeWithShares;
-  private originalShares: Array<Share>;
+  private originalShares: Share[];
   private selectedShare: Share;
   private emailIsInvalid: boolean;
   private emailInput: HTMLInputElement;
@@ -153,8 +152,6 @@ export class ShareRecipe {
     this.emailIsInvalid = false;
 
     await this.recipesService.share(this.model.id, this.newShares, this.removedShares);
-
-    await Actions.getRecipes(this.recipesService);
 
     if (this.removedShares.length > 0) {
       this.eventAggregator.publish(AlertEvents.ShowSuccess, "shareRecipe.sharingDetailsSaved");

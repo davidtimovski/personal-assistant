@@ -315,7 +315,7 @@ export class DietaryProfile {
     return valid && JSON.stringify(this.model) !== this.originalDietaryProfileJson;
   }
 
-  propertyIsInvalid(properties: ValidateResult[], property: string, errorMessages: Array<string>): boolean {
+  propertyIsInvalid(properties: ValidateResult[], property: string, errorMessages: string[]): boolean {
     let invalidProperty = properties.find((p) => {
       return p.propertyName === property && !p.valid;
     });

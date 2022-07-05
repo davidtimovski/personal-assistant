@@ -61,6 +61,7 @@ export class Recipe {
 
       this.model = viewRecipe;
 
+      // Set image width and height to avoid reflows
       this.resizeObserver = new ResizeObserver(() => {
         this.model.imageWidth = this.recipeContainer.offsetWidth - 2;
         this.model.imageHeight = (this.recipeContainer.offsetWidth - 2) / 2;
@@ -99,89 +100,19 @@ export class Recipe {
   }
 
   copyAsText() {
-    let text = this.model.name + "\n----------";
-
-    if (this.model.description) {
-      text += "\n\n" + this.model.description;
-    }
-
-    if (this.model.ingredients.length > 0) {
-      text += `\n\n${this.i18n.tr("editRecipe.ingredients")}:`;
-
-      for (let ingredient of this.model.ingredients) {
-        text += `\n◾ ${ingredient.name}`;
-        if (ingredient.amount) {
-          text += ` - ${ingredient.amount + (ingredient.unit ? " " + ingredient.unit : "")}`;
-        }
-      }
-    }
-
-    if (this.model.instructions) {
-      text += `\n\n${this.i18n.tr("editRecipe.instructions")}:`;
-      text += "\n----------\n" + this.model.instructions + "\n----------";
-    }
-
-    if (this.model.videoUrl) {
-      text += `\n\n${this.i18n.tr("editRecipe.youTubeUrl")}: ${this.model.videoUrl}`;
-    }
-
-    if (this.model.prepDuration || this.model.cookDuration) {
-      text += "\n";
-
-      if (this.model.prepDuration) {
-        const prepDurationHours = this.model.prepDuration.substring(0, 2);
-        const prepDurationMinutes = this.model.prepDuration.substring(3, 5);
-
-        text += `\n${this.i18n.tr("editRecipe.prepDuration")}: `;
-
-        if (parseInt(prepDurationHours, 10) === 0) {
-          text += parseInt(prepDurationMinutes, 10) + this.i18n.tr("minutesLetter");
-        } else {
-          text +=
-            parseInt(prepDurationHours, 10) +
-            this.i18n.tr("hoursLetter") +
-            " " +
-            parseInt(prepDurationMinutes, 10) +
-            this.i18n.tr("minutesLetter");
-        }
-      }
-      if (this.model.cookDuration) {
-        const cookDurationHours = this.model.cookDuration.substring(0, 2);
-        const cookDurationMinutes = this.model.cookDuration.substring(3, 5);
-
-        text += `\n${this.i18n.tr("editRecipe.cookDuration")}: `;
-
-        if (parseInt(cookDurationHours, 10) === 0) {
-          text += parseInt(cookDurationMinutes, 10) + this.i18n.tr("minutesLetter");
-        } else {
-          text +=
-            parseInt(cookDurationHours, 10) +
-            this.i18n.tr("hoursLetter") +
-            " " +
-            parseInt(cookDurationMinutes, 10) +
-            this.i18n.tr("minutesLetter");
-        }
-      }
-    }
-
-    if (this.model.servings > 1) {
-      text +=
-        "\n\n" +
-        this.i18n.tr("recipe.servings", {
-          servings: this.model.servings,
-        });
-    }
-
-    const textArea = document.createElement("textarea");
-    textArea.value = text;
-    textArea.style.position = "fixed"; // avoid scrolling to bottom
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-
-    document.execCommand("copy");
-
-    document.body.removeChild(textArea);
+    this.recipesService.copyAsText(
+      this.model,
+      this.i18n.tr("editRecipe.ingredients"),
+      this.i18n.tr("editRecipe.instructions"),
+      this.i18n.tr("editRecipe.youTubeUrl"),
+      this.i18n.tr("editRecipe.prepDuration"),
+      this.i18n.tr("minutesLetter"),
+      this.i18n.tr("hoursLetter"),
+      this.i18n.tr("editRecipe.cookDuration"),
+      this.i18n.tr("recipe.servings", {
+        servings: this.model.servings,
+      })
+    );
 
     this.copyAsTextCompleted = true;
     window.setTimeout(() => {
