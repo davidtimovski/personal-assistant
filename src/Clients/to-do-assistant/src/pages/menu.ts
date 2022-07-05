@@ -11,7 +11,7 @@ export class Menu {
   private version = "--";
   private unseenNotifications = 0;
   private pendingShareRequestCount = 0;
-  private personalAssistantUrl: string;
+  private readonly personalAssistantUrl: string;
   private preferencesButtonIsLoading = false;
   private helpButtonIsLoading = false;
 
@@ -31,17 +31,13 @@ export class Menu {
       }
     });
 
-    this.notificationsService
-      .getUnseenNotificationsCount()
-      .then((unseenNotifications) => {
-        this.unseenNotifications = unseenNotifications;
-      });
+    this.notificationsService.getUnseenNotificationsCount().then((unseenNotifications) => {
+      this.unseenNotifications = unseenNotifications;
+    });
 
-    this.listsService
-      .getPendingShareRequestsCount()
-      .then((pendingShareRequestCount) => {
-        this.pendingShareRequestCount = pendingShareRequestCount;
-      });
+    this.listsService.getPendingShareRequestsCount().then((pendingShareRequestCount) => {
+      this.pendingShareRequestCount = pendingShareRequestCount;
+    });
   }
 
   goToPreferences() {

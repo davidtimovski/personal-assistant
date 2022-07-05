@@ -1,4 +1,4 @@
-import { Task } from "models/entities/task";
+import { Task } from "models/entities";
 import { ListTask } from "./listTask";
 import { SharingState } from "./sharingState";
 

@@ -1,5 +1,5 @@
-import { Task } from "./task";
-import { SharingState } from "../viewmodels/sharingState";
+import { SharingState } from "./viewmodels/sharingState";
+import { AssignedUser } from "./viewmodels/assignedUser";
 
 export class List {
   constructor(
@@ -15,4 +15,16 @@ export class List {
     public tasks: Array<Task>,
     public modifiedDate: string
   ) {}
+}
+
+export class Task {
+  id: number;
+  listId: number;
+  name: string;
+  isCompleted: boolean;
+  isOneTime: boolean;
+  isHighPriority: boolean;
+  isPrivate: boolean;
+  assignedUser: AssignedUser;
+  order: number;
 }

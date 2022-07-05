@@ -12,7 +12,6 @@ import { UsersService } from "services/usersService";
 import { EditListModel } from "models/viewmodels/editListModel";
 import { SharingState } from "models/viewmodels/sharingState";
 import { PreferencesModel } from "models/preferencesModel";
-import * as Actions from "utils/state/actions";
 
 @inject(Router, ListsService, UsersService, ValidationController, I18N, EventAggregator)
 export class EditList {
@@ -123,8 +122,6 @@ export class EditList {
           }
           this.nameIsInvalid = false;
 
-          await Actions.getLists(this.listsService);
-
           const redirectRoute = this.model.isArchived ? "archivedListsEdited" : "listsEdited";
           this.router.navigateToRoute(redirectRoute, {
             editedId: this.model.id,
@@ -142,8 +139,6 @@ export class EditList {
             this.model.tasksText
           );
           this.nameIsInvalid = false;
-
-          await Actions.getLists(this.listsService);
 
           this.router.navigateToRoute("listsEdited", {
             editedId: id,
@@ -169,8 +164,6 @@ export class EditList {
 
       await this.listsService.delete(this.model.id);
 
-      await Actions.getLists(this.listsService);
-
       this.eventAggregator.publish(AlertEvents.ShowSuccess, "editList.deleteSuccessful");
       this.router.navigateToRoute("lists");
     } else {
@@ -188,8 +181,6 @@ export class EditList {
       this.leaveButtonIsLoading = true;
 
       await this.listsService.leave(this.model.id);
-
-      await Actions.getLists(this.listsService);
 
       this.eventAggregator.publish(AlertEvents.ShowSuccess, "editList.youHaveLeftTheList");
 

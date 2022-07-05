@@ -12,7 +12,6 @@ import { ListWithShares } from "models/viewmodels/listWithShares";
 import { Share } from "models/viewmodels/share";
 import { CanShareList } from "models/viewmodels/canShareList";
 import { SharingState } from "models/viewmodels/sharingState";
-import * as Actions from "utils/state/actions";
 
 @inject(Router, AuthService, ListsService, ValidationController, I18N, EventAggregator)
 export class ShareList {
@@ -218,8 +217,6 @@ export class ShareList {
     this.emailIsInvalid = false;
 
     await this.listsService.share(this.model.id, this.newShares, this.editedShares, this.removedShares);
-
-    await Actions.getLists(this.listsService);
 
     if (this.editedShares.length + this.removedShares.length > 0) {
       this.eventAggregator.publish(AlertEvents.ShowSuccess, "shareList.sharingDetailsSaved");

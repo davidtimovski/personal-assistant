@@ -1,4 +1,4 @@
-import { Task } from "models/entities/task";
+import { Task } from "models/entities";
 import { AssignedUser } from "../viewmodels/assignedUser";
 
 export class ListTask {

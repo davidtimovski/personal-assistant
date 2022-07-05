@@ -1,12 +1,13 @@
 import { inject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { I18N } from "aurelia-i18n";
+
+import { DateHelper } from "../../../shared/src/utils/dateHelper";
 
 import { NotificationsService } from "services/notificationsService";
 import { Notification } from "models/viewmodels/notification";
 import { LocalStorage } from "utils/localStorage";
 
-@inject(Router, NotificationsService, LocalStorage, I18N)
+@inject(Router, NotificationsService, LocalStorage)
 export class Notifications {
   private highlightedId: number;
   private unseenNotifications: Array<Notification>;
@@ -17,8 +18,7 @@ export class Notifications {
   constructor(
     private readonly router: Router,
     private readonly notificationsService: NotificationsService,
-    private readonly localStorage: LocalStorage,
-    private readonly i18n: I18N
+    private readonly localStorage: LocalStorage
   ) {}
 
   activate(params: any) {
@@ -33,7 +33,10 @@ export class Notifications {
     const allNotifications = await this.notificationsService.getAll();
 
     for (let notification of allNotifications) {
-      notification.formattedCreatedDate = this.formatCreatedDate(notification.createdDate);
+      notification.formattedCreatedDate = DateHelper.formatWeekdayTime(
+        new Date(notification.createdDate),
+        this.language
+      );
     }
 
     this.unseenNotifications = allNotifications
@@ -73,13 +76,5 @@ export class Notifications {
       .replace(/#\[/g, '<span class="colored-text">')
       .replace(/\]#/g, "</span>");
     return notification;
-  }
-
-  formatCreatedDate(createdDateString: string): string {
-    const date = new Date(createdDateString);
-    const weekday = this.i18n.tr(`weekdays.${date.getDay()}`);
-    const time = date.toLocaleTimeString(this.language);
-
-    return `${weekday}, ${time}`;
   }
 }

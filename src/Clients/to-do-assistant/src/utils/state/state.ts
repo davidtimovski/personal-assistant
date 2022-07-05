@@ -1,4 +1,4 @@
-import { List } from "models/entities/list";
+import { List } from "models/entities";
 
 export interface State {
   loading: boolean;

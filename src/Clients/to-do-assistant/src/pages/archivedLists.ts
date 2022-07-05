@@ -3,7 +3,6 @@ import { EventAggregator } from "aurelia-event-aggregator";
 import { connectTo } from "aurelia-store";
 
 import { ListsService } from "services/listsService";
-import { List } from "models/entities/list";
 import { ArchivedList } from "models/viewmodels/archivedList";
 import { State } from "utils/state/state";
 import { AppEvents } from "models/appEvents";
@@ -35,15 +34,7 @@ export class ArchivedLists {
   }
 
   setListsFromState() {
-    this.archivedLists = this.state.lists
-      .filter((x) => x.isArchived)
-      .sort((a: List, b: List) => {
-        const aDate = new Date(a.modifiedDate);
-        const bDate = new Date(b.modifiedDate);
-        if (aDate > bDate) return -1;
-        if (aDate < bDate) return 1;
-        return 0;
-      });
+    this.archivedLists = ListsService.getArchived(this.state.lists);
   }
 
   getClassFromIcon(icon: string): string {
