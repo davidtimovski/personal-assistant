@@ -8,5 +8,5 @@ export class RecipeWithShares {
   ownerEmail: string;
   ownerImageUri: string;
   userShare: Share;
-  shares: Array<Share>;
+  shares: Share[];
 }

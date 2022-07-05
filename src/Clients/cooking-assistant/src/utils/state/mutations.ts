@@ -2,7 +2,7 @@ import store from "./store";
 import { State } from "./state";
 import { RecipeModel } from "models/viewmodels/recipeModel";
 
-function getRecipes(state: State, recipes: Array<RecipeModel>) {
+function getRecipes(state: State, recipes: RecipeModel[]) {
   if (!recipes) {
     return;
   }

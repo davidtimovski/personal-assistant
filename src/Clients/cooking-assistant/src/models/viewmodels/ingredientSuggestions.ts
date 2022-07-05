@@ -15,21 +15,18 @@ export class IngredientSuggestion {
 
 export class IngredientCategory {
   name: string;
-  ingredients: Array<IngredientSuggestion>;
-  subcategories: Array<IngredientCategory>;
+  ingredients: IngredientSuggestion[];
+  subcategories: IngredientCategory[];
   matched: boolean;
 }
 
 export class PublicIngredientSuggestions {
-  uncategorized: Array<IngredientSuggestion>;
-  categories: Array<IngredientCategory>;
+  uncategorized: IngredientSuggestion[];
+  categories: IngredientCategory[];
 }
 
 export class IngredientSuggestions {
-  constructor(
-    public userIngredients: Array<IngredientSuggestion>,
-    public publicIngredients: PublicIngredientSuggestions
-  ) {}
+  constructor(public userIngredients: IngredientSuggestion[], public publicIngredients: PublicIngredientSuggestions) {}
 }
 
 export enum IngredientPickerEvents {

@@ -8,7 +8,6 @@ import { ReviewIngredientsModel } from "models/viewmodels/reviewIngredientsModel
 import { ReviewIngredient } from "models/viewmodels/reviewIngredient";
 import { IngredientReplacement } from "models/viewmodels/ingredientReplacement";
 import { IngredientPickerEvents, IngredientSuggestion } from "models/viewmodels/ingredientSuggestions";
-import * as Actions from "utils/state/actions";
 
 @inject(Router, RecipesService, I18N, EventAggregator)
 export class ReviewIngredients {
@@ -112,8 +111,6 @@ export class ReviewIngredients {
       });
 
     const recipeId = await this.recipesService.tryImport(this.model.id, ingredientReplacements, false);
-
-    await Actions.getRecipes(this.recipesService);
 
     this.router.navigateToRoute("recipesEdited", {
       editedId: recipeId,

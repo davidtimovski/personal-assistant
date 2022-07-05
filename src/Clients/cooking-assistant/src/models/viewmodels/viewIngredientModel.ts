@@ -10,5 +10,5 @@ export class ViewIngredientModel {
   name: string;
   nutritionData: NutritionData;
   priceData: PriceData;
-  recipes: Array<SimpleRecipe>;
+  recipes: SimpleRecipe[];
 }

@@ -14,7 +14,6 @@ const ensureArray = (config) => (config && (Array.isArray(config) ? config : [co
 const when = (condition, config, negativeConfig) => (condition ? ensureArray(config) : ensureArray(negativeConfig));
 
 // primary config:
-const title = "Cooking Assistant";
 const outDir = path.resolve(__dirname, project.platform.output);
 const srcDir = path.resolve(__dirname, "src");
 const nodeModulesDir = path.resolve(__dirname, "node_modules");
@@ -57,8 +56,8 @@ module.exports = ({ production } = {}, { extractCss, analyze, tests, hmr, port, 
       // sizes are compared against source before minification
       maxInitialRequests: Infinity, // Default is 3, make this unlimited if using HTTP/2
       maxAsyncRequests: Infinity, // Default is 5, make this unlimited if using HTTP/2
-      minSize: 10000, // chunk is only created if it would be bigger than minSize, adjust as required
-      maxSize: 40000, // splits chunks if bigger than 40k, adjust as required (maxSize added in webpack v4.15)
+      minSize: 40000, // chunk is only created if it would be bigger than minSize, adjust as required
+      maxSize: 160000, // splits chunks if bigger than 40k, adjust as required (maxSize added in webpack v4.15)
       cacheGroups: {
         default: false, // Disable the built-in groups default & vendors (vendors is redefined below)
         // You can insert additional cacheGroup entries here if you want to split out specific modules
@@ -271,7 +270,6 @@ module.exports = ({ production } = {}, { extractCss, analyze, tests, hmr, port, 
         : undefined,
       metadata: {
         // available in index.ejs //
-        title,
         baseUrl,
         apiUrl: production ? "https://api.personalassistant.site" : "http://localhost:5001",
       },
