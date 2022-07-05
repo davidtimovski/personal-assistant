@@ -1,21 +1,15 @@
 import { inject } from "aurelia-framework";
 import { Router } from "aurelia-router";
-import { I18N } from "aurelia-i18n";
 
 import { ListsService } from "services/listsService";
 import { ShareRequest } from "models/viewmodels/shareRequest";
-import * as Actions from "utils/state/actions";
 
-@inject(Router, ListsService, I18N)
+@inject(Router, ListsService)
 export class ShareRequests {
   private pendingShareRequests: Array<ShareRequest>;
   private declinedShareRequests: Array<ShareRequest>;
 
-  constructor(
-    private readonly router: Router,
-    private readonly listsService: ListsService,
-    private readonly i18n: I18N
-  ) {}
+  constructor(private readonly router: Router, private readonly listsService: ListsService) {}
 
   async attached() {
     const allShareRequests = await this.listsService.getShareRequests();
@@ -33,8 +27,6 @@ export class ShareRequests {
 
     await this.listsService.setShareIsAccepted(request.listId, true);
     this.pendingShareRequests.splice(this.pendingShareRequests.indexOf(request), 1);
-
-    await Actions.getLists(this.listsService);
 
     this.router.navigateToRoute("listsEdited", { editedId: request.listId });
   }

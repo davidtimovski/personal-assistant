@@ -6,11 +6,10 @@ import { connectTo } from "aurelia-store";
 
 import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 
-import { List } from "models/entities/list";
+import { List } from "models/entities";
 import { ListsService } from "services/listsService";
 import { SharingState } from "models/viewmodels/sharingState";
 import { State } from "utils/state/state";
-import * as Actions from "utils/state/actions";
 import { AppEvents } from "models/appEvents";
 
 @inject(Router, ListsService, I18N, EventAggregator)
@@ -67,8 +66,6 @@ export class ArchiveList {
 
     try {
       await this.listsService.setIsArchived(this.model.id, true);
-
-      await Actions.getLists(this.listsService);
 
       this.eventAggregator.publish(AlertEvents.ShowSuccess, "archiveList.archiveSuccessful");
 

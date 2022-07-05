@@ -3,27 +3,31 @@ import { json } from "aurelia-fetch-client";
 import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
 import { ErrorLogger } from "../../../shared/src/services/errorLogger";
 
-import { Task } from "models/entities/task";
+import { ListsService } from "./listsService";
+import { Task } from "models/entities";
 import { EditTaskModel } from "models/viewmodels/editTaskModel";
+import { BulkAddTasksModel } from "models/viewmodels/bulkAddTasksModel";
 import * as Actions from "utils/state/actions";
 import * as environment from "../../config/environment.json";
 
 export class TasksService extends HttpProxyBase {
   private readonly logger = new ErrorLogger(JSON.parse(<any>environment).urls.clientLogger, this.authService);
 
-  async get(id: number): Promise<Task> {
-    const result = await this.ajax<Task>(`tasks/${id}`);
-
-    return result;
+  get(id: number): Promise<Task> {
+    return this.ajax<Task>(`tasks/${id}`);
   }
 
-  async getForUpdate(id: number): Promise<EditTaskModel> {
-    const result = await this.ajax<EditTaskModel>(`tasks/${id}/update`);
-
-    return result;
+  getForUpdate(id: number): Promise<EditTaskModel> {
+    return this.ajax<EditTaskModel>(`tasks/${id}/update`);
   }
 
-  async create(listId: number, name: string, isOneTime: boolean, isPrivate: boolean): Promise<number> {
+  async create(
+    listId: number,
+    name: string,
+    isOneTime: boolean,
+    isPrivate: boolean,
+    listsService: ListsService
+  ): Promise<number> {
     try {
       const id = await this.ajax<number>("tasks", {
         method: "post",
@@ -35,6 +39,8 @@ export class TasksService extends HttpProxyBase {
         }),
       });
 
+      await Actions.getLists(listsService);
+
       return id;
     } catch (e) {
       this.logger.logError(e);
@@ -42,34 +48,33 @@ export class TasksService extends HttpProxyBase {
     }
   }
 
-  async bulkCreate(
-    listId: number,
-    tasksText: string,
-    tasksAreOneTime: boolean,
-    tasksArePrivate: boolean
-  ): Promise<void> {
+  async bulkCreate(model: BulkAddTasksModel, listsService: ListsService): Promise<void> {
     try {
       await this.ajaxExecute("tasks/bulk", {
         method: "post",
         body: json({
-          listId: listId,
-          tasksText: tasksText,
-          tasksAreOneTime: tasksAreOneTime,
-          tasksArePrivate: tasksArePrivate,
+          listId: model.listId,
+          tasksText: model.tasksText,
+          tasksAreOneTime: model.tasksAreOneTime,
+          tasksArePrivate: model.tasksArePrivate,
         }),
       });
+
+      await Actions.getLists(listsService);
     } catch (e) {
       this.logger.logError(e);
       throw e;
     }
   }
 
-  async update(editTaskViewModel: EditTaskModel): Promise<void> {
+  async update(editTaskViewModel: EditTaskModel, listsService: ListsService): Promise<void> {
     try {
       await this.ajaxExecute("tasks", {
         method: "put",
         body: json(editTaskViewModel),
       });
+
+      await Actions.getLists(listsService);
     } catch (e) {
       this.logger.logError(e);
       throw e;

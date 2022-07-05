@@ -13,7 +13,6 @@ import { ListsService } from "services/listsService";
 import { EditTaskModel } from "models/viewmodels/editTaskModel";
 import { AssigneeOption } from "models/viewmodels/assigneeOption";
 import * as environment from "../../config/environment.json";
-import * as Actions from "utils/state/actions";
 
 @inject(Router, TasksService, ListsService, ValidationController, I18N, EventAggregator)
 export class EditTask {
@@ -130,10 +129,8 @@ export class EditTask {
 
     if (result.valid) {
       try {
-        await this.tasksService.update(this.model);
+        await this.tasksService.update(this.model, this.listsService);
         this.nameIsInvalid = false;
-
-        await Actions.getLists(this.listsService);
 
         this.router.navigateToRoute("listEdited", {
           id: this.model.listId,

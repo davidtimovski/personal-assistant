@@ -8,6 +8,7 @@ export class ListModel {
     public sharingState: SharingState,
     public order: number,
     public computedListType: string,
+    public computedListIconClass: string,
     public uncompletedTaskCount: number
   ) {}
 

@@ -1,7 +1,6 @@
 import store from "./store";
 import { State } from "./state";
-import { List } from "models/entities/list";
-import { Task } from "models/entities/task";
+import { List, Task } from "models/entities";
 import { ListsService } from "services/listsService";
 
 function getLists(state: State, lists: List[]) {

@@ -28,9 +28,8 @@ let createLog: HttpHandler =
 let webApp: HttpHandler =
     choose [
         POST >=>
-             choose [
-                route "/logs"
-                >=> createLog
+            choose [
+                route "/logs" >=> createLog
             ]
         setStatusCode 404 >=> text "Not Found" ]
 

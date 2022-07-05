@@ -8,12 +8,10 @@ import { connectTo } from "aurelia-store";
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 
-import { List } from "models/entities/list";
+import { List } from "models/entities";
 import { ListsService } from "services/listsService";
 import { SharingState } from "models/viewmodels/sharingState";
-import { Task } from "models/entities/task";
 import { State } from "utils/state/state";
-import * as Actions from "utils/state/actions";
 import { AppEvents } from "models/appEvents";
 
 @inject(Router, ListsService, ValidationController, I18N, EventAggregator)
@@ -103,8 +101,6 @@ export class CopyList {
         this.model.id = await this.listsService.copy(this.model);
         this.nameIsInvalid = false;
 
-        await Actions.getLists(this.listsService);
-
         this.eventAggregator.publish(AlertEvents.ShowSuccess, "copyList.copySuccessful");
 
         this.router.navigateToRoute("listsEdited", {
@@ -120,63 +116,7 @@ export class CopyList {
   }
 
   copyAsText() {
-    let text = this.listName;
-
-    const tasks = this.model.tasks
-      .filter((x) => !x.isCompleted && !x.isPrivate)
-      .sort((a: Task, b: Task) => {
-        return a.order - b.order;
-      });
-    const privateTasks = this.model.tasks
-      .filter((x) => !x.isCompleted && x.isPrivate)
-      .sort((a: Task, b: Task) => {
-        return a.order - b.order;
-      });
-    const completedTasks = this.model.tasks
-      .filter((x) => x.isCompleted && !x.isPrivate)
-      .sort((a: Task, b: Task) => {
-        return a.order - b.order;
-      });
-    const completedPrivateTasks = this.model.tasks
-      .filter((x) => x.isCompleted && x.isPrivate)
-      .sort((a: Task, b: Task) => {
-        return a.order - b.order;
-      });
-
-    if (privateTasks.length + tasks.length > 0) {
-      text += "\n";
-
-      for (let task of privateTasks) {
-        text += `\n${task.name} ☐`;
-      }
-      for (let task of tasks) {
-        text += `\n${task.name} ☐`;
-      }
-    }
-
-    if (completedPrivateTasks.length + completedTasks.length > 0) {
-      if (tasks.length > 0) {
-        text += "\n----------";
-      }
-
-      for (let task of completedPrivateTasks) {
-        text += `\n${task.name} 🗹`;
-      }
-      for (let task of completedTasks) {
-        text += `\n${task.name} 🗹`;
-      }
-    }
-
-    const textArea = document.createElement("textarea");
-    textArea.value = text;
-    textArea.style.position = "fixed"; // avoid scrolling to bottom
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-
-    document.execCommand("copy");
-
-    document.body.removeChild(textArea);
+    this.listsService.copyAsText(this.listName, this.model);
 
     this.copyAsTextCompleted = true;
     window.setTimeout(() => {

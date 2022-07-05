@@ -2,15 +2,11 @@ import { NotificationsServiceBase } from "../../../shared/src/services/notificat
 import { Notification } from "models/viewmodels/notification";
 
 export class NotificationsService extends NotificationsServiceBase {
-  async getAll(): Promise<Array<Notification>> {
-    const result = await this.ajax<Array<Notification>>("notifications");
-
-    return result;
+  getAll(): Promise<Array<Notification>> {
+    return this.ajax<Array<Notification>>("notifications");
   }
 
-  async getUnseenNotificationsCount(): Promise<number> {
-    const result = await this.ajax<number>("notifications/unseen-notifications-count");
-
-    return result;
+  getUnseenNotificationsCount(): Promise<number> {
+    return this.ajax<number>("notifications/unseen-notifications-count");
   }
 }

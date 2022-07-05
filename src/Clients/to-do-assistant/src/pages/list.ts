@@ -12,7 +12,6 @@ import { TasksService } from "services/tasksService";
 import { ViewList } from "models/viewmodels/viewList";
 import { SharingState } from "models/viewmodels/sharingState";
 import { State } from "utils/state/state";
-import * as Actions from "utils/state/actions";
 import { ListTask } from "models/viewmodels/listTask";
 import { AppEvents } from "models/appEvents";
 import { SoundPlayer } from "utils/soundPlayer";
@@ -317,11 +316,15 @@ export class List {
           this.similarTaskNames = [];
 
           try {
-            await this.tasksService.create(this.model.id, this.newTaskName, this.isOneTime, this.isPrivate);
+            await this.tasksService.create(
+              this.model.id,
+              this.newTaskName,
+              this.isOneTime,
+              this.isPrivate,
+              this.listsService
+            );
             this.newTaskIsLoading = false;
             this.newTaskName = "";
-
-            await Actions.getLists(this.listsService);
 
             const list = this.state.lists.find((x) => x.id === this.listId);
 
@@ -468,8 +471,6 @@ export class List {
 
   async restore() {
     await this.listsService.setIsArchived(this.model.id, false);
-
-    await Actions.getLists(this.listsService);
 
     this.router.navigateToRoute("listsEdited", { editedId: this.model.id });
   }

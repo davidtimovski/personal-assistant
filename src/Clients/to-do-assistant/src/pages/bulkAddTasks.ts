@@ -10,7 +10,6 @@ import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 import { BulkAddTasksModel } from "models/viewmodels/bulkAddTasksModel";
 import { TasksService } from "services/tasksService";
 import { ListsService } from "services/listsService";
-import * as Actions from "utils/state/actions";
 
 @inject(Router, TasksService, ListsService, ValidationController, EventAggregator)
 @connectTo()
@@ -70,15 +69,8 @@ export class BulkAddTasks {
       this.saveButtonIsLoading = false;
     } else {
       try {
-        await this.tasksService.bulkCreate(
-          this.model.listId,
-          this.model.tasksText,
-          this.model.tasksAreOneTime,
-          this.model.tasksArePrivate
-        );
+        await this.tasksService.bulkCreate(this.model, this.listsService);
         this.tasksTextIsInvalid = false;
-
-        await Actions.getLists(this.listsService);
 
         this.eventAggregator.publish(AlertEvents.ShowSuccess, "bulkAddTasks.addSuccessful");
 

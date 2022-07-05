@@ -3,7 +3,7 @@ import { json } from "aurelia-fetch-client";
 import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
 import { ErrorLogger } from "../../../shared/src/services/errorLogger";
 
-import { List } from "models/entities/list";
+import { List, Task } from "models/entities";
 import { ListWithShares } from "models/viewmodels/listWithShares";
 import { Share } from "models/viewmodels/share";
 import { ShareRequest } from "models/viewmodels/shareRequest";
@@ -12,6 +12,9 @@ import { CanShareList } from "models/viewmodels/canShareList";
 import { AssigneeOption } from "models/viewmodels/assigneeOption";
 import { ListIcon } from "models/viewmodels/listIcon";
 import { EditListModel } from "models/viewmodels/editListModel";
+import { ArchivedList } from "models/viewmodels/archivedList";
+import { ListModel } from "models/viewmodels/listModel";
+import * as Actions from "utils/state/actions";
 import * as environment from "../../config/environment.json";
 
 export class ListsService extends HttpProxyBase {
@@ -23,46 +26,32 @@ export class ListsService extends HttpProxyBase {
     return result;
   }
 
-  async getAllAsOptions(): Promise<ListOption[]> {
-    const result = await this.ajax<ListOption[]>("lists/options");
-
-    return result;
+  getAllAsOptions(): Promise<ListOption[]> {
+    return this.ajax<ListOption[]>("lists/options");
   }
 
-  async get(id: number): Promise<EditListModel> {
-    const result = await this.ajax<EditListModel>(`lists/${id}`);
-
-    return result;
+  get(id: number): Promise<EditListModel> {
+    return this.ajax<EditListModel>(`lists/${id}`);
   }
 
-  async getWithShares(id: number): Promise<ListWithShares> {
-    const result = await this.ajax<ListWithShares>(`lists/${id}/with-shares`);
-
-    return result;
+  getWithShares(id: number): Promise<ListWithShares> {
+    return this.ajax<ListWithShares>(`lists/${id}/with-shares`);
   }
 
-  async getShareRequests(): Promise<ShareRequest[]> {
-    const result = await this.ajax<ShareRequest[]>("lists/share-requests");
-
-    return result;
+  getShareRequests(): Promise<ShareRequest[]> {
+    return this.ajax<ShareRequest[]>("lists/share-requests");
   }
 
-  async getPendingShareRequestsCount(): Promise<number> {
-    const result = await this.ajax<number>("lists/pending-share-requests-count");
-
-    return result;
+  getPendingShareRequestsCount(): Promise<number> {
+    return this.ajax<number>("lists/pending-share-requests-count");
   }
 
-  async getIsShared(id: number): Promise<boolean> {
-    const result = await this.ajax<boolean>(`lists/${id}/shared`);
-
-    return result;
+  getIsShared(id: number): Promise<boolean> {
+    return this.ajax<boolean>(`lists/${id}/shared`);
   }
 
-  async getMembersAsAssigneeOptions(id: number): Promise<AssigneeOption[]> {
-    const result = await this.ajax<AssigneeOption[]>(`lists/${id}/members`);
-
-    return result;
+  getMembersAsAssigneeOptions(id: number): Promise<AssigneeOption[]> {
+    return this.ajax<AssigneeOption[]>(`lists/${id}/members`);
   }
 
   async create(name: string, icon: string, isOneTimeToggleDefault: boolean, tasksText: string): Promise<number> {
@@ -77,6 +66,8 @@ export class ListsService extends HttpProxyBase {
         }),
       });
 
+      await Actions.getLists(this);
+
       return id;
     } catch (e) {
       this.logger.logError(e);
@@ -90,6 +81,8 @@ export class ListsService extends HttpProxyBase {
         method: "put",
         body: json(list),
       });
+
+      await Actions.getLists(this);
     } catch (e) {
       this.logger.logError(e);
       throw e;
@@ -105,6 +98,8 @@ export class ListsService extends HttpProxyBase {
           notificationsEnabled: list.notificationsEnabled,
         }),
       });
+
+      await Actions.getLists(this);
     } catch (e) {
       this.logger.logError(e);
       throw e;
@@ -116,16 +111,16 @@ export class ListsService extends HttpProxyBase {
       await this.ajaxExecute(`lists/${id}`, {
         method: "delete",
       });
+
+      await Actions.getLists(this);
     } catch (e) {
       this.logger.logError(e);
       throw e;
     }
   }
 
-  async canShareListWithUser(email: string): Promise<CanShareList> {
-    const result = await this.ajax<CanShareList>(`lists/can-share-with-user/${email}`);
-
-    return result;
+  canShareListWithUser(email: string): Promise<CanShareList> {
+    return this.ajax<CanShareList>(`lists/can-share-with-user/${email}`);
   }
 
   async share(id: number, newShares: Share[], editedShares: Share[], removedShares: Share[]): Promise<void> {
@@ -139,6 +134,8 @@ export class ListsService extends HttpProxyBase {
           removedShares: removedShares,
         }),
       });
+
+      await Actions.getLists(this);
     } catch (e) {
       this.logger.logError(e);
       throw e;
@@ -150,6 +147,8 @@ export class ListsService extends HttpProxyBase {
       await this.ajaxExecute(`lists/${id}/leave`, {
         method: "delete",
       });
+
+      await Actions.getLists(this);
     } catch (e) {
       this.logger.logError(e);
       throw e;
@@ -167,7 +166,74 @@ export class ListsService extends HttpProxyBase {
         }),
       });
 
+      await Actions.getLists(this);
+
       return id;
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
+  }
+
+  copyAsText(listName: string, listToCopy: List) {
+    try {
+      let text = listName;
+
+      const tasks = listToCopy.tasks
+        .filter((x) => !x.isCompleted && !x.isPrivate)
+        .sort((a: Task, b: Task) => {
+          return a.order - b.order;
+        });
+      const privateTasks = listToCopy.tasks
+        .filter((x) => !x.isCompleted && x.isPrivate)
+        .sort((a: Task, b: Task) => {
+          return a.order - b.order;
+        });
+      const completedTasks = listToCopy.tasks
+        .filter((x) => x.isCompleted && !x.isPrivate)
+        .sort((a: Task, b: Task) => {
+          return a.order - b.order;
+        });
+      const completedPrivateTasks = listToCopy.tasks
+        .filter((x) => x.isCompleted && x.isPrivate)
+        .sort((a: Task, b: Task) => {
+          return a.order - b.order;
+        });
+
+      if (privateTasks.length + tasks.length > 0) {
+        text += "\n";
+
+        for (let task of privateTasks) {
+          text += `\n${task.name} ☐`;
+        }
+        for (let task of tasks) {
+          text += `\n${task.name} ☐`;
+        }
+      }
+
+      if (completedPrivateTasks.length + completedTasks.length > 0) {
+        if (tasks.length > 0) {
+          text += "\n----------";
+        }
+
+        for (let task of completedPrivateTasks) {
+          text += `\n${task.name} 🗹`;
+        }
+        for (let task of completedTasks) {
+          text += `\n${task.name} 🗹`;
+        }
+      }
+
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed"; // avoid scrolling to bottom
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      document.execCommand("copy");
+
+      document.body.removeChild(textArea);
     } catch (e) {
       this.logger.logError(e);
       throw e;
@@ -183,6 +249,8 @@ export class ListsService extends HttpProxyBase {
           isArchived: isArchived,
         }),
       });
+
+      await Actions.getLists(this);
     } catch (e) {
       this.logger.logError(e);
       throw e;
@@ -197,6 +265,8 @@ export class ListsService extends HttpProxyBase {
           listId: id,
         }),
       });
+
+      await Actions.getLists(this);
     } catch (e) {
       this.logger.logError(e);
       throw e;
@@ -212,6 +282,8 @@ export class ListsService extends HttpProxyBase {
           isAccepted: isAccepted,
         }),
       });
+
+      await Actions.getLists(this);
     } catch (e) {
       this.logger.logError(e);
       throw e;
@@ -232,6 +304,58 @@ export class ListsService extends HttpProxyBase {
       this.logger.logError(e);
       throw e;
     }
+  }
+
+  static getForHomeScreen(lists: List[]): ListModel[] {
+    return lists
+      .filter((x) => !x.isArchived && !x.computedListType)
+      .sort((a: List, b: List) => {
+        return a.order - b.order;
+      })
+      .map(
+        (x) =>
+          new ListModel(
+            x.id,
+            x.name,
+            x.icon,
+            x.sharingState,
+            x.order,
+            x.computedListType,
+            null,
+            x.tasks.filter((x) => !x.isCompleted).length
+          )
+      );
+  }
+
+  static getComputedForHomeScreen(lists: List[], computedListNameLookup: any): ListModel[] {
+    return lists
+      .filter((x) => x.computedListType)
+      .map(
+        (x) =>
+          new ListModel(
+            x.id,
+            computedListNameLookup[x.computedListType],
+            x.icon,
+            x.sharingState,
+            x.order,
+            x.computedListType,
+            this.getComputedListIconClass(x.computedListType),
+            x.tasks.filter((x) => !x.isCompleted).length
+          )
+      );
+  }
+
+  static getArchived(lists: List[]): ArchivedList[] {
+    return lists
+      .filter((x) => x.isArchived)
+      .sort((a: List, b: List) => {
+        const aDate = new Date(a.modifiedDate);
+        const bDate = new Date(b.modifiedDate);
+        if (aDate > bDate) return -1;
+        if (aDate < bDate) return 1;
+        return 0;
+      })
+      .map((x) => new ArchivedList(x.id, x.name, x.icon, x.sharingState));
   }
 
   static getIconOptions(): ListIcon[] {
