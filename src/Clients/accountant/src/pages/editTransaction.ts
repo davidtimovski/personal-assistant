@@ -32,7 +32,7 @@ export class EditTransaction {
   private transactionId: number;
   private model: EditTransactionModel;
   private type: TransactionType;
-  private categoryOptions: Array<SelectOption>;
+  private categoryOptions: SelectOption[];
   private originalTransactionJson: string;
   private readonly maxDate: string;
   private decPasswordInput: HTMLInputElement;

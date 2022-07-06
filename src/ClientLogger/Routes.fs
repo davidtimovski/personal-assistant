@@ -6,7 +6,6 @@ open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Logging
 open Giraffe
 open Models
-open Repository
 
 let private getConnectionString (ctx: HttpContext) =
     let config = ctx.GetService<IConfiguration>()
@@ -15,10 +14,10 @@ let private getConnectionString (ctx: HttpContext) =
 let createLog: HttpHandler =
     fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
-            let! error = ctx.BindJsonAsync<LogError>()
+            let! error = ctx.BindJsonAsync<CreateError>()
             let connectionString = getConnectionString ctx
 
-            createError error connectionString |> ignore
+            Repository.createError error connectionString |> ignore
 
             ctx.SetStatusCode 201
 

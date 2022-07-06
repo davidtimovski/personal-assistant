@@ -1,4 +1,3 @@
 export enum HttpError {
-  Unexpected,
-  Unauthorized,
+  Unauthorized = "unauthorized",
 }

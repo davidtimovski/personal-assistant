@@ -55,7 +55,7 @@ export class TransferFunds {
       .on(this.model);
   }
 
-  async attached() {
+  attached() {
     this.accountsService.getMainId().then(async (mainAccountId: number) => {
       this.mainAccountId = mainAccountId;
 
@@ -72,7 +72,7 @@ export class TransferFunds {
       this.model.accountOptions = options;
     });
 
-    this.accountsService.getAllWithBalance(this.model.currency).then((accounts: Array<Account>) => {
+    this.accountsService.getAllWithBalance(this.model.currency).then((accounts: Account[]) => {
       this.accounts = accounts;
     });
   }

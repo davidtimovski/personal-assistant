@@ -4,13 +4,14 @@ import { json } from "aurelia-fetch-client";
 import { AuthService } from "./authService";
 import { DateHelper } from "../utils/dateHelper";
 import { HttpError } from "../models/enums/httpError";
+import { ValidationErrors } from "models/validationErrors";
 
 @inject(AuthService)
 export class ErrorLogger {
   constructor(private readonly baseUrl: string, private readonly authService: AuthService) {}
 
   async logError(error: any): Promise<void> {
-    if (!navigator.onLine || error === HttpError.Unauthorized) {
+    if (!navigator.onLine || error === HttpError.Unauthorized || error instanceof ValidationErrors) {
       return;
     }
 
@@ -22,6 +23,8 @@ export class ErrorLogger {
       stackTrace = error.stack;
     } else if (typeof error === "string") {
       message = error;
+    } else {
+      message = error.toString();
     }
 
     await window.fetch(`${this.baseUrl}/logs`, {

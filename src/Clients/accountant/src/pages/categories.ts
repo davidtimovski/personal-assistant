@@ -9,7 +9,7 @@ import { AppEvents } from "models/appEvents";
 
 @inject(Router, CategoriesService, EventAggregator)
 export class Categories {
-  private categories: Array<CategoryItem>;
+  private categories: CategoryItem[];
   private lastEditedId: number;
   private syncing = false;
 
@@ -52,7 +52,7 @@ export class Categories {
     this.categories = categoryItems;
   }
 
-  mapToCategoryItem(category: Category, subCategories: Array<Category>) {
+  mapToCategoryItem(category: Category, subCategories: Category[]) {
     return new CategoryItem(
       category.id,
       category.name,

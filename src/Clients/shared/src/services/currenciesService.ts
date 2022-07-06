@@ -29,7 +29,7 @@ export class CurrenciesService extends HttpProxyBase {
     this.localStorage.setCurrencyRates(JSON.stringify(this.currencyRates));
   }
 
-  getCurrencies(): Array<string> {
+  getCurrencies(): string[] {
     const currencies = new Array<string>();
 
     const currencyRates = this.currencyRates ? this.currencyRates : JSON.parse(this.localStorage.getCurrencyRates());

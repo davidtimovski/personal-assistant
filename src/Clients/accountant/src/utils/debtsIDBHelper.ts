@@ -1,7 +1,7 @@
 import { inject } from "aurelia-framework";
 
 import { DebtModel } from "models/entities/debt";
-import { CreatedIdPair } from "models/sync/created";
+import { CreatedIdPair } from "models/sync";
 import { IDBContext } from "./idbContext";
 
 @inject(IDBContext)
@@ -64,7 +64,7 @@ export class DebtsIDBHelper {
     await this.db.debts.delete(id);
   }
 
-  async sync(deletedDebtIds: Array<number>, debts: Array<DebtModel>) {
+  async sync(deletedDebtIds: number[], debts: DebtModel[]) {
     await this.db.transaction("rw", this.db.debts, async () => {
       if (deletedDebtIds.length > 0) {
         await this.db.debts.bulkDelete(deletedDebtIds);
@@ -85,7 +85,7 @@ export class DebtsIDBHelper {
     return debts.filter((d) => !d.synced).toArray();
   }
 
-  async consolidate(debtIdPairs: Array<CreatedIdPair>) {
+  async consolidate(debtIdPairs: CreatedIdPair[]) {
     if (debtIdPairs.length === 0) {
       return;
     }

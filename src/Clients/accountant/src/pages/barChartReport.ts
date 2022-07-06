@@ -19,9 +19,10 @@ import { CategoryType } from "models/entities/category";
 export class BarChartReport {
   private mainAccountId: number;
   private currency: string;
+  private language: string;
   private chart: Chart;
-  private fromOptions: Array<FromOption>;
-  private categoryOptions: Array<SelectOption>;
+  private fromOptions: FromOption[];
+  private categoryOptions: SelectOption[];
   private balanceAverage: number;
   private spentAverage: number;
   private depositedAverage: number;
@@ -51,6 +52,7 @@ export class BarChartReport {
 
   activate() {
     this.currency = this.localStorage.getCurrency();
+    this.language = this.localStorage.getLanguage();
 
     const fromOptions = new Array<FromOption>();
     const now = new Date();
@@ -132,13 +134,13 @@ export class BarChartReport {
     for (let i = 0; i < monthsDiff; i++) {
       const date = DateHelper.formatYYYYMM(fromDate);
 
-      let monthString = this.i18n.tr(`months.${fromDate.getMonth()}`).substring(0, 3);
+      let monthString = DateHelper.getShortMonth(fromDate, this.language);
       if (fromDate.getFullYear() < now.getFullYear()) {
         monthString += " " + fromDate.getFullYear().toString().substring(2, 4);
       }
 
       if (itemGroups.has(date)) {
-        let monthTransactions: Array<TransactionModel>;
+        let monthTransactions: TransactionModel[];
         for (const key of itemGroups.keys()) {
           if (key === date) {
             monthTransactions = itemGroups.get(key);
@@ -258,7 +260,7 @@ export class BarChartReport {
     this.chart.update();
   }
 
-  groupBy(list: Array<TransactionModel>, keyGetter: { (x: TransactionModel): string; (arg0: TransactionModel): any }) {
+  groupBy(list: TransactionModel[], keyGetter: { (x: TransactionModel): string; (arg0: TransactionModel): any }) {
     const map = new Map();
     list.forEach((item) => {
       const key = keyGetter(item);

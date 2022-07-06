@@ -8,8 +8,8 @@ export class Capital {
     public spent: number,
     public upcoming: number,
     public available: number,
-    public expenditures: Array<AmountByCategory>,
-    public upcomingExpenses: Array<UpcomingExpenseDashboard>,
-    public debt: Array<DebtDashboard>
+    public expenditures: AmountByCategory[],
+    public upcomingExpenses: UpcomingExpenseDashboard[],
+    public debt: DebtDashboard[]
   ) {}
 }

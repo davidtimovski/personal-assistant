@@ -1,5 +1,5 @@
 import { CategoryType } from "models/entities/category";
-import { Syncable } from "models/sync/syncable";
+import { Syncable } from "models/syncable";
 
 export class CategoryItem implements Syncable {
   constructor(
@@ -8,6 +8,6 @@ export class CategoryItem implements Syncable {
     public type: CategoryType,
     public generateUpcomingExpense: boolean,
     public synced: boolean,
-    public subCategories: Array<CategoryItem>
+    public subCategories: CategoryItem[]
   ) {}
 }

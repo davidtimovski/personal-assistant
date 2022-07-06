@@ -9,7 +9,7 @@ export class StockPriceInputCustomElement {
   @bindable({ defaultBindingMode: bindingMode.twoWay }) amount: number;
   @bindable({ defaultBindingMode: bindingMode.twoWay }) currency: string;
 
-  private currencySuggestions: Array<CurrencySuggestion>;
+  private currencySuggestions: CurrencySuggestion[];
   private changing = false;
   private autocomplete: AutocompleteResult;
   private selectCurrencyInput: HTMLInputElement;

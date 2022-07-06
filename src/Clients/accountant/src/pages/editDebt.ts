@@ -187,15 +187,13 @@ export class EditDebt {
 
       try {
         await this.debtsService.delete(this.model.id);
+
         this.eventAggregator.publish(AlertEvents.ShowSuccess, "editDebt.deleteSuccessful");
         this.router.navigateToRoute("debt");
-      } catch (e) {
-        this.eventAggregator.publish(AlertEvents.ShowError, e);
-
+      } catch {
         this.deleteButtonText = this.i18n.tr("delete");
         this.deleteInProgress = false;
         this.deleteButtonIsLoading = false;
-        return;
       }
     } else {
       this.deleteButtonText = this.i18n.tr("sure");

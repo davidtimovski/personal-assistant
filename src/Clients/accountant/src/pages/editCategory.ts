@@ -19,8 +19,8 @@ export class EditCategory {
   private originalCategoryJson: string;
   private isNewCategory: boolean;
   private isParent: boolean;
-  private parentCategoryOptions: Array<SelectOption>;
-  private typeOptions: Array<SelectOption>;
+  private parentCategoryOptions: SelectOption[];
+  private typeOptions: SelectOption[];
   private nameInput: HTMLInputElement;
   private nameIsInvalid: boolean;
   private saveButtonText: string;

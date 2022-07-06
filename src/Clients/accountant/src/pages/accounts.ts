@@ -9,8 +9,8 @@ import { AppEvents } from "models/appEvents";
 
 @inject(Router, AccountsService, LocalStorage, EventAggregator)
 export class Accounts {
-  private accounts: Array<AccountItem>;
-  private funds: Array<AccountItem>;
+  private accounts: AccountItem[];
+  private funds: AccountItem[];
   private sum: number;
   private currency: string;
   private viewStocks = false;

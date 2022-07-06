@@ -5,7 +5,7 @@ open Npgsql
 open Npgsql.FSharp
 open Models
 
-let createError (error : LogError) (connectionString : string) =
+let createError (error : CreateError) (connectionString : string) =
     use connection = new NpgsqlConnection(connectionString)
     connection.Open()
 

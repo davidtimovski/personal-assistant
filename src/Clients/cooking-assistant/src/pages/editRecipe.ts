@@ -6,6 +6,7 @@ import { EventAggregator } from "aurelia-event-aggregator";
 
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
+import { ValidationErrors } from "../../../shared/src/models/validationErrors";
 
 import * as environment from "../../config/environment.json";
 import { RecipesService } from "services/recipesService";
@@ -287,7 +288,7 @@ export class EditRecipe {
     this.imageIsUploading = true;
     try {
       this.model.imageUri = await this.recipesService.uploadTempImage(this.imageInput.files[0]);
-    } catch (e) {
+    } catch {
       this.saveButtonIsLoading = false;
     }
     this.imageIsUploading = false;
@@ -319,8 +320,11 @@ export class EditRecipe {
           this.router.navigateToRoute("recipesEdited", {
             editedId: this.model.id,
           });
-        } catch (errorFields) {
-          this.nameIsInvalid = errorFields.includes("Name");
+        } catch (e) {
+          if (e instanceof ValidationErrors) {
+            this.nameIsInvalid = e.fields.includes("Name");
+          }
+
           this.saveButtonIsLoading = false;
         }
       } else {
@@ -343,8 +347,11 @@ export class EditRecipe {
           this.router.navigateToRoute("recipesEdited", {
             editedId: this.model.id,
           });
-        } catch (errorFields) {
-          this.nameIsInvalid = errorFields.includes("Name");
+        } catch (e) {
+          if (e instanceof ValidationErrors) {
+            this.nameIsInvalid = e.fields.includes("Name");
+          }
+
           this.saveButtonIsLoading = false;
         }
       }

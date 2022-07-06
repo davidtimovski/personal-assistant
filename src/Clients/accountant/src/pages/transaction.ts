@@ -3,6 +3,7 @@ import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
+import { DateHelper } from "../../../shared/src/utils/dateHelper";
 
 import { CategoriesService } from "services/categoriesService";
 import { AccountsService } from "services/accountsService";
@@ -18,11 +19,12 @@ export class Transaction {
   private fromExpenditureHeatmap: boolean;
   private model: ViewTransaction;
   private currency: string;
+  private language: string;
   private passwordInput: HTMLInputElement;
   private passwordShown = false;
   private decryptButtonIsLoading = false;
   private decryptionPasswordIsInvalid: boolean;
-  private typeStringLookup: Array<string>;
+  private typeStringLookup: string[];
 
   constructor(
     private readonly router: Router,
@@ -45,6 +47,7 @@ export class Transaction {
     this.fromExpenditureHeatmap = <boolean>params.fromExpenditureHeatmap;
 
     this.currency = this.localStorage.getCurrency();
+    this.language = this.localStorage.getLanguage();
   }
 
   async attached() {
@@ -101,14 +104,14 @@ export class Transaction {
       model.accountValue = fromAccount.name;
     }
 
-    model.date = this.formatOcccurrenceDate(transaction.date);
+    model.date = this.formatOccurrenceDate(transaction.date);
 
     this.model = model;
   }
 
-  formatOcccurrenceDate(occcurrenceDateString: string): string {
-    const date = new Date(Date.parse(occcurrenceDateString));
-    const month = this.i18n.tr(`months.${date.getMonth()}`);
+  formatOccurrenceDate(occurrenceDateString: string): string {
+    const date = new Date(Date.parse(occurrenceDateString));
+    const month = DateHelper.getLongMonth(date, this.language);
 
     const now = new Date();
     if (now.getFullYear() === date.getFullYear()) {

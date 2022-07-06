@@ -2,7 +2,7 @@
 
 open System
 
-type LogError =
+type CreateError =
     {
         UserId : int
         Message : string

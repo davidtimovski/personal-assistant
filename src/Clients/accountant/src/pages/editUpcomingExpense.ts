@@ -28,7 +28,7 @@ import { CategoryType } from "models/entities/category";
 export class EditUpcomingExpense {
   private upcomingExpenseId: number;
   private model: EditUpcomingExpenseModel;
-  private categoryOptions: Array<SelectOption>;
+  private categoryOptions: SelectOption[];
   private originalUpcomingExpenseJson: string;
   private isNewUpcomingExpense: boolean;
   private amountInput: HTMLInputElement;
@@ -39,6 +39,7 @@ export class EditUpcomingExpense {
   private deleteButtonText: string;
   private saveButtonIsLoading = false;
   private deleteButtonIsLoading = false;
+  private language: string;
 
   constructor(
     private readonly router: Router,
@@ -60,6 +61,8 @@ export class EditUpcomingExpense {
   }
 
   activate(params: any) {
+    this.language = this.localStorage.getLanguage();
+
     this.upcomingExpenseId = parseInt(params.id, 10);
     this.isNewUpcomingExpense = this.upcomingExpenseId === 0;
 
@@ -208,15 +211,13 @@ export class EditUpcomingExpense {
 
       try {
         await this.upcomingExpensesService.delete(this.model.id);
+
         this.eventAggregator.publish(AlertEvents.ShowSuccess, "editUpcomingExpense.deleteSuccessful");
         this.router.navigateToRoute("upcomingExpenses");
-      } catch (e) {
-        this.eventAggregator.publish(AlertEvents.ShowError, e);
-
+      } catch {
         this.deleteButtonText = this.i18n.tr("delete");
         this.deleteInProgress = false;
         this.deleteButtonIsLoading = false;
-        return;
       }
     } else {
       this.deleteButtonText = this.i18n.tr("sure");

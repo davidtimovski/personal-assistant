@@ -9,6 +9,6 @@ export class TransferFundsModel {
     public toAccount: Account,
     public amount: number,
     public currency: string,
-    public accountOptions: Array<SelectOption>
+    public accountOptions: SelectOption[]
   ) {}
 }

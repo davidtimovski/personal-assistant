@@ -28,6 +28,7 @@
                 <th class="edit-link-cell"></th>
                 <th t="amount">Amount</th>
                 <th t="debt.person">Person</th>
+                <th t="debt.created">Created</th>
                 <th class="sync-icon-cell"></th>
               </tr>
             </thead>
@@ -50,6 +51,7 @@
                 </td>
                 <td>${debt.amount | numberFormat:debt.currency}</td>
                 <td>${debt.person}</td>
+                <td>${debt.created}</td>
                 <td class="sync-icon-cell">
                   <i if.bind="!debt.synced" class="fas fa-sync-alt" t="[title,aria-label]notSynced"></i>
                 </td>

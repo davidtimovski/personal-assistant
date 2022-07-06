@@ -6,7 +6,7 @@ import { Tooltip } from "../../../shared/src/models/tooltip";
 
 @inject(TooltipsService, I18N)
 export class Help {
-  private tooltips: Array<Tooltip>;
+  private tooltips: Tooltip[];
 
   constructor(private readonly tooltipsService: TooltipsService, private readonly i18n: I18N) {}
 

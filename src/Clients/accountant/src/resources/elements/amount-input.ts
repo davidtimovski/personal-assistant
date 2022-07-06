@@ -12,7 +12,7 @@ export class AmountInputCustomElement {
   @bindable({ defaultBindingMode: bindingMode.toView }) inputId: string = "amount";
   @bindable({ defaultBindingMode: bindingMode.toView }) focusOnInit: boolean;
 
-  private currencySuggestions: Array<CurrencySuggestion>;
+  private currencySuggestions: CurrencySuggestion[];
   private changing = false;
   private autocomplete: AutocompleteResult;
   private amountInput: HTMLInputElement;

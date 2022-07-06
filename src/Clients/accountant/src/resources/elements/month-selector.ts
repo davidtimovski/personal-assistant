@@ -1,20 +1,19 @@
-import { bindable, bindingMode, inject } from "aurelia-framework";
-import { I18N } from "aurelia-i18n";
-
+import { bindable, bindingMode } from "aurelia-framework";
+import { DateHelper } from "../../../../shared/src/utils/dateHelper";
 import { SelectOption } from "models/viewmodels/selectOption";
 
-@inject(I18N)
 export class MonthSelectorCustomElement {
   @bindable({ defaultBindingMode: bindingMode.twoWay }) month: number;
   @bindable({ defaultBindingMode: bindingMode.twoWay }) year: number;
   @bindable({ defaultBindingMode: bindingMode.toView }) disabled: boolean;
+  @bindable({ defaultBindingMode: bindingMode.toView }) language: string;
 
-  private monthOptions: Array<SelectOption>;
-  private yearOptions: Array<number> = [];
+  private monthOptions: SelectOption[];
+  private yearOptions = new Array<number>();
   private currentMonth: number;
   private currentYear: number;
 
-  constructor(private readonly i18n: I18N) {
+  constructor() {
     const now = new Date();
     this.currentMonth = now.getMonth();
     this.currentYear = now.getFullYear();
@@ -44,7 +43,8 @@ export class MonthSelectorCustomElement {
 
     this.monthOptions = [];
     for (let i = startingMonthOption; i < 12; i++) {
-      const option = new SelectOption(i, this.i18n.tr(`months.${i}`));
+      const month = new Date(1, i, 1);
+      const option = new SelectOption(i, DateHelper.getLongMonth(month, this.language));
       this.monthOptions.push(option);
     }
   }

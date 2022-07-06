@@ -36,7 +36,7 @@ export class NewTransaction {
   private debtId: number;
   private userIsDebtor: boolean;
   private debtPerson: string;
-  private categoryOptions: Array<SelectOption>;
+  private categoryOptions: SelectOption[];
   private originalTransactionJson: string;
   private readonly maxDate: string;
   private passwordInput: HTMLInputElement;

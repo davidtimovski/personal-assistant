@@ -1,4 +1,4 @@
-import { Syncable } from "models/sync/syncable";
+import { Syncable } from "models/syncable";
 
 export class Category implements Syncable {
   synced = false;

@@ -163,15 +163,13 @@ export class EditAccount {
 
       try {
         await this.accountsService.delete(this.account.id);
+
         this.eventAggregator.publish(AlertEvents.ShowSuccess, "editAccount.deleteSuccessful");
         this.router.navigateToRoute("accounts");
-      } catch (e) {
-        this.eventAggregator.publish(AlertEvents.ShowError, e);
-
+      } catch {
         this.deleteButtonText = this.i18n.tr("delete");
         this.deleteInProgress = false;
         this.deleteButtonIsLoading = false;
-        return;
       }
     } else {
       if (await this.accountsService.hasTransactions(this.account.id)) {

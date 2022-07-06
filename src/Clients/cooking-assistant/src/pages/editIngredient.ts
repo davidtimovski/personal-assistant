@@ -13,6 +13,7 @@ import autocomplete, { AutocompleteResult } from "autocompleter";
 
 import { LocalStorageCurrencies } from "../../../shared/src/utils/localStorageCurrencies";
 import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
+import { ValidationErrors } from "../../../shared/src/models/validationErrors";
 
 import { IngredientsService } from "services/ingredientsService";
 import { EditIngredientModel } from "models/viewmodels/editIngredientModel";
@@ -320,8 +321,10 @@ export class EditIngredient {
         this.router.navigateToRoute("ingredientsEdited", {
           editedId: this.ingredientId,
         });
-      } catch (errorFields) {
-        this.nameIsInvalid = errorFields.includes("Name");
+      } catch (e) {
+        if (e instanceof ValidationErrors) {
+          this.nameIsInvalid = e.fields.includes("Name");
+        }
       }
     } else {
       let errorMessages = new Array<string>();

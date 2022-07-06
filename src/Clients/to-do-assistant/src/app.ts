@@ -70,7 +70,6 @@ export class App {
 
     config.options.root = "/";
     config.options.pushState = true;
-    config.title = "To Do Assistant";
 
     this.addLoginRoute(config);
     config.addAuthorizeStep(AuthorizeStep);
@@ -109,9 +108,9 @@ export class App {
     try {
       await callbackHandler();
       navigationInstruction();
-    } catch (err) {
+    } catch (e) {
       navigationInstruction();
-      throw err;
+      throw e;
     }
   }
 }

@@ -18,7 +18,7 @@ export class BalanceAdjustment {
   private originalBalance: number;
   private currency: string;
   private originalAdjustmentJson: string;
-  private accountOptions: Array<SelectOption>;
+  private accountOptions: SelectOption[];
   private balanceIsInvalid: boolean;
   private adjustButtonIsLoading = false;
 

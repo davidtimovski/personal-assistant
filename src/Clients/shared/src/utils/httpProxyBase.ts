@@ -6,10 +6,11 @@ import { AuthService } from "../../../shared/src/services/authService";
 
 import { HttpError } from "../models/enums/httpError";
 import { AlertEvents } from "../models/enums/alertEvents";
+import { ValidationErrors } from "models/validationErrors";
 
 @inject(AuthService, HttpClient, EventAggregator)
 export class HttpProxyBase {
-  protected readonly successCodes: Array<number> = [200, 201, 204];
+  protected readonly successCodes = [200, 201, 204];
 
   constructor(
     protected readonly authService: AuthService,
@@ -17,56 +18,65 @@ export class HttpProxyBase {
     protected readonly eventAggregator: EventAggregator
   ) {}
 
-  protected async ajax<T>(uri: string, requestInit?: RequestInit): Promise<T> {
+  protected async ajax<T>(uri: string, init?: RequestInit): Promise<T> {
     let response: Response;
 
     try {
-      response = await this.httpClient.fetch(uri, requestInit);
-    } catch (error) {
+      response = await this.httpClient.fetch(uri, init);
+    } catch (e) {
       this.eventAggregator.publish(AlertEvents.ShowError, "unexpectedError");
-      throw [];
+      throw e;
     }
 
     if (!this.successCodes.includes(response.status)) {
       this.redirectIfUnauthorized(response.status);
 
-      return await this.HandleErrorCodes(response);
+      if (response.status === 404) {
+        return null;
+      }
+
+      await this.HandleErrorCodes(response);
     }
 
     if (response.status === 204) {
-      throw HttpError.Unexpected;
+      this.eventAggregator.publish(AlertEvents.ShowError, "unexpectedError");
+      throw new Error(`GET request to '${uri}' returned 204 No Content.`);
     }
 
     return <T>await response.json();
   }
 
-  protected async ajaxBlob(uri: string, requestInit?: RequestInit): Promise<Blob> {
+  protected async ajaxBlob(uri: string, init?: RequestInit): Promise<Blob> {
     let response: Response;
 
     try {
-      response = await this.httpClient.fetch(uri, requestInit);
-    } catch (error) {
+      response = await this.httpClient.fetch(uri, init);
+    } catch (e) {
       this.eventAggregator.publish(AlertEvents.ShowError, "unexpectedError");
-      throw [];
+      throw e;
     }
 
     if (!this.successCodes.includes(response.status)) {
       this.redirectIfUnauthorized(response.status);
 
-      return await this.HandleErrorCodes(response);
+      if (response.status === 404) {
+        return null;
+      }
+
+      await this.HandleErrorCodes(response);
     }
 
     return response.blob();
   }
 
-  protected async ajaxExecute(uri: string, requestInit?: RequestInit): Promise<void> {
+  protected async ajaxExecute(uri: string, init?: RequestInit): Promise<void> {
     let response: Response;
 
     try {
-      response = await this.httpClient.fetch(uri, requestInit);
-    } catch (error) {
+      response = await this.httpClient.fetch(uri, init);
+    } catch (e) {
       this.eventAggregator.publish(AlertEvents.ShowError, "unexpectedError");
-      throw [];
+      throw e;
     }
 
     if (!this.successCodes.includes(response.status)) {
@@ -76,13 +86,17 @@ export class HttpProxyBase {
     }
   }
 
-  protected async ajaxUploadFile(uri: string, requestInit?: RequestInit): Promise<string> {
-    const response: Response = await this.httpClient.fetch(uri, requestInit);
+  protected async ajaxUploadFile(uri: string, init?: RequestInit): Promise<string> {
+    const response: Response = await this.httpClient.fetch(uri, init);
 
     if (!this.successCodes.includes(response.status)) {
       this.redirectIfUnauthorized(response.status);
 
-      return await this.HandleErrorCodes(response);
+      if (response.status === 404) {
+        return null;
+      }
+
+      await this.HandleErrorCodes(response);
     }
 
     return <string>await response.json();
@@ -95,22 +109,22 @@ export class HttpProxyBase {
     }
   }
 
-  private async HandleErrorCodes(response: Response) {
+  private async HandleErrorCodes(response: Response): Promise<void> {
     if (response.status === 404) {
-      return null;
+      throw new Error("404 Not Found returned");
     } else if (response.status === 422) {
       let errors: any;
 
       try {
         errors = await response.json();
-      } catch (_) {
+      } catch (e) {
         this.eventAggregator.publish(AlertEvents.ShowError, "unexpectedError");
-        throw HttpError.Unexpected;
+        throw e;
       }
 
       if (errors.message === "Failed to fetch") {
         this.eventAggregator.publish(AlertEvents.ShowError, "failedToFetchError");
-        throw [];
+        throw new Error("Failed to fetch");
       }
 
       const modelErrors = new Array<string>();
@@ -121,10 +135,10 @@ export class HttpProxyBase {
       }
       this.eventAggregator.publish(AlertEvents.ShowError, modelErrors);
 
-      throw errorFields;
+      throw new ValidationErrors(errorFields);
     }
 
     this.eventAggregator.publish(AlertEvents.ShowError, "unexpectedError");
-    throw HttpError.Unexpected;
+    throw new Error(`Error status code ${response.status} not handled`);
   }
 }

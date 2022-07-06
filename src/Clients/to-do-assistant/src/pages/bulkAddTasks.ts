@@ -6,6 +6,7 @@ import { connectTo } from "aurelia-store";
 
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
+import { ValidationErrors } from "../../../shared/src/models/validationErrors";
 
 import { BulkAddTasksModel } from "models/viewmodels/bulkAddTasksModel";
 import { TasksService } from "services/tasksService";
@@ -75,8 +76,11 @@ export class BulkAddTasks {
         this.eventAggregator.publish(AlertEvents.ShowSuccess, "bulkAddTasks.addSuccessful");
 
         this.router.navigateToRoute("list", { id: this.model.listId });
-      } catch (errorFields) {
-        this.tasksTextIsInvalid = errorFields.includes("TasksText");
+      } catch (e) {
+        if (e instanceof ValidationErrors) {
+          this.tasksTextIsInvalid = e.fields.includes("TasksText");
+        }
+
         this.saveButtonIsLoading = false;
       }
     }

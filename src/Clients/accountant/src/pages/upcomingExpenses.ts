@@ -3,6 +3,8 @@ import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
+import { DateHelper } from "../../../shared/src/utils/dateHelper";
+
 import { UpcomingExpensesService } from "services/upcomingExpensesService";
 import { LocalStorage } from "utils/localStorage";
 import { UpcomingExpenseItem } from "models/viewmodels/upcomingExpenseItem";
@@ -10,8 +12,9 @@ import { AppEvents } from "models/appEvents";
 
 @inject(Router, UpcomingExpensesService, I18N, EventAggregator, LocalStorage)
 export class UpcomingExpenses {
-  private upcomingExpenses: Array<UpcomingExpenseItem>;
+  private upcomingExpenses: UpcomingExpenseItem[];
   private currency: string;
+  private language: string;
   private lastEditedId: number;
   private syncing = false;
 
@@ -36,6 +39,7 @@ export class UpcomingExpenses {
     }
 
     this.currency = this.localStorage.getCurrency();
+    this.language = this.localStorage.getLanguage();
   }
 
   async attached() {
@@ -60,7 +64,7 @@ export class UpcomingExpenses {
 
   formatDate(dateString: string): string {
     const date = new Date(Date.parse(dateString));
-    const month = this.i18n.tr(`months.${date.getMonth()}`);
+    const month = DateHelper.getLongMonth(date, this.language);
 
     const now = new Date();
     if (now.getFullYear() === date.getFullYear()) {

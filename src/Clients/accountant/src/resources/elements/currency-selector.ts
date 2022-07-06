@@ -8,7 +8,7 @@ import { CurrencySuggestion } from "../../../../shared/src/models/viewmodels/cur
 @inject(CurrenciesService, LocalStorageCurrencies)
 export class CurrencySelectorCustomElement {
   private currency: string;
-  private currencySuggestions: Array<CurrencySuggestion>;
+  private currencySuggestions: CurrencySuggestion[];
   private changing = false;
   private autocomplete: AutocompleteResult;
   private selectCurrencyInput: HTMLInputElement;
