@@ -1,25 +1,4 @@
 {
-  "Routes": [
-    {
-      "DownstreamPathTemplate": "/{route}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 5002
-        }
-      ],
-      "UpstreamPathTemplate": "/clientlogger/{route}",
-      "UpstreamHttpMethod": [ "Post" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      },
-      "AddHeadersToRequest": {
-        "UserId": "Claims[sub] > value"
-      }
-    }
-  ],
   "GlobalConfiguration": {
     "BaseUrl": "https://api.personalassistant.site"
   }
