@@ -1,4 +1,4 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { I18N } from "aurelia-i18n";
 
 import { CurrenciesService } from "../../../shared/src/services/currenciesService";
@@ -13,7 +13,7 @@ import {
 import { MoneyFormattingHelper } from "utils/moneyFormattingHelper";
 import { AccountsService } from "services/accountsService";
 
-@inject(LocalStorage, I18N, CurrenciesService, AccountsService)
+@autoinject
 export class EarlyRetirementCalculator {
   private answers: EarlyRetirementAnswers;
   private currentSection = "start";

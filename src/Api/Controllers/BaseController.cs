@@ -12,7 +12,7 @@ public abstract class BaseController : Controller
         {
             if (!currentUserId.HasValue)
             {
-                string id = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                string id = User.FindFirst("sub").Value;
                 currentUserId = int.Parse(id);
             }
 

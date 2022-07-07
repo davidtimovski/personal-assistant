@@ -1,4 +1,4 @@
-import { inject, computedFrom, NewInstance } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
@@ -19,15 +19,7 @@ import { PreferencesModel } from "models/preferencesModel";
 import { UpdateDietaryProfile } from "models/viewmodels/updateDietaryProfile";
 import { DailyIntake } from "models/viewmodels/dailyIntake";
 
-@inject(
-  Router,
-  DietaryProfileService,
-  UsersService,
-  NewInstance.of(ValidationController),
-  NewInstance.of(ValidationController),
-  I18N,
-  EventAggregator
-)
+@autoinject
 export class DietaryProfile {
   private model: EditDietaryProfile;
   private originalDietaryProfileJson: string;

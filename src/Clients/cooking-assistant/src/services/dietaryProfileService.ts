@@ -1,22 +1,23 @@
+import { autoinject } from "aurelia-framework";
 import { json } from "aurelia-fetch-client";
 
-import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
+import { HttpProxy } from "../../../shared/src/utils/httpProxy";
 import { ErrorLogger } from "../../../shared/src/services/errorLogger";
 
-import { EditDietaryProfile } from "../models/viewmodels/editDietaryProfile";
-import { UpdateDietaryProfile } from "../models/viewmodels/updateDietaryProfile";
-import { RecommendedDailyIntake } from "../models/viewmodels/recommendedDailyIntake";
-import * as environment from "../../config/environment.json";
+import { EditDietaryProfile } from "models/viewmodels/editDietaryProfile";
+import { UpdateDietaryProfile } from "models/viewmodels/updateDietaryProfile";
+import { RecommendedDailyIntake } from "models/viewmodels/recommendedDailyIntake";
 
-export class DietaryProfileService extends HttpProxyBase {
-  private readonly logger = new ErrorLogger(JSON.parse(<any>environment).urls.clientLogger, this.authService);
+@autoinject
+export class DietaryProfileService {
+  constructor(private readonly httpProxy: HttpProxy, private readonly logger: ErrorLogger) {}
 
   get(): Promise<EditDietaryProfile> {
-    return this.ajax<EditDietaryProfile>("dietaryprofiles");
+    return this.httpProxy.ajax<EditDietaryProfile>("api/dietaryprofiles");
   }
 
   async getDailyIntake(getRecommendedIntake: EditDietaryProfile): Promise<RecommendedDailyIntake> {
-    const result = await this.ajax<RecommendedDailyIntake>("dietaryprofiles", {
+    const result = await this.httpProxy.ajax<RecommendedDailyIntake>("api/dietaryprofiles", {
       method: "post",
       body: json({
         birthday: getRecommendedIntake.birthday,
@@ -35,7 +36,7 @@ export class DietaryProfileService extends HttpProxyBase {
 
   async update(updateDietaryProfile: UpdateDietaryProfile): Promise<void> {
     try {
-      await this.ajaxExecute("dietaryprofiles", {
+      await this.httpProxy.ajaxExecute("api/dietaryprofiles", {
         method: "put",
         body: json(updateDietaryProfile),
       });
@@ -47,7 +48,7 @@ export class DietaryProfileService extends HttpProxyBase {
 
   async delete(): Promise<void> {
     try {
-      await this.ajaxExecute("dietaryprofiles", {
+      await this.httpProxy.ajaxExecute("api/dietaryprofiles", {
         method: "delete",
       });
     } catch (e) {

@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { EventAggregator } from "aurelia-event-aggregator";
@@ -11,7 +11,7 @@ import { SendRecipeModel } from "models/viewmodels/sendRecipeModel";
 import { Recipient } from "models/viewmodels/recipient";
 import { CanSendRecipe } from "models/viewmodels/canSendRecipe";
 
-@inject(Router, AuthService, RecipesService, ValidationController, EventAggregator)
+@autoinject
 export class SendRecipe {
   private model: SendRecipeModel;
   private recipientEmail = "";

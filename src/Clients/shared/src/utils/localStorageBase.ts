@@ -18,9 +18,7 @@ export class LocalStorageBase {
       window.localStorage.setItem("profileImageUri", "");
     }
 
-    const profileImageUriLastLoad = window.localStorage.getItem(
-      "profileImageUriLastLoad"
-    );
+    const profileImageUriLastLoad = window.localStorage.getItem("profileImageUriLastLoad");
     if (!profileImageUriLastLoad) {
       this.setProfileImageUriLastLoad(new Date(0));
     }
@@ -31,13 +29,9 @@ export class LocalStorageBase {
     return language ? language : this.defaultLanguage;
   }
   setLanguageFromUrl() {
-    const urlLanguage = window.location.pathname
-      ? window.location.pathname.substr(1)
-      : "";
+    const urlLanguage = window.location.pathname ? window.location.pathname.substr(1) : "";
     if (
-      [Language.English.toString(), Language.Macedonian.toString()].indexOf(
-        urlLanguage
-      ) !== -1 &&
+      [Language.English.toString(), Language.Macedonian.toString()].indexOf(urlLanguage) !== -1 &&
       urlLanguage !== window.localStorage.getItem("language")
     ) {
       window.localStorage.setItem("language", urlLanguage);
@@ -51,10 +45,7 @@ export class LocalStorageBase {
     window.localStorage.setItem("profileImageUri", profileImageUri);
   }
   setProfileImageUriLastLoad(lastLoad: Date) {
-    window.localStorage.setItem(
-      "profileImageUriLastLoad",
-      lastLoad.getTime().toString()
-    );
+    window.localStorage.setItem("profileImageUriLastLoad", lastLoad.getTime().toString());
   }
 
   isStale(dataType: string): boolean {

@@ -1,11 +1,11 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { User, UserManager } from "oidc-client";
 import { HttpClient } from "aurelia-fetch-client";
 import { EventAggregator } from "aurelia-event-aggregator";
 
 import { AuthEvents } from "../models/enums/authEvents";
 
-@inject(UserManager, HttpClient, EventAggregator)
+@autoinject
 export class AuthService {
   private user: User;
 

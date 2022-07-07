@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
@@ -12,7 +12,7 @@ import { SharingState } from "models/viewmodels/sharingState";
 import { State } from "utils/state/state";
 import { AppEvents } from "models/appEvents";
 
-@inject(Router, ListsService, I18N, EventAggregator)
+@autoinject
 @connectTo()
 export class ArchiveList {
   private listId: number;

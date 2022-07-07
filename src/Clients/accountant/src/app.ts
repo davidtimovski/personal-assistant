@@ -1,5 +1,5 @@
 import { NavigationInstruction, RouterConfiguration, Router } from "aurelia-router";
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { EventAggregator } from "aurelia-event-aggregator";
 import { I18N } from "aurelia-i18n";
 
@@ -14,7 +14,7 @@ import routes from "./routes";
 import { AppEvents } from "models/appEvents";
 import { AuthEvents } from "../../shared/src/models/enums/authEvents";
 
-@inject(AuthService, EventAggregator, SyncService, LocalStorage, CurrenciesService, BroadcastChannel, I18N)
+@autoinject
 export class App {
   private isTouchDevice = false;
   router: Router;
@@ -81,7 +81,6 @@ export class App {
 
     config.options.root = "/";
     config.options.pushState = true;
-    config.title = "Accountant";
 
     this.addLoginRoute(config);
     config.addAuthorizeStep(AuthorizeStep);
@@ -120,9 +119,9 @@ export class App {
     try {
       await callbackHandler();
       navigationInstruction();
-    } catch (err) {
+    } catch (e) {
       navigationInstruction();
-      throw err;
+      throw e;
     }
   }
 }

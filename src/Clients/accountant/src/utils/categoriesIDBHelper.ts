@@ -1,10 +1,10 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 
 import { Category, CategoryType } from "models/entities/category";
-import { CreatedIdPair } from "models/sync/created";
+import { CreatedIdPair } from "models/sync";
 import { IDBContext } from "./idbContext";
 
-@inject(IDBContext)
+@autoinject
 export class CategoriesIDBHelper {
   constructor(private readonly db: IDBContext) {}
 
@@ -107,7 +107,7 @@ export class CategoriesIDBHelper {
     return transactionsCount > 0;
   }
 
-  async sync(deletedCategoryIds: Array<number>, categories: Category[]) {
+  async sync(deletedCategoryIds: number[], categories: Category[]) {
     await this.db.transaction("rw", this.db.categories, this.db.transactions, this.db.upcomingExpenses, async () => {
       if (deletedCategoryIds.length > 0) {
         for (const categoryId of deletedCategoryIds) {
@@ -132,7 +132,7 @@ export class CategoriesIDBHelper {
     return categories.filter((c) => !c.synced).toArray();
   }
 
-  async consolidate(categoryIdPairs: Array<CreatedIdPair>) {
+  async consolidate(categoryIdPairs: CreatedIdPair[]) {
     if (categoryIdPairs.length === 0) {
       return;
     }

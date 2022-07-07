@@ -1,10 +1,10 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { Router } from "aurelia-router";
 
 import { RecipesService } from "services/recipesService";
 import { ReceivedRecipe } from "models/viewmodels/receivedRecipe";
 
-@inject(Router, RecipesService)
+@autoinject
 export class Inbox {
   private pendingReceivedRecipes: ReceivedRecipe[];
   private declinedReceivedRecipes: ReceivedRecipe[];

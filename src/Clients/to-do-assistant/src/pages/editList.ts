@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
@@ -6,6 +6,7 @@ import { EventAggregator } from "aurelia-event-aggregator";
 
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
+import { ValidationErrors } from "../../../shared/src/models/validationErrors";
 
 import { ListsService } from "services/listsService";
 import { UsersService } from "services/usersService";
@@ -13,7 +14,7 @@ import { EditListModel } from "models/viewmodels/editListModel";
 import { SharingState } from "models/viewmodels/sharingState";
 import { PreferencesModel } from "models/preferencesModel";
 
-@inject(Router, ListsService, UsersService, ValidationController, I18N, EventAggregator)
+@autoinject
 export class EditList {
   private model: EditListModel;
   private originalListJson: string;
@@ -126,8 +127,11 @@ export class EditList {
           this.router.navigateToRoute(redirectRoute, {
             editedId: this.model.id,
           });
-        } catch (errorFields) {
-          this.nameIsInvalid = errorFields.includes("Name");
+        } catch (e) {
+          if (e instanceof ValidationErrors) {
+            this.nameIsInvalid = e.fields.includes("Name");
+          }
+
           this.saveButtonIsLoading = false;
         }
       } else {
@@ -143,9 +147,12 @@ export class EditList {
           this.router.navigateToRoute("listsEdited", {
             editedId: id,
           });
-        } catch (errorFields) {
-          this.nameIsInvalid = errorFields.includes("Name");
-          this.tasksTextIsInvalid = errorFields.includes("TasksText");
+        } catch (e) {
+          if (e instanceof ValidationErrors) {
+            this.nameIsInvalid = e.fields.includes("Name");
+            this.tasksTextIsInvalid = e.fields.includes("TasksText");
+          }
+
           this.saveButtonIsLoading = false;
         }
       }

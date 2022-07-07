@@ -1,4 +1,4 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
@@ -12,7 +12,7 @@ import { ListTask } from "models/viewmodels/listTask";
 import { AppEvents } from "models/appEvents";
 import { SoundPlayer } from "utils/soundPlayer";
 
-@inject(Router, TasksService, I18N, EventAggregator)
+@autoinject
 @connectTo()
 export class ComputedList {
   private type: string;

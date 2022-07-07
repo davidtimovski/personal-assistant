@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { EventAggregator } from "aurelia-event-aggregator";
 import { connectTo } from "aurelia-store";
 
@@ -7,7 +7,7 @@ import { ArchivedList } from "models/viewmodels/archivedList";
 import { State } from "utils/state/state";
 import { AppEvents } from "models/appEvents";
 
-@inject(EventAggregator)
+@autoinject
 @connectTo()
 export class ArchivedLists {
   private archivedLists: Array<ArchivedList>;

@@ -1,7 +1,9 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 import { connectTo } from "aurelia-store";
+
+import { DateHelper } from "../../../shared/src/utils/dateHelper";
 
 import { TransactionsService } from "services/transactionsService";
 import { CategoriesService } from "services/categoriesService";
@@ -16,17 +18,18 @@ import { State } from "utils/state/state";
 import * as Actions from "utils/state/actions";
 import { SearchFilters } from "models/viewmodels/searchFilters";
 
-@inject(Router, TransactionsService, CategoriesService, AccountsService, LocalStorage, I18N)
+@autoinject
 @connectTo()
 export class Transactions {
-  private transactions: Array<TransactionItem>;
+  private transactions: TransactionItem[];
   private currency: string;
+  private language: string;
   private lastEditedId: number;
   private viewCategory = false;
   private filters: SearchFilters;
   private pageCount: number;
-  private categoryOptions: Array<SelectOption>;
-  private accountOptions: Array<SelectOption>;
+  private categoryOptions: SelectOption[];
+  private accountOptions: SelectOption[];
   state: State;
 
   constructor(
@@ -44,6 +47,7 @@ export class Transactions {
     }
 
     this.currency = this.localStorage.getCurrency();
+    this.language = this.localStorage.getLanguage();
   }
 
   attached() {
@@ -158,7 +162,7 @@ export class Transactions {
 
   formatDate(dateString: string): string {
     const date = new Date(Date.parse(dateString));
-    const month = this.i18n.tr(`months.${date.getMonth()}`).substring(0, 3);
+    const month = DateHelper.getShortMonth(date, this.language);
 
     const now = new Date();
     if (now.getFullYear() === date.getFullYear()) {

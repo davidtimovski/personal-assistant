@@ -18,7 +18,6 @@
       </div>
 
       <div class="content-wrap">
-
         <div if.bind="!model" class="double-circle-loading">
           <div class="double-bounce1"></div>
           <div class="double-bounce2"></div>
@@ -27,9 +26,9 @@
         <div else>
           <div show.bind="!connTracker.isOnline && model.synced" class="message warning">
             <i class="fas fa-exclamation-triangle"></i>
-            <span t="whileOfflineCannotModify">While offline you cannot modify data that has already been synced with
-              the
-              cloud.</span>
+            <span t="whileOfflineCannotModify"
+              >While offline you cannot modify data that has already been synced with the cloud.</span
+            >
           </div>
 
           <div if.bind="model.generated" class="message info">
@@ -46,8 +45,12 @@
             <div class="form-control inline">
               <label for="category" t="category">Category</label>
               <div class="loadable-select ${categoryOptions ? 'loaded' : ''}">
-                <select id="category" value.bind="model.categoryId" disabled.bind="model.generated || !categoryOptions"
-                  class="category-select">
+                <select
+                  id="category"
+                  value.bind="model.categoryId"
+                  disabled.bind="model.generated || !categoryOptions"
+                  class="category-select"
+                >
                   <option model.bind="category.id" repeat.for="category of categoryOptions">${category.name}</option>
                 </select>
                 <i class="fas fa-circle-notch fa-spin"></i>
@@ -55,37 +58,58 @@
             </div>
             <div class="form-control inline">
               <label t="editUpcomingExpense.month">Month</label>
-              <month-selector month.bind="model.month" year.bind="model.year" disabled.bind="model.generated">
+              <month-selector
+                month.bind="model.month"
+                year.bind="model.year"
+                disabled.bind="model.generated"
+                language.bind="language"
+              >
               </month-selector>
             </div>
             <div class="form-control">
-              <textarea value.bind="model.description" maxlength="250" class="description-textarea"
-                t="[placeholder,aria-label]editUpcomingExpense.description"></textarea>
+              <textarea
+                value.bind="model.description"
+                maxlength="250"
+                class="description-textarea"
+                t="[placeholder,aria-label]editUpcomingExpense.description"
+              ></textarea>
             </div>
           </form>
 
-          <hr>
+          <hr />
 
           <div class="save-delete-wrap">
-            <a if.bind="!deleteInProgress" click.delegate="save()"
-              class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
+            <a
+              if.bind="!deleteInProgress"
+              click.delegate="save()"
+              class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}"
+            >
               <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
                 <i class="fas fa-circle-notch fa-spin"></i>
               </span>
               <span>${saveButtonText}</span>
             </a>
-            <a if.bind="!isNewUpcomingExpense" click.delegate="delete()"
-              class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}">
+            <a
+              if.bind="!isNewUpcomingExpense"
+              click.delegate="delete()"
+              class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}"
+            >
               <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
                 <i class="fas fa-circle-notch fa-spin"></i>
               </span>
               <span>${deleteButtonText}</span>
             </a>
-            <button type="button" if.bind="isNewUpcomingExpense || deleteInProgress" click.delegate="cancel()"
-              t="cancel" class="button secondary-button">Cancel</button>
+            <button
+              type="button"
+              if.bind="isNewUpcomingExpense || deleteInProgress"
+              click.delegate="cancel()"
+              t="cancel"
+              class="button secondary-button"
+            >
+              Cancel
+            </button>
           </div>
         </div>
-
       </div>
     </div>
   </div>

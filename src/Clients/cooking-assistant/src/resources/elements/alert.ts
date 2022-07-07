@@ -1,10 +1,10 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { EventAggregator } from "aurelia-event-aggregator";
 import { I18N } from "aurelia-i18n";
 
 import { AlertEvents } from "../../../../shared/src/models/enums/alertEvents";
 
-@inject(EventAggregator, I18N)
+@autoinject
 export class AlertCustomElement {
   private type: string;
   private message: string;

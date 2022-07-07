@@ -1,4 +1,4 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { Router } from "aurelia-router";
 
 import { NotificationsService } from "services/notificationsService";
@@ -6,7 +6,7 @@ import { ListsService } from "services/listsService";
 import { AuthService } from "../../../shared/src/services/authService";
 import * as environment from "../../config/environment.json";
 
-@inject(Router, NotificationsService, ListsService, AuthService)
+@autoinject
 export class Menu {
   private version = "--";
   private unseenNotifications = 0;

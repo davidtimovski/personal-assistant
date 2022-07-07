@@ -1,6 +1,7 @@
+import { autoinject } from "aurelia-framework";
 import { json } from "aurelia-fetch-client";
 
-import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
+import { HttpProxy } from "../../../shared/src/utils/httpProxy";
 import { ErrorLogger } from "../../../shared/src/services/errorLogger";
 
 import { List, Task } from "models/entities";
@@ -15,48 +16,46 @@ import { EditListModel } from "models/viewmodels/editListModel";
 import { ArchivedList } from "models/viewmodels/archivedList";
 import { ListModel } from "models/viewmodels/listModel";
 import * as Actions from "utils/state/actions";
-import * as environment from "../../config/environment.json";
 
-export class ListsService extends HttpProxyBase {
-  private readonly logger = new ErrorLogger(JSON.parse(<any>environment).urls.clientLogger, this.authService);
+@autoinject
+export class ListsService {
+  constructor(private readonly httpProxy: HttpProxy, private readonly logger: ErrorLogger) {}
 
-  async getAll(): Promise<List[]> {
-    const result = await this.ajax<List[]>("lists");
-
-    return result;
+  getAll(): Promise<List[]> {
+    return this.httpProxy.ajax<List[]>("api/lists");
   }
 
   getAllAsOptions(): Promise<ListOption[]> {
-    return this.ajax<ListOption[]>("lists/options");
+    return this.httpProxy.ajax<ListOption[]>("api/lists/options");
   }
 
   get(id: number): Promise<EditListModel> {
-    return this.ajax<EditListModel>(`lists/${id}`);
+    return this.httpProxy.ajax<EditListModel>(`api/lists/${id}`);
   }
 
   getWithShares(id: number): Promise<ListWithShares> {
-    return this.ajax<ListWithShares>(`lists/${id}/with-shares`);
+    return this.httpProxy.ajax<ListWithShares>(`api/lists/${id}/with-shares`);
   }
 
   getShareRequests(): Promise<ShareRequest[]> {
-    return this.ajax<ShareRequest[]>("lists/share-requests");
+    return this.httpProxy.ajax<ShareRequest[]>("api/lists/share-requests");
   }
 
   getPendingShareRequestsCount(): Promise<number> {
-    return this.ajax<number>("lists/pending-share-requests-count");
+    return this.httpProxy.ajax<number>("api/lists/pending-share-requests-count");
   }
 
   getIsShared(id: number): Promise<boolean> {
-    return this.ajax<boolean>(`lists/${id}/shared`);
+    return this.httpProxy.ajax<boolean>(`api/lists/${id}/shared`);
   }
 
   getMembersAsAssigneeOptions(id: number): Promise<AssigneeOption[]> {
-    return this.ajax<AssigneeOption[]>(`lists/${id}/members`);
+    return this.httpProxy.ajax<AssigneeOption[]>(`api/lists/${id}/members`);
   }
 
   async create(name: string, icon: string, isOneTimeToggleDefault: boolean, tasksText: string): Promise<number> {
     try {
-      const id = await this.ajax<number>("lists", {
+      const id = await this.httpProxy.ajax<number>("api/lists", {
         method: "post",
         body: json({
           name: name,
@@ -77,7 +76,7 @@ export class ListsService extends HttpProxyBase {
 
   async update(list: EditListModel): Promise<void> {
     try {
-      await this.ajaxExecute("lists", {
+      await this.httpProxy.ajaxExecute("api/lists", {
         method: "put",
         body: json(list),
       });
@@ -91,7 +90,7 @@ export class ListsService extends HttpProxyBase {
 
   async updateShared(list: EditListModel): Promise<void> {
     try {
-      await this.ajaxExecute("lists/shared", {
+      await this.httpProxy.ajaxExecute("api/lists/shared", {
         method: "put",
         body: json({
           id: list.id,
@@ -108,7 +107,7 @@ export class ListsService extends HttpProxyBase {
 
   async delete(id: number): Promise<void> {
     try {
-      await this.ajaxExecute(`lists/${id}`, {
+      await this.httpProxy.ajaxExecute(`api/lists/${id}`, {
         method: "delete",
       });
 
@@ -120,12 +119,12 @@ export class ListsService extends HttpProxyBase {
   }
 
   canShareListWithUser(email: string): Promise<CanShareList> {
-    return this.ajax<CanShareList>(`lists/can-share-with-user/${email}`);
+    return this.httpProxy.ajax<CanShareList>(`api/lists/can-share-with-user/${email}`);
   }
 
   async share(id: number, newShares: Share[], editedShares: Share[], removedShares: Share[]): Promise<void> {
     try {
-      await this.ajaxExecute("lists/share", {
+      await this.httpProxy.ajaxExecute("api/lists/share", {
         method: "put",
         body: json({
           listId: id,
@@ -144,7 +143,7 @@ export class ListsService extends HttpProxyBase {
 
   async leave(id: number): Promise<void> {
     try {
-      await this.ajaxExecute(`lists/${id}/leave`, {
+      await this.httpProxy.ajaxExecute(`api/lists/${id}/leave`, {
         method: "delete",
       });
 
@@ -157,7 +156,7 @@ export class ListsService extends HttpProxyBase {
 
   async copy(list: List): Promise<number> {
     try {
-      const id = await this.ajax<number>("lists/copy", {
+      const id = await this.httpProxy.ajax<number>("api/lists/copy", {
         method: "post",
         body: json({
           id: list.id,
@@ -242,7 +241,7 @@ export class ListsService extends HttpProxyBase {
 
   async setIsArchived(id: number, isArchived: boolean): Promise<void> {
     try {
-      await this.ajaxExecute("lists/is-archived", {
+      await this.httpProxy.ajaxExecute("api/lists/is-archived", {
         method: "put",
         body: json({
           listId: id,
@@ -259,7 +258,7 @@ export class ListsService extends HttpProxyBase {
 
   async setTasksAsNotCompleted(id: number): Promise<void> {
     try {
-      await this.ajaxExecute("lists/set-tasks-as-not-completed", {
+      await this.httpProxy.ajaxExecute("api/lists/set-tasks-as-not-completed", {
         method: "put",
         body: json({
           listId: id,
@@ -275,7 +274,7 @@ export class ListsService extends HttpProxyBase {
 
   async setShareIsAccepted(id: number, isAccepted: boolean): Promise<void> {
     try {
-      await this.ajaxExecute("lists/share-is-accepted", {
+      await this.httpProxy.ajaxExecute("api/lists/share-is-accepted", {
         method: "put",
         body: json({
           listId: id,
@@ -292,7 +291,7 @@ export class ListsService extends HttpProxyBase {
 
   async reorder(id: number, oldOrder: number, newOrder: number): Promise<void> {
     try {
-      await this.ajaxExecute("lists/reorder", {
+      await this.httpProxy.ajaxExecute("api/lists/reorder", {
         method: "put",
         body: json({
           id: id,

@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
@@ -13,7 +13,7 @@ import { Share } from "models/viewmodels/share";
 import { CanShareList } from "models/viewmodels/canShareList";
 import { SharingState } from "models/viewmodels/sharingState";
 
-@inject(Router, AuthService, ListsService, ValidationController, I18N, EventAggregator)
+@autoinject
 export class ShareList {
   private model: ListWithShares;
   private originalShares: Share[];

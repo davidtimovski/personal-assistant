@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
@@ -7,6 +7,7 @@ import { connectTo } from "aurelia-store";
 
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
+import { ValidationErrors } from "../../../shared/src/models/validationErrors";
 
 import { List } from "models/entities";
 import { ListsService } from "services/listsService";
@@ -14,7 +15,7 @@ import { SharingState } from "models/viewmodels/sharingState";
 import { State } from "utils/state/state";
 import { AppEvents } from "models/appEvents";
 
-@inject(Router, ListsService, ValidationController, I18N, EventAggregator)
+@autoinject
 @connectTo()
 export class CopyList {
   private listId: number;
@@ -106,8 +107,11 @@ export class CopyList {
         this.router.navigateToRoute("listsEdited", {
           editedId: this.model.id,
         });
-      } catch (errorFields) {
-        this.nameIsInvalid = errorFields.includes("Name");
+      } catch (e) {
+        if (e instanceof ValidationErrors) {
+          this.nameIsInvalid = e.fields.includes("Name");
+        }
+
         this.saveButtonIsLoading = false;
       }
     } else {

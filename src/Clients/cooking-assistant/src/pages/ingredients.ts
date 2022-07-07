@@ -1,10 +1,10 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 
 import { IngredientsService } from "services/ingredientsService";
 import { SimpleIngredient } from "models/viewmodels/simpleIngredient";
 
-@inject(Router, IngredientsService)
+@autoinject
 export class Ingredients {
   private ingredients: SimpleIngredient[];
   private shadowIngredients: SimpleIngredient[];

@@ -1,9 +1,9 @@
-import { bindable, bindingMode, inject } from "aurelia-framework";
+import { bindable, bindingMode, autoinject } from "aurelia-framework";
 import { EventAggregator } from "aurelia-event-aggregator";
 
-import { IngredientPickerEvents, IngredientSuggestion } from "../../../models/viewmodels/ingredientSuggestions";
+import { IngredientPickerEvents, IngredientSuggestion } from "models/viewmodels/ingredientSuggestions";
 
-@inject(EventAggregator)
+@autoinject
 export class PublicIngredientSuggestion {
   @bindable({ defaultBindingMode: bindingMode.toView }) ingredient: IngredientSuggestion;
 

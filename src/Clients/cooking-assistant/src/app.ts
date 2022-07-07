@@ -1,9 +1,5 @@
-import { inject } from "aurelia-framework";
-import {
-  NavigationInstruction,
-  RouterConfiguration,
-  Router,
-} from "aurelia-router";
+import { autoinject } from "aurelia-framework";
+import { NavigationInstruction, RouterConfiguration, Router } from "aurelia-router";
 import { EventAggregator } from "aurelia-event-aggregator";
 import { I18N } from "aurelia-i18n";
 
@@ -20,16 +16,7 @@ import { RecipesService } from "services/recipesService";
 import routes from "./routes";
 import { AppEvents } from "models/appEvents";
 
-@inject(
-  AuthService,
-  LocalStorageCurrencies,
-  CurrenciesService,
-  EventAggregator,
-  ConnectionTracker,
-  RecipesService,
-  BroadcastChannel,
-  I18N
-)
+@autoinject
 export class App {
   private isTouchDevice = false;
   router: Router;
@@ -75,7 +62,6 @@ export class App {
 
     config.options.root = "/";
     config.options.pushState = true;
-    config.title = "Cooking Assistant";
 
     this.addLoginRoute(config);
     config.addAuthorizeStep(AuthorizeStep);
@@ -93,22 +79,15 @@ export class App {
           await this.authService.signinRedirect();
         };
 
-        const navigationInstruction = () =>
-          this.redirectAfterCallback(instruction, "/");
+        const navigationInstruction = () => this.redirectAfterCallback(instruction, "/");
 
-        return this.runHandlerAndCompleteNavigationInstruction(
-          callbackHandler,
-          navigationInstruction
-        );
+        return this.runHandlerAndCompleteNavigationInstruction(callbackHandler, navigationInstruction);
       },
       route: "login-callback",
     });
   }
 
-  private redirectAfterCallback(
-    instruction: NavigationInstruction,
-    route: string
-  ) {
+  private redirectAfterCallback(instruction: NavigationInstruction, route: string) {
     window.history.pushState({}, "", route);
     instruction.queryString = "";
     instruction.config.redirect = route;
@@ -121,9 +100,9 @@ export class App {
     try {
       await callbackHandler();
       navigationInstruction();
-    } catch (err) {
+    } catch (e) {
       navigationInstruction();
-      throw err;
+      throw e;
     }
   }
 }

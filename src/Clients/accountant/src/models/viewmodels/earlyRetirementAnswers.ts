@@ -9,7 +9,7 @@ export class EarlyRetirementAnswers {
   hasLifeInsurance = false;
   lifeInsuranceAge: number;
   lifeInsuranceReturn: AmountModel;
-  upcomingExpenses: Array<LargeUpcomingExpense>;
+  upcomingExpenses: LargeUpcomingExpense[];
   retirementIncome: AmountModel;
 
   constructor(upcomingExpenses: LargeUpcomingExpense[], currency: string) {

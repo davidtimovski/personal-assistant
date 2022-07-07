@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 
@@ -10,9 +10,9 @@ import { LocalStorage } from "utils/localStorage";
 import { HeatmapDay } from "models/viewmodels/heatmapDay";
 import { HeatmapExpense } from "models/viewmodels/heatmapExpense";
 
-@inject(Router, TransactionsService, AccountsService, I18N, LocalStorage)
+@autoinject
 export class ExpenditureHeatmap {
-  private days: Array<HeatmapDay>;
+  private days: HeatmapDay[];
   private selectedDay: HeatmapDay;
   private selectedExpenditureCaret = 0;
   private maxSpent: number;
@@ -71,6 +71,7 @@ export class ExpenditureHeatmap {
     "#f9e5d4",
   ];
   private currency: string;
+  private language: string;
 
   constructor(
     private readonly router: Router,
@@ -82,6 +83,7 @@ export class ExpenditureHeatmap {
 
   activate() {
     this.currency = this.localStorage.getCurrency();
+    this.language = this.localStorage.getLanguage();
   }
 
   async attached() {
@@ -177,7 +179,7 @@ export class ExpenditureHeatmap {
 
   formatDate(date: Date): string {
     const day = date.getDate();
-    const month = this.i18n.tr(`months.${date.getMonth()}`);
+    const month = DateHelper.getLongMonth(date, this.language);
     return `${day} ${month}`;
   }
 

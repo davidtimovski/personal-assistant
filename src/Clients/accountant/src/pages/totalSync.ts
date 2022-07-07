@@ -1,8 +1,8 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { ConnectionTracker } from "../../../shared/src/utils/connectionTracker";
 import { SyncService } from "services/syncService";
 
-@inject(SyncService, ConnectionTracker)
+@autoinject
 export class TotalSync {
   private syncButtonIsLoading = false;
 

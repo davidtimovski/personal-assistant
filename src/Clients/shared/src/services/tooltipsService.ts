@@ -1,31 +1,47 @@
+import { autoinject } from "aurelia-framework";
 import { json } from "aurelia-fetch-client";
 
-import { HttpProxyBase } from "../utils/httpProxyBase";
+import { ErrorLogger } from "./errorLogger";
+import { HttpProxy } from "../utils/httpProxy";
 import { Tooltip } from "../models/tooltip";
 
-export class TooltipsService extends HttpProxyBase {
-  async getAll(application: string): Promise<Array<Tooltip>> {
-    const result = await this.ajax<Array<Tooltip>>(
-      `tooltips/application/${application}`
-    );
+@autoinject
+export class TooltipsService {
+  constructor(private readonly httpProxy: HttpProxy, private readonly logger: ErrorLogger) {}
 
-    return result;
+  async getAll(application: string): Promise<Array<Tooltip>> {
+    try {
+      const result = await this.httpProxy.ajax<Array<Tooltip>>(`api/tooltips/application/${application}`);
+      return result;
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   async getByKey(key: string, application: string): Promise<Tooltip> {
-    const result = await this.ajax<Tooltip>(`tooltips/key/${key}/${application}`);
-
-    return result;
+    try {
+      const result = await this.httpProxy.ajax<Tooltip>(`api/tooltips/key/${key}/${application}`);
+      return result;
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   async toggleDismissed(key: string, application: string, isDismissed: boolean): Promise<void> {
-    await this.ajaxExecute("tooltips", {
-      method: "put",
-      body: json({
-        key: key,
-        application: application,
-        isDismissed: isDismissed,
-      }),
-    });
+    try {
+      await this.httpProxy.ajaxExecute("api/tooltips", {
+        method: "put",
+        body: json({
+          key: key,
+          application: application,
+          isDismissed: isDismissed,
+        }),
+      });
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 }

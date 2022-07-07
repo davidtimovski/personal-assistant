@@ -1,11 +1,11 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 
 import { Account } from "models/entities/account";
-import { CreatedIdPair } from "models/sync/created";
+import { CreatedIdPair } from "models/sync";
 import { IDBContext } from "./idbContext";
 import { TransactionModel } from "models/entities/transaction";
 
-@inject(IDBContext)
+@autoinject
 export class AccountsIDBHelper {
   constructor(private readonly db: IDBContext) {}
 
@@ -121,7 +121,7 @@ export class AccountsIDBHelper {
     return transactionsCount > 0;
   }
 
-  async sync(deletedAccountIds: Array<number>, accounts: Array<Account>) {
+  async sync(deletedAccountIds: number[], accounts: Account[]) {
     await this.db.transaction("rw", this.db.accounts, this.db.transactions, async () => {
       if (deletedAccountIds.length > 0) {
         for (const accountId of deletedAccountIds) {
@@ -146,7 +146,7 @@ export class AccountsIDBHelper {
     return accounts.filter((a) => !a.synced).toArray();
   }
 
-  async consolidate(accountIdPairs: Array<CreatedIdPair>) {
+  async consolidate(accountIdPairs: CreatedIdPair[]) {
     if (accountIdPairs.length === 0) {
       return;
     }

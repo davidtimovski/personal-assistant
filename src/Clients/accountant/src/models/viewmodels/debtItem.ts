@@ -5,6 +5,7 @@ export class DebtItem {
     public amount: number,
     public currency: string,
     public person: string,
+    public created: string,
     public synced: boolean
   ) {}
 }

@@ -1,11 +1,11 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import autocomplete, { AutocompleteResult } from "autocompleter";
 
 import { CurrenciesService } from "../../../../shared/src/services/currenciesService";
 import { LocalStorageCurrencies } from "../../../../shared/src/utils/localStorageCurrencies";
 import { CurrencySuggestion } from "../../../../shared/src/models/viewmodels/currencySuggestion";
 
-@inject(CurrenciesService, LocalStorageCurrencies)
+@autoinject
 export class CurrencySelectorCustomElement {
   private currency: string;
   private currencySuggestions: CurrencySuggestion[];

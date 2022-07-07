@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
@@ -18,21 +18,12 @@ import { EditTransactionModel } from "models/viewmodels/editTransactionModel";
 import { CategoryType } from "models/entities/category";
 import { TransactionType } from "models/viewmodels/transactionType";
 
-@inject(
-  Router,
-  CategoriesService,
-  TransactionsService,
-  EncryptionService,
-  ValidationController,
-  I18N,
-  EventAggregator,
-  ConnectionTracker
-)
+@autoinject
 export class EditTransaction {
   private transactionId: number;
   private model: EditTransactionModel;
   private type: TransactionType;
-  private categoryOptions: Array<SelectOption>;
+  private categoryOptions: SelectOption[];
   private originalTransactionJson: string;
   private readonly maxDate: string;
   private decPasswordInput: HTMLInputElement;

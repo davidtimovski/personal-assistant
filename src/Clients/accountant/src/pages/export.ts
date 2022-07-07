@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 
@@ -7,7 +7,7 @@ import { DateHelper } from "../../../shared/src/utils/dateHelper";
 
 import { TransactionsService } from "services/transactionsService";
 
-@inject(Router, TransactionsService, I18N, ConnectionTracker)
+@autoinject
 export class Export {
   private exportButtonIsLoading = false;
 

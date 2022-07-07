@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 import { connectTo } from "aurelia-store";
@@ -16,7 +16,7 @@ import { State } from "utils/state/state";
 import * as Actions from "utils/state/actions";
 import { AppEvents } from "models/appEvents";
 
-@inject(Router, RecipesService, UsersService, I18N, LocalStorageCurrencies, EventAggregator, ConnectionTracker)
+@autoinject
 @connectTo()
 export class Recipes {
   private imageUri = JSON.parse(<any>environment).defaultProfileImageUri;

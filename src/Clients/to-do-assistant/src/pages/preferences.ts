@@ -1,4 +1,4 @@
-import { inject, observable } from "aurelia-framework";
+import { autoinject, observable } from "aurelia-framework";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 import { connectTo } from "aurelia-store";
@@ -13,7 +13,7 @@ import { State } from "utils/state/state";
 import * as Actions from "utils/state/actions";
 import { SoundPlayer } from "utils/soundPlayer";
 
-@inject(UsersService, NotificationsService, ListsService, I18N, EventAggregator)
+@autoinject
 @connectTo()
 export class Preferences {
   private readonly notificationsVapidKey =

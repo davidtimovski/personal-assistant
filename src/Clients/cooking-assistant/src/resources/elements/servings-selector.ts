@@ -1,19 +1,19 @@
-import { inject, bindable, bindingMode } from "aurelia-framework";
+import { autoinject, bindable, bindingMode } from "aurelia-framework";
 import { I18N } from "aurelia-i18n";
 
-import { ViewRecipe } from "../../models/viewmodels/viewRecipe";
+import { ViewRecipe } from "models/viewmodels/viewRecipe";
 
-@inject(I18N)
+@autoinject
 export class ServingsSelectorCustomElement {
   @bindable recipe: ViewRecipe;
   @bindable({ defaultBindingMode: bindingMode.toView }) viewing: boolean;
 
-  constructor(private readonly i18n: I18N) { }
+  constructor(private readonly i18n: I18N) {}
 
   get servingsLabel() {
     if (this.recipe.servings > 1) {
       return this.i18n.tr("recipe.servings", {
-        servings: this.recipe.servings
+        servings: this.recipe.servings,
       });
     }
 
@@ -40,10 +40,8 @@ export class ServingsSelectorCustomElement {
 
   adjustIngredientAmountToServings() {
     if (this.viewing) {
-      for (let ingredient of this.recipe.ingredients.filter(x => x.amount)) {
-        ingredient.amount = parseFloat(
-          (ingredient.amountPerServing * this.recipe.servings).toFixed(2)
-        );
+      for (let ingredient of this.recipe.ingredients.filter((x) => x.amount)) {
+        ingredient.amount = parseFloat((ingredient.amountPerServing * this.recipe.servings).toFixed(2));
       }
     }
   }

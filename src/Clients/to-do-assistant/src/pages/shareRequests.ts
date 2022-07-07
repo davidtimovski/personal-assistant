@@ -1,10 +1,10 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { Router } from "aurelia-router";
 
 import { ListsService } from "services/listsService";
 import { ShareRequest } from "models/viewmodels/shareRequest";
 
-@inject(Router, ListsService)
+@autoinject
 export class ShareRequests {
   private pendingShareRequests: Array<ShareRequest>;
   private declinedShareRequests: Array<ShareRequest>;

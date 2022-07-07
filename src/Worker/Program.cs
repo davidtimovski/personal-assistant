@@ -1,12 +1,12 @@
 using System;
 using System.IO;
 using System.Net.Http;
+using Application.Contracts.Common;
 using CloudinaryDotNet;
+using Infrastructure.Cdn;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Application.Contracts.Common;
-using Infrastructure.Cdn;
 using Serilog;
 
 namespace Worker;

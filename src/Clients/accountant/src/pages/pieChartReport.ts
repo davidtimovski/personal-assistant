@@ -1,4 +1,4 @@
-import { inject, observable } from "aurelia-framework";
+import { autoinject, observable } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 import { ArcElement, Chart, PieController } from "chart.js";
@@ -15,13 +15,13 @@ import { TransactionModel } from "models/entities/transaction";
 import { SearchFilters } from "models/viewmodels/searchFilters";
 import * as Actions from "utils/state/actions";
 
-@inject(Router, TransactionsService, AccountsService, LocalStorage, I18N)
+@autoinject
 @connectTo()
 export class PieChartReport {
   private mainAccountId: number;
   private currency: string;
   private chart: Chart;
-  private items: Array<AmountByCategory>;
+  private items: AmountByCategory[];
   private sum: number;
   private canvasCtx: CanvasRenderingContext2D;
   private fromDate: string;
@@ -141,7 +141,7 @@ export class PieChartReport {
     this.router.navigateToRoute("transactions");
   }
 
-  groupBy(list: Array<TransactionModel>, keyGetter: { (x: TransactionModel): string; (arg0: TransactionModel): any }) {
+  groupBy(list: TransactionModel[], keyGetter: { (x: TransactionModel): string; (arg0: TransactionModel): any }) {
     const map = new Map();
     list.forEach((item) => {
       const key = keyGetter(item);

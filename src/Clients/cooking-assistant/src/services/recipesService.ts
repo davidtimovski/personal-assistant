@@ -1,48 +1,40 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { json } from "aurelia-fetch-client";
-import { HttpClient } from "aurelia-fetch-client";
-import { EventAggregator } from "aurelia-event-aggregator";
 
-import { AuthService } from "../../../shared/src/services/authService";
-import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
+import { HttpProxy } from "../../../shared/src/utils/httpProxy";
 import { LocalStorageCurrencies } from "../../../shared/src/utils/localStorageCurrencies";
 import { ErrorLogger } from "../../../shared/src/services/errorLogger";
 import { Language } from "../../../shared/src/models/enums/language";
 
-import { RecipeModel } from "../models/viewmodels/recipeModel";
-import { ViewRecipe } from "../models/viewmodels/viewRecipe";
-import { EditRecipeIngredient } from "../models/viewmodels/editRecipeIngredient";
-import { EditRecipeModel } from "../models/viewmodels/editRecipeModel";
-import { SendRecipeModel } from "../models/viewmodels/sendRecipeModel";
-import { CanSendRecipe } from "../models/viewmodels/canSendRecipe";
-import { ReceivedRecipe } from "../models/viewmodels/receivedRecipe";
-import { ReviewIngredientsModel } from "../models/viewmodels/reviewIngredientsModel";
-import { IngredientReplacement } from "../models/viewmodels/ingredientReplacement";
-import { RecipeWithShares } from "../models/viewmodels/recipeWithShares";
-import { CanShareRecipe } from "../models/viewmodels/canShareRecipe";
-import { ShareRequest } from "../models/viewmodels/shareRequest";
-import * as Actions from "../utils/state/actions";
-import * as environment from "../../config/environment.json";
+import { RecipeModel } from "models/viewmodels/recipeModel";
+import { ViewRecipe } from "models/viewmodels/viewRecipe";
+import { EditRecipeIngredient } from "models/viewmodels/editRecipeIngredient";
+import { EditRecipeModel } from "models/viewmodels/editRecipeModel";
+import { SendRecipeModel } from "models/viewmodels/sendRecipeModel";
+import { CanSendRecipe } from "models/viewmodels/canSendRecipe";
+import { ReceivedRecipe } from "models/viewmodels/receivedRecipe";
+import { ReviewIngredientsModel } from "models/viewmodels/reviewIngredientsModel";
+import { IngredientReplacement } from "models/viewmodels/ingredientReplacement";
+import { RecipeWithShares } from "models/viewmodels/recipeWithShares";
+import { CanShareRecipe } from "models/viewmodels/canShareRecipe";
+import { ShareRequest } from "models/viewmodels/shareRequest";
+import * as Actions from "utils/state/actions";
 
-@inject(AuthService, HttpClient, EventAggregator, LocalStorageCurrencies)
-export class RecipesService extends HttpProxyBase {
-  private readonly logger = new ErrorLogger(JSON.parse(<any>environment).urls.clientLogger, this.authService);
-
+@autoinject
+export class RecipesService {
   constructor(
-    protected readonly authService: AuthService,
-    protected readonly httpClient: HttpClient,
-    protected readonly eventAggregator: EventAggregator,
-    private readonly localStorage: LocalStorageCurrencies
-  ) {
-    super(authService, httpClient, eventAggregator);
-  }
+    private readonly httpProxy: HttpProxy,
+    private readonly localStorage: LocalStorageCurrencies,
+    private readonly logger: ErrorLogger
+  ) {}
 
   getAll(): Promise<RecipeModel[]> {
-    return this.ajax<RecipeModel[]>("recipes");
+    this.logger.logError(new Error("tessst err cooking"));
+    return this.httpProxy.ajax<RecipeModel[]>("api/recipes");
   }
 
   async get(id: number, currency: string): Promise<ViewRecipe> {
-    const result = await this.ajax<ViewRecipe>(`recipes/${id}/${currency}`);
+    const result = await this.httpProxy.ajax<ViewRecipe>(`api/recipes/${id}/${currency}`);
 
     Actions.setDataLastLoad(id, new Date());
 
@@ -50,31 +42,31 @@ export class RecipesService extends HttpProxyBase {
   }
 
   getForUpdate(id: number): Promise<EditRecipeModel> {
-    return this.ajax<EditRecipeModel>(`recipes/${id}/update`);
+    return this.httpProxy.ajax<EditRecipeModel>(`api/recipes/${id}/update`);
   }
 
   getWithShares(id: number): Promise<RecipeWithShares> {
-    return this.ajax<RecipeWithShares>(`recipes/${id}/with-shares`);
+    return this.httpProxy.ajax<RecipeWithShares>(`api/recipes/${id}/with-shares`);
   }
 
   getShareRequests(): Promise<ShareRequest[]> {
-    return this.ajax<ShareRequest[]>("recipes/share-requests");
+    return this.httpProxy.ajax<ShareRequest[]>("api/recipes/share-requests");
   }
 
   getPendingShareRequestsCount(): Promise<number> {
-    return this.ajax<number>("recipes/pending-share-requests-count");
+    return this.httpProxy.ajax<number>("api/recipes/pending-share-requests-count");
   }
 
   getForSending(id: number): Promise<SendRecipeModel> {
-    return this.ajax<SendRecipeModel>(`recipes/${id}/sending`);
+    return this.httpProxy.ajax<SendRecipeModel>(`api/recipes/${id}/sending`);
   }
 
   getSendRequests(): Promise<ReceivedRecipe[]> {
-    return this.ajax<ReceivedRecipe[]>("recipes/send-requests");
+    return this.httpProxy.ajax<ReceivedRecipe[]>("api/recipes/send-requests");
   }
 
   getPendingSendRequestsCount(): Promise<number> {
-    return this.ajax<number>("recipes/pending-send-requests-count");
+    return this.httpProxy.ajax<number>("api/recipes/pending-send-requests-count");
   }
 
   async tryImport(
@@ -83,7 +75,7 @@ export class RecipesService extends HttpProxyBase {
     checkIfReviewRequired: boolean
   ): Promise<number> {
     try {
-      const result = await this.ajax<number>(`recipes/try-import`, {
+      const result = await this.httpProxy.ajax<number>(`api/recipes/try-import`, {
         method: "post",
         body: json({
           id: id,
@@ -102,7 +94,7 @@ export class RecipesService extends HttpProxyBase {
   }
 
   getForReview(id: number): Promise<ReviewIngredientsModel> {
-    return this.ajax<ReviewIngredientsModel>(`recipes/${id}/review`);
+    return this.httpProxy.ajax<ReviewIngredientsModel>(`api/recipes/${id}/review`);
   }
 
   async create(
@@ -119,7 +111,7 @@ export class RecipesService extends HttpProxyBase {
     try {
       const parsedIngredients = this.parseIngredientsAmount(ingredients);
 
-      const id = await this.ajax<number>("recipes", {
+      const id = await this.httpProxy.ajax<number>("api/recipes", {
         method: "post",
         body: json({
           name: name,
@@ -148,7 +140,7 @@ export class RecipesService extends HttpProxyBase {
       const formData = new FormData();
       formData.append("image", image);
 
-      const data: any = await this.ajaxUploadFile("recipes/upload-temp-image", {
+      const data: any = await this.httpProxy.ajaxUploadFile("api/recipes/upload-temp-image", {
         method: "post",
         body: formData,
       });
@@ -164,7 +156,7 @@ export class RecipesService extends HttpProxyBase {
     try {
       const parsedIngredients = this.parseIngredientsAmount(recipe.ingredients);
 
-      await this.ajaxExecute("recipes", {
+      await this.httpProxy.ajaxExecute("api/recipes", {
         method: "put",
         body: json({
           id: recipe.id,
@@ -189,7 +181,7 @@ export class RecipesService extends HttpProxyBase {
 
   async delete(id: number): Promise<void> {
     try {
-      await this.ajaxExecute(`recipes/${id}`, {
+      await this.httpProxy.ajaxExecute(`api/recipes/${id}`, {
         method: "delete",
       });
 
@@ -201,12 +193,12 @@ export class RecipesService extends HttpProxyBase {
   }
 
   canShareRecipeWithUser(email: string): Promise<CanShareRecipe> {
-    return this.ajax<CanShareRecipe>(`recipes/can-share-with-user/${email}`);
+    return this.httpProxy.ajax<CanShareRecipe>(`api/recipes/can-share-with-user/${email}`);
   }
 
   async share(id: number, newShares: number[], removedShares: number[]): Promise<void> {
     try {
-      await this.ajaxExecute("recipes/share", {
+      await this.httpProxy.ajaxExecute("api/recipes/share", {
         method: "put",
         body: json({
           recipeId: id,
@@ -224,7 +216,7 @@ export class RecipesService extends HttpProxyBase {
 
   async setShareIsAccepted(id: number, isAccepted: boolean): Promise<void> {
     try {
-      await this.ajaxExecute("recipes/share-is-accepted", {
+      await this.httpProxy.ajaxExecute("api/recipes/share-is-accepted", {
         method: "put",
         body: json({
           recipeId: id,
@@ -241,7 +233,7 @@ export class RecipesService extends HttpProxyBase {
 
   async leave(id: number): Promise<void> {
     try {
-      await this.ajaxExecute(`recipes/${id}/leave`, {
+      await this.httpProxy.ajaxExecute(`api/recipes/${id}/leave`, {
         method: "delete",
       });
 
@@ -253,12 +245,12 @@ export class RecipesService extends HttpProxyBase {
   }
 
   canSendRecipeToUser(email: string, recipeId: number): Promise<CanSendRecipe> {
-    return this.ajax<CanSendRecipe>(`recipes/can-send-recipe-to-user/${email}/${recipeId}`);
+    return this.httpProxy.ajax<CanSendRecipe>(`api/recipes/can-send-recipe-to-user/${email}/${recipeId}`);
   }
 
   async send(id: number, recipientsIds: number[]): Promise<void> {
     try {
-      await this.ajaxExecute("recipes/send", {
+      await this.httpProxy.ajaxExecute("api/recipes/send", {
         method: "post",
         body: json({
           recipeId: id,
@@ -273,7 +265,7 @@ export class RecipesService extends HttpProxyBase {
 
   async declineSendRequest(id: number): Promise<void> {
     try {
-      await this.ajaxExecute("recipes/decline-send-request", {
+      await this.httpProxy.ajaxExecute("api/recipes/decline-send-request", {
         method: "put",
         body: json({
           recipeId: id,
@@ -287,7 +279,7 @@ export class RecipesService extends HttpProxyBase {
 
   async deleteSendRequest(id: number): Promise<void> {
     try {
-      await this.ajaxExecute(`recipes/${id}/send-request`, {
+      await this.httpProxy.ajaxExecute(`api/recipes/${id}/send-request`, {
         method: "delete",
       });
     } catch (e) {

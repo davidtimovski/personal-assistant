@@ -1,4 +1,4 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 
@@ -9,7 +9,7 @@ import { RecipesService } from "services/recipesService";
 import { Ingredient } from "models/viewmodels/ingredient";
 import { SharingState } from "models/viewmodels/sharingState";
 
-@inject(Router, I18N, RecipesService, LocalStorageCurrencies)
+@autoinject
 export class Recipe {
   private recipeId: number;
   private model: ViewRecipe;

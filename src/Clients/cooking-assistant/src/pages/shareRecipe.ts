@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
@@ -13,7 +13,7 @@ import { Share } from "models/viewmodels/share";
 import { CanShareRecipe } from "models/viewmodels/canShareRecipe";
 import { SharingState } from "models/viewmodels/sharingState";
 
-@inject(Router, AuthService, RecipesService, ValidationController, I18N, EventAggregator)
+@autoinject
 export class ShareRecipe {
   private model: RecipeWithShares;
   private originalShares: Share[];

@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
@@ -6,6 +6,7 @@ import { EventAggregator } from "aurelia-event-aggregator";
 
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
+import { ValidationErrors } from "../../../shared/src/models/validationErrors";
 
 import * as environment from "../../config/environment.json";
 import { RecipesService } from "services/recipesService";
@@ -15,7 +16,7 @@ import { EditRecipeModel } from "models/viewmodels/editRecipeModel";
 import { EditRecipeIngredient } from "models/viewmodels/editRecipeIngredient";
 import { PreferencesModel } from "models/preferencesModel";
 
-@inject(Router, RecipesService, UsersService, ValidationController, I18N, EventAggregator)
+@autoinject
 export class EditRecipe {
   private model: EditRecipeModel;
   private originalRecipeJson: string;
@@ -287,7 +288,7 @@ export class EditRecipe {
     this.imageIsUploading = true;
     try {
       this.model.imageUri = await this.recipesService.uploadTempImage(this.imageInput.files[0]);
-    } catch (e) {
+    } catch {
       this.saveButtonIsLoading = false;
     }
     this.imageIsUploading = false;
@@ -319,8 +320,11 @@ export class EditRecipe {
           this.router.navigateToRoute("recipesEdited", {
             editedId: this.model.id,
           });
-        } catch (errorFields) {
-          this.nameIsInvalid = errorFields.includes("Name");
+        } catch (e) {
+          if (e instanceof ValidationErrors) {
+            this.nameIsInvalid = e.fields.includes("Name");
+          }
+
           this.saveButtonIsLoading = false;
         }
       } else {
@@ -343,8 +347,11 @@ export class EditRecipe {
           this.router.navigateToRoute("recipesEdited", {
             editedId: this.model.id,
           });
-        } catch (errorFields) {
-          this.nameIsInvalid = errorFields.includes("Name");
+        } catch (e) {
+          if (e instanceof ValidationErrors) {
+            this.nameIsInvalid = e.fields.includes("Name");
+          }
+
           this.saveButtonIsLoading = false;
         }
       }

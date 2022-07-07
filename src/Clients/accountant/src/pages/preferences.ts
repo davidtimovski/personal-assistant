@@ -1,7 +1,7 @@
-import { inject, observable } from "aurelia-framework";
+import { autoinject, observable } from "aurelia-framework";
 import { LocalStorage } from "utils/localStorage";
 
-@inject(LocalStorage)
+@autoinject
 export class Preferences {
   @observable() private showUpcomingExpensesOnDashboard: boolean;
   @observable() private showDebtOnDashboard: boolean;
