@@ -1,15 +1,15 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
 
 import { TransactionModel } from "models/entities/transaction";
-import { CreatedIdPair } from "models/sync/created";
+import { CreatedIdPair } from "models/sync";
 import { IDBContext } from "./idbContext";
 import { TransactionType } from "models/viewmodels/transactionType";
 import { SearchFilters } from "models/viewmodels/searchFilters";
 import { Category } from "models/entities/category";
 
-@inject(IDBContext)
+@autoinject
 export class TransactionsIDBHelper {
   constructor(private readonly db: IDBContext) {}
 
@@ -175,7 +175,7 @@ export class TransactionsIDBHelper {
     toDate: string,
     accountId: number,
     searchByCategory: boolean,
-    categoryIds: Array<number>,
+    categoryIds: number[],
     type: TransactionType,
     description: string
   ): boolean {
@@ -277,7 +277,7 @@ export class TransactionsIDBHelper {
     t: TransactionModel,
     mainAccountId: number,
     searchByCategory: boolean,
-    categoryIds: Array<number>,
+    categoryIds: number[],
     type: TransactionType
   ): boolean {
     let inType =
@@ -430,7 +430,7 @@ export class TransactionsIDBHelper {
     await this.db.transactions.delete(id);
   }
 
-  async sync(deletedTransactionIds: Array<number>, transactions: TransactionModel[]) {
+  async sync(deletedTransactionIds: number[], transactions: TransactionModel[]) {
     await this.db.transaction("rw", this.db.transactions, async () => {
       if (deletedTransactionIds.length > 0) {
         await this.db.transactions.bulkDelete(deletedTransactionIds);
@@ -452,7 +452,7 @@ export class TransactionsIDBHelper {
     return transactions.filter((t) => !t.synced).toArray();
   }
 
-  async consolidate(transactionIdPairs: Array<CreatedIdPair>) {
+  async consolidate(transactionIdPairs: CreatedIdPair[]) {
     if (transactionIdPairs.length === 0) {
       return;
     }
@@ -490,7 +490,7 @@ export class TransactionsIDBHelper {
     return categoryIds;
   }
 
-  private getCategoryWithParent(categoryId: number, categories: Array<Category>): Category {
+  private getCategoryWithParent(categoryId: number, categories: Category[]): Category {
     if (categoryId === null) {
       return null;
     }

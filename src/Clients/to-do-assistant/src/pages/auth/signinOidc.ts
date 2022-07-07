@@ -1,10 +1,10 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { UserManager, WebStorageStateStore } from "oidc-client";
 
 import { AuthService } from "../../../../shared/src/services/authService";
 
-@inject(AuthService, Router)
+@autoinject
 export class SigninOidc {
   constructor(private readonly authService: AuthService, private readonly router: Router) {}
 

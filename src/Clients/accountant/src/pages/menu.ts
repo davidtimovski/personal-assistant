@@ -1,10 +1,10 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { Router } from "aurelia-router";
 
 import { AuthService } from "../../../shared/src/services/authService";
 import * as environment from "../../config/environment.json";
 
-@inject(Router, AuthService)
+@autoinject
 export class Menu {
   private reportsDrawerIsOpen = false;
   private version = "--";

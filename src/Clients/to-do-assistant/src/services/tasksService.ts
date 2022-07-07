@@ -1,6 +1,7 @@
+import { autoinject } from "aurelia-framework";
 import { json } from "aurelia-fetch-client";
 
-import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
+import { HttpProxy } from "../../../shared/src/utils/httpProxy";
 import { ErrorLogger } from "../../../shared/src/services/errorLogger";
 
 import { ListsService } from "./listsService";
@@ -8,17 +9,17 @@ import { Task } from "models/entities";
 import { EditTaskModel } from "models/viewmodels/editTaskModel";
 import { BulkAddTasksModel } from "models/viewmodels/bulkAddTasksModel";
 import * as Actions from "utils/state/actions";
-import * as environment from "../../config/environment.json";
 
-export class TasksService extends HttpProxyBase {
-  private readonly logger = new ErrorLogger(JSON.parse(<any>environment).urls.clientLogger, this.authService);
+@autoinject
+export class TasksService {
+  constructor(private readonly httpProxy: HttpProxy, private readonly logger: ErrorLogger) {}
 
   get(id: number): Promise<Task> {
-    return this.ajax<Task>(`tasks/${id}`);
+    return this.httpProxy.ajax<Task>(`api/tasks/${id}`);
   }
 
   getForUpdate(id: number): Promise<EditTaskModel> {
-    return this.ajax<EditTaskModel>(`tasks/${id}/update`);
+    return this.httpProxy.ajax<EditTaskModel>(`api/tasks/${id}/update`);
   }
 
   async create(
@@ -29,7 +30,7 @@ export class TasksService extends HttpProxyBase {
     listsService: ListsService
   ): Promise<number> {
     try {
-      const id = await this.ajax<number>("tasks", {
+      const id = await this.httpProxy.ajax<number>("api/tasks", {
         method: "post",
         body: json({
           listId: listId,
@@ -50,7 +51,7 @@ export class TasksService extends HttpProxyBase {
 
   async bulkCreate(model: BulkAddTasksModel, listsService: ListsService): Promise<void> {
     try {
-      await this.ajaxExecute("tasks/bulk", {
+      await this.httpProxy.ajaxExecute("api/tasks/bulk", {
         method: "post",
         body: json({
           listId: model.listId,
@@ -69,7 +70,7 @@ export class TasksService extends HttpProxyBase {
 
   async update(editTaskViewModel: EditTaskModel, listsService: ListsService): Promise<void> {
     try {
-      await this.ajaxExecute("tasks", {
+      await this.httpProxy.ajaxExecute("api/tasks", {
         method: "put",
         body: json(editTaskViewModel),
       });
@@ -83,7 +84,7 @@ export class TasksService extends HttpProxyBase {
 
   async delete(id: number, listId: number): Promise<void> {
     try {
-      await this.ajaxExecute(`tasks/${id}`, {
+      await this.httpProxy.ajaxExecute(`api/tasks/${id}`, {
         method: "delete",
       });
 
@@ -96,7 +97,7 @@ export class TasksService extends HttpProxyBase {
 
   async complete(id: number, listId: number): Promise<void> {
     try {
-      await this.ajaxExecute("tasks/complete", {
+      await this.httpProxy.ajaxExecute("api/tasks/complete", {
         method: "put",
         body: json({
           id: id,
@@ -112,7 +113,7 @@ export class TasksService extends HttpProxyBase {
 
   async uncomplete(id: number, listId: number): Promise<void> {
     try {
-      await this.ajaxExecute("tasks/uncomplete", {
+      await this.httpProxy.ajaxExecute("api/tasks/uncomplete", {
         method: "put",
         body: json({
           id: id,
@@ -128,7 +129,7 @@ export class TasksService extends HttpProxyBase {
 
   async reorder(id: number, listId: number, oldOrder: number, newOrder: number): Promise<void> {
     try {
-      await this.ajaxExecute("tasks/reorder", {
+      await this.httpProxy.ajaxExecute("api/tasks/reorder", {
         method: "put",
         body: json({
           id: id,

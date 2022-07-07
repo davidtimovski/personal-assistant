@@ -1,0 +1,10 @@
+{
+  "editor.formatOnSave": true,
+  "files.exclude": {
+    ".vscode": true,
+    "aurelia_project": true,
+    "dist": true,
+    "node_modules": true,
+    "Publish.lnk": true
+  }
+}

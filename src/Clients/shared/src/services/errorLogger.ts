@@ -1,37 +1,34 @@
-import { inject } from "aurelia-framework";
 import { json } from "aurelia-fetch-client";
 
-import { AuthService } from "./authService";
+import { HttpProxy } from "../utils/httpProxy";
 import { DateHelper } from "../utils/dateHelper";
 import { HttpError } from "../models/enums/httpError";
+import { ValidationErrors } from "../models/validationErrors";
 
-@inject(AuthService)
 export class ErrorLogger {
-  constructor(private readonly baseUrl: string, private readonly authService: AuthService) {}
+  constructor(private readonly httpProxy: HttpProxy, private readonly application: string) {}
 
   async logError(error: any): Promise<void> {
-    if (!navigator.onLine || error === HttpError.Unauthorized) {
+    if (!navigator.onLine || error === HttpError.Unauthorized || error instanceof ValidationErrors) {
       return;
     }
 
     let message = "",
-      stackTrace = "";
+      stackTrace = null;
 
     if (error instanceof Error) {
       message = error.message;
       stackTrace = error.stack;
     } else if (typeof error === "string") {
       message = error;
+    } else {
+      message = error.toString();
     }
 
-    await window.fetch(`${this.baseUrl}/logs`, {
+    await this.httpProxy.ajaxExecute("clientlogger/logs", {
       method: "post",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Requested-With": "Fetch",
-      },
       body: json({
-        userId: this.authService.currentUser.profile.sub,
+        application: this.application,
         message: message,
         stackTrace: stackTrace,
         occurred: DateHelper.adjustForTimeZone(new Date()),

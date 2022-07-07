@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
@@ -13,6 +13,7 @@ import autocomplete, { AutocompleteResult } from "autocompleter";
 
 import { LocalStorageCurrencies } from "../../../shared/src/utils/localStorageCurrencies";
 import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
+import { ValidationErrors } from "../../../shared/src/models/validationErrors";
 
 import { IngredientsService } from "services/ingredientsService";
 import { EditIngredientModel } from "models/viewmodels/editIngredientModel";
@@ -20,7 +21,7 @@ import { NutritionData } from "models/viewmodels/nutritionData";
 import { PriceData } from "models/viewmodels/priceData";
 import { TaskSuggestion } from "models/viewmodels/taskSuggestion";
 
-@inject(Router, IngredientsService, ValidationController, I18N, EventAggregator, LocalStorageCurrencies)
+@autoinject
 export class EditIngredient {
   private ingredientId: number;
   private model: EditIngredientModel;
@@ -320,8 +321,10 @@ export class EditIngredient {
         this.router.navigateToRoute("ingredientsEdited", {
           editedId: this.ingredientId,
         });
-      } catch (errorFields) {
-        this.nameIsInvalid = errorFields.includes("Name");
+      } catch (e) {
+        if (e instanceof ValidationErrors) {
+          this.nameIsInvalid = e.fields.includes("Name");
+        }
       }
     } else {
       let errorMessages = new Array<string>();

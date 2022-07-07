@@ -4,6 +4,8 @@ import { HttpClient } from "aurelia-fetch-client";
 import { Backend, TCustomAttribute } from "aurelia-i18n";
 import { UserManager, Log, WebStorageStateStore } from "oidc-client";
 
+import { HttpProxy } from "../../shared/src/utils/httpProxy";
+import { ErrorLogger } from "../../shared/src/services/errorLogger";
 import { Language } from "../../shared/src/models/enums/language";
 
 import * as environment from "../config/environment.json";
@@ -44,12 +46,12 @@ export function configure(aurelia: Aurelia) {
     .developmentLogging(envConfig.debug ? "debug" : "warn")
     .feature(PLATFORM.moduleName("resources/index"));
 
-  // Register singletons
+  // Configure services
   const container = aurelia.container;
 
   const httpClient = new HttpClient();
   httpClient.configure((config) => {
-    config.withBaseUrl(`${envConfig.urls.api}/api/`).withDefaults({
+    config.withBaseUrl(`${envConfig.urls.api}/`).withDefaults({
       headers: {
         Accept: "application/json",
         "Accept-Language": language,
@@ -80,6 +82,8 @@ export function configure(aurelia: Aurelia) {
       }),
     })
   );
+
+  container.registerInstance(ErrorLogger, new ErrorLogger(container.get(HttpProxy), "ToDoAssistant"));
 
   container.registerInstance(BroadcastChannel, new BroadcastChannel("sw-version-updates"));
 

@@ -3,13 +3,13 @@ import { EventAggregator } from "aurelia-event-aggregator";
 
 import { ValidationUtil } from "../../../../../shared/src/utils/validationUtil";
 
-import { IngredientsService } from "../../../services/ingredientsService";
+import { IngredientsService } from "services/ingredientsService";
 import {
   IngredientCategory,
   IngredientPickerEvents,
   IngredientSuggestion,
   IngredientSuggestions,
-} from "../../../models/viewmodels/ingredientSuggestions";
+} from "models/viewmodels/ingredientSuggestions";
 
 @inject(IngredientsService, EventAggregator)
 export class IngredientPicker {

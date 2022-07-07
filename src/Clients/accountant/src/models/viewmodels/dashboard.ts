@@ -5,8 +5,8 @@ import { DebtDashboard } from "./debtDashboard";
 export class DashboardModel {
   constructor(
     public upcomingSum: number,
-    public expenditures: Array<AmountByCategory>,
-    public upcomingExpenses: Array<UpcomingExpenseDashboard>,
-    public debt: Array<DebtDashboard>
+    public expenditures: AmountByCategory[],
+    public upcomingExpenses: UpcomingExpenseDashboard[],
+    public debt: DebtDashboard[]
   ) {}
 }

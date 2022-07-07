@@ -1,13 +1,16 @@
 import { Aurelia } from "aurelia-framework";
 import { PLATFORM } from "aurelia-pal";
 import { HttpClient } from "aurelia-fetch-client";
-import { UserManager, Log, WebStorageStateStore } from "oidc-client";
 import { Backend, TCustomAttribute } from "aurelia-i18n";
+import { UserManager, Log, WebStorageStateStore } from "oidc-client";
+
+import { LocalStorageCurrencies } from "../../shared/src/utils/localStorageCurrencies";
+import { HttpProxy } from "../../shared/src/utils/httpProxy";
+import { ErrorLogger } from "../../shared/src/services/errorLogger";
+import { Language } from "../../shared/src/models/enums/language";
 
 import * as environment from "../config/environment.json";
 import { initialState } from "utils/state/state";
-import { Language } from "../../shared/src/models/enums/language";
-import { LocalStorageCurrencies } from "../../shared/src/utils/localStorageCurrencies";
 
 export function configure(aurelia: Aurelia) {
   const localStorage = new LocalStorageCurrencies();
@@ -42,12 +45,12 @@ export function configure(aurelia: Aurelia) {
     .developmentLogging(envConfig.debug ? "debug" : "warn")
     .feature(PLATFORM.moduleName("resources/index"));
 
-  // Register singletons
+  // Configure services
   const container = aurelia.container;
 
   const httpClient = new HttpClient();
   httpClient.configure((config) => {
-    config.withBaseUrl(`${envConfig.urls.api}/api/`).withDefaults({
+    config.withBaseUrl(`${envConfig.urls.api}/`).withDefaults({
       headers: {
         Accept: "application/json",
         "Accept-Language": language,
@@ -77,6 +80,8 @@ export function configure(aurelia: Aurelia) {
       }),
     })
   );
+
+  container.registerInstance(ErrorLogger, new ErrorLogger(container.get(HttpProxy), "CookingAssistant"));
 
   container.registerInstance(BroadcastChannel, new BroadcastChannel("sw-version-updates"));
 

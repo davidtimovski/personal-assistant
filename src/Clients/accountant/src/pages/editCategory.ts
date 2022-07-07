@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
@@ -12,15 +12,15 @@ import { CategoriesService } from "services/categoriesService";
 import { Category, CategoryType } from "models/entities/category";
 import { SelectOption } from "models/viewmodels/selectOption";
 
-@inject(Router, CategoriesService, ValidationController, I18N, EventAggregator, ConnectionTracker)
+@autoinject
 export class EditCategory {
   private categoryId: number;
   private category: Category;
   private originalCategoryJson: string;
   private isNewCategory: boolean;
   private isParent: boolean;
-  private parentCategoryOptions: Array<SelectOption>;
-  private typeOptions: Array<SelectOption>;
+  private parentCategoryOptions: SelectOption[];
+  private typeOptions: SelectOption[];
   private nameInput: HTMLInputElement;
   private nameIsInvalid: boolean;
   private saveButtonText: string;

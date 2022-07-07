@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
@@ -7,7 +7,7 @@ import { NotificationsService } from "services/notificationsService";
 import { Notification } from "models/viewmodels/notification";
 import { LocalStorage } from "utils/localStorage";
 
-@inject(Router, NotificationsService, LocalStorage)
+@autoinject
 export class Notifications {
   private highlightedId: number;
   private unseenNotifications: Array<Notification>;

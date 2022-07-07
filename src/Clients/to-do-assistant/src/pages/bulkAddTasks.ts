@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { EventAggregator } from "aurelia-event-aggregator";
@@ -6,12 +6,13 @@ import { connectTo } from "aurelia-store";
 
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
+import { ValidationErrors } from "../../../shared/src/models/validationErrors";
 
 import { BulkAddTasksModel } from "models/viewmodels/bulkAddTasksModel";
 import { TasksService } from "services/tasksService";
 import { ListsService } from "services/listsService";
 
-@inject(Router, TasksService, ListsService, ValidationController, EventAggregator)
+@autoinject
 @connectTo()
 export class BulkAddTasks {
   private model: BulkAddTasksModel;
@@ -75,8 +76,11 @@ export class BulkAddTasks {
         this.eventAggregator.publish(AlertEvents.ShowSuccess, "bulkAddTasks.addSuccessful");
 
         this.router.navigateToRoute("list", { id: this.model.listId });
-      } catch (errorFields) {
-        this.tasksTextIsInvalid = errorFields.includes("TasksText");
+      } catch (e) {
+        if (e instanceof ValidationErrors) {
+          this.tasksTextIsInvalid = e.fields.includes("TasksText");
+        }
+
         this.saveButtonIsLoading = false;
       }
     }

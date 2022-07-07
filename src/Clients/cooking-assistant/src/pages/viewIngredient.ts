@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
@@ -11,7 +11,7 @@ import { IngredientsService } from "services/ingredientsService";
 import { ViewIngredientModel } from "models/viewmodels/viewIngredientModel";
 import { TaskSuggestion } from "models/viewmodels/taskSuggestion";
 
-@inject(Router, IngredientsService, I18N, EventAggregator, LocalStorageCurrencies)
+@autoinject
 export class ViewIngredient {
   private ingredientId: number;
   private model: ViewIngredientModel;

@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
@@ -13,7 +13,7 @@ import { LocalStorage } from "utils/localStorage";
 import { DebtModel } from "models/entities/debt";
 import { EditDebtModel } from "models/viewmodels/editDebtModel";
 
-@inject(Router, DebtsService, LocalStorage, ValidationController, I18N, EventAggregator, ConnectionTracker)
+@autoinject
 export class EditDebt {
   private debtId: number;
   private model = new EditDebtModel(null, null, null, null, null, false, null, false);
@@ -187,15 +187,13 @@ export class EditDebt {
 
       try {
         await this.debtsService.delete(this.model.id);
+
         this.eventAggregator.publish(AlertEvents.ShowSuccess, "editDebt.deleteSuccessful");
         this.router.navigateToRoute("debt");
-      } catch (e) {
-        this.eventAggregator.publish(AlertEvents.ShowError, e);
-
+      } catch {
         this.deleteButtonText = this.i18n.tr("delete");
         this.deleteInProgress = false;
         this.deleteButtonIsLoading = false;
-        return;
       }
     } else {
       this.deleteButtonText = this.i18n.tr("sure");

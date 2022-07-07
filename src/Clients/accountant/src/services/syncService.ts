@@ -1,103 +1,96 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { json } from "aurelia-fetch-client";
-import { HttpClient } from "aurelia-fetch-client";
-import { EventAggregator } from "aurelia-event-aggregator";
 
-import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
-import { AuthService } from "../../../shared/src/services/authService";
+import { HttpProxy } from "../../../shared/src/utils/httpProxy";
+import { ErrorLogger } from "../../../shared/src/services/errorLogger";
 
-import { AccountsIDBHelper } from "../utils/accountsIDBHelper";
-import { CategoriesIDBHelper } from "../utils/categoriesIDBHelper";
-import { TransactionsIDBHelper } from "../utils/transactionsIDBHelper";
-import { UpcomingExpensesIDBHelper } from "../utils/upcomingExpensesIDBHelper";
-import { DebtsIDBHelper } from "../utils/debtsIDBHelper";
+import { AccountsIDBHelper } from "utils/accountsIDBHelper";
+import { CategoriesIDBHelper } from "utils/categoriesIDBHelper";
+import { TransactionsIDBHelper } from "utils/transactionsIDBHelper";
+import { UpcomingExpensesIDBHelper } from "utils/upcomingExpensesIDBHelper";
+import { DebtsIDBHelper } from "utils/debtsIDBHelper";
 import { LocalStorage } from "utils/localStorage";
-import { Changed } from "models/sync/changed";
-import { Create } from "models/sync/create";
-import { Created } from "models/sync/created";
+import { Changed, Create, Created } from "models/sync";
 
-@inject(
-  AuthService,
-  HttpClient,
-  EventAggregator,
-  AccountsIDBHelper,
-  CategoriesIDBHelper,
-  TransactionsIDBHelper,
-  UpcomingExpensesIDBHelper,
-  DebtsIDBHelper,
-  LocalStorage
-)
-export class SyncService extends HttpProxyBase {
+@autoinject
+export class SyncService {
   constructor(
-    protected readonly authService: AuthService,
-    protected readonly httpClient: HttpClient,
-    protected readonly eventAggregator: EventAggregator,
+    private readonly httpProxy: HttpProxy,
     private readonly accountsIDBHelper: AccountsIDBHelper,
     private readonly categoriesIDBHelper: CategoriesIDBHelper,
     private readonly transactionsIDBHelper: TransactionsIDBHelper,
     private readonly upcomingExpensesIDBHelper: UpcomingExpensesIDBHelper,
     private readonly debtsIDBHelper: DebtsIDBHelper,
-    private readonly localStorage: LocalStorage
-  ) {
-    super(authService, httpClient, eventAggregator);
-  }
+    private readonly localStorage: LocalStorage,
+    private readonly logger: ErrorLogger
+  ) {}
 
   async sync(lastSynced: string): Promise<string> {
-    let lastSyncedServer = "1970-01-01T00:00:00.000Z";
+    try {
+      let lastSyncedServer = "1970-01-01T00:00:00.000Z";
 
-    await this.upcomingExpensesIDBHelper.deleteOld();
+      await this.upcomingExpensesIDBHelper.deleteOld();
 
-    const changed = await this.ajax<Changed>("sync/changes", {
-      method: "post",
-      body: json({
-        lastSynced: lastSynced,
-      }),
-    });
-    lastSyncedServer = changed.lastSynced;
+      const changed = await this.httpProxy.ajax<Changed>("api/sync/changes", {
+        method: "post",
+        body: json({
+          lastSynced: lastSynced,
+        }),
+      });
+      lastSyncedServer = changed.lastSynced;
 
-    await this.accountsIDBHelper.sync(changed.deletedAccountIds, changed.accounts);
-    await this.categoriesIDBHelper.sync(changed.deletedCategoryIds, changed.categories);
-    await this.transactionsIDBHelper.sync(changed.deletedTransactionIds, changed.transactions);
-    await this.upcomingExpensesIDBHelper.sync(changed.deletedUpcomingExpenseIds, changed.upcomingExpenses);
-    await this.debtsIDBHelper.sync(changed.deletedDebtIds, changed.debts);
+      await this.accountsIDBHelper.sync(changed.deletedAccountIds, changed.accounts);
+      await this.categoriesIDBHelper.sync(changed.deletedCategoryIds, changed.categories);
+      await this.transactionsIDBHelper.sync(changed.deletedTransactionIds, changed.transactions);
+      await this.upcomingExpensesIDBHelper.sync(changed.deletedUpcomingExpenseIds, changed.upcomingExpenses);
+      await this.debtsIDBHelper.sync(changed.deletedDebtIds, changed.debts);
 
-    const accountsToCreate = await this.accountsIDBHelper.getForSyncing();
-    const categoriesToCreate = await this.categoriesIDBHelper.getForSyncing();
-    const transactionsToCreate = await this.transactionsIDBHelper.getForSyncing();
-    const upcomingExpensesToCreate = await this.upcomingExpensesIDBHelper.getForSyncing();
-    const debtsToCreate = await this.debtsIDBHelper.getForSyncing();
-    const create = new Create(
-      accountsToCreate,
-      categoriesToCreate,
-      transactionsToCreate,
-      upcomingExpensesToCreate,
-      debtsToCreate
-    );
-    const created = await this.ajax<Created>("sync/create-entities", {
-      method: "post",
-      body: json(create),
-    });
+      const accountsToCreate = await this.accountsIDBHelper.getForSyncing();
+      const categoriesToCreate = await this.categoriesIDBHelper.getForSyncing();
+      const transactionsToCreate = await this.transactionsIDBHelper.getForSyncing();
+      const upcomingExpensesToCreate = await this.upcomingExpensesIDBHelper.getForSyncing();
+      const debtsToCreate = await this.debtsIDBHelper.getForSyncing();
+      const create = new Create(
+        accountsToCreate,
+        categoriesToCreate,
+        transactionsToCreate,
+        upcomingExpensesToCreate,
+        debtsToCreate
+      );
+      const created = await this.httpProxy.ajax<Created>("api/sync/create-entities", {
+        method: "post",
+        body: json(create),
+      });
 
-    await this.accountsIDBHelper.consolidate(created.accountIdPairs);
-    await this.categoriesIDBHelper.consolidate(created.categoryIdPairs);
-    await this.transactionsIDBHelper.consolidate(created.transactionIdPairs);
-    await this.upcomingExpensesIDBHelper.consolidate(created.upcomingExpenseIdPairs);
-    await this.debtsIDBHelper.consolidate(created.debtIdPairs);
+      await this.accountsIDBHelper.consolidate(created.accountIdPairs);
+      await this.categoriesIDBHelper.consolidate(created.categoryIdPairs);
+      await this.transactionsIDBHelper.consolidate(created.transactionIdPairs);
+      await this.upcomingExpensesIDBHelper.consolidate(created.upcomingExpenseIdPairs);
+      await this.debtsIDBHelper.consolidate(created.debtIdPairs);
 
-    return lastSyncedServer;
+      return lastSyncedServer;
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   async totalSync(): Promise<void> {
-    const deleteContextRequest = window.indexedDB.deleteDatabase("IDBContext");
+    try {
+      const deleteContextRequest = window.indexedDB.deleteDatabase("IDBContext");
 
-    deleteContextRequest.onsuccess = () => {
-      const deleteDbNamesRequest = window.indexedDB.deleteDatabase("__dbnames");
+      deleteContextRequest.onsuccess = () => {
+        const deleteDbNamesRequest = window.indexedDB.deleteDatabase("__dbnames");
 
-      deleteDbNamesRequest.onsuccess = () => {
-        this.localStorage.setLastSynced("1970-01-01T00:00:00.000Z");
+        deleteDbNamesRequest.onsuccess = () => {
+          this.localStorage.setLastSynced("1970-01-01T00:00:00.000Z");
 
-        window.location.href = "/dashboard";
+          window.location.href = "/dashboard";
+        };
       };
-    };
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 }

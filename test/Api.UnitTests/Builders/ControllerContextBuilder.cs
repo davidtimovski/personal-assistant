@@ -22,7 +22,7 @@ public class ControllerContextBuilder
                 User = new ClaimsPrincipal(new ClaimsIdentity(
                     new[]
                     {
-                        new Claim(ClaimTypes.NameIdentifier, _userId.ToString())
+                        new Claim("sub", _userId.ToString())
                     }, "mock"))
             }
         };

@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { EventAggregator } from "aurelia-event-aggregator";
 
@@ -7,9 +7,9 @@ import { Category } from "models/entities/category";
 import { CategoryItem } from "models/viewmodels/categoryItem";
 import { AppEvents } from "models/appEvents";
 
-@inject(Router, CategoriesService, EventAggregator)
+@autoinject
 export class Categories {
-  private categories: Array<CategoryItem>;
+  private categories: CategoryItem[];
   private lastEditedId: number;
   private syncing = false;
 
@@ -52,7 +52,7 @@ export class Categories {
     this.categories = categoryItems;
   }
 
-  mapToCategoryItem(category: Category, subCategories: Array<Category>) {
+  mapToCategoryItem(category: Category, subCategories: Category[]) {
     return new CategoryItem(
       category.id,
       category.name,

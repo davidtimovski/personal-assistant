@@ -1,6 +1,4 @@
 export class NumberFormatValueConverter {
-  constructor() {}
-
   toView(value: any, currency: string) {
     if (isNaN(parseFloat(value))) {
       return null;
@@ -8,7 +6,7 @@ export class NumberFormatValueConverter {
 
     if (currency === "MKD") {
       return new Intl.NumberFormat("mk-MK", {
-        maximumFractionDigits: 0
+        maximumFractionDigits: 0,
       }).format(value);
     }
 

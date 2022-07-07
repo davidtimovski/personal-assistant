@@ -1,75 +1,93 @@
-import { inject } from "aurelia-framework";
-import { HttpClient } from "aurelia-fetch-client";
+import { autoinject } from "aurelia-framework";
 import { EventAggregator } from "aurelia-event-aggregator";
 
-import { AuthService } from "./authService";
-import { HttpProxyBase } from "../utils/httpProxyBase";
+import { ErrorLogger } from "./errorLogger";
+import { HttpProxy } from "../utils/httpProxy";
 import { LocalStorageCurrencies } from "../utils/localStorageCurrencies";
 import { DateHelper } from "../utils/dateHelper";
 import { AlertEvents } from "../models/enums/alertEvents";
 
-@inject(AuthService, HttpClient, EventAggregator, LocalStorageCurrencies)
-export class CurrenciesService extends HttpProxyBase {
+@autoinject
+export class CurrenciesService {
   private currencyRates: any;
 
   constructor(
-    protected readonly authService: AuthService,
-    protected readonly httpClient: HttpClient,
-    protected readonly eventAggregator: EventAggregator,
-    private readonly localStorage: LocalStorageCurrencies
-  ) {
-    super(authService, httpClient, eventAggregator);
-  }
+    private readonly httpProxy: HttpProxy,
+    private readonly eventAggregator: EventAggregator,
+    private readonly localStorage: LocalStorageCurrencies,
+    private readonly logger: ErrorLogger
+  ) {}
 
   async loadRates(): Promise<void> {
-    const today = DateHelper.format(new Date());
+    try {
+      const today = DateHelper.format(new Date());
 
-    this.currencyRates = await this.ajax<string>(`currencies/${today}`);
+      this.currencyRates = await this.httpProxy.ajax<string>(`api/currencies/${today}`);
 
-    this.localStorage.setCurrencyRates(JSON.stringify(this.currencyRates));
+      this.localStorage.setCurrencyRates(JSON.stringify(this.currencyRates));
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
-  getCurrencies(): Array<string> {
-    const currencies = new Array<string>();
+  getCurrencies(): string[] {
+    try {
+      const currencies = new Array<string>();
 
-    const currencyRates = this.currencyRates ? this.currencyRates : JSON.parse(this.localStorage.getCurrencyRates());
+      const currencyRates = this.currencyRates ? this.currencyRates : JSON.parse(this.localStorage.getCurrencyRates());
 
-    for (const currency in currencyRates) {
-      currencies.push(currency);
+      for (const currency in currencyRates) {
+        currencies.push(currency);
+      }
+
+      return currencies.sort();
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
     }
-
-    return currencies.sort();
   }
 
   convert(amount: number, fromCurrency: string, toCurrency: string): number {
-    amount = parseFloat(<any>amount);
+    try {
+      amount = parseFloat(<any>amount);
 
-    if (fromCurrency === toCurrency) {
-      return amount;
+      if (fromCurrency === toCurrency) {
+        return amount;
+      }
+
+      const fromRate = this.getRate(fromCurrency);
+      const amountFixed = this.toFixed(amount, 2);
+      const eurAmount = parseFloat((amountFixed / fromRate).toFixed(2));
+
+      const toRate = this.getRate(toCurrency);
+      if (toCurrency === "MKD") {
+        return parseFloat((eurAmount * toRate).toFixed(0));
+      }
+      return parseFloat((eurAmount * toRate).toFixed(2));
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
     }
-
-    const fromRate = this.getRate(fromCurrency);
-    const amountFixed = this.toFixed(amount, 2);
-    const eurAmount = parseFloat((amountFixed / fromRate).toFixed(2));
-
-    const toRate = this.getRate(toCurrency);
-    if (toCurrency === "MKD") {
-      return parseFloat((eurAmount * toRate).toFixed(0));
-    }
-    return parseFloat((eurAmount * toRate).toFixed(2));
   }
 
   private getRate(currency: string): number {
-    if (!this.currencyRates) {
-      const currencyRates = this.localStorage.getCurrencyRates();
-      if (currencyRates) {
-        this.currencyRates = JSON.parse(currencyRates);
-        return this.currencyRates[currency];
-      } else {
-        this.eventAggregator.publish(AlertEvents.ShowError, "currencyConversionError");
+    try {
+      if (!this.currencyRates) {
+        const currencyRates = this.localStorage.getCurrencyRates();
+        if (currencyRates) {
+          this.currencyRates = JSON.parse(currencyRates);
+          return this.currencyRates[currency];
+        } else {
+          this.eventAggregator.publish(AlertEvents.ShowError, "currencyConversionError");
+          throw new Error(`Could not get rate for currency ${currency}`);
+        }
       }
+      return this.currencyRates[currency];
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
     }
-    return this.currencyRates[currency];
   }
 
   private toFixed(num: number, fixed: number): number {

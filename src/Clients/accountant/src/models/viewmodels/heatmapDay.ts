@@ -10,7 +10,7 @@ export class HeatmapDay {
     public spentPercentage: number,
     public backgroundColor: string,
     public textColor: string,
-    public expenditures: Array<HeatmapExpense>
+    public expenditures: HeatmapExpense[]
   ) {
     this.expenditures = [];
   }

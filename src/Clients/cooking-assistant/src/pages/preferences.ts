@@ -1,4 +1,4 @@
-import { inject, observable } from "aurelia-framework";
+import { autoinject, observable } from "aurelia-framework";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
 
@@ -8,7 +8,7 @@ import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
 import { UsersService } from "services/usersService";
 import { PreferencesModel } from "models/preferencesModel";
 
-@inject(UsersService, NotificationsServiceBase, I18N, EventAggregator)
+@autoinject
 export class Preferences {
   private readonly notificationsVapidKey =
     "BIWWy4ZjIrLMVBxYwsq4rlixA3miMGeMw0yCqldR5Cpv5mozBw1oQxEbbp5q1I9SL9_zUjaLfYheoqb578becPY";

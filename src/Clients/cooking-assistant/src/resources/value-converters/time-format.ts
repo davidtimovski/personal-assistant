@@ -1,7 +1,7 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { I18N } from "aurelia-i18n";
 
-@inject(I18N)
+@autoinject
 export class TimeFormatValueConverter {
   constructor(private readonly i18n: I18N) {}
 
@@ -15,12 +15,6 @@ export class TimeFormatValueConverter {
       return hours + this.i18n.tr("hoursLetter");
     }
 
-    return (
-      hours +
-      this.i18n.tr("hoursLetter") +
-      " " +
-      minutes +
-      this.i18n.tr("minutesLetter")
-    );
+    return hours + this.i18n.tr("hoursLetter") + " " + minutes + this.i18n.tr("minutesLetter");
   }
 }

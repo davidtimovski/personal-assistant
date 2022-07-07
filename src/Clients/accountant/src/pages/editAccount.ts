@@ -1,4 +1,4 @@
-import { inject, computedFrom, observable } from "aurelia-framework";
+import { autoinject, computedFrom, observable } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
@@ -12,7 +12,7 @@ import { AccountsService } from "services/accountsService";
 import { LocalStorage } from "utils/localStorage";
 import { Account } from "models/entities/account";
 
-@inject(Router, AccountsService, LocalStorage, ValidationController, I18N, EventAggregator, ConnectionTracker)
+@autoinject
 export class EditAccount {
   private accountId: number;
   private account: Account;
@@ -163,15 +163,13 @@ export class EditAccount {
 
       try {
         await this.accountsService.delete(this.account.id);
+
         this.eventAggregator.publish(AlertEvents.ShowSuccess, "editAccount.deleteSuccessful");
         this.router.navigateToRoute("accounts");
-      } catch (e) {
-        this.eventAggregator.publish(AlertEvents.ShowError, e);
-
+      } catch {
         this.deleteButtonText = this.i18n.tr("delete");
         this.deleteInProgress = false;
         this.deleteButtonIsLoading = false;
-        return;
       }
     } else {
       if (await this.accountsService.hasTransactions(this.account.id)) {

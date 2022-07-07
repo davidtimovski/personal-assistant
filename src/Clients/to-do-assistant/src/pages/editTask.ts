@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
@@ -6,6 +6,7 @@ import { EventAggregator } from "aurelia-event-aggregator";
 
 import { ValidationUtil } from "../../../shared/src/utils/validationUtil";
 import { AlertEvents } from "../../../shared/src/models/enums/alertEvents";
+import { ValidationErrors } from "../../../shared/src/models/validationErrors";
 
 import { TasksService } from "services/tasksService";
 import { ListOption } from "models/viewmodels/listOption";
@@ -14,7 +15,7 @@ import { EditTaskModel } from "models/viewmodels/editTaskModel";
 import { AssigneeOption } from "models/viewmodels/assigneeOption";
 import * as environment from "../../config/environment.json";
 
-@inject(Router, TasksService, ListsService, ValidationController, I18N, EventAggregator)
+@autoinject
 export class EditTask {
   private taskId: number;
   private model: EditTaskModel;
@@ -136,8 +137,11 @@ export class EditTask {
           id: this.model.listId,
           editedId: this.model.id,
         });
-      } catch (errorFields) {
-        this.nameIsInvalid = errorFields.includes("Name");
+      } catch (e) {
+        if (e instanceof ValidationErrors) {
+          this.nameIsInvalid = e.fields.includes("Name");
+        }
+
         this.saveButtonIsLoading = false;
       }
     } else {

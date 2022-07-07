@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
@@ -20,7 +20,7 @@ import * as Actions from "utils/state/actions";
 import { TransactionType } from "models/viewmodels/transactionType";
 import { AppEvents } from "models/appEvents";
 
-@inject(Router, CapitalService, UsersServiceBase, LocalStorage, I18N, EventAggregator, ConnectionTracker)
+@autoinject
 @connectTo()
 export class Dashboard {
   private imageUri = JSON.parse(<any>environment).defaultProfileImageUri;
