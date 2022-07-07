@@ -1,31 +1,22 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { json } from "aurelia-fetch-client";
-import { HttpClient } from "aurelia-fetch-client";
-import { EventAggregator } from "aurelia-event-aggregator";
 
-import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
-import { AuthService } from "../../../shared/src/services/authService";
+import { HttpProxy } from "../../../shared/src/utils/httpProxy";
 import { CurrenciesService } from "../../../shared/src/services/currenciesService";
 import { ErrorLogger } from "../../../shared/src/services/errorLogger";
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
 
-import { UpcomingExpensesIDBHelper } from "../utils/upcomingExpensesIDBHelper";
+import { UpcomingExpensesIDBHelper } from "utils/upcomingExpensesIDBHelper";
 import { UpcomingExpense } from "models/entities/upcomingExpense";
-import * as environment from "../../config/environment.json";
 
-@inject(AuthService, HttpClient, EventAggregator, UpcomingExpensesIDBHelper, CurrenciesService)
-export class UpcomingExpensesService extends HttpProxyBase {
-  private readonly logger = new ErrorLogger(JSON.parse(<any>environment).urls.clientLogger, this.authService);
-
+@autoinject
+export class UpcomingExpensesService {
   constructor(
-    protected readonly authService: AuthService,
-    protected readonly httpClient: HttpClient,
-    protected readonly eventAggregator: EventAggregator,
+    private readonly httpProxy: HttpProxy,
     private readonly idbHelper: UpcomingExpensesIDBHelper,
-    private readonly currenciesService: CurrenciesService
-  ) {
-    super(authService, httpClient, eventAggregator);
-  }
+    private readonly currenciesService: CurrenciesService,
+    private readonly logger: ErrorLogger
+  ) {}
 
   async getAll(currency: string): Promise<Array<UpcomingExpense>> {
     try {
@@ -57,7 +48,7 @@ export class UpcomingExpensesService extends HttpProxyBase {
       upcomingExpense.createdDate = upcomingExpense.modifiedDate = now;
 
       if (navigator.onLine) {
-        upcomingExpense.id = await this.ajax<number>("upcomingexpenses", {
+        upcomingExpense.id = await this.httpProxy.ajax<number>("api/upcomingexpenses", {
           method: "post",
           body: json(upcomingExpense),
         });
@@ -83,7 +74,7 @@ export class UpcomingExpensesService extends HttpProxyBase {
       upcomingExpense.modifiedDate = DateHelper.adjustForTimeZone(new Date());
 
       if (navigator.onLine) {
-        await this.ajaxExecute("upcomingexpenses", {
+        await this.httpProxy.ajaxExecute("api/upcomingexpenses", {
           method: "put",
           body: json(upcomingExpense),
         });
@@ -102,7 +93,7 @@ export class UpcomingExpensesService extends HttpProxyBase {
   async delete(id: number): Promise<void> {
     try {
       if (navigator.onLine) {
-        await this.ajaxExecute(`upcomingexpenses/${id}`, {
+        await this.httpProxy.ajaxExecute(`api/upcomingexpenses/${id}`, {
           method: "delete",
         });
       } else if (await this.idbHelper.isSynced(id)) {

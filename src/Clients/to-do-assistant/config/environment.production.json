@@ -4,8 +4,7 @@
   "urls": {
     "authority": "https://personalassistant.site",
     "host": "https://todo.personalassistant.site",
-    "api": "https://api.personalassistant.site",
-    "clientLogger": "https://logger.personalassistant.site"
+    "api": "https://api.personalassistant.site"
   },
   "defaultProfileImageUri": "https://res.cloudinary.com/personalassistant/t_profile_thumbnail/production/defaults/sfmqac.webp"
 }

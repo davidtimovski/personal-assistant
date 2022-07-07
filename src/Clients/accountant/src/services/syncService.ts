@@ -1,48 +1,29 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { json } from "aurelia-fetch-client";
-import { HttpClient } from "aurelia-fetch-client";
-import { EventAggregator } from "aurelia-event-aggregator";
 
-import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
-import { AuthService } from "../../../shared/src/services/authService";
+import { HttpProxy } from "../../../shared/src/utils/httpProxy";
 import { ErrorLogger } from "../../../shared/src/services/errorLogger";
 
-import { AccountsIDBHelper } from "../utils/accountsIDBHelper";
-import { CategoriesIDBHelper } from "../utils/categoriesIDBHelper";
-import { TransactionsIDBHelper } from "../utils/transactionsIDBHelper";
-import { UpcomingExpensesIDBHelper } from "../utils/upcomingExpensesIDBHelper";
-import { DebtsIDBHelper } from "../utils/debtsIDBHelper";
+import { AccountsIDBHelper } from "utils/accountsIDBHelper";
+import { CategoriesIDBHelper } from "utils/categoriesIDBHelper";
+import { TransactionsIDBHelper } from "utils/transactionsIDBHelper";
+import { UpcomingExpensesIDBHelper } from "utils/upcomingExpensesIDBHelper";
+import { DebtsIDBHelper } from "utils/debtsIDBHelper";
 import { LocalStorage } from "utils/localStorage";
 import { Changed, Create, Created } from "models/sync";
-import * as environment from "../../config/environment.json";
 
-@inject(
-  AuthService,
-  HttpClient,
-  EventAggregator,
-  AccountsIDBHelper,
-  CategoriesIDBHelper,
-  TransactionsIDBHelper,
-  UpcomingExpensesIDBHelper,
-  DebtsIDBHelper,
-  LocalStorage
-)
-export class SyncService extends HttpProxyBase {
-  private readonly logger = new ErrorLogger(JSON.parse(<any>environment).urls.clientLogger, this.authService);
-
+@autoinject
+export class SyncService {
   constructor(
-    protected readonly authService: AuthService,
-    protected readonly httpClient: HttpClient,
-    protected readonly eventAggregator: EventAggregator,
+    private readonly httpProxy: HttpProxy,
     private readonly accountsIDBHelper: AccountsIDBHelper,
     private readonly categoriesIDBHelper: CategoriesIDBHelper,
     private readonly transactionsIDBHelper: TransactionsIDBHelper,
     private readonly upcomingExpensesIDBHelper: UpcomingExpensesIDBHelper,
     private readonly debtsIDBHelper: DebtsIDBHelper,
-    private readonly localStorage: LocalStorage
-  ) {
-    super(authService, httpClient, eventAggregator);
-  }
+    private readonly localStorage: LocalStorage,
+    private readonly logger: ErrorLogger
+  ) {}
 
   async sync(lastSynced: string): Promise<string> {
     try {
@@ -50,7 +31,7 @@ export class SyncService extends HttpProxyBase {
 
       await this.upcomingExpensesIDBHelper.deleteOld();
 
-      const changed = await this.ajax<Changed>("sync/changes", {
+      const changed = await this.httpProxy.ajax<Changed>("api/sync/changes", {
         method: "post",
         body: json({
           lastSynced: lastSynced,
@@ -76,7 +57,7 @@ export class SyncService extends HttpProxyBase {
         upcomingExpensesToCreate,
         debtsToCreate
       );
-      const created = await this.ajax<Created>("sync/create-entities", {
+      const created = await this.httpProxy.ajax<Created>("api/sync/create-entities", {
         method: "post",
         body: json(create),
       });

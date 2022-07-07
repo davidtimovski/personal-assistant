@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
@@ -16,7 +16,7 @@ import { EditRecipeModel } from "models/viewmodels/editRecipeModel";
 import { EditRecipeIngredient } from "models/viewmodels/editRecipeIngredient";
 import { PreferencesModel } from "models/preferencesModel";
 
-@inject(Router, RecipesService, UsersService, ValidationController, I18N, EventAggregator)
+@autoinject
 export class EditRecipe {
   private model: EditRecipeModel;
   private originalRecipeJson: string;

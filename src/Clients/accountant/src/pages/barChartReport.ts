@@ -1,4 +1,4 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { I18N } from "aurelia-i18n";
 import { BarController, BarElement, CategoryScale, Chart, LinearScale } from "chart.js";
 
@@ -15,7 +15,7 @@ import { TransactionModel } from "models/entities/transaction";
 import { SelectOption } from "models/viewmodels/selectOption";
 import { CategoryType } from "models/entities/category";
 
-@inject(TransactionsService, CategoriesService, AccountsService, LocalStorage, I18N)
+@autoinject
 export class BarChartReport {
   private mainAccountId: number;
   private currency: string;

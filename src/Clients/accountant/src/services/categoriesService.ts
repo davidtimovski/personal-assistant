@@ -1,30 +1,21 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { json } from "aurelia-fetch-client";
-import { HttpClient } from "aurelia-fetch-client";
-import { EventAggregator } from "aurelia-event-aggregator";
 
-import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
-import { AuthService } from "../../../shared/src/services/authService";
+import { HttpProxy } from "../../../shared/src/utils/httpProxy";
 import { ErrorLogger } from "../../../shared/src/services/errorLogger";
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
 
-import { CategoriesIDBHelper } from "../utils/categoriesIDBHelper";
+import { CategoriesIDBHelper } from "utils/categoriesIDBHelper";
 import { Category, CategoryType } from "models/entities/category";
 import { SelectOption } from "models/viewmodels/selectOption";
-import * as environment from "../../config/environment.json";
 
-@inject(AuthService, HttpClient, EventAggregator, CategoriesIDBHelper)
-export class CategoriesService extends HttpProxyBase {
-  private readonly logger = new ErrorLogger(JSON.parse(<any>environment).urls.clientLogger, this.authService);
-
+@autoinject
+export class CategoriesService {
   constructor(
-    protected readonly authService: AuthService,
-    protected readonly httpClient: HttpClient,
-    protected readonly eventAggregator: EventAggregator,
-    private readonly idbHelper: CategoriesIDBHelper
-  ) {
-    super(authService, httpClient, eventAggregator);
-  }
+    private readonly httpProxy: HttpProxy,
+    private readonly idbHelper: CategoriesIDBHelper,
+    private readonly logger: ErrorLogger
+  ) {}
 
   getAll(): Promise<Array<Category>> {
     return this.idbHelper.getAll();
@@ -90,7 +81,7 @@ export class CategoriesService extends HttpProxyBase {
       }
 
       if (navigator.onLine) {
-        category.id = await this.ajax<number>("categories", {
+        category.id = await this.httpProxy.ajax<number>("api/categories", {
           method: "post",
           body: json(category),
         });
@@ -115,7 +106,7 @@ export class CategoriesService extends HttpProxyBase {
       }
 
       if (navigator.onLine) {
-        await this.ajaxExecute("categories", {
+        await this.httpProxy.ajaxExecute("api/categories", {
           method: "put",
           body: json(category),
         });
@@ -134,7 +125,7 @@ export class CategoriesService extends HttpProxyBase {
   async delete(id: number): Promise<void> {
     try {
       if (navigator.onLine) {
-        await this.ajaxExecute(`categories/${id}`, {
+        await this.httpProxy.ajaxExecute(`api/categories/${id}`, {
           method: "delete",
         });
       } else if (await this.idbHelper.isSynced(id)) {

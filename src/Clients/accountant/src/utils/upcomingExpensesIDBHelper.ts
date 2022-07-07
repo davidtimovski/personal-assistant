@@ -1,10 +1,10 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 
 import { UpcomingExpense } from "models/entities/upcomingExpense";
 import { CreatedIdPair } from "models/sync";
 import { IDBContext } from "./idbContext";
 
-@inject(IDBContext)
+@autoinject
 export class UpcomingExpensesIDBHelper {
   constructor(private readonly db: IDBContext) {}
 

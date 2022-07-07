@@ -1,42 +1,30 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { json } from "aurelia-fetch-client";
-import { HttpClient } from "aurelia-fetch-client";
-import { EventAggregator } from "aurelia-event-aggregator";
 
-import { AuthService } from "../../../shared/src/services/authService";
-import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
+import { HttpProxy } from "../../../shared/src/utils/httpProxy";
 import { ErrorLogger } from "../../../shared/src/services/errorLogger";
 
-import { SimpleIngredient } from "../models/viewmodels/simpleIngredient";
-import { EditIngredientModel } from "../models/viewmodels/editIngredientModel";
-import { IngredientSuggestion, PublicIngredientSuggestions } from "../models/viewmodels/ingredientSuggestions";
-import { PriceData } from "../models/viewmodels/priceData";
-import { TaskSuggestion } from "../models/viewmodels/taskSuggestion";
-import { ViewIngredientModel } from "../models/viewmodels/viewIngredientModel";
-import * as environment from "../../config/environment.json";
+import { SimpleIngredient } from "models/viewmodels/simpleIngredient";
+import { EditIngredientModel } from "models/viewmodels/editIngredientModel";
+import { IngredientSuggestion, PublicIngredientSuggestions } from "models/viewmodels/ingredientSuggestions";
+import { PriceData } from "models/viewmodels/priceData";
+import { TaskSuggestion } from "models/viewmodels/taskSuggestion";
+import { ViewIngredientModel } from "models/viewmodels/viewIngredientModel";
 
-@inject(AuthService, HttpClient, EventAggregator)
-export class IngredientsService extends HttpProxyBase {
-  private readonly logger = new ErrorLogger(JSON.parse(<any>environment).urls.clientLogger, this.authService);
-
-  constructor(
-    protected readonly authService: AuthService,
-    protected readonly httpClient: HttpClient,
-    protected readonly eventAggregator: EventAggregator
-  ) {
-    super(authService, httpClient, eventAggregator);
-  }
+@autoinject
+export class IngredientsService {
+  constructor(private readonly httpProxy: HttpProxy, private readonly logger: ErrorLogger) {}
 
   getAll(): Promise<SimpleIngredient[]> {
-    return this.ajax<SimpleIngredient[]>("ingredients");
+    return this.httpProxy.ajax<SimpleIngredient[]>("api/ingredients");
   }
 
   getForUpdate(id: number): Promise<EditIngredientModel> {
-    return this.ajax<EditIngredientModel>(`ingredients/${id}/update`);
+    return this.httpProxy.ajax<EditIngredientModel>(`api/ingredients/${id}/update`);
   }
 
   getPublic(id: number): Promise<ViewIngredientModel> {
-    return this.ajax<ViewIngredientModel>(`ingredients/${id}/public`);
+    return this.httpProxy.ajax<ViewIngredientModel>(`api/ingredients/${id}/public`);
   }
 
   async update(ingredient: EditIngredientModel): Promise<void> {
@@ -49,7 +37,7 @@ export class IngredientsService extends HttpProxyBase {
         ingredient.priceData.isSet && ingredient.priceData.price ? ingredient.priceData.currency : null
       );
 
-      await this.ajaxExecute("ingredients", {
+      await this.httpProxy.ajaxExecute("api/ingredients", {
         method: "put",
         body: json({
           id: ingredient.id,
@@ -67,7 +55,7 @@ export class IngredientsService extends HttpProxyBase {
 
   async updatePublic(id: number, taskId: number): Promise<void> {
     try {
-      await this.ajaxExecute("ingredients/public", {
+      await this.httpProxy.ajaxExecute("api/ingredients/public", {
         method: "put",
         body: json({
           id: id,
@@ -82,7 +70,7 @@ export class IngredientsService extends HttpProxyBase {
 
   async delete(id: number): Promise<void> {
     try {
-      await this.ajaxExecute(`ingredients/${id}`, {
+      await this.httpProxy.ajaxExecute(`api/ingredients/${id}`, {
         method: "delete",
       });
     } catch (e) {
@@ -92,14 +80,14 @@ export class IngredientsService extends HttpProxyBase {
   }
 
   getTaskSuggestions(): Promise<TaskSuggestion[]> {
-    return this.ajax<TaskSuggestion[]>("ingredients/task-suggestions");
+    return this.httpProxy.ajax<TaskSuggestion[]>("api/ingredients/task-suggestions");
   }
 
   getUserIngredientSuggestions(): Promise<IngredientSuggestion[]> {
-    return this.ajax<IngredientSuggestion[]>("ingredients/user-suggestions");
+    return this.httpProxy.ajax<IngredientSuggestion[]>("api/ingredients/user-suggestions");
   }
 
   getPublicIngredientSuggestions(): Promise<PublicIngredientSuggestions> {
-    return this.ajax<PublicIngredientSuggestions>("ingredients/public-suggestions");
+    return this.httpProxy.ajax<PublicIngredientSuggestions>("api/ingredients/public-suggestions");
   }
 }

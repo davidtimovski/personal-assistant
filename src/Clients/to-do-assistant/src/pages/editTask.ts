@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
@@ -15,7 +15,7 @@ import { EditTaskModel } from "models/viewmodels/editTaskModel";
 import { AssigneeOption } from "models/viewmodels/assigneeOption";
 import * as environment from "../../config/environment.json";
 
-@inject(Router, TasksService, ListsService, ValidationController, I18N, EventAggregator)
+@autoinject
 export class EditTask {
   private taskId: number;
   private model: EditTaskModel;

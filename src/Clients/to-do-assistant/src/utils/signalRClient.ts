@@ -1,4 +1,4 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { EventAggregator } from "aurelia-event-aggregator";
 
 import { SignalRClientBase } from "../../../shared/src/utils/signalRClientBase";
@@ -8,7 +8,7 @@ import { ListsService } from "services/listsService";
 import * as Actions from "utils/state/actions";
 import { AppEvents } from "models/appEvents";
 
-@inject(ListsService, EventAggregator)
+@autoinject
 export class SignalRClient extends SignalRClientBase {
   constructor(private readonly listsService: ListsService, private readonly eventAggregator: EventAggregator) {
     super();

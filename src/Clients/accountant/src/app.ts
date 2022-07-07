@@ -1,5 +1,5 @@
 import { NavigationInstruction, RouterConfiguration, Router } from "aurelia-router";
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { EventAggregator } from "aurelia-event-aggregator";
 import { I18N } from "aurelia-i18n";
 
@@ -14,7 +14,7 @@ import routes from "./routes";
 import { AppEvents } from "models/appEvents";
 import { AuthEvents } from "../../shared/src/models/enums/authEvents";
 
-@inject(AuthService, EventAggregator, SyncService, LocalStorage, CurrenciesService, BroadcastChannel, I18N)
+@autoinject
 export class App {
   private isTouchDevice = false;
   router: Router;

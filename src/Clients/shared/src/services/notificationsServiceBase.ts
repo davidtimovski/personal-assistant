@@ -1,18 +1,26 @@
+import { autoinject } from "aurelia-framework";
 import { json } from "aurelia-fetch-client";
-import { HttpProxyBase } from "../utils/httpProxyBase";
 
-export class NotificationsServiceBase extends HttpProxyBase {
-  async createSubscription(
-    application: string,
-    subscription: PushSubscription
-  ): Promise<void> {
-    await this.ajaxExecute("pushsubscriptions", {
-      method: "post",
-      body: json({
-        application: application,
-        subscription: subscription,
-      }),
-    });
+import { HttpProxy } from "../utils/httpProxy";
+import { ErrorLogger } from "./errorLogger";
+
+@autoinject
+export class NotificationsServiceBase {
+  constructor(protected readonly httpProxy: HttpProxy, private readonly logger: ErrorLogger) {}
+
+  async createSubscription(application: string, subscription: PushSubscription): Promise<void> {
+    try {
+      await this.httpProxy.ajaxExecute("api/pushsubscriptions", {
+        method: "post",
+        body: json({
+          application: application,
+          subscription: subscription,
+        }),
+      });
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
   }
 
   static getApplicationServerKey(vapidPublicKey: string): Uint8Array {
@@ -21,9 +29,7 @@ export class NotificationsServiceBase extends HttpProxyBase {
 
   private static urlBase64ToUint8Array(base64String: string): Uint8Array {
     const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-    const base64 = (base64String + padding)
-      .replace(/\-/g, "+")
-      .replace(/_/g, "/");
+    const base64 = (base64String + padding).replace(/\-/g, "+").replace(/_/g, "/");
 
     const rawData = window.atob(base64);
     const outputArray = new Uint8Array(rawData.length);

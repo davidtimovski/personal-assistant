@@ -1,4 +1,4 @@
-import { inject, observable } from "aurelia-framework";
+import { autoinject, observable } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 import { ArcElement, Chart, PieController } from "chart.js";
@@ -15,7 +15,7 @@ import { TransactionModel } from "models/entities/transaction";
 import { SearchFilters } from "models/viewmodels/searchFilters";
 import * as Actions from "utils/state/actions";
 
-@inject(Router, TransactionsService, AccountsService, LocalStorage, I18N)
+@autoinject
 @connectTo()
 export class PieChartReport {
   private mainAccountId: number;

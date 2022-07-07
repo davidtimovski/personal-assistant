@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
@@ -13,7 +13,7 @@ import { LocalStorage } from "utils/localStorage";
 import { DebtModel } from "models/entities/debt";
 import { EditDebtModel } from "models/viewmodels/editDebtModel";
 
-@inject(Router, DebtsService, LocalStorage, ValidationController, I18N, EventAggregator, ConnectionTracker)
+@autoinject
 export class EditDebt {
   private debtId: number;
   private model = new EditDebtModel(null, null, null, null, null, false, null, false);

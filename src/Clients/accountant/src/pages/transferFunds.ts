@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
@@ -14,7 +14,7 @@ import { TransferFundsModel } from "models/viewmodels/transferFunds";
 import { TransactionModel } from "models/entities/transaction";
 import { Account } from "models/entities/account";
 
-@inject(Router, AccountsService, TransactionsService, LocalStorage, ValidationController, I18N, EventAggregator)
+@autoinject
 export class TransferFunds {
   private model = new TransferFundsModel(null, null, null, null, null, null, null);
   private accounts: Account[];

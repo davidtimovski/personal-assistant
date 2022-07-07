@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
 using Api.Config;
 using Api.Hubs;
+using Application;
+using Application.Contracts.CookingAssistant.DietaryProfiles.Models;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
+using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Localization;
@@ -13,17 +17,19 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Application;
-using Application.Contracts.CookingAssistant.DietaryProfiles.Models;
-using Infrastructure;
+using Ocelot.DependencyInjection;
+using Ocelot.Middleware;
 using Persistence;
-using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
 {
+    configBuilder.AddJsonFile("ocelot.json");
+
     if (context.HostingEnvironment.EnvironmentName == Environments.Production)
     {
+        configBuilder.AddJsonFile("ocelot.Production.json");
+
         var config = configBuilder.Build();
 
         string url = config["KeyVault:Url"];
@@ -124,6 +130,8 @@ builder.Services.AddMvc(options =>
 })
     .AddNewtonsoftJson();
 
+builder.Services.AddOcelot();   
+
 builder.Services.AddHttpClient();
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
@@ -147,9 +155,13 @@ app.UseRequestLocalization(new RequestLocalizationOptions
 
 app.UseCors("AllowAllApps");
 
+// Have user ID claim be named "sub"
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMvc();
+app.UseOcelot().Wait();
 
 app.MapHub<ToDoAssistantHub>("/toDoAssistantHub");
 

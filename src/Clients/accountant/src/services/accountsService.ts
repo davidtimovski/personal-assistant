@@ -1,35 +1,26 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { json } from "aurelia-fetch-client";
-import { HttpClient } from "aurelia-fetch-client";
-import { EventAggregator } from "aurelia-event-aggregator";
 
-import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
-import { AuthService } from "../../../shared/src/services/authService";
+import { HttpProxy } from "../../../shared/src/utils/httpProxy";
 import { CurrenciesService } from "../../../shared/src/services/currenciesService";
 import { ErrorLogger } from "../../../shared/src/services/errorLogger";
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
 
-import { AccountsIDBHelper } from "../utils/accountsIDBHelper";
-import { TransactionsIDBHelper } from "../utils/transactionsIDBHelper";
+import { AccountsIDBHelper } from "utils/accountsIDBHelper";
+import { TransactionsIDBHelper } from "utils/transactionsIDBHelper";
 import { Account } from "models/entities/account";
 import { SelectOption } from "models/viewmodels/selectOption";
 import { TransactionModel } from "models/entities/transaction";
-import * as environment from "../../config/environment.json";
 
-@inject(AuthService, HttpClient, EventAggregator, AccountsIDBHelper, TransactionsIDBHelper, CurrenciesService)
-export class AccountsService extends HttpProxyBase {
-  private readonly logger = new ErrorLogger(JSON.parse(<any>environment).urls.clientLogger, this.authService);
-
+@autoinject
+export class AccountsService {
   constructor(
-    protected readonly authService: AuthService,
-    protected readonly httpClient: HttpClient,
-    protected readonly eventAggregator: EventAggregator,
+    private readonly httpProxy: HttpProxy,
     private readonly idbHelper: AccountsIDBHelper,
     private readonly transactionsIDBHelper: TransactionsIDBHelper,
-    private readonly currenciesService: CurrenciesService
-  ) {
-    super(authService, httpClient, eventAggregator);
-  }
+    private readonly currenciesService: CurrenciesService,
+    private readonly logger: ErrorLogger
+  ) {}
 
   getMainId(): Promise<number> {
     return this.idbHelper.getMainId();
@@ -192,7 +183,7 @@ export class AccountsService extends HttpProxyBase {
       account.createdDate = account.modifiedDate = now;
 
       if (navigator.onLine) {
-        account.id = await this.ajax<number>("accounts", {
+        account.id = await this.httpProxy.ajax<number>("api/accounts", {
           method: "post",
           body: json(account),
         });
@@ -213,7 +204,7 @@ export class AccountsService extends HttpProxyBase {
       account.modifiedDate = DateHelper.adjustForTimeZone(new Date());
 
       if (navigator.onLine) {
-        await this.ajaxExecute("accounts", {
+        await this.httpProxy.ajaxExecute("api/accounts", {
           method: "put",
           body: json(account),
         });
@@ -232,7 +223,7 @@ export class AccountsService extends HttpProxyBase {
   async delete(id: number): Promise<void> {
     try {
       if (navigator.onLine) {
-        await this.ajaxExecute(`accounts/${id}`, {
+        await this.httpProxy.ajaxExecute(`api/accounts/${id}`, {
           method: "delete",
         });
       } else if (await this.idbHelper.isSynced(id)) {

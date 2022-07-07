@@ -3,10 +3,10 @@ import { Notification } from "models/viewmodels/notification";
 
 export class NotificationsService extends NotificationsServiceBase {
   getAll(): Promise<Array<Notification>> {
-    return this.ajax<Array<Notification>>("notifications");
+    return this.httpProxy.ajax<Array<Notification>>("api/notifications");
   }
 
   getUnseenNotificationsCount(): Promise<number> {
-    return this.ajax<number>("notifications/unseen-notifications-count");
+    return this.httpProxy.ajax<number>("api/notifications/unseen-notifications-count");
   }
 }

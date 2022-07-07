@@ -1,46 +1,29 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { json } from "aurelia-fetch-client";
-import { HttpClient } from "aurelia-fetch-client";
-import { EventAggregator } from "aurelia-event-aggregator";
 
-import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
-import { AuthService } from "../../../shared/src/services/authService";
+import { HttpProxy } from "../../../shared/src/utils/httpProxy";
 import { CurrenciesService } from "../../../shared/src/services/currenciesService";
 import { ErrorLogger } from "../../../shared/src/services/errorLogger";
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
 
-import { TransactionsIDBHelper } from "../utils/transactionsIDBHelper";
+import { TransactionsIDBHelper } from "utils/transactionsIDBHelper";
 import { TransactionModel } from "models/entities/transaction";
 import { TransactionType } from "models/viewmodels/transactionType";
 import { CategoriesService } from "./categoriesService";
 import { EncryptionService } from "./encryptionService";
 import { SearchFilters } from "models/viewmodels/searchFilters";
 import { AmountByCategory } from "models/viewmodels/amountByCategory";
-import * as environment from "../../config/environment.json";
 
-@inject(
-  AuthService,
-  HttpClient,
-  EventAggregator,
-  TransactionsIDBHelper,
-  CategoriesService,
-  CurrenciesService,
-  EncryptionService
-)
-export class TransactionsService extends HttpProxyBase {
-  private readonly logger = new ErrorLogger(JSON.parse(<any>environment).urls.clientLogger, this.authService);
-
+@autoinject
+export class TransactionsService {
   constructor(
-    protected readonly authService: AuthService,
-    protected readonly httpClient: HttpClient,
-    protected readonly eventAggregator: EventAggregator,
+    private readonly httpProxy: HttpProxy,
     private readonly idbHelper: TransactionsIDBHelper,
     private readonly categoriesService: CategoriesService,
     private readonly currenciesService: CurrenciesService,
-    private readonly encryptionService: EncryptionService
-  ) {
-    super(authService, httpClient, eventAggregator);
-  }
+    private readonly encryptionService: EncryptionService,
+    private readonly logger: ErrorLogger
+  ) {}
 
   count(filters: SearchFilters): Promise<number> {
     return this.idbHelper.count(filters);
@@ -240,7 +223,7 @@ export class TransactionsService extends HttpProxyBase {
       transaction.createdDate = transaction.modifiedDate = now;
 
       if (navigator.onLine) {
-        transaction.id = await this.ajax<number>("transactions", {
+        transaction.id = await this.httpProxy.ajax<number>("api/transactions", {
           method: "post",
           body: json(transaction),
         });
@@ -288,7 +271,7 @@ export class TransactionsService extends HttpProxyBase {
       transaction.modifiedDate = DateHelper.adjustForTimeZone(new Date());
 
       if (navigator.onLine) {
-        await this.ajaxExecute("transactions", {
+        await this.httpProxy.ajaxExecute("api/transactions", {
           method: "put",
           body: json(transaction),
         });
@@ -307,7 +290,7 @@ export class TransactionsService extends HttpProxyBase {
   async delete(id: number): Promise<void> {
     try {
       if (navigator.onLine) {
-        await this.ajaxExecute(`transactions/${id}`, {
+        await this.httpProxy.ajaxExecute(`api/transactions/${id}`, {
           method: "delete",
         });
       } else if (await this.idbHelper.isSynced(id)) {
@@ -360,7 +343,7 @@ export class TransactionsService extends HttpProxyBase {
   }
 
   async export(fileId: string): Promise<Blob> {
-    return this.ajaxBlob("transactions/export", {
+    return this.httpProxy.ajaxBlob("api/transactions/export", {
       method: "post",
       body: json({
         fileId: fileId,
@@ -373,7 +356,7 @@ export class TransactionsService extends HttpProxyBase {
 
   async deleteExportedFile(fileId: string): Promise<void> {
     try {
-      await this.ajaxExecute(`transactions/exported-file/${fileId}`, {
+      await this.httpProxy.ajaxExecute(`api/transactions/exported-file/${fileId}`, {
         method: "delete",
       });
     } catch (e) {

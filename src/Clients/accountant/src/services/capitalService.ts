@@ -1,6 +1,5 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 
-import { AuthService } from "../../../shared/src/services/authService";
 import { CurrenciesService } from "../../../shared/src/services/currenciesService";
 import { ErrorLogger } from "../../../shared/src/services/errorLogger";
 
@@ -15,20 +14,9 @@ import { DebtModel } from "models/entities/debt";
 import { TransactionsService } from "./transactionsService";
 import { UpcomingExpenseDashboard } from "models/viewmodels/upcomingExpenseDashboard";
 import { DebtDashboard } from "models/viewmodels/debtDashboard";
-import * as environment from "../../config/environment.json";
 
-@inject(
-  TransactionsIDBHelper,
-  UpcomingExpensesIDBHelper,
-  DebtsIDBHelper,
-  TransactionsService,
-  AccountsService,
-  CurrenciesService,
-  AuthService
-)
+@autoinject
 export class CapitalService {
-  private readonly logger = new ErrorLogger(JSON.parse(<any>environment).urls.clientLogger, this.authService);
-
   constructor(
     private readonly transactionsIDBHelper: TransactionsIDBHelper,
     private readonly upcomingExpensesIDBHelper: UpcomingExpensesIDBHelper,
@@ -36,7 +24,7 @@ export class CapitalService {
     private readonly transactionsService: TransactionsService,
     private readonly accountsService: AccountsService,
     private readonly currenciesService: CurrenciesService,
-    private readonly authService: AuthService
+    private readonly logger: ErrorLogger
   ) {}
 
   async get(

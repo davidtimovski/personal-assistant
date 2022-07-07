@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
@@ -12,7 +12,7 @@ import { LocalStorage } from "utils/localStorage";
 import { Adjustment } from "models/viewmodels/adjustmentModel";
 import { SelectOption } from "models/viewmodels/selectOption";
 
-@inject(Router, TransactionsService, AccountsService, LocalStorage, ValidationController, I18N, EventAggregator)
+@autoinject
 export class BalanceAdjustment {
   private model: Adjustment;
   private originalBalance: number;

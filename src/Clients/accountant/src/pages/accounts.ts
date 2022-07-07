@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 
 import { AccountsService } from "services/accountsService";
@@ -7,7 +7,7 @@ import { EventAggregator } from "aurelia-event-aggregator";
 import { AccountItem } from "models/viewmodels/accountItem";
 import { AppEvents } from "models/appEvents";
 
-@inject(Router, AccountsService, LocalStorage, EventAggregator)
+@autoinject
 export class Accounts {
   private accounts: AccountItem[];
   private funds: AccountItem[];

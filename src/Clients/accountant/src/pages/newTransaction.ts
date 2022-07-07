@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
@@ -19,17 +19,7 @@ import { NewTransactionModel } from "models/viewmodels/newTransactionModel";
 import { CategoryType } from "models/entities/category";
 import { DebtModel } from "models/entities/debt";
 
-@inject(
-  Router,
-  CategoriesService,
-  TransactionsService,
-  AccountsService,
-  DebtsService,
-  LocalStorage,
-  ValidationController,
-  I18N,
-  EventAggregator
-)
+@autoinject
 export class NewTransaction {
   private model = new NewTransactionModel(null, null, null, null, null, null, false, null);
   private isExpense: boolean;

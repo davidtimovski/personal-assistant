@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 
@@ -10,7 +10,7 @@ import { LocalStorage } from "utils/localStorage";
 import { HeatmapDay } from "models/viewmodels/heatmapDay";
 import { HeatmapExpense } from "models/viewmodels/heatmapExpense";
 
-@inject(Router, TransactionsService, AccountsService, I18N, LocalStorage)
+@autoinject
 export class ExpenditureHeatmap {
   private days: HeatmapDay[];
   private selectedDay: HeatmapDay;

@@ -1,4 +1,4 @@
-import { inject, computedFrom, observable } from "aurelia-framework";
+import { autoinject, computedFrom, observable } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
@@ -12,7 +12,7 @@ import { AccountsService } from "services/accountsService";
 import { LocalStorage } from "utils/localStorage";
 import { Account } from "models/entities/account";
 
-@inject(Router, AccountsService, LocalStorage, ValidationController, I18N, EventAggregator, ConnectionTracker)
+@autoinject
 export class EditAccount {
   private accountId: number;
   private account: Account;

@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
@@ -15,16 +15,7 @@ import { SelectOption } from "models/viewmodels/selectOption";
 import { EditUpcomingExpenseModel } from "models/viewmodels/editUpcomingExpenseModel";
 import { CategoryType } from "models/entities/category";
 
-@inject(
-  Router,
-  CategoriesService,
-  UpcomingExpensesService,
-  LocalStorage,
-  ValidationController,
-  I18N,
-  EventAggregator,
-  ConnectionTracker
-)
+@autoinject
 export class EditUpcomingExpense {
   private upcomingExpenseId: number;
   private model: EditUpcomingExpenseModel;

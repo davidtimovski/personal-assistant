@@ -1,10 +1,10 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { I18N } from "aurelia-i18n";
 
 import { TooltipsService } from "../../../shared/src/services/tooltipsService";
 import { Tooltip } from "../../../shared/src/models/tooltip";
 
-@inject(TooltipsService, I18N)
+@autoinject
 export class Help {
   private tooltips: Tooltip[];
 

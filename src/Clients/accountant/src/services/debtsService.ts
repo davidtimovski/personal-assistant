@@ -1,32 +1,24 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { json } from "aurelia-fetch-client";
-import { HttpClient } from "aurelia-fetch-client";
-import { EventAggregator } from "aurelia-event-aggregator";
 
-import { HttpProxyBase } from "../../../shared/src/utils/httpProxyBase";
-import { AuthService } from "../../../shared/src/services/authService";
+import { HttpProxy } from "../../../shared/src/utils/httpProxy";
 import { CurrenciesService } from "../../../shared/src/services/currenciesService";
 import { ErrorLogger } from "../../../shared/src/services/errorLogger";
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
 
-import { DebtsIDBHelper } from "../utils/debtsIDBHelper";
+import { DebtsIDBHelper } from "utils/debtsIDBHelper";
 import { DebtModel } from "models/entities/debt";
-import * as environment from "../../config/environment.json";
 
-@inject(AuthService, HttpClient, EventAggregator, DebtsIDBHelper, CurrenciesService)
-export class DebtsService extends HttpProxyBase {
-  private readonly logger = new ErrorLogger(JSON.parse(<any>environment).urls.clientLogger, this.authService);
+@autoinject
+export class DebtsService {
   private readonly mergedDebtSeparator = "----------";
 
   constructor(
-    protected readonly authService: AuthService,
-    protected readonly httpClient: HttpClient,
-    protected readonly eventAggregator: EventAggregator,
+    private readonly httpProxy: HttpProxy,
     private readonly idbHelper: DebtsIDBHelper,
-    private readonly currenciesService: CurrenciesService
-  ) {
-    super(authService, httpClient, eventAggregator);
-  }
+    private readonly currenciesService: CurrenciesService,
+    private readonly logger: ErrorLogger
+  ) {}
 
   async getAll(currency: string): Promise<Array<DebtModel>> {
     try {
@@ -95,7 +87,7 @@ export class DebtsService extends HttpProxyBase {
         const mergedDebt = new DebtModel(null, debt.person, balance, debt.currency, description, balance < 0, now, now);
 
         if (navigator.onLine) {
-          mergedDebt.id = await this.ajax<number>("debts/merged", {
+          mergedDebt.id = await this.httpProxy.ajax<number>("api/debts/merged", {
             method: "post",
             body: json(mergedDebt),
           });
@@ -113,7 +105,7 @@ export class DebtsService extends HttpProxyBase {
         debt.createdDate = debt.modifiedDate = now;
 
         if (navigator.onLine) {
-          debt.id = await this.ajax<number>("debts", {
+          debt.id = await this.httpProxy.ajax<number>("api/debts", {
             method: "post",
             body: json(debt),
           });
@@ -172,7 +164,7 @@ export class DebtsService extends HttpProxyBase {
       debt.modifiedDate = DateHelper.adjustForTimeZone(new Date());
 
       if (navigator.onLine) {
-        await this.ajaxExecute("debts", {
+        await this.httpProxy.ajaxExecute("api/debts", {
           method: "put",
           body: json(debt),
         });
@@ -191,7 +183,7 @@ export class DebtsService extends HttpProxyBase {
   async delete(id: number): Promise<void> {
     try {
       if (navigator.onLine) {
-        await this.ajaxExecute(`debts/${id}`, {
+        await this.httpProxy.ajaxExecute(`api/debts/${id}`, {
           method: "delete",
         });
       } else if (await this.idbHelper.isSynced(id)) {

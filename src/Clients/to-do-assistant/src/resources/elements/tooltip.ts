@@ -1,10 +1,10 @@
-import { inject, bindable, bindingMode } from "aurelia-framework";
+import { autoinject, bindable, bindingMode } from "aurelia-framework";
 import { I18N } from "aurelia-i18n";
 
 import { TooltipsService } from "../../../../shared/src/services/tooltipsService";
 import { Tooltip } from "../../../../shared/src/models/tooltip";
 
-@inject(TooltipsService, I18N)
+@autoinject
 export class TooltipCustomElement {
   @bindable({ defaultBindingMode: bindingMode.toView }) key: string;
   private tooltip: Tooltip;
@@ -13,10 +13,7 @@ export class TooltipCustomElement {
   private isDismissed = false;
   private questionSpan: HTMLSpanElement;
 
-  constructor(
-    private readonly tooltipsService: TooltipsService,
-    private readonly i18n: I18N
-  ) {}
+  constructor(private readonly tooltipsService: TooltipsService, private readonly i18n: I18N) {}
 
   async attached() {
     this.tooltip = await this.tooltipsService.getByKey(this.key, "ToDoAssistant");

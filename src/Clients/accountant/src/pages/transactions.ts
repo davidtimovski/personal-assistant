@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 import { connectTo } from "aurelia-store";
@@ -18,7 +18,7 @@ import { State } from "utils/state/state";
 import * as Actions from "utils/state/actions";
 import { SearchFilters } from "models/viewmodels/searchFilters";
 
-@inject(Router, TransactionsService, CategoriesService, AccountsService, LocalStorage, I18N)
+@autoinject
 @connectTo()
 export class Transactions {
   private transactions: TransactionItem[];

@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { EventAggregator } from "aurelia-event-aggregator";
 
@@ -7,7 +7,7 @@ import { Category } from "models/entities/category";
 import { CategoryItem } from "models/viewmodels/categoryItem";
 import { AppEvents } from "models/appEvents";
 
-@inject(Router, CategoriesService, EventAggregator)
+@autoinject
 export class Categories {
   private categories: CategoryItem[];
   private lastEditedId: number;

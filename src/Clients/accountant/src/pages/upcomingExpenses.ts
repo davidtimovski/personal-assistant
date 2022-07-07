@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
@@ -10,7 +10,7 @@ import { LocalStorage } from "utils/localStorage";
 import { UpcomingExpenseItem } from "models/viewmodels/upcomingExpenseItem";
 import { AppEvents } from "models/appEvents";
 
-@inject(Router, UpcomingExpensesService, I18N, EventAggregator, LocalStorage)
+@autoinject
 export class UpcomingExpenses {
   private upcomingExpenses: UpcomingExpenseItem[];
   private currency: string;

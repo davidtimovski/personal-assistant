@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { EventAggregator } from "aurelia-event-aggregator";
@@ -12,7 +12,7 @@ import { BulkAddTasksModel } from "models/viewmodels/bulkAddTasksModel";
 import { TasksService } from "services/tasksService";
 import { ListsService } from "services/listsService";
 
-@inject(Router, TasksService, ListsService, ValidationController, EventAggregator)
+@autoinject
 @connectTo()
 export class BulkAddTasks {
   private model: BulkAddTasksModel;

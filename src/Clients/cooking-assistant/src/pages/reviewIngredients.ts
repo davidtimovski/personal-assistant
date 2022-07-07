@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
@@ -9,7 +9,7 @@ import { ReviewIngredient } from "models/viewmodels/reviewIngredient";
 import { IngredientReplacement } from "models/viewmodels/ingredientReplacement";
 import { IngredientPickerEvents, IngredientSuggestion } from "models/viewmodels/ingredientSuggestions";
 
-@inject(Router, RecipesService, I18N, EventAggregator)
+@autoinject
 export class ReviewIngredients {
   private model: ReviewIngredientsModel;
   private reviewing = false;

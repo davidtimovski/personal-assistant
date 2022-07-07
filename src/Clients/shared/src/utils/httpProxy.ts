@@ -1,24 +1,23 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { HttpClient, RequestInit } from "aurelia-fetch-client";
 import { EventAggregator } from "aurelia-event-aggregator";
 
-import { AuthService } from "../../../shared/src/services/authService";
-
+import { AuthService } from "../services/authService";
 import { HttpError } from "../models/enums/httpError";
 import { AlertEvents } from "../models/enums/alertEvents";
-import { ValidationErrors } from "models/validationErrors";
+import { ValidationErrors } from "../models/validationErrors";
 
-@inject(AuthService, HttpClient, EventAggregator)
-export class HttpProxyBase {
-  protected readonly successCodes = [200, 201, 204];
+@autoinject
+export class HttpProxy {
+  private readonly successCodes = [200, 201, 204];
 
   constructor(
-    protected readonly authService: AuthService,
-    protected readonly httpClient: HttpClient,
-    protected readonly eventAggregator: EventAggregator
+    private readonly authService: AuthService,
+    private readonly httpClient: HttpClient,
+    private readonly eventAggregator: EventAggregator
   ) {}
 
-  protected async ajax<T>(uri: string, init?: RequestInit): Promise<T> {
+  public async ajax<T>(uri: string, init?: RequestInit): Promise<T> {
     let response: Response;
 
     try {
@@ -40,13 +39,13 @@ export class HttpProxyBase {
 
     if (response.status === 204) {
       this.eventAggregator.publish(AlertEvents.ShowError, "unexpectedError");
-      throw new Error(`GET request to '${uri}' returned 204 No Content.`);
+      throw new Error(`GET request to '${uri}' returned 204 No Content`);
     }
 
     return <T>await response.json();
   }
 
-  protected async ajaxBlob(uri: string, init?: RequestInit): Promise<Blob> {
+  public async ajaxBlob(uri: string, init?: RequestInit): Promise<Blob> {
     let response: Response;
 
     try {
@@ -69,7 +68,7 @@ export class HttpProxyBase {
     return response.blob();
   }
 
-  protected async ajaxExecute(uri: string, init?: RequestInit): Promise<void> {
+  public async ajaxExecute(uri: string, init?: RequestInit): Promise<void> {
     let response: Response;
 
     try {
@@ -86,7 +85,7 @@ export class HttpProxyBase {
     }
   }
 
-  protected async ajaxUploadFile(uri: string, init?: RequestInit): Promise<string> {
+  public async ajaxUploadFile(uri: string, init?: RequestInit): Promise<string> {
     const response: Response = await this.httpClient.fetch(uri, init);
 
     if (!this.successCodes.includes(response.status)) {

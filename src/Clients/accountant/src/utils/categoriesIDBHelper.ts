@@ -1,10 +1,10 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 
 import { Category, CategoryType } from "models/entities/category";
 import { CreatedIdPair } from "models/sync";
 import { IDBContext } from "./idbContext";
 
-@inject(IDBContext)
+@autoinject
 export class CategoriesIDBHelper {
   constructor(private readonly db: IDBContext) {}
 

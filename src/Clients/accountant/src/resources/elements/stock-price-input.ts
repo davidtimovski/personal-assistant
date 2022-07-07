@@ -1,10 +1,10 @@
-import { inject, bindable, bindingMode } from "aurelia-framework";
+import { autoinject, bindable, bindingMode } from "aurelia-framework";
 import autocomplete, { AutocompleteResult } from "autocompleter";
 
 import { CurrenciesService } from "../../../../shared/src/services/currenciesService";
 import { CurrencySuggestion } from "../../../../shared/src/models/viewmodels/currencySuggestion";
 
-@inject(CurrenciesService)
+@autoinject
 export class StockPriceInputCustomElement {
   @bindable({ defaultBindingMode: bindingMode.twoWay }) amount: number;
   @bindable({ defaultBindingMode: bindingMode.twoWay }) currency: string;

@@ -14,14 +14,21 @@ let private getConnectionString (ctx: HttpContext) =
 let createLog: HttpHandler =
     fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
-            let! error = ctx.BindJsonAsync<CreateError>()
-            let connectionString = getConnectionString ctx
+            match ctx.TryGetRequestHeader "UserId" with
+            | None ->
+                ctx.SetStatusCode StatusCodes.Status401Unauthorized
+                return! next ctx
+            | Some userIdHeader ->
+                let! model = ctx.BindJsonAsync<CreateError>()
+                let userId = (userIdHeader |> int)
 
-            Repository.createError error connectionString |> ignore
+                let connectionString = getConnectionString ctx
 
-            ctx.SetStatusCode 201
+                Repository.createError model userId connectionString |> ignore
 
-            return! next ctx
+                ctx.SetStatusCode StatusCodes.Status201Created
+
+                return! next ctx
         }
 
 let webApp: HttpHandler =
@@ -30,7 +37,7 @@ let webApp: HttpHandler =
             choose [
                 route "/logs" >=> createLog
             ]
-        setStatusCode 404 >=> text "Not Found" ]
+        setStatusCode StatusCodes.Status404NotFound >=> text "Not Found" ]
 
 let errorHandler (ex : Exception) (logger : ILogger) =
     logger.LogError(ex, "An unhandled exception has occurred while executing the request.")

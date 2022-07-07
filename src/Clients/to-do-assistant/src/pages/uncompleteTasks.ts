@@ -1,4 +1,4 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 import { EventAggregator } from "aurelia-event-aggregator";
@@ -12,7 +12,7 @@ import { State } from "utils/state/state";
 import { SharingState } from "models/viewmodels/sharingState";
 import { AppEvents } from "models/appEvents";
 
-@inject(Router, ListsService, I18N, EventAggregator)
+@autoinject
 @connectTo()
 export class UncompleteTasks {
   private listId: number;

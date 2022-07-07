@@ -1,4 +1,4 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { I18N } from "aurelia-i18n";
 
@@ -13,7 +13,7 @@ import { LocalStorage } from "utils/localStorage";
 import { ViewTransaction } from "models/viewmodels/viewTransaction";
 import { TransactionType } from "models/viewmodels/transactionType";
 
-@inject(Router, CategoriesService, AccountsService, TransactionsService, EncryptionService, LocalStorage, I18N)
+@autoinject
 export class Transaction {
   private transactionId: number;
   private fromExpenditureHeatmap: boolean;

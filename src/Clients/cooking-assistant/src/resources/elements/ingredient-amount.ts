@@ -1,7 +1,7 @@
-import { inject, bindable, bindingMode, computedFrom } from "aurelia-framework";
+import { autoinject, bindable, bindingMode, computedFrom } from "aurelia-framework";
 import { I18N } from "aurelia-i18n";
 
-@inject(I18N)
+@autoinject
 export class IngredientAmountCustomElement {
   private readonly pluralizableUnits = ["cup", "tbsp", "tsp"];
   @bindable({ defaultBindingMode: bindingMode.toView }) amount: number;
@@ -75,7 +75,7 @@ export class IngredientAmountCustomElement {
       if (integerPart >= 1) {
         return integerPart + " " + fraction;
       }
-      
+
       return fraction;
     }
 

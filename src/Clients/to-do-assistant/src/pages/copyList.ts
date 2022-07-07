@@ -1,4 +1,4 @@
-import { inject, computedFrom } from "aurelia-framework";
+import { autoinject, computedFrom } from "aurelia-framework";
 import { Router } from "aurelia-router";
 import { ValidationController, validateTrigger, ValidationRules, ControllerValidateResult } from "aurelia-validation";
 import { I18N } from "aurelia-i18n";
@@ -15,7 +15,7 @@ import { SharingState } from "models/viewmodels/sharingState";
 import { State } from "utils/state/state";
 import { AppEvents } from "models/appEvents";
 
-@inject(Router, ListsService, ValidationController, I18N, EventAggregator)
+@autoinject
 @connectTo()
 export class CopyList {
   private listId: number;

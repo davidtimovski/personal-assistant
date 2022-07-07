@@ -1,4 +1,4 @@
-import { inject } from "aurelia-framework";
+import { autoinject } from "aurelia-framework";
 
 import { DateHelper } from "../../../shared/src/utils/dateHelper";
 
@@ -9,7 +9,7 @@ import { TransactionType } from "models/viewmodels/transactionType";
 import { SearchFilters } from "models/viewmodels/searchFilters";
 import { Category } from "models/entities/category";
 
-@inject(IDBContext)
+@autoinject
 export class TransactionsIDBHelper {
   constructor(private readonly db: IDBContext) {}
 
