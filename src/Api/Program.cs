@@ -20,6 +20,7 @@ using Microsoft.Extensions.Hosting;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using Persistence;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
@@ -43,9 +44,7 @@ builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
         configBuilder.AddAzureKeyVault(client, new AzureKeyVaultConfigurationOptions());
     }
 });
-#if !DEBUG
 builder.Host.UseSerilog();
-#endif
 
 builder.Services
     .AddInfrastructure(builder.Configuration, builder.Environment.EnvironmentName)
