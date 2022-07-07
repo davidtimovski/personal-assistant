@@ -5,8 +5,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "host.docker.internal",
-          "Port": 5002
+          "Host": "clientlogger",
+          "Port": 80
         }
       ],
       "UpstreamPathTemplate": "/clientlogger/{route}",
