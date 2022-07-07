@@ -22,7 +22,7 @@ public class ToDoAssistantHub : Hub
     {
         get
         {
-            string id = Context.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            string id = Context.User.FindFirst("sub").Value;
             return int.Parse(id);
         }
     }

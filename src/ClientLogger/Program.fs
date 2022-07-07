@@ -17,31 +17,12 @@ let configureApp (app : IApplicationBuilder) =
 
     let settings = app.ApplicationServices.GetService<IConfiguration>()
 
-    let configureCors (builder: CorsPolicyBuilder) =
-        builder
-            .WithOrigins(
-                settings.GetValue<string>("Urls:ToDoAssistant"),
-                settings.GetValue<string>("Urls:CookingAssistant"),
-                settings.GetValue<string>("Urls:Accountant"))
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .SetPreflightMaxAge(TimeSpan.FromDays(20))
-        |> ignore
-
     (match env.IsDevelopment() with
     | true  ->
         app.UseDeveloperExceptionPage()
     | false ->
         app .UseGiraffeErrorHandler(errorHandler))
-        .UseCors(configureCors)
         .UseGiraffe(webApp)
-
-let configureAppConfiguration (context: WebHostBuilderContext) (config: IConfigurationBuilder) =
-    config
-        .AddJsonFile("appsettings.json", false, true)
-        .AddJsonFile(sprintf "appsettings.%s.json" context.HostingEnvironment.EnvironmentName, true)
-        .AddEnvironmentVariables()
-    |> ignore
 
 let configureServices (services : IServiceCollection) =
     services.AddCors()    |> ignore
@@ -59,7 +40,6 @@ let main args =
         .ConfigureWebHostDefaults(
             fun webHostBuilder ->
                 webHostBuilder
-                    .ConfigureAppConfiguration(configureAppConfiguration)
                     .UseContentRoot(contentRoot)
                     .Configure(Action<IApplicationBuilder> configureApp)
                     .ConfigureServices(configureServices)
