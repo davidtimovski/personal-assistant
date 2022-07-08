@@ -1,10 +1,10 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-FROM mcr.microsoft.com/dotnet/aspnet:6.0.0-bullseye-slim-amd64 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:6.0.6-bullseye-slim-amd64 AS base
 WORKDIR /app
 EXPOSE 80
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0.100-bullseye-slim-amd64 AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0.301-bullseye-slim-amd64 AS build
 WORKDIR /src
 COPY ["src/Sender/Sender.csproj", "src/Sender/"]
 COPY ["src/Domain/Domain.csproj", "src/Domain/"]

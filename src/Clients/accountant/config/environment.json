@@ -4,7 +4,8 @@
   "urls": {
     "authority": "http://localhost:5000",
     "host": "http://localhost:8082",
-    "api": "http://localhost:5001"
+    "api": "http://localhost:5001",
+    "gateway": "http://localhost:5002"
   },
   "defaultProfileImageUri": "https://res.cloudinary.com/personalassistant/t_profile_thumbnail/production/defaults/sfmqac.webp"
 }

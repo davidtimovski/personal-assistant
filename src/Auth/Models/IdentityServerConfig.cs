@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using IdentityServer4;
 using IdentityServer4.Models;
 using Microsoft.Extensions.Configuration;
@@ -19,16 +18,21 @@ public static class IdentityServerConfig
     public static IEnumerable<ApiResource> ApiResources =>
         new List<ApiResource>
         {
-            new ApiResource("personal-assistant-api", "Personal Assistant")
+            new ApiResource("personal-assistant-api", "Personal Assistant API")
             {
-                Scopes = { ApiScopes.First().Name }
+                Scopes = { "personal-assistant-api" }
+            },
+            new ApiResource("personal-assistant-gateway", "Personal Assistant Gateway")
+            {
+                Scopes = { "personal-assistant-gateway" }
             }
         };
 
     public static IEnumerable<ApiScope> ApiScopes =>
         new List<ApiScope>
         {
-            new ApiScope("personal-assistant-api")
+            new ApiScope("personal-assistant-api"),
+            new ApiScope("personal-assistant-gateway")
         };
 
     public static IEnumerable<Client> GetClients(IConfiguration config)
@@ -49,7 +53,8 @@ public static class IdentityServerConfig
                 AllowedScopes = {
                     IdentityServerConstants.StandardScopes.OpenId,
                     IdentityServerConstants.StandardScopes.Email,
-                    "personal-assistant-api"
+                    "personal-assistant-api",
+                    "personal-assistant-gateway"
                 },
                 AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds
             },
@@ -67,7 +72,8 @@ public static class IdentityServerConfig
                 AllowedScopes = {
                     IdentityServerConstants.StandardScopes.OpenId,
                     IdentityServerConstants.StandardScopes.Email,
-                    "personal-assistant-api"
+                    "personal-assistant-api",
+                    "personal-assistant-gateway"
                 },
                 AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds
             },
@@ -85,7 +91,8 @@ public static class IdentityServerConfig
                 AllowedScopes = {
                     IdentityServerConstants.StandardScopes.OpenId,
                     IdentityServerConstants.StandardScopes.Email,
-                    "personal-assistant-api"
+                    "personal-assistant-api",
+                    "personal-assistant-gateway"
                 },
                 AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds
             }
