@@ -17,20 +17,16 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Ocelot.DependencyInjection;
-using Ocelot.Middleware;
 using Persistence;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
+
+
+if (builder.Environment.IsProduction())
 {
-    configBuilder.AddJsonFile("ocelot.json");
-
-    if (context.HostingEnvironment.EnvironmentName == Environments.Production)
+    builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
     {
-        configBuilder.AddJsonFile("ocelot.Production.json");
-
         var config = configBuilder.Build();
 
         string url = config["KeyVault:Url"];
@@ -42,9 +38,10 @@ builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
 
         var client = new SecretClient(new Uri(url), credential);
         configBuilder.AddAzureKeyVault(client, new AzureKeyVaultConfigurationOptions());
-    }
-});
-builder.Host.UseSerilog();
+    });
+
+    builder.Host.UseSerilog();
+}
 
 builder.Services
     .AddInfrastructure(builder.Configuration, builder.Environment.EnvironmentName)
@@ -57,9 +54,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.Authority = builder.Configuration["Urls:Authority"];
         options.Audience = "personal-assistant-api";
 
-#if DEBUG
-        options.RequireHttpsMetadata = false;
-#endif
+        if (builder.Environment.IsDevelopment())
+        {
+            options.RequireHttpsMetadata = false;
+        }
 
         // For SignalR
         options.Events = new JwtBearerEvents
@@ -129,8 +127,6 @@ builder.Services.AddMvc(options =>
 })
     .AddNewtonsoftJson();
 
-builder.Services.AddOcelot();   
-
 builder.Services.AddHttpClient();
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
@@ -160,7 +156,6 @@ JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMvc();
-app.UseOcelot().Wait();
 
 app.MapHub<ToDoAssistantHub>("/toDoAssistantHub");
 

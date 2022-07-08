@@ -1,10 +1,10 @@
-const CACHE_NAME = "1.13.6";
+const CACHE_NAME = "1.13.7";
 const precacheResources = [
   "#SHELL#",
   "#WEBFONTS#",
   "/manifest.json",
   "/robots.txt",
-  "/favicon.png?v=9",
+  "/favicon.png?v=10",
   "/images/icons/app-icon-x48.png",
   "/images/icons/app-icon-x48m.png",
   "/images/icons/app-icon-x72.png",

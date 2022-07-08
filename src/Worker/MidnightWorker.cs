@@ -41,23 +41,25 @@ public class MidnightWorker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        bool isProd = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") == "Production";
+
         while (!stoppingToken.IsCancellationRequested)
         {
-            var currentTime = DateTime.UtcNow;
-            if (currentTime.Hour != 0 || currentTime.Minute != 0)
+            var now = DateTime.UtcNow;
+            if (now.Hour != 0 || now.Minute != 0)
             {
                 continue;
             }
                 
-            await GetAndSaveCurrencyRates(currentTime);
+            await GetAndSaveCurrencyRates(now);
+            await DeleteOldNotificationsAsync(now);
+            await DeleteOldDeletedEntityEntriesAsync(now);
+            await GenerateUpcomingExpenses(now);
 
-#if !DEBUG
-                    await DeleteTemporaryCdnResourcesAsync();
-#endif
-
-            await DeleteOldNotificationsAsync();
-            await DeleteOldDeletedEntityEntriesAsync();
-            await GenerateUpcomingExpenses();
+            if (isProd)
+            {
+                await DeleteTemporaryCdnResourcesAsync(now);
+            }
 
             _logger.LogInformation("Midnight worker run successful.");
 
@@ -65,7 +67,7 @@ public class MidnightWorker : BackgroundService
         }
     }
 
-    private async Task GetAndSaveCurrencyRates(DateTime date)
+    private async Task GetAndSaveCurrencyRates(DateTime now)
     {
         try
         {
@@ -82,7 +84,7 @@ public class MidnightWorker : BackgroundService
 
             var parameters = new CurrencyRates
             {
-                Date = new DateTime(date.Year, date.Month, date.Day),
+                Date = new DateTime(now.Year, now.Month, now.Day),
                 Rates = ratesData
             };
 
@@ -101,25 +103,11 @@ public class MidnightWorker : BackgroundService
         }
     }
 
-    private async Task DeleteTemporaryCdnResourcesAsync()
+    private async Task DeleteOldNotificationsAsync(DateTime now)
     {
         try
         {
-            var olderThan = DateTime.UtcNow.AddDays(-2);
-            await _cdnService.DeleteTemporaryResourcesAsync(olderThan);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"{nameof(DeleteTemporaryCdnResourcesAsync)} failed");
-            throw;
-        }
-    }
-
-    private async Task DeleteOldNotificationsAsync()
-    {
-        try
-        {
-            var aWeekAgo = DateTime.UtcNow.AddDays(-7);
+            var aWeekAgo = now.AddDays(-7);
 
             using var conn = new NpgsqlConnection(_connectionString);
             conn.Open();
@@ -133,11 +121,11 @@ public class MidnightWorker : BackgroundService
         }
     }
 
-    private async Task DeleteOldDeletedEntityEntriesAsync()
+    private async Task DeleteOldDeletedEntityEntriesAsync(DateTime now)
     {
         try
         {
-            var sixMonthsAgo = DateTime.UtcNow.AddMonths(-6);
+            var sixMonthsAgo = now.AddMonths(-6);
 
             using var conn = new NpgsqlConnection(_connectionString);
             conn.Open();
@@ -151,10 +139,8 @@ public class MidnightWorker : BackgroundService
         }        
     }
 
-    private async Task GenerateUpcomingExpenses()
+    private async Task GenerateUpcomingExpenses(DateTime now)
     {
-        var now = DateTime.UtcNow;
-
         string getMostFrequentCurrency(IEnumerable<Transaction> expenses)
         {
             if (expenses.Count() == 1)
@@ -267,6 +253,20 @@ public class MidnightWorker : BackgroundService
         catch (Exception ex)
         {
             _logger.LogError(ex, $"{nameof(GenerateUpcomingExpenses)} failed");
+            throw;
+        }
+    }
+
+    private async Task DeleteTemporaryCdnResourcesAsync(DateTime now)
+    {
+        try
+        {
+            var olderThan = now.AddDays(-2);
+            await _cdnService.DeleteTemporaryResourcesAsync(olderThan);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"{nameof(DeleteTemporaryCdnResourcesAsync)} failed");
             throw;
         }
     }

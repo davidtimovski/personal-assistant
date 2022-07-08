@@ -44,9 +44,11 @@ builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
         configBuilder.AddAzureKeyVault(client, new AzureKeyVaultConfigurationOptions());
     }
 });
-#if !DEBUG
-builder.Host.UseSerilog();
-#endif
+
+if (builder.Environment.IsProduction())
+{
+    builder.Host.UseSerilog();
+}
 
 builder.Services
     .AddInfrastructure(builder.Configuration, builder.Environment.EnvironmentName)
