@@ -29,7 +29,6 @@ export class RecipesService {
   ) {}
 
   getAll(): Promise<RecipeModel[]> {
-    this.logger.logError(new Error("tessst err cooking"));
     return this.httpProxy.ajax<RecipeModel[]>("api/recipes");
   }
 

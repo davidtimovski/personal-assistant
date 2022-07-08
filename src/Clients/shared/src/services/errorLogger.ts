@@ -6,7 +6,11 @@ import { HttpError } from "../models/enums/httpError";
 import { ValidationErrors } from "../models/validationErrors";
 
 export class ErrorLogger {
-  constructor(private readonly httpProxy: HttpProxy, private readonly application: string) {}
+  constructor(
+    private readonly httpProxy: HttpProxy,
+    private readonly gatewayUrl: string,
+    private readonly application: string
+  ) {}
 
   async logError(error: any): Promise<void> {
     if (!navigator.onLine || error === HttpError.Unauthorized || error instanceof ValidationErrors) {
@@ -25,7 +29,7 @@ export class ErrorLogger {
       message = error.toString();
     }
 
-    await this.httpProxy.ajaxExecute("clientlogger/logs", {
+    await this.httpProxy.ajaxExecute(`${this.gatewayUrl}/clientlogger/logs`, {
       method: "post",
       body: json({
         application: this.application,

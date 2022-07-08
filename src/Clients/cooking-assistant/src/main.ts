@@ -72,7 +72,7 @@ export function configure(aurelia: Aurelia) {
       client_id: "cooking-assistant",
       redirect_uri: `${envConfig.urls.host}/signin-oidc`,
       response_type: "code",
-      scope: "openid email personal-assistant-api",
+      scope: "openid email personal-assistant-api personal-assistant-gateway",
       post_logout_redirect_uri: envConfig.urls.host,
       userStore: new WebStorageStateStore({
         prefix: "oidc",
@@ -81,7 +81,10 @@ export function configure(aurelia: Aurelia) {
     })
   );
 
-  container.registerInstance(ErrorLogger, new ErrorLogger(container.get(HttpProxy), "CookingAssistant"));
+  container.registerInstance(
+    ErrorLogger,
+    new ErrorLogger(container.get(HttpProxy), envConfig.urls.gateway, "CookingAssistant")
+  );
 
   container.registerInstance(BroadcastChannel, new BroadcastChannel("sw-version-updates"));
 
