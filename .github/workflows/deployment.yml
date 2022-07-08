@@ -31,6 +31,9 @@ jobs:
       - name: Build Api image
         run: docker build -f ./src/Api/Dockerfile . --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:api-latest
 
+    - name: Build Gateway image
+        run: docker build -f ./src/Gateway/Dockerfile . --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:gateway-latest
+
       - name: Build ClientLogger image
         run: docker build -f ./src/ClientLogger/Dockerfile . --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:clientlogger-latest
 
@@ -49,6 +52,9 @@ jobs:
 
       - name: Publish Api image
         run: docker push ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:api-latest
+
+      - name: Publish Gateway image
+        run: docker push ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:gateway-latest
       
       - name: Publish ClientLogger image
         run: docker push ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:clientlogger-latest
