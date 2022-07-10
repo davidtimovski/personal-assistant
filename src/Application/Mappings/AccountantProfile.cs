@@ -35,10 +35,12 @@ public class AccountantProfile : Profile
 
         CreateMap<CreateTransaction, Transaction>()
             .ForMember(x => x.Id, src => src.Ignore())
+            .ForMember(x => x.Generated, src => src.Ignore())
             .ForMember(x => x.FromAccount, src => src.Ignore())
             .ForMember(x => x.ToAccount, src => src.Ignore())
             .ForMember(x => x.Category, src => src.Ignore());
         CreateMap<UpdateTransaction, Transaction>()
+            .ForMember(x => x.Generated, src => src.Ignore())
             .ForMember(x => x.FromAccount, src => src.Ignore())
             .ForMember(x => x.ToAccount, src => src.Ignore())
             .ForMember(x => x.Category, src => src.Ignore());

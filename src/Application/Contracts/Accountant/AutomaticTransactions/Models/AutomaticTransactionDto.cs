@@ -1,6 +1,6 @@
 ﻿using System;
-using AutoMapper;
 using Application.Mappings;
+using AutoMapper;
 using Domain.Entities.Accountant;
 
 namespace Application.Contracts.Accountant.AutomaticTransactions.Models;
@@ -13,8 +13,7 @@ public class AutomaticTransactionDto : IMapFrom<AutomaticTransaction>
     public decimal Amount { get; set; }
     public string Currency { get; set; }
     public string Description { get; set; }
-    public DateTime? Date { get; set; }
-    public short? DayInMonth { get; set; }
+    public short DayInMonth { get; set; }
     public DateTime CreatedDate { get; set; }
     public DateTime ModifiedDate { get; set; }
 
