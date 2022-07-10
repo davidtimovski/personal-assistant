@@ -6,6 +6,11 @@ on:
       - master
     paths:
       - "src/Api/**"
+      - "src/Domain/**"
+      - "src/Application/**"
+      - "src/Utility/**"
+      - "src/Persistence/**"
+      - "src/Infrastructure/**"
 
 env:
   REGISTRY_URL: ${{ secrets.REGISTRY_URL }}

@@ -6,6 +6,7 @@ on:
       - master
     paths:
       - "src/Sender/**"
+      - "src/Domain/**"
 
 env:
   REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
