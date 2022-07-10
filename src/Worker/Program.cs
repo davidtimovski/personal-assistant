@@ -55,6 +55,8 @@ public class Program
                     c.BaseAddress = new Uri("http://data.fixer.io/api/");
                 });
 
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
                 services.AddHostedService<MidnightWorker>();
             });
 }

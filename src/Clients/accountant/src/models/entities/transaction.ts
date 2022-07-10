@@ -22,6 +22,7 @@ export class TransactionModel implements Syncable {
     public encryptedDescription: string,
     public salt: string,
     public nonce: string,
+    public generated: boolean,
     public createdDate: Date,
     public modifiedDate: Date
   ) {}

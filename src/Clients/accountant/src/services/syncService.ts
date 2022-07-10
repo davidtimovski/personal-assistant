@@ -9,6 +9,7 @@ import { CategoriesIDBHelper } from "utils/categoriesIDBHelper";
 import { TransactionsIDBHelper } from "utils/transactionsIDBHelper";
 import { UpcomingExpensesIDBHelper } from "utils/upcomingExpensesIDBHelper";
 import { DebtsIDBHelper } from "utils/debtsIDBHelper";
+import { AutomaticTransactionsIDBHelper } from "utils/automaticTransactionsIDBHelper";
 import { LocalStorage } from "utils/localStorage";
 import { Changed, Create, Created } from "models/sync";
 
@@ -21,6 +22,7 @@ export class SyncService {
     private readonly transactionsIDBHelper: TransactionsIDBHelper,
     private readonly upcomingExpensesIDBHelper: UpcomingExpensesIDBHelper,
     private readonly debtsIDBHelper: DebtsIDBHelper,
+    private readonly automaticTransactionsIDBHelper: AutomaticTransactionsIDBHelper,
     private readonly localStorage: LocalStorage,
     private readonly logger: ErrorLogger
   ) {}
@@ -44,18 +46,25 @@ export class SyncService {
       await this.transactionsIDBHelper.sync(changed.deletedTransactionIds, changed.transactions);
       await this.upcomingExpensesIDBHelper.sync(changed.deletedUpcomingExpenseIds, changed.upcomingExpenses);
       await this.debtsIDBHelper.sync(changed.deletedDebtIds, changed.debts);
+      await this.automaticTransactionsIDBHelper.sync(
+        changed.deletedAutomaticTransactionIds,
+        changed.automaticTransactions
+      );
 
       const accountsToCreate = await this.accountsIDBHelper.getForSyncing();
       const categoriesToCreate = await this.categoriesIDBHelper.getForSyncing();
       const transactionsToCreate = await this.transactionsIDBHelper.getForSyncing();
       const upcomingExpensesToCreate = await this.upcomingExpensesIDBHelper.getForSyncing();
       const debtsToCreate = await this.debtsIDBHelper.getForSyncing();
+      const automaticTransactionsToCreate = await this.automaticTransactionsIDBHelper.getForSyncing();
+
       const create = new Create(
         accountsToCreate,
         categoriesToCreate,
         transactionsToCreate,
         upcomingExpensesToCreate,
-        debtsToCreate
+        debtsToCreate,
+        automaticTransactionsToCreate
       );
       const created = await this.httpProxy.ajax<Created>("api/sync/create-entities", {
         method: "post",
@@ -67,6 +76,7 @@ export class SyncService {
       await this.transactionsIDBHelper.consolidate(created.transactionIdPairs);
       await this.upcomingExpensesIDBHelper.consolidate(created.upcomingExpenseIdPairs);
       await this.debtsIDBHelper.consolidate(created.debtIdPairs);
+      await this.automaticTransactionsIDBHelper.consolidate(created.automaticTransactionIdPairs);
 
       return lastSyncedServer;
     } catch (e) {

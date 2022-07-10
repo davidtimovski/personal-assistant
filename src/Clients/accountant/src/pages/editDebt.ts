@@ -17,8 +17,8 @@ import { EditDebtModel } from "models/viewmodels/editDebtModel";
 export class EditDebt {
   private debtId: number;
   private model = new EditDebtModel(null, null, null, null, null, false, null, false);
-  private originalDebtJson: string;
-  private isNewDebt: boolean;
+  private originalJson: string;
+  private isNew: boolean;
   private personInput: HTMLInputElement;
   private personIsInvalid: boolean;
   private amountIsInvalid: boolean;
@@ -48,21 +48,19 @@ export class EditDebt {
 
   activate(params: any) {
     this.debtId = parseInt(params.id, 10);
-    this.isNewDebt = this.debtId === 0;
+    this.isNew = this.debtId === 0;
 
-    if (this.isNewDebt) {
+    if (this.isNew) {
       this.model.currency = this.localStorage.getCurrency();
 
       this.saveButtonText = this.i18n.tr("create");
-
-      this.setValidationRules();
     } else {
       this.saveButtonText = this.i18n.tr("save");
     }
   }
 
   async attached() {
-    if (this.isNewDebt) {
+    if (this.isNew) {
       this.personInput.focus();
     } else {
       const debt = await this.debtsService.get(this.debtId);
@@ -81,10 +79,10 @@ export class EditDebt {
         debt.synced
       );
 
-      this.originalDebtJson = JSON.stringify(this.model);
-
-      this.setValidationRules();
+      this.originalJson = JSON.stringify(this.model);
     }
+
+    this.setValidationRules();
   }
 
   setValidationRules() {
@@ -110,7 +108,7 @@ export class EditDebt {
     return (
       !ValidationUtil.isEmptyOrWhitespace(this.model.person) &&
       !!this.model.amount &&
-      JSON.stringify(this.model) !== this.originalDebtJson &&
+      JSON.stringify(this.model) !== this.originalJson &&
       !(!this.connTracker.isOnline && this.model.synced)
     );
   }
@@ -126,7 +124,7 @@ export class EditDebt {
     const result: ControllerValidateResult = await this.validationController.validate();
 
     if (result.valid) {
-      if (this.isNewDebt) {
+      if (this.isNew) {
         try {
           const debt = new DebtModel(
             null,

@@ -27,7 +27,7 @@ export class NewTransaction {
   private userIsDebtor: boolean;
   private debtPerson: string;
   private categoryOptions: SelectOption[];
-  private originalTransactionJson: string;
+  private originalJson: string;
   private readonly maxDate: string;
   private passwordInput: HTMLInputElement;
   private passwordShown = false;
@@ -154,7 +154,7 @@ export class NewTransaction {
 
   @computedFrom("model.amount", "model.categoryId", "model.date", "model.description")
   get canSubmit() {
-    return !!this.model.amount && JSON.stringify(this.model) !== this.originalTransactionJson;
+    return !!this.model.amount && JSON.stringify(this.model) !== this.originalJson;
   }
 
   async submit() {
@@ -188,6 +188,7 @@ export class NewTransaction {
           null,
           null,
           null,
+          false,
           null,
           null
         );

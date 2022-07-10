@@ -1,4 +1,5 @@
 ﻿using Application.Contracts.Accountant.Accounts.Models;
+using Application.Contracts.Accountant.AutomaticTransactions.Models;
 using Application.Contracts.Accountant.Categories.Models;
 using Application.Contracts.Accountant.Debts.Models;
 using Application.Contracts.Accountant.Sync.Models;
@@ -34,10 +35,12 @@ public class AccountantProfile : Profile
 
         CreateMap<CreateTransaction, Transaction>()
             .ForMember(x => x.Id, src => src.Ignore())
+            .ForMember(x => x.Generated, src => src.Ignore())
             .ForMember(x => x.FromAccount, src => src.Ignore())
             .ForMember(x => x.ToAccount, src => src.Ignore())
             .ForMember(x => x.Category, src => src.Ignore());
         CreateMap<UpdateTransaction, Transaction>()
+            .ForMember(x => x.Generated, src => src.Ignore())
             .ForMember(x => x.FromAccount, src => src.Ignore())
             .ForMember(x => x.ToAccount, src => src.Ignore())
             .ForMember(x => x.Category, src => src.Ignore());
@@ -55,5 +58,10 @@ public class AccountantProfile : Profile
             .ForMember(x => x.Id, src => src.Ignore());
         CreateMap<UpdateDebt, Debt>();
         CreateMap<SyncDebt, Debt>();
+
+        CreateMap<CreateAutomaticTransaction, AutomaticTransaction>()
+            .ForMember(x => x.Id, src => src.Ignore());
+        CreateMap<UpdateAutomaticTransaction, AutomaticTransaction>();
+        CreateMap<SyncAutomaticTransaction, AutomaticTransaction>();
     }
 }

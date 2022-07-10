@@ -30,6 +30,7 @@ public class PersonalAssistantContext : DbContext
     public DbSet<Category> Categories { get; set; }
     public DbSet<UpcomingExpense> UpcomingExpenses { get; set; }
     public DbSet<Debt> Debts { get; set; }
+    public DbSet<AutomaticTransaction> AutomaticTransactions { get; set; }
     public DbSet<DeletedEntity> DeletedEntities { get; set; }
 
     public DbSet<PushSubscription> PushSubscriptions { get; set; }
@@ -125,6 +126,7 @@ public class PersonalAssistantContext : DbContext
         modelBuilder.Entity<Category>(x => { x.ToTable("accountant_categories"); });
         modelBuilder.Entity<UpcomingExpense>(x => { x.ToTable("accountant_upcoming_expenses"); });
         modelBuilder.Entity<Debt>(x => { x.ToTable("accountant_debts"); });
+        modelBuilder.Entity<AutomaticTransaction>(x => { x.ToTable("accountant_automatic_transactions"); });
         modelBuilder.Entity<DeletedEntity>(x =>
         { 
             x.ToTable("accountant_deleted_entities");

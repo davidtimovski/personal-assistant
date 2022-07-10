@@ -54,6 +54,7 @@ export function configure(aurelia: Aurelia) {
       headers: {
         Accept: "application/json",
         "Accept-Language": language,
+        "Content-Type": "application/json",
         "X-Requested-With": "Fetch",
       },
     });

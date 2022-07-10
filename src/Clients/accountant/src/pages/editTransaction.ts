@@ -24,7 +24,7 @@ export class EditTransaction {
   private model: EditTransactionModel;
   private type: TransactionType;
   private categoryOptions: SelectOption[];
-  private originalTransactionJson: string;
+  private originalJson: string;
   private readonly maxDate: string;
   private decPasswordInput: HTMLInputElement;
   private decPasswordShown = false;
@@ -95,6 +95,7 @@ export class EditTransaction {
         transaction.encryptedDescription,
         transaction.salt,
         transaction.nonce,
+        transaction.generated,
         null,
         transaction.isEncrypted,
         null,
@@ -104,7 +105,7 @@ export class EditTransaction {
 
       this.type = TransactionsService.getType(transaction.fromAccountId, transaction.toAccountId);
 
-      this.originalTransactionJson = JSON.stringify(this.model);
+      this.originalJson = JSON.stringify(this.model);
 
       let amountFrom = 0.01;
       let amountTo = 8000001;
@@ -208,7 +209,7 @@ export class EditTransaction {
   get canSave() {
     return (
       !!this.model.amount &&
-      JSON.stringify(this.model) !== this.originalTransactionJson &&
+      JSON.stringify(this.model) !== this.originalJson &&
       !(!this.connTracker.isOnline && this.model.synced)
     );
   }
@@ -240,6 +241,7 @@ export class EditTransaction {
           this.model.encryptedDescription,
           this.model.salt,
           this.model.nonce,
+          this.model.generated,
           this.model.createdDate,
           null
         );

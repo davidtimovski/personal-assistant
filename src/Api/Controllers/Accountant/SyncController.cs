@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Api.Models.Accountant.Sync;
 using Application.Contracts.Accountant.Accounts;
 using Application.Contracts.Accountant.Accounts.Models;
+using Application.Contracts.Accountant.AutomaticTransactions;
+using Application.Contracts.Accountant.AutomaticTransactions.Models;
 using Application.Contracts.Accountant.Categories;
 using Application.Contracts.Accountant.Categories.Models;
 using Application.Contracts.Accountant.Common.Models;
@@ -32,6 +34,7 @@ public class SyncController : BaseController
     private readonly ITransactionService _transactionService;
     private readonly IUpcomingExpenseService _upcomingExpenseService;
     private readonly IDebtService _debtService;
+    private readonly IAutomaticTransactionService _automaticTransactionService;
 
     public SyncController(
         ISyncService syncService,
@@ -39,7 +42,8 @@ public class SyncController : BaseController
         IAccountService accountService,
         ITransactionService transactionService,
         IUpcomingExpenseService upcomingExpenseService,
-        IDebtService debtService)
+        IDebtService debtService,
+        IAutomaticTransactionService automaticTransactionService)
     {
         _syncService = syncService;
         _categoryService = categoryService;
@@ -47,6 +51,7 @@ public class SyncController : BaseController
         _transactionService = transactionService;
         _upcomingExpenseService = upcomingExpenseService;
         _debtService = debtService;
+        _automaticTransactionService = automaticTransactionService;
     }
 
     [HttpPost("changes")]
@@ -66,6 +71,7 @@ public class SyncController : BaseController
         IEnumerable<TransactionDto> transactions = _transactionService.GetAll(getAll);
         IEnumerable<UpcomingExpenseDto> upcomingExpenses = _upcomingExpenseService.GetAll(getAll);
         IEnumerable<DebtDto> debts = _debtService.GetAll(getAll);
+        IEnumerable<AutomaticTransactionDto> automaticTransactions = _automaticTransactionService.GetAll(getAll);
 
         var getDeletedIds = new GetDeletedIds(CurrentUserId, vm.LastSynced);
 
@@ -81,7 +87,9 @@ public class SyncController : BaseController
             DeletedUpcomingExpenseIds = _upcomingExpenseService.GetDeletedIds(getDeletedIds),
             UpcomingExpenses = upcomingExpenses,
             DeletedDebtIds = _debtService.GetDeletedIds(getDeletedIds),
-            Debts = debts
+            Debts = debts,
+            DeletedAutomaticTransactionIds = _debtService.GetDeletedIds(getDeletedIds),
+            AutomaticTransactions = automaticTransactions
         };
 
         return Ok(changedVm);
@@ -99,6 +107,7 @@ public class SyncController : BaseController
         dto.Categories.ForEach(x => { x.UserId = CurrentUserId; });
         dto.UpcomingExpenses.ForEach(x => { x.UserId = CurrentUserId; });
         dto.Debts.ForEach(x => { x.UserId = CurrentUserId; });
+        dto.AutomaticTransactions.ForEach(x => { x.UserId = CurrentUserId; });
 
         var syncedEntityIds = await _syncService.SyncEntitiesAsync(dto);
 
@@ -123,6 +132,10 @@ public class SyncController : BaseController
         for (var i = 0; i < syncedEntityIds.DebtIds.Length; i++)
         {
             createdEntitiesVm.DebtIdPairs.Add(new CreatedEntityIdPair(dto.Debts[i].Id, syncedEntityIds.DebtIds[i]));
+        }
+        for (var i = 0; i < syncedEntityIds.AutomaticTransactionIds.Length; i++)
+        {
+            createdEntitiesVm.AutomaticTransactionIdPairs.Add(new CreatedEntityIdPair(dto.AutomaticTransactions[i].Id, syncedEntityIds.AutomaticTransactionIds[i]));
         }
 
         return StatusCode(201, createdEntitiesVm);

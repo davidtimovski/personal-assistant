@@ -15,6 +15,7 @@ CREATE TABLE public.accountant_transactions
     salt bytea,
     nonce bytea,
     encryption_hint character varying(100) COLLATE pg_catalog."default",
+	generated boolean NOT NULL DEFAULT FALSE,
     created_date timestamp with time zone NOT NULL,
     modified_date timestamp with time zone NOT NULL,
     CONSTRAINT pk_accountant_transactions PRIMARY KEY (id),

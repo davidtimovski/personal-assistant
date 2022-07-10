@@ -9,6 +9,7 @@ public class CreatedEntityIdsVm
     public List<CreatedEntityIdPair> TransactionIdPairs { get; set; } = new List<CreatedEntityIdPair>();
     public List<CreatedEntityIdPair> UpcomingExpenseIdPairs { get; set; } = new List<CreatedEntityIdPair>();
     public List<CreatedEntityIdPair> DebtIdPairs { get; set; } = new List<CreatedEntityIdPair>();
+    public List<CreatedEntityIdPair> AutomaticTransactionIdPairs { get; set; } = new List<CreatedEntityIdPair>();
 }
 
 public class CreatedEntityIdPair

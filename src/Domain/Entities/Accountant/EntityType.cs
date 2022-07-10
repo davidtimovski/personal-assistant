@@ -6,5 +6,6 @@ public enum EntityType
     Account,
     Transaction,
     UpcomingExpense,
-    Debt
+    Debt,
+    AutomaticTransaction
 }

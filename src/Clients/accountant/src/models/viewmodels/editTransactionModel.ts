@@ -14,6 +14,7 @@ export class EditTransactionModel {
     public encryptedDescription: string,
     public salt: string,
     public nonce: string,
+    public generated: boolean,
     public decryptionPassword: string,
     public encrypt: boolean,
     public encryptionPassword: string,

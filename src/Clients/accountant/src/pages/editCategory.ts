@@ -16,8 +16,8 @@ import { SelectOption } from "models/viewmodels/selectOption";
 export class EditCategory {
   private categoryId: number;
   private category: Category;
-  private originalCategoryJson: string;
-  private isNewCategory: boolean;
+  private originalJson: string;
+  private isNew: boolean;
   private isParent: boolean;
   private parentCategoryOptions: SelectOption[];
   private typeOptions: SelectOption[];
@@ -54,20 +54,18 @@ export class EditCategory {
 
   activate(params: any) {
     this.categoryId = parseInt(params.id, 10);
-    this.isNewCategory = this.categoryId === 0;
+    this.isNew = this.categoryId === 0;
 
-    if (this.isNewCategory) {
+    if (this.isNew) {
       this.category = new Category(0, null, "", CategoryType.AllTransactions, false, false, null, null);
       this.saveButtonText = this.i18n.tr("create");
-
-      this.setValidationRules();
     } else {
       this.saveButtonText = this.i18n.tr("save");
     }
   }
 
   attached() {
-    if (this.isNewCategory) {
+    if (this.isNew) {
       this.nameInput.focus();
     } else {
       this.categoriesService.isParent(this.categoryId).then((isParent: boolean) => {
@@ -80,15 +78,15 @@ export class EditCategory {
         }
         this.category = category;
 
-        this.originalCategoryJson = JSON.stringify(this.category);
-
-        this.setValidationRules();
+        this.originalJson = JSON.stringify(this.category);
       });
     }
 
     this.categoriesService.getParentAsOptions(this.i18n.tr("editCategory.none"), this.categoryId).then((options) => {
       this.parentCategoryOptions = options;
     });
+
+    this.setValidationRules();
   }
 
   setValidationRules() {
@@ -116,7 +114,7 @@ export class EditCategory {
   get canSave() {
     return (
       !ValidationUtil.isEmptyOrWhitespace(this.category.name) &&
-      JSON.stringify(this.category) !== this.originalCategoryJson &&
+      JSON.stringify(this.category) !== this.originalJson &&
       !(!this.connTracker.isOnline && this.category.synced)
     );
   }
@@ -134,7 +132,7 @@ export class EditCategory {
     this.nameIsInvalid = !result.valid;
 
     if (result.valid) {
-      if (this.isNewCategory) {
+      if (this.isNew) {
         try {
           const id = await this.categoriesService.create(this.category);
           this.nameIsInvalid = false;

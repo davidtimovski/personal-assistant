@@ -73,6 +73,7 @@ export class Transaction {
       transaction.encryptedDescription,
       transaction.salt,
       transaction.nonce,
+      transaction.generated,
       null
     );
 

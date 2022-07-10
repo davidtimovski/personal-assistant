@@ -79,9 +79,9 @@ public class TransactionsRepository : BaseRepository, ITransactionsRepository
 
         int id;
         var insertQuery = @"INSERT INTO accountant_transactions 
-                                (from_account_id, to_account_id, category_id, amount, from_stocks, to_stocks, currency, description, date, is_encrypted, encrypted_description, salt, nonce, created_date, modified_date)
+                                (from_account_id, to_account_id, category_id, amount, from_stocks, to_stocks, currency, description, date, is_encrypted, encrypted_description, salt, nonce, generated, created_date, modified_date)
                                 VALUES 
-                                (@FromAccountId, @ToAccountId, @CategoryId, @Amount, @FromStocks, @ToStocks, @Currency, @Description, @Date, @IsEncrypted, @EncryptedDescription, @Salt, @Nonce, @CreatedDate, @ModifiedDate) returning id";
+                                (@FromAccountId, @ToAccountId, @CategoryId, @Amount, @FromStocks, @ToStocks, @Currency, @Description, @Date, @IsEncrypted, @EncryptedDescription, @Salt, @Nonce, @Generated, @CreatedDate, @ModifiedDate) returning id";
 
         var dbTransaction = conn.BeginTransaction();
 

@@ -18,6 +18,7 @@ public class SyncTransaction
     public byte[] EncryptedDescription { get; set; }
     public byte[] Salt { get; set; }
     public byte[] Nonce { get; set; }
+    public bool Generated { get; set; }
     public DateTime CreatedDate { get; set; }
     public DateTime ModifiedDate { get; set; }
 }

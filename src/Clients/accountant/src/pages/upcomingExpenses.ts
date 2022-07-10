@@ -52,6 +52,7 @@ export class UpcomingExpenses {
         new UpcomingExpenseItem(
           upcomingExpense.id,
           upcomingExpense.amount,
+          upcomingExpense.currency,
           upcomingExpense.categoryName || this.i18n.tr("uncategorized"),
           this.formatDate(upcomingExpense.date),
           upcomingExpense.synced

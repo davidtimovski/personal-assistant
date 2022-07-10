@@ -50,10 +50,11 @@ public class MidnightWorker : BackgroundService
             {
                 continue;
             }
-                
+
             await GetAndSaveCurrencyRates(now);
             await DeleteOldNotificationsAsync(now);
             await DeleteOldDeletedEntityEntriesAsync(now);
+            await GenerateTransactions(now);
             await GenerateUpcomingExpenses(now);
 
             if (isProd)
@@ -136,9 +137,95 @@ public class MidnightWorker : BackgroundService
         {
             _logger.LogError(ex, $"{nameof(DeleteOldDeletedEntityEntriesAsync)} failed");
             throw;
-        }        
+        }
     }
 
+    /// <summary>
+    /// For the automatic transactions functionality in Accountant.
+    /// </summary>
+    private async Task GenerateTransactions(DateTime now)
+    {
+        try
+        {
+            using var conn = new NpgsqlConnection(_connectionString);
+            conn.Open();
+
+            var automaticTransactions = conn.Query<AutomaticTransaction>(@"SELECT * FROM accountant_automatic_transactions WHERE day_in_month = @DayInMonth", new { DayInMonth = now.Day });
+
+            var userGroups = automaticTransactions.GroupBy(x => x.UserId);
+
+            foreach (var userGroup in userGroups)
+            {
+                int userMainAccountId = conn.QueryFirst<int>(@"SELECT id FROM accountant_accounts WHERE user_id = @UserId AND is_main", new { UserId = userGroup.Key });
+
+                foreach (AutomaticTransaction automaticTransaction in userGroup)
+                {
+                    string expenseOrDepositClause = automaticTransaction.IsDeposit
+                        ? "to_account_id = @MainAccountId AND from_account_id IS NULL"
+                        : "from_account_id = @MainAccountId AND to_account_id IS NULL";
+
+                    bool exists = conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
+                                                             FROM accountant_transactions
+                                                             WHERE generated
+                                                                 AND ((category_id IS NULL AND @CategoryId IS NULL) OR category_id = @CategoryId)
+                                                                 AND amount = @Amount
+                                                                 AND currency = @Currency
+                                                                 AND description = @Description
+                                                                 AND date = @Date
+                                                                 AND " + expenseOrDepositClause,
+                        new
+                        {
+                            automaticTransaction.Amount,
+                            automaticTransaction.Currency,
+                            automaticTransaction.CategoryId,
+                            automaticTransaction.Description,
+                            Date = now.Date,
+                            MainAccountId = userMainAccountId
+                        });
+
+                    if (exists)
+                    {
+                        continue;
+                    }
+
+                    var transaction = new Transaction
+                    {
+                        CategoryId = automaticTransaction.CategoryId,
+                        Amount = automaticTransaction.Amount,
+                        Currency = automaticTransaction.Currency,
+                        Description = automaticTransaction.Description,
+                        Date = now.Date,
+                        Generated = true,
+                        CreatedDate = now,
+                        ModifiedDate = now
+                    };
+
+                    if (automaticTransaction.IsDeposit)
+                    {
+                        transaction.ToAccountId = userMainAccountId;
+                    }
+                    else
+                    {
+                        transaction.FromAccountId = userMainAccountId;
+                    }
+
+                    await conn.ExecuteAsync(@"INSERT INTO accountant_transactions 
+                        (from_account_id, to_account_id, category_id, amount, currency, description, date, is_encrypted, generated, created_date, modified_date)
+                        VALUES 
+                        (@FromAccountId, @ToAccountId, @CategoryId, @Amount, @Currency, @Description, @Date, FALSE, @Generated, @CreatedDate, @ModifiedDate)", transaction);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"{nameof(GenerateTransactions)} failed");
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// For the upcoming expenses funcitonality in Accountant.
+    /// </summary>
     private async Task GenerateUpcomingExpenses(DateTime now)
     {
         string getMostFrequentCurrency(IEnumerable<Transaction> expenses)
@@ -183,10 +270,10 @@ public class MidnightWorker : BackgroundService
             {
                 foreach (Category category in userGroup)
                 {
-                    var exists = conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                                        FROM accountant_upcoming_expenses
-                                                        WHERE category_id = @CategoryId AND generated 
-                                                        AND to_char(created_date, 'YYYY-MM') = to_char(@Now, 'YYYY-MM')",
+                    bool exists = conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
+                                                             FROM accountant_upcoming_expenses
+                                                             WHERE generated AND category_id = @CategoryId
+                                                                 AND to_char(created_date, 'YYYY-MM') = to_char(@Now, 'YYYY-MM')",
                         new { CategoryId = category.Id, Now = now });
                     if (exists)
                     {
@@ -219,34 +306,35 @@ public class MidnightWorker : BackgroundService
                                                             AND from_account_id IS NOT NULL AND to_account_id IS NULL",
                         new { category.UserId, CategoryId = category.Id, From = threeMonthsAgo, To = firstOfThisMonth }).ToList();
 
-                    if (ShouldGenerate(expenses))
+                    if (!ShouldGenerate(expenses))
                     {
-                        decimal sum = expenses.Sum(x => x.Amount);
-                        int months = expenses.GroupBy(x => x.Date.ToString("yyyy-MM")).Count();
-                        decimal amount = sum / months;
-                        var currency = getMostFrequentCurrency(expenses);
-                        if (currency == "MKD")
-                        {
-                            amount = Math.Round(amount);
-                            amount -= amount % 10;
-                        }
-                        var date = new DateTime(now.Year, now.Month, 1);
-
-                        var upcomingExpense = new UpcomingExpense
-                        {
-                            UserId = category.UserId,
-                            CategoryId = category.Id,
-                            Amount = amount,
-                            Currency = currency,
-                            Date = date,
-                            Generated = true,
-                            CreatedDate = now,
-                            ModifiedDate = now
-                        };
-
-                        await conn.ExecuteAsync(@"INSERT INTO accountant_upcoming_expenses (user_id, category_id, amount, currency, description, date, generated, created_date, modified_date)
-                                              VALUES (@UserId, @CategoryId, @Amount, @Currency, @Description, @Date, @Generated, @CreatedDate, @ModifiedDate)", upcomingExpense);
+                        continue;
                     }
+
+                    decimal sum = expenses.Sum(x => x.Amount);
+                    int months = expenses.GroupBy(x => x.Date.ToString("yyyy-MM")).Count();
+                    decimal amount = sum / months;
+                    var currency = getMostFrequentCurrency(expenses);
+                    if (currency == "MKD")
+                    {
+                        amount = Math.Round(amount);
+                        amount -= amount % 10;
+                    }
+
+                    var upcomingExpense = new UpcomingExpense
+                    {
+                        UserId = category.UserId,
+                        CategoryId = category.Id,
+                        Amount = amount,
+                        Currency = currency,
+                        Date = new DateTime(now.Year, now.Month, 1),
+                        Generated = true,
+                        CreatedDate = now,
+                        ModifiedDate = now
+                    };
+
+                    await conn.ExecuteAsync(@"INSERT INTO accountant_upcoming_expenses (user_id, category_id, amount, currency, description, date, generated, created_date, modified_date)
+                                              VALUES (@UserId, @CategoryId, @Amount, @Currency, @Description, @Date, @Generated, @CreatedDate, @ModifiedDate)", upcomingExpense);
                 }
             }
         }

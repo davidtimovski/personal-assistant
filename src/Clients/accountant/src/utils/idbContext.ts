@@ -5,6 +5,7 @@ import { Account } from "models/entities/account";
 import { TransactionModel } from "models/entities/transaction";
 import { UpcomingExpense } from "models/entities/upcomingExpense";
 import { DebtModel } from "models/entities/debt";
+import { AutomaticTransaction } from "models/entities/automaticTransaction";
 
 export class IDBContext extends Dexie {
   public categories: Dexie.Table<Category, number>;
@@ -12,6 +13,7 @@ export class IDBContext extends Dexie {
   public transactions: Dexie.Table<TransactionModel, number>;
   public upcomingExpenses: Dexie.Table<UpcomingExpense, number>;
   public debts: Dexie.Table<DebtModel, number>;
+  public automaticTransactions: Dexie.Table<AutomaticTransaction, number>;
 
   public constructor() {
     super("IDBContext");
@@ -21,6 +23,7 @@ export class IDBContext extends Dexie {
       transactions: "id,fromAccountId,toAccountId,categoryId,date",
       upcomingExpenses: "id,categoryId,date",
       debts: "id",
+      automaticTransactions: "id,categoryId",
     });
     this.categories = this.table("categories");
     this.categories.mapToClass(Category);
@@ -31,5 +34,6 @@ export class IDBContext extends Dexie {
 
     this.upcomingExpenses = this.table("upcomingExpenses");
     this.debts = this.table("debts");
+    this.automaticTransactions = this.table("automaticTransactions");
   }
 }

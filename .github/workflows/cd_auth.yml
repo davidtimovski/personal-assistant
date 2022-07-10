@@ -1,0 +1,43 @@
+name: Continuous deployment Auth
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "src/Auth/**"
+      - "src/Domain/**"
+      - "src/Application/**"
+      - "src/Utility/**"
+      - "src/Persistence/**"
+      - "src/Infrastructure/**"
+
+env:
+  REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
+  REGISTRY_IMAGE: ${{ secrets.REGISTRY_IMAGE }}
+  REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+  REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+
+jobs:
+  test:
+    uses: davidtimovski/personal-assistant/.github/workflows/test.yml@master
+  deploy:
+    name: Build and push images to Docker Hub
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build Auth image
+        run: docker build -f ./src/Auth/Dockerfile . --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:auth-latest
+
+      - name: Login to Registry
+        uses: docker/login-action@v1.14.1
+        with:
+          registry: ${{ env.REGISTRY_URL }}
+          username: ${{ env.REGISTRY_USERNAME }}
+          password: ${{ env.REGISTRY_TOKEN }}
+
+      - name: Publish Auth image
+        run: docker push ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:auth-latest

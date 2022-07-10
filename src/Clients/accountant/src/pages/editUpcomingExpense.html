@@ -9,7 +9,7 @@
           <i class="fas fa-pencil-alt"></i>
         </div>
         <div class="page-title">
-          <span if.bind="isNewUpcomingExpense" t="editUpcomingExpense.newUpcomingExpense"></span>
+          <span if.bind="isNew" t="editUpcomingExpense.newUpcomingExpense"></span>
           <span else t="editUpcomingExpense.editUpcomingExpense"></span>
         </div>
         <a route-href="route: upcomingExpenses" class="back-button">
@@ -33,7 +33,7 @@
 
           <div if.bind="model.generated" class="message info">
             <i class="fas fa-info-circle"></i>
-            <span t="editUpcomingExpense.generatedAlert">This upcoming expense has been automatically generated.</span>
+            <span t="editUpcomingExpense.generatedAlert">This upcoming expense was automatically generated.</span>
           </div>
 
           <form submit.trigger="save()">
@@ -42,6 +42,7 @@
               <amount-input amount.bind="model.amount" currency.bind="model.currency" invalid.bind="amountIsInvalid">
               </amount-input>
             </div>
+
             <div class="form-control inline">
               <label for="category" t="category">Category</label>
               <div class="loadable-select ${categoryOptions ? 'loaded' : ''}">
@@ -56,6 +57,7 @@
                 <i class="fas fa-circle-notch fa-spin"></i>
               </div>
             </div>
+
             <div class="form-control inline">
               <label t="editUpcomingExpense.month">Month</label>
               <month-selector
@@ -66,6 +68,7 @@
               >
               </month-selector>
             </div>
+
             <div class="form-control">
               <textarea
                 value.bind="model.description"
@@ -74,41 +77,41 @@
                 t="[placeholder,aria-label]editUpcomingExpense.description"
               ></textarea>
             </div>
+
+            <hr />
+
+            <div class="save-delete-wrap">
+              <a
+                if.bind="!deleteInProgress"
+                click.delegate="save()"
+                class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}"
+              >
+                <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
+                  <i class="fas fa-circle-notch fa-spin"></i>
+                </span>
+                <span>${saveButtonText}</span>
+              </a>
+              <a
+                if.bind="!isNew"
+                click.delegate="delete()"
+                class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}"
+              >
+                <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
+                  <i class="fas fa-circle-notch fa-spin"></i>
+                </span>
+                <span>${deleteButtonText}</span>
+              </a>
+              <button
+                type="button"
+                if.bind="isNew || deleteInProgress"
+                click.delegate="cancel()"
+                t="cancel"
+                class="button secondary-button"
+              >
+                Cancel
+              </button>
+            </div>
           </form>
-
-          <hr />
-
-          <div class="save-delete-wrap">
-            <a
-              if.bind="!deleteInProgress"
-              click.delegate="save()"
-              class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}"
-            >
-              <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
-                <i class="fas fa-circle-notch fa-spin"></i>
-              </span>
-              <span>${saveButtonText}</span>
-            </a>
-            <a
-              if.bind="!isNewUpcomingExpense"
-              click.delegate="delete()"
-              class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}"
-            >
-              <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
-                <i class="fas fa-circle-notch fa-spin"></i>
-              </span>
-              <span>${deleteButtonText}</span>
-            </a>
-            <button
-              type="button"
-              if.bind="isNewUpcomingExpense || deleteInProgress"
-              click.delegate="cancel()"
-              t="cancel"
-              class="button secondary-button"
-            >
-              Cancel
-            </button>
-          </div>
         </div>
       </div>
     </div>

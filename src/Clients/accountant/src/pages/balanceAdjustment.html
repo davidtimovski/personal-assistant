@@ -16,7 +16,6 @@
       </div>
 
       <div class="content-wrap">
-
         <div if.bind="!model" class="double-circle-loading">
           <div class="double-bounce1"></div>
           <div class="double-bounce2"></div>
@@ -26,41 +25,57 @@
           <form submit.trigger="adjust()">
             <div class="form-control inline">
               <label for="balance" t="balance">Balance</label>
-              <amount-input amount.bind="model.balance" currency.bind="currency" invalid.bind="balanceIsInvalid"
-                input-id.bind="'balance'">
+              <amount-input
+                amount.bind="model.balance"
+                currency.bind="currency"
+                invalid.bind="balanceIsInvalid"
+                input-id.bind="'balance'"
+              >
               </amount-input>
             </div>
+
             <div class="form-control inline">
               <label for="account" t="account">Account</label>
-              <select id="account" value.bind="model.accountId" change.delegate="accountChanged()"
-                class="category-select">
+              <select
+                id="account"
+                value.bind="model.accountId"
+                change.delegate="accountChanged()"
+                class="category-select"
+              >
                 <option model.bind="account.id" repeat.for="account of accountOptions">${account.name}</option>
               </select>
             </div>
+
             <div class="form-control inline">
               <label t="balanceAdjustment.adjustedBy">Adjusted by</label>
               <span><span if.bind="adjustedBy > 0">+</span>${adjustedBy | numberFormat:currency}</span>
             </div>
+
             <div class="form-control">
-              <textarea value.bind="model.description" maxlength="500" class="description-textarea"
-                t="[placeholder,aria-label]description"></textarea>
+              <textarea
+                value.bind="model.description"
+                maxlength="500"
+                class="description-textarea"
+                t="[placeholder,aria-label]description"
+              ></textarea>
+            </div>
+
+            <hr />
+
+            <div class="save-delete-wrap">
+              <a
+                click.delegate="adjust()"
+                class="button primary-button ${!canAdjust || adjustButtonIsLoading ? 'disabled' : ''}"
+              >
+                <span class="button-loader ${adjustButtonIsLoading ? 'loading' : ''}">
+                  <i class="fas fa-circle-notch fa-spin"></i>
+                </span>
+                <span t="balanceAdjustment.adjust">Adjust</span>
+              </a>
+              <a route-href="route: menu" t="cancel" class="button secondary-button">Cancel</a>
             </div>
           </form>
-
-          <hr>
-
-          <div class="save-delete-wrap">
-            <a click.delegate="adjust()"
-              class="button primary-button ${!canAdjust || adjustButtonIsLoading ? 'disabled' : ''}">
-              <span class="button-loader ${adjustButtonIsLoading ? 'loading' : ''}">
-                <i class="fas fa-circle-notch fa-spin"></i>
-              </span>
-              <span t="balanceAdjustment.adjust">Adjust</span>
-            </a>
-            <a route-href="route: menu" t="cancel" class="button secondary-button">Cancel</a>
-          </div>
         </div>
-
       </div>
     </div>
   </div>

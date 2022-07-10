@@ -40,6 +40,7 @@
               <amount-input amount.bind="model.amount" currency.bind="model.currency" invalid.bind="amountIsInvalid">
               </amount-input>
             </div>
+
             <div if.bind="model.fromStocks !== null" class="form-control inline">
               <label for="sold-stocks" t="soldStocks">Sold stocks</label>
               <input
@@ -53,6 +54,7 @@
                 required
               />
             </div>
+
             <div if.bind="model.toStocks !== null" class="form-control inline">
               <label for="purchased-stocks" t="purchasedStocks">Purchased stocks</label>
               <input
@@ -66,6 +68,7 @@
                 required
               />
             </div>
+
             <div class="form-control inline">
               <label for="category" t="category">Category</label>
               <div class="loadable-select ${categoryOptions ? 'loaded' : ''}">
@@ -80,6 +83,7 @@
                 <i class="fas fa-circle-notch fa-spin"></i>
               </div>
             </div>
+
             <div class="form-control inline">
               <label for="date" t="date">Date</label>
               <input
@@ -91,6 +95,7 @@
                 required
               />
             </div>
+
             <div if.bind="model.isEncrypted" autocomplete="off" class="inline-decrypt-form">
               <div class="viewable-password">
                 <input
@@ -127,6 +132,7 @@
                 <i class="fas fa-eraser"></i>
               </a>
             </div>
+
             <div else class="form-control">
               <div class="encryption-box ${model.encrypt ? 'active' : ''}">
                 <textarea
@@ -167,40 +173,41 @@
                 </div>
               </div>
             </div>
+
+            <hr />
+
+            <div class="save-delete-wrap">
+              <a
+                if.bind="!deleteInProgress"
+                click.delegate="save()"
+                class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}"
+              >
+                <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
+                  <i class="fas fa-circle-notch fa-spin"></i>
+                </span>
+                <span t="save">Save</span>
+              </a>
+              <a
+                click.delegate="delete()"
+                class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}"
+              >
+                <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
+                  <i class="fas fa-circle-notch fa-spin"></i>
+                </span>
+                <span>${deleteButtonText}</span>
+              </a>
+              <button
+                type="button"
+                if.bind="deleteInProgress"
+                click.delegate="cancel()"
+                t="cancel"
+                class="button secondary-button"
+              >
+                Cancel
+              </button>
+            </div>
+
           </form>
-
-          <hr />
-
-          <div class="save-delete-wrap">
-            <a
-              if.bind="!deleteInProgress"
-              click.delegate="save()"
-              class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}"
-            >
-              <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
-                <i class="fas fa-circle-notch fa-spin"></i>
-              </span>
-              <span t="save">Save</span>
-            </a>
-            <a
-              click.delegate="delete()"
-              class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}"
-            >
-              <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
-                <i class="fas fa-circle-notch fa-spin"></i>
-              </span>
-              <span>${deleteButtonText}</span>
-            </a>
-            <button
-              type="button"
-              if.bind="deleteInProgress"
-              click.delegate="cancel()"
-              t="cancel"
-              class="button secondary-button"
-            >
-              Cancel
-            </button>
-          </div>
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Application.Contracts.Accountant.Accounts.Models;
+using Application.Contracts.Accountant.AutomaticTransactions.Models;
 using Application.Contracts.Accountant.Categories.Models;
 using Application.Contracts.Accountant.Debts.Models;
 using Application.Contracts.Accountant.Transactions.Models;
@@ -26,4 +27,7 @@ public class ChangedVm
 
     public IEnumerable<int> DeletedDebtIds { get; set; }
     public IEnumerable<DebtDto> Debts { get; set; }
+
+    public IEnumerable<int> DeletedAutomaticTransactionIds { get; set; }
+    public IEnumerable<AutomaticTransactionDto> AutomaticTransactions { get; set; }
 }

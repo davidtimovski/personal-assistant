@@ -20,8 +20,8 @@ export class EditUpcomingExpense {
   private upcomingExpenseId: number;
   private model: EditUpcomingExpenseModel;
   private categoryOptions: SelectOption[];
-  private originalUpcomingExpenseJson: string;
-  private isNewUpcomingExpense: boolean;
+  private originalJson: string;
+  private isNew: boolean;
   private amountInput: HTMLInputElement;
   private amountIsInvalid: boolean;
   private dateIsInvalid: boolean;
@@ -55,16 +55,14 @@ export class EditUpcomingExpense {
     this.language = this.localStorage.getLanguage();
 
     this.upcomingExpenseId = parseInt(params.id, 10);
-    this.isNewUpcomingExpense = this.upcomingExpenseId === 0;
+    this.isNew = this.upcomingExpenseId === 0;
 
-    if (this.isNewUpcomingExpense) {
+    if (this.isNew) {
       const currency = this.localStorage.getCurrency();
 
       this.model = new EditUpcomingExpenseModel(null, null, null, currency, null, null, false, null, false);
 
       this.saveButtonText = this.i18n.tr("create");
-
-      this.setValidationRules();
     } else {
       this.saveButtonText = this.i18n.tr("save");
     }
@@ -75,7 +73,7 @@ export class EditUpcomingExpense {
       this.categoryOptions = options;
     });
 
-    if (!this.isNewUpcomingExpense) {
+    if (!this.isNew) {
       this.upcomingExpensesService.get(this.upcomingExpenseId).then((upcomingExpense: UpcomingExpense) => {
         if (upcomingExpense === null) {
           this.router.navigateToRoute("notFound");
@@ -93,11 +91,11 @@ export class EditUpcomingExpense {
           upcomingExpense.synced
         );
 
-        this.originalUpcomingExpenseJson = JSON.stringify(this.model);
-
-        this.setValidationRules();
+        this.originalJson = JSON.stringify(this.model);
       });
     }
+
+    this.setValidationRules();
   }
 
   setValidationRules() {
@@ -123,7 +121,7 @@ export class EditUpcomingExpense {
   get canSave() {
     return (
       !!this.model.amount &&
-      JSON.stringify(this.model) !== this.originalUpcomingExpenseJson &&
+      JSON.stringify(this.model) !== this.originalJson &&
       !(!this.connTracker.isOnline && this.model.synced)
     );
   }
@@ -139,7 +137,7 @@ export class EditUpcomingExpense {
     const result: ControllerValidateResult = await this.validationController.validate();
 
     if (result.valid) {
-      if (this.isNewUpcomingExpense) {
+      if (this.isNew) {
         try {
           const upcomingExpense = new UpcomingExpense(
             null,

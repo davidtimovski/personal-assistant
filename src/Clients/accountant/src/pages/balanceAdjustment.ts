@@ -17,7 +17,7 @@ export class BalanceAdjustment {
   private model: Adjustment;
   private originalBalance: number;
   private currency: string;
-  private originalAdjustmentJson: string;
+  private originalJson: string;
   private accountOptions: SelectOption[];
   private balanceIsInvalid: boolean;
   private adjustButtonIsLoading = false;
@@ -51,7 +51,7 @@ export class BalanceAdjustment {
 
     this.model = new Adjustment(mainAccountId, balance, this.i18n.tr("balanceAdjustment.balanceAdjustment"));
 
-    this.originalAdjustmentJson = JSON.stringify(this.model);
+    this.originalJson = JSON.stringify(this.model);
 
     let min = 0.01;
     if (this.currency === "MKD") {
@@ -75,7 +75,7 @@ export class BalanceAdjustment {
 
   @computedFrom("model.balance")
   get canAdjust() {
-    return !!this.model.balance && JSON.stringify(this.model) !== this.originalAdjustmentJson;
+    return !!this.model.balance && JSON.stringify(this.model) !== this.originalJson;
   }
 
   async adjust() {
