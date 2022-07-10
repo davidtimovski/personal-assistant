@@ -16,9 +16,9 @@ import { Account } from "models/entities/account";
 export class EditAccount {
   private accountId: number;
   private account: Account;
-  private originalAccountJson: string;
+  private originalJson: string;
   private currency: string;
-  private isNewAccount: boolean;
+  private isNew: boolean;
   private isMainAccount: boolean;
   private nameInput: HTMLInputElement;
   private nameIsInvalid: boolean;
@@ -51,23 +51,21 @@ export class EditAccount {
 
   activate(params: any) {
     this.accountId = parseInt(params.id, 10);
-    this.isNewAccount = this.accountId === 0;
+    this.isNew = this.accountId === 0;
 
     this.currency = this.localStorage.getCurrency();
 
-    if (this.isNewAccount) {
+    if (this.isNew) {
       this.account = new Account("", this.currency, null, null);
       this.investmentFund = false;
       this.saveButtonText = this.i18n.tr("create");
-
-      this.setValidationRules();
     } else {
       this.saveButtonText = this.i18n.tr("save");
     }
   }
 
   async attached() {
-    if (this.isNewAccount) {
+    if (this.isNew) {
       this.nameInput.focus();
     } else {
       const mainId = await this.accountsService.getMainId();
@@ -81,10 +79,10 @@ export class EditAccount {
       this.account = account;
       this.investmentFund = !!account.stockPrice;
 
-      this.originalAccountJson = JSON.stringify(this.account);
-
-      this.setValidationRules();
+      this.originalJson = JSON.stringify(this.account);
     }
+
+    this.setValidationRules();
   }
 
   setValidationRules() {
@@ -108,7 +106,7 @@ export class EditAccount {
     return (
       !ValidationUtil.isEmptyOrWhitespace(this.account.name) &&
       (!this.investmentFund || !!this.account.stockPrice) &&
-      JSON.stringify(this.account) !== this.originalAccountJson &&
+      JSON.stringify(this.account) !== this.originalJson &&
       !(!this.connTracker.isOnline && this.account.synced)
     );
   }
@@ -126,7 +124,7 @@ export class EditAccount {
     this.nameIsInvalid = !result.valid;
 
     if (result.valid) {
-      if (this.isNewAccount) {
+      if (this.isNew) {
         try {
           const id = await this.accountsService.create(this.account);
           this.nameIsInvalid = false;

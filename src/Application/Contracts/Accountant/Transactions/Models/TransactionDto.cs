@@ -1,6 +1,6 @@
 ﻿using System;
-using AutoMapper;
 using Application.Mappings;
+using AutoMapper;
 using Domain.Entities.Accountant;
 
 namespace Application.Contracts.Accountant.Transactions.Models;
@@ -21,6 +21,7 @@ public class TransactionDto : IMapFrom<Transaction>
     public byte[] EncryptedDescription { get; set; }
     public byte[] Salt { get; set; }
     public byte[] Nonce { get; set; }
+    public bool Generated { get; set; }
     public DateTime CreatedDate { get; set; }
     public DateTime ModifiedDate { get; set; }
 

@@ -9,4 +9,5 @@ public class SyncEntities
     public List<SyncTransaction> Transactions { get; set; }
     public List<SyncUpcomingExpense> UpcomingExpenses { get; set; }
     public List<SyncDebt> Debts { get; set; }
+    public List<SyncAutomaticTransaction> AutomaticTransactions { get; set; }
 }

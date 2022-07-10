@@ -1,0 +1,84 @@
+<template>
+  <require from="../static/styles/pages/automatic-transactions.scss"></require>
+  <require from="./../resources/elements/empty-list-message.html"></require>
+  <require from="./../resources/value-converters/number-format"></require>
+
+  <div class="container">
+    <div class="au-animate animate-fade-in animate-fade-out">
+      <div class="page-title-wrap">
+        <div class="side inactive small">
+          <i class="fa-solid fa-robot"></i>
+        </div>
+        <div t="automaticTransactions.automaticTransactions" class="page-title">Automatic transactions</div>
+        <a route-href="route: dashboard" class="back-button">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+
+      <div class="content-wrap">
+        <div class="content-body">
+          <div if.bind="!automaticTransactions" class="double-circle-loading">
+            <div class="double-bounce1"></div>
+            <div class="double-bounce2"></div>
+          </div>
+
+          <table if.bind="automaticTransactions && automaticTransactions.length > 0" class="editable-table">
+            <thead>
+              <tr>
+                <th class="edit-link-cell"></th>
+                <th t="automaticTransactions.onEvery">On every</th>
+                <th t="amount">Amount</th>
+                <th t="category">Category</th>
+                <th class="sync-icon-cell"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                repeat.for="automaticTransaction of automaticTransactions"
+                class.bind="automaticTransaction.id === getEditedId ? 'highlighted-row' : ''"
+              >
+                <td class="edit-link-cell">
+                  <a
+                    route-href="route: editAutomaticTransaction; params.bind: { id: automaticTransaction.id }"
+                    class="link"
+                    t="[title,aria-label]edit"
+                  >
+                    <i class="fas fa-pencil-alt"></i>
+                  </a>
+                </td>
+                <td>${automaticTransaction.dayInMonth}</td>
+                <td>
+                  ${automaticTransaction.amount | numberFormat:automaticTransaction.currency}
+                  <i
+                    class="fas is-deposit-icon ${automaticTransaction.isDeposit ? 'fa-donate deposit-color' : 'fa-wallet expense-color'}"
+                  ></i>
+                </td>
+                <td>${automaticTransaction.category}</td>
+                <td class="sync-icon-cell">
+                  <i if.bind="!automaticTransaction.synced" class="fas fa-sync-alt" t="[title,aria-label]notSynced"></i>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <empty-list-message
+            if.bind="automaticTransactions.length === 0"
+            message-key="automaticTransactions.emptyListMessage"
+          >
+          </empty-list-message>
+        </div>
+
+        <div class="centering-wrap">
+          <a
+            click.delegate="newAutomaticTransaction()"
+            class="new-button ${syncing ? 'disabled' : ''}"
+            role="button"
+            t="[title,aria-label]automaticTransactions.newAutomaticTransaction"
+          >
+            <i class="fas fa-plus"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

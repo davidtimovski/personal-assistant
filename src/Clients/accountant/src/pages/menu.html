@@ -21,23 +21,33 @@
           <a route-href="route: categories" class="wide-button" t="menu.categories">Categories</a>
           <a route-href="route: accounts" class="wide-button" t="menu.accounts">Accounts</a>
           <a route-href="route: balanceAdjustment" class="wide-button" t="menu.balanceAdjustment">Balance adjustment</a>
+          <a route-href="route: automaticTransactions" class="wide-button" t="menu.automaticTransactions"
+            >Automatic transactions</a
+          >
 
           <div class="drawer-button-wrap ${reportsDrawerIsOpen ? 'open' : ''}">
-            <button type="button" click.delegate="toggleReportsDrawer()" class="wide-button drawer-button"
-              t="menu.reports">
+            <button
+              type="button"
+              click.delegate="toggleReportsDrawer()"
+              class="wide-button drawer-button"
+              t="menu.reports"
+            >
               Reports
             </button>
             <div class="drawer-content-wrap">
               <div class="drawer-content">
                 <a route-href="route: pieChartReport" class="wide-button" t="menu.pieChart">Pie chart</a>
                 <a route-href="route: barChartReport" class="wide-button" t="menu.barChart">Bar chart</a>
-                <a route-href="route: expenditureHeatmap" class="wide-button" t="menu.expenditureHeatmap">Expenditure
-                  heatmap</a>
+                <a route-href="route: expenditureHeatmap" class="wide-button" t="menu.expenditureHeatmap"
+                  >Expenditure heatmap</a
+                >
               </div>
             </div>
           </div>
 
-          <a route-href="route: earlyRetirementCalculator" class="wide-button" t="menu.earlyRetirementCalculator">Early retirement calculator</a>
+          <a route-href="route: earlyRetirementCalculator" class="wide-button" t="menu.earlyRetirementCalculator"
+            >Early retirement calculator</a
+          >
           <a route-href="route: export" class="wide-button" t="menu.export">Export</a>
           <a route-href="route: totalSync" class="wide-button" t="menu.totalSync">Total sync</a>
 
@@ -59,8 +69,9 @@
         <hr />
 
         <div class="horizontal-buttons-wrap">
-          <a href.bind="personalAssistantUrl" class="wide-button" t="menu.goToPersonalAssistant">Go to Personal
-            Assistant</a>
+          <a href.bind="personalAssistantUrl" class="wide-button" t="menu.goToPersonalAssistant"
+            >Go to Personal Assistant</a
+          >
           <a click.delegate="logOut()" class="wide-button" t="menu.logOut">Log Out</a>
         </div>
 

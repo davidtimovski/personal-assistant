@@ -46,7 +46,7 @@
                   </a>
                 </td>
                 <td>${upcomingExpense.date}</td>
-                <td>${upcomingExpense.amount | numberFormat:currency}</td>
+                <td>${upcomingExpense.amount | numberFormat:upcomingExpense.currency}</td>
                 <td>${upcomingExpense.category}</td>
                 <td class="sync-icon-cell">
                   <i if.bind="!upcomingExpense.synced" class="fas fa-sync-alt" t="[title,aria-label]notSynced"></i>

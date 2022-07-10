@@ -18,6 +18,7 @@ public class Transaction : Entity
     public byte[] EncryptedDescription { get; set; }
     public byte[] Salt { get; set; }
     public byte[] Nonce { get; set; }
+    public bool Generated { get; set; }
 
     public Account FromAccount { get; set; }
     public Account ToAccount { get; set; }

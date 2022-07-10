@@ -27,15 +27,17 @@ public class SyncService : ISyncService
         var transactions = model.Transactions.Select(x => _mapper.Map<Transaction>(x)).ToList();
         var upcomingExpenses = model.UpcomingExpenses.Select(x => _mapper.Map<UpcomingExpense>(x)).ToList();
         var debts = model.Debts.Select(x => _mapper.Map<Debt>(x)).ToList();
+        var automaticTransactions = model.AutomaticTransactions.Select(x => _mapper.Map<AutomaticTransaction>(x)).ToList();
 
-        await _syncRepository.SyncAsync(accounts, categories, transactions, upcomingExpenses, debts);
+        await _syncRepository.SyncAsync(accounts, categories, transactions, upcomingExpenses, debts, automaticTransactions);
 
         var accountIds = accounts.Select(x => x.Id).ToArray();
         var categoryIds = categories.Select(x => x.Id).ToArray();
         var transactionIds = transactions.Select(x => x.Id).ToArray();
         var upcomingExpenseIds = upcomingExpenses.Select(x => x.Id).ToArray();
         var debtIds = debts.Select(x => x.Id).ToArray();
+        var automaticTransactionIds = automaticTransactions.Select(x => x.Id).ToArray();
 
-        return new SyncedEntityIds(accountIds, categoryIds, transactionIds, upcomingExpenseIds, debtIds);
+        return new SyncedEntityIds(accountIds, categoryIds, transactionIds, upcomingExpenseIds, debtIds, automaticTransactionIds);
     }
 }

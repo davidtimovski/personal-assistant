@@ -9,7 +9,7 @@
           <i class="fas fa-pencil-alt"></i>
         </div>
         <div class="page-title">
-          <span if.bind="isNewCategory" t="editCategory.newCategory"></span>
+          <span if.bind="isNew" t="editCategory.newCategory"></span>
           <span else>
             <span t="editCategory.edit">Edit</span>&nbsp;<span class="colored-text">${category.name}</span>
           </span>
@@ -20,7 +20,6 @@
       </div>
 
       <div class="content-wrap">
-
         <div if.bind="!category" class="double-circle-loading">
           <div class="double-bounce1"></div>
           <div class="double-bounce2"></div>
@@ -29,9 +28,9 @@
         <div else>
           <div show.bind="!connTracker.isOnline && category.synced" class="message warning">
             <i class="fas fa-exclamation-triangle"></i>
-            <span t="whileOfflineCannotModify">While offline you cannot modify data that has already been synced with
-              the
-              cloud.</span>
+            <span t="whileOfflineCannotModify"
+              >While offline you cannot modify data that has already been synced with the cloud.</span
+            >
           </div>
 
           <div if.bind="isParent" class="message info">
@@ -41,65 +40,99 @@
 
           <form submit.trigger="save()">
             <div class="form-control">
-              <input type="text" value.bind="category.name & validate" ref="nameInput" maxlength="30"
-                class.bind="nameIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]editCategory.categoryName"
-                required>
+              <input
+                type="text"
+                value.bind="category.name & validate"
+                ref="nameInput"
+                maxlength="30"
+                class.bind="nameIsInvalid ? 'invalid' : ''"
+                t="[placeholder,aria-label]editCategory.categoryName"
+                required
+              />
             </div>
+
             <div if.bind="!isParent" class="form-control inline">
               <label for="parent-category" t="editCategory.parentCategory">Parent category</label>
               <div class="loadable-select ${parentCategoryOptions ? 'loaded' : ''}">
-                <select id="parent-category" value.bind="category.parentId" disabled.bind="!parentCategoryOptions"
-                  class="category-select">
-                  <option model.bind="category.id" repeat.for="category of parentCategoryOptions">${category.name}
+                <select
+                  id="parent-category"
+                  value.bind="category.parentId"
+                  disabled.bind="!parentCategoryOptions"
+                  class="category-select"
+                >
+                  <option model.bind="category.id" repeat.for="category of parentCategoryOptions">
+                    ${category.name}
                   </option>
                 </select>
                 <i class="fas fa-circle-notch fa-spin"></i>
               </div>
             </div>
+
             <div class="form-control inline">
               <label for="type" t="editCategory.type">Type</label>
               <select id="type" value.bind="category.type" change.delegate="typeChanged()" class="category-select">
                 <option model.bind="type.id" repeat.for="type of typeOptions">${type.name}</option>
               </select>
             </div>
+
             <div class="form-control">
-              <checkbox label-key="editCategory.generateUpcomingExpense" value.bind="category.generateUpcomingExpense"
-                disabled.bind="category.type !== 2">
+              <checkbox
+                label-key="editCategory.generateUpcomingExpense"
+                value.bind="category.generateUpcomingExpense"
+                disabled.bind="category.type !== 2"
+              >
               </checkbox>
             </div>
+
             <div class="form-control">
-              <checkbox label-key="editCategory.tax" value.bind="category.isTax" disabled.bind="category.type !== 2"></checkbox>
+              <checkbox
+                label-key="editCategory.tax"
+                value.bind="category.isTax"
+                disabled.bind="category.type !== 2"
+              ></checkbox>
               <tooltip key="taxCategories"></tooltip>
             </div>
+
+            <hr />
+
+            <div show.bind="deleteInProgress && transactionsWarningVisible" class="delete-confirmation-alert">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span t="[html]editCategory.categoryHasTransactions"></span>
+            </div>
+
+            <div class="save-delete-wrap">
+              <a
+                if.bind="!deleteInProgress"
+                click.delegate="save()"
+                class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}"
+              >
+                <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
+                  <i class="fas fa-circle-notch fa-spin"></i>
+                </span>
+                <span>${saveButtonText}</span>
+              </a>
+              <a
+                if.bind="!isNew"
+                click.delegate="delete()"
+                class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}"
+              >
+                <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
+                  <i class="fas fa-circle-notch fa-spin"></i>
+                </span>
+                <span>${deleteButtonText}</span>
+              </a>
+              <button
+                type="button"
+                if.bind="isNew || deleteInProgress"
+                click.delegate="cancel()"
+                t="cancel"
+                class="button secondary-button"
+              >
+                Cancel
+              </button>
+            </div>
           </form>
-
-          <hr>
-
-          <div show.bind="deleteInProgress && transactionsWarningVisible" class="delete-confirmation-alert">
-            <i class="fas fa-exclamation-triangle"></i>
-            <span t="[html]editCategory.categoryHasTransactions"></span>
-          </div>
-
-          <div class="save-delete-wrap">
-            <a if.bind="!deleteInProgress" click.delegate="save()"
-              class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
-              <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
-                <i class="fas fa-circle-notch fa-spin"></i>
-              </span>
-              <span>${saveButtonText}</span>
-            </a>
-            <a if.bind="!isNewCategory" click.delegate="delete()"
-              class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}">
-              <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
-                <i class="fas fa-circle-notch fa-spin"></i>
-              </span>
-              <span>${deleteButtonText}</span>
-            </a>
-            <button type="button" if.bind="isNewCategory || deleteInProgress" click.delegate="cancel()" t="cancel"
-              class="button secondary-button">Cancel</button>
-          </div>
         </div>
-
       </div>
     </div>
   </div>

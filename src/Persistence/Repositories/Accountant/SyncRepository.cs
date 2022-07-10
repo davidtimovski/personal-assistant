@@ -10,7 +10,8 @@ public class SyncRepository : BaseRepository, ISyncRepository
     public SyncRepository(PersonalAssistantContext efContext)
         : base(efContext) { }
 
-    public async Task SyncAsync(IEnumerable<Account> accounts, IEnumerable<Category> categories, IEnumerable<Transaction> transactions, IEnumerable<UpcomingExpense> upcomingExpenses, IEnumerable<Debt> debts)
+    public async Task SyncAsync(IEnumerable<Account> accounts, IEnumerable<Category> categories, IEnumerable<Transaction> transactions, 
+        IEnumerable<UpcomingExpense> upcomingExpenses, IEnumerable<Debt> debts, IEnumerable<AutomaticTransaction> automaticTransactions)
     {
         EFContext.Accounts.AddRange(accounts);
         EFContext.Categories.AddRange(categories);
@@ -26,7 +27,9 @@ public class SyncRepository : BaseRepository, ISyncRepository
             upcomingExpense.Date = upcomingExpense.Date.ToUniversalTime();
         }
         EFContext.UpcomingExpenses.AddRange(upcomingExpenses);
+
         EFContext.Debts.AddRange(debts);
+        EFContext.AutomaticTransactions.AddRange(automaticTransactions);
 
         await EFContext.SaveChangesAsync();
     }

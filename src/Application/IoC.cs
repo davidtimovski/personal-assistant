@@ -1,14 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
-using FluentValidation;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Application.Contracts.Accountant.Accounts;
+using Application.Contracts.Accountant.AutomaticTransactions;
 using Application.Contracts.Accountant.Categories;
 using Application.Contracts.Accountant.Debts;
+using Application.Contracts.Accountant.Sync;
 using Application.Contracts.Accountant.Transactions;
 using Application.Contracts.Accountant.UpcomingExpenses;
-using Application.Contracts.Accountant.Sync;
 using Application.Contracts.Common;
 using Application.Contracts.Common.Models;
 using Application.Contracts.CookingAssistant.Common;
@@ -27,6 +25,9 @@ using Application.Services.Accountant;
 using Application.Services.Common;
 using Application.Services.CookingAssistant;
 using Application.Services.ToDoAssistant;
+using FluentValidation;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Utility;
 
 namespace Application;
@@ -72,6 +73,7 @@ public static class IoC
         services.AddTransient<ITransactionService, TransactionService>();
         services.AddTransient<IUpcomingExpenseService, UpcomingExpenseService>();
         services.AddTransient<IDebtService, DebtService>();
+        services.AddTransient<IAutomaticTransactionService, AutomaticTransactionService>();
         services.AddTransient<ISyncService, SyncService>();
 
         var activityMultiplier = new Dictionary<string, float>();

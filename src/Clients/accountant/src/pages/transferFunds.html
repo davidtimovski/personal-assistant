@@ -7,8 +7,8 @@
   <div class="container">
     <div class="au-animate animate-fade-in animate-fade-out">
       <div class="page-title-wrap">
-        <div class="side inactive medium">
-          <i class="fas fa-exchange-alt"></i>
+        <div class="side inactive small">
+          <i class="fa-solid fa-money-bill-transfer"></i>
         </div>
         <div t="transferFunds.transferFunds" class="page-title">Transfer funds</div>
         <a route-href="route: accounts" class="back-button">
@@ -21,8 +21,12 @@
           <div class="form-control">
             <label for="from-account" class="transfer-funds-label">${fromAccountLabel}</label>
             <div class="loadable-select ${model.accountOptions ? 'loaded' : ''}">
-              <select id="from-account" value.bind="model.fromAccountId" change.delegate="fromAccountChanged()"
-                disabled.bind="!model.accountOptions">
+              <select
+                id="from-account"
+                value.bind="model.fromAccountId"
+                change.delegate="fromAccountChanged()"
+                disabled.bind="!model.accountOptions"
+              >
                 <option model.bind="account.id" repeat.for="account of model.accountOptions">${account.name}</option>
               </select>
               <i class="fas fa-circle-notch fa-spin"></i>
@@ -41,8 +45,12 @@
           <div class="form-control">
             <label for="to-account" class="transfer-funds-label">${toAccountLabel}</label>
             <div class="loadable-select ${model.accountOptions ? 'loaded' : ''}">
-              <select id="to-account" value.bind="model.toAccountId" change.delegate="toAccountChanged()"
-                disabled.bind="!model.accountOptions">
+              <select
+                id="to-account"
+                value.bind="model.toAccountId"
+                change.delegate="toAccountChanged()"
+                disabled.bind="!model.accountOptions"
+              >
                 <option model.bind="account.id" repeat.for="account of model.accountOptions">${account.name}</option>
               </select>
               <i class="fas fa-circle-notch fa-spin"></i>
@@ -63,20 +71,23 @@
             <amount-input amount.bind="model.amount" currency.bind="model.currency" invalid.bind="amountIsInvalid">
             </amount-input>
           </div>
+
+          <hr />
+
+          <div class="save-delete-wrap">
+            <a
+              click.delegate="transfer()"
+              class="button primary-button ${!canTransfer || transferButtonIsLoading ? 'disabled' : ''}"
+            >
+              <span class="button-loader ${transferButtonIsLoading ? 'loading' : ''}">
+                <i class="fas fa-circle-notch fa-spin"></i>
+              </span>
+              <span>${transferButtonLabel}</span>
+            </a>
+            <a route-href="route: accounts" t="cancel" class="button secondary-button">Cancel</a>
+          </div>
+
         </form>
-
-        <hr />
-
-        <div class="save-delete-wrap">
-          <a click.delegate="transfer()"
-            class="button primary-button ${!canTransfer || transferButtonIsLoading ? 'disabled' : ''}">
-            <span class="button-loader ${transferButtonIsLoading ? 'loading' : ''}">
-              <i class="fas fa-circle-notch fa-spin"></i>
-            </span>
-            <span>${transferButtonLabel}</span>
-          </a>
-          <a route-href="route: accounts" t="cancel" class="button secondary-button">Cancel</a>
-        </div>
       </div>
     </div>
   </div>

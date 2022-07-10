@@ -1,0 +1,122 @@
+<template>
+  <require from="./../resources/elements/amount-input"></require>
+  <require from="./../resources/elements/double-radio"></require>
+
+  <div class="container">
+    <div class="au-animate animate-fade-in animate-fade-out">
+      <div class="page-title-wrap">
+        <div class="side inactive small">
+          <i class="fas fa-pencil-alt"></i>
+        </div>
+        <div class="page-title">
+          <span if.bind="isNew" t="editAutomaticTransaction.newAutomaticTransaction"></span>
+          <span else t="editAutomaticTransaction.editAutomaticTransaction"></span>
+        </div>
+        <a route-href="route: automaticTransactions" class="back-button">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+
+      <div class="content-wrap">
+        <div if.bind="!model" class="double-circle-loading">
+          <div class="double-bounce1"></div>
+          <div class="double-bounce2"></div>
+        </div>
+
+        <div else>
+          <div show.bind="!connTracker.isOnline && model.synced" class="message warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span t="whileOfflineCannotModify"
+              >While offline you cannot modify data that has already been synced with the cloud.</span
+            >
+          </div>
+
+          <form submit.trigger="save()">
+            <div class="form-control">
+              <double-radio
+                name="depositExpenseToggle"
+                left-label-key="editAutomaticTransaction.expense"
+                right-label-key="editAutomaticTransaction.deposit"
+                left-value.bind="false"
+                right-value.bind="true"
+                bind-to.bind="isDeposit"
+              >
+              </double-radio>
+            </div>
+
+            <div class="form-control inline">
+              <label for="amount" t="amount">Amount</label>
+              <amount-input amount.bind="model.amount" currency.bind="model.currency" invalid.bind="amountIsInvalid">
+              </amount-input>
+            </div>
+
+            <div class="form-control inline">
+              <label for="category" t="category">Category</label>
+              <div class="loadable-select ${categoryOptions ? 'loaded' : ''}">
+                <select
+                  id="category"
+                  value.bind="model.categoryId"
+                  disabled.bind="!categoryOptions"
+                  class="category-select"
+                >
+                  <option model.bind="category.id" repeat.for="category of categoryOptions">${category.name}</option>
+                </select>
+                <i class="fas fa-circle-notch fa-spin"></i>
+              </div>
+            </div>
+
+            <div class="form-control inline">
+              <label for="day-in-month" t="editAutomaticTransaction.onEvery">On every</label>
+              <select id="day-in-month" value.bind="model.dayInMonth" class="category-select">
+                <option model.bind="day.id" repeat.for="day of dayInMonthOptions">${day.name}</option>
+              </select>
+            </div>
+
+            <div class="form-control">
+              <textarea
+                value.bind="model.description"
+                maxlength="250"
+                class="description-textarea"
+                t="[placeholder,aria-label]description"
+              ></textarea>
+            </div>
+
+            <hr />
+
+            <div class="save-delete-wrap">
+              <a
+                if.bind="!deleteInProgress"
+                click.delegate="save()"
+                class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}"
+              >
+                <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
+                  <i class="fas fa-circle-notch fa-spin"></i>
+                </span>
+                <span>${saveButtonText}</span>
+              </a>
+              <a
+                if.bind="!isNew"
+                click.delegate="delete()"
+                class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}"
+              >
+                <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
+                  <i class="fas fa-circle-notch fa-spin"></i>
+                </span>
+                <span>${deleteButtonText}</span>
+              </a>
+              <button
+                type="button"
+                if.bind="isNew || deleteInProgress"
+                click.delegate="cancel()"
+                t="cancel"
+                class="button secondary-button"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

@@ -1,4 +1,5 @@
 ﻿using Application.Contracts.Accountant.Accounts;
+using Application.Contracts.Accountant.AutomaticTransactions;
 using Application.Contracts.Accountant.Categories;
 using Application.Contracts.Accountant.Debts;
 using Application.Contracts.Accountant.Sync;
@@ -40,6 +41,7 @@ public static class IoC
         services.AddTransient<ITransactionsRepository, TransactionsRepository>();
         services.AddTransient<IUpcomingExpensesRepository, UpcomingExpensesRepository>();
         services.AddTransient<IDebtsRepository, DebtsRepository>();
+        services.AddTransient<IAutomaticTransactionsRepository, AutomaticTransactionsRepository>();
         services.AddTransient<ISyncRepository, SyncRepository>();
 
         services.AddDbContext<PersonalAssistantContext>(options =>

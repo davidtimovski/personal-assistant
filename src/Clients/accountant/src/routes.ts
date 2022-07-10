@@ -43,6 +43,21 @@ export default [
     moduleId: PLATFORM.moduleName("./pages/balanceAdjustment"),
   },
   {
+    route: "automatic-transactions",
+    name: "automaticTransactions",
+    moduleId: PLATFORM.moduleName("./pages/automaticTransactions"),
+  },
+  {
+    route: "automatic-transactions/:editedId",
+    name: "automaticTransactionsEdited",
+    moduleId: PLATFORM.moduleName("./pages/automaticTransactions"),
+  },
+  {
+    route: "automatic-transactions-expense/:id",
+    name: "editAutomaticTransaction",
+    moduleId: PLATFORM.moduleName("./pages/editAutomaticTransaction"),
+  },
+  {
     route: "transactions",
     name: "transactions",
     moduleId: PLATFORM.moduleName("./pages/transactions"),

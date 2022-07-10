@@ -9,7 +9,7 @@
           <i class="fas fa-pencil-alt"></i>
         </div>
         <div class="page-title">
-          <span if.bind="isNewAccount" t="editAccount.newAccount"></span>
+          <span if.bind="isNew" t="editAccount.newAccount"></span>
           <span else>
             <span t="editAccount.edit">Edit</span>&nbsp;<span class="colored-text">${account.name}</span>
           </span>
@@ -28,22 +28,30 @@
         <div else>
           <div show.bind="!connTracker.isOnline && account.synced" class="message warning">
             <i class="fas fa-exclamation-triangle"></i>
-            <span t="whileOfflineCannotModify">While offline you cannot modify data that has already been synced with
-              the cloud.</span>
+            <span t="whileOfflineCannotModify"
+              >While offline you cannot modify data that has already been synced with the cloud.</span
+            >
           </div>
 
           <div if.bind="isMainAccount" class="message info">
             <i class="fas fa-info-circle"></i>
-            <span t="editAccount.mainAccount">This is your main account. It represents your current capital and every
-              new expense or deposit initially
-              goes here.</span>
+            <span t="editAccount.mainAccount"
+              >This is your main account. It represents your current capital and every new expense or deposit initially
+              goes here.</span
+            >
           </div>
 
           <form submit.trigger="save()">
             <div class="form-control">
-              <input type="text" value.bind="account.name & validate" ref="nameInput" maxlength="30"
-                class.bind="nameIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]editAccount.accountName"
-                required />
+              <input
+                type="text"
+                value.bind="account.name & validate"
+                ref="nameInput"
+                maxlength="30"
+                class.bind="nameIsInvalid ? 'invalid' : ''"
+                t="[placeholder,aria-label]editAccount.accountName"
+                required
+              />
             </div>
 
             <div if.bind="!isMainAccount">
@@ -51,41 +59,52 @@
                 <checkbox label-key="editAccount.investmentFund" value.bind="investmentFund"></checkbox>
               </div>
 
-              <div if.bind="investmentFund" class="form-control inline">
+              <div if.bind="investmentFund" class="form-control inline au-animate animate-fade-in animate-fade-out">
                 <label for="stock" t="editAccount.stockPrice">Stock price</label>
                 <stock-price-input amount.bind="account.stockPrice" currency.bind="account.currency">
                 </stock-price-input>
               </div>
             </div>
+
+            <hr />
+
+            <div show.bind="deleteInProgress && transactionsWarningVisible" class="delete-confirmation-alert">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span t="[html]editAccount.accountHasTransactions"></span>
+            </div>
+
+            <div class="save-delete-wrap">
+              <a
+                if.bind="!deleteInProgress"
+                click.delegate="save()"
+                class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}"
+              >
+                <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
+                  <i class="fas fa-circle-notch fa-spin"></i>
+                </span>
+                <span>${saveButtonText}</span>
+              </a>
+              <a
+                if.bind="!isNew && !isMainAccount"
+                click.delegate="delete()"
+                class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}"
+              >
+                <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
+                  <i class="fas fa-circle-notch fa-spin"></i>
+                </span>
+                <span>${deleteButtonText}</span>
+              </a>
+              <button
+                type="button"
+                if.bind="isNew || deleteInProgress || isMainAccount"
+                click.delegate="cancel()"
+                t="cancel"
+                class="button secondary-button"
+              >
+                Cancel
+              </button>
+            </div>
           </form>
-
-          <hr />
-
-          <div show.bind="deleteInProgress && transactionsWarningVisible" class="delete-confirmation-alert">
-            <i class="fas fa-exclamation-triangle"></i>
-            <span t="[html]editAccount.accountHasTransactions"></span>
-          </div>
-
-          <div class="save-delete-wrap">
-            <a if.bind="!deleteInProgress" click.delegate="save()"
-              class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
-              <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
-                <i class="fas fa-circle-notch fa-spin"></i>
-              </span>
-              <span>${saveButtonText}</span>
-            </a>
-            <a if.bind="!isNewAccount && !isMainAccount" click.delegate="delete()"
-              class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}">
-              <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
-                <i class="fas fa-circle-notch fa-spin"></i>
-              </span>
-              <span>${deleteButtonText}</span>
-            </a>
-            <button type="button" if.bind="isNewAccount || deleteInProgress || isMainAccount" click.delegate="cancel()"
-              t="cancel" class="button secondary-button">
-              Cancel
-            </button>
-          </div>
         </div>
       </div>
     </div>

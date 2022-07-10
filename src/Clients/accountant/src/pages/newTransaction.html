@@ -22,7 +22,6 @@
       </div>
 
       <div class="content-wrap">
-
         <div if.bind="!model" class="double-circle-loading">
           <div class="double-bounce1"></div>
           <div class="double-bounce2"></div>
@@ -31,55 +30,90 @@
         <div else>
           <div if.bind="debtId" class="message info">
             <i class="fas fa-info-circle"></i>
-            <span if.bind="userIsDebtor"><span t="newTransaction.settleDebtTo">Settle debt to</span>
-              ${debtPerson}.</span>
+            <span if.bind="userIsDebtor"
+              ><span t="newTransaction.settleDebtTo">Settle debt to</span> ${debtPerson}.</span
+            >
             <span else><span t="newTransaction.settleDebtFrom">Settle debt from</span> ${debtPerson}.</span>
           </div>
 
           <div if.bind="pastMidnight" class="message info">
             <i class="far fa-moon"></i>
-            <span t="newTransaction.considerUsingYesterday1">Currently it's</span> <span>${pastMidnight}</span> <span t="newTransaction.considerUsingYesterday2">past midnight. Consider using yesterday's date.</span>
+            <span t="newTransaction.considerUsingYesterday1">Currently it's</span> <span>${pastMidnight}</span>
+            <span t="newTransaction.considerUsingYesterday2">past midnight. Consider using yesterday's date.</span>
           </div>
 
           <form submit.trigger="submit()" autocomplete="off">
             <div class="form-control inline">
               <label for="amount" t="amount">Amount</label>
-              <amount-input amount.bind="model.amount" currency.bind="model.currency" invalid.bind="amountIsInvalid"
-                focus-on-init.bind="true">
+              <amount-input
+                amount.bind="model.amount"
+                currency.bind="model.currency"
+                invalid.bind="amountIsInvalid"
+                focus-on-init.bind="true"
+              >
               </amount-input>
             </div>
+
             <div class="form-control inline">
               <label for="category" t="category">Category</label>
               <div class="loadable-select ${categoryOptions ? 'loaded' : ''}">
-                <select id="category" value.bind="model.categoryId" disabled.bind="!categoryOptions"
-                  class="category-select">
+                <select
+                  id="category"
+                  value.bind="model.categoryId"
+                  disabled.bind="!categoryOptions"
+                  class="category-select"
+                >
                   <option model.bind="category.id" repeat.for="category of categoryOptions">${category.name}</option>
                 </select>
                 <i class="fas fa-circle-notch fa-spin"></i>
               </div>
             </div>
+
             <div class="form-control inline">
               <label for="date" t="date">Date</label>
-              <input type="date" id="date" value.bind="model.date & validate" max="${maxDate}"
-                class.bind="dateIsInvalid ? 'invalid' : ''" required>
+              <input
+                type="date"
+                id="date"
+                value.bind="model.date & validate"
+                max="${maxDate}"
+                class.bind="dateIsInvalid ? 'invalid' : ''"
+                required
+              />
             </div>
+
             <div class="form-control">
               <div class="encryption-box ${model.encrypt ? 'active' : ''}">
-                <textarea value.bind="model.description" maxlength="500" class="description-textarea"
-                  t="[placeholder,aria-label]description"></textarea>
+                <textarea
+                  value.bind="model.description"
+                  maxlength="500"
+                  class="description-textarea"
+                  t="[placeholder,aria-label]description"
+                ></textarea>
 
-                <checkbox label-key="newTransaction.encryptDescription" value.bind="model.encrypt"
-                  disabled.bind="!canEncrypt"></checkbox>
+                <checkbox
+                  label-key="newTransaction.encryptDescription"
+                  value.bind="model.encrypt"
+                  disabled.bind="!canEncrypt"
+                ></checkbox>
 
                 <div if.bind="model.encrypt">
                   <tooltip key="encryptedDescription"></tooltip>
                   <div class="viewable-password">
-                    <input type="password" value.bind="model.encryptionPassword & validate" ref="passwordInput"
-                      disabled.bind="!model.encrypt" maxlength="100"
-                      class.bind="encryptionPasswordIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]password">
-                    <a click.delegate="togglePasswordShow()"
-                      class="password-show-button ${passwordShown ? 'shown' : ''}" title="${passwordShowIconLabel}"
-                      aria-label="${passwordShowIconLabel}">
+                    <input
+                      type="password"
+                      value.bind="model.encryptionPassword & validate"
+                      ref="passwordInput"
+                      disabled.bind="!model.encrypt"
+                      maxlength="100"
+                      class.bind="encryptionPasswordIsInvalid ? 'invalid' : ''"
+                      t="[placeholder,aria-label]password"
+                    />
+                    <a
+                      click.delegate="togglePasswordShow()"
+                      class="password-show-button ${passwordShown ? 'shown' : ''}"
+                      title="${passwordShowIconLabel}"
+                      aria-label="${passwordShowIconLabel}"
+                    >
                       <i class="fas fa-eye"></i>
                       <i class="fas fa-eye-slash"></i>
                     </a>
@@ -87,22 +121,24 @@
                 </div>
               </div>
             </div>
+
+            <hr />
+
+            <div class="save-delete-wrap">
+              <a
+                click.delegate="submit()"
+                class="button primary-button ${!canSubmit || submitButtonIsLoading ? 'disabled' : ''}"
+              >
+                <span class="button-loader ${submitButtonIsLoading ? 'loading' : ''}">
+                  <i class="fas fa-circle-notch fa-spin"></i>
+                </span>
+                <span t="newTransaction.submit">Submit</span>
+              </a>
+              <a click.delegate="back()" t="cancel" class="button secondary-button">Cancel</a>
+            </div>
+
           </form>
-
-          <hr>
-
-          <div class="save-delete-wrap">
-            <a click.delegate="submit()"
-              class="button primary-button ${!canSubmit || submitButtonIsLoading ? 'disabled' : ''}">
-              <span class="button-loader ${submitButtonIsLoading ? 'loading' : ''}">
-                <i class="fas fa-circle-notch fa-spin"></i>
-              </span>
-              <span t="newTransaction.submit">Submit</span>
-            </a>
-            <a click.delegate="back()" t="cancel" class="button secondary-button">Cancel</a>
-          </div>
         </div>
-
       </div>
     </div>
   </div>

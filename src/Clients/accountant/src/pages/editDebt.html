@@ -9,7 +9,7 @@
           <i class="fas fa-pencil-alt"></i>
         </div>
         <div class="page-title">
-          <span if.bind="isNewDebt" t="editDebt.newDebt"></span>
+          <span if.bind="isNew" t="editDebt.newDebt"></span>
           <span else t="editDebt.editDebt"></span>
         </div>
         <a route-href="route: debt" class="back-button">
@@ -18,7 +18,6 @@
       </div>
 
       <div class="content-wrap">
-
         <div if.bind="!model" class="double-circle-loading">
           <div class="double-bounce1"></div>
           <div class="double-bounce2"></div>
@@ -27,58 +26,89 @@
         <div else>
           <div show.bind="!connTracker.isOnline && model.synced" class="message warning">
             <i class="fas fa-exclamation-triangle"></i>
-            <span t="whileOfflineCannotModify">While offline you cannot modify data that has already been synced with
-              the
-              cloud.</span>
+            <span t="whileOfflineCannotModify"
+              >While offline you cannot modify data that has already been synced with the cloud.</span
+            >
           </div>
 
           <form submit.trigger="save()">
             <div class="form-control">
-              <input type="text" value.bind="model.person & validate" ref="personInput" maxlength="20"
-                class.bind="personIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]editDebt.person" required>
+              <input
+                type="text"
+                value.bind="model.person & validate"
+                ref="personInput"
+                maxlength="20"
+                class.bind="personIsInvalid ? 'invalid' : ''"
+                t="[placeholder,aria-label]editDebt.person"
+                required
+              />
             </div>
+
             <div class="form-control inline">
               <label for="amount" t="amount">Amount</label>
               <amount-input amount.bind="model.amount" currency.bind="model.currency" invalid.bind="amountIsInvalid">
               </amount-input>
             </div>
+
             <div class="form-control with-descriptor">
               <div class="setting-descriptor" t="editDebt.iAmThe">I am a..</div>
 
-              <double-radio name="debtorLenderToggle" left-label-key="editDebt.lender" right-label-key="editDebt.debtor"
-                left-value.bind="false" right-value.bind="true" bind-to.bind="model.userIsDebtor">
+              <double-radio
+                name="debtorLenderToggle"
+                left-label-key="editDebt.lender"
+                right-label-key="editDebt.debtor"
+                left-value.bind="false"
+                right-value.bind="true"
+                bind-to.bind="model.userIsDebtor"
+              >
               </double-radio>
             </div>
-        </div>
-        <div class="form-control">
-          <textarea value.bind="model.description" maxlength="2000" class="description-textarea"
-            t="[placeholder,aria-label]description"></textarea>
-        </div>
-        </form>
 
-        <hr>
+            <div class="form-control">
+              <textarea
+                value.bind="model.description"
+                maxlength="2000"
+                class="description-textarea"
+                t="[placeholder,aria-label]description"
+              ></textarea>
+            </div>
 
-        <div class="save-delete-wrap">
-          <a if.bind="!deleteInProgress" click.delegate="save()"
-            class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}">
-            <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
-              <i class="fas fa-circle-notch fa-spin"></i>
-            </span>
-            <span>${saveButtonText}</span>
-          </a>
-          <a if.bind="!isNewDebt" click.delegate="delete()"
-            class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}">
-            <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
-              <i class="fas fa-circle-notch fa-spin"></i>
-            </span>
-            <span>${deleteButtonText}</span>
-          </a>
-          <button type="button" if.bind="isNewDebt || deleteInProgress" click.delegate="cancel()" t="cancel"
-            class="button secondary-button">Cancel</button>
+            <hr />
+
+            <div class="save-delete-wrap">
+              <a
+                if.bind="!deleteInProgress"
+                click.delegate="save()"
+                class="button primary-button ${!canSave || saveButtonIsLoading ? 'disabled' : ''}"
+              >
+                <span class="button-loader ${saveButtonIsLoading ? 'loading' : ''}">
+                  <i class="fas fa-circle-notch fa-spin"></i>
+                </span>
+                <span>${saveButtonText}</span>
+              </a>
+              <a
+                if.bind="!isNew"
+                click.delegate="delete()"
+                class="button danger-button ${deleteButtonIsLoading ? 'disabled' : ''} ${deleteInProgress ? 'confirm' : ''}"
+              >
+                <span class="button-loader ${deleteButtonIsLoading ? 'loading' : ''}">
+                  <i class="fas fa-circle-notch fa-spin"></i>
+                </span>
+                <span>${deleteButtonText}</span>
+              </a>
+              <button
+                type="button"
+                if.bind="isNew || deleteInProgress"
+                click.delegate="cancel()"
+                t="cancel"
+                class="button secondary-button"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
         </div>
       </div>
-
     </div>
-  </div>
   </div>
 </template>

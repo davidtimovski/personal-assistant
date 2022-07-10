@@ -12,7 +12,7 @@ public class SyncControllerTests
 
     public SyncControllerTests()
     {
-        _sut = new SyncController(null, null, null, null, null, null)
+        _sut = new SyncController(null, null, null, null, null, null, null)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };

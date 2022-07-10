@@ -6,8 +6,11 @@
   <div class="container">
     <div class="au-animate animate-fade-in animate-fade-out">
       <div class="page-title-wrap">
-        <a route-href="route: editTransaction; params.bind: { id: transactionId }" class="side small"
-          t="[title,aria-label]edit">
+        <a
+          route-href="route: editTransaction; params.bind: { id: transactionId }"
+          class="side small"
+          t="[title,aria-label]edit"
+        >
           <i class="fas fa-pencil-alt"></i>
         </a>
         <div class="page-title">${model.typeLabel}</div>
@@ -23,11 +26,17 @@
         </div>
 
         <div else class="viewing">
+          <div if.bind="model.generated" class="message info">
+            <i class="fas fa-info-circle"></i>
+            <span t="transaction.generatedAlert">This transaction was automatically generated.</span>
+          </div>
+
           <div class="form-control inline">
             <label t="amount">Amount</label>
             <span
-              class="${model.type === 1 ? 'expense-color' : (model.type === 2 ? 'deposit-color' : 'transfer-color')}">${model.amount
-              | moneyFormat:currency}</span>
+              class="${model.type === 1 ? 'expense-color' : (model.type === 2 ? 'deposit-color' : 'transfer-color')}"
+              >${model.amount | moneyFormat:currency}</span
+            >
           </div>
           <div if.bind="model.currency !== currency" class="form-control inline">
             <label> <span t="transaction.originalAmountIn">Original amount in </span>${model.currency} </label>
@@ -65,9 +74,15 @@
 
               <form submit.trigger="decrypt()" class="decrypt-form">
                 <div class="viewable-password">
-                  <input type="password" value.bind="model.decryptionPassword" ref="passwordInput" maxlength="100"
-                    class.bind="decryptionPasswordIsInvalid ? 'invalid' : ''" t="[placeholder,aria-label]password"
-                    required />
+                  <input
+                    type="password"
+                    value.bind="model.decryptionPassword"
+                    ref="passwordInput"
+                    maxlength="100"
+                    class.bind="decryptionPasswordIsInvalid ? 'invalid' : ''"
+                    t="[placeholder,aria-label]password"
+                    required
+                  />
                   <a click.delegate="togglePasswordShow()" class="password-show-button ${passwordShown ? 'shown' : ''}">
                     <i class="fas fa-eye"></i>
                     <i class="fas fa-eye-slash"></i>
