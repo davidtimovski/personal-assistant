@@ -32,10 +32,11 @@ builder.Services.AddCors(options =>
     var toDoAssistantUrl = builder.Configuration["Urls:ToDoAssistant"];
     var cookingAssistantUrl = builder.Configuration["Urls:CookingAssistant"];
     var accountantUrl = builder.Configuration["Urls:Accountant"];
+    var accountant2Url = builder.Configuration["Urls:Accountant2"];
 
     options.AddPolicy("AllowAllApps", builder =>
     {
-        builder.WithOrigins(toDoAssistantUrl, cookingAssistantUrl, accountantUrl)
+        builder.WithOrigins(toDoAssistantUrl, cookingAssistantUrl, accountantUrl, accountant2Url)
                .AllowAnyMethod()
                .AllowAnyHeader()
                .SetPreflightMaxAge(TimeSpan.FromDays(20));

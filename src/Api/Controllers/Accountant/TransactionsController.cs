@@ -13,7 +13,7 @@ using Microsoft.Extensions.Localization;
 namespace Api.Controllers.Accountant;
 
 [Authorize]
-[EnableCors("AllowAccountant")]
+[EnableCors("AllowAccountant,AllowAccountant2")]
 [Route("api/[controller]")]
 public class TransactionsController : BaseController
 {
