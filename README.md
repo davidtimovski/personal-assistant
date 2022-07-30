@@ -4,9 +4,9 @@ An ecosystem of PWAs that cooperate with each other to provide unique functional
 
 [https://personalassistant.site](https://personalassistant.site)
 
-[![alt text](https://github.com/davidtimovski/personal-assistant/blob/master/src/Clients/to-do-assistant/src/static/images/icons/app-icon-96x96.png?raw=true)](https://personalassistant.site/home/to-do-assistant)
-[![alt text](https://github.com/davidtimovski/personal-assistant/blob/master/src/Clients/cooking-assistant/src/static/images/icons/app-icon-96x96.png?raw=true)](https://personalassistant.site/home/cooking-assistant)
-[![alt text](https://github.com/davidtimovski/personal-assistant/blob/master/src/Clients/accountant/src/static/images/icons/app-icon-96x96.png?raw=true)](https://personalassistant.site/home/accountant)
+[![alt text](https://github.com/davidtimovski/personal-assistant/blob/master/src/Clients/to-do-assistant/src/static/images/icons/app-icon-x96.png?raw=true)](https://personalassistant.site/home/to-do-assistant)
+[![alt text](https://github.com/davidtimovski/personal-assistant/blob/master/src/Clients/cooking-assistant/src/static/images/icons/app-icon-x96.png?raw=true)](https://personalassistant.site/home/cooking-assistant)
+[![alt text](https://github.com/davidtimovski/personal-assistant/blob/master/src/Clients/accountant/src/static/images/icons/app-icon-x96.png?raw=true)](https://personalassistant.site/home/accountant)
 
 ## Apps
 
@@ -43,6 +43,7 @@ An ecosystem of PWAs that cooperate with each other to provide unique functional
 * Manage multiple accounts
 * Manage investment funds
 * Track debt
+* Setup transactions to be automatically created for you every month
 * View different types of reports regarding your income and expenditures
 * Get an early retirement calculation based on your personal financial situation
 * Encrypt your transactions for privacy

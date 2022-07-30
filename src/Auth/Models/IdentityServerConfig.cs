@@ -95,6 +95,25 @@ public static class IdentityServerConfig
                     "personal-assistant-gateway"
                 },
                 AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds
+            },
+            new Client
+            {
+                ClientId = "accountant2",
+                ClientName = "Accountant2",
+                AllowedGrantTypes = GrantTypes.Code,
+                RequireConsent = false,
+                RequirePkce = true,
+                RequireClientSecret = false,
+                RedirectUris = { $"{config["Urls:Accountant2"]}/signin-oidc" },
+                PostLogoutRedirectUris = { config["Urls:Accountant2"] },
+                AllowedCorsOrigins = { config["Urls:Accountant2"] },
+                AllowedScopes = {
+                    IdentityServerConstants.StandardScopes.OpenId,
+                    IdentityServerConstants.StandardScopes.Email,
+                    "personal-assistant-api",
+                    "personal-assistant-gateway"
+                },
+                AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds
             }
         };
     }

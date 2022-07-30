@@ -1,0 +1,74 @@
+.animate-fade-in.au-enter-active {
+	animation: fadeIn var(--transition-quick);
+}
+.animate-fade-out.au-leave-active {
+	animation: fadeOut var(--transition-quick);
+}
+.animate-fade-in.au-enter {
+	opacity: 0;
+}
+.au-stagger {
+	animation-delay: 50ms;
+}
+
+@keyframes fadeIn {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+@keyframes fadeOut {
+	0% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+
+@keyframes AnimateGradiant {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
+.highlighted {
+	animation: highlight ease-in 2.5s;
+}
+@keyframes highlight {
+	0% {
+		box-shadow: 0 0 10px 0 var(--primary-color);
+	}
+}
+
+@keyframes flash {
+	50% {
+		opacity: 1;
+	}
+	65% {
+		opacity: 0;
+	}
+}
+
+@keyframes spin {
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes glow {
+	from {
+		color: var(--faded-color);
+	}
+	to {
+		color: var(--primary-color-dark);
+	}
+}

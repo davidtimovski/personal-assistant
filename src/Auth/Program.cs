@@ -184,13 +184,15 @@ app.UseRequestLocalization(new RequestLocalizationOptions
 var toDoAssistantUrl = builder.Configuration["Urls:ToDoAssistant"];
 var cookingAssistantUrl = builder.Configuration["Urls:CookingAssistant"];
 var accountantUrl = builder.Configuration["Urls:Accountant"];
+var accountant2Url = builder.Configuration["Urls:Accountant2"];
 
 app.UseCors(builder =>
 {
     builder.WithOrigins(
         toDoAssistantUrl,
         cookingAssistantUrl,
-        accountantUrl
+        accountantUrl,
+        accountant2Url
     );
     builder.WithMethods("GET");
     builder.WithHeaders("Authorization");

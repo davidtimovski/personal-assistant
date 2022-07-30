@@ -3,10 +3,12 @@
 UPDATE "ClientRedirectUris" SET "RedirectUri" = 'http://localhost:8080/signin-oidc' WHERE "ClientId" = 1;
 UPDATE "ClientRedirectUris" SET "RedirectUri" = 'http://localhost:8081/signin-oidc' WHERE "ClientId" = 2;
 UPDATE "ClientRedirectUris" SET "RedirectUri" = 'http://localhost:8082/signin-oidc' WHERE "ClientId" = 3;
+UPDATE "ClientRedirectUris" SET "RedirectUri" = 'http://localhost:8085/signin-oidc' WHERE "ClientId" = 4;
 
 UPDATE "ClientPostLogoutRedirectUris" SET "PostLogoutRedirectUri" = 'http://localhost:8080' WHERE "ClientId" = 1;
 UPDATE "ClientPostLogoutRedirectUris" SET "PostLogoutRedirectUri" = 'http://localhost:8081' WHERE "ClientId" = 2;
 UPDATE "ClientPostLogoutRedirectUris" SET "PostLogoutRedirectUri" = 'http://localhost:8082' WHERE "ClientId" = 3;
+UPDATE "ClientPostLogoutRedirectUris" SET "PostLogoutRedirectUri" = 'http://localhost:8085' WHERE "ClientId" = 4;
 
 DELETE FROM push_subscriptions;
 
