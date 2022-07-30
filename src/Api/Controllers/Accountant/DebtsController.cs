@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Api.Controllers.Accountant;
 
 [Authorize]
-[EnableCors("AllowAccountant")]
+[EnableCors("AllowAccountant,AllowAccountant2")]
 [Route("api/[controller]")]
 public class DebtsController : BaseController
 {
