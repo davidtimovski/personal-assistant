@@ -102,15 +102,7 @@ builder.Services.AddCors(options =>
 
     options.AddPolicy("AllowAccountant", builder =>
     {
-        builder.WithOrigins(accountantUrl)
-               .AllowAnyMethod()
-               .AllowAnyHeader()
-               .SetPreflightMaxAge(TimeSpan.FromDays(20));
-    });
-
-    options.AddPolicy("AllowAccountant2", builder =>
-    {
-        builder.WithOrigins(accountant2Url)
+        builder.WithOrigins(accountantUrl, accountant2Url)
                .AllowAnyMethod()
                .AllowAnyHeader()
                .SetPreflightMaxAge(TimeSpan.FromDays(20));

@@ -110,7 +110,7 @@
 
 				<hr />
 
-				<div class="version"><span>{$tr('menu.version')}</span> ${version}</div>
+				<div class="version"><span>{$tr('menu.version')}</span> {version}</div>
 			</div>
 		</div>
 	</div>

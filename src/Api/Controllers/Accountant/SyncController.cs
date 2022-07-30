@@ -24,7 +24,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Api.Controllers.Accountant;
 
 [Authorize]
-[EnableCors("AllowAccountant,AllowAccountant2")]
+[EnableCors("AllowAccountant")]
 [Route("api/[controller]")]
 public class SyncController : BaseController
 {
