@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
 	import { goto } from '$app/navigation';
+
 	import { AuthService } from '../../../shared2/services/authService';
-	import { tr } from '$lib/localization/i18n';
+
+	import { t } from '$lib/localization/i18n';
 	import Variables from '$lib/variables';
 
 	const personalAssistantUrl = Variables.urls.authority;
@@ -42,12 +44,12 @@
 
 <section>
 	<div class="container">
-		<div class="au-animate animate-fade-in animate-fade-out">
+		<div class="au-animate">
 			<div class="page-title-wrap">
 				<div class="side inactive">
 					<i class="fas fa-bars" />
 				</div>
-				<div class="page-title">{$tr('menu.menu')}</div>
+				<div class="page-title">{$t('menu.menu')}</div>
 				<a href="/" class="back-button">
 					<i class="fas fa-times" />
 				</a>
@@ -83,17 +85,17 @@
 					<a href="/earlyRetirementCalculator" class="wide-button"
 						>{$tr('menu.earlyRetirementCalculator')}</a
 					>
-					<a href="/export" class="wide-button">{$tr('menu.export')}</a>
-					<a href="/totalSync" class="wide-button">{$tr('menu.totalSync')}</a>
+					<a href="/export" class="wide-button">{$tr('menu.export')}</a> -->
+					<a href="/totalSync" class="wide-button">{$t('menu.totalSync')}</a>
 
 					<a on:click={goToPreferences} class="wide-button with-badge">
 						<span class="button-loader" class:loading={preferencesButtonIsLoading}>
 							<i class="fas fa-circle-notch fa-spin" />
 						</span>
-						<span>{$tr('menu.preferences')}</span>
+						<span>{$t('menu.preferences')}</span>
 					</a>
 
-					<a on:click={goToHelp} class="wide-button with-badge">
+					<!-- <a on:click={goToHelp} class="wide-button with-badge">
 						<span class="button-loader" class:loading={helpButtonIsLoading}>
 							<i class="fas fa-circle-notch fa-spin" />
 						</span>
@@ -104,13 +106,13 @@
 				<hr />
 
 				<div class="horizontal-buttons-wrap">
-					<a href={personalAssistantUrl} class="wide-button">{$tr('menu.goToPersonalAssistant')}</a>
-					<a on:click={logOut} class="wide-button">{$tr('menu.logOut')}</a>
+					<a href={personalAssistantUrl} class="wide-button">{$t('menu.goToPersonalAssistant')}</a>
+					<a on:click={logOut} class="wide-button">{$t('menu.logOut')}</a>
 				</div>
 
 				<hr />
 
-				<div class="version"><span>{$tr('menu.version')}</span> {version}</div>
+				<div class="version"><span>{$t('menu.version')}</span> {version}</div>
 			</div>
 		</div>
 	</div>

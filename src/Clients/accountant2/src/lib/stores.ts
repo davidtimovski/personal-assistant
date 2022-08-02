@@ -1,10 +1,13 @@
 import { writable } from 'svelte/store';
 import type { User } from 'oidc-client';
-import { AppEvents } from './models/appEvents';
-import { SearchFilters } from './models/viewmodels/searchFilters';
-import { DateHelper } from '../../../shared2/utils/dateHelper';
-import { TransactionType } from './models/viewmodels/transactionType';
 
+import { DateHelper } from '../../../shared2/utils/dateHelper';
+
+import { AppEvents } from '$lib/models/appEvents';
+import { SearchFilters } from '$lib/models/viewmodels/searchFilters';
+import { TransactionType } from '$lib/models/viewmodels/transactionType';
+
+export const isOnline = writable<boolean>(true);
 export const loggedInUser = writable<User | null>(null);
 export const syncStatus = writable<AppEvents>(AppEvents.NotSyncing);
 

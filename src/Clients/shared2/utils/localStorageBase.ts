@@ -13,7 +13,7 @@ export class LocalStorageBase {
     }
   }
 
-  public get(key: string): any {
+  public get(key: string): string {
     const value = window.localStorage.getItem(key);
     if (value) {
       return value;
@@ -23,7 +23,15 @@ export class LocalStorageBase {
     return this.defaults[key];
   }
 
+  public getBool(key: string): boolean {
+    return this.toBool(this.get(key));
+  }
+
   public set(key: string, value: any) {
     window.localStorage.setItem(key, value);
+  }
+
+  private toBool(value: string) {
+    return value === "true";
   }
 }

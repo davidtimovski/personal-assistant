@@ -7,7 +7,7 @@ import { TransactionsIDBHelper } from '$lib/utils/transactionsIDBHelper';
 import { UpcomingExpensesIDBHelper } from '$lib/utils/upcomingExpensesIDBHelper';
 import { DebtsIDBHelper } from '$lib/utils/debtsIDBHelper';
 import { AutomaticTransactionsIDBHelper } from '$lib/utils/automaticTransactionsIDBHelper';
-import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
+import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 import { Changed, Create, Created } from '$lib/models/sync';
 import Variables from '$lib/variables';
 
@@ -95,9 +95,9 @@ export class SyncService {
 				const deleteDbNamesRequest = window.indexedDB.deleteDatabase('__dbnames');
 
 				deleteDbNamesRequest.onsuccess = () => {
-					this.localStorage.set('lastSynced', '1970-01-01T00:00:00.000Z');
+					this.localStorage.set(LocalStorageKeys.LastSynced, '1970-01-01T00:00:00.000Z');
 
-					window.location.href = '/dashboard';
+					window.location.href = '/';
 				};
 			};
 		} catch (e) {

@@ -4,7 +4,7 @@ import Variables from "$lib/variables";
 import { loggedInUser } from "$lib/stores";
 
 export class AuthService {
-  private userManager: UserManager | null = null;
+  private userManager: any = null;
 
   constructor(window: Window) {
     if (Variables.debug) {
@@ -60,10 +60,6 @@ export class AuthService {
         return;
       }
     }
-
-    //this.httpClient.defaults.headers["Authorization"] = `Bearer ${this.user.access_token}`;
-
-    // this.eventAggregator.publish(AuthEvents.Authenticated);
   }
 
   async login() {

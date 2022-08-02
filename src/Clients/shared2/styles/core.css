@@ -11,6 +11,7 @@
   font-style: normal;
   font-weight: 400;
   src: local(""), url("/webfonts/DidactGothic-Regular.ttf") format("truetype");
+  font-display: swap;
 }
 
 :root {

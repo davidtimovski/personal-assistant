@@ -1,6 +1,7 @@
 {
 	"files.exclude": {
 		".svelte-kit": true,
+		"build": true,
 		"node_modules": true
 	}
 }

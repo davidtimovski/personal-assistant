@@ -5,8 +5,8 @@
 	import { UsersService } from '../../../shared2/services/usersService';
 	import { DateHelper } from '../../../shared2/utils/dateHelper';
 
-	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
-	import { tr } from '$lib/localization/i18n';
+	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
+	import { t } from '$lib/localization/i18n';
 	import { CapitalService } from '$lib/services/capitalService';
 	import type { Capital } from '$lib/models/capital';
 	import { DashboardModel } from '$lib/models/viewmodels/dashboard';
@@ -42,7 +42,7 @@
 
 	function getCapital() {
 		const capitalService = new CapitalService();
-		capitalService.get($tr('uncategorized'), showUpcomingExpenses, showDebt, currency).then((capital: Capital) => {
+		capitalService.get($t('uncategorized'), showUpcomingExpenses, showDebt, currency).then((capital: Capital) => {
 			if (!capital) {
 				return;
 			}
@@ -61,7 +61,7 @@
 
 	function sync() {
 		if (!progressBarActive) {
-			syncStatus.set(AppEvents.ReSync);
+			syncStatus.update((_) => AppEvents.ReSync);
 
 			usersService.getProfileImageUri().then((uri) => {
 				if (imageUri !== uri) {
@@ -78,7 +78,9 @@
 
 		const toDate = DateHelper.format(new Date());
 
-		searchFilters.set(new SearchFilters(1, 15, fromDate, toDate, 0, expenditure.categoryId, TransactionType.Any, null));
+		searchFilters.update(
+			(_) => new SearchFilters(1, 15, fromDate, toDate, 0, expenditure.categoryId, TransactionType.Any, null)
+		);
 
 		goto('transactions');
 	}
@@ -135,11 +137,9 @@
 				imageUri = localStorage.get('profileImageUri');
 			}
 
-			showUpcomingExpenses = localStorage.get('showUpcomingExpensesOnDashboard');
-			showDebt = localStorage.get('showDebtOnDashboard');
+			showUpcomingExpenses = localStorage.getBool(LocalStorageKeys.ShowUpcomingExpensesOnDashboard);
+			showDebt = localStorage.getBool(LocalStorageKeys.ShowDebtOnDashboard);
 			currency = localStorage.get('currency');
-
-			getCapital();
 		});
 
 		syncStatus.subscribe((value) => {
@@ -147,6 +147,7 @@
 				startProgressBar();
 			} else if (value === AppEvents.SyncFinished) {
 				finishProgressBar();
+				getCapital();
 			}
 		});
 	});
@@ -154,7 +155,7 @@
 
 <section>
 	<div class="container">
-		<div class="au-animate animate-fade-in animate-fade-out">
+		<div class="au-animate">
 			<div class="page-title-wrap-loader">
 				<div class="title-wrap">
 					{#if menuButtonIsLoading}
@@ -166,10 +167,10 @@
 							on:click={goToMenu}
 							class="profile-image-container"
 							role="button"
-							title={$tr('dashboard.menu')}
-							aria-label={$tr('dashboard.menu')}
+							title={$t('dashboard.menu')}
+							aria-label={$t('dashboard.menu')}
 						>
-							<img src={imageUri} class="profile-image" width="40" height="40" alt={$tr('profilePicture')} />
+							<img src={imageUri} class="profile-image" width="40" height="40" alt={$t('profilePicture')} />
 						</div>
 					{/if}
 
@@ -181,8 +182,8 @@
 						class="sync-button"
 						class:disabled={!connTracker.isOnline || progressBarActive}
 						role="button"
-						title={$tr('dashboard.refresh')}
-						aria-label={$tr('dashboard.refresh')}
+						title={$t('dashboard.refresh')}
+						aria-label={$t('dashboard.refresh')}
 					>
 						<i class="fas fa-sync-alt" />
 					</a>
@@ -196,19 +197,19 @@
 				<div class="capital-summary">
 					<a href="/" class="summary-item-wrap">
 						<div class="summary-item">
-							<div class="summary-title">{$tr('dashboard.available')}</div>
+							<div class="summary-title">{$t('dashboard.available')}</div>
 							<div class="summary-value">{Formatter.number(available, currency)}</div>
 						</div>
 					</a>
 					<a href="/" class="summary-item-wrap">
 						<div class="summary-item">
-							<div class="summary-title">{$tr('dashboard.spent')}</div>
+							<div class="summary-title">{$t('dashboard.spent')}</div>
 							<div class="summary-value">{Formatter.number(spent, currency)}</div>
 						</div>
 					</a>
 					<a href="/" class="summary-item-wrap">
 						<div class="summary-item">
-							<div class="summary-title">{$tr('balance')}</div>
+							<div class="summary-title">{$t('balance')}</div>
 							<div class="summary-value">{Formatter.number(balance, currency)}</div>
 						</div>
 					</a>
@@ -216,10 +217,10 @@
 
 				<div class="dashboard-buttons">
 					<button type="button" on:click={newDeposit} class="dashboard-button" class:disabled={progressBarActive}>
-						{$tr('dashboard.newDeposit')}
+						{$t('dashboard.newDeposit')}
 					</button>
 					<button type="button" on:click={newExpense} class="dashboard-button" class:disabled={progressBarActive}>
-						{$tr('dashboard.newExpense')}
+						{$t('dashboard.newExpense')}
 					</button>
 				</div>
 
@@ -232,7 +233,7 @@
 					<div>
 						{#if model.expenditures.length > 0}
 							<div>
-								<a href="/transactions" class="dashboard-table-title">{$tr('dashboard.expenditures')}</a>
+								<a href="/transactions" class="dashboard-table-title">{$t('dashboard.expenditures')}</a>
 								<table class="amount-by-category-table">
 									<tbody>
 										{#each model.expenditures as expenditure}
@@ -255,7 +256,7 @@
 
 						{#if model.upcomingExpenses.length > 0}
 							<div>
-								<a href="/upcoming-expenses" class="dashboard-table-title">{$tr('dashboard.upcomingExpenses')}</a>
+								<a href="/upcoming-expenses" class="dashboard-table-title">{$t('dashboard.upcomingExpenses')}</a>
 								<table class="dashboard-table">
 									<tbody>
 										{#each model.upcomingExpenses as upcomingExpense}
@@ -284,16 +285,16 @@
 
 						{#if model.debt.length > 0}
 							<div>
-								<a href="/debt" class="dashboard-table-title">{$tr('dashboard.debt')}</a>
+								<a href="/debt" class="dashboard-table-title">{$t('dashboard.debt')}</a>
 								<table class="dashboard-table">
 									<tbody>
 										{#each model.debt as debtItem}
 											<tr>
 												<td>
 													{#if debtItem.userIsDebtor}
-														<span>{$tr('dashboard.to')}</span>
+														<span>{$t('dashboard.to')}</span>
 													{:else}
-														<span>{$tr('dashboard.from')}</span>
+														<span>{$t('dashboard.from')}</span>
 														{debtItem.person}
 													{/if}
 												</td>
