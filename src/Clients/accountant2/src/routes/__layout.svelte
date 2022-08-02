@@ -17,7 +17,7 @@
 			return;
 		}
 
-		syncStatus.update((_) => AppEvents.SyncStarted);
+		syncStatus.set(AppEvents.SyncStarted);
 
 		const syncService = new SyncService();
 		const syncPromises = new Array<Promise<any>>();
@@ -33,13 +33,13 @@
 		syncPromises.push(ratesPromise);
 
 		Promise.all(syncPromises).then(() => {
-			syncStatus.update((_) => AppEvents.SyncFinished);
+			syncStatus.set(AppEvents.SyncFinished);
 		});
 	}
 
 	onMount(() => {
 		const localStorage = new LocalStorageUtil();
-		locale.update((_) => localStorage.get('language'));
+		locale.set(localStorage.get('language'));
 
 		new AuthService(window).login();
 
@@ -51,13 +51,13 @@
 			sync(localStorage);
 		});
 
-		isOnline.update((_) => navigator.onLine);
+		isOnline.set(navigator.onLine);
 		window.addEventListener('online', () => {
 			sync(localStorage);
-			isOnline.update((_) => true);
+			isOnline.set(true);
 		});
 		window.addEventListener('offline', () => {
-			isOnline.update((_) => false);
+			isOnline.set(false);
 		});
 
 		syncStatus.subscribe((value) => {

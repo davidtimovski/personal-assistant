@@ -4,7 +4,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 
-	import Checkbox from '$lib/components/Checkbox.svelte';
+	import Checkbox from '$lib/components/checkbox.svelte';
 
 	let localStorage: LocalStorageUtil;
 
@@ -49,6 +49,7 @@
 			<div class="content-wrap">
 				<form>
 					<div class="form-control">
+						<!-- TODO -->
 						<!-- <currency-selector /> -->
 					</div>
 

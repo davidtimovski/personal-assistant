@@ -241,7 +241,7 @@ td.sync-icon-cell {
 .clickable-cell {
 	cursor: pointer;
 }
-/* 
+
 .multi-radio-wrap {
 	display: flex;
 	border-radius: var(--border-radius);
@@ -249,41 +249,36 @@ td.sync-icon-cell {
 }
 .multi-radio-part {
 	flex-grow: 1;
+}
+.multi-radio-part input[type='radio'] {
+	display: none;
+}
+.multi-radio-part label {
+	display: block;
+	position: relative;
+	background: #fff;
+	padding: 0;
+	text-align: center;
+	font-size: inherit;
+	line-height: 37px;
+	cursor: pointer;
+	user-select: none;
 
-	input[type='radio'] {
-		display: none;
-	}
-
-	label {
-		display: block;
-		position: relative;
-		background: #fff;
-		padding: 0;
-		text-align: center;
-		font-size: inherit;
-		line-height: 37px;
-		cursor: pointer;
-		user-select: none;
-
-		transition: background var(--transition), color var(--transition);
-
-		&.selected {
-			background: var(--primary-color);
-			box-shadow: inset var(--box-shadow);
-			color: #fafafa;
-		}
-	}
-
-	&:first-child label {
-		border-top-left-radius: var(--border-radius);
-		border-bottom-left-radius: var(--border-radius);
-	}
-
-	&:last-child label {
-		border-top-right-radius: var(--border-radius);
-		border-bottom-right-radius: var(--border-radius);
-	}
-} */
+	transition: background var(--transition), color var(--transition);
+}
+.multi-radio-part label.selected {
+	background: var(--primary-color);
+	box-shadow: inset var(--box-shadow);
+	color: #fafafa;
+}
+.multi-radio-part:first-child label {
+	border-top-left-radius: var(--border-radius);
+	border-bottom-left-radius: var(--border-radius);
+}
+.multi-radio-part:last-child label {
+	border-top-right-radius: var(--border-radius);
+	border-bottom-right-radius: var(--border-radius);
+}
 
 .debt-icon .debtor {
 	color: var(--expense-color);

@@ -367,7 +367,7 @@ export class TransactionsService {
 		}
 	}
 
-	static getType(fromAccountId: number, toAccountId: number): TransactionType {
+	static getType(fromAccountId: number | null, toAccountId: number | null): TransactionType {
 		if (fromAccountId && toAccountId) {
 			return TransactionType.Transfer;
 		}

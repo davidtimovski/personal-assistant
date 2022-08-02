@@ -223,7 +223,7 @@ export class TransactionsIDBHelper {
 		}
 
 		const hasDescription =
-			!description || !t.description || t.description.toUpperCase().includes(description.toUpperCase());
+			!description || (!!t.description && t.description.toUpperCase().includes(description.toUpperCase()));
 
 		return hasDescription;
 	}

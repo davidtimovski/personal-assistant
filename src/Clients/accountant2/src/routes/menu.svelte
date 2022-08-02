@@ -57,35 +57,35 @@
 
 			<div class="content-wrap">
 				<div class="horizontal-buttons-wrap">
-					<!-- <a href="/transactions" class="wide-button">{$tr('menu.transactions')}</a>
-					<a href="/upcomingExpenses" class="wide-button">{$tr('menu.upcomingExpenses')}</a>
-					<a href="/debt" class="wide-button">{$tr('menu.debt')}</a>
-					<a href="/categories" class="wide-button">{$tr('menu.categories')}</a>
-					<a href="/accounts" class="wide-button">{$tr('menu.accounts')}</a>
-					<a href="/balanceAdjustment" class="wide-button">{$tr('menu.balanceAdjustment')}</a>
+					<a href="/transactions" class="wide-button">{$t('menu.transactions')}</a>
+					<!-- <a href="/upcomingExpenses" class="wide-button">{$t('menu.upcomingExpenses')}</a>
+					<a href="/debt" class="wide-button">{$t('menu.debt')}</a>
+					<a href="/categories" class="wide-button">{$t('menu.categories')}</a>
+					<a href="/accounts" class="wide-button">{$t('menu.accounts')}</a>
+					<a href="/balanceAdjustment" class="wide-button">{$t('menu.balanceAdjustment')}</a>
 					<a href="/automaticTransactions" class="wide-button"
-						>{$tr('menu.automaticTransactions')}</a
+						>{$t('menu.automaticTransactions')}</a
 					>
 
 					<div class="drawer-button-wrap" class:open={reportsDrawerIsOpen}>
 						<button type="button" on:click={toggleReportsDrawer} class="wide-button drawer-button">
-							{$tr('menu.reports')}
+							{$t('menu.reports')}
 						</button>
 						<div class="drawer-content-wrap">
 							<div class="drawer-content">
-								<a href="/pieChartReport" class="wide-button">{$tr('menu.pieChart')}</a>
-								<a href="/barChartReport" class="wide-button">{$tr('menu.barChart')}</a>
+								<a href="/pieChartReport" class="wide-button">{$t('menu.pieChart')}</a>
+								<a href="/barChartReport" class="wide-button">{$t('menu.barChart')}</a>
 								<a href="/expenditureHeatmap" class="wide-button"
-									>{$tr('menu.expenditureHeatmap')}</a
+									>{$t('menu.expenditureHeatmap')}</a
 								>
 							</div>
 						</div>
 					</div>
 
 					<a href="/earlyRetirementCalculator" class="wide-button"
-						>{$tr('menu.earlyRetirementCalculator')}</a
+						>{$t('menu.earlyRetirementCalculator')}</a
 					>
-					<a href="/export" class="wide-button">{$tr('menu.export')}</a> -->
+					<a href="/export" class="wide-button">{$t('menu.export')}</a> -->
 					<a href="/totalSync" class="wide-button">{$t('menu.totalSync')}</a>
 
 					<a on:click={goToPreferences} class="wide-button with-badge">
@@ -99,7 +99,7 @@
 						<span class="button-loader" class:loading={helpButtonIsLoading}>
 							<i class="fas fa-circle-notch fa-spin" />
 						</span>
-						<span>{$tr('menu.help')}</span>
+						<span>{$t('menu.help')}</span>
 					</a> -->
 				</div>
 

@@ -61,7 +61,7 @@
 
 	function sync() {
 		if (!progressBarActive) {
-			syncStatus.update((_) => AppEvents.ReSync);
+			syncStatus.set(AppEvents.ReSync);
 
 			usersService.getProfileImageUri().then((uri) => {
 				if (imageUri !== uri) {
@@ -78,9 +78,7 @@
 
 		const toDate = DateHelper.format(new Date());
 
-		searchFilters.update(
-			(_) => new SearchFilters(1, 15, fromDate, toDate, 0, expenditure.categoryId, TransactionType.Any, null)
-		);
+		searchFilters.set(new SearchFilters(1, 15, fromDate, toDate, 0, expenditure.categoryId, TransactionType.Any, null));
 
 		goto('transactions');
 	}
@@ -195,19 +193,19 @@
 
 			<div class="content-wrap dashboard">
 				<div class="capital-summary">
-					<a href="/" class="summary-item-wrap">
+					<a href="/transactions" class="summary-item-wrap">
 						<div class="summary-item">
 							<div class="summary-title">{$t('dashboard.available')}</div>
 							<div class="summary-value">{Formatter.number(available, currency)}</div>
 						</div>
 					</a>
-					<a href="/" class="summary-item-wrap">
+					<a href="/transactions" class="summary-item-wrap">
 						<div class="summary-item">
 							<div class="summary-title">{$t('dashboard.spent')}</div>
 							<div class="summary-value">{Formatter.number(spent, currency)}</div>
 						</div>
 					</a>
-					<a href="/" class="summary-item-wrap">
+					<a href="/transactions" class="summary-item-wrap">
 						<div class="summary-item">
 							<div class="summary-title">{$t('balance')}</div>
 							<div class="summary-value">{Formatter.number(balance, currency)}</div>
