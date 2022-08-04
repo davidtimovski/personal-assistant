@@ -11,21 +11,15 @@
 	let reportsDrawerIsOpen = false;
 	let version = '--';
 
-	let preferencesButtonIsLoading = false;
 	let helpButtonIsLoading = false;
 
 	function toggleReportsDrawer() {
 		reportsDrawerIsOpen = !reportsDrawerIsOpen;
 	}
 
-	function goToPreferences() {
-		preferencesButtonIsLoading = true;
-		goto('preferences');
-	}
-
 	function goToHelp() {
 		helpButtonIsLoading = true;
-		goto('help');
+		goto('/help');
 	}
 
 	async function logOut() {
@@ -87,13 +81,7 @@
 					>
 					<a href="/export" class="wide-button">{$t('menu.export')}</a> -->
 					<a href="/totalSync" class="wide-button">{$t('menu.totalSync')}</a>
-
-					<a on:click={goToPreferences} class="wide-button with-badge">
-						<span class="button-loader" class:loading={preferencesButtonIsLoading}>
-							<i class="fas fa-circle-notch fa-spin" />
-						</span>
-						<span>{$t('menu.preferences')}</span>
-					</a>
+					<a href="/preferences" class="wide-button">{$t('menu.preferences')}</a>
 
 					<!-- <a on:click={goToHelp} class="wide-button with-badge">
 						<span class="button-loader" class:loading={helpButtonIsLoading}>

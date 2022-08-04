@@ -25,8 +25,8 @@
 	let lastEditedId: number;
 	let viewCategory = false;
 	let pageCount: number;
-	let categoryOptions: SelectOption[] = [];
-	let accountOptions: SelectOption[] = [];
+	let categoryOptions: SelectOption[] | null = null;
+	let accountOptions: SelectOption[] | null = null;
 
 	let transactionsService: TransactionsService;
 	let categoriesService: CategoriesService;
@@ -91,7 +91,7 @@
 	}
 
 	function getCategoryName(categoryId: number | null): string {
-		const category = categoryOptions.find((x) => x.id === categoryId);
+		const category = categoryOptions?.find((x) => x.id === categoryId);
 		if (!category) {
 			throw new Error('Could not find category');
 		}
@@ -197,15 +197,15 @@
 	}
 
 	onMount(() => {
-		transactionsService = new TransactionsService();
-		categoriesService = new CategoriesService();
-		accountsService = new AccountsService();
-		localStorage = new LocalStorageUtil();
-
 		const editedId = $page.url.searchParams.get('editedId');
 		if (editedId) {
 			lastEditedId = parseInt(editedId, 10);
 		}
+
+		transactionsService = new TransactionsService();
+		categoriesService = new CategoriesService();
+		accountsService = new AccountsService();
+		localStorage = new LocalStorageUtil();
 
 		currency = localStorage.get('currency');
 		language = localStorage.get('language');
@@ -230,7 +230,7 @@
 
 <section>
 	<div class="container">
-		<div class="au-animate animate-fade-in animate-fade-out">
+		<div class="au-animate">
 			<div class="page-title-wrap">
 				<div class="side inactive">
 					<i class="fas fa-search-dollar" />
@@ -253,7 +253,7 @@
 					</div>
 					<div class="form-control inline">
 						<label for="category">{$t('category')}</label>
-						<div class="loadable-select {categoryOptions ? 'loaded' : ''}">
+						<div class="loadable-select" class:loaded={categoryOptions}>
 							<select
 								id="category"
 								bind:value={$searchFilters.categoryId}
@@ -261,16 +261,18 @@
 								disabled={!categoryOptions}
 								class="category-select"
 							>
-								{#each categoryOptions as category}
-									<option value={category.id}>{category.name}</option>
-								{/each}
+								{#if categoryOptions}
+									{#each categoryOptions as category}
+										<option value={category.id}>{category.name}</option>
+									{/each}
+								{/if}
 							</select>
 							<i class="fas fa-circle-notch fa-spin" />
 						</div>
 					</div>
 					<div class="form-control inline">
 						<label for="account">{$t('account')}</label>
-						<div class="loadable-select {accountOptions ? 'loaded' : ''}">
+						<div class="loadable-select" class:loaded={accountOptions}>
 							<select
 								id="account"
 								bind:value={$searchFilters.accountId}
@@ -278,9 +280,11 @@
 								disabled={!accountOptions}
 								class="category-select"
 							>
-								{#each accountOptions as account}
-									<option value={account.id}>{account.name}</option>
-								{/each}
+								{#if accountOptions}
+									{#each accountOptions as account}
+										<option value={account.id}>{account.name}</option>
+									{/each}
+								{/if}
 							</select>
 							<i class="fas fa-circle-notch fa-spin" />
 						</div>

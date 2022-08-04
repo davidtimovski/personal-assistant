@@ -5,6 +5,7 @@ import { DateHelper } from '../../../../shared2/utils/dateHelper';
 
 import { DebtsIDBHelper } from '$lib/utils/debtsIDBHelper';
 import { DebtModel } from '$lib/models/entities/debt';
+import Variables from '$lib/variables';
 
 export class DebtsService {
 	private readonly mergedDebtSeparator = '----------';
@@ -81,7 +82,7 @@ export class DebtsService {
 				const mergedDebt = new DebtModel(0, debt.person, balance, debt.currency, description, balance < 0, now, now);
 
 				if (navigator.onLine) {
-					mergedDebt.id = await this.httpProxy.ajax<number>('api/debts/merged', {
+					mergedDebt.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/api/debts/merged`, {
 						method: 'post',
 						body: window.JSON.stringify(mergedDebt)
 					});
@@ -99,7 +100,7 @@ export class DebtsService {
 				debt.createdDate = debt.modifiedDate = now;
 
 				if (navigator.onLine) {
-					debt.id = await this.httpProxy.ajax<number>('api/debts', {
+					debt.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/api/debts`, {
 						method: 'post',
 						body: window.JSON.stringify(debt)
 					});
@@ -158,7 +159,7 @@ export class DebtsService {
 			debt.modifiedDate = DateHelper.adjustForTimeZone(new Date());
 
 			if (navigator.onLine) {
-				await this.httpProxy.ajaxExecute('api/debts', {
+				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/debts`, {
 					method: 'put',
 					body: window.JSON.stringify(debt)
 				});
@@ -177,7 +178,7 @@ export class DebtsService {
 	async delete(id: number): Promise<void> {
 		try {
 			if (navigator.onLine) {
-				await this.httpProxy.ajaxExecute(`api/debts/${id}`, {
+				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/debts/${id}`, {
 					method: 'delete'
 				});
 			} else if (await this.idbHelper.isSynced(id)) {

@@ -86,9 +86,6 @@ export class AccountsIDBHelper {
 	}
 
 	async update(account: Account): Promise<void> {
-		if (!account.id) {
-			throw new Error('TODO');
-		}
 		await this.db.accounts.update(account.id, account);
 	}
 

@@ -1,5 +1,4 @@
 @import "./normalize.css";
-@import "./variables.css";
 @import "./fontawesome/fontawesome.css";
 @import "./fontawesome/regular.css";
 @import "./fontawesome/solid.css";
@@ -92,31 +91,6 @@ table td {
 .side.disabled {
   cursor: default;
   color: var(--faded-color);
-}
-
-.message {
-  border-radius: var(--border-radius);
-  padding: 7px 12px;
-  margin-bottom: 20px;
-  font-size: 1rem;
-  line-height: 1.5rem;
-}
-.message i {
-  margin-right: 5px;
-}
-.message.info {
-  background: var(--primary-color-light);
-  color: var(--primary-color-dark);
-}
-.message.info i {
-  color: var(--primary-color-dark);
-}
-.message.warning {
-  background: var(--warning-color);
-  color: var(--warning-color-dark);
-}
-.message.warning i {
-  color: var(--warning-color-dark);
 }
 
 .center {
@@ -755,7 +729,7 @@ a.button {
 }
 
 /* DESKTOP */
-@media screen and (min-width: var(--desktop-min)) {
+@media screen and (min-width: 1200px) {
   input[type="text"],
   input[type="email"],
   input[type="number"],
@@ -783,7 +757,8 @@ a.button {
   }
 }
 
-@media screen and (max-width: var(--desktop-min)) {
+/* NON-DESKTOP */
+@media screen and (max-width: 1200px) {
   body {
     font-size: 17px;
   }

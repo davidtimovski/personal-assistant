@@ -52,17 +52,17 @@ textarea {
 	color: var(--primary-color-dark);
 }
 
-.amount-by-category-table tbody td {
+.amount-by-category-table td {
 	padding: 5px 15px 5px 0;
 	line-height: 1.2rem;
 }
 
-.amount-by-category-table tbody td:last-child {
+.amount-by-category-table td:last-child {
 	padding-right: 0;
 	text-align: right;
 }
 
-.amount-by-category-table tbody td.sub-category-cell {
+.amount-by-category-table td.sub-category-cell {
 	padding-left: 10px;
 }
 
@@ -118,6 +118,7 @@ form .description-textarea {
 }
 
 form input[type='text'],
+form input[type='password'],
 form input[type='number'],
 form input[type='date'],
 textarea {
@@ -418,7 +419,7 @@ td.sync-icon-cell {
 	background: #e1e1e1;
 }
 
-@media screen and (min-width: --desktop-min) {
+@media screen and (min-width: 1200px) {
 	table tr td,
 	.editable-table tr td {
 		font-size: 1rem;

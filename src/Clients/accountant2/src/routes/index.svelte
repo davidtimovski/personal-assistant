@@ -26,6 +26,9 @@
 	let showDebt = false;
 	let currency: string;
 	let menuButtonIsLoading = false;
+	let connTracker = {
+		isOnline: true
+	};
 
 	// Progress bar
 	let progressBarActive = false;
@@ -33,11 +36,6 @@
 	let progressIntervalId: number | null = null;
 	let progressBarVisible = false;
 
-	let connTracker = {
-		isOnline: true
-	};
-
-	// Services
 	let usersService: UsersService;
 
 	function getCapital() {
@@ -56,7 +54,7 @@
 
 	function goToMenu() {
 		menuButtonIsLoading = true;
-		goto('menu');
+		goto('/menu');
 	}
 
 	function sync() {
@@ -80,19 +78,7 @@
 
 		searchFilters.set(new SearchFilters(1, 15, fromDate, toDate, 0, expenditure.categoryId, TransactionType.Any, null));
 
-		goto('transactions');
-	}
-
-	function newDeposit() {
-		if (!progressBarActive) {
-			goto('newTransaction/1');
-		}
-	}
-
-	function newExpense() {
-		if (!progressBarActive) {
-			goto('newTransaction/0');
-		}
+		goto('/transactions');
 	}
 
 	function startProgressBar() {
@@ -214,12 +200,12 @@
 				</div>
 
 				<div class="dashboard-buttons">
-					<button type="button" on:click={newDeposit} class="dashboard-button" class:disabled={progressBarActive}>
+					<a href="newTransaction/1" class="dashboard-button">
 						{$t('dashboard.newDeposit')}
-					</button>
-					<button type="button" on:click={newExpense} class="dashboard-button" class:disabled={progressBarActive}>
+					</a>
+					<a href="newTransaction/0" class="dashboard-button">
 						{$t('dashboard.newExpense')}
-					</button>
+					</a>
 				</div>
 
 				{#if !model}
@@ -297,7 +283,7 @@
 													{/if}
 												</td>
 												<td>{debtItem.description}</td>
-												<td class="amount-cell ${debtItem.userIsDebtor ? 'expense-color' : 'deposit-color'}">
+												<td class="amount-cell {debtItem.userIsDebtor ? 'expense-color' : 'deposit-color'}">
 													{Formatter.money(debtItem.amount, currency)}
 												</td>
 											</tr>
@@ -356,13 +342,15 @@
 
 		.dashboard-button {
 			position: relative;
-			width: 48%;
+			display: inline-block;
+			width: calc(50% - 15px);
 			background: #fff;
 			border: 1px solid #ddd;
 			border-left: 3px solid var(--primary-color);
 			border-right: 3px solid var(--primary-color);
 			border-radius: var(--border-radius);
-			outline: none;
+			text-align: center;
+			text-decoration: none;
 			font-size: inherit;
 			line-height: 45px;
 			color: var(--primary-color);

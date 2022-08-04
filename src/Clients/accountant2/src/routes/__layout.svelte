@@ -12,6 +12,8 @@
 	import { isOnline, loggedInUser, syncStatus } from '$lib/stores';
 	import { AppEvents } from '$lib/models/appEvents';
 
+	import Alert from '$lib/components/Alert.svelte';
+
 	function sync(localStorage: LocalStorageUtil) {
 		if (!navigator.onLine) {
 			return;
@@ -72,7 +74,7 @@
 	<div />
 	<div class="center">
 		<slot />
-		<!-- <alert></alert> -->
+		<Alert />
 	</div>
 	<div />
 </main>

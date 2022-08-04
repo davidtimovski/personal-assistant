@@ -215,7 +215,7 @@ export class TransactionsIDBHelper {
 			if (categoryIds === null) {
 				inCategory = t.categoryId === null;
 			} else {
-				inCategory = categoryIds.includes(t.categoryId);
+				inCategory = categoryIds.includes(<number>t.categoryId);
 			}
 		}
 		if (!inCategory) {
@@ -295,7 +295,7 @@ export class TransactionsIDBHelper {
 				return t.categoryId === null;
 			}
 
-			return categoryIds.includes(t.categoryId);
+			return categoryIds.includes(<number>t.categoryId);
 		}
 
 		return true;
@@ -505,7 +505,7 @@ export class TransactionsIDBHelper {
 		return categoryIds;
 	}
 
-	private getCategoryWithParent(categoryId: number, categories: Category[]): Category | null {
+	private getCategoryWithParent(categoryId: number | null, categories: Category[]): Category | null {
 		if (categoryId === null) {
 			return null;
 		}

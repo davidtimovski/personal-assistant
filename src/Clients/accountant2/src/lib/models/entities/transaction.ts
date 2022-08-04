@@ -11,7 +11,7 @@ export class TransactionModel implements Syncable {
 		public id: number,
 		public fromAccountId: number | null,
 		public toAccountId: number | null,
-		public categoryId: number,
+		public categoryId: number | null,
 		public amount: number,
 		public fromStocks: number | null,
 		public toStocks: number | null,

@@ -5,6 +5,8 @@
 	import { SyncService } from '$lib/services/syncService';
 	import { isOnline } from '$lib/stores';
 
+	import AlertBlock from '$lib/components/AlertBlock.svelte';
+
 	let syncButtonIsLoading = false;
 
 	let syncService: SyncService;
@@ -49,13 +51,10 @@
 
 			<div class="content-wrap">
 				{#if !$isOnline}
-					<div class="message warning">
-						<i class="fas fa-exclamation-triangle" />
-						<span>{$t('totalSync.offlineText')}</span>
-					</div>
+					<AlertBlock type="warning" message={$t('totalSync.offlineText')} />
 				{/if}
 
-				<div class="text-wrap">{$t('totalSync.syncText')}</div>
+				<AlertBlock type="warning" message={$t('totalSync.syncText')} />
 
 				<div class="save-delete-wrap">
 					<a on:click={sync} class="button primary-button" class:disabled={!canSync} role="button">
