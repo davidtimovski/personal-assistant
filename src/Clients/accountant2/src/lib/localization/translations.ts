@@ -23,6 +23,7 @@ export default {
 		description: 'Description',
 		password: 'Password',
 		encryptedPlaceholder: '[ Encrypted ]',
+		decryptDescription: 'Decrypt description',
 		balance: 'Balance',
 		uncategorized: 'Uncategorized',
 		deletedAccount: '[deleted account]',
@@ -104,7 +105,6 @@ export default {
 			editDeposit: 'Edit deposit',
 			editTransaction: 'Edit transaction',
 			encryptDescription: 'Encrypt description',
-			decryptDescription: 'Decrypt description',
 			resetDescription: 'Reset description',
 			saveSuccessful: 'Transaction was successfully saved',
 			deleteSuccessful: 'Transaction was successfully deleted'
@@ -430,6 +430,7 @@ export default {
 		description: 'Опис',
 		password: 'Лозинка',
 		encryptedPlaceholder: '[ Шифрирано ]',
+		decryptDescription: 'Дешифрирај опис',
 		balance: 'Состојба',
 		uncategorized: 'Некатегоризирано',
 		deletedAccount: '[избришана сметка]',
@@ -511,7 +512,6 @@ export default {
 			editDeposit: 'Ажурирај депозит',
 			editTransaction: 'Ажурирај трансакција',
 			encryptDescription: 'Шифрирај опис',
-			decryptDescription: 'Дешифрирај опис',
 			resetDescription: 'Ресетирај опис',
 			saveSuccessful: 'Трансакцијата беше успешно зачувана',
 			deleteSuccessful: 'Трансакцијата беше успешно избришана'

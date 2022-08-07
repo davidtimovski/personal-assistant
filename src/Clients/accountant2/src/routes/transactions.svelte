@@ -22,7 +22,7 @@
 	let transactions: TransactionItem[] | null = null;
 	let currency: string;
 	let language: string;
-	let lastEditedId: number;
+	let editedId: number | undefined;
 	let viewCategory = false;
 	let pageCount: number;
 	let categoryOptions: SelectOption[] | null = null;
@@ -197,9 +197,9 @@
 	}
 
 	onMount(() => {
-		const editedId = $page.url.searchParams.get('editedId');
-		if (editedId) {
-			lastEditedId = parseInt(editedId, 10);
+		const edited = $page.url.searchParams.get('edited');
+		if (edited) {
+			editedId = parseInt(edited, 10);
 		}
 
 		transactionsService = new TransactionsService();
@@ -399,7 +399,7 @@
 										<tr
 											on:click={() => viewTransaction(transaction.id)}
 											class="clickable"
-											class:highlighted-row={transaction.id === lastEditedId}
+											class:highlighted-row={transaction.id === editedId}
 										>
 											<td class="type-cell">
 												{#if transaction.type === 1}
@@ -415,13 +415,7 @@
 												{/if}
 											</td>
 											<td>{Formatter.number(transaction.amount, currency)}</td>
-											<td>
-												{#if viewCategory}
-													<span>{transaction.category}</span>
-												{:else}
-													<span>{transaction.description}</span>
-												{/if}
-											</td>
+											<td>{viewCategory ? transaction.category : transaction.description}</td>
 											<td class="date-cell">{transaction.date}</td>
 
 											<td class="sync-icon-cell">

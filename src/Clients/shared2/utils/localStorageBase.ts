@@ -1,15 +1,15 @@
 import { Language } from "../models/enums/language";
 
 export class LocalStorageBase {
-  private readonly defaults: { [name: string]: any } = {
-    language: Language.English,
-    profileImageUri: null,
-    profileImageUriLastLoad: 0,
-  };
+  private readonly defaults = new Map<string, any>([
+    ["language", Language.English],
+    ["profileImageUri", null],
+    ["profileImageUriLastLoad", 0],
+  ]);
 
-  constructor(additionalDefaults?: any) {
+  constructor(additionalDefaults?: Map<string, any>) {
     if (additionalDefaults) {
-      this.defaults = { ...this.defaults, ...additionalDefaults };
+      this.defaults = new Map([...this.defaults, ...additionalDefaults]);
     }
   }
 
@@ -19,8 +19,8 @@ export class LocalStorageBase {
       return value;
     }
 
-    this.set(key, this.defaults[key]);
-    return this.defaults[key];
+    this.set(key, this.defaults.get(key));
+    return this.defaults.get(key);
   }
 
   public getBool(key: string): boolean {

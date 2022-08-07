@@ -3,7 +3,7 @@
 	export async function load({ params }) {
 		return {
 			props: {
-				transactionId: parseInt(params.id, 10)
+				id: parseInt(params.id, 10)
 			}
 		};
 	}
@@ -29,7 +29,7 @@
 
 	import AlertBlock from '$lib/components/AlertBlock.svelte';
 
-	export let transactionId: number;
+	export let id: number;
 
 	let fromExpenditureHeatmap = false;
 	let model: ViewTransaction | null = null;
@@ -38,14 +38,14 @@
 	let passwordShown = false;
 	let decryptButtonIsLoading = false;
 	let decryptionPasswordIsInvalid: boolean;
-	let typeStringLookup: string[];
+	let typeStringMap = new Map<TransactionType, string>();
 	let passwordShowIconLabel: string;
 
+	let localStorage: LocalStorageUtil;
 	let transactionsService: TransactionsService;
 	let categoriesService: CategoriesService;
 	let accountsService: AccountsService;
 	let encryptionService: EncryptionService;
-	let localStorage: LocalStorageUtil;
 
 	function formatOccurrenceDate(occurrenceDateString: string): string {
 		const date = new Date(Date.parse(occurrenceDateString));
@@ -114,23 +114,25 @@
 	}
 
 	onMount(async () => {
-		typeStringLookup = ['', $t('transaction.expense'), $t('transaction.deposit'), $t('transaction.transfer')];
+		typeStringMap.set(TransactionType.Expense, $t('transaction.expense'));
+		typeStringMap.set(TransactionType.Deposit, $t('transaction.deposit'));
+		typeStringMap.set(TransactionType.Transfer, $t('transaction.transfer'));
 
 		const fromExpenditureHeatmapParam = $page.url.searchParams.get('fromExpenditureHeatmap');
 		if (fromExpenditureHeatmapParam) {
 			fromExpenditureHeatmap = fromExpenditureHeatmapParam === 'true';
 		}
 
+		localStorage = new LocalStorageUtil();
 		transactionsService = new TransactionsService();
 		categoriesService = new CategoriesService();
 		accountsService = new AccountsService();
-		localStorage = new LocalStorageUtil();
 		encryptionService = new EncryptionService();
 
 		currency = localStorage.get('currency');
 		language = localStorage.get('language');
 
-		const transaction = await transactionsService.getForViewing(transactionId, currency);
+		const transaction = await transactionsService.getForViewing(id, currency);
 		if (transaction === null) {
 			// TODO
 			await goto('notFound');
@@ -151,7 +153,7 @@
 
 		const viewTransaction = new ViewTransaction(
 			type,
-			typeStringLookup[type],
+			<string>typeStringMap.get(type),
 			null,
 			null,
 			<number>transaction.convertedAmount,
@@ -196,7 +198,7 @@
 	<div class="container">
 		<div class="au-animate">
 			<div class="page-title-wrap">
-				<a href="/editTransaction/{transactionId}" class="side small" title={$t('edit')} aria-label={$t('edit')}>
+				<a href="/editTransaction/{id}" class="side small" title={$t('edit')} aria-label={$t('edit')}>
 					<i class="fas fa-pencil-alt" />
 				</a>
 				<div class="page-title">{model?.typeLabel}</div>
@@ -301,7 +303,14 @@
 												<i class="fas fa-eye-slash" />
 											</a>
 										</div>
-										<a on:click={decrypt} class="decrypt-button" class:loading={decryptButtonIsLoading} role="button">
+										<a
+											on:click={decrypt}
+											class="decrypt-button"
+											class:loading={decryptButtonIsLoading}
+											role="button"
+											title={$t('decryptDescription')}
+											aria-label={$t('decryptDescription')}
+										>
 											<i class="fas fa-unlock" />
 											<i class="fas fa-circle-notch fa-spin" />
 										</a>

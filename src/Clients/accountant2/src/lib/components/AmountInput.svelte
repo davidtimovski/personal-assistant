@@ -12,7 +12,7 @@
 	export let currency: string | null;
 	export let invalid = false;
 	export let inputId: string = 'amount';
-	export let focusOnInit: boolean;
+	export let focusOnInit = false;
 
 	let changing = false;
 	let autocompleteResult: AutocompleteResult;

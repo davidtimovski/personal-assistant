@@ -24,7 +24,7 @@ export class TransactionModel implements Syncable {
 		public nonce: string | null,
 		public generated: boolean,
 		public createdDate: Date,
-		public modifiedDate: Date
+		public modifiedDate: Date | null
 	) {}
 
 	get isTax() {

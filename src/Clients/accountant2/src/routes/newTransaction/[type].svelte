@@ -46,7 +46,7 @@
 	let debtId: number;
 	let userIsDebtor: boolean;
 	let debtPerson: string;
-	let categoryOptions: SelectOption[] = [];
+	let categoryOptions: SelectOption[] | null = null;
 	let maxDate: string;
 	let passwordShown = false;
 	let amountIsInvalid = false;
@@ -55,11 +55,11 @@
 	let submitButtonIsLoading = false;
 	let passwordShowIconLabel: string;
 
+	let localStorage: LocalStorageUtil;
 	let transactionsService: TransactionsService;
 	let categoriesService: CategoriesService;
 	let accountsService: AccountsService;
 	let debtsService: DebtsService;
-	let localStorage: LocalStorageUtil;
 
 	let amountFrom = 0.01;
 	let amountTo = 8000001;
@@ -259,11 +259,11 @@
 			debtId = parseInt(debtIdParam, 10);
 		}
 
+		localStorage = new LocalStorageUtil();
 		transactionsService = new TransactionsService();
 		categoriesService = new CategoriesService();
 		accountsService = new AccountsService();
 		debtsService = new DebtsService();
-		localStorage = new LocalStorageUtil();
 
 		currency = localStorage.get('currency');
 
@@ -338,9 +338,11 @@
 						<label for="category">{$t('category')}</label>
 						<div class="loadable-select" class:loaded={categoryOptions}>
 							<select id="category" bind:value={categoryId} disabled={!categoryOptions} class="category-select">
-								{#each categoryOptions as category}
-									<option value={category.id}>{category.name}</option>
-								{/each}
+								{#if categoryOptions}
+									{#each categoryOptions as category}
+										<option value={category.id}>{category.name}</option>
+									{/each}
+								{/if}
 							</select>
 							<i class="fas fa-circle-notch fa-spin" />
 						</div>
