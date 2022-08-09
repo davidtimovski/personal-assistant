@@ -8,12 +8,12 @@ import { DebtModel } from '$lib/models/entities/debt';
 import Variables from '$lib/variables';
 
 export class DebtsService {
-	private readonly mergedDebtSeparator = '----------';
-
 	private readonly httpProxy = new HttpProxy();
 	private readonly idbHelper = new DebtsIDBHelper();
 	private readonly currenciesService = new CurrenciesService('Accountant');
 	private readonly logger = new ErrorLogger('Accountant');
+
+	static readonly mergedDebtSeparator = '----------';
 
 	async getAll(currency: string): Promise<Array<DebtModel>> {
 		try {
@@ -77,7 +77,7 @@ export class DebtsService {
 				descriptionsArray.push(newDesc);
 
 				const description =
-					descriptionsArray.length > 0 ? descriptionsArray.join(`\n${this.mergedDebtSeparator}\n`) : null;
+					descriptionsArray.length > 0 ? descriptionsArray.join(`\n${DebtsService.mergedDebtSeparator}\n`) : null;
 
 				const mergedDebt = new DebtModel(0, debt.person, balance, debt.currency, description, balance < 0, now, now);
 
@@ -134,7 +134,7 @@ export class DebtsService {
 			result += userIsDebtor ? '-' + amount + currency : amount + currency;
 
 			if (description) {
-				if (description.includes(this.mergedDebtSeparator)) {
+				if (description.includes(DebtsService.mergedDebtSeparator)) {
 					// use existing description if the debt is already a merged one
 					result = description;
 				} else {

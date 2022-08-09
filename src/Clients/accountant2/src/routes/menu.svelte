@@ -52,8 +52,8 @@
 			<div class="content-wrap">
 				<div class="horizontal-buttons-wrap">
 					<a href="/transactions" class="wide-button">{$t('menu.transactions')}</a>
-					<!-- <a href="/upcomingExpenses" class="wide-button">{$t('menu.upcomingExpenses')}</a>
-					<a href="/debt" class="wide-button">{$t('menu.debt')}</a>
+					<a href="/upcomingExpenses" class="wide-button">{$t('menu.upcomingExpenses')}</a>
+					<!-- <a href="/debt" class="wide-button">{$t('menu.debt')}</a>
 					<a href="/categories" class="wide-button">{$t('menu.categories')}</a>
 					<a href="/accounts" class="wide-button">{$t('menu.accounts')}</a>
 					<a href="/balanceAdjustment" class="wide-button">{$t('menu.balanceAdjustment')}</a>
@@ -95,7 +95,7 @@
 
 				<div class="horizontal-buttons-wrap">
 					<a href={personalAssistantUrl} class="wide-button">{$t('menu.goToPersonalAssistant')}</a>
-					<a on:click={logOut} class="wide-button">{$t('menu.logOut')}</a>
+					<a on:click={logOut} class="wide-button" role="button">{$t('menu.logOut')}</a>
 				</div>
 
 				<hr />

@@ -560,7 +560,7 @@ a.button {
   display: none;
 }
 
-.button-loader .loading {
+.button-loader.loading {
   display: inline;
 }
 

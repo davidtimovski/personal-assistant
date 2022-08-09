@@ -9,7 +9,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 
-	let currency: string;
+	let currency: string | null = null;
 	let changing = false;
 	let autocompleteResult: AutocompleteResult;
 	let selectCurrencyInput: HTMLInputElement | null;

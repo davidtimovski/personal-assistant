@@ -35,10 +35,10 @@
 	let fromAccountId: number | null = null;
 	let toAccountId: number | null = null;
 	let categoryId: number | null = null;
-	let amount: number;
+	let amount: number | null = null;
 	let fromStocks: number | null = null;
 	let toStocks: number | null = null;
-	let currency: string;
+	let currency: string | null = null;
 	let description: string | null = null;
 	let date: string;
 	let isEncrypted: boolean;
@@ -179,7 +179,7 @@
 	};
 
 	async function save() {
-		if (!amount || saveButtonIsLoading) {
+		if (!canSave() || saveButtonIsLoading) {
 			return;
 		}
 
@@ -197,10 +197,10 @@
 					fromAccountId,
 					toAccountId,
 					categoryId,
-					amount,
+					<number>amount,
 					fromStocks,
 					toStocks,
-					currency,
+					<string>currency,
 					description,
 					date,
 					encrypt,
@@ -546,6 +546,7 @@
 								</span>
 								<span>{deleteButtonText}</span>
 							</a>
+
 							{#if deleteInProgress}
 								<button type="button" on:click={cancel} class="button secondary-button">
 									{$t('cancel')}

@@ -28,10 +28,10 @@
 	let categoryOptions: SelectOption[] | null = null;
 	let accountOptions: SelectOption[] | null = null;
 
+	let localStorage: LocalStorageUtil;
 	let transactionsService: TransactionsService;
 	let categoriesService: CategoriesService;
 	let accountsService: AccountsService;
-	let localStorage: LocalStorageUtil;
 
 	function getTransactions(filterChanged: boolean) {
 		if (filterChanged) {
@@ -202,10 +202,10 @@
 			editedId = parseInt(edited, 10);
 		}
 
+		localStorage = new LocalStorageUtil();
 		transactionsService = new TransactionsService();
 		categoriesService = new CategoriesService();
 		accountsService = new AccountsService();
-		localStorage = new LocalStorageUtil();
 
 		currency = localStorage.get('currency');
 		language = localStorage.get('language');
