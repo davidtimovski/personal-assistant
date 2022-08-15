@@ -228,262 +228,258 @@
 	});
 </script>
 
-<section>
-	<div class="container">
-		<div class="au-animate">
-			<div class="page-title-wrap">
-				<div class="side inactive">
-					<i class="fas fa-search-dollar" />
-				</div>
-				<div class="page-title">{$t('transactions.transactions')}</div>
-				<a href="/" class="back-button">
-					<i class="fas fa-times" />
-				</a>
+<section class="container">
+	<div class="page-title-wrap">
+		<div class="side inactive">
+			<i class="fas fa-search-dollar" />
+		</div>
+		<div class="page-title">{$t('transactions.transactions')}</div>
+		<a href="/" class="back-button">
+			<i class="fas fa-times" />
+		</a>
+	</div>
+
+	<div class="content-wrap">
+		<form on:submit={filterChanged}>
+			<div class="form-control inline">
+				<label for="from-date">{$t('transactions.from')}</label>
+				<input type="date" id="from-date" bind:value={$searchFilters.fromDate} on:change={filterChanged} />
 			</div>
-
-			<div class="content-wrap">
-				<form on:submit={filterChanged}>
-					<div class="form-control inline">
-						<label for="from-date">{$t('transactions.from')}</label>
-						<input type="date" id="from-date" bind:value={$searchFilters.fromDate} on:change={filterChanged} />
-					</div>
-					<div class="form-control inline">
-						<label for="to-date">{$t('transactions.to')}</label>
-						<input type="date" id="to-date" bind:value={$searchFilters.toDate} on:change={filterChanged} />
-					</div>
-					<div class="form-control inline">
-						<label for="category">{$t('category')}</label>
-						<div class="loadable-select" class:loaded={categoryOptions}>
-							<select
-								id="category"
-								bind:value={$searchFilters.categoryId}
-								on:change={filterChanged}
-								disabled={!categoryOptions}
-								class="category-select"
-							>
-								{#if categoryOptions}
-									{#each categoryOptions as category}
-										<option value={category.id}>{category.name}</option>
-									{/each}
-								{/if}
-							</select>
-							<i class="fas fa-circle-notch fa-spin" />
-						</div>
-					</div>
-					<div class="form-control inline">
-						<label for="account">{$t('account')}</label>
-						<div class="loadable-select" class:loaded={accountOptions}>
-							<select
-								id="account"
-								bind:value={$searchFilters.accountId}
-								on:change={filterChanged}
-								disabled={!accountOptions}
-								class="category-select"
-							>
-								{#if accountOptions}
-									{#each accountOptions as account}
-										<option value={account.id}>{account.name}</option>
-									{/each}
-								{/if}
-							</select>
-							<i class="fas fa-circle-notch fa-spin" />
-						</div>
-					</div>
-					<div class="form-control">
-						<div class="multi-radio-wrap">
-							<div class="multi-radio-part">
-								<label class:selected={$searchFilters.type === 0}>
-									<span>{$t('transactions.all')}</span>
-									<input
-										type="radio"
-										name="typeToggle"
-										value={0}
-										bind:group={$searchFilters.type}
-										on:change={filterChanged}
-									/>
-								</label>
-							</div>
-							<div class="multi-radio-part">
-								<label class:selected={$searchFilters.type === 1}>
-									<span>{$t('transactions.expenses')}</span>
-									<input
-										type="radio"
-										name="typeToggle"
-										value={1}
-										bind:group={$searchFilters.type}
-										on:change={filterChanged}
-									/>
-								</label>
-							</div>
-							<div class="multi-radio-part">
-								<label class:selected={$searchFilters.type === 2}>
-									<span>{$t('transactions.deposits')}</span>
-									<input
-										type="radio"
-										name="typeToggle"
-										value={2}
-										bind:group={$searchFilters.type}
-										on:change={filterChanged}
-									/>
-								</label>
-							</div>
-							{#if $searchFilters.accountId === 0}
-								<div class="multi-radio-part">
-									<label class:selected={$searchFilters.type === 3}>
-										<span>{$t('transactions.transfers')}</span>
-										<input
-											type="radio"
-											name="typeToggle"
-											value={3}
-											bind:group={$searchFilters.type}
-											on:change={filterChanged}
-										/>
-									</label>
-								</div>
-							{/if}
-						</div>
-					</div>
-					<div class="form-control">
-						<div class="description-filter-wrap" class:searching={$searchFilters.description}>
-							<input
-								type="text"
-								bind:value={$searchFilters.description}
-								on:keyup={() => DebounceHelper.debounce(() => getTransactions(true), 1000)}
-								maxlength="30"
-								placeholder={$t('transactions.searchByDescription')}
-								aria-label={$t('transactions.searchByDescription')}
-							/>
-							<i
-								class="fas fa-times"
-								on:click={clearDescriptionFilter}
-								role="button"
-								title={$t('transactions.clear')}
-								aria-label={$t('transactions.clear')}
-							/>
-						</div>
-					</div>
-				</form>
-
-				{#if !transactions}
-					<div class="double-circle-loading">
-						<div class="double-bounce1" />
-						<div class="double-bounce2" />
-					</div>
-				{:else}
-					<div id="transactions-table-wrap">
-						<table class="editable-table">
-							<thead>
-								<tr>
-									<th class="type-cell" />
-									<th>{$t('amount')}</th>
-									<th
-										on:click={toggleViewCategory}
-										class="clickable-cell"
-										role="button"
-										title={$t('transactions.toggleDescriptionCategory')}
-										aria-label={$t('transactions.toggleDescriptionCategory')}
-									>
-										{#if viewCategory}
-											<span>{$t('category')}</span>
-										{:else}
-											<span>{$t('description')}</span>
-										{/if}
-									</th>
-									<th>{$t('date')}</th>
-									<th class="sync-icon-cell" />
-								</tr>
-							</thead>
-							{#if transactions.length > 0}
-								<tbody>
-									{#each transactions as transaction}
-										<tr
-											on:click={() => viewTransaction(transaction.id)}
-											class="clickable"
-											class:highlighted-row={transaction.id === editedId}
-										>
-											<td class="type-cell">
-												{#if transaction.type === 1}
-													<i class="fas fa-wallet expense-color" />
-												{/if}
-
-												{#if transaction.type === 2}
-													<i class="fas fa-donate deposit-color" />
-												{/if}
-
-												{#if transaction.type === 3}
-													<i class="fas fa-exchange-alt transfer-color" />
-												{/if}
-											</td>
-											<td>{Formatter.number(transaction.amount, currency)}</td>
-											<td>{viewCategory ? transaction.category : transaction.description}</td>
-											<td class="date-cell">{transaction.date}</td>
-
-											<td class="sync-icon-cell">
-												{#if !transaction.synced}
-													<i class="fas fa-sync-alt" title={$t('notSynced')} aria-label={$t('notSynced')} />
-												{/if}
-											</td>
-										</tr>
-									{/each}
-								</tbody>
-							{:else}
-								<tfoot>
-									<td class="no-data-column" colspan="5">{$t('transactions.thereIsNothingHere')}</td>
-								</tfoot>
-							{/if}
-						</table>
-
-						{#if transactions.length > 0}
-							<div class="transactions-pagination">
-								<div
-									role="button"
-									on:click={first}
-									title={$t('transactions.first')}
-									aria-label={$t('transactions.first')}
-									class="transactions-pagination-arrow-wrap left"
-									class:hidden={$searchFilters.page === 1}
-								>
-									<i class="fas fa-angle-double-left" />
-								</div>
-								<div
-									role="button"
-									on:click={previous}
-									title={$t('transactions.previous')}
-									aria-label={$t('transactions.previous')}
-									class="transactions-pagination-arrow-wrap left"
-									class:hidden={$searchFilters.page === 1}
-								>
-									<i class="fas fa-angle-left" />
-								</div>
-								<div class="transactions-pagination-numbering">
-									<span>{$searchFilters.page}</span>/<span>{pageCount}</span>
-								</div>
-								<div
-									role="button"
-									on:click={next}
-									title={$t('transactions.next')}
-									aria-label={$t('transactions.next')}
-									class="transactions-pagination-arrow-wrap right"
-									class:hidden={$searchFilters.page === pageCount}
-								>
-									<i class="fas fa-angle-right" />
-								</div>
-								<div
-									role="button"
-									on:click={last}
-									title={$t('transactions.last')}
-									aria-label={$t('transactions.last')}
-									class="transactions-pagination-arrow-wrap right"
-									class:hidden={$searchFilters.page === pageCount}
-								>
-									<i class="fas fa-angle-double-right" />
-								</div>
-							</div>
+			<div class="form-control inline">
+				<label for="to-date">{$t('transactions.to')}</label>
+				<input type="date" id="to-date" bind:value={$searchFilters.toDate} on:change={filterChanged} />
+			</div>
+			<div class="form-control inline">
+				<label for="category">{$t('category')}</label>
+				<div class="loadable-select" class:loaded={categoryOptions}>
+					<select
+						id="category"
+						bind:value={$searchFilters.categoryId}
+						on:change={filterChanged}
+						disabled={!categoryOptions}
+						class="category-select"
+					>
+						{#if categoryOptions}
+							{#each categoryOptions as category}
+								<option value={category.id}>{category.name}</option>
+							{/each}
 						{/if}
+					</select>
+					<i class="fas fa-circle-notch fa-spin" />
+				</div>
+			</div>
+			<div class="form-control inline">
+				<label for="account">{$t('account')}</label>
+				<div class="loadable-select" class:loaded={accountOptions}>
+					<select
+						id="account"
+						bind:value={$searchFilters.accountId}
+						on:change={filterChanged}
+						disabled={!accountOptions}
+						class="category-select"
+					>
+						{#if accountOptions}
+							{#each accountOptions as account}
+								<option value={account.id}>{account.name}</option>
+							{/each}
+						{/if}
+					</select>
+					<i class="fas fa-circle-notch fa-spin" />
+				</div>
+			</div>
+			<div class="form-control">
+				<div class="multi-radio-wrap">
+					<div class="multi-radio-part">
+						<label class:selected={$searchFilters.type === 0}>
+							<span>{$t('transactions.all')}</span>
+							<input
+								type="radio"
+								name="typeToggle"
+								value={0}
+								bind:group={$searchFilters.type}
+								on:change={filterChanged}
+							/>
+						</label>
+					</div>
+					<div class="multi-radio-part">
+						<label class:selected={$searchFilters.type === 1}>
+							<span>{$t('transactions.expenses')}</span>
+							<input
+								type="radio"
+								name="typeToggle"
+								value={1}
+								bind:group={$searchFilters.type}
+								on:change={filterChanged}
+							/>
+						</label>
+					</div>
+					<div class="multi-radio-part">
+						<label class:selected={$searchFilters.type === 2}>
+							<span>{$t('transactions.deposits')}</span>
+							<input
+								type="radio"
+								name="typeToggle"
+								value={2}
+								bind:group={$searchFilters.type}
+								on:change={filterChanged}
+							/>
+						</label>
+					</div>
+					{#if $searchFilters.accountId === 0}
+						<div class="multi-radio-part">
+							<label class:selected={$searchFilters.type === 3}>
+								<span>{$t('transactions.transfers')}</span>
+								<input
+									type="radio"
+									name="typeToggle"
+									value={3}
+									bind:group={$searchFilters.type}
+									on:change={filterChanged}
+								/>
+							</label>
+						</div>
+					{/if}
+				</div>
+			</div>
+			<div class="form-control">
+				<div class="description-filter-wrap" class:searching={$searchFilters.description}>
+					<input
+						type="text"
+						bind:value={$searchFilters.description}
+						on:keyup={() => DebounceHelper.debounce(() => getTransactions(true), 1000)}
+						maxlength="30"
+						placeholder={$t('transactions.searchByDescription')}
+						aria-label={$t('transactions.searchByDescription')}
+					/>
+					<i
+						class="fas fa-times"
+						on:click={clearDescriptionFilter}
+						role="button"
+						title={$t('transactions.clear')}
+						aria-label={$t('transactions.clear')}
+					/>
+				</div>
+			</div>
+		</form>
+
+		{#if !transactions}
+			<div class="double-circle-loading">
+				<div class="double-bounce1" />
+				<div class="double-bounce2" />
+			</div>
+		{:else}
+			<div id="transactions-table-wrap">
+				<table class="editable-table">
+					<thead>
+						<tr>
+							<th class="type-cell" />
+							<th>{$t('amount')}</th>
+							<th
+								on:click={toggleViewCategory}
+								class="clickable-cell"
+								role="button"
+								title={$t('transactions.toggleDescriptionCategory')}
+								aria-label={$t('transactions.toggleDescriptionCategory')}
+							>
+								{#if viewCategory}
+									<span>{$t('category')}</span>
+								{:else}
+									<span>{$t('description')}</span>
+								{/if}
+							</th>
+							<th>{$t('date')}</th>
+							<th class="sync-icon-cell" />
+						</tr>
+					</thead>
+					{#if transactions.length > 0}
+						<tbody>
+							{#each transactions as transaction}
+								<tr
+									on:click={() => viewTransaction(transaction.id)}
+									class="clickable"
+									class:highlighted-row={transaction.id === editedId}
+								>
+									<td class="type-cell">
+										{#if transaction.type === 1}
+											<i class="fas fa-wallet expense-color" />
+										{/if}
+
+										{#if transaction.type === 2}
+											<i class="fas fa-donate deposit-color" />
+										{/if}
+
+										{#if transaction.type === 3}
+											<i class="fas fa-exchange-alt transfer-color" />
+										{/if}
+									</td>
+									<td>{Formatter.number(transaction.amount, currency)}</td>
+									<td>{viewCategory ? transaction.category : transaction.description}</td>
+									<td class="date-cell">{transaction.date}</td>
+
+									<td class="sync-icon-cell">
+										{#if !transaction.synced}
+											<i class="fas fa-sync-alt" title={$t('notSynced')} aria-label={$t('notSynced')} />
+										{/if}
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					{:else}
+						<tfoot>
+							<td class="no-data-column" colspan="5">{$t('transactions.thereIsNothingHere')}</td>
+						</tfoot>
+					{/if}
+				</table>
+
+				{#if transactions.length > 0}
+					<div class="transactions-pagination">
+						<div
+							role="button"
+							on:click={first}
+							title={$t('transactions.first')}
+							aria-label={$t('transactions.first')}
+							class="transactions-pagination-arrow-wrap left"
+							class:hidden={$searchFilters.page === 1}
+						>
+							<i class="fas fa-angle-double-left" />
+						</div>
+						<div
+							role="button"
+							on:click={previous}
+							title={$t('transactions.previous')}
+							aria-label={$t('transactions.previous')}
+							class="transactions-pagination-arrow-wrap left"
+							class:hidden={$searchFilters.page === 1}
+						>
+							<i class="fas fa-angle-left" />
+						</div>
+						<div class="transactions-pagination-numbering">
+							<span>{$searchFilters.page}</span>/<span>{pageCount}</span>
+						</div>
+						<div
+							role="button"
+							on:click={next}
+							title={$t('transactions.next')}
+							aria-label={$t('transactions.next')}
+							class="transactions-pagination-arrow-wrap right"
+							class:hidden={$searchFilters.page === pageCount}
+						>
+							<i class="fas fa-angle-right" />
+						</div>
+						<div
+							role="button"
+							on:click={last}
+							title={$t('transactions.last')}
+							aria-label={$t('transactions.last')}
+							class="transactions-pagination-arrow-wrap right"
+							class:hidden={$searchFilters.page === pageCount}
+						>
+							<i class="fas fa-angle-double-right" />
+						</div>
 					</div>
 				{/if}
 			</div>
-		</div>
+		{/if}
 	</div>
 </section>
 

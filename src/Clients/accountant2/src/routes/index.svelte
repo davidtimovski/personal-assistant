@@ -83,15 +83,13 @@
 	}
 
 	function sync() {
-		if (!progressBarActive) {
-			syncStatus.set(AppEvents.ReSync);
+		syncStatus.set(AppEvents.ReSync);
 
-			usersService.getProfileImageUri().then((uri) => {
-				if (imageUri !== uri) {
-					imageUri = uri;
-				}
-			});
-		}
+		usersService.getProfileImageUri().then((uri) => {
+			if (imageUri !== uri) {
+				imageUri = uri;
+			}
+		});
 	}
 
 	function goToTransactions(expenditure: AmountByCategory) {
@@ -164,156 +162,152 @@
 	});
 </script>
 
-<section>
-	<div class="container">
-		<div class="au-animate">
-			<div class="page-title-wrap-loader">
-				<div class="title-wrap">
-					{#if menuButtonIsLoading}
-						<span class="menu-loader">
-							<i class="fas fa-circle-notch fa-spin" />
-						</span>
-					{:else}
-						<div
-							on:click={goToMenu}
-							class="profile-image-container"
-							role="button"
-							title={$t('dashboard.menu')}
-							aria-label={$t('dashboard.menu')}
-						>
-							<img src={imageUri} class="profile-image" width="40" height="40" alt={$t('profilePicture')} />
-						</div>
-					{/if}
+<section class="container">
+	<div class="page-title-wrap-loader">
+		<div class="title-wrap">
+			{#if menuButtonIsLoading}
+				<span class="menu-loader">
+					<i class="fas fa-circle-notch fa-spin" />
+				</span>
+			{:else}
+				<div
+					on:click={goToMenu}
+					class="profile-image-container"
+					role="button"
+					title={$t('dashboard.menu')}
+					aria-label={$t('dashboard.menu')}
+				>
+					<img src={imageUri} class="profile-image" width="40" height="40" alt={$t('profilePicture')} />
+				</div>
+			{/if}
 
-					<div class="page-title reduced">
-						<span />
-					</div>
-					<a
-						on:click={sync}
-						class="sync-button"
-						class:disabled={!connTracker.isOnline || progressBarActive}
-						role="button"
-						title={$t('dashboard.refresh')}
-						aria-label={$t('dashboard.refresh')}
-					>
-						<i class="fas fa-sync-alt" />
-					</a>
-				</div>
-				<div class="progress-bar">
-					<div class="progress" class:visible={progressBarVisible} style="width: {progress}%;" />
-				</div>
+			<div class="page-title reduced">
+				<span />
 			</div>
-
-			<div class="content-wrap dashboard">
-				<div class="capital-summary">
-					<a href="/transactions" class="summary-item-wrap">
-						<div class="summary-item">
-							<div class="summary-title">{$t('dashboard.available')}</div>
-							<div class="summary-value">{Formatter.number(available, currency)}</div>
-						</div>
-					</a>
-					<a href="/transactions" class="summary-item-wrap">
-						<div class="summary-item">
-							<div class="summary-title">{$t('dashboard.spent')}</div>
-							<div class="summary-value">{Formatter.number(spent, currency)}</div>
-						</div>
-					</a>
-					<a href="/transactions" class="summary-item-wrap">
-						<div class="summary-item">
-							<div class="summary-title">{$t('balance')}</div>
-							<div class="summary-value">{Formatter.number(balance, currency)}</div>
-						</div>
-					</a>
-				</div>
-
-				<div class="dashboard-buttons">
-					<a href="newTransaction/1" class="dashboard-button">
-						{$t('dashboard.newDeposit')}
-					</a>
-					<a href="newTransaction/0" class="dashboard-button">
-						{$t('dashboard.newExpense')}
-					</a>
-				</div>
-
-				{#if expenditures && expenditures.length > 0}
-					<div>
-						<a href="/transactions" class="dashboard-table-title">{$t('dashboard.expenditures')}</a>
-						<table class="amount-by-category-table">
-							<tbody>
-								{#each expenditures as expenditure}
-									<tr on:click={() => goToTransactions(expenditure)}>
-										<td>{expenditure.categoryName}</td>
-										<td class="amount-cell">{Formatter.money(expenditure.amount, currency)}</td>
-									</tr>
-
-									{#each expenditure.subItems as subExpenditure}
-										<tr on:click={() => goToTransactions(subExpenditure)}>
-											<td class="sub-category-cell">{subExpenditure.categoryName}</td>
-											<td class="amount-cell">{Formatter.money(subExpenditure.amount, currency)}</td>
-										</tr>
-									{/each}
-								{/each}
-							</tbody>
-						</table>
-					</div>
-				{/if}
-
-				{#if upcomingExpenses && upcomingExpenses.length > 0}
-					<div>
-						<a href="/upcoming-expenses" class="dashboard-table-title">{$t('dashboard.upcomingExpenses')}</a>
-						<table class="dashboard-table">
-							<tbody>
-								{#each upcomingExpenses as upcomingExpense}
-									<tr>
-										<td>{upcomingExpense.category}</td>
-										<td>{upcomingExpense.description}</td>
-										<td class="amount-cell">{Formatter.money(upcomingExpense.amount, currency)}</td>
-									</tr>
-								{/each}
-							</tbody>
-							{#if upcomingExpenses.length > 1}
-								<tfoot>
-									<tr>
-										<td colspan="3">
-											<!-- Space taker -->
-										</td>
-									</tr>
-									<tr>
-										<td colspan="3">{Formatter.money(upcomingSum, currency)}</td>
-									</tr>
-								</tfoot>
-							{/if}
-						</table>
-					</div>
-				{/if}
-
-				{#if debt && debt.length > 0}
-					<div>
-						<a href="/debt" class="dashboard-table-title">{$t('dashboard.debt')}</a>
-						<table class="dashboard-table">
-							<tbody>
-								{#each debt as debtItem}
-									<tr>
-										<td>
-											{#if debtItem.userIsDebtor}
-												<span>{$t('dashboard.to')}</span>
-											{:else}
-												<span>{$t('dashboard.from')}</span>
-												{debtItem.person}
-											{/if}
-										</td>
-										<td>{debtItem.description}</td>
-										<td class="amount-cell {debtItem.userIsDebtor ? 'expense-color' : 'deposit-color'}">
-											{Formatter.money(debtItem.amount, currency)}
-										</td>
-									</tr>
-								{/each}
-							</tbody>
-						</table>
-					</div>
-				{/if}
-			</div>
+			<button
+				type="button"
+				on:click={sync}
+				class="sync-button"
+				disabled={!connTracker.isOnline || progressBarActive}
+				title={$t('dashboard.refresh')}
+				aria-label={$t('dashboard.refresh')}
+			>
+				<i class="fas fa-sync-alt" />
+			</button>
 		</div>
+		<div class="progress-bar">
+			<div class="progress" class:visible={progressBarVisible} style="width: {progress}%;" />
+		</div>
+	</div>
+
+	<div class="content-wrap dashboard">
+		<div class="capital-summary">
+			<a href="/transactions" class="summary-item-wrap">
+				<div class="summary-item">
+					<div class="summary-title">{$t('dashboard.available')}</div>
+					<div class="summary-value">{Formatter.number(available, currency)}</div>
+				</div>
+			</a>
+			<a href="/transactions" class="summary-item-wrap">
+				<div class="summary-item">
+					<div class="summary-title">{$t('dashboard.spent')}</div>
+					<div class="summary-value">{Formatter.number(spent, currency)}</div>
+				</div>
+			</a>
+			<a href="/transactions" class="summary-item-wrap">
+				<div class="summary-item">
+					<div class="summary-title">{$t('balance')}</div>
+					<div class="summary-value">{Formatter.number(balance, currency)}</div>
+				</div>
+			</a>
+		</div>
+
+		<div class="dashboard-buttons">
+			<a href="newTransaction/1" class="dashboard-button">
+				{$t('dashboard.newDeposit')}
+			</a>
+			<a href="newTransaction/0" class="dashboard-button">
+				{$t('dashboard.newExpense')}
+			</a>
+		</div>
+
+		{#if expenditures && expenditures.length > 0}
+			<div>
+				<a href="/transactions" class="dashboard-table-title">{$t('dashboard.expenditures')}</a>
+				<table class="amount-by-category-table">
+					<tbody>
+						{#each expenditures as expenditure}
+							<tr on:click={() => goToTransactions(expenditure)}>
+								<td>{expenditure.categoryName}</td>
+								<td class="amount-cell">{Formatter.money(expenditure.amount, currency)}</td>
+							</tr>
+
+							{#each expenditure.subItems as subExpenditure}
+								<tr on:click={() => goToTransactions(subExpenditure)}>
+									<td class="sub-category-cell">{subExpenditure.categoryName}</td>
+									<td class="amount-cell">{Formatter.money(subExpenditure.amount, currency)}</td>
+								</tr>
+							{/each}
+						{/each}
+					</tbody>
+				</table>
+			</div>
+		{/if}
+
+		{#if upcomingExpenses && upcomingExpenses.length > 0}
+			<div>
+				<a href="/upcomingExpenses" class="dashboard-table-title">{$t('dashboard.upcomingExpenses')}</a>
+				<table class="dashboard-table">
+					<tbody>
+						{#each upcomingExpenses as upcomingExpense}
+							<tr>
+								<td>{upcomingExpense.category}</td>
+								<td>{upcomingExpense.description}</td>
+								<td class="amount-cell">{Formatter.money(upcomingExpense.amount, currency)}</td>
+							</tr>
+						{/each}
+					</tbody>
+					{#if upcomingExpenses.length > 1}
+						<tfoot>
+							<tr>
+								<td colspan="3">
+									<!-- Space taker -->
+								</td>
+							</tr>
+							<tr>
+								<td colspan="3">{Formatter.money(upcomingSum, currency)}</td>
+							</tr>
+						</tfoot>
+					{/if}
+				</table>
+			</div>
+		{/if}
+
+		{#if debt && debt.length > 0}
+			<div>
+				<a href="/debt" class="dashboard-table-title">{$t('dashboard.debt')}</a>
+				<table class="dashboard-table">
+					<tbody>
+						{#each debt as debtItem}
+							<tr>
+								<td>
+									{#if debtItem.userIsDebtor}
+										<span>{$t('dashboard.to')}</span>
+									{:else}
+										<span>{$t('dashboard.from')}</span>
+										{debtItem.person}
+									{/if}
+								</td>
+								<td>{debtItem.description}</td>
+								<td class="amount-cell {debtItem.userIsDebtor ? 'expense-color' : 'deposit-color'}">
+									{Formatter.money(debtItem.amount, currency)}
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
+		{/if}
 	</div>
 </section>
 

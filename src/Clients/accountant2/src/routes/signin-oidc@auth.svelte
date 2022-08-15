@@ -24,15 +24,13 @@
 	});
 </script>
 
-<section>
-	<div class="auth-wrap">
-		<div class="loader-wrap">
-			<div class="loader" />
-			<i class="fas fa-lock" />
-		</div>
-
-		<div class="authorizing">AUTHORIZING</div>
+<section class="auth-wrap">
+	<div class="loader-wrap">
+		<div class="loader" />
+		<i class="fas fa-lock" />
 	</div>
+
+	<div class="authorizing">AUTHORIZING</div>
 </section>
 
 <style lang="scss">

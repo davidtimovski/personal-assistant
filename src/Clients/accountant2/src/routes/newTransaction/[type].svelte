@@ -43,7 +43,7 @@
 	let date: string | null = null;
 	let encrypt = false;
 	let encryptionPassword: string | null = null;
-	let debtId: number;
+	let debtId: number | null = null;
 	let userIsDebtor: boolean;
 	let debtPerson: string;
 	let categoryOptions: SelectOption[] | null = null;
@@ -53,6 +53,7 @@
 	let dateIsInvalid = false;
 	let encryptionPasswordIsInvalid = false;
 	let submitButtonIsLoading = false;
+	let passwordInput: HTMLInputElement | null = null;
 	let passwordShowIconLabel: string;
 
 	let localStorage: LocalStorageUtil;
@@ -103,7 +104,10 @@
 	};
 
 	function togglePasswordShow() {
-		const passwordInput = <HTMLInputElement>document.getElementById('password-input');
+		if (!passwordInput) {
+			return;
+		}
+
 		if (passwordShown) {
 			passwordInput.type = 'password';
 			passwordShowIconLabel = $t('showPassword');
@@ -143,10 +147,6 @@
 	}
 
 	async function submit() {
-		if (!amount || submitButtonIsLoading) {
-			return;
-		}
-
 		submitButtonIsLoading = true;
 		alertState.update((x) => {
 			x.hide();
@@ -292,127 +292,123 @@
 	});
 </script>
 
-<section>
-	<div class="container">
-		<div class="au-animate">
-			<div class="page-title-wrap">
-				{#if isExpense}
-					<div class="side inactive small">
-						<i class="fas fa-wallet" />
-					</div>
-				{:else}
-					<div class="side inactive medium">
-						<i class="fas fa-donate" />
-					</div>
-				{/if}
-
-				<div class="page-title">
-					<span>{$t(isExpense ? 'newTransaction.newExpense' : 'newTransaction.newDeposit')}</span>
-				</div>
-
-				<a href={debtId ? 'debt' : '/'} class="back-button" role="button">
-					<i class="fas fa-times" />
-				</a>
+<section class="container">
+	<div class="page-title-wrap">
+		{#if isExpense}
+			<div class="side inactive small">
+				<i class="fas fa-wallet" />
 			</div>
-
-			<div class="content-wrap">
-				{#if debtId}
-					{#if userIsDebtor}
-						<AlertBlock type="info" message={$t('newTransaction.settleDebtTo', { person: debtPerson })} />
-					{:else}
-						<AlertBlock type="info" message={$t('newTransaction.settleDebtFrom', { person: debtPerson })} />
-					{/if}
-				{/if}
-
-				{#if pastMidnight()}
-					<AlertBlock type="info" message={$t('newTransaction.considerUsingYesterday', { time: pastMidnight() })} />
-				{/if}
-
-				<form on:submit={submit} autocomplete="off">
-					<div class="form-control inline">
-						<label for="amount">{$t('amount')}</label>
-						<AmountInput bind:amount bind:currency invalid={amountIsInvalid} focusOnInit={true} />
-					</div>
-
-					<div class="form-control inline">
-						<label for="category">{$t('category')}</label>
-						<div class="loadable-select" class:loaded={categoryOptions}>
-							<select id="category" bind:value={categoryId} disabled={!categoryOptions} class="category-select">
-								{#if categoryOptions}
-									{#each categoryOptions as category}
-										<option value={category.id}>{category.name}</option>
-									{/each}
-								{/if}
-							</select>
-							<i class="fas fa-circle-notch fa-spin" />
-						</div>
-					</div>
-
-					<div class="form-control inline">
-						<label for="date">{$t('date')}</label>
-						<input type="date" id="date" bind:value={date} max={maxDate} class:invalid={dateIsInvalid} required />
-					</div>
-
-					<div class="form-control">
-						<div class="encryption-box" class:active={encrypt}>
-							<textarea
-								bind:value={description}
-								maxlength="500"
-								class="description-textarea"
-								placeholder={$t('description')}
-								aria-label={$t('description')}
-							/>
-
-							<Checkbox labelKey="newTransaction.encryptDescription" bind:value={encrypt} disabled={!canEncrypt()} />
-
-							{#if encrypt}
-								<!-- TODO -->
-								<!-- <tooltip key="encryptedDescription" /> -->
-								<div class="viewable-password">
-									<input
-										type="password"
-										id="password-input"
-										bind:value={encryptionPassword}
-										disabled={!encrypt}
-										maxlength="100"
-										class:invalid={encryptionPasswordIsInvalid}
-										placeholder={$t('password')}
-										aria-label={$t('password')}
-									/>
-									<a
-										on:click={togglePasswordShow}
-										class="password-show-button"
-										class:shown={passwordShown}
-										role="button"
-										title={passwordShowIconLabel}
-										aria-label={passwordShowIconLabel}
-									>
-										<i class="fas fa-eye" />
-										<i class="fas fa-eye-slash" />
-									</a>
-								</div>
-							{/if}
-						</div>
-					</div>
-
-					<hr />
-
-					<div class="save-delete-wrap">
-						<a
-							on:click={submit}
-							class="button primary-button"
-							class:disabled={!amount || submitButtonIsLoading}
-							role="button"
-						>
-							<span class="button-loader" class:loading={submitButtonIsLoading}>
-								<i class="fas fa-circle-notch fa-spin" />
-							</span>
-							<span>{$t('newTransaction.submit')}</span>
-						</a>
-						<a href={debtId ? 'debt' : '/'} class="button secondary-button">{$t('cancel')}</a>
-					</div>
-				</form>
+		{:else}
+			<div class="side inactive medium">
+				<i class="fas fa-donate" />
 			</div>
+		{/if}
+
+		<div class="page-title">
+			<span>{$t(isExpense ? 'newTransaction.newExpense' : 'newTransaction.newDeposit')}</span>
 		</div>
+
+		<a href={debtId ? '/debt' : '/'} class="back-button" role="button">
+			<i class="fas fa-times" />
+		</a>
+	</div>
+
+	<div class="content-wrap">
+		{#if debtId}
+			{#if userIsDebtor}
+				<AlertBlock type="info" message={$t('newTransaction.settleDebtTo', { person: debtPerson })} />
+			{:else}
+				<AlertBlock type="info" message={$t('newTransaction.settleDebtFrom', { person: debtPerson })} />
+			{/if}
+		{/if}
+
+		{#if pastMidnight()}
+			<AlertBlock type="info" message={$t('newTransaction.considerUsingYesterday', { time: pastMidnight() })} />
+		{/if}
+
+		<form on:submit={submit} autocomplete="off">
+			<div class="form-control inline">
+				<label for="amount">{$t('amount')}</label>
+				<AmountInput bind:amount bind:currency invalid={amountIsInvalid} focusOnInit={true} />
+			</div>
+
+			<div class="form-control inline">
+				<label for="category">{$t('category')}</label>
+				<div class="loadable-select" class:loaded={categoryOptions}>
+					<select id="category" bind:value={categoryId} disabled={!categoryOptions} class="category-select">
+						{#if categoryOptions}
+							{#each categoryOptions as category}
+								<option value={category.id}>{category.name}</option>
+							{/each}
+						{/if}
+					</select>
+					<i class="fas fa-circle-notch fa-spin" />
+				</div>
+			</div>
+
+			<div class="form-control inline">
+				<label for="date">{$t('date')}</label>
+				<input type="date" id="date" bind:value={date} max={maxDate} class:invalid={dateIsInvalid} required />
+			</div>
+
+			<div class="form-control">
+				<div class="encryption-box" class:active={encrypt}>
+					<textarea
+						bind:value={description}
+						maxlength="500"
+						class="description-textarea"
+						placeholder={$t('description')}
+						aria-label={$t('description')}
+					/>
+
+					<Checkbox labelKey="newTransaction.encryptDescription" bind:value={encrypt} disabled={!canEncrypt()} />
+
+					{#if encrypt}
+						<!-- TODO -->
+						<!-- <tooltip key="encryptedDescription" /> -->
+						<div class="viewable-password">
+							<input
+								type="password"
+								bind:this={passwordInput}
+								bind:value={encryptionPassword}
+								disabled={!encrypt}
+								maxlength="100"
+								class:invalid={encryptionPasswordIsInvalid}
+								placeholder={$t('password')}
+								aria-label={$t('password')}
+							/>
+							<button
+								type="button"
+								on:click={togglePasswordShow}
+								class="password-show-button"
+								class:shown={passwordShown}
+								title={passwordShowIconLabel}
+								aria-label={passwordShowIconLabel}
+							>
+								<i class="fas fa-eye" />
+								<i class="fas fa-eye-slash" />
+							</button>
+						</div>
+					{/if}
+				</div>
+			</div>
+
+			<hr />
+
+			<div class="save-delete-wrap">
+				<button
+					type="button"
+					on:click={submit}
+					class="button primary-button"
+					disabled={!amount || submitButtonIsLoading}
+				>
+					<span class="button-loader" class:loading={submitButtonIsLoading}>
+						<i class="fas fa-circle-notch fa-spin" />
+					</span>
+					<span>{$t('newTransaction.submit')}</span>
+				</button>
+				<a href={debtId ? '/debt' : '/'} class="button secondary-button">{$t('cancel')}</a>
+			</div>
+		</form>
 	</div>
 </section>

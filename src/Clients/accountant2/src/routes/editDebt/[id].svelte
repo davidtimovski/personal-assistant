@@ -13,46 +13,40 @@
 	import { onMount } from 'svelte/internal';
 	import { goto } from '$app/navigation';
 
-	import { DateHelper } from '../../../../shared2/utils/dateHelper';
 	import { ValidationResult, ValidationUtil } from '../../../../shared2/utils/validationUtils';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 	import { alertState, isOnline } from '$lib/stores';
-	import type { SelectOption } from '$lib/models/viewmodels/selectOption';
-	import { UpcomingExpensesService } from '$lib/services/upcomingExpensesService';
-	import { UpcomingExpense } from '$lib/models/entities/upcomingExpense';
-	import { CategoryType } from '$lib/models/entities/category';
-	import { CategoriesService } from '$lib/services/categoriesService';
+	import { DebtsService } from '$lib/services/debtsService';
+	import { DebtModel } from '$lib/models/entities/debt';
 
 	import AlertBlock from '$lib/components/AlertBlock.svelte';
 	import AmountInput from '$lib/components/AmountInput.svelte';
-	import MonthSelector from '$lib/components/MonthSelector.svelte';
+	import DoubleRadio from '$lib/components/DoubleRadio.svelte';
 
 	export let id: number;
 
-	let categoryId: number | null = null;
-	let amount: number | null = null;
+	let person: string;
+	let amount: number;
 	let currency: string;
-	let description: string;
-	let generated: boolean;
+	let description: string | null;
+	let userIsDebtor: boolean;
 	let createdDate: Date | null;
 	let synced: boolean;
-	let month: number | null = null;
-	let year: number | null = null;
-	let categoryOptions: SelectOption[] | null = null;
 	let isNew: boolean;
+	let personInput: HTMLInputElement;
+	let mergeDebtPerPerson: boolean | null = null;
+	let personIsInvalid: boolean;
 	let amountIsInvalid: boolean;
 	let saveButtonText: string;
 	let deleteInProgress = false;
 	let deleteButtonText: string;
 	let saveButtonIsLoading = false;
 	let deleteButtonIsLoading = false;
-	let language: string;
 
 	let localStorage: LocalStorageUtil;
-	let upcomingExpensesService: UpcomingExpensesService;
-	let categoriesService: CategoriesService;
+	let debtsService: DebtsService;
 
 	let amountTo = 8000000;
 
@@ -85,42 +79,24 @@
 		if (result.valid) {
 			if (isNew) {
 				try {
-					const upcomingExpense = new UpcomingExpense(
-						0,
-						<number>categoryId,
-						<number>amount,
-						currency,
-						description,
-						DateHelper.format(new Date(<number>year, <number>month, 1)),
-						false,
-						null,
-						null
-					);
-					const id = await upcomingExpensesService.create(upcomingExpense);
+					const debt = new DebtModel(0, person, amount, currency, description, userIsDebtor, null, null);
+					const id = await debtsService.createOrMerge(debt, <boolean>mergeDebtPerPerson);
+					personIsInvalid = false;
 					amountIsInvalid = false;
 
-					goto('/upcomingExpenses?edited=' + id);
+					goto('/debt?edited=' + id);
 				} catch {
 					saveButtonIsLoading = false;
 				}
 			} else {
 				try {
-					const upcomingExpense = new UpcomingExpense(
-						id,
-						<number>categoryId,
-						<number>amount,
-						currency,
-						description,
-						DateHelper.format(new Date(<number>year, <number>month, 1)),
-						generated,
-						createdDate,
-						null
-					);
+					const debt = new DebtModel(id, person, amount, currency, description, userIsDebtor, createdDate, null);
 
-					await upcomingExpensesService.update(upcomingExpense);
+					await debtsService.update(debt);
+					personIsInvalid = false;
 					amountIsInvalid = false;
 
-					goto('/upcomingExpenses?edited=' + id);
+					goto('/debt?edited=' + id);
 				} catch {
 					saveButtonIsLoading = false;
 				}
@@ -130,18 +106,18 @@
 		}
 	}
 
-	async function deleteUpcomingExpense() {
+	async function deleteDebt() {
 		if (deleteInProgress) {
 			deleteButtonIsLoading = true;
 
 			try {
-				await upcomingExpensesService.delete(id);
+				await debtsService.delete(id);
 
 				alertState.update((x) => {
-					x.showSuccess('editUpcomingExpense.deleteSuccessful');
+					x.showSuccess('editDebt.deleteSuccessful');
 					return x;
 				});
-				goto('/upcomingExpenses');
+				goto('/debt');
 			} catch {
 				deleteButtonText = $t('delete');
 				deleteInProgress = false;
@@ -155,7 +131,7 @@
 
 	function cancel() {
 		if (!deleteInProgress) {
-			goto('/upcomingExpenses');
+			goto('/debt');
 		}
 		deleteButtonText = $t('delete');
 		deleteInProgress = false;
@@ -166,19 +142,21 @@
 
 		alertState.subscribe((value) => {
 			if (value.hidden) {
+				personIsInvalid = false;
 				amountIsInvalid = false;
 			}
 		});
 
 		localStorage = new LocalStorageUtil();
-		upcomingExpensesService = new UpcomingExpensesService();
-		categoriesService = new CategoriesService();
+		debtsService = new DebtsService();
 
-		language = localStorage.get('language');
+		mergeDebtPerPerson = localStorage.getBool('mergeDebtPerPerson');
 
 		isNew = id === 0;
 
 		if (isNew) {
+			personInput.focus();
+
 			currency = localStorage.get('currency');
 			if (currency === 'MKD') {
 				amountTo = 450000000;
@@ -189,30 +167,22 @@
 		} else {
 			saveButtonText = $t('save');
 
-			upcomingExpensesService.get(id).then((upcomingExpense: UpcomingExpense) => {
-				if (upcomingExpense === null) {
+			debtsService.get(id).then((debt: DebtModel) => {
+				if (debt === null) {
 					// TODO
 					goto('notFound');
 				}
 
-				categoryId = upcomingExpense.categoryId;
-				amount = upcomingExpense.amount;
-				currency = upcomingExpense.currency;
-				if (currency === 'MKD') {
-					amountTo = 450000000;
-				}
-				description = upcomingExpense.description;
-				month = parseInt(upcomingExpense.date.slice(5, 7), 10) - 1;
-				year = parseInt(upcomingExpense.date.slice(0, 4), 10);
-				generated = upcomingExpense.generated;
-				createdDate = upcomingExpense.createdDate;
-				synced = upcomingExpense.synced;
+				id = debt.id;
+				person = debt.person;
+				amount = debt.amount;
+				currency = debt.currency;
+				description = debt.description;
+				userIsDebtor = debt.userIsDebtor;
+				createdDate = debt.createdDate;
+				synced = debt.synced;
 			});
 		}
-
-		categoriesService.getAllAsOptions($t('uncategorized'), CategoryType.ExpenseOnly).then((options) => {
-			categoryOptions = options;
-		});
 	});
 </script>
 
@@ -222,9 +192,9 @@
 			<i class="fas fa-pencil-alt" />
 		</div>
 		<div class="page-title">
-			<span>{$t(isNew ? 'editUpcomingExpense.newUpcomingExpense' : 'editUpcomingExpense.editUpcomingExpense')}</span>
+			<span>{$t(isNew ? 'editDebt.newDebt' : 'editDebt.editDebt')}</span>
 		</div>
-		<a href="/upcomingExpenses" class="back-button">
+		<a href="/debt" class="back-button">
 			<i class="fas fa-times" />
 		</a>
 	</div>
@@ -234,45 +204,43 @@
 			<AlertBlock type="warning" message={$t('whileOfflineCannotModify')} />
 		{/if}
 
-		{#if generated}
-			<div class="message info">
-				<i class="fas fa-info-circle" />
-				<span>{$t('editUpcomingExpense.generatedAlert')}</span>
-			</div>
-		{/if}
-
 		<form on:submit={save}>
+			<div class="form-control">
+				<input
+					type="text"
+					bind:this={personInput}
+					bind:value={person}
+					maxlength="20"
+					class:invalid={personIsInvalid}
+					placeholder={$t('editDebt.person')}
+					aria-label={$t('editDebt.person')}
+					required
+				/>
+			</div>
+
 			<div class="form-control inline">
 				<label for="amount">{$t('amount')}</label>
 				<AmountInput bind:amount bind:currency invalid={amountIsInvalid} />
 			</div>
 
-			<div class="form-control inline">
-				<label for="category">{$t('category')}</label>
-				<div class="loadable-select" class:loaded={categoryOptions}>
-					<select id="category" bind:value={categoryId} disabled={!categoryOptions} class="category-select">
-						{#if categoryOptions}
-							{#each categoryOptions as category}
-								<option value={category.id}>{category.name}</option>
-							{/each}
-						{/if}
-					</select>
-					<i class="fas fa-circle-notch fa-spin" />
-				</div>
-			</div>
+			<div class="form-control with-descriptor">
+				<div class="setting-descriptor">{$t('editDebt.iAmThe')}</div>
 
-			<div class="form-control inline">
-				<label for="month-selector">{$t('editUpcomingExpense.month')}</label>
-				<MonthSelector bind:month bind:year disabled={generated} {language} />
+				<DoubleRadio
+					name="debtorLenderToggle"
+					leftLabelKey="editDebt.lender"
+					rightLabelKey="editDebt.debtor"
+					bind:value={userIsDebtor}
+				/>
 			</div>
 
 			<div class="form-control">
 				<textarea
 					bind:value={description}
-					maxlength="250"
+					maxlength="2000"
 					class="description-textarea"
-					placeholder={$t('editUpcomingExpense.description')}
-					aria-label={$t('editUpcomingExpense.description')}
+					placeholder={$t('description')}
+					aria-label={$t('description')}
 				/>
 			</div>
 
@@ -296,7 +264,7 @@
 				{#if !isNew}
 					<button
 						type="button"
-						on:click={deleteUpcomingExpense}
+						on:click={deleteDebt}
 						class="button danger-button"
 						disabled={deleteButtonIsLoading}
 						class:confirm={deleteInProgress}

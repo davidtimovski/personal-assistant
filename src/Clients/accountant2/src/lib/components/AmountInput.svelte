@@ -139,7 +139,6 @@
 			font-size: inherit;
 			line-height: 27px;
 			color: inherit;
-			cursor: pointer;
 			transition: background var(--transition-quick), box-shadow var(--transition-quick), color var(--transition-quick);
 		}
 

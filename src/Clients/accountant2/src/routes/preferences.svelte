@@ -34,53 +34,45 @@
 	});
 </script>
 
-<section>
-	<div class="container">
-		<div class="au-animate">
-			<div class="page-title-wrap">
-				<div class="side inactive small">
-					<i class="fas fa-sliders-h" />
-				</div>
-				<div class="page-title">{$t('preferences.preferences')}</div>
-				<a href="/" class="back-button">
-					<i class="fas fa-times" />
-				</a>
-			</div>
-
-			<div class="content-wrap">
-				<form>
-					<div class="form-control">
-						<CurrencySelector />
-					</div>
-
-					<div class="form-control">
-						<Checkbox
-							labelKey="preferences.mergeDebtPerPerson"
-							value={mergeDebtPerPerson}
-							on:change={mergeDebtPerPersonChanged}
-						/>
-					</div>
-
-					<div class="form-control-group">
-						<div class="setting-descriptor">{$t('preferences.showOnDashboard')}</div>
-						<div class="form-control">
-							<Checkbox
-								labelKey="preferences.upcomingExpenses"
-								value={showUpcomingExpensesOnDashboard}
-								on:change={showUpcomingExpensesOnDashboardChanged}
-							/>
-						</div>
-						<div class="form-control">
-							<Checkbox
-								labelKey="preferences.debt"
-								value={showDebtOnDashboard}
-								on:change={showDebtOnDashboardChanged}
-							/>
-						</div>
-					</div>
-				</form>
-			</div>
+<section class="container">
+	<div class="page-title-wrap">
+		<div class="side inactive small">
+			<i class="fas fa-sliders-h" />
 		</div>
+		<div class="page-title">{$t('preferences.preferences')}</div>
+		<a href="/" class="back-button">
+			<i class="fas fa-times" />
+		</a>
+	</div>
+
+	<div class="content-wrap">
+		<form>
+			<div class="form-control">
+				<CurrencySelector />
+			</div>
+
+			<div class="form-control">
+				<Checkbox
+					labelKey="preferences.mergeDebtPerPerson"
+					value={mergeDebtPerPerson}
+					on:change={mergeDebtPerPersonChanged}
+				/>
+			</div>
+
+			<div class="form-control-group">
+				<div class="setting-descriptor">{$t('preferences.showOnDashboard')}</div>
+				<div class="form-control">
+					<Checkbox
+						labelKey="preferences.upcomingExpenses"
+						value={showUpcomingExpensesOnDashboard}
+						on:change={showUpcomingExpensesOnDashboardChanged}
+					/>
+				</div>
+				<div class="form-control">
+					<Checkbox labelKey="preferences.debt" value={showDebtOnDashboard} on:change={showDebtOnDashboardChanged} />
+				</div>
+			</div>
+		</form>
 	</div>
 </section>
 

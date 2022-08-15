@@ -39,6 +39,7 @@
 	let decryptButtonIsLoading = false;
 	let decryptionPasswordIsInvalid: boolean;
 	let typeStringMap = new Map<TransactionType, string>();
+	let passwordInput: HTMLInputElement | null = null;
 	let passwordShowIconLabel: string;
 
 	let localStorage: LocalStorageUtil;
@@ -60,7 +61,10 @@
 	}
 
 	function togglePasswordShow() {
-		const passwordInput = <HTMLInputElement>document.getElementById('password-input');
+		if (!passwordInput) {
+			return;
+		}
+
 		if (passwordShown) {
 			passwordInput.type = 'password';
 			passwordShowIconLabel = $t('showPassword');
@@ -194,134 +198,130 @@
 	});
 </script>
 
-<section>
-	<div class="container">
-		<div class="au-animate">
-			<div class="page-title-wrap">
-				<a href="/editTransaction/{id}" class="side small" title={$t('edit')} aria-label={$t('edit')}>
-					<i class="fas fa-pencil-alt" />
-				</a>
-				<div class="page-title">{model?.typeLabel}</div>
-				<a on:click={back} class="back-button" role="button">
-					<i class="fas fa-times" />
-				</a>
+<section class="container">
+	<div class="page-title-wrap">
+		<a href="/editTransaction/{id}" class="side small" title={$t('edit')} aria-label={$t('edit')}>
+			<i class="fas fa-pencil-alt" />
+		</a>
+		<div class="page-title">{model?.typeLabel}</div>
+		<button type="button" on:click={back} class="back-button">
+			<i class="fas fa-times" />
+		</button>
+	</div>
+
+	<div class="content-wrap">
+		{#if !model}
+			<div class="double-circle-loading">
+				<div class="double-bounce1" />
+				<div class="double-bounce2" />
 			</div>
+		{:else}
+			<div class="viewing">
+				{#if model.generated}
+					<AlertBlock type="info" message={$t('transaction.generatedAlert')} />
+				{/if}
 
-			<div class="content-wrap">
-				{#if !model}
-					<div class="double-circle-loading">
-						<div class="double-bounce1" />
-						<div class="double-bounce2" />
+				<div class="form-control inline">
+					<span>{$t('amount')}</span>
+					<span
+						class:expense-color={model.type === 1}
+						class:deposit-color={model.type === 2}
+						class:transfer-color={model.type === 3}>{Formatter.money(model.amount, currency)}</span
+					>
+				</div>
+
+				{#if model.currency !== currency}
+					<div class="form-control inline">
+						<span><span>{$t('transaction.originalAmountIn')}</span>{model.currency}</span>
+						<span>{Formatter.money(model.originalAmount, currency)}</span>
 					</div>
-				{:else}
-					<div class="viewing">
-						{#if model.generated}
-							<AlertBlock type="info" message={$t('transaction.generatedAlert')} />
-						{/if}
+				{/if}
 
-						<div class="form-control inline">
-							<span>{$t('amount')}</span>
-							<span
-								class:expense-color={model.type === 1}
-								class:deposit-color={model.type === 2}
-								class:transfer-color={model.type === 3}>{Formatter.money(model.amount, currency)}</span
-							>
+				<div class="form-control inline">
+					<span>{model.accountLabel}</span>
+					<span>{model.accountValue}</span>
+				</div>
+
+				{#if model.fromStocks}
+					<div class="form-control inline">
+						<span>{$t('soldStocks')}</span>
+						<span class="expense-color">{Formatter.moneyPrecise(model.fromStocks, currency)}</span>
+					</div>
+				{/if}
+
+				{#if model.toStocks}
+					<div class="form-control inline">
+						<span>{$t('purchasedStocks')}</span>
+						<span class="deposit-color">{Formatter.moneyPrecise(model.toStocks, currency)}</span>
+					</div>
+				{/if}
+
+				<div class="form-control inline">
+					<span>{$t('category')}</span>
+					<span>{model.category}</span>
+				</div>
+
+				<div class="form-control inline">
+					<span>{$t('date')}</span>
+					<span>{model.date}</span>
+				</div>
+
+				{#if model.description}
+					<div class="form-control">
+						<div class="description-view">
+							<span>{$t('description')}</span>
+							<textarea bind:value={model.description} readonly />
 						</div>
+					</div>
+				{/if}
 
-						{#if model.currency !== currency}
-							<div class="form-control inline">
-								<span><span>{$t('transaction.originalAmountIn')}</span>{model.currency}</span>
-								<span>{Formatter.money(model.originalAmount, currency)}</span>
-							</div>
-						{/if}
+				{#if model.isEncrypted}
+					<div class="form-control">
+						<div class="description-view encrypted">
+							<span>{$t('description')}</span>
 
-						<div class="form-control inline">
-							<span>{model.accountLabel}</span>
-							<span>{model.accountValue}</span>
-						</div>
-
-						{#if model.fromStocks}
-							<div class="form-control inline">
-								<span>{$t('soldStocks')}</span>
-								<span class="expense-color">{Formatter.moneyPrecise(model.fromStocks, currency)}</span>
-							</div>
-						{/if}
-
-						{#if model.toStocks}
-							<div class="form-control inline">
-								<span>{$t('purchasedStocks')}</span>
-								<span class="deposit-color">{Formatter.moneyPrecise(model.toStocks, currency)}</span>
-							</div>
-						{/if}
-
-						<div class="form-control inline">
-							<span>{$t('category')}</span>
-							<span>{model.category}</span>
-						</div>
-
-						<div class="form-control inline">
-							<span>{$t('date')}</span>
-							<span>{model.date}</span>
-						</div>
-
-						{#if model.description}
-							<div class="form-control">
-								<div class="description-view">
-									<span>{$t('description')}</span>
-									<textarea bind:value={model.description} readonly />
+							<form on:submit={decrypt} class="decrypt-form">
+								<div class="viewable-password">
+									<input
+										type="password"
+										bind:this={passwordInput}
+										bind:value={model.decryptionPassword}
+										class="password-input"
+										maxlength="100"
+										class:invalid={decryptionPasswordIsInvalid}
+										placeholder={$t('password')}
+										aria-label={$t('password')}
+										required
+									/>
+									<button
+										type="button"
+										on:click={togglePasswordShow}
+										class="password-show-button"
+										class:shown={passwordShown}
+										title={passwordShowIconLabel}
+										aria-label={passwordShowIconLabel}
+									>
+										<i class="fas fa-eye" />
+										<i class="fas fa-eye-slash" />
+									</button>
 								</div>
-							</div>
-						{/if}
-
-						{#if model.isEncrypted}
-							<div class="form-control">
-								<div class="description-view encrypted">
-									<span>{$t('description')}</span>
-
-									<form on:submit={decrypt} class="decrypt-form">
-										<div class="viewable-password">
-											<input
-												type="password"
-												id="password-input"
-												bind:value={model.decryptionPassword}
-												class="password-input"
-												maxlength="100"
-												class:invalid={decryptionPasswordIsInvalid}
-												placeholder={$t('password')}
-												aria-label={$t('password')}
-												required
-											/>
-											<a
-												on:click={togglePasswordShow}
-												class="password-show-button"
-												class:shown={passwordShown}
-												role="button"
-												title={passwordShowIconLabel}
-												aria-label={passwordShowIconLabel}
-											>
-												<i class="fas fa-eye" />
-												<i class="fas fa-eye-slash" />
-											</a>
-										</div>
-										<a
-											on:click={decrypt}
-											class="decrypt-button"
-											class:loading={decryptButtonIsLoading}
-											role="button"
-											title={$t('decryptDescription')}
-											aria-label={$t('decryptDescription')}
-										>
-											<i class="fas fa-unlock" />
-											<i class="fas fa-circle-notch fa-spin" />
-										</a>
-									</form>
-								</div>
-							</div>
-						{/if}
+								<button
+									type="button"
+									on:click={decrypt}
+									class="decrypt-button"
+									class:loading={decryptButtonIsLoading}
+									title={$t('decryptDescription')}
+									aria-label={$t('decryptDescription')}
+								>
+									<i class="fas fa-unlock" />
+									<i class="fas fa-circle-notch fa-spin" />
+								</button>
+							</form>
+						</div>
 					</div>
 				{/if}
 			</div>
-		</div>
+		{/if}
 	</div>
 </section>
 

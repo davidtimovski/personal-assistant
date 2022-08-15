@@ -268,9 +268,14 @@ textarea.invalid {
   align-items: center;
   min-width: 55px;
   height: 60px;
+  background: transparent;
+  border: none;
+  outline: none;
   font-size: 24px;
-  text-decoration: none;
   color: var(--primary-color);
+}
+.page-title-wrap a.back-button {
+  text-decoration: none;
 }
 .page-title-wrap .back-button:hover {
   color: var(--primary-color-dark);
@@ -300,8 +305,10 @@ textarea.invalid {
   justify-content: center;
   align-items: center;
   height: 50px;
+  background: transparent;
+  border: none;
+  outline: none;
   font-size: 24px;
-  text-decoration: none;
   color: var(--primary-color);
 }
 .page-title-wrap-loader .title-wrap .sync-button:hover {
@@ -491,11 +498,11 @@ a.wide-button {
   outline: none;
   border-radius: 50%;
   box-shadow: var(--box-shadow);
-  text-decoration: none;
   font-size: 19px;
   color: #fff;
-  cursor: pointer;
-  user-select: none;
+}
+.new-button:disabled {
+  color: var(--faded-color);
 }
 .new-button i {
   animation: spin 1s ease-in-out;
@@ -541,7 +548,6 @@ form {
   text-align: center;
   line-height: 45px;
   color: #fff;
-  cursor: pointer;
 }
 a.button {
   text-decoration: none;

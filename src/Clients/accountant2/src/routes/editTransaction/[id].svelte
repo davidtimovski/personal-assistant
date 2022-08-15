@@ -65,6 +65,8 @@
 	let deleteButtonText: string;
 	let saveButtonIsLoading = false;
 	let deleteButtonIsLoading = false;
+	let encryptPasswordInput: HTMLInputElement | null = null;
+	let decryptPasswordInput: HTMLInputElement | null = null;
 	let passwordShowIconLabel: string;
 
 	let transactionsService: TransactionsService;
@@ -90,12 +92,15 @@
 	};
 
 	function toggleDecPasswordShow() {
-		const passwordInput = <HTMLInputElement>document.getElementById('decrypt-password-input');
+		if (!decryptPasswordInput) {
+			return;
+		}
+
 		if (decPasswordShown) {
-			passwordInput.type = 'password';
+			decryptPasswordInput.type = 'password';
 			passwordShowIconLabel = $t('showPassword');
 		} else {
-			passwordInput.type = 'text';
+			decryptPasswordInput.type = 'text';
 			passwordShowIconLabel = $t('hidePassword');
 		}
 
@@ -103,12 +108,15 @@
 	}
 
 	function toggleEncPasswordShow() {
-		const passwordInput = <HTMLInputElement>document.getElementById('encrypt-password-input');
+		if (!encryptPasswordInput) {
+			return;
+		}
+
 		if (encPasswordShown) {
-			passwordInput.type = 'password';
+			encryptPasswordInput.type = 'password';
 			passwordShowIconLabel = $t('showPassword');
 		} else {
-			passwordInput.type = 'text';
+			encryptPasswordInput.type = 'text';
 			passwordShowIconLabel = $t('hidePassword');
 		}
 
@@ -179,10 +187,6 @@
 	};
 
 	async function save() {
-		if (!canSave() || saveButtonIsLoading) {
-			return;
-		}
-
 		saveButtonIsLoading = true;
 		alertState.update((x) => {
 			x.hide();
@@ -253,10 +257,6 @@
 	}
 
 	async function deleteTransaction() {
-		if (deleteButtonIsLoading) {
-			return;
-		}
-
 		if (deleteInProgress) {
 			deleteButtonIsLoading = true;
 
@@ -338,224 +338,216 @@
 	});
 </script>
 
-<section>
-	<div class="container">
-		<div class="au-animate animate-fade-in animate-fade-out">
-			<div class="page-title-wrap">
-				<div class="side inactive small">
-					<i class="fas fa-pencil-alt" />
+<section class="container">
+	<div class="page-title-wrap">
+		<div class="side inactive small">
+			<i class="fas fa-pencil-alt" />
+		</div>
+		<div class="page-title">
+			{#if type === 1}
+				<span>{$t('editTransaction.editExpense')}</span>
+			{/if}
+			{#if type === 2}
+				<span>{$t('editTransaction.editDeposit')}</span>
+			{/if}
+			{#if type !== 1 && type !== 2}
+				<span>{$t('editTransaction.editTransaction')}</span>
+			{/if}
+		</div>
+		<a href="/transaction/{id}" class="back-button">
+			<i class="fas fa-times" />
+		</a>
+	</div>
+
+	<div class="content-wrap">
+		<div>
+			{#if !$isOnline && synced}
+				<AlertBlock type="warning" message={$t('whileOfflineCannotModify')} />
+			{/if}
+
+			<form on:submit={save} autocomplete="off">
+				<div class="form-control inline">
+					<label for="amount">{$t('amount')}</label>
+					<AmountInput bind:amount bind:currency invalid={amountIsInvalid} />
 				</div>
-				<div class="page-title">
-					{#if type === 1}
-						<span>{$t('editTransaction.editExpense')}</span>
-					{/if}
-					{#if type === 2}
-						<span>{$t('editTransaction.editDeposit')}</span>
-					{/if}
-					{#if type !== 1 && type !== 2}
-						<span>{$t('editTransaction.editTransaction')}</span>
-					{/if}
-				</div>
-				<a href="/transaction/{id}" class="back-button">
-					<i class="fas fa-times" />
-				</a>
-			</div>
 
-			<div class="content-wrap">
-				<div>
-					{#if !$isOnline && synced}
-						<AlertBlock type="warning" message={$t('whileOfflineCannotModify')} />
-					{/if}
+				{#if fromStocks !== null}
+					<div class="form-control inline">
+						<label for="sold-stocks">{$t('soldStocks')}</label>
+						<input
+							type="number"
+							id="sold-stocks"
+							bind:value={fromStocks}
+							min="0.0001"
+							max="100000"
+							step="0.0001"
+							class="stocks-input"
+							required
+						/>
+					</div>
+				{/if}
 
-					<form on:submit={save} autocomplete="off">
-						<div class="form-control inline">
-							<label for="amount">{$t('amount')}</label>
-							<AmountInput bind:amount bind:currency invalid={amountIsInvalid} />
-						</div>
+				{#if toStocks !== null}
+					<div class="form-control inline">
+						<label for="purchased-stocks">{$t('purchasedStocks')}</label>
+						<input
+							type="number"
+							id="purchased-stocks"
+							bind:value={toStocks}
+							min="0.0001"
+							max="100000"
+							step="0.0001"
+							class="stocks-input"
+							required
+						/>
+					</div>
+				{/if}
 
-						{#if fromStocks !== null}
-							<div class="form-control inline">
-								<label for="sold-stocks">{$t('soldStocks')}</label>
-								<input
-									type="number"
-									id="sold-stocks"
-									bind:value={fromStocks}
-									min="0.0001"
-									max="100000"
-									step="0.0001"
-									class="stocks-input"
-									required
-								/>
-							</div>
-						{/if}
-
-						{#if toStocks !== null}
-							<div class="form-control inline">
-								<label for="purchased-stocks">{$t('purchasedStocks')}</label>
-								<input
-									type="number"
-									id="purchased-stocks"
-									bind:value={toStocks}
-									min="0.0001"
-									max="100000"
-									step="0.0001"
-									class="stocks-input"
-									required
-								/>
-							</div>
-						{/if}
-
-						<div class="form-control inline">
-							<label for="category">{$t('category')}</label>
-							<div class="loadable-select" class:loaded={categoryOptions}>
-								<select id="category" bind:value={categoryId} disabled={!categoryOptions} class="category-select">
-									{#if categoryOptions}
-										{#each categoryOptions as category}
-											<option value={category.id}>{category.name}</option>
-										{/each}
-									{/if}
-								</select>
-								<i class="fas fa-circle-notch fa-spin" />
-							</div>
-						</div>
-
-						<div class="form-control inline">
-							<label for="date">{$t('date')}</label>
-							<input type="date" id="date" bind:value={date} max={maxDate} class:invalid={dateIsInvalid} required />
-						</div>
-
-						{#if isEncrypted}
-							<div class="inline-decrypt-form">
-								<div class="viewable-password">
-									<input
-										type="password"
-										bind:value={decryptionPassword}
-										id="decrypt-password-input"
-										maxlength="100"
-										class:invalid={decryptionPasswordIsInvalid}
-										placeholder={$t('password')}
-										aria-label={$t('password')}
-									/>
-									<a
-										on:click={toggleDecPasswordShow}
-										class="password-show-button"
-										class:shown={decPasswordShown}
-										role="button"
-									>
-										<i class="fas fa-eye" />
-										<i class="fas fa-eye-slash" />
-									</a>
-								</div>
-								<a
-									on:click={decrypt}
-									class="decrypt-button"
-									class:loading={decryptButtonIsLoading}
-									role="button"
-									title={$t('decryptDescription')}
-									aria-label={$t('decryptDescription')}
-								>
-									<i class="fas fa-unlock" />
-									<i class="fas fa-circle-notch fa-spin" />
-								</a>
-								<a
-									on:click={erase}
-									class="erase-button"
-									role="button"
-									title={$t('editTransaction.resetDescription')}
-									aria-label={$t('editTransaction.resetDescription')}
-								>
-									<i class="fas fa-eraser" />
-								</a>
-							</div>
-						{:else}
-							<div class="form-control">
-								<div class="encryption-box" class:active={encrypt}>
-									<textarea
-										bind:value={description}
-										maxlength="500"
-										class="description-textarea"
-										placeholder={$t('description')}
-										aria-label={$t('description')}
-									/>
-
-									<Checkbox
-										labelKey="editTransaction.encryptDescription"
-										bind:value={encrypt}
-										disabled={!canEncrypt()}
-									/>
-
-									{#if encrypt}
-										<div>
-											<!-- TODO -->
-											<!-- <tooltip key="encryptedDescription" /> -->
-											<div class="viewable-password">
-												<input
-													type="password"
-													bind:value={encryptionPassword}
-													id="encrypt-password-input"
-													disabled={!encrypt}
-													maxlength="100"
-													class:invalid={encryptionPasswordIsInvalid}
-													placeholder={$t('password')}
-													aria-label={$t('password')}
-												/>
-												<a
-													on:click={toggleEncPasswordShow}
-													class="password-show-button"
-													class:shown={encPasswordShown}
-													role="button"
-													title={passwordShowIconLabel}
-													aria-label={passwordShowIconLabel}
-												>
-													<i class="fas fa-eye" />
-													<i class="fas fa-eye-slash" />
-												</a>
-											</div>
-										</div>
-									{/if}
-								</div>
-							</div>
-						{/if}
-
-						<hr />
-
-						<div class="save-delete-wrap">
-							{#if !deleteInProgress}
-								<a
-									on:click={save}
-									class="button primary-button"
-									class:disabled={!canSave() || saveButtonIsLoading}
-									role="button"
-								>
-									<span class="button-loader" class:loading={saveButtonIsLoading}>
-										<i class="fas fa-circle-notch fa-spin" />
-									</span>
-									<span>{$t('save')}</span>
-								</a>
+				<div class="form-control inline">
+					<label for="category">{$t('category')}</label>
+					<div class="loadable-select" class:loaded={categoryOptions}>
+						<select id="category" bind:value={categoryId} disabled={!categoryOptions} class="category-select">
+							{#if categoryOptions}
+								{#each categoryOptions as category}
+									<option value={category.id}>{category.name}</option>
+								{/each}
 							{/if}
+						</select>
+						<i class="fas fa-circle-notch fa-spin" />
+					</div>
+				</div>
 
-							<a
-								on:click={deleteTransaction}
-								class="button danger-button"
-								class:disabled={deleteButtonIsLoading}
-								class:confirm={deleteInProgress}
-								role="button"
+				<div class="form-control inline">
+					<label for="date">{$t('date')}</label>
+					<input type="date" id="date" bind:value={date} max={maxDate} class:invalid={dateIsInvalid} required />
+				</div>
+
+				{#if isEncrypted}
+					<div class="inline-decrypt-form">
+						<div class="viewable-password">
+							<input
+								type="password"
+								bind:this={decryptPasswordInput}
+								bind:value={decryptionPassword}
+								maxlength="100"
+								class:invalid={decryptionPasswordIsInvalid}
+								placeholder={$t('password')}
+								aria-label={$t('password')}
+							/>
+							<button
+								type="button"
+								on:click={toggleDecPasswordShow}
+								class="password-show-button"
+								class:shown={decPasswordShown}
 							>
-								<span class="button-loader" class:loading={deleteButtonIsLoading}>
-									<i class="fas fa-circle-notch fa-spin" />
-								</span>
-								<span>{deleteButtonText}</span>
-							</a>
+								<i class="fas fa-eye" />
+								<i class="fas fa-eye-slash" />
+							</button>
+						</div>
+						<button
+							type="button"
+							on:click={decrypt}
+							class="decrypt-button"
+							class:loading={decryptButtonIsLoading}
+							title={$t('decryptDescription')}
+							aria-label={$t('decryptDescription')}
+						>
+							<i class="fas fa-unlock" />
+							<i class="fas fa-circle-notch fa-spin" />
+						</button>
+						<button
+							type="button"
+							on:click={erase}
+							class="erase-button"
+							title={$t('editTransaction.resetDescription')}
+							aria-label={$t('editTransaction.resetDescription')}
+						>
+							<i class="fas fa-eraser" />
+						</button>
+					</div>
+				{:else}
+					<div class="form-control">
+						<div class="encryption-box" class:active={encrypt}>
+							<textarea
+								bind:value={description}
+								maxlength="500"
+								class="description-textarea"
+								placeholder={$t('description')}
+								aria-label={$t('description')}
+							/>
 
-							{#if deleteInProgress}
-								<button type="button" on:click={cancel} class="button secondary-button">
-									{$t('cancel')}
-								</button>
+							<Checkbox labelKey="editTransaction.encryptDescription" bind:value={encrypt} disabled={!canEncrypt()} />
+
+							{#if encrypt}
+								<div>
+									<!-- TODO -->
+									<!-- <tooltip key="encryptedDescription" /> -->
+									<div class="viewable-password">
+										<input
+											type="password"
+											bind:this={encryptPasswordInput}
+											bind:value={encryptionPassword}
+											disabled={!encrypt}
+											maxlength="100"
+											class:invalid={encryptionPasswordIsInvalid}
+											placeholder={$t('password')}
+											aria-label={$t('password')}
+										/>
+										<button
+											type="button"
+											on:click={toggleEncPasswordShow}
+											class="password-show-button"
+											class:shown={encPasswordShown}
+											title={passwordShowIconLabel}
+											aria-label={passwordShowIconLabel}
+										>
+											<i class="fas fa-eye" />
+											<i class="fas fa-eye-slash" />
+										</button>
+									</div>
+								</div>
 							{/if}
 						</div>
-					</form>
+					</div>
+				{/if}
+
+				<hr />
+
+				<div class="save-delete-wrap">
+					{#if !deleteInProgress}
+						<button
+							type="button"
+							on:click={save}
+							class="button primary-button"
+							disabled={!canSave() || saveButtonIsLoading}
+						>
+							<span class="button-loader" class:loading={saveButtonIsLoading}>
+								<i class="fas fa-circle-notch fa-spin" />
+							</span>
+							<span>{$t('save')}</span>
+						</button>
+					{/if}
+
+					<button
+						type="button"
+						on:click={deleteTransaction}
+						class="button danger-button"
+						disabled={deleteButtonIsLoading}
+						class:confirm={deleteInProgress}
+					>
+						<span class="button-loader" class:loading={deleteButtonIsLoading}>
+							<i class="fas fa-circle-notch fa-spin" />
+						</span>
+						<span>{deleteButtonText}</span>
+					</button>
+
+					{#if deleteInProgress}
+						<button type="button" on:click={cancel} class="button secondary-button">
+							{$t('cancel')}
+						</button>
+					{/if}
 				</div>
-			</div>
+			</form>
 		</div>
 	</div>
 </section>
@@ -564,5 +556,23 @@
 	input[type='number'].stocks-input {
 		width: 100px;
 		text-align: center;
+	}
+
+	.erase-button {
+		background: var(--warning-color-dark);
+		border: none;
+		border-radius: var(--border-radius);
+		outline: none;
+		padding: 0 10px;
+		margin-left: 10px;
+		font-size: 1.3rem;
+		line-height: 37px;
+		color: #fff;
+	}
+
+	@media screen and (min-width: 1200px) {
+		.erase-button {
+			line-height: 45px;
+		}
 	}
 </style>

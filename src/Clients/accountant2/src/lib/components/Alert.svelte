@@ -8,7 +8,7 @@
 
 	let type: string | null;
 	let message: string | null;
-	let refreshLink: HTMLAnchorElement | null;
+	let refreshButtonVisible = false;
 	let shown = false;
 	let hideTimeout = 0;
 	let resetMessageTimeout = 0;
@@ -53,7 +53,7 @@
 	function reset() {
 		type = null;
 		message = null;
-		(<HTMLAnchorElement>refreshLink).style.display = 'none';
+		refreshButtonVisible = false;
 	}
 
 	function refresh() {
@@ -61,8 +61,6 @@
 	}
 
 	onMount(() => {
-		refreshLink = <HTMLAnchorElement>document.getElementById('refresh-link');
-
 		alertState.subscribe((value) => {
 			if (value.status === AlertStatus.Error) {
 				let message = '';
@@ -72,9 +70,7 @@
 				} else if (value.messageKey) {
 					const translationKey = value.messageKey;
 
-					if (refreshLink) {
-						refreshLink.style.display = translationKey === 'unexpectedError' ? 'block' : 'none';
-					}
+					refreshButtonVisible = translationKey === 'unexpectedError';
 
 					message = $t(translationKey);
 				}
@@ -92,7 +88,10 @@
 <div on:click={hide} class="alert {type}" class:shown>
 	<span class="alert-body">
 		<span class="alert-message" contenteditable="true" bind:innerHTML={message} />
-		<a id="refresh-link" on:click={refresh} class="refresh-link">{$t('refresh')}</a>
+
+		{#if refreshButtonVisible}
+			<button type="button" on:click={refresh} class="refresh-button">{$t('refresh')}</button>
+		{/if}
 	</span>
 </div>
 
@@ -118,8 +117,10 @@
 			text-align: center;
 			user-select: none;
 
-			.refresh-link {
-				display: none;
+			.refresh-button {
+				background: transparent;
+				border: none;
+				outline: none;
 				margin-top: 10px;
 				text-decoration: underline;
 			}

@@ -14,10 +14,6 @@
 	$: canSync = $isOnline && !syncButtonIsLoading;
 
 	async function sync() {
-		if (!canSync) {
-			return;
-		}
-
 		syncButtonIsLoading = true;
 
 		try {
@@ -36,36 +32,32 @@
 	});
 </script>
 
-<section>
-	<div class="container">
-		<div class="au-animate">
-			<div class="page-title-wrap">
-				<div class="side inactive medium">
-					<i class="fas fa-cloud-download-alt" />
-				</div>
-				<div class="page-title">{$t('totalSync.totalSync')}</div>
-				<a on:click={back} class="back-button" role="button">
-					<i class="fas fa-times" />
-				</a>
-			</div>
+<section class="container">
+	<div class="page-title-wrap">
+		<div class="side inactive medium">
+			<i class="fas fa-cloud-download-alt" />
+		</div>
+		<div class="page-title">{$t('totalSync.totalSync')}</div>
+		<button type="button" on:click={back} class="back-button">
+			<i class="fas fa-times" />
+		</button>
+	</div>
 
-			<div class="content-wrap">
-				{#if !$isOnline}
-					<AlertBlock type="warning" message={$t('totalSync.offlineText')} />
-				{/if}
+	<div class="content-wrap">
+		{#if !$isOnline}
+			<AlertBlock type="warning" message={$t('totalSync.offlineText')} />
+		{/if}
 
-				<AlertBlock type="warning" message={$t('totalSync.syncText')} />
+		<AlertBlock type="warning" message={$t('totalSync.syncText')} />
 
-				<div class="save-delete-wrap">
-					<a on:click={sync} class="button primary-button" class:disabled={!canSync} role="button">
-						<span class="button-loader" class:loading={syncButtonIsLoading}>
-							<i class="fas fa-circle-notch fa-spin" />
-						</span>
-						<span>{$t('totalSync.sync')}</span>
-					</a>
-					<a href="/menu" class="button secondary-button">{$t('cancel')}</a>
-				</div>
-			</div>
+		<div class="save-delete-wrap">
+			<button type="button" on:click={sync} class="button primary-button" disabled={!canSync}>
+				<span class="button-loader" class:loading={syncButtonIsLoading}>
+					<i class="fas fa-circle-notch fa-spin" />
+				</span>
+				<span>{$t('totalSync.sync')}</span>
+			</button>
+			<a href="/menu" class="button secondary-button">{$t('cancel')}</a>
 		</div>
 	</div>
 </section>

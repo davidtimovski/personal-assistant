@@ -10,7 +10,7 @@ export class DebtModel implements Syncable {
 		public currency: string,
 		public description: string | null,
 		public userIsDebtor: boolean,
-		public createdDate: Date,
-		public modifiedDate: Date
+		public createdDate: Date | null,
+		public modifiedDate: Date | null
 	) {}
 }
