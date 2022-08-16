@@ -31,6 +31,8 @@
 
 	export let id: number;
 
+	const isNew = id === 0;
+
 	let categoryId: number | null = null;
 	let amount: number | null = null;
 	let currency: string;
@@ -41,7 +43,6 @@
 	let month: number | null = null;
 	let year: number | null = null;
 	let categoryOptions: SelectOption[] | null = null;
-	let isNew: boolean;
 	let amountIsInvalid: boolean;
 	let saveButtonText: string;
 	let deleteInProgress = false;
@@ -83,6 +84,8 @@
 
 		const result = validate();
 		if (result.valid) {
+			amountIsInvalid = false;
+
 			if (isNew) {
 				try {
 					const upcomingExpense = new UpcomingExpense(
@@ -96,10 +99,9 @@
 						null,
 						null
 					);
-					const id = await upcomingExpensesService.create(upcomingExpense);
-					amountIsInvalid = false;
+					const newId = await upcomingExpensesService.create(upcomingExpense);
 
-					goto('/upcomingExpenses?edited=' + id);
+					goto('/upcomingExpenses?edited=' + newId);
 				} catch {
 					saveButtonIsLoading = false;
 				}
@@ -116,9 +118,7 @@
 						createdDate,
 						null
 					);
-
 					await upcomingExpensesService.update(upcomingExpense);
-					amountIsInvalid = false;
 
 					goto('/upcomingExpenses?edited=' + id);
 				} catch {
@@ -175,8 +175,6 @@
 		categoriesService = new CategoriesService();
 
 		language = localStorage.get('language');
-
-		isNew = id === 0;
 
 		if (isNew) {
 			currency = localStorage.get('currency');

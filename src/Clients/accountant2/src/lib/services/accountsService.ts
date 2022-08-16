@@ -182,7 +182,7 @@ export class AccountsService {
 			account.createdDate = account.modifiedDate = now;
 
 			if (navigator.onLine) {
-				account.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/accounts`, {
+				account.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/api/accounts`, {
 					method: 'post',
 					body: window.JSON.stringify(account)
 				});
@@ -222,7 +222,7 @@ export class AccountsService {
 	async delete(id: number): Promise<void> {
 		try {
 			if (navigator.onLine) {
-				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/accounts/${id}`, {
+				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/accounts/${id}`, {
 					method: 'delete'
 				});
 			} else if (await this.idbHelper.isSynced(id)) {

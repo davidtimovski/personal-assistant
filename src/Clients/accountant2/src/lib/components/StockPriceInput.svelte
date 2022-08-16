@@ -8,19 +8,13 @@
 
 	import { t } from '$lib/localization/i18n';
 
-	export let amount: number | null;
-	export let currency: string | null;
+	export let stockPrice: number | null;
+	export let currency: string;
 	export let invalid = false;
-	export let inputId: string = 'amount';
-	export let focusOnInit = false;
 
 	let changing = false;
 	let autocompleteResult: AutocompleteResult;
-	let amountInput: HTMLInputElement | null;
 	let selectCurrencyInput: HTMLInputElement | null;
-	let min = 0.01;
-	let max = 1500000;
-	let step = 'any';
 
 	let currenciesService: CurrenciesService;
 
@@ -39,12 +33,6 @@
 	}
 
 	onMount(() => {
-		if (currency === 'MKD') {
-			min = 1;
-			max = 100000000;
-			step = '1';
-		}
-
 		currenciesService = new CurrenciesService('Accountant');
 		const currencies = currenciesService.getCurrencies();
 
@@ -62,34 +50,14 @@
 			onSelect: (suggestion: CurrencySuggestion) => {
 				changing = false;
 				currency = suggestion.name;
-
-				if (!amount) {
-					window.setTimeout(() => {
-						amountInput?.focus();
-					}, 0);
-				}
 			},
 			className: 'currency-autocomplete-customizations'
 		});
-
-		if (focusOnInit) {
-			(<HTMLInputElement>amountInput).focus();
-		}
 	});
 </script>
 
 <div class="amount-input-wrap" class:changing>
-	<input
-		type="number"
-		id={inputId}
-		bind:this={amountInput}
-		bind:value={amount}
-		{min}
-		{max}
-		{step}
-		class:invalid
-		required
-	/>
+	<input type="number" id="stock-price" bind:value={stockPrice} min="0.0001" max="100000" class:invalid required />
 
 	<input
 		type="text"
@@ -145,6 +113,7 @@
 			font-size: inherit;
 			line-height: 27px;
 			color: inherit;
+			cursor: pointer;
 			transition: background var(--transition-quick), box-shadow var(--transition-quick), color var(--transition-quick);
 		}
 

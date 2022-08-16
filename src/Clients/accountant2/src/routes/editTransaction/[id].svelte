@@ -195,6 +195,9 @@
 
 		const result = validate();
 		if (result.valid) {
+			amountIsInvalid = false;
+			dateIsInvalid = false;
+
 			try {
 				const transaction = new TransactionModel(
 					id,
@@ -217,8 +220,6 @@
 				);
 
 				await transactionsService.update(transaction, <string>encryptionPassword);
-				amountIsInvalid = false;
-				dateIsInvalid = false;
 
 				goto('/transactions?edited=' + id);
 			} catch {

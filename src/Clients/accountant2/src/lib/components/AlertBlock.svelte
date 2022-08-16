@@ -2,12 +2,21 @@
 	export let type: string;
 	export let message: string;
 
-	let iconClass = type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+	let iconClass: string;
+	switch (type) {
+		case 'info':
+			iconClass = 'fa-info-circle';
+			break;
+		case 'warning':
+		case 'danger':
+			iconClass = 'fa-exclamation-triangle';
+			break;
+	}
 </script>
 
 <div class="message {type}">
 	<i class="fas {iconClass}" />
-	<span>{message}</span>
+	<span contenteditable="true" bind:innerHTML={message} />
 </div>
 
 <style lang="scss">
@@ -17,6 +26,7 @@
 		margin-bottom: 20px;
 		font-size: 1rem;
 		line-height: 1.5rem;
+		text-align: center;
 
 		i {
 			margin-right: 5px;
@@ -37,6 +47,15 @@
 
 			i {
 				color: var(--warning-color-dark);
+			}
+		}
+
+		&.danger {
+			background: #ffe0d9;
+			color: var(--danger-color-dark);
+
+			i {
+				color: var(--danger-color-dark);
 			}
 		}
 	}

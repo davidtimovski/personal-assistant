@@ -27,6 +27,8 @@
 
 	export let id: number;
 
+	const isNew = id === 0;
+
 	let person: string;
 	let amount: number;
 	let currency: string;
@@ -34,7 +36,6 @@
 	let userIsDebtor: boolean;
 	let createdDate: Date | null;
 	let synced: boolean;
-	let isNew: boolean;
 	let personInput: HTMLInputElement;
 	let mergeDebtPerPerson: boolean | null = null;
 	let personIsInvalid: boolean;
@@ -77,24 +78,22 @@
 
 		const result = validate();
 		if (result.valid) {
+			personIsInvalid = false;
+			amountIsInvalid = false;
+
 			if (isNew) {
 				try {
 					const debt = new DebtModel(0, person, amount, currency, description, userIsDebtor, null, null);
-					const id = await debtsService.createOrMerge(debt, <boolean>mergeDebtPerPerson);
-					personIsInvalid = false;
-					amountIsInvalid = false;
+					const newId = await debtsService.createOrMerge(debt, <boolean>mergeDebtPerPerson);
 
-					goto('/debt?edited=' + id);
+					goto('/debt?edited=' + newId);
 				} catch {
 					saveButtonIsLoading = false;
 				}
 			} else {
 				try {
 					const debt = new DebtModel(id, person, amount, currency, description, userIsDebtor, createdDate, null);
-
 					await debtsService.update(debt);
-					personIsInvalid = false;
-					amountIsInvalid = false;
 
 					goto('/debt?edited=' + id);
 				} catch {
@@ -152,11 +151,7 @@
 
 		mergeDebtPerPerson = localStorage.getBool('mergeDebtPerPerson');
 
-		isNew = id === 0;
-
 		if (isNew) {
-			personInput.focus();
-
 			currency = localStorage.get('currency');
 			if (currency === 'MKD') {
 				amountTo = 450000000;
@@ -164,6 +159,8 @@
 			synced = false;
 
 			saveButtonText = $t('create');
+
+			personInput.focus();
 		} else {
 			saveButtonText = $t('save');
 

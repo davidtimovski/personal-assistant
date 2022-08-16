@@ -163,6 +163,10 @@
 
 		const result = validate();
 		if (result.valid) {
+			amountIsInvalid = false;
+			dateIsInvalid = false;
+			encryptionPasswordIsInvalid = false;
+
 			try {
 				let fromAccountId: number | null = null;
 				let toAccountId: number | null = null;
@@ -186,12 +190,7 @@
 
 				if (debtId) {
 					await debtsService.delete(debtId);
-				}
 
-				amountIsInvalid = false;
-				dateIsInvalid = false;
-
-				if (debtId) {
 					alertState.update((x) => {
 						x.showSuccess('newTransaction.debtSettlingSuccessful');
 						return x;

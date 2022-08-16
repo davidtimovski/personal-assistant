@@ -53,8 +53,8 @@
 			<a href="/upcomingExpenses" class="wide-button">{$t('menu.upcomingExpenses')}</a>
 			<a href="/debt" class="wide-button">{$t('menu.debt')}</a>
 			<a href="/categories" class="wide-button">{$t('menu.categories')}</a>
-			<!-- <a href="/accounts" class="wide-button">{$t('menu.accounts')}</a>
-			<a href="/balanceAdjustment" class="wide-button">{$t('menu.balanceAdjustment')}</a>
+			<a href="/accounts" class="wide-button">{$t('menu.accounts')}</a>
+			<!--<a href="/balanceAdjustment" class="wide-button">{$t('menu.balanceAdjustment')}</a>
 			<a href="/automaticTransactions" class="wide-button"
 				>{$t('menu.automaticTransactions')}</a
 			>

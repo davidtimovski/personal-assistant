@@ -13,7 +13,7 @@
 	import { onMount } from 'svelte/internal';
 	import { goto } from '$app/navigation';
 
-	import { ValidationResult } from '../../../../shared2/utils/validationUtils';
+	import { ValidationResult, ValidationUtil } from '../../../../shared2/utils/validationUtils';
 
 	import { t } from '$lib/localization/i18n';
 	import { alertState, isOnline } from '$lib/stores';
@@ -26,6 +26,8 @@
 
 	export let id: number;
 
+	const isNew = id === 0;
+
 	let parentId: number | null = null;
 	let name: string;
 	let type: CategoryType | null = null;
@@ -34,7 +36,6 @@
 	let createdDate: Date | null;
 	let modifiedDate: Date | null;
 	let synced: boolean;
-	let isNew: boolean;
 	let isParent: boolean;
 	let parentCategoryOptions: SelectOption[];
 	let typeOptions: SelectOption[];
@@ -51,13 +52,13 @@
 	let categoriesService: CategoriesService;
 
 	$: canSave = () => {
-		return !!name && !(!$isOnline && synced);
+		return !ValidationUtil.isEmptyOrWhitespace(name) && !(!$isOnline && synced);
 	};
 
 	function validate(): ValidationResult {
 		const result = new ValidationResult(true);
 
-		if (!name) {
+		if (ValidationUtil.isEmptyOrWhitespace(name)) {
 			result.fail('name');
 		}
 
@@ -83,6 +84,8 @@
 		nameIsInvalid = !result.valid;
 
 		if (result.valid) {
+			nameIsInvalid = false;
+
 			if (isNew) {
 				try {
 					const category = new Category(
@@ -95,10 +98,9 @@
 						createdDate,
 						modifiedDate
 					);
-					const id = await categoriesService.create(category);
-					nameIsInvalid = false;
+					const newId = await categoriesService.create(category);
 
-					goto('/categories?edited=' + id);
+					goto('/categories?edited=' + newId);
 				} catch {
 					saveButtonIsLoading = false;
 				}
@@ -116,7 +118,6 @@
 					);
 
 					await categoriesService.update(category);
-					nameIsInvalid = false;
 
 					goto('/categories?edited=' + id);
 				} catch {
@@ -183,14 +184,12 @@
 
 		categoriesService = new CategoriesService();
 
-		isNew = id === 0;
-
 		if (isNew) {
-			nameInput.focus();
-
 			type = CategoryType.AllTransactions;
 			synced = false;
 			saveButtonText = $t('create');
+
+			nameInput.focus();
 		} else {
 			saveButtonText = $t('save');
 
@@ -251,8 +250,8 @@
 			<div class="form-control">
 				<input
 					type="text"
-					bind:value={name}
 					bind:this={nameInput}
+					bind:value={name}
 					maxlength="30"
 					class:invalid={nameIsInvalid}
 					placeholder={$t('editCategory.categoryName')}
@@ -310,10 +309,7 @@
 			<hr />
 
 			{#if deleteInProgress && transactionsWarningVisible}
-				<div class="delete-confirmation-alert">
-					<i class="fas fa-exclamation-triangle" />
-					<span contenteditable="true" bind:innerHTML={categoryHasTransactionsHtml} />
-				</div>
+				<AlertBlock type="danger" message={categoryHasTransactionsHtml} />
 			{/if}
 
 			<div class="save-delete-wrap">
