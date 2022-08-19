@@ -23,7 +23,7 @@ export class TransactionModel implements Syncable {
 		public salt: string | null,
 		public nonce: string | null,
 		public generated: boolean,
-		public createdDate: Date,
+		public createdDate: Date | null,
 		public modifiedDate: Date | null
 	) {}
 

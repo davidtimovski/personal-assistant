@@ -1,7 +1,7 @@
 export class Formatter {
-	static number(value: any, currency: string) {
-		if (isNaN(parseFloat(value))) {
-			return null;
+	static number(value: any, currency: string | null) {
+		if (isNaN(parseFloat(value)) || !currency) {
+			return '';
 		}
 
 		if (currency === 'MKD') {
@@ -13,9 +13,9 @@ export class Formatter {
 		return new Intl.NumberFormat().format(value);
 	}
 
-	static money(value: any, currency: string) {
-		if (isNaN(parseFloat(value))) {
-			return null;
+	static money(value: any, currency: string | null) {
+		if (isNaN(parseFloat(value)) || !currency) {
+			return '';
 		}
 
 		if (currency === 'MKD') {
@@ -31,9 +31,9 @@ export class Formatter {
 		}).format(value);
 	}
 
-	static moneyPrecise(value: any, currency: string) {
-		if (isNaN(parseFloat(value))) {
-			return null;
+	static moneyPrecise(value: any, currency: string | null) {
+		if (isNaN(parseFloat(value)) || !currency) {
+			return '';
 		}
 
 		if (currency === 'MKD') {

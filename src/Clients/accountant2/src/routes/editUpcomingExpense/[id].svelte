@@ -35,8 +35,8 @@
 
 	let categoryId: number | null = null;
 	let amount: number | null = null;
-	let currency: string;
-	let description: string;
+	let currency: string | null = null;
+	let description: string | null = null;
 	let generated: boolean;
 	let createdDate: Date | null;
 	let synced: boolean;
@@ -62,10 +62,6 @@
 	};
 
 	function validate(): ValidationResult {
-		if (!currency) {
-			return new ValidationResult(false);
-		}
-
 		const result = new ValidationResult(true);
 
 		if (!ValidationUtil.between(<number>amount, 0, amountTo)) {
@@ -76,6 +72,10 @@
 	}
 
 	async function save() {
+		if (!amount || !currency || !year || !month) {
+			throw new Error('Unexpected error: required fields missing');
+		}
+
 		saveButtonIsLoading = true;
 		alertState.update((x) => {
 			x.hide();
@@ -90,11 +90,11 @@
 				try {
 					const upcomingExpense = new UpcomingExpense(
 						0,
-						<number>categoryId,
-						<number>amount,
+						categoryId,
+						amount,
 						currency,
 						description,
-						DateHelper.format(new Date(<number>year, <number>month, 1)),
+						DateHelper.format(new Date(year, month, 1)),
 						false,
 						null,
 						null
@@ -109,11 +109,11 @@
 				try {
 					const upcomingExpense = new UpcomingExpense(
 						id,
-						<number>categoryId,
-						<number>amount,
+						categoryId,
+						amount,
 						currency,
 						description,
-						DateHelper.format(new Date(<number>year, <number>month, 1)),
+						DateHelper.format(new Date(year, month, 1)),
 						generated,
 						createdDate,
 						null

@@ -4,7 +4,11 @@ export class ValidationUtil {
   }
 
   /** Inclusive between. */
-  static between(value: number, from: number, to: number): boolean {
+  static between(value: number | null, from: number, to: number): boolean {
+    if (!value) {
+      return false;
+    }
+
     return value >= from && value <= to;
   }
 }

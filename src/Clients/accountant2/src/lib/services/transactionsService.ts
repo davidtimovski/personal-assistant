@@ -254,13 +254,10 @@ export class TransactionsService {
 	async buySellStocks(
 		fromAccountId: number | null,
 		toAccountId: number | null,
-		categoryId: number | null,
 		amount: number,
 		fromStocks: number | null,
 		toStocks: number | null,
-		currency: string,
-		description: string | null,
-		date: string
+		currency: string
 	): Promise<void> {
 		try {
 			if (!fromAccountId && !toAccountId) {
@@ -276,22 +273,18 @@ export class TransactionsService {
 				toStocks = parseFloat(<any>toStocks);
 			}
 
-			if (description) {
-				description = description.replace(/(\r\n|\r|\n){3,}/g, '$1\n').trim();
-			}
-
 			const now = DateHelper.adjustForTimeZone(new Date());
 			const transaction = new TransactionModel(
 				0,
 				fromAccountId,
 				toAccountId,
-				categoryId,
+				null,
 				amount,
 				fromStocks,
 				toStocks,
 				currency,
-				description,
-				date,
+				null,
+				DateHelper.format(new Date()),
 				false,
 				null,
 				null,
@@ -320,7 +313,7 @@ export class TransactionsService {
 		await this.idbHelper.create(transaction);
 	}
 
-	async update(transaction: TransactionModel, password: string): Promise<void> {
+	async update(transaction: TransactionModel, password: string | null): Promise<void> {
 		try {
 			if (!transaction.fromAccountId && !transaction.toAccountId) {
 				throw new Error('AccountId is missing.');
@@ -340,6 +333,9 @@ export class TransactionsService {
 			}
 
 			if (transaction.isEncrypted) {
+				if (!password) {
+					throw new Error('Encryption password cannot be null');
+				}
 				if (!transaction.description) {
 					throw new Error('Encrypted description cannot be null');
 				}

@@ -29,11 +29,11 @@
 
 	const isNew = id === 0;
 
-	let person: string;
-	let amount: number;
-	let currency: string;
+	let person = '';
+	let amount: number | null = null;
+	let currency: string | null = null;
 	let description: string | null;
-	let userIsDebtor: boolean;
+	let userIsDebtor: boolean | null = null;
 	let createdDate: Date | null;
 	let synced: boolean;
 	let personInput: HTMLInputElement;
@@ -56,10 +56,6 @@
 	};
 
 	function validate(): ValidationResult {
-		if (!currency) {
-			return new ValidationResult(false);
-		}
-
 		const result = new ValidationResult(true);
 
 		if (!ValidationUtil.between(<number>amount, 0, amountTo)) {
@@ -70,6 +66,10 @@
 	}
 
 	async function save() {
+		if (!amount || !currency || userIsDebtor === null) {
+			throw new Error('Unexpected error: required fields missing');
+		}
+
 		saveButtonIsLoading = true;
 		alertState.update((x) => {
 			x.hide();

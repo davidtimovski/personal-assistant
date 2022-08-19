@@ -49,7 +49,7 @@
 	let decryptionPassword: string | null = null;
 	let encrypt = false;
 	let encryptionPassword: string | null = null;
-	let createdDate: Date;
+	let createdDate: Date | null = null;
 	let synced: boolean;
 	let type: TransactionType;
 	let categoryOptions: SelectOption[] | null = null;
@@ -156,16 +156,7 @@
 	}
 
 	function validate(): ValidationResult {
-		if (!currency) {
-			return new ValidationResult(false);
-		}
-
 		const result = new ValidationResult(true);
-
-		if (!amount) {
-			result.fail('amount');
-			return result;
-		}
 
 		if (!ValidationUtil.between(amount, amountFrom, amountTo)) {
 			result.fail('amount');
@@ -187,6 +178,10 @@
 	};
 
 	async function save() {
+		if (!amount || !currency) {
+			throw new Error('Unexpected error: required fields missing');
+		}
+
 		saveButtonIsLoading = true;
 		alertState.update((x) => {
 			x.hide();
@@ -204,10 +199,10 @@
 					fromAccountId,
 					toAccountId,
 					categoryId,
-					<number>amount,
+					amount,
 					fromStocks,
 					toStocks,
-					<string>currency,
+					currency,
 					description,
 					date,
 					encrypt,
@@ -219,7 +214,7 @@
 					null
 				);
 
-				await transactionsService.update(transaction, <string>encryptionPassword);
+				await transactionsService.update(transaction, encryptionPassword);
 
 				goto('/transactions?edited=' + id);
 			} catch {
@@ -285,7 +280,7 @@
 		deleteInProgress = false;
 	}
 
-	onMount(() => {
+	onMount(async () => {
 		maxDate = date = DateHelper.format(new Date());
 		deleteButtonText = $t('delete');
 		passwordShowIconLabel = $t('showPassword');
@@ -305,37 +300,36 @@
 			categoryOptions = options;
 		});
 
-		transactionsService.get(id).then(async (transaction: TransactionModel) => {
-			if (transaction === null) {
-				// TODO
-				await goto('notFound');
-			}
+		const transaction = await transactionsService.get(id);
+		if (transaction === null) {
+			// TODO
+			goto('notFound');
+		}
 
-			fromAccountId = transaction.fromAccountId;
-			toAccountId = transaction.toAccountId;
-			categoryId = transaction.categoryId;
-			amount = transaction.amount;
-			fromStocks = transaction.fromStocks;
-			toStocks = transaction.toStocks;
-			currency = transaction.currency;
-			description = transaction.description;
-			date = transaction.date.slice(0, 10);
-			isEncrypted = transaction.isEncrypted;
-			encryptedDescription = transaction.encryptedDescription;
-			salt = transaction.salt;
-			nonce = transaction.nonce;
-			generated = transaction.generated;
-			isEncrypted = transaction.isEncrypted;
-			createdDate = transaction.createdDate;
-			synced = transaction.synced;
+		fromAccountId = transaction.fromAccountId;
+		toAccountId = transaction.toAccountId;
+		categoryId = transaction.categoryId;
+		amount = transaction.amount;
+		fromStocks = transaction.fromStocks;
+		toStocks = transaction.toStocks;
+		currency = transaction.currency;
+		description = transaction.description;
+		date = transaction.date.slice(0, 10);
+		isEncrypted = transaction.isEncrypted;
+		encryptedDescription = transaction.encryptedDescription;
+		salt = transaction.salt;
+		nonce = transaction.nonce;
+		generated = transaction.generated;
+		isEncrypted = transaction.isEncrypted;
+		createdDate = transaction.createdDate;
+		synced = transaction.synced;
 
-			if (currency === 'MKD') {
-				amountFrom = 0;
-				amountTo = 450000001;
-			}
+		if (currency === 'MKD') {
+			amountFrom = 0;
+			amountTo = 450000001;
+		}
 
-			type = TransactionsService.getType(transaction.fromAccountId, transaction.toAccountId);
-		});
+		type = TransactionsService.getType(transaction.fromAccountId, transaction.toAccountId);
 	});
 </script>
 

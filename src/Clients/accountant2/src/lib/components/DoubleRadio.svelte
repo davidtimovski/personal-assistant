@@ -4,7 +4,7 @@
 	export let name: string;
 	export let leftLabelKey: string;
 	export let rightLabelKey: string;
-	export let value: boolean;
+	export let value: boolean | null;
 
 	let leftLabel = $t(leftLabelKey);
 	let rightLabel = $t(rightLabelKey);

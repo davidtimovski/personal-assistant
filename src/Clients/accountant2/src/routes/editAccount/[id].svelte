@@ -96,6 +96,8 @@
 			} else {
 				try {
 					const account = new Account(id, name, currency, isMain, createdDate, modifiedDate);
+					account.stockPrice = investmentFund ? stockPrice : null;
+
 					await accountsService.update(account);
 
 					goto('/accounts?edited=' + id);

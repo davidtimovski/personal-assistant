@@ -167,7 +167,7 @@
 		transactionsWarningVisible = false;
 	}
 
-	onMount(() => {
+	onMount(async () => {
 		categoryHasTransactionsHtml = $t('editCategory.categoryHasTransactions');
 		deleteButtonText = $t('delete');
 		typeOptions = [
@@ -214,9 +214,7 @@
 			});
 		}
 
-		categoriesService.getParentAsOptions($t('editCategory.none'), id).then((options) => {
-			parentCategoryOptions = options;
-		});
+		parentCategoryOptions = await categoriesService.getParentAsOptions($t('editCategory.none'), id);
 	});
 </script>
 

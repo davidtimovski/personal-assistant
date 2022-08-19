@@ -20,14 +20,12 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 	import { alertState } from '$lib/stores';
-
 	import type { SelectOption } from '$lib/models/viewmodels/selectOption';
 	import { TransactionsService } from '$lib/services/transactionsService';
 	import { CategoriesService } from '$lib/services/categoriesService';
 	import { AccountsService } from '$lib/services/accountsService';
 	import { DebtsService } from '$lib/services/debtsService';
 	import { CategoryType } from '$lib/models/entities/category';
-	import type { DebtModel } from '$lib/models/entities/debt';
 
 	import Checkbox from '$lib/components/Checkbox.svelte';
 	import AmountInput from '$lib/components/AmountInput.svelte';
@@ -120,16 +118,7 @@
 	}
 
 	function validate(): ValidationResult {
-		if (!currency) {
-			return new ValidationResult(false);
-		}
-
 		const result = new ValidationResult(true);
-
-		if (!amount) {
-			result.fail('amount');
-			return result;
-		}
 
 		if (!ValidationUtil.between(amount, amountFrom, amountTo)) {
 			result.fail('amount');
@@ -147,6 +136,10 @@
 	}
 
 	async function submit() {
+		if (!amount || !currency) {
+			throw new Error('Unexpected error: required fields missing');
+		}
+
 		submitButtonIsLoading = true;
 		alertState.update((x) => {
 			x.hide();
@@ -180,8 +173,8 @@
 					fromAccountId,
 					toAccountId,
 					categoryId,
-					<number>amount,
-					<string>currency,
+					amount,
+					currency,
 					description,
 					<string>date,
 					encrypt,
@@ -240,7 +233,7 @@
 		}
 	}
 
-	onMount(() => {
+	onMount(async () => {
 		maxDate = date = DateHelper.format(new Date());
 
 		passwordShowIconLabel = $t('showPassword');
@@ -282,11 +275,10 @@
 		});
 
 		if (debtId) {
-			debtsService.get(debtId).then((debt: DebtModel) => {
-				userIsDebtor = debt.userIsDebtor;
-				debtPerson = debt.person;
-				amount = debt.amount;
-			});
+			const debt = await debtsService.get(debtId);
+			userIsDebtor = debt.userIsDebtor;
+			debtPerson = debt.person;
+			amount = debt.amount;
 		}
 	});
 </script>
