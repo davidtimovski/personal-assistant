@@ -11,7 +11,7 @@ export class TransactionModel implements Syncable {
 		public id: number,
 		public fromAccountId: number | null,
 		public toAccountId: number | null,
-		public categoryId: number,
+		public categoryId: number | null,
 		public amount: number,
 		public fromStocks: number | null,
 		public toStocks: number | null,
@@ -23,8 +23,8 @@ export class TransactionModel implements Syncable {
 		public salt: string | null,
 		public nonce: string | null,
 		public generated: boolean,
-		public createdDate: Date,
-		public modifiedDate: Date
+		public createdDate: Date | null,
+		public modifiedDate: Date | null
 	) {}
 
 	get isTax() {

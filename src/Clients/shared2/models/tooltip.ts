@@ -1,7 +1,7 @@
 export class Tooltip {
-  public title: string;
-  public question: string;
-  public answer: string;
+  title: string;
+  question: string;
+  answer: string;
 
   constructor(public key: string, public isDismissed: boolean) {}
 }

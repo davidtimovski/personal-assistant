@@ -4,115 +4,95 @@ import { ErrorLogger } from '../../../../shared2/services/errorLogger';
 import { TransactionsIDBHelper } from '$lib/utils/transactionsIDBHelper';
 import { UpcomingExpensesIDBHelper } from '$lib/utils/upcomingExpensesIDBHelper';
 import { DebtsIDBHelper } from '$lib/utils/debtsIDBHelper';
-import { AccountsService } from '$lib/services/accountsService';
-import { Capital } from '$lib/models/capital';
-import type { TransactionModel } from '$lib/models/entities/transaction';
 import type { UpcomingExpense } from '$lib/models/entities/upcomingExpense';
 import type { DebtModel } from '$lib/models/entities/debt';
-import { TransactionsService } from './transactionsService';
+import { TransactionsService } from '$lib/services/transactionsService';
 import { UpcomingExpenseDashboard } from '$lib/models/viewmodels/upcomingExpenseDashboard';
 import { DebtDashboard } from '$lib/models/viewmodels/debtDashboard';
+import type { AmountByCategory } from '$lib/models/viewmodels/amountByCategory';
+import { DebtsService } from '$lib/services/debtsService';
 
 export class CapitalService {
 	private readonly transactionsIDBHelper = new TransactionsIDBHelper();
 	private readonly upcomingExpensesIDBHelper = new UpcomingExpensesIDBHelper();
 	private readonly debtsIDBHelper = new DebtsIDBHelper();
 	private readonly transactionsService = new TransactionsService();
-	private readonly accountsService = new AccountsService();
 	private readonly currenciesService = new CurrenciesService('Accountant');
 	private readonly logger = new ErrorLogger('Accountant');
 
-	async get(
+	async getSpent(
+		mainAccountId: number,
 		uncategorizedLabel: string,
-		includeUpcomingExpenses: boolean,
-		includeDebt: boolean,
 		currency: string
-	): Promise<Capital> {
+	): Promise<[AmountByCategory[], number]> {
 		try {
-			const mainAccountId = await this.accountsService.getMainId();
-			const capital = new Capital(0, 0, 0, 0, [], [], []);
+			const transactions = await this.transactionsIDBHelper.getExpendituresForCurrentMonth(mainAccountId);
+			const expenditures = await this.transactionsService.getByCategory(transactions, currency, uncategorizedLabel);
 
-			const balancePromise = this.accountsService.getBalance(mainAccountId, currency).then((balance: number) => {
-				capital.balance = balance;
+			const spent = transactions
+				.filter((x) => !x.isTax)
+				.map((e) => e.amount)
+				.reduce((prev, curr) => prev + curr, 0);
+
+			return [expenditures, spent];
+		} catch (e) {
+			this.logger.logError(e);
+			throw e;
+		}
+	}
+
+	async getUpcomingExpenses(
+		uncategorizedLabel: string,
+		currency: string
+	): Promise<[UpcomingExpenseDashboard[], number]> {
+		try {
+			const monthUpcomingExpenses = await this.upcomingExpensesIDBHelper.getAllForMonth();
+
+			let upcomingSum = 0;
+			monthUpcomingExpenses.forEach((x: UpcomingExpense) => {
+				x.amount = this.currenciesService.convert(x.amount, x.currency, currency);
+				upcomingSum += x.amount;
 			});
 
-			const expendituresPromise = this.transactionsIDBHelper
-				.getExpendituresForCurrentMonth(mainAccountId)
-				.then(async (transactions: TransactionModel[]) => {
-					capital.expenditures = await this.transactionsService.getByCategory(
-						transactions,
-						currency,
-						uncategorizedLabel
-					);
-
-					capital.spent = transactions
-						.filter((x) => !x.isTax)
-						.map((e) => e.amount)
-						.reduce((prev, curr) => prev + curr, 0);
-				});
-
-			const upcomingPromise = new Promise<void>((resolve) => {
-				if (!includeUpcomingExpenses) {
-					resolve();
-					return;
-				}
-
-				this.upcomingExpensesIDBHelper.getAllForMonth().then((monthUpcomingExpenses: UpcomingExpense[]) => {
-					monthUpcomingExpenses.forEach((x: UpcomingExpense) => {
-						x.amount = this.currenciesService.convert(x.amount, x.currency, currency);
-						capital.upcoming += x.amount;
-					});
-
-					const upcomingExpenses = new Array<UpcomingExpenseDashboard>();
-					for (const upcomingExpense of monthUpcomingExpenses) {
-						const trimmedDescription = this.trimDescription(upcomingExpense.description);
-						upcomingExpenses.push(
-							new UpcomingExpenseDashboard(
-								upcomingExpense.categoryName || uncategorizedLabel,
-								trimmedDescription,
-								upcomingExpense.amount
-							)
-						);
-					}
-					capital.upcomingExpenses = upcomingExpenses.sort(
-						(a: UpcomingExpenseDashboard, b: UpcomingExpenseDashboard) => {
-							return b.amount - a.amount;
-						}
-					);
-
-					resolve();
-				});
+			let upcomingExpenses = new Array<UpcomingExpenseDashboard>();
+			for (const upcomingExpense of monthUpcomingExpenses) {
+				const trimmedDescription = this.trimDescription(upcomingExpense.description);
+				upcomingExpenses.push(
+					new UpcomingExpenseDashboard(
+						upcomingExpense.categoryName || uncategorizedLabel,
+						trimmedDescription,
+						upcomingExpense.amount
+					)
+				);
+			}
+			upcomingExpenses = upcomingExpenses.sort((a: UpcomingExpenseDashboard, b: UpcomingExpenseDashboard) => {
+				return b.amount - a.amount;
 			});
 
-			const debtPromise = new Promise<void>(async (resolve) => {
-				if (!includeDebt) {
-					resolve();
-					return;
-				}
+			return [upcomingExpenses, upcomingSum];
+		} catch (e) {
+			this.logger.logError(e);
+			throw e;
+		}
+	}
 
-				this.debtsIDBHelper.getAll().then((debt: DebtModel[]) => {
-					debt.forEach((x: DebtModel) => {
-						x.amount = this.currenciesService.convert(x.amount, x.currency, currency);
-					});
+	async getDebt(currency: string): Promise<DebtDashboard[]> {
+		try {
+			const debt = await this.debtsIDBHelper.getAll();
 
-					const debtDashboard = new Array<DebtDashboard>();
-					for (const debtItem of debt) {
-						const trimmedDescription = this.trimDescription(debtItem.description);
-						debtDashboard.push(
-							new DebtDashboard(debtItem.person, debtItem.userIsDebtor, trimmedDescription, debtItem.amount)
-						);
-					}
-					capital.debt = debtDashboard;
-
-					resolve();
-				});
+			debt.forEach((x: DebtModel) => {
+				x.amount = this.currenciesService.convert(x.amount, x.currency, currency);
 			});
 
-			await Promise.all([balancePromise, expendituresPromise, upcomingPromise, debtPromise]);
+			const debtDashboard = new Array<DebtDashboard>();
+			for (const debtItem of debt) {
+				const trimmedDescription = this.trimDescription(debtItem.description);
+				debtDashboard.push(
+					new DebtDashboard(debtItem.person, debtItem.userIsDebtor, trimmedDescription, debtItem.amount)
+				);
+			}
 
-			capital.available = capital.balance - capital.upcoming;
-
-			return capital;
+			return debtDashboard;
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -122,6 +102,10 @@ export class CapitalService {
 	private trimDescription(description: string | null): string {
 		if (!description) {
 			return '';
+		}
+
+		if (description.includes(DebtsService.mergedDebtSeparator)) {
+			return '[ Combined ]';
 		}
 
 		const length = 25;

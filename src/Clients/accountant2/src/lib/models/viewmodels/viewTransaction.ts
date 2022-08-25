@@ -1,24 +1,24 @@
-import { TransactionType } from "models/viewmodels/transactionType";
+import type { TransactionType } from '$lib/models/viewmodels/transactionType';
 
 export class ViewTransaction {
-  constructor(
-    public type: TransactionType,
-    public typeLabel: string,
-    public accountLabel: string,
-    public accountValue: string,
-    public amount: number,
-    public currency: string,
-    public originalAmount: number,
-    public fromStocks: number,
-    public toStocks: number,
-    public category: string,
-    public description: string,
-    public date: string,
-    public isEncrypted: boolean,
-    public encryptedDescription: string,
-    public salt: string,
-    public nonce: string,
-    public generated: boolean,
-    public decryptionPassword: string
-  ) {}
+	constructor(
+		public type: TransactionType,
+		public typeLabel: string,
+		public accountLabel: string | null,
+		public accountValue: string | null,
+		public amount: number,
+		public currency: string,
+		public originalAmount: number,
+		public fromStocks: number | null,
+		public toStocks: number | null,
+		public category: string,
+		public description: string | null,
+		public date: string,
+		public isEncrypted: boolean,
+		public encryptedDescription: string | null,
+		public salt: string | null,
+		public nonce: string | null,
+		public generated: boolean,
+		public decryptionPassword: string | null
+	) {}
 }

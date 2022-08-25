@@ -5,6 +5,7 @@ import { DateHelper } from '../../../../shared2/utils/dateHelper';
 
 import { UpcomingExpensesIDBHelper } from '$lib/utils/upcomingExpensesIDBHelper';
 import type { UpcomingExpense } from '$lib/models/entities/upcomingExpense';
+import Variables from '$lib/variables';
 
 export class UpcomingExpensesService {
 	private readonly httpProxy = new HttpProxy();
@@ -42,7 +43,7 @@ export class UpcomingExpensesService {
 			upcomingExpense.createdDate = upcomingExpense.modifiedDate = now;
 
 			if (navigator.onLine) {
-				upcomingExpense.id = await this.httpProxy.ajax<number>('api/upcomingexpenses', {
+				upcomingExpense.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/api/upcomingexpenses`, {
 					method: 'post',
 					body: window.JSON.stringify(upcomingExpense)
 				});
@@ -68,7 +69,7 @@ export class UpcomingExpensesService {
 			upcomingExpense.modifiedDate = DateHelper.adjustForTimeZone(new Date());
 
 			if (navigator.onLine) {
-				await this.httpProxy.ajaxExecute('api/upcomingexpenses', {
+				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/upcomingexpenses`, {
 					method: 'put',
 					body: window.JSON.stringify(upcomingExpense)
 				});
@@ -87,7 +88,7 @@ export class UpcomingExpensesService {
 	async delete(id: number): Promise<void> {
 		try {
 			if (navigator.onLine) {
-				await this.httpProxy.ajaxExecute(`api/upcomingexpenses/${id}`, {
+				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/upcomingexpenses/${id}`, {
 					method: 'delete'
 				});
 			} else if (await this.idbHelper.isSynced(id)) {

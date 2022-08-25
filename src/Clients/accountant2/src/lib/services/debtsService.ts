@@ -5,14 +5,15 @@ import { DateHelper } from '../../../../shared2/utils/dateHelper';
 
 import { DebtsIDBHelper } from '$lib/utils/debtsIDBHelper';
 import { DebtModel } from '$lib/models/entities/debt';
+import Variables from '$lib/variables';
 
 export class DebtsService {
-	private readonly mergedDebtSeparator = '----------';
-
 	private readonly httpProxy = new HttpProxy();
 	private readonly idbHelper = new DebtsIDBHelper();
 	private readonly currenciesService = new CurrenciesService('Accountant');
 	private readonly logger = new ErrorLogger('Accountant');
+
+	static readonly mergedDebtSeparator = '----------';
 
 	async getAll(currency: string): Promise<Array<DebtModel>> {
 		try {
@@ -76,12 +77,12 @@ export class DebtsService {
 				descriptionsArray.push(newDesc);
 
 				const description =
-					descriptionsArray.length > 0 ? descriptionsArray.join(`\n${this.mergedDebtSeparator}\n`) : null;
+					descriptionsArray.length > 0 ? descriptionsArray.join(`\n${DebtsService.mergedDebtSeparator}\n`) : null;
 
 				const mergedDebt = new DebtModel(0, debt.person, balance, debt.currency, description, balance < 0, now, now);
 
 				if (navigator.onLine) {
-					mergedDebt.id = await this.httpProxy.ajax<number>('api/debts/merged', {
+					mergedDebt.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/api/debts/merged`, {
 						method: 'post',
 						body: window.JSON.stringify(mergedDebt)
 					});
@@ -99,7 +100,7 @@ export class DebtsService {
 				debt.createdDate = debt.modifiedDate = now;
 
 				if (navigator.onLine) {
-					debt.id = await this.httpProxy.ajax<number>('api/debts', {
+					debt.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/api/debts`, {
 						method: 'post',
 						body: window.JSON.stringify(debt)
 					});
@@ -133,7 +134,7 @@ export class DebtsService {
 			result += userIsDebtor ? '-' + amount + currency : amount + currency;
 
 			if (description) {
-				if (description.includes(this.mergedDebtSeparator)) {
+				if (description.includes(DebtsService.mergedDebtSeparator)) {
 					// use existing description if the debt is already a merged one
 					result = description;
 				} else {
@@ -158,7 +159,7 @@ export class DebtsService {
 			debt.modifiedDate = DateHelper.adjustForTimeZone(new Date());
 
 			if (navigator.onLine) {
-				await this.httpProxy.ajaxExecute('api/debts', {
+				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/debts`, {
 					method: 'put',
 					body: window.JSON.stringify(debt)
 				});
@@ -177,7 +178,7 @@ export class DebtsService {
 	async delete(id: number): Promise<void> {
 		try {
 			if (navigator.onLine) {
-				await this.httpProxy.ajaxExecute(`api/debts/${id}`, {
+				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/debts/${id}`, {
 					method: 'delete'
 				});
 			} else if (await this.idbHelper.isSynced(id)) {

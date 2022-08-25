@@ -1,9 +1,9 @@
 import type { Syncable } from '$lib/models/syncable';
 
 export class Account implements Syncable {
-	stockPrice: number | undefined;
-	stocks: number | undefined;
-	balance: number | undefined;
+	stockPrice: number | null = null;
+	stocks: number | null = null;
+	balance: number | null = null;
 	synced = false;
 
 	constructor(
@@ -11,7 +11,7 @@ export class Account implements Syncable {
 		public name: string,
 		public currency: string,
 		public isMain: boolean,
-		public createdDate: Date,
-		public modifiedDate: Date
+		public createdDate: Date | null,
+		public modifiedDate: Date | null
 	) {}
 }
