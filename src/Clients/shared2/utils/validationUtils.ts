@@ -11,6 +11,14 @@ export class ValidationUtil {
 
     return value >= from && value <= to;
   }
+
+  static sameOrHigher(value: number | null, from: number): boolean {
+    if (!value) {
+      return false;
+    }
+
+    return value >= from;
+  }
 }
 
 export class ValidationResult {

@@ -1,6 +1,6 @@
 {
 	"name": "accountant2",
-	"version": "0.1.0",
+	"version": "2.0.0-beta.1",
 	"scripts": {
 		"dev": "vite dev --port 8085",
 		"build": "vite build",
@@ -14,7 +14,7 @@
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "next",
 		"@sveltejs/adapter-static": "next",
-		"@sveltejs/kit": "next",
+		"@sveltejs/kit": "^1.0.0-next.444",
 		"@types/cookie": "^0.5.1",
 		"@typescript-eslint/eslint-plugin": "^5.27.0",
 		"@typescript-eslint/parser": "^5.27.0",
