@@ -51,7 +51,7 @@
 	let debtsService: DebtsService;
 
 	let amountFrom = 0.01;
-	let amountTo = 8000001;
+	let amountTo = 8000000;
 
 	$: pastMidnight = (): string | null => {
 		if (!date) {
@@ -250,8 +250,8 @@
 		currency = localStorage.get('currency');
 
 		if (currency === 'MKD') {
-			amountFrom = 0;
-			amountTo = 450000001;
+			amountFrom = 1;
+			amountTo = 450000000;
 		}
 
 		const categoryType = data.isExpense ? CategoryType.ExpenseOnly : CategoryType.DepositOnly;

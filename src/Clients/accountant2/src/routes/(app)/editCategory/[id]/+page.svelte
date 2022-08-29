@@ -30,7 +30,7 @@
 	let parentCategoryOptions: SelectOption[];
 	let typeOptions: SelectOption[];
 	let nameInput: HTMLInputElement;
-	let nameIsInvalid: boolean;
+	let nameIsInvalid = false;
 	let saveButtonText: string;
 	let transactionsWarningVisible = false;
 	let deleteInProgress = false;

@@ -28,8 +28,8 @@
 	let synced = false;
 	let isMainAccount: boolean;
 	let nameInput: HTMLInputElement;
-	let nameIsInvalid: boolean;
-	let stockPriceIsInvalid: boolean;
+	let nameIsInvalid = false;
+	let stockPriceIsInvalid = false;
 	let investmentFund: boolean;
 	let saveButtonText: string;
 	let transactionsWarningVisible = false;

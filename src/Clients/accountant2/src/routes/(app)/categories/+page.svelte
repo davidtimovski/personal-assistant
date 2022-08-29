@@ -107,7 +107,7 @@
 											title={$t('categories.depositOnly')}
 											aria-label={$t('categories.depositOnly')}
 										>
-											<i class="far fa-calendar-alt" />
+											<i class="fas fa-donate" />
 										</span>
 									{/if}
 
@@ -117,7 +117,7 @@
 											title={$t('categories.expenseOnly')}
 											aria-label={$t('categories.expenseOnly')}
 										>
-											<i class="far fa-calendar-alt" />
+											<i class="fas fa-wallet" />
 										</span>
 									{/if}
 								</span>

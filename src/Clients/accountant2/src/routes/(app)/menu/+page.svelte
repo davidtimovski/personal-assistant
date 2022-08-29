@@ -55,10 +55,9 @@
 			<a href="/categories" class="wide-button">{$t('menu.categories')}</a>
 			<a href="/accounts" class="wide-button">{$t('menu.accounts')}</a>
 			<a href="/balanceAdjustment" class="wide-button">{$t('menu.balanceAdjustment')}</a>
-			<!--<a href="/automaticTransactions" class="wide-button"
-				>{$t('menu.automaticTransactions')}</a
-			>
+			<a href="/automaticTransactions" class="wide-button">{$t('menu.automaticTransactions')}</a>
 
+			<!--
 			<div class="drawer-button-wrap" class:open={reportsDrawerIsOpen}>
 				<button type="button" on:click={toggleReportsDrawer} class="wide-button drawer-button">
 					{$t('menu.reports')}

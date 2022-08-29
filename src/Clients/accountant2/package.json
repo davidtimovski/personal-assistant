@@ -1,6 +1,6 @@
 {
 	"name": "accountant2",
-	"version": "2.0.0-beta.1",
+	"version": "2.0.0-beta.2",
 	"scripts": {
 		"dev": "vite dev --port 8085",
 		"build": "vite build",
@@ -12,7 +12,7 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-auto": "next",
+		"@sveltejs/adapter-auto": "^1.0.0-next.69",
 		"@sveltejs/adapter-static": "next",
 		"@sveltejs/kit": "^1.0.0-next.444",
 		"@types/cookie": "^0.5.1",

@@ -27,7 +27,7 @@
 	let language: string;
 	let passwordShown = false;
 	let decryptButtonIsLoading = false;
-	let decryptionPasswordIsInvalid: boolean;
+	let decryptionPasswordIsInvalid = false;
 	let typeStringMap = new Map<TransactionType, string>();
 	let passwordInput: HTMLInputElement | null = null;
 	let passwordShowIconLabel: string;

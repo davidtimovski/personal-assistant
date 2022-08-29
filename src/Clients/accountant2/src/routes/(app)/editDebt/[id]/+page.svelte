@@ -28,8 +28,8 @@
 	let synced: boolean;
 	let personInput: HTMLInputElement;
 	let mergeDebtPerPerson: boolean | null = null;
-	let personIsInvalid: boolean;
-	let amountIsInvalid: boolean;
+	let personIsInvalid = false;
+	let amountIsInvalid = false;
 	let saveButtonText: string;
 	let deleteInProgress = false;
 	let deleteButtonText: string;
@@ -143,9 +143,6 @@
 
 		if (isNew) {
 			currency = localStorage.get('currency');
-			if (currency === 'MKD') {
-				amountTo = 450000000;
-			}
 			synced = false;
 
 			saveButtonText = $t('create');
@@ -168,6 +165,10 @@
 				createdDate = debt.createdDate;
 				synced = debt.synced;
 			});
+		}
+
+		if (currency === 'MKD') {
+			amountTo = 450000000;
 		}
 	});
 </script>

@@ -165,14 +165,14 @@
     estree-walker "^2.0.1"
     picomatch "^2.2.2"
 
-"@sveltejs/adapter-auto@next":
-  version "1.0.0-next.66"
-  resolved "https://registry.yarnpkg.com/@sveltejs/adapter-auto/-/adapter-auto-1.0.0-next.66.tgz#93a6de02a7a4ebef11160bf8d012ef349839656e"
-  integrity sha512-p78AQaSDHkLS5EFGqCF2xrLHMjKxx6wTLUvnP26cu2llh/VV4NihQ0rheVNgPWL+tGZpVznhrUG8fWmJxPciug==
+"@sveltejs/adapter-auto@^1.0.0-next.69":
+  version "1.0.0-next.69"
+  resolved "https://registry.yarnpkg.com/@sveltejs/adapter-auto/-/adapter-auto-1.0.0-next.69.tgz#3fe916daed9e0aae61d96dee8b8224f57808237f"
+  integrity sha512-DSrcYgrJ1YFnxJecTiktV4A01B2Avn5t6HvO49YJiGp2mdSxCxJbvqn6I4tPB1T64AInBLFUMmKBK9o9ZJbBMA==
   dependencies:
     "@sveltejs/adapter-cloudflare" "1.0.0-next.32"
-    "@sveltejs/adapter-netlify" "1.0.0-next.72"
-    "@sveltejs/adapter-vercel" "1.0.0-next.68"
+    "@sveltejs/adapter-netlify" "1.0.0-next.75"
+    "@sveltejs/adapter-vercel" "1.0.0-next.71"
 
 "@sveltejs/adapter-cloudflare@1.0.0-next.32":
   version "1.0.0-next.32"
@@ -183,10 +183,10 @@
     esbuild "^0.14.48"
     worktop "0.8.0-next.14"
 
-"@sveltejs/adapter-netlify@1.0.0-next.72":
-  version "1.0.0-next.72"
-  resolved "https://registry.yarnpkg.com/@sveltejs/adapter-netlify/-/adapter-netlify-1.0.0-next.72.tgz#5fe42a4944de476baa089cdc7f525ae6037585c9"
-  integrity sha512-g570hYAMkgrJfo/TRg3DZFmlR7bNFHECFPOMgc8R+f28ROap/nXA8ICbiSBF7+zJ5JXvJbqHGjERSsyhEq+59g==
+"@sveltejs/adapter-netlify@1.0.0-next.75":
+  version "1.0.0-next.75"
+  resolved "https://registry.yarnpkg.com/@sveltejs/adapter-netlify/-/adapter-netlify-1.0.0-next.75.tgz#c47370c083a8e4d127c00a6e7dc094d22c79dedf"
+  integrity sha512-1zTR/U/ceEAyqIGJ74v54G+JbIR+fSmTN9qfqGOM0gBwVoBVRUujGm4tDFJQNYzvuGzVnC7br/rhYMLZd2JluQ==
   dependencies:
     "@iarna/toml" "^2.2.5"
     esbuild "^0.14.48"
@@ -198,22 +198,22 @@
   resolved "https://registry.yarnpkg.com/@sveltejs/adapter-static/-/adapter-static-1.0.0-next.39.tgz#ae79b95accd3af6ecfa92e9596c4d41b49cf6fea"
   integrity sha512-EeD39H6iEe0UEKnKxLFTZFZpi/FcX5xfbAvsMQ+B09aDZccpQmkJBSIo+4kq1JsQGSjwi/+J3aE9bR67R6CIyQ==
 
-"@sveltejs/adapter-vercel@1.0.0-next.68":
-  version "1.0.0-next.68"
-  resolved "https://registry.yarnpkg.com/@sveltejs/adapter-vercel/-/adapter-vercel-1.0.0-next.68.tgz#ccd0707f02d8aff9185b373a484366d961f58753"
-  integrity sha512-ImM+fDwGkVaf920Wzh284nfAfu/WoPXCpMwog0kveIODVgCozbpJY55fO860LccqdS0YDyeFqOUrZJCqcYNx4w==
+"@sveltejs/adapter-vercel@1.0.0-next.71":
+  version "1.0.0-next.71"
+  resolved "https://registry.yarnpkg.com/@sveltejs/adapter-vercel/-/adapter-vercel-1.0.0-next.71.tgz#5722e9d0bcedbfd2cd54ca9304e511af1aa4d1fa"
+  integrity sha512-Tj8za7fMXheaiB6hNqv61jr/AmAUm+G8huoY1cIvtSqqBHzGmiZH+GFK1Tq/e8e0XR2Xb/ZpZCQSyrFLU2grIQ==
   dependencies:
-    "@vercel/nft" "^0.21.0"
+    "@vercel/nft" "^0.22.0"
     esbuild "^0.14.48"
 
 "@sveltejs/kit@^1.0.0-next.444":
-  version "1.0.0-next.444"
-  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.0.0-next.444.tgz#fd34207d67fa8622a6e2a3da0f57fe65d1e1d7e1"
-  integrity sha512-B9ekUK5r/3IODxyXjAmEWFC1ytxRlsnApgF8qV/2IJWvWXvj62PjB8qK7UBvMM9A1codfx94RMvj9r6wTKRIAA==
+  version "1.0.0-next.447"
+  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.0.0-next.447.tgz#34ff631f878e3111c74be7fae0cca8e777b5b44a"
+  integrity sha512-a+Mdze6GreNIgOSFwGvRZNxPNF2crAvpkJUHovLnzWj7uFs/XPj1U7P9Ubg47SphEAgV7/JM3nre9ibjO3LyDA==
   dependencies:
     "@sveltejs/vite-plugin-svelte" "^1.0.1"
     cookie "^0.5.0"
-    devalue "^2.0.1"
+    devalue "^3.1.2"
     kleur "^4.1.4"
     magic-string "^0.26.2"
     mime "^3.0.0"
@@ -358,10 +358,10 @@
     "@typescript-eslint/types" "5.35.1"
     eslint-visitor-keys "^3.3.0"
 
-"@vercel/nft@^0.21.0":
-  version "0.21.0"
-  resolved "https://registry.yarnpkg.com/@vercel/nft/-/nft-0.21.0.tgz#e0715b1997cd7021a7c7c48b584ef2295fd4b810"
-  integrity sha512-hFCAETfI5cG8l5iAiLhMC2bReC5K7SIybzrxGorv+eGspIbIFsVw7Vg85GovXm/LxA08pIDrAlrhR6GN36XB/Q==
+"@vercel/nft@^0.22.0":
+  version "0.22.0"
+  resolved "https://registry.yarnpkg.com/@vercel/nft/-/nft-0.22.0.tgz#586ed4edfd0dabc9bf07525044782198a0b31199"
+  integrity sha512-hB80/093PPiCefN2gVbqv6J93MH+63Zr7uDCwkiS/U4W07DXkLoftbnkBmZoS0Q84LiTSl9DRVSHU4XYCX+sJA==
   dependencies:
     "@mapbox/node-pre-gyp" "^1.0.5"
     acorn "^8.6.0"
@@ -834,10 +834,10 @@ detect-libc@^2.0.0:
   resolved "https://registry.yarnpkg.com/detect-libc/-/detect-libc-2.0.1.tgz#e1897aa88fa6ad197862937fbc0441ef352ee0cd"
   integrity sha512-463v3ZeIrcWtdgIg6vI6XUncguvr2TnGl4SzDXinkt9mSLpBJKXT3mW6xT3VQdDN11+WVs29pgvivTc4Lp8v+w==
 
-devalue@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/devalue/-/devalue-2.0.1.tgz#5d368f9adc0928e47b77eea53ca60d2f346f9762"
-  integrity sha512-I2TiqT5iWBEyB8GRfTDP0hiLZ0YeDJZ+upDxjBfOC2lebO5LezQMv7QvIUTzdb64jQyAKLf1AHADtGN+jw6v8Q==
+devalue@^3.1.2:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/devalue/-/devalue-3.1.2.tgz#412497b63d2dc0beba2179723475c2ef4c2b1b31"
+  integrity sha512-wUXbMGPAsBx79UF14nsWSsJlC7RcwPlf2w3bGheODWxKx57e9n68ceoijbqCJCEbjyo0S79nqfPwQgyijwLaqw==
 
 dexie@^3.2.2:
   version "3.2.2"
@@ -2800,9 +2800,9 @@ supports-preserve-symlinks-flag@^1.0.0:
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
 svelte-check@^2.7.1:
-  version "2.8.1"
-  resolved "https://registry.yarnpkg.com/svelte-check/-/svelte-check-2.8.1.tgz#484499d66ad6a5043e9dfeb91b0dfadf2a9c63b0"
-  integrity sha512-cibyY1sgt3ONIDnQbSgV2X9AJFhwEslRHNo95lijrYfPzVEvTvbmL2ohsUyqB5L7j1GhLXtQbjCJ4lZZ/fwbeQ==
+  version "2.9.0"
+  resolved "https://registry.yarnpkg.com/svelte-check/-/svelte-check-2.9.0.tgz#94a4bbe5bccade5a9edae987f417040ab7af4a2a"
+  integrity sha512-9AVrtP7WbfDgCdqTZNPdj5CCCy1OrYMxFVWAWzNw7fl93c9klFJFtqzVXa6fovfQ050CcpUyJE2dPFL9TFAREw==
   dependencies:
     "@jridgewell/trace-mapping" "^0.3.9"
     chokidar "^3.4.1"

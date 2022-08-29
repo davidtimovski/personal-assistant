@@ -13,12 +13,12 @@
 	import { CategoriesService } from '$lib/services/categoriesService';
 	import { EncryptionService } from '$lib/services/encryptionService';
 	import { CategoryType } from '$lib/models/entities/category';
+	import { TransactionModel } from '$lib/models/entities/transaction';
 	import type { SelectOption } from '$lib/models/viewmodels/selectOption';
 
 	import Checkbox from '$lib/components/Checkbox.svelte';
 	import AmountInput from '$lib/components/AmountInput.svelte';
 	import AlertBlock from '$lib/components/AlertBlock.svelte';
-	import { TransactionModel } from '$lib/models/entities/transaction';
 
 	export let data: PageData;
 
@@ -64,7 +64,7 @@
 	let encryptionService: EncryptionService;
 
 	let amountFrom = 0.01;
-	let amountTo = 8000001;
+	let amountTo = 8000000;
 
 	$: canEncrypt = () => {
 		if (!description) {
@@ -315,8 +315,8 @@
 		synced = transaction.synced;
 
 		if (currency === 'MKD') {
-			amountFrom = 0;
-			amountTo = 450000001;
+			amountFrom = 1;
+			amountTo = 450000000;
 		}
 
 		type = TransactionsService.getType(transaction.fromAccountId, transaction.toAccountId);

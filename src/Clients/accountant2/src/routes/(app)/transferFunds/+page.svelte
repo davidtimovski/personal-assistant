@@ -27,7 +27,7 @@
 	let mainAccountId: number;
 	let fromAccountLabel = '---';
 	let toAccountLabel = '---';
-	let amountIsInvalid: boolean;
+	let amountIsInvalid = false;
 	let transferButtonLabel: string;
 	let transferButtonIsLoading = false;
 
@@ -36,7 +36,7 @@
 	let transactionsService: TransactionsService;
 
 	let amountFrom = 0.01;
-	let amountTo = 8000001;
+	let amountTo = 8000000;
 
 	function fromAccountChanged() {
 		if (!accountOptions) {
@@ -215,8 +215,8 @@
 		currency = localStorage.get('currency');
 
 		if (currency === 'MKD') {
-			amountFrom = 0;
-			amountTo = 450000001;
+			amountFrom = 1;
+			amountTo = 450000000;
 		}
 
 		accountsService.getMainId().then(async (id: number) => {

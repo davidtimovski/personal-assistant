@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { createEventDispatcher } from 'svelte';
 	import { t } from '$lib/localization/i18n';
 
 	export let name: string;
@@ -8,13 +9,18 @@
 
 	let leftLabel = $t(leftLabelKey);
 	let rightLabel = $t(rightLabelKey);
+
+	const dispatch = createEventDispatcher();
+	function changeState() {
+		dispatch('change', value);
+	}
 </script>
 
 <div class="double-radio-wrap">
 	<div class="double-radio-side">
 		<label class:selected={!value}>
 			<span>{leftLabel}</span>
-			<input type="radio" {name} bind:group={value} value={false} />
+			<input type="radio" {name} bind:group={value} value={false} on:change={changeState} />
 			<span class="checkbox-icon">
 				<i class="fas fa-check" />
 			</span>
@@ -23,7 +29,7 @@
 	<div class="double-radio-side">
 		<label class:selected={value}>
 			<span>{rightLabel}</span>
-			<input type="radio" {name} bind:group={value} value={true} />
+			<input type="radio" {name} bind:group={value} value={true} on:change={changeState} />
 			<span class="checkbox-icon">
 				<i class="fas fa-check" />
 			</span>

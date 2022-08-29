@@ -3,66 +3,73 @@
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
-	import { DateHelper } from '../../../../../../shared2/utils/dateHelper';
 	import { ValidationResult, ValidationUtil } from '../../../../../../shared2/utils/validationUtils';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 	import { alertState, isOnline } from '$lib/stores';
-	import type { SelectOption } from '$lib/models/viewmodels/selectOption';
-	import { UpcomingExpensesService } from '$lib/services/upcomingExpensesService';
-	import { UpcomingExpense } from '$lib/models/entities/upcomingExpense';
-	import { CategoryType } from '$lib/models/entities/category';
+	import { AutomaticTransactionsService } from '$lib/services/automaticTransactionsService';
 	import { CategoriesService } from '$lib/services/categoriesService';
+	import { CategoryType } from '$lib/models/entities/category';
+	import { SelectOption } from '$lib/models/viewmodels/selectOption';
+	import { AutomaticTransaction } from '$lib/models/entities/automaticTransaction';
 
 	import AlertBlock from '$lib/components/AlertBlock.svelte';
 	import AmountInput from '$lib/components/AmountInput.svelte';
-	import MonthSelector from '$lib/components/MonthSelector.svelte';
+	import DoubleRadio from '$lib/components/DoubleRadio.svelte';
 
 	export let data: PageData;
 
 	const isNew = data.id === 0;
 
+	let isDeposit: boolean;
 	let categoryId: number | null = null;
 	let amount: number | null = null;
 	let currency: string | null = null;
 	let description: string | null = null;
-	let generated: boolean;
+	let dayInMonth: number;
 	let createdDate: Date | null;
 	let synced: boolean;
-	let month: number | null = null;
-	let year: number | null = null;
 	let categoryOptions: SelectOption[] | null = null;
+	let dayInMonthOptions = new Array<SelectOption>();
 	let amountIsInvalid = false;
 	let saveButtonText: string;
 	let deleteInProgress = false;
 	let deleteButtonText: string;
 	let saveButtonIsLoading = false;
 	let deleteButtonIsLoading = false;
-	let language: string;
 
 	let localStorage: LocalStorageUtil;
-	let upcomingExpensesService: UpcomingExpensesService;
+	let automaticTransactionsService: AutomaticTransactionsService;
 	let categoriesService: CategoriesService;
 
-	let amountTo = 8000000;
-
-	$: canSave = () => {
-		return !!amount && !(!$isOnline && synced);
-	};
+	let amountFrom = 0.01;
+	let amountTo = 8000001;
 
 	function validate(): ValidationResult {
 		const result = new ValidationResult(true);
 
-		if (!ValidationUtil.between(<number>amount, 0, amountTo)) {
+		if (!ValidationUtil.between(amount, amountFrom, amountTo)) {
 			result.fail('amount');
 		}
 
 		return result;
 	}
 
+	function isDepositChanged() {
+		const categoryType = isDeposit ? CategoryType.DepositOnly : CategoryType.ExpenseOnly;
+
+		categoriesService.getAllAsOptions($t('uncategorized'), categoryType).then((options) => {
+			categoryOptions = options;
+		});
+	}
+
+	$: canSave = () => {
+		return !!amount && !(!$isOnline && synced);
+	};
+
 	async function save() {
-		if (!amount || !currency || !year || !month) {
+		if (!amount || !currency) {
 			throw new Error('Unexpected error: required fields missing');
 		}
 
@@ -78,39 +85,41 @@
 
 			if (isNew) {
 				try {
-					const upcomingExpense = new UpcomingExpense(
+					const automaticTransaction = new AutomaticTransaction(
 						0,
+						isDeposit,
 						categoryId,
 						amount,
 						currency,
 						description,
-						DateHelper.format(new Date(year, month, 1)),
-						false,
+						dayInMonth,
 						null,
 						null
 					);
-					const newId = await upcomingExpensesService.create(upcomingExpense);
 
-					goto('/upcomingExpenses?edited=' + newId);
+					const newId = await automaticTransactionsService.create(automaticTransaction);
+
+					goto('/automaticTransactions?edited=' + newId);
 				} catch {
 					saveButtonIsLoading = false;
 				}
 			} else {
 				try {
-					const upcomingExpense = new UpcomingExpense(
+					const automaticTransaction = new AutomaticTransaction(
 						data.id,
+						isDeposit,
 						categoryId,
 						amount,
 						currency,
 						description,
-						DateHelper.format(new Date(year, month, 1)),
-						generated,
+						dayInMonth,
 						createdDate,
 						null
 					);
-					await upcomingExpensesService.update(upcomingExpense);
 
-					goto('/upcomingExpenses?edited=' + data.id);
+					await automaticTransactionsService.update(automaticTransaction);
+
+					goto('/automaticTransactions?edited=' + data.id);
 				} catch {
 					saveButtonIsLoading = false;
 				}
@@ -120,18 +129,18 @@
 		}
 	}
 
-	async function deleteUpcomingExpense() {
+	async function deleteAutomaticTransaction() {
 		if (deleteInProgress) {
 			deleteButtonIsLoading = true;
 
 			try {
-				await upcomingExpensesService.delete(data.id);
+				await automaticTransactionsService.delete(data.id);
 
 				alertState.update((x) => {
-					x.showSuccess('editUpcomingExpense.deleteSuccessful');
+					x.showSuccess('editAutomaticTransaction.deleteSuccessful');
 					return x;
 				});
-				goto('/upcomingExpenses');
+				goto('/automaticTransactions');
 			} catch {
 				deleteButtonText = $t('delete');
 				deleteInProgress = false;
@@ -145,14 +154,18 @@
 
 	function cancel() {
 		if (!deleteInProgress) {
-			goto('/upcomingExpenses');
+			goto('/automaticTransactions');
 		}
 		deleteButtonText = $t('delete');
 		deleteInProgress = false;
 	}
 
-	onMount(() => {
+	onMount(async () => {
 		deleteButtonText = $t('delete');
+
+		for (let i = 1; i < 29; i++) {
+			dayInMonthOptions.push(new SelectOption(i, $t(`dayOrdinal${i}`)));
+		}
 
 		alertState.subscribe((value) => {
 			if (value.hidden) {
@@ -161,47 +174,40 @@
 		});
 
 		localStorage = new LocalStorageUtil();
-		upcomingExpensesService = new UpcomingExpensesService();
+		automaticTransactionsService = new AutomaticTransactionsService();
 		categoriesService = new CategoriesService();
-
-		language = localStorage.get('language');
 
 		if (isNew) {
 			currency = localStorage.get('currency');
+			dayInMonth = 1;
 			synced = false;
 
 			saveButtonText = $t('create');
 		} else {
 			saveButtonText = $t('save');
 
-			upcomingExpensesService.get(data.id).then((upcomingExpense: UpcomingExpense) => {
-				if (upcomingExpense === null) {
-					// TODO
-					goto('notFound');
-				}
+			const automaticTransaction = await automaticTransactionsService.get(data.id);
+			if (automaticTransaction === null) {
+				// TODO
+				goto('notFound');
+			}
 
-				categoryId = upcomingExpense.categoryId;
-				amount = upcomingExpense.amount;
-				currency = upcomingExpense.currency;
-				if (currency === 'MKD') {
-					amountTo = 450000000;
-				}
-				description = upcomingExpense.description;
-				month = parseInt(upcomingExpense.date.slice(5, 7), 10) - 1;
-				year = parseInt(upcomingExpense.date.slice(0, 4), 10);
-				generated = upcomingExpense.generated;
-				createdDate = upcomingExpense.createdDate;
-				synced = upcomingExpense.synced;
-			});
+			isDeposit = automaticTransaction.isDeposit;
+			categoryId = automaticTransaction.categoryId;
+			amount = automaticTransaction.amount;
+			currency = automaticTransaction.currency;
+			description = automaticTransaction.description;
+			dayInMonth = automaticTransaction.dayInMonth;
+			createdDate = automaticTransaction.createdDate;
+			synced = automaticTransaction.synced;
 		}
 
 		if (currency === 'MKD') {
+			amountFrom = 1;
 			amountTo = 450000000;
 		}
 
-		categoriesService.getAllAsOptions($t('uncategorized'), CategoryType.ExpenseOnly).then((options) => {
-			categoryOptions = options;
-		});
+		isDepositChanged();
 	});
 </script>
 
@@ -211,9 +217,15 @@
 			<i class="fas fa-pencil-alt" />
 		</div>
 		<div class="page-title">
-			<span>{$t(isNew ? 'editUpcomingExpense.newUpcomingExpense' : 'editUpcomingExpense.editUpcomingExpense')}</span>
+			<span
+				>{$t(
+					isNew
+						? 'editAutomaticTransaction.newAutomaticTransaction'
+						: 'editAutomaticTransaction.editAutomaticTransaction'
+				)}</span
+			>
 		</div>
-		<a href="/upcomingExpenses" class="back-button">
+		<a href="/automaticTransactions" class="back-button">
 			<i class="fas fa-times" />
 		</a>
 	</div>
@@ -223,14 +235,17 @@
 			<AlertBlock type="warning" message={$t('whileOfflineCannotModify')} />
 		{/if}
 
-		{#if generated}
-			<div class="message info">
-				<i class="fas fa-info-circle" />
-				<span>{$t('editUpcomingExpense.generatedAlert')}</span>
-			</div>
-		{/if}
-
 		<form on:submit={save}>
+			<div class="form-control">
+				<DoubleRadio
+					name="depositExpenseToggle"
+					leftLabelKey="editAutomaticTransaction.expense"
+					rightLabelKey="editAutomaticTransaction.deposit"
+					bind:value={isDeposit}
+					on:change={isDepositChanged}
+				/>
+			</div>
+
 			<div class="form-control inline">
 				<label for="amount">{$t('amount')}</label>
 				<AmountInput bind:amount bind:currency invalid={amountIsInvalid} />
@@ -251,8 +266,12 @@
 			</div>
 
 			<div class="form-control inline">
-				<label for="month-selector">{$t('editUpcomingExpense.month')}</label>
-				<MonthSelector bind:month bind:year disabled={generated} {language} />
+				<label for="day-in-month">{$t('editAutomaticTransaction.onEvery')}</label>
+				<select id="day-in-month" bind:value={dayInMonth} class="category-select">
+					{#each dayInMonthOptions as day}
+						<option value={day.id}>{day.name}</option>
+					{/each}
+				</select>
 			</div>
 
 			<div class="form-control">
@@ -285,7 +304,7 @@
 				{#if !isNew}
 					<button
 						type="button"
-						on:click={deleteUpcomingExpense}
+						on:click={deleteAutomaticTransaction}
 						class="button danger-button"
 						disabled={deleteButtonIsLoading}
 						class:confirm={deleteInProgress}
