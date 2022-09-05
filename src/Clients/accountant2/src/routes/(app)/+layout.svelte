@@ -1,6 +1,9 @@
 <script lang="ts">
 	import '../../app.css';
 
+	export const ssr = false;
+	export const prerender = true;
+
 	import { onMount } from 'svelte/internal';
 
 	import { AuthService } from '../../../../shared2/services/authService';

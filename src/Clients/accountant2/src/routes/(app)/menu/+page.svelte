@@ -57,7 +57,6 @@
 			<a href="/balanceAdjustment" class="wide-button">{$t('menu.balanceAdjustment')}</a>
 			<a href="/automaticTransactions" class="wide-button">{$t('menu.automaticTransactions')}</a>
 
-			<!--
 			<div class="drawer-button-wrap" class:open={reportsDrawerIsOpen}>
 				<button type="button" on:click={toggleReportsDrawer} class="wide-button drawer-button">
 					{$t('menu.reports')}
@@ -65,18 +64,23 @@
 				<div class="drawer-content-wrap">
 					<div class="drawer-content">
 						<a href="/pieChartReport" class="wide-button">{$t('menu.pieChart')}</a>
+						<a href="/" class="wide-button" style="text-decoration: line-through;">{$t('menu.barChart')}</a>
+						<a href="/" class="wide-button" style="text-decoration: line-through;">{$t('menu.expenditureHeatmap')}</a>
+						<!--
 						<a href="/barChartReport" class="wide-button">{$t('menu.barChart')}</a>
 						<a href="/expenditureHeatmap" class="wide-button"
 							>{$t('menu.expenditureHeatmap')}</a
 						>
+						-->
 					</div>
 				</div>
 			</div>
 
+			<!--
 			<a href="/earlyRetirementCalculator" class="wide-button"
 				>{$t('menu.earlyRetirementCalculator')}</a
-			>
-			<a href="/export" class="wide-button">{$t('menu.export')}</a> -->
+			> -->
+			<a href="/export" class="wide-button">{$t('menu.export')}</a>
 			<a href="/totalSync" class="wide-button">{$t('menu.totalSync')}</a>
 			<a href="/preferences" class="wide-button">{$t('menu.preferences')}</a>
 
@@ -102,45 +106,45 @@
 </section>
 
 <style lang="scss">
-	// .drawer-button-wrap {
-	// 	background: #f6f6f6;
-	// 	border-radius: 23px;
-	// 	box-shadow: inset var(--box-shadow);
-	// 	margin-top: 10px;
+	.drawer-button-wrap {
+		background: #f6f6f6;
+		border-radius: 23px;
+		box-shadow: inset var(--box-shadow);
+		margin-top: 10px;
 
-	// 	.drawer-button {
-	// 		box-shadow: none;
-	// 		transition: border-radius var(--transition);
-	// 	}
+		.drawer-button {
+			box-shadow: none;
+			transition: border-radius var(--transition);
+		}
 
-	// 	&.open {
-	// 		.drawer-button {
-	// 			border-bottom: 1px solid #e6e6e6;
-	// 			border-bottom-left-radius: 0;
-	// 			border-bottom-right-radius: 0;
-	// 			color: var(--regular-color);
-	// 		}
-	// 	}
+		&.open {
+			.drawer-button {
+				border-bottom: 1px solid #e6e6e6;
+				border-bottom-left-radius: 0;
+				border-bottom-right-radius: 0;
+				color: var(--regular-color);
+			}
+		}
 
-	// 	.drawer-content-wrap {
-	// 		max-height: 0;
-	// 		overflow-y: hidden;
-	// 		transition-property: all;
-	// 		transition-duration: 0.5s;
-	// 		transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+		.drawer-content-wrap {
+			max-height: 0;
+			overflow-y: hidden;
+			transition-property: all;
+			transition-duration: 0.5s;
+			transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
 
-	// 		.drawer-content {
-	// 			padding: 15px 20px;
-	// 		}
-	// 	}
-	// 	&.open .drawer-content-wrap {
-	// 		max-height: 175px;
-	// 	}
-	// }
+			.drawer-content {
+				padding: 15px 20px;
+			}
+		}
+		&.open .drawer-content-wrap {
+			max-height: 175px;
+		}
+	}
 
-	// @media screen and (min-width: 1200px) {
-	// 	.drawer-button-wrap.open .drawer-content-wrap {
-	// 		max-height: 191px;
-	// 	}
-	// }
+	@media screen and (min-width: 1200px) {
+		.drawer-button-wrap.open .drawer-content-wrap {
+			max-height: 191px;
+		}
+	}
 </style>

@@ -10,7 +10,6 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
-	import { ViewTransaction } from '$lib/models/viewmodels/viewTransaction';
 	import { TransactionsService } from '$lib/services/transactionsService';
 	import { TransactionType } from '$lib/models/viewmodels/transactionType';
 	import { CategoriesService } from '$lib/services/categoriesService';
@@ -22,8 +21,25 @@
 	export let data: PageData;
 
 	let fromExpenditureHeatmap = false;
-	let model: ViewTransaction | null = null;
-	let currency: string;
+	let type: TransactionType;
+	let typeLabel = '---';
+	let accountLabel = '---';
+	let accountValue = '---';
+	let amount: number | undefined;
+	let originalAmount: number;
+	let currency = '';
+	let fromStocks: number | null;
+	let toStocks: number | null;
+	let categoryName = '---';
+	let description: string | null;
+	let date = '---';
+	let isEncrypted: boolean;
+	let encryptedDescription: string | null;
+	let salt: string | null;
+	let nonce: string | null;
+	let generated: boolean;
+	let decryptionPassword: string | null = null;
+	let preferredCurrency: string;
 	let language: string;
 	let passwordShown = false;
 	let decryptButtonIsLoading = false;
@@ -67,11 +83,7 @@
 	}
 
 	async function decrypt() {
-		if (!model) {
-			return;
-		}
-
-		if (ValidationUtil.isEmptyOrWhitespace(model.decryptionPassword)) {
+		if (ValidationUtil.isEmptyOrWhitespace(decryptionPassword)) {
 			decryptionPasswordIsInvalid = true;
 			return;
 		}
@@ -79,19 +91,19 @@
 		decryptButtonIsLoading = true;
 
 		try {
-			if (!model.encryptedDescription || !model.salt || !model.nonce || !model.decryptionPassword) {
+			if (!encryptedDescription || !salt || !nonce || !decryptionPassword) {
 				throw new Error('Cannot decrypt. Description, salt, nonce, or password missing.');
 			}
 
 			const decryptedDescription = await encryptionService.decrypt(
-				model.encryptedDescription,
-				model.salt,
-				model.nonce,
-				model.decryptionPassword
+				encryptedDescription,
+				salt,
+				nonce,
+				decryptionPassword
 			);
 
-			model.isEncrypted = false;
-			model.description = decryptedDescription;
+			isEncrypted = false;
+			description = decryptedDescription;
 			decryptButtonIsLoading = false;
 		} catch {
 			decryptionPasswordIsInvalid = true;
@@ -123,10 +135,10 @@
 		accountsService = new AccountsService();
 		encryptionService = new EncryptionService();
 
-		currency = localStorage.get('currency');
+		preferredCurrency = localStorage.get('currency');
 		language = localStorage.get('language');
 
-		const transaction = await transactionsService.getForViewing(data.id, currency);
+		const transaction = await transactionsService.getForViewing(data.id, preferredCurrency);
 		if (transaction === null) {
 			// TODO
 			await goto('notFound');
@@ -137,7 +149,14 @@
 		}
 
 		const type = TransactionsService.getType(transaction.fromAccountId, transaction.toAccountId);
-		let categoryName: string;
+
+		typeLabel = <string>typeStringMap.get(type);
+		amount = transaction.convertedAmount;
+		originalAmount = transaction.amount;
+		currency = transaction.currency;
+		fromStocks = transaction.fromStocks;
+		toStocks = transaction.toStocks;
+
 		if (transaction.categoryId) {
 			const category = await categoriesService.get(transaction.categoryId);
 			categoryName = category.fullName;
@@ -145,46 +164,31 @@
 			categoryName = $t('uncategorized');
 		}
 
-		const viewTransaction = new ViewTransaction(
-			type,
-			<string>typeStringMap.get(type),
-			null,
-			null,
-			<number>transaction.convertedAmount,
-			transaction.currency,
-			transaction.amount,
-			transaction.fromStocks,
-			transaction.toStocks,
-			categoryName,
-			transaction.description,
-			formatOccurrenceDate(transaction.date),
-			transaction.isEncrypted,
-			transaction.encryptedDescription,
-			transaction.salt,
-			transaction.nonce,
-			transaction.generated,
-			null
-		);
+		description = transaction.description;
+		date = formatOccurrenceDate(transaction.date);
+		isEncrypted = transaction.isEncrypted;
+		encryptedDescription = transaction.encryptedDescription;
+		salt = transaction.salt;
+		nonce = transaction.nonce;
+		generated = transaction.generated;
 
-		if (viewTransaction.type === TransactionType.Transfer) {
+		if (type === TransactionType.Transfer) {
 			const fromAccount = await accountsService.get(<number>transaction.fromAccountId);
 			const toAccount = await accountsService.get(<number>transaction.toAccountId);
-			viewTransaction.accountLabel = $t('transaction.accounts');
-			viewTransaction.accountValue = $t('transaction.to', {
+			accountLabel = $t('transaction.accounts');
+			accountValue = $t('transaction.to', {
 				from: fromAccount.name,
 				to: toAccount.name
 			});
-		} else if (viewTransaction.type === TransactionType.Deposit) {
+		} else if (type === TransactionType.Deposit) {
 			const toAccount = await accountsService.get(<number>transaction.toAccountId);
-			viewTransaction.accountLabel = $t('transaction.toAccount');
-			viewTransaction.accountValue = toAccount.name;
+			accountLabel = $t('transaction.toAccount');
+			accountValue = toAccount.name;
 		} else {
 			const fromAccount = await accountsService.get(<number>transaction.fromAccountId);
-			viewTransaction.accountLabel = $t('transaction.fromAccount');
-			viewTransaction.accountValue = fromAccount.name;
+			accountLabel = $t('transaction.fromAccount');
+			accountValue = fromAccount.name;
 		}
-
-		model = viewTransaction;
 	});
 </script>
 
@@ -193,125 +197,116 @@
 		<a href="/editTransaction/{data.id}" class="side small" title={$t('edit')} aria-label={$t('edit')}>
 			<i class="fas fa-pencil-alt" />
 		</a>
-		<div class="page-title">{model?.typeLabel}</div>
+		<div class="page-title">{typeLabel}</div>
 		<button type="button" on:click={back} class="back-button">
 			<i class="fas fa-times" />
 		</button>
 	</div>
 
 	<div class="content-wrap">
-		{#if !model}
-			<div class="double-circle-loading">
-				<div class="double-bounce1" />
-				<div class="double-bounce2" />
+		<div class="viewing">
+			{#if generated}
+				<AlertBlock type="info" message={$t('transaction.generatedAlert')} />
+			{/if}
+
+			<div class="form-control inline">
+				<span>{$t('amount')}</span>
+				<span class:expense-color={type === 1} class:deposit-color={type === 2} class:transfer-color={type === 3}
+					>{Formatter.money(amount, preferredCurrency)}</span
+				>
 			</div>
-		{:else}
-			<div class="viewing">
-				{#if model.generated}
-					<AlertBlock type="info" message={$t('transaction.generatedAlert')} />
-				{/if}
 
+			{#if currency && currency !== preferredCurrency}
 				<div class="form-control inline">
-					<span>{$t('amount')}</span>
-					<span
-						class:expense-color={model.type === 1}
-						class:deposit-color={model.type === 2}
-						class:transfer-color={model.type === 3}>{Formatter.money(model.amount, currency)}</span
-					>
+					<span><span>{$t('transaction.originalAmountIn')}</span>{currency}</span>
+					<span>{Formatter.money(originalAmount, preferredCurrency)}</span>
 				</div>
+			{/if}
 
-				{#if model.currency !== currency}
-					<div class="form-control inline">
-						<span><span>{$t('transaction.originalAmountIn')}</span>{model.currency}</span>
-						<span>{Formatter.money(model.originalAmount, currency)}</span>
-					</div>
-				{/if}
+			<div class="form-control inline">
+				<span>{accountLabel}</span>
+				<span>{accountValue}</span>
+			</div>
 
+			{#if fromStocks}
 				<div class="form-control inline">
-					<span>{model.accountLabel}</span>
-					<span>{model.accountValue}</span>
+					<span>{$t('soldStocks')}</span>
+					<span class="expense-color">{Formatter.moneyPrecise(fromStocks, preferredCurrency)}</span>
 				</div>
+			{/if}
 
-				{#if model.fromStocks}
-					<div class="form-control inline">
-						<span>{$t('soldStocks')}</span>
-						<span class="expense-color">{Formatter.moneyPrecise(model.fromStocks, currency)}</span>
-					</div>
-				{/if}
-
-				{#if model.toStocks}
-					<div class="form-control inline">
-						<span>{$t('purchasedStocks')}</span>
-						<span class="deposit-color">{Formatter.moneyPrecise(model.toStocks, currency)}</span>
-					</div>
-				{/if}
-
+			{#if toStocks}
 				<div class="form-control inline">
-					<span>{$t('category')}</span>
-					<span>{model.category}</span>
+					<span>{$t('purchasedStocks')}</span>
+					<span class="deposit-color">{Formatter.moneyPrecise(toStocks, preferredCurrency)}</span>
 				</div>
+			{/if}
 
-				<div class="form-control inline">
-					<span>{$t('date')}</span>
-					<span>{model.date}</span>
-				</div>
+			<div class="form-control inline">
+				<span>{$t('category')}</span>
+				<span>{categoryName}</span>
+			</div>
 
-				{#if model.description}
-					<div class="form-control">
-						<div class="description-view">
-							<span>{$t('description')}</span>
-							<textarea bind:value={model.description} readonly />
-						</div>
+			<div class="form-control inline">
+				<span>{$t('date')}</span>
+				<span>{date}</span>
+			</div>
+
+			{#if description}
+				<div class="form-control">
+					<div class="description-view">
+						<span>{$t('description')}</span>
+						<textarea bind:value={description} readonly />
 					</div>
-				{/if}
+				</div>
+			{/if}
 
-				{#if model.isEncrypted}
-					<div class="form-control">
-						<div class="description-view encrypted">
-							<span>{$t('description')}</span>
+			{#if isEncrypted}
+				<div class="form-control">
+					<div class="description-view encrypted">
+						<span>{$t('description')}</span>
 
-							<form on:submit={decrypt} class="decrypt-form">
-								<div class="viewable-password">
-									<input
-										type="password"
-										bind:this={passwordInput}
-										bind:value={model.decryptionPassword}
-										class="password-input"
-										maxlength="100"
-										class:invalid={decryptionPasswordIsInvalid}
-										placeholder={$t('password')}
-										aria-label={$t('password')}
-										required
-									/>
-									<button
-										type="button"
-										on:click={togglePasswordShow}
-										class="password-show-button"
-										class:shown={passwordShown}
-										title={passwordShowIconLabel}
-										aria-label={passwordShowIconLabel}
-									>
-										<i class="fas fa-eye" />
-										<i class="fas fa-eye-slash" />
-									</button>
-								</div>
+						<form on:submit={decrypt} class="decrypt-form">
+							<div class="viewable-password">
+								<input
+									type="password"
+									bind:this={passwordInput}
+									bind:value={decryptionPassword}
+									class="password-input"
+									maxlength="100"
+									class:invalid={decryptionPasswordIsInvalid}
+									placeholder={$t('password')}
+									aria-label={$t('password')}
+									required
+								/>
 								<button
 									type="button"
-									on:click={decrypt}
-									class="decrypt-button"
-									class:loading={decryptButtonIsLoading}
-									title={$t('decryptDescription')}
-									aria-label={$t('decryptDescription')}
+									on:click={togglePasswordShow}
+									class="password-show-button"
+									class:shown={passwordShown}
+									title={passwordShowIconLabel}
+									aria-label={passwordShowIconLabel}
 								>
-									<i class="fas fa-unlock" />
-									<i class="fas fa-circle-notch fa-spin" />
+									<i class="fas fa-eye" />
+									<i class="fas fa-eye-slash" />
 								</button>
-							</form>
-						</div>
+							</div>
+							<button
+								type="button"
+								on:click={decrypt}
+								class="decrypt-button"
+								class:loading={decryptButtonIsLoading}
+								title={$t('decryptDescription')}
+								aria-label={$t('decryptDescription')}
+							>
+								<i class="fas fa-unlock" />
+								<i class="fas fa-circle-notch fa-spin" />
+							</button>
+						</form>
 					</div>
-				{/if}
-			</div>
-		{/if}
+				</div>
+			{/if}
+		</div>
 	</div>
 </section>
 

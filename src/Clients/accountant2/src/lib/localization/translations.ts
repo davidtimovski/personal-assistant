@@ -247,7 +247,9 @@ export default {
 			from: 'From',
 			to: 'To',
 			expenses: 'Expenses',
-			deposits: 'Deposits'
+			deposits: 'Deposits',
+			emptyListMessageExpenses: 'You have no expenses in the selected period',
+			emptyListMessageDeposits: 'You have no deposits in the selected period'
 		},
 		barChartReport: {
 			barChart: 'Bar chart',
@@ -654,7 +656,9 @@ export default {
 			from: 'Од',
 			to: 'До',
 			expenses: 'Одлив',
-			deposits: 'Прилив'
+			deposits: 'Прилив',
+			emptyListMessageExpenses: 'Немате трошоци во селектираниот период',
+			emptyListMessageDeposits: 'Немате депозити во селектираниот период'
 		},
 		barChartReport: {
 			barChart: 'Колона извештај',
