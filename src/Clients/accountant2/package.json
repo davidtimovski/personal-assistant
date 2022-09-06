@@ -1,6 +1,6 @@
 {
 	"name": "accountant2",
-	"version": "2.0.0-beta.3",
+	"version": "2.0.0-beta.4",
 	"scripts": {
 		"dev": "vite dev --port 8085",
 		"build": "vite build",

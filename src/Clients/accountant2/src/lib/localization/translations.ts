@@ -260,6 +260,7 @@ export default {
 			expenses: 'Expenses',
 			deposits: 'Deposits',
 			savings: 'Savings',
+			perMonth: 'Per month (average)',
 			spent: 'Spent',
 			deposited: 'Deposited',
 			saved: 'Saved'
@@ -669,6 +670,7 @@ export default {
 			expenses: 'Одлив',
 			deposits: 'Прилив',
 			savings: 'Штедење',
+			perMonth: 'Месечно (просек)',
 			spent: 'Потрошено',
 			deposited: 'Заработено',
 			saved: 'Заштедено'

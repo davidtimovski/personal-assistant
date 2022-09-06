@@ -28,7 +28,7 @@
 	let fromAccountLabel = '---';
 	let toAccountLabel = '---';
 	let amountIsInvalid = false;
-	let transferButtonLabel: string;
+	let transferButtonLabel = '';
 	let transferButtonIsLoading = false;
 
 	let localStorage: LocalStorageUtil;
