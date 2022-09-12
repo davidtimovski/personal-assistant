@@ -15,12 +15,21 @@ export class LocalStorageBase {
 
   public get(key: string): string {
     const value = window.localStorage.getItem(key);
-    if (value) {
-      return value;
+    if (!value) {
+      this.set(key, this.defaults.get(key));
+      return this.defaults.get(key);
     }
 
-    this.set(key, this.defaults.get(key));
-    return this.defaults.get(key);
+    return value;
+  }
+
+  public getObject<Type>(key: string): Type | null {
+    const value = window.localStorage.getItem(key);
+    if (!value) {
+      return null;
+    }
+
+    return JSON.parse(value);
   }
 
   public getBool(key: string): boolean {

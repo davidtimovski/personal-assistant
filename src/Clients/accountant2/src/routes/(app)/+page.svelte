@@ -14,23 +14,17 @@
 	import { SearchFilters } from '$lib/models/viewmodels/searchFilters';
 	import type { AmountByCategory } from '$lib/models/viewmodels/amountByCategory';
 	import { TransactionType } from '$lib/models/viewmodels/transactionType';
-	import type { UpcomingExpenseDashboard } from '$lib/models/viewmodels/upcomingExpenseDashboard';
-	import type { DebtDashboard } from '$lib/models/viewmodels/debtDashboard';
+	import { HomePageData } from '$lib/models/viewmodels/homePageData';
 	import { AccountsService } from '$lib/services/accountsService';
 
 	let imageUri: any;
-	let available = 0;
-	let spent = 0;
-	let balance = 0;
-	let upcomingSum = 0;
-	let expenditures: AmountByCategory[] | null = null;
-	let upcomingExpenses: UpcomingExpenseDashboard[] | null = null;
-	let debt: DebtDashboard[] | null = null;
+	let data = new HomePageData();
 	let currency: string;
 	let menuButtonIsLoading = false;
 	let connTracker = {
 		isOnline: true
 	};
+	let dataLoaded = false;
 
 	// Progress bar
 	let progressBarActive = false;
@@ -38,6 +32,7 @@
 	let progressIntervalId: number | null = null;
 	let progressBarVisible = false;
 
+	let localStorage: LocalStorageUtil;
 	let usersService: UsersService;
 	let capitalService: CapitalService;
 	let accountsService: AccountsService;
@@ -46,35 +41,46 @@
 		const mainAccountId = await accountsService.getMainId();
 
 		const balancePromise = accountsService.getBalance(mainAccountId, currency).then((result) => {
-			balance = result;
-			return balance;
+			data.balance = result;
+			return data.balance;
 		});
 
-		capitalService.getSpent(mainAccountId, $t('uncategorized'), currency).then((result) => {
-			spent = result[1];
-			expenditures = result[0];
+		const expendituresPromise = capitalService.getSpent(mainAccountId, $t('uncategorized'), currency).then((result) => {
+			data.spent = result[1];
+			data.expenditures = result[0];
 		});
 
-		const upcomingExpensesPromise = new Promise<number>((resolve) => {
+		const upcomingExpensesPromise = new Promise<number>(async (resolve) => {
 			if (!showUpcomingExpenses) {
 				resolve(0);
 				return;
 			}
 
-			capitalService.getUpcomingExpenses($t('uncategorized'), currency).then((result) => {
-				upcomingSum = result[1];
-				upcomingExpenses = result[0];
-				resolve(upcomingSum);
-			});
+			const result = await capitalService.getUpcomingExpenses($t('uncategorized'), currency);
+			data.upcomingSum = result[1];
+			data.upcomingExpenses = result[0];
+			resolve(data.upcomingSum);
 		});
 
-		Promise.all([balancePromise, upcomingExpensesPromise]).then((result) => {
-			available = result[0] - result[1];
+		const numbersPromise = Promise.all([balancePromise, upcomingExpensesPromise]).then((result) => {
+			data.available = result[0] - result[1];
 		});
 
-		if (showDebt) {
-			debt = await capitalService.getDebt(currency);
-		}
+		const debtPromise = new Promise<void>(async (resolve) => {
+			if (!showDebt) {
+				resolve();
+				return;
+			}
+
+			data.debt = await capitalService.getDebt(currency);
+			resolve();
+		});
+
+		await Promise.all([numbersPromise, expendituresPromise, debtPromise]);
+
+		finishProgressBar();
+		dataLoaded = true;
+		localStorage.set('homePageData', JSON.stringify(data));
 	}
 
 	function goToMenu() {
@@ -105,6 +111,7 @@
 	}
 
 	function startProgressBar() {
+		dataLoaded = false;
 		progressBarActive = true;
 		progress = 10;
 
@@ -128,20 +135,25 @@
 	}
 
 	onMount(() => {
-		const localStorage = new LocalStorageUtil();
+		localStorage = new LocalStorageUtil();
+		usersService = new UsersService('Accountant');
+		capitalService = new CapitalService();
+		accountsService = new AccountsService();
+
+		let cache = localStorage.getObject<HomePageData>('homePageData');
+		if (cache) {
+			data = cache;
+		}
+
 		const showUpcomingExpenses = localStorage.getBool(LocalStorageKeys.ShowUpcomingExpensesOnDashboard);
 		const showDebt = localStorage.getBool(LocalStorageKeys.ShowDebtOnDashboard);
 		currency = localStorage.get('currency');
-
-		capitalService = new CapitalService();
-		accountsService = new AccountsService();
 
 		loggedInUser.subscribe((value) => {
 			if (!value) {
 				return;
 			}
 
-			usersService = new UsersService('Accountant');
 			if (usersService.profileImageUriIsStale()) {
 				usersService.getProfileImageUri().then((uri) => {
 					imageUri = uri;
@@ -155,7 +167,6 @@
 			if (value === AppEvents.SyncStarted) {
 				startProgressBar();
 			} else if (value === AppEvents.SyncFinished) {
-				finishProgressBar();
 				getCapital(showUpcomingExpenses, showDebt);
 			}
 		});
@@ -202,22 +213,22 @@
 
 	<div class="content-wrap dashboard">
 		<div class="capital-summary">
-			<a href="/transactions" class="summary-item-wrap">
+			<a href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
 				<div class="summary-item">
 					<div class="summary-title">{$t('dashboard.available')}</div>
-					<div class="summary-value">{Formatter.number(available, currency)}</div>
+					<div class="summary-value">{Formatter.number(data.available, currency)}</div>
 				</div>
 			</a>
-			<a href="/transactions" class="summary-item-wrap">
+			<a href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
 				<div class="summary-item">
 					<div class="summary-title">{$t('dashboard.spent')}</div>
-					<div class="summary-value">{Formatter.number(spent, currency)}</div>
+					<div class="summary-value">{Formatter.number(data.spent, currency)}</div>
 				</div>
 			</a>
-			<a href="/transactions" class="summary-item-wrap">
+			<a href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
 				<div class="summary-item">
 					<div class="summary-title">{$t('balance')}</div>
-					<div class="summary-value">{Formatter.number(balance, currency)}</div>
+					<div class="summary-value">{Formatter.number(data.balance, currency)}</div>
 				</div>
 			</a>
 		</div>
@@ -231,12 +242,12 @@
 			</a>
 		</div>
 
-		{#if expenditures && expenditures.length > 0}
+		{#if data.expenditures && data.expenditures.length > 0}
 			<div>
 				<a href="/transactions" class="dashboard-table-title">{$t('dashboard.expenditures')}</a>
 				<table class="amount-by-category-table">
 					<tbody>
-						{#each expenditures as expenditure}
+						{#each data.expenditures as expenditure}
 							<tr on:click={() => goToTransactions(expenditure)}>
 								<td>{expenditure.categoryName}</td>
 								<td class="amount-cell">{Formatter.money(expenditure.amount, currency)}</td>
@@ -254,12 +265,12 @@
 			</div>
 		{/if}
 
-		{#if upcomingExpenses && upcomingExpenses.length > 0}
+		{#if data.upcomingExpenses && data.upcomingExpenses.length > 0}
 			<div>
 				<a href="/upcomingExpenses" class="dashboard-table-title">{$t('dashboard.upcomingExpenses')}</a>
 				<table class="dashboard-table">
 					<tbody>
-						{#each upcomingExpenses as upcomingExpense}
+						{#each data.upcomingExpenses as upcomingExpense}
 							<tr>
 								<td>{upcomingExpense.category}</td>
 								<td>{upcomingExpense.description}</td>
@@ -267,7 +278,7 @@
 							</tr>
 						{/each}
 					</tbody>
-					{#if upcomingExpenses.length > 1}
+					{#if data.upcomingExpenses.length > 1}
 						<tfoot>
 							<tr>
 								<td colspan="3">
@@ -275,7 +286,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td colspan="3">{Formatter.money(upcomingSum, currency)}</td>
+								<td colspan="3">{Formatter.money(data.upcomingSum, currency)}</td>
 							</tr>
 						</tfoot>
 					{/if}
@@ -283,12 +294,12 @@
 			</div>
 		{/if}
 
-		{#if debt && debt.length > 0}
+		{#if data.debt && data.debt.length > 0}
 			<div>
 				<a href="/debt" class="dashboard-table-title">{$t('dashboard.debt')}</a>
 				<table class="dashboard-table">
 					<tbody>
-						{#each debt as debtItem}
+						{#each data.debt as debtItem}
 							<tr>
 								<td>
 									{#if debtItem.userIsDebtor}
@@ -326,6 +337,12 @@
 		margin-right: 2%;
 		text-decoration: none;
 		color: #fff;
+		opacity: 0.6;
+		transition: opacity 350ms ease-out;
+
+		&.loaded {
+			opacity: 1;
+		}
 
 		&:last-child {
 			margin-right: 0;
