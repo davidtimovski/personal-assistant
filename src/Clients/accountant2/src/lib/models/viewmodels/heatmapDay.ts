@@ -8,8 +8,8 @@ export class HeatmapDay {
 		public isToday: boolean,
 		public spent: number,
 		public spentPercentage: number,
-		public backgroundColor: string,
-		public textColor: string,
+		public backgroundColor: string | null,
+		public textColor: string | null,
 		public expenditures: HeatmapExpense[]
 	) {
 		this.expenditures = [];

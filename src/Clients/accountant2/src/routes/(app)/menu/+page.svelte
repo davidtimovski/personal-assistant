@@ -65,12 +65,7 @@
 					<div class="drawer-content">
 						<a href="/pieChartReport" class="wide-button">{$t('menu.pieChart')}</a>
 						<a href="/barChartReport" class="wide-button">{$t('menu.barChart')}</a>
-						<a href="/" class="wide-button" style="text-decoration: line-through;">{$t('menu.expenditureHeatmap')}</a>
-						<!--
-						<a href="/expenditureHeatmap" class="wide-button"
-							>{$t('menu.expenditureHeatmap')}</a
-						>
-						-->
+						<a href="/expenditureHeatmap" class="wide-button">{$t('menu.expenditureHeatmap')}</a>
 					</div>
 				</div>
 			</div>
