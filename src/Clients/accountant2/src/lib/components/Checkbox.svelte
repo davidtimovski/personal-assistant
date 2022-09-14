@@ -2,7 +2,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import { t } from '$lib/localization/i18n';
 
-	export let labelKey: string;
+	export let labelKey: string | null = null;
 	export let value: boolean;
 	export let disabled = false;
 
@@ -13,7 +13,7 @@
 </script>
 
 <!-- svelte-ignore a11y-label-has-associated-control -->
-<label class="checkbox-toggle" class:disabled>
+<label class="checkbox-toggle" class:disabled class:no-label={!labelKey}>
 	{#if labelKey}
 		<span>{$t(labelKey)}</span>
 	{/if}
@@ -43,6 +43,10 @@
 		line-height: 37px;
 		cursor: pointer;
 		transition: opacity var(--transition);
+
+		&.no-label {
+			display: inline-flex;
+		}
 
 		&.disabled {
 			opacity: 0.5;

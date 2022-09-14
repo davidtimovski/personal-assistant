@@ -1,5 +1,3 @@
-import type { HeatmapExpense } from './heatmapExpense';
-
 export class HeatmapDay {
 	constructor(
 		public day: number,
@@ -14,4 +12,13 @@ export class HeatmapDay {
 	) {
 		this.expenditures = [];
 	}
+}
+
+export class HeatmapExpense {
+	constructor(
+		public transactionId: number,
+		public category: string,
+		public description: string,
+		public amount: number
+	) {}
 }

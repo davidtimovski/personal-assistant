@@ -24,6 +24,7 @@
 
 	async function logOut() {
 		window.localStorage.removeItem('profileImageUriLastLoad');
+		window.localStorage.removeItem('homePageData');
 		const authService = new AuthService(window);
 		await authService.logout();
 	}
@@ -70,10 +71,7 @@
 				</div>
 			</div>
 
-			<!--
-			<a href="/earlyRetirementCalculator" class="wide-button"
-				>{$t('menu.earlyRetirementCalculator')}</a
-			> -->
+			<a href="/earlyRetirementCalculator" class="wide-button">{$t('menu.earlyRetirementCalculator')}</a>
 			<a href="/export" class="wide-button">{$t('menu.export')}</a>
 			<a href="/totalSync" class="wide-button">{$t('menu.totalSync')}</a>
 			<a href="/preferences" class="wide-button">{$t('menu.preferences')}</a>

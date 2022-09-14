@@ -278,7 +278,7 @@ export default {
 		earlyRetirementCalculator: {
 			earlyRetirementCalculator: 'Early retirement calculator',
 			explanation:
-				"Many people wish to retire earlier than usual. This calculator allows you to find when you'll be able to retire depending on your personal financial situation. You will need to answer some questions to help us determine where you are now financially, how much you save or invest, what upcoming expenses you're expecting, and how much money you will need to live comfortably in retirement.",
+				"This calculator allows you to find when you'll be able to retire depending on your personal financial situation. You will need to answer some questions to help us determine where you are now financially, how much you save or invest, what upcoming expenses you're expecting, and how much money you will need to live comfortably in retirement.",
 			start: 'Start',
 			age: 'Age',
 			whatIsYourAge: 'What is your age?',
@@ -322,7 +322,7 @@ export default {
 				'You save <span class="er-calc-highlight">{{savedPerMonth}}</span> per month on an account or fund with a <span class="er-calc-highlight">{{savingInterestRate}}%</span> yearly interest rate',
 			summaryItem3b: "You don't put aside any money montly",
 			summaryItem4a:
-				'You are eligible for pension at age <span class="er-calc-highlight">{{pensionAge}}</span> and will recieve <span class="er-calc-highlight">{{pensionPerMonth}}</span> per month',
+				'You are eligible for pension at age <span class="er-calc-highlight">{{pensionAge}}</span> and will receive <span class="er-calc-highlight">{{pensionPerMonth}}</span> per month',
 			summaryItem4b: 'You are not eligible for pension',
 			summaryItem5a:
 				'You have a life insurance policy with an investment option that will yield <span class="er-calc-highlight">{{lifeInsuranceReturn}}</span> when you reach <span class="er-calc-highlight">{{lifeInsuranceAge}}</span> years of age',
@@ -688,7 +688,7 @@ export default {
 		earlyRetirementCalculator: {
 			earlyRetirementCalculator: 'Калкулатор за рано пензионирање',
 			explanation:
-				'Многу луѓе посакуваат да се пензионираат порано него вообичаено. Овој калкулатор ви дозволува да откриете кога би можеле да се пензионирате земајки ја во предвид вашата финансиска ситуација. Ќе треба да одговорите на неколку прашања за да ни помогнете да воспоставиме каде се наоѓате финансиски, колку штедите или инвестирате, какви идни трошоци очекувате, и колку пари ќе ви се потребни да живеете комфорно во пензија.',
+				'Овој калкулатор ви дозволува да откриете кога би можеле да се пензионирате земајки ја во предвид вашата финансиска ситуација. Ќе треба да одговорите на неколку прашања за да ни помогнете да воспоставиме каде се наоѓате финансиски, колку штедите или инвестирате, какви идни трошоци очекувате, и колку пари ќе ви се потребни да живеете комфорно во пензија.',
 			start: 'Започни',
 			age: 'Години',
 			whatIsYourAge: 'Колку години имате?',

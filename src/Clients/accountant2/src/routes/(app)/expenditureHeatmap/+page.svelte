@@ -9,8 +9,7 @@
 	import { Formatter } from '$lib/utils/formatter';
 	import { TransactionsService } from '$lib/services/transactionsService';
 	import { AccountsService } from '$lib/services/accountsService';
-	import { HeatmapDay } from '$lib/models/viewmodels/heatmapDay';
-	import { HeatmapExpense } from '$lib/models/viewmodels/heatmapExpense';
+	import { HeatmapDay, HeatmapExpense } from '$lib/models/viewmodels/expenditureHeatmap';
 
 	let days: HeatmapDay[] | null = null;
 	let selectedDay: HeatmapDay | null = null;
