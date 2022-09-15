@@ -13,6 +13,7 @@
 
 	import AlertBlock from '$lib/components/AlertBlock.svelte';
 	import Checkbox from '$lib/components/Checkbox.svelte';
+	import Tooltip from '$lib/components/Tooltip.svelte';
 
 	export let data: PageData;
 
@@ -290,8 +291,7 @@
 
 			<div class="form-control">
 				<Checkbox labelKey="editCategory.tax" bind:value={isTax} disabled={type !== 2} />
-				<!-- TODO -->
-				<!-- <tooltip key="taxCategories" /> -->
+				<Tooltip key="taxCategories" />
 			</div>
 
 			<hr />

@@ -405,7 +405,7 @@ export default {
 				title: 'Tax categories',
 				question: 'What does it mean?',
 				answer:
-					'Transactions made within a tax category will be not be considered as regular expenses and will simply be exempted from all expenditure sums like in the dashboard page, Pie chart, Bar chart, and Expenditure heatmap.'
+					'Transactions made within a tax category will be not be considered as regular expenses and will simply be exempted from all expenditure sums like in the home page, Pie chart, Bar chart, and Expenditure heatmap.'
 			}
 		}
 	},
@@ -817,7 +817,7 @@ export default {
 				title: 'Даночни категории',
 				question: 'Што значи ова?',
 				answer:
-					'Трансакциите кои се направени во даночни категории нема да бидат сметани како обични трошоци и едноставно ќе бидат изземени од сите суми на трошоци како во главната страна, Пита извештај, Колона извештај, и Календар на трошоци.'
+					'Трансакциите кои се направени во даночни категории нема да бидат сметани како обични трошоци и едноставно ќе бидат изземени од сите суми на трошоци како на главната страна, Пита извештај, Колона извештај, и Календар на трошоци.'
 			}
 		}
 	}

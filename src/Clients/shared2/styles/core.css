@@ -637,48 +637,6 @@ a.button {
   cursor: default;
 }
 
-.tooltip-item {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 5px;
-  margin-bottom: 10px;
-}
-.tooltip-item hr {
-  margin: 3px 10%;
-}
-.tooltip-item .tooltip-header {
-  display: flex;
-  justify-content: space-between;
-}
-.tooltip-item .tooltip-header a {
-  width: 54px;
-  padding: 3px 0 1px;
-  font-size: 25px;
-  text-align: center;
-  line-height: 40px;
-  text-decoration: none;
-  color: var(--primary-color);
-  transition: color var(--transition);
-}
-.tooltip-item .tooltip-header a:hover {
-  color: var(--primary-color-dark);
-}
-.tooltip-item .fa-eye-slash {
-  color: var(--faded-color);
-}
-.tooltip-item .tooltip-title {
-  padding: 10px 5px;
-  font-size: 1rem;
-  line-height: 1.4rem;
-  text-align: center;
-}
-.tooltip-item .tooltip-answer {
-  padding: 8px 10px;
-  font-size: 1rem;
-  line-height: 1.3rem;
-  text-align: center;
-}
-
 .text-wrap {
   padding: 15px 5px;
   margin-bottom: 25px;

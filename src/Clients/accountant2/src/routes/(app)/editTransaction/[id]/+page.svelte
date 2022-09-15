@@ -19,6 +19,7 @@
 	import Checkbox from '$lib/components/Checkbox.svelte';
 	import AmountInput from '$lib/components/AmountInput.svelte';
 	import AlertBlock from '$lib/components/AlertBlock.svelte';
+	import Tooltip from '$lib/components/Tooltip.svelte';
 
 	export let data: PageData;
 
@@ -465,8 +466,8 @@
 
 							{#if encrypt}
 								<div>
-									<!-- TODO -->
-									<!-- <tooltip key="encryptedDescription" /> -->
+									<Tooltip key="encryptedDescription" />
+
 									<div class="viewable-password">
 										<input
 											type="password"

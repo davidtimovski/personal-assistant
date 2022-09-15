@@ -25,22 +25,6 @@ export class AuthService {
     });
   }
 
-  // get currentUser(): User | null {
-  // 	return this.user;
-  // }
-
-  // get currentUserId(): number | null {
-  // 	if (!this.user) {
-  // 		return null;
-  // 	}
-
-  // 	return parseInt(this.user.profile.sub, 10);
-  // }
-
-  // get authenticated(): boolean {
-  // 	return !!this.user;
-  // }
-
   async loginCallback() {
     if (!this.userManager) {
       return;

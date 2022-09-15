@@ -1,17 +1,18 @@
-import { inject } from "aurelia";
-import { json } from "@aurelia/fetch-client";
-
 import { ErrorLogger } from "./errorLogger";
-import { HttpProxy } from "../utils/httpProxy";
+import { HttpProxy } from "../services/httpProxy";
 import { Tooltip } from "../models/tooltip";
+import Variables from "$lib/variables";
 
-@inject()
 export class TooltipsService {
-  constructor(private readonly httpProxy: HttpProxy, private readonly logger: ErrorLogger) {}
+  private readonly httpProxy = new HttpProxy();
+
+  constructor(private readonly logger: ErrorLogger) {}
 
   async getAll(application: string): Promise<Array<Tooltip>> {
     try {
-      const result = await this.httpProxy.ajax<Array<Tooltip>>(`api/tooltips/application/${application}`);
+      const result = await this.httpProxy.ajax<Array<Tooltip>>(
+        `${Variables.urls.api}/api/tooltips/application/${application}`
+      );
       return result;
     } catch (e) {
       this.logger.logError(e);
@@ -21,7 +22,9 @@ export class TooltipsService {
 
   async getByKey(key: string, application: string): Promise<Tooltip> {
     try {
-      const result = await this.httpProxy.ajax<Tooltip>(`api/tooltips/key/${key}/${application}`);
+      const result = await this.httpProxy.ajax<Tooltip>(
+        `${Variables.urls.api}/api/tooltips/key/${key}/${application}`
+      );
       return result;
     } catch (e) {
       this.logger.logError(e);
@@ -29,11 +32,15 @@ export class TooltipsService {
     }
   }
 
-  async toggleDismissed(key: string, application: string, isDismissed: boolean): Promise<void> {
+  async toggleDismissed(
+    key: string,
+    application: string,
+    isDismissed: boolean
+  ): Promise<void> {
     try {
-      await this.httpProxy.ajaxExecute("api/tooltips", {
+      await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/tooltips`, {
         method: "put",
-        body: json({
+        body: window.JSON.stringify({
           key: key,
           application: application,
           isDismissed: isDismissed,

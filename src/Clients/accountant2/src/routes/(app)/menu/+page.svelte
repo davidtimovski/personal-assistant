@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
-	import { goto } from '$app/navigation';
 
 	import { AuthService } from '../../../../../shared2/services/authService';
 
@@ -11,15 +10,8 @@
 	let reportsDrawerIsOpen = false;
 	let version = '--';
 
-	let helpButtonIsLoading = false;
-
 	function toggleReportsDrawer() {
 		reportsDrawerIsOpen = !reportsDrawerIsOpen;
-	}
-
-	function goToHelp() {
-		helpButtonIsLoading = true;
-		goto('/help');
 	}
 
 	async function logOut() {
@@ -75,13 +67,7 @@
 			<a href="/export" class="wide-button">{$t('menu.export')}</a>
 			<a href="/totalSync" class="wide-button">{$t('menu.totalSync')}</a>
 			<a href="/preferences" class="wide-button">{$t('menu.preferences')}</a>
-
-			<!-- <a on:click={goToHelp} class="wide-button with-badge">
-				<span class="button-loader" class:loading={helpButtonIsLoading}>
-					<i class="fas fa-circle-notch fa-spin" />
-				</span>
-				<span>{$t('menu.help')}</span>
-			</a> -->
+			<a href="/help" class="wide-button">{$t('menu.help')}</a>
 		</div>
 
 		<hr />
