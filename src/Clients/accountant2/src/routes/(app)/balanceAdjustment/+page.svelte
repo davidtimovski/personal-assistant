@@ -15,10 +15,10 @@
 	import AmountInput from '$lib/components/AmountInput.svelte';
 
 	let accountId: number;
-	let balance: number;
+	let balance: number | null = null;
 	let description: string;
 	let originalBalance: number;
-	let currency: string;
+	let currency: string | null = null;
 	let accountOptions: SelectOption[] | null = null;
 	let balanceIsInvalid = false;
 	let adjustButtonIsLoading = false;
@@ -30,11 +30,11 @@
 	let min = 0.01;
 
 	async function accountChanged() {
-		const accountBalance = await accountsService.getBalance(accountId, currency);
+		const accountBalance = await accountsService.getBalance(accountId, <string>currency);
 		originalBalance = balance = accountBalance;
 	}
 
-	$: adjustedBy = balance - originalBalance;
+	$: adjustedBy = !balance ? 0 : balance - originalBalance;
 
 	function validate(): ValidationResult {
 		const result = new ValidationResult(true);
@@ -60,7 +60,7 @@
 			try {
 				const amount = parseFloat(<any>balance) - originalBalance;
 
-				await transactionsService.adjust(accountId, amount, description, currency);
+				await transactionsService.adjust(accountId, amount, description, <string>currency);
 
 				alertState.update((x) => {
 					x.showSuccess('balanceAdjustment.adjustmentSuccessful');

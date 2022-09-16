@@ -23,7 +23,6 @@
 	let currency: string;
 	let language: string;
 	let editedId: number | undefined;
-	let viewCategory = false;
 	let pageCount: number;
 	let categoryOptions: SelectOption[] | null = null;
 	let accountOptions: SelectOption[] | null = null;
@@ -65,8 +64,13 @@
 						transaction.id,
 						transaction.amount,
 						getType(transaction.fromAccountId, transaction.toAccountId),
-						getCategoryName(transaction.categoryId),
-						formatDescription(transaction.description, transaction.isEncrypted),
+						getDetail(
+							transaction.description,
+							transaction.isEncrypted,
+							transaction.categoryId,
+							transaction.fromAccountId,
+							transaction.toAccountId
+						),
 						formatDate(transaction.date),
 						transaction.synced
 					)
@@ -90,12 +94,37 @@
 		});
 	}
 
-	function getCategoryName(categoryId: number | null): string {
-		const category = categoryOptions?.find((x) => x.id === categoryId);
-		if (!category) {
-			throw new Error('Could not find category');
+	function getDetail(
+		description: string | null,
+		isEncrypted: boolean,
+		categoryId: number | null,
+		fromAccountId: number | null,
+		toAccountId: number | null
+	): string {
+		if (!accountOptions || !categoryOptions) {
+			throw new Error('Category and account options not loaded yet');
 		}
 
+		if (fromAccountId && toAccountId) {
+			const fromAccount = <SelectOption>accountOptions.find((x) => x.id === fromAccountId);
+			const toAccount = <SelectOption>accountOptions.find((x) => x.id === toAccountId);
+			return fromAccount.name + ' -> ' + toAccount.name;
+		}
+
+		if (description) {
+			if (isEncrypted) {
+				return $t('encryptedPlaceholder');
+			}
+
+			const length = 40;
+			if (description.length <= length) {
+				return description;
+			}
+
+			return description.substring(0, length - 2) + '..';
+		}
+
+		const category = <SelectOption>categoryOptions.find((x) => x.id === categoryId);
 		return category.name;
 	}
 
@@ -115,23 +144,6 @@
 		return TransactionsService.getType(fromAccountId, toAccountId);
 	}
 
-	function formatDescription(description: string | null, isEncrypted: boolean): string {
-		if (isEncrypted) {
-			return $t('encryptedPlaceholder');
-		}
-
-		if (!description) {
-			return '';
-		}
-
-		const length = 40;
-		if (description.length <= length) {
-			return description;
-		}
-
-		return description.substring(0, length - 2) + '..';
-	}
-
 	function formatDate(dateString: string): string {
 		const date = new Date(Date.parse(dateString));
 		const month = DateHelper.getShortMonth(date, language);
@@ -142,10 +154,6 @@
 		}
 
 		return `${month} ${date.getDate()}, ${date.getFullYear()}`;
-	}
-
-	function toggleViewCategory() {
-		viewCategory = !viewCategory;
 	}
 
 	function filterChanged() {
@@ -374,19 +382,7 @@
 						<tr>
 							<th class="type-cell" />
 							<th>{$t('amount')}</th>
-							<th
-								on:click={toggleViewCategory}
-								class="clickable-cell"
-								role="button"
-								title={$t('transactions.toggleDescriptionCategory')}
-								aria-label={$t('transactions.toggleDescriptionCategory')}
-							>
-								{#if viewCategory}
-									<span>{$t('category')}</span>
-								{:else}
-									<span>{$t('description')}</span>
-								{/if}
-							</th>
+							<th>{$t('transactions.detail')}</th>
 							<th>{$t('date')}</th>
 							<th class="sync-icon-cell" />
 						</tr>
@@ -413,7 +409,7 @@
 										{/if}
 									</td>
 									<td>{Formatter.number(transaction.amount, currency)}</td>
-									<td>{viewCategory ? transaction.category : transaction.description}</td>
+									<td>{transaction.detail}</td>
 									<td class="date-cell">{transaction.date}</td>
 
 									<td class="sync-icon-cell">

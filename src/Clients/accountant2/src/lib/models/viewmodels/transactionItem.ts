@@ -5,8 +5,7 @@ export class TransactionItem {
 		public id: number,
 		public amount: number,
 		public type: TransactionType,
-		public category: string,
-		public description: string,
+		public detail: string,
 		public date: string,
 		public synced: boolean
 	) {}

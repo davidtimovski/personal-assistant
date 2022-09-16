@@ -29,14 +29,14 @@
 	let amount: number | null = null;
 	let currency: string | null = null;
 	let description: string | null = null;
-	let date: string | null = null;
+	let date = DateHelper.format(new Date());
 	let encrypt = false;
 	let encryptionPassword: string | null = null;
 	let debtId: number | null = null;
 	let userIsDebtor: boolean;
 	let debtPerson: string;
 	let categoryOptions: SelectOption[] | null = null;
-	let maxDate: string;
+	const maxDate = date;
 	let passwordShown = false;
 	let amountIsInvalid = false;
 	let dateIsInvalid = false;
@@ -225,8 +225,6 @@
 	}
 
 	onMount(async () => {
-		maxDate = date = DateHelper.format(new Date());
-
 		passwordShowIconLabel = $t('showPassword');
 
 		alertState.subscribe((value) => {

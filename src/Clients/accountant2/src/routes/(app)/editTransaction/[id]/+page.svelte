@@ -31,7 +31,7 @@
 	let toStocks: number | null = null;
 	let currency: string | null = null;
 	let description: string | null = null;
-	let date: string;
+	let date = DateHelper.format(new Date());
 	let isEncrypted: boolean;
 	let encryptedDescription: string | null = null;
 	let salt: string | null = null;
@@ -44,7 +44,7 @@
 	let synced: boolean;
 	let type: TransactionType;
 	let categoryOptions: SelectOption[] | null = null;
-	let maxDate: string;
+	const maxDate = date;
 	let decPasswordShown = false;
 	let encPasswordShown = false;
 	let amountIsInvalid = false;
@@ -272,7 +272,6 @@
 	}
 
 	onMount(async () => {
-		maxDate = date = DateHelper.format(new Date());
 		deleteButtonText = $t('delete');
 		passwordShowIconLabel = $t('showPassword');
 

@@ -37,7 +37,7 @@
 	from.setDate(1);
 	let fromDate = DateHelper.format(from);
 	let toDate = DateHelper.format(new Date());
-	let maxDate = toDate;
+	const maxDate = toDate;
 
 	Chart.register(ArcElement, PieController);
 	Chart.defaults.font.family = '"Didact Gothic", sans-serif';
@@ -70,15 +70,29 @@
 		const flatItems = new Array<PieChartItem>();
 		const legendColors = [...colors];
 		for (const item of byCategory) {
-			item.color = legendColors.length > 0 ? <string>legendColors.shift() : '#e0e0e0';
-			flatItems.push(item);
+			if (item.subItems.length === 0) {
+				item.color = legendColors.length > 0 ? <string>legendColors.shift() : '#e0e0e0';
+				flatItems.push(item);
 
-			for (const subItem of item.subItems) {
-				subItem.color = legendColors.length > 0 ? <string>legendColors.shift() : '#e0e0e0';
-				flatItems.push(subItem);
+				sum += item.amount;
+			} else if (item.subItems.length === 1) {
+				item.color = legendColors.length > 0 ? <string>legendColors.shift() : '#e0e0e0';
+
+				const subItem = item.subItems[0];
+				item.categoryId = subItem.categoryId;
+				item.categoryName += '/' + subItem.categoryName?.replace('- ', '');
+				item.subItems = [];
+				flatItems.push(item);
+
+				sum += item.amount;
+			} else {
+				for (const subItem of item.subItems) {
+					subItem.color = legendColors.length > 0 ? <string>legendColors.shift() : '#e0e0e0';
+					flatItems.push(subItem);
+
+					sum += subItem.amount;
+				}
 			}
-
-			sum += item.data.amount;
 		}
 
 		items = byCategory;
@@ -86,8 +100,8 @@
 		for (let i = 0; i < flatItems.length; i++) {
 			(<any>chart.data.datasets[0]).backgroundColor[i] = flatItems[i].color;
 
-			labels.push(<string>flatItems[i].data.categoryName);
-			amounts.push(flatItems[i].data.amount);
+			labels.push(<string>flatItems[i].categoryName);
+			amounts.push(flatItems[i].amount);
 		}
 
 		if (flatItems.length > 0) {
@@ -102,7 +116,7 @@
 	}
 
 	function goToTransactions(item: PieChartItem) {
-		searchFilters.set(new SearchFilters(1, 15, fromDate, toDate, 0, item.data.categoryId, type(), null));
+		searchFilters.set(new SearchFilters(1, 15, fromDate, toDate, 0, item.categoryId, type(), null));
 		goto('transactions');
 	}
 
@@ -201,8 +215,13 @@
 									goToTransactions(item);
 								}}
 							>
-								<td><span class="legend-color" style="background: {item.color};" />{item.data.categoryName}</td>
-								<td class="amount-cell">{Formatter.money(item.data.amount, currency)}</td>
+								<td>
+									{#if item.color}
+										<span class="legend-color" style="background: {item.color};" />
+									{/if}
+									<span>{item.categoryName}</span></td
+								>
+								<td class="amount-cell">{Formatter.money(item.amount, currency)}</td>
 							</tr>
 							{#each item.subItems as subItem}
 								<tr
@@ -211,9 +230,9 @@
 									}}
 								>
 									<td class="sub-category-cell">
-										<span class="legend-color" style="background: {subItem.color};" />{subItem.data.categoryName}
+										<span class="legend-color" style="background: {subItem.color};" />{subItem.categoryName}
 									</td>
-									<td class="amount-cell">{Formatter.money(subItem.data.amount, currency)}</td>
+									<td class="amount-cell">{Formatter.money(subItem.amount, currency)}</td>
 								</tr>
 							{/each}
 						{/each}

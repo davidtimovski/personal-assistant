@@ -223,7 +223,6 @@ export class TransactionsService {
 				description = null;
 			}
 
-			const now = DateHelper.adjustForTimeZone(new Date());
 			const transaction = new TransactionModel(
 				0,
 				fromAccountId,
@@ -240,8 +239,8 @@ export class TransactionsService {
 				salt,
 				nonce,
 				false,
-				now,
-				now
+				null,
+				null
 			);
 
 			await this.createTransaction(transaction);
@@ -273,7 +272,6 @@ export class TransactionsService {
 				toStocks = parseFloat(<any>toStocks);
 			}
 
-			const now = DateHelper.adjustForTimeZone(new Date());
 			const transaction = new TransactionModel(
 				0,
 				fromAccountId,
@@ -290,8 +288,8 @@ export class TransactionsService {
 				null,
 				null,
 				false,
-				now,
-				now
+				null,
+				null
 			);
 
 			await this.createTransaction(transaction);
@@ -302,6 +300,9 @@ export class TransactionsService {
 	}
 
 	private async createTransaction(transaction: TransactionModel): Promise<void> {
+		transaction.createdDate = DateHelper.adjustForTimeZone(new Date());
+		transaction.modifiedDate = DateHelper.adjustForTimeZone(new Date());
+
 		if (navigator.onLine) {
 			transaction.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/api/transactions`, {
 				method: 'post',
