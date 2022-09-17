@@ -4,7 +4,7 @@ import Variables from "$lib/variables";
 import { loggedInUser } from "$lib/stores";
 
 export class AuthService {
-  private userManager: UserManager | null = null;
+  private userManager: any = null;
 
   constructor(window: Window) {
     if (Variables.debug) {
@@ -25,22 +25,6 @@ export class AuthService {
     });
   }
 
-  // get currentUser(): User | null {
-  // 	return this.user;
-  // }
-
-  // get currentUserId(): number | null {
-  // 	if (!this.user) {
-  // 		return null;
-  // 	}
-
-  // 	return parseInt(this.user.profile.sub, 10);
-  // }
-
-  // get authenticated(): boolean {
-  // 	return !!this.user;
-  // }
-
   async loginCallback() {
     if (!this.userManager) {
       return;
@@ -60,10 +44,6 @@ export class AuthService {
         return;
       }
     }
-
-    //this.httpClient.defaults.headers["Authorization"] = `Bearer ${this.user.access_token}`;
-
-    // this.eventAggregator.publish(AuthEvents.Authenticated);
   }
 
   async login() {

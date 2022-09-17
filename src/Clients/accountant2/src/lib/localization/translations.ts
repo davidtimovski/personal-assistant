@@ -23,11 +23,11 @@ export default {
 		description: 'Description',
 		password: 'Password',
 		encryptedPlaceholder: '[ Encrypted ]',
+		decryptDescription: 'Decrypt description',
 		balance: 'Balance',
 		uncategorized: 'Uncategorized',
 		deletedAccount: '[deleted account]',
-		whileOfflineCannotModify:
-			'While offline you cannot modify data that has already been synced with the cloud.',
+		whileOfflineCannotModify: 'While offline you cannot modify data that has already been synced with the cloud.',
 		changeCurrency: 'Change currency',
 		showPassword: 'Show password',
 		hidePassword: 'Hide password',
@@ -78,10 +78,9 @@ export default {
 		newTransaction: {
 			newExpense: 'New expense',
 			newDeposit: 'New deposit',
-			settleDebtTo: 'Settle debt to',
-			settleDebtFrom: 'Settle debt from',
-			considerUsingYesterday1: "It's currently",
-			considerUsingYesterday2: "past midnight. Consider using yesterday's date.",
+			settleDebtTo: 'Settle debt to {{person}}.',
+			settleDebtFrom: 'Settle debt from {{person}}.',
+			considerUsingYesterday: "It's currently {{time}} past midnight. Consider using yesterday's date.",
 			encryptDescription: 'Encrypt description',
 			submit: 'Submit',
 			dateIsRequired: 'The Date is required',
@@ -106,7 +105,6 @@ export default {
 			editDeposit: 'Edit deposit',
 			editTransaction: 'Edit transaction',
 			encryptDescription: 'Encrypt description',
-			decryptDescription: 'Decrypt description',
 			resetDescription: 'Reset description',
 			saveSuccessful: 'Transaction was successfully saved',
 			deleteSuccessful: 'Transaction was successfully deleted'
@@ -121,7 +119,7 @@ export default {
 			transfers: 'Transfers',
 			searchByDescription: 'Search by description',
 			clear: 'Clear',
-			toggleDescriptionCategory: 'Toggle Description/Category',
+			detail: 'Detail',
 			first: 'First',
 			last: 'Last',
 			previous: 'Previous',
@@ -139,8 +137,7 @@ export default {
 			editUpcomingExpense: 'Edit upcoming expense',
 			generatedAlert: 'This upcoming expense was automatically generated.',
 			month: 'Month',
-			description:
-				'Description. Leave empty if you want it to target all expenses in the category.',
+			description: 'Description. Leave empty if you want it to target all expenses in the category.',
 			saveSuccessful: 'Upcoming expense was successfully saved',
 			deleteSuccessful: 'Upcoming expense was successfully deleted'
 		},
@@ -184,8 +181,7 @@ export default {
 			allTransactions: 'All transactions',
 			depositOnly: 'Deposit only',
 			expenseOnly: 'Expense only',
-			categoryHasTransactions:
-				'This category has transactions.<br>Deleting it will remove them as well.',
+			categoryHasTransactions: 'This category has transactions.<br>Deleting it will remove them as well.',
 			okayDelete: 'Okay, delete',
 			deleteSuccessful: 'Category was successfully deleted'
 		},
@@ -219,8 +215,7 @@ export default {
 			accountName: 'Account name',
 			investmentFund: 'Investment fund',
 			stockPrice: 'Stock price',
-			accountHasTransactions:
-				'This account has transactions.<br>Deleting it will remove them as well.',
+			accountHasTransactions: 'This account has transactions.<br>Deleting it will remove them as well.',
 			okayDelete: 'Okay, delete',
 			deleteSuccessful: 'Account was successfully deleted'
 		},
@@ -252,7 +247,9 @@ export default {
 			from: 'From',
 			to: 'To',
 			expenses: 'Expenses',
-			deposits: 'Deposits'
+			deposits: 'Deposits',
+			emptyListMessageExpenses: 'You have no expenses in the selected period',
+			emptyListMessageDeposits: 'You have no deposits in the selected period'
 		},
 		barChartReport: {
 			barChart: 'Bar chart',
@@ -263,6 +260,7 @@ export default {
 			expenses: 'Expenses',
 			deposits: 'Deposits',
 			savings: 'Savings',
+			perMonth: 'Per month (average)',
 			spent: 'Spent',
 			deposited: 'Deposited',
 			saved: 'Saved'
@@ -280,7 +278,7 @@ export default {
 		earlyRetirementCalculator: {
 			earlyRetirementCalculator: 'Early retirement calculator',
 			explanation:
-				"Many people wish to retire earlier than usual. This calculator allows you to find when you'll be able to retire depending on your personal financial situation. You will need to answer some questions to help us determine where you are now financially, how much you save or invest, what upcoming expenses you're expecting, and how much money you will need to live comfortably in retirement.",
+				"This calculator allows you to find when you'll be able to retire depending on your personal financial situation. You will need to answer some questions to help us determine where you are now financially, how much you save or invest, what upcoming expenses you're expecting, and how much money you will need to live comfortably in retirement.",
 			start: 'Start',
 			age: 'Age',
 			whatIsYourAge: 'What is your age?',
@@ -311,13 +309,11 @@ export default {
 			home: 'Home',
 			car: 'Car',
 			kids: 'Kids',
-			listAnyUpcomingExpenses:
-				"List any large expenses that you're anticipating before you retire.",
+			listAnyUpcomingExpenses: "List any large expenses that you're anticipating before you retire.",
 			removeExpense: 'Remove expense',
 			addExpense: 'Add expense',
 			retirement: 'Retirement',
-			retirementIncome:
-				'What monthly net income would you consider enough for you to live comfortably in retirement?',
+			retirementIncome: 'What monthly net income would you consider enough for you to live comfortably in retirement?',
 			summary: 'Summary',
 			summaryItem1: 'You are <span class="er-calc-highlight">{{age}}</span> years old',
 			summaryItem2a: 'Currently you have <span class="er-calc-highlight">{{capital}}</span> saved',
@@ -326,7 +322,7 @@ export default {
 				'You save <span class="er-calc-highlight">{{savedPerMonth}}</span> per month on an account or fund with a <span class="er-calc-highlight">{{savingInterestRate}}%</span> yearly interest rate',
 			summaryItem3b: "You don't put aside any money montly",
 			summaryItem4a:
-				'You are eligible for pension at age <span class="er-calc-highlight">{{pensionAge}}</span> and will recieve <span class="er-calc-highlight">{{pensionPerMonth}}</span> per month',
+				'You are eligible for pension at age <span class="er-calc-highlight">{{pensionAge}}</span> and will receive <span class="er-calc-highlight">{{pensionPerMonth}}</span> per month',
 			summaryItem4b: 'You are not eligible for pension',
 			summaryItem5a:
 				'You have a life insurance policy with an investment option that will yield <span class="er-calc-highlight">{{lifeInsuranceReturn}}</span> when you reach <span class="er-calc-highlight">{{lifeInsuranceAge}}</span> years of age',
@@ -341,8 +337,7 @@ export default {
 			result: 'Result',
 			consideringTheAnswers:
 				'Considering the answers you provided you will be able to retire at age <span class="retirement-age er-calc-highlight">{{earlyRetirementAge}}</span>.',
-			notLikelyToRetire:
-				'You are not likely to retire at a reasonable age considering the answers you provided.'
+			notLikelyToRetire: 'You are not likely to retire at a reasonable age considering the answers you provided.'
 		},
 		export: {
 			export: 'Export',
@@ -353,8 +348,7 @@ export default {
 		},
 		totalSync: {
 			totalSync: 'Total sync',
-			syncText:
-				"This will remove any local data that hasn't been synchronized and reload everything from the cloud.",
+			syncText: "This will remove any local data that hasn't been synchronized and reload everything from the cloud.",
 			offlineText: 'You have to be online in order to sync.',
 			sync: 'Sync'
 		},
@@ -387,7 +381,6 @@ export default {
 		},
 		preferences: {
 			preferences: 'Preferences',
-			currency: 'Currency',
 			change: 'Change',
 			showOnDashboard: 'Show on dashboard',
 			upcomingExpenses: 'Upcoming expenses',
@@ -412,7 +405,7 @@ export default {
 				title: 'Tax categories',
 				question: 'What does it mean?',
 				answer:
-					'Transactions made within a tax category will be not be considered as regular expenses and will simply be exempted from all expenditure sums like in the dashboard page, Pie chart, Bar chart, and Expenditure heatmap.'
+					'Transactions made within a tax category will be not be considered as regular expenses and will simply be exempted from all expenditure sums like in the home page, Pie chart, Bar chart, and Expenditure heatmap.'
 			}
 		}
 	},
@@ -440,11 +433,11 @@ export default {
 		description: 'Опис',
 		password: 'Лозинка',
 		encryptedPlaceholder: '[ Шифрирано ]',
+		decryptDescription: 'Дешифрирај опис',
 		balance: 'Состојба',
 		uncategorized: 'Некатегоризирано',
 		deletedAccount: '[избришана сметка]',
-		whileOfflineCannotModify:
-			'Додека сте офлајн неможете да промените податоци кои веќе се синхронизирани со сервер.',
+		whileOfflineCannotModify: 'Додека сте офлајн неможете да промените податоци кои веќе се синхронизирани со сервер.',
 		changeCurrency: 'Промени валута',
 		showPassword: 'Покажи лозинка',
 		hidePassword: 'Сокриј лозинка',
@@ -495,10 +488,9 @@ export default {
 		newTransaction: {
 			newExpense: 'Нов трошок',
 			newDeposit: 'Нов депозит',
-			settleDebtTo: 'Расчисти го долгот со',
-			settleDebtFrom: 'Расчисти го долгот од',
-			considerUsingYesterday1: 'Моментално е',
-			considerUsingYesterday2: 'после полноќ. Можеби треба да го користите вчерашниот датум.',
+			settleDebtTo: 'Расчисти го долгот со {{person}}.',
+			settleDebtFrom: 'Расчисти го долгот од {{person}}.',
+			considerUsingYesterday: 'Моментално е {{time}} после полноќ. Можеби треба да го користите вчерашниот датум.',
 			encryptDescription: 'Шифрирај опис',
 			submit: 'Поднеси',
 			dateIsRequired: 'Датумот е задолжителен',
@@ -523,7 +515,6 @@ export default {
 			editDeposit: 'Ажурирај депозит',
 			editTransaction: 'Ажурирај трансакција',
 			encryptDescription: 'Шифрирај опис',
-			decryptDescription: 'Дешифрирај опис',
 			resetDescription: 'Ресетирај опис',
 			saveSuccessful: 'Трансакцијата беше успешно зачувана',
 			deleteSuccessful: 'Трансакцијата беше успешно избришана'
@@ -538,7 +529,7 @@ export default {
 			transfers: 'Префрлено',
 			searchByDescription: 'Пребарај по опис',
 			clear: 'Исчисти',
-			toggleDescriptionCategory: 'Одбери Опис/Категорија',
+			detail: 'Детал',
 			first: 'Прва',
 			last: 'Последна',
 			previous: 'Предходна',
@@ -556,8 +547,7 @@ export default {
 			editUpcomingExpense: 'Ажурирај иден трошок',
 			generatedAlert: 'Овој иден трошок беше автоматски креиран.',
 			month: 'Месец',
-			description:
-				'Опис. Оставете го празен доколку сакате да ги опфати сите трошоци во категоријата.',
+			description: 'Опис. Оставете го празен доколку сакате да ги опфати сите трошоци во категоријата.',
 			saveSuccessful: 'Идниот трошок беше успешно зачуван',
 			deleteSuccessful: 'Идниот трошок беше успешно избришан'
 		},
@@ -601,8 +591,7 @@ export default {
 			allTransactions: 'Сите трансакции',
 			depositOnly: 'Само за депозити',
 			expenseOnly: 'Само за трошоци',
-			categoryHasTransactions:
-				'Ова категорија има трансакции.<br>Доколку ја избришете и тие ќе бидат отстранети.',
+			categoryHasTransactions: 'Ова категорија има трансакции.<br>Доколку ја избришете и тие ќе бидат отстранети.',
 			okayDelete: 'Во ред, избриши',
 			deleteSuccessful: 'Категоријата беше успешно избришана'
 		},
@@ -636,8 +625,7 @@ export default {
 			accountName: 'Име на сметката',
 			investmentFund: 'Инвестициски фонд',
 			stockPrice: 'Цена на удел',
-			accountHasTransactions:
-				'Оваа сметка има трансакции.<br>Доколку ја избришете и тие ќе бидат отстранети.',
+			accountHasTransactions: 'Оваа сметка има трансакции.<br>Доколку ја избришете и тие ќе бидат отстранети.',
 			okayDelete: 'Во ред, избриши',
 			deleteSuccessful: 'Сметката беше успешно избришана'
 		},
@@ -669,7 +657,9 @@ export default {
 			from: 'Од',
 			to: 'До',
 			expenses: 'Одлив',
-			deposits: 'Прилив'
+			deposits: 'Прилив',
+			emptyListMessageExpenses: 'Немате трошоци во селектираниот период',
+			emptyListMessageDeposits: 'Немате депозити во селектираниот период'
 		},
 		barChartReport: {
 			barChart: 'Колона извештај',
@@ -680,6 +670,7 @@ export default {
 			expenses: 'Одлив',
 			deposits: 'Прилив',
 			savings: 'Штедење',
+			perMonth: 'Месечно (просек)',
 			spent: 'Потрошено',
 			deposited: 'Заработено',
 			saved: 'Заштедено'
@@ -697,7 +688,7 @@ export default {
 		earlyRetirementCalculator: {
 			earlyRetirementCalculator: 'Калкулатор за рано пензионирање',
 			explanation:
-				'Многу луѓе посакуваат да се пензионираат порано него вообичаено. Овој калкулатор ви дозволува да откриете кога би можеле да се пензионирате земајки ја во предвид вашата финансиска ситуација. Ќе треба да одговорите на неколку прашања за да ни помогнете да воспоставиме каде се наоѓате финансиски, колку штедите или инвестирате, какви идни трошоци очекувате, и колку пари ќе ви се потребни да живеете комфорно во пензија.',
+				'Овој калкулатор ви дозволува да откриете кога би можеле да се пензионирате земајки ја во предвид вашата финансиска ситуација. Ќе треба да одговорите на неколку прашања за да ни помогнете да воспоставиме каде се наоѓате финансиски, колку штедите или инвестирате, какви идни трошоци очекувате, и колку пари ќе ви се потребни да живеете комфорно во пензија.',
 			start: 'Започни',
 			age: 'Години',
 			whatIsYourAge: 'Колку години имате?',
@@ -728,17 +719,14 @@ export default {
 			home: 'Дом',
 			car: 'Кола',
 			kids: 'Деца',
-			listAnyUpcomingExpenses:
-				'Запишете какви било големи трошоци кои што ги очекувате пред да се пензионирате.',
+			listAnyUpcomingExpenses: 'Запишете какви било големи трошоци кои што ги очекувате пред да се пензионирате.',
 			removeExpense: 'Отстрани трошок',
 			addExpense: 'Додади трошок',
 			retirement: 'Пензионирање',
-			retirementIncome:
-				'Колкав месечен нето приход сметате дека е доволно за вас да живеете комфорно во пензија?',
+			retirementIncome: 'Колкав месечен нето приход сметате дека е доволно за вас да живеете комфорно во пензија?',
 			summary: 'Сумарно',
 			summaryItem1: 'Имате <span class="er-calc-highlight">{{age}}</span> години',
-			summaryItem2a:
-				'Моментално имате заштедено <span class="er-calc-highlight">{{capital}}</span>',
+			summaryItem2a: 'Моментално имате заштедено <span class="er-calc-highlight">{{capital}}</span>',
 			summaryItem2b: 'Немате заштедено ништо моментално',
 			summaryItem3a:
 				'Штедите <span class="er-calc-highlight">{{savedPerMonth}}</span> месечно на сметка или фонд со годишна камата од <span class="er-calc-highlight">{{savingInterestRate}}%</span>',
@@ -805,7 +793,6 @@ export default {
 		},
 		preferences: {
 			preferences: 'Преференци',
-			currency: 'Валута',
 			change: 'Смени',
 			showOnDashboard: 'Прикажи на прва страна',
 			upcomingExpenses: 'Идни трошоци',
@@ -830,7 +817,7 @@ export default {
 				title: 'Даночни категории',
 				question: 'Што значи ова?',
 				answer:
-					'Трансакциите кои се направени во даночни категории нема да бидат сметани како обични трошоци и едноставно ќе бидат изземени од сите суми на трошоци како во главната страна, Пита извештај, Колона извештај, и Календар на трошоци.'
+					'Трансакциите кои се направени во даночни категории нема да бидат сметани како обични трошоци и едноставно ќе бидат изземени од сите суми на трошоци како на главната страна, Пита извештај, Колона извештај, и Календар на трошоци.'
 			}
 		}
 	}

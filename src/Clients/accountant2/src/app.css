@@ -33,8 +33,7 @@ textarea {
 	color: var(--primary-color);
 }
 
-.side.disabled,
-.new-button.disabled {
+.side.disabled {
 	cursor: default;
 	color: var(--faded-color);
 }
@@ -52,17 +51,17 @@ textarea {
 	color: var(--primary-color-dark);
 }
 
-.amount-by-category-table tbody td {
+.amount-by-category-table td {
 	padding: 5px 15px 5px 0;
 	line-height: 1.2rem;
 }
 
-.amount-by-category-table tbody td:last-child {
+.amount-by-category-table td:last-child {
 	padding-right: 0;
 	text-align: right;
 }
 
-.amount-by-category-table tbody td.sub-category-cell {
+.amount-by-category-table td.sub-category-cell {
 	padding-left: 10px;
 }
 
@@ -118,6 +117,7 @@ form .description-textarea {
 }
 
 form input[type='text'],
+form input[type='password'],
 form input[type='number'],
 form input[type='date'],
 textarea {
@@ -214,10 +214,6 @@ textarea {
 	color: var(--faded-color);
 }
 
-.editable-table .link.debt-icon {
-	font-size: 1.4rem;
-}
-
 .deposit-color {
 	color: var(--deposit-color);
 }
@@ -241,7 +237,7 @@ td.sync-icon-cell {
 .clickable-cell {
 	cursor: pointer;
 }
-/* 
+
 .multi-radio-wrap {
 	display: flex;
 	border-radius: var(--border-radius);
@@ -249,47 +245,35 @@ td.sync-icon-cell {
 }
 .multi-radio-part {
 	flex-grow: 1;
-
-	input[type='radio'] {
-		display: none;
-	}
-
-	label {
-		display: block;
-		position: relative;
-		background: #fff;
-		padding: 0;
-		text-align: center;
-		font-size: inherit;
-		line-height: 37px;
-		cursor: pointer;
-		user-select: none;
-
-		transition: background var(--transition), color var(--transition);
-
-		&.selected {
-			background: var(--primary-color);
-			box-shadow: inset var(--box-shadow);
-			color: #fafafa;
-		}
-	}
-
-	&:first-child label {
-		border-top-left-radius: var(--border-radius);
-		border-bottom-left-radius: var(--border-radius);
-	}
-
-	&:last-child label {
-		border-top-right-radius: var(--border-radius);
-		border-bottom-right-radius: var(--border-radius);
-	}
-} */
-
-.debt-icon .debtor {
-	color: var(--expense-color);
 }
-.debt-icon .lender {
-	color: var(--deposit-color);
+.multi-radio-part input[type='radio'] {
+	display: none;
+}
+.multi-radio-part label {
+	display: block;
+	position: relative;
+	background: #fff;
+	padding: 0;
+	text-align: center;
+	font-size: inherit;
+	line-height: 37px;
+	cursor: pointer;
+	user-select: none;
+
+	transition: background var(--transition), color var(--transition);
+}
+.multi-radio-part label.selected {
+	background: var(--primary-color);
+	box-shadow: inset var(--box-shadow);
+	color: #fafafa;
+}
+.multi-radio-part:first-child label {
+	border-top-left-radius: var(--border-radius);
+	border-bottom-left-radius: var(--border-radius);
+}
+.multi-radio-part:last-child label {
+	border-top-right-radius: var(--border-radius);
+	border-bottom-right-radius: var(--border-radius);
 }
 
 .encryption-box {
@@ -322,9 +306,7 @@ td.sync-icon-cell {
 	padding: 0 12px;
 	font-size: 1.2rem;
 	line-height: 37px;
-	text-decoration: none;
 	color: var(--faded-color);
-	cursor: pointer;
 }
 
 .password-show-button i:nth-child(2) {
@@ -363,35 +345,16 @@ td.sync-icon-cell {
 	margin-left: 10px;
 	font-size: 1.2rem;
 	line-height: 37px;
-	text-decoration: none;
 	color: #fff;
-	cursor: pointer;
 }
-
 .decrypt-button i:nth-child(2) {
 	display: none;
 }
-
 .decrypt-button.loading i:nth-child(2) {
 	display: inline-block;
 }
-
 .decrypt-button.loading i:first-child {
 	display: none;
-}
-
-.erase-button {
-	background: var(--warning-color-dark);
-	border: none;
-	border-radius: var(--border-radius);
-	outline: none;
-	padding: 0 10px;
-	margin-left: 10px;
-	font-size: 1.3rem;
-	line-height: 37px;
-	text-decoration: none;
-	color: #fff;
-	cursor: pointer;
 }
 
 .clickable {
@@ -399,7 +362,7 @@ td.sync-icon-cell {
 }
 
 .highlighted-row {
-	animation: highlightRow ease-in 2.5s;
+	animation: highlightRow ease-in 5s;
 }
 @keyframes highlightRow {
 	0% {
@@ -423,7 +386,7 @@ td.sync-icon-cell {
 	background: #e1e1e1;
 }
 
-@media screen and (min-width: --desktop-min) {
+@media screen and (min-width: 1200px) {
 	table tr td,
 	.editable-table tr td {
 		font-size: 1rem;
@@ -466,8 +429,7 @@ td.sync-icon-cell {
 	}
 
 	.password-show-button,
-	.decrypt-button,
-	.erase-button {
+	.decrypt-button {
 		line-height: 45px;
 	}
 

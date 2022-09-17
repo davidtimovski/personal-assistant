@@ -10,6 +10,7 @@ import { CategoriesService } from '$lib/services/categoriesService';
 import { EncryptionService } from '$lib/services/encryptionService';
 import type { SearchFilters } from '$lib/models/viewmodels/searchFilters';
 import { AmountByCategory } from '$lib/models/viewmodels/amountByCategory';
+import Variables from '$lib/variables';
 
 export class TransactionsService {
 	private readonly httpProxy = new HttpProxy();
@@ -70,7 +71,11 @@ export class TransactionsService {
 					(e) => e.amount !== 0 && e.parentCategoryId === expenditure.categoryId
 				);
 
-				if (subExpenditures.length) {
+				if (subExpenditures.length === 1) {
+					expenditure.categoryId = subExpenditures[0].categoryId;
+					expenditure.categoryName += '/' + subExpenditures[0].categoryName?.replace('- ', '');
+					expenditure.amount = subExpenditures[0].amount;
+				} else if (subExpenditures.length > 1) {
 					expenditure.amount += subExpenditures.map((c) => c.amount).reduce((prev, curr) => prev + curr, 0);
 					expenditure.subItems = subExpenditures.sort((a, b) => b.amount - a.amount);
 				}
@@ -182,59 +187,138 @@ export class TransactionsService {
 		}
 	}
 
-	async create(transaction: TransactionModel, password: string | null): Promise<void> {
+	async create(
+		fromAccountId: number | null,
+		toAccountId: number | null,
+		categoryId: number | null,
+		amount: number,
+		currency: string,
+		description: string | null,
+		date: string,
+		encrypt: boolean,
+		password: string | null
+	): Promise<void> {
 		try {
-			if (!transaction.fromAccountId && !transaction.toAccountId) {
+			if (!fromAccountId && !toAccountId) {
 				throw new Error('AccountId is missing.');
 			}
 
-			transaction.amount = parseFloat(<any>transaction.amount);
+			amount = parseFloat(<any>amount);
 
-			if (transaction.fromStocks && typeof transaction.fromStocks === 'string') {
-				transaction.fromStocks = parseFloat(<any>transaction.fromStocks);
-			}
-			if (transaction.toStocks && typeof transaction.toStocks === 'string') {
-				transaction.toStocks = parseFloat(<any>transaction.toStocks);
+			if (description) {
+				description = description.replace(/(\r\n|\r|\n){3,}/g, '$1\n').trim();
 			}
 
-			if (transaction.description) {
-				transaction.description = transaction.description.replace(/(\r\n|\r|\n){3,}/g, '$1\n').trim();
-			}
-
-			if (transaction.isEncrypted) {
-				if (!transaction.description) {
+			let encryptedDescription: string | null = null;
+			let salt: string | null = null;
+			let nonce: string | null = null;
+			if (encrypt) {
+				if (!description) {
 					throw new Error('Encrypted description cannot be null');
 				}
 				if (!password) {
 					throw new Error('Encrypted description needs a password');
 				}
 
-				const result = await this.encryptionService.encrypt(transaction.description, password);
-				transaction.encryptedDescription = result.encryptedData;
-				transaction.salt = result.salt;
-				transaction.nonce = result.nonce;
-				transaction.description = null;
+				const result = await this.encryptionService.encrypt(description, password);
+				encryptedDescription = result.encryptedData;
+				salt = result.salt;
+				nonce = result.nonce;
+				description = null;
 			}
 
-			const now = DateHelper.adjustForTimeZone(new Date());
-			transaction.createdDate = transaction.modifiedDate = now;
+			const transaction = new TransactionModel(
+				0,
+				fromAccountId,
+				toAccountId,
+				categoryId,
+				amount,
+				null,
+				null,
+				currency,
+				description,
+				date,
+				encrypt,
+				encryptedDescription,
+				salt,
+				nonce,
+				false,
+				null,
+				null
+			);
 
-			if (navigator.onLine) {
-				transaction.id = await this.httpProxy.ajax<number>('api/transactions', {
-					method: 'post',
-					body: window.JSON.stringify(transaction)
-				});
-				transaction.synced = true;
-			}
-
-			await this.idbHelper.create(transaction);
+			await this.createTransaction(transaction);
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
 		}
 	}
 
-	async update(transaction: TransactionModel, password: string): Promise<void> {
+	async buySellStocks(
+		fromAccountId: number | null,
+		toAccountId: number | null,
+		amount: number,
+		fromStocks: number | null,
+		toStocks: number | null,
+		currency: string
+	): Promise<void> {
+		try {
+			if (!fromAccountId && !toAccountId) {
+				throw new Error('AccountId is missing.');
+			}
+
+			amount = parseFloat(<any>amount);
+
+			if (fromStocks && typeof fromStocks === 'string') {
+				fromStocks = parseFloat(<any>fromStocks);
+			}
+			if (toStocks && typeof toStocks === 'string') {
+				toStocks = parseFloat(<any>toStocks);
+			}
+
+			const transaction = new TransactionModel(
+				0,
+				fromAccountId,
+				toAccountId,
+				null,
+				amount,
+				fromStocks,
+				toStocks,
+				currency,
+				null,
+				DateHelper.format(new Date()),
+				false,
+				null,
+				null,
+				null,
+				false,
+				null,
+				null
+			);
+
+			await this.createTransaction(transaction);
+		} catch (e) {
+			this.logger.logError(e);
+			throw e;
+		}
+	}
+
+	private async createTransaction(transaction: TransactionModel): Promise<void> {
+		transaction.createdDate = DateHelper.adjustForTimeZone(new Date());
+		transaction.modifiedDate = DateHelper.adjustForTimeZone(new Date());
+
+		if (navigator.onLine) {
+			transaction.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/api/transactions`, {
+				method: 'post',
+				body: window.JSON.stringify(transaction)
+			});
+			transaction.synced = true;
+		}
+
+		await this.idbHelper.create(transaction);
+	}
+
+	async update(transaction: TransactionModel, password: string | null): Promise<void> {
 		try {
 			if (!transaction.fromAccountId && !transaction.toAccountId) {
 				throw new Error('AccountId is missing.');
@@ -254,6 +338,9 @@ export class TransactionsService {
 			}
 
 			if (transaction.isEncrypted) {
+				if (!password) {
+					throw new Error('Encryption password cannot be null');
+				}
 				if (!transaction.description) {
 					throw new Error('Encrypted description cannot be null');
 				}
@@ -272,7 +359,7 @@ export class TransactionsService {
 			transaction.modifiedDate = DateHelper.adjustForTimeZone(new Date());
 
 			if (navigator.onLine) {
-				await this.httpProxy.ajaxExecute('api/transactions', {
+				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/transactions`, {
 					method: 'put',
 					body: window.JSON.stringify(transaction)
 				});
@@ -291,7 +378,7 @@ export class TransactionsService {
 	async delete(id: number): Promise<void> {
 		try {
 			if (navigator.onLine) {
-				await this.httpProxy.ajaxExecute(`api/transactions/${id}`, {
+				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/transactions/${id}`, {
 					method: 'delete'
 				});
 			} else if (await this.idbHelper.isSynced(id)) {
@@ -315,7 +402,7 @@ export class TransactionsService {
 				0,
 				null,
 				null,
-				0,
+				null,
 				amount,
 				null,
 				null,
@@ -337,7 +424,7 @@ export class TransactionsService {
 				transaction.toAccountId = accountId;
 			}
 
-			await this.create(transaction, null);
+			await this.createTransaction(transaction);
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -345,7 +432,7 @@ export class TransactionsService {
 	}
 
 	async export(fileId: string): Promise<Blob> {
-		return this.httpProxy.ajaxBlob('api/transactions/export', {
+		return this.httpProxy.ajaxBlob(`${Variables.urls.api}/api/transactions/export`, {
 			method: 'post',
 			body: window.JSON.stringify({
 				fileId: fileId
@@ -358,7 +445,7 @@ export class TransactionsService {
 
 	async deleteExportedFile(fileId: string): Promise<void> {
 		try {
-			await this.httpProxy.ajaxExecute(`api/transactions/exported-file/${fileId}`, {
+			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/transactions/exported-file/${fileId}`, {
 				method: 'delete'
 			});
 		} catch (e) {
@@ -367,7 +454,7 @@ export class TransactionsService {
 		}
 	}
 
-	static getType(fromAccountId: number, toAccountId: number): TransactionType {
+	static getType(fromAccountId: number | null, toAccountId: number | null): TransactionType {
 		if (fromAccountId && toAccountId) {
 			return TransactionType.Transfer;
 		}

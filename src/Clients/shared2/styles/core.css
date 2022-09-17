@@ -1,5 +1,4 @@
 @import "./normalize.css";
-@import "./variables.css";
 @import "./fontawesome/fontawesome.css";
 @import "./fontawesome/regular.css";
 @import "./fontawesome/solid.css";
@@ -11,6 +10,7 @@
   font-style: normal;
   font-weight: 400;
   src: local(""), url("/webfonts/DidactGothic-Regular.ttf") format("truetype");
+  font-display: swap;
 }
 
 :root {
@@ -91,31 +91,6 @@ table td {
 .side.disabled {
   cursor: default;
   color: var(--faded-color);
-}
-
-.message {
-  border-radius: var(--border-radius);
-  padding: 7px 12px;
-  margin-bottom: 20px;
-  font-size: 1rem;
-  line-height: 1.5rem;
-}
-.message i {
-  margin-right: 5px;
-}
-.message.info {
-  background: var(--primary-color-light);
-  color: var(--primary-color-dark);
-}
-.message.info i {
-  color: var(--primary-color-dark);
-}
-.message.warning {
-  background: var(--warning-color);
-  color: var(--warning-color-dark);
-}
-.message.warning i {
-  color: var(--warning-color-dark);
 }
 
 .center {
@@ -293,9 +268,14 @@ textarea.invalid {
   align-items: center;
   min-width: 55px;
   height: 60px;
+  background: transparent;
+  border: none;
+  outline: none;
   font-size: 24px;
-  text-decoration: none;
   color: var(--primary-color);
+}
+.page-title-wrap a.back-button {
+  text-decoration: none;
 }
 .page-title-wrap .back-button:hover {
   color: var(--primary-color-dark);
@@ -325,8 +305,10 @@ textarea.invalid {
   justify-content: center;
   align-items: center;
   height: 50px;
+  background: transparent;
+  border: none;
+  outline: none;
   font-size: 24px;
-  text-decoration: none;
   color: var(--primary-color);
 }
 .page-title-wrap-loader .title-wrap .sync-button:hover {
@@ -516,11 +498,11 @@ a.wide-button {
   outline: none;
   border-radius: 50%;
   box-shadow: var(--box-shadow);
-  text-decoration: none;
   font-size: 19px;
   color: #fff;
-  cursor: pointer;
-  user-select: none;
+}
+.new-button:disabled {
+  color: var(--faded-color);
 }
 .new-button i {
   animation: spin 1s ease-in-out;
@@ -566,7 +548,6 @@ form {
   text-align: center;
   line-height: 45px;
   color: #fff;
-  cursor: pointer;
 }
 a.button {
   text-decoration: none;
@@ -585,7 +566,7 @@ a.button {
   display: none;
 }
 
-.button-loader .loading {
+.button-loader.loading {
   display: inline;
 }
 
@@ -656,64 +637,6 @@ a.button {
   cursor: default;
 }
 
-.delete-confirmation-alert {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 25px;
-  padding: 10px 15px;
-  line-height: 28px;
-  text-align: center;
-  user-select: none;
-}
-
-.delete-confirmation-alert i {
-  margin-right: 5px;
-  color: var(--danger-color);
-}
-
-.tooltip-item {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 5px;
-  margin-bottom: 10px;
-}
-.tooltip-item hr {
-  margin: 3px 10%;
-}
-.tooltip-item .tooltip-header {
-  display: flex;
-  justify-content: space-between;
-}
-.tooltip-item .tooltip-header a {
-  width: 54px;
-  padding: 3px 0 1px;
-  font-size: 25px;
-  text-align: center;
-  line-height: 40px;
-  text-decoration: none;
-  color: var(--primary-color);
-  transition: color var(--transition);
-}
-.tooltip-item .tooltip-header a:hover {
-  color: var(--primary-color-dark);
-}
-.tooltip-item .fa-eye-slash {
-  color: var(--faded-color);
-}
-.tooltip-item .tooltip-title {
-  padding: 10px 5px;
-  font-size: 1rem;
-  line-height: 1.4rem;
-  text-align: center;
-}
-.tooltip-item .tooltip-answer {
-  padding: 8px 10px;
-  font-size: 1rem;
-  line-height: 1.3rem;
-  text-align: center;
-}
-
 .text-wrap {
   padding: 15px 5px;
   margin-bottom: 25px;
@@ -754,7 +677,7 @@ a.button {
 }
 
 /* DESKTOP */
-@media screen and (min-width: var(--desktop-min)) {
+@media screen and (min-width: 1200px) {
   input[type="text"],
   input[type="email"],
   input[type="number"],
@@ -782,7 +705,8 @@ a.button {
   }
 }
 
-@media screen and (max-width: var(--desktop-min)) {
+/* NON-DESKTOP */
+@media screen and (max-width: 1200px) {
   body {
     font-size: 17px;
   }

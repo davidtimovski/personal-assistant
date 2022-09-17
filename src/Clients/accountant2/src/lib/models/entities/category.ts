@@ -11,8 +11,8 @@ export class Category implements Syncable {
 		public type: CategoryType,
 		public generateUpcomingExpense: boolean,
 		public isTax: boolean,
-		public createdDate: Date,
-		public modifiedDate: Date
+		public createdDate: Date | null,
+		public modifiedDate: Date | null
 	) {}
 
 	get fullName(): string {

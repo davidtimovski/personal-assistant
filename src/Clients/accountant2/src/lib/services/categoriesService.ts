@@ -5,6 +5,7 @@ import { DateHelper } from '../../../../shared2/utils/dateHelper';
 import { CategoriesIDBHelper } from '$lib/utils/categoriesIDBHelper';
 import { Category, CategoryType } from '$lib/models/entities/category';
 import { SelectOption } from '$lib/models/viewmodels/selectOption';
+import Variables from '$lib/variables';
 
 export class CategoriesService {
 	private readonly httpProxy = new HttpProxy();
@@ -75,7 +76,7 @@ export class CategoriesService {
 			}
 
 			if (navigator.onLine) {
-				category.id = await this.httpProxy.ajax<number>('api/categories', {
+				category.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/api/categories`, {
 					method: 'post',
 					body: window.JSON.stringify(category)
 				});
@@ -100,7 +101,7 @@ export class CategoriesService {
 			}
 
 			if (navigator.onLine) {
-				await this.httpProxy.ajaxExecute('api/categories', {
+				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/categories`, {
 					method: 'put',
 					body: window.JSON.stringify(category)
 				});
@@ -119,7 +120,7 @@ export class CategoriesService {
 	async delete(id: number): Promise<void> {
 		try {
 			if (navigator.onLine) {
-				await this.httpProxy.ajaxExecute(`api/categories/${id}`, {
+				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/categories/${id}`, {
 					method: 'delete'
 				});
 			} else if (await this.idbHelper.isSynced(id)) {
