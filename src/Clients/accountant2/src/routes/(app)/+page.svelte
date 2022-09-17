@@ -248,13 +248,13 @@
 				<table class="amount-by-category-table">
 					<tbody>
 						{#each data.expenditures as expenditure}
-							<tr on:click={() => goToTransactions(expenditure)}>
+							<tr on:click={() => goToTransactions(expenditure)} role="button">
 								<td>{expenditure.categoryName}</td>
 								<td class="amount-cell">{Formatter.money(expenditure.amount, currency)}</td>
 							</tr>
 
 							{#each expenditure.subItems as subExpenditure}
-								<tr on:click={() => goToTransactions(subExpenditure)}>
+								<tr on:click={() => goToTransactions(subExpenditure)} role="button">
 									<td class="sub-category-cell">{subExpenditure.categoryName}</td>
 									<td class="amount-cell">{Formatter.money(subExpenditure.amount, currency)}</td>
 								</tr>
@@ -286,7 +286,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td colspan="3">{Formatter.money(data.upcomingSum, currency)}</td>
+								<td colspan="3" class="table-sum">{Formatter.money(data.upcomingSum, currency)}</td>
 							</tr>
 						</tfoot>
 					{/if}
@@ -417,7 +417,7 @@
 			white-space: nowrap;
 		}
 
-		tfoot tr:last-child td {
+		.table-sum {
 			border-top: 1px solid #ddd;
 			padding: 5px 0;
 			font-size: 1.1rem;
@@ -433,6 +433,10 @@
 		.dashboard-table td {
 			font-size: 1.1rem;
 			line-height: 1.3rem;
+		}
+
+		.dashboard-table .table-sum {
+			font-size: 1.3rem;
 		}
 	}
 </style>

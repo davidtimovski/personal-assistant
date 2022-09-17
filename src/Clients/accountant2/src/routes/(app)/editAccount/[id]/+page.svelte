@@ -169,8 +169,7 @@
 
 			const account = await accountsService.get(data.id);
 			if (account === null) {
-				// TODO
-				goto('notFound');
+				throw new Error('Account not found');
 			}
 
 			name = account.name;

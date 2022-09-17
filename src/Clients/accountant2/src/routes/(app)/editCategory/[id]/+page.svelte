@@ -190,8 +190,7 @@
 
 			categoriesService.get(data.id).then((category: Category) => {
 				if (category === null) {
-					// TODO
-					goto('notFound');
+					throw new Error('Category not found');
 				}
 
 				parentId = category.parentId;

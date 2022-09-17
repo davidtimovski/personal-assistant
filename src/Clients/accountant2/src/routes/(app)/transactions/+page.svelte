@@ -394,6 +394,7 @@
 									on:click={() => viewTransaction(transaction.id)}
 									class="clickable"
 									class:highlighted-row={transaction.id === editedId}
+									role="button"
 								>
 									<td class="type-cell">
 										{#if transaction.type === 1}

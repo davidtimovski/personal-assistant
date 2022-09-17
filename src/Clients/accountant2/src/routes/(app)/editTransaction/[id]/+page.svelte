@@ -292,8 +292,7 @@
 
 		const transaction = await transactionsService.get(data.id);
 		if (transaction === null) {
-			// TODO
-			goto('notFound');
+			throw new Error('Transaction not found');
 		}
 
 		fromAccountId = transaction.fromAccountId;

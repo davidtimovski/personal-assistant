@@ -188,8 +188,7 @@
 
 			const automaticTransaction = await automaticTransactionsService.get(data.id);
 			if (automaticTransaction === null) {
-				// TODO
-				goto('notFound');
+				throw new Error('Automatic transaction not found');
 			}
 
 			isDeposit = automaticTransaction.isDeposit;

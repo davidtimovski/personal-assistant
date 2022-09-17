@@ -176,8 +176,7 @@
 
 			upcomingExpensesService.get(data.id).then((upcomingExpense: UpcomingExpense) => {
 				if (upcomingExpense === null) {
-					// TODO
-					goto('notFound');
+					throw new Error('Upcoming expense not found');
 				}
 
 				categoryId = upcomingExpense.categoryId;

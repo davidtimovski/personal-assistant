@@ -140,8 +140,7 @@
 
 		const transaction = await transactionsService.getForViewing(data.id, preferredCurrency);
 		if (transaction === null) {
-			// TODO
-			await goto('notFound');
+			throw new Error('Transaction not found');
 		}
 
 		if (transaction.isEncrypted) {

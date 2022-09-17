@@ -71,7 +71,11 @@ export class TransactionsService {
 					(e) => e.amount !== 0 && e.parentCategoryId === expenditure.categoryId
 				);
 
-				if (subExpenditures.length) {
+				if (subExpenditures.length === 1) {
+					expenditure.categoryId = subExpenditures[0].categoryId;
+					expenditure.categoryName += '/' + subExpenditures[0].categoryName?.replace('- ', '');
+					expenditure.amount = subExpenditures[0].amount;
+				} else if (subExpenditures.length > 1) {
 					expenditure.amount += subExpenditures.map((c) => c.amount).reduce((prev, curr) => prev + curr, 0);
 					expenditure.subItems = subExpenditures.sort((a, b) => b.amount - a.amount);
 				}

@@ -14,8 +14,6 @@
 	let days: HeatmapDay[] | null = null;
 	let selectedDay: HeatmapDay | null = null;
 	let selectedExpenditureCaret = 0;
-	let maxSpent: number;
-	let minSpent: number;
 	let loaded = false;
 	const colors = [
 		'#241432',
@@ -72,6 +70,22 @@
 	let currency: string;
 	let language: string;
 
+	const now = new Date();
+	const month = now.getMonth() - 1;
+	const aMonthAgo = new Date(now.getFullYear(), month, now.getDate());
+	const weekday = aMonthAgo.getDay();
+
+	if (weekday > 1 || weekday === 0) {
+		const diff = weekday - 1;
+		aMonthAgo.setDate(aMonthAgo.getDate() - diff);
+	}
+
+	const fromDate = new Date(aMonthAgo.getFullYear(), aMonthAgo.getMonth(), aMonthAgo.getDate());
+	const todayString = DateHelper.format(now);
+
+	let maxSpent = 0;
+	let minSpent = 10000000;
+
 	let localStorage: LocalStorageUtil;
 	let transactionsService: TransactionsService;
 	let accountsService: AccountsService;
@@ -118,18 +132,6 @@
 		currency = localStorage.get('currency');
 		language = localStorage.get('language');
 
-		const now = new Date();
-		const month = now.getMonth() - 1;
-		const aMonthAgo = new Date(now.getFullYear(), month, now.getDate());
-		const weekday = aMonthAgo.getDay();
-
-		if (weekday > 1 || weekday === 0) {
-			const diff = weekday - 1;
-			aMonthAgo.setDate(aMonthAgo.getDate() - diff);
-		}
-
-		const fromDate = new Date(aMonthAgo.getFullYear(), aMonthAgo.getMonth(), aMonthAgo.getDate());
-		const todayString = DateHelper.format(now);
 		const daysArray = new Array<HeatmapDay>();
 
 		while (aMonthAgo < now) {
@@ -159,11 +161,9 @@
 			}
 		}
 
+		days = daysArray;
+
 		const mainAccountId = await accountsService.getMainId();
-
-		let maxSpent = 0;
-		let minSpent = 10000000;
-
 		const transactions = await transactionsService.getExpendituresFrom(mainAccountId, fromDate, currency);
 
 		for (const day of daysArray) {
@@ -185,10 +185,13 @@
 			}
 		}
 
-		for (const day of daysArray) {
+		for (let day of daysArray) {
 			day.spentPercentage = (day.spent / maxSpent) * 100;
 
-			if (day.spent === maxSpent) {
+			if (day.spent === 0) {
+				day.backgroundColor = colors[0];
+				day.textColor = '#eee';
+			} else if (day.spent === maxSpent) {
 				day.backgroundColor = colors[49];
 				day.textColor = 'initial';
 			} else {
@@ -198,7 +201,7 @@
 			}
 		}
 
-		days = daysArray;
+		days = days.slice(0); // Force days color update
 		maxSpent = maxSpent;
 		minSpent = minSpent;
 		loaded = true;

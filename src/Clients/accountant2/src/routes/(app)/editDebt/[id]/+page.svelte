@@ -153,8 +153,7 @@
 
 			debtsService.get(data.id).then((debt: DebtModel) => {
 				if (debt === null) {
-					// TODO
-					goto('notFound');
+					throw new Error('Debt not found');
 				}
 
 				person = debt.person;
