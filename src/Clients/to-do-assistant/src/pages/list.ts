@@ -166,6 +166,13 @@ export class List {
 
     await this.tasksService.reorder(id, this.listId, oldOrder, newOrder);
 
+    const list = this.state.lists.find((x) => x.id === this.listId);
+    if (data.item.isPrivate) {
+      this.model.setPrivateTasksFromState(list.tasks);
+    } else {
+      this.model.setTasksFromState(list.tasks);
+    }
+
     this.isReordering = false;
   }
 
