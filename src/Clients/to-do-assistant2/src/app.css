@@ -1,0 +1,129 @@
+@import '../../shared2/styles/core.css';
+@import '../../shared2/styles/input-date.css';
+
+:root {
+	--regular-color: #30507d;
+	--primary-color: var(--to-do-assistant-color);
+	--primary-color-dark: #097cdc;
+	--primary-color-light: #eeeeff;
+	--faded-color: #98b0c5;
+}
+
+input[type='text'],
+input[type='email'],
+select,
+textarea {
+	background-color: #f0f6ff;
+}
+
+::placeholder {
+	color: #777;
+}
+
+.double-bounce1,
+.double-bounce2 {
+	background-color: #7accff;
+}
+
+.wide-button .badge {
+	background: linear-gradient(225deg, #00a6ed, #7a46f3);
+}
+
+.button.primary-button,
+.save-delete-wrap .primary-button.loading:disabled {
+	background: linear-gradient(225deg, #00a6ed, #7a46f3);
+	background-size: 400% 400%;
+}
+.button.primary-button:disabled {
+	color: var(--primary-color);
+}
+
+.highlighted {
+	animation: highlight ease-in 2.5s;
+}
+@keyframes highlight {
+	0% {
+		background: #fff5cc;
+	}
+}
+
+.cooking-assistant-color {
+	color: var(--cooking-assistant-color);
+}
+
+.top-buttons-drawer.open .top-buttons-drawer-wrap {
+	max-height: 325px;
+}
+
+.reorderable-repeat-dragging-me.to-do-list,
+.reorderable-repeat-dragging-me .to-do-task-content {
+	visibility: visible; /* unset visibility: hidden */
+	background: #f4faff;
+	box-shadow: inset 0 1px 4px 0 rgba(0, 0, 0, 0.14);
+	color: transparent; /* hide text */
+}
+
+.labeled-separator-text {
+	padding-top: 8px;
+}
+.labeled-separator-text i {
+	margin-right: 5px;
+}
+
+.icon-wrap {
+	width: calc(100% - 20px);
+	background: #fff;
+	border-radius: 8px;
+	padding: 0 10px;
+	line-height: 45px;
+	color: #888;
+}
+.icon-wrap .placeholder {
+	color: var(--regular-color);
+}
+.icon-wrap .icon-options {
+	display: grid;
+	grid-template-columns: auto auto auto auto auto;
+	padding-bottom: 10px;
+}
+.icon-wrap .icon-options .icon-option {
+	display: inline-block;
+	border: 1px solid transparent;
+	border-radius: 8px;
+	margin: 3px;
+	font-size: 23px;
+	line-height: 45px;
+	text-align: center;
+	cursor: pointer;
+}
+.icon-wrap .icon-options .icon-option.selected {
+	background: #f0f6ff;
+	border-color: #ddd;
+	color: var(--primary-color);
+}
+
+.alert-message {
+	padding: 12px 10px;
+	line-height: 27px;
+	text-align: center;
+}
+
+/* Workaround for sticky :hover on mobile devices */
+.touch-device .lists-reorder-toggle.checked:hover,
+.touch-device .tasks-reorder-toggle.checked:hover {
+	color: var(--primary-color);
+}
+.touch-device .lists-reorder-toggle:hover,
+.touch-device .tasks-reorder-toggle:hover {
+	color: var(--faded-color);
+}
+
+@media screen and (min-width: 1200px) {
+	.body {
+		min-height: initial;
+	}
+	.body-overlay {
+		border-bottom-left-radius: 18px;
+		border-bottom-right-radius: 18px;
+	}
+}
