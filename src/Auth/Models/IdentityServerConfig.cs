@@ -99,7 +99,7 @@ public static class IdentityServerConfig
             new Client
             {
                 ClientId = "accountant2",
-                ClientName = "Accountant2",
+                ClientName = "Accountant v2",
                 AllowedGrantTypes = GrantTypes.Code,
                 RequireConsent = false,
                 RequirePkce = true,
@@ -107,6 +107,25 @@ public static class IdentityServerConfig
                 RedirectUris = { $"{config["Urls:Accountant2"]}/signin-oidc" },
                 PostLogoutRedirectUris = { config["Urls:Accountant2"] },
                 AllowedCorsOrigins = { config["Urls:Accountant2"] },
+                AllowedScopes = {
+                    IdentityServerConstants.StandardScopes.OpenId,
+                    IdentityServerConstants.StandardScopes.Email,
+                    "personal-assistant-api",
+                    "personal-assistant-gateway"
+                },
+                AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds
+            },
+            new Client
+            {
+                ClientId = "to-do-assistant2",
+                ClientName = "To Do Assistant v2",
+                AllowedGrantTypes = GrantTypes.Code,
+                RequireConsent = false,
+                RequirePkce = true,
+                RequireClientSecret = false,
+                RedirectUris = { $"{config["Urls:ToDoAssistant2"]}/signin-oidc" },
+                PostLogoutRedirectUris = { config["Urls:ToDoAssistant2"] },
+                AllowedCorsOrigins = { config["Urls:ToDoAssistant2"] },
                 AllowedScopes = {
                     IdentityServerConstants.StandardScopes.OpenId,
                     IdentityServerConstants.StandardScopes.Email,

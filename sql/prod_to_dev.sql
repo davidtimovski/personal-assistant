@@ -4,16 +4,19 @@ UPDATE "ClientRedirectUris" SET "RedirectUri" = 'http://localhost:8080/signin-oi
 UPDATE "ClientRedirectUris" SET "RedirectUri" = 'http://localhost:8081/signin-oidc' WHERE "ClientId" = 2;
 UPDATE "ClientRedirectUris" SET "RedirectUri" = 'http://localhost:8082/signin-oidc' WHERE "ClientId" = 3;
 UPDATE "ClientRedirectUris" SET "RedirectUri" = 'http://localhost:8085/signin-oidc' WHERE "ClientId" = 4;
+UPDATE "ClientRedirectUris" SET "RedirectUri" = 'http://localhost:8083/signin-oidc' WHERE "ClientId" = 5;
 
 UPDATE "ClientPostLogoutRedirectUris" SET "PostLogoutRedirectUri" = 'http://localhost:8080' WHERE "ClientId" = 1;
 UPDATE "ClientPostLogoutRedirectUris" SET "PostLogoutRedirectUri" = 'http://localhost:8081' WHERE "ClientId" = 2;
 UPDATE "ClientPostLogoutRedirectUris" SET "PostLogoutRedirectUri" = 'http://localhost:8082' WHERE "ClientId" = 3;
 UPDATE "ClientPostLogoutRedirectUris" SET "PostLogoutRedirectUri" = 'http://localhost:8085' WHERE "ClientId" = 4;
+UPDATE "ClientPostLogoutRedirectUris" SET "PostLogoutRedirectUri" = 'http://localhost:8083' WHERE "ClientId" = 5;
 
 UPDATE "ClientCorsOrigins" SET "Origin" = 'http://localhost:8080' WHERE "ClientId" = 1;
 UPDATE "ClientCorsOrigins" SET "Origin" = 'http://localhost:8081' WHERE "ClientId" = 2;
 UPDATE "ClientCorsOrigins" SET "Origin" = 'http://localhost:8082' WHERE "ClientId" = 3;
 UPDATE "ClientCorsOrigins" SET "Origin" = 'http://localhost:8085' WHERE "ClientId" = 4;
+UPDATE "ClientCorsOrigins" SET "Origin" = 'http://localhost:8083' WHERE "ClientId" = 5;
 
 DELETE FROM push_subscriptions;
 
