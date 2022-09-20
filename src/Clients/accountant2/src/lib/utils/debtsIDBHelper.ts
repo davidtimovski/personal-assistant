@@ -26,8 +26,8 @@ export class DebtsIDBHelper {
 	async getByPerson(person: string): Promise<DebtModel[]> {
 		const debtWithPerson = await this.db.debts.filter((x) => x.person.toLowerCase() === person).toArray();
 		return debtWithPerson.sort((a: DebtModel, b: DebtModel) => {
-			const aDate = new Date(a.createdDate);
-			const bDate = new Date(b.createdDate);
+			const aDate = new Date(<Date>a.createdDate);
+			const bDate = new Date(<Date>b.createdDate);
 			if (aDate < bDate) return -1;
 			if (aDate > bDate) return 1;
 

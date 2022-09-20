@@ -66,12 +66,17 @@ export class AccountsService {
 		}
 	}
 
+	/** The first item in the array will be the main account. */
 	async getNonInvestmentFundsAsOptions(): Promise<Array<SelectOption>> {
 		try {
 			const accounts = await this.idbHelper.getAllAsOptions(true);
 
 			const options = new Array<SelectOption>();
-			for (const account of accounts) {
+
+			const main = <Account>accounts.find((x) => x.isMain);
+			options.push(new SelectOption(main.id, main.name));
+
+			for (const account of accounts.filter((x) => !x.isMain)) {
 				options.push(new SelectOption(account.id, account.name));
 			}
 

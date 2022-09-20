@@ -82,8 +82,8 @@ export class TransactionsIDBHelper {
 			if (aDate > bDate) return -1;
 			if (aDate < bDate) return 1;
 
-			const aModDate = new Date(a.modifiedDate);
-			const bModDate = new Date(b.modifiedDate);
+			const aModDate = new Date(<Date>a.modifiedDate);
+			const bModDate = new Date(<Date>b.modifiedDate);
 			if (aModDate > bModDate) return -1;
 			if (aModDate < bModDate) return 1;
 			return 0;
@@ -412,13 +412,12 @@ export class TransactionsIDBHelper {
 
 				if (relatedUpcomingExpenses.length > 0) {
 					for (var upcomingExpense of relatedUpcomingExpenses) {
-						const upcomingExpenseHasDescription = !!upcomingExpense.description;
 						const bothWithDescriptionsAndTheyMatch =
-							upcomingExpenseHasDescription &&
+							upcomingExpense.description &&
 							!!transaction.description &&
 							upcomingExpense.description.toUpperCase() === transaction.description.toUpperCase();
 
-						if (!upcomingExpenseHasDescription || bothWithDescriptionsAndTheyMatch) {
+						if (!upcomingExpense.description || bothWithDescriptionsAndTheyMatch) {
 							if (upcomingExpense.amount > transaction.amount) {
 								upcomingExpense.amount -= transaction.amount;
 								upcomingExpense.modifiedDate = new Date();

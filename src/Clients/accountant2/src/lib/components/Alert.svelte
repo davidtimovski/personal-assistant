@@ -78,8 +78,8 @@
 				show('error', message);
 			} else if (value.status === AlertStatus.Success) {
 				showTemporary('success', $t(<string>value.messageKey));
-			} else if (type === 'error') {
-				hide();
+			} else {
+				shown = false;
 			}
 		});
 	});
@@ -103,6 +103,7 @@
 		width: 100%;
 		text-align: center;
 		font-size: 1rem;
+		line-height: 1.6rem;
 		transition: bottom 700ms ease-in-out, top 700ms ease-in-out;
 
 		&.shown {

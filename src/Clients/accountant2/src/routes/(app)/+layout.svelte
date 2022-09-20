@@ -46,7 +46,7 @@
 		const localStorage = new LocalStorageUtil();
 		locale.set(localStorage.get('language'));
 
-		new AuthService(window).login();
+		new AuthService('accountant2', window).login();
 
 		loggedInUser.subscribe((value) => {
 			if (!value) {

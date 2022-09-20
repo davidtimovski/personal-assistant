@@ -181,11 +181,11 @@
 			});
 		} else if (type === TransactionType.Deposit) {
 			const toAccount = await accountsService.get(<number>transaction.toAccountId);
-			accountLabel = $t('transaction.toAccount');
+			accountLabel = $t('toAccount');
 			accountValue = toAccount.name;
 		} else {
 			const fromAccount = await accountsService.get(<number>transaction.fromAccountId);
-			accountLabel = $t('transaction.fromAccount');
+			accountLabel = $t('fromAccount');
 			accountValue = fromAccount.name;
 		}
 	});
@@ -217,8 +217,8 @@
 
 			{#if currency && currency !== preferredCurrency}
 				<div class="form-control inline">
-					<span><span>{$t('transaction.originalAmountIn')}</span>{currency}</span>
-					<span>{Formatter.money(originalAmount, preferredCurrency)}</span>
+					<span>{$t('transaction.originalAmount')}</span>
+					<span>{Formatter.money(originalAmount, currency)}</span>
 				</div>
 			{/if}
 
@@ -230,14 +230,14 @@
 			{#if fromStocks}
 				<div class="form-control inline">
 					<span>{$t('soldStocks')}</span>
-					<span class="expense-color">{Formatter.moneyPrecise(fromStocks, preferredCurrency)}</span>
+					<span class="expense-color">{Formatter.money(fromStocks, preferredCurrency, 4)}</span>
 				</div>
 			{/if}
 
 			{#if toStocks}
 				<div class="form-control inline">
 					<span>{$t('purchasedStocks')}</span>
-					<span class="deposit-color">{Formatter.moneyPrecise(toStocks, preferredCurrency)}</span>
+					<span class="deposit-color">{Formatter.money(toStocks, preferredCurrency, 4)}</span>
 				</div>
 			{/if}
 
