@@ -12,8 +12,8 @@
 	import { alertState } from '$lib/stores';
 	import type { SelectOption } from '$lib/models/viewmodels/selectOption';
 	import { TransactionsService } from '$lib/services/transactionsService';
-	import { CategoriesService } from '$lib/services/categoriesService';
 	import { AccountsService } from '$lib/services/accountsService';
+	import { CategoriesService } from '$lib/services/categoriesService';
 	import { DebtsService } from '$lib/services/debtsService';
 	import { CategoryType } from '$lib/models/entities/category';
 
@@ -24,7 +24,7 @@
 
 	export let data: PageData;
 
-	let mainAccountId: number | null = null;
+	let accountId: number | null = null;
 	let categoryId: number | null = null;
 	let amount: number | null = null;
 	let currency: string | null = null;
@@ -35,6 +35,7 @@
 	let debtId: number | null = null;
 	let userIsDebtor: boolean;
 	let debtPerson: string;
+	let accountOptions: SelectOption[] | null = null;
 	let categoryOptions: SelectOption[] | null = null;
 	const maxDate = date;
 	let passwordShown = false;
@@ -47,8 +48,8 @@
 
 	let localStorage: LocalStorageUtil;
 	let transactionsService: TransactionsService;
-	let categoriesService: CategoriesService;
 	let accountsService: AccountsService;
+	let categoriesService: CategoriesService;
 	let debtsService: DebtsService;
 
 	let amountFrom = 0.01;
@@ -137,14 +138,6 @@
 			return x;
 		});
 
-		if (!mainAccountId) {
-			alertState.update((x) => {
-				x.showError('unexpectedError');
-				return x;
-			});
-			return;
-		}
-
 		const result = validate();
 		if (result.valid) {
 			amountIsInvalid = false;
@@ -155,9 +148,9 @@
 				let fromAccountId: number | null = null;
 				let toAccountId: number | null = null;
 				if (data.isExpense) {
-					fromAccountId = mainAccountId;
+					fromAccountId = accountId;
 				} else {
-					toAccountId = mainAccountId;
+					toAccountId = accountId;
 				}
 
 				await transactionsService.create(
@@ -201,12 +194,12 @@
 
 			const invalidDate = result.erroredFields.includes('date');
 			if (invalidDate) {
-				messages.push($t('newTransaction.dateIsRequired'));
+				messages.push($t('dateIsRequired'));
 			}
 
 			const invalidEncryptionPassword = result.erroredFields.includes('encryptionPassword');
 			if (invalidEncryptionPassword) {
-				messages.push($t('newTransaction.passwordIsRequired'));
+				messages.push($t('passwordIsRequired'));
 			}
 
 			if (messages.length > 0) {
@@ -242,8 +235,8 @@
 
 		localStorage = new LocalStorageUtil();
 		transactionsService = new TransactionsService();
-		categoriesService = new CategoriesService();
 		accountsService = new AccountsService();
+		categoriesService = new CategoriesService();
 		debtsService = new DebtsService();
 
 		currency = localStorage.get('currency');
@@ -255,8 +248,9 @@
 
 		const categoryType = data.isExpense ? CategoryType.ExpenseOnly : CategoryType.DepositOnly;
 
-		accountsService.getMainId().then((id: number) => {
-			mainAccountId = id;
+		accountsService.getNonInvestmentFundsAsOptions().then(async (options) => {
+			accountOptions = options;
+			accountId = <number>options[0].id;
 		});
 
 		categoriesService.getAllAsOptions($t('uncategorized'), categoryType).then((options) => {
@@ -310,6 +304,20 @@
 			<div class="form-control inline">
 				<label for="amount">{$t('amount')}</label>
 				<AmountInput bind:amount bind:currency invalid={amountIsInvalid} focusOnInit={true} />
+			</div>
+
+			<div class="form-control inline">
+				<label for="account">{$t(data.isExpense ? 'fromAccount' : 'toAccount')}</label>
+				<div class="loadable-select" class:loaded={accountOptions}>
+					<select id="account" bind:value={accountId} disabled={!accountOptions} class="category-select">
+						{#if accountOptions}
+							{#each accountOptions as account}
+								<option value={account.id}>{account.name}</option>
+							{/each}
+						{/if}
+					</select>
+					<i class="fas fa-circle-notch fa-spin" />
+				</div>
 			</div>
 
 			<div class="form-control inline">
@@ -380,7 +388,7 @@
 					type="button"
 					on:click={submit}
 					class="button primary-button"
-					disabled={!amount || submitButtonIsLoading}
+					disabled={!amount || !accountId || submitButtonIsLoading}
 				>
 					<span class="button-loader" class:loading={submitButtonIsLoading}>
 						<i class="fas fa-circle-notch fa-spin" />

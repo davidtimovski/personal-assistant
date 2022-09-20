@@ -133,7 +133,7 @@
 											{#if viewStocks}
 												<span>{account.stocks || ''}</span>
 											{:else}
-												<span>{account.stockPrice ? Formatter.moneyPrecise(account.stockPrice, currency) : ''}</span>
+												<span>{account.stockPrice ? Formatter.money(account.stockPrice, currency, 4) : ''}</span>
 											{/if}
 										</td>
 									{/if}

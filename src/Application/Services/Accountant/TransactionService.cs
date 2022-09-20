@@ -51,17 +51,21 @@ public class TransactionService : ITransactionService
         {
             throw new ArgumentException("AccountId is missing.");
         }
+        else if (model.FromAccountId == model.ToAccountId)
+        {
+            throw new ArgumentException("FromAccountId and ToAccountId cannot be the same.");
+        }
 
         if (model.FromAccountId.HasValue &&
             !_accountsRepository.Exists(model.FromAccountId.Value, model.UserId))
         {
-            throw new ArgumentException("FromAccount doesn't belong to user with specified userId.");
+            throw new ArgumentException("FromAccountId doesn't belong to user with specified userId.");
         }
 
         if (model.ToAccountId.HasValue &&
             !_accountsRepository.Exists(model.ToAccountId.Value, model.UserId))
         {
-            throw new ArgumentException("ToAccount doesn't belong to user with specified userId.");
+            throw new ArgumentException("ToAccountId doesn't belong to user with specified userId.");
         }
 
         var transaction = _mapper.Map<Transaction>(model);
@@ -76,6 +80,15 @@ public class TransactionService : ITransactionService
 
     public async Task UpdateAsync(UpdateTransaction model)
     {
+        if (!model.FromAccountId.HasValue && !model.ToAccountId.HasValue)
+        {
+            throw new ArgumentException("AccountId is missing.");
+        }
+        else if (model.FromAccountId == model.ToAccountId)
+        {
+            throw new ArgumentException("FromAccountId and ToAccountId cannot be the same.");
+        }
+
         if (model.FromAccountId.HasValue &&
             !_accountsRepository.Exists(model.FromAccountId.Value, model.UserId))
         {

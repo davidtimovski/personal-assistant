@@ -79,13 +79,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddCors(options =>
 {
     var toDoAssistantUrl = builder.Configuration["Urls:ToDoAssistant"];
+    var toDoAssistant2Url = builder.Configuration["Urls:ToDoAssistant2"];
     var cookingAssistantUrl = builder.Configuration["Urls:CookingAssistant"];
     var accountantUrl = builder.Configuration["Urls:Accountant"];
     var accountant2Url = builder.Configuration["Urls:Accountant2"];
 
     options.AddPolicy("AllowToDoAssistant", builder =>
     {
-        builder.WithOrigins(toDoAssistantUrl)
+        builder.WithOrigins(toDoAssistantUrl, toDoAssistant2Url)
                .AllowAnyMethod()
                .AllowAnyHeader()
                .AllowCredentials() // For SignalR
@@ -110,7 +111,7 @@ builder.Services.AddCors(options =>
 
     options.AddPolicy("AllowAllApps", builder =>
     {
-        builder.WithOrigins(toDoAssistantUrl, cookingAssistantUrl, accountantUrl, accountant2Url)
+        builder.WithOrigins(toDoAssistantUrl, toDoAssistant2Url, cookingAssistantUrl, accountantUrl, accountant2Url)
                .AllowAnyMethod()
                .AllowAnyHeader()
                .SetPreflightMaxAge(TimeSpan.FromDays(20));

@@ -15,7 +15,7 @@
 		})
 			.signinRedirectCallback()
 			.then(async () => {
-				await new AuthService(window).loginCallback();
+				await new AuthService('accountant2', window).loginCallback();
 				await goto('/');
 			})
 			.catch((e) => {

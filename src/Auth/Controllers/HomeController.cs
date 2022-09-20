@@ -51,7 +51,7 @@ public class HomeController : Controller
             {
                 { "ToDoAssistant", new ApplicationVm("To Do Assistant", new Uri(_configuration["Urls:ToDoAssistant"] + $"/{language}"), "to-do-assistant") },
                 { "CookingAssistant", new ApplicationVm("Cooking Assistant", new Uri(_configuration["Urls:CookingAssistant"] + $"/{language}"), "cooking-assistant") },
-                { "Accountant", new ApplicationVm("Accountant", new Uri(_configuration["Urls:Accountant"] + $"/{language}"), "accountant") }
+                { "Accountant", new ApplicationVm("Accountant", new Uri(_configuration["Urls:Accountant2"]), "accountant") }
             },
             Alert = alert
         };

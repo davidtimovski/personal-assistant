@@ -17,7 +17,7 @@
 	async function logOut() {
 		window.localStorage.removeItem('profileImageUriLastLoad');
 		window.localStorage.removeItem('homePageData');
-		const authService = new AuthService(window);
+		const authService = new AuthService('accountant2', window);
 		await authService.logout();
 	}
 

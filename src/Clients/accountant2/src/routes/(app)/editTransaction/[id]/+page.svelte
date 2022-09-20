@@ -9,12 +9,13 @@
 	import { t } from '$lib/localization/i18n';
 	import { alertState, isOnline } from '$lib/stores';
 	import { TransactionsService } from '$lib/services/transactionsService';
-	import type { TransactionType } from '$lib/models/viewmodels/transactionType';
+	import { TransactionType } from '$lib/models/viewmodels/transactionType';
+	import { AccountsService } from '$lib/services/accountsService';
 	import { CategoriesService } from '$lib/services/categoriesService';
 	import { EncryptionService } from '$lib/services/encryptionService';
 	import { CategoryType } from '$lib/models/entities/category';
 	import { TransactionModel } from '$lib/models/entities/transaction';
-	import type { SelectOption } from '$lib/models/viewmodels/selectOption';
+	import { SelectOption } from '$lib/models/viewmodels/selectOption';
 
 	import Checkbox from '$lib/components/Checkbox.svelte';
 	import AmountInput from '$lib/components/AmountInput.svelte';
@@ -24,7 +25,9 @@
 	export let data: PageData;
 
 	let fromAccountId: number | null = null;
+	let fromAccountName = '---';
 	let toAccountId: number | null = null;
+	let toAccountName = '---';
 	let categoryId: number | null = null;
 	let amount: number | null = null;
 	let fromStocks: number | null = null;
@@ -43,6 +46,7 @@
 	let createdDate: Date | null = null;
 	let synced: boolean;
 	let type: TransactionType;
+	let accountOptions: SelectOption[] | null = null;
 	let categoryOptions: SelectOption[] | null = null;
 	const maxDate = date;
 	let decPasswordShown = false;
@@ -61,6 +65,7 @@
 	let passwordShowIconLabel: string;
 
 	let transactionsService: TransactionsService;
+	let accountsService: AccountsService;
 	let categoriesService: CategoriesService;
 	let encryptionService: EncryptionService;
 
@@ -153,6 +158,12 @@
 			result.fail('amount');
 		}
 
+		if (!fromAccountId && !toAccountId) {
+			result.fail('accountsMissing');
+		} else if (fromAccountId === toAccountId) {
+			result.fail('accountsEqual');
+		}
+
 		if (!date) {
 			result.fail('date');
 		}
@@ -219,14 +230,24 @@
 				messages.push($t('amountBetween', { from: amountFrom, to: amountTo }));
 			}
 
+			const accountsMissing = result.erroredFields.includes('accountsMissing');
+			if (accountsMissing) {
+				messages.push($t('editTransaction.anAccountIsRequired'));
+			}
+
+			const accountsEqual = result.erroredFields.includes('accountsEqual');
+			if (accountsEqual) {
+				messages.push($t('editTransaction.accountsCannotBeEqual'));
+			}
+
 			const invalidDate = result.erroredFields.includes('date');
 			if (invalidDate) {
-				messages.push($t('newTransaction.dateIsRequired'));
+				messages.push($t('dateIsRequired'));
 			}
 
 			const invalidEncryptionPassword = result.erroredFields.includes('encryptionPassword');
 			if (invalidEncryptionPassword) {
-				messages.push($t('newTransaction.passwordIsRequired'));
+				messages.push($t('passwordIsRequired'));
 			}
 
 			if (messages.length > 0) {
@@ -283,6 +304,7 @@
 		});
 
 		transactionsService = new TransactionsService();
+		accountsService = new AccountsService();
 		categoriesService = new CategoriesService();
 		encryptionService = new EncryptionService();
 
@@ -293,6 +315,27 @@
 		const transaction = await transactionsService.get(data.id);
 		if (transaction === null) {
 			throw new Error('Transaction not found');
+		}
+
+		type = TransactionsService.getType(transaction.fromAccountId, transaction.toAccountId);
+
+		if (type === TransactionType.Transfer && (transaction.fromStocks || transaction.toStocks)) {
+			accountsService.getAllAsOptions().then((options) => {
+				options.unshift(new SelectOption(null, $t('editTransaction.none')));
+				accountOptions = options;
+
+				// Set names because they're uneditable when funds are involved
+				fromAccountName = <string>options?.find((x) => x.id === fromAccountId)?.name;
+				toAccountName = <string>options?.find((x) => x.id === toAccountId)?.name;
+			});
+		} else {
+			accountsService.getNonInvestmentFundsAsOptions().then((options) => {
+				if (type === TransactionType.Transfer) {
+					options.unshift(new SelectOption(null, $t('editTransaction.none')));
+				}
+
+				accountOptions = options;
+			});
 		}
 
 		fromAccountId = transaction.fromAccountId;
@@ -317,8 +360,6 @@
 			amountFrom = 1;
 			amountTo = 450000000;
 		}
-
-		type = TransactionsService.getType(transaction.fromAccountId, transaction.toAccountId);
 	});
 </script>
 
@@ -354,6 +395,46 @@
 					<label for="amount">{$t('amount')}</label>
 					<AmountInput bind:amount bind:currency invalid={amountIsInvalid} />
 				</div>
+
+				{#if type === TransactionType.Expense || type === TransactionType.Transfer}
+					<div class="form-control inline">
+						<label for="from-account">{$t('fromAccount')}</label>
+						{#if fromStocks || toStocks}
+							<span>{fromAccountName}</span>
+						{:else}
+							<div class="loadable-select" class:loaded={accountOptions}>
+								<select id="from-account" bind:value={fromAccountId} disabled={!accountOptions} class="category-select">
+									{#if accountOptions}
+										{#each accountOptions as account}
+											<option value={account.id}>{account.name}</option>
+										{/each}
+									{/if}
+								</select>
+								<i class="fas fa-circle-notch fa-spin" />
+							</div>
+						{/if}
+					</div>
+				{/if}
+
+				{#if type === TransactionType.Deposit || type === TransactionType.Transfer}
+					<div class="form-control inline">
+						<label for="to-account">{$t('toAccount')}</label>
+						{#if fromStocks || toStocks}
+							<span>{toAccountName}</span>
+						{:else}
+							<div class="loadable-select" class:loaded={accountOptions}>
+								<select id="to-account" bind:value={toAccountId} disabled={!accountOptions} class="category-select">
+									{#if accountOptions}
+										{#each accountOptions as account}
+											<option value={account.id}>{account.name}</option>
+										{/each}
+									{/if}
+								</select>
+								<i class="fas fa-circle-notch fa-spin" />
+							</div>
+						{/if}
+					</div>
+				{/if}
 
 				{#if fromStocks !== null}
 					<div class="form-control inline">

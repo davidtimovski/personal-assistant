@@ -273,7 +273,7 @@
 				{#if fromAccount?.stockPrice}
 					<div class="account-stock-price-balance-label">
 						<span>{$t('transferFunds.stockPrice')}</span>
-						<span>{Formatter.moneyPrecise(fromAccount.stockPrice, currency)}</span>
+						<span>{Formatter.money(fromAccount.stockPrice, currency, 4)}</span>
 					</div>
 				{:else}
 					<div class="account-stock-price-balance-label">
@@ -299,7 +299,7 @@
 				{#if toAccount?.stockPrice}
 					<div class="account-stock-price-balance-label">
 						<span>{$t('transferFunds.stockPrice')}</span>
-						<span>{Formatter.moneyPrecise(toAccount?.stockPrice, currency)}</span>
+						<span>{Formatter.money(toAccount?.stockPrice, currency, 4)}</span>
 					</div>
 				{:else}
 					<div class="account-stock-price-balance-label">

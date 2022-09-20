@@ -6,14 +6,14 @@ import { loggedInUser } from "$lib/stores";
 export class AuthService {
   private userManager: any = null;
 
-  constructor(window: Window) {
+  constructor(client: string, window: Window) {
     if (Variables.debug) {
       Log.logger = console;
     }
 
     this.userManager = new UserManager({
       authority: Variables.urls.authority,
-      client_id: "accountant2",
+      client_id: client,
       redirect_uri: `${Variables.urls.host}/signin-oidc`,
       response_type: "code",
       scope: "openid email personal-assistant-api personal-assistant-gateway",

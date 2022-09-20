@@ -1,13 +1,13 @@
-input[type='date'] {
-	background: #fff;
-	border: 1px solid #ddd;
-	border-radius: 6px;
-	padding: 0 12px;
-	line-height: 37px;
-	font-size: inherit;
-	color: inherit;
+input[type="date"] {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 0 12px;
+  line-height: 37px;
+  font-size: inherit;
+  color: inherit;
 }
 
-input[type='date']:disabled {
-	opacity: 0.5;
+input[type="date"]:disabled {
+  opacity: 0.6;
 }

@@ -53,8 +53,8 @@ export class AccountsIDBHelper {
 		return accounts.sort((a: Account, b: Account) => {
 			if ((<any>a).transactionsCount > (<any>b).transactionsCount) return -1;
 			if ((<any>a).transactionsCount < (<any>b).transactionsCount) return 1;
-			if (new Date(a.modifiedDate) > new Date(b.modifiedDate)) return -1;
-			if (new Date(a.modifiedDate) < new Date(b.modifiedDate)) return 1;
+			if (new Date(<Date>a.modifiedDate) > new Date(<Date>b.modifiedDate)) return -1;
+			if (new Date(<Date>a.modifiedDate) < new Date(<Date>b.modifiedDate)) return 1;
 			return 0;
 		});
 	}
