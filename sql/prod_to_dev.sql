@@ -41,3 +41,4 @@ UPDATE accountant_transactions SET description = 'scrambled'
         to_account_id IN (SELECT id FROM accountant_accounts WHERE user_id > 3)
     );
 UPDATE accountant_upcoming_expenses SET description = 'scrambled' WHERE user_id > 3 AND description IS NOT NULL;
+UPDATE accountant_automatic_transactions SET description = 'scrambled' WHERE user_id > 3 AND description IS NOT NULL;

@@ -1,0 +1,378 @@
+<script lang="ts">
+	import { onMount } from 'svelte/internal';
+	import { slide } from 'svelte/transition';
+	import { goto } from '$app/navigation';
+	import type { PageData } from './$types';
+
+	import { ValidationResult, ValidationUtil } from '../../../../../../shared2/utils/validationUtils';
+	import { ValidationErrors } from '../../../../../../shared2/models/validationErrors';
+
+	import { t } from '$lib/localization/i18n';
+	import { alertState } from '$lib/stores';
+	import { ListsService } from '$lib/services/listsService';
+	import { UsersService } from '$lib/services/usersService';
+	import { SharingState } from '$lib/models/viewmodels/sharingState';
+	import type { PreferencesModel } from '$lib/models/preferencesModel';
+
+	import AlertBlock from '$lib/components/AlertBlock.svelte';
+	import Checkbox from '$lib/components/Checkbox.svelte';
+	import Tooltip from '$lib/components/Tooltip.svelte';
+
+	export let data: PageData;
+
+	const isNew = data.id === 0;
+
+	let name: string;
+	let icon: string;
+	let tasksText: string;
+	let notificationsEnabled: boolean;
+	let isOneTimeToggleDefault: boolean;
+	let isArchived: boolean;
+	let sharingState: SharingState;
+	let nameIsInvalid = false;
+	let tasksTextIsInvalid = false;
+	let tasksInputIsVisible = false;
+	let confirmationInProgress = false;
+	let saveButtonText: string;
+	let deleteButtonText: string;
+	let leaveButtonText: string;
+	let iconOptions = ListsService.getIconOptions();
+	let nameInput: HTMLInputElement;
+	let preferences: PreferencesModel | null = null;
+	let saveButtonIsLoading = false;
+	let deleteButtonIsLoading = false;
+	let leaveButtonIsLoading = false;
+
+	let listsService: ListsService;
+	let usersService: UsersService;
+
+	$: canSave = () => {
+		return !ValidationUtil.isEmptyOrWhitespace(name);
+	};
+
+	$: notificationsCheckboxEnabled = () => {
+		return sharingState !== SharingState.NotShared && preferences?.notificationsEnabled;
+	};
+
+	function showTasksTextarea() {
+		tasksInputIsVisible = true;
+	}
+
+	function selectIcon(i: string) {
+		icon = i;
+	}
+
+	function validate(): ValidationResult {
+		const result = new ValidationResult(true);
+
+		if (ValidationUtil.isEmptyOrWhitespace(name)) {
+			result.fail('name');
+		}
+
+		return result;
+	}
+
+	async function save() {
+		saveButtonIsLoading = true;
+		alertState.update((x) => {
+			x.hide();
+			return x;
+		});
+
+		const result = validate();
+
+		if (result.valid) {
+			nameIsInvalid = false;
+
+			if (!isNew) {
+				try {
+					if (sharingState === SharingState.Member) {
+						await listsService.updateShared(data.id, notificationsEnabled);
+					} else {
+						await listsService.update(
+							data.id,
+							name,
+							icon,
+							tasksText,
+							notificationsEnabled,
+							isOneTimeToggleDefault,
+							isArchived,
+							sharingState
+						);
+					}
+
+					const redirectRoute = isArchived ? '/archivedLists' : '/';
+					await goto(redirectRoute + '?edited=' + data.id);
+				} catch (e) {
+					if (e instanceof ValidationErrors) {
+						nameIsInvalid = e.fields.includes('Name');
+					}
+
+					saveButtonIsLoading = false;
+				}
+			} else {
+				try {
+					const newId = await listsService.create(name, icon, isOneTimeToggleDefault, tasksText);
+
+					await goto('/?edited=' + newId);
+				} catch (e) {
+					if (e instanceof ValidationErrors) {
+						nameIsInvalid = e.fields.includes('Name');
+						tasksTextIsInvalid = e.fields.includes('TasksText');
+					}
+
+					saveButtonIsLoading = false;
+				}
+			}
+		} else {
+			saveButtonIsLoading = false;
+		}
+	}
+
+	async function deleteList() {
+		if (deleteButtonIsLoading) {
+			return;
+		}
+
+		if (confirmationInProgress) {
+			deleteButtonIsLoading = true;
+
+			await listsService.delete(data.id);
+
+			alertState.update((x) => {
+				x.showSuccess('editList.deleteSuccessful');
+				return x;
+			});
+			goto('/');
+		} else {
+			deleteButtonText = $t('sure');
+			confirmationInProgress = true;
+		}
+	}
+
+	async function leaveList() {
+		if (leaveButtonIsLoading) {
+			return;
+		}
+
+		if (confirmationInProgress) {
+			leaveButtonIsLoading = true;
+
+			await listsService.leave(data.id);
+
+			alertState.update((x) => {
+				x.showSuccess('editList.youHaveLeftTheList');
+				return x;
+			});
+			goto('/');
+		} else {
+			leaveButtonText = $t('sure');
+			confirmationInProgress = true;
+		}
+	}
+
+	async function cancel() {
+		if (!confirmationInProgress) {
+			if (isNew) {
+				await goto('/');
+			} else {
+				await goto(`/list/${data.id}`);
+			}
+		}
+		deleteButtonText = $t('delete');
+		leaveButtonText = $t('editList.leave');
+		confirmationInProgress = false;
+	}
+
+	function back() {
+		if (isNew) {
+			goto('/');
+		} else {
+			goto(`/list/${data.id}`);
+		}
+	}
+
+	onMount(async () => {
+		deleteButtonText = $t('delete');
+		leaveButtonText = $t('editList.leave');
+
+		alertState.subscribe((value) => {
+			if (value.hidden) {
+				nameIsInvalid = false;
+			}
+		});
+
+		listsService = new ListsService();
+		usersService = new UsersService();
+
+		if (isNew) {
+			icon = iconOptions[0].icon;
+			sharingState = SharingState.NotShared;
+
+			saveButtonText = $t('editList.create');
+			nameInput.focus();
+		} else {
+			saveButtonText = $t('save');
+
+			const model = await listsService.get(data.id);
+			if (model === null) {
+				throw new Error('List not found');
+			}
+
+			name = model.name;
+			icon = model.icon;
+			notificationsEnabled = model.notificationsEnabled;
+			isOneTimeToggleDefault = model.isOneTimeToggleDefault;
+			isArchived = model.isArchived;
+			sharingState = model.sharingState;
+		}
+
+		preferences = await usersService.getPreferences();
+	});
+</script>
+
+<section class="container">
+	<div class="page-title-wrap">
+		<div class="side inactive small">
+			<i class="fas fa-pencil-alt" />
+		</div>
+		<div class="page-title">
+			{#if isNew}
+				<span>{$t('editList.newList')}</span>
+			{:else}
+				<span>{$t('editList.edit')}</span>&nbsp;<span class="colored-text">{name}</span>
+			{/if}
+		</div>
+		<button type="button" on:click={back} class="back-button">
+			<i class="fas fa-times" />
+		</button>
+	</div>
+
+	<div class="content-wrap">
+		{#if sharingState === 4}
+			<AlertBlock type="warning" message={$t('editList.inOrderToChangeThisList')} />
+		{/if}
+
+		<form on:submit={save}>
+			{#if sharingState !== 4}
+				<div class="form-control">
+					<input
+						type="text"
+						bind:value={name}
+						bind:this={nameInput}
+						maxlength="50"
+						class:invalid={nameIsInvalid}
+						placeholder={$t('listName')}
+						aria-label={$t('listName')}
+						required
+					/>
+				</div>
+			{/if}
+
+			{#if isNew}
+				<div class="form-control">
+					{#if !tasksInputIsVisible}
+						<div class="horizontal-buttons-wrap">
+							<button type="button" on:click={showTasksTextarea} class="wide-button">
+								{$t('editList.addTasks')}
+							</button>
+						</div>
+					{:else}
+						<textarea
+							bind:value={tasksText}
+							class:invalid={tasksTextIsInvalid}
+							transition:slide
+							placeholder={$t('editList.eachRow')}
+							aria-label={$t('editList.eachRow')}
+						/>
+					{/if}
+				</div>
+			{/if}
+
+			{#if sharingState !== 4}
+				<div class="form-control">
+					<div class="icon-wrap">
+						<span class="placeholder">{$t('editList.icon')}</span>
+						<div class="icon-options">
+							{#each iconOptions as i}
+								<div on:click={() => selectIcon(i.icon)} class:selected={icon === i.icon} class="icon-option">
+									<i class={i.cssClass} />
+								</div>
+							{/each}
+						</div>
+					</div>
+				</div>
+			{/if}
+
+			<div class="form-control">
+				<Checkbox
+					labelKey="editList.notifications"
+					bind:value={notificationsEnabled}
+					disabled={!notificationsCheckboxEnabled()}
+				/>
+			</div>
+
+			{#if sharingState !== 4}
+				<div class="form-control">
+					<Checkbox labelKey="deleteOnCompletion" bind:value={isOneTimeToggleDefault} />
+
+					<Tooltip key="oneTimeTasks" />
+				</div>
+			{/if}
+		</form>
+
+		<hr />
+
+		<div class="save-delete-wrap">
+			{#if !confirmationInProgress}
+				<button
+					type="button"
+					on:click={save}
+					class="button primary-button"
+					disabled={!canSave() || saveButtonIsLoading}
+				>
+					<span class="button-loader" class:loading={saveButtonIsLoading}>
+						<i class="fas fa-circle-notch fa-spin" />
+					</span>
+					<span>{saveButtonText}</span>
+				</button>
+			{/if}
+
+			{#if (!isNew && sharingState === 0) || sharingState === 1 || sharingState === 2}
+				<button
+					type="button"
+					on:click={deleteList}
+					class="button danger-button"
+					disabled={deleteButtonIsLoading}
+					class:confirm={confirmationInProgress}
+				>
+					<span class="button-loader" class:loading={deleteButtonIsLoading}>
+						<i class="fas fa-circle-notch fa-spin" />
+					</span>
+					<span>{deleteButtonText}</span>
+				</button>
+			{/if}
+
+			{#if sharingState === 3 || sharingState === 4}
+				<button
+					type="button"
+					on:click={leaveList}
+					class="button danger-button"
+					disabled={leaveButtonIsLoading}
+					class:confirm={confirmationInProgress}
+				>
+					<span class="button-loader" class:loading={leaveButtonIsLoading}>
+						<i class="fas fa-circle-notch fa-spin" />
+					</span>
+					<span>{leaveButtonText}</span>
+				</button>
+			{/if}
+
+			{#if isNew || confirmationInProgress}
+				<button type="button" on:click={cancel} class="button secondary-button">
+					{$t('cancel')}
+				</button>
+			{/if}
+		</div>
+	</div>
+</section>

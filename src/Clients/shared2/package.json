@@ -1,9 +1,14 @@
 {
-  "name": "svelte-kit-app-shared",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
+  "name": "shared2",
+  "description": "A shared library for personal assistant apps.",
+  "version": "2.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/davidtimovski/personal-assistant"
+  },
+  "license": "GPL-3.0",
   "dependencies": {
+    "@microsoft/signalr": "^6.0.9",
     "oidc-client": "^1.11.5"
   }
 }

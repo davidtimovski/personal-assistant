@@ -16,7 +16,7 @@ export default {
 		deleteOnCompletion: 'Delete tasks on completion',
 		dragToReorder: 'Drag to reorder',
 		highPriority: 'High Priority',
-		lists: {
+		index: {
 			menu: 'Menu',
 			reorderLists: 'Reorder lists',
 			refresh: 'Refresh',
@@ -233,7 +233,7 @@ export default {
 		deleteOnCompletion: 'Бриши задачи при комплетирање',
 		dragToReorder: 'Влечи за подредување',
 		highPriority: 'Висок Приоритет',
-		lists: {
+		index: {
 			menu: 'Мени',
 			reorderLists: 'Подреди листи',
 			refresh: 'Освежи',

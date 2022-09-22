@@ -501,6 +501,9 @@ a.wide-button {
   font-size: 19px;
   color: #fff;
 }
+a.new-button {
+  text-decoration: none;
+}
 .new-button:disabled {
   color: var(--faded-color);
 }
