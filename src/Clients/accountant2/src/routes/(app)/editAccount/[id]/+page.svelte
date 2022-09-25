@@ -6,7 +6,7 @@
 	import { ValidationResult, ValidationUtil } from '../../../../../../shared2/utils/validationUtils';
 
 	import { t } from '$lib/localization/i18n';
-	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
+	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { alertState, isOnline } from '$lib/stores';
 	import { AccountsService } from '$lib/services/accountsService';
 	import { Account } from '$lib/models/entities/account';
@@ -156,7 +156,7 @@
 		accountsService = new AccountsService();
 
 		if (isNew) {
-			currency = localStorage.get('currency');
+			currency = localStorage.get(LocalStorageKeys.Currency);
 			investmentFund = false;
 			saveButtonText = $t('create');
 
@@ -210,7 +210,7 @@
 			<AlertBlock type="info" message={$t('editAccount.mainAccount')} />
 		{/if}
 
-		<form on:submit={save}>
+		<form on:submit|preventDefault={save}>
 			<div class="form-control">
 				<input
 					type="text"
@@ -247,12 +247,7 @@
 
 			<div class="save-delete-wrap">
 				{#if !deleteInProgress}
-					<button
-						type="button"
-						on:click={save}
-						class="button primary-button"
-						disabled={!canSave() || saveButtonIsLoading}
-					>
+					<button class="button primary-button" disabled={!canSave() || saveButtonIsLoading}>
 						<span class="button-loader" class:loading={saveButtonIsLoading}>
 							<i class="fas fa-circle-notch fa-spin" />
 						</span>

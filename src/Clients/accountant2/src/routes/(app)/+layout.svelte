@@ -46,8 +46,6 @@
 		const localStorage = new LocalStorageUtil();
 		locale.set(localStorage.get('language'));
 
-		new AuthService('accountant2', window).login();
-
 		loggedInUser.subscribe((value) => {
 			if (!value) {
 				return;
@@ -55,6 +53,8 @@
 
 			sync(localStorage);
 		});
+
+		new AuthService('accountant2', window).login();
 
 		isOnline.set(navigator.onLine);
 		window.addEventListener('online', () => {

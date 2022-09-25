@@ -5,7 +5,7 @@
 	import { ValidationResult, ValidationUtil } from '../../../../../shared2/utils/validationUtils';
 
 	import { t } from '$lib/localization/i18n';
-	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
+	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
 	import { alertState } from '$lib/stores';
 	import type { SelectOption } from '$lib/models/viewmodels/selectOption';
@@ -81,7 +81,7 @@
 		accountsService = new AccountsService();
 		transactionsService = new TransactionsService();
 
-		currency = localStorage.get('currency');
+		currency = localStorage.get(LocalStorageKeys.Currency);
 
 		if (currency === 'MKD') {
 			min = 1;
@@ -111,7 +111,7 @@
 	</div>
 
 	<div class="content-wrap">
-		<form on:submit={adjust}>
+		<form on:submit|preventDefault={adjust}>
 			<div class="form-control inline">
 				<label for="balance">{$t('balance')}</label>
 				<AmountInput bind:amount={balance} bind:currency invalid={balanceIsInvalid} inputId="balance" />
@@ -155,12 +155,7 @@
 			<hr />
 
 			<div class="save-delete-wrap">
-				<button
-					type="button"
-					on:click={adjust}
-					class="button primary-button"
-					disabled={!balance || adjustButtonIsLoading}
-				>
+				<button class="button primary-button" disabled={!balance || adjustButtonIsLoading}>
 					<span class="button-loader" class:loading={adjustButtonIsLoading}>
 						<i class="fas fa-circle-notch fa-spin" />
 					</span>

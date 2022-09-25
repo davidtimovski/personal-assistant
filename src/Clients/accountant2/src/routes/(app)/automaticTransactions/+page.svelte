@@ -4,7 +4,7 @@
 	import { page } from '$app/stores';
 
 	import { t } from '$lib/localization/i18n';
-	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
+	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
 	import { syncStatus } from '$lib/stores';
 	import { AutomaticTransactionsService } from '$lib/services/automaticTransactionsService';
@@ -38,7 +38,7 @@
 		localStorage = new LocalStorageUtil();
 		automaticTransactionsService = new AutomaticTransactionsService();
 
-		currency = localStorage.get('currency');
+		currency = localStorage.get(LocalStorageKeys.Currency);
 
 		const allAutomaticTransactions = await automaticTransactionsService.getAll(currency);
 

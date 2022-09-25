@@ -7,7 +7,7 @@
 	import { CurrencySuggestion } from '../../../../shared2/models/viewmodels/currencySuggestion';
 
 	import { t } from '$lib/localization/i18n';
-	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
+	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 
 	let currency: string | null = null;
 	let changing = false;
@@ -33,7 +33,7 @@
 		localStorage = new LocalStorageUtil();
 		currenciesService = new CurrenciesService('Accountant');
 
-		currency = localStorage.get('currency');
+		currency = localStorage.get(LocalStorageKeys.Currency);
 		const currencies = currenciesService.getCurrencies();
 
 		autocompleteResult = autocomplete({

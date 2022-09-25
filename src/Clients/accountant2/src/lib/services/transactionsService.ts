@@ -394,7 +394,7 @@ export class TransactionsService {
 
 	async adjust(accountId: number, amount: number, description: string, currency: string) {
 		try {
-			const date = DateHelper.format(DateHelper.adjustForTimeZone(new Date()));
+			const date = DateHelper.format(new Date());
 			const isExpense = amount < 0;
 			amount = Math.abs(amount);
 
@@ -414,8 +414,8 @@ export class TransactionsService {
 				null,
 				null,
 				false,
-				new Date(),
-				new Date()
+				null,
+				null
 			);
 
 			if (isExpense) {

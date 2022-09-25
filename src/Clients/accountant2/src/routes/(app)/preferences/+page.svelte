@@ -10,27 +10,27 @@
 	let localStorage: LocalStorageUtil;
 
 	let mergeDebtPerPerson: boolean;
-	let showUpcomingExpensesOnDashboard: boolean;
-	let showDebtOnDashboard: boolean;
+	let showUpcomingExpensesOnHomePage: boolean;
+	let showDebtOnHomePage: boolean;
 
 	function mergeDebtPerPersonChanged(ev: { detail: boolean }) {
 		localStorage.set(LocalStorageKeys.MergeDebtPerPerson, ev.detail);
 	}
 
-	function showUpcomingExpensesOnDashboardChanged(ev: { detail: boolean }) {
-		localStorage.set(LocalStorageKeys.ShowUpcomingExpensesOnDashboard, ev.detail);
+	function showUpcomingExpensesOnHomePageChanged(ev: { detail: boolean }) {
+		localStorage.set(LocalStorageKeys.ShowUpcomingExpensesOnHomePage, ev.detail);
 	}
 
-	function showDebtOnDashboardChanged(ev: { detail: boolean }) {
-		localStorage.set(LocalStorageKeys.ShowDebtOnDashboard, ev.detail);
+	function showDebtOnHomePageChanged(ev: { detail: boolean }) {
+		localStorage.set(LocalStorageKeys.ShowDebtOnHomePage, ev.detail);
 	}
 
 	onMount(() => {
 		localStorage = new LocalStorageUtil();
 
 		mergeDebtPerPerson = localStorage.getBool(LocalStorageKeys.MergeDebtPerPerson);
-		showUpcomingExpensesOnDashboard = localStorage.getBool(LocalStorageKeys.ShowUpcomingExpensesOnDashboard);
-		showDebtOnDashboard = localStorage.getBool(LocalStorageKeys.ShowDebtOnDashboard);
+		showUpcomingExpensesOnHomePage = localStorage.getBool(LocalStorageKeys.ShowUpcomingExpensesOnHomePage);
+		showDebtOnHomePage = localStorage.getBool(LocalStorageKeys.ShowDebtOnHomePage);
 	});
 </script>
 
@@ -60,16 +60,16 @@
 			</div>
 
 			<div class="form-control-group">
-				<div class="setting-descriptor">{$t('preferences.showOnDashboard')}</div>
+				<div class="setting-descriptor">{$t('preferences.showOnHomePage')}</div>
 				<div class="form-control">
 					<Checkbox
 						labelKey="preferences.upcomingExpenses"
-						value={showUpcomingExpensesOnDashboard}
-						on:change={showUpcomingExpensesOnDashboardChanged}
+						value={showUpcomingExpensesOnHomePage}
+						on:change={showUpcomingExpensesOnHomePageChanged}
 					/>
 				</div>
 				<div class="form-control">
-					<Checkbox labelKey="preferences.debt" value={showDebtOnDashboard} on:change={showDebtOnDashboardChanged} />
+					<Checkbox labelKey="preferences.debt" value={showDebtOnHomePage} on:change={showDebtOnHomePageChanged} />
 				</div>
 			</div>
 		</form>

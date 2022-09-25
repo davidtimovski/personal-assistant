@@ -4,7 +4,7 @@
 
 	import { DateHelper } from '../../../../../shared2/utils/dateHelper';
 
-	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
+	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { t } from '$lib/localization/i18n';
 	import { Formatter } from '$lib/utils/formatter';
 	import { TransactionsService } from '$lib/services/transactionsService';
@@ -129,7 +129,7 @@
 		transactionsService = new TransactionsService();
 		accountsService = new AccountsService();
 
-		currency = localStorage.get('currency');
+		currency = localStorage.get(LocalStorageKeys.Currency);
 		language = localStorage.get('language');
 
 		const daysArray = new Array<HeatmapDay>();

@@ -6,7 +6,7 @@
 	import { DateHelper } from '../../../../../shared2/utils/dateHelper';
 
 	import { t } from '$lib/localization/i18n';
-	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
+	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
 	import { searchFilters } from '$lib/stores';
 	import { TransactionsService } from '$lib/services/transactionsService';
@@ -215,7 +215,7 @@
 		categoriesService = new CategoriesService();
 		accountsService = new AccountsService();
 
-		currency = localStorage.get('currency');
+		currency = localStorage.get(LocalStorageKeys.Currency);
 		language = localStorage.get('language');
 
 		const categoryOptionsPromise = new Promise<void>(async (resolve) => {
@@ -248,7 +248,7 @@
 	</div>
 
 	<div class="content-wrap">
-		<form on:submit={filterChanged}>
+		<form on:submit|preventDefault={filterChanged}>
 			<div class="form-control inline">
 				<label for="from-date">{$t('transactions.from')}</label>
 				<input type="date" id="from-date" bind:value={$searchFilters.fromDate} on:change={filterChanged} />
