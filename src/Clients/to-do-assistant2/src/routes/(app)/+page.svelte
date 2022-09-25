@@ -5,26 +5,23 @@
 
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 	import { t } from '$lib/localization/i18n';
-	import { loggedInUser, syncStatus, lists } from '$lib/stores';
+	import { loggedInUser, lists } from '$lib/stores';
 	import { UsersService } from '$lib/services/usersService';
 	import { ListsService } from '$lib/services/listsService';
 	import type { ListModel } from '$lib/models/viewmodels/listModel';
 	import type { ListIcon } from '$lib/models/viewmodels/listIcon';
-	import { SyncEvents } from '$lib/models/syncEvents';
-	import type { List } from '$lib/models/entities';
 
 	let imageUri: any;
 	let computedLists: ListModel[] | null = null;
 	let regularLists: ListModel[] | null = null;
 	let iconOptions = ListsService.getIconOptions();
 	let editedId: number | undefined;
-	let isReordering = false;
+	//let isReordering = false;
 	let computedListNameLookup = new Map<string, string>();
 	let menuButtonIsLoading = false;
 	let connTracker = {
 		isOnline: true
 	};
-	let dataLoaded = false;
 
 	// Progress bar
 	let progressBarActive = false;
@@ -42,18 +39,13 @@
 	}
 
 	function sync() {
-		syncStatus.set(SyncEvents.ReSync);
+		listsService.getAll();
 
 		usersService.getProfileImageUri().then((uri) => {
 			if (imageUri !== uri) {
 				imageUri = uri;
 			}
 		});
-	}
-
-	function setListsFromState() {
-		computedLists = ListsService.getComputedForHomeScreen($lists, computedListNameLookup);
-		regularLists = ListsService.getForHomeScreen($lists);
 	}
 
 	function setTaskCompletion(listId: number, isCompleted: boolean) {
@@ -71,7 +63,6 @@
 	}
 
 	function startProgressBar() {
-		dataLoaded = false;
 		progressBarActive = true;
 		progress = 10;
 
@@ -120,13 +111,19 @@
 			}
 		});
 
-		syncStatus.subscribe((value) => {
-			if (value === SyncEvents.SyncStarted) {
-				startProgressBar();
-			} else if (value === SyncEvents.SyncFinished) {
-				setListsFromState();
-				finishProgressBar();
+		if ($lists.length === 0) {
+			startProgressBar();
+		}
+
+		lists.subscribe((l) => {
+			if (l.length === 0) {
+				return;
 			}
+
+			computedLists = ListsService.getComputedForHomeScreen($lists, computedListNameLookup);
+			regularLists = ListsService.getForHomeScreen($lists);
+
+			finishProgressBar();
 		});
 	});
 </script>
@@ -149,7 +146,7 @@
 					<img src={imageUri} class="profile-image" width="40" height="40" alt={$t('profilePicture')} />
 				</div>
 			{/if}
-
+			<!-- 
 			<label
 				class="lists-reorder-toggle lists"
 				class:checked={isReordering}
@@ -158,7 +155,7 @@
 			>
 				<input type="checkbox" bind:checked={isReordering} />
 				<i class="fas fa-random" />
-			</label>
+			</label> -->
 			<div class="page-title">
 				<span />
 			</div>
@@ -179,7 +176,7 @@
 	</div>
 
 	<div class="content-wrap lists">
-		<div class="to-do-lists-wrap" class:reordering={isReordering}>
+		<div class="to-do-lists-wrap">
 			{#if !computedLists || !regularLists}
 				<div>
 					<div class="to-do-list-placeholder">&nbsp;</div>
@@ -201,15 +198,15 @@
 						<a
 							class="to-do-list"
 							class:empty={list.isEmpty}
-							class:highlighted-row={list.id === editedId}
+							class:highlighted={list.id === editedId}
 							class:is-shared={list.sharingState !== 0 && list.sharingState !== 1}
 							class:pending-share={list.sharingState === 1}
 							href="/list/{list.id}"
 						>
 							<i class="icon {getClassFromIcon(list.icon)}" />
-							<span class="sort-handle" title={$t('dragToReorder')} aria-label={$t('dragToReorder')}>
+							<!-- <span class="sort-handle" title={$t('dragToReorder')} aria-label={$t('dragToReorder')}>
 								<i class="reorder-icon fas fa-hand-paper" />
-							</span>
+							</span> -->
 							<span class="name">{list.name}</span>
 							<i class="fas fa-users shared-icon" title={$t('index.shared')} aria-label={$t('index.shared')} />
 							<i
@@ -232,30 +229,30 @@
 </section>
 
 <style lang="scss">
-	.lists-reorder-toggle {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		width: 45px;
-		height: 50px;
-		margin-left: 15px;
-		font-size: 25px;
-		text-decoration: none;
-		color: var(--faded-color);
-		cursor: pointer;
+	// .lists-reorder-toggle {
+	// 	display: flex;
+	// 	justify-content: center;
+	// 	align-items: center;
+	// 	width: 45px;
+	// 	height: 50px;
+	// 	margin-left: 15px;
+	// 	font-size: 25px;
+	// 	text-decoration: none;
+	// 	color: var(--faded-color);
+	// 	cursor: pointer;
 
-		&.checked {
-			color: var(--primary-color);
-		}
+	// 	&.checked {
+	// 		color: var(--primary-color);
+	// 	}
 
-		input {
-			display: none;
-		}
+	// 	input {
+	// 		display: none;
+	// 	}
 
-		&:hover {
-			color: var(--primary-color-dark);
-		}
-	}
+	// 	&:hover {
+	// 		color: var(--primary-color-dark);
+	// 	}
+	// }
 
 	.content-wrap.lists {
 		padding-top: 15px;
@@ -264,9 +261,9 @@
 	.to-do-lists-wrap {
 		margin-bottom: 30px;
 
-		&.reordering .to-do-list:not(.computed-list) .icon {
-			display: none;
-		}
+		// &.reordering .to-do-list:not(.computed-list) .icon {
+		// 	display: none;
+		// }
 	}
 
 	.to-do-list {
@@ -303,13 +300,13 @@
 			color: var(--primary-color-dark);
 		}
 
-		.reorder-icon {
-			display: none;
-			width: 45px;
-			line-height: 45px;
-			text-align: center;
-			color: var(--primary-color);
-		}
+		// .reorder-icon {
+		// 	display: none;
+		// 	width: 45px;
+		// 	line-height: 45px;
+		// 	text-align: center;
+		// 	color: var(--primary-color);
+		// }
 
 		.shared-icon {
 			display: none;
@@ -335,7 +332,7 @@
 				color: #999;
 			}
 
-			.reorder-icon,
+			//.reorder-icon,
 			.shared-icon {
 				color: #aaa;
 			}
@@ -369,9 +366,9 @@
 		cursor: grab;
 		cursor: -webkit-grab;
 	}
-	.reordering .to-do-list:not(.computed-list) .reorder-icon {
-		display: inline-block !important;
-	}
+	// .reordering .to-do-list:not(.computed-list) .reorder-icon {
+	// 	display: inline-block !important;
+	// }
 
 	.to-do-list-placeholder {
 		background: #e9f4ff;

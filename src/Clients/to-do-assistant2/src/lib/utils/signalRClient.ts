@@ -1,8 +1,8 @@
 import { SignalRClientBase } from '../../../../shared2/utils/signalRClientBase';
 
-import { syncStatus } from '$lib/stores';
+import { remoteEvents } from '$lib/stores';
 import { ListsService } from '$lib/services/listsService';
-import { SyncEvents } from '$lib/models/syncEvents';
+import { RemoteEvent, RemoteEventType } from '$lib/models/remoteEvents';
 import Variables from '$lib/variables';
 
 export class SignalRClient extends SignalRClientBase {
@@ -16,7 +16,7 @@ export class SignalRClient extends SignalRClientBase {
 			//await Actions.getLists(this.listsService);
 			//this.eventAggregator.publish(AppEvents.ListsChanged);
 
-			syncStatus.set(SyncEvents.ReSync);
+			await this.listsService.getAll();
 		});
 
 		await (<signalR.HubConnection>this.connection).invoke('JoinGroups');
@@ -24,10 +24,26 @@ export class SignalRClient extends SignalRClientBase {
 		this.on('TaskCompletedChanged', async (userId: number, id: number, listId: number, isCompleted: boolean) => {
 			if (userId !== currentUserId) {
 				// TODO
+				// if (isCompleted) {
+				// 	//await Actions.completeTask(id, listId);
+				// } else {
+				// 	//await Actions.uncompleteTask(id, listId);
+				// }
+
 				if (isCompleted) {
-					//await Actions.completeTask(id, listId);
+					remoteEvents.set(
+						new RemoteEvent(RemoteEventType.TaskCompletedRemotely, {
+							id: id,
+							listId: listId
+						})
+					);
 				} else {
-					//await Actions.uncompleteTask(id, listId);
+					remoteEvents.set(
+						new RemoteEvent(RemoteEventType.TaskUncompletedRemotely, {
+							id: id,
+							listId: listId
+						})
+					);
 				}
 
 				// this.eventAggregator.publish(AppEvents.TaskCompletedChangedRemotely, {
@@ -43,6 +59,13 @@ export class SignalRClient extends SignalRClientBase {
 				// TODO
 				//await Actions.deleteTask(id, listId);
 				//this.eventAggregator.publish(AppEvents.TaskDeletedRemotely, { id: id, listId: listId });
+
+				remoteEvents.set(
+					new RemoteEvent(RemoteEventType.TaskDeletedRemotely, {
+						id: id,
+						listId: listId
+					})
+				);
 			}
 		});
 
@@ -59,6 +82,8 @@ export class SignalRClient extends SignalRClientBase {
 				// TODO
 				//await Actions.getLists(this.listsService);
 				//this.eventAggregator.publish(AppEvents.ListsChanged);
+
+				await this.listsService.getAll();
 			}
 		});
 	}

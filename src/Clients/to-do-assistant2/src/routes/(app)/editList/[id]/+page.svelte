@@ -22,12 +22,12 @@
 
 	const isNew = data.id === 0;
 
-	let name: string;
-	let icon: string;
-	let tasksText: string;
+	let name = '';
+	let icon = '';
+	let tasksText = '';
 	let notificationsEnabled: boolean;
 	let isOneTimeToggleDefault: boolean;
-	let isArchived: boolean;
+	let isArchived = false;
 	let sharingState: SharingState;
 	let nameIsInvalid = false;
 	let tasksTextIsInvalid = false;
@@ -281,7 +281,7 @@
 						<textarea
 							bind:value={tasksText}
 							class:invalid={tasksTextIsInvalid}
-							transition:slide
+							in:slide
 							placeholder={$t('editList.eachRow')}
 							aria-label={$t('editList.eachRow')}
 						/>

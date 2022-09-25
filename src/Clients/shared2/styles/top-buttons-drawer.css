@@ -1,65 +1,68 @@
 .top-buttons-drawer-container {
-	position: relative;
-	height: 21px;
+  position: relative;
+  height: 21px;
 }
 
 .top-buttons-drawer-container .top-buttons-drawer {
-	position: absolute;
-	top: 0;
-	left: 10%;
-	z-index: 2;
-	width: 80%;
-	background: #fff;
-	border-bottom-left-radius: 7px;
-	border-bottom-right-radius: 7px;
-	box-shadow: inset var(--box-shadow);
-	transition: box-shadow var(--transition);
+  position: absolute;
+  top: 0;
+  left: 10%;
+  z-index: 2;
+  width: 80%;
+  background: #fff;
+  border-bottom-left-radius: 7px;
+  border-bottom-right-radius: 7px;
+  box-shadow: inset var(--box-shadow);
+  transition: box-shadow var(--transition);
 }
 
 .top-buttons-drawer-container .top-buttons-drawer .top-buttons-drawer-wrap {
-	max-height: 0;
-	overflow-y: hidden;
-	transition-property: all;
-	transition-duration: 0.5s;
-	transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+  max-height: 0;
+  overflow-y: hidden;
+  transition-property: all;
+  transition-duration: 0.5s;
+  transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
 }
 
 .top-buttons-drawer-container
-	.top-buttons-drawer
-	.top-buttons-drawer-wrap
-	.top-buttons-drawer-content {
-	padding: 20px 25px 15px;
+  .top-buttons-drawer
+  .top-buttons-drawer-wrap
+  .top-buttons-drawer-content {
+  padding: 20px 25px 15px;
 }
 
-.top-buttons-drawer-container .fa-angle-up {
-	display: none;
+.top-buttons-drawer-container .top-buttons-drawer .fa-angle-up {
+  display: none;
 }
 
-.top-buttons-drawer-container.open .fa-angle-up {
-	display: inline;
+.top-buttons-drawer-container .top-buttons-drawer.open .fa-angle-up {
+  display: inline;
 }
 
-.top-buttons-drawer-container.open .fa-angle-down {
-	display: none;
+.top-buttons-drawer-container .top-buttons-drawer.open .fa-angle-down {
+  display: none;
 }
 
 .top-buttons-drawer-container .top-drawer-handle {
-	border: 1px solid #ddd;
-	border-bottom-left-radius: 7px;
-	border-bottom-right-radius: 7px;
-	border-top: none;
-	text-align: center;
-	font-size: 16px;
-	line-height: 20px;
-	color: var(--faded-color);
-	cursor: pointer;
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  text-align: center;
+  font-size: 16px;
+  line-height: 20px;
+  color: var(--faded-color);
 }
 
 .top-buttons-drawer-container .top-drawer-handle:hover {
-	color: var(--primary-color-dark);
+  color: var(--primary-color-dark);
 }
 
 /* Workaround for sticky :hover on mobile devices */
-.touch-device .top-buttons-drawer-container .top-buttons-drawer .top-drawer-handle:hover {
-	color: var(--faded-color);
+.touch-device
+  .top-buttons-drawer-container
+  .top-buttons-drawer
+  .top-drawer-handle:hover {
+  color: var(--faded-color);
 }

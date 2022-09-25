@@ -9,70 +9,17 @@
 
 	import { AuthService } from '../../../../shared2/services/authService';
 
-	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
+	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 	import { locale } from '$lib/localization/i18n';
-	import { isOnline, loggedInUser, syncStatus, lists } from '$lib/stores';
-	import { SyncEvents } from '$lib/models/syncEvents';
+	import { isOnline, loggedInUser } from '$lib/stores';
 	import { ListsService } from '$lib/services/listsService';
 	import { SignalRClient } from '$lib/utils/signalRClient';
-	import { List, Task } from '$lib/models/entities';
-	import { SharingState } from '$lib/models/viewmodels/sharingState';
 
 	import Alert from '$lib/components/Alert.svelte';
 
 	let listsService: ListsService;
 	let signalRClient: SignalRClient;
 	let user: User | null = null;
-
-	function generateComputedLists(allLists: List[]) {
-		const allTasks: Task[] = allLists
-			.filter((x) => !x.isArchived && !x.computedListType)
-			.reduce((a: Task[], b: List) => {
-				return a.concat(b.tasks);
-			}, []);
-
-		const uncompletedHighPriorityTasks = allTasks.filter((x) => !x.isCompleted && x.isHighPriority);
-		const highPriorityList = allLists.find((x) => x.computedListType);
-		if (uncompletedHighPriorityTasks.length > 0) {
-			if (highPriorityList) {
-				highPriorityList.tasks = uncompletedHighPriorityTasks;
-			} else {
-				allLists.push(
-					new List(
-						0,
-						null,
-						null,
-						false,
-						false,
-						SharingState.NotShared,
-						0,
-						false,
-						ListsService.highPriorityComputedListMoniker,
-						uncompletedHighPriorityTasks,
-						null
-					)
-				);
-			}
-		} else if (highPriorityList) {
-			const index = allLists.indexOf(highPriorityList);
-			allLists.splice(index, 1);
-		}
-	}
-
-	async function sync(localStorage: LocalStorageUtil) {
-		syncStatus.set(SyncEvents.SyncStarted);
-
-		const l = await listsService.getAll();
-
-		const highPriorityListsEnabled = localStorage.getBool(LocalStorageKeys.HighPriorityListEnabled);
-		if (highPriorityListsEnabled) {
-			generateComputedLists(l);
-		}
-
-		lists.set(l);
-
-		syncStatus.set(SyncEvents.SyncFinished);
-	}
 
 	onMount(() => {
 		const localStorage = new LocalStorageUtil();
@@ -88,7 +35,7 @@
 
 			user = value;
 
-			await sync(localStorage);
+			await listsService.getAll();
 
 			signalRClient.initialize(user.access_token, parseInt(user.profile.sub, 10));
 		});
@@ -101,12 +48,6 @@
 		});
 		window.addEventListener('offline', () => {
 			isOnline.set(false);
-		});
-
-		syncStatus.subscribe((value) => {
-			if (value === SyncEvents.ReSync) {
-				sync(localStorage);
-			}
 		});
 	});
 </script>

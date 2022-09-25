@@ -1,6 +1,8 @@
 export enum AppEvents {
+	None = 'app:none',
 	ListsChanged = 'app:lists-changed',
-	TaskCompletedChangedRemotely = 'app:task-completed-changed-remotely',
+	TaskCompletedRemotely = 'app:task-completed-remotely',
+	TaskUnCompletedRemotely = 'app:task-uncompleted-remotely',
 	TaskDeletedRemotely = 'app:task-deleted-remotely',
 	TaskReorderedRemotely = 'app:task-reordered-remotely',
 	SyncStarted = 'SyncStarted'

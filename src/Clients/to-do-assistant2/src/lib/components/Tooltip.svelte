@@ -50,7 +50,7 @@
 			<span bind:this={questionSpan} class="question glow">{tooltip.question}</span>
 		</div>
 		{#if isOpen}
-			<div transition:slide class="answer-wrap">
+			<div in:slide class="answer-wrap">
 				<div class="answer">
 					<i class="fas fa-info-circle" class:faded={isDismissed} />
 					<span>{tooltip.answer}</span>
@@ -62,7 +62,7 @@
 		{/if}
 
 		{#if isDismissed}
-			<div transition:slide class="dismissed-wrap">
+			<div in:slide class="dismissed-wrap">
 				<div class="dismissed">
 					<i class="fas fa-arrow-alt-circle-up" />
 					<span>{$t('tooltips.tooltipWillNoLongerShow')}</span>

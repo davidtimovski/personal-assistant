@@ -48,7 +48,7 @@ export default {
 			alreadyExists: 'Already exists',
 			alreadyExistsUncomplete: 'Already exists. Do you want to uncomplete it?',
 			similarTasksExist: 'There are a few similar tasks here: {{taskNames}}. Do you still want to add this task?',
-			archivedList: 'This list is archived.<br>Do you want to restore it?',
+			listIsArchived: 'This list is archived.<br>Do you want to restore it?',
 			restore: 'Restore',
 			emptyListMessage: "There's nothing here"
 		},
@@ -265,7 +265,7 @@ export default {
 			alreadyExists: 'Веќе постои',
 			alreadyExistsUncomplete: 'Веќе постои. Дали сакате да го качите горе?',
 			similarTasksExist: 'Има неколку слични задачи овде: {{taskNames}}. Сеуште сакате да ја додадете оваа задача?',
-			archivedList: 'Оваа листа е архивирана.<br>Дали сакате да ја вратите?',
+			listIsArchived: 'Оваа листа е архивирана.<br>Дали сакате да ја вратите?',
 			restore: 'Врати',
 			emptyListMessage: 'Нема ништо овде'
 		},

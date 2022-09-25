@@ -68,6 +68,9 @@ table td {
   align-items: center;
   min-width: 60px;
   height: 60px;
+  background: transparent;
+  border: none;
+  outline: none;
   font-size: 27px;
   text-decoration: none;
   color: var(--primary-color);
@@ -255,6 +258,9 @@ textarea.invalid {
   align-items: center;
   min-width: 60px;
   height: 60px;
+  background: transparent;
+  border: none;
+  outline: none;
   font-size: 23px;
   text-decoration: none;
   color: var(--primary-color);

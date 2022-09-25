@@ -1,7 +1,9 @@
 import { HttpProxy } from '../../../../shared2/services/httpProxy';
 import { ErrorLogger } from '../../../../shared2/services/errorLogger';
 
-import type { List, Task } from '$lib/models/entities';
+import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
+import { lists } from '$lib/stores';
+import { List, type Task } from '$lib/models/entities';
 import type { ListWithShares } from '$lib/models/viewmodels/listWithShares';
 import type { Share } from '$lib/models/viewmodels/share';
 import type { ShareRequest } from '$lib/models/viewmodels/shareRequest';
@@ -12,15 +14,57 @@ import { ListIcon } from '$lib/models/viewmodels/listIcon';
 import type { EditListModel } from '$lib/models/viewmodels/editListModel';
 import { ArchivedList } from '$lib/models/viewmodels/archivedList';
 import { ListModel } from '$lib/models/viewmodels/listModel';
-import type { SharingState } from '$lib/models/viewmodels/sharingState';
+import { SharingState } from '$lib/models/viewmodels/sharingState';
 import Variables from '$lib/variables';
 
 export class ListsService {
 	private readonly httpProxy = new HttpProxy();
 	private readonly logger = new ErrorLogger('ToDoAssistant');
+	private readonly localStorage = new LocalStorageUtil();
 
-	getAll(): Promise<List[]> {
-		return this.httpProxy.ajax<List[]>(`${Variables.urls.api}/api/lists`);
+	async getAll() {
+		const allLists = await this.httpProxy.ajax<List[]>(`${Variables.urls.api}/api/lists`);
+
+		if (this.localStorage.getBool(LocalStorageKeys.HighPriorityListEnabled)) {
+			this.generateComputedLists(allLists);
+		}
+
+		lists.set(allLists);
+	}
+
+	private generateComputedLists(allLists: List[]) {
+		const allTasks: Task[] = allLists
+			.filter((x) => !x.isArchived && !x.computedListType)
+			.reduce((a: Task[], b: List) => {
+				return a.concat(b.tasks);
+			}, []);
+
+		const uncompletedHighPriorityTasks = allTasks.filter((x) => !x.isCompleted && x.isHighPriority);
+		const highPriorityList = allLists.find((x) => x.computedListType);
+		if (uncompletedHighPriorityTasks.length > 0) {
+			if (highPriorityList) {
+				highPriorityList.tasks = uncompletedHighPriorityTasks;
+			} else {
+				allLists.push(
+					new List(
+						0,
+						null,
+						null,
+						false,
+						false,
+						SharingState.NotShared,
+						0,
+						false,
+						ListsService.highPriorityComputedListMoniker,
+						uncompletedHighPriorityTasks,
+						null
+					)
+				);
+			}
+		} else if (highPriorityList) {
+			const index = allLists.indexOf(highPriorityList);
+			allLists.splice(index, 1);
+		}
 	}
 
 	getAllAsOptions(): Promise<ListOption[]> {
@@ -63,7 +107,7 @@ export class ListsService {
 				})
 			});
 
-			//await Actions.getLists(this);
+			await this.getAll();
 
 			return id;
 		} catch (e) {
@@ -97,7 +141,7 @@ export class ListsService {
 				})
 			});
 
-			//await Actions.getLists(this);
+			await this.getAll();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -114,7 +158,7 @@ export class ListsService {
 				})
 			});
 
-			//await Actions.getLists(this);
+			await this.getAll();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -127,7 +171,7 @@ export class ListsService {
 				method: 'delete'
 			});
 
-			//await Actions.getLists(this);
+			await this.getAll();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -150,7 +194,7 @@ export class ListsService {
 				})
 			});
 
-			//await Actions.getLists(this);
+			await this.getAll();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -163,7 +207,7 @@ export class ListsService {
 				method: 'delete'
 			});
 
-			//await Actions.getLists(this);
+			await this.getAll();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -181,7 +225,7 @@ export class ListsService {
 				})
 			});
 
-			//await Actions.getLists(this);
+			await this.getAll();
 
 			return id;
 		} catch (e) {
@@ -265,7 +309,7 @@ export class ListsService {
 				})
 			});
 
-			//await Actions.getLists(this);
+			await this.getAll();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -281,7 +325,7 @@ export class ListsService {
 				})
 			});
 
-			//await Actions.getLists(this);
+			await this.getAll();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -298,7 +342,7 @@ export class ListsService {
 				})
 			});
 
-			//await Actions.getLists(this);
+			await this.getAll();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;

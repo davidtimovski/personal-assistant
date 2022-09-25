@@ -18,13 +18,15 @@ export class List {
 }
 
 export class Task {
-	id: number;
-	listId: number;
-	name: string;
-	isCompleted: boolean;
-	isOneTime: boolean;
-	isHighPriority: boolean;
-	isPrivate: boolean;
-	assignedUser: AssignedUser;
-	order: number;
+	constructor(
+		public id: number,
+		public listId: number,
+		public name: string,
+		public isCompleted: boolean,
+		public isOneTime: boolean,
+		public isHighPriority: boolean,
+		public isPrivate: boolean,
+		public assignedUser: AssignedUser,
+		public order: number
+	) {}
 }
