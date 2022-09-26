@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte/internal';
 	import { goto } from '$app/navigation';
 
-	import { UsersService } from '../../../../shared2/services/usersService';
+	import { UsersServiceBase } from '../../../../shared2/services/usersServiceBase';
 	import { DateHelper } from '../../../../shared2/utils/dateHelper';
 
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
@@ -14,7 +14,7 @@
 	import { SearchFilters } from '$lib/models/viewmodels/searchFilters';
 	import type { AmountByCategory } from '$lib/models/viewmodels/amountByCategory';
 	import { TransactionType } from '$lib/models/viewmodels/transactionType';
-	import { HomePageData } from '$lib/models/viewmodels/homePageData';
+	import { HomePageData } from '$lib/models/viewmodels/homePage';
 	import { AccountsService } from '$lib/services/accountsService';
 
 	let imageUri: any;
@@ -33,7 +33,7 @@
 	let progressBarVisible = false;
 
 	let localStorage: LocalStorageUtil;
-	let usersService: UsersService;
+	let usersService: UsersServiceBase;
 	let capitalService: CapitalService;
 	let accountsService: AccountsService;
 
@@ -91,7 +91,7 @@
 	function sync() {
 		syncStatus.set(AppEvents.ReSync);
 
-		usersService.getProfileImageUri().then((uri) => {
+		usersService.getProfileImageUri().then((uri: string) => {
 			if (imageUri !== uri) {
 				imageUri = uri;
 			}
@@ -136,7 +136,7 @@
 
 	onMount(() => {
 		localStorage = new LocalStorageUtil();
-		usersService = new UsersService('Accountant');
+		usersService = new UsersServiceBase('Accountant');
 		capitalService = new CapitalService();
 		accountsService = new AccountsService();
 
@@ -145,9 +145,9 @@
 			data = cache;
 		}
 
-		const showUpcomingExpenses = localStorage.getBool(LocalStorageKeys.ShowUpcomingExpensesOnDashboard);
-		const showDebt = localStorage.getBool(LocalStorageKeys.ShowDebtOnDashboard);
-		currency = localStorage.get('currency');
+		const showUpcomingExpenses = localStorage.getBool(LocalStorageKeys.ShowUpcomingExpensesOnHomePage);
+		const showDebt = localStorage.getBool(LocalStorageKeys.ShowDebtOnHomePage);
+		currency = localStorage.get(LocalStorageKeys.Currency);
 
 		loggedInUser.subscribe((value) => {
 			if (!value) {
@@ -155,7 +155,7 @@
 			}
 
 			if (usersService.profileImageUriIsStale()) {
-				usersService.getProfileImageUri().then((uri) => {
+				usersService.getProfileImageUri().then((uri: string) => {
 					imageUri = uri;
 				});
 			} else {
@@ -185,8 +185,8 @@
 					on:click={goToMenu}
 					class="profile-image-container"
 					role="button"
-					title={$t('dashboard.menu')}
-					aria-label={$t('dashboard.menu')}
+					title={$t('index.menu')}
+					aria-label={$t('index.menu')}
 				>
 					<img src={imageUri} class="profile-image" width="40" height="40" alt={$t('profilePicture')} />
 				</div>
@@ -200,8 +200,8 @@
 				on:click={sync}
 				class="sync-button"
 				disabled={!connTracker.isOnline || progressBarActive}
-				title={$t('dashboard.refresh')}
-				aria-label={$t('dashboard.refresh')}
+				title={$t('index.refresh')}
+				aria-label={$t('index.refresh')}
 			>
 				<i class="fas fa-sync-alt" />
 			</button>
@@ -211,17 +211,17 @@
 		</div>
 	</div>
 
-	<div class="content-wrap dashboard">
+	<div class="content-wrap">
 		<div class="capital-summary">
 			<a href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
 				<div class="summary-item">
-					<div class="summary-title">{$t('dashboard.available')}</div>
+					<div class="summary-title">{$t('index.available')}</div>
 					<div class="summary-value">{Formatter.number(data.available, currency)}</div>
 				</div>
 			</a>
 			<a href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
 				<div class="summary-item">
-					<div class="summary-title">{$t('dashboard.spent')}</div>
+					<div class="summary-title">{$t('index.spent')}</div>
 					<div class="summary-value">{Formatter.number(data.spent, currency)}</div>
 				</div>
 			</a>
@@ -233,18 +233,18 @@
 			</a>
 		</div>
 
-		<div class="dashboard-buttons">
-			<a href="newTransaction/1" class="dashboard-button">
-				{$t('dashboard.newDeposit')}
+		<div class="home-buttons">
+			<a href="newTransaction/1" class="home-button">
+				{$t('index.newDeposit')}
 			</a>
-			<a href="newTransaction/0" class="dashboard-button">
-				{$t('dashboard.newExpense')}
+			<a href="newTransaction/0" class="home-button">
+				{$t('index.newExpense')}
 			</a>
 		</div>
 
 		{#if data.expenditures && data.expenditures.length > 0}
 			<div>
-				<a href="/transactions" class="dashboard-table-title">{$t('dashboard.expenditures')}</a>
+				<a href="/transactions" class="home-table-title">{$t('index.expenditures')}</a>
 				<table class="amount-by-category-table">
 					<tbody>
 						{#each data.expenditures as expenditure}
@@ -267,8 +267,8 @@
 
 		{#if data.upcomingExpenses && data.upcomingExpenses.length > 0}
 			<div>
-				<a href="/upcomingExpenses" class="dashboard-table-title">{$t('dashboard.upcomingExpenses')}</a>
-				<table class="dashboard-table">
+				<a href="/upcomingExpenses" class="home-table-title">{$t('index.upcomingExpenses')}</a>
+				<table class="home-table">
 					<tbody>
 						{#each data.upcomingExpenses as upcomingExpense}
 							<tr>
@@ -296,16 +296,16 @@
 
 		{#if data.debt && data.debt.length > 0}
 			<div>
-				<a href="/debt" class="dashboard-table-title">{$t('dashboard.debt')}</a>
-				<table class="dashboard-table">
+				<a href="/debt" class="home-table-title">{$t('index.debt')}</a>
+				<table class="home-table">
 					<tbody>
 						{#each data.debt as debtItem}
 							<tr>
 								<td>
 									{#if debtItem.userIsDebtor}
-										<span>{$t('dashboard.to')}</span>
+										<span>{$t('index.to')}</span>
 									{:else}
-										<span>{$t('dashboard.from')}</span>
+										<span>{$t('index.from')}</span>
 										{debtItem.person}
 									{/if}
 								</td>
@@ -323,7 +323,7 @@
 </section>
 
 <style lang="scss">
-	.content-wrap.dashboard {
+	.content-wrap {
 		padding-top: 15px;
 	}
 
@@ -362,14 +362,14 @@
 		}
 	}
 
-	.dashboard-buttons {
+	.home-buttons {
 		display: flex;
 		justify-content: space-between;
 		border-top: 1px solid #ddd;
 		padding-top: 15px;
 		margin-top: 20px;
 
-		.dashboard-button {
+		.home-button {
 			position: relative;
 			display: inline-block;
 			width: calc(50% - 15px);
@@ -391,7 +391,7 @@
 		}
 	}
 
-	.dashboard-table-title {
+	.home-table-title {
 		display: block;
 		border-bottom: 1px solid #ddd;
 		padding-bottom: 5px;
@@ -399,7 +399,7 @@
 		text-decoration: none;
 		color: var(--primary-color);
 	}
-	.dashboard-table {
+	.home-table {
 		width: 100%;
 		font-size: 1rem;
 
@@ -425,17 +425,17 @@
 	}
 
 	/* Workaround for sticky :hover on mobile devices */
-	.touch-device .dashboard-buttons .dashboard-button:hover {
+	.touch-device .home-buttons .home-button:hover {
 		color: var(--primary-color);
 	}
 
 	@media screen and (min-width: 1200px) {
-		.dashboard-table td {
+		.home-table td {
 			font-size: 1.1rem;
 			line-height: 1.3rem;
 		}
 
-		.dashboard-table .table-sum {
+		.home-table .table-sum {
 			font-size: 1.3rem;
 		}
 	}

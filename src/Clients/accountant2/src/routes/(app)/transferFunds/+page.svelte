@@ -6,7 +6,7 @@
 	import { ValidationResult, ValidationUtil } from '../../../../../shared2/utils/validationUtils';
 
 	import { t } from '$lib/localization/i18n';
-	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
+	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
 	import { alertState } from '$lib/stores';
 	import type { Account } from '$lib/models/entities/account';
@@ -212,7 +212,7 @@
 		accountsService = new AccountsService();
 		transactionsService = new TransactionsService();
 
-		currency = localStorage.get('currency');
+		currency = localStorage.get(LocalStorageKeys.Currency);
 
 		if (currency === 'MKD') {
 			amountFrom = 1;
@@ -251,7 +251,7 @@
 	</div>
 
 	<div class="content-wrap">
-		<form on:submit={transfer}>
+		<form on:submit|preventDefault={transfer}>
 			<div class="form-control">
 				<label for="from-account" class="transfer-funds-label">{fromAccountLabel}</label>
 				<div class="loadable-select" class:loaded={accountOptions}>
@@ -318,12 +318,7 @@
 			<hr />
 
 			<div class="save-delete-wrap">
-				<button
-					type="button"
-					on:click={transfer}
-					class="button primary-button"
-					class:disabled={!amount || transferButtonIsLoading}
-				>
+				<button class="button primary-button" class:disabled={!amount || transferButtonIsLoading}>
 					<span class="button-loader" class:loading={transferButtonIsLoading}>
 						<i class="fas fa-circle-notch fa-spin" />
 					</span>

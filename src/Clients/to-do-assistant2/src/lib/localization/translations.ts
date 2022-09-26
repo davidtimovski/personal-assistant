@@ -16,7 +16,7 @@ export default {
 		deleteOnCompletion: 'Delete tasks on completion',
 		dragToReorder: 'Drag to reorder',
 		highPriority: 'High Priority',
-		lists: {
+		index: {
 			menu: 'Menu',
 			reorderLists: 'Reorder lists',
 			refresh: 'Refresh',
@@ -48,7 +48,7 @@ export default {
 			alreadyExists: 'Already exists',
 			alreadyExistsUncomplete: 'Already exists. Do you want to uncomplete it?',
 			similarTasksExist: 'There are a few similar tasks here: {{taskNames}}. Do you still want to add this task?',
-			archivedList: 'This list is archived.<br>Do you want to restore it?',
+			listIsArchived: 'This list is archived.<br>Do you want to restore it?',
 			restore: 'Restore',
 			emptyListMessage: "There's nothing here"
 		},
@@ -233,7 +233,7 @@ export default {
 		deleteOnCompletion: 'Бриши задачи при комплетирање',
 		dragToReorder: 'Влечи за подредување',
 		highPriority: 'Висок Приоритет',
-		lists: {
+		index: {
 			menu: 'Мени',
 			reorderLists: 'Подреди листи',
 			refresh: 'Освежи',
@@ -265,7 +265,7 @@ export default {
 			alreadyExists: 'Веќе постои',
 			alreadyExistsUncomplete: 'Веќе постои. Дали сакате да го качите горе?',
 			similarTasksExist: 'Има неколку слични задачи овде: {{taskNames}}. Сеуште сакате да ја додадете оваа задача?',
-			archivedList: 'Оваа листа е архивирана.<br>Дали сакате да ја вратите?',
+			listIsArchived: 'Оваа листа е архивирана.<br>Дали сакате да ја вратите?',
 			restore: 'Врати',
 			emptyListMessage: 'Нема ништо овде'
 		},

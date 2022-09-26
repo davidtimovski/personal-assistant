@@ -8,7 +8,7 @@
 	import { ValidationUtil } from '../../../../../../shared2/utils/validationUtils';
 
 	import { t } from '$lib/localization/i18n';
-	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
+	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
 	import { TransactionsService } from '$lib/services/transactionsService';
 	import { TransactionType } from '$lib/models/viewmodels/transactionType';
@@ -135,7 +135,7 @@
 		accountsService = new AccountsService();
 		encryptionService = new EncryptionService();
 
-		preferredCurrency = localStorage.get('currency');
+		preferredCurrency = localStorage.get(LocalStorageKeys.Currency);
 		language = localStorage.get('language');
 
 		const transaction = await transactionsService.getForViewing(data.id, preferredCurrency);
@@ -265,7 +265,7 @@
 					<div class="description-view encrypted">
 						<span>{$t('description')}</span>
 
-						<form on:submit={decrypt} class="decrypt-form">
+						<form on:submit|preventDefault={decrypt} class="decrypt-form">
 							<div class="viewable-password">
 								<input
 									type="password"

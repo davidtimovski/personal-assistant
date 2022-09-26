@@ -4,7 +4,7 @@
 	import { page } from '$app/stores';
 
 	import { t } from '$lib/localization/i18n';
-	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
+	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
 	import { syncStatus } from '$lib/stores';
 	import { AccountsService } from '$lib/services/accountsService';
@@ -49,7 +49,7 @@
 		localStorage = new LocalStorageUtil();
 		accountsService = new AccountsService();
 
-		currency = localStorage.get('currency');
+		currency = localStorage.get(LocalStorageKeys.Currency);
 
 		const accountDtos = await accountsService.getAllWithBalance(currency);
 

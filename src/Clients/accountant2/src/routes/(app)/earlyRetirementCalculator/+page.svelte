@@ -4,7 +4,7 @@
 	import { CurrenciesService } from '../../../../../shared2/services/currenciesService';
 
 	import { t } from '$lib/localization/i18n';
-	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
+	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
 	import { AccountsService } from '$lib/services/accountsService';
 	import { LargeUpcomingExpense, SummaryItem } from '$lib/models/viewmodels/earlyRetirementCalculator';
@@ -374,7 +374,7 @@
 		accountsService = new AccountsService();
 		currenciesService = new CurrenciesService('Accountant');
 
-		currency = localStorage.get('currency');
+		currency = localStorage.get(LocalStorageKeys.Currency);
 
 		capitalCurrency =
 			savedPerMonthCurrency =

@@ -6,7 +6,7 @@
 	import { ValidationResult, ValidationUtil } from '../../../../../../shared2/utils/validationUtils';
 
 	import { t } from '$lib/localization/i18n';
-	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
+	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { alertState, isOnline } from '$lib/stores';
 	import { AutomaticTransactionsService } from '$lib/services/automaticTransactionsService';
 	import { CategoriesService } from '$lib/services/categoriesService';
@@ -178,7 +178,7 @@
 		categoriesService = new CategoriesService();
 
 		if (isNew) {
-			currency = localStorage.get('currency');
+			currency = localStorage.get(LocalStorageKeys.Currency);
 			dayInMonth = 1;
 			synced = false;
 
@@ -234,7 +234,7 @@
 			<AlertBlock type="warning" message={$t('whileOfflineCannotModify')} />
 		{/if}
 
-		<form on:submit={save}>
+		<form on:submit|preventDefault={save}>
 			<div class="form-control">
 				<DoubleRadio
 					name="depositExpenseToggle"
@@ -287,12 +287,7 @@
 
 			<div class="save-delete-wrap">
 				{#if !deleteInProgress}
-					<button
-						type="button"
-						on:click={save}
-						class="button primary-button"
-						disabled={!canSave() || saveButtonIsLoading}
-					>
+					<button class="button primary-button" disabled={!canSave() || saveButtonIsLoading}>
 						<span class="button-loader" class:loading={saveButtonIsLoading}>
 							<i class="fas fa-circle-notch fa-spin" />
 						</span>

@@ -7,7 +7,7 @@
 	import { ValidationResult, ValidationUtil } from '../../../../../../shared2/utils/validationUtils';
 
 	import { t } from '$lib/localization/i18n';
-	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
+	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { alertState, isOnline } from '$lib/stores';
 	import type { SelectOption } from '$lib/models/viewmodels/selectOption';
 	import { UpcomingExpensesService } from '$lib/services/upcomingExpensesService';
@@ -167,7 +167,7 @@
 		language = localStorage.get('language');
 
 		if (isNew) {
-			currency = localStorage.get('currency');
+			currency = localStorage.get(LocalStorageKeys.Currency);
 			synced = false;
 
 			saveButtonText = $t('create');
@@ -229,7 +229,7 @@
 			</div>
 		{/if}
 
-		<form on:submit={save}>
+		<form on:submit|preventDefault={save}>
 			<div class="form-control inline">
 				<label for="amount">{$t('amount')}</label>
 				<AmountInput bind:amount bind:currency invalid={amountIsInvalid} />
@@ -268,12 +268,7 @@
 
 			<div class="save-delete-wrap">
 				{#if !deleteInProgress}
-					<button
-						type="button"
-						on:click={save}
-						class="button primary-button"
-						disabled={!canSave() || saveButtonIsLoading}
-					>
+					<button class="button primary-button" disabled={!canSave() || saveButtonIsLoading}>
 						<span class="button-loader" class:loading={saveButtonIsLoading}>
 							<i class="fas fa-circle-notch fa-spin" />
 						</span>

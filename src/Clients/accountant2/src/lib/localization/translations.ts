@@ -66,7 +66,7 @@ export default {
 		dayOrdinal26: '26th',
 		dayOrdinal27: '27th',
 		dayOrdinal28: '28th',
-		dashboard: {
+		index: {
 			menu: 'Menu',
 			refresh: 'Refresh',
 			newDeposit: 'New deposit',
@@ -388,7 +388,7 @@ export default {
 		preferences: {
 			preferences: 'Preferences',
 			change: 'Change',
-			showOnDashboard: 'Show on dashboard',
+			showOnHomePage: 'Show on home page',
 			upcomingExpenses: 'Upcoming expenses',
 			debt: 'Debt',
 			mergeDebtPerPerson: 'Merge debt per person'
@@ -482,7 +482,7 @@ export default {
 		dayOrdinal26: '26ти',
 		dayOrdinal27: '27ми',
 		dayOrdinal28: '28ми',
-		dashboard: {
+		index: {
 			menu: 'Мени',
 			refresh: 'Освежи',
 			newDeposit: 'Нов депозит',
@@ -804,7 +804,7 @@ export default {
 		preferences: {
 			preferences: 'Преференци',
 			change: 'Смени',
-			showOnDashboard: 'Прикажи на прва страна',
+			showOnHomePage: 'Прикажи на главна страна',
 			upcomingExpenses: 'Идни трошоци',
 			debt: 'Долгови',
 			mergeDebtPerPerson: 'Спојувај долгови по личност'

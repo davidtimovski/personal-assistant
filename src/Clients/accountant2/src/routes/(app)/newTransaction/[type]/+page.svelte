@@ -8,7 +8,7 @@
 	import { ValidationResult, ValidationUtil } from '../../../../../../shared2/utils/validationUtils';
 
 	import { t } from '$lib/localization/i18n';
-	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
+	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { alertState } from '$lib/stores';
 	import type { SelectOption } from '$lib/models/viewmodels/selectOption';
 	import { TransactionsService } from '$lib/services/transactionsService';
@@ -239,7 +239,7 @@
 		categoriesService = new CategoriesService();
 		debtsService = new DebtsService();
 
-		currency = localStorage.get('currency');
+		currency = localStorage.get(LocalStorageKeys.Currency);
 
 		if (currency === 'MKD') {
 			amountFrom = 1;
@@ -300,7 +300,7 @@
 			<AlertBlock type="info" message={$t('newTransaction.considerUsingYesterday', { time: pastMidnight() })} />
 		{/if}
 
-		<form on:submit={submit} autocomplete="off">
+		<form on:submit|preventDefault={submit} autocomplete="off">
 			<div class="form-control inline">
 				<label for="amount">{$t('amount')}</label>
 				<AmountInput bind:amount bind:currency invalid={amountIsInvalid} focusOnInit={true} />
@@ -384,12 +384,7 @@
 			<hr />
 
 			<div class="save-delete-wrap">
-				<button
-					type="button"
-					on:click={submit}
-					class="button primary-button"
-					disabled={!amount || !accountId || submitButtonIsLoading}
-				>
+				<button class="button primary-button" disabled={!amount || !accountId || submitButtonIsLoading}>
 					<span class="button-loader" class:loading={submitButtonIsLoading}>
 						<i class="fas fa-circle-notch fa-spin" />
 					</span>

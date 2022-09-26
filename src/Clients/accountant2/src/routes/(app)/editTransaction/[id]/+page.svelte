@@ -390,7 +390,7 @@
 				<AlertBlock type="warning" message={$t('whileOfflineCannotModify')} />
 			{/if}
 
-			<form on:submit={save} autocomplete="off">
+			<form on:submit|preventDefault={save} autocomplete="off">
 				<div class="form-control inline">
 					<label for="amount">{$t('amount')}</label>
 					<AmountInput bind:amount bind:currency invalid={amountIsInvalid} />
@@ -398,10 +398,11 @@
 
 				{#if type === TransactionType.Expense || type === TransactionType.Transfer}
 					<div class="form-control inline">
-						<label for="from-account">{$t('fromAccount')}</label>
 						{#if fromStocks || toStocks}
+							<span>{$t('fromAccount')}</span>
 							<span>{fromAccountName}</span>
 						{:else}
+							<label for="from-account">{$t('fromAccount')}</label>
 							<div class="loadable-select" class:loaded={accountOptions}>
 								<select id="from-account" bind:value={fromAccountId} disabled={!accountOptions} class="category-select">
 									{#if accountOptions}
@@ -418,10 +419,11 @@
 
 				{#if type === TransactionType.Deposit || type === TransactionType.Transfer}
 					<div class="form-control inline">
-						<label for="to-account">{$t('toAccount')}</label>
 						{#if fromStocks || toStocks}
+							<span>{$t('toAccount')}</span>
 							<span>{toAccountName}</span>
 						{:else}
+							<label for="to-account">{$t('toAccount')}</label>
 							<div class="loadable-select" class:loaded={accountOptions}>
 								<select id="to-account" bind:value={toAccountId} disabled={!accountOptions} class="category-select">
 									{#if accountOptions}
@@ -580,12 +582,7 @@
 
 				<div class="save-delete-wrap">
 					{#if !deleteInProgress}
-						<button
-							type="button"
-							on:click={save}
-							class="button primary-button"
-							disabled={!canSave() || saveButtonIsLoading}
-						>
+						<button class="button primary-button" disabled={!canSave() || saveButtonIsLoading}>
 							<span class="button-loader" class:loading={saveButtonIsLoading}>
 								<i class="fas fa-circle-notch fa-spin" />
 							</span>

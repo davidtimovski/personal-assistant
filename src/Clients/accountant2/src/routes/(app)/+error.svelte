@@ -21,6 +21,6 @@
 			<a href="/" class="wide-button">{$t('notFound.takeMeHome')}</a>
 		</div>
 	{:else}
-		<h1>{$page.error.message}</h1>
+		<h1>{$page.error?.message}</h1>
 	{/if}
 </section>

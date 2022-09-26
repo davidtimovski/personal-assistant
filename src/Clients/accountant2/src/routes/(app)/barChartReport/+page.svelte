@@ -5,7 +5,7 @@
 	import { DateHelper } from '../../../../../shared2/utils/dateHelper';
 
 	import { t } from '$lib/localization/i18n';
-	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
+	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
 	import { TransactionsService } from '$lib/services/transactionsService';
 	import { AccountsService } from '$lib/services/accountsService';
@@ -232,7 +232,7 @@
 		accountsService = new AccountsService();
 		categoriesService = new CategoriesService();
 
-		currency = localStorage.get('currency');
+		currency = localStorage.get(LocalStorageKeys.Currency);
 		language = localStorage.get('language');
 
 		const now = new Date();

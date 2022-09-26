@@ -3,13 +3,13 @@ import { LocalStorageBase } from "../utils/localStorageBase";
 import { ErrorLogger } from "./errorLogger";
 import Variables from "$lib/variables";
 
-export class UsersService {
+export class UsersServiceBase {
   private readonly profileImageThumbRegex =
     /res.cloudinary.com\/personalassistant\/t_profile_thumbnail\/(development|production)\/users/g;
 
-  private readonly httpProxy = new HttpProxy();
-  private readonly localStorageBase = new LocalStorageBase();
-  private readonly logger: ErrorLogger;
+  protected readonly httpProxy = new HttpProxy();
+  protected readonly localStorageBase = new LocalStorageBase();
+  protected readonly logger: ErrorLogger;
 
   constructor(application: string) {
     this.logger = new ErrorLogger(application);

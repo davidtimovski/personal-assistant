@@ -6,7 +6,7 @@
 	import { DateHelper } from '../../../../../shared2/utils/dateHelper';
 
 	import { t } from '$lib/localization/i18n';
-	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
+	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
 	import { syncStatus } from '$lib/stores';
 	import { DebtsService } from '$lib/services/debtsService';
@@ -58,7 +58,7 @@
 		localStorage = new LocalStorageUtil();
 		debtsService = new DebtsService();
 
-		currency = localStorage.get('currency');
+		currency = localStorage.get(LocalStorageKeys.Currency);
 		language = localStorage.get('language');
 
 		const debtDtos = await debtsService.getAll(currency);

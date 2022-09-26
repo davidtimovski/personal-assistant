@@ -6,7 +6,7 @@
 	import { DateHelper } from '../../../../../shared2/utils/dateHelper';
 
 	import { t } from '$lib/localization/i18n';
-	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
+	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
 	import { searchFilters } from '$lib/stores';
 	import { TransactionsService } from '$lib/services/transactionsService';
@@ -125,7 +125,7 @@
 		transactionsService = new TransactionsService();
 		accountsService = new AccountsService();
 
-		currency = localStorage.get('currency');
+		currency = localStorage.get(LocalStorageKeys.Currency);
 
 		canvasCtx = canvas.getContext('2d');
 		chart = new Chart(<CanvasRenderingContext2D>canvasCtx, {

@@ -7,8 +7,7 @@ import { DebtsIDBHelper } from '$lib/utils/debtsIDBHelper';
 import type { UpcomingExpense } from '$lib/models/entities/upcomingExpense';
 import type { DebtModel } from '$lib/models/entities/debt';
 import { TransactionsService } from '$lib/services/transactionsService';
-import { UpcomingExpenseDashboard } from '$lib/models/viewmodels/upcomingExpenseDashboard';
-import { DebtDashboard } from '$lib/models/viewmodels/debtDashboard';
+import { HomePageDebt, HomePageUpcomingExpense } from '$lib/models/viewmodels/homePage';
 import type { AmountByCategory } from '$lib/models/viewmodels/amountByCategory';
 import { DebtsService } from '$lib/services/debtsService';
 
@@ -44,7 +43,7 @@ export class CapitalService {
 	async getUpcomingExpenses(
 		uncategorizedLabel: string,
 		currency: string
-	): Promise<[UpcomingExpenseDashboard[], number]> {
+	): Promise<[HomePageUpcomingExpense[], number]> {
 		try {
 			const monthUpcomingExpenses = await this.upcomingExpensesIDBHelper.getAllForMonth();
 
@@ -54,18 +53,18 @@ export class CapitalService {
 				upcomingSum += x.amount;
 			});
 
-			let upcomingExpenses = new Array<UpcomingExpenseDashboard>();
+			let upcomingExpenses = new Array<HomePageUpcomingExpense>();
 			for (const upcomingExpense of monthUpcomingExpenses) {
 				const trimmedDescription = this.trimDescription(upcomingExpense.description);
 				upcomingExpenses.push(
-					new UpcomingExpenseDashboard(
+					new HomePageUpcomingExpense(
 						upcomingExpense.categoryName || uncategorizedLabel,
 						trimmedDescription,
 						upcomingExpense.amount
 					)
 				);
 			}
-			upcomingExpenses = upcomingExpenses.sort((a: UpcomingExpenseDashboard, b: UpcomingExpenseDashboard) => {
+			upcomingExpenses = upcomingExpenses.sort((a: HomePageUpcomingExpense, b: HomePageUpcomingExpense) => {
 				return b.amount - a.amount;
 			});
 
@@ -76,7 +75,7 @@ export class CapitalService {
 		}
 	}
 
-	async getDebt(currency: string): Promise<DebtDashboard[]> {
+	async getDebt(currency: string): Promise<HomePageDebt[]> {
 		try {
 			const debt = await this.debtsIDBHelper.getAll();
 
@@ -84,15 +83,15 @@ export class CapitalService {
 				x.amount = this.currenciesService.convert(x.amount, x.currency, currency);
 			});
 
-			const debtDashboard = new Array<DebtDashboard>();
+			const homePageDebt = new Array<HomePageDebt>();
 			for (const debtItem of debt) {
 				const trimmedDescription = this.trimDescription(debtItem.description);
-				debtDashboard.push(
-					new DebtDashboard(debtItem.person, debtItem.userIsDebtor, trimmedDescription, debtItem.amount)
+				homePageDebt.push(
+					new HomePageDebt(debtItem.person, debtItem.userIsDebtor, trimmedDescription, debtItem.amount)
 				);
 			}
 
-			return debtDashboard;
+			return homePageDebt;
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
