@@ -11,8 +11,4 @@ export class ListModel {
 		public computedListIconClass: string | null,
 		public uncompletedTaskCount: number
 	) {}
-
-	public get isEmpty() {
-		return this.uncompletedTaskCount === 0;
-	}
 }

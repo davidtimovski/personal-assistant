@@ -1,15 +1,19 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
+	import { onDestroy } from 'svelte';
+	import type { Unsubscriber } from 'svelte/store';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 
-	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 	import { t } from '$lib/localization/i18n';
-	import { loggedInUser, lists } from '$lib/stores';
+	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
+	import { loggedInUser, lists, remoteEvents } from '$lib/stores';
 	import { UsersService } from '$lib/services/usersService';
 	import { ListsService } from '$lib/services/listsService';
+	import { TasksService } from '$lib/services/tasksService';
 	import type { ListModel } from '$lib/models/viewmodels/listModel';
 	import type { ListIcon } from '$lib/models/viewmodels/listIcon';
+	import { RemoteEventType } from '$lib/models/remoteEvents';
 
 	let imageUri: any;
 	let computedLists: ListModel[] | null = null;
@@ -17,11 +21,12 @@
 	let iconOptions = ListsService.getIconOptions();
 	let editedId: number | undefined;
 	//let isReordering = false;
-	let computedListNameLookup = new Map<string, string>();
+	const computedListNameLookup = new Map<string, string>();
 	let menuButtonIsLoading = false;
 	let connTracker = {
 		isOnline: true
 	};
+	const unsubscriptions: Unsubscriber[] = [];
 
 	// Progress bar
 	let progressBarActive = false;
@@ -32,6 +37,7 @@
 	let localStorage: LocalStorageUtil;
 	let usersService: UsersService;
 	let listsService: ListsService;
+	let tasksService: TasksService;
 
 	function goToMenu() {
 		menuButtonIsLoading = true;
@@ -39,6 +45,8 @@
 	}
 
 	function sync() {
+		startProgressBar();
+
 		listsService.getAll();
 
 		usersService.getProfileImageUri().then((uri) => {
@@ -48,14 +56,9 @@
 		});
 	}
 
-	function setTaskCompletion(listId: number, isCompleted: boolean) {
-		const list = <ListModel>(<ListModel[]>regularLists).find((x) => x.id === listId);
-
-		if (isCompleted) {
-			list.uncompletedTaskCount--;
-		} else {
-			list.uncompletedTaskCount++;
-		}
+	function setListsFromState() {
+		computedLists = ListsService.getComputedForHomeScreen($lists, computedListNameLookup);
+		regularLists = ListsService.getForHomeScreen($lists);
 	}
 
 	function getClassFromIcon(icon: string): string {
@@ -86,7 +89,7 @@
 	}
 
 	onMount(() => {
-		computedListNameLookup.set('high-priority', $t('highPriority'));
+		computedListNameLookup.set(ListsService.highPriorityComputedListMoniker, $t('highPriority'));
 
 		const edited = $page.url.searchParams.get('edited');
 		if (edited) {
@@ -96,35 +99,58 @@
 		localStorage = new LocalStorageUtil();
 		usersService = new UsersService();
 		listsService = new ListsService();
+		tasksService = new TasksService();
 
-		loggedInUser.subscribe((value) => {
-			if (!value) {
-				return;
-			}
+		unsubscriptions.push(
+			loggedInUser.subscribe((value) => {
+				if (!value) {
+					return;
+				}
 
-			if (usersService.profileImageUriIsStale()) {
-				usersService.getProfileImageUri().then((uri) => {
-					imageUri = uri;
-				});
-			} else {
-				imageUri = localStorage.get('profileImageUri');
-			}
-		});
+				if (usersService.profileImageUriIsStale()) {
+					usersService.getProfileImageUri().then((uri) => {
+						imageUri = uri;
+					});
+				} else {
+					imageUri = localStorage.get('profileImageUri');
+				}
+			})
+		);
 
 		if ($lists.length === 0) {
 			startProgressBar();
 		}
 
-		lists.subscribe((l) => {
-			if (l.length === 0) {
-				return;
-			}
+		unsubscriptions.push(
+			lists.subscribe((l) => {
+				if (l.length === 0) {
+					return;
+				}
 
-			computedLists = ListsService.getComputedForHomeScreen($lists, computedListNameLookup);
-			regularLists = ListsService.getForHomeScreen($lists);
+				setListsFromState();
+				finishProgressBar();
+			})
+		);
 
-			finishProgressBar();
-		});
+		unsubscriptions.push(
+			remoteEvents.subscribe((e) => {
+				if (e.type === RemoteEventType.TaskCompletedRemotely) {
+					tasksService.completeLocal(e.data.id, e.data.listId, $lists);
+				} else if (e.type === RemoteEventType.TaskUncompletedRemotely) {
+					tasksService.uncompleteLocal(e.data.id, e.data.listId, $lists);
+				} else if (e.type === RemoteEventType.TaskDeletedRemotely) {
+					tasksService.deleteLocal(e.data.id, e.data.listId, $lists);
+				}
+
+				setListsFromState();
+			})
+		);
+	});
+
+	onDestroy(() => {
+		for (const unsubscribe of unsubscriptions) {
+			unsubscribe();
+		}
 	});
 </script>
 
@@ -188,7 +214,7 @@
 			{:else}
 				<div class="au-stagger">
 					{#each computedLists as list}
-						<a class="to-do-list computed-list" href="/computedList?type{list.computedListType}">
+						<a class="to-do-list computed-list" href="/computedList?type={list.computedListType}">
 							<i class="icon {list.computedListIconClass}" />
 							<span class="name">{list.name}</span>
 						</a>
@@ -197,7 +223,7 @@
 					{#each regularLists as list}
 						<a
 							class="to-do-list"
-							class:empty={list.isEmpty}
+							class:empty={list.uncompletedTaskCount === 0}
 							class:highlighted={list.id === editedId}
 							class:is-shared={list.sharingState !== 0 && list.sharingState !== 1}
 							class:pending-share={list.sharingState === 1}

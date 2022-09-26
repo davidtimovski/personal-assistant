@@ -22,7 +22,14 @@ export class ListsService {
 	private readonly logger = new ErrorLogger('ToDoAssistant');
 	private readonly localStorage = new LocalStorageUtil();
 
-	async getAll() {
+	async getAll(includeCache = false) {
+		if (includeCache) {
+			let cache = this.localStorage.getObject<List[]>('homePageData');
+			if (cache) {
+				lists.set(cache);
+			}
+		}
+
 		const allLists = await this.httpProxy.ajax<List[]>(`${Variables.urls.api}/api/lists`);
 
 		if (this.localStorage.getBool(LocalStorageKeys.HighPriorityListEnabled)) {
@@ -30,6 +37,7 @@ export class ListsService {
 		}
 
 		lists.set(allLists);
+		this.localStorage.set('homePageData', JSON.stringify(allLists));
 	}
 
 	private generateComputedLists(allLists: List[]) {
@@ -40,7 +48,7 @@ export class ListsService {
 			}, []);
 
 		const uncompletedHighPriorityTasks = allTasks.filter((x) => !x.isCompleted && x.isHighPriority);
-		const highPriorityList = allLists.find((x) => x.computedListType);
+		const highPriorityList = allLists.find((x) => x.computedListType === ListsService.highPriorityComputedListMoniker);
 		if (uncompletedHighPriorityTasks.length > 0) {
 			if (highPriorityList) {
 				highPriorityList.tasks = uncompletedHighPriorityTasks;
@@ -393,7 +401,7 @@ export class ListsService {
 				(x) =>
 					new ListModel(
 						x.id,
-						computedListNameLookup[x.computedListType],
+						computedListNameLookup.get(x.computedListType),
 						<string>x.icon,
 						x.sharingState,
 						x.order,

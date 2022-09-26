@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
+	import { onDestroy } from 'svelte';
 	import { slide } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
@@ -42,6 +43,12 @@
 	let saveButtonIsLoading = false;
 	let deleteButtonIsLoading = false;
 	let leaveButtonIsLoading = false;
+
+	const alertStateUnsub = alertState.subscribe((value) => {
+		if (value.hidden) {
+			nameIsInvalid = false;
+		}
+	});
 
 	let listsService: ListsService;
 	let usersService: UsersService;
@@ -196,12 +203,6 @@
 		deleteButtonText = $t('delete');
 		leaveButtonText = $t('editList.leave');
 
-		alertState.subscribe((value) => {
-			if (value.hidden) {
-				nameIsInvalid = false;
-			}
-		});
-
 		listsService = new ListsService();
 		usersService = new UsersService();
 
@@ -229,6 +230,8 @@
 
 		preferences = await usersService.getPreferences();
 	});
+
+	onDestroy(alertStateUnsub);
 </script>
 
 <section class="container">
