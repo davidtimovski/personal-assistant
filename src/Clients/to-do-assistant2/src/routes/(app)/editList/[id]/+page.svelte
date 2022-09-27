@@ -137,10 +137,6 @@
 	}
 
 	async function deleteList() {
-		if (deleteButtonIsLoading) {
-			return;
-		}
-
 		if (confirmationInProgress) {
 			deleteButtonIsLoading = true;
 
@@ -158,10 +154,6 @@
 	}
 
 	async function leaveList() {
-		if (leaveButtonIsLoading) {
-			return;
-		}
-
 		if (confirmationInProgress) {
 			leaveButtonIsLoading = true;
 
@@ -256,7 +248,7 @@
 			<AlertBlock type="warning" message={$t('editList.inOrderToChangeThisList')} />
 		{/if}
 
-		<form on:submit={save}>
+		<form on:submit|preventDefault={save}>
 			{#if sharingState !== 4}
 				<div class="form-control">
 					<input

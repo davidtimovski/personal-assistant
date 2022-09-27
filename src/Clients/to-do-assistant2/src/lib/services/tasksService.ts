@@ -60,14 +60,28 @@ export class TasksService {
 		}
 	}
 
-	async update(editTaskViewModel: EditTaskModel, listsService: ListsService): Promise<void> {
+	async update(
+		id: number,
+		listId: number,
+		name: string,
+		isOneTime: boolean,
+		isHighPriority: boolean,
+		isPrivate: boolean,
+		assignedToUserId: number | null
+	): Promise<void> {
 		try {
 			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/tasks`, {
 				method: 'put',
-				body: window.JSON.stringify(editTaskViewModel)
+				body: window.JSON.stringify({
+					id: id,
+					listId: listId,
+					name: name,
+					isOneTime: isOneTime,
+					isHighPriority: isHighPriority,
+					isPrivate: isPrivate,
+					assignedToUserId: assignedToUserId
+				})
 			});
-
-			//await Actions.getLists(listsService);
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
