@@ -313,6 +313,7 @@ textarea.invalid {
   height: 50px;
   background: transparent;
   border: none;
+  padding: 0 2px;
   outline: none;
   font-size: 24px;
   color: var(--primary-color);

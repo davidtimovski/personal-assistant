@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
+	import { onDestroy } from 'svelte';
 	import { slide } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
@@ -42,6 +43,12 @@
 	let saveButtonIsLoading = false;
 	let deleteButtonIsLoading = false;
 	let leaveButtonIsLoading = false;
+
+	const alertStateUnsub = alertState.subscribe((value) => {
+		if (value.hidden) {
+			nameIsInvalid = false;
+		}
+	});
 
 	let listsService: ListsService;
 	let usersService: UsersService;
@@ -130,10 +137,6 @@
 	}
 
 	async function deleteList() {
-		if (deleteButtonIsLoading) {
-			return;
-		}
-
 		if (confirmationInProgress) {
 			deleteButtonIsLoading = true;
 
@@ -151,10 +154,6 @@
 	}
 
 	async function leaveList() {
-		if (leaveButtonIsLoading) {
-			return;
-		}
-
 		if (confirmationInProgress) {
 			leaveButtonIsLoading = true;
 
@@ -196,12 +195,6 @@
 		deleteButtonText = $t('delete');
 		leaveButtonText = $t('editList.leave');
 
-		alertState.subscribe((value) => {
-			if (value.hidden) {
-				nameIsInvalid = false;
-			}
-		});
-
 		listsService = new ListsService();
 		usersService = new UsersService();
 
@@ -229,6 +222,8 @@
 
 		preferences = await usersService.getPreferences();
 	});
+
+	onDestroy(alertStateUnsub);
 </script>
 
 <section class="container">
@@ -253,7 +248,7 @@
 			<AlertBlock type="warning" message={$t('editList.inOrderToChangeThisList')} />
 		{/if}
 
-		<form on:submit={save}>
+		<form on:submit|preventDefault={save}>
 			{#if sharingState !== 4}
 				<div class="form-control">
 					<input

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
+	import { onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
@@ -41,6 +42,12 @@
 	let categoryHasTransactionsHtml: string;
 
 	let categoriesService: CategoriesService;
+
+	const alertUnsubscriber = alertState.subscribe((value) => {
+		if (value.hidden) {
+			nameIsInvalid = false;
+		}
+	});
 
 	$: canSave = () => {
 		return !ValidationUtil.isEmptyOrWhitespace(name) && !(!$isOnline && synced);
@@ -167,12 +174,6 @@
 			new SelectOption(CategoryType.ExpenseOnly, $t('editCategory.expenseOnly'))
 		];
 
-		alertState.subscribe((value) => {
-			if (value.hidden) {
-				nameIsInvalid = false;
-			}
-		});
-
 		categoriesService = new CategoriesService();
 
 		if (isNew) {
@@ -206,6 +207,8 @@
 
 		parentCategoryOptions = await categoriesService.getParentAsOptions($t('editCategory.none'), data.id);
 	});
+
+	onDestroy(alertUnsubscriber);
 </script>
 
 <section class="container">

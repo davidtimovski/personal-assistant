@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onDestroy } from 'svelte';
 
 	import { AlertStatus } from '../../../../shared2/models/enums/alertEvents';
 
@@ -12,6 +12,28 @@
 	let shown = false;
 	let hideTimeout = 0;
 	let resetMessageTimeout = 0;
+
+	const unsubscriber = alertState.subscribe((value) => {
+		if (value.status === AlertStatus.Error) {
+			let message = '';
+
+			if (value.messages.length > 0) {
+				message = value.messages.join('<br>');
+			} else if (value.messageKey) {
+				const translationKey = value.messageKey;
+
+				refreshButtonVisible = translationKey === 'unexpectedError';
+
+				message = $t(translationKey);
+			}
+
+			show('error', message);
+		} else if (value.status === AlertStatus.Success) {
+			showTemporary('success', $t(<string>value.messageKey));
+		} else {
+			shown = false;
+		}
+	});
 
 	function show(alertType: string, alertMessage: string) {
 		if (resetMessageTimeout) {
@@ -60,29 +82,7 @@
 		window.location.reload();
 	}
 
-	onMount(() => {
-		alertState.subscribe((value) => {
-			if (value.status === AlertStatus.Error) {
-				let message = '';
-
-				if (value.messages.length > 0) {
-					message = value.messages.join('<br>');
-				} else if (value.messageKey) {
-					const translationKey = value.messageKey;
-
-					refreshButtonVisible = translationKey === 'unexpectedError';
-
-					message = $t(translationKey);
-				}
-
-				show('error', message);
-			} else if (value.status === AlertStatus.Success) {
-				showTemporary('success', $t(<string>value.messageKey));
-			} else {
-				shown = false;
-			}
-		});
-	});
+	onDestroy(unsubscriber);
 </script>
 
 <div on:click={hide} class="alert {type}" class:shown>

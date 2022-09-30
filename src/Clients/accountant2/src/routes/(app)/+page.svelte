@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
+	import { onDestroy } from 'svelte';
+	import type { Unsubscriber } from 'svelte/store';
 	import { goto } from '$app/navigation';
 
 	import { UsersServiceBase } from '../../../../shared2/services/usersServiceBase';
@@ -25,6 +27,7 @@
 		isOnline: true
 	};
 	let dataLoaded = false;
+	const unsubscriptions: Unsubscriber[] = [];
 
 	// Progress bar
 	let progressBarActive = false;
@@ -149,27 +152,37 @@
 		const showDebt = localStorage.getBool(LocalStorageKeys.ShowDebtOnHomePage);
 		currency = localStorage.get(LocalStorageKeys.Currency);
 
-		loggedInUser.subscribe((value) => {
-			if (!value) {
-				return;
-			}
+		unsubscriptions.push(
+			loggedInUser.subscribe((value) => {
+				if (!value) {
+					return;
+				}
 
-			if (usersService.profileImageUriIsStale()) {
-				usersService.getProfileImageUri().then((uri: string) => {
-					imageUri = uri;
-				});
-			} else {
-				imageUri = localStorage.get('profileImageUri');
-			}
-		});
+				if (usersService.profileImageUriIsStale()) {
+					usersService.getProfileImageUri().then((uri: string) => {
+						imageUri = uri;
+					});
+				} else {
+					imageUri = localStorage.get('profileImageUri');
+				}
+			})
+		);
 
-		syncStatus.subscribe((value) => {
-			if (value === AppEvents.SyncStarted) {
-				startProgressBar();
-			} else if (value === AppEvents.SyncFinished) {
-				getCapital(showUpcomingExpenses, showDebt);
-			}
-		});
+		unsubscriptions.push(
+			syncStatus.subscribe((value) => {
+				if (value === AppEvents.SyncStarted) {
+					startProgressBar();
+				} else if (value === AppEvents.SyncFinished) {
+					getCapital(showUpcomingExpenses, showDebt);
+				}
+			})
+		);
+	});
+
+	onDestroy(() => {
+		for (const unsubscribe of unsubscriptions) {
+			unsubscribe();
+		}
 	});
 </script>
 

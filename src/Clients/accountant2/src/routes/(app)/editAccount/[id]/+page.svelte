@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
+	import { onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
@@ -41,6 +42,13 @@
 
 	let localStorage: LocalStorageUtil;
 	let accountsService: AccountsService;
+
+	const alertUnsubscriber = alertState.subscribe((value) => {
+		if (value.hidden) {
+			nameIsInvalid = false;
+			stockPriceIsInvalid = false;
+		}
+	});
 
 	$: canSave = () => {
 		return !ValidationUtil.isEmptyOrWhitespace(name) && !(!$isOnline && synced);
@@ -145,13 +153,6 @@
 		accountHasTransactionsHtml = $t('editAccount.accountHasTransactions');
 		deleteButtonText = $t('delete');
 
-		alertState.subscribe((value) => {
-			if (value.hidden) {
-				nameIsInvalid = false;
-				stockPriceIsInvalid = false;
-			}
-		});
-
 		localStorage = new LocalStorageUtil();
 		accountsService = new AccountsService();
 
@@ -182,6 +183,8 @@
 			investmentFund = !!account.stockPrice;
 		}
 	});
+
+	onDestroy(alertUnsubscriber);
 </script>
 
 <section class="container">

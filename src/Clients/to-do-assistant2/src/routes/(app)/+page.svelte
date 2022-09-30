@@ -1,15 +1,19 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
+	import { onDestroy } from 'svelte';
+	import type { Unsubscriber } from 'svelte/store';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 
-	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 	import { t } from '$lib/localization/i18n';
-	import { loggedInUser, lists } from '$lib/stores';
+	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
+	import { loggedInUser, lists, remoteEvents } from '$lib/stores';
 	import { UsersService } from '$lib/services/usersService';
 	import { ListsService } from '$lib/services/listsService';
+	import { TasksService } from '$lib/services/tasksService';
 	import type { ListModel } from '$lib/models/viewmodels/listModel';
 	import type { ListIcon } from '$lib/models/viewmodels/listIcon';
+	import { RemoteEventType } from '$lib/models/remoteEvents';
 
 	let imageUri: any;
 	let computedLists: ListModel[] | null = null;
@@ -17,11 +21,12 @@
 	let iconOptions = ListsService.getIconOptions();
 	let editedId: number | undefined;
 	//let isReordering = false;
-	let computedListNameLookup = new Map<string, string>();
+	const computedListNameLookup = new Map<string, string>();
 	let menuButtonIsLoading = false;
 	let connTracker = {
 		isOnline: true
 	};
+	const unsubscriptions: Unsubscriber[] = [];
 
 	// Progress bar
 	let progressBarActive = false;
@@ -32,6 +37,7 @@
 	let localStorage: LocalStorageUtil;
 	let usersService: UsersService;
 	let listsService: ListsService;
+	let tasksService: TasksService;
 
 	function goToMenu() {
 		menuButtonIsLoading = true;
@@ -39,6 +45,8 @@
 	}
 
 	function sync() {
+		startProgressBar();
+
 		listsService.getAll();
 
 		usersService.getProfileImageUri().then((uri) => {
@@ -48,14 +56,9 @@
 		});
 	}
 
-	function setTaskCompletion(listId: number, isCompleted: boolean) {
-		const list = <ListModel>(<ListModel[]>regularLists).find((x) => x.id === listId);
-
-		if (isCompleted) {
-			list.uncompletedTaskCount--;
-		} else {
-			list.uncompletedTaskCount++;
-		}
+	function setListsFromState() {
+		computedLists = ListsService.getComputedForHomeScreen($lists, computedListNameLookup);
+		regularLists = ListsService.getForHomeScreen($lists);
 	}
 
 	function getClassFromIcon(icon: string): string {
@@ -86,7 +89,7 @@
 	}
 
 	onMount(() => {
-		computedListNameLookup.set('high-priority', $t('highPriority'));
+		computedListNameLookup.set(ListsService.highPriorityComputedListMoniker, $t('highPriority'));
 
 		const edited = $page.url.searchParams.get('edited');
 		if (edited) {
@@ -96,35 +99,58 @@
 		localStorage = new LocalStorageUtil();
 		usersService = new UsersService();
 		listsService = new ListsService();
+		tasksService = new TasksService();
 
-		loggedInUser.subscribe((value) => {
-			if (!value) {
-				return;
-			}
+		unsubscriptions.push(
+			loggedInUser.subscribe((value) => {
+				if (!value) {
+					return;
+				}
 
-			if (usersService.profileImageUriIsStale()) {
-				usersService.getProfileImageUri().then((uri) => {
-					imageUri = uri;
-				});
-			} else {
-				imageUri = localStorage.get('profileImageUri');
-			}
-		});
+				if (usersService.profileImageUriIsStale()) {
+					usersService.getProfileImageUri().then((uri) => {
+						imageUri = uri;
+					});
+				} else {
+					imageUri = localStorage.get('profileImageUri');
+				}
+			})
+		);
 
 		if ($lists.length === 0) {
 			startProgressBar();
 		}
 
-		lists.subscribe((l) => {
-			if (l.length === 0) {
-				return;
-			}
+		unsubscriptions.push(
+			lists.subscribe((l) => {
+				if (l.length === 0) {
+					return;
+				}
 
-			computedLists = ListsService.getComputedForHomeScreen($lists, computedListNameLookup);
-			regularLists = ListsService.getForHomeScreen($lists);
+				setListsFromState();
+				finishProgressBar();
+			})
+		);
 
-			finishProgressBar();
-		});
+		unsubscriptions.push(
+			remoteEvents.subscribe((e) => {
+				if (e.type === RemoteEventType.TaskCompletedRemotely) {
+					tasksService.completeLocal(e.data.id, e.data.listId, $lists);
+				} else if (e.type === RemoteEventType.TaskUncompletedRemotely) {
+					tasksService.uncompleteLocal(e.data.id, e.data.listId, $lists);
+				} else if (e.type === RemoteEventType.TaskDeletedRemotely) {
+					tasksService.deleteLocal(e.data.id, e.data.listId, $lists);
+				}
+
+				setListsFromState();
+			})
+		);
+	});
+
+	onDestroy(() => {
+		for (const unsubscribe of unsubscriptions) {
+			unsubscribe();
+		}
 	});
 </script>
 
@@ -188,33 +214,32 @@
 			{:else}
 				<div class="au-stagger">
 					{#each computedLists as list}
-						<a class="to-do-list computed-list" href="/computedList?type{list.computedListType}">
+						<div class="to-do-list computed-list">
 							<i class="icon {list.computedListIconClass}" />
-							<span class="name">{list.name}</span>
-						</a>
+							<a href="/computedList?type={list.computedListType}" class="name">{list.name}</a>
+						</div>
 					{/each}
 
 					{#each regularLists as list}
-						<a
+						<div
 							class="to-do-list"
-							class:empty={list.isEmpty}
+							class:empty={list.uncompletedTaskCount === 0}
 							class:highlighted={list.id === editedId}
 							class:is-shared={list.sharingState !== 0 && list.sharingState !== 1}
 							class:pending-share={list.sharingState === 1}
-							href="/list/{list.id}"
 						>
 							<i class="icon {getClassFromIcon(list.icon)}" />
 							<!-- <span class="sort-handle" title={$t('dragToReorder')} aria-label={$t('dragToReorder')}>
 								<i class="reorder-icon fas fa-hand-paper" />
 							</span> -->
-							<span class="name">{list.name}</span>
+							<a href="/list/{list.id}" class="name">{list.name}</a>
 							<i class="fas fa-users shared-icon" title={$t('index.shared')} aria-label={$t('index.shared')} />
 							<i
 								class="fas fa-user-clock shared-icon"
 								title={$t('index.pendingAccept')}
 								aria-label={$t('index.pendingAccept')}
 							/>
-						</a>
+						</div>
 					{/each}
 				</div>
 			{/if}
@@ -270,10 +295,7 @@
 		position: relative;
 		display: flex;
 		justify-content: flex-start;
-		background: #e9f4ff;
-		border-radius: 6px;
 		margin: 12px 0;
-		text-decoration: none;
 		user-select: none;
 
 		&:first-child {
@@ -284,20 +306,16 @@
 			margin-bottom: 0;
 		}
 
-		&:hover {
-			background: #e1f2ff;
-		}
-
 		.icon {
-			min-width: 37px;
-			height: 37px;
-			background: #fff;
+			min-width: 43px;
+			height: 41px;
+			border: 2px solid #9df;
 			border-radius: 6px;
-			margin: 4px;
-			line-height: 37px;
+			margin-right: 8px;
+			line-height: 41px;
 			text-align: center;
 			font-size: 22px;
-			color: var(--primary-color-dark);
+			color: var(--primary-color);
 		}
 
 		// .reorder-icon {
@@ -321,15 +339,28 @@
 			margin-bottom: 25px;
 
 			i {
+				background: #fff1f1;
+				border-color: #f9a;
 				color: var(--danger-color);
+			}
+
+			.name {
+				background: #fff1f1;
+				border: 2px solid #f9a;
+				padding: 4px 15px;
+				line-height: 33px;
+				color: var(--danger-color);
+
+				&:hover {
+					background: #ffe7e7;
+				}
 			}
 		}
 
 		&.empty {
-			background: #f4f4f4;
-
 			.icon {
-				color: #999;
+				border-color: #ddd;
+				color: #aaa;
 			}
 
 			//.reorder-icon,
@@ -338,7 +369,12 @@
 			}
 
 			.name {
+				background: #f4f4f4;
 				color: #4a4a4a;
+
+				&:hover {
+					background: #eee;
+				}
 			}
 		}
 
@@ -355,17 +391,29 @@
 		}
 
 		.name {
-			padding: 8px 10px;
-			line-height: 27px;
+			width: 100%;
+			background: #e9f4ff;
+			border-radius: 6px;
+			padding: 8px 15px;
+			line-height: 29px;
 			font-size: 1.1rem;
+			text-decoration: none;
 			color: var(--regular-color);
+
+			&:hover {
+				background: #e1f0ff;
+			}
+		}
+
+		&.is-shared .name {
+			margin-right: 8px;
 		}
 	}
 
-	.sort-handle {
-		cursor: grab;
-		cursor: -webkit-grab;
-	}
+	// .sort-handle {
+	// 	cursor: grab;
+	// 	cursor: -webkit-grab;
+	// }
 	// .reordering .to-do-list:not(.computed-list) .reorder-icon {
 	// 	display: inline-block !important;
 	// }

@@ -4,8 +4,8 @@ export class LocalStorageUtil extends LocalStorageBase {
 	constructor() {
 		super(
 			new Map<string, any>([
-				['soundsEnabled', true],
-				['highPriorityListEnabled', true]
+				[LocalStorageKeys.SoundsEnabled, true],
+				[LocalStorageKeys.HighPriorityListEnabled, true]
 			])
 		);
 	}

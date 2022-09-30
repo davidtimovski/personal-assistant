@@ -40,6 +40,12 @@ export class LocalStorageBase {
     window.localStorage.setItem(key, value);
   }
 
+  public clear() {
+    for (const key of this.defaults.keys()) {
+      window.localStorage.removeItem(key);
+    }
+  }
+
   private toBool(value: string) {
     return value === "true";
   }

@@ -2,12 +2,13 @@ import { HttpProxy } from '../../../../shared2/services/httpProxy';
 import { ErrorLogger } from '../../../../shared2/services/errorLogger';
 
 import { lists } from '$lib/stores';
-import type { ListsService } from '$lib/services/listsService';
-import type { List, Task } from '$lib/models/entities';
+import { ListsService } from '$lib/services/listsService';
+import { List, type Task } from '$lib/models/entities';
 import type { EditTaskModel } from '$lib/models/viewmodels/editTaskModel';
 import type { BulkAddTasksModel } from '$lib/models/viewmodels/bulkAddTasksModel';
 import { ListTask } from '$lib/models/viewmodels/listTask';
 import Variables from '$lib/variables';
+import { SharingState } from '$lib/models/viewmodels/sharingState';
 
 export class TasksService {
 	private readonly httpProxy = new HttpProxy();
@@ -59,27 +60,39 @@ export class TasksService {
 		}
 	}
 
-	async update(editTaskViewModel: EditTaskModel, listsService: ListsService): Promise<void> {
+	async update(
+		id: number,
+		listId: number,
+		name: string,
+		isOneTime: boolean,
+		isHighPriority: boolean,
+		isPrivate: boolean,
+		assignedToUserId: number | null
+	): Promise<void> {
 		try {
 			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/tasks`, {
 				method: 'put',
-				body: window.JSON.stringify(editTaskViewModel)
+				body: window.JSON.stringify({
+					id: id,
+					listId: listId,
+					name: name,
+					isOneTime: isOneTime,
+					isHighPriority: isHighPriority,
+					isPrivate: isPrivate,
+					assignedToUserId: assignedToUserId
+				})
 			});
-
-			//await Actions.getLists(listsService);
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
 		}
 	}
 
-	async delete(id: number, listId: number): Promise<void> {
+	async delete(id: number): Promise<void> {
 		try {
 			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/tasks/${id}`, {
 				method: 'delete'
 			});
-
-			//await Actions.deleteTask(id, listId);
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -107,10 +120,32 @@ export class TasksService {
 		const index = list.tasks.indexOf(task);
 		list.tasks.splice(index, 1);
 
+		if (task.isHighPriority) {
+			const allTasks: Task[] = localLists
+				.filter((x) => !x.isArchived && !x.computedListType)
+				.reduce((a: Task[], b: List) => {
+					return a.concat(b.tasks);
+				}, []);
+			const uncompletedHighPriorityTasks = allTasks.filter((x) => !x.isCompleted && x.isHighPriority);
+
+			const highPriorityList = localLists.find(
+				(x) => x.computedListType === ListsService.highPriorityComputedListMoniker
+			);
+			if (highPriorityList) {
+				if (uncompletedHighPriorityTasks.length > 0) {
+					const index = highPriorityList.tasks.indexOf(task);
+					highPriorityList.tasks.splice(index, 1);
+				} else {
+					const index = localLists.indexOf(highPriorityList);
+					localLists.splice(index, 1);
+				}
+			}
+		}
+
 		lists.set(localLists);
 	}
 
-	async complete(id: number, listId: number): Promise<void> {
+	async complete(id: number): Promise<void> {
 		try {
 			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/tasks/complete`, {
 				method: 'put',
@@ -163,10 +198,32 @@ export class TasksService {
 
 		task.order = 1;
 
+		if (task.isHighPriority) {
+			const allTasks: Task[] = localLists
+				.filter((x) => !x.isArchived && !x.computedListType)
+				.reduce((a: Task[], b: List) => {
+					return a.concat(b.tasks);
+				}, []);
+			const uncompletedHighPriorityTasks = allTasks.filter((x) => !x.isCompleted && x.isHighPriority);
+
+			const highPriorityList = localLists.find(
+				(x) => x.computedListType === ListsService.highPriorityComputedListMoniker
+			);
+			if (highPriorityList) {
+				if (uncompletedHighPriorityTasks.length > 0) {
+					const index = highPriorityList.tasks.indexOf(task);
+					highPriorityList.tasks.splice(index, 1);
+				} else {
+					const index = localLists.indexOf(highPriorityList);
+					localLists.splice(index, 1);
+				}
+			}
+		}
+
 		lists.set(localLists);
 	}
 
-	async uncomplete(id: number, listId: number): Promise<void> {
+	async uncomplete(id: number): Promise<void> {
 		try {
 			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/tasks/uncomplete`, {
 				method: 'put',
@@ -213,6 +270,31 @@ export class TasksService {
 
 		task.isCompleted = false;
 		task.order = newOrder;
+
+		if (task.isHighPriority) {
+			const highPriorityList = localLists.find(
+				(x) => x.computedListType === ListsService.highPriorityComputedListMoniker
+			);
+			if (highPriorityList) {
+				highPriorityList.tasks.push(task);
+			} else {
+				localLists.push(
+					new List(
+						0,
+						null,
+						null,
+						false,
+						false,
+						SharingState.NotShared,
+						0,
+						false,
+						ListsService.highPriorityComputedListMoniker,
+						[task],
+						null
+					)
+				);
+			}
+		}
 
 		lists.set(localLists);
 	}

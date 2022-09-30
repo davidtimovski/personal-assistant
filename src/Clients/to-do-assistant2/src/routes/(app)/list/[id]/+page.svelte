@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
+	import { onDestroy } from 'svelte';
+	import type { Unsubscriber } from 'svelte/store';
 	import { flip } from 'svelte/animate';
 	import { quintOut } from 'svelte/easing';
 	import { crossfade, slide } from 'svelte/transition';
@@ -9,9 +11,9 @@
 
 	import { ValidationResult, ValidationUtil } from '../../../../../../shared2/utils/validationUtils';
 
-	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { t } from '$lib/localization/i18n';
-	import { remoteEvents, lists } from '$lib/stores';
+	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
+	import { lists, remoteEvents } from '$lib/stores';
 	import { alertState } from '$lib/stores';
 	import { SharingState } from '$lib/models/viewmodels/sharingState';
 	import { ListsService } from '$lib/services/listsService';
@@ -26,7 +28,7 @@
 
 	let name = '';
 	let isOneTimeToggleDefault: boolean;
-	let sharingState: SharingState | null = null;
+	let sharingState = SharingState.NotShared;
 	let isArchived = false;
 	let computedListType: string;
 	let tasks = new Array<ListTask>();
@@ -58,6 +60,7 @@
 	let editListButtonIsLoading = false;
 	let listIsArchivedText: string;
 	let addNewPlaceholderText: string;
+	const unsubscriptions: Unsubscriber[] = [];
 
 	let localStorage: LocalStorageUtil;
 	let listsService: ListsService;
@@ -296,14 +299,14 @@
 
 		if (task.isOneTime) {
 			if (!remote) {
-				await tasksService.delete(task.id, data.id);
+				await tasksService.delete(task.id);
 			}
 			tasksService.deleteLocal(task.id, data.id, $lists);
 		} else {
 			completedTasksAreVisible = true;
 
 			if (!remote) {
-				await tasksService.complete(task.id, data.id);
+				await tasksService.complete(task.id);
 			}
 			tasksService.completeLocal(task.id, data.id, $lists);
 		}
@@ -321,7 +324,7 @@
 		}
 
 		if (!remote) {
-			await tasksService.uncomplete(task.id, data.id);
+			await tasksService.uncomplete(task.id);
 		}
 		tasksService.uncompleteLocal(task.id, data.id, $lists);
 	}
@@ -408,11 +411,13 @@
 	onMount(async () => {
 		addNewPlaceholderText = $t('list.addNew');
 
-		alertState.subscribe((value) => {
-			if (value.hidden) {
-				newTaskIsInvalid = false;
-			}
-		});
+		unsubscriptions.push(
+			alertState.subscribe((value) => {
+				if (value.hidden) {
+					newTaskIsInvalid = false;
+				}
+			})
+		);
 
 		const edited = $page.url.searchParams.get('edited');
 		if (edited) {
@@ -429,48 +434,58 @@
 			soundPlayer.initialize();
 		}
 
-		lists.subscribe((l) => {
-			if (l.length === 0) {
-				return;
-			}
-
-			const list = l.find((x) => x.id === data.id);
-			if (!list) {
-				throw new Error('List not found');
-			} else {
-				name = <string>list.name;
-				isOneTimeToggleDefault = list.isOneTimeToggleDefault;
-				sharingState = list.sharingState;
-				isArchived = list.isArchived;
-				computedListType = list.computedListType;
-				tasks = TasksService.getTasks(list.tasks);
-				privateTasks = TasksService.getPrivateTasks(list.tasks);
-				completedTasks = TasksService.getCompletedTasks(list.tasks);
-				completedPrivateTasks = TasksService.getCompletedPrivateTasks(list.tasks);
-				isOneTime = isOneTimeToggleDefault;
-
-				listIsArchivedText = $t('list.listIsArchived');
-				shareButtonText = sharingState === SharingState.NotShared ? $t('list.shareList') : $t('list.members');
-			}
-		});
-
-		remoteEvents.subscribe((e) => {
-			if (e.type === RemoteEventType.TaskCompletedRemotely || e.type === RemoteEventType.TaskDeletedRemotely) {
-				const allTasks = tasks.concat(privateTasks).concat(completedTasks).concat(completedPrivateTasks);
-
-				const task = allTasks.find((x) => x.id === e.data.id);
-				if (task) {
-					complete(task, true);
+		unsubscriptions.push(
+			lists.subscribe((l) => {
+				if (l.length === 0) {
+					return;
 				}
-			} else if (e.type === RemoteEventType.TaskUncompletedRemotely) {
-				const allTasks = tasks.concat(privateTasks).concat(completedTasks).concat(completedPrivateTasks);
 
-				const task = allTasks.find((x) => x.id === e.data.id);
-				if (task) {
-					uncomplete(task, true);
+				const list = l.find((x) => x.id === data.id);
+				if (!list) {
+					throw new Error('List not found');
+				} else {
+					name = <string>list.name;
+					isOneTimeToggleDefault = list.isOneTimeToggleDefault;
+					sharingState = list.sharingState;
+					isArchived = list.isArchived;
+					computedListType = list.computedListType;
+					tasks = TasksService.getTasks(list.tasks);
+					privateTasks = TasksService.getPrivateTasks(list.tasks);
+					completedTasks = TasksService.getCompletedTasks(list.tasks);
+					completedPrivateTasks = TasksService.getCompletedPrivateTasks(list.tasks);
+					isOneTime = isOneTimeToggleDefault;
+
+					listIsArchivedText = $t('list.listIsArchived');
+					shareButtonText = sharingState === SharingState.NotShared ? $t('list.shareList') : $t('list.members');
 				}
-			}
-		});
+			})
+		);
+
+		unsubscriptions.push(
+			remoteEvents.subscribe((e) => {
+				if (e.type === RemoteEventType.TaskCompletedRemotely || e.type === RemoteEventType.TaskDeletedRemotely) {
+					const allTasks = tasks.concat(privateTasks).concat(completedTasks).concat(completedPrivateTasks);
+
+					const task = allTasks.find((x) => x.id === e.data.id);
+					if (task) {
+						complete(task, true);
+					}
+				} else if (e.type === RemoteEventType.TaskUncompletedRemotely) {
+					const allTasks = tasks.concat(privateTasks).concat(completedTasks).concat(completedPrivateTasks);
+
+					const task = allTasks.find((x) => x.id === e.data.id);
+					if (task) {
+						uncomplete(task, true);
+					}
+				}
+			})
+		);
+	});
+
+	onDestroy(() => {
+		for (const unsubscribe of unsubscriptions) {
+			unsubscribe();
+		}
 	});
 </script>
 
@@ -688,7 +703,6 @@
 									aria-label={$t('list.complete')}
 								>
 									<i class="far fa-square" />
-
 									<i class="fas fa-trash-alt" />
 								</button>
 							</div>
@@ -728,7 +742,6 @@
 								aria-label={$t('list.complete')}
 							>
 								<i class="far fa-square" />
-
 								<i class="fas fa-trash-alt" />
 							</button>
 						</div>

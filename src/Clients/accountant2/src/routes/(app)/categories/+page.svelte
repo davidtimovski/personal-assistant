@@ -14,7 +14,6 @@
 
 	let categories: CategoryItem[] | null = null;
 	let editedId: number | undefined;
-	let syncing = false;
 
 	let categoriesService: CategoriesService;
 
@@ -32,14 +31,6 @@
 	}
 
 	onMount(async () => {
-		syncStatus.subscribe((value) => {
-			if (value === AppEvents.SyncStarted) {
-				syncing = true;
-			} else if (value === AppEvents.SyncFinished) {
-				syncing = false;
-			}
-		});
-
 		const edited = $page.url.searchParams.get('edited');
 		if (edited) {
 			editedId = parseInt(edited, 10);
@@ -152,7 +143,7 @@
 												title={$t('categories.depositOnly')}
 												aria-label={$t('categories.depositOnly')}
 											>
-												<i class="far fa-calendar-alt" />
+												<i class="fas fa-donate" />
 											</span>
 										{/if}
 
@@ -162,7 +153,7 @@
 												title={$t('categories.expenseOnly')}
 												aria-label={$t('categories.expenseOnly')}
 											>
-												<i class="far fa-calendar-alt" />
+												<i class="fas fa-wallet" />
 											</span>
 										{/if}
 									</span>
@@ -187,7 +178,7 @@
 				type="button"
 				on:click={() => goto('/editCategory/0')}
 				class="new-button"
-				disabled={syncing}
+				disabled={$syncStatus === AppEvents.SyncStarted}
 				title={$t('categories.newCategory')}
 				aria-label={$t('categories.newCategory')}
 			>

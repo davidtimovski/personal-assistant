@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
+	import { onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
@@ -40,6 +41,13 @@
 	let debtsService: DebtsService;
 
 	let amountTo = 8000000;
+
+	const alertUnsubscriber = alertState.subscribe((value) => {
+		if (value.hidden) {
+			personIsInvalid = false;
+			amountIsInvalid = false;
+		}
+	});
 
 	$: canSave = () => {
 		return !!amount && !(!$isOnline && synced);
@@ -129,19 +137,14 @@
 	onMount(() => {
 		deleteButtonText = $t('delete');
 
-		alertState.subscribe((value) => {
-			if (value.hidden) {
-				personIsInvalid = false;
-				amountIsInvalid = false;
-			}
-		});
-
 		localStorage = new LocalStorageUtil();
 		debtsService = new DebtsService();
 
 		mergeDebtPerPerson = localStorage.getBool('mergeDebtPerPerson');
 
 		if (isNew) {
+			userIsDebtor = false;
+
 			currency = localStorage.get(LocalStorageKeys.Currency);
 			synced = false;
 
@@ -170,6 +173,8 @@
 			amountTo = 450000000;
 		}
 	});
+
+	onDestroy(alertUnsubscriber);
 </script>
 
 <section class="container">

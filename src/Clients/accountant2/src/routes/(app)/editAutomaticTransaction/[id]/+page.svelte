@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
+	import { onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
@@ -45,6 +46,12 @@
 
 	let amountFrom = 0.01;
 	let amountTo = 8000001;
+
+	const alertUnsubscriber = alertState.subscribe((value) => {
+		if (value.hidden) {
+			amountIsInvalid = false;
+		}
+	});
 
 	function validate(): ValidationResult {
 		const result = new ValidationResult(true);
@@ -167,12 +174,6 @@
 			dayInMonthOptions.push(new SelectOption(i, $t(`dayOrdinal${i}`)));
 		}
 
-		alertState.subscribe((value) => {
-			if (value.hidden) {
-				amountIsInvalid = false;
-			}
-		});
-
 		localStorage = new LocalStorageUtil();
 		automaticTransactionsService = new AutomaticTransactionsService();
 		categoriesService = new CategoriesService();
@@ -208,6 +209,8 @@
 
 		isDepositChanged();
 	});
+
+	onDestroy(alertUnsubscriber);
 </script>
 
 <section class="container">

@@ -5,6 +5,8 @@
 	export const prerender = true;
 
 	import { onMount } from 'svelte/internal';
+	import { onDestroy } from 'svelte';
+	import type { Unsubscriber } from 'svelte/store';
 
 	import { AuthService } from '../../../../shared2/services/authService';
 	import { CurrenciesService } from '../../../../shared2/services/currenciesService';
@@ -17,7 +19,20 @@
 
 	import Alert from '$lib/components/Alert.svelte';
 
-	function sync(localStorage: LocalStorageUtil) {
+	let localStorage: LocalStorageUtil;
+	const unsubscriptions: Unsubscriber[] = [];
+
+	unsubscriptions.push(
+		loggedInUser.subscribe((value) => {
+			if (!value) {
+				return;
+			}
+
+			sync();
+		})
+	);
+
+	function sync() {
 		if (!navigator.onLine) {
 			return;
 		}
@@ -43,33 +58,33 @@
 	}
 
 	onMount(() => {
-		const localStorage = new LocalStorageUtil();
+		localStorage = new LocalStorageUtil();
 		locale.set(localStorage.get('language'));
-
-		loggedInUser.subscribe((value) => {
-			if (!value) {
-				return;
-			}
-
-			sync(localStorage);
-		});
 
 		new AuthService('accountant2', window).login();
 
 		isOnline.set(navigator.onLine);
 		window.addEventListener('online', () => {
-			sync(localStorage);
+			sync();
 			isOnline.set(true);
 		});
 		window.addEventListener('offline', () => {
 			isOnline.set(false);
 		});
 
-		syncStatus.subscribe((value) => {
-			if (value === AppEvents.ReSync) {
-				sync(localStorage);
-			}
-		});
+		unsubscriptions.push(
+			syncStatus.subscribe((value) => {
+				if (value === AppEvents.ReSync) {
+					sync();
+				}
+			})
+		);
+	});
+
+	onDestroy(() => {
+		for (const unsubscribe of unsubscriptions) {
+			unsubscribe();
+		}
 	});
 </script>
 
