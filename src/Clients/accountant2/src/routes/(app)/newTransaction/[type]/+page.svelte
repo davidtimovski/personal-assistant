@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
+	import { onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import type { PageData } from './$types';
@@ -54,6 +55,14 @@
 
 	let amountFrom = 0.01;
 	let amountTo = 8000000;
+
+	const alertUnsubscriber = alertState.subscribe((value) => {
+		if (value.hidden) {
+			amountIsInvalid = false;
+			dateIsInvalid = false;
+			encryptionPasswordIsInvalid = false;
+		}
+	});
 
 	$: pastMidnight = (): string | null => {
 		if (!date) {
@@ -220,14 +229,6 @@
 	onMount(async () => {
 		passwordShowIconLabel = $t('showPassword');
 
-		alertState.subscribe((value) => {
-			if (value.hidden) {
-				amountIsInvalid = false;
-				dateIsInvalid = false;
-				encryptionPasswordIsInvalid = false;
-			}
-		});
-
 		const debtIdParam = $page.url.searchParams.get('debtId');
 		if (debtIdParam) {
 			debtId = parseInt(debtIdParam, 10);
@@ -264,6 +265,8 @@
 			amount = debt.amount;
 		}
 	});
+
+	onDestroy(alertUnsubscriber);
 </script>
 
 <section class="container">

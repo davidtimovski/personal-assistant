@@ -19,7 +19,6 @@
 	let currency: string;
 	let language: string;
 	let editedId: number | undefined;
-	let syncing = false;
 
 	let localStorage: LocalStorageUtil;
 	let debtsService: DebtsService;
@@ -42,14 +41,6 @@
 	}
 
 	onMount(async () => {
-		syncStatus.subscribe((value) => {
-			if (value === AppEvents.SyncStarted) {
-				syncing = true;
-			} else if (value === AppEvents.SyncFinished) {
-				syncing = false;
-			}
-		});
-
 		const edited = $page.url.searchParams.get('edited');
 		if (edited) {
 			editedId = parseInt(edited, 10);
@@ -153,7 +144,7 @@
 				type="button"
 				on:click={() => goto('/editDebt/0')}
 				class="new-button"
-				disabled={syncing}
+				disabled={$syncStatus === AppEvents.SyncStarted}
 				title={$t('debt.newDebt')}
 				aria-label={$t('debt.newDebt')}
 			>

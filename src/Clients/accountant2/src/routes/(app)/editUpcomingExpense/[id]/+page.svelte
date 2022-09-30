@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
+	import { onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
@@ -46,6 +47,12 @@
 	let categoriesService: CategoriesService;
 
 	let amountTo = 8000000;
+
+	const alertUnsubscriber = alertState.subscribe((value) => {
+		if (value.hidden) {
+			amountIsInvalid = false;
+		}
+	});
 
 	$: canSave = () => {
 		return !!amount && !(!$isOnline && synced);
@@ -154,12 +161,6 @@
 	onMount(() => {
 		deleteButtonText = $t('delete');
 
-		alertState.subscribe((value) => {
-			if (value.hidden) {
-				amountIsInvalid = false;
-			}
-		});
-
 		localStorage = new LocalStorageUtil();
 		upcomingExpensesService = new UpcomingExpensesService();
 		categoriesService = new CategoriesService();
@@ -202,6 +203,8 @@
 			categoryOptions = options;
 		});
 	});
+
+	onDestroy(alertUnsubscriber);
 </script>
 
 <section class="container">

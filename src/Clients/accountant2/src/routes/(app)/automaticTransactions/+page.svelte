@@ -16,20 +16,11 @@
 	let automaticTransactions: AutomaticTransactionItem[] | null = null;
 	let currency: string;
 	let editedId: number | undefined;
-	let syncing = false;
 
 	let localStorage: LocalStorageUtil;
 	let automaticTransactionsService: AutomaticTransactionsService;
 
 	onMount(async () => {
-		syncStatus.subscribe((value) => {
-			if (value === AppEvents.SyncStarted) {
-				syncing = true;
-			} else if (value === AppEvents.SyncFinished) {
-				syncing = false;
-			}
-		});
-
 		const edited = $page.url.searchParams.get('edited');
 		if (edited) {
 			editedId = parseInt(edited, 10);
@@ -132,7 +123,7 @@
 				type="button"
 				on:click={() => goto('/editAutomaticTransaction/0')}
 				class="new-button"
-				disabled={syncing}
+				disabled={$syncStatus === AppEvents.SyncStarted}
 				title={$t('automaticTransactions.newAutomaticTransaction')}
 				aria-label={$t('automaticTransactions.newAutomaticTransaction')}
 			>

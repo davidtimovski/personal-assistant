@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
+	import { onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
@@ -71,6 +72,13 @@
 
 	let amountFrom = 0.01;
 	let amountTo = 8000000;
+
+	const alertUnsubscriber = alertState.subscribe((value) => {
+		if (value.hidden) {
+			amountIsInvalid = false;
+			dateIsInvalid = false;
+		}
+	});
 
 	$: canEncrypt = () => {
 		if (!description) {
@@ -296,13 +304,6 @@
 		deleteButtonText = $t('delete');
 		passwordShowIconLabel = $t('showPassword');
 
-		alertState.subscribe((value) => {
-			if (value.hidden) {
-				amountIsInvalid = false;
-				dateIsInvalid = false;
-			}
-		});
-
 		transactionsService = new TransactionsService();
 		accountsService = new AccountsService();
 		categoriesService = new CategoriesService();
@@ -361,6 +362,8 @@
 			amountTo = 450000000;
 		}
 	});
+
+	onDestroy(alertUnsubscriber);
 </script>
 
 <section class="container">

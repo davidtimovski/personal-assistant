@@ -7,8 +7,8 @@
 	export let rightLabelKey: string;
 	export let value: boolean | null;
 
-	let leftLabel = $t(leftLabelKey);
-	let rightLabel = $t(rightLabelKey);
+	const leftLabel = $t(leftLabelKey);
+	const rightLabel = $t(rightLabelKey);
 
 	const dispatch = createEventDispatcher();
 	function changeState() {
