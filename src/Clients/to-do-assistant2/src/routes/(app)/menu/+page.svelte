@@ -4,18 +4,24 @@
 	import { AuthService } from '../../../../../shared2/services/authService';
 
 	import { t } from '$lib/localization/i18n';
+	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 	import Variables from '$lib/variables';
+
+	let localStorage: LocalStorageUtil;
 
 	const personalAssistantUrl = Variables.urls.authority;
 	let version = '--';
 
 	async function logOut() {
-		window.localStorage.removeItem('profileImageUriLastLoad');
+		localStorage.clear();
+
 		const authService = new AuthService('to-do-assistant2', window);
 		await authService.logout();
 	}
 
 	onMount(async () => {
+		localStorage = new LocalStorageUtil();
+
 		const cacheNames = await caches.keys();
 		if (cacheNames.length > 0) {
 			version = cacheNames.sort().reverse()[0];

@@ -38,6 +38,8 @@ public class ListService : IListService
         _mapper = mapper;
     }
 
+    public string[] IconOptions => new string[] { "list", "shopping-cart", "shopping-bag", "home", "birthday", "cheers", "vacation", "passport", "plane", "car", "pickup-truck", "world", "camping", "tree", "motorcycle", "bicycle", "workout", "ski", "snowboard", "swimming", "work", "baby", "dog", "cat", "bird", "fish", "camera", "medicine", "file", "book", "mountain", "facebook", "twitter", "instagram", "tiktok" };
+
     public IEnumerable<ListDto> GetAll(int userId)
     {
         IEnumerable<ToDoList> lists = _listsRepository.GetAllWithTasksAndSharingDetails(userId);

@@ -15,8 +15,6 @@ public class UpdateList
 
 public class UpdateListValidator : AbstractValidator<UpdateList>
 {
-    private static readonly string[] ListIcons = new string[] { "list", "shopping", "home", "birthday", "cheers", "vacation", "plane", "car", "pickup-truck", "world", "camping", "motorcycle", "bicycle", "ski", "snowboard", "work", "baby", "dog", "cat", "fish", "camera", "medicine", "file", "book", "mountain" };
-
     public UpdateListValidator(IListService listService)
     {
         RuleFor(dto => dto.UserId)
@@ -31,6 +29,6 @@ public class UpdateListValidator : AbstractValidator<UpdateList>
 
         RuleFor(dto => dto.Icon)
             .NotEmpty().WithMessage("Lists.ModifyList.IconIsRequired")
-            .Must(icon => ListIcons.Contains(icon)).WithMessage("Lists.ModifyList.InvalidIcon");
+            .Must(icon => listService.IconOptions.Contains(icon)).WithMessage("Lists.ModifyList.InvalidIcon");
     }
 }

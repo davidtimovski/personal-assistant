@@ -224,7 +224,6 @@
 						<div
 							class="to-do-list"
 							class:empty={list.uncompletedTaskCount === 0}
-							class:highlighted={list.id === editedId}
 							class:is-shared={list.sharingState !== 0 && list.sharingState !== 1}
 							class:pending-share={list.sharingState === 1}
 						>
@@ -232,7 +231,7 @@
 							<!-- <span class="sort-handle" title={$t('dragToReorder')} aria-label={$t('dragToReorder')}>
 								<i class="reorder-icon fas fa-hand-paper" />
 							</span> -->
-							<a href="/list/{list.id}" class="name">{list.name}</a>
+							<a href="/list/{list.id}" class="name" class:highlighted={list.id === editedId}>{list.name}</a>
 							<i class="fas fa-users shared-icon" title={$t('index.shared')} aria-label={$t('index.shared')} />
 							<i
 								class="fas fa-user-clock shared-icon"

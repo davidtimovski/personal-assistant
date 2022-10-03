@@ -30,7 +30,7 @@ export class HttpProxy {
         throw new Error("Not found");
       }
 
-      await this.HandleErrorCodes(response);
+      await this.handleErrorCodes(response);
     }
 
     if (response.status === 204) {
@@ -60,7 +60,7 @@ export class HttpProxy {
         throw new Error("Not found");
       }
 
-      await this.HandleErrorCodes(response);
+      await this.handleErrorCodes(response);
     }
 
     return response.blob();
@@ -78,7 +78,7 @@ export class HttpProxy {
     }
     if (!this.successCodes.includes(response.status)) {
       this.redirectIfUnauthorized(response.status);
-      await this.HandleErrorCodes(response);
+      await this.handleErrorCodes(response);
     }
   }
 
@@ -97,7 +97,7 @@ export class HttpProxy {
         return null;
       }
 
-      await this.HandleErrorCodes(response);
+      await this.handleErrorCodes(response);
     }
 
     return <string>await response.json();
@@ -131,7 +131,7 @@ export class HttpProxy {
     }
   }
 
-  private async HandleErrorCodes(response: Response): Promise<void> {
+  private async handleErrorCodes(response: Response): Promise<void> {
     if (response.status === 404) {
       throw new Error("404 Not Found returned");
     } else if (response.status === 422) {

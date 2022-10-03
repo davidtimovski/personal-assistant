@@ -6,13 +6,16 @@
 
 	import { onMount } from 'svelte/internal';
 	import { onDestroy } from 'svelte';
+	import { page } from '$app/stores';
 	import type { User } from 'oidc-client';
 
+	import { Language } from '../../../../shared2/models/enums/language';
 	import { AuthService } from '../../../../shared2/services/authService';
 
+	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 	import { locale } from '$lib/localization/i18n';
-	import { isOnline, loggedInUser } from '$lib/stores';
+	import { isOffline, loggedInUser } from '$lib/stores';
 	import { ListsService } from '$lib/services/listsService';
 	import { SignalRClient } from '$lib/utils/signalRClient';
 
@@ -36,16 +39,21 @@
 
 	onMount(() => {
 		const localStorage = new LocalStorageUtil();
+
+		const lang = $page.url.searchParams.get('lang');
+		if (lang && (lang === Language.English || lang === Language.Macedonian)) {
+			localStorage.set('language', lang);
+		}
 		locale.set(localStorage.get('language'));
 
 		new AuthService('to-do-assistant2', window).login();
 
-		isOnline.set(navigator.onLine);
+		isOffline.set(!navigator.onLine);
 		window.addEventListener('online', () => {
-			isOnline.set(true);
+			isOffline.set(false);
 		});
 		window.addEventListener('offline', () => {
-			isOnline.set(false);
+			isOffline.set(true);
 		});
 	});
 
@@ -59,4 +67,41 @@
 		<Alert />
 	</div>
 	<div />
+
+	<div class="connection-warning-overlay" class:visible={$isOffline}>
+		<div class="connection-warning">
+			<i class="fas fa-wifi" />
+			<br />
+			<span>{$t('waitingForConnection')}</span>
+		</div>
+	</div>
 </main>
+
+<style lang="scss">
+	.connection-warning-overlay {
+		display: none;
+		position: fixed;
+		z-index: 2;
+		width: 100%;
+		height: 100%;
+		background: rgba(0, 0, 0, 0.7);
+
+		&.visible {
+			display: block;
+		}
+
+		.connection-warning {
+			padding: 0 25px;
+			margin-top: 190px;
+			font-size: 2rem;
+			line-height: 2.5rem;
+			text-align: center;
+			color: #fafafa;
+			user-select: none;
+		}
+		.connection-warning i {
+			margin-bottom: 15px;
+			animation: flashColor 1.5s infinite;
+		}
+	}
+</style>

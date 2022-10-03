@@ -8,6 +8,8 @@ namespace Application.Contracts.ToDoAssistant.Lists;
 
 public interface IListService
 {
+    string[] IconOptions { get; }
+
     IEnumerable<ListDto> GetAll(int userId);
     IEnumerable<ToDoListOption> GetAllAsOptions(int userId);
     IEnumerable<AssigneeOption> GetMembersAsAssigneeOptions(int id, int userId);
