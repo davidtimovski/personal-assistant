@@ -12,7 +12,7 @@ import { Changed, Create, Created } from '$lib/models/sync';
 import Variables from '$lib/variables';
 
 export class SyncService {
-	private readonly httpProxy = new HttpProxy();
+	private readonly httpProxy = new HttpProxy('accountant2');
 	private readonly accountsIDBHelper = new AccountsIDBHelper();
 	private readonly categoriesIDBHelper = new CategoriesIDBHelper();
 	private readonly transactionsIDBHelper = new TransactionsIDBHelper();
@@ -20,7 +20,7 @@ export class SyncService {
 	private readonly debtsIDBHelper = new DebtsIDBHelper();
 	private readonly automaticTransactionsIDBHelper = new AutomaticTransactionsIDBHelper();
 	private readonly localStorage = new LocalStorageUtil();
-	private readonly logger = new ErrorLogger('Accountant');
+	private readonly logger = new ErrorLogger('Accountant', 'accountant2');
 
 	async sync(lastSynced: string): Promise<string> {
 		try {

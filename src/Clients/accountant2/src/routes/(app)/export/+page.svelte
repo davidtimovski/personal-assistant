@@ -16,9 +16,7 @@
 
 	let transactionsService: TransactionsService;
 
-	$: canExport = () => {
-		return isOnline && !exportButtonIsLoading;
-	};
+	$: canExport = isOnline && !exportButtonIsLoading;
 
 	async function exportTransactions() {
 		exportButtonIsLoading = true;
@@ -76,7 +74,7 @@
 		<div contenteditable="true" bind:innerHTML={exportText} class="text-wrap" />
 
 		<div class="save-delete-wrap">
-			<button type="button" on:click={exportTransactions} class="button primary-button" disabled={!canExport()}>
+			<button type="button" on:click={exportTransactions} class="button primary-button" disabled={!canExport}>
 				<span class="button-loader" class:loading={exportButtonIsLoading}>
 					<i class="fas fa-circle-notch fa-spin" />
 				</span>

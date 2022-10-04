@@ -222,14 +222,14 @@ export class ListsService {
 		}
 	}
 
-	async copy(list: List): Promise<number> {
+	async copy(listId: number, name: string, icon: string): Promise<number> {
 		try {
 			const id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/api/lists/copy`, {
 				method: 'post',
 				body: window.JSON.stringify({
-					id: list.id,
-					name: list.name,
-					icon: list.icon
+					id: listId,
+					name: name,
+					icon: icon
 				})
 			});
 
@@ -242,26 +242,26 @@ export class ListsService {
 		}
 	}
 
-	copyAsText(listName: string, listToCopy: List) {
+	copyAsText(name: string, allTasks: Task[]) {
 		try {
-			let text = listName;
+			let text = name;
 
-			const tasks = listToCopy.tasks
+			const tasks = allTasks
 				.filter((x) => !x.isCompleted && !x.isPrivate)
 				.sort((a: Task, b: Task) => {
 					return a.order - b.order;
 				});
-			const privateTasks = listToCopy.tasks
+			const privateTasks = allTasks
 				.filter((x) => !x.isCompleted && x.isPrivate)
 				.sort((a: Task, b: Task) => {
 					return a.order - b.order;
 				});
-			const completedTasks = listToCopy.tasks
+			const completedTasks = allTasks
 				.filter((x) => x.isCompleted && !x.isPrivate)
 				.sort((a: Task, b: Task) => {
 					return a.order - b.order;
 				});
-			const completedPrivateTasks = listToCopy.tasks
+			const completedPrivateTasks = allTasks
 				.filter((x) => x.isCompleted && x.isPrivate)
 				.sort((a: Task, b: Task) => {
 					return a.order - b.order;
@@ -428,30 +428,40 @@ export class ListsService {
 	static getIconOptions(): ListIcon[] {
 		return [
 			new ListIcon('list', 'fas fa-list'),
-			new ListIcon('shopping', 'fas fa-shopping-cart'),
+			new ListIcon('shopping-cart', 'fas fa-shopping-cart'),
+			new ListIcon('shopping-bag', 'fas fa-bag-shopping'),
 			new ListIcon('home', 'fas fa-home'),
 			new ListIcon('birthday', 'fas fa-birthday-cake'),
 			new ListIcon('cheers', 'fas fa-glass-cheers'),
 			new ListIcon('vacation', 'fas fa-umbrella-beach'),
-			new ListIcon('plane', 'fas fa-plane-departure'),
+			new ListIcon('passport', 'fas fa-passport'),
+			new ListIcon('plane', 'fas fa-plane'),
 			new ListIcon('car', 'fas fa-car'),
 			new ListIcon('pickup-truck', 'fas fa-truck-pickup'),
 			new ListIcon('world', 'fas fa-globe-americas'),
 			new ListIcon('camping', 'fas fa-campground'),
+			new ListIcon('tree', 'fas fa-tree'),
 			new ListIcon('motorcycle', 'fas fa-motorcycle'),
 			new ListIcon('bicycle', 'fas fa-bicycle'),
+			new ListIcon('workout', 'fas fa-dumbbell'),
 			new ListIcon('ski', 'fas fa-skiing'),
 			new ListIcon('snowboard', 'fas fa-snowboarding'),
+			new ListIcon('swimming', 'fas fa-person-swimming'),
 			new ListIcon('work', 'fas fa-briefcase'),
 			new ListIcon('baby', 'fas fa-baby-carriage'),
 			new ListIcon('dog', 'fas fa-dog'),
 			new ListIcon('cat', 'fas fa-cat'),
+			new ListIcon('bird', 'fas fa-dove'),
 			new ListIcon('fish', 'fas fa-fish'),
 			new ListIcon('camera', 'fas fa-camera'),
 			new ListIcon('medicine', 'fas fa-prescription-bottle-alt'),
 			new ListIcon('file', 'fas fa-file-alt'),
 			new ListIcon('book', 'fas fa-book'),
-			new ListIcon('mountain', 'fas fa-mountain')
+			new ListIcon('mountain', 'fas fa-mountain'),
+			new ListIcon('facebook', 'fab fa-facebook'),
+			new ListIcon('twitter', 'fab fa-twitter'),
+			new ListIcon('instagram', 'fab fa-instagram'),
+			new ListIcon('tiktok', 'fab fa-tiktok')
 		];
 	}
 

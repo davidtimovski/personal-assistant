@@ -12,6 +12,6 @@ public enum OverviewAlert
 public class OverviewViewModel
 {
     public string UserName { get; set; }
-    public Dictionary<string, ApplicationVm> Applications { get; set; }
+    public List<ClientApplicationViewModel> ClientApplications { get; set; }
     public OverviewAlert Alert { get; set; }
 }

@@ -14,10 +14,10 @@ export class LocalStorageBase {
   }
 
   public get(key: string): string {
-    const value = window.localStorage.getItem(key);
+    let value = window.localStorage.getItem(key);
     if (!value) {
-      this.set(key, this.defaults.get(key));
-      return this.defaults.get(key);
+      value = <string>this.defaults.get(key);
+      this.set(key, value);
     }
 
     return value;

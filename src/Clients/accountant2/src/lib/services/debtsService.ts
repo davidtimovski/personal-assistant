@@ -8,10 +8,10 @@ import { DebtModel } from '$lib/models/entities/debt';
 import Variables from '$lib/variables';
 
 export class DebtsService {
-	private readonly httpProxy = new HttpProxy();
+	private readonly httpProxy = new HttpProxy('accountant2');
 	private readonly idbHelper = new DebtsIDBHelper();
 	private readonly currenciesService = new CurrenciesService('Accountant');
-	private readonly logger = new ErrorLogger('Accountant');
+	private readonly logger = new ErrorLogger('Accountant', 'accountant2');
 
 	static readonly mergedDebtSeparator = '----------';
 
@@ -55,7 +55,7 @@ export class DebtsService {
 						convertedAmount,
 						debt.currency,
 						otherDebt.userIsDebtor,
-						new Date(otherDebt.createdDate),
+						new Date(<Date>otherDebt.createdDate),
 						otherDebt.description
 					);
 					descriptionsArray.push(desc);

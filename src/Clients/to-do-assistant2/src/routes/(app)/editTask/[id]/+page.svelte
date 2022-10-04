@@ -8,7 +8,7 @@
 	import { ValidationErrors } from '../../../../../../shared2/models/validationErrors';
 
 	import { t } from '$lib/localization/i18n';
-	import { alertState } from '$lib/stores';
+	import { alertState, lists } from '$lib/stores';
 	import { TasksService } from '$lib/services/tasksService';
 	import { ListsService } from '$lib/services/listsService';
 	import type { AssigneeOption } from '$lib/models/viewmodels/assigneeOption';
@@ -108,6 +108,7 @@
 				saveButtonIsLoading = false;
 			}
 		} else {
+			nameIsInvalid = true;
 			saveButtonIsLoading = false;
 		}
 	}
@@ -117,6 +118,7 @@
 			deleteButtonIsLoading = true;
 
 			await tasksService.delete(data.id);
+			tasksService.deleteLocal(data.id, listId, $lists);
 
 			alertState.update((x) => {
 				x.showSuccess('editTask.deleteSuccessful');

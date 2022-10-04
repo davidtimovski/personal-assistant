@@ -33,7 +33,7 @@
 	}
 
 	onMount(async () => {
-		tooltipsService = new TooltipsService(new ErrorLogger('Accountant'));
+		tooltipsService = new TooltipsService(new ErrorLogger('Accountant', 'accountant2'));
 
 		tooltip = await tooltipsService.getByKey(key, 'Accountant');
 		if (!tooltip.isDismissed) {

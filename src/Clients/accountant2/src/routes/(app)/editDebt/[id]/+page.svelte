@@ -49,12 +49,14 @@
 		}
 	});
 
-	$: canSave = () => {
-		return !!amount && !(!$isOnline && synced);
-	};
+	$: canSave = !!amount && !(!$isOnline && synced);
 
 	function validate(): ValidationResult {
 		const result = new ValidationResult(true);
+
+		if (ValidationUtil.isEmptyOrWhitespace(person)) {
+			result.fail('person');
+		}
 
 		if (!ValidationUtil.between(<number>amount, 0, amountTo)) {
 			result.fail('amount');
@@ -99,6 +101,9 @@
 				}
 			}
 		} else {
+			personIsInvalid = result.erroredFields.includes('person');
+			amountIsInvalid = result.erroredFields.includes('amount');
+
 			saveButtonIsLoading = false;
 		}
 	}
@@ -239,7 +244,7 @@
 
 			<div class="save-delete-wrap">
 				{#if !deleteInProgress}
-					<button class="button primary-button" disabled={!canSave() || saveButtonIsLoading}>
+					<button class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
 						<span class="button-loader" class:loading={saveButtonIsLoading}>
 							<i class="fas fa-circle-notch fa-spin" />
 						</span>

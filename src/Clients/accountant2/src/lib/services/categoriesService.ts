@@ -8,9 +8,9 @@ import { SelectOption } from '$lib/models/viewmodels/selectOption';
 import Variables from '$lib/variables';
 
 export class CategoriesService {
-	private readonly httpProxy = new HttpProxy();
+	private readonly httpProxy = new HttpProxy('accountant2');
 	private readonly idbHelper = new CategoriesIDBHelper();
-	private readonly logger = new ErrorLogger('Accountant');
+	private readonly logger = new ErrorLogger('Accountant', 'accountant2');
 
 	getAll(): Promise<Array<Category>> {
 		return this.idbHelper.getAll();

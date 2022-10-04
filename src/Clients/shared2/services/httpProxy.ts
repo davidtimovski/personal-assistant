@@ -1,14 +1,18 @@
 import type { User } from "oidc-client";
 
+import { AuthService } from "./authService";
 import { ValidationErrors } from "../models/validationErrors";
-import { loggedInUser } from "$lib/stores";
+import { HttpError } from "../models/enums/httpError";
+import { alertState, loggedInUser } from "$lib/stores";
 
 export class HttpProxy {
+  private readonly authService: AuthService;
   private readonly successCodes = [200, 201, 204];
   private user: User | null = null;
 
-  constructor() {
+  constructor(client: string) {
     loggedInUser.subscribe((x) => (this.user = x));
+    this.authService = new AuthService(client, window);
   }
 
   async ajax<T>(uri: string, init?: RequestInit): Promise<T> {
@@ -19,22 +23,28 @@ export class HttpProxy {
     try {
       response = await window.fetch(uri, init);
     } catch (e) {
-      //this.eventAggregator.publish(AlertEvents.ShowError, "unexpectedError");
+      alertState.update((x) => {
+        x.showError("unexpectedError");
+        return x;
+      });
       throw e;
     }
 
     if (!this.successCodes.includes(response.status)) {
-      this.redirectIfUnauthorized(response.status);
+      await this.redirectIfUnauthorized(response.status);
 
       if (response.status === 404) {
         throw new Error("Not found");
       }
 
-      await this.HandleErrorCodes(response);
+      await this.handleErrorCodes(response);
     }
 
     if (response.status === 204) {
-      //this.eventAggregator.publish(AlertEvents.ShowError, "unexpectedError");
+      alertState.update((x) => {
+        x.showError("unexpectedError");
+        return x;
+      });
       throw new Error(`GET request to '${uri}' returned 204 No Content`);
     }
 
@@ -49,18 +59,21 @@ export class HttpProxy {
     try {
       response = await window.fetch(uri, init);
     } catch (e) {
-      //this.eventAggregator.publish(AlertEvents.ShowError, "unexpectedError");
+      alertState.update((x) => {
+        x.showError("unexpectedError");
+        return x;
+      });
       throw e;
     }
 
     if (!this.successCodes.includes(response.status)) {
-      this.redirectIfUnauthorized(response.status);
+      await this.redirectIfUnauthorized(response.status);
 
       if (response.status === 404) {
         throw new Error("Not found");
       }
 
-      await this.HandleErrorCodes(response);
+      await this.handleErrorCodes(response);
     }
 
     return response.blob();
@@ -73,12 +86,15 @@ export class HttpProxy {
     try {
       response = await window.fetch(uri, init);
     } catch (e) {
-      //this.eventAggregator.publish(AlertEvents.ShowError, "unexpectedError");
+      alertState.update((x) => {
+        x.showError("unexpectedError");
+        return x;
+      });
       throw e;
     }
     if (!this.successCodes.includes(response.status)) {
-      this.redirectIfUnauthorized(response.status);
-      await this.HandleErrorCodes(response);
+      await this.redirectIfUnauthorized(response.status);
+      await this.handleErrorCodes(response);
     }
   }
 
@@ -91,13 +107,8 @@ export class HttpProxy {
     const response: Response = await window.fetch(uri, init);
 
     if (!this.successCodes.includes(response.status)) {
-      this.redirectIfUnauthorized(response.status);
-
-      if (response.status === 404) {
-        return null;
-      }
-
-      await this.HandleErrorCodes(response);
+      await this.redirectIfUnauthorized(response.status);
+      await this.handleErrorCodes(response);
     }
 
     return <string>await response.json();
@@ -107,7 +118,6 @@ export class HttpProxy {
     const headers = {
       Accept: "application/json",
       Authorization: `Bearer ${this.user?.access_token}`,
-      //"Accept-Language": language,
       "Content-Type": "application/json",
       "X-Requested-With": "Fetch",
     };
@@ -123,39 +133,54 @@ export class HttpProxy {
     return init;
   }
 
-  private redirectIfUnauthorized(statusCode: number) {
+  private async redirectIfUnauthorized(statusCode: number) {
     if (statusCode === 401) {
-      // TODO
-      //this.authService.signinRedirect();
-      //throw HttpError.Unauthorized;
+      await this.authService.signinRedirect();
+      throw HttpError.Unauthorized;
     }
   }
 
-  private async HandleErrorCodes(response: Response): Promise<void> {
+  private async handleErrorCodes(response: Response): Promise<void> {
     if (response.status === 404) {
       throw new Error("404 Not Found returned");
     } else if (response.status === 422) {
       let errors: any;
+
       try {
         errors = await response.json();
       } catch (e) {
-        //this.eventAggregator.publish(AlertEvents.ShowError, "unexpectedError");
+        alertState.update((x) => {
+          x.showError("unexpectedError");
+          return x;
+        });
         throw e;
       }
+
       if (errors.message === "Failed to fetch") {
-        //this.eventAggregator.publish(AlertEvents.ShowError, "failedToFetchError");
-        throw new Error("Failed to fetch");
+        alertState.update((x) => {
+          x.showError("failedToFetchError");
+          return x;
+        });
+        throw HttpError.FailedToFetch;
       }
-      const modelErrors = new Array<string>();
+
       const errorFields = new Array<string>();
       for (let key in errors) {
-        modelErrors.push(errors[key][0]);
         errorFields.push(key);
       }
-      //this.eventAggregator.publish(AlertEvents.ShowError, modelErrors);
+      alertState.update((x) => {
+        x.showErrors(errorFields);
+        return x;
+      });
+
       throw new ValidationErrors(errorFields);
     }
-    //this.eventAggregator.publish(AlertEvents.ShowError, "unexpectedError");
+
+    alertState.update((x) => {
+      x.showError("unexpectedError");
+      return x;
+    });
+
     throw new Error(`Error status code ${response.status} not handled`);
   }
 }

@@ -5,9 +5,11 @@ import { ValidationErrors } from "../models/validationErrors";
 import Variables from "$lib/variables";
 
 export class ErrorLogger {
-  private readonly httpProxy = new HttpProxy();
+  private readonly httpProxy: HttpProxy;
 
-  constructor(private readonly application: string) {}
+  constructor(private readonly application: string, client: string) {
+    this.httpProxy = new HttpProxy(client);
+  }
 
   async logError(error: any): Promise<void> {
     if (

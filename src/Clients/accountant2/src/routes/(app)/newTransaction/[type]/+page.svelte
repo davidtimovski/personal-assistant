@@ -199,23 +199,22 @@
 			const invalidAmount = result.erroredFields.includes('amount');
 			if (invalidAmount) {
 				messages.push($t('amountBetween', { from: amountFrom, to: amountTo }));
+				amountIsInvalid = true;
 			}
 
 			const invalidDate = result.erroredFields.includes('date');
 			if (invalidDate) {
 				messages.push($t('dateIsRequired'));
+				dateIsInvalid = true;
 			}
 
 			const invalidEncryptionPassword = result.erroredFields.includes('encryptionPassword');
 			if (invalidEncryptionPassword) {
 				messages.push($t('passwordIsRequired'));
+				encryptionPasswordIsInvalid = true;
 			}
 
 			if (messages.length > 0) {
-				amountIsInvalid = !!invalidAmount;
-				dateIsInvalid = !!invalidDate;
-				encryptionPasswordIsInvalid = !!invalidEncryptionPassword;
-
 				alertState.update((x) => {
 					x.showErrors(messages);
 					return x;

@@ -77,7 +77,8 @@ export default {
 			upcomingExpenses: 'Upcoming expenses',
 			debt: 'Debt',
 			to: 'To',
-			from: 'From'
+			from: 'From',
+			combined: '[ Combined ]'
 		},
 		newTransaction: {
 			newExpense: 'New expense',
@@ -493,7 +494,8 @@ export default {
 			upcomingExpenses: 'Идни трошоци',
 			debt: 'Долгови',
 			to: 'На',
-			from: 'Од'
+			from: 'Од',
+			combined: '[ Комбиниран ]'
 		},
 		newTransaction: {
 			newExpense: 'Нов трошок',

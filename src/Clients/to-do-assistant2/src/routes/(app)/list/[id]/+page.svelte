@@ -240,15 +240,12 @@
 					uncompleteDuplicateButtonVisible = false;
 				}
 			} else {
-				if (similarTaskNames.length) {
-					similarTaskNames = [];
-				} else {
-					similarTaskNames = findSimilarTasks(newTaskName);
-				}
+				similarTaskNames = findSimilarTasks(newTaskName);
+
 				if (similarTaskNames.length) {
 					newTaskIsLoading = false;
 					similarTasksMessageText = $t('list.similarTasksExist', {
-						taskNames: similarTaskNames.join(', ')
+						taskNames: similarTaskNames.map((x) => `<span class="colored-text">${x}</span>`).join(', ')
 					});
 				} else {
 					newTaskIsInvalid = false;
@@ -281,7 +278,7 @@
 				}
 			}
 		} else {
-			newTaskIsInvalid = result.erroredFields.includes('name');
+			newTaskIsInvalid = true;
 			newTaskIsLoading = false;
 		}
 	}
@@ -400,13 +397,9 @@
 		duplicateTask = null;
 	}
 
-	$: duplicateAlertIsVisible = () => {
-		return duplicateTask !== null;
-	};
+	$: duplicateAlertIsVisible = duplicateTask !== null;
 
-	$: similarTasksAlertIsVisible = () => {
-		return !!similarTaskNames.length;
-	};
+	$: similarTasksAlertIsVisible = similarTaskNames.length > 0;
 
 	onMount(async () => {
 		addNewPlaceholderText = $t('list.addNew');
@@ -443,21 +436,21 @@
 				const list = l.find((x) => x.id === data.id);
 				if (!list) {
 					throw new Error('List not found');
-				} else {
-					name = <string>list.name;
-					isOneTimeToggleDefault = list.isOneTimeToggleDefault;
-					sharingState = list.sharingState;
-					isArchived = list.isArchived;
-					computedListType = list.computedListType;
-					tasks = TasksService.getTasks(list.tasks);
-					privateTasks = TasksService.getPrivateTasks(list.tasks);
-					completedTasks = TasksService.getCompletedTasks(list.tasks);
-					completedPrivateTasks = TasksService.getCompletedPrivateTasks(list.tasks);
-					isOneTime = isOneTimeToggleDefault;
-
-					listIsArchivedText = $t('list.listIsArchived');
-					shareButtonText = sharingState === SharingState.NotShared ? $t('list.shareList') : $t('list.members');
 				}
+
+				name = <string>list.name;
+				isOneTimeToggleDefault = list.isOneTimeToggleDefault;
+				sharingState = list.sharingState;
+				isArchived = list.isArchived;
+				computedListType = list.computedListType;
+				tasks = TasksService.getTasks(list.tasks);
+				privateTasks = TasksService.getPrivateTasks(list.tasks);
+				completedTasks = TasksService.getCompletedTasks(list.tasks);
+				completedPrivateTasks = TasksService.getCompletedPrivateTasks(list.tasks);
+				isOneTime = isOneTimeToggleDefault;
+
+				listIsArchivedText = $t('list.listIsArchived');
+				shareButtonText = sharingState === SharingState.NotShared ? $t('list.shareList') : $t('list.members');
 			})
 		);
 
@@ -539,22 +532,17 @@
 			<div class="top-buttons-drawer" class:open={topDrawerIsOpen}>
 				<div class="top-buttons-drawer-wrap">
 					<div class="top-buttons-drawer-content horizontal-buttons-wrap">
-						<a href="/bulkAddTasks/{data.id}" class="wide-button" style="text-decoration: line-through"
-							>{$t('list.bulkAddTasks')}</a
-						>
+						<a href="/bulkAddTasks/{data.id}" class="wide-button">{$t('list.bulkAddTasks')}</a>
 						<a href="/shareList/{data.id}" class="wide-button" style="text-decoration: line-through"
 							>{shareButtonText}</a
 						>
-						<a href="/copyList/{data.id}" class="wide-button" style="text-decoration: line-through">{$t('list.copy')}</a
-						>
+						<a href="/copyList/{data.id}" class="wide-button">{$t('list.copy')}</a>
 						<a href="/uncompleteTasks/{data.id}" class="wide-button" style="text-decoration: line-through"
 							>{$t('list.uncompleteAllTasks')}</a
 						>
 
 						{#if !isArchived}
-							<a href="/archiveList/{data.id}" class="wide-button" style="text-decoration: line-through"
-								>{$t('list.archive')}</a
-							>
+							<a href="/archiveList/{data.id}" class="wide-button">{$t('list.archive')}</a>
 						{/if}
 					</div>
 				</div>
@@ -585,7 +573,7 @@
 				</div>
 			{/if}
 
-			{#if duplicateAlertIsVisible()}
+			{#if duplicateAlertIsVisible}
 				<div class="duplicate-task-alert" in:slide>
 					<button type="button" on:click={hideDuplicateTaskAlert} class="side">
 						<i class="fas fa-times-circle" />
@@ -604,7 +592,7 @@
 				</div>
 			{/if}
 
-			{#if similarTasksAlertIsVisible()}
+			{#if similarTasksAlertIsVisible}
 				<div class="duplicate-task-alert" in:slide>
 					<span class="side inactive">
 						<i class="fas fa-info-circle" />

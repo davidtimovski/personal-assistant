@@ -203,6 +203,7 @@
 				transferButtonIsLoading = false;
 			}
 		} else {
+			amountIsInvalid = true;
 			transferButtonIsLoading = false;
 		}
 	}

@@ -2,10 +2,10 @@
 
 namespace Auth.ViewModels.Home;
 
-public class ApplicationVm
+public class ClientApplicationViewModel
 {
-    public ApplicationVm(string name, Uri url, string cssClass) : this(name, url, cssClass, false) { }
-    public ApplicationVm(string name, Uri url, string cssClass, bool inDevelopment)
+    public ClientApplicationViewModel(string name, Uri url, string cssClass) : this(name, url, cssClass, false) { }
+    public ClientApplicationViewModel(string name, Uri url, string cssClass, bool inDevelopment)
     {
         Name = name;
         Url = url;

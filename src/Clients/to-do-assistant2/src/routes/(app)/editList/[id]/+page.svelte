@@ -53,13 +53,9 @@
 	let listsService: ListsService;
 	let usersService: UsersService;
 
-	$: canSave = () => {
-		return !ValidationUtil.isEmptyOrWhitespace(name);
-	};
+	$: canSave = !ValidationUtil.isEmptyOrWhitespace(name);
 
-	$: notificationsCheckboxEnabled = () => {
-		return sharingState !== SharingState.NotShared && preferences?.notificationsEnabled;
-	};
+	$: notificationsCheckboxEnabled = sharingState !== SharingState.NotShared && preferences?.notificationsEnabled;
 
 	function showTasksTextarea() {
 		tasksInputIsVisible = true;
@@ -132,6 +128,7 @@
 				}
 			}
 		} else {
+			nameIsInvalid = true;
 			saveButtonIsLoading = false;
 		}
 	}
@@ -303,7 +300,7 @@
 				<Checkbox
 					labelKey="editList.notifications"
 					bind:value={notificationsEnabled}
-					disabled={!notificationsCheckboxEnabled()}
+					disabled={!notificationsCheckboxEnabled}
 				/>
 			</div>
 
@@ -320,12 +317,7 @@
 
 		<div class="save-delete-wrap">
 			{#if !confirmationInProgress}
-				<button
-					type="button"
-					on:click={save}
-					class="button primary-button"
-					disabled={!canSave() || saveButtonIsLoading}
-				>
+				<button type="button" on:click={save} class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
 					<span class="button-loader" class:loading={saveButtonIsLoading}>
 						<i class="fas fa-circle-notch fa-spin" />
 					</span>

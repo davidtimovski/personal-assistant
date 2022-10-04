@@ -41,19 +41,22 @@ export class TasksService {
 		}
 	}
 
-	async bulkCreate(model: BulkAddTasksModel, listsService: ListsService): Promise<void> {
+	async bulkCreate(
+		listId: number,
+		tasksText: string,
+		tasksAreOneTime: boolean,
+		tasksArePrivate: boolean
+	): Promise<void> {
 		try {
 			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/tasks/bulk`, {
 				method: 'post',
 				body: window.JSON.stringify({
-					listId: model.listId,
-					tasksText: model.tasksText,
-					tasksAreOneTime: model.tasksAreOneTime,
-					tasksArePrivate: model.tasksArePrivate
+					listId: listId,
+					tasksText: tasksText,
+					tasksAreOneTime: tasksAreOneTime,
+					tasksArePrivate: tasksArePrivate
 				})
 			});
-
-			//await Actions.getLists(listsService);
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;

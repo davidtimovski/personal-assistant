@@ -71,9 +71,7 @@
 		});
 	}
 
-	$: canSave = () => {
-		return !!amount && !(!$isOnline && synced);
-	};
+	$: canSave = !!amount && !(!$isOnline && synced);
 
 	async function save() {
 		if (!amount || !currency) {
@@ -132,6 +130,7 @@
 				}
 			}
 		} else {
+			amountIsInvalid = true;
 			saveButtonIsLoading = false;
 		}
 	}
@@ -290,7 +289,7 @@
 
 			<div class="save-delete-wrap">
 				{#if !deleteInProgress}
-					<button class="button primary-button" disabled={!canSave() || saveButtonIsLoading}>
+					<button class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
 						<span class="button-loader" class:loading={saveButtonIsLoading}>
 							<i class="fas fa-circle-notch fa-spin" />
 						</span>

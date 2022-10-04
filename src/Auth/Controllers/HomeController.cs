@@ -47,11 +47,11 @@ public class HomeController : Controller
         var model = new OverviewViewModel
         {
             UserName = user.Name,
-            Applications = new Dictionary<string, ApplicationVm>
+            ClientApplications = new List<ClientApplicationViewModel>
             {
-                { "ToDoAssistant", new ApplicationVm("To Do Assistant", new Uri(_configuration["Urls:ToDoAssistant"] + $"/{language}"), "to-do-assistant") },
-                { "CookingAssistant", new ApplicationVm("Cooking Assistant", new Uri(_configuration["Urls:CookingAssistant"] + $"/{language}"), "cooking-assistant") },
-                { "Accountant", new ApplicationVm("Accountant", new Uri(_configuration["Urls:Accountant2"]), "accountant") }
+                new ClientApplicationViewModel("To Do Assistant", new Uri(_configuration["Urls:ToDoAssistant"] + $"/{language}"), "to-do-assistant"),
+                new ClientApplicationViewModel("Cooking Assistant", new Uri(_configuration["Urls:CookingAssistant"] + $"/{language}"), "cooking-assistant"),
+                new ClientApplicationViewModel("Accountant", new Uri(_configuration["Urls:Accountant2"] + $"?lang={language}"), "accountant")
             },
             Alert = alert
         };

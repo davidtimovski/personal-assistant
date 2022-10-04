@@ -8,10 +8,10 @@ import type { AutomaticTransaction } from '$lib/models/entities/automaticTransac
 import Variables from '$lib/variables';
 
 export class AutomaticTransactionsService {
-	private readonly httpProxy = new HttpProxy();
+	private readonly httpProxy = new HttpProxy('accountant2');
 	private readonly idbHelper = new AutomaticTransactionsIDBHelper();
 	private readonly currenciesService = new CurrenciesService('Accountant');
-	private readonly logger = new ErrorLogger('Accountant');
+	private readonly logger = new ErrorLogger('Accountant', 'accountant2');
 
 	async getAll(currency: string): Promise<Array<AutomaticTransaction>> {
 		try {
