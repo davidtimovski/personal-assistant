@@ -54,9 +54,7 @@
 		}
 	});
 
-	$: canSave = () => {
-		return !!amount && !(!$isOnline && synced);
-	};
+	$: canSave = !!amount && !(!$isOnline && synced);
 
 	function validate(): ValidationResult {
 		const result = new ValidationResult(true);
@@ -123,6 +121,7 @@
 				}
 			}
 		} else {
+			amountIsInvalid = true;
 			saveButtonIsLoading = false;
 		}
 	}
@@ -226,10 +225,7 @@
 		{/if}
 
 		{#if generated}
-			<div class="message info">
-				<i class="fas fa-info-circle" />
-				<span>{$t('editUpcomingExpense.generatedAlert')}</span>
-			</div>
+			<AlertBlock type="info" message={$t('editUpcomingExpense.generatedAlert')} />
 		{/if}
 
 		<form on:submit|preventDefault={save}>
@@ -271,7 +267,7 @@
 
 			<div class="save-delete-wrap">
 				{#if !deleteInProgress}
-					<button class="button primary-button" disabled={!canSave() || saveButtonIsLoading}>
+					<button class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
 						<span class="button-loader" class:loading={saveButtonIsLoading}>
 							<i class="fas fa-circle-notch fa-spin" />
 						</span>

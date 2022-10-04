@@ -50,9 +50,7 @@
 		}
 	});
 
-	$: canSave = () => {
-		return !ValidationUtil.isEmptyOrWhitespace(name) && !(!$isOnline && synced);
-	};
+	$: canSave = !ValidationUtil.isEmptyOrWhitespace(name) && !(!$isOnline && synced);
 
 	function validate(): ValidationResult {
 		const result = new ValidationResult(true);
@@ -250,7 +248,7 @@
 
 			<div class="save-delete-wrap">
 				{#if !deleteInProgress}
-					<button class="button primary-button" disabled={!canSave() || saveButtonIsLoading}>
+					<button class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
 						<span class="button-loader" class:loading={saveButtonIsLoading}>
 							<i class="fas fa-circle-notch fa-spin" />
 						</span>

@@ -75,7 +75,7 @@
 				return;
 			}
 
-			data.debt = await capitalService.getDebt(currency);
+			data.debt = await capitalService.getDebt(currency, $t('index.combined'));
 			resolve();
 		});
 

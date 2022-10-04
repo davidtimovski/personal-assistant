@@ -24,7 +24,7 @@
 	}
 
 	onMount(async () => {
-		tooltipsService = new TooltipsService(new ErrorLogger('Accountant'));
+		tooltipsService = new TooltipsService(new ErrorLogger('Accountant', 'accountant2'));
 
 		const accountantTooltips = await tooltipsService.getAll('Accountant');
 		for (const tooltip of accountantTooltips) {

@@ -6,8 +6,10 @@
 
 	import { onMount } from 'svelte/internal';
 	import { onDestroy } from 'svelte';
+	import { page } from '$app/stores';
 	import type { Unsubscriber } from 'svelte/store';
 
+	import { Language } from '../../../../shared2/models/enums/language';
 	import { AuthService } from '../../../../shared2/services/authService';
 	import { CurrenciesService } from '../../../../shared2/services/currenciesService';
 
@@ -59,9 +61,14 @@
 
 	onMount(() => {
 		localStorage = new LocalStorageUtil();
+
+		const lang = $page.url.searchParams.get('lang');
+		if (lang && (lang === Language.English || lang === Language.Macedonian)) {
+			localStorage.set('language', lang);
+		}
 		locale.set(localStorage.get('language'));
 
-		new AuthService('accountant2', window).login();
+		new AuthService('accountant2').login();
 
 		isOnline.set(navigator.onLine);
 		window.addEventListener('online', () => {

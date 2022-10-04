@@ -338,7 +338,7 @@
 						</div>
 					{/if}
 
-					{#if categoryType !== 0}
+					{#if categoryType === 0}
 						<div class="multi-radio-part">
 							<label class:selected={type === 4}>
 								<span>{$t('barChartReport.savings')}</span>

@@ -17,7 +17,7 @@ export class CapitalService {
 	private readonly debtsIDBHelper = new DebtsIDBHelper();
 	private readonly transactionsService = new TransactionsService();
 	private readonly currenciesService = new CurrenciesService('Accountant');
-	private readonly logger = new ErrorLogger('Accountant');
+	private readonly logger = new ErrorLogger('Accountant', 'accountant2');
 
 	async getSpent(
 		mainAccountId: number,
@@ -75,7 +75,7 @@ export class CapitalService {
 		}
 	}
 
-	async getDebt(currency: string): Promise<HomePageDebt[]> {
+	async getDebt(currency: string, combinedLabel: string): Promise<HomePageDebt[]> {
 		try {
 			const debt = await this.debtsIDBHelper.getAll();
 
@@ -85,7 +85,7 @@ export class CapitalService {
 
 			const homePageDebt = new Array<HomePageDebt>();
 			for (const debtItem of debt) {
-				const trimmedDescription = this.trimDescription(debtItem.description);
+				const trimmedDescription = this.trimDebtDescription(debtItem.description, combinedLabel);
 				homePageDebt.push(
 					new HomePageDebt(debtItem.person, debtItem.userIsDebtor, trimmedDescription, debtItem.amount)
 				);
@@ -98,13 +98,21 @@ export class CapitalService {
 		}
 	}
 
-	private trimDescription(description: string | null): string {
+	private trimDebtDescription(description: string | null, combinedLabel: string): string {
 		if (!description) {
 			return '';
 		}
 
 		if (description.includes(DebtsService.mergedDebtSeparator)) {
-			return '[ Combined ]';
+			return combinedLabel;
+		}
+
+		return this.trimDescription(description);
+	}
+
+	private trimDescription(description: string | null): string {
+		if (!description) {
+			return '';
 		}
 
 		const length = 25;

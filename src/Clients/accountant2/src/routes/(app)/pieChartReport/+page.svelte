@@ -42,9 +42,7 @@
 	Chart.register(ArcElement, PieController);
 	Chart.defaults.font.family = '"Didact Gothic", sans-serif';
 
-	$: type = () => {
-		return isDeposits ? TransactionType.Deposit : TransactionType.Expense;
-	};
+	$: type = isDeposits ? TransactionType.Deposit : TransactionType.Expense;
 
 	async function loadData() {
 		chartPrepared = false;
@@ -58,7 +56,7 @@
 				fromDate,
 				toDate,
 				mainAccountId,
-				type(),
+				type,
 				currency,
 				$t('uncategorized')
 			)
@@ -116,7 +114,7 @@
 	}
 
 	function goToTransactions(item: PieChartItem) {
-		searchFilters.set(new SearchFilters(1, 15, fromDate, toDate, 0, item.categoryId, type(), null));
+		searchFilters.set(new SearchFilters(1, 15, fromDate, toDate, 0, item.categoryId, type, null));
 		goto('transactions');
 	}
 

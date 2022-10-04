@@ -6,7 +6,7 @@ import { loggedInUser } from "$lib/stores";
 export class AuthService {
   private userManager: any = null;
 
-  constructor(client: string, window: Window) {
+  constructor(client: string) {
     if (Variables.debug) {
       Log.logger = console;
     }

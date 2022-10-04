@@ -13,12 +13,12 @@ import { AmountByCategory } from '$lib/models/viewmodels/amountByCategory';
 import Variables from '$lib/variables';
 
 export class TransactionsService {
-	private readonly httpProxy = new HttpProxy();
+	private readonly httpProxy = new HttpProxy('accountant2');
 	private readonly idbHelper = new TransactionsIDBHelper();
 	private readonly categoriesService = new CategoriesService();
 	private readonly currenciesService = new CurrenciesService('Accountant');
 	private readonly encryptionService = new EncryptionService();
-	private readonly logger = new ErrorLogger('Accountant');
+	private readonly logger = new ErrorLogger('Accountant', 'accountant2');
 
 	count(filters: SearchFilters): Promise<number> {
 		return this.idbHelper.count(filters);

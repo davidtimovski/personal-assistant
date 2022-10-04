@@ -3,10 +3,6 @@
 @{
     ViewData["Title"] = Localizer["Overview"];
     ViewData["Description"] = Localizer["Overview"];
-
-    ViewData["ToDoAssistantUrl"] = Model.Applications["ToDoAssistant"].Url;
-    ViewData["CookingAssistantUrl"] = Model.Applications["CookingAssistant"].Url;
-    ViewData["AccountantUrl"] = Model.Applications["Accountant"].Url;
 }
 
 @switch (Model.Alert)
@@ -24,18 +20,18 @@
 <div class="overview-apps">
     <h3>@Localizer["GoTo"]</h3>
 
-    @foreach (KeyValuePair<string, ApplicationVm> item in Model.Applications)
+    @foreach (var app in Model.ClientApplications)
     {
-        @if (item.Value.InDevelopment)
+        @if (app.InDevelopment)
         {
-            <a href="@item.Value.Url" class="app @item.Value.CssClass in-development">
-                <div>@item.Value.Name</div>
+            <a href="@app.Url" class="app @app.CssClass in-development">
+                <div>@app.Name</div>
                 <div>@Localizer["InDevelopment"]</div>
             </a>
         }
         else
         {
-            <a href="@item.Value.Url" class="app @item.Value.CssClass">@item.Value.Name</a>
+            <a href="@app.Url" class="app @app.CssClass">@app.Name</a>
         }
     }
 </div>
