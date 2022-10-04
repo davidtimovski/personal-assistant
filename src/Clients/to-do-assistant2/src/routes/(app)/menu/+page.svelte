@@ -15,7 +15,7 @@
 	async function logOut() {
 		localStorage.clear();
 
-		const authService = new AuthService('to-do-assistant2', window);
+		const authService = new AuthService('to-do-assistant2');
 		await authService.logout();
 	}
 
@@ -42,6 +42,7 @@
 
 	<div class="content-wrap">
 		<div class="horizontal-buttons-wrap">
+			<a href="/archivedLists" class="wide-button">{$t('menu.archivedLists')}</a>
 			<a href="/help" class="wide-button">{$t('menu.help')}</a>
 		</div>
 

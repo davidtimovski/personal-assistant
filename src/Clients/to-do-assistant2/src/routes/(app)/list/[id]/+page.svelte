@@ -537,9 +537,7 @@
 							>{shareButtonText}</a
 						>
 						<a href="/copyList/{data.id}" class="wide-button">{$t('list.copy')}</a>
-						<a href="/uncompleteTasks/{data.id}" class="wide-button" style="text-decoration: line-through"
-							>{$t('list.uncompleteAllTasks')}</a
-						>
+						<a href="/uncompleteTasks/{data.id}" class="wide-button">{$t('list.uncompleteAllTasks')}</a>
 
 						{#if !isArchived}
 							<a href="/archiveList/{data.id}" class="wide-button">{$t('list.archive')}</a>

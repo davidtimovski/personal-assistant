@@ -5,14 +5,13 @@ import { lists } from '$lib/stores';
 import { ListsService } from '$lib/services/listsService';
 import { List, type Task } from '$lib/models/entities';
 import type { EditTaskModel } from '$lib/models/viewmodels/editTaskModel';
-import type { BulkAddTasksModel } from '$lib/models/viewmodels/bulkAddTasksModel';
 import { ListTask } from '$lib/models/viewmodels/listTask';
 import Variables from '$lib/variables';
 import { SharingState } from '$lib/models/viewmodels/sharingState';
 
 export class TasksService {
-	private readonly httpProxy = new HttpProxy();
-	private readonly logger = new ErrorLogger('ToDoAssistant');
+	private readonly httpProxy = new HttpProxy('to-do-assistant2');
+	private readonly logger = new ErrorLogger('ToDoAssistant', 'to-do-assistant2');
 
 	get(id: number): Promise<Task> {
 		return this.httpProxy.ajax<Task>(`${Variables.urls.api}/api/tasks/${id}`);

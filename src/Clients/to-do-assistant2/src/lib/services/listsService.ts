@@ -18,8 +18,8 @@ import { SharingState } from '$lib/models/viewmodels/sharingState';
 import Variables from '$lib/variables';
 
 export class ListsService {
-	private readonly httpProxy = new HttpProxy();
-	private readonly logger = new ErrorLogger('ToDoAssistant');
+	private readonly httpProxy = new HttpProxy('to-do-assistant2');
+	private readonly logger = new ErrorLogger('ToDoAssistant', 'to-do-assistant2');
 	private readonly localStorage = new LocalStorageUtil();
 
 	async getAll(includeCache = false) {

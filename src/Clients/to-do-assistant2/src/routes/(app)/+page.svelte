@@ -212,7 +212,7 @@
 					<div class="to-do-list-placeholder">&nbsp;</div>
 				</div>
 			{:else}
-				<div class="au-stagger">
+				<div>
 					{#each computedLists as list}
 						<div class="to-do-list computed-list">
 							<i class="icon {list.computedListIconClass}" />

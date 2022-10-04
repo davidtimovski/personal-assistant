@@ -46,7 +46,7 @@
 		}
 		locale.set(localStorage.get('language'));
 
-		new AuthService('to-do-assistant2', window).login();
+		new AuthService('to-do-assistant2').login();
 
 		isOffline.set(!navigator.onLine);
 		window.addEventListener('online', () => {

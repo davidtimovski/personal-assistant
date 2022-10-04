@@ -29,11 +29,11 @@
 		}
 
 		isDismissed = true;
-		await tooltipsService.toggleDismissed(tooltip.key, 'To', true);
+		await tooltipsService.toggleDismissed(tooltip.key, 'ToDoAssistant', true);
 	}
 
 	onMount(async () => {
-		tooltipsService = new TooltipsService(new ErrorLogger('ToDoAssistant'));
+		tooltipsService = new TooltipsService(new ErrorLogger('ToDoAssistant', 'to-do-assistant2'));
 
 		tooltip = await tooltipsService.getByKey(key, 'ToDoAssistant');
 		if (!tooltip.isDismissed) {
