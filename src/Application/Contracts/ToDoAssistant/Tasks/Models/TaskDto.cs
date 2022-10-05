@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Application.Mappings;
 using Domain.Entities.ToDoAssistant;
+using System;
 
 namespace Application.Contracts.ToDoAssistant.Tasks.Models;
 
@@ -15,6 +16,7 @@ public class TaskDto : IMapFrom<ToDoTask>
     public bool IsPrivate { get; set; }
     public AssignedUser AssignedUser { get; set; }
     public short Order { get; set; }
+    public DateTime ModifiedDate { get; set; }
 
     public void Mapping(Profile profile)
     {

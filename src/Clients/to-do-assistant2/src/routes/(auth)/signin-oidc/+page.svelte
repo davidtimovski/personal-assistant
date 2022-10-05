@@ -15,7 +15,7 @@
 		})
 			.signinRedirectCallback()
 			.then(async () => {
-				await new AuthService('to-do-assistant2', window).loginCallback();
+				await new AuthService('to-do-assistant2').loginCallback();
 				await goto('/');
 			})
 			.catch((e) => {

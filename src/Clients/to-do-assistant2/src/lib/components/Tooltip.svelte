@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
+	import { onDestroy } from 'svelte';
 	import { slide } from 'svelte/transition';
-
-	import { t } from '$lib/localization/i18n';
 
 	import type { Tooltip } from '../../../../shared2/models/tooltip';
 	import { TooltipsService } from '../../../../shared2/services/tooltipsService';
-	import { ErrorLogger } from '../../../../shared2/services/errorLogger';
+
+	import { t } from '$lib/localization/i18n';
 
 	export let key: string;
 
@@ -20,7 +20,6 @@
 
 	function toggleOpen() {
 		isOpen = !isOpen;
-		questionSpan.classList.remove('glow');
 	}
 
 	async function dismiss() {
@@ -29,25 +28,29 @@
 		}
 
 		isDismissed = true;
-		await tooltipsService.toggleDismissed(tooltip.key, 'To', true);
+		await tooltipsService.toggleDismissed(tooltip.key, true);
 	}
 
 	onMount(async () => {
-		tooltipsService = new TooltipsService(new ErrorLogger('ToDoAssistant'));
+		tooltipsService = new TooltipsService('ToDoAssistant', 'to-do-assistant2');
 
-		tooltip = await tooltipsService.getByKey(key, 'ToDoAssistant');
+		tooltip = await tooltipsService.getByKey(key);
 		if (!tooltip.isDismissed) {
 			tooltip.question = (<any>$t(`tooltips.${key}`)).question;
 			tooltip.answer = (<any>$t(`tooltips.${key}`)).answer;
 			isVisible = true;
 		}
 	});
+
+	onDestroy(() => {
+		tooltipsService?.release();
+	});
 </script>
 
 <div class="tooltip" class:visible={isVisible}>
 	{#if tooltip}
 		<div on:click={toggleOpen} class="question-wrap">
-			<span bind:this={questionSpan} class="question glow">{tooltip.question}</span>
+			<span bind:this={questionSpan} class="question" class:glow={!isOpen}>{tooltip.question}</span>
 		</div>
 		{#if isOpen}
 			<div in:slide class="answer-wrap">

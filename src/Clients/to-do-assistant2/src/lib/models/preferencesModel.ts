@@ -1,3 +1,3 @@
 export class PreferencesModel {
-	notificationsEnabled: boolean | null = null;
+	constructor(public notificationsEnabled: boolean) {}
 }

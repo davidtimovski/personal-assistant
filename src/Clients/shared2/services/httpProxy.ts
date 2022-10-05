@@ -1,3 +1,4 @@
+import type { Unsubscriber } from "svelte/store";
 import type { User } from "oidc-client";
 
 import { AuthService } from "./authService";
@@ -9,10 +10,11 @@ export class HttpProxy {
   private readonly authService: AuthService;
   private readonly successCodes = [200, 201, 204];
   private user: User | null = null;
+  private loggedInUserUnsub: Unsubscriber;
 
   constructor(client: string) {
-    loggedInUser.subscribe((x) => (this.user = x));
-    this.authService = new AuthService(client, window);
+    this.loggedInUserUnsub = loggedInUser.subscribe((x) => (this.user = x));
+    this.authService = new AuthService(client);
   }
 
   async ajax<T>(uri: string, init?: RequestInit): Promise<T> {
@@ -112,6 +114,10 @@ export class HttpProxy {
     }
 
     return <string>await response.json();
+  }
+
+  release() {
+    this.loggedInUserUnsub();
   }
 
   private setHeaders(init?: RequestInit): RequestInit {

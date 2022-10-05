@@ -2,17 +2,17 @@ import { HttpProxy } from '../../../../shared2/services/httpProxy';
 import { ErrorLogger } from '../../../../shared2/services/errorLogger';
 
 import { lists } from '$lib/stores';
-import { ListsService } from '$lib/services/listsService';
+import { DerivedLists } from '$lib/services/listsService';
+import { LocalStorageKeys, type LocalStorageUtil } from '$lib/utils/localStorageUtil';
 import { List, type Task } from '$lib/models/entities';
 import type { EditTaskModel } from '$lib/models/viewmodels/editTaskModel';
-import type { BulkAddTasksModel } from '$lib/models/viewmodels/bulkAddTasksModel';
 import { ListTask } from '$lib/models/viewmodels/listTask';
-import Variables from '$lib/variables';
 import { SharingState } from '$lib/models/viewmodels/sharingState';
+import Variables from '$lib/variables';
 
 export class TasksService {
-	private readonly httpProxy = new HttpProxy();
-	private readonly logger = new ErrorLogger('ToDoAssistant');
+	private readonly httpProxy = new HttpProxy('to-do-assistant2');
+	private readonly logger = new ErrorLogger('ToDoAssistant', 'to-do-assistant2');
 
 	get(id: number): Promise<Task> {
 		return this.httpProxy.ajax<Task>(`${Variables.urls.api}/api/tasks/${id}`);
@@ -102,7 +102,7 @@ export class TasksService {
 		}
 	}
 
-	deleteLocal(id: number, listId: number, localLists: List[]) {
+	deleteLocal(id: number, listId: number, localLists: List[], localStorage: LocalStorageUtil) {
 		const list = localLists.find((x) => x.id === listId);
 		if (!list) {
 			throw new Error('List not found');
@@ -123,25 +123,37 @@ export class TasksService {
 		const index = list.tasks.indexOf(task);
 		list.tasks.splice(index, 1);
 
-		if (task.isHighPriority) {
-			const allTasks: Task[] = localLists
-				.filter((x) => !x.isArchived && !x.computedListType)
-				.reduce((a: Task[], b: List) => {
-					return a.concat(b.tasks);
-				}, []);
-			const uncompletedHighPriorityTasks = allTasks.filter((x) => !x.isCompleted && x.isHighPriority);
+		if (task.isHighPriority && localStorage.getBool(LocalStorageKeys.HighPriorityListEnabled)) {
+			const highPriorityList = localLists.find((x) => x.derivedListType === DerivedLists.HighPriority);
+			if (!highPriorityList) {
+				throw new Error(`Could not find derived list of type ${DerivedLists.HighPriority}`);
+			}
 
-			const highPriorityList = localLists.find(
-				(x) => x.computedListType === ListsService.highPriorityComputedListMoniker
-			);
-			if (highPriorityList) {
-				if (uncompletedHighPriorityTasks.length > 0) {
-					const index = highPriorityList.tasks.indexOf(task);
-					highPriorityList.tasks.splice(index, 1);
-				} else {
-					const index = localLists.indexOf(highPriorityList);
-					localLists.splice(index, 1);
-				}
+			if (highPriorityList.tasks.length > 1) {
+				const index = highPriorityList.tasks.indexOf(task);
+				highPriorityList.tasks.splice(index, 1);
+			} else {
+				const index = localLists.indexOf(highPriorityList);
+				localLists.splice(index, 1);
+			}
+		}
+
+		if (localStorage.getBool(LocalStorageKeys.StaleTasksListEnabled)) {
+			const staleTasksList = localLists.find((x) => x.derivedListType === DerivedLists.StaleTasks);
+			if (!staleTasksList) {
+				throw new Error(`Could not find derived list of type ${DerivedLists.StaleTasks}`);
+			}
+
+			const index = staleTasksList.tasks.indexOf(task);
+			if (index === -1) {
+				return;
+			}
+
+			if (staleTasksList.tasks.length > 1) {
+				staleTasksList.tasks.splice(index, 1);
+			} else {
+				const index = localLists.indexOf(staleTasksList);
+				localLists.splice(index, 1);
 			}
 		}
 
@@ -162,7 +174,7 @@ export class TasksService {
 		}
 	}
 
-	completeLocal(id: number, listId: number, localLists: List[]) {
+	completeLocal(id: number, listId: number, localLists: List[], localStorage: LocalStorageUtil) {
 		const list = localLists.find((x) => x.id === listId);
 		if (!list) {
 			throw new Error('List not found');
@@ -200,26 +212,39 @@ export class TasksService {
 		}
 
 		task.order = 1;
+		task.modifiedDate = new Date().toISOString();
 
-		if (task.isHighPriority) {
-			const allTasks: Task[] = localLists
-				.filter((x) => !x.isArchived && !x.computedListType)
-				.reduce((a: Task[], b: List) => {
-					return a.concat(b.tasks);
-				}, []);
-			const uncompletedHighPriorityTasks = allTasks.filter((x) => !x.isCompleted && x.isHighPriority);
+		if (task.isHighPriority && localStorage.getBool(LocalStorageKeys.HighPriorityListEnabled)) {
+			const highPriorityList = localLists.find((x) => x.derivedListType === DerivedLists.HighPriority);
+			if (!highPriorityList) {
+				throw new Error(`Could not find derived list of type ${DerivedLists.HighPriority}`);
+			}
 
-			const highPriorityList = localLists.find(
-				(x) => x.computedListType === ListsService.highPriorityComputedListMoniker
-			);
-			if (highPriorityList) {
-				if (uncompletedHighPriorityTasks.length > 0) {
-					const index = highPriorityList.tasks.indexOf(task);
-					highPriorityList.tasks.splice(index, 1);
-				} else {
-					const index = localLists.indexOf(highPriorityList);
-					localLists.splice(index, 1);
-				}
+			if (highPriorityList.tasks.length > 1) {
+				const index = highPriorityList.tasks.indexOf(task);
+				highPriorityList.tasks.splice(index, 1);
+			} else {
+				const index = localLists.indexOf(highPriorityList);
+				localLists.splice(index, 1);
+			}
+		}
+
+		if (localStorage.getBool(LocalStorageKeys.StaleTasksListEnabled)) {
+			const staleTasksList = localLists.find((x) => x.derivedListType === DerivedLists.StaleTasks);
+			if (!staleTasksList) {
+				throw new Error(`Could not find derived list of type ${DerivedLists.StaleTasks}`);
+			}
+
+			const index = staleTasksList.tasks.indexOf(task);
+			if (index === -1) {
+				return;
+			}
+
+			if (staleTasksList.tasks.length > 1) {
+				staleTasksList.tasks.splice(index, 1);
+			} else {
+				const index = localLists.indexOf(staleTasksList);
+				localLists.splice(index, 1);
 			}
 		}
 
@@ -240,7 +265,7 @@ export class TasksService {
 		}
 	}
 
-	uncompleteLocal(id: number, listId: number, localLists: List[]) {
+	uncompleteLocal(id: number, listId: number, localLists: List[], localStorage: LocalStorageUtil) {
 		const list = localLists.find((x) => x.id === listId);
 		if (!list) {
 			throw new Error('List not found');
@@ -273,11 +298,10 @@ export class TasksService {
 
 		task.isCompleted = false;
 		task.order = newOrder;
+		task.modifiedDate = new Date().toISOString();
 
-		if (task.isHighPriority) {
-			const highPriorityList = localLists.find(
-				(x) => x.computedListType === ListsService.highPriorityComputedListMoniker
-			);
+		if (task.isHighPriority && localStorage.getBool(LocalStorageKeys.HighPriorityListEnabled)) {
+			const highPriorityList = localLists.find((x) => x.derivedListType === DerivedLists.HighPriority);
 			if (highPriorityList) {
 				highPriorityList.tasks.push(task);
 			} else {
@@ -291,7 +315,7 @@ export class TasksService {
 						SharingState.NotShared,
 						0,
 						false,
-						ListsService.highPriorityComputedListMoniker,
+						DerivedLists.HighPriority,
 						[task],
 						null
 					)
@@ -360,5 +384,9 @@ export class TasksService {
 			.map((x) => {
 				return ListTask.fromTask(x);
 			});
+	}
+
+	release() {
+		this.httpProxy.release();
 	}
 }

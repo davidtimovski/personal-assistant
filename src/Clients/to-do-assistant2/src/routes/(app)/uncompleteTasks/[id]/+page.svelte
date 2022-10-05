@@ -13,25 +13,25 @@
 	export let data: PageData;
 
 	let name = '';
-	let archivingAListText = '';
-	let archiveButtonIsLoading = false;
+	let uncompleteText = '';
+	let uncompleteButtonIsLoading = false;
 	let listsUnsub: Unsubscriber;
 
 	let listsService: ListsService;
 
-	async function archive() {
-		archiveButtonIsLoading = true;
+	async function uncomplete() {
+		uncompleteButtonIsLoading = true;
 
 		try {
-			await listsService.setIsArchived(data.id, true);
+			await listsService.uncompleteAllTasks(data.id);
 
 			alertState.update((x) => {
-				x.showSuccess('archiveList.archiveSuccessful');
+				x.showSuccess('uncompleteTasks.uncompleteTasksSuccessful');
 				return x;
 			});
-			goto('/');
+			goto(`/list/${data.id}`);
 		} catch {
-			archiveButtonIsLoading = false;
+			uncompleteButtonIsLoading = false;
 		}
 	}
 
@@ -49,8 +49,10 @@
 			}
 
 			name = <string>list.name;
-			archivingAListText = $t(
-				list.sharingState === SharingState.NotShared ? 'archiveList.archivingAList' : 'archiveList.archivingAListShared'
+			uncompleteText = $t(
+				list.sharingState !== SharingState.NotShared
+					? 'uncompleteTasks.thisWillUncompleteShared'
+					: 'uncompleteTasks.thisWillUncomplete'
 			);
 		});
 	});
@@ -63,11 +65,11 @@
 
 <section class="container">
 	<div class="page-title-wrap">
-		<div class="side inactive small">
-			<i class="fas fa-archive" />
+		<div class="side inactive">
+			<i class="fas fa-check-circle" />
 		</div>
 		<div class="page-title">
-			<span>{$t('archiveList.archive')}</span>&nbsp;<span class="colored-text">{name}</span>?
+			<span>{$t('uncompleteTasks.uncompleteTasksIn')}</span>&nbsp;<span class="colored-text">{name}</span>?
 		</div>
 		<a href="/list/{data.id}" class="back-button">
 			<i class="fas fa-times" />
@@ -75,14 +77,14 @@
 	</div>
 
 	<div class="content-wrap">
-		<div class="text-wrap">{archivingAListText}</div>
+		<div class="text-wrap">{uncompleteText}</div>
 
 		<div class="save-delete-wrap">
-			<button type="button" on:click={archive} class="button primary-button" disabled={archiveButtonIsLoading}>
-				<span class="button-loader" class:loading={archiveButtonIsLoading}>
+			<button type="button" on:click={uncomplete} class="button primary-button" disabled={uncompleteButtonIsLoading}>
+				<span class="button-loader" class:loading={uncompleteButtonIsLoading}>
 					<i class="fas fa-circle-notch fa-spin" />
 				</span>
-				<span>{$t('archiveList.archive')}</span>
+				<span>{$t('uncompleteTasks.uncomplete')}</span>
 			</button>
 			<a href="/list/{data.id}" class="button secondary-button">{$t('cancel')}</a>
 		</div>

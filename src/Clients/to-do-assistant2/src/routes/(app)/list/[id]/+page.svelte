@@ -13,8 +13,7 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
-	import { lists, remoteEvents } from '$lib/stores';
-	import { alertState } from '$lib/stores';
+	import { alertState, lists, remoteEvents } from '$lib/stores';
 	import { SharingState } from '$lib/models/viewmodels/sharingState';
 	import { ListsService } from '$lib/services/listsService';
 	import { TasksService } from '$lib/services/tasksService';
@@ -30,7 +29,7 @@
 	let isOneTimeToggleDefault: boolean;
 	let sharingState = SharingState.NotShared;
 	let isArchived = false;
-	let computedListType: string;
+	let derivedListType: string;
 	let tasks = new Array<ListTask>();
 	let privateTasks = new Array<ListTask>();
 	let completedTasks = new Array<ListTask>();
@@ -298,14 +297,14 @@
 			if (!remote) {
 				await tasksService.delete(task.id);
 			}
-			tasksService.deleteLocal(task.id, data.id, $lists);
+			tasksService.deleteLocal(task.id, data.id, $lists, localStorage);
 		} else {
 			completedTasksAreVisible = true;
 
 			if (!remote) {
 				await tasksService.complete(task.id);
 			}
-			tasksService.completeLocal(task.id, data.id, $lists);
+			tasksService.completeLocal(task.id, data.id, $lists, localStorage);
 		}
 	}
 
@@ -323,7 +322,7 @@
 		if (!remote) {
 			await tasksService.uncomplete(task.id);
 		}
-		tasksService.uncompleteLocal(task.id, data.id, $lists);
+		tasksService.uncompleteLocal(task.id, data.id, $lists, localStorage);
 	}
 
 	async function editList() {
@@ -442,7 +441,7 @@
 				isOneTimeToggleDefault = list.isOneTimeToggleDefault;
 				sharingState = list.sharingState;
 				isArchived = list.isArchived;
-				computedListType = list.computedListType;
+				derivedListType = list.derivedListType;
 				tasks = TasksService.getTasks(list.tasks);
 				privateTasks = TasksService.getPrivateTasks(list.tasks);
 				completedTasks = TasksService.getCompletedTasks(list.tasks);
@@ -479,6 +478,8 @@
 		for (const unsubscribe of unsubscriptions) {
 			unsubscribe();
 		}
+		listsService?.release();
+		tasksService?.release();
 	});
 </script>
 
@@ -537,9 +538,7 @@
 							>{shareButtonText}</a
 						>
 						<a href="/copyList/{data.id}" class="wide-button">{$t('list.copy')}</a>
-						<a href="/uncompleteTasks/{data.id}" class="wide-button" style="text-decoration: line-through"
-							>{$t('list.uncompleteAllTasks')}</a
-						>
+						<a href="/uncompleteTasks/{data.id}" class="wide-button">{$t('list.uncompleteAllTasks')}</a>
 
 						{#if !isArchived}
 							<a href="/archiveList/{data.id}" class="wide-button">{$t('list.archive')}</a>
@@ -668,7 +667,7 @@
 					{#each privateTasks as task (task.id)}
 						<div
 							class="to-do-task"
-							class:high-priority={computedListType !== 'high-priority' && task.isHighPriority}
+							class:high-priority={derivedListType !== 'high-priority' && task.isHighPriority}
 							in:receive={{ key: task.id }}
 							animate:flip
 						>
@@ -703,7 +702,7 @@
 				{#each tasks as task (task.id)}
 					<div
 						class="to-do-task"
-						class:high-priority={computedListType !== 'high-priority' && task.isHighPriority}
+						class:high-priority={derivedListType !== 'high-priority' && task.isHighPriority}
 						in:receive={{ key: task.id }}
 						animate:flip
 					>

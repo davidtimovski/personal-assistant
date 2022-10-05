@@ -1,22 +1,31 @@
-import { inject } from "aurelia";
-import { json } from "@aurelia/fetch-client";
-
-import { HttpProxy } from "../utils/httpProxy";
+import { HttpProxy } from "../services/httpProxy";
 import { ErrorLogger } from "./errorLogger";
+import Variables from "$lib/variables";
 
-@inject()
 export class NotificationsServiceBase {
-  constructor(protected readonly httpProxy: HttpProxy, private readonly logger: ErrorLogger) {}
+  protected readonly httpProxy: HttpProxy;
+  protected readonly logger: ErrorLogger;
 
-  async createSubscription(application: string, subscription: PushSubscription): Promise<void> {
+  constructor(application: string, client: string) {
+    this.httpProxy = new HttpProxy(client);
+    this.logger = new ErrorLogger(application, client);
+  }
+
+  async createSubscription(
+    application: string,
+    subscription: PushSubscription
+  ): Promise<void> {
     try {
-      await this.httpProxy.ajaxExecute("api/pushsubscriptions", {
-        method: "post",
-        body: json({
-          application: application,
-          subscription: subscription,
-        }),
-      });
+      await this.httpProxy.ajaxExecute(
+        `${Variables.urls.api}/api/pushsubscriptions`,
+        {
+          method: "post",
+          body: window.JSON.stringify({
+            application: application,
+            subscription: subscription,
+          }),
+        }
+      );
     } catch (e) {
       this.logger.logError(e);
       throw e;
@@ -27,9 +36,15 @@ export class NotificationsServiceBase {
     return NotificationsServiceBase.urlBase64ToUint8Array(vapidPublicKey);
   }
 
+  release() {
+    this.httpProxy.release();
+  }
+
   private static urlBase64ToUint8Array(base64String: string): Uint8Array {
     const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-    const base64 = (base64String + padding).replace(/\-/g, "+").replace(/_/g, "/");
+    const base64 = (base64String + padding)
+      .replace(/\-/g, "+")
+      .replace(/_/g, "/");
 
     const rawData = window.atob(base64);
     const outputArray = new Uint8Array(rawData.length);

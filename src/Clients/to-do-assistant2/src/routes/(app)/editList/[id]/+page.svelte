@@ -220,7 +220,11 @@
 		preferences = await usersService.getPreferences();
 	});
 
-	onDestroy(alertStateUnsub);
+	onDestroy(() => {
+		alertStateUnsub();
+		listsService?.release();
+		usersService?.release();
+	});
 </script>
 
 <section class="container">

@@ -11,7 +11,8 @@ export class ListTask {
 		public isHighPriority: boolean,
 		public isPrivate: boolean,
 		public assignedUser: AssignedUser,
-		public order: number
+		public order: number,
+		public modifiedDate: string
 	) {}
 
 	static fromTask(task: Task) {
@@ -24,7 +25,8 @@ export class ListTask {
 			task.isHighPriority,
 			task.isPrivate,
 			task.assignedUser,
-			task.order
+			task.order,
+			task.modifiedDate
 		);
 	}
 }

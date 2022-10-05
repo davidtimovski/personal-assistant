@@ -357,15 +357,15 @@ public class ListsController : BaseController
         return NoContent();
     }
 
-    [HttpPut("set-tasks-as-not-completed")]
-    public async Task<IActionResult> SetTasksAsNotCompleted([FromBody] SetTasksAsNotCompletedDto dto)
+    [HttpPut("uncomplete-all")]
+    public async Task<IActionResult> UncompleteAll([FromBody] SetTasksAsNotCompletedDto dto)
     {
         if (dto == null)
         {
             return BadRequest();
         }
 
-        SetTasksAsNotCompletedResult result = await _listService.SetTasksAsNotCompletedAsync(dto.ListId, CurrentUserId);
+        SetTasksAsNotCompletedResult result = await _listService.UncompleteAllAsync(dto.ListId, CurrentUserId);
 
         foreach (var recipient in result.NotificationRecipients)
         {

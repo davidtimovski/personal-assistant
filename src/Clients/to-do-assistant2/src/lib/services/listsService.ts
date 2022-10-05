@@ -17,9 +17,14 @@ import { ListModel } from '$lib/models/viewmodels/listModel';
 import { SharingState } from '$lib/models/viewmodels/sharingState';
 import Variables from '$lib/variables';
 
+export enum DerivedLists {
+	HighPriority = 'high-priority',
+	StaleTasks = 'stale-tasks'
+}
+
 export class ListsService {
-	private readonly httpProxy = new HttpProxy();
-	private readonly logger = new ErrorLogger('ToDoAssistant');
+	private readonly httpProxy = new HttpProxy('to-do-assistant2');
+	private readonly logger = new ErrorLogger('ToDoAssistant', 'to-do-assistant2');
 	private readonly localStorage = new LocalStorageUtil();
 
 	async getAll(includeCache = false) {
@@ -32,23 +37,32 @@ export class ListsService {
 
 		const allLists = await this.httpProxy.ajax<List[]>(`${Variables.urls.api}/api/lists`);
 
-		if (this.localStorage.getBool(LocalStorageKeys.HighPriorityListEnabled)) {
-			this.generateComputedLists(allLists);
+		const highPriorityListEnabled = this.localStorage.getBool(LocalStorageKeys.HighPriorityListEnabled);
+		const staleTasksListEnabled = this.localStorage.getBool(LocalStorageKeys.StaleTasksListEnabled);
+
+		if (highPriorityListEnabled || staleTasksListEnabled) {
+			const allTasks: Task[] = allLists
+				.filter((x) => !x.isArchived && !x.derivedListType)
+				.reduce((a: Task[], b: List) => {
+					return a.concat(b.tasks);
+				}, []);
+
+			if (highPriorityListEnabled) {
+				this.generateHighPriorityList(allLists, allTasks);
+			}
+
+			if (staleTasksListEnabled) {
+				this.generateStaleTasksList(allLists, allTasks);
+			}
 		}
 
 		lists.set(allLists);
 		this.localStorage.set('homePageData', JSON.stringify(allLists));
 	}
 
-	private generateComputedLists(allLists: List[]) {
-		const allTasks: Task[] = allLists
-			.filter((x) => !x.isArchived && !x.computedListType)
-			.reduce((a: Task[], b: List) => {
-				return a.concat(b.tasks);
-			}, []);
-
+	private generateHighPriorityList(allLists: List[], allTasks: Task[]) {
 		const uncompletedHighPriorityTasks = allTasks.filter((x) => !x.isCompleted && x.isHighPriority);
-		const highPriorityList = allLists.find((x) => x.computedListType === ListsService.highPriorityComputedListMoniker);
+		const highPriorityList = allLists.find((x) => x.derivedListType === DerivedLists.HighPriority);
 		if (uncompletedHighPriorityTasks.length > 0) {
 			if (highPriorityList) {
 				highPriorityList.tasks = uncompletedHighPriorityTasks;
@@ -61,9 +75,9 @@ export class ListsService {
 						false,
 						false,
 						SharingState.NotShared,
-						0,
+						1,
 						false,
-						ListsService.highPriorityComputedListMoniker,
+						DerivedLists.HighPriority,
 						uncompletedHighPriorityTasks,
 						null
 					)
@@ -71,6 +85,39 @@ export class ListsService {
 			}
 		} else if (highPriorityList) {
 			const index = allLists.indexOf(highPriorityList);
+			allLists.splice(index, 1);
+		}
+	}
+
+	private generateStaleTasksList(allLists: List[], allTasks: Task[]) {
+		const now = new Date();
+		const month = now.getMonth() - 1;
+		const aMonthAgo = new Date(now.getFullYear(), month, now.getDate());
+
+		const uncompletedStaleTasks = allTasks.filter((x) => !x.isCompleted && new Date(x.modifiedDate) < aMonthAgo);
+		const staleTasksList = allLists.find((x) => x.derivedListType === DerivedLists.StaleTasks);
+		if (uncompletedStaleTasks.length > 0) {
+			if (staleTasksList) {
+				staleTasksList.tasks = uncompletedStaleTasks;
+			} else {
+				allLists.push(
+					new List(
+						0,
+						null,
+						null,
+						false,
+						false,
+						SharingState.NotShared,
+						2,
+						false,
+						DerivedLists.StaleTasks,
+						uncompletedStaleTasks,
+						null
+					)
+				);
+			}
+		} else if (staleTasksList) {
+			const index = allLists.indexOf(staleTasksList);
 			allLists.splice(index, 1);
 		}
 	}
@@ -293,7 +340,7 @@ export class ListsService {
 
 			const textArea = document.createElement('textarea');
 			textArea.value = text;
-			textArea.style.position = 'fixed'; // avoid scrolling to bottom
+			textArea.style.position = 'fixed'; // Avoid scrolling to bottom
 			document.body.appendChild(textArea);
 			textArea.focus();
 			textArea.select();
@@ -324,9 +371,9 @@ export class ListsService {
 		}
 	}
 
-	async setTasksAsNotCompleted(id: number): Promise<void> {
+	async uncompleteAllTasks(id: number): Promise<void> {
 		try {
-			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/lists/set-tasks-as-not-completed`, {
+			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/lists/uncomplete-all`, {
 				method: 'put',
 				body: window.JSON.stringify({
 					listId: id
@@ -375,7 +422,7 @@ export class ListsService {
 
 	static getForHomeScreen(lists: List[]): ListModel[] {
 		return lists
-			.filter((x) => !x.isArchived && !x.computedListType)
+			.filter((x) => !x.isArchived && !x.derivedListType)
 			.sort((a: List, b: List) => {
 				return a.order - b.order;
 			})
@@ -387,26 +434,29 @@ export class ListsService {
 						<string>x.icon,
 						x.sharingState,
 						x.order,
-						x.computedListType,
+						x.derivedListType,
 						null,
 						x.tasks.filter((x) => !x.isCompleted).length
 					)
 			);
 	}
 
-	static getComputedForHomeScreen(lists: List[], computedListNameLookup: any): ListModel[] {
+	static getDerivedForHomeScreen(lists: List[], derivedListNameLookup: any): ListModel[] {
 		return lists
-			.filter((x) => x.computedListType)
+			.filter((x) => x.derivedListType)
+			.sort((a: List, b: List) => {
+				return a.order - b.order;
+			})
 			.map(
 				(x) =>
 					new ListModel(
 						x.id,
-						computedListNameLookup.get(x.computedListType),
+						derivedListNameLookup.get(x.derivedListType),
 						<string>x.icon,
 						x.sharingState,
 						x.order,
-						x.computedListType,
-						this.getComputedListIconClass(x.computedListType),
+						x.derivedListType,
+						this.getDerivedListIconClass(x.derivedListType),
 						x.tasks.filter((x) => !x.isCompleted).length
 					)
 			);
@@ -465,13 +515,21 @@ export class ListsService {
 		];
 	}
 
-	static highPriorityComputedListMoniker = 'high-priority';
+	static derivedListsIcons = new Map<string, string>([
+		[DerivedLists.HighPriority, 'fas fa-exclamation-triangle'],
+		[DerivedLists.StaleTasks, 'fas fa-inbox']
+	]);
 
-	static getComputedListIconClass(type: string): string {
-		if (type === this.highPriorityComputedListMoniker) {
-			return 'fas fa-exclamation-triangle';
+	static getDerivedListIconClass(type: string): string {
+		const icon = ListsService.derivedListsIcons.get(type);
+		if (!icon) {
+			throw 'No such derived list type';
 		}
 
-		throw 'No such computed list type';
+		return icon;
+	}
+
+	release() {
+		this.httpProxy.release();
 	}
 }

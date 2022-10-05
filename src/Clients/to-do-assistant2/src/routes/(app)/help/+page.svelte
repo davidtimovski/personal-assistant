@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
 
-	import { ErrorLogger } from '../../../../../shared2/services/errorLogger';
 	import { TooltipsService } from '../../../../../shared2/services/tooltipsService';
 	import type { Tooltip } from '../../../../../shared2/models/tooltip';
 
@@ -13,20 +12,20 @@
 
 	async function dismiss(tooltip: Tooltip) {
 		tooltip.isDismissed = true;
-		await tooltipsService.toggleDismissed(tooltip.key, 'ToDoAssistant', true);
+		await tooltipsService.toggleDismissed(tooltip.key, true);
 		tooltips = tooltips.slice(0);
 	}
 
 	async function retain(tooltip: Tooltip) {
 		tooltip.isDismissed = false;
-		await tooltipsService.toggleDismissed(tooltip.key, 'ToDoAssistant', false);
+		await tooltipsService.toggleDismissed(tooltip.key, false);
 		tooltips = tooltips.slice(0);
 	}
 
 	onMount(async () => {
-		tooltipsService = new TooltipsService(new ErrorLogger('ToDoAssistant'));
+		tooltipsService = new TooltipsService('ToDoAssistant', 'to-do-assistant2');
 
-		const toDoAssistantTooltips = await tooltipsService.getAll('ToDoAssistant');
+		const toDoAssistantTooltips = await tooltipsService.getAll();
 		for (const tooltip of toDoAssistantTooltips) {
 			tooltip.title = (<any>$t(`tooltips.${tooltip.key}`)).title;
 			tooltip.answer = (<any>$t(`tooltips.${tooltip.key}`)).answer;

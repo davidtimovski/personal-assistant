@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
+	import { goto } from '$app/navigation';
 
 	import { AuthService } from '../../../../../shared2/services/authService';
 
@@ -7,16 +8,21 @@
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 	import Variables from '$lib/variables';
 
-	let localStorage: LocalStorageUtil;
-
+	let preferencesButtonIsLoading = false;
 	const personalAssistantUrl = Variables.urls.authority;
 	let version = '--';
+
+	let localStorage: LocalStorageUtil;
+
+	async function goToPreferences() {
+		preferencesButtonIsLoading = true;
+		await goto('/preferences');
+	}
 
 	async function logOut() {
 		localStorage.clear();
 
-		const authService = new AuthService('to-do-assistant2', window);
-		await authService.logout();
+		await new AuthService('to-do-assistant2').logout();
 	}
 
 	onMount(async () => {
@@ -42,6 +48,13 @@
 
 	<div class="content-wrap">
 		<div class="horizontal-buttons-wrap">
+			<a href="/archivedLists" class="wide-button">{$t('menu.archivedLists')}</a>
+			<button type="button" on:click={goToPreferences} class="wide-button with-badge">
+				<span class="button-loader" class:loading={preferencesButtonIsLoading}>
+					<i class="fas fa-circle-notch fa-spin" />
+				</span>
+				<span>{$t('menu.preferences')}</span>
+			</button>
 			<a href="/help" class="wide-button">{$t('menu.help')}</a>
 		</div>
 

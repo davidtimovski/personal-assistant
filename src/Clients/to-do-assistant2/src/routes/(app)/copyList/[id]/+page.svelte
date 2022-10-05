@@ -119,6 +119,7 @@
 		for (const unsubscribe of unsubscriptions) {
 			unsubscribe();
 		}
+		listsService?.release();
 	});
 </script>
 
