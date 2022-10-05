@@ -658,7 +658,7 @@ public class ListsRepository : BaseRepository, IListsRepository
         await EFContext.SaveChangesAsync();
     }
 
-    public async Task<bool> SetTasksAsNotCompletedAsync(int id, int userId, DateTime modifiedDate)
+    public async Task<bool> UncompleteAllAsync(int id, int userId, DateTime modifiedDate)
     {
         List<ToDoTask> tasks = EFContext.Tasks.Where(x => x.ListId == id).ToList();
 

@@ -88,7 +88,11 @@
 		tasksTextInput.focus();
 	});
 
-	onDestroy(alertStateUnsub);
+	onDestroy(() => {
+		alertStateUnsub();
+		listsService?.release();
+		tasksService?.release();
+	});
 </script>
 
 <section class="container">

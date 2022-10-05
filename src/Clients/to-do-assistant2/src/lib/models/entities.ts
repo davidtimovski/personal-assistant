@@ -11,7 +11,7 @@ export class List {
 		public sharingState: SharingState,
 		public order: number,
 		public isArchived: boolean,
-		public computedListType: string,
+		public derivedListType: string,
 		public tasks: Task[],
 		public modifiedDate: string | null
 	) {}
@@ -27,6 +27,7 @@ export class Task {
 		public isHighPriority: boolean,
 		public isPrivate: boolean,
 		public assignedUser: AssignedUser,
-		public order: number
+		public order: number,
+		public modifiedDate: string
 	) {}
 }

@@ -22,6 +22,7 @@
 	import Alert from '$lib/components/Alert.svelte';
 
 	let listsService: ListsService;
+	let signalrClient: SignalRClient;
 	let user: User | null = null;
 
 	const loggedInUserUnsub = loggedInUser.subscribe(async (value) => {
@@ -34,7 +35,7 @@
 		listsService = new ListsService();
 		await listsService.getAll(true);
 
-		new SignalRClient().initialize(user.access_token, parseInt(user.profile.sub, 10));
+		await new SignalRClient(listsService).initialize(user.access_token, parseInt(user.profile.sub, 10));
 	});
 
 	onMount(() => {
@@ -57,7 +58,10 @@
 		});
 	});
 
-	onDestroy(loggedInUserUnsub);
+	onDestroy(() => {
+		loggedInUserUnsub();
+		listsService?.release();
+	});
 </script>
 
 <main>

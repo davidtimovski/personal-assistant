@@ -9,19 +9,19 @@
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 	import { loggedInUser, lists, remoteEvents } from '$lib/stores';
 	import { UsersService } from '$lib/services/usersService';
-	import { ListsService } from '$lib/services/listsService';
+	import { DerivedLists, ListsService } from '$lib/services/listsService';
 	import { TasksService } from '$lib/services/tasksService';
 	import type { ListModel } from '$lib/models/viewmodels/listModel';
 	import type { ListIcon } from '$lib/models/viewmodels/listIcon';
 	import { RemoteEventType } from '$lib/models/remoteEvents';
 
 	let imageUri: any;
-	let computedLists: ListModel[] | null = null;
+	let derivedLists: ListModel[] | null = null;
 	let regularLists: ListModel[] | null = null;
 	let iconOptions = ListsService.getIconOptions();
 	let editedId: number | undefined;
 	//let isReordering = false;
-	const computedListNameLookup = new Map<string, string>();
+	const derivedListNameLookup = new Map<string, string>();
 	let menuButtonIsLoading = false;
 	let connTracker = {
 		isOnline: true
@@ -57,7 +57,7 @@
 	}
 
 	function setListsFromState() {
-		computedLists = ListsService.getComputedForHomeScreen($lists, computedListNameLookup);
+		derivedLists = ListsService.getDerivedForHomeScreen($lists, derivedListNameLookup);
 		regularLists = ListsService.getForHomeScreen($lists);
 	}
 
@@ -89,7 +89,8 @@
 	}
 
 	onMount(() => {
-		computedListNameLookup.set(ListsService.highPriorityComputedListMoniker, $t('highPriority'));
+		derivedListNameLookup.set(DerivedLists.HighPriority, $t('highPriority'));
+		derivedListNameLookup.set(DerivedLists.StaleTasks, $t('staleTasks'));
 
 		const edited = $page.url.searchParams.get('edited');
 		if (edited) {
@@ -135,11 +136,11 @@
 		unsubscriptions.push(
 			remoteEvents.subscribe((e) => {
 				if (e.type === RemoteEventType.TaskCompletedRemotely) {
-					tasksService.completeLocal(e.data.id, e.data.listId, $lists);
+					tasksService.completeLocal(e.data.id, e.data.listId, $lists, localStorage);
 				} else if (e.type === RemoteEventType.TaskUncompletedRemotely) {
-					tasksService.uncompleteLocal(e.data.id, e.data.listId, $lists);
+					tasksService.uncompleteLocal(e.data.id, e.data.listId, $lists, localStorage);
 				} else if (e.type === RemoteEventType.TaskDeletedRemotely) {
-					tasksService.deleteLocal(e.data.id, e.data.listId, $lists);
+					tasksService.deleteLocal(e.data.id, e.data.listId, $lists, localStorage);
 				}
 
 				setListsFromState();
@@ -151,6 +152,9 @@
 		for (const unsubscribe of unsubscriptions) {
 			unsubscribe();
 		}
+		usersService?.release();
+		listsService?.release();
+		tasksService?.release();
 	});
 </script>
 
@@ -203,20 +207,12 @@
 
 	<div class="content-wrap lists">
 		<div class="to-do-lists-wrap">
-			{#if !computedLists || !regularLists}
+			{#if derivedLists && regularLists}
 				<div>
-					<div class="to-do-list-placeholder">&nbsp;</div>
-					<div class="to-do-list-placeholder">&nbsp;</div>
-					<div class="to-do-list-placeholder">&nbsp;</div>
-					<div class="to-do-list-placeholder">&nbsp;</div>
-					<div class="to-do-list-placeholder">&nbsp;</div>
-				</div>
-			{:else}
-				<div>
-					{#each computedLists as list}
-						<div class="to-do-list computed-list">
-							<i class="icon {list.computedListIconClass}" />
-							<a href="/computedList?type={list.computedListType}" class="name">{list.name}</a>
+					{#each derivedLists as list}
+						<div class="to-do-list derived-list {list.derivedListType}">
+							<i class="icon {list.derivedListIconClass}" />
+							<a href="/derivedList?type={list.derivedListType}" class="name">{list.name}</a>
 						</div>
 					{/each}
 
@@ -229,8 +225,8 @@
 						>
 							<i class="icon {getClassFromIcon(list.icon)}" />
 							<!-- <span class="sort-handle" title={$t('dragToReorder')} aria-label={$t('dragToReorder')}>
-								<i class="reorder-icon fas fa-hand-paper" />
-							</span> -->
+							<i class="reorder-icon fas fa-hand-paper" />
+						</span> -->
 							<a href="/list/{list.id}" class="name" class:highlighted={list.id === editedId}>{list.name}</a>
 							<i class="fas fa-users shared-icon" title={$t('index.shared')} aria-label={$t('index.shared')} />
 							<i
@@ -285,7 +281,7 @@
 	.to-do-lists-wrap {
 		margin-bottom: 30px;
 
-		// &.reordering .to-do-list:not(.computed-list) .icon {
+		// &.reordering .to-do-list:not(.derived-list) .icon {
 		// 	display: none;
 		// }
 	}
@@ -334,24 +330,45 @@
 			color: var(--primary-color);
 		}
 
-		&.computed-list {
+		&.derived-list {
 			margin-bottom: 25px;
 
-			i {
-				background: #fff1f1;
-				border-color: #f9a;
-				color: var(--danger-color);
-			}
-
 			.name {
-				background: #fff1f1;
-				border: 2px solid #f9a;
 				padding: 4px 15px;
 				line-height: 33px;
-				color: var(--danger-color);
+			}
 
-				&:hover {
-					background: #ffe7e7;
+			&.high-priority {
+				.name {
+					border: 2px solid;
+
+					&:hover {
+						background: #ffe7e7;
+					}
+				}
+
+				i,
+				.name {
+					background: #fff1f1;
+					border-color: #f9a;
+					color: var(--danger-color);
+				}
+			}
+
+			&.stale-tasks {
+				.name {
+					border: 2px solid;
+
+					&:hover {
+						background: #fff0de;
+					}
+				}
+
+				i,
+				.name {
+					background: #fff7e4;
+					border-color: #f9ba76;
+					color: #dd7001;
 				}
 			}
 		}
@@ -413,40 +430,7 @@
 	// 	cursor: grab;
 	// 	cursor: -webkit-grab;
 	// }
-	// .reordering .to-do-list:not(.computed-list) .reorder-icon {
+	// .reordering .to-do-list:not(.derived-list) .reorder-icon {
 	// 	display: inline-block !important;
 	// }
-
-	.to-do-list-placeholder {
-		background: #e9f4ff;
-		border-radius: var(--border-radius);
-		padding: 9px 10px;
-		margin: 12px 0;
-		line-height: 27px;
-		user-select: none;
-
-		&:first-child {
-			margin-top: 0;
-		}
-
-		&:last-child {
-			margin-bottom: 0;
-		}
-
-		&:nth-child(2) {
-			opacity: 0.85;
-		}
-
-		&:nth-child(3) {
-			opacity: 0.65;
-		}
-
-		&:nth-child(4) {
-			opacity: 0.55;
-		}
-
-		&:nth-child(5) {
-			opacity: 0.35;
-		}
-	}
 </style>

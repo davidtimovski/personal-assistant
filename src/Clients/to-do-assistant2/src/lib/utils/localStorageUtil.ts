@@ -5,7 +5,8 @@ export class LocalStorageUtil extends LocalStorageBase {
 		super(
 			new Map<string, any>([
 				[LocalStorageKeys.SoundsEnabled, true],
-				[LocalStorageKeys.HighPriorityListEnabled, true]
+				[LocalStorageKeys.HighPriorityListEnabled, true],
+				[LocalStorageKeys.StaleTasksListEnabled, true]
 			])
 		);
 	}
@@ -13,5 +14,6 @@ export class LocalStorageUtil extends LocalStorageBase {
 
 export enum LocalStorageKeys {
 	SoundsEnabled = 'soundsEnabled',
-	HighPriorityListEnabled = 'highPriorityListEnabled'
+	HighPriorityListEnabled = 'highPriorityListEnabled',
+	StaleTasksListEnabled = 'staleTasksListEnabled'
 }

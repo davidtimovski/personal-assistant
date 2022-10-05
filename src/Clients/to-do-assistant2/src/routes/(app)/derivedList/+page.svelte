@@ -8,11 +8,13 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 
+	import { DateHelper } from '../../../../../shared2/utils/dateHelper';
+
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { lists, remoteEvents } from '$lib/stores';
 	import { TasksService } from '$lib/services/tasksService';
-	import { ListsService } from '$lib/services/listsService';
+	import { DerivedLists, ListsService } from '$lib/services/listsService';
 	import type { ListTask } from '$lib/models/viewmodels/listTask';
 	import { SoundPlayer } from '$lib/utils/soundPlayer';
 	import { RemoteEventType } from '$lib/models/remoteEvents';
@@ -22,12 +24,13 @@
 	let tasks = new Array<ListTask>();
 	let privateTasks = new Array<ListTask>();
 	let iconClass: string | null = null;
+	let language: string;
 	let shadowTasks: ListTask[];
 	let shadowPrivateTasks: ListTask[];
 	let searchTasksText = '';
 	let editedId: number | undefined;
 	let soundsEnabled = false;
-	const computedListNameLookup = new Map<string, string>();
+	const derivedListNameLookup = new Map<string, string>();
 	const unsubscriptions: Unsubscriber[] = [];
 
 	let localStorage: LocalStorageUtil;
@@ -51,6 +54,10 @@
 			};
 		}
 	});
+
+	function formatStaleTaskDate(modifiedDate: string): string {
+		return DateHelper.formatDayMonth(new Date(modifiedDate), language);
+	}
 
 	function searchTasksInputChanged() {
 		if (searchTasksText.trim().length > 0) {
@@ -96,17 +103,18 @@
 			if (!remote) {
 				await tasksService.delete(task.id);
 			}
-			tasksService.deleteLocal(task.id, task.listId, $lists);
+			tasksService.deleteLocal(task.id, task.listId, $lists, localStorage);
 		} else {
 			if (!remote) {
 				await tasksService.complete(task.id);
 			}
-			tasksService.completeLocal(task.id, task.listId, $lists);
+			tasksService.completeLocal(task.id, task.listId, $lists, localStorage);
 		}
 	}
 
 	onMount(async () => {
-		computedListNameLookup.set(ListsService.highPriorityComputedListMoniker, $t('highPriority'));
+		derivedListNameLookup.set(DerivedLists.HighPriority, $t('highPriority'));
+		derivedListNameLookup.set(DerivedLists.StaleTasks, $t('staleTasks'));
 
 		type = <string>$page.url.searchParams.get('type');
 
@@ -119,6 +127,8 @@
 		tasksService = new TasksService();
 		soundPlayer = new SoundPlayer();
 
+		language = localStorage.get('language');
+
 		soundsEnabled = localStorage.getBool(LocalStorageKeys.SoundsEnabled);
 		if (soundsEnabled) {
 			soundPlayer.initialize();
@@ -130,12 +140,12 @@
 					return;
 				}
 
-				const list = l.find((x) => x.computedListType === type);
+				const list = l.find((x) => x.derivedListType === type);
 				if (!list) {
 					goto('/');
 				} else {
-					name = <string>computedListNameLookup.get(type);
-					iconClass = ListsService.getComputedListIconClass(type);
+					name = <string>derivedListNameLookup.get(type);
+					iconClass = ListsService.getDerivedListIconClass(type);
 
 					tasks = TasksService.getTasks(list.tasks);
 					privateTasks = TasksService.getPrivateTasks(list.tasks);
@@ -156,7 +166,7 @@
 						complete(task, true);
 					}
 				} else if (e.type === RemoteEventType.TaskUncompletedRemotely) {
-					const list = $lists.find((x) => x.computedListType === type);
+					const list = $lists.find((x) => x.derivedListType === type);
 					if (!list) {
 						throw new Error('List not found');
 					}
@@ -180,6 +190,7 @@
 		for (const unsubscribe of unsubscriptions) {
 			unsubscribe();
 		}
+		tasksService?.release();
 	});
 </script>
 
@@ -202,38 +213,43 @@
 						type="text"
 						bind:value={searchTasksText}
 						on:keyup={searchTasksInputChanged}
-						placeholder={$t('computedList.searchTasks')}
-						aria-label={$t('computedList.searchTasks')}
+						placeholder={$t('derivedList.searchTasks')}
+						aria-label={$t('derivedList.searchTasks')}
 						maxlength="50"
 					/>
 					<i
 						class="fas fa-times"
 						on:click={clearFilter}
 						role="button"
-						title={$t('computedList.clear')}
-						aria-label={$t('computedList.clear')}
+						title={$t('derivedList.clear')}
+						aria-label={$t('derivedList.clear')}
 					/>
 				</div>
 			</form>
 
 			{#if privateTasks.length > 0}
-				<div class="computed-to-do-tasks-wrap private">
+				<div class="to-do-tasks-wrap private" class:high-priority={type === DerivedLists.HighPriority}>
 					<div class="private-tasks-label">
 						<i class="fas fa-key" />
-						<span>{$t('computedList.privateTasks')}</span>
+						<span>{$t('derivedList.privateTasks')}</span>
 					</div>
 
 					{#each privateTasks as task (task.id)}
 						<div class="to-do-task" in:receive={{ key: task.id }} animate:flip>
 							<div class="to-do-task-content" class:highlighted={task.id === editedId}>
+								{#if type === DerivedLists.StaleTasks}
+									<span class="unchanged-since">{formatStaleTaskDate(task.modifiedDate)}</span>
+								{/if}
+
 								<span class="name">{task.name}</span>
+
 								<button
 									type="button"
 									on:click={() => complete(task)}
 									class="check-button"
 									class:one-time={task.isOneTime}
-									title={$t('computedList.complete')}
-									aria-label={$t('computedList.complete')}
+									title={$t('derivedList.complete')}
+									aria-label={$t('derivedList.complete')}
 								>
 									<i class="far fa-square" />
 									<i class="fas fa-trash-alt" />
@@ -244,7 +260,7 @@
 				</div>
 			{/if}
 
-			<div class="computed-to-do-tasks-wrap">
+			<div class="to-do-tasks-wrap" class:high-priority={type === DerivedLists.HighPriority}>
 				{#each tasks as task (task.id)}
 					<div class="to-do-task" in:receive={{ key: task.id }} animate:flip>
 						{#if task.assignedUser}
@@ -252,14 +268,19 @@
 						{/if}
 
 						<div class="to-do-task-content" class:highlighted={task.id === editedId} class:assigned={task.assignedUser}>
+							{#if type === DerivedLists.StaleTasks}
+								<span class="unchanged-since">{formatStaleTaskDate(task.modifiedDate)}</span>
+							{/if}
+
 							<span class="name">{task.name}</span>
+
 							<button
 								type="button"
 								on:click={() => complete(task)}
 								class="check-button"
 								class:one-time={task.isOneTime}
-								title={$t('computedList.complete')}
-								aria-label={$t('computedList.complete')}
+								title={$t('derivedList.complete')}
+								aria-label={$t('derivedList.complete')}
 							>
 								<i class="far fa-square" />
 								<i class="fas fa-trash-alt" />
@@ -310,8 +331,12 @@
 		}
 	}
 
-	.computed-to-do-tasks-wrap {
+	.to-do-tasks-wrap {
 		margin-top: 35px;
+
+		&.high-priority .to-do-task .to-do-task-content .name {
+			padding-left: 50px;
+		}
 
 		&.private {
 			background: #f4faff;
@@ -362,10 +387,17 @@
 					margin-bottom: 0;
 				}
 
+				.unchanged-since {
+					padding: 9px 5px;
+					line-height: 27px;
+					white-space: nowrap;
+					color: #dd7001;
+				}
+
 				.name {
 					width: 100%;
 					border-bottom: 1px solid #ddd;
-					padding: 9px 5px 9px 50px;
+					padding: 9px 5px;
 					line-height: 27px;
 					text-align: center;
 					cursor: default;

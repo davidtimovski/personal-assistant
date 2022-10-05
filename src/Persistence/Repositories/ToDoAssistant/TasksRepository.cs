@@ -352,6 +352,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
         }
 
         task.Order = 1;
+        task.ModifiedDate = DateTime.UtcNow;
 
         await EFContext.SaveChangesAsync();
     }
@@ -386,6 +387,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
 
         task.IsCompleted = false;
         task.Order = newOrder;
+        task.ModifiedDate = DateTime.UtcNow;
 
         await EFContext.SaveChangesAsync();
     }

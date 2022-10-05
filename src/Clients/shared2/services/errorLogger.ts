@@ -20,8 +20,8 @@ export class ErrorLogger {
       return;
     }
 
-    let message = "",
-      stackTrace = null;
+    let message = "";
+    let stackTrace: string | undefined;
 
     if (error instanceof Error) {
       message = error.message;
@@ -44,5 +44,9 @@ export class ErrorLogger {
         }),
       }
     );
+  }
+
+  release() {
+    this.httpProxy.release();
   }
 }

@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
+	import { onDestroy } from 'svelte';
+	import type { Unsubscriber } from 'svelte/store';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
@@ -13,6 +15,7 @@
 	let name = '';
 	let uncompleteText = '';
 	let uncompleteButtonIsLoading = false;
+	let listsUnsub: Unsubscriber;
 
 	let listsService: ListsService;
 
@@ -20,7 +23,7 @@
 		uncompleteButtonIsLoading = true;
 
 		try {
-			await listsService.setTasksAsNotCompleted(data.id);
+			await listsService.uncompleteAllTasks(data.id);
 
 			alertState.update((x) => {
 				x.showSuccess('uncompleteTasks.uncompleteTasksSuccessful');
@@ -35,7 +38,7 @@
 	onMount(async () => {
 		listsService = new ListsService();
 
-		return lists.subscribe((l) => {
+		listsUnsub = lists.subscribe((l) => {
 			if (l.length === 0) {
 				return;
 			}
@@ -52,6 +55,11 @@
 					: 'uncompleteTasks.thisWillUncomplete'
 			);
 		});
+	});
+
+	onDestroy(() => {
+		listsUnsub();
+		listsService?.release();
 	});
 </script>
 

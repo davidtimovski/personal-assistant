@@ -1,6 +1,7 @@
 {
 	"files.exclude": {
 		".svelte-kit": true,
+		".vscode": true,
 		"build": true,
 		"node_modules": true,
 		".env.production.local": true

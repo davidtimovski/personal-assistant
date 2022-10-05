@@ -16,6 +16,7 @@ export default {
 		deleteOnCompletion: 'Delete tasks on completion',
 		dragToReorder: 'Drag to reorder',
 		highPriority: 'High Priority',
+		staleTasks: 'Stale Tasks',
 		index: {
 			menu: 'Menu',
 			reorderLists: 'Reorder lists',
@@ -52,7 +53,7 @@ export default {
 			restore: 'Restore',
 			emptyListMessage: "There's nothing here"
 		},
-		computedList: {
+		derivedList: {
 			searchTasks: 'Search tasks',
 			clear: 'Clear',
 			complete: 'Complete',
@@ -180,7 +181,9 @@ export default {
 			notificationsUnpermitted:
 				'Notifications are currently unpermitted. Please permit Notifications for To Do Assistant in your browser first.',
 			sounds: 'Sounds',
-			showHighPriorityList: 'Show High Priority list'
+			derivedLists: 'Derived lists',
+			highPriorityList: 'High Priority list',
+			staleTasksList: 'Stale Tasks list'
 		},
 		notFound: {
 			youSeemLost: 'You seem lost..',
@@ -233,6 +236,7 @@ export default {
 		deleteOnCompletion: 'Бриши задачи при комплетирање',
 		dragToReorder: 'Влечи за подредување',
 		highPriority: 'Висок Приоритет',
+		staleTasks: 'Застарени Задачи',
 		index: {
 			menu: 'Мени',
 			reorderLists: 'Подреди листи',
@@ -269,7 +273,7 @@ export default {
 			restore: 'Врати',
 			emptyListMessage: 'Нема ништо овде'
 		},
-		computedList: {
+		derivedList: {
 			searchTasks: 'Пребарај задачи',
 			clear: 'Исчисти',
 			complete: 'Заврши',
@@ -399,7 +403,9 @@ export default {
 			notificationsUnpermitted:
 				'Известувањата моментално се забранети. Дадете дозвола за известувања на To Do Assistant во вашиот пребарувач прво.',
 			sounds: 'Звуци',
-			showHighPriorityList: 'Прикажи листа од Висок Приоритет'
+			derivedLists: 'Изведени листи',
+			highPriorityList: 'Листа од Висок Приоритет',
+			staleTasksList: 'Листа од Застарени Задачи'
 		},
 		notFound: {
 			youSeemLost: 'Се изгубивте?',

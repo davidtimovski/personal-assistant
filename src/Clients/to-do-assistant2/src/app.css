@@ -102,12 +102,6 @@ textarea {
 	color: var(--primary-color);
 }
 
-.alert-message {
-	padding: 12px 10px;
-	line-height: 27px;
-	text-align: center;
-}
-
 /* Workaround for sticky :hover on mobile devices */
 .touch-device .lists-reorder-toggle.checked:hover,
 .touch-device .tasks-reorder-toggle.checked:hover {

@@ -9,6 +9,7 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { alertState, lists } from '$lib/stores';
+	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 	import { TasksService } from '$lib/services/tasksService';
 	import { ListsService } from '$lib/services/listsService';
 	import type { AssigneeOption } from '$lib/models/viewmodels/assigneeOption';
@@ -47,6 +48,7 @@
 		}
 	});
 
+	let localStorage: LocalStorageUtil;
 	let tasksService: TasksService;
 	let listsService: ListsService;
 
@@ -118,7 +120,7 @@
 			deleteButtonIsLoading = true;
 
 			await tasksService.delete(data.id);
-			tasksService.deleteLocal(data.id, listId, $lists);
+			tasksService.deleteLocal(data.id, listId, $lists, localStorage);
 
 			alertState.update((x) => {
 				x.showSuccess('editTask.deleteSuccessful');
@@ -147,6 +149,7 @@
 	onMount(async () => {
 		deleteButtonText = $t('delete');
 
+		localStorage = new LocalStorageUtil();
 		tasksService = new TasksService();
 		listsService = new ListsService();
 
@@ -180,7 +183,11 @@
 		});
 	});
 
-	onDestroy(alertStateUnsub);
+	onDestroy(() => {
+		alertStateUnsub();
+		tasksService?.release();
+		listsService?.release();
+	});
 </script>
 
 <section class="container">

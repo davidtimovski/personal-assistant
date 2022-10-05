@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
 using Api.Config;
 using Api.Controllers.ToDoAssistant;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Moq;
 using Api.UnitTests.Builders;
 using Application.Contracts.ToDoAssistant.Lists;
 using Application.Contracts.ToDoAssistant.Lists.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Moq;
 using Xunit;
 
 namespace Api.UnitTests.Controllers.ToDoAssistant;
@@ -92,9 +92,9 @@ public class ListsControllerTests
     }
 
     [Fact]
-    public async Task SetTasksAsNotCompleted_Returns400_IfBodyMissing()
+    public async Task UncompleteAll_Returns400_IfBodyMissing()
     {
-        var result = await _sut.SetTasksAsNotCompleted(null);
+        var result = await _sut.UncompleteAll(null);
         Assert.IsType<BadRequestResult>(result);
     }
 

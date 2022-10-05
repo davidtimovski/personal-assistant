@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using FluentValidation;
 using Application.Contracts.ToDoAssistant.Lists.Models;
 using Domain.Entities.Common;
+using FluentValidation;
 
 namespace Application.Contracts.ToDoAssistant.Lists;
 
@@ -39,7 +39,7 @@ public interface IListService
     Task<LeaveListResult> LeaveAsync(int id, int userId);
     Task<int> CopyAsync(CopyList model, IValidator<CopyList> validator);
     Task SetIsArchivedAsync(int id, int userId, bool isArchived);
-    Task<SetTasksAsNotCompletedResult> SetTasksAsNotCompletedAsync(int id, int userId);
+    Task<SetTasksAsNotCompletedResult> UncompleteAllAsync(int id, int userId);
     Task<SetShareIsAcceptedResult> SetShareIsAcceptedAsync(int id, int userId, bool isAccepted);
     Task ReorderAsync(int id, int userId, short oldOrder, short newOrder);
 }

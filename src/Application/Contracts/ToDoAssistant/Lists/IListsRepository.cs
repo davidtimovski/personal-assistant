@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Domain.Entities;
 using Domain.Entities.Common;
 using Domain.Entities.ToDoAssistant;
 
@@ -41,7 +40,7 @@ public interface IListsRepository
     Task<ListShare> LeaveAsync(int id, int userId);
     Task<int> CopyAsync(ToDoList list);
     Task SetIsArchivedAsync(int id, int userId, bool isArchived, DateTime modifiedDate);
-    Task<bool> SetTasksAsNotCompletedAsync(int id, int userId, DateTime modifiedDate);
+    Task<bool> UncompleteAllAsync(int id, int userId, DateTime modifiedDate);
     Task SetShareIsAcceptedAsync(int id, int userId, bool isAccepted, DateTime modifiedDate);
     Task ReorderAsync(int id, int userId, short oldOrder, short newOrder, DateTime modifiedDate);
 }

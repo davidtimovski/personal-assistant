@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
+	import { onDestroy } from 'svelte';
+	import type { Unsubscriber } from 'svelte/store';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
@@ -13,6 +15,7 @@
 	let name = '';
 	let archivingAListText = '';
 	let archiveButtonIsLoading = false;
+	let listsUnsub: Unsubscriber;
 
 	let listsService: ListsService;
 
@@ -35,7 +38,7 @@
 	onMount(async () => {
 		listsService = new ListsService();
 
-		return lists.subscribe((l) => {
+		listsUnsub = lists.subscribe((l) => {
 			if (l.length === 0) {
 				return;
 			}
@@ -50,6 +53,11 @@
 				list.sharingState === SharingState.NotShared ? 'archiveList.archivingAList' : 'archiveList.archivingAListShared'
 			);
 		});
+	});
+
+	onDestroy(() => {
+		listsUnsub();
+		listsService?.release();
 	});
 </script>
 

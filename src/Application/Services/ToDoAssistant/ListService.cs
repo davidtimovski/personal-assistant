@@ -439,14 +439,14 @@ public class ListService : IListService
         await _listsRepository.SetIsArchivedAsync(id, userId, isArchived, DateTime.UtcNow);
     }
 
-    public async Task<SetTasksAsNotCompletedResult> SetTasksAsNotCompletedAsync(int id, int userId)
+    public async Task<SetTasksAsNotCompletedResult> UncompleteAllAsync(int id, int userId)
     {
         if (!UserOwnsOrShares(id, userId))
         {
             throw new ValidationException("Unauthorized");
         }
 
-        bool nonPrivateTasksWereUncompleted = await _listsRepository.SetTasksAsNotCompletedAsync(id, userId, DateTime.UtcNow);
+        bool nonPrivateTasksWereUncompleted = await _listsRepository.UncompleteAllAsync(id, userId, DateTime.UtcNow);
         if (!nonPrivateTasksWereUncompleted)
         {
             return new SetTasksAsNotCompletedResult();

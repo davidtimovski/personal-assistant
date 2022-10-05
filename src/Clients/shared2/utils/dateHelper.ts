@@ -1,7 +1,9 @@
 export class DateHelper {
   /** Format as yyyy-MM-dd. */
   static format(date: Date): string {
-    return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().split("T")[0];
+    return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+      .toISOString()
+      .split("T")[0];
   }
 
   /** Format as dd/MM/yyyy. */
@@ -11,12 +13,32 @@ export class DateHelper {
 
   /** Format as yyyy-MM. */
   static formatYYYYMM(date: Date): string {
-    return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().substring(0, 7);
+    return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+      .toISOString()
+      .substring(0, 7);
+  }
+
+  /** Format to show the day, month, and possibly year in the specified locale */
+  static formatDayMonth(date: Date, language: string): string {
+    if (date.getFullYear() === new Date().getFullYear()) {
+      return date.toLocaleDateString(language, {
+        day: "numeric",
+        month: "short",
+      });
+    }
+
+    return date.toLocaleDateString(language, {
+      day: "numeric",
+      month: "short",
+      year: "2-digit",
+    });
   }
 
   /** Format as HH:mm. */
   static formatHoursMinutes(date: Date): string {
-    const timePart = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().split("T")[1];
+    const timePart = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+      .toISOString()
+      .split("T")[1];
 
     return timePart.substring(0, 5);
   }

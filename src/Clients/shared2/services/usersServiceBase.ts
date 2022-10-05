@@ -7,12 +7,13 @@ export class UsersServiceBase {
   private readonly profileImageThumbRegex =
     /res.cloudinary.com\/personalassistant\/t_profile_thumbnail\/(development|production)\/users/g;
 
-  protected readonly httpProxy = new HttpProxy();
+  protected readonly httpProxy: HttpProxy;
   protected readonly localStorageBase = new LocalStorageBase();
   protected readonly logger: ErrorLogger;
 
-  constructor(application: string) {
-    this.logger = new ErrorLogger(application);
+  constructor(application: string, client: string) {
+    this.httpProxy = new HttpProxy(client);
+    this.logger = new ErrorLogger(application, client);
   }
 
   profileImageUriIsStale(): boolean {
@@ -70,5 +71,9 @@ export class UsersServiceBase {
       this.logger.logError(e);
       throw e;
     }
+  }
+
+  release() {
+    this.httpProxy.release();
   }
 }
