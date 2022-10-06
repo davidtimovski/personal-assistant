@@ -125,35 +125,31 @@ export class TasksService {
 
 		if (task.isHighPriority && localStorage.getBool(LocalStorageKeys.HighPriorityListEnabled)) {
 			const highPriorityList = localLists.find((x) => x.derivedListType === DerivedLists.HighPriority);
-			if (!highPriorityList) {
-				throw new Error(`Could not find derived list of type ${DerivedLists.HighPriority}`);
-			}
-
-			if (highPriorityList.tasks.length > 1) {
-				const index = highPriorityList.tasks.indexOf(task);
-				highPriorityList.tasks.splice(index, 1);
-			} else {
-				const index = localLists.indexOf(highPriorityList);
-				localLists.splice(index, 1);
+			if (highPriorityList) {
+				if (highPriorityList.tasks.length > 1) {
+					const index = highPriorityList.tasks.indexOf(task);
+					highPriorityList.tasks.splice(index, 1);
+				} else {
+					const index = localLists.indexOf(highPriorityList);
+					localLists.splice(index, 1);
+				}
 			}
 		}
 
 		if (localStorage.getBool(LocalStorageKeys.StaleTasksListEnabled)) {
 			const staleTasksList = localLists.find((x) => x.derivedListType === DerivedLists.StaleTasks);
-			if (!staleTasksList) {
-				throw new Error(`Could not find derived list of type ${DerivedLists.StaleTasks}`);
-			}
+			if (staleTasksList) {
+				const index = staleTasksList.tasks.indexOf(task);
+				if (index === -1) {
+					return;
+				}
 
-			const index = staleTasksList.tasks.indexOf(task);
-			if (index === -1) {
-				return;
-			}
-
-			if (staleTasksList.tasks.length > 1) {
-				staleTasksList.tasks.splice(index, 1);
-			} else {
-				const index = localLists.indexOf(staleTasksList);
-				localLists.splice(index, 1);
+				if (staleTasksList.tasks.length > 1) {
+					staleTasksList.tasks.splice(index, 1);
+				} else {
+					const index = localLists.indexOf(staleTasksList);
+					localLists.splice(index, 1);
+				}
 			}
 		}
 
@@ -216,35 +212,31 @@ export class TasksService {
 
 		if (task.isHighPriority && localStorage.getBool(LocalStorageKeys.HighPriorityListEnabled)) {
 			const highPriorityList = localLists.find((x) => x.derivedListType === DerivedLists.HighPriority);
-			if (!highPriorityList) {
-				throw new Error(`Could not find derived list of type ${DerivedLists.HighPriority}`);
-			}
-
-			if (highPriorityList.tasks.length > 1) {
-				const index = highPriorityList.tasks.indexOf(task);
-				highPriorityList.tasks.splice(index, 1);
-			} else {
-				const index = localLists.indexOf(highPriorityList);
-				localLists.splice(index, 1);
+			if (highPriorityList) {
+				if (highPriorityList.tasks.length > 1) {
+					const index = highPriorityList.tasks.indexOf(task);
+					highPriorityList.tasks.splice(index, 1);
+				} else {
+					const index = localLists.indexOf(highPriorityList);
+					localLists.splice(index, 1);
+				}
 			}
 		}
 
 		if (localStorage.getBool(LocalStorageKeys.StaleTasksListEnabled)) {
 			const staleTasksList = localLists.find((x) => x.derivedListType === DerivedLists.StaleTasks);
-			if (!staleTasksList) {
-				throw new Error(`Could not find derived list of type ${DerivedLists.StaleTasks}`);
-			}
+			if (staleTasksList) {
+				const index = staleTasksList.tasks.indexOf(task);
+				if (index === -1) {
+					return;
+				}
 
-			const index = staleTasksList.tasks.indexOf(task);
-			if (index === -1) {
-				return;
-			}
-
-			if (staleTasksList.tasks.length > 1) {
-				staleTasksList.tasks.splice(index, 1);
-			} else {
-				const index = localLists.indexOf(staleTasksList);
-				localLists.splice(index, 1);
+				if (staleTasksList.tasks.length > 1) {
+					staleTasksList.tasks.splice(index, 1);
+				} else {
+					const index = localLists.indexOf(staleTasksList);
+					localLists.splice(index, 1);
+				}
 			}
 		}
 

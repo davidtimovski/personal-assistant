@@ -511,7 +511,7 @@
 			<i class="fas fa-random" />
 		</label> -->
 
-		<div class="page-title tasks">{name}</div>
+		<div class="page-title">{name}</div>
 
 		<label
 			class="search-toggle"
@@ -534,9 +534,7 @@
 				<div class="top-buttons-drawer-wrap">
 					<div class="top-buttons-drawer-content horizontal-buttons-wrap">
 						<a href="/bulkAddTasks/{data.id}" class="wide-button">{$t('list.bulkAddTasks')}</a>
-						<a href="/shareList/{data.id}" class="wide-button" style="text-decoration: line-through"
-							>{shareButtonText}</a
-						>
+						<a href="/shareList/{data.id}" class="wide-button">{shareButtonText}</a>
 						<a href="/copyList/{data.id}" class="wide-button">{$t('list.copy')}</a>
 						<a href="/uncompleteTasks/{data.id}" class="wide-button">{$t('list.uncompleteAllTasks')}</a>
 
@@ -849,8 +847,14 @@
 </section>
 
 <style lang="scss">
-	.page-title.tasks {
+	.page-title {
 		padding: 10px 48px 10px 38px;
+	}
+
+	.alert-message {
+		padding: 12px 10px;
+		line-height: 27px;
+		text-align: center;
 	}
 
 	.add-input-wrap {
