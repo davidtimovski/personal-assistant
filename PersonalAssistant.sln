@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api.UnitTests", "test\Api.U
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.UnitTests", "test\Application.UnitTests\Application.UnitTests.csproj", "{9D41BEF4-4EA3-459B-B4F4-F826BA058B1D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Worker", "src\Worker\Worker.csproj", "{ACDE4E64-CEB1-4BD1-B894-9987EFA0F935}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jobs", "src\Jobs\Jobs.csproj", "{ACDE4E64-CEB1-4BD1-B894-9987EFA0F935}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sender", "src\Sender\Sender.csproj", "{B1D9FE08-DFFB-4F8B-9102-013139B77E7D}"
 EndProject
@@ -48,8 +48,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.github\workflows\cd_clientlogger.yml = .github\workflows\cd_clientlogger.yml
 		.github\workflows\cd_gateway.yml = .github\workflows\cd_gateway.yml
 		.github\workflows\cd_sender.yml = .github\workflows\cd_sender.yml
-		.github\workflows\test.yml = .github\workflows\test.yml
 		.github\workflows\ci_dev.yml = .github\workflows\ci_dev.yml
+		.github\workflows\test.yml = .github\workflows\test.yml
 	EndProjectSection
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{A1987576-C974-4672-AA1E-868237023E5F}"

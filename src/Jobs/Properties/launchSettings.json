@@ -1,13 +1,10 @@
 {
   "profiles": {
-    "PersonalAssistant.WorkerService": {
+    "PersonalAssistant.Jobs": {
       "commandName": "Project",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
-    },
-    "Docker": {
-      "commandName": "Docker"
     }
   }
 }
