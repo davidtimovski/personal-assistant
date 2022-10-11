@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 
@@ -8,7 +8,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
-	import { syncStatus } from '$lib/stores';
+	import { locale, syncStatus } from '$lib/stores';
 	import { UpcomingExpensesService } from '$lib/services/upcomingExpensesService';
 	import { UpcomingExpenseItem } from '$lib/models/viewmodels/upcomingExpenseItem';
 	import { AppEvents } from '$lib/models/appEvents';
@@ -17,7 +17,6 @@
 
 	let upcomingExpenses: UpcomingExpenseItem[] | null = null;
 	let currency: string;
-	let language: string;
 	let editedId: number | undefined;
 
 	let localStorage: LocalStorageUtil;
@@ -25,7 +24,7 @@
 
 	function formatDate(dateString: string): string {
 		const date = new Date(Date.parse(dateString));
-		const month = DateHelper.getLongMonth(date, language);
+		const month = DateHelper.getLongMonth(date, $locale);
 
 		const now = new Date();
 		if (now.getFullYear() === date.getFullYear()) {
@@ -45,7 +44,6 @@
 		upcomingExpensesService = new UpcomingExpensesService();
 
 		currency = localStorage.get(LocalStorageKeys.Currency);
-		language = localStorage.get('language');
 
 		const upcomingExpensesForMonth = await upcomingExpensesService.getAll(currency);
 
@@ -64,6 +62,10 @@
 		}
 
 		upcomingExpenses = upcomingExpenseItems;
+	});
+
+	onDestroy(() => {
+		upcomingExpensesService?.release();
 	});
 </script>
 
@@ -110,7 +112,7 @@
 									</a>
 								</td>
 								<td>{upcomingExpense.date}</td>
-								<td>{Formatter.number(upcomingExpense.amount, currency)}</td>
+								<td>{Formatter.number(upcomingExpense.amount, currency, $locale)}</td>
 								<td>{upcomingExpense.category}</td>
 								<td class="sync-icon-cell">
 									{#if !upcomingExpense.synced}

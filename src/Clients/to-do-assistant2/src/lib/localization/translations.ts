@@ -75,12 +75,11 @@ export default {
 		shareList: {
 			share: 'Share',
 			addMember: 'Add member',
-			removeMember: 'Remove member',
+			remove: 'Remove',
 			newMemberEmail: 'New member email',
 			newAdminEmail: 'New admin email',
 			member: 'Member',
 			admin: 'Admin',
-			shareWith: 'Share with',
 			members: 'Members',
 			owner: 'Owner',
 			newlyAddedMember: 'Newly added member',
@@ -182,8 +181,8 @@ export default {
 				'Notifications are currently unpermitted. Please permit Notifications for To Do Assistant in your browser first.',
 			sounds: 'Sounds',
 			derivedLists: 'Derived lists',
-			highPriorityList: 'High Priority list',
-			staleTasksList: 'Stale Tasks list'
+			highPriority: 'High Priority',
+			staleTasks: 'Stale Tasks'
 		},
 		notFound: {
 			youSeemLost: 'You seem lost..',
@@ -297,12 +296,11 @@ export default {
 		shareList: {
 			share: 'Сподели',
 			addMember: 'Додади член',
-			removeMember: 'Отстрани член',
+			remove: 'Отстрани',
 			newMemberEmail: 'Емаил на нов член',
 			newAdminEmail: 'Емаил на нов админ',
 			member: 'Член',
 			admin: 'Админ',
-			shareWith: 'Сподели со',
 			members: 'Членови',
 			owner: 'Сопственик',
 			newlyAddedMember: 'Ново додаден член',
@@ -404,8 +402,8 @@ export default {
 				'Известувањата моментално се забранети. Дадете дозвола за известувања на To Do Assistant во вашиот пребарувач прво.',
 			sounds: 'Звуци',
 			derivedLists: 'Изведени листи',
-			highPriorityList: 'Листа од Висок Приоритет',
-			staleTasksList: 'Листа од Застарени Задачи'
+			highPriority: 'Висок Приоритет',
+			staleTasks: 'Застарени Задачи'
 		},
 		notFound: {
 			youSeemLost: 'Се изгубивте?',

@@ -16,7 +16,7 @@ export class CapitalService {
 	private readonly upcomingExpensesIDBHelper = new UpcomingExpensesIDBHelper();
 	private readonly debtsIDBHelper = new DebtsIDBHelper();
 	private readonly transactionsService = new TransactionsService();
-	private readonly currenciesService = new CurrenciesService('Accountant');
+	private readonly currenciesService = new CurrenciesService('Accountant', 'accountant2');
 	private readonly logger = new ErrorLogger('Accountant', 'accountant2');
 
 	async getSpent(
@@ -96,6 +96,11 @@ export class CapitalService {
 			this.logger.logError(e);
 			throw e;
 		}
+	}
+
+	release() {
+		this.currenciesService.release();
+		this.logger.release();
 	}
 
 	private trimDebtDescription(description: string | null, combinedLabel: string): string {

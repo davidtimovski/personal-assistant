@@ -5,7 +5,7 @@ export class LocalStorageUtil extends LocalStorageBase {
 		super(
 			new Map<string, any>([
 				[LocalStorageKeys.Currency, 'EUR'],
-				['currencyRates', { EUR: 1 }],
+				[LocalStorageKeys.CurrencyRates, { EUR: 1 }],
 				[LocalStorageKeys.LastSynced, '1970-01-01T00:00:00.000Z'],
 				[LocalStorageKeys.MergeDebtPerPerson, true],
 				[LocalStorageKeys.ShowUpcomingExpensesOnHomePage, true],
@@ -17,6 +17,7 @@ export class LocalStorageUtil extends LocalStorageBase {
 
 export enum LocalStorageKeys {
 	Currency = 'currency',
+	CurrencyRates = 'currencyRates',
 	LastSynced = 'lastSynced',
 	MergeDebtPerPerson = 'mergeDebtPerPerson',
 	ShowUpcomingExpensesOnHomePage = 'showUpcomingExpensesOnHomePage',

@@ -4,8 +4,7 @@
 	export const ssr = false;
 	export const prerender = true;
 
-	import { onMount } from 'svelte/internal';
-	import { onDestroy } from 'svelte';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import { page } from '$app/stores';
 	import type { Unsubscriber } from 'svelte/store';
 
@@ -14,15 +13,17 @@
 	import { CurrenciesService } from '../../../../shared2/services/currenciesService';
 
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
-	import { locale } from '$lib/localization/i18n';
 	import { SyncService } from '$lib/services/syncService';
-	import { isOnline, loggedInUser, syncStatus } from '$lib/stores';
+	import { locale, isOnline, loggedInUser, syncStatus } from '$lib/stores';
 	import { AppEvents } from '$lib/models/appEvents';
 
 	import Alert from '$lib/components/Alert.svelte';
 
 	let localStorage: LocalStorageUtil;
 	const unsubscriptions: Unsubscriber[] = [];
+
+	let syncService: SyncService;
+	let currenciesService: CurrenciesService;
 
 	unsubscriptions.push(
 		loggedInUser.subscribe((value) => {
@@ -41,7 +42,7 @@
 
 		syncStatus.set(AppEvents.SyncStarted);
 
-		const syncService = new SyncService();
+		syncService = new SyncService();
 		const syncPromises = new Array<Promise<any>>();
 
 		const lastSynced = localStorage.get(LocalStorageKeys.LastSynced);
@@ -50,7 +51,7 @@
 		});
 		syncPromises.push(syncPromise);
 
-		const currenciesService = new CurrenciesService('Accountant');
+		currenciesService = new CurrenciesService('Accountant', 'accountant2');
 		const ratesPromise = currenciesService.loadRates();
 		syncPromises.push(ratesPromise);
 
@@ -92,6 +93,8 @@
 		for (const unsubscribe of unsubscriptions) {
 			unsubscribe();
 		}
+		syncService?.release();
+		currenciesService?.release();
 	});
 </script>
 

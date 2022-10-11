@@ -1,15 +1,16 @@
 import { ErrorLogger } from "./errorLogger";
 import { HttpProxy } from "../services/httpProxy";
-import { LocalStorageCurrencies } from "../utils/localStorageCurrencies";
+import { LocalStorageBase } from "../utils/localStorageBase";
 import { DateHelper } from "../utils/dateHelper";
 import Variables from "$lib/variables";
 
 export class CurrenciesService {
-  private currencyRates: any;
-
   private readonly httpProxy: HttpProxy;
-  private readonly localStorage = new LocalStorageCurrencies();
+  private readonly localStorage = new LocalStorageBase();
   private readonly logger: ErrorLogger;
+  private readonly key = "currencyRates";
+
+  private currencyRates: Map<string, number> | null = null;
 
   constructor(application: string, client: string) {
     this.httpProxy = new HttpProxy(client);
@@ -20,11 +21,15 @@ export class CurrenciesService {
     try {
       const today = DateHelper.format(new Date());
 
-      this.currencyRates = await this.httpProxy.ajax<string>(
+      const currencyRates = await this.httpProxy.ajax<string>(
         `${Variables.urls.api}/api/currencies/${today}`
       );
 
-      this.localStorage.setCurrencyRates(JSON.stringify(this.currencyRates));
+      this.localStorage.set(this.key, window.JSON.stringify(currencyRates));
+
+      this.currencyRates = <Map<string, number>>(
+        (<unknown>new Map(Object.entries(currencyRates)))
+      );
     } catch (e) {
       this.logger.logError(e);
       throw e;
@@ -37,7 +42,7 @@ export class CurrenciesService {
 
       const currencyRates = this.currencyRates
         ? this.currencyRates
-        : JSON.parse(this.localStorage.getCurrencyRates());
+        : window.JSON.parse(this.localStorage.get(this.key));
 
       for (const currency in currencyRates) {
         currencies.push(currency);
@@ -52,7 +57,9 @@ export class CurrenciesService {
 
   convert(amount: number, fromCurrency: string, toCurrency: string): number {
     try {
-      amount = parseFloat(<any>amount);
+      if (typeof amount === "string") {
+        amount = parseFloat(amount);
+      }
 
       if (fromCurrency === toCurrency) {
         return amount;
@@ -81,16 +88,18 @@ export class CurrenciesService {
   private getRate(currency: string): number {
     try {
       if (!this.currencyRates) {
-        const currencyRates = this.localStorage.getCurrencyRates();
+        const currencyRates = this.localStorage.get(this.key);
         if (currencyRates) {
-          this.currencyRates = JSON.parse(currencyRates);
-          return this.currencyRates[currency];
+          this.currencyRates = <Map<string, number>>(
+            (<unknown>new Map(Object.entries(window.JSON.parse(currencyRates))))
+          );
+          return <number>this.currencyRates.get(currency);
         }
 
         throw new Error(`Could not get rate for currency ${currency}`);
       }
 
-      return this.currencyRates[currency];
+      return <number>this.currencyRates.get(currency);
     } catch (e) {
       this.logger.logError(e);
       throw e;

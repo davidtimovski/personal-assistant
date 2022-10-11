@@ -192,7 +192,7 @@
 				<div class="setting-descriptor">{$t('preferences.derivedLists')}</div>
 				<div class="form-control">
 					<Checkbox
-						labelKey="preferences.highPriorityList"
+						labelKey="preferences.highPriority"
 						bind:value={highPriorityListEnabled}
 						on:change={highPriorityListEnabledChanged}
 					/>
@@ -200,7 +200,7 @@
 
 				<div class="form-control">
 					<Checkbox
-						labelKey="preferences.staleTasksList"
+						labelKey="preferences.staleTasks"
 						bind:value={staleTasksListEnabled}
 						on:change={staleTasksListEnabledChanged}
 					/>

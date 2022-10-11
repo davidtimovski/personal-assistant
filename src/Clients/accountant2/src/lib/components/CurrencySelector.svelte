@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import type { AutocompleteResult } from 'autocompleter';
 	import autocomplete from 'autocompleter';
 
@@ -31,7 +31,7 @@
 		selectCurrencyInput = <HTMLInputElement>document.getElementById('select-currency-input');
 
 		localStorage = new LocalStorageUtil();
-		currenciesService = new CurrenciesService('Accountant');
+		currenciesService = new CurrenciesService('Accountant', 'accountant2');
 
 		currency = localStorage.get(LocalStorageKeys.Currency);
 		const currencies = currenciesService.getCurrencies();
@@ -55,6 +55,10 @@
 			},
 			className: 'currency-autocomplete-customizations'
 		});
+	});
+
+	onDestroy(() => {
+		currenciesService?.release();
 	});
 </script>
 

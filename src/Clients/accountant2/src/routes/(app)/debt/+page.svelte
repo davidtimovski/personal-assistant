@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 
@@ -8,7 +8,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
-	import { syncStatus } from '$lib/stores';
+	import { locale, syncStatus } from '$lib/stores';
 	import { DebtsService } from '$lib/services/debtsService';
 	import { DebtItem } from '$lib/models/viewmodels/debtItem';
 	import { AppEvents } from '$lib/models/appEvents';
@@ -17,7 +17,6 @@
 
 	let debts: DebtItem[] | null = null;
 	let currency: string;
-	let language: string;
 	let editedId: number | undefined;
 
 	let localStorage: LocalStorageUtil;
@@ -25,7 +24,7 @@
 
 	function formatDate(dateString: string): string {
 		const date = new Date(Date.parse(dateString));
-		const month = DateHelper.getLongMonth(date, language);
+		const month = DateHelper.getLongMonth(date, $locale);
 
 		const now = new Date();
 		if (now.getFullYear() === date.getFullYear()) {
@@ -50,7 +49,6 @@
 		debtsService = new DebtsService();
 
 		currency = localStorage.get(LocalStorageKeys.Currency);
-		language = localStorage.get('language');
 
 		const debtDtos = await debtsService.getAll(currency);
 
@@ -70,6 +68,10 @@
 		}
 
 		debts = debtItems;
+	});
+
+	onDestroy(() => {
+		debtsService?.release();
 	});
 </script>
 
@@ -122,7 +124,7 @@
 										<i class="fas fa-hand-holding-usd {debt.userIsDebtor ? 'debtor' : 'lender'}" />
 									</button>
 								</td>
-								<td>{Formatter.number(debt.amount, currency)}</td>
+								<td>{Formatter.number(debt.amount, currency, $locale)}</td>
 								<td>{debt.person}</td>
 								<td>{debt.created}</td>
 								<td class="sync-icon-cell">

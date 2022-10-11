@@ -105,4 +105,9 @@ export class SyncService {
 			throw e;
 		}
 	}
+
+	release() {
+		this.httpProxy.release();
+		this.logger.release();
+	}
 }

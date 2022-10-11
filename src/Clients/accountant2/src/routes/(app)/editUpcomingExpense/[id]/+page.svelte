@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
-	import { onDestroy } from 'svelte';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
@@ -40,7 +39,6 @@
 	let deleteButtonText: string;
 	let saveButtonIsLoading = false;
 	let deleteButtonIsLoading = false;
-	let language: string;
 
 	let localStorage: LocalStorageUtil;
 	let upcomingExpensesService: UpcomingExpensesService;
@@ -164,8 +162,6 @@
 		upcomingExpensesService = new UpcomingExpensesService();
 		categoriesService = new CategoriesService();
 
-		language = localStorage.get('language');
-
 		if (isNew) {
 			currency = localStorage.get(LocalStorageKeys.Currency);
 			synced = false;
@@ -203,7 +199,11 @@
 		});
 	});
 
-	onDestroy(alertUnsubscriber);
+	onDestroy(() => {
+		alertUnsubscriber();
+		upcomingExpensesService?.release();
+		categoriesService?.release();
+	});
 </script>
 
 <section class="container">
@@ -250,7 +250,7 @@
 
 			<div class="form-control inline">
 				<label for="month-selector">{$t('editUpcomingExpense.month')}</label>
-				<MonthSelector bind:month bind:year disabled={generated} {language} />
+				<MonthSelector bind:month bind:year disabled={generated} />
 			</div>
 
 			<div class="form-control">

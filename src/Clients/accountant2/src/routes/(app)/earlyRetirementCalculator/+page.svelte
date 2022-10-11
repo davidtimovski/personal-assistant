@@ -1,11 +1,12 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte/internal';
 
 	import { CurrenciesService } from '../../../../../shared2/services/currenciesService';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
+	import { locale } from '$lib/stores';
 	import { AccountsService } from '$lib/services/accountsService';
 	import { LargeUpcomingExpense, SummaryItem } from '$lib/models/viewmodels/earlyRetirementCalculator';
 
@@ -164,7 +165,7 @@
 			summaryItems.push(
 				new SummaryItem(
 					$t('earlyRetirementCalculator.summaryItem2a', {
-						capital: Formatter.money(capital, capitalCurrency)
+						capital: Formatter.money(capital, capitalCurrency, $locale)
 					})
 				)
 			);
@@ -176,7 +177,7 @@
 			summaryItems.push(
 				new SummaryItem(
 					$t('earlyRetirementCalculator.summaryItem3a', {
-						savedPerMonth: Formatter.money(savedPerMonth, savedPerMonthCurrency),
+						savedPerMonth: Formatter.money(savedPerMonth, savedPerMonthCurrency, $locale),
 						savingInterestRate: savingInterestRate
 					})
 				)
@@ -190,7 +191,7 @@
 				new SummaryItem(
 					$t('earlyRetirementCalculator.summaryItem4a', {
 						pensionAge: pensionAge,
-						pensionPerMonth: Formatter.money(pensionPerMonth, pensionPerMonthCurrency)
+						pensionPerMonth: Formatter.money(pensionPerMonth, pensionPerMonthCurrency, $locale)
 					})
 				)
 			);
@@ -202,7 +203,7 @@
 			summaryItems.push(
 				new SummaryItem(
 					$t('earlyRetirementCalculator.summaryItem5a', {
-						lifeInsuranceReturn: Formatter.money(lifeInsuranceReturn, lifeInsuranceReturnCurrency),
+						lifeInsuranceReturn: Formatter.money(lifeInsuranceReturn, lifeInsuranceReturnCurrency, $locale),
 						lifeInsuranceAge: lifeInsuranceAge
 					})
 				)
@@ -218,7 +219,7 @@
 				expensesSummaryItem.children.push(
 					new SummaryItem(
 						$t('earlyRetirementCalculator.summaryItem6a', {
-							amount: Formatter.money(expense.amount, expense.currency),
+							amount: Formatter.money(expense.amount, expense.currency, $locale),
 							expense: expense.name
 						})
 					)
@@ -231,7 +232,7 @@
 		summaryItems.push(
 			new SummaryItem(
 				$t('earlyRetirementCalculator.summaryItem7', {
-					retirementIncome: Formatter.money(retirementIncome, retirementIncomeCurrency)
+					retirementIncome: Formatter.money(retirementIncome, retirementIncomeCurrency, $locale)
 				})
 			)
 		);
@@ -372,7 +373,7 @@
 	onMount(async () => {
 		localStorage = new LocalStorageUtil();
 		accountsService = new AccountsService();
-		currenciesService = new CurrenciesService('Accountant');
+		currenciesService = new CurrenciesService('Accountant', 'accountant2');
 
 		currency = localStorage.get(LocalStorageKeys.Currency);
 
@@ -397,6 +398,11 @@
 		accountsService.getAverageMonthlySavingsFromThePastYear(currency).then((savingsPerMonth) => {
 			savedPerMonth = Math.floor(savingsPerMonth);
 		});
+	});
+
+	onDestroy(() => {
+		accountsService?.release();
+		currenciesService?.release();
 	});
 </script>
 
@@ -624,23 +630,27 @@
 							<i class="large-upcoming-expense-icon {expense.iconClass}" />
 							<input type="text" bind:value={expense.name} />
 							<AmountInput bind:amount={expense.amount} bind:currency={expense.currency} />
-							<i
+							<button
+								type="button"
 								on:click={() => removeUpcomingExpense(expense)}
-								class="fas fa-times-circle remove-button"
-								role="button"
+								class="remove-button"
 								title={$t('earlyRetirementCalculator.removeExpense')}
 								aria-label={$t('earlyRetirementCalculator.removeExpense')}
-							/>
+							>
+								<i class="fas fa-times-circle" />
+							</button>
 						</div>
 					{/each}
 
-					<i
-						class="fas fa-plus add-button"
+					<button
+						type="button"
 						on:click={addUpcomingExpense}
-						role="button"
+						class="add-button"
 						title={$t('earlyRetirementCalculator.addExpense')}
 						aria-label={$t('earlyRetirementCalculator.addExpense')}
-					/>
+					>
+						<i class="fas fa-plus" />
+					</button>
 				</div>
 			</div>
 
@@ -864,7 +874,9 @@
 			}
 
 			.remove-button {
-				cursor: pointer;
+				background: transparent;
+				border: none;
+				outline: none;
 
 				&:hover {
 					color: var(--primary-color-dark);
@@ -874,14 +886,13 @@
 
 		.add-button {
 			background: #fafafa;
+			border: none;
 			border-radius: 50%;
 			box-shadow: var(--box-shadow);
 			padding: 8px 15px;
 			margin-top: 30px;
 			line-height: 27px;
 			color: var(--primary-color);
-			cursor: pointer;
-			user-select: none;
 
 			&:hover {
 				color: var(--primary-color-dark);

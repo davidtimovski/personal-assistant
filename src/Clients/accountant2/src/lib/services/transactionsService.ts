@@ -16,7 +16,7 @@ export class TransactionsService {
 	private readonly httpProxy = new HttpProxy('accountant2');
 	private readonly idbHelper = new TransactionsIDBHelper();
 	private readonly categoriesService = new CategoriesService();
-	private readonly currenciesService = new CurrenciesService('Accountant');
+	private readonly currenciesService = new CurrenciesService('Accountant', 'accountant2');
 	private readonly encryptionService = new EncryptionService();
 	private readonly logger = new ErrorLogger('Accountant', 'accountant2');
 
@@ -203,7 +203,9 @@ export class TransactionsService {
 				throw new Error('AccountId is missing.');
 			}
 
-			amount = parseFloat(<any>amount);
+			if (typeof amount === 'string') {
+				amount = parseFloat(amount);
+			}
 
 			if (description) {
 				description = description.replace(/(\r\n|\r|\n){3,}/g, '$1\n').trim();
@@ -267,13 +269,15 @@ export class TransactionsService {
 				throw new Error('AccountId is missing.');
 			}
 
-			amount = parseFloat(<any>amount);
+			if (typeof amount === 'string') {
+				amount = parseFloat(amount);
+			}
 
 			if (fromStocks && typeof fromStocks === 'string') {
-				fromStocks = parseFloat(<any>fromStocks);
+				fromStocks = parseFloat(fromStocks);
 			}
 			if (toStocks && typeof toStocks === 'string') {
-				toStocks = parseFloat(<any>toStocks);
+				toStocks = parseFloat(toStocks);
 			}
 
 			const transaction = new TransactionModel(
@@ -324,13 +328,15 @@ export class TransactionsService {
 				throw new Error('AccountId is missing.');
 			}
 
-			transaction.amount = parseFloat(<any>transaction.amount);
+			if (typeof transaction.amount === 'string') {
+				transaction.amount = parseFloat(transaction.amount);
+			}
 
 			if (transaction.fromStocks && typeof transaction.fromStocks === 'string') {
-				transaction.fromStocks = parseFloat(<any>transaction.fromStocks);
+				transaction.fromStocks = parseFloat(transaction.fromStocks);
 			}
 			if (transaction.toStocks && typeof transaction.toStocks === 'string') {
-				transaction.toStocks = parseFloat(<any>transaction.toStocks);
+				transaction.toStocks = parseFloat(transaction.toStocks);
 			}
 
 			if (transaction.description) {
@@ -464,5 +470,11 @@ export class TransactionsService {
 		}
 
 		return TransactionType.Deposit;
+	}
+
+	release() {
+		this.httpProxy.release();
+		this.currenciesService.release();
+		this.logger.release();
 	}
 }

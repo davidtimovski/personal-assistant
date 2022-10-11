@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte/internal';
 
-	import { ErrorLogger } from '../../../../../shared2/services/errorLogger';
 	import { TooltipsService } from '../../../../../shared2/services/tooltipsService';
 	import type { Tooltip } from '../../../../../shared2/models/tooltip';
 
@@ -13,25 +12,29 @@
 
 	async function dismiss(tooltip: Tooltip) {
 		tooltip.isDismissed = true;
-		await tooltipsService.toggleDismissed(tooltip.key, 'Accountant', true);
+		await tooltipsService.toggleDismissed(tooltip.key, true);
 		tooltips = tooltips.slice(0);
 	}
 
 	async function retain(tooltip: Tooltip) {
 		tooltip.isDismissed = false;
-		await tooltipsService.toggleDismissed(tooltip.key, 'Accountant', false);
+		await tooltipsService.toggleDismissed(tooltip.key, false);
 		tooltips = tooltips.slice(0);
 	}
 
 	onMount(async () => {
-		tooltipsService = new TooltipsService(new ErrorLogger('Accountant', 'accountant2'));
+		tooltipsService = new TooltipsService('Accountant', 'accountant2');
 
-		const accountantTooltips = await tooltipsService.getAll('Accountant');
+		const accountantTooltips = await tooltipsService.getAll();
 		for (const tooltip of accountantTooltips) {
 			tooltip.title = (<any>$t(`tooltips.${tooltip.key}`)).title;
 			tooltip.answer = (<any>$t(`tooltips.${tooltip.key}`)).answer;
 		}
 		tooltips = accountantTooltips;
+	});
+
+	onDestroy(() => {
+		tooltipsService?.release();
 	});
 </script>
 
@@ -118,7 +121,7 @@
 			line-height: 40px;
 			text-decoration: none;
 			color: var(--primary-color);
-			transition: color var(--transition);
+			transition: color var(--transition-quick);
 
 			&:hover {
 				color: var(--primary-color-dark);

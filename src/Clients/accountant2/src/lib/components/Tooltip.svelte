@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import { slide } from 'svelte/transition';
-
-	import { t } from '$lib/localization/i18n';
 
 	import type { Tooltip } from '../../../../shared2/models/tooltip';
 	import { TooltipsService } from '../../../../shared2/services/tooltipsService';
-	import { ErrorLogger } from '../../../../shared2/services/errorLogger';
+
+	import { t } from '$lib/localization/i18n';
 
 	export let key: string;
 
@@ -14,13 +13,11 @@
 	let isVisible = false;
 	let isOpen = false;
 	let isDismissed = false;
-	let questionSpan: HTMLSpanElement;
 
 	let tooltipsService: TooltipsService;
 
 	function toggleOpen() {
 		isOpen = !isOpen;
-		questionSpan.classList.remove('glow');
 	}
 
 	async function dismiss() {
@@ -29,26 +26,31 @@
 		}
 
 		isDismissed = true;
-		await tooltipsService.toggleDismissed(tooltip.key, 'Accountant', true);
+		await tooltipsService.toggleDismissed(tooltip.key, true);
 	}
 
 	onMount(async () => {
-		tooltipsService = new TooltipsService(new ErrorLogger('Accountant', 'accountant2'));
+		tooltipsService = new TooltipsService('Accountant', 'accountant2');
 
-		tooltip = await tooltipsService.getByKey(key, 'Accountant');
+		tooltip = await tooltipsService.getByKey(key);
 		if (!tooltip.isDismissed) {
 			tooltip.question = (<any>$t(`tooltips.${key}`)).question;
 			tooltip.answer = (<any>$t(`tooltips.${key}`)).answer;
 			isVisible = true;
 		}
 	});
+
+	onDestroy(() => {
+		tooltipsService?.release();
+	});
 </script>
 
 <div class="tooltip" class:visible={isVisible}>
 	{#if tooltip}
-		<div on:click={toggleOpen} class="question-wrap">
-			<span bind:this={questionSpan} class="question glow">{tooltip.question}</span>
+		<div class="question-wrap">
+			<button type="button" on:click={toggleOpen} class="question" class:glow={!isOpen}>{tooltip.question}</button>
 		</div>
+
 		{#if isOpen}
 			<div in:slide class="answer-wrap">
 				<div class="answer">
@@ -88,6 +90,9 @@
 		}
 
 		.question {
+			background: transparent;
+			border: none;
+			outline: none;
 			text-decoration: underline;
 			cursor: pointer;
 

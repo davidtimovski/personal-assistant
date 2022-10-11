@@ -5,7 +5,7 @@ import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil'
 import { lists } from '$lib/stores';
 import { List, type Task } from '$lib/models/entities';
 import type { ListWithShares } from '$lib/models/viewmodels/listWithShares';
-import type { Share } from '$lib/models/viewmodels/share';
+import type { ShareUserAndPermission } from '$lib/models/viewmodels/share';
 import type { ShareRequest } from '$lib/models/viewmodels/shareRequest';
 import type { ListOption } from '$lib/models/viewmodels/listOption';
 import type { CanShareList } from '$lib/models/viewmodels/canShareList';
@@ -237,7 +237,12 @@ export class ListsService {
 		return this.httpProxy.ajax<CanShareList>(`${Variables.urls.api}/api/lists/can-share-with-user/${email}`);
 	}
 
-	async share(id: number, newShares: Share[], editedShares: Share[], removedShares: Share[]): Promise<void> {
+	async share(
+		id: number,
+		newShares: ShareUserAndPermission[],
+		editedShares: ShareUserAndPermission[],
+		removedShares: ShareUserAndPermission[]
+	): Promise<void> {
 		try {
 			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/lists/share`, {
 				method: 'put',

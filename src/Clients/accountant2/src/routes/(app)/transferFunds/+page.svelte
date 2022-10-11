@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import { goto } from '$app/navigation';
 
 	import { DateHelper } from '../../../../../shared2/utils/dateHelper';
@@ -8,7 +8,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
-	import { alertState } from '$lib/stores';
+	import { alertState, locale } from '$lib/stores';
 	import type { Account } from '$lib/models/entities/account';
 	import type { SelectOption } from '$lib/models/viewmodels/selectOption';
 	import { AccountsService } from '$lib/services/accountsService';
@@ -238,6 +238,11 @@
 
 		accounts = await accountsService.getAllWithBalance(currency);
 	});
+
+	onDestroy(() => {
+		accountsService?.release();
+		transactionsService?.release();
+	});
 </script>
 
 <section class="container">
@@ -274,12 +279,12 @@
 				{#if fromAccount?.stockPrice}
 					<div class="account-stock-price-balance-label">
 						<span>{$t('transferFunds.stockPrice')}</span>
-						<span>{Formatter.money(fromAccount.stockPrice, currency, 4)}</span>
+						<span>{Formatter.moneyPrecise(fromAccount.stockPrice, currency, $locale, 4)}</span>
 					</div>
 				{:else}
 					<div class="account-stock-price-balance-label">
 						<span>{$t('balance')}</span>
-						<span>{Formatter.money(fromAccount?.balance, currency)}</span>
+						<span>{Formatter.moneyPrecise(fromAccount?.balance, currency, $locale)}</span>
 					</div>
 				{/if}
 			</div>
@@ -300,12 +305,12 @@
 				{#if toAccount?.stockPrice}
 					<div class="account-stock-price-balance-label">
 						<span>{$t('transferFunds.stockPrice')}</span>
-						<span>{Formatter.money(toAccount?.stockPrice, currency, 4)}</span>
+						<span>{Formatter.moneyPrecise(toAccount?.stockPrice, currency, $locale, 4)}</span>
 					</div>
 				{:else}
 					<div class="account-stock-price-balance-label">
 						<span>{$t('balance')}</span>
-						<span>{Formatter.money(toAccount?.balance, currency)}</span>
+						<span>{Formatter.moneyPrecise(toAccount?.balance, currency, $locale)}</span>
 					</div>
 				{/if}
 			</div>

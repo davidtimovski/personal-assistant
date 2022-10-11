@@ -117,7 +117,7 @@
 			line-height: 40px;
 			text-decoration: none;
 			color: var(--primary-color);
-			transition: color var(--transition);
+			transition: color var(--transition-quick);
 
 			&:hover {
 				color: var(--primary-color-dark);

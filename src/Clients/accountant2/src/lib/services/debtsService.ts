@@ -10,7 +10,7 @@ import Variables from '$lib/variables';
 export class DebtsService {
 	private readonly httpProxy = new HttpProxy('accountant2');
 	private readonly idbHelper = new DebtsIDBHelper();
-	private readonly currenciesService = new CurrenciesService('Accountant');
+	private readonly currenciesService = new CurrenciesService('Accountant', 'accountant2');
 	private readonly logger = new ErrorLogger('Accountant', 'accountant2');
 
 	static readonly mergedDebtSeparator = '----------';
@@ -37,7 +37,10 @@ export class DebtsService {
 	async createOrMerge(debt: DebtModel, mergeDebtPerPerson: boolean): Promise<number> {
 		try {
 			const now = DateHelper.adjustForTimeZone(new Date());
-			debt.amount = parseFloat(<any>debt.amount);
+
+			if (typeof debt.amount === 'string') {
+				debt.amount = parseFloat(debt.amount);
+			}
 
 			const otherDebtWithPerson = await this.idbHelper.getByPerson(debt.person.trim().toLowerCase());
 			if (mergeDebtPerPerson && otherDebtWithPerson.length > 0) {
@@ -151,7 +154,9 @@ export class DebtsService {
 
 	async update(debt: DebtModel): Promise<void> {
 		try {
-			debt.amount = parseFloat(<any>debt.amount);
+			if (typeof debt.amount === 'string') {
+				debt.amount = parseFloat(debt.amount);
+			}
 
 			if (debt.description) {
 				debt.description = debt.description.replace(/(\r\n|\r|\n){3,}/g, '$1\n').trim();
@@ -190,5 +195,11 @@ export class DebtsService {
 			this.logger.logError(e);
 			throw e;
 		}
+	}
+
+	release() {
+		this.httpProxy.release();
+		this.currenciesService.release();
+		this.logger.release();
 	}
 }

@@ -2,31 +2,29 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 using Application.Contracts.Common;
 using Dapper;
 using Domain.Entities.Accountant;
 using Domain.Entities.Common;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Npgsql;
 
-namespace Worker;
+namespace Jobs;
 
-public class MidnightWorker : BackgroundService
+public class MidnightJob
 {
-    private readonly ILogger<MidnightWorker> _logger;
+    private readonly ILogger<MidnightJob> _logger;
     private readonly ICdnService _cdnService;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly string _connectionString;
     private readonly string _currencyRatesApiKey;
 
-    public MidnightWorker(
-        ILogger<MidnightWorker> logger,
+    public MidnightJob(
+        ILogger<MidnightJob> logger,
         ICdnService cdnService,
         IHttpClientFactory httpClientFactory,
         IConfiguration configuration)
@@ -39,80 +37,33 @@ public class MidnightWorker : BackgroundService
         _currencyRatesApiKey = configuration["FixerApiAccessKey"];
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    public async Task RunAsync()
     {
         bool isProd = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") == "Production";
+        var now = DateTime.UtcNow;
 
-        while (!stoppingToken.IsCancellationRequested)
+        using var conn = new NpgsqlConnection(_connectionString);
+        conn.Open();
+
+        await DeleteOldNotificationsAsync(conn, now);
+        await DeleteOldDeletedEntityEntriesAsync(conn, now);
+        await GenerateTransactions(conn, now);
+        await GenerateUpcomingExpenses(conn, now);
+
+        if (isProd)
         {
-            var now = DateTime.UtcNow;
-            if (now.Hour != 0 || now.Minute != 0)
-            {
-                continue;
-            }
-
-            await GetAndSaveCurrencyRates(now);
-            await DeleteOldNotificationsAsync(now);
-            await DeleteOldDeletedEntityEntriesAsync(now);
-            await GenerateTransactions(now);
-            await GenerateUpcomingExpenses(now);
-
-            if (isProd)
-            {
-                await DeleteTemporaryCdnResourcesAsync(now);
-            }
-
-            _logger.LogInformation("Midnight worker run successful.");
-
-            await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
+            await GetAndSaveCurrencyRates(conn, now);
+            await DeleteTemporaryCdnResourcesAsync(now);
         }
+
+        _logger.LogInformation("Midnight job run successful.");
     }
 
-    private async Task GetAndSaveCurrencyRates(DateTime now)
-    {
-        try
-        {
-            using HttpClient httpClient = _httpClientFactory.CreateClient("fixer");
-            HttpResponseMessage result = await httpClient.GetAsync($"latest?access_key={_currencyRatesApiKey}");
-
-            string jsonResponse = await result.Content.ReadAsStringAsync();
-            JObject json = JObject.Parse(jsonResponse);
-            string ratesData = json["rates"].ToString(Formatting.None);
-
-            // Save to database
-            using var conn = new NpgsqlConnection(_connectionString);
-            conn.Open();
-
-            var parameters = new CurrencyRates
-            {
-                Date = new DateTime(now.Year, now.Month, now.Day),
-                Rates = ratesData
-            };
-
-            var exists = conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM currency_rates WHERE date = @Date", new { parameters.Date });
-            if (exists)
-            {
-                return;
-            }
-
-            await conn.ExecuteAsync(@"INSERT INTO currency_rates (date, rates) VALUES (@Date, CAST(@Rates AS json))", parameters);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"{nameof(GetAndSaveCurrencyRates)} failed");
-            throw;
-        }
-    }
-
-    private async Task DeleteOldNotificationsAsync(DateTime now)
+    private async Task DeleteOldNotificationsAsync(NpgsqlConnection conn, DateTime now)
     {
         try
         {
             var aWeekAgo = now.AddDays(-7);
-
-            using var conn = new NpgsqlConnection(_connectionString);
-            conn.Open();
-
             await conn.ExecuteAsync(@"DELETE FROM todo_notifications WHERE created_date < @DeleteFrom", new { DeleteFrom = aWeekAgo });
         }
         catch (Exception ex)
@@ -122,15 +73,11 @@ public class MidnightWorker : BackgroundService
         }
     }
 
-    private async Task DeleteOldDeletedEntityEntriesAsync(DateTime now)
+    private async Task DeleteOldDeletedEntityEntriesAsync(NpgsqlConnection conn, DateTime now)
     {
         try
         {
             var sixMonthsAgo = now.AddMonths(-6);
-
-            using var conn = new NpgsqlConnection(_connectionString);
-            conn.Open();
-
             await conn.ExecuteAsync(@"DELETE FROM accountant_deleted_entities WHERE deleted_date < @DeleteFrom", new { DeleteFrom = sixMonthsAgo });
         }
         catch (Exception ex)
@@ -143,13 +90,10 @@ public class MidnightWorker : BackgroundService
     /// <summary>
     /// For the automatic transactions functionality in Accountant.
     /// </summary>
-    private async Task GenerateTransactions(DateTime now)
+    private async Task GenerateTransactions(NpgsqlConnection conn, DateTime now)
     {
         try
         {
-            using var conn = new NpgsqlConnection(_connectionString);
-            conn.Open();
-
             var automaticTransactions = conn.Query<AutomaticTransaction>(@"SELECT * FROM accountant_automatic_transactions WHERE day_in_month = @DayInMonth", new { DayInMonth = now.Day });
 
             var userGroups = automaticTransactions.GroupBy(x => x.UserId);
@@ -226,7 +170,7 @@ public class MidnightWorker : BackgroundService
     /// <summary>
     /// For the upcoming expenses funcitonality in Accountant.
     /// </summary>
-    private async Task GenerateUpcomingExpenses(DateTime now)
+    private async Task GenerateUpcomingExpenses(NpgsqlConnection conn, DateTime now)
     {
         string getMostFrequentCurrency(IEnumerable<Transaction> expenses)
         {
@@ -259,9 +203,6 @@ public class MidnightWorker : BackgroundService
 
         try
         {
-            using var conn = new NpgsqlConnection(_connectionString);
-            conn.Open();
-
             var categories = conn.Query<Category>(@"SELECT * FROM accountant_categories WHERE generate_upcoming_expense");
 
             var userGroups = categories.GroupBy(x => x.UserId);
@@ -341,6 +282,41 @@ public class MidnightWorker : BackgroundService
         catch (Exception ex)
         {
             _logger.LogError(ex, $"{nameof(GenerateUpcomingExpenses)} failed");
+            throw;
+        }
+    }
+
+    private async Task GetAndSaveCurrencyRates(NpgsqlConnection conn, DateTime now)
+    {
+        var today = new DateTime(now.Year, now.Month, now.Day);
+
+        try
+        {
+            var exists = conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM currency_rates WHERE date = @Date", new { Date = today });
+            if (exists)
+            {
+                return;
+            }
+
+            using HttpClient httpClient = _httpClientFactory.CreateClient("fixer");
+            HttpResponseMessage result = await httpClient.GetAsync($"latest?access_key={_currencyRatesApiKey}");
+
+            string jsonResponse = await result.Content.ReadAsStringAsync();
+            var json = JObject.Parse(jsonResponse);
+            string ratesData = json["rates"].ToString(Formatting.None);
+
+            // Save to database
+            var parameters = new CurrencyRates
+            {
+                Date = today,
+                Rates = ratesData
+            };
+
+            await conn.ExecuteAsync(@"INSERT INTO currency_rates (date, rates) VALUES (@Date, CAST(@Rates AS json))", parameters);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"{nameof(GetAndSaveCurrencyRates)} failed");
             throw;
         }
     }

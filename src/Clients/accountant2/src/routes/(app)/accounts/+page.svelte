@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
-	import { syncStatus } from '$lib/stores';
+	import { locale, syncStatus } from '$lib/stores';
 	import { AccountsService } from '$lib/services/accountsService';
 	import { AccountItem } from '$lib/models/viewmodels/accountItem';
 	import { AppEvents } from '$lib/models/appEvents';
@@ -67,6 +67,10 @@
 
 		accounts = accountItems;
 	});
+
+	onDestroy(() => {
+		accountsService?.release();
+	});
 </script>
 
 <section class="container">
@@ -124,11 +128,15 @@
 											{#if viewStocks}
 												<span>{account.stocks || ''}</span>
 											{:else}
-												<span>{account.stockPrice ? Formatter.money(account.stockPrice, currency, 4) : ''}</span>
+												<span
+													>{account.stockPrice
+														? Formatter.moneyPrecise(account.stockPrice, currency, $locale, 4)
+														: ''}</span
+												>
 											{/if}
 										</td>
 									{/if}
-									<td class="right-col">{Formatter.money(account.balance, currency)}</td>
+									<td class="right-col">{Formatter.money(account.balance, currency, $locale)}</td>
 									<td class="sync-icon-cell">
 										{#if !account.synced}
 											<i class="fas fa-sync-alt" title={$t('notSynced')} aria-label={$t('notSynced')} />
@@ -140,7 +148,7 @@
 						{#if accounts.length > 1}
 							<tfoot>
 								<tr>
-									<td colspan="4">{Formatter.money(sum, currency)}</td>
+									<td colspan="4">{Formatter.money(sum, currency, $locale)}</td>
 								</tr>
 							</tfoot>
 						{/if}
