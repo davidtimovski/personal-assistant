@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
-	import { onDestroy } from 'svelte';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
@@ -182,7 +181,10 @@
 		}
 	});
 
-	onDestroy(alertUnsubscriber);
+	onDestroy(() => {
+		alertUnsubscriber();
+		accountsService?.release();
+	});
 </script>
 
 <section class="container">

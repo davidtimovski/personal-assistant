@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import type { PageData } from './$types';
@@ -10,6 +10,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
+	import { locale } from '$lib/stores';
 	import { TransactionsService } from '$lib/services/transactionsService';
 	import { TransactionType } from '$lib/models/viewmodels/transactionType';
 	import { CategoriesService } from '$lib/services/categoriesService';
@@ -40,7 +41,6 @@
 	let generated: boolean;
 	let decryptionPassword: string | null = null;
 	let preferredCurrency: string;
-	let language: string;
 	let passwordShown = false;
 	let decryptButtonIsLoading = false;
 	let decryptionPasswordIsInvalid = false;
@@ -56,7 +56,7 @@
 
 	function formatOccurrenceDate(occurrenceDateString: string): string {
 		const date = new Date(Date.parse(occurrenceDateString));
-		const month = DateHelper.getLongMonth(date, language);
+		const month = DateHelper.getLongMonth(date, $locale);
 
 		const now = new Date();
 		if (now.getFullYear() === date.getFullYear()) {
@@ -136,7 +136,6 @@
 		encryptionService = new EncryptionService();
 
 		preferredCurrency = localStorage.get(LocalStorageKeys.Currency);
-		language = localStorage.get('language');
 
 		const transaction = await transactionsService.getForViewing(data.id, preferredCurrency);
 		if (transaction === null) {
@@ -189,6 +188,12 @@
 			accountValue = fromAccount.name;
 		}
 	});
+
+	onDestroy(() => {
+		transactionsService?.release();
+		categoriesService?.release();
+		accountsService?.release();
+	});
 </script>
 
 <section class="container">
@@ -211,14 +216,14 @@
 			<div class="form-control inline">
 				<span>{$t('amount')}</span>
 				<span class:expense-color={type === 1} class:deposit-color={type === 2} class:transfer-color={type === 3}
-					>{Formatter.money(amount, preferredCurrency)}</span
+					>{Formatter.money(amount, preferredCurrency, $locale)}</span
 				>
 			</div>
 
 			{#if currency && currency !== preferredCurrency}
 				<div class="form-control inline">
 					<span>{$t('transaction.originalAmount')}</span>
-					<span>{Formatter.money(originalAmount, currency)}</span>
+					<span>{Formatter.money(originalAmount, currency, $locale)}</span>
 				</div>
 			{/if}
 
@@ -230,14 +235,14 @@
 			{#if fromStocks}
 				<div class="form-control inline">
 					<span>{$t('soldStocks')}</span>
-					<span class="expense-color">{Formatter.money(fromStocks, preferredCurrency, 4)}</span>
+					<span class="expense-color">{Formatter.moneyPrecise(fromStocks, preferredCurrency, $locale, 4)}</span>
 				</div>
 			{/if}
 
 			{#if toStocks}
 				<div class="form-control inline">
 					<span>{$t('purchasedStocks')}</span>
-					<span class="deposit-color">{Formatter.money(toStocks, preferredCurrency, 4)}</span>
+					<span class="deposit-color">{Formatter.moneyPrecise(toStocks, preferredCurrency, $locale, 4)}</span>
 				</div>
 			{/if}
 

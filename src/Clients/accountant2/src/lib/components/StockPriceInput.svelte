@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import type { AutocompleteResult } from 'autocompleter';
 	import autocomplete from 'autocompleter';
 
@@ -33,7 +33,7 @@
 	}
 
 	onMount(() => {
-		currenciesService = new CurrenciesService('Accountant');
+		currenciesService = new CurrenciesService('Accountant', 'accountant2');
 		const currencies = currenciesService.getCurrencies();
 
 		autocompleteResult = autocomplete({
@@ -53,6 +53,10 @@
 			},
 			className: 'currency-autocomplete-customizations'
 		});
+	});
+
+	onDestroy(() => {
+		currenciesService?.release();
 	});
 </script>
 

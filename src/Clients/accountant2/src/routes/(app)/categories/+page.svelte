@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 
@@ -54,6 +54,10 @@
 		}
 
 		categories = categoryItems;
+	});
+
+	onDestroy(() => {
+		categoriesService?.release();
 	});
 </script>
 

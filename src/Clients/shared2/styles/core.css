@@ -203,7 +203,9 @@ textarea.invalid {
   display: flex;
   align-items: center;
   height: 50px;
-  cursor: pointer;
+  background: transparent;
+  border: none;
+  outline: none;
 }
 
 .profile-image-container .profile-image {
@@ -275,7 +277,7 @@ textarea.invalid {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 40px;
+  min-width: 48px;
   height: 50px;
   font-size: 27px;
   color: var(--primary-color);

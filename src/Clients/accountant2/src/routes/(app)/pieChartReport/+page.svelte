@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import { goto } from '$app/navigation';
 	import { ArcElement, Chart, PieController } from 'chart.js';
 
@@ -8,7 +8,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
-	import { searchFilters } from '$lib/stores';
+	import { locale, searchFilters } from '$lib/stores';
 	import { TransactionsService } from '$lib/services/transactionsService';
 	import { AccountsService } from '$lib/services/accountsService';
 	import { PieChartItem } from '$lib/models/viewmodels/pieChartItem';
@@ -148,6 +148,11 @@
 		mainAccountId = await accountsService.getMainId();
 		loadData();
 	});
+
+	onDestroy(() => {
+		transactionsService?.release();
+		accountsService?.release();
+	});
 </script>
 
 <section class="container">
@@ -219,7 +224,7 @@
 									{/if}
 									<span>{item.categoryName}</span></td
 								>
-								<td class="amount-cell">{Formatter.money(item.amount, currency)}</td>
+								<td class="amount-cell">{Formatter.money(item.amount, currency, $locale)}</td>
 							</tr>
 							{#each item.subItems as subItem}
 								<tr
@@ -230,7 +235,7 @@
 									<td class="sub-category-cell">
 										<span class="legend-color" style="background: {subItem.color};" />{subItem.categoryName}
 									</td>
-									<td class="amount-cell">{Formatter.money(subItem.amount, currency)}</td>
+									<td class="amount-cell">{Formatter.money(subItem.amount, currency, $locale)}</td>
 								</tr>
 							{/each}
 						{/each}
@@ -244,7 +249,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td colspan="3">{Formatter.money(sum, currency)}</td>
+								<td colspan="3">{Formatter.money(sum, currency, $locale)}</td>
 							</tr>
 						</tfoot>
 					{/if}

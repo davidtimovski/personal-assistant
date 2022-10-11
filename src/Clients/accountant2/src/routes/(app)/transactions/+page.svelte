@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 
@@ -8,7 +8,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
-	import { searchFilters } from '$lib/stores';
+	import { locale, searchFilters } from '$lib/stores';
 	import { TransactionsService } from '$lib/services/transactionsService';
 	import { CategoriesService } from '$lib/services/categoriesService';
 	import { AccountsService } from '$lib/services/accountsService';
@@ -21,7 +21,6 @@
 
 	let transactions: TransactionItem[] | null = null;
 	let currency: string;
-	let language: string;
 	let editedId: number | undefined;
 	let pageCount: number;
 	let categoryOptions: SelectOption[] | null = null;
@@ -146,7 +145,7 @@
 
 	function formatDate(dateString: string): string {
 		const date = new Date(Date.parse(dateString));
-		const month = DateHelper.getShortMonth(date, language);
+		const month = DateHelper.getShortMonth(date, $locale);
 
 		const now = new Date();
 		if (now.getFullYear() === date.getFullYear()) {
@@ -216,7 +215,6 @@
 		accountsService = new AccountsService();
 
 		currency = localStorage.get(LocalStorageKeys.Currency);
-		language = localStorage.get('language');
 
 		const categoryOptionsPromise = new Promise<void>(async (resolve) => {
 			const options = await categoriesService.getAllAsOptions($t('uncategorized'), CategoryType.AllTransactions);
@@ -233,6 +231,12 @@
 		Promise.all([categoryOptionsPromise, accountOptionsPromise]).then(() => {
 			getTransactions(false);
 		});
+	});
+
+	onDestroy(() => {
+		transactionsService?.release();
+		categoriesService?.release();
+		accountsService?.release();
 	});
 </script>
 
@@ -359,13 +363,14 @@
 						placeholder={$t('transactions.searchByDescription')}
 						aria-label={$t('transactions.searchByDescription')}
 					/>
-					<i
-						class="fas fa-times"
+					<button
+						type="button"
 						on:click={clearDescriptionFilter}
-						role="button"
 						title={$t('transactions.clear')}
 						aria-label={$t('transactions.clear')}
-					/>
+					>
+						<i class="fas fa-times" />
+					</button>
 				</div>
 			</div>
 		</form>
@@ -409,7 +414,7 @@
 											<i class="fas fa-exchange-alt transfer-color" />
 										{/if}
 									</td>
-									<td>{Formatter.number(transaction.amount, currency)}</td>
+									<td>{Formatter.number(transaction.amount, currency, $locale)}</td>
 									<td>{transaction.detail}</td>
 									<td class="date-cell">{transaction.date}</td>
 
@@ -430,8 +435,8 @@
 
 				{#if transactions.length > 0}
 					<div class="transactions-pagination">
-						<div
-							role="button"
+						<button
+							type="button"
 							on:click={first}
 							title={$t('transactions.first')}
 							aria-label={$t('transactions.first')}
@@ -439,9 +444,9 @@
 							class:hidden={$searchFilters.page === 1}
 						>
 							<i class="fas fa-angle-double-left" />
-						</div>
-						<div
-							role="button"
+						</button>
+						<button
+							type="button"
 							on:click={previous}
 							title={$t('transactions.previous')}
 							aria-label={$t('transactions.previous')}
@@ -449,12 +454,12 @@
 							class:hidden={$searchFilters.page === 1}
 						>
 							<i class="fas fa-angle-left" />
-						</div>
+						</button>
 						<div class="transactions-pagination-numbering">
 							<span>{$searchFilters.page}</span>/<span>{pageCount}</span>
 						</div>
-						<div
-							role="button"
+						<button
+							type="button"
 							on:click={next}
 							title={$t('transactions.next')}
 							aria-label={$t('transactions.next')}
@@ -462,9 +467,9 @@
 							class:hidden={$searchFilters.page === pageCount}
 						>
 							<i class="fas fa-angle-right" />
-						</div>
-						<div
-							role="button"
+						</button>
+						<button
+							type="button"
 							on:click={last}
 							title={$t('transactions.last')}
 							aria-label={$t('transactions.last')}
@@ -472,7 +477,7 @@
 							class:hidden={$searchFilters.page === pageCount}
 						>
 							<i class="fas fa-angle-double-right" />
-						</div>
+						</button>
 					</div>
 				{/if}
 			</div>
@@ -489,14 +494,16 @@
 			width: calc(100% - 56px);
 		}
 
-		i {
+		button {
 			display: none;
 			position: absolute;
 			top: 0;
 			right: 0;
-			padding: 11px 13px;
+			background: transparent;
+			border: none;
+			outline: none;
+			padding: 10px 13px;
 			color: var(--primary-color);
-			cursor: pointer;
 
 			&:hover {
 				color: var(--primary-color-dark);
@@ -509,7 +516,7 @@
 				width: calc(100% - 56px);
 			}
 
-			i {
+			button {
 				display: inline-block;
 			}
 		}
@@ -521,29 +528,22 @@
 		width: 280px;
 		margin: 35px auto 0;
 
-		.transactions-pagination-arrow-wrap {
+		&-arrow-wrap {
 			display: flex;
 			align-items: center;
 			justify-content: center;
 			width: 42px;
 			height: 30px;
 			background: var(--primary-color);
+			border: none;
+			outline: none;
 			border-radius: var(--border-radius);
 			margin: 4px 0;
 			font-size: 20px;
 			color: #fff;
-			cursor: pointer;
 
 			&:hover {
 				background: var(--primary-color-dark);
-			}
-
-			&.right i {
-				margin-right: -2px;
-			}
-
-			&.left i {
-				margin-left: -2px;
 			}
 		}
 
@@ -561,8 +561,8 @@
 				width: calc(100% - 62px);
 			}
 
-			i {
-				padding: 13px 15px;
+			button {
+				padding: 11px 15px;
 			}
 		}
 	}

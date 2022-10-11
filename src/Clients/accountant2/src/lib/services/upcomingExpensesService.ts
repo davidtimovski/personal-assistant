@@ -10,7 +10,7 @@ import Variables from '$lib/variables';
 export class UpcomingExpensesService {
 	private readonly httpProxy = new HttpProxy('accountant2');
 	private readonly idbHelper = new UpcomingExpensesIDBHelper();
-	private readonly currenciesService = new CurrenciesService('Accountant');
+	private readonly currenciesService = new CurrenciesService('Accountant', 'accountant2');
 	private readonly logger = new ErrorLogger('Accountant', 'accountant2');
 
 	async getAll(currency: string): Promise<Array<UpcomingExpense>> {
@@ -34,7 +34,9 @@ export class UpcomingExpensesService {
 
 	async create(upcomingExpense: UpcomingExpense): Promise<number> {
 		try {
-			upcomingExpense.amount = parseFloat(<any>upcomingExpense.amount);
+			if (typeof upcomingExpense.amount === 'string') {
+				upcomingExpense.amount = parseFloat(upcomingExpense.amount);
+			}
 
 			if (upcomingExpense.description) {
 				upcomingExpense.description = upcomingExpense.description.replace(/(\r\n|\r|\n){3,}/g, '$1\n').trim();
@@ -61,7 +63,9 @@ export class UpcomingExpensesService {
 
 	async update(upcomingExpense: UpcomingExpense): Promise<void> {
 		try {
-			upcomingExpense.amount = parseFloat(<any>upcomingExpense.amount);
+			if (typeof upcomingExpense.amount === 'string') {
+				upcomingExpense.amount = parseFloat(upcomingExpense.amount);
+			}
 
 			if (upcomingExpense.description) {
 				upcomingExpense.description = upcomingExpense.description.replace(/(\r\n|\r|\n){3,}/g, '$1\n').trim();
@@ -100,5 +104,11 @@ export class UpcomingExpensesService {
 			this.logger.logError(e);
 			throw e;
 		}
+	}
+
+	release() {
+		this.httpProxy.release();
+		this.currenciesService.release();
+		this.logger.release();
 	}
 }

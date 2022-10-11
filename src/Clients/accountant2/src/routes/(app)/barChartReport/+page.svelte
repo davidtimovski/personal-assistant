@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import { BarController, BarElement, CategoryScale, Chart, LinearScale } from 'chart.js';
 
 	import { DateHelper } from '../../../../../shared2/utils/dateHelper';
@@ -7,6 +7,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
+	import { locale } from '$lib/stores';
 	import { TransactionsService } from '$lib/services/transactionsService';
 	import { AccountsService } from '$lib/services/accountsService';
 	import { CategoriesService } from '$lib/services/categoriesService';
@@ -19,7 +20,6 @@
 
 	let mainAccountId: number;
 	let currency: string;
-	let language: string;
 	let chart: Chart;
 	let fromOptions: FromOption[] | null = null;
 	let categoryOptions: SelectOption[] | null = null;
@@ -102,7 +102,7 @@
 		for (let i = 0; i < monthsDiff; i++) {
 			const date = DateHelper.formatYYYYMM(from);
 
-			let monthString = DateHelper.getShortMonth(from, language);
+			let monthString = DateHelper.getShortMonth(from, $locale);
 			if (from.getFullYear() < now.getFullYear()) {
 				monthString += ' ' + from.getFullYear().toString().substring(2, 4);
 			}
@@ -233,7 +233,6 @@
 		categoriesService = new CategoriesService();
 
 		currency = localStorage.get(LocalStorageKeys.Currency);
-		language = localStorage.get('language');
 
 		const now = new Date();
 		const fromOpts = new Array<FromOption>();
@@ -264,6 +263,12 @@
 		mainAccountId = await accountsService.getMainId();
 
 		loadData();
+	});
+
+	onDestroy(() => {
+		transactionsService?.release();
+		accountsService?.release();
+		categoriesService?.release();
 	});
 </script>
 
@@ -360,28 +365,28 @@
 			{#if type === 0}
 				<tr>
 					<td>{$t('balance')}</td>
-					<td>{Formatter.money(balanceAverage, currency)}</td>
+					<td>{Formatter.money(balanceAverage, currency, $locale)}</td>
 				</tr>
 			{/if}
 
 			{#if type === 0 || type === 1}
 				<tr>
 					<td>{$t('barChartReport.spent')}</td>
-					<td>{Formatter.money(spentAverage, currency)}</td>
+					<td>{Formatter.money(spentAverage, currency, $locale)}</td>
 				</tr>
 			{/if}
 
 			{#if type === 0 || type === 2}
 				<tr>
 					<td>{$t('barChartReport.deposited')}</td>
-					<td>{Formatter.money(depositedAverage, currency)}</td>
+					<td>{Formatter.money(depositedAverage, currency, $locale)}</td>
 				</tr>
 			{/if}
 
 			{#if type === 4}
 				<tr>
 					<td>{$t('barChartReport.saved')}</td>
-					<td>{Formatter.money(savedAverage, currency)}</td>
+					<td>{Formatter.money(savedAverage, currency, $locale)}</td>
 				</tr>
 			{/if}
 		</table>

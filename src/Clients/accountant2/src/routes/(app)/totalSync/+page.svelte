@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte/internal';
 
 	import { t } from '$lib/localization/i18n';
 	import { SyncService } from '$lib/services/syncService';
@@ -29,6 +29,10 @@
 
 	onMount(() => {
 		syncService = new SyncService();
+	});
+
+	onDestroy(() => {
+		syncService?.release();
 	});
 </script>
 

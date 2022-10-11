@@ -10,7 +10,7 @@ import Variables from '$lib/variables';
 export class AutomaticTransactionsService {
 	private readonly httpProxy = new HttpProxy('accountant2');
 	private readonly idbHelper = new AutomaticTransactionsIDBHelper();
-	private readonly currenciesService = new CurrenciesService('Accountant');
+	private readonly currenciesService = new CurrenciesService('Accountant', 'accountant2');
 	private readonly logger = new ErrorLogger('Accountant', 'accountant2');
 
 	async getAll(currency: string): Promise<Array<AutomaticTransaction>> {
@@ -34,7 +34,9 @@ export class AutomaticTransactionsService {
 
 	async create(automaticTransaction: AutomaticTransaction): Promise<number> {
 		try {
-			automaticTransaction.amount = parseFloat(<any>automaticTransaction.amount);
+			if (typeof automaticTransaction.amount === 'string') {
+				automaticTransaction.amount = parseFloat(automaticTransaction.amount);
+			}
 
 			if (automaticTransaction.description) {
 				automaticTransaction.description = automaticTransaction.description.replace(/(\r\n|\r|\n){3,}/g, '$1\n').trim();
@@ -61,7 +63,9 @@ export class AutomaticTransactionsService {
 
 	async update(automaticTransaction: AutomaticTransaction): Promise<void> {
 		try {
-			automaticTransaction.amount = parseFloat(<any>automaticTransaction.amount);
+			if (typeof automaticTransaction.amount === 'string') {
+				automaticTransaction.amount = parseFloat(automaticTransaction.amount);
+			}
 
 			if (automaticTransaction.description) {
 				automaticTransaction.description = automaticTransaction.description.replace(/(\r\n|\r|\n){3,}/g, '$1\n').trim();
@@ -100,5 +104,11 @@ export class AutomaticTransactionsService {
 			this.logger.logError(e);
 			throw e;
 		}
+	}
+
+	release() {
+		this.httpProxy.release();
+		this.currenciesService.release();
+		this.logger.release();
 	}
 }

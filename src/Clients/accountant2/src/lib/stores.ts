@@ -10,6 +10,7 @@ import { TransactionType } from '$lib/models/viewmodels/transactionType';
 import { AlertStatus } from '../../../shared2/models/enums/alertEvents';
 
 export const isOnline = writable<boolean>(true);
+export const locale = writable('en-US');
 export const loggedInUser = writable<User | null>(null);
 export const syncStatus = writable<AppEvents>(AppEvents.NotSyncing);
 export const alertState = writable<AlertState>(new AlertState(AlertStatus.Hidden, null, []));

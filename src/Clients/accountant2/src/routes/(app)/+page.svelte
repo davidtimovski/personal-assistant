@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
-	import { onDestroy } from 'svelte';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import type { Unsubscriber } from 'svelte/store';
 	import { goto } from '$app/navigation';
 
@@ -11,7 +10,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { CapitalService } from '$lib/services/capitalService';
 	import { Formatter } from '$lib/utils/formatter';
-	import { loggedInUser, syncStatus, searchFilters } from '$lib/stores';
+	import { locale, loggedInUser, syncStatus, searchFilters } from '$lib/stores';
 	import { AppEvents } from '$lib/models/appEvents';
 	import { SearchFilters } from '$lib/models/viewmodels/searchFilters';
 	import type { AmountByCategory } from '$lib/models/viewmodels/amountByCategory';
@@ -139,7 +138,7 @@
 
 	onMount(() => {
 		localStorage = new LocalStorageUtil();
-		usersService = new UsersServiceBase('Accountant');
+		usersService = new UsersServiceBase('Accountant', 'accountant2');
 		capitalService = new CapitalService();
 		accountsService = new AccountsService();
 
@@ -183,6 +182,9 @@
 		for (const unsubscribe of unsubscriptions) {
 			unsubscribe();
 		}
+		usersService?.release();
+		capitalService?.release();
+		accountsService?.release();
 	});
 </script>
 
@@ -194,15 +196,15 @@
 					<i class="fas fa-circle-notch fa-spin" />
 				</span>
 			{:else}
-				<div
+				<button
+					type="button"
 					on:click={goToMenu}
 					class="profile-image-container"
-					role="button"
 					title={$t('index.menu')}
 					aria-label={$t('index.menu')}
 				>
 					<img src={imageUri} class="profile-image" width="40" height="40" alt={$t('profilePicture')} />
-				</div>
+				</button>
 			{/if}
 
 			<div class="page-title reduced">
@@ -229,19 +231,19 @@
 			<a href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
 				<div class="summary-item">
 					<div class="summary-title">{$t('index.available')}</div>
-					<div class="summary-value">{Formatter.number(data.available, currency)}</div>
+					<div class="summary-value">{Formatter.number(data.available, currency, $locale)}</div>
 				</div>
 			</a>
 			<a href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
 				<div class="summary-item">
 					<div class="summary-title">{$t('index.spent')}</div>
-					<div class="summary-value">{Formatter.number(data.spent, currency)}</div>
+					<div class="summary-value">{Formatter.number(data.spent, currency, $locale)}</div>
 				</div>
 			</a>
 			<a href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
 				<div class="summary-item">
 					<div class="summary-title">{$t('balance')}</div>
-					<div class="summary-value">{Formatter.number(data.balance, currency)}</div>
+					<div class="summary-value">{Formatter.number(data.balance, currency, $locale)}</div>
 				</div>
 			</a>
 		</div>
@@ -263,13 +265,13 @@
 						{#each data.expenditures as expenditure}
 							<tr on:click={() => goToTransactions(expenditure)} role="button">
 								<td>{expenditure.categoryName}</td>
-								<td class="amount-cell">{Formatter.money(expenditure.amount, currency)}</td>
+								<td class="amount-cell">{Formatter.money(expenditure.amount, currency, $locale)}</td>
 							</tr>
 
 							{#each expenditure.subItems as subExpenditure}
 								<tr on:click={() => goToTransactions(subExpenditure)} role="button">
 									<td class="sub-category-cell">{subExpenditure.categoryName}</td>
-									<td class="amount-cell">{Formatter.money(subExpenditure.amount, currency)}</td>
+									<td class="amount-cell">{Formatter.money(subExpenditure.amount, currency, $locale)}</td>
 								</tr>
 							{/each}
 						{/each}
@@ -287,7 +289,7 @@
 							<tr>
 								<td>{upcomingExpense.category}</td>
 								<td>{upcomingExpense.description}</td>
-								<td class="amount-cell">{Formatter.money(upcomingExpense.amount, currency)}</td>
+								<td class="amount-cell">{Formatter.money(upcomingExpense.amount, currency, $locale)}</td>
 							</tr>
 						{/each}
 					</tbody>
@@ -299,7 +301,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td colspan="3" class="table-sum">{Formatter.money(data.upcomingSum, currency)}</td>
+								<td colspan="3" class="table-sum">{Formatter.money(data.upcomingSum, currency, $locale)}</td>
 							</tr>
 						</tfoot>
 					{/if}
@@ -324,7 +326,7 @@
 								</td>
 								<td>{debtItem.description}</td>
 								<td class="amount-cell {debtItem.userIsDebtor ? 'expense-color' : 'deposit-color'}">
-									{Formatter.money(debtItem.amount, currency)}
+									{Formatter.money(debtItem.amount, currency, $locale)}
 								</td>
 							</tr>
 						{/each}

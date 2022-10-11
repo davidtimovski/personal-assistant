@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
-	import { onDestroy } from 'svelte';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
@@ -209,7 +208,11 @@
 		isDepositChanged();
 	});
 
-	onDestroy(alertUnsubscriber);
+	onDestroy(() => {
+		alertUnsubscriber();
+		automaticTransactionsService?.release();
+		categoriesService?.release();
+	});
 </script>
 
 <section class="container">

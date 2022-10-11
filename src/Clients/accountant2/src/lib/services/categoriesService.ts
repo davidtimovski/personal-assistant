@@ -137,4 +137,9 @@ export class CategoriesService {
 	hasTransactions(id: number): Promise<boolean> {
 		return this.idbHelper.hasTransactions(id);
 	}
+
+	release() {
+		this.httpProxy.release();
+		this.logger.release();
+	}
 }

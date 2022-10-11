@@ -1,33 +1,48 @@
 export class Formatter {
-	static number(value: any, currency: string | null) {
-		if (isNaN(parseFloat(value)) || !currency) {
+	private static withFractions = new Set(['EUR', 'USD']);
+
+	static number(value: any, currency: string | null, language: string | null) {
+		if (isNaN(parseFloat(value)) || !currency || !language) {
 			return '';
 		}
 
-		if (currency === 'MKD') {
-			return new Intl.NumberFormat('mk-MK', {
-				maximumFractionDigits: 0
-			}).format(value);
-		}
-
-		return new Intl.NumberFormat().format(value);
+		return new Intl.NumberFormat(language, {
+			maximumFractionDigits: Formatter.withFractions.has(currency) ? 2 : 0
+		}).format(value);
 	}
 
-	static money(value: any, currency: string | null, fractionDigits?: number | undefined) {
-		if (isNaN(parseFloat(value)) || !currency) {
+	static money(value: any, currency: string | null, language: string | null) {
+		if (isNaN(parseFloat(value)) || !currency || !language) {
 			return '';
 		}
 
-		if (currency === 'MKD') {
-			const formatted = new Intl.NumberFormat('mk-MK', {
-				maximumFractionDigits: fractionDigits ? fractionDigits : 0
-			}).format(value);
-			return formatted + ' MKD';
-		}
+		const fraction = Formatter.withFractions.has(currency) ? 2 : 0;
 
-		return new Intl.NumberFormat('de-DE', {
+		const formatConfig = new Intl.NumberFormat(language, {
 			style: 'currency',
 			currency: currency,
+			currencyDisplay: 'narrowSymbol',
+			minimumFractionDigits: fraction,
+			maximumFractionDigits: fraction
+		});
+
+		return formatConfig.format(value);
+	}
+
+	static moneyPrecise(
+		value: any,
+		currency: string | null,
+		language: string | null,
+		fractionDigits?: number | undefined
+	) {
+		if (isNaN(parseFloat(value)) || !currency || !language) {
+			return '';
+		}
+
+		return new Intl.NumberFormat(language, {
+			style: 'currency',
+			currency: currency,
+			minimumFractionDigits: fractionDigits,
 			maximumFractionDigits: fractionDigits
 		}).format(value);
 	}

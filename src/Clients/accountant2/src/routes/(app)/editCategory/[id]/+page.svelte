@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
-	import { onDestroy } from 'svelte';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
@@ -205,7 +204,10 @@
 		parentCategoryOptions = await categoriesService.getParentAsOptions($t('editCategory.none'), data.id);
 	});
 
-	onDestroy(alertUnsubscriber);
+	onDestroy(() => {
+		alertUnsubscriber();
+		categoriesService?.release();
+	});
 </script>
 
 <section class="container">

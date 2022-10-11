@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import type { AutocompleteResult } from 'autocompleter';
 	import autocomplete from 'autocompleter';
 
@@ -45,7 +45,7 @@
 			step = '1';
 		}
 
-		currenciesService = new CurrenciesService('Accountant');
+		currenciesService = new CurrenciesService('Accountant', 'accountant2');
 		const currencies = currenciesService.getCurrencies();
 
 		autocompleteResult = autocomplete({
@@ -75,6 +75,10 @@
 		if (focusOnInit) {
 			(<HTMLInputElement>amountInput).focus();
 		}
+	});
+
+	onDestroy(() => {
+		currenciesService?.release();
 	});
 </script>
 

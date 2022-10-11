@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import { goto } from '$app/navigation';
 
 	import { ValidationResult, ValidationUtil } from '../../../../../shared2/utils/validationUtils';
@@ -7,7 +7,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
-	import { alertState } from '$lib/stores';
+	import { locale, alertState } from '$lib/stores';
 	import type { SelectOption } from '$lib/models/viewmodels/selectOption';
 	import { AccountsService } from '$lib/services/accountsService';
 	import { TransactionsService } from '$lib/services/transactionsService';
@@ -97,6 +97,11 @@
 		balance = accountBalance;
 		description = $t('balanceAdjustment.balanceAdjustment');
 	});
+
+	onDestroy(() => {
+		accountsService?.release();
+		transactionsService?.release();
+	});
 </script>
 
 <section class="container">
@@ -139,7 +144,7 @@
 
 			<div class="form-control inline">
 				<span>{$t('balanceAdjustment.adjustedBy')}</span>
-				<span> {(adjustedBy > 0 ? '+' : '') + Formatter.number(adjustedBy, currency)}</span>
+				<span> {(adjustedBy > 0 ? '+' : '') + Formatter.number(adjustedBy, currency, $locale)}</span>
 			</div>
 
 			<div class="form-control">

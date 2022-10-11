@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import { goto } from '$app/navigation';
 
 	import { DateHelper } from '../../../../../shared2/utils/dateHelper';
@@ -7,6 +7,7 @@
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { t } from '$lib/localization/i18n';
 	import { Formatter } from '$lib/utils/formatter';
+	import { locale } from '$lib/stores';
 	import { TransactionsService } from '$lib/services/transactionsService';
 	import { AccountsService } from '$lib/services/accountsService';
 	import { HeatmapDay, HeatmapExpense } from '$lib/models/viewmodels/expenditureHeatmap';
@@ -68,7 +69,6 @@
 		'#f9e5d4'
 	];
 	let currency: string;
-	let language: string;
 
 	const now = new Date();
 	const month = now.getMonth() - 1;
@@ -92,7 +92,7 @@
 
 	function formatDate(date: Date): string {
 		const day = date.getDate();
-		const month = DateHelper.getLongMonth(date, language);
+		const month = DateHelper.getLongMonth(date, $locale);
 		return `${day} ${month}`;
 	}
 
@@ -130,7 +130,6 @@
 		accountsService = new AccountsService();
 
 		currency = localStorage.get(LocalStorageKeys.Currency);
-		language = localStorage.get('language');
 
 		const daysArray = new Array<HeatmapDay>();
 
@@ -206,6 +205,11 @@
 		minSpent = minSpent;
 		loaded = true;
 	});
+
+	onDestroy(() => {
+		transactionsService?.release();
+		accountsService?.release();
+	});
 </script>
 
 <section class="container">
@@ -231,7 +235,8 @@
 
 			{#if days}
 				{#each days as day}
-					<div
+					<button
+						type="button"
 						on:click={() => select(day)}
 						class="heatmap-cell date"
 						class:today={day.isToday}
@@ -239,7 +244,7 @@
 						style="background: {day.backgroundColor}; color: {day.textColor};"
 					>
 						{day.day}
-					</div>
+					</button>
 				{/each}
 			{/if}
 		</div>
@@ -252,8 +257,8 @@
 					</div>
 					<div class="heatmap-legend-line" />
 					<div class="heatmap-legend-amounts">
-						<span>{Formatter.number(minSpent, currency)}</span>
-						<span>{Formatter.number(maxSpent, currency)}</span>
+						<span>{Formatter.number(minSpent, currency, $locale)}</span>
+						<span>{Formatter.number(maxSpent, currency, $locale)}</span>
 					</div>
 				</div>
 
@@ -262,10 +267,10 @@
 					<table class="expenditure-heatmap-table">
 						<tbody>
 							{#each selectedDay.expenditures as expenditure}
-								<tr on:click={() => viewTransaction(expenditure.transactionId)}>
+								<tr on:click={() => viewTransaction(expenditure.transactionId)} role="button">
 									<td>{expenditure.category}</td>
 									<td>{expenditure.description}</td>
-									<td class="amount-cell">{Formatter.money(expenditure.amount, currency)}</td>
+									<td class="amount-cell">{Formatter.money(expenditure.amount, currency, $locale)}</td>
 								</tr>
 							{/each}
 						</tbody>
@@ -278,7 +283,7 @@
 									</td>
 								</tr>
 								<tr>
-									<td colspan="3">{Formatter.money(selectedDay.spent, currency)}</td>
+									<td colspan="3">{Formatter.money(selectedDay.spent, currency, $locale)}</td>
 								</tr>
 							</tfoot>
 						{/if}
@@ -299,10 +304,9 @@
 		line-height: 2.1rem;
 
 		.heatmap-cell {
-			padding: 4px;
+			outline: none;
+			padding: 6px;
 			text-align: center;
-			cursor: pointer;
-			user-select: none;
 			color: #999;
 			transition: color var(--transition);
 
@@ -313,16 +317,17 @@
 			&.date {
 				background: linear-gradient(-90deg, #ddd 0%, #f3f3f3 100%);
 				background-size: 400% 400%;
+				border: 4px solid transparent;
 				animation: heatmapCellLoading 2.5s ease-in-out infinite;
 			}
 
 			&.today {
-				border: 4px solid var(--green-color-dark);
+				border-color: var(--green-color-dark);
 				padding: 0;
 			}
 
 			&.selected {
-				border: 4px solid var(--primary-color);
+				border-color: var(--primary-color);
 				padding: 0;
 			}
 

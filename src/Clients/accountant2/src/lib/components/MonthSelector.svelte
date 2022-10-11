@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
 	import { DateHelper } from '../../../../shared2/utils/dateHelper';
+	import { locale } from '$lib/stores';
 	import { SelectOption } from '$lib/models/viewmodels/selectOption';
 
 	export let month: number | null;
 	export let year: number | null;
 	export let disabled: boolean;
-	export let language: string;
 
 	let monthOptions: SelectOption[] | null = null;
 	let yearOptions: number[] | null = null;
@@ -29,7 +29,7 @@
 		monthOptions = [];
 		for (let i = startingMonthOption; i < 12; i++) {
 			const month = new Date(1, i, 1);
-			const option = new SelectOption(i, DateHelper.getLongMonth(month, language));
+			const option = new SelectOption(i, DateHelper.getLongMonth(month, $locale));
 			monthOptions.push(option);
 		}
 	}

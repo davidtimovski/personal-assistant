@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
-	import { syncStatus } from '$lib/stores';
+	import { locale, syncStatus } from '$lib/stores';
 	import { AutomaticTransactionsService } from '$lib/services/automaticTransactionsService';
 	import { AutomaticTransactionItem } from '$lib/models/viewmodels/automaticTransactionItem';
 	import { AppEvents } from '$lib/models/appEvents';
@@ -49,6 +49,10 @@
 		}
 
 		automaticTransactions = automaticTransactionItems;
+	});
+
+	onDestroy(() => {
+		automaticTransactionsService?.release();
 	});
 </script>
 
@@ -96,7 +100,7 @@
 								</td>
 								<td>{automaticTransaction.dayInMonth}</td>
 								<td>
-									{Formatter.number(automaticTransaction.amount, currency)}
+									{Formatter.number(automaticTransaction.amount, currency, $locale)}
 									<i
 										class="fas is-deposit-icon {automaticTransaction.isDeposit
 											? 'fa-donate deposit-color'

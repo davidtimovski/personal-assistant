@@ -87,7 +87,7 @@
 
 <div on:click={hide} class="alert {type}" class:shown>
 	<span class="alert-body">
-		<span class="alert-message" contenteditable="true" bind:innerHTML={message} />
+		<div class="alert-message" contenteditable="true" bind:innerHTML={message} />
 
 		{#if refreshButtonVisible}
 			<button type="button" on:click={refresh} class="refresh-button">{$t('refresh')}</button>
@@ -122,7 +122,6 @@
 				background: transparent;
 				border: none;
 				outline: none;
-				margin-top: 10px;
 				text-decoration: underline;
 			}
 		}

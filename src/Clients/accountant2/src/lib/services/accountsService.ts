@@ -14,7 +14,7 @@ export class AccountsService {
 	private readonly httpProxy = new HttpProxy('accountant2');
 	private readonly idbHelper = new AccountsIDBHelper();
 	private readonly transactionsIDBHelper = new TransactionsIDBHelper();
-	private readonly currenciesService = new CurrenciesService('Accountant');
+	private readonly currenciesService = new CurrenciesService('Accountant', 'accountant2');
 	private readonly logger = new ErrorLogger('Accountant', 'accountant2');
 
 	getMainId(): Promise<number> {
@@ -242,5 +242,11 @@ export class AccountsService {
 
 	async hasTransactions(id: number): Promise<boolean> {
 		return this.idbHelper.hasTransactions(id);
+	}
+
+	release() {
+		this.httpProxy.release();
+		this.currenciesService.release();
+		this.logger.release();
 	}
 }
