@@ -12,38 +12,36 @@ export class ErrorLogger {
   }
 
   async logError(error: any): Promise<void> {
-    if (
-      !navigator.onLine ||
-      error === HttpError.Unauthorized ||
-      error instanceof ValidationErrors
-    ) {
-      return;
-    }
-
-    let message = "";
-    let stackTrace: string | undefined;
-
-    if (error instanceof Error) {
-      message = error.message;
-      stackTrace = error.stack;
-    } else if (typeof error === "string") {
-      message = error;
-    } else {
-      message = error.toString();
-    }
-
-    await this.httpProxy.ajaxExecute(
-      `${Variables.urls.gateway}/clientlogger/logs`,
-      {
-        method: "post",
-        body: window.JSON.stringify({
-          application: this.application,
-          message: message,
-          stackTrace: stackTrace,
-          occurred: DateHelper.adjustForTimeZone(new Date()),
-        }),
-      }
-    );
+    // TODO: Possible cause of issues server-side
+    // if (
+    //   !navigator.onLine ||
+    //   error === HttpError.Unauthorized ||
+    //   error instanceof ValidationErrors
+    // ) {
+    //   return;
+    // }
+    // let message = "";
+    // let stackTrace: string | undefined;
+    // if (error instanceof Error) {
+    //   message = error.message;
+    //   stackTrace = error.stack;
+    // } else if (typeof error === "string") {
+    //   message = error;
+    // } else {
+    //   message = error.toString();
+    // }
+    // await this.httpProxy.ajaxExecute(
+    //   `${Variables.urls.gateway}/clientlogger/logs`,
+    //   {
+    //     method: "post",
+    //     body: window.JSON.stringify({
+    //       application: this.application,
+    //       message: message,
+    //       stackTrace: stackTrace,
+    //       occurred: DateHelper.adjustForTimeZone(new Date()),
+    //     }),
+    //   }
+    // );
   }
 
   release() {
