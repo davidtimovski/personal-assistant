@@ -21,7 +21,6 @@
 	let imageUri: any;
 	let data = new HomePageData();
 	let currency: string;
-	let menuButtonIsLoading = false;
 	let connTracker = {
 		isOnline: true
 	};
@@ -83,11 +82,6 @@
 		finishProgressBar();
 		dataLoaded = true;
 		localStorage.set('homePageData', JSON.stringify(data));
-	}
-
-	function goToMenu() {
-		menuButtonIsLoading = true;
-		goto('/menu');
 	}
 
 	function sync() {
@@ -191,21 +185,9 @@
 <section class="container">
 	<div class="page-title-wrap-loader">
 		<div class="title-wrap">
-			{#if menuButtonIsLoading}
-				<span class="menu-loader">
-					<i class="fas fa-circle-notch fa-spin" />
-				</span>
-			{:else}
-				<button
-					type="button"
-					on:click={goToMenu}
-					class="profile-image-container"
-					title={$t('index.menu')}
-					aria-label={$t('index.menu')}
-				>
-					<img src={imageUri} class="profile-image" width="40" height="40" alt={$t('profilePicture')} />
-				</button>
-			{/if}
+			<a href="/menu" class="profile-image-container" title={$t('index.menu')} aria-label={$t('index.menu')}>
+				<img src={imageUri} class="profile-image" width="40" height="40" alt={$t('profilePicture')} />
+			</a>
 
 			<div class="page-title reduced">
 				<span />

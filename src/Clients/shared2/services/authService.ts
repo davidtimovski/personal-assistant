@@ -26,10 +26,6 @@ export class AuthService {
   }
 
   async loginCallback() {
-    if (!this.userManager) {
-      return;
-    }
-
     let user = await this.userManager.getUser();
     if (user) {
       loggedInUser.set(user);
@@ -53,18 +49,10 @@ export class AuthService {
   }
 
   async signinRedirect() {
-    if (!this.userManager) {
-      return;
-    }
-
     await this.userManager.signinRedirect();
   }
 
   async logout() {
-    if (!this.userManager) {
-      return;
-    }
-
     await this.userManager.clearStaleState();
     await this.userManager.signoutRedirect();
   }
