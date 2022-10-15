@@ -7,6 +7,7 @@ public interface IUsersRepository
 {
     User Get(int id);
     User Get(string email);
+    int GetId(string auth0Id);
     bool Exists(int id);
     string GetLanguage(int id);
     string GetImageUri(int id);

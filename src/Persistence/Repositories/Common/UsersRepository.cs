@@ -25,6 +25,13 @@ public class UsersRepository : BaseRepository, IUsersRepository
         return conn.QueryFirstOrDefault<User>(@"SELECT * FROM ""AspNetUsers"" WHERE ""Email"" = @Email AND ""EmailConfirmed"" = TRUE", new { Email = email });
     }
 
+    public int GetId(string auth0Id)
+    {
+        using IDbConnection conn = OpenConnection();
+
+        return conn.QueryFirstOrDefault<int>(@"SELECT user_id FROM user_id_map WHERE auth0_id = @Auth0Id", new { Auth0Id = auth0Id });
+    }
+
     public bool Exists(int id)
     {
         using IDbConnection conn = OpenConnection();

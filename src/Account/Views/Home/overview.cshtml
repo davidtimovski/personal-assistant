@@ -1,0 +1,58 @@
+﻿@model OverviewViewModel
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["Overview"];
+    ViewData["Description"] = Localizer["Overview"];
+}
+
+@switch (Model.Alert)
+{
+    case OverviewAlert.ProfileUpdated:
+        <p class="alert success">@Localizer["ProfileUpdatedSuccess"]</p>
+        break;
+    case OverviewAlert.PasswordResetEmailSent:
+        <p class="alert success">@Localizer["PasswordResetSuccess"]</p>
+        break;
+}
+
+<div class="welcome-message">@Localizer["Hello"], @Model.UserName.</div>
+
+<div class="overview-apps">
+    <h3>@Localizer["GoTo"]</h3>
+
+    @foreach (var app in Model.ClientApplications)
+    {
+        @if (app.InDevelopment)
+        {
+            <a href="@app.Url" class="app @app.CssClass in-development">
+                <div>@app.Name</div>
+                <div>@Localizer["InDevelopment"]</div>
+            </a>
+        }
+        else
+        {
+            <a href="@app.Url" class="app @app.CssClass">@app.Name</a>
+        }
+    }
+</div>
+
+<div class="links">
+    <div>
+        <a asp-action="edit-profile" asp-controller="account">@Localizer["EditProfile"]</a>
+    </div>
+    <div>
+        <a asp-action="change-password" asp-controller="account">@Localizer["ChangePassword"]</a>
+    </div>
+@*    <div>
+        <a asp-action="delete" asp-controller="account">@Localizer["DeleteAccount"]</a>
+    </div>*@
+</div>
+
+<div class="links">
+    <div>
+        <a asp-action="privacy-policy" asp-controller="home">@Localizer["PrivacyPolicy"]</a>
+    </div>
+    <div>
+        <a asp-action="about" asp-controller="home">@Localizer["About"]</a>
+    </div>
+</div>

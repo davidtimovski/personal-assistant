@@ -34,6 +34,8 @@ public class TasksController : BaseController
     private readonly Urls _urls;
 
     public TasksController(
+        IUserIdLookup userIdLookup,
+        IUsersRepository usersRepository,
         IHubContext<ToDoAssistantHub> hubContext,
         ITaskService taskService,
         INotificationService notificationService,
@@ -42,7 +44,7 @@ public class TasksController : BaseController
         IValidator<BulkCreate> bulkCreateValidator,
         IValidator<UpdateTask> updateValidator,
         IStringLocalizer<TasksController> localizer,
-        IOptions<Urls> urls)
+        IOptions<Urls> urls) : base(userIdLookup, usersRepository)
     {
         _hubContext = hubContext;
         _taskService = taskService;

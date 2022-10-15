@@ -23,7 +23,7 @@
 	}
 
 	onMount(async () => {
-		tooltipsService = new TooltipsService('Accountant', 'accountant2');
+		tooltipsService = new TooltipsService('Accountant');
 
 		const accountantTooltips = await tooltipsService.getAll();
 		for (const tooltip of accountantTooltips) {

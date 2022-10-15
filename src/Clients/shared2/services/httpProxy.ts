@@ -1,20 +1,25 @@
 import type { Unsubscriber } from "svelte/store";
-import type { User } from "oidc-client";
 
 import { AuthService } from "./authService";
 import { ValidationErrors } from "../models/validationErrors";
 import { HttpError } from "../models/enums/httpError";
-import { alertState, loggedInUser } from "$lib/stores";
+import { alertState, authInfo } from "$lib/stores";
 
 export class HttpProxy {
   private readonly authService: AuthService;
   private readonly successCodes = [200, 201, 204];
-  private user: User | null = null;
-  private loggedInUserUnsub: Unsubscriber;
+  private token: string | null = null;
+  private authInfoUnsub: Unsubscriber;
 
-  constructor(client: string) {
-    this.loggedInUserUnsub = loggedInUser.subscribe((x) => (this.user = x));
-    this.authService = new AuthService(client);
+  constructor() {
+    this.authInfoUnsub = authInfo.subscribe((x) => {
+      if (!x) {
+        return;
+      }
+
+      this.token = x.token;
+    });
+    this.authService = new AuthService();
   }
 
   async ajax<T>(uri: string, init?: RequestInit): Promise<T> {
@@ -33,12 +38,6 @@ export class HttpProxy {
     }
 
     if (!this.successCodes.includes(response.status)) {
-      await this.redirectIfUnauthorized(response.status);
-
-      if (response.status === 404) {
-        throw new Error("Not found");
-      }
-
       await this.handleErrorCodes(response);
     }
 
@@ -69,12 +68,6 @@ export class HttpProxy {
     }
 
     if (!this.successCodes.includes(response.status)) {
-      await this.redirectIfUnauthorized(response.status);
-
-      if (response.status === 404) {
-        throw new Error("Not found");
-      }
-
       await this.handleErrorCodes(response);
     }
 
@@ -95,7 +88,6 @@ export class HttpProxy {
       throw e;
     }
     if (!this.successCodes.includes(response.status)) {
-      await this.redirectIfUnauthorized(response.status);
       await this.handleErrorCodes(response);
     }
   }
@@ -109,7 +101,6 @@ export class HttpProxy {
     const response: Response = await window.fetch(uri, init);
 
     if (!this.successCodes.includes(response.status)) {
-      await this.redirectIfUnauthorized(response.status);
       await this.handleErrorCodes(response);
     }
 
@@ -117,13 +108,13 @@ export class HttpProxy {
   }
 
   release() {
-    this.loggedInUserUnsub();
+    this.authInfoUnsub();
   }
 
   private setHeaders(init?: RequestInit): RequestInit {
     const headers = {
       Accept: "application/json",
-      Authorization: `Bearer ${this.user?.access_token}`,
+      Authorization: `Bearer ${this.token}`,
       "Content-Type": "application/json",
       "X-Requested-With": "Fetch",
     };
@@ -139,15 +130,16 @@ export class HttpProxy {
     return init;
   }
 
-  private async redirectIfUnauthorized(statusCode: number) {
-    if (statusCode === 401) {
-      await this.authService.signinRedirect();
-      throw HttpError.Unauthorized;
-    }
-  }
-
   private async handleErrorCodes(response: Response): Promise<void> {
-    if (response.status === 404) {
+    if (response.status === 401) {
+      debugger;
+      if (!this.authService.initialized) {
+        await this.authService.initialize();
+      }
+
+      //await this.authService.signinRedirect();
+      throw HttpError.Unauthorized;
+    } else if (response.status === 404) {
       throw new Error("404 Not Found returned");
     } else if (response.status === 422) {
       let errors: any;

@@ -12,7 +12,7 @@ public class DebtsControllerTests
 
     public DebtsControllerTests()
     {
-        _sut = new DebtsController(null)
+        _sut = new DebtsController(null, null, null)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };

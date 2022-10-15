@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Api.Models.Accountant.Transactions;
 using Application.Contracts.Accountant.Transactions;
 using Application.Contracts.Accountant.Transactions.Models;
+using Application.Contracts.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Hosting;
@@ -22,9 +23,11 @@ public class TransactionsController : BaseController
     private readonly IWebHostEnvironment _webHostEnvironment;
 
     public TransactionsController(
+        IUserIdLookup userIdLookup,
+        IUsersRepository usersRepository,
         ITransactionService transactionService,
         IStringLocalizer<TransactionsController> localizer,
-        IWebHostEnvironment webHostEnvironment)
+        IWebHostEnvironment webHostEnvironment) : base(userIdLookup, usersRepository)
     {
         _transactionService = transactionService;
         _localizer = localizer;

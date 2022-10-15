@@ -31,7 +31,7 @@
 		selectCurrencyInput = <HTMLInputElement>document.getElementById('select-currency-input');
 
 		localStorage = new LocalStorageUtil();
-		currenciesService = new CurrenciesService('Accountant', 'accountant2');
+		currenciesService = new CurrenciesService('Accountant');
 
 		currency = localStorage.get(LocalStorageKeys.Currency);
 		const currencies = currenciesService.getCurrencies();

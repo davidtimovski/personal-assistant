@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Api.Controllers.CookingAssistant;
-using Microsoft.AspNetCore.Mvc;
 using Api.UnitTests.Builders;
+using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
 namespace Api.UnitTests.Controllers.CookingAssistant;
@@ -12,7 +12,7 @@ public class DietaryProfilesControllerTests
 
     public DietaryProfilesControllerTests()
     {
-        _sut = new DietaryProfilesController(null, null, null)
+        _sut = new DietaryProfilesController(null, null, null, null, null)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };

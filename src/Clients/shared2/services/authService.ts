@@ -1,71 +1,65 @@
-import pkg from "oidc-client";
-const { Log, UserManager, WebStorageStateStore } = pkg;
+import createAuth0Client, { Auth0Client } from "@auth0/auth0-spa-js";
+
+import { authInfo } from "$lib/stores";
+import { AuthInfo } from "$lib/models/authInfo";
 import Variables from "$lib/variables";
-import { loggedInUser } from "$lib/stores";
 
 export class AuthService {
-  private userManager: any = null;
+  private client: Auth0Client | null = null;
 
-  constructor(client: string) {
-    if (Variables.debug) {
-      Log.logger = console;
-    }
+  get initialized(): boolean {
+    return this.client !== null;
+  }
 
-    this.userManager = new UserManager({
-      authority: Variables.urls.authority,
-      client_id: client,
+  async initialize() {
+    this.client = await createAuth0Client({
+      domain: "personalassistant-site.eu.auth0.com",
+      client_id: "De8UNquc4izDdIcmqcsje1iiaySD3RCc",
+      audience: `${Variables.urls.api}/api`,
+      cacheLocation: "localstorage",
       redirect_uri: `${Variables.urls.host}/signin-oidc`,
-      response_type: "code",
-      scope: "openid email personal-assistant-api personal-assistant-gateway",
-      post_logout_redirect_uri: Variables.urls.host,
-      userStore: new WebStorageStateStore({
-        prefix: "oidc",
-        store: window.localStorage,
-      }),
     });
   }
 
-  async loginCallback() {
-    if (!this.userManager) {
-      return;
+  async authenticated() {
+    if (!this.client) {
+      throw new Error("Not initialized");
     }
 
-    let user = await this.userManager.getUser();
-    if (user) {
-      loggedInUser.set(user);
-    } else {
-      await this.userManager.clearStaleState();
-
-      try {
-        user = await this.userManager.signinSilent();
-        loggedInUser.set(user);
-      } catch {
-        await this.userManager.signinRedirect();
-        return;
-      }
-    }
-  }
-
-  async login() {
-    if (!window.location.href.includes("signin-oidc")) {
-      await this.loginCallback();
-    }
+    return await this.client.isAuthenticated();
   }
 
   async signinRedirect() {
-    if (!this.userManager) {
-      return;
+    if (!this.client) {
+      throw new Error("Not initialized");
     }
 
-    await this.userManager.signinRedirect();
+    await this.client.loginWithRedirect();
+  }
+
+  async handleRedirectCallback() {
+    if (!this.client) {
+      throw new Error("Not initialized");
+    }
+
+    await this.client.handleRedirectCallback();
+  }
+
+  async setToken() {
+    if (!this.client) {
+      throw new Error("Not initialized");
+    }
+
+    const token = await this.client.getTokenSilently();
+    const profile = await this.client?.getUser();
+
+    authInfo.set(new AuthInfo(token, profile));
   }
 
   async logout() {
-    if (!this.userManager) {
-      return;
-    }
-
-    await this.userManager.clearStaleState();
-    await this.userManager.signoutRedirect();
+    await this.initialize();
+    await this.client?.logout({
+      returnTo: Variables.urls.authority,
+    });
   }
 }

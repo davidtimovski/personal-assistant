@@ -14,7 +14,10 @@ public class UsersController : BaseController
 {
     private readonly IUserService _userService;
 
-    public UsersController(IUserService userService)
+    public UsersController(
+        IUserIdLookup userIdLookup,
+        IUsersRepository usersRepository,
+        IUserService userService) : base(userIdLookup, usersRepository)
     {
         _userService = userService;
     }

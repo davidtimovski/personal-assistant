@@ -203,9 +203,6 @@ textarea.invalid {
   display: flex;
   align-items: center;
   height: 50px;
-  background: transparent;
-  border: none;
-  outline: none;
 }
 
 .profile-image-container .profile-image {
@@ -272,15 +269,6 @@ textarea.invalid {
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
   padding: 10px 20px;
-}
-.page-title-wrap-loader .title-wrap .menu-loader {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 48px;
-  height: 50px;
-  font-size: 27px;
-  color: var(--primary-color);
 }
 .page-title-wrap-loader .title-wrap .sync-button {
   display: flex;

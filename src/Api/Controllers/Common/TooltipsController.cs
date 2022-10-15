@@ -14,7 +14,10 @@ public class TooltipsController : BaseController
 {
     private readonly ITooltipService _tooltipService;
 
-    public TooltipsController(ITooltipService tooltipService)
+    public TooltipsController(
+        IUserIdLookup userIdLookup,
+        IUsersRepository usersRepository,
+        ITooltipService tooltipService) : base(userIdLookup, usersRepository)
     {
         _tooltipService = tooltipService;
     }

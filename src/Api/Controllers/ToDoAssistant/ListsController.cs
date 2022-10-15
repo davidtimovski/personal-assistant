@@ -37,6 +37,8 @@ public class ListsController : BaseController
     private readonly Urls _urls;
 
     public ListsController(
+        IUserIdLookup userIdLookup,
+        IUsersRepository usersRepository,
         IListService listService,
         INotificationService notificationService,
         ISenderService senderService,
@@ -47,7 +49,7 @@ public class ListsController : BaseController
         IValidator<ShareList> shareValidator,
         IValidator<CopyList> copyValidator,
         IStringLocalizer<ListsController> localizer,
-        IOptions<Urls> urls)
+        IOptions<Urls> urls) : base(userIdLookup, usersRepository)
     {
         _listService = listService;
         _notificationService = notificationService;

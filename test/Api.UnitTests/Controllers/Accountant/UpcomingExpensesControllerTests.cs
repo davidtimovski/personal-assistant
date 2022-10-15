@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Api.Controllers.Accountant;
-using Microsoft.AspNetCore.Mvc;
 using Api.UnitTests.Builders;
+using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
 namespace Api.UnitTests.Controllers.Accountant;
@@ -12,7 +12,7 @@ public class UpcomingExpensesControllerTests
 
     public UpcomingExpensesControllerTests()
     {
-        _sut = new UpcomingExpensesController(null)
+        _sut = new UpcomingExpensesController(null, null, null)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };

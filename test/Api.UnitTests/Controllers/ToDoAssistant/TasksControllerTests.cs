@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
 using Api.Config;
 using Api.Controllers.ToDoAssistant;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Moq;
 using Api.UnitTests.Builders;
 using Application.Contracts.ToDoAssistant.Tasks;
 using Application.Contracts.ToDoAssistant.Tasks.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Moq;
 using Xunit;
 
 namespace Api.UnitTests.Controllers.ToDoAssistant;
@@ -19,7 +19,7 @@ public class TasksControllerTests
     public TasksControllerTests()
     {
         _sut = new TasksController(
-            null,
+            null, null, null,
             _taskServiceMock.Object,
             null, null, null, null, null, null,
             new Mock<IOptions<Urls>>().Object)

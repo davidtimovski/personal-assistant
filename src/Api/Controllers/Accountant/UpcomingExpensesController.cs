@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Application.Contracts.Accountant.UpcomingExpenses;
 using Application.Contracts.Accountant.UpcomingExpenses.Models;
+using Application.Contracts.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,10 @@ public class UpcomingExpensesController : BaseController
 {
     private readonly IUpcomingExpenseService _upcomingExpenseService;
 
-    public UpcomingExpensesController(IUpcomingExpenseService upcomingExpenseService)
+    public UpcomingExpensesController(
+        IUserIdLookup userIdLookup,
+        IUsersRepository usersRepository,
+        IUpcomingExpenseService upcomingExpenseService) : base(userIdLookup, usersRepository)
     {
         _upcomingExpenseService = upcomingExpenseService;
     }

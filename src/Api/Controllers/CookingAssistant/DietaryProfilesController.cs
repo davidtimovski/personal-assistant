@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Application.Contracts.Common;
 using Application.Contracts.CookingAssistant.DietaryProfiles;
 using Application.Contracts.CookingAssistant.DietaryProfiles.Models;
 using FluentValidation;
@@ -18,9 +19,11 @@ public class DietaryProfilesController : BaseController
     private readonly IValidator<UpdateDietaryProfile> _updateDietaryProfileValidator;
 
     public DietaryProfilesController(
+        IUserIdLookup userIdLookup,
+        IUsersRepository usersRepository,
         IDietaryProfileService dietaryProfileService,
         IValidator<GetRecommendedDailyIntake> getRecommendedDailyIntakeValidator,
-        IValidator<UpdateDietaryProfile> updateDietaryProfileValidator)
+        IValidator<UpdateDietaryProfile> updateDietaryProfileValidator) : base(userIdLookup, usersRepository)
     {
         _dietaryProfileService = dietaryProfileService;
         _getRecommendedDailyIntakeValidator = getRecommendedDailyIntakeValidator;

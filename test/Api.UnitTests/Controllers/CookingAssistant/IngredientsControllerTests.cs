@@ -16,7 +16,7 @@ public class IngredientsControllerTests
 
     public IngredientsControllerTests()
     {
-        _sut = new IngredientsController(_ingredientServiceMock.Object, null, null, null)
+        _sut = new IngredientsController(null, null, _ingredientServiceMock.Object, null, null, null)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };

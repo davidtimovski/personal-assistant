@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Application.Contracts.Accountant.Categories;
 using Application.Contracts.Accountant.Categories.Models;
+using Application.Contracts.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,10 @@ public class CategoriesController : BaseController
 {
     private readonly ICategoryService _categoryService;
 
-    public CategoriesController(ICategoryService categoryService)
+    public CategoriesController(
+        IUserIdLookup userIdLookup,
+        IUsersRepository usersRepository,
+        ICategoryService categoryService) : base(userIdLookup, usersRepository)
     {
         _categoryService = categoryService;
     }

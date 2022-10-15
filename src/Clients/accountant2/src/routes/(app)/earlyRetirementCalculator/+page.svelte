@@ -373,7 +373,7 @@
 	onMount(async () => {
 		localStorage = new LocalStorageUtil();
 		accountsService = new AccountsService();
-		currenciesService = new CurrenciesService('Accountant', 'accountant2');
+		currenciesService = new CurrenciesService('Accountant');
 
 		currency = localStorage.get(LocalStorageKeys.Currency);
 

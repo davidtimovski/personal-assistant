@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Application.Contracts.Accountant.Debts;
 using Application.Contracts.Accountant.Debts.Models;
+using Application.Contracts.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,10 @@ public class DebtsController : BaseController
 {
     private readonly IDebtService _debtService;
 
-    public DebtsController(IDebtService debtService)
+    public DebtsController(
+        IUserIdLookup userIdLookup,
+        IUsersRepository usersRepository,
+        IDebtService debtService) : base(userIdLookup, usersRepository)
     {
         _debtService = debtService;
     }

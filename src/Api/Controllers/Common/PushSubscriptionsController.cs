@@ -15,7 +15,9 @@ public class PushSubscriptionsController : BaseController
     private readonly IPushSubscriptionService _pushSubscriptionService;
 
     public PushSubscriptionsController(
-        IPushSubscriptionService pushSubscriptionService)
+        IUserIdLookup userIdLookup,
+        IUsersRepository usersRepository,
+        IPushSubscriptionService pushSubscriptionService) : base(userIdLookup, usersRepository)
     {
         _pushSubscriptionService = pushSubscriptionService;
     }

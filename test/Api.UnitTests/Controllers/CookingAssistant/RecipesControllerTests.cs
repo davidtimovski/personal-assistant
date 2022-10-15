@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
 using Api.Config;
 using Api.Controllers.CookingAssistant;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Moq;
 using Api.UnitTests.Builders;
 using Application.Contracts.CookingAssistant.Recipes;
 using Application.Contracts.CookingAssistant.Recipes.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Moq;
 using Xunit;
 
 namespace Api.UnitTests.Controllers.CookingAssistant;
@@ -18,7 +18,7 @@ public class RecipesControllerTests
 
     public RecipesControllerTests()
     {
-        _sut = new RecipesController(_recipeServiceMock.Object,
+        _sut = new RecipesController(null, null, _recipeServiceMock.Object,
             null, null, null, null, null, null, null, null, null,
             null, null, null, null, new Mock<IOptions<Urls>>().Object)
         {

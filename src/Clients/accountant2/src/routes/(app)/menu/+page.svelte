@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte/internal';
+	import { onMount } from 'svelte/internal';
 
 	import { AuthService } from '../../../../../shared2/services/authService';
 
@@ -20,17 +20,18 @@
 	async function logOut() {
 		localStorage.clear();
 
-		const authService = new AuthService('accountant2');
+		const authService = new AuthService();
 		await authService.logout();
 	}
 
 	onMount(async () => {
 		localStorage = new LocalStorageUtil();
 
-		const cacheNames = await caches.keys();
-		if (cacheNames.length > 0) {
-			version = cacheNames.sort().reverse()[0];
-		}
+		caches.keys().then((cacheNames) => {
+			if (cacheNames.length > 0) {
+				version = cacheNames.sort().reverse()[0];
+			}
+		});
 	});
 </script>
 

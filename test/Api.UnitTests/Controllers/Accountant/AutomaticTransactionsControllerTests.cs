@@ -12,7 +12,7 @@ public class AutomaticTransactionsControllerTests
 
     public AutomaticTransactionsControllerTests()
     {
-        _sut = new AutomaticTransactionsController(null)
+        _sut = new AutomaticTransactionsController(null, null, null)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };

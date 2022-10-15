@@ -46,6 +46,8 @@ public class RecipesController : BaseController
     private readonly Urls _urls;
 
     public RecipesController(
+        IUserIdLookup userIdLookup,
+        IUsersRepository usersRepository,
         IRecipeService recipeService,
         IIngredientService ingredientService,
         IStringLocalizer<RecipesController> localizer,
@@ -60,7 +62,7 @@ public class RecipesController : BaseController
         IValidator<CreateSendRequest> createSendRequestValidator,
         IValidator<ImportRecipe> importRecipeValidator,
         IValidator<UploadTempImage> uploadTempImageValidator,
-        IOptions<Urls> urls)
+        IOptions<Urls> urls) : base(userIdLookup, usersRepository)
     {
         _recipeService = recipeService;
         _ingredientService = ingredientService;

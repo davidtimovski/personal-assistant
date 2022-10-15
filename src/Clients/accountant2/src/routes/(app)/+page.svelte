@@ -10,7 +10,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { CapitalService } from '$lib/services/capitalService';
 	import { Formatter } from '$lib/utils/formatter';
-	import { locale, loggedInUser, syncStatus, searchFilters } from '$lib/stores';
+	import { locale, authInfo, syncStatus, searchFilters } from '$lib/stores';
 	import { AppEvents } from '$lib/models/appEvents';
 	import { SearchFilters } from '$lib/models/viewmodels/searchFilters';
 	import type { AmountByCategory } from '$lib/models/viewmodels/amountByCategory';
@@ -21,7 +21,6 @@
 	let imageUri: any;
 	let data = new HomePageData();
 	let currency: string;
-	let menuButtonIsLoading = false;
 	let connTracker = {
 		isOnline: true
 	};
@@ -85,11 +84,6 @@
 		localStorage.set('homePageData', JSON.stringify(data));
 	}
 
-	function goToMenu() {
-		menuButtonIsLoading = true;
-		goto('/menu');
-	}
-
 	function sync() {
 		syncStatus.set(AppEvents.ReSync);
 
@@ -138,7 +132,7 @@
 
 	onMount(() => {
 		localStorage = new LocalStorageUtil();
-		usersService = new UsersServiceBase('Accountant', 'accountant2');
+		usersService = new UsersServiceBase('Accountant');
 		capitalService = new CapitalService();
 		accountsService = new AccountsService();
 
@@ -152,7 +146,7 @@
 		currency = localStorage.get(LocalStorageKeys.Currency);
 
 		unsubscriptions.push(
-			loggedInUser.subscribe((value) => {
+			authInfo.subscribe((value) => {
 				if (!value) {
 					return;
 				}
@@ -191,21 +185,9 @@
 <section class="container">
 	<div class="page-title-wrap-loader">
 		<div class="title-wrap">
-			{#if menuButtonIsLoading}
-				<span class="menu-loader">
-					<i class="fas fa-circle-notch fa-spin" />
-				</span>
-			{:else}
-				<button
-					type="button"
-					on:click={goToMenu}
-					class="profile-image-container"
-					title={$t('index.menu')}
-					aria-label={$t('index.menu')}
-				>
-					<img src={imageUri} class="profile-image" width="40" height="40" alt={$t('profilePicture')} />
-				</button>
-			{/if}
+			<a href="/menu" class="profile-image-container" title={$t('index.menu')} aria-label={$t('index.menu')}>
+				<img src={imageUri} class="profile-image" width="40" height="40" alt={$t('profilePicture')} />
+			</a>
 
 			<div class="page-title reduced">
 				<span />

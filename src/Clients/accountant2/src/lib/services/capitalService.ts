@@ -16,8 +16,8 @@ export class CapitalService {
 	private readonly upcomingExpensesIDBHelper = new UpcomingExpensesIDBHelper();
 	private readonly debtsIDBHelper = new DebtsIDBHelper();
 	private readonly transactionsService = new TransactionsService();
-	private readonly currenciesService = new CurrenciesService('Accountant', 'accountant2');
-	private readonly logger = new ErrorLogger('Accountant', 'accountant2');
+	private readonly currenciesService = new CurrenciesService('Accountant');
+	private readonly logger = new ErrorLogger('Accountant');
 
 	async getSpent(
 		mainAccountId: number,

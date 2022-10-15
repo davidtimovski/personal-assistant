@@ -3,12 +3,11 @@ import { ErrorLogger } from "./errorLogger";
 import Variables from "$lib/variables";
 
 export class NotificationsServiceBase {
-  protected readonly httpProxy: HttpProxy;
+  protected readonly httpProxy = new HttpProxy();
   protected readonly logger: ErrorLogger;
 
-  constructor(application: string, client: string) {
-    this.httpProxy = new HttpProxy(client);
-    this.logger = new ErrorLogger(application, client);
+  constructor(application: string) {
+    this.logger = new ErrorLogger(application);
   }
 
   async createSubscription(

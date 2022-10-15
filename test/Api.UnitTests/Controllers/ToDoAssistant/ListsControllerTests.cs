@@ -19,6 +19,7 @@ public class ListsControllerTests
     public ListsControllerTests()
     {
         _sut = new ListsController(
+            null, null,
             _listServiceMock.Object,
             null, null, null, null, null, null, null, null, null,
             new Mock<IOptions<Urls>>().Object)

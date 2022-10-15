@@ -5,16 +5,15 @@ import { DateHelper } from "../utils/dateHelper";
 import Variables from "$lib/variables";
 
 export class CurrenciesService {
-  private readonly httpProxy: HttpProxy;
+  private readonly httpProxy = new HttpProxy();
   private readonly localStorage = new LocalStorageBase();
   private readonly logger: ErrorLogger;
   private readonly key = "currencyRates";
 
   private currencyRates: Map<string, number> | null = null;
 
-  constructor(application: string, client: string) {
-    this.httpProxy = new HttpProxy(client);
-    this.logger = new ErrorLogger(application, client);
+  constructor(application: string) {
+    this.logger = new ErrorLogger(application);
   }
 
   async loadRates(): Promise<void> {

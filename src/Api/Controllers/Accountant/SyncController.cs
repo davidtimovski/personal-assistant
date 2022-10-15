@@ -17,6 +17,7 @@ using Application.Contracts.Accountant.Transactions;
 using Application.Contracts.Accountant.Transactions.Models;
 using Application.Contracts.Accountant.UpcomingExpenses;
 using Application.Contracts.Accountant.UpcomingExpenses.Models;
+using Application.Contracts.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -37,13 +38,15 @@ public class SyncController : BaseController
     private readonly IAutomaticTransactionService _automaticTransactionService;
 
     public SyncController(
+        IUserIdLookup userIdLookup,
+        IUsersRepository usersRepository,
         ISyncService syncService,
         ICategoryService categoryService,
         IAccountService accountService,
         ITransactionService transactionService,
         IUpcomingExpenseService upcomingExpenseService,
         IDebtService debtService,
-        IAutomaticTransactionService automaticTransactionService)
+        IAutomaticTransactionService automaticTransactionService) : base(userIdLookup, usersRepository)
     {
         _syncService = syncService;
         _categoryService = categoryService;
