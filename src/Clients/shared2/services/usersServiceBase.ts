@@ -74,5 +74,6 @@ export class UsersServiceBase {
 
   release() {
     this.httpProxy.release();
+    this.logger.release();
   }
 }

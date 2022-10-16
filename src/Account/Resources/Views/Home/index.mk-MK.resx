@@ -117,16 +117,28 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CurrentPasswordIsRequired" xml:space="preserve">
-    <value>Current password is required</value>
+  <data name="About" xml:space="preserve">
+    <value>За нас</value>
   </data>
-  <data name="NewPasswordIsRequired" xml:space="preserve">
-    <value>New password is required</value>
+  <data name="DontHaveAnAccount" xml:space="preserve">
+    <value>Немате сметка?</value>
   </data>
-  <data name="PasswordMinLength" xml:space="preserve">
-    <value>The Password must be at least {0} characters long</value>
+  <data name="ForgotYourPassword" xml:space="preserve">
+    <value>Ја заборавивте лозинката?</value>
   </data>
-  <data name="PasswordsMustMatch" xml:space="preserve">
-    <value>Passwords must match</value>
+  <data name="Home" xml:space="preserve">
+    <value>Дома</value>
+  </data>
+  <data name="LanguageChanged" xml:space="preserve">
+    <value>Јазикот беше успешно променет, може да се најавите</value>
+  </data>
+  <data name="LoggedOut" xml:space="preserve">
+    <value>Бевте успешно одјавени</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Најава</value>
+  </data>
+  <data name="PrivacyPolicy" xml:space="preserve">
+    <value>Полиса за приватност</value>
   </data>
 </root>

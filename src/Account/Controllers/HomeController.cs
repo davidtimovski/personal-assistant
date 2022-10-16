@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Account.ViewModels.Home;
+using Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
@@ -11,35 +13,43 @@ using Microsoft.Extensions.Configuration;
 
 namespace Account.Controllers;
 
-public class HomeController : Controller
+public class HomeController : BaseController
 {
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _configuration;
 
-    public HomeController(IConfiguration configuration)
+    public HomeController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
     {
+        _httpClientFactory = httpClientFactory;
         _configuration = configuration;
     }
 
     [HttpGet]
-    public IActionResult Index()
+    public IActionResult Index(IndexAlert alert = IndexAlert.None)
     {
         if (User?.Identity.IsAuthenticated == true)
         {
             return RedirectToAction(nameof(Overview));
         }
 
-        return RedirectToAction(nameof(AccountController.Login), "Account");
+        return View(new IndexViewModel(alert));
     }
 
     [HttpGet]
     [Authorize]
     public async Task<IActionResult> Overview(OverviewAlert alert = OverviewAlert.None)
     {
+        using HttpClient httpClient = _httpClientFactory.CreateClient();
+
+        var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0:ClientSecret"]);
+        await Auth0ManagementUtil.InitializeAsync(httpClient, config);
+
+        var profile = await Auth0ManagementUtil.GetUserProfileAsync(httpClient, AuthId);
         var language = CultureInfo.CurrentCulture.Name;
 
         var model = new OverviewViewModel
         {
-            UserName = "Test User's Name",
+            UserName = profile.name,
             ClientApplications = new List<ClientApplicationViewModel>
             {
                 new ClientApplicationViewModel("To Do Assistant", new Uri(_configuration["Urls:ToDoAssistant"] + $"/{language}"), "to-do-assistant"),

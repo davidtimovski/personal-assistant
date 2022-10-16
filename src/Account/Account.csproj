@@ -64,33 +64,20 @@
     <EmbeddedResource Update="Resources\Services\EmailTemplateService.en-US.resx">
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Resources\ViewModels\Account\ChangePasswordViewModelValidator.en-US.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
     <EmbeddedResource Update="Resources\ViewModels\Account\DeleteViewModelValidator.en-US.resx">
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Resources\ViewModels\Account\ForgotPasswordViewModelValidator.en-US.resx">
+    <EmbeddedResource Update="Resources\ViewModels\Account\ResetPasswordViewModelValidator.en-US.resx">
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Resources\ViewModels\Account\RegisterViewModelValidator.en-US.resx">
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Views\Account\change-password.en-US.resx">
+    <EmbeddedResource Update="Resources\Views\Account\reset-password.en-US.resx">
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Resources\Views\Account\delete.en-US.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Views\Account\forgot-password.en-US.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Views\Account\logged-out.en-US.resx">
-      <SubType>Designer</SubType>
-      <Generator>ResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Views\Account\logged-out.mk-MK.resx">
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Update="Resources\Views\Home\accountant.en-US.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -101,13 +88,13 @@
     <EmbeddedResource Update="Resources\Views\Home\about.en-US.resx">
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Views\Home\index.en-US.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
     <EmbeddedResource Update="Resources\Views\Home\to-do-assistant.en-US.resx">
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Resources\Views\Home\privacy-policy.en-US.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Views\Account\lockout.en-US.resx">
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Resources\Views\Account\register.en-US.resx">
@@ -123,12 +110,8 @@
     <EmbeddedResource Include="Resources\EmailTemplates\admin\NewEmailVerification.txt" />
     <EmbeddedResource Include="Resources\EmailTemplates\admin\NewRegistration.html" />
     <EmbeddedResource Include="Resources\EmailTemplates\admin\NewRegistration.txt" />
-    <EmbeddedResource Include="Resources\EmailTemplates\en-US\PasswordReset.html" />
-    <EmbeddedResource Include="Resources\EmailTemplates\en-US\PasswordReset.txt" />
     <EmbeddedResource Include="Resources\EmailTemplates\en-US\RegisterConfirmation.html" />
     <EmbeddedResource Include="Resources\EmailTemplates\en-US\RegisterConfirmation.txt" />
-    <EmbeddedResource Include="Resources\EmailTemplates\mk-MK\PasswordReset.html" />
-    <EmbeddedResource Include="Resources\EmailTemplates\mk-MK\PasswordReset.txt" />
     <EmbeddedResource Include="Resources\EmailTemplates\mk-MK\RegisterConfirmation.html" />
     <EmbeddedResource Include="Resources\EmailTemplates\mk-MK\RegisterConfirmation.txt" />
   </ItemGroup>

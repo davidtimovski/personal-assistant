@@ -60,7 +60,7 @@ public class TasksController : BaseController
     [HttpGet("{id}")]
     public IActionResult Get(int id)
     {
-        TaskDto taskDto = _taskService.Get(id, CurrentUserId);
+        TaskDto taskDto = _taskService.Get(id, UserId);
         if (taskDto == null)
         {
             return NotFound();
@@ -72,7 +72,7 @@ public class TasksController : BaseController
     [HttpGet("{id}/update")]
     public IActionResult GetForUpdate(int id)
     {
-        TaskForUpdate taskDto = _taskService.GetForUpdate(id, CurrentUserId);
+        TaskForUpdate taskDto = _taskService.GetForUpdate(id, UserId);
         if (taskDto == null)
         {
             return NotFound();
@@ -89,13 +89,13 @@ public class TasksController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         CreatedTaskResult result = await _taskService.CreateAsync(dto, _createValidator);
 
         if (result.NotifySignalR)
         {
-            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", dto.UserId);
+            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", AuthId);
         }
 
         foreach (var recipient in result.NotificationRecipients)
@@ -127,13 +127,13 @@ public class TasksController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         BulkCreateResult result = await _taskService.BulkCreateAsync(dto, _bulkCreateValidator);
 
         if (result.NotifySignalR)
         {
-            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", dto.UserId);
+            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", AuthId);
         }
 
         if (!result.Notify())
@@ -173,13 +173,13 @@ public class TasksController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         UpdateTaskResult result = await _taskService.UpdateAsync(dto, _updateValidator);
 
         if (result.NotifySignalR)
         {
-            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", dto.UserId);
+            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", AuthId);
         }
 
         if (!result.Notify())
@@ -265,11 +265,11 @@ public class TasksController : BaseController
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        DeleteTaskResult result = await _taskService.DeleteAsync(id, CurrentUserId);
+        DeleteTaskResult result = await _taskService.DeleteAsync(id, UserId);
 
         if (result.NotifySignalR)
         {
-            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskDeleted", CurrentUserId, id, result.ListId);
+            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskDeleted", AuthId, id, result.ListId);
         }
 
         foreach (var recipient in result.NotificationRecipients)
@@ -277,7 +277,7 @@ public class TasksController : BaseController
             CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
             var message = _localizer["RemovedTaskNotification", CurrentUserName, result.TaskName, result.ListName];
 
-            var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, CurrentUserId, result.ListId, null, message);
+            var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, result.ListId, null, message);
             var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
             var toDoAssistantPushNotification = new ToDoAssistantPushNotification
             {
@@ -301,13 +301,13 @@ public class TasksController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         CompleteUncompleteTaskResult result = await _taskService.CompleteAsync(dto);
 
         if (result.NotifySignalR)
         {
-            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskCompletedChanged", dto.UserId, dto.Id, result.ListId, true);
+            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskCompletedChanged", AuthId, dto.Id, result.ListId, true);
         }
 
         foreach (var recipient in result.NotificationRecipients)
@@ -339,13 +339,13 @@ public class TasksController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         CompleteUncompleteTaskResult result = await _taskService.UncompleteAsync(dto);
 
         if (result.NotifySignalR)
         {
-            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskCompletedChanged", dto.UserId, dto.Id, result.ListId, false);
+            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskCompletedChanged", AuthId, dto.Id, result.ListId, false);
         }
 
         foreach (var recipient in result.NotificationRecipients)
@@ -377,7 +377,7 @@ public class TasksController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         ReorderTaskResult result = await _taskService.ReorderAsync(dto);
 

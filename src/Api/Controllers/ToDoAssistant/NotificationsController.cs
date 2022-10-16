@@ -24,7 +24,7 @@ public class NotificationsController : BaseController
     [HttpGet]
     public IActionResult GetAll()
     {
-        var notificationDtos = _notificationService.GetAllAndFlagUnseen(CurrentUserId);
+        var notificationDtos = _notificationService.GetAllAndFlagUnseen(UserId);
 
         return Ok(notificationDtos);
     }
@@ -32,7 +32,7 @@ public class NotificationsController : BaseController
     [HttpGet("unseen-notifications-count")]
     public IActionResult GetUnseenNotificationsCount()
     {
-        int unseenNotificationsCount = _notificationService.GetUnseenNotificationsCount(CurrentUserId);
+        int unseenNotificationsCount = _notificationService.GetUnseenNotificationsCount(UserId);
 
         return Ok(unseenNotificationsCount);
     }

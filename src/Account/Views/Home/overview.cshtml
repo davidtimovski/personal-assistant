@@ -41,11 +41,14 @@
         <a asp-action="edit-profile" asp-controller="account">@Localizer["EditProfile"]</a>
     </div>
     <div>
-        <a asp-action="change-password" asp-controller="account">@Localizer["ChangePassword"]</a>
+        <a asp-action="reset-password" asp-controller="account">@Localizer["ResetPassword"]</a>
     </div>
 @*    <div>
         <a asp-action="delete" asp-controller="account">@Localizer["DeleteAccount"]</a>
     </div>*@
+    <div>
+        <a asp-action="logout" asp-controller="account" asp-route-returnUrlSlug="?alert=@IndexAlert.LoggedOut">@Localizer["Logout"]</a>
+    </div>
 </div>
 
 <div class="links">

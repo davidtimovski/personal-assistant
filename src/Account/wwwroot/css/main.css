@@ -563,28 +563,6 @@ select {
         text-align: center;
     }
 
-.logout-form {
-    text-align: center;
-}
-
-    .logout-form button {
-        background: transparent;
-        border: none;
-        outline: none;
-        padding: 0;
-        text-decoration: underline;
-        font-family: inherit;
-        font-size: inherit;
-        line-height: 34px;
-        color: var(--main-color);
-        cursor: pointer;
-        transition: color var(--transition);
-    }
-
-        .logout-form button:hover {
-            color: var(--main-color-dark);
-        }
-
 .welcome-message {
     font-size: 1.3rem;
     text-align: center;

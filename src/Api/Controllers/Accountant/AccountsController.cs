@@ -31,7 +31,7 @@ public class AccountsController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         int id = await _accountService.CreateAsync(dto);
 
@@ -46,7 +46,7 @@ public class AccountsController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         await _accountService.UpdateAsync(dto);
 
@@ -56,7 +56,7 @@ public class AccountsController : BaseController
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        await _accountService.DeleteAsync(id, CurrentUserId);
+        await _accountService.DeleteAsync(id, UserId);
 
         return NoContent();
     }

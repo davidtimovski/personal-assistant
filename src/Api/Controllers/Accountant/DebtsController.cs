@@ -31,7 +31,7 @@ public class DebtsController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         int id = await _debtService.CreateAsync(dto);
 
@@ -46,7 +46,7 @@ public class DebtsController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         int id = await _debtService.CreateMergedAsync(dto);
 
@@ -61,7 +61,7 @@ public class DebtsController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         await _debtService.UpdateAsync(dto);
 
@@ -71,7 +71,7 @@ public class DebtsController : BaseController
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        await _debtService.DeleteAsync(id, CurrentUserId);
+        await _debtService.DeleteAsync(id, UserId);
 
         return NoContent();
     }

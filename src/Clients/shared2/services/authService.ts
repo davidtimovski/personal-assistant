@@ -1,11 +1,13 @@
 import createAuth0Client, { Auth0Client } from "@auth0/auth0-spa-js";
 
 import { authInfo } from "$lib/stores";
-import { AuthInfo } from "$lib/models/authInfo";
+import { AuthInfo } from "../models/authInfo";
 import Variables from "$lib/variables";
 
 export class AuthService {
   private client: Auth0Client | null = null;
+
+  constructor(public clientId: string) {}
 
   get initialized(): boolean {
     return this.client !== null;
@@ -14,7 +16,7 @@ export class AuthService {
   async initialize() {
     this.client = await createAuth0Client({
       domain: "personalassistant-site.eu.auth0.com",
-      client_id: "De8UNquc4izDdIcmqcsje1iiaySD3RCc",
+      client_id: this.clientId,
       audience: `${Variables.urls.api}/api`,
       cacheLocation: "localstorage",
       redirect_uri: `${Variables.urls.host}/signin-oidc`,
@@ -57,9 +59,12 @@ export class AuthService {
   }
 
   async logout() {
-    await this.initialize();
-    await this.client?.logout({
-      returnTo: Variables.urls.authority,
+    if (!this.client) {
+      throw new Error("Not initialized");
+    }
+
+    await this.client.logout({
+      returnTo: Variables.urls.account,
     });
   }
 }

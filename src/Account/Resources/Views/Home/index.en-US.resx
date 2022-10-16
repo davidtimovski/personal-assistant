@@ -117,10 +117,28 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="LockedOut" xml:space="preserve">
-    <value>Заклучени сте :(</value>
+  <data name="About" xml:space="preserve">
+    <value>About</value>
   </data>
-  <data name="YouAreLockedOut" xml:space="preserve">
-    <value>Заклучени сте надвор заради премногу неуспешни обиди за најава. Неможете да се најавите во следните {0} минути.</value>
+  <data name="DontHaveAnAccount" xml:space="preserve">
+    <value>Don't have an account?</value>
+  </data>
+  <data name="ForgotYourPassword" xml:space="preserve">
+    <value>Forgot your password?</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="LanguageChanged" xml:space="preserve">
+    <value>The language has been successfully changed, you can log back in</value>
+  </data>
+  <data name="LoggedOut" xml:space="preserve">
+    <value>You've been successfully logged out</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="PrivacyPolicy" xml:space="preserve">
+    <value>Privacy policy</value>
   </data>
 </root>

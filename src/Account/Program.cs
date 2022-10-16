@@ -26,6 +26,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
 using Persistence;
 using Serilog;
+using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
@@ -86,8 +87,11 @@ builder.Services.AddMvc(options =>
 {
     options.EnableEndpointRouting = false;
 })
-    .AddViewLocalization()
-    .AddFluentValidation(x => x.RegisterValidatorsFromAssemblyContaining<Program>());
+    .AddViewLocalization();
+
+builder.Services
+    .AddFluentValidationAutoValidation()
+    .AddFluentValidationClientsideAdapters();
 
 builder.Services.AddHttpClient();
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);

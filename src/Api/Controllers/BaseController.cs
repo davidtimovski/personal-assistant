@@ -14,28 +14,36 @@ public abstract class BaseController : Controller
         _usersRepository = usersRepository;
     }
 
-    private int? currentUserId;
-    protected int CurrentUserId
+    private int? userId;
+    protected int UserId
     {
         get
         {
-            if (!currentUserId.HasValue)
+            if (!userId.HasValue)
             {
                 string auth0Id = User.FindFirst("sub").Value;
                 
                 if (_userIdLookup.Contains(auth0Id))
                 {
-                    currentUserId = _userIdLookup.Get(auth0Id);
+                    userId = _userIdLookup.Get(auth0Id);
                 }
                 else
                 {
                     var userId = _usersRepository.GetId(auth0Id);
                     _userIdLookup.Set(auth0Id, userId);
-                    currentUserId = userId;
-                }                
+                    this.userId = userId;
+                }
             }
 
-            return currentUserId.Value;
+            return userId.Value;
+        }
+    }
+
+    protected string AuthId
+    {
+        get
+        {
+            return User.FindFirst("sub").Value;
         }
     }
 
@@ -46,7 +54,7 @@ public abstract class BaseController : Controller
         {
             if (currentUserName == null)
             {
-                currentUserName = User.FindFirst("name2").Value;
+                currentUserName = User.FindFirst("name").Value;
             }
 
             return currentUserName;

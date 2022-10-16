@@ -120,9 +120,6 @@
   <data name="About" xml:space="preserve">
     <value>About</value>
   </data>
-  <data name="ChangePassword" xml:space="preserve">
-    <value>Change password</value>
-  </data>
   <data name="DeleteAccount" xml:space="preserve">
     <value>Delete account</value>
   </data>
@@ -138,6 +135,9 @@
   <data name="InDevelopment" xml:space="preserve">
     <value>- in development -</value>
   </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Logout</value>
+  </data>
   <data name="Overview" xml:space="preserve">
     <value>Overview</value>
   </data>
@@ -149,5 +149,8 @@
   </data>
   <data name="ProfileUpdatedSuccess" xml:space="preserve">
     <value>Profile updated successfully</value>
+  </data>
+  <data name="ResetPassword" xml:space="preserve">
+    <value>Reset password</value>
   </data>
 </root>

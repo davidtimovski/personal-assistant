@@ -65,9 +65,9 @@ public class SyncController : BaseController
             return BadRequest();
         }
 
-        await _upcomingExpenseService.DeleteOldAsync(CurrentUserId);
+        await _upcomingExpenseService.DeleteOldAsync(UserId);
 
-        var getAll = new GetAll(CurrentUserId, vm.LastSynced);
+        var getAll = new GetAll(UserId, vm.LastSynced);
 
         IEnumerable<CategoryDto> categories = _categoryService.GetAll(getAll);
         IEnumerable<AccountDto> accounts = _accountService.GetAll(getAll);
@@ -76,7 +76,7 @@ public class SyncController : BaseController
         IEnumerable<DebtDto> debts = _debtService.GetAll(getAll);
         IEnumerable<AutomaticTransactionDto> automaticTransactions = _automaticTransactionService.GetAll(getAll);
 
-        var getDeletedIds = new GetDeletedIds(CurrentUserId, vm.LastSynced);
+        var getDeletedIds = new GetDeletedIds(UserId, vm.LastSynced);
 
         var changedVm = new ChangedVm
         {
@@ -106,11 +106,11 @@ public class SyncController : BaseController
             return BadRequest();
         }
 
-        dto.Accounts.ForEach(x => { x.UserId = CurrentUserId; });
-        dto.Categories.ForEach(x => { x.UserId = CurrentUserId; });
-        dto.UpcomingExpenses.ForEach(x => { x.UserId = CurrentUserId; });
-        dto.Debts.ForEach(x => { x.UserId = CurrentUserId; });
-        dto.AutomaticTransactions.ForEach(x => { x.UserId = CurrentUserId; });
+        dto.Accounts.ForEach(x => { x.UserId = UserId; });
+        dto.Categories.ForEach(x => { x.UserId = UserId; });
+        dto.UpcomingExpenses.ForEach(x => { x.UserId = UserId; });
+        dto.Debts.ForEach(x => { x.UserId = UserId; });
+        dto.AutomaticTransactions.ForEach(x => { x.UserId = UserId; });
 
         var syncedEntityIds = await _syncService.SyncEntitiesAsync(dto);
 

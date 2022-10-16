@@ -9,7 +9,7 @@
 	import Variables from '$lib/variables';
 
 	let preferencesButtonIsLoading = false;
-	const personalAssistantUrl = Variables.urls.authority;
+	const personalAssistantUrl = Variables.urls.account;
 	let version = '--';
 
 	let localStorage: LocalStorageUtil;
@@ -22,16 +22,19 @@
 	async function logOut() {
 		localStorage.clear();
 
-		await new AuthService('to-do-assistant2').logout();
+		const authService = new AuthService(Variables.auth0ClientId);
+		await authService.initialize();
+		await authService.logout();
 	}
 
 	onMount(async () => {
 		localStorage = new LocalStorageUtil();
 
-		const cacheNames = await caches.keys();
-		if (cacheNames.length > 0) {
-			version = cacheNames.sort().reverse()[0];
-		}
+		caches.keys().then((cacheNames) => {
+			if (cacheNames.length > 0) {
+				version = cacheNames.sort().reverse()[0];
+			}
+		});
 	});
 </script>
 

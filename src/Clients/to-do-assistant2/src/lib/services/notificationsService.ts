@@ -2,7 +2,7 @@ import { NotificationsServiceBase } from '../../../../shared2/services/notificat
 
 export class NotificationsService extends NotificationsServiceBase {
 	constructor() {
-		super('ToDoAssistant', 'to-do-assistant2');
+		super('ToDoAssistant');
 	}
 
 	getAll(): Promise<Array<Notification>> {

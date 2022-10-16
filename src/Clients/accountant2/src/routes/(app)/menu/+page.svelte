@@ -9,7 +9,7 @@
 
 	let localStorage: LocalStorageUtil;
 
-	const personalAssistantUrl = Variables.urls.authority;
+	const personalAssistantUrl = Variables.urls.account;
 	let reportsDrawerIsOpen = false;
 	let version = '--';
 
@@ -20,7 +20,8 @@
 	async function logOut() {
 		localStorage.clear();
 
-		const authService = new AuthService();
+		const authService = new AuthService(Variables.auth0ClientId);
+		await authService.initialize();
 		await authService.logout();
 	}
 

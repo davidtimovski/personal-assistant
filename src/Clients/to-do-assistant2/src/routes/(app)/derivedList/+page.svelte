@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
-	import { onDestroy } from 'svelte';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import type { Unsubscriber } from 'svelte/store';
 	import { flip } from 'svelte/animate';
 	import { quintOut } from 'svelte/easing';
@@ -12,7 +11,7 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
-	import { lists, remoteEvents } from '$lib/stores';
+	import { locale, lists, remoteEvents } from '$lib/stores';
 	import { TasksService } from '$lib/services/tasksService';
 	import { DerivedLists, ListsService } from '$lib/services/listsService';
 	import type { ListTask } from '$lib/models/viewmodels/listTask';
@@ -24,7 +23,6 @@
 	let tasks = new Array<ListTask>();
 	let privateTasks = new Array<ListTask>();
 	let iconClass: string | null = null;
-	let language: string;
 	let shadowTasks: ListTask[];
 	let shadowPrivateTasks: ListTask[];
 	let searchTasksText = '';
@@ -56,7 +54,7 @@
 	});
 
 	function formatStaleTaskDate(modifiedDate: string): string {
-		return DateHelper.formatDayMonth(new Date(modifiedDate), language);
+		return DateHelper.formatDayMonth(new Date(modifiedDate), $locale);
 	}
 
 	function searchTasksInputChanged() {
@@ -126,8 +124,6 @@
 		localStorage = new LocalStorageUtil();
 		tasksService = new TasksService();
 		soundPlayer = new SoundPlayer();
-
-		language = localStorage.get('language');
 
 		soundsEnabled = localStorage.getBool(LocalStorageKeys.SoundsEnabled);
 		if (soundsEnabled) {
@@ -217,13 +213,14 @@
 						aria-label={$t('derivedList.searchTasks')}
 						maxlength="50"
 					/>
-					<i
-						class="fas fa-times"
+					<button
+						type="button"
 						on:click={clearFilter}
-						role="button"
 						title={$t('derivedList.clear')}
 						aria-label={$t('derivedList.clear')}
-					/>
+					>
+						<i class="fas fa-times" />
+					</button>
 				</div>
 			</form>
 
@@ -305,14 +302,16 @@
 			}
 		}
 
-		i {
+		button {
 			display: none;
 			position: absolute;
 			top: 0;
 			right: 0;
-			padding: 15px;
+			background: transparent;
+			border: none;
+			outline: none;
+			padding: 14px 15px;
 			color: var(--primary-color);
-			cursor: pointer;
 
 			&:hover {
 				color: var(--primary-color-dark);
@@ -325,7 +324,7 @@
 				width: calc(100% - 70px);
 			}
 
-			i {
+			button {
 				display: inline-block;
 			}
 		}
@@ -435,8 +434,8 @@
 	}
 
 	@media screen and (min-width: 1200px) {
-		.search-tasks-wrap i {
-			padding: 13px 15px;
+		.search-tasks-wrap button {
+			padding: 11px 15px;
 		}
 	}
 </style>

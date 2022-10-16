@@ -30,7 +30,7 @@ public class PushSubscriptionsController : BaseController
             return BadRequest();
         }
 
-        await _pushSubscriptionService.CreateSubscriptionAsync(CurrentUserId,
+        await _pushSubscriptionService.CreateSubscriptionAsync(UserId,
             dto.Application,
             dto.Subscription.Endpoint,
             dto.Subscription.Keys["auth"],

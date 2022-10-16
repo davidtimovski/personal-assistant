@@ -18,7 +18,7 @@ public static class Auth0ManagementUtil
     {
         Domain = config.Domain;
 
-        if (Expires.HasValue && Expires < DateTime.UtcNow.AddMinutes(-1))
+        if (Expires.HasValue && Expires > DateTime.UtcNow.AddMinutes(1))
         {
             return;
         }

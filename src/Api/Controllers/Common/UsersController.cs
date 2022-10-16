@@ -25,7 +25,7 @@ public class UsersController : BaseController
     [HttpGet("language")]
     public IActionResult GetLanguage()
     {
-        string language = _userService.GetLanguage(CurrentUserId);
+        string language = _userService.GetLanguage(UserId);
 
         return Ok(language);
     }
@@ -33,7 +33,7 @@ public class UsersController : BaseController
     [HttpGet("profile-image-uri")]
     public IActionResult GetProfileImageUri()
     {
-        string imageUri = _userService.GetImageUri(CurrentUserId);
+        string imageUri = _userService.GetImageUri(UserId);
 
         return Ok(imageUri);
     }
@@ -41,7 +41,7 @@ public class UsersController : BaseController
     [HttpGet("to-do-preferences")]
     public IActionResult GetToDoPreferences()
     {
-        ToDoAssistantPreferences preferences = _userService.GetToDoAssistantPreferences(CurrentUserId);
+        ToDoAssistantPreferences preferences = _userService.GetToDoAssistantPreferences(UserId);
 
         return Ok(preferences);
     }
@@ -49,7 +49,7 @@ public class UsersController : BaseController
     [HttpGet("cooking-preferences")]
     public IActionResult GetCookingPreferences()
     {
-        CookingAssistantPreferences preferences = _userService.GetCookingAssistantPreferences(CurrentUserId);
+        CookingAssistantPreferences preferences = _userService.GetCookingAssistantPreferences(UserId);
 
         return Ok(preferences);
     }
@@ -62,7 +62,7 @@ public class UsersController : BaseController
             return BadRequest();
         }
 
-        await _userService.UpdateToDoNotificationsEnabledAsync(CurrentUserId, dto.ToDoNotificationsEnabled);
+        await _userService.UpdateToDoNotificationsEnabledAsync(UserId, dto.ToDoNotificationsEnabled);
 
         return NoContent();
     }
@@ -75,7 +75,7 @@ public class UsersController : BaseController
             return BadRequest();
         }
 
-        await _userService.UpdateCookingNotificationsEnabledAsync(CurrentUserId, dto.CookingNotificationsEnabled);
+        await _userService.UpdateCookingNotificationsEnabledAsync(UserId, dto.CookingNotificationsEnabled);
 
         return NoContent();
     }
@@ -88,7 +88,7 @@ public class UsersController : BaseController
             return BadRequest();
         }
 
-        await _userService.UpdateImperialSystemAsync(CurrentUserId, dto.ImperialSystem);
+        await _userService.UpdateImperialSystemAsync(UserId, dto.ImperialSystem);
 
         return NoContent();
     }

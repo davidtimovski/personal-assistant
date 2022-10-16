@@ -3,15 +3,15 @@ using Microsoft.Extensions.Localization;
 
 namespace Account.ViewModels.Account;
 
-public class ForgotPasswordViewModel
+public class ResetPasswordViewModel
 {
     public string Email { get; set; }
     public float GoogleReCaptchaScore { get; set; }
 }
 
-public class ForgotPasswordViewModelValidator : AbstractValidator<ForgotPasswordViewModel>
+public class ChangePasswordViewModelValidator : AbstractValidator<ResetPasswordViewModel>
 {
-    public ForgotPasswordViewModelValidator(IStringLocalizer<ForgotPasswordViewModelValidator> localizer)
+    public ChangePasswordViewModelValidator(IStringLocalizer<ChangePasswordViewModelValidator> localizer)
     {
         RuleFor(dto => dto.Email).NotEmpty().WithMessage(localizer["EmailIsRequired"]).EmailAddress().WithMessage(localizer["InvalidEmailAddress"]);
         RuleFor(dto => dto.GoogleReCaptchaScore).Must(score => score > 0.5).WithMessage(localizer["YouDontSeemToBeHuman"]);

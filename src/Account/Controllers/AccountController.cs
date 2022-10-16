@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Account.Models;
 using Account.ViewModels.Account;
@@ -29,7 +30,7 @@ using Newtonsoft.Json;
 namespace Account.Controllers;
 
 [Authorize]
-public class AccountController : Controller
+public class AccountController : BaseController
 {
     //private readonly IEmailTemplateService _emailTemplateService;
     private readonly IAccountService _accountService;
@@ -68,138 +69,31 @@ public class AccountController : Controller
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task Login(string returnUrl)
+    public async Task Login()
     {
-        if (returnUrl == null)
-        {
-            returnUrl = _configuration["Urls:PersonalAssistant"];
-        }
-
         // Indicate here where Auth0 should redirect the user after a login.
         // Note that the resulting absolute Uri must be added to the
         // **Allowed Callback URLs** settings for the app.
-        var authenticationProperties = new LoginAuthenticationPropertiesBuilder().WithRedirectUri(returnUrl).Build();
+        var authenticationProperties = new LoginAuthenticationPropertiesBuilder()
+            .WithRedirectUri(_configuration["Urls:PersonalAssistant"])
+            .Build();
 
         await HttpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
     }
 
-    /// <summary>
-    /// Handle logout page postback
-    /// </summary>
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task Logout()
-    {
-        var authenticationProperties = new LogoutAuthenticationPropertiesBuilder()
-           // Indicate here where Auth0 should redirect the user after a logout.
-           // Note that the resulting absolute Uri must be added to the
-           // **Allowed Logout URLs** settings for the app.
-           .WithRedirectUri(_configuration["Urls:PersonalAssistant"])
-           .Build();
-
-        await HttpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
-        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-    }
-
     [HttpGet]
     [AllowAnonymous]
-    public IActionResult Register(string returnUrl)
-    {
-        if (User?.Identity.IsAuthenticated == true)
-        {
-            return RedirectToAction(nameof(HomeController.Overview), "Home");
-        }
-
-        ViewData["ReturnUrl"] = returnUrl;
-        return View();
-    }
-
-    [HttpPost]
-    [AllowAnonymous]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl)
-    {
-        return View(model);
-        //if (!ModelState.IsValid)
-        //{
-        //    return View(model);
-        //}
-            
-        //ViewData["ReturnUrl"] = returnUrl;
-            
-        //var user = new ApplicationUser
-        //{
-        //    Name = model.Name.Trim(),
-        //    UserName = model.Email.Trim(),
-        //    Email = model.Email.Trim(),
-        //    Language = model.Language,
-        //    ToDoNotificationsEnabled = false,
-        //    CookingNotificationsEnabled = false,
-        //    ImperialSystem = false,
-        //    ImageUri = _cdnService.GetDefaultProfileImageUri(),
-        //    DateRegistered = DateTime.UtcNow
-        //};
-
-        //IdentityResult result = await _userManager.CreateAsync(user, model.Password);
-        //if (!result.Succeeded)
-        //{
-        //    AddIdentityErrors(result, nameof(Register));
-        //    return View(model);
-        //}
-
-        //string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        //var callbackUrl = Url.Action("confirm-email", "Account", new { userId = user.Id, token, returnUrl }, HttpContext.Request.Scheme);
-        //await _emailTemplateService.EnqueueRegisterConfirmationEmailAsync(user.Name, user.Email, new Uri(callbackUrl), model.Language);
-
-        //_ = _emailTemplateService.EnqueueNewRegistrationEmailAsync(user.Name, user.Email);
-
-        //SetLanguageCookie(model.Language);
-
-        //return RedirectToAction(nameof(Login), new { alert = GenerateLoginAlertFromRegistrationEmail(user.Email) });
-    }
-
-    //[HttpGet]
-    //[AllowAnonymous]
-    //[ActionName("confirm-email")]
-    //public async Task<IActionResult> ConfirmEmail(int userId, string token, string returnUrl)
-    //{
-    //    ApplicationUser user = await _userManager.FindByIdAsync(userId.ToString());
-    //    if (user == null)
-    //    {
-    //        return RedirectToAction(nameof(Login));
-    //    }
-
-    //    if (user.EmailConfirmed)
-    //    {
-    //        return RedirectToAction(nameof(Login));
-    //    }
-
-    //    IdentityResult confirmEmailResult = await _userManager.ConfirmEmailAsync(user, token);
-    //    if (!confirmEmailResult.Succeeded)
-    //    {
-    //        return RedirectToAction(nameof(Login));
-    //    }
-
-    //    await CreateRequiredDataAsync(user.Id);
-    //    await CreateSamplesAsync(user.Id);
-
-    //    _ = _emailTemplateService.EnqueueNewEmailVerificationEmailAsync(user.Name, user.Email);
-
-    //    return RedirectToAction(nameof(Login), new { returnUrl, alert = LoginAlert.RegistrationConfirmed });
-    //}
-
-    [HttpGet]
-    [ActionName("change-password")]
-    public async Task<IActionResult> ChangePassword()
+    [ActionName("reset-password")]
+    public async Task<IActionResult> ResetPassword()
     {
         using HttpClient httpClient = _httpClientFactory.CreateClient();
 
-        var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0ClientSecret"]);
+        var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0:ClientSecret"]);
         await Auth0ManagementUtil.InitializeAsync(httpClient, config);
 
-        var profile = await Auth0ManagementUtil.GetUserProfileAsync(httpClient, "auth0|634703e9a061a272e193a11d");
+        var profile = await Auth0ManagementUtil.GetUserProfileAsync(httpClient, AuthId);
 
-        var viewModel = new ChangePasswordViewModel
+        var viewModel = new ResetPasswordViewModel
         {
             Email = profile.email
         };
@@ -208,9 +102,10 @@ public class AccountController : Controller
     }
 
     [HttpPost]
-    [ActionName("change-password")]
+    [AllowAnonymous]
+    [ActionName("reset-password")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
     {
         if (!ModelState.IsValid)
         {
@@ -219,7 +114,7 @@ public class AccountController : Controller
 
         using HttpClient httpClient = _httpClientFactory.CreateClient();
 
-        var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0ClientSecret"]);
+        var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0:ClientSecret"]);
         await Auth0ManagementUtil.InitializeAsync(httpClient, config);
 
         try
@@ -236,6 +131,78 @@ public class AccountController : Controller
 
         return RedirectToAction(nameof(HomeController.Overview), "Home", new { alert = OverviewAlert.PasswordResetEmailSent });
     }
+
+    /// <summary>
+    /// Handle logout page postback
+    /// </summary>
+    [HttpGet]
+    public async Task Logout(string returnUrlSlug)
+    {
+        var authenticationProperties = new LogoutAuthenticationPropertiesBuilder()
+           // Indicate here where Auth0 should redirect the user after a logout.
+           // Note that the resulting absolute Uri must be added to the
+           // **Allowed Logout URLs** settings for the app.
+           .WithRedirectUri(_configuration["Urls:PersonalAssistant"] + returnUrlSlug)
+           .Build();
+
+        await HttpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+    }
+
+    [HttpGet]
+    [AllowAnonymous]
+    public IActionResult Register(string returnUrl)
+    {
+        if (User?.Identity.IsAuthenticated == true)
+        {
+            return RedirectToAction(nameof(HomeController.Overview), "Home");
+        }
+
+        return View();
+    }
+
+    //[HttpPost]
+    //[AllowAnonymous]
+    //[ValidateAntiForgeryToken]
+    //public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl)
+    //{
+    //    if (!ModelState.IsValid)
+    //    {
+    //        return View(model);
+    //    }
+
+    //    ViewData["ReturnUrl"] = returnUrl;
+
+    //    var user = new ApplicationUser
+    //    {
+    //        Name = model.Name.Trim(),
+    //        UserName = model.Email.Trim(),
+    //        Email = model.Email.Trim(),
+    //        Language = model.Language,
+    //        ToDoNotificationsEnabled = false,
+    //        CookingNotificationsEnabled = false,
+    //        ImperialSystem = false,
+    //        ImageUri = _cdnService.GetDefaultProfileImageUri(),
+    //        DateRegistered = DateTime.UtcNow
+    //    };
+
+    //    IdentityResult result = await _userManager.CreateAsync(user, model.Password);
+    //    if (!result.Succeeded)
+    //    {
+    //        AddIdentityErrors(result, nameof(Register));
+    //        return View(model);
+    //    }
+
+    //    string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+    //    var callbackUrl = Url.Action("confirm-email", "Account", new { userId = user.Id, token, returnUrl }, HttpContext.Request.Scheme);
+    //    await _emailTemplateService.EnqueueRegisterConfirmationEmailAsync(user.Name, user.Email, new Uri(callbackUrl), model.Language);
+
+    //    _ = _emailTemplateService.EnqueueNewRegistrationEmailAsync(user.Name, user.Email);
+
+    //    SetLanguageCookie(model.Language);
+
+    //    return RedirectToAction(nameof(Login), new { alert = GenerateLoginAlertFromRegistrationEmail(user.Email) });
+    //}
 
     [HttpPost]
     [AllowAnonymous]
@@ -313,10 +280,10 @@ public class AccountController : Controller
     {
         using HttpClient httpClient = _httpClientFactory.CreateClient();
 
-        var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0ClientSecret"]);
+        var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0:ClientSecret"]);
         await Auth0ManagementUtil.InitializeAsync(httpClient, config);
 
-        var profile = await Auth0ManagementUtil.GetUserProfileAsync(httpClient, "auth0|634703e9a061a272e193a11d");
+        var profile = await Auth0ManagementUtil.GetUserProfileAsync(httpClient, AuthId);
 
         var viewModel = new ViewProfileViewModel
         {
@@ -349,10 +316,10 @@ public class AccountController : Controller
 
         using HttpClient httpClient = _httpClientFactory.CreateClient();
 
-        var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0ClientSecret"]);
+        var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0:ClientSecret"]);
         await Auth0ManagementUtil.InitializeAsync(httpClient, config);
 
-        var profile = await Auth0ManagementUtil.GetUserProfileAsync(httpClient, "auth0|634703e9a061a272e193a11d");
+        var profile = await Auth0ManagementUtil.GetUserProfileAsync(httpClient, AuthId);
 
         string userCurrentLanguage = profile.user_metadata.Language;
         profile.name = model.Name.Trim();
@@ -362,7 +329,7 @@ public class AccountController : Controller
 
         try
         {
-            await Auth0ManagementUtil.UpdateUserProfileAsync(httpClient, "auth0|634703e9a061a272e193a11d", profile);
+            await Auth0ManagementUtil.UpdateUserProfileAsync(httpClient, AuthId, profile);
         }
         catch (Exception ex)
         {
@@ -400,8 +367,7 @@ public class AccountController : Controller
 
         if (model.Language != userCurrentLanguage)
         {
-            await Logout();
-            return RedirectToAction(nameof(Login));
+            return RedirectToAction(nameof(Logout), "Account", new { returnUrlSlug = "?alert=" + IndexAlert.LanguageChanged });
         }
 
         return RedirectToAction(nameof(HomeController.Overview), "Home", new { alert = OverviewAlert.ProfileUpdated });

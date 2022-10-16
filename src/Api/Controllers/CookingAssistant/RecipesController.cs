@@ -84,7 +84,7 @@ public class RecipesController : BaseController
     [HttpGet]
     public IActionResult GetAll()
     {
-        IEnumerable<SimpleRecipe> recipeDtos = _recipeService.GetAll(CurrentUserId);
+        IEnumerable<SimpleRecipe> recipeDtos = _recipeService.GetAll(UserId);
 
         return Ok(recipeDtos);
     }
@@ -92,7 +92,7 @@ public class RecipesController : BaseController
     [HttpGet("{id}/{currency}")]
     public IActionResult Get(int id, string currency)
     {
-        RecipeDto recipeDto = _recipeService.Get(id, CurrentUserId, currency);
+        RecipeDto recipeDto = _recipeService.Get(id, UserId, currency);
         if (recipeDto == null)
         {
             return NotFound();
@@ -109,7 +109,7 @@ public class RecipesController : BaseController
     [HttpGet("{id}/update")]
     public IActionResult GetForUpdate(int id)
     {
-        RecipeForUpdate recipeDto = _recipeService.GetForUpdate(id, CurrentUserId);
+        RecipeForUpdate recipeDto = _recipeService.GetForUpdate(id, UserId);
         if (recipeDto == null)
         {
             return NotFound();
@@ -126,7 +126,7 @@ public class RecipesController : BaseController
     [HttpGet("{id}/with-shares")]
     public IActionResult GetWithShares(int id)
     {
-        RecipeWithShares recipeDto = _recipeService.GetWithShares(id, CurrentUserId);
+        RecipeWithShares recipeDto = _recipeService.GetWithShares(id, UserId);
         if (recipeDto == null)
         {
             return NotFound();
@@ -138,7 +138,7 @@ public class RecipesController : BaseController
     [HttpGet("share-requests")]
     public IActionResult GetShareRequests()
     {
-        IEnumerable<ShareRecipeRequest> shareRequests = _recipeService.GetShareRequests(CurrentUserId);
+        IEnumerable<ShareRecipeRequest> shareRequests = _recipeService.GetShareRequests(UserId);
 
         return Ok(shareRequests);
     }
@@ -146,7 +146,7 @@ public class RecipesController : BaseController
     [HttpGet("pending-share-requests-count")]
     public IActionResult GetPendingShareRequestsCount()
     {
-        int pendingShareRequestsCount = _recipeService.GetPendingShareRequestsCount(CurrentUserId);
+        int pendingShareRequestsCount = _recipeService.GetPendingShareRequestsCount(UserId);
 
         return Ok(pendingShareRequestsCount);
     }
@@ -154,7 +154,7 @@ public class RecipesController : BaseController
     [HttpGet("{id}/sending")]
     public IActionResult GetForSending(int id)
     {
-        RecipeForSending recipeDto = _recipeService.GetForSending(id, CurrentUserId);
+        RecipeForSending recipeDto = _recipeService.GetForSending(id, UserId);
         if (recipeDto == null)
         {
             return NotFound();
@@ -166,7 +166,7 @@ public class RecipesController : BaseController
     [HttpGet("send-requests")]
     public IActionResult GetSendRequests()
     {
-        IEnumerable<SendRequestDto> sendRequestDtos = _recipeService.GetSendRequests(CurrentUserId);
+        IEnumerable<SendRequestDto> sendRequestDtos = _recipeService.GetSendRequests(UserId);
 
         return Ok(sendRequestDtos);
     }
@@ -174,7 +174,7 @@ public class RecipesController : BaseController
     [HttpGet("pending-send-requests-count")]
     public IActionResult GetPendingSendRequestsCount()
     {
-        int pendingSendRequestsCount =  _recipeService.GetPendingSendRequestsCount(CurrentUserId);
+        int pendingSendRequestsCount =  _recipeService.GetPendingSendRequestsCount(UserId);
 
         return Ok(pendingSendRequestsCount);
     }
@@ -182,7 +182,7 @@ public class RecipesController : BaseController
     [HttpGet("{id}/review")]
     public IActionResult GetForReview(int id)
     {
-        RecipeForReview recipeDto = _recipeService.GetForReview(id, CurrentUserId);
+        RecipeForReview recipeDto = _recipeService.GetForReview(id, UserId);
         if (recipeDto == null)
         {
             return NotFound();
@@ -199,7 +199,7 @@ public class RecipesController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         int id = await _recipeService.CreateAsync(dto, _createRecipeValidator);
 
@@ -210,9 +210,9 @@ public class RecipesController : BaseController
     public async Task<IActionResult> UploadTempImage(IFormFile image)
     {
         var uploadModel = new UploadTempImage(
-            CurrentUserId,
+            UserId,
             Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp"),
-            $"users/{CurrentUserId}/recipes",
+            $"users/{UserId}/recipes",
             "recipe")
         {
             Length = image.Length,
@@ -233,7 +233,7 @@ public class RecipesController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         UpdateRecipeResult result = await _recipeService.UpdateAsync(dto, _updateRecipeValidator);
 
@@ -258,7 +258,7 @@ public class RecipesController : BaseController
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        DeleteRecipeResult result = await _recipeService.DeleteAsync(id, CurrentUserId);
+        DeleteRecipeResult result = await _recipeService.DeleteAsync(id, UserId);
 
         foreach (var recipient in result.NotificationRecipients)
         {
@@ -292,7 +292,7 @@ public class RecipesController : BaseController
         {
             canShareVm.UserId = user.Id;
             canShareVm.ImageUri = user.ImageUri;
-            canShareVm.CanShare = _recipeService.CanShareWithUser(user.Id, CurrentUserId);
+            canShareVm.CanShare = _recipeService.CanShareWithUser(user.Id, UserId);
         }
 
         return Ok(canShareVm);
@@ -306,7 +306,7 @@ public class RecipesController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         foreach (int removedUserId in dto.RemovedShares)
         {
@@ -345,7 +345,7 @@ public class RecipesController : BaseController
             return BadRequest();
         }
 
-        SetShareIsAcceptedResult result = await _recipeService.SetShareIsAcceptedAsync(dto.RecipeId, CurrentUserId, dto.IsAccepted);
+        SetShareIsAcceptedResult result = await _recipeService.SetShareIsAcceptedAsync(dto.RecipeId, UserId, dto.IsAccepted);
         if (!result.Notify())
         {
             return NoContent();
@@ -373,7 +373,7 @@ public class RecipesController : BaseController
     [HttpDelete("{id}/leave")]
     public async Task<IActionResult> Leave(int id)
     {
-        LeaveRecipeResult result = await _recipeService.LeaveAsync(id, CurrentUserId);
+        LeaveRecipeResult result = await _recipeService.LeaveAsync(id, UserId);
 
         foreach (var recipient in result.NotificationRecipients)
         {
@@ -404,7 +404,7 @@ public class RecipesController : BaseController
             canSendDto.UserId = user.Id;
             canSendDto.ImageUri = user.ImageUri;
 
-            var (canSend, alreadySent) = _recipeService.CheckSendRequest(recipeId, user.Id, CurrentUserId);
+            var (canSend, alreadySent) = _recipeService.CheckSendRequest(recipeId, user.Id, UserId);
             canSendDto.CanSend = canSend;
             canSendDto.AlreadySent = alreadySent;
         }
@@ -420,7 +420,7 @@ public class RecipesController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         SendRecipeResult result = await _recipeService.SendAsync(dto, _createSendRequestValidator);
 
@@ -451,7 +451,7 @@ public class RecipesController : BaseController
             return BadRequest();
         }
 
-        DeclineSendRequestResult result = await _recipeService.DeclineSendRequestAsync(dto.RecipeId, CurrentUserId);
+        DeclineSendRequestResult result = await _recipeService.DeclineSendRequestAsync(dto.RecipeId, UserId);
         if (!result.Notify())
         {
             return NoContent();
@@ -476,7 +476,7 @@ public class RecipesController : BaseController
     [HttpDelete("{recipeId}/send-request")]
     public async Task<IActionResult> DeleteSendRequest(int recipeId)
     {
-        await _recipeService.DeleteSendRequestAsync(recipeId, CurrentUserId);
+        await _recipeService.DeleteSendRequestAsync(recipeId, UserId);
 
         return NoContent();
     }
@@ -491,7 +491,7 @@ public class RecipesController : BaseController
 
         var importModel = new ImportRecipe
         {
-            UserId = CurrentUserId
+            UserId = UserId
         };
 
         if (dto.CheckIfReviewRequired && _recipeService.IngredientsReviewIsRequired(dto.Id, importModel.UserId))

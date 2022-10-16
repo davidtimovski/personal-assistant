@@ -33,7 +33,7 @@ public class DietaryProfilesController : BaseController
     [HttpGet]
     public IActionResult Get()
     {
-        EditDietaryProfile dto = _dietaryProfileService.Get(CurrentUserId);
+        EditDietaryProfile dto = _dietaryProfileService.Get(UserId);
 
         return Ok(dto);
     }
@@ -59,7 +59,7 @@ public class DietaryProfilesController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         await _dietaryProfileService.CreateOrUpdateAsync(dto, _updateDietaryProfileValidator);
 
@@ -69,7 +69,7 @@ public class DietaryProfilesController : BaseController
     [HttpDelete]
     public async Task<IActionResult> Delete()
     {
-        await _dietaryProfileService.DeleteAsync(CurrentUserId);
+        await _dietaryProfileService.DeleteAsync(UserId);
 
         return NoContent();
     }

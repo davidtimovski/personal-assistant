@@ -150,4 +150,7 @@
   <data name="Show" xml:space="preserve">
     <value>Покажи</value>
   </data>
+  <data name="Unavailable" xml:space="preserve">
+    <value>Се извинуваме, но оваа страна е моментално недостапна бидејќи сме во процес на менување на провајдерот за автентикација.</value>
+  </data>
 </root>

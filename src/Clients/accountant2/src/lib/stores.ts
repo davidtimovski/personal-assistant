@@ -1,10 +1,10 @@
 import { writable } from 'svelte/store';
 
 import { DateHelper } from '../../../shared2/utils/dateHelper';
+import type { AuthInfo } from '../../../shared2/models/authInfo';
 import { AlertState } from '../../../shared2/models/alertState';
 
 import { AppEvents } from '$lib/models/appEvents';
-import type { AuthInfo } from '$lib/models/authInfo';
 import { SearchFilters } from '$lib/models/viewmodels/searchFilters';
 import { TransactionType } from '$lib/models/viewmodels/transactionType';
 import { AlertStatus } from '../../../shared2/models/enums/alertEvents';

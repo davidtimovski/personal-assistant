@@ -120,9 +120,6 @@
   <data name="About" xml:space="preserve">
     <value>За нас</value>
   </data>
-  <data name="ChangePassword" xml:space="preserve">
-    <value>Смени лозинка</value>
-  </data>
   <data name="DeleteAccount" xml:space="preserve">
     <value>Избриши сметка</value>
   </data>
@@ -138,6 +135,9 @@
   <data name="InDevelopment" xml:space="preserve">
     <value>- се развива -</value>
   </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Одјава</value>
+  </data>
   <data name="Overview" xml:space="preserve">
     <value>Преглед</value>
   </data>
@@ -149,5 +149,8 @@
   </data>
   <data name="ProfileUpdatedSuccess" xml:space="preserve">
     <value>Профилот беше успешно ажуриран</value>
+  </data>
+  <data name="ResetPassword" xml:space="preserve">
+    <value>Ресетирај лозинка</value>
   </data>
 </root>

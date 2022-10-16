@@ -39,7 +39,7 @@ public class IngredientsController : BaseController
     [HttpGet]
     public IActionResult GetAll()
     {
-        var ingredientDtos = _ingredientService.GetUserAndUsedPublicIngredients(CurrentUserId);
+        var ingredientDtos = _ingredientService.GetUserAndUsedPublicIngredients(UserId);
 
         foreach (var ingredient in ingredientDtos.Where(x => x.IsPublic && !x.IsProduct))
         {
@@ -52,7 +52,7 @@ public class IngredientsController : BaseController
     [HttpGet("{id}/update")]
     public IActionResult GetForUpdate(int id)
     {
-        EditIngredient editIngredientDto = _ingredientService.GetForUpdate(id, CurrentUserId);
+        EditIngredient editIngredientDto = _ingredientService.GetForUpdate(id, UserId);
         if (editIngredientDto == null)
         {
             return NotFound();
@@ -64,7 +64,7 @@ public class IngredientsController : BaseController
     [HttpGet("{id}/public")]
     public IActionResult GetPublic(int id)
     {
-        ViewIngredient viewIngredientDto = _ingredientService.GetPublic(id, CurrentUserId);
+        ViewIngredient viewIngredientDto = _ingredientService.GetPublic(id, UserId);
         if (viewIngredientDto == null)
         {
             return NotFound();
@@ -81,7 +81,7 @@ public class IngredientsController : BaseController
     [HttpGet("user-suggestions")]
     public IActionResult GetUserSuggestions()
     {
-        var suggestionsDtos = _ingredientService.GetUserSuggestions(CurrentUserId);
+        var suggestionsDtos = _ingredientService.GetUserSuggestions(UserId);
 
         return Ok(suggestionsDtos);
     }
@@ -121,7 +121,7 @@ public class IngredientsController : BaseController
     [HttpGet("task-suggestions")]
     public IActionResult GetTaskSuggestions()
     {
-        IEnumerable<TaskSuggestion> taskSuggestions = _ingredientService.GetTaskSuggestions(CurrentUserId);
+        IEnumerable<TaskSuggestion> taskSuggestions = _ingredientService.GetTaskSuggestions(UserId);
 
         return Ok(taskSuggestions);
     }
@@ -134,7 +134,7 @@ public class IngredientsController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         await _ingredientService.UpdateAsync(dto, _updateValidator);
 
@@ -149,7 +149,7 @@ public class IngredientsController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         await _ingredientService.UpdateAsync(dto, _updatePublicValidator);
 
@@ -159,7 +159,7 @@ public class IngredientsController : BaseController
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteOrRemoveFromRecipesAsync(int id)
     {
-        await _ingredientService.DeleteOrRemoveFromRecipesAsync(id, CurrentUserId);
+        await _ingredientService.DeleteOrRemoveFromRecipesAsync(id, UserId);
 
         return NoContent();
     }

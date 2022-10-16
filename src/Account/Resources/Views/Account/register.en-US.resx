@@ -150,4 +150,7 @@
   <data name="Show" xml:space="preserve">
     <value>Show</value>
   </data>
+  <data name="Unavailable" xml:space="preserve">
+    <value>Sorry, but this page is currently unavailable because we're moving to a new authentication provider.</value>
+  </data>
 </root>
