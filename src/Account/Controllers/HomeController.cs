@@ -44,12 +44,12 @@ public class HomeController : BaseController
         var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0:ClientSecret"]);
         await Auth0ManagementUtil.InitializeAsync(httpClient, config);
 
-        var profile = await Auth0ManagementUtil.GetUserProfileAsync(httpClient, AuthId);
+        var user = await Auth0ManagementUtil.GetUserAsync(httpClient, AuthId);
         var language = CultureInfo.CurrentCulture.Name;
 
         var model = new OverviewViewModel
         {
-            UserName = profile.name,
+            UserName = user.Name,
             ClientApplications = new List<ClientApplicationViewModel>
             {
                 new ClientApplicationViewModel("To Do Assistant", new Uri(_configuration["Urls:ToDoAssistant"] + $"/{language}"), "to-do-assistant"),

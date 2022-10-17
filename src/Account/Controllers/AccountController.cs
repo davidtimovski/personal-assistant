@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Account.Models;
 using Account.ViewModels.Account;
@@ -91,11 +90,11 @@ public class AccountController : BaseController
         var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0:ClientSecret"]);
         await Auth0ManagementUtil.InitializeAsync(httpClient, config);
 
-        var profile = await Auth0ManagementUtil.GetUserProfileAsync(httpClient, AuthId);
+        var user = await Auth0ManagementUtil.GetUserAsync(httpClient, AuthId);
 
         var viewModel = new ResetPasswordViewModel
         {
-            Email = profile.email
+            Email = user.Email
         };
 
         return View(viewModel);
@@ -283,13 +282,13 @@ public class AccountController : BaseController
         var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0:ClientSecret"]);
         await Auth0ManagementUtil.InitializeAsync(httpClient, config);
 
-        var profile = await Auth0ManagementUtil.GetUserProfileAsync(httpClient, AuthId);
+        var user = await Auth0ManagementUtil.GetUserAsync(httpClient, AuthId);
 
         var viewModel = new ViewProfileViewModel
         {
-            Name = profile.name,
-            Language = profile.user_metadata.Language,
-            ImageUri = profile.user_metadata.ImageUri,
+            Name = user.Name,
+            Language = user.Language,
+            ImageUri = user.ImageUri,
             DefaultImageUri = _cdnService.GetDefaultProfileImageUri(),
             BaseUrl = _configuration["Urls:PersonalAssistant"]
         };
@@ -319,17 +318,17 @@ public class AccountController : BaseController
         var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0:ClientSecret"]);
         await Auth0ManagementUtil.InitializeAsync(httpClient, config);
 
-        var profile = await Auth0ManagementUtil.GetUserProfileAsync(httpClient, AuthId);
+        var user = await Auth0ManagementUtil.GetUserAsync(httpClient, AuthId);
 
-        string userCurrentLanguage = profile.user_metadata.Language;
-        profile.name = model.Name.Trim();
-        profile.user_metadata.Language = model.Language;
-        string oldImageUri = profile.user_metadata.ImageUri;
-        profile.user_metadata.ImageUri = string.IsNullOrEmpty(model.ImageUri) ? null : model.ImageUri;
+        string userCurrentLanguage = user.Language;
+        user.Name = model.Name.Trim();
+        user.Language = model.Language;
+        string oldImageUri = user.ImageUri;
+        user.ImageUri = string.IsNullOrEmpty(model.ImageUri) ? null : model.ImageUri;
 
         try
         {
-            await Auth0ManagementUtil.UpdateUserProfileAsync(httpClient, AuthId, profile);
+            await Auth0ManagementUtil.UpdateUserAsync(httpClient, AuthId, user);
         }
         catch (Exception ex)
         {
@@ -357,9 +356,9 @@ public class AccountController : BaseController
             }
 
             // and has a new one, remove its temp tag
-            if (profile.user_metadata.ImageUri != null)
+            if (user.ImageUri != null)
             {
-                await _cdnService.RemoveTempTagAsync(profile.user_metadata.ImageUri);
+                await _cdnService.RemoveTempTagAsync(user.ImageUri);
             }
         }
 

@@ -123,9 +123,6 @@
   <data name="ImageTooLarge" xml:space="preserve">
     <value>The image you chose is too large. Maximum size is {0}MB.</value>
   </data>
-  <data name="IncorrectPassword" xml:space="preserve">
-    <value>Incorrect password</value>
-  </data>
   <data name="InvalidImage" xml:space="preserve">
     <value>The submitted image is not valid</value>
   </data>

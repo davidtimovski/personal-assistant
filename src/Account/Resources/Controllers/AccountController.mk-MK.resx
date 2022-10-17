@@ -123,9 +123,6 @@
   <data name="ImageTooLarge" xml:space="preserve">
     <value>Сликата која ја одбравте е преголема. Максималната големина е {0}MB.</value>
   </data>
-  <data name="IncorrectPassword" xml:space="preserve">
-    <value>Неточна лозинка</value>
-  </data>
   <data name="InvalidImage" xml:space="preserve">
     <value>Поднесената слика не е валидна</value>
   </data>

@@ -120,17 +120,11 @@
   <data name="Back" xml:space="preserve">
     <value>Назад</value>
   </data>
-  <data name="ConfirmPassword" xml:space="preserve">
-    <value>Потврди лозинка</value>
-  </data>
   <data name="CreateANewAccount" xml:space="preserve">
     <value>Креирајте нова сметка</value>
   </data>
   <data name="Email" xml:space="preserve">
     <value>Емаил</value>
-  </data>
-  <data name="Hide" xml:space="preserve">
-    <value>Сокриј</value>
   </data>
   <data name="Language" xml:space="preserve">
     <value>Јазик</value>
@@ -138,17 +132,11 @@
   <data name="Name" xml:space="preserve">
     <value>Име</value>
   </data>
-  <data name="Password" xml:space="preserve">
-    <value>Лозинка</value>
-  </data>
   <data name="PleaseSelectLanguage" xml:space="preserve">
     <value>Изберете јазик</value>
   </data>
   <data name="Register" xml:space="preserve">
     <value>Регистрирај се</value>
-  </data>
-  <data name="Show" xml:space="preserve">
-    <value>Покажи</value>
   </data>
   <data name="Unavailable" xml:space="preserve">
     <value>Се извинуваме, но оваа страна е моментално недостапна бидејќи сме во процес на менување на провајдерот за автентикација.</value>

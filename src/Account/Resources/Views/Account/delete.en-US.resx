@@ -129,13 +129,4 @@
   <data name="DeleteYourAccount" xml:space="preserve">
     <value>Delete your account</value>
   </data>
-  <data name="Hide" xml:space="preserve">
-    <value>Сокриј</value>
-  </data>
-  <data name="Password" xml:space="preserve">
-    <value>Password</value>
-  </data>
-  <data name="Show" xml:space="preserve">
-    <value>Покажи</value>
-  </data>
 </root>

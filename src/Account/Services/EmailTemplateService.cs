@@ -15,7 +15,6 @@ namespace Account.Services;
 public interface IEmailTemplateService
 {
     Task EnqueueRegisterConfirmationEmailAsync(string toName, string toEmail, Uri url, string language);
-    Task EnqueuePasswordResetEmailAsync(string toEmail, Uri url, string language);
     Task EnqueueNewRegistrationEmailAsync(string name, string email);
     Task EnqueueNewEmailVerificationEmailAsync(string name, string email);
 }
@@ -57,27 +56,6 @@ public class EmailTemplateService : IEmailTemplateService
         email.BodyHtml = bodyHtml
             .Replace("#SUBJECT#", email.Subject, StringComparison.Ordinal)
             .Replace("#NAME#", toName, StringComparison.Ordinal)
-            .Replace("#URL#", url.AbsoluteUri, StringComparison.Ordinal);
-
-        _senderService.Enqueue(email);
-    }
-
-    public async Task EnqueuePasswordResetEmailAsync(string toEmail, Uri url, string language)
-    {
-        var email = new Email
-        {
-            ToAddress = toEmail,
-            ToName = string.Empty,
-            Subject = _localizer["PasswordResetEmailSubject"]
-        };
-
-        string bodyText = await GetTemplateContentsAsync("PasswordReset.txt", language);
-        email.BodyText = bodyText
-            .Replace("#URL#", url.AbsoluteUri, StringComparison.Ordinal);
-
-        string bodyHtml = await GetTemplateContentsAsync("PasswordReset.html", language);
-        email.BodyHtml = bodyHtml
-            .Replace("#SUBJECT#", email.Subject, StringComparison.Ordinal)
             .Replace("#URL#", url.AbsoluteUri, StringComparison.Ordinal);
 
         _senderService.Enqueue(email);

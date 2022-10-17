@@ -14,11 +14,5 @@
     "inputFiles": [
       "wwwroot/js/account/edit-profile.js"
     ]
-  },
-  {
-    "outputFileName": "bin/Release/CDN/js/shared/password-show-hide.min.js",
-    "inputFiles": [
-      "wwwroot/js/shared/password-show-hide.js"
-    ]
   }
 ]

@@ -120,17 +120,11 @@
   <data name="Back" xml:space="preserve">
     <value>Back</value>
   </data>
-  <data name="ConfirmPassword" xml:space="preserve">
-    <value>Confirm password</value>
-  </data>
   <data name="CreateANewAccount" xml:space="preserve">
     <value>Create a new account</value>
   </data>
   <data name="Email" xml:space="preserve">
     <value>Email</value>
-  </data>
-  <data name="Hide" xml:space="preserve">
-    <value>Hide</value>
   </data>
   <data name="Language" xml:space="preserve">
     <value>Language</value>
@@ -138,17 +132,11 @@
   <data name="Name" xml:space="preserve">
     <value>Name</value>
   </data>
-  <data name="Password" xml:space="preserve">
-    <value>Password</value>
-  </data>
   <data name="PleaseSelectLanguage" xml:space="preserve">
     <value>Please select language</value>
   </data>
   <data name="Register" xml:space="preserve">
     <value>Register</value>
-  </data>
-  <data name="Show" xml:space="preserve">
-    <value>Show</value>
   </data>
   <data name="Unavailable" xml:space="preserve">
     <value>Sorry, but this page is currently unavailable because we're moving to a new authentication provider.</value>

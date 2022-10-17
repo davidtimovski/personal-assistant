@@ -76,7 +76,6 @@ textarea {
 	border-radius: 8px;
 	padding: 0 10px;
 	line-height: 45px;
-	color: #888;
 }
 .icon-wrap .placeholder {
 	color: var(--regular-color);
@@ -88,13 +87,15 @@ textarea {
 }
 .icon-wrap .icon-options .icon-option {
 	display: inline-block;
+	background: transparent;
 	border: 1px solid transparent;
 	border-radius: 8px;
+	outline: none;
 	margin: 3px;
 	font-size: 23px;
 	line-height: 45px;
 	text-align: center;
-	cursor: pointer;
+	color: #888;
 }
 .icon-wrap .icon-options .icon-option.selected {
 	background: #f0f6ff;

@@ -290,9 +290,14 @@
 						<span class="placeholder">{$t('editList.icon')}</span>
 						<div class="icon-options">
 							{#each iconOptions as i}
-								<div on:click={() => selectIcon(i.icon)} class:selected={icon === i.icon} class="icon-option">
+								<button
+									type="button"
+									on:click={() => selectIcon(i.icon)}
+									class:selected={icon === i.icon}
+									class="icon-option"
+								>
 									<i class={i.cssClass} />
-								</div>
+								</button>
 							{/each}
 						</div>
 					</div>

@@ -2,6 +2,7 @@
 using Api.Config;
 using Api.Controllers.ToDoAssistant;
 using Api.UnitTests.Builders;
+using Application.Contracts.Common;
 using Application.Contracts.ToDoAssistant.Lists;
 using Application.Contracts.ToDoAssistant.Lists.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -13,13 +14,14 @@ namespace Api.UnitTests.Controllers.ToDoAssistant;
 
 public class ListsControllerTests
 {
+    private readonly Mock<IUserIdLookup> _userIdLookupMock = new();
     private readonly Mock<IListService> _listServiceMock = new();
     private readonly ListsController _sut;
 
     public ListsControllerTests()
     {
         _sut = new ListsController(
-            null, null,
+            _userIdLookupMock.Object, null,
             _listServiceMock.Object,
             null, null, null, null, null, null, null, null, null,
             new Mock<IOptions<Urls>>().Object)
@@ -31,6 +33,8 @@ public class ListsControllerTests
     [Fact]
     public void Get_Returns404_IfNotFound()
     {
+        _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
+        _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
         _listServiceMock.Setup(x => x.GetForEdit(It.IsAny<int>(), It.IsAny<int>()))
             .Returns((EditListDto)null);
 
@@ -42,6 +46,8 @@ public class ListsControllerTests
     [Fact]
     public void GetWithShares_Returns404_IfNotFound()
     {
+        _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
+        _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
         _listServiceMock.Setup(x => x.GetWithShares(It.IsAny<int>(), It.IsAny<int>()))
             .Returns((ListWithShares)null);
 

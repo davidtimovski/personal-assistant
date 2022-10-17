@@ -22,14 +22,3 @@
         <button type="submit" class="button">@Localizer["DeleteAccount"]</button>
     </footer>
 </form>
-
-<script>
-    var showLabel = "@Localizer["Show"]";
-    var hideLabel = "@Localizer["Hide"]";
-</script>
-<environment include="Development">
-    <script src="~/js/shared/password-show-hide.js" asp-append-version="true"></script>
-</environment>
-<environment include="Production">
-    <script src="https://cdn.personalassistant.site/js/shared/password-show-hide.min.js"></script>
-</environment>

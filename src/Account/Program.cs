@@ -57,13 +57,6 @@ builder.Services
     .AddPersistence(builder.Configuration["ConnectionString"])
     .AddApplication(builder.Configuration);
 
-builder.Services.AddDbContext<AccountContext>(options =>
-{
-    options.UseNpgsql(builder.Configuration["ConnectionString"]);
-});
-// https://www.npgsql.org/efcore/release-notes/6.0.html#opting-out-of-the-new-timestamp-mapping-logic
-AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
 // Cookie configuration for HTTPS
 if (builder.Environment.EnvironmentName == Environments.Production)
 {

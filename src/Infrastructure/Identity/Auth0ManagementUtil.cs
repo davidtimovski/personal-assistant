@@ -40,7 +40,7 @@ public static class Auth0ManagementUtil
         Expires = DateTime.UtcNow.AddSeconds(result.expires_in);
     }
 
-    public static async Task<UserProfile> GetUserProfileAsync(HttpClient httpClient, string auth0Id)
+    public static async Task<User> GetUserAsync(HttpClient httpClient, string auth0Id)
     {
         using var requestMessage = new HttpRequestMessage(HttpMethod.Get, new Uri($"https://{Domain}/api/v2/users/{auth0Id}?fields=email,name,user_metadata"));
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
@@ -48,14 +48,31 @@ public static class Auth0ManagementUtil
         var response = await httpClient.SendAsync(requestMessage);
         response.EnsureSuccessStatusCode();
 
-        return JsonConvert.DeserializeObject<UserProfile>(await response.Content.ReadAsStringAsync());
+        var result = JsonConvert.DeserializeObject<Auth0User>(await response.Content.ReadAsStringAsync());
+
+        return new User
+        {
+            Email = result.email,
+            Name = result.name,
+            Language = result.user_metadata.language,
+            ImageUri = result.user_metadata.image_uri
+        };
     }
 
-    public static async Task UpdateUserProfileAsync(HttpClient httpClient, string auth0Id, UserProfile profile)
+    public static async Task UpdateUserAsync(HttpClient httpClient, string auth0Id, User user)
     {
         using var requestMessage = new HttpRequestMessage(HttpMethod.Patch, new Uri($"https://{Domain}/api/v2/users/{auth0Id}"));
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
 
+        var profile = new Auth0User
+        {
+            name = user.Name,
+            user_metadata = new Auth0UserProfileMetadata
+            {
+                language = user.Language,
+                image_uri = user.ImageUri
+            }
+        };
         requestMessage.Content = new StringContent(JsonConvert.SerializeObject(profile), Encoding.UTF8, "application/json");
 
         var response = await httpClient.SendAsync(requestMessage);
@@ -93,17 +110,17 @@ public struct Auth0ManagementUtilConfig
     public string ClientSecret { get; }
 }
 
-public class UserProfile
+internal class Auth0User
 {
     public string email { get; set; }
     public string name { get; set; }
-    public UserProfileMetadata user_metadata { get; set; }
+    public Auth0UserProfileMetadata user_metadata { get; set; }
 }
 
-public class UserProfileMetadata
+internal class Auth0UserProfileMetadata
 {
-    public string Language { get; set; }
-    public string ImageUri { get; set; }
+    public string language { get; set; }
+    public string image_uri { get; set; }
 }
 
 internal class TokenResult
