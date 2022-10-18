@@ -5,7 +5,7 @@ import Variables from '$lib/variables';
 
 export class UsersService extends UsersServiceBase {
 	constructor() {
-		super('ToDoAssistant', 'to-do-assistant2');
+		super('ToDoAssistant');
 	}
 
 	async getPreferences(): Promise<PreferencesModel> {

@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
-	import { onDestroy } from 'svelte';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import type { Unsubscriber } from 'svelte/store';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
@@ -8,7 +7,7 @@
 	import { ValidationResult, ValidationUtil } from '../../../../../../shared2/utils/validationUtils';
 
 	import { t } from '$lib/localization/i18n';
-	import { alertState, loggedInUser } from '$lib/stores';
+	import { alertState, authInfo } from '$lib/stores';
 	import { ListsService } from '$lib/services/listsService';
 	import { Share, ShareUserAndPermission } from '$lib/models/viewmodels/share';
 	import { SharingState } from '$lib/models/viewmodels/sharingState';
@@ -44,7 +43,7 @@
 	let selectedShareIsAdmin = false;
 
 	unsubscriptions.push(
-		loggedInUser.subscribe((value) => {
+		authInfo.subscribe((value) => {
 			if (value) {
 				currentUserEmail = <string>value.profile.name;
 			}

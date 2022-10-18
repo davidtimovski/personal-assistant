@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
-	import { onDestroy } from 'svelte';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import type { Unsubscriber } from 'svelte/store';
 	import { flip } from 'svelte/animate';
 	import { quintOut } from 'svelte/easing';

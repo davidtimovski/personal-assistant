@@ -1,25 +1,27 @@
 ﻿using System.Threading.Tasks;
 using Api.Config;
 using Api.Controllers.ToDoAssistant;
+using Api.UnitTests.Builders;
+using Application.Contracts.Common;
+using Application.Contracts.ToDoAssistant.Tasks;
+using Application.Contracts.ToDoAssistant.Tasks.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
-using Api.UnitTests.Builders;
-using Application.Contracts.ToDoAssistant.Tasks;
-using Application.Contracts.ToDoAssistant.Tasks.Models;
 using Xunit;
 
 namespace Api.UnitTests.Controllers.ToDoAssistant;
 
 public class TasksControllerTests
 {
+    private readonly Mock<IUserIdLookup> _userIdLookupMock = new();
     private readonly Mock<ITaskService> _taskServiceMock = new();
     private readonly TasksController _sut;
 
     public TasksControllerTests()
     {
         _sut = new TasksController(
-            null,
+            _userIdLookupMock.Object, null, null,
             _taskServiceMock.Object,
             null, null, null, null, null, null,
             new Mock<IOptions<Urls>>().Object)
@@ -31,6 +33,8 @@ public class TasksControllerTests
     [Fact]
     public void Get_Returns404_IfNotFound()
     {
+        _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
+        _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
         _taskServiceMock.Setup(x => x.Get(It.IsAny<int>(), It.IsAny<int>()))
             .Returns((TaskDto)null);
 
@@ -42,6 +46,8 @@ public class TasksControllerTests
     [Fact]
     public void GetForUpdate_Returns404_IfNotFound()
     {
+        _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
+        _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
         _taskServiceMock.Setup(x => x.GetForUpdate(It.IsAny<int>(), It.IsAny<int>()))
             .Returns((TaskForUpdate)null);
 

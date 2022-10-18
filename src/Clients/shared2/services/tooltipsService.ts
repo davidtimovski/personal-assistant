@@ -4,12 +4,11 @@ import type { Tooltip } from "../models/tooltip";
 import Variables from "$lib/variables";
 
 export class TooltipsService {
-  private readonly httpProxy: HttpProxy;
+  private readonly httpProxy = new HttpProxy();
   private readonly logger: ErrorLogger;
 
-  constructor(private readonly application: string, client: string) {
-    this.httpProxy = new HttpProxy(client);
-    this.logger = new ErrorLogger(application, client);
+  constructor(private readonly application: string) {
+    this.logger = new ErrorLogger(application);
   }
 
   async getAll(): Promise<Array<Tooltip>> {

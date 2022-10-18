@@ -1,0 +1,37 @@
+﻿@model IndexViewModel
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["Home"];
+    ViewData["Description"] = Localizer["Home"];
+}
+
+@switch (Model.Alert)
+{
+    case IndexAlert.LoggedOut:
+        <p class="alert success">@Localizer["LoggedOut"]</p>
+        break;
+    case IndexAlert.LanguageChanged:
+        <p class="alert success">@Localizer["LanguageChanged"]</p>
+        break;
+}
+
+<div class="login-links">
+    <div>
+        <a asp-action="login" asp-controller="account">@Localizer["Login"]</a>
+    </div>
+    <div>
+        <a asp-action="register" asp-controller="account">@Localizer["DontHaveAnAccount"]</a>
+    </div>
+    <div>
+        <a asp-action="reset-password" asp-controller="account">@Localizer["ForgotYourPassword"]</a>
+    </div>
+</div>
+
+<div class="links">
+    <div>
+        <a asp-action="privacy-policy" asp-controller="home">@Localizer["PrivacyPolicy"]</a>
+    </div>
+    <div>
+        <a asp-action="about" asp-controller="home">@Localizer["About"]</a>
+    </div>
+</div>

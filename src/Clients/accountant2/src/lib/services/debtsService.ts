@@ -8,10 +8,10 @@ import { DebtModel } from '$lib/models/entities/debt';
 import Variables from '$lib/variables';
 
 export class DebtsService {
-	private readonly httpProxy = new HttpProxy('accountant2');
+	private readonly httpProxy = new HttpProxy();
 	private readonly idbHelper = new DebtsIDBHelper();
-	private readonly currenciesService = new CurrenciesService('Accountant', 'accountant2');
-	private readonly logger = new ErrorLogger('Accountant', 'accountant2');
+	private readonly currenciesService = new CurrenciesService('Accountant');
+	private readonly logger = new ErrorLogger('Accountant');
 
 	static readonly mergedDebtSeparator = '----------';
 

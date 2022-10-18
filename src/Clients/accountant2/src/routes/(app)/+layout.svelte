@@ -14,8 +14,9 @@
 
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { SyncService } from '$lib/services/syncService';
-	import { locale, isOnline, loggedInUser, syncStatus } from '$lib/stores';
+	import { locale, isOnline, authInfo, syncStatus } from '$lib/stores';
 	import { AppEvents } from '$lib/models/appEvents';
+	import Variables from '$lib/variables';
 
 	import Alert from '$lib/components/Alert.svelte';
 
@@ -26,7 +27,7 @@
 	let currenciesService: CurrenciesService;
 
 	unsubscriptions.push(
-		loggedInUser.subscribe((value) => {
+		authInfo.subscribe((value) => {
 			if (!value) {
 				return;
 			}
@@ -51,7 +52,7 @@
 		});
 		syncPromises.push(syncPromise);
 
-		currenciesService = new CurrenciesService('Accountant', 'accountant2');
+		currenciesService = new CurrenciesService('Accountant');
 		const ratesPromise = currenciesService.loadRates();
 		syncPromises.push(ratesPromise);
 
@@ -60,7 +61,7 @@
 		});
 	}
 
-	onMount(() => {
+	onMount(async () => {
 		localStorage = new LocalStorageUtil();
 
 		const lang = $page.url.searchParams.get('lang');
@@ -69,7 +70,15 @@
 		}
 		locale.set(localStorage.get('language'));
 
-		new AuthService('accountant2').login();
+		const authService = new AuthService(Variables.auth0ClientId);
+		await authService.initialize();
+
+		if (await authService.authenticated()) {
+			await authService.setToken();
+		} else {
+			await authService.signinRedirect();
+			return;
+		}
 
 		isOnline.set(navigator.onLine);
 		window.addEventListener('online', () => {

@@ -147,7 +147,7 @@ export class UpcomingExpensesIDBHelper {
 
 	async deleteOld(): Promise<void> {
 		const now = new Date();
-		const startOfMonth = new Date(now.getFullYear(), 0, 1, 0, 0, 0);
+		const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
 
 		const upcomingExpensesToDelete = await this.db.upcomingExpenses
 			.filter((x) => new Date(x.date) < startOfMonth)

@@ -1,13 +1,11 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
-	import { onDestroy } from 'svelte';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import type { Unsubscriber } from 'svelte/store';
-	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
-	import { loggedInUser, lists, remoteEvents } from '$lib/stores';
+	import { authInfo, lists, remoteEvents } from '$lib/stores';
 	import { UsersService } from '$lib/services/usersService';
 	import { DerivedLists, ListsService } from '$lib/services/listsService';
 	import { TasksService } from '$lib/services/tasksService';
@@ -22,7 +20,6 @@
 	let editedId: number | undefined;
 	//let isReordering = false;
 	const derivedListNameLookup = new Map<string, string>();
-	let menuButtonIsLoading = false;
 	let connTracker = {
 		isOnline: true
 	};
@@ -38,11 +35,6 @@
 	let usersService: UsersService;
 	let listsService: ListsService;
 	let tasksService: TasksService;
-
-	function goToMenu() {
-		menuButtonIsLoading = true;
-		goto('/menu');
-	}
 
 	function sync() {
 		startProgressBar();
@@ -103,7 +95,7 @@
 		tasksService = new TasksService();
 
 		unsubscriptions.push(
-			loggedInUser.subscribe((value) => {
+			authInfo.subscribe((value) => {
 				if (!value) {
 					return;
 				}
@@ -161,21 +153,10 @@
 <section class="container">
 	<div class="page-title-wrap-loader">
 		<div class="title-wrap">
-			{#if menuButtonIsLoading}
-				<span class="menu-loader">
-					<i class="fas fa-circle-notch fa-spin" />
-				</span>
-			{:else}
-				<div
-					on:click={goToMenu}
-					class="profile-image-container"
-					role="button"
-					title={$t('index.menu')}
-					aria-label={$t('index.menu')}
-				>
-					<img src={imageUri} class="profile-image" width="40" height="40" alt={$t('profilePicture')} />
-				</div>
-			{/if}
+			<a href="/menu" class="profile-image-container" title={$t('index.menu')} aria-label={$t('index.menu')}>
+				<img src={imageUri} class="profile-image" width="40" height="40" alt={$t('profilePicture')} />
+			</a>
+
 			<!-- 
 			<label
 				class="lists-reorder-toggle lists"

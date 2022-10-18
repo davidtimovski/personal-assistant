@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Repositories.CookingAssistant;
 
+// TODO: Change/remove references to AspNetUsers
 public class RecipesRepository : BaseRepository, IRecipesRepository
 {
     public RecipesRepository(PersonalAssistantContext efContext)

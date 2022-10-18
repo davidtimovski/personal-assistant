@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
-	import { onDestroy } from 'svelte';
+	import { onMount, onDestroy } from 'svelte/internal';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';

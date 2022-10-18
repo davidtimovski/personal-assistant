@@ -11,11 +11,11 @@ import type { TransactionModel } from '$lib/models/entities/transaction';
 import Variables from '$lib/variables';
 
 export class AccountsService {
-	private readonly httpProxy = new HttpProxy('accountant2');
+	private readonly httpProxy = new HttpProxy();
 	private readonly idbHelper = new AccountsIDBHelper();
 	private readonly transactionsIDBHelper = new TransactionsIDBHelper();
-	private readonly currenciesService = new CurrenciesService('Accountant', 'accountant2');
-	private readonly logger = new ErrorLogger('Accountant', 'accountant2');
+	private readonly currenciesService = new CurrenciesService('Accountant');
+	private readonly logger = new ErrorLogger('Accountant');
 
 	getMainId(): Promise<number> {
 		return this.idbHelper.getMainId();

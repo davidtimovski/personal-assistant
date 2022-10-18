@@ -11,8 +11,8 @@ import { SharingState } from '$lib/models/viewmodels/sharingState';
 import Variables from '$lib/variables';
 
 export class TasksService {
-	private readonly httpProxy = new HttpProxy('to-do-assistant2');
-	private readonly logger = new ErrorLogger('ToDoAssistant', 'to-do-assistant2');
+	private readonly httpProxy = new HttpProxy();
+	private readonly logger = new ErrorLogger('ToDoAssistant');
 
 	get(id: number): Promise<Task> {
 		return this.httpProxy.ajax<Task>(`${Variables.urls.api}/api/tasks/${id}`);
@@ -380,5 +380,6 @@ export class TasksService {
 
 	release() {
 		this.httpProxy.release();
+		this.logger.release();
 	}
 }

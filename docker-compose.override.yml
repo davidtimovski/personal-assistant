@@ -1,7 +1,7 @@
 version: '3.4'
 
 services:
-  auth:
+  account:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
@@ -9,12 +9,13 @@ services:
       - EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
       - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
       - AdminEmail=${ADMIN_EMAIL}
+      - Auth0__ClientSecret=${AUTH0_CLIENT_SECRET}
       - Cloudinary__ApiKey=${CLOUDINARY_API_KEY}
       - Cloudinary__ApiSecret=${CLOUDINARY_API_SECRET}
       - PORT=80
     volumes:
       - ./certs:/app/certs:z
-      - ./src/Auth/storage:/app/storage:z
+      - ./src/Account/storage:/app/storage:z
     ports:
       - "5000:80"
   

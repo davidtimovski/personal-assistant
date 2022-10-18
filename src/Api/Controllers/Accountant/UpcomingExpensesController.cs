@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Application.Contracts.Accountant.UpcomingExpenses;
 using Application.Contracts.Accountant.UpcomingExpenses.Models;
+using Application.Contracts.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,10 @@ public class UpcomingExpensesController : BaseController
 {
     private readonly IUpcomingExpenseService _upcomingExpenseService;
 
-    public UpcomingExpensesController(IUpcomingExpenseService upcomingExpenseService)
+    public UpcomingExpensesController(
+        IUserIdLookup userIdLookup,
+        IUsersRepository usersRepository,
+        IUpcomingExpenseService upcomingExpenseService) : base(userIdLookup, usersRepository)
     {
         _upcomingExpenseService = upcomingExpenseService;
     }
@@ -27,7 +31,7 @@ public class UpcomingExpensesController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         int id = await _upcomingExpenseService.CreateAsync(dto);
 
@@ -42,7 +46,7 @@ public class UpcomingExpensesController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         await _upcomingExpenseService.UpdateAsync(dto);
 
@@ -52,7 +56,7 @@ public class UpcomingExpensesController : BaseController
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        await _upcomingExpenseService.DeleteAsync(id, CurrentUserId);
+        await _upcomingExpenseService.DeleteAsync(id, UserId);
 
         return NoContent();
     }

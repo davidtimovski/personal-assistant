@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Api.Config;
 using Api.Hubs;
@@ -17,6 +18,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Persistence;
 using Serilog;
 
@@ -48,33 +50,34 @@ builder.Services
     .AddPersistence(builder.Configuration["ConnectionString"])
     .AddApplication(builder.Configuration);
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-    {
-        options.Authority = builder.Configuration["Urls:Authority"];
-        options.Audience = "personal-assistant-api";
-
-        if (builder.Environment.IsDevelopment())
+builder.Services
+        .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
         {
-            options.RequireHttpsMetadata = false;
-        }
-
-        // For SignalR
-        options.Events = new JwtBearerEvents
-        {
-            OnMessageReceived = context =>
+            options.Authority = $"https://{builder.Configuration["Auth0:Domain"]}/";
+            options.Audience = builder.Configuration["Auth0:Audience"];
+            // If the access token does not have a `sub` claim, `User.Identity.Name` will be `null`. Map it to a different claim by setting the NameClaimType below.
+            options.TokenValidationParameters = new TokenValidationParameters
             {
-                var accessToken = context.Request.Query["access_token"];
+                NameClaimType = ClaimTypes.NameIdentifier
+            };
 
-                var path = context.HttpContext.Request.Path;
-                if (!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/toDoAssistantHub")))
+            // For SignalR
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
                 {
-                    context.Token = accessToken;
+                    var accessToken = context.Request.Query["access_token"];
+
+                    var path = context.HttpContext.Request.Path;
+                    if (!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/toDoAssistantHub")))
+                    {
+                        context.Token = accessToken;
+                    }
+                    return Task.CompletedTask;
                 }
-                return Task.CompletedTask;
-            }
-        };
-    });
+            };
+        });
 
 builder.Services.AddCors(options =>
 {

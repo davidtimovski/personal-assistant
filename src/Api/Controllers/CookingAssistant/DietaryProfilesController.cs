@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Application.Contracts.Common;
 using Application.Contracts.CookingAssistant.DietaryProfiles;
 using Application.Contracts.CookingAssistant.DietaryProfiles.Models;
 using FluentValidation;
@@ -18,9 +19,11 @@ public class DietaryProfilesController : BaseController
     private readonly IValidator<UpdateDietaryProfile> _updateDietaryProfileValidator;
 
     public DietaryProfilesController(
+        IUserIdLookup userIdLookup,
+        IUsersRepository usersRepository,
         IDietaryProfileService dietaryProfileService,
         IValidator<GetRecommendedDailyIntake> getRecommendedDailyIntakeValidator,
-        IValidator<UpdateDietaryProfile> updateDietaryProfileValidator)
+        IValidator<UpdateDietaryProfile> updateDietaryProfileValidator) : base(userIdLookup, usersRepository)
     {
         _dietaryProfileService = dietaryProfileService;
         _getRecommendedDailyIntakeValidator = getRecommendedDailyIntakeValidator;
@@ -30,7 +33,7 @@ public class DietaryProfilesController : BaseController
     [HttpGet]
     public IActionResult Get()
     {
-        EditDietaryProfile dto = _dietaryProfileService.Get(CurrentUserId);
+        EditDietaryProfile dto = _dietaryProfileService.Get(UserId);
 
         return Ok(dto);
     }
@@ -56,7 +59,7 @@ public class DietaryProfilesController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         await _dietaryProfileService.CreateOrUpdateAsync(dto, _updateDietaryProfileValidator);
 
@@ -66,7 +69,7 @@ public class DietaryProfilesController : BaseController
     [HttpDelete]
     public async Task<IActionResult> Delete()
     {
-        await _dietaryProfileService.DeleteAsync(CurrentUserId);
+        await _dietaryProfileService.DeleteAsync(UserId);
 
         return NoContent();
     }

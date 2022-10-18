@@ -1,9 +1,9 @@
 version: '3.4'
 
 services:
-  auth: 
-    image: ${DOCKER_REGISTRY}:auth-latest
-    container_name: pa-auth
+  account: 
+    image: ${DOCKER_REGISTRY}:account-latest
+    container_name: pa-account
     restart: always
     environment:
       - ASPNETCORE_URLS=http://0.0.0.0:80

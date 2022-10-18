@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Api.Controllers.Accountant;
-using Microsoft.AspNetCore.Mvc;
 using Api.UnitTests.Builders;
+using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
 namespace Api.UnitTests.Controllers.Accountant;
@@ -12,7 +12,7 @@ public class TransactionsControllerTests
 
     public TransactionsControllerTests()
     {
-        _sut = new TransactionsController(null, null, null)
+        _sut = new TransactionsController(null, null, null, null, null)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };
