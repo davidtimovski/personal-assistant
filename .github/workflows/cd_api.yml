@@ -1,6 +1,7 @@
 name: Continuous deployment Api
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master

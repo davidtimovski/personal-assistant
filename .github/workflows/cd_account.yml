@@ -1,6 +1,7 @@
 name: Continuous deployment Account
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
