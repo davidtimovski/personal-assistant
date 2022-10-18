@@ -14,7 +14,7 @@ COPY ["src/Persistence/Persistence.csproj", "src/Persistence/"]
 COPY ["src/Infrastructure/Infrastructure.csproj", "src/Infrastructure/"]
 RUN dotnet restore "src/Account/Account.csproj"
 COPY . .
-WORKDIR "/src/src/Auth"
+WORKDIR "/src/src/Account"
 RUN dotnet build "Account.csproj" -c Release -o /app/build
 
 FROM build AS publish
