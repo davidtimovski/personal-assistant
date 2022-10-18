@@ -1,6 +1,7 @@
 name: Continuous deployment ClientLogger
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
