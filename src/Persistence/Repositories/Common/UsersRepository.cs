@@ -6,6 +6,7 @@ using Domain.Entities.Common;
 
 namespace Persistence.Repositories.Common;
 
+// TODO: Change/remove references to AspNetUsers
 public class UsersRepository : BaseRepository, IUsersRepository
 {
     public UsersRepository(PersonalAssistantContext efContext)

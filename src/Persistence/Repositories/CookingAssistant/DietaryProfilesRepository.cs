@@ -14,6 +14,7 @@ public class DietaryProfilesRepository : BaseRepository, IDietaryProfilesReposit
     public DietaryProfilesRepository(PersonalAssistantContext efContext)
         : base(efContext) { }
 
+    // TODO: Change/remove references to AspNetUsers
     public DietaryProfile Get(int userId)
     {
         using IDbConnection conn = OpenConnection();

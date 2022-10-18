@@ -14,6 +14,7 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
     public NotificationsRepository(PersonalAssistantContext efContext)
         : base(efContext) { }
 
+    // TODO: Change/remove references to AspNetUsers
     public IEnumerable<Notification> GetAllAndFlagUnseen(int userId)
     {
         using IDbConnection conn = OpenConnection();
