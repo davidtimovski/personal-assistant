@@ -15,8 +15,6 @@ services:
     ports:
       - "5000:80"
     volumes:
-      - ./certs:/app/certs
-      - ./session-keys:/app/session-keys
       - ./storage:/app/storage
     depends_on:
       - postgres
