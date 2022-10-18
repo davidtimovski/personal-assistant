@@ -1,24 +1,26 @@
 ﻿using System.Threading.Tasks;
 using Api.Config;
 using Api.Controllers.CookingAssistant;
+using Api.UnitTests.Builders;
+using Application.Contracts.Common;
+using Application.Contracts.CookingAssistant.Recipes;
+using Application.Contracts.CookingAssistant.Recipes.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
-using Api.UnitTests.Builders;
-using Application.Contracts.CookingAssistant.Recipes;
-using Application.Contracts.CookingAssistant.Recipes.Models;
 using Xunit;
 
 namespace Api.UnitTests.Controllers.CookingAssistant;
 
 public class RecipesControllerTests
 {
+    private readonly Mock<IUserIdLookup> _userIdLookupMock = new();
     private readonly Mock<IRecipeService> _recipeServiceMock = new();
     private readonly RecipesController _sut;
 
     public RecipesControllerTests()
     {
-        _sut = new RecipesController(_recipeServiceMock.Object,
+        _sut = new RecipesController(_userIdLookupMock.Object, null, _recipeServiceMock.Object,
             null, null, null, null, null, null, null, null, null,
             null, null, null, null, new Mock<IOptions<Urls>>().Object)
         {
@@ -29,6 +31,8 @@ public class RecipesControllerTests
     [Fact]
     public void Get_Returns404_IfNotFound()
     {
+        _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
+        _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
         _recipeServiceMock.Setup(x => x.Get(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
             .Returns((RecipeDto)null);
 
@@ -40,6 +44,8 @@ public class RecipesControllerTests
     [Fact]
     public void GetForUpdate_Returns404_IfNotFound()
     {
+        _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
+        _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
         _recipeServiceMock.Setup(x => x.GetForUpdate(It.IsAny<int>(), It.IsAny<int>()))
             .Returns((RecipeForUpdate)null);
 
@@ -51,6 +57,8 @@ public class RecipesControllerTests
     [Fact]
     public void GetWithShares_Returns404_IfNotFound()
     {
+        _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
+        _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
         _recipeServiceMock.Setup(x => x.GetWithShares(It.IsAny<int>(), It.IsAny<int>()))
             .Returns((RecipeWithShares)null);
 
@@ -62,6 +70,8 @@ public class RecipesControllerTests
     [Fact]
     public void GetForSending_Returns404_IfNotFound()
     {
+        _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
+        _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
         _recipeServiceMock.Setup(x => x.GetForSending(It.IsAny<int>(), It.IsAny<int>()))
             .Returns((RecipeForSending)null);
 
@@ -73,6 +83,8 @@ public class RecipesControllerTests
     [Fact]
     public void GetForReview_Returns404_IfNotFound()
     {
+        _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
+        _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
         _recipeServiceMock.Setup(x => x.GetForReview(It.IsAny<int>(), It.IsAny<int>()))
             .Returns((RecipeForReview)null);
 

@@ -15,7 +15,9 @@ public class PushSubscriptionsController : BaseController
     private readonly IPushSubscriptionService _pushSubscriptionService;
 
     public PushSubscriptionsController(
-        IPushSubscriptionService pushSubscriptionService)
+        IUserIdLookup userIdLookup,
+        IUsersRepository usersRepository,
+        IPushSubscriptionService pushSubscriptionService) : base(userIdLookup, usersRepository)
     {
         _pushSubscriptionService = pushSubscriptionService;
     }
@@ -28,7 +30,7 @@ public class PushSubscriptionsController : BaseController
             return BadRequest();
         }
 
-        await _pushSubscriptionService.CreateSubscriptionAsync(CurrentUserId,
+        await _pushSubscriptionService.CreateSubscriptionAsync(UserId,
             dto.Application,
             dto.Subscription.Endpoint,
             dto.Subscription.Keys["auth"],

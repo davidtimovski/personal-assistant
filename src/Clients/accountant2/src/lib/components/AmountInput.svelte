@@ -45,7 +45,7 @@
 			step = '1';
 		}
 
-		currenciesService = new CurrenciesService('Accountant', 'accountant2');
+		currenciesService = new CurrenciesService('Accountant');
 		const currencies = currenciesService.getCurrencies();
 
 		autocompleteResult = autocomplete({

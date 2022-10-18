@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Api.Controllers.Common;
-using Microsoft.AspNetCore.Mvc;
 using Api.UnitTests.Builders;
+using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
 namespace Api.UnitTests.Controllers.Common;
@@ -12,7 +12,7 @@ public class PushSubscriptionsControllerTests
 
     public PushSubscriptionsControllerTests()
     {
-        _sut = new PushSubscriptionsController(null)
+        _sut = new PushSubscriptionsController(null, null, null)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };

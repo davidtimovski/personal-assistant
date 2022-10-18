@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
-	import { onDestroy } from 'svelte';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import { slide } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
@@ -291,9 +290,14 @@
 						<span class="placeholder">{$t('editList.icon')}</span>
 						<div class="icon-options">
 							{#each iconOptions as i}
-								<div on:click={() => selectIcon(i.icon)} class:selected={icon === i.icon} class="icon-option">
+								<button
+									type="button"
+									on:click={() => selectIcon(i.icon)}
+									class:selected={icon === i.icon}
+									class="icon-option"
+								>
 									<i class={i.cssClass} />
-								</div>
+								</button>
 							{/each}
 						</div>
 					</div>

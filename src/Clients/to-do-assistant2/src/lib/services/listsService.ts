@@ -23,8 +23,8 @@ export enum DerivedLists {
 }
 
 export class ListsService {
-	private readonly httpProxy = new HttpProxy('to-do-assistant2');
-	private readonly logger = new ErrorLogger('ToDoAssistant', 'to-do-assistant2');
+	private readonly httpProxy = new HttpProxy();
+	private readonly logger = new ErrorLogger('ToDoAssistant');
 	private readonly localStorage = new LocalStorageUtil();
 
 	async getAll(includeCache = false) {
@@ -536,5 +536,6 @@ export class ListsService {
 
 	release() {
 		this.httpProxy.release();
+		this.logger.release();
 	}
 }

@@ -1,26 +1,23 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte/internal';
-	import { goto } from '$app/navigation';
-	import pkg from 'oidc-client';
-	const { UserManager, WebStorageStateStore } = pkg;
+	import { onMount } from 'svelte/internal';
 	import { AuthService } from '../../../../../shared2/services/authService';
+	import Variables from '$lib/variables';
 
-	onMount(() => {
-		new UserManager({
-			response_mode: 'query',
-			userStore: new WebStorageStateStore({
-				prefix: 'oidc',
-				store: window.localStorage
-			})
-		})
-			.signinRedirectCallback()
-			.then(async () => {
-				await new AuthService('accountant2').loginCallback();
-				await goto('/');
-			})
-			.catch((e) => {
-				console.error(e);
-			});
+	onMount(async () => {
+		const authService = new AuthService(Variables.auth0ClientId);
+		await authService.initialize();
+
+		const query = window.location.search;
+		if (!query.includes('code=') || !query.includes('state=')) {
+			throw new Error('Query parameters for redirect callback missing');
+		}
+
+		// Process the login state
+		await authService.handleRedirectCallback();
+
+		// Use replaceState to redirect the user away and remove the querystring parameters
+		window.history.replaceState({}, document.title, '/');
+		window.location.href = '/';
 	});
 </script>
 

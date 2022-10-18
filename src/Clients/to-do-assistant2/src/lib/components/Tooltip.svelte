@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
-	import { onDestroy } from 'svelte';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import { slide } from 'svelte/transition';
 
 	import type { Tooltip } from '../../../../shared2/models/tooltip';
@@ -14,7 +13,6 @@
 	let isVisible = false;
 	let isOpen = false;
 	let isDismissed = false;
-	let questionSpan: HTMLSpanElement;
 
 	let tooltipsService: TooltipsService;
 
@@ -32,7 +30,7 @@
 	}
 
 	onMount(async () => {
-		tooltipsService = new TooltipsService('ToDoAssistant', 'to-do-assistant2');
+		tooltipsService = new TooltipsService('ToDoAssistant');
 
 		tooltip = await tooltipsService.getByKey(key);
 		if (!tooltip.isDismissed) {
@@ -50,7 +48,7 @@
 <div class="tooltip" class:visible={isVisible}>
 	{#if tooltip}
 		<div on:click={toggleOpen} class="question-wrap">
-			<span bind:this={questionSpan} class="question" class:glow={!isOpen}>{tooltip.question}</span>
+			<span class="question" class:glow={!isOpen}>{tooltip.question}</span>
 		</div>
 		{#if isOpen}
 			<div in:slide class="answer-wrap">

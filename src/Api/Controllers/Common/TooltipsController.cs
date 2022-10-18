@@ -14,7 +14,10 @@ public class TooltipsController : BaseController
 {
     private readonly ITooltipService _tooltipService;
 
-    public TooltipsController(ITooltipService tooltipService)
+    public TooltipsController(
+        IUserIdLookup userIdLookup,
+        IUsersRepository usersRepository,
+        ITooltipService tooltipService) : base(userIdLookup, usersRepository)
     {
         _tooltipService = tooltipService;
     }
@@ -22,7 +25,7 @@ public class TooltipsController : BaseController
     [HttpGet("application/{application}")]
     public IActionResult GetAll(string application)
     {
-        var tooltipDtos = _tooltipService.GetAll(application, CurrentUserId);
+        var tooltipDtos = _tooltipService.GetAll(application, UserId);
 
         return Ok(tooltipDtos);
     }
@@ -30,7 +33,7 @@ public class TooltipsController : BaseController
     [HttpGet("key/{key}/{application}")]
     public IActionResult GetByKey(string key, string application)
     {
-        var tooltipDto = _tooltipService.GetByKey(CurrentUserId, key, application);
+        var tooltipDto = _tooltipService.GetByKey(UserId, key, application);
 
         return Ok(tooltipDto);
     }
@@ -43,7 +46,7 @@ public class TooltipsController : BaseController
             return BadRequest();
         }
 
-        await _tooltipService.ToggleDismissedAsync(CurrentUserId, dto.Key, dto.Application, dto.IsDismissed);
+        await _tooltipService.ToggleDismissedAsync(UserId, dto.Key, dto.Application, dto.IsDismissed);
 
         return NoContent();
     }

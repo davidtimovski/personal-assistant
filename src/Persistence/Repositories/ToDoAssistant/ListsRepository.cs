@@ -10,6 +10,7 @@ using Domain.Entities.ToDoAssistant;
 
 namespace Persistence.Repositories.ToDoAssistant;
 
+// TODO: Change/remove references to AspNetUsers
 public class ListsRepository : BaseRepository, IListsRepository
 {
     public ListsRepository(PersonalAssistantContext efContext)

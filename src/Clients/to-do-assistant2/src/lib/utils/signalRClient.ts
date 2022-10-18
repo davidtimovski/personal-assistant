@@ -10,7 +10,7 @@ export class SignalRClient extends SignalRClientBase {
 		super();
 	}
 
-	async initialize(accessToken: string, currentUserId: number) {
+	async initialize(accessToken: string, currentUserId: string) {
 		await this.connect(`${Variables.urls.api}/toDoAssistantHub`, accessToken, Variables.debug);
 
 		(<signalR.HubConnection>this.connection).onreconnected(async () => {
@@ -19,7 +19,7 @@ export class SignalRClient extends SignalRClientBase {
 
 		await (<signalR.HubConnection>this.connection).invoke('JoinGroups');
 
-		this.on('TaskCompletedChanged', async (userId: number, id: number, listId: number, isCompleted: boolean) => {
+		this.on('TaskCompletedChanged', async (userId: string, id: number, listId: number, isCompleted: boolean) => {
 			if (userId !== currentUserId) {
 				if (isCompleted) {
 					remoteEvents.set(
@@ -39,7 +39,7 @@ export class SignalRClient extends SignalRClientBase {
 			}
 		});
 
-		this.on('TaskDeleted', async (userId: number, id: number, listId: number) => {
+		this.on('TaskDeleted', async (userId: string, id: number, listId: number) => {
 			if (userId !== currentUserId) {
 				remoteEvents.set(
 					new RemoteEvent(RemoteEventType.TaskDeletedRemotely, {
@@ -50,15 +50,16 @@ export class SignalRClient extends SignalRClientBase {
 			}
 		});
 
-		this.on('TaskReordered', async (userId: number, id: number, listId: number, oldOrder: number, newOrder: number) => {
-			if (userId !== currentUserId) {
-				// TODO
-				//await Actions.reorderTask(id, listId, oldOrder, newOrder);
-				//this.eventAggregator.publish(AppEvents.TaskReorderedRemotely, { id: id, listId: listId });
-			}
-		});
+		// TODO
+		// this.on('TaskReordered', async (userId: string, id: number, listId: number, oldOrder: number, newOrder: number) => {
+		// 	if (userId !== currentUserId) {
+		// 		// TODO
+		// 		await Actions.reorderTask(id, listId, oldOrder, newOrder);
+		// 		this.eventAggregator.publish(AppEvents.TaskReorderedRemotely, { id: id, listId: listId });
+		// 	}
+		// });
 
-		this.on('TasksModified', async (userId: number) => {
+		this.on('TasksModified', async (userId: string) => {
 			if (userId !== currentUserId) {
 				await this.listsService.getAll();
 			}

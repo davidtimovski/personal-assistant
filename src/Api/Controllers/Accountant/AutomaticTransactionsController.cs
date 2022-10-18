@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Application.Contracts.Accountant.AutomaticTransactions;
 using Application.Contracts.Accountant.AutomaticTransactions.Models;
+using Application.Contracts.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,10 @@ public class AutomaticTransactionsController : BaseController
 {
     private readonly IAutomaticTransactionService _automaticTransactionService;
 
-    public AutomaticTransactionsController(IAutomaticTransactionService automaticTransactionService)
+    public AutomaticTransactionsController(
+        IUserIdLookup userIdLookup,
+        IUsersRepository usersRepository,
+        IAutomaticTransactionService automaticTransactionService) : base(userIdLookup, usersRepository)
     {
         _automaticTransactionService = automaticTransactionService;
     }
@@ -27,7 +31,7 @@ public class AutomaticTransactionsController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         int id = await _automaticTransactionService.CreateAsync(dto);
 
@@ -42,7 +46,7 @@ public class AutomaticTransactionsController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         await _automaticTransactionService.UpdateAsync(dto);
 
@@ -52,7 +56,7 @@ public class AutomaticTransactionsController : BaseController
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        await _automaticTransactionService.DeleteAsync(id, CurrentUserId);
+        await _automaticTransactionService.DeleteAsync(id, UserId);
 
         return NoContent();
     }

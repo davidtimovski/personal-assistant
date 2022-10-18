@@ -4,41 +4,36 @@
 	export const ssr = false;
 	export const prerender = true;
 
-	import { onMount } from 'svelte/internal';
-	import { onDestroy } from 'svelte';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import { page } from '$app/stores';
-	import type { User } from 'oidc-client';
 
 	import { Language } from '../../../../shared2/models/enums/language';
 	import { AuthService } from '../../../../shared2/services/authService';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
-	import { locale } from '$lib/localization/i18n';
-	import { isOffline, loggedInUser } from '$lib/stores';
+	import { locale, isOffline, authInfo } from '$lib/stores';
 	import { ListsService } from '$lib/services/listsService';
 	import { SignalRClient } from '$lib/utils/signalRClient';
+	import Variables from '$lib/variables';
 
 	import Alert from '$lib/components/Alert.svelte';
 
 	let listsService: ListsService;
 	let signalrClient: SignalRClient;
-	let user: User | null = null;
 
-	const loggedInUserUnsub = loggedInUser.subscribe(async (value) => {
+	const authInfoUnsub = authInfo.subscribe(async (value) => {
 		if (!value) {
 			return;
 		}
 
-		user = value;
-
 		listsService = new ListsService();
 		await listsService.getAll(true);
 
-		await new SignalRClient(listsService).initialize(user.access_token, parseInt(user.profile.sub, 10));
+		await new SignalRClient(listsService).initialize(value.token, value.profile.sub);
 	});
 
-	onMount(() => {
+	onMount(async () => {
 		const localStorage = new LocalStorageUtil();
 
 		const lang = $page.url.searchParams.get('lang');
@@ -47,7 +42,15 @@
 		}
 		locale.set(localStorage.get('language'));
 
-		new AuthService('to-do-assistant2').login();
+		const authService = new AuthService(Variables.auth0ClientId);
+		await authService.initialize();
+
+		if (await authService.authenticated()) {
+			await authService.setToken();
+		} else {
+			await authService.signinRedirect();
+			return;
+		}
 
 		isOffline.set(!navigator.onLine);
 		window.addEventListener('online', () => {
@@ -59,7 +62,7 @@
 	});
 
 	onDestroy(() => {
-		loggedInUserUnsub();
+		authInfoUnsub();
 		listsService?.release();
 	});
 </script>

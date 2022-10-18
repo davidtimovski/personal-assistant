@@ -8,7 +8,7 @@
   },
   "license": "GPL-3.0",
   "dependencies": {
-    "@microsoft/signalr": "^6.0.9",
-    "oidc-client": "^1.11.5"
+    "@auth0/auth0-spa-js": "^1.22.5",
+    "@microsoft/signalr": "^6.0.9"
   }
 }

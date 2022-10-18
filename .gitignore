@@ -34,6 +34,7 @@ msbuild.wrn
 .vs/
 
 # My
+node_modules
 **/*.pfx
 DevOps/
 **/publish.ps1

@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Application.Contracts.Accountant.Debts;
 using Application.Contracts.Accountant.Debts.Models;
+using Application.Contracts.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,10 @@ public class DebtsController : BaseController
 {
     private readonly IDebtService _debtService;
 
-    public DebtsController(IDebtService debtService)
+    public DebtsController(
+        IUserIdLookup userIdLookup,
+        IUsersRepository usersRepository,
+        IDebtService debtService) : base(userIdLookup, usersRepository)
     {
         _debtService = debtService;
     }
@@ -27,7 +31,7 @@ public class DebtsController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         int id = await _debtService.CreateAsync(dto);
 
@@ -42,7 +46,7 @@ public class DebtsController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         int id = await _debtService.CreateMergedAsync(dto);
 
@@ -57,7 +61,7 @@ public class DebtsController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         await _debtService.UpdateAsync(dto);
 
@@ -67,7 +71,7 @@ public class DebtsController : BaseController
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        await _debtService.DeleteAsync(id, CurrentUserId);
+        await _debtService.DeleteAsync(id, UserId);
 
         return NoContent();
     }

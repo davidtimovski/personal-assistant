@@ -10,7 +10,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { CapitalService } from '$lib/services/capitalService';
 	import { Formatter } from '$lib/utils/formatter';
-	import { locale, loggedInUser, syncStatus, searchFilters } from '$lib/stores';
+	import { locale, authInfo, syncStatus, searchFilters } from '$lib/stores';
 	import { AppEvents } from '$lib/models/appEvents';
 	import { SearchFilters } from '$lib/models/viewmodels/searchFilters';
 	import type { AmountByCategory } from '$lib/models/viewmodels/amountByCategory';
@@ -132,7 +132,7 @@
 
 	onMount(() => {
 		localStorage = new LocalStorageUtil();
-		usersService = new UsersServiceBase('Accountant', 'accountant2');
+		usersService = new UsersServiceBase('Accountant');
 		capitalService = new CapitalService();
 		accountsService = new AccountsService();
 
@@ -146,7 +146,7 @@
 		currency = localStorage.get(LocalStorageKeys.Currency);
 
 		unsubscriptions.push(
-			loggedInUser.subscribe((value) => {
+			authInfo.subscribe((value) => {
 				if (!value) {
 					return;
 				}

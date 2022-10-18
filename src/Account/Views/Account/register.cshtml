@@ -1,0 +1,91 @@
+﻿@model RegisterViewModel
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["Register"];
+    ViewData["Description"] = Localizer["CreateANewAccount"];
+}
+
+<div class="message info">@Localizer["Unavailable"]</div>
+
+<footer>
+    <a href="/" class="button">@Localizer["Back"]</a>
+    <span></span>
+</footer>
+
+@*<form asp-controller="account" asp-action="register" method="post" role="form">
+    <h1>@Localizer["CreateANewAccount"]</h1>
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <environment include="Development">
+        <input type="hidden" asp-for="GoogleReCaptchaScore" value="1" />
+    </environment>
+    <environment include="Production">
+        <input type="hidden" asp-for="GoogleReCaptchaScore" value="0" />
+    </environment>
+
+    <div class="form-group">
+        <input type="text" asp-for="Name" maxlength="30" placeholder="@Localizer["Name"]" aria-label="@Localizer["Name"]" required />
+    </div>
+    <div class="form-group">
+        <input type="email" asp-for="Email" maxlength="254" placeholder="@Localizer["Email"]" aria-label="@Localizer["Email"]" required />
+    </div>
+    <div class="form-group">
+        <select asp-for="Language" aria-label="@Localizer["Language"]" required>
+            <option value="">@Localizer["PleaseSelectLanguage"]</option>
+            <option value="en-US">English</option>
+            <option value="mk-MK">Македонски</option>
+        </select>
+    </div>
+    <div class="form-group relative">
+        <input type="password" asp-for="Password" class="password-input" maxlength="100" placeholder="@Localizer["Password"]" aria-label="@Localizer["Password"]" required />
+        <button type="button" class="password-show-button" data-for="Password">@Localizer["Show"]</button>
+    </div>
+    <div class="form-group relative">
+        <input type="password" asp-for="ConfirmPassword" class="password-input" maxlength="100" placeholder="@Localizer["ConfirmPassword"]" aria-label="@Localizer["ConfirmPassword"]" required />
+        <button type="button" class="password-show-button" data-for="ConfirmPassword">@Localizer["Show"]</button>
+    </div>
+
+    <footer>
+        <a href="/" class="button">@Localizer["Back"]</a>
+
+        <environment include="Development">
+            <button type="submit" id="register-button" class="button">@Localizer["Register"]</button>
+        </environment>
+        <environment include="Production">
+            <button type="submit" id="register-button" class="button" disabled="disabled">@Localizer["Register"]</button>
+        </environment>
+    </footer>
+</form>
+
+<environment include="Production">
+    <script src="https://www.google.com/recaptcha/api.js?render=6LfpNqYUAAAAAPlCVjWxJQEKQKmQMKqXDBFrtjAX"></script>
+    <script>
+        grecaptcha.ready(() => {
+            grecaptcha.execute('6LfpNqYUAAAAAPlCVjWxJQEKQKmQMKqXDBFrtjAX', { action: 'register' }).then(token => {
+                const formData = new FormData();
+                formData.append('token', token);
+
+                fetch('/account/verify-recaptcha', {
+                    method: 'post',
+                    body: formData
+                })
+                    .then(response => response.text())
+                    .then(score => {
+                        document.getElementById('GoogleReCaptchaScore').value = score;
+                        document.getElementById('register-button').removeAttribute('disabled');
+                    });
+            });
+        });
+
+        (async function () {
+            const response = await fetch('https://api.ipgeolocation.io/ipgeo?apiKey=8d6cd8bdac9a4b2f8edef66b785a45ee&fields=country_code2', { mode: 'cors' });
+            const data = await response.json();
+            if (data.country_code2 === 'MK') {
+                let languageSelect = document.getElementById('Language');
+                languageSelect.value = 'mk-MK';
+            }
+        })();
+    </script>
+</environment>
+*@

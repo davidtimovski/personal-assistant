@@ -3,6 +3,7 @@ using Application.Contracts.Common;
 using CloudinaryDotNet;
 using Infrastructure.Cdn;
 using Infrastructure.Currency;
+using Infrastructure.Identity;
 using Infrastructure.Sender;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,8 +17,10 @@ public static class IoC
         IConfiguration configuration,
         string environmentName)
     {
+
         services.AddTransient<ICurrencyService, CurrencyService>();
 
+        services.AddSingleton<IUserIdLookup, UserIdLookup>();
         services.AddSingleton<ISenderService, SenderService>();
 
         services.AddSingleton<ICdnService>(new CloudinaryService(

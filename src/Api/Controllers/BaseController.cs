@@ -1,22 +1,49 @@
-﻿using System.Security.Claims;
+﻿using Application.Contracts.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
 public abstract class BaseController : Controller
 {
-    private int? currentUserId;
-    protected int CurrentUserId
+    private readonly IUserIdLookup _userIdLookup;
+    private readonly IUsersRepository _usersRepository;
+
+    public BaseController(IUserIdLookup userIdLookup, IUsersRepository usersRepository)
+    {
+        _userIdLookup = userIdLookup;
+        _usersRepository = usersRepository;
+    }
+
+    private int? userId;
+    protected int UserId
     {
         get
         {
-            if (!currentUserId.HasValue)
+            if (!userId.HasValue)
             {
-                string id = User.FindFirst("sub").Value;
-                currentUserId = int.Parse(id);
+                string auth0Id = User.FindFirst("sub").Value;
+                
+                if (_userIdLookup.Contains(auth0Id))
+                {
+                    userId = _userIdLookup.Get(auth0Id);
+                }
+                else
+                {
+                    var userId = _usersRepository.GetId(auth0Id);
+                    _userIdLookup.Set(auth0Id, userId);
+                    this.userId = userId;
+                }
             }
 
-            return currentUserId.Value;
+            return userId.Value;
+        }
+    }
+
+    protected string AuthId
+    {
+        get
+        {
+            return User.FindFirst("sub").Value;
         }
     }
 
@@ -27,7 +54,7 @@ public abstract class BaseController : Controller
         {
             if (currentUserName == null)
             {
-                currentUserName = User.FindFirst("name2").Value;
+                currentUserName = User.FindFirst("name").Value;
             }
 
             return currentUserName;

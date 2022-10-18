@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Application.Contracts.Accountant.Categories;
 using Application.Contracts.Accountant.Categories.Models;
+using Application.Contracts.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,10 @@ public class CategoriesController : BaseController
 {
     private readonly ICategoryService _categoryService;
 
-    public CategoriesController(ICategoryService categoryService)
+    public CategoriesController(
+        IUserIdLookup userIdLookup,
+        IUsersRepository usersRepository,
+        ICategoryService categoryService) : base(userIdLookup, usersRepository)
     {
         _categoryService = categoryService;
     }
@@ -27,7 +31,7 @@ public class CategoriesController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         int id = await _categoryService.CreateAsync(dto);
 
@@ -42,7 +46,7 @@ public class CategoriesController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         await _categoryService.UpdateAsync(dto);
 
@@ -52,7 +56,7 @@ public class CategoriesController : BaseController
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        await _categoryService.DeleteAsync(id, CurrentUserId);
+        await _categoryService.DeleteAsync(id, UserId);
 
         return NoContent();
     }

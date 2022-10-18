@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store';
-import type { User } from 'oidc-client';
 
 import { DateHelper } from '../../../shared2/utils/dateHelper';
+import type { AuthInfo } from '../../../shared2/models/authInfo';
 import { AlertState } from '../../../shared2/models/alertState';
 
 import { AppEvents } from '$lib/models/appEvents';
@@ -11,7 +11,7 @@ import { AlertStatus } from '../../../shared2/models/enums/alertEvents';
 
 export const isOnline = writable<boolean>(true);
 export const locale = writable('en-US');
-export const loggedInUser = writable<User | null>(null);
+export const authInfo = writable<AuthInfo | null>(null);
 export const syncStatus = writable<AppEvents>(AppEvents.NotSyncing);
 export const alertState = writable<AlertState>(new AlertState(AlertStatus.Hidden, null, []));
 

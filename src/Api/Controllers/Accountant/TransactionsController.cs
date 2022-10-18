@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Api.Models.Accountant.Transactions;
 using Application.Contracts.Accountant.Transactions;
 using Application.Contracts.Accountant.Transactions.Models;
+using Application.Contracts.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Hosting;
@@ -22,9 +23,11 @@ public class TransactionsController : BaseController
     private readonly IWebHostEnvironment _webHostEnvironment;
 
     public TransactionsController(
+        IUserIdLookup userIdLookup,
+        IUsersRepository usersRepository,
         ITransactionService transactionService,
         IStringLocalizer<TransactionsController> localizer,
-        IWebHostEnvironment webHostEnvironment)
+        IWebHostEnvironment webHostEnvironment) : base(userIdLookup, usersRepository)
     {
         _transactionService = transactionService;
         _localizer = localizer;
@@ -39,7 +42,7 @@ public class TransactionsController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         int id = await _transactionService.CreateAsync(dto);
 
@@ -54,7 +57,7 @@ public class TransactionsController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = CurrentUserId;
+        dto.UserId = UserId;
 
         await _transactionService.UpdateAsync(dto);
 
@@ -64,7 +67,7 @@ public class TransactionsController : BaseController
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        await _transactionService.DeleteAsync(id, CurrentUserId);
+        await _transactionService.DeleteAsync(id, UserId);
 
         return NoContent();
     }
@@ -78,7 +81,7 @@ public class TransactionsController : BaseController
         }
 
         string directory = Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp");
-        var exportAsCsvModel = new ExportAsCsv(CurrentUserId, directory, vm.FileId, _localizer["Uncategorized"], _localizer["Encrypted"]);
+        var exportAsCsvModel = new ExportAsCsv(UserId, directory, vm.FileId, _localizer["Uncategorized"], _localizer["Encrypted"]);
 
         FileStream file = _transactionService.ExportAsCsv(exportAsCsvModel);
 

@@ -5,14 +5,11 @@ import { ValidationErrors } from "../models/validationErrors";
 import Variables from "$lib/variables";
 
 export class ErrorLogger {
-  private readonly httpProxy: HttpProxy;
+  private readonly httpProxy = new HttpProxy();
 
-  constructor(private readonly application: string, client: string) {
-    this.httpProxy = new HttpProxy(client);
-  }
+  constructor(private readonly application: string) {}
 
   async logError(error: any): Promise<void> {
-    // TODO: Possible cause of issues server-side
     // if (
     //   !navigator.onLine ||
     //   error === HttpError.Unauthorized ||
