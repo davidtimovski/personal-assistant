@@ -247,7 +247,7 @@
 
 		const categoryType = data.isExpense ? CategoryType.ExpenseOnly : CategoryType.DepositOnly;
 
-		accountsService.getNonInvestmentFundsAsOptions().then(async (options) => {
+		accountsService.getNonInvestmentFundsAsOptions().then((options) => {
 			accountOptions = options;
 			accountId = <number>options[0].id;
 		});
