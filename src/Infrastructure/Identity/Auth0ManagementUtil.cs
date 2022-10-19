@@ -40,7 +40,7 @@ public static class Auth0ManagementUtil
         Expires = DateTime.UtcNow.AddSeconds(result.expires_in);
     }
 
-    public static async Task<User> GetUserAsync(HttpClient httpClient, string auth0Id)
+    public static async Task<Auth0User> GetUserAsync(HttpClient httpClient, string auth0Id)
     {
         using var requestMessage = new HttpRequestMessage(HttpMethod.Get, new Uri($"https://{Domain}/api/v2/users/{auth0Id}?fields=email,name,user_metadata"));
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
@@ -48,32 +48,18 @@ public static class Auth0ManagementUtil
         var response = await httpClient.SendAsync(requestMessage);
         response.EnsureSuccessStatusCode();
 
-        var result = JsonConvert.DeserializeObject<Auth0User>(await response.Content.ReadAsStringAsync());
-
-        return new User
-        {
-            Email = result.email,
-            Name = result.name,
-            Language = result.user_metadata.language,
-            ImageUri = result.user_metadata.image_uri
-        };
+        return JsonConvert.DeserializeObject<Auth0User>(await response.Content.ReadAsStringAsync());
     }
 
-    public static async Task UpdateUserAsync(HttpClient httpClient, string auth0Id, User user)
+    public static async Task UpdateNameAsync(HttpClient httpClient, string auth0Id, string name)
     {
         using var requestMessage = new HttpRequestMessage(HttpMethod.Patch, new Uri($"https://{Domain}/api/v2/users/{auth0Id}"));
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
 
-        var profile = new Auth0User
+        requestMessage.Content = new StringContent(JsonConvert.SerializeObject(new 
         {
-            name = user.Name,
-            user_metadata = new Auth0UserProfileMetadata
-            {
-                language = user.Language,
-                image_uri = user.ImageUri
-            }
-        };
-        requestMessage.Content = new StringContent(JsonConvert.SerializeObject(profile), Encoding.UTF8, "application/json");
+            name = name.Trim()
+        }), Encoding.UTF8, "application/json");
 
         var response = await httpClient.SendAsync(requestMessage);
         response.EnsureSuccessStatusCode();
@@ -110,17 +96,10 @@ public struct Auth0ManagementUtilConfig
     public string ClientSecret { get; }
 }
 
-internal class Auth0User
+public class Auth0User
 {
     public string email { get; set; }
     public string name { get; set; }
-    public Auth0UserProfileMetadata user_metadata { get; set; }
-}
-
-internal class Auth0UserProfileMetadata
-{
-    public string language { get; set; }
-    public string image_uri { get; set; }
 }
 
 internal class TokenResult

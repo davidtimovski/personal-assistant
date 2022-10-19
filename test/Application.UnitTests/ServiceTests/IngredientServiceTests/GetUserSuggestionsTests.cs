@@ -24,7 +24,8 @@ public class GetUserSuggestionsTests
 
         _sut = new IngredientService(
             _ingredientsRepositoryMock.Object,
-            MapperMocker.GetMapper<CookingAssistantProfile>());
+            MapperMocker.GetMapper<CookingAssistantProfile>(),
+            null);
     }
 
     [Fact]

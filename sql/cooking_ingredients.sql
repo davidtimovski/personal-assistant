@@ -38,8 +38,8 @@ CREATE TABLE public.cooking_ingredients
     REFERENCES public.cooking_ingredients (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE,
-    CONSTRAINT fk_cooking_ingredients_aspnetusers_user_id FOREIGN KEY (user_id)
-    REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE
+    CONSTRAINT fk_cooking_ingredients_users_user_id FOREIGN KEY (user_id)
+    REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE,
     CONSTRAINT fk_cooking_ingredients_cooking_ingredient_categories_category_id FOREIGN KEY (category_id)

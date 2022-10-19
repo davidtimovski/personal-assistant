@@ -12,7 +12,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Repositories.CookingAssistant;
 
-// TODO: Change/remove references to AspNetUsers
 public class RecipesRepository : BaseRepository, IRecipesRepository
 {
     public RecipesRepository(PersonalAssistantContext efContext)
@@ -54,9 +53,9 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        const string recipeSql = @"SELECT r.*, u.""Id"", dp.*
+        const string recipeSql = @"SELECT r.*, u.id, dp.*
                                    FROM cooking_recipes AS r 
-                                   INNER JOIN ""AspNetUsers"" AS u ON r.user_id = u.""Id""
+                                   INNER JOIN users AS u ON r.user_id = u.id
                                    LEFT JOIN cooking_dietary_profiles AS dp ON dp.user_id = @UserId
                                    LEFT JOIN cooking_shares AS s ON r.id = s.recipe_id
                                    WHERE r.id = @Id AND (r.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))";
@@ -146,10 +145,10 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT DISTINCT r.*, u.""Id"", u.""Email"", u.""ImageUri""
+        const string query = @"SELECT DISTINCT r.*, u.id, u.email, u.image_uri
                                FROM cooking_recipes AS r
                                LEFT JOIN cooking_shares AS s ON r.id = s.recipe_id
-                               INNER JOIN ""AspNetUsers"" AS u ON r.user_id = u.""Id""
+                               INNER JOIN users AS u ON r.user_id = u.id
                                WHERE r.id = @Id AND (r.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))";
 
         return conn.Query<Recipe, User, Recipe>(query,
@@ -164,9 +163,9 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT s.*, u.""Id"", u.""Email"", u.""ImageUri""
+        const string query = @"SELECT s.*, u.id, u.email, u.image_uri
                                FROM cooking_shares AS s
-                               INNER JOIN ""AspNetUsers"" AS u ON s.user_id = u.""Id""
+                               INNER JOIN users AS u ON s.user_id = u.id
                                WHERE s.recipe_id = @RecipeId AND s.is_accepted IS NOT FALSE
                                ORDER BY (CASE WHEN s.is_accepted THEN 1 ELSE 2 END) ASC, s.created_date";
 
@@ -182,10 +181,10 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT s.*, r.name, u.""Name""
+        const string query = @"SELECT s.*, r.name, u.name
                                FROM cooking_shares AS s
                                INNER JOIN cooking_recipes AS r ON s.recipe_id = r.id
-                               INNER JOIN ""AspNetUsers"" AS u ON r.user_id = u.""Id""
+                               INNER JOIN users AS u ON r.user_id = u.id
                                WHERE s.user_id = @UserId
                                ORDER BY s.modified_date DESC";
 
@@ -232,10 +231,10 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT sr.*, r.name, u.""Name""
+        const string query = @"SELECT sr.*, r.name, u.name
                                FROM cooking_send_requests AS sr
                                INNER JOIN cooking_recipes AS r ON sr.recipe_id = r.id
-                               INNER JOIN ""AspNetUsers"" AS u ON r.user_id = u.""Id""
+                               INNER JOIN users AS u ON r.user_id = u.id
                                WHERE sr.user_id = @UserId
                                ORDER BY sr.modified_date DESC";
 
@@ -402,14 +401,14 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.Query<User>(@"SELECT u.*
-                                  FROM ""AspNetUsers"" AS u
-                                  INNER JOIN cooking_shares AS s ON u.""Id"" = s.user_id
-                                  WHERE u.""Id"" != @ExcludeUserId AND s.recipe_id = @RecipeId AND s.is_accepted AND u.""ToDoNotificationsEnabled""
+                                  FROM users AS u
+                                  INNER JOIN cooking_shares AS s ON u.id = s.user_id
+                                  WHERE u.id != @ExcludeUserId AND s.recipe_id = @RecipeId AND s.is_accepted AND u.todo_notifications_enabled
                                   UNION
                                   SELECT u.*
-                                  FROM ""AspNetUsers"" AS u
-                                  INNER JOIN cooking_recipes AS r ON u.""Id"" = r.user_id
-                                  WHERE u.""Id"" != @ExcludeUserId AND r.id = @RecipeId AND u.""ToDoNotificationsEnabled""",
+                                  FROM users AS u
+                                  INNER JOIN cooking_recipes AS r ON u.id = r.user_id
+                                  WHERE u.id != @ExcludeUserId AND r.id = @RecipeId AND u.todo_notifications_enabled",
             new { RecipeId = id, ExcludeUserId = excludeUserId });
     }
     public bool CheckIfUserCanBeNotifiedOfRecipeChange(int id, int userId)
@@ -417,9 +416,9 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                          FROM ""AspNetUsers"" AS u
-                                          INNER JOIN cooking_shares AS s ON u.""Id"" = s.user_id
-                                          WHERE u.""Id"" = @UserId AND s.recipe_id = @RecipeId AND s.is_accepted AND u.""ToDoNotificationsEnabled""",
+                                          FROM users AS u
+                                          INNER JOIN cooking_shares AS s ON u.id = s.user_id
+                                          WHERE u.id = @UserId AND s.recipe_id = @RecipeId AND s.is_accepted AND u.todo_notifications_enabled",
             new { RecipeId = id, UserId = userId });
     }
 
@@ -428,9 +427,9 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.Query<User>(@"SELECT u.*
-                                  FROM ""AspNetUsers"" AS u
-                                  INNER JOIN cooking_shares AS s ON u.""Id"" = s.user_id
-                                  WHERE s.recipe_id = @RecipeId AND s.is_accepted AND u.""ToDoNotificationsEnabled""",
+                                  FROM users AS u
+                                  INNER JOIN cooking_shares AS s ON u.id = s.user_id
+                                  WHERE s.recipe_id = @RecipeId AND s.is_accepted AND u.todo_notifications_enabled",
             new { RecipeId = id });
     }
 
@@ -439,9 +438,9 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.Query<User>(@"SELECT u.*
-                                  FROM ""AspNetUsers"" AS u
-                                  INNER JOIN cooking_send_requests AS sr ON u.""Id"" = sr.user_id
-                                  WHERE sr.recipe_id = @RecipeId AND u.""CookingNotificationsEnabled""",
+                                  FROM users AS u
+                                  INNER JOIN cooking_send_requests AS sr ON u.id = sr.user_id
+                                  WHERE sr.recipe_id = @RecipeId AND u.cooking_notifications_enabled",
             new { RecipeId = id });
     }
 

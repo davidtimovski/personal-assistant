@@ -14,8 +14,8 @@ CREATE TABLE public.cooking_recipes
     created_date timestamp with time zone NOT NULL,
     modified_date timestamp with time zone NOT NULL,
     CONSTRAINT pk_cooking_recipes PRIMARY KEY (id),
-    CONSTRAINT fk_cooking_recipes_aspnetusers_user_id FOREIGN KEY (user_id)
-    REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE
+    CONSTRAINT fk_cooking_recipes_users_user_id FOREIGN KEY (user_id)
+    REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE
 )

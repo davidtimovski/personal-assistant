@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Contracts.Accountant.Categories;
@@ -6,6 +7,7 @@ using Application.Contracts.Accountant.Categories.Models;
 using Application.Contracts.Accountant.Common.Models;
 using AutoMapper;
 using Domain.Entities.Accountant;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services.Accountant;
 
@@ -13,59 +15,102 @@ public class CategoryService : ICategoryService
 {
     private readonly ICategoriesRepository _categoriesRepository;
     private readonly IMapper _mapper;
+    private readonly ILogger<CategoryService> _logger;
 
     public CategoryService(
         ICategoriesRepository categoriesRepository,
-        IMapper mapper)
+        IMapper mapper,
+        ILogger<CategoryService> logger)
     {
         _categoriesRepository = categoriesRepository;
         _mapper = mapper;
+        _logger = logger;
     }
 
     public IEnumerable<CategoryDto> GetAll(GetAll model)
     {
-        var categories = _categoriesRepository.GetAll(model.UserId, model.FromModifiedDate);
+        try
+        {
+            var categories = _categoriesRepository.GetAll(model.UserId, model.FromModifiedDate);
 
-        var categoryDtos = categories.Select(x => _mapper.Map<CategoryDto>(x));
+            var categoryDtos = categories.Select(x => _mapper.Map<CategoryDto>(x));
 
-        return categoryDtos;
+            return categoryDtos;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(GetAll)}");
+            throw;
+        }
     }
 
     public IEnumerable<int> GetDeletedIds(GetDeletedIds model)
     {
-        return _categoriesRepository.GetDeletedIds(model.UserId, model.FromDate);
+        try
+        {
+            return _categoriesRepository.GetDeletedIds(model.UserId, model.FromDate);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(GetDeletedIds)}");
+            throw;
+        }
     }
 
     public Task<int> CreateAsync(CreateCategory model)
     {
-        if (model.Type == CategoryType.DepositOnly)
+        try
         {
-            model.GenerateUpcomingExpense = false;
+            if (model.Type == CategoryType.DepositOnly)
+            {
+                model.GenerateUpcomingExpense = false;
+            }
+
+            var category = _mapper.Map<Category>(model);
+
+            category.Name = category.Name.Trim();
+
+            return _categoriesRepository.CreateAsync(category);
         }
-
-        var category = _mapper.Map<Category>(model);
-
-        category.Name = category.Name.Trim();
-
-        return _categoriesRepository.CreateAsync(category);
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(CreateAsync)}");
+            throw;
+        }
     }
 
     public async Task UpdateAsync(UpdateCategory model)
     {
-        if (model.Type == CategoryType.DepositOnly)
+        try
         {
-            model.GenerateUpcomingExpense = false;
+            if (model.Type == CategoryType.DepositOnly)
+            {
+                model.GenerateUpcomingExpense = false;
+            }
+
+            var category = _mapper.Map<Category>(model);
+
+            category.Name = category.Name.Trim();
+
+            await _categoriesRepository.UpdateAsync(category);
         }
-
-        var category = _mapper.Map<Category>(model);
-
-        category.Name = category.Name.Trim();
-
-        await _categoriesRepository.UpdateAsync(category);
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(UpdateAsync)}");
+            throw;
+        }
     }
 
     public async Task DeleteAsync(int id, int userId)
     {
-        await _categoriesRepository.DeleteAsync(id, userId);
+        try
+        {
+            await _categoriesRepository.DeleteAsync(id, userId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(DeleteAsync)}");
+            throw;
+        }
     }
 }

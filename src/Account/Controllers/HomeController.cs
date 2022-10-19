@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Account.ViewModels.Home;
+using Application.Contracts.Common;
 using Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -18,7 +19,11 @@ public class HomeController : BaseController
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _configuration;
 
-    public HomeController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+    public HomeController(
+        IUserIdLookup userIdLookup, 
+        IUsersRepository usersRepository, 
+        IHttpClientFactory httpClientFactory, 
+        IConfiguration configuration) : base(userIdLookup, usersRepository)
     {
         _httpClientFactory = httpClientFactory;
         _configuration = configuration;
@@ -49,12 +54,12 @@ public class HomeController : BaseController
 
         var model = new OverviewViewModel
         {
-            UserName = user.Name,
+            UserName = user.name,
             ClientApplications = new List<ClientApplicationViewModel>
             {
-                new ClientApplicationViewModel("To Do Assistant", new Uri(_configuration["Urls:ToDoAssistant"] + $"/{language}"), "to-do-assistant"),
+                new ClientApplicationViewModel("To Do Assistant", new Uri(_configuration["Urls:ToDoAssistant"] + $"?lang={language}"), "to-do-assistant"),
                 new ClientApplicationViewModel("Cooking Assistant", new Uri(_configuration["Urls:CookingAssistant"] + $"/{language}"), "cooking-assistant"),
-                new ClientApplicationViewModel("Accountant", new Uri(_configuration["Urls:Accountant2"] + $"?lang={language}"), "accountant")
+                new ClientApplicationViewModel("Accountant", new Uri(_configuration["Urls:Accountant"] + $"?lang={language}"), "accountant")
             },
             Alert = alert
         };

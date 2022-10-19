@@ -8,8 +8,8 @@ CREATE TABLE public.client_errors
     occurred timestamp with time zone NOT NULL,
     created_date timestamp with time zone NOT NULL,
     CONSTRAINT pk_client_errors PRIMARY KEY (id),
-    CONSTRAINT fk_client_errors_aspnetusers_user_id FOREIGN KEY (user_id)
-    REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE
+    CONSTRAINT fk_client_errors_users_user_id FOREIGN KEY (user_id)
+    REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE
 )

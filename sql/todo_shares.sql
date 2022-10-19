@@ -14,8 +14,8 @@ CREATE TABLE public.todo_shares
     REFERENCES public.todo_lists (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE,
-    CONSTRAINT fk_todo_shares_aspnetusers_user_id FOREIGN KEY (user_id)
-    REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE
+    CONSTRAINT fk_todo_shares_users_user_id FOREIGN KEY (user_id)
+    REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE
 )

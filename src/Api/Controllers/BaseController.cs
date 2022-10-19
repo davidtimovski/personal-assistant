@@ -1,4 +1,5 @@
-﻿using Application.Contracts.Common;
+﻿using System;
+using Application.Contracts.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -43,6 +44,11 @@ public abstract class BaseController : Controller
     {
         get
         {
+            if (User?.Identity.IsAuthenticated == false)
+            {
+                throw new Exception($"The {nameof(AuthId)} property is only available for authenticated users");
+            }
+
             return User.FindFirst("sub").Value;
         }
     }

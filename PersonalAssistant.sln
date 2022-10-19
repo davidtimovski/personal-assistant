@@ -44,15 +44,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.github\workflows\cd_account.yml = .github\workflows\cd_account.yml
 		.github\workflows\cd_api.yml = .github\workflows\cd_api.yml
 		.github\workflows\cd_clientlogger.yml = .github\workflows\cd_clientlogger.yml
-		.github\workflows\cd_gateway.yml = .github\workflows\cd_gateway.yml
 		.github\workflows\cd_sender.yml = .github\workflows\cd_sender.yml
 		.github\workflows\ci_dev.yml = .github\workflows\ci_dev.yml
 		.github\workflows\test.yml = .github\workflows\test.yml
 	EndProjectSection
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{A1987576-C974-4672-AA1E-868237023E5F}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gateway", "src\Gateway\Gateway.csproj", "{20FD042A-327B-470C-B7F7-747B01166D6B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Account", "src\Account\Account.csproj", "{A4BF0452-9390-4D34-B55F-3F017C09E63F}"
 EndProject
@@ -110,10 +107,6 @@ Global
 		{A1987576-C974-4672-AA1E-868237023E5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1987576-C974-4672-AA1E-868237023E5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1987576-C974-4672-AA1E-868237023E5F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{20FD042A-327B-470C-B7F7-747B01166D6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{20FD042A-327B-470C-B7F7-747B01166D6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{20FD042A-327B-470C-B7F7-747B01166D6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{20FD042A-327B-470C-B7F7-747B01166D6B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A4BF0452-9390-4D34-B55F-3F017C09E63F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A4BF0452-9390-4D34-B55F-3F017C09E63F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A4BF0452-9390-4D34-B55F-3F017C09E63F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -134,7 +127,6 @@ Global
 		{A50F7C88-8397-41E2-BE82-D5F49F8F039D} = {4D1DD8B8-7BE5-46E4-8032-9D45823E76A5}
 		{94B9AA32-4784-409B-B5C8-34C0FE45E19C} = {C1098B33-586C-4024-9BF4-F71CED6654D9}
 		{CEE41C39-726C-45DB-9B9E-7786D25981C4} = {4D1DD8B8-7BE5-46E4-8032-9D45823E76A5}
-		{20FD042A-327B-470C-B7F7-747B01166D6B} = {577BCF93-9D25-4060-A201-FA11AC92DD26}
 		{A4BF0452-9390-4D34-B55F-3F017C09E63F} = {577BCF93-9D25-4060-A201-FA11AC92DD26}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

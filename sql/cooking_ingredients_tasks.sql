@@ -9,8 +9,8 @@ CREATE TABLE IF NOT EXISTS public.cooking_ingredients_tasks
         REFERENCES public.cooking_ingredients (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE CASCADE,
-    CONSTRAINT fk_cooking_ingredients_tasks_aspnetusers_user_id FOREIGN KEY (user_id)
-        REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE
+    CONSTRAINT fk_cooking_ingredients_tasks_users_user_id FOREIGN KEY (user_id)
+        REFERENCES public.users (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE CASCADE,
     CONSTRAINT fk_cooking_ingredients_tasks_todo_tasks_task_id FOREIGN KEY (task_id)

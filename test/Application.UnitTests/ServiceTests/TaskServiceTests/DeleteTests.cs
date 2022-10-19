@@ -20,7 +20,8 @@ public class DeleteTests
             null,
             _tasksRepositoryMock.Object,
             null,
-            MapperMocker.GetMapper<ToDoAssistantProfile>());
+            MapperMocker.GetMapper<ToDoAssistantProfile>(),
+            null);
     }
 
     [Fact]

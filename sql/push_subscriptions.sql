@@ -8,8 +8,8 @@ CREATE TABLE public.push_subscriptions
     p256dh_key character varying(255) NOT NULL COLLATE pg_catalog."default",
     created_date timestamp with time zone NOT NULL,
     CONSTRAINT pk_push_subscriptions PRIMARY KEY (id),
-    CONSTRAINT fk_push_subscriptions_aspnetusers_user_id FOREIGN KEY (user_id)
-    REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE
+    CONSTRAINT fk_push_subscriptions_users_user_id FOREIGN KEY (user_id)
+    REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE
 )

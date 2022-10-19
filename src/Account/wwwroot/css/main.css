@@ -448,12 +448,12 @@ form .text-danger {
             cursor: default;
         }
 
-.login-links {
-    margin-top: 40px;
+.home-links {
+    margin-top: 30px;
 }
 
-    .login-links div {
-        line-height: 34px;
+    .home-links div {
+        line-height: 38px;
         text-align: center;
     }
 
@@ -554,14 +554,6 @@ select {
         color: var(--cooking-assistant-main-color);
     }
 
-.links {
-    margin-top: 50px;
-}
-
-    .links div {
-        line-height: 38px;
-        text-align: center;
-    }
 
 .welcome-message {
     font-size: 1.3rem;

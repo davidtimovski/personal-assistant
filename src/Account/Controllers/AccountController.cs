@@ -32,6 +32,7 @@ namespace Account.Controllers;
 public class AccountController : BaseController
 {
     //private readonly IEmailTemplateService _emailTemplateService;
+    private readonly IUserService _userService;
     private readonly IAccountService _accountService;
     private readonly IListService _listService;
     private readonly IRecipeService _recipeService;
@@ -44,6 +45,9 @@ public class AccountController : BaseController
 
     public AccountController(
         //IEmailTemplateService emailTemplateService,
+        IUserIdLookup userIdLookup,
+        IUsersRepository usersRepository,
+        IUserService userService,
         IAccountService accountService,
         IListService listService,
         IRecipeService recipeService,
@@ -52,9 +56,10 @@ public class AccountController : BaseController
         IConfiguration configuration,
         IStringLocalizer<AccountController> localizer,
         IWebHostEnvironment webHostEnvironment,
-        ILogger<AccountController> logger)
+        ILogger<AccountController> logger) : base(userIdLookup, usersRepository)
     {
         //_emailTemplateService = emailTemplateService;
+        _userService = userService;
         _accountService = accountService;
         _listService = listService;
         _recipeService = recipeService;
@@ -90,12 +95,13 @@ public class AccountController : BaseController
         var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0:ClientSecret"]);
         await Auth0ManagementUtil.InitializeAsync(httpClient, config);
 
-        var user = await Auth0ManagementUtil.GetUserAsync(httpClient, AuthId);
+        var viewModel = new ResetPasswordViewModel();
 
-        var viewModel = new ResetPasswordViewModel
+        if (User?.Identity.IsAuthenticated == true)
         {
-            Email = user.Email
-        };
+            var user = await Auth0ManagementUtil.GetUserAsync(httpClient, AuthId);
+            viewModel.Email = user.email;
+        }
 
         return View(viewModel);
     }
@@ -282,11 +288,12 @@ public class AccountController : BaseController
         var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0:ClientSecret"]);
         await Auth0ManagementUtil.InitializeAsync(httpClient, config);
 
-        var user = await Auth0ManagementUtil.GetUserAsync(httpClient, AuthId);
+        var authUser = await Auth0ManagementUtil.GetUserAsync(httpClient, AuthId);
+        var user = _userService.Get(UserId);
 
         var viewModel = new ViewProfileViewModel
         {
-            Name = user.Name,
+            Name = authUser.name,
             Language = user.Language,
             ImageUri = user.ImageUri,
             DefaultImageUri = _cdnService.GetDefaultProfileImageUri(),
@@ -318,17 +325,12 @@ public class AccountController : BaseController
         var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0:ClientSecret"]);
         await Auth0ManagementUtil.InitializeAsync(httpClient, config);
 
-        var user = await Auth0ManagementUtil.GetUserAsync(httpClient, AuthId);
-
-        string userCurrentLanguage = user.Language;
-        user.Name = model.Name.Trim();
-        user.Language = model.Language;
-        string oldImageUri = user.ImageUri;
-        user.ImageUri = string.IsNullOrEmpty(model.ImageUri) ? null : model.ImageUri;
+        var imageUri = string.IsNullOrEmpty(model.ImageUri) ? null : model.ImageUri;
 
         try
         {
-            await Auth0ManagementUtil.UpdateUserAsync(httpClient, AuthId, user);
+            await Auth0ManagementUtil.UpdateNameAsync(httpClient, AuthId, model.Name);
+            await _userService.UpdateProfileAsync(UserId, model.Name, model.Language, imageUri);
         }
         catch (Exception ex)
         {
@@ -345,6 +347,10 @@ public class AccountController : BaseController
                 BaseUrl = _configuration["Urls:PersonalAssistant"]
             });
         }
+
+        var user = _userService.Get(UserId);
+
+        string oldImageUri = user.ImageUri;
 
         // If the user changed his image
         if (oldImageUri != model.ImageUri)
@@ -364,7 +370,7 @@ public class AccountController : BaseController
 
         SetLanguageCookie(model.Language);
 
-        if (model.Language != userCurrentLanguage)
+        if (model.Language != user.Language)
         {
             return RedirectToAction(nameof(Logout), "Account", new { returnUrlSlug = "?alert=" + IndexAlert.LanguageChanged });
         }
@@ -402,13 +408,9 @@ public class AccountController : BaseController
                     await image.CopyToAsync(stream);
                 }
 
-                //ApplicationUser user = await _userManager.GetUserAsync(User);
-
-                // TODO: get user id here
-
                 string imageUri = await _cdnService.UploadProfileTempAsync(
                     filePath: tempImagePath,
-                    uploadPath: $"users/2",
+                    uploadPath: $"users/{UserId}",
                     template: "profile"
                 );
 

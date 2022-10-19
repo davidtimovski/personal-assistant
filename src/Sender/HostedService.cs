@@ -146,7 +146,7 @@ public sealed class HostedService : IHostedService, IDisposable
                                 }
                             ), vapidDetails);
                     }
-                    catch (WebPushException ex) when (ex.Message == "Subscription no longer valid")
+                    catch (WebPushException ex) when (ex.Message.StartsWith("Subscription no longer valid"))
                     {
                         conn.Execute(@"DELETE FROM push_subscriptions WHERE id = @Id", new { recipientSub.Id });
                     }

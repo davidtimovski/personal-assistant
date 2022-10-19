@@ -14,8 +14,8 @@ CREATE TABLE public.accountant_categories
     REFERENCES public.accountant_categories (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE SET NULL,
-    CONSTRAINT fk_accountant_categories_aspnetusers_user_id FOREIGN KEY (user_id)
-    REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE
+    CONSTRAINT fk_accountant_categories_users_user_id FOREIGN KEY (user_id)
+    REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE
 )

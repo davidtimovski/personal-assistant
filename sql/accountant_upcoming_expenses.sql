@@ -11,8 +11,8 @@ CREATE TABLE public.accountant_upcoming_expenses
     created_date timestamp with time zone NOT NULL,
     modified_date timestamp with time zone NOT NULL,
     CONSTRAINT pk_accountant_upcoming_expenses PRIMARY KEY (id),
-    CONSTRAINT fk_accountant_upcoming_expenses_aspnetusers_user_id FOREIGN KEY (user_id)
-    REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE
+    CONSTRAINT fk_accountant_upcoming_expenses_users_user_id FOREIGN KEY (user_id)
+    REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE,
     CONSTRAINT fk_accountant_upcoming_expenses_accountant_categories_category_id FOREIGN KEY (category_id)

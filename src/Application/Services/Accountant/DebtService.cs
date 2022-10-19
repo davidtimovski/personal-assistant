@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Contracts.Accountant.Common.Models;
@@ -6,6 +7,7 @@ using Application.Contracts.Accountant.Debts;
 using Application.Contracts.Accountant.Debts.Models;
 using AutoMapper;
 using Domain.Entities.Accountant;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services.Accountant;
 
@@ -13,70 +15,121 @@ public class DebtService : IDebtService
 {
     private readonly IDebtsRepository _debtsRepository;
     private readonly IMapper _mapper;
+    private readonly ILogger<DebtService> _logger;
 
     public DebtService(
         IDebtsRepository debtsRepository,
-        IMapper mapper)
+        IMapper mapper,
+        ILogger<DebtService> logger)
     {
         _debtsRepository = debtsRepository;
         _mapper = mapper;
+        _logger = logger;
     }
 
     public IEnumerable<DebtDto> GetAll(GetAll model)
     {
-        var debt = _debtsRepository.GetAll(model.UserId, model.FromModifiedDate);
+        try
+        {
+            var debt = _debtsRepository.GetAll(model.UserId, model.FromModifiedDate);
 
-        var debtDtos = debt.Select(x => _mapper.Map<DebtDto>(x));
+            var debtDtos = debt.Select(x => _mapper.Map<DebtDto>(x));
 
-        return debtDtos;
+            return debtDtos;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(GetAll)}");
+            throw;
+        }
     }
 
     public IEnumerable<int> GetDeletedIds(GetDeletedIds model)
     {
-        return _debtsRepository.GetDeletedIds(model.UserId, model.FromDate);
+        try
+        {
+            return _debtsRepository.GetDeletedIds(model.UserId, model.FromDate);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(GetDeletedIds)}");
+            throw;
+        }
     }
 
     public Task<int> CreateAsync(CreateDebt model)
     {
-        var debt = _mapper.Map<Debt>(model);
-
-        debt.Person = debt.Person.Trim();
-        if (debt.Description != null)
+        try
         {
-            debt.Description = debt.Description.Trim();
-        }
+            var debt = _mapper.Map<Debt>(model);
 
-        return _debtsRepository.CreateAsync(debt);
+            debt.Person = debt.Person.Trim();
+            if (debt.Description != null)
+            {
+                debt.Description = debt.Description.Trim();
+            }
+
+            return _debtsRepository.CreateAsync(debt);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(CreateAsync)}");
+            throw;
+        }
     }
 
     public Task<int> CreateMergedAsync(CreateDebt model)
     {
-        var debt = _mapper.Map<Debt>(model);
-
-        debt.Person = debt.Person.Trim();
-        if (debt.Description != null)
+        try
         {
-            debt.Description = debt.Description.Trim();
-        }
+            var debt = _mapper.Map<Debt>(model);
 
-        return _debtsRepository.CreateMergedAsync(debt);
+            debt.Person = debt.Person.Trim();
+            if (debt.Description != null)
+            {
+                debt.Description = debt.Description.Trim();
+            }
+
+            return _debtsRepository.CreateMergedAsync(debt);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(CreateMergedAsync)}");
+            throw;
+        }
     }
 
     public async Task UpdateAsync(UpdateDebt model)
     {
-        var debt = _mapper.Map<Debt>(model);
-
-        debt.Person = debt.Person.Trim();
-        if (debt.Description != null)
+        try
         {
-            debt.Description = debt.Description.Trim();
-        }
+            var debt = _mapper.Map<Debt>(model);
 
-        await _debtsRepository.UpdateAsync(debt);
+            debt.Person = debt.Person.Trim();
+            if (debt.Description != null)
+            {
+                debt.Description = debt.Description.Trim();
+            }
+
+            await _debtsRepository.UpdateAsync(debt);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(UpdateAsync)}");
+            throw;
+        }
     }
 
     public async Task DeleteAsync(int id, int userId)
     {
-        await _debtsRepository.DeleteAsync(id, userId);
+        try
+        {
+            await _debtsRepository.DeleteAsync(id, userId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(DeleteAsync)}");
+            throw;
+        }
     }
 }

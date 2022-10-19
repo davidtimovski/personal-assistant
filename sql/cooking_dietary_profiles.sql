@@ -40,8 +40,8 @@ CREATE TABLE public.cooking_dietary_profiles
     created_date timestamp with time zone NOT NULL,
     modified_date timestamp with time zone NOT NULL,
     CONSTRAINT pk_cooking_dietary_profiles PRIMARY KEY (user_id),
-    CONSTRAINT fk_cooking_dietary_profiles_aspnetusers_user_id FOREIGN KEY (user_id)
-    REFERENCES public.aspnetusers (id) MATCH SIMPLE
+    CONSTRAINT fk_cooking_dietary_profiles_users_user_id FOREIGN KEY (user_id)
+    REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE
 )

@@ -24,7 +24,8 @@ public class UpdateTests
             new Mock<IDailyIntakeHelper>().Object,
             new Mock<IOptions<DailyIntakeReference>>().Object,
             new Mock<IDietaryProfilesRepository>().Object,
-            MapperMocker.GetMapper<CookingAssistantProfile>());
+            MapperMocker.GetMapper<CookingAssistantProfile>(),
+            null);
     }
 
     [Fact]

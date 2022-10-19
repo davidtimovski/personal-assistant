@@ -28,6 +28,7 @@ using Application.Services.ToDoAssistant;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using Utility;
 
 namespace Application;
@@ -36,6 +37,10 @@ public static class IoC
 {
     public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
     {
+        Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(configuration)
+            .CreateLogger();
+
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
         services.AddTransient<IConversion, Conversion>();

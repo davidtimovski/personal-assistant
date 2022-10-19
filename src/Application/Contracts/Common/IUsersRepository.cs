@@ -11,6 +11,7 @@ public interface IUsersRepository
     bool Exists(int id);
     string GetLanguage(int id);
     string GetImageUri(int id);
+    Task UpdateProfileAsync(int id, string name, string language, string imageUri);
     Task UpdateToDoNotificationsEnabledAsync(int id, bool enabled);
     Task UpdateCookingNotificationsEnabledAsync(int id, bool enabled);
     Task UpdateImperialSystemAsync(int id, bool imperialSystem);

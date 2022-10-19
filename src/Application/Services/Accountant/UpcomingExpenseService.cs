@@ -7,6 +7,7 @@ using Application.Contracts.Accountant.UpcomingExpenses;
 using Application.Contracts.Accountant.UpcomingExpenses.Models;
 using AutoMapper;
 using Domain.Entities.Accountant;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services.Accountant;
 
@@ -14,61 +15,112 @@ public class UpcomingExpenseService : IUpcomingExpenseService
 {
     private readonly IUpcomingExpensesRepository _upcomingExpensesRepository;
     private readonly IMapper _mapper;
+    private readonly ILogger<UpcomingExpenseService> _logger;
 
     public UpcomingExpenseService(
         IUpcomingExpensesRepository upcomingExpensesRepository,
-        IMapper mapper)
+        IMapper mapper,
+        ILogger<UpcomingExpenseService> logger)
     {
         _upcomingExpensesRepository = upcomingExpensesRepository;
         _mapper = mapper;
+        _logger = logger;
     }
 
     public IEnumerable<UpcomingExpenseDto> GetAll(GetAll model)
     {
-        var upcomingExpenses = _upcomingExpensesRepository.GetAll(model.UserId, model.FromModifiedDate);
+        try
+        {
+            var upcomingExpenses = _upcomingExpensesRepository.GetAll(model.UserId, model.FromModifiedDate);
 
-        var upcomingExpenseDtos = upcomingExpenses.Select(x => _mapper.Map<UpcomingExpenseDto>(x));
+            var upcomingExpenseDtos = upcomingExpenses.Select(x => _mapper.Map<UpcomingExpenseDto>(x));
 
-        return upcomingExpenseDtos;
+            return upcomingExpenseDtos;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(GetAll)}");
+            throw;
+        }
     }
 
     public IEnumerable<int> GetDeletedIds(GetDeletedIds model)
     {
-        return _upcomingExpensesRepository.GetDeletedIds(model.UserId, model.FromDate);
+        try
+        {
+            return _upcomingExpensesRepository.GetDeletedIds(model.UserId, model.FromDate);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(GetDeletedIds)}");
+            throw;
+        }
     }
 
     public Task<int> CreateAsync(CreateUpcomingExpense model)
     {
-        var upcomingExpense = _mapper.Map<UpcomingExpense>(model);
-
-        if (upcomingExpense.Description != null)
+        try
         {
-            upcomingExpense.Description = upcomingExpense.Description.Trim();
-        }
+            var upcomingExpense = _mapper.Map<UpcomingExpense>(model);
 
-        return _upcomingExpensesRepository.CreateAsync(upcomingExpense);
+            if (upcomingExpense.Description != null)
+            {
+                upcomingExpense.Description = upcomingExpense.Description.Trim();
+            }
+
+            return _upcomingExpensesRepository.CreateAsync(upcomingExpense);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(CreateAsync)}");
+            throw;
+        }
     }
 
     public async Task UpdateAsync(UpdateUpcomingExpense model)
     {
-        var upcomingExpense = _mapper.Map<UpcomingExpense>(model);
-
-        if (upcomingExpense.Description != null)
+        try
         {
-            upcomingExpense.Description = upcomingExpense.Description.Trim();
-        }
+            var upcomingExpense = _mapper.Map<UpcomingExpense>(model);
 
-        await _upcomingExpensesRepository.UpdateAsync(upcomingExpense);
+            if (upcomingExpense.Description != null)
+            {
+                upcomingExpense.Description = upcomingExpense.Description.Trim();
+            }
+
+            await _upcomingExpensesRepository.UpdateAsync(upcomingExpense);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(UpdateAsync)}");
+            throw;
+        }
     }
 
     public async Task DeleteAsync(int id, int userId)
     {
-        await _upcomingExpensesRepository.DeleteAsync(id, userId);
+        try
+        {
+            await _upcomingExpensesRepository.DeleteAsync(id, userId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(DeleteAsync)}");
+            throw;
+        }
     }
 
     public async Task DeleteOldAsync(int userId)
     {
-        var startOfMonth = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1, 0, 0, 0);
-        await _upcomingExpensesRepository.DeleteOldAsync(userId, startOfMonth);
+        try
+        {
+            var startOfMonth = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1, 0, 0, 0);
+            await _upcomingExpensesRepository.DeleteOldAsync(userId, startOfMonth);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(DeleteOldAsync)}");
+            throw;
+        }
     }
 }
