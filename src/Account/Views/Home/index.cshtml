@@ -15,10 +15,13 @@
         break;
 }
 
-<div class="login-links">
+<div class="home-links">
     <div>
         <a asp-action="login" asp-controller="account">@Localizer["Login"]</a>
     </div>
+</div>
+
+<div class="home-links">
     <div>
         <a asp-action="register" asp-controller="account">@Localizer["DontHaveAnAccount"]</a>
     </div>
@@ -27,7 +30,7 @@
     </div>
 </div>
 
-<div class="links">
+<div class="home-links">
     <div>
         <a asp-action="privacy-policy" asp-controller="home">@Localizer["PrivacyPolicy"]</a>
     </div>

@@ -21,7 +21,8 @@ public class UncompleteTests
             null,
             _tasksRepositoryMock.Object,
             null,
-            MapperMocker.GetMapper<ToDoAssistantProfile>());
+            MapperMocker.GetMapper<ToDoAssistantProfile>(),
+            null);
     }
 
     [Fact]

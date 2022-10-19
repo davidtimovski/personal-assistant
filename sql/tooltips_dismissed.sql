@@ -2,8 +2,8 @@ CREATE TABLE public.tooltips_dismissed
 (
     tooltip_id integer NOT NULL,
     user_id integer NOT NULL,
-    CONSTRAINT fk_tooltips_dismissed_aspnetusers_user_id FOREIGN KEY (user_id)
-    REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE
+    CONSTRAINT fk_tooltips_dismissed_users_user_id FOREIGN KEY (user_id)
+    REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE,
     UNIQUE (tooltip_id, user_id)

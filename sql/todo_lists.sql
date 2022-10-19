@@ -11,8 +11,8 @@ CREATE TABLE public.todo_lists
     created_date timestamp with time zone NOT NULL,
     modified_date timestamp with time zone NOT NULL,
     CONSTRAINT pk_todo_lists PRIMARY KEY (id),
-    CONSTRAINT fk_todo_lists_aspnetusers_user_id FOREIGN KEY (user_id)
-    REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE
+    CONSTRAINT fk_todo_lists_users_user_id FOREIGN KEY (user_id)
+    REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE
 )

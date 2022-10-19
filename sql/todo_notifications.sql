@@ -10,12 +10,12 @@ CREATE TABLE public.todo_notifications
     created_date timestamp with time zone NOT NULL,
     modified_date timestamp with time zone NOT NULL,
     CONSTRAINT pk_todo_notifications PRIMARY KEY (id),
-    CONSTRAINT fk_todo_notifications_aspnetusers_user_id FOREIGN KEY (user_id)
-    REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE
+    CONSTRAINT fk_todo_notifications_users_user_id FOREIGN KEY (user_id)
+    REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE,
     CONSTRAINT fk_todo_notifications_aspmetusers_action_user_id FOREIGN KEY (action_user_id)
-    REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE
+    REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE,
     CONSTRAINT fk_todo_notifications_todo_lists_list_id FOREIGN KEY (list_id)

@@ -25,7 +25,8 @@ public class UpdateTests
 
         _sut = new RecipeService(null, null, null, null, null,
             _recipesRepositoryMock.Object,
-            MapperMocker.GetMapper<CookingAssistantProfile>());
+            MapperMocker.GetMapper<CookingAssistantProfile>(),
+            null);
     }
 
     [Fact]

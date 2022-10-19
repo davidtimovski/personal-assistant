@@ -22,7 +22,8 @@ public class NotificationTests
             _listsRepositoryMock.Object,
             _tasksRepositoryMock.Object,
             null,
-            MapperMocker.GetMapper<ToDoAssistantProfile>());
+            MapperMocker.GetMapper<ToDoAssistantProfile>(),
+            null);
     }
 
     [Fact]

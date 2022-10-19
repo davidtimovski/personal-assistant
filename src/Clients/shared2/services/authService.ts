@@ -17,7 +17,7 @@ export class AuthService {
     this.client = await createAuth0Client({
       domain: "personalassistant-site.eu.auth0.com",
       client_id: this.clientId,
-      audience: `${Variables.urls.api}/api`,
+      audience: Variables.urls.api,
       cacheLocation: "localstorage",
       redirect_uri: `${Variables.urls.host}/signin-oidc`,
     });

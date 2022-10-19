@@ -29,7 +29,7 @@ public class GetRecommendedDailyIntakeTests
             new Mock<IDailyIntakeHelper>().Object,
             dailyIntakeRefOptionsMock.Object,
             null,
-            GetMapper());
+            GetMapper(), null);
     }
 
     [Fact]

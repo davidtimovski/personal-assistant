@@ -10,8 +10,8 @@ CREATE TABLE public.cooking_send_requests
     REFERENCES public.cooking_recipes (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE,
-    CONSTRAINT fk_cooking_send_requests_aspnetusers_user_id FOREIGN KEY (user_id)
-    REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE
+    CONSTRAINT fk_cooking_send_requests_users_user_id FOREIGN KEY (user_id)
+    REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE
 )

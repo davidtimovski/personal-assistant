@@ -9,8 +9,8 @@ CREATE TABLE public.accountant_accounts
     created_date timestamp with time zone NOT NULL,
     modified_date timestamp with time zone NOT NULL,
     CONSTRAINT pk_accountant_accounts PRIMARY KEY (id),
-    CONSTRAINT fk_accountant_accounts_aspnetusers_user_id FOREIGN KEY (user_id)
-    REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE
+    CONSTRAINT fk_accountant_accounts_users_user_id FOREIGN KEY (user_id)
+    REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE
 )

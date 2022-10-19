@@ -39,20 +39,6 @@ services:
       - postgres
       - rabbitmq
 
-  gateway:
-    image: ${DOCKER_REGISTRY}:gateway-latest
-    container_name: pa-gateway
-    restart: always
-    environment:
-      - ASPNETCORE_URLS=http://0.0.0.0:80
-      - PORT=80
-    ports:
-      - "5002:80"
-    volumes:
-      - ./storage:/app/storage
-    depends_on:
-      - clientlogger
-
   clientlogger:
     image: ${DOCKER_REGISTRY}:clientlogger-latest
     container_name: pa-clientlogger
@@ -62,7 +48,7 @@ services:
       - ConnectionString=${CONNECTION_STRING}
       - PORT=80
     ports:
-      - "5003:80"
+      - "5002:80"
     volumes:
       - ./storage:/app/storage
     depends_on:

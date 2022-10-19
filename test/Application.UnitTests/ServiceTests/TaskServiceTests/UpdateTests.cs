@@ -35,7 +35,8 @@ public class UpdateTests
             new Mock<IListService>().Object,
             _tasksRepositoryMock.Object,
             _listsRepositoryMock.Object,
-            MapperMocker.GetMapper<ToDoAssistantProfile>());
+            MapperMocker.GetMapper<ToDoAssistantProfile>(),
+            null);
     }
 
     [Fact]

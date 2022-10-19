@@ -10,7 +10,6 @@ using Domain.Entities.ToDoAssistant;
 
 namespace Persistence.Repositories.ToDoAssistant;
 
-// TODO: Change/remove references to AspNetUsers
 public class ListsRepository : BaseRepository, IListsRepository
 {
     public ListsRepository(PersonalAssistantContext efContext)
@@ -62,9 +61,9 @@ public class ListsRepository : BaseRepository, IListsRepository
         var listIds = lists.Select(x => x.Id).ToArray();
         var shares = conn.Query<ListShare>(@"SELECT * FROM todo_shares WHERE list_id = ANY(@ListIds)", new { ListIds = listIds }).ToList();
 
-        const string tasksSql = @"SELECT t.*, u.""Id"", u.""ImageUri""
+        const string tasksSql = @"SELECT t.*, u.id, u.image_uri
                                   FROM todo_tasks AS t
-                                  LEFT JOIN ""AspNetUsers"" AS u ON t.assigned_to_user_id = u.""Id""
+                                  LEFT JOIN users AS u ON t.assigned_to_user_id = u.id
                                   WHERE t.list_id = ANY(@ListIds)
                                   AND (t.private_to_user_id IS NULL OR t.private_to_user_id = @UserId)";
 
@@ -89,12 +88,12 @@ public class ListsRepository : BaseRepository, IListsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.Query<User>(@"SELECT DISTINCT u.""Id"", u.""Name"", u.""ImageUri""
-                                  FROM ""AspNetUsers"" AS u
-                                  LEFT JOIN todo_lists AS l ON u.""Id"" = l.user_id
-                                  LEFT JOIN todo_shares AS s ON u.""Id"" = s.user_id
+        return conn.Query<User>(@"SELECT DISTINCT u.id, u.name, u.image_uri
+                                  FROM users AS u
+                                  LEFT JOIN todo_lists AS l ON u.id = l.user_id
+                                  LEFT JOIN todo_shares AS s ON u.id = s.user_id
                                   WHERE l.id = @ListId OR (s.list_id = @ListId AND s.is_accepted IS NOT FALSE)
-                                  ORDER BY u.""Name""", new { ListId = id });
+                                  ORDER BY u.name", new { ListId = id });
     }
 
     public ToDoList Get(int id)
@@ -129,10 +128,10 @@ public class ListsRepository : BaseRepository, IListsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT DISTINCT l.*, u.""Id"", u.""Email"", u.""ImageUri""
+        const string query = @"SELECT DISTINCT l.*, u.id, u.email, u.image_uri
                                FROM todo_lists AS l
                                LEFT JOIN todo_shares AS s ON l.id = s.list_id
-                               INNER JOIN ""AspNetUsers"" AS u ON l.user_id = u.""Id""
+                               INNER JOIN users AS u ON l.user_id = u.id
                                WHERE l.id = @Id AND (l.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))";
 
         return conn.Query<ToDoList, User, ToDoList>(query,
@@ -147,9 +146,9 @@ public class ListsRepository : BaseRepository, IListsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT s.*, u.""Id"", u.""Email"", u.""ImageUri""
+        const string query = @"SELECT s.*, u.id, u.email, u.image_uri
                                FROM todo_shares AS s
-                               INNER JOIN ""AspNetUsers"" AS u ON s.user_id = u.""Id""
+                               INNER JOIN users AS u ON s.user_id = u.id
                                WHERE s.list_id = @ListId AND s.is_accepted IS NOT FALSE
                                ORDER BY (CASE WHEN s.is_accepted THEN 1 ELSE 2 END) ASC, s.created_date";
 
@@ -165,10 +164,10 @@ public class ListsRepository : BaseRepository, IListsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT s.*, l.name, u.""Name""
+        const string query = @"SELECT s.*, l.name, u.name
                                FROM todo_shares AS s
                                INNER JOIN todo_lists AS l ON s.list_id = l.id
-                               INNER JOIN ""AspNetUsers"" AS u ON l.user_id = u.""Id""
+                               INNER JOIN users AS u ON l.user_id = u.id
                                WHERE s.user_id = @UserId
                                ORDER BY s.modified_date DESC";
 
@@ -325,14 +324,14 @@ public class ListsRepository : BaseRepository, IListsRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.Query<User>(@"SELECT u.*
-                                  FROM ""AspNetUsers"" AS u
-                                  INNER JOIN todo_shares AS s ON u.""Id"" = s.user_id
-                                  WHERE u.""Id"" != @ExcludeUserId AND s.list_id = @ListId AND s.is_accepted AND u.""ToDoNotificationsEnabled"" AND s.notifications_enabled
+                                  FROM users AS u
+                                  INNER JOIN todo_shares AS s ON u.id = s.user_id
+                                  WHERE u.id != @ExcludeUserId AND s.list_id = @ListId AND s.is_accepted AND u.todo_notifications_enabled AND s.notifications_enabled
                                   UNION
                                   SELECT u.*
-                                  FROM ""AspNetUsers"" AS u
-                                  INNER JOIN todo_lists AS l ON u.""Id"" = l.user_id
-                                  WHERE u.""Id"" != @ExcludeUserId AND l.id = @ListId AND u.""ToDoNotificationsEnabled"" AND l.notifications_enabled",
+                                  FROM users AS u
+                                  INNER JOIN todo_lists AS l ON u.id = l.user_id
+                                  WHERE u.id != @ExcludeUserId AND l.id = @ListId AND u.todo_notifications_enabled AND l.notifications_enabled",
             new { ListId = id, ExcludeUserId = excludeUserId });
     }
 
@@ -341,9 +340,9 @@ public class ListsRepository : BaseRepository, IListsRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.Query<User>(@"SELECT u.*
-                                  FROM ""AspNetUsers"" AS u
-                                  INNER JOIN todo_shares AS s ON u.""Id"" = s.user_id
-                                  WHERE s.list_id = @ListId AND s.is_accepted AND u.""ToDoNotificationsEnabled"" AND s.notifications_enabled",
+                                  FROM users AS u
+                                  INNER JOIN todo_shares AS s ON u.id = s.user_id
+                                  WHERE s.list_id = @ListId AND s.is_accepted AND u.todo_notifications_enabled AND s.notifications_enabled",
             new { ListId = id });
     }
 
@@ -352,9 +351,9 @@ public class ListsRepository : BaseRepository, IListsRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                          FROM ""AspNetUsers"" AS u
-                                          INNER JOIN todo_shares AS s ON u.""Id"" = s.user_id
-                                          WHERE u.""Id"" = @UserId AND s.list_id = @ListId AND s.is_accepted AND u.""ToDoNotificationsEnabled"" AND s.notifications_enabled",
+                                          FROM users AS u
+                                          INNER JOIN todo_shares AS s ON u.id = s.user_id
+                                          WHERE u.id = @UserId AND s.list_id = @ListId AND s.is_accepted AND u.todo_notifications_enabled AND s.notifications_enabled",
             new { ListId = id, UserId = userId });
     }
 

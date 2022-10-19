@@ -25,7 +25,8 @@ public class UpdateSharedTests
             _listsRepositoryMock.Object,
             null,
             null,
-            MapperMocker.GetMapper<ToDoAssistantProfile>());
+            MapperMocker.GetMapper<ToDoAssistantProfile>(),
+            null);
     }
 
     [Fact]

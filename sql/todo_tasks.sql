@@ -16,12 +16,12 @@ CREATE TABLE public.todo_tasks
     REFERENCES public.todo_lists (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE,
-    CONSTRAINT fk_todo_tasks_aspnetusers_private_to_user_id FOREIGN KEY (private_to_user_id)
-    REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE
+    CONSTRAINT fk_todo_tasks_users_private_to_user_id FOREIGN KEY (private_to_user_id)
+    REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE,
-    CONSTRAINT fk_todo_tasks_aspnetusers_assigned_to_user_id FOREIGN KEY (assigned_to_user_id)
-    REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE
+    CONSTRAINT fk_todo_tasks_users_assigned_to_user_id FOREIGN KEY (assigned_to_user_id)
+    REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE
 )

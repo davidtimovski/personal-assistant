@@ -27,7 +27,8 @@ public class CreateTests
         _sut = new TransactionService(
             _transactionsRepositoryMock.Object,
             _accountsRepositoryMock.Object,
-            MapperMocker.GetMapper<AccountantProfile>());
+            MapperMocker.GetMapper<AccountantProfile>(),
+            null);
     }
 
     [Fact]

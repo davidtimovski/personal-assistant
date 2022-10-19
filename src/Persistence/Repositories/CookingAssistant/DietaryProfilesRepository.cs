@@ -14,14 +14,13 @@ public class DietaryProfilesRepository : BaseRepository, IDietaryProfilesReposit
     public DietaryProfilesRepository(PersonalAssistantContext efContext)
         : base(efContext) { }
 
-    // TODO: Change/remove references to AspNetUsers
     public DietaryProfile Get(int userId)
     {
         using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT dp.*, u.""Id"", u.""ImperialSystem""
+        const string query = @"SELECT dp.*, u.id, u.imperial_system
                                FROM cooking_dietary_profiles AS dp
-                               INNER JOIN ""AspNetUsers"" AS u ON dp.user_id = u.""Id""
+                               INNER JOIN users AS u ON dp.user_id = u.id
                                WHERE dp.user_id = @UserId";
 
         var dietaryProfiles = conn.Query<DietaryProfile, User, DietaryProfile>(query,

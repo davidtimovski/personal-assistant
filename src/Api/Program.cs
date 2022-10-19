@@ -20,7 +20,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Persistence;
-using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,8 +40,6 @@ if (builder.Environment.IsProduction())
         var client = new SecretClient(new Uri(url), credential);
         configBuilder.AddAzureKeyVault(client, new AzureKeyVaultConfigurationOptions());
     });
-
-    builder.Host.UseSerilog();
 }
 
 builder.Services
@@ -82,14 +79,12 @@ builder.Services
 builder.Services.AddCors(options =>
 {
     var toDoAssistantUrl = builder.Configuration["Urls:ToDoAssistant"];
-    var toDoAssistant2Url = builder.Configuration["Urls:ToDoAssistant2"];
     var cookingAssistantUrl = builder.Configuration["Urls:CookingAssistant"];
     var accountantUrl = builder.Configuration["Urls:Accountant"];
-    var accountant2Url = builder.Configuration["Urls:Accountant2"];
 
     options.AddPolicy("AllowToDoAssistant", builder =>
     {
-        builder.WithOrigins(toDoAssistantUrl, toDoAssistant2Url)
+        builder.WithOrigins(toDoAssistantUrl)
                .AllowAnyMethod()
                .AllowAnyHeader()
                .AllowCredentials() // For SignalR
@@ -106,7 +101,7 @@ builder.Services.AddCors(options =>
 
     options.AddPolicy("AllowAccountant", builder =>
     {
-        builder.WithOrigins(accountantUrl, accountant2Url)
+        builder.WithOrigins(accountantUrl)
                .AllowAnyMethod()
                .AllowAnyHeader()
                .SetPreflightMaxAge(TimeSpan.FromDays(20));
@@ -114,7 +109,7 @@ builder.Services.AddCors(options =>
 
     options.AddPolicy("AllowAllApps", builder =>
     {
-        builder.WithOrigins(toDoAssistantUrl, toDoAssistant2Url, cookingAssistantUrl, accountantUrl, accountant2Url)
+        builder.WithOrigins(toDoAssistantUrl, cookingAssistantUrl, accountantUrl)
                .AllowAnyMethod()
                .AllowAnyHeader()
                .SetPreflightMaxAge(TimeSpan.FromDays(20));

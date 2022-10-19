@@ -21,15 +21,6 @@ services:
       - postgres
       - rabbitmq
 
-  gateway:
-    image: personalassistant-gateway:latest
-    container_name: personalassistant-gateway
-    build:
-      context: .
-      dockerfile: src/Gateway/Dockerfile
-    depends_on:
-      - clientlogger
-
   clientlogger:
     image: personalassistant-clientlogger:latest
     container_name: personalassistant-clientlogger

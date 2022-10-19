@@ -12,6 +12,7 @@ using AutoMapper;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Domain.Entities.Accountant;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services.Accountant;
 
@@ -20,29 +21,48 @@ public class TransactionService : ITransactionService
     private readonly ITransactionsRepository _transactionsRepository;
     private readonly IAccountsRepository _accountsRepository;
     private readonly IMapper _mapper;
+    private readonly ILogger<TransactionService> _logger;
 
     public TransactionService(
         ITransactionsRepository transactionsRepository,
         IAccountsRepository accountsRepository,
-        IMapper mapper)
+        IMapper mapper,
+        ILogger<TransactionService> logger)
     {
         _transactionsRepository = transactionsRepository;
         _accountsRepository = accountsRepository;
         _mapper = mapper;
+        _logger = logger;
     }
 
     public IEnumerable<TransactionDto> GetAll(GetAll model)
     {
-        var transactions = _transactionsRepository.GetAll(model.UserId, model.FromModifiedDate);
+        try
+        {
+            var transactions = _transactionsRepository.GetAll(model.UserId, model.FromModifiedDate);
 
-        var transactionDtos = transactions.Select(x => _mapper.Map<TransactionDto>(x));
+            var transactionDtos = transactions.Select(x => _mapper.Map<TransactionDto>(x));
 
-        return transactionDtos;
+            return transactionDtos;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(GetAll)}");
+            throw;
+        }
     }
 
     public IEnumerable<int> GetDeletedIds(GetDeletedIds model)
     {
-        return _transactionsRepository.GetDeletedIds(model.UserId, model.FromDate);
+        try
+        {
+            return _transactionsRepository.GetDeletedIds(model.UserId, model.FromDate);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(GetDeletedIds)}");
+            throw;
+        }
     }
 
     public async Task<int> CreateAsync(CreateTransaction model)
@@ -68,14 +88,22 @@ public class TransactionService : ITransactionService
             throw new ArgumentException("ToAccountId doesn't belong to user with specified userId.");
         }
 
-        var transaction = _mapper.Map<Transaction>(model);
-
-        if (transaction.Description != null)
+        try
         {
-            transaction.Description = transaction.Description.Trim();
-        }
+            var transaction = _mapper.Map<Transaction>(model);
 
-        return await _transactionsRepository.CreateAsync(transaction);
+            if (transaction.Description != null)
+            {
+                transaction.Description = transaction.Description.Trim();
+            }
+
+            return await _transactionsRepository.CreateAsync(transaction);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(CreateAsync)}");
+            throw;
+        }
     }
 
     public async Task UpdateAsync(UpdateTransaction model)
@@ -101,49 +129,81 @@ public class TransactionService : ITransactionService
             throw new ArgumentException("ToAccount doesn't belong to user with specified userId.");
         }
 
-        var transaction = _mapper.Map<Transaction>(model);
-
-        if (transaction.Description != null)
+        try
         {
-            transaction.Description = transaction.Description.Trim();
-        }
+            var transaction = _mapper.Map<Transaction>(model);
 
-        await _transactionsRepository.UpdateAsync(transaction);
+            if (transaction.Description != null)
+            {
+                transaction.Description = transaction.Description.Trim();
+            }
+
+            await _transactionsRepository.UpdateAsync(transaction);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(UpdateAsync)}");
+            throw;
+        }
     }
 
     public async Task DeleteAsync(int id, int userId)
     {
-        await _transactionsRepository.DeleteAsync(id, userId);
+        try
+        {
+            await _transactionsRepository.DeleteAsync(id, userId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(DeleteAsync)}");
+            throw;
+        }
     }
 
     public FileStream ExportAsCsv(ExportAsCsv model)
     {
-        string fileName = model.FileId + ".csv";
-        string tempFilePath = Path.Combine(model.Directory, fileName);
-
-        IEnumerable<Transaction> transactions = _transactionsRepository.GetAllForExport(model.UserId, model.Uncategorized).ToList();
-        foreach (var transaction in transactions)
+        try
         {
-            if (transaction.IsEncrypted)
+            string fileName = model.FileId + ".csv";
+            string tempFilePath = Path.Combine(model.Directory, fileName);
+
+            IEnumerable<Transaction> transactions = _transactionsRepository.GetAllForExport(model.UserId, model.Uncategorized).ToList();
+            foreach (var transaction in transactions)
             {
-                transaction.Description = model.Encrypted;
+                if (transaction.IsEncrypted)
+                {
+                    transaction.Description = model.Encrypted;
+                }
             }
-        }
 
-        using (var writer = new StreamWriter(tempFilePath))
-        using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+            using (var writer = new StreamWriter(tempFilePath))
+            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+            {
+                csv.Context.RegisterClassMap<TransactionMap>();
+                csv.WriteRecords(transactions);
+            }
+
+            return new FileStream(tempFilePath, FileMode.Open);
+        }
+        catch (Exception ex)
         {
-            csv.Context.RegisterClassMap<TransactionMap>();
-            csv.WriteRecords(transactions);
+            _logger.LogError(ex, $"Unexpected error in {nameof(ExportAsCsv)}");
+            throw;
         }
-
-        return new FileStream(tempFilePath, FileMode.Open);
     }
 
     public void DeleteExportedFile(DeleteExportedFile model)
     {
-        string filePath = Path.Combine(model.Directory, model.FileId + ".csv");
-        File.Delete(filePath);
+        try
+        {
+            string filePath = Path.Combine(model.Directory, model.FileId + ".csv");
+            File.Delete(filePath);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(GetAll)}");
+            throw;
+        }
     }
 }
 

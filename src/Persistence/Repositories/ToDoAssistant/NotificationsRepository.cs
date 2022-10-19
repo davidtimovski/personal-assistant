@@ -14,14 +14,13 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
     public NotificationsRepository(PersonalAssistantContext efContext)
         : base(efContext) { }
 
-    // TODO: Change/remove references to AspNetUsers
     public IEnumerable<Notification> GetAllAndFlagUnseen(int userId)
     {
         using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT n.*, u.""Id"", u.""ImageUri""
+        const string query = @"SELECT n.*, u.id, u.image_uri
                                FROM todo_notifications AS n
-                               INNER JOIN ""AspNetUsers"" AS u ON n.action_user_id = u.""Id""
+                               INNER JOIN users AS u ON n.action_user_id = u.id
                                WHERE user_id = @UserId
                                ORDER BY modified_date DESC";
 

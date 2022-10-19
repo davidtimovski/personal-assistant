@@ -5,8 +5,8 @@ CREATE TABLE public.accountant_deleted_entities
     entity_id integer NOT NULL,
     deleted_date timestamp with time zone NOT NULL,
     CONSTRAINT pk_accountant_deleted_entities PRIMARY KEY (user_id, entity_type, entity_id),
-    CONSTRAINT fk_accountant_deleted_entities_aspnetusers_user_id FOREIGN KEY (user_id)
-    REFERENCES public."AspNetUsers" ("Id") MATCH SIMPLE
+    CONSTRAINT fk_accountant_deleted_entities_users_user_id FOREIGN KEY (user_id)
+    REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE
 )
