@@ -58,8 +58,8 @@ public class HomeController : BaseController
             ClientApplications = new List<ClientApplicationViewModel>
             {
                 new ClientApplicationViewModel("To Do Assistant", new Uri(_configuration["Urls:ToDoAssistant"] + $"?lang={language}"), "to-do-assistant"),
-                new ClientApplicationViewModel("Cooking Assistant", new Uri(_configuration["Urls:CookingAssistant"] + $"/{language}"), "cooking-assistant"),
-                new ClientApplicationViewModel("Accountant", new Uri(_configuration["Urls:Accountant"] + $"?lang={language}"), "accountant")
+                new ClientApplicationViewModel("Accountant", new Uri(_configuration["Urls:Accountant"] + $"?lang={language}"), "accountant"),
+                new ClientApplicationViewModel("Cooking Assistant", new Uri(_configuration["Urls:CookingAssistant"] + $"/{language}"), "cooking-assistant", true),
             },
             Alert = alert
         };
