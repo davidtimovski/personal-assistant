@@ -7,7 +7,7 @@ import Variables from "$lib/variables";
 export class AuthService {
   private client: Auth0Client | null = null;
 
-  constructor(public clientId: string) {}
+  constructor() {}
 
   get initialized(): boolean {
     return this.client !== null;
@@ -15,8 +15,8 @@ export class AuthService {
 
   async initialize() {
     this.client = await createAuth0Client({
-      domain: "personalassistant-site.eu.auth0.com",
-      client_id: this.clientId,
+      domain: Variables.auth0Domain,
+      client_id: Variables.auth0ClientId,
       audience: Variables.urls.api,
       cacheLocation: "localstorage",
       redirect_uri: `${Variables.urls.host}/signin-oidc`,

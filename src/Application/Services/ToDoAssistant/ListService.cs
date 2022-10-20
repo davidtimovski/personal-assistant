@@ -476,11 +476,13 @@ public class ListService : IListService
                 notificationType = ListNotificationType.Other;
             }
 
+            var user = _userService.Get(model.UserId);
             var result = new UpdateListResult
             {
                 Type = notificationType,
                 OriginalListName = original.Name,
-                ActionUserImageUri = _userService.GetImageUri(model.UserId),
+                ActionUserName = user.Name,
+                ActionUserImageUri = user.ImageUri,
                 NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
             };
 
@@ -529,10 +531,12 @@ public class ListService : IListService
                 return new DeleteListResult();
             }
 
+            var user = _userService.Get(userId);
             var result = new DeleteListResult
             {
                 DeletedListName = deletedListName,
-                ActionUserImageUri = _userService.GetImageUri(userId),
+                ActionUserName = user.Name,
+                ActionUserImageUri = user.ImageUri,
                 NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
             };
 
@@ -621,10 +625,12 @@ public class ListService : IListService
 
             ToDoList list = _listsRepository.Get(id);
 
+            var user = _userService.Get(userId);
             var result = new LeaveListResult
             {
                 ListName = list.Name,
-                ActionUserImageUri = _userService.GetImageUri(userId),
+                ActionUserName = user.Name,
+                ActionUserImageUri = user.ImageUri,
                 NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
             };
 
@@ -698,10 +704,12 @@ public class ListService : IListService
 
             ToDoList list = _listsRepository.Get(id);
 
+            var user = _userService.Get(userId);
             var result = new SetTasksAsNotCompletedResult
             {
                 ListName = list.Name,
-                ActionUserImageUri = _userService.GetImageUri(userId),
+                ActionUserName = user.Name,
+                ActionUserImageUri = user.ImageUri,
                 NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
             };
 
@@ -728,10 +736,12 @@ public class ListService : IListService
 
             ToDoList list = _listsRepository.Get(id);
 
+            var user = _userService.Get(userId);
             var result = new SetShareIsAcceptedResult
             {
                 ListName = list.Name,
-                ActionUserImageUri = _userService.GetImageUri(userId),
+                ActionUserName = user.Name,
+                ActionUserImageUri = user.ImageUri,
                 NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
             };
 

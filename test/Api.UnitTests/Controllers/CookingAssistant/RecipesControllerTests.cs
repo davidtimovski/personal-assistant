@@ -22,7 +22,7 @@ public class RecipesControllerTests
     {
         _sut = new RecipesController(_userIdLookupMock.Object, null, _recipeServiceMock.Object,
             null, null, null, null, null, null, null, null, null,
-            null, null, null, null, new Mock<IOptions<Urls>>().Object)
+            null, null, null, null, new Mock<IOptions<Urls>>().Object, null)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };

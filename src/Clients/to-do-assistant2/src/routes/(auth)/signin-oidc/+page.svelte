@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
 	import { AuthService } from '../../../../../shared2/services/authService';
-	import Variables from '$lib/variables';
 
 	onMount(async () => {
-		const authService = new AuthService(Variables.auth0ClientId);
+		const authService = new AuthService();
 		await authService.initialize();
 
 		const query = window.location.search;

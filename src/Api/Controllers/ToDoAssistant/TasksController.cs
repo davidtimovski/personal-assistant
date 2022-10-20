@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using Api.Config;
 using Api.Hubs;
@@ -14,6 +15,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Api.Controllers.ToDoAssistant;
@@ -32,6 +34,7 @@ public class TasksController : BaseController
     private readonly IValidator<UpdateTask> _updateValidator;
     private readonly IStringLocalizer<TasksController> _localizer;
     private readonly Urls _urls;
+    private readonly ILogger<TasksController> _logger;
 
     public TasksController(
         IUserIdLookup userIdLookup,
@@ -44,7 +47,8 @@ public class TasksController : BaseController
         IValidator<BulkCreate> bulkCreateValidator,
         IValidator<UpdateTask> updateValidator,
         IStringLocalizer<TasksController> localizer,
-        IOptions<Urls> urls) : base(userIdLookup, usersRepository)
+        IOptions<Urls> urls,
+        ILogger<TasksController> logger) : base(userIdLookup, usersRepository)
     {
         _hubContext = hubContext;
         _taskService = taskService;
@@ -55,6 +59,7 @@ public class TasksController : BaseController
         _updateValidator = updateValidator;
         _localizer = localizer;
         _urls = urls.Value;
+        _logger = logger;
     }
 
     [HttpGet("{id}")]
@@ -93,27 +98,35 @@ public class TasksController : BaseController
 
         CreatedTaskResult result = await _taskService.CreateAsync(dto, _createValidator);
 
-        if (result.NotifySignalR)
+        try
         {
-            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", AuthId);
-        }
-
-        foreach (var recipient in result.NotificationRecipients)
-        {
-            CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer["CreatedTaskNotification", CurrentUserName, result.TaskName, result.ListName];
-
-            var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, dto.ListId, result.TaskId, message);
-            var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-            var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+            if (result.NotifySignalR)
             {
-                SenderImageUri = result.ActionUserImageUri,
-                UserId = recipient.Id,
-                Message = message,
-                OpenUrl = GetNotificationsPageUrl(notificationId)
-            };
+                await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", AuthId);
+            }
 
-            _senderService.Enqueue(toDoAssistantPushNotification);
+            foreach (var recipient in result.NotificationRecipients)
+            {
+                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+                var message = _localizer["CreatedTaskNotification", result.ActionUserName, result.TaskName, result.ListName];
+
+                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, dto.ListId, result.TaskId, message);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+                {
+                    SenderImageUri = result.ActionUserImageUri,
+                    UserId = recipient.Id,
+                    Message = message,
+                    OpenUrl = GetNotificationsPageUrl(notificationId)
+                };
+
+                _senderService.Enqueue(toDoAssistantPushNotification);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(Create)}");
+            throw;
         }
 
         return StatusCode(201, result.TaskId);
@@ -131,35 +144,43 @@ public class TasksController : BaseController
 
         BulkCreateResult result = await _taskService.BulkCreateAsync(dto, _bulkCreateValidator);
 
-        if (result.NotifySignalR)
+        try
         {
-            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", AuthId);
-        }
-
-        if (!result.Notify())
-        {
-            return StatusCode(201);
-        }
-
-        foreach (BulkCreatedTask task in result.CreatedTasks)
-        {
-            foreach (var recipient in result.NotificationRecipients)
+            if (result.NotifySignalR)
             {
-                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-                var message = _localizer["CreatedTaskNotification", CurrentUserName, task.Name, result.ListName];
-
-                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, dto.ListId, task.Id, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
-                {
-                    SenderImageUri = result.ActionUserImageUri,
-                    UserId = recipient.Id,
-                    Message = message,
-                    OpenUrl = GetNotificationsPageUrl(notificationId)
-                };
-
-                _senderService.Enqueue(toDoAssistantPushNotification);
+                await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", AuthId);
             }
+
+            if (!result.Notify())
+            {
+                return StatusCode(201);
+            }
+
+            foreach (BulkCreatedTask task in result.CreatedTasks)
+            {
+                foreach (var recipient in result.NotificationRecipients)
+                {
+                    CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+                    var message = _localizer["CreatedTaskNotification", result.ActionUserName, task.Name, result.ListName];
+
+                    var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, dto.ListId, task.Id, message);
+                    var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                    var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+                    {
+                        SenderImageUri = result.ActionUserImageUri,
+                        UserId = recipient.Id,
+                        Message = message,
+                        OpenUrl = GetNotificationsPageUrl(notificationId)
+                    };
+
+                    _senderService.Enqueue(toDoAssistantPushNotification);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(BulkCreate)}");
+            throw;
         }
 
         return StatusCode(201);
@@ -177,86 +198,94 @@ public class TasksController : BaseController
 
         UpdateTaskResult result = await _taskService.UpdateAsync(dto, _updateValidator);
 
-        if (result.NotifySignalR)
+        try
         {
-            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", AuthId);
-        }
-
-        if (!result.Notify())
-        {
-            return NoContent();
-        }
-
-        foreach (var recipient in result.NotificationRecipients)
-        {
-            CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer["UpdatedTaskNotification", CurrentUserName, result.OriginalTaskName, result.ListName];
-
-            var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
-            var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-            var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+            if (result.NotifySignalR)
             {
-                SenderImageUri = result.ActionUserImageUri,
-                UserId = recipient.Id,
-                Message = message,
-                OpenUrl = GetNotificationsPageUrl(notificationId)
-            };
+                await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", AuthId);
+            }
 
-            _senderService.Enqueue(toDoAssistantPushNotification);
-        }
-
-        foreach (var recipient in result.RemovedNotificationRecipients)
-        {
-            CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer["RemovedTaskNotification", CurrentUserName, result.OriginalTaskName, result.OldListName];
-
-            var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.OldListId, null, message);
-            var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-            var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+            if (!result.Notify())
             {
-                SenderImageUri = result.ActionUserImageUri,
-                UserId = recipient.Id,
-                Message = message,
-                OpenUrl = GetNotificationsPageUrl(notificationId)
-            };
+                return NoContent();
+            }
 
-            _senderService.Enqueue(toDoAssistantPushNotification);
-        }
-
-        foreach (var recipient in result.CreatedNotificationRecipients)
-        {
-            CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer["CreatedTaskNotification", CurrentUserName, dto.Name, result.ListName];
-
-            var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
-            var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-            var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+            foreach (var recipient in result.NotificationRecipients)
             {
-                SenderImageUri = result.ActionUserImageUri,
-                UserId = recipient.Id,
-                Message = message,
-                OpenUrl = GetNotificationsPageUrl(notificationId)
-            };
+                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+                var message = _localizer["UpdatedTaskNotification", result.ActionUserName, result.OriginalTaskName, result.ListName];
 
-            _senderService.Enqueue(toDoAssistantPushNotification);
-        }
+                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+                {
+                    SenderImageUri = result.ActionUserImageUri,
+                    UserId = recipient.Id,
+                    Message = message,
+                    OpenUrl = GetNotificationsPageUrl(notificationId)
+                };
 
-        if (result.AssignedNotificationRecipient != null)
-        {
-            CultureInfo.CurrentCulture = new CultureInfo(result.AssignedNotificationRecipient.Language, false);
-            var message = _localizer["AssignedTaskNotification", CurrentUserName, result.OriginalTaskName, result.ListName];
+                _senderService.Enqueue(toDoAssistantPushNotification);
+            }
 
-            var createNotificationDto = new CreateOrUpdateNotification(result.AssignedNotificationRecipient.Id, dto.UserId, result.ListId, dto.Id, message);
-            var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-            var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+            foreach (var recipient in result.RemovedNotificationRecipients)
             {
-                SenderImageUri = result.ActionUserImageUri,
-                UserId = result.AssignedNotificationRecipient.Id,
-                Message = message,
-                OpenUrl = GetNotificationsPageUrl(notificationId)
-            };
+                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+                var message = _localizer["RemovedTaskNotification", result.ActionUserName, result.OriginalTaskName, result.OldListName];
 
-            _senderService.Enqueue(toDoAssistantPushNotification);
+                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.OldListId, null, message);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+                {
+                    SenderImageUri = result.ActionUserImageUri,
+                    UserId = recipient.Id,
+                    Message = message,
+                    OpenUrl = GetNotificationsPageUrl(notificationId)
+                };
+
+                _senderService.Enqueue(toDoAssistantPushNotification);
+            }
+
+            foreach (var recipient in result.CreatedNotificationRecipients)
+            {
+                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+                var message = _localizer["CreatedTaskNotification", result.ActionUserName, dto.Name, result.ListName];
+
+                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+                {
+                    SenderImageUri = result.ActionUserImageUri,
+                    UserId = recipient.Id,
+                    Message = message,
+                    OpenUrl = GetNotificationsPageUrl(notificationId)
+                };
+
+                _senderService.Enqueue(toDoAssistantPushNotification);
+            }
+
+            if (result.AssignedNotificationRecipient != null)
+            {
+                CultureInfo.CurrentCulture = new CultureInfo(result.AssignedNotificationRecipient.Language, false);
+                var message = _localizer["AssignedTaskNotification", result.ActionUserName, result.OriginalTaskName, result.ListName];
+
+                var createNotificationDto = new CreateOrUpdateNotification(result.AssignedNotificationRecipient.Id, dto.UserId, result.ListId, dto.Id, message);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+                {
+                    SenderImageUri = result.ActionUserImageUri,
+                    UserId = result.AssignedNotificationRecipient.Id,
+                    Message = message,
+                    OpenUrl = GetNotificationsPageUrl(notificationId)
+                };
+
+                _senderService.Enqueue(toDoAssistantPushNotification);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(Update)}");
+            throw;
         }
 
         return NoContent();
@@ -267,27 +296,35 @@ public class TasksController : BaseController
     {
         DeleteTaskResult result = await _taskService.DeleteAsync(id, UserId);
 
-        if (result.NotifySignalR)
+        try
         {
-            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskDeleted", AuthId, id, result.ListId);
-        }
-
-        foreach (var recipient in result.NotificationRecipients)
-        {
-            CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer["RemovedTaskNotification", CurrentUserName, result.TaskName, result.ListName];
-
-            var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, result.ListId, null, message);
-            var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-            var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+            if (result.NotifySignalR)
             {
-                SenderImageUri = result.ActionUserImageUri,
-                UserId = recipient.Id,
-                Message = message,
-                OpenUrl = GetNotificationsPageUrl(notificationId)
-            };
+                await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskDeleted", AuthId, id, result.ListId);
+            }
 
-            _senderService.Enqueue(toDoAssistantPushNotification);
+            foreach (var recipient in result.NotificationRecipients)
+            {
+                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+                var message = _localizer["RemovedTaskNotification", result.ActionUserName, result.TaskName, result.ListName];
+
+                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, result.ListId, null, message);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+                {
+                    SenderImageUri = result.ActionUserImageUri,
+                    UserId = recipient.Id,
+                    Message = message,
+                    OpenUrl = GetNotificationsPageUrl(notificationId)
+                };
+
+                _senderService.Enqueue(toDoAssistantPushNotification);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(Delete)}");
+            throw;
         }
 
         return NoContent();
@@ -305,27 +342,35 @@ public class TasksController : BaseController
 
         CompleteUncompleteTaskResult result = await _taskService.CompleteAsync(dto);
 
-        if (result.NotifySignalR)
+        try
         {
-            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskCompletedChanged", AuthId, dto.Id, result.ListId, true);
-        }
-
-        foreach (var recipient in result.NotificationRecipients)
-        {
-            CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            string message = _localizer["CompletedTaskNotification", CurrentUserName, result.TaskName, result.ListName];
-
-            var updateNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
-            var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto);
-            var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+            if (result.NotifySignalR)
             {
-                SenderImageUri = result.ActionUserImageUri,
-                UserId = recipient.Id,
-                Message = message,
-                OpenUrl = GetNotificationsPageUrl(notificationId)
-            };
+                await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskCompletedChanged", AuthId, dto.Id, result.ListId, true);
+            }
 
-            _senderService.Enqueue(toDoAssistantPushNotification);
+            foreach (var recipient in result.NotificationRecipients)
+            {
+                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+                string message = _localizer["CompletedTaskNotification", result.ActionUserName, result.TaskName, result.ListName];
+
+                var updateNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto);
+                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+                {
+                    SenderImageUri = result.ActionUserImageUri,
+                    UserId = recipient.Id,
+                    Message = message,
+                    OpenUrl = GetNotificationsPageUrl(notificationId)
+                };
+
+                _senderService.Enqueue(toDoAssistantPushNotification);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(Complete)}");
+            throw;
         }
 
         return NoContent();
@@ -343,51 +388,67 @@ public class TasksController : BaseController
 
         CompleteUncompleteTaskResult result = await _taskService.UncompleteAsync(dto);
 
-        if (result.NotifySignalR)
+        try
         {
-            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskCompletedChanged", AuthId, dto.Id, result.ListId, false);
-        }
-
-        foreach (var recipient in result.NotificationRecipients)
-        {
-            CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            string message = _localizer["UncompletedTaskNotification", CurrentUserName, result.TaskName, result.ListName];
-
-            var updateNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
-            var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto);
-            var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+            if (result.NotifySignalR)
             {
-                SenderImageUri = result.ActionUserImageUri,
-                UserId = recipient.Id,
-                Message = message,
-                OpenUrl = GetNotificationsPageUrl(notificationId)
-            };
+                await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskCompletedChanged", AuthId, dto.Id, result.ListId, false);
+            }
 
-            _senderService.Enqueue(toDoAssistantPushNotification);
+            foreach (var recipient in result.NotificationRecipients)
+            {
+                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+                string message = _localizer["UncompletedTaskNotification", result.ActionUserName, result.TaskName, result.ListName];
+
+                var updateNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto);
+                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+                {
+                    SenderImageUri = result.ActionUserImageUri,
+                    UserId = recipient.Id,
+                    Message = message,
+                    OpenUrl = GetNotificationsPageUrl(notificationId)
+                };
+
+                _senderService.Enqueue(toDoAssistantPushNotification);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(Uncomplete)}");
+            throw;
         }
 
         return NoContent();
     }
 
-    [HttpPut("reorder")]
-    public async Task<IActionResult> Reorder([FromBody] ReorderTask dto)
-    {
-        if (dto == null)
-        {
-            return BadRequest();
-        }
+    //[HttpPut("reorder")]
+    //public async Task<IActionResult> Reorder([FromBody] ReorderTask dto)
+    //{
+    //    if (dto == null)
+    //    {
+    //        return BadRequest();
+    //    }
 
-        dto.UserId = UserId;
+    //    dto.UserId = UserId;
 
-        ReorderTaskResult result = await _taskService.ReorderAsync(dto);
+    //    ReorderTaskResult result = await _taskService.ReorderAsync(dto);
 
-        if (result.NotifySignalR)
-        {
-            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskReordered", dto.UserId, dto.Id, result.ListId, dto.OldOrder, dto.NewOrder);
-        }
+    //    try
+    //    {
+    //        if (result.NotifySignalR)
+    //        {
+    //            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskReordered", dto.UserId, dto.Id, result.ListId, dto.OldOrder, dto.NewOrder);
+    //        }
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        _logger.LogError(ex, $"Unexpected error in {nameof(Reorder)}");
+    //        throw;
+    //    }
 
-        return NoContent();
-    }
+    //    return NoContent();
+    //}
 
     private string GetNotificationsPageUrl(int notificationId)
     {

@@ -22,7 +22,7 @@
 	async function logOut() {
 		localStorage.clear();
 
-		const authService = new AuthService(Variables.auth0ClientId);
+		const authService = new AuthService();
 		await authService.initialize();
 		await authService.logout();
 	}

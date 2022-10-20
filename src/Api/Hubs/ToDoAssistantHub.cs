@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Application.Contracts.Common;
 using Application.Contracts.ToDoAssistant.Lists;
 using Microsoft.AspNetCore.Authorization;
@@ -29,7 +30,7 @@ public class ToDoAssistantHub : Hub
     {
         get
         {
-            string auth0Id = Context.User.FindFirst("sub").Value;
+            string auth0Id = Context.User.Identity.Name;
 
             if (_userIdLookup.Contains(auth0Id))
             {
@@ -38,8 +39,13 @@ public class ToDoAssistantHub : Hub
             else
             {
                 var userId = _usersRepository.GetId(auth0Id);
-                _userIdLookup.Set(auth0Id, userId);
-                return userId;
+                if (!userId.HasValue)
+                {
+                    throw new Exception($"The user with auth0_id '{auth0Id}' does not have a mapping");
+                }
+
+                _userIdLookup.Set(auth0Id, userId.Value);
+                return userId.Value;
             }
         }
     }

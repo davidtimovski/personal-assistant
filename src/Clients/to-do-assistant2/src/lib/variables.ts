@@ -7,5 +7,6 @@ export default class Variables {
 		defaultProfileImageUrl: import.meta.env.VITE_DEFAULT_PROFILE_IMAGE_URL
 	};
 	static debug = import.meta.env.DEV;
+	static auth0Domain = import.meta.env.VITE_AUTH0_DOMAIN;
 	static auth0ClientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
 }

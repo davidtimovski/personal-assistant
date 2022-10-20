@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Security.Claims;
 using Application.Contracts.Common;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,7 +22,7 @@ public abstract class BaseController : Controller
         {
             if (!userId.HasValue)
             {
-                string auth0Id = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                string auth0Id = User.Identity.Name;
 
                 if (_userIdLookup.Contains(auth0Id))
                 {
@@ -32,7 +31,12 @@ public abstract class BaseController : Controller
                 else
                 {
                     var userId = _usersRepository.GetId(auth0Id);
-                    _userIdLookup.Set(auth0Id, userId);
+                    if (!userId.HasValue)
+                    {
+                        throw new Exception($"The user with auth0_id '{auth0Id}' does not have a mapping");
+                    }
+
+                    _userIdLookup.Set(auth0Id, userId.Value);
                     this.userId = userId;
                 }
             }
@@ -50,7 +54,7 @@ public abstract class BaseController : Controller
                 throw new Exception($"The {nameof(AuthId)} property is only available for authenticated users");
             }
 
-            return User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            return User.Identity.Name;
         }
     }
 }

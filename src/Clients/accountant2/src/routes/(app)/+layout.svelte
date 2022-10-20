@@ -16,7 +16,6 @@
 	import { SyncService } from '$lib/services/syncService';
 	import { locale, isOnline, authInfo, syncStatus } from '$lib/stores';
 	import { AppEvents } from '$lib/models/appEvents';
-	import Variables from '$lib/variables';
 
 	import Alert from '$lib/components/Alert.svelte';
 
@@ -70,7 +69,7 @@
 		}
 		locale.set(localStorage.get('language'));
 
-		const authService = new AuthService(Variables.auth0ClientId);
+		const authService = new AuthService();
 		await authService.initialize();
 
 		if (await authService.authenticated()) {

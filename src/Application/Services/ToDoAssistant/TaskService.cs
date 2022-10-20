@@ -196,9 +196,12 @@ public class TaskService : ITaskService
                 return result;
             }
 
+            var user = _userService.Get(model.UserId);
+
             result.TaskName = task.Name;
             result.ListName = list.Name;
-            result.ActionUserImageUri = _userService.GetImageUri(model.UserId);
+            result.ActionUserName = user.Name;
+            result.ActionUserImageUri = user.ImageUri;
             result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language });
 
             return result;
@@ -246,13 +249,16 @@ public class TaskService : ITaskService
                 return result;
             }
 
+            var user = _userService.Get(model.UserId);
+
             result.ListName = list.Name;
             result.CreatedTasks = createdTasks.Select(x => new BulkCreatedTask
             {
                 Id = x.Id,
                 Name = x.Name
             });
-            result.ActionUserImageUri = _userService.GetImageUri(model.UserId);
+            result.ActionUserName = user.Name;
+            result.ActionUserImageUri = user.ImageUri;
             result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language });
 
             return result;
@@ -325,7 +331,9 @@ public class TaskService : ITaskService
 
             if (result.Notify())
             {
-                result.ActionUserImageUri = _userService.GetImageUri(model.UserId);
+                var user = _userService.Get(model.UserId);
+                result.ActionUserName = user.Name;
+                result.ActionUserImageUri = user.ImageUri;
             }
 
             return result;
@@ -366,9 +374,12 @@ public class TaskService : ITaskService
                 return result;
             }
 
+            var user = _userService.Get(userId);
+
             result.TaskName = task.Name;
             result.ListName = list.Name;
-            result.ActionUserImageUri = _userService.GetImageUri(userId);
+            result.ActionUserName = user.Name;
+            result.ActionUserImageUri = user.ImageUri;
             result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language });
 
             return result;
@@ -409,9 +420,12 @@ public class TaskService : ITaskService
                 return result;
             }
 
+            var user = _userService.Get(model.UserId);
+
             result.TaskName = task.Name;
             result.ListName = list.Name;
-            result.ActionUserImageUri = _userService.GetImageUri(model.UserId);
+            result.ActionUserName = user.Name;
+            result.ActionUserImageUri = user.ImageUri;
             result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language });
 
             return result;
@@ -452,9 +466,12 @@ public class TaskService : ITaskService
                 return result;
             }
 
+            var user = _userService.Get(model.UserId);
+
             result.TaskName = task.Name;
             result.ListName = list.Name;
-            result.ActionUserImageUri = _userService.GetImageUri(model.UserId);
+            result.ActionUserName = user.Name;
+            result.ActionUserImageUri = user.ImageUri;
             result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language });
 
             return result;
