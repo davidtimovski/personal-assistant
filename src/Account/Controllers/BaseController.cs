@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Claims;
 using Application.Contracts.Common;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,7 +23,7 @@ public abstract class BaseController : Controller
         {
             if (!userId.HasValue)
             {
-                string auth0Id = User.Identity.Name;
+                string auth0Id = User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
                 if (_userIdLookup.Contains(auth0Id))
                 {
@@ -54,7 +55,7 @@ public abstract class BaseController : Controller
                 throw new Exception($"The {nameof(AuthId)} property is only available for authenticated users");
             }
 
-            return User.Identity.Name;
+            return User.FindFirst(ClaimTypes.NameIdentifier).Value;
         }
     }
 }
