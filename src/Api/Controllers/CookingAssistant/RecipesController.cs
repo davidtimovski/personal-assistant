@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -20,6 +21,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Api.Controllers.CookingAssistant;
@@ -44,6 +46,7 @@ public class RecipesController : BaseController
     private readonly IValidator<ImportRecipe> _importRecipeValidator;
     private readonly IValidator<UploadTempImage> _uploadTempImageValidator;
     private readonly Urls _urls;
+    private readonly ILogger<RecipesController> _logger;
 
     public RecipesController(
         IUserIdLookup userIdLookup,
@@ -62,7 +65,8 @@ public class RecipesController : BaseController
         IValidator<CreateSendRequest> createSendRequestValidator,
         IValidator<ImportRecipe> importRecipeValidator,
         IValidator<UploadTempImage> uploadTempImageValidator,
-        IOptions<Urls> urls) : base(userIdLookup, usersRepository)
+        IOptions<Urls> urls,
+        ILogger<RecipesController> logger) : base(userIdLookup, usersRepository)
     {
         _recipeService = recipeService;
         _ingredientService = ingredientService;
@@ -79,6 +83,7 @@ public class RecipesController : BaseController
         _importRecipeValidator = importRecipeValidator;
         _uploadTempImageValidator = uploadTempImageValidator;
         _urls = urls.Value;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -209,20 +214,28 @@ public class RecipesController : BaseController
     [HttpPost("upload-temp-image")]
     public async Task<IActionResult> UploadTempImage(IFormFile image)
     {
-        var uploadModel = new UploadTempImage(
-            UserId,
-            Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp"),
-            $"users/{UserId}/recipes",
-            "recipe")
+        try
         {
-            Length = image.Length,
-            FileName = image.FileName
-        };
-        await image.CopyToAsync(uploadModel.File);
+            var uploadModel = new UploadTempImage(
+                UserId,
+                Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp"),
+                $"users/{UserId}/recipes",
+                "recipe")
+                {
+                    Length = image.Length,
+                    FileName = image.FileName
+                };
+            await image.CopyToAsync(uploadModel.File);
 
-        string tempImageUri = await _cdnService.UploadTempAsync(uploadModel, _uploadTempImageValidator);
+            string tempImageUri = await _cdnService.UploadTempAsync(uploadModel, _uploadTempImageValidator);
 
-        return StatusCode(201, new { tempImageUri });
+            return StatusCode(201, new { tempImageUri });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(UploadTempImage)}");
+            throw;
+        }
     }
 
     [HttpPut]
@@ -237,19 +250,27 @@ public class RecipesController : BaseController
 
         UpdateRecipeResult result = await _recipeService.UpdateAsync(dto, _updateRecipeValidator);
 
-        foreach (var recipient in result.NotificationRecipients)
+        try
         {
-            CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer["UpdatedRecipeNotification", CurrentUserName, result.RecipeName];
-
-            var pushNotification = new CookingAssistantPushNotification
+            foreach (var recipient in result.NotificationRecipients)
             {
-                SenderImageUri = result.ActionUserImageUri,
-                UserId = recipient.Id,
-                Message = message
-            };
+                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+                var message = _localizer["UpdatedRecipeNotification", result.ActionUserName, result.RecipeName];
 
-            _senderService.Enqueue(pushNotification);
+                var pushNotification = new CookingAssistantPushNotification
+                {
+                    SenderImageUri = result.ActionUserImageUri,
+                    UserId = recipient.Id,
+                    Message = message
+                };
+
+                _senderService.Enqueue(pushNotification);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(Update)}");
+            throw;
         }
 
         return NoContent();
@@ -260,19 +281,27 @@ public class RecipesController : BaseController
     {
         DeleteRecipeResult result = await _recipeService.DeleteAsync(id, UserId);
 
-        foreach (var recipient in result.NotificationRecipients)
-        {
-            CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer["DeletedRecipeNotification", CurrentUserName, result.RecipeName];
-
-            var pushNotification = new CookingAssistantPushNotification
+        try
+        { 
+            foreach (var recipient in result.NotificationRecipients)
             {
-                SenderImageUri = result.ActionUserImageUri,
-                UserId = recipient.Id,
-                Message = message
-            };
+                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+                var message = _localizer["DeletedRecipeNotification", result.ActionUserName, result.RecipeName];
 
-            _senderService.Enqueue(pushNotification);
+                var pushNotification = new CookingAssistantPushNotification
+                {
+                    SenderImageUri = result.ActionUserImageUri,
+                    UserId = recipient.Id,
+                    Message = message
+                };
+
+                _senderService.Enqueue(pushNotification);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(Delete)}");
+            throw;
         }
 
         return NoContent();
@@ -308,28 +337,36 @@ public class RecipesController : BaseController
 
         dto.UserId = UserId;
 
-        foreach (int removedUserId in dto.RemovedShares)
+        try
         {
-            if (!_recipeService.CheckIfUserCanBeNotifiedOfRecipeChange(dto.RecipeId, removedUserId))
+            foreach (int removedUserId in dto.RemovedShares)
             {
-                continue;
+                if (!_recipeService.CheckIfUserCanBeNotifiedOfRecipeChange(dto.RecipeId, removedUserId))
+                {
+                    continue;
+                }
+
+                var currentUser = _userService.Get(dto.UserId);
+                var user = _userService.Get(removedUserId);
+                RecipeToNotify recipe = _recipeService.Get(dto.RecipeId);
+
+                CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
+                var message = _localizer["RemovedShareNotification", currentUser.Name, recipe.Name];
+
+                var pushNotification = new CookingAssistantPushNotification
+                {
+                    SenderImageUri = currentUser.ImageUri,
+                    UserId = user.Id,
+                    Message = message
+                };
+
+                _senderService.Enqueue(pushNotification);
             }
-
-            var currentUser = _userService.Get(dto.UserId);
-            var user = _userService.Get(removedUserId);
-            RecipeToNotify recipe = _recipeService.Get(dto.RecipeId);
-
-            CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
-            var message = _localizer["RemovedShareNotification", CurrentUserName, recipe.Name];
-
-            var pushNotification = new CookingAssistantPushNotification
-            {
-                SenderImageUri = currentUser.ImageUri,
-                UserId = user.Id,
-                Message = message
-            };
-
-            _senderService.Enqueue(pushNotification);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(Share)}");
+            throw;
         }
 
         await _recipeService.ShareAsync(dto, _shareValidator);
@@ -351,20 +388,28 @@ public class RecipesController : BaseController
             return NoContent();
         }
 
-        var localizerKey = dto.IsAccepted ? "JoinedRecipeNotification" : "DeclinedShareRequestNotification";
-        foreach (var recipient in result.NotificationRecipients)
+        try
         {
-            CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer[localizerKey, CurrentUserName, result.RecipeName];
-
-            var pushNotification = new CookingAssistantPushNotification
+            var localizerKey = dto.IsAccepted ? "JoinedRecipeNotification" : "DeclinedShareRequestNotification";
+            foreach (var recipient in result.NotificationRecipients)
             {
-                SenderImageUri = result.ActionUserImageUri,
-                UserId = recipient.Id,
-                Message = message
-            };
+                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+                var message = _localizer[localizerKey, result.ActionUserName, result.RecipeName];
 
-            _senderService.Enqueue(pushNotification);
+                var pushNotification = new CookingAssistantPushNotification
+                {
+                    SenderImageUri = result.ActionUserImageUri,
+                    UserId = recipient.Id,
+                    Message = message
+                };
+
+                _senderService.Enqueue(pushNotification);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(SetShareIsAccepted)}");
+            throw;
         }
 
         return NoContent();
@@ -375,19 +420,27 @@ public class RecipesController : BaseController
     {
         LeaveRecipeResult result = await _recipeService.LeaveAsync(id, UserId);
 
-        foreach (var recipient in result.NotificationRecipients)
+        try
         {
-            CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer["LeftRecipeNotification", CurrentUserName, result.RecipeName];
-
-            var pushNotification = new CookingAssistantPushNotification
+            foreach (var recipient in result.NotificationRecipients)
             {
-                SenderImageUri = result.ActionUserImageUri,
-                UserId = recipient.Id,
-                Message = message
-            };
+                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+                var message = _localizer["LeftRecipeNotification", result.ActionUserName, result.RecipeName];
 
-            _senderService.Enqueue(pushNotification);
+                var pushNotification = new CookingAssistantPushNotification
+                {
+                    SenderImageUri = result.ActionUserImageUri,
+                    UserId = recipient.Id,
+                    Message = message
+                };
+
+                _senderService.Enqueue(pushNotification);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(Leave)}");
+            throw;
         }
 
         return NoContent();
@@ -424,20 +477,28 @@ public class RecipesController : BaseController
 
         SendRecipeResult result = await _recipeService.SendAsync(dto, _createSendRequestValidator);
 
-        foreach (var recipient in result.NotificationRecipients)
+        try
         {
-            CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer["SentRecipeNotification", CurrentUserName, result.RecipeName];
-
-            var pushNotification = new CookingAssistantPushNotification
+            foreach (var recipient in result.NotificationRecipients)
             {
-                SenderImageUri = result.ActionUserImageUri,
-                UserId = recipient.Id,
-                Message = message,
-                OpenUrl = $"{_urls.CookingAssistant}/inbox"
-            };
+                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+                var message = _localizer["SentRecipeNotification", result.ActionUserName, result.RecipeName];
 
-            _senderService.Enqueue(pushNotification);
+                var pushNotification = new CookingAssistantPushNotification
+                {
+                    SenderImageUri = result.ActionUserImageUri,
+                    UserId = recipient.Id,
+                    Message = message,
+                    OpenUrl = $"{_urls.CookingAssistant}/inbox"
+                };
+
+                _senderService.Enqueue(pushNotification);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(Send)}");
+            throw;
         }
 
         return StatusCode(201, null);
@@ -457,18 +518,26 @@ public class RecipesController : BaseController
             return NoContent();
         }
 
-        NotificationRecipient recipient = result.NotificationRecipients.First();
-        CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-        var message = _localizer["DeclinedSendRequestNotification", CurrentUserName, result.RecipeName];
-
-        var pushNotification = new CookingAssistantPushNotification
+        try
         {
-            SenderImageUri = result.ActionUserImageUri,
-            UserId = recipient.Id,
-            Message = message
-        };
+            NotificationRecipient recipient = result.NotificationRecipients.First();
+            CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+            var message = _localizer["DeclinedSendRequestNotification", result.ActionUserName, result.RecipeName];
 
-        _senderService.Enqueue(pushNotification);
+            var pushNotification = new CookingAssistantPushNotification
+            {
+                SenderImageUri = result.ActionUserImageUri,
+                UserId = recipient.Id,
+                Message = message
+            };
+
+            _senderService.Enqueue(pushNotification);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(DeclineSendRequest)}");
+            throw;
+        }
 
         return NoContent();
     }
@@ -518,17 +587,25 @@ public class RecipesController : BaseController
         User currentUser = _userService.Get(importModel.UserId);
         User recipeUser = _userService.Get(recipe.UserId);
 
-        CultureInfo.CurrentCulture = new CultureInfo(recipeUser.Language, false);
-        var message = _localizer["AcceptedSendRequestNotification", CurrentUserName, recipe.Name];
-
-        var pushNotification = new CookingAssistantPushNotification
+        try
         {
-            SenderImageUri = currentUser.ImageUri,
-            UserId = recipeUser.Id,
-            Message = message
-        };
+            CultureInfo.CurrentCulture = new CultureInfo(recipeUser.Language, false);
+            var message = _localizer["AcceptedSendRequestNotification", currentUser.Name, recipe.Name];
 
-        _senderService.Enqueue(pushNotification);
+            var pushNotification = new CookingAssistantPushNotification
+            {
+                SenderImageUri = currentUser.ImageUri,
+                UserId = recipeUser.Id,
+                Message = message
+            };
+
+            _senderService.Enqueue(pushNotification);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(TryImport)}");
+            throw;
+        }
 
         return StatusCode(201, id);
     }

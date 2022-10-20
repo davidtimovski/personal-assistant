@@ -9,6 +9,7 @@ public class UpdateListResult : INotificationResult
 {
     public ListNotificationType Type { get; set; }
     public string OriginalListName { get; set; }
+    public string ActionUserName { get; set; }
     public string ActionUserImageUri { get; set; }
     public IEnumerable<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
 

@@ -22,7 +22,7 @@ public abstract class BaseController : Controller
         {
             if (!userId.HasValue)
             {
-                string auth0Id = User.FindFirst("sub").Value;
+                string auth0Id = User.Identity.Name;
                 
                 if (_userIdLookup.Contains(auth0Id))
                 {
@@ -31,7 +31,12 @@ public abstract class BaseController : Controller
                 else
                 {
                     var userId = _usersRepository.GetId(auth0Id);
-                    _userIdLookup.Set(auth0Id, userId);
+                    if (!userId.HasValue)
+                    {
+                        throw new Exception($"The user with auth0_id '{auth0Id}' does not have a mapping");
+                    }
+
+                    _userIdLookup.Set(auth0Id, userId.Value);
                     this.userId = userId;
                 }
             }
@@ -49,21 +54,7 @@ public abstract class BaseController : Controller
                 throw new Exception($"The {nameof(AuthId)} property is only available for authenticated users");
             }
 
-            return User.FindFirst("sub").Value;
-        }
-    }
-
-    private string currentUserName;
-    protected string CurrentUserName
-    {
-        get
-        {
-            if (currentUserName == null)
-            {
-                currentUserName = User.FindFirst("name").Value;
-            }
-
-            return currentUserName;
+            return User.Identity.Name;
         }
     }
 }

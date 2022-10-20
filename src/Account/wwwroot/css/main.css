@@ -448,12 +448,12 @@ form .text-danger {
             cursor: default;
         }
 
-.home-links {
+.links-container {
     margin-top: 30px;
 }
 
-    .home-links div {
-        line-height: 38px;
+    .links-container div {
+        line-height: 34px;
         text-align: center;
     }
 

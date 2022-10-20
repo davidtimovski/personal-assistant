@@ -18,6 +18,7 @@ public class BulkCreateResult : INotificationResult
 
     public string ListName { get; set; }
     public IEnumerable<BulkCreatedTask> CreatedTasks { get; set; }
+    public string ActionUserName { get; set; }
     public string ActionUserImageUri { get; set; }
     public IEnumerable<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
 

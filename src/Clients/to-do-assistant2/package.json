@@ -1,13 +1,13 @@
 {
 	"name": "to-do-assistant2",
-	"version": "2.0.0-beta.10",
+	"version": "2.0.0-beta.11",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/davidtimovski/personal-assistant"
 	},
 	"license": "GPL-3.0",
 	"scripts": {
-		"dev": "vite dev --port 8083",
+		"dev": "vite dev --port 8080",
 		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",

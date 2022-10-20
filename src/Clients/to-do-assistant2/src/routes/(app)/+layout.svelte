@@ -15,12 +15,10 @@
 	import { locale, isOffline, authInfo } from '$lib/stores';
 	import { ListsService } from '$lib/services/listsService';
 	import { SignalRClient } from '$lib/utils/signalRClient';
-	import Variables from '$lib/variables';
 
 	import Alert from '$lib/components/Alert.svelte';
 
 	let listsService: ListsService;
-	let signalrClient: SignalRClient;
 
 	const authInfoUnsub = authInfo.subscribe(async (value) => {
 		if (!value) {
@@ -42,7 +40,7 @@
 		}
 		locale.set(localStorage.get('language'));
 
-		const authService = new AuthService(Variables.auth0ClientId);
+		const authService = new AuthService();
 		await authService.initialize();
 
 		if (await authService.authenticated()) {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using Api.Config;
@@ -15,6 +16,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Api.Controllers.ToDoAssistant;
@@ -35,6 +37,7 @@ public class ListsController : BaseController
     private readonly IValidator<CopyList> _copyValidator;
     private readonly IStringLocalizer<ListsController> _localizer;
     private readonly Urls _urls;
+    private readonly ILogger<ListsController> _logger;
 
     public ListsController(
         IUserIdLookup userIdLookup,
@@ -49,7 +52,8 @@ public class ListsController : BaseController
         IValidator<ShareList> shareValidator,
         IValidator<CopyList> copyValidator,
         IStringLocalizer<ListsController> localizer,
-        IOptions<Urls> urls) : base(userIdLookup, usersRepository)
+        IOptions<Urls> urls,
+        ILogger<ListsController> logger) : base(userIdLookup, usersRepository)
     {
         _listService = listService;
         _notificationService = notificationService;
@@ -62,6 +66,7 @@ public class ListsController : BaseController
         _copyValidator = copyValidator;
         _localizer = localizer;
         _urls = urls.Value;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -167,36 +172,44 @@ public class ListsController : BaseController
             return NoContent();
         }
 
-        string resourceKey;
-        switch (result.Type)
+        try
         {
-            case ListNotificationType.NameUpdated:
-                resourceKey = "UpdatedListNameNotification";
-                break;
-            case ListNotificationType.IconUpdated:
-                resourceKey = "UpdatedListIconNotification";
-                break;
-            default:
-                resourceKey = "UpdatedListNotification";
-                break;
-        }
-
-        foreach (var recipient in result.NotificationRecipients)
-        {
-            CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer[resourceKey, CurrentUserName, result.OriginalListName];
-
-            var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, dto.Id, null, message);
-            var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-            var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+            string resourceKey;
+            switch (result.Type)
             {
-                SenderImageUri = result.ActionUserImageUri,
-                UserId = recipient.Id,
-                Message = message,
-                OpenUrl = GetNotificationsPageUrl(notificationId)
-            };
+                case ListNotificationType.NameUpdated:
+                    resourceKey = "UpdatedListNameNotification";
+                    break;
+                case ListNotificationType.IconUpdated:
+                    resourceKey = "UpdatedListIconNotification";
+                    break;
+                default:
+                    resourceKey = "UpdatedListNotification";
+                    break;
+            }
 
-            _senderService.Enqueue(toDoAssistantPushNotification);
+            foreach (var recipient in result.NotificationRecipients)
+            {
+                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+                var message = _localizer[resourceKey, result.ActionUserName, result.OriginalListName];
+
+                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, dto.Id, null, message);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+                {
+                    SenderImageUri = result.ActionUserImageUri,
+                    UserId = recipient.Id,
+                    Message = message,
+                    OpenUrl = GetNotificationsPageUrl(notificationId)
+                };
+
+                _senderService.Enqueue(toDoAssistantPushNotification);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(Update)}");
+            throw;
         }
 
         return NoContent();
@@ -222,22 +235,30 @@ public class ListsController : BaseController
     {
         DeleteListResult result = await _listService.DeleteAsync(id, UserId);
 
-        foreach (var recipient in result.NotificationRecipients)
+        try
         {
-            CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer["DeletedListNotification", CurrentUserName, result.DeletedListName];
-
-            var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, null, null, message);
-            var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-            var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+            foreach (var recipient in result.NotificationRecipients)
             {
-                SenderImageUri = result.ActionUserImageUri,
-                UserId = recipient.Id,
-                Message = message,
-                OpenUrl = GetNotificationsPageUrl(notificationId)
-            };
+                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+                var message = _localizer["DeletedListNotification", result.ActionUserName, result.DeletedListName];
 
-            _senderService.Enqueue(toDoAssistantPushNotification);
+                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, null, null, message);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+                {
+                    SenderImageUri = result.ActionUserImageUri,
+                    UserId = recipient.Id,
+                    Message = message,
+                    OpenUrl = GetNotificationsPageUrl(notificationId)
+                };
+
+                _senderService.Enqueue(toDoAssistantPushNotification);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(Delete)}");
+            throw;
         }
 
         return NoContent();
@@ -273,31 +294,39 @@ public class ListsController : BaseController
 
         dto.UserId = UserId;
 
-        foreach (ShareUserAndPermission removedShare in dto.RemovedShares)
+        try
         {
-            if (!_listService.CheckIfUserCanBeNotifiedOfChange(dto.ListId, removedShare.UserId))
+            foreach (ShareUserAndPermission removedShare in dto.RemovedShares)
             {
-                continue;
+                if (!_listService.CheckIfUserCanBeNotifiedOfChange(dto.ListId, removedShare.UserId))
+                {
+                    continue;
+                }
+
+                var currentUser = _userService.Get(dto.UserId);
+                var user = _userService.Get(removedShare.UserId);
+                SimpleList list = _listService.Get(dto.ListId);
+
+                CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
+                var message = _localizer["RemovedShareNotification", currentUser.Name, list.Name];
+
+                var createNotificationDto = new CreateOrUpdateNotification(user.Id, dto.UserId, null, null, message);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+                {
+                    SenderImageUri = currentUser.ImageUri,
+                    UserId = user.Id,
+                    Message = message,
+                    OpenUrl = GetNotificationsPageUrl(notificationId)
+                };
+
+                _senderService.Enqueue(toDoAssistantPushNotification);
             }
-
-            var currentUser = _userService.Get(dto.UserId);
-            var user = _userService.Get(removedShare.UserId);
-            SimpleList list = _listService.Get(dto.ListId);
-
-            CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
-            var message = _localizer["RemovedShareNotification", CurrentUserName, list.Name];
-
-            var createNotificationDto = new CreateOrUpdateNotification(user.Id, dto.UserId, null, null, message);
-            var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-            var toDoAssistantPushNotification = new ToDoAssistantPushNotification
-            {
-                SenderImageUri = currentUser.ImageUri,
-                UserId = user.Id,
-                Message = message,
-                OpenUrl = GetNotificationsPageUrl(notificationId)
-            };
-
-            _senderService.Enqueue(toDoAssistantPushNotification);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(Share)}");
+            throw;
         }
 
         await _listService.ShareAsync(dto, _shareValidator);
@@ -310,22 +339,30 @@ public class ListsController : BaseController
     {
         LeaveListResult result = await _listService.LeaveAsync(id, UserId);
 
-        foreach (var recipient in result.NotificationRecipients)
+        try
         {
-            CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer["LeftListNotification", CurrentUserName, result.ListName];
-
-            var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, id, null, message);
-            var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-            var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+            foreach (var recipient in result.NotificationRecipients)
             {
-                SenderImageUri = result.ActionUserImageUri,
-                UserId = recipient.Id,
-                Message = message,
-                OpenUrl = GetNotificationsPageUrl(notificationId)
-            };
+                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+                var message = _localizer["LeftListNotification", result.ActionUserName, result.ListName];
 
-            _senderService.Enqueue(toDoAssistantPushNotification);
+                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, id, null, message);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+                {
+                    SenderImageUri = result.ActionUserImageUri,
+                    UserId = recipient.Id,
+                    Message = message,
+                    OpenUrl = GetNotificationsPageUrl(notificationId)
+                };
+
+                _senderService.Enqueue(toDoAssistantPushNotification);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(Leave)}");
+            throw;
         }
 
         return NoContent();
@@ -369,22 +406,30 @@ public class ListsController : BaseController
 
         SetTasksAsNotCompletedResult result = await _listService.UncompleteAllAsync(dto.ListId, UserId);
 
-        foreach (var recipient in result.NotificationRecipients)
+        try
         {
-            CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer["UncompletedAllTasksNotification", CurrentUserName, result.ListName];
-
-            var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, dto.ListId, null, message);
-            var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-            var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+            foreach (var recipient in result.NotificationRecipients)
             {
-                SenderImageUri = result.ActionUserImageUri,
-                UserId = recipient.Id,
-                Message = message,
-                OpenUrl = GetNotificationsPageUrl(notificationId)
-            };
+                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+                var message = _localizer["UncompletedAllTasksNotification", result.ActionUserName, result.ListName];
 
-            _senderService.Enqueue(toDoAssistantPushNotification);
+                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, dto.ListId, null, message);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+                {
+                    SenderImageUri = result.ActionUserImageUri,
+                    UserId = recipient.Id,
+                    Message = message,
+                    OpenUrl = GetNotificationsPageUrl(notificationId)
+                };
+
+                _senderService.Enqueue(toDoAssistantPushNotification);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(UncompleteAll)}");
+            throw;
         }
 
         return NoContent();
@@ -404,40 +449,48 @@ public class ListsController : BaseController
             return NoContent();
         }
 
-        var localizerKey = dto.IsAccepted ? "JoinedListNotification" : "DeclinedShareRequestNotification";
-        foreach (var recipient in result.NotificationRecipients)
+        try
         {
-            CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-            var message = _localizer[localizerKey, CurrentUserName, result.ListName];
-
-            var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, dto.ListId, null, message);
-            var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
-            var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+            var localizerKey = dto.IsAccepted ? "JoinedListNotification" : "DeclinedShareRequestNotification";
+            foreach (var recipient in result.NotificationRecipients)
             {
-                SenderImageUri = result.ActionUserImageUri,
-                UserId = recipient.Id,
-                Message = message,
-                OpenUrl = GetNotificationsPageUrl(notificationId)
-            };
+                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+                var message = _localizer[localizerKey, result.ActionUserName, result.ListName];
 
-            _senderService.Enqueue(toDoAssistantPushNotification);
+                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, dto.ListId, null, message);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+                {
+                    SenderImageUri = result.ActionUserImageUri,
+                    UserId = recipient.Id,
+                    Message = message,
+                    OpenUrl = GetNotificationsPageUrl(notificationId)
+                };
+
+                _senderService.Enqueue(toDoAssistantPushNotification);
+            }
         }
-
-        return NoContent();
-    }
-
-    [HttpPut("reorder")]
-    public async Task<IActionResult> Reorder([FromBody] ReorderListDto dto)
-    {
-        if (dto == null)
+        catch (Exception ex)
         {
-            return BadRequest();
+            _logger.LogError(ex, $"Unexpected error in {nameof(SetShareIsAccepted)}");
+            throw;
         }
-
-        await _listService.ReorderAsync(dto.Id, UserId, dto.OldOrder, dto.NewOrder);
 
         return NoContent();
     }
+
+    //[HttpPut("reorder")]
+    //public async Task<IActionResult> Reorder([FromBody] ReorderListDto dto)
+    //{
+    //    if (dto == null)
+    //    {
+    //        return BadRequest();
+    //    }
+
+    //    await _listService.ReorderAsync(dto.Id, UserId, dto.OldOrder, dto.NewOrder);
+
+    //    return NoContent();
+    //}
 
     private string GetNotificationsPageUrl(int notificationId)
     {

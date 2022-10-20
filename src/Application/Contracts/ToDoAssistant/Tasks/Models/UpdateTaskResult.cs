@@ -22,6 +22,7 @@ public class UpdateTaskResult : INotificationResult
 
     public int OldListId { get; set; }
     public string OldListName { get; set; }
+    public string ActionUserName { get; set; }
     public string ActionUserImageUri { get; set; }
     public IEnumerable<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
     public IEnumerable<NotificationRecipient> RemovedNotificationRecipients { get; set; } = new List<NotificationRecipient>();

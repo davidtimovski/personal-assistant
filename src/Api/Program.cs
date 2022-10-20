@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Api.Config;
@@ -20,6 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Persistence;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +41,10 @@ if (builder.Environment.IsProduction())
         configBuilder.AddAzureKeyVault(client, new AzureKeyVaultConfigurationOptions());
     });
 }
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
 
 builder.Services
     .AddInfrastructure(builder.Configuration, builder.Environment.EnvironmentName)
@@ -149,9 +153,6 @@ app.UseRequestLocalization(new RequestLocalizationOptions
 });
 
 app.UseCors("AllowAllApps");
-
-// Have user ID claim be named "sub"
-JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 app.UseAuthentication();
 app.UseAuthorization();

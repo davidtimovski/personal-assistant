@@ -79,7 +79,7 @@ public class AccountController : BaseController
         // Note that the resulting absolute Uri must be added to the
         // **Allowed Callback URLs** settings for the app.
         var authenticationProperties = new LoginAuthenticationPropertiesBuilder()
-            .WithRedirectUri(_configuration["Urls:PersonalAssistant"])
+            .WithRedirectUri(_configuration["Urls:Account"])
             .Build();
 
         await HttpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
@@ -147,7 +147,7 @@ public class AccountController : BaseController
            // Indicate here where Auth0 should redirect the user after a logout.
            // Note that the resulting absolute Uri must be added to the
            // **Allowed Logout URLs** settings for the app.
-           .WithRedirectUri(_configuration["Urls:PersonalAssistant"] + returnUrlSlug)
+           .WithRedirectUri(_configuration["Urls:Account"] + returnUrlSlug)
            .Build();
 
         await HttpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
@@ -297,7 +297,7 @@ public class AccountController : BaseController
             Language = user.Language,
             ImageUri = user.ImageUri,
             DefaultImageUri = _cdnService.GetDefaultProfileImageUri(),
-            BaseUrl = _configuration["Urls:PersonalAssistant"]
+            BaseUrl = _configuration["Urls:Account"]
         };
 
         return View(viewModel);
@@ -316,7 +316,7 @@ public class AccountController : BaseController
                 Language = model.Language,
                 ImageUri = model.ImageUri,
                 DefaultImageUri = _cdnService.GetDefaultProfileImageUri(),
-                BaseUrl = _configuration["Urls:PersonalAssistant"]
+                BaseUrl = _configuration["Urls:Account"]
             });
         }
 
@@ -344,7 +344,7 @@ public class AccountController : BaseController
                 Language = model.Language,
                 ImageUri = model.ImageUri,
                 DefaultImageUri = _cdnService.GetDefaultProfileImageUri(),
-                BaseUrl = _configuration["Urls:PersonalAssistant"]
+                BaseUrl = _configuration["Urls:Account"]
             });
         }
 

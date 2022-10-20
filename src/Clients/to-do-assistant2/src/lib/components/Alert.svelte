@@ -43,6 +43,7 @@
 
 		type = alertType;
 		message = alertMessage;
+		refreshButtonVisible = type === 'error';
 		shown = true;
 	}
 

@@ -10,6 +10,7 @@ using Application.Contracts.CookingAssistant.Recipes;
 using Application.Contracts.CookingAssistant.Recipes.Models;
 using Application.Utils;
 using AutoMapper;
+using Domain.Entities.Common;
 using Domain.Entities.CookingAssistant;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
@@ -610,10 +611,12 @@ public class RecipeService : IRecipeService
                 return new UpdateRecipeResult();
             }
 
+            var user = _userService.Get(model.UserId);
             var result = new UpdateRecipeResult
             {
                 RecipeName = originalName,
-                ActionUserImageUri = _userService.GetImageUri(model.UserId),
+                ActionUserName = user.Name,
+                ActionUserImageUri = user.ImageUri,
                 NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
             };
 
@@ -650,10 +653,12 @@ public class RecipeService : IRecipeService
                 return new DeleteRecipeResult();
             }
 
+            var user = _userService.Get(userId);
             var result = new DeleteRecipeResult
             {
                 RecipeName = recipeName,
-                ActionUserImageUri = _userService.GetImageUri(userId),
+                ActionUserName = user.Name,
+                ActionUserImageUri = user.ImageUri,
                 NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
             };
 
@@ -721,10 +726,12 @@ public class RecipeService : IRecipeService
 
             Recipe recipe = _recipesRepository.Get(recipeId);
 
+            var user = _userService.Get(userId);
             var result = new SetShareIsAcceptedResult
             {
                 RecipeName = recipe.Name,
-                ActionUserImageUri = _userService.GetImageUri(userId),
+                ActionUserName = user.Name,
+                ActionUserImageUri = user.ImageUri,
                 NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
             };
 
@@ -756,10 +763,12 @@ public class RecipeService : IRecipeService
 
             Recipe recipe = _recipesRepository.Get(id);
 
+            var user = _userService.Get(userId);
             var result = new LeaveRecipeResult
             {
                 RecipeName = recipe.Name,
-                ActionUserImageUri = _userService.GetImageUri(userId),
+                ActionUserName = user.Name,
+                ActionUserImageUri = user.ImageUri,
                 NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
             };
 
@@ -811,10 +820,12 @@ public class RecipeService : IRecipeService
 
             Recipe recipe = _recipesRepository.Get(model.RecipeId);
 
+            var user = _userService.Get(model.UserId);
             var result = new SendRecipeResult
             {
                 RecipeName = recipe.Name,
-                ActionUserImageUri = _userService.GetImageUri(model.UserId),
+                ActionUserName = user.Name,
+                ActionUserImageUri = user.ImageUri,
                 NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
             };
 
@@ -835,11 +846,13 @@ public class RecipeService : IRecipeService
 
             Recipe recipe = _recipesRepository.Get(recipeId);
             var userToBeNotified = _userService.Get(recipe.UserId);
-           
+
+            var user = _userService.Get(userId);
             var result = new DeclineSendRequestResult
             {
                 RecipeName = recipe.Name,
-                ActionUserImageUri = _userService.GetImageUri(userId),
+                ActionUserName = user.Name,
+                ActionUserImageUri = user.ImageUri,
                 NotificationRecipients = new List<NotificationRecipient> { new NotificationRecipient { Id = userToBeNotified.Id, Language = userToBeNotified.Language } }
             };
 

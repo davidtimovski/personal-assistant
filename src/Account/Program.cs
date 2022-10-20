@@ -1,32 +1,23 @@
 ﻿using System;
 using System.Globalization;
-using System.IO;
-using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
-using Application;
-using Account.Models;
 using Account.Services;
+using Application;
 using Auth0.AspNetCore.Authentication;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using FluentValidation.AspNetCore;
 using Infrastructure;
-using Infrastructure.Identity;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
 using Persistence;
 using Serilog;
-using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
@@ -46,11 +37,6 @@ builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
         configBuilder.AddAzureKeyVault(client, new AzureKeyVaultConfigurationOptions());
     }
 });
-
-if (builder.Environment.IsProduction())
-{
-    builder.Host.UseSerilog();
-}
 
 builder.Services
     .AddInfrastructure(builder.Configuration, builder.Environment.EnvironmentName)

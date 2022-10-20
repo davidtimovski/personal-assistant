@@ -81,6 +81,7 @@ public class UpdateRecipeIngredient
 public class UpdateRecipeResult : INotificationResult
 {
     public string RecipeName { get; set; }
+    public string ActionUserName { get; set; }
     public string ActionUserImageUri { get; set; }
     public IEnumerable<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
 

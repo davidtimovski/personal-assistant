@@ -20,6 +20,7 @@ public class CreatedTaskResult : INotificationResult
 
     public string TaskName { get; set; }
     public string ListName { get; set; }
+    public string ActionUserName { get; set; }
     public string ActionUserImageUri { get; set; }
     public IEnumerable<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
 
