@@ -1,9 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte/internal';
 	import type { Unsubscriber } from 'svelte/store';
-	import { flip } from 'svelte/animate';
-	import { quintOut } from 'svelte/easing';
-	import { crossfade } from 'svelte/transition';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 
@@ -34,24 +31,6 @@
 	let localStorage: LocalStorageUtil;
 	let tasksService: TasksService;
 	let soundPlayer: SoundPlayer;
-
-	const [receive] = crossfade({
-		duration: (d) => Math.sqrt(d * 200),
-
-		fallback(node) {
-			const style = getComputedStyle(node);
-			const transform = style.transform === 'none' ? '' : style.transform;
-
-			return {
-				duration: 600,
-				easing: quintOut,
-				css: (t) => `
-					transform: ${transform} scale(${t});
-					opacity: ${t}
-				`
-			};
-		}
-	});
 
 	function formatStaleTaskDate(modifiedDate: string): string {
 		return DateHelper.formatDayMonth(new Date(modifiedDate), $locale);
@@ -231,8 +210,8 @@
 						<span>{$t('derivedList.privateTasks')}</span>
 					</div>
 
-					{#each privateTasks as task (task.id)}
-						<div class="to-do-task" in:receive={{ key: task.id }} animate:flip>
+					{#each privateTasks as task}
+						<div class="to-do-task">
 							<div class="to-do-task-content" class:highlighted={task.id === editedId}>
 								{#if type === DerivedLists.StaleTasks}
 									<span class="unchanged-since">{formatStaleTaskDate(task.modifiedDate)}</span>
@@ -249,6 +228,7 @@
 									aria-label={$t('derivedList.complete')}
 								>
 									<i class="far fa-square" />
+									<i class="fas fa-check-square" />
 									<i class="fas fa-trash-alt" />
 								</button>
 							</div>
@@ -258,8 +238,8 @@
 			{/if}
 
 			<div class="to-do-tasks-wrap" class:high-priority={type === DerivedLists.HighPriority}>
-				{#each tasks as task (task.id)}
-					<div class="to-do-task" in:receive={{ key: task.id }} animate:flip>
+				{#each tasks as task}
+					<div class="to-do-task">
 						{#if task.assignedUser}
 							<img src={task.assignedUser.imageUri} class="to-do-task-assignee-image" alt={$t('profilePicture')} />
 						{/if}
@@ -280,6 +260,7 @@
 								aria-label={$t('derivedList.complete')}
 							>
 								<i class="far fa-square" />
+								<i class="fas fa-check-square" />
 								<i class="fas fa-trash-alt" />
 							</button>
 						</div>
@@ -373,6 +354,23 @@
 
 				&:hover {
 					color: var(--primary-color-dark);
+				}
+
+				.fa-check-square {
+					display: none;
+				}
+
+				&:not(.one-time):active {
+					.fa-check-square {
+						display: inline;
+					}
+					.fa-square {
+						display: none;
+					}
+				}
+
+				&.one-time:active .fa-trash-alt {
+					color: var(--danger-color);
 				}
 			}
 

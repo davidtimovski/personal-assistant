@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte/internal';
 	import type { Unsubscriber } from 'svelte/store';
-	import { flip } from 'svelte/animate';
-	import { quintOut } from 'svelte/easing';
-	import { crossfade, slide } from 'svelte/transition';
+	import { slide } from 'svelte/transition';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
@@ -64,24 +62,6 @@
 	let listsService: ListsService;
 	let tasksService: TasksService;
 	let soundPlayer: SoundPlayer;
-
-	const [receive] = crossfade({
-		duration: (d) => Math.sqrt(d * 200),
-
-		fallback(node) {
-			const style = getComputedStyle(node);
-			const transform = style.transform === 'none' ? '' : style.transform;
-
-			return {
-				duration: 600,
-				easing: quintOut,
-				css: (t) => `
-					transform: ${transform} scale(${t});
-					opacity: ${t}
-				`
-			};
-		}
-	});
 
 	function toggleTopDrawer() {
 		topDrawerIsOpen = !topDrawerIsOpen;
@@ -601,13 +581,13 @@
 			{/if}
 
 			<form on:submit|preventDefault={create}>
-				<div class="add-input-wrap" class:with-private-toggle={sharingState !== 0 && !isSearching}>
+				<div class="add-input-wrap" class:with-private-toggle={sharingState !== 0} class:searching={isSearching}>
 					<input
 						type="text"
 						bind:value={newTaskName}
 						bind:this={newTaskNameInput}
 						on:keyup={newTaskNameInputChanged}
-						class="new-task"
+						class="new-task-input"
 						class:invalid={newTaskIsInvalid}
 						placeholder={addNewPlaceholderText}
 						aria-label={addNewPlaceholderText}
@@ -615,38 +595,40 @@
 						maxlength="50"
 						required
 					/>
-					<label
-						class="is-private-toggle"
-						class:checked={isPrivate}
-						title={$t('list.togglePrivateTasks')}
-						aria-label={$t('list.togglePrivateTasks')}
-					>
-						<input type="checkbox" bind:checked={isPrivate} on:change={isPrivateToggleChanged} />
-						<i class="fas fa-lock" />
-						<i class="fas fa-unlock" />
-					</label>
-					<label
-						class="is-one-time-toggle"
-						class:checked={isOneTime}
-						title={$t('list.toggleTaskDeletionOnCompletion')}
-						aria-label={$t('list.toggleTaskDeletionOnCompletion')}
-					>
-						<input type="checkbox" bind:checked={isOneTime} on:change={isOneTimeToggleChanged} />
-						<i class="fas fa-trash-alt" />
-						<i class="far fa-trash-alt" />
-					</label>
 
-					{#if !newTaskIsLoading}
-						<button
-							on:click={create}
-							class="add-task-button"
-							disabled={isSearching}
-							title={$t('list.add')}
-							aria-label={$t('list.add')}
+					{#if sharingState !== 0 && !isSearching}
+						<label
+							class="is-private-toggle"
+							class:checked={isPrivate}
+							title={$t('list.togglePrivateTasks')}
+							aria-label={$t('list.togglePrivateTasks')}
 						>
+							<input type="checkbox" bind:checked={isPrivate} on:change={isPrivateToggleChanged} />
+							<i class="fas fa-lock" />
+							<i class="fas fa-unlock" />
+						</label>
+					{/if}
+
+					{#if !isSearching}
+						<label
+							class="is-one-time-toggle"
+							class:checked={isOneTime}
+							title={$t('list.toggleTaskDeletionOnCompletion')}
+							aria-label={$t('list.toggleTaskDeletionOnCompletion')}
+						>
+							<input type="checkbox" bind:checked={isOneTime} on:change={isOneTimeToggleChanged} />
+							<i class="fas fa-trash-alt" />
+							<i class="far fa-trash-alt" />
+						</label>
+					{/if}
+
+					{#if !newTaskIsLoading && !isSearching}
+						<button on:click={create} class="add-task-button" title={$t('list.add')} aria-label={$t('list.add')}>
 							<i class="fas fa-plus-circle" />
 						</button>
-					{:else}
+					{/if}
+
+					{#if newTaskIsLoading && !isSearching}
 						<div class="loader">
 							<i class="fas fa-circle-notch fa-spin" />
 						</div>
@@ -661,13 +643,8 @@
 						<span>{$t('list.privateTasks')}</span>
 					</div>
 
-					{#each privateTasks as task (task.id)}
-						<div
-							class="to-do-task"
-							class:high-priority={derivedListType !== 'high-priority' && task.isHighPriority}
-							in:receive={{ key: task.id }}
-							animate:flip
-						>
+					{#each privateTasks as task}
+						<div class="to-do-task" class:high-priority={derivedListType !== 'high-priority' && task.isHighPriority}>
 							<div class="to-do-task-content" class:highlighted={task.id === editedId}>
 								<a href="/editTask/{task.id}" class="edit-button" title={$t('list.edit')} aria-label={$t('list.edit')}>
 									<i class="fas fa-pencil-alt" />
@@ -687,6 +664,7 @@
 									aria-label={$t('list.complete')}
 								>
 									<i class="far fa-square" />
+									<i class="fas fa-check-square" />
 									<i class="fas fa-trash-alt" />
 								</button>
 							</div>
@@ -696,13 +674,8 @@
 			{/if}
 
 			<div class="to-do-tasks-wrap">
-				{#each tasks as task (task.id)}
-					<div
-						class="to-do-task"
-						class:high-priority={derivedListType !== 'high-priority' && task.isHighPriority}
-						in:receive={{ key: task.id }}
-						animate:flip
-					>
+				{#each tasks as task}
+					<div class="to-do-task" class:high-priority={derivedListType !== 'high-priority' && task.isHighPriority}>
 						<div class="to-do-task-content" class:assigned={task.assignedUser} class:highlighted={task.id === editedId}>
 							<a href="/editTask/{task.id}" class="edit-button" title={$t('list.edit')} aria-label={$t('list.edit')}>
 								<i class="fas fa-pencil-alt" />
@@ -726,6 +699,7 @@
 								aria-label={$t('list.complete')}
 							>
 								<i class="far fa-square" />
+								<i class="fas fa-check-square" />
 								<i class="fas fa-trash-alt" />
 							</button>
 						</div>
@@ -756,8 +730,8 @@
 									<span>{$t('list.donePrivateTasks')}</span>
 								</div>
 
-								{#each completedPrivateTasks as task (task.id)}
-									<div class="to-do-task completed" in:receive={{ key: task.id }} animate:flip>
+								{#each completedPrivateTasks as task}
+									<div class="to-do-task completed">
 										<div class="to-do-task-content" class:highlighted={task.id === editedId}>
 											<a
 												href="/editTask/{task.id}"
@@ -776,11 +750,12 @@
 											<button
 												type="button"
 												on:click={() => uncomplete(task)}
-												class="check-button"
+												class="uncheck-button"
 												title={$t('list.uncomplete')}
 												aria-label={$t('list.uncomplete')}
 											>
 												<i class="fas fa-check-square" />
+												<i class="far fa-square" />
 											</button>
 										</div>
 									</div>
@@ -789,8 +764,8 @@
 						{/if}
 
 						<div class="to-do-tasks-wrap">
-							{#each completedTasks as task (task.id)}
-								<div class="to-do-task completed" in:receive={{ key: task.id }} animate:flip>
+							{#each completedTasks as task}
+								<div class="to-do-task completed">
 									<div
 										class="to-do-task-content"
 										class:assigned={task.assignedUser}
@@ -822,11 +797,12 @@
 										<button
 											type="button"
 											on:click={() => uncomplete(task)}
-											class="check-button"
+											class="uncheck-button"
 											title={$t('list.uncomplete')}
 											aria-label={$t('list.uncomplete')}
 										>
 											<i class="fas fa-check-square" />
+											<i class="far fa-square" />
 										</button>
 									</div>
 								</div>
@@ -859,30 +835,25 @@
 	.add-input-wrap {
 		position: relative;
 
-		input {
+		.new-task-input {
 			width: calc(100% - 60px);
 			padding-right: 46px;
 			line-height: 45px;
 
-			&:disabled {
-				text-align: center;
-			}
-
-			&.new-task {
-				width: calc(100% - 112px);
-				padding-right: 98px;
-			}
+			// &.new-task {
+			// 	width: calc(100% - 112px);
+			// 	padding-right: 98px;
+			// }
 		}
 
-		&.with-private-toggle {
-			.is-private-toggle {
-				display: block;
-			}
+		&.with-private-toggle .new-task-input {
+			width: calc(100% - 154px);
+			padding-right: 140px;
+		}
 
-			input.new-task {
-				width: calc(100% - 154px);
-				padding-right: 140px;
-			}
+		&.searching .new-task-input {
+			width: calc(100% - 26px);
+			padding-right: 12px;
 		}
 
 		.add-task-button,
@@ -908,10 +879,6 @@
 			&:hover {
 				color: var(--primary-color-dark);
 			}
-
-			&:disabled {
-				color: var(--faded-color);
-			}
 		}
 
 		.is-one-time-toggle {
@@ -924,9 +891,12 @@
 		}
 
 		.is-private-toggle {
-			display: none;
 			right: 90px;
 			line-height: 45px;
+
+			&:hover {
+				color: var(--primary-color-dark);
+			}
 		}
 
 		.is-one-time-toggle input,
@@ -1002,20 +972,24 @@
 				margin: 6px 9px 0 4px;
 			}
 
-			.edit-button {
-				min-width: 45px;
-				font-size: 23px;
-				line-height: 45px;
-				text-decoration: none;
-				text-align: center;
-				color: var(--primary-color);
-
-				&:hover {
-					color: var(--primary-color-dark);
-				}
+			.fa-square,
+			.fa-check-square,
+			.one-time .fa-trash-alt {
+				display: inline;
 			}
 
-			.check-button {
+			.fa-trash-alt,
+			.one-time .fa-square,
+			.one-time .fa-check-square {
+				display: none;
+			}
+
+			.one-time {
+				font-size: 23px;
+			}
+
+			.check-button,
+			.uncheck-button {
 				min-width: 45px;
 				background: transparent;
 				border: none;
@@ -1027,6 +1001,40 @@
 
 				&:hover {
 					color: var(--primary-color-dark);
+				}
+			}
+
+			.check-button {
+				.fa-check-square {
+					display: none;
+				}
+
+				&:not(.one-time):active {
+					.fa-check-square {
+						display: inline;
+					}
+					.fa-square {
+						display: none;
+					}
+				}
+
+				&.one-time:active .fa-trash-alt {
+					color: var(--danger-color);
+				}
+			}
+
+			.uncheck-button {
+				.fa-square {
+					display: none;
+				}
+
+				&:active {
+					.fa-square {
+						display: inline;
+					}
+					.fa-check-square {
+						display: none;
+					}
 				}
 			}
 
@@ -1059,22 +1067,6 @@
 				&.assigned .name {
 					padding: 9px 52px 9px 5px;
 				}
-
-				.fa-square,
-				.fa-check-square,
-				.one-time .fa-trash-alt {
-					display: inline;
-				}
-
-				.fa-trash-alt,
-				.one-time .fa-square,
-				.one-time .fa-check-square {
-					display: none;
-				}
-
-				.one-time {
-					font-size: 23px;
-				}
 			}
 		}
 	}
@@ -1086,6 +1078,19 @@
 	// .reordering .reorder-icon {
 	// 	display: inline-block !important;
 	// }
+
+	.edit-button {
+		min-width: 45px;
+		font-size: 23px;
+		line-height: 45px;
+		text-decoration: none;
+		text-align: center;
+		color: var(--primary-color);
+
+		&:hover {
+			color: var(--primary-color-dark);
+		}
+	}
 
 	.completed-tasks {
 		display: none;
@@ -1202,30 +1207,6 @@
 
 		&:hover {
 			color: var(--primary-color-dark);
-		}
-	}
-
-	/* Workaround for sticky :hover on mobile devices */
-	.touch-device {
-		.add-input-wrap button:hover,
-		.add-input-wrap .is-one-time-toggle:hover,
-		.add-input-wrap .is-private-toggle:hover,
-		.search-toggle.checked:hover {
-			color: var(--primary-color);
-		}
-
-		.search-toggle:hover {
-			color: var(--faded-color);
-		}
-
-		.toggle-completed-visible {
-			&:hover {
-				color: #888;
-			}
-
-			&:active {
-				background: transparent;
-			}
 		}
 	}
 
