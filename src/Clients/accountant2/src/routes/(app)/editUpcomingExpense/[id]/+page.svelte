@@ -55,7 +55,7 @@
 	$: canSave = !!amount && !(!$isOnline && synced);
 
 	function validate(): ValidationResult {
-		const result = new ValidationResult(true);
+		const result = new ValidationResult();
 
 		if (!ValidationUtil.between(<number>amount, 0, amountTo)) {
 			result.fail('amount');

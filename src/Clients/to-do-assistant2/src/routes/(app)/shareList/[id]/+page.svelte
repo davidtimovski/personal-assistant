@@ -73,7 +73,7 @@
 	}
 
 	function validate(): ValidationResult {
-		const result = new ValidationResult(true);
+		const result = new ValidationResult();
 
 		if (ValidationUtil.isEmptyOrWhitespace(selectedShareEmail)) {
 			result.fail('email');

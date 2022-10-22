@@ -16,39 +16,48 @@
 	const unsubscriber = alertState.subscribe((value) => {
 		if (value.status === AlertStatus.Error) {
 			let message = '';
+			let showRefreshLink = false;
 
 			if (value.messages.length > 0) {
 				message = value.messages.join('<br>');
 			} else if (value.messageKey) {
 				const translationKey = value.messageKey;
 
-				refreshButtonVisible = translationKey === 'unexpectedError';
+				showRefreshLink = translationKey === 'unexpectedError';
 
 				message = $t(translationKey);
 			}
 
-			show('error', message);
+			showError(message, showRefreshLink);
 		} else if (value.status === AlertStatus.Success) {
-			showTemporary('success', $t(<string>value.messageKey));
+			showSuccess($t(<string>value.messageKey));
 		} else {
 			shown = false;
 		}
 	});
 
-	function show(alertType: string, alertMessage: string) {
+	function showError(alertMessage: string, showRefreshLink: boolean) {
 		if (resetMessageTimeout) {
 			window.clearTimeout(resetMessageTimeout);
 			resetMessageTimeout = 0;
 		}
 
-		type = alertType;
+		type = 'error';
 		message = alertMessage;
-		refreshButtonVisible = type === 'error';
+		refreshButtonVisible = showRefreshLink;
 		shown = true;
 	}
 
-	function showTemporary(type: string, message: string) {
-		show(type, message);
+	function showSuccess(alertMessage: string) {
+		if (resetMessageTimeout) {
+			window.clearTimeout(resetMessageTimeout);
+			resetMessageTimeout = 0;
+		}
+
+		type = 'success';
+		message = alertMessage;
+		refreshButtonVisible = false;
+		shown = true;
 
 		if (hideTimeout) {
 			window.clearTimeout(hideTimeout);
@@ -86,7 +95,7 @@
 	onDestroy(unsubscriber);
 </script>
 
-<div on:click={hide} class="alert {type}" class:shown>
+<div class="alert {type}" class:shown>
 	<span class="alert-body">
 		<div class="alert-message" contenteditable="true" bind:innerHTML={message} />
 

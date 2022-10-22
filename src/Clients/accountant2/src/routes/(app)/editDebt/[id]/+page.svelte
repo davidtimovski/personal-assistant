@@ -51,7 +51,7 @@
 	$: canSave = !!amount && !(!$isOnline && synced);
 
 	function validate(): ValidationResult {
-		const result = new ValidationResult(true);
+		const result = new ValidationResult();
 
 		if (ValidationUtil.isEmptyOrWhitespace(person)) {
 			result.fail('person');

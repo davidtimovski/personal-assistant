@@ -118,7 +118,7 @@
 	}
 
 	function validate(): ValidationResult {
-		const result = new ValidationResult(true);
+		const result = new ValidationResult();
 
 		if (!ValidationUtil.between(amount, amountFrom, amountTo)) {
 			result.fail('amount');

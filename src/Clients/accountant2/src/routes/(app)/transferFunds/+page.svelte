@@ -4,6 +4,7 @@
 
 	import { DateHelper } from '../../../../../shared2/utils/dateHelper';
 	import { ValidationResult, ValidationUtil } from '../../../../../shared2/utils/validationUtils';
+	import { CurrenciesService } from '../../../../../shared2/services/currenciesService';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
@@ -34,6 +35,7 @@
 	let localStorage: LocalStorageUtil;
 	let accountsService: AccountsService;
 	let transactionsService: TransactionsService;
+	let currenciesService: CurrenciesService;
 
 	let amountFrom = 0.01;
 	let amountTo = 8000000;
@@ -107,10 +109,21 @@
 	}
 
 	function validate(): ValidationResult {
-		const result = new ValidationResult(true);
+		if (!fromAccount || !amount) {
+			throw new Error('Unexpected error: required fields missing');
+		}
+
+		const result = new ValidationResult();
 
 		if (!ValidationUtil.between(amount, amountFrom, amountTo)) {
 			result.fail('amount');
+		}
+
+		const amountFloat = parseFloat(amount.toString());
+		const fromBalance = currenciesService.convert(<number>fromAccount.balance, fromAccount.currency, <string>currency);
+
+		if (fromBalance < amountFloat) {
+			result.fail('insufficientFunds');
 		}
 
 		return result;
@@ -135,38 +148,6 @@
 			amountIsInvalid = false;
 
 			try {
-				const amountFloat = parseFloat(amount.toString());
-
-				if (<number>fromAccount.balance < amountFloat) {
-					amountIsInvalid = true;
-					transferButtonIsLoading = false;
-
-					let formattedBalance: string;
-					if (currency === 'MKD') {
-						formattedBalance =
-							new Intl.NumberFormat('mk-MK', {
-								maximumFractionDigits: 0
-							}).format(<number>fromAccount.balance) + ' MKD';
-					} else {
-						formattedBalance = new Intl.NumberFormat('de-DE', {
-							style: 'currency',
-							currency: currency
-						}).format(<number>fromAccount.balance);
-					}
-
-					const fromAccountName = accountOptions.find((x) => x.id === fromAccountId)?.name;
-					alertState.update((x) => {
-						x.showErrors([
-							$t('transferFunds.accountOnlyHas', {
-								account: fromAccountName,
-								balance: formattedBalance
-							})
-						]);
-						return x;
-					});
-					return;
-				}
-
 				let fromStocks: number | null = null;
 				if (fromAccount.stockPrice !== null) {
 					fromStocks = parseFloat((amount / fromAccount.stockPrice).toFixed(4));
@@ -203,6 +184,20 @@
 				transferButtonIsLoading = false;
 			}
 		} else {
+			if (result.erroredFields.includes('insufficientFunds')) {
+				const fromAccountName = accountOptions.find((x) => x.id === fromAccountId)?.name;
+
+				alertState.update((x) => {
+					x.showErrors([
+						$t('transferFunds.accountOnlyHas', {
+							account: fromAccountName,
+							balance: Formatter.money((<Account>fromAccount).balance, (<Account>fromAccount).currency, $locale)
+						})
+					]);
+					return x;
+				});
+			}
+
 			amountIsInvalid = true;
 			transferButtonIsLoading = false;
 		}
@@ -212,6 +207,7 @@
 		localStorage = new LocalStorageUtil();
 		accountsService = new AccountsService();
 		transactionsService = new TransactionsService();
+		currenciesService = new CurrenciesService('Accountant');
 
 		currency = localStorage.get(LocalStorageKeys.Currency);
 
@@ -242,6 +238,7 @@
 	onDestroy(() => {
 		accountsService?.release();
 		transactionsService?.release();
+		currenciesService?.release();
 	});
 </script>
 
