@@ -24,7 +24,7 @@ export class ValidationUtil {
 export class ValidationResult {
   erroredFields: string[] = [];
 
-  constructor(public valid: boolean) {}
+  constructor(public valid = true) {}
 
   fail(field: string) {
     this.valid = false;

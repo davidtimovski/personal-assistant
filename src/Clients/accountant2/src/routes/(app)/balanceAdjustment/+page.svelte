@@ -37,7 +37,7 @@
 	$: adjustedBy = !balance ? 0 : balance - originalBalance;
 
 	function validate(): ValidationResult {
-		const result = new ValidationResult(true);
+		const result = new ValidationResult();
 
 		if (!ValidationUtil.sameOrHigher(balance, min)) {
 			result.fail('balance');

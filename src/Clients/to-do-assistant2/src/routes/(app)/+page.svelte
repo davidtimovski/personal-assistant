@@ -167,9 +167,8 @@
 				<input type="checkbox" bind:checked={isReordering} />
 				<i class="fas fa-random" />
 			</label> -->
-			<div class="page-title">
-				<span />
-			</div>
+
+			<div class="page-title" />
 			<button
 				type="button"
 				on:click={sync}
