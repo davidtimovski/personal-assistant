@@ -156,6 +156,15 @@
   <data name="DietaryProfiles.WeightIsRequired" xml:space="preserve">
     <value>Weight in either pounds or kg is required</value>
   </data>
+  <data name="Forecasts.InvalidPrecipitationUnit" xml:space="preserve">
+    <value>Invalid precipitation unit</value>
+  </data>
+  <data name="Forecasts.InvalidTemperatureUnit" xml:space="preserve">
+    <value>Invalid temperature unit</value>
+  </data>
+  <data name="Forecasts.InvalidWindSpeedUnit" xml:space="preserve">
+    <value>Invalid wind speed unit</value>
+  </data>
   <data name="Ingredients.UpdateIngredient.NameIsRequired" xml:space="preserve">
     <value>Name is required</value>
   </data>
