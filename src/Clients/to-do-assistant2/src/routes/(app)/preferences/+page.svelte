@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte/internal';
 
+	import Checkbox from '../../../../../shared2/components/Checkbox.svelte';
+
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { alertState } from '$lib/stores';
@@ -8,8 +10,6 @@
 	import { NotificationsService } from '$lib/services/notificationsService';
 	import { ListsService } from '$lib/services/listsService';
 	import { SoundPlayer } from '$lib/utils/soundPlayer';
-
-	import Checkbox from '$lib/components/Checkbox.svelte';
 
 	const notificationsVapidKey =
 		'BCL8HRDvXuYjw011VypF_TtfmklYFmqXAADY7pV3WB9vL609d8wNK0zTUs4hB0V3uAnCTpzOd2pANBmsMQoUhD0';

@@ -5,6 +5,8 @@
 	import type { PageData } from './$types';
 
 	import { ValidationResult, ValidationUtil } from '../../../../../../shared2/utils/validationUtils';
+	import DoubleRadioBool from '../../../../../../shared2/components/DoubleRadioBool.svelte';
+	import Tooltip from '../../../../../../shared2/components/Tooltip.svelte';
 
 	import { t } from '$lib/localization/i18n';
 	import { alertState, authInfo } from '$lib/stores';
@@ -12,9 +14,6 @@
 	import { Share, ShareUserAndPermission } from '$lib/models/viewmodels/share';
 	import { SharingState } from '$lib/models/viewmodels/sharingState';
 	import type { CanShareList } from '$lib/models/viewmodels/canShareList';
-
-	import DoubleRadio from '$lib/components/DoubleRadio.svelte';
-	import Tooltip from '$lib/components/Tooltip.svelte';
 
 	export let data: PageData;
 
@@ -322,14 +321,14 @@
 					</div>
 				</div>
 				<div class="form-control">
-					<DoubleRadio
+					<DoubleRadioBool
 						name="permissionsToggle"
 						leftLabelKey="shareList.member"
 						rightLabelKey="shareList.admin"
 						bind:value={selectedShareIsAdmin}
 					/>
 
-					<Tooltip key="memberVsAdmin" />
+					<Tooltip key="memberVsAdmin" application="ToDoAssistant" />
 				</div>
 			</form>
 		{/if}

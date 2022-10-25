@@ -3,14 +3,14 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 
+	import EmptyListMessage from '../../../../../shared2/components/EmptyListMessage.svelte';
+
 	import { t } from '$lib/localization/i18n';
 	import { syncStatus } from '$lib/stores';
 	import { CategoriesService } from '$lib/services/categoriesService';
 	import { CategoryItem } from '$lib/models/viewmodels/categoryItem';
 	import { AppEvents } from '$lib/models/appEvents';
 	import type { Category } from '$lib/models/entities/category';
-
-	import EmptyListMessage from '$lib/components/EmptyListMessage.svelte';
 
 	let categories: CategoryItem[] | null = null;
 	let editedId: number | undefined;

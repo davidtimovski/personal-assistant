@@ -10,7 +10,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { CapitalService } from '$lib/services/capitalService';
 	import { Formatter } from '$lib/utils/formatter';
-	import { locale, authInfo, syncStatus, searchFilters } from '$lib/stores';
+	import { isOnline, locale, authInfo, syncStatus, searchFilters } from '$lib/stores';
 	import { AppEvents } from '$lib/models/appEvents';
 	import { SearchFilters } from '$lib/models/viewmodels/searchFilters';
 	import type { AmountByCategory } from '$lib/models/viewmodels/amountByCategory';
@@ -21,9 +21,6 @@
 	let imageUri: any;
 	let data = new HomePageData();
 	let currency: string;
-	let connTracker = {
-		isOnline: true
-	};
 	let dataLoaded = false;
 	const unsubscriptions: Unsubscriber[] = [];
 
@@ -131,12 +128,18 @@
 	}
 
 	onMount(() => {
+		if (!navigator.onLine) {
+			dataLoaded = true;
+		}
+
 		localStorage = new LocalStorageUtil();
 		usersService = new UsersServiceBase('Accountant');
 		capitalService = new CapitalService();
 		accountsService = new AccountsService();
 
-		let cache = localStorage.getObject<HomePageData>('homePageData');
+		imageUri = localStorage.get('profileImageUri');
+
+		const cache = localStorage.getObject<HomePageData>('homePageData');
 		if (cache) {
 			data = cache;
 		}
@@ -155,8 +158,6 @@
 					usersService.getProfileImageUri().then((uri: string) => {
 						imageUri = uri;
 					});
-				} else {
-					imageUri = localStorage.get('profileImageUri');
 				}
 			})
 		);
@@ -186,7 +187,7 @@
 	<div class="page-title-wrap-loader">
 		<div class="title-wrap">
 			<a href="/menu" class="profile-image-container" title={$t('index.menu')} aria-label={$t('index.menu')}>
-				<img src={imageUri} class="profile-image" width="40" height="40" alt={$t('profilePicture')} />
+				<img src={imageUri} class="profile-image" width="40" height="40" alt="" />
 			</a>
 
 			<div class="page-title reduced">
@@ -196,7 +197,7 @@
 				type="button"
 				on:click={sync}
 				class="sync-button"
-				disabled={!connTracker.isOnline || progressBarActive}
+				disabled={!$isOnline || progressBarActive}
 				title={$t('index.refresh')}
 				aria-label={$t('index.refresh')}
 			>

@@ -5,6 +5,7 @@
 
 	import { DateHelper } from '../../../../../../shared2/utils/dateHelper';
 	import { ValidationResult, ValidationUtil } from '../../../../../../shared2/utils/validationUtils';
+	import AlertBlock from '../../../../../../shared2/components/AlertBlock.svelte';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
@@ -15,7 +16,6 @@
 	import { CategoryType } from '$lib/models/entities/category';
 	import { CategoriesService } from '$lib/services/categoriesService';
 
-	import AlertBlock from '$lib/components/AlertBlock.svelte';
 	import AmountInput from '$lib/components/AmountInput.svelte';
 	import MonthSelector from '$lib/components/MonthSelector.svelte';
 

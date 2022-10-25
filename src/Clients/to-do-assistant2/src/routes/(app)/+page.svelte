@@ -5,7 +5,7 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
-	import { authInfo, lists, remoteEvents } from '$lib/stores';
+	import { isOffline, authInfo, lists, remoteEvents } from '$lib/stores';
 	import { UsersService } from '$lib/services/usersService';
 	import { DerivedLists, ListsService } from '$lib/services/listsService';
 	import { TasksService } from '$lib/services/tasksService';
@@ -20,9 +20,6 @@
 	let editedId: number | undefined;
 	//let isReordering = false;
 	const derivedListNameLookup = new Map<string, string>();
-	let connTracker = {
-		isOnline: true
-	};
 	const unsubscriptions: Unsubscriber[] = [];
 
 	// Progress bar
@@ -94,6 +91,8 @@
 		listsService = new ListsService();
 		tasksService = new TasksService();
 
+		imageUri = localStorage.get('profileImageUri');
+
 		unsubscriptions.push(
 			authInfo.subscribe((value) => {
 				if (!value) {
@@ -104,8 +103,6 @@
 					usersService.getProfileImageUri().then((uri) => {
 						imageUri = uri;
 					});
-				} else {
-					imageUri = localStorage.get('profileImageUri');
 				}
 			})
 		);
@@ -154,7 +151,7 @@
 	<div class="page-title-wrap-loader">
 		<div class="title-wrap">
 			<a href="/menu" class="profile-image-container" title={$t('index.menu')} aria-label={$t('index.menu')}>
-				<img src={imageUri} class="profile-image" width="40" height="40" alt={$t('profilePicture')} />
+				<img src={imageUri} class="profile-image" width="40" height="40" alt="" />
 			</a>
 
 			<!-- 
@@ -173,7 +170,7 @@
 				type="button"
 				on:click={sync}
 				class="sync-button"
-				disabled={!connTracker.isOnline || progressBarActive}
+				disabled={$isOffline || progressBarActive}
 				title={$t('index.refresh')}
 				aria-label={$t('index.refresh')}
 			>
