@@ -7,6 +7,7 @@
 	import type { PageData } from './$types';
 
 	import { ValidationResult, ValidationUtil } from '../../../../../../shared2/utils/validationUtils';
+	import EmptyListMessage from '../../../../../../shared2/components/EmptyListMessage.svelte';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
@@ -17,8 +18,6 @@
 	import type { ListTask } from '$lib/models/viewmodels/listTask';
 	import { SoundPlayer } from '$lib/utils/soundPlayer';
 	import { RemoteEventType } from '$lib/models/remoteEvents';
-
-	import EmptyListMessage from '$lib/components/EmptyListMessage.svelte';
 
 	export let data: PageData;
 

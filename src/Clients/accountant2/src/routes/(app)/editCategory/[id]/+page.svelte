@@ -4,16 +4,15 @@
 	import type { PageData } from './$types';
 
 	import { ValidationResult, ValidationUtil } from '../../../../../../shared2/utils/validationUtils';
+	import AlertBlock from '../../../../../../shared2/components/AlertBlock.svelte';
+	import Checkbox from '../../../../../../shared2/components/Checkbox.svelte';
+	import Tooltip from '../../../../../../shared2/components/Tooltip.svelte';
 
 	import { t } from '$lib/localization/i18n';
 	import { alertState, isOnline } from '$lib/stores';
 	import { CategoriesService } from '$lib/services/categoriesService';
 	import { Category, CategoryType } from '$lib/models/entities/category';
 	import { SelectOption } from '$lib/models/viewmodels/selectOption';
-
-	import AlertBlock from '$lib/components/AlertBlock.svelte';
-	import Checkbox from '$lib/components/Checkbox.svelte';
-	import Tooltip from '$lib/components/Tooltip.svelte';
 
 	export let data: PageData;
 
@@ -292,7 +291,7 @@
 
 			<div class="form-control">
 				<Checkbox labelKey="editCategory.tax" bind:value={isTax} disabled={type !== 2} />
-				<Tooltip key="taxCategories" />
+				<Tooltip key="taxCategories" application="Accountant" />
 			</div>
 
 			<hr />

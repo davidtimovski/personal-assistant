@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte/internal';
 
+	import AlertBlock from '../../../../../shared2/components/AlertBlock.svelte';
+
 	import { t } from '$lib/localization/i18n';
 	import { SyncService } from '$lib/services/syncService';
 	import { isOnline } from '$lib/stores';
-
-	import AlertBlock from '$lib/components/AlertBlock.svelte';
 
 	let syncButtonIsLoading = false;
 

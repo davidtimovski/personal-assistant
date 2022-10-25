@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
 
+	import CurrencySelector from '../../../../../shared2/components/CurrencySelector.svelte';
+	import Checkbox from '../../../../../shared2/components/Checkbox.svelte';
+
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
-
-	import CurrencySelector from '$lib/components/CurrencySelector.svelte';
-	import Checkbox from '$lib/components/Checkbox.svelte';
 
 	let localStorage: LocalStorageUtil;
 
@@ -48,7 +48,7 @@
 	<div class="content-wrap">
 		<form>
 			<div class="form-control">
-				<CurrencySelector />
+				<CurrencySelector application="Accountant" />
 			</div>
 
 			<div class="form-control">

@@ -3,12 +3,11 @@
 	import { goto } from '$app/navigation';
 
 	import { DateHelper } from '../../../../../shared2/utils/dateHelper';
+	import AlertBlock from '../../../../../shared2/components/AlertBlock.svelte';
 
 	import { t } from '$lib/localization/i18n';
 	import { isOnline } from '$lib/stores';
 	import { TransactionsService } from '$lib/services/transactionsService';
-
-	import AlertBlock from '$lib/components/AlertBlock.svelte';
 
 	let synced: boolean;
 	let exportText: string;

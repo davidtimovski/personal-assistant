@@ -11,13 +11,12 @@
 	import { Language } from '../../../../shared2/models/enums/language';
 	import { AuthService } from '../../../../shared2/services/authService';
 	import { CurrenciesService } from '../../../../shared2/services/currenciesService';
+	import Alert from '../../../../shared2/components/Alert.svelte';
 
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { SyncService } from '$lib/services/syncService';
 	import { locale, isOnline, authInfo, syncStatus } from '$lib/stores';
 	import { AppEvents } from '$lib/models/appEvents';
-
-	import Alert from '$lib/components/Alert.svelte';
 
 	let localStorage: LocalStorageUtil;
 	const unsubscriptions: Unsubscriber[] = [];
@@ -69,14 +68,16 @@
 		}
 		locale.set(localStorage.get('language'));
 
-		const authService = new AuthService();
-		await authService.initialize();
+		if (navigator.onLine) {
+			const authService = new AuthService();
+			await authService.initialize();
 
-		if (await authService.authenticated()) {
-			await authService.setToken();
-		} else {
-			await authService.signinRedirect();
-			return;
+			if (await authService.authenticated()) {
+				await authService.setToken();
+			} else {
+				await authService.signinRedirect();
+				return;
+			}
 		}
 
 		isOnline.set(navigator.onLine);

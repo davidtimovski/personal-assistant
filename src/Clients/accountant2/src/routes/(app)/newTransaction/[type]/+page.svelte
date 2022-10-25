@@ -6,6 +6,9 @@
 
 	import { DateHelper } from '../../../../../../shared2/utils/dateHelper';
 	import { ValidationResult, ValidationUtil } from '../../../../../../shared2/utils/validationUtils';
+	import AlertBlock from '../../../../../../shared2/components/AlertBlock.svelte';
+	import Checkbox from '../../../../../../shared2/components/Checkbox.svelte';
+	import Tooltip from '../../../../../../shared2/components/Tooltip.svelte';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
@@ -17,10 +20,7 @@
 	import { DebtsService } from '$lib/services/debtsService';
 	import { CategoryType } from '$lib/models/entities/category';
 
-	import Checkbox from '$lib/components/Checkbox.svelte';
 	import AmountInput from '$lib/components/AmountInput.svelte';
-	import AlertBlock from '$lib/components/AlertBlock.svelte';
-	import Tooltip from '$lib/components/Tooltip.svelte';
 
 	export let data: PageData;
 
@@ -359,7 +359,7 @@
 					<Checkbox labelKey="newTransaction.encryptDescription" bind:value={encrypt} disabled={!canEncrypt()} />
 
 					{#if encrypt}
-						<Tooltip key="encryptedDescription" />
+						<Tooltip key="encryptedDescription" application="Accountant" />
 
 						<div class="viewable-password">
 							<input

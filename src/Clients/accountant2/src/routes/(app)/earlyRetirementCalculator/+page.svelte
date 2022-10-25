@@ -2,6 +2,7 @@
 	import { onMount, onDestroy } from 'svelte/internal';
 
 	import { CurrenciesService } from '../../../../../shared2/services/currenciesService';
+	import Checkbox from '../../../../../shared2/components/Checkbox.svelte';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
@@ -11,7 +12,6 @@
 	import { LargeUpcomingExpense, SummaryItem } from '$lib/models/viewmodels/earlyRetirementCalculator';
 
 	import AmountInput from '$lib/components/AmountInput.svelte';
-	import Checkbox from '$lib/components/Checkbox.svelte';
 
 	// Answers
 	let age: number;

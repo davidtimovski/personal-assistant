@@ -4,6 +4,8 @@
 	import type { PageData } from './$types';
 
 	import { ValidationResult, ValidationUtil } from '../../../../../../shared2/utils/validationUtils';
+	import AlertBlock from '../../../../../../shared2/components/AlertBlock.svelte';
+	import DoubleRadioBool from '../../../../../../shared2/components/DoubleRadioBool.svelte';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
@@ -14,9 +16,7 @@
 	import { SelectOption } from '$lib/models/viewmodels/selectOption';
 	import { AutomaticTransaction } from '$lib/models/entities/automaticTransaction';
 
-	import AlertBlock from '$lib/components/AlertBlock.svelte';
 	import AmountInput from '$lib/components/AmountInput.svelte';
-	import DoubleRadio from '$lib/components/DoubleRadio.svelte';
 
 	export let data: PageData;
 
@@ -241,7 +241,7 @@
 
 		<form on:submit|preventDefault={save}>
 			<div class="form-control">
-				<DoubleRadio
+				<DoubleRadioBool
 					name="depositExpenseToggle"
 					leftLabelKey="editAutomaticTransaction.expense"
 					rightLabelKey="editAutomaticTransaction.deposit"
