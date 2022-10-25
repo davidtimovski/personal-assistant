@@ -6,6 +6,9 @@
 
 	import { ValidationResult, ValidationUtil } from '../../../../../../shared2/utils/validationUtils';
 	import { ValidationErrors } from '../../../../../../shared2/models/validationErrors';
+	import AlertBlock from '../../../../../../shared2/components/AlertBlock.svelte';
+	import Checkbox from '../../../../../../shared2/components/Checkbox.svelte';
+	import Tooltip from '../../../../../../shared2/components/Tooltip.svelte';
 
 	import { t } from '$lib/localization/i18n';
 	import { alertState } from '$lib/stores';
@@ -13,10 +16,6 @@
 	import { UsersService } from '$lib/services/usersService';
 	import { SharingState } from '$lib/models/viewmodels/sharingState';
 	import type { PreferencesModel } from '$lib/models/preferencesModel';
-
-	import AlertBlock from '$lib/components/AlertBlock.svelte';
-	import Checkbox from '$lib/components/Checkbox.svelte';
-	import Tooltip from '$lib/components/Tooltip.svelte';
 
 	export let data: PageData;
 
@@ -316,7 +315,7 @@
 				<div class="form-control">
 					<Checkbox labelKey="deleteOnCompletion" bind:value={isOneTimeToggleDefault} />
 
-					<Tooltip key="oneTimeTasks" />
+					<Tooltip key="oneTimeTasks" application="ToDoAssistant" />
 				</div>
 			{/if}
 		</form>

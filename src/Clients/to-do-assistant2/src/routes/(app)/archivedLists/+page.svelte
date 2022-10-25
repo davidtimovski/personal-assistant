@@ -2,13 +2,13 @@
 	import { onMount } from 'svelte/internal';
 	import { page } from '$app/stores';
 
+	import EmptyListMessage from '../../../../../shared2/components/EmptyListMessage.svelte';
+
 	import { t } from '$lib/localization/i18n';
 	import { lists } from '$lib/stores';
 	import { ListsService } from '$lib/services/listsService';
 	import type { ArchivedList } from '$lib/models/viewmodels/archivedList';
 	import type { ListIcon } from '$lib/models/viewmodels/listIcon';
-
-	import EmptyListMessage from '$lib/components/EmptyListMessage.svelte';
 
 	let archivedLists: Array<ArchivedList> | null = null;
 	const iconOptions = ListsService.getIconOptions();

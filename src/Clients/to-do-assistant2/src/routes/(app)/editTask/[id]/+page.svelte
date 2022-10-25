@@ -5,6 +5,8 @@
 
 	import { ValidationResult, ValidationUtil } from '../../../../../../shared2/utils/validationUtils';
 	import { ValidationErrors } from '../../../../../../shared2/models/validationErrors';
+	import Checkbox from '../../../../../../shared2/components/Checkbox.svelte';
+	import Tooltip from '../../../../../../shared2/components/Tooltip.svelte';
 
 	import { t } from '$lib/localization/i18n';
 	import { alertState, lists } from '$lib/stores';
@@ -15,9 +17,6 @@
 	import type { ListOption } from '$lib/models/viewmodels/listOption';
 	import type { EditTaskModel } from '$lib/models/viewmodels/editTaskModel';
 	import Variables from '$lib/variables';
-
-	import Checkbox from '$lib/components/Checkbox.svelte';
-	import Tooltip from '$lib/components/Tooltip.svelte';
 
 	export let data: PageData;
 
@@ -245,7 +244,7 @@
 				<div class="form-control">
 					<Checkbox labelKey="editTask.taskIsPrivate" bind:value={isPrivate} />
 
-					<Tooltip key="privateTasks" />
+					<Tooltip key="privateTasks" application="ToDoAssistant" />
 				</div>
 
 				{#if !isPrivate && assigneeOptions}

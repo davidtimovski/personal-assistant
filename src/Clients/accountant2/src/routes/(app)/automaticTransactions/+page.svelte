@@ -3,6 +3,8 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 
+	import EmptyListMessage from '../../../../../shared2/components/EmptyListMessage.svelte';
+
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
@@ -10,8 +12,6 @@
 	import { AutomaticTransactionsService } from '$lib/services/automaticTransactionsService';
 	import { AutomaticTransactionItem } from '$lib/models/viewmodels/automaticTransactionItem';
 	import { AppEvents } from '$lib/models/appEvents';
-
-	import EmptyListMessage from '$lib/components/EmptyListMessage.svelte';
 
 	let automaticTransactions: AutomaticTransactionItem[] | null = null;
 	let currency: string;

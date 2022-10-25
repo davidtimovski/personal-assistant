@@ -9,14 +9,13 @@
 
 	import { Language } from '../../../../shared2/models/enums/language';
 	import { AuthService } from '../../../../shared2/services/authService';
+	import Alert from '../../../../shared2/components/Alert.svelte';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 	import { locale, isOffline, authInfo } from '$lib/stores';
 	import { ListsService } from '$lib/services/listsService';
 	import { SignalRClient } from '$lib/utils/signalRClient';
-
-	import Alert from '$lib/components/Alert.svelte';
 
 	let listsService: ListsService;
 

@@ -6,6 +6,7 @@
 
 	import { DateHelper } from '../../../../../../shared2/utils/dateHelper';
 	import { ValidationUtil } from '../../../../../../shared2/utils/validationUtils';
+	import AlertBlock from '../../../../../../shared2/components/AlertBlock.svelte';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
@@ -16,8 +17,6 @@
 	import { CategoriesService } from '$lib/services/categoriesService';
 	import { AccountsService } from '$lib/services/accountsService';
 	import { EncryptionService } from '$lib/services/encryptionService';
-
-	import AlertBlock from '$lib/components/AlertBlock.svelte';
 
 	export let data: PageData;
 

@@ -5,13 +5,12 @@
 
 	import { ValidationResult, ValidationUtil } from '../../../../../../shared2/utils/validationUtils';
 	import { ValidationErrors } from '../../../../../../shared2/models/validationErrors';
+	import Checkbox from '../../../../../../shared2/components/Checkbox.svelte';
 
 	import { t } from '$lib/localization/i18n';
 	import { alertState } from '$lib/stores';
 	import { TasksService } from '$lib/services/tasksService';
 	import { ListsService } from '$lib/services/listsService';
-
-	import Checkbox from '$lib/components/Checkbox.svelte';
 
 	export let data: PageData;
 

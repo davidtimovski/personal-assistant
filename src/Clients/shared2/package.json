@@ -9,6 +9,7 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@auth0/auth0-spa-js": "^1.22.5",
-    "@microsoft/signalr": "^6.0.9"
+    "@microsoft/signalr": "^6.0.9",
+    "autocompleter": "^6.1.3"
   }
 }

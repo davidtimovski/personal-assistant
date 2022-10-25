@@ -4,6 +4,8 @@
 	import type { PageData } from './$types';
 
 	import { ValidationResult, ValidationUtil } from '../../../../../../shared2/utils/validationUtils';
+	import AlertBlock from '../../../../../../shared2/components/AlertBlock.svelte';
+	import DoubleRadioBool from '../../../../../../shared2/components/DoubleRadioBool.svelte';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
@@ -11,9 +13,7 @@
 	import { DebtsService } from '$lib/services/debtsService';
 	import { DebtModel } from '$lib/models/entities/debt';
 
-	import AlertBlock from '$lib/components/AlertBlock.svelte';
 	import AmountInput from '$lib/components/AmountInput.svelte';
-	import DoubleRadio from '$lib/components/DoubleRadio.svelte';
 
 	export let data: PageData;
 
@@ -224,7 +224,7 @@
 			<div class="form-control with-descriptor">
 				<div class="setting-descriptor">{$t('editDebt.iAmThe')}</div>
 
-				<DoubleRadio
+				<DoubleRadioBool
 					name="debtorLenderToggle"
 					leftLabelKey="editDebt.lender"
 					rightLabelKey="editDebt.debtor"

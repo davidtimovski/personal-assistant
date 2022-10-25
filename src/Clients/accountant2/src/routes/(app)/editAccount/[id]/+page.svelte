@@ -4,6 +4,8 @@
 	import type { PageData } from './$types';
 
 	import { ValidationResult, ValidationUtil } from '../../../../../../shared2/utils/validationUtils';
+	import AlertBlock from '../../../../../../shared2/components/AlertBlock.svelte';
+	import Checkbox from '../../../../../../shared2/components/Checkbox.svelte';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
@@ -11,8 +13,6 @@
 	import { AccountsService } from '$lib/services/accountsService';
 	import { Account } from '$lib/models/entities/account';
 
-	import AlertBlock from '$lib/components/AlertBlock.svelte';
-	import Checkbox from '$lib/components/Checkbox.svelte';
 	import StockPriceInput from '$lib/components/StockPriceInput.svelte';
 
 	export let data: PageData;

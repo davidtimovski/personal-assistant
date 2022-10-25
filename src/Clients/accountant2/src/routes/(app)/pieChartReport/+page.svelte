@@ -4,6 +4,8 @@
 	import { ArcElement, Chart, PieController } from 'chart.js';
 
 	import { DateHelper } from '../../../../../shared2/utils/dateHelper';
+	import DoubleRadioBool from '../../../../../shared2/components/DoubleRadioBool.svelte';
+	import EmptyListMessage from '../../../../../shared2/components/EmptyListMessage.svelte';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
@@ -14,9 +16,6 @@
 	import { PieChartItem } from '$lib/models/viewmodels/pieChartItem';
 	import { SearchFilters } from '$lib/models/viewmodels/searchFilters';
 	import { TransactionType } from '$lib/models/viewmodels/transactionType';
-
-	import DoubleRadio from '$lib/components/DoubleRadio.svelte';
-	import EmptyListMessage from '$lib/components/EmptyListMessage.svelte';
 
 	let chartPrepared = false;
 	let isDeposits = false;
@@ -177,7 +176,7 @@
 				<input type="date" id="to-date" bind:value={toDate} on:change={loadData} max={maxDate} />
 			</div>
 			<div class="form-control">
-				<DoubleRadio
+				<DoubleRadioBool
 					name="expensesDepositsToggle"
 					leftLabelKey="pieChartReport.expenses"
 					rightLabelKey="pieChartReport.deposits"

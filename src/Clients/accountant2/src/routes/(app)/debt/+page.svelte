@@ -4,6 +4,7 @@
 	import { page } from '$app/stores';
 
 	import { DateHelper } from '../../../../../shared2/utils/dateHelper';
+	import EmptyListMessage from '../../../../../shared2/components/EmptyListMessage.svelte';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
@@ -12,8 +13,6 @@
 	import { DebtsService } from '$lib/services/debtsService';
 	import { DebtItem } from '$lib/models/viewmodels/debtItem';
 	import { AppEvents } from '$lib/models/appEvents';
-
-	import EmptyListMessage from '$lib/components/EmptyListMessage.svelte';
 
 	let debts: DebtItem[] | null = null;
 	let currency: string;
