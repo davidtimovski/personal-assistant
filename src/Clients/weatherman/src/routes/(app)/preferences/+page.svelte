@@ -3,10 +3,12 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
+	import { ForecastsService } from '$lib/services/forecastsService';
 
-	import DoubleRadio from '$lib/components/DoubleRadio.svelte';
+	import DoubleRadioString from '$lib/components/DoubleRadioString.svelte';
 
 	let localStorage: LocalStorageUtil;
+	let forecastsService: ForecastsService;
 
 	let temperatureUnit: string | null = null;
 	let precipitationUnit: string | null = null;
@@ -14,18 +16,22 @@
 
 	function temperatureUnitChanged() {
 		localStorage.set(LocalStorageKeys.TemperatureUnit, temperatureUnit);
+		forecastsService.get();
 	}
 
 	function precipitationUnitChanged() {
 		localStorage.set(LocalStorageKeys.PrecipitationUnit, precipitationUnit);
+		forecastsService.get();
 	}
 
 	function windSpeedUnitChanged() {
 		localStorage.set(LocalStorageKeys.WindSpeedUnit, windSpeedUnit);
+		forecastsService.get();
 	}
 
 	onMount(() => {
 		localStorage = new LocalStorageUtil();
+		forecastsService = new ForecastsService();
 
 		temperatureUnit = localStorage.get(LocalStorageKeys.TemperatureUnit);
 		precipitationUnit = localStorage.get(LocalStorageKeys.PrecipitationUnit);
@@ -48,7 +54,7 @@
 		<form>
 			<div class="form-control-group">
 				<div class="setting-descriptor">{$t('preferences.temperatureUnit')}</div>
-				<DoubleRadio
+				<DoubleRadioString
 					name="temperatureUnitToggle"
 					leftLabelKey="preferences.celsius"
 					rightLabelKey="preferences.fahrenheit"
@@ -61,7 +67,7 @@
 
 			<div class="form-control-group">
 				<div class="setting-descriptor">{$t('preferences.precipitationUnit')}</div>
-				<DoubleRadio
+				<DoubleRadioString
 					name="precipitationUnitToggle"
 					leftLabelKey="preferences.millimeters"
 					rightLabelKey="preferences.inches"
@@ -74,7 +80,7 @@
 
 			<div class="form-control-group">
 				<div class="setting-descriptor">{$t('preferences.windSpeedUnit')}</div>
-				<DoubleRadio
+				<DoubleRadioString
 					name="windSpeedUnitToggle"
 					leftLabelKey="preferences.kmh"
 					rightLabelKey="preferences.mph"

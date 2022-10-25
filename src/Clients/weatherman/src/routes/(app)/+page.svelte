@@ -6,12 +6,10 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
-	import { authInfo } from '$lib/stores';
+	import { isOffline, authInfo, forecast } from '$lib/stores';
+	import { ForecastsService } from '$lib/services/forecastsService';
 
 	let imageUri: any;
-	let connTracker = {
-		isOnline: true
-	};
 	const unsubscriptions: Unsubscriber[] = [];
 
 	// Progress bar
@@ -22,11 +20,12 @@
 
 	let localStorage: LocalStorageUtil;
 	let usersService: UsersServiceBase;
+	let forecastsService: ForecastsService;
 
 	function sync() {
 		startProgressBar();
 
-		//forecastsService.getAll();
+		forecastsService.get();
 
 		usersService.getProfileImageUri().then((uri) => {
 			if (imageUri !== uri) {
@@ -61,6 +60,9 @@
 	onMount(() => {
 		localStorage = new LocalStorageUtil();
 		usersService = new UsersServiceBase('Weatherman');
+		forecastsService = new ForecastsService();
+
+		imageUri = localStorage.get('profileImageUri');
 
 		unsubscriptions.push(
 			authInfo.subscribe((value) => {
@@ -72,27 +74,23 @@
 					usersService.getProfileImageUri().then((uri) => {
 						imageUri = uri;
 					});
-				} else {
-					imageUri = localStorage.get('profileImageUri');
 				}
 			})
 		);
 
-		// if ($lists.length === 0) {
-		// 	startProgressBar();
-		// }
+		if ($forecast === null) {
+			startProgressBar();
+		}
 
-		unsubscriptions
-			.push
-			// lists.subscribe((l) => {
-			// 	if (l.length === 0) {
-			// 		return;
-			// 	}
+		unsubscriptions.push(
+			forecast.subscribe((x) => {
+				if (!x) {
+					return;
+				}
 
-			// 	setListsFromState();
-			// 	finishProgressBar();
-			// })
-			();
+				finishProgressBar();
+			})
+		);
 	});
 
 	onDestroy(() => {
@@ -100,6 +98,7 @@
 			unsubscribe();
 		}
 		usersService?.release();
+		forecastsService?.release();
 	});
 </script>
 
@@ -107,7 +106,7 @@
 	<div class="page-title-wrap-loader">
 		<div class="title-wrap">
 			<a href="/menu" class="profile-image-container" title={$t('index.menu')} aria-label={$t('index.menu')}>
-				<img src={imageUri} class="profile-image" width="40" height="40" alt={$t('profilePicture')} />
+				<img src={imageUri} class="profile-image" width="40" height="40" alt="" />
 			</a>
 
 			<div class="page-title" />
@@ -115,7 +114,7 @@
 				type="button"
 				on:click={sync}
 				class="sync-button"
-				disabled={!connTracker.isOnline || progressBarActive}
+				disabled={$isOffline || progressBarActive}
 				title={$t('index.refresh')}
 				aria-label={$t('index.refresh')}
 			>
@@ -127,7 +126,16 @@
 		</div>
 	</div>
 
-	<div class="content-wrap" />
+	<div class="content-wrap">
+		<div>
+			<div>
+				{#if $forecast !== null}
+					<div>{$forecast.temperature}</div>
+				{/if}
+			</div>
+			<div />
+		</div>
+	</div>
 </section>
 
 <style lang="scss">

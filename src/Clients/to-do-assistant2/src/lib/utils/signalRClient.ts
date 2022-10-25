@@ -55,7 +55,7 @@ export class SignalRClient extends SignalRClientBase {
 		// 	if (userId !== currentUserId) {
 		// 		// TODO
 		// 		await Actions.reorderTask(id, listId, oldOrder, newOrder);
-		// 		this.eventAggregator.publish(AppEvents.TaskReorderedRemotely, { id: id, listId: listId });
+		// 		this.eventAggregator.publish(RemoteEventType.TaskReorderedRemotely, { id: id, listId: listId });
 		// 	}
 		// });
 

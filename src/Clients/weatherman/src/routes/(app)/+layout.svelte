@@ -9,24 +9,14 @@
 
 	import { Language } from '../../../../shared2/models/enums/language';
 	import { AuthService } from '../../../../shared2/services/authService';
+	import Alert from '../../../../shared2/components/Alert.svelte';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
-	import { locale, isOffline, authInfo } from '$lib/stores';
+	import { locale, isOffline } from '$lib/stores';
 	import { ForecastsService } from '$lib/services/forecastsService';
 
-	import Alert from '$lib/components/Alert.svelte';
-
 	let forecastsService: ForecastsService;
-
-	const authInfoUnsub = authInfo.subscribe(async (value) => {
-		if (!value) {
-			return;
-		}
-
-		forecastsService = new ForecastsService();
-		await forecastsService.get(50.07, 14.42, 'celsius', 'mm', 'kmh');
-	});
 
 	onMount(async () => {
 		const localStorage = new LocalStorageUtil();
@@ -47,6 +37,8 @@
 			return;
 		}
 
+		new ForecastsService().get();
+
 		isOffline.set(!navigator.onLine);
 		window.addEventListener('online', () => {
 			isOffline.set(false);
@@ -57,7 +49,6 @@
 	});
 
 	onDestroy(() => {
-		authInfoUnsub();
 		forecastsService?.release();
 	});
 </script>

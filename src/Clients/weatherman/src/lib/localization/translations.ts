@@ -5,11 +5,6 @@ export default {
 		unexpectedError: 'An unexpected error occurred',
 		refresh: 'Refresh',
 		failedToFetchError: 'Please check your internet connection.',
-		profilePicture: 'Profile picture',
-		save: 'Save',
-		delete: 'Delete',
-		sure: 'Sure?',
-		cancel: 'Cancel',
 		index: {
 			menu: 'Menu',
 			refresh: 'Refresh'
@@ -32,6 +27,10 @@ export default {
 			windSpeedUnit: 'Wind speed unit',
 			kmh: 'km/h',
 			mph: 'mph'
+		},
+		notFound: {
+			youSeemLost: 'You seem lost..',
+			takeMeHome: 'Take me home'
 		}
 	},
 	'mk-MK': {
@@ -40,11 +39,6 @@ export default {
 		unexpectedError: 'Се случи неочекувана грешка',
 		refresh: 'Освежи',
 		failedToFetchError: 'Вѐ молиме да ја проверите вашата интернет конекција.',
-		profilePicture: 'Профилна слика',
-		save: 'Зачувај',
-		sure: 'Сигурно?',
-		delete: 'Избриши',
-		cancel: 'Откажи',
 		index: {
 			menu: 'Мени',
 			refresh: 'Освежи'
@@ -67,6 +61,10 @@ export default {
 			windSpeedUnit: 'Единица за брзина на ветер',
 			kmh: 'км/ч',
 			mph: 'м/ч'
+		},
+		notFound: {
+			youSeemLost: 'Се изгубивте?',
+			takeMeHome: 'Врати ме дома'
 		}
 	}
 };
