@@ -2,6 +2,7 @@
 using Domain.Entities.Common;
 using Domain.Entities.CookingAssistant;
 using Domain.Entities.ToDoAssistant;
+using Domain.Entities.Weatherman;
 using Microsoft.EntityFrameworkCore;
 
 namespace Persistence;
@@ -32,6 +33,8 @@ public class PersonalAssistantContext : DbContext
     public DbSet<Debt> Debts { get; set; }
     public DbSet<AutomaticTransaction> AutomaticTransactions { get; set; }
     public DbSet<DeletedEntity> DeletedEntities { get; set; }
+
+    public DbSet<Forecast> Forecasts { get; set; }
 
     public DbSet<PushSubscription> PushSubscriptions { get; set; }
     public DbSet<TooltipDismissed> TooltipsDismissed { get; set; }
@@ -131,6 +134,12 @@ public class PersonalAssistantContext : DbContext
         { 
             x.ToTable("accountant_deleted_entities");
             x.HasKey(e => new { e.UserId, e.EntityType, e.EntityId });
+        });
+
+        modelBuilder.Entity<Forecast>(x =>
+        { 
+            x.ToTable("weatherman_forecasts");
+            x.Property(b => b.Data).HasColumnType("json");
         });
 
         modelBuilder.Entity<Tooltip>(x => { x.ToTable("tooltips"); });

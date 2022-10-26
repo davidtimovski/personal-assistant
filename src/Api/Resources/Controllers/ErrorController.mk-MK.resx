@@ -156,6 +156,15 @@
   <data name="DietaryProfiles.WeightIsRequired" xml:space="preserve">
     <value>Тежина во фунти или кила е задолжителна</value>
   </data>
+  <data name="Forecasts.InvalidPrecipitationUnit" xml:space="preserve">
+    <value>Невалидна единица за врнежи</value>
+  </data>
+  <data name="Forecasts.InvalidTemperatureUnit" xml:space="preserve">
+    <value>Невалидна единица за температура</value>
+  </data>
+  <data name="Forecasts.InvalidWindSpeedUnit" xml:space="preserve">
+    <value>Невалидна единица за брзина на ветер</value>
+  </data>
   <data name="Ingredients.UpdateIngredient.NameIsRequired" xml:space="preserve">
     <value>Името е задолжително</value>
   </data>

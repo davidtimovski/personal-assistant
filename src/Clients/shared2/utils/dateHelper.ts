@@ -1,17 +1,24 @@
 export class DateHelper {
-  /** Format as yyyy-MM-dd. */
+  /** Format as 2022-10-25. Adjusted for time zone. */
   static format(date: Date): string {
     return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
       .toISOString()
       .split("T")[0];
   }
 
-  /** Format as dd/MM/yyyy. */
+  /** Format as 2022-10-25T18:15:14.321Z. Adjusted for time zone.  */
+  static formatISO(date: Date): string {
+    return new Date(
+      date.getTime() - date.getTimezoneOffset() * 60000
+    ).toISOString();
+  }
+
+  /** Format as 25/10/2022. */
   static formatForReading(date: Date): string {
     return date.toLocaleDateString("en-GB");
   }
 
-  /** Format as yyyy-MM. */
+  /** Format as 2022-10. Adjusted for time zone. */
   static formatYYYYMM(date: Date): string {
     return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
       .toISOString()
@@ -34,7 +41,7 @@ export class DateHelper {
     });
   }
 
-  /** Format as HH:mm. */
+  /** Format as 18:15. Adjusted for time zone. */
   static formatHoursMinutes(date: Date): string {
     const timePart = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
       .toISOString()

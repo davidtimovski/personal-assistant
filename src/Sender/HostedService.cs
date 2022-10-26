@@ -76,7 +76,7 @@ public sealed class HostedService : IHostedService, IDisposable
         {
             var body = ea.Body;
             var message = Encoding.UTF8.GetString(body.ToArray());
-            var email = JsonConvert.DeserializeObject<Email>(message);
+            var email = System.Text.Json.JsonSerializer.Deserialize<Email>(message);
 
             var client = new SendGridClient(_configuration["SendGridApiKey"]);
             var from = new EmailAddress(_configuration["SystemEmail"], "Personal Assistant");
@@ -108,7 +108,7 @@ public sealed class HostedService : IHostedService, IDisposable
         {
             var body = ea.Body;
             string message = Encoding.UTF8.GetString(body.ToArray());
-            var pushNotification = JsonConvert.DeserializeObject<PushNotification>(message);
+            var pushNotification = System.Text.Json.JsonSerializer.Deserialize<PushNotification>(message);
 
             using var conn = new NpgsqlConnection(_configuration["ConnectionString"]);
             conn.Open();

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace Infrastructure.Identity;
 
@@ -35,7 +35,7 @@ public static class Auth0ManagementUtil
         var response = await httpClient.SendAsync(requestMessage);
         response.EnsureSuccessStatusCode();
 
-        var result = JsonConvert.DeserializeObject<TokenResult>(await response.Content.ReadAsStringAsync());
+        var result = JsonSerializer.Deserialize<TokenResult>(await response.Content.ReadAsStringAsync());
         AccessToken = result.access_token;
         Expires = DateTime.UtcNow.AddSeconds(result.expires_in);
     }
@@ -48,7 +48,7 @@ public static class Auth0ManagementUtil
         var response = await httpClient.SendAsync(requestMessage);
         response.EnsureSuccessStatusCode();
 
-        return JsonConvert.DeserializeObject<Auth0User>(await response.Content.ReadAsStringAsync());
+        return JsonSerializer.Deserialize<Auth0User>(await response.Content.ReadAsStringAsync());
     }
 
     public static async Task UpdateNameAsync(HttpClient httpClient, string auth0Id, string name)
@@ -56,7 +56,7 @@ public static class Auth0ManagementUtil
         using var requestMessage = new HttpRequestMessage(HttpMethod.Patch, new Uri($"https://{Domain}/api/v2/users/{auth0Id}"));
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
 
-        requestMessage.Content = new StringContent(JsonConvert.SerializeObject(new 
+        requestMessage.Content = new StringContent(JsonSerializer.Serialize(new 
         {
             name = name.Trim()
         }), Encoding.UTF8, "application/json");
@@ -70,7 +70,7 @@ public static class Auth0ManagementUtil
         using var requestMessage = new HttpRequestMessage(HttpMethod.Post, new Uri($"https://{Domain}/dbconnections/change_password"));
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
 
-        requestMessage.Content = new StringContent(JsonConvert.SerializeObject(new
+        requestMessage.Content = new StringContent(JsonSerializer.Serialize(new
         {
             client_id = clientId,
             email = email,
