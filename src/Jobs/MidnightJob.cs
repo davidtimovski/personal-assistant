@@ -8,6 +8,7 @@ using Dapper;
 using Domain.Entities.Accountant;
 using Domain.Entities.Common;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -20,6 +21,7 @@ public class MidnightJob
     private readonly ILogger<MidnightJob> _logger;
     private readonly ICdnService _cdnService;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IHostEnvironment _hostEnvironment;
     private readonly string _connectionString;
     private readonly string _currencyRatesApiKey;
 
@@ -27,11 +29,13 @@ public class MidnightJob
         ILogger<MidnightJob> logger,
         ICdnService cdnService,
         IHttpClientFactory httpClientFactory,
+        IHostEnvironment hostEnvironment,
         IConfiguration configuration)
     {
         _logger = logger;
         _cdnService = cdnService;
         _httpClientFactory = httpClientFactory;
+        _hostEnvironment = hostEnvironment;
 
         _connectionString = configuration["ConnectionString"];
         _currencyRatesApiKey = configuration["FixerApiAccessKey"];
@@ -39,7 +43,6 @@ public class MidnightJob
 
     public async Task RunAsync()
     {
-        bool isProd = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") == "Production";
         var now = DateTime.UtcNow;
 
         using var conn = new NpgsqlConnection(_connectionString);
@@ -50,7 +53,7 @@ public class MidnightJob
         await GenerateTransactions(conn, now);
         await GenerateUpcomingExpenses(conn, now);
 
-        if (isProd)
+        if (_hostEnvironment.IsProduction())
         {
             await GetAndSaveCurrencyRates(conn, now);
             await DeleteTemporaryCdnResourcesAsync(now);

@@ -12,12 +12,14 @@ using Application.Contracts.CookingAssistant.Recipes;
 using Application.Contracts.ToDoAssistant.Lists;
 using Application.Contracts.ToDoAssistant.Notifications;
 using Application.Contracts.ToDoAssistant.Tasks;
+using Application.Contracts.Weatherman.Forecasts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Repositories.Accountant;
 using Persistence.Repositories.Common;
 using Persistence.Repositories.CookingAssistant;
 using Persistence.Repositories.ToDoAssistant;
+using Persistence.Repositories.Weatherman;
 
 namespace Persistence;
 
@@ -43,6 +45,7 @@ public static class IoC
         services.AddTransient<IDebtsRepository, DebtsRepository>();
         services.AddTransient<IAutomaticTransactionsRepository, AutomaticTransactionsRepository>();
         services.AddTransient<ISyncRepository, SyncRepository>();
+        services.AddTransient<IForecastsRepository, ForecastsRepository>();
 
         services.AddDbContext<PersonalAssistantContext>(options =>
         {

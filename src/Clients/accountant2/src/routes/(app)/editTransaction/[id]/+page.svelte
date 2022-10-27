@@ -63,6 +63,8 @@
 	let encryptPasswordInput: HTMLInputElement | null = null;
 	let decryptPasswordInput: HTMLInputElement | null = null;
 	let passwordShowIconLabel: string;
+	let stockPurchase = false;
+	let stockSelling = false;
 
 	let transactionsService: TransactionsService;
 	let accountsService: AccountsService;
@@ -353,6 +355,8 @@
 		isEncrypted = transaction.isEncrypted;
 		createdDate = transaction.createdDate;
 		synced = transaction.synced;
+		stockPurchase = !!transaction.toStocks;
+		stockSelling = !!transaction.fromStocks;
 
 		if (currency === 'MKD') {
 			amountFrom = 1;
@@ -403,7 +407,7 @@
 
 				{#if type === TransactionType.Expense || type === TransactionType.Transfer}
 					<div class="form-control inline">
-						{#if fromStocks || toStocks}
+						{#if stockPurchase || stockSelling}
 							<span>{$t('fromAccount')}</span>
 							<span>{fromAccountName}</span>
 						{:else}
@@ -424,7 +428,7 @@
 
 				{#if type === TransactionType.Deposit || type === TransactionType.Transfer}
 					<div class="form-control inline">
-						{#if fromStocks || toStocks}
+						{#if stockPurchase || stockSelling}
 							<span>{$t('toAccount')}</span>
 							<span>{toAccountName}</span>
 						{:else}
@@ -443,7 +447,7 @@
 					</div>
 				{/if}
 
-				{#if fromStocks !== null}
+				{#if stockSelling}
 					<div class="form-control inline">
 						<label for="sold-stocks">{$t('soldStocks')}</label>
 						<input
@@ -459,7 +463,7 @@
 					</div>
 				{/if}
 
-				{#if toStocks !== null}
+				{#if stockPurchase}
 					<div class="form-control inline">
 						<label for="purchased-stocks">{$t('purchasedStocks')}</label>
 						<input

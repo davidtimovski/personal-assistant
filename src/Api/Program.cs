@@ -85,6 +85,7 @@ builder.Services.AddCors(options =>
     var toDoAssistantUrl = builder.Configuration["Urls:ToDoAssistant"];
     var cookingAssistantUrl = builder.Configuration["Urls:CookingAssistant"];
     var accountantUrl = builder.Configuration["Urls:Accountant"];
+    var weathermanUrl = builder.Configuration["Urls:Weatherman"];
 
     options.AddPolicy("AllowToDoAssistant", builder =>
     {
@@ -111,9 +112,17 @@ builder.Services.AddCors(options =>
                .SetPreflightMaxAge(TimeSpan.FromDays(20));
     });
 
+    options.AddPolicy("AllowWeatherman", builder =>
+    {
+        builder.WithOrigins(weathermanUrl)
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .SetPreflightMaxAge(TimeSpan.FromDays(20));
+    });
+
     options.AddPolicy("AllowAllApps", builder =>
     {
-        builder.WithOrigins(toDoAssistantUrl, cookingAssistantUrl, accountantUrl)
+        builder.WithOrigins(toDoAssistantUrl, cookingAssistantUrl, accountantUrl, weathermanUrl)
                .AllowAnyMethod()
                .AllowAnyHeader()
                .SetPreflightMaxAge(TimeSpan.FromDays(20));
@@ -131,7 +140,14 @@ builder.Services.AddMvc(options =>
 })
     .AddNewtonsoftJson();
 
-builder.Services.AddHttpClient();
+builder.Services.AddHttpClient("open-meteo", c =>
+{
+    c.BaseAddress = new Uri("https://api.open-meteo.com/v1/");
+});
+builder.Services.AddHttpClient("client-logger", c =>
+{
+    c.BaseAddress = new Uri("http://clientlogger/");
+});
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
 builder.Services.Configure<Urls>(builder.Configuration.GetSection("Urls"));

@@ -117,13 +117,15 @@ app.UseRequestLocalization(new RequestLocalizationOptions
 var toDoAssistantUrl = builder.Configuration["Urls:ToDoAssistant"];
 var cookingAssistantUrl = builder.Configuration["Urls:CookingAssistant"];
 var accountantUrl = builder.Configuration["Urls:Accountant"];
+var weathermanUrl = builder.Configuration["Urls:Weatherman"];
 
 app.UseCors(builder =>
 {
     builder.WithOrigins(
         toDoAssistantUrl,
         cookingAssistantUrl,
-        accountantUrl
+        accountantUrl,
+        weathermanUrl
     );
     builder.WithMethods("GET");
     builder.WithHeaders("Authorization");

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Account.Models;
 using Account.ViewModels.Account;
@@ -24,7 +25,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace Account.Controllers;
 
@@ -222,7 +222,7 @@ public class AccountController : BaseController
 
         using HttpClient httpClient = _httpClientFactory.CreateClient();
         var result = await httpClient.PostAsync(new Uri(_configuration["ReCaptchaVerificationUrl"]), content);
-        var response = JsonConvert.DeserializeObject<ReCaptchaResponse>(await result.Content.ReadAsStringAsync());
+        var response = JsonSerializer.Deserialize<ReCaptchaResponse>(await result.Content.ReadAsStringAsync());
 
         return Ok(response.Score);
     }

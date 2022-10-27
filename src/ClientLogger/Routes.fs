@@ -9,26 +9,20 @@ open Models
 
 let private getConnectionString (ctx: HttpContext) =
     let config = ctx.GetService<IConfiguration>()
-    config.["ConnectionString"]
+    config["ConnectionString"]
 
 let createLog: HttpHandler =
     fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
-            match ctx.TryGetRequestHeader "UserId" with
-            | None ->
-                ctx.SetStatusCode StatusCodes.Status401Unauthorized
-                return! next ctx
-            | Some userIdHeader ->
-                let! model = ctx.BindJsonAsync<CreateError>()
-                let userId = (userIdHeader |> int)
+            let! model = ctx.BindJsonAsync<CreateError>()
 
-                let connectionString = getConnectionString ctx
+            let connectionString = getConnectionString ctx
 
-                Repository.createError model userId connectionString |> ignore
+            Repository.createError model connectionString |> ignore
 
-                ctx.SetStatusCode StatusCodes.Status201Created
+            ctx.SetStatusCode StatusCodes.Status201Created
 
-                return! next ctx
+            return! next ctx
         }
 
 let webApp: HttpHandler =

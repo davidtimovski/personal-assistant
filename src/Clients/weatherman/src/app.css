@@ -1,0 +1,9 @@
+@import '../../shared2/styles/core.css';
+
+:root {
+	--regular-color: #30507d;
+	--primary-color: var(--to-do-assistant-color);
+	--primary-color-dark: #097cdc;
+	--primary-color-light: #eeeeff;
+	--faded-color: #98b0c5;
+}
