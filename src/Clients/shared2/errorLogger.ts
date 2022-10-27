@@ -1,42 +1,47 @@
-import { json } from "@aurelia/fetch-client";
-
-import { HttpProxy } from "../utils/httpProxy";
+import { HttpProxy, HttpProxyError } from "../services/httpProxy";
 import { DateHelper } from "../utils/dateHelper";
-import { HttpError } from "../models/enums/httpError";
 import { ValidationErrors } from "../models/validationErrors";
+import Variables from "$lib/variables";
 
 export class ErrorLogger {
-  constructor(
-    private readonly httpProxy: HttpProxy,
-    private readonly gatewayUrl: string,
-    private readonly application: string
-  ) {}
+    private readonly httpProxy = new HttpProxy();
 
-  async logError(error: any): Promise<void> {
-    if (!navigator.onLine || error === HttpError.Unauthorized || error instanceof ValidationErrors) {
-      return;
+    constructor(private readonly application: string) { }
+
+    async logError(error: any): Promise<void> {
+        if (
+            !navigator.onLine ||
+            error instanceof HttpProxyError ||
+            error instanceof ValidationErrors
+        ) {
+            return;
+        }
+
+        let message = "";
+        let stackTrace: string | undefined;
+        if (error instanceof Error) {
+            message = error.message;
+            stackTrace = error.stack;
+        } else if (typeof error === "string") {
+            message = error;
+        } else {
+            message = error.toString();
+        }
+
+        await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/gateway`, {
+            method: "post",
+            body: window.JSON.stringify({
+                service: "client-logger",
+                url: "logs",
+                application: this.application,
+                message: message,
+                stackTrace: stackTrace,
+                occurred: DateHelper.adjustForTimeZone(new Date()),
+            }),
+        });
     }
 
-    let message = "",
-      stackTrace = null;
-
-    if (error instanceof Error) {
-      message = error.message;
-      stackTrace = error.stack;
-    } else if (typeof error === "string") {
-      message = error;
-    } else {
-      message = error.toString();
+    release() {
+        this.httpProxy.release();
     }
-
-    await this.httpProxy.ajaxExecute(`${this.gatewayUrl}/clientlogger/logs`, {
-      method: "post",
-      body: json({
-        application: this.application,
-        message: message,
-        stackTrace: stackTrace,
-        occurred: DateHelper.adjustForTimeZone(new Date()),
-      }),
-    });
-  }
 }

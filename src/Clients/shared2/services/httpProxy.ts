@@ -2,8 +2,14 @@ import type { Unsubscriber } from "svelte/store";
 
 import { AuthService } from "./authService";
 import { ValidationErrors } from "../models/validationErrors";
-import { HttpError } from "../models/enums/httpError";
 import { alertState, authInfo } from "$lib/stores";
+
+export class HttpProxyError extends Error {
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, HttpProxyError.prototype);
+  }
+}
 
 export class HttpProxy {
   private readonly authService: AuthService;
@@ -34,7 +40,7 @@ export class HttpProxy {
         x.showError("unexpectedError");
         return x;
       });
-      throw e;
+      throw new HttpProxyError(e.message);
     }
 
     if (!this.successCodes.includes(response.status)) {
@@ -46,7 +52,9 @@ export class HttpProxy {
         x.showError("unexpectedError");
         return x;
       });
-      throw new Error(`GET request to '${uri}' returned 204 No Content`);
+      throw new HttpProxyError(
+        `GET request to '${uri}' returned 204 No Content`
+      );
     }
 
     return <T>await response.json();
@@ -64,7 +72,7 @@ export class HttpProxy {
         x.showError("unexpectedError");
         return x;
       });
-      throw e;
+      throw new HttpProxyError(e.message);
     }
 
     if (!this.successCodes.includes(response.status)) {
@@ -85,7 +93,7 @@ export class HttpProxy {
         x.showError("unexpectedError");
         return x;
       });
-      throw e;
+      throw new HttpProxyError(e.message);
     }
     if (!this.successCodes.includes(response.status)) {
       await this.handleErrorCodes(response);
@@ -132,13 +140,12 @@ export class HttpProxy {
 
   private async handleErrorCodes(response: Response): Promise<void> {
     if (response.status === 401) {
-      debugger;
       if (!this.authService.initialized) {
         await this.authService.initialize();
       }
 
       //await this.authService.signinRedirect();
-      throw HttpError.Unauthorized;
+      throw new HttpProxyError("unauthorized");
     } else if (response.status === 404) {
       throw new Error("404 Not Found returned");
     } else if (response.status === 422) {
@@ -151,15 +158,15 @@ export class HttpProxy {
           x.showError("unexpectedError");
           return x;
         });
-        throw e;
+        throw new HttpProxyError(e.message);
       }
 
-      if (errors.message === "Failed to fetch") {
+      if (errors.message === "failedToFetch") {
         alertState.update((x) => {
           x.showError("failedToFetchError");
           return x;
         });
-        throw HttpError.FailedToFetch;
+        throw new HttpProxyError("failedToFetch");
       }
 
       const errorFields = new Array<string>();
@@ -179,6 +186,8 @@ export class HttpProxy {
       return x;
     });
 
-    throw new Error(`Error status code ${response.status} not handled`);
+    throw new HttpProxyError(
+      `Error status code ${response.status} not handled`
+    );
   }
 }
