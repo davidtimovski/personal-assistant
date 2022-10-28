@@ -120,6 +120,9 @@
   <data name="About" xml:space="preserve">
     <value>About</value>
   </data>
+  <data name="Beta" xml:space="preserve">
+    <value>- beta -</value>
+  </data>
   <data name="DeleteAccount" xml:space="preserve">
     <value>Delete account</value>
   </data>

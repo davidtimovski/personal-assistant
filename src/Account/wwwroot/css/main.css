@@ -1,8 +1,10 @@
 ﻿:root {
     --main-color: #3598dc;
     --main-color-dark: #0568ac;
+    --to-do-assistant-main-color: #5aacf1;
     --cooking-assistant-main-color: #49e09b;
     --accountant-main-color: #6a68f3;
+    --weatherman-main-color: #ff9401;
     --danger-color: #e73d4a;
     --border-radius: 4px;
     --border-radius-heavy: 8px;
@@ -38,6 +40,12 @@ body {
 }
 .accountant-bg {
     background: url('/images/accountant.svg') no-repeat;
+    background-size: 100%;
+    background-position: center;
+    animation: none;
+}
+.weatherman-bg {
+    background: url('/images/weatherman.svg') no-repeat;
     background-size: 100%;
     background-position: center;
     animation: none;
@@ -190,6 +198,10 @@ main {
         color: #cface7;
     }
 
+    .cell-wrap .weatherman {
+        color: #ffc97e;
+    }
+
     .cell-wrap .to-do-assistant:hover {
         background: url('/images/to-do-assistant.svg') no-repeat;
         background-size: 100%;
@@ -204,6 +216,12 @@ main {
 
     .cell-wrap .accountant:hover {
         background: url('/images/accountant.svg') no-repeat;
+        background-size: 100%;
+        background-position: center;
+    }
+
+    .cell-wrap .weatherman:hover {
+        background: url('/images/weatherman.svg') no-repeat;
         background-size: 100%;
         background-position: center;
     }
@@ -317,11 +335,17 @@ a {
     a:hover {
         color: var(--main-color-dark);
     }
+.to-do-assistant a {
+    color: var(--to-do-assistant-main-color);
+}
 .cooking-assistant a {
     color: var(--cooking-assistant-main-color);
 }
 .accountant a {
     color: var(--accountant-main-color);
+}
+.weatherman a {
+    color: var(--weatherman-main-color);
 }
 
 .alert {
@@ -596,8 +620,8 @@ select {
 
         .overview-apps .app.to-do-assistant {
             background: #e8f3fa;
-            border-bottom: 2px solid var(--main-color);
-            color: var(--main-color);
+            border-bottom: 2px solid var(--to-do-assistant-main-color);
+            color: var(--to-do-assistant-main-color);
         }
 
         .overview-apps .app.cooking-assistant {
@@ -610,6 +634,12 @@ select {
             background: #eeecff;
             border-bottom: 2px solid var(--accountant-main-color);
             color: var(--accountant-main-color);
+        }
+
+        .overview-apps .app.weatherman {
+            background: #faf3dd;
+            border-bottom: 2px solid var(--weatherman-main-color);
+            color: var(--weatherman-main-color);
         }
 
 

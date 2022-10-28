@@ -118,34 +118,14 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Back" xml:space="preserve">
-    <value>Back</value>
+    <value>Назад</value>
   </data>
   <data name="FeaturesText" xml:space="preserve">
-    <value>&lt;h3&gt;Create and manage to-dos in a simple and intuitive way.&lt;/h3&gt;
+    <value>&lt;h3&gt;Биди свесен за времето.&lt;/h3&gt;
 &lt;br&gt;
 &lt;br&gt;
-&lt;ul class="blue"&gt;
-&lt;li&gt;
-Create lists and tasks
-&lt;ul class="blue"&gt;
-&lt;li&gt;Delete tasks upon completion&lt;/li&gt;
-&lt;li&gt;Flag tasks as high priority&lt;/li&gt;
-&lt;li&gt;Search tasks within list&lt;/li&gt;
-&lt;li&gt;Get hints for duplicate and similar tasks&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;
-Share lists with other users
-&lt;ul class="blue"&gt;
-&lt;li&gt;Get notifications in shared lists&lt;/li&gt;
-&lt;li&gt;Set permissions of shared list members&lt;/li&gt;
-&lt;li&gt;Create private tasks in shared lists&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;Reorder lists and tasks&lt;/li&gt;
-&lt;li&gt;Copy lists&lt;/li&gt;
-&lt;li&gt;Archive unused lists&lt;/li&gt;
-&lt;li&gt;Easily create multiple tasks from text&lt;/li&gt;
+&lt;ul class="green"&gt;
+&lt;li&gt;Добиј информации за времето&lt;/li&gt;
 &lt;/ul&gt;</value>
   </data>
 </root>

@@ -2,8 +2,8 @@
 
 :root {
 	--regular-color: #30507d;
-	--primary-color: var(--to-do-assistant-color);
-	--primary-color-dark: #097cdc;
+	--primary-color: var(--weatherman-color);
+	--primary-color-dark: #dd7200;
 	--primary-color-light: #eeeeff;
 	--faded-color: #98b0c5;
 }
