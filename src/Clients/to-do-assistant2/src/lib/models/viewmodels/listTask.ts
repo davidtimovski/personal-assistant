@@ -1,5 +1,5 @@
 import type { Task } from '$lib/models/entities';
-import type { AssignedUser } from '$lib/models/viewmodels/assignedUser';
+import type { Assignee } from '$lib/models/viewmodels/assignee';
 
 export class ListTask {
 	constructor(
@@ -10,7 +10,7 @@ export class ListTask {
 		public isOneTime: boolean,
 		public isHighPriority: boolean,
 		public isPrivate: boolean,
-		public assignedUser: AssignedUser,
+		public assignedUser: Assignee,
 		public order: number,
 		public modifiedDate: string
 	) {}

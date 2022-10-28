@@ -1,5 +1,5 @@
 import type { SharingState } from '$lib/models/viewmodels/sharingState';
-import type { AssignedUser } from '$lib/models/viewmodels/assignedUser';
+import type { Assignee } from '$lib/models/viewmodels/assignee';
 
 export class List {
 	constructor(
@@ -26,8 +26,20 @@ export class Task {
 		public isOneTime: boolean,
 		public isHighPriority: boolean,
 		public isPrivate: boolean,
-		public assignedUser: AssignedUser,
+		public assignedUser: Assignee,
 		public order: number,
 		public modifiedDate: string
+	) {}
+}
+
+export class Share {
+	constructor(
+		public userId: number,
+		public email: string,
+		public name: string,
+		public imageUri: string,
+		public isAdmin: boolean,
+		public isAccepted: boolean,
+		public createdDate: string | null
 	) {}
 }

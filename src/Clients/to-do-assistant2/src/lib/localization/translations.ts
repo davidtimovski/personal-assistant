@@ -5,7 +5,7 @@ export default {
 		unexpectedError: 'An unexpected error occurred',
 		refresh: 'Refresh',
 		failedToFetchError: 'Please check your internet connection.',
-		profilePicture: 'Profile picture',
+		profilePicture: 'Profile picture of {{name}}',
 		name: 'Name',
 		listName: 'List name',
 		email: 'Email',
@@ -148,8 +148,7 @@ export default {
 			by: 'by',
 			decline: 'Decline',
 			accept: 'Accept',
-			unblock: 'Unblock',
-			blockedUsers: 'Blocked users',
+			declinedRequests: 'Declined requests',
 			emptyListMessage: 'There are no new share requests'
 		},
 		archivedLists: {
@@ -208,7 +207,7 @@ export default {
 				title: 'Share requests',
 				question: 'What is this?',
 				answer:
-					'Someone wants to share a list with you. Shared lists are a way for multiple users to collaborate. If you decline a share request the user that made it will not be able to further share any more with you.'
+					'Someone wants to share a list with you. Shared lists are a way for multiple users to collaborate. If you decline a share request, the user that made it will not be able to share any more with you.'
 			},
 			privateTasks: {
 				title: 'Private tasks',
@@ -224,7 +223,7 @@ export default {
 		unexpectedError: 'Се случи неочекувана грешка',
 		refresh: 'Освежи',
 		failedToFetchError: 'Вѐ молиме да ја проверите вашата интернет конекција.',
-		profilePicture: 'Профилна слика',
+		profilePicture: 'Профилна слика на {{name}}',
 		name: 'Име',
 		listName: 'Име на листата',
 		email: 'Емаил',
@@ -369,8 +368,7 @@ export default {
 			by: 'од',
 			decline: 'Одбиј',
 			accept: 'Прифати',
-			unblock: 'Одблокирај',
-			blockedUsers: 'Блокирани корисници',
+			declinedRequests: 'Одбиени споделувања',
 			emptyListMessage: 'Немате нови споделени листи'
 		},
 		archivedLists: {
@@ -429,7 +427,7 @@ export default {
 				title: 'Споделени листи',
 				question: 'Што е ова?',
 				answer:
-					'Некој сака да сподели листа со вас. Споделените листи се начин за повеќе корисници да соработуваат. Доколку одбиете барање за споделување корисникот кој го направил тоа барање ќе неможе да споделува листи со вас.'
+					'Некој сака да сподели листа со вас. Споделените листи се начин за повеќе корисници да соработуваат. Доколку одбиете барање за споделување, корисникот кој го направил тоа барање ќе неможе да споделува листи со вас.'
 			},
 			privateTasks: {
 				title: 'Приватни задачи',

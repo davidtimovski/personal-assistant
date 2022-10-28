@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Application.Contracts.Common;
 using Application.Contracts.Common.Models;
+using Application.Contracts.ToDoAssistant;
 using Application.Contracts.ToDoAssistant.Lists;
 using Application.Contracts.ToDoAssistant.Lists.Models;
 using Application.Contracts.ToDoAssistant.Notifications;
@@ -78,7 +79,7 @@ public class ListService : IListService
         }
     }
 
-    public IEnumerable<AssigneeOption> GetMembersAsAssigneeOptions(int id, int userId)
+    public IEnumerable<Assignee> GetMembersAsAssigneeOptions(int id, int userId)
     {
         try
         {
@@ -89,7 +90,7 @@ public class ListService : IListService
 
             IEnumerable<User> members = _listsRepository.GetMembersAsAssigneeOptions(id);
 
-            var result = members.Select(x => _mapper.Map<AssigneeOption>(x));
+            var result = members.Select(x => _mapper.Map<Assignee>(x));
 
             return result;
         }

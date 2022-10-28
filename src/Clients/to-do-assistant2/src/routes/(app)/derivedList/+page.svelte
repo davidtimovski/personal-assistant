@@ -241,7 +241,12 @@
 				{#each tasks as task}
 					<div class="to-do-task">
 						{#if task.assignedUser}
-							<img src={task.assignedUser.imageUri} class="to-do-task-assignee-image" alt={$t('profilePicture')} />
+							<img
+								src={task.assignedUser.imageUri}
+								class="to-do-task-assignee-image"
+								title={task.assignedUser.name}
+								alt={$t('profilePicture', { name: task.assignedUser.name })}
+							/>
 						{/if}
 
 						<div class="to-do-task-content" class:highlighted={task.id === editedId} class:assigned={task.assignedUser}>

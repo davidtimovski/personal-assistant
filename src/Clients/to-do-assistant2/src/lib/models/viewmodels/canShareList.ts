@@ -1,5 +1,3 @@
 export class CanShareList {
-  userId: number;
-  imageUri: string;
-  canShare: boolean;
+	constructor(public userId: number, public imageUri: string, public canShare: boolean) {}
 }

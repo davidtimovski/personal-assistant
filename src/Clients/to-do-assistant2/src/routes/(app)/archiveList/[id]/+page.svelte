@@ -14,7 +14,7 @@
 	let name = '';
 	let archivingAListText = '';
 	let archiveButtonIsLoading = false;
-	let listsUnsub: Unsubscriber;
+	const unsubscriptions: Unsubscriber[] = [];
 
 	let listsService: ListsService;
 
@@ -37,25 +37,31 @@
 	onMount(async () => {
 		listsService = new ListsService();
 
-		listsUnsub = lists.subscribe((l) => {
-			if (l.length === 0) {
-				return;
-			}
+		unsubscriptions.push(
+			lists.subscribe((l) => {
+				if (l.length === 0) {
+					return;
+				}
 
-			const list = l.find((x) => x.id === data.id);
-			if (!list) {
-				throw new Error('List not found');
-			}
+				const list = l.find((x) => x.id === data.id);
+				if (!list) {
+					throw new Error('List not found');
+				}
 
-			name = <string>list.name;
-			archivingAListText = $t(
-				list.sharingState === SharingState.NotShared ? 'archiveList.archivingAList' : 'archiveList.archivingAListShared'
-			);
-		});
+				name = <string>list.name;
+				archivingAListText = $t(
+					list.sharingState === SharingState.NotShared
+						? 'archiveList.archivingAList'
+						: 'archiveList.archivingAListShared'
+				);
+			})
+		);
 	});
 
 	onDestroy(() => {
-		listsUnsub();
+		for (const unsubscribe of unsubscriptions) {
+			unsubscribe();
+		}
 		listsService?.release();
 	});
 </script>

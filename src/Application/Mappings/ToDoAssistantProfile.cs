@@ -1,10 +1,10 @@
 ﻿using System.Linq;
-using AutoMapper;
 using Application.Contracts.Common;
 using Application.Contracts.Common.Models;
 using Application.Contracts.ToDoAssistant.Lists.Models;
 using Application.Contracts.ToDoAssistant.Notifications.Models;
 using Application.Contracts.ToDoAssistant.Tasks.Models;
+using AutoMapper;
 using Domain.Entities.Common;
 using Domain.Entities.ToDoAssistant;
 
@@ -200,23 +200,6 @@ public class PrivateToUserIdUpdateResolver : IValueResolver<UpdateTask, ToDoTask
     public int? Resolve(UpdateTask source, ToDoTask dest, int? destMember, ResolutionContext context)
     {
         return source.IsPrivate.HasValue && source.IsPrivate.Value ? (int?)source.UserId : null;
-    }
-}
-
-public class TaskAssignedUserResolver : IValueResolver<ToDoTask, object, AssignedUser>
-{
-    public AssignedUser Resolve(ToDoTask source, object dest, AssignedUser destMember, ResolutionContext context)
-    {
-        if (source.AssignedToUser != null)
-        {
-            return new AssignedUser
-            {
-                Id = source.AssignedToUser.Id,
-                ImageUri = source.AssignedToUser.ImageUri
-            };
-        }
-
-        return null;
     }
 }
 

@@ -13,7 +13,7 @@
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 	import { TasksService } from '$lib/services/tasksService';
 	import { ListsService } from '$lib/services/listsService';
-	import type { AssigneeOption } from '$lib/models/viewmodels/assigneeOption';
+	import type { Assignee } from '$lib/models/viewmodels/assignee';
 	import type { ListOption } from '$lib/models/viewmodels/listOption';
 	import type { EditTaskModel } from '$lib/models/viewmodels/editTaskModel';
 	import Variables from '$lib/variables';
@@ -29,7 +29,7 @@
 	let isInSharedList = false;
 	let recipes: Array<string>;
 	let listOptions: ListOption[] | null = null;
-	let assigneeOptions: AssigneeOption[] | null = null;
+	let assigneeOptions: Assignee[] | null = null;
 	let nobodyImageUri = Variables.urls.defaultProfileImageUrl;
 	let nameIsInvalid = false;
 	let recipesText: string;
@@ -252,7 +252,7 @@
 						<div class="assign-to-user-header">{assignToUserLabel()}</div>
 						<div class="assign-to-user-content">
 							<label class="radio" class:selected={!assignedToUserId}>
-								<img src={nobodyImageUri} class="assign-to-user-image" alt={$t('profilePicture')} />
+								<img src={nobodyImageUri} class="assign-to-user-image" alt="" />
 								<div class="assign-to-user-item">
 									<span>{$t('editTask.nobody')}</span>
 									<input type="radio" name="assign" bind:group={assignedToUserId} value={null} />
@@ -261,7 +261,12 @@
 
 							{#each assigneeOptions as assigneeOption}
 								<label class="radio" class:selected={assignedToUserId === assigneeOption.id}>
-									<img src={assigneeOption.imageUri} class="assign-to-user-image" alt={$t('profilePicture')} />
+									<img
+										src={assigneeOption.imageUri}
+										class="assign-to-user-image"
+										title={assigneeOption.name}
+										alt={$t('profilePicture', { name: assigneeOption.name })}
+									/>
 									<div class="assign-to-user-item">
 										<span>{assigneeOption.name} <i class="fas fa-check" /></span>
 										<input type="radio" name="assign" bind:group={assignedToUserId} value={assigneeOption.id} />

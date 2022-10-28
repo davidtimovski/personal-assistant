@@ -1,12 +1,15 @@
-import { SharingState } from "./sharingState";
-import { Share } from "./share";
+import type { SharingState } from '$lib/models/viewmodels/sharingState';
+import type { Share } from '$lib/models/entities';
 
 export class ListWithShares {
-  id: number;
-  name: string;
-  sharingState: SharingState;
-  ownerEmail: string;
-  ownerImageUri: string;
-  userShare: Share;
-  shares: Array<Share>;
+	constructor(
+		public id: number,
+		public name: string,
+		public sharingState: SharingState,
+		public ownerEmail: string,
+		public ownerName: string,
+		public ownerImageUri: string,
+		public userShare: Share,
+		public shares: Array<Share>
+	) {}
 }
