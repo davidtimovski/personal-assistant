@@ -684,7 +684,12 @@
 							</span> -->
 
 							{#if task.assignedUser}
-								<img src={task.assignedUser.imageUri} class="to-do-task-assignee-image" alt={$t('profilePicture')} />
+								<img
+									src={task.assignedUser.imageUri}
+									class="to-do-task-assignee-image"
+									title={task.assignedUser.name}
+									alt={$t('profilePicture', { name: task.assignedUser.name })}
+								/>
 							{/if}
 
 							<span class="name">{task.name}</span>
@@ -787,7 +792,8 @@
 											<img
 												src={task.assignedUser.imageUri}
 												class="to-do-task-assignee-image"
-												alt={$t('profilePicture')}
+												title={task.assignedUser.name}
+												alt={$t('profilePicture', { name: task.assignedUser.name })}
 											/>
 										{/if}
 
@@ -1079,7 +1085,7 @@
 	// }
 
 	.edit-button {
-		min-width: 45px;
+		min-width: 60px;
 		font-size: 23px;
 		line-height: 45px;
 		text-decoration: none;

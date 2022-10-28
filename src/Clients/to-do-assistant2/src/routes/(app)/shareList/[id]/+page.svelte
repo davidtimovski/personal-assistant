@@ -11,7 +11,8 @@
 	import { t } from '$lib/localization/i18n';
 	import { alertState, authInfo } from '$lib/stores';
 	import { ListsService } from '$lib/services/listsService';
-	import { Share, ShareUserAndPermission } from '$lib/models/viewmodels/share';
+	import { Share } from '$lib/models/entities';
+	import { ShareUserAndPermission } from '$lib/models/viewmodels/shareUserAndPermission';
 	import { SharingState } from '$lib/models/viewmodels/sharingState';
 	import type { CanShareList } from '$lib/models/viewmodels/canShareList';
 
@@ -20,6 +21,7 @@
 	let name = '';
 	let sharingState: SharingState;
 	let ownerEmail = '';
+	let ownerName = '';
 	let ownerImageUri = '';
 	let userShare: Share;
 	let shares: Array<Share>;
@@ -38,6 +40,7 @@
 	// Selected share
 	let selectedShareUserId = 0;
 	let selectedShareEmail = '';
+	let selectedShareName = '';
 	let selectedShareImageUri = '';
 	let selectedShareIsAdmin = false;
 
@@ -66,6 +69,7 @@
 	function resetSelectedShare() {
 		selectedShareUserId = 0;
 		selectedShareEmail = '';
+		selectedShareName = '';
 		selectedShareImageUri = '';
 		selectedShareIsAdmin = false;
 		membersLabel = $t('shareList.members');
@@ -131,6 +135,7 @@
 					const selectedShare = new Share(
 						selectedShareUserId,
 						selectedShareEmail,
+						selectedShareName,
 						selectedShareImageUri,
 						selectedShareIsAdmin,
 						false,
@@ -162,6 +167,7 @@
 				new Share(
 					selectedShareUserId,
 					selectedShareEmail.trim(),
+					selectedShareName,
 					selectedShareImageUri,
 					selectedShareIsAdmin,
 					false,
@@ -205,6 +211,7 @@
 		} else {
 			selectedShareUserId = share.userId;
 			selectedShareEmail = share.email;
+			selectedShareName = share.name;
 			selectedShareImageUri = share.imageUri;
 			selectedShareIsAdmin = share.isAdmin;
 
@@ -255,6 +262,7 @@
 		name = list.name;
 		sharingState = list.sharingState;
 		ownerEmail = list.ownerEmail;
+		ownerName = list.ownerName;
 		ownerImageUri = list.ownerImageUri;
 		userShare = list.userShare;
 		shares = list.shares;
@@ -339,7 +347,7 @@
 		</div>
 
 		<div class="share-with">
-			<img class="share-image" src={ownerImageUri} alt={$t('profilePicture')} />
+			<img class="share-image" src={ownerImageUri} title={ownerName} alt={$t('profilePicture', { name: ownerName })} />
 			<div class="share-content not-editable">
 				<div class="icon" title={$t('shareList.owner')} aria-label={$t('shareList.owner')}>
 					<i class="fas fa-crown" />
@@ -350,7 +358,12 @@
 
 		{#if userShare}
 			<div class="share-with">
-				<img class="share-image" src={userShare.imageUri} alt={$t('profilePicture')} />
+				<img
+					class="share-image"
+					src={userShare.imageUri}
+					title={userShare.name}
+					alt={$t('profilePicture', { name: userShare.name })}
+				/>
 				<div class="share-content not-editable">
 					{#if userShare.isAdmin}
 						<div class="icon" title={$t('shareList.admin')} aria-label={$t('shareList.admin')}>
@@ -370,7 +383,12 @@
 		{#if shares}
 			{#each shares as share}
 				<div class="share-with">
-					<img class="share-image" src={share.imageUri} alt={$t('profilePicture')} />
+					<img
+						class="share-image"
+						src={share.imageUri}
+						title={share.name}
+						alt={$t('profilePicture', { name: share.name })}
+					/>
 					<div class="share-content" class:selected={share.email === selectedShareEmail}>
 						{#if share.userId && !share.createdDate && share.userId !== 0 && share.email !== selectedShareEmail}
 							<div class="icon" title={$t('shareList.newlyAddedMember')} aria-label={$t('shareList.newlyAddedMember')}>

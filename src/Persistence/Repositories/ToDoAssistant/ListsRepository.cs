@@ -61,7 +61,7 @@ public class ListsRepository : BaseRepository, IListsRepository
         var listIds = lists.Select(x => x.Id).ToArray();
         var shares = conn.Query<ListShare>(@"SELECT * FROM todo_shares WHERE list_id = ANY(@ListIds)", new { ListIds = listIds }).ToList();
 
-        const string tasksSql = @"SELECT t.*, u.id, u.image_uri
+        const string tasksSql = @"SELECT t.*, u.id, u.name, u.image_uri
                                   FROM todo_tasks AS t
                                   LEFT JOIN users AS u ON t.assigned_to_user_id = u.id
                                   WHERE t.list_id = ANY(@ListIds)
@@ -146,7 +146,7 @@ public class ListsRepository : BaseRepository, IListsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT s.*, u.id, u.email, u.image_uri
+        const string query = @"SELECT s.*, u.id, u.email, u.name, u.image_uri
                                FROM todo_shares AS s
                                INNER JOIN users AS u ON s.user_id = u.id
                                WHERE s.list_id = @ListId AND s.is_accepted IS NOT FALSE
@@ -703,7 +703,7 @@ public class ListsRepository : BaseRepository, IListsRepository
             order = ++listsCount;
         }
 
-        ListShare share = EFContext.ListShares.First(x => x.ListId == id && x.UserId == userId && !x.IsAccepted.HasValue);
+        ListShare share = EFContext.ListShares.First(x => x.ListId == id && x.UserId == userId && x.IsAccepted != true);
         share.IsAccepted = isAccepted;
         share.Order = order;
         share.ModifiedDate = modifiedDate;

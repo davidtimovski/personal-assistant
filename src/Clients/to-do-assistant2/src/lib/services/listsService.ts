@@ -5,11 +5,11 @@ import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil'
 import { lists } from '$lib/stores';
 import { List, type Task } from '$lib/models/entities';
 import type { ListWithShares } from '$lib/models/viewmodels/listWithShares';
-import type { ShareUserAndPermission } from '$lib/models/viewmodels/share';
+import type { ShareUserAndPermission } from '$lib/models/viewmodels/shareUserAndPermission';
 import type { ShareRequest } from '$lib/models/viewmodels/shareRequest';
 import type { ListOption } from '$lib/models/viewmodels/listOption';
 import type { CanShareList } from '$lib/models/viewmodels/canShareList';
-import type { AssigneeOption } from '$lib/models/viewmodels/assigneeOption';
+import type { Assignee } from '$lib/models/viewmodels/assignee';
 import { ListIcon } from '$lib/models/viewmodels/listIcon';
 import type { EditListModel } from '$lib/models/viewmodels/editListModel';
 import { ArchivedList } from '$lib/models/viewmodels/archivedList';
@@ -146,8 +146,8 @@ export class ListsService {
 		return this.httpProxy.ajax<boolean>(`${Variables.urls.api}/api/lists/${id}/shared`);
 	}
 
-	getMembersAsAssigneeOptions(id: number): Promise<AssigneeOption[]> {
-		return this.httpProxy.ajax<AssigneeOption[]>(`${Variables.urls.api}/api/lists/${id}/members`);
+	getMembersAsAssigneeOptions(id: number): Promise<Assignee[]> {
+		return this.httpProxy.ajax<Assignee[]>(`${Variables.urls.api}/api/lists/${id}/members`);
 	}
 
 	async create(name: string, icon: string, isOneTimeToggleDefault: boolean, tasksText: string): Promise<number> {

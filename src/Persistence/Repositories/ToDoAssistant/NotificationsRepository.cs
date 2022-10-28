@@ -18,7 +18,7 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT n.*, u.id, u.image_uri
+        const string query = @"SELECT n.*, u.id, u.name, u.image_uri
                                FROM todo_notifications AS n
                                INNER JOIN users AS u ON n.action_user_id = u.id
                                WHERE user_id = @UserId
