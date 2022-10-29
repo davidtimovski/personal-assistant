@@ -94,7 +94,7 @@ public class ForecastService : IForecastService
                 Temperature = ConvertTemperature(data.hourly.temperature_2m[parameters.Date.Hour], data.hourly_units.TemperatureUnitString, parameters.TemperatureUnit),
                 Precipitation = ConvertPrecipitation(data.hourly.precipitation[parameters.Date.Hour], data.hourly_units.precipitation, parameters.PrecipitationUnit),
                 WindSpeed = ConvertWindSpeed(data.hourly.windspeed_10m[parameters.Date.Hour], data.hourly_units.WindSpeedUnitString, parameters.WindSpeedUnit),
-                WeatherCode = data.hourly.weathercode[parameters.Date.Hour]
+                WeatherCode = (WeatherCode)data.hourly.weathercode[parameters.Date.Hour]
             };
 
             int from = parameters.Date.Hour + 1;
@@ -106,7 +106,7 @@ public class ForecastService : IForecastService
                     Temperature: ConvertTemperature(data.hourly.temperature_2m[i], data.hourly_units.TemperatureUnitString, parameters.TemperatureUnit),
                     Precipitation: ConvertPrecipitation(data.hourly.precipitation[i], data.hourly_units.precipitation, parameters.PrecipitationUnit),
                     WindSpeed: ConvertWindSpeed(data.hourly.windspeed_10m[i], data.hourly_units.WindSpeedUnitString, parameters.WindSpeedUnit),
-                    WeatherCode: data.hourly.weathercode[i]
+                    WeatherCode: (WeatherCode)data.hourly.weathercode[i]
                 ));
             }
 

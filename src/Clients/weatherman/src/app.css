@@ -1,7 +1,7 @@
 @import '../../shared2/styles/core.css';
 
 :root {
-	--regular-color: #30507d;
+	--regular-color: #333;
 	--primary-color: var(--weatherman-color);
 	--primary-color-dark: #dd7200;
 	--primary-color-light: #eeeeff;

@@ -1,9 +1,11 @@
+import type { WeatherCode } from '$lib/models/weatherCode';
+
 export class Forecast {
 	constructor(
 		public temperature: number,
 		public precipitation: number,
 		public windSpeed: number,
-		public weatherCode: number,
+		public weatherCode: WeatherCode,
 		public hourly: ForecastHourly[]
 	) {}
 }
@@ -14,6 +16,6 @@ export class ForecastHourly {
 		public temperature: number,
 		public precipitation: number,
 		public windSpeed: number,
-		public weatherCode: number
+		public weatherCode: WeatherCode
 	) {}
 }

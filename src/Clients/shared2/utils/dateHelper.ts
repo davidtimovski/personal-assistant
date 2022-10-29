@@ -26,46 +26,44 @@ export class DateHelper {
   }
 
   /** Format to show the day, month, and possibly year in the specified locale */
-  static formatDayMonth(date: Date, language: string): string {
+  static formatDayMonth(date: Date, locale: string): string {
     if (date.getFullYear() === new Date().getFullYear()) {
-      return date.toLocaleDateString(language, {
+      return date.toLocaleDateString(locale, {
         day: "numeric",
         month: "short",
       });
     }
 
-    return date.toLocaleDateString(language, {
+    return date.toLocaleDateString(locale, {
       day: "numeric",
       month: "short",
       year: "2-digit",
     });
   }
 
-  /** Format as 18:15. Adjusted for time zone. */
-  static formatHoursMinutes(date: Date): string {
-    const timePart = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-      .toISOString()
-      .split("T")[1];
-
-    return timePart.substring(0, 5);
+  /** Format as (HH/hh):mm (AM/PM). Adjusted for time zone. */
+  static formatHoursMinutes(date: Date, locale: string): string {
+    return new Date(
+      date.getTime() - date.getTimezoneOffset() * 60000
+    ).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
   }
 
   /** Format as Weekday, (HH/hh):mm:ss (AM/PM). */
-  static formatWeekdayTime(date: Date, language: string): string {
-    const weekday = date.toLocaleString(language, { weekday: "long" });
-    const time = date.toLocaleTimeString(language);
+  static formatWeekdayTime(date: Date, locale: string): string {
+    const weekday = date.toLocaleString(locale, { weekday: "long" });
+    const time = date.toLocaleTimeString(locale);
 
     return `${weekday}, ${time}`;
   }
 
   /** Example: Jan, Feb, Mar. */
-  static getShortMonth(date: Date, language: string) {
-    return date.toLocaleString(language, { month: "short" });
+  static getShortMonth(date: Date, locale: string) {
+    return date.toLocaleString(locale, { month: "short" });
   }
 
   /** Example: January, Febuary, March. */
-  static getLongMonth(date: Date, language: string) {
-    return date.toLocaleString(language, { month: "long" });
+  static getLongMonth(date: Date, locale: string) {
+    return date.toLocaleString(locale, { month: "long" });
   }
 
   static adjustForTimeZone(date: Date): Date {
