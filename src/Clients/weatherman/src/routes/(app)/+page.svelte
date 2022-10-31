@@ -11,9 +11,12 @@
 	import { ForecastsService } from '$lib/services/forecastsService';
 	import { WeatherCode } from '$lib/models/weatherCode';
 
+	import Illustration from '$lib/components/Illustration.svelte';
+
 	let imageUri: any;
-	let currentTime = DateHelper.formatHoursMinutes(new Date(), $locale);
-	let isNight = false;
+	let now = new Date();
+	let currentTime = DateHelper.formatWeekdayHoursMinutes(now, $locale);
+	let weatherDescription: string;
 	let windSpeedUnit: string;
 	let precipitationUnit: string;
 	const weatherDescriptionTr = new Map<WeatherCode, string>();
@@ -34,8 +37,9 @@
 	function sync() {
 		startProgressBar();
 
-		currentTime = DateHelper.formatHoursMinutes(new Date(), $locale);
-		forecastsService.get();
+		now = new Date();
+		currentTime = DateHelper.formatWeekdayHoursMinutes(now, $locale);
+		forecastsService.get($locale);
 
 		usersService.getProfileImageUri().then((uri) => {
 			if (imageUri !== uri) {
@@ -65,85 +69,6 @@
 			progressBarActive = false;
 			progressBarVisible = false;
 		}, 500);
-	}
-
-	function getWeatherImage(weatherCode: WeatherCode) {
-		switch (weatherCode) {
-			case WeatherCode.ClearSky:
-				if (isNight) {
-					return 'moon.svg';
-				}
-				return 'sun.svg';
-			case WeatherCode.MainlyClear:
-				if (isNight) {
-					return 'moon.svg';
-				}
-				return 'sun.svg';
-			case WeatherCode.PartlyCloudy:
-				if (isNight) {
-					return 'cloud-moon.svg';
-				}
-				return 'cloud-sun.svg';
-			case WeatherCode.Overcast:
-				return 'cloudy.svg';
-			case WeatherCode.Fog:
-			case WeatherCode.DepositingRimeFog:
-				return 'fog.svg';
-			case WeatherCode.DrizzleLight:
-			case WeatherCode.DrizzleLightFreezing:
-				if (isNight) {
-					return 'drizzle-light-moon.svg';
-				}
-				return 'drizzle-light-sun.svg';
-			case WeatherCode.DrizzleModerate:
-			case WeatherCode.DrizzleDense:
-			case WeatherCode.DrizzleDenseFreezing:
-				if (isNight) {
-					return 'drizzle-heavy-moon.svg';
-				}
-				return 'drizzle-heavy-sun.svg';
-			case WeatherCode.RainLight:
-				return 'rain-light.svg';
-			case WeatherCode.RainModerate:
-			case WeatherCode.RainHeavy:
-				return 'rain-heavy.svg';
-			case WeatherCode.SnowLight:
-				return 'snow-light.svg';
-			case WeatherCode.SnowModerate:
-			case WeatherCode.SnowHeavy:
-			case WeatherCode.SnowGrains:
-				return 'snow-heavy.svg';
-			case WeatherCode.ShowerLight:
-				if (isNight) {
-					return 'shower-light-moon.svg';
-				}
-				return 'shower-light-sun.svg';
-			case WeatherCode.ShowerModerate:
-			case WeatherCode.ShowerViolent:
-				if (isNight) {
-					return 'shower-heavy-moon.svg';
-				}
-				return 'shower-heavy-sun.svg';
-			case WeatherCode.SnowShowerLight:
-				if (isNight) {
-					return 'snow-light-moon.svg';
-				}
-				return 'snow-light-sun.svg';
-			case WeatherCode.SnowShowerHeavy:
-				return 'snow-heavy.svg';
-			case WeatherCode.Thunderstorm:
-				return 'thunderstorm.svg';
-			case WeatherCode.ThunderstormWithHailLight:
-				if (isNight) {
-					return 'hail-light-moon.svg';
-				}
-				return 'hail-light-sun.svg';
-			case WeatherCode.ThunderstormWithHailHeavy:
-				if (isNight) {
-					return 'hail-heavy-moon.svg';
-				}
-				return 'hail-heavy-sun.svg';
-		}
 	}
 
 	onMount(() => {
@@ -211,6 +136,8 @@
 					return;
 				}
 
+				weatherDescription = <string>weatherDescriptionTr.get(x.weatherCode);
+
 				finishProgressBar();
 			})
 		);
@@ -253,13 +180,18 @@
 		{#if $forecast !== null}
 			<div class="wrap">
 				<div class="current-forecast">
-					<div
-						style="background-image: url({'/images/weather/' + getWeatherImage($forecast.weatherCode)});"
-						class="current-weather-illustration"
-						alt=""
-					/>
+					<div class="current-illustration">
+						<Illustration weatherCode={$forecast.weatherCode} isNight={$forecast.isNight} />
+					</div>
+					<!-- <div style="background-image: url({$forecast.illustrationSrc});" class="current-illustration" alt="" /> -->
+
 					<div class="current-temp">{$forecast.temperature}°</div>
-					<div class="current-weather">{weatherDescriptionTr.get($forecast.weatherCode)}</div>
+
+					{#if $forecast.temperature !== $forecast.apparentTemperature}
+						<div class="current-apparent-temp">{$t('index.feelsLike')} {$forecast.apparentTemperature}°</div>
+					{/if}
+
+					<div class="weather-description">{weatherDescription}</div>
 
 					<table class="wind-and-precipitation">
 						<tr class="wind">
@@ -283,7 +215,10 @@
 					<table>
 						{#each $forecast.hourly as hourForecast}
 							<tr>
-								<td>{hourForecast.time}</td>
+								<td>{hourForecast.timeString}</td>
+								<td class="hourly-illustration">
+									<Illustration weatherCode={hourForecast.weatherCode} isNight={hourForecast.isNight} />
+								</td>
 								<td>{hourForecast.temperature}°</td>
 							</tr>
 						{/each}
@@ -309,23 +244,22 @@
 		padding: 0 10px;
 	}
 
-	.current-weather-illustration {
-		width: 100%;
-		height: 80px;
-		background-repeat: no-repeat;
-		background-size: cover;
-		background-position: 0;
-	}
-
 	.current-temp {
-		padding: 10px 0 35px;
+		padding: 10px 0;
 		font-size: 90px;
 		line-height: 70px;
 		text-align: center;
 	}
+	.current-apparent-temp {
+		padding: 10px 0;
+		margin-top: 10px;
+		font-size: 1.1rem;
+		line-height: 1.3rem;
+		text-align: center;
+	}
 
-	.current-weather {
-		margin-bottom: 20px;
+	.weather-description {
+		margin: 30px 0 20px;
 		font-size: 1.4rem;
 		line-height: 1.8rem;
 	}
@@ -360,16 +294,10 @@
 
 			td {
 				border-bottom: 1px solid #ddd;
-				padding: 7px 10px;
+				padding: 3px 5px;
 				font-size: 18px;
+				white-space: nowrap;
 			}
-		}
-	}
-
-	@media screen and (min-width: 1200px) {
-		.current-weather-illustration {
-			height: 130px;
-			background-position: 0;
 		}
 	}
 </style>

@@ -48,10 +48,28 @@ export class DateHelper {
     ).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
   }
 
+  /** Format as (HH/hh) (AM/PM). Adjusted for time zone. */
+  static formatHours(date: Date, locale: string): string {
+    return new Date(
+      date.getTime() - date.getTimezoneOffset() * 60000
+    ).toLocaleTimeString(locale, { hour: "2-digit" });
+  }
+
   /** Format as Weekday, (HH/hh):mm:ss (AM/PM). */
   static formatWeekdayTime(date: Date, locale: string): string {
     const weekday = date.toLocaleString(locale, { weekday: "long" });
     const time = date.toLocaleTimeString(locale);
+
+    return `${weekday}, ${time}`;
+  }
+
+  /** Format as Weekday, (HH/hh):mm:ss (AM/PM). */
+  static formatWeekdayHoursMinutes(date: Date, locale: string): string {
+    const weekday = date.toLocaleString(locale, { weekday: "long" });
+    const time = date.toLocaleTimeString(locale, {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
     return `${weekday}, ${time}`;
   }

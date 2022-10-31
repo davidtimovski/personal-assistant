@@ -37,7 +37,7 @@
 			return;
 		}
 
-		new ForecastsService().get();
+		new ForecastsService().get($locale);
 
 		isOffline.set(!navigator.onLine);
 		window.addEventListener('online', () => {

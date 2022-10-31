@@ -304,8 +304,8 @@
 										<span>{$t('index.to')}</span>
 									{:else}
 										<span>{$t('index.from')}</span>
-										{debtItem.person}
 									{/if}
+									<span>{debtItem.person}</span>
 								</td>
 								<td>{debtItem.description}</td>
 								<td class="amount-cell {debtItem.userIsDebtor ? 'expense-color' : 'deposit-color'}">

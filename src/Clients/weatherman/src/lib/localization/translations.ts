@@ -3,11 +3,14 @@ export default {
 		versionUpdatedTo: 'Version updated to {{version}}',
 		waitingForConnection: 'Waiting for connection..',
 		unexpectedError: 'An unexpected error occurred',
+		unableToRetrieveLocation:
+			'We were unable to retrieve your location. Please make sure you have provided location permission and your location is turned on.',
 		refresh: 'Refresh',
 		failedToFetchError: 'Please check your internet connection.',
 		index: {
 			menu: 'Menu',
 			refresh: 'Refresh',
+			feelsLike: 'Feels like:',
 			clear: 'Clear',
 			mainlyClear: 'Mainly clear',
 			partlyCloudy: 'Partly cloudy',
@@ -66,11 +69,14 @@ export default {
 		versionUpdatedTo: 'Верзијата е покачена на {{version}}',
 		waitingForConnection: 'Се чека конекција..',
 		unexpectedError: 'Се случи неочекувана грешка',
+		unableToRetrieveLocation:
+			'Неможевме да ја одредиме вашата локација. Ве молиме осигурајтѐ се дека дадовте дозвола за пристап до вашата локација и дека локацијата е пуштена.',
 		refresh: 'Освежи',
 		failedToFetchError: 'Вѐ молиме да ја проверите вашата интернет конекција.',
 		index: {
 			menu: 'Мени',
 			refresh: 'Освежи',
+			feelsLike: 'Се осеќа како:',
 			clear: 'Чисто',
 			mainlyClear: 'Воглавно чисто',
 			partlyCloudy: 'Малку облачно',
@@ -118,7 +124,7 @@ export default {
 			inches: 'Инчи',
 			windSpeedUnit: 'Единица за брзина на ветер',
 			kmh: 'км/ч',
-			mph: 'м/ч'
+			mph: 'ми/ч'
 		},
 		notFound: {
 			youSeemLost: 'Се изгубивте?',

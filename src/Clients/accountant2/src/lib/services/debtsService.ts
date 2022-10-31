@@ -4,6 +4,7 @@ import { ErrorLogger } from '../../../../shared2/services/errorLogger';
 import { DateHelper } from '../../../../shared2/utils/dateHelper';
 
 import { DebtsIDBHelper } from '$lib/utils/debtsIDBHelper';
+import { Formatter } from '$lib/utils/formatter';
 import { DebtModel } from '$lib/models/entities/debt';
 import Variables from '$lib/variables';
 
@@ -34,7 +35,13 @@ export class DebtsService {
 		return this.idbHelper.get(id);
 	}
 
-	async createOrMerge(debt: DebtModel, mergeDebtPerPerson: boolean): Promise<number> {
+	async createOrMerge(
+		debt: DebtModel,
+		mergeDebtPerPerson: boolean,
+		locale: string,
+		lendedLabel: string,
+		borrowedLabel: string
+	): Promise<number> {
 		try {
 			const now = DateHelper.adjustForTimeZone(new Date());
 
@@ -59,7 +66,10 @@ export class DebtsService {
 						debt.currency,
 						otherDebt.userIsDebtor,
 						new Date(<Date>otherDebt.createdDate),
-						otherDebt.description
+						otherDebt.description,
+						locale,
+						lendedLabel,
+						borrowedLabel
 					);
 					descriptionsArray.push(desc);
 				}
@@ -75,14 +85,27 @@ export class DebtsService {
 					debt.currency,
 					debt.userIsDebtor,
 					now,
-					debt.description
+					debt.description,
+					locale,
+					lendedLabel,
+					borrowedLabel
 				);
 				descriptionsArray.push(newDesc);
 
 				const description =
 					descriptionsArray.length > 0 ? descriptionsArray.join(`\n${DebtsService.mergedDebtSeparator}\n`) : null;
 
-				const mergedDebt = new DebtModel(0, debt.person, balance, debt.currency, description, balance < 0, now, now);
+				const userIsDebtor = balance < 0;
+				const mergedDebt = new DebtModel(
+					0,
+					debt.person,
+					Math.abs(balance),
+					debt.currency,
+					description,
+					userIsDebtor,
+					now,
+					now
+				);
 
 				if (navigator.onLine) {
 					mergedDebt.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/api/debts/merged`, {
@@ -114,38 +137,6 @@ export class DebtsService {
 
 				return debt.id;
 			}
-		} catch (e) {
-			this.logger.logError(e);
-			throw e;
-		}
-	}
-
-	private getMergedDebtDescription(
-		amount: number,
-		currency: string,
-		userIsDebtor: boolean,
-		createdDate: Date,
-		description: string | null
-	) {
-		try {
-			const date = DateHelper.formatForReading(createdDate);
-
-			// start with date
-			let result = date + ' | ';
-
-			// add amount (positive or negative) and currency
-			result += userIsDebtor ? '-' + amount + currency : amount + currency;
-
-			if (description) {
-				if (description.includes(DebtsService.mergedDebtSeparator)) {
-					// use existing description if the debt is already a merged one
-					result = description;
-				} else {
-					result += ` | ${description}`;
-				}
-			}
-
-			return result;
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -201,5 +192,40 @@ export class DebtsService {
 		this.httpProxy.release();
 		this.currenciesService.release();
 		this.logger.release();
+	}
+
+	private getMergedDebtDescription(
+		amount: number,
+		currency: string,
+		userIsDebtor: boolean,
+		createdDate: Date,
+		description: string | null,
+		locale: string,
+		lendedLabel: string,
+		borrowedLabel: string
+	) {
+		try {
+			const date = DateHelper.formatForReading(createdDate);
+
+			// start with date
+			let result = date + ' | ';
+
+			// add amount (positive or negative) and currency
+			result += (userIsDebtor ? borrowedLabel : lendedLabel) + ' ' + Formatter.money(amount, currency, locale);
+
+			if (description) {
+				if (description.includes(DebtsService.mergedDebtSeparator)) {
+					// use existing description if the debt is already a merged one
+					result = description;
+				} else {
+					result += ` | ${description}`;
+				}
+			}
+
+			return result;
+		} catch (e) {
+			this.logger.logError(e);
+			throw e;
+		}
 	}
 }

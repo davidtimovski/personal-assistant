@@ -100,7 +100,7 @@
 							<th class="edit-link-cell" />
 							<th>{$t('amount')}</th>
 							<th>{$t('debt.person')}</th>
-							<th>{$t('debt.created')}</th>
+							<th>{$t('debt.occurred')}</th>
 							<th class="sync-icon-cell" />
 						</tr>
 					</thead>
