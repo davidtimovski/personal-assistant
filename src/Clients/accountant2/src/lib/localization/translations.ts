@@ -150,7 +150,7 @@ export default {
 		debt: {
 			debt: 'Debt',
 			person: 'Person',
-			created: 'Created',
+			occurred: 'Occurred',
 			settleDebt: 'Settle debt',
 			emptyListMessage: "You don't have any debt",
 			newDebt: 'New debt'
@@ -162,6 +162,8 @@ export default {
 			iAmThe: 'I am the..',
 			lender: 'Lender',
 			debtor: 'Debtor',
+			lended: 'Lended',
+			borrowed: 'Borrowed',
 			saveSuccessful: 'Debt was successfully saved',
 			deleteSuccessful: 'Debt was successfully deleted'
 		},
@@ -564,7 +566,7 @@ export default {
 		debt: {
 			debt: 'Долгови',
 			person: 'Личност',
-			created: 'Креиран',
+			occurred: 'Случен',
 			settleDebt: 'Подмири долг',
 			emptyListMessage: 'Немате долгови',
 			newDebt: 'Нов долг'
@@ -576,6 +578,8 @@ export default {
 			iAmThe: 'Јас сум..',
 			lender: 'Позајмувач',
 			debtor: 'Должник',
+			lended: 'Даде',
+			borrowed: 'Позајми',
 			saveSuccessful: 'Долгот беше успешно зачуван',
 			deleteSuccessful: 'Долгот беше успешно избришан'
 		},

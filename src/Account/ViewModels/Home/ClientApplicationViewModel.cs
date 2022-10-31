@@ -1,20 +1,31 @@
-﻿using System;
+﻿namespace Account.ViewModels.Home;
 
-namespace Account.ViewModels.Home;
+public enum ReleaseStatus
+{
+    Released,
+    Beta,
+    InDevelopment
+}
 
 public class ClientApplicationViewModel
 {
-    public ClientApplicationViewModel(string name, Uri url, string cssClass) : this(name, url, cssClass, false) { }
-    public ClientApplicationViewModel(string name, Uri url, string cssClass, bool inDevelopment)
+    public ClientApplicationViewModel(string name, string cssClass)
+    {
+        Name = name;
+        CssClass = cssClass;
+        ReleaseStatus = ReleaseStatus.InDevelopment;
+    }
+
+    public ClientApplicationViewModel(string name, string url, string cssClass, ReleaseStatus releaseStatus = ReleaseStatus.Released)
     {
         Name = name;
         Url = url;
         CssClass = cssClass;
-        InDevelopment = inDevelopment;
+        ReleaseStatus = releaseStatus;
     }
 
-    public string Name { get; set; }
-    public Uri Url { get; set; }
-    public string CssClass { get; set; }
-    public bool InDevelopment { get; set; }
+    public string Name { get; }
+    public string Url { get; }
+    public string CssClass { get; }
+    public ReleaseStatus ReleaseStatus { get; }
 }

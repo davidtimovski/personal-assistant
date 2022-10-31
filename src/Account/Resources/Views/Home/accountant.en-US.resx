@@ -117,7 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AccountantText" xml:space="preserve">
+  <data name="Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="FeaturesText" xml:space="preserve">
     <value>&lt;h3&gt;Track your finances.&lt;/h3&gt;
 &lt;br&gt;
 &lt;br&gt;
@@ -141,8 +144,5 @@ Track and anticipate upcoming expenses
 &lt;li&gt;Offline mode&lt;/li&gt;
 &lt;li&gt;Supports 168 currencies&lt;/li&gt;
 &lt;/ul&gt;</value>
-  </data>
-  <data name="Back" xml:space="preserve">
-    <value>Back</value>
   </data>
 </root>

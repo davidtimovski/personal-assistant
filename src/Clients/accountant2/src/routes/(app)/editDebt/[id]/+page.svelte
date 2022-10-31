@@ -9,7 +9,7 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
-	import { alertState, isOnline } from '$lib/stores';
+	import { alertState, isOnline, locale } from '$lib/stores';
 	import { DebtsService } from '$lib/services/debtsService';
 	import { DebtModel } from '$lib/models/entities/debt';
 
@@ -83,7 +83,13 @@
 			if (isNew) {
 				try {
 					const debt = new DebtModel(0, person, amount, currency, description, userIsDebtor, null, null);
-					const newId = await debtsService.createOrMerge(debt, <boolean>mergeDebtPerPerson);
+					const newId = await debtsService.createOrMerge(
+						debt,
+						<boolean>mergeDebtPerPerson,
+						$locale,
+						$t('editDebt.lended'),
+						$t('editDebt.borrowed')
+					);
 
 					goto('/debt?edited=' + newId);
 				} catch {

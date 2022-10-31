@@ -1,9 +1,23 @@
 @import '../../shared2/styles/core.css';
 
 :root {
-	--regular-color: #30507d;
-	--primary-color: var(--to-do-assistant-color);
-	--primary-color-dark: #097cdc;
+	--regular-color: #444;
+	--primary-color: var(--weatherman-color);
+	--primary-color-dark: #dd7200;
 	--primary-color-light: #eeeeff;
 	--faded-color: #98b0c5;
+}
+
+.current-illustration svg {
+	width: 100%;
+}
+
+.hourly-illustration svg {
+	width: 44px;
+	height: 24px;
+}
+
+.current-illustration svg,
+.hourly-illustration svg {
+	fill: #777;
 }

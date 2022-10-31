@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Account.ViewModels.Home;
 using Application.Contracts.Common;
-using Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
@@ -16,16 +13,16 @@ namespace Account.Controllers;
 
 public class HomeController : BaseController
 {
-    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IUserService _userService;
     private readonly IConfiguration _configuration;
 
     public HomeController(
         IUserIdLookup userIdLookup, 
-        IUsersRepository usersRepository, 
-        IHttpClientFactory httpClientFactory, 
+        IUsersRepository usersRepository,
+        IUserService userService, 
         IConfiguration configuration) : base(userIdLookup, usersRepository)
     {
-        _httpClientFactory = httpClientFactory;
+        _userService = userService;
         _configuration = configuration;
     }
 
@@ -42,24 +39,19 @@ public class HomeController : BaseController
 
     [HttpGet]
     [Authorize]
-    public async Task<IActionResult> Overview(OverviewAlert alert = OverviewAlert.None)
+    public IActionResult Overview(OverviewAlert alert = OverviewAlert.None)
     {
-        using HttpClient httpClient = _httpClientFactory.CreateClient();
-
-        var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0:ClientSecret"]);
-        await Auth0ManagementUtil.InitializeAsync(httpClient, config);
-
-        var user = await Auth0ManagementUtil.GetUserAsync(httpClient, AuthId);
-        var language = CultureInfo.CurrentCulture.Name;
+        var user = _userService.Get(UserId);
 
         var model = new OverviewViewModel
         {
-            UserName = user.name,
+            UserName = user.Name,
             ClientApplications = new List<ClientApplicationViewModel>
             {
-                new ClientApplicationViewModel("To Do Assistant", new Uri(_configuration["Urls:ToDoAssistant"] + $"?lang={language}"), "to-do-assistant"),
-                new ClientApplicationViewModel("Accountant", new Uri(_configuration["Urls:Accountant"] + $"?lang={language}"), "accountant"),
-                new ClientApplicationViewModel("Cooking Assistant", new Uri(_configuration["Urls:CookingAssistant"] + $"/{language}"), "cooking-assistant", true),
+                new ClientApplicationViewModel("To Do Assistant", _configuration["Urls:ToDoAssistant"] + $"?lang={user.Language}", "to-do-assistant"),
+                new ClientApplicationViewModel("Accountant", _configuration["Urls:Accountant"] + $"?lang={user.Language}", "accountant"),
+                new ClientApplicationViewModel("Weatherman", _configuration["Urls:Weatherman"] + $"?lang={user.Language}", "weatherman", ReleaseStatus.Beta),
+                new ClientApplicationViewModel("Cooking Assistant", "cooking-assistant"),
             },
             Alert = alert
         };
@@ -98,6 +90,13 @@ public class HomeController : BaseController
     [HttpGet]
     [ActionName("accountant")]
     public IActionResult Accountant()
+    {
+        return View();
+    }
+
+    [HttpGet]
+    [ActionName("weatherman")]
+    public IActionResult Weatherman()
     {
         return View();
     }

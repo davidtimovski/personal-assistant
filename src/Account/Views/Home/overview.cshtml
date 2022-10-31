@@ -22,16 +22,23 @@
 
     @foreach (var app in Model.ClientApplications)
     {
-        @if (app.InDevelopment)
+        @if (app.ReleaseStatus == ReleaseStatus.Released)
         {
-            <a href="#" class="app @app.CssClass in-development">
+            <a href="@app.Url" class="app @app.CssClass">@app.Name</a>
+        }
+        else if (app.ReleaseStatus == ReleaseStatus.Beta)
+        {
+            <a href="@app.Url" class="app @app.CssClass in-development">
                 <div>@app.Name</div>
-                <div>@Localizer["InDevelopment"]</div>
+                <div>@Localizer["Beta"]</div>
             </a>
         }
         else
         {
-            <a href="@app.Url" class="app @app.CssClass">@app.Name</a>
+            <div class="app @app.CssClass in-development">
+                <div>@app.Name</div>
+                <div>@Localizer["InDevelopment"]</div>
+            </div>
         }
     }
 </div>

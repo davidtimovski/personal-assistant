@@ -120,6 +120,9 @@
   <data name="About" xml:space="preserve">
     <value>За нас</value>
   </data>
+  <data name="Beta" xml:space="preserve">
+    <value>- бета -</value>
+  </data>
   <data name="DeleteAccount" xml:space="preserve">
     <value>Избриши сметка</value>
   </data>

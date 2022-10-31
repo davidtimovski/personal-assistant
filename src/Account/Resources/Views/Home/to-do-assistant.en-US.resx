@@ -120,7 +120,7 @@
   <data name="Back" xml:space="preserve">
     <value>Back</value>
   </data>
-  <data name="ToDoAssistantText" xml:space="preserve">
+  <data name="FeaturesText" xml:space="preserve">
     <value>&lt;h3&gt;Create and manage to-dos in a simple and intuitive way.&lt;/h3&gt;
 &lt;br&gt;
 &lt;br&gt;

@@ -1,0 +1,31 @@
+﻿namespace Application.Contracts.Weatherman.Forecasts.Models;
+
+public enum WeatherCode
+{
+    ClearSky = 0,
+    MainlyClear = 1,
+    PartlyCloudy = 2,
+    Overcast = 3,
+    Fog = 45,
+    DepositingRimeFog = 48,
+    DrizzleLight = 51,
+    DrizzleModerate = 53,
+    DrizzleDense = 55,
+    DrizzleLightFreezing = 56,
+    DrizzleDenseFreezing = 57,
+    RainLight = 61,
+    RainModerate = 63,
+    RainHeavy = 65,
+    SnowLight = 71,
+    SnowModerate = 73,
+    SnowHeavy = 75,
+    SnowGrains = 77,
+    ShowerLight = 80,
+    ShowerModerate = 81,
+    ShowerViolent = 82,
+    SnowShowerLight = 85,
+    SnowShowerHeavy = 86,
+    Thunderstorm = 95,
+    ThunderstormWithHailLight = 96,
+    ThunderstormWithHailHeavy = 99,
+}

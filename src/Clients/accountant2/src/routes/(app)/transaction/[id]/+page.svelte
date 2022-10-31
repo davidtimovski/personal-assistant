@@ -43,7 +43,7 @@
 	let passwordShown = false;
 	let decryptButtonIsLoading = false;
 	let decryptionPasswordIsInvalid = false;
-	let typeStringMap = new Map<TransactionType, string>();
+	const typeStringMap = new Map<TransactionType, string>();
 	let passwordInput: HTMLInputElement | null = null;
 	let passwordShowIconLabel: string;
 

@@ -4,12 +4,12 @@
 	import { page } from '$app/stores';
 
 	import EmptyListMessage from '../../../../../shared2/components/EmptyListMessage.svelte';
+	import { DateHelper } from '../../../../../shared2/utils/dateHelper';
 
 	import { t } from '$lib/localization/i18n';
 	import { authInfo, locale } from '$lib/stores';
 	import { NotificationsService } from '$lib/services/notificationsService';
 	import type { Notification } from '$lib/models/viewmodels/notification';
-	import { DateHelper } from '../../../../../shared2/utils/dateHelper';
 
 	let highlightedId: number | undefined;
 	let unseenNotifications: Array<Notification> | null = null;
@@ -50,9 +50,9 @@
 				for (const notification of allNotifications) {
 					notification.formattedCreatedDate = DateHelper.formatWeekdayTime(new Date(notification.createdDate), $locale);
 					if (notification.listId && notification.taskId) {
-						notification.url = `list/${notification.listId}/${notification.taskId}`;
+						notification.url = `/list/${notification.listId}?edited=${notification.taskId}`;
 					} else if (notification.listId) {
-						notification.url = `list/${notification.listId}`;
+						notification.url = `/list/${notification.listId}`;
 					} else {
 						notification.url = '#';
 					}

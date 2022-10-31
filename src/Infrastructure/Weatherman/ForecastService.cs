@@ -92,21 +92,34 @@ public class ForecastService : IForecastService
             var result = new ForecastResult
             {
                 Temperature = ConvertTemperature(data.hourly.temperature_2m[parameters.Date.Hour], data.hourly_units.TemperatureUnitString, parameters.TemperatureUnit),
+                ApparentTemperature = ConvertTemperature(data.hourly.apparent_temperature[parameters.Date.Hour], data.hourly_units.TemperatureUnitString, parameters.TemperatureUnit),
                 Precipitation = ConvertPrecipitation(data.hourly.precipitation[parameters.Date.Hour], data.hourly_units.precipitation, parameters.PrecipitationUnit),
                 WindSpeed = ConvertWindSpeed(data.hourly.windspeed_10m[parameters.Date.Hour], data.hourly_units.WindSpeedUnitString, parameters.WindSpeedUnit),
-                WeatherCode = data.hourly.weathercode[parameters.Date.Hour]
+                WeatherCode = (WeatherCode)data.hourly.weathercode[parameters.Date.Hour],
+                IsNight = parameters.Date > data.daily.sunset[0]
             };
+
+            for (var i = 1; i < 7; i++)
+            {
+                result.Daily.Add(new Daily(
+                    WeatherCode: (WeatherCode)data.daily.weathercode[i],
+                    TemperatureMax: ConvertTemperature(data.daily.temperature_2m_max[i], data.daily_units.TemperatureMaxUnitString, parameters.TemperatureUnit),
+                    TemperatureMin: ConvertTemperature(data.daily.temperature_2m_min[i], data.daily_units.TemperatureMinUnitString, parameters.TemperatureUnit)
+                ));
+            }
 
             int from = parameters.Date.Hour + 1;
             int to = from + 24;
             for (var i = from; i < to; i++)
             {
                 result.Hourly.Add(new HourlyForecast(
-                    Time: data.hourly.time[i].ToString("HH:mm"),
+                    Hour: (short)data.hourly.time[i].Hour,
                     Temperature: ConvertTemperature(data.hourly.temperature_2m[i], data.hourly_units.TemperatureUnitString, parameters.TemperatureUnit),
+                    ApparentTemperature: ConvertTemperature(data.hourly.apparent_temperature[i], data.hourly_units.TemperatureUnitString, parameters.TemperatureUnit),
                     Precipitation: ConvertPrecipitation(data.hourly.precipitation[i], data.hourly_units.precipitation, parameters.PrecipitationUnit),
                     WindSpeed: ConvertWindSpeed(data.hourly.windspeed_10m[i], data.hourly_units.WindSpeedUnitString, parameters.WindSpeedUnit),
-                    WeatherCode: data.hourly.weathercode[i]
+                    WeatherCode: (WeatherCode)data.hourly.weathercode[i],
+                    IsNight: data.hourly.time[i] > data.daily.sunset[0]
                 ));
             }
 
@@ -127,7 +140,8 @@ public class ForecastService : IForecastService
         queryString.Add("temperature_unit", parameters.TemperatureUnit);
         queryString.Add("precipitation_unit", parameters.PrecipitationUnit);
         queryString.Add("windspeed_unit", parameters.WindSpeedUnit);
-        queryString.Add("hourly", "temperature_2m,precipitation,windspeed_10m,weathercode");
+        queryString.Add("hourly", "temperature_2m,apparent_temperature,precipitation,windspeed_10m,weathercode");
+        queryString.Add("daily", "weathercode,temperature_2m_max,temperature_2m_min,sunrise,sunset");
         queryString.Add("timezone", "auto");
 
         using HttpClient httpClient = _httpClientFactory.CreateClient("open-meteo");

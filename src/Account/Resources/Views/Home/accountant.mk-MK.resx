@@ -117,7 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AccountantText" xml:space="preserve">
+  <data name="Back" xml:space="preserve">
+    <value>Назад</value>
+  </data>
+  <data name="FeaturesText" xml:space="preserve">
     <value>&lt;h3&gt;Следи ги своите финансии.&lt;/h3&gt;
 &lt;br&gt;
 &lt;br&gt;
@@ -141,8 +144,5 @@
 &lt;li&gt;Офлајн пристап&lt;/li&gt;
 &lt;li&gt;Поддржува 168 валути&lt;/li&gt;
 &lt;/ul&gt;</value>
-  </data>
-  <data name="Back" xml:space="preserve">
-    <value>Назад</value>
   </data>
 </root>

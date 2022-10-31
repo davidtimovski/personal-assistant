@@ -116,7 +116,8 @@
     position: fixed;
     bottom: -45px;
     z-index: 1;
-    width: 100%;
+    width: calc(100% - 30px);
+    padding: 0 15px;
     text-align: center;
     font-size: 1rem;
     line-height: 1.6rem;
@@ -169,6 +170,7 @@
       bottom: unset;
       right: 30px;
       width: unset;
+      max-width: 400px;
       font-size: 1.1rem;
       text-align: right;
 
