@@ -13,7 +13,7 @@ public interface IUserService
     string GetImageUri(int id);
     ToDoAssistantPreferences GetToDoAssistantPreferences(int id);
     CookingAssistantPreferences GetCookingAssistantPreferences(int id);
-    Task UpdateProfileAsync(int id, string name, string language, string imageUri);
+    Task UpdateProfileAsync(int id, string name, string language, string culture, string imageUri);
     Task UpdateToDoNotificationsEnabledAsync(int id, bool enabled);
     Task UpdateCookingNotificationsEnabledAsync(int id, bool enabled);
     Task UpdateImperialSystemAsync(int id, bool imperialSystem);

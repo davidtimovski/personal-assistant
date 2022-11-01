@@ -4,6 +4,7 @@ CREATE TABLE public.users
 	email character varying(256) COLLATE pg_catalog."default" NOT NULL,
     name character varying(30) COLLATE pg_catalog."default" NOT NULL,
     language character varying(5) COLLATE pg_catalog."default" NOT NULL,
+	culture character varying(10) COLLATE pg_catalog."default" NOT NULL,
 	image_uri character varying(255) NOT NULL COLLATE pg_catalog."default",
     todo_notifications_enabled boolean NOT NULL DEFAULT FALSE,
     cooking_notifications_enabled boolean NOT NULL DEFAULT FALSE,

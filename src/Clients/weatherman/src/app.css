@@ -14,10 +14,10 @@
 
 .hourly-illustration svg {
 	width: 44px;
-	height: 24px;
+	height: 20px;
 }
 
 .current-illustration svg,
 .hourly-illustration svg {
-	fill: #777;
+	fill: #666;
 }

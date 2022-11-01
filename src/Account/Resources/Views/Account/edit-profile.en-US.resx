@@ -123,6 +123,9 @@
   <data name="Change" xml:space="preserve">
     <value>Change</value>
   </data>
+  <data name="Culture" xml:space="preserve">
+    <value>Culture</value>
+  </data>
   <data name="EditProfile" xml:space="preserve">
     <value>Edit profile</value>
   </data>

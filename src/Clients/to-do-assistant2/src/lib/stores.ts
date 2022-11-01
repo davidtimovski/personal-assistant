@@ -8,7 +8,8 @@ import { RemoteEvent, RemoteEventType } from './models/remoteEvents';
 import type { List } from './models/entities';
 
 export const isOffline = writable<boolean>(false);
-export const locale = writable('en-US');
+export const language = writable('en-US');
+export const culture = writable('en-US');
 export const authInfo = writable<AuthInfo | null>(null);
 export const remoteEvents = writable<RemoteEvent>(new RemoteEvent(RemoteEventType.None, null));
 export const alertState = writable<AlertState>(new AlertState(AlertStatus.Hidden, null, []));

@@ -98,6 +98,9 @@ article > ul {
     article > ul.purple {
         list-style-image: url('/images/check-purple.webp');
     }
+    article > ul.orange {
+        list-style-image: url('/images/check-orange.webp');
+    }
 article > ul li {
     margin-bottom: 15px;
     line-height: 28px;
@@ -113,6 +116,9 @@ article > ul li {
         }
         article > ul li > ul.purple {
             list-style-image: url('/images/double-check-purple.webp');
+        }
+        article > ul li > ul.orange {
+            list-style-image: url('/images/double-check-orange.webp');
         }
 
 main {

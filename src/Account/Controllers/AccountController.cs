@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -295,6 +296,7 @@ public class AccountController : BaseController
         {
             Name = authUser.name,
             Language = user.Language,
+            Culture = user.Culture,
             ImageUri = user.ImageUri,
             DefaultImageUri = _cdnService.GetDefaultProfileImageUri(),
             BaseUrl = _configuration["Urls:Account"]
@@ -314,6 +316,7 @@ public class AccountController : BaseController
             {
                 Name = model.Name,
                 Language = model.Language,
+                Culture = model.Culture,
                 ImageUri = model.ImageUri,
                 DefaultImageUri = _cdnService.GetDefaultProfileImageUri(),
                 BaseUrl = _configuration["Urls:Account"]
@@ -330,7 +333,7 @@ public class AccountController : BaseController
         try
         {
             await Auth0ManagementUtil.UpdateNameAsync(httpClient, AuthId, model.Name);
-            await _userService.UpdateProfileAsync(UserId, model.Name, model.Language, imageUri);
+            await _userService.UpdateProfileAsync(UserId, model.Name, model.Language, model.Culture, imageUri);
         }
         catch (Exception ex)
         {
@@ -342,6 +345,7 @@ public class AccountController : BaseController
             {
                 Name = model.Name,
                 Language = model.Language,
+                Culture = model.Culture,
                 ImageUri = model.ImageUri,
                 DefaultImageUri = _cdnService.GetDefaultProfileImageUri(),
                 BaseUrl = _configuration["Urls:Account"]

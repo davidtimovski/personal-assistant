@@ -9,18 +9,12 @@ export class Forecast {
 		public weatherCode: WeatherCode,
 		public isNight: boolean,
 		public daily: ForecastDaily[],
-		public hourly: ForecastHourly[],
-		public illustrationSrc: string
+		public hourly: ForecastHourly[]
 	) {}
 }
 
 export class ForecastDaily {
-	constructor(
-		public weatherCode: WeatherCode,
-		public temperatureMax: number,
-		public temperatureMin: number,
-		public illustrationSrc: string
-	) {}
+	constructor(public weatherCode: WeatherCode, public temperatureMax: number, public temperatureMin: number) {}
 }
 
 export class ForecastHourly {
@@ -32,7 +26,6 @@ export class ForecastHourly {
 		public windSpeed: number,
 		public weatherCode: WeatherCode,
 		public isNight: boolean,
-		public timeString: string,
-		public illustrationSrc: string
+		public timeString: string
 	) {}
 }

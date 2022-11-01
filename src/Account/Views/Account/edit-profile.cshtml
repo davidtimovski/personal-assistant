@@ -30,10 +30,20 @@
     <div class="form-group">
         <input type="text" asp-for="Name" maxlength="30" placeholder="@Localizer["Name"]" aria-label="@Localizer["Name"]" required />
     </div>
+
     <div class="form-group">
-        <select asp-for="Language" aria-label="@Localizer["Language"]">
+        <select asp-for="Language" title="@Localizer["Language"]" aria-label="@Localizer["Language"]">
             <option value="en-US">English</option>
             <option value="mk-MK">Македонски</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <select asp-for="Culture" title="@Localizer["Culture"]" aria-label="@Localizer["Culture"]">
+            @foreach (var option in Model.CultureOptions)
+            {
+                <option value="@option.Value">@option.Label</option>
+            }
         </select>
     </div>
 

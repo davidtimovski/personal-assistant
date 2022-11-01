@@ -13,7 +13,7 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
-	import { locale, isOffline } from '$lib/stores';
+	import { language, culture, isOffline } from '$lib/stores';
 	import { ForecastsService } from '$lib/services/forecastsService';
 
 	let forecastsService: ForecastsService;
@@ -25,7 +25,13 @@
 		if (lang && (lang === Language.English || lang === Language.Macedonian)) {
 			localStorage.set('language', lang);
 		}
-		locale.set(localStorage.get('language'));
+		language.set(localStorage.get('language'));
+
+		const cul = $page.url.searchParams.get('cul');
+		if (cul) {
+			localStorage.set('culture', cul);
+		}
+		culture.set(localStorage.get('culture'));
 
 		const authService = new AuthService();
 		await authService.initialize();
@@ -37,7 +43,7 @@
 			return;
 		}
 
-		new ForecastsService().get($locale);
+		new ForecastsService().get($culture);
 
 		isOffline.set(!navigator.onLine);
 		window.addEventListener('online', () => {

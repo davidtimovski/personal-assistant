@@ -13,7 +13,7 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
-	import { locale, isOffline, authInfo } from '$lib/stores';
+	import { language, culture, isOffline, authInfo } from '$lib/stores';
 	import { ListsService } from '$lib/services/listsService';
 	import { SignalRClient } from '$lib/utils/signalRClient';
 
@@ -37,7 +37,13 @@
 		if (lang && (lang === Language.English || lang === Language.Macedonian)) {
 			localStorage.set('language', lang);
 		}
-		locale.set(localStorage.get('language'));
+		language.set(localStorage.get('language'));
+
+		const cul = $page.url.searchParams.get('cul');
+		if (cul) {
+			localStorage.set('culture', cul);
+		}
+		culture.set(localStorage.get('culture'));
 
 		const authService = new AuthService();
 		await authService.initialize();

@@ -8,7 +8,7 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
-	import { locale, lists, remoteEvents } from '$lib/stores';
+	import { language, lists, remoteEvents } from '$lib/stores';
 	import { TasksService } from '$lib/services/tasksService';
 	import { DerivedLists, ListsService } from '$lib/services/listsService';
 	import type { ListTask } from '$lib/models/viewmodels/listTask';
@@ -33,7 +33,7 @@
 	let soundPlayer: SoundPlayer;
 
 	function formatStaleTaskDate(modifiedDate: string): string {
-		return DateHelper.formatDayMonth(new Date(modifiedDate), $locale);
+		return DateHelper.formatDayMonth(new Date(modifiedDate), $language);
 	}
 
 	function searchTasksInputChanged() {
