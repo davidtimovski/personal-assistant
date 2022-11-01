@@ -121,11 +121,11 @@ public class UserService : IUserService
         }
     }
 
-    public async Task UpdateProfileAsync(int id, string name, string language, string imageUri)
+    public async Task UpdateProfileAsync(int id, string name, string language, string culture, string imageUri)
     {
         try
         {
-            await _usersRepository.UpdateProfileAsync(id, name.Trim(), language, imageUri);
+            await _usersRepository.UpdateProfileAsync(id, name.Trim(), language, culture, imageUri);
         }
         catch (Exception ex)
         {

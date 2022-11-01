@@ -1,5 +1,5 @@
 import { derived } from 'svelte/store';
-import { locale } from '$lib/stores';
+import { language } from '$lib/stores';
 import translations from '$lib/localization/translations';
 
 export const locales = Object.keys(translations);
@@ -27,7 +27,7 @@ function translate(locale: string, key: string, vars: any) {
 }
 
 export const t = derived(
-	locale,
+	language,
 	($locale) =>
 		(key: string, vars = {}) =>
 			translate($locale, key, vars)

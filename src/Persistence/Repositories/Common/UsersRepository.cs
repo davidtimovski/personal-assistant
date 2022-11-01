@@ -15,57 +15,58 @@ public class UsersRepository : BaseRepository, IUsersRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.QueryFirstOrDefault<User>(@"SELECT * FROM users WHERE id = @Id", new { Id = id });
+        return conn.QueryFirstOrDefault<User>(@"SELECT * FROM users WHERE id = @id", new { id });
     }
 
     public User Get(string email)
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.QueryFirstOrDefault<User>(@"SELECT * FROM users WHERE email = @Email", new { Email = email });
+        return conn.QueryFirstOrDefault<User>(@"SELECT * FROM users WHERE email = @email", new { email });
     }
 
     public int? GetId(string auth0Id)
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.QueryFirstOrDefault<int?>(@"SELECT user_id FROM user_id_map WHERE auth0_id = @Auth0Id", new { Auth0Id = auth0Id });
+        return conn.QueryFirstOrDefault<int?>(@"SELECT user_id FROM user_id_map WHERE auth0_id = @auth0Id", new { auth0Id });
     }
 
     public bool Exists(int id)
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM users WHERE id = @Id", new { Id = id });
+        return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM users WHERE id = @id", new { id });
     }
 
     public string GetLanguage(int id)
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.QueryFirstOrDefault<string>(@"SELECT language FROM users WHERE id = @Id", new { Id = id });
+        return conn.QueryFirstOrDefault<string>(@"SELECT language FROM users WHERE id = @id", new { id });
     }
 
     public string GetImageUri(int id)
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.QueryFirstOrDefault<string>(@"SELECT image_uri FROM users WHERE id = @Id", new { Id = id });
+        return conn.QueryFirstOrDefault<string>(@"SELECT image_uri FROM users WHERE id = @id", new { id });
     }
 
-    public async Task UpdateProfileAsync(int id, string name, string language, string imageUri)
+    public async Task UpdateProfileAsync(int id, string name, string language, string culture, string imageUri)
     {
         using IDbConnection conn = OpenConnection();
 
         await conn.QueryAsync(@"UPDATE users
-                                SET name = @Name, language = @Language, image_uri = @ImageUri
-                                WHERE id = @Id",
+                                SET name = @name, language = @language, culture = @culture, image_uri = @imageUri
+                                WHERE id = @id",
             new
             {
-                Id = id,
-                Name = name,
-                Language = language,
-                ImageUri = imageUri
+                id,
+                name,
+                language,
+                culture,
+                imageUri
             });
     }
 
@@ -74,12 +75,12 @@ public class UsersRepository : BaseRepository, IUsersRepository
         using IDbConnection conn = OpenConnection();
 
         await conn.QueryAsync(@"UPDATE users
-                                SET todo_notifications_enabled = @Enabled
-                                WHERE id = @Id",
+                                SET todo_notifications_enabled = @enabled
+                                WHERE id = @id",
             new
             {
-                Id = id,
-                Enabled = enabled
+                id,
+                enabled
             });
     }
 
@@ -88,12 +89,12 @@ public class UsersRepository : BaseRepository, IUsersRepository
         using IDbConnection conn = OpenConnection();
 
         await conn.QueryAsync(@"UPDATE users
-                                SET cooking_notifications_enabled = @Enabled
-                                WHERE id = @Id",
+                                SET cooking_notifications_enabled = @enabled
+                                WHERE id = @id",
             new
             {
-                Id = id,
-                Enabled = enabled
+                id,
+                enabled
             });
     }
 
@@ -102,12 +103,12 @@ public class UsersRepository : BaseRepository, IUsersRepository
         using IDbConnection conn = OpenConnection();
 
         await conn.QueryAsync(@"UPDATE users
-                                SET imperial_system = @ImperialSystem
-                                WHERE id = @Id",
+                                SET imperial_system = @imperialSystem
+                                WHERE id = @id",
             new
             {
-                Id = id,
-                ImperialSystem = imperialSystem
+                id,
+                imperialSystem
             });
     }
 }

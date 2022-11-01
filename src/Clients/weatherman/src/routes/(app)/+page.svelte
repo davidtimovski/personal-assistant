@@ -7,7 +7,7 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageKeys, LocalStorageUtil } from '$lib/utils/localStorageUtil';
-	import { isOffline, authInfo, forecast, locale } from '$lib/stores';
+	import { isOffline, authInfo, forecast, culture } from '$lib/stores';
 	import { ForecastsService } from '$lib/services/forecastsService';
 	import { WeatherCode } from '$lib/models/weatherCode';
 
@@ -15,7 +15,7 @@
 
 	let imageUri: any;
 	let now = new Date();
-	let currentTime = DateHelper.formatWeekdayHoursMinutes(now, $locale);
+	let currentTime = DateHelper.formatWeekdayHoursMinutes(now, $culture);
 	let weatherDescription: string;
 	let windSpeedUnit: string;
 	let precipitationUnit: string;
@@ -38,8 +38,8 @@
 		startProgressBar();
 
 		now = new Date();
-		currentTime = DateHelper.formatWeekdayHoursMinutes(now, $locale);
-		forecastsService.get($locale);
+		currentTime = DateHelper.formatWeekdayHoursMinutes(now, $culture);
+		forecastsService.get($culture);
 
 		usersService.getProfileImageUri().then((uri) => {
 			if (imageUri !== uri) {
@@ -183,7 +183,6 @@
 					<div class="current-illustration">
 						<Illustration weatherCode={$forecast.weatherCode} isNight={$forecast.isNight} />
 					</div>
-					<!-- <div style="background-image: url({$forecast.illustrationSrc});" class="current-illustration" alt="" /> -->
 
 					<div class="current-temp">{$forecast.temperature}°</div>
 
@@ -210,6 +209,8 @@
 						</tr>
 					</table>
 				</div>
+
+				<div class="gutter" />
 
 				<div class="hourly-forecast">
 					<table>
@@ -241,11 +242,14 @@
 
 	.current-forecast {
 		flex: 1;
-		padding: 0 10px;
+	}
+
+	.current-illustration {
+		padding: 0 20px;
 	}
 
 	.current-temp {
-		padding: 10px 0;
+		padding: 10px 0 0 5px;
 		font-size: 90px;
 		line-height: 70px;
 		text-align: center;
@@ -259,7 +263,7 @@
 	}
 
 	.weather-description {
-		margin: 30px 0 20px;
+		margin: 25px 0 20px;
 		font-size: 1.4rem;
 		line-height: 1.8rem;
 	}
@@ -286,6 +290,10 @@
 		}
 	}
 
+	.gutter {
+		flex: 0.1;
+	}
+
 	.hourly-forecast {
 		flex: 1;
 
@@ -294,9 +302,17 @@
 
 			td {
 				border-bottom: 1px solid #ddd;
-				padding: 3px 5px;
+				padding: 4px 5px;
 				font-size: 18px;
 				white-space: nowrap;
+
+				&.hourly-illustration {
+					padding: 1px 5px;
+				}
+			}
+
+			tr:last-child td {
+				border-bottom: none;
 			}
 		}
 	}

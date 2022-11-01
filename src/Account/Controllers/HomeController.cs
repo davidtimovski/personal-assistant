@@ -48,9 +48,9 @@ public class HomeController : BaseController
             UserName = user.Name,
             ClientApplications = new List<ClientApplicationViewModel>
             {
-                new ClientApplicationViewModel("To Do Assistant", _configuration["Urls:ToDoAssistant"] + $"?lang={user.Language}", "to-do-assistant"),
+                new ClientApplicationViewModel("To Do Assistant", _configuration["Urls:ToDoAssistant"] + $"?lang={user.Language}&cul={user.Culture}", "to-do-assistant"),
                 new ClientApplicationViewModel("Accountant", _configuration["Urls:Accountant"] + $"?lang={user.Language}", "accountant"),
-                new ClientApplicationViewModel("Weatherman", _configuration["Urls:Weatherman"] + $"?lang={user.Language}", "weatherman", ReleaseStatus.Beta),
+                new ClientApplicationViewModel("Weatherman", _configuration["Urls:Weatherman"] + $"?lang={user.Language}&cul={user.Culture}", "weatherman", ReleaseStatus.Beta),
                 new ClientApplicationViewModel("Cooking Assistant", "cooking-assistant"),
             },
             Alert = alert

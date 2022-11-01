@@ -7,7 +7,7 @@
 	import { DateHelper } from '../../../../../shared2/utils/dateHelper';
 
 	import { t } from '$lib/localization/i18n';
-	import { authInfo, locale } from '$lib/stores';
+	import { authInfo, culture } from '$lib/stores';
 	import { NotificationsService } from '$lib/services/notificationsService';
 	import type { Notification } from '$lib/models/viewmodels/notification';
 
@@ -15,7 +15,6 @@
 	let unseenNotifications: Array<Notification> | null = null;
 	let seenNotifications: Array<Notification> | null = null;
 	let seenNotificationsVisible = false;
-	let editedId: number | undefined;
 	const unsubscriptions: Unsubscriber[] = [];
 
 	let notificationsService: NotificationsService;
@@ -32,9 +31,9 @@
 	}
 
 	onMount(async () => {
-		const edited = $page.url.searchParams.get('edited');
-		if (edited) {
-			editedId = parseInt(edited, 10);
+		const id = $page.url.searchParams.get('id');
+		if (id) {
+			highlightedId = parseInt(id, 10);
 		}
 
 		notificationsService = new NotificationsService();
@@ -48,7 +47,10 @@
 				const allNotifications = await notificationsService.getAll();
 
 				for (const notification of allNotifications) {
-					notification.formattedCreatedDate = DateHelper.formatWeekdayTime(new Date(notification.createdDate), $locale);
+					notification.formattedCreatedDate = DateHelper.formatWeekdayTime(
+						new Date(notification.createdDate),
+						$culture
+					);
 					if (notification.listId && notification.taskId) {
 						notification.url = `/list/${notification.listId}?edited=${notification.taskId}`;
 					} else if (notification.listId) {
