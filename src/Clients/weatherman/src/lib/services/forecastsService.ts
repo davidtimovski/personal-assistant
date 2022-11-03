@@ -20,16 +20,23 @@ export class ForecastsService {
 				const temperatureUnit = this.localStorage.get(LocalStorageKeys.TemperatureUnit);
 				const precipitationUnit = this.localStorage.get(LocalStorageKeys.PrecipitationUnit);
 				const windSpeedUnit = this.localStorage.get(LocalStorageKeys.WindSpeedUnit);
-				const dateString = DateHelper.formatISO(now);
+				const time = DateHelper.formatISO(now);
 
 				const data = await this.httpProxy.ajax<Forecast>(
-					`${Variables.urls.api}/api/forecasts?latitude=${latitude}&longitude=${longitude}&temperatureunit=${temperatureUnit}&precipitationunit=${precipitationUnit}&windspeedunit=${windSpeedUnit}&date=${dateString}`
+					`${Variables.urls.api}/api/forecasts?latitude=${latitude}&longitude=${longitude}&temperatureunit=${temperatureUnit}&precipitationunit=${precipitationUnit}&windspeedunit=${windSpeedUnit}&time=${time}`
 				);
 
 				now.setMinutes(0);
 				for (const hourly of data.hourly) {
 					now.setHours(hourly.hour);
 					hourly.timeString = DateHelper.formatHours(now, culture);
+				}
+
+				for (const nextDay of data.nextDays) {
+					for (const hourly of nextDay.hourly) {
+						now.setHours(hourly.hour);
+						hourly.timeString = DateHelper.formatHours(now, culture);
+					}
 				}
 
 				forecast.set(data);

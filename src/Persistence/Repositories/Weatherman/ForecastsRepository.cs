@@ -13,15 +13,13 @@ public class ForecastsRepository : BaseRepository, IForecastsRepository
     public ForecastsRepository(PersonalAssistantContext efContext)
         : base(efContext) { }
 
-    public Forecast Get(float latitude, float longitude)
+    public Forecast Get(GetForecast parameters)
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.QueryFirstOrDefault<Forecast>(@"SELECT * FROM weatherman_forecasts WHERE latitude = @Latitude AND longitude = @Longitude", new
-        {
-            Latitude = latitude,
-            Longitude = longitude
-        });
+        return conn.QueryFirstOrDefault<Forecast>(@"SELECT * FROM weatherman_forecasts 
+            WHERE latitude = @Latitude AND longitude = @Longitude 
+                AND temperature_unit = @TemperatureUnit AND precipitation_unit = @PrecipitationUnit AND wind_speed_unit = @WindSpeedUnit", parameters);
     }
 
     public async Task CreateAsync(Forecast model)

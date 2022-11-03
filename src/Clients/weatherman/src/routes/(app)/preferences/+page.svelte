@@ -3,6 +3,7 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
+	import { culture } from '$lib/stores';
 	import { ForecastsService } from '$lib/services/forecastsService';
 
 	import DoubleRadioString from '$lib/components/DoubleRadioString.svelte';
@@ -16,17 +17,17 @@
 
 	function temperatureUnitChanged() {
 		localStorage.set(LocalStorageKeys.TemperatureUnit, temperatureUnit);
-		forecastsService.get();
+		forecastsService.get($culture);
 	}
 
 	function precipitationUnitChanged() {
 		localStorage.set(LocalStorageKeys.PrecipitationUnit, precipitationUnit);
-		forecastsService.get();
+		forecastsService.get($culture);
 	}
 
 	function windSpeedUnitChanged() {
 		localStorage.set(LocalStorageKeys.WindSpeedUnit, windSpeedUnit);
-		forecastsService.get();
+		forecastsService.get($culture);
 	}
 
 	onMount(() => {

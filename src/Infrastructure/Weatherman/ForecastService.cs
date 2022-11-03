@@ -68,62 +68,41 @@ public class ForecastService : IForecastService
             parameters.Latitude = (float)Math.Round(parameters.Latitude, 2);
             parameters.Longitude = (float)Math.Round(parameters.Longitude, 2);
 
-            var forecast = _forecastsRepository.Get(parameters.Latitude, parameters.Longitude);
+            var forecast = _forecastsRepository.Get(parameters);
             if (forecast == null)
             {
+                string data = await GetFromProviderAsync(parameters);
+                var openMeteoResult = JsonSerializer.Deserialize<OpenMeteoResult>(data);
+                ForecastResult result = Map(openMeteoResult, parameters);
+
                 forecast = new Forecast
                 {
                     Latitude = parameters.Latitude,
                     Longitude = parameters.Longitude,
+                    TemperatureUnit = parameters.TemperatureUnit,
+                    PrecipitationUnit = parameters.PrecipitationUnit,
+                    WindSpeedUnit = parameters.WindSpeedUnit,
                     LastUpdate = now,
-                    Data = await GetFromProviderAsync(parameters)
+                    Data = JsonSerializer.Serialize(result)
                 };
 
                 await _forecastsRepository.CreateAsync(forecast);
+
+                return result;
             }
             else if (forecast.LastUpdate < now.AddMinutes(-30))
             {
-                forecast.Data = await GetFromProviderAsync(parameters);
+                string data = await GetFromProviderAsync(parameters);
+                var openMeteoResult = JsonSerializer.Deserialize<OpenMeteoResult>(data);
+                ForecastResult result = Map(openMeteoResult, parameters);
+
+                forecast.Data = JsonSerializer.Serialize(result);
                 await _forecastsRepository.UpdateAsync(forecast.Id, now, forecast.Data);
+
+                return result;
             }
 
-            var data = JsonSerializer.Deserialize<OpenMeteoResult>(forecast.Data);
-
-            var result = new ForecastResult
-            {
-                Temperature = ConvertTemperature(data.hourly.temperature_2m[parameters.Date.Hour], data.hourly_units.TemperatureUnitString, parameters.TemperatureUnit),
-                ApparentTemperature = ConvertTemperature(data.hourly.apparent_temperature[parameters.Date.Hour], data.hourly_units.TemperatureUnitString, parameters.TemperatureUnit),
-                Precipitation = ConvertPrecipitation(data.hourly.precipitation[parameters.Date.Hour], data.hourly_units.precipitation, parameters.PrecipitationUnit),
-                WindSpeed = ConvertWindSpeed(data.hourly.windspeed_10m[parameters.Date.Hour], data.hourly_units.WindSpeedUnitString, parameters.WindSpeedUnit),
-                WeatherCode = (WeatherCode)data.hourly.weathercode[parameters.Date.Hour],
-                IsNight = parameters.Date > data.daily.sunset[0]
-            };
-
-            for (var i = 1; i < 7; i++)
-            {
-                result.Daily.Add(new Daily(
-                    WeatherCode: (WeatherCode)data.daily.weathercode[i],
-                    TemperatureMax: ConvertTemperature(data.daily.temperature_2m_max[i], data.daily_units.TemperatureMaxUnitString, parameters.TemperatureUnit),
-                    TemperatureMin: ConvertTemperature(data.daily.temperature_2m_min[i], data.daily_units.TemperatureMinUnitString, parameters.TemperatureUnit)
-                ));
-            }
-
-            int from = parameters.Date.Hour + 1;
-            int to = from + 24;
-            for (var i = from; i < to; i++)
-            {
-                result.Hourly.Add(new HourlyForecast(
-                    Hour: (short)data.hourly.time[i].Hour,
-                    Temperature: ConvertTemperature(data.hourly.temperature_2m[i], data.hourly_units.TemperatureUnitString, parameters.TemperatureUnit),
-                    ApparentTemperature: ConvertTemperature(data.hourly.apparent_temperature[i], data.hourly_units.TemperatureUnitString, parameters.TemperatureUnit),
-                    Precipitation: ConvertPrecipitation(data.hourly.precipitation[i], data.hourly_units.precipitation, parameters.PrecipitationUnit),
-                    WindSpeed: ConvertWindSpeed(data.hourly.windspeed_10m[i], data.hourly_units.WindSpeedUnitString, parameters.WindSpeedUnit),
-                    WeatherCode: (WeatherCode)data.hourly.weathercode[i],
-                    IsNight: data.hourly.time[i] > data.daily.sunset[0]
-                ));
-            }
-
-            return result;
+            return JsonSerializer.Deserialize<ForecastResult>(forecast.Data);
         }
         catch (Exception ex)
         {
@@ -152,48 +131,64 @@ public class ForecastService : IForecastService
         return await response.Content.ReadAsStringAsync();
     }
 
-    private short ConvertTemperature(float temperature, string fromUnit, string toUnit)
+    private static ForecastResult Map(OpenMeteoResult openMeteoResult, GetForecast parameters)
     {
-        if (fromUnit == toUnit)
+        var result = new ForecastResult
         {
-            return (short)Math.Round(temperature);
+            WeatherCode = (WeatherCode)openMeteoResult.hourly.weathercode[parameters.Time.Hour],
+            Temperature = (short)Math.Round(openMeteoResult.hourly.temperature_2m[parameters.Time.Hour]),
+            ApparentTemperature = (short)Math.Round(openMeteoResult.hourly.apparent_temperature[parameters.Time.Hour]),
+            Precipitation = (short)Math.Round(openMeteoResult.hourly.precipitation[parameters.Time.Hour]),
+            WindSpeed = (short)Math.Round(openMeteoResult.hourly.windspeed_10m[parameters.Time.Hour]),
+            IsNight = parameters.Time < openMeteoResult.daily.sunrise[0] || parameters.Time > openMeteoResult.daily.sunset[0],
+            NextDays = new List<DailyForecast>(5),
+            Hourly = new List<HourlyForecast>(24)
+        };
+
+        int from = parameters.Time.Hour + 1;
+        int to = from + 24;
+        for (var i = from; i < to; i++)
+        {
+            result.Hourly.Add(new HourlyForecast(
+                Hour: (short)openMeteoResult.hourly.time[i].Hour,
+                WeatherCode: (WeatherCode)openMeteoResult.hourly.weathercode[i],
+                Temperature: (short)Math.Round(openMeteoResult.hourly.temperature_2m[i]),
+                ApparentTemperature: (short)Math.Round(openMeteoResult.hourly.apparent_temperature[i]),
+                Precipitation: (short)Math.Round(openMeteoResult.hourly.precipitation[i]),
+                WindSpeed: (short)Math.Round(openMeteoResult.hourly.windspeed_10m[i]),
+                IsNight: openMeteoResult.hourly.time[i] < openMeteoResult.daily.sunrise[0] || openMeteoResult.hourly.time[i] > openMeteoResult.daily.sunset[0]
+            ));
         }
 
-        if (fromUnit == "celsius")
+        for (var i = 1; i < 6; i++)
         {
-            return (short)Math.Round((temperature * 1.8) + 32);
+            var dailyForecast = new DailyForecast
+            {
+                Date = openMeteoResult.daily.time[i].ToString("yyyy-MM-dd"),
+                WeatherCode = (WeatherCode)openMeteoResult.daily.weathercode[i],
+                TemperatureMax = (short)Math.Round(openMeteoResult.daily.temperature_2m_max[i]),
+                TemperatureMin = (short)Math.Round(openMeteoResult.daily.temperature_2m_min[i]),
+                Hourly = new List<HourlyForecast>(24)
+            };
+
+            var fromIndex = i * 24 + 7;
+            var toIndex = fromIndex + 24;
+            for (var j = fromIndex; j < toIndex; j++)
+            {
+                dailyForecast.Hourly.Add(new HourlyForecast(
+                   Hour: (short)openMeteoResult.hourly.time[j].Hour,
+                   WeatherCode: (WeatherCode)openMeteoResult.hourly.weathercode[j],
+                   Temperature: (short)Math.Round(openMeteoResult.hourly.temperature_2m[j]),
+                   ApparentTemperature: (short)Math.Round(openMeteoResult.hourly.apparent_temperature[j]),
+                   Precipitation: (short)Math.Round(openMeteoResult.hourly.precipitation[j]),
+                   WindSpeed: (short)Math.Round(openMeteoResult.hourly.windspeed_10m[j]),
+                   IsNight: openMeteoResult.hourly.time[j] < openMeteoResult.daily.sunrise[i] || openMeteoResult.hourly.time[j] > openMeteoResult.daily.sunset[i]
+               ));
+            }
+
+            result.NextDays.Add(dailyForecast);
         }
 
-        return (short)Math.Round((temperature - 32) / 1.8);
-    }
-
-    private short ConvertPrecipitation(float precipitation, string fromUnit, string toUnit)
-    {
-        if (fromUnit == toUnit)
-        {
-            return (short)Math.Round(precipitation);
-        }
-
-        if (fromUnit == "mm")
-        {
-            return (short)Math.Round(precipitation / 25.4);
-        }
-
-        return (short)Math.Round(precipitation * 25.4);
-    }
-
-    private short ConvertWindSpeed(float windSpeed, string fromUnit, string toUnit)
-    {
-        if (fromUnit == toUnit)
-        {
-            return (short)Math.Round(windSpeed);
-        }
-
-        if (fromUnit == "kmh")
-        {
-            return (short)Math.Round(windSpeed / 1.609);
-        }
-
-        return (short)Math.Round(windSpeed * 1.609);
+        return result;
     }
 }

@@ -7,22 +7,41 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageKeys, LocalStorageUtil } from '$lib/utils/localStorageUtil';
-	import { isOffline, authInfo, forecast, culture } from '$lib/stores';
+	import { isOffline, authInfo, forecast, language, culture } from '$lib/stores';
 	import { ForecastsService } from '$lib/services/forecastsService';
 	import { WeatherCode } from '$lib/models/weatherCode';
 
 	import Illustration from '$lib/components/Illustration.svelte';
+	import NextDayForecast from '$lib/components/NextDayForecast.svelte';
 
 	let imageUri: any;
 	let now = new Date();
-	let currentTime = DateHelper.formatWeekdayHoursMinutes(now, $culture);
-	let weatherDescription: string;
-	let windSpeedUnit: string;
-	let precipitationUnit: string;
+	let selectedDate = DateHelper.format(now);
+	let currentTime = DateHelper.formatHoursMinutes(now, $culture);
+	let currentDate = selectedDate;
+	let weatherDescription = '';
+	let windSpeedUnit = '';
+	let precipitationUnit = '';
 	const weatherDescriptionTr = new Map<WeatherCode, string>();
 	const windSpeedUnitsTr = new Map<string, string>();
 	const precipitationUnitsTr = new Map<string, string>();
 	const unsubscriptions: Unsubscriber[] = [];
+
+	const current = new Date();
+	const weekDays = [
+		{
+			date: currentDate,
+			weekDay: DateHelper.formatWeekdayShort(now, $language)
+		}
+	];
+	for (let i = 0; i < 5; i++) {
+		current.setDate(current.getDate() + 1);
+
+		weekDays.push({
+			date: DateHelper.format(current),
+			weekDay: DateHelper.formatWeekdayShort(current, $language)
+		});
+	}
 
 	// Progress bar
 	let progressBarActive = false;
@@ -34,11 +53,17 @@
 	let usersService: UsersServiceBase;
 	let forecastsService: ForecastsService;
 
+	function setCurrentTime() {
+		now = new Date();
+		selectedDate = DateHelper.format(now);
+		currentTime = DateHelper.formatHoursMinutes(now, $culture);
+		currentDate = selectedDate;
+	}
+
 	function sync() {
 		startProgressBar();
 
-		now = new Date();
-		currentTime = DateHelper.formatWeekdayHoursMinutes(now, $culture);
+		setCurrentTime();
 		forecastsService.get($culture);
 
 		usersService.getProfileImageUri().then((uri) => {
@@ -69,6 +94,10 @@
 			progressBarActive = false;
 			progressBarVisible = false;
 		}, 500);
+	}
+
+	function selectDate(date: string) {
+		selectedDate = date;
 	}
 
 	onMount(() => {
@@ -177,55 +206,74 @@
 	</div>
 
 	<div class="content-wrap">
+		<div class="days">
+			{#each weekDays as weekDay}
+				<button
+					type="button"
+					on:click={() => selectDate(weekDay.date)}
+					class="week-day"
+					class:selected={selectedDate === weekDay.date}>{weekDay.weekDay}</button
+				>
+			{/each}
+		</div>
+
 		{#if $forecast !== null}
-			<div class="wrap">
-				<div class="current-forecast">
-					<div class="current-illustration">
-						<Illustration weatherCode={$forecast.weatherCode} isNight={$forecast.isNight} />
+			<div class="tab" class:visible={selectedDate === currentDate}>
+				<div class="wrap">
+					<div class="current-forecast">
+						<div class="current-illustration">
+							<Illustration weatherCode={$forecast.weatherCode} isNight={$forecast.isNight} />
+						</div>
+
+						<div class="current-temp">{$forecast.temperature}°</div>
+
+						{#if $forecast.temperature !== $forecast.apparentTemperature}
+							<div class="current-apparent-temp">{$t('index.feelsLike')} {$forecast.apparentTemperature}°</div>
+						{/if}
+
+						<div class="weather-description">{weatherDescription}</div>
+
+						<table class="wind-and-precipitation">
+							<tr class="wind">
+								<td><i class="fa-solid fa-wind" /></td>
+								<td>
+									<span class="current-value">{$forecast.windSpeed}</span>
+									<span>{windSpeedUnit}</span>
+								</td>
+							</tr>
+							<tr class="precipitation">
+								<td><i class="fa-solid fa-droplet" /></td>
+								<td>
+									<span class="current-value">{$forecast.precipitation}</span>
+									<span>{precipitationUnit}</span>
+								</td>
+							</tr>
+						</table>
 					</div>
 
-					<div class="current-temp">{$forecast.temperature}°</div>
+					<div class="gutter" />
 
-					{#if $forecast.temperature !== $forecast.apparentTemperature}
-						<div class="current-apparent-temp">{$t('index.feelsLike')} {$forecast.apparentTemperature}°</div>
-					{/if}
-
-					<div class="weather-description">{weatherDescription}</div>
-
-					<table class="wind-and-precipitation">
-						<tr class="wind">
-							<td><i class="fa-solid fa-wind" /></td>
-							<td>
-								<span class="current-value">{$forecast.windSpeed}</span>
-								<span>{windSpeedUnit}</span>
-							</td>
-						</tr>
-						<tr class="precipitation">
-							<td><i class="fa-solid fa-droplet" /></td>
-							<td>
-								<span class="current-value">{$forecast.precipitation}</span>
-								<span>{precipitationUnit}</span>
-							</td>
-						</tr>
-					</table>
-				</div>
-
-				<div class="gutter" />
-
-				<div class="hourly-forecast">
-					<table>
-						{#each $forecast.hourly as hourForecast}
-							<tr>
-								<td>{hourForecast.timeString}</td>
-								<td class="hourly-illustration">
-									<Illustration weatherCode={hourForecast.weatherCode} isNight={hourForecast.isNight} />
-								</td>
-								<td>{hourForecast.temperature}°</td>
-							</tr>
-						{/each}
-					</table>
+					<div class="hourly-forecast">
+						<table>
+							{#each $forecast.hourly as hourForecast}
+								<tr>
+									<td>{hourForecast.timeString}</td>
+									<td class="hourly-illustration">
+										<Illustration weatherCode={hourForecast.weatherCode} isNight={hourForecast.isNight} />
+									</td>
+									<td>{hourForecast.temperature}°</td>
+								</tr>
+							{/each}
+						</table>
+					</div>
 				</div>
 			</div>
+
+			{#each $forecast.nextDays as nextDay}
+				<div class="tab" class:visible={nextDay.date === selectedDate}>
+					<NextDayForecast forecast={nextDay} />
+				</div>
+			{/each}
 		{/if}
 	</div>
 </section>
@@ -234,6 +282,27 @@
 	.page-title {
 		font-size: 22px;
 		color: #774022;
+	}
+
+	.days {
+		display: flex;
+		gap: 8px;
+		margin-bottom: 30px;
+
+		.week-day {
+			flex: 1;
+			background: #eee;
+			border: none;
+			border-radius: 4px;
+			outline: none;
+			padding: 4px 6px;
+			transition: background var(--transition);
+
+			&.selected {
+				background: var(--primary-color);
+				color: #fff;
+			}
+		}
 	}
 
 	.wrap {
@@ -306,6 +375,14 @@
 				font-size: 18px;
 				white-space: nowrap;
 
+				&:nth-child(2) {
+					text-align: center;
+				}
+
+				&:nth-child(3) {
+					text-align: right;
+				}
+
 				&.hourly-illustration {
 					padding: 1px 5px;
 				}
@@ -314,6 +391,20 @@
 			tr:last-child td {
 				border-bottom: none;
 			}
+		}
+	}
+
+	.tab {
+		display: none;
+
+		&.visible {
+			display: block;
+		}
+	}
+
+	@media screen and (min-width: 800px) {
+		.days .week-day {
+			padding: 6px;
 		}
 	}
 </style>

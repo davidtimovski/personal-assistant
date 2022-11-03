@@ -4,16 +4,23 @@ namespace Application.Contracts.Weatherman.Forecasts.Models;
 
 public class ForecastResult
 {
-    public short Temperature { get; set; }
-    public short ApparentTemperature { get; set; }
-    public short Precipitation { get; set; }
-    public short WindSpeed { get; set; }
-    public WeatherCode WeatherCode { get; set; }
-    public bool IsNight { get; set; }
-    public List<Daily> Daily { get; } = new List<Daily>(7);
-    public List<HourlyForecast> Hourly { get; } = new List<HourlyForecast>(24);
+    public WeatherCode WeatherCode { get; init; }
+    public short Temperature { get; init; }
+    public short ApparentTemperature { get; init; }
+    public short Precipitation { get; init; }
+    public short WindSpeed { get; init; }
+    public bool IsNight { get; init; }
+    public List<HourlyForecast> Hourly { get; init; }
+    public List<DailyForecast> NextDays { get; init; }
 }
 
-public readonly record struct Daily(WeatherCode WeatherCode, short TemperatureMax, short TemperatureMin);
+public class DailyForecast
+{
+    public string Date { get; init; }
+    public WeatherCode WeatherCode { get; init; }
+    public short TemperatureMax { get; init; }
+    public short TemperatureMin { get; init; }
+    public List<HourlyForecast> Hourly { get; init; }
+}
 
-public readonly record struct HourlyForecast(short Hour, short Temperature, short ApparentTemperature, short Precipitation, short WindSpeed, WeatherCode WeatherCode, bool IsNight);
+public readonly record struct HourlyForecast(short Hour, WeatherCode WeatherCode, short Temperature, short ApparentTemperature, short Precipitation, short WindSpeed, bool IsNight);
