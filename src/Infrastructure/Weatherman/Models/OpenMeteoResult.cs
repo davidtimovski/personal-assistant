@@ -79,6 +79,7 @@ internal class OpenMeteoHourly
 
 internal class OpenMeteoDaily
 {
+    public DateTime[] time { get; set; }
     public short[] weathercode { get; set; }
     public float[] temperature_2m_max { get; set; }
     public float[] temperature_2m_min { get; set; }

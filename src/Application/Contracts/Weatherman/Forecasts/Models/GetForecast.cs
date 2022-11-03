@@ -9,5 +9,5 @@ public class GetForecast
     public string TemperatureUnit { get; set; }
     public string PrecipitationUnit { get; set; }
     public string WindSpeedUnit { get; set; }
-    public DateTime Date { get; set; }
+    public DateTime Time { get; set; }
 }

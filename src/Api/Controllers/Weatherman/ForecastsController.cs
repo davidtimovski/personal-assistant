@@ -21,7 +21,7 @@ public class ForecastsController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get(float latitude, float longitude, string temperatureUnit, string precipitationUnit, string windSpeedUnit, DateTime date)
+    public async Task<IActionResult> Get(float latitude, float longitude, string temperatureUnit, string precipitationUnit, string windSpeedUnit, DateTime time)
     {
         if (temperatureUnit == null || precipitationUnit == null || windSpeedUnit == null)
         {
@@ -35,7 +35,7 @@ public class ForecastsController : Controller
             TemperatureUnit = temperatureUnit,
             PrecipitationUnit = precipitationUnit,
             WindSpeedUnit = windSpeedUnit,
-            Date = date
+            Time = time
         };
         var forecast = await _forecastService.GetAsync(parameters);
 
