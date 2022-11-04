@@ -9,10 +9,5 @@ public interface IUsersRepository
     User Get(string email);
     int? GetId(string auth0Id);
     bool Exists(int id);
-    string GetLanguage(int id);
-    string GetImageUri(int id);
-    Task UpdateProfileAsync(int id, string name, string language, string culture, string imageUri);
-    Task UpdateToDoNotificationsEnabledAsync(int id, bool enabled);
-    Task UpdateCookingNotificationsEnabledAsync(int id, bool enabled);
-    Task UpdateImperialSystemAsync(int id, bool imperialSystem);
+    Task UpdateAsync(User user);
 }

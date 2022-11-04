@@ -6,13 +6,6 @@ export class DateHelper {
       .split("T")[0];
   }
 
-  /** Format as 2022-10-25T18:15:14.321Z. Adjusted for time zone. */
-  static formatISO(date: Date): string {
-    return new Date(
-      date.getTime() - date.getTimezoneOffset() * 60000
-    ).toISOString();
-  }
-
   /** Format as 25/10/2022. */
   static formatForReading(date: Date): string {
     return date.toLocaleDateString("en-GB");

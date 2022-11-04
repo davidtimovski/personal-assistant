@@ -7,8 +7,6 @@ import Variables from "$lib/variables";
 export class AuthService {
   private client: Auth0Client | null = null;
 
-  constructor() {}
-
   get initialized(): boolean {
     return this.client !== null;
   }

@@ -1,15 +1,11 @@
-import { Language } from "../models/enums/language";
-
 export class LocalStorageBase {
-  private readonly defaults = new Map<string, any>([
-    ["language", Language.English],
-    ["profileImageUri", null],
-    ["profileImageUriLastLoad", 0],
-  ]);
+  private readonly defaults: Map<string, any>;
 
-  constructor(additionalDefaults?: Map<string, any>) {
-    if (additionalDefaults) {
-      this.defaults = new Map([...this.defaults, ...additionalDefaults]);
+  constructor(defaults?: Map<string, any>) {
+    if (defaults) {
+      this.defaults = defaults;
+    } else {
+      this.defaults = new Map<string, any>();
     }
   }
 
@@ -41,6 +37,7 @@ export class LocalStorageBase {
   }
 
   public clear() {
+    window.localStorage.removeItem("user");
     for (const key of this.defaults.keys()) {
       window.localStorage.removeItem(key);
     }

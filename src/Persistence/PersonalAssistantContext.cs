@@ -13,6 +13,8 @@ public class PersonalAssistantContext : DbContext
     {
     }
 
+    public DbSet<User> Users { get; set; }
+
     public DbSet<ToDoList> Lists { get; set; }
     public DbSet<ToDoTask> Tasks { get; set; }
     public DbSet<ListShare> ListShares { get; set; }
@@ -41,6 +43,11 @@ public class PersonalAssistantContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<User>(x =>
+        {
+            x.Property(e => e.ToDoNotificationsEnabled).HasColumnName("todo_notifications_enabled");
+        });
+
         modelBuilder.Entity<ToDoList>(x =>
         {
             x.ToTable("todo_lists");

@@ -7,17 +7,16 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageKeys, LocalStorageUtil } from '$lib/utils/localStorageUtil';
-	import { isOffline, authInfo, forecast, language, culture } from '$lib/stores';
+	import { isOffline, user, forecast } from '$lib/stores';
 	import { ForecastsService } from '$lib/services/forecastsService';
 	import { WeatherCode } from '$lib/models/weatherCode';
 
 	import Illustration from '$lib/components/Illustration.svelte';
 	import NextDayForecast from '$lib/components/NextDayForecast.svelte';
 
-	let imageUri: any;
 	let now = new Date();
-	let selectedDate = DateHelper.format(now);
-	let currentTime = DateHelper.formatHoursMinutes(now, $culture);
+	let selectedDate = '';
+	let currentTime = '';
 	let currentDate = selectedDate;
 	let weatherDescription = '';
 	let windSpeedUnit = '';
@@ -28,20 +27,7 @@
 	const unsubscriptions: Unsubscriber[] = [];
 
 	const current = new Date();
-	const weekDays = [
-		{
-			date: currentDate,
-			weekDay: DateHelper.formatWeekdayShort(now, $language)
-		}
-	];
-	for (let i = 0; i < 5; i++) {
-		current.setDate(current.getDate() + 1);
-
-		weekDays.push({
-			date: DateHelper.format(current),
-			weekDay: DateHelper.formatWeekdayShort(current, $language)
-		});
-	}
+	const weekDays: any[] = [];
 
 	// Progress bar
 	let progressBarActive = false;
@@ -56,7 +42,7 @@
 	function setCurrentTime() {
 		now = new Date();
 		selectedDate = DateHelper.format(now);
-		currentTime = DateHelper.formatHoursMinutes(now, $culture);
+		currentTime = DateHelper.formatHoursMinutes(now, $user.culture);
 		currentDate = selectedDate;
 	}
 
@@ -64,13 +50,7 @@
 		startProgressBar();
 
 		setCurrentTime();
-		forecastsService.get($culture);
-
-		usersService.getProfileImageUri().then((uri) => {
-			if (imageUri !== uri) {
-				imageUri = uri;
-			}
-		});
+		forecastsService.get($user.culture);
 	}
 
 	function startProgressBar() {
@@ -137,23 +117,8 @@
 		usersService = new UsersServiceBase('Weatherman');
 		forecastsService = new ForecastsService();
 
-		imageUri = localStorage.get('profileImageUri');
 		windSpeedUnit = <string>windSpeedUnitsTr.get(localStorage.get(LocalStorageKeys.WindSpeedUnit));
 		precipitationUnit = <string>precipitationUnitsTr.get(localStorage.get(LocalStorageKeys.PrecipitationUnit));
-
-		unsubscriptions.push(
-			authInfo.subscribe((value) => {
-				if (!value) {
-					return;
-				}
-
-				if (usersService.profileImageUriIsStale()) {
-					usersService.getProfileImageUri().then((uri) => {
-						imageUri = uri;
-					});
-				}
-			})
-		);
 
 		if ($forecast === null) {
 			startProgressBar();
@@ -163,6 +128,21 @@
 			forecast.subscribe((x) => {
 				if (!x) {
 					return;
+				}
+
+				setCurrentTime();
+
+				weekDays.push({
+					date: currentDate,
+					weekDay: DateHelper.formatWeekdayShort(now, $user.language)
+				});
+				for (let i = 0; i < 5; i++) {
+					current.setDate(current.getDate() + 1);
+
+					weekDays.push({
+						date: DateHelper.format(current),
+						weekDay: DateHelper.formatWeekdayShort(current, $user.language)
+					});
 				}
 
 				weatherDescription = <string>weatherDescriptionTr.get(x.weatherCode);
@@ -185,7 +165,7 @@
 	<div class="page-title-wrap-loader">
 		<div class="title-wrap">
 			<a href="/menu" class="profile-image-container" title={$t('index.menu')} aria-label={$t('index.menu')}>
-				<img src={imageUri} class="profile-image" width="40" height="40" alt="" />
+				<img src={$user.imageUri} class="profile-image" width="40" height="40" alt="" />
 			</a>
 
 			<div class="page-title">{currentTime}</div>

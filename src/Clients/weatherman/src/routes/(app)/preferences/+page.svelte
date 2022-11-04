@@ -3,10 +3,11 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
-	import { culture } from '$lib/stores';
+	import { user } from '$lib/stores';
 	import { ForecastsService } from '$lib/services/forecastsService';
 
 	import DoubleRadioString from '$lib/components/DoubleRadioString.svelte';
+	import type { WeathermanUser } from '$lib/models/user';
 
 	let localStorage: LocalStorageUtil;
 	let forecastsService: ForecastsService;
@@ -17,17 +18,17 @@
 
 	function temperatureUnitChanged() {
 		localStorage.set(LocalStorageKeys.TemperatureUnit, temperatureUnit);
-		forecastsService.get($culture);
+		forecastsService.get((<WeathermanUser>$user).culture);
 	}
 
 	function precipitationUnitChanged() {
 		localStorage.set(LocalStorageKeys.PrecipitationUnit, precipitationUnit);
-		forecastsService.get($culture);
+		forecastsService.get((<WeathermanUser>$user).culture);
 	}
 
 	function windSpeedUnitChanged() {
 		localStorage.set(LocalStorageKeys.WindSpeedUnit, windSpeedUnit);
-		forecastsService.get($culture);
+		forecastsService.get((<WeathermanUser>$user).culture);
 	}
 
 	onMount(() => {

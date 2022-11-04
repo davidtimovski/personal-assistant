@@ -5,34 +5,36 @@
 	export const prerender = true;
 
 	import { onMount, onDestroy } from 'svelte/internal';
-	import { page } from '$app/stores';
 
-	import { Language } from '../../../../shared2/models/enums/language';
+	import { UsersServiceBase } from '../../../../shared2/services/usersServiceBase';
 	import { AuthService } from '../../../../shared2/services/authService';
 	import Alert from '../../../../shared2/components/Alert.svelte';
 
 	import { t } from '$lib/localization/i18n';
-	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
-	import { language, culture, isOffline } from '$lib/stores';
+	import { isOffline, user } from '$lib/stores';
 	import { ForecastsService } from '$lib/services/forecastsService';
+	import type { WeathermanUser } from '$lib/models/user';
 
+	let usersService: UsersServiceBase;
 	let forecastsService: ForecastsService;
 
+	function loadUser() {
+		const usersService = new UsersServiceBase('Weatherman');
+
+		const cachedUser = usersService.getFromCache();
+		if (cachedUser) {
+			user.set(cachedUser);
+		}
+
+		usersService.get<WeathermanUser>().then((currentUser) => {
+			user.set(currentUser);
+			usersService.cache(currentUser);
+
+			new ForecastsService().get(currentUser.culture);
+		});
+	}
+
 	onMount(async () => {
-		const localStorage = new LocalStorageUtil();
-
-		const lang = $page.url.searchParams.get('lang');
-		if (lang && (lang === Language.English || lang === Language.Macedonian)) {
-			localStorage.set('language', lang);
-		}
-		language.set(localStorage.get('language'));
-
-		const cul = $page.url.searchParams.get('cul');
-		if (cul) {
-			localStorage.set('culture', cul);
-		}
-		culture.set(localStorage.get('culture'));
-
 		const authService = new AuthService();
 		await authService.initialize();
 
@@ -43,7 +45,7 @@
 			return;
 		}
 
-		new ForecastsService().get($culture);
+		loadUser();
 
 		isOffline.set(!navigator.onLine);
 		window.addEventListener('online', () => {
@@ -55,6 +57,7 @@
 	});
 
 	onDestroy(() => {
+		usersService?.release();
 		forecastsService?.release();
 	});
 </script>

@@ -10,6 +10,7 @@ public class ViewProfileViewModel
     {
         CultureOptions = CultureInfo.GetCultures(CultureTypes.AllCultures)
             .Where(x => !string.IsNullOrEmpty(x.Name))
+            .OrderBy(x => x.EnglishName)
             .Select(x => new CultureOption(x.Name, x.EnglishName)).ToList();
     }
 

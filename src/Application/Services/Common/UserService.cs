@@ -53,6 +53,22 @@ public class UserService : IUserService
         }
     }
 
+    public T Get<T>(int id) where T : UserDto
+    {
+        try
+        {
+            var user = _usersRepository.Get(id);
+            var result = _mapper.Map<T>(user);
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(Get)}");
+            throw;
+        }
+    }
+
     public bool Exists(int id)
     {
         try
@@ -62,33 +78,6 @@ public class UserService : IUserService
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(Exists)}");
-            throw;
-        }
-    }
-
-    public string GetLanguage(int id)
-    {
-        try
-        {
-            return _usersRepository.GetLanguage(id);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(GetLanguage)}");
-            throw;
-        }
-    }
-
-    public string GetImageUri(int id)
-    {
-        try
-        {
-            string imageUri = _usersRepository.GetImageUri(id);
-            return _cdnService.ImageUriToThumbnail(imageUri);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(GetImageUri)}");
             throw;
         }
     }
@@ -125,7 +114,14 @@ public class UserService : IUserService
     {
         try
         {
-            await _usersRepository.UpdateProfileAsync(id, name.Trim(), language, culture, imageUri);
+            var user = _usersRepository.Get(id);
+            user.Name = name;
+            user.Language = language;
+            user.Culture = culture;
+            user.ImageUri = imageUri;
+            user.ModifiedDate = DateTime.UtcNow;
+
+            await _usersRepository.UpdateAsync(user);
         }
         catch (Exception ex)
         {
@@ -138,7 +134,11 @@ public class UserService : IUserService
     {
         try
         {
-            await _usersRepository.UpdateToDoNotificationsEnabledAsync(id, enabled);
+            var user = _usersRepository.Get(id);
+            user.ToDoNotificationsEnabled = enabled;
+            user.ModifiedDate = DateTime.UtcNow;
+
+            await _usersRepository.UpdateAsync(user);
         }
         catch (Exception ex)
         {
@@ -151,7 +151,11 @@ public class UserService : IUserService
     {
         try
         {
-            await _usersRepository.UpdateCookingNotificationsEnabledAsync(id, enabled);
+            var user = _usersRepository.Get(id);
+            user.CookingNotificationsEnabled = enabled;
+            user.ModifiedDate = DateTime.UtcNow;
+
+            await _usersRepository.UpdateAsync(user);
         }
         catch (Exception ex)
         {
@@ -164,7 +168,11 @@ public class UserService : IUserService
     {
         try
         {
-            await _usersRepository.UpdateImperialSystemAsync(id, imperialSystem);
+            var user = _usersRepository.Get(id);
+            user.ImperialSystem = imperialSystem;
+            user.ModifiedDate = DateTime.UtcNow;
+
+            await _usersRepository.UpdateAsync(user);
         }
         catch (Exception ex)
         {
