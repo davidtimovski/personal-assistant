@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Application.Contracts.Common;
 using Application.Contracts.Common.Models;
+using Application.Contracts.Weatherman;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -22,20 +23,19 @@ public class UsersController : BaseController
         _userService = userService;
     }
 
-    [HttpGet("language")]
-    public IActionResult GetLanguage()
+    [HttpGet]
+    public IActionResult Get(string application)
     {
-        string language = _userService.GetLanguage(UserId);
+        UserDto user = null;
 
-        return Ok(language);
-    }
+        switch (application)
+        {
+            case "Weatherman":
+                user = _userService.Get<WeathermanUser>(UserId);
+                break;
+        }
 
-    [HttpGet("profile-image-uri")]
-    public IActionResult GetProfileImageUri()
-    {
-        string imageUri = _userService.GetImageUri(UserId);
-
-        return Ok(imageUri);
+        return Ok(user);
     }
 
     [HttpGet("to-do-preferences")]

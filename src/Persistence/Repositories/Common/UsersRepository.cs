@@ -15,14 +15,14 @@ public class UsersRepository : BaseRepository, IUsersRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.QueryFirstOrDefault<User>(@"SELECT * FROM users WHERE id = @id", new { id });
+        return conn.QueryFirst<User>(@"SELECT * FROM users WHERE id = @id", new { id });
     }
 
     public User Get(string email)
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.QueryFirstOrDefault<User>(@"SELECT * FROM users WHERE email = @email", new { email });
+        return conn.QueryFirst<User>(@"SELECT * FROM users WHERE email = @email", new { email });
     }
 
     public int? GetId(string auth0Id)
@@ -39,76 +39,19 @@ public class UsersRepository : BaseRepository, IUsersRepository
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM users WHERE id = @id", new { id });
     }
 
-    public string GetLanguage(int id)
+    public async Task UpdateAsync(User user)
     {
-        using IDbConnection conn = OpenConnection();
+        User dbUser = EFContext.Users.Find(user.Id);
 
-        return conn.QueryFirstOrDefault<string>(@"SELECT language FROM users WHERE id = @id", new { id });
-    }
+        dbUser.Name = user.Name;
+        dbUser.Language = user.Language;
+        dbUser.Culture = user.Culture;
+        dbUser.ToDoNotificationsEnabled = user.ToDoNotificationsEnabled;
+        dbUser.CookingNotificationsEnabled = user.CookingNotificationsEnabled;
+        dbUser.ImperialSystem = user.ImperialSystem;
+        dbUser.ImageUri = user.ImageUri;
+        dbUser.ModifiedDate = user.ModifiedDate;
 
-    public string GetImageUri(int id)
-    {
-        using IDbConnection conn = OpenConnection();
-
-        return conn.QueryFirstOrDefault<string>(@"SELECT image_uri FROM users WHERE id = @id", new { id });
-    }
-
-    public async Task UpdateProfileAsync(int id, string name, string language, string culture, string imageUri)
-    {
-        using IDbConnection conn = OpenConnection();
-
-        await conn.QueryAsync(@"UPDATE users
-                                SET name = @name, language = @language, culture = @culture, image_uri = @imageUri
-                                WHERE id = @id",
-            new
-            {
-                id,
-                name,
-                language,
-                culture,
-                imageUri
-            });
-    }
-
-    public async Task UpdateToDoNotificationsEnabledAsync(int id, bool enabled)
-    {
-        using IDbConnection conn = OpenConnection();
-
-        await conn.QueryAsync(@"UPDATE users
-                                SET todo_notifications_enabled = @enabled
-                                WHERE id = @id",
-            new
-            {
-                id,
-                enabled
-            });
-    }
-
-    public async Task UpdateCookingNotificationsEnabledAsync(int id, bool enabled)
-    {
-        using IDbConnection conn = OpenConnection();
-
-        await conn.QueryAsync(@"UPDATE users
-                                SET cooking_notifications_enabled = @enabled
-                                WHERE id = @id",
-            new
-            {
-                id,
-                enabled
-            });
-    }
-
-    public async Task UpdateImperialSystemAsync(int id, bool imperialSystem)
-    {
-        using IDbConnection conn = OpenConnection();
-
-        await conn.QueryAsync(@"UPDATE users
-                                SET imperial_system = @imperialSystem
-                                WHERE id = @id",
-            new
-            {
-                id,
-                imperialSystem
-            });
+        await EFContext.SaveChangesAsync();
     }
 }

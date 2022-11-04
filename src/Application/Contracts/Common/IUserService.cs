@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Application.Contracts.Common.Models;
 using Domain.Entities.Common;
 
@@ -8,9 +9,8 @@ public interface IUserService
 {
     User Get(int id);
     User Get(string email);
+    T Get<T>(int id) where T : UserDto;
     bool Exists(int id);
-    string GetLanguage(int id);
-    string GetImageUri(int id);
     ToDoAssistantPreferences GetToDoAssistantPreferences(int id);
     CookingAssistantPreferences GetCookingAssistantPreferences(int id);
     Task UpdateProfileAsync(int id, string name, string language, string culture, string imageUri);

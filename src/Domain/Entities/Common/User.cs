@@ -1,4 +1,5 @@
-﻿using Domain.Entities.CookingAssistant;
+﻿using System;
+using Domain.Entities.CookingAssistant;
 
 namespace Domain.Entities.Common;
 
@@ -13,6 +14,7 @@ public class User
     public bool CookingNotificationsEnabled { get; set; }
     public bool ImperialSystem { get; set; }
     public string ImageUri { get; set; }
+    public DateTime ModifiedDate { get; set; }
 
     public DietaryProfile DietaryProfile { get; set; }
 }

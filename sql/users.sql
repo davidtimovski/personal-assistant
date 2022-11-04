@@ -9,6 +9,7 @@ CREATE TABLE public.users
     todo_notifications_enabled boolean NOT NULL DEFAULT FALSE,
     cooking_notifications_enabled boolean NOT NULL DEFAULT FALSE,
     imperial_system boolean NOT NULL DEFAULT FALSE,
+	modified_date timestamp with time zone NOT NULL,
     CONSTRAINT pk_users PRIMARY KEY (id)
 )
 WITH (
