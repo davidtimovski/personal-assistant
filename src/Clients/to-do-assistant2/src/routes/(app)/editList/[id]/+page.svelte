@@ -11,11 +11,10 @@
 	import Tooltip from '../../../../../../shared2/components/Tooltip.svelte';
 
 	import { t } from '$lib/localization/i18n';
-	import { alertState } from '$lib/stores';
+	import { user, alertState } from '$lib/stores';
 	import { ListsService } from '$lib/services/listsService';
 	import { UsersService } from '$lib/services/usersService';
 	import { SharingState } from '$lib/models/viewmodels/sharingState';
-	import type { PreferencesModel } from '$lib/models/preferencesModel';
 
 	export let data: PageData;
 
@@ -37,7 +36,6 @@
 	let leaveButtonText: string;
 	let iconOptions = ListsService.getIconOptions();
 	let nameInput: HTMLInputElement;
-	let preferences: PreferencesModel | null = null;
 	let saveButtonIsLoading = false;
 	let deleteButtonIsLoading = false;
 	let leaveButtonIsLoading = false;
@@ -53,7 +51,7 @@
 
 	$: canSave = !ValidationUtil.isEmptyOrWhitespace(name);
 
-	$: notificationsCheckboxEnabled = sharingState !== SharingState.NotShared && preferences?.notificationsEnabled;
+	$: notificationsCheckboxEnabled = sharingState !== SharingState.NotShared && $user.toDoNotificationsEnabled;
 
 	function showTasksTextarea() {
 		tasksInputIsVisible = true;
@@ -214,8 +212,6 @@
 			isArchived = model.isArchived;
 			sharingState = model.sharingState;
 		}
-
-		preferences = await usersService.getPreferences();
 	});
 
 	onDestroy(() => {

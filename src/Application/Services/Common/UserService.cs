@@ -82,20 +82,6 @@ public class UserService : IUserService
         }
     }
 
-    public ToDoAssistantPreferences GetToDoAssistantPreferences(int id)
-    {
-        try
-        {
-            User user = _usersRepository.Get(id);
-            return _mapper.Map<ToDoAssistantPreferences>(user);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(GetToDoAssistantPreferences)}");
-            throw;
-        }
-    }
-
     public CookingAssistantPreferences GetCookingAssistantPreferences(int id)
     {
         try

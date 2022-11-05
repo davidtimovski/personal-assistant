@@ -15,14 +15,14 @@ public class UsersRepository : BaseRepository, IUsersRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.QueryFirst<User>(@"SELECT * FROM users WHERE id = @id", new { id });
+        return conn.QueryFirstOrDefault<User>(@"SELECT * FROM users WHERE id = @id", new { id });
     }
 
     public User Get(string email)
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.QueryFirst<User>(@"SELECT * FROM users WHERE email = @email", new { email });
+        return conn.QueryFirstOrDefault<User>(@"SELECT * FROM users WHERE email = @email", new { email });
     }
 
     public int? GetId(string auth0Id)

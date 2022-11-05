@@ -1,15 +1,11 @@
 import { UsersServiceBase } from '../../../../shared2/services/usersServiceBase';
 
-import type { PreferencesModel } from '$lib/models/preferencesModel';
+import { user } from '$lib/stores';
 import Variables from '$lib/variables';
 
 export class UsersService extends UsersServiceBase {
 	constructor() {
-		super('ToDoAssistant');
-	}
-
-	async getPreferences(): Promise<PreferencesModel> {
-		return await this.httpProxy.ajax<PreferencesModel>(`${Variables.urls.api}/api/users/to-do-preferences`);
+		super('To Do Assistant');
 	}
 
 	async updateNotificationsEnabled(enabled: boolean): Promise<void> {
@@ -19,6 +15,12 @@ export class UsersService extends UsersServiceBase {
 				body: window.JSON.stringify({
 					toDoNotificationsEnabled: enabled
 				})
+			});
+
+			user.update((x) => {
+				x.toDoNotificationsEnabled = enabled;
+				this.cache(x);
+				return x;
 			});
 		} catch (e) {
 			this.logger.logError(e);

@@ -7,7 +7,7 @@
 	import { ForecastsService } from '$lib/services/forecastsService';
 
 	import DoubleRadioString from '$lib/components/DoubleRadioString.svelte';
-	import type { WeathermanUser } from '$lib/models/user';
+	import type { WeathermanUser } from '$lib/models/weathermanUser';
 
 	let localStorage: LocalStorageUtil;
 	let forecastsService: ForecastsService;

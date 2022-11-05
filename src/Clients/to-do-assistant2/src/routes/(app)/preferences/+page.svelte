@@ -5,7 +5,7 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
-	import { alertState } from '$lib/stores';
+	import { user, alertState } from '$lib/stores';
 	import { UsersService } from '$lib/services/usersService';
 	import { NotificationsService } from '$lib/services/notificationsService';
 	import { ListsService } from '$lib/services/listsService';
@@ -13,7 +13,6 @@
 
 	const notificationsVapidKey =
 		'BCL8HRDvXuYjw011VypF_TtfmklYFmqXAADY7pV3WB9vL609d8wNK0zTUs4hB0V3uAnCTpzOd2pANBmsMQoUhD0';
-	let notificationsEnabled: boolean;
 	let notificationsState: string;
 	const notificationIconSrc = '/images/icons/app-icon-x96.png';
 	let notificationsAreSupported = false;
@@ -37,40 +36,39 @@
 				return x;
 			});
 		} else {
-			await Notification.requestPermission(async (result) => {
-				switch (result) {
-					case 'granted':
-						const previousNotificationState = notificationsState;
+			const permission = await Notification.requestPermission();
 
-						if (previousNotificationsPermission === 'granted') {
-							notificationsEnabled = !notificationsEnabled;
-							notificationsState = notificationsEnabled ? 'checked' : 'unchecked';
-						} else {
-							notificationsEnabled = notificationsCheckboxChecked = true;
-							notificationsState = 'checked';
+			switch (permission) {
+				case 'granted':
+					const previousNotificationState = notificationsState;
+
+					if (previousNotificationsPermission === 'granted') {
+						notificationsState = notificationsCheckboxChecked ? 'checked' : 'unchecked';
+					} else {
+						notificationsCheckboxChecked = true;
+						notificationsState = 'checked';
+					}
+
+					if (notificationsCheckboxChecked) {
+						try {
+							await subscribeToPushNotifications();
+						} catch {
+							notificationsState = previousNotificationState;
+							notificationsCheckboxChecked = false;
 						}
+					}
 
-						if (notificationsEnabled) {
-							try {
-								await subscribeToPushNotifications();
-							} catch {
-								notificationsState = previousNotificationState;
-								notificationsEnabled = notificationsCheckboxChecked = false;
-							}
-						}
+					break;
+				case 'denied':
+					notificationsState = 'denied';
+					notificationsCheckboxChecked = false;
+					break;
+				default:
+					notificationsCheckboxChecked = false;
+					break;
+			}
 
-						break;
-					case 'denied':
-						notificationsState = 'denied';
-						notificationsEnabled = notificationsCheckboxChecked = false;
-						break;
-					default:
-						notificationsEnabled = notificationsCheckboxChecked = false;
-						break;
-				}
-			});
-
-			await usersService.updateNotificationsEnabled(notificationsEnabled);
+			await usersService.updateNotificationsEnabled(notificationsCheckboxChecked);
 		}
 	}
 
@@ -120,16 +118,13 @@
 		listsService = new ListsService();
 		soundPlayer = new SoundPlayer();
 
-		const preferences = await usersService.getPreferences();
-		notificationsEnabled = preferences.notificationsEnabled;
-
 		if ('Notification' in window) {
 			notificationsAreSupported = true;
 
 			switch ((Notification as any).permission) {
 				case 'granted':
-					notificationsState = notificationsEnabled ? 'checked' : 'unchecked';
-					if (notificationsEnabled) {
+					notificationsState = $user.toDoNotificationsEnabled ? 'checked' : 'unchecked';
+					if ($user.toDoNotificationsEnabled) {
 						notificationsCheckboxChecked = true;
 					}
 					break;

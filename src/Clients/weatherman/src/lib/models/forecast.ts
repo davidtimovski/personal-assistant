@@ -19,6 +19,7 @@ export class DailyForecast {
 		public weatherCode: WeatherCode,
 		public temperatureMax: number,
 		public temperatureMin: number,
+		public precipitation: number,
 		public hourly: HourlyForecast[]
 	) {}
 }
@@ -29,8 +30,6 @@ export class HourlyForecast {
 		public weatherCode: WeatherCode,
 		public temperature: number,
 		public apparentTemperature: number,
-		public precipitation: number,
-		public windSpeed: number,
 		public isNight: boolean,
 		public timeString: string
 	) {}

@@ -9,7 +9,7 @@
 	import Tooltip from '../../../../../../shared2/components/Tooltip.svelte';
 
 	import { t } from '$lib/localization/i18n';
-	import { alertState, authInfo } from '$lib/stores';
+	import { user, alertState } from '$lib/stores';
 	import { ListsService } from '$lib/services/listsService';
 	import { Share } from '$lib/models/entities';
 	import { ShareUserAndPermission } from '$lib/models/viewmodels/shareUserAndPermission';
@@ -28,7 +28,6 @@
 	let originalShares: Share[];
 	let emailIsInvalid = false;
 	let emailInput: HTMLInputElement;
-	let currentUserEmail: string;
 	let canSave = false;
 	let newShares = new Array<ShareUserAndPermission>();
 	let editedShares = new Array<ShareUserAndPermission>();
@@ -43,14 +42,6 @@
 	let selectedShareName = '';
 	let selectedShareImageUri = '';
 	let selectedShareIsAdmin = false;
-
-	unsubscriptions.push(
-		authInfo.subscribe((value) => {
-			if (value) {
-				currentUserEmail = <string>value.profile.name;
-			}
-		})
-	);
 
 	unsubscriptions.push(
 		alertState.subscribe((value) => {
@@ -82,7 +73,7 @@
 			result.fail('email');
 		}
 
-		if (selectedShareEmail.trim().toLowerCase() === currentUserEmail) {
+		if (selectedShareEmail.trim().toLowerCase() === $user.email) {
 			result.fail('email');
 		}
 

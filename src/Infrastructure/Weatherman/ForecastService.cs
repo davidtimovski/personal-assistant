@@ -119,8 +119,8 @@ public class ForecastService : IForecastService
         queryString.Add("temperature_unit", parameters.TemperatureUnit);
         queryString.Add("precipitation_unit", parameters.PrecipitationUnit);
         queryString.Add("windspeed_unit", parameters.WindSpeedUnit);
-        queryString.Add("hourly", "temperature_2m,apparent_temperature,precipitation,windspeed_10m,weathercode");
-        queryString.Add("daily", "weathercode,temperature_2m_max,temperature_2m_min,sunrise,sunset");
+        queryString.Add("hourly", "weathercode,temperature_2m,apparent_temperature,precipitation,windspeed_10m");
+        queryString.Add("daily", "weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum,sunrise,sunset");
         queryString.Add("timezone", "auto");
 
         using HttpClient httpClient = _httpClientFactory.CreateClient("open-meteo");
@@ -138,7 +138,7 @@ public class ForecastService : IForecastService
             WeatherCode = (WeatherCode)openMeteoResult.hourly.weathercode[parameters.Time.Hour],
             Temperature = (short)Math.Round(openMeteoResult.hourly.temperature_2m[parameters.Time.Hour]),
             ApparentTemperature = (short)Math.Round(openMeteoResult.hourly.apparent_temperature[parameters.Time.Hour]),
-            Precipitation = (short)Math.Round(openMeteoResult.hourly.precipitation[parameters.Time.Hour]),
+            Precipitation = (float)Math.Round(openMeteoResult.hourly.precipitation[parameters.Time.Hour], 1),
             WindSpeed = (short)Math.Round(openMeteoResult.hourly.windspeed_10m[parameters.Time.Hour]),
             IsNight = parameters.Time < openMeteoResult.daily.sunrise[0] || parameters.Time > openMeteoResult.daily.sunset[0],
             NextDays = new List<DailyForecast>(5),
@@ -154,8 +154,6 @@ public class ForecastService : IForecastService
                 WeatherCode: (WeatherCode)openMeteoResult.hourly.weathercode[i],
                 Temperature: (short)Math.Round(openMeteoResult.hourly.temperature_2m[i]),
                 ApparentTemperature: (short)Math.Round(openMeteoResult.hourly.apparent_temperature[i]),
-                Precipitation: (short)Math.Round(openMeteoResult.hourly.precipitation[i]),
-                WindSpeed: (short)Math.Round(openMeteoResult.hourly.windspeed_10m[i]),
                 IsNight: openMeteoResult.hourly.time[i] < openMeteoResult.daily.sunrise[0] || openMeteoResult.hourly.time[i] > openMeteoResult.daily.sunset[0]
             ));
         }
@@ -168,6 +166,7 @@ public class ForecastService : IForecastService
                 WeatherCode = (WeatherCode)openMeteoResult.daily.weathercode[i],
                 TemperatureMax = (short)Math.Round(openMeteoResult.daily.temperature_2m_max[i]),
                 TemperatureMin = (short)Math.Round(openMeteoResult.daily.temperature_2m_min[i]),
+                Precipitation = (float)Math.Round(openMeteoResult.daily.precipitation_sum[i], 1),
                 Hourly = new List<HourlyForecast>(24)
             };
 
@@ -180,8 +179,6 @@ public class ForecastService : IForecastService
                    WeatherCode: (WeatherCode)openMeteoResult.hourly.weathercode[j],
                    Temperature: (short)Math.Round(openMeteoResult.hourly.temperature_2m[j]),
                    ApparentTemperature: (short)Math.Round(openMeteoResult.hourly.apparent_temperature[j]),
-                   Precipitation: (short)Math.Round(openMeteoResult.hourly.precipitation[j]),
-                   WindSpeed: (short)Math.Round(openMeteoResult.hourly.windspeed_10m[j]),
                    IsNight: openMeteoResult.hourly.time[j] < openMeteoResult.daily.sunrise[i] || openMeteoResult.hourly.time[j] > openMeteoResult.daily.sunset[i]
                ));
             }

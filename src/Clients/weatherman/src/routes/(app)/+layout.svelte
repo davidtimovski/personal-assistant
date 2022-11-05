@@ -13,14 +13,12 @@
 	import { t } from '$lib/localization/i18n';
 	import { isOffline, user } from '$lib/stores';
 	import { ForecastsService } from '$lib/services/forecastsService';
-	import type { WeathermanUser } from '$lib/models/user';
+	import type { WeathermanUser } from '$lib/models/weathermanUser';
 
 	let usersService: UsersServiceBase;
 	let forecastsService: ForecastsService;
 
 	function loadUser() {
-		const usersService = new UsersServiceBase('Weatherman');
-
 		const cachedUser = usersService.getFromCache();
 		if (cachedUser) {
 			user.set(cachedUser);
@@ -45,6 +43,7 @@
 			return;
 		}
 
+		usersService = new UsersServiceBase('Weatherman');
 		loadUser();
 
 		isOffline.set(!navigator.onLine);

@@ -14,6 +14,7 @@
 	import Illustration from '$lib/components/Illustration.svelte';
 	import NextDayForecast from '$lib/components/NextDayForecast.svelte';
 
+	let weekDays: any[] = [];
 	let now = new Date();
 	let selectedDate = '';
 	let currentTime = '';
@@ -25,9 +26,6 @@
 	const windSpeedUnitsTr = new Map<string, string>();
 	const precipitationUnitsTr = new Map<string, string>();
 	const unsubscriptions: Unsubscriber[] = [];
-
-	const current = new Date();
-	const weekDays: any[] = [];
 
 	// Progress bar
 	let progressBarActive = false;
@@ -132,16 +130,19 @@
 
 				setCurrentTime();
 
-				weekDays.push({
-					date: currentDate,
-					weekDay: DateHelper.formatWeekdayShort(now, $user.language)
-				});
+				const dateCounter = new Date();
+				weekDays = [
+					{
+						date: currentDate,
+						weekDay: DateHelper.formatWeekdayShort(dateCounter, $user.language)
+					}
+				];
 				for (let i = 0; i < 5; i++) {
-					current.setDate(current.getDate() + 1);
+					dateCounter.setDate(dateCounter.getDate() + 1);
 
 					weekDays.push({
-						date: DateHelper.format(current),
-						weekDay: DateHelper.formatWeekdayShort(current, $user.language)
+						date: DateHelper.format(dateCounter),
+						weekDay: DateHelper.formatWeekdayShort(dateCounter, $user.language)
 					});
 				}
 

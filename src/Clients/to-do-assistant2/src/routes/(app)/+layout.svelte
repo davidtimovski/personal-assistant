@@ -5,18 +5,18 @@
 	export const prerender = true;
 
 	import { onMount, onDestroy } from 'svelte/internal';
-	import { page } from '$app/stores';
 
-	import { Language } from '../../../../shared2/models/enums/language';
 	import { AuthService } from '../../../../shared2/services/authService';
 	import Alert from '../../../../shared2/components/Alert.svelte';
 
 	import { t } from '$lib/localization/i18n';
-	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
-	import { language, culture, isOffline, authInfo } from '$lib/stores';
+	import { isOffline, authInfo, user } from '$lib/stores';
+	import { UsersService } from '$lib/services/usersService';
 	import { ListsService } from '$lib/services/listsService';
 	import { SignalRClient } from '$lib/utils/signalRClient';
+	import type { ToDoAssistantUser } from '$lib/models/toDoAssistantUser';
 
+	let usersService: UsersService;
 	let listsService: ListsService;
 
 	const authInfoUnsub = authInfo.subscribe(async (value) => {
@@ -30,21 +30,19 @@
 		await new SignalRClient(listsService).initialize(value.token, value.profile.sub);
 	});
 
+	function loadUser() {
+		const cachedUser = usersService.getFromCache<ToDoAssistantUser>();
+		if (cachedUser) {
+			user.set(cachedUser);
+		}
+
+		usersService.get<ToDoAssistantUser>().then((currentUser) => {
+			user.set(currentUser);
+			usersService.cache(currentUser);
+		});
+	}
+
 	onMount(async () => {
-		const localStorage = new LocalStorageUtil();
-
-		const lang = $page.url.searchParams.get('lang');
-		if (lang && (lang === Language.English || lang === Language.Macedonian)) {
-			localStorage.set('language', lang);
-		}
-		language.set(localStorage.get('language'));
-
-		const cul = $page.url.searchParams.get('cul');
-		if (cul) {
-			localStorage.set('culture', cul);
-		}
-		culture.set(localStorage.get('culture'));
-
 		const authService = new AuthService();
 		await authService.initialize();
 
@@ -54,6 +52,9 @@
 			await authService.signinRedirect();
 			return;
 		}
+
+		usersService = new UsersService();
+		loadUser();
 
 		isOffline.set(!navigator.onLine);
 		window.addEventListener('online', () => {
@@ -66,6 +67,7 @@
 
 	onDestroy(() => {
 		authInfoUnsub();
+		usersService?.release();
 		listsService?.release();
 	});
 </script>

@@ -4,7 +4,7 @@ import type { AuthInfo } from '../../../shared2/models/authInfo';
 import { AlertState } from '../../../shared2/models/alertState';
 import { AlertStatus } from '../../../shared2/models/enums/alertEvents';
 
-import { WeathermanUser } from '$lib/models/user';
+import { WeathermanUser } from '$lib/models/weathermanUser';
 import type { Forecast } from '$lib/models/forecast';
 import Variables from '$lib/variables';
 

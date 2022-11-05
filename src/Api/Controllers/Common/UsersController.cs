@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
+using Application.Contracts.Accountant;
 using Application.Contracts.Common;
 using Application.Contracts.Common.Models;
+using Application.Contracts.ToDoAssistant;
 using Application.Contracts.Weatherman;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
@@ -30,20 +32,18 @@ public class UsersController : BaseController
 
         switch (application)
         {
+            case "To Do Assistant":
+                user = _userService.Get<ToDoAssistantUser>(UserId);
+                break;
+            case "Accountant":
+                user = _userService.Get<AccountantUser>(UserId);
+                break;
             case "Weatherman":
                 user = _userService.Get<WeathermanUser>(UserId);
                 break;
         }
 
         return Ok(user);
-    }
-
-    [HttpGet("to-do-preferences")]
-    public IActionResult GetToDoPreferences()
-    {
-        ToDoAssistantPreferences preferences = _userService.GetToDoAssistantPreferences(UserId);
-
-        return Ok(preferences);
     }
 
     [HttpGet("cooking-preferences")]
@@ -55,7 +55,7 @@ public class UsersController : BaseController
     }
 
     [HttpPut("to-do-notifications-enabled")]
-    public async Task<IActionResult> UpdateToDoNotificationsEnabled([FromBody] UpdateUser dto)
+    public async Task<IActionResult> UpdateToDoNotificationsEnabled([FromBody] UpdateUserPreferences dto)
     {
         if (dto == null)
         {
@@ -68,7 +68,7 @@ public class UsersController : BaseController
     }
 
     [HttpPut("cooking-notifications-enabled")]
-    public async Task<IActionResult> UpdateCookingNotificationsEnabled([FromBody] UpdateUser dto)
+    public async Task<IActionResult> UpdateCookingNotificationsEnabled([FromBody] UpdateUserPreferences dto)
     {
         if (dto == null)
         {
@@ -81,7 +81,7 @@ public class UsersController : BaseController
     }
 
     [HttpPut("imperial-system")]
-    public async Task<IActionResult> UpdateImperialSystem([FromBody] UpdateUser dto)
+    public async Task<IActionResult> UpdateImperialSystem([FromBody] UpdateUserPreferences dto)
     {
         if (dto == null)
         {
