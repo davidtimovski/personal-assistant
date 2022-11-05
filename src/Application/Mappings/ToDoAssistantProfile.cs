@@ -1,11 +1,9 @@
 ﻿using System.Linq;
 using Application.Contracts.Common;
-using Application.Contracts.Common.Models;
 using Application.Contracts.ToDoAssistant.Lists.Models;
 using Application.Contracts.ToDoAssistant.Notifications.Models;
 using Application.Contracts.ToDoAssistant.Tasks.Models;
 using AutoMapper;
-using Domain.Entities.Common;
 using Domain.Entities.ToDoAssistant;
 
 namespace Application.Mappings;
@@ -93,9 +91,6 @@ public class ToDoAssistantProfile : Profile
             .ForMember(x => x.User, src => src.Ignore())
             .ForMember(x => x.CreatedDate, src => src.Ignore())
             .ForMember(x => x.ModifiedDate, src => src.Ignore());
-
-        CreateMap<User, ToDoAssistantPreferences>()
-            .ForMember(x => x.NotificationsEnabled, opt => opt.MapFrom(src => src.ToDoNotificationsEnabled));
     }
 }
 

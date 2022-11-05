@@ -12,7 +12,7 @@ import Variables from '$lib/variables';
 
 export class TasksService {
 	private readonly httpProxy = new HttpProxy();
-	private readonly logger = new ErrorLogger('ToDoAssistant');
+	private readonly logger = new ErrorLogger('To Do Assistant');
 
 	get(id: number): Promise<Task> {
 		return this.httpProxy.ajax<Task>(`${Variables.urls.api}/api/tasks/${id}`);

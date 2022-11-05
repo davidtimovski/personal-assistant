@@ -7,7 +7,7 @@
 	import { DateHelper } from '../../../../../shared2/utils/dateHelper';
 
 	import { t } from '$lib/localization/i18n';
-	import { authInfo, culture } from '$lib/stores';
+	import { authInfo, user } from '$lib/stores';
 	import { NotificationsService } from '$lib/services/notificationsService';
 	import type { Notification } from '$lib/models/viewmodels/notification';
 
@@ -49,7 +49,8 @@
 				for (const notification of allNotifications) {
 					notification.formattedCreatedDate = DateHelper.formatWeekdayTime(
 						new Date(notification.createdDate),
-						$culture
+						$user.language,
+						$user.culture
 					);
 					if (notification.listId && notification.taskId) {
 						notification.url = `/list/${notification.listId}?edited=${notification.taskId}`;

@@ -23,7 +23,7 @@
 	}
 
 	onMount(async () => {
-		tooltipsService = new TooltipsService('ToDoAssistant');
+		tooltipsService = new TooltipsService('To Do Assistant');
 
 		const toDoAssistantTooltips = await tooltipsService.getAll();
 		for (const tooltip of toDoAssistantTooltips) {

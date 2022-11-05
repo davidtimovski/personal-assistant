@@ -7,7 +7,7 @@ public class ForecastResult
     public WeatherCode WeatherCode { get; init; }
     public short Temperature { get; init; }
     public short ApparentTemperature { get; init; }
-    public short Precipitation { get; init; }
+    public float Precipitation { get; init; }
     public short WindSpeed { get; init; }
     public bool IsNight { get; init; }
     public List<HourlyForecast> Hourly { get; init; }
@@ -20,7 +20,8 @@ public class DailyForecast
     public WeatherCode WeatherCode { get; init; }
     public short TemperatureMax { get; init; }
     public short TemperatureMin { get; init; }
+    public float Precipitation { get; init; }
     public List<HourlyForecast> Hourly { get; init; }
 }
 
-public readonly record struct HourlyForecast(short Hour, WeatherCode WeatherCode, short Temperature, short ApparentTemperature, short Precipitation, short WindSpeed, bool IsNight);
+public readonly record struct HourlyForecast(short Hour, WeatherCode WeatherCode, short Temperature, short ApparentTemperature, bool IsNight);

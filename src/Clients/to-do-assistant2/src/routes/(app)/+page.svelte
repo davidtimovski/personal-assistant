@@ -5,7 +5,7 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
-	import { isOffline, authInfo, lists, remoteEvents } from '$lib/stores';
+	import { isOffline, user, lists, remoteEvents } from '$lib/stores';
 	import { UsersService } from '$lib/services/usersService';
 	import { DerivedLists, ListsService } from '$lib/services/listsService';
 	import { TasksService } from '$lib/services/tasksService';
@@ -13,7 +13,6 @@
 	import type { ListIcon } from '$lib/models/viewmodels/listIcon';
 	import { RemoteEventType } from '$lib/models/remoteEvents';
 
-	let imageUri: any;
 	let derivedLists: ListModel[] | null = null;
 	let regularLists: ListModel[] | null = null;
 	let iconOptions = ListsService.getIconOptions();
@@ -37,12 +36,6 @@
 		startProgressBar();
 
 		listsService.getAll();
-
-		usersService.getProfileImageUri().then((uri) => {
-			if (imageUri !== uri) {
-				imageUri = uri;
-			}
-		});
 	}
 
 	function setListsFromState() {
@@ -91,22 +84,6 @@
 		listsService = new ListsService();
 		tasksService = new TasksService();
 
-		imageUri = localStorage.get('profileImageUri');
-
-		unsubscriptions.push(
-			authInfo.subscribe((value) => {
-				if (!value) {
-					return;
-				}
-
-				if (usersService.profileImageUriIsStale()) {
-					usersService.getProfileImageUri().then((uri) => {
-						imageUri = uri;
-					});
-				}
-			})
-		);
-
 		if ($lists.length === 0) {
 			startProgressBar();
 		}
@@ -151,7 +128,7 @@
 	<div class="page-title-wrap-loader">
 		<div class="title-wrap">
 			<a href="/menu" class="profile-image-container" title={$t('index.menu')} aria-label={$t('index.menu')}>
-				<img src={imageUri} class="profile-image" width="40" height="40" alt="" />
+				<img src={$user.imageUri} class="profile-image" width="40" height="40" alt="" />
 			</a>
 
 			<!-- 

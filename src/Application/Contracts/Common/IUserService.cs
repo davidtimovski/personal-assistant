@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Application.Contracts.Common.Models;
 using Domain.Entities.Common;
 
@@ -11,7 +10,6 @@ public interface IUserService
     User Get(string email);
     T Get<T>(int id) where T : UserDto;
     bool Exists(int id);
-    ToDoAssistantPreferences GetToDoAssistantPreferences(int id);
     CookingAssistantPreferences GetCookingAssistantPreferences(int id);
     Task UpdateProfileAsync(int id, string name, string language, string culture, string imageUri);
     Task UpdateToDoNotificationsEnabledAsync(int id, bool enabled);

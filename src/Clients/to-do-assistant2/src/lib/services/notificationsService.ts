@@ -5,7 +5,7 @@ import Variables from '$lib/variables';
 
 export class NotificationsService extends NotificationsServiceBase {
 	constructor() {
-		super('ToDoAssistant');
+		super('To Do Assistant');
 	}
 
 	getAll(): Promise<Array<Notification>> {

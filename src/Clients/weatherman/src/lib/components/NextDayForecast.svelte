@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte/internal';
 
 	import { t } from '$lib/localization/i18n';
+	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import type { DailyForecast } from '$lib/models/forecast';
 	import { WeatherCode } from '$lib/models/weatherCode';
 
@@ -10,7 +11,11 @@
 	export let forecast: DailyForecast;
 
 	let weatherDescription = '';
+	let precipitationUnit = '';
 	const weatherDescriptionTr = new Map<WeatherCode, string>();
+	const precipitationUnitsTr = new Map<string, string>();
+
+	let localStorage: LocalStorageUtil;
 
 	onMount(() => {
 		weatherDescriptionTr
@@ -41,6 +46,12 @@
 			.set(WeatherCode.ThunderstormWithHailLight, $t('index.thunderstormWithLightHail'))
 			.set(WeatherCode.ThunderstormWithHailHeavy, $t('index.thunderstormWithHeavyHail'));
 
+		precipitationUnitsTr.set('mm', $t('index.mm')).set('inches', $t('index.inches'));
+
+		localStorage = new LocalStorageUtil();
+
+		precipitationUnit = <string>precipitationUnitsTr.get(localStorage.get(LocalStorageKeys.PrecipitationUnit));
+
 		weatherDescription = <string>weatherDescriptionTr.get(forecast.weatherCode);
 	});
 </script>
@@ -54,6 +65,16 @@
 		<div class="current-temp">{forecast.temperatureMax}° / {forecast.temperatureMin}°</div>
 
 		<div class="weather-description">{weatherDescription}</div>
+
+		<table class="precipitation">
+			<tr class="precipitation">
+				<td><i class="fa-solid fa-droplet" /></td>
+				<td>
+					<span class="current-value">{forecast.precipitation}</span>
+					<span>{precipitationUnit}</span>
+				</td>
+			</tr>
+		</table>
 	</div>
 
 	<div class="gutter" />
@@ -97,6 +118,28 @@
 		margin: 25px 0 20px;
 		font-size: 1.4rem;
 		line-height: 1.8rem;
+	}
+
+	.precipitation {
+		td {
+			padding-bottom: 6px;
+		}
+
+		i {
+			margin-right: 7px;
+			font-size: 1.2rem;
+		}
+
+		.current-value {
+			font-size: 1.5rem;
+		}
+
+		.wind i {
+			color: #999;
+		}
+		.precipitation i {
+			color: #5aacf1;
+		}
 	}
 
 	.gutter {
