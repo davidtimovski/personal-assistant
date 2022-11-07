@@ -613,14 +613,7 @@
 						{#if newTaskUrl}
 							<div in:slide class="new-task-url-wrap">
 								<hr />
-								<input
-									type="url"
-									bind:value={newTaskUrl}
-									placeholder={$t('list.newTaskUrl')}
-									aria-label={$t('list.newTaskUrl')}
-									maxlength="1000"
-									readonly
-								/>
+								<input type="url" bind:value={newTaskUrl} maxlength="1000" readonly />
 								<button
 									type="button"
 									on:click={clearUrl}
