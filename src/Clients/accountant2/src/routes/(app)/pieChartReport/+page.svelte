@@ -10,7 +10,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
-	import { locale, searchFilters } from '$lib/stores';
+	import { user, searchFilters } from '$lib/stores';
 	import { TransactionsService } from '$lib/services/transactionsService';
 	import { AccountsService } from '$lib/services/accountsService';
 	import { PieChartItem } from '$lib/models/viewmodels/pieChartItem';
@@ -223,7 +223,7 @@
 									{/if}
 									<span>{item.categoryName}</span></td
 								>
-								<td class="amount-cell">{Formatter.money(item.amount, currency, $locale)}</td>
+								<td class="amount-cell">{Formatter.money(item.amount, currency, $user.culture)}</td>
 							</tr>
 							{#each item.subItems as subItem}
 								<tr
@@ -234,7 +234,7 @@
 									<td class="sub-category-cell">
 										<span class="legend-color" style="background: {subItem.color};" />{subItem.categoryName}
 									</td>
-									<td class="amount-cell">{Formatter.money(subItem.amount, currency, $locale)}</td>
+									<td class="amount-cell">{Formatter.money(subItem.amount, currency, $user.culture)}</td>
 								</tr>
 							{/each}
 						{/each}
@@ -248,7 +248,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td colspan="3">{Formatter.money(sum, currency, $locale)}</td>
+								<td colspan="3">{Formatter.money(sum, currency, $user.culture)}</td>
 							</tr>
 						</tfoot>
 					{/if}

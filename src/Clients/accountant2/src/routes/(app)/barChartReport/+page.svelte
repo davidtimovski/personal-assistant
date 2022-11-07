@@ -7,7 +7,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
-	import { locale } from '$lib/stores';
+	import { user } from '$lib/stores';
 	import { TransactionsService } from '$lib/services/transactionsService';
 	import { AccountsService } from '$lib/services/accountsService';
 	import { CategoriesService } from '$lib/services/categoriesService';
@@ -102,7 +102,7 @@
 		for (let i = 0; i < monthsDiff; i++) {
 			const date = DateHelper.formatYYYYMM(from);
 
-			let monthString = DateHelper.getShortMonth(from, $locale);
+			let monthString = DateHelper.getShortMonth(from, $user.language);
 			if (from.getFullYear() < now.getFullYear()) {
 				monthString += ' ' + from.getFullYear().toString().substring(2, 4);
 			}
@@ -365,28 +365,28 @@
 			{#if type === 0}
 				<tr>
 					<td>{$t('balance')}</td>
-					<td>{Formatter.money(balanceAverage, currency, $locale)}</td>
+					<td>{Formatter.money(balanceAverage, currency, $user.culture)}</td>
 				</tr>
 			{/if}
 
 			{#if type === 0 || type === 1}
 				<tr>
 					<td>{$t('barChartReport.spent')}</td>
-					<td>{Formatter.money(spentAverage, currency, $locale)}</td>
+					<td>{Formatter.money(spentAverage, currency, $user.culture)}</td>
 				</tr>
 			{/if}
 
 			{#if type === 0 || type === 2}
 				<tr>
 					<td>{$t('barChartReport.deposited')}</td>
-					<td>{Formatter.money(depositedAverage, currency, $locale)}</td>
+					<td>{Formatter.money(depositedAverage, currency, $user.culture)}</td>
 				</tr>
 			{/if}
 
 			{#if type === 4}
 				<tr>
 					<td>{$t('barChartReport.saved')}</td>
-					<td>{Formatter.money(savedAverage, currency, $locale)}</td>
+					<td>{Formatter.money(savedAverage, currency, $user.culture)}</td>
 				</tr>
 			{/if}
 		</table>

@@ -68,7 +68,7 @@ export class CategoriesService {
 
 	async create(category: Category): Promise<number> {
 		try {
-			const now = DateHelper.adjustForTimeZone(new Date());
+			const now = DateHelper.adjustTimeZone(new Date());
 			category.createdDate = category.modifiedDate = now;
 
 			if (category.type === CategoryType.DepositOnly) {
@@ -94,7 +94,7 @@ export class CategoriesService {
 
 	async update(category: Category): Promise<void> {
 		try {
-			category.modifiedDate = DateHelper.adjustForTimeZone(new Date());
+			category.modifiedDate = DateHelper.adjustTimeZone(new Date());
 
 			if (category.type === CategoryType.DepositOnly) {
 				category.generateUpcomingExpense = false;

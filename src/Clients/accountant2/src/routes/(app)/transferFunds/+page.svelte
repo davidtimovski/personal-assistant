@@ -9,7 +9,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
-	import { alertState, locale } from '$lib/stores';
+	import { user, alertState } from '$lib/stores';
 	import type { Account } from '$lib/models/entities/account';
 	import type { SelectOption } from '$lib/models/viewmodels/selectOption';
 	import { AccountsService } from '$lib/services/accountsService';
@@ -191,7 +191,7 @@
 					x.showErrors([
 						$t('transferFunds.accountOnlyHas', {
 							account: fromAccountName,
-							balance: Formatter.money((<Account>fromAccount).balance, (<Account>fromAccount).currency, $locale)
+							balance: Formatter.money((<Account>fromAccount).balance, (<Account>fromAccount).currency, $user.culture)
 						})
 					]);
 					return x;
@@ -276,12 +276,12 @@
 				{#if fromAccount?.stockPrice}
 					<div class="account-stock-price-balance-label">
 						<span>{$t('transferFunds.stockPrice')}</span>
-						<span>{Formatter.moneyPrecise(fromAccount.stockPrice, currency, $locale, 4)}</span>
+						<span>{Formatter.moneyPrecise(fromAccount.stockPrice, currency, $user.culture, 4)}</span>
 					</div>
 				{:else}
 					<div class="account-stock-price-balance-label">
 						<span>{$t('balance')}</span>
-						<span>{Formatter.moneyPrecise(fromAccount?.balance, currency, $locale)}</span>
+						<span>{Formatter.moneyPrecise(fromAccount?.balance, currency, $user.culture)}</span>
 					</div>
 				{/if}
 			</div>
@@ -302,12 +302,12 @@
 				{#if toAccount?.stockPrice}
 					<div class="account-stock-price-balance-label">
 						<span>{$t('transferFunds.stockPrice')}</span>
-						<span>{Formatter.moneyPrecise(toAccount?.stockPrice, currency, $locale, 4)}</span>
+						<span>{Formatter.moneyPrecise(toAccount?.stockPrice, currency, $user.culture, 4)}</span>
 					</div>
 				{:else}
 					<div class="account-stock-price-balance-label">
 						<span>{$t('balance')}</span>
-						<span>{Formatter.moneyPrecise(toAccount?.balance, currency, $locale)}</span>
+						<span>{Formatter.moneyPrecise(toAccount?.balance, currency, $user.culture)}</span>
 					</div>
 				{/if}
 			</div>

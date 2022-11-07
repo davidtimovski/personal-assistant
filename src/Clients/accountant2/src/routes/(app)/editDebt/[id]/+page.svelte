@@ -9,7 +9,7 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
-	import { alertState, isOnline, locale } from '$lib/stores';
+	import { user, alertState, isOnline } from '$lib/stores';
 	import { DebtsService } from '$lib/services/debtsService';
 	import { DebtModel } from '$lib/models/entities/debt';
 
@@ -86,7 +86,7 @@
 					const newId = await debtsService.createOrMerge(
 						debt,
 						<boolean>mergeDebtPerPerson,
-						$locale,
+						$user.culture,
 						$t('editDebt.lended'),
 						$t('editDebt.borrowed')
 					);

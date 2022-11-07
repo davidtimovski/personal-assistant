@@ -8,7 +8,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
-	import { locale, searchFilters } from '$lib/stores';
+	import { user, searchFilters } from '$lib/stores';
 	import { TransactionsService } from '$lib/services/transactionsService';
 	import { CategoriesService } from '$lib/services/categoriesService';
 	import { AccountsService } from '$lib/services/accountsService';
@@ -145,7 +145,7 @@
 
 	function formatDate(dateString: string): string {
 		const date = new Date(Date.parse(dateString));
-		const month = DateHelper.getShortMonth(date, $locale);
+		const month = DateHelper.getShortMonth(date, $user.language);
 
 		const now = new Date();
 		if (now.getFullYear() === date.getFullYear()) {
@@ -414,7 +414,7 @@
 											<i class="fas fa-exchange-alt transfer-color" />
 										{/if}
 									</td>
-									<td>{Formatter.number(transaction.amount, currency, $locale)}</td>
+									<td>{Formatter.number(transaction.amount, currency, $user.culture)}</td>
 									<td>{transaction.detail}</td>
 									<td class="date-cell">{transaction.date}</td>
 

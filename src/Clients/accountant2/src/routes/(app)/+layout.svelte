@@ -5,69 +5,35 @@
 	export const prerender = true;
 
 	import { onMount, onDestroy } from 'svelte/internal';
-	import { page } from '$app/stores';
 	import type { Unsubscriber } from 'svelte/store';
 
-	import { Language } from '../../../../shared2/models/enums/language';
 	import { AuthService } from '../../../../shared2/services/authService';
-	import { CurrenciesService } from '../../../../shared2/services/currenciesService';
+	import { UsersServiceBase } from '../../../../shared2/services/usersServiceBase';
 	import Alert from '../../../../shared2/components/Alert.svelte';
 
-	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { SyncService } from '$lib/services/syncService';
-	import { locale, isOnline, authInfo, syncStatus } from '$lib/stores';
+	import { user, isOnline, syncStatus } from '$lib/stores';
+	import type { AccountantUser } from '$lib/models/accountantUser';
 	import { AppEvents } from '$lib/models/appEvents';
 
-	let localStorage: LocalStorageUtil;
+	let usersService: UsersServiceBase;
+	let syncService: SyncService;
+
 	const unsubscriptions: Unsubscriber[] = [];
 
-	let syncService: SyncService;
-	let currenciesService: CurrenciesService;
-
-	unsubscriptions.push(
-		authInfo.subscribe((value) => {
-			if (!value) {
-				return;
-			}
-
-			sync();
-		})
-	);
-
-	function sync() {
-		if (!navigator.onLine) {
-			return;
+	function loadUser() {
+		const cachedUser = usersService.getFromCache();
+		if (cachedUser) {
+			user.set(cachedUser);
 		}
 
-		syncStatus.set(AppEvents.SyncStarted);
-
-		syncService = new SyncService();
-		const syncPromises = new Array<Promise<any>>();
-
-		const lastSynced = localStorage.get(LocalStorageKeys.LastSynced);
-		const syncPromise = syncService.sync(lastSynced).then((lastSyncedServer: string) => {
-			localStorage.set(LocalStorageKeys.LastSynced, lastSyncedServer);
-		});
-		syncPromises.push(syncPromise);
-
-		currenciesService = new CurrenciesService('Accountant');
-		const ratesPromise = currenciesService.loadRates();
-		syncPromises.push(ratesPromise);
-
-		Promise.all(syncPromises).then(() => {
-			syncStatus.set(AppEvents.SyncFinished);
+		usersService.get<AccountantUser>().then((currentUser) => {
+			user.set(currentUser);
+			usersService.cache(currentUser);
 		});
 	}
 
 	onMount(async () => {
-		localStorage = new LocalStorageUtil();
-
-		const lang = $page.url.searchParams.get('lang');
-		if (lang && (lang === Language.English || lang === Language.Macedonian)) {
-			localStorage.set('language', lang);
-		}
-		locale.set(localStorage.get('language'));
-
 		if (navigator.onLine) {
 			const authService = new AuthService();
 			await authService.initialize();
@@ -78,11 +44,17 @@
 				await authService.signinRedirect();
 				return;
 			}
+
+			usersService = new UsersServiceBase('Accountant');
+			syncService = new SyncService();
+
+			loadUser();
+			syncService.sync();
 		}
 
 		isOnline.set(navigator.onLine);
 		window.addEventListener('online', () => {
-			sync();
+			syncService.sync();
 			isOnline.set(true);
 		});
 		window.addEventListener('offline', () => {
@@ -92,7 +64,7 @@
 		unsubscriptions.push(
 			syncStatus.subscribe((value) => {
 				if (value === AppEvents.ReSync) {
-					sync();
+					syncService.sync();
 				}
 			})
 		);
@@ -102,8 +74,8 @@
 		for (const unsubscribe of unsubscriptions) {
 			unsubscribe();
 		}
+		usersService?.release();
 		syncService?.release();
-		currenciesService?.release();
 	});
 </script>
 

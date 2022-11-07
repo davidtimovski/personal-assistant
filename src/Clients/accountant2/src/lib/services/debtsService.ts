@@ -38,12 +38,12 @@ export class DebtsService {
 	async createOrMerge(
 		debt: DebtModel,
 		mergeDebtPerPerson: boolean,
-		locale: string,
+		culture: string,
 		lendedLabel: string,
 		borrowedLabel: string
 	): Promise<number> {
 		try {
-			const now = DateHelper.adjustForTimeZone(new Date());
+			const now = DateHelper.adjustTimeZone(new Date());
 
 			if (typeof debt.amount === 'string') {
 				debt.amount = parseFloat(debt.amount);
@@ -67,7 +67,7 @@ export class DebtsService {
 						otherDebt.userIsDebtor,
 						new Date(<Date>otherDebt.createdDate),
 						otherDebt.description,
-						locale,
+						culture,
 						lendedLabel,
 						borrowedLabel
 					);
@@ -86,7 +86,7 @@ export class DebtsService {
 					debt.userIsDebtor,
 					now,
 					debt.description,
-					locale,
+					culture,
 					lendedLabel,
 					borrowedLabel
 				);
@@ -152,7 +152,7 @@ export class DebtsService {
 			if (debt.description) {
 				debt.description = debt.description.replace(/(\r\n|\r|\n){3,}/g, '$1\n').trim();
 			}
-			debt.modifiedDate = DateHelper.adjustForTimeZone(new Date());
+			debt.modifiedDate = DateHelper.adjustTimeZone(new Date());
 
 			if (navigator.onLine) {
 				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/debts`, {
@@ -200,7 +200,7 @@ export class DebtsService {
 		userIsDebtor: boolean,
 		createdDate: Date,
 		description: string | null,
-		locale: string,
+		culture: string,
 		lendedLabel: string,
 		borrowedLabel: string
 	) {
@@ -211,7 +211,7 @@ export class DebtsService {
 			let result = date + ' | ';
 
 			// add amount (positive or negative) and currency
-			result += (userIsDebtor ? borrowedLabel : lendedLabel) + ' ' + Formatter.money(amount, currency, locale);
+			result += (userIsDebtor ? borrowedLabel : lendedLabel) + ' ' + Formatter.money(amount, currency, culture);
 
 			if (description) {
 				if (description.includes(DebtsService.mergedDebtSeparator)) {
