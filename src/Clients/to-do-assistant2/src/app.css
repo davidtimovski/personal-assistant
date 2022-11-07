@@ -11,6 +11,7 @@
 
 input[type='text'],
 input[type='email'],
+input[type='url'],
 select,
 textarea {
 	background-color: #f0f6ff;

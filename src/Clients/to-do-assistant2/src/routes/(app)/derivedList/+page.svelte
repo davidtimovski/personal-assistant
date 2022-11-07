@@ -192,12 +192,7 @@
 						aria-label={$t('derivedList.searchTasks')}
 						maxlength="50"
 					/>
-					<button
-						type="button"
-						on:click={clearFilter}
-						title={$t('derivedList.clear')}
-						aria-label={$t('derivedList.clear')}
-					>
+					<button type="button" on:click={clearFilter} title={$t('clear')} aria-label={$t('clear')}>
 						<i class="fas fa-times" />
 					</button>
 				</div>
@@ -217,7 +212,11 @@
 									<span class="unchanged-since">{formatStaleTaskDate(task.modifiedDate)}</span>
 								{/if}
 
-								<span class="name">{task.name}</span>
+								{#if task.url}
+									<a href={task.url} class="name" target="_blank" rel="noreferrer">{task.name}</a>
+								{:else}
+									<span class="name">{task.name}</span>
+								{/if}
 
 								<button
 									type="button"
@@ -254,7 +253,11 @@
 								<span class="unchanged-since">{formatStaleTaskDate(task.modifiedDate)}</span>
 							{/if}
 
-							<span class="name">{task.name}</span>
+							{#if task.url}
+								<a href={task.url} class="name" target="_blank" rel="noreferrer">{task.name}</a>
+							{:else}
+								<span class="name">{task.name}</span>
+							{/if}
 
 							<button
 								type="button"
@@ -296,7 +299,9 @@
 			background: transparent;
 			border: none;
 			outline: none;
-			padding: 14px 15px;
+			padding: 0 15px;
+			font-size: 23px;
+			line-height: 47px;
 			color: var(--primary-color);
 
 			&:hover {
@@ -402,7 +407,9 @@
 					padding: 9px 5px;
 					line-height: 27px;
 					text-align: center;
-					cursor: default;
+				}
+				a.name {
+					color: var(--primary-color-dark);
 				}
 				&.assigned .name {
 					padding: 9px 48px 9px 50px;
@@ -433,12 +440,6 @@
 		i {
 			margin-right: 5px;
 			font-size: 16px;
-		}
-	}
-
-	@media screen and (min-width: 1200px) {
-		.search-tasks-wrap button {
-			padding: 11px 15px;
 		}
 	}
 </style>

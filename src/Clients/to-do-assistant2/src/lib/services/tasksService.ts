@@ -11,6 +11,9 @@ import { SharingState } from '$lib/models/viewmodels/sharingState';
 import Variables from '$lib/variables';
 
 export class TasksService {
+	private static readonly urlRegex =
+		/^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?$/i;
+
 	private readonly httpProxy = new HttpProxy();
 	private readonly logger = new ErrorLogger('To Do Assistant');
 
@@ -22,15 +25,16 @@ export class TasksService {
 		return this.httpProxy.ajax<EditTaskModel>(`${Variables.urls.api}/api/tasks/${id}/update`);
 	}
 
-	async create(listId: number, name: string, isOneTime: boolean, isPrivate: boolean): Promise<number> {
+	async create(listId: number, name: string, url: string, isOneTime: boolean, isPrivate: boolean): Promise<number> {
 		try {
 			const id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/api/tasks`, {
 				method: 'post',
 				body: window.JSON.stringify({
-					listId: listId,
-					name: name,
-					isOneTime: isOneTime,
-					isPrivate: isPrivate
+					listId,
+					name,
+					url,
+					isOneTime,
+					isPrivate
 				})
 			});
 
@@ -67,6 +71,7 @@ export class TasksService {
 		id: number,
 		listId: number,
 		name: string,
+		url: string,
 		isOneTime: boolean,
 		isHighPriority: boolean,
 		isPrivate: boolean,
@@ -76,13 +81,14 @@ export class TasksService {
 			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/tasks`, {
 				method: 'put',
 				body: window.JSON.stringify({
-					id: id,
-					listId: listId,
-					name: name,
-					isOneTime: isOneTime,
-					isHighPriority: isHighPriority,
-					isPrivate: isPrivate,
-					assignedToUserId: assignedToUserId
+					id,
+					listId,
+					name,
+					url,
+					isOneTime,
+					isHighPriority,
+					isPrivate,
+					assignedToUserId
 				})
 			});
 		} catch (e) {
@@ -376,6 +382,10 @@ export class TasksService {
 			.map((x) => {
 				return ListTask.fromTask(x);
 			});
+	}
+
+	static isUrl(text: string) {
+		return this.urlRegex.test(text);
 	}
 
 	release() {

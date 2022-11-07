@@ -56,7 +56,7 @@ public class ToDoAssistantProfile : Profile
             .ForMember(x => x.Id, src => src.Ignore())
             .ForMember(x => x.IsCompleted, src => src.Ignore())
             .ForMember(x => x.IsHighPriority, src => src.Ignore())
-            .ForMember(t => t.PrivateToUserId, opt => opt.MapFrom<PrivateToUserIdCreateResolver>())
+            .ForMember(t => t.PrivateToUserId, opt => opt.MapFrom(src => src.IsPrivate.HasValue && src.IsPrivate.Value ? (int?)src.UserId : null))
             .ForMember(x => x.AssignedToUserId, src => src.Ignore())
             .ForMember(x => x.Order, src => src.Ignore())
             .ForMember(x => x.CreatedDate, src => src.Ignore())
@@ -66,6 +66,7 @@ public class ToDoAssistantProfile : Profile
         CreateMap<BulkCreate, ToDoTask>()
             .ForMember(x => x.Id, src => src.Ignore())
             .ForMember(x => x.Name, src => src.Ignore())
+            .ForMember(x => x.Url, src => src.Ignore())
             .ForMember(x => x.IsCompleted, src => src.Ignore())
             .ForMember(x => x.IsOneTime, src => src.Ignore())
             .ForMember(x => x.IsHighPriority, src => src.Ignore())
@@ -78,7 +79,7 @@ public class ToDoAssistantProfile : Profile
             .ForMember(x => x.AssignedToUser, src => src.Ignore());
         CreateMap<UpdateTask, ToDoTask>()
             .ForMember(x => x.IsCompleted, src => src.Ignore())
-            .ForMember(t => t.PrivateToUserId, opt => opt.MapFrom<PrivateToUserIdUpdateResolver>())
+            .ForMember(t => t.PrivateToUserId, opt => opt.MapFrom(src => src.IsPrivate.HasValue && src.IsPrivate.Value ? (int?)src.UserId : null))
             .ForMember(x => x.Order, src => src.Ignore())
             .ForMember(x => x.CreatedDate, src => src.Ignore())
             .ForMember(x => x.ModifiedDate, src => src.Ignore())
@@ -179,22 +180,6 @@ public class IsArchivedResolver : IValueResolver<ToDoList, object, bool>
         }
 
         return source.IsArchived;
-    }
-}
-
-public class PrivateToUserIdCreateResolver : IValueResolver<CreateTask, ToDoTask, int?>
-{
-    public int? Resolve(CreateTask source, ToDoTask dest, int? destMember, ResolutionContext context)
-    {
-        return source.IsPrivate.HasValue && source.IsPrivate.Value ? (int?)source.UserId : null;
-    }
-}
-
-public class PrivateToUserIdUpdateResolver : IValueResolver<UpdateTask, ToDoTask, int?>
-{
-    public int? Resolve(UpdateTask source, ToDoTask dest, int? destMember, ResolutionContext context)
-    {
-        return source.IsPrivate.HasValue && source.IsPrivate.Value ? (int?)source.UserId : null;
     }
 }
 

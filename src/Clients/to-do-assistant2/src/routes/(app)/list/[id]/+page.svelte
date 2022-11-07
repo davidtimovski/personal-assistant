@@ -43,6 +43,7 @@
 	let shadowCompletedTasks: ListTask[];
 	let shadowCompletedPrivateTasks: ListTask[];
 	let newTaskName = '';
+	let newTaskUrl = '';
 	let isPrivate = false;
 	let isOneTime = false;
 	let newTaskIsLoading = false;
@@ -92,6 +93,7 @@
 
 	function isSearchingToggleChanged() {
 		if (isSearching) {
+			newTaskUrl = '';
 			newTaskIsInvalid = false;
 			completedTasksAreVisible = true;
 			shadowTasks = tasks.slice();
@@ -129,7 +131,19 @@
 			newTaskIsInvalid = false;
 			duplicateTask = null;
 			similarTaskNames = [];
+
+			if (TasksService.isUrl(newTaskName)) {
+				newTaskUrl = newTaskName;
+				newTaskName = '';
+				newTaskNameInput.focus();
+			} else {
+				addNewPlaceholderText = $t('list.addNew');
+			}
 		}
+	}
+
+	function clearUrl() {
+		newTaskUrl = '';
 	}
 
 	function filterTasks() {
@@ -229,11 +243,12 @@
 					duplicateTask = null;
 					similarTaskNames = [];
 					try {
-						await tasksService.create(data.id, newTaskName, isOneTime, isPrivate);
+						await tasksService.create(data.id, newTaskName, newTaskUrl, isOneTime, isPrivate);
 						await listsService.getAll();
 
 						newTaskIsLoading = false;
 						newTaskName = '';
+						newTaskUrl = '';
 
 						const list = $lists.find((x) => x.id === data.id);
 						if (!list) {
@@ -581,19 +596,36 @@
 
 			<form on:submit|preventDefault={create}>
 				<div class="add-input-wrap" class:with-private-toggle={sharingState !== 0} class:searching={isSearching}>
-					<input
-						type="text"
-						bind:value={newTaskName}
-						bind:this={newTaskNameInput}
-						on:keyup={newTaskNameInputChanged}
-						class="new-task-input"
-						class:invalid={newTaskIsInvalid}
-						placeholder={addNewPlaceholderText}
-						aria-label={addNewPlaceholderText}
-						readonly={newTaskIsLoading}
-						maxlength="50"
-						required
-					/>
+					<div class="new-task-input-wrap">
+						<input
+							type="text"
+							bind:value={newTaskName}
+							bind:this={newTaskNameInput}
+							on:keyup={newTaskNameInputChanged}
+							class="new-task-input"
+							class:invalid={newTaskIsInvalid}
+							placeholder={addNewPlaceholderText}
+							aria-label={addNewPlaceholderText}
+							readonly={newTaskIsLoading}
+							maxlength="50"
+							required
+						/>
+						{#if newTaskUrl}
+							<div in:slide class="new-task-url-wrap">
+								<hr />
+								<input type="url" bind:value={newTaskUrl} maxlength="1000" readonly />
+								<button
+									type="button"
+									on:click={clearUrl}
+									class="clear-url-button"
+									title={$t('clear')}
+									aria-label={$t('clear')}
+								>
+									<i class="fas fa-times" />
+								</button>
+							</div>
+						{/if}
+					</div>
 
 					{#if sharingState !== 0 && !isSearching}
 						<label
@@ -652,7 +684,11 @@
 									<i class="reorder-icon fas fa-hand-paper" />
 								</span> -->
 
-								<span class="name">{task.name}</span>
+								{#if task.url}
+									<a href={task.url} class="name" target="_blank" rel="noreferrer">{task.name}</a>
+								{:else}
+									<span class="name">{task.name}</span>
+								{/if}
 
 								<button
 									type="button"
@@ -692,7 +728,11 @@
 								/>
 							{/if}
 
-							<span class="name">{task.name}</span>
+							{#if task.url}
+								<a href={task.url} class="name" target="_blank" rel="noreferrer">{task.name}</a>
+							{:else}
+								<span class="name">{task.name}</span>
+							{/if}
 
 							<button
 								type="button"
@@ -749,7 +789,11 @@
 												<i class="reorder-icon fas fa-hand-paper" />
 											</span> -->
 
-											<span class="name">{task.name}</span>
+											{#if task.url}
+												<a href={task.url} class="name" target="_blank" rel="noreferrer">{task.name}</a>
+											{:else}
+												<span class="name">{task.name}</span>
+											{/if}
 
 											<button
 												type="button"
@@ -797,7 +841,11 @@
 											/>
 										{/if}
 
-										<span class="name">{task.name}</span>
+										{#if task.url}
+											<a href={task.url} class="name" target="_blank" rel="noreferrer">{task.name}</a>
+										{:else}
+											<span class="name">{task.name}</span>
+										{/if}
 
 										<button
 											type="button"
@@ -840,23 +888,60 @@
 	.add-input-wrap {
 		position: relative;
 
-		.new-task-input {
-			width: calc(100% - 60px);
-			padding-right: 46px;
-			line-height: 45px;
+		.new-task-input-wrap {
+			background-color: #f0f6ff;
+			border: 1px solid #ddd;
+			border-radius: 6px;
+			padding: 5px 12px;
 
-			// &.new-task {
-			// 	width: calc(100% - 112px);
-			// 	padding-right: 98px;
-			// }
+			input {
+				width: 100%;
+				border: none;
+				outline: none;
+				background: transparent;
+				padding: 0;
+				line-height: 35px;
+			}
+
+			.new-task-input {
+				width: calc(100% - 87px);
+				padding-right: 100px;
+			}
+
+			.new-task-url-wrap {
+				position: relative;
+
+				input {
+					width: calc(100% - 45px);
+					color: #678;
+				}
+
+				.clear-url-button {
+					position: absolute;
+					top: 2px;
+					right: -12px;
+					background: none;
+					border: none;
+					outline: none;
+					padding: 0 15px;
+					font-size: 23px;
+					line-height: 47px;
+					text-decoration: none;
+					color: var(--primary-color);
+				}
+			}
+
+			hr {
+				margin: 7px 0;
+			}
 		}
 
-		&.with-private-toggle .new-task-input {
-			width: calc(100% - 154px);
-			padding-right: 140px;
+		&.with-private-toggle .new-task-input-wrap .new-task-input {
+			width: calc(100% - 132px);
+			padding-right: 145px;
 		}
 
-		&.searching .new-task-input {
+		&.searching .new-task-input-wrap .new-task-input {
 			width: calc(100% - 26px);
 			padding-right: 12px;
 		}
@@ -965,7 +1050,7 @@
 				}
 			}
 
-			&.high-priority {
+			&.high-priority .name {
 				font-weight: bold;
 				color: var(--danger-color-dark);
 			}
@@ -1067,7 +1152,9 @@
 					padding: 9px 5px;
 					line-height: 27px;
 					text-align: center;
-					cursor: default;
+				}
+				a.name {
+					color: var(--primary-color-dark);
 				}
 				&.assigned .name {
 					padding: 9px 52px 9px 5px;
