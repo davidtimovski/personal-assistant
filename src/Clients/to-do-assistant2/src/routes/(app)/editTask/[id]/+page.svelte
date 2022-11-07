@@ -22,6 +22,7 @@
 
 	let listId: number;
 	let name = '';
+	let url = '';
 	let isOneTime = false;
 	let isPrivate = false;
 	let isHighPriority = false;
@@ -83,6 +84,10 @@
 		return result;
 	}
 
+	function clearUrl() {
+		url = '';
+	}
+
 	async function save() {
 		saveButtonIsLoading = true;
 		alertState.update((x) => {
@@ -96,7 +101,7 @@
 			nameIsInvalid = false;
 
 			try {
-				await tasksService.update(data.id, listId, name, isOneTime, isHighPriority, isPrivate, assignedToUserId);
+				await tasksService.update(data.id, listId, name, url, isOneTime, isHighPriority, isPrivate, assignedToUserId);
 				await listsService.getAll();
 
 				goto(`/list/${listId}?edited=${data.id}`);
@@ -158,6 +163,7 @@
 
 			listId = task.listId;
 			name = task.name;
+			url = task.url;
 			isOneTime = task.isOneTime;
 			isPrivate = task.isPrivate;
 			isHighPriority = task.isHighPriority;
@@ -216,6 +222,27 @@
 				/>
 			</div>
 
+			<div class="form-control url">
+				<input
+					type="url"
+					bind:value={url}
+					maxlength="1000"
+					placeholder={$t('editTask.url')}
+					aria-label={$t('editTask.url')}
+				/>
+				{#if url}
+					<button
+						type="button"
+						on:click={clearUrl}
+						class="clear-url-button"
+						title={$t('clear')}
+						aria-label={$t('clear')}
+					>
+						<i class="fas fa-times" />
+					</button>
+				{/if}
+			</div>
+
 			<div class="form-control">
 				<select
 					id="from-account"
@@ -244,7 +271,7 @@
 				<div class="form-control">
 					<Checkbox labelKey="editTask.taskIsPrivate" bind:value={isPrivate} />
 
-					<Tooltip key="privateTasks" application="ToDoAssistant" />
+					<Tooltip key="privateTasks" application="To Do Assistant" />
 				</div>
 
 				{#if !isPrivate && assigneeOptions}
@@ -329,6 +356,28 @@
 </section>
 
 <style lang="scss">
+	.form-control.url {
+		position: relative;
+
+		input {
+			width: calc(100% - 74px);
+			padding-right: 60px;
+		}
+
+		.clear-url-button {
+			position: absolute;
+			top: 1px;
+			right: 0;
+			background: none;
+			border: none;
+			outline: none;
+			padding: 0 15px;
+			line-height: 38px;
+			text-decoration: none;
+			color: var(--primary-color);
+		}
+	}
+
 	.assign-to-user {
 		.assign-to-user-header {
 			background: var(--primary-color);
@@ -406,5 +455,11 @@
 	/* Workaround for sticky :hover on mobile devices */
 	.touch-device .assign-to-user .radio:hover {
 		color: var(--regular-color);
+	}
+
+	@media screen and (min-width: 1200px) {
+		.form-control.url .clear-url-button {
+			line-height: 46px;
+		}
 	}
 </style>
