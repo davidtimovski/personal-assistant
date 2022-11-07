@@ -278,6 +278,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
 
         ToDoTask dbTask = EFContext.Tasks.Find(task.Id);
         dbTask.Name = task.Name;
+        dbTask.Url = task.Url;
         dbTask.ListId = task.ListId;
         dbTask.IsOneTime = task.IsOneTime;
         dbTask.IsHighPriority = task.IsHighPriority;

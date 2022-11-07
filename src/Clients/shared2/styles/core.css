@@ -124,6 +124,7 @@ button {
 
 input[type="text"],
 input[type="email"],
+input[type="url"],
 input[type="number"],
 input[type="password"] {
   width: calc(100% - 26px);
@@ -655,7 +656,9 @@ a.button {
 @media screen and (min-width: 1200px) {
   input[type="text"],
   input[type="email"],
+  input[type="url"],
   input[type="number"],
+  input[type="password"],
   select {
     line-height: 45px;
   }

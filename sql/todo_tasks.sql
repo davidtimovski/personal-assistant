@@ -3,6 +3,7 @@ CREATE TABLE public.todo_tasks
     id serial NOT NULL,
     list_id integer NOT NULL,
     name character varying(50) NOT NULL COLLATE pg_catalog."default",
+	url character varying(1000) COLLATE pg_catalog."default",
     is_completed boolean NOT NULL DEFAULT FALSE,
     is_one_time boolean NOT NULL DEFAULT FALSE,
     is_high_priority boolean NOT NULL DEFAULT FALSE,

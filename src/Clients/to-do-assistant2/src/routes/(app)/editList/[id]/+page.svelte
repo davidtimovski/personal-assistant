@@ -311,7 +311,7 @@
 				<div class="form-control">
 					<Checkbox labelKey="deleteOnCompletion" bind:value={isOneTimeToggleDefault} />
 
-					<Tooltip key="oneTimeTasks" application="ToDoAssistant" />
+					<Tooltip key="oneTimeTasks" application="To Do Assistant" />
 				</div>
 			{/if}
 		</form>

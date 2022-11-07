@@ -22,6 +22,7 @@ export class Task {
 		public id: number,
 		public listId: number,
 		public name: string,
+		public url: string,
 		public isCompleted: boolean,
 		public isOneTime: boolean,
 		public isHighPriority: boolean,

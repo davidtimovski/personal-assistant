@@ -13,6 +13,7 @@ export default {
 		delete: 'Delete',
 		sure: 'Sure?',
 		cancel: 'Cancel',
+		clear: 'Clear',
 		deleteOnCompletion: 'Delete tasks on completion',
 		dragToReorder: 'Drag to reorder',
 		highPriority: 'High Priority',
@@ -55,7 +56,6 @@ export default {
 		},
 		derivedList: {
 			searchTasks: 'Search tasks',
-			clear: 'Clear',
 			complete: 'Complete',
 			privateTasks: 'Private tasks'
 		},
@@ -123,6 +123,7 @@ export default {
 		},
 		editTask: {
 			edit: 'Edit',
+			url: 'URL',
 			list: 'List',
 			deleteWhenDone: 'Delete when done',
 			highPriority: 'High priority',
@@ -231,6 +232,7 @@ export default {
 		sure: 'Сигурно?',
 		delete: 'Избриши',
 		cancel: 'Откажи',
+		clear: 'Исчисти',
 		deleteOnCompletion: 'Бриши задачи при комплетирање',
 		dragToReorder: 'Влечи за подредување',
 		highPriority: 'Висок Приоритет',
@@ -273,7 +275,6 @@ export default {
 		},
 		derivedList: {
 			searchTasks: 'Пребарај задачи',
-			clear: 'Исчисти',
 			complete: 'Заврши',
 			privateTasks: 'Приватни задачи'
 		},
@@ -343,6 +344,7 @@ export default {
 		},
 		editTask: {
 			edit: 'Промени ја',
+			url: 'URL',
 			list: 'Листа',
 			deleteWhenDone: 'Избриши при завршување',
 			highPriority: 'Висок приоритет',

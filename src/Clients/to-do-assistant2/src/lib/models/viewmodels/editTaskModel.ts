@@ -3,6 +3,7 @@ export class EditTaskModel {
 		public id: number,
 		public listId: number,
 		public name: string,
+		public url: string,
 		public isCompleted: boolean,
 		public isOneTime: boolean,
 		public isPrivate: boolean,

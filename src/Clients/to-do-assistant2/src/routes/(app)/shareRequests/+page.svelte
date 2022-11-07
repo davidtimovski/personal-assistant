@@ -75,7 +75,7 @@
 
 		{#if pendingShareRequests && pendingShareRequests.length > 0}
 			<div class="share-requests-wrap">
-				<Tooltip key="shareRequests" application="ToDoAssistant" />
+				<Tooltip key="shareRequests" application="To Do Assistant" />
 
 				{#each pendingShareRequests as request}
 					<div class="share-request">

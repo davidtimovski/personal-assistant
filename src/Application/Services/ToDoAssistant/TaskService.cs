@@ -173,6 +173,7 @@ public class TaskService : ITaskService
             var task = _mapper.Map<ToDoTask>(model);
 
             task.Name = task.Name.Trim();
+            task.Url = string.IsNullOrEmpty(task.Url) ? null : task.Url.Trim();
 
             if (!_listService.IsShared(task.ListId, model.UserId))
             {
@@ -279,6 +280,7 @@ public class TaskService : ITaskService
             var task = _mapper.Map<ToDoTask>(model);
 
             task.Name = task.Name.Trim();
+            task.Url = string.IsNullOrEmpty(task.Url) ? null : task.Url.Trim();
 
             if (model.IsPrivate == true)
             {

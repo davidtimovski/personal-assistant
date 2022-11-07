@@ -327,7 +327,7 @@
 						bind:value={selectedShareIsAdmin}
 					/>
 
-					<Tooltip key="memberVsAdmin" application="ToDoAssistant" />
+					<Tooltip key="memberVsAdmin" application="To Do Assistant" />
 				</div>
 			</form>
 		{/if}
