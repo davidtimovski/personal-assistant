@@ -1,6 +1,9 @@
 import { HttpProxy } from '../../../../shared2/services/httpProxy';
+import { CurrenciesService } from '../../../../shared2/services/currenciesService';
 import { ErrorLogger } from '../../../../shared2/services/errorLogger';
+import { DateHelper } from '../../../../shared2/utils/dateHelper';
 
+import { syncStatus } from '$lib/stores';
 import { AccountsIDBHelper } from '$lib/utils/accountsIDBHelper';
 import { CategoriesIDBHelper } from '$lib/utils/categoriesIDBHelper';
 import { TransactionsIDBHelper } from '$lib/utils/transactionsIDBHelper';
@@ -9,6 +12,7 @@ import { DebtsIDBHelper } from '$lib/utils/debtsIDBHelper';
 import { AutomaticTransactionsIDBHelper } from '$lib/utils/automaticTransactionsIDBHelper';
 import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 import { Changed, Create, Created } from '$lib/models/sync';
+import { AppEvents } from '$lib/models/appEvents';
 import Variables from '$lib/variables';
 
 export class SyncService {
@@ -20,10 +24,20 @@ export class SyncService {
 	private readonly debtsIDBHelper = new DebtsIDBHelper();
 	private readonly automaticTransactionsIDBHelper = new AutomaticTransactionsIDBHelper();
 	private readonly localStorage = new LocalStorageUtil();
+	private readonly currenciesService = new CurrenciesService('Accountant');
 	private readonly logger = new ErrorLogger('Accountant');
 
-	async sync(lastSynced: string): Promise<string> {
+	async sync() {
+		if (!navigator.onLine) {
+			return;
+		}
+
 		try {
+			syncStatus.set(AppEvents.SyncStarted);
+			const lastSynced = this.localStorage.get(LocalStorageKeys.LastSynced);
+
+			this.currenciesService.loadRates();
+
 			let lastSyncedServer = '1970-01-01T00:00:00.000Z';
 
 			await this.upcomingExpensesIDBHelper.deleteOld();
@@ -38,7 +52,7 @@ export class SyncService {
 				throw new Error('api/sync/changes call failed');
 			}
 
-			lastSyncedServer = changed.lastSynced;
+			lastSyncedServer = DateHelper.adjustTimeZone(new Date(changed.lastSynced)).toISOString();
 
 			await this.accountsIDBHelper.sync(changed.deletedAccountIds, changed.accounts);
 			await this.categoriesIDBHelper.sync(changed.deletedCategoryIds, changed.categories);
@@ -80,7 +94,8 @@ export class SyncService {
 			await this.debtsIDBHelper.consolidate(created.debtIdPairs);
 			await this.automaticTransactionsIDBHelper.consolidate(created.automaticTransactionIdPairs);
 
-			return lastSyncedServer;
+			this.localStorage.set(LocalStorageKeys.LastSynced, lastSyncedServer);
+			syncStatus.set(AppEvents.SyncFinished);
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -108,6 +123,7 @@ export class SyncService {
 
 	release() {
 		this.httpProxy.release();
+		this.currenciesService.release();
 		this.logger.release();
 	}
 }

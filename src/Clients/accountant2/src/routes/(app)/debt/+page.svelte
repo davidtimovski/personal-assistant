@@ -9,7 +9,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
-	import { locale, syncStatus } from '$lib/stores';
+	import { user, syncStatus } from '$lib/stores';
 	import { DebtsService } from '$lib/services/debtsService';
 	import { DebtItem } from '$lib/models/viewmodels/debtItem';
 	import { AppEvents } from '$lib/models/appEvents';
@@ -23,7 +23,7 @@
 
 	function formatDate(dateString: string): string {
 		const date = new Date(Date.parse(dateString));
-		const month = DateHelper.getLongMonth(date, $locale);
+		const month = DateHelper.getLongMonth(date, $user.language);
 
 		const now = new Date();
 		if (now.getFullYear() === date.getFullYear()) {
@@ -123,7 +123,7 @@
 										<i class="fas fa-hand-holding-usd {debt.userIsDebtor ? 'debtor' : 'lender'}" />
 									</button>
 								</td>
-								<td>{Formatter.number(debt.amount, currency, $locale)}</td>
+								<td>{Formatter.number(debt.amount, currency, $user.culture)}</td>
 								<td>{debt.person}</td>
 								<td>{debt.created}</td>
 								<td class="sync-icon-cell">

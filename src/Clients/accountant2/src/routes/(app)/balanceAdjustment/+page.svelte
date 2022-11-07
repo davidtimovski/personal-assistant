@@ -7,7 +7,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
-	import { locale, alertState } from '$lib/stores';
+	import { user, alertState } from '$lib/stores';
 	import type { SelectOption } from '$lib/models/viewmodels/selectOption';
 	import { AccountsService } from '$lib/services/accountsService';
 	import { TransactionsService } from '$lib/services/transactionsService';
@@ -144,7 +144,7 @@
 
 			<div class="form-control inline">
 				<span>{$t('balanceAdjustment.adjustedBy')}</span>
-				<span> {(adjustedBy > 0 ? '+' : '') + Formatter.number(adjustedBy, currency, $locale)}</span>
+				<span> {(adjustedBy > 0 ? '+' : '') + Formatter.number(adjustedBy, currency, $user.culture)}</span>
 			</div>
 
 			<div class="form-control">

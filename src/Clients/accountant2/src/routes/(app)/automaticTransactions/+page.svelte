@@ -8,7 +8,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
-	import { locale, syncStatus } from '$lib/stores';
+	import { user, syncStatus } from '$lib/stores';
 	import { AutomaticTransactionsService } from '$lib/services/automaticTransactionsService';
 	import { AutomaticTransactionItem } from '$lib/models/viewmodels/automaticTransactionItem';
 	import { AppEvents } from '$lib/models/appEvents';
@@ -100,7 +100,7 @@
 								</td>
 								<td>{automaticTransaction.dayInMonth}</td>
 								<td>
-									{Formatter.number(automaticTransaction.amount, currency, $locale)}
+									{Formatter.number(automaticTransaction.amount, currency, $user.culture)}
 									<i
 										class="fas is-deposit-icon {automaticTransaction.isDeposit
 											? 'fa-donate deposit-color'

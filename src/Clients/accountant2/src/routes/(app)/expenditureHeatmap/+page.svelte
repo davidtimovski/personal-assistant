@@ -7,7 +7,7 @@
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { t } from '$lib/localization/i18n';
 	import { Formatter } from '$lib/utils/formatter';
-	import { locale } from '$lib/stores';
+	import { user } from '$lib/stores';
 	import { TransactionsService } from '$lib/services/transactionsService';
 	import { AccountsService } from '$lib/services/accountsService';
 	import { HeatmapDay, HeatmapExpense } from '$lib/models/viewmodels/expenditureHeatmap';
@@ -92,7 +92,7 @@
 
 	function formatDate(date: Date): string {
 		const day = date.getDate();
-		const month = DateHelper.getLongMonth(date, $locale);
+		const month = DateHelper.getLongMonth(date, $user.language);
 		return `${day} ${month}`;
 	}
 
@@ -257,8 +257,8 @@
 					</div>
 					<div class="heatmap-legend-line" />
 					<div class="heatmap-legend-amounts">
-						<span>{Formatter.number(minSpent, currency, $locale)}</span>
-						<span>{Formatter.number(maxSpent, currency, $locale)}</span>
+						<span>{Formatter.number(minSpent, currency, $user.culture)}</span>
+						<span>{Formatter.number(maxSpent, currency, $user.culture)}</span>
 					</div>
 				</div>
 
@@ -270,7 +270,7 @@
 								<tr on:click={() => viewTransaction(expenditure.transactionId)} role="button">
 									<td>{expenditure.category}</td>
 									<td>{expenditure.description}</td>
-									<td class="amount-cell">{Formatter.money(expenditure.amount, currency, $locale)}</td>
+									<td class="amount-cell">{Formatter.money(expenditure.amount, currency, $user.culture)}</td>
 								</tr>
 							{/each}
 						</tbody>
@@ -283,7 +283,7 @@
 									</td>
 								</tr>
 								<tr>
-									<td colspan="3">{Formatter.money(selectedDay.spent, currency, $locale)}</td>
+									<td colspan="3">{Formatter.money(selectedDay.spent, currency, $user.culture)}</td>
 								</tr>
 							</tfoot>
 						{/if}

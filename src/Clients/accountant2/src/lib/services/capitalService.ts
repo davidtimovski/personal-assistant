@@ -23,7 +23,7 @@ export class CapitalService {
 		mainAccountId: number,
 		uncategorizedLabel: string,
 		currency: string
-	): Promise<[AmountByCategory[], number]> {
+	): Promise<{ expenditures: AmountByCategory[]; spent: number }> {
 		try {
 			const transactions = await this.transactionsIDBHelper.getExpendituresForCurrentMonth(mainAccountId);
 			const expenditures = await this.transactionsService.getByCategory(transactions, currency, uncategorizedLabel);
@@ -33,7 +33,7 @@ export class CapitalService {
 				.map((e) => e.amount)
 				.reduce((prev, curr) => prev + curr, 0);
 
-			return [expenditures, spent];
+			return { expenditures, spent };
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -43,7 +43,7 @@ export class CapitalService {
 	async getUpcomingExpenses(
 		uncategorizedLabel: string,
 		currency: string
-	): Promise<[HomePageUpcomingExpense[], number]> {
+	): Promise<{ upcomingExpenses: HomePageUpcomingExpense[]; upcomingSum: number }> {
 		try {
 			const monthUpcomingExpenses = await this.upcomingExpensesIDBHelper.getAllForMonth();
 
@@ -68,7 +68,7 @@ export class CapitalService {
 				return b.amount - a.amount;
 			});
 
-			return [upcomingExpenses, upcomingSum];
+			return { upcomingExpenses, upcomingSum };
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;

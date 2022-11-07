@@ -1,4 +1,9 @@
 export class DateHelper {
+  static adjustTimeZone(date: Date): Date {
+    date.setTime(date.getTime() - date.getTimezoneOffset() * 60000);
+    return date;
+  }
+
   /** Format as 2022-10-25. Adjusted for time zone. */
   static format(date: Date): string {
     return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
@@ -78,19 +83,12 @@ export class DateHelper {
   }
 
   /** Example: Jan, Feb, Mar. */
-  static getShortMonth(date: Date, culture: string) {
-    return date.toLocaleString(culture, { month: "short" });
+  static getShortMonth(date: Date, language: string) {
+    return date.toLocaleString(language, { month: "short" });
   }
 
   /** Example: January, Febuary, March. */
-  static getLongMonth(date: Date, culture: string) {
-    return date.toLocaleString(culture, { month: "long" });
-  }
-
-  static adjustForTimeZone(date: Date): Date {
-    let hoursDiff = date.getHours() - date.getTimezoneOffset() / 60;
-    date.setHours(hoursDiff);
-
-    return date;
+  static getLongMonth(date: Date, language: string) {
+    return date.toLocaleString(language, { month: "long" });
   }
 }

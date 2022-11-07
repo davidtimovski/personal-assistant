@@ -3,15 +3,19 @@ import { writable } from 'svelte/store';
 import { DateHelper } from '../../../shared2/utils/dateHelper';
 import type { AuthInfo } from '../../../shared2/models/authInfo';
 import { AlertState } from '../../../shared2/models/alertState';
+import { AlertStatus } from '../../../shared2/models/enums/alertEvents';
 
+import { AccountantUser } from '$lib/models/accountantUser';
 import { AppEvents } from '$lib/models/appEvents';
 import { SearchFilters } from '$lib/models/viewmodels/searchFilters';
 import { TransactionType } from '$lib/models/viewmodels/transactionType';
-import { AlertStatus } from '../../../shared2/models/enums/alertEvents';
+import Variables from '$lib/variables';
 
 export const isOnline = writable<boolean>(true);
-export const locale = writable('en-US');
 export const authInfo = writable<AuthInfo | null>(null);
+export const user = writable<AccountantUser>(
+	new AccountantUser('', '', 'en-US', 'en-US', Variables.urls.defaultProfileImageUrl)
+);
 export const syncStatus = writable<AppEvents>(AppEvents.NotSyncing);
 export const alertState = writable<AlertState>(new AlertState(AlertStatus.Hidden, null, []));
 

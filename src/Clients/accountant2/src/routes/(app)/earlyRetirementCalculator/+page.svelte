@@ -7,7 +7,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
-	import { locale } from '$lib/stores';
+	import { user } from '$lib/stores';
 	import { AccountsService } from '$lib/services/accountsService';
 	import { LargeUpcomingExpense, SummaryItem } from '$lib/models/viewmodels/earlyRetirementCalculator';
 
@@ -165,7 +165,7 @@
 			summaryItems.push(
 				new SummaryItem(
 					$t('earlyRetirementCalculator.summaryItem2a', {
-						capital: Formatter.money(capital, capitalCurrency, $locale)
+						capital: Formatter.money(capital, capitalCurrency, $user.culture)
 					})
 				)
 			);
@@ -177,7 +177,7 @@
 			summaryItems.push(
 				new SummaryItem(
 					$t('earlyRetirementCalculator.summaryItem3a', {
-						savedPerMonth: Formatter.money(savedPerMonth, savedPerMonthCurrency, $locale),
+						savedPerMonth: Formatter.money(savedPerMonth, savedPerMonthCurrency, $user.culture),
 						savingInterestRate: savingInterestRate
 					})
 				)
@@ -191,7 +191,7 @@
 				new SummaryItem(
 					$t('earlyRetirementCalculator.summaryItem4a', {
 						pensionAge: pensionAge,
-						pensionPerMonth: Formatter.money(pensionPerMonth, pensionPerMonthCurrency, $locale)
+						pensionPerMonth: Formatter.money(pensionPerMonth, pensionPerMonthCurrency, $user.culture)
 					})
 				)
 			);
@@ -203,7 +203,7 @@
 			summaryItems.push(
 				new SummaryItem(
 					$t('earlyRetirementCalculator.summaryItem5a', {
-						lifeInsuranceReturn: Formatter.money(lifeInsuranceReturn, lifeInsuranceReturnCurrency, $locale),
+						lifeInsuranceReturn: Formatter.money(lifeInsuranceReturn, lifeInsuranceReturnCurrency, $user.culture),
 						lifeInsuranceAge: lifeInsuranceAge
 					})
 				)
@@ -219,7 +219,7 @@
 				expensesSummaryItem.children.push(
 					new SummaryItem(
 						$t('earlyRetirementCalculator.summaryItem6a', {
-							amount: Formatter.money(expense.amount, expense.currency, $locale),
+							amount: Formatter.money(expense.amount, expense.currency, $user.culture),
 							expense: expense.name
 						})
 					)
@@ -232,7 +232,7 @@
 		summaryItems.push(
 			new SummaryItem(
 				$t('earlyRetirementCalculator.summaryItem7', {
-					retirementIncome: Formatter.money(retirementIncome, retirementIncomeCurrency, $locale)
+					retirementIncome: Formatter.money(retirementIncome, retirementIncomeCurrency, $user.culture)
 				})
 			)
 		);

@@ -11,7 +11,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
-	import { locale } from '$lib/stores';
+	import { user } from '$lib/stores';
 	import { TransactionsService } from '$lib/services/transactionsService';
 	import { TransactionType } from '$lib/models/viewmodels/transactionType';
 	import { CategoriesService } from '$lib/services/categoriesService';
@@ -55,7 +55,7 @@
 
 	function formatOccurrenceDate(occurrenceDateString: string): string {
 		const date = new Date(Date.parse(occurrenceDateString));
-		const month = DateHelper.getLongMonth(date, $locale);
+		const month = DateHelper.getLongMonth(date, $user.language);
 
 		const now = new Date();
 		if (now.getFullYear() === date.getFullYear()) {
@@ -215,14 +215,14 @@
 			<div class="form-control inline">
 				<span>{$t('amount')}</span>
 				<span class:expense-color={type === 1} class:deposit-color={type === 2} class:transfer-color={type === 3}
-					>{Formatter.money(amount, preferredCurrency, $locale)}</span
+					>{Formatter.money(amount, preferredCurrency, $user.culture)}</span
 				>
 			</div>
 
 			{#if currency && currency !== preferredCurrency}
 				<div class="form-control inline">
 					<span>{$t('transaction.originalAmount')}</span>
-					<span>{Formatter.money(originalAmount, currency, $locale)}</span>
+					<span>{Formatter.money(originalAmount, currency, $user.culture)}</span>
 				</div>
 			{/if}
 
@@ -234,14 +234,14 @@
 			{#if fromStocks}
 				<div class="form-control inline">
 					<span>{$t('soldStocks')}</span>
-					<span class="expense-color">{Formatter.moneyPrecise(fromStocks, preferredCurrency, $locale, 4)}</span>
+					<span class="expense-color">{Formatter.moneyPrecise(fromStocks, preferredCurrency, $user.culture, 4)}</span>
 				</div>
 			{/if}
 
 			{#if toStocks}
 				<div class="form-control inline">
 					<span>{$t('purchasedStocks')}</span>
-					<span class="deposit-color">{Formatter.moneyPrecise(toStocks, preferredCurrency, $locale, 4)}</span>
+					<span class="deposit-color">{Formatter.moneyPrecise(toStocks, preferredCurrency, $user.culture, 4)}</span>
 				</div>
 			{/if}
 

@@ -9,7 +9,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
-	import { locale, syncStatus } from '$lib/stores';
+	import { user, syncStatus } from '$lib/stores';
 	import { UpcomingExpensesService } from '$lib/services/upcomingExpensesService';
 	import { UpcomingExpenseItem } from '$lib/models/viewmodels/upcomingExpenseItem';
 	import { AppEvents } from '$lib/models/appEvents';
@@ -23,7 +23,7 @@
 
 	function formatDate(dateString: string): string {
 		const date = new Date(Date.parse(dateString));
-		const month = DateHelper.getLongMonth(date, $locale);
+		const month = DateHelper.getLongMonth(date, $user.language);
 
 		const now = new Date();
 		if (now.getFullYear() === date.getFullYear()) {
@@ -111,7 +111,7 @@
 									</a>
 								</td>
 								<td>{upcomingExpense.date}</td>
-								<td>{Formatter.number(upcomingExpense.amount, currency, $locale)}</td>
+								<td>{Formatter.number(upcomingExpense.amount, currency, $user.culture)}</td>
 								<td>{upcomingExpense.category}</td>
 								<td class="sync-icon-cell">
 									{#if !upcomingExpense.synced}
