@@ -117,7 +117,7 @@
 		newTaskNameInput.focus();
 	}
 
-	function newTaskNameInputChanged(event: KeyboardEvent) {
+	function newTaskNameInputChange(event: KeyboardEvent) {
 		if (isSearching) {
 			if (newTaskName.trim().length > 0) {
 				filterTasks();
@@ -131,14 +131,19 @@
 			newTaskIsInvalid = false;
 			duplicateTask = null;
 			similarTaskNames = [];
+		}
+	}
 
-			if (TasksService.isUrl(newTaskName)) {
-				newTaskUrl = newTaskName;
+	function newTaskNameInputPaste(e: any) {
+		newTaskIsInvalid = false;
+		const pastedText = e.clipboardData.getData('Text');
+
+		if (TasksService.isUrl(pastedText)) {
+			newTaskUrl = pastedText.trim();
+			window.setTimeout(() => {
 				newTaskName = '';
 				newTaskNameInput.focus();
-			} else {
-				addNewPlaceholderText = $t('list.addNew');
-			}
+			}, 0);
 		}
 	}
 
@@ -601,7 +606,8 @@
 							type="text"
 							bind:value={newTaskName}
 							bind:this={newTaskNameInput}
-							on:keyup={newTaskNameInputChanged}
+							on:keyup={newTaskNameInputChange}
+							on:paste={newTaskNameInputPaste}
 							class="new-task-input"
 							class:invalid={newTaskIsInvalid}
 							placeholder={addNewPlaceholderText}
