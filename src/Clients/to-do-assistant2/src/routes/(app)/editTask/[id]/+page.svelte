@@ -33,6 +33,7 @@
 	let assigneeOptions: Assignee[] | null = null;
 	let nobodyImageUri = Variables.urls.defaultProfileImageUrl;
 	let nameIsInvalid = false;
+	let urlIsInvalid = false;
 	let recipesText: string;
 	let deleteInProgress = false;
 	let deleteButtonText: string;
@@ -81,6 +82,10 @@
 			result.fail('name');
 		}
 
+		if (url && !TasksService.isUrl(url)) {
+			result.fail('url');
+		}
+
 		return result;
 	}
 
@@ -113,7 +118,8 @@
 				saveButtonIsLoading = false;
 			}
 		} else {
-			nameIsInvalid = true;
+			nameIsInvalid = result.erroredFields.includes('name');
+			urlIsInvalid = result.erroredFields.includes('url');
 			saveButtonIsLoading = false;
 		}
 	}
@@ -227,6 +233,7 @@
 					type="url"
 					bind:value={url}
 					maxlength="1000"
+					class:invalid={urlIsInvalid}
 					placeholder={$t('editTask.url')}
 					aria-label={$t('editTask.url')}
 				/>
