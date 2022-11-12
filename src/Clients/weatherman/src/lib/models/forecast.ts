@@ -1,6 +1,8 @@
 import type { WeatherCode } from '$lib/models/weatherCode';
 
 export class Forecast {
+	lastRetrieved: number | null = null;
+
 	constructor(
 		public weatherCode: WeatherCode,
 		public temperature: number,

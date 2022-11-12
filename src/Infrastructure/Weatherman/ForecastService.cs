@@ -90,7 +90,7 @@ public class ForecastService : IForecastService
 
                 return result;
             }
-            else if (forecast.LastUpdate < now.AddMinutes(-30))
+            else if (forecast.LastUpdate.Day != now.Day || forecast.LastUpdate < now.AddMinutes(-30))
             {
                 string data = await GetFromProviderAsync(parameters);
                 var openMeteoResult = JsonSerializer.Deserialize<OpenMeteoResult>(data);
@@ -102,7 +102,24 @@ public class ForecastService : IForecastService
                 return result;
             }
 
-            return JsonSerializer.Deserialize<ForecastResult>(forecast.Data);
+            var cachedResult = JsonSerializer.Deserialize<ForecastResult>(forecast.Data);
+
+            if (forecast.LastUpdate.Hour != now.Hour)
+            {
+                HourlyForecast nextHour = cachedResult.Hourly[0];
+
+                cachedResult.Temperature = nextHour.Temperature;
+                cachedResult.ApparentTemperature = nextHour.ApparentTemperature;
+                cachedResult.Precipitation = nextHour.Precipitation;
+                cachedResult.WindSpeed = nextHour.WindSpeed;
+                cachedResult.IsNight = nextHour.IsNight;
+                cachedResult.Hourly.RemoveAt(0);
+
+                forecast.Data = JsonSerializer.Serialize(cachedResult);
+                await _forecastsRepository.UpdateAsync(forecast.Id, now, forecast.Data);
+            }
+
+            return cachedResult;
         }
         catch (Exception ex)
         {
@@ -154,6 +171,8 @@ public class ForecastService : IForecastService
                 WeatherCode: (WeatherCode)openMeteoResult.hourly.weathercode[i],
                 Temperature: (short)Math.Round(openMeteoResult.hourly.temperature_2m[i]),
                 ApparentTemperature: (short)Math.Round(openMeteoResult.hourly.apparent_temperature[i]),
+                Precipitation: (float)Math.Round(openMeteoResult.hourly.precipitation[i], 1),
+                WindSpeed: (short)Math.Round(openMeteoResult.hourly.windspeed_10m[i]),
                 IsNight: openMeteoResult.hourly.time[i] < openMeteoResult.daily.sunrise[0] || openMeteoResult.hourly.time[i] > openMeteoResult.daily.sunset[0]
             ));
         }
@@ -179,6 +198,8 @@ public class ForecastService : IForecastService
                    WeatherCode: (WeatherCode)openMeteoResult.hourly.weathercode[j],
                    Temperature: (short)Math.Round(openMeteoResult.hourly.temperature_2m[j]),
                    ApparentTemperature: (short)Math.Round(openMeteoResult.hourly.apparent_temperature[j]),
+                   Precipitation: (float)Math.Round(openMeteoResult.hourly.precipitation[j], 1),
+                   WindSpeed: (short)Math.Round(openMeteoResult.hourly.windspeed_10m[j]),
                    IsNight: openMeteoResult.hourly.time[j] < openMeteoResult.daily.sunrise[i] || openMeteoResult.hourly.time[j] > openMeteoResult.daily.sunset[i]
                ));
             }

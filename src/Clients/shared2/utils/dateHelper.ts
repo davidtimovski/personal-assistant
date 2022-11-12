@@ -1,7 +1,6 @@
 export class DateHelper {
   static adjustTimeZone(date: Date): Date {
-    date.setTime(date.getTime() - date.getTimezoneOffset() * 60000);
-    return date;
+    return new Date(date.getTime() - date.getTimezoneOffset() * 60000);
   }
 
   /** Format as 2022-10-25. Adjusted for time zone. */
