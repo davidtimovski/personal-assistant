@@ -11,7 +11,7 @@
 	import Alert from '../../../../shared2/components/Alert.svelte';
 
 	import { t } from '$lib/localization/i18n';
-	import { isOffline, user } from '$lib/stores';
+	import { isOffline, user, forecast } from '$lib/stores';
 	import { ForecastsService } from '$lib/services/forecastsService';
 	import type { WeathermanUser } from '$lib/models/weathermanUser';
 
@@ -28,7 +28,7 @@
 			user.set(currentUser);
 			usersService.cache(currentUser);
 
-			new ForecastsService().get(currentUser.culture);
+			forecastsService.get(currentUser.culture);
 		});
 	}
 
@@ -44,6 +44,7 @@
 		}
 
 		usersService = new UsersServiceBase('Weatherman');
+		forecastsService = new ForecastsService();
 		loadUser();
 
 		isOffline.set(!navigator.onLine);
@@ -53,6 +54,21 @@
 		window.addEventListener('offline', () => {
 			isOffline.set(true);
 		});
+
+		document.addEventListener(
+			'visibilitychange',
+			() => {
+				if (document.hidden || $forecast === null || $forecast.lastRetrieved === null) {
+					return;
+				}
+
+				const fifteenMinutesAgo = Date.now() - 900000;
+				if ($forecast.lastRetrieved < fifteenMinutesAgo) {
+					forecastsService.get($user.culture);
+				}
+			},
+			false
+		);
 	});
 
 	onDestroy(() => {
