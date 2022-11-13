@@ -3,7 +3,7 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
-	import type { DailyForecast } from '$lib/models/forecast';
+	import { TimeOfDay, type DailyForecast } from '$lib/models/forecast';
 	import { WeatherCode } from '$lib/models/weatherCode';
 
 	import Illustration from '$lib/components/Illustration.svelte';
@@ -59,7 +59,7 @@
 <div class="wrap">
 	<div class="current-forecast">
 		<div class="current-illustration">
-			<Illustration weatherCode={forecast.weatherCode} isNight={false} />
+			<Illustration weatherCode={forecast.weatherCode} timeOfDay={TimeOfDay.Day} />
 		</div>
 
 		<div class="current-temp">{forecast.temperatureMax}° / {forecast.temperatureMin}°</div>
@@ -85,7 +85,7 @@
 				<tr>
 					<td>{hourForecast.timeString}</td>
 					<td class="hourly-illustration">
-						<Illustration weatherCode={hourForecast.weatherCode} isNight={hourForecast.isNight} />
+						<Illustration weatherCode={hourForecast.weatherCode} timeOfDay={hourForecast.timeOfDay} />
 					</td>
 					<td>{hourForecast.temperature}°</td>
 				</tr>

@@ -203,7 +203,7 @@
 				<div class="wrap">
 					<div class="current-forecast">
 						<div class="current-illustration">
-							<Illustration weatherCode={$forecast.weatherCode} isNight={$forecast.isNight} />
+							<Illustration weatherCode={$forecast.weatherCode} timeOfDay={$forecast.timeOfDay} />
 						</div>
 
 						<div class="current-temp">{$forecast.temperature}°</div>
@@ -240,7 +240,7 @@
 								<tr>
 									<td>{hourForecast.timeString}</td>
 									<td class="hourly-illustration">
-										<Illustration weatherCode={hourForecast.weatherCode} isNight={hourForecast.isNight} />
+										<Illustration weatherCode={hourForecast.weatherCode} timeOfDay={hourForecast.timeOfDay} />
 									</td>
 									<td>{hourForecast.temperature}°</td>
 								</tr>

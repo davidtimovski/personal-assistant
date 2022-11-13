@@ -9,7 +9,7 @@ export class Forecast {
 		public apparentTemperature: number,
 		public precipitation: number,
 		public windSpeed: number,
-		public isNight: boolean,
+		public timeOfDay: TimeOfDay,
 		public hourly: HourlyForecast[],
 		public nextDays: DailyForecast[]
 	) {}
@@ -32,7 +32,14 @@ export class HourlyForecast {
 		public weatherCode: WeatherCode,
 		public temperature: number,
 		public apparentTemperature: number,
-		public isNight: boolean,
+		public timeOfDay: TimeOfDay,
 		public timeString: string
 	) {}
+}
+
+export enum TimeOfDay {
+	Day,
+	SunLow,
+	SunLower,
+	Night
 }

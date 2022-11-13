@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { WeatherCode } from '$lib/models/weatherCode';
+	import { TimeOfDay } from '$lib/models/forecast';
 
 	import CloudMoon from '$lib/components/illustrations/CloudMoon.svelte';
 	import CloudSun from '$lib/components/illustrations/CloudSun.svelte';
@@ -23,36 +24,46 @@
 	import SnowLightMoon from '$lib/components/illustrations/SnowLightMoon.svelte';
 	import SnowLightSun from '$lib/components/illustrations/SnowLightSun.svelte';
 	import Sun from '$lib/components/illustrations/Sun.svelte';
+	import SunLow from '$lib/components/illustrations/SunLow.svelte';
+	import SunLower from '$lib/components/illustrations/SunLower.svelte';
 	import Thunderstorm from '$lib/components/illustrations/Thunderstorm.svelte';
 
 	export let weatherCode: WeatherCode;
-	export let isNight: boolean;
+	export let timeOfDay: TimeOfDay;
 </script>
 
 {#if weatherCode === WeatherCode.ClearSky || weatherCode === WeatherCode.MainlyClear}
-	{#if isNight}
+	{#if timeOfDay === TimeOfDay.Night}
 		<Moon />
-	{:else}
+	{:else if timeOfDay === TimeOfDay.Day}
 		<Sun />
+	{:else if timeOfDay === TimeOfDay.SunLow}
+		<SunLow />
+	{:else if timeOfDay === TimeOfDay.SunLower}
+		<SunLower />
 	{/if}
 {:else if weatherCode === WeatherCode.PartlyCloudy}
-	{#if isNight}
-		<CloudMoon />
-	{:else}
-		<CloudSun />
+	{#if timeOfDay === TimeOfDay.Night}
+		<Moon />
+	{:else if timeOfDay === TimeOfDay.Day}
+		<Sun />
+	{:else if timeOfDay === TimeOfDay.SunLow}
+		<SunLow />
+	{:else if timeOfDay === TimeOfDay.SunLower}
+		<SunLower />
 	{/if}
 {:else if weatherCode === WeatherCode.Overcast}
 	<Cloudy />
 {:else if weatherCode === WeatherCode.Fog || weatherCode === WeatherCode.DepositingRimeFog}
 	<Fog />
 {:else if weatherCode === WeatherCode.DrizzleLight || weatherCode === WeatherCode.DrizzleLightFreezing}
-	{#if isNight}
+	{#if timeOfDay !== TimeOfDay.Day}
 		<DrizzleLightMoon />
 	{:else}
 		<DrizzleLightSun />
 	{/if}
 {:else if weatherCode === WeatherCode.DrizzleModerate || weatherCode === WeatherCode.DrizzleDense || weatherCode === WeatherCode.DrizzleDenseFreezing}
-	{#if isNight}
+	{#if timeOfDay !== TimeOfDay.Day}
 		<DrizzleHeavyMoon />
 	{:else}
 		<DrizzleHeavySun />
@@ -62,7 +73,7 @@
 {:else if weatherCode === WeatherCode.RainModerate || weatherCode === WeatherCode.RainHeavy}
 	<RainHeavy />
 {:else if weatherCode === WeatherCode.SnowLight}
-	{#if isNight}
+	{#if timeOfDay !== TimeOfDay.Day}
 		<SnowLightMoon />
 	{:else}
 		<SnowLightSun />
@@ -70,19 +81,19 @@
 {:else if weatherCode === WeatherCode.SnowModerate || weatherCode === WeatherCode.SnowHeavy || weatherCode === WeatherCode.SnowGrains}
 	<SnowHeavy />
 {:else if weatherCode === WeatherCode.ShowerLight}
-	{#if isNight}
+	{#if timeOfDay !== TimeOfDay.Day}
 		<ShowerLightMoon />
 	{:else}
 		<ShowerLightSun />
 	{/if}
 {:else if weatherCode === WeatherCode.ShowerModerate || weatherCode === WeatherCode.ShowerViolent}
-	{#if isNight}
+	{#if timeOfDay !== TimeOfDay.Day}
 		<ShowerHeavyMoon />
 	{:else}
 		<ShowerHeavySun />
 	{/if}
 {:else if weatherCode === WeatherCode.SnowShowerLight}
-	{#if isNight}
+	{#if timeOfDay !== TimeOfDay.Day}
 		<SnowLightMoon />
 	{:else}
 		<SnowLightSun />
@@ -92,7 +103,7 @@
 {:else if weatherCode === WeatherCode.Thunderstorm}
 	<Thunderstorm />
 {:else if weatherCode === WeatherCode.ThunderstormWithHailLight}
-	{#if isNight}
+	{#if timeOfDay !== TimeOfDay.Day}
 		<HailLightMoon />
 	{:else}
 		<HailLightSun />

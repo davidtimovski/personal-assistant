@@ -9,7 +9,7 @@ public class ForecastResult
     public short ApparentTemperature { get; set; }
     public float Precipitation { get; set; }
     public short WindSpeed { get; set; }
-    public bool IsNight { get; set; }
+    public TimeOfDay TimeOfDay { get; set; }
     public List<HourlyForecast> Hourly { get; set; }
     public List<DailyForecast> NextDays { get; set; }
 }
@@ -24,4 +24,12 @@ public class DailyForecast
     public List<HourlyForecast> Hourly { get; init; }
 }
 
-public readonly record struct HourlyForecast(short Hour, WeatherCode WeatherCode, short Temperature, short ApparentTemperature, float Precipitation, short WindSpeed, bool IsNight);
+public readonly record struct HourlyForecast(short Hour, WeatherCode WeatherCode, short Temperature, short ApparentTemperature, float Precipitation, short WindSpeed, TimeOfDay TimeOfDay);
+
+public enum TimeOfDay
+{
+    Day,
+    SunLow,
+    SunLower,
+    Night
+}
