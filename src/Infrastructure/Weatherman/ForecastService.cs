@@ -112,7 +112,7 @@ public class ForecastService : IForecastService
                 cachedResult.ApparentTemperature = nextHour.ApparentTemperature;
                 cachedResult.Precipitation = nextHour.Precipitation;
                 cachedResult.WindSpeed = nextHour.WindSpeed;
-                cachedResult.IsNight = nextHour.IsNight;
+                cachedResult.TimeOfDay = nextHour.TimeOfDay;
                 cachedResult.Hourly.RemoveAt(0);
 
                 forecast.Data = JsonSerializer.Serialize(cachedResult);
@@ -150,6 +150,8 @@ public class ForecastService : IForecastService
 
     private static ForecastResult Map(OpenMeteoResult openMeteoResult, GetForecast parameters)
     {
+        var firstDaySunrise = openMeteoResult.daily.sunrise[0].TimeOfDay;
+        var firstDaySunset = openMeteoResult.daily.sunset[0].TimeOfDay;
         var result = new ForecastResult
         {
             WeatherCode = (WeatherCode)openMeteoResult.hourly.weathercode[parameters.Time.Hour],
@@ -157,7 +159,7 @@ public class ForecastService : IForecastService
             ApparentTemperature = (short)Math.Round(openMeteoResult.hourly.apparent_temperature[parameters.Time.Hour]),
             Precipitation = (float)Math.Round(openMeteoResult.hourly.precipitation[parameters.Time.Hour], 1),
             WindSpeed = (short)Math.Round(openMeteoResult.hourly.windspeed_10m[parameters.Time.Hour]),
-            IsNight = parameters.Time < openMeteoResult.daily.sunrise[0] || parameters.Time > openMeteoResult.daily.sunset[0],
+            TimeOfDay = GetTimeOfDay(parameters.Time.TimeOfDay, firstDaySunrise, firstDaySunset),
             NextDays = new List<DailyForecast>(5),
             Hourly = new List<HourlyForecast>(24)
         };
@@ -173,7 +175,7 @@ public class ForecastService : IForecastService
                 ApparentTemperature: (short)Math.Round(openMeteoResult.hourly.apparent_temperature[i]),
                 Precipitation: (float)Math.Round(openMeteoResult.hourly.precipitation[i], 1),
                 WindSpeed: (short)Math.Round(openMeteoResult.hourly.windspeed_10m[i]),
-                IsNight: openMeteoResult.hourly.time[i] < openMeteoResult.daily.sunrise[0] || openMeteoResult.hourly.time[i] > openMeteoResult.daily.sunset[0]
+                TimeOfDay: GetTimeOfDay(openMeteoResult.hourly.time[i].TimeOfDay, firstDaySunrise, firstDaySunset)
             ));
         }
 
@@ -189,6 +191,9 @@ public class ForecastService : IForecastService
                 Hourly = new List<HourlyForecast>(24)
             };
 
+            var sunrise = openMeteoResult.daily.sunrise[i].TimeOfDay;
+            var sunset = openMeteoResult.daily.sunset[i].TimeOfDay;
+
             var fromIndex = i * 24 + 7;
             var toIndex = fromIndex + 24;
             for (var j = fromIndex; j < toIndex; j++)
@@ -200,7 +205,7 @@ public class ForecastService : IForecastService
                    ApparentTemperature: (short)Math.Round(openMeteoResult.hourly.apparent_temperature[j]),
                    Precipitation: (float)Math.Round(openMeteoResult.hourly.precipitation[j], 1),
                    WindSpeed: (short)Math.Round(openMeteoResult.hourly.windspeed_10m[j]),
-                   IsNight: openMeteoResult.hourly.time[j] < openMeteoResult.daily.sunrise[i] || openMeteoResult.hourly.time[j] > openMeteoResult.daily.sunset[i]
+                   TimeOfDay: GetTimeOfDay(openMeteoResult.hourly.time[j].TimeOfDay, sunrise, sunset)
                ));
             }
 
@@ -208,5 +213,25 @@ public class ForecastService : IForecastService
         }
 
         return result;
+    }
+
+    private static TimeOfDay GetTimeOfDay(TimeSpan time, TimeSpan sunrise, TimeSpan sunset)
+    {
+        if (time.Hours == sunrise.Hours || time.Hours == sunset.Hours)
+        {
+            return TimeOfDay.SunLower;
+        }
+
+        if (time.Hours == (sunrise.Hours + 1) || time.Hours == (sunset.Hours - 1))
+        {
+            return TimeOfDay.SunLow;
+        }
+
+        if (time < sunrise || time > sunset)
+        {
+            return TimeOfDay.Night;
+        }
+
+        return TimeOfDay.Day;
     }
 }
