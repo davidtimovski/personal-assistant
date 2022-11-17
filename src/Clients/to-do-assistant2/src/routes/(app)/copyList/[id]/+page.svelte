@@ -8,7 +8,7 @@
 	import { ValidationErrors } from '../../../../../../shared2/models/validationErrors';
 
 	import { t } from '$lib/localization/i18n';
-	import { alertState, lists } from '$lib/stores';
+	import { alertState, state } from '$lib/stores';
 	import { ListsService } from '$lib/services/listsService';
 	import type { Task } from '$lib/models/entities';
 
@@ -96,12 +96,12 @@
 		listsService = new ListsService();
 
 		unsubscriptions.push(
-			lists.subscribe((l) => {
-				if (l.length === 0) {
+			state.subscribe((s) => {
+				if (s.lists.length === 0) {
 					return;
 				}
 
-				const list = l.find((x) => x.id === data.id);
+				const list = s.lists.find((x) => x.id === data.id);
 				if (!list) {
 					throw new Error('List not found');
 				}

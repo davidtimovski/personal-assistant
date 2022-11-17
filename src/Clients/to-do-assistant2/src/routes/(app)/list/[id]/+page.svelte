@@ -11,7 +11,8 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
-	import { alertState, lists, remoteEvents } from '$lib/stores';
+	import { ThrottleHelper } from '$lib/utils/throttleHelper';
+	import { alertState, state, remoteEvents } from '$lib/stores';
 	import { SharingState } from '$lib/models/viewmodels/sharingState';
 	import { ListsService } from '$lib/services/listsService';
 	import { TasksService } from '$lib/services/tasksService';
@@ -19,13 +20,14 @@
 	import { SoundPlayer } from '$lib/utils/soundPlayer';
 	import { RemoteEventType } from '$lib/models/remoteEvents';
 
+	import Task from './components/Task.svelte';
+
 	export let data: PageData;
 
 	let name = '';
 	let isOneTimeToggleDefault: boolean;
 	let sharingState = SharingState.NotShared;
 	let isArchived = false;
-	let derivedListType: string;
 	let tasks = new Array<ListTask>();
 	let privateTasks = new Array<ListTask>();
 	let completedTasks = new Array<ListTask>();
@@ -50,7 +52,6 @@
 	let newTaskIsInvalid = false;
 	let newTaskNameInput: HTMLInputElement;
 	let editedId: number | undefined;
-	//let isReordering = false;
 	let isSearching = false;
 	let soundsEnabled = false;
 	let editListButtonIsLoading = false;
@@ -70,26 +71,6 @@
 	function closeDrawer() {
 		topDrawerIsOpen = false;
 	}
-
-	// async function reorder(changedArray: ListTask[], actionData: any) {
-	// 	const id: number = changedArray[actionData.toIndex].id;
-	// 	const oldOrder = ++actionData.fromIndex;
-	// 	const newOrder = ++actionData.toIndex;
-
-	// 	await tasksService.reorder(id, data.id, oldOrder, newOrder);
-
-	// 	const list = $lists.find((x) => x.id === data.id);
-	// 	if (!list) {
-	// 		throw new Error('List not found');
-	// 	}
-
-	// 	if (actionData.item.isPrivate) {
-	// 		privateTasks = TasksService.getPrivateTasks(list.tasks);
-	// 	} else {
-	// 		tasks = TasksService.getTasks(list.tasks);
-	// 	}
-	// 	isReordering = false;
-	// }
 
 	function isSearchingToggleChanged() {
 		if (isSearching) {
@@ -255,7 +236,7 @@
 						newTaskName = '';
 						newTaskUrl = '';
 
-						const list = $lists.find((x) => x.id === data.id);
+						const list = $state.lists.find((x) => x.id === data.id);
 						if (!list) {
 							throw new Error('List not found');
 						}
@@ -291,19 +272,29 @@
 			resetSearchFilter();
 		}
 
-		if (task.isOneTime) {
-			if (!remote) {
-				await tasksService.delete(task.id);
-			}
-			tasksService.deleteLocal(task.id, data.id, $lists, localStorage);
+		// Animate action
+		task.active = true;
+		if (task.isPrivate) {
+			privateTasks = [...privateTasks];
 		} else {
-			completedTasksAreVisible = true;
-
-			if (!remote) {
-				await tasksService.complete(task.id);
-			}
-			tasksService.completeLocal(task.id, data.id, $lists, localStorage);
+			tasks = [...tasks];
 		}
+
+		ThrottleHelper.executeAfterDelay(async () => {
+			if (task.isOneTime) {
+				if (!remote) {
+					await tasksService.delete(task.id);
+				}
+				tasksService.deleteLocal(task.id, data.id, $state.lists, localStorage);
+			} else {
+				completedTasksAreVisible = true;
+
+				if (!remote) {
+					await tasksService.complete(task.id);
+				}
+				tasksService.completeLocal(task.id, data.id, $state.lists, localStorage);
+			}
+		}, Date.now());
 	}
 
 	async function uncomplete(task: ListTask, remote = false) {
@@ -317,10 +308,20 @@
 			resetSearchFilter();
 		}
 
-		if (!remote) {
-			await tasksService.uncomplete(task.id);
+		// Animate action
+		task.active = true;
+		if (task.isPrivate) {
+			completedPrivateTasks = [...completedPrivateTasks];
+		} else {
+			completedTasks = [...completedTasks];
 		}
-		tasksService.uncompleteLocal(task.id, data.id, $lists, localStorage);
+
+		ThrottleHelper.executeAfterDelay(async () => {
+			if (!remote) {
+				await tasksService.uncomplete(task.id);
+			}
+			tasksService.uncompleteLocal(task.id, data.id, $state.lists, localStorage);
+		}, Date.now());
 	}
 
 	async function editList() {
@@ -420,17 +421,14 @@
 		soundPlayer = new SoundPlayer();
 
 		soundsEnabled = localStorage.getBool(LocalStorageKeys.SoundsEnabled);
-		if (soundsEnabled) {
-			soundPlayer.initialize();
-		}
 
 		unsubscriptions.push(
-			lists.subscribe((l) => {
-				if (l.length === 0) {
+			state.subscribe((s) => {
+				if (s.lists.length === 0) {
 					return;
 				}
 
-				const list = l.find((x) => x.id === data.id);
+				const list = s.lists.find((x) => x.id === data.id);
 				if (!list) {
 					throw new Error('List not found');
 				}
@@ -439,7 +437,6 @@
 				isOneTimeToggleDefault = list.isOneTimeToggleDefault;
 				sharingState = list.sharingState;
 				isArchived = list.isArchived;
-				derivedListType = list.derivedListType;
 				tasks = TasksService.getTasks(list.tasks);
 				privateTasks = TasksService.getPrivateTasks(list.tasks);
 				completedTasks = TasksService.getCompletedTasks(list.tasks);
@@ -498,16 +495,6 @@
 				<i class="fas fa-pencil-alt" />
 			</button>
 		{/if}
-
-		<!-- <label
-			class="tasks-reorder-toggle tasks"
-			class:checked={isReordering}
-			title={$t('list.reorderTasks')}
-			aria-label={$t('list.reorderTasks')}
-		>
-			<input type="checkbox" bind:checked={isReordering} />
-			<i class="fas fa-random" />
-		</label> -->
 
 		<div class="page-title">{name}</div>
 
@@ -601,7 +588,7 @@
 
 			<form on:submit|preventDefault={create}>
 				<div class="add-input-wrap" class:with-private-toggle={sharingState !== 0} class:searching={isSearching}>
-					<div class="new-task-input-wrap">
+					<div class="new-task-input-wrap" class:invalid={newTaskIsInvalid}>
 						<input
 							type="text"
 							bind:value={newTaskName}
@@ -609,7 +596,6 @@
 							on:keyup={newTaskNameInputChange}
 							on:paste={newTaskNameInputPaste}
 							class="new-task-input"
-							class:invalid={newTaskIsInvalid}
 							placeholder={addNewPlaceholderText}
 							aria-label={addNewPlaceholderText}
 							readonly={newTaskIsLoading}
@@ -681,79 +667,35 @@
 					</div>
 
 					{#each privateTasks as task}
-						<div class="to-do-task" class:high-priority={derivedListType !== 'high-priority' && task.isHighPriority}>
-							<div class="to-do-task-content" class:highlighted={task.id === editedId}>
-								<a href="/editTask/{task.id}" class="edit-button" title={$t('list.edit')} aria-label={$t('list.edit')}>
-									<i class="fas fa-pencil-alt" />
-								</a>
-								<!-- <span class="sort-handle" title={$t('dragToReorder')} aria-label={$t('dragToReorder')}>
-									<i class="reorder-icon fas fa-hand-paper" />
-								</span> -->
-
-								{#if task.url}
-									<a href={task.url} class="name" target="_blank" rel="noreferrer">{task.name}</a>
-								{:else}
-									<span class="name">{task.name}</span>
-								{/if}
-
-								<button
-									type="button"
-									on:click={() => complete(task)}
-									class="check-button"
-									class:one-time={task.isOneTime}
-									title={$t('list.complete')}
-									aria-label={$t('list.complete')}
-								>
-									<i class="far fa-square" />
-									<i class="fas fa-check-square" />
-									<i class="fas fa-trash-alt" />
-								</button>
-							</div>
-						</div>
+						<Task
+							active={task.active}
+							highPriority={task.isHighPriority}
+							highlighted={task.id === editedId}
+							id={task.id}
+							name={task.name}
+							url={task.url}
+							completed={task.isCompleted}
+							isOneTime={task.isOneTime}
+							on:click={() => complete(task)}
+						/>
 					{/each}
 				</div>
 			{/if}
 
 			<div class="to-do-tasks-wrap">
 				{#each tasks as task}
-					<div class="to-do-task" class:high-priority={derivedListType !== 'high-priority' && task.isHighPriority}>
-						<div class="to-do-task-content" class:assigned={task.assignedUser} class:highlighted={task.id === editedId}>
-							<a href="/editTask/{task.id}" class="edit-button" title={$t('list.edit')} aria-label={$t('list.edit')}>
-								<i class="fas fa-pencil-alt" />
-							</a>
-							<!-- <span class="sort-handle" title={$t('dragToReorder')} aria-label={$t('dragToReorder')}>
-								<i class="reorder-icon fas fa-hand-paper" />
-							</span> -->
-
-							{#if task.assignedUser}
-								<img
-									src={task.assignedUser.imageUri}
-									class="to-do-task-assignee-image"
-									title={task.assignedUser.name}
-									alt={$t('profilePicture', { name: task.assignedUser.name })}
-								/>
-							{/if}
-
-							{#if task.url}
-								<a href={task.url} class="name" target="_blank" rel="noreferrer">{task.name}</a>
-							{:else}
-								<span class="name">{task.name}</span>
-							{/if}
-
-							<button
-								type="button"
-								on:click={() => complete(task)}
-								class="check-button"
-								class:one-time={task.isOneTime}
-								title={$t('list.complete')}
-								aria-label={$t('list.complete')}
-							>
-								<i class="far fa-square" />
-								<i class="fas fa-check-square" />
-								<i class="fas fa-trash-alt" />
-							</button>
-						</div>
-					</div>
+					<Task
+						active={task.active}
+						highPriority={task.isHighPriority}
+						highlighted={task.id === editedId}
+						assignedUser={task.assignedUser}
+						id={task.id}
+						name={task.name}
+						url={task.url}
+						completed={task.isCompleted}
+						isOneTime={task.isOneTime}
+						on:click={() => complete(task)}
+					/>
 				{/each}
 			</div>
 
@@ -781,90 +723,35 @@
 								</div>
 
 								{#each completedPrivateTasks as task}
-									<div class="to-do-task completed">
-										<div class="to-do-task-content" class:highlighted={task.id === editedId}>
-											<a
-												href="/editTask/{task.id}"
-												class="edit-button"
-												title={$t('list.edit')}
-												aria-label={$t('list.edit')}
-											>
-												<i class="fas fa-pencil-alt" />
-											</a>
-											<!-- <span class="sort-handle" title={$t('dragToReorder')} aria-label={$t('dragToReorder')}>
-												<i class="reorder-icon fas fa-hand-paper" />
-											</span> -->
-
-											{#if task.url}
-												<a href={task.url} class="name" target="_blank" rel="noreferrer">{task.name}</a>
-											{:else}
-												<span class="name">{task.name}</span>
-											{/if}
-
-											<button
-												type="button"
-												on:click={() => uncomplete(task)}
-												class="uncheck-button"
-												title={$t('list.uncomplete')}
-												aria-label={$t('list.uncomplete')}
-											>
-												<i class="fas fa-check-square" />
-												<i class="far fa-square" />
-											</button>
-										</div>
-									</div>
+									<Task
+										active={task.active}
+										highPriority={task.isHighPriority}
+										highlighted={task.id === editedId}
+										id={task.id}
+										name={task.name}
+										url={task.url}
+										completed={task.isCompleted}
+										isOneTime={task.isOneTime}
+										on:click={() => uncomplete(task)}
+									/>
 								{/each}
 							</div>
 						{/if}
 
 						<div class="to-do-tasks-wrap">
 							{#each completedTasks as task}
-								<div class="to-do-task completed">
-									<div
-										class="to-do-task-content"
-										class:assigned={task.assignedUser}
-										class:highlighted={task.id === editedId}
-									>
-										<a
-											href="/editTask/{task.id}"
-											class="edit-button"
-											title={$t('list.edit')}
-											aria-label={$t('list.edit')}
-										>
-											<i class="fas fa-pencil-alt" />
-										</a>
-
-										<!-- <span class="sort-handle" title={$t('dragToReorder')} aria-label={$t('dragToReorder')}>
-											<i class="reorder-icon fas fa-hand-paper" />
-										</span> -->
-
-										{#if task.assignedUser}
-											<img
-												src={task.assignedUser.imageUri}
-												class="to-do-task-assignee-image"
-												title={task.assignedUser.name}
-												alt={$t('profilePicture', { name: task.assignedUser.name })}
-											/>
-										{/if}
-
-										{#if task.url}
-											<a href={task.url} class="name" target="_blank" rel="noreferrer">{task.name}</a>
-										{:else}
-											<span class="name">{task.name}</span>
-										{/if}
-
-										<button
-											type="button"
-											on:click={() => uncomplete(task)}
-											class="uncheck-button"
-											title={$t('list.uncomplete')}
-											aria-label={$t('list.uncomplete')}
-										>
-											<i class="fas fa-check-square" />
-											<i class="far fa-square" />
-										</button>
-									</div>
-								</div>
+								<Task
+									active={task.active}
+									highPriority={task.isHighPriority}
+									highlighted={task.id === editedId}
+									assignedUser={task.assignedUser}
+									id={task.id}
+									name={task.name}
+									url={task.url}
+									completed={task.isCompleted}
+									isOneTime={task.isOneTime}
+									on:click={() => uncomplete(task)}
+								/>
 							{/each}
 						</div>
 					</div>
@@ -899,6 +786,10 @@
 			border: 1px solid #ddd;
 			border-radius: 6px;
 			padding: 5px 12px;
+
+			&.invalid {
+				background: #fff0f6;
+			}
 
 			input {
 				width: 100%;
@@ -1034,160 +925,6 @@
 			box-shadow: inset 0 1px 4px 0 rgba(0, 0, 0, 0.14);
 			padding: 15px;
 		}
-
-		// &.reordering .edit-button {
-		// 	display: none;
-		// }
-
-		.to-do-task {
-			display: flex;
-			justify-content: flex-start;
-			margin-bottom: 7px;
-
-			&:last-child {
-				margin-bottom: 0;
-			}
-
-			&.completed {
-				opacity: 0.6;
-
-				&:hover {
-					opacity: 1;
-				}
-			}
-
-			&.high-priority .name {
-				font-weight: bold;
-				color: var(--danger-color-dark);
-			}
-
-			&-assignee-image {
-				width: 34px;
-				height: 34px;
-				border-radius: 50%;
-				margin: 6px 9px 0 4px;
-			}
-
-			.fa-square,
-			.fa-check-square,
-			.one-time .fa-trash-alt {
-				display: inline;
-			}
-
-			.fa-trash-alt,
-			.one-time .fa-square,
-			.one-time .fa-check-square {
-				display: none;
-			}
-
-			.one-time {
-				font-size: 23px;
-			}
-
-			.check-button,
-			.uncheck-button {
-				min-width: 45px;
-				background: transparent;
-				border: none;
-				outline: none;
-				font-size: 27px;
-				line-height: 45px;
-				text-align: center;
-				color: var(--primary-color);
-
-				&:hover {
-					color: var(--primary-color-dark);
-				}
-			}
-
-			.check-button {
-				.fa-check-square {
-					display: none;
-				}
-
-				&:not(.one-time):active {
-					.fa-check-square {
-						display: inline;
-					}
-					.fa-square {
-						display: none;
-					}
-				}
-
-				&.one-time:active .fa-trash-alt {
-					color: var(--danger-color);
-				}
-			}
-
-			.uncheck-button {
-				.fa-square {
-					display: none;
-				}
-
-				&:active {
-					.fa-square {
-						display: inline;
-					}
-					.fa-check-square {
-						display: none;
-					}
-				}
-			}
-
-			// .reorder-icon {
-			// 	display: none;
-			// 	width: 45px;
-			// 	line-height: 45px;
-			// 	text-align: center;
-			// 	color: var(--primary-color);
-			// }
-
-			&-content {
-				display: flex;
-				justify-content: space-between;
-				width: 100%;
-				border-radius: 6px;
-
-				&.private .to-do-task:last-child {
-					margin-bottom: 0;
-				}
-
-				.name {
-					width: 100%;
-					border-bottom: 1px solid #ddd;
-					padding: 9px 5px;
-					line-height: 27px;
-					text-align: center;
-				}
-				a.name {
-					color: var(--primary-color-dark);
-				}
-				&.assigned .name {
-					padding: 9px 52px 9px 5px;
-				}
-			}
-		}
-	}
-
-	// .sort-handle {
-	// 	cursor: grab;
-	// 	cursor: -webkit-grab;
-	// }
-	// .reordering .reorder-icon {
-	// 	display: inline-block !important;
-	// }
-
-	.edit-button {
-		min-width: 60px;
-		font-size: 23px;
-		line-height: 45px;
-		text-decoration: none;
-		text-align: center;
-		color: var(--primary-color);
-
-		&:hover {
-			color: var(--primary-color-dark);
-		}
 	}
 
 	.completed-tasks {
@@ -1254,33 +991,6 @@
 		border-radius: 8px;
 		margin-bottom: 25px;
 	}
-
-	// .tasks-reorder-toggle {
-	// 	position: absolute;
-	// 	top: 0;
-	// 	left: 55px;
-	// 	z-index: 1;
-	// 	display: flex;
-	// 	justify-content: center;
-	// 	align-items: center;
-	// 	width: 45px;
-	// 	height: 60px;
-	// 	font-size: 25px;
-	// 	text-decoration: none;
-	// 	color: var(--faded-color);
-
-	// 	&.checked {
-	// 		color: var(--primary-color);
-	// 	}
-
-	// 	input {
-	// 		display: none;
-	// 	}
-
-	// 	&:hover {
-	// 		color: var(--primary-color-dark);
-	// 	}
-	// }
 
 	.search-toggle {
 		position: absolute;

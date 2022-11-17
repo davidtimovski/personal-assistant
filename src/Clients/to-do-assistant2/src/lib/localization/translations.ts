@@ -15,12 +15,10 @@ export default {
 		cancel: 'Cancel',
 		clear: 'Clear',
 		deleteOnCompletion: 'Delete tasks on completion',
-		dragToReorder: 'Drag to reorder',
 		highPriority: 'High Priority',
 		staleTasks: 'Stale Tasks',
 		index: {
 			menu: 'Menu',
-			reorderLists: 'Reorder lists',
 			refresh: 'Refresh',
 			shared: 'Shared',
 			pendingAccept: 'Pending accept',
@@ -28,7 +26,6 @@ export default {
 		},
 		list: {
 			edit: 'Edit',
-			reorderTasks: 'Reorder tasks',
 			bulkAddTasks: 'Bulk add tasks',
 			shareList: 'Share list',
 			members: 'Members',
@@ -234,12 +231,10 @@ export default {
 		cancel: 'Откажи',
 		clear: 'Исчисти',
 		deleteOnCompletion: 'Бриши задачи при комплетирање',
-		dragToReorder: 'Влечи за подредување',
 		highPriority: 'Висок Приоритет',
 		staleTasks: 'Застарени Задачи',
 		index: {
 			menu: 'Мени',
-			reorderLists: 'Подреди листи',
 			refresh: 'Освежи',
 			shared: 'Споделена',
 			pendingAccept: 'Се исчекува прифаќање',
@@ -247,7 +242,6 @@ export default {
 		},
 		list: {
 			edit: 'Промени',
-			reorderTasks: 'Подреди задачи',
 			bulkAddTasks: 'Додади повеќе задачи',
 			shareList: 'Сподели листа',
 			members: 'Членови',

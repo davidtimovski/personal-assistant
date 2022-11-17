@@ -1,13 +1,14 @@
 import { HttpProxy } from '../../../../shared2/services/httpProxy';
 import { ErrorLogger } from '../../../../shared2/services/errorLogger';
 
-import { lists } from '$lib/stores';
+import { state } from '$lib/stores';
 import { DerivedLists } from '$lib/services/listsService';
 import { LocalStorageKeys, type LocalStorageUtil } from '$lib/utils/localStorageUtil';
 import { List, type Task } from '$lib/models/entities';
 import type { EditTaskModel } from '$lib/models/viewmodels/editTaskModel';
 import { ListTask } from '$lib/models/viewmodels/listTask';
 import { SharingState } from '$lib/models/viewmodels/sharingState';
+import { State } from '$lib/models/state';
 import Variables from '$lib/variables';
 
 export class TasksService {
@@ -159,7 +160,7 @@ export class TasksService {
 			}
 		}
 
-		lists.set(localLists);
+		state.set(new State(localLists, false));
 	}
 
 	async complete(id: number): Promise<void> {
@@ -246,7 +247,7 @@ export class TasksService {
 			}
 		}
 
-		lists.set(localLists);
+		state.set(new State(localLists, false));
 	}
 
 	async uncomplete(id: number): Promise<void> {
@@ -321,7 +322,7 @@ export class TasksService {
 			}
 		}
 
-		lists.set(localLists);
+		state.set(new State(localLists, false));
 	}
 
 	// async reorder(id: number, listId: number, oldOrder: number, newOrder: number): Promise<void> {

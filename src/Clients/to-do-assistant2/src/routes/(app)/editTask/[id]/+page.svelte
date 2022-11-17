@@ -9,7 +9,7 @@
 	import Tooltip from '../../../../../../shared2/components/Tooltip.svelte';
 
 	import { t } from '$lib/localization/i18n';
-	import { alertState, lists } from '$lib/stores';
+	import { alertState, state } from '$lib/stores';
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 	import { TasksService } from '$lib/services/tasksService';
 	import { ListsService } from '$lib/services/listsService';
@@ -129,7 +129,7 @@
 			deleteButtonIsLoading = true;
 
 			await tasksService.delete(data.id);
-			tasksService.deleteLocal(data.id, listId, $lists, localStorage);
+			tasksService.deleteLocal(data.id, listId, $state.lists, localStorage);
 
 			alertState.update((x) => {
 				x.showSuccess('editTask.deleteSuccessful');

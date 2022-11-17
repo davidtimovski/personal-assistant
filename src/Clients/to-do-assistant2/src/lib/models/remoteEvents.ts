@@ -6,6 +6,5 @@ export enum RemoteEventType {
 	None = 'remote:none',
 	TaskCompletedRemotely = 'app:task-completed-remotely',
 	TaskUncompletedRemotely = 'app:task-uncompleted-remotely',
-	TaskDeletedRemotely = 'app:task-deleted-remotely',
-	TaskReorderedRemotely = 'app:task-reordered-remotely'
+	TaskDeletedRemotely = 'app:task-deleted-remotely'
 }

@@ -2,7 +2,7 @@ import { HttpProxy } from '../../../../shared2/services/httpProxy';
 import { ErrorLogger } from '../../../../shared2/services/errorLogger';
 
 import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
-import { lists } from '$lib/stores';
+import { state } from '$lib/stores';
 import { List, type Task } from '$lib/models/entities';
 import type { ListWithShares } from '$lib/models/viewmodels/listWithShares';
 import type { ShareUserAndPermission } from '$lib/models/viewmodels/shareUserAndPermission';
@@ -16,6 +16,7 @@ import { ArchivedList } from '$lib/models/viewmodels/archivedList';
 import { ListModel } from '$lib/models/viewmodels/listModel';
 import { SharingState } from '$lib/models/viewmodels/sharingState';
 import Variables from '$lib/variables';
+import { State } from '$lib/models/state';
 
 export enum DerivedLists {
 	HighPriority = 'high-priority',
@@ -29,9 +30,9 @@ export class ListsService {
 
 	async getAll(includeCache = false) {
 		if (includeCache) {
-			let cache = this.localStorage.getObject<List[]>('homePageData');
-			if (cache) {
-				lists.set(cache);
+			let cachedLists = this.localStorage.getObject<List[]>('homePageData');
+			if (cachedLists) {
+				state.set(new State(cachedLists, true));
 			}
 		}
 
@@ -56,8 +57,8 @@ export class ListsService {
 			}
 		}
 
-		lists.set(allLists);
 		this.localStorage.set('homePageData', JSON.stringify(allLists));
+		state.set(new State(allLists, false));
 	}
 
 	private generateHighPriorityList(allLists: List[], allTasks: Task[]) {
@@ -409,21 +410,21 @@ export class ListsService {
 		}
 	}
 
-	async reorder(id: number, oldOrder: number, newOrder: number): Promise<void> {
-		try {
-			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/lists/reorder`, {
-				method: 'put',
-				body: window.JSON.stringify({
-					id: id,
-					oldOrder: oldOrder,
-					newOrder: newOrder
-				})
-			});
-		} catch (e) {
-			this.logger.logError(e);
-			throw e;
-		}
-	}
+	// async reorder(id: number, oldOrder: number, newOrder: number): Promise<void> {
+	// 	try {
+	// 		await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/lists/reorder`, {
+	// 			method: 'put',
+	// 			body: window.JSON.stringify({
+	// 				id: id,
+	// 				oldOrder: oldOrder,
+	// 				newOrder: newOrder
+	// 			})
+	// 		});
+	// 	} catch (e) {
+	// 		this.logger.logError(e);
+	// 		throw e;
+	// 	}
+	// }
 
 	static getForHomeScreen(lists: List[]): ListModel[] {
 		return lists

@@ -2,6 +2,8 @@ import type { Task } from '$lib/models/entities';
 import type { Assignee } from '$lib/models/viewmodels/assignee';
 
 export class ListTask {
+	active = false;
+
 	constructor(
 		public id: number,
 		public listId: number,

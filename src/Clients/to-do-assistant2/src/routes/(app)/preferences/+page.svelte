@@ -96,7 +96,6 @@
 		localStorage.set(LocalStorageKeys.SoundsEnabled, soundsEnabled);
 
 		if (soundsEnabled) {
-			await soundPlayer.initialize();
 			soundPlayer.playBleep();
 		}
 	}
