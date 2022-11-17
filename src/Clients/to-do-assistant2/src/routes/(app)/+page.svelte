@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte/internal';
 	import type { Unsubscriber } from 'svelte/store';
+	import { tweened } from 'svelte/motion';
+	import { cubicOut } from 'svelte/easing';
 	import { page } from '$app/stores';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
-	import { isOffline, user, lists, remoteEvents } from '$lib/stores';
+	import { isOffline, user, state, remoteEvents } from '$lib/stores';
 	import { UsersService } from '$lib/services/usersService';
 	import { DerivedLists, ListsService } from '$lib/services/listsService';
 	import { TasksService } from '$lib/services/tasksService';
@@ -17,14 +19,16 @@
 	let regularLists: ListModel[] | null = null;
 	let iconOptions = ListsService.getIconOptions();
 	let editedId: number | undefined;
-	//let isReordering = false;
 	const derivedListNameLookup = new Map<string, string>();
 	const unsubscriptions: Unsubscriber[] = [];
 
 	// Progress bar
 	let progressBarActive = false;
-	let progress = 0;
-	let progressIntervalId: number | null = null;
+	const progress = tweened(0, {
+		duration: 500,
+		easing: cubicOut
+	});
+	let progressIntervalId: number | undefined;
 	let progressBarVisible = false;
 
 	let localStorage: LocalStorageUtil;
@@ -39,8 +43,8 @@
 	}
 
 	function setListsFromState() {
-		derivedLists = ListsService.getDerivedForHomeScreen($lists, derivedListNameLookup);
-		regularLists = ListsService.getForHomeScreen($lists);
+		derivedLists = ListsService.getDerivedForHomeScreen($state.lists, derivedListNameLookup);
+		regularLists = ListsService.getForHomeScreen($state.lists);
 	}
 
 	function getClassFromIcon(icon: string): string {
@@ -49,11 +53,14 @@
 
 	function startProgressBar() {
 		progressBarActive = true;
-		progress = 10;
+		progress.set(10);
 
 		progressIntervalId = window.setInterval(() => {
-			if (progress < 85) {
-				progress += 15;
+			if ($progress < 85) {
+				progress.update((x) => {
+					x += 15;
+					return x;
+				});
 			} else if (progressIntervalId) {
 				window.clearInterval(progressIntervalId);
 			}
@@ -63,8 +70,9 @@
 	}
 
 	function finishProgressBar() {
+		window.clearInterval(progressIntervalId);
+		progress.set(100);
 		window.setTimeout(() => {
-			progress = 100;
 			progressBarActive = false;
 			progressBarVisible = false;
 		}, 500);
@@ -84,29 +92,32 @@
 		listsService = new ListsService();
 		tasksService = new TasksService();
 
-		if ($lists.length === 0) {
+		if ($state.lists.length === 0) {
 			startProgressBar();
 		}
 
 		unsubscriptions.push(
-			lists.subscribe((l) => {
-				if (l.length === 0) {
+			state.subscribe((s) => {
+				if (s.lists.length === 0) {
 					return;
 				}
 
 				setListsFromState();
-				finishProgressBar();
+
+				if (!s.cache) {
+					finishProgressBar();
+				}
 			})
 		);
 
 		unsubscriptions.push(
 			remoteEvents.subscribe((e) => {
 				if (e.type === RemoteEventType.TaskCompletedRemotely) {
-					tasksService.completeLocal(e.data.id, e.data.listId, $lists, localStorage);
+					tasksService.completeLocal(e.data.id, e.data.listId, $state.lists, localStorage);
 				} else if (e.type === RemoteEventType.TaskUncompletedRemotely) {
-					tasksService.uncompleteLocal(e.data.id, e.data.listId, $lists, localStorage);
+					tasksService.uncompleteLocal(e.data.id, e.data.listId, $state.lists, localStorage);
 				} else if (e.type === RemoteEventType.TaskDeletedRemotely) {
-					tasksService.deleteLocal(e.data.id, e.data.listId, $lists, localStorage);
+					tasksService.deleteLocal(e.data.id, e.data.listId, $state.lists, localStorage);
 				}
 
 				setListsFromState();
@@ -131,17 +142,6 @@
 				<img src={$user.imageUri} class="profile-image" width="40" height="40" alt="" />
 			</a>
 
-			<!-- 
-			<label
-				class="lists-reorder-toggle lists"
-				class:checked={isReordering}
-				title={$t('index.reorderLists')}
-				aria-label={$t('index.reorderLists')}
-			>
-				<input type="checkbox" bind:checked={isReordering} />
-				<i class="fas fa-random" />
-			</label> -->
-
 			<div class="page-title" />
 			<button
 				type="button"
@@ -155,7 +155,7 @@
 			</button>
 		</div>
 		<div class="progress-bar">
-			<div class="progress" class:visible={progressBarVisible} style="width: {progress}%;" />
+			<div class="progress" class:visible={progressBarVisible} style="width: {$progress}%;" />
 		</div>
 	</div>
 
@@ -178,9 +178,6 @@
 							class:pending-share={list.sharingState === 1}
 						>
 							<i class="icon {getClassFromIcon(list.icon)}" />
-							<!-- <span class="sort-handle" title={$t('dragToReorder')} aria-label={$t('dragToReorder')}>
-							<i class="reorder-icon fas fa-hand-paper" />
-						</span> -->
 							<a href="/list/{list.id}" class="name" class:highlighted={list.id === editedId}>{list.name}</a>
 							<i class="fas fa-users shared-icon" title={$t('index.shared')} aria-label={$t('index.shared')} />
 							<i
@@ -203,41 +200,12 @@
 </section>
 
 <style lang="scss">
-	// .lists-reorder-toggle {
-	// 	display: flex;
-	// 	justify-content: center;
-	// 	align-items: center;
-	// 	width: 45px;
-	// 	height: 50px;
-	// 	margin-left: 15px;
-	// 	font-size: 25px;
-	// 	text-decoration: none;
-	// 	color: var(--faded-color);
-	// 	cursor: pointer;
-
-	// 	&.checked {
-	// 		color: var(--primary-color);
-	// 	}
-
-	// 	input {
-	// 		display: none;
-	// 	}
-
-	// 	&:hover {
-	// 		color: var(--primary-color-dark);
-	// 	}
-	// }
-
 	.content-wrap.lists {
 		padding-top: 15px;
 	}
 
 	.to-do-lists-wrap {
 		margin-bottom: 30px;
-
-		// &.reordering .to-do-list:not(.derived-list) .icon {
-		// 	display: none;
-		// }
 	}
 
 	.to-do-list {
@@ -266,14 +234,6 @@
 			font-size: 22px;
 			color: var(--primary-color);
 		}
-
-		// .reorder-icon {
-		// 	display: none;
-		// 	width: 45px;
-		// 	line-height: 45px;
-		// 	text-align: center;
-		// 	color: var(--primary-color);
-		// }
 
 		.shared-icon {
 			display: none;
@@ -333,7 +293,6 @@
 				color: #aaa;
 			}
 
-			//.reorder-icon,
 			.shared-icon {
 				color: #aaa;
 			}
@@ -379,12 +338,4 @@
 			margin-right: 8px;
 		}
 	}
-
-	// .sort-handle {
-	// 	cursor: grab;
-	// 	cursor: -webkit-grab;
-	// }
-	// .reordering .to-do-list:not(.derived-list) .reorder-icon {
-	// 	display: inline-block !important;
-	// }
 </style>

@@ -1,38 +1,44 @@
 export class SoundPlayer {
-	private readonly context = new AudioContext();
+	private context: AudioContext | undefined;
 	private bleep: AudioBuffer | null = null;
 	private blop: AudioBuffer | null = null;
 
-	async initialize() {
+	async playBleep() {
+		if (!this.bleep) {
+			await this.initialize();
+		}
+
+		this.play(<AudioBuffer>this.bleep);
+	}
+
+	async playBlop() {
+		if (!this.blop) {
+			await this.initialize();
+		}
+
+		this.play(<AudioBuffer>this.blop);
+	}
+
+	private async initialize() {
+		this.context = new AudioContext();
+
 		const bleepPromise = window.fetch('/audio/bleep.mp3').then(async (response) => {
 			const arrayBuffer = await response.arrayBuffer();
-			this.bleep = await this.context.decodeAudioData(arrayBuffer);
+			this.bleep = await (<AudioContext>this.context).decodeAudioData(arrayBuffer);
 		});
 		const blopPromise = window.fetch('/audio/blop.mp3').then(async (response) => {
 			const arrayBuffer = await response.arrayBuffer();
-			this.blop = await this.context.decodeAudioData(arrayBuffer);
+			this.blop = await (<AudioContext>this.context).decodeAudioData(arrayBuffer);
 		});
 
 		return Promise.all([bleepPromise, blopPromise]);
 	}
 
-	playBleep() {
-		if (!this.bleep) {
-			throw 'Buffer not initialized. Cannot play sound.';
-		}
-
-		this.play(this.bleep);
-	}
-
-	playBlop() {
-		if (!this.blop) {
-			throw 'Buffer not initialized. Cannot play sound.';
-		}
-
-		this.play(this.blop);
-	}
-
 	private play(audioBuffer: AudioBuffer) {
+		if (!this.context) {
+			throw 'AudioContext not initialized. Cannot play sound.';
+		}
+
 		const source = this.context.createBufferSource();
 		source.buffer = audioBuffer;
 		source.connect(this.context.destination);

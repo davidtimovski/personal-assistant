@@ -4,16 +4,17 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 
-	import { DateHelper } from '../../../../../shared2/utils/dateHelper';
-
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
-	import { user, lists, remoteEvents } from '$lib/stores';
+	import { ThrottleHelper } from '$lib/utils/throttleHelper';
+	import { state, remoteEvents } from '$lib/stores';
 	import { TasksService } from '$lib/services/tasksService';
 	import { DerivedLists, ListsService } from '$lib/services/listsService';
 	import type { ListTask } from '$lib/models/viewmodels/listTask';
 	import { SoundPlayer } from '$lib/utils/soundPlayer';
 	import { RemoteEventType } from '$lib/models/remoteEvents';
+
+	import DerivedTask from './components/DerivedTask.svelte';
 
 	let type: string;
 	let name = '';
@@ -23,7 +24,6 @@
 	let shadowTasks: ListTask[];
 	let shadowPrivateTasks: ListTask[];
 	let searchTasksText = '';
-	let editedId: number | undefined;
 	let soundsEnabled = false;
 	const derivedListNameLookup = new Map<string, string>();
 	const unsubscriptions: Unsubscriber[] = [];
@@ -31,10 +31,6 @@
 	let localStorage: LocalStorageUtil;
 	let tasksService: TasksService;
 	let soundPlayer: SoundPlayer;
-
-	function formatStaleTaskDate(modifiedDate: string): string {
-		return DateHelper.formatDayMonth(new Date(modifiedDate), $user.language);
-	}
 
 	function searchTasksInputChanged() {
 		if (searchTasksText.trim().length > 0) {
@@ -70,23 +66,31 @@
 			soundPlayer.playBleep();
 		}
 
-		editedId = 0;
-
 		if (searchTasksText.length > 0) {
 			resetSearchFilter();
 		}
 
-		if (task.isOneTime) {
-			if (!remote) {
-				await tasksService.delete(task.id);
-			}
-			tasksService.deleteLocal(task.id, task.listId, $lists, localStorage);
+		// Animate action
+		task.active = true;
+		if (task.isPrivate) {
+			privateTasks = [...privateTasks];
 		} else {
-			if (!remote) {
-				await tasksService.complete(task.id);
-			}
-			tasksService.completeLocal(task.id, task.listId, $lists, localStorage);
+			tasks = [...tasks];
 		}
+
+		ThrottleHelper.executeAfterDelay(async () => {
+			if (task.isOneTime) {
+				if (!remote) {
+					await tasksService.delete(task.id);
+				}
+				tasksService.deleteLocal(task.id, task.listId, $state.lists, localStorage);
+			} else {
+				if (!remote) {
+					await tasksService.complete(task.id);
+				}
+				tasksService.completeLocal(task.id, task.listId, $state.lists, localStorage);
+			}
+		}, Date.now());
 	}
 
 	onMount(async () => {
@@ -95,27 +99,19 @@
 
 		type = <string>$page.url.searchParams.get('type');
 
-		const edited = $page.url.searchParams.get('edited');
-		if (edited) {
-			editedId = parseInt(edited, 10);
-		}
-
 		localStorage = new LocalStorageUtil();
 		tasksService = new TasksService();
 		soundPlayer = new SoundPlayer();
 
 		soundsEnabled = localStorage.getBool(LocalStorageKeys.SoundsEnabled);
-		if (soundsEnabled) {
-			soundPlayer.initialize();
-		}
 
 		unsubscriptions.push(
-			lists.subscribe((l) => {
-				if (l.length === 0) {
+			state.subscribe((s) => {
+				if (s.lists.length === 0) {
 					return;
 				}
 
-				const list = l.find((x) => x.derivedListType === type);
+				const list = s.lists.find((x) => x.derivedListType === type);
 				if (!list) {
 					goto('/');
 				} else {
@@ -141,7 +137,7 @@
 						complete(task, true);
 					}
 				} else if (e.type === RemoteEventType.TaskUncompletedRemotely) {
-					const list = $lists.find((x) => x.derivedListType === type);
+					const list = $state.lists.find((x) => x.derivedListType === type);
 					if (!list) {
 						throw new Error('List not found');
 					}
@@ -199,80 +195,40 @@
 			</form>
 
 			{#if privateTasks.length > 0}
-				<div class="to-do-tasks-wrap private" class:high-priority={type === DerivedLists.HighPriority}>
+				<div class="to-do-tasks-wrap private">
 					<div class="private-tasks-label">
 						<i class="fas fa-key" />
 						<span>{$t('derivedList.privateTasks')}</span>
 					</div>
 
 					{#each privateTasks as task}
-						<div class="to-do-task">
-							<div class="to-do-task-content" class:highlighted={task.id === editedId}>
-								{#if type === DerivedLists.StaleTasks}
-									<span class="unchanged-since">{formatStaleTaskDate(task.modifiedDate)}</span>
-								{/if}
-
-								{#if task.url}
-									<a href={task.url} class="name" target="_blank" rel="noreferrer">{task.name}</a>
-								{:else}
-									<span class="name">{task.name}</span>
-								{/if}
-
-								<button
-									type="button"
-									on:click={() => complete(task)}
-									class="check-button"
-									class:one-time={task.isOneTime}
-									title={$t('derivedList.complete')}
-									aria-label={$t('derivedList.complete')}
-								>
-									<i class="far fa-square" />
-									<i class="fas fa-check-square" />
-									<i class="fas fa-trash-alt" />
-								</button>
-							</div>
-						</div>
+						<DerivedTask
+							active={task.active}
+							highPriority={task.isHighPriority}
+							stale={type === DerivedLists.StaleTasks}
+							name={task.name}
+							url={task.url}
+							isOneTime={task.isOneTime}
+							modifiedDate={task.modifiedDate}
+							on:click={() => complete(task)}
+						/>
 					{/each}
 				</div>
 			{/if}
 
-			<div class="to-do-tasks-wrap" class:high-priority={type === DerivedLists.HighPriority}>
+			<div class="to-do-tasks-wrap">
 				{#each tasks as task}
-					<div class="to-do-task">
-						{#if task.assignedUser}
-							<img
-								src={task.assignedUser.imageUri}
-								class="to-do-task-assignee-image"
-								title={task.assignedUser.name}
-								alt={$t('profilePicture', { name: task.assignedUser.name })}
-							/>
-						{/if}
-
-						<div class="to-do-task-content" class:highlighted={task.id === editedId} class:assigned={task.assignedUser}>
-							{#if type === DerivedLists.StaleTasks}
-								<span class="unchanged-since">{formatStaleTaskDate(task.modifiedDate)}</span>
-							{/if}
-
-							{#if task.url}
-								<a href={task.url} class="name" target="_blank" rel="noreferrer">{task.name}</a>
-							{:else}
-								<span class="name">{task.name}</span>
-							{/if}
-
-							<button
-								type="button"
-								on:click={() => complete(task)}
-								class="check-button"
-								class:one-time={task.isOneTime}
-								title={$t('derivedList.complete')}
-								aria-label={$t('derivedList.complete')}
-							>
-								<i class="far fa-square" />
-								<i class="fas fa-check-square" />
-								<i class="fas fa-trash-alt" />
-							</button>
-						</div>
-					</div>
+					<DerivedTask
+						active={task.active}
+						highPriority={task.isHighPriority}
+						stale={type === DerivedLists.StaleTasks}
+						assignedUser={task.assignedUser}
+						name={task.name}
+						url={task.url}
+						isOneTime={task.isOneTime}
+						modifiedDate={task.modifiedDate}
+						on:click={() => complete(task)}
+					/>
 				{/each}
 			</div>
 		</div>
@@ -324,111 +280,11 @@
 	.to-do-tasks-wrap {
 		margin-top: 35px;
 
-		&.high-priority .to-do-task .to-do-task-content .name {
-			padding-left: 50px;
-		}
-
 		&.private {
 			background: #f4faff;
 			border-radius: var(--border-radius);
 			box-shadow: inset 0 1px 4px 0 rgba(0, 0, 0, 0.14);
 			padding: 15px;
-		}
-
-		.to-do-task {
-			display: flex;
-			justify-content: flex-start;
-			margin-bottom: 7px;
-
-			&:last-child {
-				margin-bottom: 0;
-			}
-
-			&-assignee-image {
-				width: 34px;
-				height: 34px;
-				border-radius: 50%;
-				margin: 6px 9px 0 0;
-			}
-
-			.check-button {
-				min-width: 45px;
-				background: transparent;
-				border: none;
-				outline: none;
-				font-size: 27px;
-				line-height: 45px;
-				text-decoration: none;
-				text-align: center;
-				color: var(--primary-color);
-
-				&:hover {
-					color: var(--primary-color-dark);
-				}
-
-				.fa-check-square {
-					display: none;
-				}
-
-				&:not(.one-time):active {
-					.fa-check-square {
-						display: inline;
-					}
-					.fa-square {
-						display: none;
-					}
-				}
-
-				&.one-time:active .fa-trash-alt {
-					color: var(--danger-color);
-				}
-			}
-
-			&-content {
-				display: flex;
-				justify-content: space-between;
-				width: 100%;
-				border-radius: 6px;
-
-				&.private .to-do-task:last-child {
-					margin-bottom: 0;
-				}
-
-				.unchanged-since {
-					padding: 9px 5px;
-					line-height: 27px;
-					white-space: nowrap;
-					color: #dd7001;
-				}
-
-				.name {
-					width: 100%;
-					border-bottom: 1px solid #ddd;
-					padding: 9px 5px;
-					line-height: 27px;
-					text-align: center;
-				}
-				a.name {
-					color: var(--primary-color-dark);
-				}
-				&.assigned .name {
-					padding: 9px 48px 9px 50px;
-				}
-
-				.fa-square,
-				.one-time .fa-trash-alt {
-					display: inline;
-				}
-
-				.fa-trash-alt,
-				.one-time .fa-square {
-					display: none;
-				}
-
-				.one-time {
-					font-size: 23px;
-				}
-			}
 		}
 	}
 

@@ -5,7 +5,7 @@
 	import EmptyListMessage from '../../../../../shared2/components/EmptyListMessage.svelte';
 
 	import { t } from '$lib/localization/i18n';
-	import { lists } from '$lib/stores';
+	import { state } from '$lib/stores';
 	import { ListsService } from '$lib/services/listsService';
 	import type { ArchivedList } from '$lib/models/viewmodels/archivedList';
 	import type { ListIcon } from '$lib/models/viewmodels/listIcon';
@@ -24,12 +24,8 @@
 			editedId = parseInt(edited, 10);
 		}
 
-		return lists.subscribe((l) => {
-			if (l.length === 0) {
-				return;
-			}
-
-			archivedLists = ListsService.getArchived($lists);
+		return state.subscribe((s) => {
+			archivedLists = ListsService.getArchived(s.lists);
 		});
 	});
 </script>

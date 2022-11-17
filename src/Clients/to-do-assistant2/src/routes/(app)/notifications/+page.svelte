@@ -181,6 +181,7 @@
 		padding: 9px 10px;
 		margin-bottom: 10px;
 		text-decoration: none;
+		color: var(--regular-color);
 
 		&-image {
 			width: 34px;

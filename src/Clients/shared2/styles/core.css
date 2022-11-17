@@ -313,7 +313,7 @@ textarea.invalid {
   background: var(--primary-color);
   border-radius: 1px;
 
-  transition: width 500ms, opacity 1.1s ease-in-out;
+  transition: opacity 1s ease-in-out;
 }
 .progress-bar .progress.visible {
   opacity: 1;
