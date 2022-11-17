@@ -42,7 +42,7 @@
 <style lang="scss">
 	.double-radio-wrap {
 		display: flex;
-		border: 1px solid #ddd;
+		border: 1px solid;
 		border-radius: 8px;
 
 		input[type='radio'] {
@@ -55,7 +55,6 @@
 			top: 5px;
 			right: 12px;
 			font-size: 21px;
-			color: #fff;
 
 			transition: color var(--transition);
 		}
@@ -66,7 +65,6 @@
 			label {
 				display: block;
 				position: relative;
-				background: #fff;
 				padding: 0 48px 0 15px;
 				font-size: inherit;
 				line-height: 37px;
@@ -77,7 +75,6 @@
 
 				&.selected {
 					background: var(--primary-color);
-					color: #fff;
 
 					.checkbox-icon {
 						display: inline;
@@ -109,6 +106,46 @@
 		.double-radio-wrap .checkbox-icon {
 			top: 9px;
 			font-size: 23px;
+		}
+	}
+
+	@media (prefers-color-scheme: light) {
+		.double-radio-wrap {
+			border-color: #ddd;
+
+			.checkbox-icon {
+				color: #fff;
+			}
+
+			.double-radio-side {
+				label {
+					background: #fff;
+
+					&.selected {
+						color: #fff;
+					}
+				}
+			}
+		}
+	}
+
+	@media (prefers-color-scheme: dark) {
+		.double-radio-wrap {
+			border-color: #666;
+
+			.checkbox-icon {
+				color: #fff;
+			}
+
+			.double-radio-side {
+				label {
+					background: #333;
+
+					&.selected {
+						color: #fff;
+					}
+				}
+			}
 		}
 	}
 </style>

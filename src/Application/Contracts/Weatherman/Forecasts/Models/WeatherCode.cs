@@ -16,6 +16,8 @@ public enum WeatherCode
     RainLight = 61,
     RainModerate = 63,
     RainHeavy = 65,
+    FreezingRainLight = 66,
+    FreezingRainHeavy = 67,
     SnowLight = 71,
     SnowModerate = 73,
     SnowHeavy = 75,

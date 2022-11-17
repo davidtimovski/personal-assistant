@@ -44,13 +44,9 @@
 	{/if}
 {:else if weatherCode === WeatherCode.PartlyCloudy}
 	{#if timeOfDay === TimeOfDay.Night}
-		<Moon />
-	{:else if timeOfDay === TimeOfDay.Day}
-		<Sun />
-	{:else if timeOfDay === TimeOfDay.SunLow}
-		<SunLow />
-	{:else if timeOfDay === TimeOfDay.SunLower}
-		<SunLower />
+		<CloudMoon />
+	{:else}
+		<CloudSun />
 	{/if}
 {:else if weatherCode === WeatherCode.Overcast}
 	<Cloudy />
@@ -68,9 +64,9 @@
 	{:else}
 		<DrizzleHeavySun />
 	{/if}
-{:else if weatherCode === WeatherCode.RainLight}
+{:else if weatherCode === WeatherCode.RainLight || weatherCode === WeatherCode.FreezingRainLight}
 	<RainLight />
-{:else if weatherCode === WeatherCode.RainModerate || weatherCode === WeatherCode.RainHeavy}
+{:else if weatherCode === WeatherCode.RainModerate || weatherCode === WeatherCode.RainHeavy || weatherCode === WeatherCode.FreezingRainHeavy}
 	<RainHeavy />
 {:else if weatherCode === WeatherCode.SnowLight}
 	{#if timeOfDay !== TimeOfDay.Day}
