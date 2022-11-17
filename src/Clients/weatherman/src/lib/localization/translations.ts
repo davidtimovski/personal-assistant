@@ -7,6 +7,7 @@ export default {
 			'We were unable to retrieve your location. Please make sure you have provided location permission and your location is turned on.',
 		refresh: 'Refresh',
 		failedToFetchError: 'Please check your internet connection.',
+		h: 'h',
 		index: {
 			menu: 'Menu',
 			refresh: 'Refresh',
@@ -24,6 +25,8 @@ export default {
 			lightRain: 'Light rain',
 			moderateRain: 'Moderate rain',
 			heavyRain: 'Heavy rain',
+			lightFreezingRain: 'Light freezing rain',
+			heavyFreezingRain: 'Heavy freezing rain',
 			lightSnow: 'Light snow',
 			moderateSnow: 'Moderate snow',
 			heavySnow: 'Heavy snow',
@@ -73,6 +76,7 @@ export default {
 			'Неможевме да ја одредиме вашата локација. Ве молиме осигурајтѐ се дека дадовте дозвола за пристап до вашата локација и дека локацијата е пуштена.',
 		refresh: 'Освежи',
 		failedToFetchError: 'Вѐ молиме да ја проверите вашата интернет конекција.',
+		h: 'ч',
 		index: {
 			menu: 'Мени',
 			refresh: 'Освежи',
@@ -90,6 +94,8 @@ export default {
 			lightRain: 'Лесен дожд',
 			moderateRain: 'Среден дожд',
 			heavyRain: 'Силен дожд',
+			lightFreezingRain: 'Лесен смрзнувачки дожд',
+			heavyFreezingRain: 'Силен смрзнувачки дожд',
 			lightSnow: 'Лесен снег',
 			moderateSnow: 'Среден снег',
 			heavySnow: 'Силен снег',

@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte/internal';
 	import type { Unsubscriber } from 'svelte/store';
+	import { tweened } from 'svelte/motion';
+	import { cubicOut } from 'svelte/easing';
 
 	import { DateHelper } from '../../../../shared2/utils/dateHelper';
 	import { UsersServiceBase } from '../../../../shared2/services/usersServiceBase';
@@ -29,8 +31,11 @@
 
 	// Progress bar
 	let progressBarActive = false;
-	let progress = 0;
-	let progressIntervalId: number | null = null;
+	const progress = tweened(0, {
+		duration: 500,
+		easing: cubicOut
+	});
+	let progressIntervalId: number | undefined;
 	let progressBarVisible = false;
 
 	let localStorage: LocalStorageUtil;
@@ -53,11 +58,14 @@
 
 	function startProgressBar() {
 		progressBarActive = true;
-		progress = 10;
+		progress.set(10);
 
 		progressIntervalId = window.setInterval(() => {
-			if (progress < 85) {
-				progress += 15;
+			if ($progress < 85) {
+				progress.update((x) => {
+					x += 15;
+					return x;
+				});
 			} else if (progressIntervalId) {
 				window.clearInterval(progressIntervalId);
 			}
@@ -67,8 +75,9 @@
 	}
 
 	function finishProgressBar() {
+		window.clearInterval(progressIntervalId);
 		window.setTimeout(() => {
-			progress = 100;
+			progress.set(100);
 			progressBarActive = false;
 			progressBarVisible = false;
 		}, 500);
@@ -94,6 +103,8 @@
 			.set(WeatherCode.RainLight, $t('index.lightRain'))
 			.set(WeatherCode.RainModerate, $t('index.moderateRain'))
 			.set(WeatherCode.RainHeavy, $t('index.heavyRain'))
+			.set(WeatherCode.FreezingRainLight, $t('index.lightFreezingRain'))
+			.set(WeatherCode.FreezingRainHeavy, $t('index.heavyFreezingRain'))
 			.set(WeatherCode.SnowLight, $t('index.lightSnow'))
 			.set(WeatherCode.SnowModerate, $t('index.moderateSnow'))
 			.set(WeatherCode.SnowHeavy, $t('index.heavySnow'))
@@ -182,7 +193,7 @@
 			</button>
 		</div>
 		<div class="progress-bar">
-			<div class="progress" class:visible={progressBarVisible} style="width: {progress}%;" />
+			<div class="progress" class:visible={progressBarVisible} style="width: {$progress}%;" />
 		</div>
 	</div>
 
@@ -238,7 +249,7 @@
 						<table>
 							{#each $forecast.hourly as hourForecast}
 								<tr>
-									<td>{hourForecast.timeString}</td>
+									<td>{hourForecast.timeString} {$t('h')}</td>
 									<td class="hourly-illustration">
 										<Illustration weatherCode={hourForecast.weatherCode} timeOfDay={hourForecast.timeOfDay} />
 									</td>
@@ -262,7 +273,6 @@
 <style lang="scss">
 	.page-title {
 		font-size: 22px;
-		color: #774022;
 	}
 
 	.days {
@@ -272,7 +282,6 @@
 
 		.week-day {
 			flex: 1;
-			background: #eee;
 			border: none;
 			border-radius: 4px;
 			outline: none;
@@ -351,7 +360,7 @@
 			width: 100%;
 
 			td {
-				border-bottom: 1px solid #ddd;
+				border-bottom: 1px solid;
 				padding: 4px 5px;
 				font-size: 18px;
 				white-space: nowrap;
@@ -386,6 +395,35 @@
 	@media screen and (min-width: 800px) {
 		.days .week-day {
 			padding: 6px;
+		}
+	}
+
+	@media (prefers-color-scheme: light) {
+		.page-title {
+			color: #774022;
+		}
+
+		.days .week-day {
+			background: #eee;
+		}
+
+		.hourly-forecast table td {
+			border-color: #ddd;
+		}
+	}
+
+	@media (prefers-color-scheme: dark) {
+		.page-title {
+			color: #bf7421;
+		}
+
+		.days .week-day {
+			background: #444;
+			color: #fff;
+		}
+
+		.hourly-forecast table td {
+			border-color: #777;
 		}
 	}
 </style>

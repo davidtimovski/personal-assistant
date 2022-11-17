@@ -33,6 +33,8 @@
 			.set(WeatherCode.RainLight, $t('index.lightRain'))
 			.set(WeatherCode.RainModerate, $t('index.moderateRain'))
 			.set(WeatherCode.RainHeavy, $t('index.heavyRain'))
+			.set(WeatherCode.FreezingRainLight, $t('index.lightFreezingRain'))
+			.set(WeatherCode.FreezingRainHeavy, $t('index.heavyFreezingRain'))
 			.set(WeatherCode.SnowLight, $t('index.lightSnow'))
 			.set(WeatherCode.SnowModerate, $t('index.moderateSnow'))
 			.set(WeatherCode.SnowHeavy, $t('index.heavySnow'))
@@ -83,7 +85,7 @@
 		<table>
 			{#each forecast.hourly as hourForecast}
 				<tr>
-					<td>{hourForecast.timeString}</td>
+					<td>{hourForecast.timeString} {$t('h')}</td>
 					<td class="hourly-illustration">
 						<Illustration weatherCode={hourForecast.weatherCode} timeOfDay={hourForecast.timeOfDay} />
 					</td>
@@ -153,7 +155,7 @@
 			width: 100%;
 
 			td {
-				border-bottom: 1px solid #ddd;
+				border-bottom: 1px solid;
 				padding: 4px 5px;
 				font-size: 18px;
 				white-space: nowrap;
@@ -174,6 +176,18 @@
 			tr:last-child td {
 				border-bottom: none;
 			}
+		}
+	}
+
+	@media (prefers-color-scheme: light) {
+		.hourly-forecast table td {
+			border-color: #ddd;
+		}
+	}
+
+	@media (prefers-color-scheme: dark) {
+		.hourly-forecast table td {
+			border-color: #777;
 		}
 	}
 </style>

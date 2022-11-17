@@ -23,7 +23,6 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 if (builder.Environment.IsProduction())
 {
     builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
