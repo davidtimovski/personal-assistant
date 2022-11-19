@@ -3,6 +3,7 @@
 	import type { Assignee } from '$lib/models/viewmodels/assignee';
 
 	export let active: boolean;
+	export let disabled: boolean;
 	export let highPriority: boolean;
 	export let highlighted: boolean;
 	export let assignedUser: Assignee | null = null;
@@ -40,6 +41,7 @@
 			class:check-button={!completed}
 			class:uncheck-button={completed}
 			class:one-time={isOneTime}
+			{disabled}
 			title={$t(completed ? 'list.uncomplete' : 'list.complete')}
 			aria-label={$t(completed ? 'list.uncomplete' : 'list.complete')}
 		>
@@ -151,7 +153,11 @@
 			text-align: center;
 			color: var(--primary-color);
 
-			&:hover {
+			&:disabled {
+				color: var(--faded-color);
+			}
+
+			&:not(:disabled):hover {
 				color: var(--primary-color-dark);
 			}
 		}

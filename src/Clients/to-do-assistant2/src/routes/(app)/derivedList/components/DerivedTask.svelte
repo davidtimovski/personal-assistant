@@ -1,11 +1,12 @@
 <script lang="ts">
+	import { DateHelper } from '../../../../../../shared2/utils/dateHelper';
+
 	import { t } from '$lib/localization/i18n';
 	import { user } from '$lib/stores';
 	import type { Assignee } from '$lib/models/viewmodels/assignee';
 
-	import { DateHelper } from '../../../../../../shared2/utils/dateHelper';
-
 	export let active: boolean;
+	export let disabled: boolean;
 	export let highPriority: boolean;
 	export let stale = false;
 	export let assignedUser: Assignee | null = null;
@@ -45,6 +46,7 @@
 			on:click
 			class="check-button"
 			class:one-time={isOneTime}
+			{disabled}
 			title={$t('derivedList.complete')}
 			aria-label={$t('derivedList.complete')}
 		>
@@ -105,7 +107,11 @@
 			text-align: center;
 			color: var(--primary-color);
 
-			&:hover {
+			&:disabled {
+				color: var(--faded-color);
+			}
+
+			&:not(:disabled):hover {
 				color: var(--primary-color-dark);
 			}
 

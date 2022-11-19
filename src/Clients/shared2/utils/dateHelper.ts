@@ -54,14 +54,17 @@ export class DateHelper {
     return date.toLocaleString(language, { weekday: "short" });
   }
 
-  /** Format as Friday, (HH/hh):mm:ss (AM/PM). */
+  /** Format as Friday, (HH/hh):mm (AM/PM). */
   static formatWeekdayTime(
     date: Date,
     language: string,
     culture: string
   ): string {
     const weekday = date.toLocaleString(language, { weekday: "long" });
-    const time = date.toLocaleTimeString(culture);
+    const time = date.toLocaleTimeString(culture, {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
     return `${weekday}, ${time}`;
   }

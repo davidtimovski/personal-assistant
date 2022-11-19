@@ -217,7 +217,11 @@
 					uncompleteDuplicateButtonVisible = false;
 				}
 			} else {
-				similarTaskNames = findSimilarTasks(newTaskName);
+				if (similarTaskNames.length) {
+					similarTaskNames = [];
+				} else {
+					similarTaskNames = findSimilarTasks(newTaskName);
+				}
 
 				if (similarTaskNames.length) {
 					newTaskIsLoading = false;
@@ -274,25 +278,19 @@
 
 		// Animate action
 		task.active = true;
-		if (task.isPrivate) {
-			privateTasks = [...privateTasks];
-		} else {
-			tasks = [...tasks];
-		}
+		disableTasks();
 
 		ThrottleHelper.executeAfterDelay(async () => {
 			if (task.isOneTime) {
 				if (!remote) {
 					await tasksService.delete(task.id);
 				}
-				tasksService.deleteLocal(task.id, data.id, $state.lists, localStorage);
+				tasksService.deleteLocal(task.id, data.id, $state.lists);
 			} else {
-				completedTasksAreVisible = true;
-
 				if (!remote) {
 					await tasksService.complete(task.id);
 				}
-				tasksService.completeLocal(task.id, data.id, $state.lists, localStorage);
+				tasksService.completeLocal(task.id, data.id, $state.lists);
 			}
 		}, Date.now());
 	}
@@ -310,18 +308,41 @@
 
 		// Animate action
 		task.active = true;
-		if (task.isPrivate) {
-			completedPrivateTasks = [...completedPrivateTasks];
-		} else {
-			completedTasks = [...completedTasks];
-		}
+		disableTasks();
 
 		ThrottleHelper.executeAfterDelay(async () => {
 			if (!remote) {
 				await tasksService.uncomplete(task.id);
 			}
-			tasksService.uncompleteLocal(task.id, data.id, $state.lists, localStorage);
+			tasksService.uncompleteLocal(task.id, data.id, $state.lists);
 		}, Date.now());
+	}
+
+	function disableTasks() {
+		privateTasks = [
+			...privateTasks.map((t) => {
+				t.disabled = true;
+				return t;
+			})
+		];
+		tasks = [
+			...tasks.map((t) => {
+				t.disabled = true;
+				return t;
+			})
+		];
+		completedPrivateTasks = [
+			...completedPrivateTasks.map((t) => {
+				t.disabled = true;
+				return t;
+			})
+		];
+		completedTasks = [
+			...completedTasks.map((t) => {
+				t.disabled = true;
+				return t;
+			})
+		];
 	}
 
 	async function editList() {
@@ -646,7 +667,13 @@
 					{/if}
 
 					{#if !newTaskIsLoading && !isSearching}
-						<button on:click={create} class="add-task-button" title={$t('list.add')} aria-label={$t('list.add')}>
+						<button
+							type="button"
+							on:click={create}
+							class="add-task-button"
+							title={$t('list.add')}
+							aria-label={$t('list.add')}
+						>
 							<i class="fas fa-plus-circle" />
 						</button>
 					{/if}
@@ -669,6 +696,7 @@
 					{#each privateTasks as task}
 						<Task
 							active={task.active}
+							disabled={task.disabled}
 							highPriority={task.isHighPriority}
 							highlighted={task.id === editedId}
 							id={task.id}
@@ -686,6 +714,7 @@
 				{#each tasks as task}
 					<Task
 						active={task.active}
+						disabled={task.disabled}
 						highPriority={task.isHighPriority}
 						highlighted={task.id === editedId}
 						assignedUser={task.assignedUser}
@@ -725,6 +754,7 @@
 								{#each completedPrivateTasks as task}
 									<Task
 										active={task.active}
+										disabled={task.disabled}
 										highPriority={task.isHighPriority}
 										highlighted={task.id === editedId}
 										id={task.id}
@@ -742,6 +772,7 @@
 							{#each completedTasks as task}
 								<Task
 									active={task.active}
+									disabled={task.disabled}
 									highPriority={task.isHighPriority}
 									highlighted={task.id === editedId}
 									assignedUser={task.assignedUser}
