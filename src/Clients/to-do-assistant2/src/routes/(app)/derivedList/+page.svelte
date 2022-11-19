@@ -72,11 +72,7 @@
 
 		// Animate action
 		task.active = true;
-		if (task.isPrivate) {
-			privateTasks = [...privateTasks];
-		} else {
-			tasks = [...tasks];
-		}
+		disableTasks();
 
 		ThrottleHelper.executeAfterDelay(async () => {
 			if (task.isOneTime) {
@@ -91,6 +87,21 @@
 				tasksService.completeLocal(task.id, task.listId, $state.lists, localStorage);
 			}
 		}, Date.now());
+	}
+
+	function disableTasks() {
+		privateTasks = [
+			...privateTasks.map((t) => {
+				t.disabled = true;
+				return t;
+			})
+		];
+		tasks = [
+			...tasks.map((t) => {
+				t.disabled = true;
+				return t;
+			})
+		];
 	}
 
 	onMount(async () => {
@@ -204,6 +215,7 @@
 					{#each privateTasks as task}
 						<DerivedTask
 							active={task.active}
+							disabled={task.disabled}
 							highPriority={task.isHighPriority}
 							stale={type === DerivedLists.StaleTasks}
 							name={task.name}
@@ -220,6 +232,7 @@
 				{#each tasks as task}
 					<DerivedTask
 						active={task.active}
+						disabled={task.disabled}
 						highPriority={task.isHighPriority}
 						stale={type === DerivedLists.StaleTasks}
 						assignedUser={task.assignedUser}

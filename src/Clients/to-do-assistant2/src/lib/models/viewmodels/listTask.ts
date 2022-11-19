@@ -3,6 +3,7 @@ import type { Assignee } from '$lib/models/viewmodels/assignee';
 
 export class ListTask {
 	active = false;
+	disabled = false;
 
 	constructor(
 		public id: number,

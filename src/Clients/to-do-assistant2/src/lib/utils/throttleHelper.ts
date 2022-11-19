@@ -1,5 +1,5 @@
 export class ThrottleHelper {
-	private static readonly delayMs = 600;
+	private static readonly delayMs = 450;
 
 	/** Used to delay UI update if server responds too quickly */
 	static executeAfterDelay(callback: () => void, startTime: number) {
