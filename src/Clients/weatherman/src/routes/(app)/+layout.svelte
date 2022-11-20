@@ -14,6 +14,7 @@
 	import { isOffline, user, forecast } from '$lib/stores';
 	import { ForecastsService } from '$lib/services/forecastsService';
 	import type { WeathermanUser } from '$lib/models/weathermanUser';
+	import Variables from '$lib/variables';
 
 	let usersService: UsersServiceBase;
 	let forecastsService: ForecastsService;
@@ -24,7 +25,7 @@
 			user.set(cachedUser);
 		}
 
-		usersService.get<WeathermanUser>().then((currentUser) => {
+		usersService.getCore<WeathermanUser>().then((currentUser) => {
 			user.set(currentUser);
 			usersService.cache(currentUser);
 
@@ -34,7 +35,7 @@
 
 	onMount(async () => {
 		const authService = new AuthService();
-		await authService.initialize();
+		await authService.initialize(Variables.urls.gateway);
 
 		if (await authService.authenticated()) {
 			await authService.setToken();

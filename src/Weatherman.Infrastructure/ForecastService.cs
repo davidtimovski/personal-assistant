@@ -2,12 +2,12 @@
 using System.Web;
 using Domain.Weatherman;
 using FluentValidation;
-using Infrastructure.Weatherman.Models;
 using Microsoft.Extensions.Logging;
 using Weatherman.Application.Contracts.Forecasts;
 using Weatherman.Application.Contracts.Forecasts.Models;
+using Weatherman.Infrastructure.Models;
 
-namespace Infrastructure.Weatherman;
+namespace Weatherman.Infrastructure;
 
 public class ForecastService : IForecastService
 {

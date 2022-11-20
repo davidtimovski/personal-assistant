@@ -24,7 +24,7 @@ using Weatherman.Persistence;
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
 {
-    if (context.HostingEnvironment.EnvironmentName == Environments.Production)
+    if (context.HostingEnvironment.IsProduction())
     {
         var config = configBuilder.Build();
 
@@ -41,13 +41,13 @@ builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
 });
 
 builder.Services
+    .AddApplication(builder.Configuration)
     .AddInfrastructure(builder.Configuration, builder.Environment.EnvironmentName)
     .AddPersistence(builder.Configuration["ConnectionString"])
     .AddToDoAssistantPersistence(builder.Configuration["ConnectionString"])
     .AddCookingAssistantPersistence(builder.Configuration["ConnectionString"])
     .AddAccountantPersistence(builder.Configuration["ConnectionString"])
     .AddWeathermanPersistence(builder.Configuration["ConnectionString"])
-    .AddApplication(builder.Configuration)
     .AddToDoAssistant(builder.Configuration)
     .AddCookingAssistant(builder.Configuration)
     .AddAccountant(builder.Configuration)

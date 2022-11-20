@@ -1,0 +1,46 @@
+name: Continuous deployment Weatherman
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - "src/Domain/**"
+      - "src/Application/**"
+      - "src/Infrastructure/**"
+      - "src/Persistence/**"
+      - "src/Weatherman.Application/**"
+      - "src/Weatherman.Infrastructure/**"
+      - "src/Weatherman.Persistence/**"
+      - "src/Weatherman.Api/**"
+
+env:
+  REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
+  REGISTRY_IMAGE: ${{ secrets.REGISTRY_IMAGE }}
+  REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+  REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+
+jobs:
+  test:
+    uses: davidtimovski/personal-assistant/.github/workflows/test.yml@master
+  deploy:
+    name: Build and push images to Docker Hub
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build Api image
+        run: docker build -f ./src/Weatherman.Api/Dockerfile . --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:weatherman-api-latest
+
+      - name: Login to Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY_URL }}
+          username: ${{ env.REGISTRY_USERNAME }}
+          password: ${{ env.REGISTRY_TOKEN }}
+
+      - name: Publish Weatherman.Api image
+        run: docker push ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:weatherman-api-latest

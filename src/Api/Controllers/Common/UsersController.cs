@@ -9,6 +9,7 @@ using Weatherman.Application.Contracts;
 
 namespace Api.Controllers.Common;
 
+[Obsolete("Moved to Core.Api")]
 [Authorize]
 [EnableCors("AllowAllApps")]
 [Route("api/[controller]")]

@@ -4,10 +4,8 @@ using Infrastructure.Cdn;
 using Infrastructure.Currency;
 using Infrastructure.Identity;
 using Infrastructure.Sender;
-using Infrastructure.Weatherman;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Weatherman.Application.Contracts.Forecasts;
 
 namespace Infrastructure;
 
@@ -19,7 +17,6 @@ public static class IoC
         string environmentName)
     {
         services.AddTransient<ICurrencyService, CurrencyService>();
-        services.AddTransient<IForecastService, ForecastService>();
 
         services.AddSingleton<IUserIdLookup, UserIdLookup>();
         services.AddSingleton<ISenderService, SenderService>();

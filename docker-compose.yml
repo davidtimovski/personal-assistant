@@ -21,6 +21,34 @@ services:
       - postgres
       - rabbitmq
 
+  gateway:
+    image: personalassistant-gateway:latest
+    container_name: personalassistant-gateway
+    build:
+      context: .
+      dockerfile: src/Gateway/Dockerfile
+    depends_on:
+      - core-api
+      - weatherman-api
+
+  core-api:
+    image: personalassistant-core-api:latest
+    container_name: personalassistant-core-api
+    build:
+      context: .
+      dockerfile: src/Core.Api/Dockerfile
+    depends_on:
+      - postgres
+
+  weatherman-api:
+    image: personalassistant-weatherman-api:latest
+    container_name: personalassistant-weatherman-api
+    build:
+      context: .
+      dockerfile: src/Weatherman.Api/Dockerfile
+    depends_on:
+      - postgres
+
   clientlogger:
     image: personalassistant-clientlogger:latest
     container_name: personalassistant-clientlogger

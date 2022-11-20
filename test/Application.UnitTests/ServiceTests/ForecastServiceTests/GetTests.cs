@@ -1,8 +1,8 @@
 ﻿using Application.UnitTests.Builders;
 using FluentValidation;
-using Infrastructure.Weatherman;
 using Moq;
 using Weatherman.Application.Contracts.Forecasts;
+using Weatherman.Infrastructure;
 using Xunit;
 
 namespace Application.UnitTests.ServiceTests.ForecastServiceTests;

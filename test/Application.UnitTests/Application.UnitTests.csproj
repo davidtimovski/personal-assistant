@@ -25,6 +25,7 @@
     <ProjectReference Include="..\..\src\ToDoAssistant.Application\ToDoAssistant.Application.csproj" />
     <ProjectReference Include="..\..\src\Utility\Utility.fsproj" />
     <ProjectReference Include="..\..\src\Weatherman.Application\Weatherman.Application.csproj" />
+    <ProjectReference Include="..\..\src\Weatherman.Infrastructure\Weatherman.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System.Reflection;
+using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ToDoAssistant.Application.Contracts.Lists;
@@ -14,6 +15,8 @@ public static class IoC
 {
     public static IServiceCollection AddToDoAssistant(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
         services.AddTransient<IValidator<CreateList>, CreateListValidator>();
         services.AddTransient<IValidator<UpdateList>, UpdateListValidator>();
         services.AddTransient<IValidator<ShareList>, ShareListValidator>();

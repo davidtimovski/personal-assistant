@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Weatherman.Models;
+﻿namespace Weatherman.Infrastructure.Models;
 
 internal class OpenMeteoResult
 {

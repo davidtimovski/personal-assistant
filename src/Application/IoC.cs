@@ -6,7 +6,6 @@ using Application.Services;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Utility;
 
 namespace Application;
 
@@ -15,8 +14,6 @@ public static class IoC
     public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
-
-        services.AddTransient<IConversion, Conversion>();
 
         services.AddTransient<IValidator<UploadTempImage>, UploadTempImageValidator>();
 

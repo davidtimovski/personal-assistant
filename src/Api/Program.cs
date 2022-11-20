@@ -20,7 +20,6 @@ using Serilog;
 using ToDoAssistant.Application;
 using ToDoAssistant.Persistence;
 using Weatherman.Application;
-using Weatherman.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,13 +46,12 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Services
+    .AddApplication(builder.Configuration)
     .AddInfrastructure(builder.Configuration, builder.Environment.EnvironmentName)
     .AddPersistence(builder.Configuration["ConnectionString"])
     .AddToDoAssistantPersistence(builder.Configuration["ConnectionString"])
     .AddCookingAssistantPersistence(builder.Configuration["ConnectionString"])
     .AddAccountantPersistence(builder.Configuration["ConnectionString"])
-    .AddWeathermanPersistence(builder.Configuration["ConnectionString"])
-    .AddApplication(builder.Configuration)
     .AddToDoAssistant(builder.Configuration)
     .AddCookingAssistant(builder.Configuration)
     .AddAccountant(builder.Configuration)

@@ -17,7 +17,7 @@ using IHost host = Host.CreateDefaultBuilder(args)
     })
     .ConfigureLogging((hostContext, logging) =>
     {
-        if (hostContext.HostingEnvironment.EnvironmentName == Environments.Production)
+        if (hostContext.HostingEnvironment.IsProduction())
         {
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(hostContext.Configuration)

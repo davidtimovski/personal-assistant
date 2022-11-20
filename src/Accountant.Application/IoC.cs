@@ -1,4 +1,5 @@
-﻿using Accountant.Application.Contracts.Accounts;
+﻿using System.Reflection;
+using Accountant.Application.Contracts.Accounts;
 using Accountant.Application.Contracts.AutomaticTransactions;
 using Accountant.Application.Contracts.Categories;
 using Accountant.Application.Contracts.Debts;
@@ -15,6 +16,8 @@ public static class IoC
 {
     public static IServiceCollection AddAccountant(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
         services.AddTransient<IAccountService, AccountService>();
         services.AddTransient<ICategoryService, CategoryService>();
         services.AddTransient<ITransactionService, TransactionService>();
