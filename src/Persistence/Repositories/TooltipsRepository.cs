@@ -2,7 +2,6 @@
 using Application.Contracts;
 using Dapper;
 using Domain.Common;
-using Domain.Common;
 
 namespace Persistence.Repositories;
 
