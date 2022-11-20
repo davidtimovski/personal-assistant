@@ -1,9 +1,7 @@
-﻿using System.Net.Http;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Api.Models;
-using Application.Contracts.Common;
+using Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;

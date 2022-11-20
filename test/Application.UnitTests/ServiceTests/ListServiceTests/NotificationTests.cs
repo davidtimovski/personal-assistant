@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Domain.Common;
 using Moq;
-using Application.Contracts.ToDoAssistant.Lists;
-using Application.Contracts.ToDoAssistant.Tasks;
-using Application.Mappings;
-using Application.Services.ToDoAssistant;
-using Domain.Entities.Common;
+using ToDoAssistant.Application.Contracts.Lists;
+using ToDoAssistant.Application.Contracts.Tasks;
+using ToDoAssistant.Application.Mappings;
+using ToDoAssistant.Application.Services;
 using Xunit;
 
 namespace Application.UnitTests.ServiceTests.ListServiceTests;

@@ -1,12 +1,12 @@
-﻿using System.Threading.Tasks;
-using Application.Contracts.Common;
-using Application.Contracts.Common.Models;
+﻿using Application.Contracts;
+using Application.Contracts.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers.Common;
 
+[Obsolete("Moved to Core.Api")]
 [Authorize]
 [EnableCors("AllowAllApps")]
 [Route("api/[controller]")]

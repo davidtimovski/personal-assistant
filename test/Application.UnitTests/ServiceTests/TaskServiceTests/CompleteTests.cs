@@ -1,10 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using Domain.ToDoAssistant;
 using Moq;
-using Application.Contracts.ToDoAssistant.Tasks;
-using Application.Contracts.ToDoAssistant.Tasks.Models;
-using Application.Mappings;
-using Application.Services.ToDoAssistant;
-using Domain.Entities.ToDoAssistant;
+using ToDoAssistant.Application.Contracts.Tasks;
+using ToDoAssistant.Application.Contracts.Tasks.Models;
+using ToDoAssistant.Application.Mappings;
+using ToDoAssistant.Application.Services;
 using Xunit;
 
 namespace Application.UnitTests.ServiceTests.TaskServiceTests;

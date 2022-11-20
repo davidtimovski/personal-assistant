@@ -1,6 +1,5 @@
-﻿using System;
-using System.Text;
-using Application.Contracts.Common;
+﻿using System.Text;
+using Application.Contracts;
 using Infrastructure.Sender.Models;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;

@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Api.Controllers.CookingAssistant;
+﻿using Api.Controllers.CookingAssistant;
 using Api.UnitTests.Builders;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;

@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using Application.Contracts.Common;
+﻿using Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers.Common;
 
+[Obsolete("Moved to Core.Api")]
 [Authorize]
 [EnableCors("AllowAllApps")]
 [Route("api/[controller]")]

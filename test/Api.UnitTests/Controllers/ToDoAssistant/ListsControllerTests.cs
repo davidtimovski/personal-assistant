@@ -1,13 +1,12 @@
-﻿using System.Threading.Tasks;
-using Api.Config;
+﻿using Api.Config;
 using Api.Controllers.ToDoAssistant;
 using Api.UnitTests.Builders;
-using Application.Contracts.Common;
-using Application.Contracts.ToDoAssistant.Lists;
-using Application.Contracts.ToDoAssistant.Lists.Models;
+using Application.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
+using ToDoAssistant.Application.Contracts.Lists;
+using ToDoAssistant.Application.Contracts.Lists.Models;
 using Xunit;
 
 namespace Api.UnitTests.Controllers.ToDoAssistant;

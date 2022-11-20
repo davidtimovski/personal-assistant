@@ -1,9 +1,8 @@
-﻿using System.Threading.Tasks;
-using Api.Controllers.CookingAssistant;
+﻿using Api.Controllers.CookingAssistant;
 using Api.UnitTests.Builders;
-using Application.Contracts.Common;
-using Application.Contracts.CookingAssistant.Ingredients;
-using Application.Contracts.CookingAssistant.Ingredients.Models;
+using Application.Contracts;
+using CookingAssistant.Application.Contracts.Ingredients;
+using CookingAssistant.Application.Contracts.Ingredients.Models;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;

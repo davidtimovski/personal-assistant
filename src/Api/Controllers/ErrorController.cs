@@ -3,7 +3,6 @@ using FluentValidation.Results;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Logging;
 
 namespace Api.Controllers;
 

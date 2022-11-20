@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Application.Contracts.CookingAssistant.DietaryProfiles.Models;
+﻿using CookingAssistant.Application.Contracts.DietaryProfiles.Models;
 
 namespace Application.UnitTests.Builders;
 

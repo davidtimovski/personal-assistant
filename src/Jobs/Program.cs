@@ -1,8 +1,4 @@
-using System;
-using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Application.Contracts.Common;
+using Application.Contracts;
 using CloudinaryDotNet;
 using Infrastructure.Cdn;
 using Jobs;
@@ -21,7 +17,7 @@ using IHost host = Host.CreateDefaultBuilder(args)
     })
     .ConfigureLogging((hostContext, logging) =>
     {
-        if (hostContext.HostingEnvironment.EnvironmentName == Environments.Production)
+        if (hostContext.HostingEnvironment.IsProduction())
         {
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(hostContext.Configuration)

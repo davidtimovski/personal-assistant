@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Api.Models.Accountant.Transactions;
+﻿namespace Api.Models.Accountant.Transactions;
 
 public class ExportVm
 {

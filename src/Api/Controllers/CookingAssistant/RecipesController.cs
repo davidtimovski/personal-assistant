@@ -1,27 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 using Api.Config;
 using Api.Models;
 using Api.Models.CookingAssistant.Recipes;
-using Application.Contracts.Common;
-using Application.Contracts.Common.Models;
-using Application.Contracts.CookingAssistant.Ingredients;
-using Application.Contracts.CookingAssistant.Recipes;
-using Application.Contracts.CookingAssistant.Recipes.Models;
-using Domain.Entities.Common;
+using Application.Contracts;
+using Application.Contracts.Models;
+using CookingAssistant.Application.Contracts.Ingredients;
+using CookingAssistant.Application.Contracts.Recipes;
+using CookingAssistant.Application.Contracts.Recipes.Models;
+using Domain.Common;
 using FluentValidation;
 using Infrastructure.Sender.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Api.Controllers.CookingAssistant;
@@ -179,7 +171,7 @@ public class RecipesController : BaseController
     [HttpGet("pending-send-requests-count")]
     public IActionResult GetPendingSendRequestsCount()
     {
-        int pendingSendRequestsCount =  _recipeService.GetPendingSendRequestsCount(UserId);
+        int pendingSendRequestsCount = _recipeService.GetPendingSendRequestsCount(UserId);
 
         return Ok(pendingSendRequestsCount);
     }
@@ -221,10 +213,10 @@ public class RecipesController : BaseController
                 Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp"),
                 $"users/{UserId}/recipes",
                 "recipe")
-                {
-                    Length = image.Length,
-                    FileName = image.FileName
-                };
+            {
+                Length = image.Length,
+                FileName = image.FileName
+            };
             await image.CopyToAsync(uploadModel.File);
 
             string tempImageUri = await _cdnService.UploadTempAsync(uploadModel, _uploadTempImageValidator);
@@ -282,7 +274,7 @@ public class RecipesController : BaseController
         DeleteRecipeResult result = await _recipeService.DeleteAsync(id, UserId);
 
         try
-        { 
+        {
             foreach (var recipient in result.NotificationRecipients)
             {
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);

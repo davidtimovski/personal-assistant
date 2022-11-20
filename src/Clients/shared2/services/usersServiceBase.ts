@@ -13,10 +13,22 @@ export class UsersServiceBase {
     this.logger = new ErrorLogger(this.application);
   }
 
+  /** Should be obsoleted by /core/api/ eventually */
   async get<Type extends User>(): Promise<Type> {
     try {
       return await this.httpProxy.ajax<Type>(
         `${Variables.urls.api}/api/users?application=${this.application}`
+      );
+    } catch (e) {
+      this.logger.logError(e);
+      throw e;
+    }
+  }
+
+  async getCore<Type extends User>(): Promise<Type> {
+    try {
+      return await this.httpProxy.ajax<Type>(
+        `${Variables.urls.gateway}/core/api/users?application=${this.application}`
       );
     } catch (e) {
       this.logger.logError(e);

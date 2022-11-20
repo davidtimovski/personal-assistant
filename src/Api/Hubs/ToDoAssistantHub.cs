@@ -1,10 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
-using Application.Contracts.Common;
-using Application.Contracts.ToDoAssistant.Lists;
+﻿using Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.SignalR;
+using ToDoAssistant.Application.Contracts.Lists;
 
 namespace Api.Hubs;
 
@@ -18,7 +16,7 @@ public class ToDoAssistantHub : Hub
 
     public ToDoAssistantHub(
         IUserIdLookup userIdLookup,
-        IUsersRepository usersRepository, 
+        IUsersRepository usersRepository,
         IListsRepository listsRepository)
     {
         _userIdLookup = userIdLookup;

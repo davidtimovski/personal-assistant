@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Application.Contracts.CookingAssistant.Ingredients.Models;
-using Domain.Entities.CookingAssistant;
+﻿using CookingAssistant.Application.Contracts.Ingredients.Models;
+using Domain.CookingAssistant;
 
 namespace Application.UnitTests.Builders;
 

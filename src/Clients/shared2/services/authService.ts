@@ -11,11 +11,11 @@ export class AuthService {
     return this.client !== null;
   }
 
-  async initialize() {
+  async initialize(audience: string) {
     this.client = await createAuth0Client({
       domain: Variables.auth0Domain,
       client_id: Variables.auth0ClientId,
-      audience: Variables.urls.api,
+      audience: audience,
       cacheLocation: "localstorage",
       redirect_uri: `${Variables.urls.host}/signin-oidc`,
     });

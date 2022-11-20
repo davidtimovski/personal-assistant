@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Api.Models;
+﻿namespace Api.Models;
 
 public abstract class GatewayRequest
 {

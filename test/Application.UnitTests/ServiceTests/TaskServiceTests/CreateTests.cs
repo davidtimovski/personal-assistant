@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Application.UnitTests.Builders;
+using Domain.ToDoAssistant;
 using FluentValidation;
 using Moq;
-using Application.Contracts.ToDoAssistant.Lists;
-using Application.Contracts.ToDoAssistant.Tasks;
-using Application.Contracts.ToDoAssistant.Tasks.Models;
-using Application.Mappings;
-using Application.Services.ToDoAssistant;
-using Application.UnitTests.Builders;
-using Domain.Entities.ToDoAssistant;
+using ToDoAssistant.Application.Contracts.Lists;
+using ToDoAssistant.Application.Contracts.Tasks;
+using ToDoAssistant.Application.Contracts.Tasks.Models;
+using ToDoAssistant.Application.Mappings;
+using ToDoAssistant.Application.Services;
 using Xunit;
 
 namespace Application.UnitTests.ServiceTests.TaskServiceTests;

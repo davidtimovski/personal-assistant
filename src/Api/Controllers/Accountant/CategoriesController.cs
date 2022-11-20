@@ -1,7 +1,6 @@
-﻿using System.Threading.Tasks;
-using Application.Contracts.Accountant.Categories;
-using Application.Contracts.Accountant.Categories.Models;
-using Application.Contracts.Common;
+﻿using Accountant.Application.Contracts.Categories;
+using Accountant.Application.Contracts.Categories.Models;
+using Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;

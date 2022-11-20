@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
   </PropertyGroup>
@@ -30,10 +31,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Domain\Domain.csproj" />
+    <ProjectReference Include="..\Accountant.Application\Accountant.Application.csproj" />
+    <ProjectReference Include="..\Accountant.Persistence\Accountant.Persistence.csproj" />
+    <ProjectReference Include="..\CookingAssistant.Application\CookingAssistant.Application.csproj" />
+    <ProjectReference Include="..\CookingAssistant.Persistence\CookingAssistant.Persistence.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
-    <ProjectReference Include="..\Persistence\Persistence.csproj" />
-    <ProjectReference Include="..\Application\Application.csproj" />
+    <ProjectReference Include="..\ToDoAssistant.Application\ToDoAssistant.Application.csproj" />
+    <ProjectReference Include="..\ToDoAssistant.Persistence\ToDoAssistant.Persistence.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -77,7 +81,5 @@
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
   </ItemGroup>
-
-  <ProjectExtensions><VisualStudio><UserProperties appsettings_1Production_1json__JSONSchema="http://json.schemastore.org/appsscript" /></VisualStudio></ProjectExtensions>
 
 </Project>

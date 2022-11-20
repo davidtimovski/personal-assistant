@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Api.Models.Accountant.Sync;
+﻿namespace Api.Models.Accountant.Sync;
 
 public class GetChangesVm
 {

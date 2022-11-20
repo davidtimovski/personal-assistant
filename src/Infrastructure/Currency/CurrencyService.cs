@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Text.Json;
-using Application.Contracts.Common;
+using Application.Contracts;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using Npgsql;

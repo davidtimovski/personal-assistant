@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Account.ViewModels.Home;
+﻿namespace Account.ViewModels.Home;
 
 public enum OverviewAlert
 {

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
-using Api.Controllers.Weatherman;
-using Api.UnitTests.Builders;
+﻿using Api.UnitTests.Builders;
 using Microsoft.AspNetCore.Mvc;
+using Weatherman.Api.Controllers;
 using Xunit;
 
 namespace Api.UnitTests.Controllers.Weatherman;

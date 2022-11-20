@@ -1,5 +1,4 @@
-﻿using System;
-using Application.Contracts.Common;
+﻿using Application.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -23,7 +22,7 @@ public abstract class BaseController : Controller
             if (!userId.HasValue)
             {
                 string auth0Id = User.Identity.Name;
-                
+
                 if (_userIdLookup.Contains(auth0Id))
                 {
                     userId = _userIdLookup.Get(auth0Id);

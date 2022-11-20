@@ -1,11 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using Application.UnitTests.Builders;
 using FluentValidation;
 using Moq;
-using Application.Contracts.ToDoAssistant.Lists;
-using Application.Contracts.ToDoAssistant.Lists.Models;
-using Application.Mappings;
-using Application.Services.ToDoAssistant;
-using Application.UnitTests.Builders;
+using ToDoAssistant.Application.Contracts.Lists;
+using ToDoAssistant.Application.Contracts.Lists.Models;
+using ToDoAssistant.Application.Mappings;
+using ToDoAssistant.Application.Services;
 using Xunit;
 
 namespace Application.UnitTests.ServiceTests.ListServiceTests;

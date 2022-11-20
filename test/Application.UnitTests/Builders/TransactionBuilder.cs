@@ -1,4 +1,4 @@
-﻿using Application.Contracts.Accountant.Transactions.Models;
+﻿using Accountant.Application.Contracts.Transactions.Models;
 
 namespace Application.UnitTests.Builders;
 

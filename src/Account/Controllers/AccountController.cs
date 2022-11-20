@@ -1,31 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 using Account.Models;
 using Account.ViewModels.Account;
 using Account.ViewModels.Home;
-using Application.Contracts.Accountant.Accounts;
-using Application.Contracts.Accountant.Accounts.Models;
-using Application.Contracts.Common;
-using Application.Contracts.CookingAssistant.Recipes;
-using Application.Contracts.ToDoAssistant.Lists;
+using Accountant.Application.Contracts.Accounts;
+using Accountant.Application.Contracts.Accounts.Models;
+using Application.Contracts;
 using Auth0.AspNetCore.Authentication;
+using CookingAssistant.Application.Contracts.Recipes;
 using Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Logging;
+using ToDoAssistant.Application.Contracts.Lists;
 
 namespace Account.Controllers;
 
@@ -242,7 +231,7 @@ public class AccountController : BaseController
     //    {
     //        return View(model);
     //    }
-            
+
     //    ApplicationUser user = await _userManager.GetUserAsync(User);
 
     //    var passwordIsValid = await _userManager.CheckPasswordAsync(user, model.Password);
@@ -394,7 +383,7 @@ public class AccountController : BaseController
 
         string extension = Path.GetExtension(image.FileName);
 
-        if (!new [] { ".JPG", ".PNG", ".JPEG" }.Contains(extension.ToUpperInvariant()))
+        if (!new[] { ".JPG", ".PNG", ".JPEG" }.Contains(extension.ToUpperInvariant()))
         {
             ModelState.AddModelError(string.Empty, _localizer["InvalidImageFormat"]);
             return new UnprocessableEntityObjectResult(ModelState);

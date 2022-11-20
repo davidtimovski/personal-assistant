@@ -1,18 +1,13 @@
-﻿using System;
-using Azure.Extensions.AspNetCore.Configuration.Secrets;
+﻿using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Sender;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
 {
-    if (context.HostingEnvironment.EnvironmentName == Environments.Production)
+    if (context.HostingEnvironment.IsProduction())
     {
         var config = configBuilder.Build();
 
@@ -29,7 +24,7 @@ builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
 })
     .ConfigureLogging((hostContext, logging) =>
     {
-        if (hostContext.HostingEnvironment.EnvironmentName == Environments.Production)
+        if (hostContext.HostingEnvironment.IsProduction())
         {
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(hostContext.Configuration)

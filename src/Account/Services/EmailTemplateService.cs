@@ -1,13 +1,7 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
-using Application.Contracts.Common;
+using Application.Contracts;
 using Infrastructure.Sender.Models;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
 
 namespace Account.Services;
