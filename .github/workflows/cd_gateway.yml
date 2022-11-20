@@ -1,4 +1,4 @@
-name: Continuous deployment Weatherman
+name: Continuous deployment Gateway
 
 on:
   workflow_dispatch:
@@ -6,14 +6,7 @@ on:
     branches:
       - master
     paths:
-      - "src/Domain/**"
-      - "src/Application/**"
-      - "src/Infrastructure/**"
-      - "src/Persistence/**"
-      - "src/Weatherman.Application/**"
-      - "src/Weatherman.Infrastructure/**"
-      - "src/Weatherman.Persistence/**"
-      - "src/Weatherman.Api/**"
+      - "src/Gateway/**"
 
 env:
   REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
@@ -32,8 +25,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Build Weatherman image
-        run: docker build -f ./src/Weatherman.Api/Dockerfile . --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:weatherman-api-latest
+      - name: Build Gateway image
+        run: docker build -f ./src/Gateway/Dockerfile . --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:gateway-latest
 
       - name: Login to Registry
         uses: docker/login-action@v2
@@ -42,5 +35,5 @@ jobs:
           username: ${{ env.REGISTRY_USERNAME }}
           password: ${{ env.REGISTRY_TOKEN }}
 
-      - name: Publish Weatherman.Api image
-        run: docker push ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:weatherman-api-latest
+      - name: Publish Gateway image
+        run: docker push ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:gateway-latest

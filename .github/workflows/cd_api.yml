@@ -6,20 +6,21 @@ on:
     branches:
       - master
     paths:
-      - "src/Api/**"
       - "src/Domain/**"
       - "src/Application/**"
       - "src/ToDoAssistant.Application/**"
       - "src/CookingAssistant.Application/**"
       - "src/Accountant.Application/**"
-      - "src/Weatherman.Application/**"
       - "src/Persistence/**"
       - "src/ToDoAssistant.Persistence/**"
       - "src/CookingAssistant.Persistence/**"
       - "src/Accountant.Persistence/**"
-      - "src/Weatherman.Persistence/**"
       - "src/Utility/**"
       - "src/Infrastructure/**"
+      - "src/ToDoAssistant.Infrastructure/**"
+      - "src/CookingAssistant.Infrastructure/**"
+      - "src/Accountant.Infrastructure/**"
+      - "src/Api/**"
 
 env:
   REGISTRY_URL: ${{ secrets.REGISTRY_URL }}

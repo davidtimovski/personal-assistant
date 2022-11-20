@@ -10,6 +10,7 @@ on:
       - "src/Application/**"
       - "src/Infrastructure/**"
       - "src/Persistence/**"
+      - "src/Core.Api/**"
 
 env:
   REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
@@ -28,7 +29,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Build Api image
+      - name: Build Core image
         run: docker build -f ./src/Core.Api/Dockerfile . --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:core-api-latest
 
       - name: Login to Registry
