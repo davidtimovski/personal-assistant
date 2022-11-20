@@ -1,13 +1,12 @@
-﻿using AutoMapper;
+﻿using Application.UnitTests.Builders;
+using CookingAssistant.Application.Contracts.Common;
+using CookingAssistant.Application.Contracts.DietaryProfiles;
+using CookingAssistant.Application.Contracts.DietaryProfiles.Models;
+using CookingAssistant.Application.Mappings;
+using CookingAssistant.Application.Services;
 using FluentValidation;
 using Microsoft.Extensions.Options;
 using Moq;
-using Application.Contracts.CookingAssistant.Common;
-using Application.Contracts.CookingAssistant.DietaryProfiles;
-using Application.Contracts.CookingAssistant.DietaryProfiles.Models;
-using Application.Mappings;
-using Application.Services.CookingAssistant;
-using Application.UnitTests.Builders;
 using Utility;
 using Xunit;
 
@@ -29,7 +28,8 @@ public class GetRecommendedDailyIntakeTests
             new Mock<IDailyIntakeHelper>().Object,
             dailyIntakeRefOptionsMock.Object,
             null,
-            GetMapper(), null);
+            MapperMocker.GetMapper<CookingAssistantProfile>(),
+            null);
     }
 
     [Fact]
@@ -50,15 +50,5 @@ public class GetRecommendedDailyIntakeTests
         var failedValidator = ValidatorMocker.GetFailed<GetRecommendedDailyIntake>();
 
         Assert.Throws<ValidationException>(() => _sut.GetRecommendedDailyIntake(model, failedValidator.Object));
-    }
-
-    private IMapper GetMapper()
-    {
-        var configurationProvider = new MapperConfiguration(cfg =>
-        {
-            cfg.AddProfile<MappingProfile>();
-            cfg.AddProfile<CookingAssistantProfile>();
-        });
-        return configurationProvider.CreateMapper();
     }
 }

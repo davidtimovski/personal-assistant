@@ -1,12 +1,11 @@
-﻿using System.Threading.Tasks;
-using Application.Contracts.Accountant;
-using Application.Contracts.Common;
-using Application.Contracts.Common.Models;
-using Application.Contracts.ToDoAssistant;
-using Application.Contracts.Weatherman;
+﻿using Accountant.Application.Contracts;
+using Application.Contracts;
+using Application.Contracts.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using ToDoAssistant.Application.Contracts;
+using Weatherman.Application.Contracts;
 
 namespace Api.Controllers.Common;
 

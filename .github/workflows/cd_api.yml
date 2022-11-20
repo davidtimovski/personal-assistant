@@ -9,8 +9,16 @@ on:
       - "src/Api/**"
       - "src/Domain/**"
       - "src/Application/**"
-      - "src/Utility/**"
+      - "src/ToDoAssistant.Application/**"
+      - "src/CookingAssistant.Application/**"
+      - "src/Accountant.Application/**"
+      - "src/Weatherman.Application/**"
       - "src/Persistence/**"
+      - "src/ToDoAssistant.Persistence/**"
+      - "src/CookingAssistant.Persistence/**"
+      - "src/Accountant.Persistence/**"
+      - "src/Weatherman.Persistence/**"
+      - "src/Utility/**"
       - "src/Infrastructure/**"
 
 env:

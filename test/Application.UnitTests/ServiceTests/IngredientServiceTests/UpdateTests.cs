@@ -1,10 +1,9 @@
-﻿using System.Threading.Tasks;
-using Application.Contracts.CookingAssistant.Ingredients;
-using Application.Contracts.CookingAssistant.Ingredients.Models;
-using Application.Mappings;
-using Application.Services.CookingAssistant;
-using Application.UnitTests.Builders;
-using Domain.Entities.CookingAssistant;
+﻿using Application.UnitTests.Builders;
+using CookingAssistant.Application.Contracts.Ingredients;
+using CookingAssistant.Application.Contracts.Ingredients.Models;
+using CookingAssistant.Application.Mappings;
+using CookingAssistant.Application.Services;
+using Domain.CookingAssistant;
 using FluentValidation;
 using Moq;
 using Xunit;

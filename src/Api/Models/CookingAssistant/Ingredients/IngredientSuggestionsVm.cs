@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Application.Contracts.CookingAssistant.Ingredients.Models;
+﻿using CookingAssistant.Application.Contracts.Ingredients.Models;
 
 namespace Api.Models.CookingAssistant.Ingredients;
 

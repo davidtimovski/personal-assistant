@@ -1,10 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
-using Application.Contracts.Weatherman.Forecasts;
-using Application.Contracts.Weatherman.Forecasts.Models;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Weatherman.Application.Contracts.Forecasts;
+using Weatherman.Application.Contracts.Forecasts.Models;
 
 namespace Api.Controllers.Weatherman;
 

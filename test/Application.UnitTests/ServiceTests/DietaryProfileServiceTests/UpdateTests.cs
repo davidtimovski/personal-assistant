@@ -1,13 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using Application.UnitTests.Builders;
+using CookingAssistant.Application.Contracts.Common;
+using CookingAssistant.Application.Contracts.DietaryProfiles;
+using CookingAssistant.Application.Contracts.DietaryProfiles.Models;
+using CookingAssistant.Application.Mappings;
+using CookingAssistant.Application.Services;
 using FluentValidation;
 using Microsoft.Extensions.Options;
 using Moq;
-using Application.Contracts.CookingAssistant.Common;
-using Application.Contracts.CookingAssistant.DietaryProfiles;
-using Application.Contracts.CookingAssistant.DietaryProfiles.Models;
-using Application.Mappings;
-using Application.Services.CookingAssistant;
-using Application.UnitTests.Builders;
 using Utility;
 using Xunit;
 

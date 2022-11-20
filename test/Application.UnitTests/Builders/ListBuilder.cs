@@ -1,4 +1,4 @@
-﻿using Application.Contracts.ToDoAssistant.Lists.Models;
+﻿using ToDoAssistant.Application.Contracts.Lists.Models;
 
 namespace Application.UnitTests.Builders;
 

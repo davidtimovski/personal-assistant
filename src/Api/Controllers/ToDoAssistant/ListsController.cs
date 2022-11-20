@@ -1,23 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 using Api.Config;
 using Api.Models;
 using Api.Models.ToDoAssistant.Lists;
-using Application.Contracts.Common;
-using Application.Contracts.ToDoAssistant.Lists;
-using Application.Contracts.ToDoAssistant.Lists.Models;
-using Application.Contracts.ToDoAssistant.Notifications;
-using Application.Contracts.ToDoAssistant.Notifications.Models;
+using Application.Contracts;
 using FluentValidation;
 using Infrastructure.Sender.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using ToDoAssistant.Application.Contracts.Lists;
+using ToDoAssistant.Application.Contracts.Lists.Models;
+using ToDoAssistant.Application.Contracts.Notifications;
+using ToDoAssistant.Application.Contracts.Notifications.Models;
 
 namespace Api.Controllers.ToDoAssistant;
 

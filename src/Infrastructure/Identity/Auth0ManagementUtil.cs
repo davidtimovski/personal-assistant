@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Identity;
 
@@ -56,7 +52,7 @@ public static class Auth0ManagementUtil
         using var requestMessage = new HttpRequestMessage(HttpMethod.Patch, new Uri($"https://{Domain}/api/v2/users/{auth0Id}"));
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
 
-        requestMessage.Content = new StringContent(JsonSerializer.Serialize(new 
+        requestMessage.Content = new StringContent(JsonSerializer.Serialize(new
         {
             name = name.Trim()
         }), Encoding.UTF8, "application/json");

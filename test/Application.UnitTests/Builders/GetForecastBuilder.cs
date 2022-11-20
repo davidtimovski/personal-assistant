@@ -1,4 +1,4 @@
-﻿using Application.Contracts.Weatherman.Forecasts.Models;
+﻿using Weatherman.Application.Contracts.Forecasts.Models;
 
 namespace Application.UnitTests.Builders;
 

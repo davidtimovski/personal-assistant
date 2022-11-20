@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Infrastructure.Weatherman.Models;
+﻿namespace Infrastructure.Weatherman.Models;
 
 internal class OpenMeteoResult
 {

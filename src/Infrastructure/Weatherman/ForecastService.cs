@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 using System.Web;
-using Application.Contracts.Weatherman.Forecasts;
-using Application.Contracts.Weatherman.Forecasts.Models;
-using Domain.Entities.Weatherman;
+using Domain.Weatherman;
 using FluentValidation;
 using Infrastructure.Weatherman.Models;
 using Microsoft.Extensions.Logging;
+using Weatherman.Application.Contracts.Forecasts;
+using Weatherman.Application.Contracts.Forecasts.Models;
 
 namespace Infrastructure.Weatherman;
 

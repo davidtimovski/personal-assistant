@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Api.Controllers.Weatherman;
+﻿using Api.Controllers.Weatherman;
 using Api.UnitTests.Builders;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;

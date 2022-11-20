@@ -1,10 +1,9 @@
-﻿using System.Threading.Tasks;
-using Api.Config;
+﻿using Api.Config;
 using Api.Controllers.CookingAssistant;
 using Api.UnitTests.Builders;
-using Application.Contracts.Common;
-using Application.Contracts.CookingAssistant.Recipes;
-using Application.Contracts.CookingAssistant.Recipes.Models;
+using Application.Contracts;
+using CookingAssistant.Application.Contracts.Recipes;
+using CookingAssistant.Application.Contracts.Recipes.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;

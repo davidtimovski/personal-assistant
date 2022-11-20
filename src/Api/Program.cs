@@ -1,25 +1,26 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Security.Claims;
-using System.Threading.Tasks;
+using Accountant.Application;
+using Accountant.Persistence;
 using Api.Config;
 using Api.Hubs;
 using Application;
-using Application.Contracts.CookingAssistant.DietaryProfiles.Models;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
+using CookingAssistant.Application;
+using CookingAssistant.Application.Contracts.DietaryProfiles.Models;
+using CookingAssistant.Persistence;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Persistence;
 using Serilog;
+using ToDoAssistant.Application;
+using ToDoAssistant.Persistence;
+using Weatherman.Application;
+using Weatherman.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,7 +49,15 @@ Log.Logger = new LoggerConfiguration()
 builder.Services
     .AddInfrastructure(builder.Configuration, builder.Environment.EnvironmentName)
     .AddPersistence(builder.Configuration["ConnectionString"])
-    .AddApplication(builder.Configuration);
+    .AddToDoAssistantPersistence(builder.Configuration["ConnectionString"])
+    .AddCookingAssistantPersistence(builder.Configuration["ConnectionString"])
+    .AddAccountantPersistence(builder.Configuration["ConnectionString"])
+    .AddWeathermanPersistence(builder.Configuration["ConnectionString"])
+    .AddApplication(builder.Configuration)
+    .AddToDoAssistant(builder.Configuration)
+    .AddCookingAssistant(builder.Configuration)
+    .AddAccountant(builder.Configuration)
+    .AddWeatherman(builder.Configuration);
 
 builder.Services
         .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

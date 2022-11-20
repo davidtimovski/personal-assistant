@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Application.Contracts.Common;
-using Application.Contracts.Common.Models;
+﻿using System.Text.RegularExpressions;
+using Application.Contracts;
+using Application.Contracts.Models;
 using Application.Utils;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;

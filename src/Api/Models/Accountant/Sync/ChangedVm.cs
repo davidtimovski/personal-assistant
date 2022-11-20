@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using Application.Contracts.Accountant.Accounts.Models;
-using Application.Contracts.Accountant.AutomaticTransactions.Models;
-using Application.Contracts.Accountant.Categories.Models;
-using Application.Contracts.Accountant.Debts.Models;
-using Application.Contracts.Accountant.Transactions.Models;
-using Application.Contracts.Accountant.UpcomingExpenses.Models;
+﻿using Accountant.Application.Contracts.Accounts.Models;
+using Accountant.Application.Contracts.AutomaticTransactions.Models;
+using Accountant.Application.Contracts.Categories.Models;
+using Accountant.Application.Contracts.Debts.Models;
+using Accountant.Application.Contracts.Transactions.Models;
+using Accountant.Application.Contracts.UpcomingExpenses.Models;
 
 namespace Api.Models.Accountant.Sync;
 

@@ -1,6 +1,4 @@
-﻿using System.Net.Http;
-using Application.Contracts.Common;
-using Application.Contracts.Weatherman.Forecasts;
+﻿using Application.Contracts;
 using CloudinaryDotNet;
 using Infrastructure.Cdn;
 using Infrastructure.Currency;
@@ -9,6 +7,7 @@ using Infrastructure.Sender;
 using Infrastructure.Weatherman;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Weatherman.Application.Contracts.Forecasts;
 
 namespace Infrastructure;
 

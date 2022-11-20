@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Application.Contracts.CookingAssistant.Recipes.Models;
+﻿using CookingAssistant.Application.Contracts.Recipes.Models;
 
 namespace Application.UnitTests.Builders;
 

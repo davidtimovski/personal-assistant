@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Application.Contracts.Common;
+using Application.Contracts;
 using Dapper;
-using Domain.Entities.Accountant;
-using Domain.Entities.Common;
+using Domain.Accountant;
+using Domain.Common;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

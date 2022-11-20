@@ -1,6 +1,5 @@
-﻿using System;
-using System.Security.Claims;
-using Application.Contracts.Common;
+﻿using System.Security.Claims;
+using Application.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Account.Controllers;

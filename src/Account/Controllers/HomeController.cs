@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using Account.ViewModels.Home;
-using Application.Contracts.Common;
+using Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 
 namespace Account.Controllers;
 
@@ -17,9 +13,9 @@ public class HomeController : BaseController
     private readonly IConfiguration _configuration;
 
     public HomeController(
-        IUserIdLookup userIdLookup, 
+        IUserIdLookup userIdLookup,
         IUsersRepository usersRepository,
-        IUserService userService, 
+        IUserService userService,
         IConfiguration configuration) : base(userIdLookup, usersRepository)
     {
         _userService = userService;

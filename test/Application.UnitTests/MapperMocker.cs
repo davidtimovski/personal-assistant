@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Application.Mappings;
 
 namespace Application.UnitTests;
 
@@ -9,7 +8,9 @@ public static class MapperMocker
     {
         var configurationProvider = new MapperConfiguration(cfg =>
         {
-            cfg.AddProfile<MappingProfile>();
+            cfg.AddProfile<ToDoAssistant.Application.Mappings.MappingProfile>();
+            cfg.AddProfile<CookingAssistant.Application.Mappings.MappingProfile>();
+            cfg.AddProfile<Accountant.Application.Mappings.MappingProfile>();
             cfg.AddProfile<TProfile>();
         });
         return configurationProvider.CreateMapper();

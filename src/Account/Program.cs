@@ -1,23 +1,25 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using Account.Services;
+using Accountant.Application;
+using Accountant.Persistence;
 using Application;
 using Auth0.AspNetCore.Authentication;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
+using CookingAssistant.Application;
+using CookingAssistant.Persistence;
 using FluentValidation.AspNetCore;
 using Infrastructure;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
 using Persistence;
 using Serilog;
+using ToDoAssistant.Application;
+using ToDoAssistant.Persistence;
+using Weatherman.Application;
+using Weatherman.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
@@ -41,7 +43,15 @@ builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
 builder.Services
     .AddInfrastructure(builder.Configuration, builder.Environment.EnvironmentName)
     .AddPersistence(builder.Configuration["ConnectionString"])
-    .AddApplication(builder.Configuration);
+    .AddToDoAssistantPersistence(builder.Configuration["ConnectionString"])
+    .AddCookingAssistantPersistence(builder.Configuration["ConnectionString"])
+    .AddAccountantPersistence(builder.Configuration["ConnectionString"])
+    .AddWeathermanPersistence(builder.Configuration["ConnectionString"])
+    .AddApplication(builder.Configuration)
+    .AddToDoAssistant(builder.Configuration)
+    .AddCookingAssistant(builder.Configuration)
+    .AddAccountant(builder.Configuration)
+    .AddWeatherman(builder.Configuration);
 
 // Cookie configuration for HTTPS
 if (builder.Environment.EnvironmentName == Environments.Production)
@@ -53,7 +63,8 @@ if (builder.Environment.EnvironmentName == Environments.Production)
 }
 
 builder.Services
-    .AddAuth0WebAppAuthentication(options => {
+    .AddAuth0WebAppAuthentication(options =>
+    {
         options.Domain = builder.Configuration["Auth0:Domain"];
         options.ClientId = builder.Configuration["Auth0:ClientId"];
     });

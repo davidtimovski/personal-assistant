@@ -1,5 +1,7 @@
-﻿using AutoMapper;
-using Application.Mappings;
+﻿using Accountant.Application.Mappings;
+using AutoMapper;
+using CookingAssistant.Application.Mappings;
+using ToDoAssistant.Application.Mappings;
 
 namespace Application.UnitTests.Mappings;
 
@@ -9,9 +11,11 @@ public class MappingTestsFixture
     {
         ConfigurationProvider = new MapperConfiguration(cfg =>
         {
-            cfg.AddProfile<MappingProfile>();
+            cfg.AddProfile<ToDoAssistant.Application.Mappings.MappingProfile>();
             cfg.AddProfile<ToDoAssistantProfile>();
+            cfg.AddProfile<CookingAssistant.Application.Mappings.MappingProfile>();
             cfg.AddProfile<CookingAssistantProfile>();
+            cfg.AddProfile<Accountant.Application.Mappings.MappingProfile>();
             cfg.AddProfile<AccountantProfile>();
         });
 

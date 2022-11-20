@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-using Application.Contracts.Common;
-using Application.Contracts.Common.Models;
+﻿using Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;

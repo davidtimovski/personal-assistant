@@ -1,13 +1,9 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
+﻿using Accountant.Application.Contracts.Transactions;
+using Accountant.Application.Contracts.Transactions.Models;
 using Api.Models.Accountant.Transactions;
-using Application.Contracts.Accountant.Transactions;
-using Application.Contracts.Accountant.Transactions.Models;
-using Application.Contracts.Common;
+using Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 

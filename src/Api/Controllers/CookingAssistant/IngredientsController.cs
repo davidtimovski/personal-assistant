@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Application.Contracts.Common;
-using Application.Contracts.CookingAssistant.Ingredients;
-using Application.Contracts.CookingAssistant.Ingredients.Models;
+﻿using Application.Contracts;
+using CookingAssistant.Application.Contracts.Ingredients;
+using CookingAssistant.Application.Contracts.Ingredients.Models;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
@@ -93,7 +90,7 @@ public class IngredientsController : BaseController
         var suggestionsDto = _ingredientService.GetPublicSuggestions();
 
         suggestionsDto.Uncategorized.ForEach(suggestion =>
-        { 
+        {
             TranslateSuggestion(suggestion);
         });
 

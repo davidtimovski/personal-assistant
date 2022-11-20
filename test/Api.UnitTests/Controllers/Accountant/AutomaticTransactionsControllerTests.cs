@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Api.Controllers.Accountant;
+﻿using Api.Controllers.Accountant;
 using Api.UnitTests.Builders;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;

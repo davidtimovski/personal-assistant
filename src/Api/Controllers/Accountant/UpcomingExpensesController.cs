@@ -1,7 +1,6 @@
-﻿using System.Threading.Tasks;
-using Application.Contracts.Accountant.UpcomingExpenses;
-using Application.Contracts.Accountant.UpcomingExpenses.Models;
-using Application.Contracts.Common;
+﻿using Accountant.Application.Contracts.UpcomingExpenses;
+using Accountant.Application.Contracts.UpcomingExpenses.Models;
+using Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;

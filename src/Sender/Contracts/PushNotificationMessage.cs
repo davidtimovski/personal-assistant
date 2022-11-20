@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Sender.Contracts;
+﻿namespace Sender.Contracts;
 
 internal class PushNotificationMessage
 {

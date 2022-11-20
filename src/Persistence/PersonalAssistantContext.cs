@@ -1,8 +1,8 @@
-﻿using Domain.Entities.Accountant;
-using Domain.Entities.Common;
-using Domain.Entities.CookingAssistant;
-using Domain.Entities.ToDoAssistant;
-using Domain.Entities.Weatherman;
+﻿using Domain.Accountant;
+using Domain.Common;
+using Domain.CookingAssistant;
+using Domain.ToDoAssistant;
+using Domain.Weatherman;
 using Microsoft.EntityFrameworkCore;
 
 namespace Persistence;
@@ -60,7 +60,7 @@ public class PersonalAssistantContext : DbContext
             x.Ignore(e => e.IsShared);
         });
         modelBuilder.Entity<ToDoTask>(x =>
-        { 
+        {
             x.ToTable("todo_tasks");
 
             x.Property(e => e.ListId).IsRequired();
@@ -75,7 +75,7 @@ public class PersonalAssistantContext : DbContext
             x.Property(e => e.NotificationsEnabled).HasDefaultValue(true);
         });
         modelBuilder.Entity<Notification>(x =>
-        { 
+        {
             x.ToTable("todo_notifications");
         });
 
@@ -138,13 +138,13 @@ public class PersonalAssistantContext : DbContext
         modelBuilder.Entity<Debt>(x => { x.ToTable("accountant_debts"); });
         modelBuilder.Entity<AutomaticTransaction>(x => { x.ToTable("accountant_automatic_transactions"); });
         modelBuilder.Entity<DeletedEntity>(x =>
-        { 
+        {
             x.ToTable("accountant_deleted_entities");
             x.HasKey(e => new { e.UserId, e.EntityType, e.EntityId });
         });
 
         modelBuilder.Entity<Forecast>(x =>
-        { 
+        {
             x.ToTable("weatherman_forecasts");
             x.Property(b => b.Data).HasColumnType("json");
         });

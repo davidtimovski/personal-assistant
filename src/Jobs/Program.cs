@@ -1,8 +1,4 @@
-using System;
-using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Application.Contracts.Common;
+using Application.Contracts;
 using CloudinaryDotNet;
 using Infrastructure.Cdn;
 using Jobs;

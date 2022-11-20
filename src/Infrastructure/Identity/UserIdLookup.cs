@@ -1,5 +1,5 @@
 ﻿using System.Collections.Concurrent;
-using Application.Contracts.Common;
+using Application.Contracts;
 
 namespace Infrastructure.Identity;
 

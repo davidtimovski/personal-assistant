@@ -1,11 +1,5 @@
-﻿using System;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Dapper;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Npgsql;
@@ -113,7 +107,7 @@ public sealed class HostedService : IHostedService, IDisposable
             using var conn = new NpgsqlConnection(_configuration["ConnectionString"]);
             conn.Open();
 
-            var recipientSubs = conn.Query<Domain.Entities.Common.PushSubscription>(@"SELECT * FROM push_subscriptions WHERE user_id = @UserId AND application = @Application",
+            var recipientSubs = conn.Query<Domain.Common.PushSubscription>(@"SELECT * FROM push_subscriptions WHERE user_id = @UserId AND application = @Application",
                 new { pushNotification.UserId, pushNotification.Application });
 
             string appVapidConfigPrefix = pushNotification.Application.Replace(" ", string.Empty, StringComparison.Ordinal);

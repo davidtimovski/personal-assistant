@@ -1,8 +1,8 @@
-﻿using Application.Contracts.Common;
-using Application.Contracts.ToDoAssistant.Notifications;
+﻿using Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using ToDoAssistant.Application.Contracts.Notifications;
 
 namespace Api.Controllers.ToDoAssistant;
 

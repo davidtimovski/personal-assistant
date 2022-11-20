@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
     <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
@@ -36,10 +37,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Accountant.Application\Accountant.Application.csproj" />
+    <ProjectReference Include="..\Accountant.Persistence\Accountant.Persistence.csproj" />
+    <ProjectReference Include="..\CookingAssistant.Application\CookingAssistant.Application.csproj" />
+    <ProjectReference Include="..\CookingAssistant.Persistence\CookingAssistant.Persistence.csproj" />
     <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
-    <ProjectReference Include="..\Persistence\Persistence.csproj" />
-    <ProjectReference Include="..\Application\Application.csproj" />
+    <ProjectReference Include="..\ToDoAssistant.Application\ToDoAssistant.Application.csproj" />
+    <ProjectReference Include="..\ToDoAssistant.Persistence\ToDoAssistant.Persistence.csproj" />
+    <ProjectReference Include="..\Weatherman.Application\Weatherman.Application.csproj" />
+    <ProjectReference Include="..\Weatherman.Persistence\Weatherman.Persistence.csproj" />
   </ItemGroup>
 
   <ItemGroup>
