@@ -10,6 +10,7 @@ on:
       - "src/Application/**"
       - "src/Infrastructure/**"
       - "src/Persistence/**"
+      - "src/Core.Api/**"
 
 env:
   REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
