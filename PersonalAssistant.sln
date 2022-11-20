@@ -45,6 +45,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.github\workflows\cd_api.yml = .github\workflows\cd_api.yml
 		.github\workflows\cd_clientlogger.yml = .github\workflows\cd_clientlogger.yml
 		.github\workflows\cd_core.yml = .github\workflows\cd_core.yml
+		.github\workflows\cd_gateway.yml = .github\workflows\cd_gateway.yml
 		.github\workflows\cd_sender.yml = .github\workflows\cd_sender.yml
 		.github\workflows\cd_weatherman.yml = .github\workflows\cd_weatherman.yml
 		.github\workflows\ci_dev.yml = .github\workflows\ci_dev.yml
@@ -75,9 +76,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gateway", "src\Gateway\Gate
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weatherman.Api", "src\Weatherman.Api\Weatherman.Api.csproj", "{148946BF-9343-425F-9E05-AB4A74B8B598}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weatherman.Infrastructure", "src\Weatherman.Infrastructure\Weatherman.Infrastructure.csproj", "{40D19BA3-8007-4B4E-ACF6-49A38BA4BCA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weatherman.Infrastructure", "src\Weatherman.Infrastructure\Weatherman.Infrastructure.csproj", "{40D19BA3-8007-4B4E-ACF6-49A38BA4BCA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Api", "src\Core.Api\Core.Api.csproj", "{62429A2D-BABF-4F2C-B7DF-8FE51FDEC589}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Api", "src\Core.Api\Core.Api.csproj", "{62429A2D-BABF-4F2C-B7DF-8FE51FDEC589}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
