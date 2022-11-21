@@ -1,4 +1,4 @@
-CREATE TABLE public.accountant_categories
+CREATE TABLE accountant.categories
 (
     id serial NOT NULL,
     parent_id integer,
@@ -9,12 +9,12 @@ CREATE TABLE public.accountant_categories
     is_tax boolean NOT NULL DEFAULT FALSE,
     created_date timestamp with time zone NOT NULL,
     modified_date timestamp with time zone NOT NULL,
-    CONSTRAINT pk_accountant_categories PRIMARY KEY (id),
-    CONSTRAINT fk_accountant_categories_accountant_categories_parent_id FOREIGN KEY (parent_id)
-    REFERENCES public.accountant_categories (id) MATCH SIMPLE
+    CONSTRAINT pk_categories PRIMARY KEY (id),
+    CONSTRAINT fk_categories_categories_parent_id FOREIGN KEY (parent_id)
+    REFERENCES accountant.categories (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE SET NULL,
-    CONSTRAINT fk_accountant_categories_users_user_id FOREIGN KEY (user_id)
+    CONSTRAINT fk_categories_users_user_id FOREIGN KEY (user_id)
     REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE
@@ -24,15 +24,15 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE public.accountant_categories
+ALTER TABLE accountant.categories
     OWNER to personalassistant;
 
-CREATE INDEX ix_accountant_categories_parent_id
-    ON public.accountant_categories USING btree
+CREATE INDEX ix_categories_parent_id
+    ON accountant.categories USING btree
     (parent_id)
     TABLESPACE pg_default;
 
-CREATE INDEX ix_accountant_categories_user_id
-    ON public.accountant_categories USING btree
+CREATE INDEX ix_categories_user_id
+    ON accountant.categories USING btree
     (user_id)
     TABLESPACE pg_default;

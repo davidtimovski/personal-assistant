@@ -1,4 +1,4 @@
-CREATE TABLE public.cooking_recipes
+CREATE TABLE cooking.recipes
 (
     id serial NOT NULL,
     user_id integer NOT NULL,
@@ -13,8 +13,8 @@ CREATE TABLE public.cooking_recipes
     last_opened_date timestamp with time zone NOT NULL,
     created_date timestamp with time zone NOT NULL,
     modified_date timestamp with time zone NOT NULL,
-    CONSTRAINT pk_cooking_recipes PRIMARY KEY (id),
-    CONSTRAINT fk_cooking_recipes_users_user_id FOREIGN KEY (user_id)
+    CONSTRAINT pk_recipes PRIMARY KEY (id),
+    CONSTRAINT fk_recipes_users_user_id FOREIGN KEY (user_id)
     REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE
@@ -24,10 +24,10 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE public.cooking_recipes
+ALTER TABLE cooking.recipes
     OWNER to personalassistant;
 
-CREATE INDEX ix_cooking_recipes_user_id
-    ON public.cooking_recipes USING btree
+CREATE INDEX ix_recipes_user_id
+    ON cooking.recipes USING btree
     (user_id)
     TABLESPACE pg_default;

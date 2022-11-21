@@ -1,4 +1,4 @@
-CREATE TABLE public.accountant_accounts
+CREATE TABLE accountant.accounts
 (
     id serial NOT NULL,
     user_id integer NOT NULL,
@@ -8,8 +8,8 @@ CREATE TABLE public.accountant_accounts
     stock_price decimal(10, 4),
     created_date timestamp with time zone NOT NULL,
     modified_date timestamp with time zone NOT NULL,
-    CONSTRAINT pk_accountant_accounts PRIMARY KEY (id),
-    CONSTRAINT fk_accountant_accounts_users_user_id FOREIGN KEY (user_id)
+    CONSTRAINT pk_accounts PRIMARY KEY (id),
+    CONSTRAINT fk_accounts_users_user_id FOREIGN KEY (user_id)
     REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE
@@ -19,10 +19,10 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE public.accountant_accounts
+ALTER TABLE accountant.accounts
     OWNER to personalassistant;
 
-CREATE INDEX ix_accountant_accounts_user_id
-    ON public.accountant_accounts USING btree
+CREATE INDEX ix_accounts_user_id
+    ON accountant.accounts USING btree
     (user_id)
     TABLESPACE pg_default;

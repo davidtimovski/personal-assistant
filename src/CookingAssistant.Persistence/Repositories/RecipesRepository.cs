@@ -18,17 +18,17 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         var recipes = conn.Query<Recipe>(@"SELECT r.id, r.user_id, r.name, r.image_uri, r.last_opened_date, COUNT(t.id) AS ingredients_missing
-                                           FROM cooking_recipes AS r
-                                           LEFT JOIN cooking_recipes_ingredients AS ri ON r.id = ri.recipe_id
-                                           LEFT JOIN cooking_ingredients AS i ON ri.ingredient_id = i.id
-                                           LEFT JOIN cooking_ingredients_tasks AS it ON i.id = it.ingredient_id AND it.user_id = @UserId
-                                           LEFT JOIN todo_tasks AS t ON it.task_id = t.id AND t.is_completed = FALSE
-                                           LEFT JOIN cooking_shares AS s ON r.id = s.recipe_id
+                                           FROM cooking.recipes AS r
+                                           LEFT JOIN cooking.recipes_ingredients AS ri ON r.id = ri.recipe_id
+                                           LEFT JOIN cooking.ingredients AS i ON ri.ingredient_id = i.id
+                                           LEFT JOIN cooking.ingredients_tasks AS it ON i.id = it.ingredient_id AND it.user_id = @UserId
+                                           LEFT JOIN todo.tasks AS t ON it.task_id = t.id AND t.is_completed = FALSE
+                                           LEFT JOIN cooking.shares AS s ON r.id = s.recipe_id
                                            WHERE r.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted)
                                            GROUP BY r.id, r.name", new { UserId = userId }).ToList();
 
         var recipeIds = recipes.Select(x => x.Id).ToArray();
-        var shares = conn.Query<RecipeShare>(@"SELECT * FROM cooking_shares WHERE recipe_id = ANY(@RecipeIds)", new { RecipeIds = recipeIds });
+        var shares = conn.Query<RecipeShare>(@"SELECT * FROM cooking.shares WHERE recipe_id = ANY(@RecipeIds)", new { RecipeIds = recipeIds });
 
         foreach (var recipe in recipes)
         {
@@ -42,7 +42,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.QueryFirstOrDefault<Recipe>(@"SELECT * FROM cooking_recipes WHERE id = @Id", new { Id = id });
+        return conn.QueryFirstOrDefault<Recipe>(@"SELECT * FROM cooking.recipes WHERE id = @Id", new { Id = id });
     }
 
     public Recipe Get(int id, int userId)
@@ -50,10 +50,10 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         const string recipeSql = @"SELECT r.*, u.id, dp.*
-                                   FROM cooking_recipes AS r 
+                                   FROM cooking.recipes AS r 
                                    INNER JOIN users AS u ON r.user_id = u.id
-                                   LEFT JOIN cooking_dietary_profiles AS dp ON dp.user_id = @UserId
-                                   LEFT JOIN cooking_shares AS s ON r.id = s.recipe_id
+                                   LEFT JOIN cooking.dietary_profiles AS dp ON dp.user_id = @UserId
+                                   LEFT JOIN cooking.shares AS s ON r.id = s.recipe_id
                                    WHERE r.id = @Id AND (r.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))";
 
         var recipes = conn.Query<Recipe, User, DietaryProfile, Recipe>(recipeSql,
@@ -73,20 +73,20 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
 
         if (recipe.UserId == userId)
         {
-            conn.Execute(@"UPDATE cooking_recipes SET last_opened_date = @LastOpenedDate WHERE id = @Id", new { Id = id, LastOpenedDate = DateTime.UtcNow });
+            conn.Execute(@"UPDATE cooking.recipes SET last_opened_date = @LastOpenedDate WHERE id = @Id", new { Id = id, LastOpenedDate = DateTime.UtcNow });
         }
         else
         {
-            conn.Execute(@"UPDATE cooking_shares SET last_opened_date = @LastOpenedDate WHERE recipe_id = @Id", new { Id = id, LastOpenedDate = DateTime.UtcNow });
+            conn.Execute(@"UPDATE cooking.shares SET last_opened_date = @LastOpenedDate WHERE recipe_id = @Id", new { Id = id, LastOpenedDate = DateTime.UtcNow });
         }
 
-        recipe.Shares = conn.Query<RecipeShare>(@"SELECT * FROM cooking_shares WHERE recipe_id = @Id", new { Id = id }).ToList();
+        recipe.Shares = conn.Query<RecipeShare>(@"SELECT * FROM cooking.shares WHERE recipe_id = @Id", new { Id = id }).ToList();
 
         const string recipeIngredientsSql = @"SELECT ri.amount, ri.unit, i.*, it.task_id, t.id, t.is_completed
-                                              FROM cooking_recipes_ingredients AS ri
-                                              INNER JOIN cooking_ingredients AS i ON ri.ingredient_id = i.id
-                                              LEFT JOIN cooking_ingredients_tasks AS it ON i.id = it.ingredient_id AND it.user_id = @UserId
-                                              LEFT JOIN todo_tasks AS t ON it.task_id = t.id
+                                              FROM cooking.recipes_ingredients AS ri
+                                              INNER JOIN cooking.ingredients AS i ON ri.ingredient_id = i.id
+                                              LEFT JOIN cooking.ingredients_tasks AS it ON i.id = it.ingredient_id AND it.user_id = @UserId
+                                              LEFT JOIN todo.tasks AS t ON it.task_id = t.id
                                               WHERE ri.recipe_id = @RecipeId";
 
         var recipeIngredients = conn.Query<RecipeIngredient, Ingredient, ToDoTask, RecipeIngredient>(recipeIngredientsSql,
@@ -110,18 +110,18 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         var recipe = conn.QueryFirstOrDefault<Recipe>(@"SELECT r.* 
-                                                        FROM cooking_recipes AS r 
-                                                        LEFT JOIN cooking_shares AS s ON r.id = s.recipe_id
+                                                        FROM cooking.recipes AS r 
+                                                        LEFT JOIN cooking.shares AS s ON r.id = s.recipe_id
                                                         WHERE id = @Id AND (r.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))",
             new { Id = id, UserId = userId });
 
         if (recipe != null)
         {
-            recipe.Shares = conn.Query<RecipeShare>(@"SELECT * FROM cooking_shares WHERE recipe_id = @Id", new { Id = id }).ToList();
+            recipe.Shares = conn.Query<RecipeShare>(@"SELECT * FROM cooking.shares WHERE recipe_id = @Id", new { Id = id }).ToList();
 
             const string recipeIngredientsSql = @"SELECT ri.amount, ri.unit, i.*
-                                                  FROM cooking_recipes_ingredients AS ri
-                                                  INNER JOIN cooking_ingredients AS i ON ri.ingredient_id = i.id
+                                                  FROM cooking.recipes_ingredients AS ri
+                                                  INNER JOIN cooking.ingredients AS i ON ri.ingredient_id = i.id
                                                   WHERE ri.recipe_id = @RecipeId";
 
             var recipeIngredients = conn.Query<RecipeIngredient, Ingredient, RecipeIngredient>(recipeIngredientsSql,
@@ -142,8 +142,8 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         const string query = @"SELECT DISTINCT r.*, u.id, u.email, u.image_uri
-                               FROM cooking_recipes AS r
-                               LEFT JOIN cooking_shares AS s ON r.id = s.recipe_id
+                               FROM cooking.recipes AS r
+                               LEFT JOIN cooking.shares AS s ON r.id = s.recipe_id
                                INNER JOIN users AS u ON r.user_id = u.id
                                WHERE r.id = @Id AND (r.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))";
 
@@ -160,7 +160,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         const string query = @"SELECT s.*, u.id, u.email, u.image_uri
-                               FROM cooking_shares AS s
+                               FROM cooking.shares AS s
                                INNER JOIN users AS u ON s.user_id = u.id
                                WHERE s.recipe_id = @RecipeId AND s.is_accepted IS NOT FALSE
                                ORDER BY (CASE WHEN s.is_accepted THEN 1 ELSE 2 END) ASC, s.created_date";
@@ -178,8 +178,8 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         const string query = @"SELECT s.*, r.name, u.name
-                               FROM cooking_shares AS s
-                               INNER JOIN cooking_recipes AS r ON s.recipe_id = r.id
+                               FROM cooking.shares AS s
+                               INNER JOIN cooking.recipes AS r ON s.recipe_id = r.id
                                INNER JOIN users AS u ON r.user_id = u.id
                                WHERE s.user_id = @UserId
                                ORDER BY s.modified_date DESC";
@@ -197,7 +197,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cooking_shares WHERE user_id = @UserId AND is_accepted IS NULL",
+        return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cooking.shares WHERE user_id = @UserId AND is_accepted IS NULL",
             new { UserId = userId });
     }
 
@@ -206,8 +206,8 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         return !conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                           FROM cooking_recipes AS r
-                                           INNER JOIN cooking_shares AS s on r.id = s.recipe_id
+                                           FROM cooking.recipes AS r
+                                           INNER JOIN cooking.shares AS s on r.id = s.recipe_id
                                            WHERE r.user_id = @UserId AND s.user_id = @ShareWithId AND s.is_accepted = FALSE",
             new { ShareWithId = shareWithId, UserId = userId });
     }
@@ -217,8 +217,8 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.QueryFirstOrDefault<Recipe>(@"SELECT r.id, r.name
-                                                  FROM cooking_recipes AS r
-                                                  LEFT JOIN cooking_shares AS s on r.id = s.recipe_id
+                                                  FROM cooking.recipes AS r
+                                                  LEFT JOIN cooking.shares AS s on r.id = s.recipe_id
                                                   WHERE r.id = @Id AND (r.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))",
             new { Id = id, UserId = userId });
     }
@@ -228,8 +228,8 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         const string query = @"SELECT sr.*, r.name, u.name
-                               FROM cooking_send_requests AS sr
-                               INNER JOIN cooking_recipes AS r ON sr.recipe_id = r.id
+                               FROM cooking.send_requests AS sr
+                               INNER JOIN cooking.recipes AS r ON sr.recipe_id = r.id
                                INNER JOIN users AS u ON r.user_id = u.id
                                WHERE sr.user_id = @UserId
                                ORDER BY sr.modified_date DESC";
@@ -247,7 +247,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cooking_send_requests WHERE user_id = @UserId AND is_declined = FALSE",
+        return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cooking.send_requests WHERE user_id = @UserId AND is_declined = FALSE",
             new { UserId = userId });
     }
 
@@ -255,7 +255,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM cooking_send_requests WHERE recipe_id = @RecipeId AND user_id = @UserId AND is_declined = FALSE",
+        return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM cooking.send_requests WHERE recipe_id = @RecipeId AND user_id = @UserId AND is_declined = FALSE",
             new { RecipeId = id, UserId = userId });
     }
 
@@ -263,11 +263,11 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        var userThatsImportingHasIngredients = conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM cooking_ingredients WHERE user_id = @UserId", new { UserId = userId });
+        var userThatsImportingHasIngredients = conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM cooking.ingredients WHERE user_id = @UserId", new { UserId = userId });
 
         var recipeHasCustomIngredients = conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                                                    FROM cooking_recipes_ingredients AS ri
-                                                                    INNER JOIN cooking_ingredients AS i ON ri.ingredient_id = i.id
+                                                                    FROM cooking.recipes_ingredients AS ri
+                                                                    INNER JOIN cooking.ingredients AS i ON ri.ingredient_id = i.id
                                                                     WHERE recipe_id = @RecipeId AND user_id != 1", new { RecipeId = id });
 
         return userThatsImportingHasIngredients && recipeHasCustomIngredients;
@@ -277,7 +277,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        var recipe = conn.QueryFirstOrDefault<Recipe>(@"SELECT id, user_id, name, description, image_uri FROM cooking_recipes WHERE id = @Id", new { Id = id });
+        var recipe = conn.QueryFirstOrDefault<Recipe>(@"SELECT id, user_id, name, description, image_uri FROM cooking.recipes WHERE id = @Id", new { Id = id });
 
         if (recipe == null)
         {
@@ -285,8 +285,8 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         }
 
         const string recipeIngredientsSql = @"SELECT ri.ingredient_id, i.*
-                                              FROM cooking_recipes_ingredients AS ri
-                                              INNER JOIN cooking_ingredients AS i ON ri.ingredient_id = i.id
+                                              FROM cooking.recipes_ingredients AS ri
+                                              INNER JOIN cooking.ingredients AS i ON ri.ingredient_id = i.id
                                               WHERE ri.recipe_id = @RecipeId AND i.user_id = @UserId";
 
         var recipeIngredients = conn.Query<RecipeIngredient, Ingredient, RecipeIngredient>(recipeIngredientsSql,
@@ -305,7 +305,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.Query<string>(@"SELECT image_uri FROM cooking_recipes WHERE user_id = @UserId",
+        return conn.Query<string>(@"SELECT image_uri FROM cooking.recipes WHERE user_id = @UserId",
             new { UserId = userId });
     }
 
@@ -313,7 +313,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<string>(@"SELECT image_uri FROM cooking_recipes WHERE id = @Id",
+        return conn.ExecuteScalar<string>(@"SELECT image_uri FROM cooking.recipes WHERE id = @Id",
             new { Id = id });
     }
 
@@ -321,7 +321,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM cooking_recipes WHERE id = @Id AND user_id = @UserId",
+        return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM cooking.recipes WHERE id = @Id AND user_id = @UserId",
             new { Id = id, UserId = userId });
     }
 
@@ -330,8 +330,8 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                          FROM cooking_recipes AS r
-                                          LEFT JOIN cooking_shares AS s ON r.id = s.recipe_id
+                                          FROM cooking.recipes AS r
+                                          LEFT JOIN cooking.shares AS s ON r.id = s.recipe_id
                                           WHERE r.id = @Id AND (r.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))",
             new { Id = id, UserId = userId });
     }
@@ -341,8 +341,8 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                          FROM cooking_recipes AS r
-                                          LEFT JOIN cooking_shares AS s ON r.id = s.recipe_id
+                                          FROM cooking.recipes AS r
+                                          LEFT JOIN cooking.shares AS s ON r.id = s.recipe_id
                                           WHERE UPPER(r.name) = UPPER(@Name) AND (r.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))",
             new { Name = name, UserId = userId });
     }
@@ -352,8 +352,8 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                          FROM cooking_recipes AS r
-                                          LEFT JOIN cooking_shares AS s ON r.id = s.recipe_id
+                                          FROM cooking.recipes AS r
+                                          LEFT JOIN cooking.shares AS s ON r.id = s.recipe_id
                                           WHERE r.id != @Id AND UPPER(r.name) = UPPER(@Name) AND (r.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))",
             new { Id = id, Name = name, UserId = userId });
     }
@@ -362,7 +362,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cooking_recipes WHERE user_id = @UserId", new { UserId = userId });
+        return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cooking.recipes WHERE user_id = @UserId", new { UserId = userId });
     }
 
     public bool UserHasBlockedSharing(int recipeId, int userId, int sharedWithId)
@@ -370,8 +370,8 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                          FROM cooking_shares
-                                          WHERE user_id = @SharedWithId AND is_accepted = FALSE AND (SELECT user_id FROM cooking_recipes WHERE id = @RecipeId) = @SharerId",
+                                          FROM cooking.shares
+                                          WHERE user_id = @SharedWithId AND is_accepted = FALSE AND (SELECT user_id FROM cooking.recipes WHERE id = @RecipeId) = @SharerId",
             new { SharedWithId = sharedWithId, SharerId = userId, RecipeId = recipeId });
     }
 
@@ -380,12 +380,12 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         bool canSend = !conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                                   FROM cooking_send_requests
-                                                   WHERE user_id = @SendToId AND is_declined = TRUE AND (SELECT user_id FROM cooking_recipes WHERE id = @RecipeId) = @SenderId",
+                                                   FROM cooking.send_requests
+                                                   WHERE user_id = @SendToId AND is_declined = TRUE AND (SELECT user_id FROM cooking.recipes WHERE id = @RecipeId) = @SenderId",
             new { SendToId = sendToId, SenderId = userId, RecipeId = recipeId });
 
         bool alreadySent = conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                                      FROM cooking_send_requests
+                                                      FROM cooking.send_requests
                                                       WHERE recipe_id = @RecipeId AND user_id = @SendToId",
             new { RecipeId = recipeId, SendToId = sendToId });
 
@@ -398,12 +398,12 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
 
         return conn.Query<User>(@"SELECT u.*
                                   FROM users AS u
-                                  INNER JOIN cooking_shares AS s ON u.id = s.user_id
+                                  INNER JOIN cooking.shares AS s ON u.id = s.user_id
                                   WHERE u.id != @ExcludeUserId AND s.recipe_id = @RecipeId AND s.is_accepted AND u.todo_notifications_enabled
                                   UNION
                                   SELECT u.*
                                   FROM users AS u
-                                  INNER JOIN cooking_recipes AS r ON u.id = r.user_id
+                                  INNER JOIN cooking.recipes AS r ON u.id = r.user_id
                                   WHERE u.id != @ExcludeUserId AND r.id = @RecipeId AND u.todo_notifications_enabled",
             new { RecipeId = id, ExcludeUserId = excludeUserId });
     }
@@ -413,7 +413,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
                                           FROM users AS u
-                                          INNER JOIN cooking_shares AS s ON u.id = s.user_id
+                                          INNER JOIN cooking.shares AS s ON u.id = s.user_id
                                           WHERE u.id = @UserId AND s.recipe_id = @RecipeId AND s.is_accepted AND u.todo_notifications_enabled",
             new { RecipeId = id, UserId = userId });
     }
@@ -424,7 +424,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
 
         return conn.Query<User>(@"SELECT u.*
                                   FROM users AS u
-                                  INNER JOIN cooking_shares AS s ON u.id = s.user_id
+                                  INNER JOIN cooking.shares AS s ON u.id = s.user_id
                                   WHERE s.recipe_id = @RecipeId AND s.is_accepted AND u.todo_notifications_enabled",
             new { RecipeId = id });
     }
@@ -435,7 +435,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
 
         return conn.Query<User>(@"SELECT u.*
                                   FROM users AS u
-                                  INNER JOIN cooking_send_requests AS sr ON u.id = sr.user_id
+                                  INNER JOIN cooking.send_requests AS sr ON u.id = sr.user_id
                                   WHERE sr.recipe_id = @RecipeId AND u.cooking_notifications_enabled",
             new { RecipeId = id });
     }
@@ -544,10 +544,10 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
         var transaction = conn.BeginTransaction();
 
-        await conn.ExecuteAsync(@"DELETE FROM cooking_shares
+        await conn.ExecuteAsync(@"DELETE FROM cooking.shares
                                   WHERE recipe_id = @RecipeId AND user_id = @UserId AND is_accepted IS DISTINCT FROM FALSE", removedShares, transaction);
 
-        await conn.ExecuteAsync(@"INSERT INTO cooking_shares (recipe_id, user_id, last_opened_date, created_date, modified_date) 
+        await conn.ExecuteAsync(@"INSERT INTO cooking.shares (recipe_id, user_id, last_opened_date, created_date, modified_date) 
                                   VALUES (@RecipeId, @UserId, @LastOpenedDate, @CreatedDate, @ModifiedDate)", newShares, transaction);
 
         transaction.Commit();
@@ -567,7 +567,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
 
         var share = conn.QueryFirstOrDefault<RecipeShare>(@"SELECT * 
-                                                            FROM cooking_shares 
+                                                            FROM cooking.shares 
                                                             WHERE recipe_id = @RecipeId AND user_id = @UserId",
             new { RecipeId = id, UserId = userId });
 
@@ -744,7 +744,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         bool exists;
         do
         {
-            exists = conn.ExecuteScalar<bool>($@"SELECT COUNT(*) FROM cooking_{table} WHERE UPPER(name) = UPPER(@Name) AND user_id = @UserId",
+            exists = conn.ExecuteScalar<bool>($@"SELECT COUNT(*) FROM cooking.{table} WHERE UPPER(name) = UPPER(@Name) AND user_id = @UserId",
                 new { Name = currentName, UserId = userId });
 
             if (exists)

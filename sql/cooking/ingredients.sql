@@ -1,4 +1,4 @@
-CREATE TABLE public.cooking_ingredients
+CREATE TABLE cooking.ingredients
 (
     id serial NOT NULL,
     parent_id integer,
@@ -32,22 +32,22 @@ CREATE TABLE public.cooking_ingredients
     currency character varying(3) COLLATE pg_catalog."default",
     created_date timestamp with time zone NOT NULL,
     modified_date timestamp with time zone NOT NULL,
-    CONSTRAINT pk_cooking_ingredients PRIMARY KEY (id),
-    CONSTRAINT uq_cooking_ingredients_name_type UNIQUE (name, type),
-    CONSTRAINT fk_cooking_ingredients_cooking_ingredients_parent_id FOREIGN KEY (parent_id)
-    REFERENCES public.cooking_ingredients (id) MATCH SIMPLE
+    CONSTRAINT pk_ingredients PRIMARY KEY (id),
+    CONSTRAINT uq_ingredients_name_type UNIQUE (name, type),
+    CONSTRAINT fk_ingredients_ingredients_parent_id FOREIGN KEY (parent_id)
+    REFERENCES cooking.ingredients (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE,
-    CONSTRAINT fk_cooking_ingredients_users_user_id FOREIGN KEY (user_id)
+    CONSTRAINT fk_ingredients_users_user_id FOREIGN KEY (user_id)
     REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE,
-    CONSTRAINT fk_cooking_ingredients_cooking_ingredient_categories_category_id FOREIGN KEY (category_id)
-    REFERENCES public.cooking_ingredient_categories (id) MATCH SIMPLE
+    CONSTRAINT fk_ingredients_ingredient_categories_category_id FOREIGN KEY (category_id)
+    REFERENCES cooking.ingredient_categories (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE SET NULL,
-    CONSTRAINT fk_cooking_ingredients_cooking_ingredient_categories_brand_id FOREIGN KEY (brand_id)
-    REFERENCES public.cooking_ingredient_categories (id) MATCH SIMPLE
+    CONSTRAINT fk_ingredients_ingredient_categories_brand_id FOREIGN KEY (brand_id)
+    REFERENCES cooking.ingredient_categories (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE SET NULL
 )
@@ -56,10 +56,10 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE public.cooking_ingredients
+ALTER TABLE cooking.ingredients
     OWNER to personalassistant;
 
-CREATE INDEX ix_cooking_ingredients_user_id
-    ON public.cooking_ingredients USING btree
+CREATE INDEX ix_ingredients_user_id
+    ON cooking.ingredients USING btree
     (user_id)
     TABLESPACE pg_default;

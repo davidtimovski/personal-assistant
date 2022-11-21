@@ -1,4 +1,4 @@
-CREATE TABLE public.accountant_debts
+CREATE TABLE accountant.debts
 (
     id serial NOT NULL,
     user_id integer NOT NULL,
@@ -9,8 +9,8 @@ CREATE TABLE public.accountant_debts
     user_is_debtor boolean NOT NULL DEFAULT FALSE,
     created_date timestamp with time zone NOT NULL,
     modified_date timestamp with time zone NOT NULL,
-    CONSTRAINT pk_accountant_debts PRIMARY KEY (id),
-    CONSTRAINT fk_accountant_debts_users_user_id FOREIGN KEY (user_id)
+    CONSTRAINT pk_debts PRIMARY KEY (id),
+    CONSTRAINT fk_debts_users_user_id FOREIGN KEY (user_id)
     REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE
@@ -20,10 +20,10 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE public.accountant_debts
+ALTER TABLE accountant.debts
     OWNER to personalassistant;
 
-CREATE INDEX ix_accountant_debts_user_id
-    ON public.accountant_debts USING btree
+CREATE INDEX ix_debts_user_id
+    ON accountant.debts USING btree
     (user_id)
     TABLESPACE pg_default;

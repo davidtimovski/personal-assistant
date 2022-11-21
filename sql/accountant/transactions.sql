@@ -1,4 +1,4 @@
-CREATE TABLE public.accountant_transactions
+CREATE TABLE accountant.transactions
 (
     id serial NOT NULL,
     from_account_id integer,
@@ -18,17 +18,17 @@ CREATE TABLE public.accountant_transactions
 	generated boolean NOT NULL DEFAULT FALSE,
     created_date timestamp with time zone NOT NULL,
     modified_date timestamp with time zone NOT NULL,
-    CONSTRAINT pk_accountant_transactions PRIMARY KEY (id),
-    CONSTRAINT fk_accountant_transactions_accountant_accounts_to_account_id FOREIGN KEY (to_account_id)
-    REFERENCES public.accountant_accounts (id) MATCH SIMPLE
+    CONSTRAINT pk_transactions PRIMARY KEY (id),
+    CONSTRAINT fk_transactions_accounts_to_account_id FOREIGN KEY (to_account_id)
+    REFERENCES accountant.accounts (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE,
-    CONSTRAINT fk_accountant_transactions_accountant_accounts_from_account_id FOREIGN KEY (from_account_id)
-    REFERENCES public.accountant_accounts (id) MATCH SIMPLE
+    CONSTRAINT fk_transactions_accounts_from_account_id FOREIGN KEY (from_account_id)
+    REFERENCES accountant.accounts (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE,
-    CONSTRAINT fk_accountant_transactions_accountant_categories_category_id FOREIGN KEY (category_id)
-    REFERENCES public.accountant_categories (id) MATCH SIMPLE
+    CONSTRAINT fk_transactions_categories_category_id FOREIGN KEY (category_id)
+    REFERENCES accountant.categories (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE
 )
@@ -37,20 +37,20 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE public.accountant_transactions
+ALTER TABLE accountant.transactions
     OWNER to personalassistant;
 
-CREATE INDEX ix_accountant_transactions_from_account_id
-    ON public.accountant_transactions USING btree
+CREATE INDEX ix_transactions_from_account_id
+    ON accountant.transactions USING btree
     (from_account_id)
     TABLESPACE pg_default;
 
-CREATE INDEX ix_accountant_transactions_to_account_id
-    ON public.accountant_transactions USING btree
+CREATE INDEX ix_transactions_to_account_id
+    ON accountant.transactions USING btree
     (to_account_id)
     TABLESPACE pg_default;
     
-CREATE INDEX ix_accountant_transactions_category_id
-    ON public.accountant_transactions USING btree
+CREATE INDEX ix_transactions_category_id
+    ON accountant.transactions USING btree
     (category_id)
     TABLESPACE pg_default;

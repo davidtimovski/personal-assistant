@@ -1,4 +1,4 @@
-CREATE TABLE public.todo_tasks
+CREATE TABLE todo.tasks
 (
     id serial NOT NULL,
     list_id integer NOT NULL,
@@ -12,16 +12,16 @@ CREATE TABLE public.todo_tasks
     order smallint NOT NULL,
     created_date timestamp with time zone NOT NULL,
     modified_date timestamp with time zone NOT NULL,
-    CONSTRAINT pk_todo_tasks PRIMARY KEY (id),
-    CONSTRAINT fk_todo_tasks_todo_lists_list_id FOREIGN KEY (list_id)
-    REFERENCES public.todo_lists (id) MATCH SIMPLE
+    CONSTRAINT pk_tasks PRIMARY KEY (id),
+    CONSTRAINT fk_tasks_lists_list_id FOREIGN KEY (list_id)
+    REFERENCES todo.lists (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE,
-    CONSTRAINT fk_todo_tasks_users_private_to_user_id FOREIGN KEY (private_to_user_id)
+    CONSTRAINT fk_tasks_users_private_to_user_id FOREIGN KEY (private_to_user_id)
     REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE,
-    CONSTRAINT fk_todo_tasks_users_assigned_to_user_id FOREIGN KEY (assigned_to_user_id)
+    CONSTRAINT fk_tasks_users_assigned_to_user_id FOREIGN KEY (assigned_to_user_id)
     REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE
@@ -31,10 +31,10 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE public.todo_tasks
+ALTER TABLE todo.tasks
     OWNER to personalassistant;
 
-CREATE INDEX ix_todo_tasks_list_id
-    ON public.todo_tasks USING btree
+CREATE INDEX ix_tasks_list_id
+    ON todo.tasks USING btree
     (list_id)
     TABLESPACE pg_default;

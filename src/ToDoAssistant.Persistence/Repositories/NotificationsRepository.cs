@@ -17,7 +17,7 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
         using IDbConnection conn = OpenConnection();
 
         const string query = @"SELECT n.*, u.id, u.name, u.image_uri
-                               FROM todo_notifications AS n
+                               FROM todo.notifications AS n
                                INNER JOIN users AS u ON n.action_user_id = u.id
                                WHERE user_id = @UserId
                                ORDER BY modified_date DESC";
@@ -33,7 +33,7 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
         var unseenNotificationIds = notifications.Where(x => !x.IsSeen).Select(x => x.Id).ToList();
         if (unseenNotificationIds.Count > 0)
         {
-            conn.Execute(@"UPDATE todo_notifications SET is_seen = TRUE WHERE id = ANY(@UnseenNotificationIds)",
+            conn.Execute(@"UPDATE todo.notifications SET is_seen = TRUE WHERE id = ANY(@UnseenNotificationIds)",
                 new { UnseenNotificationIds = unseenNotificationIds });
         }
 
@@ -44,7 +44,7 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM todo_notifications WHERE user_id = @UserId AND is_seen = FALSE",
+        return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM todo.notifications WHERE user_id = @UserId AND is_seen = FALSE",
             new { UserId = userId });
     }
 
@@ -52,7 +52,7 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        await conn.ExecuteAsync(@"DELETE FROM todo_notifications WHERE user_id = @UserId AND list_id = @ListId",
+        await conn.ExecuteAsync(@"DELETE FROM todo.notifications WHERE user_id = @UserId AND list_id = @ListId",
             new { UserId = userId, ListId = listId });
     }
 
@@ -61,7 +61,7 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
         using IDbConnection conn = OpenConnection();
 
         var id = await conn.QueryFirstOrDefaultAsync<int?>(@"SELECT id
-                                                             FROM todo_notifications 
+                                                             FROM todo.notifications 
                                                              WHERE user_id = @UserId AND message = @Message AND is_seen = FALSE",
             new { notification.UserId, notification.Message });
 

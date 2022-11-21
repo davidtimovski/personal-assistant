@@ -16,7 +16,7 @@ public class DietaryProfilesRepository : BaseRepository, IDietaryProfilesReposit
         using IDbConnection conn = OpenConnection();
 
         const string query = @"SELECT dp.*, u.id, u.imperial_system
-                               FROM cooking_dietary_profiles AS dp
+                               FROM cooking.dietary_profiles AS dp
                                INNER JOIN users AS u ON dp.user_id = u.id
                                WHERE dp.user_id = @UserId";
 

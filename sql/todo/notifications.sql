@@ -1,4 +1,4 @@
-CREATE TABLE public.todo_notifications
+CREATE TABLE todo.notifications
 (
     id serial NOT NULL,
     user_id integer NOT NULL,
@@ -9,21 +9,21 @@ CREATE TABLE public.todo_notifications
     is_seen boolean NOT NULL DEFAULT false,
     created_date timestamp with time zone NOT NULL,
     modified_date timestamp with time zone NOT NULL,
-    CONSTRAINT pk_todo_notifications PRIMARY KEY (id),
-    CONSTRAINT fk_todo_notifications_users_user_id FOREIGN KEY (user_id)
+    CONSTRAINT pk_notifications PRIMARY KEY (id),
+    CONSTRAINT fk_notifications_users_user_id FOREIGN KEY (user_id)
     REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE,
-    CONSTRAINT fk_todo_notifications_aspmetusers_action_user_id FOREIGN KEY (action_user_id)
+    CONSTRAINT fk_notifications_aspmetusers_action_user_id FOREIGN KEY (action_user_id)
     REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE,
-    CONSTRAINT fk_todo_notifications_todo_lists_list_id FOREIGN KEY (list_id)
-    REFERENCES public.todo_lists (id) MATCH SIMPLE
+    CONSTRAINT fk_notifications_lists_list_id FOREIGN KEY (list_id)
+    REFERENCES todo.lists (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE SET NULL,
-    CONSTRAINT fk_todo_notifications_todo_tasks_task_id FOREIGN KEY (task_id)
-    REFERENCES public.todo_tasks (id) MATCH SIMPLE
+    CONSTRAINT fk_notifications_tasks_task_id FOREIGN KEY (task_id)
+    REFERENCES todo.tasks (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE SET NULL
 )
@@ -32,10 +32,10 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE public.todo_notifications
+ALTER TABLE todo.notifications
     OWNER to personalassistant;
 
-CREATE INDEX ix_todo_notifications_user_id
-    ON public.todo_notifications USING btree
+CREATE INDEX ix_notifications_user_id
+    ON todo.notifications USING btree
     (user_id)
     TABLESPACE pg_default;

@@ -1,4 +1,4 @@
-CREATE TABLE public.todo_lists
+CREATE TABLE todo.lists
 (
     id serial NOT NULL,
     user_id integer NOT NULL,
@@ -10,8 +10,8 @@ CREATE TABLE public.todo_lists
     is_archived boolean NOT NULL DEFAULT FALSE,
     created_date timestamp with time zone NOT NULL,
     modified_date timestamp with time zone NOT NULL,
-    CONSTRAINT pk_todo_lists PRIMARY KEY (id),
-    CONSTRAINT fk_todo_lists_users_user_id FOREIGN KEY (user_id)
+    CONSTRAINT pk_lists PRIMARY KEY (id),
+    CONSTRAINT fk_lists_users_user_id FOREIGN KEY (user_id)
     REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE
@@ -21,10 +21,10 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE public.todo_lists
+ALTER TABLE todo.lists
     OWNER to personalassistant;
 
-CREATE INDEX ix_todo_lists_user_id
-    ON public.todo_lists USING btree
+CREATE INDEX ix_lists_user_id
+    ON todo.lists USING btree
     (user_id)
     TABLESPACE pg_default;

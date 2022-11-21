@@ -1,4 +1,4 @@
-CREATE TABLE public.cooking_dietary_profiles
+CREATE TABLE cooking.dietary_profiles
 (
     user_id integer NOT NULL,
     birthday date,
@@ -39,8 +39,8 @@ CREATE TABLE public.cooking_dietary_profiles
     track_magnesium boolean NOT NULL DEFAULT TRUE,
     created_date timestamp with time zone NOT NULL,
     modified_date timestamp with time zone NOT NULL,
-    CONSTRAINT pk_cooking_dietary_profiles PRIMARY KEY (user_id),
-    CONSTRAINT fk_cooking_dietary_profiles_users_user_id FOREIGN KEY (user_id)
+    CONSTRAINT pk_dietary_profiles PRIMARY KEY (user_id),
+    CONSTRAINT fk_dietary_profiles_users_user_id FOREIGN KEY (user_id)
     REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE
@@ -50,10 +50,10 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE public.cooking_dietary_profiles
+ALTER TABLE cooking.dietary_profiles
     OWNER to personalassistant;
 
-CREATE INDEX ix_cooking_dietary_profiles_user_id
-    ON public.cooking_dietary_profiles USING btree
+CREATE INDEX ix_dietary_profiles_user_id
+    ON cooking.dietary_profiles USING btree
     (user_id)
     TABLESPACE pg_default;
