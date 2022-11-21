@@ -21,7 +21,7 @@ export class CurrenciesService {
       const today = DateHelper.format(new Date());
 
       const currencyRates = await this.httpProxy.ajax<string>(
-        `${Variables.urls.api}/api/currencies/${today}`
+        `${Variables.urls.gateway}/core/api/currencies/${today}`
       );
 
       this.localStorage.set(this.key, window.JSON.stringify(currencyRates));

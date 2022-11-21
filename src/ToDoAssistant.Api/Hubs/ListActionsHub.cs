@@ -1,20 +1,19 @@
 ﻿using Application.Contracts;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.SignalR;
 using ToDoAssistant.Application.Contracts.Lists;
 
-namespace Api.Hubs;
+namespace ToDoAssistant.Api.Hubs;
 
 [Authorize]
-[EnableCors("AllowToDoAssistant")]
-public class ToDoAssistantHub : Hub
+public class ListActionsHub : Hub
 {
     private readonly IUserIdLookup _userIdLookup;
     private readonly IUsersRepository _usersRepository;
     private readonly IListsRepository _listsRepository;
 
-    public ToDoAssistantHub(
+    public ListActionsHub(
         IUserIdLookup userIdLookup,
         IUsersRepository usersRepository,
         IListsRepository listsRepository)

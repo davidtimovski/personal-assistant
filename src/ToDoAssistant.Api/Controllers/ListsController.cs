@@ -1,24 +1,20 @@
 ﻿using System.Globalization;
-using Api.Config;
-using Api.Models;
-using Api.Models.ToDoAssistant.Lists;
 using Application.Contracts;
 using FluentValidation;
 using Infrastructure.Sender.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Options;
+using ToDoAssistant.Api.Models;
+using ToDoAssistant.Api.Models.Lists;
 using ToDoAssistant.Application.Contracts.Lists;
 using ToDoAssistant.Application.Contracts.Lists.Models;
 using ToDoAssistant.Application.Contracts.Notifications;
 using ToDoAssistant.Application.Contracts.Notifications.Models;
 
-namespace Api.Controllers.ToDoAssistant;
+namespace ToDoAssistant.Api.Controllers;
 
 [Authorize]
-[EnableCors("AllowToDoAssistant")]
 [Route("api/[controller]")]
 public class ListsController : BaseController
 {
@@ -32,7 +28,7 @@ public class ListsController : BaseController
     private readonly IValidator<ShareList> _shareValidator;
     private readonly IValidator<CopyList> _copyValidator;
     private readonly IStringLocalizer<ListsController> _localizer;
-    private readonly Urls _urls;
+    private readonly string _url;
     private readonly ILogger<ListsController> _logger;
 
     public ListsController(
@@ -48,7 +44,7 @@ public class ListsController : BaseController
         IValidator<ShareList> shareValidator,
         IValidator<CopyList> copyValidator,
         IStringLocalizer<ListsController> localizer,
-        IOptions<Urls> urls,
+        IConfiguration configuration,
         ILogger<ListsController> logger) : base(userIdLookup, usersRepository)
     {
         _listService = listService;
@@ -61,7 +57,7 @@ public class ListsController : BaseController
         _shareValidator = shareValidator;
         _copyValidator = copyValidator;
         _localizer = localizer;
-        _urls = urls.Value;
+        _url = configuration["Url"];
         _logger = logger;
     }
 
@@ -490,6 +486,6 @@ public class ListsController : BaseController
 
     private string GetNotificationsPageUrl(int notificationId)
     {
-        return $"{_urls.ToDoAssistant}/notifications/{notificationId}";
+        return $"{_url}/notifications/{notificationId}";
     }
 }

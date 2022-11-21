@@ -1,28 +1,24 @@
 ﻿using System.Globalization;
-using Api.Config;
-using Api.Hubs;
 using Application.Contracts;
 using FluentValidation;
 using Infrastructure.Sender.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Options;
+using ToDoAssistant.Api.Hubs;
 using ToDoAssistant.Application.Contracts.Notifications;
 using ToDoAssistant.Application.Contracts.Notifications.Models;
 using ToDoAssistant.Application.Contracts.Tasks;
 using ToDoAssistant.Application.Contracts.Tasks.Models;
 
-namespace Api.Controllers.ToDoAssistant;
+namespace ToDoAssistant.Api.Controllers;
 
 [Authorize]
-[EnableCors("AllowToDoAssistant")]
 [Route("api/[controller]")]
 public class TasksController : BaseController
 {
-    private readonly IHubContext<ToDoAssistantHub> _hubContext;
+    private readonly IHubContext<ListActionsHub> _listActionsHubContext;
     private readonly ITaskService _taskService;
     private readonly INotificationService _notificationService;
     private readonly ISenderService _senderService;
@@ -30,13 +26,13 @@ public class TasksController : BaseController
     private readonly IValidator<BulkCreate> _bulkCreateValidator;
     private readonly IValidator<UpdateTask> _updateValidator;
     private readonly IStringLocalizer<TasksController> _localizer;
-    private readonly Urls _urls;
+    private readonly string _url;
     private readonly ILogger<TasksController> _logger;
 
     public TasksController(
         IUserIdLookup userIdLookup,
         IUsersRepository usersRepository,
-        IHubContext<ToDoAssistantHub> hubContext,
+        IHubContext<ListActionsHub> listActionsHubContext,
         ITaskService taskService,
         INotificationService notificationService,
         ISenderService senderService,
@@ -44,10 +40,10 @@ public class TasksController : BaseController
         IValidator<BulkCreate> bulkCreateValidator,
         IValidator<UpdateTask> updateValidator,
         IStringLocalizer<TasksController> localizer,
-        IOptions<Urls> urls,
+        IConfiguration configuration,
         ILogger<TasksController> logger) : base(userIdLookup, usersRepository)
     {
-        _hubContext = hubContext;
+        _listActionsHubContext = listActionsHubContext;
         _taskService = taskService;
         _notificationService = notificationService;
         _senderService = senderService;
@@ -55,7 +51,7 @@ public class TasksController : BaseController
         _bulkCreateValidator = bulkCreateValidator;
         _updateValidator = updateValidator;
         _localizer = localizer;
-        _urls = urls.Value;
+        _url = configuration["Url"];
         _logger = logger;
     }
 
@@ -99,7 +95,7 @@ public class TasksController : BaseController
         {
             if (result.NotifySignalR)
             {
-                await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", AuthId);
+                await _listActionsHubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", AuthId);
             }
 
             foreach (var recipient in result.NotificationRecipients)
@@ -145,7 +141,7 @@ public class TasksController : BaseController
         {
             if (result.NotifySignalR)
             {
-                await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", AuthId);
+                await _listActionsHubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", AuthId);
             }
 
             if (!result.Notify())
@@ -199,7 +195,7 @@ public class TasksController : BaseController
         {
             if (result.NotifySignalR)
             {
-                await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", AuthId);
+                await _listActionsHubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", AuthId);
             }
 
             if (!result.Notify())
@@ -297,7 +293,7 @@ public class TasksController : BaseController
         {
             if (result.NotifySignalR)
             {
-                await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskDeleted", AuthId, id, result.ListId);
+                await _listActionsHubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskDeleted", AuthId, id, result.ListId);
             }
 
             foreach (var recipient in result.NotificationRecipients)
@@ -343,7 +339,7 @@ public class TasksController : BaseController
         {
             if (result.NotifySignalR)
             {
-                await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskCompletedChanged", AuthId, dto.Id, result.ListId, true);
+                await _listActionsHubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskCompletedChanged", AuthId, dto.Id, result.ListId, true);
             }
 
             foreach (var recipient in result.NotificationRecipients)
@@ -389,7 +385,7 @@ public class TasksController : BaseController
         {
             if (result.NotifySignalR)
             {
-                await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskCompletedChanged", AuthId, dto.Id, result.ListId, false);
+                await _listActionsHubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskCompletedChanged", AuthId, dto.Id, result.ListId, false);
             }
 
             foreach (var recipient in result.NotificationRecipients)
@@ -449,6 +445,6 @@ public class TasksController : BaseController
 
     private string GetNotificationsPageUrl(int notificationId)
     {
-        return $"{_urls.ToDoAssistant}/notifications/{notificationId}";
+        return $"{_url}/notifications/{notificationId}";
     }
 }

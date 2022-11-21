@@ -1,4 +1,4 @@
-﻿namespace Api.Models.ToDoAssistant.Lists;
+﻿namespace ToDoAssistant.Api.Models.Lists;
 
 public class SetTasksAsNotCompletedDto
 {

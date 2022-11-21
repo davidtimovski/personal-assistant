@@ -3,7 +3,6 @@ using System.Security.Claims;
 using Accountant.Application;
 using Accountant.Persistence;
 using Api.Config;
-using Api.Hubs;
 using Application;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
@@ -17,8 +16,6 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.IdentityModel.Tokens;
 using Persistence;
 using Serilog;
-using ToDoAssistant.Application;
-using ToDoAssistant.Persistence;
 using Weatherman.Application;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,10 +46,8 @@ builder.Services
     .AddApplication(builder.Configuration)
     .AddInfrastructure(builder.Configuration, builder.Environment.EnvironmentName)
     .AddPersistence(builder.Configuration["ConnectionString"])
-    .AddToDoAssistantPersistence(builder.Configuration["ConnectionString"])
     .AddCookingAssistantPersistence(builder.Configuration["ConnectionString"])
     .AddAccountantPersistence(builder.Configuration["ConnectionString"])
-    .AddToDoAssistant(builder.Configuration)
     .AddCookingAssistant(builder.Configuration)
     .AddAccountant(builder.Configuration)
     .AddWeatherman(builder.Configuration);
@@ -68,39 +63,12 @@ builder.Services
             {
                 NameClaimType = ClaimTypes.NameIdentifier
             };
-
-            // For SignalR
-            options.Events = new JwtBearerEvents
-            {
-                OnMessageReceived = context =>
-                {
-                    var accessToken = context.Request.Query["access_token"];
-
-                    var path = context.HttpContext.Request.Path;
-                    if (!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/toDoAssistantHub")))
-                    {
-                        context.Token = accessToken;
-                    }
-                    return Task.CompletedTask;
-                }
-            };
         });
 
 builder.Services.AddCors(options =>
 {
-    var toDoAssistantUrl = builder.Configuration["Urls:ToDoAssistant"];
     var cookingAssistantUrl = builder.Configuration["Urls:CookingAssistant"];
     var accountantUrl = builder.Configuration["Urls:Accountant"];
-    var weathermanUrl = builder.Configuration["Urls:Weatherman"];
-
-    options.AddPolicy("AllowToDoAssistant", builder =>
-    {
-        builder.WithOrigins(toDoAssistantUrl)
-               .AllowAnyMethod()
-               .AllowAnyHeader()
-               .AllowCredentials() // For SignalR
-               .SetPreflightMaxAge(TimeSpan.FromDays(20));
-    });
 
     options.AddPolicy("AllowCookingAssistant", builder =>
     {
@@ -118,17 +86,9 @@ builder.Services.AddCors(options =>
                .SetPreflightMaxAge(TimeSpan.FromDays(20));
     });
 
-    options.AddPolicy("AllowWeatherman", builder =>
-    {
-        builder.WithOrigins(weathermanUrl)
-               .AllowAnyMethod()
-               .AllowAnyHeader()
-               .SetPreflightMaxAge(TimeSpan.FromDays(20));
-    });
-
     options.AddPolicy("AllowAllApps", builder =>
     {
-        builder.WithOrigins(toDoAssistantUrl, cookingAssistantUrl, accountantUrl, weathermanUrl)
+        builder.WithOrigins(cookingAssistantUrl, accountantUrl)
                .AllowAnyMethod()
                .AllowAnyHeader()
                .SetPreflightMaxAge(TimeSpan.FromDays(20));
@@ -137,8 +97,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddApplicationInsightsTelemetry()
     .AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies())
-    .AddLocalization(options => options.ResourcesPath = "Resources")
-    .AddSignalR();
+    .AddLocalization(options => options.ResourcesPath = "Resources");
 
 builder.Services.AddMvc(options =>
 {
@@ -146,17 +105,12 @@ builder.Services.AddMvc(options =>
 })
     .AddNewtonsoftJson();
 
-builder.Services.AddHttpClient("open-meteo", c =>
-{
-    c.BaseAddress = new Uri("https://api.open-meteo.com/v1/");
-});
 builder.Services.AddHttpClient("client-logger", c =>
 {
     c.BaseAddress = new Uri("http://clientlogger/");
 });
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
-builder.Services.Configure<Urls>(builder.Configuration.GetSection("Urls"));
 builder.Services.Configure<DailyIntakeReference>(builder.Configuration.GetSection("DietaryProfile:ReferenceDailyIntake"));
 
 var app = builder.Build();
@@ -179,7 +133,5 @@ app.UseCors("AllowAllApps");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMvc();
-
-app.MapHub<ToDoAssistantHub>("/toDoAssistantHub");
 
 app.Run();

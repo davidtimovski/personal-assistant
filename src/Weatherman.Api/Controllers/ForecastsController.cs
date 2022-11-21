@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Weatherman.Application.Contracts.Forecasts;
 using Weatherman.Application.Contracts.Forecasts.Models;
 
 namespace Weatherman.Api.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 public class ForecastsController : Controller
 {

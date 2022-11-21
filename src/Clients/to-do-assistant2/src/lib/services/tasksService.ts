@@ -20,16 +20,16 @@ export class TasksService {
 	private readonly localStorage = new LocalStorageUtil();
 
 	get(id: number): Promise<Task> {
-		return this.httpProxy.ajax<Task>(`${Variables.urls.api}/api/tasks/${id}`);
+		return this.httpProxy.ajax<Task>(`${Variables.urls.gateway}/todo/api/tasks/${id}`);
 	}
 
 	getForUpdate(id: number): Promise<EditTaskModel> {
-		return this.httpProxy.ajax<EditTaskModel>(`${Variables.urls.api}/api/tasks/${id}/update`);
+		return this.httpProxy.ajax<EditTaskModel>(`${Variables.urls.gateway}/todo/api/tasks/${id}/update`);
 	}
 
 	async create(listId: number, name: string, url: string, isOneTime: boolean, isPrivate: boolean): Promise<number> {
 		try {
-			const id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/api/tasks`, {
+			const id = await this.httpProxy.ajax<number>(`${Variables.urls.gateway}/todo/api/tasks`, {
 				method: 'post',
 				body: window.JSON.stringify({
 					listId,
@@ -54,7 +54,7 @@ export class TasksService {
 		tasksArePrivate: boolean
 	): Promise<void> {
 		try {
-			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/tasks/bulk`, {
+			await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/todo/api/tasks/bulk`, {
 				method: 'post',
 				body: window.JSON.stringify({
 					listId: listId,
@@ -80,7 +80,7 @@ export class TasksService {
 		assignedToUserId: number | null
 	): Promise<void> {
 		try {
-			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/tasks`, {
+			await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/todo/api/tasks`, {
 				method: 'put',
 				body: window.JSON.stringify({
 					id,
@@ -101,7 +101,7 @@ export class TasksService {
 
 	async delete(id: number): Promise<void> {
 		try {
-			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/tasks/${id}`, {
+			await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/todo/api/tasks/${id}`, {
 				method: 'delete'
 			});
 		} catch (e) {
@@ -166,7 +166,7 @@ export class TasksService {
 
 	async complete(id: number): Promise<void> {
 		try {
-			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/tasks/complete`, {
+			await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/todo/api/tasks/complete`, {
 				method: 'put',
 				body: window.JSON.stringify({
 					id: id
@@ -252,7 +252,7 @@ export class TasksService {
 
 	async uncomplete(id: number): Promise<void> {
 		try {
-			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/tasks/uncomplete`, {
+			await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/todo/api/tasks/uncomplete`, {
 				method: 'put',
 				body: window.JSON.stringify({
 					id: id
@@ -327,7 +327,7 @@ export class TasksService {
 
 	// async reorder(id: number, listId: number, oldOrder: number, newOrder: number): Promise<void> {
 	// 	try {
-	// 		await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/tasks/reorder`, {
+	// 		await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/todo/api/tasks/reorder`, {
 	// 			method: 'put',
 	// 			body: window.JSON.stringify({
 	// 				id: id,

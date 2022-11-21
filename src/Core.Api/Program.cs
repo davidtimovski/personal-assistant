@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Accountant.Application;
 using Accountant.Persistence;
 using Application;
@@ -5,6 +6,8 @@ using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Infrastructure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Persistence;
 using Serilog;
 using ToDoAssistant.Application;
@@ -47,6 +50,19 @@ builder.Services
     .AddWeatherman(builder.Configuration)
     .AddWeathermanPersistence(builder.Configuration["ConnectionString"]);
 
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = $"https://{builder.Configuration["Auth0:Domain"]}/";
+        options.Audience = builder.Configuration["Auth0:Audience"];
+        // If the access token does not have a `sub` claim, `User.Identity.Name` will be `null`. Map it to a different claim by setting the NameClaimType below.
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            NameClaimType = ClaimTypes.NameIdentifier
+        };
+    });
+
 builder.Services.AddMvc(options =>
 {
     options.EnableEndpointRouting = false;
@@ -55,8 +71,8 @@ builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true
 
 var app = builder.Build();
 
-app.UseExceptionHandler("/error");
-
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseMvc();
 
 app.Run();

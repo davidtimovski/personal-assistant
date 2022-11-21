@@ -11,7 +11,7 @@ export class SignalRClient extends SignalRClientBase {
 	}
 
 	async initialize(accessToken: string, currentUserId: string) {
-		await this.connect(`${Variables.urls.api}/toDoAssistantHub`, accessToken, Variables.debug);
+		await this.connect(`${Variables.urls.gateway}/todo/hub`, accessToken, Variables.debug);
 
 		(<signalR.HubConnection>this.connection).onreconnected(async () => {
 			await this.listsService.getAll();

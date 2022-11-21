@@ -37,7 +37,6 @@
     <ProjectReference Include="..\CookingAssistant.Persistence\CookingAssistant.Persistence.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     <ProjectReference Include="..\ToDoAssistant.Application\ToDoAssistant.Application.csproj" />
-    <ProjectReference Include="..\ToDoAssistant.Persistence\ToDoAssistant.Persistence.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -49,36 +48,6 @@
     </EmbeddedResource>
     <EmbeddedResource Update="Resources\Models\CookingAssistant\DietaryProfiles\GetRecommendedDailyIntakeDtoValidator.en-US.resx">
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Models\ToDoAssistant\Lists\CreateListDtoValidator.en-US.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Models\ToDoAssistant\Lists\CreateListDtoValidator.mk-MK.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Models\ToDoAssistant\Tasks\BulkCreateTasksDtoValidator.en-US.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Models\ToDoAssistant\Tasks\BulkCreateTasksDtoValidator.mk-MK.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Models\ToDoAssistant\Tasks\CreateTaskDtoValidator.en-US.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>CreateToDoItemDtoValidator.en-US.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Models\ToDoAssistant\Tasks\UpdateTaskDtoValidator.en-US.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>UpdateToDoItemDtoValidator.en-US.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Models\ToDoAssistant\Tasks\UpdateTaskDtoValidator.mk-MK.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Models\ToDoAssistant\Lists\UpdateListDtoValidator.en-US.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>UpdateToDoListDtoValidator.en-US.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Models\ToDoAssistant\Lists\UpdateListDtoValidator.mk-MK.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
   </ItemGroup>
 

@@ -1,7 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 
@@ -17,19 +13,6 @@ builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
     }
 });
 
-builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.Authority = $"https://{builder.Configuration["Auth0:Domain"]}/";
-        options.Audience = builder.Configuration["Auth0:Audience"];
-        // If the access token does not have a `sub` claim, `User.Identity.Name` will be `null`. Map it to a different claim by setting the NameClaimType below.
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            NameClaimType = ClaimTypes.NameIdentifier
-        };
-    });
-
 builder.Services.AddCors(options =>
 {
     var toDoAssistantUrl = builder.Configuration["Urls:ToDoAssistant"];
@@ -42,6 +25,7 @@ builder.Services.AddCors(options =>
         builder.WithOrigins(toDoAssistantUrl, cookingAssistantUrl, accountantUrl, weathermanUrl)
                .AllowAnyMethod()
                .AllowAnyHeader()
+               .AllowCredentials() // For SignalR
                .SetPreflightMaxAge(TimeSpan.FromDays(20));
     });
 });
@@ -52,9 +36,7 @@ var app = builder.Build();
 
 app.UseCors("AllowAllApps");
 
-app.UseAuthentication();
-app.UseAuthorization();
-
+app.UseWebSockets();
 app.UseOcelot().Wait();
 
 app.Run();

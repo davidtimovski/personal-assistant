@@ -1,9 +1,11 @@
 ﻿using Application.Contracts;
 using Application.Contracts.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Core.Api.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 public class TooltipsController : BaseController
 {
