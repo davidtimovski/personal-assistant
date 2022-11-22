@@ -1,16 +1,15 @@
-﻿using Accountant.Application.Contracts.Transactions;
+﻿using Accountant.Api.Models.Transactions;
+using Accountant.Application.Contracts.Transactions;
 using Accountant.Application.Contracts.Transactions.Models;
-using Api.Models.Accountant.Transactions;
 using Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
-namespace Api.Controllers.Accountant;
+namespace Accountant.Api.Controllers;
 
 [Authorize]
-[EnableCors("AllowAccountant")]
 [Route("api/[controller]")]
 public class TransactionsController : BaseController
 {

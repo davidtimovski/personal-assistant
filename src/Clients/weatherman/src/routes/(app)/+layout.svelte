@@ -25,7 +25,7 @@
 			user.set(cachedUser);
 		}
 
-		usersService.getCore<WeathermanUser>().then((currentUser) => {
+		usersService.get<WeathermanUser>().then((currentUser) => {
 			user.set(currentUser);
 			usersService.cache(currentUser);
 

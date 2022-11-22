@@ -15,6 +15,7 @@
 	import { user, isOnline, syncStatus } from '$lib/stores';
 	import type { AccountantUser } from '$lib/models/accountantUser';
 	import { AppEvents } from '$lib/models/appEvents';
+	import Variables from '$lib/variables';
 
 	let usersService: UsersServiceBase;
 	let syncService: SyncService;
@@ -36,7 +37,7 @@
 	onMount(async () => {
 		if (navigator.onLine) {
 			const authService = new AuthService();
-			await authService.initialize();
+			await authService.initialize(Variables.urls.gateway);
 
 			if (await authService.authenticated()) {
 				await authService.setToken();

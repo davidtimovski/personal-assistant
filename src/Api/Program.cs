@@ -1,8 +1,5 @@
 ﻿using System.Globalization;
 using System.Security.Claims;
-using Accountant.Application;
-using Accountant.Persistence;
-using Api.Config;
 using Application;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
@@ -16,7 +13,6 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.IdentityModel.Tokens;
 using Persistence;
 using Serilog;
-using Weatherman.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,10 +43,7 @@ builder.Services
     .AddInfrastructure(builder.Configuration, builder.Environment.EnvironmentName)
     .AddPersistence(builder.Configuration["ConnectionString"])
     .AddCookingAssistantPersistence(builder.Configuration["ConnectionString"])
-    .AddAccountantPersistence(builder.Configuration["ConnectionString"])
-    .AddCookingAssistant(builder.Configuration)
-    .AddAccountant(builder.Configuration)
-    .AddWeatherman(builder.Configuration);
+    .AddCookingAssistant(builder.Configuration);
 
 builder.Services
         .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -68,7 +61,6 @@ builder.Services
 builder.Services.AddCors(options =>
 {
     var cookingAssistantUrl = builder.Configuration["Urls:CookingAssistant"];
-    var accountantUrl = builder.Configuration["Urls:Accountant"];
 
     options.AddPolicy("AllowCookingAssistant", builder =>
     {
@@ -77,25 +69,9 @@ builder.Services.AddCors(options =>
                .AllowAnyHeader()
                .SetPreflightMaxAge(TimeSpan.FromDays(20));
     });
-
-    options.AddPolicy("AllowAccountant", builder =>
-    {
-        builder.WithOrigins(accountantUrl)
-               .AllowAnyMethod()
-               .AllowAnyHeader()
-               .SetPreflightMaxAge(TimeSpan.FromDays(20));
-    });
-
-    options.AddPolicy("AllowAllApps", builder =>
-    {
-        builder.WithOrigins(cookingAssistantUrl, accountantUrl)
-               .AllowAnyMethod()
-               .AllowAnyHeader()
-               .SetPreflightMaxAge(TimeSpan.FromDays(20));
-    });
 });
 
-builder.Services.AddApplicationInsightsTelemetry()
+builder.Services
     .AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies())
     .AddLocalization(options => options.ResourcesPath = "Resources");
 
@@ -127,8 +103,6 @@ app.UseRequestLocalization(new RequestLocalizationOptions
     SupportedCultures = supportedCultures,
     SupportedUICultures = supportedCultures
 });
-
-app.UseCors("AllowAllApps");
 
 app.UseAuthentication();
 app.UseAuthorization();

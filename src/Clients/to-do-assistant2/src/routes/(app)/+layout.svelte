@@ -37,7 +37,7 @@
 			user.set(cachedUser);
 		}
 
-		usersService.getCore<ToDoAssistantUser>().then((currentUser) => {
+		usersService.get<ToDoAssistantUser>().then((currentUser) => {
 			user.set(currentUser);
 			usersService.cache(currentUser);
 		});

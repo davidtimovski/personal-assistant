@@ -1,4 +1,4 @@
-﻿namespace Api.Models.Accountant.Transactions;
+﻿namespace Accountant.Api.Models.Transactions;
 
 public class ExportVm
 {

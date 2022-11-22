@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { onMount, onDestroy, debug } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte/internal';
 	import type { Unsubscriber } from 'svelte/store';
+	import { tweened } from 'svelte/motion';
+	import { cubicOut } from 'svelte/easing';
 	import { goto } from '$app/navigation';
 
 	import { UsersServiceBase } from '../../../../shared2/services/usersServiceBase';
@@ -25,8 +27,11 @@
 
 	// Progress bar
 	let progressBarActive = false;
-	let progress = 0;
-	let progressIntervalId: number | null = null;
+	const progress = tweened(0, {
+		duration: 500,
+		easing: cubicOut
+	});
+	let progressIntervalId: number | undefined;
 	let progressBarVisible = false;
 
 	let localStorage: LocalStorageUtil;
@@ -99,13 +104,15 @@
 	}
 
 	function startProgressBar() {
-		dataLoaded = false;
 		progressBarActive = true;
-		progress = 10;
+		progress.set(10);
 
 		progressIntervalId = window.setInterval(() => {
-			if (progress < 85) {
-				progress += 15;
+			if ($progress < 85) {
+				progress.update((x) => {
+					x += 15;
+					return x;
+				});
 			} else if (progressIntervalId) {
 				window.clearInterval(progressIntervalId);
 			}
@@ -115,8 +122,9 @@
 	}
 
 	function finishProgressBar() {
+		window.clearInterval(progressIntervalId);
+		progress.set(100);
 		window.setTimeout(() => {
-			progress = 100;
 			progressBarActive = false;
 			progressBarVisible = false;
 		}, 500);
@@ -182,7 +190,7 @@
 			</button>
 		</div>
 		<div class="progress-bar">
-			<div class="progress" class:visible={progressBarVisible} style="width: {progress}%;" />
+			<div class="progress" class:visible={progressBarVisible} style="width: {$progress}%;" />
 		</div>
 	</div>
 

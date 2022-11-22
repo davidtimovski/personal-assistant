@@ -1,10 +1,14 @@
+using System.Globalization;
 using System.Security.Claims;
+using Accountant.Application;
+using Accountant.Persistence;
 using Application;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.IdentityModel.Tokens;
 using Persistence;
 using Serilog;
@@ -36,7 +40,9 @@ Log.Logger = new LoggerConfiguration()
 builder.Services
     .AddApplication(builder.Configuration)
     .AddInfrastructure(builder.Configuration, builder.Environment.EnvironmentName)
-    .AddPersistence(builder.Configuration["ConnectionString"]);
+    .AddPersistence(builder.Configuration["ConnectionString"])
+    .AddAccountant(builder.Configuration)
+    .AddAccountantPersistence(builder.Configuration["ConnectionString"]);
 
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -51,6 +57,8 @@ builder.Services
         };
     });
 
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
 builder.Services.AddMvc(options =>
 {
     options.EnableEndpointRouting = false;
@@ -58,6 +66,17 @@ builder.Services.AddMvc(options =>
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
 var app = builder.Build();
+
+var supportedCultures = new[] {
+    new CultureInfo("en-US"),
+    new CultureInfo("mk-MK")
+};
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(culture: supportedCultures[0].Name, uiCulture: supportedCultures[0].Name),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+});
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -45,10 +45,13 @@ export class AutomaticTransactionsService {
 			automaticTransaction.createdDate = automaticTransaction.modifiedDate = now;
 
 			if (navigator.onLine) {
-				automaticTransaction.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/api/automatictransactions`, {
-					method: 'post',
-					body: window.JSON.stringify(automaticTransaction)
-				});
+				automaticTransaction.id = await this.httpProxy.ajax<number>(
+					`${Variables.urls.gateway}/accountant/api/automatictransactions`,
+					{
+						method: 'post',
+						body: window.JSON.stringify(automaticTransaction)
+					}
+				);
 				automaticTransaction.synced = true;
 			}
 
@@ -73,7 +76,7 @@ export class AutomaticTransactionsService {
 			automaticTransaction.modifiedDate = DateHelper.adjustTimeZone(new Date());
 
 			if (navigator.onLine) {
-				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/automatictransactions`, {
+				await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/accountant/api/automatictransactions`, {
 					method: 'put',
 					body: window.JSON.stringify(automaticTransaction)
 				});
@@ -92,7 +95,7 @@ export class AutomaticTransactionsService {
 	async delete(id: number): Promise<void> {
 		try {
 			if (navigator.onLine) {
-				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/automatictransactions/${id}`, {
+				await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/accountant/api/automatictransactions/${id}`, {
 					method: 'delete'
 				});
 			} else if (await this.idbHelper.isSynced(id)) {

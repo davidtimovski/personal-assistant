@@ -42,6 +42,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.env.prod.example = .env.prod.example
 		.gitignore = .gitignore
 		.github\workflows\cd_account.yml = .github\workflows\cd_account.yml
+		.github\workflows\cd_accountant.yml = .github\workflows\cd_accountant.yml
 		.github\workflows\cd_api.yml = .github\workflows\cd_api.yml
 		.github\workflows\cd_clientlogger.yml = .github\workflows\cd_clientlogger.yml
 		.github\workflows\cd_core.yml = .github\workflows\cd_core.yml
@@ -81,7 +82,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weatherman.Infrastructure",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Api", "src\Core.Api\Core.Api.csproj", "{62429A2D-BABF-4F2C-B7DF-8FE51FDEC589}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToDoAssistant.Api", "src\ToDoAssistant.Api\ToDoAssistant.Api.csproj", "{3FDC9889-1B57-430D-8CA0-367F782989C6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToDoAssistant.Api", "src\ToDoAssistant.Api\ToDoAssistant.Api.csproj", "{3FDC9889-1B57-430D-8CA0-367F782989C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accountant.Api", "src\Accountant.Api\Accountant.Api.csproj", "{DD8E9547-5F53-4CFC-A930-AFF8B15074B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -193,6 +196,10 @@ Global
 		{3FDC9889-1B57-430D-8CA0-367F782989C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3FDC9889-1B57-430D-8CA0-367F782989C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3FDC9889-1B57-430D-8CA0-367F782989C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD8E9547-5F53-4CFC-A930-AFF8B15074B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD8E9547-5F53-4CFC-A930-AFF8B15074B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD8E9547-5F53-4CFC-A930-AFF8B15074B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD8E9547-5F53-4CFC-A930-AFF8B15074B0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -223,6 +230,7 @@ Global
 		{40D19BA3-8007-4B4E-ACF6-49A38BA4BCA7} = {C1098B33-586C-4024-9BF4-F71CED6654D9}
 		{62429A2D-BABF-4F2C-B7DF-8FE51FDEC589} = {577BCF93-9D25-4060-A201-FA11AC92DD26}
 		{3FDC9889-1B57-430D-8CA0-367F782989C6} = {577BCF93-9D25-4060-A201-FA11AC92DD26}
+		{DD8E9547-5F53-4CFC-A930-AFF8B15074B0} = {577BCF93-9D25-4060-A201-FA11AC92DD26}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1296A1BD-7B9D-40F2-9873-972EB471C47D}
