@@ -14,7 +14,7 @@ public class UpcomingExpensesRepository : BaseRepository, IUpcomingExpensesRepos
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.Query<UpcomingExpense>(@"SELECT * FROM accountant_upcoming_expenses WHERE user_id = @UserId AND modified_date > @FromModifiedDate",
+        return conn.Query<UpcomingExpense>(@"SELECT * FROM accountant.upcoming_expenses WHERE user_id = @UserId AND modified_date > @FromModifiedDate",
             new { UserId = userId, FromModifiedDate = fromModifiedDate });
     }
 
@@ -22,7 +22,7 @@ public class UpcomingExpensesRepository : BaseRepository, IUpcomingExpensesRepos
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.Query<int>(@"SELECT entity_id FROM accountant_deleted_entities WHERE user_id = @UserId AND entity_type = @EntityType AND deleted_date > @DeletedDate",
+        return conn.Query<int>(@"SELECT entity_id FROM accountant.deleted_entities WHERE user_id = @UserId AND entity_type = @EntityType AND deleted_date > @DeletedDate",
             new { UserId = userId, EntityType = (short)EntityType.UpcomingExpense, DeletedDate = fromDate });
     }
 
@@ -78,32 +78,32 @@ public class UpcomingExpensesRepository : BaseRepository, IUpcomingExpensesRepos
         using IDbConnection conn = OpenConnection();
         var transaction = conn.BeginTransaction();
 
-        var toDelete = await conn.QueryAsync<UpcomingExpense>(@"SELECT * FROM accountant_upcoming_expenses WHERE user_id = @UserId AND date < @Date",
+        var toDelete = await conn.QueryAsync<UpcomingExpense>(@"SELECT * FROM accountant.upcoming_expenses WHERE user_id = @UserId AND date < @Date",
             new { UserId = userId, Date = before });
 
         foreach (var upcomingExpense in toDelete)
         {
             var deletedEntryExists = await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*)
-                                                                           FROM accountant_deleted_entities
+                                                                           FROM accountant.deleted_entities
                                                                            WHERE user_id = @UserId AND entity_type = @EntityType AND entity_id = @EntityId",
                 new { UserId = userId, EntityType = (short)EntityType.UpcomingExpense, EntityId = upcomingExpense.Id });
 
             if (deletedEntryExists)
             {
-                await conn.QueryAsync<int>(@"UPDATE accountant_deleted_entities SET deleted_date = @DeletedDate
+                await conn.QueryAsync<int>(@"UPDATE accountant.deleted_entities SET deleted_date = @DeletedDate
                                              WHERE user_id = @UserId AND entity_type = @EntityType AND entity_id = @EntityId",
                     new { UserId = userId, EntityType = (short)EntityType.UpcomingExpense, EntityId = upcomingExpense.Id, DeletedDate = DateTime.UtcNow },
                     transaction);
             }
             else
             {
-                await conn.QueryAsync<int>(@"INSERT INTO accountant_deleted_entities (user_id, entity_type, entity_id, deleted_date)
+                await conn.QueryAsync<int>(@"INSERT INTO accountant.deleted_entities (user_id, entity_type, entity_id, deleted_date)
                                              VALUES (@UserId, @EntityType, @EntityId, @DeletedDate)",
                     new { UserId = userId, EntityType = (short)EntityType.UpcomingExpense, EntityId = upcomingExpense.Id, DeletedDate = DateTime.UtcNow },
                     transaction);
             }
 
-            await conn.ExecuteAsync(@"DELETE FROM accountant_upcoming_expenses WHERE id = @Id AND user_id = @UserId",
+            await conn.ExecuteAsync(@"DELETE FROM accountant.upcoming_expenses WHERE id = @Id AND user_id = @UserId",
                 new { upcomingExpense.Id, UserId = userId }, transaction);
         }
 

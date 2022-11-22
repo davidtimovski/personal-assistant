@@ -15,7 +15,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.QueryFirstOrDefault<ToDoTask>(@"SELECT * FROM todo_tasks WHERE id = @Id", new { Id = id });
+        return conn.QueryFirstOrDefault<ToDoTask>(@"SELECT * FROM todo.tasks WHERE id = @Id", new { Id = id });
     }
 
     public ToDoTask Get(int id, int userId)
@@ -23,9 +23,9 @@ public class TasksRepository : BaseRepository, ITasksRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.QueryFirstOrDefault<ToDoTask>(@"SELECT t.* 
-                                                    FROM todo_tasks AS t
-                                                    INNER JOIN todo_lists AS l ON t.list_id = l.id
-                                                    LEFT JOIN todo_shares AS s ON l.id = s.list_id
+                                                    FROM todo.tasks AS t
+                                                    INNER JOIN todo.lists AS l ON t.list_id = l.id
+                                                    LEFT JOIN todo.shares AS s ON l.id = s.list_id
                                                     WHERE t.id = @Id AND (l.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))",
             new { Id = id, UserId = userId });
     }
@@ -35,9 +35,9 @@ public class TasksRepository : BaseRepository, ITasksRepository
         using IDbConnection conn = OpenConnection();
 
         var task = conn.QueryFirstOrDefault<ToDoTask>(@"SELECT t.* 
-                                                        FROM todo_tasks AS t
-                                                        INNER JOIN todo_lists AS l ON t.list_id = l.id
-                                                        LEFT JOIN todo_shares AS s ON l.id = s.list_id
+                                                        FROM todo.tasks AS t
+                                                        INNER JOIN todo.lists AS l ON t.list_id = l.id
+                                                        LEFT JOIN todo.shares AS s ON l.id = s.list_id
                                                         WHERE t.id = @Id AND (l.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))",
             new { Id = id, UserId = userId });
 
@@ -49,11 +49,11 @@ public class TasksRepository : BaseRepository, ITasksRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.Query<string>(@"SELECT r.name
-                                    FROM cooking_ingredients AS i
-                                    INNER JOIN cooking_ingredients_tasks AS it ON i.id = it.ingredient_id AND it.user_id = @UserId
-                                    INNER JOIN cooking_recipes_ingredients AS ri ON i.id = ri.ingredient_id
-                                    LEFT JOIN cooking_recipes AS r ON ri.recipe_id = r.id
-                                    LEFT JOIN cooking_shares AS s ON ri.recipe_id = s.recipe_id
+                                    FROM cooking.ingredients AS i
+                                    INNER JOIN cooking.ingredients_tasks AS it ON i.id = it.ingredient_id AND it.user_id = @UserId
+                                    INNER JOIN cooking.recipes_ingredients AS ri ON i.id = ri.ingredient_id
+                                    LEFT JOIN cooking.recipes AS r ON ri.recipe_id = r.id
+                                    LEFT JOIN cooking.shares AS s ON ri.recipe_id = s.recipe_id
                                     WHERE it.task_id = @TaskId AND (r.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))
                                     ORDER BY r.name",
             new { TaskId = id, UserId = userId }).ToList();
@@ -64,9 +64,9 @@ public class TasksRepository : BaseRepository, ITasksRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                          FROM todo_tasks AS t
-                                          INNER JOIN todo_lists AS l ON t.list_id = l.id
-                                          LEFT JOIN todo_shares AS s ON l.id = s.list_id
+                                          FROM todo.tasks AS t
+                                          INNER JOIN todo.lists AS l ON t.list_id = l.id
+                                          LEFT JOIN todo.shares AS s ON l.id = s.list_id
                                           WHERE t.id = @Id AND (l.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))",
             new { Id = id, UserId = userId });
     }
@@ -76,9 +76,9 @@ public class TasksRepository : BaseRepository, ITasksRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) 
-                                          FROM todo_tasks AS t
-                                          INNER JOIN todo_lists AS l ON t.list_id = l.id
-                                          LEFT JOIN todo_shares AS s ON l.id = s.list_id
+                                          FROM todo.tasks AS t
+                                          INNER JOIN todo.lists AS l ON t.list_id = l.id
+                                          LEFT JOIN todo.shares AS s ON l.id = s.list_id
                                           WHERE UPPER(t.name) = UPPER(@Name) 
                                           AND t.list_id = @ListId 
                                           AND (l.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))
@@ -91,9 +91,9 @@ public class TasksRepository : BaseRepository, ITasksRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) 
-                                          FROM todo_tasks AS t
-                                          INNER JOIN todo_lists AS l ON t.list_id = l.id
-                                          LEFT JOIN todo_shares AS s ON l.id = s.list_id
+                                          FROM todo.tasks AS t
+                                          INNER JOIN todo.lists AS l ON t.list_id = l.id
+                                          LEFT JOIN todo.shares AS s ON l.id = s.list_id
                                           WHERE UPPER(t.name) = ANY(@Names) 
                                           AND t.list_id = @ListId 
                                           AND (l.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))
@@ -106,8 +106,8 @@ public class TasksRepository : BaseRepository, ITasksRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                          FROM todo_tasks AS t
-                                          INNER JOIN todo_lists AS l ON t.list_id = l.id
+                                          FROM todo.tasks AS t
+                                          INNER JOIN todo.lists AS l ON t.list_id = l.id
                                           WHERE t.id != @Id 
                                           AND UPPER(t.name) = UPPER(@Name) 
                                           AND t.list_id = @ListId AND l.user_id = @UserId
@@ -119,7 +119,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM todo_tasks WHERE id = @Id AND private_to_user_id = @UserId",
+        return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM todo.tasks WHERE id = @Id AND private_to_user_id = @UserId",
             new { Id = id, UserId = userId });
     }
 
@@ -127,7 +127,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM todo_tasks WHERE list_id = @ListId", new { ListId = listId });
+        return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM todo.tasks WHERE list_id = @ListId", new { ListId = listId });
     }
 
     public async Task<int> CreateAsync(ToDoTask task, int userId)
@@ -227,7 +227,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
             using IDbConnection conn = OpenConnection();
 
             var newListIsShared = conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                                             FROM todo_shares
+                                                             FROM todo.shares
                                                              WHERE list_id = @ListId AND is_accepted IS NOT FALSE",
                 new { task.ListId });
 
@@ -446,7 +446,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<short>(@"SELECT COUNT(*)
-                                           FROM todo_tasks
+                                           FROM todo.tasks
                                            WHERE list_id = @ListId AND is_completed = @IsCompleted AND private_to_user_id = @UserId",
             new { ListId = listId, IsCompleted = isCompleted, UserId = userId });
     }
@@ -456,7 +456,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.ExecuteScalar<short>(@"SELECT COUNT(*)
-                                           FROM todo_tasks
+                                           FROM todo.tasks
                                            WHERE list_id = @ListId AND is_completed = @IsCompleted AND private_to_user_id IS NULL",
             new { ListId = listId, IsCompleted = isCompleted });
     }

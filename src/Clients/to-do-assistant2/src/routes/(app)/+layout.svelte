@@ -15,6 +15,7 @@
 	import { ListsService } from '$lib/services/listsService';
 	import { SignalRClient } from '$lib/utils/signalRClient';
 	import type { ToDoAssistantUser } from '$lib/models/toDoAssistantUser';
+	import Variables from '$lib/variables';
 
 	let usersService: UsersService;
 	let listsService: ListsService;
@@ -36,7 +37,7 @@
 			user.set(cachedUser);
 		}
 
-		usersService.get<ToDoAssistantUser>().then((currentUser) => {
+		usersService.getCore<ToDoAssistantUser>().then((currentUser) => {
 			user.set(currentUser);
 			usersService.cache(currentUser);
 		});
@@ -44,7 +45,7 @@
 
 	onMount(async () => {
 		const authService = new AuthService();
-		await authService.initialize();
+		await authService.initialize(Variables.urls.gateway);
 
 		if (await authService.authenticated()) {
 			await authService.setToken();

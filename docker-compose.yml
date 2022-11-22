@@ -29,6 +29,7 @@ services:
       dockerfile: src/Gateway/Dockerfile
     depends_on:
       - core-api
+      - todo-api
       - weatherman-api
 
   core-api:
@@ -39,6 +40,16 @@ services:
       dockerfile: src/Core.Api/Dockerfile
     depends_on:
       - postgres
+
+  todo-api:
+    image: personalassistant-todo-api:latest
+    container_name: personalassistant-todo-api
+    build:
+      context: .
+      dockerfile: src/ToDoAssistant.Api/Dockerfile
+    depends_on:
+      - postgres
+      - rabbitmq
 
   weatherman-api:
     image: personalassistant-weatherman-api:latest

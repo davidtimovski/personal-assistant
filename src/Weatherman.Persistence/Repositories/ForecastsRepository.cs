@@ -16,7 +16,7 @@ public class ForecastsRepository : BaseRepository, IForecastsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.QueryFirstOrDefault<Forecast>(@"SELECT * FROM weatherman_forecasts 
+        return conn.QueryFirstOrDefault<Forecast>(@"SELECT * FROM weatherman.forecasts 
             WHERE latitude = @Latitude AND longitude = @Longitude 
                 AND temperature_unit = @TemperatureUnit AND precipitation_unit = @PrecipitationUnit AND wind_speed_unit = @WindSpeedUnit", parameters);
     }

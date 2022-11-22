@@ -36,7 +36,7 @@ export class ErrorLogger {
         application: this.application,
         message: message,
         stackTrace: stackTrace,
-        occurred: DateHelper.adjustForTimeZone(new Date()),
+        occurred: DateHelper.adjustTimeZone(new Date()),
       }),
     });
   }

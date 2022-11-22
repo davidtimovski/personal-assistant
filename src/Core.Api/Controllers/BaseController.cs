@@ -21,7 +21,7 @@ public abstract class BaseController : Controller
         {
             if (!userId.HasValue)
             {
-                string auth0Id = Request.Headers["UserId"];
+                string auth0Id = User.Identity.Name;
 
                 if (_userIdLookup.Contains(auth0Id))
                 {

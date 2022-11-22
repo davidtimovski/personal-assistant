@@ -52,6 +52,7 @@ services:
       - ./storage:/app/storage
     depends_on:
       - core-api
+      - todo-api
       - weatherman-api
 
   core-api:
@@ -62,12 +63,27 @@ services:
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
       - PORT=80
-    ports:
-      - "5004:80"
     volumes:
       - ./storage:/app/storage
     depends_on:
       - postgres
+
+  todo-api:
+    image: ${DOCKER_REGISTRY}:todo-api-latest
+    container_name: pa-todo-api
+    restart: always
+    environment:
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - EventBusConnection=${EVENT_BUS_HOST}
+      - EventBusUserName=${EVENT_BUS_USERNAME}
+      - EventBusPassword=${EVENT_BUS_PASSWORD}
+      - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
+      - PORT=80
+    volumes:
+      - ./storage:/app/storage
+    depends_on:
+      - postgres
+      - rabbitmq
 
   weatherman-api:
     image: ${DOCKER_REGISTRY}:weatherman-api-latest
@@ -77,8 +93,6 @@ services:
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
       - PORT=80
-    ports:
-      - "5008:80"
     volumes:
       - ./storage:/app/storage
     depends_on:
@@ -92,8 +106,6 @@ services:
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - ConnectionString=${CONNECTION_STRING}
       - PORT=80
-    ports:
-      - "5002:80"
     volumes:
       - ./storage:/app/storage
     depends_on:

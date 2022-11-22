@@ -36,7 +36,7 @@ export class ListsService {
 			}
 		}
 
-		const allLists = await this.httpProxy.ajax<List[]>(`${Variables.urls.api}/api/lists`);
+		const allLists = await this.httpProxy.ajax<List[]>(`${Variables.urls.gateway}/todo/api/lists`);
 
 		const highPriorityListEnabled = this.localStorage.getBool(LocalStorageKeys.HighPriorityListEnabled);
 		const staleTasksListEnabled = this.localStorage.getBool(LocalStorageKeys.StaleTasksListEnabled);
@@ -124,36 +124,36 @@ export class ListsService {
 	}
 
 	getAllAsOptions(): Promise<ListOption[]> {
-		return this.httpProxy.ajax<ListOption[]>(`${Variables.urls.api}/api/lists/options`);
+		return this.httpProxy.ajax<ListOption[]>(`${Variables.urls.gateway}/todo/api/lists/options`);
 	}
 
 	get(id: number): Promise<EditListModel> {
-		return this.httpProxy.ajax<EditListModel>(`${Variables.urls.api}/api/lists/${id}`);
+		return this.httpProxy.ajax<EditListModel>(`${Variables.urls.gateway}/todo/api/lists/${id}`);
 	}
 
 	getWithShares(id: number): Promise<ListWithShares> {
-		return this.httpProxy.ajax<ListWithShares>(`${Variables.urls.api}/api/lists/${id}/with-shares`);
+		return this.httpProxy.ajax<ListWithShares>(`${Variables.urls.gateway}/todo/api/lists/${id}/with-shares`);
 	}
 
 	getShareRequests(): Promise<ShareRequest[]> {
-		return this.httpProxy.ajax<ShareRequest[]>(`${Variables.urls.api}/api/lists/share-requests`);
+		return this.httpProxy.ajax<ShareRequest[]>(`${Variables.urls.gateway}/todo/api/lists/share-requests`);
 	}
 
 	getPendingShareRequestsCount(): Promise<number> {
-		return this.httpProxy.ajax<number>(`${Variables.urls.api}/api/lists/pending-share-requests-count`);
+		return this.httpProxy.ajax<number>(`${Variables.urls.gateway}/todo/api/lists/pending-share-requests-count`);
 	}
 
 	getIsShared(id: number): Promise<boolean> {
-		return this.httpProxy.ajax<boolean>(`${Variables.urls.api}/api/lists/${id}/shared`);
+		return this.httpProxy.ajax<boolean>(`${Variables.urls.gateway}/todo/api/lists/${id}/shared`);
 	}
 
 	getMembersAsAssigneeOptions(id: number): Promise<Assignee[]> {
-		return this.httpProxy.ajax<Assignee[]>(`${Variables.urls.api}/api/lists/${id}/members`);
+		return this.httpProxy.ajax<Assignee[]>(`${Variables.urls.gateway}/todo/api/lists/${id}/members`);
 	}
 
 	async create(name: string, icon: string, isOneTimeToggleDefault: boolean, tasksText: string): Promise<number> {
 		try {
-			const id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/api/lists`, {
+			const id = await this.httpProxy.ajax<number>(`${Variables.urls.gateway}/todo/api/lists`, {
 				method: 'post',
 				body: window.JSON.stringify({
 					name: name,
@@ -183,7 +183,7 @@ export class ListsService {
 		sharingState: SharingState
 	): Promise<void> {
 		try {
-			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/lists`, {
+			await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/todo/api/lists`, {
 				method: 'put',
 				body: window.JSON.stringify({
 					id: id,
@@ -206,7 +206,7 @@ export class ListsService {
 
 	async updateShared(id: number, notificationsEnabled: boolean): Promise<void> {
 		try {
-			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/lists/shared`, {
+			await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/todo/api/lists/shared`, {
 				method: 'put',
 				body: window.JSON.stringify({
 					id: id,
@@ -223,7 +223,7 @@ export class ListsService {
 
 	async delete(id: number): Promise<void> {
 		try {
-			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/lists/${id}`, {
+			await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/todo/api/lists/${id}`, {
 				method: 'delete'
 			});
 
@@ -235,7 +235,7 @@ export class ListsService {
 	}
 
 	canShareListWithUser(email: string): Promise<CanShareList> {
-		return this.httpProxy.ajax<CanShareList>(`${Variables.urls.api}/api/lists/can-share-with-user/${email}`);
+		return this.httpProxy.ajax<CanShareList>(`${Variables.urls.gateway}/todo/api/lists/can-share-with-user/${email}`);
 	}
 
 	async share(
@@ -245,7 +245,7 @@ export class ListsService {
 		removedShares: ShareUserAndPermission[]
 	): Promise<void> {
 		try {
-			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/lists/share`, {
+			await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/todo/api/lists/share`, {
 				method: 'put',
 				body: window.JSON.stringify({
 					listId: id,
@@ -264,7 +264,7 @@ export class ListsService {
 
 	async leave(id: number): Promise<void> {
 		try {
-			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/lists/${id}/leave`, {
+			await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/todo/api/lists/${id}/leave`, {
 				method: 'delete'
 			});
 
@@ -277,7 +277,7 @@ export class ListsService {
 
 	async copy(listId: number, name: string, icon: string): Promise<number> {
 		try {
-			const id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/api/lists/copy`, {
+			const id = await this.httpProxy.ajax<number>(`${Variables.urls.gateway}/todo/api/lists/copy`, {
 				method: 'post',
 				body: window.JSON.stringify({
 					id: listId,
@@ -362,7 +362,7 @@ export class ListsService {
 
 	async setIsArchived(id: number, isArchived: boolean): Promise<void> {
 		try {
-			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/lists/is-archived`, {
+			await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/todo/api/lists/is-archived`, {
 				method: 'put',
 				body: window.JSON.stringify({
 					listId: id,
@@ -379,7 +379,7 @@ export class ListsService {
 
 	async uncompleteAllTasks(id: number): Promise<void> {
 		try {
-			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/lists/uncomplete-all`, {
+			await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/todo/api/lists/uncomplete-all`, {
 				method: 'put',
 				body: window.JSON.stringify({
 					listId: id
@@ -395,7 +395,7 @@ export class ListsService {
 
 	async setShareIsAccepted(id: number, isAccepted: boolean): Promise<void> {
 		try {
-			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/lists/share-is-accepted`, {
+			await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/todo/api/lists/share-is-accepted`, {
 				method: 'put',
 				body: window.JSON.stringify({
 					listId: id,
@@ -412,7 +412,7 @@ export class ListsService {
 
 	// async reorder(id: number, oldOrder: number, newOrder: number): Promise<void> {
 	// 	try {
-	// 		await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/lists/reorder`, {
+	// 		await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/todo/api/lists/reorder`, {
 	// 			method: 'put',
 	// 			body: window.JSON.stringify({
 	// 				id: id,

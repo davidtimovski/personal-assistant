@@ -16,7 +16,7 @@ export class NotificationsServiceBase {
   ): Promise<void> {
     try {
       await this.httpProxy.ajaxExecute(
-        `${Variables.urls.api}/api/pushsubscriptions`,
+        `${Variables.urls.gateway}/core/api/pushsubscriptions`,
         {
           method: "post",
           body: window.JSON.stringify({

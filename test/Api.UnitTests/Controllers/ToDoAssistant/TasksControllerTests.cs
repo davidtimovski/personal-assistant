@@ -1,10 +1,9 @@
-﻿using Api.Config;
-using Api.Controllers.ToDoAssistant;
-using Api.UnitTests.Builders;
+﻿using Api.UnitTests.Builders;
 using Application.Contracts;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 using Moq;
+using ToDoAssistant.Api.Controllers;
 using ToDoAssistant.Application.Contracts.Tasks;
 using ToDoAssistant.Application.Contracts.Tasks.Models;
 using Xunit;
@@ -23,7 +22,7 @@ public class TasksControllerTests
             _userIdLookupMock.Object, null, null,
             _taskServiceMock.Object,
             null, null, null, null, null, null,
-            new Mock<IOptions<Urls>>().Object, null)
+            new Mock<IConfiguration>().Object, null)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };

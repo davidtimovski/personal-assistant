@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Api\Api.csproj" />
+    <ProjectReference Include="..\..\src\ToDoAssistant.Api\ToDoAssistant.Api.csproj" />
     <ProjectReference Include="..\..\src\Weatherman.Api\Weatherman.Api.csproj" />
   </ItemGroup>
 

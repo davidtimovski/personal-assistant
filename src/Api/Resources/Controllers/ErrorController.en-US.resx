@@ -174,33 +174,6 @@
   <data name="IsLinkedToNonExistentTask" xml:space="preserve">
     <value>Ingredient is attached to a non-existent task</value>
   </data>
-  <data name="Lists.CreateList.DuplicateTasks" xml:space="preserve">
-    <value>There are duplicates in the text</value>
-  </data>
-  <data name="Lists.CreateList.NoTasks" xml:space="preserve">
-    <value>No tasks have been found in the text</value>
-  </data>
-  <data name="Lists.CreateList.TasksNameMaxLength" xml:space="preserve">
-    <value>Tasks cannot have a name longer than 50 characters</value>
-  </data>
-  <data name="Lists.ListLimitReached" xml:space="preserve">
-    <value>You cannot create more than 50 lists, sorry</value>
-  </data>
-  <data name="Lists.ModifyList.IconIsRequired" xml:space="preserve">
-    <value>Icon is required</value>
-  </data>
-  <data name="Lists.ModifyList.InvalidIcon" xml:space="preserve">
-    <value>Selected Icon is not valid</value>
-  </data>
-  <data name="Lists.ModifyList.NameIsRequired" xml:space="preserve">
-    <value>Name is required</value>
-  </data>
-  <data name="Lists.ModifyList.NameMaxLength" xml:space="preserve">
-    <value>Name cannot be longer than 50 characters</value>
-  </data>
-  <data name="Lists.ShareList.UserDoesNotExist" xml:space="preserve">
-    <value>User does not exist</value>
-  </data>
   <data name="Recipes.ModifyRecipe.AmountMustBeBetween" xml:space="preserve">
     <value>If an amount is set it must be between 0.1 and 10000</value>
   </data>
@@ -245,36 +218,6 @@
   </data>
   <data name="Recipes.RecipeLimitReached" xml:space="preserve">
     <value>You cannot create more than 250 recipes, sorry</value>
-  </data>
-  <data name="Tasks.BulkCreate.DuplicateTasks" xml:space="preserve">
-    <value>There are duplicates in the text</value>
-  </data>
-  <data name="Tasks.BulkCreate.NoTasks" xml:space="preserve">
-    <value>No tasks have been found in the text</value>
-  </data>
-  <data name="Tasks.BulkCreate.SomeTasksAlreadyExist" xml:space="preserve">
-    <value>Some of the tasks already exist</value>
-  </data>
-  <data name="Tasks.BulkCreate.TasksNameMaxLength" xml:space="preserve">
-    <value>Tasks cannot have a name longer than 50 characters</value>
-  </data>
-  <data name="Tasks.BulkCreate.TextIsRequired" xml:space="preserve">
-    <value>Text is required</value>
-  </data>
-  <data name="Tasks.ModifyTask.NameIsRequired" xml:space="preserve">
-    <value>Name is required</value>
-  </data>
-  <data name="Tasks.ModifyTask.NameMaxLength" xml:space="preserve">
-    <value>Name cannot be longer than 50 characters</value>
-  </data>
-  <data name="Tasks.UpdateTask.SelectedListAlreadyContainsMaxTasks" xml:space="preserve">
-    <value>The selected list already contains the maximum of 250 tasks</value>
-  </data>
-  <data name="Tasks.UpdateTask.TheAssignedUserIsNotAMember" xml:space="preserve">
-    <value>The assigned user is not a member of the list</value>
-  </data>
-  <data name="TasksPerListLimitReached" xml:space="preserve">
-    <value>You cannot create more than 250 tasks per list, sorry</value>
   </data>
   <data name="Unauthorized" xml:space="preserve">
     <value>Unauthorized</value>

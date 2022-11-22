@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using Api.Config;
 using Api.Models;
 using Api.Models.CookingAssistant.Recipes;
 using Application.Contracts;
@@ -14,7 +13,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Options;
 
 namespace Api.Controllers.CookingAssistant;
 
@@ -37,7 +35,7 @@ public class RecipesController : BaseController
     private readonly IValidator<CreateSendRequest> _createSendRequestValidator;
     private readonly IValidator<ImportRecipe> _importRecipeValidator;
     private readonly IValidator<UploadTempImage> _uploadTempImageValidator;
-    private readonly Urls _urls;
+    private readonly string _url;
     private readonly ILogger<RecipesController> _logger;
 
     public RecipesController(
@@ -57,7 +55,7 @@ public class RecipesController : BaseController
         IValidator<CreateSendRequest> createSendRequestValidator,
         IValidator<ImportRecipe> importRecipeValidator,
         IValidator<UploadTempImage> uploadTempImageValidator,
-        IOptions<Urls> urls,
+        IConfiguration configuration,
         ILogger<RecipesController> logger) : base(userIdLookup, usersRepository)
     {
         _recipeService = recipeService;
@@ -74,7 +72,7 @@ public class RecipesController : BaseController
         _createSendRequestValidator = createSendRequestValidator;
         _importRecipeValidator = importRecipeValidator;
         _uploadTempImageValidator = uploadTempImageValidator;
-        _urls = urls.Value;
+        _url = configuration["Urls:CookingAssistant"];
         _logger = logger;
     }
 
@@ -481,7 +479,7 @@ public class RecipesController : BaseController
                     SenderImageUri = result.ActionUserImageUri,
                     UserId = recipient.Id,
                     Message = message,
-                    OpenUrl = $"{_urls.CookingAssistant}/inbox"
+                    OpenUrl = $"{_url}/inbox"
                 };
 
                 _senderService.Enqueue(pushNotification);
