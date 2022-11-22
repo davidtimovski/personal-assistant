@@ -1,9 +1,9 @@
-﻿using Api.Controllers.Common;
-using Api.UnitTests.Builders;
+﻿using Api.UnitTests.Builders;
+using Core.Api.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
-namespace Api.UnitTests.Controllers.Common;
+namespace Api.UnitTests.Controllers.Core;
 
 public class PushSubscriptionsControllerTests
 {

@@ -1,4 +1,5 @@
-﻿using Accountant.Application.Contracts.Accounts;
+﻿using Accountant.Api.Models.Sync;
+using Accountant.Application.Contracts.Accounts;
 using Accountant.Application.Contracts.Accounts.Models;
 using Accountant.Application.Contracts.AutomaticTransactions;
 using Accountant.Application.Contracts.AutomaticTransactions.Models;
@@ -13,16 +14,14 @@ using Accountant.Application.Contracts.Transactions;
 using Accountant.Application.Contracts.Transactions.Models;
 using Accountant.Application.Contracts.UpcomingExpenses;
 using Accountant.Application.Contracts.UpcomingExpenses.Models;
-using Api.Models.Accountant.Sync;
 using Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Api.Controllers.Accountant;
+namespace Accountant.Api.Controllers;
 
 [Authorize]
-[EnableCors("AllowAccountant")]
 [Route("api/[controller]")]
 public class SyncController : BaseController
 {

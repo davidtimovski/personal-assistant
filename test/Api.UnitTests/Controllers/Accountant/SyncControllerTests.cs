@@ -1,4 +1,4 @@
-﻿using Api.Controllers.Accountant;
+﻿using Accountant.Api.Controllers;
 using Api.UnitTests.Builders;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;

@@ -30,6 +30,7 @@ services:
     depends_on:
       - core-api
       - todo-api
+      - accountant-api
       - weatherman-api
 
   core-api:
@@ -50,6 +51,15 @@ services:
     depends_on:
       - postgres
       - rabbitmq
+
+  accountant-api:
+    image: personalassistant-accountant-api:latest
+    container_name: personalassistant-accountant-api
+    build:
+      context: .
+      dockerfile: src/Accountant.Api/Dockerfile
+    depends_on:
+      - postgres
 
   weatherman-api:
     image: personalassistant-weatherman-api:latest

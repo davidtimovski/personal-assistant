@@ -79,12 +79,12 @@
 				if (!remote) {
 					await tasksService.delete(task.id);
 				}
-				tasksService.deleteLocal(task.id, task.listId, $state.lists, localStorage);
+				tasksService.deleteLocal(task.id, task.listId, $state.lists);
 			} else {
 				if (!remote) {
 					await tasksService.complete(task.id);
 				}
-				tasksService.completeLocal(task.id, task.listId, $state.lists, localStorage);
+				tasksService.completeLocal(task.id, task.listId, $state.lists);
 			}
 		}, Date.now());
 	}

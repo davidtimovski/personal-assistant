@@ -25,7 +25,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
-    <ProjectReference Include="..\Persistence\Persistence.csproj" />
+    <ProjectReference Include="..\Accountant.Application\Accountant.Application.csproj" />
+    <ProjectReference Include="..\Accountant.Persistence\Accountant.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

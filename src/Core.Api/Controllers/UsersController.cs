@@ -1,10 +1,7 @@
-﻿using Accountant.Application.Contracts;
-using Application.Contracts;
+﻿using Application.Contracts;
 using Application.Contracts.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ToDoAssistant.Application.Contracts;
-using Weatherman.Application.Contracts;
 
 namespace Core.Api.Controllers;
 

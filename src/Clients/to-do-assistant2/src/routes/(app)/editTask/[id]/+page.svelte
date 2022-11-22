@@ -129,7 +129,7 @@
 			deleteButtonIsLoading = true;
 
 			await tasksService.delete(data.id);
-			tasksService.deleteLocal(data.id, listId, $state.lists, localStorage);
+			tasksService.deleteLocal(data.id, listId, $state.lists);
 
 			alertState.update((x) => {
 				x.showSuccess('editTask.deleteSuccessful');

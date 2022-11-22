@@ -159,6 +159,11 @@ public class TransactionService : ITransactionService
     {
         try
         {
+            if (!Directory.Exists(model.Directory))
+            {
+                Directory.CreateDirectory(model.Directory);
+            }
+
             string fileName = model.FileId + ".csv";
             string tempFilePath = Path.Combine(model.Directory, fileName);
 

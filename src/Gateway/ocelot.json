@@ -41,6 +41,18 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
+          "Host": "accountant-api",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/accountant/{route}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
+    },
+    {
+      "DownstreamPathTemplate": "/{route}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
           "Host": "weatherman-api",
           "Port": 80
         }

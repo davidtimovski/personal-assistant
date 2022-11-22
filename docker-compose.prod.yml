@@ -53,6 +53,7 @@ services:
     depends_on:
       - core-api
       - todo-api
+      - accountant-api
       - weatherman-api
 
   core-api:
@@ -84,6 +85,19 @@ services:
     depends_on:
       - postgres
       - rabbitmq
+
+  accountant-api:
+    image: ${DOCKER_REGISTRY}:accountant-api-latest
+    container_name: pa-accountant-api
+    restart: always
+    environment:
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
+      - PORT=80
+    volumes:
+      - ./storage:/app/storage
+    depends_on:
+      - postgres
 
   weatherman-api:
     image: ${DOCKER_REGISTRY}:weatherman-api-latest

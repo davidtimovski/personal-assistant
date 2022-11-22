@@ -1,5 +1,4 @@
-﻿@inject Microsoft.ApplicationInsights.AspNetCore.JavaScriptSnippet JavaScriptSnippet
-@{
+﻿@{
     var backgroundClass = string.Empty;
     switch (ViewData["Title"])
     {
@@ -40,7 +39,6 @@
         <link rel="preload" href="https://cdn.personalassistant.site/css/style.min.css?v=5" as="style">
         <link rel="stylesheet" href="https://cdn.personalassistant.site/css/style.min.css?v=5">
     </environment>
-    @Html.Raw(JavaScriptSnippet.FullScript)
 </head>
 <body class="@backgroundClass">
     <main class="wide-layout">

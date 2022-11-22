@@ -108,7 +108,7 @@ export class DebtsService {
 				);
 
 				if (navigator.onLine) {
-					mergedDebt.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/api/debts/merged`, {
+					mergedDebt.id = await this.httpProxy.ajax<number>(`${Variables.urls.gateway}/accountant/api/debts/merged`, {
 						method: 'post',
 						body: window.JSON.stringify(mergedDebt)
 					});
@@ -126,7 +126,7 @@ export class DebtsService {
 				debt.createdDate = debt.modifiedDate = now;
 
 				if (navigator.onLine) {
-					debt.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/api/debts`, {
+					debt.id = await this.httpProxy.ajax<number>(`${Variables.urls.gateway}/accountant/api/debts`, {
 						method: 'post',
 						body: window.JSON.stringify(debt)
 					});
@@ -155,7 +155,7 @@ export class DebtsService {
 			debt.modifiedDate = DateHelper.adjustTimeZone(new Date());
 
 			if (navigator.onLine) {
-				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/debts`, {
+				await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/accountant/api/debts`, {
 					method: 'put',
 					body: window.JSON.stringify(debt)
 				});
@@ -174,7 +174,7 @@ export class DebtsService {
 	async delete(id: number): Promise<void> {
 		try {
 			if (navigator.onLine) {
-				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/debts/${id}`, {
+				await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/accountant/api/debts/${id}`, {
 					method: 'delete'
 				});
 			} else if (await this.idbHelper.isSynced(id)) {

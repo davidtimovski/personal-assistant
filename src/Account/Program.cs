@@ -69,7 +69,7 @@ builder.Services
         options.ClientId = builder.Configuration["Auth0:ClientId"];
     });
 
-builder.Services.AddApplicationInsightsTelemetry()
+builder.Services
     .AddLocalization(options => options.ResourcesPath = "Resources")
     .AddCors();
 

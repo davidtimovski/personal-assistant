@@ -5,7 +5,7 @@ using Accountant.Application.Contracts.Debts.Models;
 using Accountant.Application.Contracts.Transactions.Models;
 using Accountant.Application.Contracts.UpcomingExpenses.Models;
 
-namespace Api.Models.Accountant.Sync;
+namespace Accountant.Api.Models.Sync;
 
 public class ChangedVm
 {

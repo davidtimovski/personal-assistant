@@ -113,11 +113,11 @@
 		unsubscriptions.push(
 			remoteEvents.subscribe((e) => {
 				if (e.type === RemoteEventType.TaskCompletedRemotely) {
-					tasksService.completeLocal(e.data.id, e.data.listId, $state.lists, localStorage);
+					tasksService.completeLocal(e.data.id, e.data.listId, $state.lists);
 				} else if (e.type === RemoteEventType.TaskUncompletedRemotely) {
-					tasksService.uncompleteLocal(e.data.id, e.data.listId, $state.lists, localStorage);
+					tasksService.uncompleteLocal(e.data.id, e.data.listId, $state.lists);
 				} else if (e.type === RemoteEventType.TaskDeletedRemotely) {
-					tasksService.deleteLocal(e.data.id, e.data.listId, $state.lists, localStorage);
+					tasksService.deleteLocal(e.data.id, e.data.listId, $state.lists);
 				}
 
 				setListsFromState();

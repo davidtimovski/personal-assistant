@@ -5,10 +5,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Api.Controllers.Accountant;
+namespace Accountant.Api.Controllers;
 
 [Authorize]
-[EnableCors("AllowAccountant")]
 [Route("api/[controller]")]
 public class AutomaticTransactionsController : BaseController
 {
