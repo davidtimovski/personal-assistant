@@ -22,8 +22,6 @@ env:
   REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
 
 jobs:
-  test:
-    uses: davidtimovski/personal-assistant/.github/workflows/test.yml@master
   deploy:
     name: Build and push images to Docker Hub
     needs: test
