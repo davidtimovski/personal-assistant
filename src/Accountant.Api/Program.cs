@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.IdentityModel.Tokens;
 using Persistence;
-using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,11 +30,13 @@ if (builder.Environment.IsProduction())
         var client = new SecretClient(new Uri(url), credential);
         configBuilder.AddAzureKeyVault(client, new AzureKeyVaultConfigurationOptions());
     });
-}
 
-Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .CreateLogger();
+    builder.Host.ConfigureLogging((context, loggingBuilder) =>
+    {
+        loggingBuilder.AddConfiguration(context.Configuration);
+        loggingBuilder.AddSentry();
+    });
+}
 
 builder.Services
     .AddApplication(builder.Configuration)

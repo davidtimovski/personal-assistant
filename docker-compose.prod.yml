@@ -93,6 +93,7 @@ services:
     environment:
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
+      - Sentry__Dsn=${SENTRY_DSN}
       - PORT=80
     volumes:
       - ./storage:/app/storage
