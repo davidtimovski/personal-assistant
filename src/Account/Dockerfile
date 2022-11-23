@@ -11,11 +11,9 @@ COPY ["src/Domain/Domain.csproj", "src/Domain/"]
 COPY ["src/ToDoAssistant.Application/ToDoAssistant.Application.csproj", "src/ToDoAssistant.Application/"]
 COPY ["src/CookingAssistant.Application/CookingAssistant.Application.csproj", "src/CookingAssistant.Application/"]
 COPY ["src/Accountant.Application/Accountant.Application.csproj", "src/Accountant.Application/"]
-COPY ["src/Weatherman.Application/Weatherman.Application.csproj", "src/Weatherman.Application/"]
 COPY ["src/ToDoAssistant.Persistence/ToDoAssistant.Persistence.csproj", "src/ToDoAssistant.Persistence/"]
 COPY ["src/CookingAssistant.Persistence/CookingAssistant.Persistence.csproj", "src/CookingAssistant.Persistence/"]
 COPY ["src/Accountant.Persistence/Accountant.Persistence.csproj", "src/Accountant.Persistence/"]
-COPY ["src/Weatherman.Persistence/Weatherman.Persistence.csproj", "src/Weatherman.Persistence/"]
 COPY ["src/Infrastructure/Infrastructure.csproj", "src/Infrastructure/"]
 RUN dotnet restore "src/Account/Account.csproj"
 COPY . .

@@ -6,19 +6,17 @@ on:
     branches:
       - master
     paths:
-      - "src/Account/**"
       - "src/Domain/**"
       - "src/Application/**"
+      - "src/Infrastructure/**"
+      - "src/Persistence/**"
       - "src/ToDoAssistant.Application/**"
       - "src/CookingAssistant.Application/**"
       - "src/Accountant.Application/**"
-      - "src/Weatherman.Application/**"
-      - "src/Persistence/**"
       - "src/ToDoAssistant.Persistence/**"
       - "src/CookingAssistant.Persistence/**"
       - "src/Accountant.Persistence/**"
-      - "src/Weatherman.Persistence/**"
-      - "src/Infrastructure/**"
+      - "src/Account/**"
 
 env:
   REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
