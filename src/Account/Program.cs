@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Security.Cryptography.X509Certificates;
 using Account.Services;
 using Accountant.Application;
 using Accountant.Persistence;
@@ -6,11 +7,13 @@ using Application;
 using Auth0.AspNetCore.Authentication;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
+using Azure.Security.KeyVault.Certificates;
 using Azure.Security.KeyVault.Secrets;
 using CookingAssistant.Application;
 using CookingAssistant.Persistence;
 using FluentValidation.AspNetCore;
 using Infrastructure;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Net.Http.Headers;
@@ -22,18 +25,26 @@ var builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsProduction())
 {
+    var keyVaultUri = new Uri(builder.Configuration["KeyVault:Url"]);
+    string tenantId = builder.Configuration["KeyVault:TenantId"];
+    string clientId = builder.Configuration["KeyVault:ClientId"];
+    string clientSecret = builder.Configuration["KeyVault:ClientSecret"];
+
+    var tokenCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+
     builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
     {
-        string url = builder.Configuration["KeyVault:Url"];
-        string tenantId = builder.Configuration["KeyVault:TenantId"];
-        string clientId = builder.Configuration["KeyVault:ClientId"];
-        string clientSecret = builder.Configuration["KeyVault:ClientSecret"];
-
-        var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
-
-        var client = new SecretClient(new Uri(url), credential);
-        configBuilder.AddAzureKeyVault(client, new AzureKeyVaultConfigurationOptions());
+        var secretClient = new SecretClient(keyVaultUri, tokenCredential);
+        configBuilder.AddAzureKeyVault(secretClient, new AzureKeyVaultConfigurationOptions());
     });
+
+    var certClient = new CertificateClient(keyVaultUri, tokenCredential);
+    X509Certificate2 certificate = certClient.DownloadCertificate("personal-assistant");
+
+    builder.Services
+        .AddDataProtection()
+        .PersistKeysToFileSystem(new DirectoryInfo(@"storage/dataprotection-keys/"))
+        .ProtectKeysWithCertificate(certificate);
 
     builder.Host.ConfigureLogging((context, loggingBuilder) =>
     {
