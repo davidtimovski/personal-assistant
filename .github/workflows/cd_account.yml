@@ -26,8 +26,7 @@ env:
 
 jobs:
   deploy:
-    name: Build and push images to Docker Hub
-    needs: test
+    name: Build and push image to Docker Hub
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
