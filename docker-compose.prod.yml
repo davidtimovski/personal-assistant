@@ -11,6 +11,7 @@ services:
       - EventBusUserName=${EVENT_BUS_USERNAME}
       - EventBusPassword=${EVENT_BUS_PASSWORD}
       - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
+      - Sentry__Dsn=${ACCOUNT_SENTRY_DSN}
       - PORT=80
     ports:
       - "5000:80"
@@ -63,6 +64,7 @@ services:
     environment:
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
+      - Sentry__Dsn=${CORE_SENTRY_DSN}
       - PORT=80
     volumes:
       - ./storage:/app/storage
@@ -79,6 +81,7 @@ services:
       - EventBusUserName=${EVENT_BUS_USERNAME}
       - EventBusPassword=${EVENT_BUS_PASSWORD}
       - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
+      - Sentry__Dsn=${TODO_SENTRY_DSN}
       - PORT=80
     volumes:
       - ./storage:/app/storage
@@ -93,7 +96,7 @@ services:
     environment:
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
-      - Sentry__Dsn=${SENTRY_DSN}
+      - Sentry__Dsn=${ACCOUNTANT_SENTRY_DSN}
       - PORT=80
     volumes:
       - ./storage:/app/storage
@@ -107,6 +110,7 @@ services:
     environment:
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
+      - Sentry__Dsn=${WEATHERMAN_SENTRY_DSN}
       - PORT=80
     volumes:
       - ./storage:/app/storage

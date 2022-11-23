@@ -15,30 +15,32 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Net.Http.Headers;
 using Persistence;
-using Serilog;
 using ToDoAssistant.Application;
 using ToDoAssistant.Persistence;
-using Weatherman.Application;
-using Weatherman.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
-{
-    if (context.HostingEnvironment.IsProduction())
-    {
-        var config = configBuilder.Build();
 
-        string url = config["KeyVault:Url"];
-        string tenantId = config["KeyVault:TenantId"];
-        string clientId = config["KeyVault:ClientId"];
-        string clientSecret = config["KeyVault:ClientSecret"];
+if (builder.Environment.IsProduction())
+{
+    builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
+    {
+        string url = builder.Configuration["KeyVault:Url"];
+        string tenantId = builder.Configuration["KeyVault:TenantId"];
+        string clientId = builder.Configuration["KeyVault:ClientId"];
+        string clientSecret = builder.Configuration["KeyVault:ClientSecret"];
 
         var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
 
         var client = new SecretClient(new Uri(url), credential);
         configBuilder.AddAzureKeyVault(client, new AzureKeyVaultConfigurationOptions());
-    }
-});
+    });
+
+    builder.Host.ConfigureLogging((context, loggingBuilder) =>
+    {
+        loggingBuilder.AddConfiguration(context.Configuration);
+        loggingBuilder.AddSentry();
+    });
+}
 
 builder.Services
     .AddApplication(builder.Configuration)
@@ -47,11 +49,9 @@ builder.Services
     .AddToDoAssistantPersistence(builder.Configuration["ConnectionString"])
     .AddCookingAssistantPersistence(builder.Configuration["ConnectionString"])
     .AddAccountantPersistence(builder.Configuration["ConnectionString"])
-    .AddWeathermanPersistence(builder.Configuration["ConnectionString"])
     .AddToDoAssistant(builder.Configuration)
     .AddCookingAssistant(builder.Configuration)
-    .AddAccountant(builder.Configuration)
-    .AddWeatherman(builder.Configuration);
+    .AddAccountant(builder.Configuration);
 
 // Cookie configuration for HTTPS
 if (builder.Environment.EnvironmentName == Environments.Production)
@@ -85,10 +85,6 @@ builder.Services
 
 builder.Services.AddHttpClient();
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
-
-Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .CreateLogger();
 
 builder.Services.AddTransient<IEmailTemplateService, EmailTemplateService>();
 

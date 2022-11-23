@@ -27,8 +27,8 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.0" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="3.4.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="Sentry.AspNetCore" Version="3.24.0" />
+    <PackageReference Include="Sentry.Extensions.Logging" Version="3.24.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -43,8 +43,6 @@
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     <ProjectReference Include="..\ToDoAssistant.Application\ToDoAssistant.Application.csproj" />
     <ProjectReference Include="..\ToDoAssistant.Persistence\ToDoAssistant.Persistence.csproj" />
-    <ProjectReference Include="..\Weatherman.Application\Weatherman.Application.csproj" />
-    <ProjectReference Include="..\Weatherman.Persistence\Weatherman.Persistence.csproj" />
   </ItemGroup>
 
   <ItemGroup>

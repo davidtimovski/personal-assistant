@@ -1,12 +1,14 @@
 using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
+using Azure.Security.KeyVault.Certificates;
 using Azure.Security.KeyVault.Secrets;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.IdentityModel.Tokens;
 using Persistence;
-using Serilog;
 using Weatherman.Application;
 using Weatherman.Infrastructure;
 using Weatherman.Persistence;
@@ -15,25 +17,33 @@ var builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsProduction())
 {
+    var keyVaultUri = new Uri(builder.Configuration["KeyVault:Url"]);
+    string tenantId = builder.Configuration["KeyVault:TenantId"];
+    string clientId = builder.Configuration["KeyVault:ClientId"];
+    string clientSecret = builder.Configuration["KeyVault:ClientSecret"];
+
+    var tokenCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+
     builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
     {
-        var config = configBuilder.Build();
+        var secretClient = new SecretClient(keyVaultUri, tokenCredential);
+        configBuilder.AddAzureKeyVault(secretClient, new AzureKeyVaultConfigurationOptions());
+    });
 
-        string url = config["KeyVault:Url"];
-        string tenantId = config["KeyVault:TenantId"];
-        string clientId = config["KeyVault:ClientId"];
-        string clientSecret = config["KeyVault:ClientSecret"];
+    var certClient = new CertificateClient(keyVaultUri, tokenCredential);
+    X509Certificate2 certificate = certClient.DownloadCertificate("personal-assistant");
 
-        var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+    builder.Services
+        .AddDataProtection()
+        .PersistKeysToFileSystem(new DirectoryInfo(@"storage/dataprotection-keys/"))
+        .ProtectKeysWithCertificate(certificate);
 
-        var client = new SecretClient(new Uri(url), credential);
-        configBuilder.AddAzureKeyVault(client, new AzureKeyVaultConfigurationOptions());
+    builder.Host.ConfigureLogging((context, loggingBuilder) =>
+    {
+        loggingBuilder.AddConfiguration(context.Configuration);
+        loggingBuilder.AddSentry();
     });
 }
-
-Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .CreateLogger();
 
 builder.Services
     .AddInfrastructure(builder.Configuration, builder.Environment.EnvironmentName)
