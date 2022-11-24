@@ -1,19 +1,13 @@
 ﻿using System.Globalization;
-using System.Security.Cryptography.X509Certificates;
 using Account.Services;
 using Accountant.Application;
 using Accountant.Persistence;
 using Application;
 using Auth0.AspNetCore.Authentication;
-using Azure.Extensions.AspNetCore.Configuration.Secrets;
-using Azure.Identity;
-using Azure.Security.KeyVault.Certificates;
-using Azure.Security.KeyVault.Secrets;
 using CookingAssistant.Application;
 using CookingAssistant.Persistence;
 using FluentValidation.AspNetCore;
 using Infrastructure;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Net.Http.Headers;
@@ -30,21 +24,8 @@ if (builder.Environment.IsProduction())
     string clientId = builder.Configuration["KeyVault:ClientId"];
     string clientSecret = builder.Configuration["KeyVault:ClientSecret"];
 
-    var tokenCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
-
-    builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
-    {
-        var secretClient = new SecretClient(keyVaultUri, tokenCredential);
-        configBuilder.AddAzureKeyVault(secretClient, new AzureKeyVaultConfigurationOptions());
-    });
-
-    var certClient = new CertificateClient(keyVaultUri, tokenCredential);
-    X509Certificate2 certificate = certClient.DownloadCertificate("personal-assistant");
-
-    builder.Services
-        .AddDataProtection()
-        .PersistKeysToFileSystem(new DirectoryInfo(@"storage/dataprotection-keys/"))
-        .ProtectKeysWithCertificate(certificate);
+    builder.Host.AddKeyVault(keyVaultUri, tenantId, clientId, clientSecret);
+    builder.Services.AddDataProtectionWithCertificate(keyVaultUri, tenantId, clientId, clientSecret);
 
     builder.Host.ConfigureLogging((context, loggingBuilder) =>
     {
@@ -54,15 +35,26 @@ if (builder.Environment.IsProduction())
 }
 
 builder.Services
-    .AddApplication(builder.Configuration)
-    .AddInfrastructure(builder.Configuration, builder.Environment.EnvironmentName)
-    .AddPersistence(builder.Configuration["ConnectionString"])
-    .AddToDoAssistantPersistence(builder.Configuration["ConnectionString"])
-    .AddCookingAssistantPersistence(builder.Configuration["ConnectionString"])
-    .AddAccountantPersistence(builder.Configuration["ConnectionString"])
-    .AddToDoAssistant(builder.Configuration)
+    .AddApplication()
+    .AddToDoAssistant()
     .AddCookingAssistant(builder.Configuration)
-    .AddAccountant(builder.Configuration);
+    .AddAccountant();
+
+builder.Services
+    .AddUserIdMapper()
+    .AddCloudinary(builder.Configuration["Cloudinary:CloudName"],
+                   builder.Configuration["Cloudinary:ApiKey"],
+                   builder.Configuration["Cloudinary:ApiSecret"],
+                   builder.Environment.EnvironmentName,
+                   builder.Configuration["Cloudinary:DefaultImageUris:Profile"],
+                   builder.Configuration["Cloudinary:DefaultImageUris:Recipe"])
+    .AddCurrencies();
+
+builder.Services
+    .AddPersistence(builder.Configuration["ConnectionString"])
+    .AddToDoAssistantPersistence()
+    .AddCookingAssistantPersistence()
+    .AddAccountantPersistence();
 
 // Cookie configuration for HTTPS
 if (builder.Environment.EnvironmentName == Environments.Production)

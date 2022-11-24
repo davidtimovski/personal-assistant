@@ -8,18 +8,15 @@ namespace Application.Services;
 
 public class UserService : IUserService
 {
-    private readonly ICdnService _cdnService;
     private readonly IUsersRepository _usersRepository;
     private readonly IMapper _mapper;
     private readonly ILogger<UserService> _logger;
 
     public UserService(
-        ICdnService cdnService,
         IUsersRepository usersRepository,
         IMapper mapper,
         ILogger<UserService> logger)
     {
-        _cdnService = cdnService;
         _usersRepository = usersRepository;
         _mapper = mapper;
         _logger = logger;

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
-namespace ToDoAssistant.Controllers;
+namespace ToDoAssistant.Api.Controllers;
 
 public class ErrorController : ControllerBase
 {

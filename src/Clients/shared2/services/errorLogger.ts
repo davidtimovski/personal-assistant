@@ -28,17 +28,18 @@ export class ErrorLogger {
       message = error.toString();
     }
 
-    await this.httpProxy.ajaxExecute(`${Variables.urls.api}/api/gateway`, {
-      method: "post",
-      body: window.JSON.stringify({
-        service: "client-logger",
-        url: "logs",
-        application: this.application,
-        message: message,
-        stackTrace: stackTrace,
-        occurred: DateHelper.adjustTimeZone(new Date()),
-      }),
-    });
+    await this.httpProxy.ajaxExecute(
+      `${Variables.urls.gateway}/client-logger/logs`,
+      {
+        method: "post",
+        body: window.JSON.stringify({
+          application: this.application,
+          message: message,
+          stackTrace: stackTrace,
+          occurred: DateHelper.adjustTimeZone(new Date()),
+        }),
+      }
+    );
   }
 
   release() {

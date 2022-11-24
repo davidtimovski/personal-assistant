@@ -8,7 +8,7 @@ namespace ToDoAssistant.Persistence;
 
 public static class IoC
 {
-    public static IServiceCollection AddToDoAssistantPersistence(this IServiceCollection services, string connectionString)
+    public static IServiceCollection AddToDoAssistantPersistence(this IServiceCollection services)
     {
         services.AddTransient<IListsRepository, ListsRepository>();
         services.AddTransient<ITasksRepository, TasksRepository>();

@@ -7,14 +7,13 @@ using Accountant.Application.Contracts.Sync;
 using Accountant.Application.Contracts.Transactions;
 using Accountant.Application.Contracts.UpcomingExpenses;
 using Accountant.Application.Services;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Accountant.Application;
 
 public static class IoC
 {
-    public static IServiceCollection AddAccountant(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddAccountant(this IServiceCollection services)
     {
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
 

@@ -1,18 +1,8 @@
 using System.Globalization;
-using System.Security.Claims;
-using System.Security.Cryptography.X509Certificates;
 using Accountant.Application;
 using Accountant.Persistence;
-using Application;
-using Azure.Extensions.AspNetCore.Configuration.Secrets;
-using Azure.Identity;
-using Azure.Security.KeyVault.Certificates;
-using Azure.Security.KeyVault.Secrets;
 using Infrastructure;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.IdentityModel.Tokens;
 using Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,21 +14,8 @@ if (builder.Environment.IsProduction())
     string clientId = builder.Configuration["KeyVault:ClientId"];
     string clientSecret = builder.Configuration["KeyVault:ClientSecret"];
 
-    var tokenCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
-
-    builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
-    {
-        var secretClient = new SecretClient(keyVaultUri, tokenCredential);
-        configBuilder.AddAzureKeyVault(secretClient, new AzureKeyVaultConfigurationOptions());
-    });
-
-    var certClient = new CertificateClient(keyVaultUri, tokenCredential);
-    X509Certificate2 certificate = certClient.DownloadCertificate("personal-assistant");
-
-    builder.Services
-        .AddDataProtection()
-        .PersistKeysToFileSystem(new DirectoryInfo(@"storage/dataprotection-keys/"))
-        .ProtectKeysWithCertificate(certificate);
+    builder.Host.AddKeyVault(keyVaultUri, tenantId, clientId, clientSecret);
+    builder.Services.AddDataProtectionWithCertificate(keyVaultUri, tenantId, clientId, clientSecret);
 
     builder.Host.ConfigureLogging((context, loggingBuilder) =>
     {
@@ -47,25 +24,16 @@ if (builder.Environment.IsProduction())
     });
 }
 
-builder.Services
-    .AddApplication(builder.Configuration)
-    .AddInfrastructure(builder.Configuration, builder.Environment.EnvironmentName)
-    .AddPersistence(builder.Configuration["ConnectionString"])
-    .AddAccountant(builder.Configuration)
-    .AddAccountantPersistence(builder.Configuration["ConnectionString"]);
+builder.Services.AddAccountant();
 
+builder.Services.AddAuth0(
+    authority: $"https://{builder.Configuration["Auth0:Domain"]}/",
+    audience: builder.Configuration["Auth0:Audience"]
+);
+    
 builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.Authority = $"https://{builder.Configuration["Auth0:Domain"]}/";
-        options.Audience = builder.Configuration["Auth0:Audience"];
-        // If the access token does not have a `sub` claim, `User.Identity.Name` will be `null`. Map it to a different claim by setting the NameClaimType below.
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            NameClaimType = ClaimTypes.NameIdentifier
-        };
-    });
+    .AddPersistence(builder.Configuration["ConnectionString"])
+    .AddAccountantPersistence();
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 

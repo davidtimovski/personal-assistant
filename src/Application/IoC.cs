@@ -11,11 +11,9 @@ namespace Application;
 
 public static class IoC
 {
-    public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
-
-        services.AddTransient<IValidator<UploadTempImage>, UploadTempImageValidator>();
 
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<IPushSubscriptionService, PushSubscriptionService>();
