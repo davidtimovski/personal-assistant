@@ -12,7 +12,7 @@ namespace Accountant.Persistence;
 
 public static class IoC
 {
-    public static IServiceCollection AddAccountantPersistence(this IServiceCollection services, string connectionString)
+    public static IServiceCollection AddAccountantPersistence(this IServiceCollection services)
     {
         services.AddTransient<IAccountsRepository, AccountsRepository>();
         services.AddTransient<ICategoriesRepository, CategoriesRepository>();

@@ -1,6 +1,4 @@
-using Application.Contracts;
-using CloudinaryDotNet;
-using Infrastructure.Cdn;
+using Infrastructure;
 using Jobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,15 +26,13 @@ using IHost host = Host.CreateDefaultBuilder(args)
     })
     .ConfigureServices((hostContext, services) =>
     {
-        services.AddSingleton<ICdnService>(new CloudinaryService(
-            cloudinaryAccount: new Account(
-                hostContext.Configuration["Cloudinary:CloudName"],
-                hostContext.Configuration["Cloudinary:ApiKey"],
-                hostContext.Configuration["Cloudinary:ApiSecret"]),
+        services.AddCloudinary(
+            hostContext.Configuration["Cloudinary:CloudName"],
+            hostContext.Configuration["Cloudinary:ApiKey"],
+            hostContext.Configuration["Cloudinary:ApiSecret"],
             hostContext.HostingEnvironment.EnvironmentName,
-            hostContext.Configuration["DefaultImageUris:Profile"],
-            hostContext.Configuration["DefaultImageUris:Recipe"],
-            new HttpClient()));
+            hostContext.Configuration["Cloudinary:DefaultImageUris:Profile"],
+            hostContext.Configuration["Cloudinary:DefaultImageUris:Recipe"]);
 
         services.AddHttpClient("fixer", c =>
         {

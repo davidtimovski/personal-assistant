@@ -1,6 +1,6 @@
-﻿using Api.Controllers.CookingAssistant;
-using Api.UnitTests.Builders;
+﻿using Api.UnitTests.Builders;
 using Application.Contracts;
+using CookingAssistant.Api.Controllers;
 using CookingAssistant.Application.Contracts.Ingredients;
 using CookingAssistant.Application.Contracts.Ingredients.Models;
 using Microsoft.AspNetCore.Mvc;

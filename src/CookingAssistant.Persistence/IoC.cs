@@ -8,7 +8,7 @@ namespace CookingAssistant.Persistence;
 
 public static class IoC
 {
-    public static IServiceCollection AddCookingAssistantPersistence(this IServiceCollection services, string connectionString)
+    public static IServiceCollection AddCookingAssistantPersistence(this IServiceCollection services)
     {
         services.AddTransient<IRecipesRepository, RecipesRepository>();
         services.AddTransient<IIngredientsRepository, IngredientsRepository>();

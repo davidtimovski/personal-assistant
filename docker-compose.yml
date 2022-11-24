@@ -11,16 +11,6 @@ services:
       - postgres
       - rabbitmq
 
-  api:
-    image: personalassistant-api:latest
-    container_name: personalassistant-api
-    build:
-      context: .
-      dockerfile: src/Api/Dockerfile
-    depends_on:
-      - postgres
-      - rabbitmq
-
   gateway:
     image: personalassistant-gateway:latest
     container_name: personalassistant-gateway
@@ -48,6 +38,16 @@ services:
     build:
       context: .
       dockerfile: src/ToDoAssistant.Api/Dockerfile
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  cooking-api:
+    image: personalassistant-cooking-api:latest
+    container_name: personalassistant-cooking-api
+    build:
+      context: .
+      dockerfile: src/CookingAssistant.Api/Dockerfile
     depends_on:
       - postgres
       - rabbitmq

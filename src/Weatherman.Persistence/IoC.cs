@@ -6,7 +6,7 @@ namespace Weatherman.Persistence;
 
 public static class IoC
 {
-    public static IServiceCollection AddWeathermanPersistence(this IServiceCollection services, string connectionString)
+    public static IServiceCollection AddWeathermanPersistence(this IServiceCollection services)
     {
         services.AddTransient<IForecastsRepository, ForecastsRepository>();
 

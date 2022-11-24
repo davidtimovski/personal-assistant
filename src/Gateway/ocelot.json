@@ -22,7 +22,7 @@
         }
       ],
       "UpstreamPathTemplate": "/todo/hub",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ]
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Options" ]
     },
     {
       "DownstreamPathTemplate": "/{route}",
@@ -34,6 +34,18 @@
         }
       ],
       "UpstreamPathTemplate": "/todo/{route}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
+    },
+    {
+      "DownstreamPathTemplate": "/{route}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "cooking-api",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/cooking/{route}",
       "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
     },
     {
@@ -59,6 +71,18 @@
       ],
       "UpstreamPathTemplate": "/weatherman/{route}",
       "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
+    },
+    {
+      "DownstreamPathTemplate": "/{route}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "clientlogger",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/client-logger/{route}",
+      "UpstreamHttpMethod": [ "Post" ]
     }
   ],
   "GlobalConfiguration": {

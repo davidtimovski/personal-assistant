@@ -1,5 +1,5 @@
-﻿using Api.Controllers.CookingAssistant;
-using Api.UnitTests.Builders;
+﻿using Api.UnitTests.Builders;
+using CookingAssistant.Api.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
