@@ -29,7 +29,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Build Weatherman image
+      - name: Build weatherman-api-latest image
         run: docker build -f ./src/Weatherman.Api/Dockerfile . --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:weatherman-api-latest
 
       - name: Login to Registry
@@ -39,5 +39,5 @@ jobs:
           username: ${{ env.REGISTRY_USERNAME }}
           password: ${{ env.REGISTRY_TOKEN }}
 
-      - name: Publish Weatherman.Api image
+      - name: Publish weatherman-api-latest image
         run: docker push ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:weatherman-api-latest

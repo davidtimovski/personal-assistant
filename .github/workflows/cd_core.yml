@@ -26,7 +26,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Build Core image
+      - name: Build core-api-latest image
         run: docker build -f ./src/Core.Api/Dockerfile . --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:core-api-latest
 
       - name: Login to Registry
@@ -36,5 +36,5 @@ jobs:
           username: ${{ env.REGISTRY_USERNAME }}
           password: ${{ env.REGISTRY_TOKEN }}
 
-      - name: Publish Core.Api image
+      - name: Publish core-api-latest image
         run: docker push ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:core-api-latest
