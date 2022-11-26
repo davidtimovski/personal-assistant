@@ -22,13 +22,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="appsettings.json" />
+    <Content Include="appsettings.json">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="appsettings.Production.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Compile Include="Models.fs" />
     <Compile Include="HandlerBase.fs" />
     <Compile Include="SyncHandlers.fs" />
     <Compile Include="AccountHandlers.fs" />
     <Compile Include="CategoryHandlers.fs" />
-    <Content Include="appsettings.Production.json" />
     <Compile Include="TransactionHandlers.fs" />
     <Compile Include="UpcomingExpenseHandlers.fs" />
     <Compile Include="DebtHandlers.fs" />
