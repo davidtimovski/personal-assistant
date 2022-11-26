@@ -28,7 +28,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Build Cooking Assistant image
+      - name: Build cooking-api-latest image
         run: docker build -f ./src/CookingAssistant.Api/Dockerfile . --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:cooking-api-latest
 
       - name: Login to Registry
@@ -38,5 +38,5 @@ jobs:
           username: ${{ env.REGISTRY_USERNAME }}
           password: ${{ env.REGISTRY_TOKEN }}
 
-      - name: Publish CookingAssistant.Api image
+      - name: Publish cooking-api-latest image
         run: docker push ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:cooking-api-latest

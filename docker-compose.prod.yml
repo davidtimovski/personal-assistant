@@ -122,6 +122,7 @@ services:
     restart: always
     environment:
       - ASPNETCORE_URLS=http://0.0.0.0:80
+      - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
       - PORT=80
     volumes:
       - ./storage:/app/storage

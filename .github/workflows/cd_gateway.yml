@@ -22,7 +22,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Build Gateway image
+      - name: Build gateway-latest image
         run: docker build -f ./src/Gateway/Dockerfile . --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:gateway-latest
 
       - name: Login to Registry
@@ -32,5 +32,5 @@ jobs:
           username: ${{ env.REGISTRY_USERNAME }}
           password: ${{ env.REGISTRY_TOKEN }}
 
-      - name: Publish Gateway image
+      - name: Publish gateway-latest image
         run: docker push ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:gateway-latest

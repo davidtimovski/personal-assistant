@@ -28,7 +28,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Build To Do Assistant image
+      - name: Build accountant-api-latest image
         run: docker build -f ./src/Accountant.Api/Dockerfile . --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:accountant-api-latest
 
       - name: Login to Registry
@@ -38,5 +38,5 @@ jobs:
           username: ${{ env.REGISTRY_USERNAME }}
           password: ${{ env.REGISTRY_TOKEN }}
 
-      - name: Publish Accountant.Api image
+      - name: Publish accountant-api-latest image
         run: docker push ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:accountant-api-latest

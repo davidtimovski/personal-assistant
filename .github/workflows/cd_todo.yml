@@ -28,7 +28,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Build To Do Assistant image
+      - name: Build todo-api-latest image
         run: docker build -f ./src/ToDoAssistant.Api/Dockerfile . --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:todo-api-latest
 
       - name: Login to Registry
@@ -38,5 +38,5 @@ jobs:
           username: ${{ env.REGISTRY_USERNAME }}
           password: ${{ env.REGISTRY_TOKEN }}
 
-      - name: Publish ToDoAssistant.Api image
+      - name: Publish todo-api-latest image
         run: docker push ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:todo-api-latest
