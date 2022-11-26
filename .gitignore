@@ -41,3 +41,4 @@ DevOps/
 **/Publish.lnk
 tempkey.jwk
 .env
+**/storage/

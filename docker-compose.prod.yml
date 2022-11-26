@@ -35,6 +35,7 @@ services:
     depends_on:
       - core-api
       - todo-api
+      - cooking-api
       - accountant-api
       - weatherman-api
 
