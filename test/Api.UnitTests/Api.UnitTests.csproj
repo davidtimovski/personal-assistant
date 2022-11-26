@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Accountant.Api\Accountant.Api.csproj" />
     <ProjectReference Include="..\..\src\CookingAssistant.Api\CookingAssistant.Api.csproj" />
     <ProjectReference Include="..\..\src\Core.Api\Core.Api.csproj" />
     <ProjectReference Include="..\..\src\ToDoAssistant.Api\ToDoAssistant.Api.csproj" />
