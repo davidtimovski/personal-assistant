@@ -137,6 +137,7 @@ public class ForecastService : IForecastService
         queryString.Add("timezone", "auto");
 
         using HttpClient httpClient = _httpClientFactory.CreateClient("open-meteo");
+        httpClient.BaseAddress = new Uri("https://api.open-meteo.com/v1/");
         HttpResponseMessage response = await httpClient.GetAsync("forecast?" + HttpUtility.UrlDecode(queryString.ToString()));
 
         response.EnsureSuccessStatusCode();
