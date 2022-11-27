@@ -28,13 +28,23 @@
 	let transactionsService: TransactionsService;
 
 	let min = 0.01;
+	$: adjustedBy = !balance ? 0 : balance - originalBalance;
+
+	$: if (currency) {
+		loadBalance();
+	}
+
+	async function loadBalance() {
+		balance = null;
+		const accountBalance = await accountsService.getBalance(accountId, <string>currency);
+		originalBalance = accountBalance;
+		balance = originalBalance;
+	}
 
 	async function accountChanged() {
 		const accountBalance = await accountsService.getBalance(accountId, <string>currency);
 		originalBalance = balance = accountBalance;
 	}
-
-	$: adjustedBy = !balance ? 0 : balance - originalBalance;
 
 	function validate(): ValidationResult {
 		const result = new ValidationResult();
@@ -89,12 +99,10 @@
 
 		accountOptions = await accountsService.getNonInvestmentFundsAsOptions();
 		const mainAccountId = <number>accountOptions[0].id;
-
-		const accountBalance = await accountsService.getBalance(mainAccountId, currency);
-		originalBalance = accountBalance;
-
 		accountId = mainAccountId;
-		balance = accountBalance;
+
+		loadBalance();
+
 		description = $t('balanceAdjustment.balanceAdjustment');
 	});
 
@@ -119,7 +127,13 @@
 		<form on:submit|preventDefault={adjust}>
 			<div class="form-control inline">
 				<label for="balance">{$t('balance')}</label>
-				<AmountInput bind:amount={balance} bind:currency invalid={balanceIsInvalid} inputId="balance" />
+				<AmountInput
+					bind:amount={balance}
+					bind:currency
+					invalid={balanceIsInvalid}
+					inputId="balance"
+					disabled={!balance}
+				/>
 			</div>
 
 			<div class="form-control inline">
