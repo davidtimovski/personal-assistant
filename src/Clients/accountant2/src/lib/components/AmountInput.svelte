@@ -13,6 +13,7 @@
 	export let invalid = false;
 	export let inputId: string = 'amount';
 	export let focusOnInit = false;
+	export let disabled = false;
 
 	let changing = false;
 	let autocompleteResult: AutocompleteResult;
@@ -88,6 +89,7 @@
 		id={inputId}
 		bind:this={amountInput}
 		bind:value={amount}
+		{disabled}
 		{min}
 		{max}
 		{step}
@@ -125,6 +127,10 @@
 			border-bottom-right-radius: 0;
 			border-right: none;
 			text-align: center;
+
+			&:disabled {
+				opacity: 0.6;
+			}
 		}
 
 		.select-currency-input {
