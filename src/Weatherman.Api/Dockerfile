@@ -6,14 +6,14 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0.100-bullseye-slim-amd64 AS build
 WORKDIR /src
-COPY ["src/Weatherman.Api/Weatherman.Api.csproj", "src/Weatherman.Api/"]
-RUN dotnet restore "src/Weatherman.Api/Weatherman.Api.csproj"
+COPY ["src/Weatherman.Api/Weatherman.Api.fsproj", "src/Weatherman.Api/"]
+RUN dotnet restore "src/Weatherman.Api/Weatherman.Api.fsproj"
 COPY . .
 WORKDIR "/src/src/Weatherman.Api"
-RUN dotnet build "Weatherman.Api.csproj" -c Release -o /app/build
+RUN dotnet build "Weatherman.Api.fsproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Weatherman.Api.csproj" -c Release -o /app/publish
+RUN dotnet publish "Weatherman.Api.fsproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app

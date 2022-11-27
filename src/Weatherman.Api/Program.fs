@@ -1,10 +1,7 @@
-module Accountant.Api.App
+module Weatherman.Api.App
 
 open System
-open System.Globalization
 open System.IO
-open Accountant.Application
-open Accountant.Persistence
 open Azure.Extensions.AspNetCore.Configuration.Secrets
 open Azure.Identity
 open Azure.Security.KeyVault.Secrets
@@ -14,9 +11,11 @@ open Microsoft.AspNetCore.Builder
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.Hosting
-open Microsoft.AspNetCore.Localization
 open Microsoft.Extensions.Logging
 open Persistence
+open Weatherman.Application
+open Weatherman.Infrastructure
+open Weatherman.Persistence
 open Routes
 
 let addKeyVault (context: HostBuilderContext) (configBuilder: IConfigurationBuilder) =
@@ -50,13 +49,15 @@ let configureServices (services: IServiceCollection) =
 
     addDataProtection (env.IsProduction()) services settings
 
-    services.AddAccountant() |> ignore
+    services.AddWeatherman() |> ignore
 
-    services.AddAuth0("https://" + settings["Auth0:Domain"] + "/", settings["Auth0:Audience"])
-    |> ignore
+    services
+        .AddAuth0("https://" + settings["Auth0:Domain"] + "/", settings["Auth0:Audience"])
+        .AddWeathermanInfrastructure() |> ignore
 
-    services.AddPersistence(settings["ConnectionString"]).AddAccountantPersistence()
-    |> ignore
+    services
+        .AddPersistence(settings["ConnectionString"])
+        .AddWeathermanPersistence() |> ignore
 
     services.AddGiraffe() |> ignore
 
@@ -64,13 +65,7 @@ let configureServices (services: IServiceCollection) =
     let serializationOptions = SystemTextJson.Serializer.DefaultOptions
     services.AddSingleton<Json.ISerializer>(SystemTextJson.Serializer(serializationOptions)) |> ignore
 
-let addLocalization (app: WebApplication) =
-    let supportedCultures = [| new CultureInfo("en-US"); new CultureInfo("mk-MK") |]
-    let localizationOptions = new RequestLocalizationOptions()
-    localizationOptions.DefaultRequestCulture <- new RequestCulture(supportedCultures[0])
-    localizationOptions.SupportedCultures <- supportedCultures
-    localizationOptions.SupportedUICultures <- supportedCultures
-    app.UseRequestLocalization(localizationOptions) |> ignore
+    services.AddHttpClient("open-meteo") |> ignore
 
 let errorHandler (ex: Exception) (logger: ILogger) =
     logger.LogError(ex, "An unhandled exception has occurred while executing the request.")
@@ -104,8 +99,6 @@ let main args =
      | true -> app.UseDeveloperExceptionPage()
      | false -> app.UseGiraffeErrorHandler(errorHandler))
     |> ignore
-
-    addLocalization app
 
     app.UseAuthentication().UseGiraffe(webApp)
 

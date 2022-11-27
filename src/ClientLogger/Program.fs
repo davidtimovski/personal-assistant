@@ -53,6 +53,10 @@ let configureServices (services : IServiceCollection) =
 
     services.AddGiraffe() |> ignore
 
+    // Use System.Text.Json serializer
+    let serializationOptions = SystemTextJson.Serializer.DefaultOptions
+    services.AddSingleton<Json.ISerializer>(SystemTextJson.Serializer(serializationOptions)) |> ignore
+
 let configureApp (app : IApplicationBuilder) =
     let env = app.ApplicationServices.GetService<IWebHostEnvironment>()
 
