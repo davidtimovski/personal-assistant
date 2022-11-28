@@ -14,7 +14,7 @@ UPDATE cooking.ingredients SET name = CONCAT('Ingredient ', CAST(id AS text)) WH
 UPDATE accountant.accounts SET name = CONCAT('Account ', CAST(id AS text)) WHERE user_id > 3;
 UPDATE accountant.categories SET name = CONCAT('Category ', CAST(id AS text)) WHERE user_id > 3;
 UPDATE accountant.debts SET person = CONCAT('Debt ', CAST(id AS text)), description = 'scrambled' WHERE user_id > 3;
-UPDATE accountant.transactions SET description = 'scrambled'
+UPDATE accountant.transactions SET amount = floor(random() * amount + 1), description = 'scrambled'
     WHERE description IS NOT NULL AND (
         from_account_id IN (SELECT id FROM accountant.accounts WHERE user_id > 3) OR
         to_account_id IN (SELECT id FROM accountant.accounts WHERE user_id > 3)

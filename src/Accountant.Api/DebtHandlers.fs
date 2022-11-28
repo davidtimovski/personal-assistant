@@ -1,66 +1,85 @@
 ﻿module DebtHandlers
 
 open Accountant.Application.Contracts.Debts
-open Accountant.Application.Contracts.Debts.Models
+open Accountant.Application.Fs.Models.Debts
+open Accountant.Application.Fs.Services
 open Giraffe
 open Microsoft.AspNetCore.Http
+open Microsoft.Extensions.Logging
 open HandlerBase
 
 let create: HttpHandler =
     fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
-            let! dto = ctx.BindJsonAsync<CreateDebt>()
+            try
+                let! dto = ctx.BindJsonAsync<CreateDebt>()
+                let userId = getUserId ctx
 
-            if dto = null then
-                return! (RequestErrors.BAD_REQUEST "Bad request") next ctx
-            else
-                let service = ctx.GetService<IDebtService>()
-                dto.UserId <- getUserId ctx
+                let debt = DebtService.prepareForCreate dto userId
 
-                let! id = service.CreateAsync(dto)
+                let repository = ctx.GetService<IDebtsRepository>()
+                let! id = repository.CreateAsync(debt)
 
-                return! (Successful.CREATED id) next ctx
+                return! Successful.CREATED id next ctx
+            with ex ->
+               let logger = ctx.GetService<ILogger>()
+               logger.LogError(ex, "Unexpected error in create")
+
+               return! ServerErrors.INTERNAL_ERROR "An unexpected error occurred" next ctx
         }
 
 let createMerged: HttpHandler =
     fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
-            let! dto = ctx.BindJsonAsync<CreateDebt>()
+            try
+                let! dto = ctx.BindJsonAsync<CreateDebt>()
+                let userId = getUserId ctx
 
-            if dto = null then
-                return! (RequestErrors.BAD_REQUEST "Bad request") next ctx
-            else
-                let service = ctx.GetService<IDebtService>()
-                dto.UserId <- getUserId ctx
+                let debt = DebtService.prepareForCreateMerged dto userId
 
-                let! id = service.CreateMergedAsync(dto)
+                let repository = ctx.GetService<IDebtsRepository>()
+                let! id = repository.CreateMergedAsync(debt)
 
-                return! (Successful.CREATED id) next ctx
+                return! Successful.CREATED id next ctx
+            with ex ->
+               let logger = ctx.GetService<ILogger>()
+               logger.LogError(ex, "Unexpected error in createMerged")
+
+               return! ServerErrors.INTERNAL_ERROR "An unexpected error occurred" next ctx
         }
 
 let update: HttpHandler =
     fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
-            let! dto = ctx.BindJsonAsync<UpdateDebt>()
+            try
+                let! dto = ctx.BindJsonAsync<UpdateDebt>()
+                let userId = getUserId ctx
 
-            if dto = null then
-                return! (RequestErrors.BAD_REQUEST "Bad request") next ctx
-            else
-                let service = ctx.GetService<IDebtService>()
-                dto.UserId <- getUserId ctx
+                let debt = DebtService.prepareForUpdate dto userId
 
-                do! service.UpdateAsync(dto)
+                let repository = ctx.GetService<IDebtsRepository>()
+                do! repository.UpdateAsync(debt)
 
                 return! Successful.NO_CONTENT next ctx
+            with ex ->
+                let logger = ctx.GetService<ILogger>()
+                logger.LogError(ex, "Unexpected error in update")
+
+                return! ServerErrors.INTERNAL_ERROR "An unexpected error occurred" next ctx
         }
 
 let delete (id: int) : HttpHandler =
     fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
-            let service = ctx.GetService<IDebtService>()
-            let userId = getUserId ctx
+            try
+                let repository = ctx.GetService<IDebtsRepository>()
+                let userId = getUserId ctx
 
-            do! service.DeleteAsync(id, userId)
+                do! repository.DeleteAsync(id, userId)
+                return! Successful.NO_CONTENT next ctx
+            with ex ->
+                let logger = ctx.GetService<ILogger>()
+                logger.LogError(ex, "Unexpected error in delete")
 
-            return! Successful.NO_CONTENT next ctx
+                return! ServerErrors.INTERNAL_ERROR "An unexpected error occurred" next ctx
         }

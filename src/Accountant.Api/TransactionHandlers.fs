@@ -23,7 +23,7 @@ let create: HttpHandler =
 
                 let! id = service.CreateAsync(dto)
 
-                return! (Successful.CREATED id) next ctx
+                return! Successful.CREATED id next ctx
         }
 
 let update: HttpHandler =

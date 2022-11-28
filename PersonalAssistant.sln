@@ -86,6 +86,8 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Accountant.Api", "src\Accou
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Weatherman.Api", "src\Weatherman.Api\Weatherman.Api.fsproj", "{F599B2C5-CDA9-493D-8EF0-0721EB4602E4}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Accountant.Application.Fs", "src\Accountant.Application.Fs\Accountant.Application.Fs.fsproj", "{3B8B57DA-763B-4A13-9394-0C7100A66338}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -200,6 +202,10 @@ Global
 		{F599B2C5-CDA9-493D-8EF0-0721EB4602E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F599B2C5-CDA9-493D-8EF0-0721EB4602E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F599B2C5-CDA9-493D-8EF0-0721EB4602E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B8B57DA-763B-4A13-9394-0C7100A66338}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B8B57DA-763B-4A13-9394-0C7100A66338}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B8B57DA-763B-4A13-9394-0C7100A66338}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B8B57DA-763B-4A13-9394-0C7100A66338}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -231,6 +237,7 @@ Global
 		{3FDC9889-1B57-430D-8CA0-367F782989C6} = {577BCF93-9D25-4060-A201-FA11AC92DD26}
 		{740E9C22-F0F3-4424-8674-D2AFC8093860} = {577BCF93-9D25-4060-A201-FA11AC92DD26}
 		{F599B2C5-CDA9-493D-8EF0-0721EB4602E4} = {577BCF93-9D25-4060-A201-FA11AC92DD26}
+		{3B8B57DA-763B-4A13-9394-0C7100A66338} = {4D1DD8B8-7BE5-46E4-8032-9D45823E76A5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1296A1BD-7B9D-40F2-9873-972EB471C47D}

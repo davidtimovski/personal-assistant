@@ -1,50 +1,65 @@
 ﻿module UpcomingExpenseHandlers
 
 open Accountant.Application.Contracts.UpcomingExpenses
-open Accountant.Application.Contracts.UpcomingExpenses.Models
+open Accountant.Application.Fs.Models.UpcomingExpenses
+open Accountant.Application.Fs.Services
 open Giraffe
 open Microsoft.AspNetCore.Http
+open Microsoft.Extensions.Logging
 open HandlerBase
 
 let create: HttpHandler =
     fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
-            let! dto = ctx.BindJsonAsync<CreateUpcomingExpense>()
+            try
+                let! dto = ctx.BindJsonAsync<CreateUpcomingExpense>()
+                let userId = getUserId ctx
 
-            if dto = null then
-                return! (RequestErrors.BAD_REQUEST "Bad request") next ctx
-            else
-                let service = ctx.GetService<IUpcomingExpenseService>()
-                dto.UserId <- getUserId ctx
+                let upcomingExpense = UpcomingExpenseService.prepareForCreate dto userId
 
-                let! id = service.CreateAsync(dto)
+                let repository = ctx.GetService<IUpcomingExpensesRepository>()
+                let! id = repository.CreateAsync(upcomingExpense)
 
-                return! (Successful.CREATED id) next ctx
+                return! Successful.CREATED id next ctx
+            with ex ->
+               let logger = ctx.GetService<ILogger>()
+               logger.LogError(ex, "Unexpected error in create")
+
+               return! ServerErrors.INTERNAL_ERROR "An unexpected error occurred" next ctx
         }
 
 let update: HttpHandler =
     fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
-            let! dto = ctx.BindJsonAsync<UpdateUpcomingExpense>()
+            try
+                let! dto = ctx.BindJsonAsync<UpdateUpcomingExpense>()
+                let userId = getUserId ctx
 
-            if dto = null then
-                return! (RequestErrors.BAD_REQUEST "Bad request") next ctx
-            else
-                let service = ctx.GetService<IUpcomingExpenseService>()
-                dto.UserId <- getUserId ctx
+                let upcomingExpense = UpcomingExpenseService.prepareForUpdate dto userId
 
-                do! service.UpdateAsync(dto)
+                let repository = ctx.GetService<IUpcomingExpensesRepository>()
+                do! repository.UpdateAsync(upcomingExpense)
 
                 return! Successful.NO_CONTENT next ctx
+            with ex ->
+               let logger = ctx.GetService<ILogger>()
+               logger.LogError(ex, "Unexpected error in update")
+
+               return! ServerErrors.INTERNAL_ERROR "An unexpected error occurred" next ctx
         }
 
 let delete (id: int) : HttpHandler =
     fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
-            let service = ctx.GetService<IUpcomingExpenseService>()
-            let userId = getUserId ctx
+            try
+                let repository = ctx.GetService<IUpcomingExpensesRepository>()
+                let userId = getUserId ctx
 
-            do! service.DeleteAsync(id, userId)
+                do! repository.DeleteAsync(id, userId)
+                return! Successful.NO_CONTENT next ctx
+            with ex ->
+                let logger = ctx.GetService<ILogger>()
+                logger.LogError(ex, "Unexpected error in delete")
 
-            return! Successful.NO_CONTENT next ctx
+                return! ServerErrors.INTERNAL_ERROR "An unexpected error occurred" next ctx
         }
