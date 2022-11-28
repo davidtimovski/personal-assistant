@@ -2,12 +2,12 @@
 
 open System
 open System.Collections.Generic
-open Accountant.Application.Contracts.Accounts.Models
-open Accountant.Application.Contracts.Categories.Models
+open Accountant.Application.Fs.Models.Accounts
+open Accountant.Application.Fs.Models.AutomaticTransactions
+open Accountant.Application.Fs.Models.Categories
+open Accountant.Application.Fs.Models.Debts
+open Accountant.Application.Fs.Models.UpcomingExpenses
 open Accountant.Application.Contracts.Transactions.Models
-open Accountant.Application.Contracts.UpcomingExpenses.Models
-open Accountant.Application.Contracts.Debts.Models
-open Accountant.Application.Contracts.AutomaticTransactions.Models
 
 type GetChangesDto = { LastSynced: DateTime }
 
@@ -15,7 +15,7 @@ type ChangedDto =
     { LastSynced: DateTime
 
       DeletedAccountIds: IEnumerable<int>
-      Accounts: IEnumerable<AccountDto>
+      Accounts: seq<AccountDto>
 
       DeletedCategoryIds: IEnumerable<int>
       Categories: IEnumerable<CategoryDto>

@@ -11,6 +11,7 @@ on:
       - "src/Infrastructure/**"
       - "src/Persistence/**"
       - "src/Accountant.Application/**"
+      - "src/Accountant.Application.Fs/**"
       - "src/Accountant.Persistence/**"
       - "src/Accountant.Api/**"
 

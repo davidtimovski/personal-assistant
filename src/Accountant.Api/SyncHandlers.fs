@@ -14,49 +14,50 @@ open Giraffe
 open Microsoft.AspNetCore.Http
 open HandlerBase
 open Models
+open Accountant.Application.Fs.Services
 
 let getChanges: HttpHandler =
     fun (next: HttpFunc) (ctx: HttpContext) ->
-        let accountService = ctx.GetService<IAccountService>()
-        let categoryService = ctx.GetService<ICategoryService>()
+        let accountsRepository = ctx.GetService<IAccountsRepository>()
+        let categoryRepository = ctx.GetService<ICategoriesRepository>()
         let transactionService = ctx.GetService<ITransactionService>()
-        let upcomingExpenseService = ctx.GetService<IUpcomingExpenseService>()
-        let debtService = ctx.GetService<IDebtService>()
-        let automaticTransactionService = ctx.GetService<IAutomaticTransactionService>()
+        let upcomingExpensesRepository = ctx.GetService<IUpcomingExpensesRepository>()
+        let debtsRepository = ctx.GetService<IDebtsRepository>()
+        let automaticTransactionsRepository = ctx.GetService<IAutomaticTransactionsRepository>()
 
         task {
             let! dto = ctx.BindJsonAsync<GetChangesDto>()
             let userId = getUserId ctx
 
-            do! upcomingExpenseService.DeleteOldAsync(userId)
+            do! upcomingExpensesRepository.DeleteOldAsync(userId, UpcomingExpenseService.getFirstDayOfMonth)
 
             let getAll = new GetAll(userId, dto.LastSynced)
 
-            let accounts = accountService.GetAll(getAll)
-            let categories = categoryService.GetAll(getAll)
+            let accounts = accountsRepository.GetAll(userId, dto.LastSynced) |> AccountService.mapAll
+            let categories = categoryRepository.GetAll(userId, dto.LastSynced) |> CategoryService.mapAll
             let transactions = transactionService.GetAll(getAll)
-            let upcomingExpenses = upcomingExpenseService.GetAll(getAll)
-            let debts = debtService.GetAll(getAll)
-            let automaticTransactions = automaticTransactionService.GetAll(getAll)
+            let upcomingExpenses = upcomingExpensesRepository.GetAll(userId, dto.LastSynced) |> UpcomingExpenseService.mapAll
+            let debts = debtsRepository.GetAll(userId, dto.LastSynced) |> DebtService.mapAll
+            let automaticTransactions = automaticTransactionsRepository.GetAll(userId, dto.LastSynced) |> AutomaticTransactionService.mapAll
 
             let getDeletedIds = GetDeletedIds(userId, dto.LastSynced)
 
             let changed =
                 { LastSynced = DateTime.Now
-                  DeletedAccountIds = accountService.GetDeletedIds(getDeletedIds)
+                  DeletedAccountIds = accountsRepository.GetDeletedIds(userId, dto.LastSynced)
                   Accounts = accounts
-                  DeletedCategoryIds = categoryService.GetDeletedIds(getDeletedIds)
+                  DeletedCategoryIds = categoryRepository.GetDeletedIds(userId, dto.LastSynced)
                   Categories = categories
                   DeletedTransactionIds = transactionService.GetDeletedIds(getDeletedIds)
                   Transactions = transactions
-                  DeletedUpcomingExpenseIds = upcomingExpenseService.GetDeletedIds(getDeletedIds)
+                  DeletedUpcomingExpenseIds = upcomingExpensesRepository.GetDeletedIds(userId, dto.LastSynced)
                   UpcomingExpenses = upcomingExpenses
-                  DeletedDebtIds = debtService.GetDeletedIds(getDeletedIds)
+                  DeletedDebtIds = debtsRepository.GetDeletedIds(userId, dto.LastSynced)
                   Debts = debts
-                  DeletedAutomaticTransactionIds = automaticTransactionService.GetDeletedIds(getDeletedIds)
+                  DeletedAutomaticTransactionIds = automaticTransactionsRepository.GetDeletedIds(userId, dto.LastSynced)
                   AutomaticTransactions = automaticTransactions }
 
-            return! (Successful.OK changed) next ctx
+            return! Successful.OK changed next ctx
         }
 
 let createEntities: HttpHandler =
@@ -65,7 +66,7 @@ let createEntities: HttpHandler =
             let! dto = ctx.BindJsonAsync<SyncEntities>()
 
             if dto = null then
-                return! (RequestErrors.BAD_REQUEST "Bad request") next ctx
+                return! RequestErrors.BAD_REQUEST "Bad request" next ctx
             else
                 let syncService = ctx.GetService<ISyncService>()
                 let userId = getUserId ctx
@@ -115,5 +116,5 @@ let createEntities: HttpHandler =
                               { LocalId = dto.AutomaticTransactions[x].Id
                                 Id = syncedEntityIds.AutomaticTransactionIds[x] }) }
 
-                return! (Successful.OK changedEntitiesDto) next ctx
+                return! Successful.OK changedEntitiesDto next ctx
         }

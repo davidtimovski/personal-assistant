@@ -11,7 +11,7 @@ let get: HttpHandler =
         let result = ctx.TryBindQueryString<GetForecastDto>()
 
         (match result with
-            | Error _ -> (RequestErrors.BAD_REQUEST "Bad request") next ctx
+            | Error _ -> RequestErrors.BAD_REQUEST "Bad request" next ctx
             | Ok dto ->
                 let service = ctx.GetService<IForecastService>()
 
@@ -28,6 +28,6 @@ let get: HttpHandler =
                 task {
                     let! forecast = service.GetAsync(parameters)
 
-                    return! (Successful.OK forecast) next ctx
+                    return! Successful.OK forecast next ctx
                 }
         )

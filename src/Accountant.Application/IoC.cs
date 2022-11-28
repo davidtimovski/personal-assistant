@@ -1,11 +1,6 @@
 ﻿using System.Reflection;
-using Accountant.Application.Contracts.Accounts;
-using Accountant.Application.Contracts.AutomaticTransactions;
-using Accountant.Application.Contracts.Categories;
-using Accountant.Application.Contracts.Debts;
 using Accountant.Application.Contracts.Sync;
 using Accountant.Application.Contracts.Transactions;
-using Accountant.Application.Contracts.UpcomingExpenses;
 using Accountant.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,12 +12,7 @@ public static class IoC
     {
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
-        services.AddTransient<IAccountService, AccountService>();
-        services.AddTransient<ICategoryService, CategoryService>();
         services.AddTransient<ITransactionService, TransactionService>();
-        services.AddTransient<IUpcomingExpenseService, UpcomingExpenseService>();
-        services.AddTransient<IDebtService, DebtService>();
-        services.AddTransient<IAutomaticTransactionService, AutomaticTransactionService>();
         services.AddTransient<ISyncService, SyncService>();
 
         return services;
