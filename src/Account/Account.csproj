@@ -33,6 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Accountant.Application.Fs\Accountant.Application.Fs.fsproj" />
     <ProjectReference Include="..\Accountant.Application\Accountant.Application.csproj" />
     <ProjectReference Include="..\Accountant.Persistence\Accountant.Persistence.csproj" />
     <ProjectReference Include="..\CookingAssistant.Application\CookingAssistant.Application.csproj" />
