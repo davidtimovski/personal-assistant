@@ -35,3 +35,14 @@ module UpcomingExpenses =
           Generated: bool
           CreatedDate: DateTime
           ModifiedDate: DateTime }
+
+    type SyncUpcomingExpense =
+        { Id: int
+          CategoryId: Nullable<int>
+          Amount: decimal
+          Currency: string
+          Description: string
+          Date: DateTime
+          Generated: bool
+          CreatedDate: DateTime
+          ModifiedDate: DateTime }

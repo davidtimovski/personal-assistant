@@ -29,3 +29,12 @@ module Accounts =
           StockPrice: Nullable<decimal>
           CreatedDate: DateTime
           ModifiedDate: DateTime }
+
+    type SyncAccount =
+        { Id: int
+          Name: string
+          IsMain: bool
+          Currency: string
+          StockPrice: Nullable<decimal>
+          CreatedDate: DateTime
+          ModifiedDate: DateTime }

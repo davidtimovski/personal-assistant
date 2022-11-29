@@ -12,6 +12,7 @@ module CategoryService =
               ParentId = x.ParentId
               Name = x.Name
               Type = x.Type
+              GenerateUpcomingExpense = x.GenerateUpcomingExpense
               IsTax = x.IsTax
               CreatedDate = x.CreatedDate
               ModifiedDate = x.ModifiedDate })

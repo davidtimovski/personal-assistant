@@ -14,17 +14,13 @@ public class SyncRepository : BaseRepository, ISyncRepository
         EFContext.Accounts.AddRange(accounts);
         EFContext.Categories.AddRange(categories);
 
-        foreach (var transaction in transactions)
-        {
-            transaction.Date = transaction.Date.ToUniversalTime();
-        }
-        EFContext.Transactions.AddRange(transactions);
+        List<Transaction> transactionsList = transactions.ToList();
+        transactionsList.ForEach(x => x.Date = x.Date.ToUniversalTime());
+        EFContext.Transactions.AddRange(transactionsList);
 
-        foreach (var upcomingExpense in upcomingExpenses)
-        {
-            upcomingExpense.Date = upcomingExpense.Date.ToUniversalTime();
-        }
-        EFContext.UpcomingExpenses.AddRange(upcomingExpenses);
+        List<UpcomingExpense> upcomingExpensesList = upcomingExpenses.ToList();
+        upcomingExpensesList.ForEach(x => x.Date = x.Date.ToUniversalTime());
+        EFContext.UpcomingExpenses.AddRange(upcomingExpensesList);
 
         EFContext.Debts.AddRange(debts);
         EFContext.AutomaticTransactions.AddRange(automaticTransactions);
