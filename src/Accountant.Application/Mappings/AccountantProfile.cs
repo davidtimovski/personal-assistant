@@ -1,5 +1,4 @@
-﻿using Accountant.Application.Contracts.Sync.Models;
-using Accountant.Application.Contracts.Transactions.Models;
+﻿using Accountant.Application.Contracts.Transactions.Models;
 using AutoMapper;
 using Domain.Accountant;
 
@@ -20,16 +19,5 @@ public class AccountantProfile : Profile
             .ForMember(x => x.FromAccount, src => src.Ignore())
             .ForMember(x => x.ToAccount, src => src.Ignore())
             .ForMember(x => x.Category, src => src.Ignore());
-
-        CreateMap<SyncAccount, Account>()
-            .ForMember(x => x.IsMain, src => src.Ignore());
-        CreateMap<SyncCategory, Category>();
-        CreateMap<SyncTransaction, Transaction>()
-            .ForMember(x => x.FromAccount, src => src.Ignore())
-            .ForMember(x => x.ToAccount, src => src.Ignore())
-            .ForMember(x => x.Category, src => src.Ignore());
-        CreateMap<SyncUpcomingExpense, UpcomingExpense>();
-        CreateMap<SyncDebt, Debt>();
-        CreateMap<SyncAutomaticTransaction, AutomaticTransaction>();
     }
 }

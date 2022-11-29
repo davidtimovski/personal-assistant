@@ -22,7 +22,7 @@ let create: HttpHandler =
 
                 return! Successful.CREATED id next ctx
             with ex ->
-               let logger = ctx.GetService<ILogger>()
+               let logger = ctx.GetService<ILogger<HttpContext>>()
                logger.LogError(ex, "Unexpected error in create")
 
                return! ServerErrors.INTERNAL_ERROR "An unexpected error occurred" next ctx
@@ -42,7 +42,7 @@ let update: HttpHandler =
 
                 return! Successful.NO_CONTENT next ctx
             with ex ->
-               let logger = ctx.GetService<ILogger>()
+               let logger = ctx.GetService<ILogger<HttpContext>>()
                logger.LogError(ex, "Unexpected error in update")
 
                return! ServerErrors.INTERNAL_ERROR "An unexpected error occurred" next ctx
@@ -58,7 +58,7 @@ let delete (id: int) : HttpHandler =
                 do! repository.DeleteAsync(id, userId)
                 return! Successful.NO_CONTENT next ctx
             with ex ->
-                let logger = ctx.GetService<ILogger>()
+                let logger = ctx.GetService<ILogger<HttpContext>>()
                 logger.LogError(ex, "Unexpected error in delete")
 
                 return! ServerErrors.INTERNAL_ERROR "An unexpected error occurred" next ctx

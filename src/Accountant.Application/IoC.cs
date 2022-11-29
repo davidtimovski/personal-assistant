@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using Accountant.Application.Contracts.Sync;
 using Accountant.Application.Contracts.Transactions;
 using Accountant.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +12,6 @@ public static class IoC
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
         services.AddTransient<ITransactionService, TransactionService>();
-        services.AddTransient<ISyncService, SyncService>();
 
         return services;
     }

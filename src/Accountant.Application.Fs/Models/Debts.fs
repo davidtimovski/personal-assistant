@@ -32,3 +32,13 @@ module Debts =
           Description: string
           CreatedDate: DateTime
           ModifiedDate: DateTime }
+
+    type SyncDebt =
+        { Id: int
+          Person: string
+          Amount: decimal
+          Currency: string
+          UserIsDebtor: bool
+          Description: string
+          CreatedDate: DateTime
+          ModifiedDate: DateTime }

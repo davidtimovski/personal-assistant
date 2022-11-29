@@ -10,6 +10,7 @@ module Categories =
           ParentId: Nullable<int>
           Name: string
           Type: CategoryType
+          GenerateUpcomingExpense: bool
           IsTax: bool
           CreatedDate: DateTime
           ModifiedDate: DateTime }
@@ -24,6 +25,16 @@ module Categories =
           ModifiedDate: DateTime }
 
     type UpdateCategory =
+        { Id: int
+          ParentId: Nullable<int>
+          Name: string
+          Type: CategoryType
+          GenerateUpcomingExpense: bool
+          IsTax: bool
+          CreatedDate: DateTime
+          ModifiedDate: DateTime }
+
+    type SyncCategory =
         { Id: int
           ParentId: Nullable<int>
           Name: string

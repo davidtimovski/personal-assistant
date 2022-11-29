@@ -35,3 +35,14 @@ module AutomaticTransactions =
           DayInMonth: int16
           CreatedDate: DateTime
           ModifiedDate: DateTime }
+
+    type SyncAutomaticTransaction =
+        { Id: int
+          IsDeposit: bool
+          CategoryId: Nullable<int>
+          Amount: decimal
+          Currency: string
+          Description: string
+          DayInMonth: int16
+          CreatedDate: DateTime
+          ModifiedDate: DateTime }

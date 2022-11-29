@@ -3,7 +3,7 @@ using Account.Models;
 using Account.ViewModels.Account;
 using Account.ViewModels.Home;
 using Accountant.Application.Contracts.Accounts;
-using Accountant.Application.Contracts.Accounts.Models;
+using Accountant.Application.Fs.Services;
 using Application.Contracts;
 using Auth0.AspNetCore.Authentication;
 using CookingAssistant.Application.Contracts.Recipes;
@@ -23,7 +23,7 @@ public class AccountController : BaseController
 {
     //private readonly IEmailTemplateService _emailTemplateService;
     private readonly IUserService _userService;
-    private readonly IAccountService _accountService;
+    private readonly IAccountsRepository _accountsRepository;
     private readonly IListService _listService;
     private readonly IRecipeService _recipeService;
     private readonly ICdnService _cdnService;
@@ -38,7 +38,7 @@ public class AccountController : BaseController
         IUserIdLookup userIdLookup,
         IUsersRepository usersRepository,
         IUserService userService,
-        IAccountService accountService,
+        IAccountsRepository accountsRepository,
         IListService listService,
         IRecipeService recipeService,
         ICdnService cdnService,
@@ -50,7 +50,7 @@ public class AccountController : BaseController
     {
         //_emailTemplateService = emailTemplateService;
         _userService = userService;
-        _accountService = accountService;
+        _accountsRepository = accountsRepository;
         _listService = listService;
         _recipeService = recipeService;
         _cdnService = cdnService;
@@ -440,12 +440,8 @@ public class AccountController : BaseController
 
     private async Task CreateRequiredDataAsync(int userId)
     {
-        var createMainAccount = new CreateMainAccount
-        {
-            UserId = userId,
-            Name = _localizer["MainAccountName"]
-        };
-        await _accountService.CreateMainAsync(createMainAccount);
+        var mainAccount = AccountService.prepareForCreateMain(userId, _localizer["MainAccountName"]);
+        await _accountsRepository.CreateAsync(mainAccount);
     }
 
     private async Task CreateSamplesAsync(int userId)
