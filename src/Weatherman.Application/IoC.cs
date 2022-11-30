@@ -7,8 +7,6 @@ public static class IoC
 {
     public static IServiceCollection AddWeatherman(this IServiceCollection services)
     {
-        services.AddAutoMapper(Assembly.GetExecutingAssembly());
-
         return services;
     }
 }

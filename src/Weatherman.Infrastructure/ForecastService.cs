@@ -14,17 +14,17 @@ public class ForecastService : IForecastService
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IForecastsRepository _forecastsRepository;
     private readonly ILogger<ForecastService> _logger;
-    private readonly HashSet<string> _validTemperatureUnits = new HashSet<string>
+    private readonly HashSet<string> _validTemperatureUnits = new()
     {
         "celsius",
         "fahrenheit"
     };
-    private readonly HashSet<string> _validPrecipitationUnits = new HashSet<string>
+    private readonly HashSet<string> _validPrecipitationUnits = new()
     {
         "mm",
         "inch"
     };
-    private readonly HashSet<string> _validWindSpeedUnits = new HashSet<string>
+    private readonly HashSet<string> _validWindSpeedUnits = new()
     {
         "kmh",
         "mph"
