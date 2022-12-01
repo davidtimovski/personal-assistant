@@ -45,10 +45,10 @@ let update: HttpHandler =
 let delete (id: int) : HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
-            let service = ctx.GetService<ITransactionService>()
+            let repository = ctx.GetService<ITransactionsRepository>()
             let userId = getUserId ctx
 
-            do! service.DeleteAsync(id, userId)
+            do! repository.DeleteAsync(id, userId)
 
             return! Successful.NO_CONTENT next ctx
         })
@@ -80,13 +80,10 @@ let export: HttpHandler =
 let deleteExportedFile (fileId: Guid) : HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
-            let service = ctx.GetService<ITransactionService>()
             let webHostEnvironment = ctx.GetService<IWebHostEnvironment>()
 
-            let directory = Path.Combine(webHostEnvironment.ContentRootPath, "storage", "temp")
-            let deleteExportedFileModel = new DeleteExportedFile(directory, fileId)
-
-            service.DeleteExportedFile(deleteExportedFileModel)
+            let filePath = Path.Combine(webHostEnvironment.ContentRootPath, "storage", "temp", $"{fileId}.csv")
+            File.Delete(filePath);
 
             return! Successful.NO_CONTENT next ctx
         })

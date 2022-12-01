@@ -4,7 +4,6 @@ open System
 open Accountant.Application.Contracts.Accounts
 open Accountant.Application.Contracts.AutomaticTransactions
 open Accountant.Application.Contracts.Categories
-open Accountant.Application.Contracts.Common.Models
 open Accountant.Application.Contracts.Debts
 open Accountant.Application.Contracts.Transactions
 open Accountant.Application.Contracts.UpcomingExpenses
@@ -20,7 +19,7 @@ let getChanges: HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         let accountsRepository = ctx.GetService<IAccountsRepository>()
         let categoryRepository = ctx.GetService<ICategoriesRepository>()
-        let transactionService = ctx.GetService<ITransactionService>()
+        let transactionsRepository = ctx.GetService<ITransactionsRepository>()
         let upcomingExpensesRepository = ctx.GetService<IUpcomingExpensesRepository>()
         let debtsRepository = ctx.GetService<IDebtsRepository>()
 
@@ -39,7 +38,7 @@ let getChanges: HttpHandler =
             let categories =
                 categoryRepository.GetAll(userId, dto.LastSynced) |> CategoryService.mapAll
 
-            let transactions = transactionService.GetAll(new GetAll(userId, dto.LastSynced))
+            let transactions = transactionsRepository.GetAll(userId, dto.LastSynced)
 
             let upcomingExpenses =
                 upcomingExpensesRepository.GetAll(userId, dto.LastSynced)
@@ -51,15 +50,13 @@ let getChanges: HttpHandler =
                 automaticTransactionsRepository.GetAll(userId, dto.LastSynced)
                 |> AutomaticTransactionService.mapAll
 
-            let getDeletedIds = GetDeletedIds(userId, dto.LastSynced)
-
             let changed =
                 { LastSynced = DateTime.Now
                   DeletedAccountIds = accountsRepository.GetDeletedIds(userId, dto.LastSynced)
                   Accounts = accounts
                   DeletedCategoryIds = categoryRepository.GetDeletedIds(userId, dto.LastSynced)
                   Categories = categories
-                  DeletedTransactionIds = transactionService.GetDeletedIds(getDeletedIds)
+                  DeletedTransactionIds = transactionsRepository.GetDeletedIds(userId, dto.LastSynced)
                   Transactions = transactions
                   DeletedUpcomingExpenseIds = upcomingExpensesRepository.GetDeletedIds(userId, dto.LastSynced)
                   UpcomingExpenses = upcomingExpenses
