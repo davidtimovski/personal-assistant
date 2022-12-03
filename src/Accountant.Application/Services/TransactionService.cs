@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using Accountant.Application.Contracts.Accounts;
-using Accountant.Application.Contracts.Common.Models;
 using Accountant.Application.Contracts.Transactions;
 using Accountant.Application.Contracts.Transactions.Models;
 using AutoMapper;
@@ -28,36 +27,6 @@ public class TransactionService : ITransactionService
         _accountsRepository = accountsRepository;
         _mapper = mapper;
         _logger = logger;
-    }
-
-    public IEnumerable<TransactionDto> GetAll(GetAll model)
-    {
-        try
-        {
-            var transactions = _transactionsRepository.GetAll(model.UserId, model.FromModifiedDate);
-
-            var transactionDtos = transactions.Select(x => _mapper.Map<TransactionDto>(x));
-
-            return transactionDtos;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(GetAll)}");
-            throw;
-        }
-    }
-
-    public IEnumerable<int> GetDeletedIds(GetDeletedIds model)
-    {
-        try
-        {
-            return _transactionsRepository.GetDeletedIds(model.UserId, model.FromDate);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(GetDeletedIds)}");
-            throw;
-        }
     }
 
     public async Task<int> CreateAsync(CreateTransaction model)
@@ -142,19 +111,6 @@ public class TransactionService : ITransactionService
         }
     }
 
-    public async Task DeleteAsync(int id, int userId)
-    {
-        try
-        {
-            await _transactionsRepository.DeleteAsync(id, userId);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(DeleteAsync)}");
-            throw;
-        }
-    }
-
     public FileStream ExportAsCsv(ExportAsCsv model)
     {
         try
@@ -188,20 +144,6 @@ public class TransactionService : ITransactionService
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(ExportAsCsv)}");
-            throw;
-        }
-    }
-
-    public void DeleteExportedFile(DeleteExportedFile model)
-    {
-        try
-        {
-            string filePath = Path.Combine(model.Directory, model.FileId + ".csv");
-            File.Delete(filePath);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(GetAll)}");
             throw;
         }
     }

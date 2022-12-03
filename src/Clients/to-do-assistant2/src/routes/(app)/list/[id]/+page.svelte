@@ -246,9 +246,9 @@
 						}
 
 						if (isPrivate) {
-							privateTasks = TasksService.getPrivateTasks(list.tasks);
+							privateTasks = TasksService.getPrivateTasks(list.tasks, false);
 						} else {
-							tasks = TasksService.getTasks(list.tasks);
+							tasks = TasksService.getTasks(list.tasks, false);
 						}
 						if (soundsEnabled) {
 							soundPlayer.playBlop();
@@ -458,10 +458,10 @@
 				isOneTimeToggleDefault = list.isOneTimeToggleDefault;
 				sharingState = list.sharingState;
 				isArchived = list.isArchived;
-				tasks = TasksService.getTasks(list.tasks);
-				privateTasks = TasksService.getPrivateTasks(list.tasks);
-				completedTasks = TasksService.getCompletedTasks(list.tasks);
-				completedPrivateTasks = TasksService.getCompletedPrivateTasks(list.tasks);
+				tasks = TasksService.getTasks(list.tasks, s.fromCache);
+				privateTasks = TasksService.getPrivateTasks(list.tasks, s.fromCache);
+				completedTasks = TasksService.getCompletedTasks(list.tasks, s.fromCache);
+				completedPrivateTasks = TasksService.getCompletedPrivateTasks(list.tasks, s.fromCache);
 				isOneTime = isOneTimeToggleDefault;
 
 				listIsArchivedText = $t('list.listIsArchived');
@@ -670,6 +670,7 @@
 						<button
 							type="button"
 							on:click={create}
+							disabled={$state.fromCache}
 							class="add-task-button"
 							title={$t('list.add')}
 							aria-label={$t('list.add')}
@@ -894,7 +895,11 @@
 		.add-task-button {
 			line-height: 45px;
 
-			&:hover {
+			&:disabled {
+				color: var(--faded-color);
+			}
+
+			&:not(:disabled):hover {
 				color: var(--primary-color-dark);
 			}
 		}

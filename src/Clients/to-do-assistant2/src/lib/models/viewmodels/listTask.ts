@@ -3,7 +3,6 @@ import type { Assignee } from '$lib/models/viewmodels/assignee';
 
 export class ListTask {
 	active = false;
-	disabled = false;
 
 	constructor(
 		public id: number,
@@ -16,10 +15,11 @@ export class ListTask {
 		public isPrivate: boolean,
 		public assignedUser: Assignee,
 		public order: number,
-		public modifiedDate: string
+		public modifiedDate: string,
+		public disabled: boolean
 	) {}
 
-	static fromTask(task: Task) {
+	static fromTask(task: Task, disabled: boolean) {
 		return new ListTask(
 			task.id,
 			task.listId,
@@ -31,7 +31,8 @@ export class ListTask {
 			task.isPrivate,
 			task.assignedUser,
 			task.order,
-			task.modifiedDate
+			task.modifiedDate,
+			disabled
 		);
 	}
 }

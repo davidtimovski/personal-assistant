@@ -640,6 +640,25 @@ a.button {
   color: inherit;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --regular-color: #eee;
+  }
+
+  body {
+    background: url("/images/background-dark.webp");
+  }
+
+  .container {
+    background: #222;
+  }
+
+  .wide-button {
+    background: #333;
+    border-color: #666;
+  }
+}
+
 @media screen and (max-width: 1500px) {
   main {
     grid-template-columns: 30% 40% 30%;
@@ -711,8 +730,16 @@ a.button {
 }
 
 @media screen and (max-width: 550px) {
-  body {
-    background: #fff;
+  @media (prefers-color-scheme: light) {
+    body {
+      background: #fff;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body {
+      background: #222;
+    }
   }
 
   main {
@@ -766,24 +793,5 @@ a.button {
   .wide-button {
     background: #fff;
     border-color: #ddd;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --regular-color: #eee;
-  }
-
-  body {
-    background: url("/images/background-dark.webp");
-  }
-
-  .container {
-    background: #222;
-  }
-
-  .wide-button {
-    background: #333;
-    border-color: #666;
   }
 }

@@ -11,7 +11,7 @@ export default {
 		index: {
 			menu: 'Menu',
 			refresh: 'Refresh',
-			feelsLike: 'Feels like:',
+			feelsLike: 'Feels like',
 			clear: 'Clear',
 			mainlyClear: 'Mainly clear',
 			partlyCloudy: 'Partly cloudy',
@@ -80,7 +80,7 @@ export default {
 		index: {
 			menu: 'Мени',
 			refresh: 'Освежи',
-			feelsLike: 'Се осеќа како:',
+			feelsLike: 'Се осеќа како',
 			clear: 'Чисто',
 			mainlyClear: 'Воглавно чисто',
 			partlyCloudy: 'Малку облачно',
