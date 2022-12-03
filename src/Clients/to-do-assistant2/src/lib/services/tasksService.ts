@@ -341,47 +341,47 @@ export class TasksService {
 	// 	}
 	// }
 
-	static getTasks(tasks: Task[]) {
+	static getTasks(tasks: Task[], disabled: boolean) {
 		return tasks
 			.filter((x) => !x.isCompleted && !x.isPrivate)
 			.sort((a: Task, b: Task) => {
 				return a.order - b.order;
 			})
 			.map((x) => {
-				return ListTask.fromTask(x);
+				return ListTask.fromTask(x, disabled);
 			});
 	}
 
-	static getPrivateTasks(tasks: Task[]) {
+	static getPrivateTasks(tasks: Task[], disabled: boolean) {
 		return tasks
 			.filter((x) => !x.isCompleted && x.isPrivate)
 			.sort((a: Task, b: Task) => {
 				return a.order - b.order;
 			})
 			.map((x) => {
-				return ListTask.fromTask(x);
+				return ListTask.fromTask(x, disabled);
 			});
 	}
 
-	static getCompletedTasks(tasks: Task[]) {
+	static getCompletedTasks(tasks: Task[], disabled: boolean) {
 		return tasks
 			.filter((x) => x.isCompleted && !x.isPrivate)
 			.sort((a: Task, b: Task) => {
 				return a.order - b.order;
 			})
 			.map((x) => {
-				return ListTask.fromTask(x);
+				return ListTask.fromTask(x, disabled);
 			});
 	}
 
-	static getCompletedPrivateTasks(tasks: Task[]) {
+	static getCompletedPrivateTasks(tasks: Task[], disabled: boolean) {
 		return tasks
 			.filter((x) => x.isCompleted && x.isPrivate)
 			.sort((a: Task, b: Task) => {
 				return a.order - b.order;
 			})
 			.map((x) => {
-				return ListTask.fromTask(x);
+				return ListTask.fromTask(x, disabled);
 			});
 	}
 

@@ -129,8 +129,8 @@
 					name = <string>derivedListNameLookup.get(type);
 					iconClass = ListsService.getDerivedListIconClass(type);
 
-					tasks = TasksService.getTasks(list.tasks);
-					privateTasks = TasksService.getPrivateTasks(list.tasks);
+					tasks = TasksService.getTasks(list.tasks, s.fromCache);
+					privateTasks = TasksService.getPrivateTasks(list.tasks, s.fromCache);
 
 					shadowTasks = tasks.slice();
 					shadowPrivateTasks = privateTasks.slice();
@@ -159,9 +159,9 @@
 					}
 
 					if (task.isPrivate) {
-						privateTasks = TasksService.getPrivateTasks(list.tasks);
+						privateTasks = TasksService.getPrivateTasks(list.tasks, false);
 					} else {
-						tasks = TasksService.getTasks(list.tasks);
+						tasks = TasksService.getTasks(list.tasks, false);
 					}
 				}
 			})
