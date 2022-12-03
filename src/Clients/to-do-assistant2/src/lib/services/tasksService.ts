@@ -148,15 +148,14 @@ export class TasksService {
 			const staleTasksList = localLists.find((x) => x.derivedListType === DerivedLists.StaleTasks);
 			if (staleTasksList) {
 				const index = staleTasksList.tasks.indexOf(task);
-				if (index === -1) {
-					return;
-				}
 
-				if (staleTasksList.tasks.length > 1) {
-					staleTasksList.tasks.splice(index, 1);
-				} else {
-					const index = localLists.indexOf(staleTasksList);
-					localLists.splice(index, 1);
+				if (index > -1) {
+					if (staleTasksList.tasks.length > 1) {
+						staleTasksList.tasks.splice(index, 1);
+					} else {
+						const index = localLists.indexOf(staleTasksList);
+						localLists.splice(index, 1);
+					}
 				}
 			}
 		}
