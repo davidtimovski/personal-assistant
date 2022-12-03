@@ -18,6 +18,7 @@
     <Compile Include="Services\CategoryService.fs" />
     <Compile Include="Services\DebtService.fs" />
     <Compile Include="Services\SyncService.fs" />
+    <Compile Include="Services\TransactionService.fs" />
     <Compile Include="Services\UpcomingExpenseService.fs" />
   </ItemGroup>
 

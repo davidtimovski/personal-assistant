@@ -38,7 +38,7 @@ let getChanges: HttpHandler =
             let categories =
                 categoryRepository.GetAll(userId, dto.LastSynced) |> CategoryService.mapAll
 
-            let transactions = transactionsRepository.GetAll(userId, dto.LastSynced)
+            let transactions = transactionsRepository.GetAll(userId, dto.LastSynced) |> TransactionService.mapAll
 
             let upcomingExpenses =
                 upcomingExpensesRepository.GetAll(userId, dto.LastSynced)
