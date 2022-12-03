@@ -6,8 +6,8 @@ open Accountant.Application.Fs.Models.Accounts
 open Accountant.Application.Fs.Models.AutomaticTransactions
 open Accountant.Application.Fs.Models.Categories
 open Accountant.Application.Fs.Models.Debts
+open Accountant.Application.Fs.Models.Transactions
 open Accountant.Application.Fs.Models.UpcomingExpenses
-open Accountant.Application.Contracts.Transactions.Models
 
 type GetChangesDto = { LastSynced: DateTime }
 
