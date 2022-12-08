@@ -16,7 +16,7 @@ open HandlerBase
 open Models
 
 let getChanges: HttpHandler =
-    recordPerf (successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+    successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         let accountsRepository = ctx.GetService<IAccountsRepository>()
         let categoryRepository = ctx.GetService<ICategoriesRepository>()
         let transactionsRepository = ctx.GetService<ITransactionsRepository>()
@@ -66,11 +66,11 @@ let getChanges: HttpHandler =
                   AutomaticTransactions = automaticTransactions }
 
             return! Successful.OK changed next ctx
-        })
+        }
     )
 
 let createEntities: HttpHandler =
-    recordPerf (successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+    successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let! dto = ctx.BindJsonAsync<SyncEntities>()
 
@@ -140,5 +140,5 @@ let createEntities: HttpHandler =
                             Id = syncedAutomaticTransactionIds[x] }) }
 
             return! Successful.OK changedEntitiesDto next ctx
-        })
+        }
     )

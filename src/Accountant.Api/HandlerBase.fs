@@ -6,7 +6,6 @@ open Giraffe
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Localization
 open Microsoft.Extensions.Logging
-open Sentry
 
 let getUserId (ctx: HttpContext) =
     let userIdLookup = ctx.GetService<IUserIdLookup>()
@@ -23,17 +22,6 @@ let getUserId (ctx: HttpContext) =
             dbId.Value
         else
             raise (Exception($"The user with auth0_id '{auth0Id}' does not have a mapping"))
-
-let recordPerf (handler: HttpHandler) (next: HttpFunc) (ctx: HttpContext) =
-    task {
-        let transaction = SentrySdk.StartTransaction($"{ctx.Request.Method} {ctx.Request.Path}", "handler")
-
-        let! result = handler next ctx
-
-        transaction.Finish()
-
-        return result
-    }
 
 let successOrLog (handler: HttpHandler) (next: HttpFunc) (ctx: HttpContext) =
     task {
