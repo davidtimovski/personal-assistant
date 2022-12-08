@@ -46,4 +46,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseMvc();
 
+if (app.Environment.IsProduction())
+{
+    app.UseSentryTracing();
+}
+
 app.Run();

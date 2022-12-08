@@ -8,30 +8,19 @@ open Weatherman.Application.Contracts.Forecasts.Models
 open Models
 open Sentry
 
-let recordPerf (handler: HttpHandler) (next: HttpFunc) (ctx: HttpContext) =
-    task {
-        let transaction = SentrySdk.StartTransaction(ctx.Request.Path, "handler")
-
-        let! result = handler next ctx
-
-        transaction.Finish()
-
-        return result
-    }
-
 let successOrLog (handler: HttpHandler) (next: HttpFunc) (ctx: HttpContext) =
     task {
         try
             return! handler next ctx
         with ex ->
             let logger = ctx.GetService<ILogger<HttpContext>>()
-            logger.LogError(ex, $"Unexpected error in handler for route: {ctx.Request.Path}")
+            logger.LogError(ex, $"Unexpected error in handler for request: {ctx.Request.Method} {ctx.Request.Path}")
 
             return! ServerErrors.INTERNAL_ERROR "An unexpected error occurred" next ctx
     }
 
 let get: HttpHandler =
-    recordPerf (successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+    successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         let result = ctx.TryBindQueryString<GetForecastDto>()
 
         (match result with
@@ -54,5 +43,5 @@ let get: HttpHandler =
 
                     return! Successful.OK forecast next ctx
                 }
-        ))
+        )
     )
