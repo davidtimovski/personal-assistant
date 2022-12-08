@@ -8,7 +8,7 @@ open Microsoft.AspNetCore.Http
 open HandlerBase
 
 let create: HttpHandler =
-    recordPerf (successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+    successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let! dto = ctx.BindJsonAsync<CreateAutomaticTransaction>()
             let userId = getUserId ctx
@@ -19,11 +19,11 @@ let create: HttpHandler =
             let! id = repository.CreateAsync(automaticTransaction)
 
             return! Successful.CREATED id next ctx
-        })
+        }
     )
 
 let update: HttpHandler =
-    recordPerf (successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+    successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let! dto = ctx.BindJsonAsync<UpdateAutomaticTransaction>()
             let userId = getUserId ctx
@@ -34,16 +34,16 @@ let update: HttpHandler =
             do! repository.UpdateAsync(automaticTransaction)
 
             return! Successful.NO_CONTENT next ctx
-        })
+        }
     )
 
 let delete (id: int) : HttpHandler =
-    recordPerf (successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+    successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let repository = ctx.GetService<IAutomaticTransactionsRepository>()
             let userId = getUserId ctx
 
             do! repository.DeleteAsync(id, userId)
             return! Successful.NO_CONTENT next ctx
-        })
+        }
     )

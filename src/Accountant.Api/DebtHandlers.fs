@@ -8,7 +8,7 @@ open Microsoft.AspNetCore.Http
 open HandlerBase
 
 let create: HttpHandler =
-    recordPerf (successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+    successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let! dto = ctx.BindJsonAsync<CreateDebt>()
             let userId = getUserId ctx
@@ -19,11 +19,11 @@ let create: HttpHandler =
             let! id = repository.CreateAsync(debt)
 
             return! Successful.CREATED id next ctx
-        })
+        }
     )
 
 let createMerged: HttpHandler =
-    recordPerf (successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+    successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let! dto = ctx.BindJsonAsync<CreateDebt>()
             let userId = getUserId ctx
@@ -34,11 +34,11 @@ let createMerged: HttpHandler =
             let! id = repository.CreateMergedAsync(debt)
 
             return! Successful.CREATED id next ctx
-        })
+        }
     )
 
 let update: HttpHandler =
-    recordPerf (successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+    successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let! dto = ctx.BindJsonAsync<UpdateDebt>()
             let userId = getUserId ctx
@@ -49,16 +49,16 @@ let update: HttpHandler =
             do! repository.UpdateAsync(debt)
 
             return! Successful.NO_CONTENT next ctx
-        })
+        }
     )
 
 let delete (id: int) : HttpHandler =
-    recordPerf (successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+    successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let repository = ctx.GetService<IDebtsRepository>()
             let userId = getUserId ctx
 
             do! repository.DeleteAsync(id, userId)
             return! Successful.NO_CONTENT next ctx
-        })
+        }
     )

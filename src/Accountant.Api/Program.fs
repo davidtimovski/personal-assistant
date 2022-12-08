@@ -100,10 +100,11 @@ let main args =
 
     let app = builder.Build()
 
-    (match app.Environment.IsDevelopment() with
-     | true -> app.UseDeveloperExceptionPage()
-     | false -> app.UseGiraffeErrorHandler(errorHandler))
-    |> ignore
+    match app.Environment.IsProduction() with
+     | true ->
+        app.UseSentryTracing() |> ignore
+        app.UseGiraffeErrorHandler(errorHandler) |> ignore
+     | false -> app.UseDeveloperExceptionPage() |> ignore
 
     addLocalization app
 

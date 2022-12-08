@@ -8,7 +8,7 @@ open Microsoft.AspNetCore.Http
 open HandlerBase
 
 let create: HttpHandler =
-    recordPerf (successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+    successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let! dto = ctx.BindJsonAsync<CreateAccount>()
             let userId = getUserId ctx
@@ -19,11 +19,11 @@ let create: HttpHandler =
             let! id = repository.CreateAsync(account)
 
             return! Successful.CREATED id next ctx
-        })
+        }
     )
 
 let update: HttpHandler =
-    recordPerf (successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+    successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let! dto = ctx.BindJsonAsync<UpdateAccount>()
             let userId = getUserId ctx
@@ -34,11 +34,11 @@ let update: HttpHandler =
             do! repository.UpdateAsync(account)
 
             return! Successful.NO_CONTENT next ctx
-        })
+        }
     )
 
 let delete (id: int) : HttpHandler =
-    recordPerf (successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+    successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let repository = ctx.GetService<IAccountsRepository>()
             let userId = getUserId ctx
@@ -48,5 +48,5 @@ let delete (id: int) : HttpHandler =
             else
                 do! repository.DeleteAsync(id, userId)
                 return! Successful.NO_CONTENT next ctx
-        })
+        }
     )

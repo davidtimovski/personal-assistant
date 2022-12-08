@@ -11,7 +11,7 @@ open HandlerBase
 open Models
 
 let create: HttpHandler =
-    recordPerf (successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+    successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let! dto = ctx.BindJsonAsync<CreateTransaction>()
 
@@ -24,11 +24,11 @@ let create: HttpHandler =
                 let! id = service.CreateAsync(dto)
 
                 return! Successful.CREATED id next ctx
-        })
+        }
     )
 
 let update: HttpHandler =
-    recordPerf (successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+    successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let! dto = ctx.BindJsonAsync<UpdateTransaction>()
 
@@ -41,11 +41,11 @@ let update: HttpHandler =
                 do! service.UpdateAsync(dto)
 
                 return! Successful.NO_CONTENT next ctx
-        })
+        }
     )
 
 let delete (id: int) : HttpHandler =
-    recordPerf (successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+    successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let repository = ctx.GetService<ITransactionsRepository>()
             let userId = getUserId ctx
@@ -53,11 +53,11 @@ let delete (id: int) : HttpHandler =
             do! repository.DeleteAsync(id, userId)
 
             return! Successful.NO_CONTENT next ctx
-        })
+        }
     )
 
 let export: HttpHandler =
-    recordPerf (successOrLog (fun (_) (ctx: HttpContext) ->
+    successOrLog (fun (_) (ctx: HttpContext) ->
         task {
             let! dto = ctx.BindJsonAsync<ExportDto>()
 
@@ -78,11 +78,11 @@ let export: HttpHandler =
             ctx.SetHttpHeader("Content-Disposition", "attachment; filename=\"transactions.csv\"")
 
             return! ctx.WriteStreamAsync(true, file, None, None)
-        })
+        }
     )
 
 let deleteExportedFile (fileId: Guid) : HttpHandler =
-    recordPerf (successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+    successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let webHostEnvironment = ctx.GetService<IWebHostEnvironment>()
 
@@ -90,5 +90,5 @@ let deleteExportedFile (fileId: Guid) : HttpHandler =
             File.Delete(filePath);
 
             return! Successful.NO_CONTENT next ctx
-        })
+        }
     )

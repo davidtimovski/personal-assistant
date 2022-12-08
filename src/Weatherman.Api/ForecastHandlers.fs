@@ -6,7 +6,6 @@ open Microsoft.Extensions.Logging
 open Weatherman.Application.Contracts.Forecasts
 open Weatherman.Application.Contracts.Forecasts.Models
 open Models
-open Sentry
 
 let successOrLog (handler: HttpHandler) (next: HttpFunc) (ctx: HttpContext) =
     task {
