@@ -11,7 +11,7 @@ open HandlerBase
 open Models
 
 let create: HttpHandler =
-    successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+    recordPerf (successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let! dto = ctx.BindJsonAsync<CreateTransaction>()
 
@@ -25,9 +25,10 @@ let create: HttpHandler =
 
                 return! Successful.CREATED id next ctx
         })
+    )
 
 let update: HttpHandler =
-    successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+    recordPerf (successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let! dto = ctx.BindJsonAsync<UpdateTransaction>()
 
@@ -41,9 +42,10 @@ let update: HttpHandler =
 
                 return! Successful.NO_CONTENT next ctx
         })
+    )
 
 let delete (id: int) : HttpHandler =
-    successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+    recordPerf (successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let repository = ctx.GetService<ITransactionsRepository>()
             let userId = getUserId ctx
@@ -52,9 +54,10 @@ let delete (id: int) : HttpHandler =
 
             return! Successful.NO_CONTENT next ctx
         })
+    )
 
 let export: HttpHandler =
-    successOrLog (fun (_) (ctx: HttpContext) ->
+    recordPerf (successOrLog (fun (_) (ctx: HttpContext) ->
         task {
             let! dto = ctx.BindJsonAsync<ExportDto>()
 
@@ -76,9 +79,10 @@ let export: HttpHandler =
 
             return! ctx.WriteStreamAsync(true, file, None, None)
         })
+    )
 
 let deleteExportedFile (fileId: Guid) : HttpHandler =
-    successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+    recordPerf (successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let webHostEnvironment = ctx.GetService<IWebHostEnvironment>()
 
@@ -87,3 +91,4 @@ let deleteExportedFile (fileId: Guid) : HttpHandler =
 
             return! Successful.NO_CONTENT next ctx
         })
+    )
