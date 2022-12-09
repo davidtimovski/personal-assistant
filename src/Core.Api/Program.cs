@@ -34,17 +34,14 @@ builder.Services
 
 builder.Services.AddPersistence(builder.Configuration["ConnectionString"]);
 
-builder.Services.AddMvc(options =>
-{
-    options.EnableEndpointRouting = false;
-});
+builder.Services.AddControllers();
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
 var app = builder.Build();
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseMvc();
+app.MapControllers();
 
 if (app.Environment.IsProduction())
 {
