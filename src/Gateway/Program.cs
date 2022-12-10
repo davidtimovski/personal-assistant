@@ -20,13 +20,13 @@ builder.Services.AddCors(options =>
     var accountantUrl = builder.Configuration["Urls:Accountant"];
     var weathermanUrl = builder.Configuration["Urls:Weatherman"];
 
-    options.AddPolicy("AllowAllApps", builder =>
+    options.AddPolicy("AllowAllApps", corsBuilder =>
     {
-        builder.WithOrigins(toDoAssistantUrl, cookingAssistantUrl, accountantUrl, weathermanUrl)
-               .AllowAnyMethod()
-               .AllowAnyHeader()
-               .AllowCredentials() // For SignalR
-               .SetPreflightMaxAge(TimeSpan.FromDays(20));
+        corsBuilder.WithOrigins(toDoAssistantUrl, cookingAssistantUrl, accountantUrl, weathermanUrl)
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials() // For SignalR
+            .SetPreflightMaxAge(TimeSpan.FromDays(20));
     });
 });
 

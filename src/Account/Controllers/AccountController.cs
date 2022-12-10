@@ -464,15 +464,15 @@ public class AccountController : BaseController
         await _recipeService.CreateSampleAsync(userId, sampleRecipeTranslations);
     }
 
-    private IActionResult RedirectToLocal(string returnUrl)
-    {
-        if (Url.IsLocalUrl(returnUrl))
-        {
-            return Redirect(returnUrl);
-        }
-
-        return RedirectToAction(nameof(HomeController.Index));
-    }
+    // private IActionResult RedirectToLocal(string returnUrl)
+    // {
+    //     if (Url.IsLocalUrl(returnUrl))
+    //     {
+    //         return Redirect(returnUrl);
+    //     }
+    //
+    //     return RedirectToAction(nameof(HomeController.Index));
+    // }
 
     #endregion
 }

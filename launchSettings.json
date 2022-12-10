@@ -1,0 +1,72 @@
+{
+  "profiles": {
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "account": "StartDebugging",
+        "accountant-api": "StartDebugging",
+        "clientlogger": "StartDebugging",
+        "cooking-api": "StartDebugging",
+        "core-api": "StartDebugging",
+        "gateway": "StartDebugging",
+        "postgres": "StartWithoutDebugging",
+        "rabbitmq": "StartWithoutDebugging",
+        "sender": "StartDebugging",
+        "todo-api": "StartDebugging",
+        "weatherman-api": "StartDebugging"
+      }
+    },
+    "Accountant.Api": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "account": "StartDebugging",
+        "accountant-api": "StartDebugging",
+        "clientlogger": "StartDebugging",
+        "cooking-api": "StartWithoutDebugging",
+        "core-api": "StartDebugging",
+        "gateway": "StartDebugging",
+        "postgres": "StartWithoutDebugging",
+        "rabbitmq": "StartWithoutDebugging",
+        "sender": "StartDebugging",
+        "todo-api": "StartWithoutDebugging",
+        "weatherman-api": "StartWithoutDebugging"
+      }
+    },
+    "ToDoAssistant.Api": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "account": "StartDebugging",
+        "accountant-api": "StartWithoutDebugging",
+        "clientlogger": "StartDebugging",
+        "cooking-api": "StartWithoutDebugging",
+        "core-api": "StartDebugging",
+        "gateway": "StartDebugging",
+        "postgres": "StartWithoutDebugging",
+        "rabbitmq": "StartWithoutDebugging",
+        "sender": "StartDebugging",
+        "todo-api": "StartDebugging",
+        "weatherman-api": "StartWithoutDebugging"
+      }
+    },
+    "Weatherman.Api": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "account": "StartDebugging",
+        "accountant-api": "StartWithoutDebugging",
+        "clientlogger": "StartDebugging",
+        "cooking-api": "StartWithoutDebugging",
+        "core-api": "StartDebugging",
+        "gateway": "StartDebugging",
+        "postgres": "StartWithoutDebugging",
+        "rabbitmq": "StartWithoutDebugging",
+        "sender": "StartDebugging",
+        "todo-api": "StartWithoutDebugging",
+        "weatherman-api": "StartDebugging"
+      }
+    }
+  }
+}

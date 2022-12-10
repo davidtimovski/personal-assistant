@@ -1,8 +1,4 @@
-﻿using System.Linq;
-using Application;
-using Application.Contracts;
-
-namespace Application.Contracts.Models;
+﻿namespace Application.Contracts.Models;
 
 public class TooltipToggleDismissed
 {
