@@ -57,14 +57,12 @@ builder.Services
     .AddPersistence(builder.Configuration["ConnectionString"])
     .AddToDoAssistantPersistence();
 
+builder.Services.AddControllers();
+
 builder.Services
     .AddLocalization(options => options.ResourcesPath = "Resources")
     .AddSignalR();
 
-builder.Services.AddMvc(options =>
-{
-    options.EnableEndpointRouting = false;
-});
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
 var app = builder.Build();
@@ -84,13 +82,12 @@ app.UseRequestLocalization(new RequestLocalizationOptions
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseMvc();
+app.MapControllers();
+app.MapHub<ListActionsHub>("/hub");
 
 if (app.Environment.IsProduction())
 {
     app.UseSentryTracing();
 }
-
-app.MapHub<ListActionsHub>("/hub");
 
 app.Run();

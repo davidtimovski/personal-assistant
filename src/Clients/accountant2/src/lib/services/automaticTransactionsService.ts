@@ -46,7 +46,7 @@ export class AutomaticTransactionsService {
 
 			if (navigator.onLine) {
 				automaticTransaction.id = await this.httpProxy.ajax<number>(
-					`${Variables.urls.gateway}/accountant/api/automatictransactions`,
+					`${Variables.urls.gateway}/accountant/api/automatic-transactions`,
 					{
 						method: 'post',
 						body: window.JSON.stringify(automaticTransaction)
@@ -76,7 +76,7 @@ export class AutomaticTransactionsService {
 			automaticTransaction.modifiedDate = DateHelper.adjustTimeZone(new Date());
 
 			if (navigator.onLine) {
-				await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/accountant/api/automatictransactions`, {
+				await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/accountant/api/automatic-transactions`, {
 					method: 'put',
 					body: window.JSON.stringify(automaticTransaction)
 				});
@@ -95,7 +95,7 @@ export class AutomaticTransactionsService {
 	async delete(id: number): Promise<void> {
 		try {
 			if (navigator.onLine) {
-				await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/accountant/api/automatictransactions/${id}`, {
+				await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/accountant/api/automatic-transactions/${id}`, {
 					method: 'delete'
 				});
 			} else if (await this.idbHelper.isSynced(id)) {

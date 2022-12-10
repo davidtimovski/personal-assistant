@@ -1,10 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Reflection;
 using Application.Contracts;
-using Application.Contracts.Models;
 using Application.Services;
-using FluentValidation;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application;

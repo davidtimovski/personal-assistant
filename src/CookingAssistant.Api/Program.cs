@@ -44,11 +44,7 @@ builder.Services
 builder.Services
     .AddLocalization(options => options.ResourcesPath = "Resources");
 
-builder.Services.AddMvc(options =>
-{
-    options.EnableEndpointRouting = false;
-});
-
+builder.Services.AddControllers();
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 builder.Services.Configure<DailyIntakeReference>(builder.Configuration.GetSection("DietaryProfile:ReferenceDailyIntake"));
 
@@ -69,6 +65,6 @@ app.UseRequestLocalization(new RequestLocalizationOptions
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseMvc();
+app.MapControllers();
 
 app.Run();

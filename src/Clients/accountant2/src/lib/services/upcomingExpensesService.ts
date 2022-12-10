@@ -46,7 +46,7 @@ export class UpcomingExpensesService {
 
 			if (navigator.onLine) {
 				upcomingExpense.id = await this.httpProxy.ajax<number>(
-					`${Variables.urls.gateway}/accountant/api/upcomingexpenses`,
+					`${Variables.urls.gateway}/accountant/api/upcoming-expenses`,
 					{
 						method: 'post',
 						body: window.JSON.stringify(upcomingExpense)
@@ -76,7 +76,7 @@ export class UpcomingExpensesService {
 			upcomingExpense.modifiedDate = DateHelper.adjustTimeZone(new Date());
 
 			if (navigator.onLine) {
-				await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/accountant/api/upcomingexpenses`, {
+				await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/accountant/api/upcoming-expenses`, {
 					method: 'put',
 					body: window.JSON.stringify(upcomingExpense)
 				});
@@ -95,7 +95,7 @@ export class UpcomingExpensesService {
 	async delete(id: number): Promise<void> {
 		try {
 			if (navigator.onLine) {
-				await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/accountant/api/upcomingexpenses/${id}`, {
+				await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/accountant/api/upcoming-expenses/${id}`, {
 					method: 'delete'
 				});
 			} else if (await this.idbHelper.isSynced(id)) {
