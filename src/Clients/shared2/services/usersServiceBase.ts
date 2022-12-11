@@ -15,9 +15,20 @@ export class UsersServiceBase {
 
   async get<Type extends User>(): Promise<Type> {
     try {
-      return await this.httpProxy.ajax<Type>(
+      const user = await this.httpProxy.ajax<Type>(
         `${Variables.urls.gateway}/core/api/users?application=${this.application}`
       );
+
+      // 40x40 thumbnail
+      const uriEnvironment = user.imageUri.includes("production")
+        ? "production"
+        : "development";
+      user.imageUri = user.imageUri.replace(
+        uriEnvironment,
+        `w_40,h_40,c_limit/${uriEnvironment}`
+      );
+
+      return user;
     } catch (e) {
       this.logger.logError(e);
       throw e;

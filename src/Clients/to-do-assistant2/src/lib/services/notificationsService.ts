@@ -9,10 +9,10 @@ export class NotificationsService extends NotificationsServiceBase {
 	}
 
 	getAll(): Promise<Array<Notification>> {
-		return this.httpProxy.ajax<Array<Notification>>(`${Variables.urls.gateway}/todo/api/notifications`);
+		return this.httpProxy.ajax<Array<Notification>>(`${Variables.urls.api}/notifications`);
 	}
 
 	getUnseenNotificationsCount(): Promise<number> {
-		return this.httpProxy.ajax<number>(`${Variables.urls.gateway}/todo/api/notifications/unseen-notifications-count`);
+		return this.httpProxy.ajax<number>(`${Variables.urls.api}/notifications/unseen-notifications-count`);
 	}
 }

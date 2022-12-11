@@ -76,7 +76,7 @@ export class CategoriesService {
 			}
 
 			if (navigator.onLine) {
-				category.id = await this.httpProxy.ajax<number>(`${Variables.urls.gateway}/accountant/api/categories`, {
+				category.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/categories`, {
 					method: 'post',
 					body: window.JSON.stringify(category)
 				});
@@ -101,7 +101,7 @@ export class CategoriesService {
 			}
 
 			if (navigator.onLine) {
-				await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/accountant/api/categories`, {
+				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/categories`, {
 					method: 'put',
 					body: window.JSON.stringify(category)
 				});
@@ -120,7 +120,7 @@ export class CategoriesService {
 	async delete(id: number): Promise<void> {
 		try {
 			if (navigator.onLine) {
-				await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/accountant/api/categories/${id}`, {
+				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/categories/${id}`, {
 					method: 'delete'
 				});
 			} else if (await this.idbHelper.isSynced(id)) {

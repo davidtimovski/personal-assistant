@@ -20,11 +20,6 @@ public class CloudinaryService : ICdnService
         { "profile", new Transformation().Width(400).Height(400).Crop("lfill").FetchFormat(Format) },
         { "recipe", new Transformation().Width(640).Height(320).Crop("lfill").FetchFormat(Format) }
     };
-    private readonly Dictionary<string, List<Transformation>> _eagerTransformTemplates = new()
-    {
-        { "profile", new List<Transformation> { new Transformation().Named("profile_thumbnail") } },
-        { "recipe", new List<Transformation>() }
-    };
     private CloudinaryDotNet.Cloudinary Cloudinary { get; }
     private readonly HttpClient _httpClient;
 
@@ -57,15 +52,13 @@ public class CloudinaryService : ICdnService
     {
         string uri = GenerateRandomString();
         Transformation transformation = _templates[template];
-        List<Transformation> eagerTransforms = _eagerTransformTemplates[template];
 
         var uploadParams = new ImageUploadParams
         {
             File = new FileDescription(filePath),
             Folder = $"{_environment}/{uploadPath}/",
             PublicId = uri,
-            Transformation = transformation,
-            EagerTransforms = eagerTransforms
+            Transformation = transformation
         };
 
         ImageUploadResult uploadResult = await Cloudinary.UploadAsync(uploadParams);
@@ -111,7 +104,6 @@ public class CloudinaryService : ICdnService
     {
         string uri = GenerateRandomString();
         Transformation transformation = _templates[template];
-        List<Transformation> eagerTransforms = _eagerTransformTemplates[template];
 
         var uploadParams = new ImageUploadParams
         {
@@ -119,7 +111,6 @@ public class CloudinaryService : ICdnService
             Folder = $"{_environment}/{uploadPath}/",
             PublicId = uri,
             Transformation = transformation,
-            EagerTransforms = eagerTransforms,
             Tags = "temp"
         };
 
@@ -130,6 +121,8 @@ public class CloudinaryService : ICdnService
         }
 
         File.Delete(filePath);
+
+        // w_40,h_40,c_limit
 
         return _baseUrl + $"{uploadPath}/{uri}.{Format}";
     }
@@ -266,7 +259,6 @@ public class CloudinaryService : ICdnService
     {
         string uri = GenerateRandomString();
         Transformation transformation = _templates[template];
-        List<Transformation> eagerTransforms = _eagerTransformTemplates[template];
 
         var uploadParams = new ImageUploadParams
         {
@@ -274,7 +266,6 @@ public class CloudinaryService : ICdnService
             Folder = $"{_environment}/{uploadPath}/",
             PublicId = uri,
             Transformation = transformation,
-            EagerTransforms = eagerTransforms,
             Tags = "temp"
         };
 

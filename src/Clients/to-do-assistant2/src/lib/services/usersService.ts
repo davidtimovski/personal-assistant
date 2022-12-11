@@ -10,7 +10,7 @@ export class UsersService extends UsersServiceBase {
 
 	async updateNotificationsEnabled(enabled: boolean): Promise<void> {
 		try {
-			await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/todo/api/users/to-do-notifications-enabled`, {
+			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/users/to-do-notifications-enabled`, {
 				method: 'put',
 				body: window.JSON.stringify({
 					toDoNotificationsEnabled: enabled
