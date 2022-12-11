@@ -312,7 +312,7 @@ export class TransactionsService {
 		transaction.modifiedDate = DateHelper.adjustTimeZone(new Date());
 
 		if (navigator.onLine) {
-			transaction.id = await this.httpProxy.ajax<number>(`${Variables.urls.gateway}/accountant/api/transactions`, {
+			transaction.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/transactions`, {
 				method: 'post',
 				body: window.JSON.stringify(transaction)
 			});
@@ -365,7 +365,7 @@ export class TransactionsService {
 			transaction.modifiedDate = DateHelper.adjustTimeZone(new Date());
 
 			if (navigator.onLine) {
-				await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/accountant/api/transactions`, {
+				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/transactions`, {
 					method: 'put',
 					body: window.JSON.stringify(transaction)
 				});
@@ -384,7 +384,7 @@ export class TransactionsService {
 	async delete(id: number): Promise<void> {
 		try {
 			if (navigator.onLine) {
-				await this.httpProxy.ajaxExecute(`${Variables.urls.gateway}/accountant/api/transactions/${id}`, {
+				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/transactions/${id}`, {
 					method: 'delete'
 				});
 			} else if (await this.idbHelper.isSynced(id)) {
@@ -438,7 +438,7 @@ export class TransactionsService {
 	}
 
 	async export(fileId: string): Promise<Blob> {
-		return this.httpProxy.ajaxBlob(`${Variables.urls.gateway}/accountant/api/transactions/export`, {
+		return this.httpProxy.ajaxBlob(`${Variables.urls.api}/transactions/export`, {
 			method: 'post',
 			body: window.JSON.stringify({
 				fileId: fileId
@@ -451,12 +451,9 @@ export class TransactionsService {
 
 	async deleteExportedFile(fileId: string): Promise<void> {
 		try {
-			await this.httpProxy.ajaxExecute(
-				`${Variables.urls.gateway}/accountant/api/transactions/exported-file/${fileId}`,
-				{
-					method: 'delete'
-				}
-			);
+			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/transactions/exported-file/${fileId}`, {
+				method: 'delete'
+			});
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;

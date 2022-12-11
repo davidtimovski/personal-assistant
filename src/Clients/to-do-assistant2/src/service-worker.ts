@@ -1,6 +1,6 @@
 import { build, files } from '$service-worker';
 
-const APP_VERSION = '2.2.7';
+const APP_VERSION = '2.2.8';
 
 self.addEventListener('install', (event: ExtendableEvent) => {
 	event.waitUntil(

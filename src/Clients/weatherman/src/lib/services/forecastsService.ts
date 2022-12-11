@@ -26,7 +26,7 @@ export class ForecastsService {
 					const time = DateHelper.adjustTimeZone(now).toISOString();
 
 					const data = await this.httpProxy.ajax<Forecast>(
-						`${Variables.urls.gateway}/weatherman/api/forecasts?latitude=${latitude}&longitude=${longitude}&temperatureunit=${temperatureUnit}&precipitationunit=${precipitationUnit}&windspeedunit=${windSpeedUnit}&time=${time}`
+						`${Variables.urls.api}/forecasts?latitude=${latitude}&longitude=${longitude}&temperatureunit=${temperatureUnit}&precipitationunit=${precipitationUnit}&windspeedunit=${windSpeedUnit}&time=${time}`
 					);
 					data.lastRetrieved = now.valueOf();
 

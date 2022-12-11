@@ -42,7 +42,7 @@ export class SyncService {
 
 			await this.upcomingExpensesIDBHelper.deleteOld();
 
-			const changed = await this.httpProxy.ajax<Changed>(`${Variables.urls.gateway}/accountant/api/sync/changes`, {
+			const changed = await this.httpProxy.ajax<Changed>(`${Variables.urls.api}/sync/changes`, {
 				method: 'post',
 				body: window.JSON.stringify({
 					lastSynced: lastSynced
@@ -79,13 +79,10 @@ export class SyncService {
 				debtsToCreate,
 				automaticTransactionsToCreate
 			);
-			const created = await this.httpProxy.ajax<Created>(
-				`${Variables.urls.gateway}/accountant/api/sync/create-entities`,
-				{
-					method: 'post',
-					body: window.JSON.stringify(create)
-				}
-			);
+			const created = await this.httpProxy.ajax<Created>(`${Variables.urls.api}/sync/create-entities`, {
+				method: 'post',
+				body: window.JSON.stringify(create)
+			});
 			if (!created) {
 				throw new Error('api/sync/create-entities call failed');
 			}
