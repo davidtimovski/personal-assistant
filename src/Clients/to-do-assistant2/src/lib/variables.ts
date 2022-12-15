@@ -5,7 +5,7 @@ export default class Variables {
 		gateway: import.meta.env.VITE_GATEWAY_URL,
 		api: import.meta.env.VITE_GATEWAY_URL + '/todo/api',
 		defaultProfileImageUrl:
-			'https://res.cloudinary.com/personalassistant/w_40,h_40,c_limit/production/defaults/sfmqac.webp'
+			'https://res.cloudinary.com/personalassistant/w_80,h_80,c_limit/production/defaults/sfmqac.webp'
 	};
 	static debug = import.meta.env.DEV;
 	static auth0Domain = import.meta.env.VITE_AUTH0_DOMAIN;

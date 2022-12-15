@@ -12,7 +12,7 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
-	import { alertState } from '$lib/stores';
+	import { alertState, user } from '$lib/stores';
 	import type { SelectOption } from '$lib/models/viewmodels/selectOption';
 	import { TransactionsService } from '$lib/services/transactionsService';
 	import { AccountsService } from '$lib/services/accountsService';
@@ -79,7 +79,7 @@
 		if (isToday) {
 			const hour = now.getHours();
 			if (hour < 4) {
-				return DateHelper.formatHoursMinutes(now);
+				return DateHelper.formatHoursMinutes(now, $user.culture);
 			}
 		}
 

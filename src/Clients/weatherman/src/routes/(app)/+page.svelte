@@ -16,7 +16,6 @@
 	import Illustration from '$lib/components/Illustration.svelte';
 	import NextDayForecast from '$lib/components/NextDayForecast.svelte';
 
-	let weekDays: any[] = [];
 	let now = new Date();
 	let selectedDate = '';
 	let currentTime = '';
@@ -53,7 +52,7 @@
 		startProgressBar();
 
 		setCurrentTime();
-		forecastsService.get($user.culture);
+		forecastsService.get(now, $user.language, $user.culture);
 	}
 
 	function startProgressBar() {
@@ -134,30 +133,22 @@
 		}
 
 		unsubscriptions.push(
-			forecast.subscribe((x) => {
-				if (!x) {
+			user.subscribe((x) => {
+				if (!x.email) {
 					return;
 				}
 
 				setCurrentTime();
+			})
+		);
 
-				const dateCounter = new Date();
-				weekDays = [
-					{
-						date: currentDate,
-						weekDay: DateHelper.formatWeekdayShort(dateCounter, $user.language)
-					}
-				];
-				for (let i = 0; i < 5; i++) {
-					dateCounter.setDate(dateCounter.getDate() + 1);
-
-					weekDays.push({
-						date: DateHelper.format(dateCounter),
-						weekDay: DateHelper.formatWeekdayShort(dateCounter, $user.language)
-					});
+		unsubscriptions.push(
+			forecast.subscribe((x) => {
+				if (!x.initialized) {
+					return;
 				}
 
-				weatherDescription = <string>weatherDescriptionTr.get(x.weatherCode);
+				weatherDescription = <string>weatherDescriptionTr.get(<WeatherCode>x.weatherCode);
 
 				finishProgressBar();
 			})
@@ -199,7 +190,7 @@
 
 	<div class="content-wrap">
 		<div class="days">
-			{#each weekDays as weekDay}
+			{#each $forecast.weekDays as weekDay}
 				<button
 					type="button"
 					on:click={() => selectDate(weekDay.date)}
@@ -213,34 +204,43 @@
 			<div class="tab" class:visible={selectedDate === currentDate}>
 				<div class="wrap">
 					<div class="current-forecast">
-						<div class="current-illustration">
-							<Illustration weatherCode={$forecast.weatherCode} timeOfDay={$forecast.timeOfDay} />
-						</div>
+						{#if $forecast.initialized}
+							<div class="current-illustration">
+								<Illustration weatherCode={$forecast.weatherCode} timeOfDay={$forecast.timeOfDay} />
+							</div>
 
-						<div class="current-temp">{$forecast.temperature}°</div>
+							<div class="current-temp">{$forecast.temperature}°</div>
 
-						{#if $forecast.temperature !== $forecast.apparentTemperature}
-							<div class="current-apparent-temp">{$t('index.feelsLike')} {$forecast.apparentTemperature}°</div>
+							{#if $forecast.temperature !== $forecast.apparentTemperature}
+								<div class="current-apparent-temp">{$t('index.feelsLike')} {$forecast.apparentTemperature}°</div>
+							{/if}
+
+							<div class="weather-description">{weatherDescription}</div>
+
+							<table class="wind-and-precipitation">
+								<tr class="wind">
+									<td><i class="fa-solid fa-wind" /></td>
+									<td>
+										<span class="current-value">{$forecast.windSpeed}</span>
+										<span>{windSpeedUnit}</span>
+									</td>
+								</tr>
+								<tr class="precipitation">
+									<td><i class="fa-solid fa-droplet" /></td>
+									<td>
+										<span class="current-value">{$forecast.precipitation}</span>
+										<span>{precipitationUnit}</span>
+									</td>
+								</tr>
+							</table>
+						{:else if $forecast.hourly.length > 0}
+							<div class="loader-wrap">
+								<div class="double-circle-loading">
+									<div class="double-bounce1" />
+									<div class="double-bounce2" />
+								</div>
+							</div>
 						{/if}
-
-						<div class="weather-description">{weatherDescription}</div>
-
-						<table class="wind-and-precipitation">
-							<tr class="wind">
-								<td><i class="fa-solid fa-wind" /></td>
-								<td>
-									<span class="current-value">{$forecast.windSpeed}</span>
-									<span>{windSpeedUnit}</span>
-								</td>
-							</tr>
-							<tr class="precipitation">
-								<td><i class="fa-solid fa-droplet" /></td>
-								<td>
-									<span class="current-value">{$forecast.precipitation}</span>
-									<span>{precipitationUnit}</span>
-								</td>
-							</tr>
-						</table>
 					</div>
 
 					<div class="gutter" />
@@ -251,9 +251,15 @@
 								<tr>
 									<td>{hourForecast.timeString} {$t('h')}</td>
 									<td class="hourly-illustration">
-										<Illustration weatherCode={hourForecast.weatherCode} timeOfDay={hourForecast.timeOfDay} />
+										{#if hourForecast.timeOfDay !== null}
+											<Illustration weatherCode={hourForecast.weatherCode} timeOfDay={hourForecast.timeOfDay} />
+										{/if}
 									</td>
-									<td>{hourForecast.temperature}°</td>
+									<td>
+										{#if hourForecast.temperature !== null}
+											<span>{hourForecast.temperature}°</span>
+										{/if}
+									</td>
 								</tr>
 							{/each}
 						</table>
@@ -301,6 +307,10 @@
 
 	.current-forecast {
 		flex: 1;
+
+		.loader-wrap {
+			padding-top: 60px;
+		}
 	}
 
 	.current-illustration {
