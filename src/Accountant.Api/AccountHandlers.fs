@@ -5,6 +5,7 @@ open Accountant.Application.Fs.Models.Accounts
 open Accountant.Application.Fs.Services
 open Giraffe
 open Microsoft.AspNetCore.Http
+open CommonHandlers
 open HandlerBase
 
 let create: HttpHandler =

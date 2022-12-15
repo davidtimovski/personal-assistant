@@ -5,7 +5,6 @@ open Application.Contracts
 open Giraffe
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Localization
-open Microsoft.Extensions.Logging
 
 let getUserId (ctx: HttpContext) =
     let userIdLookup = ctx.GetService<IUserIdLookup>()
@@ -22,17 +21,6 @@ let getUserId (ctx: HttpContext) =
             dbId.Value
         else
             raise (Exception($"The user with auth0_id '{auth0Id}' does not have a mapping"))
-
-let successOrLog (handler: HttpHandler) (next: HttpFunc) (ctx: HttpContext) =
-    task {
-        try
-            return! handler next ctx
-        with ex ->
-            let logger = ctx.GetService<ILogger<HttpContext>>()
-            logger.LogError(ex, $"Unexpected error in handler for request: {ctx.Request.Method} {ctx.Request.Path}")
-
-            return! ServerErrors.INTERNAL_ERROR "An unexpected error occurred" next ctx
-    }
 
 let localize (ctx: HttpContext) text =
     let enTranslations = Map ["Encrypted", "[ Encrypted ]"; "Uncategorized", "Uncategorized"]

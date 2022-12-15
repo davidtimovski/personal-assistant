@@ -1,15 +1,17 @@
 import type { WeatherCode } from '$lib/models/weatherCode';
 
 export class Forecast {
+	initialized = false;
 	lastRetrieved: number | null = null;
+	weekDays: { date: string; weekDay: string }[] = [];
 
 	constructor(
-		public weatherCode: WeatherCode,
-		public temperature: number,
-		public apparentTemperature: number,
-		public precipitation: number,
-		public windSpeed: number,
-		public timeOfDay: TimeOfDay,
+		public weatherCode: WeatherCode | null,
+		public temperature: number | null,
+		public apparentTemperature: number | null,
+		public precipitation: number | null,
+		public windSpeed: number | null,
+		public timeOfDay: TimeOfDay | null,
 		public hourly: HourlyForecast[],
 		public nextDays: DailyForecast[]
 	) {}
@@ -29,11 +31,11 @@ export class DailyForecast {
 export class HourlyForecast {
 	constructor(
 		public hour: number,
-		public weatherCode: WeatherCode,
-		public temperature: number,
-		public apparentTemperature: number,
-		public timeOfDay: TimeOfDay,
-		public timeString: string
+		public timeString: string,
+		public weatherCode: WeatherCode | null,
+		public temperature: number | null,
+		public apparentTemperature: number | null,
+		public timeOfDay: TimeOfDay | null
 	) {}
 }
 

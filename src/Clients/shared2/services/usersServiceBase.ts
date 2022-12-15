@@ -25,7 +25,7 @@ export class UsersServiceBase {
         : "development";
       user.imageUri = user.imageUri.replace(
         uriEnvironment,
-        `w_40,h_40,c_limit/${uriEnvironment}`
+        `w_80,h_80,c_limit/${uriEnvironment}`
       );
 
       return user;

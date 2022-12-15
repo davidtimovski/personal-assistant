@@ -14,28 +14,29 @@
 	import { isOffline, user, forecast } from '$lib/stores';
 	import { ForecastsService } from '$lib/services/forecastsService';
 	import type { WeathermanUser } from '$lib/models/weathermanUser';
-	import Variables from '$lib/variables';
 
 	let usersService: UsersServiceBase;
 	let forecastsService: ForecastsService;
+	const now = new Date();
 
 	function loadUser() {
 		const cachedUser = usersService.getFromCache();
 		if (cachedUser) {
 			user.set(cachedUser);
+			forecastsService.setPlaceholder(now, cachedUser.language, cachedUser.culture);
 		}
 
 		usersService.get<WeathermanUser>().then((currentUser) => {
 			user.set(currentUser);
 			usersService.cache(currentUser);
 
-			forecastsService.get(currentUser.culture);
+			forecastsService.get(now, currentUser.language, currentUser.culture);
 		});
 	}
 
 	onMount(async () => {
 		const authService = new AuthService();
-		await authService.initialize(Variables.urls.gateway);
+		await authService.initialize();
 
 		if (await authService.authenticated()) {
 			await authService.setToken();
@@ -65,7 +66,7 @@
 
 				const fifteenMinutesAgo = Date.now() - 900000;
 				if ($forecast.lastRetrieved < fifteenMinutesAgo) {
-					forecastsService.get($user.culture);
+					forecastsService.get(new Date(), $user.language, $user.culture);
 				}
 			},
 			false

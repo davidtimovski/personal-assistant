@@ -7,6 +7,7 @@ open Accountant.Application.Contracts.Transactions.Models
 open Giraffe
 open Microsoft.AspNetCore.Hosting
 open Microsoft.AspNetCore.Http
+open CommonHandlers
 open HandlerBase
 open Models
 

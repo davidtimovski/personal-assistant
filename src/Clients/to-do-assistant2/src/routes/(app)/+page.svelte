@@ -104,7 +104,7 @@
 
 				setListsFromState();
 
-				if (!s.cache) {
+				if (!s.fromCache) {
 					finishProgressBar();
 				}
 			})
