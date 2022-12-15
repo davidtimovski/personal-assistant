@@ -23,6 +23,7 @@ services:
       - cooking-api
       - accountant-api
       - weatherman-api
+      - trainer-api
 
   core-api:
     image: personalassistant-core-api:latest
@@ -68,6 +69,15 @@ services:
     build:
       context: .
       dockerfile: src/Weatherman.Api/Dockerfile
+    depends_on:
+      - postgres
+
+  trainer-api:
+    image: personalassistant-trainer-api:latest
+    container_name: personalassistant-trainer-api
+    build:
+      context: .
+      dockerfile: src/Trainer.Api/Dockerfile
     depends_on:
       - postgres
 

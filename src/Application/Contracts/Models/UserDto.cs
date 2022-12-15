@@ -38,3 +38,11 @@ public class WeathermanUser : UserDto, IMapFrom<User>
         profile.CreateMap<User, WeathermanUser>();
     }
 }
+
+public class TrainerUser : UserDto, IMapFrom<User>
+{
+    public void Mapping(Profile profile)
+    {
+        profile.CreateMap<User, TrainerUser>();
+    }
+}

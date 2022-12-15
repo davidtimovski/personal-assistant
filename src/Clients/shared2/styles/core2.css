@@ -125,8 +125,7 @@ input[type="url"],
 input[type="number"],
 input[type="password"] {
   width: calc(100% - 26px);
-  background: #fff;
-  border: 1px solid #ddd;
+  border: 1px solid;
   border-radius: 6px;
   outline: none;
   padding: 0 12px;
@@ -148,12 +147,11 @@ input::-webkit-inner-spin-button {
 select {
   appearance: none;
   width: 100%;
-  background-color: #fff;
   background-image: url("/images/select-caret.webp");
   background-repeat: no-repeat;
   background-position: right 15px top 17px;
   background-size: 12px 6px;
-  border: 1px solid #ddd;
+  border: 1px solid;
   border-radius: 6px;
   outline: none;
   padding: 0 12px;
@@ -171,8 +169,7 @@ textarea {
   width: calc(100% - 26px);
   height: 175px;
   min-height: 40px;
-  background: #fff;
-  border: 1px solid #ddd;
+  border: 1px solid;
   border-radius: 6px;
   outline: none;
   padding: 8px 12px;
@@ -341,10 +338,9 @@ hr {
   display: block;
   height: 1px;
   border: 0;
-  border-top: 1px solid #ddd;
+  border-top: 1px solid;
   padding: 0;
   margin: 6% 10% 5%;
-  color: #ddd;
 }
 
 .hidden {
@@ -511,13 +507,12 @@ form {
   justify-content: space-between;
 }
 .button {
-  border: 1px solid #ddd;
+  border: 1px solid;
   border-radius: 8px;
   outline: none;
   font-size: inherit;
   text-align: center;
   line-height: 45px;
-  color: #fff;
 }
 a.button {
   text-decoration: none;
@@ -572,14 +567,6 @@ a.button {
   border-color: transparent;
   animation: AnimateGradiant 8s ease infinite;
 }
-.button.secondary-button {
-  background: #fff;
-  color: var(--primary-color-dark);
-}
-.button.danger-button {
-  background: #fff;
-  color: var(--danger-color);
-}
 .button.danger-button.confirm {
   background: linear-gradient(225deg, #ed2f00, #f34646);
   background-size: 400% 400%;
@@ -600,8 +587,6 @@ a.button {
 }
 .button.primary-button:disabled,
 .button.primary-button.disabled {
-  background: #fff;
-  border-color: #ddd;
   opacity: 0.7;
   color: var(--primary-color);
   cursor: default;
@@ -653,7 +638,53 @@ a.button {
     background: #222;
   }
 
+  input[type="text"],
+  input[type="email"],
+  input[type="url"],
+  input[type="number"],
+  input[type="password"] {
+    background: #333;
+    border-color: #666;
+  }
+
+  select {
+    background-color: #333;
+    background-image: url("/images/select-caret.webp");
+    border-color: #666;
+  }
+
+  textarea {
+    background: #333;
+    border-color: #666;
+  }
+
+  hr {
+    border-color: #666;
+    color: #666;
+  }
+
   .wide-button {
+    background: #333;
+    border-color: #666;
+  }
+
+  .button {
+    border-color: #666;
+    color: #fff;
+  }
+
+  .button.danger-button {
+    background: #333;
+    color: var(--danger-color);
+  }
+
+  .button.secondary-button {
+    background: #333;
+    color: var(--primary-color-dark);
+  }
+
+  .button.primary-button:disabled,
+  .button.primary-button.disabled {
     background: #333;
     border-color: #666;
   }
@@ -790,7 +821,53 @@ a.button {
     background: #fff;
   }
 
+  input[type="text"],
+  input[type="email"],
+  input[type="url"],
+  input[type="number"],
+  input[type="password"] {
+    background: #fff;
+    border-color: #ddd;
+  }
+
+  select {
+    background-color: #fff;
+    background-image: url("/images/select-caret.webp");
+    border-color: #ddd;
+  }
+
+  textarea {
+    background: #fff;
+    border-color: #ddd;
+  }
+
+  hr {
+    border-color: #ddd;
+    color: #ddd;
+  }
+
   .wide-button {
+    background: #fff;
+    border-color: #ddd;
+  }
+
+  .button {
+    border-color: #ddd;
+    color: #fff;
+  }
+
+  .button.danger-button {
+    background: #fff;
+    color: var(--danger-color);
+  }
+
+  .button.secondary-button {
+    background: #fff;
+    color: var(--primary-color-dark);
+  }
+
+  .button.primary-button:disabled,
+  .button.primary-button.disabled {
     background: #fff;
     border-color: #ddd;
   }

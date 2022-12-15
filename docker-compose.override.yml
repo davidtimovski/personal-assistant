@@ -88,6 +88,16 @@ services:
     ports:
       - "5008:80"
 
+  trainer-api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - PORT=80
+    volumes:
+      - ./src/Trainer.Api/storage:/app/storage:z
+    ports:
+      - "5009:80"
+
   clientlogger:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development

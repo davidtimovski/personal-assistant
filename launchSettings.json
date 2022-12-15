@@ -14,7 +14,8 @@
         "rabbitmq": "StartWithoutDebugging",
         "sender": "StartDebugging",
         "todo-api": "StartDebugging",
-        "weatherman-api": "StartDebugging"
+        "weatherman-api": "StartDebugging",
+        "trainer-api": "StartDebugging"
       }
     },
     "Accountant.Api": {
@@ -31,7 +32,8 @@
         "rabbitmq": "StartWithoutDebugging",
         "sender": "StartDebugging",
         "todo-api": "StartWithoutDebugging",
-        "weatherman-api": "StartWithoutDebugging"
+        "weatherman-api": "StartWithoutDebugging",
+        "trainer-api": "StartDebugging"
       }
     },
     "ToDoAssistant.Api": {
@@ -48,7 +50,8 @@
         "rabbitmq": "StartWithoutDebugging",
         "sender": "StartDebugging",
         "todo-api": "StartDebugging",
-        "weatherman-api": "StartWithoutDebugging"
+        "weatherman-api": "StartWithoutDebugging",
+        "trainer-api": "StartDebugging"
       }
     },
     "Weatherman.Api": {
@@ -65,7 +68,26 @@
         "rabbitmq": "StartWithoutDebugging",
         "sender": "StartDebugging",
         "todo-api": "StartWithoutDebugging",
-        "weatherman-api": "StartDebugging"
+        "weatherman-api": "StartDebugging",
+        "trainer-api": "StartDebugging"
+      }
+    },
+    "Trainer.Api": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "account": "StartDebugging",
+        "accountant-api": "StartWithoutDebugging",
+        "clientlogger": "StartDebugging",
+        "cooking-api": "StartWithoutDebugging",
+        "core-api": "StartWithoutDebugging",
+        "gateway": "StartDebugging",
+        "postgres": "StartWithoutDebugging",
+        "rabbitmq": "StartWithoutDebugging",
+        "sender": "StartDebugging",
+        "todo-api": "StartWithoutDebugging",
+        "trainer-api": "StartDebugging",
+        "weatherman-api": "StartWithoutDebugging"
       }
     }
   }
