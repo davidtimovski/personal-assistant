@@ -141,4 +141,7 @@
   <data name="PrivacyPolicy" xml:space="preserve">
     <value>Полиса за приватност</value>
   </data>
+  <data name="SuccessfullyRegistered" xml:space="preserve">
+    <value>Успешно се регистриравте. Добредојдовте!</value>
+  </data>
 </root>

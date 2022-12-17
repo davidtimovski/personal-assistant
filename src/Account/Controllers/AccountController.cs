@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Account.Models;
+using Account.Services;
 using Account.ViewModels.Account;
 using Account.ViewModels.Home;
 using Accountant.Application.Contracts.Accounts;
@@ -21,7 +22,7 @@ namespace Account.Controllers;
 [Authorize]
 public class AccountController : BaseController
 {
-    //private readonly IEmailTemplateService _emailTemplateService;
+    private readonly IEmailTemplateService _emailTemplateService;
     private readonly IUserService _userService;
     private readonly IAccountsRepository _accountsRepository;
     private readonly IListService _listService;
@@ -34,7 +35,7 @@ public class AccountController : BaseController
     private readonly ILogger<AccountController> _logger;
 
     public AccountController(
-        //IEmailTemplateService emailTemplateService,
+        IEmailTemplateService emailTemplateService,
         IUserIdLookup userIdLookup,
         IUsersRepository usersRepository,
         IUserService userService,
@@ -48,7 +49,7 @@ public class AccountController : BaseController
         IWebHostEnvironment webHostEnvironment,
         ILogger<AccountController> logger) : base(userIdLookup, usersRepository)
     {
-        //_emailTemplateService = emailTemplateService;
+        _emailTemplateService = emailTemplateService;
         _userService = userService;
         _accountsRepository = accountsRepository;
         _listService = listService;
@@ -118,7 +119,7 @@ public class AccountController : BaseController
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Resetting user password failed");
+            _logger.LogError(ex, $"Resetting user password failed for user: {model.Email}");
 
             ModelState.AddModelError(string.Empty, _localizer["AnErrorOccurred"]);
             return View(model);
@@ -153,51 +154,60 @@ public class AccountController : BaseController
             return RedirectToAction(nameof(HomeController.Overview), "Home");
         }
 
-        return View();
+        return View(new RegisterViewModel());
     }
 
-    //[HttpPost]
-    //[AllowAnonymous]
-    //[ValidateAntiForgeryToken]
-    //public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl)
-    //{
-    //    if (!ModelState.IsValid)
-    //    {
-    //        return View(model);
-    //    }
+    [HttpPost]
+    [AllowAnonymous]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
 
-    //    ViewData["ReturnUrl"] = returnUrl;
+        ViewData["ReturnUrl"] = returnUrl;
 
-    //    var user = new ApplicationUser
-    //    {
-    //        Name = model.Name.Trim(),
-    //        UserName = model.Email.Trim(),
-    //        Email = model.Email.Trim(),
-    //        Language = model.Language,
-    //        ToDoNotificationsEnabled = false,
-    //        CookingNotificationsEnabled = false,
-    //        ImperialSystem = false,
-    //        ImageUri = _cdnService.GetDefaultProfileImageUri(),
-    //        DateRegistered = DateTime.UtcNow
-    //    };
+        using HttpClient httpClient = _httpClientFactory.CreateClient();
 
-    //    IdentityResult result = await _userManager.CreateAsync(user, model.Password);
-    //    if (!result.Succeeded)
-    //    {
-    //        AddIdentityErrors(result, nameof(Register));
-    //        return View(model);
-    //    }
+        var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0:ClientSecret"]);
+        await Auth0ManagementUtil.InitializeAsync(httpClient, config);
 
-    //    string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-    //    var callbackUrl = Url.Action("confirm-email", "Account", new { userId = user.Id, token, returnUrl }, HttpContext.Request.Scheme);
-    //    await _emailTemplateService.EnqueueRegisterConfirmationEmailAsync(user.Name, user.Email, new Uri(callbackUrl), model.Language);
+        try
+        {
+            var authId = await Auth0ManagementUtil.RegisterUserAsync(httpClient, model.Email, model.Password, model.Name);
+            var userId = await _userService.CreateAsync(authId, model.Email, model.Name, model.Language, model.Culture, _cdnService.GetDefaultProfileImageUri());
 
-    //    _ = _emailTemplateService.EnqueueNewRegistrationEmailAsync(user.Name, user.Email);
+            await CreateRequiredDataAsync(userId);
+            await CreateSamplesAsync(userId);
+        }
+        catch (PasswordTooWeakException)
+        {
+            ModelState.AddModelError(nameof(model.Password), _localizer["PasswordTooWeak"]);
+            return View(model);
+        }
+        catch (Auth0Exception ex)
+        {
+            _logger.LogError(ex, $"User registration failed for: {model.Email}. Auth0 response: {ex.Message}");
 
-    //    SetLanguageCookie(model.Language);
+            ModelState.AddModelError(string.Empty, _localizer["AnErrorOccurred"]);
+            return View(model);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"User registration failed for: {model.Email}");
 
-    //    return RedirectToAction(nameof(Login), new { alert = GenerateLoginAlertFromRegistrationEmail(user.Email) });
-    //}
+            ModelState.AddModelError(string.Empty, _localizer["AnErrorOccurred"]);
+            return View(model);
+        }
+
+        _ = _emailTemplateService.EnqueueNewRegistrationEmailAsync(model.Name.Trim(), model.Email.Trim());
+
+        SetLanguageCookie(model.Language);
+
+        return RedirectToAction(nameof(HomeController.Index), "Home", new { alert = IndexAlert.SuccessfullyRegistered });
+    }
 
     [HttpPost]
     [AllowAnonymous]
@@ -326,7 +336,7 @@ public class AccountController : BaseController
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Updating user profile failed");
+            _logger.LogError(ex, $"Updating user profile failed for user: {model.Name}");
 
             ModelState.AddModelError(string.Empty, _localizer["AnErrorOccurred"]);
 
@@ -463,16 +473,6 @@ public class AccountController : BaseController
         };
         await _recipeService.CreateSampleAsync(userId, sampleRecipeTranslations);
     }
-
-    // private IActionResult RedirectToLocal(string returnUrl)
-    // {
-    //     if (Url.IsLocalUrl(returnUrl))
-    //     {
-    //         return Redirect(returnUrl);
-    //     }
-    //
-    //     return RedirectToAction(nameof(HomeController.Index));
-    // }
 
     #endregion
 }

@@ -4,6 +4,7 @@ public enum IndexAlert
 {
     None,
     LoggedOut,
+    SuccessfullyRegistered,
     LanguageChanged
 }
 

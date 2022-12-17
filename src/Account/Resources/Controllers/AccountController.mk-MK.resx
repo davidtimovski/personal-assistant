@@ -132,6 +132,9 @@
   <data name="MainAccountName" xml:space="preserve">
     <value>Главна</value>
   </data>
+  <data name="PasswordTooWeak" xml:space="preserve">
+    <value>Лозинката е премногу едноставна</value>
+  </data>
   <data name="RegisterDuplicateUserName" xml:space="preserve">
     <value>Корисничка сметка со тој емаил веќе постои</value>
   </data>

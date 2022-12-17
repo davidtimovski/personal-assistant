@@ -141,4 +141,7 @@
   <data name="PrivacyPolicy" xml:space="preserve">
     <value>Privacy policy</value>
   </data>
+  <data name="SuccessfullyRegistered" xml:space="preserve">
+    <value>You can successfully registered. Welcome!</value>
+  </data>
 </root>

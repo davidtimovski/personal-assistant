@@ -38,6 +38,25 @@ public class UsersRepository : BaseRepository, IUsersRepository
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM users WHERE id = @id", new { id });
     }
 
+    public bool Exists(string email)
+    {
+        using IDbConnection conn = OpenConnection();
+
+        return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM users WHERE email = @email", new { email });
+    }
+
+    public async Task<int> CreateAsync(string auth0Id, User user)
+    {
+        EFContext.Users.Add(user);
+        await EFContext.SaveChangesAsync();
+
+        using IDbConnection conn = OpenConnection();
+        await conn.ExecuteAsync(@"INSERT INTO user_id_map (user_id, auth0_id) VALUES (@userId, @auth0Id)",
+            new { userId = user.Id, auth0Id });
+
+        return user.Id;
+    }
+
     public async Task UpdateAsync(User user)
     {
         User dbUser = EFContext.Users.Find(user.Id);

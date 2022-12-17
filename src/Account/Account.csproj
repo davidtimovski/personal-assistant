@@ -95,8 +95,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\EmailTemplates\admin\NewEmailVerification.html" />
-    <EmbeddedResource Include="Resources\EmailTemplates\admin\NewEmailVerification.txt" />
     <EmbeddedResource Include="Resources\EmailTemplates\admin\NewRegistration.html" />
     <EmbeddedResource Include="Resources\EmailTemplates\admin\NewRegistration.txt" />
     <EmbeddedResource Include="Resources\EmailTemplates\en-US\RegisterConfirmation.html" />
