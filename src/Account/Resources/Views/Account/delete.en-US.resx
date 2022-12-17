@@ -129,4 +129,7 @@
   <data name="DeleteYourAccount" xml:space="preserve">
     <value>Delete your account</value>
   </data>
+  <data name="IUnderstandDelete" xml:space="preserve">
+    <value>I understand, delete</value>
+  </data>
 </root>

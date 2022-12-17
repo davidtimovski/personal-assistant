@@ -22,6 +22,7 @@ namespace Account.Controllers;
 [Authorize]
 public class AccountController : BaseController
 {
+    private readonly IUsersRepository _usersRepository;
     private readonly IEmailTemplateService _emailTemplateService;
     private readonly IUserService _userService;
     private readonly IAccountsRepository _accountsRepository;
@@ -35,9 +36,9 @@ public class AccountController : BaseController
     private readonly ILogger<AccountController> _logger;
 
     public AccountController(
-        IEmailTemplateService emailTemplateService,
         IUserIdLookup userIdLookup,
         IUsersRepository usersRepository,
+        IEmailTemplateService emailTemplateService,
         IUserService userService,
         IAccountsRepository accountsRepository,
         IListService listService,
@@ -49,6 +50,7 @@ public class AccountController : BaseController
         IWebHostEnvironment webHostEnvironment,
         ILogger<AccountController> logger) : base(userIdLookup, usersRepository)
     {
+        _usersRepository = usersRepository;
         _emailTemplateService = emailTemplateService;
         _userService = userService;
         _accountsRepository = accountsRepository;
@@ -81,16 +83,13 @@ public class AccountController : BaseController
     [ActionName("reset-password")]
     public async Task<IActionResult> ResetPassword()
     {
-        using HttpClient httpClient = _httpClientFactory.CreateClient();
-
-        var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0:ClientSecret"]);
-        await Auth0ManagementUtil.InitializeAsync(httpClient, config);
-
         var viewModel = new ResetPasswordViewModel();
 
         if (User?.Identity.IsAuthenticated == true)
         {
-            var user = await Auth0ManagementUtil.GetUserAsync(httpClient, AuthId);
+            using var httpClient = await InitializeAuth0ClientAsync();
+
+            var user = await Auth0Proxy.GetUserAsync(httpClient, AuthId);
             viewModel.Email = user.email;
         }
 
@@ -108,14 +107,11 @@ public class AccountController : BaseController
             return View(model);
         }
 
-        using HttpClient httpClient = _httpClientFactory.CreateClient();
-
-        var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0:ClientSecret"]);
-        await Auth0ManagementUtil.InitializeAsync(httpClient, config);
-
         try
         {
-            await Auth0ManagementUtil.ResetPasswordAsync(httpClient, _configuration["Auth0:ClientId"], model.Email);
+            using var httpClient = await InitializeAuth0ClientAsync();
+
+            await Auth0Proxy.ResetPasswordAsync(httpClient, _configuration["Auth0:ClientId"], model.Email);
         }
         catch (Exception ex)
         {
@@ -169,15 +165,14 @@ public class AccountController : BaseController
 
         ViewData["ReturnUrl"] = returnUrl;
 
-        using HttpClient httpClient = _httpClientFactory.CreateClient();
-
-        var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0:ClientSecret"]);
-        await Auth0ManagementUtil.InitializeAsync(httpClient, config);
-
         try
         {
-            var authId = await Auth0ManagementUtil.RegisterUserAsync(httpClient, model.Email, model.Password, model.Name);
+            using var httpClient = await InitializeAuth0ClientAsync();
+
+            var authId = await Auth0Proxy.RegisterUserAsync(httpClient, model.Email, model.Password, model.Name);
             var userId = await _userService.CreateAsync(authId, model.Email, model.Name, model.Language, model.Culture, _cdnService.GetDefaultProfileImageUri());
+
+            await _cdnService.CreateFolderForUserAsync(userId);
 
             await CreateRequiredDataAsync(userId);
             await CreateSamplesAsync(userId);
@@ -227,68 +222,55 @@ public class AccountController : BaseController
         return Ok(response.Score);
     }
 
-    //[HttpGet]
-    //public IActionResult Delete()
-    //{
-    //    return View();
-    //}
+    [HttpGet]
+    public IActionResult Delete()
+    {
+        return View();
+    }
 
-    //[HttpPost]
-    //[ValidateAntiForgeryToken]
-    //public async Task<IActionResult> Delete(DeleteViewModel model)
-    //{
-    //    if (!ModelState.IsValid)
-    //    {
-    //        return View(model);
-    //    }
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [ActionName("delete")]
+    public async Task<IActionResult> DeleteAccount()
+    {
+        try
+        {
+            using var httpClient = await InitializeAuth0ClientAsync();
 
-    //    ApplicationUser user = await _userManager.GetUserAsync(User);
+            await Auth0Proxy.DeleteUserAsync(httpClient, AuthId);
 
-    //    var passwordIsValid = await _userManager.CheckPasswordAsync(user, model.Password);
-    //    if (passwordIsValid)
-    //    {
-    //        await _signInManager.SignOutAsync();
+            // Delete resources
+            var user = _userService.Get(UserId);
+            var filePaths = new List<string> { user.ImageUri };
+            IEnumerable<string> recipeUris = _recipeService.GetAllImageUris(user.Id);
+            filePaths.AddRange(recipeUris);
+            await _cdnService.DeleteUserResourcesAsync(user.Id, filePaths);
 
-    //        IdentityResult result = await _userManager.DeleteAsync(user);
-    //        if (result.Succeeded)
-    //        {
-    //            var filePaths = new List<string>();
-    //            if (user.ImageUri != null)
-    //            {
-    //                filePaths.Add($"users/{user.Id}/{user.ImageUri}");
-    //            }
+            await _usersRepository.DeleteAsync(UserId);
 
-    //            var recipeUris = _recipeService.GetAllImageUris(user.Id);
-    //            if (recipeUris.Any())
-    //            {
-    //                filePaths.AddRange(recipeUris.Select(uri => $"users/{user.Id}/recipes/{uri}"));
+            // Logout
+            var authenticationProperties = new LogoutAuthenticationPropertiesBuilder().Build();
+            await HttpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"User account deletion failed for user: {UserId}");
 
-    //                await _cdnService.DeleteUserResourcesAsync(user.Id, filePaths);
-    //            }
+            ModelState.AddModelError(string.Empty, _localizer["AnErrorOccurred"]);
+            return View("Delete");
+        }
 
-    //            return RedirectToAction(nameof(Login), new { alert = LoginAlert.AccountDeleted });
-    //        }
-
-    //        ModelState.AddModelError(string.Empty, _localizer["AnErrorOccurred"]);
-    //    }
-    //    else
-    //    {
-    //        ModelState.AddModelError(string.Empty, _localizer["IncorrectPassword"]);
-    //    }
-
-    //    return View(model);
-    //}
+        return RedirectToAction(nameof(HomeController.Index), "Home", new { alert = IndexAlert.AccountDeleted });
+    }
 
     [HttpGet]
     [ActionName("edit-profile")]
     public async Task<IActionResult> EditProfile()
     {
-        using HttpClient httpClient = _httpClientFactory.CreateClient();
+        using var httpClient = await InitializeAuth0ClientAsync();
 
-        var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0:ClientSecret"]);
-        await Auth0ManagementUtil.InitializeAsync(httpClient, config);
-
-        var authUser = await Auth0ManagementUtil.GetUserAsync(httpClient, AuthId);
+        var authUser = await Auth0Proxy.GetUserAsync(httpClient, AuthId);
         var user = _userService.Get(UserId);
 
         var viewModel = new ViewProfileViewModel
@@ -322,16 +304,13 @@ public class AccountController : BaseController
             });
         }
 
-        using HttpClient httpClient = _httpClientFactory.CreateClient();
-
-        var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0:ClientSecret"]);
-        await Auth0ManagementUtil.InitializeAsync(httpClient, config);
-
-        var imageUri = string.IsNullOrEmpty(model.ImageUri) ? null : model.ImageUri;
-
         try
         {
-            await Auth0ManagementUtil.UpdateNameAsync(httpClient, AuthId, model.Name);
+            using var httpClient = await InitializeAuth0ClientAsync();
+
+            await Auth0Proxy.UpdateNameAsync(httpClient, AuthId, model.Name);
+
+            var imageUri = string.IsNullOrEmpty(model.ImageUri) ? null : model.ImageUri;
             await _userService.UpdateProfileAsync(UserId, model.Name, model.Language, model.Culture, imageUri);
         }
         catch (Exception ex)
@@ -399,13 +378,17 @@ public class AccountController : BaseController
             return new UnprocessableEntityObjectResult(ModelState);
         }
 
-        string tempImageName = Guid.NewGuid() + extension;
-        string tempImagePath = Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp", tempImageName);
-
         if (image.Length > 0)
         {
             try
             {
+                string tempFolder = Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp");
+                if (!Directory.Exists(tempFolder))
+                {
+                    Directory.CreateDirectory(tempFolder);
+                }
+
+                string tempImagePath = Path.Combine(tempFolder, Guid.NewGuid() + extension);
                 using (var stream = new FileStream(tempImagePath, FileMode.Create))
                 {
                     await image.CopyToAsync(stream);
@@ -428,6 +411,16 @@ public class AccountController : BaseController
 
         ModelState.AddModelError(string.Empty, _localizer["InvalidImage"]);
         return new UnprocessableEntityObjectResult(ModelState);
+    }
+
+    private async Task<HttpClient> InitializeAuth0ClientAsync()
+    {
+        var httpClient = _httpClientFactory.CreateClient();
+
+        var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0:ClientSecret"]);
+        await Auth0Proxy.InitializeAsync(httpClient, config);
+
+        return httpClient;
     }
 
     #region Helpers

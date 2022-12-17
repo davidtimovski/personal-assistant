@@ -120,6 +120,9 @@
   <data name="About" xml:space="preserve">
     <value>About</value>
   </data>
+  <data name="AccountDeleted" xml:space="preserve">
+    <value>Your account was successfully deleted. Sorry to see you go :(</value>
+  </data>
   <data name="DontHaveAnAccount" xml:space="preserve">
     <value>Don't have an account?</value>
   </data>

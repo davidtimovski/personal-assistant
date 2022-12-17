@@ -5,10 +5,8 @@ using Infrastructure.Identity.Auth0ApiModels;
 
 namespace Infrastructure.Identity;
 
-public static class Auth0ManagementUtil
+public static class Auth0Proxy
 {
-    private const string DatabaseConnectionName = "Username-Password-Authentication";
-
     private static string Domain;
     private static string AccessToken;
     private static DateTime? Expires;
@@ -59,8 +57,7 @@ public static class Auth0ManagementUtil
                 email.Trim(),
                 false,
                 password,
-                name.Trim(),
-                DatabaseConnectionName
+                name.Trim()
             );
         requestMessage.Content = new StringContent(JsonSerializer.Serialize(createModel), Encoding.UTF8, "application/json");
 
@@ -80,6 +77,15 @@ public static class Auth0ManagementUtil
         var result = JsonSerializer.Deserialize<CreateUserResult>(await response.Content.ReadAsStringAsync());
 
         return result.user_id;
+    }
+
+    public static async Task DeleteUserAsync(HttpClient httpClient, string auth0Id)
+    {
+        using var requestMessage = new HttpRequestMessage(HttpMethod.Delete, new Uri($"https://{Domain}/api/v2/users/{auth0Id}"));
+        requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
+
+        var response = await httpClient.SendAsync(requestMessage);
+        response.EnsureSuccessStatusCode();
     }
 
     public static async Task UpdateNameAsync(HttpClient httpClient, string auth0Id, string name)

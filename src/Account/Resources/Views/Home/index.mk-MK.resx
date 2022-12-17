@@ -120,6 +120,9 @@
   <data name="About" xml:space="preserve">
     <value>За нас</value>
   </data>
+  <data name="AccountDeleted" xml:space="preserve">
+    <value>Вашата сметка беше успешно избришана. Жал ни е што си одите :(</value>
+  </data>
   <data name="DontHaveAnAccount" xml:space="preserve">
     <value>Немате сметка?</value>
   </data>

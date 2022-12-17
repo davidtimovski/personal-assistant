@@ -2,6 +2,7 @@
 using Application.Contracts;
 using Dapper;
 using Domain.Common;
+using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Repositories;
 
@@ -69,6 +70,14 @@ public class UsersRepository : BaseRepository, IUsersRepository
         dbUser.ImperialSystem = user.ImperialSystem;
         dbUser.ImageUri = user.ImageUri;
         dbUser.ModifiedDate = user.ModifiedDate;
+
+        await EFContext.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var person = EFContext.Users.Attach(new User { Id = id });
+        person.State = EntityState.Deleted;
 
         await EFContext.SaveChangesAsync();
     }

@@ -50,9 +50,6 @@
     <EmbeddedResource Update="Resources\Services\EmailTemplateService.en-US.resx">
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Resources\ViewModels\Account\DeleteViewModelValidator.en-US.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
     <EmbeddedResource Update="Resources\ViewModels\Account\ResetPasswordViewModelValidator.en-US.resx">
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>

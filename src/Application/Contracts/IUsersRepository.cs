@@ -11,4 +11,5 @@ public interface IUsersRepository
     bool Exists(int id);
     Task<int> CreateAsync(string auth0Id, User user);
     Task UpdateAsync(User user);
+    Task DeleteAsync(int id);
 }
