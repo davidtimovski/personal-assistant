@@ -28,6 +28,9 @@
 	const precipitationUnitsTr = new Map<string, string>();
 	const unsubscriptions: Unsubscriber[] = [];
 
+	$: currentTempColor =
+		$forecast.temperature !== null ? ForecastsService.getTempColor(<number>$forecast.temperature) : 'inherit';
+
 	// Progress bar
 	let progressBarActive = false;
 	const progress = tweened(0, {
@@ -209,7 +212,7 @@
 								<Illustration weatherCode={$forecast.weatherCode} timeOfDay={$forecast.timeOfDay} />
 							</div>
 
-							<div class="current-temp">{$forecast.temperature}°</div>
+							<div class="current-temp" style="color: {currentTempColor}">{$forecast.temperature}°</div>
 
 							{#if $forecast.temperature !== $forecast.apparentTemperature}
 								<div class="current-apparent-temp">{$t('index.feelsLike')} {$forecast.apparentTemperature}°</div>
@@ -320,12 +323,11 @@
 	.current-temp {
 		padding: 10px 0 0 5px;
 		font-size: 90px;
-		line-height: 70px;
+		line-height: 100px;
 		text-align: center;
 	}
 	.current-apparent-temp {
 		padding: 10px 0;
-		margin-top: 10px;
 		font-size: 1.1rem;
 		line-height: 1.3rem;
 		text-align: center;

@@ -3,6 +3,7 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
+	import { ForecastsService } from '$lib/services/forecastsService';
 	import { TimeOfDay, type DailyForecast } from '$lib/models/forecast';
 	import { WeatherCode } from '$lib/models/weatherCode';
 
@@ -14,6 +15,11 @@
 	let precipitationUnit = '';
 	const weatherDescriptionTr = new Map<WeatherCode, string>();
 	const precipitationUnitsTr = new Map<string, string>();
+
+	$: maxTempColor =
+		forecast.temperatureMax !== null ? ForecastsService.getTempColor(forecast.temperatureMax) : 'inherit';
+	$: minTempColor =
+		forecast.temperatureMax !== null ? ForecastsService.getTempColor(forecast.temperatureMin) : 'inherit';
 
 	let localStorage: LocalStorageUtil;
 
@@ -64,7 +70,10 @@
 			<Illustration weatherCode={forecast.weatherCode} timeOfDay={TimeOfDay.Day} />
 		</div>
 
-		<div class="current-temp">{forecast.temperatureMax}° / {forecast.temperatureMin}°</div>
+		<div class="current-temp">
+			<span style="color: {maxTempColor}">{forecast.temperatureMax}°</span> /
+			<span style="color: {minTempColor}">{forecast.temperatureMin}°</span>
+		</div>
 
 		<div class="weather-description">{weatherDescription}</div>
 
