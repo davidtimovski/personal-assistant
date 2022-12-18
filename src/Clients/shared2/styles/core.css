@@ -111,10 +111,6 @@ table td {
   box-shadow: var(--box-shadow);
 }
 
-a {
-  cursor: pointer;
-}
-
 input,
 select,
 textarea,

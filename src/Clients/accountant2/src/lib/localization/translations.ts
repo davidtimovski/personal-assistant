@@ -6,6 +6,7 @@ export default {
 		currencyConversionError: 'An unexpected error occurred whilst converting currencies',
 		refresh: 'Refresh',
 		failedToFetchError: 'Please check your internet connection.',
+		syncSuccessful: 'Sync successful.<br>Retrieved {{retrieved}} records and pushed {{pushed}} records.',
 		name: 'Name',
 		save: 'Save',
 		edit: 'Edit',
@@ -424,6 +425,8 @@ export default {
 		currencyConversionError: 'Се случи неочекувана грешка при конверзијата на валути',
 		refresh: 'Освежи',
 		failedToFetchError: 'Вѐ молиме да ја проверите вашата интернет конекција.',
+		syncSuccessful:
+			'Синхронизацијата беше успешна.<br>Повелечени беа {{retrieved}} ставки а испратени беа {{pushed}} ставки.',
 		name: 'Име',
 		save: 'Зачувај',
 		edit: 'Промени',

@@ -30,7 +30,7 @@
 
       showError(message, showRefreshLink);
     } else if (value.status === AlertStatus.Success) {
-      showSuccess($t(<string>value.messageKey));
+      showSuccess($t(<string>value.messageKey, value.messageData));
     } else {
       shown = false;
     }

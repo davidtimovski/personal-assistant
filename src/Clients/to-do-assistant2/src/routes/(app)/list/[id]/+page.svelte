@@ -240,6 +240,10 @@
 						newTaskName = '';
 						newTaskUrl = '';
 
+						if ($state.lists === null) {
+							throw new Error('Lists not loaded yet');
+						}
+
 						const list = $state.lists.find((x) => x.id === data.id);
 						if (!list) {
 							throw new Error('List not found');
@@ -281,6 +285,10 @@
 		disableTasks();
 
 		ThrottleHelper.executeAfterDelay(async () => {
+			if ($state.lists === null) {
+				throw new Error('Lists not loaded yet');
+			}
+
 			if (task.isOneTime) {
 				if (!remote) {
 					await tasksService.delete(task.id);
@@ -311,6 +319,10 @@
 		disableTasks();
 
 		ThrottleHelper.executeAfterDelay(async () => {
+			if ($state.lists === null) {
+				throw new Error('Lists not loaded yet');
+			}
+
 			if (!remote) {
 				await tasksService.uncomplete(task.id);
 			}
@@ -445,7 +457,7 @@
 
 		unsubscriptions.push(
 			state.subscribe((s) => {
-				if (s.lists.length === 0) {
+				if (s.lists === null) {
 					return;
 				}
 

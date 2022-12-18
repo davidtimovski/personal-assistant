@@ -12,9 +12,9 @@
 	import Alert from '../../../../shared2/components/Alert.svelte';
 
 	import { SyncService } from '$lib/services/syncService';
-	import { user, isOnline, syncStatus } from '$lib/stores';
+	import { alertState, user, isOnline, syncStatus } from '$lib/stores';
 	import type { AccountantUser } from '$lib/models/accountantUser';
-	import { AppEvents } from '$lib/models/appEvents';
+	import { SyncEvents } from '$lib/models/syncStatus';
 
 	let usersService: UsersServiceBase;
 	let syncService: SyncService;
@@ -63,7 +63,14 @@
 
 		unsubscriptions.push(
 			syncStatus.subscribe((value) => {
-				if (value === AppEvents.ReSync) {
+				if (value.status === SyncEvents.SyncFinished) {
+					if (value.retrieved + value.pushed > 0) {
+						alertState.update((x) => {
+							x.showSuccess('syncSuccessful', { retrieved: value.retrieved, pushed: value.pushed });
+							return x;
+						});
+					}
+				} else if (value.status === SyncEvents.ReSync) {
 					syncService.sync();
 				}
 			})

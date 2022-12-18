@@ -22,7 +22,9 @@ export default {
 			refresh: 'Refresh',
 			shared: 'Shared',
 			pendingAccept: 'Pending accept',
-			newList: 'New list'
+			newList: 'New list',
+			emptyListMessage:
+				"You don't have any (non-<a href='/archivedLists'>archived</a>) lists.<br><br>Create some using the plus button below."
 		},
 		list: {
 			edit: 'Edit',
@@ -238,7 +240,9 @@ export default {
 			refresh: 'Освежи',
 			shared: 'Споделена',
 			pendingAccept: 'Се исчекува прифаќање',
-			newList: 'Нова листа'
+			newList: 'Нова листа',
+			emptyListMessage:
+				"Немате (не-<a href='/archivedLists'>архивирани</a>) листи сеуште.<br><br>Креирајте користејки го плус копчето подолу."
 		},
 		list: {
 			edit: 'Промени',

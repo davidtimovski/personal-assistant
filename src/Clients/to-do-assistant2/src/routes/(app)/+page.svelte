@@ -5,6 +5,8 @@
 	import { cubicOut } from 'svelte/easing';
 	import { page } from '$app/stores';
 
+	import EmptyListMessage from '../../../../shared2/components/EmptyListMessage.svelte';
+
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 	import { isOffline, user, state, remoteEvents } from '$lib/stores';
@@ -43,6 +45,10 @@
 	}
 
 	function setListsFromState() {
+		if ($state.lists === null) {
+			throw new Error('Lists not loaded yet');
+		}
+
 		derivedLists = ListsService.getDerivedForHomeScreen($state.lists, derivedListNameLookup);
 		regularLists = ListsService.getForHomeScreen($state.lists);
 	}
@@ -92,13 +98,13 @@
 		listsService = new ListsService();
 		tasksService = new TasksService();
 
-		if ($state.lists.length === 0) {
+		if ($state.lists === null) {
 			startProgressBar();
 		}
 
 		unsubscriptions.push(
 			state.subscribe((s) => {
-				if (s.lists.length === 0) {
+				if (s.lists === null) {
 					return;
 				}
 
@@ -112,6 +118,10 @@
 
 		unsubscriptions.push(
 			remoteEvents.subscribe((e) => {
+				if ($state.lists === null) {
+					return;
+				}
+
 				if (e.type === RemoteEventType.TaskCompletedRemotely) {
 					tasksService.completeLocal(e.data.id, e.data.listId, $state.lists);
 				} else if (e.type === RemoteEventType.TaskUncompletedRemotely) {
@@ -162,7 +172,7 @@
 	<div class="content-wrap lists">
 		<div class="to-do-lists-wrap">
 			{#if derivedLists && regularLists}
-				<div>
+				{#if regularLists.length > 0}
 					{#each derivedLists as list}
 						<div class="to-do-list derived-list {list.derivedListType}">
 							<i class="icon {list.derivedListIconClass}" />
@@ -187,7 +197,9 @@
 							/>
 						</div>
 					{/each}
-				</div>
+				{:else}
+					<EmptyListMessage messageKey="index.emptyListMessage" />
+				{/if}
 			{/if}
 		</div>
 

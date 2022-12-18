@@ -13,12 +13,12 @@
 	import { CapitalService } from '$lib/services/capitalService';
 	import { Formatter } from '$lib/utils/formatter';
 	import { isOnline, user, syncStatus, searchFilters } from '$lib/stores';
-	import { AppEvents } from '$lib/models/appEvents';
 	import { SearchFilters } from '$lib/models/viewmodels/searchFilters';
 	import type { AmountByCategory } from '$lib/models/viewmodels/amountByCategory';
 	import { TransactionType } from '$lib/models/viewmodels/transactionType';
 	import { HomePageData, HomePageDebt, HomePageUpcomingExpense } from '$lib/models/viewmodels/homePage';
 	import { AccountsService } from '$lib/services/accountsService';
+	import { SyncStatus, SyncEvents } from '$lib/models/syncStatus';
 
 	let data = new HomePageData();
 	let currency: string;
@@ -88,7 +88,7 @@
 	}
 
 	function sync() {
-		syncStatus.set(AppEvents.ReSync);
+		syncStatus.set(new SyncStatus(SyncEvents.ReSync, 0, 0));
 	}
 
 	function goToTransactions(expenditure: AmountByCategory) {
@@ -149,9 +149,9 @@
 
 		unsubscriptions.push(
 			syncStatus.subscribe((value) => {
-				if (value === AppEvents.SyncStarted) {
+				if (value.status === SyncEvents.SyncStarted) {
 					startProgressBar();
-				} else if (value === AppEvents.SyncFinished) {
+				} else if (value.status === SyncEvents.SyncFinished) {
 					getCapital();
 				}
 			})

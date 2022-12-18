@@ -6,18 +6,15 @@
 	import EmptyListMessage from '../../../../../shared2/components/EmptyListMessage.svelte';
 
 	import { t } from '$lib/localization/i18n';
-	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { Formatter } from '$lib/utils/formatter';
 	import { user, syncStatus } from '$lib/stores';
 	import { AutomaticTransactionsService } from '$lib/services/automaticTransactionsService';
 	import { AutomaticTransactionItem } from '$lib/models/viewmodels/automaticTransactionItem';
-	import { AppEvents } from '$lib/models/appEvents';
+	import { SyncEvents } from '$lib/models/syncStatus';
 
 	let automaticTransactions: AutomaticTransactionItem[] | null = null;
-	let currency: string;
 	let editedId: number | undefined;
 
-	let localStorage: LocalStorageUtil;
 	let automaticTransactionsService: AutomaticTransactionsService;
 
 	onMount(async () => {
@@ -26,12 +23,9 @@
 			editedId = parseInt(edited, 10);
 		}
 
-		localStorage = new LocalStorageUtil();
 		automaticTransactionsService = new AutomaticTransactionsService();
 
-		currency = localStorage.get(LocalStorageKeys.Currency);
-
-		const allAutomaticTransactions = await automaticTransactionsService.getAll(currency);
+		const allAutomaticTransactions = await automaticTransactionsService.getAll();
 
 		const automaticTransactionItems = new Array<AutomaticTransactionItem>();
 		for (const automaticTransaction of allAutomaticTransactions) {
@@ -100,9 +94,9 @@
 								</td>
 								<td>{automaticTransaction.dayInMonth}</td>
 								<td>
-									{Formatter.number(automaticTransaction.amount, currency, $user.culture)}
+									{Formatter.money(automaticTransaction.amount, automaticTransaction.currency, $user.culture)}
 									<i
-										class="fas is-deposit-icon {automaticTransaction.isDeposit
+										class="fas deposit-or-expense-icon {automaticTransaction.isDeposit
 											? 'fa-donate deposit-color'
 											: 'fa-wallet expense-color'}"
 									/>
@@ -127,7 +121,7 @@
 				type="button"
 				on:click={() => goto('/editAutomaticTransaction/0')}
 				class="new-button"
-				disabled={$syncStatus === AppEvents.SyncStarted}
+				disabled={$syncStatus.status === SyncEvents.SyncStarted}
 				title={$t('automaticTransactions.newAutomaticTransaction')}
 				aria-label={$t('automaticTransactions.newAutomaticTransaction')}
 			>
@@ -138,7 +132,7 @@
 </section>
 
 <style lang="scss">
-	.is-deposit-icon {
+	.deposit-or-expense-icon {
 		margin-left: 5px;
 	}
 </style>
