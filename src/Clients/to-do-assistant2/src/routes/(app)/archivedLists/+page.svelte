@@ -25,6 +25,10 @@
 		}
 
 		return state.subscribe((s) => {
+			if (s.lists === null) {
+				return;
+			}
+
 			archivedLists = ListsService.getArchived(s.lists);
 		});
 	});

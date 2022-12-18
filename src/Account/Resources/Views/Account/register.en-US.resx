@@ -120,6 +120,9 @@
   <data name="Back" xml:space="preserve">
     <value>Back</value>
   </data>
+  <data name="ConfirmPassword" xml:space="preserve">
+    <value>Confirm password</value>
+  </data>
   <data name="CreateANewAccount" xml:space="preserve">
     <value>Create a new account</value>
   </data>
@@ -137,8 +140,5 @@
   </data>
   <data name="Register" xml:space="preserve">
     <value>Register</value>
-  </data>
-  <data name="Unavailable" xml:space="preserve">
-    <value>Sorry, but this page is currently unavailable because we're moving to a new authentication provider.</value>
   </data>
 </root>

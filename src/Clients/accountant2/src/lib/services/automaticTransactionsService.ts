@@ -1,5 +1,4 @@
 import { HttpProxy } from '../../../../shared2/services/httpProxy';
-import { CurrenciesService } from '../../../../shared2/services/currenciesService';
 import { ErrorLogger } from '../../../../shared2/services/errorLogger';
 import { DateHelper } from '../../../../shared2/utils/dateHelper';
 
@@ -10,18 +9,11 @@ import Variables from '$lib/variables';
 export class AutomaticTransactionsService {
 	private readonly httpProxy = new HttpProxy();
 	private readonly idbHelper = new AutomaticTransactionsIDBHelper();
-	private readonly currenciesService = new CurrenciesService('Accountant');
 	private readonly logger = new ErrorLogger('Accountant');
 
-	async getAll(currency: string): Promise<Array<AutomaticTransaction>> {
+	async getAll(): Promise<Array<AutomaticTransaction>> {
 		try {
-			const automaticTransactions = await this.idbHelper.getAll();
-
-			automaticTransactions.forEach((x: AutomaticTransaction) => {
-				x.amount = this.currenciesService.convert(x.amount, x.currency, currency);
-			});
-
-			return automaticTransactions;
+			return await this.idbHelper.getAll();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -108,7 +100,6 @@ export class AutomaticTransactionsService {
 
 	release() {
 		this.httpProxy.release();
-		this.currenciesService.release();
 		this.logger.release();
 	}
 }

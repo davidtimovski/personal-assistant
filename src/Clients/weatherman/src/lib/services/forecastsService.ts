@@ -11,6 +11,59 @@ export class ForecastsService {
 	private readonly httpProxy = new HttpProxy();
 	private readonly logger = new ErrorLogger('Weatherman');
 	private readonly localStorage = new LocalStorageUtil();
+	private static readonly tempColors = [
+		'#88DDFF',
+		'#8EDFFF',
+		'#94E0FF',
+		'#99E2FF',
+		'#9FE4FF',
+		'#A5E5FF',
+		'#ABE7FF',
+		'#B1E9FF',
+		'#B7EAFF',
+		'#BCECFF',
+		'#C2EEFF',
+		'#C8EFFF',
+		'#CEF1FF',
+		'#D3F3FF',
+		'#DAF4FF',
+		'#DFF6FF',
+		'#E5F8FF',
+		'#EBF9FF',
+		'#F1FBFF',
+		'#F6FDFF',
+		'#FCFEFF',
+		'#FFFDF7',
+		'#FFFAE6',
+		'#FFF7D5',
+		'#FFF4C5',
+		'#FFF1B4',
+		'#FFEEA3',
+		'#FFEB93',
+		'#FFE782',
+		'#FFE471',
+		'#FFE161',
+		'#FFDE50',
+		'#FFDB3F',
+		'#FFD82F',
+		'#FFD51E',
+		'#FFD10D',
+		'#FFCD00',
+		'#FFC300',
+		'#FFB900',
+		'#FFAF00',
+		'#FFA500',
+		'#FF9A00',
+		'#FF9000',
+		'#FF8600',
+		'#FF7C00',
+		'#FF7200',
+		'#FF6800',
+		'#FF5D00',
+		'#FF5400',
+		'#FF4900',
+		'#FF3F00'
+	];
 
 	setPlaceholder(now: Date, language: string, culture: string) {
 		const hours = [];
@@ -72,6 +125,18 @@ export class ForecastsService {
 			this.logger.logError(e);
 			throw e;
 		}
+	}
+
+	static getTempColor(temperature: number) {
+		if (temperature < -10) {
+			return this.tempColors[0];
+		}
+
+		if (temperature > 40) {
+			return this.tempColors[this.tempColors.length - 1];
+		}
+
+		return this.tempColors[temperature + 10];
 	}
 
 	private getWeekDays(currentDate: Date, language: string) {

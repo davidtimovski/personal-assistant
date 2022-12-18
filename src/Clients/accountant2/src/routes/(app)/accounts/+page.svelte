@@ -9,7 +9,7 @@
 	import { user, syncStatus } from '$lib/stores';
 	import { AccountsService } from '$lib/services/accountsService';
 	import { AccountItem } from '$lib/models/viewmodels/accountItem';
-	import { AppEvents } from '$lib/models/appEvents';
+	import { SyncEvents } from '$lib/models/syncStatus';
 
 	let accounts: AccountItem[] | null = null;
 	let sum = 0;
@@ -162,7 +162,7 @@
 				type="button"
 				on:click={() => goto('/editAccount/0')}
 				class="new-button"
-				disabled={$syncStatus === AppEvents.SyncStarted}
+				disabled={$syncStatus.status === SyncEvents.SyncStarted}
 				title={$t('accounts.newAccount')}
 				aria-label={$t('accounts.newAccount')}
 			>

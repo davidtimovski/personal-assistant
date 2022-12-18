@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Reflection;
 using Account.Services;
 using Accountant.Application;
 using Accountant.Persistence;
@@ -6,6 +7,7 @@ using Application;
 using Auth0.AspNetCore.Authentication;
 using CookingAssistant.Application;
 using CookingAssistant.Persistence;
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -84,7 +86,8 @@ builder.Services.AddMvc(options =>
 
 builder.Services
     .AddFluentValidationAutoValidation()
-    .AddFluentValidationClientsideAdapters();
+    .AddFluentValidationClientsideAdapters()
+    .AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
 builder.Services.AddHttpClient();
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);

@@ -10,6 +10,7 @@ public interface IUserService
     T Get<T>(int id) where T : UserDto;
     bool Exists(int id);
     CookingAssistantPreferences GetCookingAssistantPreferences(int id);
+    Task<int> CreateAsync(string auth0Id, string email, string name, string language, string culture, string imageUri);
     Task UpdateProfileAsync(int id, string name, string language, string culture, string imageUri);
     Task UpdateToDoNotificationsEnabledAsync(int id, bool enabled);
     Task UpdateCookingNotificationsEnabledAsync(int id, bool enabled);

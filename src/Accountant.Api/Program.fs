@@ -78,12 +78,10 @@ let errorHandler (ex: Exception) (logger: ILogger) =
 
 [<EntryPoint>]
 let main args =
-    let contentRoot = Directory.GetCurrentDirectory()
-
     let builder = WebApplication.CreateBuilder(args)
 
     builder.Host
-        .UseContentRoot(contentRoot)
+        .UseContentRoot(Directory.GetCurrentDirectory())
         .ConfigureAppConfiguration(addKeyVault) |> ignore
 
     match builder.Environment.IsProduction() with

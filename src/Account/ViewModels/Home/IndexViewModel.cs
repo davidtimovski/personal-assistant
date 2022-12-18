@@ -4,7 +4,9 @@ public enum IndexAlert
 {
     None,
     LoggedOut,
-    LanguageChanged
+    SuccessfullyRegistered,
+    LanguageChanged,
+    AccountDeleted
 }
 
 public class IndexViewModel

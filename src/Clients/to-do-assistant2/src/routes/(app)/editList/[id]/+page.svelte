@@ -39,6 +39,7 @@
 	let saveButtonIsLoading = false;
 	let deleteButtonIsLoading = false;
 	let leaveButtonIsLoading = false;
+	let loading = !isNew;
 
 	const alertStateUnsub = alertState.subscribe((value) => {
 		if (value.hidden) {
@@ -194,8 +195,8 @@
 		if (isNew) {
 			icon = iconOptions[0].icon;
 			sharingState = SharingState.NotShared;
-
 			saveButtonText = $t('editList.create');
+
 			nameInput.focus();
 		} else {
 			saveButtonText = $t('save');
@@ -211,6 +212,7 @@
 			isOneTimeToggleDefault = model.isOneTimeToggleDefault;
 			isArchived = model.isArchived;
 			sharingState = model.sharingState;
+			loading = false;
 		}
 	});
 
@@ -239,130 +241,142 @@
 	</div>
 
 	<div class="content-wrap">
-		{#if sharingState === 4}
-			<AlertBlock type="warning" message={$t('editList.inOrderToChangeThisList')} />
-		{/if}
-
-		<form on:submit|preventDefault={save}>
-			{#if sharingState !== 4}
-				<div class="form-control">
-					<input
-						type="text"
-						bind:value={name}
-						bind:this={nameInput}
-						maxlength="50"
-						class:invalid={nameIsInvalid}
-						placeholder={$t('listName')}
-						aria-label={$t('listName')}
-						required
-					/>
-				</div>
+		{#if loading}
+			<div class="double-circle-loading">
+				<div class="double-bounce1" />
+				<div class="double-bounce2" />
+			</div>
+		{:else}
+			{#if sharingState === 4}
+				<AlertBlock type="warning" message={$t('editList.inOrderToChangeThisList')} />
 			{/if}
 
-			{#if isNew}
-				<div class="form-control">
-					{#if !tasksInputIsVisible}
-						<div class="horizontal-buttons-wrap">
-							<button type="button" on:click={showTasksTextarea} class="wide-button">
-								{$t('editList.addTasks')}
-							</button>
-						</div>
-					{:else}
-						<textarea
-							bind:value={tasksText}
-							class:invalid={tasksTextIsInvalid}
-							in:slide
-							placeholder={$t('editList.eachRow')}
-							aria-label={$t('editList.eachRow')}
+			<form on:submit|preventDefault={save}>
+				{#if sharingState !== 4}
+					<div class="form-control">
+						<input
+							type="text"
+							bind:value={name}
+							bind:this={nameInput}
+							maxlength="50"
+							class:invalid={nameIsInvalid}
+							placeholder={$t('listName')}
+							aria-label={$t('listName')}
+							required
 						/>
-					{/if}
-				</div>
-			{/if}
+					</div>
+				{/if}
 
-			{#if sharingState !== 4}
-				<div class="form-control">
-					<div class="icon-wrap">
-						<span class="placeholder">{$t('editList.icon')}</span>
-						<div class="icon-options">
-							{#each iconOptions as i}
-								<button
-									type="button"
-									on:click={() => selectIcon(i.icon)}
-									class:selected={icon === i.icon}
-									class="icon-option"
-								>
-									<i class={i.cssClass} />
+				{#if isNew}
+					<div class="form-control">
+						{#if !tasksInputIsVisible}
+							<div class="horizontal-buttons-wrap">
+								<button type="button" on:click={showTasksTextarea} class="wide-button">
+									{$t('editList.addTasks')}
 								</button>
-							{/each}
+							</div>
+						{:else}
+							<textarea
+								bind:value={tasksText}
+								class:invalid={tasksTextIsInvalid}
+								in:slide
+								placeholder={$t('editList.eachRow')}
+								aria-label={$t('editList.eachRow')}
+							/>
+						{/if}
+					</div>
+				{/if}
+
+				{#if sharingState !== 4}
+					<div class="form-control">
+						<div class="icon-wrap">
+							<span class="placeholder">{$t('editList.icon')}</span>
+							<div class="icon-options">
+								{#each iconOptions as i}
+									<button
+										type="button"
+										on:click={() => selectIcon(i.icon)}
+										class:selected={icon === i.icon}
+										class="icon-option"
+									>
+										<i class={i.cssClass} />
+									</button>
+								{/each}
+							</div>
 						</div>
 					</div>
-				</div>
-			{/if}
+				{/if}
 
-			<div class="form-control">
-				<Checkbox
-					labelKey="editList.notifications"
-					bind:value={notificationsEnabled}
-					disabled={!notificationsCheckboxEnabled}
-				/>
-			</div>
-
-			{#if sharingState !== 4}
 				<div class="form-control">
-					<Checkbox labelKey="deleteOnCompletion" bind:value={isOneTimeToggleDefault} />
-
-					<Tooltip key="oneTimeTasks" application="To Do Assistant" />
+					<Checkbox
+						labelKey="editList.notifications"
+						bind:value={notificationsEnabled}
+						disabled={!notificationsCheckboxEnabled}
+					/>
 				</div>
-			{/if}
-		</form>
 
-		<hr />
+				{#if sharingState !== 4}
+					<div class="form-control">
+						<Checkbox labelKey="deleteOnCompletion" bind:value={isOneTimeToggleDefault} />
 
-		<div class="save-delete-wrap">
-			{#if !confirmationInProgress}
-				<button type="button" on:click={save} class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
-					<span class="button-loader" class:loading={saveButtonIsLoading}>
-						<i class="fas fa-circle-notch fa-spin" />
-					</span>
-					<span>{saveButtonText}</span>
-				</button>
-			{/if}
+						<Tooltip key="oneTimeTasks" application="To Do Assistant" />
+					</div>
+				{/if}
+			</form>
 
-			{#if (!isNew && sharingState === 0) || sharingState === 1 || sharingState === 2}
-				<button
-					type="button"
-					on:click={deleteList}
-					class="button danger-button"
-					disabled={deleteButtonIsLoading}
-					class:confirm={confirmationInProgress}
-				>
-					<span class="button-loader" class:loading={deleteButtonIsLoading}>
-						<i class="fas fa-circle-notch fa-spin" />
-					</span>
-					<span>{deleteButtonText}</span>
-				</button>
-			{/if}
+			<hr />
 
-			{#if sharingState === 3 || sharingState === 4}
-				<button
-					type="button"
-					on:click={leaveList}
-					class="button danger-button"
-					disabled={leaveButtonIsLoading}
-					class:confirm={confirmationInProgress}
-				>
-					<span class="button-loader" class:loading={leaveButtonIsLoading}>
-						<i class="fas fa-circle-notch fa-spin" />
-					</span>
-					<span>{leaveButtonText}</span>
-				</button>
-			{/if}
+			<div class="save-delete-wrap">
+				{#if !confirmationInProgress}
+					<button
+						type="button"
+						on:click={save}
+						class="button primary-button"
+						disabled={!canSave || saveButtonIsLoading}
+					>
+						<span class="button-loader" class:loading={saveButtonIsLoading}>
+							<i class="fas fa-circle-notch fa-spin" />
+						</span>
+						<span>{saveButtonText}</span>
+					</button>
+				{/if}
 
-			{#if isNew || confirmationInProgress}
-				<button type="button" on:click={cancel} class="button secondary-button">
-					{$t('cancel')}
-				</button>
-			{/if}
-		</div>
+				{#if (!isNew && sharingState === 0) || sharingState === 1 || sharingState === 2}
+					<button
+						type="button"
+						on:click={deleteList}
+						class="button danger-button"
+						disabled={deleteButtonIsLoading}
+						class:confirm={confirmationInProgress}
+					>
+						<span class="button-loader" class:loading={deleteButtonIsLoading}>
+							<i class="fas fa-circle-notch fa-spin" />
+						</span>
+						<span>{deleteButtonText}</span>
+					</button>
+				{/if}
+
+				{#if sharingState === 3 || sharingState === 4}
+					<button
+						type="button"
+						on:click={leaveList}
+						class="button danger-button"
+						disabled={leaveButtonIsLoading}
+						class:confirm={confirmationInProgress}
+					>
+						<span class="button-loader" class:loading={leaveButtonIsLoading}>
+							<i class="fas fa-circle-notch fa-spin" />
+						</span>
+						<span>{leaveButtonText}</span>
+					</button>
+				{/if}
+
+				{#if isNew || confirmationInProgress}
+					<button type="button" on:click={cancel} class="button secondary-button">
+						{$t('cancel')}
+					</button>
+				{/if}
+			</div>
+		{/if}
 	</div>
 </section>

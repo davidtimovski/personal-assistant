@@ -120,6 +120,9 @@
   <data name="Back" xml:space="preserve">
     <value>Назад</value>
   </data>
+  <data name="ConfirmPassword" xml:space="preserve">
+    <value>Потврди лозинка</value>
+  </data>
   <data name="CreateANewAccount" xml:space="preserve">
     <value>Креирајте нова сметка</value>
   </data>
@@ -137,8 +140,5 @@
   </data>
   <data name="Register" xml:space="preserve">
     <value>Регистрирај се</value>
-  </data>
-  <data name="Unavailable" xml:space="preserve">
-    <value>Се извинуваме, но оваа страна е моментално недостапна бидејќи сме во процес на менување на провајдерот за автентикација.</value>
   </data>
 </root>

@@ -8,9 +8,7 @@ namespace Account.Services;
 
 public interface IEmailTemplateService
 {
-    Task EnqueueRegisterConfirmationEmailAsync(string toName, string toEmail, Uri url, string language);
     Task EnqueueNewRegistrationEmailAsync(string name, string email);
-    Task EnqueueNewEmailVerificationEmailAsync(string name, string email);
 }
 
 public class EmailTemplateService : IEmailTemplateService
@@ -32,29 +30,6 @@ public class EmailTemplateService : IEmailTemplateService
         _adminEmail = configuration["AdminEmail"];
     }
 
-    public async Task EnqueueRegisterConfirmationEmailAsync(string toName, string toEmail, Uri url, string language)
-    {
-        var email = new Email
-        {
-            ToAddress = toEmail,
-            ToName = toName,
-            Subject = _localizer["RegisterConfirmationEmailSubject"]
-        };
-
-        string bodyText = await GetTemplateContentsAsync("RegisterConfirmation.txt", language);
-        email.BodyText = bodyText
-            .Replace("#NAME#", toName, StringComparison.Ordinal)
-            .Replace("#URL#", url.AbsoluteUri, StringComparison.Ordinal);
-
-        string bodyHtml = await GetTemplateContentsAsync("RegisterConfirmation.html", language);
-        email.BodyHtml = bodyHtml
-            .Replace("#SUBJECT#", email.Subject, StringComparison.Ordinal)
-            .Replace("#NAME#", toName, StringComparison.Ordinal)
-            .Replace("#URL#", url.AbsoluteUri, StringComparison.Ordinal);
-
-        _senderService.Enqueue(email);
-    }
-
     public async Task EnqueueNewRegistrationEmailAsync(string newUserName, string newUserEmail)
     {
         if (_env.EnvironmentName == Environments.Production)
@@ -72,32 +47,6 @@ public class EmailTemplateService : IEmailTemplateService
                 .Replace("#EMAIL#", newUserEmail, StringComparison.Ordinal);
 
             string bodyHtml = await GetTemplateContentsAsync("NewRegistration.html", "admin");
-            email.BodyHtml = bodyHtml
-                .Replace("#SUBJECT#", email.Subject, StringComparison.Ordinal)
-                .Replace("#NAME#", newUserName, StringComparison.Ordinal)
-                .Replace("#EMAIL#", newUserEmail, StringComparison.Ordinal);
-
-            _senderService.Enqueue(email);
-        }
-    }
-
-    public async Task EnqueueNewEmailVerificationEmailAsync(string newUserName, string newUserEmail)
-    {
-        if (_env.EnvironmentName == Environments.Production)
-        {
-            var email = new Email
-            {
-                ToAddress = _adminEmail,
-                ToName = "Admin",
-                Subject = "New email confirmation on Personal Assistant"
-            };
-
-            string bodyText = await GetTemplateContentsAsync("NewEmailVerification.txt", "admin");
-            email.BodyText = bodyText
-                .Replace("#NAME#", newUserName, StringComparison.Ordinal)
-                .Replace("#EMAIL#", newUserEmail, StringComparison.Ordinal);
-
-            string bodyHtml = await GetTemplateContentsAsync("NewEmailVerification.html", "admin");
             email.BodyHtml = bodyHtml
                 .Replace("#SUBJECT#", email.Subject, StringComparison.Ordinal)
                 .Replace("#NAME#", newUserName, StringComparison.Ordinal)

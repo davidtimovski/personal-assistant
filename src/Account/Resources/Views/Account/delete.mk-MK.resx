@@ -129,4 +129,7 @@
   <data name="DeleteYourAccount" xml:space="preserve">
     <value>Избриши сметка</value>
   </data>
+  <data name="IUnderstandDelete" xml:space="preserve">
+    <value>Разбирам, избриши</value>
+  </data>
 </root>

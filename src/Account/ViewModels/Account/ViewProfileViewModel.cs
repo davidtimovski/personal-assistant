@@ -20,15 +20,3 @@ public class ViewProfileViewModel
     public string BaseUrl { get; set; }
     public List<CultureOption> CultureOptions { get; }
 }
-
-public class CultureOption
-{
-    public CultureOption(string value, string label)
-    {
-        Value = value;
-        Label = label;
-    }
-
-    public string Value { get; }
-    public string Label { get; }
-}

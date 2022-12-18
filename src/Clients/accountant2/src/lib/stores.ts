@@ -6,7 +6,7 @@ import { AlertState } from '../../../shared2/models/alertState';
 import { AlertStatus } from '../../../shared2/models/enums/alertEvents';
 
 import { AccountantUser } from '$lib/models/accountantUser';
-import { AppEvents } from '$lib/models/appEvents';
+import { SyncStatus, SyncEvents } from '$lib/models/syncStatus';
 import { SearchFilters } from '$lib/models/viewmodels/searchFilters';
 import { TransactionType } from '$lib/models/viewmodels/transactionType';
 import Variables from '$lib/variables';
@@ -16,7 +16,7 @@ export const authInfo = writable<AuthInfo | null>(null);
 export const user = writable<AccountantUser>(
 	new AccountantUser('', '', 'en-US', 'en-US', Variables.urls.defaultProfileImageUrl)
 );
-export const syncStatus = writable<AppEvents>(AppEvents.NotSyncing);
+export const syncStatus = writable<SyncStatus>(new SyncStatus(SyncEvents.NotSyncing, 0, 0));
 export const alertState = writable<AlertState>(new AlertState(AlertStatus.Hidden, null, []));
 
 const from = new Date();

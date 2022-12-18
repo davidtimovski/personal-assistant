@@ -9,7 +9,7 @@
 	import { syncStatus } from '$lib/stores';
 	import { CategoriesService } from '$lib/services/categoriesService';
 	import { CategoryItem } from '$lib/models/viewmodels/categoryItem';
-	import { AppEvents } from '$lib/models/appEvents';
+	import { SyncEvents } from '$lib/models/syncStatus';
 	import type { Category } from '$lib/models/entities/category';
 
 	let categories: CategoryItem[] | null = null;
@@ -182,7 +182,7 @@
 				type="button"
 				on:click={() => goto('/editCategory/0')}
 				class="new-button"
-				disabled={$syncStatus === AppEvents.SyncStarted}
+				disabled={$syncStatus.status === SyncEvents.SyncStarted}
 				title={$t('categories.newCategory')}
 				aria-label={$t('categories.newCategory')}
 			>

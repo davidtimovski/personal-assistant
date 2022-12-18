@@ -75,13 +75,11 @@ let configureLogging (builder : ILoggingBuilder) =
 
 [<EntryPoint>]
 let main args =
-    let contentRoot = Directory.GetCurrentDirectory()
-
     Host.CreateDefaultBuilder(args)
         .ConfigureWebHostDefaults(
             fun webHostBuilder ->
                 webHostBuilder
-                    .UseContentRoot(contentRoot)
+                    .UseContentRoot(Directory.GetCurrentDirectory())
                     .ConfigureAppConfiguration(addKeyVault)
                     .ConfigureServices(configureServices)
                     .Configure(Action<IApplicationBuilder> configureApp)

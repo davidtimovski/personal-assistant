@@ -12,7 +12,7 @@ import { DebtsIDBHelper } from '$lib/utils/debtsIDBHelper';
 import { AutomaticTransactionsIDBHelper } from '$lib/utils/automaticTransactionsIDBHelper';
 import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 import { Changed, Create, Created } from '$lib/models/sync';
-import { AppEvents } from '$lib/models/appEvents';
+import { SyncStatus, SyncEvents } from '$lib/models/syncStatus';
 import Variables from '$lib/variables';
 
 export class SyncService {
@@ -33,7 +33,7 @@ export class SyncService {
 		}
 
 		try {
-			syncStatus.set(AppEvents.SyncStarted);
+			syncStatus.set(new SyncStatus(SyncEvents.SyncStarted, 0, 0));
 			const lastSynced = this.localStorage.get(LocalStorageKeys.LastSynced);
 
 			this.currenciesService.loadRates();
@@ -95,7 +95,29 @@ export class SyncService {
 			await this.automaticTransactionsIDBHelper.consolidate(created.automaticTransactionIdPairs);
 
 			this.localStorage.set(LocalStorageKeys.LastSynced, lastSyncedServer);
-			syncStatus.set(AppEvents.SyncFinished);
+
+			const retrieved =
+				changed.deletedAccountIds.length +
+				changed.accounts.length +
+				changed.deletedCategoryIds.length +
+				changed.categories.length +
+				changed.deletedTransactionIds.length +
+				changed.transactions.length +
+				changed.deletedUpcomingExpenseIds.length +
+				changed.upcomingExpenses.length +
+				changed.deletedDebtIds.length +
+				changed.debts.length +
+				changed.deletedAutomaticTransactionIds.length +
+				changed.automaticTransactions.length;
+
+			const pushed =
+				created.accountIdPairs.length +
+				created.categoryIdPairs.length +
+				created.transactionIdPairs.length +
+				created.upcomingExpenseIdPairs.length +
+				created.debtIdPairs.length +
+				created.automaticTransactionIdPairs.length;
+			syncStatus.set(new SyncStatus(SyncEvents.SyncFinished, retrieved, pushed));
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;

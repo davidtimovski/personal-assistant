@@ -138,11 +138,11 @@
   <data name="PasswordIsRequired" xml:space="preserve">
     <value>Лозинката е задолжителна</value>
   </data>
-  <data name="PasswordMinLength" xml:space="preserve">
-    <value>Лозинката мора да биде минимум {0} карактери долга</value>
-  </data>
   <data name="PasswordsMustMatch" xml:space="preserve">
     <value>Лозинките мора да се исти</value>
+  </data>
+  <data name="UserAlreadyExists" xml:space="preserve">
+    <value>Кориснич со тој емаил веќе постои</value>
   </data>
   <data name="YouDontSeemToBeHuman" xml:space="preserve">
     <value>Не се чиниш како човек</value>

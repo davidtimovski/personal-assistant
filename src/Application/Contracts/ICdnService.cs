@@ -14,6 +14,7 @@ public interface ICdnService
     Task<string> CopyAndUploadAsync(string localTempPath, string imageUriToCopy, string uploadPath, string template);
     Task RemoveTempTagAsync(string imageUri);
     Task DeleteAsync(string imageUri);
+    Task CreateFolderForUserAsync(int userId);
     Task DeleteUserResourcesAsync(int userId, IEnumerable<string> imageUris);
     Task DeleteTemporaryResourcesAsync(DateTime olderThan);
 }

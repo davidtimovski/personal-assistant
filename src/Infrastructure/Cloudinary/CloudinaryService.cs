@@ -45,7 +45,7 @@ public class CloudinaryService : ICdnService
     public string ImageUriToThumbnail(string imageUri)
     {
         string[] parts = imageUri.Split("personalassistant");
-        return parts[0] + "personalassistant/t_profile_thumbnail" + parts[1];
+        return parts[0] + "personalassistant/w_80,h_80,c_limit" + parts[1];
     }
 
     public async Task<string> UploadAsync(string filePath, string uploadPath, string template)
@@ -121,8 +121,6 @@ public class CloudinaryService : ICdnService
         }
 
         File.Delete(filePath);
-
-        // w_40,h_40,c_limit
 
         return _baseUrl + $"{uploadPath}/{uri}.{Format}";
     }
@@ -200,10 +198,19 @@ public class CloudinaryService : ICdnService
         }
     }
 
+    public async Task CreateFolderForUserAsync(int userId)
+    {
+        CreateFolderResult result = await Cloudinary.CreateFolderAsync($"{_environment}/users/{userId}");
+        if (result.Error != null)
+        {
+            throw new Exception($"{nameof(CloudinaryService)}.{nameof(CreateFolderForUserAsync)}() returned error: {result.Error.Message}");
+        }
+    }
+
     public async Task DeleteUserResourcesAsync(int userId, IEnumerable<string> imageUris)
     {
         var publicIds = new List<string>();
-        foreach (string uri in imageUris)
+        foreach (string uri in imageUris.Where(x => !IsDefaultImage(x)))
         {
             string publicId = GetPublicIdFromUri(uri);
             publicIds.Add(publicId);
@@ -282,14 +289,9 @@ public class CloudinaryService : ICdnService
 
     private string GetPublicIdFromUri(string uri)
     {
-        var pathRegex = new Regex(@"users/.+");
+        var pathRegex = new Regex(@"personalassistant\/(.*).webp");
         Match match = pathRegex.Match(uri);
-        string path = match.Value;
-
-        int periodIndex = path.LastIndexOf('.');
-        path = path.Substring(0, periodIndex);
-
-        return $"{_environment}/{path}";
+        return match.Groups[1].Value;
     }
 
     private static string GenerateRandomString()

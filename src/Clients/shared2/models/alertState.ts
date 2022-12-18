@@ -4,7 +4,8 @@ export class AlertState {
   constructor(
     public status: AlertStatus,
     public messageKey: string | null,
-    public messages: string[]
+    public messages: string[],
+    public messageData: any = {}
   ) {}
 
   hide() {
@@ -13,10 +14,11 @@ export class AlertState {
     this.messages = [];
   }
 
-  showSuccess(messageKey: string) {
+  showSuccess(messageKey: string, messageData: any = {}) {
     this.status = AlertStatus.Success;
     this.messageKey = messageKey;
     this.messages = [];
+    this.messageData = messageData;
   }
 
   showError(messageKey: string) {

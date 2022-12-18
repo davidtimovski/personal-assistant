@@ -91,6 +91,32 @@ public class UserService : IUserService
         }
     }
 
+    public async Task<int> CreateAsync(string auth0Id, string email, string name, string language, string culture, string imageUri)
+    {
+        try
+        {
+            var user = new User
+            {
+                Email = email.Trim(),
+                Name = name.Trim(),
+                Language = language,
+                Culture = culture.Trim(),
+                ToDoNotificationsEnabled = false,
+                CookingNotificationsEnabled = false,
+                ImperialSystem = false,
+                ImageUri = imageUri.Trim(),
+                ModifiedDate = DateTime.UtcNow,
+            };
+
+            return await _usersRepository.CreateAsync(auth0Id, user);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(CreateAsync)}");
+            throw;
+        }
+    }
+
     public async Task UpdateProfileAsync(int id, string name, string language, string culture, string imageUri)
     {
         try

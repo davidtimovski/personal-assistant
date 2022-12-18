@@ -12,7 +12,7 @@
 	import { user, syncStatus } from '$lib/stores';
 	import { UpcomingExpensesService } from '$lib/services/upcomingExpensesService';
 	import { UpcomingExpenseItem } from '$lib/models/viewmodels/upcomingExpenseItem';
-	import { AppEvents } from '$lib/models/appEvents';
+	import { SyncEvents } from '$lib/models/syncStatus';
 
 	let upcomingExpenses: UpcomingExpenseItem[] | null = null;
 	let currency: string;
@@ -132,7 +132,7 @@
 				type="button"
 				on:click={() => goto('/editUpcomingExpense/0')}
 				class="new-button"
-				disabled={$syncStatus === AppEvents.SyncStarted}
+				disabled={$syncStatus.status === SyncEvents.SyncStarted}
 				title={$t('upcomingExpenses.newUpcomingExpense')}
 				aria-label={$t('upcomingExpenses.newUpcomingExpense')}
 			>

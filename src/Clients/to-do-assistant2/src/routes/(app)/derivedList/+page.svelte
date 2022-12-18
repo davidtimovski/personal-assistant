@@ -75,6 +75,10 @@
 		disableTasks();
 
 		ThrottleHelper.executeAfterDelay(async () => {
+			if ($state.lists === null) {
+				throw new Error('Lists not loaded yet');
+			}
+
 			if (task.isOneTime) {
 				if (!remote) {
 					await tasksService.delete(task.id);
@@ -118,7 +122,7 @@
 
 		unsubscriptions.push(
 			state.subscribe((s) => {
-				if (s.lists.length === 0) {
+				if (s.lists === null) {
 					return;
 				}
 
@@ -140,6 +144,10 @@
 
 		unsubscriptions.push(
 			remoteEvents.subscribe((e) => {
+				if ($state.lists === null) {
+					return;
+				}
+
 				if (e.type === RemoteEventType.TaskCompletedRemotely || e.type === RemoteEventType.TaskDeletedRemotely) {
 					const allTasks = tasks.concat(privateTasks);
 
