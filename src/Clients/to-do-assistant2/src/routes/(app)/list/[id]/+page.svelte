@@ -575,7 +575,7 @@
 					<span class="side inactive small">
 						<i class="fas fa-archive" />
 					</span>
-					<div class="alert-message" contenteditable="true" bind:innerHTML={listIsArchivedText} />
+					<div class="alert-message" contenteditable="false" bind:innerHTML={listIsArchivedText} />
 					<button
 						type="button"
 						on:click={restore}
@@ -612,7 +612,7 @@
 					<span class="side inactive">
 						<i class="fas fa-info-circle" />
 					</span>
-					<div class="alert-message danger" contenteditable="true" bind:innerHTML={similarTasksMessageText} />
+					<div class="alert-message danger" contenteditable="false" bind:innerHTML={similarTasksMessageText} />
 					<button type="button" on:click={create} class="side" title={$t('list.add')} aria-label={$t('list.add')}>
 						<i class="fas fa-check-circle" />
 					</button>

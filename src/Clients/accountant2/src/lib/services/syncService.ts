@@ -10,7 +10,7 @@ import { TransactionsIDBHelper } from '$lib/utils/transactionsIDBHelper';
 import { UpcomingExpensesIDBHelper } from '$lib/utils/upcomingExpensesIDBHelper';
 import { DebtsIDBHelper } from '$lib/utils/debtsIDBHelper';
 import { AutomaticTransactionsIDBHelper } from '$lib/utils/automaticTransactionsIDBHelper';
-import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
+import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 import { Changed, Create, Created } from '$lib/models/sync';
 import { SyncStatus, SyncEvents } from '$lib/models/syncStatus';
 import Variables from '$lib/variables';
@@ -34,7 +34,7 @@ export class SyncService {
 
 		try {
 			syncStatus.set(new SyncStatus(SyncEvents.SyncStarted, 0, 0));
-			const lastSynced = this.localStorage.get(LocalStorageKeys.LastSynced);
+			const lastSynced = this.localStorage.getLastSynced();
 
 			this.currenciesService.loadRates();
 
@@ -94,7 +94,7 @@ export class SyncService {
 			await this.debtsIDBHelper.consolidate(created.debtIdPairs);
 			await this.automaticTransactionsIDBHelper.consolidate(created.automaticTransactionIdPairs);
 
-			this.localStorage.set(LocalStorageKeys.LastSynced, lastSyncedServer);
+			this.localStorage.setLastSynced(lastSyncedServer);
 
 			const retrieved =
 				changed.deletedAccountIds.length +
@@ -117,6 +117,7 @@ export class SyncService {
 				created.upcomingExpenseIdPairs.length +
 				created.debtIdPairs.length +
 				created.automaticTransactionIdPairs.length;
+
 			syncStatus.set(new SyncStatus(SyncEvents.SyncFinished, retrieved, pushed));
 		} catch (e) {
 			this.logger.logError(e);
@@ -132,7 +133,7 @@ export class SyncService {
 				const deleteDbNamesRequest = window.indexedDB.deleteDatabase('__dbnames');
 
 				deleteDbNamesRequest.onsuccess = () => {
-					this.localStorage.set(LocalStorageKeys.LastSynced, '1970-01-01T00:00:00.000Z');
+					this.localStorage.setLastSynced('1970-01-01T00:00:00.000Z');
 
 					window.location.href = '/';
 				};

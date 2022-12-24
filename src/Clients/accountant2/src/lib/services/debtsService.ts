@@ -4,6 +4,7 @@ import { ErrorLogger } from '../../../../shared2/services/errorLogger';
 import { DateHelper } from '../../../../shared2/utils/dateHelper';
 
 import { DebtsIDBHelper } from '$lib/utils/debtsIDBHelper';
+import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 import { Formatter } from '$lib/utils/formatter';
 import { DebtModel } from '$lib/models/entities/debt';
 import Variables from '$lib/variables';
@@ -11,10 +12,11 @@ import Variables from '$lib/variables';
 export class DebtsService {
 	private readonly httpProxy = new HttpProxy();
 	private readonly idbHelper = new DebtsIDBHelper();
+	private readonly localStorage = new LocalStorageUtil();
 	private readonly currenciesService = new CurrenciesService('Accountant');
 	private readonly logger = new ErrorLogger('Accountant');
 
-	static readonly mergedDebtSeparator = '----------';
+	static readonly mergedDebtSeparator = '--------------';
 
 	async getAll(currency: string): Promise<Array<DebtModel>> {
 		try {
@@ -118,6 +120,8 @@ export class DebtsService {
 				const otherDebtIds = otherDebtWithPerson.map((x) => x.id);
 				await this.idbHelper.createMerged(mergedDebt, otherDebtIds);
 
+				this.localStorage.setLastSyncedNow();
+
 				return mergedDebt.id;
 			} else {
 				if (debt.description) {
@@ -134,6 +138,8 @@ export class DebtsService {
 				}
 
 				await this.idbHelper.create(debt);
+
+				this.localStorage.setLastSyncedNow();
 
 				return debt.id;
 			}
@@ -165,6 +171,8 @@ export class DebtsService {
 			}
 
 			await this.idbHelper.update(debt);
+
+			this.localStorage.setLastSyncedNow();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -182,6 +190,8 @@ export class DebtsService {
 			}
 
 			await this.idbHelper.delete(id);
+
+			this.localStorage.setLastSyncedNow();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;

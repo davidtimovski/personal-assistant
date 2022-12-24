@@ -9,9 +9,10 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
-	import { user, alertState, isOnline } from '$lib/stores';
+	import { user, alertState, isOnline, syncStatus } from '$lib/stores';
 	import { DebtsService } from '$lib/services/debtsService';
 	import { DebtModel } from '$lib/models/entities/debt';
+	import { SyncEvents } from '$lib/models/syncStatus';
 
 	import AmountInput from '$lib/components/AmountInput.svelte';
 
@@ -48,7 +49,7 @@
 		}
 	});
 
-	$: canSave = !!amount && !(!$isOnline && synced);
+	$: canSave = $syncStatus.status !== SyncEvents.SyncStarted && !!amount && !(!$isOnline && synced);
 
 	function validate(): ValidationResult {
 		const result = new ValidationResult();

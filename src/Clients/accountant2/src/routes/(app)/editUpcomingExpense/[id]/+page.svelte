@@ -9,12 +9,13 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
-	import { alertState, isOnline } from '$lib/stores';
+	import { alertState, isOnline, syncStatus } from '$lib/stores';
 	import type { SelectOption } from '$lib/models/viewmodels/selectOption';
 	import { UpcomingExpensesService } from '$lib/services/upcomingExpensesService';
 	import { UpcomingExpense } from '$lib/models/entities/upcomingExpense';
 	import { CategoryType } from '$lib/models/entities/category';
 	import { CategoriesService } from '$lib/services/categoriesService';
+	import { SyncEvents } from '$lib/models/syncStatus';
 
 	import AmountInput from '$lib/components/AmountInput.svelte';
 	import MonthSelector from '$lib/components/MonthSelector.svelte';
@@ -52,7 +53,7 @@
 		}
 	});
 
-	$: canSave = !!amount && !(!$isOnline && synced);
+	$: canSave = $syncStatus.status !== SyncEvents.SyncStarted && !!amount && !(!$isOnline && synced);
 
 	function validate(): ValidationResult {
 		const result = new ValidationResult();

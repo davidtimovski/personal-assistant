@@ -12,13 +12,14 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
-	import { alertState, user } from '$lib/stores';
+	import { alertState, syncStatus, user } from '$lib/stores';
 	import type { SelectOption } from '$lib/models/viewmodels/selectOption';
 	import { TransactionsService } from '$lib/services/transactionsService';
 	import { AccountsService } from '$lib/services/accountsService';
 	import { CategoriesService } from '$lib/services/categoriesService';
 	import { DebtsService } from '$lib/services/debtsService';
 	import { CategoryType } from '$lib/models/entities/category';
+	import { SyncEvents } from '$lib/models/syncStatus';
 
 	import AmountInput from '$lib/components/AmountInput.svelte';
 
@@ -391,7 +392,10 @@
 			<hr />
 
 			<div class="save-delete-wrap">
-				<button class="button primary-button" disabled={!amount || !accountId || submitButtonIsLoading}>
+				<button
+					class="button primary-button"
+					disabled={$syncStatus.status === SyncEvents.SyncStarted || !amount || !accountId || submitButtonIsLoading}
+				>
 					<span class="button-loader" class:loading={submitButtonIsLoading}>
 						<i class="fas fa-circle-notch fa-spin" />
 					</span>

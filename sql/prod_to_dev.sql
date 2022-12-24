@@ -1,4 +1,5 @@
 DELETE FROM push_subscriptions;
+UPDATE user_id_map SET auth0_id = 'auth0|6351a364595f24dcfed77fea' WHERE user_id = 2;
 
 -- Scramble user data
 

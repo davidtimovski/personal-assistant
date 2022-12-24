@@ -1,3 +1,4 @@
+import { DateHelper } from '../../../../shared2/utils/dateHelper';
 import { LocalStorageBase } from '../../../../shared2/utils/localStorageBase';
 
 export class LocalStorageUtil extends LocalStorageBase {
@@ -12,6 +13,18 @@ export class LocalStorageUtil extends LocalStorageBase {
 				[LocalStorageKeys.ShowDebtOnHomePage, true]
 			])
 		);
+	}
+
+	getLastSynced() {
+		return this.get(LocalStorageKeys.LastSynced);
+	}
+
+	setLastSyncedNow() {
+		this.set(LocalStorageKeys.LastSynced, DateHelper.adjustTimeZone(new Date()).toISOString());
+	}
+
+	setLastSynced(lastSynced: string) {
+		this.set(LocalStorageKeys.LastSynced, lastSynced);
 	}
 }
 

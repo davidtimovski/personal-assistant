@@ -328,11 +328,11 @@
 
 			{#if deleteInProgress && recipes.length > 0}
 				<div class="delete-confirmation-alert">
-					<span contenteditable="true" bind:innerHTML={taskUsedAsIngredientText} />
+					<span contenteditable="false" bind:innerHTML={taskUsedAsIngredientText} />
 					<br />
-					<span contenteditable="true" bind:innerHTML={recipesText} />.
+					<span contenteditable="false" bind:innerHTML={recipesText} />.
 					<br />
-					<span contenteditable="true" bind:innerHTML={deletingWillUnlinkText} />
+					<span contenteditable="false" bind:innerHTML={deletingWillUnlinkText} />
 				</div>
 			{/if}
 

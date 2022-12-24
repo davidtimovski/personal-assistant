@@ -99,7 +99,7 @@
   <span class="alert-body">
     <div
       class="alert-message"
-      contenteditable="true"
+      contenteditable="false"
       bind:innerHTML={message}
     />
 

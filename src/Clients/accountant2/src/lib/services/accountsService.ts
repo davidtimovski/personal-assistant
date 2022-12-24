@@ -5,6 +5,7 @@ import { DateHelper } from '../../../../shared2/utils/dateHelper';
 
 import { AccountsIDBHelper } from '$lib/utils/accountsIDBHelper';
 import { TransactionsIDBHelper } from '$lib/utils/transactionsIDBHelper';
+import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 import type { Account } from '$lib/models/entities/account';
 import { SelectOption } from '$lib/models/viewmodels/selectOption';
 import type { TransactionModel } from '$lib/models/entities/transaction';
@@ -14,6 +15,7 @@ export class AccountsService {
 	private readonly httpProxy = new HttpProxy();
 	private readonly idbHelper = new AccountsIDBHelper();
 	private readonly transactionsIDBHelper = new TransactionsIDBHelper();
+	private readonly localStorage = new LocalStorageUtil();
 	private readonly currenciesService = new CurrenciesService('Accountant');
 	private readonly logger = new ErrorLogger('Accountant');
 
@@ -196,6 +198,8 @@ export class AccountsService {
 
 			await this.idbHelper.create(account);
 
+			this.localStorage.setLastSyncedNow();
+
 			return account.id;
 		} catch (e) {
 			this.logger.logError(e);
@@ -218,6 +222,8 @@ export class AccountsService {
 			}
 
 			await this.idbHelper.update(account);
+
+			this.localStorage.setLastSyncedNow();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -233,14 +239,17 @@ export class AccountsService {
 			} else if (await this.idbHelper.isSynced(id)) {
 				throw 'failedToFetchError';
 			}
+
 			await this.idbHelper.delete(id);
+
+			this.localStorage.setLastSyncedNow();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
 		}
 	}
 
-	async hasTransactions(id: number): Promise<boolean> {
+	hasTransactions(id: number): Promise<boolean> {
 		return this.idbHelper.hasTransactions(id);
 	}
 

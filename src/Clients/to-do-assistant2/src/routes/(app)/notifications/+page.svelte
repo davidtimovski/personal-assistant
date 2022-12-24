@@ -115,7 +115,7 @@
 							alt={$t('profilePicture', { name: notification.userName })}
 						/>
 						<div class="notification-content">
-							<div class="name" contenteditable="true" bind:innerHTML={notification.message} />
+							<div class="name" contenteditable="false" bind:innerHTML={notification.message} />
 							<div class="notification-time">{notification.formattedCreatedDate}</div>
 						</div>
 					</a>
@@ -149,7 +149,7 @@
 									alt={$t('profilePicture', { name: notification.userName })}
 								/>
 								<div class="notification-content">
-									<div class="name" contenteditable="true" bind:innerHTML={notification.message} />
+									<div class="name" contenteditable="false" bind:innerHTML={notification.message} />
 									<div class="notification-time">{notification.formattedCreatedDate}</div>
 								</div>
 							</a>

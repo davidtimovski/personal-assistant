@@ -9,10 +9,11 @@
 	import Tooltip from '../../../../../../shared2/components/Tooltip.svelte';
 
 	import { t } from '$lib/localization/i18n';
-	import { alertState, isOnline } from '$lib/stores';
+	import { alertState, isOnline, syncStatus } from '$lib/stores';
 	import { CategoriesService } from '$lib/services/categoriesService';
 	import { Category, CategoryType } from '$lib/models/entities/category';
 	import { SelectOption } from '$lib/models/viewmodels/selectOption';
+	import { SyncEvents } from '$lib/models/syncStatus';
 
 	export let data: PageData;
 
@@ -47,7 +48,10 @@
 		}
 	});
 
-	$: canSave = !ValidationUtil.isEmptyOrWhitespace(name) && !(!$isOnline && synced);
+	$: canSave =
+		$syncStatus.status !== SyncEvents.SyncStarted &&
+		!ValidationUtil.isEmptyOrWhitespace(name) &&
+		!(!$isOnline && synced);
 
 	function validate(): ValidationResult {
 		const result = new ValidationResult();
