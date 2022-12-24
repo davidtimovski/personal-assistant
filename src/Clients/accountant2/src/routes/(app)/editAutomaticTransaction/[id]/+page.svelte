@@ -9,12 +9,13 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
-	import { alertState, isOnline } from '$lib/stores';
+	import { alertState, isOnline, syncStatus } from '$lib/stores';
 	import { AutomaticTransactionsService } from '$lib/services/automaticTransactionsService';
 	import { CategoriesService } from '$lib/services/categoriesService';
 	import { CategoryType } from '$lib/models/entities/category';
 	import { SelectOption } from '$lib/models/viewmodels/selectOption';
 	import { AutomaticTransaction } from '$lib/models/entities/automaticTransaction';
+	import { SyncEvents } from '$lib/models/syncStatus';
 
 	import AmountInput from '$lib/components/AmountInput.svelte';
 
@@ -70,7 +71,7 @@
 		});
 	}
 
-	$: canSave = !!amount && !(!$isOnline && synced);
+	$: canSave = $syncStatus.status !== SyncEvents.SyncStarted && !!amount && !(!$isOnline && synced);
 
 	async function save() {
 		if (!amount || !currency) {

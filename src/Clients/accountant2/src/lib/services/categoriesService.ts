@@ -3,6 +3,7 @@ import { ErrorLogger } from '../../../../shared2/services/errorLogger';
 import { DateHelper } from '../../../../shared2/utils/dateHelper';
 
 import { CategoriesIDBHelper } from '$lib/utils/categoriesIDBHelper';
+import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 import { Category, CategoryType } from '$lib/models/entities/category';
 import { SelectOption } from '$lib/models/viewmodels/selectOption';
 import Variables from '$lib/variables';
@@ -10,6 +11,7 @@ import Variables from '$lib/variables';
 export class CategoriesService {
 	private readonly httpProxy = new HttpProxy();
 	private readonly idbHelper = new CategoriesIDBHelper();
+	private readonly localStorage = new LocalStorageUtil();
 	private readonly logger = new ErrorLogger('Accountant');
 
 	getAll(): Promise<Array<Category>> {
@@ -85,6 +87,8 @@ export class CategoriesService {
 
 			await this.idbHelper.create(category);
 
+			this.localStorage.setLastSyncedNow();
+
 			return category.id;
 		} catch (e) {
 			this.logger.logError(e);
@@ -111,6 +115,8 @@ export class CategoriesService {
 			}
 
 			await this.idbHelper.update(category);
+
+			this.localStorage.setLastSyncedNow();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -128,6 +134,8 @@ export class CategoriesService {
 			}
 
 			await this.idbHelper.delete(id);
+
+			this.localStorage.setLastSyncedNow();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;

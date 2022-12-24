@@ -4,12 +4,14 @@ import { ErrorLogger } from '../../../../shared2/services/errorLogger';
 import { DateHelper } from '../../../../shared2/utils/dateHelper';
 
 import { UpcomingExpensesIDBHelper } from '$lib/utils/upcomingExpensesIDBHelper';
+import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 import type { UpcomingExpense } from '$lib/models/entities/upcomingExpense';
 import Variables from '$lib/variables';
 
 export class UpcomingExpensesService {
 	private readonly httpProxy = new HttpProxy();
 	private readonly idbHelper = new UpcomingExpensesIDBHelper();
+	private readonly localStorage = new LocalStorageUtil();
 	private readonly currenciesService = new CurrenciesService('Accountant');
 	private readonly logger = new ErrorLogger('Accountant');
 
@@ -54,6 +56,8 @@ export class UpcomingExpensesService {
 
 			await this.idbHelper.create(upcomingExpense);
 
+			this.localStorage.setLastSyncedNow();
+
 			return upcomingExpense.id;
 		} catch (e) {
 			this.logger.logError(e);
@@ -83,6 +87,8 @@ export class UpcomingExpensesService {
 			}
 
 			await this.idbHelper.update(upcomingExpense);
+
+			this.localStorage.setLastSyncedNow();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -100,6 +106,8 @@ export class UpcomingExpensesService {
 			}
 
 			await this.idbHelper.delete(id);
+
+			this.localStorage.setLastSyncedNow();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;

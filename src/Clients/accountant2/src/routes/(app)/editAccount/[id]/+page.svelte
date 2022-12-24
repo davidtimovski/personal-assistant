@@ -9,9 +9,10 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
-	import { alertState, isOnline } from '$lib/stores';
+	import { alertState, isOnline, syncStatus } from '$lib/stores';
 	import { AccountsService } from '$lib/services/accountsService';
 	import { Account } from '$lib/models/entities/account';
+	import { SyncEvents } from '$lib/models/syncStatus';
 
 	import StockPriceInput from '$lib/components/StockPriceInput.svelte';
 
@@ -49,7 +50,10 @@
 		}
 	});
 
-	$: canSave = !ValidationUtil.isEmptyOrWhitespace(name) && !(!$isOnline && synced);
+	$: canSave =
+		$syncStatus.status !== SyncEvents.SyncStarted &&
+		!ValidationUtil.isEmptyOrWhitespace(name) &&
+		!(!$isOnline && synced);
 
 	function validate(): ValidationResult {
 		const result = new ValidationResult();

@@ -10,7 +10,7 @@
 	import Tooltip from '../../../../../../shared2/components/Tooltip.svelte';
 
 	import { t } from '$lib/localization/i18n';
-	import { alertState, isOnline } from '$lib/stores';
+	import { alertState, isOnline, syncStatus } from '$lib/stores';
 	import { TransactionsService } from '$lib/services/transactionsService';
 	import { TransactionType } from '$lib/models/viewmodels/transactionType';
 	import { AccountsService } from '$lib/services/accountsService';
@@ -19,6 +19,7 @@
 	import { CategoryType } from '$lib/models/entities/category';
 	import { TransactionModel } from '$lib/models/entities/transaction';
 	import { SelectOption } from '$lib/models/viewmodels/selectOption';
+	import { SyncEvents } from '$lib/models/syncStatus';
 
 	import AmountInput from '$lib/components/AmountInput.svelte';
 
@@ -184,7 +185,7 @@
 		return result;
 	}
 
-	$: canSave = !!amount && !(!$isOnline && synced);
+	$: canSave = $syncStatus.status !== SyncEvents.SyncStarted && !!amount && !(!$isOnline && synced);
 
 	async function save() {
 		if (!amount || !currency) {

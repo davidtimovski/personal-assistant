@@ -74,7 +74,7 @@
 			<AlertBlock type="warning" message={$t('export.offlineText')} />
 		{/if}
 
-		<div contenteditable="true" bind:innerHTML={exportText} class="text-wrap" />
+		<div contenteditable="false" bind:innerHTML={exportText} class="text-wrap" />
 
 		<div class="save-delete-wrap">
 			<button type="button" on:click={exportTransactions} class="button primary-button" disabled={!canExport}>
