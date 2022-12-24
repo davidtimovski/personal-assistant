@@ -1,28 +1,33 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte/internal';
+	import { goto } from '$app/navigation';
 
+	import { DateHelper } from '../../../../shared2/utils/dateHelper';
 	import { ValidationResult } from '../../../../shared2/utils/validationUtils';
 
 	import { t } from '$lib/localization/i18n';
+	import { alertState } from '$lib/stores';
 	import { ProgressService } from '$lib/services/progressService';
-	import { EditAmountProgressEntry, AmountSets } from '$lib/models/editProgressEntry';
+	import type { EditAmountProgress, EditProgress } from '$lib/models/editProgress';
+	import type { Exercise, ExerciseAmount } from '$lib/models/exercise';
 
-	export let id: number;
-	export let exerciseId: number;
-	export let sets: number;
-	export let amountUnit: string | null = null;
+	export let exercise: Exercise;
+	export let progress: EditProgress;
 
-	let date: string;
-	let entries = new Array<AmountSets>();
+	let exerciseModel = <ExerciseAmount>exercise;
+	let progressModel = <EditAmountProgress>progress;
+	const maxDate = DateHelper.format(new Date());
 	let saveButtonIsLoading = false;
-
-	for (let i = 1; i <= sets; i++) {
-		entries.push(new AmountSets(i, 0));
-	}
 
 	let progressService: ProgressService;
 
 	$: canSave = true;
+
+	async function dateChanged() {
+		goto(`/progress/${progressModel.date}?exerciseId=${exercise.id}`);
+
+		progressModel = <EditAmountProgress>await progressService.get(exercise.id, progressModel.date);
+	}
 
 	function validate(): ValidationResult {
 		const result = new ValidationResult();
@@ -37,8 +42,13 @@
 	async function save() {
 		const result = validate();
 		if (result.valid) {
-			const createModel = new EditAmountProgressEntry(id, exerciseId, date, entries);
-			await progressService.createAmount(createModel);
+			await progressService.createAmount(progressModel);
+
+			alertState.update((x) => {
+				x.showSuccess('progress.saveSuccessful');
+				return x;
+			});
+			goto('/');
 		}
 	}
 
@@ -52,10 +62,19 @@
 </script>
 
 <form on:submit|preventDefault={save}>
-	{#each entries as entry}
+	<div class="form-control inline">
+		<label for="date">{$t('date')}</label>
+		<input type="date" id="date" bind:value={progressModel.date} on:change={dateChanged} max={maxDate} required />
+	</div>
+
+	{#each progressModel.sets as set}
 		<div>
-			<input type="number" bind:value={entry.set} readonly />
-			<input type="number" bind:value={entry.amount} min="0" />
+			<span>Set {set.set}</span>
+
+			<div>
+				<labeL for="amount">{exerciseModel.amountUnit}</labeL>
+				<input type="number" id="amount" bind:value={set.amount} min="0" />
+			</div>
 		</div>
 	{/each}
 </form>

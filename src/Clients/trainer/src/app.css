@@ -11,6 +11,11 @@
 	margin-bottom: 30px;
 }
 
+.double-bounce1,
+.double-bounce2 {
+	background-color: #bb8aff;
+}
+
 .button.primary-button,
 .save-delete-wrap .primary-button.loading:disabled {
 	background-size: 400% 400%;

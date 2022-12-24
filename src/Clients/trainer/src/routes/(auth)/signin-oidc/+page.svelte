@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte/internal';
 	import { AuthService } from '../../../../../shared2/services/authService';
-	import Variables from '$lib/variables';
 
 	onMount(async () => {
 		const authService = new AuthService();
-		await authService.initialize(Variables.urls.gateway);
+		await authService.initialize();
 
 		const query = window.location.search;
 		if (!query.includes('code=') || !query.includes('state=')) {

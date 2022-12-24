@@ -10,9 +10,13 @@ export default {
 		create: 'Create',
 		save: 'Save',
 		cancel: 'Cancel',
+		date: 'Date',
 		index: {
 			menu: 'Menu',
 			refresh: 'Refresh'
+		},
+		progress: {
+			saveSuccessful: 'Progess was successfully saved'
 		},
 		exercises: {
 			exercises: 'Exercises',
@@ -51,9 +55,13 @@ export default {
 		create: 'Креирај',
 		save: 'Зачувај',
 		cancel: 'Откажи',
+		date: 'Датум',
 		index: {
 			menu: 'Мени',
 			refresh: 'Освежи'
+		},
+		progress: {
+			saveSuccessful: 'Прогресот беше успешно зачуван'
 		},
 		exercises: {
 			exercises: 'Вежби',

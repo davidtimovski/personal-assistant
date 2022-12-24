@@ -99,57 +99,6 @@
 		}
 	}
 
-	//.category-wrap {
-	// 	display: flex;
-	// }
-
-	// .subcategory-wrap {
-	// 	display: flex;
-	// 	padding-left: 30px;
-	// }
-
-	// .category {
-	// 	display: flex;
-	// 	justify-content: space-between;
-	// 	width: 100%;
-	// 	background: #f4f1f8;
-	// 	border-radius: var(--border-radius);
-	// 	margin-bottom: 10px;
-	// 	padding: 9px 15px;
-	// 	color: var(--regular-color);
-	// 	line-height: 27px;
-	// 	text-decoration: none;
-	// 	user-select: none;
-
-	// 	&:hover {
-	// 		color: var(--primary-color-dark);
-	// 	}
-
-	// 	.name {
-	// 		padding-right: 15px;
-	// 	}
-
-	// 	&:last-child {
-	// 		margin-bottom: 0;
-	// 	}
-	// }
-
-	// .category-indicator {
-	// 	margin-left: 15px;
-	// 	font-size: 1.2rem;
-	// 	color: var(--faded-color);
-	// }
-
-	// .sync {
-	// 	line-height: 45px;
-	// 	font-size: 1.2rem;
-	// 	color: var(--faded-color);
-
-	// 	i {
-	// 		margin-left: 15px;
-	// 	}
-	// }
-
 	@media (prefers-color-scheme: light) {
 		.exercise {
 			background: #eee;

@@ -12,9 +12,7 @@
 
 	import { t } from '$lib/localization/i18n';
 	import { isOffline, user } from '$lib/stores';
-	//import { ForecastsService } from '$lib/services/progressService';
 	import type { TrainerUser } from '$lib/models/trainerUser';
-	import Variables from '$lib/variables';
 
 	let usersService: UsersServiceBase;
 	//let forecastsService: ForecastsService;
@@ -28,14 +26,12 @@
 		usersService.get<TrainerUser>().then((currentUser) => {
 			user.set(currentUser);
 			usersService.cache(currentUser);
-
-			//forecastsService.get(currentUser.culture);
 		});
 	}
 
 	onMount(async () => {
 		const authService = new AuthService();
-		await authService.initialize(Variables.urls.gateway);
+		await authService.initialize();
 
 		if (await authService.authenticated()) {
 			await authService.setToken();
@@ -45,7 +41,6 @@
 		}
 
 		usersService = new UsersServiceBase('Trainer');
-		//forecastsService = new ForecastsService();
 		loadUser();
 
 		isOffline.set(!navigator.onLine);
@@ -59,7 +54,6 @@
 
 	onDestroy(() => {
 		usersService?.release();
-		//forecastsService?.release();
 	});
 </script>
 

@@ -37,12 +37,30 @@ type CreateAmountX2Exercise =
       amount2Unit: string }
 
 [<CLIMutable>]
-type AmountSeries =
-    { serie: int
+type AmountSet =
+    { set: int
       amount: int }
 
 [<CLIMutable>]
-type CreateProgressEntry =
+type CreateProgressAmount =
     { exerciseId: int
       date: DateOnly
-      series: seq<AmountSeries> }
+      sets: seq<AmountSet> }
+
+[<CLIMutable>]
+type EditProgressAmount =
+    { exerciseId: int
+      date: DateOnly
+      sets: seq<AmountSet> }
+
+[<CLIMutable>]
+type AmountX2Set =
+    { set: int
+      amount1: int
+      amount2: int }
+
+[<CLIMutable>]
+type EditProgressAmountX2 =
+    { exerciseId: int
+      date: DateOnly
+      sets: seq<AmountX2Set> }

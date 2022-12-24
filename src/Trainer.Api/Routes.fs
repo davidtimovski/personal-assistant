@@ -15,7 +15,9 @@ let webApp: HttpHandler =
               >=> authorize
               >=> choose
                       [ route "/exercises" >=> ExerciseHandlers.getAll
-                        routef "/exercises/%i" ExerciseHandlers.get ]
+                        routef "/exercises/%i" ExerciseHandlers.get
+
+                        routef "/progress/%i/%s" ProgressHandlers.get ]
               POST
               >=> authorize
               >=> choose

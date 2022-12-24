@@ -10,14 +10,14 @@ open System
 let exercises: Object array = [|
     {
         id = 1
-        name = "running"
-        sets = 1
+        name = "Running"
+        sets = 2
         amountUnit = "meters"
         ofType = ExerciseType.Amount
     }
     {
         id = 2
-        name = "lifting weights"
+        name = "Lifting weights"
         sets = 1
         amount1Unit = "meters"
         amount2Unit = "haha"

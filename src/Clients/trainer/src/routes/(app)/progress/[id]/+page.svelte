@@ -1,36 +1,37 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte/internal';
-	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 	import { page } from '$app/stores';
 
-	import { DateHelper } from '../../../../../../shared2/utils/dateHelper';
-	import { ValidationResult, ValidationUtil } from '../../../../../../shared2/utils/validationUtils';
-	import AlertBlock from '../../../../../../shared2/components/AlertBlock.svelte';
-
 	import { t } from '$lib/localization/i18n';
-	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
-	import { alertState } from '$lib/stores';
+	import { ExercisesService } from '$lib/services/exercisesService';
+	import { ProgressService } from '$lib/services/progressService';
+	import { ExerciseType, type Exercise } from '$lib/models/exercise';
+	import type { EditProgress } from '$lib/models/editProgress';
 
 	import EditProgressAmountForm from '$lib/components/EditProgressAmountForm.svelte';
 
 	export let data: PageData;
 
-	const isNew = data.id === 0;
+	let exercisesService: ExercisesService;
+	let progressService: ProgressService;
 
-	const exercise = {
-		id: 0,
-		name: 'Running',
-		sets: 2,
-		type: 'amount',
-		amountUnit: 'meters'
-	};
+	let exercise: Exercise | null = null;
+	let progress: EditProgress | null = null;
 
-	onMount(() => {
-		exercise.id = parseInt(<string>$page.url.searchParams.get('exerciseId'), 10);
+	onMount(async () => {
+		const exerciseId = parseInt(<string>$page.url.searchParams.get('exerciseId'), 10);
+
+		exercisesService = new ExercisesService();
+		progressService = new ProgressService();
+
+		exercise = await exercisesService.get(exerciseId);
+		progress = await progressService.get(exerciseId, data.date);
 	});
 
-	onDestroy(() => {});
+	onDestroy(() => {
+		exercisesService?.release();
+	});
 </script>
 
 <section class="container">
@@ -47,13 +48,13 @@
 	</div>
 
 	<div class="content-wrap">
-		{#if exercise.type === 'amount'}
-			<EditProgressAmountForm
-				id={data.id}
-				exerciseId={exercise.id}
-				sets={exercise.sets}
-				amountUnit={exercise.amountUnit}
-			/>
+		{#if !exercise || !progress}
+			<div class="double-circle-loading">
+				<div class="double-bounce1" />
+				<div class="double-bounce2" />
+			</div>
+		{:else if exercise.ofType === ExerciseType.Amount}
+			<EditProgressAmountForm {exercise} {progress} />
 		{/if}
 	</div>
 </section>

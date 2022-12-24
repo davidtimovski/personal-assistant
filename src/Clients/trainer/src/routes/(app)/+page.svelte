@@ -1,17 +1,18 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte/internal';
+	import type { Unsubscriber } from 'svelte/store';
 	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
 
-	import { t } from '$lib/localization/i18n';
-	import { isOffline, user } from '$lib/stores';
+	import { DateHelper } from '../../../../shared2/utils/dateHelper';
 
-	const exercises = [
-		{
-			id: 1,
-			name: 'Running'
-		}
-	];
+	import { t } from '$lib/localization/i18n';
+	import { isOffline, user, authInfo } from '$lib/stores';
+	import { ExercisesService } from '$lib/services/exercisesService';
+	import type { Exercise } from '$lib/models/exercise';
+
+	let exercises: Exercise[] | null = null;
+	const date = DateHelper.format(new Date());
 
 	// Progress bar
 	let progressBarActive = false;
@@ -21,6 +22,10 @@
 	});
 	let progressIntervalId: number | undefined;
 	let progressBarVisible = false;
+
+	let exercisesService: ExercisesService;
+
+	const unsubscriptions: Unsubscriber[] = [];
 
 	function sync() {
 		startProgressBar();
@@ -54,12 +59,25 @@
 	}
 
 	onMount(() => {
-		// if ($forecast === null) {
-		// 	startProgressBar();
-		// }
+		exercisesService = new ExercisesService();
+
+		unsubscriptions.push(
+			authInfo.subscribe(async (x) => {
+				if (!x) {
+					return;
+				}
+
+				exercises = await exercisesService.getAll();
+			})
+		);
 	});
 
-	onDestroy(() => {});
+	onDestroy(() => {
+		for (const unsubscribe of unsubscriptions) {
+			unsubscribe();
+		}
+		exercisesService?.release();
+	});
 </script>
 
 <section class="container">
@@ -86,10 +104,19 @@
 	</div>
 
 	<div class="content-wrap">
-		{#each exercises as exercise}
-			<a href="/progress/0?exerciseId={exercise.id}">{exercise.name}</a>
-			<br />
-		{/each}
+		{#if !exercises}
+			<div class="double-circle-loading">
+				<div class="double-bounce1" />
+				<div class="double-bounce2" />
+			</div>
+		{:else if exercises.length > 0}
+			{#each exercises as exercise}
+				<a href="/progress/{date}?exerciseId={exercise.id}">{exercise.name}</a>
+				<br />
+			{/each}
+		{:else}
+			<div>Create some exercises</div>
+		{/if}
 	</div>
 </section>
 
