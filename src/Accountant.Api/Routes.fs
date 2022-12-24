@@ -1,11 +1,8 @@
 ﻿module Routes
 
 open Giraffe
-open Microsoft.AspNetCore.Authentication.JwtBearer
 open Microsoft.AspNetCore.Http
-
-let authorize: HttpHandler =
-    requiresAuthentication (challenge JwtBearerDefaults.AuthenticationScheme)
+open CommonHandlers
 
 let webApp: HttpHandler =
     subRoute

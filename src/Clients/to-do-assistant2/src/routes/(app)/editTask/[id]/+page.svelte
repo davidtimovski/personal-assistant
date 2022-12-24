@@ -13,6 +13,7 @@
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 	import { TasksService } from '$lib/services/tasksService';
 	import { ListsService } from '$lib/services/listsService';
+	import type { List } from '$lib/models/entities';
 	import type { Assignee } from '$lib/models/viewmodels/assignee';
 	import type { ListOption } from '$lib/models/viewmodels/listOption';
 	import type { EditTaskModel } from '$lib/models/viewmodels/editTaskModel';
@@ -41,6 +42,7 @@
 	let deleteButtonIsLoading = false;
 	let taskUsedAsIngredientText: string;
 	let deletingWillUnlinkText: string;
+	let loading = true;
 
 	const alertStateUnsub = alertState.subscribe((value) => {
 		if (value.hidden) {
@@ -129,7 +131,7 @@
 			deleteButtonIsLoading = true;
 
 			await tasksService.delete(data.id);
-			tasksService.deleteLocal(data.id, listId, $state.lists);
+			tasksService.deleteLocal(data.id, listId, <List[]>$state.lists);
 
 			alertState.update((x) => {
 				x.showSuccess('editTask.deleteSuccessful');
@@ -162,7 +164,7 @@
 		tasksService = new TasksService();
 		listsService = new ListsService();
 
-		tasksService.getForUpdate(data.id).then((task: EditTaskModel) => {
+		const tasksPromise = tasksService.getForUpdate(data.id).then((task: EditTaskModel) => {
 			if (task === null) {
 				throw new Error('Task not found');
 			}
@@ -188,9 +190,12 @@
 			}
 		});
 
-		listsService.getAllAsOptions().then((options) => {
+		const listOptionsPromise = listsService.getAllAsOptions().then((options) => {
 			listOptions = options;
 		});
+
+		await Promise.all([tasksPromise, listOptionsPromise]);
+		loading = false;
 	});
 
 	onDestroy(() => {
@@ -215,150 +220,157 @@
 	</div>
 
 	<div class="content-wrap">
-		<form on:submit|preventDefault={save}>
-			<div class="form-control">
-				<input
-					type="text"
-					bind:value={name}
-					maxlength="50"
-					class:invalid={nameIsInvalid}
-					placeholder={$t('name')}
-					aria-label={$t('name')}
-					required
-				/>
+		{#if loading}
+			<div class="double-circle-loading">
+				<div class="double-bounce1" />
+				<div class="double-bounce2" />
 			</div>
+		{:else}
+			<form on:submit|preventDefault={save}>
+				<div class="form-control">
+					<input
+						type="text"
+						bind:value={name}
+						maxlength="50"
+						class:invalid={nameIsInvalid}
+						placeholder={$t('name')}
+						aria-label={$t('name')}
+						required
+					/>
+				</div>
 
-			<div class="form-control url">
-				<input
-					type="url"
-					bind:value={url}
-					maxlength="1000"
-					class:invalid={urlIsInvalid}
-					placeholder={$t('editTask.url')}
-					aria-label={$t('editTask.url')}
-				/>
-				{#if url}
+				<div class="form-control url">
+					<input
+						type="url"
+						bind:value={url}
+						maxlength="1000"
+						class:invalid={urlIsInvalid}
+						placeholder={$t('editTask.url')}
+						aria-label={$t('editTask.url')}
+					/>
+					{#if url}
+						<button
+							type="button"
+							on:click={clearUrl}
+							class="clear-url-button"
+							title={$t('clear')}
+							aria-label={$t('clear')}
+						>
+							<i class="fas fa-times" />
+						</button>
+					{/if}
+				</div>
+
+				<div class="form-control">
+					<select
+						id="from-account"
+						bind:value={listId}
+						on:change={loadAssigneeOptions}
+						disabled={!listOptions}
+						aria-label={$t('editTask.list')}
+					>
+						{#if listOptions}
+							{#each listOptions as list}
+								<option value={list.id}>{list.name}</option>
+							{/each}
+						{/if}
+					</select>
+				</div>
+
+				<div class="form-control">
+					<Checkbox labelKey="editTask.deleteWhenDone" bind:value={isOneTime} />
+				</div>
+
+				<div class="form-control">
+					<Checkbox labelKey="editTask.highPriority" bind:value={isHighPriority} />
+				</div>
+
+				{#if isInSharedList}
+					<div class="form-control">
+						<Checkbox labelKey="editTask.taskIsPrivate" bind:value={isPrivate} />
+
+						<Tooltip key="privateTasks" application="To Do Assistant" />
+					</div>
+
+					{#if !isPrivate && assigneeOptions}
+						<div class="assign-to-user">
+							<div class="assign-to-user-header">{assignToUserLabel()}</div>
+							<div class="assign-to-user-content">
+								<label class="radio" class:selected={!assignedToUserId}>
+									<img src={nobodyImageUri} class="assign-to-user-image" alt="" />
+									<div class="assign-to-user-item">
+										<span>{$t('editTask.nobody')}</span>
+										<input type="radio" name="assign" bind:group={assignedToUserId} value={null} />
+									</div>
+								</label>
+
+								{#each assigneeOptions as assigneeOption}
+									<label class="radio" class:selected={assignedToUserId === assigneeOption.id}>
+										<img
+											src={assigneeOption.imageUri}
+											class="assign-to-user-image"
+											title={assigneeOption.name}
+											alt={$t('profilePicture', { name: assigneeOption.name })}
+										/>
+										<div class="assign-to-user-item">
+											<span>{assigneeOption.name} <i class="fas fa-check" /></span>
+											<input type="radio" name="assign" bind:group={assignedToUserId} value={assigneeOption.id} />
+										</div>
+									</label>
+								{/each}
+							</div>
+						</div>
+					{/if}
+				{/if}
+			</form>
+
+			<hr />
+
+			{#if deleteInProgress && recipes.length > 0}
+				<div class="delete-confirmation-alert">
+					<span contenteditable="false" bind:innerHTML={taskUsedAsIngredientText} />
+					<br />
+					<span contenteditable="false" bind:innerHTML={recipesText} />.
+					<br />
+					<span contenteditable="false" bind:innerHTML={deletingWillUnlinkText} />
+				</div>
+			{/if}
+
+			<div class="save-delete-wrap">
+				{#if !deleteInProgress}
 					<button
 						type="button"
-						on:click={clearUrl}
-						class="clear-url-button"
-						title={$t('clear')}
-						aria-label={$t('clear')}
+						on:click={save}
+						class="button primary-button"
+						disabled={!canSave() || saveButtonIsLoading}
 					>
-						<i class="fas fa-times" />
+						<span class="button-loader" class:loading={saveButtonIsLoading}>
+							<i class="fas fa-circle-notch fa-spin" />
+						</span>
+						<span>{$t('save')}</span>
+					</button>
+				{/if}
+
+				<button
+					type="button"
+					on:click={deleteTask}
+					class="button danger-button"
+					disabled={deleteButtonIsLoading}
+					class:confirm={deleteInProgress}
+				>
+					<span class="button-loader" class:loading={deleteButtonIsLoading}>
+						<i class="fas fa-circle-notch fa-spin" />
+					</span>
+					<span>{deleteButtonText}</span>
+				</button>
+
+				{#if deleteInProgress}
+					<button type="button" on:click={cancel} class="button secondary-button">
+						{$t('cancel')}
 					</button>
 				{/if}
 			</div>
-
-			<div class="form-control">
-				<select
-					id="from-account"
-					bind:value={listId}
-					on:change={loadAssigneeOptions}
-					disabled={!listOptions}
-					aria-label={$t('editTask.list')}
-				>
-					{#if listOptions}
-						{#each listOptions as list}
-							<option value={list.id}>{list.name}</option>
-						{/each}
-					{/if}
-				</select>
-			</div>
-
-			<div class="form-control">
-				<Checkbox labelKey="editTask.deleteWhenDone" bind:value={isOneTime} />
-			</div>
-
-			<div class="form-control">
-				<Checkbox labelKey="editTask.highPriority" bind:value={isHighPriority} />
-			</div>
-
-			{#if isInSharedList}
-				<div class="form-control">
-					<Checkbox labelKey="editTask.taskIsPrivate" bind:value={isPrivate} />
-
-					<Tooltip key="privateTasks" application="To Do Assistant" />
-				</div>
-
-				{#if !isPrivate && assigneeOptions}
-					<div class="assign-to-user">
-						<div class="assign-to-user-header">{assignToUserLabel()}</div>
-						<div class="assign-to-user-content">
-							<label class="radio" class:selected={!assignedToUserId}>
-								<img src={nobodyImageUri} class="assign-to-user-image" alt="" />
-								<div class="assign-to-user-item">
-									<span>{$t('editTask.nobody')}</span>
-									<input type="radio" name="assign" bind:group={assignedToUserId} value={null} />
-								</div>
-							</label>
-
-							{#each assigneeOptions as assigneeOption}
-								<label class="radio" class:selected={assignedToUserId === assigneeOption.id}>
-									<img
-										src={assigneeOption.imageUri}
-										class="assign-to-user-image"
-										title={assigneeOption.name}
-										alt={$t('profilePicture', { name: assigneeOption.name })}
-									/>
-									<div class="assign-to-user-item">
-										<span>{assigneeOption.name} <i class="fas fa-check" /></span>
-										<input type="radio" name="assign" bind:group={assignedToUserId} value={assigneeOption.id} />
-									</div>
-								</label>
-							{/each}
-						</div>
-					</div>
-				{/if}
-			{/if}
-		</form>
-
-		<hr />
-
-		{#if deleteInProgress && recipes.length > 0}
-			<div class="delete-confirmation-alert">
-				<span contenteditable="true" bind:innerHTML={taskUsedAsIngredientText} />
-				<br />
-				<span contenteditable="true" bind:innerHTML={recipesText} />.
-				<br />
-				<span contenteditable="true" bind:innerHTML={deletingWillUnlinkText} />
-			</div>
 		{/if}
-
-		<div class="save-delete-wrap">
-			{#if !deleteInProgress}
-				<button
-					type="button"
-					on:click={save}
-					class="button primary-button"
-					disabled={!canSave() || saveButtonIsLoading}
-				>
-					<span class="button-loader" class:loading={saveButtonIsLoading}>
-						<i class="fas fa-circle-notch fa-spin" />
-					</span>
-					<span>{$t('save')}</span>
-				</button>
-			{/if}
-
-			<button
-				type="button"
-				on:click={deleteTask}
-				class="button danger-button"
-				disabled={deleteButtonIsLoading}
-				class:confirm={deleteInProgress}
-			>
-				<span class="button-loader" class:loading={deleteButtonIsLoading}>
-					<i class="fas fa-circle-notch fa-spin" />
-				</span>
-				<span>{deleteButtonText}</span>
-			</button>
-
-			{#if deleteInProgress}
-				<button type="button" on:click={cancel} class="button secondary-button">
-					{$t('cancel')}
-				</button>
-			{/if}
-		</div>
 	</div>
 </section>
 

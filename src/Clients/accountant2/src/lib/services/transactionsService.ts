@@ -4,6 +4,7 @@ import { ErrorLogger } from '../../../../shared2/services/errorLogger';
 import { DateHelper } from '../../../../shared2/utils/dateHelper';
 
 import { TransactionsIDBHelper } from '$lib/utils/transactionsIDBHelper';
+import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 import { TransactionModel } from '$lib/models/entities/transaction';
 import { TransactionType } from '$lib/models/viewmodels/transactionType';
 import { CategoriesService } from '$lib/services/categoriesService';
@@ -15,6 +16,7 @@ import Variables from '$lib/variables';
 export class TransactionsService {
 	private readonly httpProxy = new HttpProxy();
 	private readonly idbHelper = new TransactionsIDBHelper();
+	private readonly localStorage = new LocalStorageUtil();
 	private readonly categoriesService = new CategoriesService();
 	private readonly currenciesService = new CurrenciesService('Accountant');
 	private readonly encryptionService = new EncryptionService();
@@ -320,6 +322,8 @@ export class TransactionsService {
 		}
 
 		await this.idbHelper.create(transaction);
+
+		this.localStorage.setLastSyncedNow();
 	}
 
 	async update(transaction: TransactionModel, password: string | null): Promise<void> {
@@ -375,6 +379,8 @@ export class TransactionsService {
 			}
 
 			await this.idbHelper.update(transaction);
+
+			this.localStorage.setLastSyncedNow();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -392,6 +398,8 @@ export class TransactionsService {
 			}
 
 			await this.idbHelper.delete(id);
+
+			this.localStorage.setLastSyncedNow();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -437,7 +445,7 @@ export class TransactionsService {
 		}
 	}
 
-	async export(fileId: string): Promise<Blob> {
+	export(fileId: string): Promise<Blob> {
 		return this.httpProxy.ajaxBlob(`${Variables.urls.api}/transactions/export`, {
 			method: 'post',
 			body: window.JSON.stringify({

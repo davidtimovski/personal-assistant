@@ -1,27 +1,21 @@
 import { HttpProxy } from '../../../../shared2/services/httpProxy';
-import { CurrenciesService } from '../../../../shared2/services/currenciesService';
 import { ErrorLogger } from '../../../../shared2/services/errorLogger';
 import { DateHelper } from '../../../../shared2/utils/dateHelper';
 
 import { AutomaticTransactionsIDBHelper } from '$lib/utils/automaticTransactionsIDBHelper';
+import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 import type { AutomaticTransaction } from '$lib/models/entities/automaticTransaction';
 import Variables from '$lib/variables';
 
 export class AutomaticTransactionsService {
 	private readonly httpProxy = new HttpProxy();
 	private readonly idbHelper = new AutomaticTransactionsIDBHelper();
-	private readonly currenciesService = new CurrenciesService('Accountant');
+	private readonly localStorage = new LocalStorageUtil();
 	private readonly logger = new ErrorLogger('Accountant');
 
-	async getAll(currency: string): Promise<Array<AutomaticTransaction>> {
+	async getAll(): Promise<Array<AutomaticTransaction>> {
 		try {
-			const automaticTransactions = await this.idbHelper.getAll();
-
-			automaticTransactions.forEach((x: AutomaticTransaction) => {
-				x.amount = this.currenciesService.convert(x.amount, x.currency, currency);
-			});
-
-			return automaticTransactions;
+			return await this.idbHelper.getAll();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -54,6 +48,8 @@ export class AutomaticTransactionsService {
 
 			await this.idbHelper.create(automaticTransaction);
 
+			this.localStorage.setLastSyncedNow();
+
 			return automaticTransaction.id;
 		} catch (e) {
 			this.logger.logError(e);
@@ -83,6 +79,8 @@ export class AutomaticTransactionsService {
 			}
 
 			await this.idbHelper.update(automaticTransaction);
+
+			this.localStorage.setLastSyncedNow();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -100,6 +98,8 @@ export class AutomaticTransactionsService {
 			}
 
 			await this.idbHelper.delete(id);
+
+			this.localStorage.setLastSyncedNow();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -108,7 +108,6 @@ export class AutomaticTransactionsService {
 
 	release() {
 		this.httpProxy.release();
-		this.currenciesService.release();
 		this.logger.release();
 	}
 }

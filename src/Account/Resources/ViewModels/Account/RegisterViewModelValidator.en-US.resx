@@ -138,11 +138,11 @@
   <data name="PasswordIsRequired" xml:space="preserve">
     <value>Password is required</value>
   </data>
-  <data name="PasswordMinLength" xml:space="preserve">
-    <value>The Password must be at least {0} characters long</value>
-  </data>
   <data name="PasswordsMustMatch" xml:space="preserve">
     <value>Passwords must match</value>
+  </data>
+  <data name="UserAlreadyExists" xml:space="preserve">
+    <value>A user with that email address already exists</value>
   </data>
   <data name="YouDontSeemToBeHuman" xml:space="preserve">
     <value>You don't seem to be human</value>

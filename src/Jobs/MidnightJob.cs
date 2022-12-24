@@ -67,7 +67,6 @@ public class MidnightJob
         catch (Exception ex)
         {
             _logger.LogError(ex, $"{nameof(DeleteOldNotificationsAsync)} failed");
-            throw;
         }
     }
 
@@ -81,7 +80,6 @@ public class MidnightJob
         catch (Exception ex)
         {
             _logger.LogError(ex, $"{nameof(DeleteOldDeletedEntityEntriesAsync)} failed");
-            throw;
         }
     }
 
@@ -161,7 +159,6 @@ public class MidnightJob
         catch (Exception ex)
         {
             _logger.LogError(ex, $"{nameof(GenerateTransactions)} failed");
-            throw;
         }
     }
 
@@ -177,13 +174,21 @@ public class MidnightJob
                 return expenses.First().Currency;
             }
 
-            var currency = expenses
-                .GroupBy(x => x.Currency)
-                .Where(g => g.Count() > 1)
-                .OrderByDescending(g => g.Count())
-                .Select(g => g.Key).First();
+            var groupedByCurrency = expenses.GroupBy(x => x.Currency);
+            var biggestCurrencyGroup = groupedByCurrency.OrderByDescending(g => g.Count()).First();
 
-            return currency;
+            var groupsWithMaxExpenses = groupedByCurrency.Where(g => g.Count() == biggestCurrencyGroup.Count());
+
+            // There are multiple biggest groups
+            if (groupsWithMaxExpenses.Count() > 1)
+            {
+                // Use currency from last expense that belongs to biggest groups
+                var expensesFromBiggestGroups = groupsWithMaxExpenses.SelectMany(x => x.ToList());
+                return expensesFromBiggestGroups.OrderByDescending(x => x.Date).First().Currency;
+            }
+
+            // Use currency from biggest group
+            return biggestCurrencyGroup.First().Currency;
         }
 
         bool ShouldGenerate(IReadOnlyCollection<Transaction> expenses)
@@ -280,7 +285,6 @@ public class MidnightJob
         catch (Exception ex)
         {
             _logger.LogError(ex, $"{nameof(GenerateUpcomingExpenses)} failed");
-            throw;
         }
     }
 
@@ -315,7 +319,6 @@ public class MidnightJob
         catch (Exception ex)
         {
             _logger.LogError(ex, $"{nameof(GetAndSaveCurrencyRates)} failed");
-            throw;
         }
     }
 
@@ -329,7 +332,6 @@ public class MidnightJob
         catch (Exception ex)
         {
             _logger.LogError(ex, $"{nameof(DeleteTemporaryCdnResourcesAsync)} failed");
-            throw;
         }
     }
 }

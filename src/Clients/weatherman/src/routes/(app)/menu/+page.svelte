@@ -23,7 +23,7 @@
 		localStorage.clear();
 
 		const authService = new AuthService();
-		await authService.initialize(Variables.urls.gateway);
+		await authService.initialize();
 		await authService.logout();
 	}
 

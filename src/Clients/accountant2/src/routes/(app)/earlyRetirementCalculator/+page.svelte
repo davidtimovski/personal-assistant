@@ -695,12 +695,12 @@
 				<ul>
 					{#each summaryItems as summaryItem}
 						<li>
-							<span contenteditable="true" bind:innerHTML={summaryItem.contentHtml} />
+							<span contenteditable="false" bind:innerHTML={summaryItem.contentHtml} />
 
 							{#if summaryItem.children.length > 0}
 								<ul>
 									{#each summaryItem.children as childItem}
-										<li contenteditable="true" bind:innerHTML={childItem.contentHtml} />
+										<li contenteditable="false" bind:innerHTML={childItem.contentHtml} />
 									{/each}
 								</ul>
 							{/if}
@@ -724,7 +724,7 @@
 
 			<div class="result-message">
 				{#if earlyRetirementAge < 85}
-					<span contenteditable="true" bind:innerHTML={consideringTheAnswersMessage} />
+					<span contenteditable="false" bind:innerHTML={consideringTheAnswersMessage} />
 				{:else}
 					<span>{$t('earlyRetirementCalculator.notLikelyToRetire')}</span>
 				{/if}

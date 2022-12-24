@@ -6,6 +6,7 @@ export default {
 		currencyConversionError: 'An unexpected error occurred whilst converting currencies',
 		refresh: 'Refresh',
 		failedToFetchError: 'Please check your internet connection.',
+		syncSuccessful: 'Sync successful.<br>Retrieved {{retrieved}} and pushed {{pushed}} changes.',
 		name: 'Name',
 		save: 'Save',
 		edit: 'Edit',
@@ -87,7 +88,6 @@ export default {
 			considerUsingYesterday: "It's currently {{time}} past midnight. Consider using yesterday's date.",
 			encryptDescription: 'Encrypt description',
 			submit: 'Submit',
-
 			debtSettlingSuccessful: 'Debt was successfully settled',
 			expenseSubmitted: 'Expense was successfully submitted',
 			depositSubmitted: 'Deposit was successfully submitted'
@@ -424,6 +424,8 @@ export default {
 		currencyConversionError: 'Се случи неочекувана грешка при конверзијата на валути',
 		refresh: 'Освежи',
 		failedToFetchError: 'Вѐ молиме да ја проверите вашата интернет конекција.',
+		syncSuccessful:
+			'Синхронизацијата беше успешна.<br>Повелечени беа {{retrieved}} а испратени беа {{pushed}} промени.',
 		name: 'Име',
 		save: 'Зачувај',
 		edit: 'Промени',

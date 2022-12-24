@@ -1,10 +1,11 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using Infrastructure.Identity.Auth0ApiModels;
 
 namespace Infrastructure.Identity;
 
-public static class Auth0ManagementUtil
+public static class Auth0Proxy
 {
     private static string Domain;
     private static string AccessToken;
@@ -45,6 +46,46 @@ public static class Auth0ManagementUtil
         response.EnsureSuccessStatusCode();
 
         return JsonSerializer.Deserialize<Auth0User>(await response.Content.ReadAsStringAsync());
+    }
+
+    public static async Task<string> RegisterUserAsync(HttpClient httpClient, string email, string password, string name)
+    {
+        using var requestMessage = new HttpRequestMessage(HttpMethod.Post, new Uri($"https://{Domain}/api/v2/users"));
+        requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
+
+        var createModel = new CreateUserPayload(
+                email.Trim(),
+                false,
+                password,
+                name.Trim()
+            );
+        requestMessage.Content = new StringContent(JsonSerializer.Serialize(createModel), Encoding.UTF8, "application/json");
+
+        var response = await httpClient.SendAsync(requestMessage);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            if (content.Contains("PasswordStrengthError"))
+            {
+                throw new PasswordTooWeakException();
+            }
+
+            throw new Auth0Exception(content);
+        }
+
+        var result = JsonSerializer.Deserialize<CreateUserResult>(await response.Content.ReadAsStringAsync());
+
+        return result.user_id;
+    }
+
+    public static async Task DeleteUserAsync(HttpClient httpClient, string auth0Id)
+    {
+        using var requestMessage = new HttpRequestMessage(HttpMethod.Delete, new Uri($"https://{Domain}/api/v2/users/{auth0Id}"));
+        requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
+
+        var response = await httpClient.SendAsync(requestMessage);
+        response.EnsureSuccessStatusCode();
     }
 
     public static async Task UpdateNameAsync(HttpClient httpClient, string auth0Id, string name)
@@ -90,18 +131,4 @@ public struct Auth0ManagementUtilConfig
     public string Domain { get; }
     public string ClientId { get; }
     public string ClientSecret { get; }
-}
-
-public class Auth0User
-{
-    public string email { get; set; }
-    public string name { get; set; }
-}
-
-internal class TokenResult
-{
-    public string access_token { get; set; }
-    public int expires_in { get; set; }
-    public string scope { get; set; }
-    public string token_type { get; set; }
 }

@@ -19,13 +19,13 @@ export class UsersServiceBase {
         `${Variables.urls.gateway}/core/api/users?application=${this.application}`
       );
 
-      // 40x40 thumbnail
+      // 80x80 thumbnail
       const uriEnvironment = user.imageUri.includes("production")
         ? "production"
         : "development";
       user.imageUri = user.imageUri.replace(
         uriEnvironment,
-        `w_40,h_40,c_limit/${uriEnvironment}`
+        `w_80,h_80,c_limit/${uriEnvironment}`
       );
 
       return user;

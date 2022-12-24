@@ -39,7 +39,7 @@
 
 		unsubscriptions.push(
 			state.subscribe((s) => {
-				if (s.lists.length === 0) {
+				if (s.lists === null) {
 					return;
 				}
 

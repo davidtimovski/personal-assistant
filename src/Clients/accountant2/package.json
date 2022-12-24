@@ -1,6 +1,6 @@
 {
 	"name": "accountant2",
-	"version": "2.2.11",
+	"version": "2.2.14",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/davidtimovski/personal-assistant"
@@ -18,7 +18,7 @@
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^1.0.0-next.90",
 		"@sveltejs/adapter-static": "^1.0.0-next.49",
-		"@sveltejs/kit": "^1.0.0-next.581",
+		"@sveltejs/kit": "^1.0.0-next.587",
 		"@types/cookie": "^0.5.1",
 		"@typescript-eslint/eslint-plugin": "^5.45.0",
 		"@typescript-eslint/parser": "^5.45.0",

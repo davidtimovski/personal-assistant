@@ -5,14 +5,7 @@
     ViewData["Description"] = Localizer["CreateANewAccount"];
 }
 
-<div class="message info">@Localizer["Unavailable"]</div>
-
-<footer>
-    <a href="/" class="button">@Localizer["Back"]</a>
-    <span></span>
-</footer>
-
-@*<form asp-controller="account" asp-action="register" method="post" role="form">
+<form asp-controller="account" asp-action="register" method="post" role="form">
     <h1>@Localizer["CreateANewAccount"]</h1>
 
     <div asp-validation-summary="All" class="text-danger"></div>
@@ -27,9 +20,11 @@
     <div class="form-group">
         <input type="text" asp-for="Name" maxlength="30" placeholder="@Localizer["Name"]" aria-label="@Localizer["Name"]" required />
     </div>
+
     <div class="form-group">
         <input type="email" asp-for="Email" maxlength="254" placeholder="@Localizer["Email"]" aria-label="@Localizer["Email"]" required />
     </div>
+
     <div class="form-group">
         <select asp-for="Language" aria-label="@Localizer["Language"]" required>
             <option value="">@Localizer["PleaseSelectLanguage"]</option>
@@ -37,10 +32,21 @@
             <option value="mk-MK">Македонски</option>
         </select>
     </div>
+
+    <div class="form-group">
+        <select asp-for="Culture" title="@Localizer["Culture"]" aria-label="@Localizer["Culture"]">
+            @foreach (var option in Model.CultureOptions)
+            {
+                <option value="@option.Value">@option.Label</option>
+            }
+        </select>
+    </div>
+
     <div class="form-group relative">
         <input type="password" asp-for="Password" class="password-input" maxlength="100" placeholder="@Localizer["Password"]" aria-label="@Localizer["Password"]" required />
         <button type="button" class="password-show-button" data-for="Password">@Localizer["Show"]</button>
     </div>
+
     <div class="form-group relative">
         <input type="password" asp-for="ConfirmPassword" class="password-input" maxlength="100" placeholder="@Localizer["ConfirmPassword"]" aria-label="@Localizer["ConfirmPassword"]" required />
         <button type="button" class="password-show-button" data-for="ConfirmPassword">@Localizer["Show"]</button>
@@ -88,4 +94,3 @@
         })();
     </script>
 </environment>
-*@

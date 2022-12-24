@@ -12,7 +12,7 @@
 	import { user, syncStatus } from '$lib/stores';
 	import { DebtsService } from '$lib/services/debtsService';
 	import { DebtItem } from '$lib/models/viewmodels/debtItem';
-	import { AppEvents } from '$lib/models/appEvents';
+	import { SyncEvents } from '$lib/models/syncStatus';
 
 	let debts: DebtItem[] | null = null;
 	let currency: string;
@@ -145,7 +145,7 @@
 				type="button"
 				on:click={() => goto('/editDebt/0')}
 				class="new-button"
-				disabled={$syncStatus === AppEvents.SyncStarted}
+				disabled={$syncStatus.status === SyncEvents.SyncStarted}
 				title={$t('debt.newDebt')}
 				aria-label={$t('debt.newDebt')}
 			>

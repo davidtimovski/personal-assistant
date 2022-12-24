@@ -15,7 +15,6 @@
 	import { ListsService } from '$lib/services/listsService';
 	import { SignalRClient } from '$lib/utils/signalRClient';
 	import type { ToDoAssistantUser } from '$lib/models/toDoAssistantUser';
-	import Variables from '$lib/variables';
 
 	let usersService: UsersService;
 	let listsService: ListsService;
@@ -24,9 +23,6 @@
 		if (!value) {
 			return;
 		}
-
-		listsService = new ListsService();
-		await listsService.getAll(true);
 
 		await new SignalRClient(listsService).initialize(value.token, value.profile.sub);
 	});
@@ -45,7 +41,7 @@
 
 	onMount(async () => {
 		const authService = new AuthService();
-		await authService.initialize(Variables.urls.gateway);
+		await authService.initialize();
 
 		if (await authService.authenticated()) {
 			await authService.setToken();
@@ -56,6 +52,9 @@
 
 		usersService = new UsersService();
 		loadUser();
+
+		listsService = new ListsService();
+		listsService.getAll(true);
 
 		isOffline.set(!navigator.onLine);
 		window.addEventListener('online', () => {

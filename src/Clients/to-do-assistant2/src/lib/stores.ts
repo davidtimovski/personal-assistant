@@ -16,4 +16,4 @@ export const user = writable<ToDoAssistantUser>(
 );
 export const remoteEvents = writable<RemoteEvent>(new RemoteEvent(RemoteEventType.None, null));
 export const alertState = writable<AlertState>(new AlertState(AlertStatus.Hidden, null, []));
-export const state = writable<State>(new State([], true));
+export const state = writable<State>(new State(null, true));

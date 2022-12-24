@@ -132,6 +132,9 @@
   <data name="MainAccountName" xml:space="preserve">
     <value>Main</value>
   </data>
+  <data name="PasswordTooWeak" xml:space="preserve">
+    <value>The password you provided is too weak</value>
+  </data>
   <data name="RegisterDuplicateUserName" xml:space="preserve">
     <value>An account with that email address already exists</value>
   </data>
