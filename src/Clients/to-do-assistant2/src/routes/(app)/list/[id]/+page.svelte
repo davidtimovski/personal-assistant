@@ -366,14 +366,14 @@
 		if (isArchived) {
 			await goto('/archivedLists');
 		} else {
-			await goto('/');
+			await goto('/lists');
 		}
 	}
 
 	async function restore() {
 		await listsService.setIsArchived(data.id, false);
 
-		goto('/?edited=' + data.id);
+		goto('/lists?edited=' + data.id);
 	}
 
 	async function uncompleteDuplicate() {
@@ -826,7 +826,7 @@
 		position: relative;
 
 		.new-task-input-wrap {
-			background-color: #f0f6ff;
+			background-color: var(--input-background);
 			border: 1px solid #ddd;
 			border-radius: 6px;
 			padding: 5px 12px;

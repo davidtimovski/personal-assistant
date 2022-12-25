@@ -233,7 +233,7 @@
 			});
 		}
 
-		await goto('/?edited=' + data.id);
+		await goto('/lists?edited=' + data.id);
 	}
 
 	function shareExistedPreviously(userId: number): boolean {

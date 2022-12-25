@@ -78,7 +78,7 @@
 					x.showSuccess('copyList.copySuccessful');
 					return x;
 				});
-				await goto('/?edited=' + newId);
+				await goto('/lists?edited=' + newId);
 			} catch (e) {
 				if (e instanceof ValidationErrors) {
 					nameIsInvalid = e.fields.includes('Name');

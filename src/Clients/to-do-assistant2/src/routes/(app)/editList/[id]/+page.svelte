@@ -101,7 +101,7 @@
 						);
 					}
 
-					const redirectRoute = isArchived ? '/archivedLists' : '/';
+					const redirectRoute = isArchived ? '/archivedLists' : '/lists';
 					await goto(redirectRoute + '?edited=' + data.id);
 				} catch (e) {
 					if (e instanceof ValidationErrors) {
@@ -114,7 +114,7 @@
 				try {
 					const newId = await listsService.create(name, icon, isOneTimeToggleDefault, tasksText);
 
-					await goto('/?edited=' + newId);
+					await goto('/lists?edited=' + newId);
 				} catch (e) {
 					if (e instanceof ValidationErrors) {
 						nameIsInvalid = e.fields.includes('Name');
@@ -140,7 +140,7 @@
 				x.showSuccess('editList.deleteSuccessful');
 				return x;
 			});
-			goto('/');
+			goto('/lists');
 		} else {
 			deleteButtonText = $t('sure');
 			confirmationInProgress = true;
@@ -157,7 +157,7 @@
 				x.showSuccess('editList.youHaveLeftTheList');
 				return x;
 			});
-			goto('/');
+			goto('/lists');
 		} else {
 			leaveButtonText = $t('sure');
 			confirmationInProgress = true;
@@ -167,7 +167,7 @@
 	async function cancel() {
 		if (!confirmationInProgress) {
 			if (isNew) {
-				await goto('/');
+				await goto('/lists');
 			} else {
 				await goto(`/list/${data.id}`);
 			}
@@ -179,7 +179,7 @@
 
 	function back() {
 		if (isNew) {
-			goto('/');
+			goto('/lists');
 		} else {
 			goto(`/list/${data.id}`);
 		}
@@ -248,7 +248,7 @@
 			</div>
 		{:else}
 			{#if sharingState === 4}
-				<AlertBlock type="warning" message={$t('editList.inOrderToChangeThisList')} />
+				<AlertBlock type="info" message={$t('editList.forAccessTo')} />
 			{/if}
 
 			<form on:submit|preventDefault={save}>

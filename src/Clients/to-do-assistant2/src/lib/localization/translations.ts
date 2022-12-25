@@ -61,7 +61,7 @@ export default {
 		editList: {
 			newList: 'New list',
 			edit: 'Edit',
-			inOrderToChangeThisList: 'In order to change this list you must be an owner or Administrator.',
+			forAccessTo: 'For access to other settings you need to be an owner or Administrator.',
 			icon: 'Icon',
 			addTasks: 'Add tasks?',
 			eachRow: 'Each row will be a new task',
@@ -279,7 +279,7 @@ export default {
 		editList: {
 			newList: 'Нова листа',
 			edit: 'Промени',
-			inOrderToChangeThisList: 'За да можете да ја промените оваа листа мора да сте сопственик или Администратор.',
+			forAccessTo: 'За пристап до други подесувања треба да сте сопственик или Администратор.',
 			icon: 'Иконка',
 			addTasks: 'Додади задачи?',
 			eachRow: 'Секој нов ред ќе биде нова задача',

@@ -2,11 +2,12 @@
 @import '../../shared2/styles/top-buttons-drawer.css';
 
 :root {
-	--regular-color: #30507d;
+	--regular-color: #50708d;
 	--primary-color: var(--to-do-assistant-color);
 	--primary-color-dark: #097cdc;
 	--primary-color-light: #eeeeff;
 	--faded-color: #98b0c5;
+	--input-background: #f7f7fb;
 }
 
 input[type='text'],
@@ -14,7 +15,7 @@ input[type='email'],
 input[type='url'],
 select,
 textarea {
-	background-color: #f0f6ff;
+	background-color: var(--input-background);
 }
 
 ::placeholder {
@@ -40,7 +41,7 @@ textarea {
 }
 
 .highlighted {
-	animation: highlight ease-in 2.5s;
+	animation: highlight ease-in 3.5s;
 }
 @keyframes highlight {
 	0% {

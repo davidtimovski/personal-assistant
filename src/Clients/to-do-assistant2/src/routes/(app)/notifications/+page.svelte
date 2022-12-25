@@ -164,14 +164,6 @@
 <style lang="scss">
 	.notifications-wrap.seen {
 		margin-top: 15px;
-
-		.notification:not(.highlighted) {
-			opacity: 0.6;
-		}
-
-		.notification:hover {
-			opacity: 1;
-		}
 	}
 
 	.notification {
