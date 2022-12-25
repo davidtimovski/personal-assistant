@@ -28,7 +28,7 @@
 				x.showSuccess('archiveList.archiveSuccessful');
 				return x;
 			});
-			goto('/');
+			goto('/lists');
 		} catch {
 			archiveButtonIsLoading = false;
 		}

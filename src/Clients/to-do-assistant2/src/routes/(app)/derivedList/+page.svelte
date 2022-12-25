@@ -128,7 +128,7 @@
 
 				const list = s.lists.find((x) => x.derivedListType === type);
 				if (!list) {
-					goto('/');
+					goto('/lists');
 				} else {
 					name = <string>derivedListNameLookup.get(type);
 					iconClass = ListsService.getDerivedListIconClass(type);
