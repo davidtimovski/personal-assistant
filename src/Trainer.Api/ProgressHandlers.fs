@@ -5,7 +5,7 @@ open Giraffe
 open Application.Contracts
 open Microsoft.AspNetCore.Http
 open Models
-open HandlerBase
+open CommonHandlers
 
 let progresses: EditProgressAmount array = [|
     {
@@ -29,6 +29,10 @@ let progresses: EditProgressAmount array = [|
             {
                 set = 1
                 amount = 10
+            }
+            {
+                set = 2
+                amount = 15
             }
         |]
     }

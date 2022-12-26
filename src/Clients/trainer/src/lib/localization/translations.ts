@@ -10,6 +10,7 @@ export default {
 		create: 'Create',
 		save: 'Save',
 		cancel: 'Cancel',
+		back: 'Back',
 		date: 'Date',
 		index: {
 			menu: 'Menu',
@@ -55,6 +56,7 @@ export default {
 		create: 'Креирај',
 		save: 'Зачувај',
 		cancel: 'Откажи',
+		back: 'Назад',
 		date: 'Датум',
 		index: {
 			menu: 'Мени',

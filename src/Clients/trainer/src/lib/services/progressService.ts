@@ -2,7 +2,7 @@ import { HttpProxy } from '../../../../shared2/services/httpProxy';
 import { ErrorLogger } from '../../../../shared2/services/errorLogger';
 import { DateHelper } from '../../../../shared2/utils/dateHelper';
 
-import type { EditAmountProgress, EditProgress } from '$lib/models/editProgress';
+import type { EditAmountProgress, EditAmountX2Progress, EditProgress } from '$lib/models/editProgress';
 import Variables from '$lib/variables';
 
 export class ProgressService {
@@ -25,6 +25,20 @@ export class ProgressService {
 	async createAmount(model: EditAmountProgress): Promise<number> {
 		try {
 			const id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/progress/amount`, {
+				method: 'post',
+				body: window.JSON.stringify(model)
+			});
+
+			return id;
+		} catch (e) {
+			this.logger.logError(e);
+			throw e;
+		}
+	}
+
+	async createAmountX2(model: EditAmountX2Progress): Promise<number> {
+		try {
+			const id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/progress/amountx2`, {
 				method: 'post',
 				body: window.JSON.stringify(model)
 			});

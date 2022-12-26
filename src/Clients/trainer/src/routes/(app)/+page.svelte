@@ -111,7 +111,7 @@
 			</div>
 		{:else if exercises.length > 0}
 			{#each exercises as exercise}
-				<a href="/progress/{date}?exerciseId={exercise.id}">{exercise.name}</a>
+				<a href="/progress/{exercise.id}?date={date}">{exercise.name}</a>
 				<br />
 			{/each}
 		{:else}

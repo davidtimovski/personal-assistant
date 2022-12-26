@@ -119,7 +119,8 @@ input[type="text"],
 input[type="email"],
 input[type="url"],
 input[type="number"],
-input[type="password"] {
+input[type="password"],
+input[type="date"] {
   width: calc(100% - 26px);
   border: 1px solid;
   border-radius: 6px;
@@ -638,7 +639,8 @@ a.button {
   input[type="email"],
   input[type="url"],
   input[type="number"],
-  input[type="password"] {
+  input[type="password"],
+  input[type="date"] {
     background: #333;
     border-color: #666;
   }
@@ -821,7 +823,8 @@ a.button {
   input[type="email"],
   input[type="url"],
   input[type="number"],
-  input[type="password"] {
+  input[type="password"],
+  input[type="date"] {
     background: #fff;
     border-color: #ddd;
   }

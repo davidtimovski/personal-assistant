@@ -1,6 +1,6 @@
 // @ts-ignore
 export async function load({ params }) {
 	return {
-		date: params.date
+		id: params.id
 	};
 }

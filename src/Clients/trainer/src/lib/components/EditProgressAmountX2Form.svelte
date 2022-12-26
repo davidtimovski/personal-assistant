@@ -8,14 +8,14 @@
 	import { t } from '$lib/localization/i18n';
 	import { alertState } from '$lib/stores';
 	import { ProgressService } from '$lib/services/progressService';
-	import type { EditAmountProgress, EditProgress } from '$lib/models/editProgress';
-	import type { Exercise, ExerciseAmount } from '$lib/models/exercise';
+	import type { EditAmountX2Progress, EditProgress } from '$lib/models/editProgress';
+	import type { Exercise, ExerciseAmountX2 } from '$lib/models/exercise';
 
 	export let exercise: Exercise;
 	export let progress: EditProgress;
 
-	let exerciseModel = <ExerciseAmount>exercise;
-	let progressModel = <EditAmountProgress>progress;
+	let exerciseModel = <ExerciseAmountX2>exercise;
+	let progressModel = <EditAmountX2Progress>progress;
 	const maxDate = DateHelper.format(new Date());
 	let saveButtonIsLoading = false;
 
@@ -26,7 +26,7 @@
 	async function dateChanged() {
 		goto(`/progress/${exercise.id}?date=${progressModel.date}`);
 
-		progressModel = <EditAmountProgress>await progressService.get(exercise.id, progressModel.date);
+		progressModel = <EditAmountX2Progress>await progressService.get(exercise.id, progressModel.date);
 	}
 
 	function validate(): ValidationResult {
@@ -42,7 +42,7 @@
 	async function save() {
 		const result = validate();
 		if (result.valid) {
-			await progressService.createAmount(progressModel);
+			await progressService.createAmountX2(progressModel);
 
 			alertState.update((x) => {
 				x.showSuccess('progress.saveSuccessful');
@@ -73,7 +73,8 @@
 		<thead>
 			<tr>
 				<th>Set</th>
-				<th>{exerciseModel.amountUnit}</th>
+				<th>{exerciseModel.amount1Unit}</th>
+				<th>{exerciseModel.amount2Unit}</th>
 			</tr>
 		</thead>
 
@@ -81,7 +82,8 @@
 			{#each progressModel.sets as set}
 				<tr>
 					<td>{set.set}</td>
-					<td><input type="number" id="amount" bind:value={set.amount} min="0" /></td>
+					<td><input type="number" bind:value={set.amount1} min="0" /></td>
+					<td><input type="number" bind:value={set.amount2} min="0" /></td>
 				</tr>
 			{/each}
 		</tbody>

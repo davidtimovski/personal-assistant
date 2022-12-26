@@ -13,7 +13,6 @@ open Accountant.Application.Fs.Models.Sync
 open Giraffe
 open Microsoft.AspNetCore.Http
 open CommonHandlers
-open HandlerBase
 open Models
 
 let getChanges: HttpHandler =

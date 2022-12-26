@@ -1,11 +1,11 @@
 ﻿module ExerciseHandlers
 
+open System
 open Giraffe
 open Application.Contracts
 open Microsoft.AspNetCore.Http
 open Models
-open HandlerBase
-open System
+open CommonHandlers
 
 let exercises: Object array = [|
     {

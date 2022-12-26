@@ -68,13 +68,13 @@
 	}
 	.loader {
 		margin: 30px auto;
-		font-size: 10px;
+		font-size: 12px;
 		position: relative;
 		text-indent: -9999em;
-		border-top: 1em solid rgba(106, 104, 243, 0.3);
-		border-right: 1em solid rgba(106, 104, 243, 0.3);
-		border-bottom: 1em solid rgba(106, 104, 243, 0.3);
-		border-left: 1em solid var(--primary-color);
+		border-top: 0.7em solid rgba(106, 104, 243, 0.3);
+		border-right: 0.7em solid rgba(106, 104, 243, 0.3);
+		border-bottom: 0.7em solid rgba(106, 104, 243, 0.3);
+		border-left: 0.7em solid var(--primary-color);
 		transform: translateZ(0);
 		animation: load8 1.1s infinite linear;
 	}

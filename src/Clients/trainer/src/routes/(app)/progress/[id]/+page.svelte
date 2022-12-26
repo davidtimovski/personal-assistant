@@ -10,6 +10,7 @@
 	import type { EditProgress } from '$lib/models/editProgress';
 
 	import EditProgressAmountForm from '$lib/components/EditProgressAmountForm.svelte';
+	import EditProgressAmountX2Form from '$lib/components/EditProgressAmountX2Form.svelte';
 
 	export let data: PageData;
 
@@ -20,13 +21,13 @@
 	let progress: EditProgress | null = null;
 
 	onMount(async () => {
-		const exerciseId = parseInt(<string>$page.url.searchParams.get('exerciseId'), 10);
+		const date = <string>$page.url.searchParams.get('date');
 
 		exercisesService = new ExercisesService();
 		progressService = new ProgressService();
 
-		exercise = await exercisesService.get(exerciseId);
-		progress = await progressService.get(exerciseId, data.date);
+		exercise = await exercisesService.get(data.id);
+		progress = await progressService.get(data.id, date);
 	});
 
 	onDestroy(() => {
@@ -55,6 +56,8 @@
 			</div>
 		{:else if exercise.ofType === ExerciseType.Amount}
 			<EditProgressAmountForm {exercise} {progress} />
+		{:else if exercise.ofType === ExerciseType.AmountX2}
+			<EditProgressAmountX2Form {exercise} {progress} />
 		{/if}
 	</div>
 </section>
