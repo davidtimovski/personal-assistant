@@ -35,6 +35,9 @@ public class UsersController : BaseController
             case "Weatherman":
                 user = _userService.Get<WeathermanUser>(UserId);
                 break;
+            case "Trainer":
+                user = _userService.Get<TrainerUser>(UserId);
+                break;
         }
 
         return Ok(user);

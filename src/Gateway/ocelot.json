@@ -77,6 +77,18 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
+          "Host": "trainer-api",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/trainer/{route}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
+    },
+    {
+      "DownstreamPathTemplate": "/{route}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
           "Host": "clientlogger",
           "Port": 80
         }

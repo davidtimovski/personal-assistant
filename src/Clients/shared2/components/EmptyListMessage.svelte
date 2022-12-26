@@ -7,7 +7,7 @@
 </script>
 
 <div class="empty-list-message">
-  <span contenteditable="true" bind:innerHTML={message} />
+  <span contenteditable="false" bind:innerHTML={message} />
 </div>
 
 <style lang="scss">

@@ -90,6 +90,8 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Accountant.Application.Fs",
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Api.Common", "src\Api.Common\Api.Common.fsproj", "{1A479D65-90F9-4C19-8B0D-64D81D444BD8}"
 EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Trainer.Api", "src\Trainer.Api\Trainer.Api.fsproj", "{1390E57F-BE1E-4EBA-97AD-C8DC12C45A0A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -212,6 +214,10 @@ Global
 		{1A479D65-90F9-4C19-8B0D-64D81D444BD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A479D65-90F9-4C19-8B0D-64D81D444BD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A479D65-90F9-4C19-8B0D-64D81D444BD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1390E57F-BE1E-4EBA-97AD-C8DC12C45A0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1390E57F-BE1E-4EBA-97AD-C8DC12C45A0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1390E57F-BE1E-4EBA-97AD-C8DC12C45A0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1390E57F-BE1E-4EBA-97AD-C8DC12C45A0A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -245,6 +251,7 @@ Global
 		{F599B2C5-CDA9-493D-8EF0-0721EB4602E4} = {577BCF93-9D25-4060-A201-FA11AC92DD26}
 		{3B8B57DA-763B-4A13-9394-0C7100A66338} = {4D1DD8B8-7BE5-46E4-8032-9D45823E76A5}
 		{1A479D65-90F9-4C19-8B0D-64D81D444BD8} = {577BCF93-9D25-4060-A201-FA11AC92DD26}
+		{1390E57F-BE1E-4EBA-97AD-C8DC12C45A0A} = {577BCF93-9D25-4060-A201-FA11AC92DD26}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1296A1BD-7B9D-40F2-9873-972EB471C47D}

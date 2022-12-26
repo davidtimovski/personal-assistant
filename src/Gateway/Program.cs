@@ -19,10 +19,11 @@ builder.Services.AddCors(options =>
     var cookingAssistantUrl = builder.Configuration["Urls:CookingAssistant"];
     var accountantUrl = builder.Configuration["Urls:Accountant"];
     var weathermanUrl = builder.Configuration["Urls:Weatherman"];
+    var trainerUrl = builder.Configuration["Urls:Trainer"];
 
     options.AddPolicy("AllowAllApps", corsBuilder =>
     {
-        corsBuilder.WithOrigins(toDoAssistantUrl, cookingAssistantUrl, accountantUrl, weathermanUrl)
+        corsBuilder.WithOrigins(toDoAssistantUrl, cookingAssistantUrl, accountantUrl, weathermanUrl, trainerUrl)
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials() // For SignalR

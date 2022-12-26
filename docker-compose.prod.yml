@@ -38,6 +38,7 @@ services:
       - cooking-api
       - accountant-api
       - weatherman-api
+      - trainer-api
 
   core-api:
     image: ${DOCKER_REGISTRY}:core-api-latest
@@ -110,6 +111,20 @@ services:
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
       - Sentry__Dsn=${WEATHERMAN_SENTRY_DSN}
+      - PORT=80
+    volumes:
+      - ./storage:/app/storage
+    depends_on:
+      - postgres
+
+  trainer-api:
+    image: ${DOCKER_REGISTRY}:trainer-api-latest
+    container_name: pa-trainer-api
+    restart: always
+    environment:
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
+      - Sentry__Dsn=${TRAINER_SENTRY_DSN}
       - PORT=80
     volumes:
       - ./storage:/app/storage

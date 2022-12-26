@@ -15,4 +15,8 @@
     <Compile Include="CommonHandlers.fs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Application\Application.csproj" />
+  </ItemGroup>
+
 </Project>
