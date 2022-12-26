@@ -3,7 +3,7 @@ using CookingAssistant.Application.Contracts.Recipes;
 using CookingAssistant.Application.Contracts.Recipes.Models;
 using CookingAssistant.Application.Mappings;
 using CookingAssistant.Application.Services;
-using Domain.CookingAssistant;
+using Application.Domain.CookingAssistant;
 using FluentValidation;
 using Moq;
 using Xunit;
@@ -20,8 +20,9 @@ public class CreateTests
     {
         _successfulValidatorMock = ValidatorMocker.GetSuccessful<CreateRecipe>();
 
-        _sut = new RecipeService(null, null, null, null, null,
+        _sut = new RecipeService(null, null, null, null,
             _recipesRepositoryMock.Object,
+            null,
             MapperMocker.GetMapper<CookingAssistantProfile>(),
             null);
     }

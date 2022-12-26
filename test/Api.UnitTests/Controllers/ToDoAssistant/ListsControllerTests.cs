@@ -1,5 +1,5 @@
 ﻿using Api.UnitTests.Builders;
-using Application.Contracts;
+using Core.Application.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Moq;

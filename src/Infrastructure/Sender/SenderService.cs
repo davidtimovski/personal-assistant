@@ -1,8 +1,8 @@
 ﻿using System.Text;
-using Application.Contracts;
+using System.Text.Json;
+using Core.Application.Contracts;
 using Infrastructure.Sender.Models;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 using RabbitMQ.Client;
 
 namespace Infrastructure.Sender;
@@ -59,7 +59,7 @@ public class SenderService : ISenderService
             autoDelete: false,
             arguments: null);
 
-        byte[] body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
+        byte[] body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message));
 
         channel.BasicPublish(exchange: string.Empty,
             routingKey: queue,

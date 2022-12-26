@@ -1,31 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
-    <PackageReference Include="Moq" Version="4.18.3" />
-    <PackageReference Include="xunit" Version="2.4.2" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
+		<PackageReference Include="Moq" Version="4.18.3" />
+		<PackageReference Include="xunit" Version="2.4.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Accountant.Application\Accountant.Application.csproj" />
-    <ProjectReference Include="..\..\src\CookingAssistant.Application\CookingAssistant.Application.csproj" />
-    <ProjectReference Include="..\..\src\Domain\Domain.csproj" />
-    <ProjectReference Include="..\..\src\Application\Application.csproj" />
-    <ProjectReference Include="..\..\src\Infrastructure\Infrastructure.csproj" />
-    <ProjectReference Include="..\..\src\ToDoAssistant.Application\ToDoAssistant.Application.csproj" />
-    <ProjectReference Include="..\..\src\Utility\Utility.fsproj" />
-    <ProjectReference Include="..\..\src\Weatherman.Application\Weatherman.Application.csproj" />
-    <ProjectReference Include="..\..\src\Weatherman.Infrastructure\Weatherman.Infrastructure.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\Application\Accountant.Application\Accountant.Application.csproj" />
+		<ProjectReference Include="..\..\src\Application\CookingAssistant.Application\CookingAssistant.Application.csproj" />
+		<ProjectReference Include="..\..\src\Application\ToDoAssistant.Application\ToDoAssistant.Application.csproj" />
+		<ProjectReference Include="..\..\src\Application\Utility\Utility.fsproj" />
+		<ProjectReference Include="..\..\src\Application\Weatherman.Application\Weatherman.Application.csproj" />
+		<ProjectReference Include="..\..\src\Infrastructure\Weatherman.Infrastructure\Weatherman.Infrastructure.csproj" />
+	</ItemGroup>
 
 </Project>

@@ -1,5 +1,5 @@
 ﻿using CookingAssistant.Application.Contracts.Ingredients.Models;
-using Domain.CookingAssistant;
+using Application.Domain.CookingAssistant;
 
 namespace Application.UnitTests.Builders;
 

@@ -24,7 +24,7 @@ services:
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - PORT=80
     volumes:
-      - ./src/Gateway/storage:/app/storage:z
+      - ./src/Web/Gateway/storage:/app/storage:z
     ports:
       - "5003:80"
 
@@ -36,7 +36,7 @@ services:
       - Cloudinary__ApiSecret=${CLOUDINARY_API_SECRET}
       - PORT=80
     volumes:
-      - ./src/Core.Api/storage:/app/storage:z
+      - ./src/Web/Core.Api/storage:/app/storage:z
     ports:
       - "5004:80"
 
@@ -49,7 +49,7 @@ services:
       - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
       - PORT=80
     volumes:
-      - ./src/ToDoAssistant.Api/storage:/app/storage:z
+      - ./src/Web/ToDoAssistant.Api/storage:/app/storage:z
     ports:
       - "5005:80"
 
@@ -64,7 +64,7 @@ services:
       - Cloudinary__ApiSecret=${CLOUDINARY_API_SECRET}
       - PORT=80
     volumes:
-      - ./src/CookingAssistant.Api/storage:/app/storage:z
+      - ./src/Web/CookingAssistant.Api/storage:/app/storage:z
     ports:
       - "5006:80"
 
@@ -74,7 +74,7 @@ services:
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - PORT=80
     volumes:
-      - ./src/Accountant.Api/storage:/app/storage:z
+      - ./src/Web/Accountant.Api/storage:/app/storage:z
     ports:
       - "5007:80"
 
@@ -84,7 +84,7 @@ services:
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - PORT=80
     volumes:
-      - ./src/Weatherman.Api/storage:/app/storage:z
+      - ./src/Web/Weatherman.Api/storage:/app/storage:z
     ports:
       - "5008:80"
 
@@ -94,7 +94,7 @@ services:
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - PORT=80
     volumes:
-      - ./src/Trainer.Api/storage:/app/storage:z
+      - ./src/Web/Trainer.Api/storage:/app/storage:z
     ports:
       - "5009:80"
 
@@ -104,7 +104,7 @@ services:
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - PORT=80
     volumes:
-      - ./src/ClientLogger/storage:/app/storage:z
+      - ./src/Web/ClientLogger/storage:/app/storage:z
     ports:
       - "5002:80"
 
@@ -120,7 +120,7 @@ services:
       - CookingAssistantVapid__PublicKey=${COOKING_VAPID_PUBLIC_KEY}
       - CookingAssistantVapid__PrivateKey=${COOKING_VAPID_PRIVATE_KEY}
     volumes:
-      - ./src/Sender/storage:/app/storage:z
+      - ./src/Background/Sender/storage:/app/storage:z
 
   postgres:
     ports:

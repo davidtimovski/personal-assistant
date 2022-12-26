@@ -1,5 +1,5 @@
 ﻿using Api.UnitTests.Builders;
-using Application.Contracts;
+using Core.Application.Contracts;
 using CookingAssistant.Api.Controllers;
 using CookingAssistant.Application.Contracts.Ingredients;
 using CookingAssistant.Application.Contracts.Ingredients.Models;
