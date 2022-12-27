@@ -1,8 +1,9 @@
 ﻿using System.Data;
-using CookingAssistant.Application.Contracts.DietaryProfiles;
-using Dapper;
 using Application.Domain.Common;
 using Application.Domain.CookingAssistant;
+using CookingAssistant.Application.Contracts.DietaryProfiles;
+using Core.Persistence;
+using Dapper;
 
 namespace Persistence.Repositories.CookingAssistant;
 

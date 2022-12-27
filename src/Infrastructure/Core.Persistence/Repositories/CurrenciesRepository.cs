@@ -2,9 +2,8 @@
 using System.Text.Json;
 using Core.Application.Contracts;
 using Dapper;
-using Persistence;
 
-namespace Infrastructure.Currency;
+namespace Core.Persistence.Repositories;
 
 public class CurrenciesRepository : BaseRepository, ICurrenciesRepository
 {

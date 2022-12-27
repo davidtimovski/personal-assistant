@@ -1,10 +1,10 @@
 ﻿using System.Data;
+using Application.Domain.Common;
 using Core.Application.Contracts;
 using Dapper;
-using Application.Domain.Common;
 using Microsoft.EntityFrameworkCore;
 
-namespace Persistence.Repositories;
+namespace Core.Persistence.Repositories;
 
 public class UsersRepository : BaseRepository, IUsersRepository
 {

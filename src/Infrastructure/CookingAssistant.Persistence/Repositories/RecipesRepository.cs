@@ -1,9 +1,10 @@
 ﻿using System.Data;
-using CookingAssistant.Application.Contracts.Recipes;
-using Dapper;
 using Application.Domain.Common;
 using Application.Domain.CookingAssistant;
 using Application.Domain.ToDoAssistant;
+using CookingAssistant.Application.Contracts.Recipes;
+using Core.Persistence;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Repositories.CookingAssistant;

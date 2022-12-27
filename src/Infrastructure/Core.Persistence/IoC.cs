@@ -1,10 +1,9 @@
 ﻿using Core.Application.Contracts;
-using Infrastructure.Currency;
+using Core.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Persistence.Repositories;
 
-namespace Persistence;
+namespace Core.Persistence;
 
 public static class IoC
 {

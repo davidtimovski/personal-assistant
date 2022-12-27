@@ -1,9 +1,9 @@
 ﻿using System.Data;
+using Application.Domain.Common;
 using Core.Application.Contracts;
 using Dapper;
-using Application.Domain.Common;
 
-namespace Persistence.Repositories;
+namespace Core.Persistence.Repositories;
 
 public class TooltipsRepository : BaseRepository, ITooltipsRepository
 {

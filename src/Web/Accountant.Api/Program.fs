@@ -10,13 +10,13 @@ open Azure.Identity
 open Azure.Security.KeyVault.Secrets
 open Giraffe
 open Core.Infrastructure
+open Core.Persistence
 open Microsoft.AspNetCore.Builder
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.Hosting
 open Microsoft.AspNetCore.Localization
 open Microsoft.Extensions.Logging
-open Persistence
 open Routes
 
 let addKeyVault (context: HostBuilderContext) (configBuilder: IConfigurationBuilder) =

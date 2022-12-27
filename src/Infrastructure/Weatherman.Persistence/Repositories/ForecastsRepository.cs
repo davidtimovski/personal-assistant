@@ -1,7 +1,7 @@
 ﻿using System.Data;
-using Dapper;
 using Application.Domain.Weatherman;
-using Persistence;
+using Core.Persistence;
+using Dapper;
 using Weatherman.Application.Contracts.Forecasts;
 using Weatherman.Application.Contracts.Forecasts.Models;
 
