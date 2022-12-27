@@ -1,7 +1,7 @@
-﻿using Core.Application.Contracts;
-using Application.Domain.Common;
+﻿using Application.Domain.Common;
+using Core.Application.Contracts;
 
-namespace Persistence.Repositories;
+namespace Core.Persistence.Repositories;
 
 public class PushSubscriptionsRepository : BaseRepository, IPushSubscriptionsRepository
 {

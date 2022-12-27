@@ -1,8 +1,8 @@
 ﻿using System.Data;
-using Dapper;
 using Application.Domain.Common;
 using Application.Domain.ToDoAssistant;
-using Persistence;
+using Core.Persistence;
+using Dapper;
 using ToDoAssistant.Application.Contracts.Lists;
 
 namespace ToDoAssistant.Persistence.Repositories;

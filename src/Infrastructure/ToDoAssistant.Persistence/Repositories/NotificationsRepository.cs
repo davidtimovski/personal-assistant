@@ -1,8 +1,8 @@
 ﻿using System.Data;
 using Application.Domain.Common;
 using Application.Domain.ToDoAssistant;
+using Core.Persistence;
 using Dapper;
-using Persistence;
 using ToDoAssistant.Application.Contracts.Notifications;
 
 namespace ToDoAssistant.Persistence.Repositories;

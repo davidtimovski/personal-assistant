@@ -5,9 +5,9 @@ using CookingAssistant.Application.Contracts.DietaryProfiles.Models;
 using CookingAssistant.Persistence;
 using Core.Application;
 using Core.Infrastructure;
+using Core.Persistence;
 using Infrastructure.Sender;
 using Microsoft.AspNetCore.Localization;
-using Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 

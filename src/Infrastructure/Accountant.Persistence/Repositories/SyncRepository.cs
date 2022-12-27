@@ -1,5 +1,6 @@
 ﻿using Accountant.Application.Contracts.Sync;
 using Application.Domain.Accountant;
+using Core.Persistence;
 
 namespace Persistence.Repositories.Accountant;
 

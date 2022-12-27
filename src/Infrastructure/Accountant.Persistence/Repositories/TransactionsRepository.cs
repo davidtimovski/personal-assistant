@@ -1,7 +1,8 @@
 ﻿using System.Data;
 using Accountant.Application.Contracts.Transactions;
-using Dapper;
 using Application.Domain.Accountant;
+using Core.Persistence;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Repositories.Accountant;

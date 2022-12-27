@@ -1,7 +1,8 @@
 ﻿using System.Data;
 using Accountant.Application.Contracts.Debts;
-using Dapper;
 using Application.Domain.Accountant;
+using Core.Persistence;
+using Dapper;
 
 namespace Persistence.Repositories.Accountant;
 

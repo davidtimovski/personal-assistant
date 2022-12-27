@@ -1,6 +1,6 @@
 using Core.Application;
 using Core.Infrastructure;
-using Persistence;
+using Core.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 

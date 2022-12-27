@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 
-namespace Persistence;
+namespace Core.Persistence;
 
 public abstract class BaseRepository
 {

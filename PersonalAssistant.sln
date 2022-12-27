@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CookingAssistant.Api", "src
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "ClientLogger", "src\Web\ClientLogger\ClientLogger.fsproj", "{9814A06E-212A-4DE4-B893-212EAD9F1850}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Persistence", "src\Infrastructure\Persistence\Persistence.csproj", "{CE0CCF73-58A9-4CB0-AA35-3B8866EE9A9B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Persistence", "src\Infrastructure\Core.Persistence\Core.Persistence.csproj", "{CE0CCF73-58A9-4CB0-AA35-3B8866EE9A9B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Application", "src\Application\Core.Application\Core.Application.csproj", "{0460E980-3C25-4D97-A11F-03DE87434BB0}"
 EndProject
@@ -96,7 +96,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{48B5CF7D-25A9-46B3-90DE-EF67BB8636F9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sender", "src\Infrastructure\Sender\Sender.csproj", "{C58752DA-E892-4ADD-8D10-A8D4877CA5B6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sender", "src\Infrastructure\Sender\Sender.csproj", "{C58752DA-E892-4ADD-8D10-A8D4877CA5B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

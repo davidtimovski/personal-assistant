@@ -1,7 +1,7 @@
 ﻿using System.Data;
-using Dapper;
 using Application.Domain.ToDoAssistant;
-using Persistence;
+using Core.Persistence;
+using Dapper;
 using ToDoAssistant.Application.Contracts.Tasks;
 
 namespace ToDoAssistant.Persistence.Repositories;

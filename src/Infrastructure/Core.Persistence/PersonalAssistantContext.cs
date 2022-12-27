@@ -5,7 +5,7 @@ using Application.Domain.ToDoAssistant;
 using Application.Domain.Weatherman;
 using Microsoft.EntityFrameworkCore;
 
-namespace Persistence;
+namespace Core.Persistence;
 
 public class PersonalAssistantContext : DbContext
 {
