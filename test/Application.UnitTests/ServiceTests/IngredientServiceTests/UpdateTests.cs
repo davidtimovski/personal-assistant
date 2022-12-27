@@ -3,7 +3,7 @@ using CookingAssistant.Application.Contracts.Ingredients;
 using CookingAssistant.Application.Contracts.Ingredients.Models;
 using CookingAssistant.Application.Mappings;
 using CookingAssistant.Application.Services;
-using Domain.CookingAssistant;
+using Application.Domain.CookingAssistant;
 using FluentValidation;
 using Moq;
 using Xunit;

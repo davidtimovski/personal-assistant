@@ -1,5 +1,5 @@
 ﻿using Application.UnitTests.Builders;
-using Domain.ToDoAssistant;
+using Application.Domain.ToDoAssistant;
 using FluentValidation;
 using Moq;
 using ToDoAssistant.Application.Contracts.Lists;

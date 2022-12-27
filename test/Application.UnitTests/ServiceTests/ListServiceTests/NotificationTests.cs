@@ -1,4 +1,4 @@
-﻿using Domain.Common;
+﻿using Application.Domain.Common;
 using Moq;
 using ToDoAssistant.Application.Contracts.Lists;
 using ToDoAssistant.Application.Contracts.Tasks;

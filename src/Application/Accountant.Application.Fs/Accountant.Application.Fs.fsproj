@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="Models\Accounts.fs" />
+		<Compile Include="Models\AutomaticTransactions.fs" />
+		<Compile Include="Models\Categories.fs" />
+		<Compile Include="Models\Debts.fs" />
+		<Compile Include="Models\Transactions.fs" />
+		<Compile Include="Models\UpcomingExpenses.fs" />
+		<Compile Include="Models\Sync.fs" />
+		<Compile Include="Services\AccountService.fs" />
+		<Compile Include="Services\AutomaticTransactionService.fs" />
+		<Compile Include="Services\CategoryService.fs" />
+		<Compile Include="Services\DebtService.fs" />
+		<Compile Include="Services\SyncService.fs" />
+		<Compile Include="Services\TransactionService.fs" />
+		<Compile Include="Services\UpcomingExpenseService.fs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Domain\Domain.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -4,7 +4,7 @@ using Accountant.Application.Contracts.Transactions.Models;
 using Accountant.Application.Mappings;
 using Accountant.Application.Services;
 using Application.UnitTests.Builders;
-using Domain.Accountant;
+using Application.Domain.Accountant;
 using FluentValidation;
 using Moq;
 using Xunit;
