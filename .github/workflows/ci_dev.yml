@@ -5,7 +5,7 @@ on:
     branches:
       - dev
     paths-ignore:
-      - "src/Application/Clients/**"
+      - "src/Web/Clients/**"
 
 jobs:
   test:
