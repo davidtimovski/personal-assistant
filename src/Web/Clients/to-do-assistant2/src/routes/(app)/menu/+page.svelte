@@ -65,7 +65,7 @@
 			<i class="fas fa-bars" />
 		</div>
 		<div class="page-title">{$t('menu.menu')}</div>
-		<a href="/" class="back-button">
+		<a href="/lists" class="back-button">
 			<i class="fas fa-times" />
 		</a>
 	</div>

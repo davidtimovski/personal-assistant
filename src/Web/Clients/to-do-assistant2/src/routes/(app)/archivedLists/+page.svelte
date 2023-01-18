@@ -40,7 +40,7 @@
 			<i class="fas fa-archive" />
 		</div>
 		<div class="page-title">{$t('archivedLists.archivedLists')}</div>
-		<a href="/" class="back-button">
+		<a href="/lists" class="back-button">
 			<i class="fas fa-times" />
 		</a>
 	</div>

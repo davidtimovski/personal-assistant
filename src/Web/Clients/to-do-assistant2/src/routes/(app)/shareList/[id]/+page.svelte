@@ -132,13 +132,13 @@
 						false,
 						null
 					);
-					shares.push(selectedShare);
+					shares = shares.concat(selectedShare);
 
 					if (shareExistedPreviously(selectedShareUserId)) {
-						removedShares.splice(removedShares.indexOf(selectedShare), 1);
-						editedShares.push(selectedShare);
+						removedShares = removedShares.filter((x) => x.userId !== selectedShare.userId);
+						editedShares = editedShares.concat(selectedShare);
 					} else {
-						newShares.push(selectedShare);
+						newShares = newShares.concat(selectedShare);
 					}
 
 					resetSelectedShare();

@@ -58,7 +58,7 @@
 			<i class="fas fa-handshake" />
 		</div>
 		<div class="page-title">{$t('shareRequests.shareRequests')}</div>
-		<a href="/" class="back-button">
+		<a href="/lists" class="back-button">
 			<i class="fas fa-times" />
 		</a>
 	</div>
