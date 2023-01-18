@@ -183,8 +183,9 @@ export default {
 			highPriority: 'High Priority',
 			staleTasks: 'Stale Tasks'
 		},
-		notFound: {
+		error: {
 			youSeemLost: 'You seem lost..',
+			somethingWentWrong: 'Something went wrong.',
 			takeMeHome: 'Take me home'
 		},
 		tooltips: {
@@ -403,8 +404,9 @@ export default {
 			highPriority: 'Висок Приоритет',
 			staleTasks: 'Застарени Задачи'
 		},
-		notFound: {
+		error: {
 			youSeemLost: 'Се изгубивте?',
+			somethingWentWrong: 'Нешто не испадна како што треба.',
 			takeMeHome: 'Врати ме дома'
 		},
 		tooltips: {

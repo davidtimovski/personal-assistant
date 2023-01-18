@@ -305,11 +305,14 @@
 			}
 		}
 
-		&.is-shared .name-container {
-			padding-right: 10px;
+		&.is-shared,
+		&.pending-share {
+			.name-container {
+				padding-right: 10px;
 
-			.name {
-				padding-right: 15px;
+				.name {
+					padding-right: 15px;
+				}
 			}
 		}
 

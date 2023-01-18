@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte/internal';
 	import { goto } from '$app/navigation';
 
-	import { user } from '$lib/stores';
+	import { authInfo } from '$lib/stores';
 
 	let containerHeight = 768;
 
@@ -11,12 +11,12 @@
 			containerHeight = window.innerHeight;
 		}
 
-		return user.subscribe((x) => {
+		return authInfo.subscribe(async (x) => {
 			if (!x) {
 				return;
 			}
 
-			goto('/lists');
+			await goto('/lists');
 		});
 	});
 </script>
@@ -27,7 +27,7 @@
 			<div class="loader" />
 		</div>
 
-		<div class="app">To Do Assistant</div>
+		<div class="app-name">To Do Assistant</div>
 	</div>
 </section>
 
@@ -40,18 +40,6 @@
 
 	.loader-wrap {
 		position: relative;
-	}
-
-	@keyframes swing {
-		0% {
-			transform: rotate(10deg);
-		}
-		50% {
-			transform: rotate(-10deg);
-		}
-		100% {
-			transform: rotate(10deg);
-		}
 	}
 
 	.loader,
@@ -81,7 +69,7 @@
 		}
 	}
 
-	.app {
+	.app-name {
 		font-size: 1.7rem;
 		user-select: none;
 	}

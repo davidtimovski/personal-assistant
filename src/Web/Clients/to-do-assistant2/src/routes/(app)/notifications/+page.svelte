@@ -89,7 +89,7 @@
 			<i class="fas fa-bell" />
 		</div>
 		<div class="page-title">{$t('notifications.notifications')}</div>
-		<a href="/" class="back-button">
+		<a href="/lists" class="back-button">
 			<i class="fas fa-times" />
 		</a>
 	</div>
