@@ -7,7 +7,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Giraffe" Version="6.0.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.3" />
 		<PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
 	</ItemGroup>
 

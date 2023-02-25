@@ -9,14 +9,10 @@
 
 	<ItemGroup>
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
-		<PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.0">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
-		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.1" />
-		<PackageReference Include="Sentry.AspNetCore" Version="3.25.0" />
-		<PackageReference Include="Sentry.Extensions.Logging" Version="3.25.0" />
+		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.4" />
+		<PackageReference Include="Sentry.AspNetCore" Version="3.28.1" />
+		<PackageReference Include="Sentry.Extensions.Logging" Version="3.28.1" />
 	</ItemGroup>
 
 	<ItemGroup>

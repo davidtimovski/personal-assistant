@@ -40,7 +40,7 @@
 			<i class="fas fa-sliders-h" />
 		</div>
 		<div class="page-title">{$t('preferences.preferences')}</div>
-		<a href="/" class="back-button">
+		<a href="/dashboard" class="back-button">
 			<i class="fas fa-times" />
 		</a>
 	</div>

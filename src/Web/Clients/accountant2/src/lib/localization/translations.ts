@@ -66,7 +66,7 @@ export default {
 		dayOrdinal26: '26th',
 		dayOrdinal27: '27th',
 		dayOrdinal28: '28th',
-		index: {
+		dashboard: {
 			menu: 'Menu',
 			refresh: 'Refresh',
 			newDeposit: 'New deposit',
@@ -395,8 +395,9 @@ export default {
 			debt: 'Debt',
 			mergeDebtPerPerson: 'Merge debt per person'
 		},
-		notFound: {
+		error: {
 			youSeemLost: 'You seem lost..',
+			somethingWentWrong: 'Something went wrong.',
 			takeMeHome: 'Take me home'
 		},
 		tooltips: {
@@ -485,7 +486,7 @@ export default {
 		dayOrdinal26: '26ти',
 		dayOrdinal27: '27ми',
 		dayOrdinal28: '28ми',
-		index: {
+		dashboard: {
 			menu: 'Мени',
 			refresh: 'Освежи',
 			newDeposit: 'Нов депозит',
@@ -815,8 +816,9 @@ export default {
 			debt: 'Долгови',
 			mergeDebtPerPerson: 'Спојувај долгови по личност'
 		},
-		notFound: {
+		error: {
 			youSeemLost: 'Се изгубивте?',
+			somethingWentWrong: 'Нешто не испадна како што треба.',
 			takeMeHome: 'Врати ме дома'
 		},
 		tooltips: {

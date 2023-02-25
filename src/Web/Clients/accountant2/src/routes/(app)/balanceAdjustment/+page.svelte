@@ -22,6 +22,7 @@
 	let accountOptions: SelectOption[] | null = null;
 	let balanceIsInvalid = false;
 	let adjustButtonIsLoading = false;
+	let balanceLoaded = false;
 
 	let localStorage: LocalStorageUtil;
 	let accountsService: AccountsService;
@@ -39,6 +40,7 @@
 		const accountBalance = await accountsService.getBalance(accountId, <string>currency);
 		originalBalance = accountBalance;
 		balance = originalBalance;
+		balanceLoaded = true;
 	}
 
 	async function accountChanged() {
@@ -76,7 +78,7 @@
 					x.showSuccess('balanceAdjustment.adjustmentSuccessful');
 					return x;
 				});
-				goto('/');
+				goto('/dashboard');
 			} catch {
 				adjustButtonIsLoading = false;
 			}
@@ -118,7 +120,7 @@
 			<i class="fas fa-coins" />
 		</div>
 		<div class="page-title">{$t('balanceAdjustment.balanceAdjustment')}</div>
-		<a href="/" class="back-button">
+		<a href="/dashboard" class="back-button">
 			<i class="fas fa-times" />
 		</a>
 	</div>
@@ -132,7 +134,7 @@
 					bind:currency
 					invalid={balanceIsInvalid}
 					inputId="balance"
-					disabled={!balance}
+					disabled={!balanceLoaded}
 				/>
 			</div>
 

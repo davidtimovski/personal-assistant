@@ -119,7 +119,7 @@
 	}
 
 	function viewTransaction(id: number) {
-		goto(`transaction/${id}?fromExpenditureHeatmap=true`);
+		goto(`/transaction/${id}?fromExpenditureHeatmap=true`);
 	}
 
 	$: selectedDayDate = selectedDay?.date;
@@ -218,7 +218,7 @@
 			<i class="fas fa-th" />
 		</div>
 		<div class="page-title">{$t('expenditureHeatmap.expenditureHeatmap')}</div>
-		<a href="/" class="back-button">
+		<a href="/dashboard" class="back-button">
 			<i class="fas fa-times" />
 		</a>
 	</div>

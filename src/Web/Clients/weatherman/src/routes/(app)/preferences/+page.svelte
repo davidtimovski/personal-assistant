@@ -18,17 +18,23 @@
 
 	function temperatureUnitChanged() {
 		localStorage.set(LocalStorageKeys.TemperatureUnit, temperatureUnit);
-		forecastsService.get((<WeathermanUser>$user).culture);
+
+		let weathermanUser = <WeathermanUser>$user;
+		forecastsService.get(new Date(), weathermanUser.language, weathermanUser.culture);
 	}
 
 	function precipitationUnitChanged() {
 		localStorage.set(LocalStorageKeys.PrecipitationUnit, precipitationUnit);
-		forecastsService.get((<WeathermanUser>$user).culture);
+
+		let weathermanUser = <WeathermanUser>$user;
+		forecastsService.get(new Date(), weathermanUser.language, weathermanUser.culture);
 	}
 
 	function windSpeedUnitChanged() {
 		localStorage.set(LocalStorageKeys.WindSpeedUnit, windSpeedUnit);
-		forecastsService.get((<WeathermanUser>$user).culture);
+
+		let weathermanUser = <WeathermanUser>$user;
+		forecastsService.get(new Date(), weathermanUser.language, weathermanUser.culture);
 	}
 
 	onMount(() => {
@@ -47,7 +53,7 @@
 			<i class="fas fa-sliders-h" />
 		</div>
 		<div class="page-title">{$t('preferences.preferences')}</div>
-		<a href="/" class="back-button">
+		<a href="/weather" class="back-button">
 			<i class="fas fa-times" />
 		</a>
 	</div>

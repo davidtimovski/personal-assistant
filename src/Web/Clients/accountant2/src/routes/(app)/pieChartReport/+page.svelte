@@ -21,7 +21,7 @@
 	let isDeposits = false;
 	let mainAccountId: number;
 	let currency: string;
-	let chart: Chart;
+	let chart: Chart<'pie', number[], unknown>;
 	let items: PieChartItem[] | null = null;
 	let sum = 0;
 	let canvas: HTMLCanvasElement;
@@ -114,7 +114,7 @@
 
 	function goToTransactions(item: PieChartItem) {
 		searchFilters.set(new SearchFilters(1, 15, fromDate, toDate, 0, item.categoryId, type, null));
-		goto('transactions');
+		goto('/transactions');
 	}
 
 	onMount(async () => {
@@ -160,7 +160,7 @@
 			<i class="fas fa-chart-pie" />
 		</div>
 		<div class="page-title">{$t('pieChartReport.pieChart')}</div>
-		<a href="/" class="back-button">
+		<a href="/dashboard" class="back-button">
 			<i class="fas fa-times" />
 		</a>
 	</div>

@@ -44,7 +44,7 @@
 			<i class="fas fa-info-circle" />
 		</div>
 		<div class="page-title">{$t('help.help')}</div>
-		<a href="/" class="back-button">
+		<a href="/dashboard" class="back-button">
 			<i class="fas fa-times" />
 		</a>
 	</div>

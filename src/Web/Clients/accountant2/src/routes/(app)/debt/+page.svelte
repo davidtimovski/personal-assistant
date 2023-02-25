@@ -35,7 +35,7 @@
 
 	function settleDebt(id: number, userIsDebtor: boolean) {
 		const type = userIsDebtor ? 0 : 1;
-		goto(`newTransaction/${type}?debtId=${id}`);
+		goto(`/newTransaction/${type}?debtId=${id}`);
 	}
 
 	onMount(async () => {
@@ -80,7 +80,7 @@
 			<i class="fas fa-hand-holding-usd" />
 		</div>
 		<div class="page-title">{$t('debt.debt')}</div>
-		<a href="/" class="back-button">
+		<a href="/dashboard" class="back-button">
 			<i class="fas fa-times" />
 		</a>
 	</div>

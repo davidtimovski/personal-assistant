@@ -1,441 +1,76 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte/internal';
-	import type { Unsubscriber } from 'svelte/store';
-	import { tweened } from 'svelte/motion';
-	import { cubicOut } from 'svelte/easing';
+	import { onMount } from 'svelte/internal';
+	import { goto } from '$app/navigation';
 
-	import { DateHelper } from '../../../../shared2/utils/dateHelper';
-	import { UsersServiceBase } from '../../../../shared2/services/usersServiceBase';
+	import { authInfo } from '$lib/stores';
 
-	import { t } from '$lib/localization/i18n';
-	import { LocalStorageKeys, LocalStorageUtil } from '$lib/utils/localStorageUtil';
-	import { isOffline, user, forecast } from '$lib/stores';
-	import { ForecastsService } from '$lib/services/forecastsService';
-	import { WeatherCode } from '$lib/models/weatherCode';
-
-	import Illustration from '$lib/components/Illustration.svelte';
-	import NextDayForecast from '$lib/components/NextDayForecast.svelte';
-
-	let now = new Date();
-	let selectedDate = '';
-	let currentTime = '';
-	let currentDate = selectedDate;
-	let weatherDescription = '';
-	let windSpeedUnit = '';
-	let precipitationUnit = '';
-	const weatherDescriptionTr = new Map<WeatherCode, string>();
-	const windSpeedUnitsTr = new Map<string, string>();
-	const precipitationUnitsTr = new Map<string, string>();
-	const unsubscriptions: Unsubscriber[] = [];
-
-	$: currentTempColor =
-		$forecast.temperature !== null ? ForecastsService.getTempColor(<number>$forecast.temperature) : 'inherit';
-
-	// Progress bar
-	let progressBarActive = false;
-	const progress = tweened(0, {
-		duration: 500,
-		easing: cubicOut
-	});
-	let progressIntervalId: number | undefined;
-	let progressBarVisible = false;
-
-	let localStorage: LocalStorageUtil;
-	let usersService: UsersServiceBase;
-	let forecastsService: ForecastsService;
-
-	function setCurrentTime() {
-		now = new Date();
-		selectedDate = DateHelper.format(now);
-		currentTime = DateHelper.formatHoursMinutes(now, $user.culture);
-		currentDate = selectedDate;
-	}
-
-	function sync() {
-		startProgressBar();
-
-		setCurrentTime();
-		forecastsService.get(now, $user.language, $user.culture);
-	}
-
-	function startProgressBar() {
-		progressBarActive = true;
-		progress.set(10);
-
-		progressIntervalId = window.setInterval(() => {
-			if ($progress < 85) {
-				progress.update((x) => {
-					x += 15;
-					return x;
-				});
-			} else if (progressIntervalId) {
-				window.clearInterval(progressIntervalId);
-			}
-		}, 500);
-
-		progressBarVisible = true;
-	}
-
-	function finishProgressBar() {
-		window.clearInterval(progressIntervalId);
-		window.setTimeout(() => {
-			progress.set(100);
-			progressBarActive = false;
-			progressBarVisible = false;
-		}, 500);
-	}
-
-	function selectDate(date: string) {
-		selectedDate = date;
-	}
+	let containerHeight = 768;
 
 	onMount(() => {
-		weatherDescriptionTr
-			.set(WeatherCode.ClearSky, $t('index.clear'))
-			.set(WeatherCode.MainlyClear, $t('index.mainlyClear'))
-			.set(WeatherCode.PartlyCloudy, $t('index.partlyCloudy'))
-			.set(WeatherCode.Overcast, $t('index.overcast'))
-			.set(WeatherCode.Fog, $t('index.foggy'))
-			.set(WeatherCode.DepositingRimeFog, $t('index.foggy'))
-			.set(WeatherCode.DrizzleLight, $t('index.lightDrizzle'))
-			.set(WeatherCode.DrizzleModerate, $t('index.moderateDrizzle'))
-			.set(WeatherCode.DrizzleDense, $t('index.denseDrizzle'))
-			.set(WeatherCode.DrizzleLightFreezing, $t('index.lightFreezingDrizzle'))
-			.set(WeatherCode.DrizzleDenseFreezing, $t('index.denseFreezingDrizzle'))
-			.set(WeatherCode.RainLight, $t('index.lightRain'))
-			.set(WeatherCode.RainModerate, $t('index.moderateRain'))
-			.set(WeatherCode.RainHeavy, $t('index.heavyRain'))
-			.set(WeatherCode.FreezingRainLight, $t('index.lightFreezingRain'))
-			.set(WeatherCode.FreezingRainHeavy, $t('index.heavyFreezingRain'))
-			.set(WeatherCode.SnowLight, $t('index.lightSnow'))
-			.set(WeatherCode.SnowModerate, $t('index.moderateSnow'))
-			.set(WeatherCode.SnowHeavy, $t('index.heavySnow'))
-			.set(WeatherCode.SnowGrains, $t('index.snowGrains'))
-			.set(WeatherCode.ShowerLight, $t('index.lightShower'))
-			.set(WeatherCode.ShowerModerate, $t('index.moderateShower'))
-			.set(WeatherCode.ShowerViolent, $t('index.violentShower'))
-			.set(WeatherCode.SnowShowerLight, $t('index.lightSnowShower'))
-			.set(WeatherCode.SnowShowerHeavy, $t('index.heavySnowShower'))
-			.set(WeatherCode.Thunderstorm, $t('index.thunderstorm'))
-			.set(WeatherCode.ThunderstormWithHailLight, $t('index.thunderstormWithLightHail'))
-			.set(WeatherCode.ThunderstormWithHailHeavy, $t('index.thunderstormWithHeavyHail'));
-
-		windSpeedUnitsTr.set('kmh', $t('index.kmh')).set('mph', $t('index.mph'));
-
-		precipitationUnitsTr.set('mm', $t('index.mm')).set('inches', $t('index.inches'));
-
-		localStorage = new LocalStorageUtil();
-		usersService = new UsersServiceBase('Weatherman');
-		forecastsService = new ForecastsService();
-
-		windSpeedUnit = <string>windSpeedUnitsTr.get(localStorage.get(LocalStorageKeys.WindSpeedUnit));
-		precipitationUnit = <string>precipitationUnitsTr.get(localStorage.get(LocalStorageKeys.PrecipitationUnit));
-
-		if ($forecast === null) {
-			startProgressBar();
+		if (window.innerHeight < containerHeight) {
+			containerHeight = window.innerHeight;
 		}
 
-		unsubscriptions.push(
-			user.subscribe((x) => {
-				if (!x.email) {
-					return;
-				}
+		return authInfo.subscribe(async (x) => {
+			if (!x) {
+				return;
+			}
 
-				setCurrentTime();
-			})
-		);
-
-		unsubscriptions.push(
-			forecast.subscribe((x) => {
-				if (!x.initialized) {
-					return;
-				}
-
-				weatherDescription = <string>weatherDescriptionTr.get(<WeatherCode>x.weatherCode);
-
-				finishProgressBar();
-			})
-		);
-	});
-
-	onDestroy(() => {
-		for (const unsubscribe of unsubscriptions) {
-			unsubscribe();
-		}
-		usersService?.release();
-		forecastsService?.release();
+			await goto('/weather');
+		});
 	});
 </script>
 
-<section class="container">
-	<div class="page-title-wrap-loader">
-		<div class="title-wrap">
-			<a href="/menu" class="profile-image-container" title={$t('index.menu')} aria-label={$t('index.menu')}>
-				<img src={$user.imageUri} class="profile-image" width="40" height="40" alt="" />
-			</a>
-
-			<div class="page-title">{currentTime}</div>
-			<button
-				type="button"
-				on:click={sync}
-				class="sync-button"
-				disabled={$isOffline || progressBarActive}
-				title={$t('index.refresh')}
-				aria-label={$t('index.refresh')}
-			>
-				<i class="fas fa-sync-alt" />
-			</button>
-		</div>
-		<div class="progress-bar">
-			<div class="progress" class:visible={progressBarVisible} style="width: {$progress}%;" />
-		</div>
-	</div>
-
-	<div class="content-wrap">
-		<div class="days">
-			{#each $forecast.weekDays as weekDay}
-				<button
-					type="button"
-					on:click={() => selectDate(weekDay.date)}
-					class="week-day"
-					class:selected={selectedDate === weekDay.date}>{weekDay.weekDay}</button
-				>
-			{/each}
+<section class="container" style="height: {containerHeight}px">
+	<div>
+		<div class="loader-wrap">
+			<div class="loader" />
 		</div>
 
-		{#if $forecast !== null}
-			<div class="tab" class:visible={selectedDate === currentDate}>
-				<div class="wrap">
-					<div class="current-forecast">
-						{#if $forecast.initialized}
-							<div class="current-illustration">
-								<Illustration weatherCode={$forecast.weatherCode} timeOfDay={$forecast.timeOfDay} />
-							</div>
-
-							<div class="current-temp" style="color: {currentTempColor}">{$forecast.temperature}°</div>
-
-							{#if $forecast.temperature !== $forecast.apparentTemperature}
-								<div class="current-apparent-temp">{$t('index.feelsLike')} {$forecast.apparentTemperature}°</div>
-							{/if}
-
-							<div class="weather-description">{weatherDescription}</div>
-
-							<table class="wind-and-precipitation">
-								<tr class="wind">
-									<td><i class="fa-solid fa-wind" /></td>
-									<td>
-										<span class="current-value">{$forecast.windSpeed}</span>
-										<span>{windSpeedUnit}</span>
-									</td>
-								</tr>
-								<tr class="precipitation">
-									<td><i class="fa-solid fa-droplet" /></td>
-									<td>
-										<span class="current-value">{$forecast.precipitation}</span>
-										<span>{precipitationUnit}</span>
-									</td>
-								</tr>
-							</table>
-						{:else if $forecast.hourly.length > 0}
-							<div class="loader-wrap">
-								<div class="double-circle-loading">
-									<div class="double-bounce1" />
-									<div class="double-bounce2" />
-								</div>
-							</div>
-						{/if}
-					</div>
-
-					<div class="gutter" />
-
-					<div class="hourly-forecast">
-						<table>
-							{#each $forecast.hourly as hourForecast}
-								<tr>
-									<td>{hourForecast.timeString} {$t('h')}</td>
-									<td class="hourly-illustration">
-										{#if hourForecast.timeOfDay !== null}
-											<Illustration weatherCode={hourForecast.weatherCode} timeOfDay={hourForecast.timeOfDay} />
-										{/if}
-									</td>
-									<td>
-										{#if hourForecast.temperature !== null}
-											<span>{hourForecast.temperature}°</span>
-										{/if}
-									</td>
-								</tr>
-							{/each}
-						</table>
-					</div>
-				</div>
-			</div>
-
-			{#each $forecast.nextDays as nextDay}
-				<div class="tab" class:visible={nextDay.date === selectedDate}>
-					<NextDayForecast forecast={nextDay} />
-				</div>
-			{/each}
-		{/if}
+		<div class="app-name">Weatherman</div>
 	</div>
 </section>
 
 <style lang="scss">
-	.page-title {
-		font-size: 22px;
-	}
-
-	.days {
+	.container {
 		display: flex;
-		gap: 8px;
-		margin-bottom: 30px;
+		justify-content: center;
+		align-items: center;
+	}
 
-		.week-day {
-			flex: 1;
-			border: none;
-			border-radius: 4px;
-			outline: none;
-			padding: 4px 6px;
-			transition: background var(--transition);
+	.loader-wrap {
+		position: relative;
+	}
 
-			&.selected {
-				background: var(--primary-color);
-				color: #fff;
-			}
+	.loader,
+	.loader:after {
+		border-radius: 50%;
+		width: 9em;
+		height: 9em;
+	}
+	.loader {
+		margin: 35px auto;
+		font-size: 12px;
+		position: relative;
+		text-indent: -9999em;
+		border-top: 0.7em solid rgba(106, 104, 243, 0.3);
+		border-right: 0.7em solid rgba(106, 104, 243, 0.3);
+		border-bottom: 0.7em solid rgba(106, 104, 243, 0.3);
+		border-left: 0.7em solid var(--primary-color);
+		transform: translateZ(0);
+		animation: load8 1.1s infinite linear;
+	}
+	@keyframes load8 {
+		0% {
+			transform: rotate(0deg);
+		}
+		100% {
+			transform: rotate(360deg);
 		}
 	}
 
-	.wrap {
-		display: flex;
-	}
-
-	.current-forecast {
-		flex: 1;
-
-		.loader-wrap {
-			padding-top: 60px;
-		}
-	}
-
-	.current-illustration {
-		padding: 0 20px;
-	}
-
-	.current-temp {
-		padding: 10px 0 0 5px;
-		font-size: 90px;
-		line-height: 100px;
-		text-align: center;
-	}
-	.current-apparent-temp {
-		padding: 10px 0;
-		font-size: 1.1rem;
-		line-height: 1.3rem;
-		text-align: center;
-	}
-
-	.weather-description {
-		margin: 25px 0 20px;
-		font-size: 1.4rem;
-		line-height: 1.8rem;
-	}
-
-	.wind-and-precipitation {
-		td {
-			padding-bottom: 6px;
-		}
-
-		i {
-			margin-right: 7px;
-			font-size: 1.2rem;
-		}
-
-		.current-value {
-			font-size: 1.5rem;
-		}
-
-		.wind i {
-			color: #999;
-		}
-		.precipitation i {
-			color: #5aacf1;
-		}
-	}
-
-	.gutter {
-		flex: 0.1;
-	}
-
-	.hourly-forecast {
-		flex: 1;
-
-		table {
-			width: 100%;
-
-			td {
-				border-bottom: 1px solid;
-				padding: 4px 5px;
-				font-size: 18px;
-				white-space: nowrap;
-
-				&:nth-child(2) {
-					text-align: center;
-				}
-
-				&:nth-child(3) {
-					text-align: right;
-				}
-
-				&.hourly-illustration {
-					padding: 1px 5px;
-				}
-			}
-
-			tr:last-child td {
-				border-bottom: none;
-			}
-		}
-	}
-
-	.tab {
-		display: none;
-
-		&.visible {
-			display: block;
-		}
-	}
-
-	@media screen and (min-width: 800px) {
-		.days .week-day {
-			padding: 6px;
-		}
-	}
-
-	@media (prefers-color-scheme: light) {
-		.page-title {
-			color: #774022;
-		}
-
-		.days .week-day {
-			background: #eee;
-		}
-
-		.hourly-forecast table td {
-			border-color: #ddd;
-		}
-	}
-
-	@media (prefers-color-scheme: dark) {
-		.page-title {
-			color: #bf7421;
-		}
-
-		.days .week-day {
-			background: #444;
-			color: #fff;
-		}
-
-		.hourly-forecast table td {
-			border-color: #777;
-		}
+	.app-name {
+		font-size: 1.7rem;
+		user-select: none;
 	}
 </style>
