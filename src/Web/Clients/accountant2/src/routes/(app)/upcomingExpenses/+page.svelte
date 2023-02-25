@@ -74,7 +74,7 @@
 			<i class="far fa-calendar-alt" />
 		</div>
 		<div class="page-title">{$t('upcomingExpenses.upcomingExpenses')}</div>
-		<a href="/" class="back-button">
+		<a href="/dashboard" class="back-button">
 			<i class="fas fa-times" />
 		</a>
 	</div>

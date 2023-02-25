@@ -8,7 +8,7 @@ export default {
 		refresh: 'Refresh',
 		failedToFetchError: 'Please check your internet connection.',
 		h: 'h',
-		index: {
+		weather: {
 			menu: 'Menu',
 			refresh: 'Refresh',
 			feelsLike: 'Feels like',
@@ -63,8 +63,9 @@ export default {
 			kmh: 'km/h',
 			mph: 'mph'
 		},
-		notFound: {
+		error: {
 			youSeemLost: 'You seem lost..',
+			somethingWentWrong: 'Something went wrong.',
 			takeMeHome: 'Take me home'
 		}
 	},
@@ -77,7 +78,7 @@ export default {
 		refresh: 'Освежи',
 		failedToFetchError: 'Вѐ молиме да ја проверите вашата интернет конекција.',
 		h: 'ч',
-		index: {
+		weather: {
 			menu: 'Мени',
 			refresh: 'Освежи',
 			feelsLike: 'Се осеќа како',
@@ -132,8 +133,9 @@ export default {
 			kmh: 'км/ч',
 			mph: 'ми/ч'
 		},
-		notFound: {
+		error: {
 			youSeemLost: 'Се изгубивте?',
+			somethingWentWrong: 'Нешто не испадна како што треба.',
 			takeMeHome: 'Врати ме дома'
 		}
 	}

@@ -189,7 +189,8 @@
 						return x;
 					});
 				}
-				goto('/');
+
+				goto('/dashboard');
 			} catch {
 				submitButtonIsLoading = false;
 			}
@@ -290,7 +291,7 @@
 			<span>{$t(data.isExpense ? 'newTransaction.newExpense' : 'newTransaction.newDeposit')}</span>
 		</div>
 
-		<a href={debtId ? '/debt' : '/'} class="back-button" role="button">
+		<a href={debtId ? '/debt' : '/dashboard'} class="back-button" role="button">
 			<i class="fas fa-times" />
 		</a>
 	</div>
@@ -401,7 +402,7 @@
 					</span>
 					<span>{$t('newTransaction.submit')}</span>
 				</button>
-				<a href={debtId ? '/debt' : '/'} class="button secondary-button">{$t('cancel')}</a>
+				<a href={debtId ? '/debt' : '/dashboard'} class="button secondary-button">{$t('cancel')}</a>
 			</div>
 		</form>
 	</div>

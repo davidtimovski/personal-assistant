@@ -412,7 +412,7 @@
 			<i class="fas fa-piggy-bank" />
 		</div>
 		<div class="page-title">{$t('earlyRetirementCalculator.earlyRetirementCalculator')}</div>
-		<a href="/" class="back-button">
+		<a href="/dashboard" class="back-button">
 			<i class="fas fa-times" />
 		</a>
 	</div>

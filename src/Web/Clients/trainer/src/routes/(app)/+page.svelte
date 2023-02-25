@@ -1,124 +1,76 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte/internal';
-	import type { Unsubscriber } from 'svelte/store';
-	import { tweened } from 'svelte/motion';
-	import { cubicOut } from 'svelte/easing';
+	import { onMount } from 'svelte/internal';
+	import { goto } from '$app/navigation';
 
-	import { DateHelper } from '../../../../shared2/utils/dateHelper';
+	import { authInfo } from '$lib/stores';
 
-	import { t } from '$lib/localization/i18n';
-	import { isOffline, user, authInfo } from '$lib/stores';
-	import { ExercisesService } from '$lib/services/exercisesService';
-	import type { Exercise } from '$lib/models/exercise';
-
-	let exercises: Exercise[] | null = null;
-	const date = DateHelper.format(new Date());
-
-	// Progress bar
-	let progressBarActive = false;
-	const progress = tweened(0, {
-		duration: 500,
-		easing: cubicOut
-	});
-	let progressIntervalId: number | undefined;
-	let progressBarVisible = false;
-
-	let exercisesService: ExercisesService;
-
-	const unsubscriptions: Unsubscriber[] = [];
-
-	function sync() {
-		startProgressBar();
-	}
-
-	function startProgressBar() {
-		progressBarActive = true;
-		progress.set(10);
-
-		progressIntervalId = window.setInterval(() => {
-			if ($progress < 85) {
-				progress.update((x) => {
-					x += 15;
-					return x;
-				});
-			} else if (progressIntervalId) {
-				window.clearInterval(progressIntervalId);
-			}
-		}, 500);
-
-		progressBarVisible = true;
-	}
-
-	function finishProgressBar() {
-		window.clearInterval(progressIntervalId);
-		window.setTimeout(() => {
-			progress.set(100);
-			progressBarActive = false;
-			progressBarVisible = false;
-		}, 500);
-	}
+	let containerHeight = 768;
 
 	onMount(() => {
-		exercisesService = new ExercisesService();
-
-		unsubscriptions.push(
-			authInfo.subscribe(async (x) => {
-				if (!x) {
-					return;
-				}
-
-				exercises = await exercisesService.getAll();
-			})
-		);
-	});
-
-	onDestroy(() => {
-		for (const unsubscribe of unsubscriptions) {
-			unsubscribe();
+		if (window.innerHeight < containerHeight) {
+			containerHeight = window.innerHeight;
 		}
-		exercisesService?.release();
+
+		return authInfo.subscribe(async (x) => {
+			if (!x) {
+				return;
+			}
+
+			await goto('/dashboard');
+		});
 	});
 </script>
 
-<section class="container">
-	<div class="page-title-wrap-loader">
-		<div class="title-wrap">
-			<a href="/menu" class="profile-image-container" title={$t('index.menu')} aria-label={$t('index.menu')}>
-				<img src={$user.imageUri} class="profile-image" width="40" height="40" alt="" />
-			</a>
-
-			<button
-				type="button"
-				on:click={sync}
-				class="sync-button"
-				disabled={$isOffline || progressBarActive}
-				title={$t('index.refresh')}
-				aria-label={$t('index.refresh')}
-			>
-				<i class="fas fa-sync-alt" />
-			</button>
+<section class="container" style="height: {containerHeight}px">
+	<div>
+		<div class="loader-wrap">
+			<div class="loader" />
 		</div>
-		<div class="progress-bar">
-			<div class="progress" class:visible={progressBarVisible} style="width: {$progress}%;" />
-		</div>
-	</div>
 
-	<div class="content-wrap">
-		{#if !exercises}
-			<div class="double-circle-loading">
-				<div class="double-bounce1" />
-				<div class="double-bounce2" />
-			</div>
-		{:else if exercises.length > 0}
-			{#each exercises as exercise}
-				<a href="/progress/{exercise.id}?date={date}">{exercise.name}</a>
-				<br />
-			{/each}
-		{:else}
-			<div>Create some exercises</div>
-		{/if}
+		<div class="app-name">Trainer</div>
 	</div>
 </section>
 
 <style lang="scss">
+	.container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.loader-wrap {
+		position: relative;
+	}
+
+	.loader,
+	.loader:after {
+		border-radius: 50%;
+		width: 9em;
+		height: 9em;
+	}
+	.loader {
+		margin: 35px auto;
+		font-size: 12px;
+		position: relative;
+		text-indent: -9999em;
+		border-top: 0.7em solid rgba(106, 104, 243, 0.3);
+		border-right: 0.7em solid rgba(106, 104, 243, 0.3);
+		border-bottom: 0.7em solid rgba(106, 104, 243, 0.3);
+		border-left: 0.7em solid var(--primary-color);
+		transform: translateZ(0);
+		animation: load8 1.1s infinite linear;
+	}
+	@keyframes load8 {
+		0% {
+			transform: rotate(0deg);
+		}
+		100% {
+			transform: rotate(360deg);
+		}
+	}
+
+	.app-name {
+		font-size: 1.7rem;
+		user-select: none;
+	}
 </style>

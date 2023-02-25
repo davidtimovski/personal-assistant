@@ -278,7 +278,7 @@
 			<i class="fas fa-chart-bar" />
 		</div>
 		<div class="page-title">{$t('barChartReport.barChart')}</div>
-		<a href="/" class="back-button">
+		<a href="/dashboard" class="back-button">
 			<i class="fas fa-times" />
 		</a>
 	</div>
