@@ -1,0 +1,65 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Users\david\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js install
+
+PATH: 
+  C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\Program Files\nodejs\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\Go\bin;C:\Program Files\Git\cmd;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Users\david\AppData\Local\Microsoft\WindowsApps;C:\Users\david\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\david\.dotnet\tools;C:\Users\david\AppData\Roaming\npm;C:\Program Files\OpenSSL-Win64\bin;C:\Users\david\go\bin
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  16.17.0
+
+Platform: 
+  win32 x64
+
+Trace: 
+  Error: EPERM: operation not permitted, unlink 'C:\Users\david\source\repos\personal-assistant\src\Web\Clients\trainer\node_modules\@esbuild\win32-x64\esbuild.exe'
+
+npm manifest: 
+  {
+  	"name": "trainer",
+  	"version": "1.0.0-beta.2",
+  	"repository": {
+  		"type": "git",
+  		"url": "https://github.com/davidtimovski/personal-assistant"
+  	},
+  	"license": "GPL-3.0",
+  	"scripts": {
+  		"dev": "vite dev --port 8084",
+  		"build": "vite build",
+  		"preview": "vite preview",
+  		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+  		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+  		"lint": "prettier --plugin-search-dir . --check . && eslint .",
+  		"format": "prettier --plugin-search-dir . --write ."
+  	},
+  	"devDependencies": {
+  		"@sveltejs/adapter-auto": "^2.0.0",
+  		"@sveltejs/adapter-static": "^2.0.0",
+  		"@sveltejs/kit": "^1.5.0",
+  		"@types/cookie": "^0.5.1",
+  		"@typescript-eslint/eslint-plugin": "^5.45.0",
+  		"@typescript-eslint/parser": "^5.45.0",
+  		"eslint": "^8.28.0",
+  		"eslint-config-prettier": "^8.5.0",
+  		"eslint-plugin-svelte3": "^4.0.0",
+  		"node-sass": "^8.0.0",
+  		"prettier": "^2.8.0",
+  		"prettier-plugin-svelte": "^2.8.1",
+  		"sass": "^1.58.3",
+  		"svelte": "^3.54.0",
+  		"svelte-check": "^3.0.1",
+  		"svelte-preprocess": "^5.0.1",
+  		"tslib": "^2.4.1",
+  		"typescript": "^4.9.3",
+  		"vite": "^4.0.0"
+  	},
+  	"type": "module"
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

@@ -12,7 +12,7 @@ export default {
 		cancel: 'Cancel',
 		back: 'Back',
 		date: 'Date',
-		index: {
+		dashboard: {
 			menu: 'Menu',
 			refresh: 'Refresh'
 		},
@@ -40,8 +40,9 @@ export default {
 			logOut: 'Log Out',
 			version: 'Version'
 		},
-		notFound: {
+		error: {
 			youSeemLost: 'You seem lost..',
+			somethingWentWrong: 'Something went wrong.',
 			takeMeHome: 'Take me home'
 		}
 	},
@@ -58,7 +59,7 @@ export default {
 		cancel: 'Откажи',
 		back: 'Назад',
 		date: 'Датум',
-		index: {
+		dashboard: {
 			menu: 'Мени',
 			refresh: 'Освежи'
 		},
@@ -86,8 +87,9 @@ export default {
 			logOut: 'Одјава',
 			version: 'Верзија'
 		},
-		notFound: {
+		error: {
 			youSeemLost: 'Се изгубивте?',
+			somethingWentWrong: 'Нешто не испадна како што треба.',
 			takeMeHome: 'Врати ме дома'
 		}
 	}

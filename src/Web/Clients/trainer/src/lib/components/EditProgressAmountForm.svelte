@@ -48,7 +48,7 @@
 				x.showSuccess('progress.saveSuccessful');
 				return x;
 			});
-			goto('/');
+			goto('/dashboard');
 		}
 	}
 
@@ -98,7 +98,7 @@
 		<span>{$t('save')}</span>
 	</button>
 
-	<a href="/" class="button secondary-button">{$t('back')}</a>
+	<a href="/dashboard" class="button secondary-button">{$t('back')}</a>
 </div>
 
 <style lang="scss">

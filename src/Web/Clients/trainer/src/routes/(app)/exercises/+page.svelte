@@ -36,7 +36,7 @@
 			<i class="fas fa-inbox" />
 		</div>
 		<div class="page-title">{$t('exercises.exercises')}</div>
-		<a href="/" class="back-button">
+		<a href="/dashboard" class="back-button">
 			<i class="fas fa-times" />
 		</a>
 	</div>

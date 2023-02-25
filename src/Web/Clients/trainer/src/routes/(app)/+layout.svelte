@@ -1,9 +1,6 @@
 <script lang="ts">
 	import '../../app.css';
 
-	export const ssr = false;
-	export const prerender = true;
-
 	import { onMount, onDestroy } from 'svelte/internal';
 
 	import { UsersServiceBase } from '../../../../shared2/services/usersServiceBase';
@@ -33,12 +30,12 @@
 		const authService = new AuthService();
 		await authService.initialize();
 
-		if (await authService.authenticated()) {
-			await authService.setToken();
-		} else {
+		if (!(await authService.authenticated())) {
 			await authService.signinRedirect();
 			return;
 		}
+
+		await authService.setToken();
 
 		usersService = new UsersServiceBase('Trainer');
 		loadUser();
