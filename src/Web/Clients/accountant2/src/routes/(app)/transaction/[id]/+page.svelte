@@ -234,14 +234,14 @@
 			{#if fromStocks}
 				<div class="form-control inline">
 					<span>{$t('soldStocks')}</span>
-					<span class="expense-color">{Formatter.moneyPrecise(fromStocks, preferredCurrency, $user.culture, 4)}</span>
+					<span class="expense-color">{Formatter.numberPrecise(fromStocks, preferredCurrency, $user.culture, 4)}</span>
 				</div>
 			{/if}
 
 			{#if toStocks}
 				<div class="form-control inline">
 					<span>{$t('purchasedStocks')}</span>
-					<span class="deposit-color">{Formatter.moneyPrecise(toStocks, preferredCurrency, $user.culture, 4)}</span>
+					<span class="deposit-color">{Formatter.numberPrecise(toStocks, preferredCurrency, $user.culture, 4)}</span>
 				</div>
 			{/if}
 

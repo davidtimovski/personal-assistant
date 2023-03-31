@@ -38,9 +38,8 @@
 	let accountsService: AccountsService;
 	let categoriesService: CategoriesService;
 
-	const from = new Date();
-	from.setMonth(from.getMonth() - 6);
-	from.setDate(1);
+	const now = new Date();
+	const from = new Date(now.getFullYear(), now.getMonth() - 6, 1);
 	let fromDate = DateHelper.format(from);
 
 	Chart.register(BarController, BarElement, CategoryScale, LinearScale);
@@ -234,14 +233,12 @@
 
 		currency = localStorage.get(LocalStorageKeys.Currency);
 
-		const now = new Date();
 		const fromOpts = new Array<FromOption>();
-		const date = new Date(now.getFullYear(), now.getMonth(), 1);
-		for (let i = 1; i <= 6; i++) {
-			date.setMonth(date.getMonth() - 6);
+		const monthsSince = [6, 12, 18, 24, 36, 48, 50, 62];
+		for (let months of monthsSince) {
+			const value = DateHelper.format(new Date(now.getFullYear(), now.getMonth() - months));
 
-			const value = DateHelper.format(date);
-			const label = i * 6 + ' ' + $t('barChartReport.months');
+			const label = months + ' ' + $t('barChartReport.months');
 
 			fromOpts.push(new FromOption(value, label));
 		}

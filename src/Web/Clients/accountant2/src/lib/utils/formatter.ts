@@ -11,6 +11,21 @@ export class Formatter {
 		}).format(value);
 	}
 
+	static numberPrecise(
+		value: any,
+		currency: string | null,
+		culture: string | null,
+		fractionDigits?: number | undefined
+	) {
+		if (isNaN(parseFloat(value)) || !currency || !culture) {
+			return '';
+		}
+
+		return new Intl.NumberFormat(culture, {
+			maximumFractionDigits: fractionDigits ? fractionDigits : 2
+		}).format(value);
+	}
+
 	static money(value: any, currency: string | null, culture: string | null) {
 		if (isNaN(parseFloat(value)) || !currency || !culture) {
 			return '';
