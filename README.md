@@ -4,10 +4,10 @@ An ecosystem of PWAs that cooperate with each other to provide unique functional
 
 [https://personalassistant.site](https://personalassistant.site)
 
-[![alt text](https://github.com/davidtimovski/personal-assistant/blob/master/src/Clients/to-do-assistant2/static/images/icons/app-icon-x96.png?raw=true)](https://personalassistant.site/home/to-do-assistant)
-[![alt text](https://github.com/davidtimovski/personal-assistant/blob/master/src/Clients/accountant2/static/images/icons/app-icon-x96.png?raw=true)](https://personalassistant.site/home/accountant)
-[![alt text](https://github.com/davidtimovski/personal-assistant/blob/master/src/Clients/cooking-assistant/src/static/images/icons/app-icon-x96.png?raw=true)](https://personalassistant.site/home/cooking-assistant)
-[![alt text](https://github.com/davidtimovski/personal-assistant/blob/master/src/Clients/weatherman/static/images/icons/app-icon-x96.png?raw=true)](https://personalassistant.site/home/weatherman)
+[![alt text](./src/Web/Clients/to-do-assistant2/static/images/icons/app-icon-x96.png)](https://personalassistant.site/home/to-do-assistant)
+[![alt text](./src/Web/Clients/accountant2/static/images/icons/app-icon-x96.png)](https://personalassistant.site/home/accountant)
+[![alt text](./src/Web/Clients/weatherman/static/images/icons/app-icon-x96.png)](https://personalassistant.site/home/weatherman)
+[![alt text](./src/Web/Clients/cooking-assistant/src/static/images/icons/app-icon-x96.png)](https://personalassistant.site/home/cooking-assistant)
 
 ## Apps
 
