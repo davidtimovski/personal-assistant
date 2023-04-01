@@ -11,22 +11,6 @@ public class AutomaticTransactionsRepository : BaseRepository, IAutomaticTransac
     public AutomaticTransactionsRepository(PersonalAssistantContext efContext)
         : base(efContext) { }
 
-    public IEnumerable<AutomaticTransaction> GetAll(int userId, DateTime fromModifiedDate)
-    {
-        using IDbConnection conn = OpenConnection();
-
-        return conn.Query<AutomaticTransaction>(@"SELECT * FROM accountant.automatic_transactions WHERE user_id = @UserId AND modified_date > @FromModifiedDate",
-            new { UserId = userId, FromModifiedDate = fromModifiedDate });
-    }
-
-    public IEnumerable<int> GetDeletedIds(int userId, DateTime fromDate)
-    {
-        using IDbConnection conn = OpenConnection();
-
-        return conn.Query<int>(@"SELECT entity_id FROM accountant.deleted_entities WHERE user_id = @UserId AND entity_type = @EntityType AND deleted_date > @DeletedDate",
-            new { UserId = userId, EntityType = (short)EntityType.AutomaticTransaction, DeletedDate = fromDate });
-    }
-
     public async Task<int> CreateAsync(AutomaticTransaction automaticTransaction)
     {
         EFContext.AutomaticTransactions.Add(automaticTransaction);

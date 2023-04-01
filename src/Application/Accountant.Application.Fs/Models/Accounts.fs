@@ -9,7 +9,7 @@ module Accounts =
           Name: string
           IsMain: bool
           Currency: string
-          StockPrice: Nullable<decimal>
+          StockPrice: decimal Option
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 

@@ -1,12 +1,11 @@
 ﻿namespace Accountant.Application.Fs.Services
 
 open System
-open System.Collections.Generic
-open Application.Domain.Accountant
+open Accountant.Domain.Models
 open Accountant.Application.Fs.Models.UpcomingExpenses
 
 module UpcomingExpenseService =
-    let mapAll (categories: IEnumerable<UpcomingExpense>) : seq<UpcomingExpenseDto> =
+    let mapAll (categories: seq<UpcomingExpense>) : seq<UpcomingExpenseDto> =
         categories
         |> Seq.map (fun x ->
             { Id = x.Id
@@ -19,12 +18,12 @@ module UpcomingExpenseService =
               CreatedDate = x.CreatedDate
               ModifiedDate = x.ModifiedDate })
 
-    let prepareForCreate (model: CreateUpcomingExpense) (userId: int) : UpcomingExpense =
+    let prepareForCreate (model: CreateUpcomingExpense) (userId: int) : Application.Domain.Accountant.UpcomingExpense =
         let trimmedDesc = (match model.Description with
                             | null -> null
                             | a -> a.Trim())
         
-        UpcomingExpense(
+        Application.Domain.Accountant.UpcomingExpense(
             Id = 0,
             UserId = userId,
             CategoryId = model.CategoryId,
@@ -37,12 +36,12 @@ module UpcomingExpenseService =
             ModifiedDate = model.ModifiedDate
         )
 
-    let prepareForUpdate (model: UpdateUpcomingExpense) (userId: int) : UpcomingExpense =
+    let prepareForUpdate (model: UpdateUpcomingExpense) (userId: int) : Application.Domain.Accountant.UpcomingExpense =
         let trimmedDesc = (match model.Description with
                             | null -> null
                             | a -> a.Trim())
         
-        UpcomingExpense(
+        Application.Domain.Accountant.UpcomingExpense(
             Id = model.Id,
             UserId = userId,
             CategoryId = model.CategoryId,

@@ -1,11 +1,10 @@
 ﻿namespace Accountant.Application.Fs.Services
 
-open System.Collections.Generic
-open Application.Domain.Accountant
+open Accountant.Domain.Models
 open Accountant.Application.Fs.Models.Debts
 
 module DebtService =
-    let mapAll (debts: IEnumerable<Debt>) : seq<DebtDto> =
+    let mapAll (debts: seq<Debt>) : seq<DebtDto> =
         debts
         |> Seq.map (fun x ->
             { Id = x.Id
@@ -17,12 +16,12 @@ module DebtService =
               CreatedDate = x.CreatedDate
               ModifiedDate = x.ModifiedDate })
 
-    let prepareForCreate (model: CreateDebt) (userId: int) : Debt =
+    let prepareForCreate (model: CreateDebt) (userId: int) : Application.Domain.Accountant.Debt =
         let trimmedDesc = (match model.Description with
                             | null -> null
                             | a -> a.Trim())
         
-        Debt(
+        Application.Domain.Accountant.Debt(
             Id = 0,
             UserId = userId,
             Person = model.Person.Trim(),
@@ -34,12 +33,12 @@ module DebtService =
             ModifiedDate = model.ModifiedDate
         )
 
-    let prepareForCreateMerged (model: CreateDebt) (userId: int) : Debt =
+    let prepareForCreateMerged (model: CreateDebt) (userId: int) : Application.Domain.Accountant.Debt =
         let trimmedDesc = (match model.Description with
                             | null -> null
                             | a -> a.Trim())
         
-        Debt(
+        Application.Domain.Accountant.Debt(
             Id = 0,
             UserId = userId,
             Person = model.Person.Trim(),
@@ -51,12 +50,12 @@ module DebtService =
             ModifiedDate = model.ModifiedDate
         )
 
-    let prepareForUpdate (model: UpdateDebt) (userId: int) : Debt =
+    let prepareForUpdate (model: UpdateDebt) (userId: int) : Application.Domain.Accountant.Debt =
         let trimmedDesc = (match model.Description with
                             | null -> null
                             | a -> a.Trim())
         
-        Debt(
+        Application.Domain.Accountant.Debt(
             Id = model.Id,
             UserId = userId,
             Person = model.Person.Trim(),

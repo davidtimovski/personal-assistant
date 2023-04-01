@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="CommonRepository.fs" />
+    <Compile Include="AccountsRepository.fs" />
+    <Compile Include="TransactionsRepository.fs" />
+    <Compile Include="AutomaticTransactionsRepository.fs" />
+    <Compile Include="CategoriesRepository.fs" />
+    <Compile Include="DebtsRepository.fs" />
+    <Compile Include="UpcomingExpensesRepository.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql.FSharp" Version="5.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Application\Accountant.Domain\Accountant.Domain.fsproj" />
+  </ItemGroup>
+
+</Project>

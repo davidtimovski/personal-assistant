@@ -1,12 +1,11 @@
 ﻿namespace Accountant.Application.Fs.Services
 
 open System
-open System.Collections.Generic
-open Application.Domain.Accountant
+open Accountant.Domain.Models
 open Accountant.Application.Fs.Models.Accounts
 
 module AccountService =
-    let mapAll (accounts: IEnumerable<Account>) : seq<AccountDto> =
+    let mapAll (accounts: seq<Account>) : seq<AccountDto> =
         accounts
         |> Seq.map (fun x ->
             { Id = x.Id
@@ -17,8 +16,8 @@ module AccountService =
               CreatedDate = x.CreatedDate
               ModifiedDate = x.ModifiedDate })
 
-    let prepareForCreate (model: CreateAccount) (userId: int) : Account =
-        Account(
+    let prepareForCreate (model: CreateAccount) (userId: int) : Application.Domain.Accountant.Account =
+        Application.Domain.Accountant.Account(
             Id = 0,
             UserId = userId,
             Name = model.Name.Trim(),
@@ -29,10 +28,10 @@ module AccountService =
             ModifiedDate = model.ModifiedDate
         )
 
-    let prepareForCreateMain (userId: int) (name: string) : Account =
+    let prepareForCreateMain (userId: int) (name: string) : Application.Domain.Accountant.Account =
         let now = DateTime.UtcNow;
 
-        Account(
+        Application.Domain.Accountant.Account(
             Id = 0,
             UserId = userId,
             Name = name.Trim(),
@@ -43,8 +42,8 @@ module AccountService =
             ModifiedDate = now
         )
 
-    let prepareForUpdate (model: UpdateAccount) (userId: int) : Account =
-        Account(
+    let prepareForUpdate (model: UpdateAccount) (userId: int) : Application.Domain.Accountant.Account =
+        Application.Domain.Accountant.Account(
             Id = model.Id,
             UserId = userId,
             Name = model.Name.Trim(),

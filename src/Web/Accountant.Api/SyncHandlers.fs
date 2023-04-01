@@ -1,15 +1,13 @@
 ﻿module SyncHandlers
 
 open System
-open Accountant.Application.Contracts.Accounts
-open Accountant.Application.Contracts.AutomaticTransactions
-open Accountant.Application.Contracts.Categories
-open Accountant.Application.Contracts.Debts
+open Accountant.Domain.Models
 open Accountant.Application.Contracts.Transactions
 open Accountant.Application.Contracts.UpcomingExpenses
 open Accountant.Application.Contracts.Sync
 open Accountant.Application.Fs.Services
 open Accountant.Application.Fs.Models.Sync
+open Accountant.Persistence.Fs
 open Giraffe
 open Microsoft.AspNetCore.Http
 open CommonHandlers
@@ -17,14 +15,9 @@ open Models
 
 let getChanges: HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
-        let accountsRepository = ctx.GetService<IAccountsRepository>()
-        let categoryRepository = ctx.GetService<ICategoriesRepository>()
-        let transactionsRepository = ctx.GetService<ITransactionsRepository>()
         let upcomingExpensesRepository = ctx.GetService<IUpcomingExpensesRepository>()
-        let debtsRepository = ctx.GetService<IDebtsRepository>()
 
-        let automaticTransactionsRepository =
-            ctx.GetService<IAutomaticTransactionsRepository>()
+        let connectionString = getConnectionString ctx
 
         task {
             let! dto = ctx.BindJsonAsync<GetChangesDto>()
@@ -32,38 +25,56 @@ let getChanges: HttpHandler =
 
             do! upcomingExpensesRepository.DeleteOldAsync(userId, UpcomingExpenseService.getFirstDayOfMonth)
 
-            let accounts =
-                accountsRepository.GetAll(userId, dto.LastSynced) |> AccountService.mapAll
+            let! deletedAccountIds = CommonRepository.getDeletedIds(userId, dto.LastSynced, EntityType.Account, connectionString) |> Async.AwaitTask
+            let! accounts = AccountsRepository.getAll(userId, dto.LastSynced, connectionString) |> Async.AwaitTask
+            let accountDtos =
+                accounts
+                |> AccountService.mapAll
 
-            let categories =
-                categoryRepository.GetAll(userId, dto.LastSynced) |> CategoryService.mapAll
+            let! deletedCategoryIds = CommonRepository.getDeletedIds(userId, dto.LastSynced, EntityType.Category, connectionString) |> Async.AwaitTask
+            let! categories = CategoriesRepository.getAll(userId, dto.LastSynced, connectionString) |> Async.AwaitTask
+            let categoryDtos =
+                categories
+                |> CategoryService.mapAll
 
-            let transactions = transactionsRepository.GetAll(userId, dto.LastSynced) |> TransactionService.mapAll
+            let! deletedTransactionIds = CommonRepository.getDeletedIds(userId, dto.LastSynced, EntityType.Transaction, connectionString) |> Async.AwaitTask
+            let! transactions = TransactionsRepository.getAll(userId, dto.LastSynced, connectionString) |> Async.AwaitTask
+            let transactionDtos = 
+                transactions
+                |> TransactionService.mapAll
 
-            let upcomingExpenses =
-                upcomingExpensesRepository.GetAll(userId, dto.LastSynced)
+            let! deletedUpcomingExpenseIds = CommonRepository.getDeletedIds(userId, dto.LastSynced, EntityType.UpcomingExpense, connectionString) |> Async.AwaitTask
+            let! upcomingExpenses = UpcomingExpensesRepository.getAll(userId, dto.LastSynced, connectionString) |> Async.AwaitTask
+            let upcomingExpenseDtos =
+                upcomingExpenses
                 |> UpcomingExpenseService.mapAll
 
-            let debts = debtsRepository.GetAll(userId, dto.LastSynced) |> DebtService.mapAll
+            let! deletedDebtIds = CommonRepository.getDeletedIds(userId, dto.LastSynced, EntityType.Debt, connectionString) |> Async.AwaitTask
+            let! debts = DebtsRepository.getAll(userId, dto.LastSynced, connectionString) |> Async.AwaitTask
+            let debtDtos = 
+                debts
+                |> DebtService.mapAll
 
-            let automaticTransactions =
-                automaticTransactionsRepository.GetAll(userId, dto.LastSynced)
+            let! deletedAutomaticTransactionIds = CommonRepository.getDeletedIds(userId, dto.LastSynced, EntityType.AutomaticTransaction, connectionString) |> Async.AwaitTask
+            let! automaticTransactions = AutomaticTransactionsRepository.getAll(userId, dto.LastSynced, connectionString) |> Async.AwaitTask
+            let automaticTransactionDtos =
+                automaticTransactions
                 |> AutomaticTransactionService.mapAll
 
             let changed =
                 { LastSynced = DateTime.Now
-                  DeletedAccountIds = accountsRepository.GetDeletedIds(userId, dto.LastSynced)
-                  Accounts = accounts
-                  DeletedCategoryIds = categoryRepository.GetDeletedIds(userId, dto.LastSynced)
-                  Categories = categories
-                  DeletedTransactionIds = transactionsRepository.GetDeletedIds(userId, dto.LastSynced)
-                  Transactions = transactions
-                  DeletedUpcomingExpenseIds = upcomingExpensesRepository.GetDeletedIds(userId, dto.LastSynced)
-                  UpcomingExpenses = upcomingExpenses
-                  DeletedDebtIds = debtsRepository.GetDeletedIds(userId, dto.LastSynced)
-                  Debts = debts
-                  DeletedAutomaticTransactionIds = automaticTransactionsRepository.GetDeletedIds(userId, dto.LastSynced)
-                  AutomaticTransactions = automaticTransactions }
+                  DeletedAccountIds = deletedAccountIds
+                  Accounts = accountDtos
+                  DeletedCategoryIds = deletedCategoryIds
+                  Categories = categoryDtos
+                  DeletedTransactionIds = deletedTransactionIds
+                  Transactions = transactionDtos
+                  DeletedUpcomingExpenseIds = deletedUpcomingExpenseIds
+                  UpcomingExpenses = upcomingExpenseDtos
+                  DeletedDebtIds = deletedDebtIds
+                  Debts = debtDtos
+                  DeletedAutomaticTransactionIds = deletedAutomaticTransactionIds
+                  AutomaticTransactions = automaticTransactionDtos }
 
             return! Successful.OK changed next ctx
         }

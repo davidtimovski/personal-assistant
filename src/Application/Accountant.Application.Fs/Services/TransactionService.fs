@@ -1,11 +1,10 @@
 ﻿namespace Accountant.Application.Fs.Services
 
-open System.Collections.Generic
-open Application.Domain.Accountant
+open Accountant.Domain.Models
 open Accountant.Application.Fs.Models.Transactions
 
 module TransactionService =
-    let mapAll (categories: IEnumerable<Transaction>) : seq<TransactionDto> =
+    let mapAll (categories: seq<Transaction>) : seq<TransactionDto> =
         categories
         |> Seq.map (fun x ->
             { Id = x.Id

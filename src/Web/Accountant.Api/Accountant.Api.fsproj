@@ -42,6 +42,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\Infrastructure\Accountant.Persistence.Fs\Accountant.Persistence.Fs.fsproj" />
 		<ProjectReference Include="..\Api.Common\Api.Common.fsproj" />
 		<ProjectReference Include="..\..\Application\Accountant.Application.Fs\Accountant.Application.Fs.fsproj" />
 		<ProjectReference Include="..\..\Application\Accountant.Application\Accountant.Application.csproj" />

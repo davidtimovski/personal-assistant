@@ -50,26 +50,6 @@ public class TransactionsRepository : BaseRepository, ITransactionsRepository
         return transactions;
     }
 
-    public IEnumerable<Transaction> GetAll(int userId, DateTime fromModifiedDate)
-    {
-        using IDbConnection conn = OpenConnection();
-
-        return conn.Query<Transaction>(@"SELECT t.* 
-                                         FROM accountant.transactions AS t
-                                         INNER JOIN accountant.accounts AS a ON a.id = t.from_account_id 
-                                             OR a.id = t.to_account_id 
-                                         WHERE a.user_id = @UserId AND t.modified_date > @FromModifiedDate",
-            new { UserId = userId, FromModifiedDate = fromModifiedDate });
-    }
-
-    public IEnumerable<int> GetDeletedIds(int userId, DateTime fromDate)
-    {
-        using IDbConnection conn = OpenConnection();
-
-        return conn.Query<int>(@"SELECT entity_id FROM accountant.deleted_entities WHERE user_id = @UserId AND entity_type = @EntityType AND deleted_date > @DeletedDate",
-            new { UserId = userId, EntityType = (short)EntityType.Transaction, DeletedDate = fromDate });
-    }
-
     public async Task<int> CreateAsync(Transaction transaction)
     {
         using IDbConnection conn = OpenConnection();

@@ -6,10 +6,10 @@ module UpcomingExpenses =
 
     type UpcomingExpenseDto =
         { Id: int
-          CategoryId: Nullable<int>
+          CategoryId: int Option
           Amount: decimal
           Currency: string
-          Description: string
+          Description: string Option
           Date: DateTime
           Generated: bool
           CreatedDate: DateTime

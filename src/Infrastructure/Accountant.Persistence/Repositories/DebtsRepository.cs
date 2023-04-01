@@ -11,22 +11,6 @@ public class DebtsRepository : BaseRepository, IDebtsRepository
     public DebtsRepository(PersonalAssistantContext efContext)
         : base(efContext) { }
 
-    public IEnumerable<Debt> GetAll(int userId, DateTime fromModifiedDate)
-    {
-        using IDbConnection conn = OpenConnection();
-
-        return conn.Query<Debt>(@"SELECT * FROM accountant.debts WHERE user_id = @UserId AND modified_date > @FromModifiedDate",
-            new { UserId = userId, FromModifiedDate = fromModifiedDate });
-    }
-
-    public IEnumerable<int> GetDeletedIds(int userId, DateTime fromDate)
-    {
-        using IDbConnection conn = OpenConnection();
-
-        return conn.Query<int>(@"SELECT entity_id FROM accountant.deleted_entities WHERE user_id = @UserId AND entity_type = @EntityType AND deleted_date > @DeletedDate",
-            new { UserId = userId, EntityType = (short)EntityType.Debt, DeletedDate = fromDate });
-    }
-
     public async Task<int> CreateAsync(Debt debt)
     {
         EFContext.Debts.Add(debt);

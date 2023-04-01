@@ -11,22 +11,6 @@ public class CategoriesRepository : BaseRepository, ICategoriesRepository
     public CategoriesRepository(PersonalAssistantContext efContext)
         : base(efContext) { }
 
-    public IEnumerable<Category> GetAll(int userId, DateTime fromModifiedDate)
-    {
-        using IDbConnection conn = OpenConnection();
-
-        return conn.Query<Category>(@"SELECT * FROM accountant.categories WHERE user_id = @UserId AND modified_date > @FromModifiedDate",
-            new { UserId = userId, FromModifiedDate = fromModifiedDate });
-    }
-
-    public IEnumerable<int> GetDeletedIds(int userId, DateTime fromDate)
-    {
-        using IDbConnection conn = OpenConnection();
-
-        return conn.Query<int>(@"SELECT entity_id FROM accountant.deleted_entities WHERE user_id = @UserId AND entity_type = @EntityType AND deleted_date > @DeletedDate",
-            new { UserId = userId, EntityType = (short)EntityType.Category, DeletedDate = fromDate });
-    }
-
     public async Task<int> CreateAsync(Category category)
     {
         EFContext.Categories.Add(category);

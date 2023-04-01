@@ -6,19 +6,19 @@ module Transactions =
 
     type TransactionDto =
         { Id: int
-          FromAccountId: Nullable<int>
-          ToAccountId: Nullable<int>
-          CategoryId: Nullable<int>
+          FromAccountId: int Option
+          ToAccountId: int Option
+          CategoryId: int Option
           Amount: decimal
-          FromStocks: Nullable<decimal>
-          ToStocks: Nullable<decimal>
+          FromStocks: decimal Option
+          ToStocks: decimal Option
           Currency: string
-          Description: string
+          Description: string Option
           Date: DateTime
           IsEncrypted: bool
-          EncryptedDescription: byte[]
-          Salt: byte[]
-          Nonce: byte[]
+          EncryptedDescription: byte[] Option
+          Salt: byte[] Option
+          Nonce: byte[] Option
           Generated: bool
           CreatedDate: DateTime
           ModifiedDate: DateTime }

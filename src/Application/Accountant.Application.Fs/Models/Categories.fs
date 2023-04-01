@@ -7,9 +7,9 @@ module Categories =
 
     type CategoryDto =
         { Id: int
-          ParentId: Nullable<int>
+          ParentId: int Option
           Name: string
-          Type: CategoryType
+          Type: Accountant.Domain.Models.CategoryType
           GenerateUpcomingExpense: bool
           IsTax: bool
           CreatedDate: DateTime

@@ -11,22 +11,6 @@ public class AccountsRepository : BaseRepository, IAccountsRepository
     public AccountsRepository(PersonalAssistantContext efContext)
         : base(efContext) { }
 
-    public IEnumerable<Account> GetAll(int userId, DateTime fromModifiedDate)
-    {
-        using IDbConnection conn = OpenConnection();
-
-        return conn.Query<Account>(@"SELECT * FROM accountant.accounts WHERE user_id = @UserId AND modified_date > @FromModifiedDate",
-            new { UserId = userId, FromModifiedDate = fromModifiedDate });
-    }
-
-    public IEnumerable<int> GetDeletedIds(int userId, DateTime fromDate)
-    {
-        using IDbConnection conn = OpenConnection();
-
-        return conn.Query<int>(@"SELECT entity_id FROM accountant.deleted_entities WHERE user_id = @UserId AND entity_type = @EntityType AND deleted_date > @DeletedDate",
-            new { UserId = userId, EntityType = (short)EntityType.Account, DeletedDate = fromDate });
-    }
-
     public bool Exists(int id, int userId)
     {
         using IDbConnection conn = OpenConnection();

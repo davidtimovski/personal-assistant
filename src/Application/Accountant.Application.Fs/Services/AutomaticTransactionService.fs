@@ -1,11 +1,11 @@
 ﻿namespace Accountant.Application.Fs.Services
 
-open System.Collections.Generic
-open Application.Domain.Accountant
+open System
+open Accountant.Domain.Models
 open Accountant.Application.Fs.Models.AutomaticTransactions
 
 module AutomaticTransactionService =
-    let mapAll (automaticTransactions: IEnumerable<AutomaticTransaction>) : seq<AutomaticTransactionDto> =
+    let mapAll (automaticTransactions: seq<AutomaticTransaction>) : seq<AutomaticTransactionDto> =
         automaticTransactions
         |> Seq.map (fun x ->
             { Id = x.Id
@@ -18,12 +18,12 @@ module AutomaticTransactionService =
               CreatedDate = x.CreatedDate
               ModifiedDate = x.ModifiedDate })
 
-    let prepareForCreate (model: CreateAutomaticTransaction) (userId: int) : AutomaticTransaction =
+    let prepareForCreate (model: CreateAutomaticTransaction) (userId: int) : Application.Domain.Accountant.AutomaticTransaction =
         let trimmedDesc = (match model.Description with
                             | null -> null
                             | a -> a.Trim())
         
-        AutomaticTransaction(
+        Application.Domain.Accountant.AutomaticTransaction(
             Id = 0,
             UserId = userId,
             IsDeposit = model.IsDeposit,
@@ -36,12 +36,12 @@ module AutomaticTransactionService =
             ModifiedDate = model.ModifiedDate
         )
 
-    let prepareForUpdate (model: UpdateAutomaticTransaction) (userId: int) : AutomaticTransaction =
+    let prepareForUpdate (model: UpdateAutomaticTransaction) (userId: int) : Application.Domain.Accountant.AutomaticTransaction =
         let trimmedDesc = (match model.Description with
                             | null -> null
                             | a -> a.Trim())
         
-        AutomaticTransaction(
+        Application.Domain.Accountant.AutomaticTransaction(
             Id = model.Id,
             UserId = userId,
             IsDeposit = model.IsDeposit,

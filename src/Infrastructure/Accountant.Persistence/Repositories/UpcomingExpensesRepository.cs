@@ -11,22 +11,6 @@ public class UpcomingExpensesRepository : BaseRepository, IUpcomingExpensesRepos
     public UpcomingExpensesRepository(PersonalAssistantContext efContext)
         : base(efContext) { }
 
-    public IEnumerable<UpcomingExpense> GetAll(int userId, DateTime fromModifiedDate)
-    {
-        using IDbConnection conn = OpenConnection();
-
-        return conn.Query<UpcomingExpense>(@"SELECT * FROM accountant.upcoming_expenses WHERE user_id = @UserId AND modified_date > @FromModifiedDate",
-            new { UserId = userId, FromModifiedDate = fromModifiedDate });
-    }
-
-    public IEnumerable<int> GetDeletedIds(int userId, DateTime fromDate)
-    {
-        using IDbConnection conn = OpenConnection();
-
-        return conn.Query<int>(@"SELECT entity_id FROM accountant.deleted_entities WHERE user_id = @UserId AND entity_type = @EntityType AND deleted_date > @DeletedDate",
-            new { UserId = userId, EntityType = (short)EntityType.UpcomingExpense, DeletedDate = fromDate });
-    }
-
     public async Task<int> CreateAsync(UpcomingExpense upcomingExpense)
     {
         upcomingExpense.Date = upcomingExpense.Date.ToUniversalTime();

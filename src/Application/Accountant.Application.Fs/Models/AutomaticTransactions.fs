@@ -7,10 +7,10 @@ module AutomaticTransactions =
     type AutomaticTransactionDto =
         { Id: int
           IsDeposit: bool
-          CategoryId: Nullable<int>
+          CategoryId: int Option
           Amount: decimal
           Currency: string
-          Description: string
+          Description: string Option
           DayInMonth: int16
           CreatedDate: DateTime
           ModifiedDate: DateTime }
