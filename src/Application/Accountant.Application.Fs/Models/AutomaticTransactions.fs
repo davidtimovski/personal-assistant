@@ -17,7 +17,7 @@ module AutomaticTransactions =
 
     type CreateAutomaticTransaction =
         { IsDeposit: bool
-          CategoryId: Nullable<int>
+          CategoryId: int Option
           Amount: decimal
           Currency: string
           Description: string
@@ -28,7 +28,7 @@ module AutomaticTransactions =
     type UpdateAutomaticTransaction =
         { Id: int
           IsDeposit: bool
-          CategoryId: Nullable<int>
+          CategoryId: int Option
           Amount: decimal
           Currency: string
           Description: string

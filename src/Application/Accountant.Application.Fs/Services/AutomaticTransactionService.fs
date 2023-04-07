@@ -1,6 +1,5 @@
 ﻿namespace Accountant.Application.Fs.Services
 
-open System
 open Accountant.Domain.Models
 open Accountant.Application.Fs.Models.AutomaticTransactions
 
@@ -18,38 +17,36 @@ module AutomaticTransactionService =
               CreatedDate = x.CreatedDate
               ModifiedDate = x.ModifiedDate })
 
-    let prepareForCreate (model: CreateAutomaticTransaction) (userId: int) : Application.Domain.Accountant.AutomaticTransaction =
-        let trimmedDesc = (match model.Description with
-                            | null -> null
-                            | a -> a.Trim())
-        
-        Application.Domain.Accountant.AutomaticTransaction(
-            Id = 0,
-            UserId = userId,
-            IsDeposit = model.IsDeposit,
-            CategoryId = model.CategoryId,
-            Amount = model.Amount,
-            Currency = model.Currency,
-            Description = trimmedDesc,
-            DayInMonth = model.DayInMonth,
-            CreatedDate = model.CreatedDate,
+    let prepareForCreate (model: CreateAutomaticTransaction) (userId: int) =
+        {
+            Id = 0
+            UserId = userId
+            IsDeposit = model.IsDeposit
+            CategoryId = model.CategoryId
+            Amount = model.Amount
+            Currency = model.Currency
+            Description =
+                match model.Description with
+                | null -> None
+                | a -> Some(a.Trim())
+            DayInMonth = model.DayInMonth
+            CreatedDate = model.CreatedDate
             ModifiedDate = model.ModifiedDate
-        )
+        }
 
-    let prepareForUpdate (model: UpdateAutomaticTransaction) (userId: int) : Application.Domain.Accountant.AutomaticTransaction =
-        let trimmedDesc = (match model.Description with
-                            | null -> null
-                            | a -> a.Trim())
-        
-        Application.Domain.Accountant.AutomaticTransaction(
-            Id = model.Id,
-            UserId = userId,
-            IsDeposit = model.IsDeposit,
-            CategoryId = model.CategoryId,
-            Amount = model.Amount,
-            Currency = model.Currency,
-            Description = trimmedDesc,
-            DayInMonth = model.DayInMonth,
-            CreatedDate = model.CreatedDate,
+    let prepareForUpdate (model: UpdateAutomaticTransaction) (userId: int) =
+        {
+            Id = model.Id
+            UserId = userId
+            IsDeposit = model.IsDeposit
+            CategoryId = model.CategoryId
+            Amount = model.Amount
+            Currency = model.Currency
+            Description =
+                match model.Description with
+                | null -> None
+                | a -> Some(a.Trim())
+            DayInMonth = model.DayInMonth
+            CreatedDate = model.CreatedDate
             ModifiedDate = model.ModifiedDate
-        )
+        }

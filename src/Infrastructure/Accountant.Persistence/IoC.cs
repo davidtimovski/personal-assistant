@@ -1,5 +1,4 @@
-﻿using Accountant.Application.Contracts.AutomaticTransactions;
-using Accountant.Application.Contracts.Debts;
+﻿using Accountant.Application.Contracts.Debts;
 using Accountant.Application.Contracts.Sync;
 using Accountant.Application.Contracts.Transactions;
 using Accountant.Application.Contracts.UpcomingExpenses;
@@ -15,7 +14,6 @@ public static class IoC
         services.AddTransient<ITransactionsRepository, TransactionsRepository>();
         services.AddTransient<IUpcomingExpensesRepository, UpcomingExpensesRepository>();
         services.AddTransient<IDebtsRepository, DebtsRepository>();
-        services.AddTransient<IAutomaticTransactionsRepository, AutomaticTransactionsRepository>();
         services.AddTransient<ISyncRepository, SyncRepository>();
 
         return services;

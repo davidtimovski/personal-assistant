@@ -57,7 +57,7 @@ module AccountsRepository =
     let create (account: Account) (ctx: AccountantContext) =
         task {
             let entity: Entities.Account = 
-                { Id = account.Id
+                { Id = 0
                   UserId = account.UserId
                   Name = account.Name
                   IsMain = account.IsMain
@@ -72,7 +72,7 @@ module AccountsRepository =
             ctx.Accounts.Add(entity) |> ignore
             let! _ = ctx.SaveChangesAsync true |> Async.AwaitTask
 
-            return account.Id
+            return entity.Id
         }
 
     let update (account: Account) (ctx: AccountantContext) =
@@ -104,9 +104,9 @@ module AccountsRepository =
         task {
             CommonRepository.addDeletedEntity userId id EntityType.Account ctx
 
-            let dbAccount = ctx.Accounts.First(fun x -> x.Id = id && x.UserId = userId)
+            let entity = ctx.Accounts.First(fun x -> x.Id = id && x.UserId = userId)
 
-            ctx.Remove(dbAccount) |> ignore
+            ctx.Remove(entity) |> ignore
  
             ctx.SaveChangesAsync true
                 |> Async.AwaitTask

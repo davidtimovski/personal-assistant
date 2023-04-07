@@ -48,7 +48,7 @@ module CategoriesRepository =
             ctx.Categories.Add(entity) |> ignore
             let! _ = ctx.SaveChangesAsync true |> Async.AwaitTask
 
-            return category.Id
+            return entity.Id
         }
 
     let update (category: Category) (ctx: AccountantContext) =
@@ -81,9 +81,9 @@ module CategoriesRepository =
         task {
             CommonRepository.addDeletedEntity userId id EntityType.Category ctx
 
-            let dbCategory = ctx.Categories.First(fun x -> x.Id = id && x.UserId = userId)
+            let entity = ctx.Categories.First(fun x -> x.Id = id && x.UserId = userId)
 
-            ctx.Remove(dbCategory) |> ignore
+            ctx.Remove(entity) |> ignore
  
             ctx.SaveChangesAsync true
                 |> Async.AwaitTask
