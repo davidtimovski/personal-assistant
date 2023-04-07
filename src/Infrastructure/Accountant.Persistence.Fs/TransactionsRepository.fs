@@ -1,20 +1,19 @@
 ﻿namespace Accountant.Persistence.Fs
 
 open System
-open System.Threading.Tasks
 open Npgsql.FSharp
 open Accountant.Domain.Models
 
 module TransactionsRepository =
 
-    let getAll (userId: int, fromModifiedDate: DateTime, connectionString: string) : Task<Transaction list> =
+    let getAll (userId: int) (fromModifiedDate: DateTime) connectionString =
         connectionString
         |> Sql.connect
         |> Sql.query "SELECT t.* 
                       FROM accountant.transactions AS t
                       INNER JOIN accountant.accounts AS a ON a.id = t.from_account_id 
                           OR a.id = t.to_account_id 
-                      WHERE a.user_id = @UserId AND t.modified_date > @FromModifiedDate"
+                      WHERE a.user_id = @userId AND t.modified_date > @fromModifiedDate"
         |> Sql.parameters [
             "userId", Sql.int userId
             "fromModifiedDate", Sql.date fromModifiedDate ]

@@ -25,38 +25,38 @@ let getChanges: HttpHandler =
 
             do! upcomingExpensesRepository.DeleteOldAsync(userId, UpcomingExpenseService.getFirstDayOfMonth)
 
-            let! deletedAccountIds = CommonRepository.getDeletedIds(userId, dto.LastSynced, EntityType.Account, connectionString) |> Async.AwaitTask
-            let! accounts = AccountsRepository.getAll(userId, dto.LastSynced, connectionString) |> Async.AwaitTask
+            let! deletedAccountIds = CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Account connectionString
+            let! accounts = AccountsRepository.getAll userId dto.LastSynced connectionString
             let accountDtos =
                 accounts
                 |> AccountService.mapAll
 
-            let! deletedCategoryIds = CommonRepository.getDeletedIds(userId, dto.LastSynced, EntityType.Category, connectionString) |> Async.AwaitTask
-            let! categories = CategoriesRepository.getAll(userId, dto.LastSynced, connectionString) |> Async.AwaitTask
+            let! deletedCategoryIds = CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Category connectionString
+            let! categories = CategoriesRepository.getAll userId dto.LastSynced connectionString
             let categoryDtos =
                 categories
                 |> CategoryService.mapAll
 
-            let! deletedTransactionIds = CommonRepository.getDeletedIds(userId, dto.LastSynced, EntityType.Transaction, connectionString) |> Async.AwaitTask
-            let! transactions = TransactionsRepository.getAll(userId, dto.LastSynced, connectionString) |> Async.AwaitTask
+            let! deletedTransactionIds = CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Transaction connectionString
+            let! transactions = TransactionsRepository.getAll userId dto.LastSynced connectionString
             let transactionDtos = 
                 transactions
                 |> TransactionService.mapAll
 
-            let! deletedUpcomingExpenseIds = CommonRepository.getDeletedIds(userId, dto.LastSynced, EntityType.UpcomingExpense, connectionString) |> Async.AwaitTask
-            let! upcomingExpenses = UpcomingExpensesRepository.getAll(userId, dto.LastSynced, connectionString) |> Async.AwaitTask
+            let! deletedUpcomingExpenseIds = CommonRepository.getDeletedIds userId dto.LastSynced EntityType.UpcomingExpense connectionString
+            let! upcomingExpenses = UpcomingExpensesRepository.getAll userId dto.LastSynced connectionString
             let upcomingExpenseDtos =
                 upcomingExpenses
                 |> UpcomingExpenseService.mapAll
 
-            let! deletedDebtIds = CommonRepository.getDeletedIds(userId, dto.LastSynced, EntityType.Debt, connectionString) |> Async.AwaitTask
-            let! debts = DebtsRepository.getAll(userId, dto.LastSynced, connectionString) |> Async.AwaitTask
+            let! deletedDebtIds = CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Debt connectionString
+            let! debts = DebtsRepository.getAll userId dto.LastSynced connectionString
             let debtDtos = 
                 debts
                 |> DebtService.mapAll
 
-            let! deletedAutomaticTransactionIds = CommonRepository.getDeletedIds(userId, dto.LastSynced, EntityType.AutomaticTransaction, connectionString) |> Async.AwaitTask
-            let! automaticTransactions = AutomaticTransactionsRepository.getAll(userId, dto.LastSynced, connectionString) |> Async.AwaitTask
+            let! deletedAutomaticTransactionIds = CommonRepository.getDeletedIds userId dto.LastSynced EntityType.AutomaticTransaction connectionString
+            let! automaticTransactions = AutomaticTransactionsRepository.getAll userId dto.LastSynced connectionString
             let automaticTransactionDtos =
                 automaticTransactions
                 |> AutomaticTransactionService.mapAll

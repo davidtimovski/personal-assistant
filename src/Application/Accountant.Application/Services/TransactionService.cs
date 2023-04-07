@@ -1,11 +1,10 @@
 ﻿using System.Globalization;
-using Accountant.Application.Contracts.Accounts;
 using Accountant.Application.Contracts.Transactions;
 using Accountant.Application.Contracts.Transactions.Models;
+using Application.Domain.Accountant;
 using AutoMapper;
 using CsvHelper;
 using CsvHelper.Configuration;
-using Application.Domain.Accountant;
 using Microsoft.Extensions.Logging;
 
 namespace Accountant.Application.Services;
@@ -13,45 +12,21 @@ namespace Accountant.Application.Services;
 public class TransactionService : ITransactionService
 {
     private readonly ITransactionsRepository _transactionsRepository;
-    private readonly IAccountsRepository _accountsRepository;
     private readonly IMapper _mapper;
     private readonly ILogger<TransactionService> _logger;
 
     public TransactionService(
         ITransactionsRepository transactionsRepository,
-        IAccountsRepository accountsRepository,
         IMapper mapper,
         ILogger<TransactionService> logger)
     {
         _transactionsRepository = transactionsRepository;
-        _accountsRepository = accountsRepository;
         _mapper = mapper;
         _logger = logger;
     }
 
     public async Task<int> CreateAsync(CreateTransaction model)
     {
-        if (!model.FromAccountId.HasValue && !model.ToAccountId.HasValue)
-        {
-            throw new ArgumentException("AccountId is missing.");
-        }
-        else if (model.FromAccountId == model.ToAccountId)
-        {
-            throw new ArgumentException("FromAccountId and ToAccountId cannot be the same.");
-        }
-
-        if (model.FromAccountId.HasValue &&
-            !_accountsRepository.Exists(model.FromAccountId.Value, model.UserId))
-        {
-            throw new ArgumentException("FromAccountId doesn't belong to user with specified userId.");
-        }
-
-        if (model.ToAccountId.HasValue &&
-            !_accountsRepository.Exists(model.ToAccountId.Value, model.UserId))
-        {
-            throw new ArgumentException("ToAccountId doesn't belong to user with specified userId.");
-        }
-
         try
         {
             var transaction = _mapper.Map<Transaction>(model);
@@ -72,27 +47,6 @@ public class TransactionService : ITransactionService
 
     public async Task UpdateAsync(UpdateTransaction model)
     {
-        if (!model.FromAccountId.HasValue && !model.ToAccountId.HasValue)
-        {
-            throw new ArgumentException("AccountId is missing.");
-        }
-        else if (model.FromAccountId == model.ToAccountId)
-        {
-            throw new ArgumentException("FromAccountId and ToAccountId cannot be the same.");
-        }
-
-        if (model.FromAccountId.HasValue &&
-            !_accountsRepository.Exists(model.FromAccountId.Value, model.UserId))
-        {
-            throw new ArgumentException("FromAccount doesn't belong to user with specified userId.");
-        }
-
-        if (model.ToAccountId.HasValue &&
-            !_accountsRepository.Exists(model.ToAccountId.Value, model.UserId))
-        {
-            throw new ArgumentException("ToAccount doesn't belong to user with specified userId.");
-        }
-
         try
         {
             var transaction = _mapper.Map<Transaction>(model);

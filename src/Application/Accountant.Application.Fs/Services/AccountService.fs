@@ -16,40 +16,40 @@ module AccountService =
               CreatedDate = x.CreatedDate
               ModifiedDate = x.ModifiedDate })
 
-    let prepareForCreate (model: CreateAccount) (userId: int) : Application.Domain.Accountant.Account =
-        Application.Domain.Accountant.Account(
-            Id = 0,
-            UserId = userId,
-            Name = model.Name.Trim(),
-            IsMain = model.IsMain,
-            Currency = model.Currency,
-            StockPrice = model.StockPrice,
-            CreatedDate = model.CreatedDate,
+    let prepareForCreate (model: CreateAccount) (userId: int) =
+        {
+            Id = 0
+            UserId = userId
+            Name = model.Name.Trim()
+            IsMain = model.IsMain
+            Currency = model.Currency
+            StockPrice = model.StockPrice
+            CreatedDate = model.CreatedDate
             ModifiedDate = model.ModifiedDate
-        )
+        }
 
-    let prepareForCreateMain (userId: int) (name: string) : Application.Domain.Accountant.Account =
-        let now = DateTime.UtcNow;
+    let prepareForCreateMain (userId: int) (name: string) =
+        let now = DateTime.UtcNow
 
-        Application.Domain.Accountant.Account(
-            Id = 0,
-            UserId = userId,
-            Name = name.Trim(),
-            IsMain = true,
-            Currency = "EUR",
-            StockPrice = Nullable(),
-            CreatedDate = now,
+        {
+            Id = 0
+            UserId = userId
+            Name = name.Trim()
+            IsMain = true
+            Currency = "EUR"
+            StockPrice = None
+            CreatedDate = now
             ModifiedDate = now
-        )
+        }
 
-    let prepareForUpdate (model: UpdateAccount) (userId: int) : Application.Domain.Accountant.Account =
-        Application.Domain.Accountant.Account(
-            Id = model.Id,
-            UserId = userId,
-            Name = model.Name.Trim(),
-            IsMain = model.IsMain,
-            Currency = model.Currency,
-            StockPrice = model.StockPrice,
-            CreatedDate = model.CreatedDate,
+    let prepareForUpdate (model: UpdateAccount) (userId: int) =
+        {
+            Id = model.Id
+            UserId = userId
+            Name = model.Name.Trim()
+            IsMain = model.IsMain
+            Currency = model.Currency
+            StockPrice = model.StockPrice
+            CreatedDate = model.CreatedDate
             ModifiedDate = model.ModifiedDate
-        )
+        }

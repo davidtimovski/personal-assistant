@@ -1,5 +1,4 @@
-﻿using Accountant.Application.Contracts.Accounts;
-using Accountant.Application.Contracts.AutomaticTransactions;
+﻿using Accountant.Application.Contracts.AutomaticTransactions;
 using Accountant.Application.Contracts.Categories;
 using Accountant.Application.Contracts.Debts;
 using Accountant.Application.Contracts.Sync;
@@ -14,7 +13,6 @@ public static class IoC
 {
     public static IServiceCollection AddAccountantPersistence(this IServiceCollection services)
     {
-        services.AddTransient<IAccountsRepository, AccountsRepository>();
         services.AddTransient<ICategoriesRepository, CategoriesRepository>();
         services.AddTransient<ITransactionsRepository, TransactionsRepository>();
         services.AddTransient<IUpcomingExpensesRepository, UpcomingExpensesRepository>();

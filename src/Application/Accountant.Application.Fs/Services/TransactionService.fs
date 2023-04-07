@@ -1,7 +1,9 @@
 ﻿namespace Accountant.Application.Fs.Services
 
+open System
 open Accountant.Domain.Models
 open Accountant.Application.Fs.Models.Transactions
+open Accountant.Persistence.Fs
 
 module TransactionService =
     let mapAll (categories: seq<Transaction>) : seq<TransactionDto> =
@@ -24,3 +26,9 @@ module TransactionService =
               Generated = x.Generated
               CreatedDate = x.CreatedDate
               ModifiedDate = x.ModifiedDate })
+
+    let modifyIsInvalid (fromAccountId: Nullable<int>) (toAccountId: Nullable<int>) (userId: int) (connectionString: string) =
+        (not fromAccountId.HasValue && not toAccountId.HasValue)
+        || (fromAccountId = toAccountId)
+        || fromAccountId.HasValue && not (AccountsRepository.exists fromAccountId.Value userId connectionString)
+        || toAccountId.HasValue && not (AccountsRepository.exists toAccountId.Value userId connectionString)

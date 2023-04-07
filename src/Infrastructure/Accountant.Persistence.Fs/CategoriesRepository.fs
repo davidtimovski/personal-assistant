@@ -1,13 +1,12 @@
 ﻿namespace Accountant.Persistence.Fs
 
 open System
-open System.Threading.Tasks
 open Npgsql.FSharp
 open Accountant.Domain.Models
 
 module CategoriesRepository =
 
-    let getAll (userId: int, fromModifiedDate: DateTime, connectionString: string) : Task<Category list> =
+    let getAll (userId: int) (fromModifiedDate: DateTime) connectionString =
         connectionString
         |> Sql.connect
         |> Sql.query "SELECT * FROM accountant.categories WHERE user_id = @userId AND modified_date > @fromModifiedDate"

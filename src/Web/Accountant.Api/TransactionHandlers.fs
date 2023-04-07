@@ -4,6 +4,7 @@ open System
 open System.IO
 open Accountant.Application.Contracts.Transactions
 open Accountant.Application.Contracts.Transactions.Models
+open Accountant.Application.Fs.Services
 open Giraffe
 open Microsoft.AspNetCore.Hosting
 open Microsoft.AspNetCore.Http
@@ -15,12 +16,14 @@ let create: HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let! dto = ctx.BindJsonAsync<CreateTransaction>()
+            dto.UserId <- getUserId ctx
 
-            if dto = null then
+            let connectionString = getConnectionString ctx
+
+            if dto = null || (TransactionService.modifyIsInvalid dto.FromAccountId dto.ToAccountId dto.UserId connectionString) then
                 return! (RequestErrors.BAD_REQUEST "Bad request") next ctx
             else
                 let service = ctx.GetService<ITransactionService>()
-                dto.UserId <- getUserId ctx
 
                 let! id = service.CreateAsync(dto)
 
@@ -32,8 +35,11 @@ let update: HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let! dto = ctx.BindJsonAsync<UpdateTransaction>()
+            dto.UserId <- getUserId ctx
 
-            if dto = null then
+            let connectionString = getConnectionString ctx
+
+            if dto = null || (TransactionService.modifyIsInvalid dto.FromAccountId dto.ToAccountId dto.UserId connectionString) then
                 return! (RequestErrors.BAD_REQUEST "Bad request") next ctx
             else
                 let service = ctx.GetService<ITransactionService>()

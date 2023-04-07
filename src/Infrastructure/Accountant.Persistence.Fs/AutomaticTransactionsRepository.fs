@@ -1,13 +1,12 @@
 ﻿namespace Accountant.Persistence.Fs
 
 open System
-open System.Threading.Tasks
 open Npgsql.FSharp
 open Accountant.Domain.Models
 
 module AutomaticTransactionsRepository =
 
-    let getAll (userId: int, fromModifiedDate: DateTime, connectionString: string) : Task<AutomaticTransaction list> =
+    let getAll (userId: int) (fromModifiedDate: DateTime) connectionString =
         connectionString
         |> Sql.connect
         |> Sql.query "SELECT * FROM accountant.automatic_transactions WHERE user_id = @userId AND modified_date > @fromModifiedDate"

@@ -4,18 +4,19 @@ open System
 
 module Models =
     type EntityType =
-       | Category = 0
-       | Account = 1
-       | Transaction = 2
-       | UpcomingExpense = 3
-       | Debt = 4
-       | AutomaticTransaction = 5
+        | Category = 0
+        | Account = 1
+        | Transaction = 2
+        | UpcomingExpense = 3
+        | Debt = 4
+        | AutomaticTransaction = 5
 
     type CategoryType =
-       | AllTransactions = 0
-       | DepositOnly = 1
-       | WithdrawalOnly = 2
+        | AllTransactions = 0
+        | DepositOnly = 1
+        | WithdrawalOnly = 2
 
+    [<CLIMutable>]
     type Account =
         { Id: int
           UserId: int
@@ -26,6 +27,7 @@ module Models =
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
+    [<CLIMutable>]
     type Transaction =
         { Id: int
           FromAccountId: int Option
@@ -45,6 +47,7 @@ module Models =
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
+    [<CLIMutable>]
     type AutomaticTransaction =
         { Id: int
           UserId: int
@@ -57,6 +60,7 @@ module Models =
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
+    [<CLIMutable>]
     type Category =
         { Id: int
           UserId: int
@@ -68,7 +72,8 @@ module Models =
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
-     type Debt =
+    [<CLIMutable>]
+    type Debt =
         { Id: int
           UserId: int
           Person: string
@@ -79,7 +84,8 @@ module Models =
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
-     type UpcomingExpense =
+    [<CLIMutable>]
+    type UpcomingExpense =
         { Id: int
           UserId: int
           CategoryId: int Option
@@ -90,3 +96,10 @@ module Models =
           Generated: bool
           CreatedDate: DateTime
           ModifiedDate: DateTime }
+
+    [<CLIMutable>]
+    type DeletedEntity =
+        { UserId: int
+          EntityType: EntityType
+          EntityId: int
+          DeletedDate: DateTime }
