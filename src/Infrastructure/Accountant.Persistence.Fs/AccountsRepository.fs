@@ -56,8 +56,22 @@ module AccountsRepository =
 
     let create (account: Account) (ctx: AccountantContext) =
         task {
-            ctx.Accounts.Add(account) |> ignore
+            let entity: Entities.Account = 
+                { Id = account.Id
+                  UserId = account.UserId
+                  Name = account.Name
+                  IsMain = account.IsMain
+                  Currency = account.Currency
+                  StockPrice = 
+                    match account.StockPrice with
+                      | None -> Nullable<_>()
+                      | Some x -> Nullable<_>(x)
+                  CreatedDate = account.CreatedDate
+                  ModifiedDate = account.ModifiedDate }
+
+            ctx.Accounts.Add(entity) |> ignore
             let! _ = ctx.SaveChangesAsync true |> Async.AwaitTask
+
             return account.Id
         }
 
@@ -65,17 +79,21 @@ module AccountsRepository =
         task {
             let dbAccount = ctx.Accounts.AsNoTracking().First(fun x -> x.Id = account.Id && x.UserId = account.UserId)
 
-            let updatedAccount = 
+            let entity: Entities.Account = 
                 { Id = dbAccount.Id
                   UserId = dbAccount.UserId
                   Name = account.Name
                   IsMain = dbAccount.IsMain
                   Currency = account.Currency
-                  StockPrice = account.StockPrice
+                  StockPrice = 
+                    match account.StockPrice with
+                      | None -> Nullable<_>()
+                      | Some x -> Nullable<_>(x)
                   CreatedDate = dbAccount.CreatedDate
                   ModifiedDate = account.ModifiedDate }
 
-            ctx.Attach(updatedAccount) |> ignore
+            ctx.Attach(entity) |> ignore
+            ctx.Entry(entity).State <- EntityState.Modified
  
             ctx.SaveChangesAsync true
                 |> Async.AwaitTask

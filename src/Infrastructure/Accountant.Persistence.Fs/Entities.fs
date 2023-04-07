@@ -1,66 +1,58 @@
-﻿namespace Accountant.Domain
+﻿namespace Accountant.Persistence.Fs
 
 open System
+open Accountant.Domain.Models
 
-module Models =
-    type EntityType =
-        | Category = 0
-        | Account = 1
-        | Transaction = 2
-        | UpcomingExpense = 3
-        | Debt = 4
-        | AutomaticTransaction = 5
-
-    type CategoryType =
-        | AllTransactions = 0
-        | DepositOnly = 1
-        | WithdrawalOnly = 2
-
+module Entities =
+    [<CLIMutable>]
     type Account =
         { Id: int
           UserId: int
           Name: string
           IsMain: bool
           Currency: string
-          StockPrice: decimal Option
+          StockPrice: Nullable<decimal>
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
+    [<CLIMutable>]
     type Transaction =
         { Id: int
-          FromAccountId: int Option
-          ToAccountId: int Option
-          CategoryId: int Option
+          FromAccountId: Nullable<int>
+          ToAccountId: Nullable<int>
+          CategoryId: Nullable<int>
           Amount: decimal
-          FromStocks: decimal Option
-          ToStocks: decimal Option
+          FromStocks: Nullable<decimal>
+          ToStocks: Nullable<decimal>
           Currency: string
-          Description: string Option
+          Description: string
           Date: DateTime
           IsEncrypted: bool
-          EncryptedDescription: byte[] Option
-          Salt: byte[] Option
-          Nonce: byte[] Option
+          EncryptedDescription: byte[]
+          Salt: byte[]
+          Nonce: byte[]
           Generated: bool
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
+    [<CLIMutable>]
     type AutomaticTransaction =
         { Id: int
           UserId: int
           IsDeposit: bool
-          CategoryId: int Option
+          CategoryId: Nullable<int>
           Amount: decimal
           Currency: string
-          Description: string Option
+          Description: string
           DayInMonth: int16
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
+    [<CLIMutable>]
     type Category =
         { Id: int
           UserId: int
-          ParentId: int Option
+          ParentId: Nullable<int>
           Name: string
           Type: CategoryType
           GenerateUpcomingExpense: bool
@@ -68,6 +60,7 @@ module Models =
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
+    [<CLIMutable>]
     type Debt =
         { Id: int
           UserId: int
@@ -75,22 +68,24 @@ module Models =
           Amount: decimal
           Currency: string
           UserIsDebtor: bool
-          Description: string Option
+          Description: string
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
+    [<CLIMutable>]
     type UpcomingExpense =
         { Id: int
           UserId: int
-          CategoryId: int Option
+          CategoryId: Nullable<int>
           Amount: decimal
           Currency: string
-          Description: string Option
+          Description: string
           Date: DateTime
           Generated: bool
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
+    [<CLIMutable>]
     type DeletedEntity =
         { UserId: int
           EntityType: EntityType

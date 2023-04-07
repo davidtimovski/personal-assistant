@@ -5,7 +5,7 @@ open System.Threading.Tasks
 open EntityFrameworkCore.FSharp.Extensions
 open Microsoft.EntityFrameworkCore
 open Npgsql.FSharp
-open Accountant.Domain.Models
+open Entities
 
 module CommonRepository =
 
@@ -14,31 +14,31 @@ module CommonRepository =
 
         [<DefaultValue>]
         val mutable private _categories: DbSet<Category>
-        member this.Categories with get() = this._categories and set v = this._categories <- v
+        member internal this.Categories with get() = this._categories and set v = this._categories <- v
 
         [<DefaultValue>]
         val mutable private _accounts : DbSet<Account>
-        member this.Accounts with get() = this._accounts and set v = this._accounts <- v
+        member internal this.Accounts with get() = this._accounts and set v = this._accounts <- v
 
         [<DefaultValue>]
         val mutable private _transactions : DbSet<Transaction>
-        member this.Transactions with get() = this._transactions and set v = this._transactions <- v
+        member internal this.Transactions with get() = this._transactions and set v = this._transactions <- v
 
         [<DefaultValue>]
         val mutable private _upcomingExpenses : DbSet<UpcomingExpense>
-        member this.UpcomingExpenses with get() = this._upcomingExpenses and set v = this._upcomingExpenses <- v
+        member internal this.UpcomingExpenses with get() = this._upcomingExpenses and set v = this._upcomingExpenses <- v
 
         [<DefaultValue>]
         val mutable private _debts : DbSet<Debt>
-        member this.Debts with get() = this._debts and set v = this._debts <- v
+        member internal this.Debts with get() = this._debts and set v = this._debts <- v
 
         [<DefaultValue>]
         val mutable private _automaticTransactions : DbSet<AutomaticTransaction>
-        member this.AutomaticTransactions with get() = this._automaticTransactions and set v = this._automaticTransactions <- v
+        member internal this.AutomaticTransactions with get() = this._automaticTransactions and set v = this._automaticTransactions <- v
 
         [<DefaultValue>]
         val mutable private _deletedEntities: DbSet<DeletedEntity>
-        member this.DeletedEntities with get() = this._deletedEntities and set v = this._deletedEntities <- v
+        member internal this.DeletedEntities with get() = this._deletedEntities and set v = this._deletedEntities <- v
 
 
         override _.OnModelCreating builder =
@@ -74,7 +74,7 @@ module CommonRepository =
             ) |> ignore
 
 
-    let getDeletedIds (userId: int) (fromDate: DateTime) (entityType: EntityType) (connectionString: string) : Task<int list> =
+    let getDeletedIds (userId: int) (fromDate: DateTime) (entityType: Accountant.Domain.Models.EntityType) (connectionString: string) : Task<int list> =
         connectionString
         |> Sql.connect
         |> Sql.query "SELECT entity_id FROM accountant.deleted_entities WHERE user_id = @userId AND entity_type = @entityType AND deleted_date > @fromDate"
@@ -84,7 +84,7 @@ module CommonRepository =
             "fromDate", Sql.date fromDate ]
         |> Sql.executeAsync (fun read -> read.int "entity_id")
 
-    let addDeletedEntity (userId: int) (entityId: int) (entityType: EntityType) (ctx: AccountantContext) =
+    let addDeletedEntity (userId: int) (entityId: int) (entityType: Accountant.Domain.Models.EntityType) (ctx: AccountantContext) =
         ctx.Add({ 
             UserId = userId
             EntityType = entityType

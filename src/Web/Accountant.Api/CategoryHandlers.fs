@@ -1,10 +1,11 @@
 ﻿module CategoryHandlers
 
-open Accountant.Application.Contracts.Categories
-open Accountant.Application.Fs.Models.Categories
-open Accountant.Application.Fs.Services
 open Giraffe
 open Microsoft.AspNetCore.Http
+open Accountant.Application.Fs.Models.Categories
+open Accountant.Application.Fs.Services
+open Accountant.Persistence.Fs
+open Accountant.Persistence.Fs.CommonRepository
 open CommonHandlers
 
 let create: HttpHandler =
@@ -15,8 +16,8 @@ let create: HttpHandler =
 
             let category = CategoryService.prepareForCreate dto userId
 
-            let repository = ctx.GetService<ICategoriesRepository>()
-            let! id = repository.CreateAsync(category)
+            let dbContext = ctx.GetService<AccountantContext>()
+            let! id = CategoriesRepository.create category dbContext
 
             return! Successful.CREATED id next ctx
         }
@@ -30,8 +31,8 @@ let update: HttpHandler =
 
             let category = CategoryService.prepareForUpdate dto userId
 
-            let repository = ctx.GetService<ICategoriesRepository>()
-            do! repository.UpdateAsync(category)
+            let dbContext = ctx.GetService<AccountantContext>()
+            let! _ = CategoriesRepository.update category dbContext
 
             return! Successful.NO_CONTENT next ctx
         }
@@ -40,10 +41,11 @@ let update: HttpHandler =
 let delete (id: int) : HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
-            let repository = ctx.GetService<ICategoriesRepository>()
             let userId = getUserId ctx
 
-            do! repository.DeleteAsync(id, userId)
+            let dbContext = ctx.GetService<AccountantContext>()
+            let! _ = CategoriesRepository.delete id userId dbContext
+
             return! Successful.NO_CONTENT next ctx
         }
     )

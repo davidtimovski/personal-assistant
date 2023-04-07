@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Entities.fs" />
     <Compile Include="CommonRepository.fs" />
     <Compile Include="AccountsRepository.fs" />
     <Compile Include="TransactionsRepository.fs" />
