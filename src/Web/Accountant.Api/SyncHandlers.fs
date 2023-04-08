@@ -1,29 +1,28 @@
 ﻿module SyncHandlers
 
 open System
+open Giraffe
+open Microsoft.AspNetCore.Http
 open Accountant.Domain.Models
 open Accountant.Application.Contracts.Transactions
-open Accountant.Application.Contracts.UpcomingExpenses
 open Accountant.Application.Contracts.Sync
 open Accountant.Application.Fs.Services
 open Accountant.Application.Fs.Models.Sync
 open Accountant.Persistence.Fs
-open Giraffe
-open Microsoft.AspNetCore.Http
+open Accountant.Persistence.Fs.CommonRepository
 open CommonHandlers
 open Models
 
 let getChanges: HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
-        let upcomingExpensesRepository = ctx.GetService<IUpcomingExpensesRepository>()
-
         let connectionString = getConnectionString ctx
+        let dbContext = ctx.GetService<AccountantContext>()
 
         task {
             let! dto = ctx.BindJsonAsync<GetChangesDto>()
             let userId = getUserId ctx
 
-            do! upcomingExpensesRepository.DeleteOldAsync(userId, UpcomingExpenseService.getFirstDayOfMonth)
+            let! _ = UpcomingExpensesRepository.deleteOld userId UpcomingExpenseService.getFirstDayOfMonth dbContext
 
             let! deletedAccountIds = CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Account connectionString
             let! accounts = AccountsRepository.getAll userId dto.LastSynced connectionString

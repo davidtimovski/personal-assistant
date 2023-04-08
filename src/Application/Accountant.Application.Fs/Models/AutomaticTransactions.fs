@@ -20,7 +20,7 @@ module AutomaticTransactions =
           CategoryId: int Option
           Amount: decimal
           Currency: string
-          Description: string
+          Description: string Option
           DayInMonth: int16
           CreatedDate: DateTime
           ModifiedDate: DateTime }
@@ -31,7 +31,7 @@ module AutomaticTransactions =
           CategoryId: int Option
           Amount: decimal
           Currency: string
-          Description: string
+          Description: string Option
           DayInMonth: int16
           CreatedDate: DateTime
           ModifiedDate: DateTime }

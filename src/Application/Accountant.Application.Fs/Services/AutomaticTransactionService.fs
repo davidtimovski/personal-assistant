@@ -27,8 +27,8 @@ module AutomaticTransactionService =
             Currency = model.Currency
             Description =
                 match model.Description with
-                | null -> None
-                | a -> Some(a.Trim())
+                | None -> None
+                | Some a -> Some(a.Trim())
             DayInMonth = model.DayInMonth
             CreatedDate = model.CreatedDate
             ModifiedDate = model.ModifiedDate
@@ -44,8 +44,8 @@ module AutomaticTransactionService =
             Currency = model.Currency
             Description =
                 match model.Description with
-                | null -> None
-                | a -> Some(a.Trim())
+                | None -> None
+                | Some a -> Some(a.Trim())
             DayInMonth = model.DayInMonth
             CreatedDate = model.CreatedDate
             ModifiedDate = model.ModifiedDate

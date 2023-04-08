@@ -18,41 +18,39 @@ module UpcomingExpenseService =
               CreatedDate = x.CreatedDate
               ModifiedDate = x.ModifiedDate })
 
-    let prepareForCreate (model: CreateUpcomingExpense) (userId: int) : Application.Domain.Accountant.UpcomingExpense =
-        let trimmedDesc = (match model.Description with
-                            | null -> null
-                            | a -> a.Trim())
-        
-        Application.Domain.Accountant.UpcomingExpense(
-            Id = 0,
-            UserId = userId,
-            CategoryId = model.CategoryId,
-            Amount = model.Amount,
-            Currency = model.Currency,
-            Description = trimmedDesc,
-            Date = model.Date,
-            Generated = model.Generated,
-            CreatedDate = model.CreatedDate,
+    let prepareForCreate (model: CreateUpcomingExpense) (userId: int) =
+        {
+            Id = 0
+            UserId = userId
+            CategoryId = model.CategoryId
+            Amount = model.Amount
+            Currency = model.Currency
+            Description =
+                match model.Description with
+                | None -> None
+                | Some a -> Some(a.Trim())
+            Date = model.Date
+            Generated = model.Generated
+            CreatedDate = model.CreatedDate
             ModifiedDate = model.ModifiedDate
-        )
+        }
 
-    let prepareForUpdate (model: UpdateUpcomingExpense) (userId: int) : Application.Domain.Accountant.UpcomingExpense =
-        let trimmedDesc = (match model.Description with
-                            | null -> null
-                            | a -> a.Trim())
-        
-        Application.Domain.Accountant.UpcomingExpense(
-            Id = model.Id,
-            UserId = userId,
-            CategoryId = model.CategoryId,
-            Amount = model.Amount,
-            Currency = model.Currency,
-            Description = trimmedDesc,
-            Date = model.Date,
-            Generated = model.Generated,
-            CreatedDate = model.CreatedDate,
+    let prepareForUpdate (model: UpdateUpcomingExpense) (userId: int) =
+        {
+            Id = model.Id
+            UserId = userId
+            CategoryId = model.CategoryId
+            Amount = model.Amount
+            Currency = model.Currency
+            Description =
+                match model.Description with
+                | None -> None
+                | Some a -> Some(a.Trim())
+            Date = model.Date
+            Generated = model.Generated
+            CreatedDate = model.CreatedDate
             ModifiedDate = model.ModifiedDate
-        )
+        }
 
     let getFirstDayOfMonth =
         new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1, 0, 0, 0)

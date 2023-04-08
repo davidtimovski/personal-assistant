@@ -16,10 +16,10 @@ module UpcomingExpenses =
           ModifiedDate: DateTime }
 
     type CreateUpcomingExpense =
-        { CategoryId: Nullable<int>
+        { CategoryId: int Option
           Amount: decimal
           Currency: string
-          Description: string
+          Description: string Option
           Date: DateTime
           Generated: bool
           CreatedDate: DateTime
@@ -27,10 +27,10 @@ module UpcomingExpenses =
 
     type UpdateUpcomingExpense =
         { Id: int
-          CategoryId: Nullable<int>
+          CategoryId: int Option
           Amount: decimal
           Currency: string
-          Description: string
+          Description: string Option
           Date: DateTime
           Generated: bool
           CreatedDate: DateTime

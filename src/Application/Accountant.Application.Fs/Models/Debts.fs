@@ -19,7 +19,7 @@ module Debts =
           Amount: decimal
           Currency: string
           UserIsDebtor: bool
-          Description: string
+          Description: string Option
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
@@ -29,7 +29,7 @@ module Debts =
           Amount: decimal
           Currency: string
           UserIsDebtor: bool
-          Description: string
+          Description: string Option
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
