@@ -5,9 +5,8 @@ open Giraffe
 open Microsoft.AspNetCore.Http
 open Accountant.Domain.Models
 open Accountant.Application.Contracts.Transactions
-open Accountant.Application.Contracts.Sync
 open Accountant.Application.Fs.Services
-open Accountant.Application.Fs.Models.Sync
+open Accountant.Application.Fs.Models.Common
 open Accountant.Persistence.Fs
 open Accountant.Persistence.Fs.CommonRepository
 open CommonHandlers
@@ -24,41 +23,41 @@ let getChanges: HttpHandler =
 
             let! _ = UpcomingExpensesRepository.deleteOld userId UpcomingExpenseService.getFirstDayOfMonth dbContext
 
-            let! deletedAccountIds = CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Account connectionString
+            let! deletedAccountIds =
+                CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Account connectionString
+
             let! accounts = AccountsRepository.getAll userId dto.LastSynced connectionString
-            let accountDtos =
-                accounts
-                |> AccountService.mapAll
+            let accountDtos = accounts |> AccountService.mapAll
 
-            let! deletedCategoryIds = CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Category connectionString
+            let! deletedCategoryIds =
+                CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Category connectionString
+
             let! categories = CategoriesRepository.getAll userId dto.LastSynced connectionString
-            let categoryDtos =
-                categories
-                |> CategoryService.mapAll
+            let categoryDtos = categories |> CategoryService.mapAll
 
-            let! deletedTransactionIds = CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Transaction connectionString
+            let! deletedTransactionIds =
+                CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Transaction connectionString
+
             let! transactions = TransactionsRepository.getAll userId dto.LastSynced connectionString
-            let transactionDtos = 
-                transactions
-                |> TransactionService.mapAll
+            let transactionDtos = transactions |> TransactionService.mapAll
 
-            let! deletedUpcomingExpenseIds = CommonRepository.getDeletedIds userId dto.LastSynced EntityType.UpcomingExpense connectionString
+            let! deletedUpcomingExpenseIds =
+                CommonRepository.getDeletedIds userId dto.LastSynced EntityType.UpcomingExpense connectionString
+
             let! upcomingExpenses = UpcomingExpensesRepository.getAll userId dto.LastSynced connectionString
-            let upcomingExpenseDtos =
-                upcomingExpenses
-                |> UpcomingExpenseService.mapAll
+            let upcomingExpenseDtos = upcomingExpenses |> UpcomingExpenseService.mapAll
 
             let! deletedDebtIds = CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Debt connectionString
             let! debts = DebtsRepository.getAll userId dto.LastSynced connectionString
-            let debtDtos = 
-                debts
-                |> DebtService.mapAll
+            let debtDtos = debts |> DebtService.mapAll
 
-            let! deletedAutomaticTransactionIds = CommonRepository.getDeletedIds userId dto.LastSynced EntityType.AutomaticTransaction connectionString
+            let! deletedAutomaticTransactionIds =
+                CommonRepository.getDeletedIds userId dto.LastSynced EntityType.AutomaticTransaction connectionString
+
             let! automaticTransactions = AutomaticTransactionsRepository.getAll userId dto.LastSynced connectionString
+
             let automaticTransactionDtos =
-                automaticTransactions
-                |> AutomaticTransactionService.mapAll
+                automaticTransactions |> AutomaticTransactionService.mapAll
 
             let changed =
                 { LastSynced = DateTime.Now
@@ -76,79 +75,63 @@ let getChanges: HttpHandler =
                   AutomaticTransactions = automaticTransactionDtos }
 
             return! Successful.OK changed next ctx
-        }
-    )
+        })
 
 let createEntities: HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let! dto = ctx.BindJsonAsync<SyncEntities>()
 
-            let syncRepository = ctx.GetService<ISyncRepository>()
             let userId = getUserId ctx
+            let dbContext = ctx.GetService<AccountantContext>()
 
-            let (accounts, categories, transactions, upcomingExpenses, debts, automaticTransactions) =
-                SyncService.mapEntitiesForSync userId dto
-
-            do!
-                syncRepository.SyncAsync(
-                    accounts,
-                    categories,
-                    transactions,
-                    upcomingExpenses,
-                    debts,
-                    automaticTransactions
-                )
-
-            let syncedAccountIds = accounts |> Seq.map (fun x -> x.Id) |> Seq.toArray
-            let syncedCategoryIds = categories |> Seq.map (fun x -> x.Id) |> Seq.toArray
-            let syncedTransactionIds = transactions |> Seq.map (fun x -> x.Id) |> Seq.toArray
-
-            let syncedUpcomingExpenseIds =
-                upcomingExpenses |> Seq.map (fun x -> x.Id) |> Seq.toArray
-
-            let syncedDebtIds = debts |> Seq.map (fun x -> x.Id) |> Seq.toArray
-
-            let syncedAutomaticTransactionIds =
-                automaticTransactions |> Seq.map (fun x -> x.Id) |> Seq.toArray
+            let! (accountIds, categoryIds, transactionIds, upcomingExpenseIds, debtIds, automaticTransactionIds) =
+                CommonRepository.sync
+                    dto.Accounts
+                    dto.Categories
+                    dto.Transactions
+                    dto.UpcomingExpenses
+                    dto.Debts
+                    dto.AutomaticTransactions
+                    userId
+                    dbContext
 
             let changedEntitiesDto =
                 { AccountIdPairs =
-                    seq { 0 .. syncedAccountIds.Length - 1 }
+                    seq { 0 .. accountIds.Length - 1 }
                     |> Seq.map (fun x ->
                         { LocalId = dto.Accounts[x].Id
-                          Id = syncedAccountIds[x] })
+                          Id = accountIds[x] })
 
                   CategoryIdPairs =
-                      seq { 0 .. syncedCategoryIds.Length - 1 }
+                      seq { 0 .. categoryIds.Length - 1 }
                       |> Seq.map (fun x ->
                           { LocalId = dto.Categories[x].Id
-                            Id = syncedCategoryIds[x] })
+                            Id = categoryIds[x] })
 
                   TransactionIdPairs =
-                      seq { 0 .. syncedTransactionIds.Length - 1 }
+                      seq { 0 .. transactionIds.Length - 1 }
                       |> Seq.map (fun x ->
                           { LocalId = dto.Transactions[x].Id
-                            Id = syncedTransactionIds[x] })
+                            Id = transactionIds[x] })
 
                   UpcomingExpenseIdPairs =
-                      seq { 0 .. syncedUpcomingExpenseIds.Length - 1 }
+                      seq { 0 .. upcomingExpenseIds.Length - 1 }
                       |> Seq.map (fun x ->
                           { LocalId = dto.UpcomingExpenses[x].Id
-                            Id = syncedUpcomingExpenseIds[x] })
+                            Id = upcomingExpenseIds[x] })
 
                   DebtIdPairs =
-                      seq { 0 .. syncedDebtIds.Length - 1 }
+                      seq { 0 .. debtIds.Length - 1 }
                       |> Seq.map (fun x ->
                           { LocalId = dto.Debts[x].Id
-                            Id = syncedDebtIds[x] })
+                            Id = debtIds[x] })
 
                   AutomaticTransactionIdPairs =
-                      seq { 0 .. syncedAutomaticTransactionIds.Length - 1 }
+                      seq { 0 .. automaticTransactionIds.Length - 1 }
                       |> Seq.map (fun x ->
                           { LocalId = dto.AutomaticTransactions[x].Id
-                            Id = syncedAutomaticTransactionIds[x] }) }
+                            Id = automaticTransactionIds[x] }) }
 
             return! Successful.OK changedEntitiesDto next ctx
-        }
-    )
+        })

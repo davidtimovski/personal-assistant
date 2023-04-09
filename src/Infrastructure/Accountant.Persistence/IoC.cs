@@ -1,5 +1,4 @@
-﻿using Accountant.Application.Contracts.Sync;
-using Accountant.Application.Contracts.Transactions;
+﻿using Accountant.Application.Contracts.Transactions;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Repositories.Accountant;
 
@@ -10,7 +9,6 @@ public static class IoC
     public static IServiceCollection AddAccountantPersistence(this IServiceCollection services)
     {
         services.AddTransient<ITransactionsRepository, TransactionsRepository>();
-        services.AddTransient<ISyncRepository, SyncRepository>();
 
         return services;
     }

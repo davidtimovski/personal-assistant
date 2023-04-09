@@ -33,13 +33,3 @@ module Categories =
           IsTax: bool
           CreatedDate: DateTime
           ModifiedDate: DateTime }
-
-    type SyncCategory =
-        { Id: int
-          ParentId: Nullable<int>
-          Name: string
-          Type: Application.Domain.Accountant.CategoryType
-          GenerateUpcomingExpense: bool
-          IsTax: bool
-          CreatedDate: DateTime
-          ModifiedDate: DateTime }

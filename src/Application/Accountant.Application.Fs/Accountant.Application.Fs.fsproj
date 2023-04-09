@@ -12,12 +12,11 @@
 		<Compile Include="Models\Debts.fs" />
 		<Compile Include="Models\Transactions.fs" />
 		<Compile Include="Models\UpcomingExpenses.fs" />
-		<Compile Include="Models\Sync.fs" />
+		<Compile Include="Models\Common.fs" />
 		<Compile Include="Services\AccountService.fs" />
 		<Compile Include="Services\AutomaticTransactionService.fs" />
 		<Compile Include="Services\CategoryService.fs" />
 		<Compile Include="Services\DebtService.fs" />
-		<Compile Include="Services\SyncService.fs" />
 		<Compile Include="Services\TransactionService.fs" />
 		<Compile Include="Services\UpcomingExpenseService.fs" />
 	</ItemGroup>

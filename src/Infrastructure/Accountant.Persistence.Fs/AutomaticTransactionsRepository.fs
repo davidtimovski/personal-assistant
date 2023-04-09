@@ -15,7 +15,7 @@ module AutomaticTransactionsRepository =
         |> Sql.query "SELECT * FROM accountant.automatic_transactions WHERE user_id = @userId AND modified_date > @fromModifiedDate"
         |> Sql.parameters [
             "userId", Sql.int userId
-            "fromModifiedDate", Sql.date fromModifiedDate ]
+            "fromModifiedDate", Sql.timestamptz fromModifiedDate ]
         |> Sql.executeAsync (fun read ->
             {
                 Id = read.int "id"
