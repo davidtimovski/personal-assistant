@@ -2,6 +2,7 @@
 
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Localization
+open Accountant.Persistence.Fs.ConnectionUtils
 
 let localize (ctx: HttpContext) text =
     let enTranslations = Map ["Encrypted", "[ Encrypted ]"; "Uncategorized", "Uncategorized"]
@@ -11,3 +12,6 @@ let localize (ctx: HttpContext) text =
     let rqf = ctx.Request.HttpContext.Features.Get<IRequestCultureFeature>();
 
     lookup[rqf.RequestCulture.Culture.Name][text]
+
+let getDbConnection (ctx: HttpContext) =
+    ConnectionString(CommonHandlers.getConnectionString ctx)

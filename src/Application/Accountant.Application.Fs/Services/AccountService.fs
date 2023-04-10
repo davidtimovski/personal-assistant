@@ -17,39 +17,33 @@ module AccountService =
               ModifiedDate = x.ModifiedDate })
 
     let prepareForCreate (model: CreateAccount) (userId: int) =
-        {
-            Id = 0
-            UserId = userId
-            Name = model.Name.Trim()
-            IsMain = model.IsMain
-            Currency = model.Currency
-            StockPrice = model.StockPrice
-            CreatedDate = model.CreatedDate
-            ModifiedDate = model.ModifiedDate
-        }
+        { Id = 0
+          UserId = userId
+          Name = model.Name.Trim()
+          IsMain = model.IsMain
+          Currency = model.Currency
+          StockPrice = model.StockPrice
+          CreatedDate = model.CreatedDate
+          ModifiedDate = model.ModifiedDate }
 
     let prepareForCreateMain (userId: int) (name: string) =
         let now = DateTime.UtcNow
 
-        {
-            Id = 0
-            UserId = userId
-            Name = name.Trim()
-            IsMain = true
-            Currency = "EUR"
-            StockPrice = None
-            CreatedDate = now
-            ModifiedDate = now
-        }
+        { Id = 0
+          UserId = userId
+          Name = name.Trim()
+          IsMain = true
+          Currency = "EUR"
+          StockPrice = None
+          CreatedDate = now
+          ModifiedDate = now }
 
     let prepareForUpdate (model: UpdateAccount) (userId: int) =
-        {
-            Id = model.Id
-            UserId = userId
-            Name = model.Name.Trim()
-            IsMain = model.IsMain
-            Currency = model.Currency
-            StockPrice = model.StockPrice
-            CreatedDate = model.CreatedDate
-            ModifiedDate = model.ModifiedDate
-        }
+        { Id = model.Id
+          UserId = userId
+          Name = model.Name.Trim()
+          IsMain = model.IsMain
+          Currency = model.Currency
+          StockPrice = model.StockPrice
+          CreatedDate = model.CreatedDate
+          ModifiedDate = model.ModifiedDate }

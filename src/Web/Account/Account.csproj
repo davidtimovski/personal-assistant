@@ -31,6 +31,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\Application\Accountant.Application.Fs\Accountant.Application.Fs.fsproj" />
 		<ProjectReference Include="..\..\Application\Accountant.Application\Accountant.Application.csproj" />
+		<ProjectReference Include="..\..\Infrastructure\Accountant.Persistence.Fs\Accountant.Persistence.Fs.fsproj" />
 		<ProjectReference Include="..\..\Infrastructure\Accountant.Persistence\Accountant.Persistence.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Cdn\Cdn.csproj" />
 		<ProjectReference Include="..\..\Application\CookingAssistant.Application\CookingAssistant.Application.csproj" />

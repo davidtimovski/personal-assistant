@@ -1,100 +1,89 @@
 ﻿namespace Accountant.Persistence.Fs
 
 open System
-open System.Linq
-open Microsoft.EntityFrameworkCore
 open Npgsql.FSharp
 open Accountant.Domain.Models
-open CommonRepository
+open ConnectionUtils
 
 module AutomaticTransactionsRepository =
 
-    let getAll (userId: int) (fromModifiedDate: DateTime) connectionString =
-        connectionString
-        |> Sql.connect
-        |> Sql.query "SELECT * FROM accountant.automatic_transactions WHERE user_id = @userId AND modified_date > @fromModifiedDate"
-        |> Sql.parameters [
-            "userId", Sql.int userId
-            "fromModifiedDate", Sql.timestamptz fromModifiedDate ]
+    [<Literal>]
+    let private table = "accountant.automatic_transactions"
+
+    let getAll (userId: int) (fromModifiedDate: DateTime) (conn: RegularOrTransactionalConn) =
+        ConnectionUtils.connect conn
+        |> Sql.query $"SELECT * FROM {table} WHERE user_id = @user_id AND modified_date > @modified_date"
+        |> Sql.parameters [ "user_id", Sql.int userId; "modified_date", Sql.timestamptz fromModifiedDate ]
         |> Sql.executeAsync (fun read ->
-            {
-                Id = read.int "id"
-                UserId = read.int "user_id"
-                IsDeposit = read.bool "is_deposit"
-                CategoryId = read.intOrNone "category_id"
-                Amount = read.decimal "amount"
-                Currency = read.string "currency"
-                Description = read.stringOrNone "description"
-                DayInMonth = read.int16 "day_in_month"
-                CreatedDate = read.dateTime "created_date"
-                ModifiedDate = read.dateTime "modified_date"
-            })
+            { Id = read.int "id"
+              UserId = read.int "user_id"
+              IsDeposit = read.bool "is_deposit"
+              CategoryId = read.intOrNone "category_id"
+              Amount = read.decimal "amount"
+              Currency = read.string "currency"
+              Description = read.stringOrNone "description"
+              DayInMonth = read.int16 "day_in_month"
+              CreatedDate = read.dateTime "created_date"
+              ModifiedDate = read.dateTime "modified_date" })
 
-    let create (automaticTransaction: AutomaticTransaction) (ctx: AccountantContext) =
+    let create (automaticTransaction: AutomaticTransaction) (conn: RegularOrTransactionalConn) =
         task {
-            let entity: Entities.AutomaticTransaction = 
-                { Id = 0
-                  UserId = automaticTransaction.UserId
-                  IsDeposit = automaticTransaction.IsDeposit
-                  CategoryId = 
-                      match automaticTransaction.CategoryId with
-                      | None -> Nullable<_>()
-                      | Some x -> Nullable<_>(x)
-                  Amount = automaticTransaction.Amount
-                  Currency = automaticTransaction.Currency
-                  Description =
-                      match automaticTransaction.Description with
-                      | None -> null
-                      | Some x -> x
-                  DayInMonth = automaticTransaction.DayInMonth
-                  CreatedDate = automaticTransaction.CreatedDate
-                  ModifiedDate = automaticTransaction.ModifiedDate }
-
-            ctx.AutomaticTransactions.Add(entity) |> ignore
-            let! _ = ctx.SaveChangesAsync true |> Async.AwaitTask
-
-            return entity.Id
+            return!
+                ConnectionUtils.connect conn
+                |> Sql.query
+                    $"INSERT INTO {table}
+                           (user_id, is_deposit, category_id, amount, currency, description, day_in_month, created_date, modified_date) VALUES 
+                           (@user_id, @is_deposit, @category_id, @amount, @currency, @description, @day_in_month, @created_date, @modified_date) RETURNING id"
+                |> Sql.parameters
+                    [ "user_id", Sql.int automaticTransaction.UserId
+                      "is_deposit", Sql.bool automaticTransaction.IsDeposit
+                      "category_id", Sql.intOrNone automaticTransaction.CategoryId
+                      "amount", Sql.decimal automaticTransaction.Amount
+                      "currency", Sql.string automaticTransaction.Currency
+                      "description", Sql.stringOrNone automaticTransaction.Description
+                      "day_in_month", Sql.int16 automaticTransaction.DayInMonth
+                      "created_date", Sql.timestamptz automaticTransaction.CreatedDate
+                      "modified_date", Sql.timestamptz automaticTransaction.ModifiedDate ]
+                |> Sql.executeRowAsync (fun read -> read.int "id")
+                |> Async.AwaitTask
         }
 
-    let update (automaticTransaction: AutomaticTransaction) (ctx: AccountantContext) =
+    let update (automaticTransaction: AutomaticTransaction) (conn: RegularOrTransactionalConn) =
         task {
-            let dbAutomaticTransaction = ctx.AutomaticTransactions.AsNoTracking().First(fun x -> x.Id = automaticTransaction.Id && x.UserId = automaticTransaction.UserId)
-
-            let entity: Entities.AutomaticTransaction = 
-                { Id = dbAutomaticTransaction.Id
-                  UserId = dbAutomaticTransaction.UserId
-                  IsDeposit = automaticTransaction.IsDeposit
-                  CategoryId = 
-                      match automaticTransaction.CategoryId with
-                      | None -> Nullable<_>()
-                      | Some x -> Nullable<_>(x)
-                  Amount = automaticTransaction.Amount
-                  Currency = automaticTransaction.Currency
-                  Description =
-                      match automaticTransaction.Description with
-                      | None -> null
-                      | Some x -> x
-                  DayInMonth = automaticTransaction.DayInMonth
-                  CreatedDate = dbAutomaticTransaction.CreatedDate
-                  ModifiedDate = automaticTransaction.ModifiedDate }
-
-            ctx.Attach(entity) |> ignore
-            ctx.Entry(entity).State <- EntityState.Modified
- 
-            ctx.SaveChangesAsync true
+            return!
+                ConnectionUtils.connect conn
+                |> Sql.query
+                    $"UPDATE {table}
+                           SET is_deposit = @is_deposit, category_id = @category_id, amount = @amount, currency = @currency, description = @description, day_in_month = @day_in_month, modified_date = @modified_date
+                           WHERE id = @id AND user_id = @user_id"
+                |> Sql.parameters
+                    [ "id", Sql.int automaticTransaction.Id
+                      "user_id", Sql.int automaticTransaction.UserId
+                      "is_deposit", Sql.bool automaticTransaction.IsDeposit
+                      "category_id", Sql.intOrNone automaticTransaction.CategoryId
+                      "amount", Sql.decimal automaticTransaction.Amount
+                      "currency", Sql.string automaticTransaction.Currency
+                      "description", Sql.stringOrNone automaticTransaction.Description
+                      "day_in_month", Sql.int16 automaticTransaction.DayInMonth
+                      "modified_date", Sql.timestamptz automaticTransaction.ModifiedDate ]
+                |> Sql.executeNonQueryAsync
                 |> Async.AwaitTask
-                |> ignore
         }
 
-    let delete (id: int) (userId: int) (ctx: AccountantContext) =
+    let delete (id: int) (userId: int) (conn: RegularOrTransactionalConn) =
         task {
-            CommonRepository.addDeletedEntity userId id EntityType.AutomaticTransaction ctx
+            ConnectionUtils.connect conn
+            |> Sql.executeTransactionAsync
+                [ $"INSERT INTO accountant.deleted_entities
+                      (user_id, entity_type, entity_id, deleted_date) VALUES
+                      (@user_id, @entity_type, @entity_id, @deleted_date)",
+                  [ [ "user_id", Sql.int userId
+                      "entity_type", Sql.int (LanguagePrimitives.EnumToValue EntityType.AutomaticTransaction)
+                      "entity_id", Sql.int id
+                      "deleted_date", Sql.timestamptz DateTime.UtcNow ] ]
 
-            let entity = ctx.AutomaticTransactions.First(fun x -> x.Id = id && x.UserId = userId)
-
-            ctx.Remove(entity) |> ignore
- 
-            ctx.SaveChangesAsync true
-                |> Async.AwaitTask
-                |> ignore
+                  $"DELETE FROM {table} WHERE id = @id AND user_id = @user_id",
+                  [ [ "id", Sql.int id; "user_id", Sql.int userId ] ] ]
+            |> Async.AwaitTask
+            |> ignore
         }

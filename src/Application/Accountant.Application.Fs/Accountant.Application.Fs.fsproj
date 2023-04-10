@@ -6,6 +6,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Include="Utils.fs" />
 		<Compile Include="Models\Accounts.fs" />
 		<Compile Include="Models\AutomaticTransactions.fs" />
 		<Compile Include="Models\Categories.fs" />
@@ -22,7 +23,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Infrastructure\Accountant.Persistence.Fs\Accountant.Persistence.Fs.fsproj" />
 		<ProjectReference Include="..\Accountant.Domain\Accountant.Domain.fsproj" />
 		<ProjectReference Include="..\Domain\Domain.csproj" />
 	</ItemGroup>

@@ -26,6 +26,17 @@ module Models =
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
+    type Category =
+        { Id: int
+          UserId: int
+          ParentId: int Option
+          Name: string
+          Type: CategoryType
+          GenerateUpcomingExpense: bool
+          IsTax: bool
+          CreatedDate: DateTime
+          ModifiedDate: DateTime }
+
     type Transaction =
         { Id: int
           FromAccountId: int Option
@@ -54,17 +65,6 @@ module Models =
           Currency: string
           Description: string Option
           DayInMonth: int16
-          CreatedDate: DateTime
-          ModifiedDate: DateTime }
-
-    type Category =
-        { Id: int
-          UserId: int
-          ParentId: int Option
-          Name: string
-          Type: CategoryType
-          GenerateUpcomingExpense: bool
-          IsTax: bool
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 

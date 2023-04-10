@@ -8,53 +8,52 @@ open Accountant.Application.Contracts.Transactions
 open Accountant.Application.Fs.Services
 open Accountant.Application.Fs.Models.Common
 open Accountant.Persistence.Fs
-open Accountant.Persistence.Fs.CommonRepository
 open CommonHandlers
+open HandlerBase
 open Models
 
 let getChanges: HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
-        let connectionString = getConnectionString ctx
-        let dbContext = ctx.GetService<AccountantContext>()
+        let connection = getDbConnection ctx
 
         task {
             let! dto = ctx.BindJsonAsync<GetChangesDto>()
             let userId = getUserId ctx
 
-            let! _ = UpcomingExpensesRepository.deleteOld userId UpcomingExpenseService.getFirstDayOfMonth dbContext
+            let! _ = UpcomingExpensesRepository.deleteOld userId UpcomingExpenseService.getFirstDayOfMonth connection
 
             let! deletedAccountIds =
-                CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Account connectionString
+                CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Account connection
 
-            let! accounts = AccountsRepository.getAll userId dto.LastSynced connectionString
+            let! accounts = AccountsRepository.getAll userId dto.LastSynced connection
             let accountDtos = accounts |> AccountService.mapAll
 
             let! deletedCategoryIds =
-                CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Category connectionString
+                CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Category connection
 
-            let! categories = CategoriesRepository.getAll userId dto.LastSynced connectionString
+            let! categories = CategoriesRepository.getAll userId dto.LastSynced connection
             let categoryDtos = categories |> CategoryService.mapAll
 
             let! deletedTransactionIds =
-                CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Transaction connectionString
+                CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Transaction connection
 
-            let! transactions = TransactionsRepository.getAll userId dto.LastSynced connectionString
+            let! transactions = TransactionsRepository.getAll userId dto.LastSynced connection
             let transactionDtos = transactions |> TransactionService.mapAll
 
             let! deletedUpcomingExpenseIds =
-                CommonRepository.getDeletedIds userId dto.LastSynced EntityType.UpcomingExpense connectionString
+                CommonRepository.getDeletedIds userId dto.LastSynced EntityType.UpcomingExpense connection
 
-            let! upcomingExpenses = UpcomingExpensesRepository.getAll userId dto.LastSynced connectionString
+            let! upcomingExpenses = UpcomingExpensesRepository.getAll userId dto.LastSynced connection
             let upcomingExpenseDtos = upcomingExpenses |> UpcomingExpenseService.mapAll
 
-            let! deletedDebtIds = CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Debt connectionString
-            let! debts = DebtsRepository.getAll userId dto.LastSynced connectionString
+            let! deletedDebtIds = CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Debt connection
+            let! debts = DebtsRepository.getAll userId dto.LastSynced connection
             let debtDtos = debts |> DebtService.mapAll
 
             let! deletedAutomaticTransactionIds =
-                CommonRepository.getDeletedIds userId dto.LastSynced EntityType.AutomaticTransaction connectionString
+                CommonRepository.getDeletedIds userId dto.LastSynced EntityType.AutomaticTransaction connection
 
-            let! automaticTransactions = AutomaticTransactionsRepository.getAll userId dto.LastSynced connectionString
+            let! automaticTransactions = AutomaticTransactionsRepository.getAll userId dto.LastSynced connection
 
             let automaticTransactionDtos =
                 automaticTransactions |> AutomaticTransactionService.mapAll
@@ -83,10 +82,10 @@ let createEntities: HttpHandler =
             let! dto = ctx.BindJsonAsync<SyncEntities>()
 
             let userId = getUserId ctx
-            let dbContext = ctx.GetService<AccountantContext>()
+            let connectionString = getConnectionString ctx
 
             let! (accountIds, categoryIds, transactionIds, upcomingExpenseIds, debtIds, automaticTransactionIds) =
-                CommonRepository.sync
+                SyncRepository.sync
                     dto.Accounts
                     dto.Categories
                     dto.Transactions
@@ -94,7 +93,7 @@ let createEntities: HttpHandler =
                     dto.Debts
                     dto.AutomaticTransactions
                     userId
-                    dbContext
+                    connectionString
 
             let changedEntitiesDto =
                 { AccountIdPairs =

@@ -1,114 +1,122 @@
 ﻿namespace Accountant.Persistence.Fs
 
 open System
-open System.Linq
-open Microsoft.EntityFrameworkCore
 open Npgsql.FSharp
 open Accountant.Domain.Models
-open CommonRepository
+open ConnectionUtils
 
 module AccountsRepository =
 
-    let getAll (userId: int) (fromModifiedDate: DateTime) connectionString =
-        connectionString
-        |> Sql.connect
-        |> Sql.query "SELECT * FROM accountant.accounts WHERE user_id = @userId AND modified_date > @fromModifiedDate"
-        |> Sql.parameters [
-            "userId", Sql.int userId
-            "fromModifiedDate", Sql.timestamptz fromModifiedDate ]
+    [<Literal>]
+    let private table = "accountant.accounts"
+
+    let getAll (userId: int) (fromModifiedDate: DateTime) (conn: RegularOrTransactionalConn) =
+        ConnectionUtils.connect conn
+        |> Sql.query $"SELECT * FROM {table} WHERE user_id = @user_id AND modified_date > @modified_date"
+        |> Sql.parameters [ "user_id", Sql.int userId; "modified_date", Sql.timestamptz fromModifiedDate ]
         |> Sql.executeAsync (fun read ->
-            {
-                Id = read.int "id"
-                UserId = read.int "user_id"
-                Name = read.string "name"
-                IsMain = read.bool "is_main"
-                Currency = read.string "currency"
-                StockPrice = read.decimalOrNone "stock_price"
-                CreatedDate = read.dateTime "created_date"
-                ModifiedDate = read.dateTime "modified_date"
-            })
+            { Id = read.int "id"
+              UserId = read.int "user_id"
+              Name = read.string "name"
+              IsMain = read.bool "is_main"
+              Currency = read.string "currency"
+              StockPrice = read.decimalOrNone "stock_price"
+              CreatedDate = read.dateTime "created_date"
+              ModifiedDate = read.dateTime "modified_date" })
 
-    let exists (id: int) (userId: int) connectionString =
-        connectionString
-        |> Sql.connect
-        |> Sql.query "SELECT COUNT(*) AS count FROM accountant.accounts WHERE id = @id AND user_id = @userId"
-        |> Sql.parameters [
-            "id", Sql.int id
-            "userId", Sql.int userId ]
+    let exists (id: int) (userId: int) (conn: RegularOrTransactionalConn) =
+        ConnectionUtils.connect conn
+        |> Sql.query $"SELECT COUNT(*) AS count FROM {table} WHERE id = @id AND user_id = @user_id"
+        |> Sql.parameters [ "id", Sql.int id; "user_id", Sql.int userId ]
         |> Sql.executeRow (fun read -> (read.int "count") > 0)
 
-    let hasMain (userId: int) connectionString =
-        connectionString
-        |> Sql.connect
-        |> Sql.query "SELECT COUNT(*) AS count FROM accountant.accounts WHERE user_id = @userId AND is_main"
-        |> Sql.parameters [
-            "userId", Sql.int userId ]
+    let hasMain (userId: int) (conn: RegularOrTransactionalConn) =
+        ConnectionUtils.connect conn
+        |> Sql.query $"SELECT COUNT(*) AS count FROM {table} WHERE user_id = @user_id AND is_main"
+        |> Sql.parameters [ "user_id", Sql.int userId ]
         |> Sql.executeRow (fun read -> (read.int "count") > 0)
 
-    let isMain (id: int) (userId: int) connectionString =
-        connectionString
-        |> Sql.connect
-        |> Sql.query "SELECT COUNT(*) AS count FROM accountant.accounts WHERE id = @id AND user_id = @userId AND is_main"
-        |> Sql.parameters [
-            "id", Sql.int id
-            "userId", Sql.int userId ]
+    let isMain (id: int) (userId: int) (conn: RegularOrTransactionalConn) =
+        ConnectionUtils.connect conn
+        |> Sql.query $"SELECT COUNT(*) AS count FROM {table} WHERE id = @id AND user_id = @user_id AND is_main"
+        |> Sql.parameters [ "id", Sql.int id; "user_id", Sql.int userId ]
         |> Sql.executeRow (fun read -> (read.int "count") > 0)
 
-    let create (account: Account) (ctx: AccountantContext) =
+    let create (account: Account) (conn: RegularOrTransactionalConn) =
         task {
-            let entity: Entities.Account = 
-                { Id = 0
-                  UserId = account.UserId
-                  Name = account.Name
-                  IsMain = account.IsMain
-                  Currency = account.Currency
-                  StockPrice = 
-                    match account.StockPrice with
-                      | None -> Nullable<_>()
-                      | Some x -> Nullable<_>(x)
-                  CreatedDate = account.CreatedDate
-                  ModifiedDate = account.ModifiedDate }
-
-            ctx.Accounts.Add(entity) |> ignore
-            let! _ = ctx.SaveChangesAsync true |> Async.AwaitTask
-
-            return entity.Id
+            return!
+                ConnectionUtils.connect conn
+                |> Sql.query
+                    $"INSERT INTO {table}
+                           (user_id, name, is_main, currency, stock_price, created_date, modified_date) VALUES 
+                           (@user_id, @name, @is_main, @currency, @stock_price, @created_date, @modified_date) RETURNING id"
+                |> Sql.parameters
+                    [ "user_id", Sql.int account.UserId
+                      "name", Sql.string account.Name
+                      "is_main", Sql.bool account.IsMain
+                      "currency", Sql.string account.Currency
+                      "stock_price", Sql.decimalOrNone account.StockPrice
+                      "created_date", Sql.timestamptz account.CreatedDate
+                      "modified_date", Sql.timestamptz account.ModifiedDate ]
+                |> Sql.executeRowAsync (fun read -> read.int "id")
+                |> Async.AwaitTask
         }
 
-    let update (account: Account) (ctx: AccountantContext) =
+    // TODO: Only for Account project
+    let createMain (account: Account) (connectionString: string) =
         task {
-            let dbAccount = ctx.Accounts.AsNoTracking().First(fun x -> x.Id = account.Id && x.UserId = account.UserId)
-
-            let entity: Entities.Account = 
-                { Id = dbAccount.Id
-                  UserId = dbAccount.UserId
-                  Name = account.Name
-                  IsMain = dbAccount.IsMain
-                  Currency = account.Currency
-                  StockPrice = 
-                    match account.StockPrice with
-                      | None -> Nullable<_>()
-                      | Some x -> Nullable<_>(x)
-                  CreatedDate = dbAccount.CreatedDate
-                  ModifiedDate = account.ModifiedDate }
-
-            ctx.Attach(entity) |> ignore
-            ctx.Entry(entity).State <- EntityState.Modified
- 
-            ctx.SaveChangesAsync true
+            return!
+                connectionString
+                |> Sql.connect
+                |> Sql.query
+                    $"INSERT INTO {table}
+                           (user_id, name, is_main, currency, stock_price, created_date, modified_date) VALUES 
+                           (@user_id, @name, @is_main, @currency, @stock_price, @created_date, @modified_date) RETURNING id"
+                |> Sql.parameters
+                    [ "user_id", Sql.int account.UserId
+                      "name", Sql.string account.Name
+                      "is_main", Sql.bool account.IsMain
+                      "currency", Sql.string account.Currency
+                      "stock_price", Sql.decimalOrNone account.StockPrice
+                      "created_date", Sql.timestamptz account.CreatedDate
+                      "modified_date", Sql.timestamptz account.ModifiedDate ]
+                |> Sql.executeRowAsync (fun read -> read.int "id")
                 |> Async.AwaitTask
-                |> ignore
         }
 
-    let delete (id: int) (userId: int) (ctx: AccountantContext) =
+    let update (account: Account) (conn: RegularOrTransactionalConn) =
         task {
-            CommonRepository.addDeletedEntity userId id EntityType.Account ctx
-
-            let entity = ctx.Accounts.First(fun x -> x.Id = id && x.UserId = userId)
-
-            ctx.Remove(entity) |> ignore
- 
-            ctx.SaveChangesAsync true
+            return!
+                ConnectionUtils.connect conn
+                |> Sql.query
+                    $"UPDATE {table}
+                           SET name = @name, currency = @currency, stock_price = @stock_price, modified_date = @modified_date
+                           WHERE id = @id AND user_id = @user_id"
+                |> Sql.parameters
+                    [ "id", Sql.int account.Id
+                      "user_id", Sql.int account.UserId
+                      "name", Sql.string account.Name
+                      "currency", Sql.string account.Currency
+                      "stock_price", Sql.decimalOrNone account.StockPrice
+                      "modified_date", Sql.timestamptz account.ModifiedDate ]
+                |> Sql.executeNonQueryAsync
                 |> Async.AwaitTask
-                |> ignore
+        }
+
+    let delete (id: int) (userId: int) (conn: RegularOrTransactionalConn) =
+        task {
+            ConnectionUtils.connect conn
+            |> Sql.executeTransactionAsync
+                [ $"INSERT INTO accountant.deleted_entities
+                      (user_id, entity_type, entity_id, deleted_date) VALUES
+                      (@user_id, @entity_type, @entity_id, @deleted_date)",
+                  [ [ "user_id", Sql.int userId
+                      "entity_type", Sql.int (LanguagePrimitives.EnumToValue EntityType.Account)
+                      "entity_id", Sql.int id
+                      "deleted_date", Sql.timestamptz DateTime.UtcNow ] ]
+
+                  $"DELETE FROM {table} WHERE id = @id AND user_id = @user_id",
+                  [ [ "id", Sql.int id; "user_id", Sql.int userId ] ] ]
+            |> Async.AwaitTask
+            |> ignore
         }

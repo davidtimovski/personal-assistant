@@ -17,33 +17,29 @@ module CategoryService =
               ModifiedDate = x.ModifiedDate })
 
     let prepareForCreate (model: CreateCategory) (userId: int) =
-        {
-            Id = 0
-            UserId = userId
-            ParentId = model.ParentId
-            Name = model.Name.Trim()
-            Type = model.Type
-            GenerateUpcomingExpense = 
-                match model.Type with
-                | CategoryType.DepositOnly -> false
-                | _ ->  model.GenerateUpcomingExpense
-            IsTax = model.IsTax
-            CreatedDate = model.CreatedDate
-            ModifiedDate = model.ModifiedDate
-        }
+        { Id = 0
+          UserId = userId
+          ParentId = model.ParentId
+          Name = model.Name.Trim()
+          Type = model.Type
+          GenerateUpcomingExpense =
+            match model.Type with
+            | CategoryType.DepositOnly -> false
+            | _ -> model.GenerateUpcomingExpense
+          IsTax = model.IsTax
+          CreatedDate = model.CreatedDate
+          ModifiedDate = model.ModifiedDate }
 
     let prepareForUpdate (model: UpdateCategory) (userId: int) =
-        {
-            Id = model.Id
-            UserId = userId
-            ParentId = model.ParentId
-            Name = model.Name.Trim()
-            Type = model.Type
-            GenerateUpcomingExpense = 
-                match model.Type with
-                | CategoryType.DepositOnly -> false
-                | _ ->  model.GenerateUpcomingExpense
-            IsTax = model.IsTax
-            CreatedDate = model.CreatedDate
-            ModifiedDate = model.ModifiedDate
-        }
+        { Id = model.Id
+          UserId = userId
+          ParentId = model.ParentId
+          Name = model.Name.Trim()
+          Type = model.Type
+          GenerateUpcomingExpense =
+            match model.Type with
+            | CategoryType.DepositOnly -> false
+            | _ -> model.GenerateUpcomingExpense
+          IsTax = model.IsTax
+          CreatedDate = model.CreatedDate
+          ModifiedDate = model.ModifiedDate }

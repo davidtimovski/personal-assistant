@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using ToDoAssistant.Application.Contracts.Lists;
-using static Accountant.Persistence.Fs.CommonRepository;
+using static Accountant.Persistence.Fs.AccountsRepository;
 
 namespace Account.Controllers;
 
@@ -26,7 +26,6 @@ public class AccountController : BaseController
     private readonly IUsersRepository _usersRepository;
     private readonly IEmailTemplateService _emailTemplateService;
     private readonly IUserService _userService;
-    private readonly AccountantContext _accountantContext;
     private readonly IListService _listService;
     private readonly IRecipeService _recipeService;
     private readonly ICdnService _cdnService;
@@ -41,7 +40,6 @@ public class AccountController : BaseController
         IUsersRepository usersRepository,
         IEmailTemplateService emailTemplateService,
         IUserService userService,
-        AccountantContext accountantContext,
         IListService listService,
         IRecipeService recipeService,
         ICdnService cdnService,
@@ -54,7 +52,6 @@ public class AccountController : BaseController
         _usersRepository = usersRepository;
         _emailTemplateService = emailTemplateService;
         _userService = userService;
-        _accountantContext = accountantContext;
         _listService = listService;
         _recipeService = recipeService;
         _cdnService = cdnService;
@@ -442,11 +439,11 @@ public class AccountController : BaseController
         );
     }
 
-    // TODO: Breaking microservice design
+    // TODO: Breaking microservice design. Implement with message queue or HTTP call.
     private async Task CreateRequiredDataAsync(int userId)
     {
         var mainAccount = AccountService.prepareForCreateMain(userId, _localizer["MainAccountName"]);
-        await AccountsRepository.create(mainAccount, _accountantContext);
+        await AccountsRepository.createMain(mainAccount, _configuration["ConnectionString"]);
     }
 
     private async Task CreateSamplesAsync(int userId)

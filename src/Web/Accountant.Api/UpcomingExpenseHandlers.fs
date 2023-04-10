@@ -5,8 +5,8 @@ open Microsoft.AspNetCore.Http
 open Accountant.Application.Fs.Models.UpcomingExpenses
 open Accountant.Application.Fs.Services
 open Accountant.Persistence.Fs
-open Accountant.Persistence.Fs.CommonRepository
 open CommonHandlers
+open HandlerBase
 
 let create: HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
@@ -16,8 +16,8 @@ let create: HttpHandler =
 
             let upcomingExpense = UpcomingExpenseService.prepareForCreate dto userId
 
-            let dbContext = ctx.GetService<AccountantContext>()
-            let! id = UpcomingExpensesRepository.create upcomingExpense dbContext
+            let connection = getDbConnection ctx
+            let! id = UpcomingExpensesRepository.create upcomingExpense connection
 
             return! Successful.CREATED id next ctx
         }
@@ -31,8 +31,8 @@ let update: HttpHandler =
 
             let upcomingExpense = UpcomingExpenseService.prepareForUpdate dto userId
 
-            let dbContext = ctx.GetService<AccountantContext>()
-            let! _ = UpcomingExpensesRepository.update upcomingExpense dbContext
+            let connection = getDbConnection ctx
+            let! _ = UpcomingExpensesRepository.update upcomingExpense connection
 
             return! Successful.NO_CONTENT next ctx
         }
@@ -43,8 +43,8 @@ let delete (id: int) : HttpHandler =
         task {
             let userId = getUserId ctx
 
-            let dbContext = ctx.GetService<AccountantContext>()
-            let! _ = UpcomingExpensesRepository.delete id userId dbContext
+            let connection = getDbConnection ctx
+            let! _ = UpcomingExpensesRepository.delete id userId connection
 
             return! Successful.NO_CONTENT next ctx
         }

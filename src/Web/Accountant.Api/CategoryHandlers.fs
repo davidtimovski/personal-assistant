@@ -5,8 +5,8 @@ open Microsoft.AspNetCore.Http
 open Accountant.Application.Fs.Models.Categories
 open Accountant.Application.Fs.Services
 open Accountant.Persistence.Fs
-open Accountant.Persistence.Fs.CommonRepository
 open CommonHandlers
+open HandlerBase
 
 let create: HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
@@ -16,8 +16,8 @@ let create: HttpHandler =
 
             let category = CategoryService.prepareForCreate dto userId
 
-            let dbContext = ctx.GetService<AccountantContext>()
-            let! id = CategoriesRepository.create category dbContext
+            let connection = getDbConnection ctx
+            let! id = CategoriesRepository.create category connection
 
             return! Successful.CREATED id next ctx
         }
@@ -31,8 +31,8 @@ let update: HttpHandler =
 
             let category = CategoryService.prepareForUpdate dto userId
 
-            let dbContext = ctx.GetService<AccountantContext>()
-            let! _ = CategoriesRepository.update category dbContext
+            let connection = getDbConnection ctx
+            let! _ = CategoriesRepository.update category connection
 
             return! Successful.NO_CONTENT next ctx
         }
@@ -43,8 +43,8 @@ let delete (id: int) : HttpHandler =
         task {
             let userId = getUserId ctx
 
-            let dbContext = ctx.GetService<AccountantContext>()
-            let! _ = CategoriesRepository.delete id userId dbContext
+            let connection = getDbConnection ctx
+            let! _ = CategoriesRepository.delete id userId connection
 
             return! Successful.NO_CONTENT next ctx
         }

@@ -5,8 +5,8 @@ open Microsoft.AspNetCore.Http
 open Accountant.Application.Fs.Models.Debts
 open Accountant.Application.Fs.Services
 open Accountant.Persistence.Fs
-open Accountant.Persistence.Fs.CommonRepository
 open CommonHandlers
+open HandlerBase
 
 let create: HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
@@ -16,8 +16,8 @@ let create: HttpHandler =
 
             let debt = DebtService.prepareForCreate dto userId
 
-            let dbContext = ctx.GetService<AccountantContext>()
-            let! id = DebtsRepository.create debt dbContext
+            let connection = getDbConnection ctx
+            let! id = DebtsRepository.create debt connection
 
             return! Successful.CREATED id next ctx
         }
@@ -31,8 +31,8 @@ let createMerged: HttpHandler =
 
             let debt = DebtService.prepareForCreateMerged dto userId
 
-            let dbContext = ctx.GetService<AccountantContext>()
-            let! id = DebtsRepository.createMerged debt dbContext
+            let connection = getDbConnection ctx
+            let! id = DebtsRepository.createMerged debt connection
 
             return! Successful.CREATED id next ctx
         }
@@ -46,8 +46,8 @@ let update: HttpHandler =
 
             let debt = DebtService.prepareForUpdate dto userId
 
-            let dbContext = ctx.GetService<AccountantContext>()
-            let! _ = DebtsRepository.update debt dbContext
+            let connection = getDbConnection ctx
+            let! _ = DebtsRepository.update debt connection
 
             return! Successful.NO_CONTENT next ctx
         }
@@ -58,8 +58,8 @@ let delete (id: int) : HttpHandler =
         task {
             let userId = getUserId ctx
 
-            let dbContext = ctx.GetService<AccountantContext>()
-            let! _ = DebtsRepository.delete id userId dbContext
+            let connection = getDbConnection ctx
+            let! _ = DebtsRepository.delete id userId connection
 
             return! Successful.NO_CONTENT next ctx
         }

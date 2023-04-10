@@ -1,6 +1,7 @@
 ﻿namespace Accountant.Application.Fs.Services
 
 open Accountant.Domain.Models
+open Accountant.Application.Fs
 open Accountant.Application.Fs.Models.Debts
 
 module DebtService =
@@ -17,49 +18,34 @@ module DebtService =
               ModifiedDate = x.ModifiedDate })
 
     let prepareForCreate (model: CreateDebt) (userId: int) =
-        {
-            Id = 0
-            UserId = userId
-            Person = model.Person.Trim()
-            Amount = model.Amount
-            Currency = model.Currency
-            UserIsDebtor = model.UserIsDebtor
-            Description =
-                match model.Description with
-                | None -> None
-                | Some a -> Some(a.Trim())
-            CreatedDate = model.CreatedDate
-            ModifiedDate = model.ModifiedDate
-        }
+        { Id = 0
+          UserId = userId
+          Person = model.Person.Trim()
+          Amount = model.Amount
+          Currency = model.Currency
+          UserIsDebtor = model.UserIsDebtor
+          Description = Utils.noneOrTrimmed model.Description
+          CreatedDate = model.CreatedDate
+          ModifiedDate = model.ModifiedDate }
 
     let prepareForCreateMerged (model: CreateDebt) (userId: int) =
-        {
-            Id = 0
-            UserId = userId
-            Person = model.Person.Trim()
-            Amount = model.Amount
-            Currency = model.Currency
-            UserIsDebtor = model.UserIsDebtor
-            Description =
-                match model.Description with
-                | None -> None
-                | Some a -> Some(a.Trim())
-            CreatedDate = model.CreatedDate
-            ModifiedDate = model.ModifiedDate
-        }
+        { Id = 0
+          UserId = userId
+          Person = model.Person.Trim()
+          Amount = model.Amount
+          Currency = model.Currency
+          UserIsDebtor = model.UserIsDebtor
+          Description = Utils.noneOrTrimmed model.Description
+          CreatedDate = model.CreatedDate
+          ModifiedDate = model.ModifiedDate }
 
     let prepareForUpdate (model: UpdateDebt) (userId: int) =
-        {
-            Id = model.Id
-            UserId = userId
-            Person = model.Person.Trim()
-            Amount = model.Amount
-            Currency = model.Currency
-            UserIsDebtor = model.UserIsDebtor
-            Description =
-                match model.Description with
-                | None -> None
-                | Some a -> Some(a.Trim())
-            CreatedDate = model.CreatedDate
-            ModifiedDate = model.ModifiedDate
-        }
+        { Id = model.Id
+          UserId = userId
+          Person = model.Person.Trim()
+          Amount = model.Amount
+          Currency = model.Currency
+          UserIsDebtor = model.UserIsDebtor
+          Description = Utils.noneOrTrimmed model.Description
+          CreatedDate = model.CreatedDate
+          ModifiedDate = model.ModifiedDate }

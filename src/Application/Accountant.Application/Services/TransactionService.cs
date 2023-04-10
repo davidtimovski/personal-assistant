@@ -25,46 +25,6 @@ public class TransactionService : ITransactionService
         _logger = logger;
     }
 
-    public async Task<int> CreateAsync(CreateTransaction model)
-    {
-        try
-        {
-            var transaction = _mapper.Map<Transaction>(model);
-
-            if (transaction.Description != null)
-            {
-                transaction.Description = transaction.Description.Trim();
-            }
-
-            return await _transactionsRepository.CreateAsync(transaction);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(CreateAsync)}");
-            throw;
-        }
-    }
-
-    public async Task UpdateAsync(UpdateTransaction model)
-    {
-        try
-        {
-            var transaction = _mapper.Map<Transaction>(model);
-
-            if (transaction.Description != null)
-            {
-                transaction.Description = transaction.Description.Trim();
-            }
-
-            await _transactionsRepository.UpdateAsync(transaction);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(UpdateAsync)}");
-            throw;
-        }
-    }
-
     public FileStream ExportAsCsv(ExportAsCsv model)
     {
         try

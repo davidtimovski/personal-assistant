@@ -11,16 +11,13 @@ open Azure.Security.KeyVault.Secrets
 open Giraffe
 open Core.Infrastructure
 open Core.Persistence
-open EntityFrameworkCore.FSharp.Extensions
 open Microsoft.AspNetCore.Builder
-open Microsoft.EntityFrameworkCore
 open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 open Microsoft.AspNetCore.Localization
 open Microsoft.Extensions.Logging
 open Routes
-open Accountant.Persistence.Fs.CommonRepository
 
 let addKeyVault (context: HostBuilderContext) (configBuilder: IConfigurationBuilder) =
     if context.HostingEnvironment.IsProduction() then
@@ -57,13 +54,6 @@ let configureServices (services: IServiceCollection) =
 
     services.AddAuth0("https://" + settings["Auth0:Domain"] + "/", settings["Auth0:Audience"])
     |> ignore
-
-    services.AddDbContext<AccountantContext>(fun (options) ->
-        options
-            .UseNpgsql(settings["ConnectionString"])
-            .UseFSharpTypes()
-            .UseSnakeCaseNamingConvention() |> ignore
-    ) |> ignore
 
     services.AddPersistence(settings["ConnectionString"]).AddAccountantPersistence()
     |> ignore

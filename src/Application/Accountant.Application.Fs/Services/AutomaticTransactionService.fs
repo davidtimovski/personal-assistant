@@ -1,6 +1,7 @@
 ﻿namespace Accountant.Application.Fs.Services
 
 open Accountant.Domain.Models
+open Accountant.Application.Fs
 open Accountant.Application.Fs.Models.AutomaticTransactions
 
 module AutomaticTransactionService =
@@ -18,35 +19,25 @@ module AutomaticTransactionService =
               ModifiedDate = x.ModifiedDate })
 
     let prepareForCreate (model: CreateAutomaticTransaction) (userId: int) =
-        {
-            Id = 0
-            UserId = userId
-            IsDeposit = model.IsDeposit
-            CategoryId = model.CategoryId
-            Amount = model.Amount
-            Currency = model.Currency
-            Description =
-                match model.Description with
-                | None -> None
-                | Some a -> Some(a.Trim())
-            DayInMonth = model.DayInMonth
-            CreatedDate = model.CreatedDate
-            ModifiedDate = model.ModifiedDate
-        }
+        { Id = 0
+          UserId = userId
+          IsDeposit = model.IsDeposit
+          CategoryId = model.CategoryId
+          Amount = model.Amount
+          Currency = model.Currency
+          Description = Utils.noneOrTrimmed model.Description
+          DayInMonth = model.DayInMonth
+          CreatedDate = model.CreatedDate
+          ModifiedDate = model.ModifiedDate }
 
     let prepareForUpdate (model: UpdateAutomaticTransaction) (userId: int) =
-        {
-            Id = model.Id
-            UserId = userId
-            IsDeposit = model.IsDeposit
-            CategoryId = model.CategoryId
-            Amount = model.Amount
-            Currency = model.Currency
-            Description =
-                match model.Description with
-                | None -> None
-                | Some a -> Some(a.Trim())
-            DayInMonth = model.DayInMonth
-            CreatedDate = model.CreatedDate
-            ModifiedDate = model.ModifiedDate
-        }
+        { Id = model.Id
+          UserId = userId
+          IsDeposit = model.IsDeposit
+          CategoryId = model.CategoryId
+          Amount = model.Amount
+          Currency = model.Currency
+          Description = Utils.noneOrTrimmed model.Description
+          DayInMonth = model.DayInMonth
+          CreatedDate = model.CreatedDate
+          ModifiedDate = model.ModifiedDate }

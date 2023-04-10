@@ -19,7 +19,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using ToDoAssistant.Application;
 using ToDoAssistant.Persistence;
-using static Accountant.Persistence.Fs.CommonRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,12 +60,6 @@ builder.Services
     .AddToDoAssistantPersistence()
     .AddCookingAssistantPersistence()
     .AddAccountantPersistence();
-
-builder.Services.AddDbContext<AccountantContext>(options =>
-{
-    options.UseNpgsql(builder.Configuration["ConnectionString"])
-           .UseSnakeCaseNamingConvention();
-});
 
 // Cookie configuration for HTTPS
 if (builder.Environment.EnvironmentName == Environments.Production)

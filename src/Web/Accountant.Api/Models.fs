@@ -42,4 +42,3 @@ type CreatedEntityIdsDto =
       DebtIdPairs: seq<CreatedEntityIdPair>
       AutomaticTransactionIdPairs: seq<CreatedEntityIdPair> }
 
-type ExportDto = { FileId: Guid }
