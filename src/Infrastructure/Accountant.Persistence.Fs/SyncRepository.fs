@@ -20,7 +20,7 @@ module SyncRepository =
             use conn = new NpgsqlConnection(connectionString)
             conn.Open()
 
-            use transaction = conn.BeginTransaction()
+            use tr = conn.BeginTransaction()
 
             let accountIds =
                 accounts
@@ -39,7 +39,7 @@ module SyncRepository =
             let transactionIds =
                 transactions
                 |> List.map (fun transaction ->
-                    TransactionsRepository.create transaction (TransactionConnection(conn)) |> Async.AwaitTask |> Async.RunSynchronously
+                    TransactionsRepository.create transaction (TransactionConnection(conn)) (Some(tr)) |> Async.AwaitTask |> Async.RunSynchronously
                 )
 
             let upcomingExpenseIds =
@@ -63,7 +63,7 @@ module SyncRepository =
                     AutomaticTransactionsRepository.create automaticTransaction (TransactionConnection(conn)) |> Async.AwaitTask |> Async.RunSynchronously
                 )
 
-            transaction.Commit()
+            tr.Commit()
 
             return (accountIds, categoryIds, transactionIds, upcomingExpenseIds, debtIds, automaticTransactionIds)
         }

@@ -5,6 +5,7 @@ open Npgsql.FSharp
 open Accountant.Domain.Models
 open Accountant.Application.Fs
 open ConnectionUtils
+open Npgsql
 
 module TransactionsRepository =
 
@@ -39,13 +40,26 @@ module TransactionsRepository =
               CreatedDate = read.dateTime "created_date"
               ModifiedDate = read.dateTime "modified_date" })
 
-    // TODO: Make transactional
-    let create (transaction: Transaction) (conn: RegularOrTransactionalConn) =
-        task {
-            let connection = ConnectionUtils.connect conn
+    let create (transaction: Transaction) (conn: RegularOrTransactionalConn) (tran: NpgsqlTransaction Option) =
+        let npgsqlConn =
+            match conn with
+            | ConnectionString cs ->
+                let conn = new NpgsqlConnection(cs)
+                conn.Open()
+                conn
+            | TransactionConnection tc -> tc
 
+        // If there is an outside transaction use that one
+        // Otherwise begin a new one
+        let tr =
+            match tran with
+            | Some t -> t
+            | None -> npgsqlConn.BeginTransaction()
+
+        task {
             let! id =
-                connection
+                npgsqlConn
+                |> Sql.existingConnection
                 |> Sql.query
                     $"INSERT INTO {table}
                             (from_account_id, to_account_id, category_id, amount, from_stocks, to_stocks, currency, description, date, is_encrypted, encrypted_description, salt, nonce, generated, created_date, modified_date) VALUES 
@@ -72,12 +86,13 @@ module TransactionsRepository =
 
             if transaction.FromAccountId.IsSome && transaction.ToAccountId.IsNone then
                 let relatedUpcomingExpenses =
-                    connection
+                    npgsqlConn
+                    |> Sql.existingConnection
                     |> Sql.query
                         "SELECT * FROM accountant.upcoming_expenses
-                         WHERE category_id = @category_id 
-                             AND EXTRACT(year FROM date) = @year
-                             AND EXTRACT(month FROM date) = @month"
+                            WHERE category_id = @category_id 
+                                AND EXTRACT(year FROM date) = @year
+                                AND EXTRACT(month FROM date) = @month"
                     |> Sql.parameters
                         [ "category_id", Sql.intOrNone transaction.CategoryId
                           "year", Sql.int (transaction.Date.Year)
@@ -106,11 +121,12 @@ module TransactionsRepository =
 
                     if ue.Description.IsNone || bothWithDescriptionsAndTheyMatch then
                         if ue.Amount > transaction.Amount then
-                            connection
+                            npgsqlConn
+                            |> Sql.existingConnection
                             |> Sql.query
                                 "UPDATE accountant.upcoming_expenses
-                                 SET amount = amount - @Amount, modified_date = @ModifiedDate
-                                 WHERE id = @Id"
+                                    SET amount = amount - @Amount, modified_date = @ModifiedDate
+                                    WHERE id = @Id"
                             |> Sql.parameters
                                 [ "id", Sql.int ue.Id
                                   "amount", Sql.decimal transaction.Amount
@@ -119,9 +135,24 @@ module TransactionsRepository =
                             |> Async.AwaitTask
                             |> ignore
                         else
-                            UpcomingExpensesRepository.delete id ue.UserId conn
+                            npgsqlConn
+                            |> Sql.existingConnection
+                            |> Sql.executeTransactionAsync
+                                [ $"INSERT INTO accountant.deleted_entities
+                                      (user_id, entity_type, entity_id, deleted_date) VALUES
+                                      (@user_id, @entity_type, @entity_id, @deleted_date)",
+                                  [ [ "user_id", Sql.int ue.UserId
+                                      "entity_type", Sql.int (LanguagePrimitives.EnumToValue EntityType.UpcomingExpense)
+                                      "entity_id", Sql.int id
+                                      "deleted_date", Sql.timestamptz DateTime.UtcNow ] ]
+
+                                  $"DELETE FROM {table} WHERE id = @id AND user_id = @user_id",
+                                  [ [ "id", Sql.int id; "user_id", Sql.int ue.UserId ] ] ]
                             |> Async.AwaitTask
                             |> ignore
+
+            if tran.IsNone then
+                tr.Commit()
 
             return id
         }

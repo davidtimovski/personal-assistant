@@ -5,6 +5,8 @@ open System.IO
 open Giraffe
 open Microsoft.AspNetCore.Hosting
 open Microsoft.AspNetCore.Http
+open Accountant.Application.Contracts.Transactions
+open Accountant.Application.Contracts.Transactions.Models
 open Accountant.Application.Fs.Models.Transactions
 open Accountant.Application.Fs.Services
 open Accountant.Persistence.Fs
@@ -30,9 +32,9 @@ let create: HttpHandler =
             else
                 let transaction = TransactionService.prepareForCreate dto
 
-                let! _ = TransactionsRepository.create transaction connection
+                let! id = TransactionsRepository.create transaction connection None
 
-                return! Successful.CREATED 5 next ctx
+                return! Successful.CREATED id next ctx
         }
     )
 
@@ -67,30 +69,30 @@ let delete (id: int) : HttpHandler =
         }
     )
 
-//let export: HttpHandler =
-//    successOrLog (fun (_) (ctx: HttpContext) ->
-//        task {
-//            let! dto = ctx.BindJsonAsync<ExportDto>()
+let export: HttpHandler =
+    successOrLog (fun (_) (ctx: HttpContext) ->
+        task {
+            let! dto = ctx.BindJsonAsync<ExportDto>()
 
-//            let service = ctx.GetService<ITransactionService>()
-//            let webHostEnvironment = ctx.GetService<IWebHostEnvironment>()
-//            let userId = getUserId ctx
+            let service = ctx.GetService<ITransactionService>()
+            let webHostEnvironment = ctx.GetService<IWebHostEnvironment>()
+            let userId = getUserId ctx
 
-//            let directory = Path.Combine(webHostEnvironment.ContentRootPath, "storage", "temp")
+            let directory = Path.Combine(webHostEnvironment.ContentRootPath, "storage", "temp")
 
-//            let uncategorized = localize ctx "Uncategorized"
-//            let encrypted = localize ctx "Encrypted"
+            let uncategorized = localize ctx "Uncategorized"
+            let encrypted = localize ctx "Encrypted"
 
-//            //let exportAsCsvModel =
-//            //    new ExportAsCsv(userId, directory, dto.FileId, uncategorized, encrypted)
+            let exportAsCsvModel =
+                new ExportAsCsv(userId, directory, dto.FileId, uncategorized, encrypted)
 
-//            //let file = service.ExportAsCsv(exportAsCsvModel)
+            let file = service.ExportAsCsv(exportAsCsvModel)
 
-//            //ctx.SetHttpHeader("Content-Disposition", "attachment; filename=\"transactions.csv\"")
+            ctx.SetHttpHeader("Content-Disposition", "attachment; filename=\"transactions.csv\"")
 
-//            return! ctx.WriteStreamAsync(true, file, None, None)
-//        }
-//    )
+            return! ctx.WriteStreamAsync(true, file, None, None)
+        }
+    )
 
 let deleteExportedFile (fileId: Guid) : HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
