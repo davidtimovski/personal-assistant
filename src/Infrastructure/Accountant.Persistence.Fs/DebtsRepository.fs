@@ -81,7 +81,7 @@ module DebtsRepository =
                           "created_date", Sql.timestamptz debt.CreatedDate
                           "modified_date", Sql.timestamptz debt.ModifiedDate ] ]
 
-                      $"INSERT INTO accountant.deleted_entities
+                      "INSERT INTO accountant.deleted_entities
                       (user_id, entity_type, entity_id, deleted_date) VALUES
                       (@user_id, @entity_type, @entity_id, @deleted_date)",
                       deletedEntitiesInsertParams
@@ -118,7 +118,7 @@ module DebtsRepository =
         task {
             ConnectionUtils.connect conn
             |> Sql.executeTransactionAsync
-                [ $"INSERT INTO accountant.deleted_entities
+                [ "INSERT INTO accountant.deleted_entities
                       (user_id, entity_type, entity_id, deleted_date) VALUES
                       (@user_id, @entity_type, @entity_id, @deleted_date)",
                   [ [ "user_id", Sql.int userId

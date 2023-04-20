@@ -72,7 +72,7 @@ module UpcomingExpensesRepository =
         task {
             ConnectionUtils.connect conn
             |> Sql.executeTransactionAsync
-                [ $"INSERT INTO accountant.deleted_entities
+                [ "INSERT INTO accountant.deleted_entities
                       (user_id, entity_type, entity_id, deleted_date) VALUES
                       (@user_id, @entity_type, @entity_id, @deleted_date)",
                   [ [ "user_id", Sql.int userId
@@ -96,19 +96,17 @@ module UpcomingExpensesRepository =
                 |> Sql.parameters [ "user_id", Sql.int userId; "date", Sql.timestamptz beforeUtc ]
                 |> Sql.execute (fun read -> read.int "id")
 
-            let now = DateTime.UtcNow
-
             let deletedEntitiesInsertParams =
                 oldUpcomingExpenseIds
                 |> List.map (fun x ->
                     [ "user_id", Sql.int userId
                       "entity_type", Sql.int (LanguagePrimitives.EnumToValue EntityType.UpcomingExpense)
                       "entity_id", Sql.int x
-                      "deleted_date", Sql.timestamptz now ])
+                      "deleted_date", Sql.timestamptz DateTime.UtcNow ])
 
             ConnectionUtils.connect conn
             |> Sql.executeTransactionAsync
-                [ $"INSERT INTO accountant.deleted_entities
+                [ "INSERT INTO accountant.deleted_entities
                     (user_id, entity_type, entity_id, deleted_date) VALUES
                     (@user_id, @entity_type, @entity_id, @deleted_date)",
                   deletedEntitiesInsertParams
