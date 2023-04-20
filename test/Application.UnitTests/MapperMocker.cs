@@ -10,7 +10,6 @@ public static class MapperMocker
         {
             cfg.AddProfile<ToDoAssistant.Application.Mappings.MappingProfile>();
             cfg.AddProfile<CookingAssistant.Application.Mappings.MappingProfile>();
-            cfg.AddProfile<Accountant.Application.Mappings.MappingProfile>();
             cfg.AddProfile<TProfile>();
         });
         return configurationProvider.CreateMapper();

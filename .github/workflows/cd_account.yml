@@ -16,6 +16,7 @@ on:
       - "src/Infrastructure/ToDoAssistant.Persistence/**"
       - "src/Infrastructure/CookingAssistant.Persistence/**"
       - "src/Infrastructure/Accountant.Persistence/**"
+      - "src/Infrastructure/Accountant.Persistence.Fs/**"
       - "src/Web/Account/**"
 
 env:

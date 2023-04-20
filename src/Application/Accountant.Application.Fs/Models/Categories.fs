@@ -1,13 +1,13 @@
 ﻿namespace Accountant.Application.Fs.Models
 
 open System
-open Application.Domain.Accountant
+open Accountant.Domain.Models
 
 module Categories =
 
     type CategoryDto =
         { Id: int
-          ParentId: Nullable<int>
+          ParentId: int Option
           Name: string
           Type: CategoryType
           GenerateUpcomingExpense: bool
@@ -16,7 +16,7 @@ module Categories =
           ModifiedDate: DateTime }
 
     type CreateCategory =
-        { ParentId: Nullable<int>
+        { ParentId: int Option
           Name: string
           Type: CategoryType
           GenerateUpcomingExpense: bool
@@ -26,17 +26,7 @@ module Categories =
 
     type UpdateCategory =
         { Id: int
-          ParentId: Nullable<int>
-          Name: string
-          Type: CategoryType
-          GenerateUpcomingExpense: bool
-          IsTax: bool
-          CreatedDate: DateTime
-          ModifiedDate: DateTime }
-
-    type SyncCategory =
-        { Id: int
-          ParentId: Nullable<int>
+          ParentId: int Option
           Name: string
           Type: CategoryType
           GenerateUpcomingExpense: bool

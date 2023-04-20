@@ -4,6 +4,7 @@ open System
 open Giraffe
 open Microsoft.AspNetCore.Authentication.JwtBearer
 open Microsoft.AspNetCore.Http
+open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.Logging
 open Core.Application.Contracts
 
@@ -36,3 +37,7 @@ let getUserId (ctx: HttpContext) =
             dbId.Value
         else
             raise (Exception($"The user with auth0_id '{auth0Id}' does not have a mapping"))
+
+let getConnectionString (ctx: HttpContext) =
+    let config = ctx.GetService<IConfiguration>()
+    config.GetValue "ConnectionString"

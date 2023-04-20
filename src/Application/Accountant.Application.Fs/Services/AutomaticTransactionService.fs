@@ -1,11 +1,11 @@
 ﻿namespace Accountant.Application.Fs.Services
 
-open System.Collections.Generic
-open Application.Domain.Accountant
+open Accountant.Domain.Models
+open Accountant.Application.Fs
 open Accountant.Application.Fs.Models.AutomaticTransactions
 
 module AutomaticTransactionService =
-    let mapAll (automaticTransactions: IEnumerable<AutomaticTransaction>) : seq<AutomaticTransactionDto> =
+    let mapAll (automaticTransactions: seq<AutomaticTransaction>) : seq<AutomaticTransactionDto> =
         automaticTransactions
         |> Seq.map (fun x ->
             { Id = x.Id
@@ -18,38 +18,26 @@ module AutomaticTransactionService =
               CreatedDate = x.CreatedDate
               ModifiedDate = x.ModifiedDate })
 
-    let prepareForCreate (model: CreateAutomaticTransaction) (userId: int) : AutomaticTransaction =
-        let trimmedDesc = (match model.Description with
-                            | null -> null
-                            | a -> a.Trim())
-        
-        AutomaticTransaction(
-            Id = 0,
-            UserId = userId,
-            IsDeposit = model.IsDeposit,
-            CategoryId = model.CategoryId,
-            Amount = model.Amount,
-            Currency = model.Currency,
-            Description = trimmedDesc,
-            DayInMonth = model.DayInMonth,
-            CreatedDate = model.CreatedDate,
-            ModifiedDate = model.ModifiedDate
-        )
+    let prepareForCreate (model: CreateAutomaticTransaction) (userId: int) =
+        { Id = 0
+          UserId = userId
+          IsDeposit = model.IsDeposit
+          CategoryId = model.CategoryId
+          Amount = model.Amount
+          Currency = model.Currency
+          Description = Utils.noneOrTrimmed model.Description
+          DayInMonth = model.DayInMonth
+          CreatedDate = model.CreatedDate
+          ModifiedDate = model.ModifiedDate }
 
-    let prepareForUpdate (model: UpdateAutomaticTransaction) (userId: int) : AutomaticTransaction =
-        let trimmedDesc = (match model.Description with
-                            | null -> null
-                            | a -> a.Trim())
-        
-        AutomaticTransaction(
-            Id = model.Id,
-            UserId = userId,
-            IsDeposit = model.IsDeposit,
-            CategoryId = model.CategoryId,
-            Amount = model.Amount,
-            Currency = model.Currency,
-            Description = trimmedDesc,
-            DayInMonth = model.DayInMonth,
-            CreatedDate = model.CreatedDate,
-            ModifiedDate = model.ModifiedDate
-        )
+    let prepareForUpdate (model: UpdateAutomaticTransaction) (userId: int) =
+        { Id = model.Id
+          UserId = userId
+          IsDeposit = model.IsDeposit
+          CategoryId = model.CategoryId
+          Amount = model.Amount
+          Currency = model.Currency
+          Description = Utils.noneOrTrimmed model.Description
+          DayInMonth = model.DayInMonth
+          CreatedDate = model.CreatedDate
+          ModifiedDate = model.ModifiedDate }

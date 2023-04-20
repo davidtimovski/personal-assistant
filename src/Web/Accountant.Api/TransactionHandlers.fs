@@ -2,27 +2,37 @@
 
 open System
 open System.IO
-open Accountant.Application.Contracts.Transactions
-open Accountant.Application.Contracts.Transactions.Models
 open Giraffe
 open Microsoft.AspNetCore.Hosting
 open Microsoft.AspNetCore.Http
+open Accountant.Application.Contracts.Transactions
+open Accountant.Application.Contracts.Transactions.Models
+open Accountant.Application.Fs.Models.Transactions
+open Accountant.Application.Fs.Services
+open Accountant.Persistence.Fs
 open CommonHandlers
 open HandlerBase
-open Models
+
+let modifyInvalid (fromAccountId: int Option) (toAccountId: int Option) (userId: int) connection =
+    (fromAccountId.IsNone && toAccountId.IsNone)
+        || (fromAccountId = toAccountId)
+        || fromAccountId.IsSome && not (AccountsRepository.exists fromAccountId.Value userId connection)
+        || toAccountId.IsSome && not (AccountsRepository.exists toAccountId.Value userId connection)
 
 let create: HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let! dto = ctx.BindJsonAsync<CreateTransaction>()
+            let userId = getUserId ctx
 
-            if dto = null then
-                return! (RequestErrors.BAD_REQUEST "Bad request") next ctx
+            let connection = getDbConnection ctx
+
+            if (modifyInvalid dto.FromAccountId dto.ToAccountId userId connection) then
+                return! (RequestErrors.UNPROCESSABLE_ENTITY "Accounts are not valid") next ctx
             else
-                let service = ctx.GetService<ITransactionService>()
-                dto.UserId <- getUserId ctx
+                let transaction = TransactionService.prepareForCreate dto
 
-                let! id = service.CreateAsync(dto)
+                let! id = TransactionsRepository.create transaction connection None
 
                 return! Successful.CREATED id next ctx
         }
@@ -32,14 +42,16 @@ let update: HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let! dto = ctx.BindJsonAsync<UpdateTransaction>()
+            let userId = getUserId ctx
 
-            if dto = null then
-                return! (RequestErrors.BAD_REQUEST "Bad request") next ctx
+            let connection = getDbConnection ctx
+
+            if (modifyInvalid dto.FromAccountId dto.ToAccountId userId connection) then
+                return! (RequestErrors.UNPROCESSABLE_ENTITY "Accounts are not valid") next ctx
             else
-                let service = ctx.GetService<ITransactionService>()
-                dto.UserId <- getUserId ctx
+                let transaction = TransactionService.prepareForUpdate dto
 
-                do! service.UpdateAsync(dto)
+                let! _ = TransactionsRepository.update transaction connection
 
                 return! Successful.NO_CONTENT next ctx
         }
@@ -48,10 +60,10 @@ let update: HttpHandler =
 let delete (id: int) : HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
-            let repository = ctx.GetService<ITransactionsRepository>()
             let userId = getUserId ctx
 
-            do! repository.DeleteAsync(id, userId)
+            let connection = getDbConnection ctx
+            let! _ = TransactionsRepository.delete id userId connection
 
             return! Successful.NO_CONTENT next ctx
         }

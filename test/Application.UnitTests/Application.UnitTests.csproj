@@ -17,7 +17,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\Application\Accountant.Application\Accountant.Application.csproj" />
 		<ProjectReference Include="..\..\src\Application\CookingAssistant.Application\CookingAssistant.Application.csproj" />
 		<ProjectReference Include="..\..\src\Application\ToDoAssistant.Application\ToDoAssistant.Application.csproj" />
 		<ProjectReference Include="..\..\src\Application\Utility\Utility.fsproj" />
