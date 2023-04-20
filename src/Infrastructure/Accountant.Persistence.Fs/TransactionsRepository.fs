@@ -199,7 +199,10 @@ module TransactionsRepository =
                       "entity_id", Sql.int id
                       "deleted_date", Sql.timestamptz DateTime.UtcNow ] ]
 
-                  $"DELETE FROM {table} WHERE id = @id AND user_id = @user_id",
+                  $"DELETE FROM accountant.transactions t
+                        USING accountant.accounts a
+                    WHERE t.id = @id AND 
+                        ((t.from_account_id = a.id AND a.user_id = @user_id) OR (t.to_account_id = a.id AND a.user_id = @user_id))",
                   [ [ "id", Sql.int id; "user_id", Sql.int userId ] ] ]
             |> Async.AwaitTask
             |> ignore
