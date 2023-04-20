@@ -1,11 +1,12 @@
 ﻿module UpcomingExpenseHandlers
 
-open Accountant.Application.Contracts.UpcomingExpenses
-open Accountant.Application.Fs.Models.UpcomingExpenses
-open Accountant.Application.Fs.Services
 open Giraffe
 open Microsoft.AspNetCore.Http
+open Accountant.Application.Fs.Models.UpcomingExpenses
+open Accountant.Application.Fs.Services
+open Accountant.Persistence.Fs
 open CommonHandlers
+open HandlerBase
 
 let create: HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
@@ -15,8 +16,8 @@ let create: HttpHandler =
 
             let upcomingExpense = UpcomingExpenseService.prepareForCreate dto userId
 
-            let repository = ctx.GetService<IUpcomingExpensesRepository>()
-            let! id = repository.CreateAsync(upcomingExpense)
+            let connection = getDbConnection ctx
+            let! id = UpcomingExpensesRepository.create upcomingExpense connection
 
             return! Successful.CREATED id next ctx
         }
@@ -30,8 +31,8 @@ let update: HttpHandler =
 
             let upcomingExpense = UpcomingExpenseService.prepareForUpdate dto userId
 
-            let repository = ctx.GetService<IUpcomingExpensesRepository>()
-            do! repository.UpdateAsync(upcomingExpense)
+            let connection = getDbConnection ctx
+            let! _ = UpcomingExpensesRepository.update upcomingExpense connection
 
             return! Successful.NO_CONTENT next ctx
         }
@@ -40,10 +41,11 @@ let update: HttpHandler =
 let delete (id: int) : HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
-            let repository = ctx.GetService<IUpcomingExpensesRepository>()
             let userId = getUserId ctx
 
-            do! repository.DeleteAsync(id, userId)
+            let connection = getDbConnection ctx
+            let! _ = UpcomingExpensesRepository.delete id userId connection
+
             return! Successful.NO_CONTENT next ctx
         }
     )

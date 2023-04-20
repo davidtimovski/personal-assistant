@@ -1,5 +1,4 @@
-﻿using Accountant.Application.Mappings;
-using AutoMapper;
+﻿using AutoMapper;
 using CookingAssistant.Application.Mappings;
 using ToDoAssistant.Application.Mappings;
 
@@ -15,8 +14,6 @@ public class MappingTestsFixture
             cfg.AddProfile<ToDoAssistantProfile>();
             cfg.AddProfile<CookingAssistant.Application.Mappings.MappingProfile>();
             cfg.AddProfile<CookingAssistantProfile>();
-            cfg.AddProfile<Accountant.Application.Mappings.MappingProfile>();
-            cfg.AddProfile<AccountantProfile>();
         });
 
         Mapper = ConfigurationProvider.CreateMapper();

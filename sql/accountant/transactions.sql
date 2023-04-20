@@ -14,7 +14,6 @@ CREATE TABLE accountant.transactions
     encrypted_description bytea,
     salt bytea,
     nonce bytea,
-    encryption_hint character varying(100) COLLATE pg_catalog."default",
 	generated boolean NOT NULL DEFAULT FALSE,
     created_date timestamp with time zone NOT NULL,
     modified_date timestamp with time zone NOT NULL,

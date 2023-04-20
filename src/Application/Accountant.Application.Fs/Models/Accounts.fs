@@ -9,7 +9,7 @@ module Accounts =
           Name: string
           IsMain: bool
           Currency: string
-          StockPrice: Nullable<decimal>
+          StockPrice: decimal Option
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
@@ -17,7 +17,7 @@ module Accounts =
         { Name: string
           IsMain: bool
           Currency: string
-          StockPrice: Nullable<decimal>
+          StockPrice: decimal Option
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
@@ -26,15 +26,6 @@ module Accounts =
           Name: string
           IsMain: bool
           Currency: string
-          StockPrice: Nullable<decimal>
-          CreatedDate: DateTime
-          ModifiedDate: DateTime }
-
-    type SyncAccount =
-        { Id: int
-          Name: string
-          IsMain: bool
-          Currency: string
-          StockPrice: Nullable<decimal>
+          StockPrice: decimal Option
           CreatedDate: DateTime
           ModifiedDate: DateTime }

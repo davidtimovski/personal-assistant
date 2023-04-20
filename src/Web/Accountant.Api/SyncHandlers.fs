@@ -1,144 +1,136 @@
 ﻿module SyncHandlers
 
 open System
-open Accountant.Application.Contracts.Accounts
-open Accountant.Application.Contracts.AutomaticTransactions
-open Accountant.Application.Contracts.Categories
-open Accountant.Application.Contracts.Debts
-open Accountant.Application.Contracts.Transactions
-open Accountant.Application.Contracts.UpcomingExpenses
-open Accountant.Application.Contracts.Sync
-open Accountant.Application.Fs.Services
-open Accountant.Application.Fs.Models.Sync
 open Giraffe
 open Microsoft.AspNetCore.Http
+open Accountant.Domain.Models
+open Accountant.Application.Contracts.Transactions
+open Accountant.Application.Fs.Services
+open Accountant.Application.Fs.Models.Common
+open Accountant.Persistence.Fs
 open CommonHandlers
+open HandlerBase
 open Models
 
 let getChanges: HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
-        let accountsRepository = ctx.GetService<IAccountsRepository>()
-        let categoryRepository = ctx.GetService<ICategoriesRepository>()
-        let transactionsRepository = ctx.GetService<ITransactionsRepository>()
-        let upcomingExpensesRepository = ctx.GetService<IUpcomingExpensesRepository>()
-        let debtsRepository = ctx.GetService<IDebtsRepository>()
-
-        let automaticTransactionsRepository =
-            ctx.GetService<IAutomaticTransactionsRepository>()
+        let connection = getDbConnection ctx
 
         task {
             let! dto = ctx.BindJsonAsync<GetChangesDto>()
             let userId = getUserId ctx
 
-            do! upcomingExpensesRepository.DeleteOldAsync(userId, UpcomingExpenseService.getFirstDayOfMonth)
+            let! _ = UpcomingExpensesRepository.deleteOld userId UpcomingExpenseService.getFirstDayOfMonth connection
 
-            let accounts =
-                accountsRepository.GetAll(userId, dto.LastSynced) |> AccountService.mapAll
+            let! deletedAccountIds =
+                CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Account connection
 
-            let categories =
-                categoryRepository.GetAll(userId, dto.LastSynced) |> CategoryService.mapAll
+            let! accounts = AccountsRepository.getAll userId dto.LastSynced connection
+            let accountDtos = accounts |> AccountService.mapAll
 
-            let transactions = transactionsRepository.GetAll(userId, dto.LastSynced) |> TransactionService.mapAll
+            let! deletedCategoryIds =
+                CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Category connection
 
-            let upcomingExpenses =
-                upcomingExpensesRepository.GetAll(userId, dto.LastSynced)
-                |> UpcomingExpenseService.mapAll
+            let! categories = CategoriesRepository.getAll userId dto.LastSynced connection
+            let categoryDtos = categories |> CategoryService.mapAll
 
-            let debts = debtsRepository.GetAll(userId, dto.LastSynced) |> DebtService.mapAll
+            let! deletedTransactionIds =
+                CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Transaction connection
 
-            let automaticTransactions =
-                automaticTransactionsRepository.GetAll(userId, dto.LastSynced)
-                |> AutomaticTransactionService.mapAll
+            let! transactions = TransactionsRepository.getAll userId dto.LastSynced connection
+            let transactionDtos = transactions |> TransactionService.mapAll
+
+            let! deletedUpcomingExpenseIds =
+                CommonRepository.getDeletedIds userId dto.LastSynced EntityType.UpcomingExpense connection
+
+            let! upcomingExpenses = UpcomingExpensesRepository.getAll userId dto.LastSynced connection
+            let upcomingExpenseDtos = upcomingExpenses |> UpcomingExpenseService.mapAll
+
+            let! deletedDebtIds = CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Debt connection
+            let! debts = DebtsRepository.getAll userId dto.LastSynced connection
+            let debtDtos = debts |> DebtService.mapAll
+
+            let! deletedAutomaticTransactionIds =
+                CommonRepository.getDeletedIds userId dto.LastSynced EntityType.AutomaticTransaction connection
+
+            let! automaticTransactions = AutomaticTransactionsRepository.getAll userId dto.LastSynced connection
+
+            let automaticTransactionDtos =
+                automaticTransactions |> AutomaticTransactionService.mapAll
 
             let changed =
                 { LastSynced = DateTime.Now
-                  DeletedAccountIds = accountsRepository.GetDeletedIds(userId, dto.LastSynced)
-                  Accounts = accounts
-                  DeletedCategoryIds = categoryRepository.GetDeletedIds(userId, dto.LastSynced)
-                  Categories = categories
-                  DeletedTransactionIds = transactionsRepository.GetDeletedIds(userId, dto.LastSynced)
-                  Transactions = transactions
-                  DeletedUpcomingExpenseIds = upcomingExpensesRepository.GetDeletedIds(userId, dto.LastSynced)
-                  UpcomingExpenses = upcomingExpenses
-                  DeletedDebtIds = debtsRepository.GetDeletedIds(userId, dto.LastSynced)
-                  Debts = debts
-                  DeletedAutomaticTransactionIds = automaticTransactionsRepository.GetDeletedIds(userId, dto.LastSynced)
-                  AutomaticTransactions = automaticTransactions }
+                  DeletedAccountIds = deletedAccountIds
+                  Accounts = accountDtos
+                  DeletedCategoryIds = deletedCategoryIds
+                  Categories = categoryDtos
+                  DeletedTransactionIds = deletedTransactionIds
+                  Transactions = transactionDtos
+                  DeletedUpcomingExpenseIds = deletedUpcomingExpenseIds
+                  UpcomingExpenses = upcomingExpenseDtos
+                  DeletedDebtIds = deletedDebtIds
+                  Debts = debtDtos
+                  DeletedAutomaticTransactionIds = deletedAutomaticTransactionIds
+                  AutomaticTransactions = automaticTransactionDtos }
 
             return! Successful.OK changed next ctx
-        }
-    )
+        })
 
 let createEntities: HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             let! dto = ctx.BindJsonAsync<SyncEntities>()
 
-            let syncRepository = ctx.GetService<ISyncRepository>()
             let userId = getUserId ctx
+            let connectionString = getConnectionString ctx
 
-            let (accounts, categories, transactions, upcomingExpenses, debts, automaticTransactions) =
-                SyncService.mapEntitiesForSync userId dto
-
-            do!
-                syncRepository.SyncAsync(
-                    accounts,
-                    categories,
-                    transactions,
-                    upcomingExpenses,
-                    debts,
-                    automaticTransactions
-                )
-
-            let syncedAccountIds = accounts |> Seq.map (fun x -> x.Id) |> Seq.toArray
-            let syncedCategoryIds = categories |> Seq.map (fun x -> x.Id) |> Seq.toArray
-            let syncedTransactionIds = transactions |> Seq.map (fun x -> x.Id) |> Seq.toArray
-
-            let syncedUpcomingExpenseIds =
-                upcomingExpenses |> Seq.map (fun x -> x.Id) |> Seq.toArray
-
-            let syncedDebtIds = debts |> Seq.map (fun x -> x.Id) |> Seq.toArray
-
-            let syncedAutomaticTransactionIds =
-                automaticTransactions |> Seq.map (fun x -> x.Id) |> Seq.toArray
+            let! (accountIds, categoryIds, transactionIds, upcomingExpenseIds, debtIds, automaticTransactionIds) =
+                SyncRepository.sync
+                    dto.Accounts
+                    dto.Categories
+                    dto.Transactions
+                    dto.UpcomingExpenses
+                    dto.Debts
+                    dto.AutomaticTransactions
+                    userId
+                    connectionString
 
             let changedEntitiesDto =
                 { AccountIdPairs =
-                    seq { 0 .. syncedAccountIds.Length - 1 }
+                    seq { 0 .. accountIds.Length - 1 }
                     |> Seq.map (fun x ->
                         { LocalId = dto.Accounts[x].Id
-                          Id = syncedAccountIds[x] })
+                          Id = accountIds[x] })
 
                   CategoryIdPairs =
-                      seq { 0 .. syncedCategoryIds.Length - 1 }
+                      seq { 0 .. categoryIds.Length - 1 }
                       |> Seq.map (fun x ->
                           { LocalId = dto.Categories[x].Id
-                            Id = syncedCategoryIds[x] })
+                            Id = categoryIds[x] })
 
                   TransactionIdPairs =
-                      seq { 0 .. syncedTransactionIds.Length - 1 }
+                      seq { 0 .. transactionIds.Length - 1 }
                       |> Seq.map (fun x ->
                           { LocalId = dto.Transactions[x].Id
-                            Id = syncedTransactionIds[x] })
+                            Id = transactionIds[x] })
 
                   UpcomingExpenseIdPairs =
-                      seq { 0 .. syncedUpcomingExpenseIds.Length - 1 }
+                      seq { 0 .. upcomingExpenseIds.Length - 1 }
                       |> Seq.map (fun x ->
                           { LocalId = dto.UpcomingExpenses[x].Id
-                            Id = syncedUpcomingExpenseIds[x] })
+                            Id = upcomingExpenseIds[x] })
 
                   DebtIdPairs =
-                      seq { 0 .. syncedDebtIds.Length - 1 }
+                      seq { 0 .. debtIds.Length - 1 }
                       |> Seq.map (fun x ->
                           { LocalId = dto.Debts[x].Id
-                            Id = syncedDebtIds[x] })
+                            Id = debtIds[x] })
 
                   AutomaticTransactionIdPairs =
-                      seq { 0 .. syncedAutomaticTransactionIds.Length - 1 }
+                      seq { 0 .. automaticTransactionIds.Length - 1 }
                       |> Seq.map (fun x ->
                           { LocalId = dto.AutomaticTransactions[x].Id
-                            Id = syncedAutomaticTransactionIds[x] }) }
+                            Id = automaticTransactionIds[x] }) }
 
             return! Successful.OK changedEntitiesDto next ctx
-        }
-    )
+        })

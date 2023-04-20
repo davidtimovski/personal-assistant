@@ -15,6 +15,7 @@ using FluentValidation.AspNetCore;
 using Infrastructure.Sender;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using ToDoAssistant.Application;
 using ToDoAssistant.Persistence;

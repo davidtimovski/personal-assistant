@@ -14,7 +14,7 @@ services:
       - Cloudinary__ApiSecret=${CLOUDINARY_API_SECRET}
       - PORT=80
     volumes:
-      - ./src/Account/storage:/app/storage:z
+      - ./src/Web/Account/storage:/app/storage:z
     ports:
       - "5000:80"
 
