@@ -1,8 +1,9 @@
-﻿namespace Accountant.Application.Fs.Models
+﻿namespace Accountant.Api.Transactions
 
 open System
+open Microsoft.AspNetCore.Http
 
-module Transactions =
+module Models =
 
     type TransactionDto =
         { Id: int
@@ -24,7 +25,8 @@ module Transactions =
           ModifiedDate: DateTime }
 
     type CreateTransaction =
-        { FromAccountId: int Option
+        { mutable HttpContext: HttpContext
+          FromAccountId: int Option
           ToAccountId: int Option
           CategoryId: int Option
           Amount: decimal
@@ -41,7 +43,8 @@ module Transactions =
           ModifiedDate: DateTime }
 
     type UpdateTransaction =
-        { Id: int
+        { mutable HttpContext: HttpContext
+          Id: int
           FromAccountId: int Option
           ToAccountId: int Option
           CategoryId: int Option

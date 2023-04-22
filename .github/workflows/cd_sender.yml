@@ -6,9 +6,9 @@ on:
     branches:
       - master
     paths:
-      - "src/Background/Sender/**"
       - "src/Application/Domain/**"
-
+      - "src/Background/Sender/**"
+      
 env:
   REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
   REGISTRY_IMAGE: ${{ secrets.REGISTRY_IMAGE }}

@@ -29,7 +29,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Application\Accountant.Application.Fs\Accountant.Application.Fs.fsproj" />
 		<ProjectReference Include="..\..\Application\Accountant.Application\Accountant.Application.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Accountant.Persistence.Fs\Accountant.Persistence.Fs.fsproj" />
 		<ProjectReference Include="..\..\Infrastructure\Accountant.Persistence\Accountant.Persistence.csproj" />
@@ -40,6 +39,7 @@
 		<ProjectReference Include="..\..\Application\ToDoAssistant.Application\ToDoAssistant.Application.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Sender\Sender.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\ToDoAssistant.Persistence\ToDoAssistant.Persistence.csproj" />
+		<ProjectReference Include="..\Accountant.Api\Accountant.Api.fsproj" />
 	</ItemGroup>
 
 	<ItemGroup>

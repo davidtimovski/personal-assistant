@@ -2,8 +2,8 @@
 
 open System
 open Npgsql.FSharp
-open Accountant.Domain.Models
 open ConnectionUtils
+open Models
 
 module CategoriesRepository =
 
@@ -24,6 +24,12 @@ module CategoriesRepository =
               IsTax = read.bool "is_tax"
               CreatedDate = read.dateTime "created_date"
               ModifiedDate = read.dateTime "modified_date" })
+
+    let exists (id: int) (userId: int) (conn: RegularOrTransactionalConn) =
+        ConnectionUtils.connect conn
+        |> Sql.query $"SELECT COUNT(*) AS count FROM {table} WHERE id = @id AND user_id = @user_id"
+        |> Sql.parameters [ "id", Sql.int id; "user_id", Sql.int userId ]
+        |> Sql.executeRow (fun read -> (read.int "count") > 0)
 
     let create (category: Category) (conn: RegularOrTransactionalConn) =
         task {

@@ -3,8 +3,6 @@ using Account.Models;
 using Account.Services;
 using Account.ViewModels.Account;
 using Account.ViewModels.Home;
-using Accountant.Application.Fs.Services;
-using Accountant.Persistence.Fs;
 using Auth0.AspNetCore.Authentication;
 using CookingAssistant.Application.Contracts.Recipes;
 using Core.Application.Contracts;
@@ -16,6 +14,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using ToDoAssistant.Application.Contracts.Lists;
+using static Accountant.Api.Accounts.Logic;
 using static Accountant.Persistence.Fs.AccountsRepository;
 
 namespace Account.Controllers;
@@ -442,8 +441,8 @@ public class AccountController : BaseController
     // TODO: Breaking microservice design. Implement with message queue or HTTP call.
     private async Task CreateRequiredDataAsync(int userId)
     {
-        var mainAccount = AccountService.prepareForCreateMain(userId, _localizer["MainAccountName"]);
-        await AccountsRepository.createMain(mainAccount, _configuration["ConnectionString"]);
+        var mainAccount = prepareForCreateMain(userId, _localizer["MainAccountName"]);
+        await createMain(mainAccount, _configuration["ConnectionString"]);
     }
 
     private async Task CreateSamplesAsync(int userId)

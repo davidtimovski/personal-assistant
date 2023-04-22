@@ -2,9 +2,8 @@
 
 open System
 open Npgsql.FSharp
-open Accountant.Domain.Models
-open Accountant.Application.Fs
 open ConnectionUtils
+open Models
 open Npgsql
 
 module TransactionsRepository =

@@ -1,9 +1,9 @@
-﻿namespace Accountant.Application.Fs.Models
+﻿namespace Accountant.Api.Categories
 
 open System
-open Accountant.Domain.Models
+open Accountant.Persistence.Fs.Models
 
-module Categories =
+module Models =
 
     type CategoryDto =
         { Id: int

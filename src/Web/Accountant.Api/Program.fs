@@ -62,7 +62,9 @@ let configureServices (services: IServiceCollection) =
 
     // Use System.Text.Json serializer
     let serializationOptions = SystemTextJson.Serializer.DefaultOptions
-    services.AddSingleton<Json.ISerializer>(SystemTextJson.Serializer(serializationOptions)) |> ignore
+
+    services.AddSingleton<Json.ISerializer>(SystemTextJson.Serializer(serializationOptions))
+    |> ignore
 
 let addLocalization (app: WebApplication) =
     let supportedCultures = [| new CultureInfo("en-US"); new CultureInfo("mk-MK") |]
@@ -80,13 +82,15 @@ let errorHandler (ex: Exception) (logger: ILogger) =
 let main args =
     let builder = WebApplication.CreateBuilder(args)
 
-    builder.Host
+    builder
+        .Host
         .UseContentRoot(Directory.GetCurrentDirectory())
-        .ConfigureAppConfiguration(addKeyVault) |> ignore
+        .ConfigureAppConfiguration(addKeyVault)
+    |> ignore
 
     match builder.Environment.IsProduction() with
     | true ->
-         builder.Host.ConfigureLogging(fun (loggingBuilder: ILoggingBuilder) ->
+        builder.Host.ConfigureLogging(fun (loggingBuilder: ILoggingBuilder) ->
             loggingBuilder.AddConfiguration(builder.Configuration).AddSentry() |> ignore)
         |> ignore
     | false ->
@@ -99,10 +103,10 @@ let main args =
     let app = builder.Build()
 
     match app.Environment.IsProduction() with
-     | true ->
+    | true ->
         app.UseSentryTracing() |> ignore
         app.UseGiraffeErrorHandler(errorHandler) |> ignore
-     | false -> app.UseDeveloperExceptionPage() |> ignore
+    | false -> app.UseDeveloperExceptionPage() |> ignore
 
     addLocalization app
 
