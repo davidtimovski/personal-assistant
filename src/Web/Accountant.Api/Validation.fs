@@ -1,8 +1,9 @@
 ﻿module Validation
 
 open Accountant.Persistence.Fs
+open Accountant.Persistence.Fs.Models
 
-let validCurrencies =
+let private validCurrencies =
     set
         [ "AED"
           "AFN"
@@ -181,12 +182,26 @@ let amountIsValid (amount: decimal) = amount > 0m
 
 let textIsNotEmpty (text: string) = text.Trim().Length > 0
 
-let textLengthIsValid (text: string Option) (length: int) =
-    text.IsNone || text.Value.Trim().Length <= length
+let textLengthIsValid (text: string) (length: int) =
+    text.Trim().Length <= length
 
-let accountBelongsTo (accountId: int) (userId: int) connection =
-    AccountsRepository.exists accountId userId connection
+let textIsNoneOrLengthIsValid (text: string Option) (length: int) =
+    text.IsNone || (textLengthIsValid text.Value length)
 
-let categoryBelongsTo (categoryId: int Option) (userId: int) connection =
-    categoryId.IsNone
-    || CategoriesRepository.exists categoryId.Value userId connection
+let categoryBelongsTo (id: int) (userId: int) connection =
+    CommonRepository.exists id userId EntityType.Category connection
+
+let accountBelongsTo (id: int) (userId: int) connection =
+    CommonRepository.exists id userId EntityType.Account connection
+
+let transactionBelongsTo (id: int) (userId: int) connection =
+    TransactionsRepository.exists id userId connection
+    
+let upcomingExpenseBelongsTo (id: int) (userId: int) connection =
+    CommonRepository.exists id userId EntityType.UpcomingExpense connection
+    
+let debtBelongsTo (id: int) (userId: int) connection =
+    CommonRepository.exists id userId EntityType.Debt connection
+    
+let automaticTransactionBelongsTo (id: int) (userId: int) connection =
+    CommonRepository.exists id userId EntityType.AutomaticTransaction connection

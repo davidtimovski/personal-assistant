@@ -38,7 +38,7 @@ module Logic =
               CreatedDate = x.CreatedDate
               ModifiedDate = x.ModifiedDate })
 
-    let validateCreateAccounts (dto: CreateTransaction) =
+    let private validateCreateAccounts (dto: CreateTransaction) =
         let userId = getUserId dto.HttpContext
         let connection = getDbConnection dto.HttpContext
 
@@ -47,29 +47,32 @@ module Logic =
         else
             Failure "Accounts are not valid"
 
-    let validateCreateCategory (dto: CreateTransaction) =
+    let private validateCreateCategory (dto: CreateTransaction) =
         let userId = getUserId dto.HttpContext
         let connection = getDbConnection dto.HttpContext
 
-        if Validation.categoryBelongsTo dto.CategoryId userId connection then
+        if
+            dto.CategoryId.IsNone
+            || Validation.categoryBelongsTo dto.CategoryId.Value userId connection
+        then
             Success dto
         else
             Failure "Category is not valid"
 
-    let validateCreateAmount (dto: CreateTransaction) =
+    let private validateCreateAmount (dto: CreateTransaction) =
         if Validation.amountIsValid dto.Amount then
             Success dto
         else
             Failure "Amount has to be a positive number"
 
-    let validateCreateCurrency (dto: CreateTransaction) =
+    let private validateCreateCurrency (dto: CreateTransaction) =
         if Validation.currencyIsValid dto.Currency then
             Success dto
         else
             Failure "Currency is not valid"
 
-    let validateCreateDescription (dto: CreateTransaction) =
-        if Validation.textLengthIsValid dto.Description descriptionMaxLength then
+    let private validateCreateDescription (dto: CreateTransaction) =
+        if Validation.textIsNoneOrLengthIsValid dto.Description descriptionMaxLength then
             Success dto
         else
             Failure $"Description cannot exceed {descriptionMaxLength} characters"
@@ -100,7 +103,16 @@ module Logic =
           CreatedDate = model.CreatedDate
           ModifiedDate = model.ModifiedDate }
 
-    let validateUpdateAccounts (dto: UpdateTransaction) =
+    let private validateUpdateTransaction (dto: UpdateTransaction) =
+        let userId = getUserId dto.HttpContext
+        let connection = getDbConnection dto.HttpContext
+
+        if Validation.transactionBelongsTo dto.Id userId connection then
+            Success dto
+        else
+            Failure "Transaction is not valid"
+
+    let private validateUpdateAccounts (dto: UpdateTransaction) =
         let userId = getUserId dto.HttpContext
         let connection = getDbConnection dto.HttpContext
 
@@ -109,35 +121,39 @@ module Logic =
         else
             Failure "Accounts are not valid"
 
-    let validateUpdateCategory (dto: UpdateTransaction) =
+    let private validateUpdateCategory (dto: UpdateTransaction) =
         let userId = getUserId dto.HttpContext
         let connection = getDbConnection dto.HttpContext
 
-        if Validation.categoryBelongsTo dto.CategoryId userId connection then
+        if
+            dto.CategoryId.IsNone
+            || Validation.categoryBelongsTo dto.CategoryId.Value userId connection
+        then
             Success dto
         else
             Failure "Category is not valid"
 
-    let validateUpdateAmount (dto: UpdateTransaction) =
+    let private validateUpdateAmount (dto: UpdateTransaction) =
         if Validation.amountIsValid dto.Amount then
             Success dto
         else
             Failure "Amount has to be a positive number"
 
-    let validateUpdateCurrency (dto: UpdateTransaction) =
+    let private validateUpdateCurrency (dto: UpdateTransaction) =
         if Validation.currencyIsValid dto.Currency then
             Success dto
         else
             Failure "Currency is not valid"
 
-    let validateUpdateDescription (dto: UpdateTransaction) =
-        if Validation.textLengthIsValid dto.Description descriptionMaxLength then
+    let private validateUpdateDescription (dto: UpdateTransaction) =
+        if Validation.textIsNoneOrLengthIsValid dto.Description descriptionMaxLength then
             Success dto
         else
             Failure $"Description cannot exceed {descriptionMaxLength} characters"
 
     let validateUpdate =
-        validateUpdateAccounts
+        validateUpdateTransaction
+        >> bind validateUpdateAccounts
         >> bind validateUpdateCategory
         >> bind validateUpdateAmount
         >> bind validateUpdateCurrency

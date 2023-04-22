@@ -24,12 +24,6 @@ module AccountsRepository =
               CreatedDate = read.dateTime "created_date"
               ModifiedDate = read.dateTime "modified_date" })
 
-    let exists (id: int) (userId: int) (conn: RegularOrTransactionalConn) =
-        ConnectionUtils.connect conn
-        |> Sql.query $"SELECT COUNT(*) AS count FROM {table} WHERE id = @id AND user_id = @user_id"
-        |> Sql.parameters [ "id", Sql.int id; "user_id", Sql.int userId ]
-        |> Sql.executeRow (fun read -> (read.int "count") > 0)
-
     let hasMain (userId: int) (conn: RegularOrTransactionalConn) =
         ConnectionUtils.connect conn
         |> Sql.query $"SELECT COUNT(*) AS count FROM {table} WHERE user_id = @user_id AND is_main"

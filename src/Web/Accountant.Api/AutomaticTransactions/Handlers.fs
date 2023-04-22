@@ -25,7 +25,7 @@ module Handlers =
                     let! id = AutomaticTransactionsRepository.create automaticTransaction connection
 
                     return! Successful.CREATED id next ctx
-                | Failure error -> return! (RequestErrors.BAD_REQUEST error) next ctx
+                | Failure error -> return! RequestErrors.BAD_REQUEST error next ctx
             })
 
     let update: HttpHandler =
@@ -43,7 +43,7 @@ module Handlers =
                     let! _ = AutomaticTransactionsRepository.update automaticTransaction connection
 
                     return! Successful.NO_CONTENT next ctx
-                | Failure error -> return! (RequestErrors.BAD_REQUEST error) next ctx
+                | Failure error -> return! RequestErrors.BAD_REQUEST error next ctx
             })
 
     let delete (id: int) : HttpHandler =

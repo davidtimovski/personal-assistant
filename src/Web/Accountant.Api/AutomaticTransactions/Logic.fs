@@ -22,29 +22,32 @@ module Logic =
               CreatedDate = x.CreatedDate
               ModifiedDate = x.ModifiedDate })
 
-    let validateCreateCategory (dto: CreateAutomaticTransaction) =
+    let private validateCreateCategory (dto: CreateAutomaticTransaction) =
         let userId = getUserId dto.HttpContext
         let connection = getDbConnection dto.HttpContext
 
-        if Validation.categoryBelongsTo dto.CategoryId userId connection then
+        if
+            dto.CategoryId.IsNone
+            || Validation.categoryBelongsTo dto.CategoryId.Value userId connection
+        then
             Success dto
         else
             Failure "Category is not valid"
 
-    let validateCreateAmount (dto: CreateAutomaticTransaction) =
+    let private validateCreateAmount (dto: CreateAutomaticTransaction) =
         if Validation.amountIsValid dto.Amount then
             Success dto
         else
             Failure "Amount has to be a positive number"
 
-    let validateCreateCurrency (dto: CreateAutomaticTransaction) =
+    let private validateCreateCurrency (dto: CreateAutomaticTransaction) =
         if Validation.currencyIsValid dto.Currency then
             Success dto
         else
             Failure "Currency is not valid"
 
-    let validateCreateDescription (dto: CreateAutomaticTransaction) =
-        if Validation.textLengthIsValid dto.Description descriptionMaxLength then
+    let private validateCreateDescription (dto: CreateAutomaticTransaction) =
+        if Validation.textIsNoneOrLengthIsValid dto.Description descriptionMaxLength then
             Success dto
         else
             Failure $"Description cannot exceed {descriptionMaxLength} characters"
@@ -67,35 +70,48 @@ module Logic =
           CreatedDate = model.CreatedDate
           ModifiedDate = model.ModifiedDate }
 
-    let validateUpdateCategory (dto: UpdateAutomaticTransaction) =
+    let private validateUpdateAutomaticTransaction (dto: UpdateAutomaticTransaction) =
         let userId = getUserId dto.HttpContext
         let connection = getDbConnection dto.HttpContext
 
-        if Validation.categoryBelongsTo dto.CategoryId userId connection then
+        if Validation.automaticTransactionBelongsTo dto.Id userId connection then
+            Success dto
+        else
+            Failure "Automatic transaction is not valid"
+
+    let private validateUpdateCategory (dto: UpdateAutomaticTransaction) =
+        let userId = getUserId dto.HttpContext
+        let connection = getDbConnection dto.HttpContext
+
+        if
+            dto.CategoryId.IsNone
+            || Validation.categoryBelongsTo dto.CategoryId.Value userId connection
+        then
             Success dto
         else
             Failure "Category is not valid"
 
-    let validateUpdateAmount (dto: UpdateAutomaticTransaction) =
+    let private validateUpdateAmount (dto: UpdateAutomaticTransaction) =
         if Validation.amountIsValid dto.Amount then
             Success dto
         else
             Failure "Amount has to be a positive number"
 
-    let validateUpdateCurrency (dto: UpdateAutomaticTransaction) =
+    let private validateUpdateCurrency (dto: UpdateAutomaticTransaction) =
         if Validation.currencyIsValid dto.Currency then
             Success dto
         else
             Failure "Currency is not valid"
 
-    let validateUpdateDescription (dto: UpdateAutomaticTransaction) =
-        if Validation.textLengthIsValid dto.Description descriptionMaxLength then
+    let private validateUpdateDescription (dto: UpdateAutomaticTransaction) =
+        if Validation.textIsNoneOrLengthIsValid dto.Description descriptionMaxLength then
             Success dto
         else
             Failure $"Description cannot exceed {descriptionMaxLength} characters"
 
     let validateUpdate =
-        validateUpdateCategory
+        validateUpdateAutomaticTransaction
+        >> bind validateUpdateCategory
         >> bind validateUpdateAmount
         >> bind validateUpdateCurrency
         >> bind validateUpdateDescription

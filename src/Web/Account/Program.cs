@@ -1,8 +1,6 @@
 ﻿using System.Globalization;
 using System.Reflection;
 using Account.Services;
-using Accountant.Application;
-using Accountant.Persistence;
 using Auth0.AspNetCore.Authentication;
 using Cdn;
 using CookingAssistant.Application;
@@ -15,7 +13,6 @@ using FluentValidation.AspNetCore;
 using Infrastructure.Sender;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using ToDoAssistant.Application;
 using ToDoAssistant.Persistence;
@@ -42,8 +39,7 @@ if (builder.Environment.IsProduction())
 builder.Services
     .AddApplication()
     .AddToDoAssistant()
-    .AddCookingAssistant(builder.Configuration)
-    .AddAccountant();
+    .AddCookingAssistant(builder.Configuration);
 
 builder.Services
     .AddUserIdMapper()
@@ -58,8 +54,7 @@ builder.Services
 builder.Services
     .AddPersistence(builder.Configuration["ConnectionString"])
     .AddToDoAssistantPersistence()
-    .AddCookingAssistantPersistence()
-    .AddAccountantPersistence();
+    .AddCookingAssistantPersistence();
 
 // Cookie configuration for HTTPS
 if (builder.Environment.EnvironmentName == Environments.Production)

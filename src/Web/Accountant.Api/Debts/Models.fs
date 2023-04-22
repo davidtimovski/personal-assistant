@@ -1,6 +1,7 @@
 ﻿namespace Accountant.Api.Debts
 
 open System
+open Microsoft.AspNetCore.Http
 
 module Models =
 
@@ -24,7 +25,8 @@ module Models =
           ModifiedDate: DateTime }
 
     type UpdateDebt =
-        { Id: int
+        { mutable HttpContext: HttpContext
+          Id: int
           Person: string
           Amount: decimal
           Currency: string

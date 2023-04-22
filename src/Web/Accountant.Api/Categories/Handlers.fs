@@ -14,37 +14,36 @@ module Handlers =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             task {
                 let! dto = ctx.BindJsonAsync<CreateCategory>()
-                let userId = getUserId ctx
-                let connection = getDbConnection ctx
+                dto.HttpContext <- ctx
 
-                match Validation.categoryBelongsTo dto.ParentId userId connection with
-                | true ->
+                match Logic.validateCreate dto with
+                | Success _ ->
+                    let userId = getUserId ctx
                     let category = Logic.prepareForCreate dto userId
 
+                    let connection = getDbConnection ctx
                     let! id = CategoriesRepository.create category connection
 
                     return! Successful.CREATED id next ctx
-                | false -> return! (RequestErrors.BAD_REQUEST "Currency is not valid") next ctx
+                | Failure error -> return! RequestErrors.BAD_REQUEST error next ctx
             })
 
     let update: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             task {
                 let! dto = ctx.BindJsonAsync<UpdateCategory>()
-                let userId = getUserId ctx
-                let connection = getDbConnection ctx
+                dto.HttpContext <- ctx
 
-                match
-                    (CategoriesRepository.exists dto.Id userId connection)
-                    && (Validation.categoryBelongsTo dto.ParentId userId connection)
-                with
-                | true ->
+                match Logic.validateUpdate dto with
+                | Success _ ->
+                    let userId = getUserId ctx
                     let category = Logic.prepareForUpdate dto userId
 
+                    let connection = getDbConnection ctx
                     let! _ = CategoriesRepository.update category connection
 
                     return! Successful.NO_CONTENT next ctx
-                | false -> return! (RequestErrors.BAD_REQUEST "Currency is not valid") next ctx
+                | Failure error -> return! RequestErrors.BAD_REQUEST error next ctx
             })
 
     let delete (id: int) : HttpHandler =

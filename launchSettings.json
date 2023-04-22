@@ -18,6 +18,24 @@
         "trainer-api": "DoNotStart"
       }
     },
+	"Account": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "account": "StartDebugging",
+        "accountant-api": "DoNotStart",
+        "clientlogger": "DoNotStart",
+        "cooking-api": "DoNotStart",
+        "core-api": "DoNotStart",
+        "gateway": "DoNotStart",
+        "postgres": "StartWithoutDebugging",
+        "rabbitmq": "StartWithoutDebugging",
+        "sender": "DoNotStart",
+        "todo-api": "DoNotStart",
+        "weatherman-api": "DoNotStart",
+        "trainer-api": "DoNotStart"
+      }
+    },
     "Accountant.Api": {
       "commandName": "DockerCompose",
       "commandVersion": "1.0",

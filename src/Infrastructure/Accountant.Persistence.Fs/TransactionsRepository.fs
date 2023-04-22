@@ -39,6 +39,16 @@ module TransactionsRepository =
               CreatedDate = read.dateTime "created_date"
               ModifiedDate = read.dateTime "modified_date" })
 
+    let exists (id: int) (userId: int) (conn: RegularOrTransactionalConn) =
+        ConnectionUtils.connect conn
+        |> Sql.query $"SELECT COUNT(*) AS count
+                       FROM {table} AS t
+                       LEFT JOIN accountant.accounts AS fa ON t.from_account_id = fa.id
+                       LEFT JOIN accountant.accounts AS ta ON t.to_account_id = ta.id
+                       WHERE t.id = @id AND (t.from_account_id IS NULL OR fa.user_id = @user_id) AND (t.to_account_id IS NULL OR ta.user_id = @user_id)"
+        |> Sql.parameters [ "id", Sql.int id; "user_id", Sql.int userId ]
+        |> Sql.executeRow (fun read -> (read.int "count") > 0)
+
     let create (transaction: Transaction) (conn: RegularOrTransactionalConn) (tran: NpgsqlTransaction Option) =
         let npgsqlConn =
             match conn with

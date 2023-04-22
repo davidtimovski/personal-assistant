@@ -24,7 +24,7 @@ module Handlers =
                     let! id = DebtsRepository.create debt connection
 
                     return! Successful.CREATED id next ctx
-                | Failure error -> return! (RequestErrors.BAD_REQUEST error) next ctx
+                | Failure error -> return! RequestErrors.BAD_REQUEST error next ctx
             })
 
     let createMerged: HttpHandler =
@@ -41,13 +41,14 @@ module Handlers =
                     let! id = DebtsRepository.createMerged debt connection
 
                     return! Successful.CREATED id next ctx
-                | Failure error -> return! (RequestErrors.BAD_REQUEST error) next ctx
+                | Failure error -> return! RequestErrors.BAD_REQUEST error next ctx
             })
 
     let update: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             task {
                 let! dto = ctx.BindJsonAsync<UpdateDebt>()
+                dto.HttpContext <- ctx
 
                 match Logic.validateUpdate dto with
                 | Success _ ->
@@ -58,7 +59,7 @@ module Handlers =
                     let! _ = DebtsRepository.update debt connection
 
                     return! Successful.NO_CONTENT next ctx
-                | Failure error -> return! (RequestErrors.BAD_REQUEST error) next ctx
+                | Failure error -> return! RequestErrors.BAD_REQUEST error next ctx
             })
 
     let delete (id: int) : HttpHandler =

@@ -15,8 +15,8 @@ module Handlers =
             task {
                 let! dto = ctx.BindJsonAsync<CreateAccount>()
 
-                match Validation.currencyIsValid dto.Currency with
-                | true ->
+                match Logic.validateCreate dto with
+                | Success _ ->
                     let userId = getUserId ctx
                     let account = Logic.prepareForCreate dto userId
 
@@ -24,16 +24,17 @@ module Handlers =
                     let! id = AccountsRepository.create account connection
 
                     return! Successful.CREATED id next ctx
-                | false -> return! (RequestErrors.BAD_REQUEST "Currency is not valid") next ctx
+                | Failure error -> return! RequestErrors.BAD_REQUEST error next ctx
             })
 
     let update: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             task {
                 let! dto = ctx.BindJsonAsync<UpdateAccount>()
+                dto.HttpContext <- ctx
 
-                match Validation.currencyIsValid dto.Currency with
-                | true ->
+                match Logic.validateUpdate dto with
+                | Success _ ->
                     let userId = getUserId ctx
                     let account = Logic.prepareForUpdate dto userId
 
@@ -41,7 +42,7 @@ module Handlers =
                     let! _ = AccountsRepository.update account connection
 
                     return! Successful.NO_CONTENT next ctx
-                | false -> return! (RequestErrors.BAD_REQUEST "Currency is not valid") next ctx
+                | Failure error -> return! RequestErrors.BAD_REQUEST error next ctx
             })
 
     let delete (id: int) : HttpHandler =
