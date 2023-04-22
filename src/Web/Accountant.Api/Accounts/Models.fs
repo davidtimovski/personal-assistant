@@ -1,6 +1,7 @@
 ﻿namespace Accountant.Api.Accounts
 
 open System
+open Microsoft.AspNetCore.Http
 
 module Models =
 
@@ -22,7 +23,8 @@ module Models =
           ModifiedDate: DateTime }
 
     type UpdateAccount =
-        { Id: int
+        { mutable HttpContext: HttpContext
+          Id: int
           Name: string
           IsMain: bool
           Currency: string

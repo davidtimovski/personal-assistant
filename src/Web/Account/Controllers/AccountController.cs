@@ -13,8 +13,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Microsoft.FSharp.Core;
 using ToDoAssistant.Application.Contracts.Lists;
-using static Accountant.Api.Accounts.Logic;
 using static Accountant.Persistence.Fs.AccountsRepository;
 
 namespace Account.Controllers;
@@ -441,8 +441,8 @@ public class AccountController : BaseController
     // TODO: Breaking microservice design. Implement with message queue or HTTP call.
     private async Task CreateRequiredDataAsync(int userId)
     {
-        var mainAccount = prepareForCreateMain(userId, _localizer["MainAccountName"]);
-        await createMain(mainAccount, _configuration["ConnectionString"]);
+        var now = DateTime.UtcNow;
+        await createMain(new Accountant.Persistence.Fs.Models.Account(0, userId, _localizer["MainAccountName"], true, "EUR", FSharpOption<decimal>.None, now, now), _configuration["ConnectionString"]);
     }
 
     private async Task CreateSamplesAsync(int userId)

@@ -1,7 +1,9 @@
 ﻿namespace Accountant.Api.Debts
 
-open Accountant.Persistence.Fs
+open Accountant.Persistence.Fs.Models
 open Models
+open Accountant.Api.HandlerBase
+open CommonHandlers
 
 module Logic =
     [<Literal>]
@@ -19,26 +21,26 @@ module Logic =
               CreatedDate = x.CreatedDate
               ModifiedDate = x.ModifiedDate })
 
-    let validateCreatePerson (dto: CreateDebt) =
+    let private validateCreatePerson (dto: CreateDebt) =
         if Validation.textIsNotEmpty dto.Person then
             Success dto
         else
             Failure "Person is not valid"
 
-    let validateCreateAmount (dto: CreateDebt) =
+    let private validateCreateAmount (dto: CreateDebt) =
         if Validation.amountIsValid dto.Amount then
             Success dto
         else
             Failure "Amount has to be a positive number"
 
-    let validateCreateCurrency (dto: CreateDebt) =
+    let private validateCreateCurrency (dto: CreateDebt) =
         if Validation.currencyIsValid dto.Currency then
             Success dto
         else
             Failure "Currency is not valid"
 
-    let validateCreateDescription (dto: CreateDebt) =
-        if Validation.textLengthIsValid dto.Description descriptionMaxLength then
+    let private validateCreateDescription (dto: CreateDebt) =
+        if Validation.textIsNoneOrLengthIsValid dto.Description descriptionMaxLength then
             Success dto
         else
             Failure $"Description cannot exceed {descriptionMaxLength} characters"
@@ -71,32 +73,42 @@ module Logic =
           CreatedDate = model.CreatedDate
           ModifiedDate = model.ModifiedDate }
 
-    let validateUpdatePerson (dto: UpdateDebt) =
+    let private validateUpdateDebt (dto: UpdateDebt) =
+        let userId = getUserId dto.HttpContext
+        let connection = getDbConnection dto.HttpContext
+
+        if Validation.debtBelongsTo dto.Id userId connection then
+            Success dto
+        else
+            Failure "Debt is not valid"
+
+    let private validateUpdatePerson (dto: UpdateDebt) =
         if Validation.textIsNotEmpty dto.Person then
             Success dto
         else
             Failure "Person is not valid"
 
-    let validateUpdateAmount (dto: UpdateDebt) =
+    let private validateUpdateAmount (dto: UpdateDebt) =
         if Validation.amountIsValid dto.Amount then
             Success dto
         else
             Failure "Amount has to be a positive number"
 
-    let validateUpdateCurrency (dto: UpdateDebt) =
+    let private validateUpdateCurrency (dto: UpdateDebt) =
         if Validation.currencyIsValid dto.Currency then
             Success dto
         else
             Failure "Currency is not valid"
 
-    let validateUpdateDescription (dto: UpdateDebt) =
-        if Validation.textLengthIsValid dto.Description descriptionMaxLength then
+    let private validateUpdateDescription (dto: UpdateDebt) =
+        if Validation.textIsNoneOrLengthIsValid dto.Description descriptionMaxLength then
             Success dto
         else
             Failure $"Description cannot exceed {descriptionMaxLength} characters"
 
     let validateUpdate =
-        validateUpdatePerson
+        validateUpdateDebt
+        >> bind validateUpdatePerson
         >> bind validateUpdateAmount
         >> bind validateUpdateCurrency
         >> bind validateUpdateDescription

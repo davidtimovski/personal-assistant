@@ -23,29 +23,32 @@ module Logic =
               CreatedDate = x.CreatedDate
               ModifiedDate = x.ModifiedDate })
 
-    let validateCreateCategory (dto: CreateUpcomingExpense) =
+    let private validateCreateCategory (dto: CreateUpcomingExpense) =
         let userId = getUserId dto.HttpContext
         let connection = getDbConnection dto.HttpContext
 
-        if Validation.categoryBelongsTo dto.CategoryId userId connection then
+        if
+            dto.CategoryId.IsNone
+            || Validation.categoryBelongsTo dto.CategoryId.Value userId connection
+        then
             Success dto
         else
             Failure "Category is not valid"
 
-    let validateCreateAmount (dto: CreateUpcomingExpense) =
+    let private validateCreateAmount (dto: CreateUpcomingExpense) =
         if Validation.amountIsValid dto.Amount then
             Success dto
         else
             Failure "Amount has to be a positive number"
 
-    let validateCreateCurrency (dto: CreateUpcomingExpense) =
+    let private validateCreateCurrency (dto: CreateUpcomingExpense) =
         if Validation.currencyIsValid dto.Currency then
             Success dto
         else
             Failure "Currency is not valid"
 
-    let validateCreateDescription (dto: CreateUpcomingExpense) =
-        if Validation.textLengthIsValid dto.Description descriptionMaxLength then
+    let private validateCreateDescription (dto: CreateUpcomingExpense) =
+        if Validation.textIsNoneOrLengthIsValid dto.Description descriptionMaxLength then
             Success dto
         else
             Failure $"Description cannot exceed {descriptionMaxLength} characters"
@@ -68,35 +71,48 @@ module Logic =
           CreatedDate = model.CreatedDate
           ModifiedDate = model.ModifiedDate }
 
-    let validateUpdateCategory (dto: UpdateUpcomingExpense) =
+    let private validateUpdateUpcomingExpense (dto: UpdateUpcomingExpense) =
         let userId = getUserId dto.HttpContext
         let connection = getDbConnection dto.HttpContext
 
-        if Validation.categoryBelongsTo dto.CategoryId userId connection then
+        if Validation.upcomingExpenseBelongsTo dto.Id userId connection then
+            Success dto
+        else
+            Failure "Upcoming expense is not valid"
+
+    let private validateUpdateCategory (dto: UpdateUpcomingExpense) =
+        let userId = getUserId dto.HttpContext
+        let connection = getDbConnection dto.HttpContext
+
+        if
+            dto.CategoryId.IsNone
+            || Validation.categoryBelongsTo dto.CategoryId.Value userId connection
+        then
             Success dto
         else
             Failure "Category is not valid"
 
-    let validateUpdateAmount (dto: UpdateUpcomingExpense) =
+    let private validateUpdateAmount (dto: UpdateUpcomingExpense) =
         if Validation.amountIsValid dto.Amount then
             Success dto
         else
             Failure "Amount has to be a positive number"
 
-    let validateUpdateCurrency (dto: UpdateUpcomingExpense) =
+    let private validateUpdateCurrency (dto: UpdateUpcomingExpense) =
         if Validation.currencyIsValid dto.Currency then
             Success dto
         else
             Failure "Currency is not valid"
 
-    let validateUpdateDescription (dto: UpdateUpcomingExpense) =
-        if Validation.textLengthIsValid dto.Description descriptionMaxLength then
+    let private validateUpdateDescription (dto: UpdateUpcomingExpense) =
+        if Validation.textIsNoneOrLengthIsValid dto.Description descriptionMaxLength then
             Success dto
         else
             Failure $"Description cannot exceed {descriptionMaxLength} characters"
 
     let validateUpdate =
-        validateUpdateCategory
+        validateUpdateUpcomingExpense
+        >> bind validateUpdateCategory
         >> bind validateUpdateAmount
         >> bind validateUpdateCurrency
         >> bind validateUpdateDescription

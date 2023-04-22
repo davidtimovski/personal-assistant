@@ -1,6 +1,7 @@
 ﻿namespace Accountant.Api.Categories
 
 open System
+open Microsoft.AspNetCore.Http
 open Accountant.Persistence.Fs.Models
 
 module Models =
@@ -16,7 +17,8 @@ module Models =
           ModifiedDate: DateTime }
 
     type CreateCategory =
-        { ParentId: int Option
+        { mutable HttpContext: HttpContext
+          ParentId: int Option
           Name: string
           Type: CategoryType
           GenerateUpcomingExpense: bool
@@ -25,7 +27,8 @@ module Models =
           ModifiedDate: DateTime }
 
     type UpdateCategory =
-        { Id: int
+        { mutable HttpContext: HttpContext
+          Id: int
           ParentId: int Option
           Name: string
           Type: CategoryType
