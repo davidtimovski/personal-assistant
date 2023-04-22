@@ -1,8 +1,8 @@
-﻿namespace Accountant.Application.Fs.Models
+﻿namespace Accountant.Api.Accounts
 
 open System
 
-module Accounts =
+module Models =
 
     type AccountDto =
         { Id: int

@@ -1,4 +1,4 @@
-﻿namespace Accountant.Domain
+﻿namespace Accountant.Persistence.Fs
 
 open System
 

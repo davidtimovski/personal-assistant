@@ -1,37 +1,40 @@
-﻿namespace Accountant.Application.Fs.Models
+﻿namespace Accountant.Api.UpcomingExpenses
 
 open System
+open Microsoft.AspNetCore.Http
 
-module AutomaticTransactions =
+module Models =
 
-    type AutomaticTransactionDto =
+    type UpcomingExpenseDto =
         { Id: int
-          IsDeposit: bool
           CategoryId: int Option
           Amount: decimal
           Currency: string
           Description: string Option
-          DayInMonth: int16
+          Date: DateTime
+          Generated: bool
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
-    type CreateAutomaticTransaction =
-        { IsDeposit: bool
+    type CreateUpcomingExpense =
+        { mutable HttpContext: HttpContext
           CategoryId: int Option
           Amount: decimal
           Currency: string
           Description: string Option
-          DayInMonth: int16
+          Date: DateTime
+          Generated: bool
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
-    type UpdateAutomaticTransaction =
-        { Id: int
-          IsDeposit: bool
+    type UpdateUpcomingExpense =
+        { mutable HttpContext: HttpContext
+          Id: int
           CategoryId: int Option
           Amount: decimal
           Currency: string
           Description: string Option
-          DayInMonth: int16
+          Date: DateTime
+          Generated: bool
           CreatedDate: DateTime
           ModifiedDate: DateTime }

@@ -2,8 +2,8 @@
 
 open System
 open Npgsql.FSharp
-open Accountant.Domain.Models
 open ConnectionUtils
+open Models
 
 module DebtsRepository =
 

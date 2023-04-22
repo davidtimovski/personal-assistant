@@ -1,8 +1,8 @@
 ﻿namespace Accountant.Persistence.Fs
 
 open Npgsql
-open Accountant.Domain.Models
 open ConnectionUtils
+open Models
 
 module SyncRepository =
 

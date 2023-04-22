@@ -1,9 +1,9 @@
-﻿namespace Accountant.Application.Fs.Services
+﻿namespace Accountant.Api.Categories
 
-open Accountant.Domain.Models
-open Accountant.Application.Fs.Models.Categories
+open Accountant.Persistence.Fs.Models
+open Models
 
-module CategoryService =
+module Logic =
     let mapAll (categories: seq<Category>) : seq<CategoryDto> =
         categories
         |> Seq.map (fun x ->

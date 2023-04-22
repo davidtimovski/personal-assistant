@@ -3,8 +3,8 @@
 open System
 open System.Threading.Tasks
 open Npgsql.FSharp
-open Accountant.Domain.Models
 open ConnectionUtils
+open Models
 
 module CommonRepository =
     let getDeletedIds

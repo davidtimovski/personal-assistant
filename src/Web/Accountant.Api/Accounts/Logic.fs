@@ -1,10 +1,10 @@
-﻿namespace Accountant.Application.Fs.Services
+﻿namespace Accountant.Api.Accounts
 
 open System
-open Accountant.Domain.Models
-open Accountant.Application.Fs.Models.Accounts
+open Accountant.Persistence.Fs
+open Models
 
-module AccountService =
+module Logic =
     let mapAll (accounts: seq<Account>) : seq<AccountDto> =
         accounts
         |> Seq.map (fun x ->

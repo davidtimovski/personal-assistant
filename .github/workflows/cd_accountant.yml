@@ -9,7 +9,6 @@ on:
       - "src/Application/Domain/**"
       - "src/Application/Core.Application/**"
       - "src/Application/Accountant.Application/**"
-      - "src/Application/Accountant.Application.Fs/**"
       - "src/Infrastructure/Core.Infrastructure/**"
       - "src/Infrastructure/Core.Persistence/**"
       - "src/Infrastructure/Accountant.Persistence/**"

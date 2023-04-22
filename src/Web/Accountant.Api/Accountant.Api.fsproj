@@ -27,15 +27,28 @@
 		<Content Include="appsettings.Production.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
-		<Compile Include="Models.fs" />
 		<Compile Include="HandlerBase.fs" />
-		<Compile Include="SyncHandlers.fs" />
-		<Compile Include="AccountHandlers.fs" />
-		<Compile Include="CategoryHandlers.fs" />
-		<Compile Include="TransactionHandlers.fs" />
-		<Compile Include="UpcomingExpenseHandlers.fs" />
-		<Compile Include="DebtHandlers.fs" />
-		<Compile Include="AutomaticTransactionHandlers.fs" />
+		<Compile Include="Validation.fs" />
+		<Compile Include="Accounts\Models.fs" />
+		<Compile Include="Accounts\Logic.fs" />
+		<Compile Include="Accounts\Handlers.fs" />
+		<Compile Include="AutomaticTransactions\Models.fs" />
+		<Compile Include="AutomaticTransactions\Logic.fs" />
+		<Compile Include="AutomaticTransactions\Handlers.fs" />
+		<Compile Include="Categories\Models.fs" />
+		<Compile Include="Categories\Logic.fs" />
+		<Compile Include="Categories\Handlers.fs" />
+		<Compile Include="Debts\Models.fs" />
+		<Compile Include="Debts\Logic.fs" />
+		<Compile Include="Debts\Handlers.fs" />
+		<Compile Include="Transactions\Models.fs" />
+		<Compile Include="Transactions\Logic.fs" />
+		<Compile Include="Transactions\Handlers.fs" />
+		<Compile Include="UpcomingExpenses\Models.fs" />
+		<Compile Include="UpcomingExpenses\Logic.fs" />
+		<Compile Include="UpcomingExpenses\Handlers.fs" />
+		<Compile Include="Sync\Models.fs" />
+		<Compile Include="Sync\Handlers.fs" />
 		<Compile Include="Routes.fs" />
 		<Compile Include="Program.fs" />
 		<None Include="Dockerfile" />
@@ -44,7 +57,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\Infrastructure\Accountant.Persistence.Fs\Accountant.Persistence.Fs.fsproj" />
 		<ProjectReference Include="..\Api.Common\Api.Common.fsproj" />
-		<ProjectReference Include="..\..\Application\Accountant.Application.Fs\Accountant.Application.Fs.fsproj" />
 		<ProjectReference Include="..\..\Application\Accountant.Application\Accountant.Application.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Accountant.Persistence\Accountant.Persistence.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Core.Infrastructure\Core.Infrastructure.csproj" />
