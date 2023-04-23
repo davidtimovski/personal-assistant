@@ -5,8 +5,6 @@ VisualStudioVersion = 17.1.31903.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CookingAssistant.Api", "src\Web\CookingAssistant.Api\CookingAssistant.Api.csproj", "{AE2034B1-3EA8-4E83-941F-44A8B75E2B02}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "ClientLogger", "src\Web\ClientLogger\ClientLogger.fsproj", "{9814A06E-212A-4DE4-B893-212EAD9F1850}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Persistence", "src\Infrastructure\Core.Persistence\Core.Persistence.csproj", "{CE0CCF73-58A9-4CB0-AA35-3B8866EE9A9B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Application", "src\Application\Core.Application\Core.Application.csproj", "{0460E980-3C25-4D97-A11F-03DE87434BB0}"
@@ -35,7 +33,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		.github\workflows\cd_account.yml = .github\workflows\cd_account.yml
 		.github\workflows\cd_accountant.yml = .github\workflows\cd_accountant.yml
-		.github\workflows\cd_clientlogger.yml = .github\workflows\cd_clientlogger.yml
 		.github\workflows\cd_cooking.yml = .github\workflows\cd_cooking.yml
 		.github\workflows\cd_core.yml = .github\workflows\cd_core.yml
 		.github\workflows\cd_gateway.yml = .github\workflows\cd_gateway.yml
@@ -57,10 +54,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToDoAssistant.Application", "src\Application\ToDoAssistant.Application\ToDoAssistant.Application.csproj", "{F443B4AC-87C6-482C-9D90-D4BEB8FAEDA9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToDoAssistant.Persistence", "src\Infrastructure\ToDoAssistant.Persistence\ToDoAssistant.Persistence.csproj", "{C1E690FE-86AF-4E74-9B08-3DEEC2FAD40F}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Accountant.Application", "src\Application\Accountant.Application\Accountant.Application.csproj", "{BBF2DA8B-F795-4BBF-94E6-DF686063AD94}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Accountant.Persistence", "src\Infrastructure\Accountant.Persistence\Accountant.Persistence.csproj", "{29406F1B-B924-4E40-B3BE-0114E23AD0D4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CookingAssistant.Application", "src\Application\CookingAssistant.Application\CookingAssistant.Application.csproj", "{F426968B-697D-4BBB-AFAE-F17BCA5D4163}"
 EndProject
@@ -108,10 +101,6 @@ Global
 		{AE2034B1-3EA8-4E83-941F-44A8B75E2B02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE2034B1-3EA8-4E83-941F-44A8B75E2B02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE2034B1-3EA8-4E83-941F-44A8B75E2B02}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9814A06E-212A-4DE4-B893-212EAD9F1850}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9814A06E-212A-4DE4-B893-212EAD9F1850}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9814A06E-212A-4DE4-B893-212EAD9F1850}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9814A06E-212A-4DE4-B893-212EAD9F1850}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CE0CCF73-58A9-4CB0-AA35-3B8866EE9A9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CE0CCF73-58A9-4CB0-AA35-3B8866EE9A9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE0CCF73-58A9-4CB0-AA35-3B8866EE9A9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -172,14 +161,6 @@ Global
 		{C1E690FE-86AF-4E74-9B08-3DEEC2FAD40F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C1E690FE-86AF-4E74-9B08-3DEEC2FAD40F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C1E690FE-86AF-4E74-9B08-3DEEC2FAD40F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BBF2DA8B-F795-4BBF-94E6-DF686063AD94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BBF2DA8B-F795-4BBF-94E6-DF686063AD94}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BBF2DA8B-F795-4BBF-94E6-DF686063AD94}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BBF2DA8B-F795-4BBF-94E6-DF686063AD94}.Release|Any CPU.Build.0 = Release|Any CPU
-		{29406F1B-B924-4E40-B3BE-0114E23AD0D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{29406F1B-B924-4E40-B3BE-0114E23AD0D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{29406F1B-B924-4E40-B3BE-0114E23AD0D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{29406F1B-B924-4E40-B3BE-0114E23AD0D4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F426968B-697D-4BBB-AFAE-F17BCA5D4163}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F426968B-697D-4BBB-AFAE-F17BCA5D4163}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F426968B-697D-4BBB-AFAE-F17BCA5D4163}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -238,7 +219,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{AE2034B1-3EA8-4E83-941F-44A8B75E2B02} = {572BEB9A-56A3-40D3-9D9E-84F9410A9316}
-		{9814A06E-212A-4DE4-B893-212EAD9F1850} = {572BEB9A-56A3-40D3-9D9E-84F9410A9316}
 		{CE0CCF73-58A9-4CB0-AA35-3B8866EE9A9B} = {C277C7F8-AAE5-4002-8C0D-BB31436438FD}
 		{0460E980-3C25-4D97-A11F-03DE87434BB0} = {D256B05C-51A4-43EE-BC76-59A0E21E00EF}
 		{CE8059EA-4799-4E38-999D-BE7D599FAD04} = {382B70F6-DD40-4B18-8D04-9D8813C7501E}
@@ -253,8 +233,6 @@ Global
 		{CE2C9A81-C79E-40E3-99EC-D4A3FEE201BA} = {C277C7F8-AAE5-4002-8C0D-BB31436438FD}
 		{F443B4AC-87C6-482C-9D90-D4BEB8FAEDA9} = {D256B05C-51A4-43EE-BC76-59A0E21E00EF}
 		{C1E690FE-86AF-4E74-9B08-3DEEC2FAD40F} = {C277C7F8-AAE5-4002-8C0D-BB31436438FD}
-		{BBF2DA8B-F795-4BBF-94E6-DF686063AD94} = {D256B05C-51A4-43EE-BC76-59A0E21E00EF}
-		{29406F1B-B924-4E40-B3BE-0114E23AD0D4} = {C277C7F8-AAE5-4002-8C0D-BB31436438FD}
 		{F426968B-697D-4BBB-AFAE-F17BCA5D4163} = {D256B05C-51A4-43EE-BC76-59A0E21E00EF}
 		{AAC86B4D-8C5E-42CC-A09E-8640AC5F4E85} = {C277C7F8-AAE5-4002-8C0D-BB31436438FD}
 		{125EBFA6-3397-4A8A-8616-C7E753147152} = {572BEB9A-56A3-40D3-9D9E-84F9410A9316}

@@ -1,8 +1,8 @@
-﻿namespace Accountant.Application.Contracts.Transactions.Models;
+﻿namespace Core.Application.Contracts.Models;
 
-public class ExportAsCsv
+public class ExportTransactionsAsCsv
 {
-    public ExportAsCsv(int userId, string directory, Guid fileId, string uncategorized, string encryped)
+    public ExportTransactionsAsCsv(int userId, string directory, Guid fileId, string uncategorized, string encryped)
     {
         UserId = userId;
         Directory = directory;

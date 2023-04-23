@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte/internal';
+	import { onMount, onDestroy, debug } from 'svelte/internal';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
@@ -67,6 +67,10 @@
 		const categoryType = isDeposit ? CategoryType.DepositOnly : CategoryType.ExpenseOnly;
 
 		categoriesService.getAllAsOptions($t('uncategorized'), categoryType).then((options) => {
+			if (options.filter((x) => x.id === categoryId).length === 0) {
+				categoryId = null;
+			}
+
 			categoryOptions = options;
 		});
 	}

@@ -83,18 +83,6 @@
       ],
       "UpstreamPathTemplate": "/trainer/{route}",
       "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
-    },
-    {
-      "DownstreamPathTemplate": "/{route}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "clientlogger",
-          "Port": 80
-        }
-      ],
-      "UpstreamPathTemplate": "/client-logger/{route}",
-      "UpstreamHttpMethod": [ "Post" ]
     }
   ],
   "GlobalConfiguration": {

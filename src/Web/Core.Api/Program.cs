@@ -34,7 +34,11 @@ builder.Services.AddPersistence(builder.Configuration["ConnectionString"]);
 builder.Services.AddControllers();
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
+builder.Services.AddHealthChecks();
+
 var app = builder.Build();
+
+app.MapHealthChecks("/health");
 
 app.UseAuthentication();
 app.UseAuthorization();

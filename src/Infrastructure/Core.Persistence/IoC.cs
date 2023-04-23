@@ -15,6 +15,7 @@ public static class IoC
         services.AddTransient<IPushSubscriptionsRepository, PushSubscriptionsRepository>();
         services.AddTransient<ITooltipsRepository, TooltipsRepository>();
         services.AddTransient<ICurrenciesRepository, CurrenciesRepository>();
+        services.AddTransient<ICsvRepository, CsvRepository>();
 
         services.AddDbContext<PersonalAssistantContext>(options =>
         {

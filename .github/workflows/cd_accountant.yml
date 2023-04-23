@@ -8,10 +8,8 @@ on:
     paths:
       - "src/Application/Domain/**"
       - "src/Application/Core.Application/**"
-      - "src/Application/Accountant.Application/**"
       - "src/Infrastructure/Core.Infrastructure/**"
       - "src/Infrastructure/Core.Persistence/**"
-      - "src/Infrastructure/Accountant.Persistence/**"
       - "src/Infrastructure/Accountant.Persistence.Fs/**"
       - "src/Web/Accountant.Api/**"
 

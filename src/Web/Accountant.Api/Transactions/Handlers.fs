@@ -5,8 +5,7 @@ open System.IO
 open Giraffe
 open Microsoft.AspNetCore.Hosting
 open Microsoft.AspNetCore.Http
-open Accountant.Application.Contracts.Transactions
-open Accountant.Application.Contracts.Transactions.Models
+open Core.Application.Contracts
 open Accountant.Persistence.Fs
 open Accountant.Api
 open CommonHandlers
@@ -65,7 +64,7 @@ module Handlers =
             task {
                 let! dto = ctx.BindJsonAsync<ExportDto>()
 
-                let service = ctx.GetService<ITransactionService>()
+                let service = ctx.GetService<ICsvService>()
                 let webHostEnvironment = ctx.GetService<IWebHostEnvironment>()
                 let userId = getUserId ctx
 
@@ -75,9 +74,9 @@ module Handlers =
                 let encrypted = localize ctx "Encrypted"
 
                 let exportAsCsvModel =
-                    new ExportAsCsv(userId, directory, dto.FileId, uncategorized, encrypted)
+                    new ExportTransactionsAsCsv(userId, directory, dto.FileId, uncategorized, encrypted)
 
-                let file = service.ExportAsCsv(exportAsCsvModel)
+                let file = service.ExportTransactionsAsCsv(exportAsCsvModel)
 
                 ctx.SetHttpHeader("Content-Disposition", "attachment; filename=\"transactions.csv\"")
 

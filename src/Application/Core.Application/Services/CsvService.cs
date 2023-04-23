@@ -1,31 +1,31 @@
 ﻿using System.Globalization;
-using Accountant.Application.Contracts.Transactions;
-using Accountant.Application.Contracts.Transactions.Models;
 using Application.Domain.Accountant;
 using AutoMapper;
+using Core.Application.Contracts;
+using Core.Application.Contracts.Models;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace Accountant.Application.Services;
+namespace Core.Application.Services;
 
-public class TransactionService : ITransactionService
+public class CsvService : ICsvService
 {
-    private readonly ITransactionsRepository _transactionsRepository;
+    private readonly ICsvRepository _csvRepository;
     private readonly IMapper _mapper;
-    private readonly ILogger<TransactionService> _logger;
+    private readonly ILogger<CsvService> _logger;
 
-    public TransactionService(
-        ITransactionsRepository transactionsRepository,
+    public CsvService(
+        ICsvRepository csvRepository,
         IMapper mapper,
-        ILogger<TransactionService> logger)
+        ILogger<CsvService> logger)
     {
-        _transactionsRepository = transactionsRepository;
+        _csvRepository = csvRepository;
         _mapper = mapper;
         _logger = logger;
     }
 
-    public FileStream ExportAsCsv(ExportAsCsv model)
+    public FileStream ExportTransactionsAsCsv(ExportTransactionsAsCsv model)
     {
         try
         {
@@ -37,7 +37,7 @@ public class TransactionService : ITransactionService
             string fileName = model.FileId + ".csv";
             string tempFilePath = Path.Combine(model.Directory, fileName);
 
-            IEnumerable<Transaction> transactions = _transactionsRepository.GetAllForExport(model.UserId, model.Uncategorized).ToList();
+            IEnumerable<Transaction> transactions = _csvRepository.GetAllTransactionsForExport(model.UserId, model.Uncategorized).ToList();
             foreach (var transaction in transactions)
             {
                 if (transaction.IsEncrypted)
@@ -57,7 +57,7 @@ public class TransactionService : ITransactionService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Unexpected error in {nameof(ExportAsCsv)}");
+            _logger.LogError(ex, $"Unexpected error in {nameof(ExportTransactionsAsCsv)}");
             throw;
         }
     }

@@ -56,6 +56,8 @@ builder.Services
     .AddToDoAssistantPersistence()
     .AddCookingAssistantPersistence();
 
+builder.Services.AddHealthChecks();
+
 // Cookie configuration for HTTPS
 if (builder.Environment.EnvironmentName == Environments.Production)
 {
@@ -141,6 +143,8 @@ app.UseCors(builder =>
     builder.WithMethods("GET");
     builder.WithHeaders("Authorization");
 });
+
+app.MapHealthChecks("/health");
 
 app.UseAuthentication();
 app.UseAuthorization();

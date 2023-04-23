@@ -31,7 +31,7 @@ module CommonRepository =
         |> Sql.parameters
             [ "userId", Sql.int userId
               "entityType", Sql.int16 (int16 entityType)
-              "fromDate", Sql.date fromDate ]
+              "fromDate", Sql.timestamptz fromDate ]
         |> Sql.executeAsync (fun read -> read.int "entity_id")
 
     let exists (id: int) (userId: int) (entity: EntityType) (conn: RegularOrTransactionalConn) =
