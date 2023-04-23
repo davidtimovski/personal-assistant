@@ -234,7 +234,7 @@
 		currency = localStorage.get(LocalStorageKeys.Currency);
 
 		const fromOpts = new Array<FromOption>();
-		const monthsSince = [6, 12, 18, 24, 36, 48, 50, 62];
+		const monthsSince = [6, 12, 18, 24, 36, 48, 60, 72];
 		for (let months of monthsSince) {
 			const value = DateHelper.format(new Date(now.getFullYear(), now.getMonth() - months));
 

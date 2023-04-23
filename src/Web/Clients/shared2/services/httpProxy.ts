@@ -170,11 +170,16 @@ export class HttpProxy {
       }
 
       const errorFields = new Array<string>();
+      const errorMessages = new Array<string>();
       for (let key in errors) {
         errorFields.push(key);
+
+        for (let message of errors[key]) {
+          errorMessages.push(message);
+        }
       }
       alertState.update((x) => {
-        x.showErrors(errorFields);
+        x.showErrors(errorMessages);
         return x;
       });
 
