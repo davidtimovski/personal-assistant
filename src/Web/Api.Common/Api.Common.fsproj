@@ -6,12 +6,17 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.2.2" />
+		<PackageReference Include="Azure.Identity" Version="1.8.2" />
+		<PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.5.0" />
 		<PackageReference Include="Giraffe" Version="6.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.5" />
 		<PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+		<PackageReference Include="Sentry.AspNetCore" Version="3.30.0" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<Compile Include="Startup.fs" />
 		<Compile Include="Models.fs" />
 		<Compile Include="Utils.fs" />
 		<Compile Include="CommonHandlers.fs" />
@@ -19,6 +24,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\Application\Core.Application\Core.Application.csproj" />
+		<ProjectReference Include="..\..\Infrastructure\Core.Infrastructure\Core.Infrastructure.csproj" />
 	</ItemGroup>
 
 </Project>

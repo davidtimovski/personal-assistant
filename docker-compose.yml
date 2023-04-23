@@ -81,15 +81,6 @@ services:
     depends_on:
       - postgres
 
-  clientlogger:
-    image: personalassistant-clientlogger:latest
-    container_name: personalassistant-clientlogger
-    build:
-      context: .
-      dockerfile: src/Web/ClientLogger/Dockerfile
-    depends_on:
-      - postgres
-  
   sender:
     image: personalassistant-sender:latest
     container_name: personalassistant-sender

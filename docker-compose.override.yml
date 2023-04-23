@@ -98,16 +98,6 @@ services:
     ports:
       - "5009:80"
 
-  clientlogger:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://0.0.0.0:80
-      - PORT=80
-    volumes:
-      - ./src/Web/ClientLogger/storage:/app/storage:z
-    ports:
-      - "5002:80"
-
   sender:
     environment:
       - DOTNET_ENVIRONMENT=Development

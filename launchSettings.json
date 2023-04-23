@@ -6,7 +6,6 @@
       "serviceActions": {
         "account": "StartDebugging",
         "accountant-api": "StartDebugging",
-        "clientlogger": "StartDebugging",
         "cooking-api": "StartDebugging",
         "core-api": "StartDebugging",
         "gateway": "StartDebugging",
@@ -24,7 +23,6 @@
       "serviceActions": {
         "account": "StartDebugging",
         "accountant-api": "DoNotStart",
-        "clientlogger": "DoNotStart",
         "cooking-api": "DoNotStart",
         "core-api": "DoNotStart",
         "gateway": "DoNotStart",
@@ -42,7 +40,6 @@
       "serviceActions": {
         "account": "StartDebugging",
         "accountant-api": "StartDebugging",
-        "clientlogger": "StartDebugging",
         "cooking-api": "DoNotStart",
         "core-api": "StartDebugging",
         "gateway": "StartDebugging",
@@ -60,7 +57,6 @@
       "serviceActions": {
         "account": "StartDebugging",
         "accountant-api": "DoNotStart",
-        "clientlogger": "StartDebugging",
         "cooking-api": "DoNotStart",
         "core-api": "StartDebugging",
         "gateway": "StartDebugging",
@@ -78,7 +74,6 @@
       "serviceActions": {
         "account": "StartDebugging",
         "accountant-api": "DoNotStart",
-        "clientlogger": "StartDebugging",
         "cooking-api": "DoNotStart",
         "core-api": "StartDebugging",
         "gateway": "StartDebugging",
@@ -96,7 +91,6 @@
       "serviceActions": {
         "account": "StartDebugging",
         "accountant-api": "DoNotStart",
-        "clientlogger": "StartDebugging",
         "cooking-api": "DoNotStart",
         "core-api": "StartWithoutDebugging",
         "gateway": "StartDebugging",

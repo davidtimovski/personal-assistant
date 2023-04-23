@@ -1,17 +1,16 @@
 ﻿using System.Data;
-using Accountant.Application.Contracts.Transactions;
 using Application.Domain.Accountant;
-using Core.Persistence;
+using Core.Application.Contracts;
 using Dapper;
 
-namespace Persistence.Repositories.Accountant;
+namespace Core.Persistence.Repositories;
 
-public class TransactionsRepository : BaseRepository, ITransactionsRepository
+public class CsvRepository : BaseRepository, ICsvRepository
 {
-    public TransactionsRepository(PersonalAssistantContext efContext)
+    public CsvRepository(PersonalAssistantContext efContext)
         : base(efContext) { }
 
-    public IEnumerable<Transaction> GetAllForExport(int userId, string uncategorized)
+    public IEnumerable<Transaction> GetAllTransactionsForExport(int userId, string uncategorized)
     {
         using IDbConnection conn = OpenConnection();
 
