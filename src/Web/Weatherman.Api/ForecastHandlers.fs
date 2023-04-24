@@ -12,24 +12,22 @@ let get: HttpHandler =
         let result = ctx.TryBindQueryString<GetForecastDto>()
 
         (match result with
-            | Error _ -> RequestErrors.BAD_REQUEST "Bad request" next ctx
-            | Ok dto ->
-                let service = ctx.GetService<IForecastService>()
+         | Error _ -> RequestErrors.BAD_REQUEST "Bad request" next ctx
+         | Ok dto ->
+             let service = ctx.GetService<IForecastService>()
 
-                let parameters =
-                    GetForecast(
-                        Latitude = dto.latitude,
-                        Longitude = dto.longitude,
-                        TemperatureUnit = dto.temperatureUnit,
-                        PrecipitationUnit = dto.precipitationUnit,
-                        WindSpeedUnit = dto.windSpeedUnit,
-                        Time = dto.time
-                    )
+             let parameters =
+                 GetForecast(
+                     Latitude = dto.latitude,
+                     Longitude = dto.longitude,
+                     TemperatureUnit = dto.temperatureUnit,
+                     PrecipitationUnit = dto.precipitationUnit,
+                     WindSpeedUnit = dto.windSpeedUnit,
+                     Time = dto.time
+                 )
 
-                task {
-                    let! forecast = service.GetAsync(parameters)
+             task {
+                 let! forecast = service.GetAsync(parameters)
 
-                    return! Successful.OK forecast next ctx
-                }
-        )
-    )
+                 return! Successful.OK forecast next ctx
+             }))

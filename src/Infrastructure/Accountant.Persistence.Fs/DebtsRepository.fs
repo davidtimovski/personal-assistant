@@ -99,8 +99,8 @@ module DebtsRepository =
                 ConnectionUtils.connect conn
                 |> Sql.query
                     $"UPDATE {table}
-                           SET person = @person, amount = @amount, currency = @currency, description = @description, user_is_debtor = @user_is_debtor, modified_date = @modified_date
-                           WHERE id = @id AND user_id = @user_id"
+                      SET person = @person, amount = @amount, currency = @currency, description = @description, user_is_debtor = @user_is_debtor, modified_date = @modified_date
+                      WHERE id = @id AND user_id = @user_id"
                 |> Sql.parameters
                     [ "id", Sql.int debt.Id
                       "user_id", Sql.int debt.UserId

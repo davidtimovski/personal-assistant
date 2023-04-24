@@ -15,6 +15,7 @@ open Routes
 let private configureServices (services: IServiceCollection) =
     let serviceProvider = services.BuildServiceProvider()
     let settings = serviceProvider.GetService<IConfiguration>()
+
     Startup.configureServices services
 
     services.AddWeatherman() |> ignore
@@ -40,7 +41,7 @@ let main args =
     let app = builder.Build()
 
     Startup.setupApp app
-    
+
     app.UseAuthentication().UseGiraffe(webApp)
 
     app.Run()

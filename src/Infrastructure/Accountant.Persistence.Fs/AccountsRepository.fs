@@ -84,8 +84,8 @@ module AccountsRepository =
                 ConnectionUtils.connect conn
                 |> Sql.query
                     $"UPDATE {table}
-                           SET name = @name, currency = @currency, stock_price = @stock_price, modified_date = @modified_date
-                           WHERE id = @id AND user_id = @user_id"
+                      SET name = @name, currency = @currency, stock_price = @stock_price, modified_date = @modified_date
+                      WHERE id = @id AND user_id = @user_id"
                 |> Sql.parameters
                     [ "id", Sql.int account.Id
                       "user_id", Sql.int account.UserId

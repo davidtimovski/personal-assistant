@@ -54,8 +54,8 @@ module AutomaticTransactionsRepository =
                 ConnectionUtils.connect conn
                 |> Sql.query
                     $"UPDATE {table}
-                           SET is_deposit = @is_deposit, category_id = @category_id, amount = @amount, currency = @currency, description = @description, day_in_month = @day_in_month, modified_date = @modified_date
-                           WHERE id = @id AND user_id = @user_id"
+                      SET is_deposit = @is_deposit, category_id = @category_id, amount = @amount, currency = @currency, description = @description, day_in_month = @day_in_month, modified_date = @modified_date
+                      WHERE id = @id AND user_id = @user_id"
                 |> Sql.parameters
                     [ "id", Sql.int automaticTransaction.Id
                       "user_id", Sql.int automaticTransaction.UserId
