@@ -52,8 +52,8 @@ module CategoriesRepository =
                 ConnectionUtils.connect conn
                 |> Sql.query
                     $"UPDATE {table}
-                           SET parent_id = @parent_id, name = @name, type = @type, generate_upcoming_expense = @generate_upcoming_expense, is_tax = @is_tax, modified_date = @modified_date
-                           WHERE id = @id AND user_id = @user_id"
+                      SET parent_id = @parent_id, name = @name, type = @type, generate_upcoming_expense = @generate_upcoming_expense, is_tax = @is_tax, modified_date = @modified_date
+                      WHERE id = @id AND user_id = @user_id"
                 |> Sql.parameters
                     [ "id", Sql.int category.Id
                       "parent_id", Sql.intOrNone category.ParentId

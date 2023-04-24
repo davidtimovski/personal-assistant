@@ -15,10 +15,10 @@ module TransactionsRepository =
         ConnectionUtils.connect conn
         |> Sql.query
             $"SELECT t.* 
-                      FROM {table} AS t
-                      INNER JOIN accountant.accounts AS a ON a.id = t.from_account_id 
-                          OR a.id = t.to_account_id 
-                      WHERE a.user_id = @user_id AND t.modified_date > @modified_date"
+              FROM {table} AS t
+              INNER JOIN accountant.accounts AS a ON a.id = t.from_account_id 
+                  OR a.id = t.to_account_id 
+              WHERE a.user_id = @user_id AND t.modified_date > @modified_date"
         |> Sql.parameters [ "user_id", Sql.int userId; "modified_date", Sql.timestamptz fromModifiedDate ]
         |> Sql.executeAsync (fun read ->
             { Id = read.int "id"
@@ -41,11 +41,12 @@ module TransactionsRepository =
 
     let exists (id: int) (userId: int) (conn: RegularOrTransactionalConn) =
         ConnectionUtils.connect conn
-        |> Sql.query $"SELECT COUNT(*) AS count
-                       FROM {table} AS t
-                       LEFT JOIN accountant.accounts AS fa ON t.from_account_id = fa.id
-                       LEFT JOIN accountant.accounts AS ta ON t.to_account_id = ta.id
-                       WHERE t.id = @id AND (t.from_account_id IS NULL OR fa.user_id = @user_id) AND (t.to_account_id IS NULL OR ta.user_id = @user_id)"
+        |> Sql.query
+            $"SELECT COUNT(*) AS count
+              FROM {table} AS t
+              LEFT JOIN accountant.accounts AS fa ON t.from_account_id = fa.id
+              LEFT JOIN accountant.accounts AS ta ON t.to_account_id = ta.id
+              WHERE t.id = @id AND (t.from_account_id IS NULL OR fa.user_id = @user_id) AND (t.to_account_id IS NULL OR ta.user_id = @user_id)"
         |> Sql.parameters [ "id", Sql.int id; "user_id", Sql.int userId ]
         |> Sql.executeRow (fun read -> (read.int "count") > 0)
 
@@ -134,7 +135,7 @@ module TransactionsRepository =
                             |> Sql.existingConnection
                             |> Sql.query
                                 "UPDATE accountant.upcoming_expenses
-                                    SET amount = amount - @Amount, modified_date = @ModifiedDate
+                                    SET amount = amount - @Amount, modified_date = @modified_date
                                     WHERE id = @Id"
                             |> Sql.parameters
                                 [ "id", Sql.int ue.Id
@@ -172,10 +173,10 @@ module TransactionsRepository =
                 ConnectionUtils.connect conn
                 |> Sql.query
                     $"UPDATE {table}
-                           SET from_account_id = @from_account_id, to_account_id = @to_account_id, category_id = @category_id, amount = @amount, from_stocks = @from_stocks,
-                                to_stocks = @to_stocks, currency = @currency, description = @description, date = @date, is_encrypted = @is_encrypted,
-                                encrypted_description = @encrypted_description, salt = @salt, nonce = @nonce, modified_date = @modified_date
-                           WHERE id = @id"
+                      SET from_account_id = @from_account_id, to_account_id = @to_account_id, category_id = @category_id, amount = @amount, from_stocks = @from_stocks,
+                           to_stocks = @to_stocks, currency = @currency, description = @description, date = @date, is_encrypted = @is_encrypted,
+                           encrypted_description = @encrypted_description, salt = @salt, nonce = @nonce, modified_date = @modified_date
+                      WHERE id = @id"
                 |> Sql.parameters
                     [ "id", Sql.int transaction.Id
                       "from_account_id", Sql.intOrNone transaction.FromAccountId

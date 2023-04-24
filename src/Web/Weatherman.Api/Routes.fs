@@ -8,6 +8,8 @@ let authorize: HttpHandler =
     requiresAuthentication (challenge JwtBearerDefaults.AuthenticationScheme)
 
 let webApp: HttpHandler =
-    choose
-        [ GET >=> authorize >=> route "/api/forecasts" >=> ForecastHandlers.get
-          setStatusCode StatusCodes.Status404NotFound >=> text "Not Found" ]
+    subRoute
+        "/api"
+        (choose
+            [ GET >=> authorize >=> choose [ route "/forecasts" >=> ForecastHandlers.get ]
+              setStatusCode StatusCodes.Status404NotFound >=> text "Not Found" ])
