@@ -26,42 +26,54 @@ module SyncRepository =
                 accounts
                 |> List.map (fun account -> { account with UserId = userId } )
                 |> List.map (fun account ->
-                    AccountsRepository.create account (TransactionConnection(conn)) |> Async.AwaitTask |> Async.RunSynchronously
+                    AccountsRepository.create account (TransactionConnection(conn)) |> Async.AwaitTask
                 )
+                |> Async.Sequential
+                |> Async.RunSynchronously
 
             let categoryIds =
                 categories
                 |> List.map (fun account -> { account with UserId = userId } )
                 |> List.map (fun category ->
-                    CategoriesRepository.create category (TransactionConnection(conn)) |> Async.AwaitTask |> Async.RunSynchronously
+                    CategoriesRepository.create category (TransactionConnection(conn)) |> Async.AwaitTask
                 )
+                |> Async.Sequential
+                |> Async.RunSynchronously
 
             let transactionIds =
                 transactions
                 |> List.map (fun transaction ->
-                    TransactionsRepository.create transaction (TransactionConnection(conn)) (Some(tr)) |> Async.AwaitTask |> Async.RunSynchronously
+                    TransactionsRepository.create transaction (TransactionConnection(conn)) (Some(tr)) |> Async.AwaitTask
                 )
+                |> Async.Sequential
+                |> Async.RunSynchronously
 
             let upcomingExpenseIds =
                 upcomingExpenses
                 |> List.map (fun account -> { account with UserId = userId } )
                 |> List.map (fun upcomingExpense ->
-                    UpcomingExpensesRepository.create upcomingExpense (TransactionConnection(conn)) |> Async.AwaitTask |> Async.RunSynchronously
+                    UpcomingExpensesRepository.create upcomingExpense (TransactionConnection(conn)) |> Async.AwaitTask
                 )
+                |> Async.Sequential
+                |> Async.RunSynchronously
 
             let debtIds =
                 debts
                 |> List.map (fun account -> { account with UserId = userId } )
                 |> List.map (fun debt ->
-                    DebtsRepository.create debt (TransactionConnection(conn)) |> Async.AwaitTask |> Async.RunSynchronously
+                     DebtsRepository.create debt (TransactionConnection(conn)) |> Async.AwaitTask
                 )
+                |> Async.Sequential
+                |> Async.RunSynchronously
 
             let automaticTransactionIds =
                 automaticTransactions
                 |> List.map (fun account -> { account with UserId = userId } )
                 |> List.map (fun automaticTransaction ->
-                    AutomaticTransactionsRepository.create automaticTransaction (TransactionConnection(conn)) |> Async.AwaitTask |> Async.RunSynchronously
+                     AutomaticTransactionsRepository.create automaticTransaction (TransactionConnection(conn)) |> Async.AwaitTask
                 )
+                |> Async.Sequential
+                |> Async.RunSynchronously
 
             tr.Commit()
 

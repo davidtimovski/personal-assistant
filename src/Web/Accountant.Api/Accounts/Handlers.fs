@@ -38,8 +38,8 @@ module Handlers =
                     let userId = getUserId ctx
                     let account = Logic.prepareForUpdate dto userId
 
-                    let connection = getDbConnection ctx
-                    let! _ = AccountsRepository.update account connection
+                    let connectionString = getConnectionString ctx
+                    let! _ = AccountsRepository.update account connectionString
 
                     return! Successful.NO_CONTENT next ctx
                 | Failure error -> return! RequestErrors.BAD_REQUEST error next ctx
@@ -48,15 +48,15 @@ module Handlers =
     let delete (id: int) : HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             let userId = getUserId ctx
-            let connection = getDbConnection ctx
+            let connectionString = getConnectionString ctx
 
-            let isMain = AccountsRepository.isMain id userId connection
+            let isMain = AccountsRepository.isMain id userId connectionString
 
             task {
                 if isMain then
                     return! RequestErrors.BAD_REQUEST "Cannot delete main account" next ctx
                 else
-                    let! _ = AccountsRepository.delete id userId connection
+                    let! _ = AccountsRepository.delete id userId connectionString
 
                     return! Successful.NO_CONTENT next ctx
             })

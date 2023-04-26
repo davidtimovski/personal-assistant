@@ -2,7 +2,6 @@
 
 open Accountant.Persistence.Fs.Models
 open Models
-open Accountant.Api.HandlerBase
 open CommonHandlers
 
 module Logic =
@@ -49,9 +48,9 @@ module Logic =
 
     let private validateUpdateAccount (dto: UpdateAccount) =
         let userId = getUserId dto.HttpContext
-        let connection = getDbConnection dto.HttpContext
+        let connectionString = getConnectionString dto.HttpContext
 
-        if Validation.accountBelongsTo dto.Id userId connection then
+        if Validation.accountBelongsTo dto.Id userId connectionString then
             Success dto
         else
             Failure "Account is not valid"

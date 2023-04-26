@@ -2,7 +2,6 @@
 
 open Accountant.Persistence.Fs.Models
 open Models
-open Accountant.Api.HandlerBase
 open CommonHandlers
 
 module Logic =
@@ -75,9 +74,9 @@ module Logic =
 
     let private validateUpdateDebt (dto: UpdateDebt) =
         let userId = getUserId dto.HttpContext
-        let connection = getDbConnection dto.HttpContext
+        let connectionString = getConnectionString dto.HttpContext
 
-        if Validation.debtBelongsTo dto.Id userId connection then
+        if Validation.debtBelongsTo dto.Id userId connectionString then
             Success dto
         else
             Failure "Debt is not valid"

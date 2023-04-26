@@ -2,7 +2,6 @@
 
 open System
 open Accountant.Persistence.Fs
-open Accountant.Api.HandlerBase
 open CommonHandlers
 open Models
 
@@ -25,11 +24,11 @@ module Logic =
 
     let private validateCreateCategory (dto: CreateUpcomingExpense) =
         let userId = getUserId dto.HttpContext
-        let connection = getDbConnection dto.HttpContext
+        let connectionString = getConnectionString dto.HttpContext
 
         if
             dto.CategoryId.IsNone
-            || Validation.categoryBelongsTo dto.CategoryId.Value userId connection
+            || Validation.categoryBelongsTo dto.CategoryId.Value userId connectionString
         then
             Success dto
         else
@@ -73,20 +72,20 @@ module Logic =
 
     let private validateUpdateUpcomingExpense (dto: UpdateUpcomingExpense) =
         let userId = getUserId dto.HttpContext
-        let connection = getDbConnection dto.HttpContext
+        let connectionString = getConnectionString dto.HttpContext
 
-        if Validation.upcomingExpenseBelongsTo dto.Id userId connection then
+        if Validation.upcomingExpenseBelongsTo dto.Id userId connectionString then
             Success dto
         else
             Failure "Upcoming expense is not valid"
 
     let private validateUpdateCategory (dto: UpdateUpcomingExpense) =
         let userId = getUserId dto.HttpContext
-        let connection = getDbConnection dto.HttpContext
+        let connectionString = getConnectionString dto.HttpContext
 
         if
             dto.CategoryId.IsNone
-            || Validation.categoryBelongsTo dto.CategoryId.Value userId connection
+            || Validation.categoryBelongsTo dto.CategoryId.Value userId connectionString
         then
             Success dto
         else

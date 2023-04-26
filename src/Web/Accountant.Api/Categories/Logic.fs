@@ -2,7 +2,6 @@
 
 open Accountant.Persistence.Fs.Models
 open Models
-open Accountant.Api.HandlerBase
 open CommonHandlers
 
 module Logic =
@@ -23,11 +22,11 @@ module Logic =
 
     let private validateCreateParentCategory (dto: CreateCategory) =
         let userId = getUserId dto.HttpContext
-        let connection = getDbConnection dto.HttpContext
+        let connectionString = getConnectionString dto.HttpContext
 
         if
             dto.ParentId.IsNone
-            || Validation.categoryBelongsTo dto.ParentId.Value userId connection
+            || Validation.categoryBelongsTo dto.ParentId.Value userId connectionString
         then
             Success dto
         else
@@ -60,20 +59,20 @@ module Logic =
 
     let private validateUpdateCategory (dto: UpdateCategory) =
         let userId = getUserId dto.HttpContext
-        let connection = getDbConnection dto.HttpContext
+        let connectionString = getConnectionString dto.HttpContext
 
-        if Validation.categoryBelongsTo dto.Id userId connection then
+        if Validation.categoryBelongsTo dto.Id userId connectionString then
             Success dto
         else
             Failure "Category is not valid"
 
     let private validateUpdateParentCategory (dto: UpdateCategory) =
         let userId = getUserId dto.HttpContext
-        let connection = getDbConnection dto.HttpContext
+        let connectionString = getConnectionString dto.HttpContext
 
         if
             dto.ParentId.IsNone
-            || Validation.categoryBelongsTo dto.ParentId.Value userId connection
+            || Validation.categoryBelongsTo dto.ParentId.Value userId connectionString
         then
             Success dto
         else
