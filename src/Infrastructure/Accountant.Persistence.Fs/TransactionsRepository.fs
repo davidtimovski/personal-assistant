@@ -11,8 +11,9 @@ module TransactionsRepository =
     [<Literal>]
     let private table = "accountant.transactions"
 
-    let getAll (userId: int) (fromModifiedDate: DateTime) (conn: RegularOrTransactionalConn) =
-        ConnectionUtils.connect conn
+    let getAll (userId: int) (fromModifiedDate: DateTime) connectionString =
+        connectionString
+        |> Sql.connect
         |> Sql.query
             $"SELECT t.* 
               FROM {table} AS t
@@ -39,16 +40,17 @@ module TransactionsRepository =
               CreatedDate = read.dateTime "created_date"
               ModifiedDate = read.dateTime "modified_date" })
 
-    let exists (id: int) (userId: int) (conn: RegularOrTransactionalConn) =
-        ConnectionUtils.connect conn
+    let exists (id: int) (userId: int) connectionString =
+        connectionString
+        |> Sql.connect
         |> Sql.query
-            $"SELECT COUNT(*) AS count
+            $"SELECT EXISTS (SELECT 1
               FROM {table} AS t
               LEFT JOIN accountant.accounts AS fa ON t.from_account_id = fa.id
               LEFT JOIN accountant.accounts AS ta ON t.to_account_id = ta.id
-              WHERE t.id = @id AND (t.from_account_id IS NULL OR fa.user_id = @user_id) AND (t.to_account_id IS NULL OR ta.user_id = @user_id)"
+              WHERE t.id = @id AND (t.from_account_id IS NULL OR fa.user_id = @user_id) AND (t.to_account_id IS NULL OR ta.user_id = @user_id)) AS exists"
         |> Sql.parameters [ "id", Sql.int id; "user_id", Sql.int userId ]
-        |> Sql.executeRow (fun read -> (read.int "count") > 0)
+        |> Sql.executeRow (fun read -> read.bool "exists")
 
     let create (transaction: Transaction) (conn: RegularOrTransactionalConn) (tran: NpgsqlTransaction Option) =
         let npgsqlConn =
@@ -72,8 +74,8 @@ module TransactionsRepository =
                 |> Sql.existingConnection
                 |> Sql.query
                     $"INSERT INTO {table}
-                            (from_account_id, to_account_id, category_id, amount, from_stocks, to_stocks, currency, description, date, is_encrypted, encrypted_description, salt, nonce, generated, created_date, modified_date) VALUES 
-                            (@from_account_id, @to_account_id, @category_id, @amount, @from_stocks, @to_stocks, @currency, @description, @date, @is_encrypted, @encrypted_description, @salt, @nonce, @generated, @created_date, @modified_date) RETURNING id"
+                          (from_account_id, to_account_id, category_id, amount, from_stocks, to_stocks, currency, description, date, is_encrypted, encrypted_description, salt, nonce, generated, created_date, modified_date) VALUES 
+                          (@from_account_id, @to_account_id, @category_id, @amount, @from_stocks, @to_stocks, @currency, @description, @date, @is_encrypted, @encrypted_description, @salt, @nonce, @generated, @created_date, @modified_date) RETURNING id"
                 |> Sql.parameters
                     [ "from_account_id", Sql.intOrNone transaction.FromAccountId
                       "to_account_id", Sql.intOrNone transaction.ToAccountId
@@ -92,7 +94,6 @@ module TransactionsRepository =
                       "created_date", Sql.timestamptz transaction.CreatedDate
                       "modified_date", Sql.timestamptz transaction.ModifiedDate ]
                 |> Sql.executeRowAsync (fun read -> read.int "id")
-                |> Async.AwaitTask
 
             if transaction.FromAccountId.IsSome && transaction.ToAccountId.IsNone then
                 let relatedUpcomingExpenses =
@@ -100,9 +101,9 @@ module TransactionsRepository =
                     |> Sql.existingConnection
                     |> Sql.query
                         "SELECT * FROM accountant.upcoming_expenses
-                            WHERE category_id = @category_id 
-                                AND EXTRACT(year FROM date) = @year
-                                AND EXTRACT(month FROM date) = @month"
+                         WHERE category_id = @category_id 
+                            AND EXTRACT(year FROM date) = @year
+                            AND EXTRACT(month FROM date) = @month"
                     |> Sql.parameters
                         [ "category_id", Sql.intOrNone transaction.CategoryId
                           "year", Sql.int (transaction.Date.Year)
@@ -135,85 +136,80 @@ module TransactionsRepository =
                             |> Sql.existingConnection
                             |> Sql.query
                                 "UPDATE accountant.upcoming_expenses
-                                    SET amount = amount - @Amount, modified_date = @modified_date
-                                    WHERE id = @Id"
+                                 SET amount = amount - @amount, modified_date = @modified_date
+                                 WHERE id = @id"
                             |> Sql.parameters
                                 [ "id", Sql.int ue.Id
                                   "amount", Sql.decimal transaction.Amount
                                   "modified_date", Sql.timestamptz DateTime.UtcNow ]
-                            |> Sql.executeNonQueryAsync
-                            |> Async.AwaitTask
+                            |> Sql.executeNonQuery
                             |> ignore
                         else
                             npgsqlConn
                             |> Sql.existingConnection
-                            |> Sql.executeTransactionAsync
-                                [ "INSERT INTO accountant.deleted_entities
-                                      (user_id, entity_type, entity_id, deleted_date) VALUES
-                                      (@user_id, @entity_type, @entity_id, @deleted_date)",
-                                  [ [ "user_id", Sql.int ue.UserId
-                                      "entity_type", Sql.int (LanguagePrimitives.EnumToValue EntityType.UpcomingExpense)
-                                      "entity_id", Sql.int id
-                                      "deleted_date", Sql.timestamptz DateTime.UtcNow ] ]
-
-                                  $"DELETE FROM {table} WHERE id = @id AND user_id = @user_id",
-                                  [ [ "id", Sql.int id; "user_id", Sql.int ue.UserId ] ] ]
-                            |> Async.AwaitTask
+                            |> Sql.query
+                                "INSERT INTO accountant.deleted_entities
+                                     (user_id, entity_type, entity_id, deleted_date) VALUES
+                                     (@user_id, @entity_type, @entity_id, @deleted_date);
+                                 DELETE FROM accountant.upcoming_expenses WHERE id = @id AND user_id = @user_id;"
+                            |> Sql.parameters
+                                [ "id", Sql.int ue.Id
+                                  "user_id", Sql.int ue.UserId
+                                  "entity_type", Sql.int (LanguagePrimitives.EnumToValue EntityType.UpcomingExpense)
+                                  "entity_id", Sql.int ue.Id
+                                  "deleted_date", Sql.timestamptz DateTime.UtcNow ]
+                            |> Sql.executeNonQuery
                             |> ignore
 
             if tran.IsNone then
                 tr.Commit()
+                tr.Dispose()
+                npgsqlConn.Dispose()
 
             return id
         }
 
-    let update (transaction: Transaction) (conn: RegularOrTransactionalConn) =
-        task {
-            return!
-                ConnectionUtils.connect conn
-                |> Sql.query
-                    $"UPDATE {table}
-                      SET from_account_id = @from_account_id, to_account_id = @to_account_id, category_id = @category_id, amount = @amount, from_stocks = @from_stocks,
-                           to_stocks = @to_stocks, currency = @currency, description = @description, date = @date, is_encrypted = @is_encrypted,
-                           encrypted_description = @encrypted_description, salt = @salt, nonce = @nonce, modified_date = @modified_date
-                      WHERE id = @id"
-                |> Sql.parameters
-                    [ "id", Sql.int transaction.Id
-                      "from_account_id", Sql.intOrNone transaction.FromAccountId
-                      "to_account_id", Sql.intOrNone transaction.ToAccountId
-                      "category_id", Sql.intOrNone transaction.CategoryId
-                      "amount", Sql.decimal transaction.Amount
-                      "from_stocks", Sql.decimalOrNone transaction.FromStocks
-                      "to_stocks", Sql.decimalOrNone transaction.ToStocks
-                      "currency", Sql.string transaction.Currency
-                      "description", Sql.stringOrNone transaction.Description
-                      "date", Sql.date (transaction.Date.ToUniversalTime())
-                      "is_encrypted", Sql.bool transaction.IsEncrypted
-                      "encrypted_description", Sql.byteaOrNone transaction.EncryptedDescription
-                      "salt", Sql.byteaOrNone transaction.Salt
-                      "nonce", Sql.byteaOrNone transaction.Nonce
-                      "modified_date", Sql.timestamptz transaction.ModifiedDate ]
-                |> Sql.executeNonQueryAsync
-                |> Async.AwaitTask
-        }
+    let update (transaction: Transaction) connectionString =
+        connectionString
+        |> Sql.connect
+        |> Sql.query
+            $"UPDATE {table}
+              SET from_account_id = @from_account_id, to_account_id = @to_account_id, category_id = @category_id, amount = @amount, from_stocks = @from_stocks,
+                  to_stocks = @to_stocks, currency = @currency, description = @description, date = @date, is_encrypted = @is_encrypted,
+                  encrypted_description = @encrypted_description, salt = @salt, nonce = @nonce, modified_date = @modified_date
+              WHERE id = @id"
+        |> Sql.parameters
+            [ "id", Sql.int transaction.Id
+              "from_account_id", Sql.intOrNone transaction.FromAccountId
+              "to_account_id", Sql.intOrNone transaction.ToAccountId
+              "category_id", Sql.intOrNone transaction.CategoryId
+              "amount", Sql.decimal transaction.Amount
+              "from_stocks", Sql.decimalOrNone transaction.FromStocks
+              "to_stocks", Sql.decimalOrNone transaction.ToStocks
+              "currency", Sql.string transaction.Currency
+              "description", Sql.stringOrNone transaction.Description
+              "date", Sql.date (transaction.Date.ToUniversalTime())
+              "is_encrypted", Sql.bool transaction.IsEncrypted
+              "encrypted_description", Sql.byteaOrNone transaction.EncryptedDescription
+              "salt", Sql.byteaOrNone transaction.Salt
+              "nonce", Sql.byteaOrNone transaction.Nonce
+              "modified_date", Sql.timestamptz transaction.ModifiedDate ]
+        |> Sql.executeNonQueryAsync
 
-    let delete (id: int) (userId: int) (conn: RegularOrTransactionalConn) =
-        task {
-            ConnectionUtils.connect conn
-            |> Sql.executeTransactionAsync
-                [ "INSERT INTO accountant.deleted_entities
-                      (user_id, entity_type, entity_id, deleted_date) VALUES
-                      (@user_id, @entity_type, @entity_id, @deleted_date)",
-                  [ [ "user_id", Sql.int userId
-                      "entity_type", Sql.int (LanguagePrimitives.EnumToValue EntityType.Transaction)
-                      "entity_id", Sql.int id
-                      "deleted_date", Sql.timestamptz DateTime.UtcNow ] ]
+    let delete (id: int) (userId: int) connectionString =
+        connectionString
+        |> Sql.connect
+        |> Sql.executeTransactionAsync
+            [ "INSERT INTO accountant.deleted_entities
+                    (user_id, entity_type, entity_id, deleted_date) VALUES
+                    (@user_id, @entity_type, @entity_id, @deleted_date)",
+              [ [ "user_id", Sql.int userId
+                  "entity_type", Sql.int (LanguagePrimitives.EnumToValue EntityType.Transaction)
+                  "entity_id", Sql.int id
+                  "deleted_date", Sql.timestamptz DateTime.UtcNow ] ]
 
-                  $"DELETE FROM accountant.transactions t
-                        USING accountant.accounts a
-                    WHERE t.id = @id AND 
-                        ((t.from_account_id = a.id AND a.user_id = @user_id) OR (t.to_account_id = a.id AND a.user_id = @user_id))",
-                  [ [ "id", Sql.int id; "user_id", Sql.int userId ] ] ]
-            |> Async.AwaitTask
-            |> ignore
-        }
+              $"DELETE FROM accountant.transactions t
+                    USING accountant.accounts a
+                WHERE t.id = @id AND 
+                    ((t.from_account_id = a.id AND a.user_id = @user_id) OR (t.to_account_id = a.id AND a.user_id = @user_id))",
+              [ [ "id", Sql.int id; "user_id", Sql.int userId ] ] ]

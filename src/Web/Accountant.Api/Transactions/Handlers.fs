@@ -40,9 +40,9 @@ module Handlers =
                 match Logic.validateUpdate dto with
                 | Success _ ->
                     let transaction = Logic.prepareForUpdate dto
-                    let connection = getDbConnection ctx
+                    let connectionString = getConnectionString ctx
 
-                    let! _ = TransactionsRepository.update transaction connection
+                    let! _ = TransactionsRepository.update transaction connectionString
 
                     return! Successful.NO_CONTENT next ctx
                 | Failure error -> return! RequestErrors.BAD_REQUEST error next ctx
@@ -53,8 +53,8 @@ module Handlers =
             task {
                 let userId = getUserId ctx
 
-                let connection = getDbConnection ctx
-                let! _ = TransactionsRepository.delete id userId connection
+                let connectionString = getConnectionString ctx
+                let! _ = TransactionsRepository.delete id userId connectionString
 
                 return! Successful.NO_CONTENT next ctx
             })

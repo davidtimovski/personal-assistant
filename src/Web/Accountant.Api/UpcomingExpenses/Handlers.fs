@@ -39,8 +39,8 @@ module Handlers =
                     let userId = getUserId ctx
                     let upcomingExpense = Logic.prepareForUpdate dto userId
 
-                    let connection = getDbConnection ctx
-                    let! _ = UpcomingExpensesRepository.update upcomingExpense connection
+                    let connectionString = getConnectionString ctx
+                    let! _ = UpcomingExpensesRepository.update upcomingExpense connectionString
 
                     return! Successful.NO_CONTENT next ctx
                 | Failure error -> return! RequestErrors.BAD_REQUEST error next ctx
@@ -51,8 +51,8 @@ module Handlers =
             task {
                 let userId = getUserId ctx
 
-                let connection = getDbConnection ctx
-                let! _ = UpcomingExpensesRepository.delete id userId connection
+                let connectionString = getConnectionString ctx
+                let! _ = UpcomingExpensesRepository.delete id userId connectionString
 
                 return! Successful.NO_CONTENT next ctx
             })

@@ -39,8 +39,8 @@ module Handlers =
                     let userId = getUserId ctx
                     let automaticTransaction = Logic.prepareForUpdate dto userId
 
-                    let connection = getDbConnection ctx
-                    let! _ = AutomaticTransactionsRepository.update automaticTransaction connection
+                    let connectionString = getConnectionString ctx
+                    let! _ = AutomaticTransactionsRepository.update automaticTransaction connectionString
 
                     return! Successful.NO_CONTENT next ctx
                 | Failure error -> return! RequestErrors.BAD_REQUEST error next ctx
@@ -50,9 +50,9 @@ module Handlers =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             task {
                 let userId = getUserId ctx
-                let connection = getDbConnection ctx
+                let connectionString = getConnectionString ctx
 
-                let! _ = AutomaticTransactionsRepository.delete id userId connection
+                let! _ = AutomaticTransactionsRepository.delete id userId connectionString
 
                 return! Successful.NO_CONTENT next ctx
             })

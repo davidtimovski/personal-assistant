@@ -6,53 +6,52 @@ open Microsoft.AspNetCore.Http
 open Accountant.Persistence.Fs
 open Accountant.Api
 open CommonHandlers
-open HandlerBase
 open Models
 
 module Handlers =
 
     let getChanges: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
-            let connection = getDbConnection ctx
+            let connectionString = getConnectionString ctx
 
             task {
                 let! dto = ctx.BindJsonAsync<GetChangesDto>()
                 let userId = getUserId ctx
 
-                let! _ = UpcomingExpensesRepository.deleteOld userId UpcomingExpenses.Logic.getFirstDayOfMonth connection
+                let! _ = UpcomingExpensesRepository.deleteOld userId UpcomingExpenses.Logic.getFirstDayOfMonth connectionString
 
                 let! deletedAccountIds =
-                    CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Account connection
+                    CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Account connectionString
 
-                let! accounts = AccountsRepository.getAll userId dto.LastSynced connection
+                let! accounts = AccountsRepository.getAll userId dto.LastSynced connectionString
                 let accountDtos = accounts |> Accounts.Logic.mapAll
 
                 let! deletedCategoryIds =
-                    CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Category connection
+                    CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Category connectionString
 
-                let! categories = CategoriesRepository.getAll userId dto.LastSynced connection
+                let! categories = CategoriesRepository.getAll userId dto.LastSynced connectionString
                 let categoryDtos = categories |> Categories.Logic.mapAll
 
                 let! deletedTransactionIds =
-                    CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Transaction connection
+                    CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Transaction connectionString
 
-                let! transactions = TransactionsRepository.getAll userId dto.LastSynced connection
+                let! transactions = TransactionsRepository.getAll userId dto.LastSynced connectionString
                 let transactionDtos = transactions |> Transactions.Logic.mapAll
 
                 let! deletedUpcomingExpenseIds =
-                    CommonRepository.getDeletedIds userId dto.LastSynced EntityType.UpcomingExpense connection
+                    CommonRepository.getDeletedIds userId dto.LastSynced EntityType.UpcomingExpense connectionString
 
-                let! upcomingExpenses = UpcomingExpensesRepository.getAll userId dto.LastSynced connection
+                let! upcomingExpenses = UpcomingExpensesRepository.getAll userId dto.LastSynced connectionString
                 let upcomingExpenseDtos = upcomingExpenses |> UpcomingExpenses.Logic.mapAll
 
-                let! deletedDebtIds = CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Debt connection
-                let! debts = DebtsRepository.getAll userId dto.LastSynced connection
+                let! deletedDebtIds = CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Debt connectionString
+                let! debts = DebtsRepository.getAll userId dto.LastSynced connectionString
                 let debtDtos = debts |> Debts.Logic.mapAll
 
                 let! deletedAutomaticTransactionIds =
-                    CommonRepository.getDeletedIds userId dto.LastSynced EntityType.AutomaticTransaction connection
+                    CommonRepository.getDeletedIds userId dto.LastSynced EntityType.AutomaticTransaction connectionString
 
-                let! automaticTransactions = AutomaticTransactionsRepository.getAll userId dto.LastSynced connection
+                let! automaticTransactions = AutomaticTransactionsRepository.getAll userId dto.LastSynced connectionString
 
                 let automaticTransactionDtos =
                     automaticTransactions |> AutomaticTransactions.Logic.mapAll

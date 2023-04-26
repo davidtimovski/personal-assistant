@@ -39,8 +39,8 @@ module Handlers =
                     let userId = getUserId ctx
                     let category = Logic.prepareForUpdate dto userId
 
-                    let connection = getDbConnection ctx
-                    let! _ = CategoriesRepository.update category connection
+                    let connectionString = getConnectionString ctx
+                    let! _ = CategoriesRepository.update category connectionString
 
                     return! Successful.NO_CONTENT next ctx
                 | Failure error -> return! RequestErrors.BAD_REQUEST error next ctx
@@ -50,9 +50,9 @@ module Handlers =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             task {
                 let userId = getUserId ctx
-                let connection = getDbConnection ctx
+                let connectionString = getConnectionString ctx
 
-                let! _ = CategoriesRepository.delete id userId connection
+                let! _ = CategoriesRepository.delete id userId connectionString
 
                 return! Successful.NO_CONTENT next ctx
             })

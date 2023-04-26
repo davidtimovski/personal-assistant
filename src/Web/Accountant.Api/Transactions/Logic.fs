@@ -2,7 +2,6 @@
 
 open Accountant.Persistence.Fs
 open Models
-open Accountant.Api.HandlerBase
 open CommonHandlers
 
 module Logic =
@@ -40,20 +39,20 @@ module Logic =
 
     let private validateCreateAccounts (dto: CreateTransaction) =
         let userId = getUserId dto.HttpContext
-        let connection = getDbConnection dto.HttpContext
+        let connectionString = getConnectionString dto.HttpContext
 
-        if validateAccounts dto.FromAccountId dto.ToAccountId userId connection then
+        if validateAccounts dto.FromAccountId dto.ToAccountId userId connectionString then
             Success dto
         else
             Failure "Accounts are not valid"
 
     let private validateCreateCategory (dto: CreateTransaction) =
         let userId = getUserId dto.HttpContext
-        let connection = getDbConnection dto.HttpContext
+        let connectionString = getConnectionString dto.HttpContext
 
         if
             dto.CategoryId.IsNone
-            || Validation.categoryBelongsTo dto.CategoryId.Value userId connection
+            || Validation.categoryBelongsTo dto.CategoryId.Value userId connectionString
         then
             Success dto
         else
@@ -105,29 +104,29 @@ module Logic =
 
     let private validateUpdateTransaction (dto: UpdateTransaction) =
         let userId = getUserId dto.HttpContext
-        let connection = getDbConnection dto.HttpContext
+        let connectionString = getConnectionString dto.HttpContext
 
-        if Validation.transactionBelongsTo dto.Id userId connection then
+        if Validation.transactionBelongsTo dto.Id userId connectionString then
             Success dto
         else
             Failure "Transaction is not valid"
 
     let private validateUpdateAccounts (dto: UpdateTransaction) =
         let userId = getUserId dto.HttpContext
-        let connection = getDbConnection dto.HttpContext
+        let connectionString = getConnectionString dto.HttpContext
 
-        if validateAccounts dto.FromAccountId dto.ToAccountId userId connection then
+        if validateAccounts dto.FromAccountId dto.ToAccountId userId connectionString then
             Success dto
         else
             Failure "Accounts are not valid"
 
     let private validateUpdateCategory (dto: UpdateTransaction) =
         let userId = getUserId dto.HttpContext
-        let connection = getDbConnection dto.HttpContext
+        let connectionString = getConnectionString dto.HttpContext
 
         if
             dto.CategoryId.IsNone
-            || Validation.categoryBelongsTo dto.CategoryId.Value userId connection
+            || Validation.categoryBelongsTo dto.CategoryId.Value userId connectionString
         then
             Success dto
         else

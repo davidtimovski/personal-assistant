@@ -37,8 +37,8 @@ module Handlers =
                     let userId = getUserId ctx
                     let debt = Logic.prepareForCreateMerged dto userId
 
-                    let connection = getDbConnection ctx
-                    let! id = DebtsRepository.createMerged debt connection
+                    let connectionString = getConnectionString ctx
+                    let! id = DebtsRepository.createMerged debt connectionString
 
                     return! Successful.CREATED id next ctx
                 | Failure error -> return! RequestErrors.BAD_REQUEST error next ctx
@@ -55,8 +55,8 @@ module Handlers =
                     let userId = getUserId ctx
                     let debt = Logic.prepareForUpdate dto userId
 
-                    let connection = getDbConnection ctx
-                    let! _ = DebtsRepository.update debt connection
+                    let connectionString = getConnectionString ctx
+                    let! _ = DebtsRepository.update debt connectionString
 
                     return! Successful.NO_CONTENT next ctx
                 | Failure error -> return! RequestErrors.BAD_REQUEST error next ctx
@@ -67,8 +67,8 @@ module Handlers =
             task {
                 let userId = getUserId ctx
 
-                let connection = getDbConnection ctx
-                let! _ = DebtsRepository.delete id userId connection
+                let connectionString = getConnectionString ctx
+                let! _ = DebtsRepository.delete id userId connectionString
 
                 return! Successful.NO_CONTENT next ctx
             })

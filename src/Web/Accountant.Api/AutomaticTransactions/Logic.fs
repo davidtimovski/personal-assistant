@@ -1,7 +1,6 @@
 ﻿namespace Accountant.Api.AutomaticTransactions
 
 open Accountant.Persistence.Fs
-open Accountant.Api.HandlerBase
 open CommonHandlers
 open Models
 
@@ -24,11 +23,11 @@ module Logic =
 
     let private validateCreateCategory (dto: CreateAutomaticTransaction) =
         let userId = getUserId dto.HttpContext
-        let connection = getDbConnection dto.HttpContext
+        let connectionString = getConnectionString dto.HttpContext
 
         if
             dto.CategoryId.IsNone
-            || Validation.categoryBelongsTo dto.CategoryId.Value userId connection
+            || Validation.categoryBelongsTo dto.CategoryId.Value userId connectionString
         then
             Success dto
         else
@@ -72,20 +71,20 @@ module Logic =
 
     let private validateUpdateAutomaticTransaction (dto: UpdateAutomaticTransaction) =
         let userId = getUserId dto.HttpContext
-        let connection = getDbConnection dto.HttpContext
+        let connectionString = getConnectionString dto.HttpContext
 
-        if Validation.automaticTransactionBelongsTo dto.Id userId connection then
+        if Validation.automaticTransactionBelongsTo dto.Id userId connectionString then
             Success dto
         else
             Failure "Automatic transaction is not valid"
 
     let private validateUpdateCategory (dto: UpdateAutomaticTransaction) =
         let userId = getUserId dto.HttpContext
-        let connection = getDbConnection dto.HttpContext
+        let connectionString = getConnectionString dto.HttpContext
 
         if
             dto.CategoryId.IsNone
-            || Validation.categoryBelongsTo dto.CategoryId.Value userId connection
+            || Validation.categoryBelongsTo dto.CategoryId.Value userId connectionString
         then
             Success dto
         else

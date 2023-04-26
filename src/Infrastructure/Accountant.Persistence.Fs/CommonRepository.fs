@@ -3,7 +3,6 @@
 open System
 open System.Threading.Tasks
 open Npgsql.FSharp
-open ConnectionUtils
 open Models
 
 module CommonRepository =
@@ -23,9 +22,10 @@ module CommonRepository =
         (userId: int)
         (fromDate: DateTime)
         (entityType: EntityType)
-        (conn: RegularOrTransactionalConn)
+        connectionString
         : Task<int list> =
-        ConnectionUtils.connect conn
+        connectionString
+        |> Sql.connect
         |> Sql.query
             "SELECT entity_id FROM accountant.deleted_entities WHERE user_id = @userId AND entity_type = @entityType AND deleted_date > @fromDate"
         |> Sql.parameters
@@ -34,13 +34,14 @@ module CommonRepository =
               "fromDate", Sql.timestamptz fromDate ]
         |> Sql.executeAsync (fun read -> read.int "entity_id")
 
-    let exists (id: int) (userId: int) (entity: EntityType) (conn: RegularOrTransactionalConn) =
+    let exists (id: int) (userId: int) (entity: EntityType) connectionString =
         if entity = EntityType.Transaction then
-            raise (ArgumentException("Method does not support Transaction entities"))
+            raise (ArgumentException("Function does not support Transaction entities"))
 
         let table = tables[entity]
 
-        ConnectionUtils.connect conn
-        |> Sql.query $"SELECT COUNT(*) AS count FROM {schema}.{table} WHERE id = @id AND user_id = @user_id"
+        connectionString
+        |> Sql.connect
+        |> Sql.query $"SELECT EXISTS (SELECT 1 FROM {schema}.{table} WHERE id = @id AND user_id = @user_id) AS exists"
         |> Sql.parameters [ "id", Sql.int id; "user_id", Sql.int userId ]
-        |> Sql.executeRow (fun read -> (read.int "count") > 0)
+        |> Sql.executeRow (fun read -> read.bool "exists")
