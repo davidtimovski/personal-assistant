@@ -1,8 +1,9 @@
 ﻿using System.Data;
-using Application.Domain.Common;
 using Core.Application.Contracts;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
+using Sentry;
+using User = Application.Domain.Common.User;
 
 namespace Core.Persistence.Repositories;
 
@@ -14,40 +15,37 @@ public class UsersRepository : BaseRepository, IUsersRepository
     public User Get(int id)
     {
         using IDbConnection conn = OpenConnection();
-
         return conn.QueryFirstOrDefault<User>(@"SELECT * FROM users WHERE id = @id", new { id });
     }
 
     public User Get(string email)
     {
         using IDbConnection conn = OpenConnection();
-
         return conn.QueryFirstOrDefault<User>(@"SELECT * FROM users WHERE email = @email", new { email });
     }
 
     public int? GetId(string auth0Id)
     {
         using IDbConnection conn = OpenConnection();
-
         return conn.QueryFirstOrDefault<int?>(@"SELECT user_id FROM user_id_map WHERE auth0_id = @auth0Id", new { auth0Id });
     }
 
     public bool Exists(int id)
     {
         using IDbConnection conn = OpenConnection();
-
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM users WHERE id = @id", new { id });
     }
 
     public bool Exists(string email)
     {
         using IDbConnection conn = OpenConnection();
-
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM users WHERE email = @email", new { email });
     }
 
-    public async Task<int> CreateAsync(string auth0Id, User user)
+    public async Task<int> CreateAsync(string auth0Id, User user, ITransaction tr)
     {
+        var span = tr.StartChild($"{nameof(UsersRepository)}.{nameof(CreateAsync)}");
+
         EFContext.Users.Add(user);
         await EFContext.SaveChangesAsync();
 
@@ -55,11 +53,17 @@ public class UsersRepository : BaseRepository, IUsersRepository
         await conn.ExecuteAsync(@"INSERT INTO user_id_map (user_id, auth0_id) VALUES (@userId, @auth0Id)",
             new { userId = user.Id, auth0Id });
 
-        return user.Id;
+        var result = user.Id;
+
+        span.Finish();
+
+        return result;
     }
 
-    public async Task UpdateAsync(User user)
+    public async Task UpdateAsync(User user, ITransaction tr)
     {
+        var span = tr.StartChild($"{nameof(UsersRepository)}.{nameof(UpdateAsync)}");
+
         User dbUser = EFContext.Users.Find(user.Id);
 
         dbUser.Name = user.Name;
@@ -72,13 +76,19 @@ public class UsersRepository : BaseRepository, IUsersRepository
         dbUser.ModifiedDate = user.ModifiedDate;
 
         await EFContext.SaveChangesAsync();
+
+        span.Finish();
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(int id, ITransaction tr)
     {
+        var span = tr.StartChild($"{nameof(UsersRepository)}.{nameof(DeleteAsync)}");
+
         var person = EFContext.Users.Attach(new User { Id = id });
         person.State = EntityState.Deleted;
 
         await EFContext.SaveChangesAsync();
+
+        span.Finish();
     }
 }

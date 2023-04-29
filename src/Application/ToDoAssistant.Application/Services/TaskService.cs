@@ -5,6 +5,7 @@ using Core.Application.Contracts.Models;
 using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
+using Sentry;
 using ToDoAssistant.Application.Contracts.Lists;
 using ToDoAssistant.Application.Contracts.Tasks;
 using ToDoAssistant.Application.Contracts.Tasks.Models;
@@ -160,9 +161,11 @@ public class TaskService : ITaskService
         }
     }
 
-    public async Task<CreatedTaskResult> CreateAsync(CreateTask model, IValidator<CreateTask> validator)
+    public async Task<CreatedTaskResult> CreateAsync(CreateTask model, IValidator<CreateTask> validator, ITransaction tr)
     {
         ValidationUtil.ValidOrThrow(model, validator);
+
+        var span = tr.StartChild($"{nameof(TaskService)}.{nameof(CreateAsync)}");
 
         try
         {
@@ -180,7 +183,7 @@ public class TaskService : ITaskService
             task.Order = 1;
             task.CreatedDate = task.ModifiedDate = DateTime.UtcNow;
 
-            var id = await _tasksRepository.CreateAsync(task, model.UserId);
+            var id = await _tasksRepository.CreateAsync(task, model.UserId, tr);
 
             ToDoList list = _listsRepository.GetWithShares(model.ListId, model.UserId);
 
@@ -208,11 +211,17 @@ public class TaskService : ITaskService
             _logger.LogError(ex, $"Unexpected error in {nameof(CreateAsync)}");
             throw;
         }
+        finally
+        {
+            span.Finish();
+        }
     }
 
-    public async Task<BulkCreateResult> BulkCreateAsync(BulkCreate model, IValidator<BulkCreate> validator)
+    public async Task<BulkCreateResult> BulkCreateAsync(BulkCreate model, IValidator<BulkCreate> validator, ITransaction tr)
     {
         ValidationUtil.ValidOrThrow(model, validator);
+
+        var span = tr.StartChild($"{nameof(TaskService)}.{nameof(BulkCreateAsync)}");
 
         try
         {
@@ -232,7 +241,7 @@ public class TaskService : ITaskService
                 }
                 ).ToList();
 
-            IEnumerable<ToDoTask> createdTasks = await _tasksRepository.BulkCreateAsync(tasks, model.TasksArePrivate, model.UserId);
+            IEnumerable<ToDoTask> createdTasks = await _tasksRepository.BulkCreateAsync(tasks, model.TasksArePrivate, model.UserId, tr);
 
             ToDoList list = _listsRepository.GetWithShares(model.ListId, model.UserId);
 
@@ -265,11 +274,17 @@ public class TaskService : ITaskService
             _logger.LogError(ex, $"Unexpected error in {nameof(BulkCreateAsync)}");
             throw;
         }
+        finally
+        {
+            span.Finish();
+        }
     }
 
-    public async Task<UpdateTaskResult> UpdateAsync(UpdateTask model, IValidator<UpdateTask> validator)
+    public async Task<UpdateTaskResult> UpdateAsync(UpdateTask model, IValidator<UpdateTask> validator, ITransaction tr)
     {
         ValidationUtil.ValidOrThrow(model, validator);
+
+        var span = tr.StartChild($"{nameof(TaskService)}.{nameof(UpdateAsync)}");
 
         try
         {
@@ -292,7 +307,7 @@ public class TaskService : ITaskService
             ToDoTask originalTask = _tasksRepository.Get(model.Id);
 
             task.ModifiedDate = DateTime.UtcNow;
-            await _tasksRepository.UpdateAsync(task, model.UserId);
+            await _tasksRepository.UpdateAsync(task, model.UserId, tr);
 
             ToDoList list = _listsRepository.GetWithShares(model.ListId, model.UserId);
 
@@ -341,10 +356,16 @@ public class TaskService : ITaskService
             _logger.LogError(ex, $"Unexpected error in {nameof(UpdateAsync)}");
             throw;
         }
+        finally
+        {
+            span.Finish();
+        }
     }
 
-    public async Task<DeleteTaskResult> DeleteAsync(int id, int userId)
+    public async Task<DeleteTaskResult> DeleteAsync(int id, int userId, ITransaction tr)
     {
+        var span = tr.StartChild($"{nameof(TaskService)}.{nameof(DeleteAsync)}");
+
         try
         {
             ToDoTask task = _tasksRepository.Get(id);
@@ -358,7 +379,7 @@ public class TaskService : ITaskService
                 throw new ValidationException("Unauthorized");
             }
 
-            await _tasksRepository.DeleteAsync(id, userId);
+            await _tasksRepository.DeleteAsync(id, userId, tr);
 
             ToDoList list = _listsRepository.GetWithShares(task.ListId, userId);
 
@@ -387,10 +408,16 @@ public class TaskService : ITaskService
             _logger.LogError(ex, $"Unexpected error in {nameof(DeleteAsync)}");
             throw;
         }
+        finally
+        {
+            span.Finish();
+        }
     }
 
-    public async Task<CompleteUncompleteTaskResult> CompleteAsync(CompleteUncomplete model)
+    public async Task<CompleteUncompleteTaskResult> CompleteAsync(CompleteUncomplete model, ITransaction tr)
     {
+        var span = tr.StartChild($"{nameof(TaskService)}.{nameof(CompleteAsync)}");
+
         try
         {
             if (!Exists(model.Id, model.UserId))
@@ -404,7 +431,7 @@ public class TaskService : ITaskService
                 return new CompleteUncompleteTaskResult(false);
             }
 
-            await _tasksRepository.CompleteAsync(model.Id, model.UserId);
+            await _tasksRepository.CompleteAsync(model.Id, model.UserId, tr);
 
             ToDoList list = _listsRepository.GetWithShares(task.ListId, model.UserId);
 
@@ -433,10 +460,16 @@ public class TaskService : ITaskService
             _logger.LogError(ex, $"Unexpected error in {nameof(CompleteAsync)}");
             throw;
         }
+        finally
+        {
+            span.Finish();
+        }
     }
 
-    public async Task<CompleteUncompleteTaskResult> UncompleteAsync(CompleteUncomplete model)
+    public async Task<CompleteUncompleteTaskResult> UncompleteAsync(CompleteUncomplete model, ITransaction tr)
     {
+        var span = tr.StartChild($"{nameof(TaskService)}.{nameof(UncompleteAsync)}");
+
         try
         {
             if (!Exists(model.Id, model.UserId))
@@ -450,7 +483,7 @@ public class TaskService : ITaskService
                 return new CompleteUncompleteTaskResult(false);
             }
 
-            await _tasksRepository.UncompleteAsync(model.Id, model.UserId);
+            await _tasksRepository.UncompleteAsync(model.Id, model.UserId, tr);
 
             ToDoList list = _listsRepository.GetWithShares(task.ListId, model.UserId);
 
@@ -478,6 +511,10 @@ public class TaskService : ITaskService
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(UncompleteAsync)}");
             throw;
+        }
+        finally
+        {
+            span.Finish();
         }
     }
 

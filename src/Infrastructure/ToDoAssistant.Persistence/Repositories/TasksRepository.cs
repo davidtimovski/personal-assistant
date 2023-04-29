@@ -1,7 +1,9 @@
 ﻿using System.Data;
 using Application.Domain.ToDoAssistant;
 using Core.Persistence;
+using Core.Persistence.Repositories;
 using Dapper;
+using Sentry;
 using ToDoAssistant.Application.Contracts.Tasks;
 
 namespace ToDoAssistant.Persistence.Repositories;
@@ -130,8 +132,10 @@ public class TasksRepository : BaseRepository, ITasksRepository
         return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM todo.tasks WHERE list_id = @ListId", new { ListId = listId });
     }
 
-    public async Task<int> CreateAsync(ToDoTask task, int userId)
+    public async Task<int> CreateAsync(ToDoTask task, int userId, ITransaction tr)
     {
+        var span = tr.StartChild($"{nameof(TasksRepository)}.{nameof(CreateAsync)}");
+
         IQueryable<ToDoTask> otherTasks;
 
         if (task.PrivateToUserId.HasValue)
@@ -152,11 +156,15 @@ public class TasksRepository : BaseRepository, ITasksRepository
 
         await EFContext.SaveChangesAsync();
 
+        span.Finish();
+
         return task.Id;
     }
 
-    public async Task<IEnumerable<ToDoTask>> BulkCreateAsync(IEnumerable<ToDoTask> tasks, bool tasksArePrivate, int userId)
+    public async Task<IEnumerable<ToDoTask>> BulkCreateAsync(IEnumerable<ToDoTask> tasks, bool tasksArePrivate, int userId, ITransaction tr)
     {
+        var span = tr.StartChild($"{nameof(TasksRepository)}.{nameof(BulkCreateAsync)}");
+
         int listId = tasks.First().ListId;
         IQueryable<ToDoTask> otherTasks;
 
@@ -186,11 +194,15 @@ public class TasksRepository : BaseRepository, ITasksRepository
 
         await EFContext.SaveChangesAsync();
 
+        span.Finish();
+
         return tasks;
     }
 
-    public async Task UpdateAsync(ToDoTask task, int userId)
+    public async Task UpdateAsync(ToDoTask task, int userId, ITransaction tr)
     {
+        var span = tr.StartChild($"{nameof(TasksRepository)}.{nameof(UpdateAsync)}");
+
         var existingTask = Get(task.Id);
 
         if (existingTask.ListId == task.ListId)
@@ -285,10 +297,14 @@ public class TasksRepository : BaseRepository, ITasksRepository
         dbTask.ModifiedDate = task.ModifiedDate;
 
         await EFContext.SaveChangesAsync();
+
+        span.Finish();
     }
 
-    public async Task DeleteAsync(int id, int userId)
+    public async Task DeleteAsync(int id, int userId, ITransaction tr)
     {
+        var span = tr.StartChild($"{nameof(TasksRepository)}.{nameof(DeleteAsync)}");
+
         ToDoTask task = EFContext.Tasks.Find(id);
         EFContext.Tasks.Remove(task);
 
@@ -310,10 +326,14 @@ public class TasksRepository : BaseRepository, ITasksRepository
         }
 
         await EFContext.SaveChangesAsync();
+
+        span.Finish();
     }
 
-    public async Task CompleteAsync(int id, int userId)
+    public async Task CompleteAsync(int id, int userId, ITransaction tr)
     {
+        var span = tr.StartChild($"{nameof(TasksRepository)}.{nameof(CompleteAsync)}");
+
         ToDoTask task = EFContext.Tasks.Find(id);
 
         if (task.PrivateToUserId.HasValue)
@@ -353,10 +373,14 @@ public class TasksRepository : BaseRepository, ITasksRepository
         task.ModifiedDate = DateTime.UtcNow;
 
         await EFContext.SaveChangesAsync();
+
+        span.Finish();
     }
 
-    public async Task UncompleteAsync(int id, int userId)
+    public async Task UncompleteAsync(int id, int userId, ITransaction tr)
     {
+        var span = tr.StartChild($"{nameof(TasksRepository)}.{nameof(UncompleteAsync)}");
+
         ToDoTask task = EFContext.Tasks.Find(id);
 
         short newOrder;
@@ -388,6 +412,8 @@ public class TasksRepository : BaseRepository, ITasksRepository
         task.ModifiedDate = DateTime.UtcNow;
 
         await EFContext.SaveChangesAsync();
+
+        span.Finish();
     }
 
     public async Task ReorderAsync(int id, int userId, short oldOrder, short newOrder, DateTime modifiedDate)

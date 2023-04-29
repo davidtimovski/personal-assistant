@@ -82,7 +82,7 @@ module Handlers =
                 let userId = getUserId ctx
                 let connectionString = getConnectionString ctx
 
-                let! (accountIds, categoryIds, transactionIds, upcomingExpenseIds, debtIds, automaticTransactionIds) =
+                let (accountIds, categoryIds, transactionIds, upcomingExpenseIds, debtIds, automaticTransactionIds) =
                     SyncRepository.sync
                         dto.Accounts
                         dto.Categories

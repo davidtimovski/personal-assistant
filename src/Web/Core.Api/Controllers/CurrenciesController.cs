@@ -1,6 +1,7 @@
 ﻿using Core.Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Sentry;
 
 namespace Core.Api.Controllers;
 
@@ -18,7 +19,14 @@ public class CurrenciesController : Controller
     [HttpGet("{date}")]
     public IActionResult GetAll(DateTime date)
     {
-        IDictionary<string, decimal> currencyRates = _currenciesRepository.GetAll(date);
+        var tr = SentrySdk.StartTransaction(
+            "GET /api/currencies/{date}",
+            $"{nameof(CurrenciesController)}.{nameof(GetAll)}"
+        );
+
+        IDictionary<string, decimal> currencyRates = _currenciesRepository.GetAll(date, tr);
+
+        tr.Finish();
 
         return Json(currencyRates);
     }

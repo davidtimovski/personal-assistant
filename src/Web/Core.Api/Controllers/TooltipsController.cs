@@ -2,6 +2,7 @@
 using Core.Application.Contracts.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Sentry;
 
 namespace Core.Api.Controllers;
 
@@ -22,7 +23,14 @@ public class TooltipsController : BaseController
     [HttpGet("application/{application}")]
     public IActionResult GetAll(string application)
     {
-        var tooltipDtos = _tooltipService.GetAll(application, UserId);
+        var tr = SentrySdk.StartTransaction(
+            "GET /api/tooltips/application/{application}",
+            $"{nameof(TooltipsController)}.{nameof(GetAll)}"
+        );
+
+        var tooltipDtos = _tooltipService.GetAll(application, UserId, tr);
+
+        tr.Finish();
 
         return Ok(tooltipDtos);
     }
@@ -30,7 +38,14 @@ public class TooltipsController : BaseController
     [HttpGet("key/{key}/{application}")]
     public IActionResult GetByKey(string key, string application)
     {
-        var tooltipDto = _tooltipService.GetByKey(UserId, key, application);
+        var tr = SentrySdk.StartTransaction(
+            "GET /api/tooltips/key/{key}/{application}",
+            $"{nameof(TooltipsController)}.{nameof(GetByKey)}"
+        );
+
+        var tooltipDto = _tooltipService.GetByKey(UserId, key, application, tr);
+
+        tr.Finish();
 
         return Ok(tooltipDto);
     }
@@ -43,7 +58,14 @@ public class TooltipsController : BaseController
             return BadRequest();
         }
 
-        await _tooltipService.ToggleDismissedAsync(UserId, dto.Key, dto.Application, dto.IsDismissed);
+        var tr = SentrySdk.StartTransaction(
+            "PUT /api/tooltips",
+            $"{nameof(TooltipsController)}.{nameof(ToggleDismissed)}"
+        );
+
+        await _tooltipService.ToggleDismissedAsync(UserId, dto.Key, dto.Application, dto.IsDismissed, tr);
+
+        tr.Finish();
 
         return NoContent();
     }

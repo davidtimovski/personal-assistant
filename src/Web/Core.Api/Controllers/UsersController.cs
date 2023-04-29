@@ -2,6 +2,7 @@
 using Core.Application.Contracts.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Sentry;
 
 namespace Core.Api.Controllers;
 
@@ -46,7 +47,14 @@ public class UsersController : BaseController
     [HttpGet("cooking-preferences")]
     public IActionResult GetCookingPreferences()
     {
-        CookingAssistantPreferences preferences = _userService.GetCookingAssistantPreferences(UserId);
+        var tr = SentrySdk.StartTransaction(
+            "GET /api/users/cooking-preferences",
+            $"{nameof(UsersController)}.{nameof(GetCookingPreferences)}"
+        );
+
+        CookingAssistantPreferences preferences = _userService.GetCookingAssistantPreferences(UserId, tr);
+
+        tr.Finish();
 
         return Ok(preferences);
     }
@@ -59,7 +67,14 @@ public class UsersController : BaseController
             return BadRequest();
         }
 
-        await _userService.UpdateToDoNotificationsEnabledAsync(UserId, dto.ToDoNotificationsEnabled);
+        var tr = SentrySdk.StartTransaction(
+            "PUT /api/users/to-do-notifications-enabled",
+            $"{nameof(UsersController)}.{nameof(UpdateToDoNotificationsEnabled)}"
+        );
+
+        await _userService.UpdateToDoNotificationsEnabledAsync(UserId, dto.ToDoNotificationsEnabled, tr);
+
+        tr.Finish();
 
         return NoContent();
     }
@@ -72,7 +87,14 @@ public class UsersController : BaseController
             return BadRequest();
         }
 
-        await _userService.UpdateCookingNotificationsEnabledAsync(UserId, dto.CookingNotificationsEnabled);
+        var tr = SentrySdk.StartTransaction(
+            "PUT /api/users/cooking-notifications-enabled",
+            $"{nameof(UsersController)}.{nameof(UpdateCookingNotificationsEnabled)}"
+        );
+
+        await _userService.UpdateCookingNotificationsEnabledAsync(UserId, dto.CookingNotificationsEnabled, tr);
+
+        tr.Finish();
 
         return NoContent();
     }
@@ -85,7 +107,14 @@ public class UsersController : BaseController
             return BadRequest();
         }
 
-        await _userService.UpdateImperialSystemAsync(UserId, dto.ImperialSystem);
+        var tr = SentrySdk.StartTransaction(
+           "PUT /api/users/imperial-system",
+            $"{nameof(UsersController)}.{nameof(UpdateImperialSystem)}"
+        );
+
+        await _userService.UpdateImperialSystemAsync(UserId, dto.ImperialSystem, tr);
+
+        tr.Finish();
 
         return NoContent();
     }

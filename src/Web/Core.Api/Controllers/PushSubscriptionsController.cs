@@ -1,6 +1,7 @@
 ﻿using Core.Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Sentry;
 
 namespace Core.Api.Controllers;
 
@@ -26,11 +27,19 @@ public class PushSubscriptionsController : BaseController
             return BadRequest();
         }
 
+        var tr = SentrySdk.StartTransaction(
+            "POST /api/pushsubscriptions",
+            $"{nameof(PushSubscriptionsController)}.{nameof(CreateSubscription)}"
+        );
+
         await _pushSubscriptionService.CreateSubscriptionAsync(UserId,
             dto.Application,
             dto.Subscription.Endpoint,
             dto.Subscription.Keys["auth"],
-            dto.Subscription.Keys["p256dh"]);
+            dto.Subscription.Keys["p256dh"],
+            tr);
+
+        tr.Finish();
 
         return StatusCode(201);
     }

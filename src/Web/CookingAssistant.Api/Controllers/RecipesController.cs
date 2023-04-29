@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using Application.Domain.Common;
 using CookingAssistant.Api.Models;
 using CookingAssistant.Api.Models.Recipes;
 using CookingAssistant.Application.Contracts.Ingredients;
@@ -12,6 +11,8 @@ using Infrastructure.Sender.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Sentry;
+using User = Application.Domain.Common.User;
 
 namespace CookingAssistant.Api.Controllers;
 
@@ -192,9 +193,16 @@ public class RecipesController : BaseController
             return BadRequest();
         }
 
+        var tr = SentrySdk.StartTransaction(
+            "POST /api/recipes",
+            $"{nameof(RecipesController)}.{nameof(Create)}"
+        );
+
         dto.UserId = UserId;
 
-        int id = await _recipeService.CreateAsync(dto, _createRecipeValidator);
+        int id = await _recipeService.CreateAsync(dto, _createRecipeValidator, tr);
+
+        tr.Finish();
 
         return StatusCode(201, id);
     }
@@ -202,6 +210,11 @@ public class RecipesController : BaseController
     [HttpPost("upload-temp-image")]
     public async Task<IActionResult> UploadTempImage(IFormFile image)
     {
+        var tr = SentrySdk.StartTransaction(
+            "POST /api/recipes/upload-temp-image",
+            $"{nameof(RecipesController)}.{nameof(UploadTempImage)}"
+        );
+
         try
         {
             var uploadModel = new UploadTempImage(
@@ -215,7 +228,7 @@ public class RecipesController : BaseController
             };
             await image.CopyToAsync(uploadModel.File);
 
-            string tempImageUri = await _cdnService.UploadTempAsync(uploadModel, _uploadTempImageValidator);
+            string tempImageUri = await _cdnService.UploadTempAsync(uploadModel, _uploadTempImageValidator, tr);
 
             return StatusCode(201, new { tempImageUri });
         }
@@ -223,6 +236,10 @@ public class RecipesController : BaseController
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(UploadTempImage)}");
             throw;
+        }
+        finally
+        {
+            tr.Finish();
         }
     }
 
@@ -234,9 +251,14 @@ public class RecipesController : BaseController
             return BadRequest();
         }
 
+        var tr = SentrySdk.StartTransaction(
+            "PUT /api/recipes",
+            $"{nameof(RecipesController)}.{nameof(Update)}"
+        );
+
         dto.UserId = UserId;
 
-        UpdateRecipeResult result = await _recipeService.UpdateAsync(dto, _updateRecipeValidator);
+        UpdateRecipeResult result = await _recipeService.UpdateAsync(dto, _updateRecipeValidator, tr);
 
         try
         {
@@ -260,6 +282,10 @@ public class RecipesController : BaseController
             _logger.LogError(ex, $"Unexpected error in {nameof(Update)}");
             throw;
         }
+        finally
+        {
+            tr.Finish();
+        }
 
         return NoContent();
     }
@@ -267,7 +293,12 @@ public class RecipesController : BaseController
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        DeleteRecipeResult result = await _recipeService.DeleteAsync(id, UserId);
+        var tr = SentrySdk.StartTransaction(
+            "DELETE /api/recipes",
+            $"{nameof(RecipesController)}.{nameof(Delete)}"
+        );
+
+        DeleteRecipeResult result = await _recipeService.DeleteAsync(id, UserId, tr);
 
         try
         {
@@ -290,6 +321,10 @@ public class RecipesController : BaseController
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(Delete)}");
             throw;
+        }
+        finally
+        {
+            tr.Finish();
         }
 
         return NoContent();
@@ -546,6 +581,11 @@ public class RecipesController : BaseController
             return BadRequest();
         }
 
+        var tr = SentrySdk.StartTransaction(
+            "POST /api/recipes/try-import",
+            $"{nameof(RecipesController)}.{nameof(TryImport)}"
+        );
+
         var importModel = new ImportRecipe
         {
             UserId = UserId
@@ -566,7 +606,8 @@ public class RecipesController : BaseController
             localTempPath: Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp"),
             imageUriToCopy: recipe.ImageUri,
             uploadPath: $"users/{importModel.UserId}/recipes",
-            template: "recipe"
+            template: "recipe",
+            tr: tr
         );
 
         int id = await _recipeService.ImportAsync(importModel, _importRecipeValidator);
@@ -593,6 +634,10 @@ public class RecipesController : BaseController
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(TryImport)}");
             throw;
+        }
+        finally
+        {
+            tr.Finish();
         }
 
         return StatusCode(201, id);
