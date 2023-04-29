@@ -21,8 +21,8 @@ public class TasksControllerTests
         _sut = new TasksController(
             _userIdLookupMock.Object, null, null,
             _taskServiceMock.Object,
-            null, null, null, null, null, null,
-            new Mock<IConfiguration>().Object, null)
+            null, null, null, null, null, null, null,
+            new Mock<IConfiguration>().Object)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };

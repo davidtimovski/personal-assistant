@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.FSharp.Core;
+using Sentry;
 using ToDoAssistant.Application.Contracts.Lists;
 using static Accountant.Persistence.Fs.AccountsRepository;
 
@@ -80,15 +81,22 @@ public class AccountController : BaseController
     [ActionName("reset-password")]
     public async Task<IActionResult> ResetPassword()
     {
+        var tr = SentrySdk.StartTransaction(
+            "GET /account/reset-password",
+            $"{nameof(AccountController)}.{nameof(ResetPassword)}"
+        );
+
         var viewModel = new ResetPasswordViewModel();
 
         if (User?.Identity.IsAuthenticated == true)
         {
-            using var httpClient = await InitializeAuth0ClientAsync();
+            using var httpClient = await InitializeAuth0ClientAsync(tr);
 
-            var user = await Auth0Proxy.GetUserAsync(httpClient, AuthId);
+            var user = await Auth0Proxy.GetUserAsync(httpClient, AuthId, tr);
             viewModel.Email = user.email;
         }
+
+        tr.Finish();
 
         return View(viewModel);
     }
@@ -104,11 +112,16 @@ public class AccountController : BaseController
             return View(model);
         }
 
+        var tr = SentrySdk.StartTransaction(
+            "POST /account/reset-password",
+            $"{nameof(AccountController)}.{nameof(ResetPassword)}"
+        );
+
         try
         {
-            using var httpClient = await InitializeAuth0ClientAsync();
+            using var httpClient = await InitializeAuth0ClientAsync(tr);
 
-            await Auth0Proxy.ResetPasswordAsync(httpClient, _configuration["Auth0:ClientId"], model.Email);
+            await Auth0Proxy.ResetPasswordAsync(httpClient, _configuration["Auth0:ClientId"], model.Email, tr);
         }
         catch (Exception ex)
         {
@@ -116,6 +129,10 @@ public class AccountController : BaseController
 
             ModelState.AddModelError(string.Empty, _localizer["AnErrorOccurred"]);
             return View(model);
+        }
+        finally
+        {
+            tr.Finish();
         }
 
         return RedirectToAction(nameof(HomeController.Overview), "Home", new { alert = OverviewAlert.PasswordResetEmailSent });
@@ -160,19 +177,24 @@ public class AccountController : BaseController
             return View(model);
         }
 
+        var tr = SentrySdk.StartTransaction(
+            "POST /account/register",
+            $"{nameof(AccountController)}.{nameof(Register)}"
+        );
+
         ViewData["ReturnUrl"] = returnUrl;
 
         try
         {
-            //using var httpClient = await InitializeAuth0ClientAsync();
+            using var httpClient = await InitializeAuth0ClientAsync(tr);
 
-            //var authId = await Auth0Proxy.RegisterUserAsync(httpClient, model.Email, model.Password, model.Name);
-            var userId = await _userService.CreateAsync("adawdawdada", model.Email, model.Name, model.Language, model.Culture, _cdnService.GetDefaultProfileImageUri());
+            var authId = await Auth0Proxy.RegisterUserAsync(httpClient, model.Email, model.Password, model.Name, tr);
+            var userId = await _userService.CreateAsync(authId, model.Email, model.Name, model.Language, model.Culture, _cdnService.GetDefaultProfileImageUri(), tr);
 
-            //await _cdnService.CreateFolderForUserAsync(userId);
+            await _cdnService.CreateFolderForUserAsync(userId, tr);
 
             await CreateRequiredDataAsync(userId);
-            // await CreateSamplesAsync(userId);
+            await CreateSamplesAsync(userId);
         }
         catch (PasswordTooWeakException)
         {
@@ -193,6 +215,10 @@ public class AccountController : BaseController
             ModelState.AddModelError(string.Empty, _localizer["AnErrorOccurred"]);
             return View(model);
         }
+        finally
+        {
+            tr.Finish();
+        }
 
         _ = _emailTemplateService.EnqueueNewRegistrationEmailAsync(model.Name.Trim(), model.Email.Trim());
 
@@ -206,6 +232,11 @@ public class AccountController : BaseController
     [ActionName("verify-recaptcha")]
     public async Task<IActionResult> VerifyReCaptcha(VerifyReCaptchaViewModel model)
     {
+        var tr = SentrySdk.StartTransaction(
+            "POST /account/verify-recaptcha",
+            $"{nameof(AccountController)}.{nameof(VerifyReCaptcha)}"
+        );
+
         using var content = new FormUrlEncodedContent(new[]
         {
             new KeyValuePair<string, string>("secret", _configuration["ReCaptchaSecret"]),
@@ -215,6 +246,8 @@ public class AccountController : BaseController
         using HttpClient httpClient = _httpClientFactory.CreateClient();
         var result = await httpClient.PostAsync(new Uri(_configuration["ReCaptchaVerificationUrl"]), content);
         var response = JsonSerializer.Deserialize<ReCaptchaResponse>(await result.Content.ReadAsStringAsync());
+
+        tr.Finish();
 
         return Ok(response.Score);
     }
@@ -230,20 +263,25 @@ public class AccountController : BaseController
     [ActionName("delete")]
     public async Task<IActionResult> DeleteAccount()
     {
+        var tr = SentrySdk.StartTransaction(
+            "POST /account/delete",
+            $"{nameof(AccountController)}.{nameof(DeleteAccount)}"
+        );
+
         try
         {
-            using var httpClient = await InitializeAuth0ClientAsync();
+            using var httpClient = await InitializeAuth0ClientAsync(tr);
 
-            await Auth0Proxy.DeleteUserAsync(httpClient, AuthId);
+            await Auth0Proxy.DeleteUserAsync(httpClient, AuthId, tr);
 
             // Delete resources
             var user = _userService.Get(UserId);
             var filePaths = new List<string> { user.ImageUri };
             IEnumerable<string> recipeUris = _recipeService.GetAllImageUris(user.Id);
             filePaths.AddRange(recipeUris);
-            await _cdnService.DeleteUserResourcesAsync(user.Id, filePaths);
+            await _cdnService.DeleteUserResourcesAsync(user.Id, filePaths, tr);
 
-            await _usersRepository.DeleteAsync(UserId);
+            await _usersRepository.DeleteAsync(UserId, tr);
 
             // Logout
             var authenticationProperties = new LogoutAuthenticationPropertiesBuilder().Build();
@@ -257,6 +295,10 @@ public class AccountController : BaseController
             ModelState.AddModelError(string.Empty, _localizer["AnErrorOccurred"]);
             return View("Delete");
         }
+        finally
+        {
+            tr.Finish();
+        }
 
         return RedirectToAction(nameof(HomeController.Index), "Home", new { alert = IndexAlert.AccountDeleted });
     }
@@ -265,9 +307,14 @@ public class AccountController : BaseController
     [ActionName("edit-profile")]
     public async Task<IActionResult> EditProfile()
     {
-        using var httpClient = await InitializeAuth0ClientAsync();
+        var tr = SentrySdk.StartTransaction(
+            "GET /account/edit-profile",
+            $"{nameof(AccountController)}.{nameof(EditProfile)}"
+        );
 
-        var authUser = await Auth0Proxy.GetUserAsync(httpClient, AuthId);
+        using var httpClient = await InitializeAuth0ClientAsync(tr);
+
+        var authUser = await Auth0Proxy.GetUserAsync(httpClient, AuthId, tr);
         var user = _userService.Get(UserId);
 
         var viewModel = new ViewProfileViewModel
@@ -279,6 +326,8 @@ public class AccountController : BaseController
             DefaultImageUri = _cdnService.GetDefaultProfileImageUri(),
             BaseUrl = _configuration["Urls:Account"]
         };
+
+        tr.Finish();
 
         return View(viewModel);
     }
@@ -301,20 +350,27 @@ public class AccountController : BaseController
             });
         }
 
+        var tr = SentrySdk.StartTransaction(
+            "POST /account/edit-profile",
+            $"{nameof(AccountController)}.{nameof(EditProfile)}"
+        );
+
         try
         {
-            using var httpClient = await InitializeAuth0ClientAsync();
+            using var httpClient = await InitializeAuth0ClientAsync(tr);
 
-            await Auth0Proxy.UpdateNameAsync(httpClient, AuthId, model.Name);
+            await Auth0Proxy.UpdateNameAsync(httpClient, AuthId, model.Name, tr);
 
             var imageUri = string.IsNullOrEmpty(model.ImageUri) ? null : model.ImageUri;
-            await _userService.UpdateProfileAsync(UserId, model.Name, model.Language, model.Culture, imageUri);
+            await _userService.UpdateProfileAsync(UserId, model.Name, model.Language, model.Culture, imageUri, tr);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Updating user profile failed for user: {model.Name}");
 
             ModelState.AddModelError(string.Empty, _localizer["AnErrorOccurred"]);
+
+            tr.Finish();
 
             return View(new ViewProfileViewModel
             {
@@ -337,17 +393,19 @@ public class AccountController : BaseController
             // and had a previous one, delete it
             if (oldImageUri != null)
             {
-                await _cdnService.DeleteAsync(oldImageUri);
+                await _cdnService.DeleteAsync(oldImageUri, tr);
             }
 
             // and has a new one, remove its temp tag
             if (user.ImageUri != null)
             {
-                await _cdnService.RemoveTempTagAsync(user.ImageUri);
+                await _cdnService.RemoveTempTagAsync(user.ImageUri, tr);
             }
         }
 
         SetLanguageCookie(model.Language);
+
+        tr.Finish();
 
         if (model.Language != user.Language)
         {
@@ -375,47 +433,57 @@ public class AccountController : BaseController
             return new UnprocessableEntityObjectResult(ModelState);
         }
 
-        if (image.Length > 0)
+        var tr = SentrySdk.StartTransaction(
+            "POST /account/upload-profile-image",
+            $"{nameof(AccountController)}.{nameof(UploadProfileImage)}"
+        );
+
+        if (image.Length == 0)
         {
-            try
-            {
-                string tempFolder = Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp");
-                if (!Directory.Exists(tempFolder))
-                {
-                    Directory.CreateDirectory(tempFolder);
-                }
-
-                string tempImagePath = Path.Combine(tempFolder, Guid.NewGuid() + extension);
-                using (var stream = new FileStream(tempImagePath, FileMode.Create))
-                {
-                    await image.CopyToAsync(stream);
-                }
-
-                string imageUri = await _cdnService.UploadProfileTempAsync(
-                    filePath: tempImagePath,
-                    uploadPath: $"users/{UserId}",
-                    template: "profile"
-                );
-
-                return StatusCode(201, new { imageUri });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, nameof(UploadProfileImage));
-                throw;
-            }
+            ModelState.AddModelError(string.Empty, _localizer["InvalidImage"]);
+            return new UnprocessableEntityObjectResult(ModelState);
         }
 
-        ModelState.AddModelError(string.Empty, _localizer["InvalidImage"]);
-        return new UnprocessableEntityObjectResult(ModelState);
+        string tempFolder = Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp");
+        if (!Directory.Exists(tempFolder))
+        {
+            Directory.CreateDirectory(tempFolder);
+        }
+
+        try
+        {
+            string tempImagePath = Path.Combine(tempFolder, Guid.NewGuid() + extension);
+            using (var stream = new FileStream(tempImagePath, FileMode.Create))
+            {
+                await image.CopyToAsync(stream);
+            }
+
+            string imageUri = await _cdnService.UploadProfileTempAsync(
+                filePath: tempImagePath,
+                uploadPath: $"users/{UserId}",
+                template: "profile",
+                tr: tr
+            );
+
+            return StatusCode(201, new { imageUri });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, nameof(UploadProfileImage));
+            throw;
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
-    private async Task<HttpClient> InitializeAuth0ClientAsync()
+    private async Task<HttpClient> InitializeAuth0ClientAsync(ITransaction tr)
     {
         var httpClient = _httpClientFactory.CreateClient();
 
         var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0:ClientSecret"]);
-        await Auth0Proxy.InitializeAsync(httpClient, config);
+        await Auth0Proxy.InitializeAsync(httpClient, config, tr);
 
         return httpClient;
     }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Localization;
+using Sentry;
 using ToDoAssistant.Api.Hubs;
 using ToDoAssistant.Application.Contracts.Notifications;
 using ToDoAssistant.Application.Contracts.Notifications.Models;
@@ -26,8 +27,8 @@ public class TasksController : BaseController
     private readonly IValidator<BulkCreate> _bulkCreateValidator;
     private readonly IValidator<UpdateTask> _updateValidator;
     private readonly IStringLocalizer<TasksController> _localizer;
-    private readonly string _url;
     private readonly ILogger<TasksController> _logger;
+    private readonly string _url;
 
     public TasksController(
         IUserIdLookup userIdLookup,
@@ -40,8 +41,8 @@ public class TasksController : BaseController
         IValidator<BulkCreate> bulkCreateValidator,
         IValidator<UpdateTask> updateValidator,
         IStringLocalizer<TasksController> localizer,
-        IConfiguration configuration,
-        ILogger<TasksController> logger) : base(userIdLookup, usersRepository)
+        ILogger<TasksController> logger,
+        IConfiguration configuration) : base(userIdLookup, usersRepository)
     {
         _listActionsHubContext = listActionsHubContext;
         _taskService = taskService;
@@ -51,8 +52,8 @@ public class TasksController : BaseController
         _bulkCreateValidator = bulkCreateValidator;
         _updateValidator = updateValidator;
         _localizer = localizer;
-        _url = configuration["Url"];
         _logger = logger;
+        _url = configuration["Url"];
     }
 
     [HttpGet("{id}")]
@@ -87,9 +88,14 @@ public class TasksController : BaseController
             return BadRequest();
         }
 
+        var tr = SentrySdk.StartTransaction(
+            "POST /api/tasks",
+            $"{nameof(TasksController)}.{nameof(Create)}"
+        );
+
         dto.UserId = UserId;
 
-        CreatedTaskResult result = await _taskService.CreateAsync(dto, _createValidator);
+        CreatedTaskResult result = await _taskService.CreateAsync(dto, _createValidator, tr);
 
         try
         {
@@ -121,6 +127,10 @@ public class TasksController : BaseController
             _logger.LogError(ex, $"Unexpected error in {nameof(Create)}");
             throw;
         }
+        finally
+        {
+            tr.Finish();
+        }
 
         return StatusCode(201, result.TaskId);
     }
@@ -133,9 +143,14 @@ public class TasksController : BaseController
             return BadRequest();
         }
 
+        var tr = SentrySdk.StartTransaction(
+            "POST /api/tasks/bulk",
+            $"{nameof(TasksController)}.{nameof(BulkCreate)}"
+        );
+
         dto.UserId = UserId;
 
-        BulkCreateResult result = await _taskService.BulkCreateAsync(dto, _bulkCreateValidator);
+        BulkCreateResult result = await _taskService.BulkCreateAsync(dto, _bulkCreateValidator, tr);
 
         try
         {
@@ -175,6 +190,10 @@ public class TasksController : BaseController
             _logger.LogError(ex, $"Unexpected error in {nameof(BulkCreate)}");
             throw;
         }
+        finally
+        {
+            tr.Finish();
+        }
 
         return StatusCode(201);
     }
@@ -187,9 +206,14 @@ public class TasksController : BaseController
             return BadRequest();
         }
 
+        var tr = SentrySdk.StartTransaction(
+            "PUT /api/tasks",
+            $"{nameof(TasksController)}.{nameof(Update)}"
+        );
+
         dto.UserId = UserId;
 
-        UpdateTaskResult result = await _taskService.UpdateAsync(dto, _updateValidator);
+        UpdateTaskResult result = await _taskService.UpdateAsync(dto, _updateValidator, tr);
 
         try
         {
@@ -280,6 +304,10 @@ public class TasksController : BaseController
             _logger.LogError(ex, $"Unexpected error in {nameof(Update)}");
             throw;
         }
+        finally
+        {
+            tr.Finish();
+        }
 
         return NoContent();
     }
@@ -287,10 +315,15 @@ public class TasksController : BaseController
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        DeleteTaskResult result = await _taskService.DeleteAsync(id, UserId);
+        var tr = SentrySdk.StartTransaction(
+            "DELETE /api/tasks/{id}",
+            $"{nameof(TasksController)}.{nameof(Delete)}"
+        );
 
         try
         {
+            DeleteTaskResult result = await _taskService.DeleteAsync(id, UserId, tr);
+
             if (result.NotifySignalR)
             {
                 await _listActionsHubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskDeleted", AuthId, id, result.ListId);
@@ -319,6 +352,10 @@ public class TasksController : BaseController
             _logger.LogError(ex, $"Unexpected error in {nameof(Delete)}");
             throw;
         }
+        finally
+        {
+            tr.Finish();
+        }
 
         return NoContent();
     }
@@ -331,12 +368,17 @@ public class TasksController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = UserId;
+        var tr = SentrySdk.StartTransaction(
+            "PUT /api/tasks/complete",
+            $"{nameof(TasksController)}.{nameof(Complete)}"
+        );
 
-        CompleteUncompleteTaskResult result = await _taskService.CompleteAsync(dto);
+        dto.UserId = UserId;
 
         try
         {
+            CompleteUncompleteTaskResult result = await _taskService.CompleteAsync(dto, tr);
+
             if (result.NotifySignalR)
             {
                 await _listActionsHubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskCompletedChanged", AuthId, dto.Id, result.ListId, true);
@@ -365,6 +407,10 @@ public class TasksController : BaseController
             _logger.LogError(ex, $"Unexpected error in {nameof(Complete)}");
             throw;
         }
+        finally
+        {
+            tr.Finish();
+        }
 
         return NoContent();
     }
@@ -377,12 +423,17 @@ public class TasksController : BaseController
             return BadRequest();
         }
 
-        dto.UserId = UserId;
+        var tr = SentrySdk.StartTransaction(
+            "PUT /api/tasks/uncomplete",
+            $"{nameof(TasksController)}.{nameof(Uncomplete)}"
+        );
 
-        CompleteUncompleteTaskResult result = await _taskService.UncompleteAsync(dto);
+        dto.UserId = UserId;
 
         try
         {
+            CompleteUncompleteTaskResult result = await _taskService.UncompleteAsync(dto, tr);
+
             if (result.NotifySignalR)
             {
                 await _listActionsHubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskCompletedChanged", AuthId, dto.Id, result.ListId, false);
@@ -410,6 +461,10 @@ public class TasksController : BaseController
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(Uncomplete)}");
             throw;
+        }
+        finally
+        {
+            tr.Finish();
         }
 
         return NoContent();

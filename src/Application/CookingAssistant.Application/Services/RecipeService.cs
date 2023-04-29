@@ -6,9 +6,11 @@ using CookingAssistant.Application.Contracts.Recipes;
 using CookingAssistant.Application.Contracts.Recipes.Models;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
+using Core.Application.Services;
 using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
+using Sentry;
 using Utility;
 
 namespace CookingAssistant.Application.Services;
@@ -404,9 +406,11 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public async Task<int> CreateAsync(CreateRecipe model, IValidator<CreateRecipe> validator)
+    public async Task<int> CreateAsync(CreateRecipe model, IValidator<CreateRecipe> validator, ITransaction tr)
     {
         ValidationUtil.ValidOrThrow(model, validator);
+
+        var span = tr.StartChild($"{nameof(RecipeService)}.{nameof(CreateAsync)}");
 
         try
         {
@@ -459,7 +463,7 @@ public class RecipeService : IRecipeService
 
             if (model.ImageUri != null)
             {
-                await _cdnService.RemoveTempTagAsync(model.ImageUri);
+                await _cdnService.RemoveTempTagAsync(model.ImageUri, tr);
             }
 
             return id;
@@ -468,6 +472,10 @@ public class RecipeService : IRecipeService
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(CreateAsync)}");
             throw;
+        }
+        finally
+        {
+            span.Finish();
         }
     }
 
@@ -527,9 +535,11 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public async Task<UpdateRecipeResult> UpdateAsync(UpdateRecipe model, IValidator<UpdateRecipe> validator)
+    public async Task<UpdateRecipeResult> UpdateAsync(UpdateRecipe model, IValidator<UpdateRecipe> validator, ITransaction tr)
     {
         ValidationUtil.ValidOrThrow(model, validator);
+
+        var span = tr.StartChild($"{nameof(RecipeService)}.{nameof(UpdateAsync)}");
 
         try
         {
@@ -590,13 +600,13 @@ public class RecipeService : IRecipeService
                 // and it previously had one, delete it
                 if (oldImageUri != null)
                 {
-                    await _cdnService.DeleteAsync(oldImageUri);
+                    await _cdnService.DeleteAsync(oldImageUri, tr);
                 }
 
                 // and a new one was set, remove its temp tag
                 if (model.ImageUri != null)
                 {
-                    await _cdnService.RemoveTempTagAsync(model.ImageUri);
+                    await _cdnService.RemoveTempTagAsync(model.ImageUri, tr);
                 }
             }
 
@@ -622,10 +632,16 @@ public class RecipeService : IRecipeService
             _logger.LogError(ex, $"Unexpected error in {nameof(UpdateAsync)}");
             throw;
         }
+        finally
+        {
+            span.Finish();
+        }
     }
 
-    public async Task<DeleteRecipeResult> DeleteAsync(int id, int userId)
+    public async Task<DeleteRecipeResult> DeleteAsync(int id, int userId, ITransaction tr)
     {
+        var span = tr.StartChild($"{nameof(RecipeService)}.{nameof(DeleteAsync)}");
+
         try
         {
             if (!_recipesRepository.UserOwns(id, userId))
@@ -639,7 +655,7 @@ public class RecipeService : IRecipeService
 
             if (imageUri != null)
             {
-                await _cdnService.DeleteAsync($"users/{userId}/recipes/{imageUri}");
+                await _cdnService.DeleteAsync($"users/{userId}/recipes/{imageUri}", tr);
             }
 
             var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeDeletion(id).ToList();
@@ -663,6 +679,10 @@ public class RecipeService : IRecipeService
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(DeleteAsync)}");
             throw;
+        }
+        finally
+        {
+            span.Finish();
         }
     }
 

@@ -2,6 +2,7 @@
 using System.Text.Json;
 using Core.Application.Contracts;
 using Dapper;
+using Sentry;
 
 namespace Core.Persistence.Repositories;
 
@@ -12,11 +13,16 @@ public class CurrenciesRepository : BaseRepository, ICurrenciesRepository
     public CurrenciesRepository(PersonalAssistantContext efContext)
         : base(efContext) { }
 
-    public IDictionary<string, decimal> GetAll(DateTime date)
+    public IDictionary<string, decimal> GetAll(DateTime date, ITransaction tr)
     {
-        using IDbConnection conn = OpenConnection();
+        var span = tr.StartChild($"{nameof(CurrenciesRepository)}.{nameof(GetAll)}");
 
-        return GetCurrencyRates(conn, date, 0);
+        using IDbConnection conn = OpenConnection();
+        var rates = GetCurrencyRates(conn, date, 0);
+
+        tr.Finish();
+
+        return rates;
     }
 
     public decimal Convert(decimal amount, string fromCurrency, string toCurrency, DateTime date)

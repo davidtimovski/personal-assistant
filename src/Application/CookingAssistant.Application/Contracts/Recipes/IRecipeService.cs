@@ -1,5 +1,6 @@
 ﻿using CookingAssistant.Application.Contracts.Recipes.Models;
 using FluentValidation;
+using Sentry;
 
 namespace CookingAssistant.Application.Contracts.Recipes;
 
@@ -26,10 +27,10 @@ public interface IRecipeService
     int Count(int userId);
     (bool canSend, bool alreadySent) CheckSendRequest(int recipeId, int sendToId, int userId);
     bool CheckIfUserCanBeNotifiedOfRecipeChange(int id, int userId);
-    Task<int> CreateAsync(CreateRecipe model, IValidator<CreateRecipe> validator);
+    Task<int> CreateAsync(CreateRecipe model, IValidator<CreateRecipe> validator, ITransaction tr);
     Task CreateSampleAsync(int userId, Dictionary<string, string> translations);
-    Task<UpdateRecipeResult> UpdateAsync(UpdateRecipe model, IValidator<UpdateRecipe> validator);
-    Task<DeleteRecipeResult> DeleteAsync(int id, int userId);
+    Task<UpdateRecipeResult> UpdateAsync(UpdateRecipe model, IValidator<UpdateRecipe> validator, ITransaction tr);
+    Task<DeleteRecipeResult> DeleteAsync(int id, int userId, ITransaction tr);
     Task ShareAsync(ShareRecipe model, IValidator<ShareRecipe> validator);
     Task<SetShareIsAcceptedResult> SetShareIsAcceptedAsync(int recipeId, int userId, bool isAccepted);
     Task<LeaveRecipeResult> LeaveAsync(int id, int userId);

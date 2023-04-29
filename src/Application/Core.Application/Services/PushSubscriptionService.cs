@@ -1,6 +1,7 @@
-﻿using Core.Application.Contracts;
-using Application.Domain.Common;
+﻿using Application.Domain.Common;
+using Core.Application.Contracts;
 using Microsoft.Extensions.Logging;
+using Sentry;
 
 namespace Core.Application.Services;
 
@@ -17,8 +18,10 @@ public class PushSubscriptionService : IPushSubscriptionService
         _logger = logger;
     }
 
-    public async Task CreateSubscriptionAsync(int userId, string application, string endpoint, string authKey, string p256dhKey)
+    public async Task CreateSubscriptionAsync(int userId, string application, string endpoint, string authKey, string p256dhKey, ITransaction tr)
     {
+        var span = tr.StartChild($"{nameof(PushSubscriptionService)}.{nameof(CreateSubscriptionAsync)}");
+
         var subscription = new PushSubscription
         {
             UserId = userId,
@@ -31,12 +34,16 @@ public class PushSubscriptionService : IPushSubscriptionService
 
         try
         {
-            await _pushSubscriptionsRepository.CreateSubscriptionAsync(subscription);
+            await _pushSubscriptionsRepository.CreateSubscriptionAsync(subscription, tr);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(CreateSubscriptionAsync)}");
             throw;
+        }
+        finally
+        {
+            span.Finish();
         }
     }
 }
