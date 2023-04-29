@@ -266,10 +266,8 @@ public class CloudinaryService : ICdnService
         span.Finish();
     }
 
-    public async Task DeleteTemporaryResourcesAsync(DateTime olderThan, ITransaction tr)
+    public async Task DeleteTemporaryResourcesAsync(DateTime olderThan)
     {
-        var span = tr.StartChild($"{nameof(CloudinaryService)}.{nameof(DeleteTemporaryResourcesAsync)}");
-
         var searchResult = Cloudinary.ListResourcesByTag("temp");
         if (!searchResult.Resources.Any())
         {
@@ -290,8 +288,6 @@ public class CloudinaryService : ICdnService
         {
             throw new Exception($"{nameof(CloudinaryService)}.{nameof(DeleteTemporaryResourcesAsync)}() returned error: {deleteResult.Error.Message}");
         }
-
-        span.Finish();
     }
 
     private bool IsDefaultImage(string uri)

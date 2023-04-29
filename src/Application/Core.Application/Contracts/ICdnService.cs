@@ -17,5 +17,5 @@ public interface ICdnService
     Task DeleteAsync(string imageUri, ITransaction tr);
     Task CreateFolderForUserAsync(int userId, ITransaction tr);
     Task DeleteUserResourcesAsync(int userId, IEnumerable<string> imageUris, ITransaction tr);
-    Task DeleteTemporaryResourcesAsync(DateTime olderThan, ITransaction tr);
+    Task DeleteTemporaryResourcesAsync(DateTime olderThan);
 }
