@@ -33,8 +33,15 @@ if (builder.Environment.IsProduction())
 
     builder.Host.ConfigureLogging((context, loggingBuilder) =>
     {
-        loggingBuilder.AddConfiguration(context.Configuration);
-        loggingBuilder.AddSentry();
+        loggingBuilder.AddSentry(options =>
+        {
+            options.Dsn = context.Configuration["Sentry:Dsn"];
+            options.SampleRate = 1;
+            options.TracesSampler = samplingCtx =>
+            {
+                return samplingCtx?.TransactionContext?.Name == "GET /health" ? 0 : 1;
+            };
+        });
     });
 }
 
