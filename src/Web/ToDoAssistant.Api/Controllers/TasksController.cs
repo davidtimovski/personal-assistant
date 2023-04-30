@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Localization;
-using Sentry;
 using ToDoAssistant.Api.Hubs;
 using ToDoAssistant.Application.Contracts.Notifications;
 using ToDoAssistant.Application.Contracts.Notifications.Models;
@@ -88,8 +87,8 @@ public class TasksController : BaseController
             return BadRequest();
         }
 
-        var tr = SentrySdk.StartTransaction(
-            "POST /api/tasks",
+        var tr = StartTransactionWithUser(
+            "POST api/tasks",
             $"{nameof(TasksController)}.{nameof(Create)}"
         );
 
@@ -143,8 +142,8 @@ public class TasksController : BaseController
             return BadRequest();
         }
 
-        var tr = SentrySdk.StartTransaction(
-            "POST /api/tasks/bulk",
+        var tr = StartTransactionWithUser(
+            "POST api/tasks/bulk",
             $"{nameof(TasksController)}.{nameof(BulkCreate)}"
         );
 
@@ -206,8 +205,8 @@ public class TasksController : BaseController
             return BadRequest();
         }
 
-        var tr = SentrySdk.StartTransaction(
-            "PUT /api/tasks",
+        var tr = StartTransactionWithUser(
+            "PUT api/tasks",
             $"{nameof(TasksController)}.{nameof(Update)}"
         );
 
@@ -315,8 +314,8 @@ public class TasksController : BaseController
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var tr = SentrySdk.StartTransaction(
-            "DELETE /api/tasks/{id}",
+        var tr = StartTransactionWithUser(
+            "DELETE api/tasks/{id}",
             $"{nameof(TasksController)}.{nameof(Delete)}"
         );
 
@@ -368,8 +367,8 @@ public class TasksController : BaseController
             return BadRequest();
         }
 
-        var tr = SentrySdk.StartTransaction(
-            "PUT /api/tasks/complete",
+        var tr = StartTransactionWithUser(
+            "PUT api/tasks/complete",
             $"{nameof(TasksController)}.{nameof(Complete)}"
         );
 
@@ -423,8 +422,8 @@ public class TasksController : BaseController
             return BadRequest();
         }
 
-        var tr = SentrySdk.StartTransaction(
-            "PUT /api/tasks/uncomplete",
+        var tr = StartTransactionWithUser(
+            "PUT api/tasks/uncomplete",
             $"{nameof(TasksController)}.{nameof(Uncomplete)}"
         );
 

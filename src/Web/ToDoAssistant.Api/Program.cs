@@ -1,7 +1,4 @@
 using System.Globalization;
-using Azure.Extensions.AspNetCore.Configuration.Secrets;
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
 using Cdn;
 using Core.Application;
 using Core.Infrastructure;
@@ -21,28 +18,10 @@ if (builder.Environment.IsProduction())
     string clientId = builder.Configuration["KeyVault:ClientId"];
     string clientSecret = builder.Configuration["KeyVault:ClientSecret"];
 
-    var tokenCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
-
-    builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
-    {
-        var secretClient = new SecretClient(keyVaultUri, tokenCredential);
-        configBuilder.AddAzureKeyVault(secretClient, new AzureKeyVaultConfigurationOptions());
-    });
-
+    builder.Host.AddKeyVault(keyVaultUri, tenantId, clientId, clientSecret);
     builder.Services.AddDataProtectionWithCertificate(keyVaultUri, tenantId, clientId, clientSecret);
 
-    builder.Host.ConfigureLogging((context, loggingBuilder) =>
-    {
-        loggingBuilder.AddSentry(options =>
-        {
-            options.Dsn = context.Configuration["Sentry:Dsn"];
-            options.SampleRate = 1;
-            options.TracesSampler = samplingCtx =>
-            {
-                return samplingCtx?.TransactionContext?.Name == "GET /health" ? 0 : 1;
-            };
-        });
-    });
+    builder.Host.AddSentryLogging(builder.Configuration["Sentry:Dsn"], new HashSet<string> { "GET /health", "GET /hub" });
 }
 
 builder.Services
