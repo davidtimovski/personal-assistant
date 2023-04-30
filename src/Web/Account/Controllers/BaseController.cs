@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Core.Application.Contracts;
 using Microsoft.AspNetCore.Mvc;
+using Sentry;
 
 namespace Account.Controllers;
 
@@ -56,5 +57,13 @@ public abstract class BaseController : Controller
 
             return User.FindFirst(ClaimTypes.NameIdentifier).Value;
         }
+    }
+
+    protected ITransaction StartTransactionWithUser(string name, string operation)
+    {
+        var tr = SentrySdk.StartTransaction(name, operation);
+        tr.User = new User { Id = UserId.ToString() };
+
+        return tr;
     }
 }

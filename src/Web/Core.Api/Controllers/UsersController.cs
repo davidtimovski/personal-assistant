@@ -2,7 +2,6 @@
 using Core.Application.Contracts.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Sentry;
 
 namespace Core.Api.Controllers;
 
@@ -47,8 +46,8 @@ public class UsersController : BaseController
     [HttpGet("cooking-preferences")]
     public IActionResult GetCookingPreferences()
     {
-        var tr = SentrySdk.StartTransaction(
-            "GET /api/users/cooking-preferences",
+        var tr = StartTransactionWithUser(
+            "GET api/users/cooking-preferences",
             $"{nameof(UsersController)}.{nameof(GetCookingPreferences)}"
         );
 
@@ -67,8 +66,8 @@ public class UsersController : BaseController
             return BadRequest();
         }
 
-        var tr = SentrySdk.StartTransaction(
-            "PUT /api/users/to-do-notifications-enabled",
+        var tr = StartTransactionWithUser(
+            "PUT api/users/to-do-notifications-enabled",
             $"{nameof(UsersController)}.{nameof(UpdateToDoNotificationsEnabled)}"
         );
 
@@ -87,8 +86,8 @@ public class UsersController : BaseController
             return BadRequest();
         }
 
-        var tr = SentrySdk.StartTransaction(
-            "PUT /api/users/cooking-notifications-enabled",
+        var tr = StartTransactionWithUser(
+            "PUT api/users/cooking-notifications-enabled",
             $"{nameof(UsersController)}.{nameof(UpdateCookingNotificationsEnabled)}"
         );
 
@@ -107,8 +106,8 @@ public class UsersController : BaseController
             return BadRequest();
         }
 
-        var tr = SentrySdk.StartTransaction(
-           "PUT /api/users/imperial-system",
+        var tr = StartTransactionWithUser(
+           "PUT api/users/imperial-system",
             $"{nameof(UsersController)}.{nameof(UpdateImperialSystem)}"
         );
 

@@ -13,14 +13,14 @@ public class CurrenciesRepository : BaseRepository, ICurrenciesRepository
     public CurrenciesRepository(PersonalAssistantContext efContext)
         : base(efContext) { }
 
-    public IDictionary<string, decimal> GetAll(DateTime date, ITransaction tr)
+    public IDictionary<string, decimal> GetAll(DateTime date, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(CurrenciesRepository)}.{nameof(GetAll)}");
+        var metric = metricsSpan.StartChild($"{nameof(CurrenciesRepository)}.{nameof(GetAll)}");
 
         using IDbConnection conn = OpenConnection();
         var rates = GetCurrencyRates(conn, date, 0);
 
-        tr.Finish();
+        metric.Finish();
 
         return rates;
     }

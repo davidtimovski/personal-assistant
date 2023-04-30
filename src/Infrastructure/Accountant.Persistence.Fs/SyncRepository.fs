@@ -3,6 +3,8 @@
 open Npgsql
 open ConnectionUtils
 open Models
+open Sentry
+type Transaction = Accountant.Persistence.Fs.Models.Transaction
 
 module SyncRepository =
 
@@ -15,7 +17,10 @@ module SyncRepository =
         (automaticTransactions: AutomaticTransaction list)
         (userId: int)
         connectionString
+        (metricsSpan: ISpan)
         =
+        let metric = metricsSpan.StartChild("SyncRepository.sync")
+
         use conn = new NpgsqlConnection(connectionString)
         conn.Open()
 
@@ -25,7 +30,7 @@ module SyncRepository =
             accounts
             |> List.map (fun account -> { account with UserId = userId } )
             |> List.map (fun account ->
-                AccountsRepository.create account (TransactionConnection(conn)) |> Async.AwaitTask
+                AccountsRepository.create account (TransactionConnection(conn)) metric |> Async.AwaitTask
             )
             |> Async.Sequential
             |> Async.RunSynchronously
@@ -34,7 +39,7 @@ module SyncRepository =
             categories
             |> List.map (fun account -> { account with UserId = userId } )
             |> List.map (fun category ->
-                CategoriesRepository.create category (TransactionConnection(conn)) |> Async.AwaitTask
+                CategoriesRepository.create category (TransactionConnection(conn)) metric |> Async.AwaitTask
             )
             |> Async.Sequential
             |> Async.RunSynchronously
@@ -42,7 +47,7 @@ module SyncRepository =
         let transactionIds =
             transactions
             |> List.map (fun transaction ->
-                TransactionsRepository.create transaction (TransactionConnection(conn)) (Some(tr)) |> Async.AwaitTask
+                TransactionsRepository.create transaction (TransactionConnection(conn)) (Some(tr)) metric |> Async.AwaitTask
             )
             |> Async.Sequential
             |> Async.RunSynchronously
@@ -51,7 +56,7 @@ module SyncRepository =
             upcomingExpenses
             |> List.map (fun account -> { account with UserId = userId } )
             |> List.map (fun upcomingExpense ->
-                UpcomingExpensesRepository.create upcomingExpense (TransactionConnection(conn)) |> Async.AwaitTask
+                UpcomingExpensesRepository.create upcomingExpense (TransactionConnection(conn)) metric |> Async.AwaitTask
             )
             |> Async.Sequential
             |> Async.RunSynchronously
@@ -60,7 +65,7 @@ module SyncRepository =
             debts
             |> List.map (fun account -> { account with UserId = userId } )
             |> List.map (fun debt ->
-                    DebtsRepository.create debt (TransactionConnection(conn)) |> Async.AwaitTask
+                    DebtsRepository.create debt (TransactionConnection(conn)) metric |> Async.AwaitTask
             )
             |> Async.Sequential
             |> Async.RunSynchronously
@@ -69,11 +74,13 @@ module SyncRepository =
             automaticTransactions
             |> List.map (fun account -> { account with UserId = userId } )
             |> List.map (fun automaticTransaction ->
-                    AutomaticTransactionsRepository.create automaticTransaction (TransactionConnection(conn)) |> Async.AwaitTask
+                    AutomaticTransactionsRepository.create automaticTransaction (TransactionConnection(conn)) metric |> Async.AwaitTask
             )
             |> Async.Sequential
             |> Async.RunSynchronously
 
         tr.Commit()
+
+        metric.Finish()
 
         (accountIds, categoryIds, transactionIds, upcomingExpenseIds, debtIds, automaticTransactionIds)

@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using Application.Domain.ToDoAssistant;
 using Core.Persistence;
-using Core.Persistence.Repositories;
 using Dapper;
 using Sentry;
 using ToDoAssistant.Application.Contracts.Tasks;
@@ -132,9 +131,9 @@ public class TasksRepository : BaseRepository, ITasksRepository
         return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM todo.tasks WHERE list_id = @ListId", new { ListId = listId });
     }
 
-    public async Task<int> CreateAsync(ToDoTask task, int userId, ITransaction tr)
+    public async Task<int> CreateAsync(ToDoTask task, int userId, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(TasksRepository)}.{nameof(CreateAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(TasksRepository)}.{nameof(CreateAsync)}");
 
         IQueryable<ToDoTask> otherTasks;
 
@@ -156,14 +155,14 @@ public class TasksRepository : BaseRepository, ITasksRepository
 
         await EFContext.SaveChangesAsync();
 
-        span.Finish();
+        metric.Finish();
 
         return task.Id;
     }
 
-    public async Task<IEnumerable<ToDoTask>> BulkCreateAsync(IEnumerable<ToDoTask> tasks, bool tasksArePrivate, int userId, ITransaction tr)
+    public async Task<IEnumerable<ToDoTask>> BulkCreateAsync(IEnumerable<ToDoTask> tasks, bool tasksArePrivate, int userId, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(TasksRepository)}.{nameof(BulkCreateAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(TasksRepository)}.{nameof(BulkCreateAsync)}");
 
         int listId = tasks.First().ListId;
         IQueryable<ToDoTask> otherTasks;
@@ -194,14 +193,14 @@ public class TasksRepository : BaseRepository, ITasksRepository
 
         await EFContext.SaveChangesAsync();
 
-        span.Finish();
+        metric.Finish();
 
         return tasks;
     }
 
-    public async Task UpdateAsync(ToDoTask task, int userId, ITransaction tr)
+    public async Task UpdateAsync(ToDoTask task, int userId, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(TasksRepository)}.{nameof(UpdateAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(TasksRepository)}.{nameof(UpdateAsync)}");
 
         var existingTask = Get(task.Id);
 
@@ -298,12 +297,12 @@ public class TasksRepository : BaseRepository, ITasksRepository
 
         await EFContext.SaveChangesAsync();
 
-        span.Finish();
+        metric.Finish();
     }
 
-    public async Task DeleteAsync(int id, int userId, ITransaction tr)
+    public async Task DeleteAsync(int id, int userId, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(TasksRepository)}.{nameof(DeleteAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(TasksRepository)}.{nameof(DeleteAsync)}");
 
         ToDoTask task = EFContext.Tasks.Find(id);
         EFContext.Tasks.Remove(task);
@@ -327,12 +326,12 @@ public class TasksRepository : BaseRepository, ITasksRepository
 
         await EFContext.SaveChangesAsync();
 
-        span.Finish();
+        metric.Finish();
     }
 
-    public async Task CompleteAsync(int id, int userId, ITransaction tr)
+    public async Task CompleteAsync(int id, int userId, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(TasksRepository)}.{nameof(CompleteAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(TasksRepository)}.{nameof(CompleteAsync)}");
 
         ToDoTask task = EFContext.Tasks.Find(id);
 
@@ -374,12 +373,12 @@ public class TasksRepository : BaseRepository, ITasksRepository
 
         await EFContext.SaveChangesAsync();
 
-        span.Finish();
+        metric.Finish();
     }
 
-    public async Task UncompleteAsync(int id, int userId, ITransaction tr)
+    public async Task UncompleteAsync(int id, int userId, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(TasksRepository)}.{nameof(UncompleteAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(TasksRepository)}.{nameof(UncompleteAsync)}");
 
         ToDoTask task = EFContext.Tasks.Find(id);
 
@@ -413,7 +412,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
 
         await EFContext.SaveChangesAsync();
 
-        span.Finish();
+        metric.Finish();
     }
 
     public async Task ReorderAsync(int id, int userId, short oldOrder, short newOrder, DateTime modifiedDate)

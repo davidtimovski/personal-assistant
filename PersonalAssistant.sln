@@ -71,7 +71,7 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Accountant.Api", "src\Web\A
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Weatherman.Api", "src\Web\Weatherman.Api\Weatherman.Api.fsproj", "{F599B2C5-CDA9-493D-8EF0-0721EB4602E4}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Api.Common", "src\Web\Api.Common\Api.Common.fsproj", "{1A479D65-90F9-4C19-8B0D-64D81D444BD8}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Api.Common.Fs", "src\Web\Api.Common.Fs\Api.Common.Fs.fsproj", "{1A479D65-90F9-4C19-8B0D-64D81D444BD8}"
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Trainer.Api", "src\Web\Trainer.Api\Trainer.Api.fsproj", "{1390E57F-BE1E-4EBA-97AD-C8DC12C45A0A}"
 EndProject
@@ -90,6 +90,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sender", "src\Infrastructure\Sender\Sender.csproj", "{C58752DA-E892-4ADD-8D10-A8D4877CA5B6}"
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Accountant.Persistence.Fs", "src\Infrastructure\Accountant.Persistence.Fs\Accountant.Persistence.Fs.fsproj", "{3C2A7161-871B-4864-B0DB-5A5D7A8D11B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api.Common", "src\Web\Api.Common\Api.Common.csproj", "{14700EED-1826-4AF7-8E84-41E4B5993338}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -213,6 +215,10 @@ Global
 		{3C2A7161-871B-4864-B0DB-5A5D7A8D11B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C2A7161-871B-4864-B0DB-5A5D7A8D11B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C2A7161-871B-4864-B0DB-5A5D7A8D11B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14700EED-1826-4AF7-8E84-41E4B5993338}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14700EED-1826-4AF7-8E84-41E4B5993338}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14700EED-1826-4AF7-8E84-41E4B5993338}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14700EED-1826-4AF7-8E84-41E4B5993338}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -250,6 +256,7 @@ Global
 		{D256B05C-51A4-43EE-BC76-59A0E21E00EF} = {48B5CF7D-25A9-46B3-90DE-EF67BB8636F9}
 		{C58752DA-E892-4ADD-8D10-A8D4877CA5B6} = {C277C7F8-AAE5-4002-8C0D-BB31436438FD}
 		{3C2A7161-871B-4864-B0DB-5A5D7A8D11B9} = {C277C7F8-AAE5-4002-8C0D-BB31436438FD}
+		{14700EED-1826-4AF7-8E84-41E4B5993338} = {572BEB9A-56A3-40D3-9D9E-84F9410A9316}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1296A1BD-7B9D-40F2-9873-972EB471C47D}

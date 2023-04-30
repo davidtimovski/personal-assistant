@@ -11,9 +11,9 @@ public class TooltipsRepository : BaseRepository, ITooltipsRepository
     public TooltipsRepository(PersonalAssistantContext efContext)
         : base(efContext) { }
 
-    public IEnumerable<Tooltip> GetAll(string application, int userId, ITransaction tr)
+    public IEnumerable<Tooltip> GetAll(string application, int userId, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(TooltipsRepository)}.{nameof(GetAll)}");
+        var metric = metricsSpan.StartChild($"{nameof(TooltipsRepository)}.{nameof(GetAll)}");
 
         using IDbConnection conn = OpenConnection();
 
@@ -23,14 +23,14 @@ public class TooltipsRepository : BaseRepository, ITooltipsRepository
                                      WHERE application = @Application",
             new { Application = application, UserId = userId });
 
-        span.Finish();
+        metric.Finish();
 
         return result;
     }
 
-    public Tooltip GetByKey(int userId, string key, string application, ITransaction tr)
+    public Tooltip GetByKey(int userId, string key, string application, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(TooltipsRepository)}.{nameof(GetByKey)}");
+        var metric = metricsSpan.StartChild($"{nameof(TooltipsRepository)}.{nameof(GetByKey)}");
 
         using IDbConnection conn = OpenConnection();
 
@@ -39,14 +39,14 @@ public class TooltipsRepository : BaseRepository, ITooltipsRepository
                                                    LEFT JOIN tooltips_dismissed AS td ON t.id = td.tooltip_id AND td.user_id = @UserId
                                                    WHERE t.key = @Key AND t.application = @Application", new { UserId = userId, Key = key, Application = application });
 
-        span.Finish();
+        metric.Finish();
 
         return result;
     }
 
-    public async Task ToggleDismissedAsync(int userId, string key, string application, bool isDismissed, ITransaction tr)
+    public async Task ToggleDismissedAsync(int userId, string key, string application, bool isDismissed, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(TooltipsRepository)}.{nameof(ToggleDismissedAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(TooltipsRepository)}.{nameof(ToggleDismissedAsync)}");
 
         using IDbConnection conn = OpenConnection();
 
@@ -69,6 +69,6 @@ public class TooltipsRepository : BaseRepository, ITooltipsRepository
 
         await EFContext.SaveChangesAsync();
 
-        span.Finish();
+        metric.Finish();
     }
 }

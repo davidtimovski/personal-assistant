@@ -6,9 +6,15 @@ open Weatherman.Application.Contracts.Forecasts
 open Weatherman.Application.Contracts.Forecasts.Models
 open Models
 open CommonHandlers
+open Sentry;
 
 let get: HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+        let tr = SentrySdk.StartTransaction(
+            "GET /api/forecasts",
+            "ForecastHandlers.get"
+        )
+
         let result = ctx.TryBindQueryString<GetForecastDto>()
 
         (match result with
@@ -27,7 +33,11 @@ let get: HttpHandler =
                  )
 
              task {
-                 let! forecast = service.GetAsync(parameters)
+                 let! forecast = service.GetAsync(parameters, tr)
 
-                 return! Successful.OK forecast next ctx
+                 let! result = Successful.OK forecast next ctx
+
+                 tr.Finish()
+
+                 return result
              }))

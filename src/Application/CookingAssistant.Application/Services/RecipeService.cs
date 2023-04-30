@@ -6,7 +6,6 @@ using CookingAssistant.Application.Contracts.Recipes;
 using CookingAssistant.Application.Contracts.Recipes.Models;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
-using Core.Application.Services;
 using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
@@ -406,11 +405,11 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public async Task<int> CreateAsync(CreateRecipe model, IValidator<CreateRecipe> validator, ITransaction tr)
+    public async Task<int> CreateAsync(CreateRecipe model, IValidator<CreateRecipe> validator, ISpan metricsSpan)
     {
         ValidationUtil.ValidOrThrow(model, validator);
 
-        var span = tr.StartChild($"{nameof(RecipeService)}.{nameof(CreateAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(CreateAsync)}");
 
         try
         {
@@ -463,7 +462,7 @@ public class RecipeService : IRecipeService
 
             if (model.ImageUri != null)
             {
-                await _cdnService.RemoveTempTagAsync(model.ImageUri, tr);
+                await _cdnService.RemoveTempTagAsync(model.ImageUri, metric);
             }
 
             return id;
@@ -475,7 +474,7 @@ public class RecipeService : IRecipeService
         }
         finally
         {
-            span.Finish();
+            metric.Finish();
         }
     }
 
@@ -535,11 +534,11 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public async Task<UpdateRecipeResult> UpdateAsync(UpdateRecipe model, IValidator<UpdateRecipe> validator, ITransaction tr)
+    public async Task<UpdateRecipeResult> UpdateAsync(UpdateRecipe model, IValidator<UpdateRecipe> validator, ISpan metricsSpan)
     {
         ValidationUtil.ValidOrThrow(model, validator);
 
-        var span = tr.StartChild($"{nameof(RecipeService)}.{nameof(UpdateAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(UpdateAsync)}");
 
         try
         {
@@ -600,13 +599,13 @@ public class RecipeService : IRecipeService
                 // and it previously had one, delete it
                 if (oldImageUri != null)
                 {
-                    await _cdnService.DeleteAsync(oldImageUri, tr);
+                    await _cdnService.DeleteAsync(oldImageUri, metric);
                 }
 
                 // and a new one was set, remove its temp tag
                 if (model.ImageUri != null)
                 {
-                    await _cdnService.RemoveTempTagAsync(model.ImageUri, tr);
+                    await _cdnService.RemoveTempTagAsync(model.ImageUri, metric);
                 }
             }
 
@@ -634,13 +633,13 @@ public class RecipeService : IRecipeService
         }
         finally
         {
-            span.Finish();
+            metric.Finish();
         }
     }
 
-    public async Task<DeleteRecipeResult> DeleteAsync(int id, int userId, ITransaction tr)
+    public async Task<DeleteRecipeResult> DeleteAsync(int id, int userId, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(RecipeService)}.{nameof(DeleteAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(DeleteAsync)}");
 
         try
         {
@@ -655,7 +654,7 @@ public class RecipeService : IRecipeService
 
             if (imageUri != null)
             {
-                await _cdnService.DeleteAsync($"users/{userId}/recipes/{imageUri}", tr);
+                await _cdnService.DeleteAsync($"users/{userId}/recipes/{imageUri}", metric);
             }
 
             var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeDeletion(id).ToList();
@@ -682,7 +681,7 @@ public class RecipeService : IRecipeService
         }
         finally
         {
-            span.Finish();
+            metric.Finish();
         }
     }
 

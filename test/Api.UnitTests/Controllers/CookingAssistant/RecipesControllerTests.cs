@@ -1,8 +1,8 @@
 ﻿using Api.UnitTests.Builders;
-using Core.Application.Contracts;
 using CookingAssistant.Api.Controllers;
 using CookingAssistant.Application.Contracts.Recipes;
 using CookingAssistant.Application.Contracts.Recipes.Models;
+using Core.Application.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Moq;
@@ -20,7 +20,7 @@ public class RecipesControllerTests
     {
         _sut = new RecipesController(_userIdLookupMock.Object, null, _recipeServiceMock.Object,
             null, null, null, null, null, null, null, null, null,
-            null, null, null, null, new Mock<IConfiguration>().Object, null)
+            null, null, null, null, null, new Mock<IConfiguration>().Object)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };

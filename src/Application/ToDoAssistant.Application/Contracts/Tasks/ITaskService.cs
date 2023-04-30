@@ -14,11 +14,11 @@ public interface ITaskService
     bool Exists(IEnumerable<string> names, int listId, int userId);
     bool Exists(int id, string name, int listId, int userId);
     int Count(int listId);
-    Task<CreatedTaskResult> CreateAsync(CreateTask model, IValidator<CreateTask> validator, ITransaction tr);
-    Task<BulkCreateResult> BulkCreateAsync(BulkCreate model, IValidator<BulkCreate> validator, ITransaction tr);
-    Task<UpdateTaskResult> UpdateAsync(UpdateTask model, IValidator<UpdateTask> validator, ITransaction tr);
-    Task<DeleteTaskResult> DeleteAsync(int id, int userId, ITransaction tr);
-    Task<CompleteUncompleteTaskResult> CompleteAsync(CompleteUncomplete model, ITransaction tr);
-    Task<CompleteUncompleteTaskResult> UncompleteAsync(CompleteUncomplete model, ITransaction tr);
-    Task<ReorderTaskResult> ReorderAsync(ReorderTask model);
+    Task<CreatedTaskResult> CreateAsync(CreateTask model, IValidator<CreateTask> validator, ISpan metricsSpan);
+    Task<BulkCreateResult> BulkCreateAsync(BulkCreate model, IValidator<BulkCreate> validator, ISpan metricsSpan);
+    Task<UpdateTaskResult> UpdateAsync(UpdateTask model, IValidator<UpdateTask> validator, ISpan metricsSpan);
+    Task<DeleteTaskResult> DeleteAsync(int id, int userId, ISpan metricsSpan);
+    Task<CompleteUncompleteTaskResult> CompleteAsync(CompleteUncomplete model, ISpan metricsSpan);
+    Task<CompleteUncompleteTaskResult> UncompleteAsync(CompleteUncomplete model, ISpan metricsSpan);
+    Task<ReorderTaskResult> ReorderAsync(ReorderTask model, ISpan metricsSpan);
 }

@@ -1,9 +1,10 @@
 ﻿using System.Data;
-using Application.Domain.Common;
 using Application.Domain.ToDoAssistant;
 using Core.Persistence;
 using Dapper;
+using Sentry;
 using ToDoAssistant.Application.Contracts.Notifications;
+using User = Application.Domain.Common.User;
 
 namespace ToDoAssistant.Persistence.Repositories;
 
@@ -48,16 +49,22 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
             new { UserId = userId });
     }
 
-    public async Task DeleteForUserAndListAsync(int userId, int listId)
+    public async Task DeleteForUserAndListAsync(int userId, int listId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(NotificationsRepository)}.{nameof(DeleteForUserAndListAsync)}");
+
         using IDbConnection conn = OpenConnection();
 
         await conn.ExecuteAsync(@"DELETE FROM todo.notifications WHERE user_id = @UserId AND list_id = @ListId",
             new { UserId = userId, ListId = listId });
+
+        metric.Finish();
     }
 
-    public async Task<int> CreateOrUpdateAsync(Notification notification)
+    public async Task<int> CreateOrUpdateAsync(Notification notification, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(NotificationsRepository)}.{nameof(CreateOrUpdateAsync)}");
+
         using IDbConnection conn = OpenConnection();
 
         var id = await conn.QueryFirstOrDefaultAsync<int?>(@"SELECT id
@@ -78,6 +85,8 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
         }
 
         await EFContext.SaveChangesAsync();
+
+        metric.Finish();
 
         return notification.Id;
     }

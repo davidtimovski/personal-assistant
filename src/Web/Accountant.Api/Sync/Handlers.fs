@@ -7,18 +7,28 @@ open Accountant.Persistence.Fs
 open Accountant.Api
 open CommonHandlers
 open Models
+open Sentry
+open Accountant.Api.HandlerBase
 
 module Handlers =
 
     let getChanges: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+            let tr =
+                startTransactionWithUser "POST /api/sync/changes" "Sync/Handlers.getChanges" ctx
+
             let connectionString = getConnectionString ctx
 
             task {
                 let! dto = ctx.BindJsonAsync<GetChangesDto>()
                 let userId = getUserId ctx
 
-                let! _ = UpcomingExpensesRepository.deleteOld userId UpcomingExpenses.Logic.getFirstDayOfMonth connectionString
+                let! _ =
+                    UpcomingExpensesRepository.deleteOld
+                        userId
+                        UpcomingExpenses.Logic.getFirstDayOfMonth
+                        connectionString
+                        tr
 
                 let! deletedAccountIds =
                     CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Account connectionString
@@ -44,14 +54,21 @@ module Handlers =
                 let! upcomingExpenses = UpcomingExpensesRepository.getAll userId dto.LastSynced connectionString
                 let upcomingExpenseDtos = upcomingExpenses |> UpcomingExpenses.Logic.mapAll
 
-                let! deletedDebtIds = CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Debt connectionString
+                let! deletedDebtIds =
+                    CommonRepository.getDeletedIds userId dto.LastSynced EntityType.Debt connectionString
+
                 let! debts = DebtsRepository.getAll userId dto.LastSynced connectionString
                 let debtDtos = debts |> Debts.Logic.mapAll
 
                 let! deletedAutomaticTransactionIds =
-                    CommonRepository.getDeletedIds userId dto.LastSynced EntityType.AutomaticTransaction connectionString
+                    CommonRepository.getDeletedIds
+                        userId
+                        dto.LastSynced
+                        EntityType.AutomaticTransaction
+                        connectionString
 
-                let! automaticTransactions = AutomaticTransactionsRepository.getAll userId dto.LastSynced connectionString
+                let! automaticTransactions =
+                    AutomaticTransactionsRepository.getAll userId dto.LastSynced connectionString
 
                 let automaticTransactionDtos =
                     automaticTransactions |> AutomaticTransactions.Logic.mapAll
@@ -71,11 +88,18 @@ module Handlers =
                       DeletedAutomaticTransactionIds = deletedAutomaticTransactionIds
                       AutomaticTransactions = automaticTransactionDtos }
 
-                return! Successful.OK changed next ctx
+                let! result = Successful.OK changed next ctx
+
+                tr.Finish()
+
+                return result
             })
 
     let createEntities: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+            let tr =
+                startTransactionWithUser "POST /api/sync/create-entities" "Sync/Handlers.createEntities" ctx
+
             task {
                 let! dto = ctx.BindJsonAsync<SyncEntities>()
 
@@ -92,6 +116,7 @@ module Handlers =
                         dto.AutomaticTransactions
                         userId
                         connectionString
+                        tr
 
                 let changedEntitiesDto =
                     { AccountIdPairs =
@@ -130,5 +155,9 @@ module Handlers =
                               { LocalId = dto.AutomaticTransactions[x].Id
                                 Id = automaticTransactionIds[x] }) }
 
-                return! Successful.OK changedEntitiesDto next ctx
+                let! result = Successful.OK changedEntitiesDto next ctx
+
+                tr.Finish()
+
+                return result
             })

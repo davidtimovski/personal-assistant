@@ -1,7 +1,7 @@
-using Core.Application.Contracts;
-using Dapper;
 using Application.Domain.Accountant;
 using Application.Domain.Common;
+using Core.Application.Contracts;
+using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

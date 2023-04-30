@@ -1,6 +1,6 @@
-﻿using Core.Application.Contracts;
+﻿using CloudinaryDotNet;
+using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
-using CloudinaryDotNet;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 

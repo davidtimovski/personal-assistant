@@ -1,6 +1,7 @@
-﻿using AutoMapper;
-using Application.Domain.ToDoAssistant;
+﻿using Application.Domain.ToDoAssistant;
+using AutoMapper;
 using Microsoft.Extensions.Logging;
+using Sentry;
 using ToDoAssistant.Application.Contracts.Notifications;
 using ToDoAssistant.Application.Contracts.Notifications.Models;
 
@@ -52,20 +53,26 @@ public class NotificationService : INotificationService
         }
     }
 
-    public Task<int> CreateOrUpdateAsync(CreateOrUpdateNotification model)
+    public Task<int> CreateOrUpdateAsync(CreateOrUpdateNotification model, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(NotificationService)}.{nameof(CreateOrUpdateAsync)}");
+
         try
         {
             var notification = _mapper.Map<Notification>(model);
 
             notification.CreatedDate = notification.ModifiedDate = DateTime.UtcNow;
 
-            return _notificationsRepository.CreateOrUpdateAsync(notification);
+            return _notificationsRepository.CreateOrUpdateAsync(notification, metric);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(CreateOrUpdateAsync)}");
             throw;
+        }
+        finally
+        {
+            metric.Finish();
         }
     }
 }

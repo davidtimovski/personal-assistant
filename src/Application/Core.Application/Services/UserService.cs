@@ -78,7 +78,7 @@ public class UserService : IUserService
         }
     }
 
-    public CookingAssistantPreferences GetCookingAssistantPreferences(int id, ITransaction tr)
+    public CookingAssistantPreferences GetCookingAssistantPreferences(int id, ISpan metricsSpan)
     {
         try
         {
@@ -92,9 +92,9 @@ public class UserService : IUserService
         }
     }
 
-    public async Task<int> CreateAsync(string auth0Id, string email, string name, string language, string culture, string imageUri, ITransaction tr)
+    public async Task<int> CreateAsync(string auth0Id, string email, string name, string language, string culture, string imageUri, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(UserService)}.{nameof(CreateAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(UserService)}.{nameof(CreateAsync)}");
 
         try
         {
@@ -111,7 +111,7 @@ public class UserService : IUserService
                 ModifiedDate = DateTime.UtcNow,
             };
 
-            return await _usersRepository.CreateAsync(auth0Id, user, tr);
+            return await _usersRepository.CreateAsync(auth0Id, user, metric);
         }
         catch (Exception ex)
         {
@@ -120,13 +120,13 @@ public class UserService : IUserService
         }
         finally
         {
-            span.Finish();
+            metric.Finish();
         }
     }
 
-    public async Task UpdateProfileAsync(int id, string name, string language, string culture, string imageUri, ITransaction tr)
+    public async Task UpdateProfileAsync(int id, string name, string language, string culture, string imageUri, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(UserService)}.{nameof(UpdateProfileAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(UserService)}.{nameof(UpdateProfileAsync)}");
 
         try
         {
@@ -137,7 +137,7 @@ public class UserService : IUserService
             user.ImageUri = imageUri;
             user.ModifiedDate = DateTime.UtcNow;
 
-            await _usersRepository.UpdateAsync(user, tr);
+            await _usersRepository.UpdateAsync(user, metric);
         }
         catch (Exception ex)
         {
@@ -146,13 +146,13 @@ public class UserService : IUserService
         }
         finally
         {
-            span.Finish();
+            metric.Finish();
         }
     }
 
-    public async Task UpdateToDoNotificationsEnabledAsync(int id, bool enabled, ITransaction tr)
+    public async Task UpdateToDoNotificationsEnabledAsync(int id, bool enabled, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(UserService)}.{nameof(UpdateToDoNotificationsEnabledAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(UserService)}.{nameof(UpdateToDoNotificationsEnabledAsync)}");
 
         try
         {
@@ -160,7 +160,7 @@ public class UserService : IUserService
             user.ToDoNotificationsEnabled = enabled;
             user.ModifiedDate = DateTime.UtcNow;
 
-            await _usersRepository.UpdateAsync(user, tr);
+            await _usersRepository.UpdateAsync(user, metric);
         }
         catch (Exception ex)
         {
@@ -169,13 +169,13 @@ public class UserService : IUserService
         }
         finally
         {
-            span.Finish();
+            metric.Finish();
         }
     }
 
-    public async Task UpdateCookingNotificationsEnabledAsync(int id, bool enabled, ITransaction tr)
+    public async Task UpdateCookingNotificationsEnabledAsync(int id, bool enabled, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(UserService)}.{nameof(UpdateCookingNotificationsEnabledAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(UserService)}.{nameof(UpdateCookingNotificationsEnabledAsync)}");
 
         try
         {
@@ -183,7 +183,7 @@ public class UserService : IUserService
             user.CookingNotificationsEnabled = enabled;
             user.ModifiedDate = DateTime.UtcNow;
 
-            await _usersRepository.UpdateAsync(user, tr);
+            await _usersRepository.UpdateAsync(user, metric);
         }
         catch (Exception ex)
         {
@@ -192,13 +192,13 @@ public class UserService : IUserService
         }
         finally
         {
-            span.Finish();
+            metric.Finish();
         }
     }
 
-    public async Task UpdateImperialSystemAsync(int id, bool imperialSystem, ITransaction tr)
+    public async Task UpdateImperialSystemAsync(int id, bool imperialSystem, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(UserService)}.{nameof(UpdateImperialSystemAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(UserService)}.{nameof(UpdateImperialSystemAsync)}");
 
         try
         {
@@ -206,7 +206,7 @@ public class UserService : IUserService
             user.ImperialSystem = imperialSystem;
             user.ModifiedDate = DateTime.UtcNow;
 
-            await _usersRepository.UpdateAsync(user, tr);
+            await _usersRepository.UpdateAsync(user, metric);
         }
         catch (Exception ex)
         {
@@ -215,7 +215,7 @@ public class UserService : IUserService
         }
         finally
         {
-            span.Finish();
+            metric.Finish();
         }
     }
 }

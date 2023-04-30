@@ -18,9 +18,9 @@ public class PushSubscriptionService : IPushSubscriptionService
         _logger = logger;
     }
 
-    public async Task CreateSubscriptionAsync(int userId, string application, string endpoint, string authKey, string p256dhKey, ITransaction tr)
+    public async Task CreateSubscriptionAsync(int userId, string application, string endpoint, string authKey, string p256dhKey, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(PushSubscriptionService)}.{nameof(CreateSubscriptionAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(PushSubscriptionService)}.{nameof(CreateSubscriptionAsync)}");
 
         var subscription = new PushSubscription
         {
@@ -34,7 +34,7 @@ public class PushSubscriptionService : IPushSubscriptionService
 
         try
         {
-            await _pushSubscriptionsRepository.CreateSubscriptionAsync(subscription, tr);
+            await _pushSubscriptionsRepository.CreateSubscriptionAsync(subscription, metric);
         }
         catch (Exception ex)
         {
@@ -43,7 +43,7 @@ public class PushSubscriptionService : IPushSubscriptionService
         }
         finally
         {
-            span.Finish();
+            metric.Finish();
         }
     }
 }

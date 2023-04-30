@@ -1,8 +1,8 @@
 ﻿using Api.UnitTests.Builders;
-using Core.Application.Contracts;
 using CookingAssistant.Api.Controllers;
 using CookingAssistant.Application.Contracts.Ingredients;
 using CookingAssistant.Application.Contracts.Ingredients.Models;
+using Core.Application.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;

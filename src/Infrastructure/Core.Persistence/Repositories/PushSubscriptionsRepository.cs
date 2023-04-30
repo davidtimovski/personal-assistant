@@ -9,13 +9,13 @@ public class PushSubscriptionsRepository : BaseRepository, IPushSubscriptionsRep
     public PushSubscriptionsRepository(PersonalAssistantContext efContext)
         : base(efContext) { }
 
-    public async Task CreateSubscriptionAsync(PushSubscription subscription, ITransaction tr)
+    public async Task CreateSubscriptionAsync(PushSubscription subscription, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(PushSubscriptionsRepository)}.{nameof(CreateSubscriptionAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(PushSubscriptionsRepository)}.{nameof(CreateSubscriptionAsync)}");
 
         EFContext.PushSubscriptions.Add(subscription);
         await EFContext.SaveChangesAsync();
 
-        span.Finish();
+        metric.Finish();
     }
 }

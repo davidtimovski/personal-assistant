@@ -3,6 +3,7 @@ using System.Web;
 using Application.Domain.Weatherman;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
+using Sentry;
 using Weatherman.Application.Contracts.Forecasts;
 using Weatherman.Application.Contracts.Forecasts.Models;
 using Weatherman.Infrastructure.Models;
@@ -40,9 +41,11 @@ public class ForecastService : IForecastService
         _logger = logger;
     }
 
-    public async Task<ForecastResult> GetAsync(GetForecast parameters)
+    public async Task<ForecastResult> GetAsync(GetForecast parameters, ISpan metricsSpan)
     {
         var now = DateTime.UtcNow;
+
+        var metric = metricsSpan.StartChild($"{nameof(ForecastService)}.{nameof(GetAsync)}");
 
         if (!_validTemperatureUnits.Contains(parameters.TemperatureUnit))
         {
@@ -64,10 +67,10 @@ public class ForecastService : IForecastService
             parameters.Latitude = (float)Math.Round(parameters.Latitude, 2);
             parameters.Longitude = (float)Math.Round(parameters.Longitude, 2);
 
-            var forecast = _forecastsRepository.Get(parameters);
+            var forecast = _forecastsRepository.Get(parameters, metric);
             if (forecast == null)
             {
-                string data = await GetFromProviderAsync(parameters);
+                string data = await GetFromProviderAsync(parameters, metric);
                 var openMeteoResult = JsonSerializer.Deserialize<OpenMeteoResult>(data);
                 ForecastResult result = Map(openMeteoResult, parameters);
 
@@ -82,18 +85,18 @@ public class ForecastService : IForecastService
                     Data = JsonSerializer.Serialize(result)
                 };
 
-                await _forecastsRepository.CreateAsync(forecast);
+                await _forecastsRepository.CreateAsync(forecast, metric);
 
                 return result;
             }
             else if (forecast.LastUpdate.Day != now.Day || forecast.LastUpdate < now.AddMinutes(-30))
             {
-                string data = await GetFromProviderAsync(parameters);
+                string data = await GetFromProviderAsync(parameters, metric);
                 var openMeteoResult = JsonSerializer.Deserialize<OpenMeteoResult>(data);
                 ForecastResult result = Map(openMeteoResult, parameters);
 
                 forecast.Data = JsonSerializer.Serialize(result);
-                await _forecastsRepository.UpdateAsync(forecast.Id, now, forecast.Data);
+                await _forecastsRepository.UpdateAsync(forecast.Id, now, forecast.Data, metric);
 
                 return result;
             }
@@ -112,7 +115,7 @@ public class ForecastService : IForecastService
                 cachedResult.Hourly.RemoveAt(0);
 
                 forecast.Data = JsonSerializer.Serialize(cachedResult);
-                await _forecastsRepository.UpdateAsync(forecast.Id, now, forecast.Data);
+                await _forecastsRepository.UpdateAsync(forecast.Id, now, forecast.Data, metric);
             }
 
             return cachedResult;
@@ -122,10 +125,16 @@ public class ForecastService : IForecastService
             _logger.LogError(ex, $"Unexpected error in {nameof(GetAsync)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    private async Task<string> GetFromProviderAsync(GetForecast parameters)
+    private async Task<string> GetFromProviderAsync(GetForecast parameters, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(ForecastService)}.{nameof(GetFromProviderAsync)}");
+
         var queryString = HttpUtility.ParseQueryString(string.Empty);
         queryString.Add("latitude", parameters.Latitude.ToString());
         queryString.Add("longitude", parameters.Longitude.ToString());
@@ -142,7 +151,11 @@ public class ForecastService : IForecastService
 
         response.EnsureSuccessStatusCode();
 
-        return await response.Content.ReadAsStringAsync();
+        var result = await response.Content.ReadAsStringAsync();
+
+        metric.Finish();
+
+        return result;
     }
 
     private static ForecastResult Map(OpenMeteoResult openMeteoResult, GetForecast parameters)

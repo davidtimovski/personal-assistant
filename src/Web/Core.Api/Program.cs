@@ -14,11 +14,7 @@ if (builder.Environment.IsProduction())
     builder.Host.AddKeyVault(keyVaultUri, tenantId, clientId, clientSecret);
     builder.Services.AddDataProtectionWithCertificate(keyVaultUri, tenantId, clientId, clientSecret);
 
-    builder.Host.ConfigureLogging((context, loggingBuilder) =>
-    {
-        loggingBuilder.AddConfiguration(context.Configuration);
-        loggingBuilder.AddSentry();
-    });
+    builder.Host.AddSentryLogging(builder.Configuration["Sentry:Dsn"], new HashSet<string> { "GET /health" });
 }
 
 builder.Services.AddApplication();

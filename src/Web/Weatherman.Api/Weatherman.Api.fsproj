@@ -29,7 +29,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Api.Common\Api.Common.fsproj" />
+		<ProjectReference Include="..\Api.Common.Fs\Api.Common.Fs.fsproj" />
 		<ProjectReference Include="..\..\Application\Weatherman.Application\Weatherman.Application.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Weatherman.Infrastructure\Weatherman.Infrastructure.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Weatherman.Persistence\Weatherman.Persistence.csproj" />

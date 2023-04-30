@@ -11,7 +11,6 @@ using Infrastructure.Sender.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using Sentry;
 using User = Application.Domain.Common.User;
 
 namespace CookingAssistant.Api.Controllers;
@@ -34,8 +33,8 @@ public class RecipesController : BaseController
     private readonly IValidator<CreateSendRequest> _createSendRequestValidator;
     private readonly IValidator<ImportRecipe> _importRecipeValidator;
     private readonly IValidator<UploadTempImage> _uploadTempImageValidator;
-    private readonly string _url;
     private readonly ILogger<RecipesController> _logger;
+    private readonly string _url;
 
     public RecipesController(
         IUserIdLookup userIdLookup,
@@ -54,8 +53,8 @@ public class RecipesController : BaseController
         IValidator<CreateSendRequest> createSendRequestValidator,
         IValidator<ImportRecipe> importRecipeValidator,
         IValidator<UploadTempImage> uploadTempImageValidator,
-        IConfiguration configuration,
-        ILogger<RecipesController> logger) : base(userIdLookup, usersRepository)
+        ILogger<RecipesController> logger,
+        IConfiguration configuration) : base(userIdLookup, usersRepository)
     {
         _recipeService = recipeService;
         _ingredientService = ingredientService;
@@ -71,8 +70,8 @@ public class RecipesController : BaseController
         _createSendRequestValidator = createSendRequestValidator;
         _importRecipeValidator = importRecipeValidator;
         _uploadTempImageValidator = uploadTempImageValidator;
-        _url = configuration["Url"];
         _logger = logger;
+        _url = configuration["Url"];
     }
 
     [HttpGet]
@@ -193,8 +192,8 @@ public class RecipesController : BaseController
             return BadRequest();
         }
 
-        var tr = SentrySdk.StartTransaction(
-            "POST /api/recipes",
+        var tr = StartTransactionWithUser(
+            "POST api/recipes",
             $"{nameof(RecipesController)}.{nameof(Create)}"
         );
 
@@ -210,8 +209,8 @@ public class RecipesController : BaseController
     [HttpPost("upload-temp-image")]
     public async Task<IActionResult> UploadTempImage(IFormFile image)
     {
-        var tr = SentrySdk.StartTransaction(
-            "POST /api/recipes/upload-temp-image",
+        var tr = StartTransactionWithUser(
+            "POST api/recipes/upload-temp-image",
             $"{nameof(RecipesController)}.{nameof(UploadTempImage)}"
         );
 
@@ -251,8 +250,8 @@ public class RecipesController : BaseController
             return BadRequest();
         }
 
-        var tr = SentrySdk.StartTransaction(
-            "PUT /api/recipes",
+        var tr = StartTransactionWithUser(
+            "PUT api/recipes",
             $"{nameof(RecipesController)}.{nameof(Update)}"
         );
 
@@ -293,8 +292,8 @@ public class RecipesController : BaseController
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var tr = SentrySdk.StartTransaction(
-            "DELETE /api/recipes",
+        var tr = StartTransactionWithUser(
+            "DELETE api/recipes",
             $"{nameof(RecipesController)}.{nameof(Delete)}"
         );
 
@@ -581,8 +580,8 @@ public class RecipesController : BaseController
             return BadRequest();
         }
 
-        var tr = SentrySdk.StartTransaction(
-            "POST /api/recipes/try-import",
+        var tr = StartTransactionWithUser(
+            "POST api/recipes/try-import",
             $"{nameof(RecipesController)}.{nameof(TryImport)}"
         );
 
@@ -607,7 +606,7 @@ public class RecipesController : BaseController
             imageUriToCopy: recipe.ImageUri,
             uploadPath: $"users/{importModel.UserId}/recipes",
             template: "recipe",
-            tr: tr
+            tr
         );
 
         int id = await _recipeService.ImportAsync(importModel, _importRecipeValidator);

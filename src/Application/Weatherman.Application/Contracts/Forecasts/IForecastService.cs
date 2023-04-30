@@ -1,8 +1,9 @@
-﻿using Weatherman.Application.Contracts.Forecasts.Models;
+﻿using Sentry;
+using Weatherman.Application.Contracts.Forecasts.Models;
 
 namespace Weatherman.Application.Contracts.Forecasts;
 
 public interface IForecastService
 {
-    Task<ForecastResult> GetAsync(GetForecast parameters);
+    Task<ForecastResult> GetAsync(GetForecast parameters, ISpan metricsSpan);
 }

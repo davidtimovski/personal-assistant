@@ -64,7 +64,14 @@ public class ListsController : BaseController
     [HttpGet]
     public IActionResult GetAll()
     {
-        IEnumerable<ListDto> lists = _listService.GetAll(UserId);
+        var tr = StartTransactionWithUser(
+            "GET api/lists",
+            $"{nameof(ListsController)}.{nameof(GetAll)}"
+        );
+
+        IEnumerable<ListDto> lists = _listService.GetAll(UserId, tr);
+
+        tr.Finish();
 
         return Ok(lists);
     }
@@ -72,7 +79,14 @@ public class ListsController : BaseController
     [HttpGet("options")]
     public IActionResult GetAllAsOptions()
     {
-        IEnumerable<ToDoListOption> options = _listService.GetAllAsOptions(UserId);
+        var tr = StartTransactionWithUser(
+            "GET api/lists/options",
+            $"{nameof(ListsController)}.{nameof(GetAllAsOptions)}"
+        );
+
+        IEnumerable<ToDoListOption> options = _listService.GetAllAsOptions(UserId, tr);
+
+        tr.Finish();
 
         return Ok(options);
     }
@@ -80,31 +94,44 @@ public class ListsController : BaseController
     [HttpGet("{id}")]
     public IActionResult Get(int id)
     {
-        EditListDto list = _listService.GetForEdit(id, UserId);
-        if (list == null)
-        {
-            return NotFound();
-        }
+        var tr = StartTransactionWithUser(
+            "GET api/lists/{id}",
+            $"{nameof(ListsController)}.{nameof(Get)}"
+        );
 
-        return Ok(list);
+        EditListDto list = _listService.GetForEdit(id, UserId, tr);
+
+        tr.Finish();
+
+        return list == null ? NotFound() : Ok(list);
     }
 
     [HttpGet("{id}/with-shares")]
     public IActionResult GetWithShares(int id)
     {
-        ListWithShares list = _listService.GetWithShares(id, UserId);
-        if (list == null)
-        {
-            return NotFound();
-        }
+        var tr = StartTransactionWithUser(
+            "GET api/lists/{id}/with-shares",
+            $"{nameof(ListsController)}.{nameof(GetWithShares)}"
+        );
 
-        return Ok(list);
+        ListWithShares list = _listService.GetWithShares(id, UserId, tr);
+
+        tr.Finish();
+
+        return list == null ? NotFound() : Ok(list);
     }
 
     [HttpGet("share-requests")]
     public IActionResult GetShareRequests()
     {
-        IEnumerable<ShareListRequest> shareRequests = _listService.GetShareRequests(UserId);
+        var tr = StartTransactionWithUser(
+            "GET api/lists/share-requests",
+            $"{nameof(ListsController)}.{nameof(GetShareRequests)}"
+        );
+
+        IEnumerable<ShareListRequest> shareRequests = _listService.GetShareRequests(UserId, tr);
+
+        tr.Finish();
 
         return Ok(shareRequests);
     }
@@ -128,7 +155,14 @@ public class ListsController : BaseController
     [HttpGet("{id}/members")]
     public IActionResult GetMembersAsAssigneeOptions(int id)
     {
-        var assigneeOptions = _listService.GetMembersAsAssigneeOptions(id, UserId);
+        var tr = StartTransactionWithUser(
+            "GET api/lists/{id}/members",
+            $"{nameof(ListsController)}.{nameof(GetMembersAsAssigneeOptions)}"
+        );
+
+        var assigneeOptions = _listService.GetMembersAsAssigneeOptions(id, UserId, tr);
+
+        tr.Finish();
 
         return Ok(assigneeOptions);
     }
@@ -141,9 +175,16 @@ public class ListsController : BaseController
             return BadRequest();
         }
 
+        var tr = StartTransactionWithUser(
+            "POST api/lists",
+            $"{nameof(ListsController)}.{nameof(Create)}"
+        );
+
         dto.UserId = UserId;
 
-        int id = await _listService.CreateAsync(dto, _createValidator);
+        int id = await _listService.CreateAsync(dto, _createValidator, tr);
+
+        tr.Finish();
 
         return StatusCode(201, id);
     }
@@ -156,9 +197,14 @@ public class ListsController : BaseController
             return BadRequest();
         }
 
+        var tr = StartTransactionWithUser(
+            "PUT api/lists",
+            $"{nameof(ListsController)}.{nameof(Update)}"
+        );
+
         dto.UserId = UserId;
 
-        UpdateListResult result = await _listService.UpdateAsync(dto, _updateValidator);
+        UpdateListResult result = await _listService.UpdateAsync(dto, _updateValidator, tr);
         if (!result.Notify())
         {
             return NoContent();
@@ -186,7 +232,7 @@ public class ListsController : BaseController
                 var message = _localizer[resourceKey, result.ActionUserName, result.OriginalListName];
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, dto.Id, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -203,6 +249,10 @@ public class ListsController : BaseController
             _logger.LogError(ex, $"Unexpected error in {nameof(Update)}");
             throw;
         }
+        finally
+        {
+            tr.Finish();
+        }
 
         return NoContent();
     }
@@ -215,9 +265,16 @@ public class ListsController : BaseController
             return BadRequest();
         }
 
+        var tr = StartTransactionWithUser(
+            "PUT api/lists/shared",
+            $"{nameof(ListsController)}.{nameof(UpdateShared)}"
+        );
+
         dto.UserId = UserId;
 
-        await _listService.UpdateSharedAsync(dto, _updateSharedValidator);
+        await _listService.UpdateSharedAsync(dto, _updateSharedValidator, tr);
+
+        tr.Finish();
 
         return NoContent();
     }
@@ -225,7 +282,12 @@ public class ListsController : BaseController
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        DeleteListResult result = await _listService.DeleteAsync(id, UserId);
+        var tr = StartTransactionWithUser(
+            "DELETE api/lists/{id}",
+            $"{nameof(ListsController)}.{nameof(Delete)}"
+        );
+
+        DeleteListResult result = await _listService.DeleteAsync(id, UserId, tr);
 
         try
         {
@@ -235,7 +297,7 @@ public class ListsController : BaseController
                 var message = _localizer["DeletedListNotification", result.ActionUserName, result.DeletedListName];
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, null, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -252,6 +314,10 @@ public class ListsController : BaseController
             _logger.LogError(ex, $"Unexpected error in {nameof(Delete)}");
             throw;
         }
+        finally
+        {
+            tr.Finish();
+        }
 
         return NoContent();
     }
@@ -259,6 +325,11 @@ public class ListsController : BaseController
     [HttpGet("can-share-with-user/{email}")]
     public IActionResult CanShareListWithUser(string email)
     {
+        var tr = StartTransactionWithUser(
+            "GET api/lists/can-share-with-user/{email}",
+            $"{nameof(ListsController)}.{nameof(CanShareListWithUser)}"
+        );
+
         var canShareVm = new CanShareVm
         {
             CanShare = false
@@ -273,6 +344,8 @@ public class ListsController : BaseController
             canShareVm.CanShare = _listService.CanShareWithUser(user.Id, UserId);
         }
 
+        tr.Finish();
+
         return Ok(canShareVm);
     }
 
@@ -284,13 +357,18 @@ public class ListsController : BaseController
             return BadRequest();
         }
 
+        var tr = StartTransactionWithUser(
+            "PUT api/lists/share",
+            $"{nameof(ListsController)}.{nameof(Share)}"
+        );
+
         dto.UserId = UserId;
 
         try
         {
             foreach (ShareUserAndPermission removedShare in dto.RemovedShares)
             {
-                if (!_listService.CheckIfUserCanBeNotifiedOfChange(dto.ListId, removedShare.UserId))
+                if (!_listService.CheckIfUserCanBeNotifiedOfChange(dto.ListId, removedShare.UserId, tr))
                 {
                     continue;
                 }
@@ -303,7 +381,7 @@ public class ListsController : BaseController
                 var message = _localizer["RemovedShareNotification", currentUser.Name, list.Name];
 
                 var createNotificationDto = new CreateOrUpdateNotification(user.Id, dto.UserId, null, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = currentUser.ImageUri,
@@ -314,14 +392,18 @@ public class ListsController : BaseController
 
                 _senderService.Enqueue(toDoAssistantPushNotification);
             }
+
+            await _listService.ShareAsync(dto, _shareValidator, tr);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(Share)}");
             throw;
         }
-
-        await _listService.ShareAsync(dto, _shareValidator);
+        finally
+        {
+            tr.Finish();
+        }
 
         return NoContent();
     }
@@ -329,7 +411,12 @@ public class ListsController : BaseController
     [HttpDelete("{id}/leave")]
     public async Task<IActionResult> Leave(int id)
     {
-        LeaveListResult result = await _listService.LeaveAsync(id, UserId);
+        var tr = StartTransactionWithUser(
+            "DELET api/lists/{id}/leave",
+            $"{nameof(ListsController)}.{nameof(Leave)}"
+        );
+
+        LeaveListResult result = await _listService.LeaveAsync(id, UserId, tr);
 
         try
         {
@@ -339,7 +426,7 @@ public class ListsController : BaseController
                 var message = _localizer["LeftListNotification", result.ActionUserName, result.ListName];
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, id, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -356,6 +443,10 @@ public class ListsController : BaseController
             _logger.LogError(ex, $"Unexpected error in {nameof(Leave)}");
             throw;
         }
+        finally
+        {
+            tr.Finish();
+        }
 
         return NoContent();
     }
@@ -368,9 +459,16 @@ public class ListsController : BaseController
             return BadRequest();
         }
 
+        var tr = StartTransactionWithUser(
+            "POST api/lists/copy",
+            $"{nameof(ListsController)}.{nameof(Copy)}"
+        );
+
         dto.UserId = UserId;
 
-        int id = await _listService.CopyAsync(dto, _copyValidator);
+        int id = await _listService.CopyAsync(dto, _copyValidator, tr);
+
+        tr.Finish();
 
         return StatusCode(201, id);
     }
@@ -383,7 +481,14 @@ public class ListsController : BaseController
             return BadRequest();
         }
 
-        await _listService.SetIsArchivedAsync(dto.ListId, UserId, dto.IsArchived);
+        var tr = StartTransactionWithUser(
+            "PUT api/lists/is-archived",
+            $"{nameof(ListsController)}.{nameof(SetIsArchived)}"
+        );
+
+        await _listService.SetIsArchivedAsync(dto.ListId, UserId, dto.IsArchived, tr);
+
+        tr.Finish();
 
         return NoContent();
     }
@@ -396,7 +501,12 @@ public class ListsController : BaseController
             return BadRequest();
         }
 
-        SetTasksAsNotCompletedResult result = await _listService.UncompleteAllAsync(dto.ListId, UserId);
+        var tr = StartTransactionWithUser(
+            "PUT api/lists/uncomplete-all",
+            $"{nameof(ListsController)}.{nameof(UncompleteAll)}"
+        );
+
+        SetTasksAsNotCompletedResult result = await _listService.UncompleteAllAsync(dto.ListId, UserId, tr);
 
         try
         {
@@ -406,7 +516,7 @@ public class ListsController : BaseController
                 var message = _localizer["UncompletedAllTasksNotification", result.ActionUserName, result.ListName];
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, dto.ListId, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -423,6 +533,10 @@ public class ListsController : BaseController
             _logger.LogError(ex, $"Unexpected error in {nameof(UncompleteAll)}");
             throw;
         }
+        finally
+        {
+            tr.Finish();
+        }
 
         return NoContent();
     }
@@ -435,7 +549,12 @@ public class ListsController : BaseController
             return BadRequest();
         }
 
-        SetShareIsAcceptedResult result = await _listService.SetShareIsAcceptedAsync(dto.ListId, UserId, dto.IsAccepted);
+        var tr = StartTransactionWithUser(
+            "PUT api/lists/share-is-accepted",
+            $"{nameof(ListsController)}.{nameof(SetShareIsAccepted)}"
+        );
+
+        SetShareIsAcceptedResult result = await _listService.SetShareIsAcceptedAsync(dto.ListId, UserId, dto.IsAccepted, tr);
         if (!result.Notify())
         {
             return NoContent();
@@ -450,7 +569,7 @@ public class ListsController : BaseController
                 var message = _localizer[localizerKey, result.ActionUserName, result.ListName];
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, dto.ListId, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -466,6 +585,10 @@ public class ListsController : BaseController
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(SetShareIsAccepted)}");
             throw;
+        }
+        finally
+        {
+            tr.Finish();
         }
 
         return NoContent();

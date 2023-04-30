@@ -23,13 +23,13 @@ public class TooltipService : ITooltipService
         _logger = logger;
     }
 
-    public IEnumerable<TooltipDto> GetAll(string application, int userId, ITransaction tr)
+    public IEnumerable<TooltipDto> GetAll(string application, int userId, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(TooltipService)}.{nameof(GetAll)}");
+        var metric = metricsSpan.StartChild($"{nameof(TooltipService)}.{nameof(GetAll)}");
 
         try
         {
-            var tooltips = _tooltipsRepository.GetAll(application, userId, tr);
+            var tooltips = _tooltipsRepository.GetAll(application, userId, metric);
 
             var tooltipDtos = tooltips.Select(x => _mapper.Map<TooltipDto>(x));
 
@@ -42,17 +42,17 @@ public class TooltipService : ITooltipService
         }
         finally
         {
-            span.Finish();
+            metric.Finish();
         }
     }
 
-    public TooltipDto GetByKey(int userId, string key, string application, ITransaction tr)
+    public TooltipDto GetByKey(int userId, string key, string application, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(TooltipService)}.{nameof(GetByKey)}");
+        var metric = metricsSpan.StartChild($"{nameof(TooltipService)}.{nameof(GetByKey)}");
 
         try
         {
-            Tooltip tooltip = _tooltipsRepository.GetByKey(userId, key, application, tr);
+            Tooltip tooltip = _tooltipsRepository.GetByKey(userId, key, application, metric);
             return _mapper.Map<TooltipDto>(tooltip);
         }
         catch (Exception ex)
@@ -62,17 +62,17 @@ public class TooltipService : ITooltipService
         }
         finally
         {
-            span.Finish();
+            metric.Finish();
         }
     }
 
-    public async Task ToggleDismissedAsync(int userId, string key, string application, bool isDismissed, ITransaction tr)
+    public async Task ToggleDismissedAsync(int userId, string key, string application, bool isDismissed, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(TooltipService)}.{nameof(ToggleDismissedAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(TooltipService)}.{nameof(ToggleDismissedAsync)}");
 
         try
         {
-            await _tooltipsRepository.ToggleDismissedAsync(userId, key, application, isDismissed, tr);
+            await _tooltipsRepository.ToggleDismissedAsync(userId, key, application, isDismissed, metric);
         }
         catch (Exception ex)
         {
@@ -81,7 +81,7 @@ public class TooltipService : ITooltipService
         }
         finally
         {
-            span.Finish();
+            metric.Finish();
         }
     }
 }

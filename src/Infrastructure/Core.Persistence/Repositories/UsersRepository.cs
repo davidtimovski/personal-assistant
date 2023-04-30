@@ -42,9 +42,9 @@ public class UsersRepository : BaseRepository, IUsersRepository
         return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM users WHERE email = @email", new { email });
     }
 
-    public async Task<int> CreateAsync(string auth0Id, User user, ITransaction tr)
+    public async Task<int> CreateAsync(string auth0Id, User user, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(UsersRepository)}.{nameof(CreateAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(UsersRepository)}.{nameof(CreateAsync)}");
 
         EFContext.Users.Add(user);
         await EFContext.SaveChangesAsync();
@@ -55,14 +55,14 @@ public class UsersRepository : BaseRepository, IUsersRepository
 
         var result = user.Id;
 
-        span.Finish();
+        metric.Finish();
 
         return result;
     }
 
-    public async Task UpdateAsync(User user, ITransaction tr)
+    public async Task UpdateAsync(User user, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(UsersRepository)}.{nameof(UpdateAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(UsersRepository)}.{nameof(UpdateAsync)}");
 
         User dbUser = EFContext.Users.Find(user.Id);
 
@@ -77,18 +77,18 @@ public class UsersRepository : BaseRepository, IUsersRepository
 
         await EFContext.SaveChangesAsync();
 
-        span.Finish();
+        metric.Finish();
     }
 
-    public async Task DeleteAsync(int id, ITransaction tr)
+    public async Task DeleteAsync(int id, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(UsersRepository)}.{nameof(DeleteAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(UsersRepository)}.{nameof(DeleteAsync)}");
 
         var person = EFContext.Users.Attach(new User { Id = id });
         person.State = EntityState.Deleted;
 
         await EFContext.SaveChangesAsync();
 
-        span.Finish();
+        metric.Finish();
     }
 }

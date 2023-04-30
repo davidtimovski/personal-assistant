@@ -1,6 +1,7 @@
 ﻿using Application.UnitTests.Builders;
 using FluentValidation;
 using Moq;
+using Sentry;
 using ToDoAssistant.Application.Contracts.Lists;
 using ToDoAssistant.Application.Contracts.Lists.Models;
 using ToDoAssistant.Application.Mappings;
@@ -13,11 +14,14 @@ public class UpdateSharedTests
 {
     private readonly Mock<IValidator<UpdateSharedList>> _successfulValidatorMock;
     private readonly Mock<IListsRepository> _listsRepositoryMock = new();
+    private readonly Mock<ISpan> _metricsSpanMock = new();
     private readonly IListService _sut;
 
     public UpdateSharedTests()
     {
         _successfulValidatorMock = ValidatorMocker.GetSuccessful<UpdateSharedList>();
+
+        _metricsSpanMock.Setup(x => x.StartChild(It.IsAny<string>())).Returns(new Mock<ISpan>().Object);
 
         _sut = new ListService(
             null,
@@ -33,7 +37,7 @@ public class UpdateSharedTests
     {
         UpdateSharedList model = new ListBuilder().BuildUpdateSharedModel();
 
-        await _sut.UpdateSharedAsync(model, _successfulValidatorMock.Object);
+        await _sut.UpdateSharedAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
 
         _successfulValidatorMock.Verify(x => x.Validate(model));
     }
@@ -44,6 +48,6 @@ public class UpdateSharedTests
         UpdateSharedList model = new ListBuilder().BuildUpdateSharedModel();
         var failedValidator = ValidatorMocker.GetFailed<UpdateSharedList>();
 
-        await Assert.ThrowsAsync<ValidationException>(() => _sut.UpdateSharedAsync(model, failedValidator.Object));
+        await Assert.ThrowsAsync<ValidationException>(() => _sut.UpdateSharedAsync(model, failedValidator.Object, _metricsSpanMock.Object));
     }
 }

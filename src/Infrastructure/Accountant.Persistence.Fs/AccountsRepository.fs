@@ -4,6 +4,7 @@ open System
 open Npgsql.FSharp
 open ConnectionUtils
 open Models
+open Sentry
 
 module AccountsRepository =
 
@@ -39,67 +40,99 @@ module AccountsRepository =
         |> Sql.parameters [ "id", Sql.int id; "user_id", Sql.int userId ]
         |> Sql.executeRow (fun read -> (read.int "count") > 0)
 
-    let create (account: Account) (conn: RegularOrTransactionalConn) =
-        ConnectionUtils.connect conn
-        |> Sql.query
-            $"INSERT INTO {table}
-                  (user_id, name, is_main, currency, stock_price, created_date, modified_date) VALUES 
-                  (@user_id, @name, @is_main, @currency, @stock_price, @created_date, @modified_date) RETURNING id"
-        |> Sql.parameters
-            [ "user_id", Sql.int account.UserId
-              "name", Sql.string account.Name
-              "is_main", Sql.bool account.IsMain
-              "currency", Sql.string account.Currency
-              "stock_price", Sql.decimalOrNone account.StockPrice
-              "created_date", Sql.timestamptz account.CreatedDate
-              "modified_date", Sql.timestamptz account.ModifiedDate ]
-        |> Sql.executeRowAsync (fun read -> read.int "id")
+    let create (account: Account) (conn: RegularOrTransactionalConn) (metricsSpan: ISpan) =
+        let metric = metricsSpan.StartChild("AccountsRepository.create")
+
+        task {
+            let! id =
+                ConnectionUtils.connect conn
+                |> Sql.query
+                    $"INSERT INTO {table}
+                          (user_id, name, is_main, currency, stock_price, created_date, modified_date) VALUES 
+                          (@user_id, @name, @is_main, @currency, @stock_price, @created_date, @modified_date) RETURNING id"
+                |> Sql.parameters
+                    [ "user_id", Sql.int account.UserId
+                      "name", Sql.string account.Name
+                      "is_main", Sql.bool account.IsMain
+                      "currency", Sql.string account.Currency
+                      "stock_price", Sql.decimalOrNone account.StockPrice
+                      "created_date", Sql.timestamptz account.CreatedDate
+                      "modified_date", Sql.timestamptz account.ModifiedDate ]
+                |> Sql.executeRowAsync (fun read -> read.int "id")
+
+            metric.Finish()
+
+            return id
+        }
 
     // TODO: Only for Account project
-    let createMain (account: Account) connectionString =
-        connectionString
-        |> Sql.connect
-        |> Sql.query
-            $"INSERT INTO {table}
-                  (user_id, name, is_main, currency, stock_price, created_date, modified_date) VALUES 
-                  (@user_id, @name, @is_main, @currency, @stock_price, @created_date, @modified_date) RETURNING id"
-        |> Sql.parameters
-            [ "user_id", Sql.int account.UserId
-              "name", Sql.string account.Name
-              "is_main", Sql.bool account.IsMain
-              "currency", Sql.string account.Currency
-              "stock_price", Sql.decimalOrNone account.StockPrice
-              "created_date", Sql.timestamptz account.CreatedDate
-              "modified_date", Sql.timestamptz account.ModifiedDate ]
-        |> Sql.executeRowAsync (fun read -> read.int "id")
+    let createMain (account: Account) connectionString (metricsSpan: ISpan) =
+        let metric = metricsSpan.StartChild("AccountsRepository.createMain")
 
-    let update (account: Account) connectionString =
-        connectionString
-        |> Sql.connect
-        |> Sql.query
-            $"UPDATE {table}
-              SET name = @name, currency = @currency, stock_price = @stock_price, modified_date = @modified_date
-              WHERE id = @id AND user_id = @user_id"
-        |> Sql.parameters
-            [ "id", Sql.int account.Id
-              "user_id", Sql.int account.UserId
-              "name", Sql.string account.Name
-              "currency", Sql.string account.Currency
-              "stock_price", Sql.decimalOrNone account.StockPrice
-              "modified_date", Sql.timestamptz account.ModifiedDate ]
-        |> Sql.executeNonQueryAsync
+        task {
+            let! id =
+                connectionString
+                |> Sql.connect
+                |> Sql.query
+                    $"INSERT INTO {table}
+                          (user_id, name, is_main, currency, stock_price, created_date, modified_date) VALUES 
+                          (@user_id, @name, @is_main, @currency, @stock_price, @created_date, @modified_date) RETURNING id"
+                |> Sql.parameters
+                    [ "user_id", Sql.int account.UserId
+                      "name", Sql.string account.Name
+                      "is_main", Sql.bool account.IsMain
+                      "currency", Sql.string account.Currency
+                      "stock_price", Sql.decimalOrNone account.StockPrice
+                      "created_date", Sql.timestamptz account.CreatedDate
+                      "modified_date", Sql.timestamptz account.ModifiedDate ]
+                |> Sql.executeRowAsync (fun read -> read.int "id")
 
-    let delete (id: int) (userId: int) connectionString =
-        connectionString
-        |> Sql.connect
-        |> Sql.executeTransactionAsync
-            [ "INSERT INTO accountant.deleted_entities
-                    (user_id, entity_type, entity_id, deleted_date) VALUES
-                    (@user_id, @entity_type, @entity_id, @deleted_date)",
-              [ [ "user_id", Sql.int userId
-                  "entity_type", Sql.int (LanguagePrimitives.EnumToValue EntityType.Account)
-                  "entity_id", Sql.int id
-                  "deleted_date", Sql.timestamptz DateTime.UtcNow ] ]
+            metric.Finish()
 
-              $"DELETE FROM {table} WHERE id = @id AND user_id = @user_id",
-              [ [ "id", Sql.int id; "user_id", Sql.int userId ] ] ]
+            return id
+        }
+
+    let update (account: Account) connectionString (metricsSpan: ISpan) =
+        let metric = metricsSpan.StartChild("AccountsRepository.update")
+
+        task {
+            let! _ =
+                connectionString
+                |> Sql.connect
+                |> Sql.query
+                    $"UPDATE {table}
+                      SET name = @name, currency = @currency, stock_price = @stock_price, modified_date = @modified_date
+                      WHERE id = @id AND user_id = @user_id"
+                |> Sql.parameters
+                    [ "id", Sql.int account.Id
+                      "user_id", Sql.int account.UserId
+                      "name", Sql.string account.Name
+                      "currency", Sql.string account.Currency
+                      "stock_price", Sql.decimalOrNone account.StockPrice
+                      "modified_date", Sql.timestamptz account.ModifiedDate ]
+                |> Sql.executeNonQueryAsync
+
+            metric.Finish()
+        }
+
+    let delete (id: int) (userId: int) connectionString (metricsSpan: ISpan) =
+        let metric = metricsSpan.StartChild("AccountsRepository.delete")
+
+        task {
+            let! _ =
+                connectionString
+                |> Sql.connect
+                |> Sql.executeTransactionAsync
+                    [ "INSERT INTO accountant.deleted_entities
+                            (user_id, entity_type, entity_id, deleted_date) VALUES
+                            (@user_id, @entity_type, @entity_id, @deleted_date)",
+                      [ [ "user_id", Sql.int userId
+                          "entity_type", Sql.int (LanguagePrimitives.EnumToValue EntityType.Account)
+                          "entity_id", Sql.int id
+                          "deleted_date", Sql.timestamptz DateTime.UtcNow ] ]
+
+                      $"DELETE FROM {table} WHERE id = @id AND user_id = @user_id",
+                      [ [ "id", Sql.int id; "user_id", Sql.int userId ] ] ]
+
+            metric.Finish()
+        }

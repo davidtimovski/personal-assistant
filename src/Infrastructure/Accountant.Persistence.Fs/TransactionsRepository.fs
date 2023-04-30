@@ -5,6 +5,9 @@ open Npgsql.FSharp
 open ConnectionUtils
 open Models
 open Npgsql
+open Sentry
+
+type TransactionModel = Accountant.Persistence.Fs.Models.Transaction
 
 module TransactionsRepository =
 
@@ -52,7 +55,14 @@ module TransactionsRepository =
         |> Sql.parameters [ "id", Sql.int id; "user_id", Sql.int userId ]
         |> Sql.executeRow (fun read -> read.bool "exists")
 
-    let create (transaction: Transaction) (conn: RegularOrTransactionalConn) (tran: NpgsqlTransaction Option) =
+    let create
+        (transaction: TransactionModel)
+        (conn: RegularOrTransactionalConn)
+        (tran: NpgsqlTransaction Option)
+        (metricsSpan: ISpan)
+        =
+        let metric = metricsSpan.StartChild("TransactionsRepository.create")
+
         let npgsqlConn =
             match conn with
             | ConnectionString cs ->
@@ -166,50 +176,66 @@ module TransactionsRepository =
                 tr.Dispose()
                 npgsqlConn.Dispose()
 
+            metric.Finish()
+
             return id
         }
 
-    let update (transaction: Transaction) connectionString =
-        connectionString
-        |> Sql.connect
-        |> Sql.query
-            $"UPDATE {table}
-              SET from_account_id = @from_account_id, to_account_id = @to_account_id, category_id = @category_id, amount = @amount, from_stocks = @from_stocks,
-                  to_stocks = @to_stocks, currency = @currency, description = @description, date = @date, is_encrypted = @is_encrypted,
-                  encrypted_description = @encrypted_description, salt = @salt, nonce = @nonce, modified_date = @modified_date
-              WHERE id = @id"
-        |> Sql.parameters
-            [ "id", Sql.int transaction.Id
-              "from_account_id", Sql.intOrNone transaction.FromAccountId
-              "to_account_id", Sql.intOrNone transaction.ToAccountId
-              "category_id", Sql.intOrNone transaction.CategoryId
-              "amount", Sql.decimal transaction.Amount
-              "from_stocks", Sql.decimalOrNone transaction.FromStocks
-              "to_stocks", Sql.decimalOrNone transaction.ToStocks
-              "currency", Sql.string transaction.Currency
-              "description", Sql.stringOrNone transaction.Description
-              "date", Sql.date (transaction.Date.ToUniversalTime())
-              "is_encrypted", Sql.bool transaction.IsEncrypted
-              "encrypted_description", Sql.byteaOrNone transaction.EncryptedDescription
-              "salt", Sql.byteaOrNone transaction.Salt
-              "nonce", Sql.byteaOrNone transaction.Nonce
-              "modified_date", Sql.timestamptz transaction.ModifiedDate ]
-        |> Sql.executeNonQueryAsync
+    let update (transaction: TransactionModel) connectionString (metricsSpan: ISpan) =
+        let metric = metricsSpan.StartChild("TransactionsRepository.update")
 
-    let delete (id: int) (userId: int) connectionString =
-        connectionString
-        |> Sql.connect
-        |> Sql.executeTransactionAsync
-            [ "INSERT INTO accountant.deleted_entities
-                    (user_id, entity_type, entity_id, deleted_date) VALUES
-                    (@user_id, @entity_type, @entity_id, @deleted_date)",
-              [ [ "user_id", Sql.int userId
-                  "entity_type", Sql.int (LanguagePrimitives.EnumToValue EntityType.Transaction)
-                  "entity_id", Sql.int id
-                  "deleted_date", Sql.timestamptz DateTime.UtcNow ] ]
+        task {
+            let! _ =
+                connectionString
+                |> Sql.connect
+                |> Sql.query
+                    $"UPDATE {table}
+                      SET from_account_id = @from_account_id, to_account_id = @to_account_id, category_id = @category_id, amount = @amount, from_stocks = @from_stocks,
+                          to_stocks = @to_stocks, currency = @currency, description = @description, date = @date, is_encrypted = @is_encrypted,
+                          encrypted_description = @encrypted_description, salt = @salt, nonce = @nonce, modified_date = @modified_date
+                      WHERE id = @id"
+                |> Sql.parameters
+                    [ "id", Sql.int transaction.Id
+                      "from_account_id", Sql.intOrNone transaction.FromAccountId
+                      "to_account_id", Sql.intOrNone transaction.ToAccountId
+                      "category_id", Sql.intOrNone transaction.CategoryId
+                      "amount", Sql.decimal transaction.Amount
+                      "from_stocks", Sql.decimalOrNone transaction.FromStocks
+                      "to_stocks", Sql.decimalOrNone transaction.ToStocks
+                      "currency", Sql.string transaction.Currency
+                      "description", Sql.stringOrNone transaction.Description
+                      "date", Sql.date (transaction.Date.ToUniversalTime())
+                      "is_encrypted", Sql.bool transaction.IsEncrypted
+                      "encrypted_description", Sql.byteaOrNone transaction.EncryptedDescription
+                      "salt", Sql.byteaOrNone transaction.Salt
+                      "nonce", Sql.byteaOrNone transaction.Nonce
+                      "modified_date", Sql.timestamptz transaction.ModifiedDate ]
+                |> Sql.executeNonQueryAsync
 
-              $"DELETE FROM accountant.transactions t
-                    USING accountant.accounts a
-                WHERE t.id = @id AND 
-                    ((t.from_account_id = a.id AND a.user_id = @user_id) OR (t.to_account_id = a.id AND a.user_id = @user_id))",
-              [ [ "id", Sql.int id; "user_id", Sql.int userId ] ] ]
+            metric.Finish()
+        }
+
+    let delete (id: int) (userId: int) connectionString (metricsSpan: ISpan) =
+        let metric = metricsSpan.StartChild("TransactionsRepository.delete")
+
+        task {
+            let! _ =
+                connectionString
+                |> Sql.connect
+                |> Sql.executeTransactionAsync
+                    [ "INSERT INTO accountant.deleted_entities
+                            (user_id, entity_type, entity_id, deleted_date) VALUES
+                            (@user_id, @entity_type, @entity_id, @deleted_date)",
+                      [ [ "user_id", Sql.int userId
+                          "entity_type", Sql.int (LanguagePrimitives.EnumToValue EntityType.Transaction)
+                          "entity_id", Sql.int id
+                          "deleted_date", Sql.timestamptz DateTime.UtcNow ] ]
+
+                      $"DELETE FROM {table} t
+                            USING accountant.accounts a
+                        WHERE t.id = @id AND 
+                            ((t.from_account_id = a.id AND a.user_id = @user_id) OR (t.to_account_id = a.id AND a.user_id = @user_id))",
+                      [ [ "id", Sql.int id; "user_id", Sql.int userId ] ] ]
+
+            metric.Finish()
+        }
