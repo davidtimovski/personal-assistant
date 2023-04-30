@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Core.Infrastructure;
@@ -68,6 +69,37 @@ public static class IoC
         host.ConfigureAppConfiguration((context, configBuilder) =>
         {
             configBuilder.AddAzureKeyVault(secretClient, new AzureKeyVaultConfigurationOptions());
+        });
+
+        return host;
+    }
+
+    public static IHostBuilder AddSentryLogging(
+        this IHostBuilder host,
+        string dsn,
+        HashSet<string> excludeTransactions)
+    {
+        host.ConfigureLogging((context, loggingBuilder) =>
+        {
+            loggingBuilder.AddSentry(options =>
+            {
+                options.Dsn = dsn;
+                options.SampleRate = 1;
+                options.TracesSampler = samplingCtx =>
+                {
+                    if (samplingCtx?.TransactionContext == null)
+                    {
+                        return 1;
+                    }
+
+                    if (excludeTransactions.Contains(samplingCtx.TransactionContext.Name))
+                    {
+                        return 0;
+                    }
+
+                    return 1;
+                };
+            });
         });
 
         return host;
