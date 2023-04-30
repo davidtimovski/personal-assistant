@@ -10,10 +10,10 @@ public interface IUserService
     User Get(string email);
     T Get<T>(int id) where T : UserDto;
     bool Exists(int id);
-    CookingAssistantPreferences GetCookingAssistantPreferences(int id, ITransaction tr);
-    Task<int> CreateAsync(string auth0Id, string email, string name, string language, string culture, string imageUri, ITransaction tr);
-    Task UpdateProfileAsync(int id, string name, string language, string culture, string imageUri, ITransaction tr);
-    Task UpdateToDoNotificationsEnabledAsync(int id, bool enabled, ITransaction tr);
-    Task UpdateCookingNotificationsEnabledAsync(int id, bool enabled, ITransaction tr);
-    Task UpdateImperialSystemAsync(int id, bool imperialSystem, ITransaction tr);
+    CookingAssistantPreferences GetCookingAssistantPreferences(int id, ISpan metricsSpan);
+    Task<int> CreateAsync(string auth0Id, string email, string name, string language, string culture, string imageUri, ISpan metricsSpan);
+    Task UpdateProfileAsync(int id, string name, string language, string culture, string imageUri, ISpan metricsSpan);
+    Task UpdateToDoNotificationsEnabledAsync(int id, bool enabled, ISpan metricsSpan);
+    Task UpdateCookingNotificationsEnabledAsync(int id, bool enabled, ISpan metricsSpan);
+    Task UpdateImperialSystemAsync(int id, bool imperialSystem, ISpan metricsSpan);
 }

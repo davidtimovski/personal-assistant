@@ -2,7 +2,6 @@
 using Core.Application.Contracts.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Sentry;
 
 namespace Core.Api.Controllers;
 
@@ -23,8 +22,8 @@ public class TooltipsController : BaseController
     [HttpGet("application/{application}")]
     public IActionResult GetAll(string application)
     {
-        var tr = SentrySdk.StartTransaction(
-            "GET /api/tooltips/application/{application}",
+        var tr = StartTransactionWithUser(
+            "GET api/tooltips/application/{application}",
             $"{nameof(TooltipsController)}.{nameof(GetAll)}"
         );
 
@@ -38,8 +37,8 @@ public class TooltipsController : BaseController
     [HttpGet("key/{key}/{application}")]
     public IActionResult GetByKey(string key, string application)
     {
-        var tr = SentrySdk.StartTransaction(
-            "GET /api/tooltips/key/{key}/{application}",
+        var tr = StartTransactionWithUser(
+            "GET api/tooltips/key/{key}/{application}",
             $"{nameof(TooltipsController)}.{nameof(GetByKey)}"
         );
 
@@ -58,8 +57,8 @@ public class TooltipsController : BaseController
             return BadRequest();
         }
 
-        var tr = SentrySdk.StartTransaction(
-            "PUT /api/tooltips",
+        var tr = StartTransactionWithUser(
+            "PUT api/tooltips",
             $"{nameof(TooltipsController)}.{nameof(ToggleDismissed)}"
         );
 

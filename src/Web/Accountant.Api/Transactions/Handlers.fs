@@ -16,6 +16,9 @@ module Handlers =
 
     let create: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+            let tr =
+                startTransactionWithUser "POST /api/transactions" "Transactions/Handlers.create" ctx
+
             task {
                 let! dto = ctx.BindJsonAsync<CreateTransaction>()
                 dto.HttpContext <- ctx
@@ -25,14 +28,21 @@ module Handlers =
                     let transaction = Logic.prepareForCreate dto
                     let connection = getDbConnection ctx
 
-                    let! id = TransactionsRepository.create transaction connection None
+                    let! id = TransactionsRepository.create transaction connection None tr
 
-                    return! Successful.CREATED id next ctx
+                    let! result = Successful.CREATED id next ctx
+
+                    tr.Finish()
+
+                    return result
                 | Failure error -> return! RequestErrors.BAD_REQUEST error next ctx
             })
 
     let update: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+            let tr =
+                startTransactionWithUser "PUT /api/transactions" "Transactions/Handlers.update" ctx
+
             task {
                 let! dto = ctx.BindJsonAsync<UpdateTransaction>()
                 dto.HttpContext <- ctx
@@ -42,21 +52,32 @@ module Handlers =
                     let transaction = Logic.prepareForUpdate dto
                     let connectionString = getConnectionString ctx
 
-                    let! _ = TransactionsRepository.update transaction connectionString
+                    let! _ = TransactionsRepository.update transaction connectionString tr
 
-                    return! Successful.NO_CONTENT next ctx
+                    let! result = Successful.NO_CONTENT next ctx
+
+                    tr.Finish()
+
+                    return result
                 | Failure error -> return! RequestErrors.BAD_REQUEST error next ctx
             })
 
     let delete (id: int) : HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+            let tr =
+                startTransactionWithUser "DELETE /api/transactions" "Transactions/Handlers.delete" ctx
+
             task {
                 let userId = getUserId ctx
 
                 let connectionString = getConnectionString ctx
-                let! _ = TransactionsRepository.delete id userId connectionString
+                let! _ = TransactionsRepository.delete id userId connectionString tr
 
-                return! Successful.NO_CONTENT next ctx
+                let! result = Successful.NO_CONTENT next ctx
+
+                tr.Finish()
+
+                return result
             })
 
     let export: HttpHandler =

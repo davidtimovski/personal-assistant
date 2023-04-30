@@ -1,9 +1,9 @@
-﻿using Application.UnitTests.Builders;
+﻿using Application.Domain.CookingAssistant;
+using Application.UnitTests.Builders;
 using CookingAssistant.Application.Contracts.Ingredients;
 using CookingAssistant.Application.Contracts.Ingredients.Models;
 using CookingAssistant.Application.Mappings;
 using CookingAssistant.Application.Services;
-using Application.Domain.CookingAssistant;
 using FluentValidation;
 using Moq;
 using Xunit;

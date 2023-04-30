@@ -1,6 +1,7 @@
 ﻿using Application.UnitTests.Builders;
 using FluentValidation;
 using Moq;
+using Sentry;
 using Weatherman.Application.Contracts.Forecasts;
 using Weatherman.Infrastructure;
 using Xunit;
@@ -10,10 +11,13 @@ namespace Application.UnitTests.ServiceTests.ForecastServiceTests;
 public class GetTests
 {
     private readonly Mock<IForecastsRepository> _forecastsRepositoryMock = new();
+    private readonly Mock<ISpan> _metricsSpanMock = new();
     private readonly IForecastService _sut;
 
     public GetTests()
     {
+        _metricsSpanMock.Setup(x => x.StartChild(It.IsAny<string>())).Returns(new Mock<ISpan>().Object);
+
         _sut = new ForecastService(
             null,
             _forecastsRepositoryMock.Object,
@@ -26,7 +30,7 @@ public class GetTests
         var parameters = new GetForecastBuilder().WithUnits().Build();
         parameters.TemperatureUnit = "invalid";
 
-        await Assert.ThrowsAsync<ValidationException>(() => _sut.GetAsync(parameters));
+        await Assert.ThrowsAsync<ValidationException>(() => _sut.GetAsync(parameters, _metricsSpanMock.Object));
     }
 
     [Fact]
@@ -35,7 +39,7 @@ public class GetTests
         var parameters = new GetForecastBuilder().WithUnits().Build();
         parameters.PrecipitationUnit = "invalid";
 
-        await Assert.ThrowsAsync<ValidationException>(() => _sut.GetAsync(parameters));
+        await Assert.ThrowsAsync<ValidationException>(() => _sut.GetAsync(parameters, _metricsSpanMock.Object));
     }
 
     [Fact]
@@ -44,6 +48,6 @@ public class GetTests
         var parameters = new GetForecastBuilder().WithUnits().Build();
         parameters.WindSpeedUnit = "invalid";
 
-        await Assert.ThrowsAsync<ValidationException>(() => _sut.GetAsync(parameters));
+        await Assert.ThrowsAsync<ValidationException>(() => _sut.GetAsync(parameters, _metricsSpanMock.Object));
     }
 }

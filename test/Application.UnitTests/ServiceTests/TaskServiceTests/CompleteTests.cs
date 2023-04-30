@@ -12,12 +12,12 @@ namespace Application.UnitTests.ServiceTests.TaskServiceTests;
 public class CompleteTests
 {
     private readonly Mock<ITasksRepository> _tasksRepositoryMock = new();
-    private readonly Mock<ITransaction> _sentryTr = new();
+    private readonly Mock<ISpan> _metricsSpanMock = new();
     private readonly ITaskService _sut;
 
     public CompleteTests()
     {
-        _sentryTr.Setup(x => x.StartChild(It.IsAny<string>())).Returns(new Mock<ISpan>().Object);
+        _metricsSpanMock.Setup(x => x.StartChild(It.IsAny<string>())).Returns(new Mock<ISpan>().Object);
 
         _sut = new TaskService(
             null,
@@ -37,8 +37,8 @@ public class CompleteTests
         _tasksRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
             .Returns(new ToDoTask { IsCompleted = true });
 
-        await _sut.CompleteAsync(new CompleteUncomplete(), _sentryTr.Object);
+        await _sut.CompleteAsync(new CompleteUncomplete(), _metricsSpanMock.Object);
 
-        _tasksRepositoryMock.Verify(x => x.CompleteAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ITransaction>()), Times.Never);
+        _tasksRepositoryMock.Verify(x => x.CompleteAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()), Times.Never);
     }
 }

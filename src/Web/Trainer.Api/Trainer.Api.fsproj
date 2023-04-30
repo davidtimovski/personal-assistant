@@ -30,7 +30,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Api.Common\Api.Common.fsproj" />
+		<ProjectReference Include="..\Api.Common.Fs\Api.Common.Fs.fsproj" />
 		<ProjectReference Include="..\..\Infrastructure\Core.Infrastructure\Core.Infrastructure.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Core.Persistence\Core.Persistence.csproj" />
 	</ItemGroup>

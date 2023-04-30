@@ -1,7 +1,6 @@
 ﻿using Core.Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Sentry;
 
 namespace Core.Api.Controllers;
 
@@ -27,8 +26,8 @@ public class PushSubscriptionsController : BaseController
             return BadRequest();
         }
 
-        var tr = SentrySdk.StartTransaction(
-            "POST /api/pushsubscriptions",
+        var tr = StartTransactionWithUser(
+            "POST api/pushsubscriptions",
             $"{nameof(PushSubscriptionsController)}.{nameof(CreateSubscription)}"
         );
 

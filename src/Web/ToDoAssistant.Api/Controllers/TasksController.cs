@@ -109,7 +109,7 @@ public class TasksController : BaseController
                 var message = _localizer["CreatedTaskNotification", result.ActionUserName, result.TaskName, result.ListName];
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, dto.ListId, result.TaskId, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -171,7 +171,7 @@ public class TasksController : BaseController
                     var message = _localizer["CreatedTaskNotification", result.ActionUserName, task.Name, result.ListName];
 
                     var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, dto.ListId, task.Id, message);
-                    var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                    var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
                     var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                     {
                         SenderImageUri = result.ActionUserImageUri,
@@ -232,7 +232,7 @@ public class TasksController : BaseController
                 var message = _localizer["UpdatedTaskNotification", result.ActionUserName, result.OriginalTaskName, result.ListName];
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -250,7 +250,7 @@ public class TasksController : BaseController
                 var message = _localizer["RemovedTaskNotification", result.ActionUserName, result.OriginalTaskName, result.OldListName];
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.OldListId, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -268,7 +268,7 @@ public class TasksController : BaseController
                 var message = _localizer["CreatedTaskNotification", result.ActionUserName, dto.Name, result.ListName];
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -286,7 +286,7 @@ public class TasksController : BaseController
                 var message = _localizer["AssignedTaskNotification", result.ActionUserName, result.OriginalTaskName, result.ListName];
 
                 var createNotificationDto = new CreateOrUpdateNotification(result.AssignedNotificationRecipient.Id, dto.UserId, result.ListId, dto.Id, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -334,7 +334,7 @@ public class TasksController : BaseController
                 var message = _localizer["RemovedTaskNotification", result.ActionUserName, result.TaskName, result.ListName];
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, result.ListId, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -389,7 +389,7 @@ public class TasksController : BaseController
                 string message = _localizer["CompletedTaskNotification", result.ActionUserName, result.TaskName, result.ListName];
 
                 var updateNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -444,7 +444,7 @@ public class TasksController : BaseController
                 string message = _localizer["UncompletedTaskNotification", result.ActionUserName, result.TaskName, result.ListName];
 
                 var updateNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,

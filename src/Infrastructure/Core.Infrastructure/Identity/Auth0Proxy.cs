@@ -1,7 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using Core.Application.Services;
 using Sentry;
 
 namespace Core.Infrastructure.Identity;
@@ -12,9 +11,9 @@ public static class Auth0Proxy
     private static string AccessToken;
     private static DateTime? Expires;
 
-    public static async Task InitializeAsync(HttpClient httpClient, Auth0ManagementUtilConfig config, ITransaction tr)
+    public static async Task InitializeAsync(HttpClient httpClient, Auth0ManagementUtilConfig config, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(Auth0Proxy)}.{nameof(InitializeAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(Auth0Proxy)}.{nameof(InitializeAsync)}");
 
         Domain = config.Domain;
 
@@ -39,12 +38,12 @@ public static class Auth0Proxy
         AccessToken = result.access_token;
         Expires = DateTime.UtcNow.AddSeconds(result.expires_in);
 
-        span.Finish();
+        metric.Finish();
     }
 
-    public static async Task<Auth0User> GetUserAsync(HttpClient httpClient, string auth0Id, ITransaction tr)
+    public static async Task<Auth0User> GetUserAsync(HttpClient httpClient, string auth0Id, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(Auth0Proxy)}.{nameof(GetUserAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(Auth0Proxy)}.{nameof(GetUserAsync)}");
 
         using var requestMessage = new HttpRequestMessage(HttpMethod.Get, new Uri($"https://{Domain}/api/v2/users/{auth0Id}?fields=email,name,user_metadata"));
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
@@ -54,14 +53,14 @@ public static class Auth0Proxy
 
         var result = JsonSerializer.Deserialize<Auth0User>(await response.Content.ReadAsStringAsync());
 
-        span.Finish();
+        metric.Finish();
 
         return result;
     }
 
-    public static async Task<string> RegisterUserAsync(HttpClient httpClient, string email, string password, string name, ITransaction tr)
+    public static async Task<string> RegisterUserAsync(HttpClient httpClient, string email, string password, string name, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(Auth0Proxy)}.{nameof(RegisterUserAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(Auth0Proxy)}.{nameof(RegisterUserAsync)}");
 
         using var requestMessage = new HttpRequestMessage(HttpMethod.Post, new Uri($"https://{Domain}/api/v2/users"));
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
@@ -89,14 +88,14 @@ public static class Auth0Proxy
 
         var result = JsonSerializer.Deserialize<CreateUserResult>(await response.Content.ReadAsStringAsync());
 
-        span.Finish();
+        metric.Finish();
 
         return result.user_id;
     }
 
-    public static async Task DeleteUserAsync(HttpClient httpClient, string auth0Id, ITransaction tr)
+    public static async Task DeleteUserAsync(HttpClient httpClient, string auth0Id, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(Auth0Proxy)}.{nameof(DeleteUserAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(Auth0Proxy)}.{nameof(DeleteUserAsync)}");
 
         using var requestMessage = new HttpRequestMessage(HttpMethod.Delete, new Uri($"https://{Domain}/api/v2/users/{auth0Id}"));
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
@@ -104,12 +103,12 @@ public static class Auth0Proxy
         var response = await httpClient.SendAsync(requestMessage);
         response.EnsureSuccessStatusCode();
 
-        span.Finish();
+        metric.Finish();
     }
 
-    public static async Task UpdateNameAsync(HttpClient httpClient, string auth0Id, string name, ITransaction tr)
+    public static async Task UpdateNameAsync(HttpClient httpClient, string auth0Id, string name, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(Auth0Proxy)}.{nameof(UpdateNameAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(Auth0Proxy)}.{nameof(UpdateNameAsync)}");
 
         using var requestMessage = new HttpRequestMessage(HttpMethod.Patch, new Uri($"https://{Domain}/api/v2/users/{auth0Id}"));
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
@@ -122,12 +121,12 @@ public static class Auth0Proxy
         var response = await httpClient.SendAsync(requestMessage);
         response.EnsureSuccessStatusCode();
 
-        span.Finish();
+        metric.Finish();
     }
 
-    public static async Task ResetPasswordAsync(HttpClient httpClient, string clientId, string email, ITransaction tr)
+    public static async Task ResetPasswordAsync(HttpClient httpClient, string clientId, string email, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(Auth0Proxy)}.{nameof(ResetPasswordAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(Auth0Proxy)}.{nameof(ResetPasswordAsync)}");
 
         using var requestMessage = new HttpRequestMessage(HttpMethod.Post, new Uri($"https://{Domain}/dbconnections/change_password"));
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
@@ -142,7 +141,7 @@ public static class Auth0Proxy
         var response = await httpClient.SendAsync(requestMessage);
         response.EnsureSuccessStatusCode();
 
-        span.Finish();
+        metric.Finish();
     }
 }
 

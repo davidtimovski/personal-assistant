@@ -1,11 +1,9 @@
 ﻿module Startup
 
 open System
+open System.Collections.Generic
 open System.Globalization
 open System.IO
-open Azure.Extensions.AspNetCore.Configuration.Secrets
-open Azure.Identity
-open Azure.Security.KeyVault.Secrets
 open Giraffe
 open Core.Infrastructure
 open Microsoft.AspNetCore.Builder
@@ -14,20 +12,6 @@ open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 open Microsoft.AspNetCore.Localization
 open Microsoft.Extensions.Logging
-
-let private addKeyVault (context: HostBuilderContext) (configBuilder: IConfigurationBuilder) =
-    if context.HostingEnvironment.IsProduction() then
-        let keyVaultUri = new Uri(context.Configuration["KeyVault:Url"])
-        let tenantId = context.Configuration["KeyVault:TenantId"]
-        let clientId = context.Configuration["KeyVault:ClientId"]
-        let clientSecret = context.Configuration["KeyVault:ClientSecret"]
-
-        let tokenCredential = new ClientSecretCredential(tenantId, clientId, clientSecret)
-
-        let secretClient = new SecretClient(keyVaultUri, tokenCredential)
-
-        configBuilder.AddAzureKeyVault(secretClient, new AzureKeyVaultConfigurationOptions())
-        |> ignore
 
 let private addDataProtection (isProduction: bool) (services: IServiceCollection) (settings: IConfiguration) =
     if isProduction then
@@ -55,14 +39,17 @@ let configureBuilder (builder: WebApplicationBuilder) =
     builder
         .Host
         .UseContentRoot(Directory.GetCurrentDirectory())
-        .ConfigureAppConfiguration(addKeyVault)
     |> ignore
 
     match builder.Environment.IsProduction() with
     | true ->
-        builder.Host.ConfigureLogging(fun (loggingBuilder: ILoggingBuilder) ->
-            loggingBuilder.AddConfiguration(builder.Configuration).AddSentry() |> ignore)
-        |> ignore
+        let keyVaultUri = new Uri(builder.Configuration["KeyVault:Url"])
+        let tenantId = builder.Configuration["KeyVault:TenantId"]
+        let clientId = builder.Configuration["KeyVault:ClientId"]
+        let clientSecret = builder.Configuration["KeyVault:ClientSecret"]
+        builder.Host.AddKeyVault(keyVaultUri, tenantId, clientId, clientSecret) |> ignore
+
+        builder.Host.AddSentryLogging(builder.Configuration["Sentry:Dsn"], HashSet<string>(["GET /health"])) |> ignore
     | false ->
         builder.Host.ConfigureLogging(fun (loggingBuilder: ILoggingBuilder) ->
             loggingBuilder.AddConsole().AddDebug() |> ignore)

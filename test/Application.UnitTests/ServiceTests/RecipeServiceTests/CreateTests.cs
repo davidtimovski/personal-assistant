@@ -15,14 +15,14 @@ public class CreateTests
 {
     private readonly Mock<IValidator<CreateRecipe>> _successfulValidatorMock;
     private readonly Mock<IRecipesRepository> _recipesRepositoryMock = new();
-    private readonly Mock<ITransaction> _sentryTr = new();
+    private readonly Mock<ISpan> _metricsSpanMock = new();
     private readonly IRecipeService _sut;
 
     public CreateTests()
     {
         _successfulValidatorMock = ValidatorMocker.GetSuccessful<CreateRecipe>();
 
-        _sentryTr.Setup(x => x.StartChild(It.IsAny<string>())).Returns(new Mock<ISpan>().Object);
+        _metricsSpanMock.Setup(x => x.StartChild(It.IsAny<string>())).Returns(new Mock<ISpan>().Object);
 
         _sut = new RecipeService(null, null, null, null,
             _recipesRepositoryMock.Object,
@@ -36,7 +36,7 @@ public class CreateTests
     {
         CreateRecipe model = new RecipeBuilder().BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _sentryTr.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
 
         _successfulValidatorMock.Verify(x => x.Validate(model));
     }
@@ -47,7 +47,7 @@ public class CreateTests
         CreateRecipe model = new RecipeBuilder().BuildCreateModel();
         var failedValidator = ValidatorMocker.GetFailed<CreateRecipe>();
 
-        await Assert.ThrowsAsync<ValidationException>(() => _sut.CreateAsync(model, failedValidator.Object, _sentryTr.Object));
+        await Assert.ThrowsAsync<ValidationException>(() => _sut.CreateAsync(model, failedValidator.Object, _metricsSpanMock.Object));
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class CreateTests
 
         CreateRecipe model = new RecipeBuilder().WithName(" Recipe name ").BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _sentryTr.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
         const string expected = "Recipe name";
 
         Assert.Equal(expected, actualName);
@@ -74,7 +74,7 @@ public class CreateTests
 
         CreateRecipe model = new RecipeBuilder().WithDescription(" Description ").BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _sentryTr.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
         const string expected = "Description";
 
         Assert.Equal(expected, actualDescription);
@@ -90,7 +90,7 @@ public class CreateTests
         CreateRecipe model = new RecipeBuilder()
             .WithRecipeIngredients(" Ingredient 1", "Ingredient 2 ", " Ingredient 3 ").BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _sentryTr.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
         var expectedRecipeIngredients = new List<RecipeIngredient>
         {
             new() { Ingredient = new Ingredient { Name = "Ingredient 1" } },
@@ -113,7 +113,7 @@ public class CreateTests
 
         CreateRecipe model = new RecipeBuilder().WithRecipeIngredientsWithAmounts(0, 0).BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _sentryTr.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
 
         foreach (RecipeIngredient recipeIngredient in actualRecipeIngredients)
         {
@@ -130,7 +130,7 @@ public class CreateTests
 
         CreateRecipe model = new RecipeBuilder().WithRecipeIngredientsWithAmounts(0, 0).BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _sentryTr.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
 
         foreach (RecipeIngredient recipeIngredient in actualRecipeIngredients)
         {
@@ -147,7 +147,7 @@ public class CreateTests
 
         CreateRecipe model = new RecipeBuilder().WithRecipeIngredientsWithAmounts(null, null).BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _sentryTr.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
 
         foreach (RecipeIngredient recipeIngredient in actualRecipeIngredients)
         {
@@ -167,7 +167,7 @@ public class CreateTests
 
         CreateRecipe model = new RecipeBuilder().WithInstructions(instructions).BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _sentryTr.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
 
         Assert.Equal(expected, actualInstructions);
     }
@@ -181,7 +181,7 @@ public class CreateTests
 
         CreateRecipe model = new RecipeBuilder().WithInstructions(" Instructions ").BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _sentryTr.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
         const string expected = "Instructions";
 
         Assert.Equal(expected, actualInstructions);
@@ -196,7 +196,7 @@ public class CreateTests
 
         CreateRecipe model = new RecipeBuilder().WithPrepDuration(TimeSpan.FromSeconds(59)).BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _sentryTr.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
 
         Assert.Null(actualPrepDuration);
     }
@@ -210,7 +210,7 @@ public class CreateTests
 
         CreateRecipe model = new RecipeBuilder().WithCookDuration(TimeSpan.FromSeconds(59)).BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _sentryTr.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
 
         Assert.Null(actualCookDuration);
     }
@@ -224,7 +224,7 @@ public class CreateTests
 
         CreateRecipe model = new RecipeBuilder().BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _sentryTr.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
 
         Assert.NotEqual(DateTime.MinValue, actualCreatedDate);
     }
@@ -238,7 +238,7 @@ public class CreateTests
 
         CreateRecipe model = new RecipeBuilder().BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _sentryTr.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
 
         Assert.NotEqual(DateTime.MinValue, actualModifiedDate);
     }

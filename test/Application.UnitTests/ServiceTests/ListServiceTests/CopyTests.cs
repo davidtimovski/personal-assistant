@@ -1,7 +1,8 @@
-﻿using Application.UnitTests.Builders;
-using Application.Domain.ToDoAssistant;
+﻿using Application.Domain.ToDoAssistant;
+using Application.UnitTests.Builders;
 using FluentValidation;
 using Moq;
+using Sentry;
 using ToDoAssistant.Application.Contracts.Lists;
 using ToDoAssistant.Application.Contracts.Lists.Models;
 using ToDoAssistant.Application.Mappings;
@@ -14,11 +15,14 @@ public class CopyTests
 {
     private readonly Mock<IValidator<CopyList>> _successfulValidatorMock;
     private readonly Mock<IListsRepository> _listsRepositoryMock = new();
+    private readonly Mock<ISpan> _metricsSpanMock = new();
     private readonly IListService _sut;
 
     public CopyTests()
     {
         _successfulValidatorMock = ValidatorMocker.GetSuccessful<CopyList>();
+
+        _metricsSpanMock.Setup(x => x.StartChild(It.IsAny<string>())).Returns(new Mock<ISpan>().Object);
 
         _sut = new ListService(
             null,
@@ -34,7 +38,7 @@ public class CopyTests
     {
         CopyList model = new ListBuilder().BuildCopyModel();
 
-        await _sut.CopyAsync(model, _successfulValidatorMock.Object);
+        await _sut.CopyAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
 
         _successfulValidatorMock.Verify(x => x.Validate(model));
     }
@@ -45,19 +49,19 @@ public class CopyTests
         CopyList model = new ListBuilder().BuildCopyModel();
         var failedValidator = ValidatorMocker.GetFailed<CopyList>();
 
-        await Assert.ThrowsAsync<ValidationException>(() => _sut.CopyAsync(model, failedValidator.Object));
+        await Assert.ThrowsAsync<ValidationException>(() => _sut.CopyAsync(model, failedValidator.Object, _metricsSpanMock.Object));
     }
 
     [Fact]
     public async Task TrimsListName()
     {
         string actualName = null;
-        _listsRepositoryMock.Setup(x => x.CopyAsync(It.IsAny<ToDoList>()))
-            .Callback<ToDoList>(l => actualName = l.Name);
+        _listsRepositoryMock.Setup(x => x.CopyAsync(It.IsAny<ToDoList>(), It.IsAny<ISpan>()))
+            .Callback<ToDoList, ISpan>((l, s) => actualName = l.Name);
 
         CopyList model = new ListBuilder().WithName(" List name ").BuildCopyModel();
 
-        await _sut.CopyAsync(model, _successfulValidatorMock.Object);
+        await _sut.CopyAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
         const string expected = "List name";
 
         Assert.Equal(expected, actualName);

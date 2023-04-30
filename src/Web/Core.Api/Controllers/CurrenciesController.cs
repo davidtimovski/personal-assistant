@@ -1,17 +1,19 @@
 ﻿using Core.Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Sentry;
 
 namespace Core.Api.Controllers;
 
 [Authorize]
 [Route("api/[controller]")]
-public class CurrenciesController : Controller
+public class CurrenciesController : BaseController
 {
     private readonly ICurrenciesRepository _currenciesRepository;
 
-    public CurrenciesController(ICurrenciesRepository currenciesRepository)
+    public CurrenciesController(
+        IUserIdLookup userIdLookup,
+        IUsersRepository usersRepository,
+        ICurrenciesRepository currenciesRepository) : base(userIdLookup, usersRepository)
     {
         _currenciesRepository = currenciesRepository;
     }
@@ -19,8 +21,8 @@ public class CurrenciesController : Controller
     [HttpGet("{date}")]
     public IActionResult GetAll(DateTime date)
     {
-        var tr = SentrySdk.StartTransaction(
-            "GET /api/currencies/{date}",
+        var tr = StartTransactionWithUser(
+            "GET api/currencies/{date}",
             $"{nameof(CurrenciesController)}.{nameof(GetAll)}"
         );
 

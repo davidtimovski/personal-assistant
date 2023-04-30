@@ -5,5 +5,5 @@ namespace Core.Application.Contracts;
 
 public interface IPushSubscriptionsRepository
 {
-    Task CreateSubscriptionAsync(PushSubscription subscription, ITransaction tr);
+    Task CreateSubscriptionAsync(PushSubscription subscription, ISpan metricsSpan);
 }

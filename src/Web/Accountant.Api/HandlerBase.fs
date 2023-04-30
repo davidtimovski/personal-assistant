@@ -3,6 +3,8 @@
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Localization
 open Accountant.Persistence.Fs.ConnectionUtils
+open Sentry
+open CommonHandlers
 
 module HandlerBase =
 
@@ -21,3 +23,9 @@ module HandlerBase =
 
     let getDbConnection (ctx: HttpContext) =
         ConnectionString(CommonHandlers.getConnectionString ctx)
+
+    let startTransactionWithUser (name: string) (operation: string) (ctx: HttpContext) =
+        let userId = getUserId ctx
+        let tr = SentrySdk.StartTransaction(name, operation)
+        tr.User <- new User(Id = userId.ToString())
+        tr

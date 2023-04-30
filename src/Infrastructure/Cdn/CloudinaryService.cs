@@ -49,9 +49,9 @@ public class CloudinaryService : ICdnService
         return parts[0] + "personalassistant/w_80,h_80,c_limit" + parts[1];
     }
 
-    public async Task<string> UploadAsync(string filePath, string uploadPath, string template, ITransaction tr)
+    public async Task<string> UploadAsync(string filePath, string uploadPath, string template, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(CloudinaryService)}.{nameof(UploadAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(UploadAsync)}");
 
         string uri = GenerateRandomString();
         Transformation transformation = _templates[template];
@@ -72,16 +72,16 @@ public class CloudinaryService : ICdnService
 
         File.Delete(filePath);
 
-        span.Finish();
+        metric.Finish();
 
         return _baseUrl + $"{uploadPath}/{uri}.{Format}";
     }
 
-    public async Task<string> UploadTempAsync(UploadTempImage model, IValidator<UploadTempImage> validator, ITransaction tr)
+    public async Task<string> UploadTempAsync(UploadTempImage model, IValidator<UploadTempImage> validator, ISpan metricsSpan)
     {
         ValidationUtil.ValidOrThrow(model, validator);
 
-        var span = tr.StartChild($"{nameof(CloudinaryService)}.{nameof(UploadTempAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(UploadTempAsync)}");
 
         string extension = Path.GetExtension(model.FileName);
 
@@ -104,14 +104,14 @@ public class CloudinaryService : ICdnService
             template: model.TransformationTemplate
         );
 
-        span.Finish();
+        metric.Finish();
 
         return imageUri;
     }
 
-    public async Task<string> UploadProfileTempAsync(string filePath, string uploadPath, string template, ITransaction tr)
+    public async Task<string> UploadProfileTempAsync(string filePath, string uploadPath, string template, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(CloudinaryService)}.{nameof(UploadProfileTempAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(UploadProfileTempAsync)}");
 
         string uri = GenerateRandomString();
         Transformation transformation = _templates[template];
@@ -133,19 +133,19 @@ public class CloudinaryService : ICdnService
 
         File.Delete(filePath);
 
-        span.Finish();
+        metric.Finish();
 
         return _baseUrl + $"{uploadPath}/{uri}.{Format}";
     }
 
-    public async Task<string> CopyAndUploadAsync(string localTempPath, string imageUriToCopy, string uploadPath, string template, ITransaction tr)
+    public async Task<string> CopyAndUploadAsync(string localTempPath, string imageUriToCopy, string uploadPath, string template, ISpan metricsSpan)
     {
         if (imageUriToCopy == _defaultRecipeImageUri)
         {
             return imageUriToCopy;
         }
 
-        var span = tr.StartChild($"{nameof(CloudinaryService)}.{nameof(CopyAndUploadAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(CopyAndUploadAsync)}");
 
         var result = await _httpClient.GetAsync(new Uri(imageUriToCopy));
 
@@ -166,22 +166,22 @@ public class CloudinaryService : ICdnService
             filePath: tempImagePath,
             uploadPath: uploadPath,
             template: template,
-            tr: tr
+            metricsSpan: metric
         );
 
-        span.Finish();
+        metric.Finish();
 
         return imageUri;
     }
 
-    public async Task RemoveTempTagAsync(string imageUri, ITransaction tr)
+    public async Task RemoveTempTagAsync(string imageUri, ISpan metricsSpan)
     {
         if (IsDefaultImage(imageUri))
         {
             return;
         }
 
-        var span = tr.StartChild($"{nameof(CloudinaryService)}.{nameof(RemoveTempTagAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(RemoveTempTagAsync)}");
 
         string publicId = GetPublicIdFromUri(imageUri);
 
@@ -198,17 +198,17 @@ public class CloudinaryService : ICdnService
             throw new Exception($"{nameof(CloudinaryService)}.{nameof(RemoveTempTagAsync)}() returned error: {tagResult.Error.Message}");
         }
 
-        span.Finish();
+        metric.Finish();
     }
 
-    public async Task DeleteAsync(string imageUri, ITransaction tr)
+    public async Task DeleteAsync(string imageUri, ISpan metricsSpan)
     {
         if (IsDefaultImage(imageUri))
         {
             return;
         }
 
-        var span = tr.StartChild($"{nameof(CloudinaryService)}.{nameof(DeleteAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(DeleteAsync)}");
 
         string publicId = GetPublicIdFromUri(imageUri);
 
@@ -221,12 +221,12 @@ public class CloudinaryService : ICdnService
             throw new Exception($"{nameof(CloudinaryService)}.{nameof(DeleteAsync)}() returned error: {deleteResult.Error.Message}");
         }
 
-        span.Finish();
+        metric.Finish();
     }
 
-    public async Task CreateFolderForUserAsync(int userId, ITransaction tr)
+    public async Task CreateFolderForUserAsync(int userId, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(CloudinaryService)}.{nameof(CreateFolderForUserAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(CreateFolderForUserAsync)}");
 
         CreateFolderResult result = await Cloudinary.CreateFolderAsync($"{_environment}/users/{userId}");
         if (result.Error != null)
@@ -234,12 +234,12 @@ public class CloudinaryService : ICdnService
             throw new Exception($"{nameof(CloudinaryService)}.{nameof(CreateFolderForUserAsync)}() returned error: {result.Error.Message}");
         }
 
-        span.Finish();
+        metric.Finish();
     }
 
-    public async Task DeleteUserResourcesAsync(int userId, IEnumerable<string> imageUris, ITransaction tr)
+    public async Task DeleteUserResourcesAsync(int userId, IEnumerable<string> imageUris, ISpan metricsSpan)
     {
-        var span = tr.StartChild($"{nameof(CloudinaryService)}.{nameof(DeleteUserResourcesAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(DeleteUserResourcesAsync)}");
 
         var publicIds = new List<string>();
         foreach (string uri in imageUris.Where(x => !IsDefaultImage(x)))
@@ -263,7 +263,7 @@ public class CloudinaryService : ICdnService
             throw new Exception($"{nameof(CloudinaryService)}.{nameof(DeleteUserResourcesAsync)}() returned error: {deleteFolderResult.Error.Message}");
         }
 
-        span.Finish();
+        metric.Finish();
     }
 
     public async Task DeleteTemporaryResourcesAsync(DateTime olderThan)

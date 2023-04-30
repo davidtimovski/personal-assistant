@@ -3,6 +3,7 @@ using Core.Application.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Moq;
+using Sentry;
 using ToDoAssistant.Api.Controllers;
 using ToDoAssistant.Application.Contracts.Lists;
 using ToDoAssistant.Application.Contracts.Lists.Models;
@@ -14,6 +15,7 @@ public class ListsControllerTests
 {
     private readonly Mock<IUserIdLookup> _userIdLookupMock = new();
     private readonly Mock<IListService> _listServiceMock = new();
+    private readonly Mock<ISpan> _metricsSpanMock = new();
     private readonly ListsController _sut;
 
     public ListsControllerTests()
@@ -33,7 +35,7 @@ public class ListsControllerTests
     {
         _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
         _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
-        _listServiceMock.Setup(x => x.GetForEdit(It.IsAny<int>(), It.IsAny<int>()))
+        _listServiceMock.Setup(x => x.GetForEdit(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()))
             .Returns((EditListDto)null);
 
         var result = _sut.Get(It.IsAny<int>());
@@ -46,7 +48,7 @@ public class ListsControllerTests
     {
         _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
         _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
-        _listServiceMock.Setup(x => x.GetWithShares(It.IsAny<int>(), It.IsAny<int>()))
+        _listServiceMock.Setup(x => x.GetWithShares(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()))
             .Returns((ListWithShares)null);
 
         var result = _sut.GetWithShares(It.IsAny<int>());

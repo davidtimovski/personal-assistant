@@ -5,6 +5,7 @@ open Npgsql.FSharp
 open ConnectionUtils
 open Models
 open Npgsql
+open Sentry
 
 module DebtsRepository =
 
@@ -27,24 +28,35 @@ module DebtsRepository =
               CreatedDate = read.dateTime "created_date"
               ModifiedDate = read.dateTime "modified_date" })
 
-    let create (debt: Debt) (conn: RegularOrTransactionalConn) =
-        ConnectionUtils.connect conn
-        |> Sql.query
-            $"INSERT INTO {table}
-                  (user_id, person, amount, currency, description, user_is_debtor, created_date, modified_date) VALUES 
-                  (@user_id, @person, @amount, @currency, @description, @user_is_debtor, @created_date, @modified_date) RETURNING id"
-        |> Sql.parameters
-            [ "user_id", Sql.int debt.UserId
-              "person", Sql.string debt.Person
-              "amount", Sql.decimal debt.Amount
-              "currency", Sql.string debt.Currency
-              "description", Sql.stringOrNone debt.Description
-              "user_is_debtor", Sql.bool debt.UserIsDebtor
-              "created_date", Sql.timestamptz debt.CreatedDate
-              "modified_date", Sql.timestamptz debt.ModifiedDate ]
-        |> Sql.executeRowAsync (fun read -> read.int "id")
+    let create (debt: Debt) (conn: RegularOrTransactionalConn) (metricsSpan: ISpan) =
+        let metric = metricsSpan.StartChild("DebtsRepository.create")
 
-    let createMerged (debt: Debt) connectionString =
+        task {
+            let! id =
+                ConnectionUtils.connect conn
+                |> Sql.query
+                    $"INSERT INTO {table}
+                          (user_id, person, amount, currency, description, user_is_debtor, created_date, modified_date) VALUES 
+                          (@user_id, @person, @amount, @currency, @description, @user_is_debtor, @created_date, @modified_date) RETURNING id"
+                |> Sql.parameters
+                    [ "user_id", Sql.int debt.UserId
+                      "person", Sql.string debt.Person
+                      "amount", Sql.decimal debt.Amount
+                      "currency", Sql.string debt.Currency
+                      "description", Sql.stringOrNone debt.Description
+                      "user_is_debtor", Sql.bool debt.UserIsDebtor
+                      "created_date", Sql.timestamptz debt.CreatedDate
+                      "modified_date", Sql.timestamptz debt.ModifiedDate ]
+                |> Sql.executeRowAsync (fun read -> read.int "id")
+
+            metric.Finish()
+
+            return id
+        }
+
+    let createMerged (debt: Debt) connectionString (metricsSpan: ISpan) =
+        let metric = metricsSpan.StartChild("DebtsRepository.createMerged")
+
         task {
             use conn = new NpgsqlConnection(connectionString)
             conn.Open()
@@ -99,38 +111,54 @@ module DebtsRepository =
 
             tr.Commit()
 
+            metric.Finish()
+
             return id
         }
 
-    let update (debt: Debt) connectionString =
-        connectionString
-        |> Sql.connect
-        |> Sql.query
-            $"UPDATE {table}
-              SET person = @person, amount = @amount, currency = @currency, description = @description, user_is_debtor = @user_is_debtor, modified_date = @modified_date
-              WHERE id = @id AND user_id = @user_id"
-        |> Sql.parameters
-            [ "id", Sql.int debt.Id
-              "user_id", Sql.int debt.UserId
-              "person", Sql.string debt.Person
-              "amount", Sql.decimal debt.Amount
-              "currency", Sql.string debt.Currency
-              "description", Sql.stringOrNone debt.Description
-              "user_is_debtor", Sql.bool debt.UserIsDebtor
-              "modified_date", Sql.timestamptz debt.ModifiedDate ]
-        |> Sql.executeNonQueryAsync
+    let update (debt: Debt) connectionString (metricsSpan: ISpan) =
+        let metric = metricsSpan.StartChild("DebtsRepository.update")
 
-    let delete (id: int) (userId: int) connectionString =
-        connectionString
-        |> Sql.connect
-        |> Sql.executeTransactionAsync
-            [ "INSERT INTO accountant.deleted_entities
-                    (user_id, entity_type, entity_id, deleted_date) VALUES
-                    (@user_id, @entity_type, @entity_id, @deleted_date)",
-              [ [ "user_id", Sql.int userId
-                  "entity_type", Sql.int (LanguagePrimitives.EnumToValue EntityType.Debt)
-                  "entity_id", Sql.int id
-                  "deleted_date", Sql.timestamptz DateTime.UtcNow ] ]
+        task {
+            let! _ =
+                connectionString
+                |> Sql.connect
+                |> Sql.query
+                    $"UPDATE {table}
+                      SET person = @person, amount = @amount, currency = @currency, description = @description, user_is_debtor = @user_is_debtor, modified_date = @modified_date
+                      WHERE id = @id AND user_id = @user_id"
+                |> Sql.parameters
+                    [ "id", Sql.int debt.Id
+                      "user_id", Sql.int debt.UserId
+                      "person", Sql.string debt.Person
+                      "amount", Sql.decimal debt.Amount
+                      "currency", Sql.string debt.Currency
+                      "description", Sql.stringOrNone debt.Description
+                      "user_is_debtor", Sql.bool debt.UserIsDebtor
+                      "modified_date", Sql.timestamptz debt.ModifiedDate ]
+                |> Sql.executeNonQueryAsync
 
-              $"DELETE FROM {table} WHERE id = @id AND user_id = @user_id",
-              [ [ "id", Sql.int id; "user_id", Sql.int userId ] ] ]
+            metric.Finish()
+        }
+
+    let delete (id: int) (userId: int) connectionString (metricsSpan: ISpan) =
+        let metric = metricsSpan.StartChild("DebtsRepository.delete")
+
+        task {
+            let! _ =
+                connectionString
+                |> Sql.connect
+                |> Sql.executeTransactionAsync
+                    [ "INSERT INTO accountant.deleted_entities
+                            (user_id, entity_type, entity_id, deleted_date) VALUES
+                            (@user_id, @entity_type, @entity_id, @deleted_date)",
+                      [ [ "user_id", Sql.int userId
+                          "entity_type", Sql.int (LanguagePrimitives.EnumToValue EntityType.Debt)
+                          "entity_id", Sql.int id
+                          "deleted_date", Sql.timestamptz DateTime.UtcNow ] ]
+
+                      $"DELETE FROM {table} WHERE id = @id AND user_id = @user_id",
+                      [ [ "id", Sql.int id; "user_id", Sql.int userId ] ] ]
+
+            metric.Finish()
+        }

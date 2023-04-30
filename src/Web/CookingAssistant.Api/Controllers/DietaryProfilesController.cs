@@ -1,6 +1,6 @@
-﻿using Core.Application.Contracts;
-using CookingAssistant.Application.Contracts.DietaryProfiles;
+﻿using CookingAssistant.Application.Contracts.DietaryProfiles;
 using CookingAssistant.Application.Contracts.DietaryProfiles.Models;
+using Core.Application.Contracts;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

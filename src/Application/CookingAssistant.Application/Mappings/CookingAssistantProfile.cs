@@ -1,11 +1,11 @@
-﻿using Core.Application.Contracts;
-using Core.Application.Contracts.Models;
+﻿using Application.Domain.Common;
+using Application.Domain.CookingAssistant;
 using AutoMapper;
 using CookingAssistant.Application.Contracts.DietaryProfiles.Models;
 using CookingAssistant.Application.Contracts.Ingredients.Models;
 using CookingAssistant.Application.Contracts.Recipes.Models;
-using Application.Domain.Common;
-using Application.Domain.CookingAssistant;
+using Core.Application.Contracts;
+using Core.Application.Contracts.Models;
 using Utility;
 
 namespace CookingAssistant.Application.Mappings;

@@ -82,7 +82,7 @@ public class AccountController : BaseController
     public async Task<IActionResult> ResetPassword()
     {
         var tr = SentrySdk.StartTransaction(
-            "GET /account/reset-password",
+            "GET account/reset-password",
             $"{nameof(AccountController)}.{nameof(ResetPassword)}"
         );
 
@@ -113,7 +113,7 @@ public class AccountController : BaseController
         }
 
         var tr = SentrySdk.StartTransaction(
-            "POST /account/reset-password",
+            "POST account/reset-password",
             $"{nameof(AccountController)}.{nameof(ResetPassword)}"
         );
 
@@ -178,7 +178,7 @@ public class AccountController : BaseController
         }
 
         var tr = SentrySdk.StartTransaction(
-            "POST /account/register",
+            "POST account/register",
             $"{nameof(AccountController)}.{nameof(Register)}"
         );
 
@@ -193,8 +193,8 @@ public class AccountController : BaseController
 
             await _cdnService.CreateFolderForUserAsync(userId, tr);
 
-            await CreateRequiredDataAsync(userId);
-            await CreateSamplesAsync(userId);
+            await CreateRequiredDataAsync(userId, tr);
+            await CreateSamplesAsync(userId, tr);
         }
         catch (PasswordTooWeakException)
         {
@@ -233,7 +233,7 @@ public class AccountController : BaseController
     public async Task<IActionResult> VerifyReCaptcha(VerifyReCaptchaViewModel model)
     {
         var tr = SentrySdk.StartTransaction(
-            "POST /account/verify-recaptcha",
+            "POST account/verify-recaptcha",
             $"{nameof(AccountController)}.{nameof(VerifyReCaptcha)}"
         );
 
@@ -263,7 +263,7 @@ public class AccountController : BaseController
     [ActionName("delete")]
     public async Task<IActionResult> DeleteAccount()
     {
-        var tr = SentrySdk.StartTransaction(
+        var tr = StartTransactionWithUser(
             "POST /account/delete",
             $"{nameof(AccountController)}.{nameof(DeleteAccount)}"
         );
@@ -307,8 +307,8 @@ public class AccountController : BaseController
     [ActionName("edit-profile")]
     public async Task<IActionResult> EditProfile()
     {
-        var tr = SentrySdk.StartTransaction(
-            "GET /account/edit-profile",
+        var tr = StartTransactionWithUser(
+            "GET account/edit-profile",
             $"{nameof(AccountController)}.{nameof(EditProfile)}"
         );
 
@@ -350,8 +350,8 @@ public class AccountController : BaseController
             });
         }
 
-        var tr = SentrySdk.StartTransaction(
-            "POST /account/edit-profile",
+        var tr = StartTransactionWithUser(
+            "POST account/edit-profile",
             $"{nameof(AccountController)}.{nameof(EditProfile)}"
         );
 
@@ -433,8 +433,8 @@ public class AccountController : BaseController
             return new UnprocessableEntityObjectResult(ModelState);
         }
 
-        var tr = SentrySdk.StartTransaction(
-            "POST /account/upload-profile-image",
+        var tr = StartTransactionWithUser(
+            "POST account/upload-profile-image",
             $"{nameof(AccountController)}.{nameof(UploadProfileImage)}"
         );
 
@@ -462,7 +462,7 @@ public class AccountController : BaseController
                 filePath: tempImagePath,
                 uploadPath: $"users/{UserId}",
                 template: "profile",
-                tr: tr
+                tr
             );
 
             return StatusCode(201, new { imageUri });
@@ -507,13 +507,13 @@ public class AccountController : BaseController
     }
 
     // TODO: Breaking microservice design. Implement with message queue or HTTP call.
-    private async Task CreateRequiredDataAsync(int userId)
+    private async Task CreateRequiredDataAsync(int userId, ISpan metricsSpan)
     {
         var now = DateTime.UtcNow;
-        await createMain(new Accountant.Persistence.Fs.Models.Account(0, userId, _localizer["MainAccountName"], true, "EUR", FSharpOption<decimal>.None, now, now), _configuration["ConnectionString"]);
+        await createMain(new Accountant.Persistence.Fs.Models.Account(0, userId, _localizer["MainAccountName"], true, "EUR", FSharpOption<decimal>.None, now, now), _configuration["ConnectionString"], metricsSpan);
     }
 
-    private async Task CreateSamplesAsync(int userId)
+    private async Task CreateSamplesAsync(int userId, ISpan metricsSpan)
     {
         var sampleListTranslations = new Dictionary<string, string>
         {
@@ -522,7 +522,7 @@ public class AccountController : BaseController
             { "SampleListTask2", _localizer["SampleListTask2"] },
             { "SampleListTask3", _localizer["SampleListTask3"] }
         };
-        await _listService.CreateSampleAsync(userId, sampleListTranslations);
+        await _listService.CreateSampleAsync(userId, sampleListTranslations, metricsSpan);
 
         var sampleRecipeTranslations = new Dictionary<string, string>
         {

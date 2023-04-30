@@ -5,7 +5,7 @@ namespace Core.Application.Contracts;
 
 public interface ITooltipsRepository
 {
-    IEnumerable<Tooltip> GetAll(string application, int userId, ITransaction tr);
-    Tooltip GetByKey(int userId, string key, string application, ITransaction tr);
-    Task ToggleDismissedAsync(int userId, string key, string application, bool isDismissed, ITransaction tr);
+    IEnumerable<Tooltip> GetAll(string application, int userId, ISpan metricsSpan);
+    Tooltip GetByKey(int userId, string key, string application, ISpan metricsSpan);
+    Task ToggleDismissedAsync(int userId, string key, string application, bool isDismissed, ISpan metricsSpan);
 }
