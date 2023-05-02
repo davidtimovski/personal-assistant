@@ -65,7 +65,7 @@ module Handlers =
     let delete (id: int) : HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             let tr =
-                startTransactionWithUser "DELETE /api/transactions" "Transactions/Handlers.delete" ctx
+                startTransactionWithUser "DELETE /api/transactions/*" "Transactions/Handlers.delete" ctx
 
             task {
                 let userId = getUserId ctx
@@ -82,6 +82,9 @@ module Handlers =
 
     let export: HttpHandler =
         successOrLog (fun (_) (ctx: HttpContext) ->
+            let tr =
+                startTransactionWithUser "POST /api/transactions/export" "Transactions/Handlers.export" ctx
+
             task {
                 let! dto = ctx.BindJsonAsync<ExportDto>()
 
@@ -101,11 +104,18 @@ module Handlers =
 
                 ctx.SetHttpHeader("Content-Disposition", "attachment; filename=\"transactions.csv\"")
 
-                return! ctx.WriteStreamAsync(true, file, None, None)
+                let! result = ctx.WriteStreamAsync(true, file, None, None)
+
+                tr.Finish()
+
+                return result
             })
 
     let deleteExportedFile (fileId: Guid) : HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+            let tr =
+                startTransactionWithUser "DELETE /api/transactions/exported-file/*" "Transactions/Handlers.deleteExportedFile" ctx
+
             task {
                 let webHostEnvironment = ctx.GetService<IWebHostEnvironment>()
 
@@ -114,5 +124,9 @@ module Handlers =
 
                 File.Delete(filePath)
 
-                return! Successful.NO_CONTENT next ctx
+                let! result = Successful.NO_CONTENT next ctx
+
+                tr.Finish()
+
+                return result
             })

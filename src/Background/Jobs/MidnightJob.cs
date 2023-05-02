@@ -45,8 +45,8 @@ public class MidnightJob
 
         await DeleteOldNotificationsAsync(conn, now);
         await DeleteOldDeletedEntityEntriesAsync(conn, now);
-        await GenerateTransactions(conn, now);
         await GenerateUpcomingExpenses(conn, now);
+        await GenerateTransactions(conn, now);
 
         if (_hostEnvironment.IsProduction())
         {
@@ -62,7 +62,7 @@ public class MidnightJob
         try
         {
             var aWeekAgo = now.AddDays(-7);
-            await conn.ExecuteAsync(@"DELETE FROM todo.notifications WHERE created_date < @DeleteFrom", new { DeleteFrom = aWeekAgo });
+            await conn.ExecuteAsync(@"DELETE FROM todo.notifications WHERE created_date < @DeleteTo", new { DeleteTo = aWeekAgo });
         }
         catch (Exception ex)
         {
@@ -74,8 +74,8 @@ public class MidnightJob
     {
         try
         {
-            var sixMonthsAgo = now.AddMonths(-6);
-            await conn.ExecuteAsync(@"DELETE FROM accountant.deleted_entities WHERE deleted_date < @DeleteFrom", new { DeleteFrom = sixMonthsAgo });
+            var oneYearAgo = now.AddYears(-1);
+            await conn.ExecuteAsync(@"DELETE FROM accountant.deleted_entities WHERE deleted_date < @DeleteTo", new { DeleteTo = oneYearAgo });
         }
         catch (Exception ex)
         {
@@ -88,6 +88,8 @@ public class MidnightJob
     /// </summary>
     private async Task GenerateTransactions(NpgsqlConnection conn, DateTime now)
     {
+        var dbTransaction = conn.BeginTransaction();
+
         try
         {
             var automaticTransactions = conn.Query<AutomaticTransaction>(@"SELECT * FROM accountant.automatic_transactions WHERE day_in_month = @DayInMonth", new { DayInMonth = now.Day });
@@ -96,7 +98,8 @@ public class MidnightJob
 
             foreach (var userGroup in userGroups)
             {
-                int userMainAccountId = conn.QueryFirst<int>(@"SELECT id FROM accountant.accounts WHERE user_id = @UserId AND is_main", new { UserId = userGroup.Key });
+                var userId = userGroup.Key;
+                int userMainAccountId = conn.QueryFirst<int>(@"SELECT id FROM accountant.accounts WHERE user_id = @UserId AND is_main", new { UserId = userId });
 
                 foreach (AutomaticTransaction automaticTransaction in userGroup)
                 {
@@ -152,9 +155,48 @@ public class MidnightJob
                     await conn.ExecuteAsync(@"INSERT INTO accountant.transactions 
                         (from_account_id, to_account_id, category_id, amount, currency, description, date, is_encrypted, generated, created_date, modified_date)
                         VALUES 
-                        (@FromAccountId, @ToAccountId, @CategoryId, @Amount, @Currency, @Description, @Date, FALSE, @Generated, @CreatedDate, @ModifiedDate)", transaction);
+                        (@FromAccountId, @ToAccountId, @CategoryId, @Amount, @Currency, @Description, @Date, FALSE, @Generated, @CreatedDate, @ModifiedDate)", transaction, dbTransaction);
+
+                    if (transaction.FromAccountId.HasValue && transaction.ToAccountId == null)
+                    {
+                        var relatedUpcomingExpenses = conn.Query<UpcomingExpense>(@"SELECT * FROM accountant.upcoming_expenses
+                            WHERE category_id = @CategoryId 
+                                AND EXTRACT(year FROM date) = @Year
+                                AND EXTRACT(month FROM date) = @Month", new { transaction.CategoryId, transaction.Date.Year, transaction.Date.Month });
+
+                        foreach (var ue in relatedUpcomingExpenses)
+                        {
+                            var bothWithDescriptionsAndTheyMatch =
+                                ue.Description != null
+                                && transaction.Description != null
+                                && string.Equals(ue.Description, transaction.Description, StringComparison.OrdinalIgnoreCase);
+
+                            if (ue.Description == null || bothWithDescriptionsAndTheyMatch)
+                            {
+                                if (ue.Amount > transaction.Amount)
+                                {
+                                    await conn.ExecuteAsync(@"UPDATE accountant.upcoming_expenses
+                                        SET amount = amount - @Amount, modified_date = @ModifiedDate
+                                        WHERE id = @Id",
+                                        new { ue.Id, transaction.Amount, ModifiedDate = now }, dbTransaction);
+                                }
+                                else
+                                {
+                                    await conn.ExecuteAsync(@"INSERT INTO accountant.deleted_entities
+                                        (user_id, entity_type, entity_id, deleted_date) VALUES
+                                        (@UserId, @EntityType, @EntityId, @DeletedDate)",
+                                        new { UserId = userId, EntityType = (int)EntityType.UpcomingExpense, EntityId = ue.Id, DeletedDate = now }, dbTransaction);
+
+                                    await conn.ExecuteAsync(@"DELETE FROM accountant.upcoming_expenses WHERE id = @Id AND user_id = @UserId",
+                                        new { ue.Id, UserId = userId }, dbTransaction);
+                                }
+                            }
+                        }
+                    }
                 }
             }
+
+            await dbTransaction.CommitAsync();
         }
         catch (Exception ex)
         {
