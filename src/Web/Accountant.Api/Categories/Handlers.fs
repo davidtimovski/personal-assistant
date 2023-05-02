@@ -63,7 +63,7 @@ module Handlers =
     let delete (id: int) : HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             let tr =
-                startTransactionWithUser "DELETE /api/categories" "Categories/Handlers.delete" ctx
+                startTransactionWithUser "DELETE /api/categories/*" "Categories/Handlers.delete" ctx
 
             task {
                 let userId = getUserId ctx

@@ -64,7 +64,7 @@ module Handlers =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             let tr =
                 startTransactionWithUser
-                    "DELETE /api/automatic-transactions"
+                    "DELETE /api/automatic-transactions/*"
                     "AutomaticTransactions/Handlers.delete"
                     ctx
 

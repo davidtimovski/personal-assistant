@@ -109,7 +109,7 @@ module DebtsRepository =
                       "modified_date", Sql.timestamptz debt.ModifiedDate ]
                 |> Sql.executeRowAsync (fun read -> read.int "id")
 
-            tr.Commit()
+            let! _ = tr.CommitAsync()
 
             metric.Finish()
 

@@ -151,7 +151,7 @@ module TransactionsRepository =
                             |> Sql.parameters
                                 [ "id", Sql.int ue.Id
                                   "amount", Sql.decimal transaction.Amount
-                                  "modified_date", Sql.timestamptz DateTime.UtcNow ]
+                                  "modified_date", Sql.timestamptz transaction.CreatedDate ]
                             |> Sql.executeNonQuery
                             |> ignore
                         else
@@ -167,7 +167,7 @@ module TransactionsRepository =
                                   "user_id", Sql.int ue.UserId
                                   "entity_type", Sql.int (LanguagePrimitives.EnumToValue EntityType.UpcomingExpense)
                                   "entity_id", Sql.int ue.Id
-                                  "deleted_date", Sql.timestamptz DateTime.UtcNow ]
+                                  "deleted_date", Sql.timestamptz transaction.CreatedDate ]
                             |> Sql.executeNonQuery
                             |> ignore
 
