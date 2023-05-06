@@ -45,7 +45,7 @@ export class DebtsService {
 		borrowedLabel: string
 	): Promise<number> {
 		try {
-			const now = DateHelper.adjustTimeZone(new Date());
+			const now = new Date();
 
 			if (typeof debt.amount === 'string') {
 				debt.amount = parseFloat(debt.amount);
@@ -158,7 +158,7 @@ export class DebtsService {
 			if (debt.description) {
 				debt.description = debt.description.replace(/(\r\n|\r|\n){3,}/g, '$1\n').trim();
 			}
-			debt.modifiedDate = DateHelper.adjustTimeZone(new Date());
+			debt.modifiedDate = new Date();
 
 			if (navigator.onLine) {
 				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/debts`, {

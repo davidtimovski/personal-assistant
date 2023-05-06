@@ -43,7 +43,7 @@ export class UpcomingExpensesService {
 			if (upcomingExpense.description) {
 				upcomingExpense.description = upcomingExpense.description.replace(/(\r\n|\r|\n){3,}/g, '$1\n').trim();
 			}
-			const now = DateHelper.adjustTimeZone(new Date());
+			const now = new Date();
 			upcomingExpense.createdDate = upcomingExpense.modifiedDate = now;
 
 			if (navigator.onLine) {
@@ -74,7 +74,7 @@ export class UpcomingExpensesService {
 			if (upcomingExpense.description) {
 				upcomingExpense.description = upcomingExpense.description.replace(/(\r\n|\r|\n){3,}/g, '$1\n').trim();
 			}
-			upcomingExpense.modifiedDate = DateHelper.adjustTimeZone(new Date());
+			upcomingExpense.modifiedDate = new Date();
 
 			if (navigator.onLine) {
 				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/upcoming-expenses`, {

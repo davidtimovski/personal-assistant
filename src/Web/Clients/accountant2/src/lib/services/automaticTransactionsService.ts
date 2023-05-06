@@ -35,7 +35,7 @@ export class AutomaticTransactionsService {
 			if (automaticTransaction.description) {
 				automaticTransaction.description = automaticTransaction.description.replace(/(\r\n|\r|\n){3,}/g, '$1\n').trim();
 			}
-			const now = DateHelper.adjustTimeZone(new Date());
+			const now = new Date();
 			automaticTransaction.createdDate = automaticTransaction.modifiedDate = now;
 
 			if (navigator.onLine) {
@@ -66,7 +66,7 @@ export class AutomaticTransactionsService {
 			if (automaticTransaction.description) {
 				automaticTransaction.description = automaticTransaction.description.replace(/(\r\n|\r|\n){3,}/g, '$1\n').trim();
 			}
-			automaticTransaction.modifiedDate = DateHelper.adjustTimeZone(new Date());
+			automaticTransaction.modifiedDate = new Date();
 
 			if (navigator.onLine) {
 				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/automatic-transactions`, {

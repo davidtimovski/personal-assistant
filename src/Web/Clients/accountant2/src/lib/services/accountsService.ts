@@ -185,7 +185,7 @@ export class AccountsService {
 
 	async create(account: Account): Promise<number> {
 		try {
-			const now = DateHelper.adjustTimeZone(new Date());
+			const now = new Date();
 			account.createdDate = account.modifiedDate = now;
 
 			if (navigator.onLine) {
@@ -209,7 +209,7 @@ export class AccountsService {
 
 	async update(account: Account): Promise<void> {
 		try {
-			account.modifiedDate = DateHelper.adjustTimeZone(new Date());
+			account.modifiedDate = new Date();
 
 			if (navigator.onLine) {
 				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/accounts`, {
