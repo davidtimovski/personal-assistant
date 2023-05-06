@@ -38,8 +38,6 @@ export class SyncService {
 
 			this.currenciesService.loadRates();
 
-			let lastSyncedServer = '1970-01-01T00:00:00.000Z';
-
 			await this.upcomingExpensesIDBHelper.deleteOld();
 
 			const changed = await this.httpProxy.ajax<Changed>(`${Variables.urls.api}/sync/changes`, {
@@ -51,8 +49,6 @@ export class SyncService {
 			if (!changed) {
 				throw new Error('api/sync/changes call failed');
 			}
-
-			lastSyncedServer = DateHelper.adjustTimeZone(new Date(changed.lastSynced)).toISOString();
 
 			await this.accountsIDBHelper.sync(changed.deletedAccountIds, changed.accounts);
 			await this.categoriesIDBHelper.sync(changed.deletedCategoryIds, changed.categories);
@@ -94,7 +90,7 @@ export class SyncService {
 			await this.debtsIDBHelper.consolidate(created.debtIdPairs);
 			await this.automaticTransactionsIDBHelper.consolidate(created.automaticTransactionIdPairs);
 
-			this.localStorage.setLastSynced(lastSyncedServer);
+			this.localStorage.setLastSynced(changed.lastSynced);
 
 			const retrieved =
 				changed.deletedAccountIds.length +

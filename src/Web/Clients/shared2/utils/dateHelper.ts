@@ -17,7 +17,12 @@ export class DateHelper {
 
   /** Format as 2022-10. */
   static formatYYYYMM(date: Date): string {
-    return date.toISOString().substring(0, 7);
+    const year = date.getFullYear().toString();
+    const month = date.toLocaleDateString(undefined, {
+      month: "2-digit",
+    });
+
+    return `${year}-${month}`;
   }
 
   /** Format to show the day, month, and possibly year in the specified culture */

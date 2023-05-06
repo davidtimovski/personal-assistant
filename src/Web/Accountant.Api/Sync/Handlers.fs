@@ -7,8 +7,7 @@ open Accountant.Persistence.Fs
 open Accountant.Api
 open CommonHandlers
 open Models
-open Sentry
-open Accountant.Api.HandlerBase
+open HandlerBase
 
 module Handlers =
 
@@ -74,7 +73,7 @@ module Handlers =
                     automaticTransactions |> AutomaticTransactions.Logic.mapAll
 
                 let changed =
-                    { LastSynced = DateTime.Now
+                    { LastSynced = DateTime.UtcNow
                       DeletedAccountIds = deletedAccountIds
                       Accounts = accountDtos
                       DeletedCategoryIds = deletedCategoryIds

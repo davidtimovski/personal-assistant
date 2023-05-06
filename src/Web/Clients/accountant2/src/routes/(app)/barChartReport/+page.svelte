@@ -82,10 +82,7 @@
 
 		const transactions = await transactionsService.getForBarChart(fromDate, mainAccountId, categoryId, type, currency);
 
-		let itemGroups = groupBy(
-			transactions,
-			(x: TransactionModel) => x.date.substring(0, 7) // yyyy-MM
-		);
+		const itemGroups = groupBy(transactions, (x: TransactionModel) => DateHelper.formatYYYYMM(new Date(x.date)));
 
 		const from = new Date(fromDate);
 		const now = new Date();
@@ -97,7 +94,7 @@
 		let depositedSum = 0;
 		let savedSum = 0;
 
-		let items = new Array<AmountByMonth>();
+		const items = new Array<AmountByMonth>();
 		for (let i = 0; i < monthsDiff; i++) {
 			const date = DateHelper.formatYYYYMM(from);
 

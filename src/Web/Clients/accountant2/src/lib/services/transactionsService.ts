@@ -310,8 +310,9 @@ export class TransactionsService {
 	}
 
 	private async createTransaction(transaction: TransactionModel): Promise<void> {
-		transaction.createdDate = DateHelper.adjustTimeZone(new Date());
-		transaction.modifiedDate = DateHelper.adjustTimeZone(new Date());
+		const now = new Date();
+		transaction.createdDate = now;
+		transaction.modifiedDate = now;
 
 		if (navigator.onLine) {
 			transaction.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/transactions`, {
@@ -366,7 +367,7 @@ export class TransactionsService {
 				transaction.nonce = null;
 			}
 
-			transaction.modifiedDate = DateHelper.adjustTimeZone(new Date());
+			transaction.modifiedDate = new Date();
 
 			if (navigator.onLine) {
 				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/transactions`, {
