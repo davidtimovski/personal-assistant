@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using Api.Common;
 using Core.Application.Contracts;
 using FluentValidation;
 using Infrastructure.Sender.Models;
@@ -87,9 +88,10 @@ public class TasksController : BaseController
             return BadRequest();
         }
 
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "POST api/tasks",
-            $"{nameof(TasksController)}.{nameof(Create)}"
+            $"{nameof(TasksController)}.{nameof(Create)}",
+            UserId
         );
 
         dto.UserId = UserId;
@@ -142,9 +144,10 @@ public class TasksController : BaseController
             return BadRequest();
         }
 
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "POST api/tasks/bulk",
-            $"{nameof(TasksController)}.{nameof(BulkCreate)}"
+            $"{nameof(TasksController)}.{nameof(BulkCreate)}",
+            UserId
         );
 
         dto.UserId = UserId;
@@ -205,9 +208,10 @@ public class TasksController : BaseController
             return BadRequest();
         }
 
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "PUT api/tasks",
-            $"{nameof(TasksController)}.{nameof(Update)}"
+            $"{nameof(TasksController)}.{nameof(Update)}",
+            UserId
         );
 
         dto.UserId = UserId;
@@ -314,9 +318,10 @@ public class TasksController : BaseController
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "DELETE api/tasks/{id}",
-            $"{nameof(TasksController)}.{nameof(Delete)}"
+            $"{nameof(TasksController)}.{nameof(Delete)}",
+            UserId
         );
 
         try
@@ -367,9 +372,10 @@ public class TasksController : BaseController
             return BadRequest();
         }
 
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "PUT api/tasks/complete",
-            $"{nameof(TasksController)}.{nameof(Complete)}"
+            $"{nameof(TasksController)}.{nameof(Complete)}",
+            UserId
         );
 
         dto.UserId = UserId;
@@ -422,9 +428,10 @@ public class TasksController : BaseController
             return BadRequest();
         }
 
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "PUT api/tasks/uncomplete",
-            $"{nameof(TasksController)}.{nameof(Uncomplete)}"
+            $"{nameof(TasksController)}.{nameof(Uncomplete)}",
+            UserId
         );
 
         dto.UserId = UserId;

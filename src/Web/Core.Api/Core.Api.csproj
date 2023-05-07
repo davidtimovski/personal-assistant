@@ -17,6 +17,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\Infrastructure\Core.Infrastructure\Core.Infrastructure.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Core.Persistence\Core.Persistence.csproj" />
+		<ProjectReference Include="..\Api.Common\Api.Common.csproj" />
 	</ItemGroup>
 
 </Project>

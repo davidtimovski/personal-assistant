@@ -1,4 +1,4 @@
-﻿namespace Background.Jobs.Models.Accountant;
+﻿namespace Jobs.Models.Accountant;
 
 internal enum EntityType
 {

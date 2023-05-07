@@ -10,7 +10,7 @@ using SendGrid;
 using SendGrid.Helpers.Mail;
 using WebPush;
 
-namespace Background.Sender;
+namespace Sender;
 
 public sealed class HostedService : IHostedService, IDisposable
 {
@@ -107,7 +107,7 @@ public sealed class HostedService : IHostedService, IDisposable
             using var conn = new NpgsqlConnection(_configuration["ConnectionString"]);
             conn.Open();
 
-            var recipientSubs = conn.Query<Application.Domain.Common.PushSubscription>(@"SELECT * FROM push_subscriptions WHERE user_id = @UserId AND application = @Application",
+            var recipientSubs = conn.Query<Application.Domain.Common.PushSubscription>("SELECT * FROM push_subscriptions WHERE user_id = @UserId AND application = @Application",
                 new { pushNotification.UserId, pushNotification.Application });
 
             string applicationName = pushNotification.Application.Replace(" ", string.Empty, StringComparison.Ordinal);
@@ -142,7 +142,7 @@ public sealed class HostedService : IHostedService, IDisposable
                     }
                     catch (WebPushException ex) when (ex.Message.StartsWith("Subscription no longer valid"))
                     {
-                        conn.Execute(@"DELETE FROM push_subscriptions WHERE id = @Id", new { recipientSub.Id });
+                        conn.Execute("DELETE FROM push_subscriptions WHERE id = @Id", new { recipientSub.Id });
                     }
                 }
             }

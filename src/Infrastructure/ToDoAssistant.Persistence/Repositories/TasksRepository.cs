@@ -120,7 +120,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM todo.tasks WHERE id = @Id AND private_to_user_id = @UserId",
+        return conn.ExecuteScalar<bool>("SELECT COUNT(*) FROM todo.tasks WHERE id = @Id AND private_to_user_id = @UserId",
             new { Id = id, UserId = userId });
     }
 
@@ -128,7 +128,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM todo.tasks WHERE list_id = @ListId", new { ListId = listId });
+        return conn.ExecuteScalar<int>("SELECT COUNT(*) FROM todo.tasks WHERE list_id = @ListId", new { ListId = listId });
     }
 
     public async Task<int> CreateAsync(ToDoTask task, int userId, ISpan metricsSpan)
@@ -473,7 +473,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
 
     private ToDoTask GetById(int id, IDbConnection conn)
     {
-        return conn.QueryFirstOrDefault<ToDoTask>(@"SELECT * FROM todo.tasks WHERE id = @Id", new { Id = id });
+        return conn.QueryFirstOrDefault<ToDoTask>("SELECT * FROM todo.tasks WHERE id = @Id", new { Id = id });
     }
 
     private short GetPrivateTasksCount(int listId, bool isCompleted, int userId, IDbConnection conn)

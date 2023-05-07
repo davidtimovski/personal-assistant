@@ -1,4 +1,5 @@
-﻿using Core.Application.Contracts;
+﻿using Api.Common;
+using Core.Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,9 +27,10 @@ public class PushSubscriptionsController : BaseController
             return BadRequest();
         }
 
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "POST api/pushsubscriptions",
-            $"{nameof(PushSubscriptionsController)}.{nameof(CreateSubscription)}"
+            $"{nameof(PushSubscriptionsController)}.{nameof(CreateSubscription)}",
+            UserId
         );
 
         await _pushSubscriptionService.CreateSubscriptionAsync(UserId,

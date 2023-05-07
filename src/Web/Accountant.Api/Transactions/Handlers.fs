@@ -8,6 +8,7 @@ open Microsoft.AspNetCore.Http
 open Core.Application.Contracts
 open Accountant.Persistence.Fs
 open Accountant.Api
+open Api.Common.Fs
 open CommonHandlers
 open HandlerBase
 open Models
@@ -16,8 +17,9 @@ module Handlers =
 
     let create: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+            let userId = getUserId ctx
             let tr =
-                startTransactionWithUser "POST /api/transactions" "Transactions/Handlers.create" ctx
+                Metrics.startTransactionWithUser "POST /api/transactions" "Transactions/Handlers.create" userId
 
             task {
                 let! dto = ctx.BindJsonAsync<CreateTransaction>()
@@ -40,8 +42,9 @@ module Handlers =
 
     let update: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+            let userId = getUserId ctx
             let tr =
-                startTransactionWithUser "PUT /api/transactions" "Transactions/Handlers.update" ctx
+                Metrics.startTransactionWithUser "PUT /api/transactions" "Transactions/Handlers.update" userId
 
             task {
                 let! dto = ctx.BindJsonAsync<UpdateTransaction>()
@@ -64,12 +67,11 @@ module Handlers =
 
     let delete (id: int) : HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+            let userId = getUserId ctx
             let tr =
-                startTransactionWithUser "DELETE /api/transactions/*" "Transactions/Handlers.delete" ctx
+                Metrics.startTransactionWithUser "DELETE /api/transactions/*" "Transactions/Handlers.delete" userId
 
             task {
-                let userId = getUserId ctx
-
                 let connectionString = getConnectionString ctx
                 let! _ = TransactionsRepository.delete id userId connectionString tr
 
@@ -82,15 +84,15 @@ module Handlers =
 
     let export: HttpHandler =
         successOrLog (fun (_) (ctx: HttpContext) ->
+            let userId = getUserId ctx
             let tr =
-                startTransactionWithUser "POST /api/transactions/export" "Transactions/Handlers.export" ctx
+                Metrics.startTransactionWithUser "POST /api/transactions/export" "Transactions/Handlers.export" userId
 
             task {
                 let! dto = ctx.BindJsonAsync<ExportDto>()
 
                 let service = ctx.GetService<ICsvService>()
                 let webHostEnvironment = ctx.GetService<IWebHostEnvironment>()
-                let userId = getUserId ctx
 
                 let directory = Path.Combine(webHostEnvironment.ContentRootPath, "storage", "temp")
 
@@ -113,8 +115,9 @@ module Handlers =
 
     let deleteExportedFile (fileId: Guid) : HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+            let userId = getUserId ctx
             let tr =
-                startTransactionWithUser "DELETE /api/transactions/exported-file/*" "Transactions/Handlers.deleteExportedFile" ctx
+                Metrics.startTransactionWithUser "DELETE /api/transactions/exported-file/*" "Transactions/Handlers.deleteExportedFile" userId
 
             task {
                 let webHostEnvironment = ctx.GetService<IWebHostEnvironment>()

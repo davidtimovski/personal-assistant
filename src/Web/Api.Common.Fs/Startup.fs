@@ -11,6 +11,7 @@ open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 open Microsoft.AspNetCore.Localization
+open Microsoft.AspNetCore.Routing
 open Microsoft.Extensions.Logging
 
 let private addDataProtection (isProduction: bool) (services: IServiceCollection) (settings: IConfiguration) =
@@ -61,6 +62,10 @@ let configureServices (services: IServiceCollection) =
     let env = serviceProvider.GetService<IHostEnvironment>()
 
     addDataProtection (env.IsProduction()) services settings
+
+    services.Configure<RouteOptions>(fun (opt: RouteOptions) ->
+        opt.LowercaseUrls <- true
+    ) |> ignore
 
     services.AddGiraffe() |> ignore
 

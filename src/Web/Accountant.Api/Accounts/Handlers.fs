@@ -4,6 +4,7 @@ open Giraffe
 open Microsoft.AspNetCore.Http
 open Accountant.Persistence.Fs
 open Accountant.Api
+open Api.Common.Fs
 open CommonHandlers
 open HandlerBase
 open Models
@@ -12,15 +13,15 @@ module Handlers =
 
     let create: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+            let userId = getUserId ctx
             let tr =
-                startTransactionWithUser "POST /api/accounts" "Accounts/Handlers.create" ctx
+                Metrics.startTransactionWithUser "POST /api/accounts" "Accounts/Handlers.create" userId
 
             task {
                 let! dto = ctx.BindJsonAsync<CreateAccount>()
 
                 match Logic.validateCreate dto with
                 | Success _ ->
-                    let userId = getUserId ctx
                     let account = Logic.prepareForCreate dto userId
 
                     let connection = getDbConnection ctx
@@ -36,7 +37,8 @@ module Handlers =
 
     let update: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
-            let tr = startTransactionWithUser "PUT /api/accounts" "Accounts/Handlers.update" ctx
+            let userId = getUserId ctx
+            let tr = Metrics.startTransactionWithUser "PUT /api/accounts" "Accounts/Handlers.update" userId
 
             task {
                 let! dto = ctx.BindJsonAsync<UpdateAccount>()
@@ -44,7 +46,6 @@ module Handlers =
 
                 match Logic.validateUpdate dto with
                 | Success _ ->
-                    let userId = getUserId ctx
                     let account = Logic.prepareForUpdate dto userId
 
                     let connectionString = getConnectionString ctx
@@ -60,10 +61,10 @@ module Handlers =
 
     let delete (id: int) : HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
-            let tr =
-                startTransactionWithUser "DELETE /api/accounts/*" "Accounts/Handlers.delete" ctx
-
             let userId = getUserId ctx
+            let tr =
+                Metrics.startTransactionWithUser "DELETE /api/accounts/*" "Accounts/Handlers.delete" userId
+
             let connectionString = getConnectionString ctx
 
             let isMain = AccountsRepository.isMain id userId connectionString

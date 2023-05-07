@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using Api.Common;
 using Core.Application.Contracts;
 using FluentValidation;
 using Infrastructure.Sender.Models;
@@ -64,9 +65,10 @@ public class ListsController : BaseController
     [HttpGet]
     public IActionResult GetAll()
     {
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "GET api/lists",
-            $"{nameof(ListsController)}.{nameof(GetAll)}"
+            $"{nameof(ListsController)}.{nameof(GetAll)}",
+            UserId
         );
 
         IEnumerable<ListDto> lists = _listService.GetAll(UserId, tr);
@@ -79,9 +81,10 @@ public class ListsController : BaseController
     [HttpGet("options")]
     public IActionResult GetAllAsOptions()
     {
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "GET api/lists/options",
-            $"{nameof(ListsController)}.{nameof(GetAllAsOptions)}"
+            $"{nameof(ListsController)}.{nameof(GetAllAsOptions)}",
+            UserId
         );
 
         IEnumerable<ToDoListOption> options = _listService.GetAllAsOptions(UserId, tr);
@@ -94,9 +97,10 @@ public class ListsController : BaseController
     [HttpGet("{id}")]
     public IActionResult Get(int id)
     {
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "GET api/lists/{id}",
-            $"{nameof(ListsController)}.{nameof(Get)}"
+            $"{nameof(ListsController)}.{nameof(Get)}",
+            UserId
         );
 
         EditListDto list = _listService.GetForEdit(id, UserId, tr);
@@ -109,9 +113,10 @@ public class ListsController : BaseController
     [HttpGet("{id}/with-shares")]
     public IActionResult GetWithShares(int id)
     {
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "GET api/lists/{id}/with-shares",
-            $"{nameof(ListsController)}.{nameof(GetWithShares)}"
+            $"{nameof(ListsController)}.{nameof(GetWithShares)}",
+            UserId
         );
 
         ListWithShares list = _listService.GetWithShares(id, UserId, tr);
@@ -124,9 +129,10 @@ public class ListsController : BaseController
     [HttpGet("share-requests")]
     public IActionResult GetShareRequests()
     {
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "GET api/lists/share-requests",
-            $"{nameof(ListsController)}.{nameof(GetShareRequests)}"
+            $"{nameof(ListsController)}.{nameof(GetShareRequests)}",
+            UserId
         );
 
         IEnumerable<ShareListRequest> shareRequests = _listService.GetShareRequests(UserId, tr);
@@ -155,9 +161,10 @@ public class ListsController : BaseController
     [HttpGet("{id}/members")]
     public IActionResult GetMembersAsAssigneeOptions(int id)
     {
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "GET api/lists/{id}/members",
-            $"{nameof(ListsController)}.{nameof(GetMembersAsAssigneeOptions)}"
+            $"{nameof(ListsController)}.{nameof(GetMembersAsAssigneeOptions)}",
+            UserId
         );
 
         var assigneeOptions = _listService.GetMembersAsAssigneeOptions(id, UserId, tr);
@@ -175,9 +182,10 @@ public class ListsController : BaseController
             return BadRequest();
         }
 
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "POST api/lists",
-            $"{nameof(ListsController)}.{nameof(Create)}"
+            $"{nameof(ListsController)}.{nameof(Create)}",
+            UserId
         );
 
         dto.UserId = UserId;
@@ -197,9 +205,10 @@ public class ListsController : BaseController
             return BadRequest();
         }
 
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "PUT api/lists",
-            $"{nameof(ListsController)}.{nameof(Update)}"
+            $"{nameof(ListsController)}.{nameof(Update)}",
+            UserId
         );
 
         dto.UserId = UserId;
@@ -265,9 +274,10 @@ public class ListsController : BaseController
             return BadRequest();
         }
 
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "PUT api/lists/shared",
-            $"{nameof(ListsController)}.{nameof(UpdateShared)}"
+            $"{nameof(ListsController)}.{nameof(UpdateShared)}",
+            UserId
         );
 
         dto.UserId = UserId;
@@ -282,9 +292,10 @@ public class ListsController : BaseController
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "DELETE api/lists/{id}",
-            $"{nameof(ListsController)}.{nameof(Delete)}"
+            $"{nameof(ListsController)}.{nameof(Delete)}",
+            UserId
         );
 
         DeleteListResult result = await _listService.DeleteAsync(id, UserId, tr);
@@ -325,9 +336,10 @@ public class ListsController : BaseController
     [HttpGet("can-share-with-user/{email}")]
     public IActionResult CanShareListWithUser(string email)
     {
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "GET api/lists/can-share-with-user/{email}",
-            $"{nameof(ListsController)}.{nameof(CanShareListWithUser)}"
+            $"{nameof(ListsController)}.{nameof(CanShareListWithUser)}",
+            UserId
         );
 
         var canShareVm = new CanShareVm
@@ -357,9 +369,10 @@ public class ListsController : BaseController
             return BadRequest();
         }
 
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "PUT api/lists/share",
-            $"{nameof(ListsController)}.{nameof(Share)}"
+            $"{nameof(ListsController)}.{nameof(Share)}",
+            UserId
         );
 
         dto.UserId = UserId;
@@ -411,9 +424,10 @@ public class ListsController : BaseController
     [HttpDelete("{id}/leave")]
     public async Task<IActionResult> Leave(int id)
     {
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "DELET api/lists/{id}/leave",
-            $"{nameof(ListsController)}.{nameof(Leave)}"
+            $"{nameof(ListsController)}.{nameof(Leave)}",
+            UserId
         );
 
         LeaveListResult result = await _listService.LeaveAsync(id, UserId, tr);
@@ -459,9 +473,10 @@ public class ListsController : BaseController
             return BadRequest();
         }
 
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "POST api/lists/copy",
-            $"{nameof(ListsController)}.{nameof(Copy)}"
+            $"{nameof(ListsController)}.{nameof(Copy)}",
+            UserId
         );
 
         dto.UserId = UserId;
@@ -481,9 +496,10 @@ public class ListsController : BaseController
             return BadRequest();
         }
 
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "PUT api/lists/is-archived",
-            $"{nameof(ListsController)}.{nameof(SetIsArchived)}"
+            $"{nameof(ListsController)}.{nameof(SetIsArchived)}",
+            UserId
         );
 
         await _listService.SetIsArchivedAsync(dto.ListId, UserId, dto.IsArchived, tr);
@@ -501,9 +517,10 @@ public class ListsController : BaseController
             return BadRequest();
         }
 
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "PUT api/lists/uncomplete-all",
-            $"{nameof(ListsController)}.{nameof(UncompleteAll)}"
+            $"{nameof(ListsController)}.{nameof(UncompleteAll)}",
+            UserId
         );
 
         SetTasksAsNotCompletedResult result = await _listService.UncompleteAllAsync(dto.ListId, UserId, tr);
@@ -549,9 +566,10 @@ public class ListsController : BaseController
             return BadRequest();
         }
 
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "PUT api/lists/share-is-accepted",
-            $"{nameof(ListsController)}.{nameof(SetShareIsAccepted)}"
+            $"{nameof(ListsController)}.{nameof(SetShareIsAccepted)}",
+            UserId
         );
 
         SetShareIsAcceptedResult result = await _listService.SetShareIsAcceptedAsync(dto.ListId, UserId, dto.IsAccepted, tr);

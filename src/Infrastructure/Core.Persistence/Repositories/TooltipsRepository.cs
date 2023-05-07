@@ -50,7 +50,7 @@ public class TooltipsRepository : BaseRepository, ITooltipsRepository
 
         using IDbConnection conn = OpenConnection();
 
-        var id = await conn.ExecuteScalarAsync<int>(@"SELECT id FROM tooltips WHERE key = @Key AND application = @Application", new { Key = key, Application = application });
+        var id = await conn.ExecuteScalarAsync<int>("SELECT id FROM tooltips WHERE key = @Key AND application = @Application", new { Key = key, Application = application });
 
         var dismissedTooltip = new TooltipDismissed
         {

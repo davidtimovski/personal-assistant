@@ -4,6 +4,7 @@ open Giraffe
 open Microsoft.AspNetCore.Http
 open Accountant.Persistence.Fs
 open Accountant.Api
+open Api.Common.Fs
 open CommonHandlers
 open HandlerBase
 open Models
@@ -12,8 +13,9 @@ module Handlers =
 
     let create: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+            let userId = getUserId ctx
             let tr =
-                startTransactionWithUser "POST /api/categories" "Categories/Handlers.create" ctx
+                Metrics.startTransactionWithUser "POST /api/categories" "Categories/Handlers.create" userId
 
             task {
                 let! dto = ctx.BindJsonAsync<CreateCategory>()
@@ -21,7 +23,6 @@ module Handlers =
 
                 match Logic.validateCreate dto with
                 | Success _ ->
-                    let userId = getUserId ctx
                     let category = Logic.prepareForCreate dto userId
 
                     let connection = getDbConnection ctx
@@ -37,8 +38,9 @@ module Handlers =
 
     let update: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+            let userId = getUserId ctx
             let tr =
-                startTransactionWithUser "PUT /api/categories" "Categories/Handlers.update" ctx
+                Metrics.startTransactionWithUser "PUT /api/categories" "Categories/Handlers.update" userId
 
             task {
                 let! dto = ctx.BindJsonAsync<UpdateCategory>()
@@ -46,7 +48,6 @@ module Handlers =
 
                 match Logic.validateUpdate dto with
                 | Success _ ->
-                    let userId = getUserId ctx
                     let category = Logic.prepareForUpdate dto userId
 
                     let connectionString = getConnectionString ctx
@@ -62,11 +63,11 @@ module Handlers =
 
     let delete (id: int) : HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+            let userId = getUserId ctx
             let tr =
-                startTransactionWithUser "DELETE /api/categories/*" "Categories/Handlers.delete" ctx
+                Metrics.startTransactionWithUser "DELETE /api/categories/*" "Categories/Handlers.delete" userId
 
             task {
-                let userId = getUserId ctx
                 let connectionString = getConnectionString ctx
 
                 let! _ = CategoriesRepository.delete id userId connectionString tr

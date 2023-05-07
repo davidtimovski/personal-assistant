@@ -15,31 +15,31 @@ public class UsersRepository : BaseRepository, IUsersRepository
     public User Get(int id)
     {
         using IDbConnection conn = OpenConnection();
-        return conn.QueryFirstOrDefault<User>(@"SELECT * FROM users WHERE id = @id", new { id });
+        return conn.QueryFirstOrDefault<User>("SELECT * FROM users WHERE id = @id", new { id });
     }
 
     public User Get(string email)
     {
         using IDbConnection conn = OpenConnection();
-        return conn.QueryFirstOrDefault<User>(@"SELECT * FROM users WHERE email = @email", new { email });
+        return conn.QueryFirstOrDefault<User>("SELECT * FROM users WHERE email = @email", new { email });
     }
 
     public int? GetId(string auth0Id)
     {
         using IDbConnection conn = OpenConnection();
-        return conn.QueryFirstOrDefault<int?>(@"SELECT user_id FROM user_id_map WHERE auth0_id = @auth0Id", new { auth0Id });
+        return conn.QueryFirstOrDefault<int?>("SELECT user_id FROM user_id_map WHERE auth0_id = @auth0Id", new { auth0Id });
     }
 
     public bool Exists(int id)
     {
         using IDbConnection conn = OpenConnection();
-        return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM users WHERE id = @id", new { id });
+        return conn.ExecuteScalar<bool>("SELECT COUNT(*) FROM users WHERE id = @id", new { id });
     }
 
     public bool Exists(string email)
     {
         using IDbConnection conn = OpenConnection();
-        return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM users WHERE email = @email", new { email });
+        return conn.ExecuteScalar<bool>("SELECT COUNT(*) FROM users WHERE email = @email", new { email });
     }
 
     public async Task<int> CreateAsync(string auth0Id, User user, ISpan metricsSpan)
@@ -50,7 +50,7 @@ public class UsersRepository : BaseRepository, IUsersRepository
         await EFContext.SaveChangesAsync();
 
         using IDbConnection conn = OpenConnection();
-        await conn.ExecuteAsync(@"INSERT INTO user_id_map (user_id, auth0_id) VALUES (@userId, @auth0Id)",
+        await conn.ExecuteAsync("INSERT INTO user_id_map (user_id, auth0_id) VALUES (@userId, @auth0Id)",
             new { userId = user.Id, auth0Id });
 
         var result = user.Id;

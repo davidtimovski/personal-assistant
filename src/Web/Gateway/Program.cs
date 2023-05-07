@@ -13,7 +13,7 @@ builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
     }
 });
 
-builder.Services.AddCors(options =>
+builder.Services.AddCors(opt =>
 {
     var toDoAssistantUrl = builder.Configuration["Urls:ToDoAssistant"];
     var cookingAssistantUrl = builder.Configuration["Urls:CookingAssistant"];
@@ -21,7 +21,7 @@ builder.Services.AddCors(options =>
     var weathermanUrl = builder.Configuration["Urls:Weatherman"];
     var trainerUrl = builder.Configuration["Urls:Trainer"];
 
-    options.AddPolicy("AllowAllApps", corsBuilder =>
+    opt.AddPolicy("AllowAllApps", corsBuilder =>
     {
         corsBuilder.WithOrigins(toDoAssistantUrl, cookingAssistantUrl, accountantUrl, weathermanUrl, trainerUrl)
             .AllowAnyMethod()

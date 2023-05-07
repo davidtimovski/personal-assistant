@@ -20,6 +20,7 @@
 		<ProjectReference Include="..\..\Infrastructure\Cdn\Cdn.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Sender\Sender.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\ToDoAssistant.Persistence\ToDoAssistant.Persistence.csproj" />
+		<ProjectReference Include="..\Api.Common\Api.Common.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

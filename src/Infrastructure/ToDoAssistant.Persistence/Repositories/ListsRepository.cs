@@ -65,7 +65,7 @@ public class ListsRepository : BaseRepository, IListsRepository
             new { UserId = userId }).ToList();
 
         var listIds = lists.Select(x => x.Id).ToArray();
-        var shares = conn.Query<ListShare>(@"SELECT * FROM todo.shares WHERE list_id = ANY(@ListIds)", new { ListIds = listIds }).ToList();
+        var shares = conn.Query<ListShare>("SELECT * FROM todo.shares WHERE list_id = ANY(@ListIds)", new { ListIds = listIds }).ToList();
 
         const string tasksSql = @"SELECT t.*, u.id, u.name, u.image_uri
                                   FROM todo.tasks AS t
@@ -114,7 +114,7 @@ public class ListsRepository : BaseRepository, IListsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.QueryFirstOrDefault<ToDoList>(@"SELECT * FROM todo.lists WHERE id = @Id", new { Id = id });
+        return conn.QueryFirstOrDefault<ToDoList>("SELECT * FROM todo.lists WHERE id = @Id", new { Id = id });
     }
 
     public ToDoList GetWithShares(int id, int userId, ISpan metricsSpan)
@@ -222,7 +222,7 @@ public class ListsRepository : BaseRepository, IListsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM todo.shares WHERE user_id = @UserId AND is_accepted IS NULL",
+        return conn.ExecuteScalar<int>("SELECT COUNT(*) FROM todo.shares WHERE user_id = @UserId AND is_accepted IS NULL",
             new { UserId = userId });
     }
 
@@ -354,7 +354,7 @@ public class ListsRepository : BaseRepository, IListsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM todo.lists WHERE user_id = @UserId", new { UserId = userId });
+        return conn.ExecuteScalar<int>("SELECT COUNT(*) FROM todo.lists WHERE user_id = @UserId", new { UserId = userId });
     }
 
     public IEnumerable<User> GetUsersToBeNotifiedOfChange(int id, int excludeUserId, ISpan metricsSpan)
@@ -448,7 +448,7 @@ public class ListsRepository : BaseRepository, IListsRepository
 
         using IDbConnection conn = OpenConnection();
 
-        var originalList = conn.QueryFirst<ToDoList>(@"SELECT * FROM todo.lists WHERE id = @Id", new { list.Id });
+        var originalList = conn.QueryFirst<ToDoList>("SELECT * FROM todo.lists WHERE id = @Id", new { list.Id });
 
         ToDoList dbList = EFContext.Lists.Find(list.Id);
         dbList.Name = list.Name;
@@ -575,7 +575,7 @@ public class ListsRepository : BaseRepository, IListsRepository
             dbShare.Order -= 1;
         }
 
-        var sharesCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*) FROM todo.shares WHERE list_id = @ListId AND is_accepted IS NOT FALSE", new { ListId = id });
+        var sharesCount = conn.ExecuteScalar<short>("SELECT COUNT(*) FROM todo.shares WHERE list_id = @ListId AND is_accepted IS NOT FALSE", new { ListId = id });
         if (sharesCount == 1)
         {
             var uncompletedTasks = EFContext.Tasks.Where(x => x.ListId == id && !x.IsCompleted && !x.PrivateToUserId.HasValue);
@@ -630,7 +630,7 @@ public class ListsRepository : BaseRepository, IListsRepository
                                                          OR (s.user_id = @UserId AND s.is_accepted AND s.is_archived = FALSE)",
             new { list.UserId });
 
-        ToDoList dbList = conn.QueryFirst<ToDoList>(@"SELECT * FROM todo.lists WHERE id = @Id", new { list.Id });
+        ToDoList dbList = conn.QueryFirst<ToDoList>("SELECT * FROM todo.lists WHERE id = @Id", new { list.Id });
 
         list.Id = default;
         list.Order = ++listsCount;
@@ -804,7 +804,7 @@ public class ListsRepository : BaseRepository, IListsRepository
 
         if (!isAccepted)
         {
-            var sharesCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*) FROM todo.shares WHERE list_id = @ListId AND is_accepted IS NOT FALSE", new { ListId = id });
+            var sharesCount = conn.ExecuteScalar<short>("SELECT COUNT(*) FROM todo.shares WHERE list_id = @ListId AND is_accepted IS NOT FALSE", new { ListId = id });
 
             // If this is the last share make all private tasks public
             if (sharesCount == 1)
@@ -855,7 +855,7 @@ public class ListsRepository : BaseRepository, IListsRepository
 
         using IDbConnection conn = OpenConnection();
 
-        var userIsOwner = conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM todo.lists WHERE id = @Id AND user_id = @UserId", new { Id = id, UserId = userId });
+        var userIsOwner = conn.ExecuteScalar<bool>("SELECT COUNT(*) FROM todo.lists WHERE id = @Id AND user_id = @UserId", new { Id = id, UserId = userId });
 
         if (userIsOwner)
         {
