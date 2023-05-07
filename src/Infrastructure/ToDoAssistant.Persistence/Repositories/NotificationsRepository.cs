@@ -34,7 +34,7 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
         var unseenNotificationIds = notifications.Where(x => !x.IsSeen).Select(x => x.Id).ToList();
         if (unseenNotificationIds.Count > 0)
         {
-            conn.Execute(@"UPDATE todo.notifications SET is_seen = TRUE WHERE id = ANY(@UnseenNotificationIds)",
+            conn.Execute("UPDATE todo.notifications SET is_seen = TRUE WHERE id = ANY(@UnseenNotificationIds)",
                 new { UnseenNotificationIds = unseenNotificationIds });
         }
 
@@ -45,7 +45,7 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM todo.notifications WHERE user_id = @UserId AND is_seen = FALSE",
+        return conn.ExecuteScalar<int>("SELECT COUNT(*) FROM todo.notifications WHERE user_id = @UserId AND is_seen = FALSE",
             new { UserId = userId });
     }
 
@@ -55,7 +55,7 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
 
         using IDbConnection conn = OpenConnection();
 
-        await conn.ExecuteAsync(@"DELETE FROM todo.notifications WHERE user_id = @UserId AND list_id = @ListId",
+        await conn.ExecuteAsync("DELETE FROM todo.notifications WHERE user_id = @UserId AND list_id = @ListId",
             new { UserId = userId, ListId = listId });
 
         metric.Finish();

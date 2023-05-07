@@ -17,9 +17,9 @@ public static class IoC
         services.AddTransient<ICurrenciesRepository, CurrenciesRepository>();
         services.AddTransient<ICsvRepository, CsvRepository>();
 
-        services.AddDbContext<PersonalAssistantContext>(options =>
+        services.AddDbContext<PersonalAssistantContext>(opt =>
         {
-            options.UseNpgsql(connectionString)
+            opt.UseNpgsql(connectionString)
                    .UseSnakeCaseNamingConvention();
         });
 

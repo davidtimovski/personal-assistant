@@ -40,12 +40,12 @@ public static class SameSiteCookiesServiceCollectionExtensions
     /// <returns>The modified <see cref="IServiceCollection" />.</returns>
     public static IServiceCollection ConfigureNonBreakingSameSiteCookies(this IServiceCollection services)
     {
-        services.Configure<CookiePolicyOptions>(options =>
+        services.Configure<CookiePolicyOptions>(opt =>
         {
-            options.MinimumSameSitePolicy = Unspecified;
-            options.OnAppendCookie = cookieContext =>
+            opt.MinimumSameSitePolicy = Unspecified;
+            opt.OnAppendCookie = cookieContext =>
                CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
-            options.OnDeleteCookie = cookieContext =>
+            opt.OnDeleteCookie = cookieContext =>
                CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
         });
 

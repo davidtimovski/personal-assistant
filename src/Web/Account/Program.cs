@@ -57,26 +57,26 @@ builder.Services.AddHealthChecks();
 // Cookie configuration for HTTPS
 if (builder.Environment.EnvironmentName == Environments.Production)
 {
-    builder.Services.Configure<CookiePolicyOptions>(options =>
+    builder.Services.Configure<CookiePolicyOptions>(opt =>
     {
-        options.MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None;
+        opt.MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None;
     });
 }
 
 builder.Services
-    .AddAuth0WebAppAuthentication(options =>
+    .AddAuth0WebAppAuthentication(opt =>
     {
-        options.Domain = builder.Configuration["Auth0:Domain"];
-        options.ClientId = builder.Configuration["Auth0:ClientId"];
+        opt.Domain = builder.Configuration["Auth0:Domain"];
+        opt.ClientId = builder.Configuration["Auth0:ClientId"];
     });
 
 builder.Services
-    .AddLocalization(options => options.ResourcesPath = "Resources")
+    .AddLocalization(opt => opt.ResourcesPath = "Resources")
     .AddCors();
 
-builder.Services.AddMvc(options =>
+builder.Services.AddMvc(opt =>
 {
-    options.EnableEndpointRouting = false;
+    opt.EnableEndpointRouting = false;
 })
     .AddViewLocalization();
 
@@ -86,7 +86,7 @@ builder.Services
     .AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
 builder.Services.AddHttpClient();
-builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+builder.Services.Configure<RouteOptions>(opt => opt.LowercaseUrls = true);
 
 builder.Services.AddTransient<IEmailTemplateService, EmailTemplateService>();
 

@@ -21,20 +21,20 @@ public static class IoC
     public static IServiceCollection AddAuth0(this IServiceCollection services, string authority, string audience, string signalrHub = null)
     {
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
+            .AddJwtBearer(opt =>
             {
-                options.Authority = authority;
-                options.Audience = audience;
+                opt.Authority = authority;
+                opt.Audience = audience;
 
                 // If the access token does not have a `sub` claim, `User.Identity.Name` will be `null`. Map it to a different claim by setting the NameClaimType below.
-                options.TokenValidationParameters = new TokenValidationParameters
+                opt.TokenValidationParameters = new TokenValidationParameters
                 {
                     NameClaimType = ClaimTypes.NameIdentifier
                 };
 
                 if (signalrHub != null)
                 {
-                    options.Events = new JwtBearerEvents
+                    opt.Events = new JwtBearerEvents
                     {
                         OnMessageReceived = context =>
                         {
@@ -81,11 +81,11 @@ public static class IoC
     {
         host.ConfigureLogging((context, loggingBuilder) =>
         {
-            loggingBuilder.AddSentry(options =>
+            loggingBuilder.AddSentry(opt =>
             {
-                options.Dsn = dsn;
-                options.SampleRate = 1;
-                options.TracesSampler = samplingCtx =>
+                opt.Dsn = dsn;
+                opt.SampleRate = 1;
+                opt.TracesSampler = samplingCtx =>
                 {
                     if (samplingCtx?.TransactionContext == null)
                     {
@@ -119,7 +119,7 @@ public static class IoC
 
         services
             .AddDataProtection()
-            .PersistKeysToFileSystem(new DirectoryInfo(@"storage/dataprotection-keys/"))
+            .PersistKeysToFileSystem(new DirectoryInfo("storage/dataprotection-keys/"))
             .ProtectKeysWithCertificate(certificate);
 
         return services;

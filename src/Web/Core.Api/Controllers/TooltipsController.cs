@@ -1,4 +1,5 @@
-﻿using Core.Application.Contracts;
+﻿using Api.Common;
+using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,9 +23,10 @@ public class TooltipsController : BaseController
     [HttpGet("application/{application}")]
     public IActionResult GetAll(string application)
     {
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "GET api/tooltips/application/{application}",
-            $"{nameof(TooltipsController)}.{nameof(GetAll)}"
+            $"{nameof(TooltipsController)}.{nameof(GetAll)}",
+            UserId
         );
 
         var tooltipDtos = _tooltipService.GetAll(application, UserId, tr);
@@ -37,9 +39,10 @@ public class TooltipsController : BaseController
     [HttpGet("key/{key}/{application}")]
     public IActionResult GetByKey(string key, string application)
     {
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "GET api/tooltips/key/{key}/{application}",
-            $"{nameof(TooltipsController)}.{nameof(GetByKey)}"
+            $"{nameof(TooltipsController)}.{nameof(GetByKey)}",
+            UserId
         );
 
         var tooltipDto = _tooltipService.GetByKey(UserId, key, application, tr);
@@ -57,9 +60,10 @@ public class TooltipsController : BaseController
             return BadRequest();
         }
 
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "PUT api/tooltips",
-            $"{nameof(TooltipsController)}.{nameof(ToggleDismissed)}"
+            $"{nameof(TooltipsController)}.{nameof(ToggleDismissed)}",
+            UserId
         );
 
         await _tooltipService.ToggleDismissedAsync(UserId, dto.Key, dto.Application, dto.IsDismissed, tr);

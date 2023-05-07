@@ -1,6 +1,5 @@
 ﻿using Core.Application.Contracts;
 using Microsoft.AspNetCore.Mvc;
-using Sentry;
 
 namespace ToDoAssistant.Api.Controllers;
 
@@ -56,13 +55,5 @@ public abstract class BaseController : Controller
 
             return User.Identity.Name;
         }
-    }
-
-    protected ITransaction StartTransactionWithUser(string name, string operation)
-    {
-        var tr = SentrySdk.StartTransaction(name, operation);
-        tr.User = new User { Id = UserId.ToString() };
-
-        return tr;
     }
 }

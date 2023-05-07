@@ -1,14 +1,14 @@
 using System.Text.Json.Nodes;
 using Application.Domain.Common;
-using Background.Jobs.Models.Accountant;
 using Core.Application.Contracts;
 using Dapper;
+using Jobs.Models.Accountant;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
-namespace Background.Jobs;
+namespace Jobs;
 
 public class MidnightJob
 {
@@ -61,7 +61,7 @@ public class MidnightJob
         try
         {
             var aWeekAgo = now.AddDays(-7);
-            await conn.ExecuteAsync(@"DELETE FROM todo.notifications WHERE created_date < @DeleteTo", new { DeleteTo = aWeekAgo });
+            await conn.ExecuteAsync("DELETE FROM todo.notifications WHERE created_date < @DeleteTo", new { DeleteTo = aWeekAgo });
         }
         catch (Exception ex)
         {
@@ -74,7 +74,7 @@ public class MidnightJob
         try
         {
             var oneYearAgo = now.AddYears(-1);
-            await conn.ExecuteAsync(@"DELETE FROM accountant.deleted_entities WHERE deleted_date < @DeleteTo", new { DeleteTo = oneYearAgo });
+            await conn.ExecuteAsync("DELETE FROM accountant.deleted_entities WHERE deleted_date < @DeleteTo", new { DeleteTo = oneYearAgo });
         }
         catch (Exception ex)
         {
@@ -91,14 +91,14 @@ public class MidnightJob
 
         try
         {
-            var automaticTransactions = conn.Query<AutomaticTransaction>(@"SELECT * FROM accountant.automatic_transactions WHERE day_in_month = @DayInMonth", new { DayInMonth = now.Day });
+            var automaticTransactions = conn.Query<AutomaticTransaction>("SELECT * FROM accountant.automatic_transactions WHERE day_in_month = @DayInMonth", new { DayInMonth = now.Day });
 
             var userGroups = automaticTransactions.GroupBy(x => x.UserId);
 
             foreach (var userGroup in userGroups)
             {
                 var userId = userGroup.Key;
-                int userMainAccountId = conn.QueryFirst<int>(@"SELECT id FROM accountant.accounts WHERE user_id = @UserId AND is_main", new { UserId = userId });
+                int userMainAccountId = conn.QueryFirst<int>("SELECT id FROM accountant.accounts WHERE user_id = @UserId AND is_main", new { UserId = userId });
 
                 foreach (AutomaticTransaction automaticTransaction in userGroup)
                 {
@@ -186,7 +186,7 @@ public class MidnightJob
                                         (@UserId, @EntityType, @EntityId, @DeletedDate)",
                                         new DeletedEntity { UserId = userId, EntityType = EntityType.UpcomingExpense, EntityId = ue.Id, DeletedDate = now }, dbTransaction);
 
-                                    await conn.ExecuteAsync(@"DELETE FROM accountant.upcoming_expenses WHERE id = @Id AND user_id = @UserId",
+                                    await conn.ExecuteAsync("DELETE FROM accountant.upcoming_expenses WHERE id = @Id AND user_id = @UserId",
                                         new { ue.Id, UserId = userId }, dbTransaction);
                                 }
                             }
@@ -247,7 +247,7 @@ public class MidnightJob
 
         try
         {
-            var categories = conn.Query<Category>(@"SELECT * FROM accountant.categories WHERE generate_upcoming_expense");
+            var categories = conn.Query<Category>("SELECT * FROM accountant.categories WHERE generate_upcoming_expense");
 
             var userGroups = categories.GroupBy(x => x.UserId);
 
@@ -335,7 +335,7 @@ public class MidnightJob
 
         try
         {
-            var exists = conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM currency_rates WHERE date = @Date", new { Date = today });
+            var exists = conn.ExecuteScalar<bool>("SELECT COUNT(*) FROM currency_rates WHERE date = @Date", new { Date = today });
             if (exists)
             {
                 return;
@@ -356,7 +356,7 @@ public class MidnightJob
                 Rates = ratesData
             };
 
-            await conn.ExecuteAsync(@"INSERT INTO currency_rates (date, rates) VALUES (@Date, CAST(@Rates AS json))", parameters);
+            await conn.ExecuteAsync("INSERT INTO currency_rates (date, rates) VALUES (@Date, CAST(@Rates AS json))", parameters);
         }
         catch (Exception ex)
         {

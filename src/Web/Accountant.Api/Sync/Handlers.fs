@@ -5,22 +5,22 @@ open Giraffe
 open Microsoft.AspNetCore.Http
 open Accountant.Persistence.Fs
 open Accountant.Api
+open Api.Common.Fs
 open CommonHandlers
 open Models
-open HandlerBase
 
 module Handlers =
 
     let getChanges: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+            let userId = getUserId ctx
             let tr =
-                startTransactionWithUser "POST /api/sync/changes" "Sync/Handlers.getChanges" ctx
+                Metrics.startTransactionWithUser "POST /api/sync/changes" "Sync/Handlers.getChanges" userId
 
             let connectionString = getConnectionString ctx
 
             task {
                 let! dto = ctx.BindJsonAsync<GetChangesDto>()
-                let userId = getUserId ctx
 
                 let! _ =
                     UpcomingExpensesRepository.deleteOld
@@ -96,13 +96,13 @@ module Handlers =
 
     let createEntities: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
+            let userId = getUserId ctx
             let tr =
-                startTransactionWithUser "POST /api/sync/create-entities" "Sync/Handlers.createEntities" ctx
+                Metrics.startTransactionWithUser "POST /api/sync/create-entities" "Sync/Handlers.createEntities" userId
 
             task {
                 let! dto = ctx.BindJsonAsync<SyncEntities>()
 
-                let userId = getUserId ctx
                 let connectionString = getConnectionString ctx
 
                 let (accountIds, categoryIds, transactionIds, upcomingExpenseIds, debtIds, automaticTransactionIds) =

@@ -18,6 +18,7 @@
 	<ItemGroup>
 		<Compile Include="Startup.fs" />
 		<Compile Include="Models.fs" />
+		<Compile Include="Metrics.fs" />
 		<Compile Include="Utils.fs" />
 		<Compile Include="CommonHandlers.fs" />
 	</ItemGroup>

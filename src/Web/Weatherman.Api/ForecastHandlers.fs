@@ -4,16 +4,14 @@ open Giraffe
 open Microsoft.AspNetCore.Http
 open Weatherman.Application.Contracts.Forecasts
 open Weatherman.Application.Contracts.Forecasts.Models
+open Api.Common.Fs
 open Models
 open CommonHandlers
-open Sentry;
 
 let get: HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
-        let tr = SentrySdk.StartTransaction(
-            "GET /api/forecasts",
-            "ForecastHandlers.get"
-        )
+        let userId = getUserId ctx
+        let tr = Metrics.startTransactionWithUser "GET /api/forecasts" "ForecastHandlers.get" userId
 
         let result = ctx.TryBindQueryString<GetForecastDto>()
 

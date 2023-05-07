@@ -44,7 +44,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
     public Ingredient Get(int id)
     {
         using IDbConnection conn = OpenConnection();
-        return conn.QueryFirstOrDefault<Ingredient>(@"SELECT * FROM cooking.ingredients WHERE id = @Id", new { Id = id });
+        return conn.QueryFirstOrDefault<Ingredient>("SELECT * FROM cooking.ingredients WHERE id = @Id", new { Id = id });
     }
 
     public Ingredient GetForUpdate(int id, int userId)
@@ -155,7 +155,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.Query<IngredientCategory>(@"SELECT * FROM cooking.ingredient_categories ORDER BY id");
+        return conn.Query<IngredientCategory>("SELECT * FROM cooking.ingredient_categories ORDER BY id");
     }
 
     public IEnumerable<ToDoTask> GetTaskSuggestions(int userId)
@@ -183,7 +183,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
     {
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<bool>(@"SELECT COUNT(*) FROM cooking.ingredients WHERE id = @Id AND user_id = @UserId",
+        return conn.ExecuteScalar<bool>("SELECT COUNT(*) FROM cooking.ingredients WHERE id = @Id AND user_id = @UserId",
             new { Id = id, UserId = userId });
     }
 

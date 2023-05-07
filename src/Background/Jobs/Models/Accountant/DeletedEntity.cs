@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Background.Jobs.Models.Accountant;
+namespace Jobs.Models.Accountant;
 
 internal class DeletedEntity
 {

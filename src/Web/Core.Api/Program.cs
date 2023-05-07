@@ -28,7 +28,7 @@ builder.Services
 builder.Services.AddPersistence(builder.Configuration["ConnectionString"]);
 
 builder.Services.AddControllers();
-builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+builder.Services.Configure<RouteOptions>(opt => opt.LowercaseUrls = true);
 
 builder.Services.AddHealthChecks();
 

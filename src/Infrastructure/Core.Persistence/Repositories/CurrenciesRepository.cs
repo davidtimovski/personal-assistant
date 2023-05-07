@@ -56,11 +56,11 @@ public class CurrenciesRepository : BaseRepository, ICurrenciesRepository
     {
         if (daysSearched == DaysSearchLimit)
         {
-            var latestRates = conn.QueryFirstOrDefault<string>(@"SELECT rates FROM currency_rates ORDER BY date DESC LIMIT 1");
+            var latestRates = conn.QueryFirstOrDefault<string>("SELECT rates FROM currency_rates ORDER BY date DESC LIMIT 1");
             return JsonSerializer.Deserialize<Dictionary<string, decimal>>(latestRates);
         }
 
-        var rates = conn.QueryFirstOrDefault<string>(@"SELECT rates FROM currency_rates WHERE date = @Date", new { Date = date });
+        var rates = conn.QueryFirstOrDefault<string>("SELECT rates FROM currency_rates WHERE date = @Date", new { Date = date });
         if (rates != null)
         {
             return JsonSerializer.Deserialize<Dictionary<string, decimal>>(rates);

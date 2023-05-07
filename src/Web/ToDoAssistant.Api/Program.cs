@@ -49,10 +49,10 @@ builder.Services
 builder.Services.AddControllers();
 
 builder.Services
-    .AddLocalization(options => options.ResourcesPath = "Resources")
+    .AddLocalization(opt => opt.ResourcesPath = "Resources")
     .AddSignalR();
 
-builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+builder.Services.Configure<RouteOptions>(opt => opt.LowercaseUrls = true);
 
 builder.Services.AddHealthChecks();
 

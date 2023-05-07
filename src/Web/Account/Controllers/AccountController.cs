@@ -3,6 +3,7 @@ using Account.Models;
 using Account.Services;
 using Account.ViewModels.Account;
 using Account.ViewModels.Home;
+using Api.Common;
 using Auth0.AspNetCore.Authentication;
 using CookingAssistant.Application.Contracts.Recipes;
 using Core.Application.Contracts;
@@ -81,7 +82,7 @@ public class AccountController : BaseController
     [ActionName("reset-password")]
     public async Task<IActionResult> ResetPassword()
     {
-        var tr = SentrySdk.StartTransaction(
+        var tr = Metrics.StartTransaction(
             "GET account/reset-password",
             $"{nameof(AccountController)}.{nameof(ResetPassword)}"
         );
@@ -112,7 +113,7 @@ public class AccountController : BaseController
             return View(model);
         }
 
-        var tr = SentrySdk.StartTransaction(
+        var tr = Metrics.StartTransaction(
             "POST account/reset-password",
             $"{nameof(AccountController)}.{nameof(ResetPassword)}"
         );
@@ -177,7 +178,7 @@ public class AccountController : BaseController
             return View(model);
         }
 
-        var tr = SentrySdk.StartTransaction(
+        var tr = Metrics.StartTransaction(
             "POST account/register",
             $"{nameof(AccountController)}.{nameof(Register)}"
         );
@@ -232,7 +233,7 @@ public class AccountController : BaseController
     [ActionName("verify-recaptcha")]
     public async Task<IActionResult> VerifyReCaptcha(VerifyReCaptchaViewModel model)
     {
-        var tr = SentrySdk.StartTransaction(
+        var tr = Metrics.StartTransaction(
             "POST account/verify-recaptcha",
             $"{nameof(AccountController)}.{nameof(VerifyReCaptcha)}"
         );
@@ -263,9 +264,10 @@ public class AccountController : BaseController
     [ActionName("delete")]
     public async Task<IActionResult> DeleteAccount()
     {
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "POST /account/delete",
-            $"{nameof(AccountController)}.{nameof(DeleteAccount)}"
+            $"{nameof(AccountController)}.{nameof(DeleteAccount)}",
+            UserId
         );
 
         try
@@ -307,9 +309,10 @@ public class AccountController : BaseController
     [ActionName("edit-profile")]
     public async Task<IActionResult> EditProfile()
     {
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "GET account/edit-profile",
-            $"{nameof(AccountController)}.{nameof(EditProfile)}"
+            $"{nameof(AccountController)}.{nameof(EditProfile)}",
+            UserId
         );
 
         using var httpClient = await InitializeAuth0ClientAsync(tr);
@@ -350,9 +353,10 @@ public class AccountController : BaseController
             });
         }
 
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "POST account/edit-profile",
-            $"{nameof(AccountController)}.{nameof(EditProfile)}"
+            $"{nameof(AccountController)}.{nameof(EditProfile)}",
+            UserId
         );
 
         try
@@ -433,9 +437,10 @@ public class AccountController : BaseController
             return new UnprocessableEntityObjectResult(ModelState);
         }
 
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "POST account/upload-profile-image",
-            $"{nameof(AccountController)}.{nameof(UploadProfileImage)}"
+            $"{nameof(AccountController)}.{nameof(UploadProfileImage)}",
+            UserId
         );
 
         if (image.Length == 0)

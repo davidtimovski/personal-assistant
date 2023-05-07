@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using Api.Common;
 using CookingAssistant.Api.Models;
 using CookingAssistant.Api.Models.Recipes;
 using CookingAssistant.Application.Contracts.Ingredients;
@@ -192,9 +193,10 @@ public class RecipesController : BaseController
             return BadRequest();
         }
 
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "POST api/recipes",
-            $"{nameof(RecipesController)}.{nameof(Create)}"
+            $"{nameof(RecipesController)}.{nameof(Create)}",
+            UserId
         );
 
         dto.UserId = UserId;
@@ -209,9 +211,10 @@ public class RecipesController : BaseController
     [HttpPost("upload-temp-image")]
     public async Task<IActionResult> UploadTempImage(IFormFile image)
     {
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "POST api/recipes/upload-temp-image",
-            $"{nameof(RecipesController)}.{nameof(UploadTempImage)}"
+            $"{nameof(RecipesController)}.{nameof(UploadTempImage)}",
+            UserId
         );
 
         try
@@ -250,9 +253,10 @@ public class RecipesController : BaseController
             return BadRequest();
         }
 
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "PUT api/recipes",
-            $"{nameof(RecipesController)}.{nameof(Update)}"
+            $"{nameof(RecipesController)}.{nameof(Update)}",
+            UserId
         );
 
         dto.UserId = UserId;
@@ -292,9 +296,10 @@ public class RecipesController : BaseController
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "DELETE api/recipes",
-            $"{nameof(RecipesController)}.{nameof(Delete)}"
+            $"{nameof(RecipesController)}.{nameof(Delete)}",
+            UserId
         );
 
         DeleteRecipeResult result = await _recipeService.DeleteAsync(id, UserId, tr);
@@ -580,9 +585,10 @@ public class RecipesController : BaseController
             return BadRequest();
         }
 
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "POST api/recipes/try-import",
-            $"{nameof(RecipesController)}.{nameof(TryImport)}"
+            $"{nameof(RecipesController)}.{nameof(TryImport)}",
+            UserId
         );
 
         var importModel = new ImportRecipe

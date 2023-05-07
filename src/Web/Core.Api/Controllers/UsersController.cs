@@ -1,4 +1,5 @@
-﻿using Core.Application.Contracts;
+﻿using Api.Common;
+using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -46,9 +47,10 @@ public class UsersController : BaseController
     [HttpGet("cooking-preferences")]
     public IActionResult GetCookingPreferences()
     {
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "GET api/users/cooking-preferences",
-            $"{nameof(UsersController)}.{nameof(GetCookingPreferences)}"
+            $"{nameof(UsersController)}.{nameof(GetCookingPreferences)}",
+            UserId
         );
 
         CookingAssistantPreferences preferences = _userService.GetCookingAssistantPreferences(UserId, tr);
@@ -66,9 +68,10 @@ public class UsersController : BaseController
             return BadRequest();
         }
 
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "PUT api/users/to-do-notifications-enabled",
-            $"{nameof(UsersController)}.{nameof(UpdateToDoNotificationsEnabled)}"
+            $"{nameof(UsersController)}.{nameof(UpdateToDoNotificationsEnabled)}",
+            UserId
         );
 
         await _userService.UpdateToDoNotificationsEnabledAsync(UserId, dto.ToDoNotificationsEnabled, tr);
@@ -86,9 +89,10 @@ public class UsersController : BaseController
             return BadRequest();
         }
 
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
             "PUT api/users/cooking-notifications-enabled",
-            $"{nameof(UsersController)}.{nameof(UpdateCookingNotificationsEnabled)}"
+            $"{nameof(UsersController)}.{nameof(UpdateCookingNotificationsEnabled)}",
+            UserId
         );
 
         await _userService.UpdateCookingNotificationsEnabledAsync(UserId, dto.CookingNotificationsEnabled, tr);
@@ -106,9 +110,10 @@ public class UsersController : BaseController
             return BadRequest();
         }
 
-        var tr = StartTransactionWithUser(
+        var tr = Metrics.StartTransactionWithUser(
            "PUT api/users/imperial-system",
-            $"{nameof(UsersController)}.{nameof(UpdateImperialSystem)}"
+            $"{nameof(UsersController)}.{nameof(UpdateImperialSystem)}",
+            UserId
         );
 
         await _userService.UpdateImperialSystemAsync(UserId, dto.ImperialSystem, tr);
