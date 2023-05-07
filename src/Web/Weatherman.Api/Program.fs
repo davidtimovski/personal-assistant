@@ -34,7 +34,7 @@ let private configureServices (services: IServiceCollection) =
 let main args =
     let builder = WebApplication.CreateBuilder(args)
 
-    Startup.configureBuilder builder
+    Startup.configureBuilder builder "Weatherman"
 
     builder.Host.ConfigureServices(configureServices) |> ignore
 
