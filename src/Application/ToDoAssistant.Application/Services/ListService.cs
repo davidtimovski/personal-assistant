@@ -40,7 +40,7 @@ public class ListService : IListService
         _logger = logger;
     }
 
-    public string[] IconOptions => new string[] { "list", "shopping-cart", "shopping-bag", "home", "birthday", "cheers", "vacation", "passport", "plane", "car", "pickup-truck", "world", "camping", "tree", "motorcycle", "bicycle", "workout", "ski", "snowboard", "swimming", "work", "baby", "dog", "cat", "bird", "fish", "camera", "medicine", "file", "book", "mountain", "facebook", "twitter", "instagram", "tiktok" };
+    public static string[] IconOptions => new string[] { "list", "shopping-cart", "shopping-bag", "home", "birthday", "cheers", "vacation", "passport", "plane", "car", "pickup-truck", "world", "camping", "tree", "motorcycle", "bicycle", "workout", "ski", "snowboard", "swimming", "work", "baby", "dog", "cat", "bird", "fish", "camera", "medicine", "file", "book", "mountain", "facebook", "twitter", "instagram", "tiktok" };
 
     public IEnumerable<ListDto> GetAll(int userId, ISpan metricsSpan)
     {

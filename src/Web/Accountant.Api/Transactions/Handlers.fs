@@ -100,7 +100,7 @@ module Handlers =
                 let exportAsCsvModel =
                     new ExportTransactionsAsCsv(userId, directory, dto.FileId, uncategorized, encrypted)
 
-                let file = service.ExportTransactionsAsCsv(exportAsCsvModel)
+                let file = service.ExportTransactionsAsCsv(exportAsCsvModel, tr)
 
                 ctx.SetHttpHeader("Content-Disposition", "attachment; filename=\"transactions.csv\"")
 

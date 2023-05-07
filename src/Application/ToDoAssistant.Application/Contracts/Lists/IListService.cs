@@ -7,8 +7,6 @@ namespace ToDoAssistant.Application.Contracts.Lists;
 
 public interface IListService
 {
-    string[] IconOptions { get; }
-
     IEnumerable<ListDto> GetAll(int userId, ISpan metricsSpan);
     IEnumerable<ToDoListOption> GetAllAsOptions(int userId, ISpan metricsSpan);
     IEnumerable<Assignee> GetMembersAsAssigneeOptions(int id, int userId, ISpan metricsSpan);

@@ -1,6 +1,5 @@
 module Weatherman.Api.App
 
-open System.IO
 open Giraffe
 open Core.Infrastructure
 open Core.Persistence
@@ -25,7 +24,7 @@ let private configureServices (services: IServiceCollection) =
 let main args =
     let builder = WebApplication.CreateBuilder(args)
 
-    Startup.configureBuilder builder
+    Startup.configureBuilder builder "Trainer"
 
     builder.Host.ConfigureServices(configureServices) |> ignore
 

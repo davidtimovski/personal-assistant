@@ -1,11 +1,11 @@
 ﻿using System.Globalization;
-using Application.Domain.Accountant;
 using AutoMapper;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
+using Sentry;
 
 namespace Core.Application.Services;
 
@@ -25,8 +25,10 @@ public class CsvService : ICsvService
         _logger = logger;
     }
 
-    public FileStream ExportTransactionsAsCsv(ExportTransactionsAsCsv model)
+    public FileStream ExportTransactionsAsCsv(ExportTransactionsAsCsv model, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(CsvService)}.{nameof(ExportTransactionsAsCsv)}");
+
         try
         {
             if (!Directory.Exists(model.Directory))
@@ -37,7 +39,7 @@ public class CsvService : ICsvService
             string fileName = model.FileId + ".csv";
             string tempFilePath = Path.Combine(model.Directory, fileName);
 
-            IEnumerable<Transaction> transactions = _csvRepository.GetAllTransactionsForExport(model.UserId, model.Uncategorized).ToList();
+            var transactions = _csvRepository.GetAllTransactionsForExport(model.UserId, model.Uncategorized, metric);
             foreach (var transaction in transactions)
             {
                 if (transaction.IsEncrypted)
@@ -60,10 +62,14 @@ public class CsvService : ICsvService
             _logger.LogError(ex, $"Unexpected error in {nameof(ExportTransactionsAsCsv)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 }
 
-public class TransactionMap : ClassMap<Transaction>
+public class TransactionMap : ClassMap<TransactionForExport>
 {
     public TransactionMap()
     {

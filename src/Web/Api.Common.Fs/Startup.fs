@@ -35,7 +35,7 @@ let private addLocalization (app: WebApplication) =
     localizationOptions.SupportedUICultures <- supportedCultures
     app.UseRequestLocalization(localizationOptions) |> ignore
 
-let configureBuilder (builder: WebApplicationBuilder) =
+let configureBuilder (builder: WebApplicationBuilder) (appName: string) =
     builder
         .Host
         .UseContentRoot(Directory.GetCurrentDirectory())
@@ -49,7 +49,7 @@ let configureBuilder (builder: WebApplicationBuilder) =
         let clientSecret = builder.Configuration["KeyVault:ClientSecret"]
         builder.Host.AddKeyVault(keyVaultUri, tenantId, clientId, clientSecret) |> ignore
 
-        builder.Host.AddSentryLogging(builder.Configuration["Sentry:Dsn"], HashSet<string>(["GET /health"])) |> ignore
+        builder.Host.AddSentryLogging(builder.Configuration[$"{appName}:Sentry:Dsn"], HashSet<string>(["GET /health"])) |> ignore
     | false ->
         builder.Host.ConfigureLogging(fun (loggingBuilder: ILoggingBuilder) ->
             loggingBuilder.AddConsole().AddDebug() |> ignore)
