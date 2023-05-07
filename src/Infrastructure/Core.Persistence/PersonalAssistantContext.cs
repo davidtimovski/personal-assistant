@@ -1,5 +1,4 @@
-﻿using Application.Domain.Accountant;
-using Application.Domain.Common;
+﻿using Application.Domain.Common;
 using Application.Domain.CookingAssistant;
 using Application.Domain.ToDoAssistant;
 using Application.Domain.Weatherman;
@@ -28,14 +27,6 @@ public class PersonalAssistantContext : DbContext
     public DbSet<SendRequest> SendRequests { get; set; }
     public DbSet<DietaryProfile> DietaryProfiles { get; set; }
 
-    public DbSet<Account> Accounts { get; set; }
-    public DbSet<Transaction> Transactions { get; set; }
-    public DbSet<Category> Categories { get; set; }
-    public DbSet<UpcomingExpense> UpcomingExpenses { get; set; }
-    public DbSet<Debt> Debts { get; set; }
-    public DbSet<AutomaticTransaction> AutomaticTransactions { get; set; }
-    public DbSet<DeletedEntity> DeletedEntities { get; set; }
-
     public DbSet<Forecast> Forecasts { get; set; }
 
     public DbSet<PushSubscription> PushSubscriptions { get; set; }
@@ -55,7 +46,6 @@ public class PersonalAssistantContext : DbContext
             x.Property(e => e.UserId).IsRequired();
             x.Property(e => e.Name).IsRequired();
             x.Property(e => e.Icon).HasDefaultValue("Regular");
-            x.Property(e => e.NotificationsEnabled).HasDefaultValue(true);
 
             x.Ignore(e => e.IsShared);
         });
@@ -71,8 +61,6 @@ public class PersonalAssistantContext : DbContext
             x.ToTable("shares", schema: "todo");
 
             x.HasKey(e => new { e.ListId, e.UserId });
-
-            x.Property(e => e.NotificationsEnabled).HasDefaultValue(true);
         });
         modelBuilder.Entity<Notification>(x =>
         {
@@ -129,18 +117,6 @@ public class PersonalAssistantContext : DbContext
         {
             x.ToTable("dietary_profiles", schema: "cooking");
             x.HasKey(e => e.UserId);
-        });
-
-        modelBuilder.Entity<Account>(x => { x.ToTable("accounts", schema: "accountant"); });
-        modelBuilder.Entity<Transaction>(x => { x.ToTable("transactions", schema: "accountant"); });
-        modelBuilder.Entity<Category>(x => { x.ToTable("categories", schema: "accountant"); });
-        modelBuilder.Entity<UpcomingExpense>(x => { x.ToTable("upcoming_expenses", schema: "accountant"); });
-        modelBuilder.Entity<Debt>(x => { x.ToTable("debts", schema: "accountant"); });
-        modelBuilder.Entity<AutomaticTransaction>(x => { x.ToTable("automatic_transactions", schema: "accountant"); });
-        modelBuilder.Entity<DeletedEntity>(x =>
-        {
-            x.ToTable("deleted_entities", schema: "accountant");
-            x.HasKey(e => new { e.UserId, e.EntityType, e.EntityId });
         });
 
         modelBuilder.Entity<Forecast>(x =>

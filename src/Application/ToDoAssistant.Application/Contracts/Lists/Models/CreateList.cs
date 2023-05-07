@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using ToDoAssistant.Application.Services;
 
 namespace ToDoAssistant.Application.Contracts.Lists.Models;
 
@@ -26,7 +27,7 @@ public class CreateListValidator : AbstractValidator<CreateList>
 
         RuleFor(dto => dto.Icon)
             .NotEmpty().WithMessage("Lists.ModifyList.IconIsRequired")
-            .Must(icon => listService.IconOptions.Contains(icon)).WithMessage("Lists.ModifyList.InvalidIcon");
+            .Must(icon => ListService.IconOptions.Contains(icon)).WithMessage("Lists.ModifyList.InvalidIcon");
 
         RuleFor(dto => dto.TasksText).Must(tasksText =>
         {

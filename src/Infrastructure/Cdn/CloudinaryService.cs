@@ -323,7 +323,7 @@ public class CloudinaryService : ICdnService
 
     private string GetPublicIdFromUri(string uri)
     {
-        var pathRegex = new Regex(@"personalassistant\/(.*).webp");
+        var pathRegex = new Regex(@$"personalassistant\/(.*).{Format}");
         Match match = pathRegex.Match(uri);
         return match.Groups[1].Value;
     }

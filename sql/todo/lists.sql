@@ -5,7 +5,7 @@ CREATE TABLE todo.lists
     name character varying(50) NOT NULL COLLATE pg_catalog."default",
     icon character varying(15) COLLATE pg_catalog."default" NOT NULL DEFAULT 'Regular'::character varying,
     order smallint,
-    notifications_enabled boolean NOT NULL DEFAULT TRUE,
+    notifications_enabled boolean NOT NULL DEFAULT FALSE,
     is_one_time_toggle_default boolean NOT NULL DEFAULT FALSE,
     is_archived boolean NOT NULL DEFAULT FALSE,
     created_date timestamp with time zone NOT NULL,

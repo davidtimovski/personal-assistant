@@ -1,12 +1,11 @@
-using Application.Domain.Accountant;
+using System.Text.Json.Nodes;
 using Application.Domain.Common;
+using Background.Jobs.Models.Accountant;
 using Core.Application.Contracts;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Npgsql;
 
 namespace Background.Jobs;
@@ -185,7 +184,7 @@ public class MidnightJob
                                     await conn.ExecuteAsync(@"INSERT INTO accountant.deleted_entities
                                         (user_id, entity_type, entity_id, deleted_date) VALUES
                                         (@UserId, @EntityType, @EntityId, @DeletedDate)",
-                                        new { UserId = userId, EntityType = (int)EntityType.UpcomingExpense, EntityId = ue.Id, DeletedDate = now }, dbTransaction);
+                                        new DeletedEntity { UserId = userId, EntityType = EntityType.UpcomingExpense, EntityId = ue.Id, DeletedDate = now }, dbTransaction);
 
                                     await conn.ExecuteAsync(@"DELETE FROM accountant.upcoming_expenses WHERE id = @Id AND user_id = @UserId",
                                         new { ue.Id, UserId = userId }, dbTransaction);
@@ -205,7 +204,7 @@ public class MidnightJob
     }
 
     /// <summary>
-    /// For the upcoming expenses funcitonality in Accountant.
+    /// For the upcoming expenses functionality in Accountant.
     /// </summary>
     private async Task GenerateUpcomingExpenses(NpgsqlConnection conn, DateTime now)
     {
@@ -346,8 +345,9 @@ public class MidnightJob
             HttpResponseMessage result = await httpClient.GetAsync($"latest?access_key={_currencyRatesApiKey}");
 
             string jsonResponse = await result.Content.ReadAsStringAsync();
-            var json = JObject.Parse(jsonResponse);
-            string ratesData = json["rates"].ToString(Formatting.None);
+
+            var json = JsonNode.Parse(jsonResponse);
+            string ratesData = json["error"].ToJsonString();
 
             // Save to database
             var parameters = new CurrencyRates

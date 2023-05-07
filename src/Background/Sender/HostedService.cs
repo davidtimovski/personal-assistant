@@ -110,7 +110,7 @@ public sealed class HostedService : IHostedService, IDisposable
             var recipientSubs = conn.Query<Application.Domain.Common.PushSubscription>(@"SELECT * FROM push_subscriptions WHERE user_id = @UserId AND application = @Application",
                 new { pushNotification.UserId, pushNotification.Application });
 
-            string appVapidConfigPrefix = pushNotification.Application.Replace(" ", string.Empty, StringComparison.Ordinal);
+            string applicationName = pushNotification.Application.Replace(" ", string.Empty, StringComparison.Ordinal);
 
             try
             {
@@ -119,8 +119,8 @@ public sealed class HostedService : IHostedService, IDisposable
                     var subscription = new PushSubscription(recipientSub.Endpoint, recipientSub.P256dhKey, recipientSub.AuthKey);
                     var vapidDetails = new VapidDetails(
                         subject: "mailto:david.timovski@gmail.com",
-                        publicKey: _configuration[$"{appVapidConfigPrefix}Vapid:PublicKey"],
-                        privateKey: _configuration[$"{appVapidConfigPrefix}Vapid:PrivateKey"]);
+                        publicKey: _configuration[$"{applicationName}:Vapid:PublicKey"],
+                        privateKey: _configuration[$"{applicationName}:Vapid:PrivateKey"]);
 
                     var webPushClient = new WebPushClient();
                     try

@@ -1,8 +1,9 @@
-﻿using Application.Domain.Accountant;
+﻿using Core.Application.Contracts.Models;
+using Sentry;
 
 namespace Core.Application.Contracts;
 
 public interface ICsvRepository
 {
-    IEnumerable<Transaction> GetAllTransactionsForExport(int userId, string uncategorized);
+    List<TransactionForExport> GetAllTransactionsForExport(int userId, string uncategorized, ISpan metricsSpan);
 }

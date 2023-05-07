@@ -1,7 +1,8 @@
 ﻿using System.Data;
-using Application.Domain.Accountant;
 using Core.Application.Contracts;
+using Core.Application.Contracts.Models;
 using Dapper;
+using Sentry;
 
 namespace Core.Persistence.Repositories;
 
@@ -10,8 +11,10 @@ public class CsvRepository : BaseRepository, ICsvRepository
     public CsvRepository(PersonalAssistantContext efContext)
         : base(efContext) { }
 
-    public IEnumerable<Transaction> GetAllTransactionsForExport(int userId, string uncategorized)
+    public List<TransactionForExport> GetAllTransactionsForExport(int userId, string uncategorized, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(CsvRepository)}.{nameof(GetAllTransactionsForExport)}");
+
         using IDbConnection conn = OpenConnection();
 
         const string query = @"SELECT t.*, fa.id, fa.name, ta.id, ta.name, c.id, c.name, pc.id, pc.name
@@ -22,15 +25,15 @@ public class CsvRepository : BaseRepository, ICsvRepository
                         LEFT JOIN accountant.categories AS pc ON c.parent_id = pc.id
                         WHERE fa.user_id = @UserId OR ta.user_id = @UserId ORDER BY date";
 
-        var transactions = conn.Query<Transaction, Account, Account, Category, Category, Transaction>(query,
+        var transactions = conn.Query<TransactionForExport, AccountForExport, AccountForExport, CategoryForExport, CategoryForExport, TransactionForExport>(query,
             (transaction, fromAccount, toAccount, category, parentCategory) =>
             {
-                transaction.FromAccount = fromAccount ?? new Account();
-                transaction.ToAccount = toAccount ?? new Account();
+                transaction.FromAccount = fromAccount ?? new AccountForExport();
+                transaction.ToAccount = toAccount ?? new AccountForExport();
 
                 if (category == null)
                 {
-                    transaction.Category = new Category { Name = uncategorized };
+                    transaction.Category = new CategoryForExport { Name = uncategorized };
                 }
                 else
                 {
@@ -43,7 +46,9 @@ public class CsvRepository : BaseRepository, ICsvRepository
                 }
 
                 return transaction;
-            }, new { UserId = userId });
+            }, new { UserId = userId }).ToList();
+
+        metric.Finish();
 
         return transactions;
     }

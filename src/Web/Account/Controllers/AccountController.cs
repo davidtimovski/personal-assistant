@@ -239,7 +239,7 @@ public class AccountController : BaseController
 
         using var content = new FormUrlEncodedContent(new[]
         {
-            new KeyValuePair<string, string>("secret", _configuration["ReCaptchaSecret"]),
+            new KeyValuePair<string, string>("secret", _configuration["Account:ReCaptchaSecret"]),
             new KeyValuePair<string, string>("response", model.Token)
         });
 
