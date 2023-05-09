@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 		<DockerfileContext>..\..</DockerfileContext>
 	</PropertyGroup>
+
+	<Import Project="..\..\..\PersonalAssistant.Cs.targets" />
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.5" />

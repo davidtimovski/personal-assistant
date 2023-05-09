@@ -24,7 +24,7 @@ public class TooltipsController : BaseController
     public IActionResult GetAll(string application)
     {
         var tr = Metrics.StartTransactionWithUser(
-            "GET api/tooltips/application/{application}",
+            $"{Request.Method} api/tooltips/application/{application}",
             $"{nameof(TooltipsController)}.{nameof(GetAll)}",
             UserId
         );
@@ -40,7 +40,7 @@ public class TooltipsController : BaseController
     public IActionResult GetByKey(string key, string application)
     {
         var tr = Metrics.StartTransactionWithUser(
-            "GET api/tooltips/key/{key}/{application}",
+            $"{Request.Method} api/tooltips/key/{key}/{application}",
             $"{nameof(TooltipsController)}.{nameof(GetByKey)}",
             UserId
         );
@@ -61,7 +61,7 @@ public class TooltipsController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-            "PUT api/tooltips",
+            $"{Request.Method} api/tooltips",
             $"{nameof(TooltipsController)}.{nameof(ToggleDismissed)}",
             UserId
         );

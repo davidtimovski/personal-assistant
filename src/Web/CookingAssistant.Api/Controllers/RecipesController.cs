@@ -194,7 +194,7 @@ public class RecipesController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-            "POST api/recipes",
+            $"{Request.Method} api/recipes",
             $"{nameof(RecipesController)}.{nameof(Create)}",
             UserId
         );
@@ -212,7 +212,7 @@ public class RecipesController : BaseController
     public async Task<IActionResult> UploadTempImage(IFormFile image)
     {
         var tr = Metrics.StartTransactionWithUser(
-            "POST api/recipes/upload-temp-image",
+            $"{Request.Method} api/recipes/upload-temp-image",
             $"{nameof(RecipesController)}.{nameof(UploadTempImage)}",
             UserId
         );
@@ -254,7 +254,7 @@ public class RecipesController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-            "PUT api/recipes",
+            $"{Request.Method} api/recipes",
             $"{nameof(RecipesController)}.{nameof(Update)}",
             UserId
         );
@@ -297,7 +297,7 @@ public class RecipesController : BaseController
     public async Task<IActionResult> Delete(int id)
     {
         var tr = Metrics.StartTransactionWithUser(
-            "DELETE api/recipes",
+            $"{Request.Method} api/recipes",
             $"{nameof(RecipesController)}.{nameof(Delete)}",
             UserId
         );
@@ -586,7 +586,7 @@ public class RecipesController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-            "POST api/recipes/try-import",
+            $"{Request.Method} api/recipes/try-import",
             $"{nameof(RecipesController)}.{nameof(TryImport)}",
             UserId
         );

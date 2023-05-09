@@ -28,7 +28,7 @@ public class PushSubscriptionsController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-            "POST api/pushsubscriptions",
+            $"{Request.Method} api/pushsubscriptions",
             $"{nameof(PushSubscriptionsController)}.{nameof(CreateSubscription)}",
             UserId
         );

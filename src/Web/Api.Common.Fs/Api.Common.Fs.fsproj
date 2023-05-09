@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
+
+	<Import Project="..\..\..\PersonalAssistant.Fs.targets" />
 
 	<ItemGroup>
 		<PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.2.2" />
@@ -12,7 +13,7 @@
 		<PackageReference Include="Giraffe" Version="6.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.5" />
 		<PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
-		<PackageReference Include="Sentry.AspNetCore" Version="3.30.0" />
+		<PackageReference Include="Sentry.AspNetCore" Version="$(SentryVersion)" />
 	</ItemGroup>
 
 	<ItemGroup>

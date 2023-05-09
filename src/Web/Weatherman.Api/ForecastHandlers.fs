@@ -11,7 +11,9 @@ open CommonHandlers
 let get: HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
         let userId = getUserId ctx
-        let tr = Metrics.startTransactionWithUser "GET /api/forecasts" "ForecastHandlers.get" userId
+
+        let tr =
+            Metrics.startTransactionWithUser $"{ctx.Request.Method} /api/forecasts" "ForecastHandlers.get" userId
 
         let result = ctx.TryBindQueryString<GetForecastDto>()
 

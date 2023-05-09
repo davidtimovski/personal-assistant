@@ -14,8 +14,12 @@ module Handlers =
     let create: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             let userId = getUserId ctx
+
             let tr =
-                Metrics.startTransactionWithUser "POST /api/automatic-transactions" "AutomaticTransactions/Handlers.create" userId
+                Metrics.startTransactionWithUser
+                    $"{ctx.Request.Method} /api/automatic-transactions"
+                    "AutomaticTransactions/Handlers.create"
+                    userId
 
             task {
                 let! dto = ctx.BindJsonAsync<CreateAutomaticTransaction>()
@@ -39,8 +43,12 @@ module Handlers =
     let update: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             let userId = getUserId ctx
+
             let tr =
-                Metrics.startTransactionWithUser "PUT /api/automatic-transactions" "AutomaticTransactions/Handlers.update" userId
+                Metrics.startTransactionWithUser
+                    $"{ctx.Request.Method} /api/automatic-transactions"
+                    "AutomaticTransactions/Handlers.update"
+                    userId
 
             task {
                 let! dto = ctx.BindJsonAsync<UpdateAutomaticTransaction>()
@@ -64,9 +72,10 @@ module Handlers =
     let delete (id: int) : HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             let userId = getUserId ctx
+
             let tr =
                 Metrics.startTransactionWithUser
-                    "DELETE /api/automatic-transactions/*"
+                    $"{ctx.Request.Method} /api/automatic-transactions/*"
                     "AutomaticTransactions/Handlers.delete"
                     userId
 

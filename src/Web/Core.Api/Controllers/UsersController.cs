@@ -48,7 +48,7 @@ public class UsersController : BaseController
     public IActionResult GetCookingPreferences()
     {
         var tr = Metrics.StartTransactionWithUser(
-            "GET api/users/cooking-preferences",
+            $"{Request.Method} api/users/cooking-preferences",
             $"{nameof(UsersController)}.{nameof(GetCookingPreferences)}",
             UserId
         );
@@ -69,7 +69,7 @@ public class UsersController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-            "PUT api/users/to-do-notifications-enabled",
+            $"{Request.Method} api/users/to-do-notifications-enabled",
             $"{nameof(UsersController)}.{nameof(UpdateToDoNotificationsEnabled)}",
             UserId
         );
@@ -90,7 +90,7 @@ public class UsersController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-            "PUT api/users/cooking-notifications-enabled",
+            $"{Request.Method} api/users/cooking-notifications-enabled",
             $"{nameof(UsersController)}.{nameof(UpdateCookingNotificationsEnabled)}",
             UserId
         );
@@ -111,7 +111,7 @@ public class UsersController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-           "PUT api/users/imperial-system",
+           $"{Request.Method} api/users/imperial-system",
             $"{nameof(UsersController)}.{nameof(UpdateImperialSystem)}",
             UserId
         );

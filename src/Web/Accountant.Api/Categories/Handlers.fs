@@ -14,8 +14,12 @@ module Handlers =
     let create: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             let userId = getUserId ctx
+
             let tr =
-                Metrics.startTransactionWithUser "POST /api/categories" "Categories/Handlers.create" userId
+                Metrics.startTransactionWithUser
+                    $"{ctx.Request.Method} /api/categories"
+                    "Categories/Handlers.create"
+                    userId
 
             task {
                 let! dto = ctx.BindJsonAsync<CreateCategory>()
@@ -39,8 +43,12 @@ module Handlers =
     let update: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             let userId = getUserId ctx
+
             let tr =
-                Metrics.startTransactionWithUser "PUT /api/categories" "Categories/Handlers.update" userId
+                Metrics.startTransactionWithUser
+                    $"{ctx.Request.Method} /api/categories"
+                    "Categories/Handlers.update"
+                    userId
 
             task {
                 let! dto = ctx.BindJsonAsync<UpdateCategory>()
@@ -64,8 +72,12 @@ module Handlers =
     let delete (id: int) : HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             let userId = getUserId ctx
+
             let tr =
-                Metrics.startTransactionWithUser "DELETE /api/categories/*" "Categories/Handlers.delete" userId
+                Metrics.startTransactionWithUser
+                    $"{ctx.Request.Method} /api/categories/*"
+                    "Categories/Handlers.delete"
+                    userId
 
             task {
                 let connectionString = getConnectionString ctx

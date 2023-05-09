@@ -24,7 +24,7 @@ public class CurrenciesController : BaseController
     public IActionResult GetAll(DateTime date)
     {
         var tr = Metrics.StartTransactionWithUser(
-            "GET api/currencies/{date}",
+            $"{Request.Method} api/currencies/{date}",
             $"{nameof(CurrenciesController)}.{nameof(GetAll)}",
             UserId
         );
