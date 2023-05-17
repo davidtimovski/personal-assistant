@@ -66,7 +66,7 @@ public class ListsController : BaseController
     public IActionResult GetAll()
     {
         var tr = Metrics.StartTransactionWithUser(
-            "GET api/lists",
+            $"{Request.Method} api/lists",
             $"{nameof(ListsController)}.{nameof(GetAll)}",
             UserId
         );
@@ -82,7 +82,7 @@ public class ListsController : BaseController
     public IActionResult GetAllAsOptions()
     {
         var tr = Metrics.StartTransactionWithUser(
-            "GET api/lists/options",
+            $"{Request.Method} api/lists/options",
             $"{nameof(ListsController)}.{nameof(GetAllAsOptions)}",
             UserId
         );
@@ -98,7 +98,7 @@ public class ListsController : BaseController
     public IActionResult Get(int id)
     {
         var tr = Metrics.StartTransactionWithUser(
-            "GET api/lists/{id}",
+            $"{Request.Method} api/lists/{id}",
             $"{nameof(ListsController)}.{nameof(Get)}",
             UserId
         );
@@ -114,7 +114,7 @@ public class ListsController : BaseController
     public IActionResult GetWithShares(int id)
     {
         var tr = Metrics.StartTransactionWithUser(
-            "GET api/lists/{id}/with-shares",
+            $"{Request.Method} api/lists/{id}/with-shares",
             $"{nameof(ListsController)}.{nameof(GetWithShares)}",
             UserId
         );
@@ -130,7 +130,7 @@ public class ListsController : BaseController
     public IActionResult GetShareRequests()
     {
         var tr = Metrics.StartTransactionWithUser(
-            "GET api/lists/share-requests",
+            $"{Request.Method} api/lists/share-requests",
             $"{nameof(ListsController)}.{nameof(GetShareRequests)}",
             UserId
         );
@@ -162,7 +162,7 @@ public class ListsController : BaseController
     public IActionResult GetMembersAsAssigneeOptions(int id)
     {
         var tr = Metrics.StartTransactionWithUser(
-            "GET api/lists/{id}/members",
+            $"{Request.Method} api/lists/{id}/members",
             $"{nameof(ListsController)}.{nameof(GetMembersAsAssigneeOptions)}",
             UserId
         );
@@ -183,7 +183,7 @@ public class ListsController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-            "POST api/lists",
+            $"{Request.Method} api/lists",
             $"{nameof(ListsController)}.{nameof(Create)}",
             UserId
         );
@@ -206,7 +206,7 @@ public class ListsController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-            "PUT api/lists",
+            $"{Request.Method} api/lists",
             $"{nameof(ListsController)}.{nameof(Update)}",
             UserId
         );
@@ -275,7 +275,7 @@ public class ListsController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-            "PUT api/lists/shared",
+            $"{Request.Method} api/lists/shared",
             $"{nameof(ListsController)}.{nameof(UpdateShared)}",
             UserId
         );
@@ -293,7 +293,7 @@ public class ListsController : BaseController
     public async Task<IActionResult> Delete(int id)
     {
         var tr = Metrics.StartTransactionWithUser(
-            "DELETE api/lists/{id}",
+            $"{Request.Method} api/lists/{id}",
             $"{nameof(ListsController)}.{nameof(Delete)}",
             UserId
         );
@@ -337,7 +337,7 @@ public class ListsController : BaseController
     public IActionResult CanShareListWithUser(string email)
     {
         var tr = Metrics.StartTransactionWithUser(
-            "GET api/lists/can-share-with-user/{email}",
+            $"{Request.Method} api/lists/can-share-with-user/{email}",
             $"{nameof(ListsController)}.{nameof(CanShareListWithUser)}",
             UserId
         );
@@ -370,7 +370,7 @@ public class ListsController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-            "PUT api/lists/share",
+            $"{Request.Method} api/lists/share",
             $"{nameof(ListsController)}.{nameof(Share)}",
             UserId
         );
@@ -474,7 +474,7 @@ public class ListsController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-            "POST api/lists/copy",
+            $"{Request.Method} api/lists/copy",
             $"{nameof(ListsController)}.{nameof(Copy)}",
             UserId
         );
@@ -497,7 +497,7 @@ public class ListsController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-            "PUT api/lists/is-archived",
+            $"{Request.Method} api/lists/is-archived",
             $"{nameof(ListsController)}.{nameof(SetIsArchived)}",
             UserId
         );
@@ -518,7 +518,7 @@ public class ListsController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-            "PUT api/lists/uncomplete-all",
+            $"{Request.Method} api/lists/uncomplete-all",
             $"{nameof(ListsController)}.{nameof(UncompleteAll)}",
             UserId
         );
@@ -567,7 +567,7 @@ public class ListsController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-            "PUT api/lists/share-is-accepted",
+            $"{Request.Method} api/lists/share-is-accepted",
             $"{nameof(ListsController)}.{nameof(SetShareIsAccepted)}",
             UserId
         );

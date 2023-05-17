@@ -32,28 +32,26 @@ public class EmailTemplateService : IEmailTemplateService
 
     public async Task EnqueueNewRegistrationEmailAsync(string newUserName, string newUserEmail)
     {
-        if (_env.EnvironmentName == Environments.Production)
+        if (_env.EnvironmentName != Environments.Production)
         {
-            var email = new Email
-            {
-                ToAddress = _adminEmail,
-                ToName = "Admin",
-                Subject = "New registration on Personal Assistant"
-            };
-
-            string bodyText = await GetTemplateContentsAsync("NewRegistration.txt", "admin");
-            email.BodyText = bodyText
-                .Replace("#NAME#", newUserName, StringComparison.Ordinal)
-                .Replace("#EMAIL#", newUserEmail, StringComparison.Ordinal);
-
-            string bodyHtml = await GetTemplateContentsAsync("NewRegistration.html", "admin");
-            email.BodyHtml = bodyHtml
-                .Replace("#SUBJECT#", email.Subject, StringComparison.Ordinal)
-                .Replace("#NAME#", newUserName, StringComparison.Ordinal)
-                .Replace("#EMAIL#", newUserEmail, StringComparison.Ordinal);
-
-            _senderService.Enqueue(email);
+            return;
         }
+
+        string bodyTextTemplate = await GetTemplateContentsAsync("NewRegistration.txt", "admin");
+        var bodyText = bodyTextTemplate
+            .Replace("#NAME#", newUserName, StringComparison.Ordinal)
+            .Replace("#EMAIL#", newUserEmail, StringComparison.Ordinal);
+
+        const string subject = "New registration on Personal Assistant";
+        string bodyHtmlTemplate = await GetTemplateContentsAsync("NewRegistration.html", "admin");
+        var bodyHtml = bodyHtmlTemplate
+            .Replace("#SUBJECT#", subject, StringComparison.Ordinal)
+            .Replace("#NAME#", newUserName, StringComparison.Ordinal)
+            .Replace("#EMAIL#", newUserEmail, StringComparison.Ordinal);
+
+        var email = new Email(_adminEmail, "Admin", subject, bodyText, bodyHtml);
+
+        _senderService.Enqueue(email);
     }
 
     private static async Task<string> GetTemplateContentsAsync(string templateName, string language)

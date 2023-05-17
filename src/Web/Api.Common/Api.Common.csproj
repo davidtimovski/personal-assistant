@@ -1,12 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-	</PropertyGroup>
+	<Import Project="..\..\..\PersonalAssistant.Cs.targets" />
 
 	<ItemGroup>
-		<PackageReference Include="Sentry.Extensions.Logging" Version="3.30.0" />
+		<PackageReference Include="Sentry.Extensions.Logging" Version="$(SentryVersion)" />
 	</ItemGroup>
 
 </Project>

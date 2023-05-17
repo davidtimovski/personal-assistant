@@ -14,7 +14,9 @@ module Handlers =
     let create: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             let userId = getUserId ctx
-            let tr = Metrics.startTransactionWithUser "POST /api/debts" "Debts/Handlers.create" userId
+
+            let tr =
+                Metrics.startTransactionWithUser $"{ctx.Request.Method} /api/debts" "Debts/Handlers.create" userId
 
             task {
                 let! dto = ctx.BindJsonAsync<CreateDebt>()
@@ -37,8 +39,12 @@ module Handlers =
     let createMerged: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             let userId = getUserId ctx
+
             let tr =
-                Metrics.startTransactionWithUser "POST /api/debts/merged" "Debts/Handlers.create" userId
+                Metrics.startTransactionWithUser
+                    $"{ctx.Request.Method} /api/debts/merged"
+                    "Debts/Handlers.create"
+                    userId
 
             task {
                 let! dto = ctx.BindJsonAsync<CreateDebt>()
@@ -61,7 +67,9 @@ module Handlers =
     let update: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             let userId = getUserId ctx
-            let tr = Metrics.startTransactionWithUser "PUT /api/debts" "Debts/Handlers.update" userId
+
+            let tr =
+                Metrics.startTransactionWithUser $"{ctx.Request.Method} /api/debts" "Debts/Handlers.update" userId
 
             task {
                 let! dto = ctx.BindJsonAsync<UpdateDebt>()
@@ -85,7 +93,9 @@ module Handlers =
     let delete (id: int) : HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             let userId = getUserId ctx
-            let tr = Metrics.startTransactionWithUser "DELETE /api/debts/*" "Debts/Handlers.delete" userId
+
+            let tr =
+                Metrics.startTransactionWithUser $"{ctx.Request.Method} /api/debts/*" "Debts/Handlers.delete" userId
 
             task {
                 let connectionString = getConnectionString ctx

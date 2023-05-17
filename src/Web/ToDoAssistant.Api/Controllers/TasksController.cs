@@ -89,7 +89,7 @@ public class TasksController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-            "POST api/tasks",
+            $"{Request.Method} api/tasks",
             $"{nameof(TasksController)}.{nameof(Create)}",
             UserId
         );
@@ -145,7 +145,7 @@ public class TasksController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-            "POST api/tasks/bulk",
+            $"{Request.Method} api/tasks/bulk",
             $"{nameof(TasksController)}.{nameof(BulkCreate)}",
             UserId
         );
@@ -209,7 +209,7 @@ public class TasksController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-            "PUT api/tasks",
+            $"{Request.Method} api/tasks",
             $"{nameof(TasksController)}.{nameof(Update)}",
             UserId
         );
@@ -319,7 +319,7 @@ public class TasksController : BaseController
     public async Task<IActionResult> Delete(int id)
     {
         var tr = Metrics.StartTransactionWithUser(
-            "DELETE api/tasks/{id}",
+            $"{Request.Method} api/tasks/{id}",
             $"{nameof(TasksController)}.{nameof(Delete)}",
             UserId
         );
@@ -373,7 +373,7 @@ public class TasksController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-            "PUT api/tasks/complete",
+            $"{Request.Method} api/tasks/complete",
             $"{nameof(TasksController)}.{nameof(Complete)}",
             UserId
         );
@@ -429,7 +429,7 @@ public class TasksController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-            "PUT api/tasks/uncomplete",
+            $"{Request.Method} api/tasks/uncomplete",
             $"{nameof(TasksController)}.{nameof(Uncomplete)}",
             UserId
         );

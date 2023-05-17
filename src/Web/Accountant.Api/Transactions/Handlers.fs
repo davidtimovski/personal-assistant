@@ -18,8 +18,12 @@ module Handlers =
     let create: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             let userId = getUserId ctx
+
             let tr =
-                Metrics.startTransactionWithUser "POST /api/transactions" "Transactions/Handlers.create" userId
+                Metrics.startTransactionWithUser
+                    $"{ctx.Request.Method} /api/transactions"
+                    "Transactions/Handlers.create"
+                    userId
 
             task {
                 let! dto = ctx.BindJsonAsync<CreateTransaction>()
@@ -43,8 +47,12 @@ module Handlers =
     let update: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             let userId = getUserId ctx
+
             let tr =
-                Metrics.startTransactionWithUser "PUT /api/transactions" "Transactions/Handlers.update" userId
+                Metrics.startTransactionWithUser
+                    $"{ctx.Request.Method} /api/transactions"
+                    "Transactions/Handlers.update"
+                    userId
 
             task {
                 let! dto = ctx.BindJsonAsync<UpdateTransaction>()
@@ -68,8 +76,12 @@ module Handlers =
     let delete (id: int) : HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             let userId = getUserId ctx
+
             let tr =
-                Metrics.startTransactionWithUser "DELETE /api/transactions/*" "Transactions/Handlers.delete" userId
+                Metrics.startTransactionWithUser
+                    $"{ctx.Request.Method} /api/transactions/*"
+                    "Transactions/Handlers.delete"
+                    userId
 
             task {
                 let connectionString = getConnectionString ctx
@@ -85,8 +97,12 @@ module Handlers =
     let export: HttpHandler =
         successOrLog (fun (_) (ctx: HttpContext) ->
             let userId = getUserId ctx
+
             let tr =
-                Metrics.startTransactionWithUser "POST /api/transactions/export" "Transactions/Handlers.export" userId
+                Metrics.startTransactionWithUser
+                    $"{ctx.Request.Method} /api/transactions/export"
+                    "Transactions/Handlers.export"
+                    userId
 
             task {
                 let! dto = ctx.BindJsonAsync<ExportDto>()
@@ -116,8 +132,12 @@ module Handlers =
     let deleteExportedFile (fileId: Guid) : HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             let userId = getUserId ctx
+
             let tr =
-                Metrics.startTransactionWithUser "DELETE /api/transactions/exported-file/*" "Transactions/Handlers.deleteExportedFile" userId
+                Metrics.startTransactionWithUser
+                    $"{ctx.Request.Method} /api/transactions/exported-file/*"
+                    "Transactions/Handlers.deleteExportedFile"
+                    userId
 
             task {
                 let webHostEnvironment = ctx.GetService<IWebHostEnvironment>()

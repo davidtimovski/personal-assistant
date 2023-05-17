@@ -91,7 +91,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sender", "src\Infrastructur
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Accountant.Persistence.Fs", "src\Infrastructure\Accountant.Persistence.Fs\Accountant.Persistence.Fs.fsproj", "{3C2A7161-871B-4864-B0DB-5A5D7A8D11B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api.Common", "src\Web\Api.Common\Api.Common.csproj", "{14700EED-1826-4AF7-8E84-41E4B5993338}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api.Common", "src\Web\Api.Common\Api.Common.csproj", "{14700EED-1826-4AF7-8E84-41E4B5993338}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "targets", "targets", "{118E3C9C-4BC3-46D3-B904-18C9784BA246}"
+	ProjectSection(SolutionItems) = preProject
+		PersonalAssistant.Cs.targets = PersonalAssistant.Cs.targets
+		PersonalAssistant.Fs.targets = PersonalAssistant.Fs.targets
+		PersonalAssistant.targets = PersonalAssistant.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -257,6 +264,7 @@ Global
 		{C58752DA-E892-4ADD-8D10-A8D4877CA5B6} = {C277C7F8-AAE5-4002-8C0D-BB31436438FD}
 		{3C2A7161-871B-4864-B0DB-5A5D7A8D11B9} = {C277C7F8-AAE5-4002-8C0D-BB31436438FD}
 		{14700EED-1826-4AF7-8E84-41E4B5993338} = {572BEB9A-56A3-40D3-9D9E-84F9410A9316}
+		{118E3C9C-4BC3-46D3-B904-18C9784BA246} = {BB91D65B-985A-462E-9085-B8C32599AD08}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1296A1BD-7B9D-40F2-9873-972EB471C47D}

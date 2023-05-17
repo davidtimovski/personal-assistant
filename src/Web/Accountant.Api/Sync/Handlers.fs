@@ -14,8 +14,12 @@ module Handlers =
     let getChanges: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             let userId = getUserId ctx
+
             let tr =
-                Metrics.startTransactionWithUser "POST /api/sync/changes" "Sync/Handlers.getChanges" userId
+                Metrics.startTransactionWithUser
+                    $"{ctx.Request.Method} /api/sync/changes"
+                    "Sync/Handlers.getChanges"
+                    userId
 
             let connectionString = getConnectionString ctx
 
@@ -97,8 +101,12 @@ module Handlers =
     let createEntities: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             let userId = getUserId ctx
+
             let tr =
-                Metrics.startTransactionWithUser "POST /api/sync/create-entities" "Sync/Handlers.createEntities" userId
+                Metrics.startTransactionWithUser
+                    $"{ctx.Request.Method} /api/sync/create-entities"
+                    "Sync/Handlers.createEntities"
+                    userId
 
             task {
                 let! dto = ctx.BindJsonAsync<SyncEntities>()

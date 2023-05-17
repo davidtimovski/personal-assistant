@@ -1,9 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-	</PropertyGroup>
+	<Import Project="..\..\..\PersonalAssistant.Cs.targets" />
 
 	<ItemGroup>
 		<PackageReference Include="Dapper" Version="2.0.123" />
@@ -11,7 +8,7 @@
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.5" />
 		<PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1" />
 		<PackageReference Include="Npgsql" Version="7.0.4" />
-		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.3" />
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
 	</ItemGroup>
 
 	<ItemGroup>

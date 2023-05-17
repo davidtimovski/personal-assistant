@@ -1,7 +1,6 @@
 ﻿using System.Text;
+using System.Text.Json;
 using Dapper;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using Npgsql;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -16,6 +15,11 @@ public sealed class HostedService : IHostedService, IDisposable
 {
     private readonly ILogger<HostedService> _logger;
     private readonly IConfiguration _configuration;
+
+    private static JsonSerializerOptions PayloadSerializationOptions = new JsonSerializerOptions
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
 
     public HostedService(
         ILogger<HostedService> logger,
@@ -70,7 +74,7 @@ public sealed class HostedService : IHostedService, IDisposable
         {
             var body = ea.Body;
             var message = Encoding.UTF8.GetString(body.ToArray());
-            var email = System.Text.Json.JsonSerializer.Deserialize<Email>(message);
+            var email = JsonSerializer.Deserialize<Email>(message);
 
             var client = new SendGridClient(_configuration["SendGridApiKey"]);
             var from = new EmailAddress(_configuration["SystemEmail"], "Personal Assistant");
@@ -102,7 +106,7 @@ public sealed class HostedService : IHostedService, IDisposable
         {
             var body = ea.Body;
             string message = Encoding.UTF8.GetString(body.ToArray());
-            var pushNotification = System.Text.Json.JsonSerializer.Deserialize<PushNotification>(message);
+            var pushNotification = JsonSerializer.Deserialize<PushNotification>(message);
 
             using var conn = new NpgsqlConnection(_configuration["ConnectionString"]);
             conn.Open();
@@ -111,6 +115,8 @@ public sealed class HostedService : IHostedService, IDisposable
                 new { pushNotification.UserId, pushNotification.Application });
 
             string applicationName = pushNotification.Application.Replace(" ", string.Empty, StringComparison.Ordinal);
+
+            var webPushClient = new WebPushClient();
 
             try
             {
@@ -122,23 +128,17 @@ public sealed class HostedService : IHostedService, IDisposable
                         publicKey: _configuration[$"{applicationName}:Vapid:PublicKey"],
                         privateKey: _configuration[$"{applicationName}:Vapid:PrivateKey"]);
 
-                    var webPushClient = new WebPushClient();
                     try
                     {
-                        await webPushClient.SendNotificationAsync(
-                            subscription,
-                            JsonConvert.SerializeObject(
-                                new PushNotificationMessage(
-                                    pushNotification.SenderImageUri,
-                                    pushNotification.Application,
-                                    pushNotification.Message,
-                                    pushNotification.OpenUrl
-                                ),
-                                new JsonSerializerSettings
-                                {
-                                    ContractResolver = new CamelCasePropertyNamesContractResolver()
-                                }
-                            ), vapidDetails);
+                        var pushNotificationPayload = new PushNotificationMessage(
+                            pushNotification.SenderImageUri,
+                            pushNotification.Application,
+                            pushNotification.Message,
+                            pushNotification.OpenUrl
+                        );
+                        var payload = JsonSerializer.Serialize(pushNotificationPayload, PayloadSerializationOptions);
+
+                        await webPushClient.SendNotificationAsync(subscription, payload, vapidDetails);
                     }
                     catch (WebPushException ex) when (ex.Message.StartsWith("Subscription no longer valid"))
                     {

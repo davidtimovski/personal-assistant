@@ -1,17 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<Import Project="..\..\..\PersonalAssistant.Cs.targets" />
 
 	<ItemGroup>
 		<PackageReference Include="RabbitMQ.Client" Version="6.5.0" />
 	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Application\Core.Application\Core.Application.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\Application\Core.Application\Core.Application.csproj" />
+	</ItemGroup>
 
 </Project>

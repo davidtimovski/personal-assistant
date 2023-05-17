@@ -14,8 +14,12 @@ module Handlers =
     let create: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             let userId = getUserId ctx
+
             let tr =
-                Metrics.startTransactionWithUser "POST /api/upcoming-expenses" "UpcomingExpenses/Handlers.create" userId
+                Metrics.startTransactionWithUser
+                    $"{ctx.Request.Method} /api/upcoming-expenses"
+                    "UpcomingExpenses/Handlers.create"
+                    userId
 
             task {
                 let! dto = ctx.BindJsonAsync<CreateUpcomingExpense>()
@@ -39,8 +43,12 @@ module Handlers =
     let update: HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             let userId = getUserId ctx
+
             let tr =
-                Metrics.startTransactionWithUser "PUT /api/upcoming-expenses" "UpcomingExpenses/Handlers.update" userId
+                Metrics.startTransactionWithUser
+                    $"{ctx.Request.Method} /api/upcoming-expenses"
+                    "UpcomingExpenses/Handlers.update"
+                    userId
 
             task {
                 let! dto = ctx.BindJsonAsync<UpdateUpcomingExpense>()
@@ -64,8 +72,12 @@ module Handlers =
     let delete (id: int) : HttpHandler =
         successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
             let userId = getUserId ctx
+
             let tr =
-                Metrics.startTransactionWithUser "DELETE /api/upcoming-expenses/*" "UpcomingExpenses/Handlers.delete" userId
+                Metrics.startTransactionWithUser
+                    $"{ctx.Request.Method} /api/upcoming-expenses/*"
+                    "UpcomingExpenses/Handlers.delete"
+                    userId
 
             task {
                 let connectionString = getConnectionString ctx

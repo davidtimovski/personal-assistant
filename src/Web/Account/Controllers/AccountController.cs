@@ -83,7 +83,7 @@ public class AccountController : BaseController
     public async Task<IActionResult> ResetPassword()
     {
         var tr = Metrics.StartTransaction(
-            "GET account/reset-password",
+            $"{Request.Method} account/reset-password",
             $"{nameof(AccountController)}.{nameof(ResetPassword)}"
         );
 
@@ -114,7 +114,7 @@ public class AccountController : BaseController
         }
 
         var tr = Metrics.StartTransaction(
-            "POST account/reset-password",
+            $"{Request.Method} account/reset-password",
             $"{nameof(AccountController)}.{nameof(ResetPassword)}"
         );
 
@@ -179,7 +179,7 @@ public class AccountController : BaseController
         }
 
         var tr = Metrics.StartTransaction(
-            "POST account/register",
+            $"{Request.Method} account/register",
             $"{nameof(AccountController)}.{nameof(Register)}"
         );
 
@@ -234,7 +234,7 @@ public class AccountController : BaseController
     public async Task<IActionResult> VerifyReCaptcha(VerifyReCaptchaViewModel model)
     {
         var tr = Metrics.StartTransaction(
-            "POST account/verify-recaptcha",
+            $"{Request.Method} account/verify-recaptcha",
             $"{nameof(AccountController)}.{nameof(VerifyReCaptcha)}"
         );
 
@@ -265,7 +265,7 @@ public class AccountController : BaseController
     public async Task<IActionResult> DeleteAccount()
     {
         var tr = Metrics.StartTransactionWithUser(
-            "POST /account/delete",
+            $"{Request.Method} /account/delete",
             $"{nameof(AccountController)}.{nameof(DeleteAccount)}",
             UserId
         );
@@ -310,7 +310,7 @@ public class AccountController : BaseController
     public async Task<IActionResult> EditProfile()
     {
         var tr = Metrics.StartTransactionWithUser(
-            "GET account/edit-profile",
+            $"{Request.Method} account/edit-profile",
             $"{nameof(AccountController)}.{nameof(EditProfile)}",
             UserId
         );
@@ -354,7 +354,7 @@ public class AccountController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-            "POST account/edit-profile",
+            $"{Request.Method} account/edit-profile",
             $"{nameof(AccountController)}.{nameof(EditProfile)}",
             UserId
         );
@@ -438,7 +438,7 @@ public class AccountController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-            "POST account/upload-profile-image",
+            $"{Request.Method} account/upload-profile-image",
             $"{nameof(AccountController)}.{nameof(UploadProfileImage)}",
             UserId
         );

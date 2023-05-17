@@ -1,6 +1,6 @@
 import { build, files } from '$service-worker';
 
-const APP_VERSION = '2.3.4';
+const APP_VERSION = '2.3.5';
 
 self.addEventListener('install', (event: ExtendableEvent) => {
 	event.waitUntil(
@@ -33,7 +33,7 @@ self.addEventListener('activate', (event: ExtendableEvent) => {
 	return self.clients.claim();
 });
 
-self.addEventListener('fetch', (event: ExtendableEvent) => {
+self.addEventListener('fetch', (event: FetchEvent) => {
 	if (event.request.url.includes('/api/')) {
 		event.respondWith(fetch(event.request));
 	} else {
@@ -43,4 +43,44 @@ self.addEventListener('fetch', (event: ExtendableEvent) => {
 			})
 		);
 	}
+});
+
+// Push notification arrived
+self.addEventListener('push', (event: PushEvent) => {
+	const data = event.data?.json() ?? {};
+
+	event.waitUntil(
+		self.registration.showNotification(
+			data.title,
+			(options = {
+				body: data.body,
+				icon: data.senderImageUri,
+				vibrate: [200, 100, 200],
+				badge: data.senderImageUri,
+				data: {
+					openUrl: data.openUrl
+				}
+			})
+		)
+	);
+});
+
+// Push notification clicked
+self.addEventListener('notificationclick', (event: NotificationEvent) => {
+	const notification = event.notification;
+
+	event.waitUntil(
+		clients.matchAll().then((allClients) => {
+			const client = allClients.find((c) => c.visibilityState === 'visible');
+
+			if (client !== undefined) {
+				client.navigate(notification.data.openUrl);
+				client.focus();
+			} else {
+				clients.openWindow(notification.data.openUrl);
+			}
+
+			notification.close();
+		})
+	);
 });
