@@ -4,6 +4,7 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0.203-bullseye-slim-amd64 AS build
 WORKDIR /src
+COPY ["PersonalAssistant.targets", "PersonalAssistant.Cs.targets", "./"]
 COPY ["src/Web/ToDoAssistant.Api/ToDoAssistant.Api.csproj", "src/Web/ToDoAssistant.Api/"]
 RUN dotnet restore "src/Web/ToDoAssistant.Api/ToDoAssistant.Api.csproj"
 COPY . .

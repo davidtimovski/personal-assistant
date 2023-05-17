@@ -4,6 +4,7 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0.203-bullseye-slim-amd64 AS build
 WORKDIR /src
+COPY ["PersonalAssistant.targets", "PersonalAssistant.Fs.targets", "./"]
 COPY ["src/Web/Accountant.Api/Accountant.Api.fsproj", "src/Web/Accountant.Api/"]
 RUN dotnet restore "src/Web/Accountant.Api/Accountant.Api.fsproj"
 COPY . .
