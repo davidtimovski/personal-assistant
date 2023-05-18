@@ -1,5 +1,4 @@
-﻿using Application.Domain.ToDoAssistant;
-using AutoMapper;
+﻿using AutoMapper;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
 using Core.Application.Utils;
@@ -11,7 +10,8 @@ using ToDoAssistant.Application.Contracts.Lists;
 using ToDoAssistant.Application.Contracts.Lists.Models;
 using ToDoAssistant.Application.Contracts.Notifications;
 using ToDoAssistant.Application.Contracts.Tasks;
-using User = Application.Domain.Common.User;
+using ToDoAssistant.Application.Entities;
+using User = Core.Application.Entities.User;
 
 namespace ToDoAssistant.Application.Services;
 

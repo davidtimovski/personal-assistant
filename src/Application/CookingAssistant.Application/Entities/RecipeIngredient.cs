@@ -1,4 +1,6 @@
-﻿namespace Application.Domain.CookingAssistant;
+﻿using Core.Application;
+
+namespace CookingAssistant.Application.Entities;
 
 public class RecipeIngredient : Entity
 {

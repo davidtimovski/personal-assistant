@@ -2,9 +2,9 @@
 
 internal class PushNotification
 {
-    public string Application { get; set; }
-    public string SenderImageUri { get; set; }
-    public int UserId { get; set; }
-    public string Message { get; set; }
-    public string OpenUrl { get; set; }
+    internal string Application { get; set; }
+    internal string SenderImageUri { get; set; }
+    internal int UserId { get; set; }
+    internal string Message { get; set; }
+    internal string OpenUrl { get; set; }
 }

@@ -1,5 +1,5 @@
-﻿using Application.Domain.Common;
-using Core.Application.Contracts;
+﻿using Core.Application.Contracts;
+using Core.Application.Entities;
 using Sentry;
 
 namespace Core.Persistence.Repositories;

@@ -1,16 +1,15 @@
 ﻿using System.Data;
-using Application.Domain.ToDoAssistant;
-using Core.Persistence;
 using Dapper;
 using Sentry;
 using ToDoAssistant.Application.Contracts.Lists;
-using User = Application.Domain.Common.User;
+using ToDoAssistant.Application.Entities;
+using User = Core.Application.Entities.User;
 
 namespace ToDoAssistant.Persistence.Repositories;
 
 public class ListsRepository : BaseRepository, IListsRepository
 {
-    public ListsRepository(PersonalAssistantContext efContext)
+    public ListsRepository(ToDoAssistantContext efContext)
         : base(efContext) { }
 
     public IEnumerable<ToDoList> GetAllAsOptions(int userId, ISpan metricsSpan)

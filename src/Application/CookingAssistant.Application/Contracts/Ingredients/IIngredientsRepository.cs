@@ -1,5 +1,4 @@
-﻿using Application.Domain.CookingAssistant;
-using Application.Domain.ToDoAssistant;
+﻿using CookingAssistant.Application.Entities;
 
 namespace CookingAssistant.Application.Contracts.Ingredients;
 

@@ -1,4 +1,4 @@
-﻿namespace Application.Domain.Weatherman;
+﻿namespace Weatherman.Application.Entities;
 
 public class Forecast
 {

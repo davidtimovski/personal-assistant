@@ -3,7 +3,7 @@ using Core.Application.Contracts;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
 using Sentry;
-using User = Application.Domain.Common.User;
+using User = Core.Application.Entities.User;
 
 namespace Core.Persistence.Repositories;
 

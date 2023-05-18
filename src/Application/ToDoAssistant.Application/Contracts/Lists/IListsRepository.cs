@@ -1,6 +1,6 @@
-﻿using Application.Domain.ToDoAssistant;
-using Sentry;
-using User = Application.Domain.Common.User;
+﻿using Sentry;
+using ToDoAssistant.Application.Entities;
+using User = Core.Application.Entities.User;
 
 namespace ToDoAssistant.Application.Contracts.Lists;
 

@@ -1,4 +1,4 @@
-﻿namespace Application.Domain;
+﻿namespace Core.Application;
 
 public class Entity
 {

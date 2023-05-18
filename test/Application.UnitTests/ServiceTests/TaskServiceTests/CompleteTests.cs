@@ -1,8 +1,8 @@
-﻿using Application.Domain.ToDoAssistant;
-using Moq;
+﻿using Moq;
 using Sentry;
 using ToDoAssistant.Application.Contracts.Tasks;
 using ToDoAssistant.Application.Contracts.Tasks.Models;
+using ToDoAssistant.Application.Entities;
 using ToDoAssistant.Application.Mappings;
 using ToDoAssistant.Application.Services;
 using Xunit;

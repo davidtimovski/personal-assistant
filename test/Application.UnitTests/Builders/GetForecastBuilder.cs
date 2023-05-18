@@ -2,13 +2,13 @@
 
 namespace Application.UnitTests.Builders;
 
-public class GetForecastBuilder
+internal class GetForecastBuilder
 {
     private string temperatureUnit;
     private string precipitationUnit;
     private string windSpeedUnit;
 
-    public GetForecastBuilder WithUnits()
+    internal GetForecastBuilder WithUnits()
     {
         temperatureUnit = "celsius";
         precipitationUnit = "mm";
@@ -16,7 +16,7 @@ public class GetForecastBuilder
         return this;
     }
 
-    public GetForecast Build()
+    internal GetForecast Build()
     {
         return new GetForecast
         {

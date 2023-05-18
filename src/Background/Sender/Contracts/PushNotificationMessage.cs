@@ -10,10 +10,10 @@ internal class PushNotificationMessage
         OpenUrl = openUrl;
     }
 
-    public string SenderImageUri { get; }
-    public string Title { get; }
-    public string Body { get; }
-    public string OpenUrl { get; }
+    internal string SenderImageUri { get; }
+    internal string Title { get; }
+    internal string Body { get; }
+    internal string OpenUrl { get; }
 
     private static string TrimMessagePlaceholders(string message)
     {

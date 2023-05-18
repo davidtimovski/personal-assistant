@@ -1,6 +1,6 @@
 using System.Text.Json.Nodes;
-using Application.Domain.Common;
 using Core.Application.Contracts;
+using Core.Application.Entities;
 using Dapper;
 using Jobs.Models.Accountant;
 using Microsoft.Extensions.Configuration;

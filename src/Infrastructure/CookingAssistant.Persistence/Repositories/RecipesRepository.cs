@@ -1,9 +1,7 @@
 ﻿using System.Data;
-using Application.Domain.Common;
-using Application.Domain.CookingAssistant;
-using Application.Domain.ToDoAssistant;
 using CookingAssistant.Application.Contracts.Recipes;
-using Core.Persistence;
+using CookingAssistant.Application.Entities;
+using CookingAssistant.Persistence;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +9,7 @@ namespace Persistence.Repositories.CookingAssistant;
 
 public class RecipesRepository : BaseRepository, IRecipesRepository
 {
-    public RecipesRepository(PersonalAssistantContext efContext)
+    public RecipesRepository(CookingAssistantContext efContext)
         : base(efContext) { }
 
     public IEnumerable<Recipe> GetAll(int userId)

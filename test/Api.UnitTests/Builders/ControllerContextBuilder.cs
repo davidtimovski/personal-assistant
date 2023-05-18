@@ -4,16 +4,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.UnitTests.Builders;
 
-public class ControllerContextBuilder
+internal class ControllerContextBuilder
 {
     private readonly int _userId;
 
-    public ControllerContextBuilder()
+    internal ControllerContextBuilder()
     {
         _userId = 1;
     }
 
-    public ControllerContext Build()
+    internal ControllerContext Build()
     {
         return new ControllerContext
         {

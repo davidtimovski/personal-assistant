@@ -2,7 +2,7 @@
 
 public abstract class PushNotification
 {
-    public PushNotification(string application)
+    internal PushNotification(string application)
     {
         Application = application;
     }

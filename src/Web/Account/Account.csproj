@@ -34,6 +34,7 @@
 		<ProjectReference Include="..\..\Infrastructure\CookingAssistant.Persistence\CookingAssistant.Persistence.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Core.Infrastructure\Core.Infrastructure.csproj" />
 		<ProjectReference Include="..\..\Application\ToDoAssistant.Application\ToDoAssistant.Application.csproj" />
+		<ProjectReference Include="..\..\Infrastructure\Core.Persistence\Core.Persistence.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Sender\Sender.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\ToDoAssistant.Persistence\ToDoAssistant.Persistence.csproj" />
 		<ProjectReference Include="..\Api.Common\Api.Common.csproj" />

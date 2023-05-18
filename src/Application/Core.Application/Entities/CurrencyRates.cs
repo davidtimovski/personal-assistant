@@ -1,4 +1,4 @@
-﻿namespace Application.Domain.Common;
+﻿namespace Core.Application.Entities;
 
 public class CurrencyRates
 {

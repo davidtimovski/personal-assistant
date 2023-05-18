@@ -1,15 +1,14 @@
 ﻿using System.Data;
-using Application.Domain.ToDoAssistant;
-using Core.Persistence;
 using Dapper;
 using Sentry;
 using ToDoAssistant.Application.Contracts.Tasks;
+using ToDoAssistant.Application.Entities;
 
 namespace ToDoAssistant.Persistence.Repositories;
 
 public class TasksRepository : BaseRepository, ITasksRepository
 {
-    public TasksRepository(PersonalAssistantContext efContext)
+    public TasksRepository(ToDoAssistantContext efContext)
         : base(efContext) { }
 
     public ToDoTask Get(int id)

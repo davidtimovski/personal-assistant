@@ -111,7 +111,7 @@ public sealed class HostedService : IHostedService, IDisposable
             using var conn = new NpgsqlConnection(_configuration["ConnectionString"]);
             conn.Open();
 
-            var recipientSubs = conn.Query<Application.Domain.Common.PushSubscription>("SELECT * FROM push_subscriptions WHERE user_id = @UserId AND application = @Application",
+            var recipientSubs = conn.Query<Core.Application.Entities.PushSubscription>("SELECT * FROM push_subscriptions WHERE user_id = @UserId AND application = @Application",
                 new { pushNotification.UserId, pushNotification.Application });
 
             string applicationName = pushNotification.Application.Replace(" ", string.Empty, StringComparison.Ordinal);

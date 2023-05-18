@@ -2,7 +2,7 @@
 
 namespace Application.UnitTests.Builders;
 
-public class TaskBuilder
+internal class TaskBuilder
 {
     private string name;
     private int userId;
@@ -11,49 +11,49 @@ public class TaskBuilder
     private bool tasksAreOneTime;
     private bool tasksArePrivate;
 
-    public TaskBuilder()
+    internal TaskBuilder()
     {
         name = "Dummy name";
         tasksText = "Dummy tasks text";
     }
 
-    public TaskBuilder WithName(string newName)
+    internal TaskBuilder WithName(string newName)
     {
         name = newName;
         return this;
     }
 
-    public TaskBuilder WithUserId(int newUserId)
+    internal TaskBuilder WithUserId(int newUserId)
     {
         userId = newUserId;
         return this;
     }
 
-    public TaskBuilder WithListId(int newListId)
+    internal TaskBuilder WithListId(int newListId)
     {
         listId = newListId;
         return this;
     }
 
-    public TaskBuilder WithTasksText(string newTasksText)
+    internal TaskBuilder WithTasksText(string newTasksText)
     {
         tasksText = newTasksText;
         return this;
     }
 
-    public TaskBuilder WithTasksAreOneTime(bool newTasksAreOneTime)
+    internal TaskBuilder WithTasksAreOneTime(bool newTasksAreOneTime)
     {
         tasksAreOneTime = newTasksAreOneTime;
         return this;
     }
 
-    public TaskBuilder WithTasksArePrivate(bool newTasksArePrivate)
+    internal TaskBuilder WithTasksArePrivate(bool newTasksArePrivate)
     {
         tasksArePrivate = newTasksArePrivate;
         return this;
     }
 
-    public CreateTask BuildCreateModel()
+    internal CreateTask BuildCreateModel()
     {
         return new CreateTask
         {
@@ -61,7 +61,7 @@ public class TaskBuilder
         };
     }
 
-    public BulkCreate BuildBulkCreateModel()
+    internal BulkCreate BuildBulkCreateModel()
     {
         return new BulkCreate
         {
@@ -73,7 +73,7 @@ public class TaskBuilder
         };
     }
 
-    public UpdateTask BuildUpdateModel()
+    internal UpdateTask BuildUpdateModel()
     {
         return new UpdateTask
         {

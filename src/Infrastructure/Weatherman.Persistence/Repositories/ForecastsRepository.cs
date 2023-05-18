@@ -1,16 +1,16 @@
 ﻿using System.Data;
-using Application.Domain.Weatherman;
 using Core.Persistence;
 using Dapper;
 using Sentry;
 using Weatherman.Application.Contracts.Forecasts;
 using Weatherman.Application.Contracts.Forecasts.Models;
+using Weatherman.Application.Entities;
 
 namespace Weatherman.Persistence.Repositories;
 
 public class ForecastsRepository : BaseRepository, IForecastsRepository
 {
-    public ForecastsRepository(PersonalAssistantContext efContext)
+    public ForecastsRepository(WeathermanContext efContext)
         : base(efContext) { }
 
     public Forecast Get(GetForecast parameters, ISpan metricsSpan)

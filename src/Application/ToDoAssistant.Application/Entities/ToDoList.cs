@@ -1,6 +1,7 @@
-﻿using Application.Domain.Common;
+﻿using Core.Application;
+using Core.Application.Entities;
 
-namespace Application.Domain.ToDoAssistant;
+namespace ToDoAssistant.Application.Entities;
 
 public class ToDoList : Entity
 {

@@ -1,5 +1,5 @@
-﻿using Application.Domain.ToDoAssistant;
-using Sentry;
+﻿using Sentry;
+using ToDoAssistant.Application.Entities;
 
 namespace ToDoAssistant.Application.Contracts.Tasks;
 

@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Sentry;
 using ToDoAssistant.Application.Contracts.Lists.Models;
-using User = Application.Domain.Common.User;
+using User = Core.Application.Entities.User;
 
 namespace ToDoAssistant.Application.Contracts.Lists;
 

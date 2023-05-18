@@ -1,7 +1,7 @@
-﻿using Application.Domain.CookingAssistant;
-using Application.UnitTests.Builders;
+﻿using Application.UnitTests.Builders;
 using CookingAssistant.Application.Contracts.Ingredients;
 using CookingAssistant.Application.Contracts.Ingredients.Models;
+using CookingAssistant.Application.Entities;
 using CookingAssistant.Application.Mappings;
 using CookingAssistant.Application.Services;
 using FluentValidation;

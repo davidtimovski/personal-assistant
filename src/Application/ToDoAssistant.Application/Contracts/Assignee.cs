@@ -1,5 +1,5 @@
-﻿using Application.Domain.Common;
-using AutoMapper;
+﻿using AutoMapper;
+using Core.Application.Entities;
 using Core.Application.Mappings;
 
 namespace ToDoAssistant.Application.Contracts;

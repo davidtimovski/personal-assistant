@@ -42,9 +42,10 @@ builder.Services
             builder.Configuration["Cloudinary:DefaultImageUris:Recipe"])
     .AddSender();
 
+var connectionString = builder.Configuration["ConnectionString"];
 builder.Services
-    .AddPersistence(builder.Configuration["ConnectionString"])
-    .AddToDoAssistantPersistence();
+    .AddPersistence(connectionString)
+    .AddToDoAssistantPersistence(connectionString);
 
 builder.Services.AddControllers();
 

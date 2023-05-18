@@ -1,15 +1,14 @@
 ﻿using System.Data;
-using Application.Domain.Common;
-using Application.Domain.CookingAssistant;
 using CookingAssistant.Application.Contracts.DietaryProfiles;
-using Core.Persistence;
+using CookingAssistant.Application.Entities;
+using CookingAssistant.Persistence;
 using Dapper;
 
 namespace Persistence.Repositories.CookingAssistant;
 
 public class DietaryProfilesRepository : BaseRepository, IDietaryProfilesRepository
 {
-    public DietaryProfilesRepository(PersonalAssistantContext efContext)
+    public DietaryProfilesRepository(CookingAssistantContext efContext)
         : base(efContext) { }
 
     public DietaryProfile Get(int userId)

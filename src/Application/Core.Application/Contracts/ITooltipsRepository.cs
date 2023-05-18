@@ -1,4 +1,4 @@
-﻿using Application.Domain.Common;
+﻿using Core.Application.Entities;
 using Sentry;
 
 namespace Core.Application.Contracts;

@@ -1,6 +1,6 @@
 ﻿using System.Data;
-using Application.Domain.Common;
 using Core.Application.Contracts;
+using Core.Application.Entities;
 using Dapper;
 using Sentry;
 

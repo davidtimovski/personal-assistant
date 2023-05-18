@@ -1,6 +1,6 @@
-﻿using Application.Domain.CookingAssistant;
-using CookingAssistant.Application.Contracts.DietaryProfiles.Models;
+﻿using CookingAssistant.Application.Contracts.DietaryProfiles.Models;
 using CookingAssistant.Application.Contracts.Recipes.Models;
+using CookingAssistant.Application.Entities;
 using FluentValidation;
 
 namespace CookingAssistant.Application.Contracts.DietaryProfiles;
