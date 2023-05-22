@@ -10,6 +10,7 @@ namespace Infrastructure.Sender;
 public class SenderService : ISenderService
 {
     private readonly IConfiguration _configuration;
+
     public SenderService(IConfiguration configuration)
     {
         _configuration = configuration;

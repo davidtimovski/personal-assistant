@@ -8,7 +8,7 @@ namespace Core.Persistence.Repositories;
 
 public class TooltipsRepository : BaseRepository, ITooltipsRepository
 {
-    public TooltipsRepository(PersonalAssistantContext efContext)
+    public TooltipsRepository(CoreContext efContext)
         : base(efContext) { }
 
     public IEnumerable<Tooltip> GetAll(string application, int userId, ISpan metricsSpan)

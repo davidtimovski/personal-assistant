@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Persistence;
 
-public class PersonalAssistantContext : DbContext
+public class CoreContext : DbContext
 {
-    public PersonalAssistantContext(DbContextOptions<PersonalAssistantContext> options) : base(options)
+    public CoreContext(DbContextOptions<CoreContext> options) : base(options)
     {
     }
 

@@ -9,7 +9,7 @@ namespace Core.Persistence.Repositories;
 
 public class UsersRepository : BaseRepository, IUsersRepository
 {
-    public UsersRepository(PersonalAssistantContext efContext)
+    public UsersRepository(CoreContext efContext)
         : base(efContext) { }
 
     public User Get(int id)

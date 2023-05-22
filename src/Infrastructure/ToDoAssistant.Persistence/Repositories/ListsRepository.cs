@@ -58,8 +58,8 @@ public class ListsRepository : BaseRepository, IListsRepository
         var lists = conn.Query<ToDoList>(@"SELECT l.*
                                            FROM todo.lists AS l
                                            LEFT JOIN todo.shares AS s ON l.id = s.list_id 
-                                           AND s.user_id = @UserId
-                                           AND s.is_accepted 
+                                               AND s.user_id = @UserId
+                                               AND s.is_accepted 
                                            WHERE (l.user_id = @UserId OR s.user_id = @UserId)",
             new { UserId = userId }).ToList();
 
@@ -70,7 +70,7 @@ public class ListsRepository : BaseRepository, IListsRepository
                                   FROM todo.tasks AS t
                                   LEFT JOIN users AS u ON t.assigned_to_user_id = u.id
                                   WHERE t.list_id = ANY(@ListIds)
-                                  AND (t.private_to_user_id IS NULL OR t.private_to_user_id = @UserId)";
+                                    AND (t.private_to_user_id IS NULL OR t.private_to_user_id = @UserId)";
 
         var tasks = conn.Query<ToDoTask, User, ToDoTask>(tasksSql,
             (task, user) =>

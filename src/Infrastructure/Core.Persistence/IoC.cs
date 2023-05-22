@@ -11,7 +11,7 @@ public static class IoC
     {
         Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
-        services.AddDbContext<PersonalAssistantContext>(opt =>
+        services.AddDbContext<CoreContext>(opt =>
         {
             opt.UseNpgsql(connectionString)
                    .UseSnakeCaseNamingConvention();

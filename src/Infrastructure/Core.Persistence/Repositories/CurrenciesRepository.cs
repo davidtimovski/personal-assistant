@@ -10,7 +10,7 @@ public class CurrenciesRepository : BaseRepository, ICurrenciesRepository
 {
     private const int DaysSearchLimit = 14;
 
-    public CurrenciesRepository(PersonalAssistantContext efContext)
+    public CurrenciesRepository(CoreContext efContext)
         : base(efContext) { }
 
     public IDictionary<string, decimal> GetAll(DateTime date, ISpan metricsSpan)
