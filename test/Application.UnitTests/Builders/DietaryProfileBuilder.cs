@@ -2,9 +2,9 @@
 
 namespace Application.UnitTests.Builders;
 
-public class DietaryProfileBuilder
+internal class DietaryProfileBuilder
 {
-    public UpdateDietaryProfile BuildUpdateModel()
+    internal UpdateDietaryProfile BuildUpdateModel()
     {
         return new UpdateDietaryProfile
         {
@@ -13,7 +13,7 @@ public class DietaryProfileBuilder
         };
     }
 
-    public GetRecommendedDailyIntake BuildGetRecommendedModel()
+    internal GetRecommendedDailyIntake BuildGetRecommendedModel()
     {
         return new GetRecommendedDailyIntake
         {
@@ -26,7 +26,7 @@ public class DietaryProfileBuilder
         };
     }
 
-    public DailyIntakeReference BuildDailyIntakeReference()
+    internal DailyIntakeReference BuildDailyIntakeReference()
     {
         return new DailyIntakeReference
         {

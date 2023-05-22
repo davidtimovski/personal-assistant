@@ -1,5 +1,5 @@
-﻿using Application.Domain.CookingAssistant;
-using AutoMapper;
+﻿using AutoMapper;
+using CookingAssistant.Application.Entities;
 using CookingAssistant.Application.Services;
 using Core.Application.Mappings;
 

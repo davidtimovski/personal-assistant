@@ -1,7 +1,7 @@
-﻿using Application.Domain.Common;
-using AutoMapper;
+﻿using AutoMapper;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
+using Core.Application.Entities;
 using Microsoft.Extensions.Logging;
 using Sentry;
 

@@ -2,29 +2,29 @@
 
 namespace Application.UnitTests.Builders;
 
-public class ListBuilder
+internal class ListBuilder
 {
     private string name;
     private string tasksText;
 
-    public ListBuilder()
+    internal ListBuilder()
     {
         name = "Dummy name";
     }
 
-    public ListBuilder WithName(string newName)
+    internal ListBuilder WithName(string newName)
     {
         name = newName;
         return this;
     }
 
-    public ListBuilder WithTasksText(string newTasksText)
+    internal ListBuilder WithTasksText(string newTasksText)
     {
         tasksText = newTasksText;
         return this;
     }
 
-    public CreateList BuildCreateModel()
+    internal CreateList BuildCreateModel()
     {
         return new CreateList
         {
@@ -33,7 +33,7 @@ public class ListBuilder
         };
     }
 
-    public UpdateList BuildUpdateModel()
+    internal UpdateList BuildUpdateModel()
     {
         return new UpdateList
         {
@@ -41,12 +41,12 @@ public class ListBuilder
         };
     }
 
-    public UpdateSharedList BuildUpdateSharedModel()
+    internal UpdateSharedList BuildUpdateSharedModel()
     {
         return new UpdateSharedList();
     }
 
-    public CopyList BuildCopyModel()
+    internal CopyList BuildCopyModel()
     {
         return new CopyList
         {

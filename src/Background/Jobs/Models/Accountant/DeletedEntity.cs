@@ -8,8 +8,8 @@ namespace Jobs.Models.Accountant;
 
 internal class DeletedEntity
 {
-    public int UserId { get; set; }
-    public EntityType EntityType { get; set; }
-    public int EntityId { get; set; }
-    public DateTime DeletedDate { get; set; }
+    internal int UserId { get; set; }
+    internal EntityType EntityType { get; set; }
+    internal int EntityId { get; set; }
+    internal DateTime DeletedDate { get; set; }
 }

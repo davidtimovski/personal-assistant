@@ -8,7 +8,7 @@ public abstract class BaseRepository
 {
     private readonly string _connectionString;
 
-    protected BaseRepository(PersonalAssistantContext efContext)
+    protected BaseRepository(CoreContext efContext)
     {
         _connectionString = efContext.Database.GetConnectionString();
         EFContext = efContext;
@@ -22,5 +22,5 @@ public abstract class BaseRepository
         return conn;
     }
 
-    protected readonly PersonalAssistantContext EFContext;
+    protected readonly CoreContext EFContext;
 }

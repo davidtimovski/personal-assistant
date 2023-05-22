@@ -2,9 +2,9 @@
 
 namespace Application.UnitTests;
 
-public static class MapperMocker
+internal static class MapperMocker
 {
-    public static IMapper GetMapper<TProfile>() where TProfile : Profile, new()
+    internal static IMapper GetMapper<TProfile>() where TProfile : Profile, new()
     {
         var configurationProvider = new MapperConfiguration(cfg =>
         {

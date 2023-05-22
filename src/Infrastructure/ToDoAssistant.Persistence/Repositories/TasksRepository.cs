@@ -1,15 +1,14 @@
 ﻿using System.Data;
-using Application.Domain.ToDoAssistant;
-using Core.Persistence;
 using Dapper;
 using Sentry;
 using ToDoAssistant.Application.Contracts.Tasks;
+using ToDoAssistant.Application.Entities;
 
 namespace ToDoAssistant.Persistence.Repositories;
 
 public class TasksRepository : BaseRepository, ITasksRepository
 {
-    public TasksRepository(PersonalAssistantContext efContext)
+    public TasksRepository(ToDoAssistantContext efContext)
         : base(efContext) { }
 
     public ToDoTask Get(int id)
@@ -135,29 +134,34 @@ public class TasksRepository : BaseRepository, ITasksRepository
     {
         var metric = metricsSpan.StartChild($"{nameof(TasksRepository)}.{nameof(CreateAsync)}");
 
-        IQueryable<ToDoTask> otherTasks;
+        using IDbConnection conn = OpenConnection();
+        var transaction = conn.BeginTransaction();
 
+        IEnumerable<int> incrementOrderTaskIds;
         if (task.PrivateToUserId.HasValue)
         {
-            otherTasks = PrivateTasks(task.ListId, userId).Where(x => !x.IsCompleted);
+            incrementOrderTaskIds = GetPrivateTaskIds(task.ListId, userId, false, null, conn);
         }
         else
         {
-            otherTasks = PublicTasks(task.ListId).Where(x => !x.IsCompleted);
+            incrementOrderTaskIds = GetPublicTaskIds(task.ListId, false, null, conn);
         }
 
-        foreach (ToDoTask otherTask in otherTasks)
-        {
-            otherTask.Order++;
-        }
+        await conn.ExecuteAsync(@"UPDATE todo.tasks SET ""order"" = ""order"" + 1 WHERE id = ANY(@Ids)",
+            new { Ids = incrementOrderTaskIds.ToList() },
+            transaction);
 
-        EFContext.Tasks.Add(task);
+        var id = await conn.ExecuteScalarAsync<int>(@"INSERT INTO todo.tasks(
+	        list_id, name, url, is_completed, is_one_time, is_high_priority, private_to_user_id, assigned_to_user_id, ""order"", created_date, modified_date)
+	        VALUES (@ListId, @Name, @Url, @IsCompleted, @IsOneTime, @IsHighPriority, @PrivateToUserId, @AssignedToUserId, @Order, @CreatedDate, @ModifiedDate) RETURNING id",
+            task,
+            transaction);
 
-        await EFContext.SaveChangesAsync();
+        transaction.Commit();
 
         metric.Finish();
 
-        return task.Id;
+        return id;
     }
 
     public async Task<IEnumerable<ToDoTask>> BulkCreateAsync(IEnumerable<ToDoTask> tasks, bool tasksArePrivate, int userId, ISpan metricsSpan)
@@ -203,39 +207,31 @@ public class TasksRepository : BaseRepository, ITasksRepository
         var metric = metricsSpan.StartChild($"{nameof(TasksRepository)}.{nameof(UpdateAsync)}");
 
         using IDbConnection conn = OpenConnection();
+        var transaction = conn.BeginTransaction();
+
         var existingTask = GetById(task.Id, conn);
 
+        IEnumerable<int> decrementOrderTaskIds = null;
+        var orderChanged = false;
         if (existingTask.ListId == task.ListId)
         {
-            task.Order = existingTask.Order;
-
             // If the task was public and it was made private reduce the Order of the public tasks
             if (!existingTask.PrivateToUserId.HasValue && task.PrivateToUserId.HasValue)
             {
-                var publicTasks = PublicTasks(existingTask.ListId).Where(x => x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
-                foreach (ToDoTask publicTask in publicTasks)
-                {
-                    publicTask.Order--;
-                }
-
-                var tasksCount = GetPrivateTasksCount(task.ListId, existingTask.IsCompleted, userId, conn);
-                task.Order = ++tasksCount;
+                decrementOrderTaskIds = GetPublicTaskIds(existingTask.ListId, existingTask.IsCompleted, existingTask.Order, conn);
+                orderChanged = true;
             }
-            // If the task was private and it was made public reduce the Order of only the user's private tasks
+            // If the task was private and it was made public reduce the Order of the user's private tasks
             else if (existingTask.PrivateToUserId.HasValue && !task.PrivateToUserId.HasValue)
             {
-                var privateTasks = PrivateTasks(existingTask.ListId, userId).Where(x => x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
-                foreach (ToDoTask privateTask in privateTasks)
-                {
-                    privateTask.Order--;
-                }
-
-                var tasksCount = GetPublicTasksCount(task.ListId, existingTask.IsCompleted, conn);
-                task.Order = ++tasksCount;
+                decrementOrderTaskIds = GetPrivateTaskIds(existingTask.ListId, userId, existingTask.IsCompleted, existingTask.Order, conn);
+                orderChanged = true;
             }
         }
         else
         {
+            orderChanged = true;
+
             var newListIsShared = conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
                                                              FROM todo.shares
                                                              WHERE list_id = @ListId AND is_accepted IS NOT FALSE",
@@ -247,54 +243,48 @@ public class TasksRepository : BaseRepository, ITasksRepository
                 task.AssignedToUserId = null;
             }
 
+            // Reduce Order of private or public tasks in old list
             if (existingTask.PrivateToUserId.HasValue)
             {
-                var privateTasks = PrivateTasks(existingTask.ListId, userId).Where(x => x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
-                foreach (ToDoTask privateTask in privateTasks)
-                {
-                    privateTask.Order--;
-                }
-
-                short tasksCount;
-
-                if (newListIsShared)
-                {
-                    // If the task was moved to a shared list calculate the Order by counting the user's private tasks
-                    tasksCount = GetPrivateTasksCount(task.ListId, existingTask.IsCompleted, userId, conn);
-                }
-                else
-                {
-                    // If the task was moved to a non-shared list calculate the Order by counting the public tasks
-                    tasksCount = GetPublicTasksCount(task.ListId, existingTask.IsCompleted, conn);
-                }
-
-                task.Order = ++tasksCount;
+                decrementOrderTaskIds = GetPrivateTaskIds(existingTask.ListId, userId, existingTask.IsCompleted, existingTask.Order, conn);
             }
             else
             {
-                var publicTasks = PublicTasks(existingTask.ListId).Where(x => x.IsCompleted == existingTask.IsCompleted && x.Order > existingTask.Order);
-                foreach (ToDoTask publicTask in publicTasks)
-                {
-                    publicTask.Order--;
-                }
-
-                var tasksCount = GetPublicTasksCount(task.ListId, existingTask.IsCompleted, conn);
-                task.Order = ++tasksCount;
+                decrementOrderTaskIds = GetPublicTaskIds(existingTask.ListId, existingTask.IsCompleted, existingTask.Order, conn);
             }
         }
 
-        ToDoTask dbTask = EFContext.Tasks.Find(task.Id);
-        dbTask.Name = task.Name;
-        dbTask.Url = task.Url;
-        dbTask.ListId = task.ListId;
-        dbTask.IsOneTime = task.IsOneTime;
-        dbTask.IsHighPriority = task.IsHighPriority;
-        dbTask.PrivateToUserId = task.PrivateToUserId;
-        dbTask.AssignedToUserId = task.AssignedToUserId;
-        dbTask.Order = task.Order;
-        dbTask.ModifiedDate = task.ModifiedDate;
+        if (orderChanged)
+        {
+            short tasksCount;
+            if (task.PrivateToUserId.HasValue)
+            {
+                tasksCount = GetPrivateTasksCount(task.ListId, userId, existingTask.IsCompleted, conn);
+            }
+            else
+            {
+                tasksCount = GetPublicTasksCount(task.ListId, existingTask.IsCompleted, conn);
+            }
+            task.Order = ++tasksCount;
+        }
+        else
+        {
+            task.Order = existingTask.Order;
+        }
 
-        await EFContext.SaveChangesAsync();
+        if (decrementOrderTaskIds != null)
+        {
+            await conn.ExecuteAsync(@"UPDATE todo.tasks SET ""order"" = ""order"" - 1 WHERE id = ANY(@Ids)",
+               new { Ids = decrementOrderTaskIds.ToList() },
+               transaction);
+        }
+    
+        await conn.ExecuteAsync(@"UPDATE todo.tasks
+	        SET list_id = @ListId, name = @Name, url = @Url, is_one_time = @IsOneTime, is_high_priority = @IsHighPriority,
+                private_to_user_id = @PrivateToUserId, assigned_to_user_id = @AssignedToUserId, ""order"" = @Order, modified_date = @ModifiedDate
+	        WHERE id = @Id", task, transaction);
+
+        transaction.Commit();
 
         metric.Finish();
     }
@@ -303,27 +293,28 @@ public class TasksRepository : BaseRepository, ITasksRepository
     {
         var metric = metricsSpan.StartChild($"{nameof(TasksRepository)}.{nameof(DeleteAsync)}");
 
-        ToDoTask task = EFContext.Tasks.Find(id);
-        EFContext.Tasks.Remove(task);
+        using IDbConnection conn = OpenConnection();
+        var transaction = conn.BeginTransaction();
 
-        IQueryable<ToDoTask> otherTasks;
+        var task = GetById(id, conn);
 
+        IEnumerable<int> decrementOrderTaskIds;
         if (task.PrivateToUserId.HasValue)
         {
-            // If the task was private reduce the Order of only the user's private tasks
-            otherTasks = PrivateTasks(task.ListId, userId).Where(x => x.IsCompleted == task.IsCompleted && x.Order > task.Order);
+            decrementOrderTaskIds = GetPrivateTaskIds(task.ListId, userId, task.IsCompleted, task.Order, conn);
         }
         else
         {
-            otherTasks = PublicTasks(task.ListId).Where(x => x.IsCompleted == task.IsCompleted && x.Order > task.Order);
+            decrementOrderTaskIds = GetPublicTaskIds(task.ListId, task.IsCompleted, task.Order, conn);
         }
 
-        foreach (ToDoTask otherTask in otherTasks)
-        {
-            otherTask.Order--;
-        }
+        await conn.ExecuteAsync(@"UPDATE todo.tasks SET ""order"" = ""order"" - 1 WHERE id = ANY(@Ids)",
+            new { Ids = decrementOrderTaskIds.ToList() },
+            transaction);
 
-        await EFContext.SaveChangesAsync();
+        await conn.ExecuteAsync("DELETE FROM todo.tasks WHERE id = @Id", new { Id = id }, transaction);
+
+        transaction.Commit();
 
         metric.Finish();
     }
@@ -337,27 +328,17 @@ public class TasksRepository : BaseRepository, ITasksRepository
 
         var task = GetById(id, conn);
 
-        IEnumerable<int> decrementOrderTaskIds;
         IEnumerable<int> incrementOrderTaskIds;
+        IEnumerable<int> decrementOrderTaskIds;
         if (task.PrivateToUserId.HasValue)
         {
-            incrementOrderTaskIds = conn.Query<int>(
-                "SELECT id FROM todo.tasks WHERE list_id = @ListId AND private_to_user_id = @UserId AND is_completed",
-                new { task.ListId, UserId = userId });
-
-            decrementOrderTaskIds = conn.Query<int>(
-                @"SELECT id FROM todo.tasks WHERE list_id = @ListId AND private_to_user_id = @UserId AND is_completed = FALSE AND ""order"" > @Order",
-                new { task.ListId, UserId = userId, task.Order });
+            incrementOrderTaskIds = GetPrivateTaskIds(task.ListId, userId, true, null, conn);
+            decrementOrderTaskIds = GetPrivateTaskIds(task.ListId, userId, false, task.Order, conn);
         }
         else
         {
-            incrementOrderTaskIds = conn.Query<int>(
-                "SELECT id FROM todo.tasks WHERE list_id = @ListId AND private_to_user_id IS NULL AND is_completed",
-                new { task.ListId });
-
-            decrementOrderTaskIds = conn.Query<int>(
-                @"SELECT id FROM todo.tasks WHERE list_id = @ListId AND private_to_user_id IS NULL AND is_completed = FALSE AND ""order"" > @Order",
-                new { task.ListId, task.Order });
+            incrementOrderTaskIds = GetPublicTaskIds(task.ListId, true, null, conn);
+            decrementOrderTaskIds = GetPublicTaskIds(task.ListId, false, task.Order, conn);
         }
 
         await conn.ExecuteAsync(@"UPDATE todo.tasks SET ""order"" = ""order"" + 1 WHERE id = ANY(@Ids)",
@@ -390,21 +371,17 @@ public class TasksRepository : BaseRepository, ITasksRepository
         IEnumerable<int> decrementOrderTaskIds;
         if (task.PrivateToUserId.HasValue)
         {
-            var tasksCount = GetPrivateTasksCount(task.ListId, false, userId, conn);
+            var tasksCount = GetPrivateTasksCount(task.ListId, userId, false, conn);
             newOrder = ++tasksCount;
 
-            decrementOrderTaskIds = conn.Query<int>(
-                @"SELECT id FROM todo.tasks WHERE list_id = @ListId AND private_to_user_id = @UserId AND is_completed AND ""order"" > @Order",
-                new { task.ListId, UserId = userId, task.Order });
+            decrementOrderTaskIds = GetPrivateTaskIds(task.ListId, userId, true, task.Order, conn);
         }
         else
         {
             var tasksCount = GetPublicTasksCount(task.ListId, false, conn);
             newOrder = ++tasksCount;
 
-            decrementOrderTaskIds = conn.Query<int>(
-                @"SELECT id FROM todo.tasks WHERE list_id = @ListId AND private_to_user_id IS NULL AND is_completed AND ""order"" > @Order",
-                new { task.ListId, task.Order });
+            decrementOrderTaskIds = GetPublicTaskIds(task.ListId, true, task.Order, conn);
         }
 
         await conn.ExecuteAsync(@"UPDATE todo.tasks SET ""order"" = ""order"" - 1 WHERE id = ANY(@Ids)",
@@ -426,7 +403,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
 
         if (task.PrivateToUserId.HasValue)
         {
-            // If the task was private reduce/increase the Order of only the user's private tasks
+            // If the task was private reduce/increase the Order of the user's private tasks
             if (newOrder > oldOrder)
             {
                 var privateTasks = PrivateTasks(task.ListId, userId).Where(x => x.IsCompleted == task.IsCompleted && x.Order >= oldOrder && x.Order <= newOrder);
@@ -471,12 +448,12 @@ public class TasksRepository : BaseRepository, ITasksRepository
         await EFContext.SaveChangesAsync();
     }
 
-    private ToDoTask GetById(int id, IDbConnection conn)
+    private static ToDoTask GetById(int id, IDbConnection conn)
     {
         return conn.QueryFirstOrDefault<ToDoTask>("SELECT * FROM todo.tasks WHERE id = @Id", new { Id = id });
     }
 
-    private short GetPrivateTasksCount(int listId, bool isCompleted, int userId, IDbConnection conn)
+    private static short GetPrivateTasksCount(int listId, int userId, bool isCompleted, IDbConnection conn)
     {
         return conn.ExecuteScalar<short>(@"SELECT COUNT(*)
                                            FROM todo.tasks
@@ -484,12 +461,34 @@ public class TasksRepository : BaseRepository, ITasksRepository
             new { ListId = listId, IsCompleted = isCompleted, UserId = userId });
     }
 
-    private short GetPublicTasksCount(int listId, bool isCompleted, IDbConnection conn)
+    private static short GetPublicTasksCount(int listId, bool isCompleted, IDbConnection conn)
     {
         return conn.ExecuteScalar<short>(@"SELECT COUNT(*)
                                            FROM todo.tasks
                                            WHERE list_id = @ListId AND is_completed = @IsCompleted AND private_to_user_id IS NULL",
             new { ListId = listId, IsCompleted = isCompleted });
+    }
+
+    private static IEnumerable<int> GetPrivateTaskIds(int listId, int userId, bool isCompleted, short? order, IDbConnection conn)
+    {
+        var query = "SELECT id FROM todo.tasks WHERE list_id = @ListId AND private_to_user_id = @UserId AND is_completed = @IsCompleted";
+        if (order.HasValue)
+        {
+            query += @" AND ""order"" > @Order";
+        }
+
+        return conn.Query<int>(query, new { ListId = listId, UserId = userId, IsCompleted = isCompleted, Order = order });
+    }
+
+    private static IEnumerable<int> GetPublicTaskIds(int listId, bool isCompleted, short? order, IDbConnection conn)
+    {
+        var query = "SELECT id FROM todo.tasks WHERE list_id = @ListId AND private_to_user_id IS NULL AND is_completed = @IsCompleted";
+        if (order.HasValue)
+        {
+            query += @" AND ""order"" > @Order";
+        }
+
+        return conn.Query<int>(query, new { ListId = listId, IsCompleted = isCompleted, Order = order });
     }
 
     private IQueryable<ToDoTask> PrivateTasks(int listId, int userId)

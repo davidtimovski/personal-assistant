@@ -1,6 +1,4 @@
-﻿using Application.Domain.CookingAssistant;
-
-namespace Application.Domain.Common;
+﻿namespace Core.Application.Entities;
 
 public class User
 {
@@ -14,6 +12,4 @@ public class User
     public bool ImperialSystem { get; set; }
     public string ImageUri { get; set; }
     public DateTime ModifiedDate { get; set; }
-
-    public DietaryProfile DietaryProfile { get; set; }
 }

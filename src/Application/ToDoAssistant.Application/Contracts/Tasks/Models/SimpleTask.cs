@@ -1,6 +1,6 @@
-﻿using Application.Domain.ToDoAssistant;
-using AutoMapper;
+﻿using AutoMapper;
 using Core.Application.Mappings;
+using ToDoAssistant.Application.Entities;
 
 namespace ToDoAssistant.Application.Contracts.Tasks.Models;
 

@@ -1,5 +1,4 @@
-﻿using Application.Domain.ToDoAssistant;
-using AutoMapper;
+﻿using AutoMapper;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
 using Core.Application.Utils;
@@ -9,6 +8,7 @@ using Sentry;
 using ToDoAssistant.Application.Contracts.Lists;
 using ToDoAssistant.Application.Contracts.Tasks;
 using ToDoAssistant.Application.Contracts.Tasks.Models;
+using ToDoAssistant.Application.Entities;
 
 namespace ToDoAssistant.Application.Services;
 

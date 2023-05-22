@@ -1,11 +1,11 @@
 ﻿using System.Text.Json;
 using System.Web;
-using Application.Domain.Weatherman;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Sentry;
 using Weatherman.Application.Contracts.Forecasts;
 using Weatherman.Application.Contracts.Forecasts.Models;
+using Weatherman.Application.Entities;
 using Weatherman.Infrastructure.Models;
 
 namespace Weatherman.Infrastructure;

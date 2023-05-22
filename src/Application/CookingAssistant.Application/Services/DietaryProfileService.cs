@@ -1,9 +1,9 @@
-﻿using Application.Domain.CookingAssistant;
-using AutoMapper;
+﻿using AutoMapper;
 using CookingAssistant.Application.Contracts.Common;
 using CookingAssistant.Application.Contracts.DietaryProfiles;
 using CookingAssistant.Application.Contracts.DietaryProfiles.Models;
 using CookingAssistant.Application.Contracts.Recipes.Models;
+using CookingAssistant.Application.Entities;
 using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.Extensions.Logging;

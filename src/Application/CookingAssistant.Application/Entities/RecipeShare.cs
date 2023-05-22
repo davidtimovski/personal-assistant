@@ -1,6 +1,7 @@
-﻿using Application.Domain.Common;
+﻿using Core.Application;
+using Core.Application.Entities;
 
-namespace Application.Domain.CookingAssistant;
+namespace CookingAssistant.Application.Entities;
 
 public class RecipeShare : Entity
 {

@@ -1,9 +1,9 @@
 ﻿using System.Text.RegularExpressions;
-using Application.Domain.CookingAssistant;
 using AutoMapper;
 using CookingAssistant.Application.Contracts.DietaryProfiles;
 using CookingAssistant.Application.Contracts.Recipes;
 using CookingAssistant.Application.Contracts.Recipes.Models;
+using CookingAssistant.Application.Entities;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
 using Core.Application.Utils;

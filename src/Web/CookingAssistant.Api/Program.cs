@@ -39,9 +39,10 @@ builder.Services
             builder.Configuration["Cloudinary:DefaultImageUris:Recipe"])
     .AddSender();
 
+var connectionString = builder.Configuration["ConnectionString"];
 builder.Services
-    .AddPersistence(builder.Configuration["ConnectionString"])
-    .AddCookingAssistantPersistence();
+    .AddPersistence(connectionString)
+    .AddCookingAssistantPersistence(connectionString);
 
 builder.Services
     .AddLocalization(opt => opt.ResourcesPath = "Resources");

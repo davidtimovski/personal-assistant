@@ -1,6 +1,6 @@
-﻿using Application.Domain.ToDoAssistant;
+﻿using Core.Application;
 
-namespace Application.Domain.CookingAssistant;
+namespace CookingAssistant.Application.Entities;
 
 public class Ingredient : Entity
 {

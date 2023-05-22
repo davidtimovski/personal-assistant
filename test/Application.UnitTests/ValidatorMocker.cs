@@ -4,9 +4,9 @@ using Moq;
 
 namespace Application.UnitTests;
 
-public static class ValidatorMocker
+internal static class ValidatorMocker
 {
-    public static Mock<IValidator<T>> GetSuccessful<T>()
+    internal static Mock<IValidator<T>> GetSuccessful<T>()
     {
         var validatorMock = new Mock<IValidator<T>>();
 
@@ -15,7 +15,7 @@ public static class ValidatorMocker
         return validatorMock;
     }
 
-    public static Mock<IValidator<T>> GetFailed<T>()
+    internal static Mock<IValidator<T>> GetFailed<T>()
     {
         var validatorMock = new Mock<IValidator<T>>();
 

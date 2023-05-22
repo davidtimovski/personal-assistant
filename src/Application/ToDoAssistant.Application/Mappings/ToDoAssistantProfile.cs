@@ -1,9 +1,9 @@
-﻿using Application.Domain.ToDoAssistant;
-using AutoMapper;
+﻿using AutoMapper;
 using Core.Application.Contracts;
 using ToDoAssistant.Application.Contracts.Lists.Models;
 using ToDoAssistant.Application.Contracts.Notifications.Models;
 using ToDoAssistant.Application.Contracts.Tasks.Models;
+using ToDoAssistant.Application.Entities;
 
 namespace ToDoAssistant.Application.Mappings;
 

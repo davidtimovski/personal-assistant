@@ -1,9 +1,9 @@
-﻿using Application.Domain.ToDoAssistant;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Sentry;
 using ToDoAssistant.Application.Contracts.Notifications;
 using ToDoAssistant.Application.Contracts.Notifications.Models;
+using ToDoAssistant.Application.Entities;
 
 namespace ToDoAssistant.Application.Services;
 

@@ -8,7 +8,7 @@ namespace Core.Persistence.Repositories;
 
 public class CsvRepository : BaseRepository, ICsvRepository
 {
-    public CsvRepository(PersonalAssistantContext efContext)
+    public CsvRepository(CoreContext efContext)
         : base(efContext) { }
 
     public List<TransactionForExport> GetAllTransactionsForExport(int userId, string uncategorized, ISpan metricsSpan)

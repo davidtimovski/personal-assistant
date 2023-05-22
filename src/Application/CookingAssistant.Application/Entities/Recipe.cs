@@ -1,8 +1,9 @@
-﻿using Application.Domain.Common;
+﻿using Core.Application;
+using Core.Application.Entities;
 
-namespace Application.Domain.CookingAssistant;
+namespace CookingAssistant.Application.Entities;
 
-public class Recipe
+public class Recipe : Entity
 {
     public int Id { get; set; }
     public int UserId { get; set; }
@@ -15,8 +16,6 @@ public class Recipe
     public string ImageUri { get; set; }
     public string VideoUrl { get; set; }
     public DateTime LastOpenedDate { get; set; }
-    public DateTime CreatedDate { get; set; }
-    public DateTime ModifiedDate { get; set; }
 
     public User User { get; set; }
     public List<RecipeIngredient> RecipeIngredients { get; set; } = new List<RecipeIngredient>();

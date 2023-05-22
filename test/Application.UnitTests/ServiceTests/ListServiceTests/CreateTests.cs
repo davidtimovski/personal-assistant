@@ -1,10 +1,10 @@
-﻿using Application.Domain.ToDoAssistant;
-using Application.UnitTests.Builders;
+﻿using Application.UnitTests.Builders;
 using FluentValidation;
 using Moq;
 using Sentry;
 using ToDoAssistant.Application.Contracts.Lists;
 using ToDoAssistant.Application.Contracts.Lists.Models;
+using ToDoAssistant.Application.Entities;
 using ToDoAssistant.Application.Mappings;
 using ToDoAssistant.Application.Services;
 using Xunit;

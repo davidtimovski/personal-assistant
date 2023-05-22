@@ -1,4 +1,4 @@
-﻿using Application.Domain.CookingAssistant;
+﻿using CookingAssistant.Application.Entities;
 
 namespace CookingAssistant.Application.Contracts.DietaryProfiles;
 

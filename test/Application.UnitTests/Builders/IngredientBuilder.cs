@@ -1,39 +1,39 @@
-﻿using Application.Domain.CookingAssistant;
-using CookingAssistant.Application.Contracts.Ingredients.Models;
+﻿using CookingAssistant.Application.Contracts.Ingredients.Models;
+using CookingAssistant.Application.Entities;
 
 namespace Application.UnitTests.Builders;
 
-public class IngredientBuilder
+internal class IngredientBuilder
 {
     private string name;
     private int? taskId;
     private List<RecipeIngredient> recipesIngredients;
 
 
-    public IngredientBuilder()
+    internal IngredientBuilder()
     {
         name = "Dummy name";
     }
 
-    public IngredientBuilder WithName(string newName)
+    internal IngredientBuilder WithName(string newName)
     {
         name = newName;
         return this;
     }
 
-    public IngredientBuilder WithTaskId()
+    internal IngredientBuilder WithTaskId()
     {
         taskId = 1;
         return this;
     }
 
-    public IngredientBuilder WithRecipeIngredientUnits(string[] units)
+    internal IngredientBuilder WithRecipeIngredientUnits(string[] units)
     {
         recipesIngredients = units.Select(x => new RecipeIngredient { Unit = x }).ToList();
         return this;
     }
 
-    public Ingredient BuildModel()
+    internal Ingredient BuildModel()
     {
         return new Ingredient
         {
@@ -42,7 +42,7 @@ public class IngredientBuilder
         };
     }
 
-    public UpdateIngredient BuildUpdateModel()
+    internal UpdateIngredient BuildUpdateModel()
     {
         return new UpdateIngredient
         {

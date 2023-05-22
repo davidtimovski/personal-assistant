@@ -2,10 +2,10 @@
 
 internal class AutomaticTransaction
 {
-    public int UserId { get; set; }
-    public bool IsDeposit { get; set; }
-    public int? CategoryId { get; set; }
-    public decimal Amount { get; set; }
-    public string Currency { get; set; }
-    public string Description { get; set; }
+    internal int UserId { get; set; }
+    internal bool IsDeposit { get; set; }
+    internal int? CategoryId { get; set; }
+    internal decimal Amount { get; set; }
+    internal string Currency { get; set; }
+    internal string Description { get; set; }
 }

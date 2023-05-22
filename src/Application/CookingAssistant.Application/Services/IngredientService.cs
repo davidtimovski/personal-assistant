@@ -1,8 +1,7 @@
-﻿using Application.Domain.CookingAssistant;
-using Application.Domain.ToDoAssistant;
-using AutoMapper;
+﻿using AutoMapper;
 using CookingAssistant.Application.Contracts.Ingredients;
 using CookingAssistant.Application.Contracts.Ingredients.Models;
+using CookingAssistant.Application.Entities;
 using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.Extensions.Logging;

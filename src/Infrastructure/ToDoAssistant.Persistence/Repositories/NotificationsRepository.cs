@@ -1,16 +1,15 @@
 ﻿using System.Data;
-using Application.Domain.ToDoAssistant;
-using Core.Persistence;
 using Dapper;
 using Sentry;
 using ToDoAssistant.Application.Contracts.Notifications;
-using User = Application.Domain.Common.User;
+using ToDoAssistant.Application.Entities;
+using User = Core.Application.Entities.User;
 
 namespace ToDoAssistant.Persistence.Repositories;
 
 public class NotificationsRepository : BaseRepository, INotificationsRepository
 {
-    public NotificationsRepository(PersonalAssistantContext efContext)
+    public NotificationsRepository(ToDoAssistantContext efContext)
         : base(efContext) { }
 
     public IEnumerable<Notification> GetAllAndFlagUnseen(int userId)

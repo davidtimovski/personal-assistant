@@ -2,6 +2,6 @@
 
 internal class Category
 {
-    public int Id { get; set; }
-    public int UserId { get; set; }
+    internal int Id { get; set; }
+    internal int UserId { get; set; }
 }

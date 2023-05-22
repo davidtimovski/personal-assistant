@@ -2,7 +2,7 @@
 
 namespace Application.UnitTests.Builders;
 
-public class RecipeBuilder
+internal class RecipeBuilder
 {
     private string name;
     private string description;
@@ -11,24 +11,24 @@ public class RecipeBuilder
     private TimeSpan? prepDuration;
     private TimeSpan? cookDuration;
 
-    public RecipeBuilder()
+    internal RecipeBuilder()
     {
         name = "Dummy name";
     }
 
-    public RecipeBuilder WithName(string newName)
+    internal RecipeBuilder WithName(string newName)
     {
         name = newName;
         return this;
     }
 
-    public RecipeBuilder WithDescription(string newDescription)
+    internal RecipeBuilder WithDescription(string newDescription)
     {
         description = newDescription;
         return this;
     }
 
-    public RecipeBuilder WithRecipeIngredients(params string[] ingredientNames)
+    internal RecipeBuilder WithRecipeIngredients(params string[] ingredientNames)
     {
         recipeIngredients = new List<UpdateRecipeIngredient>();
         foreach (var ingredient in ingredientNames)
@@ -41,7 +41,7 @@ public class RecipeBuilder
         return this;
     }
 
-    public RecipeBuilder WithRecipeIngredientsWithAmounts(params float?[] amounts)
+    internal RecipeBuilder WithRecipeIngredientsWithAmounts(params float?[] amounts)
     {
         recipeIngredients = new List<UpdateRecipeIngredient>();
         foreach (var amount in amounts)
@@ -55,25 +55,25 @@ public class RecipeBuilder
         return this;
     }
 
-    public RecipeBuilder WithInstructions(string newInstructions)
+    internal RecipeBuilder WithInstructions(string newInstructions)
     {
         instructions = newInstructions;
         return this;
     }
 
-    public RecipeBuilder WithPrepDuration(TimeSpan? newPrepDuration)
+    internal RecipeBuilder WithPrepDuration(TimeSpan? newPrepDuration)
     {
         prepDuration = newPrepDuration;
         return this;
     }
 
-    public RecipeBuilder WithCookDuration(TimeSpan? newCookDuration)
+    internal RecipeBuilder WithCookDuration(TimeSpan? newCookDuration)
     {
         cookDuration = newCookDuration;
         return this;
     }
 
-    public CreateRecipe BuildCreateModel()
+    internal CreateRecipe BuildCreateModel()
     {
         return new CreateRecipe
         {
@@ -86,7 +86,7 @@ public class RecipeBuilder
         };
     }
 
-    public UpdateRecipe BuildUpdateModel()
+    internal UpdateRecipe BuildUpdateModel()
     {
         return new UpdateRecipe
         {

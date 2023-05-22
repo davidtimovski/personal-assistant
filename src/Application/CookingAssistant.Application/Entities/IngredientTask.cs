@@ -1,4 +1,4 @@
-﻿namespace Application.Domain.CookingAssistant;
+﻿namespace CookingAssistant.Application.Entities;
 
 public class IngredientTask
 {

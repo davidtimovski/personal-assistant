@@ -5,7 +5,7 @@ using ToDoAssistant.Application.Contracts.Tasks;
 using ToDoAssistant.Application.Mappings;
 using ToDoAssistant.Application.Services;
 using Xunit;
-using User = Application.Domain.Common.User;
+using User = Core.Application.Entities.User;
 
 namespace Application.UnitTests.ServiceTests.ListServiceTests;
 

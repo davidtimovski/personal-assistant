@@ -12,7 +12,7 @@ using Infrastructure.Sender.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using User = Application.Domain.Common.User;
+using User = Core.Application.Entities.User;
 
 namespace CookingAssistant.Api.Controllers;
 

@@ -25,7 +25,10 @@ let private configureServices (services: IServiceCollection) =
         .AddWeathermanInfrastructure()
     |> ignore
 
-    services.AddPersistence(settings["ConnectionString"]).AddWeathermanPersistence()
+    let connectionString = settings["ConnectionString"]
+    services
+        .AddPersistence(connectionString)
+        .AddWeathermanPersistence(connectionString)
     |> ignore
 
     services.AddHttpClient("open-meteo") |> ignore

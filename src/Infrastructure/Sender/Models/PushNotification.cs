@@ -1,17 +1,17 @@
 ﻿namespace Infrastructure.Sender.Models;
 
-public abstract class PushNotification
+public class PushNotification
 {
-    public PushNotification(string application)
+    protected PushNotification(string application)
     {
         Application = application;
     }
 
-    public string Application { get; }
-    public string SenderImageUri { get; set; }
+    public string Application { get; } = null!;
+    public string SenderImageUri { get; set; } = null!;
     public int UserId { get; set; }
-    public string Message { get; set; }
-    public string OpenUrl { get; set; }
+    public string Message { get; set; } = null!;
+    public string OpenUrl { get; set; } = null!;
 }
 
 public class ToDoAssistantPushNotification : PushNotification

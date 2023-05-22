@@ -1,12 +1,12 @@
-﻿using Application.Domain.Common;
-using Core.Application.Contracts;
+﻿using Core.Application.Contracts;
+using Core.Application.Entities;
 using Sentry;
 
 namespace Core.Persistence.Repositories;
 
 public class PushSubscriptionsRepository : BaseRepository, IPushSubscriptionsRepository
 {
-    public PushSubscriptionsRepository(PersonalAssistantContext efContext)
+    public PushSubscriptionsRepository(CoreContext efContext)
         : base(efContext) { }
 
     public async Task CreateSubscriptionAsync(PushSubscription subscription, ISpan metricsSpan)
