@@ -94,11 +94,11 @@
 			{:else}
 				<div>
 					<table class="editable-table accounts-table">
-						{#if someAreInvestmentFunds}
-							<thead>
-								<tr>
-									<th class="type-cell" />
-									<th class="left-col">{$t('name')}</th>
+						<thead>
+							<tr>
+								<th class="type-cell" />
+								<th class="left-col">{$t('name')}</th>
+								{#if someAreInvestmentFunds}
 									<th
 										on:click={toggleViewStocks}
 										class="right-col clickable-cell"
@@ -108,11 +108,12 @@
 									>
 										<span>{$t(viewStocks ? 'accounts.stocks' : 'accounts.stockPrice')}</span>
 									</th>
-									<th class="right-col">{$t('balance')}</th>
-									<th class="sync-icon-cell" />
-								</tr>
-							</thead>
-						{/if}
+								{/if}
+
+								<th class="right-col">{$t('balance')}</th>
+								<th class="sync-icon-cell" />
+							</tr>
+						</thead>
 
 						<tbody>
 							{#each accounts as account}
@@ -126,11 +127,11 @@
 									{#if someAreInvestmentFunds}
 										<td class="right-col">
 											{#if viewStocks}
-												<span>{account.stocks || ''}</span>
+												<span>{Formatter.number(account.stocks, $user.culture)}</span>
 											{:else}
 												<span
 													>{account.stockPrice
-														? Formatter.moneyPrecise(account.stockPrice, currency, $user.culture, 4)
+														? Formatter.moneyPrecise(account.stockPrice, account.currency, $user.culture, 4)
 														: ''}</span
 												>
 											{/if}

@@ -1,7 +1,17 @@
 export class Formatter {
 	private static withFractions = new Set(['EUR', 'USD']);
 
-	static number(value: any, currency: string | null, culture: string | null) {
+	static number(value: any, culture: string | string[] | undefined, fractionDigits?: number | undefined) {
+		if (isNaN(parseFloat(value))) {
+			return '';
+		}
+
+		return new Intl.NumberFormat(culture, {
+			maximumFractionDigits: fractionDigits ? fractionDigits : 0
+		}).format(value);
+	}
+
+	static moneyWithoutCurrency(value: any, currency: string | null, culture: string | string[] | undefined) {
 		if (isNaN(parseFloat(value)) || !currency || !culture) {
 			return '';
 		}
@@ -14,7 +24,7 @@ export class Formatter {
 	static numberPrecise(
 		value: any,
 		currency: string | null,
-		culture: string | null,
+		culture: string | string[] | undefined,
 		fractionDigits?: number | undefined
 	) {
 		if (isNaN(parseFloat(value)) || !currency || !culture) {
@@ -26,7 +36,7 @@ export class Formatter {
 		}).format(value);
 	}
 
-	static money(value: any, currency: string | null, culture: string | null) {
+	static money(value: any, currency: string | null, culture: string | string[] | undefined) {
 		if (isNaN(parseFloat(value)) || !currency || !culture) {
 			return '';
 		}
@@ -47,7 +57,7 @@ export class Formatter {
 	static moneyPrecise(
 		value: any,
 		currency: string | null,
-		culture: string | null,
+		culture: string | string[] | undefined,
 		fractionDigits?: number | undefined
 	) {
 		if (isNaN(parseFloat(value)) || !currency || !culture) {

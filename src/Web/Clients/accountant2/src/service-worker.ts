@@ -1,6 +1,6 @@
 import { build, files } from '$service-worker';
 
-const APP_VERSION = '2.3.3';
+const APP_VERSION = '2.3.4';
 
 self.addEventListener('install', (event: ExtendableEvent) => {
 	event.waitUntil(
@@ -33,7 +33,7 @@ self.addEventListener('activate', (event: ExtendableEvent) => {
 	return self.clients.claim();
 });
 
-self.addEventListener('fetch', (event: ExtendableEvent) => {
+self.addEventListener('fetch', (event: FetchEvent) => {
 	if (event.request.url.includes('/api/')) {
 		event.respondWith(fetch(event.request));
 	} else {
