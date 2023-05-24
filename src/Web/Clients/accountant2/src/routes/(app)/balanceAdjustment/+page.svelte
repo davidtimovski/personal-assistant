@@ -160,7 +160,9 @@
 
 			<div class="form-control inline">
 				<span>{$t('balanceAdjustment.adjustedBy')}</span>
-				<span> {(adjustedBy > 0 ? '+' : '') + Formatter.number(adjustedBy, currency, $user.culture)}</span>
+				<span>
+					{(adjustedBy > 0 ? '+' : '') + Formatter.moneyWithoutCurrency(adjustedBy, currency, $user.culture)}</span
+				>
 			</div>
 
 			<div class="form-control">

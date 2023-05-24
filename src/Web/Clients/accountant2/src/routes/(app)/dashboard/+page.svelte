@@ -199,19 +199,19 @@
 			<a href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
 				<div class="summary-item">
 					<div class="summary-title">{$t('dashboard.available')}</div>
-					<div class="summary-value">{Formatter.number(data.available, currency, $user.language)}</div>
+					<div class="summary-value">{Formatter.moneyWithoutCurrency(data.available, currency, $user.language)}</div>
 				</div>
 			</a>
 			<a href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
 				<div class="summary-item">
 					<div class="summary-title">{$t('dashboard.spent')}</div>
-					<div class="summary-value">{Formatter.number(data.spent, currency, $user.language)}</div>
+					<div class="summary-value">{Formatter.moneyWithoutCurrency(data.spent, currency, $user.language)}</div>
 				</div>
 			</a>
 			<a href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
 				<div class="summary-item">
 					<div class="summary-title">{$t('balance')}</div>
-					<div class="summary-value">{Formatter.number(data.balance, currency, $user.language)}</div>
+					<div class="summary-value">{Formatter.moneyWithoutCurrency(data.balance, currency, $user.language)}</div>
 				</div>
 			</a>
 		</div>

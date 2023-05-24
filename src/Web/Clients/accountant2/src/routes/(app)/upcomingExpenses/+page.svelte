@@ -111,7 +111,7 @@
 									</a>
 								</td>
 								<td>{upcomingExpense.date}</td>
-								<td>{Formatter.number(upcomingExpense.amount, currency, $user.culture)}</td>
+								<td>{Formatter.money(upcomingExpense.amount, currency, $user.culture)}</td>
 								<td>{upcomingExpense.category}</td>
 								<td class="sync-icon-cell">
 									{#if !upcomingExpense.synced}

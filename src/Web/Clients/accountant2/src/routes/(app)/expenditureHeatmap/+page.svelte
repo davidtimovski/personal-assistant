@@ -257,8 +257,8 @@
 					</div>
 					<div class="heatmap-legend-line" />
 					<div class="heatmap-legend-amounts">
-						<span>{Formatter.number(minSpent, currency, $user.culture)}</span>
-						<span>{Formatter.number(maxSpent, currency, $user.culture)}</span>
+						<span>{Formatter.moneyWithoutCurrency(minSpent, currency, $user.culture)}</span>
+						<span>{Formatter.moneyWithoutCurrency(maxSpent, currency, $user.culture)}</span>
 					</div>
 				</div>
 

@@ -123,7 +123,7 @@
 										<i class="fas fa-hand-holding-usd {debt.userIsDebtor ? 'debtor' : 'lender'}" />
 									</button>
 								</td>
-								<td>{Formatter.number(debt.amount, currency, $user.culture)}</td>
+								<td>{Formatter.money(debt.amount, currency, $user.culture)}</td>
 								<td>{debt.person}</td>
 								<td>{debt.created}</td>
 								<td class="sync-icon-cell">

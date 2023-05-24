@@ -414,7 +414,7 @@
 											<i class="fas fa-exchange-alt transfer-color" />
 										{/if}
 									</td>
-									<td>{Formatter.number(transaction.amount, currency, $user.culture)}</td>
+									<td>{Formatter.moneyWithoutCurrency(transaction.amount, currency, $user.culture)}</td>
 									<td>{transaction.detail}</td>
 									<td class="date-cell">{transaction.date}</td>
 
