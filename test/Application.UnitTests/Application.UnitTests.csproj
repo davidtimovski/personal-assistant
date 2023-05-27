@@ -17,11 +17,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\Application\CookingAssistant.Application\CookingAssistant.Application.csproj" />
-		<ProjectReference Include="..\..\src\Application\ToDoAssistant.Application\ToDoAssistant.Application.csproj" />
-		<ProjectReference Include="..\..\src\Application\Utility\Utility.fsproj" />
-		<ProjectReference Include="..\..\src\Application\Weatherman.Application\Weatherman.Application.csproj" />
-		<ProjectReference Include="..\..\src\Infrastructure\Weatherman.Infrastructure\Weatherman.Infrastructure.csproj" />
+		<ProjectReference Include="..\..\src\CookingAssistant\CookingAssistant.Application\CookingAssistant.Application.csproj" />
+		<ProjectReference Include="..\..\src\CookingAssistant\CookingAssistant.Utility\CookingAssistant.Utility.fsproj" />
+		<ProjectReference Include="..\..\src\ToDoAssistant\ToDoAssistant.Application\ToDoAssistant.Application.csproj" />
+		<ProjectReference Include="..\..\src\Weatherman\Weatherman.Application\Weatherman.Application.csproj" />
+		<ProjectReference Include="..\..\src\Weatherman\Weatherman.Infrastructure\Weatherman.Infrastructure.csproj" />
 	</ItemGroup>
 
 </Project>

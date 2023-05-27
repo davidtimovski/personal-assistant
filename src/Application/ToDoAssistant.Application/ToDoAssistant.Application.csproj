@@ -1,9 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-	<Import Project="..\..\..\PersonalAssistant.Cs.targets" />
-
-	<ItemGroup>
-		<ProjectReference Include="..\Core.Application\Core.Application.csproj" />
-	</ItemGroup>
-
-</Project>

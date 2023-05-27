@@ -11,13 +11,13 @@
         "gateway": "StartDebugging",
         "postgres": "StartWithoutDebugging",
         "rabbitmq": "StartWithoutDebugging",
-        "sender": "StartDebugging",
+        "sender": "StartWithoutDebugging",
         "todo-api": "StartDebugging",
-        "weatherman-api": "StartDebugging",
-        "trainer-api": "DoNotStart"
+        "trainer-api": "DoNotStart",
+        "weatherman-api": "StartDebugging"
       }
     },
-	"Account": {
+    "Account.Web": {
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "serviceActions": {
@@ -30,8 +30,8 @@
         "rabbitmq": "StartWithoutDebugging",
         "sender": "DoNotStart",
         "todo-api": "DoNotStart",
-        "weatherman-api": "DoNotStart",
-        "trainer-api": "DoNotStart"
+        "trainer-api": "DoNotStart",
+        "weatherman-api": "DoNotStart"
       }
     },
     "Accountant.Api": {
@@ -41,14 +41,14 @@
         "account": "StartDebugging",
         "accountant-api": "StartDebugging",
         "cooking-api": "DoNotStart",
-        "core-api": "StartDebugging",
+        "core-api": "StartWithoutDebugging",
         "gateway": "StartDebugging",
         "postgres": "StartWithoutDebugging",
         "rabbitmq": "StartWithoutDebugging",
-        "sender": "StartDebugging",
+        "sender": "StartWithoutDebugging",
         "todo-api": "DoNotStart",
-        "weatherman-api": "DoNotStart",
-        "trainer-api": "DoNotStart"
+        "trainer-api": "DoNotStart",
+        "weatherman-api": "DoNotStart"
       }
     },
     "ToDoAssistant.Api": {
@@ -58,14 +58,14 @@
         "account": "StartDebugging",
         "accountant-api": "DoNotStart",
         "cooking-api": "DoNotStart",
-        "core-api": "StartDebugging",
+        "core-api": "StartWithoutDebugging",
         "gateway": "StartDebugging",
         "postgres": "StartWithoutDebugging",
         "rabbitmq": "StartWithoutDebugging",
-        "sender": "StartDebugging",
+        "sender": "StartWithoutDebugging",
         "todo-api": "StartDebugging",
-        "weatherman-api": "DoNotStart",
-        "trainer-api": "DoNotStart"
+        "trainer-api": "DoNotStart",
+        "weatherman-api": "DoNotStart"
       }
     },
     "Weatherman.Api": {
@@ -75,14 +75,14 @@
         "account": "StartDebugging",
         "accountant-api": "DoNotStart",
         "cooking-api": "DoNotStart",
-        "core-api": "StartDebugging",
+        "core-api": "StartWithoutDebugging",
         "gateway": "StartDebugging",
         "postgres": "StartWithoutDebugging",
         "rabbitmq": "StartWithoutDebugging",
-        "sender": "StartDebugging",
+        "sender": "StartWithoutDebugging",
         "todo-api": "DoNotStart",
-        "weatherman-api": "StartDebugging",
-        "trainer-api": "DoNotStart"
+        "trainer-api": "DoNotStart",
+        "weatherman-api": "StartDebugging"
       }
     },
     "Trainer.Api": {
@@ -96,7 +96,7 @@
         "gateway": "StartDebugging",
         "postgres": "StartWithoutDebugging",
         "rabbitmq": "StartWithoutDebugging",
-        "sender": "StartDebugging",
+        "sender": "StartWithoutDebugging",
         "todo-api": "DoNotStart",
         "trainer-api": "StartDebugging",
         "weatherman-api": "DoNotStart"

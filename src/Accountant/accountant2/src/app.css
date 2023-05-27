@@ -1,0 +1,441 @@
+@import '../../../Core/shared2/styles/core.css';
+@import '../../../Core/shared2/styles/input-date.css';
+
+:root {
+	--primary-color: var(--accountant-color);
+	--primary-color-dark: #4946ec;
+	--primary-color-light: #eae8ff;
+	--faded-color: #b098c5;
+	--deposit-color: #65c565;
+	--expense-color: #f55551;
+	--transfer-color: #6597f5;
+}
+
+input[type='text'],
+input[type='number'],
+input[type='date'],
+select,
+textarea {
+	background-color: #f9f8fe;
+}
+
+.double-bounce1,
+.double-bounce2 {
+	background-color: #bb8aff;
+}
+
+.button.primary-button,
+.save-delete-wrap .primary-button.loading:disabled {
+	background: linear-gradient(225deg, #7a46f3, #00a6ed);
+	background-size: 400% 400%;
+}
+.button.primary-button:disabled {
+	color: var(--primary-color);
+}
+
+.side.disabled {
+	cursor: default;
+	color: var(--faded-color);
+}
+
+.amount-by-category-table {
+	width: 100%;
+	font-size: 1rem;
+}
+
+.amount-by-category-table tbody tr {
+	cursor: pointer;
+}
+
+.amount-by-category-table tbody tr:hover {
+	color: var(--primary-color-dark);
+}
+
+.amount-by-category-table td {
+	padding: 5px 15px 5px 0;
+	line-height: 1.2rem;
+}
+
+.amount-by-category-table td:last-child {
+	padding-right: 0;
+	text-align: right;
+}
+
+.amount-by-category-table td.sub-category-cell {
+	padding-left: 10px;
+}
+
+.amount-by-category-table .amount-cell {
+	white-space: nowrap;
+}
+
+.amount-by-category-table tfoot tr:last-child td {
+	border-top: 1px solid #ddd;
+	padding: 5px 0;
+	font-size: 1.1rem;
+}
+
+.form-control.inline {
+	display: flex;
+	justify-content: space-between;
+}
+
+.form-control.inline label {
+	padding-right: 25px;
+}
+
+.form-control.inline span:nth-child(2) {
+	text-align: right;
+}
+
+form label:not(.checkbox-toggle) {
+	display: block;
+}
+form.viewing label {
+	width: auto;
+}
+form input[type='text'],
+form input[type='number'],
+form select,
+form input[type='date'] {
+	line-height: 37px;
+}
+
+form .category-select {
+	width: 210px;
+	background-position: right 15px top 17px;
+}
+
+form input[type='date'] {
+	width: 140px;
+	text-align: center;
+}
+
+form .description-textarea {
+	height: 80px;
+	max-height: 200px;
+}
+
+form input[type='text'],
+form input[type='password'],
+form input[type='number'],
+form input[type='date'],
+textarea {
+	letter-spacing: unset;
+}
+
+.loadable-select {
+	position: relative;
+}
+
+.loadable-select select {
+	transition: opacity var(--transition);
+}
+
+.loadable-select i {
+	position: absolute;
+	top: 9px;
+	left: 10px;
+	font-size: 1.3rem;
+	color: var(--primary-color);
+}
+
+.loadable-select.loaded i {
+	display: none;
+}
+
+.content-body {
+	margin-bottom: 30px;
+}
+
+.editable-table {
+	width: 100%;
+}
+
+.editable-table tbody tr:nth-child(odd),
+.editable-table tbody tr:hover {
+	background: #f4f3f9;
+}
+
+.editable-table th {
+	padding: 10px 5px;
+	line-height: 24px;
+	font-size: 1rem;
+	color: var(--primary-color-dark);
+}
+
+.editable-table td {
+	padding: 5px;
+	line-height: 24px;
+	text-align: center;
+	vertical-align: middle;
+	font-size: 0.9rem;
+}
+
+.editable-table .date-cell {
+	white-space: nowrap;
+}
+
+.editable-table .edit-link-cell {
+	padding: 0 8px 0 0;
+	text-align: left;
+}
+
+.editable-table .type-cell {
+	padding: 5px;
+	font-size: 1.3rem;
+}
+
+.editable-table .link {
+	display: block;
+	padding: 5px;
+	font-size: 1.3rem;
+	color: var(--primary-color);
+}
+
+.editable-table .link:hover {
+	color: var(--primary-color-dark);
+}
+
+.editable-table tfoot td {
+	border-top: 1px solid #ddd;
+	padding: 5px;
+	text-align: right;
+}
+
+.editable-table tfoot tr:last-child td {
+	font-size: 1.1rem;
+}
+
+.editable-table .no-data-column {
+	padding: 20px 5px;
+	font-size: 1.1rem;
+	text-align: center;
+	color: var(--faded-color);
+}
+
+.deposit-color {
+	color: var(--deposit-color);
+}
+.expense-color {
+	color: var(--expense-color);
+}
+.transfer-color {
+	color: var(--transfer-color);
+}
+
+th.sync-icon-cell,
+td.sync-icon-cell {
+	padding: 0;
+	font-size: 1.2rem;
+	color: var(--faded-color);
+}
+.sync-icon-cell i {
+	margin: 0 5px;
+}
+
+.clickable-cell {
+	cursor: pointer;
+}
+
+.multi-radio-wrap {
+	display: flex;
+	border-radius: var(--border-radius);
+	border: 1px solid #ddd;
+}
+.multi-radio-part {
+	flex-grow: 1;
+}
+.multi-radio-part input[type='radio'] {
+	display: none;
+}
+.multi-radio-part label {
+	display: block;
+	position: relative;
+	background: #fff;
+	padding: 0;
+	text-align: center;
+	font-size: inherit;
+	line-height: 37px;
+	cursor: pointer;
+	user-select: none;
+
+	transition: background var(--transition), color var(--transition);
+}
+.multi-radio-part label.selected {
+	background: var(--primary-color);
+	box-shadow: inset var(--box-shadow);
+	color: #fafafa;
+}
+.multi-radio-part:first-child label {
+	border-top-left-radius: var(--border-radius);
+	border-bottom-left-radius: var(--border-radius);
+}
+.multi-radio-part:last-child label {
+	border-top-right-radius: var(--border-radius);
+	border-bottom-right-radius: var(--border-radius);
+}
+
+.encryption-box {
+	margin-top: 5px;
+}
+
+.encryption-box.active {
+	background: #f6f6f6;
+	border-radius: var(--border-radius);
+	box-shadow: inset var(--box-shadow);
+	padding: 10px 12px;
+	transition: padding var(--transition);
+}
+
+.viewable-password {
+	position: relative;
+}
+.viewable-password input {
+	width: calc(100% - 64px);
+	padding-right: 52px;
+}
+
+.password-show-button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	background: transparent;
+	border: none;
+	outline: none;
+	padding: 0 12px;
+	font-size: 1.2rem;
+	line-height: 37px;
+	color: var(--faded-color);
+}
+
+.password-show-button i:nth-child(2) {
+	display: none;
+}
+
+.password-show-button.shown i:nth-child(2) {
+	display: inline-block;
+}
+
+.password-show-button.shown i:first-child {
+	display: none;
+}
+
+.decrypt-form {
+	display: flex;
+	justify-content: space-between;
+	margin: 0;
+}
+.decrypt-form .viewable-password {
+	width: 100%;
+}
+.inline-decrypt-form {
+	display: flex;
+}
+
+.inline-decrypt-form .viewable-password {
+	width: 100%;
+}
+.decrypt-button {
+	background: var(--green-color);
+	border: none;
+	border-radius: var(--border-radius);
+	outline: none;
+	padding: 0 12px;
+	margin-left: 10px;
+	font-size: 1.2rem;
+	line-height: 37px;
+	color: #fff;
+}
+.decrypt-button i:nth-child(2) {
+	display: none;
+}
+.decrypt-button.loading i:nth-child(2) {
+	display: inline-block;
+}
+.decrypt-button.loading i:first-child {
+	display: none;
+}
+
+.clickable {
+	cursor: pointer;
+}
+
+.highlighted-row {
+	animation: highlightRow ease-in 5s;
+}
+@keyframes highlightRow {
+	0% {
+		background: #e0c8f5;
+	}
+}
+
+.currency-autocomplete-customizations {
+	background: #fafafa;
+	border-radius: var(--border-radius);
+}
+
+.currency-autocomplete-customizations > div {
+	border-radius: var(--border-radius);
+	padding: 5px 10px;
+	font-size: 1rem;
+	cursor: pointer;
+}
+
+.currency-autocomplete-customizations .selected {
+	background: #e1e1e1;
+}
+
+@media screen and (min-width: 1200px) {
+	table tr td,
+	.editable-table tr td {
+		font-size: 1rem;
+		line-height: 26px;
+	}
+
+	.editable-table tr th {
+		font-size: 1.1rem;
+	}
+
+	.amount-by-category-table td {
+		font-size: 1.1rem;
+		line-height: 1.3rem;
+	}
+
+	form label,
+	form input[type='text'],
+	form input[type='number'],
+	form input[type='password'],
+	form select,
+	form input[type='date'] {
+		line-height: 45px;
+	}
+
+	form input[type='date'] {
+		width: 180px;
+	}
+
+	form .category-select {
+		width: 270px;
+		background-position: right 15px top 20px;
+	}
+
+	form .description-textarea {
+		height: 100px;
+	}
+
+	.multi-radio-part label {
+		line-height: 45px;
+	}
+
+	.password-show-button,
+	.decrypt-button {
+		line-height: 45px;
+	}
+
+	.loadable-select i {
+		top: 11px;
+		left: 13px;
+		font-size: 1.5rem;
+	}
+}

@@ -6,7 +6,7 @@ services:
     container_name: personalassistant-account
     build:
       context: .
-      dockerfile: src/Web/Account/Dockerfile
+      dockerfile: src/Core/Account.Web/Dockerfile
     depends_on:
       - postgres
       - rabbitmq
@@ -16,7 +16,7 @@ services:
     container_name: personalassistant-gateway
     build:
       context: .
-      dockerfile: src/Web/Gateway/Dockerfile
+      dockerfile: src/Core/Gateway/Dockerfile
     depends_on:
       - core-api
       - todo-api
@@ -30,7 +30,7 @@ services:
     container_name: personalassistant-core-api
     build:
       context: .
-      dockerfile: src/Web/Core.Api/Dockerfile
+      dockerfile: src/Core/Core.Api/Dockerfile
     depends_on:
       - postgres
 
@@ -39,7 +39,7 @@ services:
     container_name: personalassistant-todo-api
     build:
       context: .
-      dockerfile: src/Web/ToDoAssistant.Api/Dockerfile
+      dockerfile: src/ToDoAssistant/ToDoAssistant.Api/Dockerfile
     depends_on:
       - postgres
       - rabbitmq
@@ -49,7 +49,7 @@ services:
     container_name: personalassistant-cooking-api
     build:
       context: .
-      dockerfile: src/Web/CookingAssistant.Api/Dockerfile
+      dockerfile: src/CookingAssistant/CookingAssistant.Api/Dockerfile
     depends_on:
       - postgres
       - rabbitmq
@@ -59,7 +59,7 @@ services:
     container_name: personalassistant-accountant-api
     build:
       context: .
-      dockerfile: src/Web/Accountant.Api/Dockerfile
+      dockerfile: src/Accountant/Accountant.Api/Dockerfile
     depends_on:
       - postgres
 
@@ -68,7 +68,7 @@ services:
     container_name: personalassistant-weatherman-api
     build:
       context: .
-      dockerfile: src/Web/Weatherman.Api/Dockerfile
+      dockerfile: src/Weatherman/Weatherman.Api/Dockerfile
     depends_on:
       - postgres
 
@@ -77,7 +77,7 @@ services:
     container_name: personalassistant-trainer-api
     build:
       context: .
-      dockerfile: src/Web/Trainer.Api/Dockerfile
+      dockerfile: src/Trainer/Trainer.Api/Dockerfile
     depends_on:
       - postgres
 
@@ -86,7 +86,7 @@ services:
     container_name: personalassistant-sender
     build:
       context: .
-      dockerfile: src/Background/Sender/Dockerfile
+      dockerfile: src/Core/Sender/Dockerfile
     depends_on:
       - postgres
       - rabbitmq

@@ -5,7 +5,13 @@ on:
     branches:
       - dev
     paths-ignore:
-      - "src/Web/Clients/**"
+      - "src/Accountant/accountant/**"
+      - "src/Accountant/accountant2/**"
+      - "src/CookingAssistant/cooking-assistant/**"
+      - "src/ToDoAssistant/to-do-assistant/**"
+      - "src/ToDoAssistant/to-do-assistant2/**"
+      - "src/Trainer/trainer/**"
+      - "src/Weatherman/weatherman/**"
 
 jobs:
   test:

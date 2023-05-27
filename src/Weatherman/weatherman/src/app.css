@@ -1,0 +1,36 @@
+@import '../../../Core/shared2/styles/core2.css';
+
+:root {
+	--primary-color: var(--weatherman-color);
+	--primary-color-dark: #dd7200;
+	--primary-color-light: #eeeeff;
+	--faded-color: #98b0c5;
+}
+
+.double-bounce1,
+.double-bounce2 {
+	background-color: var(--primary-color);
+}
+
+.current-illustration svg {
+	width: 100%;
+}
+
+.hourly-illustration svg {
+	width: 44px;
+	height: 20px;
+}
+
+@media (prefers-color-scheme: light) {
+	.current-illustration svg,
+	.hourly-illustration svg {
+		fill: #666;
+	}
+}
+
+@media (prefers-color-scheme: dark) {
+	.current-illustration svg,
+	.hourly-illustration svg {
+		fill: #bbb;
+	}
+}
