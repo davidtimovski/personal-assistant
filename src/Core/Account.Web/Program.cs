@@ -13,7 +13,6 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Net.Http.Headers;
-using Sender;
 using ToDoAssistant.Application;
 using ToDoAssistant.Persistence;
 

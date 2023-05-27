@@ -411,12 +411,9 @@ public class AccountController : BaseController
 
         tr.Finish();
 
-        if (model.Language != user.Language)
-        {
-            return RedirectToAction(nameof(Logout), "Account", new { returnUrlSlug = "?alert=" + IndexAlert.LanguageChanged });
-        }
-
-        return RedirectToAction(nameof(HomeController.Overview), "Home", new { alert = OverviewAlert.ProfileUpdated });
+        return model.Language != user.Language
+            ? RedirectToAction(nameof(Logout), "Account", new { returnUrlSlug = "?alert=" + IndexAlert.LanguageChanged })
+            : RedirectToAction(nameof(HomeController.Overview), "Home", new { alert = OverviewAlert.ProfileUpdated });
     }
 
     [HttpPost]

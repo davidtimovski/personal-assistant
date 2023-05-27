@@ -19,7 +19,6 @@
 		<ProjectReference Include="..\..\Core\Cdn\Cdn.csproj" />
 		<ProjectReference Include="..\..\Core\Core.Infrastructure\Core.Infrastructure.csproj" />
 		<ProjectReference Include="..\..\Core\Core.Persistence\Core.Persistence.csproj" />
-		<ProjectReference Include="..\ToDoAssistant.Application\ToDoAssistant.Application.csproj" />
 		<ProjectReference Include="..\ToDoAssistant.Persistence\ToDoAssistant.Persistence.csproj" />
 	</ItemGroup>
 

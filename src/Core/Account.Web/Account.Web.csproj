@@ -29,15 +29,12 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\Accountant\Accountant.Persistence.Fs\Accountant.Persistence.Fs.fsproj" />
-		<ProjectReference Include="..\..\CookingAssistant\CookingAssistant.Application\CookingAssistant.Application.csproj" />
 		<ProjectReference Include="..\..\CookingAssistant\CookingAssistant.Persistence\CookingAssistant.Persistence.csproj" />
-		<ProjectReference Include="..\..\ToDoAssistant\ToDoAssistant.Application\ToDoAssistant.Application.csproj" />
 		<ProjectReference Include="..\..\ToDoAssistant\ToDoAssistant.Persistence\ToDoAssistant.Persistence.csproj" />
 		<ProjectReference Include="..\Api.Common\Api.Common.csproj" />
 		<ProjectReference Include="..\Cdn\Cdn.csproj" />
 		<ProjectReference Include="..\Core.Infrastructure\Core.Infrastructure.csproj" />
 		<ProjectReference Include="..\Core.Persistence\Core.Persistence.csproj" />
-		<ProjectReference Include="..\Sender\Sender.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
