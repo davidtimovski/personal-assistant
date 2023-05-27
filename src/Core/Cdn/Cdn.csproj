@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<Import Project="..\..\..\PersonalAssistant.Cs.targets" />
+
+	<ItemGroup>
+		<PackageReference Include="CloudinaryDotNet" Version="1.20.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Core.Application\Core.Application.csproj" />
+	</ItemGroup>
+
+</Project>

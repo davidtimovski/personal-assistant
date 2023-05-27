@@ -7,14 +7,13 @@ on:
       - master
     paths:
       - "*.targets"
-      - "src/Application/Domain/**"
-      - "src/Application/Core.Application/**"
-      - "src/Application/Weatherman.Application/**"
-      - "src/Infrastructure/Core.Infrastructure/**"
-      - "src/Infrastructure/Core.Persistence/**"
-      - "src/Infrastructure/Weatherman.Infrastructure/**"
-      - "src/Infrastructure/Weatherman.Persistence/**"
-      - "src/Web/Weatherman.Api/**"
+      - "src/Core/Core.Application/**"
+      - "src/Core/Core.Infrastructure/**"
+      - "src/Core/Core.Persistence/**"
+      - "src/Weatherman/Weatherman.Application/**"
+      - "src/Weatherman/Weatherman.Infrastructure/**"
+      - "src/Weatherman/Weatherman.Persistence/**"
+      - "src/Weatherman/Weatherman.Api/**"
 
 env:
   REGISTRY_URL: ${{ secrets.REGISTRY_URL }}

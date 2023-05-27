@@ -18,9 +18,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\Web\CookingAssistant.Api\CookingAssistant.Api.csproj" />
-		<ProjectReference Include="..\..\src\Web\Core.Api\Core.Api.csproj" />
-		<ProjectReference Include="..\..\src\Web\ToDoAssistant.Api\ToDoAssistant.Api.csproj" />
+		<ProjectReference Include="..\..\src\CookingAssistant\CookingAssistant.Api\CookingAssistant.Api.csproj" />
+		<ProjectReference Include="..\..\src\Core\Core.Api\Core.Api.csproj" />
+		<ProjectReference Include="..\..\src\ToDoAssistant\ToDoAssistant.Api\ToDoAssistant.Api.csproj" />
 	</ItemGroup>
 
 </Project>
