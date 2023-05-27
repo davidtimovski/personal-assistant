@@ -1,0 +1,60 @@
+@import '../../../Core/shared2/styles/core2.css';
+
+:root {
+	--primary-color: var(--trainer-color);
+	--primary-color-dark: #dd7200;
+	--primary-color-light: #eeeeff;
+	--faded-color: #98b0c5;
+}
+
+.content-body {
+	margin-bottom: 30px;
+}
+
+.double-bounce1,
+.double-bounce2 {
+	background-color: #bb8aff;
+}
+
+.button.primary-button,
+.save-delete-wrap .primary-button.loading:disabled {
+	background-size: 400% 400%;
+}
+
+.form-control.inline {
+	display: flex;
+	justify-content: space-between;
+}
+.form-control.inline input,
+.form-control.inline select {
+	width: 270px;
+}
+
+.form-control.inline label {
+	padding-right: 25px;
+	white-space: nowrap;
+}
+
+table {
+	width: 100%;
+}
+
+@media (prefers-color-scheme: light) {
+	.button.primary-button,
+	.save-delete-wrap .primary-button.loading:disabled {
+		background: linear-gradient(225deg, #00a6ed, #7a46f3);
+	}
+	.button.primary-button:disabled {
+		color: var(--primary-color);
+	}
+}
+
+@media (prefers-color-scheme: dark) {
+	.button.primary-button,
+	.save-delete-wrap .primary-button.loading:disabled {
+		background: linear-gradient(225deg, #00a6ed, #7a46f3);
+	}
+	.button.primary-button:disabled {
+		color: var(--primary-color);
+	}
+}

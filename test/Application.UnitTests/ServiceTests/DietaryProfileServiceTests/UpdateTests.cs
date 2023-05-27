@@ -4,10 +4,10 @@ using CookingAssistant.Application.Contracts.DietaryProfiles;
 using CookingAssistant.Application.Contracts.DietaryProfiles.Models;
 using CookingAssistant.Application.Mappings;
 using CookingAssistant.Application.Services;
+using CookingAssistant.Utility;
 using FluentValidation;
 using Microsoft.Extensions.Options;
 using Moq;
-using Utility;
 using Xunit;
 
 namespace Application.UnitTests.ServiceTests.DietaryProfileServiceTests;
