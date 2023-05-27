@@ -10,7 +10,7 @@ on:
       - "src/Core/Core.Application/**"
       - "src/Core/Core.Infrastructure/**"
       - "src/Core/Core.Persistence/**"
-      - "src/Core/Account/**"
+      - "src/Core/Account.Web/**"
       - "src/ToDoAssistant/ToDoAssistant.Application/**"
       - "src/ToDoAssistant/ToDoAssistant.Persistence/**"
       - "src/CookingAssistant/CookingAssistant.Application/**"
@@ -32,7 +32,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Build account-latest image
-        run: docker build -f ./src/Core/Account/Dockerfile . --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:account-latest
+        run: docker build -f ./src/Core/Account.Web/Dockerfile . --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:account-latest
 
       - name: Login to Registry
         uses: docker/login-action@v2
