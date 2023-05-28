@@ -75,7 +75,7 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
         {
             notification.Id = id.Value;
 
-            Notification dbNotification = await EFContext.Notifications.FindAsync(id);
+            Notification dbNotification = EFContext.Notifications.First(x => x.Id == id);
             dbNotification.ModifiedDate = notification.ModifiedDate;
         }
         else

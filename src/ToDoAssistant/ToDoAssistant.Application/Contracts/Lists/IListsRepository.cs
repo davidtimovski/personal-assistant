@@ -12,7 +12,7 @@ public interface IListsRepository
     IEnumerable<User> GetMembersAsAssigneeOptions(int id, ISpan metricsSpan);
     ToDoList Get(int id);
     ToDoList GetWithShares(int id, int userId, ISpan metricsSpan);
-    ToDoList GetWithOwner(int id, int userId, ISpan metricsSpan);
+    ToDoList? GetWithOwner(int id, int userId, ISpan metricsSpan);
     IEnumerable<ListShare> GetShares(int id, ISpan metricsSpan);
     IEnumerable<ListShare> GetShareRequests(int userId, ISpan metricsSpan);
     int GetPendingShareRequestsCount(int userId);

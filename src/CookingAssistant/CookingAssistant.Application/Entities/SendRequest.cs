@@ -9,6 +9,6 @@ public class SendRequest : Entity
     public int UserId { get; set; }
     public bool IsDeclined { get; set; }
 
-    public Recipe Recipe { get; set; }
-    public User User { get; set; }
+    public Recipe? Recipe { get; set; }
+    public User? User { get; set; }
 }

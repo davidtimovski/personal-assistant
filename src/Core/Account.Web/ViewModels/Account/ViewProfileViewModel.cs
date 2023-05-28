@@ -4,8 +4,15 @@ namespace Account.Web.ViewModels.Account;
 
 public class ViewProfileViewModel
 {
-    public ViewProfileViewModel()
+    public ViewProfileViewModel(string name, string language, string culture, string imageUri, string defaultImageUri, string baseUrl)
     {
+        Name = name;
+        Language = language;
+        Culture = culture;
+        ImageUri = imageUri;
+        DefaultImageUri = defaultImageUri;
+        BaseUrl = baseUrl;
+
         CultureOptions = CultureInfo.GetCultures(CultureTypes.AllCultures)
             .Where(x => !string.IsNullOrEmpty(x.Name))
             .OrderBy(x => x.EnglishName)

@@ -11,7 +11,7 @@ public class DietaryProfilesRepository : BaseRepository, IDietaryProfilesReposit
     public DietaryProfilesRepository(CookingAssistantContext efContext)
         : base(efContext) { }
 
-    public DietaryProfile Get(int userId)
+    public DietaryProfile? Get(int userId)
     {
         using IDbConnection conn = OpenConnection();
 
@@ -39,9 +39,9 @@ public class DietaryProfilesRepository : BaseRepository, IDietaryProfilesReposit
     {
         var now = DateTime.UtcNow;
 
-        DietaryProfile dbDietaryProfile = EFContext.DietaryProfiles.Find(dietaryProfile.UserId);
+        var dbDietaryProfile = EFContext.DietaryProfiles.Find(dietaryProfile.UserId);
 
-        if (dbDietaryProfile == null)
+        if (dbDietaryProfile is null)
         {
             dietaryProfile.CreatedDate = now;
             dietaryProfile.ModifiedDate = now;

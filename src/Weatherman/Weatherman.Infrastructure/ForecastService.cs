@@ -68,7 +68,7 @@ public class ForecastService : IForecastService
             parameters.Longitude = (float)Math.Round(parameters.Longitude, 2);
 
             var forecast = _forecastsRepository.Get(parameters, metric);
-            if (forecast == null)
+            if (forecast is null)
             {
                 string data = await GetFromProviderAsync(parameters, metric);
                 var openMeteoResult = JsonSerializer.Deserialize<OpenMeteoResult>(data);

@@ -6,9 +6,9 @@ public interface IRecipesRepository
 {
     IEnumerable<Recipe> GetAll(int userId);
     Recipe Get(int id);
-    Recipe Get(int id, int userId);
-    Recipe GetForUpdate(int id, int userId);
-    Recipe GetWithOwner(int id, int userId);
+    Recipe? Get(int id, int userId);
+    Recipe? GetForUpdate(int id, int userId);
+    Recipe? GetWithOwner(int id, int userId);
     IEnumerable<RecipeShare> GetShares(int id);
     IEnumerable<RecipeShare> GetShareRequests(int userId);
     int GetPendingShareRequestsCount(int userId);
@@ -18,7 +18,7 @@ public interface IRecipesRepository
     int GetPendingSendRequestsCount(int userId);
     bool SendRequestExists(int id, int userId);
     bool IngredientsReviewIsRequired(int id, int userId);
-    Recipe GetForReview(int id);
+    Recipe? GetForReview(int id);
     IEnumerable<string> GetAllImageUris(int userId);
     string GetImageUri(int id);
     bool UserOwns(int id, int userId);

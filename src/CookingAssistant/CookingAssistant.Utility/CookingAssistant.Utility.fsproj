@@ -2,6 +2,10 @@
 
 	<Import Project="..\..\..\PersonalAssistant.Fs.targets" />
 
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<Compile Include="Conversion.fs" />
 	</ItemGroup>

@@ -1,4 +1,5 @@
-﻿using Core.Application.Contracts;
+﻿using System.Security.Claims;
+using Core.Application.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Core.Api.Controllers;
@@ -21,7 +22,11 @@ public abstract class BaseController : Controller
         {
             if (!userId.HasValue)
             {
-                string auth0Id = User.Identity.Name;
+                var auth0Id = User?.Identity?.Name;
+                if (auth0Id is null)
+                {
+                    throw new Exception("Could not find name claim");
+                }
 
                 if (_userIdLookup.Contains(auth0Id))
                 {

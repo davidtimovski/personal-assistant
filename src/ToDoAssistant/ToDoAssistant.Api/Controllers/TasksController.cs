@@ -60,7 +60,7 @@ public class TasksController : BaseController
     public IActionResult Get(int id)
     {
         TaskDto taskDto = _taskService.Get(id, UserId);
-        if (taskDto == null)
+        if (taskDto is null)
         {
             return NotFound();
         }
@@ -72,7 +72,7 @@ public class TasksController : BaseController
     public IActionResult GetForUpdate(int id)
     {
         TaskForUpdate taskDto = _taskService.GetForUpdate(id, UserId);
-        if (taskDto == null)
+        if (taskDto is null)
         {
             return NotFound();
         }
@@ -83,7 +83,7 @@ public class TasksController : BaseController
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateTask dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -139,7 +139,7 @@ public class TasksController : BaseController
     [HttpPost("bulk")]
     public async Task<IActionResult> BulkCreate([FromBody] BulkCreate dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -203,7 +203,7 @@ public class TasksController : BaseController
     [HttpPut]
     public async Task<IActionResult> Update([FromBody] UpdateTask dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -367,7 +367,7 @@ public class TasksController : BaseController
     [HttpPut("complete")]
     public async Task<IActionResult> Complete([FromBody] CompleteUncomplete dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -423,7 +423,7 @@ public class TasksController : BaseController
     [HttpPut("uncomplete")]
     public async Task<IActionResult> Uncomplete([FromBody] CompleteUncomplete dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -479,7 +479,7 @@ public class TasksController : BaseController
     //[HttpPut("reorder")]
     //public async Task<IActionResult> Reorder([FromBody] ReorderTask dto)
     //{
-    //    if (dto == null)
+    //    if (dto is null)
     //    {
     //        return BadRequest();
     //    }

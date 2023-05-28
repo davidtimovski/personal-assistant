@@ -87,7 +87,7 @@ public class RecipesController : BaseController
     public IActionResult Get(int id, string currency)
     {
         RecipeDto recipeDto = _recipeService.Get(id, UserId, currency);
-        if (recipeDto == null)
+        if (recipeDto is null)
         {
             return NotFound();
         }
@@ -104,7 +104,7 @@ public class RecipesController : BaseController
     public IActionResult GetForUpdate(int id)
     {
         RecipeForUpdate recipeDto = _recipeService.GetForUpdate(id, UserId);
-        if (recipeDto == null)
+        if (recipeDto is null)
         {
             return NotFound();
         }
@@ -121,7 +121,7 @@ public class RecipesController : BaseController
     public IActionResult GetWithShares(int id)
     {
         RecipeWithShares recipeDto = _recipeService.GetWithShares(id, UserId);
-        if (recipeDto == null)
+        if (recipeDto is null)
         {
             return NotFound();
         }
@@ -149,7 +149,7 @@ public class RecipesController : BaseController
     public IActionResult GetForSending(int id)
     {
         RecipeForSending recipeDto = _recipeService.GetForSending(id, UserId);
-        if (recipeDto == null)
+        if (recipeDto is null)
         {
             return NotFound();
         }
@@ -177,7 +177,7 @@ public class RecipesController : BaseController
     public IActionResult GetForReview(int id)
     {
         RecipeForReview recipeDto = _recipeService.GetForReview(id, UserId);
-        if (recipeDto == null)
+        if (recipeDto is null)
         {
             return NotFound();
         }
@@ -188,7 +188,7 @@ public class RecipesController : BaseController
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateRecipe dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -223,11 +223,10 @@ public class RecipesController : BaseController
                 UserId,
                 Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp"),
                 $"users/{UserId}/recipes",
-                "recipe")
-            {
-                Length = image.Length,
-                FileName = image.FileName
-            };
+                "recipe",
+                image.Length,
+                image.FileName);
+
             await image.CopyToAsync(uploadModel.File);
 
             string tempImageUri = await _cdnService.UploadTempAsync(uploadModel, _uploadTempImageValidator, tr);
@@ -248,7 +247,7 @@ public class RecipesController : BaseController
     [HttpPut]
     public async Task<IActionResult> Update([FromBody] UpdateRecipe dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -357,7 +356,7 @@ public class RecipesController : BaseController
     [HttpPut("share")]
     public async Task<IActionResult> Share([FromBody] ShareRecipe dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -404,7 +403,7 @@ public class RecipesController : BaseController
     [HttpPut("share-is-accepted")]
     public async Task<IActionResult> SetShareIsAccepted([FromBody] SetShareIsAcceptedDto dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -495,7 +494,7 @@ public class RecipesController : BaseController
     [HttpPost("send")]
     public async Task<IActionResult> Send([FromBody] CreateSendRequest dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -534,7 +533,7 @@ public class RecipesController : BaseController
     [HttpPut("decline-send-request")]
     public async Task<IActionResult> DeclineSendRequest([FromBody] DeclineSendRequestDto dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -580,7 +579,7 @@ public class RecipesController : BaseController
     [HttpPost("try-import")]
     public async Task<IActionResult> TryImport([FromBody] ImportRecipeDto dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }

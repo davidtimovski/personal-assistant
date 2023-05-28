@@ -38,7 +38,7 @@ public class DietaryProfilesController : BaseController
     [HttpPost]
     public IActionResult GetDailyIntake([FromBody] GetRecommendedDailyIntake dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -51,7 +51,7 @@ public class DietaryProfilesController : BaseController
     [HttpPut]
     public async Task<IActionResult> CreateOrUpdate([FromBody] UpdateDietaryProfile dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }

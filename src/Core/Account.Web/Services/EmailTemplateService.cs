@@ -57,7 +57,16 @@ public class EmailTemplateService : IEmailTemplateService
     private static async Task<string> GetTemplateContentsAsync(string templateName, string language)
     {
         var assembly = Assembly.GetEntryAssembly();
+        if (assembly is null)
+        {
+            throw new Exception("Could not get entry assembly");
+        }
+
         var resourceStream = assembly.GetManifestResourceStream($"Account.Resources.EmailTemplates.{language.Replace('-', '_')}.{templateName}");
+        if (resourceStream is null)
+        {
+            throw new Exception("Could not get manifest resource stream");
+        }
 
         using var reader = new StreamReader(resourceStream, Encoding.UTF8);
         return await reader.ReadToEndAsync();

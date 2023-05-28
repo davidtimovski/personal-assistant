@@ -6,26 +6,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsProduction())
 {
-    var keyVaultUri = new Uri(builder.Configuration["KeyVault:Url"]);
-    string tenantId = builder.Configuration["KeyVault:TenantId"];
-    string clientId = builder.Configuration["KeyVault:ClientId"];
-    string clientSecret = builder.Configuration["KeyVault:ClientSecret"];
+    builder.Host.AddKeyVault();
+    builder.Services.AddDataProtectionWithCertificate(builder.Configuration);
 
-    builder.Host.AddKeyVault(keyVaultUri, tenantId, clientId, clientSecret);
-    builder.Services.AddDataProtectionWithCertificate(keyVaultUri, tenantId, clientId, clientSecret);
-
-    builder.Host.AddSentryLogging(builder.Configuration["Core:Sentry:Dsn"], new HashSet<string> { "GET /health" });
+    builder.Host.AddSentryLogging(builder.Configuration, "Core", new HashSet<string> { "GET /health" });
 }
 
 builder.Services.AddApplication();
 
-builder.Services
-    .AddAuth0(
-        authority: $"https://{builder.Configuration["Auth0:Domain"]}/",
-        audience: builder.Configuration["Auth0:Audience"]
-    );
+builder.Services.AddAuth0(builder.Configuration);
 
-builder.Services.AddPersistence(builder.Configuration["ConnectionString"]);
+builder.Services.AddPersistence(builder.Configuration);
 
 builder.Services.AddControllers();
 builder.Services.Configure<RouteOptions>(opt => opt.LowercaseUrls = true);

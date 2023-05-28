@@ -76,7 +76,7 @@ public class TaskService : ITaskService
         try
         {
             ToDoTask task = _tasksRepository.GetForUpdate(id, userId);
-            if (task == null)
+            if (task is null)
             {
                 return null;
             }
@@ -369,7 +369,7 @@ public class TaskService : ITaskService
         try
         {
             ToDoTask task = _tasksRepository.Get(id);
-            if (task == null)
+            if (task is null)
             {
                 return new DeleteTaskResult(false);
             }

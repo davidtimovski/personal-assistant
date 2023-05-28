@@ -211,7 +211,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
 
         var existingTask = GetById(task.Id, conn);
 
-        IEnumerable<int> decrementOrderTaskIds = null;
+        IEnumerable<int>? decrementOrderTaskIds = null;
         var orderChanged = false;
         if (existingTask.ListId == task.ListId)
         {
@@ -441,7 +441,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
             }
         }
 
-        ToDoTask dbTask = EFContext.Tasks.Find(id);
+        ToDoTask dbTask = EFContext.Tasks.First(x => x.Id == id);
         dbTask.Order = newOrder;
         dbTask.ModifiedDate = modifiedDate;
 

@@ -101,6 +101,23 @@
         "trainer-api": "StartDebugging",
         "weatherman-api": "DoNotStart"
       }
+    },
+    "Sender": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "account": "DoNotStart",
+        "accountant-api": "DoNotStart",
+        "cooking-api": "DoNotStart",
+        "core-api": "DoNotStart",
+        "gateway": "StartDebugging",
+        "postgres": "StartWithoutDebugging",
+        "rabbitmq": "StartWithoutDebugging",
+        "sender": "StartDebugging",
+        "todo-api": "DoNotStart",
+        "trainer-api": "DoNotStart",
+        "weatherman-api": "DoNotStart"
+      }
     }
   }
 }

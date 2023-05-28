@@ -1,11 +1,19 @@
-﻿public class PushNotificationsSubscription
+﻿using System.Text.Json.Serialization;
+
+public class PushNotificationsSubscription
 {
-    public string Application { get; set; }
-    public Subscription Subscription { get; set; }
+    [JsonRequired]
+    public string Application { get; set; } = null!;
+
+    [JsonRequired]
+    public Subscription Subscription { get; set; } = null!;
 }
 
 public class Subscription
 {
-    public string Endpoint { get; set; }
-    public Dictionary<string, string> Keys { get; set; }
+    [JsonRequired]
+    public string Endpoint { get; set; } = null!;
+
+    [JsonRequired]
+    public Dictionary<string, string> Keys { get; set; } = null!;
 }

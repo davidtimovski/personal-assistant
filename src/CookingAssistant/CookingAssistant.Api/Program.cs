@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using Cdn;
+using Cdn.Configuration;
 using CookingAssistant.Application;
 using CookingAssistant.Application.Contracts.DietaryProfiles.Models;
 using CookingAssistant.Persistence;
@@ -12,36 +13,28 @@ var builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsProduction())
 {
-    var keyVaultUri = new Uri(builder.Configuration["KeyVault:Url"]);
-    string tenantId = builder.Configuration["KeyVault:TenantId"];
-    string clientId = builder.Configuration["KeyVault:ClientId"];
-    string clientSecret = builder.Configuration["KeyVault:ClientSecret"];
-
-    builder.Host.AddKeyVault(keyVaultUri, tenantId, clientId, clientSecret);
-    builder.Services.AddDataProtectionWithCertificate(keyVaultUri, tenantId, clientId, clientSecret);
+    builder.Host.AddKeyVault();
+    builder.Services.AddDataProtectionWithCertificate(builder.Configuration);
 }
 
 builder.Services
     .AddApplication()
     .AddCookingAssistant(builder.Configuration);
 
+var config = builder.Configuration.GetSection("Cloudinary").Get<CloudinaryConfig>();
+if (config is null)
+{
+    throw new ArgumentNullException("Cloudinary configuration is missing");
+}
+
 builder.Services
-    .AddAuth0(
-        authority: $"https://{builder.Configuration["Auth0:Domain"]}/",
-        audience: builder.Configuration["Auth0:Audience"]
-    )
-    .AddCdn(builder.Configuration["Cloudinary:CloudName"],
-            builder.Configuration["Cloudinary:ApiKey"],
-            builder.Configuration["Cloudinary:ApiSecret"],
-            builder.Environment.EnvironmentName,
-            builder.Configuration["Cloudinary:DefaultImageUris:Profile"],
-            builder.Configuration["Cloudinary:DefaultImageUris:Recipe"])
+    .AddAuth0(builder.Configuration)
+    .AddCdn(config, builder.Environment.EnvironmentName)
     .AddSender();
 
-var connectionString = builder.Configuration["ConnectionString"];
 builder.Services
-    .AddPersistence(connectionString)
-    .AddCookingAssistantPersistence(connectionString);
+    .AddPersistence(builder.Configuration)
+    .AddCookingAssistantPersistence(builder.Configuration);
 
 builder.Services
     .AddLocalization(opt => opt.ResourcesPath = "Resources");

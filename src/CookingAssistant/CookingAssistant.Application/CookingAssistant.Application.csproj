@@ -2,6 +2,10 @@
 
 	<Import Project="..\..\..\PersonalAssistant.Cs.targets" />
 
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="..\CookingAssistant.Utility\CookingAssistant.Utility.fsproj" />
 		<ProjectReference Include="..\..\Core\Core.Application\Core.Application.csproj" />

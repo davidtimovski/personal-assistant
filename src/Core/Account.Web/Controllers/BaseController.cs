@@ -22,7 +22,13 @@ public abstract class BaseController : Controller
         {
             if (!userId.HasValue)
             {
-                string auth0Id = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var nameClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (nameClaim is null)
+                {
+                    throw new Exception($"Could not find {ClaimTypes.NameIdentifier} claim");
+                }
+
+                string auth0Id = nameClaim.Value;
 
                 if (_userIdLookup.Contains(auth0Id))
                 {
@@ -49,12 +55,18 @@ public abstract class BaseController : Controller
     {
         get
         {
-            if (User?.Identity.IsAuthenticated == false)
+            if (User?.Identity?.IsAuthenticated == false)
             {
                 throw new Exception($"The {nameof(AuthId)} property is only available for authenticated users");
             }
 
-            return User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var nameClaim = User?.FindFirst(ClaimTypes.NameIdentifier);
+            if (nameClaim is null)
+            {
+                throw new Exception($"Could not find {ClaimTypes.NameIdentifier} claim");
+            }
+
+            return nameClaim.Value;
         }
     }
 }

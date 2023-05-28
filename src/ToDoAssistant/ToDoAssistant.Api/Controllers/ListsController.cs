@@ -177,7 +177,7 @@ public class ListsController : BaseController
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateList dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -200,7 +200,7 @@ public class ListsController : BaseController
     [HttpPut]
     public async Task<IActionResult> Update([FromBody] UpdateList dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -269,7 +269,7 @@ public class ListsController : BaseController
     [HttpPut("shared")]
     public async Task<IActionResult> UpdateShared([FromBody] UpdateSharedList dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -364,7 +364,7 @@ public class ListsController : BaseController
     [HttpPut("share")]
     public async Task<IActionResult> Share([FromBody] ShareList dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -468,7 +468,7 @@ public class ListsController : BaseController
     [HttpPost("copy")]
     public async Task<IActionResult> Copy([FromBody] CopyList dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -491,7 +491,7 @@ public class ListsController : BaseController
     [HttpPut("is-archived")]
     public async Task<IActionResult> SetIsArchived([FromBody] SetIsArchivedDto dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -512,7 +512,7 @@ public class ListsController : BaseController
     [HttpPut("uncomplete-all")]
     public async Task<IActionResult> UncompleteAll([FromBody] SetTasksAsNotCompletedDto dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -561,7 +561,7 @@ public class ListsController : BaseController
     [HttpPut("share-is-accepted")]
     public async Task<IActionResult> SetShareIsAccepted([FromBody] SetShareIsAcceptedDto dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -615,7 +615,7 @@ public class ListsController : BaseController
     //[HttpPut("reorder")]
     //public async Task<IActionResult> Reorder([FromBody] ReorderListDto dto)
     //{
-    //    if (dto == null)
+    //    if (dto is null)
     //    {
     //        return BadRequest();
     //    }

@@ -1,4 +1,5 @@
-﻿using CloudinaryDotNet;
+﻿using Cdn.Configuration;
+using CloudinaryDotNet;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
 using FluentValidation;
@@ -13,18 +14,14 @@ public static class IoC
     /// </summary>
     public static IServiceCollection AddCdn(
         this IServiceCollection services,
-        string cloudName,
-        string apiKey,
-        string apiSecret,
-        string environmentName,
-        string defaultProfileUri,
-        string defaultRecipeUri)
+        CloudinaryConfig config,
+        string environmentName)
     {
         services.AddSingleton<ICdnService>(new CloudinaryService(
-            cloudinaryAccount: new Account(cloudName, apiKey, apiSecret),
+            cloudinaryAccount: new Account(config.CloudName, config.ApiKey, config.ApiSecret),
             environmentName,
-            defaultProfileUri,
-            defaultRecipeUri,
+            config.DefaultImageUris.Profile,
+            config.DefaultImageUris.Recipe,
             new HttpClient()));
 
         services.AddTransient<IValidator<UploadTempImage>, UploadTempImageValidator>();

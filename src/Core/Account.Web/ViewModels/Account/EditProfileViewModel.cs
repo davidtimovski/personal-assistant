@@ -6,10 +6,10 @@ namespace Account.Web.ViewModels.Account;
 
 public class EditProfileViewModel
 {
-    public string Name { get; set; }
-    public string Language { get; set; }
-    public string Culture { get; set; }
-    public string ImageUri { get; set; }
+    public string Name { get; set; } = null!;
+    public string Language { get; set; } = null!;
+    public string Culture { get; set; } = null!;
+    public string ImageUri { get; set; } = null!;
 }
 
 public class EditProfileViewModelValidator : AbstractValidator<EditProfileViewModel>

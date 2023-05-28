@@ -156,14 +156,14 @@ public class ListService : IListService
         }
     }
 
-    public ListWithShares GetWithShares(int id, int userId, ISpan metricsSpan)
+    public ListWithShares? GetWithShares(int id, int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(GetWithShares)}");
 
         try
         {
-            ToDoList list = _listsRepository.GetWithOwner(id, userId, metric);
-            if (list == null)
+            ToDoList? list = _listsRepository.GetWithOwner(id, userId, metric);
+            if (list is null)
             {
                 return null;
             }

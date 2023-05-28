@@ -13,6 +13,6 @@ public class ListShare : Entity
     public bool NotificationsEnabled { get; set; }
     public bool IsArchived { get; set; }
 
-    public ToDoList List { get; set; }
-    public User User { get; set; }
+    public ToDoList? List { get; set; }
+    public User? User { get; set; }
 }

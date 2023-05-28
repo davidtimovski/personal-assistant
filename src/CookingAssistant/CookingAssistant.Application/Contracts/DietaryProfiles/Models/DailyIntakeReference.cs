@@ -2,15 +2,15 @@
 
 public class DailyIntakeReference
 {
-    public List<DailyIntakeAgeGroup> Female { get; set; }
-    public List<DailyIntakeAgeGroup> Male { get; set; }
+    public List<DailyIntakeAgeGroup> Female { get; set; } = null!;
+    public List<DailyIntakeAgeGroup> Male { get; set; } = null!;
 }
 
 public class DailyIntakeAgeGroup
 {
     public short AgeFrom { get; set; }
     public short AgeTo { get; set; }
-    public RecommendedIntake RecommendedIntake { get; set; }
+    public RecommendedIntake RecommendedIntake { get; set; } = null!;
 }
 
 public class RecommendedIntake

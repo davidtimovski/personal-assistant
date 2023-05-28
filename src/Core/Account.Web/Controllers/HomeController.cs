@@ -25,7 +25,7 @@ public class HomeController : BaseController
     [HttpGet]
     public IActionResult Index(IndexAlert alert = IndexAlert.None)
     {
-        if (User?.Identity.IsAuthenticated == true)
+        if (User?.Identity?.IsAuthenticated == true)
         {
             return RedirectToAction(nameof(Overview));
         }
@@ -40,17 +40,17 @@ public class HomeController : BaseController
         var user = _userService.Get(UserId);
 
         var model = new OverviewViewModel
-        {
-            UserName = user.Name,
-            ClientApplications = new List<ClientApplicationViewModel>
+        (
+            user.Name,
+            new List<ClientApplicationViewModel>
             {
                 new ClientApplicationViewModel("To Do Assistant", _configuration["Urls:ToDoAssistant"], "to-do-assistant"),
                 new ClientApplicationViewModel("Accountant", _configuration["Urls:Accountant"], "accountant"),
                 new ClientApplicationViewModel("Weatherman", _configuration["Urls:Weatherman"], "weatherman"),
                 new ClientApplicationViewModel("Cooking Assistant", "cooking-assistant"),
             },
-            Alert = alert
-        };
+            alert
+        );
 
         return View(model);
     }

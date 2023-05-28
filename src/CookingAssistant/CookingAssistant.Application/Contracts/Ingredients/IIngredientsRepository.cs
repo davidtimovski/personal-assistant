@@ -6,8 +6,8 @@ public interface IIngredientsRepository
 {
     IEnumerable<Ingredient> GetUserAndUsedPublicIngredients(int userId);
     Ingredient Get(int id);
-    Ingredient GetForUpdate(int id, int userId);
-    Ingredient GetPublic(int id, int userId);
+    Ingredient? GetForUpdate(int id, int userId);
+    Ingredient? GetPublic(int id, int userId);
     IEnumerable<Ingredient> GetForSuggestions(int userId);
     IEnumerable<IngredientCategory> GetIngredientCategories();
     IEnumerable<ToDoTask> GetTaskSuggestions(int userId);

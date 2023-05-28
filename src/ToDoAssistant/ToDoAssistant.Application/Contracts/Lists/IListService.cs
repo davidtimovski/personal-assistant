@@ -12,7 +12,7 @@ public interface IListService
     IEnumerable<Assignee> GetMembersAsAssigneeOptions(int id, int userId, ISpan metricsSpan);
     SimpleList Get(int id);
     EditListDto GetForEdit(int id, int userId, ISpan metricsSpan);
-    ListWithShares GetWithShares(int id, int userId, ISpan metricsSpan);
+    ListWithShares? GetWithShares(int id, int userId, ISpan metricsSpan);
     IEnumerable<ShareListRequest> GetShareRequests(int userId, ISpan metricsSpan);
     int GetPendingShareRequestsCount(int userId);
     bool CanShareWithUser(int shareWithId, int userId);

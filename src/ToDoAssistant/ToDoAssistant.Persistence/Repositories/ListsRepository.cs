@@ -143,7 +143,7 @@ public class ListsRepository : BaseRepository, IListsRepository
         return result;
     }
 
-    public ToDoList GetWithOwner(int id, int userId, ISpan metricsSpan)
+    public ToDoList? GetWithOwner(int id, int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(GetWithOwner)}");
 
@@ -449,7 +449,8 @@ public class ListsRepository : BaseRepository, IListsRepository
 
         var originalList = conn.QueryFirst<ToDoList>("SELECT * FROM todo.lists WHERE id = @Id", new { list.Id });
 
-        ToDoList dbList = EFContext.Lists.Find(list.Id);
+        ToDoList dbList = EFContext.Lists.First(x => x.Id == list.Id);
+
         dbList.Name = list.Name;
         dbList.Icon = list.Icon;
         dbList.IsOneTimeToggleDefault = list.IsOneTimeToggleDefault;
@@ -510,13 +511,13 @@ public class ListsRepository : BaseRepository, IListsRepository
             var lists = EFContext.Lists.Where(x => x.UserId == affectedUser.Item1 && !x.IsArchived && x.Order > affectedUser.Item2);
             foreach (ToDoList dbList in lists)
             {
-                dbList.Order -= 1;
+                dbList.Order--;
             }
 
             var shares = EFContext.ListShares.Where(x => x.UserId == affectedUser.Item1 && x.IsAccepted == true && !x.IsArchived && x.Order > affectedUser.Item2);
             foreach (ListShare share in shares)
             {
-                share.Order -= 1;
+                share.Order--;
             }
         }
 
@@ -565,13 +566,13 @@ public class ListsRepository : BaseRepository, IListsRepository
         var lists = NonArchivedLists(userId).Where(x => x.Order > share.Order);
         foreach (ToDoList dbList in lists)
         {
-            dbList.Order -= 1;
+            dbList.Order--;
         }
 
         var shares = AcceptedShares(userId).Where(x => !x.IsArchived && x.Order > share.Order);
         foreach (ListShare dbShare in shares)
         {
-            dbShare.Order -= 1;
+            dbShare.Order--;
         }
 
         var sharesCount = conn.ExecuteScalar<short>("SELECT COUNT(*) FROM todo.shares WHERE list_id = @ListId AND is_accepted IS NOT FALSE", new { ListId = id });
@@ -658,7 +659,7 @@ public class ListsRepository : BaseRepository, IListsRepository
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(SetIsArchivedAsync)}");
 
-        ToDoList list = EFContext.Lists.FirstOrDefault(x => x.Id == id && x.UserId == userId);
+        ToDoList? list = EFContext.Lists.FirstOrDefault(x => x.Id == id && x.UserId == userId);
 
         if (list != null)
         {
@@ -667,13 +668,13 @@ public class ListsRepository : BaseRepository, IListsRepository
                 var lists = NonArchivedLists(userId).Where(x => x.Order >= list.Order);
                 foreach (ToDoList dbList in lists)
                 {
-                    dbList.Order -= 1;
+                    dbList.Order--;
                 }
 
                 var shares = NonArchivedShares(userId).Where(x => x.Order >= list.Order);
                 foreach (ListShare dbShare in shares)
                 {
-                    dbShare.Order -= 1;
+                    dbShare.Order--;
                 }
 
                 list.IsArchived = true;
@@ -707,13 +708,13 @@ public class ListsRepository : BaseRepository, IListsRepository
                 var lists = NonArchivedLists(userId).Where(x => x.Order >= share.Order);
                 foreach (ToDoList dbList in lists)
                 {
-                    dbList.Order -= 1;
+                    dbList.Order--;
                 }
 
                 var shares = NonArchivedShares(userId).Where(x => x.Order >= share.Order);
                 foreach (ListShare dbShare in shares)
                 {
-                    dbShare.Order -= 1;
+                    dbShare.Order--;
                 }
 
                 share.IsArchived = true;
@@ -828,13 +829,13 @@ public class ListsRepository : BaseRepository, IListsRepository
             var lists = NonArchivedLists(userId).Where(x => x.Order >= oldOrder && x.Order <= newOrder);
             foreach (ToDoList dbList in lists)
             {
-                dbList.Order -= 1;
+                dbList.Order--;
             }
 
             var shares = AcceptedShares(userId).Where(x => !x.IsArchived && x.Order >= oldOrder && x.Order <= newOrder);
             foreach (ListShare dbShare in shares)
             {
-                dbShare.Order -= 1;
+                dbShare.Order--;
             }
         }
         else
@@ -842,13 +843,13 @@ public class ListsRepository : BaseRepository, IListsRepository
             var lists = NonArchivedLists(userId).Where(x => x.Order <= oldOrder && x.Order >= newOrder);
             foreach (ToDoList dbList in lists)
             {
-                dbList.Order += 1;
+                dbList.Order++;
             }
 
             var shares = AcceptedShares(userId).Where(x => !x.IsArchived && x.Order <= oldOrder && x.Order >= newOrder);
             foreach (ListShare dbShare in shares)
             {
-                dbShare.Order += 1;
+                dbShare.Order++;
             }
         }
 
@@ -858,7 +859,7 @@ public class ListsRepository : BaseRepository, IListsRepository
 
         if (userIsOwner)
         {
-            ToDoList list = EFContext.Lists.Find(id);
+            ToDoList list = EFContext.Lists.First(x => x.Id == id);
             list.Order = newOrder;
             list.ModifiedDate = modifiedDate;
         }

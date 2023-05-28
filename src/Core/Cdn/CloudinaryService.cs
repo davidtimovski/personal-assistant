@@ -12,17 +12,19 @@ namespace Cdn;
 public class CloudinaryService : ICdnService
 {
     private const string Format = "webp";
+
     private readonly string _environment;
     private readonly string _defaultProfileImageUri;
     private readonly string _defaultRecipeImageUri;
     private readonly string _baseUrl;
-    private readonly Dictionary<string, Transformation> _templates = new()
+    private readonly IReadOnlyDictionary<string, Transformation> _templates = new Dictionary<string, Transformation>
     {
         { "profile", new Transformation().Width(400).Height(400).Crop("lfill").FetchFormat(Format) },
         { "recipe", new Transformation().Width(640).Height(320).Crop("lfill").FetchFormat(Format) }
     };
-    private CloudinaryDotNet.Cloudinary Cloudinary { get; }
     private readonly HttpClient _httpClient;
+
+    private CloudinaryDotNet.Cloudinary Cloudinary { get; }
 
     public CloudinaryService(
         Account cloudinaryAccount,
@@ -35,8 +37,8 @@ public class CloudinaryService : ICdnService
         _defaultProfileImageUri = defaultProfileImageUri;
         _defaultRecipeImageUri = defaultRecipeImageUri;
         _baseUrl = $"https://res.cloudinary.com/personalassistant/{_environment}/";
-        Cloudinary = new CloudinaryDotNet.Cloudinary(cloudinaryAccount);
         _httpClient = httpClient;
+        Cloudinary = new CloudinaryDotNet.Cloudinary(cloudinaryAccount);
     }
 
     public string GetDefaultProfileImageUri() => _defaultProfileImageUri;

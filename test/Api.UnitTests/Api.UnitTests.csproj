@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+	<Import Project="..\..\PersonalAssistant.Cs.targets" />
+
 	<PropertyGroup>
 		<IsPackable>false</IsPackable>
 		<ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
 	</PropertyGroup>
-
-	<Import Project="..\..\PersonalAssistant.Cs.targets" />
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />

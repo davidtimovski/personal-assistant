@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Runtime.Serialization;
+using System.Text.Json;
 using Account.Web.Models;
 using Account.Web.Services;
 using Account.Web.ViewModels.Account;
@@ -7,6 +8,7 @@ using Api.Common;
 using Auth0.AspNetCore.Authentication;
 using CookingAssistant.Application.Contracts.Recipes;
 using Core.Application.Contracts;
+using Core.Infrastructure.Configuration;
 using Core.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -14,6 +16,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using Microsoft.FSharp.Core;
 using Sentry;
 using ToDoAssistant.Application.Contracts.Lists;
@@ -34,6 +37,7 @@ public class AccountController : BaseController
     private readonly IConfiguration _configuration;
     private readonly IStringLocalizer<AccountController> _localizer;
     private readonly IWebHostEnvironment _webHostEnvironment;
+    private readonly IOptions<Auth0ManagementUtilConfig> _auth0Options;
     private readonly ILogger<AccountController> _logger;
 
     public AccountController(
@@ -48,6 +52,7 @@ public class AccountController : BaseController
         IConfiguration configuration,
         IStringLocalizer<AccountController> localizer,
         IWebHostEnvironment webHostEnvironment,
+        IOptions<Auth0ManagementUtilConfig> auth0Options,
         ILogger<AccountController> logger) : base(userIdLookup, usersRepository)
     {
         _usersRepository = usersRepository;
@@ -60,6 +65,7 @@ public class AccountController : BaseController
         _configuration = configuration;
         _localizer = localizer;
         _webHostEnvironment = webHostEnvironment;
+        _auth0Options = auth0Options;
         _logger = logger;
     }
 
@@ -89,7 +95,7 @@ public class AccountController : BaseController
 
         var viewModel = new ResetPasswordViewModel();
 
-        if (User?.Identity.IsAuthenticated == true)
+        if (User?.Identity?.IsAuthenticated == true)
         {
             using var httpClient = await InitializeAuth0ClientAsync(tr);
 
@@ -122,7 +128,7 @@ public class AccountController : BaseController
         {
             using var httpClient = await InitializeAuth0ClientAsync(tr);
 
-            await Auth0Proxy.ResetPasswordAsync(httpClient, _configuration["Auth0:ClientId"], model.Email, tr);
+            await Auth0Proxy.ResetPasswordAsync(httpClient, model.Email, tr);
         }
         catch (Exception ex)
         {
@@ -160,7 +166,7 @@ public class AccountController : BaseController
     [AllowAnonymous]
     public IActionResult Register(string returnUrl)
     {
-        if (User?.Identity.IsAuthenticated == true)
+        if (User?.Identity?.IsAuthenticated == true)
         {
             return RedirectToAction(nameof(HomeController.Overview), "Home");
         }
@@ -238,15 +244,22 @@ public class AccountController : BaseController
             $"{nameof(AccountController)}.{nameof(VerifyReCaptcha)}"
         );
 
-        using var content = new FormUrlEncodedContent(new[]
+        using var payload = new FormUrlEncodedContent(new[]
         {
             new KeyValuePair<string, string>("secret", _configuration["Account:ReCaptchaSecret"]),
             new KeyValuePair<string, string>("response", model.Token)
         });
 
         using HttpClient httpClient = _httpClientFactory.CreateClient();
-        using var result = await httpClient.PostAsync(new Uri(_configuration["ReCaptchaVerificationUrl"]), content);
-        var response = JsonSerializer.Deserialize<ReCaptchaResponse>(await result.Content.ReadAsStringAsync());
+        using var result = await httpClient.PostAsync(new Uri(_configuration["ReCaptchaVerificationUrl"]), payload);
+
+        var content = await result.Content.ReadAsStringAsync();
+
+        var response = JsonSerializer.Deserialize<ReCaptchaResponse>(content);
+        if (response is null)
+        {
+            throw new SerializationException($"Could not deserialize {nameof(ReCaptchaResponse)} from content: {content}");
+        }
 
         tr.Finish();
 
@@ -320,15 +333,14 @@ public class AccountController : BaseController
         var authUser = await Auth0Proxy.GetUserAsync(httpClient, AuthId, tr);
         var user = _userService.Get(UserId);
 
-        var viewModel = new ViewProfileViewModel
-        {
-            Name = authUser.name,
-            Language = user.Language,
-            Culture = user.Culture,
-            ImageUri = user.ImageUri,
-            DefaultImageUri = _cdnService.GetDefaultProfileImageUri(),
-            BaseUrl = _configuration["Urls:Account"]
-        };
+        var viewModel = new ViewProfileViewModel(
+            authUser.name,
+            user.Language,
+            user.Culture,
+            user.ImageUri,
+            _cdnService.GetDefaultProfileImageUri(),
+            _configuration["Urls:Account"]
+        );
 
         tr.Finish();
 
@@ -343,14 +355,14 @@ public class AccountController : BaseController
         if (!ModelState.IsValid)
         {
             return View(new ViewProfileViewModel
-            {
-                Name = model.Name,
-                Language = model.Language,
-                Culture = model.Culture,
-                ImageUri = model.ImageUri,
-                DefaultImageUri = _cdnService.GetDefaultProfileImageUri(),
-                BaseUrl = _configuration["Urls:Account"]
-            });
+            (
+                model.Name,
+                model.Language,
+                model.Culture,
+                model.ImageUri,
+                _cdnService.GetDefaultProfileImageUri(),
+                _configuration["Urls:Account"]
+            ));
         }
 
         var tr = Metrics.StartTransactionWithUser(
@@ -365,7 +377,7 @@ public class AccountController : BaseController
 
             await Auth0Proxy.UpdateNameAsync(httpClient, AuthId, model.Name, tr);
 
-            var imageUri = string.IsNullOrEmpty(model.ImageUri) ? null : model.ImageUri;
+            var imageUri = string.IsNullOrEmpty(model.ImageUri) ? _cdnService.GetDefaultProfileImageUri() : model.ImageUri;
             await _userService.UpdateProfileAsync(UserId, model.Name, model.Language, model.Culture, imageUri, tr);
         }
         catch (Exception ex)
@@ -377,14 +389,14 @@ public class AccountController : BaseController
             tr.Finish();
 
             return View(new ViewProfileViewModel
-            {
-                Name = model.Name,
-                Language = model.Language,
-                Culture = model.Culture,
-                ImageUri = model.ImageUri,
-                DefaultImageUri = _cdnService.GetDefaultProfileImageUri(),
-                BaseUrl = _configuration["Urls:Account"]
-            });
+            (
+                model.Name,
+                model.Language,
+                model.Culture,
+                model.ImageUri,
+                _cdnService.GetDefaultProfileImageUri(),
+                _configuration["Urls:Account"]
+            ));
         }
 
         var user = _userService.Get(UserId);
@@ -484,8 +496,7 @@ public class AccountController : BaseController
     {
         var httpClient = _httpClientFactory.CreateClient();
 
-        var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0:ClientSecret"]);
-        await Auth0Proxy.InitializeAsync(httpClient, config, tr);
+        await Auth0Proxy.InitializeAsync(httpClient, _auth0Options.Value, tr);
 
         return httpClient;
     }

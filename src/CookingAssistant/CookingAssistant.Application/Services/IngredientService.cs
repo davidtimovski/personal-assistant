@@ -41,11 +41,11 @@ public class IngredientService : IIngredientService
         }
     }
 
-    public EditIngredient GetForUpdate(int id, int userId)
+    public EditIngredient? GetForUpdate(int id, int userId)
     {
         try
         {
-            Ingredient ingredient = _ingredientsRepository.GetForUpdate(id, userId);
+            Ingredient? ingredient = _ingredientsRepository.GetForUpdate(id, userId);
 
             var result = _mapper.Map<EditIngredient>(ingredient);
 
@@ -58,11 +58,11 @@ public class IngredientService : IIngredientService
         }
     }
 
-    public ViewIngredient GetPublic(int id, int userId)
+    public ViewIngredient? GetPublic(int id, int userId)
     {
         try
         {
-            Ingredient ingredient = _ingredientsRepository.GetPublic(id, userId);
+            Ingredient? ingredient = _ingredientsRepository.GetPublic(id, userId);
 
             var result = _mapper.Map<ViewIngredient>(ingredient);
 

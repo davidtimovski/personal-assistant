@@ -19,6 +19,10 @@ public class CurrenciesRepository : BaseRepository, ICurrenciesRepository
 
         using IDbConnection conn = OpenConnection();
         var rates = GetCurrencyRates(conn, date, 0);
+        if (rates is null)
+        {
+            throw new Exception("No currencies were found");
+        }
 
         metric.Finish();
 
@@ -35,7 +39,7 @@ public class CurrenciesRepository : BaseRepository, ICurrenciesRepository
         using IDbConnection conn = OpenConnection();
 
         var rates = GetCurrencyRates(conn, date, 0);
-        if (rates == null)
+        if (rates is null)
         {
             return 0;
         }
@@ -52,7 +56,7 @@ public class CurrenciesRepository : BaseRepository, ICurrenciesRepository
         return eurAmount * toRate;
     }
 
-    private Dictionary<string, decimal> GetCurrencyRates(IDbConnection conn, DateTime date, int daysSearched)
+    private Dictionary<string, decimal>? GetCurrencyRates(IDbConnection conn, DateTime date, int daysSearched)
     {
         if (daysSearched == DaysSearchLimit)
         {

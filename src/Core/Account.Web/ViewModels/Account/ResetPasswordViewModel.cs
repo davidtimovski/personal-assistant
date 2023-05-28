@@ -5,7 +5,7 @@ namespace Account.Web.ViewModels.Account;
 
 public class ResetPasswordViewModel
 {
-    public string Email { get; set; }
+    public string Email { get; set; } = null!;
     public float GoogleReCaptchaScore { get; set; }
 }
 
