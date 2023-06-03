@@ -1,5 +1,6 @@
 using System.Runtime.Serialization;
 using System.Text.Json.Nodes;
+using Azure.Storage.Blobs;
 using Core.Application.Contracts;
 using Core.Application.Entities;
 using Dapper;
@@ -50,6 +51,7 @@ public class MidnightJob
         {
             await GetAndSaveCurrencyRates(conn, now);
             await DeleteTemporaryCdnResourcesAsync(now);
+            await UploadDatabaseBackupAsync();
         }
 
         _logger.LogInformation("Midnight job run completed.");
@@ -384,6 +386,27 @@ public class MidnightJob
         catch (Exception ex)
         {
             _logger.LogError(ex, $"{nameof(DeleteTemporaryCdnResourcesAsync)} failed");
+        }
+    }
+
+    private async Task UploadDatabaseBackupAsync()
+    {
+        try
+        {
+            var blobServiceClient = new BlobServiceClient(_config.DbBackup.AzureStorageConnectionString);
+            var containerClient = blobServiceClient.GetBlobContainerClient(_config.DbBackup.AzureStorageContainerName);
+
+            var backupFileDate = DateTime.UtcNow.AddDays(-1);
+            var backupFileName = $"{backupFileDate.ToString("yyyy-MM-dd")}.sql";
+
+            BlobClient blobClient = containerClient.GetBlobClient(backupFileName);
+
+            var path = Path.Combine(_config.DbBackup.BackupsPath, backupFileName);
+            await blobClient.UploadAsync(path, true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"{nameof(UploadDatabaseBackupAsync)} failed");
         }
     }
 }
