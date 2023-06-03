@@ -7,7 +7,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using ToDoAssistant.Api.Hubs;
+using ToDoAssistant.Api.Models;
 using ToDoAssistant.Application.Contracts.Notifications;
 using ToDoAssistant.Application.Contracts.Notifications.Models;
 using ToDoAssistant.Application.Contracts.Tasks;
@@ -27,8 +29,8 @@ public class TasksController : BaseController
     private readonly IValidator<BulkCreate> _bulkCreateValidator;
     private readonly IValidator<UpdateTask> _updateValidator;
     private readonly IStringLocalizer<TasksController> _localizer;
+    private readonly AppConfiguration _config;
     private readonly ILogger<TasksController> _logger;
-    private readonly string _url;
 
     public TasksController(
         IUserIdLookup userIdLookup,
@@ -41,8 +43,8 @@ public class TasksController : BaseController
         IValidator<BulkCreate> bulkCreateValidator,
         IValidator<UpdateTask> updateValidator,
         IStringLocalizer<TasksController> localizer,
-        ILogger<TasksController> logger,
-        IConfiguration configuration) : base(userIdLookup, usersRepository)
+        IOptions<AppConfiguration> config,
+        ILogger<TasksController> logger) : base(userIdLookup, usersRepository)
     {
         _listActionsHubContext = listActionsHubContext;
         _taskService = taskService;
@@ -52,8 +54,8 @@ public class TasksController : BaseController
         _bulkCreateValidator = bulkCreateValidator;
         _updateValidator = updateValidator;
         _localizer = localizer;
+        _config = config.Value;
         _logger = logger;
-        _url = configuration["Url"];
     }
 
     [HttpGet("{id}")]
@@ -506,6 +508,6 @@ public class TasksController : BaseController
 
     private string GetNotificationsPageUrl(int notificationId)
     {
-        return $"{_url}/notifications/{notificationId}";
+        return $"{_config.Url}/notifications/{notificationId}";
     }
 }

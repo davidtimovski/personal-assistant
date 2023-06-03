@@ -1,6 +1,7 @@
 ﻿using CookingAssistant.Application.Contracts.DietaryProfiles;
 using CookingAssistant.Application.Contracts.Ingredients;
 using CookingAssistant.Application.Contracts.Recipes;
+using CookingAssistant.Persistence.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

@@ -4,17 +4,16 @@ using Account.Web.Models;
 using Account.Web.Services;
 using Auth0.AspNetCore.Authentication;
 using Cdn;
-using Cdn.Configuration;
 using CookingAssistant.Application;
 using CookingAssistant.Persistence;
 using Core.Application;
 using Core.Infrastructure;
-using Core.Infrastructure.Configuration;
 using Core.Persistence;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using ToDoAssistant.Application;
 using ToDoAssistant.Persistence;
@@ -34,16 +33,10 @@ builder.Services
     .AddToDoAssistant()
     .AddCookingAssistant(builder.Configuration);
 
-var config = builder.Configuration.GetSection("Cloudinary").Get<CloudinaryConfig>();
-if (config is null)
-{
-    throw new ArgumentNullException("Cloudinary configuration is missing");
-}
-
 builder.Services
     .AddUserIdMapper()
-    .AddCdn(config, builder.Environment.EnvironmentName)
-    .AddSender();
+    .AddCdn(builder.Configuration, builder.Environment.EnvironmentName)
+    .AddSender(builder.Configuration);
 
 builder.Services
     .AddPersistence(builder.Configuration)
@@ -60,10 +53,6 @@ if (builder.Environment.EnvironmentName == Environments.Production)
         opt.MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None;
     });
 }
-
-builder.Services.AddOptions<Auth0ManagementUtilConfig>()
-    .Bind(builder.Configuration.GetSection("Auth0"))
-    .ValidateDataAnnotations();
 
 builder.Services
     .AddAuth0WebAppAuthentication(opt =>
@@ -98,6 +87,10 @@ if (builder.Environment.EnvironmentName == Environments.Development)
     builder.Services.ConfigureNonBreakingSameSiteCookies();
 }
 
+builder.Services.AddOptions<AppConfiguration>()
+    .Bind(builder.Configuration)
+    .ValidateDataAnnotations();
+
 var app = builder.Build();
 
 if (builder.Environment.EnvironmentName == Environments.Production)
@@ -125,19 +118,14 @@ app.UseRequestLocalization(new RequestLocalizationOptions
     SupportedUICultures = supportedCultures
 });
 
-var appUrls = builder.Configuration.GetSection("Urls").Get<AppUrls>();
-if (appUrls is null)
-{
-    throw new ArgumentNullException("Urls configuration is missing");
-}
-
+var appSettings = app.Services.GetRequiredService<IOptions<AppConfiguration>>();
 app.UseCors(builder =>
 {
     builder.WithOrigins(
-        appUrls.ToDoAssistant,
-        appUrls.CookingAssistant,
-        appUrls.Accountant,
-        appUrls.Weatherman
+        appSettings.Value.Urls.ToDoAssistant,
+        appSettings.Value.Urls.CookingAssistant,
+        appSettings.Value.Urls.Accountant,
+        appSettings.Value.Urls.Weatherman
     );
     builder.WithMethods("GET");
     builder.WithHeaders("Authorization");

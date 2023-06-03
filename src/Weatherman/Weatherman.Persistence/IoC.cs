@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Weatherman.Application.Contracts.Forecasts;
+using Weatherman.Persistence.Models;
 using Weatherman.Persistence.Repositories;
 
 namespace Weatherman.Persistence;

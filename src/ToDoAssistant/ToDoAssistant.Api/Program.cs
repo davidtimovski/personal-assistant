@@ -1,11 +1,11 @@
 using System.Globalization;
 using Cdn;
-using Cdn.Configuration;
 using Core.Application;
 using Core.Infrastructure;
 using Core.Persistence;
 using Microsoft.AspNetCore.Localization;
 using ToDoAssistant.Api.Hubs;
+using ToDoAssistant.Api.Models;
 using ToDoAssistant.Application;
 using ToDoAssistant.Persistence;
 
@@ -23,16 +23,10 @@ builder.Services
     .AddApplication()
     .AddToDoAssistant();
 
-var config = builder.Configuration.GetSection("Cloudinary").Get<CloudinaryConfig>();
-if (config is null)
-{
-    throw new ArgumentNullException("Cloudinary configuration is missing");
-}
-
 builder.Services
     .AddAuth0(builder.Configuration, signalrHub: "/hub")
-    .AddCdn(config, builder.Environment.EnvironmentName)
-    .AddSender();
+    .AddCdn(builder.Configuration, builder.Environment.EnvironmentName)
+    .AddSender(builder.Configuration);
 
 builder.Services
     .AddPersistence(builder.Configuration)
@@ -47,6 +41,10 @@ builder.Services
 builder.Services.Configure<RouteOptions>(opt => opt.LowercaseUrls = true);
 
 builder.Services.AddHealthChecks();
+
+builder.Services.AddOptions<AppConfiguration>()
+    .Bind(builder.Configuration)
+    .ValidateDataAnnotations();
 
 var app = builder.Build();
 

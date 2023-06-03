@@ -6,6 +6,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using ToDoAssistant.Api.Models;
 using ToDoAssistant.Api.Models.Lists;
 using ToDoAssistant.Application.Contracts.Lists;
@@ -29,7 +30,7 @@ public class ListsController : BaseController
     private readonly IValidator<ShareList> _shareValidator;
     private readonly IValidator<CopyList> _copyValidator;
     private readonly IStringLocalizer<ListsController> _localizer;
-    private readonly string _url;
+    private readonly AppConfiguration _config;
     private readonly ILogger<ListsController> _logger;
 
     public ListsController(
@@ -45,7 +46,7 @@ public class ListsController : BaseController
         IValidator<ShareList> shareValidator,
         IValidator<CopyList> copyValidator,
         IStringLocalizer<ListsController> localizer,
-        IConfiguration configuration,
+        IOptions<AppConfiguration> config,
         ILogger<ListsController> logger) : base(userIdLookup, usersRepository)
     {
         _listService = listService;
@@ -58,7 +59,7 @@ public class ListsController : BaseController
         _shareValidator = shareValidator;
         _copyValidator = copyValidator;
         _localizer = localizer;
-        _url = configuration["Url"];
+        _config = config.Value;
         _logger = logger;
     }
 
@@ -103,11 +104,11 @@ public class ListsController : BaseController
             UserId
         );
 
-        EditListDto list = _listService.GetForEdit(id, UserId, tr);
+        var list = _listService.GetForEdit(id, UserId, tr);
 
         tr.Finish();
 
-        return list == null ? NotFound() : Ok(list);
+        return list is null ? NotFound() : Ok(list);
     }
 
     [HttpGet("{id}/with-shares")]
@@ -119,11 +120,11 @@ public class ListsController : BaseController
             UserId
         );
 
-        ListWithShares list = _listService.GetWithShares(id, UserId, tr);
+        var list = _listService.GetWithShares(id, UserId, tr);
 
         tr.Finish();
 
-        return list == null ? NotFound() : Ok(list);
+        return list is null ? NotFound() : Ok(list);
     }
 
     [HttpGet("share-requests")]
@@ -627,6 +628,6 @@ public class ListsController : BaseController
 
     private string GetNotificationsPageUrl(int notificationId)
     {
-        return $"{_url}/notifications/{notificationId}";
+        return $"{_config.Url}/notifications/{notificationId}";
     }
 }

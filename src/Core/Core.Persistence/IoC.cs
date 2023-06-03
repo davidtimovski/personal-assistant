@@ -1,4 +1,5 @@
 ﻿using Core.Application.Contracts;
+using Core.Persistence.Models;
 using Core.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

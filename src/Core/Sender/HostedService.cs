@@ -15,7 +15,7 @@ namespace Sender;
 
 public sealed class HostedService : IHostedService, IDisposable
 {
-    private readonly SenderConfiguration _config;
+    private readonly AppConfiguration _config;
     private readonly IReadOnlyDictionary<string, VapidConfiguration> _vapidConfig;
     private readonly ILogger<HostedService> _logger;
 
@@ -25,7 +25,7 @@ public sealed class HostedService : IHostedService, IDisposable
     };
 
     public HostedService(
-        IOptions<SenderConfiguration> config,
+        IOptions<AppConfiguration> config,
         ILogger<HostedService> logger)
     {
         _config = config.Value;

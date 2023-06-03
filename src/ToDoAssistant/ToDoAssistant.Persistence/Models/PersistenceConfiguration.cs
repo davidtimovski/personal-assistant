@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Weatherman.Persistence;
+namespace ToDoAssistant.Persistence.Models;
 
 public class PersistenceConfiguration
 {

@@ -3,6 +3,7 @@ using System.Text.Json.Nodes;
 using Core.Application.Contracts;
 using Core.Application.Entities;
 using Dapper;
+using Jobs.Models;
 using Jobs.Models.Accountant;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -16,14 +17,14 @@ public class MidnightJob
     private readonly ICdnService _cdnService;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IHostEnvironment _hostEnvironment;
-    private readonly JobsConfiguration _config;
+    private readonly AppConfiguration _config;
     private readonly ILogger<MidnightJob> _logger;
 
     public MidnightJob(
         ICdnService cdnService,
         IHttpClientFactory httpClientFactory,
         IHostEnvironment hostEnvironment,
-        IOptions<JobsConfiguration> config,
+        IOptions<AppConfiguration> config,
         ILogger<MidnightJob> logger)
     {
         _cdnService = cdnService;

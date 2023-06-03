@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Core.Infrastructure;
@@ -157,9 +158,19 @@ public static class IoC
         return services;
     }
 
-    public static IServiceCollection AddSender(this IServiceCollection services)
+    public static IServiceCollection AddSender(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
-        services.AddSingleton<ISenderService, SenderService>();
+        services.AddOptions<SenderConfiguration>()
+            .Bind(configuration.GetSection("RabbitMQ"))
+            .ValidateDataAnnotations();
+
+        services.AddSingleton<ISenderService>(sp =>
+        {
+            var config = sp.GetRequiredService<IOptions<SenderConfiguration>>().Value;
+            return new SenderService(config);
+        });
 
         return services;
     }

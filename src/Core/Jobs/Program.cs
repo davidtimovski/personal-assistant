@@ -1,6 +1,6 @@
 using Cdn;
-using Cdn.Configuration;
 using Jobs;
+using Jobs.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -27,17 +27,11 @@ using IHost host = Host.CreateDefaultBuilder(args)
     })
     .ConfigureServices((hostContext, services) =>
     {
-        services.AddOptions<JobsConfiguration>()
+        services.AddOptions<AppConfiguration>()
             .Bind(hostContext.Configuration)
             .ValidateDataAnnotations();
 
-        var config = hostContext.Configuration.GetSection("Cloudinary").Get<CloudinaryConfig>();
-        if (config is null)
-        {
-            throw new ArgumentNullException("Cloudinary configuration is missing");
-        }
-
-        services.AddCdn(config, hostContext.HostingEnvironment.EnvironmentName);
+        services.AddCdn(hostContext.Configuration, hostContext.HostingEnvironment.EnvironmentName);
 
         var fixerApiBaseUri = hostContext.Configuration["FixerApiBaseUrl"];
         if (fixerApiBaseUri is null)

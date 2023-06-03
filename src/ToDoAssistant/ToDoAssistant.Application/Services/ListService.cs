@@ -133,13 +133,13 @@ public class ListService : IListService
         }
     }
 
-    public EditListDto GetForEdit(int id, int userId, ISpan metricsSpan)
+    public EditListDto? GetForEdit(int id, int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(GetForEdit)}");
 
         try
         {
-            ToDoList list = _listsRepository.GetWithShares(id, userId, metric);
+            ToDoList? list = _listsRepository.GetWithShares(id, userId, metric);
 
             var result = _mapper.Map<EditListDto>(list, opts => { opts.Items["UserId"] = userId; });
 

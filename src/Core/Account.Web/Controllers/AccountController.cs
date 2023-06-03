@@ -8,7 +8,6 @@ using Api.Common;
 using Auth0.AspNetCore.Authentication;
 using CookingAssistant.Application.Contracts.Recipes;
 using Core.Application.Contracts;
-using Core.Infrastructure.Configuration;
 using Core.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -34,10 +33,9 @@ public class AccountController : BaseController
     private readonly IRecipeService _recipeService;
     private readonly ICdnService _cdnService;
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly IConfiguration _configuration;
     private readonly IStringLocalizer<AccountController> _localizer;
     private readonly IWebHostEnvironment _webHostEnvironment;
-    private readonly IOptions<Auth0ManagementUtilConfig> _auth0Options;
+    private readonly AppConfiguration _config;
     private readonly ILogger<AccountController> _logger;
 
     public AccountController(
@@ -49,10 +47,9 @@ public class AccountController : BaseController
         IRecipeService recipeService,
         ICdnService cdnService,
         IHttpClientFactory httpClientFactory,
-        IConfiguration configuration,
         IStringLocalizer<AccountController> localizer,
         IWebHostEnvironment webHostEnvironment,
-        IOptions<Auth0ManagementUtilConfig> auth0Options,
+        IOptions<AppConfiguration> config,
         ILogger<AccountController> logger) : base(userIdLookup, usersRepository)
     {
         _usersRepository = usersRepository;
@@ -62,10 +59,9 @@ public class AccountController : BaseController
         _recipeService = recipeService;
         _cdnService = cdnService;
         _httpClientFactory = httpClientFactory;
-        _configuration = configuration;
         _localizer = localizer;
         _webHostEnvironment = webHostEnvironment;
-        _auth0Options = auth0Options;
+        _config = config.Value;
         _logger = logger;
     }
 
@@ -77,7 +73,7 @@ public class AccountController : BaseController
         // Note that the resulting absolute Uri must be added to the
         // **Allowed Callback URLs** settings for the app.
         var authenticationProperties = new LoginAuthenticationPropertiesBuilder()
-            .WithRedirectUri(_configuration["Urls:Account"])
+            .WithRedirectUri(_config.Urls.Account)
             .Build();
 
         await HttpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
@@ -155,7 +151,7 @@ public class AccountController : BaseController
            // Indicate here where Auth0 should redirect the user after a logout.
            // Note that the resulting absolute Uri must be added to the
            // **Allowed Logout URLs** settings for the app.
-           .WithRedirectUri(_configuration["Urls:Account"] + returnUrlSlug)
+           .WithRedirectUri(_config.Urls.Account + returnUrlSlug)
            .Build();
 
         await HttpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
@@ -246,12 +242,12 @@ public class AccountController : BaseController
 
         using var payload = new FormUrlEncodedContent(new[]
         {
-            new KeyValuePair<string, string>("secret", _configuration["Account:ReCaptchaSecret"]),
+            new KeyValuePair<string, string>("secret", _config.Account.ReCaptchaSecret),
             new KeyValuePair<string, string>("response", model.Token)
         });
 
         using HttpClient httpClient = _httpClientFactory.CreateClient();
-        using var result = await httpClient.PostAsync(new Uri(_configuration["ReCaptchaVerificationUrl"]), payload);
+        using var result = await httpClient.PostAsync(new Uri(_config.ReCaptchaVerificationUrl), payload);
 
         var content = await result.Content.ReadAsStringAsync();
 
@@ -339,7 +335,7 @@ public class AccountController : BaseController
             user.Culture,
             user.ImageUri,
             _cdnService.GetDefaultProfileImageUri(),
-            _configuration["Urls:Account"]
+            _config.Urls.Account
         );
 
         tr.Finish();
@@ -361,7 +357,7 @@ public class AccountController : BaseController
                 model.Culture,
                 model.ImageUri,
                 _cdnService.GetDefaultProfileImageUri(),
-                _configuration["Urls:Account"]
+                _config.Urls.Account
             ));
         }
 
@@ -395,7 +391,7 @@ public class AccountController : BaseController
                 model.Culture,
                 model.ImageUri,
                 _cdnService.GetDefaultProfileImageUri(),
-                _configuration["Urls:Account"]
+                _config.Urls.Account
             ));
         }
 
@@ -496,7 +492,7 @@ public class AccountController : BaseController
     {
         var httpClient = _httpClientFactory.CreateClient();
 
-        await Auth0Proxy.InitializeAsync(httpClient, _auth0Options.Value, tr);
+        await Auth0Proxy.InitializeAsync(httpClient, _config.Auth0, tr);
 
         return httpClient;
     }
@@ -523,7 +519,7 @@ public class AccountController : BaseController
     private async Task CreateRequiredDataAsync(int userId, ISpan metricsSpan)
     {
         var now = DateTime.UtcNow;
-        await createMain(new Accountant.Persistence.Fs.Models.Account(0, userId, _localizer["MainAccountName"], true, "EUR", FSharpOption<decimal>.None, now, now), _configuration["ConnectionString"], metricsSpan);
+        await createMain(new Accountant.Persistence.Fs.Models.Account(0, userId, _localizer["MainAccountName"], true, "EUR", FSharpOption<decimal>.None, now, now), _config.ConnectionString, metricsSpan);
     }
 
     private async Task CreateSamplesAsync(int userId, ISpan metricsSpan)

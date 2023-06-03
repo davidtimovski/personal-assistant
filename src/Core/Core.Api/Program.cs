@@ -1,3 +1,4 @@
+using Core.Api.Models;
 using Core.Application;
 using Core.Infrastructure;
 using Core.Persistence;
@@ -22,6 +23,10 @@ builder.Services.AddControllers();
 builder.Services.Configure<RouteOptions>(opt => opt.LowercaseUrls = true);
 
 builder.Services.AddHealthChecks();
+
+builder.Services.AddOptions<AppConfiguration>()
+    .Bind(builder.Configuration)
+    .ValidateDataAnnotations();
 
 var app = builder.Build();
 

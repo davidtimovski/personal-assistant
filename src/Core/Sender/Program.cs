@@ -1,5 +1,6 @@
 ﻿using Core.Infrastructure;
 using Sender;
+using Sender.Models;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,7 +24,7 @@ builder.Host
     })
     .ConfigureServices((hostContext, services) =>
     {
-        services.AddOptions<SenderConfiguration>()
+        services.AddOptions<AppConfiguration>()
             .Bind(builder.Configuration)
             .ValidateDataAnnotations();
 

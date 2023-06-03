@@ -1,25 +1,27 @@
 ﻿using System.Globalization;
+using Account.Web.Models;
 using Account.Web.ViewModels.Home;
 using Core.Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace Account.Web.Controllers;
 
 public class HomeController : BaseController
 {
     private readonly IUserService _userService;
-    private readonly IConfiguration _configuration;
+    private readonly AppConfiguration _config;
 
     public HomeController(
         IUserIdLookup userIdLookup,
         IUsersRepository usersRepository,
         IUserService userService,
-        IConfiguration configuration) : base(userIdLookup, usersRepository)
+        IOptions<AppConfiguration> config) : base(userIdLookup, usersRepository)
     {
         _userService = userService;
-        _configuration = configuration;
+        _config = config.Value;
     }
 
     [HttpGet]
@@ -44,9 +46,9 @@ public class HomeController : BaseController
             user.Name,
             new List<ClientApplicationViewModel>
             {
-                new ClientApplicationViewModel("To Do Assistant", _configuration["Urls:ToDoAssistant"], "to-do-assistant"),
-                new ClientApplicationViewModel("Accountant", _configuration["Urls:Accountant"], "accountant"),
-                new ClientApplicationViewModel("Weatherman", _configuration["Urls:Weatherman"], "weatherman"),
+                new ClientApplicationViewModel("To Do Assistant", _config.Urls.ToDoAssistant, "to-do-assistant"),
+                new ClientApplicationViewModel("Accountant", _config.Urls.Accountant, "accountant"),
+                new ClientApplicationViewModel("Weatherman", _config.Urls.Weatherman, "weatherman"),
                 new ClientApplicationViewModel("Cooking Assistant", "cooking-assistant"),
             },
             alert

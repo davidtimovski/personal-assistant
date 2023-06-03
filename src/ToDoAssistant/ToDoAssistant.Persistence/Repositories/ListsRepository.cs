@@ -116,7 +116,7 @@ public class ListsRepository : BaseRepository, IListsRepository
         return conn.QueryFirstOrDefault<ToDoList>("SELECT * FROM todo.lists WHERE id = @Id", new { Id = id });
     }
 
-    public ToDoList GetWithShares(int id, int userId, ISpan metricsSpan)
+    public ToDoList? GetWithShares(int id, int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(GetWithShares)}");
 
@@ -136,7 +136,7 @@ public class ListsRepository : BaseRepository, IListsRepository
                     list.Shares.Add(share);
                 }
                 return list;
-            }, new { Id = id, UserId = userId }, null, true, "user_id").First();
+            }, new { Id = id, UserId = userId }, null, true, "user_id").FirstOrDefault();
 
         metric.Finish();
 

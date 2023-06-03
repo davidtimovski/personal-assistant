@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Cdn.Configuration;
 
-namespace Jobs;
+namespace Jobs.Models;
 
-public class JobsConfiguration
+public class AppConfiguration
 {
     [Required]
     public string ConnectionString { get; set; } = null!;
@@ -11,4 +12,7 @@ public class JobsConfiguration
     [Required]
 #endif
     public string FixerApiAccessKey { get; set; } = null!;
+
+    [Required]
+    public CloudinaryConfig Cloudinary { get; set; } = null!;
 }

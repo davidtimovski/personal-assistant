@@ -1,9 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Sender;
+namespace Sender.Models;
 
-public class SenderConfiguration
+public class AppConfiguration
 {
+    [Required]
+    public string ConnectionString { get; set; } = null!;
+
+    [Required]
+    public string SystemEmail { get; set; } = null!;
+
     [Required]
     public string EventBusConnection { get; set; } = null!;
 
@@ -15,12 +21,6 @@ public class SenderConfiguration
 
     [Required]
     public string SendGridApiKey { get; set; } = null!;
-
-    [Required]
-    public string SystemEmail { get; set; } = null!;
-
-    [Required]
-    public string ConnectionString { get; set; } = null!;
 
     [Required]
     public VapidConfiguration ToDoAssistantVapid { get; set; } = null!;

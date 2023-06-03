@@ -1,8 +1,7 @@
 ﻿using System.Globalization;
 using Cdn;
-using Cdn.Configuration;
+using CookingAssistant.Api.Models;
 using CookingAssistant.Application;
-using CookingAssistant.Application.Contracts.DietaryProfiles.Models;
 using CookingAssistant.Persistence;
 using Core.Application;
 using Core.Infrastructure;
@@ -21,16 +20,10 @@ builder.Services
     .AddApplication()
     .AddCookingAssistant(builder.Configuration);
 
-var config = builder.Configuration.GetSection("Cloudinary").Get<CloudinaryConfig>();
-if (config is null)
-{
-    throw new ArgumentNullException("Cloudinary configuration is missing");
-}
-
 builder.Services
     .AddAuth0(builder.Configuration)
-    .AddCdn(config, builder.Environment.EnvironmentName)
-    .AddSender();
+    .AddCdn(builder.Configuration, builder.Environment.EnvironmentName)
+    .AddSender(builder.Configuration);
 
 builder.Services
     .AddPersistence(builder.Configuration)
@@ -41,9 +34,12 @@ builder.Services
 
 builder.Services.AddControllers();
 builder.Services.Configure<RouteOptions>(opt => opt.LowercaseUrls = true);
-builder.Services.Configure<DailyIntakeReference>(builder.Configuration.GetSection("DietaryProfile:ReferenceDailyIntake"));
 
 builder.Services.AddHealthChecks();
+
+builder.Services.AddOptions<AppConfiguration>()
+    .Bind(builder.Configuration)
+    .ValidateDataAnnotations();
 
 var app = builder.Build();
 

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Core.Persistence;
+namespace CookingAssistant.Persistence.Models;
 
 public class PersistenceConfiguration
 {

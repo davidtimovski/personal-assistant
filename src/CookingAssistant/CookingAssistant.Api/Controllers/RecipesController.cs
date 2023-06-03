@@ -12,6 +12,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using User = Core.Application.Entities.User;
 
 namespace CookingAssistant.Api.Controllers;
@@ -34,8 +35,8 @@ public class RecipesController : BaseController
     private readonly IValidator<CreateSendRequest> _createSendRequestValidator;
     private readonly IValidator<ImportRecipe> _importRecipeValidator;
     private readonly IValidator<UploadTempImage> _uploadTempImageValidator;
+    private readonly AppConfiguration _config;
     private readonly ILogger<RecipesController> _logger;
-    private readonly string _url;
 
     public RecipesController(
         IUserIdLookup userIdLookup,
@@ -54,8 +55,8 @@ public class RecipesController : BaseController
         IValidator<CreateSendRequest> createSendRequestValidator,
         IValidator<ImportRecipe> importRecipeValidator,
         IValidator<UploadTempImage> uploadTempImageValidator,
-        ILogger<RecipesController> logger,
-        IConfiguration configuration) : base(userIdLookup, usersRepository)
+        IOptions<AppConfiguration> config,
+        ILogger<RecipesController> logger) : base(userIdLookup, usersRepository)
     {
         _recipeService = recipeService;
         _ingredientService = ingredientService;
@@ -71,8 +72,8 @@ public class RecipesController : BaseController
         _createSendRequestValidator = createSendRequestValidator;
         _importRecipeValidator = importRecipeValidator;
         _uploadTempImageValidator = uploadTempImageValidator;
+        _config = config.Value;
         _logger = logger;
-        _url = configuration["Url"];
     }
 
     [HttpGet]
@@ -86,7 +87,7 @@ public class RecipesController : BaseController
     [HttpGet("{id}/{currency}")]
     public IActionResult Get(int id, string currency)
     {
-        RecipeDto recipeDto = _recipeService.Get(id, UserId, currency);
+        RecipeDto? recipeDto = _recipeService.Get(id, UserId, currency);
         if (recipeDto is null)
         {
             return NotFound();
@@ -103,7 +104,7 @@ public class RecipesController : BaseController
     [HttpGet("{id}/update")]
     public IActionResult GetForUpdate(int id)
     {
-        RecipeForUpdate recipeDto = _recipeService.GetForUpdate(id, UserId);
+        RecipeForUpdate? recipeDto = _recipeService.GetForUpdate(id, UserId);
         if (recipeDto is null)
         {
             return NotFound();
@@ -120,13 +121,8 @@ public class RecipesController : BaseController
     [HttpGet("{id}/with-shares")]
     public IActionResult GetWithShares(int id)
     {
-        RecipeWithShares recipeDto = _recipeService.GetWithShares(id, UserId);
-        if (recipeDto is null)
-        {
-            return NotFound();
-        }
-
-        return Ok(recipeDto);
+        RecipeWithShares? recipeDto = _recipeService.GetWithShares(id, UserId);
+        return recipeDto is null ? NotFound() : Ok(recipeDto);
     }
 
     [HttpGet("share-requests")]
@@ -149,12 +145,7 @@ public class RecipesController : BaseController
     public IActionResult GetForSending(int id)
     {
         RecipeForSending recipeDto = _recipeService.GetForSending(id, UserId);
-        if (recipeDto is null)
-        {
-            return NotFound();
-        }
-
-        return Ok(recipeDto);
+        return recipeDto is null ? NotFound() : Ok(recipeDto);
     }
 
     [HttpGet("send-requests")]
@@ -176,13 +167,8 @@ public class RecipesController : BaseController
     [HttpGet("{id}/review")]
     public IActionResult GetForReview(int id)
     {
-        RecipeForReview recipeDto = _recipeService.GetForReview(id, UserId);
-        if (recipeDto is null)
-        {
-            return NotFound();
-        }
-
-        return Ok(recipeDto);
+        RecipeForReview? recipeDto = _recipeService.GetForReview(id, UserId);
+        return recipeDto is null ? NotFound() : Ok(recipeDto);
     }
 
     [HttpPost]
@@ -515,7 +501,7 @@ public class RecipesController : BaseController
                     SenderImageUri = result.ActionUserImageUri,
                     UserId = recipient.Id,
                     Message = message,
-                    OpenUrl = $"{_url}/inbox"
+                    OpenUrl = $"{_config.Url}/inbox"
                 };
 
                 _senderService.Enqueue(pushNotification);
