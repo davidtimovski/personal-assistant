@@ -21,14 +21,13 @@ let private configureServices (services: IServiceCollection) =
     services.AddWeatherman() |> ignore
 
     services
-        .AddAuth0("https://" + settings["Auth0:Domain"] + "/", settings["Auth0:Audience"])
+        .AddAuth0(settings)
         .AddWeathermanInfrastructure()
     |> ignore
 
-    let connectionString = settings["ConnectionString"]
     services
-        .AddPersistence(connectionString)
-        .AddWeathermanPersistence(connectionString)
+        .AddPersistence(settings)
+        .AddWeathermanPersistence(settings)
     |> ignore
 
     services.AddHttpClient("open-meteo") |> ignore

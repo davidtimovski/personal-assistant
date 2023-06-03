@@ -5,6 +5,7 @@ using Core.Infrastructure;
 using Core.Persistence;
 using Microsoft.AspNetCore.Localization;
 using ToDoAssistant.Api.Hubs;
+using ToDoAssistant.Api.Models;
 using ToDoAssistant.Application;
 using ToDoAssistant.Persistence;
 
@@ -12,15 +13,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsProduction())
 {
-    var keyVaultUri = new Uri(builder.Configuration["KeyVault:Url"]);
-    string tenantId = builder.Configuration["KeyVault:TenantId"];
-    string clientId = builder.Configuration["KeyVault:ClientId"];
-    string clientSecret = builder.Configuration["KeyVault:ClientSecret"];
+    builder.Host.AddKeyVault();
+    builder.Services.AddDataProtectionWithCertificate(builder.Configuration);
 
-    builder.Host.AddKeyVault(keyVaultUri, tenantId, clientId, clientSecret);
-    builder.Services.AddDataProtectionWithCertificate(keyVaultUri, tenantId, clientId, clientSecret);
-
-    builder.Host.AddSentryLogging(builder.Configuration["ToDoAssistant:Sentry:Dsn"], new HashSet<string> { "GET /health", "GET /hub", "POST /hub/negotiate" });
+    builder.Host.AddSentryLogging(builder.Configuration, "ToDoAssistant", new HashSet<string> { "GET /health", "GET /hub", "POST /hub/negotiate" });
 }
 
 builder.Services
@@ -28,23 +24,13 @@ builder.Services
     .AddToDoAssistant();
 
 builder.Services
-    .AddAuth0(
-        authority: $"https://{builder.Configuration["Auth0:Domain"]}/",
-        audience: builder.Configuration["Auth0:Audience"],
-        signalrHub: "/hub"
-    )
-    .AddCdn(builder.Configuration["Cloudinary:CloudName"],
-            builder.Configuration["Cloudinary:ApiKey"],
-            builder.Configuration["Cloudinary:ApiSecret"],
-            builder.Environment.EnvironmentName,
-            builder.Configuration["Cloudinary:DefaultImageUris:Profile"],
-            builder.Configuration["Cloudinary:DefaultImageUris:Recipe"])
-    .AddSender();
+    .AddAuth0(builder.Configuration, signalrHub: "/hub")
+    .AddCdn(builder.Configuration, builder.Environment.EnvironmentName)
+    .AddSender(builder.Configuration);
 
-var connectionString = builder.Configuration["ConnectionString"];
 builder.Services
-    .AddPersistence(connectionString)
-    .AddToDoAssistantPersistence(connectionString);
+    .AddPersistence(builder.Configuration)
+    .AddToDoAssistantPersistence(builder.Configuration);
 
 builder.Services.AddControllers();
 
@@ -55,6 +41,10 @@ builder.Services
 builder.Services.Configure<RouteOptions>(opt => opt.LowercaseUrls = true);
 
 builder.Services.AddHealthChecks();
+
+builder.Services.AddOptions<AppConfiguration>()
+    .Bind(builder.Configuration)
+    .ValidateDataAnnotations();
 
 var app = builder.Build();
 

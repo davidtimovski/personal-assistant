@@ -1,10 +1,11 @@
 ﻿using Api.UnitTests.Builders;
 using CookingAssistant.Api.Controllers;
+using CookingAssistant.Api.Models;
 using CookingAssistant.Application.Contracts.Recipes;
 using CookingAssistant.Application.Contracts.Recipes.Models;
 using Core.Application.Contracts;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
@@ -20,7 +21,7 @@ public class RecipesControllerTests
     {
         _sut = new RecipesController(_userIdLookupMock.Object, null, _recipeServiceMock.Object,
             null, null, null, null, null, null, null, null, null,
-            null, null, null, null, null, new Mock<IConfiguration>().Object)
+            null, null, null, null, new Mock<IOptions<AppConfiguration>>().Object, null)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };
@@ -32,7 +33,7 @@ public class RecipesControllerTests
         _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
         _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
         _recipeServiceMock.Setup(x => x.Get(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
-            .Returns((RecipeDto)null);
+            .Returns((RecipeDto?)null);
 
         var result = _sut.Get(It.IsAny<int>(), It.IsAny<string>());
 
@@ -45,7 +46,7 @@ public class RecipesControllerTests
         _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
         _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
         _recipeServiceMock.Setup(x => x.GetForUpdate(It.IsAny<int>(), It.IsAny<int>()))
-            .Returns((RecipeForUpdate)null);
+            .Returns((RecipeForUpdate?)null);
 
         var result = _sut.GetForUpdate(It.IsAny<int>());
 
@@ -58,7 +59,7 @@ public class RecipesControllerTests
         _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
         _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
         _recipeServiceMock.Setup(x => x.GetWithShares(It.IsAny<int>(), It.IsAny<int>()))
-            .Returns((RecipeWithShares)null);
+            .Returns((RecipeWithShares?)null);
 
         var result = _sut.GetWithShares(It.IsAny<int>());
 
@@ -71,7 +72,7 @@ public class RecipesControllerTests
         _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
         _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
         _recipeServiceMock.Setup(x => x.GetForSending(It.IsAny<int>(), It.IsAny<int>()))
-            .Returns((RecipeForSending)null);
+            .Returns((RecipeForSending?)null);
 
         var result = _sut.GetForSending(It.IsAny<int>());
 
@@ -84,7 +85,7 @@ public class RecipesControllerTests
         _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
         _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
         _recipeServiceMock.Setup(x => x.GetForReview(It.IsAny<int>(), It.IsAny<int>()))
-            .Returns((RecipeForReview)null);
+            .Returns((RecipeForReview?)null);
 
         var result = _sut.GetForReview(It.IsAny<int>());
 

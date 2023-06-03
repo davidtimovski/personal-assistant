@@ -1,5 +1,6 @@
 using Cdn;
 using Jobs;
+using Jobs.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -26,17 +27,21 @@ using IHost host = Host.CreateDefaultBuilder(args)
     })
     .ConfigureServices((hostContext, services) =>
     {
-        services.AddCdn(
-            hostContext.Configuration["Cloudinary:CloudName"],
-            hostContext.Configuration["Cloudinary:ApiKey"],
-            hostContext.Configuration["Cloudinary:ApiSecret"],
-            hostContext.HostingEnvironment.EnvironmentName,
-            hostContext.Configuration["Cloudinary:DefaultImageUris:Profile"],
-            hostContext.Configuration["Cloudinary:DefaultImageUris:Recipe"]);
+        services.AddOptions<AppConfiguration>()
+            .Bind(hostContext.Configuration)
+            .ValidateDataAnnotations();
+
+        services.AddCdn(hostContext.Configuration, hostContext.HostingEnvironment.EnvironmentName);
+
+        var fixerApiBaseUri = hostContext.Configuration["FixerApiBaseUrl"];
+        if (fixerApiBaseUri is null)
+        {
+            throw new ArgumentNullException("FixerApiBaseUrl configuration is missing");
+        }
 
         services.AddHttpClient("fixer", c =>
         {
-            c.BaseAddress = new Uri("http://data.fixer.io/api/");
+            c.BaseAddress = new Uri(fixerApiBaseUri);
         });
 
         Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;

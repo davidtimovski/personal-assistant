@@ -2,9 +2,9 @@
 
 internal class Email
 {
-    internal string ToAddress { get; set; }
-    internal string ToName { get; set; }
-    internal string Subject { get; set; }
-    internal string BodyText { get; set; }
-    internal string BodyHtml { get; set; }
+    internal string ToAddress { get; set; } = null!;
+    internal string ToName { get; set; } = null!;
+    internal string Subject { get; set; } = null!;
+    internal string BodyText { get; set; } = null!;
+    internal string BodyHtml { get; set; } = null!;
 }

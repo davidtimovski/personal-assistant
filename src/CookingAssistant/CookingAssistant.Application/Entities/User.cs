@@ -10,5 +10,5 @@ public class User
     public bool ImperialSystem { get; set; }
     public string ImageUri { get; set; }
 
-    public DietaryProfile DietaryProfile { get; set; }
+    public DietaryProfile? DietaryProfile { get; set; }
 }

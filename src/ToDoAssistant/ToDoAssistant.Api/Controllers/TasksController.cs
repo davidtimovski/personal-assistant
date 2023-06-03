@@ -7,7 +7,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using ToDoAssistant.Api.Hubs;
+using ToDoAssistant.Api.Models;
 using ToDoAssistant.Application.Contracts.Notifications;
 using ToDoAssistant.Application.Contracts.Notifications.Models;
 using ToDoAssistant.Application.Contracts.Tasks;
@@ -27,8 +29,8 @@ public class TasksController : BaseController
     private readonly IValidator<BulkCreate> _bulkCreateValidator;
     private readonly IValidator<UpdateTask> _updateValidator;
     private readonly IStringLocalizer<TasksController> _localizer;
+    private readonly AppConfiguration _config;
     private readonly ILogger<TasksController> _logger;
-    private readonly string _url;
 
     public TasksController(
         IUserIdLookup userIdLookup,
@@ -41,8 +43,8 @@ public class TasksController : BaseController
         IValidator<BulkCreate> bulkCreateValidator,
         IValidator<UpdateTask> updateValidator,
         IStringLocalizer<TasksController> localizer,
-        ILogger<TasksController> logger,
-        IConfiguration configuration) : base(userIdLookup, usersRepository)
+        IOptions<AppConfiguration> config,
+        ILogger<TasksController> logger) : base(userIdLookup, usersRepository)
     {
         _listActionsHubContext = listActionsHubContext;
         _taskService = taskService;
@@ -52,15 +54,15 @@ public class TasksController : BaseController
         _bulkCreateValidator = bulkCreateValidator;
         _updateValidator = updateValidator;
         _localizer = localizer;
+        _config = config.Value;
         _logger = logger;
-        _url = configuration["Url"];
     }
 
     [HttpGet("{id}")]
     public IActionResult Get(int id)
     {
         TaskDto taskDto = _taskService.Get(id, UserId);
-        if (taskDto == null)
+        if (taskDto is null)
         {
             return NotFound();
         }
@@ -72,7 +74,7 @@ public class TasksController : BaseController
     public IActionResult GetForUpdate(int id)
     {
         TaskForUpdate taskDto = _taskService.GetForUpdate(id, UserId);
-        if (taskDto == null)
+        if (taskDto is null)
         {
             return NotFound();
         }
@@ -83,7 +85,7 @@ public class TasksController : BaseController
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateTask dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -139,7 +141,7 @@ public class TasksController : BaseController
     [HttpPost("bulk")]
     public async Task<IActionResult> BulkCreate([FromBody] BulkCreate dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -203,7 +205,7 @@ public class TasksController : BaseController
     [HttpPut]
     public async Task<IActionResult> Update([FromBody] UpdateTask dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -367,7 +369,7 @@ public class TasksController : BaseController
     [HttpPut("complete")]
     public async Task<IActionResult> Complete([FromBody] CompleteUncomplete dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -423,7 +425,7 @@ public class TasksController : BaseController
     [HttpPut("uncomplete")]
     public async Task<IActionResult> Uncomplete([FromBody] CompleteUncomplete dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -479,7 +481,7 @@ public class TasksController : BaseController
     //[HttpPut("reorder")]
     //public async Task<IActionResult> Reorder([FromBody] ReorderTask dto)
     //{
-    //    if (dto == null)
+    //    if (dto is null)
     //    {
     //        return BadRequest();
     //    }
@@ -506,6 +508,6 @@ public class TasksController : BaseController
 
     private string GetNotificationsPageUrl(int notificationId)
     {
-        return $"{_url}/notifications/{notificationId}";
+        return $"{_config.Url}/notifications/{notificationId}";
     }
 }

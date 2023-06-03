@@ -5,6 +5,7 @@ using Azure.Identity;
 using Azure.Security.KeyVault.Certificates;
 using Azure.Security.KeyVault.Secrets;
 using Core.Application.Contracts;
+using Core.Infrastructure.Configuration;
 using Core.Infrastructure.Identity;
 using Core.Infrastructure.Sender;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -13,21 +14,32 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Core.Infrastructure;
 
 public static class IoC
 {
-    public static IServiceCollection AddAuth0(this IServiceCollection services, string authority, string audience, string signalrHub = null)
+    public static IServiceCollection AddAuth0(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        string? signalrHub = null)
     {
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(opt =>
             {
-                opt.Authority = authority;
-                opt.Audience = audience;
+                var config = configuration.GetSection("Auth0").Get<Auth0Configuration>();
+                if (config is null)
+                {
+                    throw new ArgumentNullException("Auth0 configuration is missing");
+                }
 
-                // If the access token does not have a `sub` claim, `User.Identity.Name` will be `null`. Map it to a different claim by setting the NameClaimType below.
+                opt.Authority = config.Authority;
+                opt.Audience = config.Audience;
+
+                // If the access token does not have a `sub` claim, `User.Identity.Name` will be `null`.
+                // Map it to a different claim by setting the NameClaimType below.
                 opt.TokenValidationParameters = new TokenValidationParameters
                 {
                     NameClaimType = ClaimTypes.NameIdentifier
@@ -57,18 +69,21 @@ public static class IoC
         return services;
     }
 
-    public static IHostBuilder AddKeyVault(
-        this IHostBuilder host,
-        Uri keyVaultUri,
-        string tenantId,
-        string clientId,
-        string clientSecret)
+    public static IHostBuilder AddKeyVault(this IHostBuilder host)
     {
-        var tokenCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
-        var secretClient = new SecretClient(keyVaultUri, tokenCredential);
-
         host.ConfigureAppConfiguration((context, configBuilder) =>
         {
+            var config = configBuilder.Build();
+
+            var keyVaultConfig = config.GetSection("KeyVault").Get<KeyVaultConfiguration>();
+            if (keyVaultConfig is null)
+            {
+                throw new ArgumentNullException("KeyVault configuration is missing");
+            }
+
+            var tokenCredential = new ClientSecretCredential(keyVaultConfig.TenantId, keyVaultConfig.ClientId, keyVaultConfig.ClientSecret);
+            var secretClient = new SecretClient(new Uri(keyVaultConfig.Url), tokenCredential);
+
             configBuilder.AddAzureKeyVault(secretClient, new AzureKeyVaultConfigurationOptions());
         });
 
@@ -76,15 +91,22 @@ public static class IoC
     }
 
     public static IHostBuilder AddSentryLogging(
-        this IHostBuilder host,
-        string dsn,
+        this IHostBuilder hostBuilder,
+        IConfiguration configuration,
+        string configSection,
         HashSet<string> excludeTransactions)
     {
-        host.ConfigureLogging((context, loggingBuilder) =>
+        hostBuilder.ConfigureLogging((context, loggingBuilder) =>
         {
+            var config = configuration.GetSection($"{configSection}:Sentry").Get<SentryConfiguration>();
+            if (config is null)
+            {
+                throw new ArgumentNullException($"{configSection}:Sentry configuration is missing");
+            }
+
             loggingBuilder.AddSentry(opt =>
             {
-                opt.Dsn = dsn;
+                opt.Dsn = config.Dsn;
                 opt.SampleRate = 1;
                 opt.TracesSampler = samplingCtx =>
                 {
@@ -103,19 +125,22 @@ public static class IoC
             });
         });
 
-        return host;
+        return hostBuilder;
     }
 
     public static IServiceCollection AddDataProtectionWithCertificate(
         this IServiceCollection services,
-        Uri keyVaultUri,
-        string tenantId,
-        string clientId,
-        string clientSecret)
+        IConfiguration configuration)
     {
-        var tokenCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+        var keyVaultConfig = configuration.GetSection("KeyVault").Get<KeyVaultConfiguration>();
+        if (keyVaultConfig is null)
+        {
+            throw new ArgumentNullException("KeyVault configuration is missing");
+        }
 
-        var certClient = new CertificateClient(keyVaultUri, tokenCredential);
+        var tokenCredential = new ClientSecretCredential(keyVaultConfig.TenantId, keyVaultConfig.ClientId, keyVaultConfig.ClientSecret);
+
+        var certClient = new CertificateClient(new Uri(keyVaultConfig.Url), tokenCredential);
         X509Certificate2 certificate = certClient.DownloadCertificate("personal-assistant");
 
         services
@@ -133,9 +158,19 @@ public static class IoC
         return services;
     }
 
-    public static IServiceCollection AddSender(this IServiceCollection services)
+    public static IServiceCollection AddSender(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
-        services.AddSingleton<ISenderService, SenderService>();
+        services.AddOptions<SenderConfiguration>()
+            .Bind(configuration.GetSection("RabbitMQ"))
+            .ValidateDataAnnotations();
+
+        services.AddSingleton<ISenderService>(sp =>
+        {
+            var config = sp.GetRequiredService<IOptions<SenderConfiguration>>().Value;
+            return new SenderService(config);
+        });
 
         return services;
     }

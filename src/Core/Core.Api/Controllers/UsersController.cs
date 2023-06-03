@@ -23,7 +23,7 @@ public class UsersController : BaseController
     [HttpGet]
     public IActionResult Get(string application)
     {
-        UserDto user = null;
+        UserDto? user = null;
 
         switch (application)
         {
@@ -63,7 +63,7 @@ public class UsersController : BaseController
     [HttpPut("to-do-notifications-enabled")]
     public async Task<IActionResult> UpdateToDoNotificationsEnabled([FromBody] UpdateUserPreferences dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -84,7 +84,7 @@ public class UsersController : BaseController
     [HttpPut("cooking-notifications-enabled")]
     public async Task<IActionResult> UpdateCookingNotificationsEnabled([FromBody] UpdateUserPreferences dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -105,7 +105,7 @@ public class UsersController : BaseController
     [HttpPut("imperial-system")]
     public async Task<IActionResult> UpdateImperialSystem([FromBody] UpdateUserPreferences dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }

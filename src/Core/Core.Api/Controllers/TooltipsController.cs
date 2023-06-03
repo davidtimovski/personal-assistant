@@ -55,7 +55,7 @@ public class TooltipsController : BaseController
     [HttpPut]
     public async Task<IActionResult> ToggleDismissed([FromBody] TooltipToggleDismissed dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }

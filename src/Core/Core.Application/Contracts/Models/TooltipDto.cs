@@ -6,7 +6,7 @@ namespace Core.Application.Contracts.Models;
 
 public class TooltipDto : IMapFrom<Tooltip>
 {
-    public string Key { get; set; }
+    public string Key { get; set; } = null!;
     public bool IsDismissed { get; set; }
 
     public void Mapping(Profile profile)

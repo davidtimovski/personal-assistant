@@ -26,7 +26,11 @@ public class ListActionsHub : Hub
     {
         get
         {
-            string auth0Id = Context.User.Identity.Name;
+            var auth0Id = Context.User?.Identity?.Name;
+            if (auth0Id is null)
+            {
+                throw new InvalidOperationException($"{nameof(UserId)} invoked for non-authenticated user");
+            }
 
             if (_userIdLookup.Contains(auth0Id))
             {

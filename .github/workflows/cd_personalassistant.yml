@@ -1,0 +1,45 @@
+name: Continuous deployment Personal Assistant
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - "*.targets"
+      - "src/Core/Core.Application/**"
+      - "src/Core/Core.Infrastructure/**"
+      - "src/Core/Core.Persistence/**"
+      - "src/Core/PersonalAssistant.Web/**"
+      - "src/ToDoAssistant/ToDoAssistant.Application/**"
+      - "src/ToDoAssistant/ToDoAssistant.Persistence/**"
+      - "src/CookingAssistant/CookingAssistant.Application/**"
+      - "src/CookingAssistant/CookingAssistant.Persistence/**"
+      - "src/Accountant/Accountant.Persistence.Fs/**"
+
+env:
+  REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
+  REGISTRY_IMAGE: ${{ secrets.REGISTRY_IMAGE }}
+  REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+  REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+
+jobs:
+  deploy:
+    name: Build and push image to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build personalassistant-web-latest image
+        run: docker build -f ./src/Core/PersonalAssistant.Web/Dockerfile . --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:personalassistant-web-latest
+
+      - name: Login to Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY_URL }}
+          username: ${{ env.REGISTRY_USERNAME }}
+          password: ${{ env.REGISTRY_TOKEN }}
+
+      - name: Publish personalassistant-web-latest image
+        run: docker push ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:personalassistant-web-latest

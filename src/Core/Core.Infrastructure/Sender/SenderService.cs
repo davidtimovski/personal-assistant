@@ -2,18 +2,18 @@
 using System.Text.Json;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models.Sender;
-using Microsoft.Extensions.Configuration;
+using Core.Infrastructure.Configuration;
 using RabbitMQ.Client;
 
 namespace Core.Infrastructure.Sender;
 
 public class SenderService : ISenderService
 {
-    private readonly IConfiguration _configuration;
+    private readonly SenderConfiguration _config;
 
-    public SenderService(IConfiguration configuration)
+    public SenderService(SenderConfiguration config)
     {
-        _configuration = configuration;
+        _config = config;
     }
 
     public void Enqueue(ISendable sendable)
@@ -35,18 +35,10 @@ public class SenderService : ISenderService
     {
         var factory = new ConnectionFactory
         {
-            HostName = _configuration["EventBusConnection"]
+            HostName = _config.EventBusConnection,
+            UserName = _config.EventBusUserName,
+            Password = _config.EventBusPassword
         };
-
-        if (!string.IsNullOrEmpty(_configuration["EventBusUserName"]))
-        {
-            factory.UserName = _configuration["EventBusUserName"];
-        }
-
-        if (!string.IsNullOrEmpty(_configuration["EventBusPassword"]))
-        {
-            factory.Password = _configuration["EventBusPassword"];
-        }
 
         using var connection = factory.CreateConnection();
         using var channel = connection.CreateModel();

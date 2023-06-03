@@ -1,15 +1,15 @@
 version: '3.4'
 
 services:
-  account: 
-    image: ${DOCKER_REGISTRY}:account-latest
-    container_name: pa-account
+  personalassistant-web: 
+    image: ${DOCKER_REGISTRY}:personalassistant-web-latest
+    container_name: pa-web
     restart: always
     environment:
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - EventBusConnection=${EVENT_BUS_HOST}
-      - EventBusUserName=${EVENT_BUS_USERNAME}
-      - EventBusPassword=${EVENT_BUS_PASSWORD}
+      - RabbitMQ__EventBusConnection=${EVENT_BUS_HOST}
+      - RabbitMQ__EventBusUserName=${EVENT_BUS_USERNAME}
+      - RabbitMQ__EventBusPassword=${EVENT_BUS_PASSWORD}
       - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
       - PORT=80
     ports:
@@ -58,9 +58,9 @@ services:
     restart: always
     environment:
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - EventBusConnection=${EVENT_BUS_HOST}
-      - EventBusUserName=${EVENT_BUS_USERNAME}
-      - EventBusPassword=${EVENT_BUS_PASSWORD}
+      - RabbitMQ__EventBusConnection=${EVENT_BUS_HOST}
+      - RabbitMQ__EventBusUserName=${EVENT_BUS_USERNAME}
+      - RabbitMQ__EventBusPassword=${EVENT_BUS_PASSWORD}
       - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
       - PORT=80
     volumes:
@@ -75,9 +75,9 @@ services:
     restart: always
     environment:
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - EventBusConnection=${EVENT_BUS_HOST}
-      - EventBusUserName=${EVENT_BUS_USERNAME}
-      - EventBusPassword=${EVENT_BUS_PASSWORD}
+      - RabbitMQ__EventBusConnection=${EVENT_BUS_HOST}
+      - RabbitMQ__EventBusUserName=${EVENT_BUS_USERNAME}
+      - RabbitMQ__EventBusPassword=${EVENT_BUS_PASSWORD}
       - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
       - PORT=80
     volumes:

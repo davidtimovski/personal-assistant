@@ -1,28 +1,31 @@
-﻿using System.Net.Http.Headers;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Net.Http.Headers;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
+using Core.Infrastructure.Configuration;
 using Sentry;
 
 namespace Core.Infrastructure.Identity;
 
 public static class Auth0Proxy
 {
-    private static string Domain;
-    private static string AccessToken;
+    private static Auth0ManagementUtilConfig Config = null!;
+    private static string? AccessToken;
     private static DateTime? Expires;
 
     public static async Task InitializeAsync(HttpClient httpClient, Auth0ManagementUtilConfig config, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(Auth0Proxy)}.{nameof(InitializeAsync)}");
 
-        Domain = config.Domain;
+        Config = config;
 
         if (Expires.HasValue && Expires > DateTime.UtcNow.AddMinutes(1))
         {
             return;
         }
 
-        using var requestMessage = new HttpRequestMessage(HttpMethod.Post, new Uri($"https://{Domain}/oauth/token"));
+        using var requestMessage = new HttpRequestMessage(HttpMethod.Post, new Uri($"https://{Config.Domain}/oauth/token"));
         requestMessage.Content = new FormUrlEncodedContent(new[]
         {
             new KeyValuePair<string, string>("grant_type", "client_credentials"),
@@ -34,7 +37,14 @@ public static class Auth0Proxy
         using var response = await httpClient.SendAsync(requestMessage);
         response.EnsureSuccessStatusCode();
 
-        var result = JsonSerializer.Deserialize<TokenResult>(await response.Content.ReadAsStringAsync());
+        var content = await response.Content.ReadAsStringAsync();
+
+        var result = JsonSerializer.Deserialize<TokenResult>(content);
+        if (result is null)
+        {
+            throw new SerializationException($"Could not deserialize {nameof(TokenResult)} from content");
+        }
+
         AccessToken = result.access_token;
         Expires = DateTime.UtcNow.AddSeconds(result.expires_in);
 
@@ -45,13 +55,19 @@ public static class Auth0Proxy
     {
         var metric = metricsSpan.StartChild($"{nameof(Auth0Proxy)}.{nameof(GetUserAsync)}");
 
-        using var requestMessage = new HttpRequestMessage(HttpMethod.Get, new Uri($"https://{Domain}/api/v2/users/{auth0Id}?fields=email,name,user_metadata"));
+        using var requestMessage = new HttpRequestMessage(HttpMethod.Get, new Uri($"https://{Config.Domain}/api/v2/users/{auth0Id}?fields=email,name,user_metadata"));
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
 
         using var response = await httpClient.SendAsync(requestMessage);
         response.EnsureSuccessStatusCode();
 
-        var result = JsonSerializer.Deserialize<Auth0User>(await response.Content.ReadAsStringAsync());
+        var content = await response.Content.ReadAsStringAsync();
+
+        var result = JsonSerializer.Deserialize<Auth0User>(content);
+        if (result is null)
+        {
+            throw new SerializationException($"Could not deserialize {nameof(Auth0User)} from content: {content}");
+        }
 
         metric.Finish();
 
@@ -62,7 +78,7 @@ public static class Auth0Proxy
     {
         var metric = metricsSpan.StartChild($"{nameof(Auth0Proxy)}.{nameof(RegisterUserAsync)}");
 
-        using var requestMessage = new HttpRequestMessage(HttpMethod.Post, new Uri($"https://{Domain}/api/v2/users"));
+        using var requestMessage = new HttpRequestMessage(HttpMethod.Post, new Uri($"https://{Config.Domain}/api/v2/users"));
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
 
         var createModel = new CreateUserPayload(
@@ -75,9 +91,10 @@ public static class Auth0Proxy
 
         using var response = await httpClient.SendAsync(requestMessage);
 
+        var content = await response.Content.ReadAsStringAsync();
+
         if (!response.IsSuccessStatusCode)
         {
-            var content = await response.Content.ReadAsStringAsync();
             if (content.Contains("PasswordStrengthError"))
             {
                 throw new PasswordTooWeakException();
@@ -86,7 +103,11 @@ public static class Auth0Proxy
             throw new Auth0Exception(content);
         }
 
-        var result = JsonSerializer.Deserialize<CreateUserResult>(await response.Content.ReadAsStringAsync());
+        var result = JsonSerializer.Deserialize<CreateUserResult>(content);
+        if (result is null)
+        {
+            throw new SerializationException($"Could not deserialize {nameof(CreateUserResult)} from content: {content}");
+        }
 
         metric.Finish();
 
@@ -97,7 +118,7 @@ public static class Auth0Proxy
     {
         var metric = metricsSpan.StartChild($"{nameof(Auth0Proxy)}.{nameof(DeleteUserAsync)}");
 
-        using var requestMessage = new HttpRequestMessage(HttpMethod.Delete, new Uri($"https://{Domain}/api/v2/users/{auth0Id}"));
+        using var requestMessage = new HttpRequestMessage(HttpMethod.Delete, new Uri($"https://{Config.Domain}/api/v2/users/{auth0Id}"));
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
 
         using var response = await httpClient.SendAsync(requestMessage);
@@ -110,7 +131,7 @@ public static class Auth0Proxy
     {
         var metric = metricsSpan.StartChild($"{nameof(Auth0Proxy)}.{nameof(UpdateNameAsync)}");
 
-        using var requestMessage = new HttpRequestMessage(HttpMethod.Patch, new Uri($"https://{Domain}/api/v2/users/{auth0Id}"));
+        using var requestMessage = new HttpRequestMessage(HttpMethod.Patch, new Uri($"https://{Config.Domain}/api/v2/users/{auth0Id}"));
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
 
         requestMessage.Content = new StringContent(JsonSerializer.Serialize(new
@@ -124,16 +145,16 @@ public static class Auth0Proxy
         metric.Finish();
     }
 
-    public static async Task ResetPasswordAsync(HttpClient httpClient, string clientId, string email, ISpan metricsSpan)
+    public static async Task ResetPasswordAsync(HttpClient httpClient, string email, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(Auth0Proxy)}.{nameof(ResetPasswordAsync)}");
 
-        using var requestMessage = new HttpRequestMessage(HttpMethod.Post, new Uri($"https://{Domain}/dbconnections/change_password"));
+        using var requestMessage = new HttpRequestMessage(HttpMethod.Post, new Uri($"https://{Config.Domain}/dbconnections/change_password"));
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
 
         requestMessage.Content = new StringContent(JsonSerializer.Serialize(new
         {
-            client_id = clientId,
+            client_id = Config.ClientId,
             email = email,
             connection = "Username-Password-Authentication"
         }), Encoding.UTF8, "application/json");
@@ -143,18 +164,4 @@ public static class Auth0Proxy
 
         metric.Finish();
     }
-}
-
-public struct Auth0ManagementUtilConfig
-{
-    public Auth0ManagementUtilConfig(string domain, string clientId, string clientSecret)
-    {
-        Domain = domain;
-        ClientId = clientId;
-        ClientSecret = clientSecret;
-    }
-
-    public string Domain { get; }
-    public string ClientId { get; }
-    public string ClientSecret { get; }
 }

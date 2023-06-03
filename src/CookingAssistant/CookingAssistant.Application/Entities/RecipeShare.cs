@@ -10,6 +10,6 @@ public class RecipeShare : Entity
     public bool? IsAccepted { get; set; }
     public DateTime LastOpenedDate { get; set; }
 
-    public Recipe Recipe { get; set; }
-    public User User { get; set; }
+    public Recipe? Recipe { get; set; }
+    public User? User { get; set; }
 }

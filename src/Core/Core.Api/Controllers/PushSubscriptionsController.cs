@@ -22,7 +22,7 @@ public class PushSubscriptionsController : BaseController
     [HttpPost]
     public async Task<IActionResult> CreateSubscription([FromBody] PushNotificationsSubscription dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }

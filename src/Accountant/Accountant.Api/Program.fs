@@ -18,10 +18,10 @@ let private configureServices (services: IServiceCollection) =
 
     services.AddApplication() |> ignore
 
-    services.AddAuth0("https://" + settings["Auth0:Domain"] + "/", settings["Auth0:Audience"])
+    services.AddAuth0(settings)
     |> ignore
 
-    services.AddPersistence(settings["ConnectionString"]) |> ignore
+    services.AddPersistence(settings) |> ignore
 
 [<EntryPoint>]
 let main args =

@@ -1,3 +1,4 @@
+using Gateway.Models;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 
@@ -15,15 +16,20 @@ builder.Host.ConfigureAppConfiguration((context, configBuilder) =>
 
 builder.Services.AddCors(opt =>
 {
-    var toDoAssistantUrl = builder.Configuration["Urls:ToDoAssistant"];
-    var cookingAssistantUrl = builder.Configuration["Urls:CookingAssistant"];
-    var accountantUrl = builder.Configuration["Urls:Accountant"];
-    var weathermanUrl = builder.Configuration["Urls:Weatherman"];
-    var trainerUrl = builder.Configuration["Urls:Trainer"];
+    var config = builder.Configuration.Get<AppConfiguration>();
+    if (config is null)
+    {
+        throw new ArgumentNullException("App configuration is missing");
+    }
 
     opt.AddPolicy("AllowAllApps", corsBuilder =>
     {
-        corsBuilder.WithOrigins(toDoAssistantUrl, cookingAssistantUrl, accountantUrl, weathermanUrl, trainerUrl)
+        corsBuilder.WithOrigins(
+            config.Urls.ToDoAssistant,
+            config.Urls.CookingAssistant,
+            config.Urls.Accountant,
+            config.Urls.Weatherman,
+            config.Urls.Trainer)
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials() // For SignalR

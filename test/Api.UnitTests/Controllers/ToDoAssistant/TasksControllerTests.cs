@@ -1,9 +1,10 @@
 ﻿using Api.UnitTests.Builders;
 using Core.Application.Contracts;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Moq;
 using ToDoAssistant.Api.Controllers;
+using ToDoAssistant.Api.Models;
 using ToDoAssistant.Application.Contracts.Tasks;
 using ToDoAssistant.Application.Contracts.Tasks.Models;
 using Xunit;
@@ -21,8 +22,9 @@ public class TasksControllerTests
         _sut = new TasksController(
             _userIdLookupMock.Object, null, null,
             _taskServiceMock.Object,
-            null, null, null, null, null, null, null,
-            new Mock<IConfiguration>().Object)
+            null, null, null, null, null, null,
+            new Mock<IOptions<AppConfiguration>>().Object,
+            null)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };
@@ -34,7 +36,7 @@ public class TasksControllerTests
         _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
         _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
         _taskServiceMock.Setup(x => x.Get(It.IsAny<int>(), It.IsAny<int>()))
-            .Returns((TaskDto)null);
+            .Returns((TaskDto?)null);
 
         var result = _sut.Get(It.IsAny<int>());
 
@@ -47,7 +49,7 @@ public class TasksControllerTests
         _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
         _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
         _taskServiceMock.Setup(x => x.GetForUpdate(It.IsAny<int>(), It.IsAny<int>()))
-            .Returns((TaskForUpdate)null);
+            .Returns((TaskForUpdate?)null);
 
         var result = _sut.GetForUpdate(It.IsAny<int>());
 

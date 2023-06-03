@@ -21,7 +21,11 @@ public abstract class BaseController : Controller
         {
             if (!userId.HasValue)
             {
-                string auth0Id = User.Identity.Name;
+                var auth0Id = User?.Identity?.Name;
+                if (auth0Id is null)
+                {
+                    throw new InvalidOperationException($"{nameof(UserId)} invoked for non-authenticated user");
+                }
 
                 if (_userIdLookup.Contains(auth0Id))
                 {

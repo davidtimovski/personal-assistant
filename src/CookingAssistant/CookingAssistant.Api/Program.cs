@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using Cdn;
+using CookingAssistant.Api.Models;
 using CookingAssistant.Application;
-using CookingAssistant.Application.Contracts.DietaryProfiles.Models;
 using CookingAssistant.Persistence;
 using Core.Application;
 using Core.Infrastructure;
@@ -12,13 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsProduction())
 {
-    var keyVaultUri = new Uri(builder.Configuration["KeyVault:Url"]);
-    string tenantId = builder.Configuration["KeyVault:TenantId"];
-    string clientId = builder.Configuration["KeyVault:ClientId"];
-    string clientSecret = builder.Configuration["KeyVault:ClientSecret"];
-
-    builder.Host.AddKeyVault(keyVaultUri, tenantId, clientId, clientSecret);
-    builder.Services.AddDataProtectionWithCertificate(keyVaultUri, tenantId, clientId, clientSecret);
+    builder.Host.AddKeyVault();
+    builder.Services.AddDataProtectionWithCertificate(builder.Configuration);
 }
 
 builder.Services
@@ -26,31 +21,25 @@ builder.Services
     .AddCookingAssistant(builder.Configuration);
 
 builder.Services
-    .AddAuth0(
-        authority: $"https://{builder.Configuration["Auth0:Domain"]}/",
-        audience: builder.Configuration["Auth0:Audience"]
-    )
-    .AddCdn(builder.Configuration["Cloudinary:CloudName"],
-            builder.Configuration["Cloudinary:ApiKey"],
-            builder.Configuration["Cloudinary:ApiSecret"],
-            builder.Environment.EnvironmentName,
-            builder.Configuration["Cloudinary:DefaultImageUris:Profile"],
-            builder.Configuration["Cloudinary:DefaultImageUris:Recipe"])
-    .AddSender();
+    .AddAuth0(builder.Configuration)
+    .AddCdn(builder.Configuration, builder.Environment.EnvironmentName)
+    .AddSender(builder.Configuration);
 
-var connectionString = builder.Configuration["ConnectionString"];
 builder.Services
-    .AddPersistence(connectionString)
-    .AddCookingAssistantPersistence(connectionString);
+    .AddPersistence(builder.Configuration)
+    .AddCookingAssistantPersistence(builder.Configuration);
 
 builder.Services
     .AddLocalization(opt => opt.ResourcesPath = "Resources");
 
 builder.Services.AddControllers();
 builder.Services.Configure<RouteOptions>(opt => opt.LowercaseUrls = true);
-builder.Services.Configure<DailyIntakeReference>(builder.Configuration.GetSection("DietaryProfile:ReferenceDailyIntake"));
 
 builder.Services.AddHealthChecks();
+
+builder.Services.AddOptions<AppConfiguration>()
+    .Bind(builder.Configuration)
+    .ValidateDataAnnotations();
 
 var app = builder.Build();
 

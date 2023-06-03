@@ -1,20 +1,20 @@
 version: '3.4'
 
 services:
-  account:
+  personalassistant-web:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
-      - EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
-      - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
+      - RabbitMQ__EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
+      - RabbitMQ__EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
+      - RabbitMQ__EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
       - AdminEmail=${ADMIN_EMAIL}
       - Auth0__ClientSecret=${AUTH0_CLIENT_SECRET}
       - Cloudinary__ApiKey=${CLOUDINARY_API_KEY}
       - Cloudinary__ApiSecret=${CLOUDINARY_API_SECRET}
       - PORT=80
     volumes:
-      - ./src/Core/Account.Web/storage:/app/storage:z
+      - ./src/Core/PersonalAssistant.Web/storage:/app/storage:z
     ports:
       - "5000:80"
 
@@ -44,9 +44,9 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
-      - EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
-      - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
+      - RabbitMQ__EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
+      - RabbitMQ__EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
+      - RabbitMQ__EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
       - PORT=80
     volumes:
       - ./src/ToDoAssistant/ToDoAssistant.Api/storage:/app/storage:z
@@ -57,9 +57,9 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
-      - EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
-      - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
+      - RabbitMQ__EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
+      - RabbitMQ__EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
+      - RabbitMQ__EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
       - Cloudinary__ApiKey=${CLOUDINARY_API_KEY}
       - Cloudinary__ApiSecret=${CLOUDINARY_API_SECRET}
       - PORT=80

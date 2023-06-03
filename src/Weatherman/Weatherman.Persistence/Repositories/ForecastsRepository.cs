@@ -42,7 +42,8 @@ public class ForecastsRepository : BaseRepository, IForecastsRepository
     {
         var metric = metricsSpan.StartChild($"{nameof(ForecastsRepository)}.{nameof(UpdateAsync)}");
 
-        Forecast dbForecast = EFContext.Forecasts.Find(id);
+        Forecast dbForecast = EFContext.Forecasts.First(x => x.Id == id);
+
         dbForecast.LastUpdate = lastUpdate;
         dbForecast.Data = data;
         await EFContext.SaveChangesAsync();

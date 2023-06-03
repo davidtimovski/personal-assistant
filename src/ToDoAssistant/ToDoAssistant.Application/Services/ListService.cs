@@ -133,13 +133,13 @@ public class ListService : IListService
         }
     }
 
-    public EditListDto GetForEdit(int id, int userId, ISpan metricsSpan)
+    public EditListDto? GetForEdit(int id, int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(GetForEdit)}");
 
         try
         {
-            ToDoList list = _listsRepository.GetWithShares(id, userId, metric);
+            ToDoList? list = _listsRepository.GetWithShares(id, userId, metric);
 
             var result = _mapper.Map<EditListDto>(list, opts => { opts.Items["UserId"] = userId; });
 
@@ -156,14 +156,14 @@ public class ListService : IListService
         }
     }
 
-    public ListWithShares GetWithShares(int id, int userId, ISpan metricsSpan)
+    public ListWithShares? GetWithShares(int id, int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(GetWithShares)}");
 
         try
         {
-            ToDoList list = _listsRepository.GetWithOwner(id, userId, metric);
-            if (list == null)
+            ToDoList? list = _listsRepository.GetWithOwner(id, userId, metric);
+            if (list is null)
             {
                 return null;
             }

@@ -4,14 +4,14 @@ An ecosystem of PWAs that cooperate with each other to provide unique functional
 
 [https://personalassistant.site](https://personalassistant.site)
 
-[![alt text](./src/Web/Clients/to-do-assistant2/static/images/icons/app-icon-x96.png)](https://personalassistant.site/home/to-do-assistant)
-[![alt text](./src/Web/Clients/accountant2/static/images/icons/app-icon-x96.png)](https://personalassistant.site/home/accountant)
-[![alt text](./src/Web/Clients/weatherman/static/images/icons/app-icon-x96.png)](https://personalassistant.site/home/weatherman)
-[![alt text](./src/Web/Clients/cooking-assistant/src/static/images/icons/app-icon-x96.png)](https://personalassistant.site/home/cooking-assistant)
+[![alt text](./src/ToDoAssistant/to-do-assistant2/static/images/icons/app-icon-x96.png)](https://personalassistant.site/home/to-do-assistant)
+[![alt text](./src/Accountant/accountant2/static/images/icons/app-icon-x96.png)](https://personalassistant.site/home/accountant)
+[![alt text](./src/Weatherman/weatherman/static/images/icons/app-icon-x96.png)](https://personalassistant.site/home/weatherman)
+[![alt text](./src/CookingAssistant/cooking-assistant/src/static/images/icons/app-icon-x96.png)](https://personalassistant.site/home/cooking-assistant)
 
 ## Apps
 
-#### To Do Assistant
+### To Do Assistant
 
 - Create lists and tasks
   - Delete tasks upon completion
@@ -27,7 +27,7 @@ An ecosystem of PWAs that cooperate with each other to provide unique functional
 - Archive unused lists
 - Easily create multiple tasks from text
 
-#### Accountant
+### Accountant
 
 - Create expense categories
 - Make deposits and withdrawals
@@ -44,7 +44,7 @@ An ecosystem of PWAs that cooperate with each other to provide unique functional
 - Offline mode
 - Supports 168 currencies
 
-#### Cooking Assistant (back in development)
+### Cooking Assistant (back in development)
 
 - Create recipes
 - Share recipes with other users
@@ -54,7 +54,7 @@ An ecosystem of PWAs that cooperate with each other to provide unique functional
 - See the nutrition and cost of recipes
 - Create a dietary profile and track your daily nutrient intake
 
-#### Weatherman
+### Weatherman
 
 - Be aware of the weather
 

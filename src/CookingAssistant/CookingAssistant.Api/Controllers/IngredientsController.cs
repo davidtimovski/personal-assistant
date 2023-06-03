@@ -47,8 +47,8 @@ public class IngredientsController : BaseController
     [HttpGet("{id}/update")]
     public IActionResult GetForUpdate(int id)
     {
-        EditIngredient editIngredientDto = _ingredientService.GetForUpdate(id, UserId);
-        if (editIngredientDto == null)
+        EditIngredient? editIngredientDto = _ingredientService.GetForUpdate(id, UserId);
+        if (editIngredientDto is null)
         {
             return NotFound();
         }
@@ -59,8 +59,8 @@ public class IngredientsController : BaseController
     [HttpGet("{id}/public")]
     public IActionResult GetPublic(int id)
     {
-        ViewIngredient viewIngredientDto = _ingredientService.GetPublic(id, UserId);
-        if (viewIngredientDto == null)
+        ViewIngredient? viewIngredientDto = _ingredientService.GetPublic(id, UserId);
+        if (viewIngredientDto is null)
         {
             return NotFound();
         }
@@ -124,7 +124,7 @@ public class IngredientsController : BaseController
     [HttpPut]
     public async Task<IActionResult> Update([FromBody] UpdateIngredient dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -139,7 +139,7 @@ public class IngredientsController : BaseController
     [HttpPut("public")]
     public async Task<IActionResult> UpdatePublic([FromBody] UpdatePublicIngredient dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
