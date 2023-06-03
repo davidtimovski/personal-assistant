@@ -1,9 +1,5 @@
 ﻿using System.Runtime.Serialization;
 using System.Text.Json;
-using Account.Web.Models;
-using Account.Web.Services;
-using Account.Web.ViewModels.Account;
-using Account.Web.ViewModels.Home;
 using Api.Common;
 using Auth0.AspNetCore.Authentication;
 using CookingAssistant.Application.Contracts.Recipes;
@@ -17,11 +13,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Microsoft.FSharp.Core;
+using PersonalAssistant.Web.Models;
+using PersonalAssistant.Web.Services;
+using PersonalAssistant.Web.ViewModels.Account;
+using PersonalAssistant.Web.ViewModels.Home;
 using Sentry;
 using ToDoAssistant.Application.Contracts.Lists;
 using static Accountant.Persistence.Fs.AccountsRepository;
 
-namespace Account.Web.Controllers;
+namespace PersonalAssistant.Web.Controllers;
 
 [Authorize]
 public class AccountController : BaseController
@@ -160,7 +160,7 @@ public class AccountController : BaseController
 
     [HttpGet]
     [AllowAnonymous]
-    public IActionResult Register(string returnUrl)
+    public IActionResult Register(string? returnUrl)
     {
         if (User?.Identity?.IsAuthenticated == true)
         {

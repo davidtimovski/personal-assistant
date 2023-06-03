@@ -1,12 +1,12 @@
 version: '3.4'
 
 services:
-  account:
-    image: personalassistant-account:latest
-    container_name: personalassistant-account
+  personalassistant-web:
+    image: personalassistant-web:latest
+    container_name: personalassistant-web
     build:
       context: .
-      dockerfile: src/Core/Account.Web/Dockerfile
+      dockerfile: src/Core/PersonalAssistant.Web/Dockerfile
     depends_on:
       - postgres
       - rabbitmq

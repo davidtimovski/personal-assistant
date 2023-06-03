@@ -47,7 +47,7 @@ public class IngredientsController : BaseController
     [HttpGet("{id}/update")]
     public IActionResult GetForUpdate(int id)
     {
-        EditIngredient editIngredientDto = _ingredientService.GetForUpdate(id, UserId);
+        EditIngredient? editIngredientDto = _ingredientService.GetForUpdate(id, UserId);
         if (editIngredientDto is null)
         {
             return NotFound();
@@ -59,7 +59,7 @@ public class IngredientsController : BaseController
     [HttpGet("{id}/public")]
     public IActionResult GetPublic(int id)
     {
-        ViewIngredient viewIngredientDto = _ingredientService.GetPublic(id, UserId);
+        ViewIngredient? viewIngredientDto = _ingredientService.GetPublic(id, UserId);
         if (viewIngredientDto is null)
         {
             return NotFound();

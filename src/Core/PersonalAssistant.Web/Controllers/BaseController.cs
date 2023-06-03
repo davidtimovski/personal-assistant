@@ -2,7 +2,7 @@
 using Core.Application.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Account.Web.Controllers;
+namespace PersonalAssistant.Web.Controllers;
 
 public abstract class BaseController : Controller
 {

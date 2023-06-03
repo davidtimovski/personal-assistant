@@ -1,7 +1,5 @@
 ﻿using System.Globalization;
 using System.Reflection;
-using Account.Web.Models;
-using Account.Web.Services;
 using Auth0.AspNetCore.Authentication;
 using Cdn;
 using CookingAssistant.Application;
@@ -15,6 +13,8 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
+using PersonalAssistant.Web.Models;
+using PersonalAssistant.Web.Services;
 using ToDoAssistant.Application;
 using ToDoAssistant.Persistence;
 

@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace Account.Web.ViewModels.Account;
+namespace PersonalAssistant.Web.ViewModels.Account;
 
 public class ViewProfileViewModel
 {

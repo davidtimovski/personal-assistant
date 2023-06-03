@@ -3,7 +3,7 @@ using Core.Application.Contracts;
 using FluentValidation;
 using Microsoft.Extensions.Localization;
 
-namespace Account.Web.ViewModels.Account;
+namespace PersonalAssistant.Web.ViewModels.Account;
 
 public class RegisterViewModel
 {

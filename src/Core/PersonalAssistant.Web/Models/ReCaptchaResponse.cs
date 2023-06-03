@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Account.Web.Models;
+namespace PersonalAssistant.Web.Models;
 
 public class ReCaptchaResponse
 {

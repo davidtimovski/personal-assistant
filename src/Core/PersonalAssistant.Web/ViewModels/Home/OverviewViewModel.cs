@@ -1,4 +1,4 @@
-﻿namespace Account.Web.ViewModels.Home;
+﻿namespace PersonalAssistant.Web.ViewModels.Home;
 
 public enum OverviewAlert
 {

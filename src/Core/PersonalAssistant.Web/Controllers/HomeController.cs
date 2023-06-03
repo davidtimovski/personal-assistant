@@ -1,13 +1,13 @@
 ﻿using System.Globalization;
-using Account.Web.Models;
-using Account.Web.ViewModels.Home;
 using Core.Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using PersonalAssistant.Web.Models;
+using PersonalAssistant.Web.ViewModels.Home;
 
-namespace Account.Web.Controllers;
+namespace PersonalAssistant.Web.Controllers;
 
 public class HomeController : BaseController
 {

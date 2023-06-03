@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Core.Infrastructure.Configuration;
 
-namespace Account.Web.Models;
+namespace PersonalAssistant.Web.Models;
 
 public class AppConfiguration
 {

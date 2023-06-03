@@ -29,7 +29,7 @@ public class IngredientsControllerTests
         _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
         _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
         _ingredientServiceMock.Setup(x => x.GetForUpdate(It.IsAny<int>(), It.IsAny<int>()))
-            .Returns((EditIngredient)null);
+            .Returns((EditIngredient?)null);
 
         var result = _sut.GetForUpdate(It.IsAny<int>());
 

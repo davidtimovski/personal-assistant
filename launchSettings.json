@@ -4,7 +4,7 @@
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "serviceActions": {
-        "account": "StartDebugging",
+        "personalassistant-web": "StartDebugging",
         "accountant-api": "StartDebugging",
         "cooking-api": "StartDebugging",
         "core-api": "StartDebugging",
@@ -17,11 +17,11 @@
         "weatherman-api": "StartDebugging"
       }
     },
-    "Account.Web": {
+    "PersonalAssistant.Web": {
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "serviceActions": {
-        "account": "StartDebugging",
+        "personalassistant-web": "StartDebugging",
         "accountant-api": "DoNotStart",
         "cooking-api": "DoNotStart",
         "core-api": "DoNotStart",
@@ -38,7 +38,7 @@
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "serviceActions": {
-        "account": "StartDebugging",
+        "personalassistant-web": "StartDebugging",
         "accountant-api": "StartDebugging",
         "cooking-api": "DoNotStart",
         "core-api": "StartWithoutDebugging",
@@ -55,7 +55,7 @@
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "serviceActions": {
-        "account": "StartDebugging",
+        "personalassistant-web": "StartDebugging",
         "accountant-api": "DoNotStart",
         "cooking-api": "DoNotStart",
         "core-api": "StartWithoutDebugging",
@@ -72,7 +72,7 @@
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "serviceActions": {
-        "account": "StartDebugging",
+        "personalassistant-web": "StartDebugging",
         "accountant-api": "DoNotStart",
         "cooking-api": "DoNotStart",
         "core-api": "StartWithoutDebugging",
@@ -89,7 +89,7 @@
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "serviceActions": {
-        "account": "StartDebugging",
+        "personalassistant-web": "StartDebugging",
         "accountant-api": "DoNotStart",
         "cooking-api": "DoNotStart",
         "core-api": "StartWithoutDebugging",
@@ -106,7 +106,7 @@
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "serviceActions": {
-        "account": "DoNotStart",
+        "personalassistant-web": "DoNotStart",
         "accountant-api": "DoNotStart",
         "cooking-api": "DoNotStart",
         "core-api": "DoNotStart",

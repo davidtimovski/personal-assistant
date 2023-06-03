@@ -138,7 +138,7 @@ public class DietaryProfileService : IDietaryProfileService
                 short servingSize = recipeIngredient.Ingredient.ServingSize;
                 bool servingSizeIsOneUnit = recipeIngredient.Ingredient.ServingSizeIsOneUnit;
                 float amount = recipeIngredient.Amount.Value;
-                string unit = recipeIngredient.Unit;
+                string? unit = recipeIngredient.Unit;
                 byte servings = recipe.Servings;
 
                 if (recipeIngredient.Ingredient.Calories.HasValue)
@@ -212,7 +212,7 @@ public class DietaryProfileService : IDietaryProfileService
             }
 
             RecommendedIntake? intake = null;
-            DietaryProfile dietaryProfile = recipe.User.DietaryProfile;
+            DietaryProfile? dietaryProfile = recipe.User?.DietaryProfile;
 
             if (dietaryProfile != null)
             {

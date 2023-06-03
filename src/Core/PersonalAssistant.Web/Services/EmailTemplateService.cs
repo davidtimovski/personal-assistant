@@ -1,12 +1,12 @@
 ﻿using System.Reflection;
 using System.Text;
-using Account.Web.Models;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models.Sender;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using PersonalAssistant.Web.Models;
 
-namespace Account.Web.Services;
+namespace PersonalAssistant.Web.Services;
 
 public interface IEmailTemplateService
 {
