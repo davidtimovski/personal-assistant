@@ -1,4 +1,5 @@
-﻿using CookingAssistant.Application.Contracts.DietaryProfiles;
+﻿using System.Collections.Generic;
+using CookingAssistant.Application.Contracts.DietaryProfiles;
 using CookingAssistant.Application.Contracts.DietaryProfiles.Models;
 using Core.Application.Contracts;
 using FluentValidation;
@@ -30,15 +31,14 @@ public class DietaryProfilesController : BaseController
     [HttpGet]
     public IActionResult Get()
     {
-        EditDietaryProfile dto = _dietaryProfileService.Get(UserId);
-
-        return Ok(dto);
+        var dietaryProfile = _dietaryProfileService.Get(UserId);
+        return Ok(dietaryProfile);
     }
 
     [HttpPost]
     public IActionResult GetDailyIntake([FromBody] GetRecommendedDailyIntake dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }
@@ -51,7 +51,7 @@ public class DietaryProfilesController : BaseController
     [HttpPut]
     public async Task<IActionResult> CreateOrUpdate([FromBody] UpdateDietaryProfile dto)
     {
-        if (dto == null)
+        if (dto is null)
         {
             return BadRequest();
         }

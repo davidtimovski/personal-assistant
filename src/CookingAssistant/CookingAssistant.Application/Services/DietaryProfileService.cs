@@ -37,12 +37,12 @@ public class DietaryProfileService : IDietaryProfileService
         _logger = logger;
     }
 
-    public EditDietaryProfile Get(int userId)
+    public EditDietaryProfile? Get(int userId)
     {
         try
         {
-            DietaryProfile profile = _dietaryProfilesRepository.Get(userId);
-            if (profile == null)
+            var profile = _dietaryProfilesRepository.Get(userId);
+            if (profile is null)
             {
                 return null;
             }
@@ -67,7 +67,7 @@ public class DietaryProfileService : IDietaryProfileService
         {
             IEnumerable<DailyIntakeAgeGroup> intakeByGender = model.Gender == "Male" ? _dailyIntakeRef.Male : _dailyIntakeRef.Female;
             short age = model.GetAge();
-            RecommendedIntake intake = intakeByGender.FirstOrDefault(x => age >= x.AgeFrom && age <= x.AgeTo).RecommendedIntake;
+            RecommendedIntake intake = intakeByGender.First(x => age >= x.AgeFrom && age <= x.AgeTo).RecommendedIntake;
 
             // Find height
             float height = 0;
@@ -211,13 +211,13 @@ public class DietaryProfileService : IDietaryProfileService
                 }
             }
 
-            RecommendedIntake intake = null;
+            RecommendedIntake? intake = null;
             DietaryProfile dietaryProfile = recipe.User.DietaryProfile;
 
             if (dietaryProfile != null)
             {
                 IEnumerable<DailyIntakeAgeGroup> intakeByGender = dietaryProfile.Gender == "Male" ? _dailyIntakeRef.Male : _dailyIntakeRef.Female;
-                intake = intakeByGender.FirstOrDefault(x => dietaryProfile.PersonAge >= x.AgeFrom && dietaryProfile.PersonAge <= x.AgeTo).RecommendedIntake;
+                intake = intakeByGender.First(x => dietaryProfile.PersonAge >= x.AgeFrom && dietaryProfile.PersonAge <= x.AgeTo).RecommendedIntake;
             }
 
             if (nutritionSummary.Calories.HasValue)
@@ -478,7 +478,7 @@ public class DietaryProfileService : IDietaryProfileService
         try
         {
             IEnumerable<DailyIntakeAgeGroup> intakeByGender = profile.Gender == "Male" ? _dailyIntakeRef.Male : _dailyIntakeRef.Female;
-            RecommendedIntake intake = intakeByGender.FirstOrDefault(x => profile.PersonAge >= x.AgeFrom && profile.PersonAge <= x.AgeTo).RecommendedIntake;
+            RecommendedIntake intake = intakeByGender.First(x => profile.PersonAge >= x.AgeFrom && profile.PersonAge <= x.AgeTo).RecommendedIntake;
 
             var dailyIntake = new DailyIntake
             {

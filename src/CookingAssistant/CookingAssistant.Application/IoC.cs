@@ -20,6 +20,9 @@ public static class IoC
     {
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
+        services.AddOptions<DailyIntakeReference>()
+            .Bind(configuration.GetSection("DietaryProfile:ReferenceDailyIntake"));
+
         services.AddTransient<IConversion, Conversion>();
 
         services.AddTransient<IValidator<CreateRecipe>, CreateRecipeValidator>();

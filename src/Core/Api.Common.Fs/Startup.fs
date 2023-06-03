@@ -16,12 +16,7 @@ open Microsoft.Extensions.Logging
 
 let private addDataProtection (isProduction: bool) (services: IServiceCollection) (settings: IConfiguration) =
     if isProduction then
-        let keyVaultUri = new Uri(settings["KeyVault:Url"])
-        let tenantId = settings["KeyVault:TenantId"]
-        let clientId = settings["KeyVault:ClientId"]
-        let clientSecret = settings["KeyVault:ClientSecret"]
-
-        services.AddDataProtectionWithCertificate(keyVaultUri, tenantId, clientId, clientSecret)
+        services.AddDataProtectionWithCertificate(settings)
         |> ignore
 
 let private errorHandler (ex: Exception) (logger: ILogger) =
@@ -44,13 +39,9 @@ let configureBuilder (builder: WebApplicationBuilder) (appName: string) =
 
     match builder.Environment.IsProduction() with
     | true ->
-        let keyVaultUri = new Uri(builder.Configuration["KeyVault:Url"])
-        let tenantId = builder.Configuration["KeyVault:TenantId"]
-        let clientId = builder.Configuration["KeyVault:ClientId"]
-        let clientSecret = builder.Configuration["KeyVault:ClientSecret"]
-        builder.Host.AddKeyVault(keyVaultUri, tenantId, clientId, clientSecret) |> ignore
+        builder.Host.AddKeyVault() |> ignore
 
-        builder.Host.AddSentryLogging(builder.Configuration[$"{appName}:Sentry:Dsn"], HashSet<string>(["GET /health"])) |> ignore
+        builder.Host.AddSentryLogging(builder.Configuration, appName, HashSet<string>(["GET /health"])) |> ignore
     | false ->
         builder.Host.ConfigureLogging(fun (loggingBuilder: ILoggingBuilder) ->
             loggingBuilder.AddConsole().AddDebug() |> ignore)

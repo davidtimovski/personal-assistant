@@ -10,7 +10,7 @@ public abstract class BaseRepository
 
     protected BaseRepository(CoreContext efContext)
     {
-        _connectionString = efContext.Database.GetConnectionString();
+        _connectionString = efContext.Database.GetConnectionString() ?? throw new ArgumentNullException("Connection string missnig");
         EFContext = efContext;
     }
 

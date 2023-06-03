@@ -3,5 +3,5 @@
 public class CurrencyRates
 {
     public DateTime Date { get; set; }
-    public string Rates { get; set; }
+    public string Rates { get; set; } = null!;
 }

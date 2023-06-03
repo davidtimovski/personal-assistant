@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+	<Import Project="..\..\..\PersonalAssistant.Fs.targets" />
+
 	<PropertyGroup>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
-
-	<Import Project="..\..\..\PersonalAssistant.Fs.targets" />
 
 	<ItemGroup>
 		<Compile Include="Models.fs" />

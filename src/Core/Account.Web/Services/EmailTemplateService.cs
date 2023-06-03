@@ -1,8 +1,10 @@
 ﻿using System.Reflection;
 using System.Text;
+using Account.Web.Models;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models.Sender;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 
 namespace Account.Web.Services;
 
@@ -16,18 +18,18 @@ public class EmailTemplateService : IEmailTemplateService
     private readonly ISenderService _senderService;
     private readonly IWebHostEnvironment _env;
     private readonly IStringLocalizer<EmailTemplateService> _localizer;
-    private readonly string _adminEmail;
+    private readonly AppConfiguration _config;
 
     public EmailTemplateService(
         ISenderService senderService,
         IWebHostEnvironment env,
-        IConfiguration configuration,
+        IOptions<AppConfiguration> config,
         IStringLocalizer<EmailTemplateService> localizer)
     {
         _senderService = senderService;
         _env = env;
         _localizer = localizer;
-        _adminEmail = configuration["AdminEmail"];
+        _config = config.Value;
     }
 
     public async Task EnqueueNewRegistrationEmailAsync(string newUserName, string newUserEmail)
@@ -49,7 +51,7 @@ public class EmailTemplateService : IEmailTemplateService
             .Replace("#NAME#", newUserName, StringComparison.Ordinal)
             .Replace("#EMAIL#", newUserEmail, StringComparison.Ordinal);
 
-        var email = new Email(_adminEmail, "Admin", subject, bodyText, bodyHtml);
+        var email = new Email(_config.AdminEmail, "Admin", subject, bodyText, bodyHtml);
 
         _senderService.Enqueue(email);
     }
@@ -57,7 +59,16 @@ public class EmailTemplateService : IEmailTemplateService
     private static async Task<string> GetTemplateContentsAsync(string templateName, string language)
     {
         var assembly = Assembly.GetEntryAssembly();
+        if (assembly is null)
+        {
+            throw new Exception("Could not get entry assembly");
+        }
+
         var resourceStream = assembly.GetManifestResourceStream($"Account.Resources.EmailTemplates.{language.Replace('-', '_')}.{templateName}");
+        if (resourceStream is null)
+        {
+            throw new Exception("Could not get manifest resource stream");
+        }
 
         using var reader = new StreamReader(resourceStream, Encoding.UTF8);
         return await reader.ReadToEndAsync();

@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Runtime.Serialization;
+using System.Text.Json;
 using Account.Web.Models;
 using Account.Web.Services;
 using Account.Web.ViewModels.Account;
@@ -14,6 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using Microsoft.FSharp.Core;
 using Sentry;
 using ToDoAssistant.Application.Contracts.Lists;
@@ -31,9 +33,9 @@ public class AccountController : BaseController
     private readonly IRecipeService _recipeService;
     private readonly ICdnService _cdnService;
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly IConfiguration _configuration;
     private readonly IStringLocalizer<AccountController> _localizer;
     private readonly IWebHostEnvironment _webHostEnvironment;
+    private readonly AppConfiguration _config;
     private readonly ILogger<AccountController> _logger;
 
     public AccountController(
@@ -45,9 +47,9 @@ public class AccountController : BaseController
         IRecipeService recipeService,
         ICdnService cdnService,
         IHttpClientFactory httpClientFactory,
-        IConfiguration configuration,
         IStringLocalizer<AccountController> localizer,
         IWebHostEnvironment webHostEnvironment,
+        IOptions<AppConfiguration> config,
         ILogger<AccountController> logger) : base(userIdLookup, usersRepository)
     {
         _usersRepository = usersRepository;
@@ -57,9 +59,9 @@ public class AccountController : BaseController
         _recipeService = recipeService;
         _cdnService = cdnService;
         _httpClientFactory = httpClientFactory;
-        _configuration = configuration;
         _localizer = localizer;
         _webHostEnvironment = webHostEnvironment;
+        _config = config.Value;
         _logger = logger;
     }
 
@@ -71,7 +73,7 @@ public class AccountController : BaseController
         // Note that the resulting absolute Uri must be added to the
         // **Allowed Callback URLs** settings for the app.
         var authenticationProperties = new LoginAuthenticationPropertiesBuilder()
-            .WithRedirectUri(_configuration["Urls:Account"])
+            .WithRedirectUri(_config.Urls.Account)
             .Build();
 
         await HttpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
@@ -89,7 +91,7 @@ public class AccountController : BaseController
 
         var viewModel = new ResetPasswordViewModel();
 
-        if (User?.Identity.IsAuthenticated == true)
+        if (User?.Identity?.IsAuthenticated == true)
         {
             using var httpClient = await InitializeAuth0ClientAsync(tr);
 
@@ -122,7 +124,7 @@ public class AccountController : BaseController
         {
             using var httpClient = await InitializeAuth0ClientAsync(tr);
 
-            await Auth0Proxy.ResetPasswordAsync(httpClient, _configuration["Auth0:ClientId"], model.Email, tr);
+            await Auth0Proxy.ResetPasswordAsync(httpClient, model.Email, tr);
         }
         catch (Exception ex)
         {
@@ -149,7 +151,7 @@ public class AccountController : BaseController
            // Indicate here where Auth0 should redirect the user after a logout.
            // Note that the resulting absolute Uri must be added to the
            // **Allowed Logout URLs** settings for the app.
-           .WithRedirectUri(_configuration["Urls:Account"] + returnUrlSlug)
+           .WithRedirectUri(_config.Urls.Account + returnUrlSlug)
            .Build();
 
         await HttpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
@@ -160,7 +162,7 @@ public class AccountController : BaseController
     [AllowAnonymous]
     public IActionResult Register(string returnUrl)
     {
-        if (User?.Identity.IsAuthenticated == true)
+        if (User?.Identity?.IsAuthenticated == true)
         {
             return RedirectToAction(nameof(HomeController.Overview), "Home");
         }
@@ -238,15 +240,22 @@ public class AccountController : BaseController
             $"{nameof(AccountController)}.{nameof(VerifyReCaptcha)}"
         );
 
-        using var content = new FormUrlEncodedContent(new[]
+        using var payload = new FormUrlEncodedContent(new[]
         {
-            new KeyValuePair<string, string>("secret", _configuration["Account:ReCaptchaSecret"]),
+            new KeyValuePair<string, string>("secret", _config.Account.ReCaptchaSecret),
             new KeyValuePair<string, string>("response", model.Token)
         });
 
         using HttpClient httpClient = _httpClientFactory.CreateClient();
-        using var result = await httpClient.PostAsync(new Uri(_configuration["ReCaptchaVerificationUrl"]), content);
-        var response = JsonSerializer.Deserialize<ReCaptchaResponse>(await result.Content.ReadAsStringAsync());
+        using var result = await httpClient.PostAsync(new Uri(_config.ReCaptchaVerificationUrl), payload);
+
+        var content = await result.Content.ReadAsStringAsync();
+
+        var response = JsonSerializer.Deserialize<ReCaptchaResponse>(content);
+        if (response is null)
+        {
+            throw new SerializationException($"Could not deserialize {nameof(ReCaptchaResponse)} from content: {content}");
+        }
 
         tr.Finish();
 
@@ -320,15 +329,14 @@ public class AccountController : BaseController
         var authUser = await Auth0Proxy.GetUserAsync(httpClient, AuthId, tr);
         var user = _userService.Get(UserId);
 
-        var viewModel = new ViewProfileViewModel
-        {
-            Name = authUser.name,
-            Language = user.Language,
-            Culture = user.Culture,
-            ImageUri = user.ImageUri,
-            DefaultImageUri = _cdnService.GetDefaultProfileImageUri(),
-            BaseUrl = _configuration["Urls:Account"]
-        };
+        var viewModel = new ViewProfileViewModel(
+            authUser.name,
+            user.Language,
+            user.Culture,
+            user.ImageUri,
+            _cdnService.GetDefaultProfileImageUri(),
+            _config.Urls.Account
+        );
 
         tr.Finish();
 
@@ -343,14 +351,14 @@ public class AccountController : BaseController
         if (!ModelState.IsValid)
         {
             return View(new ViewProfileViewModel
-            {
-                Name = model.Name,
-                Language = model.Language,
-                Culture = model.Culture,
-                ImageUri = model.ImageUri,
-                DefaultImageUri = _cdnService.GetDefaultProfileImageUri(),
-                BaseUrl = _configuration["Urls:Account"]
-            });
+            (
+                model.Name,
+                model.Language,
+                model.Culture,
+                model.ImageUri,
+                _cdnService.GetDefaultProfileImageUri(),
+                _config.Urls.Account
+            ));
         }
 
         var tr = Metrics.StartTransactionWithUser(
@@ -365,7 +373,7 @@ public class AccountController : BaseController
 
             await Auth0Proxy.UpdateNameAsync(httpClient, AuthId, model.Name, tr);
 
-            var imageUri = string.IsNullOrEmpty(model.ImageUri) ? null : model.ImageUri;
+            var imageUri = string.IsNullOrEmpty(model.ImageUri) ? _cdnService.GetDefaultProfileImageUri() : model.ImageUri;
             await _userService.UpdateProfileAsync(UserId, model.Name, model.Language, model.Culture, imageUri, tr);
         }
         catch (Exception ex)
@@ -377,14 +385,14 @@ public class AccountController : BaseController
             tr.Finish();
 
             return View(new ViewProfileViewModel
-            {
-                Name = model.Name,
-                Language = model.Language,
-                Culture = model.Culture,
-                ImageUri = model.ImageUri,
-                DefaultImageUri = _cdnService.GetDefaultProfileImageUri(),
-                BaseUrl = _configuration["Urls:Account"]
-            });
+            (
+                model.Name,
+                model.Language,
+                model.Culture,
+                model.ImageUri,
+                _cdnService.GetDefaultProfileImageUri(),
+                _config.Urls.Account
+            ));
         }
 
         var user = _userService.Get(UserId);
@@ -484,8 +492,7 @@ public class AccountController : BaseController
     {
         var httpClient = _httpClientFactory.CreateClient();
 
-        var config = new Auth0ManagementUtilConfig(_configuration["Auth0:Domain"], _configuration["Auth0:ClientId"], _configuration["Auth0:ClientSecret"]);
-        await Auth0Proxy.InitializeAsync(httpClient, config, tr);
+        await Auth0Proxy.InitializeAsync(httpClient, _config.Auth0, tr);
 
         return httpClient;
     }
@@ -512,7 +519,7 @@ public class AccountController : BaseController
     private async Task CreateRequiredDataAsync(int userId, ISpan metricsSpan)
     {
         var now = DateTime.UtcNow;
-        await createMain(new Accountant.Persistence.Fs.Models.Account(0, userId, _localizer["MainAccountName"], true, "EUR", FSharpOption<decimal>.None, now, now), _configuration["ConnectionString"], metricsSpan);
+        await createMain(new Accountant.Persistence.Fs.Models.Account(0, userId, _localizer["MainAccountName"], true, "EUR", FSharpOption<decimal>.None, now, now), _config.ConnectionString, metricsSpan);
     }
 
     private async Task CreateSamplesAsync(int userId, ISpan metricsSpan)

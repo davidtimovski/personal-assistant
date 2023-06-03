@@ -4,12 +4,14 @@ namespace Core.Application.Contracts.Models;
 
 public class UploadTempImage
 {
-    public UploadTempImage(int userId, string localTempPath, string uploadPath, string transformationTemplate)
+    public UploadTempImage(int userId, string localTempPath, string uploadPath, string transformationTemplate, long length, string fileName)
     {
         UserId = userId;
         LocalTempPath = localTempPath;
         UploadPath = uploadPath;
         TransformationTemplate = transformationTemplate;
+        Length = length;
+        FileName = fileName;
     }
 
     public int UserId { get; set; }

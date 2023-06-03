@@ -62,7 +62,7 @@ public class UsersRepository : BaseRepository, IUsersRepository
     {
         var metric = metricsSpan.StartChild($"{nameof(UsersRepository)}.{nameof(UpdateAsync)}");
 
-        User dbUser = EFContext.Users.Find(user.Id);
+        User dbUser = EFContext.Users.First(x => x.Id == user.Id);
 
         dbUser.Name = user.Name;
         dbUser.Language = user.Language;

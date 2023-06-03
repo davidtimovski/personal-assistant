@@ -1,45 +1,44 @@
+using System.Runtime.Serialization;
 using System.Text.Json.Nodes;
 using Core.Application.Contracts;
 using Core.Application.Entities;
 using Dapper;
+using Jobs.Models;
 using Jobs.Models.Accountant;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Npgsql;
 
 namespace Jobs;
 
 public class MidnightJob
 {
-    private readonly ILogger<MidnightJob> _logger;
     private readonly ICdnService _cdnService;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IHostEnvironment _hostEnvironment;
-    private readonly string _connectionString;
-    private readonly string _currencyRatesApiKey;
+    private readonly AppConfiguration _config;
+    private readonly ILogger<MidnightJob> _logger;
 
     public MidnightJob(
-        ILogger<MidnightJob> logger,
         ICdnService cdnService,
         IHttpClientFactory httpClientFactory,
         IHostEnvironment hostEnvironment,
-        IConfiguration configuration)
+        IOptions<AppConfiguration> config,
+        ILogger<MidnightJob> logger)
     {
-        _logger = logger;
         _cdnService = cdnService;
         _httpClientFactory = httpClientFactory;
         _hostEnvironment = hostEnvironment;
-
-        _connectionString = configuration["ConnectionString"];
-        _currencyRatesApiKey = configuration["FixerApiAccessKey"];
+        _config = config.Value;
+        _logger = logger;
     }
 
     public async Task RunAsync()
     {
         var now = DateTime.UtcNow;
 
-        using var conn = new NpgsqlConnection(_connectionString);
+        using var conn = new NpgsqlConnection(_config.ConnectionString);
         conn.Open();
 
         await DeleteOldNotificationsAsync(conn, now);
@@ -342,12 +341,23 @@ public class MidnightJob
             }
 
             using HttpClient httpClient = _httpClientFactory.CreateClient("fixer");
-            using var result = await httpClient.GetAsync($"latest?access_key={_currencyRatesApiKey}");
+            using var result = await httpClient.GetAsync($"latest?access_key={_config.FixerApiAccessKey}");
 
             string jsonResponse = await result.Content.ReadAsStringAsync();
 
             var json = JsonNode.Parse(jsonResponse);
-            string ratesData = json["error"].ToJsonString();
+            if (json is null)
+            {
+                throw new SerializationException("JSON response for currency rates couldn't be deserialized");
+            }
+
+            var rates = json["rates"];
+            if (rates is null)
+            {
+                throw new SerializationException("JSON response for currency rates couldn't be deserialized");
+            }
+
+            string ratesData = rates.ToJsonString();
 
             // Save to database
             var parameters = new CurrencyRates

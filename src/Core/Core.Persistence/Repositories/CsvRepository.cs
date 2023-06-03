@@ -31,7 +31,7 @@ public class CsvRepository : BaseRepository, ICsvRepository
                 transaction.FromAccount = fromAccount ?? new AccountForExport();
                 transaction.ToAccount = toAccount ?? new AccountForExport();
 
-                if (category == null)
+                if (category is null)
                 {
                     transaction.Category = new CategoryForExport { Name = uncategorized };
                 }

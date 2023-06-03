@@ -6,11 +6,11 @@ public class DietaryProfile : Entity
 {
     public int UserId { get; set; }
     public DateTime? Birthday { get; set; }
-    public string Gender { get; set; }
+    public string? Gender { get; set; }
     public float? Height { get; set; }
     public float? Weight { get; set; }
-    public string ActivityLevel { get; set; }
-    public string Goal { get; set; }
+    public string? ActivityLevel { get; set; }
+    public string? Goal { get; set; }
     public short? CustomCalories { get; set; }
     public bool TrackCalories { get; set; }
     //public short? CustomFat { get; set; }
@@ -44,7 +44,7 @@ public class DietaryProfile : Entity
     public short? CustomMagnesium { get; set; }
     public bool TrackMagnesium { get; set; }
 
-    public User User { get; set; }
+    public User? User { get; set; }
 
     public short PersonAge
     {

@@ -15,10 +15,9 @@ let private configureServices (services: IServiceCollection) =
 
     Startup.configureServices services
 
-    services.AddAuth0("https://" + settings["Auth0:Domain"] + "/", settings["Auth0:Audience"])
-    |> ignore
+    services.AddAuth0(settings) |> ignore
 
-    services.AddPersistence(settings["ConnectionString"]) |> ignore
+    services.AddPersistence(settings) |> ignore
 
 [<EntryPoint>]
 let main args =

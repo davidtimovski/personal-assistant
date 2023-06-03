@@ -8,10 +8,10 @@ public interface IRecipeService
 {
     IEnumerable<SimpleRecipe> GetAll(int userId);
     RecipeToNotify Get(int id);
-    RecipeDto Get(int id, int userId, string currency);
-    RecipeForUpdate GetForUpdate(int id, int userId);
+    RecipeDto? Get(int id, int userId, string currency);
+    RecipeForUpdate? GetForUpdate(int id, int userId);
     RecipeForSending GetForSending(int id, int userId);
-    RecipeWithShares GetWithShares(int id, int userId);
+    RecipeWithShares? GetWithShares(int id, int userId);
     IEnumerable<ShareRecipeRequest> GetShareRequests(int userId);
     int GetPendingShareRequestsCount(int userId);
     bool CanShareWithUser(int shareWithId, int userId);
@@ -19,7 +19,7 @@ public interface IRecipeService
     int GetPendingSendRequestsCount(int userId);
     bool SendRequestExists(int id, int userId);
     bool IngredientsReviewIsRequired(int id, int userId);
-    RecipeForReview GetForReview(int id, int userId);
+    RecipeForReview? GetForReview(int id, int userId);
     IEnumerable<string> GetAllImageUris(int userId);
     bool Exists(int id, int userId);
     bool Exists(string name, int userId);

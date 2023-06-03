@@ -3,5 +3,5 @@
 public class NotificationRecipient
 {
     public int Id { get; set; }
-    public string Language { get; set; }
+    public string Language { get; set; } = null!;
 }

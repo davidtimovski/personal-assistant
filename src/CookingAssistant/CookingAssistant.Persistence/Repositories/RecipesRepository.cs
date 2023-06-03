@@ -44,7 +44,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         return conn.QueryFirstOrDefault<Recipe>("SELECT * FROM cooking.recipes WHERE id = @Id", new { Id = id });
     }
 
-    public Recipe Get(int id, int userId)
+    public Recipe? Get(int id, int userId)
     {
         using IDbConnection conn = OpenConnection();
 
@@ -104,7 +104,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         return recipe;
     }
 
-    public Recipe GetForUpdate(int id, int userId)
+    public Recipe? GetForUpdate(int id, int userId)
     {
         using IDbConnection conn = OpenConnection();
 
@@ -136,7 +136,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         return recipe;
     }
 
-    public Recipe GetWithOwner(int id, int userId)
+    public Recipe? GetWithOwner(int id, int userId)
     {
         using IDbConnection conn = OpenConnection();
 
@@ -272,13 +272,13 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         return userThatsImportingHasIngredients && recipeHasCustomIngredients;
     }
 
-    public Recipe GetForReview(int id)
+    public Recipe? GetForReview(int id)
     {
         using IDbConnection conn = OpenConnection();
 
         var recipe = conn.QueryFirstOrDefault<Recipe>("SELECT id, user_id, name, description, image_uri FROM cooking.recipes WHERE id = @Id", new { Id = id });
 
-        if (recipe == null)
+        if (recipe is null)
         {
             return null;
         }
@@ -453,11 +453,11 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         var newRecipeIngredients = recipe.RecipeIngredients.Where(x => x.IngredientId == 0).ToArray();
         foreach (var newRecipeIngredient in newRecipeIngredients)
         {
-            Ingredient existingUserIngredient = userAndPublicIngredients.FirstOrDefault(x =>
+            Ingredient? existingUserIngredient = userAndPublicIngredients.FirstOrDefault(x =>
                 x.UserId == recipe.UserId &&
                 string.Equals(x.Name, newRecipeIngredient.Ingredient.Name, StringComparison.OrdinalIgnoreCase));
 
-            if (existingUserIngredient == null)
+            if (existingUserIngredient is null)
             {
                 newRecipeIngredient.Ingredient.UserId = recipe.UserId;
                 newRecipeIngredient.Ingredient.CreatedDate = newRecipeIngredient.Ingredient.ModifiedDate = recipe.CreatedDate;
@@ -506,11 +506,11 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         var newRecipeIngredients = recipe.RecipeIngredients.Where(x => x.IngredientId == 0).ToList();
         foreach (var newRecipeIngredient in newRecipeIngredients)
         {
-            Ingredient existingUserIngredient = ownerAndPublicIngredients.FirstOrDefault(x =>
+            Ingredient? existingUserIngredient = ownerAndPublicIngredients.FirstOrDefault(x =>
                 x.UserId == dbRecipe.UserId &&
                 string.Equals(x.Name, newRecipeIngredient.Ingredient.Name, StringComparison.OrdinalIgnoreCase));
 
-            if (existingUserIngredient == null)
+            if (existingUserIngredient is null)
             {
                 newRecipeIngredient.Ingredient.UserId = dbRecipe.UserId;
                 newRecipeIngredient.Ingredient.CreatedDate = newRecipeIngredient.Ingredient.ModifiedDate = recipe.ModifiedDate;
@@ -530,7 +530,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
 
     public async Task<string> DeleteAsync(int id)
     {
-        Recipe recipe = EFContext.Recipes.Find(id);
+        Recipe recipe = EFContext.Recipes.First(x => x.Id == id);
         EFContext.Recipes.Remove(recipe);
 
         await EFContext.SaveChangesAsync();
@@ -606,7 +606,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
     {
         var now = DateTime.UtcNow;
 
-        var recipeToImport = EFContext.Recipes.Find(id);
+        var recipeToImport = EFContext.Recipes.First(x => x.Id == id);
 
         var recipe = new Recipe
         {
@@ -638,7 +638,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
             var replacement = ingredientReplacements.FirstOrDefault(x => x.Id == recipeIngredient.IngredientId);
             if (replacement == default)
             {
-                var original = EFContext.Ingredients.Find(recipeIngredient.IngredientId);
+                var original = EFContext.Ingredients.First(x => x.Id == recipeIngredient.IngredientId);
                 if (original.UserId == 1)
                 {
                     recipeIngredient.Ingredient = original;
@@ -679,7 +679,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
             else
             {
                 recipeIngredient.IngredientId = replacement.ReplacementId;
-                recipeIngredient.Ingredient = EFContext.Ingredients.Find(replacement.ReplacementId);
+                recipeIngredient.Ingredient = EFContext.Ingredients.First(x => x.Id == replacement.ReplacementId);
                 if (recipeIngredient.Ingredient.UserId == 1)
                 {
                     continue;
@@ -687,7 +687,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
 
                 if (replacement.TransferNutritionData || replacement.TransferPriceData)
                 {
-                    var original = EFContext.Ingredients.Find(recipeIngredient.IngredientId);
+                    var original = EFContext.Ingredients.First(x => x.Id == recipeIngredient.IngredientId);
 
                     if (replacement.TransferNutritionData)
                     {

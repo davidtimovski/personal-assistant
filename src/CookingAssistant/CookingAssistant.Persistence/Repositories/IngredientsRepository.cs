@@ -46,7 +46,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
         return conn.QueryFirstOrDefault<Ingredient>("SELECT * FROM cooking.ingredients WHERE id = @Id", new { Id = id });
     }
 
-    public Ingredient GetForUpdate(int id, int userId)
+    public Ingredient? GetForUpdate(int id, int userId)
     {
         using IDbConnection conn = OpenConnection();
 
@@ -55,7 +55,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
                                                                 LEFT JOIN cooking.ingredients_tasks AS it ON i.id = it.ingredient_id AND it.user_id = @UserId
                                                                 WHERE i.id = @Id AND i.user_id = @UserId", new { Id = id, UserId = userId });
 
-        if (ingredient == null)
+        if (ingredient is null)
         {
             return null;
         }
@@ -90,7 +90,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
         return ingredient;
     }
 
-    public Ingredient GetPublic(int id, int userId)
+    public Ingredient? GetPublic(int id, int userId)
     {
         using IDbConnection conn = OpenConnection();
 
@@ -106,7 +106,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
             return ingredient;
         }, new { Id = id, UserId = userId }).FirstOrDefault();
 
-        if (ingredient == null)
+        if (ingredient is null)
         {
             return null;
         }
@@ -208,7 +208,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
 
     public async Task UpdateAsync(Ingredient ingredient)
     {
-        Ingredient dbIngredient = EFContext.Ingredients.Find(ingredient.Id);
+        Ingredient dbIngredient = EFContext.Ingredients.First(x => x.Id == ingredient.Id);
 
         dbIngredient.Name = ingredient.Name;
         dbIngredient.ServingSize = ingredient.ServingSize;
@@ -236,10 +236,10 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
         dbIngredient.Currency = ingredient.Currency;
         dbIngredient.ModifiedDate = ingredient.ModifiedDate;
 
-        IngredientTask ingredientTask = EFContext.IngredientsTasks.FirstOrDefault(x => x.IngredientId == ingredient.Id && x.UserId == ingredient.UserId);
+        IngredientTask? ingredientTask = EFContext.IngredientsTasks.FirstOrDefault(x => x.IngredientId == ingredient.Id && x.UserId == ingredient.UserId);
         if (ingredient.TaskId.HasValue)
         {
-            if (ingredientTask == null)
+            if (ingredientTask is null)
             {
                 EFContext.IngredientsTasks.Add(new IngredientTask
                 {
@@ -272,10 +272,10 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
 
     public async Task UpdatePublicAsync(int id, int? taskId, int userId, DateTime createdDate)
     {
-        IngredientTask ingredientTask = EFContext.IngredientsTasks.FirstOrDefault(x => x.IngredientId == id && x.UserId == userId);
+        IngredientTask? ingredientTask = EFContext.IngredientsTasks.FirstOrDefault(x => x.IngredientId == id && x.UserId == userId);
         if (taskId.HasValue)
         {
-            if (ingredientTask == null)
+            if (ingredientTask is null)
             {
                 EFContext.IngredientsTasks.Add(new IngredientTask
                 {
@@ -308,7 +308,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
 
     public async Task DeleteAsync(int id)
     {
-        Ingredient ingredient = EFContext.Ingredients.Find(id);
+        Ingredient ingredient = EFContext.Ingredients.First(x => x.Id == id);
         EFContext.Ingredients.Remove(ingredient);
 
         await EFContext.SaveChangesAsync();
@@ -321,7 +321,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
         var recipeIngredients = EFContext.RecipesIngredients.Where(x => x.IngredientId == id && userRecipeIds.Contains(x.RecipeId));
         EFContext.RecipesIngredients.RemoveRange(recipeIngredients);
 
-        IngredientTask ingredientTask = EFContext.IngredientsTasks.FirstOrDefault(x => x.IngredientId == id && x.UserId == userId);
+        IngredientTask? ingredientTask = EFContext.IngredientsTasks.FirstOrDefault(x => x.IngredientId == id && x.UserId == userId);
         if (ingredientTask != null)
         {
             EFContext.IngredientsTasks.Remove(ingredientTask);

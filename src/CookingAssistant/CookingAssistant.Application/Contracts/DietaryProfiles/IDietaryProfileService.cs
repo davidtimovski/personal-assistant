@@ -7,7 +7,7 @@ namespace CookingAssistant.Application.Contracts.DietaryProfiles;
 
 public interface IDietaryProfileService
 {
-    EditDietaryProfile Get(int userId);
+    EditDietaryProfile? Get(int userId);
     RecommendedDailyIntake GetRecommendedDailyIntake(GetRecommendedDailyIntake model, IValidator<GetRecommendedDailyIntake> validator);
     RecipeNutritionSummary CalculateNutritionSummary(Recipe recipe);
     Task CreateOrUpdateAsync(UpdateDietaryProfile model, IValidator<UpdateDietaryProfile> validator);

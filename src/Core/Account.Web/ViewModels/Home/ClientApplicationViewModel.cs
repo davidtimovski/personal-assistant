@@ -25,7 +25,7 @@ public class ClientApplicationViewModel
     }
 
     public string Name { get; }
-    public string Url { get; }
+    public string? Url { get; }
     public string CssClass { get; }
     public ReleaseStatus ReleaseStatus { get; }
 }

@@ -1,6 +1,8 @@
-﻿using System.Text;
+﻿using System.Runtime.Serialization;
+using System.Text;
 using System.Text.Json;
 using Dapper;
+using Microsoft.Extensions.Options;
 using Npgsql;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -13,38 +15,36 @@ namespace Sender;
 
 public sealed class HostedService : IHostedService, IDisposable
 {
+    private readonly AppConfiguration _config;
+    private readonly IReadOnlyDictionary<string, VapidConfiguration> _vapidConfig;
     private readonly ILogger<HostedService> _logger;
-    private readonly IConfiguration _configuration;
 
-    private static JsonSerializerOptions PayloadSerializationOptions = new JsonSerializerOptions
+    private static JsonSerializerOptions PayloadSerializationOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
     public HostedService(
-        ILogger<HostedService> logger,
-        IConfiguration configuration)
+        IOptions<AppConfiguration> config,
+        ILogger<HostedService> logger)
     {
+        _config = config.Value;
+        _vapidConfig = new Dictionary<string, VapidConfiguration>
+        {
+            { "To Do Assistant", _config.ToDoAssistantVapid },
+            { "Cooking Assistant", _config.CookingAssistantVapid },
+        };
         _logger = logger;
-        _configuration = configuration;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
         var factory = new ConnectionFactory
         {
-            HostName = _configuration["EventBusConnection"]
+            HostName = _config.EventBusConnection,
+            UserName = _config.EventBusUserName,
+            Password = _config.EventBusPassword
         };
-
-        if (!string.IsNullOrEmpty(_configuration["EventBusUserName"]))
-        {
-            factory.UserName = _configuration["EventBusUserName"];
-        }
-
-        if (!string.IsNullOrEmpty(_configuration["EventBusPassword"]))
-        {
-            factory.Password = _configuration["EventBusPassword"];
-        }
 
         using (var connection = factory.CreateConnection())
         using (var channel = connection.CreateModel())
@@ -70,14 +70,19 @@ public sealed class HostedService : IHostedService, IDisposable
 
     private void SetupEmailQueue(IModel channel)
     {
-        async void Received(object model, BasicDeliverEventArgs ea)
+        async void Received(object? model, BasicDeliverEventArgs ea)
         {
             var body = ea.Body;
-            var message = Encoding.UTF8.GetString(body.ToArray());
-            var email = JsonSerializer.Deserialize<Email>(message);
+            var emailJson = Encoding.UTF8.GetString(body.ToArray());
 
-            var client = new SendGridClient(_configuration["SendGridApiKey"]);
-            var from = new EmailAddress(_configuration["SystemEmail"], "Personal Assistant");
+            var email = JsonSerializer.Deserialize<Email>(emailJson);
+            if (email is null)
+            {
+                throw new SerializationException("Email JSON could not be deserialized");
+            }
+
+            var client = new SendGridClient(_config.SendGridApiKey);
+            var from = new EmailAddress(_config.SystemEmail, "Personal Assistant");
             var to = new EmailAddress(email.ToAddress, email.ToName);
             var emailMessage = MailHelper.CreateSingleEmail(from, to, email.Subject, email.BodyText, email.BodyHtml);
 
@@ -102,19 +107,22 @@ public sealed class HostedService : IHostedService, IDisposable
 
     private void SetupPushNotificationQueue(IModel channel)
     {
-        async void Received(object model, BasicDeliverEventArgs ea)
+        async void Received(object? model, BasicDeliverEventArgs ea)
         {
             var body = ea.Body;
-            string message = Encoding.UTF8.GetString(body.ToArray());
-            var pushNotification = JsonSerializer.Deserialize<PushNotification>(message);
+            string notificationJson = Encoding.UTF8.GetString(body.ToArray());
 
-            using var conn = new NpgsqlConnection(_configuration["ConnectionString"]);
+            var pushNotification = JsonSerializer.Deserialize<PushNotification>(notificationJson);
+            if (pushNotification is null)
+            {
+                throw new SerializationException("Push notification JSON could not be deserialized");
+            }
+
+            using var conn = new NpgsqlConnection(_config.ConnectionString);
             conn.Open();
 
             var recipientSubs = conn.Query<Core.Application.Entities.PushSubscription>("SELECT * FROM push_subscriptions WHERE user_id = @UserId AND application = @Application",
                 new { pushNotification.UserId, pushNotification.Application });
-
-            string applicationName = pushNotification.Application.Replace(" ", string.Empty, StringComparison.Ordinal);
 
             var webPushClient = new WebPushClient();
 
@@ -123,10 +131,12 @@ public sealed class HostedService : IHostedService, IDisposable
                 foreach (var recipientSub in recipientSubs)
                 {
                     var subscription = new PushSubscription(recipientSub.Endpoint, recipientSub.P256dhKey, recipientSub.AuthKey);
+                    var appVapidConfig = _vapidConfig[pushNotification.Application];
+
                     var vapidDetails = new VapidDetails(
                         subject: "mailto:david.timovski@gmail.com",
-                        publicKey: _configuration[$"{applicationName}:Vapid:PublicKey"],
-                        privateKey: _configuration[$"{applicationName}:Vapid:PrivateKey"]);
+                        publicKey: appVapidConfig.PublicKey,
+                        privateKey: appVapidConfig.PrivateKey);
 
                     try
                     {
@@ -154,6 +164,7 @@ public sealed class HostedService : IHostedService, IDisposable
             finally
             {
                 channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                webPushClient.Dispose();
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Reflection;
+using Account.Web.Models;
 using Account.Web.Services;
 using Auth0.AspNetCore.Authentication;
 using Cdn;
@@ -12,6 +13,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using ToDoAssistant.Application;
 using ToDoAssistant.Persistence;
@@ -20,15 +22,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsProduction())
 {
-    var keyVaultUri = new Uri(builder.Configuration["KeyVault:Url"]);
-    string tenantId = builder.Configuration["KeyVault:TenantId"];
-    string clientId = builder.Configuration["KeyVault:ClientId"];
-    string clientSecret = builder.Configuration["KeyVault:ClientSecret"];
+    builder.Host.AddKeyVault();
+    builder.Services.AddDataProtectionWithCertificate(builder.Configuration);
 
-    builder.Host.AddKeyVault(keyVaultUri, tenantId, clientId, clientSecret);
-    builder.Services.AddDataProtectionWithCertificate(keyVaultUri, tenantId, clientId, clientSecret);
-
-    builder.Host.AddSentryLogging(builder.Configuration["Account:Sentry:Dsn"], new HashSet<string> { "GET /health" });
+    builder.Host.AddSentryLogging(builder.Configuration, "Account", new HashSet<string> { "GET /health" });
 }
 
 builder.Services
@@ -38,19 +35,13 @@ builder.Services
 
 builder.Services
     .AddUserIdMapper()
-    .AddCdn(builder.Configuration["Cloudinary:CloudName"],
-            builder.Configuration["Cloudinary:ApiKey"],
-            builder.Configuration["Cloudinary:ApiSecret"],
-            builder.Environment.EnvironmentName,
-            builder.Configuration["Cloudinary:DefaultImageUris:Profile"],
-            builder.Configuration["Cloudinary:DefaultImageUris:Recipe"])
-    .AddSender();
+    .AddCdn(builder.Configuration, builder.Environment.EnvironmentName)
+    .AddSender(builder.Configuration);
 
-var connectionString = builder.Configuration["ConnectionString"];
 builder.Services
-    .AddPersistence(connectionString)
-    .AddToDoAssistantPersistence(connectionString)
-    .AddCookingAssistantPersistence(connectionString);
+    .AddPersistence(builder.Configuration)
+    .AddToDoAssistantPersistence(builder.Configuration)
+    .AddCookingAssistantPersistence(builder.Configuration);
 
 builder.Services.AddHealthChecks();
 
@@ -96,6 +87,10 @@ if (builder.Environment.EnvironmentName == Environments.Development)
     builder.Services.ConfigureNonBreakingSameSiteCookies();
 }
 
+builder.Services.AddOptions<AppConfiguration>()
+    .Bind(builder.Configuration)
+    .ValidateDataAnnotations();
+
 var app = builder.Build();
 
 if (builder.Environment.EnvironmentName == Environments.Production)
@@ -123,18 +118,14 @@ app.UseRequestLocalization(new RequestLocalizationOptions
     SupportedUICultures = supportedCultures
 });
 
-var toDoAssistantUrl = builder.Configuration["Urls:ToDoAssistant"];
-var cookingAssistantUrl = builder.Configuration["Urls:CookingAssistant"];
-var accountantUrl = builder.Configuration["Urls:Accountant"];
-var weathermanUrl = builder.Configuration["Urls:Weatherman"];
-
+var appSettings = app.Services.GetRequiredService<IOptions<AppConfiguration>>();
 app.UseCors(builder =>
 {
     builder.WithOrigins(
-        toDoAssistantUrl,
-        cookingAssistantUrl,
-        accountantUrl,
-        weathermanUrl
+        appSettings.Value.Urls.ToDoAssistant,
+        appSettings.Value.Urls.CookingAssistant,
+        appSettings.Value.Urls.Accountant,
+        appSettings.Value.Urls.Weatherman
     );
     builder.WithMethods("GET");
     builder.WithHeaders("Authorization");

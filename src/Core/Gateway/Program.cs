@@ -21,6 +21,15 @@ builder.Services.AddCors(opt =>
     var weathermanUrl = builder.Configuration["Urls:Weatherman"];
     var trainerUrl = builder.Configuration["Urls:Trainer"];
 
+    if (toDoAssistantUrl == null 
+        || cookingAssistantUrl == null 
+        || accountantUrl == null 
+        || weathermanUrl == null 
+        || trainerUrl == null)
+    {
+        throw new ArgumentNullException("Missing URL configuration");
+    }
+
     opt.AddPolicy("AllowAllApps", corsBuilder =>
     {
         corsBuilder.WithOrigins(toDoAssistantUrl, cookingAssistantUrl, accountantUrl, weathermanUrl, trainerUrl)

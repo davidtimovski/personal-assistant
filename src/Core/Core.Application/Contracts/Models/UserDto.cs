@@ -6,11 +6,11 @@ namespace Core.Application.Contracts.Models;
 
 public class UserDto
 {
-    public string Email { get; set; }
-    public string Name { get; set; }
-    public string Language { get; set; }
-    public string Culture { get; set; }
-    public string ImageUri { get; set; }
+    public string Email { get; set; } = null!;
+    public string Name { get; set; } = null!;
+    public string Language { get; set; } = null!;
+    public string Culture { get; set; } = null!;
+    public string ImageUri { get; set; } = null!;
 }
 
 public class ToDoAssistantUser : UserDto, IMapFrom<User>

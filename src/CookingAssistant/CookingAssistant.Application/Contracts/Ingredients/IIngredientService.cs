@@ -6,8 +6,8 @@ namespace CookingAssistant.Application.Contracts.Ingredients;
 public interface IIngredientService
 {
     List<IngredientDto> GetUserAndUsedPublicIngredients(int userId);
-    EditIngredient GetForUpdate(int id, int userId);
-    ViewIngredient GetPublic(int id, int userId);
+    EditIngredient? GetForUpdate(int id, int userId);
+    ViewIngredient? GetPublic(int id, int userId);
     IEnumerable<IngredientSuggestion> GetUserSuggestions(int userId);
     PublicIngredientSuggestions GetPublicSuggestions();
     IEnumerable<TaskSuggestion> GetTaskSuggestions(int userId);

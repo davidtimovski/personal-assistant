@@ -86,12 +86,12 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public RecipeDto Get(int id, int userId, string currency)
+    public RecipeDto? Get(int id, int userId, string currency)
     {
         try
         {
-            Recipe recipe = _recipesRepository.Get(id, userId);
-            if (recipe == null)
+            Recipe? recipe = _recipesRepository.Get(id, userId);
+            if (recipe is null)
             {
                 return null;
             }
@@ -116,12 +116,12 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public RecipeForUpdate GetForUpdate(int id, int userId)
+    public RecipeForUpdate? GetForUpdate(int id, int userId)
     {
         try
         {
-            Recipe recipe = _recipesRepository.GetForUpdate(id, userId);
-            if (recipe == null)
+            Recipe? recipe = _recipesRepository.GetForUpdate(id, userId);
+            if (recipe is null)
             {
                 return null;
             }
@@ -140,12 +140,12 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public RecipeWithShares GetWithShares(int id, int userId)
+    public RecipeWithShares? GetWithShares(int id, int userId)
     {
         try
         {
-            Recipe recipe = _recipesRepository.GetWithOwner(id, userId);
-            if (recipe == null)
+            Recipe? recipe = _recipesRepository.GetWithOwner(id, userId);
+            if (recipe is null)
             {
                 return null;
             }
@@ -287,7 +287,7 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public RecipeForReview GetForReview(int id, int userId)
+    public RecipeForReview? GetForReview(int id, int userId)
     {
         try
         {
@@ -296,7 +296,7 @@ public class RecipeService : IRecipeService
                 return null;
             }
 
-            Recipe recipe = _recipesRepository.GetForReview(id);
+            Recipe? recipe = _recipesRepository.GetForReview(id);
 
             var result = _mapper.Map<RecipeForReview>(recipe);
 
@@ -937,7 +937,7 @@ public class RecipeService : IRecipeService
 
     private RecipeCostSummary CalculateCostSummary(Recipe recipe, string currency)
     {
-        decimal? AddPricePerAmount(decimal? currentValue, decimal priceInGrams, short productSizeGrams, bool productSizeIsOneUnit, float amount, string unit)
+        decimal? AddPricePerAmount(decimal? currentValue, decimal priceInGrams, short productSizeGrams, bool productSizeIsOneUnit, float amount, string? unit)
         {
             if (productSizeIsOneUnit)
             {
@@ -964,7 +964,7 @@ public class RecipeService : IRecipeService
                 short productSize = recipeIngredient.Ingredient.ProductSize;
                 bool productSizeIsOneUnit = recipeIngredient.Ingredient.ProductSizeIsOneUnit;
                 float amount = recipeIngredient.Amount.Value;
-                string unit = recipeIngredient.Unit;
+                string? unit = recipeIngredient.Unit;
 
                 decimal price = _currenciesRepository.Convert(recipeIngredient.Ingredient.Price.Value, recipeIngredient.Ingredient.Currency, currency, DateTime.UtcNow.Date);
 

@@ -4,8 +4,8 @@ namespace CookingAssistant.Application.Services;
 
 public class DailyIntakeHelper : IDailyIntakeHelper
 {
-    private readonly Dictionary<string, float> _activityMultiplier;
-    private readonly Dictionary<string, short> _dietaryGoalCalories;
+    private readonly IReadOnlyDictionary<string, float> _activityMultiplier;
+    private readonly IReadOnlyDictionary<string, short> _dietaryGoalCalories;
 
     public DailyIntakeHelper(Dictionary<string, float> activityMultiplier, Dictionary<string, short> dietaryGoalCalories)
     {
