@@ -32,7 +32,7 @@ public class AppConfiguration
     public AppUrls Urls { get; set; } = null!;
 
     /// <summary>
-    /// Coming from Azure Key Vault.
+    /// Coming from environment variables and Azure Key Vault.
     /// </summary>
     [Required]
     public string AdminEmail { get; set; } = null!;

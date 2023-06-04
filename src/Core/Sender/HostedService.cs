@@ -31,8 +31,8 @@ public sealed class HostedService : IHostedService, IDisposable
         _config = config.Value;
         _vapidConfig = new Dictionary<string, VapidConfiguration>
         {
-            { "To Do Assistant", _config.ToDoAssistantVapid },
-            { "Cooking Assistant", _config.CookingAssistantVapid },
+            { "To Do Assistant", _config.Sender.ToDoAssistantVapid },
+            { "Cooking Assistant", _config.Sender.CookingAssistantVapid },
         };
         _logger = logger;
     }

@@ -6,7 +6,15 @@ namespace Sender.Models;
 public class AppConfiguration
 {
     /// <summary>
-    /// Coming from appsettings.*.json and Azure Key Vault.
+    /// Coming from appsettings.Production.json and environment variables.
+    /// </summary>
+#if !DEBUG
+    [Required]
+#endif
+    public KeyVaultConfiguration KeyVault { get; set; } = null!;
+
+    /// <summary>
+    /// Coming from appsettings.json and Azure Key Vault.
     /// </summary>
     [Required]
     public string ConnectionString { get; set; } = null!;
@@ -24,7 +32,7 @@ public class AppConfiguration
     public SenderConfiguration RabbitMQ { get; set; } = null!;
 
     /// <summary>
-    /// Coming from Azure Key Vault.
+    /// Coming from environment variables and Azure Key Vault.
     /// </summary>
     [Required]
     public string SendGridApiKey { get; set; } = null!;
@@ -33,13 +41,7 @@ public class AppConfiguration
     /// Coming from Azure Key Vault.
     /// </summary>
     [Required]
-    public VapidConfiguration ToDoAssistantVapid { get; set; } = null!;
-
-    /// <summary>
-    /// Coming from Azure Key Vault.
-    /// </summary>
-    [Required]
-    public VapidConfiguration CookingAssistantVapid { get; set; } = null!;
+    public AppSecrets Sender { get; set; } = null!;
 }
 
 public class VapidConfiguration
@@ -49,4 +51,13 @@ public class VapidConfiguration
 
     [Required]
     public string PrivateKey { get; set; } = null!;
+}
+
+public class AppSecrets
+{
+    [Required]
+    public VapidConfiguration ToDoAssistantVapid { get; set; } = null!;
+
+    [Required]
+    public VapidConfiguration CookingAssistantVapid { get; set; } = null!;
 }
