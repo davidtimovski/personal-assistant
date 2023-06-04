@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Account": {
+    "PersonalAssistant.Web": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
