@@ -343,7 +343,7 @@ public class MidnightJob
             }
 
             using HttpClient httpClient = _httpClientFactory.CreateClient("fixer");
-            using var result = await httpClient.GetAsync($"latest?access_key={_config.FixerApiAccessKey}");
+            using var result = await httpClient.GetAsync($"latest?access_key={_config.FixerApi.AccessKey}");
 
             string jsonResponse = await result.Content.ReadAsStringAsync();
 

@@ -88,6 +88,7 @@ article p {
 }
 article > ul {
     text-align: center;
+    list-style-position: inside;
 }
     article > ul.blue {
         list-style-image: url('/images/check-blue.webp');
@@ -107,6 +108,7 @@ article > ul li {
 }
     article > ul li > ul {
         margin-top: 15px;
+        list-style-position: inside;
     }
         article > ul li > ul.blue {
             list-style-image: url('/images/double-check-blue.webp');
@@ -554,11 +556,11 @@ select {
     border-radius: var(--border-radius);
     outline: none;
     box-shadow: var(--box-shadow);
-    padding: 5px 10px;
+    padding: 0 15px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 16px;
     font-family: inherit;
-    line-height: inherit;
+    line-height: 32px;
     text-decoration: none;
     color: #fff;
     transition: background-color var(--transition), color var(--transition);

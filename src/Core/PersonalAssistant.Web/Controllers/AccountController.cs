@@ -73,7 +73,7 @@ public class AccountController : BaseController
         // Note that the resulting absolute Uri must be added to the
         // **Allowed Callback URLs** settings for the app.
         var authenticationProperties = new LoginAuthenticationPropertiesBuilder()
-            .WithRedirectUri(_config.Urls.Account)
+            .WithRedirectUri(_config.Urls.PersonalAssistant)
             .Build();
 
         await HttpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
@@ -151,7 +151,7 @@ public class AccountController : BaseController
            // Indicate here where Auth0 should redirect the user after a logout.
            // Note that the resulting absolute Uri must be added to the
            // **Allowed Logout URLs** settings for the app.
-           .WithRedirectUri(_config.Urls.Account + returnUrlSlug)
+           .WithRedirectUri(_config.Urls.PersonalAssistant + returnUrlSlug)
            .Build();
 
         await HttpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
@@ -242,7 +242,7 @@ public class AccountController : BaseController
 
         using var payload = new FormUrlEncodedContent(new[]
         {
-            new KeyValuePair<string, string>("secret", _config.Account.ReCaptchaSecret),
+            new KeyValuePair<string, string>("secret", _config.PersonalAssistant.ReCaptchaSecret),
             new KeyValuePair<string, string>("response", model.Token)
         });
 
@@ -335,7 +335,7 @@ public class AccountController : BaseController
             user.Culture,
             user.ImageUri,
             _cdnService.GetDefaultProfileImageUri(),
-            _config.Urls.Account
+            _config.Urls.PersonalAssistant
         );
 
         tr.Finish();
@@ -357,7 +357,7 @@ public class AccountController : BaseController
                 model.Culture,
                 model.ImageUri,
                 _cdnService.GetDefaultProfileImageUri(),
-                _config.Urls.Account
+                _config.Urls.PersonalAssistant
             ));
         }
 
@@ -391,7 +391,7 @@ public class AccountController : BaseController
                 model.Culture,
                 model.ImageUri,
                 _cdnService.GetDefaultProfileImageUri(),
-                _config.Urls.Account
+                _config.Urls.PersonalAssistant
             ));
         }
 

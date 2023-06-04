@@ -33,15 +33,15 @@ using IHost host = Host.CreateDefaultBuilder(args)
 
         services.AddCdn(hostContext.Configuration, hostContext.HostingEnvironment.EnvironmentName);
 
-        var fixerApiBaseUri = hostContext.Configuration["FixerApiBaseUrl"];
-        if (fixerApiBaseUri is null)
+        var fixerApiConfig = hostContext.Configuration.GetSection("FixerApi").Get<FixerApiConfig>();
+        if (fixerApiConfig is null)
         {
-            throw new ArgumentNullException("FixerApiBaseUrl configuration is missing");
+            throw new ArgumentNullException("Fixer API configuration is missing");
         }
 
         services.AddHttpClient("fixer", c =>
         {
-            c.BaseAddress = new Uri(fixerApiBaseUri);
+            c.BaseAddress = new Uri(fixerApiConfig.BaseUrl);
         });
 
         Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
