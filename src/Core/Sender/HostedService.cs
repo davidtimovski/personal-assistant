@@ -41,9 +41,9 @@ public sealed class HostedService : IHostedService, IDisposable
     {
         var factory = new ConnectionFactory
         {
-            HostName = _config.EventBusConnection,
-            UserName = _config.EventBusUserName,
-            Password = _config.EventBusPassword
+            HostName = _config.RabbitMQ.EventBusConnection,
+            UserName = _config.RabbitMQ.EventBusUserName,
+            Password = _config.RabbitMQ.EventBusPassword
         };
 
         using (var connection = factory.CreateConnection())

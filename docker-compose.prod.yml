@@ -130,9 +130,9 @@ services:
     container_name: pa-sender
     restart: always
     environment:
-      - EventBusConnection=${EVENT_BUS_HOST}
-      - EventBusUserName=${EVENT_BUS_USERNAME}
-      - EventBusPassword=${EVENT_BUS_PASSWORD}
+      - RabbitMQ__EventBusConnection=${EVENT_BUS_HOST}
+      - RabbitMQ__EventBusUserName=${EVENT_BUS_USERNAME}
+      - RabbitMQ__EventBusPassword=${EVENT_BUS_PASSWORD}
       - KeyVault__ClientSecret=${KEY_VAULT_SECRET}
     volumes:
       - ./storage:/app/storage

@@ -101,9 +101,9 @@ services:
   sender:
     environment:
       - DOTNET_ENVIRONMENT=Development
-      - EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
-      - EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
-      - EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
+      - RabbitMQ__EventBusConnection=${EVENT_BUS_HOST:-rabbitmq}
+      - RabbitMQ__EventBusUserName=${EVENT_BUS_USERNAME:-rabbitmq}
+      - RabbitMQ__EventBusPassword=${EVENT_BUS_PASSWORD:-rabbitmq}
       - SendGridApiKey=${SENDGRID_API_KEY}
       - ToDoAssistantVapid__PublicKey=${TODO_VAPID_PUBLIC_KEY}
       - ToDoAssistantVapid__PrivateKey=${TODO_VAPID_PRIVATE_KEY}

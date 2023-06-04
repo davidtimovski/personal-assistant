@@ -25,7 +25,7 @@ if (builder.Environment.IsProduction())
     builder.Host.AddKeyVault();
     builder.Services.AddDataProtectionWithCertificate(builder.Configuration);
 
-    builder.Host.AddSentryLogging(builder.Configuration, "Account", new HashSet<string> { "GET /health" });
+    builder.Host.AddSentryLogging(builder.Configuration, "PersonalAssistant", new HashSet<string> { "GET /health" });
 }
 
 builder.Services

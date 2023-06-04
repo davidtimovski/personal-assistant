@@ -4,6 +4,9 @@ namespace Gateway.Models;
 
 public class AppConfiguration
 {
+    /// <summary>
+    /// Coming from appsettings.*.json.
+    /// </summary>
     [Required]
     public AppUrls Urls { get; set; } = null!;
 }
