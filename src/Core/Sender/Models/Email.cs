@@ -1,10 +1,21 @@
-﻿namespace Sender.Models;
+﻿using System.Text.Json.Serialization;
 
-internal class Email
+namespace Sender.Models;
+
+public class Email
 {
-    internal string ToAddress { get; set; } = null!;
-    internal string ToName { get; set; } = null!;
-    internal string Subject { get; set; } = null!;
-    internal string BodyText { get; set; } = null!;
-    internal string BodyHtml { get; set; } = null!;
+    [JsonRequired]
+    public string ToAddress { get; set; } = null!;
+
+    [JsonRequired]
+    public string ToName { get; set; } = null!;
+
+    [JsonRequired]
+    public string Subject { get; set; } = null!;
+
+    [JsonRequired]
+    public string BodyText { get; set; } = null!;
+
+    [JsonRequired]
+    public string BodyHtml { get; set; } = null!;
 }
