@@ -2,6 +2,9 @@
 
 public class SetShareIsAcceptedDto
 {
+    [JsonRequired]
     public int ListId { get; set; }
+
+    [JsonRequired]
     public bool IsAccepted { get; set; }
 }

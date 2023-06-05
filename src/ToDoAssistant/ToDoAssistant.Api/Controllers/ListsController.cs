@@ -343,7 +343,7 @@ public class ListsController : BaseController
             UserId
         );
 
-        var canShareVm = new CanShareVm
+        var response = new CanShareResponse
         {
             CanShare = false
         };
@@ -352,14 +352,14 @@ public class ListsController : BaseController
 
         if (user != null)
         {
-            canShareVm.UserId = user.Id;
-            canShareVm.ImageUri = user.ImageUri;
-            canShareVm.CanShare = _listService.CanShareWithUser(user.Id, UserId);
+            response.UserId = user.Id;
+            response.ImageUri = user.ImageUri;
+            response.CanShare = _listService.CanShareWithUser(user.Id, UserId);
         }
 
         tr.Finish();
 
-        return Ok(canShareVm);
+        return Ok(response);
     }
 
     [HttpPut("share")]
