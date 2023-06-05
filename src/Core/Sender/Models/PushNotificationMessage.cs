@@ -1,8 +1,8 @@
 ﻿namespace Sender.Models;
 
-internal class PushNotificationMessage
+public class PushNotificationMessage
 {
-    internal PushNotificationMessage(string senderImageUri, string title, string message, string openUrl)
+    public PushNotificationMessage(string senderImageUri, string title, string message, string openUrl)
     {
         SenderImageUri = senderImageUri;
         Title = title;
@@ -10,10 +10,10 @@ internal class PushNotificationMessage
         OpenUrl = openUrl;
     }
 
-    internal string SenderImageUri { get; }
-    internal string Title { get; }
-    internal string Body { get; }
-    internal string OpenUrl { get; }
+    public string SenderImageUri { get; }
+    public string Title { get; }
+    public string Body { get; }
+    public string OpenUrl { get; }
 
     private static string TrimMessagePlaceholders(string message)
     {

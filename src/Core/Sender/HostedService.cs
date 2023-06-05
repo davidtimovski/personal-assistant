@@ -15,14 +15,14 @@ namespace Sender;
 
 public sealed class HostedService : IHostedService, IDisposable
 {
-    private readonly AppConfiguration _config;
-    private readonly IReadOnlyDictionary<string, VapidConfiguration> _vapidConfig;
-    private readonly ILogger<HostedService> _logger;
-
-    private static JsonSerializerOptions PayloadSerializationOptions = new()
+    private static readonly JsonSerializerOptions PayloadSerializationOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
+
+    private readonly AppConfiguration _config;
+    private readonly IReadOnlyDictionary<string, VapidConfiguration> _vapidConfig;
+    private readonly ILogger<HostedService> _logger;
 
     public HostedService(
         IOptions<AppConfiguration> config,
