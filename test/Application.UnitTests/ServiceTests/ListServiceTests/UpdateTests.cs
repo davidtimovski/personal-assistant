@@ -58,7 +58,7 @@ public class UpdateTests
     [Fact]
     public async Task TrimsListName()
     {
-        string actualName = null;
+        string? actualName = null;
         _listsRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<ToDoList>(), It.IsAny<int>(), It.IsAny<ISpan>()))
             .Callback<ToDoList, int, ISpan>((l, id, s) => actualName = l.Name)
             .ReturnsAsync(new ToDoList());

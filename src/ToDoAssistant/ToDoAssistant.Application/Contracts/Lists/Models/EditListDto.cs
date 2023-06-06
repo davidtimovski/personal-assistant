@@ -8,8 +8,8 @@ namespace ToDoAssistant.Application.Contracts.Lists.Models;
 public class EditListDto : IMapFrom<ToDoList>
 {
     public int Id { get; set; }
-    public string Name { get; set; }
-    public string Icon { get; set; }
+    public string Name { get; set; } = null!;
+    public string Icon { get; set; } = null!;
     public bool IsOneTimeToggleDefault { get; set; }
     public bool NotificationsEnabled { get; set; }
     public ListSharingState SharingState { get; set; }

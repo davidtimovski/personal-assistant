@@ -25,6 +25,8 @@ public class UploadTempImage
 
 public class UploadTempImageValidator : AbstractValidator<UploadTempImage>
 {
+    private static readonly HashSet<string> ValidFormats = new() { ".JPG", ".PNG", ".JPEG" };
+
     public UploadTempImageValidator()
     {
         RuleFor(dto => dto.UserId).NotEmpty().WithMessage("Unauthorized");
@@ -38,7 +40,7 @@ public class UploadTempImageValidator : AbstractValidator<UploadTempImage>
             {
                 string extension = Path.GetExtension(fileName);
 
-                if (!new string[] { ".JPG", ".PNG", ".JPEG" }.Contains(extension.ToUpperInvariant()))
+                if (!ValidFormats.Contains(extension.ToUpperInvariant()))
                 {
                     return false;
                 }

@@ -7,8 +7,8 @@ namespace ToDoAssistant.Application.Contracts.Lists.Models;
 public class ShareListRequest : IMapFrom<ListShare>
 {
     public int ListId { get; set; }
-    public string ListName { get; set; }
-    public string ListOwnerName { get; set; }
+    public string ListName { get; set; } = null!;
+    public string ListOwnerName { get; set; } = null!;
     public bool? IsAccepted { get; set; }
 
     public void Mapping(Profile profile)

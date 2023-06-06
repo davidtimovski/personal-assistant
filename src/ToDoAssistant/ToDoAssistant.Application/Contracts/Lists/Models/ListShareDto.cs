@@ -7,9 +7,9 @@ namespace ToDoAssistant.Application.Contracts.Lists.Models;
 public class ListShareDto : IMapFrom<ListShare>
 {
     public int UserId { get; set; }
-    public string Email { get; set; }
-    public string Name { get; set; }
-    public string ImageUri { get; set; }
+    public string Email { get; set; } = null!;
+    public string Name { get; set; } = null!;
+    public string ImageUri { get; set; } = null!;
     public bool IsAdmin { get; set; }
     public bool? IsAccepted { get; set; }
     public DateTime CreatedDate { get; set; }

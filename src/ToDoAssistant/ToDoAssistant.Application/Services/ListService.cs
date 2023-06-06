@@ -40,7 +40,7 @@ public class ListService : IListService
         _logger = logger;
     }
 
-    public static string[] IconOptions => new string[] { "list", "shopping-cart", "shopping-bag", "home", "birthday", "cheers", "vacation", "passport", "plane", "car", "pickup-truck", "world", "camping", "tree", "motorcycle", "bicycle", "workout", "ski", "snowboard", "swimming", "work", "baby", "dog", "cat", "bird", "fish", "camera", "medicine", "file", "book", "mountain", "facebook", "twitter", "instagram", "tiktok" };
+    public static HashSet<string> IconOptions => new HashSet<string> { "list", "shopping-cart", "shopping-bag", "home", "birthday", "cheers", "vacation", "passport", "plane", "car", "pickup-truck", "world", "camping", "tree", "motorcycle", "bicycle", "workout", "ski", "snowboard", "swimming", "work", "baby", "dog", "cat", "bird", "fish", "camera", "medicine", "file", "book", "mountain", "facebook", "twitter", "instagram", "tiktok" };
 
     public IEnumerable<ListDto> GetAll(int userId, ISpan metricsSpan)
     {
@@ -549,7 +549,7 @@ public class ListService : IListService
                 OriginalListName = original.Name,
                 ActionUserName = user.Name,
                 ActionUserImageUri = user.ImageUri,
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList()
             };
 
             return result;
@@ -615,7 +615,7 @@ public class ListService : IListService
                 DeletedListName = deletedListName,
                 ActionUserName = user.Name,
                 ActionUserImageUri = user.ImageUri,
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList()
             };
 
             return result;
@@ -721,7 +721,7 @@ public class ListService : IListService
                 ListName = list.Name,
                 ActionUserName = user.Name,
                 ActionUserImageUri = user.ImageUri,
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList()
             };
 
             return result;
@@ -818,7 +818,7 @@ public class ListService : IListService
                 ListName = list.Name,
                 ActionUserName = user.Name,
                 ActionUserImageUri = user.ImageUri,
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList()
             };
 
             return result;
@@ -856,7 +856,7 @@ public class ListService : IListService
                 ListName = list.Name,
                 ActionUserName = user.Name,
                 ActionUserImageUri = user.ImageUri,
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList()
             };
 
             return result;

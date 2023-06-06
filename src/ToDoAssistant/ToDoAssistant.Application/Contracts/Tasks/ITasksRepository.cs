@@ -6,7 +6,7 @@ namespace ToDoAssistant.Application.Contracts.Tasks;
 public interface ITasksRepository
 {
     ToDoTask Get(int id);
-    ToDoTask Get(int id, int userId);
+    ToDoTask? Get(int id, int userId);
     ToDoTask GetForUpdate(int id, int userId);
     List<string> GetRecipes(int id, int userId);
     bool Exists(int id, int userId);

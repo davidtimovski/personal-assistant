@@ -8,7 +8,7 @@ public class ImportRecipe
     public int Id { get; set; }
     public int UserId { get; set; }
     public IEnumerable<IngredientReplacement> IngredientReplacements { get; set; }
-    public string ImageUri { get; set; }
+    public string ImageUri { get; set; } = null!;
 }
 
 public class IngredientReplacement

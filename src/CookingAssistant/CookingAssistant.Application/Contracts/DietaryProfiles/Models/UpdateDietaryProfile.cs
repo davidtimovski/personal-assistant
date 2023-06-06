@@ -12,8 +12,8 @@ public class UpdateDietaryProfile
     public short? HeightInches { get; set; }
     public float? WeightKg { get; set; }
     public short? WeightLbs { get; set; }
-    public string ActivityLevel { get; set; }
-    public string Goal { get; set; }
+    public string? ActivityLevel { get; set; }
+    public string? Goal { get; set; }
     public short? CustomCalories { get; set; }
     public bool TrackCalories { get; set; }
     public short? CustomSaturatedFat { get; set; }
@@ -48,9 +48,9 @@ public class UpdateDietaryProfile
 
 public class UpdateDietaryProfileValidator : AbstractValidator<UpdateDietaryProfile>
 {
-    private readonly string[] genders = new string[] { "Male", "Female" };
-    private readonly string[] activityLevels = new string[] { "Sedentary", "Light", "Moderate", "Active", "VeryActive" };
-    private readonly string[] goals = new string[] { "None", "MildWeightLoss", "WeightLoss", "MildWeightGain", "WeightGain" };
+    private static readonly HashSet<string> Genders = new() { "Male", "Female" };
+    private static readonly HashSet<string> ActivityLevels = new() { "Sedentary", "Light", "Moderate", "Active", "VeryActive" };
+    private static readonly HashSet<string> Goals = new() { "None", "MildWeightLoss", "WeightLoss", "MildWeightGain", "WeightGain" };
 
     public UpdateDietaryProfileValidator()
     {
@@ -71,7 +71,7 @@ public class UpdateDietaryProfileValidator : AbstractValidator<UpdateDietaryProf
 
         RuleFor(dto => dto.Gender)
             .NotEmpty().WithMessage("DietaryProfiles.GenderIsRequired")
-            .Must(gender => genders.Contains(gender)).WithMessage("DietaryProfiles.GenderIsInvalid");
+            .Must(gender => Genders.Contains(gender)).WithMessage("DietaryProfiles.GenderIsInvalid");
 
         RuleFor(dto => dto.HeightCm).Must((dto, heightCm) =>
         {
@@ -110,10 +110,10 @@ public class UpdateDietaryProfileValidator : AbstractValidator<UpdateDietaryProf
         }).WithMessage("DietaryProfiles.WeightIsRequired");
 
         RuleFor(dto => dto.ActivityLevel)
-            .Must(activityLevel => activityLevels.Contains(activityLevel)).WithMessage("ActivityLevelIsInvalid");
+            .Must(activityLevel => ActivityLevels.Contains(activityLevel)).WithMessage("ActivityLevelIsInvalid");
 
         RuleFor(dto => dto.Goal)
-            .Must(goal => goals.Contains(goal)).WithMessage("DietaryProfiles.GoalIsInvalid");
+            .Must(goal => Goals.Contains(goal)).WithMessage("DietaryProfiles.GoalIsInvalid");
 
         RuleFor(dto => dto.CustomCalories).ExclusiveBetween((short)299, (short)10000);
         //RuleFor(dto => dto.CustomFat).ExclusiveBetween((short)299, (short)10000);

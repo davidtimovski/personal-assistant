@@ -621,7 +621,7 @@ public class RecipeService : IRecipeService
                 RecipeName = originalName,
                 ActionUserName = user.Name,
                 ActionUserImageUri = user.ImageUri,
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList()
             };
 
             return result;
@@ -669,7 +669,7 @@ public class RecipeService : IRecipeService
                 RecipeName = recipeName,
                 ActionUserName = user.Name,
                 ActionUserImageUri = user.ImageUri,
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList()
             };
 
             return result;
@@ -746,7 +746,7 @@ public class RecipeService : IRecipeService
                 RecipeName = recipe.Name,
                 ActionUserName = user.Name,
                 ActionUserImageUri = user.ImageUri,
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList()
             };
 
             return result;
@@ -783,7 +783,7 @@ public class RecipeService : IRecipeService
                 RecipeName = recipe.Name,
                 ActionUserName = user.Name,
                 ActionUserImageUri = user.ImageUri,
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList()
             };
 
             return result;
@@ -840,7 +840,7 @@ public class RecipeService : IRecipeService
                 RecipeName = recipe.Name,
                 ActionUserName = user.Name,
                 ActionUserImageUri = user.ImageUri,
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language })
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList()
             };
 
             return result;

@@ -6,10 +6,10 @@ namespace ToDoAssistant.Application.Contracts.Lists.Models;
 public class CreateList
 {
     public int UserId { get; set; }
-    public string Name { get; set; }
-    public string Icon { get; set; }
+    public string Name { get; set; } = null!;
+    public string Icon { get; set; } = null!;
     public bool IsOneTimeToggleDefault { get; set; }
-    public string TasksText { get; set; }
+    public string? TasksText { get; set; }
 }
 
 public class CreateListValidator : AbstractValidator<CreateList>

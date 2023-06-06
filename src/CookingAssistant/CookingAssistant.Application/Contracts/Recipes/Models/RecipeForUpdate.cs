@@ -8,15 +8,15 @@ namespace CookingAssistant.Application.Contracts.Recipes.Models;
 public class RecipeForUpdate : IMapFrom<Recipe>
 {
     public int Id { get; set; }
-    public string Name { get; set; }
-    public string Description { get; set; }
-    public List<RecipeForUpdateIngredient> Ingredients { get; set; }
-    public string Instructions { get; set; }
-    public string PrepDuration { get; set; }
-    public string CookDuration { get; set; }
+    public string Name { get; set; } = null!;
+    public string? Description { get; set; }
+    public List<RecipeForUpdateIngredient> Ingredients { get; set; } = null!;
+    public string? Instructions { get; set; }
+    public string PrepDuration { get; set; } = null!;
+    public string CookDuration { get; set; } = null!;
     public byte Servings { get; set; }
-    public string ImageUri { get; set; }
-    public string VideoUrl { get; set; }
+    public string ImageUri { get; set; } = null!;
+    public string? VideoUrl { get; set; }
     public RecipeSharingState SharingState { get; set; }
     public bool UserIsOwner { get; set; }
 
@@ -34,9 +34,9 @@ public class RecipeForUpdate : IMapFrom<Recipe>
 public class RecipeForUpdateIngredient : IMapFrom<RecipeIngredient>
 {
     public int Id { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
     public float? Amount { get; set; }
-    public string Unit { get; set; }
+    public string? Unit { get; set; }
     public bool HasNutritionData { get; set; }
     public bool HasPriceData { get; set; }
     public bool IsPublic { get; set; }

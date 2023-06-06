@@ -7,8 +7,8 @@ namespace ToDoAssistant.Application.Contracts.Tasks;
 public interface ITaskService
 {
     SimpleTask Get(int id);
-    TaskDto Get(int id, int userId);
-    TaskForUpdate GetForUpdate(int id, int userId);
+    TaskDto? Get(int id, int userId);
+    TaskForUpdate? GetForUpdate(int id, int userId);
     bool Exists(int id, int userId);
     bool Exists(string name, int listId, int userId);
     bool Exists(IEnumerable<string> names, int listId, int userId);

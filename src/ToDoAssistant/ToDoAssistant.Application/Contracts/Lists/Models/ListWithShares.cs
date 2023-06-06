@@ -8,14 +8,14 @@ namespace ToDoAssistant.Application.Contracts.Lists.Models;
 public class ListWithShares : IMapFrom<ToDoList>
 {
     public int Id { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
     public ListSharingState SharingState { get; set; }
-    public string OwnerEmail { get; set; }
-    public string OwnerName { get; set; }
-    public string OwnerImageUri { get; set; }
-    public ListShareDto UserShare { get; set; }
+    public string OwnerEmail { get; set; } = null!;
+    public string OwnerName { get; set; } = null!;
+    public string OwnerImageUri { get; set; } = null!;
+    public ListShareDto? UserShare { get; set; }
 
-    public List<ListShareDto> Shares { get; set; } = new List<ListShareDto>();
+    public List<ListShareDto> Shares { get; set; } = new();
 
     public void Mapping(Profile profile)
     {

@@ -18,8 +18,8 @@ public class Recipe : Entity
     public DateTime LastOpenedDate { get; set; }
 
     public User? User { get; set; }
-    public List<RecipeIngredient> RecipeIngredients { get; set; } = new List<RecipeIngredient>();
-    public List<RecipeShare> Shares { get; set; } = new List<RecipeShare>();
+    public List<RecipeIngredient> RecipeIngredients { get; set; } = new();
+    public List<RecipeShare> Shares { get; set; } = new();
 
     public short IngredientsMissing { get; set; }
 }

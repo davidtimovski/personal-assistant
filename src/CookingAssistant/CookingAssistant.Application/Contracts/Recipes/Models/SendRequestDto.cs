@@ -7,8 +7,8 @@ namespace CookingAssistant.Application.Contracts.Recipes.Models;
 public class SendRequestDto : IMapFrom<SendRequest>
 {
     public int RecipeId { get; set; }
-    public string RecipeName { get; set; }
-    public string RecipeSenderName { get; set; }
+    public string RecipeName { get; set; } = null!;
+    public string RecipeSenderName { get; set; } = null!;
     public bool IsDeclined { get; set; }
 
     public void Mapping(Profile profile)

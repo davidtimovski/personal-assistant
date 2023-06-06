@@ -7,15 +7,15 @@ namespace CookingAssistant.Application.Contracts.Recipes.Models;
 public class RecipeDto : IMapFrom<Recipe>
 {
     public int Id { get; set; }
-    public string Name { get; set; }
-    public string Description { get; set; }
-    public List<RecipeIngredientDto> Ingredients { get; set; }
-    public string Instructions { get; set; }
-    public string PrepDuration { get; set; }
-    public string CookDuration { get; set; }
+    public string Name { get; set; } = null!;
+    public string? Description { get; set; }
+    public List<RecipeIngredientDto> Ingredients { get; set; } = null!;
+    public string? Instructions { get; set; }
+    public string PrepDuration { get; set; } = null!;
+    public string CookDuration { get; set; } = null!;
     public byte Servings { get; set; }
-    public string ImageUri { get; set; }
-    public string VideoUrl { get; set; }
+    public string ImageUri { get; set; } = null!;
+    public string? VideoUrl { get; set; }
     public DateTime LastOpenedDate { get; set; }
     public RecipeNutritionSummary NutritionSummary { get; set; }
     public RecipeCostSummary CostSummary { get; set; }

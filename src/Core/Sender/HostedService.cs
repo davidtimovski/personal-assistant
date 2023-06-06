@@ -140,15 +140,15 @@ public sealed class HostedService : IHostedService, IDisposable
 
                     try
                     {
-                        var pushNotificationPayload = new PushNotificationMessage(
+                        var payload = new PushNotificationPayload(
                             pushNotification.SenderImageUri,
                             pushNotification.Application,
                             pushNotification.Message,
                             pushNotification.OpenUrl
                         );
-                        var payload = JsonSerializer.Serialize(pushNotificationPayload, PayloadSerializationOptions);
+                        var payloadString = JsonSerializer.Serialize(payload, PayloadSerializationOptions);
 
-                        await webPushClient.SendNotificationAsync(subscription, payload, vapidDetails);
+                        await webPushClient.SendNotificationAsync(subscription, payloadString, vapidDetails);
                     }
                     catch (WebPushException ex) when (ex.Message.StartsWith("Subscription no longer valid"))
                     {

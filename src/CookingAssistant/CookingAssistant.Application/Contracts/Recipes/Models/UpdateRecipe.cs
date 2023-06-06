@@ -1,6 +1,4 @@
-﻿using Core.Application.Contracts;
-using Core.Application.Contracts.Models;
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace CookingAssistant.Application.Contracts.Recipes.Models;
 
@@ -8,15 +6,15 @@ public class UpdateRecipe
 {
     public int Id { get; set; }
     public int UserId { get; set; }
-    public string Name { get; set; }
-    public string Description { get; set; }
-    public List<UpdateRecipeIngredient> Ingredients { get; set; }
-    public string Instructions { get; set; }
+    public string Name { get; set; } = null!;
+    public string? Description { get; set; }
+    public List<UpdateRecipeIngredient> Ingredients { get; set; } = null!;
+    public string? Instructions { get; set; }
     public TimeSpan? PrepDuration { get; set; }
     public TimeSpan? CookDuration { get; set; }
     public byte Servings { get; set; }
-    public string ImageUri { get; set; }
-    public string VideoUrl { get; set; }
+    public string? ImageUri { get; set; }
+    public string? VideoUrl { get; set; }
 }
 
 public class UpdateRecipeValidator : AbstractValidator<UpdateRecipe>
@@ -70,20 +68,7 @@ public class UpdateRecipeValidator : AbstractValidator<UpdateRecipe>
 public class UpdateRecipeIngredient
 {
     public int? Id { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
     public float? Amount { get; set; }
-    public string Unit { get; set; }
-}
-
-public class UpdateRecipeResult : INotificationResult
-{
-    public string RecipeName { get; set; }
-    public string ActionUserName { get; set; }
-    public string ActionUserImageUri { get; set; }
-    public IEnumerable<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
-
-    public bool Notify()
-    {
-        return NotificationRecipients.Any();
-    }
+    public string? Unit { get; set; }
 }

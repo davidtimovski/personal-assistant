@@ -7,7 +7,7 @@ namespace CookingAssistant.Application.Contracts.Recipes.Models;
 public class RecipeForSending : IMapFrom<Recipe>
 {
     public int Id { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     public void Mapping(Profile profile)
     {

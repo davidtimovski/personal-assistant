@@ -7,7 +7,7 @@ public class CreateSendRequest
 {
     public int RecipeId { get; set; }
     public int UserId { get; set; }
-    public List<int> RecipientsIds { get; set; }
+    public List<int> RecipientsIds { get; set; } = null!;
 }
 
 public class CreateSendRequestValidator : AbstractValidator<CreateSendRequest>

@@ -13,19 +13,19 @@ public class UpdateTaskResult : INotificationResult
         NotifySignalR = notifySignalR;
     }
 
-    public string OriginalTaskName { get; }
+    public string OriginalTaskName { get; } = null!;
     public int ListId { get; }
-    public string ListName { get; }
+    public string ListName { get; } = null!;
     public bool NotifySignalR { get; }
 
-    public int OldListId { get; set; }
-    public string OldListName { get; set; }
-    public string ActionUserName { get; set; }
-    public string ActionUserImageUri { get; set; }
-    public IEnumerable<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
-    public IEnumerable<NotificationRecipient> RemovedNotificationRecipients { get; set; } = new List<NotificationRecipient>();
-    public IEnumerable<NotificationRecipient> CreatedNotificationRecipients { get; set; } = new List<NotificationRecipient>();
-    public NotificationRecipient AssignedNotificationRecipient { get; set; }
+    public int? OldListId { get; set; }
+    public string? OldListName { get; set; }
+    public string ActionUserName { get; set; } = null!;
+    public string ActionUserImageUri { get; set; } = null!;
+    public List<NotificationRecipient> NotificationRecipients { get; set; } = new();
+    public List<NotificationRecipient> RemovedNotificationRecipients { get; set; } = new();
+    public List<NotificationRecipient> CreatedNotificationRecipients { get; set; } = new();
+    public NotificationRecipient? AssignedNotificationRecipient { get; set; }
 
     public bool Notify()
     {

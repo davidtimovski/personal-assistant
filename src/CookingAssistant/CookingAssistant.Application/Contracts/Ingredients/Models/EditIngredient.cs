@@ -8,8 +8,8 @@ public class EditIngredient : IMapFrom<Ingredient>
 {
     public int Id { get; set; }
     public int? TaskId { get; set; }
-    public string TaskName { get; set; }
-    public string TaskList { get; set; }
+    public string? TaskName { get; set; }
+    public string? TaskList { get; set; }
     public string Name { get; set; }
     public IngredientNutritionData NutritionData { get; set; } = new IngredientNutritionData();
     public IngredientPriceData PriceData { get; set; } = new IngredientPriceData();

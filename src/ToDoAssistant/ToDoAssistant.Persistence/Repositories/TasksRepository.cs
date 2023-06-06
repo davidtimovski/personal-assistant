@@ -18,7 +18,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
         return GetById(id, conn);
     }
 
-    public ToDoTask Get(int id, int userId)
+    public ToDoTask? Get(int id, int userId)
     {
         using IDbConnection conn = OpenConnection();
 
