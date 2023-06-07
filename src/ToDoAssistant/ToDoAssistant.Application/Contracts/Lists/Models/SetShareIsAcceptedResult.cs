@@ -5,10 +5,10 @@ namespace ToDoAssistant.Application.Contracts.Lists.Models;
 
 public class SetShareIsAcceptedResult : INotificationResult
 {
-    public string ListName { get; set; }
-    public string ActionUserName { get; set; }
-    public string ActionUserImageUri { get; set; }
-    public IEnumerable<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
+    public string ListName { get; set; } = null!;
+    public string ActionUserName { get; set; } = null!;
+    public string ActionUserImageUri { get; set; } = null!;
+    public List<NotificationRecipient> NotificationRecipients { get; set; } = new();
 
     public bool Notify()
     {

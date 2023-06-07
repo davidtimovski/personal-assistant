@@ -10,16 +10,16 @@ public class IngredientSuggestion : IMapFrom<Ingredient>
     public int Id { get; set; }
     public int? ParentId { get; set; }
     public int? CategoryId { get; set; }
-    public string BrandName { get; set; }
-    public string Name { get; set; }
+    public string? BrandName { get; set; }
+    public string Name { get; set; } = null!;
     public bool IsProduct { get; set; }
-    public string Unit { get; set; }
-    public string UnitImperial { get; set; }
+    public string? Unit { get; set; }
+    public string? UnitImperial { get; set; }
     public bool HasNutritionData { get; set; }
     public bool HasPriceData { get; set; }
     public bool IsPublic { get; set; }
 
-    public List<IngredientSuggestion> Children { get; set; } = new List<IngredientSuggestion>();
+    public List<IngredientSuggestion> Children { get; set; } = new();
 
     public void Mapping(Profile profile)
     {
@@ -38,9 +38,9 @@ public class IngredientCategoryDto : IMapFrom<IngredientCategory>
 {
     public int Id { get; set; }
     public int? ParentId { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
-    public List<IngredientSuggestion> Ingredients { get; set; }
+    public List<IngredientSuggestion> Ingredients { get; set; } = null!;
     public List<IngredientCategoryDto> Subcategories { get; set; }
 
     public void Mapping(Profile profile)
@@ -53,6 +53,6 @@ public class IngredientCategoryDto : IMapFrom<IngredientCategory>
 
 public class PublicIngredientSuggestions
 {
-    public List<IngredientSuggestion> Uncategorized { get; set; } = new List<IngredientSuggestion>();
-    public List<IngredientCategoryDto> Categories { get; set; } = new List<IngredientCategoryDto>();
+    public List<IngredientSuggestion> Uncategorized { get; set; } = new();
+    public List<IngredientCategoryDto> Categories { get; set; } = new();
 }

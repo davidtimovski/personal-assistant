@@ -55,7 +55,7 @@ public class CreateTests
     [Fact]
     public async Task TrimsName()
     {
-        string actualName = null;
+        string? actualName = null;
         _listsRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoList>(), It.IsAny<ISpan>()))
             .Callback<ToDoList, ISpan>((l, s) => actualName = l.Name);
 

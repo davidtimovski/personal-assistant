@@ -15,8 +15,8 @@ public class ToDoList : Entity
     public bool IsArchived { get; set; }
 
     public User? User { get; set; }
-    public List<ToDoTask> Tasks { get; set; } = new List<ToDoTask>();
-    public List<ListShare> Shares { get; set; } = new List<ListShare>();
+    public List<ToDoTask> Tasks { get; set; } = new();
+    public List<ListShare> Shares { get; set; } = new();
 
     public bool IsShared
     {

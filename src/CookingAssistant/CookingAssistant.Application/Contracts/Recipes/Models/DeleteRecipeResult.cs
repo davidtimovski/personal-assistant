@@ -5,10 +5,10 @@ namespace CookingAssistant.Application.Contracts.Recipes.Models;
 
 public class DeleteRecipeResult : INotificationResult
 {
-    public string RecipeName { get; set; }
-    public string ActionUserName { get; set; }
-    public string ActionUserImageUri { get; set; }
-    public IEnumerable<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
+    public string RecipeName { get; set; } = null!;
+    public string ActionUserName { get; set; } = null!;
+    public string ActionUserImageUri { get; set; } = null!;
+    public List<NotificationRecipient> NotificationRecipients { get; set; } = new();
 
     public bool Notify()
     {

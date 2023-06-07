@@ -7,15 +7,15 @@ namespace CookingAssistant.Application.Contracts.DietaryProfiles.Models;
 
 public class EditDietaryProfile : IMapFrom<DietaryProfile>
 {
-    public string Birthday { get; set; }
-    public string Gender { get; set; }
+    public string? Birthday { get; set; }
+    public string? Gender { get; set; }
     public short? HeightCm { get; set; }
     public short? HeightFeet { get; set; }
     public short? HeightInches { get; set; }
     public float? WeightKg { get; set; }
     public short? WeightLbs { get; set; }
-    public string ActivityLevel { get; set; }
-    public string Goal { get; set; }
+    public string? ActivityLevel { get; set; }
+    public string? Goal { get; set; }
     public DailyIntake DailyIntake { get; set; } = new DailyIntake();
 
     public void Mapping(Profile profile)

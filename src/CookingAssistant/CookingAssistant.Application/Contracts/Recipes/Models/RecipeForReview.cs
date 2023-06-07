@@ -8,9 +8,9 @@ namespace CookingAssistant.Application.Contracts.Recipes.Models;
 public class RecipeForReview : IMapFrom<Recipe>
 {
     public int Id { get; set; }
-    public string Name { get; set; }
-    public string Description { get; set; }
-    public string ImageUri { get; set; }
+    public string Name { get; set; } = null!;
+    public string? Description { get; set; }
+    public string ImageUri { get; set; } = null!;
     public IEnumerable<IngredientForReview> Ingredients { get; set; }
 
     public void Mapping(Profile profile)
@@ -23,7 +23,7 @@ public class RecipeForReview : IMapFrom<Recipe>
 public class IngredientForReview : IMapFrom<Ingredient>
 {
     public int Id { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
     public bool HasNutritionData { get; set; }
     public bool HasPriceData { get; set; }
 

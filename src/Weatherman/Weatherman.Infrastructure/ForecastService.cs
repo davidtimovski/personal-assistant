@@ -12,24 +12,25 @@ namespace Weatherman.Infrastructure;
 
 public class ForecastService : IForecastService
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly IForecastsRepository _forecastsRepository;
-    private readonly ILogger<ForecastService> _logger;
-    private readonly HashSet<string> _validTemperatureUnits = new()
+    private static readonly HashSet<string> ValidTemperatureUnits = new()
     {
         "celsius",
         "fahrenheit"
     };
-    private readonly HashSet<string> _validPrecipitationUnits = new()
+    private static readonly HashSet<string> ValidPrecipitationUnits = new()
     {
         "mm",
         "inch"
     };
-    private readonly HashSet<string> _validWindSpeedUnits = new()
+    private static readonly HashSet<string> ValidWindSpeedUnits = new()
     {
         "kmh",
         "mph"
     };
+
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IForecastsRepository _forecastsRepository;
+    private readonly ILogger<ForecastService> _logger;
 
     public ForecastService(
         IHttpClientFactory httpClientFactory,
@@ -47,17 +48,17 @@ public class ForecastService : IForecastService
 
         var metric = metricsSpan.StartChild($"{nameof(ForecastService)}.{nameof(GetAsync)}");
 
-        if (!_validTemperatureUnits.Contains(parameters.TemperatureUnit))
+        if (!ValidTemperatureUnits.Contains(parameters.TemperatureUnit))
         {
             throw new ValidationException("Forecasts.InvalidTemperatureUnit");
         }
 
-        if (!_validPrecipitationUnits.Contains(parameters.PrecipitationUnit))
+        if (!ValidPrecipitationUnits.Contains(parameters.PrecipitationUnit))
         {
             throw new ValidationException("Forecasts.InvalidPrecipitationUnit");
         }
 
-        if (!_validWindSpeedUnits.Contains(parameters.WindSpeedUnit))
+        if (!ValidWindSpeedUnits.Contains(parameters.WindSpeedUnit))
         {
             throw new ValidationException("Forecasts.InvalidWindSpeedUnit");
         }

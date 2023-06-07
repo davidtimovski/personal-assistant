@@ -9,9 +9,9 @@ public class NotificationDto : IMapFrom<Notification>
     public int Id { get; set; }
     public int? ListId { get; set; }
     public int? TaskId { get; set; }
-    public string UserName { get; set; }
-    public string UserImageUri { get; set; }
-    public string Message { get; set; }
+    public string UserName { get; set; } = null!;
+    public string UserImageUri { get; set; } = null!;
+    public string Message { get; set; } = null!;
     public bool IsSeen { get; set; }
     public DateTime CreatedDate { get; set; }
 

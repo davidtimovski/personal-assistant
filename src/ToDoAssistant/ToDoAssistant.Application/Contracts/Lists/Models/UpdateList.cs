@@ -7,8 +7,8 @@ public class UpdateList
 {
     public int Id { get; set; }
     public int UserId { get; set; }
-    public string Name { get; set; }
-    public string Icon { get; set; }
+    public string Name { get; set; } = null!;
+    public string Icon { get; set; } = null!;
     public bool IsOneTimeToggleDefault { get; set; }
     public bool NotificationsEnabled { get; set; }
 }

@@ -54,11 +54,11 @@ public class TaskService : ITaskService
         }
     }
 
-    public TaskDto Get(int id, int userId)
+    public TaskDto? Get(int id, int userId)
     {
         try
         {
-            ToDoTask task = _tasksRepository.Get(id, userId);
+            ToDoTask? task = _tasksRepository.Get(id, userId);
 
             var result = _mapper.Map<TaskDto>(task);
 
@@ -71,7 +71,7 @@ public class TaskService : ITaskService
         }
     }
 
-    public TaskForUpdate GetForUpdate(int id, int userId)
+    public TaskForUpdate? GetForUpdate(int id, int userId)
     {
         try
         {
@@ -185,7 +185,7 @@ public class TaskService : ITaskService
 
             var id = await _tasksRepository.CreateAsync(task, model.UserId, metric);
 
-            ToDoList list = _listsRepository.GetWithShares(model.ListId, model.UserId, metric);
+            ToDoList? list = _listsRepository.GetWithShares(model.ListId, model.UserId, metric);
 
             var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
             var result = new CreatedTaskResult(id, task.ListId, notifySignalR);
@@ -202,7 +202,7 @@ public class TaskService : ITaskService
             result.ListName = list.Name;
             result.ActionUserName = user.Name;
             result.ActionUserImageUri = user.ImageUri;
-            result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language });
+            result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList();
 
             return result;
         }
@@ -243,7 +243,7 @@ public class TaskService : ITaskService
 
             IEnumerable<ToDoTask> createdTasks = await _tasksRepository.BulkCreateAsync(tasks, model.TasksArePrivate, model.UserId, metric);
 
-            ToDoList list = _listsRepository.GetWithShares(model.ListId, model.UserId, metric);
+            ToDoList? list = _listsRepository.GetWithShares(model.ListId, model.UserId, metric);
 
             var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(model.ListId, model.UserId, model.TasksArePrivate, metric).ToList();
 
@@ -265,7 +265,7 @@ public class TaskService : ITaskService
             });
             result.ActionUserName = user.Name;
             result.ActionUserImageUri = user.ImageUri;
-            result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language });
+            result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList();
 
             return result;
         }
@@ -309,7 +309,7 @@ public class TaskService : ITaskService
             task.ModifiedDate = DateTime.UtcNow;
             await _tasksRepository.UpdateAsync(task, model.UserId, metric);
 
-            ToDoList list = _listsRepository.GetWithShares(model.ListId, model.UserId, metric);
+            ToDoList? list = _listsRepository.GetWithShares(model.ListId, model.UserId, metric);
 
             var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
             var result = new UpdateTaskResult(originalTask.Name, list.Id, list.Name, notifySignalR);
@@ -317,7 +317,7 @@ public class TaskService : ITaskService
             if (model.ListId == originalTask.ListId)
             {
                 var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(model.ListId, model.UserId, model.Id, metric);
-                result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language });
+                result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList();
             }
             else
             {
@@ -327,10 +327,10 @@ public class TaskService : ITaskService
                 result.OldListName = oldList.Name;
 
                 var usersToBeNotifiedOfRemoval = _listService.GetUsersToBeNotifiedOfChange(oldList.Id, model.UserId, model.Id, metric);
-                result.RemovedNotificationRecipients = usersToBeNotifiedOfRemoval.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language });
+                result.RemovedNotificationRecipients = usersToBeNotifiedOfRemoval.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList();
 
                 var usersToBeNotifiedOfCreation = _listService.GetUsersToBeNotifiedOfChange(model.ListId, model.UserId, model.Id, metric);
-                result.CreatedNotificationRecipients = usersToBeNotifiedOfCreation.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language });
+                result.CreatedNotificationRecipients = usersToBeNotifiedOfCreation.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList();
             }
 
             if (model.AssignedToUserId.HasValue
@@ -381,7 +381,7 @@ public class TaskService : ITaskService
 
             await _tasksRepository.DeleteAsync(id, userId, metric);
 
-            ToDoList list = _listsRepository.GetWithShares(task.ListId, userId, metric);
+            ToDoList? list = _listsRepository.GetWithShares(task.ListId, userId, metric);
 
             var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(task.ListId, userId, task.PrivateToUserId == userId, metric).ToList();
 
@@ -399,7 +399,7 @@ public class TaskService : ITaskService
             result.ListName = list.Name;
             result.ActionUserName = user.Name;
             result.ActionUserImageUri = user.ImageUri;
-            result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language });
+            result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList();
 
             return result;
         }
@@ -433,7 +433,7 @@ public class TaskService : ITaskService
 
             await _tasksRepository.CompleteAsync(model.Id, model.UserId, metric);
 
-            ToDoList list = _listsRepository.GetWithShares(task.ListId, model.UserId, metric);
+            ToDoList? list = _listsRepository.GetWithShares(task.ListId, model.UserId, metric);
 
             var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(task.ListId, model.UserId, model.Id, metric).ToList();
 
@@ -451,7 +451,7 @@ public class TaskService : ITaskService
             result.ListName = list.Name;
             result.ActionUserName = user.Name;
             result.ActionUserImageUri = user.ImageUri;
-            result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language });
+            result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList();
 
             return result;
         }
@@ -485,7 +485,7 @@ public class TaskService : ITaskService
 
             await _tasksRepository.UncompleteAsync(model.Id, model.UserId, metric);
 
-            ToDoList list = _listsRepository.GetWithShares(task.ListId, model.UserId, metric);
+            ToDoList? list = _listsRepository.GetWithShares(task.ListId, model.UserId, metric);
 
             var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(task.ListId, model.UserId, model.Id, metric).ToList();
 
@@ -503,7 +503,7 @@ public class TaskService : ITaskService
             result.ListName = list.Name;
             result.ActionUserName = user.Name;
             result.ActionUserImageUri = user.ImageUri;
-            result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language });
+            result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList();
 
             return result;
         }
@@ -532,7 +532,7 @@ public class TaskService : ITaskService
             await _tasksRepository.ReorderAsync(model.Id, model.UserId, model.OldOrder, model.NewOrder, DateTime.UtcNow);
 
             ToDoTask task = _tasksRepository.Get(model.Id);
-            ToDoList list = _listsRepository.GetWithShares(task.ListId, model.UserId, metric);
+            ToDoList? list = _listsRepository.GetWithShares(task.ListId, model.UserId, metric);
 
             var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
             return new ReorderTaskResult(list.Id, notifySignalR);

@@ -7,14 +7,12 @@ public class CopyList
 {
     public int Id { get; set; }
     public int UserId { get; set; }
-    public string Name { get; set; }
-    public string Icon { get; set; }
+    public string Name { get; set; } = null!;
+    public string Icon { get; set; } = null!;
 }
 
 public class CopyListValidator : AbstractValidator<CopyList>, IValidator<CopyList>
 {
-    private const string prefix = nameof(CopyListValidator);
-
     public CopyListValidator(IListService listService)
     {
         RuleFor(dto => dto.UserId)

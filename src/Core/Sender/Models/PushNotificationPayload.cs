@@ -1,8 +1,8 @@
 ﻿namespace Sender.Models;
 
-public class PushNotificationMessage
+public class PushNotificationPayload
 {
-    public PushNotificationMessage(string senderImageUri, string title, string message, string openUrl)
+    public PushNotificationPayload(string senderImageUri, string title, string message, string openUrl)
     {
         SenderImageUri = senderImageUri;
         Title = title;

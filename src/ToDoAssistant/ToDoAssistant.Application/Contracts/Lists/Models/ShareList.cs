@@ -7,9 +7,9 @@ public class ShareList
 {
     public int UserId { get; set; }
     public int ListId { get; set; }
-    public List<ShareUserAndPermission> NewShares { get; set; }
-    public List<ShareUserAndPermission> EditedShares { get; set; }
-    public List<ShareUserAndPermission> RemovedShares { get; set; }
+    public List<ShareUserAndPermission> NewShares { get; set; } = null!;
+    public List<ShareUserAndPermission> EditedShares { get; set; } = null!;
+    public List<ShareUserAndPermission> RemovedShares { get; set; } = null!;
 }
 
 public class ShareListValidator : AbstractValidator<ShareList>

@@ -7,7 +7,7 @@ public class BulkCreate
 {
     public int UserId { get; set; }
     public int ListId { get; set; }
-    public string TasksText { get; set; }
+    public string TasksText { get; set; } = null!;
     public bool TasksAreOneTime { get; set; }
     public bool TasksArePrivate { get; set; }
 }

@@ -7,8 +7,8 @@ namespace CookingAssistant.Application.Contracts.Recipes.Models;
 public class RecipeShareDto : IMapFrom<RecipeShare>
 {
     public int UserId { get; set; }
-    public string Email { get; set; }
-    public string ImageUri { get; set; }
+    public string Email { get; set; } = null!;
+    public string ImageUri { get; set; } = null!;
     public bool? IsAccepted { get; set; }
     public DateTime CreatedDate { get; set; }
 

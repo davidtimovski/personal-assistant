@@ -8,10 +8,10 @@ namespace CookingAssistant.Application.Contracts.Recipes.Models;
 public class RecipeIngredientDto : IMapFrom<RecipeIngredient>
 {
     public int Id { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
     public float? Amount { get; set; }
     public float? AmountPerServing { get; set; }
-    public string Unit { get; set; }
+    public string? Unit { get; set; }
     public bool HasNutritionData { get; set; }
     public bool HasPriceData { get; set; }
     public bool Missing { get; set; }

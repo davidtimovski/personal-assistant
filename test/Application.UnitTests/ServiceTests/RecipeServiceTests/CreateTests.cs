@@ -53,7 +53,7 @@ public class CreateTests
     [Fact]
     public async Task TrimsName()
     {
-        string actualName = null;
+        string? actualName = null;
         _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
             .Callback<Recipe>(r => actualName = r.Name);
 
@@ -68,7 +68,7 @@ public class CreateTests
     [Fact]
     public async Task TrimsDescription_IfPresent()
     {
-        string actualDescription = null;
+        string? actualDescription = null;
         _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
             .Callback<Recipe>(r => actualDescription = r.Description);
 
@@ -161,7 +161,7 @@ public class CreateTests
     [InlineData("\r\nInstructions Row 1\r\nRow 2\r\n\r\n\r\n", "Instructions Row 1\r\nRow 2")]
     public async Task CollapsesNewlinesInInstructionsToAtMostTwo(string instructions, string expected)
     {
-        string actualInstructions = null;
+        string? actualInstructions = null;
         _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
             .Callback<Recipe>(r => actualInstructions = r.Instructions);
 
@@ -175,7 +175,7 @@ public class CreateTests
     [Fact]
     public async Task TrimsInstructions_IfPresent()
     {
-        string actualInstructions = null;
+        string? actualInstructions = null;
         _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
             .Callback<Recipe>(r => actualInstructions = r.Instructions);
 

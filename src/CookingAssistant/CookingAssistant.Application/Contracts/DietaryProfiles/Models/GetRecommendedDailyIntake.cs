@@ -5,14 +5,14 @@ namespace CookingAssistant.Application.Contracts.DietaryProfiles.Models;
 public class GetRecommendedDailyIntake
 {
     public DateTime Birthday { get; set; }
-    public string Gender { get; set; }
+    public string? Gender { get; set; }
     public short? HeightCm { get; set; }
     public short? HeightFeet { get; set; }
     public short? HeightInches { get; set; }
     public short? WeightKg { get; set; }
     public short? WeightLbs { get; set; }
-    public string ActivityLevel { get; set; }
-    public string Goal { get; set; }
+    public string? ActivityLevel { get; set; }
+    public string? Goal { get; set; }
 
     public short GetAge()
     {
@@ -29,9 +29,9 @@ public class GetRecommendedDailyIntake
 
 public class GetRecommendedDailyIntakeValidator : AbstractValidator<GetRecommendedDailyIntake>
 {
-    private readonly string[] genders = new string[] { "Male", "Female" };
-    private readonly string[] activityLevels = new string[] { "Sedentary", "Light", "Moderate", "Active", "VeryActive" };
-    private readonly string[] goals = new string[] { "None", "MildWeightLoss", "WeightLoss", "MildWeightGain", "WeightGain" };
+    private static readonly HashSet<string> Genders = new () { "Male", "Female" };
+    private static readonly HashSet<string> ActivityLevels = new() { "Sedentary", "Light", "Moderate", "Active", "VeryActive" };
+    private static readonly HashSet<string> Goals = new() { "None", "MildWeightLoss", "WeightLoss", "MildWeightGain", "WeightGain" };
 
     public GetRecommendedDailyIntakeValidator()
     {
@@ -50,7 +50,7 @@ public class GetRecommendedDailyIntakeValidator : AbstractValidator<GetRecommend
 
         RuleFor(dto => dto.Gender)
             .NotEmpty().WithMessage("DietaryProfiles.GenderIsRequired")
-            .Must(gender => genders.Contains(gender)).WithMessage("DietaryProfiles.GenderIsInvalid");
+            .Must(gender => Genders.Contains(gender)).WithMessage("DietaryProfiles.GenderIsInvalid");
 
         RuleFor(dto => dto.HeightCm).Must((dto, heightCm) =>
         {
@@ -89,9 +89,9 @@ public class GetRecommendedDailyIntakeValidator : AbstractValidator<GetRecommend
         }).WithMessage("DietaryProfiles.WeightIsRequired");
 
         RuleFor(dto => dto.ActivityLevel)
-            .Must(activityLevel => activityLevels.Contains(activityLevel)).WithMessage("ActivityLevelIsInvalid");
+            .Must(activityLevel => ActivityLevels.Contains(activityLevel)).WithMessage("ActivityLevelIsInvalid");
 
         RuleFor(dto => dto.Goal)
-            .Must(goal => goals.Contains(goal)).WithMessage("DietaryProfiles.GoalIsInvalid");
+            .Must(goal => Goals.Contains(goal)).WithMessage("DietaryProfiles.GoalIsInvalid");
     }
 }

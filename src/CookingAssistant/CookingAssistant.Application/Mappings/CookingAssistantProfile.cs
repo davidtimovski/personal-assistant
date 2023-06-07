@@ -90,7 +90,7 @@ public class CookingAssistantProfile : Profile
     }
 }
 
-public class RecipeWithSharesUserShareResolver : IValueResolver<Recipe, RecipeWithShares, RecipeShareDto>
+public class RecipeWithSharesUserShareResolver : IValueResolver<Recipe, RecipeWithShares, RecipeShareDto?>
 {
     private readonly ICdnService _cdnService;
 
@@ -99,7 +99,7 @@ public class RecipeWithSharesUserShareResolver : IValueResolver<Recipe, RecipeWi
         _cdnService = cdnService;
     }
 
-    public RecipeShareDto Resolve(Recipe source, RecipeWithShares dest, RecipeShareDto destMember, ResolutionContext context)
+    public RecipeShareDto? Resolve(Recipe source, RecipeWithShares dest, RecipeShareDto? destMember, ResolutionContext context)
     {
         var shareDto = new RecipeShareDto();
         var userId = (int)context.Items["UserId"];

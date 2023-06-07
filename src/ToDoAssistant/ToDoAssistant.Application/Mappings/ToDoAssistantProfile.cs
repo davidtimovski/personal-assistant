@@ -191,7 +191,7 @@ public class IsPrivateResolver : IValueResolver<ToDoTask, TaskForUpdate, bool>
     }
 }
 
-public class ListWithSharesUserShareResolver : IValueResolver<ToDoList, ListWithShares, ListShareDto>
+public class ListWithSharesUserShareResolver : IValueResolver<ToDoList, ListWithShares, ListShareDto?>
 {
     private readonly ICdnService _cdnService;
 
@@ -200,7 +200,7 @@ public class ListWithSharesUserShareResolver : IValueResolver<ToDoList, ListWith
         _cdnService = cdnService;
     }
 
-    public ListShareDto Resolve(ToDoList source, ListWithShares dest, ListShareDto destMember, ResolutionContext context)
+    public ListShareDto? Resolve(ToDoList source, ListWithShares dest, ListShareDto? destMember, ResolutionContext context)
     {
         var shareDto = new ListShareDto();
         var userId = (int)context.Items["UserId"];

@@ -5,15 +5,9 @@ namespace Application.UnitTests.Builders;
 
 internal class IngredientBuilder
 {
-    private string name;
+    private string name = "Dummy name";
     private int? taskId;
-    private List<RecipeIngredient> recipesIngredients;
-
-
-    internal IngredientBuilder()
-    {
-        name = "Dummy name";
-    }
+    private List<RecipeIngredient> recipesIngredients = new ();
 
     internal IngredientBuilder WithName(string newName)
     {

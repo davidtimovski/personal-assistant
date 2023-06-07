@@ -5,15 +5,15 @@ namespace CookingAssistant.Application.Contracts.Recipes.Models;
 public class CreateRecipe
 {
     public int UserId { get; set; }
-    public string Name { get; set; }
-    public string Description { get; set; }
+    public string Name { get; set; } = null!;
+    public string? Description { get; set; }
     public List<UpdateRecipeIngredient> Ingredients { get; set; }
-    public string Instructions { get; set; }
+    public string? Instructions { get; set; }
     public TimeSpan? PrepDuration { get; set; }
     public TimeSpan? CookDuration { get; set; }
     public byte Servings { get; set; }
-    public string ImageUri { get; set; }
-    public string VideoUrl { get; set; }
+    public string? ImageUri { get; set; }
+    public string? VideoUrl { get; set; }
 }
 
 public class CreateRecipeValidator : AbstractValidator<CreateRecipe>
@@ -63,7 +63,7 @@ public class CreateRecipeValidator : AbstractValidator<CreateRecipe>
 
 public class UpdateRecipeIngredientValidator : AbstractValidator<UpdateRecipeIngredient>
 {
-    private readonly string[] units = new string[] { "g", "ml", "oz", "cup", "tbsp", "tsp", "pinch" };
+    private static readonly HashSet<string> Units = new () { "g", "ml", "oz", "cup", "tbsp", "tsp", "pinch" };
 
     public UpdateRecipeIngredientValidator()
     {
@@ -75,6 +75,6 @@ public class UpdateRecipeIngredientValidator : AbstractValidator<UpdateRecipeIng
             .InclusiveBetween(0.1f, 10000).WithMessage("Recipes.ModifyRecipe.AmountMustBeBetween");
 
         RuleFor(dto => dto.Unit)
-            .Must(unit => string.IsNullOrEmpty(unit) || units.Contains(unit)).WithMessage("Recipes.ModifyRecipe.InvalidUnit");
+            .Must(unit => string.IsNullOrEmpty(unit) || Units.Contains(unit)).WithMessage("Recipes.ModifyRecipe.InvalidUnit");
     }
 }

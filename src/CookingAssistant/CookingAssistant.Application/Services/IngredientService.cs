@@ -264,7 +264,7 @@ public class IngredientService : IIngredientService
             return;
         }
 
-        var metricUnits = new string[] { "g", "ml", "tbsp", "tsp", "pinch" };
+        var metricUnits = new HashSet<string> { "g", "ml", "tbsp", "tsp", "pinch" };
         var metric = recipesIngredients.Where(x => metricUnits.Contains(x.Unit)).ToList();
         if (metric.Any())
         {
@@ -276,7 +276,7 @@ public class IngredientService : IIngredientService
             suggestion.Unit = metricGrouped.First().Key;
         }
 
-        var imperialUnits = new string[] { "oz", "cup", "tbsp", "tsp", "pinch" };
+        var imperialUnits = new HashSet<string> { "oz", "cup", "tbsp", "tsp", "pinch" };
         var imperial = recipesIngredients.Where(x => imperialUnits.Contains(x.Unit)).ToList();
         if (imperial.Any())
         {

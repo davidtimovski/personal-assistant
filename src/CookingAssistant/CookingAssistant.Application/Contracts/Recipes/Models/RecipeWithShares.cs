@@ -8,13 +8,13 @@ namespace CookingAssistant.Application.Contracts.Recipes.Models;
 public class RecipeWithShares : IMapFrom<Recipe>
 {
     public int Id { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
     public RecipeSharingState SharingState { get; set; }
-    public string OwnerEmail { get; set; }
-    public string OwnerImageUri { get; set; }
-    public RecipeShareDto UserShare { get; set; }
+    public string OwnerEmail { get; set; } = null!;
+    public string OwnerImageUri { get; set; } = null!;
+    public RecipeShareDto? UserShare { get; set; }
 
-    public List<RecipeShareDto> Shares { get; set; } = new List<RecipeShareDto>();
+    public List<RecipeShareDto> Shares { get; set; } = new();
 
     public void Mapping(Profile profile)
     {

@@ -7,8 +7,8 @@ public class ShareRecipe
 {
     public int UserId { get; set; }
     public int RecipeId { get; set; }
-    public List<int> NewShares { get; set; }
-    public List<int> RemovedShares { get; set; }
+    public List<int> NewShares { get; set; } = null!;
+    public List<int> RemovedShares { get; set; } = null!;
 }
 
 public class ShareRecipeValidator : AbstractValidator<ShareRecipe>

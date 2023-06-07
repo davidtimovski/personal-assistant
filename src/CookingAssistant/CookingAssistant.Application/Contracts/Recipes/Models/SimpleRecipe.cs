@@ -8,8 +8,8 @@ namespace CookingAssistant.Application.Contracts.Recipes.Models;
 public class SimpleRecipe : IMapFrom<Recipe>
 {
     public int Id { get; set; }
-    public string Name { get; set; }
-    public string ImageUri { get; set; }
+    public string Name { get; set; } = null!;
+    public string ImageUri { get; set; } = null!;
     public short IngredientsMissing { get; set; }
     public DateTime LastOpenedDate { get; set; }
     public RecipeSharingState SharingState { get; set; }

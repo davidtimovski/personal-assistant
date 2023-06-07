@@ -7,8 +7,8 @@ namespace CookingAssistant.Application.Contracts.Recipes.Models;
 public class ShareRecipeRequest : IMapFrom<RecipeShare>
 {
     public int RecipeId { get; set; }
-    public string RecipeName { get; set; }
-    public string RecipeOwnerName { get; set; }
+    public string RecipeName { get; set; } = null!;
+    public string RecipeOwnerName { get; set; } = null!;
     public bool? IsAccepted { get; set; }
 
     public void Mapping(Profile profile)

@@ -48,7 +48,7 @@ public class UpdateTests
     [Fact]
     public async Task TrimsName_IfItsNotLinkedToTask()
     {
-        string actualName = null;
+        string? actualName = null;
         _ingredientsRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Ingredient>()))
             .Callback<Ingredient>(i => actualName = i.Name);
 

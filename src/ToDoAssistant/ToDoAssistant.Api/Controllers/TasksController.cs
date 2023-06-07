@@ -61,7 +61,7 @@ public class TasksController : BaseController
     [HttpGet("{id}")]
     public IActionResult Get(int id)
     {
-        TaskDto taskDto = _taskService.Get(id, UserId);
+        TaskDto? taskDto = _taskService.Get(id, UserId);
         if (taskDto is null)
         {
             return NotFound();
@@ -73,7 +73,7 @@ public class TasksController : BaseController
     [HttpGet("{id}/update")]
     public IActionResult GetForUpdate(int id)
     {
-        TaskForUpdate taskDto = _taskService.GetForUpdate(id, UserId);
+        TaskForUpdate? taskDto = _taskService.GetForUpdate(id, UserId);
         if (taskDto is null)
         {
             return NotFound();

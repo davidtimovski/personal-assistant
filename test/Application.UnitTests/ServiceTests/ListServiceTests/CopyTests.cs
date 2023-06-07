@@ -55,7 +55,7 @@ public class CopyTests
     [Fact]
     public async Task TrimsListName()
     {
-        string actualName = null;
+        string? actualName = null;
         _listsRepositoryMock.Setup(x => x.CopyAsync(It.IsAny<ToDoList>(), It.IsAny<ISpan>()))
             .Callback<ToDoList, ISpan>((l, s) => actualName = l.Name);
 

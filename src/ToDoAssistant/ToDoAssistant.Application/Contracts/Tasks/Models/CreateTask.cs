@@ -7,8 +7,8 @@ public class CreateTask
 {
     public int UserId { get; set; }
     public int ListId { get; set; }
-    public string Name { get; set; }
-    public string Url { get; set; }
+    public string Name { get; set; } = null!;
+    public string? Url { get; set; }
     public bool IsOneTime { get; set; }
     public bool? IsPrivate { get; set; }
 }
