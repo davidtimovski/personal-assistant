@@ -49,6 +49,7 @@
 		chart.data.datasets[0].data = [];
 		chart.update();
 		items = null;
+		sum = 0;
 
 		const byCategory = (
 			await transactionsService.getExpendituresAndDepositsByCategory(
