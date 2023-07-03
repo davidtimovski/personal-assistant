@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '../../app.css';
 
-	import { onMount, onDestroy } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte';
 
 	import { UsersServiceBase } from '../../../../../Core/shared2/services/usersServiceBase';
 	import { AuthService } from '../../../../../Core/shared2/services/authService';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte';
 	import type { Unsubscriber } from 'svelte/store';
 	import { slide } from 'svelte/transition';
 	import { page } from '$app/stores';
@@ -589,7 +589,7 @@
 			{/if}
 
 			{#if duplicateAlertIsVisible}
-				<div class="duplicate-task-alert" in:slide>
+				<div class="duplicate-task-alert" transition:slide>
 					<button type="button" on:click={hideDuplicateTaskAlert} class="side">
 						<i class="fas fa-times-circle" />
 					</button>
@@ -608,7 +608,7 @@
 			{/if}
 
 			{#if similarTasksAlertIsVisible}
-				<div class="duplicate-task-alert" in:slide>
+				<div class="duplicate-task-alert" transition:slide>
 					<span class="side inactive">
 						<i class="fas fa-info-circle" />
 					</span>
@@ -636,7 +636,7 @@
 							required
 						/>
 						{#if newTaskUrl}
-							<div in:slide class="new-task-url-wrap">
+							<div transition:slide class="new-task-url-wrap">
 								<hr />
 								<input type="url" bind:value={newTaskUrl} maxlength="1000" readonly />
 								<button

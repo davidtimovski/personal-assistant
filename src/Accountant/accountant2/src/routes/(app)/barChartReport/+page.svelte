@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte';
 	import { BarController, BarElement, CategoryScale, Chart, LinearScale } from 'chart.js';
 
 	import { DateHelper } from '../../../../../../Core/shared2/utils/dateHelper';

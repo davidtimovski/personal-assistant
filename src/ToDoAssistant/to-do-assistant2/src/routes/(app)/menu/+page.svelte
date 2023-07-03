@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 
 	import { AuthService } from '../../../../../../Core/shared2/services/authService';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte/internal';
+	import { onMount, onDestroy } from 'svelte';
 
 	import { TooltipsService } from '../../../../../../Core/shared2/services/tooltipsService';
 	import type { Tooltip } from '../../../../../../Core/shared2/models/tooltip';

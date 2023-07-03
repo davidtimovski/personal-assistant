@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onMount } from 'svelte';
 	import { AuthService } from '../../../../../../Core/shared2/services/authService';
 
 	let containerHeight = 768;
