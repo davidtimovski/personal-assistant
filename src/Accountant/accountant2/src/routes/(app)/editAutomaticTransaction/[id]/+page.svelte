@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy, debug } from 'svelte/internal';
+	import { onMount, onDestroy, debug } from 'svelte';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 

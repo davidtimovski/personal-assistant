@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 
 	import EmptyListMessage from '../../../../../../Core/shared2/components/EmptyListMessage.svelte';

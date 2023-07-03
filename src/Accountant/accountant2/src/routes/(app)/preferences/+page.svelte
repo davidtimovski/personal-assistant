@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onMount } from 'svelte';
 
 	import CurrencySelector from '../../../../../../Core/shared2/components/CurrencySelector.svelte';
 	import Checkbox from '../../../../../../Core/shared2/components/Checkbox.svelte';

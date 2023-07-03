@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte/internal";
+  import { onMount, onDestroy } from "svelte";
   import type { AutocompleteResult } from "autocompleter";
   import autocomplete from "autocompleter";
 

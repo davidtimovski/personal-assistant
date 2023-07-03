@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte/internal';
+	import { onMount } from 'svelte';
 	import { DateHelper } from '../../../../../Core/shared2/utils/dateHelper';
 	import { user } from '$lib/stores';
 	import { SelectOption } from '$lib/models/viewmodels/selectOption';
