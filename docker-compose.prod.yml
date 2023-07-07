@@ -141,7 +141,7 @@ services:
       - rabbitmq
 
   postgres:
-    image: postgres:12
+    image: postgres:15
     container_name: pa-postgres
     restart: always
     ports:
@@ -153,7 +153,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
 
   rabbitmq:
-    image: rabbitmq:3.8-management-alpine
+    image: rabbitmq:3.12-management-alpine
     container_name: pa-rabbitmq
     restart: always
     environment:
@@ -161,8 +161,8 @@ services:
       RABBITMQ_DEFAULT_USER: ${EVENT_BUS_USERNAME}
       RABBITMQ_DEFAULT_PASS: ${EVENT_BUS_PASSWORD}
     ports:
-      - "15672:15672"  # Important: In a production environment your should remove the external port
-      - "5672:5672"    # Important: In a production environment your should remove the external port
+      - "15672:15672"
+      - "5672:5672"
 
 volumes:
   postgres-data:
