@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Jobs.Models.Accountant;
 
-namespace Jobs.Models.Accountant;
-
-internal class DeletedEntity
+public class DeletedEntity
 {
-    internal int UserId { get; set; }
-    internal EntityType EntityType { get; set; }
-    internal int EntityId { get; set; }
-    internal DateTime DeletedDate { get; set; }
+    public int UserId { get; set; }
+    public EntityType EntityType { get; set; }
+    public int EntityId { get; set; }
+    public DateTime DeletedDate { get; set; }
 }

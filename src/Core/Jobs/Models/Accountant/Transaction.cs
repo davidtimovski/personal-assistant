@@ -1,15 +1,15 @@
 ﻿namespace Jobs.Models.Accountant;
 
-internal class Transaction
+public class Transaction
 {
-    internal int? FromAccountId { get; set; }
-    internal int? ToAccountId { get; set; }
-    internal int? CategoryId { get; set; }
-    internal decimal Amount { get; set; }
-    internal string Currency { get; set; } = null!;
-    internal string? Description { get; set; }
-    internal DateTime Date { get; set; }
-    internal bool Generated { get; set; }
-    internal DateTime CreatedDate { get; set; }
-    internal DateTime ModifiedDate { get; set; }
+    public int? FromAccountId { get; set; }
+    public int? ToAccountId { get; set; }
+    public int? CategoryId { get; set; }
+    public decimal Amount { get; set; }
+    public string Currency { get; set; } = null!;
+    public string? Description { get; set; }
+    public DateTime Date { get; set; }
+    public bool Generated { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public DateTime ModifiedDate { get; set; }
 }
