@@ -21,7 +21,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Npgsql.FSharp" Version="5.7.0" />
-		<PackageReference Include="Sentry.Extensions.Logging" Version="3.33.0" />
+		<PackageReference Include="Sentry.Extensions.Logging" Version="3.39.0" />
 	</ItemGroup>
 
 </Project>

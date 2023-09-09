@@ -58,6 +58,7 @@ export class CapitalService {
 				const trimmedDescription = this.trimDescription(upcomingExpense.description);
 				upcomingExpenses.push(
 					new HomePageUpcomingExpense(
+						upcomingExpense.id,
 						upcomingExpense.categoryName || uncategorizedLabel,
 						trimmedDescription,
 						upcomingExpense.amount
@@ -87,7 +88,7 @@ export class CapitalService {
 			for (const debtItem of debt) {
 				const trimmedDescription = this.trimDebtDescription(debtItem.description, combinedLabel);
 				homePageDebt.push(
-					new HomePageDebt(debtItem.person, debtItem.userIsDebtor, trimmedDescription, debtItem.amount)
+					new HomePageDebt(debtItem.id, debtItem.person, debtItem.userIsDebtor, trimmedDescription, debtItem.amount)
 				);
 			}
 

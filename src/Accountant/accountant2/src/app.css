@@ -113,7 +113,7 @@ form input[type='date'] {
 
 form .description-textarea {
 	height: 80px;
-	max-height: 200px;
+	max-height: 300px;
 }
 
 form input[type='text'],
@@ -421,7 +421,7 @@ td.sync-icon-cell {
 	}
 
 	form .description-textarea {
-		height: 100px;
+		height: 140px;
 	}
 
 	.multi-radio-part label {

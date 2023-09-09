@@ -14,7 +14,7 @@ public class ShareListRequest : IMapFrom<ListShare>
     public void Mapping(Profile profile)
     {
         profile.CreateMap<ListShare, ShareListRequest>()
-            .ForMember(x => x.ListName, opt => opt.MapFrom(src => src.List.Name))
-            .ForMember(x => x.ListOwnerName, opt => opt.MapFrom(src => src.User.Name));
+            .ForMember(x => x.ListName, opt => opt.MapFrom(src => src.List!.Name))
+            .ForMember(x => x.ListOwnerName, opt => opt.MapFrom(src => src.User!.Name));
     }
 }

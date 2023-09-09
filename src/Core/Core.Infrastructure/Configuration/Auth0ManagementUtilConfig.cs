@@ -5,11 +5,11 @@ namespace Core.Infrastructure.Configuration;
 public class Auth0ManagementUtilConfig
 {
     [Required]
-    public string Domain { get; } = null!;
+    public required string Domain { get; set; }
 
     [Required]
-    public string ClientId { get; } = null!;
+    public required string ClientId { get; set; }
 
     [Required]
-    public string ClientSecret { get; } = null!;
+    public required string ClientSecret { get; set; }
 }

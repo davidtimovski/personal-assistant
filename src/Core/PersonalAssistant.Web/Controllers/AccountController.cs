@@ -79,68 +79,6 @@ public class AccountController : BaseController
         await HttpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
     }
 
-    [HttpGet]
-    [AllowAnonymous]
-    [ActionName("reset-password")]
-    public async Task<IActionResult> ResetPassword()
-    {
-        var tr = Metrics.StartTransaction(
-            $"{Request.Method} account/reset-password",
-            $"{nameof(AccountController)}.{nameof(ResetPassword)}"
-        );
-
-        var viewModel = new ResetPasswordViewModel();
-
-        if (User?.Identity?.IsAuthenticated == true)
-        {
-            using var httpClient = await InitializeAuth0ClientAsync(tr);
-
-            var user = await Auth0Proxy.GetUserAsync(httpClient, AuthId, tr);
-            viewModel.Email = user.email;
-        }
-
-        tr.Finish();
-
-        return View(viewModel);
-    }
-
-    [HttpPost]
-    [AllowAnonymous]
-    [ActionName("reset-password")]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
-    {
-        if (!ModelState.IsValid)
-        {
-            return View(model);
-        }
-
-        var tr = Metrics.StartTransaction(
-            $"{Request.Method} account/reset-password",
-            $"{nameof(AccountController)}.{nameof(ResetPassword)}"
-        );
-
-        try
-        {
-            using var httpClient = await InitializeAuth0ClientAsync(tr);
-
-            await Auth0Proxy.ResetPasswordAsync(httpClient, model.Email, tr);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Resetting user password failed for user: {model.Email}");
-
-            ModelState.AddModelError(string.Empty, _localizer["AnErrorOccurred"]);
-            return View(model);
-        }
-        finally
-        {
-            tr.Finish();
-        }
-
-        return RedirectToAction(nameof(HomeController.Overview), "Home", new { alert = OverviewAlert.PasswordResetEmailSent });
-    }
-
     /// <summary>
     /// Handle logout page postback
     /// </summary>
@@ -173,7 +111,7 @@ public class AccountController : BaseController
     [HttpPost]
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl)
+    public async Task<IActionResult> Register(RegisterViewModel model, string? returnUrl)
     {
         if (!ModelState.IsValid)
         {
@@ -260,6 +198,68 @@ public class AccountController : BaseController
         tr.Finish();
 
         return Ok(response.Score);
+    }
+
+    [HttpGet]
+    [AllowAnonymous]
+    [ActionName("reset-password")]
+    public async Task<IActionResult> ResetPassword()
+    {
+        var tr = Metrics.StartTransaction(
+            $"{Request.Method} account/reset-password",
+            $"{nameof(AccountController)}.{nameof(ResetPassword)}"
+        );
+
+        var viewModel = new ResetPasswordViewModel();
+
+        if (User?.Identity?.IsAuthenticated == true)
+        {
+            using var httpClient = await InitializeAuth0ClientAsync(tr);
+
+            var user = await Auth0Proxy.GetUserAsync(httpClient, AuthId, tr);
+            viewModel.Email = user.email;
+        }
+
+        tr.Finish();
+
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    [AllowAnonymous]
+    [ActionName("reset-password")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var tr = Metrics.StartTransaction(
+            $"{Request.Method} account/reset-password",
+            $"{nameof(AccountController)}.{nameof(ResetPassword)}"
+        );
+
+        try
+        {
+            using var httpClient = await InitializeAuth0ClientAsync(tr);
+
+            await Auth0Proxy.ResetPasswordAsync(httpClient, model.Email, tr);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Resetting user password failed for user: {model.Email}");
+
+            ModelState.AddModelError(string.Empty, _localizer["AnErrorOccurred"]);
+            return View(model);
+        }
+        finally
+        {
+            tr.Finish();
+        }
+
+        return RedirectToAction(nameof(HomeController.Overview), "Home", new { alert = OverviewAlert.PasswordResetEmailSent });
     }
 
     [HttpGet]

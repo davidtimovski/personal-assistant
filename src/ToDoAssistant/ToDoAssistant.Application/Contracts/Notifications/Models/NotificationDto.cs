@@ -18,7 +18,7 @@ public class NotificationDto : IMapFrom<Notification>
     public void Mapping(Profile profile)
     {
         profile.CreateMap<Notification, NotificationDto>()
-            .ForMember(x => x.UserName, opt => opt.MapFrom(src => src.User.Name))
-            .ForMember(x => x.UserImageUri, opt => opt.MapFrom(src => src.User.ImageUri));
+            .ForMember(x => x.UserName, opt => opt.MapFrom(src => src.User!.Name))
+            .ForMember(x => x.UserImageUri, opt => opt.MapFrom(src => src.User!.ImageUri));
     }
 }

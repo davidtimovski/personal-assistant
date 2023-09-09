@@ -21,7 +21,6 @@
 		localStorage.clear();
 
 		const authService = new AuthService();
-		await authService.initialize();
 		await authService.logout();
 	}
 

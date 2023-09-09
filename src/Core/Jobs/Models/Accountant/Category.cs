@@ -1,7 +1,7 @@
 ﻿namespace Jobs.Models.Accountant;
 
-internal class Category
+public class Category
 {
-    internal int Id { get; set; }
-    internal int UserId { get; set; }
+    public int Id { get; set; }
+    public int UserId { get; set; }
 }

@@ -285,3 +285,9 @@
 		</form>
 	</div>
 </section>
+
+<style lang="scss">
+	.description-textarea {
+		height: 110px;
+	}
+</style>

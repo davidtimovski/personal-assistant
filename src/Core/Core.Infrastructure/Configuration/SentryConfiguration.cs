@@ -5,5 +5,5 @@ namespace Core.Infrastructure.Configuration;
 public class SentryConfiguration
 {
     [Required]
-    public string Dsn { get; set; } = null!;
+    public required string Dsn { get; set; }
 }

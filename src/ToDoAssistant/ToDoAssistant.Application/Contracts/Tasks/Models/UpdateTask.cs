@@ -41,7 +41,7 @@ public class UpdateTaskValidator : AbstractValidator<UpdateTask>
         RuleFor(dto => dto.AssignedToUserId)
             .Must((dto, assignedToUserId) =>
             {
-                if (dto.AssignedToUserId.HasValue && !listService.UserOwnsOrSharesAsPending(dto.ListId, assignedToUserId.Value))
+                if (assignedToUserId.HasValue && !listService.UserOwnsOrSharesAsPending(dto.ListId, assignedToUserId.Value))
                 {
                     return false;
                 }

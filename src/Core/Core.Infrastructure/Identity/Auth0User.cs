@@ -5,8 +5,8 @@ namespace Core.Infrastructure.Identity;
 public class Auth0User
 {
     [JsonRequired]
-    public string email { get; set; } = null!;
+    public required string email { get; init; }
 
     [JsonRequired]
-    public string name { get; set; } = null!;
+    public required string name { get; init; }
 }

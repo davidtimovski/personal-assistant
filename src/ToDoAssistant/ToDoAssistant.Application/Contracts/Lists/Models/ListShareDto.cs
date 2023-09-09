@@ -17,8 +17,8 @@ public class ListShareDto : IMapFrom<ListShare>
     public void Mapping(Profile profile)
     {
         profile.CreateMap<ListShare, ListShareDto>()
-            .ForMember(x => x.Email, opt => opt.MapFrom(src => src.User.Email))
-            .ForMember(x => x.Name, opt => opt.MapFrom(src => src.User.Name))
-            .ForMember(x => x.ImageUri, opt => opt.MapFrom(src => src.User.ImageUri));
+            .ForMember(x => x.Email, opt => opt.MapFrom(src => src.User!.Email))
+            .ForMember(x => x.Name, opt => opt.MapFrom(src => src.User!.Name))
+            .ForMember(x => x.ImageUri, opt => opt.MapFrom(src => src.User!.ImageUri));
     }
 }

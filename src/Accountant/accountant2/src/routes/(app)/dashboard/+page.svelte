@@ -103,6 +103,14 @@
 		goto('/transactions');
 	}
 
+	function editUpcomingExpense(id: number) {
+		goto(`/editUpcomingExpense/${id}`);
+	}
+
+	function editDebt(id: number) {
+		goto(`/editDebt/${id}`);
+	}
+
 	function startProgressBar() {
 		progressBarActive = true;
 		progress.set(10);
@@ -254,7 +262,7 @@
 				<table class="home-table">
 					<tbody>
 						{#each data.upcomingExpenses as upcomingExpense}
-							<tr>
+							<tr on:click={() => editUpcomingExpense(upcomingExpense.id)} role="button">
 								<td>{upcomingExpense.category}</td>
 								<td>{upcomingExpense.description}</td>
 								<td class="amount-cell">{Formatter.money(upcomingExpense.amount, currency, $user.language)}</td>
@@ -283,7 +291,7 @@
 				<table class="home-table">
 					<tbody>
 						{#each data.debt as debtItem}
-							<tr>
+							<tr on:click={() => editDebt(debtItem.id)} role="button">
 								<td>
 									{#if debtItem.userIsDebtor}
 										<span>{$t('dashboard.to')}</span>
@@ -385,6 +393,14 @@
 	.home-table {
 		width: 100%;
 		font-size: 1rem;
+
+		tbody tr {
+			cursor: pointer;
+
+			&:hover {
+				color: var(--primary-color-dark);
+			}
+		}
 
 		td {
 			padding: 5px 15px 5px 0;

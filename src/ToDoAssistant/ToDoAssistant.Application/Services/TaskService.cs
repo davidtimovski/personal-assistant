@@ -186,6 +186,10 @@ public class TaskService : ITaskService
             var id = await _tasksRepository.CreateAsync(task, model.UserId, metric);
 
             ToDoList? list = _listsRepository.GetWithShares(model.ListId, model.UserId, metric);
+            if (list is null)
+            {
+                throw new InvalidOperationException("Cannot create task in non-existing list");
+            }
 
             var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
             var result = new CreatedTaskResult(id, task.ListId, notifySignalR);
@@ -244,6 +248,10 @@ public class TaskService : ITaskService
             IEnumerable<ToDoTask> createdTasks = await _tasksRepository.BulkCreateAsync(tasks, model.TasksArePrivate, model.UserId, metric);
 
             ToDoList? list = _listsRepository.GetWithShares(model.ListId, model.UserId, metric);
+            if (list is null)
+            {
+                throw new InvalidOperationException("Cannot create tasks in non-existing list");
+            }
 
             var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(model.ListId, model.UserId, model.TasksArePrivate, metric).ToList();
 
@@ -258,14 +266,14 @@ public class TaskService : ITaskService
             var user = _userService.Get(model.UserId);
 
             result.ListName = list.Name;
-            result.CreatedTasks = createdTasks.Select(x => new BulkCreatedTask
+            result.CreatedTasks.AddRange(createdTasks.Select(x => new BulkCreatedTask
             {
                 Id = x.Id,
                 Name = x.Name
-            });
+            }));
             result.ActionUserName = user.Name;
             result.ActionUserImageUri = user.ImageUri;
-            result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList();
+            result.NotificationRecipients.AddRange(usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }));
 
             return result;
         }
@@ -310,6 +318,10 @@ public class TaskService : ITaskService
             await _tasksRepository.UpdateAsync(task, model.UserId, metric);
 
             ToDoList? list = _listsRepository.GetWithShares(model.ListId, model.UserId, metric);
+            if (list is null)
+            {
+                throw new InvalidOperationException("Cannot update task in non-existing list");
+            }
 
             var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
             var result = new UpdateTaskResult(originalTask.Name, list.Id, list.Name, notifySignalR);
@@ -382,6 +394,10 @@ public class TaskService : ITaskService
             await _tasksRepository.DeleteAsync(id, userId, metric);
 
             ToDoList? list = _listsRepository.GetWithShares(task.ListId, userId, metric);
+            if (list is null)
+            {
+                throw new InvalidOperationException("Cannot delete task from non-existing list");
+            }
 
             var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(task.ListId, userId, task.PrivateToUserId == userId, metric).ToList();
 
@@ -434,6 +450,10 @@ public class TaskService : ITaskService
             await _tasksRepository.CompleteAsync(model.Id, model.UserId, metric);
 
             ToDoList? list = _listsRepository.GetWithShares(task.ListId, model.UserId, metric);
+            if (list is null)
+            {
+                throw new InvalidOperationException("Cannot complete task in non-existing list");
+            }
 
             var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(task.ListId, model.UserId, model.Id, metric).ToList();
 
@@ -486,6 +506,10 @@ public class TaskService : ITaskService
             await _tasksRepository.UncompleteAsync(model.Id, model.UserId, metric);
 
             ToDoList? list = _listsRepository.GetWithShares(task.ListId, model.UserId, metric);
+            if (list is null)
+            {
+                throw new InvalidOperationException("Cannot uncomplete task in non-existing list");
+            }
 
             var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(task.ListId, model.UserId, model.Id, metric).ToList();
 
@@ -533,6 +557,10 @@ public class TaskService : ITaskService
 
             ToDoTask task = _tasksRepository.Get(model.Id);
             ToDoList? list = _listsRepository.GetWithShares(task.ListId, model.UserId, metric);
+            if (list is null)
+            {
+                throw new InvalidOperationException("Cannot reorder task in non-existing list");
+            }
 
             var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
             return new ReorderTaskResult(list.Id, notifySignalR);

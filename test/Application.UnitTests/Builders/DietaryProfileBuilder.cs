@@ -34,8 +34,8 @@ internal class DietaryProfileBuilder
             {
                 new DailyIntakeAgeGroup
                 {
-                    AgeFrom = 19,
-                    AgeTo = 31,
+                    AgeFrom = 31,
+                    AgeTo = 50,
                     RecommendedIntake = new RecommendedIntake
                     {
                         TotalFatFrom = 25,
@@ -43,7 +43,7 @@ internal class DietaryProfileBuilder
                         SaturatedFatMax = 10,
                         Carbohydrate = 130,
                         AddedSugarsMax = 10,
-                        Fiber = 33.6f,
+                        Fiber = 33.8f,
                         Protein = 56,
                         Sodium = 2300,
                         CholesterolMax = 300,
@@ -53,7 +53,7 @@ internal class DietaryProfileBuilder
                         Calcium = 1000,
                         Iron = 8,
                         Potassium = 4700,
-                        Magnesium = 400
+                        Magnesium = 420
                     }
                 }
             }

@@ -27,14 +27,15 @@
 
     <div class="form-group">
         <select asp-for="Language" aria-label="@Localizer["Language"]" required>
-            <option value="">@Localizer["PleaseSelectLanguage"]</option>
+            <option value="">@Localizer["SelectLanguage"]</option>
             <option value="en-US">English</option>
             <option value="mk-MK">Македонски</option>
         </select>
     </div>
 
     <div class="form-group">
-        <select asp-for="Culture" title="@Localizer["Culture"]" aria-label="@Localizer["Culture"]">
+        <select asp-for="Culture" title="@Localizer["Culture"]" aria-label="@Localizer["Culture"]" required>
+            <option value="">@Localizer["SelectCulture"]</option>
             @foreach (var option in Model.CultureOptions)
             {
                 <option value="@option.Value">@option.Label</option>
@@ -43,12 +44,12 @@
     </div>
 
     <div class="form-group relative">
-        <input type="password" asp-for="Password" class="password-input" maxlength="100" placeholder="@Localizer["Password"]" aria-label="@Localizer["Password"]" required />
+        <input type="password" asp-for="Password" class="password-input" maxlength="100" placeholder="@Localizer["Password"]" aria-label="@Localizer["Password"]" autocomplete="new-password" required />
         <button type="button" class="password-show-button" data-for="Password">@Localizer["Show"]</button>
     </div>
 
     <div class="form-group relative">
-        <input type="password" asp-for="ConfirmPassword" class="password-input" maxlength="100" placeholder="@Localizer["ConfirmPassword"]" aria-label="@Localizer["ConfirmPassword"]" required />
+        <input type="password" asp-for="ConfirmPassword" class="password-input" maxlength="100" placeholder="@Localizer["ConfirmPassword"]" aria-label="@Localizer["ConfirmPassword"]" autocomplete="off" required />
         <button type="button" class="password-show-button" data-for="ConfirmPassword">@Localizer["Show"]</button>
     </div>
 

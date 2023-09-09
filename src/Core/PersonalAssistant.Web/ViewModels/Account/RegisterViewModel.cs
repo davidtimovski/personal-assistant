@@ -9,7 +9,6 @@ public class RegisterViewModel
 {
     public RegisterViewModel()
     {
-        Culture = "en-US";
         CultureOptions = CultureInfo.GetCultures(CultureTypes.AllCultures)
             .Where(x => !string.IsNullOrEmpty(x.Name))
             .OrderBy(x => x.EnglishName)
@@ -22,8 +21,8 @@ public class RegisterViewModel
     public string ConfirmPassword { get; set; } = "";
     public string Language { get; set; } = "";
     public string Culture { get; set; } = "";
-    public List<CultureOption> CultureOptions { get; }
     public float GoogleReCaptchaScore { get; set; }
+    public List<CultureOption> CultureOptions { get; }
 }
 
 public class RegisterViewModelValidator : AbstractValidator<RegisterViewModel>

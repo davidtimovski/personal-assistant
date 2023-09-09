@@ -13,62 +13,62 @@ public class AppConfiguration
 #if !DEBUG
     [Required]
 #endif
-    public KeyVaultConfiguration KeyVault { get; set; } = null!;
+    public required KeyVaultConfiguration KeyVault { get; set; }
 
     /// <summary>
     /// Coming from appsettings.json and Azure Key Vault.
     /// </summary>
     [Required]
-    public string ConnectionString { get; set; } = null!;
+    public required string ConnectionString { get; set; }
 
     /// <summary>
     /// Coming from appsettings.*.json.
     /// </summary>
     [Required]
-    public Auth0Config Auth0 { get; set; } = null!;
+    public required Auth0Config Auth0 { get; set; }
 
     /// <summary>
     /// Coming from appsettings.*.json.
     /// </summary>
     [Required]
-    public string Url { get; set; } = null!;
+    public required string Url { get; set; }
 
     /// <summary>
     /// Coming from appsettings.json and environment variables.
     /// </summary>
     [Required]
-    public CloudinaryConfig Cloudinary { get; set; } = null!;
+    public required CloudinaryConfig Cloudinary { get; set; }
 
     /// <summary>
     /// Coming from appsettings.json.
     /// </summary>
     [Required]
-    public DietaryProfileConfig DietaryProfile { get; set; } = null!;
+    public required DietaryProfileConfig DietaryProfile { get; set; }
 
     /// <summary>
     /// Coming from environment variables.
     /// </summary>
     [Required]
-    public SenderConfiguration RabbitMQ { get; set; } = null!;
+    public required SenderConfiguration RabbitMQ { get; set; }
 }
 
 public class Auth0Config
 {
     [Required]
-    public string Domain { get; set; } = null!;
+    public required string Domain { get; set; }
 
     [Required]
-    public string Audience { get; set; } = null!;
+    public required string Audience { get; set; }
 }
 
 public class DietaryProfileConfig
 {
     [Required]
-    public Dictionary<string, float> ActivityMultiplier { get; set; } = null!;
+    public required Dictionary<string, float> ActivityMultiplier { get; set; }
 
     [Required]
-    public Dictionary<string, short> DietaryGoalCalories { get; set; } = null!;
+    public required Dictionary<string, short> DietaryGoalCalories { get; set; }
 
     [Required]
-    public DailyIntakeReference ReferenceDailyIntake { get; set; } = null!;
+    public required DailyIntakeReference ReferenceDailyIntake { get; set; }
 }

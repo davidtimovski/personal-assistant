@@ -15,7 +15,7 @@ public class BulkCreateResult : INotificationResult
     public bool NotifySignalR { get; }
 
     public string ListName { get; set; } = null!;
-    public IEnumerable<BulkCreatedTask> CreatedTasks { get; set; }
+    public List<BulkCreatedTask> CreatedTasks { get; set; } = new();
     public string ActionUserName { get; set; } = null!;
     public string ActionUserImageUri { get; set; } = null!;
     public List<NotificationRecipient> NotificationRecipients { get; set; } = new();
@@ -28,6 +28,6 @@ public class BulkCreateResult : INotificationResult
 
 public class BulkCreatedTask
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = null!;
+    public required int Id { get; init; }
+    public required string Name { get; init; }
 }

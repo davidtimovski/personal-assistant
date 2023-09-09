@@ -2,10 +2,10 @@
 
 public class GetForecast
 {
-    public float Latitude { get; set; }
-    public float Longitude { get; set; }
-    public string TemperatureUnit { get; set; }
-    public string PrecipitationUnit { get; set; }
-    public string WindSpeedUnit { get; set; }
-    public DateTime Time { get; set; }
+    public required float Latitude { get; set; }
+    public required float Longitude { get; set; }
+    public required string TemperatureUnit { get; set; }
+    public required string PrecipitationUnit { get; set; }
+    public required string WindSpeedUnit { get; set; }
+    public required DateTime Time { get; set; }
 }

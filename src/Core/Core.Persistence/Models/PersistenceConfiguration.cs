@@ -5,5 +5,5 @@ namespace Core.Persistence.Models;
 public class PersistenceConfiguration
 {
     [Required]
-    public string ConnectionString { get; set; } = null!;
+    public required string ConnectionString { get; set; }
 }

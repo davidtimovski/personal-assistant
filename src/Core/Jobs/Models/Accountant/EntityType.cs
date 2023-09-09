@@ -1,6 +1,6 @@
 ﻿namespace Jobs.Models.Accountant;
 
-internal enum EntityType
+public enum EntityType
 {
     Category,
     Account,

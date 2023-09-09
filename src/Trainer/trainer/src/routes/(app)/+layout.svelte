@@ -28,14 +28,13 @@
 
 	onMount(async () => {
 		const authService = new AuthService();
-		await authService.initialize();
 
 		if (!(await authService.authenticated())) {
 			await authService.signinRedirect();
 			return;
 		}
 
-		await authService.setToken();
+		await authService.silentLogin();
 
 		usersService = new UsersServiceBase('Trainer');
 		loadUser();

@@ -5,11 +5,11 @@ namespace Core.Infrastructure.Configuration;
 public class SenderConfiguration
 {
     [Required]
-    public string EventBusConnection { get; set; } = null!;
+    public required string EventBusConnection { get; set; }
 
     [Required]
-    public string EventBusUserName { get; set; } = null!;
+    public required string EventBusUserName { get; set; }
 
     [Required]
-    public string EventBusPassword { get; set; } = null!;
+    public required string EventBusPassword { get; set; }
 }

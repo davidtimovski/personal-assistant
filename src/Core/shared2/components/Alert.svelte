@@ -95,7 +95,7 @@
   onDestroy(unsubscriber);
 </script>
 
-<div class="alert {type}" class:shown>
+<div on:click={() => hide()} class="alert {type}" class:shown>
   <span class="alert-body">
     <div
       class="alert-message"

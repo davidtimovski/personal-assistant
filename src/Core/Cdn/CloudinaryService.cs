@@ -23,8 +23,7 @@ public class CloudinaryService : ICdnService
         { "recipe", new Transformation().Width(640).Height(320).Crop("lfill").FetchFormat(Format) }
     };
     private readonly HttpClient _httpClient;
-
-    private CloudinaryDotNet.Cloudinary Cloudinary { get; }
+    private readonly CloudinaryDotNet.Cloudinary _cloudinary;
 
     public CloudinaryService(
         Account cloudinaryAccount,
@@ -38,7 +37,7 @@ public class CloudinaryService : ICdnService
         _defaultRecipeImageUri = defaultRecipeImageUri;
         _baseUrl = $"https://res.cloudinary.com/personalassistant/{_environment}/";
         _httpClient = httpClient;
-        Cloudinary = new CloudinaryDotNet.Cloudinary(cloudinaryAccount);
+        _cloudinary = new CloudinaryDotNet.Cloudinary(cloudinaryAccount);
     }
 
     public string GetDefaultProfileImageUri() => _defaultProfileImageUri;
@@ -66,7 +65,7 @@ public class CloudinaryService : ICdnService
             Transformation = transformation
         };
 
-        ImageUploadResult uploadResult = await Cloudinary.UploadAsync(uploadParams);
+        ImageUploadResult uploadResult = await _cloudinary.UploadAsync(uploadParams);
         if (uploadResult.Error != null)
         {
             throw new Exception($"{nameof(CloudinaryService)}.{nameof(UploadAsync)}() returned error: {uploadResult.Error.Message}");
@@ -127,7 +126,7 @@ public class CloudinaryService : ICdnService
             Tags = "temp"
         };
 
-        ImageUploadResult uploadResult = await Cloudinary.UploadAsync(uploadParams);
+        ImageUploadResult uploadResult = await _cloudinary.UploadAsync(uploadParams);
         if (uploadResult.Error != null)
         {
             throw new Exception($"{nameof(CloudinaryService)}.{nameof(UploadProfileTempAsync)}() returned error: {uploadResult.Error.Message}");
@@ -194,7 +193,7 @@ public class CloudinaryService : ICdnService
             Command = TagCommand.Remove
         };
 
-        TagResult tagResult = await Cloudinary.TagAsync(tagParams);
+        TagResult tagResult = await _cloudinary.TagAsync(tagParams);
         if (tagResult.Error != null)
         {
             throw new Exception($"{nameof(CloudinaryService)}.{nameof(RemoveTempTagAsync)}() returned error: {tagResult.Error.Message}");
@@ -214,7 +213,7 @@ public class CloudinaryService : ICdnService
 
         string publicId = GetPublicIdFromUri(imageUri);
 
-        DelResResult deleteResult = await Cloudinary.DeleteResourcesAsync(new DelResParams
+        DelResResult deleteResult = await _cloudinary.DeleteResourcesAsync(new DelResParams
         {
             PublicIds = new List<string> { publicId }
         });
@@ -230,7 +229,7 @@ public class CloudinaryService : ICdnService
     {
         var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(CreateFolderForUserAsync)}");
 
-        CreateFolderResult result = await Cloudinary.CreateFolderAsync($"{_environment}/users/{userId}");
+        CreateFolderResult result = await _cloudinary.CreateFolderAsync($"{_environment}/users/{userId}");
         if (result.Error != null)
         {
             throw new Exception($"{nameof(CloudinaryService)}.{nameof(CreateFolderForUserAsync)}() returned error: {result.Error.Message}");
@@ -250,7 +249,7 @@ public class CloudinaryService : ICdnService
             publicIds.Add(publicId);
         }
 
-        DelResResult deleteResult = await Cloudinary.DeleteResourcesAsync(new DelResParams
+        DelResResult deleteResult = await _cloudinary.DeleteResourcesAsync(new DelResParams
         {
             PublicIds = publicIds
         });
@@ -259,7 +258,7 @@ public class CloudinaryService : ICdnService
             throw new Exception($"{nameof(CloudinaryService)}.{nameof(DeleteUserResourcesAsync)}() returned error: {deleteResult.Error.Message}");
         }
 
-        DeleteFolderResult deleteFolderResult = await Cloudinary.DeleteFolderAsync($"{_environment}/users/{userId}");
+        DeleteFolderResult deleteFolderResult = await _cloudinary.DeleteFolderAsync($"{_environment}/users/{userId}");
         if (deleteFolderResult.Error != null)
         {
             throw new Exception($"{nameof(CloudinaryService)}.{nameof(DeleteUserResourcesAsync)}() returned error: {deleteFolderResult.Error.Message}");
@@ -270,7 +269,7 @@ public class CloudinaryService : ICdnService
 
     public async Task DeleteTemporaryResourcesAsync(DateTime olderThan)
     {
-        var searchResult = Cloudinary.ListResourcesByTag("temp");
+        var searchResult = _cloudinary.ListResourcesByTag("temp");
         if (!searchResult.Resources.Any())
         {
             return;
@@ -282,7 +281,7 @@ public class CloudinaryService : ICdnService
             return;
         }
 
-        DelResResult deleteResult = await Cloudinary.DeleteResourcesAsync(new DelResParams
+        DelResResult deleteResult = await _cloudinary.DeleteResourcesAsync(new DelResParams
         {
             PublicIds = publicIds
         });
@@ -312,7 +311,7 @@ public class CloudinaryService : ICdnService
             Tags = "temp"
         };
 
-        ImageUploadResult uploadResult = await Cloudinary.UploadAsync(uploadParams);
+        ImageUploadResult uploadResult = await _cloudinary.UploadAsync(uploadParams);
         if (uploadResult.Error != null)
         {
             throw new Exception($"{nameof(CloudinaryService)}.{nameof(UploadTempAsync)}() returned error: {uploadResult.Error.Message}");
