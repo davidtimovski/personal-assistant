@@ -2,17 +2,17 @@
 
 namespace Core.Infrastructure.Identity;
 
-internal class TokenResult
+public class TokenResult
 {
     [JsonRequired]
-    public string access_token { get; set; } = null!;
+    public required string access_token { get; set; }
 
     [JsonRequired]
-    public int expires_in { get; set; }
+    public required int expires_in { get; set; }
 
     [JsonRequired]
-    public string scope { get; set; } = null!;
+    public required string scope { get; set; }
 
     [JsonRequired]
-    public string token_type { get; set; } = null!;
+    public required string token_type { get; set; }
 }

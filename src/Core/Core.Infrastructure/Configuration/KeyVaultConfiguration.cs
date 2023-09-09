@@ -5,14 +5,14 @@ namespace Core.Infrastructure.Configuration;
 public class KeyVaultConfiguration
 {
     [Required]
-    public string Url { get; set; } = null!;
+    public required string Url { get; set; }
 
     [Required]
-    public string TenantId { get; set; } = null!;
+    public required string TenantId { get; set; }
 
     [Required]
-    public string ClientId { get; set; } = null!;
+    public required string ClientId { get; set; }
 
     [Required]
-    public string ClientSecret { get; set; } = null!;
+    public required string ClientSecret { get; set; }
 }

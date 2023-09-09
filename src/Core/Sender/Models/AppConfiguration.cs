@@ -11,53 +11,53 @@ public class AppConfiguration
 #if !DEBUG
     [Required]
 #endif
-    public KeyVaultConfiguration KeyVault { get; set; } = null!;
+    public required KeyVaultConfiguration KeyVault { get; set; }
 
     /// <summary>
     /// Coming from appsettings.json and Azure Key Vault.
     /// </summary>
     [Required]
-    public string ConnectionString { get; set; } = null!;
+    public required string ConnectionString { get; set; }
 
     /// <summary>
     /// Coming from appsettings.*.json.
     /// </summary>
     [Required]
-    public string SystemEmail { get; set; } = null!;
+    public required string SystemEmail { get; set; }
 
     /// <summary>
     /// Coming from environment variables.
     /// </summary>
     [Required]
-    public SenderConfiguration RabbitMQ { get; set; } = null!;
+    public required SenderConfiguration RabbitMQ { get; set; }
 
     /// <summary>
     /// Coming from environment variables and Azure Key Vault.
     /// </summary>
     [Required]
-    public string SendGridApiKey { get; set; } = null!;
+    public required string SendGridApiKey { get; set; }
 
     /// <summary>
     /// Coming from Azure Key Vault.
     /// </summary>
     [Required]
-    public AppSecrets Sender { get; set; } = null!;
+    public required AppSecrets Sender { get; set; }
 }
 
 public class VapidConfiguration
 {
     [Required]
-    public string PublicKey { get; set; } = null!;
+    public required string PublicKey { get; set; }
 
     [Required]
-    public string PrivateKey { get; set; } = null!;
+    public required string PrivateKey { get; set; }
 }
 
 public class AppSecrets
 {
     [Required]
-    public VapidConfiguration ToDoAssistantVapid { get; set; } = null!;
+    public required VapidConfiguration ToDoAssistantVapid { get; set; }
 
     [Required]
-    public VapidConfiguration CookingAssistantVapid { get; set; } = null!;
+    public required VapidConfiguration CookingAssistantVapid { get; set; }
 }

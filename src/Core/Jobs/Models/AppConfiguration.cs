@@ -9,19 +9,19 @@ public class AppConfiguration
     /// Coming from appsettings.*.json.
     /// </summary>
     [Required]
-    public string ConnectionString { get; set; } = null!;
+    public required string ConnectionString { get; set; }
 
     /// <summary>
     /// Coming from appsettings.*.json.
     /// </summary>
     [Required]
-    public FixerApiConfig FixerApi { get; set; } = null!;
+    public required FixerApiConfig FixerApi { get; set; }
 
     /// <summary>
     /// Coming from appsettings.json and environment variables.
     /// </summary>
     [Required]
-    public CloudinaryConfig Cloudinary { get; set; } = null!;
+    public required CloudinaryConfig Cloudinary { get; set; }
 
     /// <summary>
     /// Coming from appsettings.Production.json.
@@ -29,18 +29,18 @@ public class AppConfiguration
 #if !DEBUG
     [Required]
 #endif
-    public DbBackupConfig DbBackup { get; set; } = null!;
+    public required DbBackupConfig DbBackup { get; set; }
 }
 
 public class FixerApiConfig
 {
     [Required]
-    public string BaseUrl { get; set; } = null!;
+    public required string BaseUrl { get; set; }
 
 #if !DEBUG
     [Required]
 #endif
-    public string AccessKey { get; set; } = null!;
+    public required string AccessKey { get; set; }
 }
 
 public class DbBackupConfig
@@ -48,11 +48,11 @@ public class DbBackupConfig
 #if !DEBUG
     [Required]
 #endif
-    public string AzureStorageConnectionString { get; set; } = null!;
+    public required string AzureStorageConnectionString { get; set; }
 
     [Required]
-    public string AzureStorageContainerName { get; set; } = null!;
+    public required string AzureStorageContainerName { get; set; }
 
     [Required]
-    public string BackupsPath { get; set; } = null!;
+    public required string BackupsPath { get; set; }
 }

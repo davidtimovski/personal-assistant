@@ -47,6 +47,8 @@ export class DebtsService {
 		try {
 			const now = new Date();
 
+			debt.person = debt.person.trim();
+
 			if (typeof debt.amount === 'string') {
 				debt.amount = parseFloat(debt.amount);
 			}
@@ -151,6 +153,9 @@ export class DebtsService {
 
 	async update(debt: DebtModel): Promise<void> {
 		try {
+			debt.modifiedDate = new Date();
+			debt.person = debt.person.trim();
+
 			if (typeof debt.amount === 'string') {
 				debt.amount = parseFloat(debt.amount);
 			}
@@ -158,7 +163,6 @@ export class DebtsService {
 			if (debt.description) {
 				debt.description = debt.description.replace(/(\r\n|\r|\n){3,}/g, '$1\n').trim();
 			}
-			debt.modifiedDate = new Date();
 
 			if (navigator.onLine) {
 				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/debts`, {

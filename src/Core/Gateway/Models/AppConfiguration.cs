@@ -8,23 +8,23 @@ public class AppConfiguration
     /// Coming from appsettings.*.json.
     /// </summary>
     [Required]
-    public AppUrls Urls { get; set; } = null!;
+    public required AppUrls Urls { get; set; }
 }
 
 public class AppUrls
 {
     [Required]
-    public string ToDoAssistant { get; set; } = null!;
+    public required string ToDoAssistant { get; set; }
 
     [Required]
-    public string CookingAssistant { get; set; } = null!;
+    public required string CookingAssistant { get; set; }
 
     [Required]
-    public string Accountant { get; set; } = null!;
+    public required string Accountant { get; set; }
 
     [Required]
-    public string Weatherman { get; set; } = null!;
+    public required string Weatherman { get; set; }
 
     [Required]
-    public string Trainer { get; set; } = null!;
+    public required string Trainer { get; set; }
 }

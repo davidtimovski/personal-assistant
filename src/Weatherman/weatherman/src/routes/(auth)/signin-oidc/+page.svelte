@@ -9,15 +9,13 @@
 			containerHeight = window.innerHeight;
 		}
 
-		const authService = new AuthService();
-		await authService.initialize();
-
 		const query = window.location.search;
 		if (!query.includes('code=') || !query.includes('state=')) {
 			throw new Error('Query parameters for redirect callback missing');
 		}
 
 		// Process the login state
+		const authService = new AuthService();
 		await authService.handleRedirectCallback();
 
 		// Use replaceState to redirect the user away and remove the querystring parameters

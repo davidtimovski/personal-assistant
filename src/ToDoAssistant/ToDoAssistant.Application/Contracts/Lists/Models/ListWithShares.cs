@@ -21,9 +21,9 @@ public class ListWithShares : IMapFrom<ToDoList>
     {
         profile.CreateMap<ToDoList, ListWithShares>()
             .ForMember(x => x.SharingState, opt => opt.MapFrom<ListSharingStateResolver>())
-            .ForMember(x => x.OwnerEmail, opt => opt.MapFrom(src => src.User.Email))
-            .ForMember(x => x.OwnerName, opt => opt.MapFrom(src => src.User.Name))
-            .ForMember(x => x.OwnerImageUri, opt => opt.MapFrom(src => src.User.ImageUri))
+            .ForMember(x => x.OwnerEmail, opt => opt.MapFrom(src => src.User!.Email))
+            .ForMember(x => x.OwnerName, opt => opt.MapFrom(src => src.User!.Name))
+            .ForMember(x => x.OwnerImageUri, opt => opt.MapFrom(src => src.User!.ImageUri))
             .ForMember(x => x.UserShare, opt => opt.MapFrom<ListWithSharesUserShareResolver>());
     }
 }

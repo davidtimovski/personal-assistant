@@ -72,7 +72,7 @@ public class ForecastService : IForecastService
             if (forecast is null)
             {
                 string data = await GetFromProviderAsync(parameters, metric);
-                var openMeteoResult = JsonSerializer.Deserialize<OpenMeteoResult>(data);
+                var openMeteoResult = JsonSerializer.Deserialize<OpenMeteoResult>(data)!;
                 ForecastResult result = Map(openMeteoResult, parameters);
 
                 forecast = new Forecast
@@ -93,7 +93,7 @@ public class ForecastService : IForecastService
             else if (forecast.LastUpdate.Day != now.Day || forecast.LastUpdate < now.AddMinutes(-30))
             {
                 string data = await GetFromProviderAsync(parameters, metric);
-                var openMeteoResult = JsonSerializer.Deserialize<OpenMeteoResult>(data);
+                var openMeteoResult = JsonSerializer.Deserialize<OpenMeteoResult>(data)!;
                 ForecastResult result = Map(openMeteoResult, parameters);
 
                 forecast.Data = JsonSerializer.Serialize(result);
@@ -102,7 +102,7 @@ public class ForecastService : IForecastService
                 return result;
             }
 
-            var cachedResult = JsonSerializer.Deserialize<ForecastResult>(forecast.Data);
+            var cachedResult = JsonSerializer.Deserialize<ForecastResult>(forecast.Data)!;
 
             if (forecast.LastUpdate.Hour != now.Hour)
             {

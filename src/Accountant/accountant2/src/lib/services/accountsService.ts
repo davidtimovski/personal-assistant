@@ -187,6 +187,7 @@ export class AccountsService {
 		try {
 			const now = new Date();
 			account.createdDate = account.modifiedDate = now;
+			account.name = account.name.trim();
 
 			if (navigator.onLine) {
 				account.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/accounts`, {
@@ -210,6 +211,7 @@ export class AccountsService {
 	async update(account: Account): Promise<void> {
 		try {
 			account.modifiedDate = new Date();
+			account.name = account.name.trim();
 
 			if (navigator.onLine) {
 				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/accounts`, {

@@ -72,6 +72,7 @@ export class CategoriesService {
 		try {
 			const now = new Date();
 			category.createdDate = category.modifiedDate = now;
+			category.name = category.name.trim();
 
 			if (category.type === CategoryType.DepositOnly) {
 				category.generateUpcomingExpense = false;
@@ -99,6 +100,7 @@ export class CategoriesService {
 	async update(category: Category): Promise<void> {
 		try {
 			category.modifiedDate = new Date();
+			category.name = category.name.trim();
 
 			if (category.type === CategoryType.DepositOnly) {
 				category.generateUpcomingExpense = false;

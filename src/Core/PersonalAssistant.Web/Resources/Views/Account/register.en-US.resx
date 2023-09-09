@@ -135,10 +135,13 @@
   <data name="Name" xml:space="preserve">
     <value>Name</value>
   </data>
-  <data name="PleaseSelectLanguage" xml:space="preserve">
-    <value>Please select language</value>
-  </data>
   <data name="Register" xml:space="preserve">
     <value>Register</value>
+  </data>
+  <data name="SelectCulture" xml:space="preserve">
+    <value>Select culture</value>
+  </data>
+  <data name="SelectLanguage" xml:space="preserve">
+    <value>Select language</value>
   </data>
 </root>

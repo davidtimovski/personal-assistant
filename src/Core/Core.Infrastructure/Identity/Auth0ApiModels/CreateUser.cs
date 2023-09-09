@@ -2,7 +2,7 @@
 
 namespace Core.Infrastructure.Identity;
 
-internal class CreateUserPayload
+public class CreateUserPayload
 {
     public CreateUserPayload(string email, bool email_verified, string password, string name)
     {
@@ -13,23 +13,23 @@ internal class CreateUserPayload
     }
 
     [JsonRequired]
-    public string email { get; set; }
+    public string email { get; init; }
 
     [JsonRequired]
-    public bool email_verified { get; set; }
+    public bool email_verified { get; init; }
 
     [JsonRequired]
-    public string password { get; set; }
+    public string password { get; init; }
 
     [JsonRequired]
-    public string name { get; set; }
+    public string name { get; init; }
 
     [JsonRequired]
-    public string connection { get; } = "Username-Password-Authentication";
+    public string connection { get; init; } = "Username-Password-Authentication";
 }
 
-internal class CreateUserResult
+public class CreateUserResult
 {
     [JsonRequired]
-    public string user_id { get; set; } = null!;
+    public required string user_id { get; init; }
 }

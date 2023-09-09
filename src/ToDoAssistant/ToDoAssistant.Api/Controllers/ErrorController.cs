@@ -24,7 +24,7 @@ public class ErrorController : ControllerBase
     {
         var context = HttpContext.Features.Get<IExceptionHandlerFeature>();
 
-        if (context.Error is ValidationException validationException)
+        if (context!.Error is ValidationException validationException)
         {
             foreach (ValidationFailure error in validationException.Errors)
             {

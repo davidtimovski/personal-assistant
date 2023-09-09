@@ -7,7 +7,7 @@ public class PushNotification : ISendable
         Application = application;
     }
 
-    public string Application { get; } = null!;
+    public string Application { get; init; }
     public string SenderImageUri { get; set; } = null!;
     public int UserId { get; set; }
     public string Message { get; set; } = null!;

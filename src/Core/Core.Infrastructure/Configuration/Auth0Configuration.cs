@@ -5,10 +5,10 @@ namespace Core.Infrastructure.Configuration;
 public class Auth0Configuration
 {
     [Required]
-    public string Domain { get; set; } = null!;
+    public required string Domain { get; set; }
 
     [Required]
-    public string Audience { get; set; } = null!;
+    public required string Audience { get; set; }
 
     public string Authority
     {

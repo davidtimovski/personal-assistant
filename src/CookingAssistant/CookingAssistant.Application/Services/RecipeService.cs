@@ -425,7 +425,7 @@ public class RecipeService : IRecipeService
 
             foreach (var recipeIngredient in recipe.RecipeIngredients)
             {
-                recipeIngredient.Ingredient.Name = recipeIngredient.Ingredient.Name.Trim();
+                recipeIngredient.Ingredient!.Name = recipeIngredient.Ingredient.Name.Trim();
                 if (recipeIngredient.Amount.HasValue)
                 {
                     if (recipeIngredient.Amount.Value == 0)
@@ -556,7 +556,7 @@ public class RecipeService : IRecipeService
 
             foreach (var recipeIngredient in recipe.RecipeIngredients)
             {
-                recipeIngredient.Ingredient.Name = recipeIngredient.Ingredient.Name.Trim();
+                recipeIngredient.Ingredient!.Name = recipeIngredient.Ingredient.Name.Trim();
                 if (recipeIngredient.Amount.HasValue)
                 {
                     if (recipeIngredient.Amount.Value == 0)
@@ -953,7 +953,7 @@ public class RecipeService : IRecipeService
         {
             RecipeIngredient[] validRecipeIngredients = recipe.RecipeIngredients
                 .Where(x => x.Amount.HasValue
-                            && x.Ingredient.Price.HasValue
+                            && x.Ingredient!.Price.HasValue
                             && (x.Ingredient.ProductSizeIsOneUnit && x.Unit == null || !x.Ingredient.ProductSizeIsOneUnit && x.Unit != null))
                 .ToArray();
 
@@ -961,12 +961,12 @@ public class RecipeService : IRecipeService
 
             foreach (var recipeIngredient in validRecipeIngredients)
             {
-                short productSize = recipeIngredient.Ingredient.ProductSize;
+                short productSize = recipeIngredient.Ingredient!.ProductSize;
                 bool productSizeIsOneUnit = recipeIngredient.Ingredient.ProductSizeIsOneUnit;
-                float amount = recipeIngredient.Amount.Value;
+                float amount = recipeIngredient.Amount!.Value;
                 string? unit = recipeIngredient.Unit;
 
-                decimal price = _currenciesRepository.Convert(recipeIngredient.Ingredient.Price.Value, recipeIngredient.Ingredient.Currency, currency, DateTime.UtcNow.Date);
+                decimal price = _currenciesRepository.Convert(recipeIngredient.Ingredient!.Price.Value, recipeIngredient.Ingredient!.Currency, currency, DateTime.UtcNow.Date);
 
                 costSummary.Cost = AddPricePerAmount(costSummary.Cost, price, productSize, productSizeIsOneUnit, amount, unit);
             }

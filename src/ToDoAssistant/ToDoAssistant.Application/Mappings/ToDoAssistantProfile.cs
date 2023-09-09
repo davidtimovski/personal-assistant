@@ -208,7 +208,7 @@ public class ListWithSharesUserShareResolver : IValueResolver<ToDoList, ListWith
         var userShare = source.Shares.FirstOrDefault(x => x.UserId == userId);
         if (userShare != null)
         {
-            shareDto.Email = userShare.User.Email;
+            shareDto.Email = userShare.User!.Email;
             shareDto.ImageUri = _cdnService.ImageUriToThumbnail(userShare.User.ImageUri);
             shareDto.IsAdmin = userShare.IsAdmin;
             return shareDto;

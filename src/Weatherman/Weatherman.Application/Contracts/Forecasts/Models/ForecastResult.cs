@@ -2,24 +2,24 @@
 
 public class ForecastResult
 {
-    public WeatherCode WeatherCode { get; set; }
-    public short Temperature { get; set; }
-    public short ApparentTemperature { get; set; }
-    public float Precipitation { get; set; }
-    public short WindSpeed { get; set; }
-    public TimeOfDay TimeOfDay { get; set; }
-    public List<HourlyForecast> Hourly { get; set; }
-    public List<DailyForecast> NextDays { get; set; }
+    public required WeatherCode WeatherCode { get; set; }
+    public required short Temperature { get; set; }
+    public required short ApparentTemperature { get; set; }
+    public required float Precipitation { get; set; }
+    public required short WindSpeed { get; set; }
+    public required TimeOfDay TimeOfDay { get; set; }
+    public required List<HourlyForecast> Hourly { get; set; }
+    public required List<DailyForecast> NextDays { get; set; }
 }
 
 public class DailyForecast
 {
-    public string Date { get; init; }
-    public WeatherCode WeatherCode { get; init; }
-    public short TemperatureMax { get; init; }
-    public short TemperatureMin { get; init; }
-    public float Precipitation { get; init; }
-    public List<HourlyForecast> Hourly { get; init; }
+    public required string Date { get; init; }
+    public required WeatherCode WeatherCode { get; init; }
+    public required short TemperatureMax { get; init; }
+    public required short TemperatureMin { get; init; }
+    public required float Precipitation { get; init; }
+    public required List<HourlyForecast> Hourly { get; init; }
 }
 
 public readonly record struct HourlyForecast(short Hour, WeatherCode WeatherCode, short Temperature, short ApparentTemperature, float Precipitation, short WindSpeed, TimeOfDay TimeOfDay);

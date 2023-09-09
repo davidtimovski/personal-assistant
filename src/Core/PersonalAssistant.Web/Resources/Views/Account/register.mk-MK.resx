@@ -135,10 +135,13 @@
   <data name="Name" xml:space="preserve">
     <value>Име</value>
   </data>
-  <data name="PleaseSelectLanguage" xml:space="preserve">
-    <value>Изберете јазик</value>
-  </data>
   <data name="Register" xml:space="preserve">
     <value>Регистрирај се</value>
+  </data>
+  <data name="SelectCulture" xml:space="preserve">
+    <value>Изберете култура</value>
+  </data>
+  <data name="SelectLanguage" xml:space="preserve">
+    <value>Изберете јазик</value>
   </data>
 </root>

@@ -11,43 +11,43 @@ public class AppConfiguration
 #if !DEBUG
     [Required]
 #endif
-    public KeyVaultConfiguration KeyVault { get; set; } = null!;
+    public required KeyVaultConfiguration KeyVault { get; set; }
 
     /// <summary>
     /// Coming from appsettings.json and Azure Key Vault.
     /// </summary>
     [Required]
-    public string ConnectionString { get; set; } = null!;
+    public required string ConnectionString { get; set; }
 
     /// <summary>
     /// Coming from appsettings.json.
     /// </summary>
     [Required]
-    public string ReCaptchaVerificationUrl { get; set; } = null!;
+    public required string ReCaptchaVerificationUrl { get; set; }
 
     /// <summary>
     /// Coming from appsettings.*.json.
     /// </summary>
     [Required]
-    public AppUrls Urls { get; set; } = null!;
+    public required AppUrls Urls { get; set; }
 
     /// <summary>
     /// Coming from environment variables and Azure Key Vault.
     /// </summary>
     [Required]
-    public string AdminEmail { get; set; } = null!;
+    public required string AdminEmail { get; set; }
 
     /// <summary>
     /// Coming from appsettings.*.json and Azure Key Vault.
     /// </summary>
     [Required]
-    public Auth0ManagementUtilConfig Auth0 { get; set; } = null!;
+    public required Auth0ManagementUtilConfig Auth0 { get; set; }
 
     /// <summary>
     /// Coming from environment variables.
     /// </summary>
     [Required]
-    public SenderConfiguration RabbitMQ { get; set; } = null!;
+    public required SenderConfiguration RabbitMQ { get; set; }
 
     /// <summary>
     /// Coming from Azure Key Vault.
@@ -55,32 +55,32 @@ public class AppConfiguration
 #if !DEBUG
     [Required]
 #endif
-    public AppSecrets PersonalAssistant { get; set; } = null!;
+    public required AppSecrets PersonalAssistant { get; set; }
 }
 
 public class AppUrls
 {
     [Required]
-    public string PersonalAssistant { get; set; } = null!;
+    public required string PersonalAssistant { get; set; }
 
     [Required]
-    public string ToDoAssistant { get; set; } = null!;
+    public required string ToDoAssistant { get; set; }
 
     [Required]
-    public string CookingAssistant { get; set; } = null!;
+    public required string CookingAssistant { get; set; }
 
     [Required]
-    public string Accountant { get; set; } = null!;
+    public required string Accountant { get; set; }
 
     [Required]
-    public string Weatherman { get; set; } = null!;
+    public required string Weatherman { get; set; }
 }
 
 public class AppSecrets
 {
     [Required]
-    public string ReCaptchaSecret { get; set; } = null!;
+    public required string ReCaptchaSecret { get; set; }
 
     [Required]
-    public SentryConfiguration Sentry { get; set; } = null!;
+    public required SentryConfiguration Sentry { get; set; }
 }
