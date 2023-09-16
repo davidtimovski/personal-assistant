@@ -26,7 +26,7 @@
 					{$t($page.status === 404 ? 'error.youSeemLost' : 'error.somethingWentWrong')}
 				</div>
 
-				<a href="/lists" class="wide-button">{$t('error.takeMeHome')}</a>
+				<a href="/recipes" class="wide-button">{$t('error.takeMeHome')}</a>
 			</div>
 		</section>
 	</div>

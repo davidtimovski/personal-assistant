@@ -70,6 +70,7 @@
 	}
 
 	.app-name {
+		text-align: center;
 		font-size: 1.7rem;
 		user-select: none;
 	}

@@ -23,6 +23,16 @@ public class ToDoAssistantUser : UserDto, IMapFrom<User>
     }
 }
 
+public class ChefUser : UserDto, IMapFrom<User>
+{
+    public bool ChefNotificationsEnabled { get; set; }
+
+    public void Mapping(Profile profile)
+    {
+        profile.CreateMap<User, ChefUser>();
+    }
+}
+
 public class AccountantUser : UserDto, IMapFrom<User>
 {
     public void Mapping(Profile profile)

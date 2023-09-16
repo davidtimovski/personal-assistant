@@ -30,6 +30,9 @@ public class UsersController : BaseController
             case "To Do Assistant":
                 user = _userService.Get<ToDoAssistantUser>(UserId);
                 break;
+            case "Chef":
+                user = _userService.Get<ChefUser>(UserId);
+                break;
             case "Accountant":
                 user = _userService.Get<AccountantUser>(UserId);
                 break;
