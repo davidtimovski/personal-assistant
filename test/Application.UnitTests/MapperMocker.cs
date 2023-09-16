@@ -9,7 +9,7 @@ internal static class MapperMocker
         var configurationProvider = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile<ToDoAssistant.Application.Mappings.MappingProfile>();
-            cfg.AddProfile<CookingAssistant.Application.Mappings.MappingProfile>();
+            cfg.AddProfile<Chef.Application.Mappings.MappingProfile>();
             cfg.AddProfile<TProfile>();
         });
         return configurationProvider.CreateMapper();

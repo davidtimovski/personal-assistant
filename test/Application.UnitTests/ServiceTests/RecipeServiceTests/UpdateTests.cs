@@ -1,9 +1,9 @@
 ﻿using Application.UnitTests.Builders;
-using CookingAssistant.Application.Contracts.Recipes;
-using CookingAssistant.Application.Contracts.Recipes.Models;
-using CookingAssistant.Application.Entities;
-using CookingAssistant.Application.Mappings;
-using CookingAssistant.Application.Services;
+using Chef.Application.Contracts.Recipes;
+using Chef.Application.Contracts.Recipes.Models;
+using Chef.Application.Entities;
+using Chef.Application.Mappings;
+using Chef.Application.Services;
 using FluentValidation;
 using Moq;
 using Sentry;
@@ -27,7 +27,7 @@ public class UpdateTests
         _sut = new RecipeService(null, null, null, null,
             _recipesRepositoryMock.Object,
             null,
-            MapperMocker.GetMapper<CookingAssistantProfile>(),
+            MapperMocker.GetMapper<ChefProfile>(),
             null);
     }
 

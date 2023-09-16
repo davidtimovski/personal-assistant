@@ -34,7 +34,7 @@ services:
     depends_on:
       - core-api
       - todo-api
-      - cooking-api
+      - chef-api
       - accountant-api
       - weatherman-api
       - trainer-api
@@ -69,9 +69,9 @@ services:
       - postgres
       - rabbitmq
 
-  cooking-api:
-    image: ${DOCKER_REGISTRY}:cooking-api-latest
-    container_name: pa-cooking-api
+  chef-api:
+    image: ${DOCKER_REGISTRY}:chef-api-latest
+    container_name: pa-chef-api
     restart: always
     environment:
       - ASPNETCORE_URLS=http://0.0.0.0:80

@@ -1,9 +1,9 @@
 ﻿using Application.UnitTests.Builders;
-using CookingAssistant.Application.Contracts.Ingredients;
-using CookingAssistant.Application.Contracts.Ingredients.Models;
-using CookingAssistant.Application.Entities;
-using CookingAssistant.Application.Mappings;
-using CookingAssistant.Application.Services;
+using Chef.Application.Contracts.Ingredients;
+using Chef.Application.Contracts.Ingredients.Models;
+using Chef.Application.Entities;
+using Chef.Application.Mappings;
+using Chef.Application.Services;
 using FluentValidation;
 using Moq;
 using Xunit;
@@ -22,7 +22,7 @@ public class GetUserSuggestionsTests
 
         _sut = new IngredientService(
             _ingredientsRepositoryMock.Object,
-            MapperMocker.GetMapper<CookingAssistantProfile>(),
+            MapperMocker.GetMapper<ChefProfile>(),
             null);
     }
 

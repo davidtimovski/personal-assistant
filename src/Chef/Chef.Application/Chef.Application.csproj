@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="..\..\..\PersonalAssistant.Cs.targets" />
+
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Chef.Utility\Chef.Utility.fsproj" />
+		<ProjectReference Include="..\..\Core\Core.Application\Core.Application.csproj" />
+	</ItemGroup>
+
+</Project>

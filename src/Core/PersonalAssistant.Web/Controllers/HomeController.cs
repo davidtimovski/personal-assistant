@@ -49,10 +49,10 @@ public class HomeController : BaseController
                 new ClientApplicationViewModel("To Do Assistant", _config.Urls.ToDoAssistant, "to-do-assistant"),
                 new ClientApplicationViewModel("Accountant", _config.Urls.Accountant, "accountant"),
                 new ClientApplicationViewModel("Weatherman", _config.Urls.Weatherman, "weatherman"),
-                new ClientApplicationViewModel("Cooking Assistant", "cooking-assistant"),
+                new ClientApplicationViewModel("Chef", _config.Urls.Chef, "chef", ReleaseStatus.Beta),
             },
             alert
-        );
+        );;
 
         return View(model);
     }
@@ -79,8 +79,8 @@ public class HomeController : BaseController
     }
 
     [HttpGet]
-    [ActionName("cooking-assistant")]
-    public IActionResult CookingAssistant()
+    [ActionName("chef")]
+    public IActionResult Chef()
     {
         return View();
     }

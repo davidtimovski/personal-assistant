@@ -41,11 +41,11 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "cooking-api",
+          "Host": "chef-api",
           "Port": 80
         }
       ],
-      "UpstreamPathTemplate": "/cooking/{route}",
+      "UpstreamPathTemplate": "/chef/{route}",
       "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
     },
     {

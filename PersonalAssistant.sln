@@ -16,7 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.env.prod.example = .env.prod.example
 		.gitignore = .gitignore
 		.github\workflows\cd_accountant.yml = .github\workflows\cd_accountant.yml
-		.github\workflows\cd_cooking.yml = .github\workflows\cd_cooking.yml
+		.github\workflows\cd_chef.yml = .github\workflows\cd_chef.yml
 		.github\workflows\cd_core.yml = .github\workflows\cd_core.yml
 		.github\workflows\cd_gateway.yml = .github\workflows\cd_gateway.yml
 		.github\workflows\cd_sender.yml = .github\workflows\cd_sender.yml
@@ -42,7 +42,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Accountant", "Accountant", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ToDoAssistant", "ToDoAssistant", "{DA41083B-8396-4101-86D7-A5531C4C8C19}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CookingAssistant", "CookingAssistant", "{8893323C-AF75-4C83-95A5-E50EDAE011C4}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Chef", "Chef", "{8893323C-AF75-4C83-95A5-E50EDAE011C4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Weatherman", "Weatherman", "{10726412-16C3-4B3D-907D-B43558757665}"
 EndProject
@@ -54,13 +54,13 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Accountant.Api", "src\Accou
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Accountant.Persistence.Fs", "src\Accountant\Accountant.Persistence.Fs\Accountant.Persistence.Fs.fsproj", "{ADA48B11-156F-4DBD-A6A2-9192AF492559}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CookingAssistant.Api", "src\CookingAssistant\CookingAssistant.Api\CookingAssistant.Api.csproj", "{57C7DC9C-8A02-45D1-A22D-A10519301664}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chef.Api", "src\Chef\Chef.Api\Chef.Api.csproj", "{57C7DC9C-8A02-45D1-A22D-A10519301664}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CookingAssistant.Application", "src\CookingAssistant\CookingAssistant.Application\CookingAssistant.Application.csproj", "{6EA111AD-2E5A-4C20-A7C2-BBE7303936A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chef.Application", "src\Chef\Chef.Application\Chef.Application.csproj", "{6EA111AD-2E5A-4C20-A7C2-BBE7303936A2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CookingAssistant.Persistence", "src\CookingAssistant\CookingAssistant.Persistence\CookingAssistant.Persistence.csproj", "{28A9BB3F-723A-462C-9CB3-42A0D48137C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chef.Persistence", "src\Chef\Chef.Persistence\Chef.Persistence.csproj", "{28A9BB3F-723A-462C-9CB3-42A0D48137C7}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "CookingAssistant.Utility", "src\CookingAssistant\CookingAssistant.Utility\CookingAssistant.Utility.fsproj", "{28A90B40-109B-4BF2-A4EA-EB85562E66B1}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Chef.Utility", "src\Chef\Chef.Utility\Chef.Utility.fsproj", "{28A90B40-109B-4BF2-A4EA-EB85562E66B1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonalAssistant.Web", "src\Core\PersonalAssistant.Web\PersonalAssistant.Web.csproj", "{2823E76B-377E-4355-B96D-086099CA84F2}"
 EndProject

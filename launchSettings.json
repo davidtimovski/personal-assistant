@@ -6,7 +6,7 @@
       "serviceActions": {
         "personalassistant-web": "StartDebugging",
         "accountant-api": "StartDebugging",
-        "cooking-api": "StartDebugging",
+        "chef-api": "StartDebugging",
         "core-api": "StartDebugging",
         "gateway": "StartDebugging",
         "postgres": "StartWithoutDebugging",
@@ -23,7 +23,7 @@
       "serviceActions": {
         "personalassistant-web": "StartDebugging",
         "accountant-api": "DoNotStart",
-        "cooking-api": "DoNotStart",
+        "chef-api": "DoNotStart",
         "core-api": "DoNotStart",
         "gateway": "DoNotStart",
         "postgres": "StartWithoutDebugging",
@@ -40,7 +40,7 @@
       "serviceActions": {
         "personalassistant-web": "StartDebugging",
         "accountant-api": "StartDebugging",
-        "cooking-api": "DoNotStart",
+        "chef-api": "DoNotStart",
         "core-api": "StartWithoutDebugging",
         "gateway": "StartDebugging",
         "postgres": "StartWithoutDebugging",
@@ -57,7 +57,7 @@
       "serviceActions": {
         "personalassistant-web": "StartDebugging",
         "accountant-api": "DoNotStart",
-        "cooking-api": "DoNotStart",
+        "chef-api": "DoNotStart",
         "core-api": "StartWithoutDebugging",
         "gateway": "StartDebugging",
         "postgres": "StartWithoutDebugging",
@@ -74,7 +74,7 @@
       "serviceActions": {
         "personalassistant-web": "StartDebugging",
         "accountant-api": "DoNotStart",
-        "cooking-api": "DoNotStart",
+        "chef-api": "DoNotStart",
         "core-api": "StartWithoutDebugging",
         "gateway": "StartDebugging",
         "postgres": "StartWithoutDebugging",
@@ -91,7 +91,7 @@
       "serviceActions": {
         "personalassistant-web": "StartDebugging",
         "accountant-api": "DoNotStart",
-        "cooking-api": "DoNotStart",
+        "chef-api": "DoNotStart",
         "core-api": "StartWithoutDebugging",
         "gateway": "StartDebugging",
         "postgres": "StartWithoutDebugging",
@@ -108,7 +108,7 @@
       "serviceActions": {
         "personalassistant-web": "DoNotStart",
         "accountant-api": "DoNotStart",
-        "cooking-api": "DoNotStart",
+        "chef-api": "DoNotStart",
         "core-api": "DoNotStart",
         "gateway": "StartDebugging",
         "postgres": "StartWithoutDebugging",

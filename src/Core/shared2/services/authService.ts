@@ -24,7 +24,7 @@ export class AuthService {
   async silentLogin() {
     try {
       const token = await this.client.getTokenSilently();
-      const profile = await this.client?.getUser();
+      const profile = await this.client.getUser();
 
       authInfo.set(new AuthInfo(token, profile));
     } catch (error) {

@@ -1,4 +1,4 @@
-﻿using CookingAssistant.Application.Contracts.DietaryProfiles.Models;
+﻿using Chef.Application.Contracts.DietaryProfiles.Models;
 
 namespace Application.UnitTests.Builders;
 

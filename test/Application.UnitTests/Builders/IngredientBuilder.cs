@@ -1,5 +1,5 @@
-﻿using CookingAssistant.Application.Contracts.Ingredients.Models;
-using CookingAssistant.Application.Entities;
+﻿using Chef.Application.Contracts.Ingredients.Models;
+using Chef.Application.Entities;
 
 namespace Application.UnitTests.Builders;
 

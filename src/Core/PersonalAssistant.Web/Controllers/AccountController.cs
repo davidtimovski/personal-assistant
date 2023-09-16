@@ -2,7 +2,7 @@
 using System.Text.Json;
 using Api.Common;
 using Auth0.AspNetCore.Authentication;
-using CookingAssistant.Application.Contracts.Recipes;
+using Chef.Application.Contracts.Recipes;
 using Core.Application.Contracts;
 using Core.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication;
