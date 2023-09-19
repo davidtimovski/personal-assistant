@@ -14,6 +14,10 @@
 	let recipes: RecipeModel[] | null = null;
 	let editedId: number | undefined;
 	const unsubscriptions: Unsubscriber[] = [];
+	let recipesContainer: HTMLDivElement;
+	let resizeObserver: ResizeObserver;
+	let imageWidth: number;
+	let imageHeight: number;
 
 	// Progress bar
 	let progressBarActive = false;
@@ -61,10 +65,6 @@
 			});
 	}
 
-	if ($state.recipes === null) {
-		startProgressBar();
-	}
-
 	unsubscriptions.push(
 		state.subscribe((s) => {
 			if (s.recipes === null) {
@@ -107,6 +107,13 @@
 	}
 
 	onMount(() => {
+		// Set image width and height to avoid reflows
+		resizeObserver = new ResizeObserver(() => {
+			imageWidth = recipesContainer.offsetWidth;
+			imageHeight = recipesContainer.offsetWidth / 2;
+		});
+		resizeObserver.observe(document.body);
+
 		const edited = $page.url.searchParams.get('edited');
 		if (edited) {
 			editedId = parseInt(edited, 10);
@@ -114,9 +121,14 @@
 
 		usersService = new UsersService();
 		recipesService = new RecipesService();
+
+		if ($state.recipes === null) {
+			startProgressBar();
+		}
 	});
 
 	onDestroy(() => {
+		resizeObserver.disconnect();
 		usersService?.release();
 		recipesService?.release();
 	});
@@ -147,7 +159,7 @@
 	</div>
 
 	<div class="content-wrap recipes">
-		<div class="recipes-wrap">
+		<div class="recipes-wrap" bind:this={recipesContainer}>
 			{#if recipes}
 				{#each recipes as recipe}
 					<a
@@ -158,7 +170,7 @@
 						class:pending-share={recipe.sharingState === 1}
 						class:ingredients-missing={recipe.ingredientsMissing > 0}
 					>
-						<img src={recipe.imageUri} alt={recipe.name} />
+						<img src={recipe.imageUri} alt={recipe.name} width={imageWidth} height={imageHeight} />
 						<div class="recipe-name">
 							<i class="fas fa-users" />
 							<i class="fas fa-user-clock" />
@@ -211,7 +223,6 @@
 		}
 
 		img {
-			width: 100%;
 			border-radius: var(--border-radius);
 			box-shadow: var(--box-shadow);
 		}

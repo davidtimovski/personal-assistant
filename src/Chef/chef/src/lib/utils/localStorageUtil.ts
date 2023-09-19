@@ -4,16 +4,14 @@ export class LocalStorageUtil extends LocalStorageBase {
 	constructor() {
 		super(
 			new Map<string, any>([
-				//[LocalStorageKeys.SoundsEnabled, true],
-				//[LocalStorageKeys.HighPriorityListEnabled, true],
-				//[LocalStorageKeys.StaleTasksListEnabled, true]
+				[LocalStorageKeys.Currency, 'EUR'],
+				[LocalStorageKeys.CurrencyRates, { EUR: 1 }]
 			])
 		);
 	}
 }
 
 export enum LocalStorageKeys {
-	//SoundsEnabled = 'soundsEnabled',
-	//HighPriorityListEnabled = 'highPriorityListEnabled',
-	//StaleTasksListEnabled = 'staleTasksListEnabled'
+	Currency = 'currency',
+	CurrencyRates = 'currencyRates'
 }

@@ -131,9 +131,8 @@ export default {
 			assignedTo: 'Assigned to',
 			nobody: 'Nobody',
 			taskUsedAsIngredientInRecipes:
-				'This task is used as an ingredient in the following recipes in <span class="cooking-assistant-color">Cooking Assistant</span>: ',
-			deletingItWillUnlinkIt:
-				'Deleting it will unlink it from <span class="cooking-assistant-color">Cooking Assistant</span>.',
+				'This task is used as an ingredient in the following recipes in <span class="chef-color">Chef</span>: ',
+			deletingItWillUnlinkIt: 'Deleting it will unlink it from <span class="chef-color">Chef</span>.',
 			okayDelete: 'Okay, delete',
 			deleteSuccessful: 'Task was successfully deleted'
 		},
@@ -352,9 +351,8 @@ export default {
 			assignedTo: 'Доделена на',
 			nobody: 'Никој',
 			taskUsedAsIngredientInRecipes:
-				'Оваа задача се користи како состојка во следните рецепти во <span class="cooking-assistant-color">Cooking Assistant</span>: ',
-			deletingItWillUnlinkIt:
-				'Доколку ја избришете ќе биде откачена од <span class="cooking-assistant-color">Cooking Assistant</span>.',
+				'Оваа задача се користи како состојка во следните рецепти во <span class="chef-color">Chef</span>: ',
+			deletingItWillUnlinkIt: 'Доколку ја избришете ќе биде откачена од <span class="chef-color">Chef</span>.',
 			okayDelete: 'Во ред, избриши',
 			deleteSuccessful: 'Задачата беше успешно избришана'
 		},

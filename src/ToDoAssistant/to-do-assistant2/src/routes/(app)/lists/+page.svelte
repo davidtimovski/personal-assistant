@@ -8,7 +8,6 @@
 	import EmptyListMessage from '../../../../../../Core/shared2/components/EmptyListMessage.svelte';
 
 	import { t } from '$lib/localization/i18n';
-	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 	import { isOffline, user, state, remoteEvents } from '$lib/stores';
 	import { UsersService } from '$lib/services/usersService';
 	import { DerivedLists, ListsService } from '$lib/services/listsService';
@@ -33,7 +32,6 @@
 	let progressIntervalId: number | undefined;
 	let progressBarVisible = false;
 
-	let localStorage: LocalStorageUtil;
 	let usersService: UsersService;
 	let listsService: ListsService;
 	let tasksService: TasksService;
@@ -93,7 +91,6 @@
 			editedId = parseInt(edited, 10);
 		}
 
-		localStorage = new LocalStorageUtil();
 		usersService = new UsersService();
 		listsService = new ListsService();
 		tasksService = new TasksService();
