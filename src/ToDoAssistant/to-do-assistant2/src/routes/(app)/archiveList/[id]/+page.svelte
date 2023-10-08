@@ -8,6 +8,7 @@
 	import { alertState, state } from '$lib/stores';
 	import { ListsService } from '$lib/services/listsService';
 	import { SharingState } from '$lib/models/viewmodels/sharingState';
+	import { SetIsArchived } from '$lib/models/server/requests/setIsArchived';
 
 	export let data: PageData;
 
@@ -22,7 +23,7 @@
 		archiveButtonIsLoading = true;
 
 		try {
-			await listsService.setIsArchived(data.id, true);
+			await listsService.setIsArchived(new SetIsArchived(data.id, true));
 
 			alertState.update((x) => {
 				x.showSuccess('archiveList.archiveSuccessful');

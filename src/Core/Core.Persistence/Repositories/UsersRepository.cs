@@ -68,7 +68,7 @@ public class UsersRepository : BaseRepository, IUsersRepository
         dbUser.Language = user.Language;
         dbUser.Culture = user.Culture;
         dbUser.ToDoNotificationsEnabled = user.ToDoNotificationsEnabled;
-        dbUser.CookingNotificationsEnabled = user.CookingNotificationsEnabled;
+        dbUser.ChefNotificationsEnabled = user.ChefNotificationsEnabled;
         dbUser.ImperialSystem = user.ImperialSystem;
         dbUser.ImageUri = user.ImageUri;
         dbUser.ModifiedDate = user.ModifiedDate;

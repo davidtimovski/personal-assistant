@@ -1,4 +1,4 @@
-﻿using CookingAssistant.Application.Contracts.DietaryProfiles.Models;
+﻿using Chef.Application.Contracts.DietaryProfiles.Models;
 
 namespace Application.UnitTests.Builders;
 
@@ -9,7 +9,45 @@ internal class DietaryProfileBuilder
         return new UpdateDietaryProfile
         {
             HeightCm = 178,
-            WeightKg = 70
+            WeightKg = 70,
+            UserId = 0,
+            Birthday = DateTime.UtcNow,
+            Gender = "",
+            HeightFeet = 5,
+            HeightInches = 10,
+            WeightLbs = 120,
+            ActivityLevel = null,
+            Goal = null,
+            CustomCalories = null,
+            TrackCalories = false,
+            CustomSaturatedFat = null,
+            TrackSaturatedFat = false,
+            CustomCarbohydrate = null,
+            TrackCarbohydrate = false,
+            CustomAddedSugars = null,
+            TrackAddedSugars = false,
+            CustomFiber = null,
+            TrackFiber = false,
+            CustomProtein = null,
+            TrackProtein = false,
+            CustomSodium = null,
+            TrackSodium = false,
+            CustomCholesterol = null,
+            TrackCholesterol = false,
+            CustomVitaminA = null,
+            TrackVitaminA = false,
+            CustomVitaminC = null,
+            TrackVitaminC = false,
+            CustomVitaminD = null,
+            TrackVitaminD = false,
+            CustomCalcium = null,
+            TrackCalcium = false,
+            CustomIron = null,
+            TrackIron = false,
+            CustomPotassium = null,
+            TrackPotassium = false,
+            CustomMagnesium = null,
+            TrackMagnesium = false
         };
     }
 
@@ -22,7 +60,10 @@ internal class DietaryProfileBuilder
             HeightCm = 178,
             WeightKg = 70,
             ActivityLevel = "Light",
-            Goal = "None"
+            Goal = "None",
+            HeightFeet = 5,
+            HeightInches = 10,
+            WeightLbs = 120
         };
     }
 

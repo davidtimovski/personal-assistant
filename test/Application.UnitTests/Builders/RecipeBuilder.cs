@@ -1,13 +1,13 @@
-﻿using CookingAssistant.Application.Contracts.Recipes.Models;
+﻿using Chef.Application.Contracts.Recipes.Models;
 
 namespace Application.UnitTests.Builders;
 
 internal class RecipeBuilder
 {
     private string name;
-    private string description;
+    private string? description;
     private List<UpdateRecipeIngredient> recipeIngredients = new();
-    private string instructions;
+    private string? instructions;
     private TimeSpan? prepDuration;
     private TimeSpan? cookDuration;
 
@@ -35,7 +35,10 @@ internal class RecipeBuilder
         {
             recipeIngredients.Add(new UpdateRecipeIngredient
             {
-                Name = ingredient
+                Name = ingredient,
+                Id = 0,
+                Amount = 0,
+                Unit = "g"
             });
         }
         return this;
@@ -49,7 +52,9 @@ internal class RecipeBuilder
             recipeIngredients.Add(new UpdateRecipeIngredient
             {
                 Name = "Dummy name",
-                Amount = amount
+                Amount = amount,
+                Id = 0,
+                Unit = "g"
             });
         }
         return this;
@@ -73,29 +78,32 @@ internal class RecipeBuilder
         return this;
     }
 
-    internal CreateRecipe BuildCreateModel()
+    internal CreateRecipe BuildCreateModel() => new CreateRecipe
     {
-        return new CreateRecipe
-        {
-            Name = name,
-            Description = description,
-            Ingredients = recipeIngredients,
-            Instructions = instructions,
-            PrepDuration = prepDuration,
-            CookDuration = cookDuration
-        };
-    }
+        Name = name,
+        Description = description,
+        Ingredients = recipeIngredients,
+        Instructions = instructions,
+        PrepDuration = prepDuration,
+        CookDuration = cookDuration,
+        UserId = 0,
+        Servings = 0,
+        ImageUri = null,
+        VideoUrl = null
+    };
 
-    internal UpdateRecipe BuildUpdateModel()
+    internal UpdateRecipe BuildUpdateModel() => new UpdateRecipe
     {
-        return new UpdateRecipe
-        {
-            Name = name,
-            Description = description,
-            Ingredients = recipeIngredients,
-            Instructions = instructions,
-            PrepDuration = prepDuration,
-            CookDuration = cookDuration
-        };
-    }
+        Name = name,
+        Description = description,
+        Ingredients = recipeIngredients,
+        Instructions = instructions,
+        PrepDuration = prepDuration,
+        CookDuration = cookDuration,
+        Id = 0,
+        UserId = 0,
+        Servings = 0,
+        ImageUri = null,
+        VideoUrl = null
+    };
 }

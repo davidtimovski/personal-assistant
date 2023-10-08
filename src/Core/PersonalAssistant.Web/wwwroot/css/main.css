@@ -2,7 +2,7 @@
     --main-color: #3598dc;
     --main-color-dark: #0568ac;
     --to-do-assistant-main-color: #5aacf1;
-    --cooking-assistant-main-color: #49e09b;
+    --chef-main-color: #49e09b;
     --accountant-main-color: #6a68f3;
     --weatherman-main-color: #ff9401;
     --danger-color: #e73d4a;
@@ -32,8 +32,8 @@ body {
     background-position: center;
     animation: none;
 }
-.cooking-assistant-bg {
-    background: url('/images/cooking-assistant.svg') no-repeat;
+.chef-bg {
+    background: url('/images/chef.svg') no-repeat;
     background-size: 100%;
     background-position: center;
     animation: none;
@@ -198,7 +198,7 @@ main {
         color: #accfe7;
     }
 
-    .cell-wrap .cooking-assistant {
+    .cell-wrap .chef {
         color: #a9efd3;
     }
 
@@ -216,8 +216,8 @@ main {
         background-position: center;
     }
 
-    .cell-wrap .cooking-assistant:hover {
-        background: url('/images/cooking-assistant.svg') no-repeat;
+    .cell-wrap .chef:hover {
+        background: url('/images/chef.svg') no-repeat;
         background-size: 100%;
         background-position: center;
     }
@@ -346,8 +346,8 @@ a {
 .to-do-assistant a {
     color: var(--to-do-assistant-main-color);
 }
-.cooking-assistant a {
-    color: var(--cooking-assistant-main-color);
+.chef a {
+    color: var(--chef-main-color);
 }
 .accountant a {
     color: var(--accountant-main-color);
@@ -578,12 +578,12 @@ select {
         cursor: default;
         transition: border-color var(--transition);
     }
-.cooking-assistant .button {
-    background: var(--cooking-assistant-main-color);
-    border-color: var(--cooking-assistant-main-color);
+.chef .button {
+    background: var(--chef-main-color);
+    border-color: var(--chef-main-color);
 }
-    .cooking-assistant .button:hover:not(:disabled) {
-        color: var(--cooking-assistant-main-color);
+    .chef .button:hover:not(:disabled) {
+        color: var(--chef-main-color);
     }
 
 
@@ -632,7 +632,7 @@ select {
             color: var(--to-do-assistant-main-color);
         }
 
-        .overview-apps .app.cooking-assistant {
+        .overview-apps .app.chef {
             background: #e8faf3;
             border-bottom: 2px solid #35dc98;
             color: #35dc98;

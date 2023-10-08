@@ -5,11 +5,11 @@ namespace ToDoAssistant.Application.Contracts.Lists.Models;
 
 public class ShareList
 {
-    public int UserId { get; set; }
-    public int ListId { get; set; }
-    public List<ShareUserAndPermission> NewShares { get; set; } = null!;
-    public List<ShareUserAndPermission> EditedShares { get; set; } = null!;
-    public List<ShareUserAndPermission> RemovedShares { get; set; } = null!;
+    public required int UserId { get; init; }
+    public required int ListId { get; init; }
+    public required List<ShareUserAndPermission> NewShares { get; init; }
+    public required List<ShareUserAndPermission> EditedShares { get; init; }
+    public required List<ShareUserAndPermission> RemovedShares { get; init; }
 }
 
 public class ShareListValidator : AbstractValidator<ShareList>

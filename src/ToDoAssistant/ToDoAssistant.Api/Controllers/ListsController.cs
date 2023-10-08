@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using ToDoAssistant.Api.Models;
-using ToDoAssistant.Api.Models.Lists;
+using ToDoAssistant.Api.Models.Lists.Requests;
+using ToDoAssistant.Api.Models.Lists.Responses;
 using ToDoAssistant.Application.Contracts.Lists;
 using ToDoAssistant.Application.Contracts.Lists.Models;
 using ToDoAssistant.Application.Contracts.Notifications;
@@ -136,7 +137,7 @@ public class ListsController : BaseController
             UserId
         );
 
-        IEnumerable<ShareListRequest> shareRequests = _listService.GetShareRequests(UserId, tr);
+        IEnumerable<Application.Contracts.Lists.Models.ShareListRequest> shareRequests = _listService.GetShareRequests(UserId, tr);
 
         tr.Finish();
 
@@ -176,9 +177,9 @@ public class ListsController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateList dto)
+    public async Task<IActionResult> Create([FromBody] CreateListRequest request)
     {
-        if (dto is null)
+        if (request is null)
         {
             return BadRequest();
         }
@@ -189,9 +190,15 @@ public class ListsController : BaseController
             UserId
         );
 
-        dto.UserId = UserId;
-
-        int id = await _listService.CreateAsync(dto, _createValidator, tr);
+        var model = new CreateList
+        {
+            UserId = UserId,
+            Name = request.Name,
+            Icon = request.Icon,
+            IsOneTimeToggleDefault = request.IsOneTimeToggleDefault,
+            TasksText = request.TasksText,
+        };
+        int id = await _listService.CreateAsync(model, _createValidator, tr);
 
         tr.Finish();
 
@@ -199,9 +206,9 @@ public class ListsController : BaseController
     }
 
     [HttpPut]
-    public async Task<IActionResult> Update([FromBody] UpdateList dto)
+    public async Task<IActionResult> Update([FromBody] UpdateListRequest request)
     {
-        if (dto is null)
+        if (request is null)
         {
             return BadRequest();
         }
@@ -212,9 +219,16 @@ public class ListsController : BaseController
             UserId
         );
 
-        dto.UserId = UserId;
-
-        UpdateListResult result = await _listService.UpdateAsync(dto, _updateValidator, tr);
+        var model = new UpdateList
+        {
+            Id = request.Id,
+            UserId = UserId,
+            Name = request.Name,
+            Icon = request.Icon,
+            IsOneTimeToggleDefault = request.IsOneTimeToggleDefault,
+            NotificationsEnabled = request.NotificationsEnabled,
+        };
+        UpdateListResult result = await _listService.UpdateAsync(model, _updateValidator, tr);
         if (!result.Notify())
         {
             return NoContent();
@@ -241,7 +255,7 @@ public class ListsController : BaseController
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
                 var message = _localizer[resourceKey, result.ActionUserName, result.OriginalListName];
 
-                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, dto.Id, null, message);
+                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, request.Id, null, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
@@ -268,9 +282,9 @@ public class ListsController : BaseController
     }
 
     [HttpPut("shared")]
-    public async Task<IActionResult> UpdateShared([FromBody] UpdateSharedList dto)
+    public async Task<IActionResult> UpdateShared([FromBody] UpdateSharedListRequest request)
     {
-        if (dto is null)
+        if (request is null)
         {
             return BadRequest();
         }
@@ -281,9 +295,13 @@ public class ListsController : BaseController
             UserId
         );
 
-        dto.UserId = UserId;
-
-        await _listService.UpdateSharedAsync(dto, _updateSharedValidator, tr);
+        var model = new UpdateSharedList
+        {
+            Id = request.Id,
+            UserId = UserId,
+            NotificationsEnabled = request.NotificationsEnabled
+        };
+        await _listService.UpdateSharedAsync(model, _updateSharedValidator, tr);
 
         tr.Finish();
 
@@ -363,9 +381,9 @@ public class ListsController : BaseController
     }
 
     [HttpPut("share")]
-    public async Task<IActionResult> Share([FromBody] ShareList dto)
+    public async Task<IActionResult> Share([FromBody] Models.Lists.Requests.ShareListRequest request)
     {
-        if (dto is null)
+        if (request is null)
         {
             return BadRequest();
         }
@@ -376,25 +394,23 @@ public class ListsController : BaseController
             UserId
         );
 
-        dto.UserId = UserId;
-
         try
         {
-            foreach (ShareUserAndPermission removedShare in dto.RemovedShares)
+            foreach (Models.Lists.Requests.ShareUserAndPermission removedShare in request.RemovedShares)
             {
-                if (!_listService.CheckIfUserCanBeNotifiedOfChange(dto.ListId, removedShare.UserId, tr))
+                if (!_listService.CheckIfUserCanBeNotifiedOfChange(request.ListId, removedShare.UserId, tr))
                 {
                     continue;
                 }
 
-                var currentUser = _userService.Get(dto.UserId);
+                var currentUser = _userService.Get(UserId);
                 var user = _userService.Get(removedShare.UserId);
-                SimpleList list = _listService.Get(dto.ListId);
+                SimpleList list = _listService.Get(request.ListId);
 
                 CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
                 var message = _localizer["RemovedShareNotification", currentUser.Name, list.Name];
 
-                var createNotificationDto = new CreateOrUpdateNotification(user.Id, dto.UserId, null, null, message);
+                var createNotificationDto = new CreateOrUpdateNotification(user.Id, UserId, null, null, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
@@ -407,7 +423,15 @@ public class ListsController : BaseController
                 _senderService.Enqueue(toDoAssistantPushNotification);
             }
 
-            await _listService.ShareAsync(dto, _shareValidator, tr);
+            var model = new ShareList
+            {
+                UserId = UserId,
+                ListId = request.ListId,
+                NewShares = request.NewShares.Select(x => new Application.Contracts.Lists.Models.ShareUserAndPermission { UserId = x.UserId, IsAdmin = x.IsAdmin }).ToList(),
+                EditedShares = request.EditedShares.Select(x => new Application.Contracts.Lists.Models.ShareUserAndPermission { UserId = x.UserId, IsAdmin = x.IsAdmin }).ToList(),
+                RemovedShares = request.RemovedShares.Select(x => new Application.Contracts.Lists.Models.ShareUserAndPermission { UserId = x.UserId, IsAdmin = x.IsAdmin }).ToList()
+            };
+            await _listService.ShareAsync(model, _shareValidator, tr);
         }
         catch (Exception ex)
         {
@@ -426,7 +450,7 @@ public class ListsController : BaseController
     public async Task<IActionResult> Leave(int id)
     {
         var tr = Metrics.StartTransactionWithUser(
-            "DELET api/lists/{id}/leave",
+            "DELETE api/lists/{id}/leave",
             $"{nameof(ListsController)}.{nameof(Leave)}",
             UserId
         );
@@ -467,9 +491,9 @@ public class ListsController : BaseController
     }
 
     [HttpPost("copy")]
-    public async Task<IActionResult> Copy([FromBody] CopyList dto)
+    public async Task<IActionResult> Copy([FromBody] CopyListRequest request)
     {
-        if (dto is null)
+        if (request is null)
         {
             return BadRequest();
         }
@@ -480,9 +504,14 @@ public class ListsController : BaseController
             UserId
         );
 
-        dto.UserId = UserId;
-
-        int id = await _listService.CopyAsync(dto, _copyValidator, tr);
+        var model = new CopyList
+        {
+            Id = request.Id,
+            UserId = UserId,
+            Name = request.Name,
+            Icon = request.Icon
+        };
+        int id = await _listService.CopyAsync(model, _copyValidator, tr);
 
         tr.Finish();
 
@@ -490,9 +519,9 @@ public class ListsController : BaseController
     }
 
     [HttpPut("is-archived")]
-    public async Task<IActionResult> SetIsArchived([FromBody] SetIsArchivedDto dto)
+    public async Task<IActionResult> SetIsArchived([FromBody] SetIsArchivedRequest request)
     {
-        if (dto is null)
+        if (request is null)
         {
             return BadRequest();
         }
@@ -503,7 +532,7 @@ public class ListsController : BaseController
             UserId
         );
 
-        await _listService.SetIsArchivedAsync(dto.ListId, UserId, dto.IsArchived, tr);
+        await _listService.SetIsArchivedAsync(request.ListId, UserId, request.IsArchived, tr);
 
         tr.Finish();
 
@@ -511,9 +540,9 @@ public class ListsController : BaseController
     }
 
     [HttpPut("uncomplete-all")]
-    public async Task<IActionResult> UncompleteAll([FromBody] SetTasksAsNotCompletedDto dto)
+    public async Task<IActionResult> UncompleteAll([FromBody] SetTasksAsNotCompletedRequest request)
     {
-        if (dto is null)
+        if (request is null)
         {
             return BadRequest();
         }
@@ -524,7 +553,7 @@ public class ListsController : BaseController
             UserId
         );
 
-        SetTasksAsNotCompletedResult result = await _listService.UncompleteAllAsync(dto.ListId, UserId, tr);
+        SetTasksAsNotCompletedResult result = await _listService.UncompleteAllAsync(request.ListId, UserId, tr);
 
         try
         {
@@ -533,7 +562,7 @@ public class ListsController : BaseController
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
                 var message = _localizer["UncompletedAllTasksNotification", result.ActionUserName, result.ListName];
 
-                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, dto.ListId, null, message);
+                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, request.ListId, null, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
@@ -560,9 +589,9 @@ public class ListsController : BaseController
     }
 
     [HttpPut("share-is-accepted")]
-    public async Task<IActionResult> SetShareIsAccepted([FromBody] SetShareIsAcceptedDto dto)
+    public async Task<IActionResult> SetShareIsAccepted([FromBody] SetShareIsAcceptedRequest request)
     {
-        if (dto is null)
+        if (request is null)
         {
             return BadRequest();
         }
@@ -573,7 +602,7 @@ public class ListsController : BaseController
             UserId
         );
 
-        SetShareIsAcceptedResult result = await _listService.SetShareIsAcceptedAsync(dto.ListId, UserId, dto.IsAccepted, tr);
+        SetShareIsAcceptedResult result = await _listService.SetShareIsAcceptedAsync(request.ListId, UserId, request.IsAccepted, tr);
         if (!result.Notify())
         {
             return NoContent();
@@ -581,13 +610,13 @@ public class ListsController : BaseController
 
         try
         {
-            var localizerKey = dto.IsAccepted ? "JoinedListNotification" : "DeclinedShareRequestNotification";
+            var localizerKey = request.IsAccepted ? "JoinedListNotification" : "DeclinedShareRequestNotification";
             foreach (var recipient in result.NotificationRecipients)
             {
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
                 var message = _localizer[localizerKey, result.ActionUserName, result.ListName];
 
-                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, dto.ListId, null, message);
+                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, request.ListId, null, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
@@ -614,14 +643,14 @@ public class ListsController : BaseController
     }
 
     //[HttpPut("reorder")]
-    //public async Task<IActionResult> Reorder([FromBody] ReorderListDto dto)
+    //public async Task<IActionResult> Reorder([FromBody] ReorderListRequest request)
     //{
-    //    if (dto is null)
+    //    if (request is null)
     //    {
     //        return BadRequest();
     //    }
 
-    //    await _listService.ReorderAsync(dto.Id, UserId, dto.OldOrder, dto.NewOrder);
+    //    await _listService.ReorderAsync(request.Id, UserId, request.OldOrder, request.NewOrder);
 
     //    return NoContent();
     //}

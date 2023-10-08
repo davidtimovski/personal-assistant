@@ -13,8 +13,8 @@ on:
       - "src/Core/PersonalAssistant.Web/**"
       - "src/ToDoAssistant/ToDoAssistant.Application/**"
       - "src/ToDoAssistant/ToDoAssistant.Persistence/**"
-      - "src/CookingAssistant/CookingAssistant.Application/**"
-      - "src/CookingAssistant/CookingAssistant.Persistence/**"
+      - "src/Chef/Chef.Application/**"
+      - "src/Chef/Chef.Persistence/**"
       - "src/Accountant/Accountant.Persistence.Fs/**"
 
 env:

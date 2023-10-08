@@ -5,14 +5,14 @@ namespace Core.Infrastructure.Identity;
 public class TokenResult
 {
     [JsonRequired]
-    public required string access_token { get; set; }
+    public required string access_token { get; init; }
 
     [JsonRequired]
-    public required int expires_in { get; set; }
+    public required int expires_in { get; init; }
 
     [JsonRequired]
-    public required string scope { get; set; }
+    public required string scope { get; init; }
 
     [JsonRequired]
-    public required string token_type { get; set; }
+    public required string token_type { get; init; }
 }

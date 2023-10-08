@@ -49,11 +49,11 @@ public class TasksRepository : BaseRepository, ITasksRepository
         using IDbConnection conn = OpenConnection();
 
         return conn.Query<string>(@"SELECT r.name
-                                    FROM cooking.ingredients AS i
-                                    INNER JOIN cooking.ingredients_tasks AS it ON i.id = it.ingredient_id AND it.user_id = @UserId
-                                    INNER JOIN cooking.recipes_ingredients AS ri ON i.id = ri.ingredient_id
-                                    LEFT JOIN cooking.recipes AS r ON ri.recipe_id = r.id
-                                    LEFT JOIN cooking.shares AS s ON ri.recipe_id = s.recipe_id
+                                    FROM chef.ingredients AS i
+                                    INNER JOIN chef.ingredients_tasks AS it ON i.id = it.ingredient_id AND it.user_id = @UserId
+                                    INNER JOIN chef.recipes_ingredients AS ri ON i.id = ri.ingredient_id
+                                    LEFT JOIN chef.recipes AS r ON ri.recipe_id = r.id
+                                    LEFT JOIN chef.shares AS s ON ri.recipe_id = s.recipe_id
                                     WHERE it.task_id = @TaskId AND (r.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))
                                     ORDER BY r.name",
             new { TaskId = id, UserId = userId }).ToList();

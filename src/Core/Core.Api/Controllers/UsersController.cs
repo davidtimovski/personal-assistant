@@ -30,6 +30,9 @@ public class UsersController : BaseController
             case "To Do Assistant":
                 user = _userService.Get<ToDoAssistantUser>(UserId);
                 break;
+            case "Chef":
+                user = _userService.Get<ChefUser>(UserId);
+                break;
             case "Accountant":
                 user = _userService.Get<AccountantUser>(UserId);
                 break;
@@ -44,16 +47,16 @@ public class UsersController : BaseController
         return Ok(user);
     }
 
-    [HttpGet("cooking-preferences")]
-    public IActionResult GetCookingPreferences()
+    [HttpGet("chef-preferences")]
+    public IActionResult GetChefPreferences()
     {
         var tr = Metrics.StartTransactionWithUser(
-            $"{Request.Method} api/users/cooking-preferences",
-            $"{nameof(UsersController)}.{nameof(GetCookingPreferences)}",
+            $"{Request.Method} api/users/chef-preferences",
+            $"{nameof(UsersController)}.{nameof(GetChefPreferences)}",
             UserId
         );
 
-        CookingAssistantPreferences preferences = _userService.GetCookingAssistantPreferences(UserId, tr);
+        ChefPreferences preferences = _userService.GetChefPreferences(UserId, tr);
 
         tr.Finish();
 
@@ -81,8 +84,8 @@ public class UsersController : BaseController
         return NoContent();
     }
 
-    [HttpPut("cooking-notifications-enabled")]
-    public async Task<IActionResult> UpdateCookingNotificationsEnabled([FromBody] UpdateUserPreferences dto)
+    [HttpPut("chef-notifications-enabled")]
+    public async Task<IActionResult> UpdateChefNotificationsEnabled([FromBody] UpdateUserPreferences dto)
     {
         if (dto is null)
         {
@@ -90,12 +93,12 @@ public class UsersController : BaseController
         }
 
         var tr = Metrics.StartTransactionWithUser(
-            $"{Request.Method} api/users/cooking-notifications-enabled",
-            $"{nameof(UsersController)}.{nameof(UpdateCookingNotificationsEnabled)}",
+            $"{Request.Method} api/users/chef-notifications-enabled",
+            $"{nameof(UsersController)}.{nameof(UpdateChefNotificationsEnabled)}",
             UserId
         );
 
-        await _userService.UpdateCookingNotificationsEnabledAsync(UserId, dto.CookingNotificationsEnabled, tr);
+        await _userService.UpdateChefNotificationsEnabledAsync(UserId, dto.ChefNotificationsEnabled, tr);
 
         tr.Finish();
 

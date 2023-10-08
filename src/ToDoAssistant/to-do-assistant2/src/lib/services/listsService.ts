@@ -1,11 +1,11 @@
 import { HttpProxy } from '../../../../../Core/shared2/services/httpProxy';
 import { ErrorLogger } from '../../../../../Core/shared2/services/errorLogger';
+import { ValidationUtil, ValidationResult } from '../../../../../Core/shared2/utils/validationUtils';
 
 import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 import { state } from '$lib/stores';
 import { List, type Task } from '$lib/models/entities';
 import type { ListWithShares } from '$lib/models/viewmodels/listWithShares';
-import type { ShareUserAndPermission } from '$lib/models/viewmodels/shareUserAndPermission';
 import type { ShareRequest } from '$lib/models/viewmodels/shareRequest';
 import type { ListOption } from '$lib/models/viewmodels/listOption';
 import type { CanShareList } from '$lib/models/viewmodels/canShareList';
@@ -15,6 +15,14 @@ import type { EditListModel } from '$lib/models/viewmodels/editListModel';
 import { ArchivedList } from '$lib/models/viewmodels/archivedList';
 import { ListModel } from '$lib/models/viewmodels/listModel';
 import { SharingState } from '$lib/models/viewmodels/sharingState';
+import type { CreateList } from '$lib/models/server/requests/createList';
+import type { UpdateList } from '$lib/models/server/requests/updateList';
+import type { UpdateSharedList } from '$lib/models/server/requests/updateSharedList';
+import type { ShareList } from '$lib/models/server/requests/shareList';
+import type { CopyList } from '$lib/models/server/requests/copyList';
+import type { SetIsArchived } from '$lib/models/server/requests/setIsArchived';
+import { SetTasksAsNotCompleted } from '$lib/models/server/requests/setTasksAsNotCompleted';
+import type { SetShareIsAccepted } from '$lib/models/server/requests/setShareIsAccepted';
 import Variables from '$lib/variables';
 import { State } from '$lib/models/state';
 
@@ -30,7 +38,7 @@ export class ListsService {
 
 	async getAll(includeCache = false) {
 		if (includeCache) {
-			let cachedLists = this.localStorage.getObject<List[]>('homePageData');
+			const cachedLists = this.localStorage.getObject<List[]>('homePageData');
 			if (cachedLists) {
 				state.set(new State(cachedLists, true));
 			}
@@ -151,16 +159,11 @@ export class ListsService {
 		return this.httpProxy.ajax<Assignee[]>(`${Variables.urls.api}/lists/${id}/members`);
 	}
 
-	async create(name: string, icon: string, isOneTimeToggleDefault: boolean, tasksText: string): Promise<number> {
+	async create(dto: CreateList): Promise<number> {
 		try {
 			const id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/lists`, {
 				method: 'post',
-				body: window.JSON.stringify({
-					name: name,
-					icon: icon,
-					isOneTimeToggleDefault: isOneTimeToggleDefault,
-					tasksText: tasksText
-				})
+				body: window.JSON.stringify(dto)
 			});
 
 			await this.getAll();
@@ -172,29 +175,21 @@ export class ListsService {
 		}
 	}
 
-	async update(
-		id: number,
-		name: string,
-		icon: string,
-		tasksText: string,
-		notificationsEnabled: boolean,
-		isOneTimeToggleDefault: boolean,
-		isArchived: boolean,
-		sharingState: SharingState
-	): Promise<void> {
+	static validateEdit(name: string): ValidationResult {
+		const result = new ValidationResult();
+
+		if (ValidationUtil.isEmptyOrWhitespace(name)) {
+			result.fail('name');
+		}
+
+		return result;
+	}
+
+	async update(dto: UpdateList): Promise<void> {
 		try {
 			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/lists`, {
 				method: 'put',
-				body: window.JSON.stringify({
-					id: id,
-					name: name,
-					icon: icon,
-					tasksText: tasksText,
-					notificationsEnabled: notificationsEnabled,
-					isOneTimeToggleDefault: isOneTimeToggleDefault,
-					isArchived: isArchived,
-					sharingState: sharingState
-				})
+				body: window.JSON.stringify(dto)
 			});
 
 			await this.getAll();
@@ -204,14 +199,11 @@ export class ListsService {
 		}
 	}
 
-	async updateShared(id: number, notificationsEnabled: boolean): Promise<void> {
+	async updateShared(dto: UpdateSharedList): Promise<void> {
 		try {
 			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/lists/shared`, {
 				method: 'put',
-				body: window.JSON.stringify({
-					id: id,
-					notificationsEnabled: notificationsEnabled
-				})
+				body: window.JSON.stringify(dto)
 			});
 
 			await this.getAll();
@@ -238,21 +230,25 @@ export class ListsService {
 		return this.httpProxy.ajax<CanShareList>(`${Variables.urls.api}/lists/can-share-with-user/${email}`);
 	}
 
-	async share(
-		id: number,
-		newShares: ShareUserAndPermission[],
-		editedShares: ShareUserAndPermission[],
-		removedShares: ShareUserAndPermission[]
-	): Promise<void> {
+	static validateShare(selectedShareEmail: string, userEmail: string): ValidationResult {
+		const result = new ValidationResult();
+
+		if (ValidationUtil.isEmptyOrWhitespace(selectedShareEmail)) {
+			result.fail('email');
+		}
+
+		if (selectedShareEmail.trim().toLowerCase() === userEmail) {
+			result.fail('email');
+		}
+
+		return result;
+	}
+
+	async share(dto: ShareList): Promise<void> {
 		try {
 			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/lists/share`, {
 				method: 'put',
-				body: window.JSON.stringify({
-					listId: id,
-					newShares: newShares,
-					editedShares: editedShares,
-					removedShares: removedShares
-				})
+				body: window.JSON.stringify(dto)
 			});
 
 			await this.getAll();
@@ -275,15 +271,21 @@ export class ListsService {
 		}
 	}
 
-	async copy(listId: number, name: string, icon: string): Promise<number> {
+	static validateCopy(name: string): ValidationResult {
+		const result = new ValidationResult();
+
+		if (ValidationUtil.isEmptyOrWhitespace(name)) {
+			result.fail('name');
+		}
+
+		return result;
+	}
+
+	async copy(dto: CopyList): Promise<number> {
 		try {
 			const id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/lists/copy`, {
 				method: 'post',
-				body: window.JSON.stringify({
-					id: listId,
-					name: name,
-					icon: icon
-				})
+				body: window.JSON.stringify(dto)
 			});
 
 			await this.getAll();
@@ -323,10 +325,10 @@ export class ListsService {
 			if (privateTasks.length + tasks.length > 0) {
 				text += '\n';
 
-				for (let task of privateTasks) {
+				for (const task of privateTasks) {
 					text += `\n${task.name} ☐`;
 				}
-				for (let task of tasks) {
+				for (const task of tasks) {
 					text += `\n${task.name} ☐`;
 				}
 			}
@@ -336,10 +338,10 @@ export class ListsService {
 					text += '\n----------';
 				}
 
-				for (let task of completedPrivateTasks) {
+				for (const task of completedPrivateTasks) {
 					text += `\n${task.name} 🗹`;
 				}
-				for (let task of completedTasks) {
+				for (const task of completedTasks) {
 					text += `\n${task.name} 🗹`;
 				}
 			}
@@ -360,14 +362,11 @@ export class ListsService {
 		}
 	}
 
-	async setIsArchived(id: number, isArchived: boolean): Promise<void> {
+	async setIsArchived(dto: SetIsArchived): Promise<void> {
 		try {
 			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/lists/is-archived`, {
 				method: 'put',
-				body: window.JSON.stringify({
-					listId: id,
-					isArchived: isArchived
-				})
+				body: window.JSON.stringify(dto)
 			});
 
 			await this.getAll();
@@ -381,9 +380,7 @@ export class ListsService {
 		try {
 			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/lists/uncomplete-all`, {
 				method: 'put',
-				body: window.JSON.stringify({
-					listId: id
-				})
+				body: window.JSON.stringify(new SetTasksAsNotCompleted(id))
 			});
 
 			await this.getAll();
@@ -393,14 +390,11 @@ export class ListsService {
 		}
 	}
 
-	async setShareIsAccepted(id: number, isAccepted: boolean): Promise<void> {
+	async setShareIsAccepted(dto: SetShareIsAccepted): Promise<void> {
 		try {
 			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/lists/share-is-accepted`, {
 				method: 'put',
-				body: window.JSON.stringify({
-					listId: id,
-					isAccepted: isAccepted
-				})
+				body: window.JSON.stringify(dto)
 			});
 
 			await this.getAll();
@@ -447,7 +441,7 @@ export class ListsService {
 			);
 	}
 
-	static getDerivedForHomeScreen(lists: List[], derivedListNameLookup: any): ListModel[] {
+	static getDerivedForHomeScreen(lists: List[], derivedListNameLookup: Map<string, string>): ListModel[] {
 		return lists
 			.filter((x) => x.derivedListType)
 			.sort((a: List, b: List) => {
@@ -457,7 +451,7 @@ export class ListsService {
 				(x) =>
 					new ListModel(
 						x.id,
-						derivedListNameLookup.get(x.derivedListType),
+						derivedListNameLookup.get(x.derivedListType)!,
 						<string>x.icon,
 						x.sharingState,
 						x.order,

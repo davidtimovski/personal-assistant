@@ -7,7 +7,8 @@ on:
     paths-ignore:
       - "src/Accountant/accountant/**"
       - "src/Accountant/accountant2/**"
-      - "src/CookingAssistant/cooking-assistant/**"
+      - "src/Chef/cooking-assistant/**"
+      - "src/Chef/chef/**"
       - "src/ToDoAssistant/to-do-assistant/**"
       - "src/ToDoAssistant/to-do-assistant2/**"
       - "src/Trainer/trainer/**"

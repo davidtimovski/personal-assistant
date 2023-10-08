@@ -59,5 +59,5 @@ public class AppSecrets
     public required VapidConfiguration ToDoAssistantVapid { get; set; }
 
     [Required]
-    public required VapidConfiguration CookingAssistantVapid { get; set; }
+    public required VapidConfiguration ChefVapid { get; set; }
 }

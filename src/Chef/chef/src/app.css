@@ -1,0 +1,232 @@
+@import '../../../Core/shared2/styles/core.css';
+@import '../../../Core/shared2/styles/top-buttons-drawer.css';
+
+:root {
+	--regular-color: #50708d;
+	--primary-color: var(--chef-color);
+	--primary-color-dark: #08cb6b;
+	--primary-color-light: #dcfffb;
+	--faded-color: #a8d4bf;
+	--input-background: #f3fff7;
+}
+
+input[type='text'],
+input[type='email'],
+input[type='url'],
+select,
+textarea {
+	background-color: var(--input-background);
+}
+
+::placeholder {
+	color: #777;
+}
+
+.top-buttons-drawer.open .top-buttons-drawer-wrap {
+	max-height: 200px;
+}
+
+textarea.small {
+	height: 75px;
+}
+
+.double-bounce1,
+.double-bounce2 {
+	background-color: #7affcc;
+}
+
+.wide-button .badge {
+	background: linear-gradient(225deg, #00eda6, #7a46f3);
+}
+
+.button.primary-button,
+.save-delete-wrap .primary-button.loading:disabled {
+	background: linear-gradient(225deg, #00eda6, #7a46f3);
+	background-size: 400% 400%;
+}
+.button.primary-button:disabled {
+	color: var(--primary-color);
+}
+
+.add-input-wrap {
+	position: relative;
+	width: 100%;
+}
+
+.add-input-wrap input {
+	width: calc(100% - 62px);
+	padding-right: 50px;
+	line-height: 45px;
+}
+
+.add-input-wrap input a {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 45px;
+	height: 47px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background: none;
+	border: none;
+	outline: none;
+	font-size: 23px;
+	line-height: 45px;
+	text-decoration: none;
+	color: var(--primary-color);
+	cursor: pointer;
+}
+
+.add-input-wrap input a:hover {
+	color: var(--primary-color-dark);
+}
+
+.video-wrap {
+	position: relative;
+	width: 100%;
+	height: 0;
+	padding-bottom: 56.25%;
+}
+
+.video-wrap .video-iframe {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+section header {
+	background: var(--primary-color);
+	border-top-left-radius: var(--border-radius);
+	border-top-right-radius: var(--border-radius);
+	padding: 5px;
+	line-height: 26px;
+	text-align: center;
+	color: #fff;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.description {
+	margin-bottom: 30px;
+	line-height: 30px;
+	text-align: center;
+	font-style: italic;
+	color: var(--faded-color);
+}
+
+.servings-selector {
+	display: flex;
+	justify-content: space-between;
+	background: #fff;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	margin-bottom: 10px;
+}
+
+.servings-selector .servings-button {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-width: 47px;
+	height: 39px;
+	font-size: 22px;
+	text-decoration: none;
+	color: var(--primary-color);
+}
+
+.servings-selector .servings {
+	line-height: 37px;
+	text-align: center;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.autocomplete-customizations {
+	background: #fafafa;
+	border-bottom-left-radius: var(--border-radius);
+	border-bottom-right-radius: var(--border-radius);
+	box-shadow: var(--box-shadow);
+}
+
+.autocomplete-customizations > div {
+	padding: 5px 10px;
+	cursor: pointer;
+}
+
+.autocomplete-customizations .group {
+	background: var(--primary-color);
+	color: #fafafa;
+}
+
+.autocomplete-customizations .selected {
+	background: #e1e1e1;
+}
+
+.small-button {
+	background: linear-gradient(225deg, #00eda6, #7a46f3);
+	background-size: 400% 400%;
+	border: none;
+	border-radius: var(--border-radius);
+	outline: none;
+	box-shadow: var(--box-shadow);
+	padding: 0 20px;
+	font-size: 1rem;
+	line-height: 2rem;
+	color: #fafafa;
+	cursor: pointer;
+
+	animation: AnimateGradiant 8s ease infinite;
+}
+
+.intake-header {
+	position: relative;
+	background: var(--primary-color);
+	border-top-left-radius: var(--border-radius);
+	border-top-right-radius: var(--border-radius);
+	padding: 6px 5px;
+	line-height: 26px;
+	text-align: center;
+	color: #fff;
+}
+.unit-input-addon {
+	background: #ddd;
+	border-radius: var(--border-radius);
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+	padding: 7px 12px 6px;
+	font-size: 20px;
+	line-height: 23px;
+}
+
+@media screen and (max-width: 600px) {
+	.unit-input-addon {
+		font-size: 18px;
+	}
+}
+
+@media screen and (min-width: 1200px) {
+	section header {
+		padding: 9px 5px;
+	}
+
+	.add-input-wrap button {
+		font-size: 25px;
+		line-height: 45px;
+	}
+
+	.servings-selector .servings-button {
+		min-width: 53px;
+		height: 45px;
+	}
+
+	.servings-selector .servings {
+		line-height: 43px;
+	}
+}

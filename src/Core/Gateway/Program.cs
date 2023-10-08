@@ -26,7 +26,7 @@ builder.Services.AddCors(opt =>
     {
         corsBuilder.WithOrigins(
             config.Urls.ToDoAssistant,
-            config.Urls.CookingAssistant,
+            config.Urls.Chef,
             config.Urls.Accountant,
             config.Urls.Weatherman,
             config.Urls.Trainer)

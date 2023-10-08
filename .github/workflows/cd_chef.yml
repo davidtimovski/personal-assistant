@@ -1,0 +1,43 @@
+name: Continuous deployment Chef
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - "*.targets"
+      - "src/Core/Core.Application/**"
+      - "src/Core/Core.Infrastructure/**"
+      - "src/Core/Core.Persistence/**"
+      - "src/Chef/Chef.Utility/**"
+      - "src/Chef/Chef.Application/**"
+      - "src/Chef/Chef.Persistence/**"
+      - "src/Chef/Chef.Api/**"
+
+env:
+  REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
+  REGISTRY_IMAGE: ${{ secrets.REGISTRY_IMAGE }}
+  REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+  REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+
+jobs:
+  deploy:
+    name: Build and push image to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build chef-api-latest image
+        run: docker build -f ./src/Chef/Chef.Api/Dockerfile . --tag ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:chef-api-latest
+
+      - name: Login to Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY_URL }}
+          username: ${{ env.REGISTRY_USERNAME }}
+          password: ${{ env.REGISTRY_TOKEN }}
+
+      - name: Publish chef-api-latest image
+        run: docker push ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_IMAGE }}:chef-api-latest

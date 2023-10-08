@@ -20,7 +20,7 @@ services:
     depends_on:
       - core-api
       - todo-api
-      - cooking-api
+      - chef-api
       - accountant-api
       - weatherman-api
       - trainer-api
@@ -44,12 +44,12 @@ services:
       - postgres
       - rabbitmq
 
-  cooking-api:
-    image: personalassistant-cooking-api:latest
-    container_name: personalassistant-cooking-api
+  chef-api:
+    image: personalassistant-chef-api:latest
+    container_name: personalassistant-chef-api
     build:
       context: .
-      dockerfile: src/CookingAssistant/CookingAssistant.Api/Dockerfile
+      dockerfile: src/Chef/Chef.Api/Dockerfile
     depends_on:
       - postgres
       - rabbitmq

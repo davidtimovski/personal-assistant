@@ -19,7 +19,7 @@ public class ToDoAssistantPushNotification : PushNotification
     public ToDoAssistantPushNotification() : base("To Do Assistant") { }
 }
 
-public class CookingAssistantPushNotification : PushNotification
+public class ChefPushNotification : PushNotification
 {
-    public CookingAssistantPushNotification() : base("Cooking Assistant") { }
+    public ChefPushNotification() : base("Chef") { }
 }

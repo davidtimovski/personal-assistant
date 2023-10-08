@@ -4,7 +4,6 @@
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
-	import { ValidationResult, ValidationUtil } from '../../../../../../../Core/shared2/utils/validationUtils';
 	import DoubleRadioBool from '../../../../../../../Core/shared2/components/DoubleRadioBool.svelte';
 	import Tooltip from '../../../../../../../Core/shared2/components/Tooltip.svelte';
 
@@ -15,6 +14,7 @@
 	import { ShareUserAndPermission } from '$lib/models/viewmodels/shareUserAndPermission';
 	import { SharingState } from '$lib/models/viewmodels/sharingState';
 	import type { CanShareList } from '$lib/models/viewmodels/canShareList';
+	import { ShareList } from '$lib/models/server/requests/shareList';
 
 	export let data: PageData;
 
@@ -66,20 +66,6 @@
 		membersLabel = $t('shareList.members');
 	}
 
-	function validate(): ValidationResult {
-		const result = new ValidationResult();
-
-		if (ValidationUtil.isEmptyOrWhitespace(selectedShareEmail)) {
-			result.fail('email');
-		}
-
-		if (selectedShareEmail.trim().toLowerCase() === $user.email) {
-			result.fail('email');
-		}
-
-		return result;
-	}
-
 	async function addShare() {
 		alertState.update((x) => {
 			x.hide();
@@ -98,7 +84,7 @@
 			return;
 		}
 
-		const result = validate();
+		const result = ListsService.validateShare(selectedShareEmail, $user.email);
 
 		if (result.valid) {
 			emailIsInvalid = false;
@@ -214,7 +200,7 @@
 		saveButtonIsLoading = true;
 		emailIsInvalid = false;
 
-		await listsService.share(data.id, newShares, editedShares, removedShares);
+		await listsService.share(new ShareList(data.id, newShares, editedShares, removedShares));
 
 		if (editedShares.length + removedShares.length > 0) {
 			alertState.update((x) => {

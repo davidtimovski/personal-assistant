@@ -2,8 +2,8 @@
 
 public class ReorderTask
 {
-    public int Id { get; set; }
-    public int UserId { get; set; }
-    public short OldOrder { get; set; }
-    public short NewOrder { get; set; }
+    public required int Id { get; init; }
+    public required int UserId { get; init; }
+    public required short OldOrder { get; init; }
+    public required short NewOrder { get; init; }
 }
