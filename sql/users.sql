@@ -7,7 +7,7 @@ CREATE TABLE public.users
 	culture character varying(10) COLLATE pg_catalog."default" NOT NULL,
 	image_uri character varying(255) NOT NULL COLLATE pg_catalog."default",
     todo_notifications_enabled boolean NOT NULL DEFAULT FALSE,
-    cooking_notifications_enabled boolean NOT NULL DEFAULT FALSE,
+    chef_notifications_enabled boolean NOT NULL DEFAULT FALSE,
     imperial_system boolean NOT NULL DEFAULT FALSE,
 	modified_date timestamp with time zone NOT NULL,
     CONSTRAINT pk_users PRIMARY KEY (id)

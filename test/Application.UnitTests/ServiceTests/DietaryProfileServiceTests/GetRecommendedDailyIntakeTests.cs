@@ -1,10 +1,10 @@
 ﻿using Application.UnitTests.Builders;
-using CookingAssistant.Application.Contracts.Common;
-using CookingAssistant.Application.Contracts.DietaryProfiles;
-using CookingAssistant.Application.Contracts.DietaryProfiles.Models;
-using CookingAssistant.Application.Mappings;
-using CookingAssistant.Application.Services;
-using CookingAssistant.Utility;
+using Chef.Application.Contracts.Common;
+using Chef.Application.Contracts.DietaryProfiles;
+using Chef.Application.Contracts.DietaryProfiles.Models;
+using Chef.Application.Mappings;
+using Chef.Application.Services;
+using Chef.Utility;
 using FluentValidation;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -28,7 +28,7 @@ public class GetRecommendedDailyIntakeTests
             new Mock<IDailyIntakeHelper>().Object,
             dailyIntakeRefOptionsMock.Object,
             null,
-            MapperMocker.GetMapper<CookingAssistantProfile>(),
+            MapperMocker.GetMapper<ChefProfile>(),
             null);
     }
 

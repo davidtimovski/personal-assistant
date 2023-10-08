@@ -5,12 +5,12 @@ namespace ToDoAssistant.Application.Contracts.Tasks.Models;
 
 public class CreateTask
 {
-    public int UserId { get; set; }
-    public int ListId { get; set; }
-    public string Name { get; set; } = null!;
-    public string? Url { get; set; }
-    public bool IsOneTime { get; set; }
-    public bool? IsPrivate { get; set; }
+    public required int UserId { get; init; }
+    public required int ListId { get; init; }
+    public required string Name { get; init; }
+    public required string? Url { get; init; }
+    public required bool IsOneTime { get; init; }
+    public required bool? IsPrivate { get; init; }
 }
 
 public class CreateTaskValidator : AbstractValidator<CreateTask>

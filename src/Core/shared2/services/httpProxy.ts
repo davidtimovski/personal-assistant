@@ -140,11 +140,7 @@ export class HttpProxy {
 
   private async handleErrorCodes(response: Response): Promise<void> {
     if (response.status === 401) {
-      if (!this.authService.initialized) {
-        await this.authService.initialize();
-      }
-
-      //await this.authService.signinRedirect();
+      await this.authService.signinRedirect();
       throw new HttpProxyError("unauthorized");
     } else if (response.status === 404) {
       throw new Error("404 Not Found returned");

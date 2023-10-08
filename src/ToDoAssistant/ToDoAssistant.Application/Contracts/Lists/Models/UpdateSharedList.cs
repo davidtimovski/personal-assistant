@@ -4,9 +4,9 @@ namespace ToDoAssistant.Application.Contracts.Lists.Models;
 
 public class UpdateSharedList
 {
-    public int Id { get; set; }
-    public int UserId { get; set; }
-    public bool NotificationsEnabled { get; set; }
+    public required int Id { get; init; }
+    public required int UserId { get; init; }
+    public required bool NotificationsEnabled { get; init; }
 }
 
 public class UpdateSharedListValidator : AbstractValidator<UpdateSharedList>

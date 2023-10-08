@@ -12,19 +12,10 @@ public class CreateUserPayload
         this.name = name;
     }
 
-    [JsonRequired]
     public string email { get; init; }
-
-    [JsonRequired]
     public bool email_verified { get; init; }
-
-    [JsonRequired]
     public string password { get; init; }
-
-    [JsonRequired]
     public string name { get; init; }
-
-    [JsonRequired]
     public string connection { get; init; } = "Username-Password-Authentication";
 }
 

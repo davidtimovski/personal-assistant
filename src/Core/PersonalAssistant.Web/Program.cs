@@ -2,8 +2,8 @@
 using System.Reflection;
 using Auth0.AspNetCore.Authentication;
 using Cdn;
-using CookingAssistant.Application;
-using CookingAssistant.Persistence;
+using Chef.Application;
+using Chef.Persistence;
 using Core.Application;
 using Core.Infrastructure;
 using Core.Persistence;
@@ -31,7 +31,7 @@ if (builder.Environment.IsProduction())
 builder.Services
     .AddApplication()
     .AddToDoAssistant()
-    .AddCookingAssistant(builder.Configuration);
+    .AddChef(builder.Configuration);
 
 builder.Services
     .AddUserIdMapper()
@@ -41,7 +41,7 @@ builder.Services
 builder.Services
     .AddPersistence(builder.Configuration)
     .AddToDoAssistantPersistence(builder.Configuration)
-    .AddCookingAssistantPersistence(builder.Configuration);
+    .AddChefPersistence(builder.Configuration);
 
 builder.Services.AddHealthChecks();
 
@@ -123,7 +123,7 @@ app.UseCors(builder =>
 {
     builder.WithOrigins(
         appSettings.Value.Urls.ToDoAssistant,
-        appSettings.Value.Urls.CookingAssistant,
+        appSettings.Value.Urls.Chef,
         appSettings.Value.Urls.Accountant,
         appSettings.Value.Urls.Weatherman
     );

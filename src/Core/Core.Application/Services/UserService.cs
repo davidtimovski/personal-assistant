@@ -78,16 +78,16 @@ public class UserService : IUserService
         }
     }
 
-    public CookingAssistantPreferences GetCookingAssistantPreferences(int id, ISpan metricsSpan)
+    public ChefPreferences GetChefPreferences(int id, ISpan metricsSpan)
     {
         try
         {
             User user = _usersRepository.Get(id);
-            return _mapper.Map<CookingAssistantPreferences>(user);
+            return _mapper.Map<ChefPreferences>(user);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Unexpected error in {nameof(GetCookingAssistantPreferences)}");
+            _logger.LogError(ex, $"Unexpected error in {nameof(GetChefPreferences)}");
             throw;
         }
     }
@@ -105,7 +105,7 @@ public class UserService : IUserService
                 Language = language,
                 Culture = culture.Trim(),
                 ToDoNotificationsEnabled = false,
-                CookingNotificationsEnabled = false,
+                ChefNotificationsEnabled = false,
                 ImperialSystem = false,
                 ImageUri = imageUri.Trim(),
                 ModifiedDate = DateTime.UtcNow,
@@ -173,21 +173,21 @@ public class UserService : IUserService
         }
     }
 
-    public async Task UpdateCookingNotificationsEnabledAsync(int id, bool enabled, ISpan metricsSpan)
+    public async Task UpdateChefNotificationsEnabledAsync(int id, bool enabled, ISpan metricsSpan)
     {
-        var metric = metricsSpan.StartChild($"{nameof(UserService)}.{nameof(UpdateCookingNotificationsEnabledAsync)}");
+        var metric = metricsSpan.StartChild($"{nameof(UserService)}.{nameof(UpdateChefNotificationsEnabledAsync)}");
 
         try
         {
             var user = _usersRepository.Get(id);
-            user.CookingNotificationsEnabled = enabled;
+            user.ChefNotificationsEnabled = enabled;
             user.ModifiedDate = DateTime.UtcNow;
 
             await _usersRepository.UpdateAsync(user, metric);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Unexpected error in {nameof(UpdateCookingNotificationsEnabledAsync)}");
+            _logger.LogError(ex, $"Unexpected error in {nameof(UpdateChefNotificationsEnabledAsync)}");
             throw;
         }
         finally

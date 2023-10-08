@@ -25,9 +25,9 @@ public class UsersControllerTests
     }
 
     [Fact]
-    public async Task UpdateCookingNotificationsEnabled_Returns400_IfBodyMissing()
+    public async Task UpdateChefNotificationsEnabled_Returns400_IfBodyMissing()
     {
-        var result = await _sut.UpdateCookingNotificationsEnabled(null);
+        var result = await _sut.UpdateChefNotificationsEnabled(null);
         Assert.IsType<BadRequestResult>(result);
     }
 

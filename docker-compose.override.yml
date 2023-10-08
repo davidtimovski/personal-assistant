@@ -53,7 +53,7 @@ services:
     ports:
       - "5005:80"
 
-  cooking-api:
+  chef-api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
@@ -64,7 +64,7 @@ services:
       - Cloudinary__ApiSecret=${CLOUDINARY_API_SECRET}
       - PORT=80
     volumes:
-      - ./src/CookingAssistant/CookingAssistant.Api/storage:/app/storage:z
+      - ./src/Chef/Chef.Api/storage:/app/storage:z
     ports:
       - "5006:80"
 
@@ -107,8 +107,8 @@ services:
       - SendGridApiKey=${SENDGRID_API_KEY}
       - Sender__ToDoAssistantVapid__PublicKey=${TODO_VAPID_PUBLIC_KEY}
       - Sender__ToDoAssistantVapid__PrivateKey=${TODO_VAPID_PRIVATE_KEY}
-      - Sender__CookingAssistantVapid__PublicKey=${COOKING_VAPID_PUBLIC_KEY}
-      - Sender__CookingAssistantVapid__PrivateKey=${COOKING_VAPID_PRIVATE_KEY}
+      - Sender__ChefVapid__PublicKey=${CHEF_VAPID_PUBLIC_KEY}
+      - Sender__ChefVapid__PrivateKey=${CHEF_VAPID_PRIVATE_KEY}
     volumes:
       - ./src/Core/Sender/storage:/app/storage:z
 

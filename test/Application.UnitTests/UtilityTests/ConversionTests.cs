@@ -1,4 +1,4 @@
-﻿using CookingAssistant.Utility;
+﻿using Chef.Utility;
 using Xunit;
 
 namespace Application.UnitTests.UtilityTests;

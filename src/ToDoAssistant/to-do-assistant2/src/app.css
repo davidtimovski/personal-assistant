@@ -49,8 +49,8 @@ textarea {
 	}
 }
 
-.cooking-assistant-color {
-	color: var(--cooking-assistant-color);
+.chef-color {
+	color: var(--chef-color);
 }
 
 .top-buttons-drawer.open .top-buttons-drawer-wrap {

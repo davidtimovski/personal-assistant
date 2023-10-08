@@ -11,7 +11,7 @@ public abstract class BaseRepository
 
     protected BaseRepository(WeathermanContext efContext)
     {
-        _connectionString = efContext.Database.GetConnectionString();
+        _connectionString = efContext.Database.GetConnectionString() ?? throw new ArgumentNullException("Connection string missing");
         EFContext = efContext;
     }
 

@@ -17,7 +17,7 @@ public class AppUrls
     public required string ToDoAssistant { get; set; }
 
     [Required]
-    public required string CookingAssistant { get; set; }
+    public required string Chef { get; set; }
 
     [Required]
     public required string Accountant { get; set; }

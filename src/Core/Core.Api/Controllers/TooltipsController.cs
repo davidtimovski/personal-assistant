@@ -1,6 +1,6 @@
 ﻿using Api.Common;
+using Core.Api.Models.Tooltips.Requests;
 using Core.Application.Contracts;
-using Core.Application.Contracts.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -53,9 +53,9 @@ public class TooltipsController : BaseController
     }
 
     [HttpPut]
-    public async Task<IActionResult> ToggleDismissed([FromBody] TooltipToggleDismissed dto)
+    public async Task<IActionResult> ToggleDismissed([FromBody] TooltipToggleDismissedRequest request)
     {
-        if (dto is null)
+        if (request is null)
         {
             return BadRequest();
         }
@@ -66,7 +66,7 @@ public class TooltipsController : BaseController
             UserId
         );
 
-        await _tooltipService.ToggleDismissedAsync(UserId, dto.Key, dto.Application, dto.IsDismissed, tr);
+        await _tooltipService.ToggleDismissedAsync(UserId, request.Key, request.Application, request.IsDismissed, tr);
 
         tr.Finish();
 

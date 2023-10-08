@@ -8,6 +8,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { ListsService } from '$lib/services/listsService';
 	import type { ShareRequest } from '$lib/models/viewmodels/shareRequest';
+	import { SetShareIsAccepted } from '$lib/models/server/requests/setShareIsAccepted';
 
 	let pendingShareRequests: Array<ShareRequest> | null = null;
 	let declinedShareRequests: Array<ShareRequest> | null = null;
@@ -19,7 +20,7 @@
 			throw new Error('Unexpected error: required fields missing');
 		}
 
-		await listsService.setShareIsAccepted(request.listId, true);
+		await listsService.setShareIsAccepted(new SetShareIsAccepted(request.listId, true));
 
 		await goto(`/?edited=${request.listId}`);
 	}
@@ -29,7 +30,7 @@
 			throw new Error('Unexpected error: required fields missing');
 		}
 
-		await listsService.setShareIsAccepted(request.listId, false);
+		await listsService.setShareIsAccepted(new SetShareIsAccepted(request.listId, false));
 		pendingShareRequests = pendingShareRequests.filter((x) => x.listId !== request.listId);
 		declinedShareRequests = [request, ...declinedShareRequests];
 	}

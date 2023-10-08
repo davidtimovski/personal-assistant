@@ -4,7 +4,7 @@
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
-	import { ValidationResult, ValidationUtil } from '../../../../../../../Core/shared2/utils/validationUtils';
+	import { ValidationUtil } from '../../../../../../../Core/shared2/utils/validationUtils';
 	import { ValidationErrors } from '../../../../../../../Core/shared2/models/validationErrors';
 	import AlertBlock from '../../../../../../../Core/shared2/components/AlertBlock.svelte';
 	import Checkbox from '../../../../../../../Core/shared2/components/Checkbox.svelte';
@@ -15,6 +15,9 @@
 	import { ListsService } from '$lib/services/listsService';
 	import { UsersService } from '$lib/services/usersService';
 	import { SharingState } from '$lib/models/viewmodels/sharingState';
+	import { UpdateList } from '$lib/models/server/requests/updateList';
+	import { UpdateSharedList } from '$lib/models/server/requests/updateSharedList';
+	import { CreateList } from '$lib/models/server/requests/createList';
 
 	export let data: PageData;
 
@@ -62,16 +65,6 @@
 		icon = i;
 	}
 
-	function validate(): ValidationResult {
-		const result = new ValidationResult();
-
-		if (ValidationUtil.isEmptyOrWhitespace(name)) {
-			result.fail('name');
-		}
-
-		return result;
-	}
-
 	async function save() {
 		saveButtonIsLoading = true;
 		alertState.update((x) => {
@@ -79,7 +72,7 @@
 			return x;
 		});
 
-		const result = validate();
+		const result = ListsService.validateEdit(name);
 
 		if (result.valid) {
 			nameIsInvalid = false;
@@ -87,17 +80,10 @@
 			if (!isNew) {
 				try {
 					if (sharingState === SharingState.Member) {
-						await listsService.updateShared(data.id, notificationsEnabled);
+						await listsService.updateShared(new UpdateSharedList(data.id, notificationsEnabled));
 					} else {
 						await listsService.update(
-							data.id,
-							name,
-							icon,
-							tasksText,
-							notificationsEnabled,
-							isOneTimeToggleDefault,
-							isArchived,
-							sharingState
+							new UpdateList(data.id, name, icon, isOneTimeToggleDefault, notificationsEnabled)
 						);
 					}
 
@@ -112,7 +98,7 @@
 				}
 			} else {
 				try {
-					const newId = await listsService.create(name, icon, isOneTimeToggleDefault, tasksText);
+					const newId = await listsService.create(new CreateList(name, icon, isOneTimeToggleDefault, tasksText));
 
 					await goto('/lists?edited=' + newId);
 				} catch (e) {
@@ -166,11 +152,7 @@
 
 	async function cancel() {
 		if (!confirmationInProgress) {
-			if (isNew) {
-				await goto('/lists');
-			} else {
-				await goto(`/list/${data.id}`);
-			}
+			back();
 		}
 		deleteButtonText = $t('delete');
 		leaveButtonText = $t('editList.leave');

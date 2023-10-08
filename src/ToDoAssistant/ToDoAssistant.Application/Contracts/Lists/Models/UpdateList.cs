@@ -5,12 +5,12 @@ namespace ToDoAssistant.Application.Contracts.Lists.Models;
 
 public class UpdateList
 {
-    public int Id { get; set; }
-    public int UserId { get; set; }
-    public string Name { get; set; } = null!;
-    public string Icon { get; set; } = null!;
-    public bool IsOneTimeToggleDefault { get; set; }
-    public bool NotificationsEnabled { get; set; }
+    public required int Id { get; init; }
+    public required int UserId { get; init; }
+    public required string Name { get; init; }
+    public required string Icon { get; init; }
+    public required bool IsOneTimeToggleDefault { get; init; }
+    public required bool NotificationsEnabled { get; init; }
 }
 
 public class UpdateListValidator : AbstractValidator<UpdateList>

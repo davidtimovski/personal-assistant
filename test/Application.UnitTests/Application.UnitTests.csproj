@@ -17,8 +17,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\CookingAssistant\CookingAssistant.Application\CookingAssistant.Application.csproj" />
-		<ProjectReference Include="..\..\src\CookingAssistant\CookingAssistant.Utility\CookingAssistant.Utility.fsproj" />
+		<ProjectReference Include="..\..\src\Chef\Chef.Application\Chef.Application.csproj" />
+		<ProjectReference Include="..\..\src\Chef\Chef.Utility\Chef.Utility.fsproj" />
 		<ProjectReference Include="..\..\src\ToDoAssistant\ToDoAssistant.Application\ToDoAssistant.Application.csproj" />
 		<ProjectReference Include="..\..\src\Weatherman\Weatherman.Application\Weatherman.Application.csproj" />
 		<ProjectReference Include="..\..\src\Weatherman\Weatherman.Infrastructure\Weatherman.Infrastructure.csproj" />

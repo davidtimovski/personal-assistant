@@ -29,7 +29,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\Accountant\Accountant.Persistence.Fs\Accountant.Persistence.Fs.fsproj" />
-		<ProjectReference Include="..\..\CookingAssistant\CookingAssistant.Persistence\CookingAssistant.Persistence.csproj" />
+		<ProjectReference Include="..\..\Chef\Chef.Persistence\Chef.Persistence.csproj" />
 		<ProjectReference Include="..\..\ToDoAssistant\ToDoAssistant.Persistence\ToDoAssistant.Persistence.csproj" />
 		<ProjectReference Include="..\Api.Common\Api.Common.csproj" />
 		<ProjectReference Include="..\Cdn\Cdn.csproj" />
@@ -62,7 +62,7 @@
 		<EmbeddedResource Update="Resources\Views\Home\weatherman.en-US.resx">
 			<Generator>ResXFileCodeGenerator</Generator>
 		</EmbeddedResource>
-		<EmbeddedResource Update="Resources\Views\Home\cooking-assistant.en-US.resx">
+		<EmbeddedResource Update="Resources\Views\Home\chef.en-US.resx">
 			<Generator>ResXFileCodeGenerator</Generator>
 		</EmbeddedResource>
 		<EmbeddedResource Update="Resources\Views\Home\about.en-US.resx">
