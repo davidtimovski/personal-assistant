@@ -6,11 +6,11 @@ namespace Chef.Application.Contracts.Ingredients.Models;
 
 public class IngredientPriceData : IMapFrom<Ingredient>
 {
-    public bool IsSet { get; set; }
-    public short ProductSize { get; set; }
-    public bool ProductSizeIsOneUnit { get; set; }
-    public decimal? Price { get; set; }
-    public string Currency { get; set; }
+    public bool IsSet { get; init; }
+    public short ProductSize { get; init; }
+    public bool ProductSizeIsOneUnit { get; init; }
+    public decimal? Price { get; init; }
+    public string? Currency { get; init; }
 
     public void Mapping(Profile profile)
     {

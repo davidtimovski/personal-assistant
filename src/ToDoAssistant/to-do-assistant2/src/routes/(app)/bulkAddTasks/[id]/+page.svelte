@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
-	import { ValidationResult, ValidationUtil } from '../../../../../../../Core/shared2/utils/validationUtils';
+	import { ValidationUtil } from '../../../../../../../Core/shared2/utils/validationUtils';
 	import { ValidationErrors } from '../../../../../../../Core/shared2/models/validationErrors';
 	import Checkbox from '../../../../../../../Core/shared2/components/Checkbox.svelte';
 
@@ -11,6 +11,7 @@
 	import { alertState } from '$lib/stores';
 	import { TasksService } from '$lib/services/tasksService';
 	import { ListsService } from '$lib/services/listsService';
+	import { BulkCreate } from '$lib/models/server/requests/bulkCreate';
 
 	export let data: PageData;
 
@@ -33,16 +34,6 @@
 
 	$: canSave = !ValidationUtil.isEmptyOrWhitespace(tasksText);
 
-	function validate(): ValidationResult {
-		const result = new ValidationResult();
-
-		if (ValidationUtil.isEmptyOrWhitespace(tasksText)) {
-			result.fail('tasksText');
-		}
-
-		return result;
-	}
-
 	async function save() {
 		saveButtonIsLoading = true;
 		alertState.update((x) => {
@@ -50,13 +41,13 @@
 			return x;
 		});
 
-		const result = validate();
+		const result = TasksService.validateBulkCreate(tasksText);
 
 		if (result.valid) {
 			tasksTextIsInvalid = false;
 
 			try {
-				await tasksService.bulkCreate(data.id, tasksText, tasksAreOneTime, tasksArePrivate);
+				await tasksService.bulkCreate(new BulkCreate(data.id, tasksText, tasksAreOneTime, tasksArePrivate));
 				await listsService.getAll();
 
 				alertState.update((x) => {

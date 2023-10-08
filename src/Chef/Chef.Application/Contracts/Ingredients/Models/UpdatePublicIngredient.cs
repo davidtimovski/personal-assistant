@@ -4,9 +4,9 @@ namespace Chef.Application.Contracts.Ingredients.Models;
 
 public class UpdatePublicIngredient
 {
-    public int Id { get; set; }
-    public int UserId { get; set; }
-    public int? TaskId { get; set; }
+    public required int UserId { get; init; }
+    public required int Id { get; init; }
+    public required int? TaskId { get; init; }
 }
 
 public class UpdatePublicIngredientValidator : AbstractValidator<UpdatePublicIngredient>

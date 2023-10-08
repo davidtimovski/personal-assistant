@@ -6,26 +6,26 @@ namespace Chef.Application.Contracts.Ingredients.Models;
 
 public class IngredientNutritionData : IMapFrom<Ingredient>
 {
-    public bool IsSet { get; set; }
-    public float ServingSize { get; set; }
-    public bool ServingSizeIsOneUnit { get; set; }
-    public float? Calories { get; set; }
-    public float? Fat { get; set; }
-    public float? SaturatedFat { get; set; }
-    public float? Carbohydrate { get; set; }
-    public float? Sugars { get; set; }
-    public float? AddedSugars { get; set; }
-    public float? Fiber { get; set; }
-    public float? Protein { get; set; }
-    public float? Sodium { get; set; }
-    public float? Cholesterol { get; set; }
-    public float? VitaminA { get; set; }
-    public float? VitaminC { get; set; }
-    public float? VitaminD { get; set; }
-    public float? Calcium { get; set; }
-    public float? Iron { get; set; }
-    public float? Potassium { get; set; }
-    public float? Magnesium { get; set; }
+    public bool IsSet { get; init; }
+    public float ServingSize { get; init; }
+    public bool ServingSizeIsOneUnit { get; init; }
+    public float? Calories { get; init; }
+    public float? Fat { get; init; }
+    public float? SaturatedFat { get; init; }
+    public float? Carbohydrate { get; init; }
+    public float? Sugars { get; init; }
+    public float? AddedSugars { get; init; }
+    public float? Fiber { get; init; }
+    public float? Protein { get; init; }
+    public float? Sodium { get; init; }
+    public float? Cholesterol { get; init; }
+    public float? VitaminA { get; init; }
+    public float? VitaminC { get; init; }
+    public float? VitaminD { get; init; }
+    public float? Calcium { get; init; }
+    public float? Iron { get; init; }
+    public float? Potassium { get; init; }
+    public float? Magnesium { get; init; }
 
     public void Mapping(Profile profile)
     {

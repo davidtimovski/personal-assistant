@@ -4,15 +4,15 @@ namespace Chef.Application.Contracts.DietaryProfiles.Models;
 
 public class GetRecommendedDailyIntake
 {
-    public DateTime Birthday { get; set; }
-    public string? Gender { get; set; }
-    public short? HeightCm { get; set; }
-    public short? HeightFeet { get; set; }
-    public short? HeightInches { get; set; }
-    public short? WeightKg { get; set; }
-    public short? WeightLbs { get; set; }
-    public string? ActivityLevel { get; set; }
-    public string? Goal { get; set; }
+    public required DateTime Birthday { get; init; }
+    public required string? Gender { get; init; }
+    public required short? HeightCm { get; init; }
+    public required short? HeightFeet { get; init; }
+    public required short? HeightInches { get; init; }
+    public required short? WeightKg { get; init; }
+    public required short? WeightLbs { get; init; }
+    public required string? ActivityLevel { get; init; }
+    public required string? Goal { get; init; }
 
     public short GetAge()
     {
@@ -50,7 +50,7 @@ public class GetRecommendedDailyIntakeValidator : AbstractValidator<GetRecommend
 
         RuleFor(dto => dto.Gender)
             .NotEmpty().WithMessage("DietaryProfiles.GenderIsRequired")
-            .Must(gender => Genders.Contains(gender)).WithMessage("DietaryProfiles.GenderIsInvalid");
+            .Must(gender => gender is null || Genders.Contains(gender)).WithMessage("DietaryProfiles.GenderIsInvalid");
 
         RuleFor(dto => dto.HeightCm).Must((dto, heightCm) =>
         {
@@ -89,9 +89,9 @@ public class GetRecommendedDailyIntakeValidator : AbstractValidator<GetRecommend
         }).WithMessage("DietaryProfiles.WeightIsRequired");
 
         RuleFor(dto => dto.ActivityLevel)
-            .Must(activityLevel => ActivityLevels.Contains(activityLevel)).WithMessage("ActivityLevelIsInvalid");
+            .Must(activityLevel => activityLevel is null || ActivityLevels.Contains(activityLevel)).WithMessage("ActivityLevelIsInvalid");
 
         RuleFor(dto => dto.Goal)
-            .Must(goal => Goals.Contains(goal)).WithMessage("DietaryProfiles.GoalIsInvalid");
+            .Must(goal => goal is null || Goals.Contains(goal)).WithMessage("DietaryProfiles.GoalIsInvalid");
     }
 }

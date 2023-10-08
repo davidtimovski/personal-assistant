@@ -23,7 +23,6 @@
 	let editedId: number | undefined;
 	let topDrawerIsOpen = false;
 	let shareButtonText: string;
-	let editListButtonIsLoading = false;
 	let model: ViewRecipe | undefined;
 	let instructionsInHtml: string | undefined;
 	let videoIFrame: HTMLIFrameElement;
@@ -45,11 +44,6 @@
 
 	function closeDrawer() {
 		topDrawerIsOpen = false;
-	}
-
-	async function editRecipe() {
-		editListButtonIsLoading = true;
-		await goto(`/editRecipe/${data.id}`);
 	}
 
 	function copyAsText() {
@@ -132,28 +126,16 @@
 			wakeLock.release();
 			wakeLock = null;
 		}
-		resizeObserver.disconnect();
+		resizeObserver?.disconnect();
 		recipesService?.release();
 	});
 </script>
 
 <section class="container" on:click={closeDrawer}>
 	<div class="page-title-wrap">
-		{#if editListButtonIsLoading}
-			<span class="page-loading">
-				<i class="fas fa-circle-notch fa-spin" />
-			</span>
-		{:else}
-			<button
-				type="button"
-				on:click={editRecipe}
-				class="edit-button"
-				title={$t('recipe.edit')}
-				aria-label={$t('recipe.edit')}
-			>
-				<i class="fas fa-pencil-alt" />
-			</button>
-		{/if}
+		<a href="/editRecipe/{data.id}" class="edit-button" title={$t('recipe.edit')} aria-label={$t('recipe.edit')}>
+			<i class="fas fa-pencil-alt" />
+		</a>
 
 		<div class="page-title">{model ? model.name : ''}</div>
 
@@ -167,8 +149,8 @@
 			<div class="top-buttons-drawer" class:open={topDrawerIsOpen}>
 				<div class="top-buttons-drawer-wrap">
 					<div class="top-buttons-drawer-content horizontal-buttons-wrap">
-						<a href="/shareRecipe/{data.id}" class="wide-button">{shareButtonText}</a>
-						<a href="/sendRecipe/{data.id}" class="wide-button">{$t('recipe.sendRecipe')}</a>
+						<!-- <a href="/shareRecipe/{data.id}" class="wide-button">{shareButtonText}</a>
+						<a href="/sendRecipe/{data.id}" class="wide-button">{$t('recipe.sendRecipe')}</a> -->
 						<a on:click={copyAsText} class="wide-button with-badge">
 							<span>{$t('recipe.copyAsText')}</span>
 							<i class="fas fa-check badge toggled" class:visible={copyAsTextCompleted} />
@@ -268,7 +250,7 @@
 						{/if}
 
 						{#if servingsSelectorIsVisible}
-							<ServingsSelector bind:recipe={model} viewing={true} />
+							<ServingsSelector bind:recipe={model} />
 						{/if}
 
 						{#if model.nutritionSummary.isSet}

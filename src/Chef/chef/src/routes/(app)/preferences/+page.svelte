@@ -77,9 +77,9 @@
 				applicationServerKey: NotificationsServiceBase.getApplicationServerKey(notificationsVapidKey)
 			});
 
-			await notificationsService.createSubscription('To Do Assistant', newSub);
+			await notificationsService.createSubscription('Chef', newSub);
 
-			await swReg.showNotification('To Do Assistant', {
+			await swReg.showNotification('Chef', {
 				body: $t('preferences.notificationsWereEnabled'),
 				icon: notificationIconSrc,
 				tag: 'notifications-enabled'

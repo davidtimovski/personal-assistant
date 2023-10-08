@@ -1,4 +1,5 @@
-﻿using Chef.Application.Contracts.Ingredients;
+﻿using Chef.Api.Models.Ingredients.Requests;
+using Chef.Application.Contracts.Ingredients;
 using Chef.Application.Contracts.Ingredients.Models;
 using Core.Application.Contracts;
 using FluentValidation;
@@ -122,31 +123,71 @@ public class IngredientsController : BaseController
     }
 
     [HttpPut]
-    public async Task<IActionResult> Update([FromBody] UpdateIngredient dto)
+    public async Task<IActionResult> Update([FromBody] UpdateIngredientRequest request)
     {
-        if (dto is null)
+        if (request is null)
         {
             return BadRequest();
         }
 
-        dto.UserId = UserId;
-
-        await _ingredientService.UpdateAsync(dto, _updateValidator);
+        var model = new UpdateIngredient
+        {
+            UserId = UserId,
+            Id = request.Id,
+            TaskId = request.TaskId,
+            Name = request.Name,
+            NutritionData = new Application.Contracts.Ingredients.Models.UpdateIngredientNutritionData
+            {
+                IsSet = request.NutritionData.IsSet,
+                ServingSize = request.NutritionData.ServingSize,
+                ServingSizeIsOneUnit = request.NutritionData.ServingSizeIsOneUnit,
+                Calories = request.NutritionData.Calories,
+                Fat = request.NutritionData.Fat,
+                SaturatedFat = request.NutritionData.SaturatedFat,
+                Carbohydrate = request.NutritionData.Carbohydrate,
+                Sugars = request.NutritionData.Sugars,
+                AddedSugars = request.NutritionData.AddedSugars,
+                Fiber = request.NutritionData.Fiber,
+                Protein = request.NutritionData.Protein,
+                Sodium = request.NutritionData.Sodium,
+                Cholesterol = request.NutritionData.Cholesterol,
+                VitaminA = request.NutritionData.VitaminA,
+                VitaminC = request.NutritionData.VitaminC,
+                VitaminD = request.NutritionData.VitaminD,
+                Calcium = request.NutritionData.Calcium,
+                Iron = request.NutritionData.Iron,
+                Potassium = request.NutritionData.Potassium,
+                Magnesium = request.NutritionData.Magnesium,
+            },
+            PriceData = new Application.Contracts.Ingredients.Models.UpdateIngredientPriceData
+            {
+                IsSet = request.PriceData.IsSet,
+                ProductSize = request.PriceData.ProductSize,
+                ProductSizeIsOneUnit = request.PriceData.ProductSizeIsOneUnit,
+                Price = request.PriceData.Price,
+                Currency = request.PriceData.Currency,
+            },
+        };
+        await _ingredientService.UpdateAsync(model, _updateValidator);
 
         return NoContent();
     }
 
     [HttpPut("public")]
-    public async Task<IActionResult> UpdatePublic([FromBody] UpdatePublicIngredient dto)
+    public async Task<IActionResult> UpdatePublic([FromBody] UpdatePublicIngredientRequest request)
     {
-        if (dto is null)
+        if (request is null)
         {
             return BadRequest();
         }
 
-        dto.UserId = UserId;
-
-        await _ingredientService.UpdateAsync(dto, _updatePublicValidator);
+        var model = new UpdatePublicIngredient
+        {
+            UserId = UserId,
+            Id = request.Id,
+            TaskId = request.TaskId,
+        };
+        await _ingredientService.UpdateAsync(model, _updatePublicValidator);
 
         return NoContent();
     }

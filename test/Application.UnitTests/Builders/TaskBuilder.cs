@@ -53,13 +53,15 @@ internal class TaskBuilder
         return this;
     }
 
-    internal CreateTask BuildCreateModel()
+    internal CreateTask BuildCreateModel() => new CreateTask
     {
-        return new CreateTask
-        {
-            Name = name
-        };
-    }
+        Name = name,
+        UserId = 0,
+        ListId = 0,
+        Url = null,
+        IsOneTime = false,
+        IsPrivate = false
+    };
 
     internal BulkCreate BuildBulkCreateModel()
     {
@@ -73,11 +75,16 @@ internal class TaskBuilder
         };
     }
 
-    internal UpdateTask BuildUpdateModel()
+    internal UpdateTask BuildUpdateModel() => new UpdateTask
     {
-        return new UpdateTask
-        {
-            Name = name
-        };
-    }
+        Name = name,
+        Id = 0,
+        UserId = 0,
+        ListId = 0,
+        Url = null,
+        IsOneTime = false,
+        IsHighPriority = false,
+        IsPrivate = false,
+        AssignedToUserId = null
+    };
 }

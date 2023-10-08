@@ -5,11 +5,11 @@ namespace ToDoAssistant.Application.Contracts.Tasks.Models;
 
 public class BulkCreate
 {
-    public int UserId { get; set; }
-    public int ListId { get; set; }
-    public string TasksText { get; set; } = null!;
-    public bool TasksAreOneTime { get; set; }
-    public bool TasksArePrivate { get; set; }
+    public required int UserId { get; init; }
+    public required int ListId { get; init; }
+    public required string TasksText { get; init; }
+    public required bool TasksAreOneTime { get; init; }
+    public required bool TasksArePrivate { get; init; }
 }
 
 public class BulkCreateValidator : AbstractValidator<BulkCreate>

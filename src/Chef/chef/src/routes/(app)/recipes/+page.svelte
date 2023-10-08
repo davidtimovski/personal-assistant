@@ -128,7 +128,7 @@
 	});
 
 	onDestroy(() => {
-		resizeObserver.disconnect();
+		resizeObserver?.disconnect();
 		usersService?.release();
 		recipesService?.release();
 	});

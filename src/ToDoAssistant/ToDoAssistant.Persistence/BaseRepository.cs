@@ -10,7 +10,7 @@ public abstract class BaseRepository
 
     protected BaseRepository(ToDoAssistantContext efContext)
     {
-        _connectionString = efContext.Database!.GetConnectionString()!;
+        _connectionString = efContext.Database!.GetConnectionString() ?? throw new ArgumentNullException("Connection string missing");
         EFContext = efContext;
     }
 

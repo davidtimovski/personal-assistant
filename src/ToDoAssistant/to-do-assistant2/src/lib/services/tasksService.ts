@@ -1,5 +1,6 @@
 import { HttpProxy } from '../../../../../Core/shared2/services/httpProxy';
 import { ErrorLogger } from '../../../../../Core/shared2/services/errorLogger';
+import { ValidationResult, ValidationUtil } from '../../../../../Core/shared2/utils/validationUtils';
 
 import { state } from '$lib/stores';
 import { DerivedLists } from '$lib/services/listsService';
@@ -8,6 +9,10 @@ import { List, type Task } from '$lib/models/entities';
 import type { EditTaskModel } from '$lib/models/viewmodels/editTaskModel';
 import { ListTask } from '$lib/models/viewmodels/listTask';
 import { SharingState } from '$lib/models/viewmodels/sharingState';
+import type { CreateTask } from '$lib/models/server/requests/createTask';
+import type { BulkCreate } from '$lib/models/server/requests/bulkCreate';
+import type { UpdateTask } from '$lib/models/server/requests/updateTask';
+import { CompleteUncomplete } from '$lib/models/server/requests/completeUncomplete';
 import { State } from '$lib/models/state';
 import Variables from '$lib/variables';
 
@@ -27,17 +32,25 @@ export class TasksService {
 		return this.httpProxy.ajax<EditTaskModel>(`${Variables.urls.api}/tasks/${id}/update`);
 	}
 
-	async create(listId: number, name: string, url: string, isOneTime: boolean, isPrivate: boolean): Promise<number> {
+	static validateEdit(name: string, url: string | null): ValidationResult {
+		const result = new ValidationResult();
+
+		if (ValidationUtil.isEmptyOrWhitespace(name)) {
+			result.fail('name');
+		}
+
+		if (url && !this.isUrl(url)) {
+			result.fail('url');
+		}
+
+		return result;
+	}
+
+	async create(dto: CreateTask): Promise<number> {
 		try {
 			const id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/tasks`, {
 				method: 'post',
-				body: window.JSON.stringify({
-					listId,
-					name,
-					url,
-					isOneTime,
-					isPrivate
-				})
+				body: window.JSON.stringify(dto)
 			});
 
 			return id;
@@ -47,21 +60,21 @@ export class TasksService {
 		}
 	}
 
-	async bulkCreate(
-		listId: number,
-		tasksText: string,
-		tasksAreOneTime: boolean,
-		tasksArePrivate: boolean
-	): Promise<void> {
+	static validateBulkCreate(tasksText: string): ValidationResult {
+		const result = new ValidationResult();
+
+		if (ValidationUtil.isEmptyOrWhitespace(tasksText)) {
+			result.fail('tasksText');
+		}
+
+		return result;
+	}
+
+	async bulkCreate(dto: BulkCreate): Promise<void> {
 		try {
 			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/tasks/bulk`, {
 				method: 'post',
-				body: window.JSON.stringify({
-					listId: listId,
-					tasksText: tasksText,
-					tasksAreOneTime: tasksAreOneTime,
-					tasksArePrivate: tasksArePrivate
-				})
+				body: window.JSON.stringify(dto)
 			});
 		} catch (e) {
 			this.logger.logError(e);
@@ -69,29 +82,11 @@ export class TasksService {
 		}
 	}
 
-	async update(
-		id: number,
-		listId: number,
-		name: string,
-		url: string,
-		isOneTime: boolean,
-		isHighPriority: boolean,
-		isPrivate: boolean,
-		assignedToUserId: number | null
-	): Promise<void> {
+	async update(dto: UpdateTask): Promise<void> {
 		try {
 			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/tasks`, {
 				method: 'put',
-				body: window.JSON.stringify({
-					id,
-					listId,
-					name,
-					url,
-					isOneTime,
-					isHighPriority,
-					isPrivate,
-					assignedToUserId
-				})
+				body: window.JSON.stringify(dto)
 			});
 		} catch (e) {
 			this.logger.logError(e);
@@ -167,9 +162,7 @@ export class TasksService {
 		try {
 			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/tasks/complete`, {
 				method: 'put',
-				body: window.JSON.stringify({
-					id: id
-				})
+				body: window.JSON.stringify(new CompleteUncomplete(id))
 			});
 		} catch (e) {
 			this.logger.logError(e);
@@ -253,9 +246,7 @@ export class TasksService {
 		try {
 			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/tasks/uncomplete`, {
 				method: 'put',
-				body: window.JSON.stringify({
-					id: id
-				})
+				body: window.JSON.stringify(new CompleteUncomplete(id))
 			});
 		} catch (e) {
 			this.logger.logError(e);

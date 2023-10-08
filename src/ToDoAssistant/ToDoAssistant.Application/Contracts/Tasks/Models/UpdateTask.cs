@@ -5,15 +5,15 @@ namespace ToDoAssistant.Application.Contracts.Tasks.Models;
 
 public class UpdateTask
 {
-    public int Id { get; set; }
-    public int UserId { get; set; }
-    public int ListId { get; set; }
-    public string Name { get; set; } = null!;
-    public string? Url { get; set; }
-    public bool IsOneTime { get; set; }
-    public bool IsHighPriority { get; set; }
-    public bool? IsPrivate { get; set; }
-    public int? AssignedToUserId { get; set; }
+    public required int Id { get; init; }
+    public required int UserId { get; init; }
+    public required int ListId { get; init; }
+    public required string Name { get; init; }
+    public required string? Url { get; init; }
+    public required bool IsOneTime { get; init; }
+    public required bool IsHighPriority { get; init; }
+    public required bool? IsPrivate { get; init; }
+    public required int? AssignedToUserId { get; init; }
 }
 
 public class UpdateTaskValidator : AbstractValidator<UpdateTask>

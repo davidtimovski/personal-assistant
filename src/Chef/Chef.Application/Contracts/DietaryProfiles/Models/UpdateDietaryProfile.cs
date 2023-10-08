@@ -4,46 +4,46 @@ namespace Chef.Application.Contracts.DietaryProfiles.Models;
 
 public class UpdateDietaryProfile
 {
-    public int UserId { get; set; }
-    public DateTime Birthday { get; set; }
-    public string Gender { get; set; }
-    public short? HeightCm { get; set; }
-    public short? HeightFeet { get; set; }
-    public short? HeightInches { get; set; }
-    public float? WeightKg { get; set; }
-    public short? WeightLbs { get; set; }
-    public string? ActivityLevel { get; set; }
-    public string? Goal { get; set; }
-    public short? CustomCalories { get; set; }
-    public bool TrackCalories { get; set; }
-    public short? CustomSaturatedFat { get; set; }
-    public bool TrackSaturatedFat { get; set; }
-    public short? CustomCarbohydrate { get; set; }
-    public bool TrackCarbohydrate { get; set; }
-    public short? CustomAddedSugars { get; set; }
-    public bool TrackAddedSugars { get; set; }
-    public float? CustomFiber { get; set; }
-    public bool TrackFiber { get; set; }
-    public short? CustomProtein { get; set; }
-    public bool TrackProtein { get; set; }
-    public short? CustomSodium { get; set; }
-    public bool TrackSodium { get; set; }
-    public short? CustomCholesterol { get; set; }
-    public bool TrackCholesterol { get; set; }
-    public short? CustomVitaminA { get; set; }
-    public bool TrackVitaminA { get; set; }
-    public short? CustomVitaminC { get; set; }
-    public bool TrackVitaminC { get; set; }
-    public short? CustomVitaminD { get; set; }
-    public bool TrackVitaminD { get; set; }
-    public short? CustomCalcium { get; set; }
-    public bool TrackCalcium { get; set; }
-    public short? CustomIron { get; set; }
-    public bool TrackIron { get; set; }
-    public short? CustomPotassium { get; set; }
-    public bool TrackPotassium { get; set; }
-    public short? CustomMagnesium { get; set; }
-    public bool TrackMagnesium { get; set; }
+    public required int UserId { get; init; }
+    public required DateTime Birthday { get; init; }
+    public required string Gender { get; init; }
+    public required short? HeightCm { get; init; }
+    public required short? HeightFeet { get; init; }
+    public required short? HeightInches { get; init; }
+    public required float? WeightKg { get; init; }
+    public required short? WeightLbs { get; init; }
+    public required string? ActivityLevel { get; init; }
+    public required string? Goal { get; init; }
+    public required short? CustomCalories { get; init; }
+    public required bool TrackCalories { get; init; }
+    public required short? CustomSaturatedFat { get; init; }
+    public required bool TrackSaturatedFat { get; init; }
+    public required short? CustomCarbohydrate { get; init; }
+    public required bool TrackCarbohydrate { get; init; }
+    public required short? CustomAddedSugars { get; init; }
+    public required bool TrackAddedSugars { get; init; }
+    public required float? CustomFiber { get; init; }
+    public required bool TrackFiber { get; init; }
+    public required short? CustomProtein { get; init; }
+    public required bool TrackProtein { get; init; }
+    public required short? CustomSodium { get; init; }
+    public required bool TrackSodium { get; init; }
+    public required short? CustomCholesterol { get; init; }
+    public required bool TrackCholesterol { get; init; }
+    public required short? CustomVitaminA { get; init; }
+    public required bool TrackVitaminA { get; init; }
+    public required short? CustomVitaminC { get; init; }
+    public required bool TrackVitaminC { get; init; }
+    public required short? CustomVitaminD { get; init; }
+    public required bool TrackVitaminD { get; init; }
+    public required short? CustomCalcium { get; init; }
+    public required bool TrackCalcium { get; init; }
+    public required short? CustomIron { get; init; }
+    public required bool TrackIron { get; init; }
+    public required short? CustomPotassium { get; init; }
+    public required bool TrackPotassium { get; init; }
+    public required short? CustomMagnesium { get; init; }
+    public required bool TrackMagnesium { get; init; }
 }
 
 public class UpdateDietaryProfileValidator : AbstractValidator<UpdateDietaryProfile>

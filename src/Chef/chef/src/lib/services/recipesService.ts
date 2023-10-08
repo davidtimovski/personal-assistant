@@ -1,5 +1,6 @@
 import { HttpProxy } from '../../../../../Core/shared2/services/httpProxy';
 import { ErrorLogger } from '../../../../../Core/shared2/services/errorLogger';
+import { ValidationResult, ValidationUtil } from '../../../../../Core/shared2/utils/validationUtils';
 
 import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 import { state } from '$lib/stores';
@@ -10,17 +11,22 @@ import type { EditRecipeModel } from '$lib/models/viewmodels/editRecipeModel';
 import type { RecipeWithShares } from '$lib/models/viewmodels/recipeWithShares';
 import type { SendRecipeModel } from '$lib/models/viewmodels/sendRecipeModel';
 import type { ReceivedRecipe } from '$lib/models/viewmodels/receivedRecipe';
-import type { IngredientReplacement } from '$lib/models/viewmodels/ingredientReplacement';
 import type { ReviewIngredientsModel } from '$lib/models/viewmodels/reviewIngredientsModel';
-import { EditRecipeIngredient } from '$lib/models/viewmodels/editRecipeIngredient';
-import type { CanShareRecipe } from '$lib/models/viewmodels/canShareRecipe';
-import type { CanSendRecipe } from '$lib/models/viewmodels/canSendRecipe';
+import type { CanShareRecipe } from '$lib/models/server/responses/canShareRecipe';
+import type { CanSendRecipe } from '$lib/models/server/responses/canSendRecipe';
+import type { CreateRecipe } from '$lib/models/server/requests/createRecipe';
+import type { UpdateRecipe } from '$lib/models/server/requests/updateRecipe';
+import type { ShareRecipe } from '$lib/models/server/requests/shareRecipe';
+import type { SetShareIsAccepted } from '$lib/models/server/requests/setShareIsAccepted';
+import type { CreateSendRequest } from '$lib/models/server/requests/createSendRequest';
+import { DeclineSendRequest } from '$lib/models/server/requests/declineSendRequest';
+import type { ImportRecipe } from '$lib/models/server/requests/importRecipe';
 import { State } from '$lib/models/state';
 import Variables from '$lib/variables';
 
 export class RecipesService {
 	private readonly httpProxy = new HttpProxy();
-	private readonly logger = new ErrorLogger('To Do Assistant');
+	private readonly logger = new ErrorLogger('Chef');
 	private readonly localStorage = new LocalStorageUtil();
 
 	async getAll(includeCache = false) {
@@ -40,7 +46,7 @@ export class RecipesService {
 	async get(id: number, currency: string): Promise<ViewRecipe> {
 		const result = await this.httpProxy.ajax<ViewRecipe>(`${Variables.urls.api}/recipes/${id}/${currency}`);
 
-		// TODO: Update last load date
+		// Update last load date
 
 		return result;
 	}
@@ -73,19 +79,11 @@ export class RecipesService {
 		return this.httpProxy.ajax<number>(`${Variables.urls.api}/recipes/pending-send-requests-count`);
 	}
 
-	async tryImport(
-		id: number,
-		ingredientReplacements: IngredientReplacement[],
-		checkIfReviewRequired: boolean
-	): Promise<number> {
+	async tryImport(dto: ImportRecipe): Promise<number> {
 		try {
 			const result = await this.httpProxy.ajax<number>(`${Variables.urls.api}/recipes/try-import`, {
 				method: 'post',
-				body: window.JSON.stringify({
-					id: id,
-					ingredientReplacements: ingredientReplacements,
-					checkIfReviewRequired: checkIfReviewRequired
-				})
+				body: window.JSON.stringify(dto)
 			});
 
 			// TODO: Refresh recipes
@@ -101,33 +99,21 @@ export class RecipesService {
 		return this.httpProxy.ajax<ReviewIngredientsModel>(`${Variables.urls.api}/recipes/${id}/review`);
 	}
 
-	async create(
-		name: string,
-		description: string,
-		ingredients: EditRecipeIngredient[],
-		instructions: string,
-		prepDuration: string,
-		cookDuration: string,
-		servings: number,
-		imageUri: string,
-		videoUrl: string
-	): Promise<number> {
-		try {
-			const parsedIngredients = this.parseIngredientsAmount(ingredients);
+	static validateEdit(name: string): ValidationResult {
+		const result = new ValidationResult();
 
+		if (ValidationUtil.isEmptyOrWhitespace(name)) {
+			result.fail('name');
+		}
+
+		return result;
+	}
+
+	async create(dto: CreateRecipe): Promise<number> {
+		try {
 			const id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/recipes`, {
 				method: 'post',
-				body: window.JSON.stringify({
-					name: name,
-					description: description,
-					ingredients: parsedIngredients,
-					instructions: instructions,
-					prepDuration: prepDuration,
-					cookDuration: cookDuration,
-					servings: servings,
-					imageUri: imageUri,
-					videoUrl: videoUrl
-				})
+				body: window.JSON.stringify(dto)
 			});
 
 			// TODO: Refresh recipes
@@ -156,24 +142,11 @@ export class RecipesService {
 		}
 	}
 
-	async update(recipe: EditRecipeModel): Promise<void> {
+	async update(dto: UpdateRecipe): Promise<void> {
 		try {
-			const parsedIngredients = this.parseIngredientsAmount(recipe.ingredients);
-
 			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/recipes`, {
 				method: 'put',
-				body: window.JSON.stringify({
-					id: recipe.id,
-					name: recipe.name,
-					description: recipe.description,
-					ingredients: parsedIngredients,
-					instructions: recipe.instructions,
-					prepDuration: recipe.prepDuration,
-					cookDuration: recipe.cookDuration,
-					servings: recipe.servings,
-					imageUri: recipe.imageUri,
-					videoUrl: recipe.videoUrl
-				})
+				body: window.JSON.stringify(dto)
 			});
 
 			// TODO: Refresh recipes
@@ -200,15 +173,11 @@ export class RecipesService {
 		return this.httpProxy.ajax<CanShareRecipe>(`${Variables.urls.api}/recipes/can-share-with-user/${email}`);
 	}
 
-	async share(id: number, newShares: number[], removedShares: number[]): Promise<void> {
+	async share(dto: ShareRecipe): Promise<void> {
 		try {
 			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/recipes/share`, {
 				method: 'put',
-				body: window.JSON.stringify({
-					recipeId: id,
-					newShares: newShares,
-					removedShares: removedShares
-				})
+				body: window.JSON.stringify(dto)
 			});
 
 			// TODO: Refresh recipes
@@ -218,14 +187,11 @@ export class RecipesService {
 		}
 	}
 
-	async setShareIsAccepted(id: number, isAccepted: boolean): Promise<void> {
+	async setShareIsAccepted(dto: SetShareIsAccepted): Promise<void> {
 		try {
 			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/recipes/share-is-accepted`, {
 				method: 'put',
-				body: window.JSON.stringify({
-					recipeId: id,
-					isAccepted: isAccepted
-				})
+				body: window.JSON.stringify(dto)
 			});
 
 			// TODO: Refresh recipes
@@ -254,14 +220,11 @@ export class RecipesService {
 		);
 	}
 
-	async send(id: number, recipientsIds: number[]): Promise<void> {
+	async send(dto: CreateSendRequest): Promise<void> {
 		try {
 			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/recipes/send`, {
 				method: 'post',
-				body: window.JSON.stringify({
-					recipeId: id,
-					recipientsIds: recipientsIds
-				})
+				body: window.JSON.stringify(dto)
 			});
 		} catch (e) {
 			this.logger.logError(e);
@@ -273,9 +236,7 @@ export class RecipesService {
 		try {
 			await this.httpProxy.ajaxExecute(`${Variables.urls.api}/recipes/decline-send-request`, {
 				method: 'put',
-				body: window.JSON.stringify({
-					recipeId: id
-				})
+				body: window.JSON.stringify(new DeclineSendRequest(id))
 			});
 		} catch (e) {
 			this.logger.logError(e);
@@ -315,7 +276,7 @@ export class RecipesService {
 			if (recipe.ingredients.length > 0) {
 				text += `\n\n${ingredientsLabel}:`;
 
-				for (let ingredient of recipe.ingredients) {
+				for (const ingredient of recipe.ingredients) {
 					text += `\n◾ ${ingredient.name}`;
 					if (ingredient.amount) {
 						text += ` - ${ingredient.amount + (ingredient.unit ? ' ' + ingredient.unit : '')}`;
@@ -403,31 +364,6 @@ export class RecipesService {
 		}
 
 		throw 'Invalid url';
-	}
-
-	private parseIngredientsAmount(ingredients: EditRecipeIngredient[]) {
-		return ingredients.map((ingredient: EditRecipeIngredient) => {
-			const parsedIngredient = new EditRecipeIngredient(
-				ingredient.id,
-				ingredient.name,
-				ingredient.amount,
-				ingredient.unit,
-				ingredient.hasNutritionData,
-				ingredient.hasPriceData,
-				false
-			);
-
-			if (
-				parsedIngredient.amount &&
-				typeof parsedIngredient.amount === 'string' &&
-				parsedIngredient.amount.includes('/')
-			) {
-				const fractions = parsedIngredient.amount.split('/');
-				parsedIngredient.amount = (parseInt(fractions[0], 10) / parseInt(fractions[1], 10)).toFixed(2);
-			}
-
-			return parsedIngredient;
-		});
 	}
 
 	release() {

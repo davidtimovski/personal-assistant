@@ -4,16 +4,16 @@ namespace Chef.Application.Contracts.Recipes.Models;
 
 public class CreateRecipe
 {
-    public int UserId { get; set; }
-    public string Name { get; set; } = null!;
-    public string? Description { get; set; }
-    public List<UpdateRecipeIngredient> Ingredients { get; set; }
-    public string? Instructions { get; set; }
-    public TimeSpan? PrepDuration { get; set; }
-    public TimeSpan? CookDuration { get; set; }
-    public byte Servings { get; set; }
-    public string? ImageUri { get; set; }
-    public string? VideoUrl { get; set; }
+    public required int UserId { get; init; }
+    public required string Name { get; init; }
+    public required string? Description { get; init; }
+    public required List<UpdateRecipeIngredient> Ingredients { get; init; }
+    public required string? Instructions { get; init; }
+    public required TimeSpan? PrepDuration { get; init; }
+    public required TimeSpan? CookDuration { get; init; }
+    public required byte Servings { get; init; }
+    public required string? ImageUri { get; init; }
+    public required string? VideoUrl { get; init; }
 }
 
 public class CreateRecipeValidator : AbstractValidator<CreateRecipe>

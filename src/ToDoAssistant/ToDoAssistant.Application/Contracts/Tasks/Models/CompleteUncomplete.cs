@@ -2,6 +2,6 @@
 
 public class CompleteUncomplete
 {
-    public int Id { get; set; }
-    public int UserId { get; set; }
+    public required int Id { get; init; }
+    public required int UserId { get; init; }
 }

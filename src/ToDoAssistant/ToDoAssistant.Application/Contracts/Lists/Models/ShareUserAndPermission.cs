@@ -5,8 +5,8 @@ namespace ToDoAssistant.Application.Contracts.Lists.Models;
 
 public class ShareUserAndPermission
 {
-    public int UserId { get; set; }
-    public bool IsAdmin { get; set; }
+    public required int UserId { get; init; }
+    public required bool IsAdmin { get; init; }
 }
 
 public class ShareUserAndPermissionValidator : AbstractValidator<ShareUserAndPermission>

@@ -37,7 +37,7 @@ public class UncompleteTests
         _tasksRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
             .Returns(new ToDoTask { IsCompleted = false });
 
-        await _sut.UncompleteAsync(new CompleteUncomplete(), _metricsSpanMock.Object);
+        await _sut.UncompleteAsync(new CompleteUncomplete { Id = 0, UserId = 0 }, _metricsSpanMock.Object);
 
         _tasksRepositoryMock.Verify(x => x.UncompleteAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()), Times.Never);
     }

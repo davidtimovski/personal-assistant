@@ -3,7 +3,6 @@
 	import type { ViewRecipe } from '$lib/models/viewmodels/viewRecipe';
 
 	export let recipe: ViewRecipe;
-	export let viewing: boolean;
 
 	function decrementServings() {
 		if (recipe.servings > 1) {
@@ -24,17 +23,13 @@
 	}
 
 	function adjustIngredientAmountToServings() {
-		if (viewing) {
-			for (let ingredient of recipe.ingredients.filter((x) => x.amount)) {
-				ingredient.amount = parseFloat((ingredient.amountPerServing * recipe.servings).toFixed(2));
-			}
+		for (let ingredient of recipe.ingredients.filter((x) => x.amount)) {
+			ingredient.amount = parseFloat((ingredient.amountPerServing * recipe.servings).toFixed(2));
 		}
 	}
 
 	function adjustCostToServings() {
-		if (viewing && recipe.costSummary.cost) {
-			recipe.costSummary.cost = parseFloat((recipe.costSummary.costPerServing * recipe.servings).toFixed(2));
-		}
+		recipe.costSummary.cost = parseFloat((recipe.costSummary.costPerServing * recipe.servings).toFixed(2));
 	}
 
 	$: servingsLabel =

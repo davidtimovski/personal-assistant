@@ -31,10 +31,3 @@ export class PublicIngredientSuggestions {
 export class IngredientSuggestions {
 	constructor(public userIngredients: IngredientSuggestion[], public publicIngredients: PublicIngredientSuggestions) {}
 }
-
-export enum IngredientPickerEvents {
-	Added = 'ingredient-picker:added',
-	Selected = 'ingredient-picker:selected',
-	Unselect = 'ingredient-picker:unselect',
-	Reset = 'ingredient-picker:reset'
-}

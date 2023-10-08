@@ -5,7 +5,7 @@ namespace Application.UnitTests.Builders;
 internal class ListBuilder
 {
     private string name;
-    private string tasksText;
+    private string? tasksText;
 
     internal ListBuilder()
     {
@@ -24,33 +24,37 @@ internal class ListBuilder
         return this;
     }
 
-    internal CreateList BuildCreateModel()
+    internal CreateList BuildCreateModel() => new CreateList
     {
-        return new CreateList
-        {
-            Name = name,
-            TasksText = tasksText
-        };
-    }
+        Name = name,
+        TasksText = tasksText,
+        UserId = 0,
+        Icon = "",
+        IsOneTimeToggleDefault = false
+    };
 
-    internal UpdateList BuildUpdateModel()
+    internal UpdateList BuildUpdateModel() => new UpdateList
     {
-        return new UpdateList
-        {
-            Name = name
-        };
-    }
+        Name = name,
+        Id = 0,
+        UserId = 0,
+        Icon = "",
+        IsOneTimeToggleDefault = false,
+        NotificationsEnabled = false
+    };
 
-    internal UpdateSharedList BuildUpdateSharedModel()
+    internal UpdateSharedList BuildUpdateSharedModel() => new UpdateSharedList
     {
-        return new UpdateSharedList();
-    }
+        Id = 0,
+        UserId = 0,
+        NotificationsEnabled = false
+    };
 
-    internal CopyList BuildCopyModel()
+    internal CopyList BuildCopyModel() => new CopyList
     {
-        return new CopyList
-        {
-            Name = name
-        };
-    }
+        Name = name,
+        Id = 0,
+        UserId = 0,
+        Icon = ""
+    };
 }

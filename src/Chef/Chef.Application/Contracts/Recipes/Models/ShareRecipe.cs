@@ -5,10 +5,10 @@ namespace Chef.Application.Contracts.Recipes.Models;
 
 public class ShareRecipe
 {
-    public int UserId { get; set; }
-    public int RecipeId { get; set; }
-    public List<int> NewShares { get; set; } = null!;
-    public List<int> RemovedShares { get; set; } = null!;
+    public required int UserId { get; init; }
+    public required int RecipeId { get; init; }
+    public required List<int> NewShares { get; init; }
+    public required List<int> RemovedShares { get; init; }
 }
 
 public class ShareRecipeValidator : AbstractValidator<ShareRecipe>

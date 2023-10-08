@@ -3,20 +3,20 @@
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
-	import { ValidationResult, ValidationUtil } from '../../../../../../../Core/shared2/utils/validationUtils';
+	import { ValidationUtil } from '../../../../../../../Core/shared2/utils/validationUtils';
 	import { ValidationErrors } from '../../../../../../../Core/shared2/models/validationErrors';
 	import Checkbox from '../../../../../../../Core/shared2/components/Checkbox.svelte';
 	import Tooltip from '../../../../../../../Core/shared2/components/Tooltip.svelte';
 
 	import { t } from '$lib/localization/i18n';
 	import { alertState, state } from '$lib/stores';
-	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 	import { TasksService } from '$lib/services/tasksService';
 	import { ListsService } from '$lib/services/listsService';
 	import type { List } from '$lib/models/entities';
 	import type { Assignee } from '$lib/models/viewmodels/assignee';
 	import type { ListOption } from '$lib/models/viewmodels/listOption';
 	import type { EditTaskModel } from '$lib/models/viewmodels/editTaskModel';
+	import { UpdateTask } from '$lib/models/server/requests/updateTask';
 	import Variables from '$lib/variables';
 
 	export let data: PageData;
@@ -50,7 +50,6 @@
 		}
 	});
 
-	let localStorage: LocalStorageUtil;
 	let tasksService: TasksService;
 	let listsService: ListsService;
 
@@ -77,20 +76,6 @@
 		}
 	}
 
-	function validate(): ValidationResult {
-		const result = new ValidationResult();
-
-		if (ValidationUtil.isEmptyOrWhitespace(name)) {
-			result.fail('name');
-		}
-
-		if (url && !TasksService.isUrl(url)) {
-			result.fail('url');
-		}
-
-		return result;
-	}
-
 	function clearUrl() {
 		url = '';
 	}
@@ -102,13 +87,15 @@
 			return x;
 		});
 
-		const result = validate();
+		const result = TasksService.validateEdit(name, url);
 
 		if (result.valid) {
 			nameIsInvalid = false;
 
 			try {
-				await tasksService.update(data.id, listId, name, url, isOneTime, isHighPriority, isPrivate, assignedToUserId);
+				await tasksService.update(
+					new UpdateTask(data.id, listId, name, url, isOneTime, isHighPriority, isPrivate, assignedToUserId)
+				);
 				await listsService.getAll();
 
 				goto(`/list/${listId}?edited=${data.id}`);
@@ -160,7 +147,6 @@
 	onMount(async () => {
 		deleteButtonText = $t('delete');
 
-		localStorage = new LocalStorageUtil();
 		tasksService = new TasksService();
 		listsService = new ListsService();
 

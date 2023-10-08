@@ -1,7 +1,8 @@
 ﻿using System.Globalization;
 using Api.Common;
 using Chef.Api.Models;
-using Chef.Api.Models.Recipes;
+using Chef.Api.Models.Recipes.Requests;
+using Chef.Api.Models.Recipes.Responses;
 using Chef.Application.Contracts.Ingredients;
 using Chef.Application.Contracts.Recipes;
 using Chef.Application.Contracts.Recipes.Models;
@@ -128,7 +129,7 @@ public class RecipesController : BaseController
     [HttpGet("share-requests")]
     public IActionResult GetShareRequests()
     {
-        IEnumerable<ShareRecipeRequest> shareRequests = _recipeService.GetShareRequests(UserId);
+        IEnumerable<Application.Contracts.Recipes.Models.ShareRecipeRequest> shareRequests = _recipeService.GetShareRequests(UserId);
 
         return Ok(shareRequests);
     }
@@ -172,9 +173,9 @@ public class RecipesController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateRecipe dto)
+    public async Task<IActionResult> Create([FromBody] CreateRecipeRequest request)
     {
-        if (dto is null)
+        if (request is null)
         {
             return BadRequest();
         }
@@ -185,9 +186,26 @@ public class RecipesController : BaseController
             UserId
         );
 
-        dto.UserId = UserId;
-
-        int id = await _recipeService.CreateAsync(dto, _createRecipeValidator, tr);
+        var model = new CreateRecipe
+        {
+            UserId = UserId,
+            Name = request.Name,
+            Description = request.Description,
+            Ingredients = request.Ingredients.Select(x => new Application.Contracts.Recipes.Models.UpdateRecipeIngredient
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Amount = x.Amount,
+                Unit = x.Unit
+            }).ToList(),
+            Instructions = request.Instructions,
+            PrepDuration = request.PrepDuration,
+            CookDuration = request.CookDuration,
+            Servings = request.Servings,
+            ImageUri = request.ImageUri,
+            VideoUrl = request.VideoUrl,
+        };
+        int id = await _recipeService.CreateAsync(model, _createRecipeValidator, tr);
 
         tr.Finish();
 
@@ -231,9 +249,9 @@ public class RecipesController : BaseController
     }
 
     [HttpPut]
-    public async Task<IActionResult> Update([FromBody] UpdateRecipe dto)
+    public async Task<IActionResult> Update([FromBody] UpdateRecipeRequest request)
     {
-        if (dto is null)
+        if (request is null)
         {
             return BadRequest();
         }
@@ -244,9 +262,27 @@ public class RecipesController : BaseController
             UserId
         );
 
-        dto.UserId = UserId;
-
-        UpdateRecipeResult result = await _recipeService.UpdateAsync(dto, _updateRecipeValidator, tr);
+        var model = new UpdateRecipe
+        {
+            UserId = UserId,
+            Id = request.Id,
+            Name = request.Name,
+            Description = request.Description,
+            Ingredients = request.Ingredients.Select(x => new Application.Contracts.Recipes.Models.UpdateRecipeIngredient
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Amount = x.Amount,
+                Unit = x.Unit
+            }).ToList(),
+            Instructions = request.Instructions,
+            PrepDuration = request.PrepDuration,
+            CookDuration = request.CookDuration,
+            Servings = request.Servings,
+            ImageUri = request.ImageUri,
+            VideoUrl = request.VideoUrl,
+        };
+        UpdateRecipeResult result = await _recipeService.UpdateAsync(model, _updateRecipeValidator, tr);
 
         try
         {
@@ -322,7 +358,7 @@ public class RecipesController : BaseController
     [HttpGet("can-share-with-user/{email}")]
     public IActionResult CanShareRecipeWithUser(string email)
     {
-        var canShareVm = new CanShareVm
+        var response = new CanShareResponse
         {
             CanShare = false
         };
@@ -331,36 +367,34 @@ public class RecipesController : BaseController
 
         if (user != null)
         {
-            canShareVm.UserId = user.Id;
-            canShareVm.ImageUri = user.ImageUri;
-            canShareVm.CanShare = _recipeService.CanShareWithUser(user.Id, UserId);
+            response.UserId = user.Id;
+            response.ImageUri = user.ImageUri;
+            response.CanShare = _recipeService.CanShareWithUser(user.Id, UserId);
         }
 
-        return Ok(canShareVm);
+        return Ok(response);
     }
 
     [HttpPut("share")]
-    public async Task<IActionResult> Share([FromBody] ShareRecipe dto)
+    public async Task<IActionResult> Share([FromBody] Models.Recipes.Requests.ShareRecipeRequest request)
     {
-        if (dto is null)
+        if (request is null)
         {
             return BadRequest();
         }
 
-        dto.UserId = UserId;
-
         try
         {
-            foreach (int removedUserId in dto.RemovedShares)
+            foreach (int removedUserId in request.RemovedShares)
             {
-                if (!_recipeService.CheckIfUserCanBeNotifiedOfRecipeChange(dto.RecipeId, removedUserId))
+                if (!_recipeService.CheckIfUserCanBeNotifiedOfRecipeChange(request.RecipeId, removedUserId))
                 {
                     continue;
                 }
 
-                var currentUser = _userService.Get(dto.UserId);
+                var currentUser = _userService.Get(UserId);
                 var user = _userService.Get(removedUserId);
-                RecipeToNotify recipe = _recipeService.Get(dto.RecipeId);
+                RecipeToNotify recipe = _recipeService.Get(request.RecipeId);
 
                 CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
                 var message = _localizer["RemovedShareNotification", currentUser.Name, recipe.Name];
@@ -381,20 +415,27 @@ public class RecipesController : BaseController
             throw;
         }
 
-        await _recipeService.ShareAsync(dto, _shareValidator);
+        var model = new ShareRecipe
+        {
+            UserId = UserId,
+            RecipeId = request.RecipeId,
+            NewShares = request.NewShares,
+            RemovedShares = request.RemovedShares,
+        };
+        await _recipeService.ShareAsync(model, _shareValidator);
 
         return NoContent();
     }
 
     [HttpPut("share-is-accepted")]
-    public async Task<IActionResult> SetShareIsAccepted([FromBody] SetShareIsAcceptedDto dto)
+    public async Task<IActionResult> SetShareIsAccepted([FromBody] SetShareIsAcceptedRequest request)
     {
-        if (dto is null)
+        if (request is null)
         {
             return BadRequest();
         }
 
-        SetShareIsAcceptedResult result = await _recipeService.SetShareIsAcceptedAsync(dto.RecipeId, UserId, dto.IsAccepted);
+        SetShareIsAcceptedResult result = await _recipeService.SetShareIsAcceptedAsync(request.RecipeId, UserId, request.IsAccepted);
         if (!result.Notify())
         {
             return NoContent();
@@ -402,7 +443,7 @@ public class RecipesController : BaseController
 
         try
         {
-            var localizerKey = dto.IsAccepted ? "JoinedRecipeNotification" : "DeclinedShareRequestNotification";
+            var localizerKey = request.IsAccepted ? "JoinedRecipeNotification" : "DeclinedShareRequestNotification";
             foreach (var recipient in result.NotificationRecipients)
             {
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
@@ -461,33 +502,40 @@ public class RecipesController : BaseController
     [HttpGet("can-send-recipe-to-user/{email}/{recipeId}")]
     public IActionResult CanSendRecipeToUser(string email, int recipeId)
     {
-        var canSendDto = new CanSendDto();
+        var response = new CanSendResponse
+        {
+            CanSend = false,
+        };
 
         var user = _userService.Get(email);
         if (user != null)
         {
-            canSendDto.UserId = user.Id;
-            canSendDto.ImageUri = user.ImageUri;
-
             var (canSend, alreadySent) = _recipeService.CheckSendRequest(recipeId, user.Id, UserId);
-            canSendDto.CanSend = canSend;
-            canSendDto.AlreadySent = alreadySent;
+
+            response.UserId = user.Id;
+            response.ImageUri = user.ImageUri;
+            response.CanSend = canSend;
+            response.AlreadySent = alreadySent;
         }
 
-        return Ok(canSendDto);
+        return Ok(response);
     }
 
     [HttpPost("send")]
-    public async Task<IActionResult> Send([FromBody] CreateSendRequest dto)
+    public async Task<IActionResult> Send([FromBody] CreateSendRequestRequest request)
     {
-        if (dto is null)
+        if (request is null)
         {
             return BadRequest();
         }
 
-        dto.UserId = UserId;
-
-        SendRecipeResult result = await _recipeService.SendAsync(dto, _createSendRequestValidator);
+        var model = new CreateSendRequest
+        {
+            UserId = UserId,
+            RecipeId = request.RecipeId,
+            RecipientsIds = request.RecipientsIds
+        };
+        SendRecipeResult result = await _recipeService.SendAsync(model, _createSendRequestValidator);
 
         try
         {
@@ -517,7 +565,7 @@ public class RecipesController : BaseController
     }
 
     [HttpPut("decline-send-request")]
-    public async Task<IActionResult> DeclineSendRequest([FromBody] DeclineSendRequestDto dto)
+    public async Task<IActionResult> DeclineSendRequest([FromBody] DeclineSendRequestRequest dto)
     {
         if (dto is null)
         {
@@ -563,7 +611,7 @@ public class RecipesController : BaseController
     }
 
     [HttpPost("try-import")]
-    public async Task<IActionResult> TryImport([FromBody] ImportRecipeDto dto)
+    public async Task<IActionResult> TryImport([FromBody] ImportRecipeRequest dto)
     {
         if (dto is null)
         {

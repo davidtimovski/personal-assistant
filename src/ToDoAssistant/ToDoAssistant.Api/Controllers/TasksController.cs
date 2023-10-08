@@ -10,6 +10,7 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using ToDoAssistant.Api.Hubs;
 using ToDoAssistant.Api.Models;
+using ToDoAssistant.Api.Models.Tasks.Requests;
 using ToDoAssistant.Application.Contracts.Notifications;
 using ToDoAssistant.Application.Contracts.Notifications.Models;
 using ToDoAssistant.Application.Contracts.Tasks;
@@ -83,9 +84,9 @@ public class TasksController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateTask dto)
+    public async Task<IActionResult> Create([FromBody] CreateTaskRequest request)
     {
-        if (dto is null)
+        if (request is null)
         {
             return BadRequest();
         }
@@ -96,9 +97,16 @@ public class TasksController : BaseController
             UserId
         );
 
-        dto.UserId = UserId;
-
-        CreatedTaskResult result = await _taskService.CreateAsync(dto, _createValidator, tr);
+        var model = new CreateTask
+        {
+            UserId = UserId,
+            ListId = request.ListId,
+            Name = request.Name,
+            Url = request.Url,
+            IsOneTime = request.IsOneTime,
+            IsPrivate = request.IsPrivate,
+        };
+        CreatedTaskResult result = await _taskService.CreateAsync(model, _createValidator, tr);
 
         try
         {
@@ -112,7 +120,7 @@ public class TasksController : BaseController
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
                 var message = _localizer["CreatedTaskNotification", result.ActionUserName, result.TaskName, result.ListName];
 
-                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, dto.ListId, result.TaskId, message);
+                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, request.ListId, result.TaskId, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
@@ -139,9 +147,9 @@ public class TasksController : BaseController
     }
 
     [HttpPost("bulk")]
-    public async Task<IActionResult> BulkCreate([FromBody] BulkCreate dto)
+    public async Task<IActionResult> BulkCreate([FromBody] BulkCreateRequest request)
     {
-        if (dto is null)
+        if (request is null)
         {
             return BadRequest();
         }
@@ -152,9 +160,15 @@ public class TasksController : BaseController
             UserId
         );
 
-        dto.UserId = UserId;
-
-        BulkCreateResult result = await _taskService.BulkCreateAsync(dto, _bulkCreateValidator, tr);
+        var model = new BulkCreate
+        {
+            UserId = UserId,
+            ListId = request.ListId,
+            TasksText = request.TasksText,
+            TasksAreOneTime = request.TasksAreOneTime,
+            TasksArePrivate = request.TasksArePrivate,
+        };
+        BulkCreateResult result = await _taskService.BulkCreateAsync(model, _bulkCreateValidator, tr);
 
         try
         {
@@ -175,7 +189,7 @@ public class TasksController : BaseController
                     CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
                     var message = _localizer["CreatedTaskNotification", result.ActionUserName, task.Name, result.ListName];
 
-                    var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, dto.ListId, task.Id, message);
+                    var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, request.ListId, task.Id, message);
                     var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
                     var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                     {
@@ -203,9 +217,9 @@ public class TasksController : BaseController
     }
 
     [HttpPut]
-    public async Task<IActionResult> Update([FromBody] UpdateTask dto)
+    public async Task<IActionResult> Update([FromBody] UpdateTaskRequest request)
     {
-        if (dto is null)
+        if (request is null)
         {
             return BadRequest();
         }
@@ -216,9 +230,19 @@ public class TasksController : BaseController
             UserId
         );
 
-        dto.UserId = UserId;
-
-        UpdateTaskResult result = await _taskService.UpdateAsync(dto, _updateValidator, tr);
+        var model = new UpdateTask
+        {
+            Id = request.Id,
+            UserId = UserId,
+            ListId = request.ListId,
+            Name = request.Name,
+            Url = request.Url,
+            IsOneTime = request.IsOneTime,
+            IsHighPriority = request.IsHighPriority,
+            IsPrivate = request.IsPrivate,
+            AssignedToUserId = request.AssignedToUserId,
+        };
+        UpdateTaskResult result = await _taskService.UpdateAsync(model, _updateValidator, tr);
 
         try
         {
@@ -237,7 +261,7 @@ public class TasksController : BaseController
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
                 var message = _localizer["UpdatedTaskNotification", result.ActionUserName, result.OriginalTaskName, result.ListName];
 
-                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
+                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, result.ListId, request.Id, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
@@ -255,7 +279,7 @@ public class TasksController : BaseController
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
                 var message = _localizer["RemovedTaskNotification", result.ActionUserName, result.OriginalTaskName, result.OldListName];
 
-                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.OldListId, null, message);
+                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, result.OldListId, null, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
@@ -271,9 +295,9 @@ public class TasksController : BaseController
             foreach (var recipient in result.CreatedNotificationRecipients)
             {
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-                var message = _localizer["CreatedTaskNotification", result.ActionUserName, dto.Name, result.ListName];
+                var message = _localizer["CreatedTaskNotification", result.ActionUserName, request.Name, result.ListName];
 
-                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
+                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, result.ListId, request.Id, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
@@ -291,7 +315,7 @@ public class TasksController : BaseController
                 CultureInfo.CurrentCulture = new CultureInfo(result.AssignedNotificationRecipient.Language, false);
                 var message = _localizer["AssignedTaskNotification", result.ActionUserName, result.OriginalTaskName, result.ListName];
 
-                var createNotificationDto = new CreateOrUpdateNotification(result.AssignedNotificationRecipient.Id, dto.UserId, result.ListId, dto.Id, message);
+                var createNotificationDto = new CreateOrUpdateNotification(result.AssignedNotificationRecipient.Id, UserId, result.ListId, request.Id, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
@@ -367,9 +391,9 @@ public class TasksController : BaseController
     }
 
     [HttpPut("complete")]
-    public async Task<IActionResult> Complete([FromBody] CompleteUncomplete dto)
+    public async Task<IActionResult> Complete([FromBody] CompleteUncompleteRequest request)
     {
-        if (dto is null)
+        if (request is null)
         {
             return BadRequest();
         }
@@ -380,15 +404,18 @@ public class TasksController : BaseController
             UserId
         );
 
-        dto.UserId = UserId;
-
         try
         {
-            CompleteUncompleteTaskResult result = await _taskService.CompleteAsync(dto, tr);
+            var model = new CompleteUncomplete
+            {
+                Id = request.Id,
+                UserId = UserId
+            };
+            CompleteUncompleteTaskResult result = await _taskService.CompleteAsync(model, tr);
 
             if (result.NotifySignalR)
             {
-                await _listActionsHubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskCompletedChanged", AuthId, dto.Id, result.ListId, true);
+                await _listActionsHubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskCompletedChanged", AuthId, request.Id, result.ListId, true);
             }
 
             foreach (var recipient in result.NotificationRecipients)
@@ -396,7 +423,7 @@ public class TasksController : BaseController
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
                 string message = _localizer["CompletedTaskNotification", result.ActionUserName, result.TaskName, result.ListName];
 
-                var updateNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
+                var updateNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, result.ListId, request.Id, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
@@ -423,9 +450,9 @@ public class TasksController : BaseController
     }
 
     [HttpPut("uncomplete")]
-    public async Task<IActionResult> Uncomplete([FromBody] CompleteUncomplete dto)
+    public async Task<IActionResult> Uncomplete([FromBody] CompleteUncompleteRequest request)
     {
-        if (dto is null)
+        if (request is null)
         {
             return BadRequest();
         }
@@ -436,15 +463,18 @@ public class TasksController : BaseController
             UserId
         );
 
-        dto.UserId = UserId;
-
         try
         {
-            CompleteUncompleteTaskResult result = await _taskService.UncompleteAsync(dto, tr);
+            var model = new CompleteUncomplete
+            {
+                Id = request.Id,
+                UserId = UserId
+            };
+            CompleteUncompleteTaskResult result = await _taskService.UncompleteAsync(model, tr);
 
             if (result.NotifySignalR)
             {
-                await _listActionsHubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskCompletedChanged", AuthId, dto.Id, result.ListId, false);
+                await _listActionsHubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskCompletedChanged", AuthId, request.Id, result.ListId, false);
             }
 
             foreach (var recipient in result.NotificationRecipients)
@@ -452,7 +482,7 @@ public class TasksController : BaseController
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
                 string message = _localizer["UncompletedTaskNotification", result.ActionUserName, result.TaskName, result.ListName];
 
-                var updateNotificationDto = new CreateOrUpdateNotification(recipient.Id, dto.UserId, result.ListId, dto.Id, message);
+                var updateNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, result.ListId, request.Id, message);
                 var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto, tr);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
@@ -479,22 +509,20 @@ public class TasksController : BaseController
     }
 
     //[HttpPut("reorder")]
-    //public async Task<IActionResult> Reorder([FromBody] ReorderTask dto)
+    //public async Task<IActionResult> Reorder([FromBody] ReorderTaskRequest request)
     //{
-    //    if (dto is null)
+    //    if (request is null)
     //    {
     //        return BadRequest();
     //    }
 
-    //    dto.UserId = UserId;
-
-    //    ReorderTaskResult result = await _taskService.ReorderAsync(dto);
+    //    ReorderTaskResult result = await _taskService.ReorderAsync(request);
 
     //    try
     //    {
     //        if (result.NotifySignalR)
     //        {
-    //            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskReordered", dto.UserId, dto.Id, result.ListId, dto.OldOrder, dto.NewOrder);
+    //            await _hubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskReordered", UserId, request.Id, result.ListId, request.OldOrder, request.NewOrder);
     //        }
     //    }
     //    catch (Exception ex)

@@ -5,10 +5,10 @@ namespace ToDoAssistant.Application.Contracts.Lists.Models;
 
 public class CopyList
 {
-    public int Id { get; set; }
-    public int UserId { get; set; }
-    public string Name { get; set; } = null!;
-    public string Icon { get; set; } = null!;
+    public required int Id { get; init; }
+    public required int UserId { get; init; }
+    public required string Name { get; init; }
+    public required string Icon { get; init; }
 }
 
 public class CopyListValidator : AbstractValidator<CopyList>, IValidator<CopyList>

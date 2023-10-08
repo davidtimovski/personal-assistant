@@ -18,7 +18,7 @@
 		return (<ListIcon>iconOptions.find((x) => x.icon === icon)).cssClass;
 	}
 
-	onMount(async () => {
+	onMount(() => {
 		const edited = $page.url.searchParams.get('edited');
 		if (edited) {
 			editedId = parseInt(edited, 10);

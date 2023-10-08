@@ -1,4 +1,5 @@
 ﻿using Api.Common;
+using Core.Api.Models.PushNotifications.Requests;
 using Core.Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,9 +21,9 @@ public class PushSubscriptionsController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateSubscription([FromBody] PushNotificationsSubscription dto)
+    public async Task<IActionResult> CreateSubscription([FromBody] PushNotificationsSubscriptionRequest request)
     {
-        if (dto is null)
+        if (request is null)
         {
             return BadRequest();
         }
@@ -34,10 +35,10 @@ public class PushSubscriptionsController : BaseController
         );
 
         await _pushSubscriptionService.CreateSubscriptionAsync(UserId,
-            dto.Application,
-            dto.Subscription.Endpoint,
-            dto.Subscription.Keys["auth"],
-            dto.Subscription.Keys["p256dh"],
+            request.Application,
+            request.Subscription.Endpoint,
+            request.Subscription.Keys["auth"],
+            request.Subscription.Keys["p256dh"],
             tr);
 
         tr.Finish();

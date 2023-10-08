@@ -6,7 +6,6 @@
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
-	import { ValidationResult, ValidationUtil } from '../../../../../../../Core/shared2/utils/validationUtils';
 	import EmptyListMessage from '../../../../../../../Core/shared2/components/EmptyListMessage.svelte';
 
 	import { t } from '$lib/localization/i18n';
@@ -17,6 +16,8 @@
 	import { ListsService } from '$lib/services/listsService';
 	import { TasksService } from '$lib/services/tasksService';
 	import type { ListTask } from '$lib/models/viewmodels/listTask';
+	import { SetIsArchived } from '$lib/models/server/requests/setIsArchived';
+	import { CreateTask } from '$lib/models/server/requests/createTask';
 	import { SoundPlayer } from '$lib/utils/soundPlayer';
 	import { RemoteEventType } from '$lib/models/remoteEvents';
 
@@ -54,7 +55,6 @@
 	let editedId: number | undefined;
 	let isSearching = false;
 	let soundsEnabled = false;
-	let editListButtonIsLoading = false;
 	let listIsArchivedText: string;
 	let addNewPlaceholderText: string;
 	const unsubscriptions: Unsubscriber[] = [];
@@ -184,21 +184,11 @@
 		completedTasksAreVisible = !completedTasksAreVisible;
 	}
 
-	function validate(): ValidationResult {
-		const result = new ValidationResult();
-
-		if (ValidationUtil.isEmptyOrWhitespace(newTaskName)) {
-			result.fail('name');
-		}
-
-		return result;
-	}
-
 	async function create() {
 		newTaskIsLoading = true;
 		editedId = 0;
 
-		const result = validate();
+		const result = TasksService.validateEdit(newTaskName, null);
 
 		if (result.valid) {
 			newTaskIsInvalid = false;
@@ -233,7 +223,7 @@
 					duplicateTask = null;
 					similarTaskNames = [];
 					try {
-						await tasksService.create(data.id, newTaskName, newTaskUrl, isOneTime, isPrivate);
+						await tasksService.create(new CreateTask(data.id, newTaskName, newTaskUrl, isOneTime, isPrivate));
 						await listsService.getAll();
 
 						newTaskIsLoading = false;
@@ -357,11 +347,6 @@
 		];
 	}
 
-	async function editList() {
-		editListButtonIsLoading = true;
-		await goto(`/editList/${data.id}`);
-	}
-
 	async function back() {
 		if (isArchived) {
 			await goto('/archivedLists');
@@ -371,7 +356,7 @@
 	}
 
 	async function restore() {
-		await listsService.setIsArchived(data.id, false);
+		await listsService.setIsArchived(new SetIsArchived(data.id, false));
 
 		goto('/lists?edited=' + data.id);
 	}
@@ -513,21 +498,9 @@
 
 <section class="container" on:click={closeDrawer}>
 	<div class="page-title-wrap">
-		{#if editListButtonIsLoading}
-			<span class="page-loading">
-				<i class="fas fa-circle-notch fa-spin" />
-			</span>
-		{:else}
-			<button
-				type="button"
-				on:click={editList}
-				class="edit-button"
-				title={$t('list.edit')}
-				aria-label={$t('list.edit')}
-			>
-				<i class="fas fa-pencil-alt" />
-			</button>
-		{/if}
+		<a href="/editList/{data.id}" class="edit-button" title={$t('list.edit')} aria-label={$t('list.edit')}>
+			<i class="fas fa-pencil-alt" />
+		</a>
 
 		<div class="page-title">{name}</div>
 

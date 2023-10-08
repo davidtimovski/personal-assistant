@@ -4,13 +4,14 @@
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
-	import { ValidationResult, ValidationUtil } from '../../../../../../../Core/shared2/utils/validationUtils';
+	import { ValidationUtil } from '../../../../../../../Core/shared2/utils/validationUtils';
 	import { ValidationErrors } from '../../../../../../../Core/shared2/models/validationErrors';
 
 	import { t } from '$lib/localization/i18n';
 	import { alertState, state } from '$lib/stores';
 	import { ListsService } from '$lib/services/listsService';
 	import type { Task } from '$lib/models/entities';
+	import { CopyList } from '$lib/models/server/requests/copyList';
 
 	export let data: PageData;
 
@@ -49,16 +50,6 @@
 		}, 1500);
 	}
 
-	function validate(): ValidationResult {
-		const result = new ValidationResult();
-
-		if (ValidationUtil.isEmptyOrWhitespace(name)) {
-			result.fail('name');
-		}
-
-		return result;
-	}
-
 	async function save() {
 		saveButtonIsLoading = true;
 		alertState.update((x) => {
@@ -66,13 +57,13 @@
 			return x;
 		});
 
-		const result = validate();
+		const result = ListsService.validateCopy(name);
 
 		if (result.valid) {
 			nameIsInvalid = false;
 
 			try {
-				const newId = await listsService.copy(data.id, name, icon);
+				const newId = await listsService.copy(new CopyList(data.id, name, icon));
 
 				alertState.update((x) => {
 					x.showSuccess('copyList.copySuccessful');

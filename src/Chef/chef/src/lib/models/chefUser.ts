@@ -7,7 +7,8 @@ export class ChefUser extends User {
 		public language: string,
 		public culture: string,
 		public imageUri: string,
-		public chefNotificationsEnabled: boolean
+		public chefNotificationsEnabled: boolean,
+		public imperialSystem: boolean
 	) {
 		super(email, name, language, culture, imageUri);
 	}
