@@ -74,8 +74,8 @@ module Models =
           Person: string
           Amount: decimal
           Currency: string
-          UserIsDebtor: bool
           Description: string Option
+          UserIsDebtor: bool
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 

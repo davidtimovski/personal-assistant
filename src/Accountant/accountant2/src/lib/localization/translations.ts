@@ -508,7 +508,6 @@ export default {
 			considerUsingYesterday: 'Моментално е {{time}} после полноќ. Можеби треба да го користите вчерашниот датум.',
 			encryptDescription: 'Шифрирај опис',
 			submit: 'Поднеси',
-
 			debtSettlingSuccessful: 'Долгот беше успешно расчистен',
 			expenseSubmitted: 'Трошокот беше успешно поднесен',
 			depositSubmitted: 'Депозитот беше успешно поднесен'

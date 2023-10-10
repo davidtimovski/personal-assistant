@@ -24,7 +24,7 @@ module Models =
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
-    type CreateTransaction =
+    type CreateTransactionRequest =
         { mutable HttpContext: HttpContext
           FromAccountId: int Option
           ToAccountId: int Option
@@ -42,7 +42,7 @@ module Models =
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
-    type UpdateTransaction =
+    type UpdateTransactionRequest =
         { mutable HttpContext: HttpContext
           Id: int
           FromAccountId: int Option

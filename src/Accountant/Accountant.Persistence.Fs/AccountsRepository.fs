@@ -65,7 +65,7 @@ module AccountsRepository =
             return id
         }
 
-    // TODO: Only for Account project
+    // TODO: Only for PersonalAssistant.Web project
     let createMain (account: Account) connectionString (metricsSpan: ISpan) =
         let metric = metricsSpan.StartChild("AccountsRepository.createMain")
 

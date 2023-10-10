@@ -1,11 +1,12 @@
 import { HttpProxy } from '../../../../../Core/shared2/services/httpProxy';
 import { CurrenciesService } from '../../../../../Core/shared2/services/currenciesService';
 import { ErrorLogger } from '../../../../../Core/shared2/services/errorLogger';
-import { DateHelper } from '../../../../../Core/shared2/utils/dateHelper';
+import { ValidationUtil, ValidationResult } from '../../../../../Core/shared2/utils/validationUtils';
 
 import { UpcomingExpensesIDBHelper } from '$lib/utils/upcomingExpensesIDBHelper';
 import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 import type { UpcomingExpense } from '$lib/models/entities/upcomingExpense';
+import { CreateUpcomingExpense, UpdateUpcomingExpense } from '$lib/models/server/requests/upcomingExpense';
 import Variables from '$lib/variables';
 
 export class UpcomingExpensesService {
@@ -34,6 +35,16 @@ export class UpcomingExpensesService {
 		return this.idbHelper.get(id);
 	}
 
+	static validate(amount: number, amountTo: number): ValidationResult {
+		const result = new ValidationResult();
+
+		if (!ValidationUtil.between(amount, 0, amountTo)) {
+			result.fail('amount');
+		}
+
+		return result;
+	}
+
 	async create(upcomingExpense: UpcomingExpense): Promise<number> {
 		try {
 			if (typeof upcomingExpense.amount === 'string') {
@@ -47,9 +58,20 @@ export class UpcomingExpensesService {
 			upcomingExpense.createdDate = upcomingExpense.modifiedDate = now;
 
 			if (navigator.onLine) {
+				const payload = new CreateUpcomingExpense(
+					upcomingExpense.categoryId,
+					upcomingExpense.amount,
+					upcomingExpense.currency,
+					upcomingExpense.description,
+					upcomingExpense.date,
+					upcomingExpense.generated,
+					upcomingExpense.createdDate,
+					upcomingExpense.modifiedDate
+				);
+
 				upcomingExpense.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/upcoming-expenses`, {
 					method: 'post',
-					body: window.JSON.stringify(upcomingExpense)
+					body: window.JSON.stringify(payload)
 				});
 				upcomingExpense.synced = true;
 			}
@@ -77,9 +99,21 @@ export class UpcomingExpensesService {
 			upcomingExpense.modifiedDate = new Date();
 
 			if (navigator.onLine) {
+				const payload = new UpdateUpcomingExpense(
+					upcomingExpense.id,
+					upcomingExpense.categoryId,
+					upcomingExpense.amount,
+					upcomingExpense.currency,
+					upcomingExpense.description,
+					upcomingExpense.date,
+					upcomingExpense.generated,
+					upcomingExpense.createdDate,
+					upcomingExpense.modifiedDate
+				);
+
 				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/upcoming-expenses`, {
 					method: 'put',
-					body: window.JSON.stringify(upcomingExpense)
+					body: window.JSON.stringify(payload)
 				});
 				upcomingExpense.synced = true;
 			} else if (await this.idbHelper.isSynced(upcomingExpense.id)) {

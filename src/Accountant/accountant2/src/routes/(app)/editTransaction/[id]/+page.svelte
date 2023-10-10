@@ -4,7 +4,7 @@
 	import type { PageData } from './$types';
 
 	import { DateHelper } from '../../../../../../../Core/shared2/utils/dateHelper';
-	import { ValidationResult, ValidationUtil } from '../../../../../../../Core/shared2/utils/validationUtils';
+	import { ValidationUtil } from '../../../../../../../Core/shared2/utils/validationUtils';
 	import AlertBlock from '../../../../../../../Core/shared2/components/AlertBlock.svelte';
 	import Checkbox from '../../../../../../../Core/shared2/components/Checkbox.svelte';
 	import Tooltip from '../../../../../../../Core/shared2/components/Tooltip.svelte';
@@ -161,30 +161,6 @@
 		decryptionPassword = null;
 	}
 
-	function validate(): ValidationResult {
-		const result = new ValidationResult();
-
-		if (!ValidationUtil.between(amount, amountFrom, amountTo)) {
-			result.fail('amount');
-		}
-
-		if (!fromAccountId && !toAccountId) {
-			result.fail('accountsMissing');
-		} else if (fromAccountId === toAccountId) {
-			result.fail('accountsEqual');
-		}
-
-		if (!date) {
-			result.fail('date');
-		}
-
-		if (encrypt && ValidationUtil.isEmptyOrWhitespace(encryptionPassword)) {
-			result.fail('encryptionPassword');
-		}
-
-		return result;
-	}
-
 	$: canSave = $syncStatus.status !== SyncEvents.SyncStarted && !!amount && !(!$isOnline && synced);
 
 	async function save() {
@@ -198,7 +174,16 @@
 			return x;
 		});
 
-		const result = validate();
+		const result = TransactionsService.validate(
+			amount,
+			amountFrom,
+			amountTo,
+			fromAccountId,
+			toAccountId,
+			date,
+			encrypt,
+			encryptionPassword
+		);
 		if (result.valid) {
 			amountIsInvalid = false;
 			dateIsInvalid = false;

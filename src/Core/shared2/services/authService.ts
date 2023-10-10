@@ -38,12 +38,12 @@ export class AuthService {
     return this.client.isAuthenticated();
   }
 
-  async signinRedirect() {
-    await this.client.loginWithRedirect();
+  signinRedirect() {
+    return this.client.loginWithRedirect();
   }
 
-  async handleRedirectCallback() {
-    await this.client.handleRedirectCallback();
+  handleRedirectCallback() {
+    return this.client.handleRedirectCallback();
   }
 
   async logout() {

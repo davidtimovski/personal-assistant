@@ -20,70 +20,70 @@ module Logic =
               CreatedDate = x.CreatedDate
               ModifiedDate = x.ModifiedDate })
 
-    let private validateCreateParentCategory (dto: CreateCategory) =
-        let userId = getUserId dto.HttpContext
-        let connectionString = getConnectionString dto.HttpContext
+    let private validateCreateParentCategory (request: CreateCategoryRequest) =
+        let userId = getUserId request.HttpContext
+        let connectionString = getConnectionString request.HttpContext
 
         if
-            dto.ParentId.IsNone
-            || Validation.categoryBelongsTo dto.ParentId.Value userId connectionString
+            request.ParentId.IsNone
+            || Validation.categoryBelongsTo request.ParentId.Value userId connectionString
         then
-            Success dto
+            Success request
         else
             Failure "Category is not valid"
 
-    let private validateCreateName (dto: CreateCategory) =
+    let private validateCreateName (request: CreateCategoryRequest) =
         if
-            (Validation.textIsNotEmpty dto.Name)
-            && (Validation.textLengthIsValid dto.Name nameMaxLength)
+            (Validation.textIsNotEmpty request.Name)
+            && (Validation.textLengthIsValid request.Name nameMaxLength)
         then
-            Success dto
+            Success request
         else
             Failure "Name is not valid"
 
     let validateCreate = validateCreateParentCategory >> bind validateCreateName
 
-    let prepareForCreate (model: CreateCategory) (userId: int) =
+    let prepareForCreate (request: CreateCategoryRequest) (userId: int) =
         { Id = 0
           UserId = userId
-          ParentId = model.ParentId
-          Name = model.Name.Trim()
-          Type = model.Type
+          ParentId = request.ParentId
+          Name = request.Name.Trim()
+          Type = request.Type
           GenerateUpcomingExpense =
-            match model.Type with
+            match request.Type with
             | CategoryType.DepositOnly -> false
-            | _ -> model.GenerateUpcomingExpense
-          IsTax = model.IsTax
-          CreatedDate = model.CreatedDate
-          ModifiedDate = model.ModifiedDate }
+            | _ -> request.GenerateUpcomingExpense
+          IsTax = request.IsTax
+          CreatedDate = request.CreatedDate
+          ModifiedDate = request.ModifiedDate }
 
-    let private validateUpdateCategory (dto: UpdateCategory) =
-        let userId = getUserId dto.HttpContext
-        let connectionString = getConnectionString dto.HttpContext
+    let private validateUpdateCategory (request: UpdateCategoryRequest) =
+        let userId = getUserId request.HttpContext
+        let connectionString = getConnectionString request.HttpContext
 
-        if Validation.categoryBelongsTo dto.Id userId connectionString then
-            Success dto
+        if Validation.categoryBelongsTo request.Id userId connectionString then
+            Success request
         else
             Failure "Category is not valid"
 
-    let private validateUpdateParentCategory (dto: UpdateCategory) =
-        let userId = getUserId dto.HttpContext
-        let connectionString = getConnectionString dto.HttpContext
+    let private validateUpdateParentCategory (request: UpdateCategoryRequest) =
+        let userId = getUserId request.HttpContext
+        let connectionString = getConnectionString request.HttpContext
 
         if
-            dto.ParentId.IsNone
-            || Validation.categoryBelongsTo dto.ParentId.Value userId connectionString
+            request.ParentId.IsNone
+            || Validation.categoryBelongsTo request.ParentId.Value userId connectionString
         then
-            Success dto
+            Success request
         else
             Failure "Category is not valid"
 
-    let private validateUpdateName (dto: UpdateCategory) =
+    let private validateUpdateName (request: UpdateCategoryRequest) =
         if
-            (Validation.textIsNotEmpty dto.Name)
-            && (Validation.textLengthIsValid dto.Name nameMaxLength)
+            (Validation.textIsNotEmpty request.Name)
+            && (Validation.textLengthIsValid request.Name nameMaxLength)
         then
-            Success dto
+            Success request
         else
             Failure "Name is not valid"
 
@@ -92,16 +92,16 @@ module Logic =
         >> bind validateUpdateParentCategory
         >> bind validateUpdateName
 
-    let prepareForUpdate (model: UpdateCategory) (userId: int) =
-        { Id = model.Id
+    let prepareForUpdate (request: UpdateCategoryRequest) (userId: int) =
+        { Id = request.Id
           UserId = userId
-          ParentId = model.ParentId
-          Name = model.Name.Trim()
-          Type = model.Type
+          ParentId = request.ParentId
+          Name = request.Name.Trim()
+          Type = request.Type
           GenerateUpcomingExpense =
-            match model.Type with
+            match request.Type with
             | CategoryType.DepositOnly -> false
-            | _ -> model.GenerateUpcomingExpense
-          IsTax = model.IsTax
-          CreatedDate = model.CreatedDate
-          ModifiedDate = model.ModifiedDate }
+            | _ -> request.GenerateUpcomingExpense
+          IsTax = request.IsTax
+          CreatedDate = request.CreatedDate
+          ModifiedDate = request.ModifiedDate }

@@ -12,7 +12,7 @@ open Accountant.Api.UpcomingExpenses.Models
 
 module Models =
 
-    type GetChangesDto = { LastSynced: DateTime }
+    type GetChangesRequest = { LastSynced: DateTime }
 
     type ChangedDto =
         { LastSynced: DateTime
@@ -35,7 +35,7 @@ module Models =
           DeletedAutomaticTransactionIds: IEnumerable<int>
           AutomaticTransactions: IEnumerable<AutomaticTransactionDto> }
 
-    type SyncEntities =
+    type SyncEntitiesRequest =
         { Accounts: Account list
           Categories: Category list
           Transactions: Transaction list

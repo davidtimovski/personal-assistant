@@ -10,11 +10,16 @@
 	let localStorage: LocalStorageUtil;
 
 	let mergeDebtPerPerson: boolean;
+	let showBalanceOnHomePage: boolean;
 	let showUpcomingExpensesOnHomePage: boolean;
 	let showDebtOnHomePage: boolean;
 
 	function mergeDebtPerPersonChanged(ev: { detail: boolean }) {
 		localStorage.set(LocalStorageKeys.MergeDebtPerPerson, ev.detail);
+	}
+
+	function showBalanceOnHomePageChanged(ev: { detail: boolean }) {
+		localStorage.set(LocalStorageKeys.ShowBalanceOnHomePage, ev.detail);
 	}
 
 	function showUpcomingExpensesOnHomePageChanged(ev: { detail: boolean }) {
@@ -29,6 +34,7 @@
 		localStorage = new LocalStorageUtil();
 
 		mergeDebtPerPerson = localStorage.getBool(LocalStorageKeys.MergeDebtPerPerson);
+		showBalanceOnHomePage = localStorage.getBool(LocalStorageKeys.ShowBalanceOnHomePage);
 		showUpcomingExpensesOnHomePage = localStorage.getBool(LocalStorageKeys.ShowUpcomingExpensesOnHomePage);
 		showDebtOnHomePage = localStorage.getBool(LocalStorageKeys.ShowDebtOnHomePage);
 	});
@@ -61,6 +67,11 @@
 
 			<div class="form-control-group">
 				<div class="setting-descriptor">{$t('preferences.showOnHomePage')}</div>
+
+				<div class="form-control">
+					<Checkbox labelKey="balance" value={showBalanceOnHomePage} on:change={showBalanceOnHomePageChanged} />
+				</div>
+
 				<div class="form-control">
 					<Checkbox
 						labelKey="preferences.upcomingExpenses"
@@ -68,6 +79,7 @@
 						on:change={showUpcomingExpensesOnHomePageChanged}
 					/>
 				</div>
+
 				<div class="form-control">
 					<Checkbox labelKey="preferences.debt" value={showDebtOnHomePage} on:change={showDebtOnHomePageChanged} />
 				</div>

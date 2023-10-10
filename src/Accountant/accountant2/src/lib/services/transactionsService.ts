@@ -2,6 +2,7 @@ import { HttpProxy } from '../../../../../Core/shared2/services/httpProxy';
 import { CurrenciesService } from '../../../../../Core/shared2/services/currenciesService';
 import { ErrorLogger } from '../../../../../Core/shared2/services/errorLogger';
 import { DateHelper } from '../../../../../Core/shared2/utils/dateHelper';
+import { ValidationResult, ValidationUtil } from '../../../../../Core/shared2/utils/validationUtils';
 
 import { TransactionsIDBHelper } from '$lib/utils/transactionsIDBHelper';
 import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
@@ -11,6 +12,7 @@ import { CategoriesService } from '$lib/services/categoriesService';
 import { EncryptionService } from '$lib/services/encryptionService';
 import type { SearchFilters } from '$lib/models/viewmodels/searchFilters';
 import { AmountByCategory } from '$lib/models/viewmodels/amountByCategory';
+import { CreateTransaction, UpdateTransaction } from '$lib/models/server/requests/transaction';
 import Variables from '$lib/variables';
 
 export class TransactionsService {
@@ -189,6 +191,39 @@ export class TransactionsService {
 		}
 	}
 
+	static validate(
+		amount: number,
+		amountFrom: number,
+		amountTo: number,
+		fromAccountId: number | null,
+		toAccountId: number | null,
+		date: string,
+		encrypt: boolean,
+		encryptionPassword: string | null
+	): ValidationResult {
+		const result = new ValidationResult();
+
+		if (!ValidationUtil.between(amount, amountFrom, amountTo)) {
+			result.fail('amount');
+		}
+
+		if (!fromAccountId && !toAccountId) {
+			result.fail('accountsMissing');
+		} else if (fromAccountId === toAccountId) {
+			result.fail('accountsEqual');
+		}
+
+		if (!date) {
+			result.fail('date');
+		}
+
+		if (encrypt && ValidationUtil.isEmptyOrWhitespace(encryptionPassword)) {
+			result.fail('encryptionPassword');
+		}
+
+		return result;
+	}
+
 	async create(
 		fromAccountId: number | null,
 		toAccountId: number | null,
@@ -315,9 +350,27 @@ export class TransactionsService {
 		transaction.modifiedDate = now;
 
 		if (navigator.onLine) {
+			const payload = new CreateTransaction(
+				transaction.fromAccountId,
+				transaction.toAccountId,
+				transaction.categoryId,
+				transaction.amount,
+				transaction.fromStocks,
+				transaction.toStocks,
+				transaction.currency,
+				transaction.description,
+				transaction.date,
+				transaction.isEncrypted,
+				transaction.encryptedDescription,
+				transaction.salt,
+				transaction.nonce,
+				transaction.createdDate,
+				transaction.modifiedDate
+			);
+
 			transaction.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/transactions`, {
 				method: 'post',
-				body: window.JSON.stringify(transaction)
+				body: window.JSON.stringify(payload)
 			});
 			transaction.synced = true;
 		}
@@ -370,9 +423,28 @@ export class TransactionsService {
 			transaction.modifiedDate = new Date();
 
 			if (navigator.onLine) {
+				const payload = new UpdateTransaction(
+					transaction.id,
+					transaction.fromAccountId,
+					transaction.toAccountId,
+					transaction.categoryId,
+					transaction.amount,
+					transaction.fromStocks,
+					transaction.toStocks,
+					transaction.currency,
+					transaction.description,
+					transaction.date,
+					transaction.isEncrypted,
+					transaction.encryptedDescription,
+					transaction.salt,
+					transaction.nonce,
+					transaction.createdDate,
+					transaction.modifiedDate
+				);
+
 				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/transactions`, {
 					method: 'put',
-					body: window.JSON.stringify(transaction)
+					body: window.JSON.stringify(payload)
 				});
 				transaction.synced = true;
 			} else if (await this.idbHelper.isSynced(transaction.id)) {

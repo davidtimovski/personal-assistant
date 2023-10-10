@@ -21,6 +21,7 @@
 	import { SyncStatus, SyncEvents } from '$lib/models/syncStatus';
 
 	let data = new HomePageData();
+	let showBalance = false;
 	let currency: string;
 	let dataLoaded = false;
 	const unsubscriptions: Unsubscriber[] = [];
@@ -148,6 +149,8 @@
 		capitalService = new CapitalService();
 		accountsService = new AccountsService();
 
+		showBalance = localStorage.getBool(LocalStorageKeys.ShowBalanceOnHomePage);
+
 		const cache = localStorage.getObject<HomePageData>('homePageData');
 		if (cache) {
 			data = cache;
@@ -203,25 +206,29 @@
 	</div>
 
 	<div class="content-wrap">
-		<div class="capital-summary">
+		<div class="capital-summary" class:with-balance={showBalance}>
 			<a href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
 				<div class="summary-item">
 					<div class="summary-title">{$t('dashboard.available')}</div>
 					<div class="summary-value">{Formatter.moneyWithoutCurrency(data.available, currency, $user.language)}</div>
 				</div>
 			</a>
+
 			<a href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
 				<div class="summary-item">
 					<div class="summary-title">{$t('dashboard.spent')}</div>
 					<div class="summary-value">{Formatter.moneyWithoutCurrency(data.spent, currency, $user.language)}</div>
 				</div>
 			</a>
-			<a href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
-				<div class="summary-item">
-					<div class="summary-title">{$t('balance')}</div>
-					<div class="summary-value">{Formatter.moneyWithoutCurrency(data.balance, currency, $user.language)}</div>
-				</div>
-			</a>
+
+			{#if showBalance}
+				<a href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
+					<div class="summary-item">
+						<div class="summary-title">{$t('balance')}</div>
+						<div class="summary-value">{Formatter.moneyWithoutCurrency(data.balance, currency, $user.language)}</div>
+					</div>
+				</a>
+			{/if}
 		</div>
 
 		<div class="home-buttons">
@@ -319,13 +326,19 @@
 	}
 
 	.capital-summary {
-		display: flex;
+		display: grid;
+		grid-auto-columns: minmax(0, 1fr);
+		grid-auto-flow: column;
+		gap: 15px;
+
+		&.with-balance {
+			gap: 7px;
+		}
 	}
+
 	.summary-item-wrap {
-		width: 32%;
 		background: linear-gradient(225deg, #7a46f3, #00a6ed);
 		border-radius: var(--border-radius);
-		margin-right: 2%;
 		text-decoration: none;
 		color: #fff;
 		opacity: 0.6;
@@ -354,16 +367,17 @@
 	}
 
 	.home-buttons {
-		display: flex;
-		justify-content: space-between;
+		display: grid;
+		grid-auto-columns: 1fr 1fr;
+		grid-auto-flow: column;
+		gap: 15px;
 		border-top: 1px solid #ddd;
-		padding-top: 15px;
+		padding-top: 20px;
 		margin-top: 20px;
 
 		.home-button {
 			position: relative;
 			display: inline-block;
-			width: calc(50% - 15px);
 			background: #fff;
 			border: 1px solid #ddd;
 			border-left: 3px solid var(--primary-color);

@@ -23,18 +23,7 @@ export class Changed {
 	) {}
 }
 
-export class Create {
-	constructor(
-		public accounts: Account[],
-		public categories: Category[],
-		public transactions: TransactionModel[],
-		public upcomingExpenses: UpcomingExpense[],
-		public debts: DebtModel[],
-		public automaticTransactions: AutomaticTransaction[]
-	) {}
-}
-
-export class Created {
+export class CreatedEntityIds {
 	constructor(
 		public accountIdPairs: CreatedIdPair[],
 		public categoryIdPairs: CreatedIdPair[],

@@ -15,22 +15,22 @@ module Models =
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
-    type CreateDebt =
+    type CreateDebtRequest =
         { Person: string
           Amount: decimal
           Currency: string
-          UserIsDebtor: bool
           Description: string Option
+          UserIsDebtor: bool
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
-    type UpdateDebt =
+    type UpdateDebtRequest =
         { mutable HttpContext: HttpContext
           Id: int
           Person: string
           Amount: decimal
           Currency: string
-          UserIsDebtor: bool
           Description: string Option
+          UserIsDebtor: bool
           CreatedDate: DateTime
           ModifiedDate: DateTime }

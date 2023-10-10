@@ -1,10 +1,14 @@
 import { HttpProxy } from '../../../../../Core/shared2/services/httpProxy';
 import { ErrorLogger } from '../../../../../Core/shared2/services/errorLogger';
-import { DateHelper } from '../../../../../Core/shared2/utils/dateHelper';
+import { ValidationResult, ValidationUtil } from '../../../../../Core/shared2/utils/validationUtils';
 
 import { AutomaticTransactionsIDBHelper } from '$lib/utils/automaticTransactionsIDBHelper';
 import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 import type { AutomaticTransaction } from '$lib/models/entities/automaticTransaction';
+import {
+	CreateAutomaticTransaction,
+	UpdateAutomaticTransaction
+} from '$lib/models/server/requests/automaticTransaction';
 import Variables from '$lib/variables';
 
 export class AutomaticTransactionsService {
@@ -26,6 +30,16 @@ export class AutomaticTransactionsService {
 		return this.idbHelper.get(id);
 	}
 
+	static validate(amount: number, amountFrom: number, amountTo: number): ValidationResult {
+		const result = new ValidationResult();
+
+		if (!ValidationUtil.between(amount, amountFrom, amountTo)) {
+			result.fail('amount');
+		}
+
+		return result;
+	}
+
 	async create(automaticTransaction: AutomaticTransaction): Promise<number> {
 		try {
 			if (typeof automaticTransaction.amount === 'string') {
@@ -39,9 +53,20 @@ export class AutomaticTransactionsService {
 			automaticTransaction.createdDate = automaticTransaction.modifiedDate = now;
 
 			if (navigator.onLine) {
+				const payload = new CreateAutomaticTransaction(
+					automaticTransaction.isDeposit,
+					automaticTransaction.categoryId,
+					automaticTransaction.amount,
+					automaticTransaction.currency,
+					automaticTransaction.description,
+					automaticTransaction.dayInMonth,
+					automaticTransaction.createdDate,
+					automaticTransaction.modifiedDate
+				);
+
 				automaticTransaction.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/automatic-transactions`, {
 					method: 'post',
-					body: window.JSON.stringify(automaticTransaction)
+					body: window.JSON.stringify(payload)
 				});
 				automaticTransaction.synced = true;
 			}
@@ -69,9 +94,21 @@ export class AutomaticTransactionsService {
 			automaticTransaction.modifiedDate = new Date();
 
 			if (navigator.onLine) {
+				const payload = new UpdateAutomaticTransaction(
+					automaticTransaction.id,
+					automaticTransaction.isDeposit,
+					automaticTransaction.categoryId,
+					automaticTransaction.amount,
+					automaticTransaction.currency,
+					automaticTransaction.description,
+					automaticTransaction.dayInMonth,
+					automaticTransaction.createdDate,
+					automaticTransaction.modifiedDate
+				);
+
 				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/automatic-transactions`, {
 					method: 'put',
-					body: window.JSON.stringify(automaticTransaction)
+					body: window.JSON.stringify(payload)
 				});
 				automaticTransaction.synced = true;
 			} else if (await this.idbHelper.isSynced(automaticTransaction.id)) {

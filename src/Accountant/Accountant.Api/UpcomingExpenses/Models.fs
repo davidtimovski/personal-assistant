@@ -16,7 +16,7 @@ module Models =
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
-    type CreateUpcomingExpense =
+    type CreateUpcomingExpenseRequest =
         { mutable HttpContext: HttpContext
           CategoryId: int Option
           Amount: decimal
@@ -27,7 +27,7 @@ module Models =
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
-    type UpdateUpcomingExpense =
+    type UpdateUpcomingExpenseRequest =
         { mutable HttpContext: HttpContext
           Id: int
           CategoryId: int Option

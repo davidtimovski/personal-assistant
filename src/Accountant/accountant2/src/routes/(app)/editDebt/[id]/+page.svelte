@@ -3,7 +3,6 @@
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
-	import { ValidationResult, ValidationUtil } from '../../../../../../../Core/shared2/utils/validationUtils';
 	import AlertBlock from '../../../../../../../Core/shared2/components/AlertBlock.svelte';
 	import DoubleRadioBool from '../../../../../../../Core/shared2/components/DoubleRadioBool.svelte';
 
@@ -51,20 +50,6 @@
 
 	$: canSave = $syncStatus.status !== SyncEvents.SyncStarted && !!amount && !(!$isOnline && synced);
 
-	function validate(): ValidationResult {
-		const result = new ValidationResult();
-
-		if (ValidationUtil.isEmptyOrWhitespace(person)) {
-			result.fail('person');
-		}
-
-		if (!ValidationUtil.between(<number>amount, 0, amountTo)) {
-			result.fail('amount');
-		}
-
-		return result;
-	}
-
 	async function save() {
 		if (!amount || !currency || userIsDebtor === null) {
 			throw new Error('Unexpected error: required fields missing');
@@ -76,7 +61,7 @@
 			return x;
 		});
 
-		const result = validate();
+		const result = DebtsService.validate(person, amount, amountTo);
 		if (result.valid) {
 			personIsInvalid = false;
 			amountIsInvalid = false;
