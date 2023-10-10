@@ -22,12 +22,12 @@ module Handlers =
                     userId
 
             task {
-                let! dto = ctx.BindJsonAsync<CreateUpcomingExpense>()
-                dto.HttpContext <- ctx
+                let! request = ctx.BindJsonAsync<CreateUpcomingExpenseRequest>()
+                request.HttpContext <- ctx
 
-                match Logic.validateCreate dto with
+                match Logic.validateCreate request with
                 | Success _ ->
-                    let upcomingExpense = Logic.prepareForCreate dto userId
+                    let upcomingExpense = Logic.prepareForCreate request userId
 
                     let connection = getDbConnection ctx
                     let! id = UpcomingExpensesRepository.create upcomingExpense connection tr
@@ -51,12 +51,12 @@ module Handlers =
                     userId
 
             task {
-                let! dto = ctx.BindJsonAsync<UpdateUpcomingExpense>()
-                dto.HttpContext <- ctx
+                let! request = ctx.BindJsonAsync<UpdateUpcomingExpenseRequest>()
+                request.HttpContext <- ctx
 
-                match Logic.validateUpdate dto with
+                match Logic.validateUpdate request with
                 | Success _ ->
-                    let upcomingExpense = Logic.prepareForUpdate dto userId
+                    let upcomingExpense = Logic.prepareForUpdate request userId
 
                     let connectionString = getConnectionString ctx
                     let! _ = UpcomingExpensesRepository.update upcomingExpense connectionString tr

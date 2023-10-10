@@ -22,12 +22,12 @@ module Handlers =
                     userId
 
             task {
-                let! dto = ctx.BindJsonAsync<CreateCategory>()
-                dto.HttpContext <- ctx
+                let! request = ctx.BindJsonAsync<CreateCategoryRequest>()
+                request.HttpContext <- ctx
 
-                match Logic.validateCreate dto with
+                match Logic.validateCreate request with
                 | Success _ ->
-                    let category = Logic.prepareForCreate dto userId
+                    let category = Logic.prepareForCreate request userId
 
                     let connection = getDbConnection ctx
                     let! id = CategoriesRepository.create category connection tr
@@ -51,12 +51,12 @@ module Handlers =
                     userId
 
             task {
-                let! dto = ctx.BindJsonAsync<UpdateCategory>()
-                dto.HttpContext <- ctx
+                let! request = ctx.BindJsonAsync<UpdateCategoryRequest>()
+                request.HttpContext <- ctx
 
-                match Logic.validateUpdate dto with
+                match Logic.validateUpdate request with
                 | Success _ ->
-                    let category = Logic.prepareForUpdate dto userId
+                    let category = Logic.prepareForUpdate request userId
 
                     let connectionString = getConnectionString ctx
                     let! _ = CategoriesRepository.update category connectionString tr

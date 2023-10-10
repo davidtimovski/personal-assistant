@@ -21,33 +21,33 @@ module Logic =
               CreatedDate = x.CreatedDate
               ModifiedDate = x.ModifiedDate })
 
-    let private validateCreateCategory (dto: CreateAutomaticTransaction) =
-        let userId = getUserId dto.HttpContext
-        let connectionString = getConnectionString dto.HttpContext
+    let private validateCreateCategory (request: CreateAutomaticTransactionRequest) =
+        let userId = getUserId request.HttpContext
+        let connectionString = getConnectionString request.HttpContext
 
         if
-            dto.CategoryId.IsNone
-            || Validation.categoryBelongsTo dto.CategoryId.Value userId connectionString
+            request.CategoryId.IsNone
+            || Validation.categoryBelongsTo request.CategoryId.Value userId connectionString
         then
-            Success dto
+            Success request
         else
             Failure "Category is not valid"
 
-    let private validateCreateAmount (dto: CreateAutomaticTransaction) =
-        if Validation.amountIsValid dto.Amount then
-            Success dto
+    let private validateCreateAmount (request: CreateAutomaticTransactionRequest) =
+        if Validation.amountIsValid request.Amount then
+            Success request
         else
             Failure "Amount has to be a positive number"
 
-    let private validateCreateCurrency (dto: CreateAutomaticTransaction) =
-        if Validation.currencyIsValid dto.Currency then
-            Success dto
+    let private validateCreateCurrency (request: CreateAutomaticTransactionRequest) =
+        if Validation.currencyIsValid request.Currency then
+            Success request
         else
             Failure "Currency is not valid"
 
-    let private validateCreateDescription (dto: CreateAutomaticTransaction) =
-        if Validation.textIsNoneOrLengthIsValid dto.Description descriptionMaxLength then
-            Success dto
+    let private validateCreateDescription (request: CreateAutomaticTransactionRequest) =
+        if Validation.textIsNoneOrLengthIsValid request.Description descriptionMaxLength then
+            Success request
         else
             Failure $"Description cannot exceed {descriptionMaxLength} characters"
 
@@ -57,54 +57,54 @@ module Logic =
         >> bind validateCreateCurrency
         >> bind validateCreateDescription
 
-    let prepareForCreate (model: CreateAutomaticTransaction) (userId: int) =
+    let prepareForCreate (request: CreateAutomaticTransactionRequest) (userId: int) =
         { Id = 0
           UserId = userId
-          IsDeposit = model.IsDeposit
-          CategoryId = model.CategoryId
-          Amount = model.Amount
-          Currency = model.Currency
-          Description = Utils.noneOrTrimmed model.Description
-          DayInMonth = model.DayInMonth
-          CreatedDate = model.CreatedDate
-          ModifiedDate = model.ModifiedDate }
+          IsDeposit = request.IsDeposit
+          CategoryId = request.CategoryId
+          Amount = request.Amount
+          Currency = request.Currency
+          Description = Utils.noneOrTrimmed request.Description
+          DayInMonth = request.DayInMonth
+          CreatedDate = request.CreatedDate
+          ModifiedDate = request.ModifiedDate }
 
-    let private validateUpdateAutomaticTransaction (dto: UpdateAutomaticTransaction) =
-        let userId = getUserId dto.HttpContext
-        let connectionString = getConnectionString dto.HttpContext
+    let private validateUpdateAutomaticTransaction (request: UpdateAutomaticTransactionRequest) =
+        let userId = getUserId request.HttpContext
+        let connectionString = getConnectionString request.HttpContext
 
-        if Validation.automaticTransactionBelongsTo dto.Id userId connectionString then
-            Success dto
+        if Validation.automaticTransactionBelongsTo request.Id userId connectionString then
+            Success request
         else
             Failure "Automatic transaction is not valid"
 
-    let private validateUpdateCategory (dto: UpdateAutomaticTransaction) =
-        let userId = getUserId dto.HttpContext
-        let connectionString = getConnectionString dto.HttpContext
+    let private validateUpdateCategory (request: UpdateAutomaticTransactionRequest) =
+        let userId = getUserId request.HttpContext
+        let connectionString = getConnectionString request.HttpContext
 
         if
-            dto.CategoryId.IsNone
-            || Validation.categoryBelongsTo dto.CategoryId.Value userId connectionString
+            request.CategoryId.IsNone
+            || Validation.categoryBelongsTo request.CategoryId.Value userId connectionString
         then
-            Success dto
+            Success request
         else
             Failure "Category is not valid"
 
-    let private validateUpdateAmount (dto: UpdateAutomaticTransaction) =
-        if Validation.amountIsValid dto.Amount then
-            Success dto
+    let private validateUpdateAmount (request: UpdateAutomaticTransactionRequest) =
+        if Validation.amountIsValid request.Amount then
+            Success request
         else
             Failure "Amount has to be a positive number"
 
-    let private validateUpdateCurrency (dto: UpdateAutomaticTransaction) =
-        if Validation.currencyIsValid dto.Currency then
-            Success dto
+    let private validateUpdateCurrency (request: UpdateAutomaticTransactionRequest) =
+        if Validation.currencyIsValid request.Currency then
+            Success request
         else
             Failure "Currency is not valid"
 
-    let private validateUpdateDescription (dto: UpdateAutomaticTransaction) =
-        if Validation.textIsNoneOrLengthIsValid dto.Description descriptionMaxLength then
-            Success dto
+    let private validateUpdateDescription (request: UpdateAutomaticTransactionRequest) =
+        if Validation.textIsNoneOrLengthIsValid request.Description descriptionMaxLength then
+            Success request
         else
             Failure $"Description cannot exceed {descriptionMaxLength} characters"
 
@@ -115,14 +115,14 @@ module Logic =
         >> bind validateUpdateCurrency
         >> bind validateUpdateDescription
 
-    let prepareForUpdate (model: UpdateAutomaticTransaction) (userId: int) =
-        { Id = model.Id
+    let prepareForUpdate (request: UpdateAutomaticTransactionRequest) (userId: int) =
+        { Id = request.Id
           UserId = userId
-          IsDeposit = model.IsDeposit
-          CategoryId = model.CategoryId
-          Amount = model.Amount
-          Currency = model.Currency
-          Description = Utils.noneOrTrimmed model.Description
-          DayInMonth = model.DayInMonth
-          CreatedDate = model.CreatedDate
-          ModifiedDate = model.ModifiedDate }
+          IsDeposit = request.IsDeposit
+          CategoryId = request.CategoryId
+          Amount = request.Amount
+          Currency = request.Currency
+          Description = Utils.noneOrTrimmed request.Description
+          DayInMonth = request.DayInMonth
+          CreatedDate = request.CreatedDate
+          ModifiedDate = request.ModifiedDate }

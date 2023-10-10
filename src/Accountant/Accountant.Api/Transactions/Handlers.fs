@@ -26,12 +26,12 @@ module Handlers =
                     userId
 
             task {
-                let! dto = ctx.BindJsonAsync<CreateTransaction>()
-                dto.HttpContext <- ctx
+                let! request = ctx.BindJsonAsync<CreateTransactionRequest>()
+                request.HttpContext <- ctx
 
-                match Logic.validateCreate dto with
+                match Logic.validateCreate request with
                 | Success _ ->
-                    let transaction = Logic.prepareForCreate dto
+                    let transaction = Logic.prepareForCreate request
                     let connection = getDbConnection ctx
 
                     let! id = TransactionsRepository.create transaction connection None tr
@@ -55,12 +55,12 @@ module Handlers =
                     userId
 
             task {
-                let! dto = ctx.BindJsonAsync<UpdateTransaction>()
-                dto.HttpContext <- ctx
+                let! request = ctx.BindJsonAsync<UpdateTransactionRequest>()
+                request.HttpContext <- ctx
 
-                match Logic.validateUpdate dto with
+                match Logic.validateUpdate request with
                 | Success _ ->
-                    let transaction = Logic.prepareForUpdate dto
+                    let transaction = Logic.prepareForUpdate request
                     let connectionString = getConnectionString ctx
 
                     let! _ = TransactionsRepository.update transaction connectionString tr

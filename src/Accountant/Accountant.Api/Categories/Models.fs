@@ -16,7 +16,7 @@ module Models =
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
-    type CreateCategory =
+    type CreateCategoryRequest =
         { mutable HttpContext: HttpContext
           ParentId: int Option
           Name: string
@@ -26,7 +26,7 @@ module Models =
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
-    type UpdateCategory =
+    type UpdateCategoryRequest =
         { mutable HttpContext: HttpContext
           Id: int
           ParentId: int Option

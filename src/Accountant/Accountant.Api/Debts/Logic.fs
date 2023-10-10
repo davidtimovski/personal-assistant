@@ -15,32 +15,32 @@ module Logic =
               Person = x.Person
               Amount = x.Amount
               Currency = x.Currency
-              UserIsDebtor = x.UserIsDebtor
               Description = x.Description
+              UserIsDebtor = x.UserIsDebtor
               CreatedDate = x.CreatedDate
               ModifiedDate = x.ModifiedDate })
 
-    let private validateCreatePerson (dto: CreateDebt) =
-        if Validation.textIsNotEmpty dto.Person then
-            Success dto
+    let private validateCreatePerson (request: CreateDebtRequest) =
+        if Validation.textIsNotEmpty request.Person then
+            Success request
         else
             Failure "Person is not valid"
 
-    let private validateCreateAmount (dto: CreateDebt) =
-        if Validation.amountIsValid dto.Amount then
-            Success dto
+    let private validateCreateAmount (request: CreateDebtRequest) =
+        if Validation.amountIsValid request.Amount then
+            Success request
         else
             Failure "Amount has to be a positive number"
 
-    let private validateCreateCurrency (dto: CreateDebt) =
-        if Validation.currencyIsValid dto.Currency then
-            Success dto
+    let private validateCreateCurrency (request: CreateDebtRequest) =
+        if Validation.currencyIsValid request.Currency then
+            Success request
         else
             Failure "Currency is not valid"
 
-    let private validateCreateDescription (dto: CreateDebt) =
-        if Validation.textIsNoneOrLengthIsValid dto.Description descriptionMaxLength then
-            Success dto
+    let private validateCreateDescription (request: CreateDebtRequest) =
+        if Validation.textIsNoneOrLengthIsValid request.Description descriptionMaxLength then
+            Success request
         else
             Failure $"Description cannot exceed {descriptionMaxLength} characters"
 
@@ -50,58 +50,58 @@ module Logic =
         >> bind validateCreateCurrency
         >> bind validateCreateDescription
 
-    let prepareForCreate (model: CreateDebt) (userId: int) =
+    let prepareForCreate (request: CreateDebtRequest) (userId: int) =
         { Id = 0
           UserId = userId
-          Person = model.Person.Trim()
-          Amount = model.Amount
-          Currency = model.Currency
-          UserIsDebtor = model.UserIsDebtor
-          Description = Utils.noneOrTrimmed model.Description
-          CreatedDate = model.CreatedDate
-          ModifiedDate = model.ModifiedDate }
+          Person = request.Person.Trim()
+          Amount = request.Amount
+          Currency = request.Currency
+          Description = Utils.noneOrTrimmed request.Description
+          UserIsDebtor = request.UserIsDebtor
+          CreatedDate = request.CreatedDate
+          ModifiedDate = request.ModifiedDate }
 
-    let prepareForCreateMerged (model: CreateDebt) (userId: int) =
+    let prepareForCreateMerged (request: CreateDebtRequest) (userId: int) =
         { Id = 0
           UserId = userId
-          Person = model.Person.Trim()
-          Amount = model.Amount
-          Currency = model.Currency
-          UserIsDebtor = model.UserIsDebtor
-          Description = Utils.noneOrTrimmed model.Description
-          CreatedDate = model.CreatedDate
-          ModifiedDate = model.ModifiedDate }
+          Person = request.Person.Trim()
+          Amount = request.Amount
+          Currency = request.Currency
+          Description = Utils.noneOrTrimmed request.Description
+          UserIsDebtor = request.UserIsDebtor
+          CreatedDate = request.CreatedDate
+          ModifiedDate = request.ModifiedDate }
 
-    let private validateUpdateDebt (dto: UpdateDebt) =
-        let userId = getUserId dto.HttpContext
-        let connectionString = getConnectionString dto.HttpContext
+    let private validateUpdateDebt (request: UpdateDebtRequest) =
+        let userId = getUserId request.HttpContext
+        let connectionString = getConnectionString request.HttpContext
 
-        if Validation.debtBelongsTo dto.Id userId connectionString then
-            Success dto
+        if Validation.debtBelongsTo request.Id userId connectionString then
+            Success request
         else
             Failure "Debt is not valid"
 
-    let private validateUpdatePerson (dto: UpdateDebt) =
-        if Validation.textIsNotEmpty dto.Person then
-            Success dto
+    let private validateUpdatePerson (request: UpdateDebtRequest) =
+        if Validation.textIsNotEmpty request.Person then
+            Success request
         else
             Failure "Person is not valid"
 
-    let private validateUpdateAmount (dto: UpdateDebt) =
-        if Validation.amountIsValid dto.Amount then
-            Success dto
+    let private validateUpdateAmount (request: UpdateDebtRequest) =
+        if Validation.amountIsValid request.Amount then
+            Success request
         else
             Failure "Amount has to be a positive number"
 
-    let private validateUpdateCurrency (dto: UpdateDebt) =
-        if Validation.currencyIsValid dto.Currency then
-            Success dto
+    let private validateUpdateCurrency (request: UpdateDebtRequest) =
+        if Validation.currencyIsValid request.Currency then
+            Success request
         else
             Failure "Currency is not valid"
 
-    let private validateUpdateDescription (dto: UpdateDebt) =
-        if Validation.textIsNoneOrLengthIsValid dto.Description descriptionMaxLength then
-            Success dto
+    let private validateUpdateDescription (request: UpdateDebtRequest) =
+        if Validation.textIsNoneOrLengthIsValid request.Description descriptionMaxLength then
+            Success request
         else
             Failure $"Description cannot exceed {descriptionMaxLength} characters"
 
@@ -112,13 +112,13 @@ module Logic =
         >> bind validateUpdateCurrency
         >> bind validateUpdateDescription
 
-    let prepareForUpdate (model: UpdateDebt) (userId: int) =
-        { Id = model.Id
+    let prepareForUpdate (request: UpdateDebtRequest) (userId: int) =
+        { Id = request.Id
           UserId = userId
-          Person = model.Person.Trim()
-          Amount = model.Amount
-          Currency = model.Currency
-          UserIsDebtor = model.UserIsDebtor
-          Description = Utils.noneOrTrimmed model.Description
-          CreatedDate = model.CreatedDate
-          ModifiedDate = model.ModifiedDate }
+          Person = request.Person.Trim()
+          Amount = request.Amount
+          Currency = request.Currency
+          Description = Utils.noneOrTrimmed request.Description
+          UserIsDebtor = request.UserIsDebtor
+          CreatedDate = request.CreatedDate
+          ModifiedDate = request.ModifiedDate }

@@ -16,7 +16,7 @@ module Models =
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
-    type CreateAutomaticTransaction =
+    type CreateAutomaticTransactionRequest =
         { mutable HttpContext: HttpContext
           IsDeposit: bool
           CategoryId: int Option
@@ -27,7 +27,7 @@ module Models =
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
-    type UpdateAutomaticTransaction =
+    type UpdateAutomaticTransactionRequest =
         { mutable HttpContext: HttpContext
           Id: int
           IsDeposit: bool

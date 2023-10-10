@@ -19,11 +19,11 @@ module Handlers =
                 Metrics.startTransactionWithUser $"{ctx.Request.Method} /api/debts" "Debts/Handlers.create" userId
 
             task {
-                let! dto = ctx.BindJsonAsync<CreateDebt>()
+                let! request = ctx.BindJsonAsync<CreateDebtRequest>()
 
-                match Logic.validateCreate dto with
+                match Logic.validateCreate request with
                 | Success _ ->
-                    let debt = Logic.prepareForCreate dto userId
+                    let debt = Logic.prepareForCreate request userId
 
                     let connection = getDbConnection ctx
                     let! id = DebtsRepository.create debt connection tr
@@ -47,11 +47,11 @@ module Handlers =
                     userId
 
             task {
-                let! dto = ctx.BindJsonAsync<CreateDebt>()
+                let! request = ctx.BindJsonAsync<CreateDebtRequest>()
 
-                match Logic.validateCreate dto with
+                match Logic.validateCreate request with
                 | Success _ ->
-                    let debt = Logic.prepareForCreateMerged dto userId
+                    let debt = Logic.prepareForCreateMerged request userId
 
                     let connectionString = getConnectionString ctx
                     let! id = DebtsRepository.createMerged debt connectionString tr
@@ -72,12 +72,12 @@ module Handlers =
                 Metrics.startTransactionWithUser $"{ctx.Request.Method} /api/debts" "Debts/Handlers.update" userId
 
             task {
-                let! dto = ctx.BindJsonAsync<UpdateDebt>()
-                dto.HttpContext <- ctx
+                let! request = ctx.BindJsonAsync<UpdateDebtRequest>()
+                request.HttpContext <- ctx
 
-                match Logic.validateUpdate dto with
+                match Logic.validateUpdate request with
                 | Success _ ->
-                    let debt = Logic.prepareForUpdate dto userId
+                    let debt = Logic.prepareForUpdate request userId
 
                     let connectionString = getConnectionString ctx
                     let! _ = DebtsRepository.update debt connectionString tr

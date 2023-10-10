@@ -19,11 +19,11 @@ module Handlers =
                 Metrics.startTransactionWithUser $"{ctx.Request.Method} /api/accounts" "Accounts/Handlers.create" userId
 
             task {
-                let! dto = ctx.BindJsonAsync<CreateAccount>()
+                let! request = ctx.BindJsonAsync<CreateAccountRequest>()
 
-                match Logic.validateCreate dto with
+                match Logic.validateCreate request with
                 | Success _ ->
-                    let account = Logic.prepareForCreate dto userId
+                    let account = Logic.prepareForCreate request userId
 
                     let connection = getDbConnection ctx
                     let! id = AccountsRepository.create account connection tr
@@ -44,12 +44,12 @@ module Handlers =
                 Metrics.startTransactionWithUser $"{ctx.Request.Method} /api/accounts" "Accounts/Handlers.update" userId
 
             task {
-                let! dto = ctx.BindJsonAsync<UpdateAccount>()
-                dto.HttpContext <- ctx
+                let! request = ctx.BindJsonAsync<UpdateAccountRequest>()
+                request.HttpContext <- ctx
 
-                match Logic.validateUpdate dto with
+                match Logic.validateUpdate request with
                 | Success _ ->
-                    let account = Logic.prepareForUpdate dto userId
+                    let account = Logic.prepareForUpdate request userId
 
                     let connectionString = getConnectionString ctx
                     let! _ = AccountsRepository.update account connectionString tr

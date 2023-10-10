@@ -19,65 +19,65 @@ module Logic =
               CreatedDate = x.CreatedDate
               ModifiedDate = x.ModifiedDate })
 
-    let private validateCreateName (dto: CreateAccount) =
+    let private validateCreateName (request: CreateAccountRequest) =
         if
-            (Validation.textIsNotEmpty dto.Name)
-            && (Validation.textLengthIsValid dto.Name nameMaxLength)
+            (Validation.textIsNotEmpty request.Name)
+            && (Validation.textLengthIsValid request.Name nameMaxLength)
         then
-            Success dto
+            Success request
         else
             Failure "Name is not valid"
 
-    let private validateCreateCurrency (dto: CreateAccount) =
-        if Validation.currencyIsValid dto.Currency then
-            Success dto
+    let private validateCreateCurrency (request: CreateAccountRequest) =
+        if Validation.currencyIsValid request.Currency then
+            Success request
         else
             Failure "Currency is not valid"
 
     let validateCreate = validateCreateName >> bind validateCreateCurrency
 
-    let prepareForCreate (model: CreateAccount) (userId: int) =
+    let prepareForCreate (request: CreateAccountRequest) (userId: int) =
         { Id = 0
           UserId = userId
-          Name = model.Name.Trim()
-          IsMain = model.IsMain
-          Currency = model.Currency
-          StockPrice = model.StockPrice
-          CreatedDate = model.CreatedDate
-          ModifiedDate = model.ModifiedDate }
+          Name = request.Name.Trim()
+          IsMain = false
+          Currency = request.Currency
+          StockPrice = request.StockPrice
+          CreatedDate = request.CreatedDate
+          ModifiedDate = request.ModifiedDate }
 
-    let private validateUpdateAccount (dto: UpdateAccount) =
-        let userId = getUserId dto.HttpContext
-        let connectionString = getConnectionString dto.HttpContext
+    let private validateUpdateAccount (request: UpdateAccountRequest) =
+        let userId = getUserId request.HttpContext
+        let connectionString = getConnectionString request.HttpContext
 
-        if Validation.accountBelongsTo dto.Id userId connectionString then
-            Success dto
+        if Validation.accountBelongsTo request.Id userId connectionString then
+            Success request
         else
             Failure "Account is not valid"
 
-    let private validateUpdateName (dto: UpdateAccount) =
+    let private validateUpdateName (request: UpdateAccountRequest) =
         if
-            (Validation.textIsNotEmpty dto.Name)
-            && (Validation.textLengthIsValid dto.Name nameMaxLength)
+            (Validation.textIsNotEmpty request.Name)
+            && (Validation.textLengthIsValid request.Name nameMaxLength)
         then
-            Success dto
+            Success request
         else
             Failure "Name is not valid"
 
-    let private validateUpdateCurrency (dto: UpdateAccount) =
-        if Validation.currencyIsValid dto.Currency then
-            Success dto
+    let private validateUpdateCurrency (request: UpdateAccountRequest) =
+        if Validation.currencyIsValid request.Currency then
+            Success request
         else
             Failure "Currency is not valid"
 
     let validateUpdate = validateUpdateAccount >> bind validateUpdateName >> bind validateUpdateCurrency
 
-    let prepareForUpdate (model: UpdateAccount) (userId: int) =
-        { Id = model.Id
+    let prepareForUpdate (request: UpdateAccountRequest) (userId: int) =
+        { Id = request.Id
           UserId = userId
-          Name = model.Name.Trim()
-          IsMain = model.IsMain
-          Currency = model.Currency
-          StockPrice = model.StockPrice
-          CreatedDate = model.CreatedDate
-          ModifiedDate = model.ModifiedDate }
+          Name = request.Name.Trim()
+          IsMain = false
+          Currency = request.Currency
+          StockPrice = request.StockPrice
+          CreatedDate = request.CreatedDate
+          ModifiedDate = request.ModifiedDate }

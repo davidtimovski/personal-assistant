@@ -37,42 +37,42 @@ module Logic =
               CreatedDate = x.CreatedDate
               ModifiedDate = x.ModifiedDate })
 
-    let private validateCreateAccounts (dto: CreateTransaction) =
-        let userId = getUserId dto.HttpContext
-        let connectionString = getConnectionString dto.HttpContext
+    let private validateCreateAccounts (request: CreateTransactionRequest) =
+        let userId = getUserId request.HttpContext
+        let connectionString = getConnectionString request.HttpContext
 
-        if validateAccounts dto.FromAccountId dto.ToAccountId userId connectionString then
-            Success dto
+        if validateAccounts request.FromAccountId request.ToAccountId userId connectionString then
+            Success request
         else
             Failure "Accounts are not valid"
 
-    let private validateCreateCategory (dto: CreateTransaction) =
-        let userId = getUserId dto.HttpContext
-        let connectionString = getConnectionString dto.HttpContext
+    let private validateCreateCategory (request: CreateTransactionRequest) =
+        let userId = getUserId request.HttpContext
+        let connectionString = getConnectionString request.HttpContext
 
         if
-            dto.CategoryId.IsNone
-            || Validation.categoryBelongsTo dto.CategoryId.Value userId connectionString
+            request.CategoryId.IsNone
+            || Validation.categoryBelongsTo request.CategoryId.Value userId connectionString
         then
-            Success dto
+            Success request
         else
             Failure "Category is not valid"
 
-    let private validateCreateAmount (dto: CreateTransaction) =
-        if Validation.amountIsValid dto.Amount then
-            Success dto
+    let private validateCreateAmount (request: CreateTransactionRequest) =
+        if Validation.amountIsValid request.Amount then
+            Success request
         else
             Failure "Amount has to be a positive number"
 
-    let private validateCreateCurrency (dto: CreateTransaction) =
-        if Validation.currencyIsValid dto.Currency then
-            Success dto
+    let private validateCreateCurrency (request: CreateTransactionRequest) =
+        if Validation.currencyIsValid request.Currency then
+            Success request
         else
             Failure "Currency is not valid"
 
-    let private validateCreateDescription (dto: CreateTransaction) =
-        if Validation.textIsNoneOrLengthIsValid dto.Description descriptionMaxLength then
-            Success dto
+    let private validateCreateDescription (request: CreateTransactionRequest) =
+        if Validation.textIsNoneOrLengthIsValid request.Description descriptionMaxLength then
+            Success request
         else
             Failure $"Description cannot exceed {descriptionMaxLength} characters"
 
@@ -83,70 +83,70 @@ module Logic =
         >> bind validateCreateCurrency
         >> bind validateCreateDescription
 
-    let prepareForCreate (model: CreateTransaction) : Transaction =
+    let prepareForCreate (request: CreateTransactionRequest) : Transaction =
         { Id = 0
-          FromAccountId = model.FromAccountId
-          ToAccountId = model.ToAccountId
-          CategoryId = model.CategoryId
-          Amount = model.Amount
-          FromStocks = model.FromStocks
-          ToStocks = model.ToStocks
-          Currency = model.Currency
-          Description = Utils.noneOrTrimmed model.Description
-          Date = model.Date
-          IsEncrypted = model.IsEncrypted
-          EncryptedDescription = model.EncryptedDescription
-          Salt = model.Salt
-          Nonce = model.Nonce
+          FromAccountId = request.FromAccountId
+          ToAccountId = request.ToAccountId
+          CategoryId = request.CategoryId
+          Amount = request.Amount
+          FromStocks = request.FromStocks
+          ToStocks = request.ToStocks
+          Currency = request.Currency
+          Description = Utils.noneOrTrimmed request.Description
+          Date = request.Date
+          IsEncrypted = request.IsEncrypted
+          EncryptedDescription = request.EncryptedDescription
+          Salt = request.Salt
+          Nonce = request.Nonce
           Generated = false
-          CreatedDate = model.CreatedDate
-          ModifiedDate = model.ModifiedDate }
+          CreatedDate = request.CreatedDate
+          ModifiedDate = request.ModifiedDate }
 
-    let private validateUpdateTransaction (dto: UpdateTransaction) =
-        let userId = getUserId dto.HttpContext
-        let connectionString = getConnectionString dto.HttpContext
+    let private validateUpdateTransaction (request: UpdateTransactionRequest) =
+        let userId = getUserId request.HttpContext
+        let connectionString = getConnectionString request.HttpContext
 
-        if Validation.transactionBelongsTo dto.Id userId connectionString then
-            Success dto
+        if Validation.transactionBelongsTo request.Id userId connectionString then
+            Success request
         else
             Failure "Transaction is not valid"
 
-    let private validateUpdateAccounts (dto: UpdateTransaction) =
-        let userId = getUserId dto.HttpContext
-        let connectionString = getConnectionString dto.HttpContext
+    let private validateUpdateAccounts (request: UpdateTransactionRequest) =
+        let userId = getUserId request.HttpContext
+        let connectionString = getConnectionString request.HttpContext
 
-        if validateAccounts dto.FromAccountId dto.ToAccountId userId connectionString then
-            Success dto
+        if validateAccounts request.FromAccountId request.ToAccountId userId connectionString then
+            Success request
         else
             Failure "Accounts are not valid"
 
-    let private validateUpdateCategory (dto: UpdateTransaction) =
-        let userId = getUserId dto.HttpContext
-        let connectionString = getConnectionString dto.HttpContext
+    let private validateUpdateCategory (request: UpdateTransactionRequest) =
+        let userId = getUserId request.HttpContext
+        let connectionString = getConnectionString request.HttpContext
 
         if
-            dto.CategoryId.IsNone
-            || Validation.categoryBelongsTo dto.CategoryId.Value userId connectionString
+            request.CategoryId.IsNone
+            || Validation.categoryBelongsTo request.CategoryId.Value userId connectionString
         then
-            Success dto
+            Success request
         else
             Failure "Category is not valid"
 
-    let private validateUpdateAmount (dto: UpdateTransaction) =
-        if Validation.amountIsValid dto.Amount then
-            Success dto
+    let private validateUpdateAmount (request: UpdateTransactionRequest) =
+        if Validation.amountIsValid request.Amount then
+            Success request
         else
             Failure "Amount has to be a positive number"
 
-    let private validateUpdateCurrency (dto: UpdateTransaction) =
-        if Validation.currencyIsValid dto.Currency then
-            Success dto
+    let private validateUpdateCurrency (request: UpdateTransactionRequest) =
+        if Validation.currencyIsValid request.Currency then
+            Success request
         else
             Failure "Currency is not valid"
 
-    let private validateUpdateDescription (dto: UpdateTransaction) =
-        if Validation.textIsNoneOrLengthIsValid dto.Description descriptionMaxLength then
-            Success dto
+    let private validateUpdateDescription (request: UpdateTransactionRequest) =
+        if Validation.textIsNoneOrLengthIsValid request.Description descriptionMaxLength then
+            Success request
         else
             Failure $"Description cannot exceed {descriptionMaxLength} characters"
 
@@ -158,21 +158,21 @@ module Logic =
         >> bind validateUpdateCurrency
         >> bind validateUpdateDescription
 
-    let prepareForUpdate (model: UpdateTransaction) : Transaction =
-        { Id = model.Id
-          FromAccountId = model.FromAccountId
-          ToAccountId = model.ToAccountId
-          CategoryId = model.CategoryId
-          Amount = model.Amount
-          FromStocks = model.FromStocks
-          ToStocks = model.ToStocks
-          Currency = model.Currency
-          Description = Utils.noneOrTrimmed model.Description
-          Date = model.Date
-          IsEncrypted = model.IsEncrypted
-          EncryptedDescription = model.EncryptedDescription
-          Salt = model.Salt
-          Nonce = model.Nonce
+    let prepareForUpdate (request: UpdateTransactionRequest) : Transaction =
+        { Id = request.Id
+          FromAccountId = request.FromAccountId
+          ToAccountId = request.ToAccountId
+          CategoryId = request.CategoryId
+          Amount = request.Amount
+          FromStocks = request.FromStocks
+          ToStocks = request.ToStocks
+          Currency = request.Currency
+          Description = Utils.noneOrTrimmed request.Description
+          Date = request.Date
+          IsEncrypted = request.IsEncrypted
+          EncryptedDescription = request.EncryptedDescription
+          Salt = request.Salt
+          Nonce = request.Nonce
           Generated = false
-          CreatedDate = model.CreatedDate
-          ModifiedDate = model.ModifiedDate }
+          CreatedDate = request.CreatedDate
+          ModifiedDate = request.ModifiedDate }

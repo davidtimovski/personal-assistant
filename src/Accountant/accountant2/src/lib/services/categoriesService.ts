@@ -1,11 +1,12 @@
 import { HttpProxy } from '../../../../../Core/shared2/services/httpProxy';
 import { ErrorLogger } from '../../../../../Core/shared2/services/errorLogger';
-import { DateHelper } from '../../../../../Core/shared2/utils/dateHelper';
+import { ValidationResult, ValidationUtil } from '../../../../../Core/shared2/utils/validationUtils';
 
 import { CategoriesIDBHelper } from '$lib/utils/categoriesIDBHelper';
 import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 import { Category, CategoryType } from '$lib/models/entities/category';
 import { SelectOption } from '$lib/models/viewmodels/selectOption';
+import { CreateCategory, UpdateCategory } from '$lib/models/server/requests/category';
 import Variables from '$lib/variables';
 
 export class CategoriesService {
@@ -68,6 +69,16 @@ export class CategoriesService {
 		return this.idbHelper.isParent(id);
 	}
 
+	static validate(name: string): ValidationResult {
+		const result = new ValidationResult();
+
+		if (ValidationUtil.isEmptyOrWhitespace(name)) {
+			result.fail('name');
+		}
+
+		return result;
+	}
+
 	async create(category: Category): Promise<number> {
 		try {
 			const now = new Date();
@@ -79,9 +90,19 @@ export class CategoriesService {
 			}
 
 			if (navigator.onLine) {
+				const payload = new CreateCategory(
+					category.parentId,
+					category.name,
+					category.type,
+					category.generateUpcomingExpense,
+					category.isTax,
+					category.createdDate,
+					category.modifiedDate
+				);
+
 				category.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/categories`, {
 					method: 'post',
-					body: window.JSON.stringify(category)
+					body: window.JSON.stringify(payload)
 				});
 				category.synced = true;
 			}
@@ -107,9 +128,20 @@ export class CategoriesService {
 			}
 
 			if (navigator.onLine) {
+				const payload = new UpdateCategory(
+					category.id,
+					category.parentId,
+					category.name,
+					category.type,
+					category.generateUpcomingExpense,
+					category.isTax,
+					category.createdDate,
+					category.modifiedDate
+				);
+
 				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/categories`, {
 					method: 'put',
-					body: window.JSON.stringify(category)
+					body: window.JSON.stringify(payload)
 				});
 				category.synced = true;
 			} else if (await this.idbHelper.isSynced(category.id)) {

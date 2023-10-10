@@ -1,7 +1,7 @@
 import { HttpProxy } from '../../../../../Core/shared2/services/httpProxy';
 import { CurrenciesService } from '../../../../../Core/shared2/services/currenciesService';
 import { ErrorLogger } from '../../../../../Core/shared2/services/errorLogger';
-import { DateHelper } from '../../../../../Core/shared2/utils/dateHelper';
+import { ValidationResult, ValidationUtil } from '../../../../../Core/shared2/utils/validationUtils';
 
 import { AccountsIDBHelper } from '$lib/utils/accountsIDBHelper';
 import { TransactionsIDBHelper } from '$lib/utils/transactionsIDBHelper';
@@ -9,6 +9,7 @@ import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 import type { Account } from '$lib/models/entities/account';
 import { SelectOption } from '$lib/models/viewmodels/selectOption';
 import type { TransactionModel } from '$lib/models/entities/transaction';
+import { CreateAccount, UpdateAccount } from '$lib/models/server/requests/account';
 import Variables from '$lib/variables';
 
 export class AccountsService {
@@ -183,6 +184,20 @@ export class AccountsService {
 		}
 	}
 
+	static validate(name: string, investmentFund: boolean, stockPrice: number | null): ValidationResult {
+		const result = new ValidationResult();
+
+		if (ValidationUtil.isEmptyOrWhitespace(name)) {
+			result.fail('name');
+		}
+
+		if (investmentFund && !stockPrice) {
+			result.fail('stockPrice');
+		}
+
+		return result;
+	}
+
 	async create(account: Account): Promise<number> {
 		try {
 			const now = new Date();
@@ -190,9 +205,17 @@ export class AccountsService {
 			account.name = account.name.trim();
 
 			if (navigator.onLine) {
+				const payload = new CreateAccount(
+					account.name,
+					account.currency,
+					account.stockPrice,
+					account.createdDate,
+					account.modifiedDate
+				);
+
 				account.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/accounts`, {
 					method: 'post',
-					body: window.JSON.stringify(account)
+					body: window.JSON.stringify(payload)
 				});
 				account.synced = true;
 			}
@@ -214,9 +237,18 @@ export class AccountsService {
 			account.name = account.name.trim();
 
 			if (navigator.onLine) {
+				const payload = new UpdateAccount(
+					account.id,
+					account.name,
+					account.currency,
+					account.stockPrice,
+					account.createdDate,
+					account.modifiedDate
+				);
+
 				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/accounts`, {
 					method: 'put',
-					body: window.JSON.stringify(account)
+					body: window.JSON.stringify(payload)
 				});
 				account.synced = true;
 			} else if (await this.idbHelper.isSynced(account.id)) {

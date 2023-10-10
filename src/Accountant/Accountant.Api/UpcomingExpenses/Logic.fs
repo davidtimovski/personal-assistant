@@ -22,33 +22,33 @@ module Logic =
               CreatedDate = x.CreatedDate
               ModifiedDate = x.ModifiedDate })
 
-    let private validateCreateCategory (dto: CreateUpcomingExpense) =
-        let userId = getUserId dto.HttpContext
-        let connectionString = getConnectionString dto.HttpContext
+    let private validateCreateCategory (request: CreateUpcomingExpenseRequest) =
+        let userId = getUserId request.HttpContext
+        let connectionString = getConnectionString request.HttpContext
 
         if
-            dto.CategoryId.IsNone
-            || Validation.categoryBelongsTo dto.CategoryId.Value userId connectionString
+            request.CategoryId.IsNone
+            || Validation.categoryBelongsTo request.CategoryId.Value userId connectionString
         then
-            Success dto
+            Success request
         else
             Failure "Category is not valid"
 
-    let private validateCreateAmount (dto: CreateUpcomingExpense) =
-        if Validation.amountIsValid dto.Amount then
-            Success dto
+    let private validateCreateAmount (request: CreateUpcomingExpenseRequest) =
+        if Validation.amountIsValid request.Amount then
+            Success request
         else
             Failure "Amount has to be a positive number"
 
-    let private validateCreateCurrency (dto: CreateUpcomingExpense) =
-        if Validation.currencyIsValid dto.Currency then
-            Success dto
+    let private validateCreateCurrency (request: CreateUpcomingExpenseRequest) =
+        if Validation.currencyIsValid request.Currency then
+            Success request
         else
             Failure "Currency is not valid"
 
-    let private validateCreateDescription (dto: CreateUpcomingExpense) =
-        if Validation.textIsNoneOrLengthIsValid dto.Description descriptionMaxLength then
-            Success dto
+    let private validateCreateDescription (request: CreateUpcomingExpenseRequest) =
+        if Validation.textIsNoneOrLengthIsValid request.Description descriptionMaxLength then
+            Success request
         else
             Failure $"Description cannot exceed {descriptionMaxLength} characters"
 
@@ -58,54 +58,54 @@ module Logic =
         >> bind validateCreateCurrency
         >> bind validateCreateDescription
 
-    let prepareForCreate (model: CreateUpcomingExpense) (userId: int) =
+    let prepareForCreate (request: CreateUpcomingExpenseRequest) (userId: int) =
         { Id = 0
           UserId = userId
-          CategoryId = model.CategoryId
-          Amount = model.Amount
-          Currency = model.Currency
-          Description = Utils.noneOrTrimmed model.Description
-          Date = model.Date
-          Generated = model.Generated
-          CreatedDate = model.CreatedDate
-          ModifiedDate = model.ModifiedDate }
+          CategoryId = request.CategoryId
+          Amount = request.Amount
+          Currency = request.Currency
+          Description = Utils.noneOrTrimmed request.Description
+          Date = request.Date
+          Generated = request.Generated
+          CreatedDate = request.CreatedDate
+          ModifiedDate = request.ModifiedDate }
 
-    let private validateUpdateUpcomingExpense (dto: UpdateUpcomingExpense) =
-        let userId = getUserId dto.HttpContext
-        let connectionString = getConnectionString dto.HttpContext
+    let private validateUpdateUpcomingExpense (request: UpdateUpcomingExpenseRequest) =
+        let userId = getUserId request.HttpContext
+        let connectionString = getConnectionString request.HttpContext
 
-        if Validation.upcomingExpenseBelongsTo dto.Id userId connectionString then
-            Success dto
+        if Validation.upcomingExpenseBelongsTo request.Id userId connectionString then
+            Success request
         else
             Failure "Upcoming expense is not valid"
 
-    let private validateUpdateCategory (dto: UpdateUpcomingExpense) =
-        let userId = getUserId dto.HttpContext
-        let connectionString = getConnectionString dto.HttpContext
+    let private validateUpdateCategory (request: UpdateUpcomingExpenseRequest) =
+        let userId = getUserId request.HttpContext
+        let connectionString = getConnectionString request.HttpContext
 
         if
-            dto.CategoryId.IsNone
-            || Validation.categoryBelongsTo dto.CategoryId.Value userId connectionString
+            request.CategoryId.IsNone
+            || Validation.categoryBelongsTo request.CategoryId.Value userId connectionString
         then
-            Success dto
+            Success request
         else
             Failure "Category is not valid"
 
-    let private validateUpdateAmount (dto: UpdateUpcomingExpense) =
-        if Validation.amountIsValid dto.Amount then
-            Success dto
+    let private validateUpdateAmount (request: UpdateUpcomingExpenseRequest) =
+        if Validation.amountIsValid request.Amount then
+            Success request
         else
             Failure "Amount has to be a positive number"
 
-    let private validateUpdateCurrency (dto: UpdateUpcomingExpense) =
-        if Validation.currencyIsValid dto.Currency then
-            Success dto
+    let private validateUpdateCurrency (request: UpdateUpcomingExpenseRequest) =
+        if Validation.currencyIsValid request.Currency then
+            Success request
         else
             Failure "Currency is not valid"
 
-    let private validateUpdateDescription (dto: UpdateUpcomingExpense) =
-        if Validation.textIsNoneOrLengthIsValid dto.Description descriptionMaxLength then
-            Success dto
+    let private validateUpdateDescription (request: UpdateUpcomingExpenseRequest) =
+        if Validation.textIsNoneOrLengthIsValid request.Description descriptionMaxLength then
+            Success request
         else
             Failure $"Description cannot exceed {descriptionMaxLength} characters"
 
@@ -116,17 +116,17 @@ module Logic =
         >> bind validateUpdateCurrency
         >> bind validateUpdateDescription
 
-    let prepareForUpdate (model: UpdateUpcomingExpense) (userId: int) =
-        { Id = model.Id
+    let prepareForUpdate (request: UpdateUpcomingExpenseRequest) (userId: int) =
+        { Id = request.Id
           UserId = userId
-          CategoryId = model.CategoryId
-          Amount = model.Amount
-          Currency = model.Currency
-          Description = Utils.noneOrTrimmed model.Description
-          Date = model.Date
-          Generated = model.Generated
-          CreatedDate = model.CreatedDate
-          ModifiedDate = model.ModifiedDate }
+          CategoryId = request.CategoryId
+          Amount = request.Amount
+          Currency = request.Currency
+          Description = Utils.noneOrTrimmed request.Description
+          Date = request.Date
+          Generated = request.Generated
+          CreatedDate = request.CreatedDate
+          ModifiedDate = request.ModifiedDate }
 
     let getFirstDayOfMonth =
         new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1, 0, 0, 0)

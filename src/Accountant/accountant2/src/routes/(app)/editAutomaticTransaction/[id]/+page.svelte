@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { onMount, onDestroy, debug } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
-	import { ValidationResult, ValidationUtil } from '../../../../../../../Core/shared2/utils/validationUtils';
 	import AlertBlock from '../../../../../../../Core/shared2/components/AlertBlock.svelte';
 	import DoubleRadioBool from '../../../../../../../Core/shared2/components/DoubleRadioBool.svelte';
 
@@ -53,16 +52,6 @@
 		}
 	});
 
-	function validate(): ValidationResult {
-		const result = new ValidationResult();
-
-		if (!ValidationUtil.between(amount, amountFrom, amountTo)) {
-			result.fail('amount');
-		}
-
-		return result;
-	}
-
 	function isDepositChanged() {
 		const categoryType = isDeposit ? CategoryType.DepositOnly : CategoryType.ExpenseOnly;
 
@@ -88,7 +77,7 @@
 			return x;
 		});
 
-		const result = validate();
+		const result = AutomaticTransactionsService.validate(amount, amountFrom, amountTo);
 		if (result.valid) {
 			amountIsInvalid = false;
 

@@ -4,7 +4,6 @@
 	import type { PageData } from './$types';
 
 	import { DateHelper } from '../../../../../../../Core/shared2/utils/dateHelper';
-	import { ValidationResult, ValidationUtil } from '../../../../../../../Core/shared2/utils/validationUtils';
 	import AlertBlock from '../../../../../../../Core/shared2/components/AlertBlock.svelte';
 
 	import { t } from '$lib/localization/i18n';
@@ -55,16 +54,6 @@
 
 	$: canSave = $syncStatus.status !== SyncEvents.SyncStarted && !!amount && !(!$isOnline && synced);
 
-	function validate(): ValidationResult {
-		const result = new ValidationResult();
-
-		if (!ValidationUtil.between(<number>amount, 0, amountTo)) {
-			result.fail('amount');
-		}
-
-		return result;
-	}
-
 	async function save() {
 		if (!amount || !currency || !year || !month) {
 			throw new Error('Unexpected error: required fields missing');
@@ -76,7 +65,7 @@
 			return x;
 		});
 
-		const result = validate();
+		const result = UpcomingExpensesService.validate(amount, amountTo);
 		if (result.valid) {
 			amountIsInvalid = false;
 

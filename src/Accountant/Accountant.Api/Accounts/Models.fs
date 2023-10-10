@@ -14,19 +14,17 @@ module Models =
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
-    type CreateAccount =
+    type CreateAccountRequest =
         { Name: string
-          IsMain: bool
           Currency: string
           StockPrice: decimal Option
           CreatedDate: DateTime
           ModifiedDate: DateTime }
 
-    type UpdateAccount =
+    type UpdateAccountRequest =
         { mutable HttpContext: HttpContext
           Id: int
           Name: string
-          IsMain: bool
           Currency: string
           StockPrice: decimal Option
           CreatedDate: DateTime

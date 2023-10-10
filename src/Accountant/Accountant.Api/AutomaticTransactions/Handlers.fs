@@ -22,12 +22,12 @@ module Handlers =
                     userId
 
             task {
-                let! dto = ctx.BindJsonAsync<CreateAutomaticTransaction>()
-                dto.HttpContext <- ctx
+                let! request = ctx.BindJsonAsync<CreateAutomaticTransactionRequest>()
+                request.HttpContext <- ctx
 
-                match Logic.validateCreate dto with
+                match Logic.validateCreate request with
                 | Success _ ->
-                    let automaticTransaction = Logic.prepareForCreate dto userId
+                    let automaticTransaction = Logic.prepareForCreate request userId
 
                     let connection = getDbConnection ctx
                     let! id = AutomaticTransactionsRepository.create automaticTransaction connection tr
@@ -51,12 +51,12 @@ module Handlers =
                     userId
 
             task {
-                let! dto = ctx.BindJsonAsync<UpdateAutomaticTransaction>()
-                dto.HttpContext <- ctx
+                let! request = ctx.BindJsonAsync<UpdateAutomaticTransactionRequest>()
+                request.HttpContext <- ctx
 
-                match Logic.validateUpdate dto with
+                match Logic.validateUpdate request with
                 | Success _ ->
-                    let automaticTransaction = Logic.prepareForUpdate dto userId
+                    let automaticTransaction = Logic.prepareForUpdate request userId
 
                     let connectionString = getConnectionString ctx
                     let! _ = AutomaticTransactionsRepository.update automaticTransaction connectionString tr

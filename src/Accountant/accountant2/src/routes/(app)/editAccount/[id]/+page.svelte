@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
-	import { ValidationResult, ValidationUtil } from '../../../../../../../Core/shared2/utils/validationUtils';
+	import { ValidationUtil } from '../../../../../../../Core/shared2/utils/validationUtils';
 	import AlertBlock from '../../../../../../../Core/shared2/components/AlertBlock.svelte';
 	import Checkbox from '../../../../../../../Core/shared2/components/Checkbox.svelte';
 
@@ -55,20 +55,6 @@
 		!ValidationUtil.isEmptyOrWhitespace(name) &&
 		!(!$isOnline && synced);
 
-	function validate(): ValidationResult {
-		const result = new ValidationResult();
-
-		if (ValidationUtil.isEmptyOrWhitespace(name)) {
-			result.fail('name');
-		}
-
-		if (investmentFund && !stockPrice) {
-			result.fail('stockPrice');
-		}
-
-		return result;
-	}
-
 	async function save() {
 		saveButtonIsLoading = true;
 		alertState.update((x) => {
@@ -76,7 +62,7 @@
 			return x;
 		});
 
-		const result = validate();
+		const result = AccountsService.validate(name, investmentFund, stockPrice);
 		if (result.valid) {
 			nameIsInvalid = false;
 			stockPriceIsInvalid = false;

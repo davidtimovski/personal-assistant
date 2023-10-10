@@ -8,6 +8,7 @@ export class LocalStorageUtil extends LocalStorageBase {
 				[LocalStorageKeys.CurrencyRates, { EUR: 1 }],
 				[LocalStorageKeys.LastSynced, '1970-01-01T00:00:00.000Z'],
 				[LocalStorageKeys.MergeDebtPerPerson, true],
+				[LocalStorageKeys.ShowBalanceOnHomePage, false],
 				[LocalStorageKeys.ShowUpcomingExpensesOnHomePage, true],
 				[LocalStorageKeys.ShowDebtOnHomePage, true]
 			])
@@ -32,6 +33,7 @@ export enum LocalStorageKeys {
 	CurrencyRates = 'currencyRates',
 	LastSynced = 'lastSynced',
 	MergeDebtPerPerson = 'mergeDebtPerPerson',
+	ShowBalanceOnHomePage = 'showBalanceOnHomePage',
 	ShowUpcomingExpensesOnHomePage = 'showUpcomingExpensesOnHomePage',
 	ShowDebtOnHomePage = 'showDebtOnHomePage'
 }

@@ -2,11 +2,13 @@ import { HttpProxy } from '../../../../../Core/shared2/services/httpProxy';
 import { CurrenciesService } from '../../../../../Core/shared2/services/currenciesService';
 import { ErrorLogger } from '../../../../../Core/shared2/services/errorLogger';
 import { DateHelper } from '../../../../../Core/shared2/utils/dateHelper';
+import { ValidationUtil, ValidationResult } from '../../../../../Core/shared2/utils/validationUtils';
 
 import { DebtsIDBHelper } from '$lib/utils/debtsIDBHelper';
 import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 import { Formatter } from '$lib/utils/formatter';
 import { DebtModel } from '$lib/models/entities/debt';
+import { CreateDebt, UpdateDebt } from '$lib/models/server/requests/debt';
 import Variables from '$lib/variables';
 
 export class DebtsService {
@@ -35,6 +37,20 @@ export class DebtsService {
 
 	get(id: number): Promise<DebtModel> {
 		return this.idbHelper.get(id);
+	}
+
+	static validate(person: string, amount: number, amountTo: number): ValidationResult {
+		const result = new ValidationResult();
+
+		if (ValidationUtil.isEmptyOrWhitespace(person)) {
+			result.fail('person');
+		}
+
+		if (!ValidationUtil.between(amount, 0, amountTo)) {
+			result.fail('amount');
+		}
+
+		return result;
 	}
 
 	async createOrMerge(
@@ -112,9 +128,19 @@ export class DebtsService {
 				);
 
 				if (navigator.onLine) {
+					const payload = new CreateDebt(
+						mergedDebt.person,
+						mergedDebt.amount,
+						mergedDebt.currency,
+						mergedDebt.description,
+						mergedDebt.userIsDebtor,
+						mergedDebt.createdDate,
+						mergedDebt.modifiedDate
+					);
+
 					mergedDebt.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/debts/merged`, {
 						method: 'post',
-						body: window.JSON.stringify(mergedDebt)
+						body: window.JSON.stringify(payload)
 					});
 					mergedDebt.synced = true;
 				}
@@ -132,9 +158,19 @@ export class DebtsService {
 				debt.createdDate = debt.modifiedDate = now;
 
 				if (navigator.onLine) {
+					const payload = new CreateDebt(
+						debt.person,
+						debt.amount,
+						debt.currency,
+						debt.description,
+						debt.userIsDebtor,
+						debt.createdDate,
+						debt.modifiedDate
+					);
+
 					debt.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/debts`, {
 						method: 'post',
-						body: window.JSON.stringify(debt)
+						body: window.JSON.stringify(payload)
 					});
 					debt.synced = true;
 				}
@@ -165,9 +201,20 @@ export class DebtsService {
 			}
 
 			if (navigator.onLine) {
+				const payload = new UpdateDebt(
+					debt.id,
+					debt.person,
+					debt.amount,
+					debt.currency,
+					debt.description,
+					debt.userIsDebtor,
+					debt.createdDate,
+					debt.modifiedDate
+				);
+
 				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/debts`, {
 					method: 'put',
-					body: window.JSON.stringify(debt)
+					body: window.JSON.stringify(payload)
 				});
 				debt.synced = true;
 			} else if (await this.idbHelper.isSynced(debt.id)) {
