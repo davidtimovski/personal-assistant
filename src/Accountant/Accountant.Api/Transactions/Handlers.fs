@@ -41,7 +41,9 @@ module Handlers =
                     tr.Finish()
 
                     return result
-                | Failure error -> return! RequestErrors.BAD_REQUEST error next ctx
+                | Failure error ->
+                    tr.Finish()
+                    return! RequestErrors.BAD_REQUEST error next ctx
             })
 
     let update: HttpHandler =
@@ -70,7 +72,9 @@ module Handlers =
                     tr.Finish()
 
                     return result
-                | Failure error -> return! RequestErrors.BAD_REQUEST error next ctx
+                | Failure error ->
+                    tr.Finish()
+                    return! RequestErrors.BAD_REQUEST error next ctx
             })
 
     let delete (id: int) : HttpHandler =

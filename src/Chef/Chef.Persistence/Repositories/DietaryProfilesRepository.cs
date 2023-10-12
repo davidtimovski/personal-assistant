@@ -1,8 +1,9 @@
 ﻿using System.Data;
 using Chef.Application.Contracts.DietaryProfiles;
 using Chef.Application.Entities;
-using Chef.Persistence;
 using Dapper;
+using Sentry;
+using User = Chef.Application.Entities.User;
 
 namespace Chef.Persistence.Repositories;
 
@@ -11,8 +12,10 @@ public class DietaryProfilesRepository : BaseRepository, IDietaryProfilesReposit
     public DietaryProfilesRepository(ChefContext efContext)
         : base(efContext) { }
 
-    public DietaryProfile? Get(int userId)
+    public DietaryProfile? Get(int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(DietaryProfilesRepository)}.{nameof(Get)}");
+
         using IDbConnection conn = OpenConnection();
 
         const string query = @"SELECT dp.*, u.id, u.imperial_system
@@ -21,10 +24,10 @@ public class DietaryProfilesRepository : BaseRepository, IDietaryProfilesReposit
                                WHERE dp.user_id = @UserId";
 
         var dietaryProfiles = conn.Query<DietaryProfile, User, DietaryProfile>(query,
-            (detaryProfile, user) =>
+            (dietaryProfile, user) =>
             {
-                detaryProfile.User = user;
-                return detaryProfile;
+                dietaryProfile.User = user;
+                return dietaryProfile;
             }, new { UserId = userId });
 
         if (!dietaryProfiles.Any())
@@ -32,11 +35,17 @@ public class DietaryProfilesRepository : BaseRepository, IDietaryProfilesReposit
             return null;
         }
 
-        return dietaryProfiles.Single();
+        var result = dietaryProfiles.Single();
+
+        metric.Finish();
+
+        return result;
     }
 
-    public async Task CreateOrUpdateAsync(DietaryProfile dietaryProfile)
+    public async Task CreateOrUpdateAsync(DietaryProfile dietaryProfile, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(DietaryProfilesRepository)}.{nameof(CreateOrUpdateAsync)}");
+
         var now = DateTime.UtcNow;
 
         var dbDietaryProfile = EFContext.DietaryProfiles.Find(dietaryProfile.UserId);
@@ -89,13 +98,19 @@ public class DietaryProfilesRepository : BaseRepository, IDietaryProfilesReposit
         }
 
         await EFContext.SaveChangesAsync();
+
+        metric.Finish();
     }
 
-    public async Task DeleteAsync(int userId)
+    public async Task DeleteAsync(int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(DietaryProfilesRepository)}.{nameof(DeleteAsync)}");
+
         DietaryProfile dietaryProfile = EFContext.DietaryProfiles.First(x => x.UserId == userId);
         EFContext.DietaryProfiles.Remove(dietaryProfile);
 
         await EFContext.SaveChangesAsync();
+
+        metric.Finish();
     }
 }

@@ -45,11 +45,13 @@ public class RecipeService : IRecipeService
         _logger = logger;
     }
 
-    public IEnumerable<SimpleRecipe> GetAll(int userId)
+    public IEnumerable<SimpleRecipe> GetAll(int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(GetAll)}");
+
         try
         {
-            List<Recipe> recipes = _recipesRepository.GetAll(userId).ToList();
+            List<Recipe> recipes = _recipesRepository.GetAll(userId, metric).ToList();
 
             var result = new List<SimpleRecipe>(recipes.Count);
             foreach (Recipe recipe in recipes)
@@ -67,13 +69,19 @@ public class RecipeService : IRecipeService
             _logger.LogError(ex, $"Unexpected error in {nameof(GetAll)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public RecipeToNotify Get(int id)
+    public RecipeToNotify Get(int id, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(Get)}");
+
         try
         {
-            Recipe recipe = _recipesRepository.Get(id);
+            Recipe recipe = _recipesRepository.Get(id, metric);
 
             var result = _mapper.Map<RecipeToNotify>(recipe);
 
@@ -84,13 +92,19 @@ public class RecipeService : IRecipeService
             _logger.LogError(ex, $"Unexpected error in {nameof(Get)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public RecipeDto? Get(int id, int userId, string currency)
+    public RecipeDto? Get(int id, int userId, string currency, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(Get)}");
+
         try
         {
-            Recipe? recipe = _recipesRepository.Get(id, userId);
+            Recipe? recipe = _recipesRepository.Get(id, userId, metric);
             if (recipe is null)
             {
                 return null;
@@ -98,7 +112,7 @@ public class RecipeService : IRecipeService
 
             var result = _mapper.Map<RecipeDto>(recipe);
 
-            result.NutritionSummary = _dietaryProfileService.CalculateNutritionSummary(recipe);
+            result.NutritionSummary = _dietaryProfileService.CalculateNutritionSummary(recipe, metric);
             result.CostSummary = CalculateCostSummary(recipe, currency);
             result.SharingState = GetSharingState(recipe, userId);
 
@@ -114,13 +128,19 @@ public class RecipeService : IRecipeService
             _logger.LogError(ex, $"Unexpected error in {nameof(Get)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public RecipeForUpdate? GetForUpdate(int id, int userId)
+    public RecipeForUpdate? GetForUpdate(int id, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(GetForUpdate)}");
+
         try
         {
-            Recipe? recipe = _recipesRepository.GetForUpdate(id, userId);
+            Recipe? recipe = _recipesRepository.GetForUpdate(id, userId, metric);
             if (recipe is null)
             {
                 return null;
@@ -138,19 +158,25 @@ public class RecipeService : IRecipeService
             _logger.LogError(ex, $"Unexpected error in {nameof(GetForUpdate)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public RecipeWithShares? GetWithShares(int id, int userId)
+    public RecipeWithShares? GetWithShares(int id, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(GetWithShares)}");
+
         try
         {
-            Recipe? recipe = _recipesRepository.GetWithOwner(id, userId);
+            Recipe? recipe = _recipesRepository.GetWithOwner(id, userId, metric);
             if (recipe is null)
             {
                 return null;
             }
 
-            recipe.Shares.AddRange(_recipesRepository.GetShares(id));
+            recipe.Shares.AddRange(_recipesRepository.GetShares(id, metric));
 
             var result = _mapper.Map<RecipeWithShares>(recipe, opts => { opts.Items["UserId"] = userId; });
             result.Shares.RemoveAll(x => x.UserId == userId);
@@ -164,13 +190,19 @@ public class RecipeService : IRecipeService
             _logger.LogError(ex, $"Unexpected error in {nameof(GetWithShares)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public IEnumerable<ShareRecipeRequest> GetShareRequests(int userId)
+    public IEnumerable<ShareRecipeRequest> GetShareRequests(int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(GetShareRequests)}");
+
         try
         {
-            IEnumerable<RecipeShare> shareRequests = _recipesRepository.GetShareRequests(userId);
+            IEnumerable<RecipeShare> shareRequests = _recipesRepository.GetShareRequests(userId, metric);
 
             var result = shareRequests.Select(x => _mapper.Map<ShareRecipeRequest>(x, opts => { opts.Items["UserId"] = userId; }));
 
@@ -181,44 +213,62 @@ public class RecipeService : IRecipeService
             _logger.LogError(ex, $"Unexpected error in {nameof(GetShareRequests)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public int GetPendingShareRequestsCount(int userId)
+    public int GetPendingShareRequestsCount(int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(GetPendingShareRequestsCount)}");
+
         try
         {
-            return _recipesRepository.GetPendingShareRequestsCount(userId);
+            return _recipesRepository.GetPendingShareRequestsCount(userId, metric);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(GetPendingShareRequestsCount)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public bool CanShareWithUser(int shareWithId, int userId)
+    public bool CanShareWithUser(int shareWithId, int userId, ISpan metricsSpan)
     {
         if (shareWithId == userId)
         {
             return false;
         }
 
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(CanShareWithUser)}");
+
         try
         {
-            return _recipesRepository.CanShareWithUser(shareWithId, userId);
+            return _recipesRepository.CanShareWithUser(shareWithId, userId, metric);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(CanShareWithUser)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public RecipeForSending GetForSending(int id, int userId)
+    public RecipeForSending GetForSending(int id, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(GetForSending)}");
+
         try
         {
-            Recipe recipe = _recipesRepository.GetForSending(id, userId);
+            Recipe recipe = _recipesRepository.GetForSending(id, userId, metric);
 
             var result = _mapper.Map<RecipeForSending>(recipe);
 
@@ -229,13 +279,19 @@ public class RecipeService : IRecipeService
             _logger.LogError(ex, $"Unexpected error in {nameof(GetForSending)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public IEnumerable<SendRequestDto> GetSendRequests(int userId)
+    public IEnumerable<SendRequestDto> GetSendRequests(int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(GetSendRequests)}");
+
         try
         {
-            IEnumerable<SendRequest> sendRequests = _recipesRepository.GetSendRequests(userId);
+            IEnumerable<SendRequest> sendRequests = _recipesRepository.GetSendRequests(userId, metric);
 
             var result = sendRequests.Select(x => _mapper.Map<SendRequestDto>(x));
 
@@ -246,18 +302,28 @@ public class RecipeService : IRecipeService
             _logger.LogError(ex, $"Unexpected error in {nameof(GetSendRequests)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public int GetPendingSendRequestsCount(int userId)
+    public int GetPendingSendRequestsCount(int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(GetPendingSendRequestsCount)}");
+
         try
         {
-            return _recipesRepository.GetPendingSendRequestsCount(userId);
+            return _recipesRepository.GetPendingSendRequestsCount(userId, metric);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(GetPendingSendRequestsCount)}");
             throw;
+        }
+        finally
+        {
+            metric.Finish();
         }
     }
 
@@ -274,21 +340,29 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public bool IngredientsReviewIsRequired(int id, int userId)
+    public bool IngredientsReviewIsRequired(int id, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(IngredientsReviewIsRequired)}");
+
         try
         {
-            return _recipesRepository.IngredientsReviewIsRequired(id, userId);
+            return _recipesRepository.IngredientsReviewIsRequired(id, userId, metric);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(IngredientsReviewIsRequired)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public RecipeForReview? GetForReview(int id, int userId)
+    public RecipeForReview? GetForReview(int id, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(GetForReview)}");
+
         try
         {
             if (!SendRequestExists(id, userId))
@@ -296,7 +370,7 @@ public class RecipeService : IRecipeService
                 return null;
             }
 
-            Recipe? recipe = _recipesRepository.GetForReview(id);
+            Recipe? recipe = _recipesRepository.GetForReview(id, metric);
 
             var result = _mapper.Map<RecipeForReview>(recipe);
 
@@ -307,18 +381,28 @@ public class RecipeService : IRecipeService
             _logger.LogError(ex, $"Unexpected error in {nameof(GetForReview)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public IEnumerable<string> GetAllImageUris(int userId)
+    public IEnumerable<string> GetAllImageUris(int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(GetAllImageUris)}");
+
         try
         {
-            return _recipesRepository.GetAllImageUris(userId);
+            return _recipesRepository.GetAllImageUris(userId, metric);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(GetAllImageUris)}");
             throw;
+        }
+        finally
+        {
+            metric.Finish();
         }
     }
 
@@ -374,34 +458,46 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public (bool canSend, bool alreadySent) CheckSendRequest(int recipeId, int sendToId, int userId)
+    public (bool canSend, bool alreadySent) CheckSendRequest(int recipeId, int sendToId, int userId, ISpan metricsSpan)
     {
+        if (sendToId == userId)
+        {
+            return (false, false);
+        }
+
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(CheckSendRequest)}");
+
         try
         {
-            if (sendToId == userId)
-            {
-                return (false, false);
-            }
-
-            return _recipesRepository.CheckSendRequest(recipeId, sendToId, userId);
+            return _recipesRepository.CheckSendRequest(recipeId, sendToId, userId, metric);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(CheckSendRequest)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public bool CheckIfUserCanBeNotifiedOfRecipeChange(int id, int userId)
+    public bool CheckIfUserCanBeNotifiedOfRecipeChange(int id, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(CheckIfUserCanBeNotifiedOfRecipeChange)}");
+
         try
         {
-            return _recipesRepository.CheckIfUserCanBeNotifiedOfRecipeChange(id, userId);
+            return _recipesRepository.CheckIfUserCanBeNotifiedOfRecipeChange(id, userId, metric);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(CheckIfUserCanBeNotifiedOfRecipeChange)}");
             throw;
+        }
+        finally
+        {
+            metric.Finish();
         }
     }
 
@@ -458,7 +554,7 @@ public class RecipeService : IRecipeService
             recipe.CookDuration = recipe.CookDuration < minute ? null : recipe.CookDuration;
 
             recipe.CreatedDate = recipe.ModifiedDate = recipe.LastOpenedDate = now;
-            int id = await _recipesRepository.CreateAsync(recipe);
+            int id = await _recipesRepository.CreateAsync(recipe, metric);
 
             if (model.ImageUri != null)
             {
@@ -478,8 +574,10 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public async Task CreateSampleAsync(int userId, Dictionary<string, string> translations)
+    public async Task CreateSampleAsync(int userId, Dictionary<string, string> translations, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(CreateSampleAsync)}");
+
         try
         {
             var now = DateTime.UtcNow;
@@ -525,12 +623,16 @@ public class RecipeService : IRecipeService
                 }
             };
 
-            await _recipesRepository.CreateAsync(recipe);
+            await _recipesRepository.CreateAsync(recipe, metric);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(CreateSampleAsync)}");
             throw;
+        }
+        finally
+        {
+            metric.Finish();
         }
     }
 
@@ -544,7 +646,7 @@ public class RecipeService : IRecipeService
         {
             var now = DateTime.UtcNow;
 
-            string oldImageUri = GetImageUri(model.Id);
+            string oldImageUri = _recipesRepository.GetImageUri(model.Id, metric);
 
             var recipe = _mapper.Map<Recipe>(model);
             recipe.Name = recipe.Name.Trim();
@@ -591,7 +693,7 @@ public class RecipeService : IRecipeService
 
             recipe.ModifiedDate = now;
 
-            string originalName = await _recipesRepository.UpdateAsync(recipe, model.UserId);
+            string originalName = await _recipesRepository.UpdateAsync(recipe, model.UserId, metric);
 
             // If the recipe image was changed
             if (oldImageUri != model.ImageUri)
@@ -609,7 +711,7 @@ public class RecipeService : IRecipeService
                 }
             }
 
-            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(model.Id, model.UserId).ToList();
+            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(model.Id, model.UserId, metric).ToList();
             if (!usersToBeNotified.Any())
             {
                 return new UpdateRecipeResult();
@@ -643,21 +745,21 @@ public class RecipeService : IRecipeService
 
         try
         {
-            if (!_recipesRepository.UserOwns(id, userId))
+            if (!_recipesRepository.UserOwns(id, userId, metric))
             {
                 throw new ValidationException("Unauthorized");
             }
 
-            string imageUri = GetImageUri(id);
+            string imageUri = _recipesRepository.GetImageUri(id, metric);
 
-            var recipeName = await _recipesRepository.DeleteAsync(id);
+            var recipeName = await _recipesRepository.DeleteAsync(id, metric);
 
             if (imageUri != null)
             {
                 await _cdnService.DeleteAsync($"users/{userId}/recipes/{imageUri}", metric);
             }
 
-            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeDeletion(id).ToList();
+            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeDeletion(id, metric).ToList();
             if (!usersToBeNotified.Any())
             {
                 return new DeleteRecipeResult();
@@ -685,9 +787,11 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public async Task ShareAsync(ShareRecipe model, IValidator<ShareRecipe> validator)
+    public async Task ShareAsync(ShareRecipe model, IValidator<ShareRecipe> validator, ISpan metricsSpan)
     {
         ValidationUtil.ValidOrThrow(model, validator);
+
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(ShareAsync)}");
 
         try
         {
@@ -696,7 +800,7 @@ public class RecipeService : IRecipeService
             var newShares = new List<RecipeShare>();
             foreach (int userId in model.NewShares)
             {
-                if (_recipesRepository.UserHasBlockedSharing(model.RecipeId, model.UserId, userId))
+                if (_recipesRepository.UserHasBlockedSharing(model.RecipeId, model.UserId, userId, metric))
                 {
                     continue;
                 }
@@ -717,28 +821,34 @@ public class RecipeService : IRecipeService
                 UserId = x
             });
 
-            await _recipesRepository.SaveSharingDetailsAsync(newShares, removedShares);
+            await _recipesRepository.SaveSharingDetailsAsync(newShares, removedShares, metric);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(ShareAsync)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public async Task<SetShareIsAcceptedResult> SetShareIsAcceptedAsync(int recipeId, int userId, bool isAccepted)
+    public async Task<SetShareIsAcceptedResult> SetShareIsAcceptedAsync(int recipeId, int userId, bool isAccepted, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(SetShareIsAcceptedAsync)}");
+
         try
         {
-            await _recipesRepository.SetShareIsAcceptedAsync(recipeId, userId, isAccepted, DateTime.UtcNow);
+            await _recipesRepository.SetShareIsAcceptedAsync(recipeId, userId, isAccepted, DateTime.UtcNow, metric);
 
-            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(recipeId, userId).ToList();
+            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(recipeId, userId, metric).ToList();
             if (!usersToBeNotified.Any())
             {
                 return new SetShareIsAcceptedResult();
             }
 
-            Recipe recipe = _recipesRepository.Get(recipeId);
+            Recipe recipe = _recipesRepository.Get(recipeId, metric);
 
             var user = _userService.Get(userId);
             var result = new SetShareIsAcceptedResult
@@ -756,26 +866,32 @@ public class RecipeService : IRecipeService
             _logger.LogError(ex, $"Unexpected error in {nameof(SetShareIsAcceptedAsync)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public async Task<LeaveRecipeResult> LeaveAsync(int id, int userId)
+    public async Task<LeaveRecipeResult> LeaveAsync(int id, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(LeaveAsync)}");
+
         try
         {
-            RecipeShare share = await _recipesRepository.LeaveAsync(id, userId);
+            RecipeShare share = await _recipesRepository.LeaveAsync(id, userId, metric);
 
             if (share.IsAccepted == false)
             {
                 return new LeaveRecipeResult();
             }
 
-            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(id, userId).ToList();
+            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(id, userId, metric).ToList();
             if (!usersToBeNotified.Any())
             {
                 return new LeaveRecipeResult();
             }
 
-            Recipe recipe = _recipesRepository.Get(id);
+            Recipe recipe = _recipesRepository.Get(id, metric);
 
             var user = _userService.Get(userId);
             var result = new LeaveRecipeResult
@@ -793,18 +909,24 @@ public class RecipeService : IRecipeService
             _logger.LogError(ex, $"Unexpected error in {nameof(LeaveAsync)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public async Task<SendRecipeResult> SendAsync(CreateSendRequest model, IValidator<CreateSendRequest> validator)
+    public async Task<SendRecipeResult> SendAsync(CreateSendRequest model, IValidator<CreateSendRequest> validator, ISpan metricsSpan)
     {
         ValidationUtil.ValidOrThrow(model, validator);
+
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(SendAsync)}");
 
         try
         {
             var sendRequests = new List<SendRequest>();
             foreach (int recipientId in model.RecipientsIds)
             {
-                var (canSend, alreadySent) = CheckSendRequest(model.RecipeId, recipientId, model.UserId);
+                var (canSend, alreadySent) = CheckSendRequest(model.RecipeId, recipientId, model.UserId, metric);
                 if (!canSend || alreadySent)
                 {
                     continue;
@@ -824,15 +946,15 @@ public class RecipeService : IRecipeService
                 request.CreatedDate = request.ModifiedDate = now;
             }
 
-            await _recipesRepository.CreateSendRequestsAsync(sendRequests);
+            await _recipesRepository.CreateSendRequestsAsync(sendRequests, metric);
 
-            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeSent(model.RecipeId).ToList();
+            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeSent(model.RecipeId, metric).ToList();
             if (!usersToBeNotified.Any())
             {
                 return new SendRecipeResult();
             }
 
-            Recipe recipe = _recipesRepository.Get(model.RecipeId);
+            Recipe recipe = _recipesRepository.Get(model.RecipeId, metric);
 
             var user = _userService.Get(model.UserId);
             var result = new SendRecipeResult
@@ -850,15 +972,21 @@ public class RecipeService : IRecipeService
             _logger.LogError(ex, $"Unexpected error in {nameof(SendAsync)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public async Task<DeclineSendRequestResult> DeclineSendRequestAsync(int recipeId, int userId)
+    public async Task<DeclineSendRequestResult> DeclineSendRequestAsync(int recipeId, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(DeclineSendRequestAsync)}");
+
         try
         {
-            await _recipesRepository.DeclineSendRequestAsync(recipeId, userId, DateTime.UtcNow);
+            await _recipesRepository.DeclineSendRequestAsync(recipeId, userId, DateTime.UtcNow, metric);
 
-            Recipe recipe = _recipesRepository.Get(recipeId);
+            Recipe recipe = _recipesRepository.Get(recipeId, metric);
             var userToBeNotified = _userService.Get(recipe.UserId);
 
             var user = _userService.Get(userId);
@@ -877,36 +1005,52 @@ public class RecipeService : IRecipeService
             _logger.LogError(ex, $"Unexpected error in {nameof(DeclineSendRequestAsync)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public async Task DeleteSendRequestAsync(int recipeId, int userId)
+    public async Task DeleteSendRequestAsync(int recipeId, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(DeleteSendRequestAsync)}");
+
         try
         {
-            await _recipesRepository.DeleteSendRequestAsync(recipeId, userId);
+            await _recipesRepository.DeleteSendRequestAsync(recipeId, userId, metric);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(DeleteSendRequestAsync)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public async Task<int> ImportAsync(ImportRecipe model, IValidator<ImportRecipe> validator)
+    public async Task<int> ImportAsync(ImportRecipe model, IValidator<ImportRecipe> validator, ISpan metricsSpan)
     {
         ValidationUtil.ValidOrThrow(model, validator);
+
+        var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(ImportAsync)}");
 
         try
         {
             var ingredientReplacements = model.IngredientReplacements
                 .Select(x => (x.Id, x.ReplacementId, x.TransferNutritionData, x.TransferPriceData));
 
-            return await _recipesRepository.ImportAsync(model.Id, ingredientReplacements, model.ImageUri, model.UserId);
+            return await _recipesRepository.ImportAsync(model.Id, ingredientReplacements, model.ImageUri, model.UserId, metric);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(ImportAsync)}");
             throw;
+        }
+        finally
+        {
+            metric.Finish();
         }
     }
 
@@ -982,19 +1126,6 @@ public class RecipeService : IRecipeService
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(CalculateCostSummary)}");
-            throw;
-        }
-    }
-
-    private string GetImageUri(int id)
-    {
-        try
-        {
-            return _recipesRepository.GetImageUri(id);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(GetImageUri)}");
             throw;
         }
     }

@@ -97,19 +97,19 @@ public class TasksController : BaseController
             UserId
         );
 
-        var model = new CreateTask
-        {
-            UserId = UserId,
-            ListId = request.ListId,
-            Name = request.Name,
-            Url = request.Url,
-            IsOneTime = request.IsOneTime,
-            IsPrivate = request.IsPrivate,
-        };
-        CreatedTaskResult result = await _taskService.CreateAsync(model, _createValidator, tr);
-
         try
         {
+            var model = new CreateTask
+            {
+                UserId = UserId,
+                ListId = request.ListId,
+                Name = request.Name,
+                Url = request.Url,
+                IsOneTime = request.IsOneTime,
+                IsPrivate = request.IsPrivate,
+            };
+            CreatedTaskResult result = await _taskService.CreateAsync(model, _createValidator, tr);
+
             if (result.NotifySignalR)
             {
                 await _listActionsHubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", AuthId);
@@ -132,18 +132,13 @@ public class TasksController : BaseController
 
                 _senderService.Enqueue(toDoAssistantPushNotification);
             }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(Create)}");
-            throw;
+
+            return StatusCode(201, result.TaskId);
         }
         finally
         {
             tr.Finish();
         }
-
-        return StatusCode(201, result.TaskId);
     }
 
     [HttpPost("bulk")]
@@ -160,18 +155,18 @@ public class TasksController : BaseController
             UserId
         );
 
-        var model = new BulkCreate
-        {
-            UserId = UserId,
-            ListId = request.ListId,
-            TasksText = request.TasksText,
-            TasksAreOneTime = request.TasksAreOneTime,
-            TasksArePrivate = request.TasksArePrivate,
-        };
-        BulkCreateResult result = await _taskService.BulkCreateAsync(model, _bulkCreateValidator, tr);
-
         try
         {
+            var model = new BulkCreate
+            {
+                UserId = UserId,
+                ListId = request.ListId,
+                TasksText = request.TasksText,
+                TasksAreOneTime = request.TasksAreOneTime,
+                TasksArePrivate = request.TasksArePrivate,
+            };
+            BulkCreateResult result = await _taskService.BulkCreateAsync(model, _bulkCreateValidator, tr);
+
             if (result.NotifySignalR)
             {
                 await _listActionsHubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", AuthId);
@@ -203,11 +198,6 @@ public class TasksController : BaseController
                 }
             }
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(BulkCreate)}");
-            throw;
-        }
         finally
         {
             tr.Finish();
@@ -230,22 +220,22 @@ public class TasksController : BaseController
             UserId
         );
 
-        var model = new UpdateTask
-        {
-            Id = request.Id,
-            UserId = UserId,
-            ListId = request.ListId,
-            Name = request.Name,
-            Url = request.Url,
-            IsOneTime = request.IsOneTime,
-            IsHighPriority = request.IsHighPriority,
-            IsPrivate = request.IsPrivate,
-            AssignedToUserId = request.AssignedToUserId,
-        };
-        UpdateTaskResult result = await _taskService.UpdateAsync(model, _updateValidator, tr);
-
         try
         {
+            var model = new UpdateTask
+            {
+                Id = request.Id,
+                UserId = UserId,
+                ListId = request.ListId,
+                Name = request.Name,
+                Url = request.Url,
+                IsOneTime = request.IsOneTime,
+                IsHighPriority = request.IsHighPriority,
+                IsPrivate = request.IsPrivate,
+                AssignedToUserId = request.AssignedToUserId,
+            };
+            UpdateTaskResult result = await _taskService.UpdateAsync(model, _updateValidator, tr);
+
             if (result.NotifySignalR)
             {
                 await _listActionsHubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", AuthId);
@@ -328,11 +318,6 @@ public class TasksController : BaseController
                 _senderService.Enqueue(toDoAssistantPushNotification);
             }
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(Update)}");
-            throw;
-        }
         finally
         {
             tr.Finish();
@@ -376,11 +361,6 @@ public class TasksController : BaseController
 
                 _senderService.Enqueue(toDoAssistantPushNotification);
             }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(Delete)}");
-            throw;
         }
         finally
         {
@@ -436,11 +416,6 @@ public class TasksController : BaseController
                 _senderService.Enqueue(toDoAssistantPushNotification);
             }
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(Complete)}");
-            throw;
-        }
         finally
         {
             tr.Finish();
@@ -494,11 +469,6 @@ public class TasksController : BaseController
 
                 _senderService.Enqueue(toDoAssistantPushNotification);
             }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(Uncomplete)}");
-            throw;
         }
         finally
         {

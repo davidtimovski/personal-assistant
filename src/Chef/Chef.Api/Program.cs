@@ -14,6 +14,8 @@ if (builder.Environment.IsProduction())
 {
     builder.Host.AddKeyVault();
     builder.Services.AddDataProtectionWithCertificate(builder.Configuration);
+
+    builder.Host.AddSentryLogging(builder.Configuration, "Chef", new HashSet<string> { "GET /health", "GET /hub", "POST /hub/negotiate" });
 }
 
 builder.Services
@@ -61,5 +63,10 @@ app.MapHealthChecks("/health");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+if (app.Environment.IsProduction())
+{
+    app.UseSentryTracing();
+}
 
 app.Run();

@@ -5,6 +5,7 @@ using Chef.Application.Contracts.Ingredients.Models;
 using Core.Application.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using Sentry;
 using Xunit;
 
 namespace Api.UnitTests.Controllers.Chef;
@@ -28,7 +29,7 @@ public class IngredientsControllerTests
     {
         _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
         _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
-        _ingredientServiceMock.Setup(x => x.GetForUpdate(It.IsAny<int>(), It.IsAny<int>()))
+        _ingredientServiceMock.Setup(x => x.GetForUpdate(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()))
             .Returns((EditIngredient?)null);
 
         var result = _sut.GetForUpdate(It.IsAny<int>());

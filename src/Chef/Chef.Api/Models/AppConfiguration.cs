@@ -50,6 +50,14 @@ public class AppConfiguration
     /// </summary>
     [Required]
     public required SenderConfiguration RabbitMQ { get; set; }
+
+    /// <summary>
+    /// Coming from Azure Key Vault.
+    /// </summary>
+#if !DEBUG
+    [Required]
+#endif
+    public required AppSecrets Chef { get; set; }
 }
 
 public class Auth0Config
@@ -71,4 +79,10 @@ public class DietaryProfileConfig
 
     [Required]
     public required DailyIntakeReference ReferenceDailyIntake { get; set; }
+}
+
+public class AppSecrets
+{
+    [Required]
+    public required SentryConfiguration Sentry { get; set; }
 }

@@ -1,9 +1,9 @@
 ﻿using System.Data;
 using Chef.Application.Contracts.Ingredients;
 using Chef.Application.Entities;
-using Chef.Persistence;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
+using Sentry;
 
 namespace Chef.Persistence.Repositories;
 
@@ -12,11 +12,13 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
     public IngredientsRepository(ChefContext efContext)
         : base(efContext) { }
 
-    public IEnumerable<Ingredient> GetUserAndUsedPublicIngredients(int userId)
+    public IEnumerable<Ingredient> GetUserAndUsedPublicIngredients(int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(IngredientsRepository)}.{nameof(GetUserAndUsedPublicIngredients)}");
+
         using IDbConnection conn = OpenConnection();
 
-        return conn.Query<Ingredient>(@"SELECT * FROM (
+        var result = conn.Query<Ingredient>(@"SELECT * FROM (
 	                                        SELECT i.*, it.task_id, COUNT(ri) AS recipe_count
 	                                        FROM chef.ingredients AS i
 	                                        LEFT JOIN chef.ingredients_tasks AS it ON i.id = it.ingredient_id AND it.user_id = @UserId
@@ -38,16 +40,28 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
 	                                        GROUP BY i.id, it.task_id
                                         ) t
                                         ORDER BY t.modified_date DESC, t.name", new { UserId = userId });
+
+        metric.Finish();
+
+        return result;
     }
 
-    public Ingredient Get(int id)
+    public Ingredient Get(int id, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(IngredientsRepository)}.{nameof(Get)}");
+
         using IDbConnection conn = OpenConnection();
-        return conn.QueryFirstOrDefault<Ingredient>("SELECT * FROM chef.ingredients WHERE id = @Id", new { Id = id });
+        var result = conn.QueryFirstOrDefault<Ingredient>("SELECT * FROM chef.ingredients WHERE id = @Id", new { Id = id });
+
+        metric.Finish();
+
+        return result;
     }
 
-    public Ingredient? GetForUpdate(int id, int userId)
+    public Ingredient? GetForUpdate(int id, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(IngredientsRepository)}.{nameof(GetForUpdate)}");
+
         using IDbConnection conn = OpenConnection();
 
         var ingredient = conn.QueryFirstOrDefault<Ingredient>(@"SELECT DISTINCT i.*, it.task_id
@@ -87,11 +101,15 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
                                            ORDER BY r.name", new { IngredientId = id, UserId = userId });
         ingredient.Recipes.AddRange(recipes);
 
+        metric.Finish();
+
         return ingredient;
     }
 
-    public Ingredient? GetPublic(int id, int userId)
+    public Ingredient? GetPublic(int id, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(IngredientsRepository)}.{nameof(GetPublic)}");
+
         using IDbConnection conn = OpenConnection();
 
         const string query = @"SELECT DISTINCT i.*, it.task_id, b.id, b.name
@@ -138,27 +156,43 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
                                            ORDER BY r.name", new { IngredientId = id, UserId = userId });
         ingredient.Recipes.AddRange(recipes);
 
+        metric.Finish();
+
         return ingredient;
     }
 
-    public IEnumerable<Ingredient> GetForSuggestions(int userId)
+    public IEnumerable<Ingredient> GetForSuggestions(int userId, ISpan metricsSpan)
     {
-        return EFContext.Ingredients.AsNoTracking()
+        var metric = metricsSpan.StartChild($"{nameof(IngredientsRepository)}.{nameof(GetForSuggestions)}");
+
+        var result = EFContext.Ingredients.AsNoTracking()
             .Where(x => x.UserId == userId)
             .Include(x => x.Brand)
             .Include(x => x.RecipesIngredients.Where(x => x.Unit != null))
             .ToList();
+
+        metric.Finish();
+
+        return result;
     }
 
-    public IEnumerable<IngredientCategory> GetIngredientCategories()
+    public IEnumerable<IngredientCategory> GetIngredientCategories(ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(IngredientsRepository)}.{nameof(GetIngredientCategories)}");
+
         using IDbConnection conn = OpenConnection();
 
-        return conn.Query<IngredientCategory>("SELECT * FROM chef.ingredient_categories ORDER BY id");
+        var result = conn.Query<IngredientCategory>("SELECT * FROM chef.ingredient_categories ORDER BY id");
+
+        metric.Finish();
+
+        return result;
     }
 
-    public IEnumerable<ToDoTask> GetTaskSuggestions(int userId)
+    public IEnumerable<ToDoTask> GetTaskSuggestions(int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(IngredientsRepository)}.{nameof(GetTaskSuggestions)}");
+
         using IDbConnection conn = OpenConnection();
 
         const string query = @"SELECT DISTINCT t.id, t.name, l.id, l.name
@@ -170,12 +204,16 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
                                LEFT JOIN chef.recipes_ingredients AS ri on i.id = ri.ingredient_id
                                WHERE l.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted)";
 
-        return conn.Query<ToDoTask, ToDoList, ToDoTask>(query,
+        var result = conn.Query<ToDoTask, ToDoList, ToDoTask>(query,
             (task, list) =>
             {
                 task.List = list;
                 return task;
             }, new { UserId = userId });
+
+        metric.Finish();
+
+        return result;
     }
 
     public bool Exists(int id, int userId)
@@ -206,8 +244,10 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
             new { IngredientId = id, RecipeId = recipeId });
     }
 
-    public async Task UpdateAsync(Ingredient ingredient)
+    public async Task UpdateAsync(Ingredient ingredient, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(IngredientsRepository)}.{nameof(UpdateAsync)}");
+
         Ingredient dbIngredient = EFContext.Ingredients.First(x => x.Id == ingredient.Id);
 
         dbIngredient.Name = ingredient.Name;
@@ -268,10 +308,14 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
         }
 
         await EFContext.SaveChangesAsync();
+
+        metric.Finish();
     }
 
-    public async Task UpdatePublicAsync(int id, int? taskId, int userId, DateTime createdDate)
+    public async Task UpdatePublicAsync(int id, int? taskId, int userId, DateTime createdDate, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(IngredientsRepository)}.{nameof(UpdatePublicAsync)}");
+
         IngredientTask? ingredientTask = EFContext.IngredientsTasks.FirstOrDefault(x => x.IngredientId == id && x.UserId == userId);
         if (taskId.HasValue)
         {
@@ -304,18 +348,26 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
         }
 
         await EFContext.SaveChangesAsync();
+
+        metric.Finish();
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(int id, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(IngredientsRepository)}.{nameof(DeleteAsync)}");
+
         Ingredient ingredient = EFContext.Ingredients.First(x => x.Id == id);
         EFContext.Ingredients.Remove(ingredient);
 
         await EFContext.SaveChangesAsync();
+
+        metric.Finish();
     }
 
-    public async Task RemoveFromRecipesAsync(int id, int userId)
+    public async Task RemoveFromRecipesAsync(int id, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(IngredientsRepository)}.{nameof(RemoveFromRecipesAsync)}");
+
         int[] userRecipeIds = EFContext.Recipes.Where(x => x.UserId == userId).Select(x => x.Id).ToArray();
 
         var recipeIngredients = EFContext.RecipesIngredients.Where(x => x.IngredientId == id && userRecipeIds.Contains(x.RecipeId));
@@ -328,5 +380,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
         }
 
         await EFContext.SaveChangesAsync();
+
+        metric.Finish();
     }
 }
