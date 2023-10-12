@@ -29,11 +29,15 @@ public class TooltipsController : BaseController
             UserId
         );
 
-        var tooltipDtos = _tooltipService.GetAll(application, UserId, tr);
-
-        tr.Finish();
-
-        return Ok(tooltipDtos);
+        try
+        {
+            var tooltipDtos = _tooltipService.GetAll(application, UserId, tr);
+            return Ok(tooltipDtos);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpGet("key/{key}/{application}")]
@@ -45,11 +49,15 @@ public class TooltipsController : BaseController
             UserId
         );
 
-        var tooltipDto = _tooltipService.GetByKey(UserId, key, application, tr);
-
-        tr.Finish();
-
-        return Ok(tooltipDto);
+        try
+        {
+            var tooltipDto = _tooltipService.GetByKey(UserId, key, application, tr);
+            return Ok(tooltipDto);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpPut]
@@ -66,9 +74,14 @@ public class TooltipsController : BaseController
             UserId
         );
 
-        await _tooltipService.ToggleDismissedAsync(UserId, request.Key, request.Application, request.IsDismissed, tr);
-
-        tr.Finish();
+        try
+        {
+            await _tooltipService.ToggleDismissedAsync(UserId, request.Key, request.Application, request.IsDismissed, tr);
+        }
+        finally
+        {
+            tr.Finish();
+        }
 
         return NoContent();
     }

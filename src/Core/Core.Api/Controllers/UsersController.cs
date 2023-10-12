@@ -56,11 +56,16 @@ public class UsersController : BaseController
             UserId
         );
 
-        ChefPreferences preferences = _userService.GetChefPreferences(UserId, tr);
+        try
+        {
 
-        tr.Finish();
-
-        return Ok(preferences);
+            ChefPreferences preferences = _userService.GetChefPreferences(UserId, tr);
+            return Ok(preferences);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpPut("to-do-notifications-enabled")]
@@ -77,9 +82,14 @@ public class UsersController : BaseController
             UserId
         );
 
-        await _userService.UpdateToDoNotificationsEnabledAsync(UserId, dto.ToDoNotificationsEnabled, tr);
-
-        tr.Finish();
+        try
+        {
+            await _userService.UpdateToDoNotificationsEnabledAsync(UserId, dto.ToDoNotificationsEnabled, tr);
+        }
+        finally
+        {
+            tr.Finish();
+        }
 
         return NoContent();
     }
@@ -98,9 +108,14 @@ public class UsersController : BaseController
             UserId
         );
 
-        await _userService.UpdateChefNotificationsEnabledAsync(UserId, dto.ChefNotificationsEnabled, tr);
-
-        tr.Finish();
+        try
+        {
+            await _userService.UpdateChefNotificationsEnabledAsync(UserId, dto.ChefNotificationsEnabled, tr);
+        }
+        finally
+        {
+            tr.Finish();
+        }
 
         return NoContent();
     }
@@ -119,9 +134,14 @@ public class UsersController : BaseController
             UserId
         );
 
-        await _userService.UpdateImperialSystemAsync(UserId, dto.ImperialSystem, tr);
-
-        tr.Finish();
+        try
+        {
+            await _userService.UpdateImperialSystemAsync(UserId, dto.ImperialSystem, tr);
+        }
+        finally
+        {
+            tr.Finish();
+        }
 
         return NoContent();
     }
