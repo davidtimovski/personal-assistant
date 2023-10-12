@@ -5,6 +5,7 @@ using Chef.Application.Entities;
 using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
+using Sentry;
 
 namespace Chef.Application.Services;
 
@@ -24,11 +25,13 @@ public class IngredientService : IIngredientService
         _logger = logger;
     }
 
-    public List<IngredientDto> GetUserAndUsedPublicIngredients(int userId)
+    public List<IngredientDto> GetUserAndUsedPublicIngredients(int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(IngredientService)}.{nameof(GetUserAndUsedPublicIngredients)}");
+
         try
         {
-            IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetUserAndUsedPublicIngredients(userId);
+            IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetUserAndUsedPublicIngredients(userId, metric);
 
             var result = ingredients.Select(x => _mapper.Map<IngredientDto>(x)).ToList();
 
@@ -39,13 +42,19 @@ public class IngredientService : IIngredientService
             _logger.LogError(ex, $"Unexpected error in {nameof(GetUserAndUsedPublicIngredients)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public EditIngredient? GetForUpdate(int id, int userId)
+    public EditIngredient? GetForUpdate(int id, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(IngredientService)}.{nameof(GetForUpdate)}");
+
         try
         {
-            Ingredient? ingredient = _ingredientsRepository.GetForUpdate(id, userId);
+            Ingredient? ingredient = _ingredientsRepository.GetForUpdate(id, userId, metric);
 
             var result = _mapper.Map<EditIngredient>(ingredient);
 
@@ -56,13 +65,19 @@ public class IngredientService : IIngredientService
             _logger.LogError(ex, $"Unexpected error in {nameof(GetForUpdate)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public ViewIngredient? GetPublic(int id, int userId)
+    public ViewIngredient? GetPublic(int id, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(IngredientService)}.{nameof(GetPublic)}");
+
         try
         {
-            Ingredient? ingredient = _ingredientsRepository.GetPublic(id, userId);
+            Ingredient? ingredient = _ingredientsRepository.GetPublic(id, userId, metric);
 
             var result = _mapper.Map<ViewIngredient>(ingredient);
 
@@ -73,13 +88,19 @@ public class IngredientService : IIngredientService
             _logger.LogError(ex, $"Unexpected error in {nameof(GetPublic)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public IEnumerable<IngredientSuggestion> GetUserSuggestions(int userId)
+    public IEnumerable<IngredientSuggestion> GetUserSuggestions(int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(IngredientService)}.{nameof(GetUserSuggestions)}");
+
         try
         {
-            IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetForSuggestions(userId);
+            IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetForSuggestions(userId, metric);
 
             var suggestions = ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x)).ToList();
 
@@ -97,16 +118,22 @@ public class IngredientService : IIngredientService
             _logger.LogError(ex, $"Unexpected error in {nameof(GetUserSuggestions)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public PublicIngredientSuggestions GetPublicSuggestions()
+    public PublicIngredientSuggestions GetPublicSuggestions(ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(IngredientService)}.{nameof(GetPublicSuggestions)}");
+
         try
         {
             var result = new PublicIngredientSuggestions();
 
-            IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetForSuggestions(1);
-            IEnumerable<IngredientCategory> categories = _ingredientsRepository.GetIngredientCategories();
+            IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetForSuggestions(1, metric);
+            IEnumerable<IngredientCategory> categories = _ingredientsRepository.GetIngredientCategories(metric);
 
             List<IngredientSuggestion> suggestions = ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x)).ToList();
 
@@ -143,13 +170,19 @@ public class IngredientService : IIngredientService
             _logger.LogError(ex, $"Unexpected error in {nameof(GetPublicSuggestions)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public IEnumerable<TaskSuggestion> GetTaskSuggestions(int userId)
+    public IEnumerable<TaskSuggestion> GetTaskSuggestions(int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(IngredientService)}.{nameof(GetTaskSuggestions)}");
+
         try
         {
-            IEnumerable<ToDoTask> tasks = _ingredientsRepository.GetTaskSuggestions(userId);
+            IEnumerable<ToDoTask> tasks = _ingredientsRepository.GetTaskSuggestions(userId, metric);
 
             var result = tasks.Select(x => _mapper.Map<TaskSuggestion>(x));
             result = result.OrderBy(x => x.Group);
@@ -160,6 +193,10 @@ public class IngredientService : IIngredientService
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(GetTaskSuggestions)}");
             throw;
+        }
+        finally
+        {
+            metric.Finish();
         }
     }
 
@@ -202,9 +239,11 @@ public class IngredientService : IIngredientService
         }
     }
 
-    public async Task UpdateAsync(UpdateIngredient model, IValidator<UpdateIngredient> validator)
+    public async Task UpdateAsync(UpdateIngredient model, IValidator<UpdateIngredient> validator, ISpan metricsSpan)
     {
         ValidationUtil.ValidOrThrow(model, validator);
+
+        var metric = metricsSpan.StartChild($"{nameof(IngredientService)}.{nameof(UpdateAsync)}");
 
         try
         {
@@ -212,48 +251,64 @@ public class IngredientService : IIngredientService
             ingredient.Name = ingredient.Name.Trim();
             ingredient.ModifiedDate = DateTime.UtcNow;
 
-            await _ingredientsRepository.UpdateAsync(ingredient);
+            await _ingredientsRepository.UpdateAsync(ingredient, metric);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(UpdateAsync)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public async Task UpdateAsync(UpdatePublicIngredient model, IValidator<UpdatePublicIngredient> validator)
+    public async Task UpdateAsync(UpdatePublicIngredient model, IValidator<UpdatePublicIngredient> validator, ISpan metricsSpan)
     {
         ValidationUtil.ValidOrThrow(model, validator);
 
+        var metric = metricsSpan.StartChild($"{nameof(IngredientService)}.{nameof(UpdateAsync)}");
+
         try
         {
-            await _ingredientsRepository.UpdatePublicAsync(model.Id, model.TaskId, model.UserId, DateTime.UtcNow);
+            await _ingredientsRepository.UpdatePublicAsync(model.Id, model.TaskId, model.UserId, DateTime.UtcNow, metric);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(UpdateAsync)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public async Task DeleteOrRemoveFromRecipesAsync(int id, int userId)
+    public async Task DeleteOrRemoveFromRecipesAsync(int id, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(IngredientService)}.{nameof(DeleteOrRemoveFromRecipesAsync)}");
+
         try
         {
-            var ingredient = _ingredientsRepository.Get(id);
+            var ingredient = _ingredientsRepository.Get(id, metric);
             if (ingredient.UserId == 1)
             {
-                await _ingredientsRepository.RemoveFromRecipesAsync(id, userId);
+                await _ingredientsRepository.RemoveFromRecipesAsync(id, userId, metric);
             }
             else if (ingredient.UserId == userId)
             {
-                await _ingredientsRepository.DeleteAsync(id);
+                await _ingredientsRepository.DeleteAsync(id, metric);
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(DeleteOrRemoveFromRecipesAsync)}");
             throw;
+        }
+        finally
+        {
+            metric.Finish();
         }
     }
 

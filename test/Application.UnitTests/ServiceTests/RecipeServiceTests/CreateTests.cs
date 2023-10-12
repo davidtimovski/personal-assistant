@@ -54,8 +54,8 @@ public class CreateTests
     public async Task TrimsName()
     {
         string? actualName = null;
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-            .Callback<Recipe>(r => actualName = r.Name);
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
+            .Callback<Recipe, ISpan>((r, _) => actualName = r.Name);
 
         CreateRecipe model = new RecipeBuilder().WithName(" Recipe name ").BuildCreateModel();
 
@@ -69,8 +69,8 @@ public class CreateTests
     public async Task TrimsDescription_IfPresent()
     {
         string? actualDescription = null;
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-            .Callback<Recipe>(r => actualDescription = r.Description);
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
+            .Callback<Recipe, ISpan>((r, _) => actualDescription = r.Description);
 
         CreateRecipe model = new RecipeBuilder().WithDescription(" Description ").BuildCreateModel();
 
@@ -83,9 +83,9 @@ public class CreateTests
     [Fact]
     public async Task TrimsRecipeIngredientNames_IfTheyAreNotLinkedToTasks()
     {
-        List<RecipeIngredient> actualRecipeIngredients = null;
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-            .Callback<Recipe>(r => actualRecipeIngredients = r.RecipeIngredients);
+        List<RecipeIngredient> actualRecipeIngredients = null!;
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
+            .Callback<Recipe, ISpan>((r, _) => actualRecipeIngredients = r.RecipeIngredients);
 
         CreateRecipe model = new RecipeBuilder()
             .WithRecipeIngredients(" Ingredient 1", "Ingredient 2 ", " Ingredient 3 ").BuildCreateModel();
@@ -107,9 +107,9 @@ public class CreateTests
     [Fact]
     public async Task SetsAmountOfRecipeIngredientsToNull_IfAmountIsZero()
     {
-        List<RecipeIngredient> actualRecipeIngredients = null;
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-            .Callback<Recipe>(r => actualRecipeIngredients = r.RecipeIngredients);
+        List<RecipeIngredient> actualRecipeIngredients = null!;
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
+            .Callback<Recipe, ISpan>((r, _) => actualRecipeIngredients = r.RecipeIngredients);
 
         CreateRecipe model = new RecipeBuilder().WithRecipeIngredientsWithAmounts(0, 0).BuildCreateModel();
 
@@ -124,9 +124,9 @@ public class CreateTests
     [Fact]
     public async Task SetsUnitOfRecipeIngredientsToNull_IfAmountIsZero()
     {
-        List<RecipeIngredient> actualRecipeIngredients = null;
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-            .Callback<Recipe>(r => actualRecipeIngredients = r.RecipeIngredients);
+        List<RecipeIngredient> actualRecipeIngredients = null!;
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
+            .Callback<Recipe, ISpan>((r, _) => actualRecipeIngredients = r.RecipeIngredients);
 
         CreateRecipe model = new RecipeBuilder().WithRecipeIngredientsWithAmounts(0, 0).BuildCreateModel();
 
@@ -141,9 +141,9 @@ public class CreateTests
     [Fact]
     public async Task SetsUnitOfRecipeIngredientsToNull_IfAmountIsNull()
     {
-        List<RecipeIngredient> actualRecipeIngredients = null;
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-            .Callback<Recipe>(r => actualRecipeIngredients = r.RecipeIngredients);
+        List<RecipeIngredient> actualRecipeIngredients = null!;
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
+            .Callback<Recipe, ISpan>((r, _) => actualRecipeIngredients = r.RecipeIngredients);
 
         CreateRecipe model = new RecipeBuilder().WithRecipeIngredientsWithAmounts(null, null).BuildCreateModel();
 
@@ -162,8 +162,8 @@ public class CreateTests
     public async Task CollapsesNewlinesInInstructionsToAtMostTwo(string instructions, string expected)
     {
         string? actualInstructions = null;
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-            .Callback<Recipe>(r => actualInstructions = r.Instructions);
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
+            .Callback<Recipe, ISpan>((r, _) => actualInstructions = r.Instructions);
 
         CreateRecipe model = new RecipeBuilder().WithInstructions(instructions).BuildCreateModel();
 
@@ -176,8 +176,8 @@ public class CreateTests
     public async Task TrimsInstructions_IfPresent()
     {
         string? actualInstructions = null;
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-            .Callback<Recipe>(r => actualInstructions = r.Instructions);
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
+            .Callback<Recipe, ISpan>((r, _) => actualInstructions = r.Instructions);
 
         CreateRecipe model = new RecipeBuilder().WithInstructions(" Instructions ").BuildCreateModel();
 
@@ -191,8 +191,8 @@ public class CreateTests
     public async Task SetsPrepDurationToNull_IfLowerThanOneMinute()
     {
         TimeSpan? actualPrepDuration = null;
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-            .Callback<Recipe>(r => actualPrepDuration = r.PrepDuration);
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
+            .Callback<Recipe, ISpan>((r, _) => actualPrepDuration = r.PrepDuration);
 
         CreateRecipe model = new RecipeBuilder().WithPrepDuration(TimeSpan.FromSeconds(59)).BuildCreateModel();
 
@@ -205,8 +205,8 @@ public class CreateTests
     public async Task SetsCookDurationToNull_IfLowerThanOneMinute()
     {
         TimeSpan? actualCookDuration = null;
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-            .Callback<Recipe>(r => actualCookDuration = r.CookDuration);
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
+            .Callback<Recipe, ISpan>((r, _) => actualCookDuration = r.CookDuration);
 
         CreateRecipe model = new RecipeBuilder().WithCookDuration(TimeSpan.FromSeconds(59)).BuildCreateModel();
 
@@ -219,8 +219,8 @@ public class CreateTests
     public async Task SetsCreatedDate()
     {
         var actualCreatedDate = new DateTime();
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-            .Callback<Recipe>(r => actualCreatedDate = r.CreatedDate);
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
+            .Callback<Recipe, ISpan>((r, _) => actualCreatedDate = r.CreatedDate);
 
         CreateRecipe model = new RecipeBuilder().BuildCreateModel();
 
@@ -233,8 +233,8 @@ public class CreateTests
     public async Task SetsModifiedDate()
     {
         var actualModifiedDate = new DateTime();
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>()))
-            .Callback<Recipe>(r => actualModifiedDate = r.ModifiedDate);
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
+            .Callback<Recipe, ISpan>((r, _) => actualModifiedDate = r.ModifiedDate);
 
         CreateRecipe model = new RecipeBuilder().BuildCreateModel();
 

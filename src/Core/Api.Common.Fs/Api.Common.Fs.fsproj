@@ -13,7 +13,7 @@
 		<PackageReference Include="Giraffe" Version="6.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.10" />
 		<PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
-		<PackageReference Include="Sentry.AspNetCore" Version="3.39.0" />
+		<PackageReference Include="Sentry.AspNetCore" Version="$(SentryVersion)" />
 	</ItemGroup>
 
 	<ItemGroup>

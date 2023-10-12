@@ -8,12 +8,14 @@ using Chef.Utility;
 using FluentValidation;
 using Microsoft.Extensions.Options;
 using Moq;
+using Sentry;
 using Xunit;
 
 namespace Application.UnitTests.ServiceTests.DietaryProfileServiceTests;
 
 public class GetRecommendedDailyIntakeTests
 {
+    private readonly Mock<ISpan> _metricsSpanMock = new();
     private readonly IDietaryProfileService _sut;
 
     public GetRecommendedDailyIntakeTests()
@@ -22,6 +24,8 @@ public class GetRecommendedDailyIntakeTests
 
         var dailyIntakeRefOptionsMock = new Mock<IOptions<DailyIntakeReference>>();
         dailyIntakeRefOptionsMock.Setup(x => x.Value).Returns(intakeRefModel);
+
+        _metricsSpanMock.Setup(x => x.StartChild(It.IsAny<string>())).Returns(new Mock<ISpan>().Object);
 
         _sut = new DietaryProfileService(
             new Mock<IConversion>().Object,
@@ -38,7 +42,7 @@ public class GetRecommendedDailyIntakeTests
         GetRecommendedDailyIntake model = new DietaryProfileBuilder().BuildGetRecommendedModel();
         var validator = ValidatorMocker.GetSuccessful<GetRecommendedDailyIntake>();
 
-        _sut.GetRecommendedDailyIntake(model, validator.Object);
+        _sut.GetRecommendedDailyIntake(model, validator.Object, _metricsSpanMock.Object);
 
         validator.Verify(x => x.Validate(model));
     }
@@ -49,6 +53,6 @@ public class GetRecommendedDailyIntakeTests
         GetRecommendedDailyIntake model = new DietaryProfileBuilder().BuildGetRecommendedModel();
         var failedValidator = ValidatorMocker.GetFailed<GetRecommendedDailyIntake>();
 
-        Assert.Throws<ValidationException>(() => _sut.GetRecommendedDailyIntake(model, failedValidator.Object));
+        Assert.Throws<ValidationException>(() => _sut.GetRecommendedDailyIntake(model, failedValidator.Object, It.IsAny<ISpan>()));
     }
 }

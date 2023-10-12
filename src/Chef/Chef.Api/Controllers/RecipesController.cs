@@ -80,96 +80,230 @@ public class RecipesController : BaseController
     [HttpGet]
     public IActionResult GetAll()
     {
-        IEnumerable<SimpleRecipe> recipeDtos = _recipeService.GetAll(UserId);
+        var tr = Metrics.StartTransactionWithUser(
+            $"{Request.Method} api/recipes",
+            $"{nameof(RecipesController)}.{nameof(GetAll)}",
+            UserId
+        );
 
-        return Ok(recipeDtos);
+        try
+        {
+            IEnumerable<SimpleRecipe> recipeDtos = _recipeService.GetAll(UserId, tr);
+
+            return Ok(recipeDtos);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpGet("{id}/{currency}")]
     public IActionResult Get(int id, string currency)
     {
-        RecipeDto? recipeDto = _recipeService.Get(id, UserId, currency);
-        if (recipeDto is null)
-        {
-            return NotFound();
-        }
+        var tr = Metrics.StartTransactionWithUser(
+            $"{Request.Method} api/recipes/{id}/{currency}",
+            $"{nameof(RecipesController)}.{nameof(Get)}",
+            UserId
+        );
 
-        foreach (var ingredient in recipeDto.Ingredients.Where(x => x.IsPublic))
+        try
         {
-            ingredient.Name = _ingredientsLocalizer[ingredient.Name];
-        }
+            RecipeDto? recipeDto = _recipeService.Get(id, UserId, currency, tr);
+            if (recipeDto is null)
+            {
+                return NotFound();
+            }
 
-        return Ok(recipeDto);
+            foreach (var ingredient in recipeDto.Ingredients.Where(x => x.IsPublic))
+            {
+                ingredient.Name = _ingredientsLocalizer[ingredient.Name];
+            }
+
+            return Ok(recipeDto);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpGet("{id}/update")]
     public IActionResult GetForUpdate(int id)
     {
-        RecipeForUpdate? recipeDto = _recipeService.GetForUpdate(id, UserId);
-        if (recipeDto is null)
-        {
-            return NotFound();
-        }
+        var tr = Metrics.StartTransactionWithUser(
+            $"{Request.Method} api/recipes/{id}/update",
+            $"{nameof(RecipesController)}.{nameof(GetForUpdate)}",
+            UserId
+        );
 
-        foreach (var ingredient in recipeDto.Ingredients.Where(x => x.IsPublic))
+        try
         {
-            ingredient.Name = _ingredientsLocalizer[ingredient.Name];
-        }
+            RecipeForUpdate? recipeDto = _recipeService.GetForUpdate(id, UserId, tr);
+            if (recipeDto is null)
+            {
+                return NotFound();
+            }
 
-        return Ok(recipeDto);
+            foreach (var ingredient in recipeDto.Ingredients.Where(x => x.IsPublic))
+            {
+                ingredient.Name = _ingredientsLocalizer[ingredient.Name];
+            }
+
+            return Ok(recipeDto);
+
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpGet("{id}/with-shares")]
     public IActionResult GetWithShares(int id)
     {
-        RecipeWithShares? recipeDto = _recipeService.GetWithShares(id, UserId);
-        return recipeDto is null ? NotFound() : Ok(recipeDto);
+        var tr = Metrics.StartTransactionWithUser(
+            $"{Request.Method} api/recipes/{id}/update",
+            $"{nameof(RecipesController)}.{nameof(GetWithShares)}",
+            UserId
+        );
+
+        try
+        {
+            RecipeWithShares? recipeDto = _recipeService.GetWithShares(id, UserId, tr);
+
+            return recipeDto is null ? NotFound() : Ok(recipeDto);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpGet("share-requests")]
     public IActionResult GetShareRequests()
     {
-        IEnumerable<Application.Contracts.Recipes.Models.ShareRecipeRequest> shareRequests = _recipeService.GetShareRequests(UserId);
+        var tr = Metrics.StartTransactionWithUser(
+            $"{Request.Method} api/recipes/share-requests",
+            $"{nameof(RecipesController)}.{nameof(GetShareRequests)}",
+            UserId
+        );
 
-        return Ok(shareRequests);
+        try
+        {
+            IEnumerable<Application.Contracts.Recipes.Models.ShareRecipeRequest> shareRequests = _recipeService.GetShareRequests(UserId, tr);
+
+            return Ok(shareRequests);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpGet("pending-share-requests-count")]
     public IActionResult GetPendingShareRequestsCount()
     {
-        int pendingShareRequestsCount = _recipeService.GetPendingShareRequestsCount(UserId);
+        var tr = Metrics.StartTransactionWithUser(
+            $"{Request.Method} api/recipes/pending-share-requests-count",
+            $"{nameof(RecipesController)}.{nameof(GetPendingShareRequestsCount)}",
+            UserId
+        );
 
-        return Ok(pendingShareRequestsCount);
+        try
+        {
+            int pendingShareRequestsCount = _recipeService.GetPendingShareRequestsCount(UserId, tr);
+
+            return Ok(pendingShareRequestsCount);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpGet("{id}/sending")]
     public IActionResult GetForSending(int id)
     {
-        RecipeForSending recipeDto = _recipeService.GetForSending(id, UserId);
-        return recipeDto is null ? NotFound() : Ok(recipeDto);
+        var tr = Metrics.StartTransactionWithUser(
+            $"{Request.Method} api/recipes/{id}/sending",
+            $"{nameof(RecipesController)}.{nameof(GetForSending)}",
+            UserId
+        );
+
+        try
+        {
+            RecipeForSending recipeDto = _recipeService.GetForSending(id, UserId, tr);
+
+            return recipeDto is null ? NotFound() : Ok(recipeDto);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpGet("send-requests")]
     public IActionResult GetSendRequests()
     {
-        IEnumerable<SendRequestDto> sendRequestDtos = _recipeService.GetSendRequests(UserId);
+        var tr = Metrics.StartTransactionWithUser(
+            $"{Request.Method} api/recipes/send-requests",
+            $"{nameof(RecipesController)}.{nameof(GetSendRequests)}",
+            UserId
+        );
 
-        return Ok(sendRequestDtos);
+        try
+        {
+            IEnumerable<SendRequestDto> sendRequestDtos = _recipeService.GetSendRequests(UserId, tr);
+
+            return Ok(sendRequestDtos);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpGet("pending-send-requests-count")]
     public IActionResult GetPendingSendRequestsCount()
     {
-        int pendingSendRequestsCount = _recipeService.GetPendingSendRequestsCount(UserId);
+        var tr = Metrics.StartTransactionWithUser(
+            $"{Request.Method} api/recipes/pending-send-requests-count",
+            $"{nameof(RecipesController)}.{nameof(GetPendingSendRequestsCount)}",
+            UserId
+        );
 
-        return Ok(pendingSendRequestsCount);
+        try
+        {
+            int pendingSendRequestsCount = _recipeService.GetPendingSendRequestsCount(UserId, tr);
+
+            return Ok(pendingSendRequestsCount);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpGet("{id}/review")]
     public IActionResult GetForReview(int id)
     {
-        RecipeForReview? recipeDto = _recipeService.GetForReview(id, UserId);
-        return recipeDto is null ? NotFound() : Ok(recipeDto);
+        var tr = Metrics.StartTransactionWithUser(
+            $"{Request.Method} api/recipes/{id}/review",
+            $"{nameof(RecipesController)}.{nameof(GetForReview)}",
+            UserId
+        );
+
+        try
+        {
+            RecipeForReview? recipeDto = _recipeService.GetForReview(id, UserId, tr);
+
+            return recipeDto is null ? NotFound() : Ok(recipeDto);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpPost]
@@ -182,34 +316,39 @@ public class RecipesController : BaseController
 
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} api/recipes",
-            $"{nameof(RecipesController)}.{nameof(Create)}",
+            $"{nameof(RecipesController)}.{nameof(GetAll)}",
             UserId
         );
 
-        var model = new CreateRecipe
+        try
         {
-            UserId = UserId,
-            Name = request.Name,
-            Description = request.Description,
-            Ingredients = request.Ingredients.Select(x => new Application.Contracts.Recipes.Models.UpdateRecipeIngredient
+            var model = new CreateRecipe
             {
-                Id = x.Id,
-                Name = x.Name,
-                Amount = x.Amount,
-                Unit = x.Unit
-            }).ToList(),
-            Instructions = request.Instructions,
-            PrepDuration = request.PrepDuration,
-            CookDuration = request.CookDuration,
-            Servings = request.Servings,
-            ImageUri = request.ImageUri,
-            VideoUrl = request.VideoUrl,
-        };
-        int id = await _recipeService.CreateAsync(model, _createRecipeValidator, tr);
+                UserId = UserId,
+                Name = request.Name,
+                Description = request.Description,
+                Ingredients = request.Ingredients.Select(x => new Application.Contracts.Recipes.Models.UpdateRecipeIngredient
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Amount = x.Amount,
+                    Unit = x.Unit
+                }).ToList(),
+                Instructions = request.Instructions,
+                PrepDuration = request.PrepDuration,
+                CookDuration = request.CookDuration,
+                Servings = request.Servings,
+                ImageUri = request.ImageUri,
+                VideoUrl = request.VideoUrl,
+            };
+            int id = await _recipeService.CreateAsync(model, _createRecipeValidator, tr);
 
-        tr.Finish();
-
-        return StatusCode(201, id);
+            return StatusCode(201, id);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpPost("upload-temp-image")]
@@ -237,11 +376,6 @@ public class RecipesController : BaseController
 
             return StatusCode(201, new { tempImageUri });
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(UploadTempImage)}");
-            throw;
-        }
         finally
         {
             tr.Finish();
@@ -262,30 +396,30 @@ public class RecipesController : BaseController
             UserId
         );
 
-        var model = new UpdateRecipe
-        {
-            UserId = UserId,
-            Id = request.Id,
-            Name = request.Name,
-            Description = request.Description,
-            Ingredients = request.Ingredients.Select(x => new Application.Contracts.Recipes.Models.UpdateRecipeIngredient
-            {
-                Id = x.Id,
-                Name = x.Name,
-                Amount = x.Amount,
-                Unit = x.Unit
-            }).ToList(),
-            Instructions = request.Instructions,
-            PrepDuration = request.PrepDuration,
-            CookDuration = request.CookDuration,
-            Servings = request.Servings,
-            ImageUri = request.ImageUri,
-            VideoUrl = request.VideoUrl,
-        };
-        UpdateRecipeResult result = await _recipeService.UpdateAsync(model, _updateRecipeValidator, tr);
-
         try
         {
+            var model = new UpdateRecipe
+            {
+                UserId = UserId,
+                Id = request.Id,
+                Name = request.Name,
+                Description = request.Description,
+                Ingredients = request.Ingredients.Select(x => new Application.Contracts.Recipes.Models.UpdateRecipeIngredient
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Amount = x.Amount,
+                    Unit = x.Unit
+                }).ToList(),
+                Instructions = request.Instructions,
+                PrepDuration = request.PrepDuration,
+                CookDuration = request.CookDuration,
+                Servings = request.Servings,
+                ImageUri = request.ImageUri,
+                VideoUrl = request.VideoUrl,
+            };
+            UpdateRecipeResult result = await _recipeService.UpdateAsync(model, _updateRecipeValidator, tr);
+
             foreach (var recipient in result.NotificationRecipients)
             {
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
@@ -301,11 +435,6 @@ public class RecipesController : BaseController
                 _senderService.Enqueue(pushNotification);
             }
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(Update)}");
-            throw;
-        }
         finally
         {
             tr.Finish();
@@ -318,15 +447,15 @@ public class RecipesController : BaseController
     public async Task<IActionResult> Delete(int id)
     {
         var tr = Metrics.StartTransactionWithUser(
-            $"{Request.Method} api/recipes",
+            $"{Request.Method} api/recipes/{id}",
             $"{nameof(RecipesController)}.{nameof(Delete)}",
             UserId
         );
 
-        DeleteRecipeResult result = await _recipeService.DeleteAsync(id, UserId, tr);
-
         try
         {
+            DeleteRecipeResult result = await _recipeService.DeleteAsync(id, UserId, tr);
+
             foreach (var recipient in result.NotificationRecipients)
             {
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
@@ -342,11 +471,6 @@ public class RecipesController : BaseController
                 _senderService.Enqueue(pushNotification);
             }
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(Delete)}");
-            throw;
-        }
         finally
         {
             tr.Finish();
@@ -358,21 +482,34 @@ public class RecipesController : BaseController
     [HttpGet("can-share-with-user/{email}")]
     public IActionResult CanShareRecipeWithUser(string email)
     {
-        var response = new CanShareResponse
-        {
-            CanShare = false
-        };
+        var tr = Metrics.StartTransactionWithUser(
+            $"{Request.Method} api/recipes/can-share-with-user/{email}",
+            $"{nameof(RecipesController)}.{nameof(CanShareRecipeWithUser)}",
+            UserId
+        );
 
-        var user = _userService.Get(email);
-
-        if (user != null)
+        try
         {
-            response.UserId = user.Id;
-            response.ImageUri = user.ImageUri;
-            response.CanShare = _recipeService.CanShareWithUser(user.Id, UserId);
+            var response = new CanShareResponse
+            {
+                CanShare = false
+            };
+
+            var user = _userService.Get(email);
+
+            if (user != null)
+            {
+                response.UserId = user.Id;
+                response.ImageUri = user.ImageUri;
+                response.CanShare = _recipeService.CanShareWithUser(user.Id, UserId, tr);
+            }
+
+            return Ok(response);
         }
-
-        return Ok(response);
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpPut("share")]
@@ -383,18 +520,24 @@ public class RecipesController : BaseController
             return BadRequest();
         }
 
+        var tr = Metrics.StartTransactionWithUser(
+            $"{Request.Method} api/recipes/share",
+            $"{nameof(RecipesController)}.{nameof(Share)}",
+            UserId
+        );
+
         try
         {
             foreach (int removedUserId in request.RemovedShares)
             {
-                if (!_recipeService.CheckIfUserCanBeNotifiedOfRecipeChange(request.RecipeId, removedUserId))
+                if (!_recipeService.CheckIfUserCanBeNotifiedOfRecipeChange(request.RecipeId, removedUserId, tr))
                 {
                     continue;
                 }
 
                 var currentUser = _userService.Get(UserId);
                 var user = _userService.Get(removedUserId);
-                RecipeToNotify recipe = _recipeService.Get(request.RecipeId);
+                RecipeToNotify recipe = _recipeService.Get(request.RecipeId, tr);
 
                 CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
                 var message = _localizer["RemovedShareNotification", currentUser.Name, recipe.Name];
@@ -408,21 +551,20 @@ public class RecipesController : BaseController
 
                 _senderService.Enqueue(pushNotification);
             }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(Share)}");
-            throw;
-        }
 
-        var model = new ShareRecipe
+            var model = new ShareRecipe
+            {
+                UserId = UserId,
+                RecipeId = request.RecipeId,
+                NewShares = request.NewShares,
+                RemovedShares = request.RemovedShares,
+            };
+            await _recipeService.ShareAsync(model, _shareValidator, tr);
+        }
+        finally
         {
-            UserId = UserId,
-            RecipeId = request.RecipeId,
-            NewShares = request.NewShares,
-            RemovedShares = request.RemovedShares,
-        };
-        await _recipeService.ShareAsync(model, _shareValidator);
+            tr.Finish();
+        }
 
         return NoContent();
     }
@@ -435,14 +577,20 @@ public class RecipesController : BaseController
             return BadRequest();
         }
 
-        SetShareIsAcceptedResult result = await _recipeService.SetShareIsAcceptedAsync(request.RecipeId, UserId, request.IsAccepted);
-        if (!result.Notify())
-        {
-            return NoContent();
-        }
+        var tr = Metrics.StartTransactionWithUser(
+            $"{Request.Method} api/recipes/share-is-accepted",
+            $"{nameof(RecipesController)}.{nameof(SetShareIsAccepted)}",
+            UserId
+        );
 
         try
         {
+            SetShareIsAcceptedResult result = await _recipeService.SetShareIsAcceptedAsync(request.RecipeId, UserId, request.IsAccepted, tr);
+            if (!result.Notify())
+            {
+                return NoContent();
+            }
+
             var localizerKey = request.IsAccepted ? "JoinedRecipeNotification" : "DeclinedShareRequestNotification";
             foreach (var recipient in result.NotificationRecipients)
             {
@@ -459,10 +607,9 @@ public class RecipesController : BaseController
                 _senderService.Enqueue(pushNotification);
             }
         }
-        catch (Exception ex)
+        finally
         {
-            _logger.LogError(ex, $"Unexpected error in {nameof(SetShareIsAccepted)}");
-            throw;
+            tr.Finish();
         }
 
         return NoContent();
@@ -471,10 +618,16 @@ public class RecipesController : BaseController
     [HttpDelete("{id}/leave")]
     public async Task<IActionResult> Leave(int id)
     {
-        LeaveRecipeResult result = await _recipeService.LeaveAsync(id, UserId);
+        var tr = Metrics.StartTransactionWithUser(
+            $"{Request.Method} api/recipes/{id}/leave",
+            $"{nameof(RecipesController)}.{nameof(Leave)}",
+            UserId
+        );
 
         try
         {
+            LeaveRecipeResult result = await _recipeService.LeaveAsync(id, UserId, tr);
+
             foreach (var recipient in result.NotificationRecipients)
             {
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
@@ -490,10 +643,9 @@ public class RecipesController : BaseController
                 _senderService.Enqueue(pushNotification);
             }
         }
-        catch (Exception ex)
+        finally
         {
-            _logger.LogError(ex, $"Unexpected error in {nameof(Leave)}");
-            throw;
+            tr.Finish();
         }
 
         return NoContent();
@@ -502,23 +654,36 @@ public class RecipesController : BaseController
     [HttpGet("can-send-recipe-to-user/{email}/{recipeId}")]
     public IActionResult CanSendRecipeToUser(string email, int recipeId)
     {
-        var response = new CanSendResponse
-        {
-            CanSend = false,
-        };
+        var tr = Metrics.StartTransactionWithUser(
+            $"{Request.Method} api/recipes/can-send-recipe-to-user/{email}/{recipeId}",
+            $"{nameof(RecipesController)}.{nameof(CanSendRecipeToUser)}",
+            UserId
+        );
 
-        var user = _userService.Get(email);
-        if (user != null)
+        try
         {
-            var (canSend, alreadySent) = _recipeService.CheckSendRequest(recipeId, user.Id, UserId);
+            var response = new CanSendResponse
+            {
+                CanSend = false,
+            };
 
-            response.UserId = user.Id;
-            response.ImageUri = user.ImageUri;
-            response.CanSend = canSend;
-            response.AlreadySent = alreadySent;
+            var user = _userService.Get(email);
+            if (user != null)
+            {
+                var (canSend, alreadySent) = _recipeService.CheckSendRequest(recipeId, user.Id, UserId, tr);
+
+                response.UserId = user.Id;
+                response.ImageUri = user.ImageUri;
+                response.CanSend = canSend;
+                response.AlreadySent = alreadySent;
+            }
+
+            return Ok(response);
         }
-
-        return Ok(response);
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpPost("send")]
@@ -529,16 +694,22 @@ public class RecipesController : BaseController
             return BadRequest();
         }
 
-        var model = new CreateSendRequest
-        {
-            UserId = UserId,
-            RecipeId = request.RecipeId,
-            RecipientsIds = request.RecipientsIds
-        };
-        SendRecipeResult result = await _recipeService.SendAsync(model, _createSendRequestValidator);
+        var tr = Metrics.StartTransactionWithUser(
+            $"{Request.Method} api/recipes/send",
+            $"{nameof(RecipesController)}.{nameof(Send)}",
+            UserId
+        );
 
         try
         {
+            var model = new CreateSendRequest
+            {
+                UserId = UserId,
+                RecipeId = request.RecipeId,
+                RecipientsIds = request.RecipientsIds
+            };
+            SendRecipeResult result = await _recipeService.SendAsync(model, _createSendRequestValidator, tr);
+
             foreach (var recipient in result.NotificationRecipients)
             {
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
@@ -554,14 +725,13 @@ public class RecipesController : BaseController
 
                 _senderService.Enqueue(pushNotification);
             }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(Send)}");
-            throw;
-        }
 
-        return StatusCode(201, null);
+            return StatusCode(201, null);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpPut("decline-send-request")]
@@ -572,14 +742,21 @@ public class RecipesController : BaseController
             return BadRequest();
         }
 
-        DeclineSendRequestResult result = await _recipeService.DeclineSendRequestAsync(dto.RecipeId, UserId);
-        if (!result.Notify())
-        {
-            return NoContent();
-        }
+        var tr = Metrics.StartTransactionWithUser(
+            $"{Request.Method} api/recipes/decline-send-request",
+            $"{nameof(RecipesController)}.{nameof(DeclineSendRequest)}",
+            UserId
+        );
 
         try
         {
+            DeclineSendRequestResult result = await _recipeService.DeclineSendRequestAsync(dto.RecipeId, UserId, tr);
+            if (!result.Notify())
+            {
+                tr.Finish();
+                return NoContent();
+            }
+
             NotificationRecipient recipient = result.NotificationRecipients.First();
             CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
             var message = _localizer["DeclinedSendRequestNotification", result.ActionUserName, result.RecipeName];
@@ -593,10 +770,9 @@ public class RecipesController : BaseController
 
             _senderService.Enqueue(pushNotification);
         }
-        catch (Exception ex)
+        finally
         {
-            _logger.LogError(ex, $"Unexpected error in {nameof(DeclineSendRequest)}");
-            throw;
+            tr.Finish();
         }
 
         return NoContent();
@@ -605,7 +781,20 @@ public class RecipesController : BaseController
     [HttpDelete("{recipeId}/send-request")]
     public async Task<IActionResult> DeleteSendRequest(int recipeId)
     {
-        await _recipeService.DeleteSendRequestAsync(recipeId, UserId);
+        var tr = Metrics.StartTransactionWithUser(
+            $"{Request.Method} api/recipes/{recipeId}/send-request",
+            $"{nameof(RecipesController)}.{nameof(DeleteSendRequest)}",
+            UserId
+        );
+
+        try
+        {
+            await _recipeService.DeleteSendRequestAsync(recipeId, UserId, tr);
+        }
+        finally
+        {
+            tr.Finish();
+        }
 
         return NoContent();
     }
@@ -624,38 +813,37 @@ public class RecipesController : BaseController
             UserId
         );
 
-        var importModel = new ImportRecipe
-        {
-            UserId = UserId
-        };
-
-        if (dto.CheckIfReviewRequired && _recipeService.IngredientsReviewIsRequired(dto.Id, importModel.UserId))
-        {
-            return Ok(0);
-        }
-
-        importModel.Id = dto.Id;
-        importModel.IngredientReplacements = dto.IngredientReplacements;
-
-        // Copy recipe image if not default
-        RecipeToNotify recipe = _recipeService.Get(importModel.Id);
-
-        importModel.ImageUri = await _cdnService.CopyAndUploadAsync(
-            localTempPath: Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp"),
-            imageUriToCopy: recipe.ImageUri,
-            uploadPath: $"users/{importModel.UserId}/recipes",
-            template: "recipe",
-            tr
-        );
-
-        int id = await _recipeService.ImportAsync(importModel, _importRecipeValidator);
-
-        // Notify
-        User currentUser = _userService.Get(importModel.UserId);
-        User recipeUser = _userService.Get(recipe.UserId);
-
         try
         {
+            var importModel = new ImportRecipe
+            {
+                UserId = UserId
+            };
+
+            if (dto.CheckIfReviewRequired && _recipeService.IngredientsReviewIsRequired(dto.Id, importModel.UserId, tr))
+            {
+                return Ok(0);
+            }
+
+            importModel.Id = dto.Id;
+            importModel.IngredientReplacements = dto.IngredientReplacements;
+
+            // Copy recipe image if not default
+            RecipeToNotify recipe = _recipeService.Get(importModel.Id, tr);
+
+            importModel.ImageUri = await _cdnService.CopyAndUploadAsync(
+                localTempPath: Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp"),
+                imageUriToCopy: recipe.ImageUri,
+                uploadPath: $"users/{importModel.UserId}/recipes",
+                template: "recipe",
+                tr
+            );
+
+            int id = await _recipeService.ImportAsync(importModel, _importRecipeValidator, tr);
+
+            User currentUser = _userService.Get(importModel.UserId);
+            User recipeUser = _userService.Get(recipe.UserId);
+
             CultureInfo.CurrentCulture = new CultureInfo(recipeUser.Language, false);
             var message = _localizer["AcceptedSendRequestNotification", currentUser.Name, recipe.Name];
 
@@ -667,17 +855,12 @@ public class RecipesController : BaseController
             };
 
             _senderService.Enqueue(pushNotification);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(TryImport)}");
-            throw;
+
+            return StatusCode(201, id);
         }
         finally
         {
             tr.Finish();
         }
-
-        return StatusCode(201, id);
     }
 }

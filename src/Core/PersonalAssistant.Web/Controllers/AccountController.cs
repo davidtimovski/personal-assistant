@@ -288,7 +288,7 @@ public class AccountController : BaseController
             // Delete resources
             var user = _userService.Get(UserId);
             var filePaths = new List<string> { user.ImageUri };
-            IEnumerable<string> recipeUris = _recipeService.GetAllImageUris(user.Id);
+            IEnumerable<string> recipeUris = _recipeService.GetAllImageUris(user.Id, tr);
             filePaths.AddRange(recipeUris);
             await _cdnService.DeleteUserResourcesAsync(user.Id, filePaths, tr);
 
@@ -539,7 +539,7 @@ public class AccountController : BaseController
             { "SampleRecipeDescription", _localizer["SampleRecipeDescription"] },
             { "SampleRecipeInstructions", _localizer["SampleRecipeInstructions"] }
         };
-        await _recipeService.CreateSampleAsync(userId, sampleRecipeTranslations);
+        await _recipeService.CreateSampleAsync(userId, sampleRecipeTranslations, metricsSpan);
     }
 
     #endregion

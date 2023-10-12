@@ -1,9 +1,10 @@
 ﻿using System.Data;
 using Chef.Application.Contracts.Recipes;
 using Chef.Application.Entities;
-using Chef.Persistence;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
+using Sentry;
+using User = Chef.Application.Entities.User;
 
 namespace Chef.Persistence.Repositories;
 
@@ -12,8 +13,10 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
     public RecipesRepository(ChefContext efContext)
         : base(efContext) { }
 
-    public IEnumerable<Recipe> GetAll(int userId)
+    public IEnumerable<Recipe> GetAll(int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetAll)}");
+
         using IDbConnection conn = OpenConnection();
 
         var recipes = conn.Query<Recipe>(@"SELECT r.id, r.user_id, r.name, r.image_uri, r.last_opened_date, COUNT(t.id) AS ingredients_missing
@@ -34,18 +37,28 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
             recipe.Shares = shares.Where(x => x.RecipeId == recipe.Id).ToList();
         }
 
+        metric.Finish();
+
         return recipes;
     }
 
-    public Recipe Get(int id)
+    public Recipe Get(int id, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(Get)}");
+
         using IDbConnection conn = OpenConnection();
 
-        return conn.QueryFirstOrDefault<Recipe>("SELECT * FROM chef.recipes WHERE id = @Id", new { Id = id });
+        var result = conn.QueryFirstOrDefault<Recipe>("SELECT * FROM chef.recipes WHERE id = @Id", new { Id = id });
+
+        metric.Finish();
+
+        return result;
     }
 
-    public Recipe? Get(int id, int userId)
+    public Recipe? Get(int id, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(Get)}");
+
         using IDbConnection conn = OpenConnection();
 
         const string recipeSql = @"SELECT r.*, u.id, dp.*
@@ -101,11 +114,15 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
 
         recipe.RecipeIngredients.AddRange(recipeIngredients);
 
+        metric.Finish();
+
         return recipe;
     }
 
-    public Recipe? GetForUpdate(int id, int userId)
+    public Recipe? GetForUpdate(int id, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetForUpdate)}");
+
         using IDbConnection conn = OpenConnection();
 
         var recipe = conn.QueryFirstOrDefault<Recipe>(@"SELECT r.* 
@@ -133,11 +150,15 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
             recipe.RecipeIngredients.AddRange(recipeIngredients);
         }
 
+        metric.Finish();
+
         return recipe;
     }
 
-    public Recipe? GetWithOwner(int id, int userId)
+    public Recipe? GetWithOwner(int id, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetWithOwner)}");
+
         using IDbConnection conn = OpenConnection();
 
         const string query = @"SELECT DISTINCT r.*, u.id, u.email, u.image_uri
@@ -146,16 +167,22 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                                INNER JOIN users AS u ON r.user_id = u.id
                                WHERE r.id = @Id AND (r.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))";
 
-        return conn.Query<Recipe, User, Recipe>(query,
+        var result = conn.Query<Recipe, User, Recipe>(query,
             (recipe, user) =>
             {
                 recipe.User = user;
                 return recipe;
             }, new { Id = id, UserId = userId }).FirstOrDefault();
+
+        metric.Finish();
+
+        return result;
     }
 
-    public IEnumerable<RecipeShare> GetShares(int id)
+    public IEnumerable<RecipeShare> GetShares(int id, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetShares)}");
+
         using IDbConnection conn = OpenConnection();
 
         const string query = @"SELECT s.*, u.id, u.email, u.image_uri
@@ -164,16 +191,22 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                                WHERE s.recipe_id = @RecipeId AND s.is_accepted IS NOT FALSE
                                ORDER BY (CASE WHEN s.is_accepted THEN 1 ELSE 2 END) ASC, s.created_date";
 
-        return conn.Query<RecipeShare, User, RecipeShare>(query,
+        var result = conn.Query<RecipeShare, User, RecipeShare>(query,
             (share, user) =>
             {
                 share.User = user;
                 return share;
             }, new { RecipeId = id });
+
+        metric.Finish();
+
+        return result;
     }
 
-    public IEnumerable<RecipeShare> GetShareRequests(int userId)
+    public IEnumerable<RecipeShare> GetShareRequests(int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetShareRequests)}");
+
         using IDbConnection conn = OpenConnection();
 
         const string query = @"SELECT s.*, r.name, u.name
@@ -183,47 +216,71 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                                WHERE s.user_id = @UserId
                                ORDER BY s.modified_date DESC";
 
-        return conn.Query<RecipeShare, Recipe, User, RecipeShare>(query,
+        var result = conn.Query<RecipeShare, Recipe, User, RecipeShare>(query,
             (share, recipe, user) =>
             {
                 share.Recipe = recipe;
                 share.User = user;
                 return share;
             }, new { UserId = userId }, null, true, "name,Name");
+
+        metric.Finish();
+
+        return result;
     }
 
-    public int GetPendingShareRequestsCount(int userId)
+    public int GetPendingShareRequestsCount(int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetPendingShareRequestsCount)}");
+
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<int>("SELECT COUNT(*) FROM chef.shares WHERE user_id = @UserId AND is_accepted IS NULL",
+        var result = conn.ExecuteScalar<int>("SELECT COUNT(*) FROM chef.shares WHERE user_id = @UserId AND is_accepted IS NULL",
             new { UserId = userId });
+
+        metric.Finish();
+
+        return result;
     }
 
-    public bool CanShareWithUser(int shareWithId, int userId)
+    public bool CanShareWithUser(int shareWithId, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(CanShareWithUser)}");
+
         using IDbConnection conn = OpenConnection();
 
-        return !conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
+        var result = !conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
                                            FROM chef.recipes AS r
                                            INNER JOIN chef.shares AS s on r.id = s.recipe_id
                                            WHERE r.user_id = @UserId AND s.user_id = @ShareWithId AND s.is_accepted = FALSE",
             new { ShareWithId = shareWithId, UserId = userId });
+
+        metric.Finish();
+
+        return result;
     }
 
-    public Recipe GetForSending(int id, int userId)
+    public Recipe GetForSending(int id, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetForSending)}");
+
         using IDbConnection conn = OpenConnection();
 
-        return conn.QueryFirstOrDefault<Recipe>(@"SELECT r.id, r.name
+        var result = conn.QueryFirstOrDefault<Recipe>(@"SELECT r.id, r.name
                                                   FROM chef.recipes AS r
                                                   LEFT JOIN chef.shares AS s on r.id = s.recipe_id
                                                   WHERE r.id = @Id AND (r.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))",
             new { Id = id, UserId = userId });
+
+        metric.Finish();
+
+        return result;
     }
 
-    public IEnumerable<SendRequest> GetSendRequests(int userId)
+    public IEnumerable<SendRequest> GetSendRequests(int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetSendRequests)}");
+
         using IDbConnection conn = OpenConnection();
 
         const string query = @"SELECT sr.*, r.name, u.name
@@ -233,21 +290,31 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                                WHERE sr.user_id = @UserId
                                ORDER BY sr.modified_date DESC";
 
-        return conn.Query<SendRequest, Recipe, User, SendRequest>(query,
+        var result = conn.Query<SendRequest, Recipe, User, SendRequest>(query,
             (sendRequest, recipe, user) =>
             {
                 sendRequest.Recipe = recipe;
                 sendRequest.User = user;
                 return sendRequest;
             }, new { UserId = userId }, null, true, "name,Name");
+
+        metric.Finish();
+
+        return result;
     }
 
-    public int GetPendingSendRequestsCount(int userId)
+    public int GetPendingSendRequestsCount(int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetPendingSendRequestsCount)}");
+
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<int>("SELECT COUNT(*) FROM chef.send_requests WHERE user_id = @UserId AND is_declined = FALSE",
+        var result = conn.ExecuteScalar<int>("SELECT COUNT(*) FROM chef.send_requests WHERE user_id = @UserId AND is_declined = FALSE",
             new { UserId = userId });
+
+        metric.Finish();
+
+        return result;
     }
 
     public bool SendRequestExists(int id, int userId)
@@ -258,8 +325,10 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
             new { RecipeId = id, UserId = userId });
     }
 
-    public bool IngredientsReviewIsRequired(int id, int userId)
+    public bool IngredientsReviewIsRequired(int id, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(IngredientsReviewIsRequired)}");
+
         using IDbConnection conn = OpenConnection();
 
         var userThatsImportingHasIngredients = conn.ExecuteScalar<bool>("SELECT COUNT(*) FROM chef.ingredients WHERE user_id = @UserId", new { UserId = userId });
@@ -269,11 +338,15 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                                                                     INNER JOIN chef.ingredients AS i ON ri.ingredient_id = i.id
                                                                     WHERE recipe_id = @RecipeId AND user_id != 1", new { RecipeId = id });
 
+        metric.Finish();
+
         return userThatsImportingHasIngredients && recipeHasCustomIngredients;
     }
 
-    public Recipe? GetForReview(int id)
+    public Recipe? GetForReview(int id, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetForReview)}");
+
         using IDbConnection conn = OpenConnection();
 
         var recipe = conn.QueryFirstOrDefault<Recipe>("SELECT id, user_id, name, description, image_uri FROM chef.recipes WHERE id = @Id", new { Id = id });
@@ -297,31 +370,51 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
 
         recipe.RecipeIngredients.AddRange(recipeIngredients);
 
+        metric.Finish();
+
         return recipe;
     }
 
-    public IEnumerable<string> GetAllImageUris(int userId)
+    public IEnumerable<string> GetAllImageUris(int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetAllImageUris)}");
+
         using IDbConnection conn = OpenConnection();
 
-        return conn.Query<string>("SELECT image_uri FROM chef.recipes WHERE user_id = @UserId",
+        var result = conn.Query<string>("SELECT image_uri FROM chef.recipes WHERE user_id = @UserId",
             new { UserId = userId });
+
+        metric.Finish();
+
+        return result;
     }
 
-    public string GetImageUri(int id)
+    public string GetImageUri(int id, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetImageUri)}");
+
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<string>("SELECT image_uri FROM chef.recipes WHERE id = @Id",
+        var result = conn.ExecuteScalar<string>("SELECT image_uri FROM chef.recipes WHERE id = @Id",
             new { Id = id });
+
+        metric.Finish();
+
+        return result;
     }
 
-    public bool UserOwns(int id, int userId)
+    public bool UserOwns(int id, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(UserOwns)}");
+
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<bool>("SELECT COUNT(*) FROM chef.recipes WHERE id = @Id AND user_id = @UserId",
+        var result = conn.ExecuteScalar<bool>("SELECT COUNT(*) FROM chef.recipes WHERE id = @Id AND user_id = @UserId",
             new { Id = id, UserId = userId });
+
+        metric.Finish();
+
+        return result;
     }
 
     public bool Exists(int id, int userId)
@@ -364,18 +457,26 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         return conn.ExecuteScalar<int>("SELECT COUNT(*) FROM chef.recipes WHERE user_id = @UserId", new { UserId = userId });
     }
 
-    public bool UserHasBlockedSharing(int recipeId, int userId, int sharedWithId)
+    public bool UserHasBlockedSharing(int recipeId, int userId, int sharedWithId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(UserHasBlockedSharing)}");
+
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
+        var result = conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
                                           FROM chef.shares
                                           WHERE user_id = @SharedWithId AND is_accepted = FALSE AND (SELECT user_id FROM chef.recipes WHERE id = @RecipeId) = @SharerId",
             new { SharedWithId = sharedWithId, SharerId = userId, RecipeId = recipeId });
+
+        metric.Finish();
+
+        return result;
     }
 
-    public (bool canSend, bool alreadySent) CheckSendRequest(int recipeId, int sendToId, int userId)
+    public (bool canSend, bool alreadySent) CheckSendRequest(int recipeId, int sendToId, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(CheckSendRequest)}");
+
         using IDbConnection conn = OpenConnection();
 
         bool canSend = !conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
@@ -388,14 +489,18 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                                                       WHERE recipe_id = @RecipeId AND user_id = @SendToId",
             new { RecipeId = recipeId, SendToId = sendToId });
 
+        metric.Finish();
+
         return (canSend, alreadySent);
     }
 
-    public IEnumerable<User> GetUsersToBeNotifiedOfRecipeChange(int id, int excludeUserId)
+    public IEnumerable<User> GetUsersToBeNotifiedOfRecipeChange(int id, int excludeUserId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetUsersToBeNotifiedOfRecipeChange)}");
+
         using IDbConnection conn = OpenConnection();
 
-        return conn.Query<User>(@"SELECT u.*
+        var result = conn.Query<User>(@"SELECT u.*
                                   FROM users AS u
                                   INNER JOIN chef.shares AS s ON u.id = s.user_id
                                   WHERE u.id != @ExcludeUserId AND s.recipe_id = @RecipeId AND s.is_accepted AND u.todo_notifications_enabled
@@ -405,42 +510,66 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                                   INNER JOIN chef.recipes AS r ON u.id = r.user_id
                                   WHERE u.id != @ExcludeUserId AND r.id = @RecipeId AND u.todo_notifications_enabled",
             new { RecipeId = id, ExcludeUserId = excludeUserId });
+
+        metric.Finish();
+
+        return result;
     }
-    public bool CheckIfUserCanBeNotifiedOfRecipeChange(int id, int userId)
+    public bool CheckIfUserCanBeNotifiedOfRecipeChange(int id, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(CheckIfUserCanBeNotifiedOfRecipeChange)}");
+
         using IDbConnection conn = OpenConnection();
 
-        return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
+        var result = conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
                                           FROM users AS u
                                           INNER JOIN chef.shares AS s ON u.id = s.user_id
                                           WHERE u.id = @UserId AND s.recipe_id = @RecipeId AND s.is_accepted AND u.todo_notifications_enabled",
             new { RecipeId = id, UserId = userId });
+
+        metric.Finish();
+
+        return result;
     }
 
-    public IEnumerable<User> GetUsersToBeNotifiedOfRecipeDeletion(int id)
+    public IEnumerable<User> GetUsersToBeNotifiedOfRecipeDeletion(int id, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetUsersToBeNotifiedOfRecipeDeletion)}");
+
         using IDbConnection conn = OpenConnection();
 
-        return conn.Query<User>(@"SELECT u.*
+        var result = conn.Query<User>(@"SELECT u.*
                                   FROM users AS u
                                   INNER JOIN chef.shares AS s ON u.id = s.user_id
                                   WHERE s.recipe_id = @RecipeId AND s.is_accepted AND u.todo_notifications_enabled",
             new { RecipeId = id });
+
+        metric.Finish();
+
+        return result;
     }
 
-    public IEnumerable<User> GetUsersToBeNotifiedOfRecipeSent(int id)
+    public IEnumerable<User> GetUsersToBeNotifiedOfRecipeSent(int id, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetUsersToBeNotifiedOfRecipeSent)}");
+
         using IDbConnection conn = OpenConnection();
 
-        return conn.Query<User>(@"SELECT u.*
+        var result = conn.Query<User>(@"SELECT u.*
                                   FROM users AS u
                                   INNER JOIN chef.send_requests AS sr ON u.id = sr.user_id
                                   WHERE sr.recipe_id = @RecipeId AND u.chef_notifications_enabled",
             new { RecipeId = id });
+
+        metric.Finish();
+
+        return result;
     }
 
-    public async Task<int> CreateAsync(Recipe recipe)
+    public async Task<int> CreateAsync(Recipe recipe, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(CreateAsync)}");
+
         var userAndPublicIngredients = EFContext.Ingredients.Where(x => x.UserId == recipe.UserId || x.UserId == 1).ToArray();
 
         var existingRecipeIngredients = recipe.RecipeIngredients.Where(x => x.IngredientId != 0).ToArray();
@@ -474,11 +603,15 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
 
         await EFContext.SaveChangesAsync();
 
+        metric.Finish();
+
         return recipe.Id;
     }
 
-    public async Task<string> UpdateAsync(Recipe recipe, int userId)
+    public async Task<string> UpdateAsync(Recipe recipe, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(UpdateAsync)}");
+
         var dbRecipe = EFContext.Recipes.Include(x => x.RecipeIngredients).First(x => x.Id == recipe.Id);
 
         var originalRecipeName = dbRecipe.Name;
@@ -525,21 +658,29 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
 
         await EFContext.SaveChangesAsync();
 
+        metric.Finish();
+
         return originalRecipeName;
     }
 
-    public async Task<string> DeleteAsync(int id)
+    public async Task<string> DeleteAsync(int id, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(DeleteAsync)}");
+
         Recipe recipe = EFContext.Recipes.First(x => x.Id == id);
         EFContext.Recipes.Remove(recipe);
 
         await EFContext.SaveChangesAsync();
 
+        metric.Finish();
+
         return recipe.Name;
     }
 
-    public async Task SaveSharingDetailsAsync(IEnumerable<RecipeShare> newShares, IEnumerable<RecipeShare> removedShares)
+    public async Task SaveSharingDetailsAsync(IEnumerable<RecipeShare> newShares, IEnumerable<RecipeShare> removedShares, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(SaveSharingDetailsAsync)}");
+
         using IDbConnection conn = OpenConnection();
         var transaction = conn.BeginTransaction();
 
@@ -550,19 +691,27 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                                   VALUES (@RecipeId, @UserId, @LastOpenedDate, @CreatedDate, @ModifiedDate)", newShares, transaction);
 
         transaction.Commit();
+
+        metric.Finish();
     }
 
-    public async Task SetShareIsAcceptedAsync(int recipeId, int userId, bool isAccepted, DateTime modifiedDate)
+    public async Task SetShareIsAcceptedAsync(int recipeId, int userId, bool isAccepted, DateTime modifiedDate, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(SetShareIsAcceptedAsync)}");
+
         RecipeShare recipeShare = EFContext.RecipeShares.First(x => x.RecipeId == recipeId && x.UserId == userId && x.IsAccepted == null);
         recipeShare.IsAccepted = isAccepted;
         recipeShare.ModifiedDate = modifiedDate;
 
         await EFContext.SaveChangesAsync();
+
+        metric.Finish();
     }
 
-    public async Task<RecipeShare> LeaveAsync(int id, int userId)
+    public async Task<RecipeShare> LeaveAsync(int id, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(LeaveAsync)}");
+
         using IDbConnection conn = OpenConnection();
 
         var share = conn.QueryFirstOrDefault<RecipeShare>(@"SELECT * 
@@ -575,35 +724,51 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
 
         await EFContext.SaveChangesAsync();
 
+        metric.Finish();
+
         return share;
     }
 
-    public async Task CreateSendRequestsAsync(IEnumerable<SendRequest> sendRequests)
+    public async Task CreateSendRequestsAsync(IEnumerable<SendRequest> sendRequests, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(CreateSendRequestsAsync)}");
+
         EFContext.AddRange(sendRequests);
 
         await EFContext.SaveChangesAsync();
+
+        metric.Finish();
     }
 
-    public async Task DeclineSendRequestAsync(int recipeId, int userId, DateTime modifiedDate)
+    public async Task DeclineSendRequestAsync(int recipeId, int userId, DateTime modifiedDate, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(DeclineSendRequestAsync)}");
+
         SendRequest sendRequest = EFContext.SendRequests.First(x => x.RecipeId == recipeId && x.UserId == userId);
         sendRequest.IsDeclined = true;
         sendRequest.ModifiedDate = modifiedDate;
 
         await EFContext.SaveChangesAsync();
+
+        metric.Finish();
     }
 
-    public async Task DeleteSendRequestAsync(int recipeId, int userId)
+    public async Task DeleteSendRequestAsync(int recipeId, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(DeleteSendRequestAsync)}");
+
         SendRequest sendRequest = EFContext.SendRequests.First(x => x.RecipeId == recipeId && x.UserId == userId);
         EFContext.SendRequests.Remove(sendRequest);
 
         await EFContext.SaveChangesAsync();
+
+        metric.Finish();
     }
 
-    public async Task<int> ImportAsync(int id, IEnumerable<(int Id, int ReplacementId, bool TransferNutritionData, bool TransferPriceData)> ingredientReplacements, string imageUri, int userId)
+    public async Task<int> ImportAsync(int id, IEnumerable<(int Id, int ReplacementId, bool TransferNutritionData, bool TransferPriceData)> ingredientReplacements, string imageUri, int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(ImportAsync)}");
+
         var now = DateTime.UtcNow;
 
         var recipeToImport = EFContext.Recipes.First(x => x.Id == id);
@@ -729,6 +894,8 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         EFContext.SendRequests.Remove(sendRequest);
 
         await EFContext.SaveChangesAsync();
+
+        metric.Finish();
 
         return recipe.Id;
     }

@@ -73,11 +73,16 @@ public class ListsController : BaseController
             UserId
         );
 
-        IEnumerable<ListDto> lists = _listService.GetAll(UserId, tr);
+        try
+        {
+            IEnumerable<ListDto> lists = _listService.GetAll(UserId, tr);
 
-        tr.Finish();
-
-        return Ok(lists);
+            return Ok(lists);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpGet("options")]
@@ -89,11 +94,16 @@ public class ListsController : BaseController
             UserId
         );
 
-        IEnumerable<ToDoListOption> options = _listService.GetAllAsOptions(UserId, tr);
+        try
+        {
+            IEnumerable<ToDoListOption> options = _listService.GetAllAsOptions(UserId, tr);
 
-        tr.Finish();
-
-        return Ok(options);
+            return Ok(options);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpGet("{id}")]
@@ -105,11 +115,16 @@ public class ListsController : BaseController
             UserId
         );
 
-        var list = _listService.GetForEdit(id, UserId, tr);
+        try
+        {
+            var list = _listService.GetForEdit(id, UserId, tr);
 
-        tr.Finish();
-
-        return list is null ? NotFound() : Ok(list);
+            return list is null ? NotFound() : Ok(list);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpGet("{id}/with-shares")]
@@ -121,11 +136,16 @@ public class ListsController : BaseController
             UserId
         );
 
-        var list = _listService.GetWithShares(id, UserId, tr);
+        try
+        {
+            var list = _listService.GetWithShares(id, UserId, tr);
 
-        tr.Finish();
-
-        return list is null ? NotFound() : Ok(list);
+            return list is null ? NotFound() : Ok(list);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpGet("share-requests")]
@@ -137,11 +157,16 @@ public class ListsController : BaseController
             UserId
         );
 
-        IEnumerable<Application.Contracts.Lists.Models.ShareListRequest> shareRequests = _listService.GetShareRequests(UserId, tr);
+        try
+        {
+            IEnumerable<Application.Contracts.Lists.Models.ShareListRequest> shareRequests = _listService.GetShareRequests(UserId, tr);
 
-        tr.Finish();
-
-        return Ok(shareRequests);
+            return Ok(shareRequests);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpGet("pending-share-requests-count")]
@@ -169,11 +194,16 @@ public class ListsController : BaseController
             UserId
         );
 
-        var assigneeOptions = _listService.GetMembersAsAssigneeOptions(id, UserId, tr);
+        try
+        {
+            var assigneeOptions = _listService.GetMembersAsAssigneeOptions(id, UserId, tr);
 
-        tr.Finish();
-
-        return Ok(assigneeOptions);
+            return Ok(assigneeOptions);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpPost]
@@ -190,19 +220,24 @@ public class ListsController : BaseController
             UserId
         );
 
-        var model = new CreateList
+        try
         {
-            UserId = UserId,
-            Name = request.Name,
-            Icon = request.Icon,
-            IsOneTimeToggleDefault = request.IsOneTimeToggleDefault,
-            TasksText = request.TasksText,
-        };
-        int id = await _listService.CreateAsync(model, _createValidator, tr);
+            var model = new CreateList
+            {
+                UserId = UserId,
+                Name = request.Name,
+                Icon = request.Icon,
+                IsOneTimeToggleDefault = request.IsOneTimeToggleDefault,
+                TasksText = request.TasksText,
+            };
+            int id = await _listService.CreateAsync(model, _createValidator, tr);
 
-        tr.Finish();
-
-        return StatusCode(201, id);
+            return StatusCode(201, id);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpPut]
@@ -219,23 +254,23 @@ public class ListsController : BaseController
             UserId
         );
 
-        var model = new UpdateList
-        {
-            Id = request.Id,
-            UserId = UserId,
-            Name = request.Name,
-            Icon = request.Icon,
-            IsOneTimeToggleDefault = request.IsOneTimeToggleDefault,
-            NotificationsEnabled = request.NotificationsEnabled,
-        };
-        UpdateListResult result = await _listService.UpdateAsync(model, _updateValidator, tr);
-        if (!result.Notify())
-        {
-            return NoContent();
-        }
-
         try
         {
+            var model = new UpdateList
+            {
+                Id = request.Id,
+                UserId = UserId,
+                Name = request.Name,
+                Icon = request.Icon,
+                IsOneTimeToggleDefault = request.IsOneTimeToggleDefault,
+                NotificationsEnabled = request.NotificationsEnabled,
+            };
+            UpdateListResult result = await _listService.UpdateAsync(model, _updateValidator, tr);
+            if (!result.Notify())
+            {
+                return NoContent();
+            }
+
             string resourceKey;
             switch (result.Type)
             {
@@ -268,11 +303,6 @@ public class ListsController : BaseController
                 _senderService.Enqueue(toDoAssistantPushNotification);
             }
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(Update)}");
-            throw;
-        }
         finally
         {
             tr.Finish();
@@ -295,15 +325,20 @@ public class ListsController : BaseController
             UserId
         );
 
-        var model = new UpdateSharedList
+        try
         {
-            Id = request.Id,
-            UserId = UserId,
-            NotificationsEnabled = request.NotificationsEnabled
-        };
-        await _listService.UpdateSharedAsync(model, _updateSharedValidator, tr);
-
-        tr.Finish();
+            var model = new UpdateSharedList
+            {
+                Id = request.Id,
+                UserId = UserId,
+                NotificationsEnabled = request.NotificationsEnabled
+            };
+            await _listService.UpdateSharedAsync(model, _updateSharedValidator, tr);
+        }
+        finally
+        {
+            tr.Finish();
+        }
 
         return NoContent();
     }
@@ -317,10 +352,10 @@ public class ListsController : BaseController
             UserId
         );
 
-        DeleteListResult result = await _listService.DeleteAsync(id, UserId, tr);
-
         try
         {
+            DeleteListResult result = await _listService.DeleteAsync(id, UserId, tr);
+
             foreach (var recipient in result.NotificationRecipients)
             {
                 CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
@@ -339,11 +374,6 @@ public class ListsController : BaseController
                 _senderService.Enqueue(toDoAssistantPushNotification);
             }
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(Delete)}");
-            throw;
-        }
         finally
         {
             tr.Finish();
@@ -361,23 +391,28 @@ public class ListsController : BaseController
             UserId
         );
 
-        var response = new CanShareResponse
+        try
         {
-            CanShare = false
-        };
+            var response = new CanShareResponse
+            {
+                CanShare = false
+            };
 
-        var user = _userService.Get(email);
+            var user = _userService.Get(email);
 
-        if (user != null)
-        {
-            response.UserId = user.Id;
-            response.ImageUri = user.ImageUri;
-            response.CanShare = _listService.CanShareWithUser(user.Id, UserId);
+            if (user != null)
+            {
+                response.UserId = user.Id;
+                response.ImageUri = user.ImageUri;
+                response.CanShare = _listService.CanShareWithUser(user.Id, UserId);
+            }
+
+            return Ok(response);
         }
-
-        tr.Finish();
-
-        return Ok(response);
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpPut("share")]
@@ -433,11 +468,6 @@ public class ListsController : BaseController
             };
             await _listService.ShareAsync(model, _shareValidator, tr);
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(Share)}");
-            throw;
-        }
         finally
         {
             tr.Finish();
@@ -477,11 +507,6 @@ public class ListsController : BaseController
                 _senderService.Enqueue(toDoAssistantPushNotification);
             }
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(Leave)}");
-            throw;
-        }
         finally
         {
             tr.Finish();
@@ -504,18 +529,23 @@ public class ListsController : BaseController
             UserId
         );
 
-        var model = new CopyList
+        try
         {
-            Id = request.Id,
-            UserId = UserId,
-            Name = request.Name,
-            Icon = request.Icon
-        };
-        int id = await _listService.CopyAsync(model, _copyValidator, tr);
+            var model = new CopyList
+            {
+                Id = request.Id,
+                UserId = UserId,
+                Name = request.Name,
+                Icon = request.Icon
+            };
+            int id = await _listService.CopyAsync(model, _copyValidator, tr);
 
-        tr.Finish();
-
-        return StatusCode(201, id);
+            return StatusCode(201, id);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpPut("is-archived")]
@@ -532,9 +562,14 @@ public class ListsController : BaseController
             UserId
         );
 
-        await _listService.SetIsArchivedAsync(request.ListId, UserId, request.IsArchived, tr);
-
-        tr.Finish();
+        try
+        {
+            await _listService.SetIsArchivedAsync(request.ListId, UserId, request.IsArchived, tr);
+        }
+        finally
+        {
+            tr.Finish();
+        }
 
         return NoContent();
     }
@@ -575,11 +610,6 @@ public class ListsController : BaseController
                 _senderService.Enqueue(toDoAssistantPushNotification);
             }
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(UncompleteAll)}");
-            throw;
-        }
         finally
         {
             tr.Finish();
@@ -602,14 +632,14 @@ public class ListsController : BaseController
             UserId
         );
 
-        SetShareIsAcceptedResult result = await _listService.SetShareIsAcceptedAsync(request.ListId, UserId, request.IsAccepted, tr);
-        if (!result.Notify())
-        {
-            return NoContent();
-        }
-
         try
         {
+            SetShareIsAcceptedResult result = await _listService.SetShareIsAcceptedAsync(request.ListId, UserId, request.IsAccepted, tr);
+            if (!result.Notify())
+            {
+                return NoContent();
+            }
+
             var localizerKey = request.IsAccepted ? "JoinedListNotification" : "DeclinedShareRequestNotification";
             foreach (var recipient in result.NotificationRecipients)
             {
@@ -628,11 +658,6 @@ public class ListsController : BaseController
 
                 _senderService.Enqueue(toDoAssistantPushNotification);
             }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(SetShareIsAccepted)}");
-            throw;
         }
         finally
         {

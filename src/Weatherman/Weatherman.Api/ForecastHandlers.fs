@@ -18,7 +18,9 @@ let get: HttpHandler =
         let result = ctx.TryBindQueryString<GetForecastDto>()
 
         (match result with
-         | Error _ -> RequestErrors.BAD_REQUEST "Bad request" next ctx
+         | Error _ ->
+            tr.Finish()
+            RequestErrors.BAD_REQUEST "Bad request" next ctx
          | Ok dto ->
              let service = ctx.GetService<IForecastService>()
 

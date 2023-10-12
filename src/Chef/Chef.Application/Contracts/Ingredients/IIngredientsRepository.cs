@@ -1,21 +1,22 @@
 ﻿using Chef.Application.Entities;
+using Sentry;
 
 namespace Chef.Application.Contracts.Ingredients;
 
 public interface IIngredientsRepository
 {
-    IEnumerable<Ingredient> GetUserAndUsedPublicIngredients(int userId);
-    Ingredient Get(int id);
-    Ingredient? GetForUpdate(int id, int userId);
-    Ingredient? GetPublic(int id, int userId);
-    IEnumerable<Ingredient> GetForSuggestions(int userId);
-    IEnumerable<IngredientCategory> GetIngredientCategories();
-    IEnumerable<ToDoTask> GetTaskSuggestions(int userId);
+    IEnumerable<Ingredient> GetUserAndUsedPublicIngredients(int userId, ISpan metricsSpan);
+    Ingredient Get(int id, ISpan metricsSpan);
+    Ingredient? GetForUpdate(int id, int userId, ISpan metricsSpan);
+    Ingredient? GetPublic(int id, int userId, ISpan metricsSpan);
+    IEnumerable<Ingredient> GetForSuggestions(int userId, ISpan metricsSpan);
+    IEnumerable<IngredientCategory> GetIngredientCategories(ISpan metricsSpan);
+    IEnumerable<ToDoTask> GetTaskSuggestions(int userId, ISpan metricsSpan);
     bool Exists(int id, int userId);
     bool Exists(int id, string name, int userId);
     bool ExistsInRecipe(int id, int recipeId);
-    Task UpdateAsync(Ingredient ingredient);
-    Task UpdatePublicAsync(int id, int? taskId, int userId, DateTime createdDate);
-    Task DeleteAsync(int id);
-    Task RemoveFromRecipesAsync(int id, int userId);
+    Task UpdateAsync(Ingredient ingredient, ISpan metricsSpan);
+    Task UpdatePublicAsync(int id, int? taskId, int userId, DateTime createdDate, ISpan metricsSpan);
+    Task DeleteAsync(int id, ISpan metricsSpan);
+    Task RemoveFromRecipesAsync(int id, int userId, ISpan metricsSpan);
 }

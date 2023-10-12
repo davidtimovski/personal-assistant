@@ -2,7 +2,6 @@
 using Core.Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Sentry;
 
 namespace Core.Api.Controllers;
 
@@ -29,10 +28,14 @@ public class CurrenciesController : BaseController
             UserId
         );
 
-        IDictionary<string, decimal> currencyRates = _currenciesRepository.GetAll(date, tr);
-
-        tr.Finish();
-
-        return Json(currencyRates);
+        try
+        {
+            IDictionary<string, decimal> currencyRates = _currenciesRepository.GetAll(date, tr);
+            return Json(currencyRates);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 }

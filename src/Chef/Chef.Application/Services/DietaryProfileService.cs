@@ -9,6 +9,7 @@ using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Sentry;
 
 namespace Chef.Application.Services;
 
@@ -37,11 +38,13 @@ public class DietaryProfileService : IDietaryProfileService
         _logger = logger;
     }
 
-    public EditDietaryProfile? Get(int userId)
+    public EditDietaryProfile? Get(int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(DietaryProfileService)}.{nameof(Get)}");
+
         try
         {
-            var profile = _dietaryProfilesRepository.Get(userId);
+            var profile = _dietaryProfilesRepository.Get(userId, metric);
             if (profile is null)
             {
                 return null;
@@ -57,11 +60,17 @@ public class DietaryProfileService : IDietaryProfileService
             _logger.LogError(ex, $"Unexpected error in {nameof(Get)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public RecommendedDailyIntake GetRecommendedDailyIntake(GetRecommendedDailyIntake model, IValidator<GetRecommendedDailyIntake> validator)
+    public RecommendedDailyIntake GetRecommendedDailyIntake(GetRecommendedDailyIntake model, IValidator<GetRecommendedDailyIntake> validator, ISpan metricsSpan)
     {
         ValidationUtil.ValidOrThrow(model, validator);
+
+        var metric = metricsSpan.StartChild($"{nameof(DietaryProfileService)}.{nameof(GetRecommendedDailyIntake)}");
 
         try
         {
@@ -120,10 +129,16 @@ public class DietaryProfileService : IDietaryProfileService
             _logger.LogError(ex, $"Unexpected error in {nameof(GetRecommendedDailyIntake)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public RecipeNutritionSummary CalculateNutritionSummary(Recipe recipe)
+    public RecipeNutritionSummary CalculateNutritionSummary(Recipe recipe, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(DietaryProfileService)}.{nameof(CalculateNutritionSummary)}");
+
         try
         {
             RecipeIngredient[] validRecipeIngredients = recipe.RecipeIngredients
@@ -420,11 +435,17 @@ public class DietaryProfileService : IDietaryProfileService
             _logger.LogError(ex, $"Unexpected error in {nameof(CalculateNutritionSummary)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public async Task CreateOrUpdateAsync(UpdateDietaryProfile model, IValidator<UpdateDietaryProfile> validator)
+    public async Task CreateOrUpdateAsync(UpdateDietaryProfile model, IValidator<UpdateDietaryProfile> validator, ISpan metricsSpan)
     {
         ValidationUtil.ValidOrThrow(model, validator);
+
+        var metric = metricsSpan.StartChild($"{nameof(DietaryProfileService)}.{nameof(CreateOrUpdateAsync)}");
 
         try
         {
@@ -451,25 +472,35 @@ public class DietaryProfileService : IDietaryProfileService
                 dietaryProfile.Weight = (float)Math.Round(model.WeightKg!.Value, 1);
             }
 
-            await _dietaryProfilesRepository.CreateOrUpdateAsync(dietaryProfile);
+            await _dietaryProfilesRepository.CreateOrUpdateAsync(dietaryProfile, metric);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(CreateOrUpdateAsync)}");
             throw;
         }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
-    public async Task DeleteAsync(int userId)
+    public async Task DeleteAsync(int userId, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(DietaryProfileService)}.{nameof(DeleteAsync)}");
+
         try
         {
-            await _dietaryProfilesRepository.DeleteAsync(userId);
+            await _dietaryProfilesRepository.DeleteAsync(userId, metric);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(DeleteAsync)}");
             throw;
+        }
+        finally
+        {
+            metric.Finish();
         }
     }
 

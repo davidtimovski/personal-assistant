@@ -34,14 +34,19 @@ public class PushSubscriptionsController : BaseController
             UserId
         );
 
-        await _pushSubscriptionService.CreateSubscriptionAsync(UserId,
-            request.Application,
-            request.Subscription.Endpoint,
-            request.Subscription.Keys["auth"],
-            request.Subscription.Keys["p256dh"],
-            tr);
-
-        tr.Finish();
+        try
+        {
+            await _pushSubscriptionService.CreateSubscriptionAsync(UserId,
+                request.Application,
+                request.Subscription.Endpoint,
+                request.Subscription.Keys["auth"],
+                request.Subscription.Keys["p256dh"],
+                tr);
+        }
+        finally
+        {
+            tr.Finish();
+        }
 
         return StatusCode(201);
     }
