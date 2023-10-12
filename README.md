@@ -6,8 +6,8 @@ An ecosystem of PWAs that cooperate with each other to provide unique functional
 
 [![alt text](./src/ToDoAssistant/to-do-assistant2/static/images/icons/app-icon-x96.png)](https://personalassistant.site/home/to-do-assistant)
 [![alt text](./src/Accountant/accountant2/static/images/icons/app-icon-x96.png)](https://personalassistant.site/home/accountant)
+[![alt text](./src/Chef/chef/static/images/icons/app-icon-x96.png)](https://personalassistant.site/home/chef)
 [![alt text](./src/Weatherman/weatherman/static/images/icons/app-icon-x96.png)](https://personalassistant.site/home/weatherman)
-[![alt text](./src/Chef/chef/src/static/images/icons/app-icon-x96.png)](https://personalassistant.site/home/chef)
 
 ## Apps
 
