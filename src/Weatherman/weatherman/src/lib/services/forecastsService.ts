@@ -70,9 +70,7 @@ export class ForecastsService {
 		const hourCounter = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), 0, 0, 0);
 		for (let i = 0; i < 24; i++) {
 			hourCounter.setHours(hourCounter.getHours() + 1);
-			hours.push(
-				new HourlyForecast(now.getHours(), DateHelper.formatHours(hourCounter, culture), null, null, null, null)
-			);
+			hours.push(new HourlyForecast(now.getHours(), DateHelper.formatHours(hourCounter, culture), null, null, null, null));
 		}
 
 		const placeholder = new Forecast(null, null, null, null, null, null, hours, []);

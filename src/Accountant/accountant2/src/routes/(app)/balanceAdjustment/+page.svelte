@@ -129,25 +129,13 @@
 		<form on:submit|preventDefault={adjust}>
 			<div class="form-control inline">
 				<label for="balance">{$t('balance')}</label>
-				<AmountInput
-					bind:amount={balance}
-					bind:currency
-					invalid={balanceIsInvalid}
-					inputId="balance"
-					disabled={!balanceLoaded}
-				/>
+				<AmountInput bind:amount={balance} bind:currency invalid={balanceIsInvalid} inputId="balance" disabled={!balanceLoaded} />
 			</div>
 
 			<div class="form-control inline">
 				<label for="account">{$t('account')}</label>
 				<div class="loadable-select" class:loaded={accountOptions}>
-					<select
-						id="account"
-						bind:value={accountId}
-						on:change={accountChanged}
-						disabled={!accountOptions}
-						class="category-select"
-					>
+					<select id="account" bind:value={accountId} on:change={accountChanged} disabled={!accountOptions} class="category-select">
 						{#if accountOptions}
 							{#each accountOptions as account}
 								<option value={account.id}>{account.name}</option>
@@ -160,9 +148,7 @@
 
 			<div class="form-control inline">
 				<span>{$t('balanceAdjustment.adjustedBy')}</span>
-				<span>
-					{(adjustedBy > 0 ? '+' : '') + Formatter.moneyWithoutCurrency(adjustedBy, currency, $user.culture)}</span
-				>
+				<span> {(adjustedBy > 0 ? '+' : '') + Formatter.moneyWithoutCurrency(adjustedBy, currency, $user.culture)}</span>
 			</div>
 
 			<div class="form-control">

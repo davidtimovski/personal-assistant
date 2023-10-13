@@ -216,12 +216,7 @@
 			<div class="form-control with-descriptor">
 				<div class="setting-descriptor">{$t('editDebt.iAmThe')}</div>
 
-				<DoubleRadioBool
-					name="debtorLenderToggle"
-					leftLabelKey="editDebt.lender"
-					rightLabelKey="editDebt.debtor"
-					bind:value={userIsDebtor}
-				/>
+				<DoubleRadioBool name="debtorLenderToggle" leftLabelKey="editDebt.lender" rightLabelKey="editDebt.debtor" bind:value={userIsDebtor} />
 			</div>
 
 			<div class="form-control">
@@ -247,13 +242,7 @@
 				{/if}
 
 				{#if !isNew}
-					<button
-						type="button"
-						on:click={deleteDebt}
-						class="button danger-button"
-						disabled={deleteButtonIsLoading}
-						class:confirm={deleteInProgress}
-					>
+					<button type="button" on:click={deleteDebt} class="button danger-button" disabled={deleteButtonIsLoading} class:confirm={deleteInProgress}>
 						<span class="button-loader" class:loading={deleteButtonIsLoading}>
 							<i class="fas fa-circle-notch fa-spin" />
 						</span>

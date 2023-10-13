@@ -82,9 +82,7 @@
 					if (sharingState === SharingState.Member) {
 						await listsService.updateShared(new UpdateSharedList(data.id, notificationsEnabled));
 					} else {
-						await listsService.update(
-							new UpdateList(data.id, name, icon, isOneTimeToggleDefault, notificationsEnabled)
-						);
+						await listsService.update(new UpdateList(data.id, name, icon, isOneTimeToggleDefault, notificationsEnabled));
 					}
 
 					const redirectRoute = isArchived ? '/archivedLists' : '/lists';
@@ -275,12 +273,7 @@
 							<span class="placeholder">{$t('editList.icon')}</span>
 							<div class="icon-options">
 								{#each iconOptions as i}
-									<button
-										type="button"
-										on:click={() => selectIcon(i.icon)}
-										class:selected={icon === i.icon}
-										class="icon-option"
-									>
+									<button type="button" on:click={() => selectIcon(i.icon)} class:selected={icon === i.icon} class="icon-option">
 										<i class={i.cssClass} />
 									</button>
 								{/each}
@@ -290,11 +283,7 @@
 				{/if}
 
 				<div class="form-control">
-					<Checkbox
-						labelKey="editList.notifications"
-						bind:value={notificationsEnabled}
-						disabled={!notificationsCheckboxEnabled}
-					/>
+					<Checkbox labelKey="editList.notifications" bind:value={notificationsEnabled} disabled={!notificationsCheckboxEnabled} />
 				</div>
 
 				{#if sharingState !== 4}
@@ -310,12 +299,7 @@
 
 			<div class="save-delete-wrap">
 				{#if !confirmationInProgress}
-					<button
-						type="button"
-						on:click={save}
-						class="button primary-button"
-						disabled={!canSave || saveButtonIsLoading}
-					>
+					<button type="button" on:click={save} class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
 						<span class="button-loader" class:loading={saveButtonIsLoading}>
 							<i class="fas fa-circle-notch fa-spin" />
 						</span>

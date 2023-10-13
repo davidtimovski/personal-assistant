@@ -57,21 +57,11 @@
 					<div class="tooltip-item">
 						<div class="tooltip-header">
 							{#if tooltip.isDismissed}
-								<button
-									type="button"
-									on:click={() => retain(tooltip)}
-									title={$t('help.show')}
-									aria-label={$t('help.show')}
-								>
+								<button type="button" on:click={() => retain(tooltip)} title={$t('help.show')} aria-label={$t('help.show')}>
 									<i class="fas fa-eye-slash" />
 								</button>
 							{:else}
-								<button
-									type="button"
-									on:click={() => dismiss(tooltip)}
-									title={$t('help.hide')}
-									aria-label={$t('help.hide')}
-								>
+								<button type="button" on:click={() => dismiss(tooltip)} title={$t('help.hide')} aria-label={$t('help.hide')}>
 									<i class="fas fa-eye" />
 								</button>
 							{/if}

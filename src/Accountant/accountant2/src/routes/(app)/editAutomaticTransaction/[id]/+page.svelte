@@ -83,17 +83,7 @@
 
 			if (isNew) {
 				try {
-					const automaticTransaction = new AutomaticTransaction(
-						0,
-						isDeposit,
-						categoryId,
-						amount,
-						currency,
-						description,
-						dayInMonth,
-						null,
-						null
-					);
+					const automaticTransaction = new AutomaticTransaction(0, isDeposit, categoryId, amount, currency, description, dayInMonth, null, null);
 
 					const newId = await automaticTransactionsService.create(automaticTransaction);
 
@@ -215,13 +205,7 @@
 			<i class="fas fa-pencil-alt" />
 		</div>
 		<div class="page-title">
-			<span
-				>{$t(
-					isNew
-						? 'editAutomaticTransaction.newAutomaticTransaction'
-						: 'editAutomaticTransaction.editAutomaticTransaction'
-				)}</span
-			>
+			<span>{$t(isNew ? 'editAutomaticTransaction.newAutomaticTransaction' : 'editAutomaticTransaction.editAutomaticTransaction')}</span>
 		</div>
 		<a href="/automaticTransactions" class="back-button">
 			<i class="fas fa-times" />

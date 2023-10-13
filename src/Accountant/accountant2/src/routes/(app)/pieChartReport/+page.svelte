@@ -52,14 +52,7 @@
 		sum = 0;
 
 		const byCategory = (
-			await transactionsService.getExpendituresAndDepositsByCategory(
-				fromDate,
-				toDate,
-				mainAccountId,
-				type,
-				currency,
-				$t('uncategorized')
-			)
+			await transactionsService.getExpendituresAndDepositsByCategory(fromDate, toDate, mainAccountId, type, currency, $t('uncategorized'))
 		).map((x) => new PieChartItem(x));
 
 		const labels = new Array<string>();
@@ -199,11 +192,7 @@
 
 			{#if items && items.length === 0}
 				<div class="empty-list-message-wrap">
-					<EmptyListMessage
-						messageKey={isDeposits
-							? 'pieChartReport.emptyListMessageDeposits'
-							: 'pieChartReport.emptyListMessageExpenses'}
-					/>
+					<EmptyListMessage messageKey={isDeposits ? 'pieChartReport.emptyListMessageDeposits' : 'pieChartReport.emptyListMessageExpenses'} />
 				</div>
 			{/if}
 		</div>

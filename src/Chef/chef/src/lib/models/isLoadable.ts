@@ -1,4 +1,4 @@
 export interface IsLoadable {
-  leftSideIsLoading: boolean;
-  rightSideIsLoading: boolean;
+	leftSideIsLoading: boolean;
+	rightSideIsLoading: boolean;
 }

@@ -4,8 +4,7 @@ export default class Variables {
 		host: import.meta.env.VITE_HOST_URL,
 		gateway: import.meta.env.VITE_GATEWAY_URL,
 		api: import.meta.env.VITE_GATEWAY_URL + '/weatherman/api',
-		defaultProfileImageUrl:
-			'https://res.cloudinary.com/personalassistant/w_80,h_80,c_limit/production/defaults/sfmqac.webp'
+		defaultProfileImageUrl: 'https://res.cloudinary.com/personalassistant/w_80,h_80,c_limit/production/defaults/sfmqac.webp'
 	};
 	static debug = import.meta.env.DEV;
 	static auth0Domain = import.meta.env.VITE_AUTH0_DOMAIN;

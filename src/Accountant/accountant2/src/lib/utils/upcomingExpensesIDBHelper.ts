@@ -1,5 +1,5 @@
 import type { UpcomingExpense } from '$lib/models/entities/upcomingExpense';
-import type { CreatedIdPair } from '$lib/models/sync';
+import type { CreatedIdPair } from '$lib/models/server/responses/sync';
 import { IDBContext } from './idbContext';
 
 export class UpcomingExpensesIDBHelper {
@@ -33,9 +33,7 @@ export class UpcomingExpensesIDBHelper {
 	async getAllForMonth(): Promise<Array<UpcomingExpense>> {
 		const month = new Date().getMonth();
 
-		const upcomingExpenses = await this.db.upcomingExpenses
-			.filter((x) => new Date(x.date).getMonth() === month)
-			.toArray();
+		const upcomingExpenses = await this.db.upcomingExpenses.filter((x) => new Date(x.date).getMonth() === month).toArray();
 
 		const categories = await this.db.categories.toArray();
 
@@ -149,9 +147,7 @@ export class UpcomingExpensesIDBHelper {
 		const now = new Date();
 		const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
 
-		const upcomingExpensesToDelete = await this.db.upcomingExpenses
-			.filter((x) => new Date(x.date) < startOfMonth)
-			.toArray();
+		const upcomingExpensesToDelete = await this.db.upcomingExpenses.filter((x) => new Date(x.date) < startOfMonth).toArray();
 
 		if (upcomingExpensesToDelete.length > 0) {
 			await this.db.transaction('rw', this.db.upcomingExpenses, async () => {

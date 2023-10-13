@@ -53,13 +53,7 @@ export class DebtsService {
 		return result;
 	}
 
-	async createOrMerge(
-		debt: DebtModel,
-		mergeDebtPerPerson: boolean,
-		culture: string,
-		lendedLabel: string,
-		borrowedLabel: string
-	): Promise<number> {
+	async createOrMerge(debt: DebtModel, mergeDebtPerPerson: boolean, culture: string, lendedLabel: string, borrowedLabel: string): Promise<number> {
 		try {
 			const now = new Date();
 
@@ -112,20 +106,10 @@ export class DebtsService {
 				);
 				descriptionsArray.push(newDesc);
 
-				const description =
-					descriptionsArray.length > 0 ? descriptionsArray.join(`\n${DebtsService.mergedDebtSeparator}\n`) : null;
+				const description = descriptionsArray.length > 0 ? descriptionsArray.join(`\n${DebtsService.mergedDebtSeparator}\n`) : null;
 
 				const userIsDebtor = balance < 0;
-				const mergedDebt = new DebtModel(
-					0,
-					debt.person,
-					Math.abs(balance),
-					debt.currency,
-					description,
-					userIsDebtor,
-					now,
-					now
-				);
+				const mergedDebt = new DebtModel(0, debt.person, Math.abs(balance), debt.currency, description, userIsDebtor, now, now);
 
 				if (navigator.onLine) {
 					const payload = new CreateDebt(

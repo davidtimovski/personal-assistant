@@ -46,9 +46,7 @@
 				continue;
 			}
 
-			const subCategories = categoryDtos
-				.filter((c) => c.parentId === categoryDto.id)
-				.sort((a, b) => (a.name > b.name ? 1 : -1));
+			const subCategories = categoryDtos.filter((c) => c.parentId === categoryDto.id).sort((a, b) => (a.name > b.name ? 1 : -1));
 			const item = mapToCategoryItem(categoryDto, subCategories);
 			categoryItems.push(item);
 		}
@@ -97,21 +95,13 @@
 									{/if}
 
 									{#if category.type === 1}
-										<span
-											class="category-indicator"
-											title={$t('categories.depositOnly')}
-											aria-label={$t('categories.depositOnly')}
-										>
+										<span class="category-indicator" title={$t('categories.depositOnly')} aria-label={$t('categories.depositOnly')}>
 											<i class="fas fa-donate" />
 										</span>
 									{/if}
 
 									{#if category.type === 2}
-										<span
-											class="category-indicator"
-											title={$t('categories.expenseOnly')}
-											aria-label={$t('categories.expenseOnly')}
-										>
+										<span class="category-indicator" title={$t('categories.expenseOnly')} aria-label={$t('categories.expenseOnly')}>
 											<i class="fas fa-wallet" />
 										</span>
 									{/if}
@@ -142,21 +132,13 @@
 										{/if}
 
 										{#if sub.type === 1}
-											<span
-												class="category-indicator"
-												title={$t('categories.depositOnly')}
-												aria-label={$t('categories.depositOnly')}
-											>
+											<span class="category-indicator" title={$t('categories.depositOnly')} aria-label={$t('categories.depositOnly')}>
 												<i class="fas fa-donate" />
 											</span>
 										{/if}
 
 										{#if sub.type === 2}
-											<span
-												class="category-indicator"
-												title={$t('categories.expenseOnly')}
-												aria-label={$t('categories.expenseOnly')}
-											>
+											<span class="category-indicator" title={$t('categories.expenseOnly')} aria-label={$t('categories.expenseOnly')}>
 												<i class="fas fa-wallet" />
 											</span>
 										{/if}

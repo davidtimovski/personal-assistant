@@ -101,12 +101,7 @@
 						{#each upcomingExpenses as upcomingExpense}
 							<tr class:highlighted-row={upcomingExpense.id === editedId}>
 								<td class="edit-link-cell">
-									<a
-										href="/editUpcomingExpense/{upcomingExpense.id}"
-										class="link"
-										title={$t('edit')}
-										aria-label={$t('edit')}
-									>
+									<a href="/editUpcomingExpense/{upcomingExpense.id}" class="link" title={$t('edit')} aria-label={$t('edit')}>
 										<i class="fas fa-pencil-alt" />
 									</a>
 								</td>

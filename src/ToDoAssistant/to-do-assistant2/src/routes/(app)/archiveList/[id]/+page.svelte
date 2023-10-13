@@ -50,11 +50,7 @@
 				}
 
 				name = <string>list.name;
-				archivingAListText = $t(
-					list.sharingState === SharingState.NotShared
-						? 'archiveList.archivingAList'
-						: 'archiveList.archivingAListShared'
-				);
+				archivingAListText = $t(list.sharingState === SharingState.NotShared ? 'archiveList.archivingAList' : 'archiveList.archivingAListShared');
 			})
 		);
 	});

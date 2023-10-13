@@ -32,28 +32,15 @@
 		recipe.costSummary.cost = parseFloat((recipe.costSummary.costPerServing * recipe.servings).toFixed(2));
 	}
 
-	$: servingsLabel =
-		recipe.servings > 1 ? $t('recipe.servings', { servings: recipe.servings }) : $t('recipe.oneServing');
+	$: servingsLabel = recipe.servings > 1 ? $t('recipe.servings', { servings: recipe.servings }) : $t('recipe.oneServing');
 </script>
 
 <div class="servings-selector">
-	<a
-		on:click={decrementServings}
-		class="servings-button"
-		role="button"
-		title={$t('decreaseServings')}
-		aria-label={$t('decreaseServings')}
-	>
+	<a on:click={decrementServings} class="servings-button" role="button" title={$t('decreaseServings')} aria-label={$t('decreaseServings')}>
 		<i class="fas fa-minus" />
 	</a>
 	<span class="servings">{servingsLabel}</span>
-	<a
-		on:click={incrementServings}
-		class="servings-button"
-		role="button"
-		title={$t('increaseServings')}
-		aria-label={$t('increaseServings')}
-	>
+	<a on:click={incrementServings} class="servings-button" role="button" title={$t('increaseServings')} aria-label={$t('increaseServings')}>
 		<i class="fas fa-plus" />
 	</a>
 </div>

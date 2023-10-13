@@ -11,8 +11,7 @@
 	import { ListsService } from '$lib/services/listsService';
 	import { SoundPlayer } from '$lib/utils/soundPlayer';
 
-	const notificationsVapidKey =
-		'BCL8HRDvXuYjw011VypF_TtfmklYFmqXAADY7pV3WB9vL609d8wNK0zTUs4hB0V3uAnCTpzOd2pANBmsMQoUhD0';
+	const notificationsVapidKey = 'BCL8HRDvXuYjw011VypF_TtfmklYFmqXAADY7pV3WB9vL609d8wNK0zTUs4hB0V3uAnCTpzOd2pANBmsMQoUhD0';
 	let notificationsState: string;
 	const notificationIconSrc = '/images/icons/app-icon-x96.png';
 	let notificationsAreSupported = false;
@@ -184,19 +183,11 @@
 			<div class="form-control-group">
 				<div class="setting-descriptor">{$t('preferences.derivedLists')}</div>
 				<div class="form-control">
-					<Checkbox
-						labelKey="preferences.highPriority"
-						bind:value={highPriorityListEnabled}
-						on:change={highPriorityListEnabledChanged}
-					/>
+					<Checkbox labelKey="preferences.highPriority" bind:value={highPriorityListEnabled} on:change={highPriorityListEnabledChanged} />
 				</div>
 
 				<div class="form-control">
-					<Checkbox
-						labelKey="preferences.staleTasks"
-						bind:value={staleTasksListEnabled}
-						on:change={staleTasksListEnabledChanged}
-					/>
+					<Checkbox labelKey="preferences.staleTasks" bind:value={staleTasksListEnabled} on:change={staleTasksListEnabledChanged} />
 				</div>
 			</div>
 		</form>

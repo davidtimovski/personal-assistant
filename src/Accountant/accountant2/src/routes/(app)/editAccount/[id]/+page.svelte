@@ -50,10 +50,7 @@
 		}
 	});
 
-	$: canSave =
-		$syncStatus.status !== SyncEvents.SyncStarted &&
-		!ValidationUtil.isEmptyOrWhitespace(name) &&
-		!(!$isOnline && synced);
+	$: canSave = $syncStatus.status !== SyncEvents.SyncStarted && !ValidationUtil.isEmptyOrWhitespace(name) && !(!$isOnline && synced);
 
 	async function save() {
 		saveButtonIsLoading = true;

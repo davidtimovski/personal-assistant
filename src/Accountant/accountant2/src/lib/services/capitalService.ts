@@ -19,11 +19,7 @@ export class CapitalService {
 	private readonly currenciesService = new CurrenciesService('Accountant');
 	private readonly logger = new ErrorLogger('Accountant');
 
-	async getSpent(
-		mainAccountId: number,
-		uncategorizedLabel: string,
-		currency: string
-	): Promise<{ expenditures: AmountByCategory[]; spent: number }> {
+	async getSpent(mainAccountId: number, uncategorizedLabel: string, currency: string): Promise<{ expenditures: AmountByCategory[]; spent: number }> {
 		try {
 			const transactions = await this.transactionsIDBHelper.getExpendituresForCurrentMonth(mainAccountId);
 			const expenditures = await this.transactionsService.getByCategory(transactions, currency, uncategorizedLabel);
@@ -87,9 +83,7 @@ export class CapitalService {
 			const homePageDebt = new Array<HomePageDebt>();
 			for (const debtItem of debt) {
 				const trimmedDescription = this.trimDebtDescription(debtItem.description, combinedLabel);
-				homePageDebt.push(
-					new HomePageDebt(debtItem.id, debtItem.person, debtItem.userIsDebtor, trimmedDescription, debtItem.amount)
-				);
+				homePageDebt.push(new HomePageDebt(debtItem.id, debtItem.person, debtItem.userIsDebtor, trimmedDescription, debtItem.amount));
 			}
 
 			return homePageDebt;

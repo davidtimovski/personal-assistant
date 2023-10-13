@@ -45,10 +45,7 @@
 	Chart.register(BarController, BarElement, CategoryScale, LinearScale);
 	Chart.defaults.font.family = '"Didact Gothic", sans-serif';
 
-	function groupBy(
-		list: TransactionModel[],
-		keyGetter: { (x: TransactionModel): string; (arg0: TransactionModel): any }
-	) {
+	function groupBy(list: TransactionModel[], keyGetter: { (x: TransactionModel): string; (arg0: TransactionModel): any }) {
 		const map = new Map();
 		list.forEach((item) => {
 			const key = keyGetter(item);
@@ -292,13 +289,7 @@
 			<div class="form-control inline">
 				<label for="category">{$t('category')}</label>
 				<div class="loadable-select" class:loaded={categoryOptions}>
-					<select
-						id="category"
-						bind:value={categoryId}
-						on:change={loadData}
-						disabled={!categoryOptions}
-						class="category-select"
-					>
+					<select id="category" bind:value={categoryId} on:change={loadData} disabled={!categoryOptions} class="category-select">
 						{#if categoryOptions}
 							{#each categoryOptions as category}
 								<option value={category.id}>{category.name}</option>

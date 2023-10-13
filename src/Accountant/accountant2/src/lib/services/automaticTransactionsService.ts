@@ -5,10 +5,7 @@ import { ValidationResult, ValidationUtil } from '../../../../../Core/shared2/ut
 import { AutomaticTransactionsIDBHelper } from '$lib/utils/automaticTransactionsIDBHelper';
 import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 import type { AutomaticTransaction } from '$lib/models/entities/automaticTransaction';
-import {
-	CreateAutomaticTransaction,
-	UpdateAutomaticTransaction
-} from '$lib/models/server/requests/automaticTransaction';
+import { CreateAutomaticTransaction, UpdateAutomaticTransaction } from '$lib/models/server/requests/automaticTransaction';
 import Variables from '$lib/variables';
 
 export class AutomaticTransactionsService {

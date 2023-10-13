@@ -9,13 +9,7 @@ export class ExerciseAmount extends Exercise {
 }
 
 export class ExerciseAmountX2 extends Exercise {
-	constructor(
-		public id: number,
-		public name: string,
-		public sets: number,
-		public amount1Unit: string,
-		public amount2Unit: string
-	) {
+	constructor(public id: number, public name: string, public sets: number, public amount1Unit: string, public amount2Unit: string) {
 		super(id, name, sets, ExerciseType.AmountX2);
 	}
 }

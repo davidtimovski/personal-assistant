@@ -53,19 +53,11 @@
 			</div>
 		{:else}
 			{#each archivedLists as list}
-				<div
-					class="to-do-list"
-					class:is-shared={list.sharingState !== 0 && list.sharingState !== 1}
-					class:pending-share={list.sharingState === 1}
-				>
+				<div class="to-do-list" class:is-shared={list.sharingState !== 0 && list.sharingState !== 1} class:pending-share={list.sharingState === 1}>
 					<i class="icon {getClassFromIcon(list.icon)}" />
 					<a href="/list/{list.id}" class="name" class:highlighted={list.id === editedId}>{list.name}</a>
 					<i class="fas fa-users shared-icon" title={$t('index.shared')} aria-label={$t('index.shared')} />
-					<i
-						class="fas fa-user-clock shared-icon"
-						title={$t('index.pendingAccept')}
-						aria-label={$t('index.pendingAccept')}
-					/>
+					<i class="fas fa-user-clock shared-icon" title={$t('index.pendingAccept')} aria-label={$t('index.pendingAccept')} />
 				</div>
 			{/each}
 		{/if}

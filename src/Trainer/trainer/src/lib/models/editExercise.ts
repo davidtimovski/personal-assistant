@@ -25,13 +25,7 @@ export class CreateAmountX2Exercise extends CreateExercise {
 }
 
 export class UpdateAmountX2Exercise extends UpdateExercise {
-	constructor(
-		public id: number,
-		public name: string,
-		public sets: number,
-		public amount1Unit: string,
-		public amount2Unit: string
-	) {
+	constructor(public id: number, public name: string, public sets: number, public amount1Unit: string, public amount2Unit: string) {
 		super(id, name, sets);
 	}
 }

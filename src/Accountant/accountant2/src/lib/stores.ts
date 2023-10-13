@@ -13,9 +13,7 @@ import Variables from '$lib/variables';
 
 export const isOnline = writable<boolean>(true);
 export const authInfo = writable<AuthInfo | null>(null);
-export const user = writable<AccountantUser>(
-	new AccountantUser('', '', 'en-US', 'en-US', Variables.urls.defaultProfileImageUrl)
-);
+export const user = writable<AccountantUser>(new AccountantUser('', '', 'en-US', 'en-US', Variables.urls.defaultProfileImageUrl));
 export const syncStatus = writable<SyncStatus>(new SyncStatus(SyncEvents.NotSyncing, 0, 0));
 export const alertState = writable<AlertState>(new AlertState(AlertStatus.Hidden, null, []));
 
@@ -23,6 +21,4 @@ const from = new Date();
 from.setDate(1);
 const initialFromDate = DateHelper.format(from);
 const initialToDate = DateHelper.format(new Date());
-export const searchFilters = writable<SearchFilters>(
-	new SearchFilters(1, 15, initialFromDate, initialToDate, 0, 0, TransactionType.Any, null)
-);
+export const searchFilters = writable<SearchFilters>(new SearchFilters(1, 15, initialFromDate, initialToDate, 0, 0, TransactionType.Any, null));

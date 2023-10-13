@@ -504,12 +504,7 @@
 
 		<div class="page-title">{name}</div>
 
-		<label
-			class="search-toggle"
-			class:checked={isSearching}
-			title={$t('list.searchTasks')}
-			aria-label={$t('list.searchTasks')}
-		>
+		<label class="search-toggle" class:checked={isSearching} title={$t('list.searchTasks')} aria-label={$t('list.searchTasks')}>
 			<input type="checkbox" bind:checked={isSearching} on:change={isSearchingToggleChanged} />
 			<i class="fas fa-search" />
 		</label>
@@ -549,13 +544,7 @@
 						<i class="fas fa-archive" />
 					</span>
 					<div class="alert-message" contenteditable="false" bind:innerHTML={listIsArchivedText} />
-					<button
-						type="button"
-						on:click={restore}
-						class="side"
-						title={$t('list.restore')}
-						aria-label={$t('list.restore')}
-					>
+					<button type="button" on:click={restore} class="side" title={$t('list.restore')} aria-label={$t('list.restore')}>
 						<i class="fas fa-check-circle" />
 					</button>
 				</div>
@@ -612,13 +601,7 @@
 							<div transition:slide class="new-task-url-wrap">
 								<hr />
 								<input type="url" bind:value={newTaskUrl} maxlength="1000" readonly />
-								<button
-									type="button"
-									on:click={clearUrl}
-									class="clear-url-button"
-									title={$t('clear')}
-									aria-label={$t('clear')}
-								>
+								<button type="button" on:click={clearUrl} class="clear-url-button" title={$t('clear')} aria-label={$t('clear')}>
 									<i class="fas fa-times" />
 								</button>
 							</div>

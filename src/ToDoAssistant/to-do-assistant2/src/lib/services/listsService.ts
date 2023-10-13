@@ -77,19 +77,7 @@ export class ListsService {
 				highPriorityList.tasks = uncompletedHighPriorityTasks;
 			} else {
 				allLists.push(
-					new List(
-						0,
-						null,
-						null,
-						false,
-						false,
-						SharingState.NotShared,
-						1,
-						false,
-						DerivedLists.HighPriority,
-						uncompletedHighPriorityTasks,
-						null
-					)
+					new List(0, null, null, false, false, SharingState.NotShared, 1, false, DerivedLists.HighPriority, uncompletedHighPriorityTasks, null)
 				);
 			}
 		} else if (highPriorityList) {
@@ -109,21 +97,7 @@ export class ListsService {
 			if (staleTasksList) {
 				staleTasksList.tasks = uncompletedStaleTasks;
 			} else {
-				allLists.push(
-					new List(
-						0,
-						null,
-						null,
-						false,
-						false,
-						SharingState.NotShared,
-						2,
-						false,
-						DerivedLists.StaleTasks,
-						uncompletedStaleTasks,
-						null
-					)
-				);
+				allLists.push(new List(0, null, null, false, false, SharingState.NotShared, 2, false, DerivedLists.StaleTasks, uncompletedStaleTasks, null));
 			}
 		} else if (staleTasksList) {
 			const index = allLists.indexOf(staleTasksList);

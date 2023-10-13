@@ -1,5 +1,5 @@
 import type { Category, CategoryType } from '$lib/models/entities/category';
-import type { CreatedIdPair } from '$lib/models/sync';
+import type { CreatedIdPair } from '$lib/models/server/responses/sync';
 import { IDBContext } from './idbContext';
 
 export class CategoriesIDBHelper {

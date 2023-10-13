@@ -21,12 +21,7 @@ export class Formatter {
 		}).format(value);
 	}
 
-	static numberPrecise(
-		value: any,
-		currency: string | null,
-		culture: string | string[] | undefined,
-		fractionDigits?: number | undefined
-	) {
+	static numberPrecise(value: any, currency: string | null, culture: string | string[] | undefined, fractionDigits?: number | undefined) {
 		if (isNaN(parseFloat(value)) || !currency || !culture) {
 			return '';
 		}
@@ -54,12 +49,7 @@ export class Formatter {
 		return formatConfig.format(value);
 	}
 
-	static moneyPrecise(
-		value: any,
-		currency: string | null,
-		culture: string | string[] | undefined,
-		fractionDigits?: number | undefined
-	) {
+	static moneyPrecise(value: any, currency: string | null, culture: string | string[] | undefined, fractionDigits?: number | undefined) {
 		if (isNaN(parseFloat(value)) || !currency || !culture) {
 			return '';
 		}

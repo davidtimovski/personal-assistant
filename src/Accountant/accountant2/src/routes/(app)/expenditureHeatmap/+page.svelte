@@ -138,17 +138,7 @@
 				const dateString = DateHelper.format(aMonthAgo);
 				const isToday = dateString === todayString;
 
-				const day = new HeatmapDay(
-					aMonthAgo.getDate(),
-					dateString,
-					formatDate(aMonthAgo),
-					isToday,
-					0,
-					0,
-					null,
-					null,
-					[]
-				);
+				const day = new HeatmapDay(aMonthAgo.getDate(), dateString, formatDate(aMonthAgo), isToday, 0, 0, null, null, []);
 
 				daysArray.push(day);
 
@@ -365,15 +355,7 @@
 
 		&-line {
 			height: 10px;
-			background: linear-gradient(
-				to right,
-				#241432 0%,
-				#6d1f56 20%,
-				#ba1656 40%,
-				#ee523f 60%,
-				#f6a47c 80%,
-				#f9e5d4 100%
-			);
+			background: linear-gradient(to right, #241432 0%, #6d1f56 20%, #ba1656 40%, #ee523f 60%, #f6a47c 80%, #f9e5d4 100%);
 		}
 
 		&-amounts {

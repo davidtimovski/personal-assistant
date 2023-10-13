@@ -51,9 +51,7 @@
 			{:else if exercises.length > 0}
 				<div class="exercises-container">
 					{#each exercises as exercise}
-						<a href="/editExercise/{exercise.id}" class="exercise" class:highlighted={editedId === exercise.id}
-							>{exercise.name}</a
-						>
+						<a href="/editExercise/{exercise.id}" class="exercise" class:highlighted={editedId === exercise.id}>{exercise.name}</a>
 					{/each}
 				</div>
 			{:else}

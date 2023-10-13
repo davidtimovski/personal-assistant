@@ -63,13 +63,7 @@
 						transaction.id,
 						transaction.amount,
 						getType(transaction.fromAccountId, transaction.toAccountId),
-						getDetail(
-							transaction.description,
-							transaction.isEncrypted,
-							transaction.categoryId,
-							transaction.fromAccountId,
-							transaction.toAccountId
-						),
+						getDetail(transaction.description, transaction.isEncrypted, transaction.categoryId, transaction.fromAccountId, transaction.toAccountId),
 						formatDate(transaction.date),
 						transaction.synced
 					)
@@ -264,13 +258,7 @@
 			<div class="form-control inline">
 				<label for="category">{$t('category')}</label>
 				<div class="loadable-select" class:loaded={categoryOptions}>
-					<select
-						id="category"
-						bind:value={$searchFilters.categoryId}
-						on:change={filterChanged}
-						disabled={!categoryOptions}
-						class="category-select"
-					>
+					<select id="category" bind:value={$searchFilters.categoryId} on:change={filterChanged} disabled={!categoryOptions} class="category-select">
 						{#if categoryOptions}
 							{#each categoryOptions as category}
 								<option value={category.id}>{category.name}</option>
@@ -283,13 +271,7 @@
 			<div class="form-control inline">
 				<label for="account">{$t('account')}</label>
 				<div class="loadable-select" class:loaded={accountOptions}>
-					<select
-						id="account"
-						bind:value={$searchFilters.accountId}
-						on:change={filterChanged}
-						disabled={!accountOptions}
-						class="category-select"
-					>
+					<select id="account" bind:value={$searchFilters.accountId} on:change={filterChanged} disabled={!accountOptions} class="category-select">
 						{#if accountOptions}
 							{#each accountOptions as account}
 								<option value={account.id}>{account.name}</option>
@@ -304,50 +286,26 @@
 					<div class="multi-radio-part">
 						<label class:selected={$searchFilters.type === 0}>
 							<span>{$t('transactions.all')}</span>
-							<input
-								type="radio"
-								name="typeToggle"
-								value={0}
-								bind:group={$searchFilters.type}
-								on:change={filterChanged}
-							/>
+							<input type="radio" name="typeToggle" value={0} bind:group={$searchFilters.type} on:change={filterChanged} />
 						</label>
 					</div>
 					<div class="multi-radio-part">
 						<label class:selected={$searchFilters.type === 1}>
 							<span>{$t('transactions.expenses')}</span>
-							<input
-								type="radio"
-								name="typeToggle"
-								value={1}
-								bind:group={$searchFilters.type}
-								on:change={filterChanged}
-							/>
+							<input type="radio" name="typeToggle" value={1} bind:group={$searchFilters.type} on:change={filterChanged} />
 						</label>
 					</div>
 					<div class="multi-radio-part">
 						<label class:selected={$searchFilters.type === 2}>
 							<span>{$t('transactions.deposits')}</span>
-							<input
-								type="radio"
-								name="typeToggle"
-								value={2}
-								bind:group={$searchFilters.type}
-								on:change={filterChanged}
-							/>
+							<input type="radio" name="typeToggle" value={2} bind:group={$searchFilters.type} on:change={filterChanged} />
 						</label>
 					</div>
 					{#if $searchFilters.accountId === 0}
 						<div class="multi-radio-part">
 							<label class:selected={$searchFilters.type === 3}>
 								<span>{$t('transactions.transfers')}</span>
-								<input
-									type="radio"
-									name="typeToggle"
-									value={3}
-									bind:group={$searchFilters.type}
-									on:change={filterChanged}
-								/>
+								<input type="radio" name="typeToggle" value={3} bind:group={$searchFilters.type} on:change={filterChanged} />
 							</label>
 						</div>
 					{/if}
@@ -363,12 +321,7 @@
 						placeholder={$t('transactions.searchByDescription')}
 						aria-label={$t('transactions.searchByDescription')}
 					/>
-					<button
-						type="button"
-						on:click={clearDescriptionFilter}
-						title={$t('transactions.clear')}
-						aria-label={$t('transactions.clear')}
-					>
+					<button type="button" on:click={clearDescriptionFilter} title={$t('transactions.clear')} aria-label={$t('transactions.clear')}>
 						<i class="fas fa-times" />
 					</button>
 				</div>
