@@ -60,56 +60,56 @@ public class ListsControllerTests
     [Fact]
     public async Task Create_Returns400_IfBodyMissing()
     {
-        var result = await _sut.Create(null);
+        var result = await _sut.Create(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 
     [Fact]
     public async Task Update_Returns400_IfBodyMissing()
     {
-        var result = await _sut.Update(null);
+        var result = await _sut.Update(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 
     [Fact]
     public async Task UpdateShared_Returns400_IfBodyMissing()
     {
-        var result = await _sut.UpdateShared(null);
+        var result = await _sut.UpdateShared(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 
     [Fact]
     public async Task Share_Returns400_IfBodyMissing()
     {
-        var result = await _sut.Share(null);
+        var result = await _sut.Share(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 
     [Fact]
     public async Task Copy_Returns400_IfBodyMissing()
     {
-        var result = await _sut.Copy(null);
+        var result = await _sut.Copy(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 
     [Fact]
     public async Task SetIsArchived_Returns400_IfBodyMissing()
     {
-        var result = await _sut.SetIsArchived(null);
+        var result = await _sut.SetIsArchived(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 
     [Fact]
     public async Task UncompleteAll_Returns400_IfBodyMissing()
     {
-        var result = await _sut.UncompleteAll(null);
+        var result = await _sut.UncompleteAll(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 
     [Fact]
     public async Task SetShareIsAccepted_Returns400_IfBodyMissing()
     {
-        var result = await _sut.SetShareIsAccepted(null);
+        var result = await _sut.SetShareIsAccepted(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 

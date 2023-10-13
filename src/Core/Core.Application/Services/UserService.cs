@@ -92,7 +92,7 @@ public class UserService : IUserService
         }
     }
 
-    public async Task<int> CreateAsync(string auth0Id, string email, string name, string language, string culture, string imageUri, ISpan metricsSpan)
+    public async Task<int> CreateAsync(string auth0Id, string email, string name, string language, string culture, string imageUri, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(UserService)}.{nameof(CreateAsync)}");
 
@@ -111,7 +111,7 @@ public class UserService : IUserService
                 ModifiedDate = DateTime.UtcNow,
             };
 
-            return await _usersRepository.CreateAsync(auth0Id, user, metric);
+            return await _usersRepository.CreateAsync(auth0Id, user, metric, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -124,7 +124,7 @@ public class UserService : IUserService
         }
     }
 
-    public async Task UpdateProfileAsync(int id, string name, string language, string culture, string imageUri, ISpan metricsSpan)
+    public async Task UpdateProfileAsync(int id, string name, string language, string culture, string imageUri, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(UserService)}.{nameof(UpdateProfileAsync)}");
 
@@ -137,7 +137,7 @@ public class UserService : IUserService
             user.ImageUri = imageUri;
             user.ModifiedDate = DateTime.UtcNow;
 
-            await _usersRepository.UpdateAsync(user, metric);
+            await _usersRepository.UpdateAsync(user, metric, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -150,7 +150,7 @@ public class UserService : IUserService
         }
     }
 
-    public async Task UpdateToDoNotificationsEnabledAsync(int id, bool enabled, ISpan metricsSpan)
+    public async Task UpdateToDoNotificationsEnabledAsync(int id, bool enabled, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(UserService)}.{nameof(UpdateToDoNotificationsEnabledAsync)}");
 
@@ -160,7 +160,7 @@ public class UserService : IUserService
             user.ToDoNotificationsEnabled = enabled;
             user.ModifiedDate = DateTime.UtcNow;
 
-            await _usersRepository.UpdateAsync(user, metric);
+            await _usersRepository.UpdateAsync(user, metric, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -173,7 +173,7 @@ public class UserService : IUserService
         }
     }
 
-    public async Task UpdateChefNotificationsEnabledAsync(int id, bool enabled, ISpan metricsSpan)
+    public async Task UpdateChefNotificationsEnabledAsync(int id, bool enabled, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(UserService)}.{nameof(UpdateChefNotificationsEnabledAsync)}");
 
@@ -183,7 +183,7 @@ public class UserService : IUserService
             user.ChefNotificationsEnabled = enabled;
             user.ModifiedDate = DateTime.UtcNow;
 
-            await _usersRepository.UpdateAsync(user, metric);
+            await _usersRepository.UpdateAsync(user, metric, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -196,7 +196,7 @@ public class UserService : IUserService
         }
     }
 
-    public async Task UpdateImperialSystemAsync(int id, bool imperialSystem, ISpan metricsSpan)
+    public async Task UpdateImperialSystemAsync(int id, bool imperialSystem, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(UserService)}.{nameof(UpdateImperialSystemAsync)}");
 
@@ -206,7 +206,7 @@ public class UserService : IUserService
             user.ImperialSystem = imperialSystem;
             user.ModifiedDate = DateTime.UtcNow;
 
-            await _usersRepository.UpdateAsync(user, metric);
+            await _usersRepository.UpdateAsync(user, metric, cancellationToken);
         }
         catch (Exception ex)
         {

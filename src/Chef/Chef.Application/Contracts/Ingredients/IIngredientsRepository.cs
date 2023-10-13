@@ -15,8 +15,8 @@ public interface IIngredientsRepository
     bool Exists(int id, int userId);
     bool Exists(int id, string name, int userId);
     bool ExistsInRecipe(int id, int recipeId);
-    Task UpdateAsync(Ingredient ingredient, ISpan metricsSpan);
-    Task UpdatePublicAsync(int id, int? taskId, int userId, DateTime createdDate, ISpan metricsSpan);
-    Task DeleteAsync(int id, ISpan metricsSpan);
-    Task RemoveFromRecipesAsync(int id, int userId, ISpan metricsSpan);
+    Task UpdateAsync(Ingredient ingredient, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task UpdatePublicAsync(int id, int? taskId, int userId, DateTime createdDate, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task DeleteAsync(int id, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task RemoveFromRecipesAsync(int id, int userId, ISpan metricsSpan, CancellationToken cancellationToken);
 }

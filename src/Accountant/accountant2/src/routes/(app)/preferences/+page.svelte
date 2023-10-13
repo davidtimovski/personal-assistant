@@ -58,11 +58,7 @@
 			</div>
 
 			<div class="form-control">
-				<Checkbox
-					labelKey="preferences.mergeDebtPerPerson"
-					value={mergeDebtPerPerson}
-					on:change={mergeDebtPerPersonChanged}
-				/>
+				<Checkbox labelKey="preferences.mergeDebtPerPerson" value={mergeDebtPerPerson} on:change={mergeDebtPerPersonChanged} />
 			</div>
 
 			<div class="form-control-group">

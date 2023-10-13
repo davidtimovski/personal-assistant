@@ -73,9 +73,7 @@
 		const selectedDate = new Date(date);
 
 		const isToday =
-			selectedDate.getDate() == now.getDate() &&
-			selectedDate.getMonth() == now.getMonth() &&
-			selectedDate.getFullYear() == now.getFullYear();
+			selectedDate.getDate() == now.getDate() && selectedDate.getMonth() == now.getMonth() && selectedDate.getFullYear() == now.getFullYear();
 
 		if (isToday) {
 			const hour = now.getHours();

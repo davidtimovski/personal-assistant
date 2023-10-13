@@ -5,6 +5,8 @@ namespace Core.Persistence;
 
 public class WeathermanContext : DbContext
 {
+    private const string schema = "weatherman";
+
     public WeathermanContext(DbContextOptions<WeathermanContext> options) : base(options)
     {
     }
@@ -15,7 +17,7 @@ public class WeathermanContext : DbContext
     {
         modelBuilder.Entity<Forecast>(x =>
         {
-            x.ToTable("forecasts", schema: "weatherman");
+            x.ToTable("forecasts", schema);
             x.Property(b => b.Data).HasColumnType("json");
         });
     }

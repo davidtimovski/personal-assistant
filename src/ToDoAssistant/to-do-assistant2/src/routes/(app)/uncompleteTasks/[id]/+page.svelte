@@ -50,9 +50,7 @@
 
 				name = <string>list.name;
 				uncompleteText = $t(
-					list.sharingState !== SharingState.NotShared
-						? 'uncompleteTasks.thisWillUncompleteShared'
-						: 'uncompleteTasks.thisWillUncomplete'
+					list.sharingState !== SharingState.NotShared ? 'uncompleteTasks.thisWillUncompleteShared' : 'uncompleteTasks.thisWillUncomplete'
 				);
 			})
 		);

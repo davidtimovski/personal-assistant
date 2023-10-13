@@ -215,9 +215,7 @@ export class RecipesService {
 	}
 
 	canSendRecipeToUser(email: string, recipeId: number): Promise<CanSendRecipe> {
-		return this.httpProxy.ajax<CanSendRecipe>(
-			`${Variables.urls.api}/recipes/can-send-recipe-to-user/${email}/${recipeId}`
-		);
+		return this.httpProxy.ajax<CanSendRecipe>(`${Variables.urls.api}/recipes/can-send-recipe-to-user/${email}/${recipeId}`);
 	}
 
 	async send(dto: CreateSendRequest): Promise<void> {
@@ -305,8 +303,7 @@ export class RecipesService {
 					if (parseInt(prepDurationHours, 10) === 0) {
 						text += parseInt(prepDurationMinutes, 10) + minutesLetter;
 					} else {
-						text +=
-							parseInt(prepDurationHours, 10) + hoursLetter + ' ' + parseInt(prepDurationMinutes, 10) + minutesLetter;
+						text += parseInt(prepDurationHours, 10) + hoursLetter + ' ' + parseInt(prepDurationMinutes, 10) + minutesLetter;
 					}
 				}
 				if (recipe.cookDuration) {
@@ -318,8 +315,7 @@ export class RecipesService {
 					if (parseInt(cookDurationHours, 10) === 0) {
 						text += parseInt(cookDurationMinutes, 10) + minutesLetter;
 					} else {
-						text +=
-							parseInt(cookDurationHours, 10) + hoursLetter + ' ' + parseInt(cookDurationMinutes, 10) + minutesLetter;
+						text += parseInt(cookDurationHours, 10) + hoursLetter + ' ' + parseInt(cookDurationMinutes, 10) + minutesLetter;
 					}
 				}
 			}

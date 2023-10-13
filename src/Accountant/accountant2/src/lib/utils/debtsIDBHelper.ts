@@ -1,5 +1,5 @@
 import type { DebtModel } from '$lib/models/entities/debt';
-import type { CreatedIdPair } from '$lib/models/sync';
+import type { CreatedIdPair } from '$lib/models/server/responses/sync';
 import { IDBContext } from './idbContext';
 
 export class DebtsIDBHelper {

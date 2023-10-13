@@ -174,13 +174,7 @@
 					</div>
 				{:else}
 					<div>
-						<img
-							src={model.imageUri}
-							class="image"
-							width={model.imageWidth}
-							height={model.imageHeight}
-							alt={model.name}
-						/>
+						<img src={model.imageUri} class="image" width={model.imageWidth} height={model.imageHeight} alt={model.name} />
 
 						{#if model.description}
 							<div class="description">{model.description}</div>
@@ -550,9 +544,7 @@
 									</div>
 									<div hidden={model.servings <= 1}>
 										<span>{$t('recipe.perServing')}</span>
-										<span class="cost"
-											>{Formatter.money(model.costSummary.costPerServing, currency, $user.language)}</span
-										>
+										<span class="cost">{Formatter.money(model.costSummary.costPerServing, currency, $user.language)}</span>
 									</div>
 								</div>
 							</section>

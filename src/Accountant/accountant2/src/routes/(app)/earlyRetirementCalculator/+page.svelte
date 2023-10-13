@@ -282,9 +282,7 @@
 		}
 
 		lifeInsuranceAge = getIntValueOrZero(lifeInsuranceAge);
-		lifeInsuranceReturn = hasLifeInsurance
-			? getConvertedValueOrZero(<number>lifeInsuranceReturn, lifeInsuranceReturnCurrency)
-			: 0;
+		lifeInsuranceReturn = hasLifeInsurance ? getConvertedValueOrZero(<number>lifeInsuranceReturn, lifeInsuranceReturnCurrency) : 0;
 
 		const monthlyInflationFactor = 1 - inflation / 12;
 		const savingInterestMonthlyFactor = 1 + getFloatValueOrZero(savingInterestRate) / 100 / 12;
@@ -377,12 +375,7 @@
 
 		currency = localStorage.get(LocalStorageKeys.Currency);
 
-		capitalCurrency =
-			savedPerMonthCurrency =
-			pensionPerMonthCurrency =
-			lifeInsuranceReturnCurrency =
-			retirementIncomeCurrency =
-				currency;
+		capitalCurrency = savedPerMonthCurrency = pensionPerMonthCurrency = lifeInsuranceReturnCurrency = retirementIncomeCurrency = currency;
 
 		upcomingExpenses = [
 			new LargeUpcomingExpense($t('earlyRetirementCalculator.home'), 'fas fa-home', currency),
@@ -422,9 +415,7 @@
 			<p class="er-calc-explanation">{$t('earlyRetirementCalculator.explanation')}</p>
 
 			<div class="centering-wrap">
-				<button type="button" on:click={start} class="er-calc-button big start"
-					>{$t('earlyRetirementCalculator.start')}</button
-				>
+				<button type="button" on:click={start} class="er-calc-button big start">{$t('earlyRetirementCalculator.start')}</button>
 			</div>
 		</section>
 
@@ -540,11 +531,7 @@
 				{$t('earlyRetirementCalculator.pensionIncome')}
 			</div>
 			<div class="er-calc-input-wrap">
-				<AmountInput
-					bind:amount={pensionPerMonth}
-					bind:currency={pensionPerMonthCurrency}
-					invalid={pensionPerMonthIsInvalid}
-				/>
+				<AmountInput bind:amount={pensionPerMonth} bind:currency={pensionPerMonthCurrency} invalid={pensionPerMonthIsInvalid} />
 			</div>
 
 			<div class="buttons-wrap">
@@ -585,13 +572,7 @@
 			</div>
 			<div class="er-calc-input-wrap">
 				<div class="interest-rate-input-wrap">
-					<input
-						type="number"
-						bind:value={lifeInsuranceAge}
-						class:invalid={lifeInsuranceAgeIsInvalid}
-						min="30"
-						max="99"
-					/>
+					<input type="number" bind:value={lifeInsuranceAge} class:invalid={lifeInsuranceAgeIsInvalid} min="30" max="99" />
 					<span class="add-on">{$t('earlyRetirementCalculator.years')}</span>
 				</div>
 			</div>
@@ -600,11 +581,7 @@
 				{$t('earlyRetirementCalculator.lifeInsuranceReturn')}
 			</div>
 			<div class="er-calc-input-wrap">
-				<AmountInput
-					bind:amount={lifeInsuranceReturn}
-					bind:currency={lifeInsuranceReturnCurrency}
-					invalid={lifeInsuranceReturnIsInvalid}
-				/>
+				<AmountInput bind:amount={lifeInsuranceReturn} bind:currency={lifeInsuranceReturnCurrency} invalid={lifeInsuranceReturnIsInvalid} />
 			</div>
 
 			<div class="buttons-wrap">
@@ -671,11 +648,7 @@
 				{$t('earlyRetirementCalculator.retirementIncome')}
 			</div>
 			<div class="er-calc-input-wrap">
-				<AmountInput
-					bind:amount={retirementIncome}
-					bind:currency={retirementIncomeCurrency}
-					invalid={preferredRetirementIncomeIsInvalid}
-				/>
+				<AmountInput bind:amount={retirementIncome} bind:currency={retirementIncomeCurrency} invalid={preferredRetirementIncomeIsInvalid} />
 			</div>
 
 			<div class="buttons-wrap">

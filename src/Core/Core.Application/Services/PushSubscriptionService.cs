@@ -18,7 +18,7 @@ public class PushSubscriptionService : IPushSubscriptionService
         _logger = logger;
     }
 
-    public async Task CreateSubscriptionAsync(int userId, string application, string endpoint, string authKey, string p256dhKey, ISpan metricsSpan)
+    public async Task CreateSubscriptionAsync(int userId, string application, string endpoint, string authKey, string p256dhKey, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(PushSubscriptionService)}.{nameof(CreateSubscriptionAsync)}");
 
@@ -34,7 +34,7 @@ public class PushSubscriptionService : IPushSubscriptionService
 
         try
         {
-            await _pushSubscriptionsRepository.CreateSubscriptionAsync(subscription, metric);
+            await _pushSubscriptionsRepository.CreateSubscriptionAsync(subscription, metric, cancellationToken);
         }
         catch (Exception ex)
         {

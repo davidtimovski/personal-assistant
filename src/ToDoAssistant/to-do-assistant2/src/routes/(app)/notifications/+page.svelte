@@ -24,9 +24,7 @@
 	}
 
 	function replacePlaceholders(notification: Notification) {
-		notification.message = notification.message
-			.replace(/#\[/g, '<span class="colored-text">')
-			.replace(/\]#/g, '</span>');
+		notification.message = notification.message.replace(/#\[/g, '<span class="colored-text">').replace(/\]#/g, '</span>');
 		return notification;
 	}
 
@@ -47,11 +45,7 @@
 				const allNotifications = await notificationsService.getAll();
 
 				for (const notification of allNotifications) {
-					notification.formattedCreatedDate = DateHelper.formatWeekdayTime(
-						new Date(notification.createdDate),
-						$user.language,
-						$user.culture
-					);
+					notification.formattedCreatedDate = DateHelper.formatWeekdayTime(new Date(notification.createdDate), $user.language, $user.culture);
 					if (notification.listId && notification.taskId) {
 						notification.url = `/list/${notification.listId}?edited=${notification.taskId}`;
 					} else if (notification.listId) {

@@ -116,9 +116,7 @@ export class TasksService {
 			throw new Error('Task not found');
 		}
 
-		const tasks = list.tasks.filter(
-			(x) => x.isCompleted === task.isCompleted && x.isPrivate === task.isPrivate && x.order > task.order
-		);
+		const tasks = list.tasks.filter((x) => x.isCompleted === task.isCompleted && x.isPrivate === task.isPrivate && x.order > task.order);
 		tasks.forEach((task) => {
 			task.order--;
 		});
@@ -294,21 +292,7 @@ export class TasksService {
 			if (highPriorityList) {
 				highPriorityList.tasks.push(task);
 			} else {
-				localLists.push(
-					new List(
-						0,
-						null,
-						null,
-						false,
-						false,
-						SharingState.NotShared,
-						0,
-						false,
-						DerivedLists.HighPriority,
-						[task],
-						null
-					)
-				);
+				localLists.push(new List(0, null, null, false, false, SharingState.NotShared, 0, false, DerivedLists.HighPriority, [task], null));
 			}
 		}
 

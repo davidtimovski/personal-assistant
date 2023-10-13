@@ -1,6 +1,7 @@
 ﻿using Api.UnitTests.Builders;
 using Core.Api.Controllers;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
 using Xunit;
 
 namespace Api.UnitTests.Controllers.Core;
@@ -20,7 +21,7 @@ public class PushSubscriptionsControllerTests
     [Fact]
     public async Task CreateSubscription_Returns400_IfBodyMissing()
     {
-        var result = await _sut.CreateSubscription(null);
+        var result = await _sut.CreateSubscription(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 }

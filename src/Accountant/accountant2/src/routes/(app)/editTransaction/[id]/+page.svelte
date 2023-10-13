@@ -174,16 +174,7 @@
 			return x;
 		});
 
-		const result = TransactionsService.validate(
-			amount,
-			amountFrom,
-			amountTo,
-			fromAccountId,
-			toAccountId,
-			date,
-			encrypt,
-			encryptionPassword
-		);
+		const result = TransactionsService.validate(amount, amountFrom, amountTo, fromAccountId, toAccountId, date, encrypt, encryptionPassword);
 		if (result.valid) {
 			amountIsInvalid = false;
 			dateIsInvalid = false;
@@ -436,32 +427,14 @@
 				{#if stockSelling}
 					<div class="form-control inline">
 						<label for="sold-stocks">{$t('soldStocks')}</label>
-						<input
-							type="number"
-							id="sold-stocks"
-							bind:value={fromStocks}
-							min="0.0001"
-							max="100000"
-							step="0.0001"
-							class="stocks-input"
-							required
-						/>
+						<input type="number" id="sold-stocks" bind:value={fromStocks} min="0.0001" max="100000" step="0.0001" class="stocks-input" required />
 					</div>
 				{/if}
 
 				{#if stockPurchase}
 					<div class="form-control inline">
 						<label for="purchased-stocks">{$t('purchasedStocks')}</label>
-						<input
-							type="number"
-							id="purchased-stocks"
-							bind:value={toStocks}
-							min="0.0001"
-							max="100000"
-							step="0.0001"
-							class="stocks-input"
-							required
-						/>
+						<input type="number" id="purchased-stocks" bind:value={toStocks} min="0.0001" max="100000" step="0.0001" class="stocks-input" required />
 					</div>
 				{/if}
 
@@ -496,12 +469,7 @@
 								placeholder={$t('password')}
 								aria-label={$t('password')}
 							/>
-							<button
-								type="button"
-								on:click={toggleDecPasswordShow}
-								class="password-show-button"
-								class:shown={decPasswordShown}
-							>
+							<button type="button" on:click={toggleDecPasswordShow} class="password-show-button" class:shown={decPasswordShown}>
 								<i class="fas fa-eye" />
 								<i class="fas fa-eye-slash" />
 							</button>

@@ -38,9 +38,7 @@
 		const result = validate();
 		if (result.valid) {
 			if (amountModel.id === 0) {
-				const newId = await exercisesService.createAmount(
-					new CreateAmountExercise(amountModel.name, amountModel.sets, amountModel.amountUnit)
-				);
+				const newId = await exercisesService.createAmount(new CreateAmountExercise(amountModel.name, amountModel.sets, amountModel.amountUnit));
 
 				alertState.update((x) => {
 					x.showSuccess('editExercise.createSuccessful');
@@ -48,9 +46,7 @@
 				});
 				goto('/exercises?edited=' + newId);
 			} else {
-				await exercisesService.updateAmount(
-					new UpdateAmountExercise(amountModel.id, amountModel.name, amountModel.sets, amountModel.amountUnit)
-				);
+				await exercisesService.updateAmount(new UpdateAmountExercise(amountModel.id, amountModel.name, amountModel.sets, amountModel.amountUnit));
 
 				alertState.update((x) => {
 					x.showSuccess('editExercise.saveSuccessful');

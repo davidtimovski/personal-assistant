@@ -84,7 +84,7 @@ public class TasksController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateTaskRequest request)
+    public async Task<IActionResult> Create([FromBody] CreateTaskRequest request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -108,7 +108,7 @@ public class TasksController : BaseController
                 IsOneTime = request.IsOneTime,
                 IsPrivate = request.IsPrivate,
             };
-            CreatedTaskResult result = await _taskService.CreateAsync(model, _createValidator, tr);
+            CreatedTaskResult result = await _taskService.CreateAsync(model, _createValidator, tr, cancellationToken);
 
             if (result.NotifySignalR)
             {
@@ -121,7 +121,7 @@ public class TasksController : BaseController
                 var message = _localizer["CreatedTaskNotification", result.ActionUserName, result.TaskName, result.ListName];
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, request.ListId, result.TaskId, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -142,7 +142,7 @@ public class TasksController : BaseController
     }
 
     [HttpPost("bulk")]
-    public async Task<IActionResult> BulkCreate([FromBody] BulkCreateRequest request)
+    public async Task<IActionResult> BulkCreate([FromBody] BulkCreateRequest request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -165,7 +165,7 @@ public class TasksController : BaseController
                 TasksAreOneTime = request.TasksAreOneTime,
                 TasksArePrivate = request.TasksArePrivate,
             };
-            BulkCreateResult result = await _taskService.BulkCreateAsync(model, _bulkCreateValidator, tr);
+            BulkCreateResult result = await _taskService.BulkCreateAsync(model, _bulkCreateValidator, tr, cancellationToken);
 
             if (result.NotifySignalR)
             {
@@ -185,7 +185,7 @@ public class TasksController : BaseController
                     var message = _localizer["CreatedTaskNotification", result.ActionUserName, task.Name, result.ListName];
 
                     var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, request.ListId, task.Id, message);
-                    var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
+                    var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
                     var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                     {
                         SenderImageUri = result.ActionUserImageUri,
@@ -207,7 +207,7 @@ public class TasksController : BaseController
     }
 
     [HttpPut]
-    public async Task<IActionResult> Update([FromBody] UpdateTaskRequest request)
+    public async Task<IActionResult> Update([FromBody] UpdateTaskRequest request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -234,7 +234,7 @@ public class TasksController : BaseController
                 IsPrivate = request.IsPrivate,
                 AssignedToUserId = request.AssignedToUserId,
             };
-            UpdateTaskResult result = await _taskService.UpdateAsync(model, _updateValidator, tr);
+            UpdateTaskResult result = await _taskService.UpdateAsync(model, _updateValidator, tr, cancellationToken);
 
             if (result.NotifySignalR)
             {
@@ -252,7 +252,7 @@ public class TasksController : BaseController
                 var message = _localizer["UpdatedTaskNotification", result.ActionUserName, result.OriginalTaskName, result.ListName];
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, result.ListId, request.Id, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -270,7 +270,7 @@ public class TasksController : BaseController
                 var message = _localizer["RemovedTaskNotification", result.ActionUserName, result.OriginalTaskName, result.OldListName];
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, result.OldListId, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -288,7 +288,7 @@ public class TasksController : BaseController
                 var message = _localizer["CreatedTaskNotification", result.ActionUserName, request.Name, result.ListName];
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, result.ListId, request.Id, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -306,7 +306,7 @@ public class TasksController : BaseController
                 var message = _localizer["AssignedTaskNotification", result.ActionUserName, result.OriginalTaskName, result.ListName];
 
                 var createNotificationDto = new CreateOrUpdateNotification(result.AssignedNotificationRecipient.Id, UserId, result.ListId, request.Id, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -327,7 +327,7 @@ public class TasksController : BaseController
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} api/tasks/{id}",
@@ -337,7 +337,7 @@ public class TasksController : BaseController
 
         try
         {
-            DeleteTaskResult result = await _taskService.DeleteAsync(id, UserId, tr);
+            DeleteTaskResult result = await _taskService.DeleteAsync(id, UserId, tr, cancellationToken);
 
             if (result.NotifySignalR)
             {
@@ -350,7 +350,7 @@ public class TasksController : BaseController
                 var message = _localizer["RemovedTaskNotification", result.ActionUserName, result.TaskName, result.ListName];
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, result.ListId, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -371,7 +371,7 @@ public class TasksController : BaseController
     }
 
     [HttpPut("complete")]
-    public async Task<IActionResult> Complete([FromBody] CompleteUncompleteRequest request)
+    public async Task<IActionResult> Complete([FromBody] CompleteUncompleteRequest request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -391,7 +391,7 @@ public class TasksController : BaseController
                 Id = request.Id,
                 UserId = UserId
             };
-            CompleteUncompleteTaskResult result = await _taskService.CompleteAsync(model, tr);
+            CompleteUncompleteTaskResult result = await _taskService.CompleteAsync(model, tr, cancellationToken);
 
             if (result.NotifySignalR)
             {
@@ -404,7 +404,7 @@ public class TasksController : BaseController
                 string message = _localizer["CompletedTaskNotification", result.ActionUserName, result.TaskName, result.ListName];
 
                 var updateNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, result.ListId, request.Id, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto, tr);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto, tr, cancellationToken);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -425,7 +425,7 @@ public class TasksController : BaseController
     }
 
     [HttpPut("uncomplete")]
-    public async Task<IActionResult> Uncomplete([FromBody] CompleteUncompleteRequest request)
+    public async Task<IActionResult> Uncomplete([FromBody] CompleteUncompleteRequest request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -445,7 +445,7 @@ public class TasksController : BaseController
                 Id = request.Id,
                 UserId = UserId
             };
-            CompleteUncompleteTaskResult result = await _taskService.UncompleteAsync(model, tr);
+            CompleteUncompleteTaskResult result = await _taskService.UncompleteAsync(model, tr, cancellationToken);
 
             if (result.NotifySignalR)
             {
@@ -458,7 +458,7 @@ public class TasksController : BaseController
                 string message = _localizer["UncompletedTaskNotification", result.ActionUserName, result.TaskName, result.ListName];
 
                 var updateNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, result.ListId, request.Id, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto, tr);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto, tr, cancellationToken);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -479,7 +479,7 @@ public class TasksController : BaseController
     }
 
     //[HttpPut("reorder")]
-    //public async Task<IActionResult> Reorder([FromBody] ReorderTaskRequest request)
+    //public async Task<IActionResult> Reorder([FromBody] ReorderTaskRequest request, CancellationToken cancellationToken)
     //{
     //    if (request is null)
     //    {

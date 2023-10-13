@@ -43,11 +43,7 @@ export class TransactionsService {
 		}
 	}
 
-	async getByCategory(
-		transactions: TransactionModel[],
-		currency: string,
-		uncategorizedLabel: string
-	): Promise<Array<AmountByCategory>> {
+	async getByCategory(transactions: TransactionModel[], currency: string, uncategorizedLabel: string): Promise<Array<AmountByCategory>> {
 		try {
 			transactions.forEach((x: TransactionModel) => {
 				x.amount = this.currenciesService.convert(x.amount, x.currency, currency);
@@ -71,9 +67,7 @@ export class TransactionsService {
 			}
 
 			for (const expenditure of expendituresByCategory) {
-				const subExpenditures = expendituresByCategory.filter(
-					(e) => e.amount !== 0 && e.parentCategoryId === expenditure.categoryId
-				);
+				const subExpenditures = expendituresByCategory.filter((e) => e.amount !== 0 && e.parentCategoryId === expenditure.categoryId);
 
 				if (subExpenditures.length === 1) {
 					expenditure.categoryId = subExpenditures[0].categoryId;
@@ -96,9 +90,7 @@ export class TransactionsService {
 				expendituresByCategory.push(expenditure);
 			}
 
-			return expendituresByCategory
-				.filter((e) => e.amount !== 0 && e.parentCategoryId === null)
-				.sort((a, b) => b.amount - a.amount);
+			return expendituresByCategory.filter((e) => e.amount !== 0 && e.parentCategoryId === null).sort((a, b) => b.amount - a.amount);
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;

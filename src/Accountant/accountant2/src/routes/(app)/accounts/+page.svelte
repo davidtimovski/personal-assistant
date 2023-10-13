@@ -51,15 +51,7 @@
 			}
 
 			accountItems.push(
-				new AccountItem(
-					account.id,
-					account.name,
-					account.currency,
-					account.stockPrice,
-					account.stocks,
-					<number>account.balance,
-					account.synced
-				)
+				new AccountItem(account.id, account.name, account.currency, account.stockPrice, account.stocks, <number>account.balance, account.synced)
 			);
 
 			sum += <number>account.balance;
@@ -129,11 +121,7 @@
 											{#if viewStocks}
 												<span>{Formatter.number(account.stocks, $user.culture)}</span>
 											{:else}
-												<span
-													>{account.stockPrice
-														? Formatter.moneyPrecise(account.stockPrice, account.currency, $user.culture, 4)
-														: ''}</span
-												>
+												<span>{account.stockPrice ? Formatter.moneyPrecise(account.stockPrice, account.currency, $user.culture, 4) : ''}</span>
 											{/if}
 										</td>
 									{/if}

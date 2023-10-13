@@ -1,5 +1,5 @@
 import type { AutomaticTransaction } from '$lib/models/entities/automaticTransaction';
-import type { CreatedIdPair } from '$lib/models/sync';
+import type { CreatedIdPair } from '$lib/models/server/responses/sync';
 import { IDBContext } from './idbContext';
 
 export class AutomaticTransactionsIDBHelper {
@@ -20,9 +20,7 @@ export class AutomaticTransactionsIDBHelper {
 			}
 		}
 
-		return automaticTransactions.sort((a: AutomaticTransaction, b: AutomaticTransaction) =>
-			a.dayInMonth > b.dayInMonth ? 1 : -1
-		);
+		return automaticTransactions.sort((a: AutomaticTransaction, b: AutomaticTransaction) => (a.dayInMonth > b.dayInMonth ? 1 : -1));
 	}
 
 	async get(id: number): Promise<AutomaticTransaction> {

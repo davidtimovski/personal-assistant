@@ -125,8 +125,7 @@ export default {
 			newlyAddedMember: 'Newly added member',
 			pendingAccept: 'Pending accept',
 			userDoesntExist: 'No user with that email exists.',
-			cannotShareWithUser:
-				'This user has blocked a share request from you previously. You cannot share with them until they unblock you.',
+			cannotShareWithUser: 'This user has blocked a share request from you previously. You cannot share with them until they unblock you.',
 			shareRequestSent: 'Share request was successfully sent',
 			shareRequestsSent: 'Share requests were successfully sent',
 			sharingDetailsSaved: 'Sharing details successfully saved'
@@ -138,8 +137,7 @@ export default {
 			recipients: 'Recipients',
 			removeRecipient: 'Remove recipient',
 			userDoesntExist: 'No user with that email exists.',
-			cannotSendToUser:
-				'This user has blocked a send request from you previously. You cannot send recipes to them until they unblock you.',
+			cannotSendToUser: 'This user has blocked a send request from you previously. You cannot send recipes to them until they unblock you.',
 			alreadySendToUser: 'You have already sent this recipe to this user. Let them know to check their inbox.',
 			sendSuccessful: 'Recipe was successfully sent'
 		},
@@ -197,8 +195,7 @@ export default {
 			usedInTheseRecipes: 'Used in these recipes',
 			notUsed: 'This ingredient is not used in any recipe.',
 			ingredientName: 'Ingredient name',
-			thisIngredientIsLinked:
-				'This ingredient is linked to the "{{taskName}}" task in the "{{taskList}}" list in To Do Assistant.',
+			thisIngredientIsLinked: 'This ingredient is linked to the "{{taskName}}" task in the "{{taskList}}" list in To Do Assistant.',
 			linkToTask: 'Link to task in To Do Assistant',
 			unlink: 'Unlink',
 			searchTasks: 'Search tasks',
@@ -220,8 +217,7 @@ export default {
 		viewIngredient: {
 			usedInTheseRecipes: 'Used in these recipes',
 			notUsed: 'This ingredient is not used in any recipe.',
-			thisIngredientIsLinked:
-				'This ingredient is linked to the "{{taskName}}" task in the "{{taskList}}" list in To Do Assistant.',
+			thisIngredientIsLinked: 'This ingredient is linked to the "{{taskName}}" task in the "{{taskList}}" list in To Do Assistant.',
 			linkToTask: 'Link to task in To Do Assistant',
 			unlink: 'Unlink',
 			searchTasks: 'Search tasks',
@@ -292,8 +288,7 @@ export default {
 			notifications: 'Notifications',
 			notificationsPermission: 'You must first give notifications permission to the app.',
 			notificationsWereEnabled: 'Notifications were successfully enabled.',
-			notificationsUnpermitted:
-				'Notifications are currently unpermitted. Please permit Notifications for Chef in your browser first.',
+			notificationsUnpermitted: 'Notifications are currently unpermitted. Please permit Notifications for Chef in your browser first.',
 			measuringUnits: 'Measuring units',
 			metric: 'Metric',
 			imperial: 'Imperial',
@@ -307,13 +302,11 @@ export default {
 		},
 		tooltips: {
 			okayUnderstood: 'Okay, understood',
-			tooltipWillNoLongerShow:
-				'This tooltip will no longer show. If you wish to retain it, go to the Menu page and click the "Help" button.',
+			tooltipWillNoLongerShow: 'This tooltip will no longer show. If you wish to retain it, go to the Menu page and click the "Help" button.',
 			receivedRecipes: {
 				title: 'Received recipes',
 				question: 'What is this?',
-				answer:
-					'Someone sent you a recipe. If you decline a recipe the user that sent it will not be able to further send any more to you.'
+				answer: 'Someone sent you a recipe. If you decline a recipe the user that sent it will not be able to further send any more to you.'
 			},
 			reviewIngredients: {
 				title: 'Review ingredients',
@@ -474,10 +467,8 @@ export default {
 			recipients: 'Приматели',
 			removeRecipient: 'Отстрани примател',
 			userDoesntExist: 'Не постои корисник со таа емаил адреса.',
-			cannotSendToUser:
-				'Овој корисник има блокирано барање за пратка на рецепт од вас. Неможете да споделувате со нив додека не ве одблокираат.',
-			alreadySendToUser:
-				'Веќе го имате испратено овој рецепт на овој корисник. Известете ги да си го проверат сандачето.',
+			cannotSendToUser: 'Овој корисник има блокирано барање за пратка на рецепт од вас. Неможете да споделувате со нив додека не ве одблокираат.',
+			alreadySendToUser: 'Веќе го имате испратено овој рецепт на овој корисник. Известете ги да си го проверат сандачето.',
 			sendSuccessful: 'Рецептот беше успешно испратен'
 		},
 		dietaryProfile: {
@@ -534,8 +525,7 @@ export default {
 			usedInTheseRecipes: 'Користена во овие рецепти',
 			notUsed: 'Оваа состојка не е користена во ниеден рецепт.',
 			ingredientName: 'Име на состојката',
-			thisIngredientIsLinked:
-				'Оваа состојка е поврзана со "{{taskName}}" задачата во "{{taskList}}" листата во To Do Assistant.',
+			thisIngredientIsLinked: 'Оваа состојка е поврзана со "{{taskName}}" задачата во "{{taskList}}" листата во To Do Assistant.',
 			linkToTask: 'Поврзи со задача во To Do Assistant',
 			unlink: 'Одврзи',
 			searchTasks: 'Пребарај задачи',
@@ -557,8 +547,7 @@ export default {
 		viewIngredient: {
 			usedInTheseRecipes: 'Користена во овие рецепти',
 			notUsed: 'Оваа состојка не е користена во ниеден рецепт.',
-			thisIngredientIsLinked:
-				'Оваа состојка е поврзана со "{{taskName}}" задачата во "{{taskList}}" листата во To Do Assistant.',
+			thisIngredientIsLinked: 'Оваа состојка е поврзана со "{{taskName}}" задачата во "{{taskList}}" листата во To Do Assistant.',
 			linkToTask: 'Поврзи со задача во To Do Assistant',
 			unlink: 'Одврзи',
 			searchTasks: 'Пребарај задачи',
@@ -629,8 +618,7 @@ export default {
 			notifications: 'Известувања',
 			notificationsPermission: 'Мора прво да дадете дозвола за известувања на апликацијата.',
 			notificationsWereEnabled: 'Известувањата беа успешно вклучени.',
-			notificationsUnpermitted:
-				'Известувањата моментално се забранети. Дадете дозвола за известувања на Chef во вашиот пребарувач прво.',
+			notificationsUnpermitted: 'Известувањата моментално се забранети. Дадете дозвола за известувања на Chef во вашиот пребарувач прво.',
 			measuringUnits: 'Единици за мерка',
 			metric: 'Метрички',
 			imperial: 'Империјални',
@@ -649,8 +637,7 @@ export default {
 			receivedRecipes: {
 				title: 'Примени рецепти',
 				question: 'Што е ова?',
-				answer:
-					'Некој ви пратил рецепт. Доколку одбиете рецепт корисникот кој го пратил ќе неможе веќе да ви праќа рецепти.'
+				answer: 'Некој ви пратил рецепт. Доколку одбиете рецепт корисникот кој го пратил ќе неможе веќе да ви праќа рецепти.'
 			},
 			reviewIngredients: {
 				title: 'Прегледај состојки',

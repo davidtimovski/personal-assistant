@@ -93,9 +93,7 @@
 			nameIsInvalid = false;
 
 			try {
-				await tasksService.update(
-					new UpdateTask(data.id, listId, name, url, isOneTime, isHighPriority, isPrivate, assignedToUserId)
-				);
+				await tasksService.update(new UpdateTask(data.id, listId, name, url, isOneTime, isHighPriority, isPrivate, assignedToUserId));
 				await listsService.getAll();
 
 				goto(`/list/${listId}?edited=${data.id}`);
@@ -235,26 +233,14 @@
 						aria-label={$t('editTask.url')}
 					/>
 					{#if url}
-						<button
-							type="button"
-							on:click={clearUrl}
-							class="clear-url-button"
-							title={$t('clear')}
-							aria-label={$t('clear')}
-						>
+						<button type="button" on:click={clearUrl} class="clear-url-button" title={$t('clear')} aria-label={$t('clear')}>
 							<i class="fas fa-times" />
 						</button>
 					{/if}
 				</div>
 
 				<div class="form-control">
-					<select
-						id="from-account"
-						bind:value={listId}
-						on:change={loadAssigneeOptions}
-						disabled={!listOptions}
-						aria-label={$t('editTask.list')}
-					>
+					<select id="from-account" bind:value={listId} on:change={loadAssigneeOptions} disabled={!listOptions} aria-label={$t('editTask.list')}>
 						{#if listOptions}
 							{#each listOptions as list}
 								<option value={list.id}>{list.name}</option>
@@ -324,12 +310,7 @@
 
 			<div class="save-delete-wrap">
 				{#if !deleteInProgress}
-					<button
-						type="button"
-						on:click={save}
-						class="button primary-button"
-						disabled={!canSave() || saveButtonIsLoading}
-					>
+					<button type="button" on:click={save} class="button primary-button" disabled={!canSave() || saveButtonIsLoading}>
 						<span class="button-loader" class:loading={saveButtonIsLoading}>
 							<i class="fas fa-circle-notch fa-spin" />
 						</span>
@@ -337,13 +318,7 @@
 					</button>
 				{/if}
 
-				<button
-					type="button"
-					on:click={deleteTask}
-					class="button danger-button"
-					disabled={deleteButtonIsLoading}
-					class:confirm={deleteInProgress}
-				>
+				<button type="button" on:click={deleteTask} class="button danger-button" disabled={deleteButtonIsLoading} class:confirm={deleteInProgress}>
 					<span class="button-loader" class:loading={deleteButtonIsLoading}>
 						<i class="fas fa-circle-notch fa-spin" />
 					</span>

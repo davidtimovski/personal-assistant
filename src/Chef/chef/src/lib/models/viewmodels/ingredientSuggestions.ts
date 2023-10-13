@@ -16,12 +16,7 @@ export class IngredientSuggestion {
 }
 
 export class IngredientCategory {
-	constructor(
-		public name: string,
-		public ingredients: IngredientSuggestion[],
-		public subcategories: IngredientCategory[],
-		public matched: boolean
-	) {}
+	constructor(public name: string, public ingredients: IngredientSuggestion[], public subcategories: IngredientCategory[], public matched: boolean) {}
 }
 
 export class PublicIngredientSuggestions {

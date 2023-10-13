@@ -117,21 +117,15 @@ export class AccountsService {
 	async getAverageMonthlySavingsFromThePastYear(currency: string) {
 		try {
 			const mainAccountId = await this.getMainId();
-			const transferTransactions = await this.transactionsIDBHelper.getAllSavingTransactionsInThePastYear(
-				mainAccountId
-			);
+			const transferTransactions = await this.transactionsIDBHelper.getAllSavingTransactionsInThePastYear(mainAccountId);
 
 			const movedFromMain = transferTransactions.filter((x) => x.fromAccountId === mainAccountId);
 			const movedToMain = transferTransactions.filter((x) => x.toAccountId === mainAccountId);
 
 			let saving = 0;
 
-			saving += movedFromMain
-				.map((x) => this.currenciesService.convert(x.amount, x.currency, currency))
-				.reduce((a, b) => a + b, 0);
-			saving -= movedToMain
-				.map((x) => this.currenciesService.convert(x.amount, x.currency, currency))
-				.reduce((a, b) => a + b, 0);
+			saving += movedFromMain.map((x) => this.currenciesService.convert(x.amount, x.currency, currency)).reduce((a, b) => a + b, 0);
+			saving -= movedToMain.map((x) => this.currenciesService.convert(x.amount, x.currency, currency)).reduce((a, b) => a + b, 0);
 
 			const earliestTransaction = transferTransactions.sort((a: TransactionModel, b: TransactionModel) => {
 				const aDate = new Date(a.date);
@@ -144,10 +138,7 @@ export class AccountsService {
 
 			const now = new Date();
 			const earliestTransactionDate = new Date(earliestTransaction.date);
-			const monthsPassed =
-				now.getMonth() -
-				earliestTransactionDate.getMonth() +
-				12 * (now.getFullYear() - earliestTransactionDate.getFullYear());
+			const monthsPassed = now.getMonth() - earliestTransactionDate.getMonth() + 12 * (now.getFullYear() - earliestTransactionDate.getFullYear());
 			const savingsPerMonth = saving / monthsPassed;
 
 			return parseFloat(savingsPerMonth.toFixed(2));
@@ -205,13 +196,7 @@ export class AccountsService {
 			account.name = account.name.trim();
 
 			if (navigator.onLine) {
-				const payload = new CreateAccount(
-					account.name,
-					account.currency,
-					account.stockPrice,
-					account.createdDate,
-					account.modifiedDate
-				);
+				const payload = new CreateAccount(account.name, account.currency, account.stockPrice, account.createdDate, account.modifiedDate);
 
 				account.id = await this.httpProxy.ajax<number>(`${Variables.urls.api}/accounts`, {
 					method: 'post',
@@ -237,14 +222,7 @@ export class AccountsService {
 			account.name = account.name.trim();
 
 			if (navigator.onLine) {
-				const payload = new UpdateAccount(
-					account.id,
-					account.name,
-					account.currency,
-					account.stockPrice,
-					account.createdDate,
-					account.modifiedDate
-				);
+				const payload = new UpdateAccount(account.id, account.name, account.currency, account.stockPrice, account.createdDate, account.modifiedDate);
 
 				await this.httpProxy.ajaxExecute(`${Variables.urls.api}/accounts`, {
 					method: 'put',

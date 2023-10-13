@@ -96,49 +96,49 @@ public class RecipesControllerTests
     [Fact]
     public async Task Create_Returns400_IfBodyMissing()
     {
-        var result = await _sut.Create(null);
+        var result = await _sut.Create(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 
     [Fact]
     public async Task Update_Returns400_IfBodyMissing()
     {
-        var result = await _sut.Update(null);
+        var result = await _sut.Update(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 
     [Fact]
     public async Task Share_Returns400_IfBodyMissing()
     {
-        var result = await _sut.Share(null);
+        var result = await _sut.Share(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 
     [Fact]
     public async Task SetShareIsAccepted_Returns400_IfBodyMissing()
     {
-        var result = await _sut.SetShareIsAccepted(null);
+        var result = await _sut.SetShareIsAccepted(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 
     [Fact]
     public async Task Send_Returns400_IfBodyMissing()
     {
-        var result = await _sut.Send(null);
+        var result = await _sut.Send(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 
     [Fact]
     public async Task DeclineSendRequest_Returns400_IfBodyMissing()
     {
-        var result = await _sut.DeclineSendRequest(null);
+        var result = await _sut.DeclineSendRequest(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 
     [Fact]
     public async Task TryImport_Returns400_IfBodyMissing()
     {
-        var result = await _sut.TryImport(null);
+        var result = await _sut.TryImport(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 }

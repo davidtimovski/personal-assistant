@@ -11,9 +11,7 @@ import Variables from '$lib/variables';
 
 export const isOffline = writable<boolean>(false);
 export const authInfo = writable<AuthInfo | null>(null);
-export const user = writable<ChefUser>(
-	new ChefUser('', '', 'en-US', 'en-US', Variables.urls.defaultProfileImageUrl, false, false)
-);
+export const user = writable<ChefUser>(new ChefUser('', '', 'en-US', 'en-US', Variables.urls.defaultProfileImageUrl, false, false));
 export const alertState = writable<AlertState>(new AlertState(AlertStatus.Hidden, null, []));
 export const state = writable<State>(new State(null, true));
 export const ingredientPickerState = writable<IngredientPickerState>(new IngredientPickerState(null, null));

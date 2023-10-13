@@ -28,8 +28,7 @@
 	const precipitationUnitsTr = new Map<string, string>();
 	const unsubscriptions: Unsubscriber[] = [];
 
-	$: currentTempColor =
-		$forecast.temperature !== null ? ForecastsService.getTempColor(<number>$forecast.temperature) : 'inherit';
+	$: currentTempColor = $forecast.temperature !== null ? ForecastsService.getTempColor(<number>$forecast.temperature) : 'inherit';
 
 	// Progress bar
 	let progressBarActive = false;
@@ -194,11 +193,8 @@
 	<div class="content-wrap">
 		<div class="days">
 			{#each $forecast.weekDays as weekDay}
-				<button
-					type="button"
-					on:click={() => selectDate(weekDay.date)}
-					class="week-day"
-					class:selected={selectedDate === weekDay.date}>{weekDay.weekDay}</button
+				<button type="button" on:click={() => selectDate(weekDay.date)} class="week-day" class:selected={selectedDate === weekDay.date}
+					>{weekDay.weekDay}</button
 				>
 			{/each}
 		</div>

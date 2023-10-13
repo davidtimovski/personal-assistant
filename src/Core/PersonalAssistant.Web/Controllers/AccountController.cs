@@ -111,7 +111,7 @@ public class AccountController : BaseController
     [HttpPost]
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Register(RegisterViewModel model, string? returnUrl)
+    public async Task<IActionResult> Register(RegisterViewModel model, string? returnUrl, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {
@@ -127,15 +127,15 @@ public class AccountController : BaseController
 
         try
         {
-            using var httpClient = await InitializeAuth0ClientAsync(tr);
+            using var httpClient = await InitializeAuth0ClientAsync(tr, cancellationToken);
 
-            var authId = await Auth0Proxy.RegisterUserAsync(httpClient, model.Email, model.Password, model.Name, tr);
-            var userId = await _userService.CreateAsync(authId, model.Email, model.Name, model.Language, model.Culture, _cdnService.GetDefaultProfileImageUri(), tr);
+            var authId = await Auth0Proxy.RegisterUserAsync(httpClient, model.Email, model.Password, model.Name, tr, cancellationToken);
+            var userId = await _userService.CreateAsync(authId, model.Email, model.Name, model.Language, model.Culture, _cdnService.GetDefaultProfileImageUri(), tr, cancellationToken);
 
-            await _cdnService.CreateFolderForUserAsync(userId, tr);
+            await _cdnService.CreateFolderForUserAsync(userId, tr, cancellationToken);
 
             await CreateRequiredDataAsync(userId, tr);
-            await CreateSamplesAsync(userId, tr);
+            await CreateSamplesAsync(userId, tr, cancellationToken);
         }
         catch (PasswordTooWeakException)
         {
@@ -171,7 +171,7 @@ public class AccountController : BaseController
     [HttpPost]
     [AllowAnonymous]
     [ActionName("verify-recaptcha")]
-    public async Task<IActionResult> VerifyReCaptcha(VerifyReCaptchaViewModel model)
+    public async Task<IActionResult> VerifyReCaptcha(VerifyReCaptchaViewModel model, CancellationToken cancellationToken)
     {
         var tr = Metrics.StartTransaction(
             $"{Request.Method} account/verify-recaptcha",
@@ -203,7 +203,7 @@ public class AccountController : BaseController
     [HttpGet]
     [AllowAnonymous]
     [ActionName("reset-password")]
-    public async Task<IActionResult> ResetPassword()
+    public async Task<IActionResult> ResetPassword(CancellationToken cancellationToken)
     {
         var tr = Metrics.StartTransaction(
             $"{Request.Method} account/reset-password",
@@ -214,9 +214,9 @@ public class AccountController : BaseController
 
         if (User?.Identity?.IsAuthenticated == true)
         {
-            using var httpClient = await InitializeAuth0ClientAsync(tr);
+            using var httpClient = await InitializeAuth0ClientAsync(tr, cancellationToken);
 
-            var user = await Auth0Proxy.GetUserAsync(httpClient, AuthId, tr);
+            var user = await Auth0Proxy.GetUserAsync(httpClient, AuthId, tr, cancellationToken);
             viewModel.Email = user.email;
         }
 
@@ -229,7 +229,7 @@ public class AccountController : BaseController
     [AllowAnonymous]
     [ActionName("reset-password")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {
@@ -243,9 +243,9 @@ public class AccountController : BaseController
 
         try
         {
-            using var httpClient = await InitializeAuth0ClientAsync(tr);
+            using var httpClient = await InitializeAuth0ClientAsync(tr, cancellationToken);
 
-            await Auth0Proxy.ResetPasswordAsync(httpClient, model.Email, tr);
+            await Auth0Proxy.ResetPasswordAsync(httpClient, model.Email, tr, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -271,7 +271,7 @@ public class AccountController : BaseController
     [HttpPost]
     [ValidateAntiForgeryToken]
     [ActionName("delete")]
-    public async Task<IActionResult> DeleteAccount()
+    public async Task<IActionResult> DeleteAccount(CancellationToken cancellationToken)
     {
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} /account/delete",
@@ -281,18 +281,18 @@ public class AccountController : BaseController
 
         try
         {
-            using var httpClient = await InitializeAuth0ClientAsync(tr);
+            using var httpClient = await InitializeAuth0ClientAsync(tr, cancellationToken);
 
-            await Auth0Proxy.DeleteUserAsync(httpClient, AuthId, tr);
+            await Auth0Proxy.DeleteUserAsync(httpClient, AuthId, tr, cancellationToken);
 
             // Delete resources
             var user = _userService.Get(UserId);
             var filePaths = new List<string> { user.ImageUri };
             IEnumerable<string> recipeUris = _recipeService.GetAllImageUris(user.Id, tr);
             filePaths.AddRange(recipeUris);
-            await _cdnService.DeleteUserResourcesAsync(user.Id, filePaths, tr);
+            await _cdnService.DeleteUserResourcesAsync(user.Id, filePaths, tr, cancellationToken);
 
-            await _usersRepository.DeleteAsync(UserId, tr);
+            await _usersRepository.DeleteAsync(UserId, tr, cancellationToken);
 
             // Logout
             var authenticationProperties = new LogoutAuthenticationPropertiesBuilder().Build();
@@ -316,7 +316,7 @@ public class AccountController : BaseController
 
     [HttpGet]
     [ActionName("edit-profile")]
-    public async Task<IActionResult> EditProfile()
+    public async Task<IActionResult> EditProfile(CancellationToken cancellationToken)
     {
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} account/edit-profile",
@@ -324,9 +324,9 @@ public class AccountController : BaseController
             UserId
         );
 
-        using var httpClient = await InitializeAuth0ClientAsync(tr);
+        using var httpClient = await InitializeAuth0ClientAsync(tr, cancellationToken);
 
-        var authUser = await Auth0Proxy.GetUserAsync(httpClient, AuthId, tr);
+        var authUser = await Auth0Proxy.GetUserAsync(httpClient, AuthId, tr, cancellationToken);
         var user = _userService.Get(UserId);
 
         var viewModel = new ViewProfileViewModel(
@@ -346,7 +346,7 @@ public class AccountController : BaseController
     [HttpPost]
     [ActionName("edit-profile")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> EditProfile(EditProfileViewModel model)
+    public async Task<IActionResult> EditProfile(EditProfileViewModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {
@@ -369,12 +369,12 @@ public class AccountController : BaseController
 
         try
         {
-            using var httpClient = await InitializeAuth0ClientAsync(tr);
+            using var httpClient = await InitializeAuth0ClientAsync(tr, cancellationToken);
 
-            await Auth0Proxy.UpdateNameAsync(httpClient, AuthId, model.Name, tr);
+            await Auth0Proxy.UpdateNameAsync(httpClient, AuthId, model.Name, tr, cancellationToken);
 
             var imageUri = string.IsNullOrEmpty(model.ImageUri) ? _cdnService.GetDefaultProfileImageUri() : model.ImageUri;
-            await _userService.UpdateProfileAsync(UserId, model.Name, model.Language, model.Culture, imageUri, tr);
+            await _userService.UpdateProfileAsync(UserId, model.Name, model.Language, model.Culture, imageUri, tr, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -405,13 +405,13 @@ public class AccountController : BaseController
             // and had a previous one, delete it
             if (oldImageUri != null)
             {
-                await _cdnService.DeleteAsync(oldImageUri, tr);
+                await _cdnService.DeleteAsync(oldImageUri, tr, cancellationToken);
             }
 
             // and has a new one, remove its temp tag
             if (user.ImageUri != null)
             {
-                await _cdnService.RemoveTempTagAsync(user.ImageUri, tr);
+                await _cdnService.RemoveTempTagAsync(user.ImageUri, tr, cancellationToken);
             }
         }
 
@@ -426,7 +426,7 @@ public class AccountController : BaseController
 
     [HttpPost]
     [ActionName("upload-profile-image")]
-    public async Task<IActionResult> UploadProfileImage(IFormFile image)
+    public async Task<IActionResult> UploadProfileImage(IFormFile image, CancellationToken cancellationToken)
     {
         if (image.Length > 10 * 1024 * 1024)
         {
@@ -472,7 +472,8 @@ public class AccountController : BaseController
                 filePath: tempImagePath,
                 uploadPath: $"users/{UserId}",
                 template: "profile",
-                tr
+                tr,
+                cancellationToken
             );
 
             return StatusCode(201, new { imageUri });
@@ -488,11 +489,11 @@ public class AccountController : BaseController
         }
     }
 
-    private async Task<HttpClient> InitializeAuth0ClientAsync(ITransaction tr)
+    private async Task<HttpClient> InitializeAuth0ClientAsync(ITransaction tr, CancellationToken cancellationToken)
     {
         var httpClient = _httpClientFactory.CreateClient();
 
-        await Auth0Proxy.InitializeAsync(httpClient, _config.Auth0, tr);
+        await Auth0Proxy.InitializeAsync(httpClient, _config.Auth0, tr, cancellationToken);
 
         return httpClient;
     }
@@ -522,7 +523,7 @@ public class AccountController : BaseController
         await createMain(new Accountant.Persistence.Fs.Models.Account(0, userId, _localizer["MainAccountName"], true, "EUR", FSharpOption<decimal>.None, now, now), _config.ConnectionString, metricsSpan);
     }
 
-    private async Task CreateSamplesAsync(int userId, ISpan metricsSpan)
+    private async Task CreateSamplesAsync(int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var sampleListTranslations = new Dictionary<string, string>
         {
@@ -531,7 +532,7 @@ public class AccountController : BaseController
             { "SampleListTask2", _localizer["SampleListTask2"] },
             { "SampleListTask3", _localizer["SampleListTask3"] }
         };
-        await _listService.CreateSampleAsync(userId, sampleListTranslations, metricsSpan);
+        await _listService.CreateSampleAsync(userId, sampleListTranslations, metricsSpan, cancellationToken);
 
         var sampleRecipeTranslations = new Dictionary<string, string>
         {
@@ -539,7 +540,7 @@ public class AccountController : BaseController
             { "SampleRecipeDescription", _localizer["SampleRecipeDescription"] },
             { "SampleRecipeInstructions", _localizer["SampleRecipeInstructions"] }
         };
-        await _recipeService.CreateSampleAsync(userId, sampleRecipeTranslations, metricsSpan);
+        await _recipeService.CreateSampleAsync(userId, sampleRecipeTranslations, metricsSpan, cancellationToken);
     }
 
     #endregion

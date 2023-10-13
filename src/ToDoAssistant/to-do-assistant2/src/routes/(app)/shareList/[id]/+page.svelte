@@ -136,20 +136,9 @@
 	}
 
 	async function saveShare() {
-		if (
-			!newShares.find((x) => x.userId === selectedShareUserId) &&
-			!editedShares.find((x) => x.userId === selectedShareUserId)
-		) {
+		if (!newShares.find((x) => x.userId === selectedShareUserId) && !editedShares.find((x) => x.userId === selectedShareUserId)) {
 			editedShares = editedShares.concat(
-				new Share(
-					selectedShareUserId,
-					selectedShareEmail.trim(),
-					selectedShareName,
-					selectedShareImageUri,
-					selectedShareIsAdmin,
-					false,
-					null
-				)
+				new Share(selectedShareUserId, selectedShareEmail.trim(), selectedShareName, selectedShareImageUri, selectedShareIsAdmin, false, null)
 			);
 		}
 
@@ -294,12 +283,7 @@
 								<i class="fas fa-save" />
 							</button>
 						{:else}
-							<button
-								type="button"
-								on:click={addShare}
-								title={$t('shareList.addMember')}
-								aria-label={$t('shareList.addMember')}
-							>
+							<button type="button" on:click={addShare} title={$t('shareList.addMember')} aria-label={$t('shareList.addMember')}>
 								<i class="fas fa-plus-circle" />
 							</button>
 						{/if}
@@ -335,12 +319,7 @@
 
 		{#if userShare}
 			<div class="share-with">
-				<img
-					class="share-image"
-					src={userShare.imageUri}
-					title={userShare.name}
-					alt={$t('profilePicture', { name: userShare.name })}
-				/>
+				<img class="share-image" src={userShare.imageUri} title={userShare.name} alt={$t('profilePicture', { name: userShare.name })} />
 				<div class="share-content not-editable">
 					{#if userShare.isAdmin}
 						<div class="icon" title={$t('shareList.admin')} aria-label={$t('shareList.admin')}>
@@ -360,12 +339,7 @@
 		{#if shares}
 			{#each shares as share}
 				<div class="share-with">
-					<img
-						class="share-image"
-						src={share.imageUri}
-						title={share.name}
-						alt={$t('profilePicture', { name: share.name })}
-					/>
+					<img class="share-image" src={share.imageUri} title={share.name} alt={$t('profilePicture', { name: share.name })} />
 					<div class="share-content" class:selected={share.email === selectedShareEmail}>
 						{#if share.userId && !share.createdDate && share.userId !== 0 && share.email !== selectedShareEmail}
 							<div class="icon" title={$t('shareList.newlyAddedMember')} aria-label={$t('shareList.newlyAddedMember')}>

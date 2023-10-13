@@ -35,7 +35,7 @@ public class UpdateTests
     {
         UpdateIngredient model = new IngredientBuilder().BuildUpdateModel();
 
-        await _sut.UpdateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.UpdateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         _successfulValidatorMock.Verify(x => x.Validate(model));
     }
@@ -46,19 +46,19 @@ public class UpdateTests
         UpdateIngredient model = new IngredientBuilder().BuildUpdateModel();
         var failedValidator = ValidatorMocker.GetFailed<UpdateIngredient>();
 
-        await Assert.ThrowsAsync<ValidationException>(() => _sut.UpdateAsync(model, failedValidator.Object, It.IsAny<ISpan>()));
+        await Assert.ThrowsAsync<ValidationException>(() => _sut.UpdateAsync(model, failedValidator.Object, It.IsAny<ISpan>(), It.IsAny<CancellationToken>()));
     }
 
     [Fact]
     public async Task TrimsName_IfItsNotLinkedToTask()
     {
         string? actualName = null;
-        _ingredientsRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Ingredient>(), It.IsAny<ISpan>()))
-            .Callback<Ingredient, ISpan>((i, _) => actualName = i.Name);
+        _ingredientsRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Ingredient>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<Ingredient, ISpan, CancellationToken>((i, _, _) => actualName = i.Name);
 
         UpdateIngredient model = new IngredientBuilder().WithName(" Ingredient name ").BuildUpdateModel();
 
-        await _sut.UpdateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.UpdateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
         const string expected = "Ingredient name";
 
         Assert.Equal(expected, actualName);

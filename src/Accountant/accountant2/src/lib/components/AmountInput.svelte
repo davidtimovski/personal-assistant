@@ -84,18 +84,7 @@
 </script>
 
 <div class="amount-input-wrap" class:changing>
-	<input
-		type="number"
-		id={inputId}
-		bind:this={amountInput}
-		bind:value={amount}
-		{disabled}
-		{min}
-		{max}
-		{step}
-		class:invalid
-		required
-	/>
+	<input type="number" id={inputId} bind:this={amountInput} bind:value={amount} {disabled} {min} {max} {step} class:invalid required />
 
 	<input
 		type="text"

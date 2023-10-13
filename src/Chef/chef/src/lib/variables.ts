@@ -4,8 +4,7 @@ export default class Variables {
 		host: import.meta.env.VITE_HOST_URL,
 		gateway: import.meta.env.VITE_GATEWAY_URL,
 		api: import.meta.env.VITE_GATEWAY_URL + '/chef/api',
-		defaultProfileImageUrl:
-			'https://res.cloudinary.com/personalassistant/w_80,h_80,c_limit/production/defaults/sfmqac.webp',
+		defaultProfileImageUrl: 'https://res.cloudinary.com/personalassistant/w_80,h_80,c_limit/production/defaults/sfmqac.webp',
 		defaultRecipeImageUrl: 'https://res.cloudinary.com/personalassistant/production/defaults/fbwpmh.webp'
 	};
 	static debug = import.meta.env.DEV;

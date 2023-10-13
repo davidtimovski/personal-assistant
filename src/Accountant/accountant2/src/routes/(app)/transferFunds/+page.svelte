@@ -86,9 +86,7 @@
 
 	function setFromAccount() {
 		fromAccount = <Account>accounts.find((x) => x.id === fromAccountId);
-		fromAccountLabel = $t(
-			fromAccount.stockPrice === null ? 'transferFunds.fromAccount' : 'transferFunds.fromInvestmentFund'
-		);
+		fromAccountLabel = $t(fromAccount.stockPrice === null ? 'transferFunds.fromAccount' : 'transferFunds.fromInvestmentFund');
 	}
 
 	function setToAccount() {
@@ -161,17 +159,7 @@
 				if (fromStocks || toStocks) {
 					await transactionsService.buySellStocks(fromAccountId, toAccountId, amount, fromStocks, toStocks, currency);
 				} else {
-					await transactionsService.create(
-						fromAccountId,
-						toAccountId,
-						null,
-						amount,
-						currency,
-						null,
-						DateHelper.format(new Date()),
-						false,
-						null
-					);
+					await transactionsService.create(fromAccountId, toAccountId, null, amount, currency, null, DateHelper.format(new Date()), false, null);
 				}
 
 				alertState.update((x) => {
@@ -258,12 +246,7 @@
 			<div class="form-control">
 				<label for="from-account" class="transfer-funds-label">{fromAccountLabel}</label>
 				<div class="loadable-select" class:loaded={accountOptions}>
-					<select
-						id="from-account"
-						bind:value={fromAccountId}
-						on:change={fromAccountChanged}
-						disabled={!accountOptions}
-					>
+					<select id="from-account" bind:value={fromAccountId} on:change={fromAccountChanged} disabled={!accountOptions}>
 						{#if accountOptions}
 							{#each accountOptions as account}
 								<option value={account.id}>{account.name}</option>

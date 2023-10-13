@@ -44,7 +44,7 @@ public class TooltipsRepository : BaseRepository, ITooltipsRepository
         return result;
     }
 
-    public async Task ToggleDismissedAsync(int userId, string key, string application, bool isDismissed, ISpan metricsSpan)
+    public async Task ToggleDismissedAsync(int userId, string key, string application, bool isDismissed, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(TooltipsRepository)}.{nameof(ToggleDismissedAsync)}");
 
@@ -67,7 +67,7 @@ public class TooltipsRepository : BaseRepository, ITooltipsRepository
             EFContext.TooltipsDismissed.Remove(dismissedTooltip);
         }
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
     }

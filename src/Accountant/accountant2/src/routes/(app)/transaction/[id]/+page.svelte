@@ -94,12 +94,7 @@
 				throw new Error('Cannot decrypt. Description, salt, nonce, or password missing.');
 			}
 
-			const decryptedDescription = await encryptionService.decrypt(
-				encryptedDescription,
-				salt,
-				nonce,
-				decryptionPassword
-			);
+			const decryptedDescription = await encryptionService.decrypt(encryptedDescription, salt, nonce, decryptionPassword);
 
 			isEncrypted = false;
 			description = decryptedDescription;

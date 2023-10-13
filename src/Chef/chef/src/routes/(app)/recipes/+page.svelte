@@ -56,8 +56,7 @@
 			})
 			.map((recipe: RecipeModel) => {
 				if (recipe.ingredientsMissing !== 0) {
-					const missingIngredientsKey =
-						recipe.ingredientsMissing > 1 ? 'recipes.missingIngredients' : 'recipes.missingIngredient';
+					const missingIngredientsKey = recipe.ingredientsMissing > 1 ? 'recipes.missingIngredients' : 'recipes.missingIngredient';
 					recipe.ingredientsMissingLabel = recipe.ingredientsMissing + ' ' + $t(missingIngredientsKey);
 				}
 

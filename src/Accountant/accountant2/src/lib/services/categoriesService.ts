@@ -47,9 +47,7 @@ export class CategoriesService {
 				const selectOptions = categories.map((c) => new SelectOption(c.id, c.name));
 				options.push(...selectOptions);
 			} else {
-				const selectOptions = categories
-					.filter((c) => c.id !== excludeCategoryId)
-					.map((c) => new SelectOption(c.id, c.name));
+				const selectOptions = categories.filter((c) => c.id !== excludeCategoryId).map((c) => new SelectOption(c.id, c.name));
 
 				options.push(...selectOptions);
 			}

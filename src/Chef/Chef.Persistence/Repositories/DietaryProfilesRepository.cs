@@ -42,7 +42,7 @@ public class DietaryProfilesRepository : BaseRepository, IDietaryProfilesReposit
         return result;
     }
 
-    public async Task CreateOrUpdateAsync(DietaryProfile dietaryProfile, ISpan metricsSpan)
+    public async Task CreateOrUpdateAsync(DietaryProfile dietaryProfile, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(DietaryProfilesRepository)}.{nameof(CreateOrUpdateAsync)}");
 
@@ -97,19 +97,19 @@ public class DietaryProfilesRepository : BaseRepository, IDietaryProfilesReposit
             dbDietaryProfile.ModifiedDate = now;
         }
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
     }
 
-    public async Task DeleteAsync(int userId, ISpan metricsSpan)
+    public async Task DeleteAsync(int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(DietaryProfilesRepository)}.{nameof(DeleteAsync)}");
 
         DietaryProfile dietaryProfile = EFContext.DietaryProfiles.First(x => x.UserId == userId);
         EFContext.DietaryProfiles.Remove(dietaryProfile);
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
     }

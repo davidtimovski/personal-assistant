@@ -39,12 +39,7 @@
 		if (result.valid) {
 			if (amountModel.id === 0) {
 				const newId = await exercisesService.createAmountX2(
-					new CreateAmountX2Exercise(
-						amountModel.name,
-						amountModel.sets,
-						amountModel.amount1Unit,
-						amountModel.amount2Unit
-					)
+					new CreateAmountX2Exercise(amountModel.name, amountModel.sets, amountModel.amount1Unit, amountModel.amount2Unit)
 				);
 
 				alertState.update((x) => {
@@ -54,13 +49,7 @@
 				goto('/exercises?edited=' + newId);
 			} else {
 				await exercisesService.updateAmountX2(
-					new UpdateAmountX2Exercise(
-						amountModel.id,
-						amountModel.name,
-						amountModel.sets,
-						amountModel.amount1Unit,
-						amountModel.amount2Unit
-					)
+					new UpdateAmountX2Exercise(amountModel.id, amountModel.name, amountModel.sets, amountModel.amount1Unit, amountModel.amount2Unit)
 				);
 
 				alertState.update((x) => {

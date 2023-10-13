@@ -207,7 +207,7 @@ public class ListsController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateListRequest request)
+    public async Task<IActionResult> Create([FromBody] CreateListRequest request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -230,7 +230,7 @@ public class ListsController : BaseController
                 IsOneTimeToggleDefault = request.IsOneTimeToggleDefault,
                 TasksText = request.TasksText,
             };
-            int id = await _listService.CreateAsync(model, _createValidator, tr);
+            int id = await _listService.CreateAsync(model, _createValidator, tr, cancellationToken);
 
             return StatusCode(201, id);
         }
@@ -241,7 +241,7 @@ public class ListsController : BaseController
     }
 
     [HttpPut]
-    public async Task<IActionResult> Update([FromBody] UpdateListRequest request)
+    public async Task<IActionResult> Update([FromBody] UpdateListRequest request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -265,7 +265,7 @@ public class ListsController : BaseController
                 IsOneTimeToggleDefault = request.IsOneTimeToggleDefault,
                 NotificationsEnabled = request.NotificationsEnabled,
             };
-            UpdateListResult result = await _listService.UpdateAsync(model, _updateValidator, tr);
+            UpdateListResult result = await _listService.UpdateAsync(model, _updateValidator, tr, cancellationToken);
             if (!result.Notify())
             {
                 return NoContent();
@@ -291,7 +291,7 @@ public class ListsController : BaseController
                 var message = _localizer[resourceKey, result.ActionUserName, result.OriginalListName];
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, request.Id, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -312,7 +312,7 @@ public class ListsController : BaseController
     }
 
     [HttpPut("shared")]
-    public async Task<IActionResult> UpdateShared([FromBody] UpdateSharedListRequest request)
+    public async Task<IActionResult> UpdateShared([FromBody] UpdateSharedListRequest request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -333,7 +333,7 @@ public class ListsController : BaseController
                 UserId = UserId,
                 NotificationsEnabled = request.NotificationsEnabled
             };
-            await _listService.UpdateSharedAsync(model, _updateSharedValidator, tr);
+            await _listService.UpdateSharedAsync(model, _updateSharedValidator, tr, cancellationToken);
         }
         finally
         {
@@ -344,7 +344,7 @@ public class ListsController : BaseController
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} api/lists/{id}",
@@ -354,7 +354,7 @@ public class ListsController : BaseController
 
         try
         {
-            DeleteListResult result = await _listService.DeleteAsync(id, UserId, tr);
+            DeleteListResult result = await _listService.DeleteAsync(id, UserId, tr, cancellationToken);
 
             foreach (var recipient in result.NotificationRecipients)
             {
@@ -362,7 +362,7 @@ public class ListsController : BaseController
                 var message = _localizer["DeletedListNotification", result.ActionUserName, result.DeletedListName];
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, null, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -416,7 +416,7 @@ public class ListsController : BaseController
     }
 
     [HttpPut("share")]
-    public async Task<IActionResult> Share([FromBody] Models.Lists.Requests.ShareListRequest request)
+    public async Task<IActionResult> Share([FromBody] Models.Lists.Requests.ShareListRequest request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -446,7 +446,7 @@ public class ListsController : BaseController
                 var message = _localizer["RemovedShareNotification", currentUser.Name, list.Name];
 
                 var createNotificationDto = new CreateOrUpdateNotification(user.Id, UserId, null, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = currentUser.ImageUri,
@@ -466,7 +466,7 @@ public class ListsController : BaseController
                 EditedShares = request.EditedShares.Select(x => new Application.Contracts.Lists.Models.ShareUserAndPermission { UserId = x.UserId, IsAdmin = x.IsAdmin }).ToList(),
                 RemovedShares = request.RemovedShares.Select(x => new Application.Contracts.Lists.Models.ShareUserAndPermission { UserId = x.UserId, IsAdmin = x.IsAdmin }).ToList()
             };
-            await _listService.ShareAsync(model, _shareValidator, tr);
+            await _listService.ShareAsync(model, _shareValidator, tr, cancellationToken);
         }
         finally
         {
@@ -477,7 +477,7 @@ public class ListsController : BaseController
     }
 
     [HttpDelete("{id}/leave")]
-    public async Task<IActionResult> Leave(int id)
+    public async Task<IActionResult> Leave(int id, CancellationToken cancellationToken)
     {
         var tr = Metrics.StartTransactionWithUser(
             "DELETE api/lists/{id}/leave",
@@ -485,7 +485,7 @@ public class ListsController : BaseController
             UserId
         );
 
-        LeaveListResult result = await _listService.LeaveAsync(id, UserId, tr);
+        LeaveListResult result = await _listService.LeaveAsync(id, UserId, tr, cancellationToken);
 
         try
         {
@@ -495,7 +495,7 @@ public class ListsController : BaseController
                 var message = _localizer["LeftListNotification", result.ActionUserName, result.ListName];
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, id, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -516,7 +516,7 @@ public class ListsController : BaseController
     }
 
     [HttpPost("copy")]
-    public async Task<IActionResult> Copy([FromBody] CopyListRequest request)
+    public async Task<IActionResult> Copy([FromBody] CopyListRequest request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -538,7 +538,7 @@ public class ListsController : BaseController
                 Name = request.Name,
                 Icon = request.Icon
             };
-            int id = await _listService.CopyAsync(model, _copyValidator, tr);
+            int id = await _listService.CopyAsync(model, _copyValidator, tr, cancellationToken);
 
             return StatusCode(201, id);
         }
@@ -549,7 +549,7 @@ public class ListsController : BaseController
     }
 
     [HttpPut("is-archived")]
-    public async Task<IActionResult> SetIsArchived([FromBody] SetIsArchivedRequest request)
+    public async Task<IActionResult> SetIsArchived([FromBody] SetIsArchivedRequest request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -564,7 +564,7 @@ public class ListsController : BaseController
 
         try
         {
-            await _listService.SetIsArchivedAsync(request.ListId, UserId, request.IsArchived, tr);
+            await _listService.SetIsArchivedAsync(request.ListId, UserId, request.IsArchived, tr, cancellationToken);
         }
         finally
         {
@@ -575,7 +575,7 @@ public class ListsController : BaseController
     }
 
     [HttpPut("uncomplete-all")]
-    public async Task<IActionResult> UncompleteAll([FromBody] SetTasksAsNotCompletedRequest request)
+    public async Task<IActionResult> UncompleteAll([FromBody] SetTasksAsNotCompletedRequest request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -588,7 +588,7 @@ public class ListsController : BaseController
             UserId
         );
 
-        SetTasksAsNotCompletedResult result = await _listService.UncompleteAllAsync(request.ListId, UserId, tr);
+        SetTasksAsNotCompletedResult result = await _listService.UncompleteAllAsync(request.ListId, UserId, tr, cancellationToken);
 
         try
         {
@@ -598,7 +598,7 @@ public class ListsController : BaseController
                 var message = _localizer["UncompletedAllTasksNotification", result.ActionUserName, result.ListName];
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, request.ListId, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -619,7 +619,7 @@ public class ListsController : BaseController
     }
 
     [HttpPut("share-is-accepted")]
-    public async Task<IActionResult> SetShareIsAccepted([FromBody] SetShareIsAcceptedRequest request)
+    public async Task<IActionResult> SetShareIsAccepted([FromBody] SetShareIsAcceptedRequest request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -634,7 +634,7 @@ public class ListsController : BaseController
 
         try
         {
-            SetShareIsAcceptedResult result = await _listService.SetShareIsAcceptedAsync(request.ListId, UserId, request.IsAccepted, tr);
+            SetShareIsAcceptedResult result = await _listService.SetShareIsAcceptedAsync(request.ListId, UserId, request.IsAccepted, tr, cancellationToken);
             if (!result.Notify())
             {
                 return NoContent();
@@ -647,7 +647,7 @@ public class ListsController : BaseController
                 var message = _localizer[localizerKey, result.ActionUserName, result.ListName];
 
                 var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, request.ListId, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr);
+                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
                 var toDoAssistantPushNotification = new ToDoAssistantPushNotification
                 {
                     SenderImageUri = result.ActionUserImageUri,
@@ -668,7 +668,7 @@ public class ListsController : BaseController
     }
 
     //[HttpPut("reorder")]
-    //public async Task<IActionResult> Reorder([FromBody] ReorderListRequest request)
+    //public async Task<IActionResult> Reorder([FromBody] ReorderListRequest request, CancellationToken cancellationToken)
     //{
     //    if (request is null)
     //    {

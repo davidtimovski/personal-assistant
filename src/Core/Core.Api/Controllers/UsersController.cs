@@ -69,7 +69,7 @@ public class UsersController : BaseController
     }
 
     [HttpPut("to-do-notifications-enabled")]
-    public async Task<IActionResult> UpdateToDoNotificationsEnabled([FromBody] UpdateUserPreferences dto)
+    public async Task<IActionResult> UpdateToDoNotificationsEnabled([FromBody] UpdateUserPreferences dto, CancellationToken cancellationToken)
     {
         if (dto is null)
         {
@@ -84,7 +84,7 @@ public class UsersController : BaseController
 
         try
         {
-            await _userService.UpdateToDoNotificationsEnabledAsync(UserId, dto.ToDoNotificationsEnabled, tr);
+            await _userService.UpdateToDoNotificationsEnabledAsync(UserId, dto.ToDoNotificationsEnabled, tr, cancellationToken);
         }
         finally
         {
@@ -95,7 +95,7 @@ public class UsersController : BaseController
     }
 
     [HttpPut("chef-notifications-enabled")]
-    public async Task<IActionResult> UpdateChefNotificationsEnabled([FromBody] UpdateUserPreferences dto)
+    public async Task<IActionResult> UpdateChefNotificationsEnabled([FromBody] UpdateUserPreferences dto, CancellationToken cancellationToken)
     {
         if (dto is null)
         {
@@ -110,7 +110,7 @@ public class UsersController : BaseController
 
         try
         {
-            await _userService.UpdateChefNotificationsEnabledAsync(UserId, dto.ChefNotificationsEnabled, tr);
+            await _userService.UpdateChefNotificationsEnabledAsync(UserId, dto.ChefNotificationsEnabled, tr, cancellationToken);
         }
         finally
         {
@@ -121,7 +121,7 @@ public class UsersController : BaseController
     }
 
     [HttpPut("imperial-system")]
-    public async Task<IActionResult> UpdateImperialSystem([FromBody] UpdateUserPreferences dto)
+    public async Task<IActionResult> UpdateImperialSystem([FromBody] UpdateUserPreferences dto, CancellationToken cancellationToken)
     {
         if (dto is null)
         {
@@ -136,7 +136,7 @@ public class UsersController : BaseController
 
         try
         {
-            await _userService.UpdateImperialSystemAsync(UserId, dto.ImperialSystem, tr);
+            await _userService.UpdateImperialSystemAsync(UserId, dto.ImperialSystem, tr, cancellationToken);
         }
         finally
         {

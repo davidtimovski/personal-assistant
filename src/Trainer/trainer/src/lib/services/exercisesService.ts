@@ -2,12 +2,7 @@ import { HttpProxy } from '../../../../../Core/shared2/services/httpProxy';
 import { ErrorLogger } from '../../../../../Core/shared2/services/errorLogger';
 
 import type { Exercise } from '$lib/models/exercise';
-import type {
-	CreateAmountExercise,
-	UpdateAmountExercise,
-	CreateAmountX2Exercise,
-	UpdateAmountX2Exercise
-} from '$lib/models/editExercise';
+import type { CreateAmountExercise, UpdateAmountExercise, CreateAmountX2Exercise, UpdateAmountX2Exercise } from '$lib/models/editExercise';
 import Variables from '$lib/variables';
 
 export class ExercisesService {

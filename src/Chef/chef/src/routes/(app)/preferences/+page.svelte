@@ -10,8 +10,7 @@
 	import { NotificationsServiceBase } from '../../../../../../Core/shared2/services/notificationsServiceBase';
 	import { RecipesService } from '$lib/services/recipesService';
 
-	const notificationsVapidKey =
-		'BIWWy4ZjIrLMVBxYwsq4rlixA3miMGeMw0yCqldR5Cpv5mozBw1oQxEbbp5q1I9SL9_zUjaLfYheoqb578becPY';
+	const notificationsVapidKey = 'BIWWy4ZjIrLMVBxYwsq4rlixA3miMGeMw0yCqldR5Cpv5mozBw1oQxEbbp5q1I9SL9_zUjaLfYheoqb578becPY';
 	let notificationsState: string;
 	const notificationIconSrc = '/images/icons/app-icon-x96.png';
 	let notificationsAreSupported = false;

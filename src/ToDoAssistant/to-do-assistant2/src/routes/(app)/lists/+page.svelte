@@ -187,13 +187,9 @@
 							<i class="icon {getClassFromIcon(list.icon)}" />
 							<a href="/list/{list.id}" class="name-container" class:highlighted={list.id === editedId}>
 								<span class="name">{list.name}</span>
-								<span class="sharing-icon shared" title={$t('index.shared')} aria-label={$t('index.shared')}
-									><i class="fas fa-users" /></span
-								>
-								<span
-									class="sharing-icon pending-accept"
-									title={$t('index.pendingAccept')}
-									aria-label={$t('index.pendingAccept')}><i class="fas fa-user-clock" /></span
+								<span class="sharing-icon shared" title={$t('index.shared')} aria-label={$t('index.shared')}><i class="fas fa-users" /></span>
+								<span class="sharing-icon pending-accept" title={$t('index.pendingAccept')} aria-label={$t('index.pendingAccept')}
+									><i class="fas fa-user-clock" /></span
 								>
 							</a>
 						</div>

@@ -98,15 +98,7 @@
 
 			const unit = imperialSystem ? ingredient.unitImperial : ingredient.unit;
 			ingredients = ingredients.concat(
-				new EditRecipeIngredient(
-					ingredient.id,
-					ingredient.name,
-					'',
-					unit,
-					ingredient.hasNutritionData,
-					ingredient.hasPriceData,
-					false
-				)
+				new EditRecipeIngredient(ingredient.id, ingredient.name, '', unit, ingredient.hasNutritionData, ingredient.hasPriceData, false)
 			);
 		})
 	);
@@ -418,9 +410,7 @@
 		usersService.get<ChefUser>().then((user: ChefUser) => {
 			imperialSystem = user.imperialSystem;
 
-			const units = user.imperialSystem
-				? [null, 'oz', 'cup', 'tbsp', 'tsp', 'pinch']
-				: [null, 'g', 'ml', 'tbsp', 'tsp', 'pinch'];
+			const units = user.imperialSystem ? [null, 'oz', 'cup', 'tbsp', 'tsp', 'pinch'] : [null, 'g', 'ml', 'tbsp', 'tsp', 'pinch'];
 
 			if (!isNew) {
 				const metricUnits = ['g', 'ml'];
@@ -432,8 +422,7 @@
 						units.push(...metricUnits);
 					}
 				} else {
-					const hasImperialUnitIngredients =
-						ingredients.filter((x) => x.unit && imperialUnits.includes(x.unit)).length > 0;
+					const hasImperialUnitIngredients = ingredients.filter((x) => x.unit && imperialUnits.includes(x.unit)).length > 0;
 					if (hasImperialUnitIngredients) {
 						units.push(...imperialUnits);
 					}
@@ -598,8 +587,7 @@
 										class="unit-toggle {ingredient.unit === null ? 'fas fa-asterisk' : ''}"
 										class:pinch={ingredient.unit === 'pinch'}
 										title={$t('editRecipe.toggleUnitOfMeasure')}
-										aria-label={$t('editRecipe.toggleUnitOfMeasure')}
-										>{ingredient.unit ? $t(ingredient.unit) : ''}</button
+										aria-label={$t('editRecipe.toggleUnitOfMeasure')}>{ingredient.unit ? $t(ingredient.unit) : ''}</button
 									>
 								</div>
 							</div>
@@ -674,12 +662,7 @@
 
 			<div class="save-delete-wrap">
 				{#if !confirmationInProgress}
-					<button
-						type="button"
-						on:click={save}
-						class="button primary-button"
-						disabled={!canSave || saveButtonIsLoading}
-					>
+					<button type="button" on:click={save} class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
 						<span class="button-loader" class:loading={saveButtonIsLoading}>
 							<i class="fas fa-circle-notch fa-spin" />
 						</span>

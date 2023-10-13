@@ -307,7 +307,7 @@ public class RecipesController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateRecipeRequest request)
+    public async Task<IActionResult> Create([FromBody] CreateRecipeRequest request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -341,7 +341,7 @@ public class RecipesController : BaseController
                 ImageUri = request.ImageUri,
                 VideoUrl = request.VideoUrl,
             };
-            int id = await _recipeService.CreateAsync(model, _createRecipeValidator, tr);
+            int id = await _recipeService.CreateAsync(model, _createRecipeValidator, tr, cancellationToken);
 
             return StatusCode(201, id);
         }
@@ -352,7 +352,7 @@ public class RecipesController : BaseController
     }
 
     [HttpPost("upload-temp-image")]
-    public async Task<IActionResult> UploadTempImage(IFormFile image)
+    public async Task<IActionResult> UploadTempImage(IFormFile image, CancellationToken cancellationToken)
     {
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} api/recipes/upload-temp-image",
@@ -372,7 +372,7 @@ public class RecipesController : BaseController
 
             await image.CopyToAsync(uploadModel.File);
 
-            string tempImageUri = await _cdnService.UploadTempAsync(uploadModel, _uploadTempImageValidator, tr);
+            string tempImageUri = await _cdnService.UploadTempAsync(uploadModel, _uploadTempImageValidator, tr, cancellationToken);
 
             return StatusCode(201, new { tempImageUri });
         }
@@ -383,7 +383,7 @@ public class RecipesController : BaseController
     }
 
     [HttpPut]
-    public async Task<IActionResult> Update([FromBody] UpdateRecipeRequest request)
+    public async Task<IActionResult> Update([FromBody] UpdateRecipeRequest request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -418,7 +418,7 @@ public class RecipesController : BaseController
                 ImageUri = request.ImageUri,
                 VideoUrl = request.VideoUrl,
             };
-            UpdateRecipeResult result = await _recipeService.UpdateAsync(model, _updateRecipeValidator, tr);
+            UpdateRecipeResult result = await _recipeService.UpdateAsync(model, _updateRecipeValidator, tr, cancellationToken);
 
             foreach (var recipient in result.NotificationRecipients)
             {
@@ -444,7 +444,7 @@ public class RecipesController : BaseController
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} api/recipes/{id}",
@@ -454,7 +454,7 @@ public class RecipesController : BaseController
 
         try
         {
-            DeleteRecipeResult result = await _recipeService.DeleteAsync(id, UserId, tr);
+            DeleteRecipeResult result = await _recipeService.DeleteAsync(id, UserId, tr, cancellationToken);
 
             foreach (var recipient in result.NotificationRecipients)
             {
@@ -513,7 +513,7 @@ public class RecipesController : BaseController
     }
 
     [HttpPut("share")]
-    public async Task<IActionResult> Share([FromBody] Models.Recipes.Requests.ShareRecipeRequest request)
+    public async Task<IActionResult> Share([FromBody] Models.Recipes.Requests.ShareRecipeRequest request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -559,7 +559,7 @@ public class RecipesController : BaseController
                 NewShares = request.NewShares,
                 RemovedShares = request.RemovedShares,
             };
-            await _recipeService.ShareAsync(model, _shareValidator, tr);
+            await _recipeService.ShareAsync(model, _shareValidator, tr, cancellationToken);
         }
         finally
         {
@@ -570,7 +570,7 @@ public class RecipesController : BaseController
     }
 
     [HttpPut("share-is-accepted")]
-    public async Task<IActionResult> SetShareIsAccepted([FromBody] SetShareIsAcceptedRequest request)
+    public async Task<IActionResult> SetShareIsAccepted([FromBody] SetShareIsAcceptedRequest request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -585,7 +585,7 @@ public class RecipesController : BaseController
 
         try
         {
-            SetShareIsAcceptedResult result = await _recipeService.SetShareIsAcceptedAsync(request.RecipeId, UserId, request.IsAccepted, tr);
+            SetShareIsAcceptedResult result = await _recipeService.SetShareIsAcceptedAsync(request.RecipeId, UserId, request.IsAccepted, tr, cancellationToken);
             if (!result.Notify())
             {
                 return NoContent();
@@ -616,7 +616,7 @@ public class RecipesController : BaseController
     }
 
     [HttpDelete("{id}/leave")]
-    public async Task<IActionResult> Leave(int id)
+    public async Task<IActionResult> Leave(int id, CancellationToken cancellationToken)
     {
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} api/recipes/{id}/leave",
@@ -626,7 +626,7 @@ public class RecipesController : BaseController
 
         try
         {
-            LeaveRecipeResult result = await _recipeService.LeaveAsync(id, UserId, tr);
+            LeaveRecipeResult result = await _recipeService.LeaveAsync(id, UserId, tr, cancellationToken);
 
             foreach (var recipient in result.NotificationRecipients)
             {
@@ -687,7 +687,7 @@ public class RecipesController : BaseController
     }
 
     [HttpPost("send")]
-    public async Task<IActionResult> Send([FromBody] CreateSendRequestRequest request)
+    public async Task<IActionResult> Send([FromBody] CreateSendRequestRequest request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -708,7 +708,7 @@ public class RecipesController : BaseController
                 RecipeId = request.RecipeId,
                 RecipientsIds = request.RecipientsIds
             };
-            SendRecipeResult result = await _recipeService.SendAsync(model, _createSendRequestValidator, tr);
+            SendRecipeResult result = await _recipeService.SendAsync(model, _createSendRequestValidator, tr, cancellationToken);
 
             foreach (var recipient in result.NotificationRecipients)
             {
@@ -735,7 +735,7 @@ public class RecipesController : BaseController
     }
 
     [HttpPut("decline-send-request")]
-    public async Task<IActionResult> DeclineSendRequest([FromBody] DeclineSendRequestRequest dto)
+    public async Task<IActionResult> DeclineSendRequest([FromBody] DeclineSendRequestRequest dto, CancellationToken cancellationToken)
     {
         if (dto is null)
         {
@@ -750,7 +750,7 @@ public class RecipesController : BaseController
 
         try
         {
-            DeclineSendRequestResult result = await _recipeService.DeclineSendRequestAsync(dto.RecipeId, UserId, tr);
+            DeclineSendRequestResult result = await _recipeService.DeclineSendRequestAsync(dto.RecipeId, UserId, tr, cancellationToken);
             if (!result.Notify())
             {
                 tr.Finish();
@@ -779,7 +779,7 @@ public class RecipesController : BaseController
     }
 
     [HttpDelete("{recipeId}/send-request")]
-    public async Task<IActionResult> DeleteSendRequest(int recipeId)
+    public async Task<IActionResult> DeleteSendRequest(int recipeId, CancellationToken cancellationToken)
     {
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} api/recipes/{recipeId}/send-request",
@@ -789,7 +789,7 @@ public class RecipesController : BaseController
 
         try
         {
-            await _recipeService.DeleteSendRequestAsync(recipeId, UserId, tr);
+            await _recipeService.DeleteSendRequestAsync(recipeId, UserId, tr, cancellationToken);
         }
         finally
         {
@@ -800,7 +800,7 @@ public class RecipesController : BaseController
     }
 
     [HttpPost("try-import")]
-    public async Task<IActionResult> TryImport([FromBody] ImportRecipeRequest dto)
+    public async Task<IActionResult> TryImport([FromBody] ImportRecipeRequest dto, CancellationToken cancellationToken)
     {
         if (dto is null)
         {
@@ -836,10 +836,11 @@ public class RecipesController : BaseController
                 imageUriToCopy: recipe.ImageUri,
                 uploadPath: $"users/{importModel.UserId}/recipes",
                 template: "recipe",
-                tr
+                tr,
+                cancellationToken
             );
 
-            int id = await _recipeService.ImportAsync(importModel, _importRecipeValidator, tr);
+            int id = await _recipeService.ImportAsync(importModel, _importRecipeValidator, tr, cancellationToken);
 
             User currentUser = _userService.Get(importModel.UserId);
             User recipeUser = _userService.Get(recipe.UserId);

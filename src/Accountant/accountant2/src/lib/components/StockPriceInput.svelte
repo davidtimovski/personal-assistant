@@ -61,16 +61,7 @@
 </script>
 
 <div class="amount-input-wrap" class:changing>
-	<input
-		type="number"
-		id="stock-price"
-		bind:value={stockPrice}
-		min="0.0001"
-		max="100000"
-		step="0.0001"
-		class:invalid
-		required
-	/>
+	<input type="number" id="stock-price" bind:value={stockPrice} min="0.0001" max="100000" step="0.0001" class:invalid required />
 
 	<input
 		type="text"

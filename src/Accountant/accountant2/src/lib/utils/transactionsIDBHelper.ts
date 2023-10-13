@@ -1,7 +1,7 @@
 import { DateHelper } from '../../../../../Core/shared2/utils/dateHelper';
 
 import type { TransactionModel } from '$lib/models/entities/transaction';
-import type { CreatedIdPair } from '$lib/models/sync';
+import type { CreatedIdPair } from '$lib/models/server/responses/sync';
 import { IDBContext } from './idbContext';
 import { TransactionType } from '$lib/models/viewmodels/transactionType';
 import type { SearchFilters } from '$lib/models/viewmodels/searchFilters';
@@ -117,12 +117,7 @@ export class TransactionsIDBHelper {
 		return transactions;
 	}
 
-	async getForBarChart(
-		fromDate: string,
-		mainAccountId: number,
-		categoryId: number,
-		type: TransactionType
-	): Promise<TransactionModel[]> {
+	async getForBarChart(fromDate: string, mainAccountId: number, categoryId: number, type: TransactionType): Promise<TransactionModel[]> {
 		const categoryIds = await this.getWithSubCategoryIds(categoryId);
 
 		const now = new Date();
@@ -199,8 +194,7 @@ export class TransactionsIDBHelper {
 			return false;
 		}
 
-		const withinDates =
-			(!fromDate || new Date(t.date) >= new Date(fromDate)) && (!toDate || new Date(t.date) <= new Date(toDate));
+		const withinDates = (!fromDate || new Date(t.date) >= new Date(fromDate)) && (!toDate || new Date(t.date) <= new Date(toDate));
 		if (!withinDates) {
 			return false;
 		}
@@ -222,8 +216,7 @@ export class TransactionsIDBHelper {
 			return false;
 		}
 
-		const hasDescription =
-			!description || (!!t.description && t.description.toUpperCase().includes(description.toUpperCase()));
+		const hasDescription = !description || (!!t.description && t.description.toUpperCase().includes(description.toUpperCase()));
 
 		return hasDescription;
 	}
@@ -237,13 +230,7 @@ export class TransactionsIDBHelper {
 	 * @param type
 	 * @returns true if a transaction matches the filters
 	 */
-	private checkAgainstFilters2(
-		t: TransactionModel,
-		fromDate: string,
-		toDate: string,
-		accountId: number,
-		type: TransactionType
-	): boolean {
+	private checkAgainstFilters2(t: TransactionModel, fromDate: string, toDate: string, accountId: number, type: TransactionType): boolean {
 		let inType =
 			(type === TransactionType.Expense && this.isExpense(t.fromAccountId, t.toAccountId)) ||
 			(type === TransactionType.Deposit && this.isDeposit(t.fromAccountId, t.toAccountId));
@@ -251,8 +238,7 @@ export class TransactionsIDBHelper {
 			return false;
 		}
 
-		const withinDates =
-			(!fromDate || new Date(t.date) >= new Date(fromDate)) && (!toDate || new Date(t.date) <= new Date(toDate));
+		const withinDates = (!fromDate || new Date(t.date) >= new Date(fromDate)) && (!toDate || new Date(t.date) <= new Date(toDate));
 		if (!withinDates) {
 			return false;
 		}
@@ -284,8 +270,7 @@ export class TransactionsIDBHelper {
 				(t.fromAccountId === mainAccountId || t.toAccountId === mainAccountId)) ||
 			(type === TransactionType.Expense && t.fromAccountId === mainAccountId && !t.toAccountId) ||
 			(type === TransactionType.Deposit && !t.fromAccountId && t.toAccountId === mainAccountId) ||
-			(type === TransactionType.Saving &&
-				this.isSavingOrWithdrawingFromSavings(t.fromAccountId, t.toAccountId, mainAccountId));
+			(type === TransactionType.Saving && this.isSavingOrWithdrawingFromSavings(t.fromAccountId, t.toAccountId, mainAccountId));
 		if (!inType) {
 			return false;
 		}
@@ -313,11 +298,7 @@ export class TransactionsIDBHelper {
 		return !!fromAccountId && !!toAccountId;
 	}
 
-	private isSavingOrWithdrawingFromSavings(
-		fromAccountId: number | null,
-		toAccountId: number | null,
-		mainAccountId: number
-	) {
+	private isSavingOrWithdrawingFromSavings(fromAccountId: number | null, toAccountId: number | null, mainAccountId: number) {
 		return (fromAccountId === mainAccountId && !!toAccountId) || (toAccountId === mainAccountId && !!fromAccountId);
 	}
 
@@ -351,10 +332,7 @@ export class TransactionsIDBHelper {
 		const transactionsPromise = this.db.transactions
 			.orderBy('date')
 			.reverse()
-			.filter(
-				(t: TransactionModel) =>
-					(!fromDate || new Date(t.date) >= new Date(fromDate)) && t.fromAccountId === mainAccountId && !t.toAccountId
-			)
+			.filter((t: TransactionModel) => (!fromDate || new Date(t.date) >= new Date(fromDate)) && t.fromAccountId === mainAccountId && !t.toAccountId)
 			.toArray();
 
 		const categoriesPromise = this.db.categories.toArray();

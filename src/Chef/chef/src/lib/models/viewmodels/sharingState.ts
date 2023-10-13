@@ -1,6 +1,6 @@
 export enum SharingState {
-  NotShared,
-  PendingShare,
-  Owner,
-  Member
+	NotShared,
+	PendingShare,
+	Owner,
+	Member
 }

@@ -34,20 +34,20 @@ public interface IRecipesRepository
     bool CheckIfUserCanBeNotifiedOfRecipeChange(int id, int userId, ISpan metricsSpan);
     IEnumerable<User> GetUsersToBeNotifiedOfRecipeDeletion(int id, ISpan metricsSpan);
     IEnumerable<User> GetUsersToBeNotifiedOfRecipeSent(int id, ISpan metricsSpan);
-    Task<int> CreateAsync(Recipe recipe, ISpan metricsSpan);
+    Task<int> CreateAsync(Recipe recipe, ISpan metricsSpan, CancellationToken cancellationToken);
     /// <remarks>
     /// If the recipe does not belong to the user
     /// it does not change the ingredients, only their Amount and Unit.
     /// </remarks>
     /// <returns>The Name of the original recipe</returns>
-    Task<string> UpdateAsync(Recipe recipe, int userId, ISpan metricsSpan);
+    Task<string> UpdateAsync(Recipe recipe, int userId, ISpan metricsSpan, CancellationToken cancellationToken);
     /// <returns>The Name of the deleted recipe</returns>
-    Task<string> DeleteAsync(int id, ISpan metricsSpan);
-    Task SaveSharingDetailsAsync(IEnumerable<RecipeShare> newShares, IEnumerable<RecipeShare> removedShares, ISpan metricsSpan);
-    Task SetShareIsAcceptedAsync(int recipeId, int userId, bool isAccepted, DateTime modifiedDate, ISpan metricsSpan);
-    Task<RecipeShare> LeaveAsync(int id, int userId, ISpan metricsSpan);
-    Task CreateSendRequestsAsync(IEnumerable<SendRequest> sendRequests, ISpan metricsSpan);
-    Task DeclineSendRequestAsync(int recipeId, int userId, DateTime modifiedDate, ISpan metricsSpan);
-    Task DeleteSendRequestAsync(int recipeId, int userId, ISpan metricsSpan);
-    Task<int> ImportAsync(int id, IEnumerable<(int Id, int ReplacementId, bool TransferNutritionData, bool TransferPriceData)> ingredientReplacements, string imageUri, int userId, ISpan metricsSpan);
+    Task<string> DeleteAsync(int id, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task SaveSharingDetailsAsync(IEnumerable<RecipeShare> newShares, IEnumerable<RecipeShare> removedShares, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task SetShareIsAcceptedAsync(int recipeId, int userId, bool isAccepted, DateTime modifiedDate, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task<RecipeShare> LeaveAsync(int id, int userId, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task CreateSendRequestsAsync(IEnumerable<SendRequest> sendRequests, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task DeclineSendRequestAsync(int recipeId, int userId, DateTime modifiedDate, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task DeleteSendRequestAsync(int recipeId, int userId, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task<int> ImportAsync(int id, IEnumerable<(int Id, int ReplacementId, bool TransferNutritionData, bool TransferPriceData)> ingredientReplacements, string imageUri, int userId, ISpan metricsSpan, CancellationToken cancellationToken);
 }

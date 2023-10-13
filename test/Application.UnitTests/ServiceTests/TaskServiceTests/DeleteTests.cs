@@ -33,8 +33,8 @@ public class DeleteTests
         _tasksRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
             .Returns((ToDoTask)null);
 
-        await _sut.DeleteAsync(It.IsAny<int>(), It.IsAny<int>(), _metricsSpanMock.Object);
+        await _sut.DeleteAsync(It.IsAny<int>(), It.IsAny<int>(), _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
-        _tasksRepositoryMock.Verify(x => x.DeleteAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()), Times.Never);
+        _tasksRepositoryMock.Verify(x => x.DeleteAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 }

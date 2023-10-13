@@ -48,7 +48,7 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
             new { UserId = userId });
     }
 
-    public async Task DeleteForUserAndListAsync(int userId, int listId, ISpan metricsSpan)
+    public async Task DeleteForUserAndListAsync(int userId, int listId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(NotificationsRepository)}.{nameof(DeleteForUserAndListAsync)}");
 
@@ -60,7 +60,7 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
         metric.Finish();
     }
 
-    public async Task<int> CreateOrUpdateAsync(Notification notification, ISpan metricsSpan)
+    public async Task<int> CreateOrUpdateAsync(Notification notification, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(NotificationsRepository)}.{nameof(CreateOrUpdateAsync)}");
 
@@ -83,7 +83,7 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
             EFContext.Notifications.Add(notification);
         }
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
 

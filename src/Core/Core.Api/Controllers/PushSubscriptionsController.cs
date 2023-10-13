@@ -21,7 +21,7 @@ public class PushSubscriptionsController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateSubscription([FromBody] PushNotificationsSubscriptionRequest request)
+    public async Task<IActionResult> CreateSubscription([FromBody] PushNotificationsSubscriptionRequest request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -41,7 +41,8 @@ public class PushSubscriptionsController : BaseController
                 request.Subscription.Endpoint,
                 request.Subscription.Keys["auth"],
                 request.Subscription.Keys["p256dh"],
-                tr);
+                tr,
+                cancellationToken);
         }
         finally
         {

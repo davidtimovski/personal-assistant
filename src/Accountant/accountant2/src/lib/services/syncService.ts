@@ -53,10 +53,7 @@ export class SyncService {
 			await this.transactionsIDBHelper.sync(changed.deletedTransactionIds, changed.transactions);
 			await this.upcomingExpensesIDBHelper.sync(changed.deletedUpcomingExpenseIds, changed.upcomingExpenses);
 			await this.debtsIDBHelper.sync(changed.deletedDebtIds, changed.debts);
-			await this.automaticTransactionsIDBHelper.sync(
-				changed.deletedAutomaticTransactionIds,
-				changed.automaticTransactions
-			);
+			await this.automaticTransactionsIDBHelper.sync(changed.deletedAutomaticTransactionIds, changed.automaticTransactions);
 
 			const accountsToCreate = await this.accountsIDBHelper.getForSyncing();
 			const categoriesToCreate = await this.categoriesIDBHelper.getForSyncing();

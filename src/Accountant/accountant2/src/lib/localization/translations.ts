@@ -295,10 +295,8 @@ export default {
 			next: 'Next',
 			capital: 'Capital',
 			howMuchMoneyCapital: 'How much money do you have saved right now?',
-			weHavePrepopulatedCapital:
-				'We have prepopulated the field based on the total funds that you have on all of your accounts.',
-			weHavePrepopulatedSaving:
-				'We have prepopulated the field based on your average saving per month from the past year.',
+			weHavePrepopulatedCapital: 'We have prepopulated the field based on the total funds that you have on all of your accounts.',
+			weHavePrepopulatedSaving: 'We have prepopulated the field based on your average saving per month from the past year.',
 			saving: 'Saving',
 			howMuchMoneySaved: 'How much money do you put aside in savings per month?',
 			interestRateSavings: 'What is the interest rate on your savings account or fund?',
@@ -336,8 +334,7 @@ export default {
 				'You have a life insurance policy with an investment option that will yield <span class="er-calc-highlight">{{lifeInsuranceReturn}}</span> when you reach <span class="er-calc-highlight">{{lifeInsuranceAge}}</span> years of age',
 			summaryItem5b: "You don't have a life insurance policy with an investment option",
 			summaryItem6: 'You have the following upcoming expenses to take into consideration:',
-			summaryItem6a:
-				'<span class="er-calc-highlight">{{amount}}</span> for <span class="er-calc-highlight">{{expense}}</span>',
+			summaryItem6a: '<span class="er-calc-highlight">{{amount}}</span> for <span class="er-calc-highlight">{{expense}}</span>',
 			summaryItem7:
 				'You estimate that you\'ll need <span class="er-calc-highlight">{{retirementIncome}}</span> per month to live comfortably in retirement',
 			summaryItem8: 'The calculation will assume a flat yearly inflation rate of {{inflation}}%',
@@ -402,8 +399,7 @@ export default {
 		},
 		tooltips: {
 			okayUnderstood: 'Okay, understood',
-			tooltipWillNoLongerShow:
-				'This tooltip will no longer show. If you wish to retain it, go to the Menu page and click the "Help" button.',
+			tooltipWillNoLongerShow: 'This tooltip will no longer show. If you wish to retain it, go to the Menu page and click the "Help" button.',
 			encryptedDescription: {
 				title: 'Encrypted description',
 				question: 'What does this do?',
@@ -425,8 +421,7 @@ export default {
 		currencyConversionError: 'Се случи неочекувана грешка при конверзијата на валути',
 		refresh: 'Освежи',
 		failedToFetchError: 'Вѐ молиме да ја проверите вашата интернет конекција.',
-		syncSuccessful:
-			'Синхронизацијата беше успешна.<br>Повелечени беа {{retrieved}} а испратени беа {{pushed}} промени.',
+		syncSuccessful: 'Синхронизацијата беше успешна.<br>Повелечени беа {{retrieved}} а испратени беа {{pushed}} промени.',
 		name: 'Име',
 		save: 'Зачувај',
 		edit: 'Промени',
@@ -713,10 +708,8 @@ export default {
 			next: 'Напред',
 			capital: 'Капитал',
 			howMuchMoneyCapital: 'Колку пари имате заштедено сега?',
-			weHavePrepopulatedCapital:
-				'Го препополнивме полето врз основ на тоталната количина на пари што ја имате на сите ваши сметки.',
-			weHavePrepopulatedSaving:
-				'Го препополнивме полето врз основ на вашето просечно месечно штедење од проследната година.',
+			weHavePrepopulatedCapital: 'Го препополнивме полето врз основ на тоталната количина на пари што ја имате на сите ваши сметки.',
+			weHavePrepopulatedSaving: 'Го препополнивме полето врз основ на вашето просечно месечно штедење од проследната година.',
 			saving: 'Штедење',
 			howMuchMoneySaved: 'Колку пари штедиш месечно?',
 			interestRateSavings: 'Колкава е каматата на вашата штедна сметка или фонд?',
@@ -754,8 +747,7 @@ export default {
 				'Имате полиса за животно осигурување со опција за инвестирање која ќе ви исплати <span class="er-calc-highlight">{{lifeInsuranceReturn}}</span> кога ќе наполните <span class="er-calc-highlight">{{lifeInsuranceAge}}</span> години',
 			summaryItem5b: 'Немате полиса за животно осигурување со опција за инвестирање',
 			summaryItem6: 'Ги имате следните идни трошоци кои треба да се земат во предвид:',
-			summaryItem6a:
-				'<span class="er-calc-highlight">{{amount}}</span> за <span class="er-calc-highlight">{{expense}}</span>',
+			summaryItem6a: '<span class="er-calc-highlight">{{amount}}</span> за <span class="er-calc-highlight">{{expense}}</span>',
 			summaryItem7:
 				'Сметате дека ќе ви се потребни <span class="er-calc-highlight">{{retirementIncome}}</span> месечно за да живеете комфорно во пензија',
 			summaryItem8: 'Калкулацијата ќе земе во предвид рамна годишна инфлација од {{inflation}}%',
@@ -763,8 +755,7 @@ export default {
 			result: 'Резултат',
 			consideringTheAnswers:
 				'Со оглед на одговорите што ги дадовте ќе можете да се пензионирате на <span class="retirement-age er-calc-highlight">{{earlyRetirementAge}}</span> години.',
-			notLikelyToRetire:
-				'Не се чини дека ќе можете да се пензионирате на разумно годиште со оглед на одговорите што ги дадовте.'
+			notLikelyToRetire: 'Не се чини дека ќе можете да се пензионирате на разумно годиште со оглед на одговорите што ги дадовте.'
 		},
 		export: {
 			export: 'Експортирај',
@@ -775,8 +766,7 @@ export default {
 		},
 		totalSync: {
 			totalSync: 'Тотална синхронизација',
-			syncText:
-				'Ова ќе ги избрише сите локални податоци кои не биле синхронизирани и ќе ги повелече сите податоци од интернет.',
+			syncText: 'Ова ќе ги избрише сите локални податоци кои не биле синхронизирани и ќе ги повелече сите податоци од интернет.',
 			offlineText: 'Морате да бидете онлајн за да можете да синхронизирате.',
 			sync: 'Синхронизирај'
 		},

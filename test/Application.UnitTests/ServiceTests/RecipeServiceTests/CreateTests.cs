@@ -36,7 +36,7 @@ public class CreateTests
     {
         CreateRecipe model = new RecipeBuilder().BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         _successfulValidatorMock.Verify(x => x.Validate(model));
     }
@@ -47,19 +47,19 @@ public class CreateTests
         CreateRecipe model = new RecipeBuilder().BuildCreateModel();
         var failedValidator = ValidatorMocker.GetFailed<CreateRecipe>();
 
-        await Assert.ThrowsAsync<ValidationException>(() => _sut.CreateAsync(model, failedValidator.Object, _metricsSpanMock.Object));
+        await Assert.ThrowsAsync<ValidationException>(() => _sut.CreateAsync(model, failedValidator.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>()));
     }
 
     [Fact]
     public async Task TrimsName()
     {
         string? actualName = null;
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
-            .Callback<Recipe, ISpan>((r, _) => actualName = r.Name);
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<Recipe, ISpan, CancellationToken>((r, _, _) => actualName = r.Name);
 
         CreateRecipe model = new RecipeBuilder().WithName(" Recipe name ").BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
         const string expected = "Recipe name";
 
         Assert.Equal(expected, actualName);
@@ -69,12 +69,12 @@ public class CreateTests
     public async Task TrimsDescription_IfPresent()
     {
         string? actualDescription = null;
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
-            .Callback<Recipe, ISpan>((r, _) => actualDescription = r.Description);
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<Recipe, ISpan, CancellationToken>((r, _, _) => actualDescription = r.Description);
 
         CreateRecipe model = new RecipeBuilder().WithDescription(" Description ").BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
         const string expected = "Description";
 
         Assert.Equal(expected, actualDescription);
@@ -84,13 +84,13 @@ public class CreateTests
     public async Task TrimsRecipeIngredientNames_IfTheyAreNotLinkedToTasks()
     {
         List<RecipeIngredient> actualRecipeIngredients = null!;
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
-            .Callback<Recipe, ISpan>((r, _) => actualRecipeIngredients = r.RecipeIngredients);
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<Recipe, ISpan, CancellationToken>((r, _, _) => actualRecipeIngredients = r.RecipeIngredients);
 
         CreateRecipe model = new RecipeBuilder()
             .WithRecipeIngredients(" Ingredient 1", "Ingredient 2 ", " Ingredient 3 ").BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
         var expectedRecipeIngredients = new List<RecipeIngredient>
         {
             new() { Ingredient = new Ingredient { Name = "Ingredient 1" } },
@@ -108,12 +108,12 @@ public class CreateTests
     public async Task SetsAmountOfRecipeIngredientsToNull_IfAmountIsZero()
     {
         List<RecipeIngredient> actualRecipeIngredients = null!;
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
-            .Callback<Recipe, ISpan>((r, _) => actualRecipeIngredients = r.RecipeIngredients);
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<Recipe, ISpan, CancellationToken>((r, _, _) => actualRecipeIngredients = r.RecipeIngredients);
 
         CreateRecipe model = new RecipeBuilder().WithRecipeIngredientsWithAmounts(0, 0).BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         foreach (RecipeIngredient recipeIngredient in actualRecipeIngredients)
         {
@@ -125,12 +125,12 @@ public class CreateTests
     public async Task SetsUnitOfRecipeIngredientsToNull_IfAmountIsZero()
     {
         List<RecipeIngredient> actualRecipeIngredients = null!;
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
-            .Callback<Recipe, ISpan>((r, _) => actualRecipeIngredients = r.RecipeIngredients);
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<Recipe, ISpan, CancellationToken>((r, _, _) => actualRecipeIngredients = r.RecipeIngredients);
 
         CreateRecipe model = new RecipeBuilder().WithRecipeIngredientsWithAmounts(0, 0).BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         foreach (RecipeIngredient recipeIngredient in actualRecipeIngredients)
         {
@@ -142,12 +142,12 @@ public class CreateTests
     public async Task SetsUnitOfRecipeIngredientsToNull_IfAmountIsNull()
     {
         List<RecipeIngredient> actualRecipeIngredients = null!;
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
-            .Callback<Recipe, ISpan>((r, _) => actualRecipeIngredients = r.RecipeIngredients);
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<Recipe, ISpan, CancellationToken>((r, _, _) => actualRecipeIngredients = r.RecipeIngredients);
 
         CreateRecipe model = new RecipeBuilder().WithRecipeIngredientsWithAmounts(null, null).BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         foreach (RecipeIngredient recipeIngredient in actualRecipeIngredients)
         {
@@ -162,12 +162,12 @@ public class CreateTests
     public async Task CollapsesNewlinesInInstructionsToAtMostTwo(string instructions, string expected)
     {
         string? actualInstructions = null;
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
-            .Callback<Recipe, ISpan>((r, _) => actualInstructions = r.Instructions);
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<Recipe, ISpan, CancellationToken>((r, _, _) => actualInstructions = r.Instructions);
 
         CreateRecipe model = new RecipeBuilder().WithInstructions(instructions).BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         Assert.Equal(expected, actualInstructions);
     }
@@ -176,12 +176,12 @@ public class CreateTests
     public async Task TrimsInstructions_IfPresent()
     {
         string? actualInstructions = null;
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
-            .Callback<Recipe, ISpan>((r, _) => actualInstructions = r.Instructions);
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<Recipe, ISpan, CancellationToken>((r, _, _) => actualInstructions = r.Instructions);
 
         CreateRecipe model = new RecipeBuilder().WithInstructions(" Instructions ").BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
         const string expected = "Instructions";
 
         Assert.Equal(expected, actualInstructions);
@@ -191,12 +191,12 @@ public class CreateTests
     public async Task SetsPrepDurationToNull_IfLowerThanOneMinute()
     {
         TimeSpan? actualPrepDuration = null;
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
-            .Callback<Recipe, ISpan>((r, _) => actualPrepDuration = r.PrepDuration);
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<Recipe, ISpan, CancellationToken>((r, _, _) => actualPrepDuration = r.PrepDuration);
 
         CreateRecipe model = new RecipeBuilder().WithPrepDuration(TimeSpan.FromSeconds(59)).BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         Assert.Null(actualPrepDuration);
     }
@@ -205,12 +205,12 @@ public class CreateTests
     public async Task SetsCookDurationToNull_IfLowerThanOneMinute()
     {
         TimeSpan? actualCookDuration = null;
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
-            .Callback<Recipe, ISpan>((r, _) => actualCookDuration = r.CookDuration);
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<Recipe, ISpan, CancellationToken>((r, _, _) => actualCookDuration = r.CookDuration);
 
         CreateRecipe model = new RecipeBuilder().WithCookDuration(TimeSpan.FromSeconds(59)).BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         Assert.Null(actualCookDuration);
     }
@@ -219,12 +219,12 @@ public class CreateTests
     public async Task SetsCreatedDate()
     {
         var actualCreatedDate = new DateTime();
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
-            .Callback<Recipe, ISpan>((r, _) => actualCreatedDate = r.CreatedDate);
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<Recipe, ISpan, CancellationToken>((r, _, _) => actualCreatedDate = r.CreatedDate);
 
         CreateRecipe model = new RecipeBuilder().BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         Assert.NotEqual(DateTime.MinValue, actualCreatedDate);
     }
@@ -233,12 +233,12 @@ public class CreateTests
     public async Task SetsModifiedDate()
     {
         var actualModifiedDate = new DateTime();
-        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>()))
-            .Callback<Recipe, ISpan>((r, _) => actualModifiedDate = r.ModifiedDate);
+        _recipesRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Recipe>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<Recipe, ISpan, CancellationToken>((r, _, _) => actualModifiedDate = r.ModifiedDate);
 
         CreateRecipe model = new RecipeBuilder().BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         Assert.NotEqual(DateTime.MinValue, actualModifiedDate);
     }

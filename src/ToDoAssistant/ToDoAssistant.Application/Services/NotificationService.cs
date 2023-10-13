@@ -53,7 +53,7 @@ public class NotificationService : INotificationService
         }
     }
 
-    public Task<int> CreateOrUpdateAsync(CreateOrUpdateNotification model, ISpan metricsSpan)
+    public Task<int> CreateOrUpdateAsync(CreateOrUpdateNotification model, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(NotificationService)}.{nameof(CreateOrUpdateAsync)}");
 
@@ -63,7 +63,7 @@ public class NotificationService : INotificationService
 
             notification.CreatedDate = notification.ModifiedDate = DateTime.UtcNow;
 
-            return _notificationsRepository.CreateOrUpdateAsync(notification, metric);
+            return _notificationsRepository.CreateOrUpdateAsync(notification, metric, cancellationToken);
         }
         catch (Exception ex)
         {

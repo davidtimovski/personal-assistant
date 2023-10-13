@@ -9,12 +9,12 @@ public class PushSubscriptionsRepository : BaseRepository, IPushSubscriptionsRep
     public PushSubscriptionsRepository(CoreContext efContext)
         : base(efContext) { }
 
-    public async Task CreateSubscriptionAsync(PushSubscription subscription, ISpan metricsSpan)
+    public async Task CreateSubscriptionAsync(PushSubscription subscription, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(PushSubscriptionsRepository)}.{nameof(CreateSubscriptionAsync)}");
 
         EFContext.PushSubscriptions.Add(subscription);
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
     }

@@ -17,11 +17,7 @@ export class EncryptionService {
 			encodedData
 		);
 
-		return new EncryptionResult(
-			this.arrayBufferToBase64(encryptedData),
-			this.arrayBufferToBase64(salt),
-			this.arrayBufferToBase64(nonce)
-		);
+		return new EncryptionResult(this.arrayBufferToBase64(encryptedData), this.arrayBufferToBase64(salt), this.arrayBufferToBase64(nonce));
 	}
 
 	async decrypt(data: string, salt: string, nonce: string, password: string): Promise<string> {
@@ -44,10 +40,7 @@ export class EncryptionService {
 	}
 
 	private async getKey(password: string, salt: Uint8Array) {
-		const cryptoKey = await window.crypto.subtle.importKey('raw', this.encoder.encode(password), 'PBKDF2', false, [
-			'deriveBits',
-			'deriveKey'
-		]);
+		const cryptoKey = await window.crypto.subtle.importKey('raw', this.encoder.encode(password), 'PBKDF2', false, ['deriveBits', 'deriveKey']);
 
 		return window.crypto.subtle.deriveKey(
 			{

@@ -27,16 +27,16 @@ public interface IListService
     IEnumerable<User> GetUsersToBeNotifiedOfChange(int id, int excludeUserId, bool isPrivate, ISpan metricsSpan);
     IEnumerable<User> GetUsersToBeNotifiedOfChange(int id, int excludeUserId, int taskId, ISpan metricsSpan);
     bool CheckIfUserCanBeNotifiedOfChange(int id, int userId, ISpan metricsSpan);
-    Task<int> CreateAsync(CreateList model, IValidator<CreateList> validator, ISpan metricsSpan);
-    Task CreateSampleAsync(int userId, Dictionary<string, string> translations, ISpan metricsSpan);
-    Task<UpdateListResult> UpdateAsync(UpdateList model, IValidator<UpdateList> validator, ISpan metricsSpan);
-    Task UpdateSharedAsync(UpdateSharedList model, IValidator<UpdateSharedList> validator, ISpan metricsSpan);
-    Task<DeleteListResult> DeleteAsync(int id, int userId, ISpan metricsSpan);
-    Task ShareAsync(ShareList model, IValidator<ShareList> validator, ISpan metricsSpan);
-    Task<LeaveListResult> LeaveAsync(int id, int userId, ISpan metricsSpan);
-    Task<int> CopyAsync(CopyList model, IValidator<CopyList> validator, ISpan metricsSpan);
-    Task SetIsArchivedAsync(int id, int userId, bool isArchived, ISpan metricsSpan);
-    Task<SetTasksAsNotCompletedResult> UncompleteAllAsync(int id, int userId, ISpan metricsSpan);
-    Task<SetShareIsAcceptedResult> SetShareIsAcceptedAsync(int id, int userId, bool isAccepted, ISpan metricsSpan);
-    Task ReorderAsync(int id, int userId, short oldOrder, short newOrder);
+    Task<int> CreateAsync(CreateList model, IValidator<CreateList> validator, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task CreateSampleAsync(int userId, Dictionary<string, string> translations, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task<UpdateListResult> UpdateAsync(UpdateList model, IValidator<UpdateList> validator, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task UpdateSharedAsync(UpdateSharedList model, IValidator<UpdateSharedList> validator, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task<DeleteListResult> DeleteAsync(int id, int userId, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task ShareAsync(ShareList model, IValidator<ShareList> validator, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task<LeaveListResult> LeaveAsync(int id, int userId, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task<int> CopyAsync(CopyList model, IValidator<CopyList> validator, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task SetIsArchivedAsync(int id, int userId, bool isArchived, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task<SetTasksAsNotCompletedResult> UncompleteAllAsync(int id, int userId, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task<SetShareIsAcceptedResult> SetShareIsAcceptedAsync(int id, int userId, bool isAccepted, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task ReorderAsync(int id, int userId, short oldOrder, short newOrder, CancellationToken cancellationToken);
 }

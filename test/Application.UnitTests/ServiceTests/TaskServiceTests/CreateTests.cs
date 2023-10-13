@@ -45,7 +45,7 @@ public class CreateTests
     {
         CreateTask model = new TaskBuilder().BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         _successfulValidatorMock.Verify(x => x.Validate(model));
     }
@@ -56,19 +56,19 @@ public class CreateTests
         CreateTask model = new TaskBuilder().BuildCreateModel();
         var failedValidator = ValidatorMocker.GetFailed<CreateTask>();
 
-        await Assert.ThrowsAsync<ValidationException>(() => _sut.CreateAsync(model, failedValidator.Object, _metricsSpanMock.Object));
+        await Assert.ThrowsAsync<ValidationException>(() => _sut.CreateAsync(model, failedValidator.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>()));
     }
 
     [Fact]
     public async Task TrimsName()
     {
         string? actualName = null;
-        _tasksRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoTask>(), It.IsAny<int>(), It.IsAny<ISpan>()))
-            .Callback<ToDoTask, int, ISpan>((t, i, s) => actualName = t.Name);
+        _tasksRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoTask>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<ToDoTask, int, ISpan, CancellationToken>((t, _, _, _) => actualName = t.Name);
 
         CreateTask model = new TaskBuilder().WithName(" Task name ").BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
         const string expected = "Task name";
 
         Assert.Equal(expected, actualName);
@@ -78,12 +78,12 @@ public class CreateTests
     public async Task SetsCreatedDate()
     {
         var actualCreatedDate = new DateTime();
-        _tasksRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoTask>(), It.IsAny<int>(), It.IsAny<ISpan>()))
-            .Callback<ToDoTask, int, ISpan>((t, u, s) => actualCreatedDate = t.CreatedDate);
+        _tasksRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoTask>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<ToDoTask, int, ISpan, CancellationToken>((t, _, _, _) => actualCreatedDate = t.CreatedDate);
 
         CreateTask model = new TaskBuilder().BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         Assert.NotEqual(DateTime.MinValue, actualCreatedDate);
     }
@@ -92,12 +92,12 @@ public class CreateTests
     public async Task SetsModifiedDate()
     {
         var actualModifiedDate = new DateTime();
-        _tasksRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoTask>(), It.IsAny<int>(), It.IsAny<ISpan>()))
-            .Callback<ToDoTask, int, ISpan>((t, u, s) => actualModifiedDate = t.ModifiedDate);
+        _tasksRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoTask>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<ToDoTask, int, ISpan, CancellationToken>((t, _, _, _) => actualModifiedDate = t.ModifiedDate);
 
         CreateTask model = new TaskBuilder().BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         Assert.NotEqual(DateTime.MinValue, actualModifiedDate);
     }

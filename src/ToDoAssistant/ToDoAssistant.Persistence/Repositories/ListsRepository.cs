@@ -412,7 +412,7 @@ public class ListsRepository : BaseRepository, IListsRepository
         return result;
     }
 
-    public async Task<int> CreateAsync(ToDoList list, ISpan metricsSpan)
+    public async Task<int> CreateAsync(ToDoList list, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(CreateAsync)}");
 
@@ -434,14 +434,14 @@ public class ListsRepository : BaseRepository, IListsRepository
 
         EFContext.Lists.Add(list);
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
 
         return list.Id;
     }
 
-    public async Task<ToDoList> UpdateAsync(ToDoList list, int userId, ISpan metricsSpan)
+    public async Task<ToDoList> UpdateAsync(ToDoList list, int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(UpdateAsync)}");
 
@@ -467,14 +467,14 @@ public class ListsRepository : BaseRepository, IListsRepository
             share.ModifiedDate = list.ModifiedDate;
         }
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
 
         return originalList;
     }
 
-    public async Task UpdateSharedAsync(ToDoList list, ISpan metricsSpan)
+    public async Task UpdateSharedAsync(ToDoList list, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(UpdateSharedAsync)}");
 
@@ -482,12 +482,12 @@ public class ListsRepository : BaseRepository, IListsRepository
         dbList.NotificationsEnabled = list.NotificationsEnabled;
         dbList.ModifiedDate = list.ModifiedDate;
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
     }
 
-    public async Task<string> DeleteAsync(int id, ISpan metricsSpan)
+    public async Task<string> DeleteAsync(int id, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var now = DateTime.UtcNow;
 
@@ -521,14 +521,14 @@ public class ListsRepository : BaseRepository, IListsRepository
             }
         }
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
 
         return list.Name;
     }
 
-    public async Task SaveSharingDetailsAsync(IEnumerable<ListShare> newShares, IEnumerable<ListShare> editedShares, IEnumerable<ListShare> removedShares, ISpan metricsSpan)
+    public async Task SaveSharingDetailsAsync(IEnumerable<ListShare> newShares, IEnumerable<ListShare> editedShares, IEnumerable<ListShare> removedShares, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(SaveSharingDetailsAsync)}");
 
@@ -543,12 +543,12 @@ public class ListsRepository : BaseRepository, IListsRepository
 
         EFContext.ListShares.AddRange(newShares);
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
     }
 
-    public async Task<ListShare> LeaveAsync(int id, int userId, ISpan metricsSpan)
+    public async Task<ListShare> LeaveAsync(int id, int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var now = DateTime.UtcNow;
 
@@ -605,14 +605,14 @@ public class ListsRepository : BaseRepository, IListsRepository
             }
         }
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
 
         return share;
     }
 
-    public async Task<int> CopyAsync(ToDoList list, ISpan metricsSpan)
+    public async Task<int> CopyAsync(ToDoList list, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(CopyAsync)}");
 
@@ -648,14 +648,14 @@ public class ListsRepository : BaseRepository, IListsRepository
 
         EFContext.Lists.Add(list);
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
 
         return list.Id;
     }
 
-    public async Task SetIsArchivedAsync(int id, int userId, bool isArchived, DateTime modifiedDate, ISpan metricsSpan)
+    public async Task SetIsArchivedAsync(int id, int userId, bool isArchived, DateTime modifiedDate, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(SetIsArchivedAsync)}");
 
@@ -741,12 +741,12 @@ public class ListsRepository : BaseRepository, IListsRepository
             }
         }
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
     }
 
-    public async Task<bool> UncompleteAllAsync(int id, int userId, DateTime modifiedDate, ISpan metricsSpan)
+    public async Task<bool> UncompleteAllAsync(int id, int userId, DateTime modifiedDate, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(UncompleteAllAsync)}");
 
@@ -772,14 +772,14 @@ public class ListsRepository : BaseRepository, IListsRepository
             task.ModifiedDate = modifiedDate;
         }
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
 
         return completedTasks.Any();
     }
 
-    public async Task SetShareIsAcceptedAsync(int id, int userId, bool isAccepted, DateTime modifiedDate, ISpan metricsSpan)
+    public async Task SetShareIsAcceptedAsync(int id, int userId, bool isAccepted, DateTime modifiedDate, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(SetShareIsAcceptedAsync)}");
 
@@ -817,12 +817,12 @@ public class ListsRepository : BaseRepository, IListsRepository
             }
         }
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
     }
 
-    public async Task ReorderAsync(int id, int userId, short oldOrder, short newOrder, DateTime modifiedDate)
+    public async Task ReorderAsync(int id, int userId, short oldOrder, short newOrder, DateTime modifiedDate, CancellationToken cancellationToken)
     {
         if (newOrder > oldOrder)
         {
@@ -870,7 +870,7 @@ public class ListsRepository : BaseRepository, IListsRepository
             share.ModifiedDate = modifiedDate;
         }
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
     }
 
     private IQueryable<ToDoList> NonArchivedLists(int userId)

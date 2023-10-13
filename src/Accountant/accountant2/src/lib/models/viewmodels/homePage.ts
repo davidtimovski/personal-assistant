@@ -11,13 +11,7 @@ export class HomePageData {
 }
 
 export class HomePageDebt {
-	constructor(
-		public id: number,
-		public person: string,
-		public userIsDebtor: boolean,
-		public description: string,
-		public amount: number
-	) {}
+	constructor(public id: number, public person: string, public userIsDebtor: boolean, public description: string, public amount: number) {}
 }
 
 export class HomePageUpcomingExpense {

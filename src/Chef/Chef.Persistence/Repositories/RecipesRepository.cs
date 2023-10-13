@@ -566,7 +566,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         return result;
     }
 
-    public async Task<int> CreateAsync(Recipe recipe, ISpan metricsSpan)
+    public async Task<int> CreateAsync(Recipe recipe, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(CreateAsync)}");
 
@@ -601,14 +601,14 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
 
         EFContext.Add(recipe);
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
 
         return recipe.Id;
     }
 
-    public async Task<string> UpdateAsync(Recipe recipe, int userId, ISpan metricsSpan)
+    public async Task<string> UpdateAsync(Recipe recipe, int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(UpdateAsync)}");
 
@@ -656,28 +656,28 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
             dbRecipe.RecipeIngredients.Add(newRecipeIngredient);
         }
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
 
         return originalRecipeName;
     }
 
-    public async Task<string> DeleteAsync(int id, ISpan metricsSpan)
+    public async Task<string> DeleteAsync(int id, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(DeleteAsync)}");
 
         Recipe recipe = EFContext.Recipes.First(x => x.Id == id);
         EFContext.Recipes.Remove(recipe);
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
 
         return recipe.Name;
     }
 
-    public async Task SaveSharingDetailsAsync(IEnumerable<RecipeShare> newShares, IEnumerable<RecipeShare> removedShares, ISpan metricsSpan)
+    public async Task SaveSharingDetailsAsync(IEnumerable<RecipeShare> newShares, IEnumerable<RecipeShare> removedShares, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(SaveSharingDetailsAsync)}");
 
@@ -695,7 +695,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         metric.Finish();
     }
 
-    public async Task SetShareIsAcceptedAsync(int recipeId, int userId, bool isAccepted, DateTime modifiedDate, ISpan metricsSpan)
+    public async Task SetShareIsAcceptedAsync(int recipeId, int userId, bool isAccepted, DateTime modifiedDate, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(SetShareIsAcceptedAsync)}");
 
@@ -703,12 +703,12 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         recipeShare.IsAccepted = isAccepted;
         recipeShare.ModifiedDate = modifiedDate;
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
     }
 
-    public async Task<RecipeShare> LeaveAsync(int id, int userId, ISpan metricsSpan)
+    public async Task<RecipeShare> LeaveAsync(int id, int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(LeaveAsync)}");
 
@@ -722,25 +722,25 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         RecipeShare recipeShare = EFContext.RecipeShares.First(x => x.RecipeId == id && x.UserId == userId);
         EFContext.RecipeShares.Remove(recipeShare);
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
 
         return share;
     }
 
-    public async Task CreateSendRequestsAsync(IEnumerable<SendRequest> sendRequests, ISpan metricsSpan)
+    public async Task CreateSendRequestsAsync(IEnumerable<SendRequest> sendRequests, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(CreateSendRequestsAsync)}");
 
         EFContext.AddRange(sendRequests);
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
     }
 
-    public async Task DeclineSendRequestAsync(int recipeId, int userId, DateTime modifiedDate, ISpan metricsSpan)
+    public async Task DeclineSendRequestAsync(int recipeId, int userId, DateTime modifiedDate, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(DeclineSendRequestAsync)}");
 
@@ -748,24 +748,24 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         sendRequest.IsDeclined = true;
         sendRequest.ModifiedDate = modifiedDate;
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
     }
 
-    public async Task DeleteSendRequestAsync(int recipeId, int userId, ISpan metricsSpan)
+    public async Task DeleteSendRequestAsync(int recipeId, int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(DeleteSendRequestAsync)}");
 
         SendRequest sendRequest = EFContext.SendRequests.First(x => x.RecipeId == recipeId && x.UserId == userId);
         EFContext.SendRequests.Remove(sendRequest);
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
     }
 
-    public async Task<int> ImportAsync(int id, IEnumerable<(int Id, int ReplacementId, bool TransferNutritionData, bool TransferPriceData)> ingredientReplacements, string imageUri, int userId, ISpan metricsSpan)
+    public async Task<int> ImportAsync(int id, IEnumerable<(int Id, int ReplacementId, bool TransferNutritionData, bool TransferPriceData)> ingredientReplacements, string imageUri, int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(ImportAsync)}");
 
@@ -893,7 +893,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         var sendRequest = EFContext.SendRequests.First(x => x.RecipeId == id && x.UserId == userId);
         EFContext.SendRequests.Remove(sendRequest);
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
 

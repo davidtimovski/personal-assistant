@@ -161,7 +161,7 @@ public class TaskService : ITaskService
         }
     }
 
-    public async Task<CreatedTaskResult> CreateAsync(CreateTask model, IValidator<CreateTask> validator, ISpan metricsSpan)
+    public async Task<CreatedTaskResult> CreateAsync(CreateTask model, IValidator<CreateTask> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         ValidationUtil.ValidOrThrow(model, validator);
 
@@ -183,7 +183,7 @@ public class TaskService : ITaskService
             task.Order = 1;
             task.CreatedDate = task.ModifiedDate = DateTime.UtcNow;
 
-            var id = await _tasksRepository.CreateAsync(task, model.UserId, metric);
+            var id = await _tasksRepository.CreateAsync(task, model.UserId, metric, cancellationToken);
 
             ToDoList? list = _listsRepository.GetWithShares(model.ListId, model.UserId, metric);
             if (list is null)
@@ -221,7 +221,7 @@ public class TaskService : ITaskService
         }
     }
 
-    public async Task<BulkCreateResult> BulkCreateAsync(BulkCreate model, IValidator<BulkCreate> validator, ISpan metricsSpan)
+    public async Task<BulkCreateResult> BulkCreateAsync(BulkCreate model, IValidator<BulkCreate> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         ValidationUtil.ValidOrThrow(model, validator);
 
@@ -245,7 +245,7 @@ public class TaskService : ITaskService
                 }
                 ).ToList();
 
-            IEnumerable<ToDoTask> createdTasks = await _tasksRepository.BulkCreateAsync(tasks, model.TasksArePrivate, model.UserId, metric);
+            IEnumerable<ToDoTask> createdTasks = await _tasksRepository.BulkCreateAsync(tasks, model.TasksArePrivate, model.UserId, metric, cancellationToken);
 
             ToDoList? list = _listsRepository.GetWithShares(model.ListId, model.UserId, metric);
             if (list is null)
@@ -288,7 +288,7 @@ public class TaskService : ITaskService
         }
     }
 
-    public async Task<UpdateTaskResult> UpdateAsync(UpdateTask model, IValidator<UpdateTask> validator, ISpan metricsSpan)
+    public async Task<UpdateTaskResult> UpdateAsync(UpdateTask model, IValidator<UpdateTask> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         ValidationUtil.ValidOrThrow(model, validator);
 
@@ -315,7 +315,7 @@ public class TaskService : ITaskService
             ToDoTask originalTask = _tasksRepository.Get(model.Id);
 
             task.ModifiedDate = DateTime.UtcNow;
-            await _tasksRepository.UpdateAsync(task, model.UserId, metric);
+            await _tasksRepository.UpdateAsync(task, model.UserId, metric, cancellationToken);
 
             ToDoList? list = _listsRepository.GetWithShares(model.ListId, model.UserId, metric);
             if (list is null)
@@ -374,7 +374,7 @@ public class TaskService : ITaskService
         }
     }
 
-    public async Task<DeleteTaskResult> DeleteAsync(int id, int userId, ISpan metricsSpan)
+    public async Task<DeleteTaskResult> DeleteAsync(int id, int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(TaskService)}.{nameof(DeleteAsync)}");
 
@@ -391,7 +391,7 @@ public class TaskService : ITaskService
                 throw new ValidationException("Unauthorized");
             }
 
-            await _tasksRepository.DeleteAsync(id, userId, metric);
+            await _tasksRepository.DeleteAsync(id, userId, metric, cancellationToken);
 
             ToDoList? list = _listsRepository.GetWithShares(task.ListId, userId, metric);
             if (list is null)
@@ -430,7 +430,7 @@ public class TaskService : ITaskService
         }
     }
 
-    public async Task<CompleteUncompleteTaskResult> CompleteAsync(CompleteUncomplete model, ISpan metricsSpan)
+    public async Task<CompleteUncompleteTaskResult> CompleteAsync(CompleteUncomplete model, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(TaskService)}.{nameof(CompleteAsync)}");
 
@@ -447,7 +447,7 @@ public class TaskService : ITaskService
                 return new CompleteUncompleteTaskResult(false);
             }
 
-            await _tasksRepository.CompleteAsync(model.Id, model.UserId, metric);
+            await _tasksRepository.CompleteAsync(model.Id, model.UserId, metric, cancellationToken);
 
             ToDoList? list = _listsRepository.GetWithShares(task.ListId, model.UserId, metric);
             if (list is null)
@@ -486,7 +486,7 @@ public class TaskService : ITaskService
         }
     }
 
-    public async Task<CompleteUncompleteTaskResult> UncompleteAsync(CompleteUncomplete model, ISpan metricsSpan)
+    public async Task<CompleteUncompleteTaskResult> UncompleteAsync(CompleteUncomplete model, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(TaskService)}.{nameof(UncompleteAsync)}");
 
@@ -503,7 +503,7 @@ public class TaskService : ITaskService
                 return new CompleteUncompleteTaskResult(false);
             }
 
-            await _tasksRepository.UncompleteAsync(model.Id, model.UserId, metric);
+            await _tasksRepository.UncompleteAsync(model.Id, model.UserId, metric, cancellationToken);
 
             ToDoList? list = _listsRepository.GetWithShares(task.ListId, model.UserId, metric);
             if (list is null)
@@ -542,7 +542,7 @@ public class TaskService : ITaskService
         }
     }
 
-    public async Task<ReorderTaskResult> ReorderAsync(ReorderTask model, ISpan metricsSpan)
+    public async Task<ReorderTaskResult> ReorderAsync(ReorderTask model, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(TaskService)}.{nameof(ReorderAsync)}");
 
@@ -553,7 +553,7 @@ public class TaskService : ITaskService
                 throw new ValidationException("Unauthorized");
             }
 
-            await _tasksRepository.ReorderAsync(model.Id, model.UserId, model.OldOrder, model.NewOrder, DateTime.UtcNow);
+            await _tasksRepository.ReorderAsync(model.Id, model.UserId, model.OldOrder, model.NewOrder, DateTime.UtcNow, cancellationToken);
 
             ToDoTask task = _tasksRepository.Get(model.Id);
             ToDoList? list = _listsRepository.GetWithShares(task.ListId, model.UserId, metric);

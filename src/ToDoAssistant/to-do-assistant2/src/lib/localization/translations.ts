@@ -23,8 +23,7 @@ export default {
 			shared: 'Shared',
 			pendingAccept: 'Pending accept',
 			newList: 'New list',
-			emptyListMessage:
-				"You don't have any (non-<a href='/archivedLists'>archived</a>) lists.<br><br>Create some using the plus button below."
+			emptyListMessage: "You don't have any (non-<a href='/archivedLists'>archived</a>) lists.<br><br>Create some using the plus button below."
 		},
 		list: {
 			edit: 'Edit',
@@ -85,8 +84,7 @@ export default {
 			pendingAccept: 'Pending accept',
 			editing: 'Editing',
 			userDoesntExist: 'No user with that email exists.',
-			cannotShareWithUser:
-				'This user has blocked a share request from you previously. You cannot share with them until they unblock you.',
+			cannotShareWithUser: 'This user has blocked a share request from you previously. You cannot share with them until they unblock you.',
 			shareRequestSent: 'Share request was successfully sent',
 			shareRequestsSent: 'Share requests were successfully sent',
 			sharingDetailsSaved: 'Sharing details successfully saved'
@@ -130,8 +128,7 @@ export default {
 			assignToUser: 'Assign to user',
 			assignedTo: 'Assigned to',
 			nobody: 'Nobody',
-			taskUsedAsIngredientInRecipes:
-				'This task is used as an ingredient in the following recipes in <span class="chef-color">Chef</span>: ',
+			taskUsedAsIngredientInRecipes: 'This task is used as an ingredient in the following recipes in <span class="chef-color">Chef</span>: ',
 			deletingItWillUnlinkIt: 'Deleting it will unlink it from <span class="chef-color">Chef</span>.',
 			okayDelete: 'Okay, delete',
 			deleteSuccessful: 'Task was successfully deleted'
@@ -175,8 +172,7 @@ export default {
 			notifications: 'Notifications',
 			notificationsPermission: 'You must first give notifications permission to the app.',
 			notificationsWereEnabled: 'Notifications were successfully enabled.',
-			notificationsUnpermitted:
-				'Notifications are currently unpermitted. Please permit Notifications for To Do Assistant in your browser first.',
+			notificationsUnpermitted: 'Notifications are currently unpermitted. Please permit Notifications for To Do Assistant in your browser first.',
 			sounds: 'Sounds',
 			derivedLists: 'Derived lists',
 			highPriority: 'High Priority',
@@ -189,19 +185,16 @@ export default {
 		},
 		tooltips: {
 			okayUnderstood: 'Okay, understood',
-			tooltipWillNoLongerShow:
-				'This tooltip will no longer show. If you wish to retain it, go to the Menu page and click the "Help" button.',
+			tooltipWillNoLongerShow: 'This tooltip will no longer show. If you wish to retain it, go to the Menu page and click the "Help" button.',
 			oneTimeTasks: {
 				title: 'Delete tasks on completion',
 				question: 'What is this?',
-				answer:
-					'When checked, the tasks in this list will by default be deleted when set to done instead of moved below.'
+				answer: 'When checked, the tasks in this list will by default be deleted when set to done instead of moved below.'
 			},
 			memberVsAdmin: {
 				title: 'List member VS admin',
 				question: 'What is the difference?',
-				answer:
-					'Members can only change tasks whereas Admins can change the list itself as well as share it with other users.'
+				answer: 'Members can only change tasks whereas Admins can change the list itself as well as share it with other users.'
 			},
 			shareRequests: {
 				title: 'Share requests',
@@ -212,8 +205,7 @@ export default {
 			privateTasks: {
 				title: 'Private tasks',
 				question: 'What is this?',
-				answer:
-					'Private tasks allow you to keep track of personal matters in a shared list. Other users in the shared list cannot see them.'
+				answer: 'Private tasks allow you to keep track of personal matters in a shared list. Other users in the shared list cannot see them.'
 			}
 		}
 	},
@@ -241,8 +233,7 @@ export default {
 			shared: 'Споделена',
 			pendingAccept: 'Се исчекува прифаќање',
 			newList: 'Нова листа',
-			emptyListMessage:
-				"Немате (не-<a href='/archivedLists'>архивирани</a>) листи сеуште.<br><br>Креирајте користејки го плус копчето подолу."
+			emptyListMessage: "Немате (не-<a href='/archivedLists'>архивирани</a>) листи сеуште.<br><br>Креирајте користејки го плус копчето подолу."
 		},
 		list: {
 			edit: 'Промени',
@@ -350,8 +341,7 @@ export default {
 			assignToUser: 'Додели на корисник',
 			assignedTo: 'Доделена на',
 			nobody: 'Никој',
-			taskUsedAsIngredientInRecipes:
-				'Оваа задача се користи како состојка во следните рецепти во <span class="chef-color">Chef</span>: ',
+			taskUsedAsIngredientInRecipes: 'Оваа задача се користи како состојка во следните рецепти во <span class="chef-color">Chef</span>: ',
 			deletingItWillUnlinkIt: 'Доколку ја избришете ќе биде откачена од <span class="chef-color">Chef</span>.',
 			okayDelete: 'Во ред, избриши',
 			deleteSuccessful: 'Задачата беше успешно избришана'
@@ -395,8 +385,7 @@ export default {
 			notifications: 'Известувања',
 			notificationsPermission: 'Мора прво да дадете дозвола за известувања на апликацијата.',
 			notificationsWereEnabled: 'Известувањата беа успешно вклучени.',
-			notificationsUnpermitted:
-				'Известувањата моментално се забранети. Дадете дозвола за известувања на To Do Assistant во вашиот пребарувач прво.',
+			notificationsUnpermitted: 'Известувањата моментално се забранети. Дадете дозвола за известувања на To Do Assistant во вашиот пребарувач прво.',
 			sounds: 'Звуци',
 			derivedLists: 'Изведени листи',
 			highPriority: 'Висок Приоритет',
@@ -414,8 +403,7 @@ export default {
 			oneTimeTasks: {
 				title: 'Бриши задачи при завршување',
 				question: 'Што е ова?',
-				answer:
-					'Доколку е одбрано, задачите во оваа листа по обичај ќе бидат избришани при завршување наместо да бидат префрлени долу.'
+				answer: 'Доколку е одбрано, задачите во оваа листа по обичај ќе бидат избришани при завршување наместо да бидат префрлени долу.'
 			},
 			memberVsAdmin: {
 				title: 'Член на листа или администратор',

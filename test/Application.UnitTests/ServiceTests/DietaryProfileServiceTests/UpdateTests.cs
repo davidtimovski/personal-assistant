@@ -37,7 +37,7 @@ public class UpdateTests
         UpdateDietaryProfile model = new DietaryProfileBuilder().BuildUpdateModel();
         var validator = ValidatorMocker.GetSuccessful<UpdateDietaryProfile>();
 
-        await _sut.CreateOrUpdateAsync(model, validator.Object, _metricsSpanMock.Object);
+        await _sut.CreateOrUpdateAsync(model, validator.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         validator.Verify(x => x.Validate(model));
     }
@@ -48,6 +48,6 @@ public class UpdateTests
         UpdateDietaryProfile model = new DietaryProfileBuilder().BuildUpdateModel();
         var failedValidator = ValidatorMocker.GetFailed<UpdateDietaryProfile>();
 
-        await Assert.ThrowsAsync<ValidationException>(() => _sut.CreateOrUpdateAsync(model, failedValidator.Object, It.IsAny<ISpan>()));
+        await Assert.ThrowsAsync<ValidationException>(() => _sut.CreateOrUpdateAsync(model, failedValidator.Object, It.IsAny<ISpan>(), It.IsAny<CancellationToken>()));
     }
 }

@@ -11,9 +11,9 @@ public interface IUserService
     T Get<T>(int id) where T : UserDto;
     bool Exists(int id);
     ChefPreferences GetChefPreferences(int id, ISpan metricsSpan);
-    Task<int> CreateAsync(string auth0Id, string email, string name, string language, string culture, string imageUri, ISpan metricsSpan);
-    Task UpdateProfileAsync(int id, string name, string language, string culture, string imageUri, ISpan metricsSpan);
-    Task UpdateToDoNotificationsEnabledAsync(int id, bool enabled, ISpan metricsSpan);
-    Task UpdateChefNotificationsEnabledAsync(int id, bool enabled, ISpan metricsSpan);
-    Task UpdateImperialSystemAsync(int id, bool imperialSystem, ISpan metricsSpan);
+    Task<int> CreateAsync(string auth0Id, string email, string name, string language, string culture, string imageUri, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task UpdateProfileAsync(int id, string name, string language, string culture, string imageUri, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task UpdateToDoNotificationsEnabledAsync(int id, bool enabled, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task UpdateChefNotificationsEnabledAsync(int id, bool enabled, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task UpdateImperialSystemAsync(int id, bool imperialSystem, ISpan metricsSpan, CancellationToken cancellationToken);
 }

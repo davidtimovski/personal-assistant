@@ -1,5 +1,5 @@
 import type { Account } from '$lib/models/entities/account';
-import type { CreatedIdPair } from '$lib/models/sync';
+import type { CreatedIdPair } from '$lib/models/server/responses/sync';
 import { IDBContext } from '$lib/utils/idbContext';
 import type { TransactionModel } from '$lib/models/entities/transaction';
 

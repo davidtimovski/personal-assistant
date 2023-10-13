@@ -83,23 +83,14 @@
 						{#each automaticTransactions as automaticTransaction}
 							<tr class:highlighted-row={automaticTransaction.id === editedId}>
 								<td class="edit-link-cell">
-									<a
-										href="/editAutomaticTransaction/{automaticTransaction.id}"
-										class="link"
-										title={$t('edit')}
-										aria-label={$t('edit')}
-									>
+									<a href="/editAutomaticTransaction/{automaticTransaction.id}" class="link" title={$t('edit')} aria-label={$t('edit')}>
 										<i class="fas fa-pencil-alt" />
 									</a>
 								</td>
 								<td>{automaticTransaction.dayInMonth}</td>
 								<td>
 									{Formatter.money(automaticTransaction.amount, automaticTransaction.currency, $user.culture)}
-									<i
-										class="fas deposit-or-expense-icon {automaticTransaction.isDeposit
-											? 'fa-donate deposit-color'
-											: 'fa-wallet expense-color'}"
-									/>
+									<i class="fas deposit-or-expense-icon {automaticTransaction.isDeposit ? 'fa-donate deposit-color' : 'fa-wallet expense-color'}" />
 								</td>
 								<td>{automaticTransaction.category}</td>
 								<td class="sync-icon-cell">

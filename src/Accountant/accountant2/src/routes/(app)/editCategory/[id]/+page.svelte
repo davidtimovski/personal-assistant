@@ -48,10 +48,7 @@
 		}
 	});
 
-	$: canSave =
-		$syncStatus.status !== SyncEvents.SyncStarted &&
-		!ValidationUtil.isEmptyOrWhitespace(name) &&
-		!(!$isOnline && synced);
+	$: canSave = $syncStatus.status !== SyncEvents.SyncStarted && !ValidationUtil.isEmptyOrWhitespace(name) && !(!$isOnline && synced);
 
 	function typeChanged() {
 		if (type !== CategoryType.ExpenseOnly) {
@@ -74,16 +71,7 @@
 
 			if (isNew) {
 				try {
-					const category = new Category(
-						0,
-						parentId,
-						name,
-						<CategoryType>type,
-						generateUpcomingExpense,
-						isTax,
-						createdDate,
-						modifiedDate
-					);
+					const category = new Category(0, parentId, name, <CategoryType>type, generateUpcomingExpense, isTax, createdDate, modifiedDate);
 					const newId = await categoriesService.create(category);
 
 					goto('/categories?edited=' + newId);
@@ -92,16 +80,7 @@
 				}
 			} else {
 				try {
-					const category = new Category(
-						data.id,
-						parentId,
-						name,
-						<CategoryType>type,
-						generateUpcomingExpense,
-						isTax,
-						createdDate,
-						modifiedDate
-					);
+					const category = new Category(data.id, parentId, name, <CategoryType>type, generateUpcomingExpense, isTax, createdDate, modifiedDate);
 
 					await categoriesService.update(category);
 
@@ -247,12 +226,7 @@
 				<div class="form-control inline">
 					<label for="parent-category">{$t('editCategory.parentCategory')}</label>
 					<div class="loadable-select" class:loaded={parentCategoryOptions}>
-						<select
-							id="parent-category"
-							bind:value={parentId}
-							disabled={!parentCategoryOptions}
-							class="category-select"
-						>
+						<select id="parent-category" bind:value={parentId} disabled={!parentCategoryOptions} class="category-select">
 							{#if parentCategoryOptions}
 								{#each parentCategoryOptions as category}
 									<option value={category.id}>{category.name}</option>
@@ -276,11 +250,7 @@
 			</div>
 
 			<div class="form-control">
-				<Checkbox
-					labelKey="editCategory.generateUpcomingExpense"
-					bind:value={generateUpcomingExpense}
-					disabled={type !== 2}
-				/>
+				<Checkbox labelKey="editCategory.generateUpcomingExpense" bind:value={generateUpcomingExpense} disabled={type !== 2} />
 			</div>
 
 			<div class="form-control">
