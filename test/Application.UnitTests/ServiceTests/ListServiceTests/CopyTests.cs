@@ -38,7 +38,7 @@ public class CopyTests
     {
         CopyList model = new ListBuilder().BuildCopyModel();
 
-        await _sut.CopyAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CopyAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         _successfulValidatorMock.Verify(x => x.Validate(model));
     }
@@ -49,19 +49,19 @@ public class CopyTests
         CopyList model = new ListBuilder().BuildCopyModel();
         var failedValidator = ValidatorMocker.GetFailed<CopyList>();
 
-        await Assert.ThrowsAsync<ValidationException>(() => _sut.CopyAsync(model, failedValidator.Object, _metricsSpanMock.Object));
+        await Assert.ThrowsAsync<ValidationException>(() => _sut.CopyAsync(model, failedValidator.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>()));
     }
 
     [Fact]
     public async Task TrimsListName()
     {
         string? actualName = null;
-        _listsRepositoryMock.Setup(x => x.CopyAsync(It.IsAny<ToDoList>(), It.IsAny<ISpan>()))
-            .Callback<ToDoList, ISpan>((l, s) => actualName = l.Name);
+        _listsRepositoryMock.Setup(x => x.CopyAsync(It.IsAny<ToDoList>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<ToDoList, ISpan, CancellationToken>((l, _, _) => actualName = l.Name);
 
         CopyList model = new ListBuilder().WithName(" List name ").BuildCopyModel();
 
-        await _sut.CopyAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CopyAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
         const string expected = "List name";
 
         Assert.Equal(expected, actualName);

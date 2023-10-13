@@ -40,14 +40,14 @@ public class IngredientsControllerTests
     [Fact]
     public async Task Update_Returns400_IfBodyMissing()
     {
-        var result = await _sut.Update(null);
+        var result = await _sut.Update(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 
     [Fact]
     public async Task UpdatePublic_Returns400_IfBodyMissing()
     {
-        var result = await _sut.UpdatePublic(null);
+        var result = await _sut.UpdatePublic(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 }

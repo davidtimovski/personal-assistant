@@ -38,7 +38,7 @@ public class CreateTests
     {
         CreateList model = new ListBuilder().BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         _successfulValidatorMock.Verify(x => x.Validate(model));
     }
@@ -49,19 +49,19 @@ public class CreateTests
         CreateList model = new ListBuilder().BuildCreateModel();
         var failedValidator = ValidatorMocker.GetFailed<CreateList>();
 
-        await Assert.ThrowsAsync<ValidationException>(() => _sut.CreateAsync(model, failedValidator.Object, _metricsSpanMock.Object));
+        await Assert.ThrowsAsync<ValidationException>(() => _sut.CreateAsync(model, failedValidator.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>()));
     }
 
     [Fact]
     public async Task TrimsName()
     {
         string? actualName = null;
-        _listsRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoList>(), It.IsAny<ISpan>()))
-            .Callback<ToDoList, ISpan>((l, s) => actualName = l.Name);
+        _listsRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoList>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<ToDoList, ISpan, CancellationToken>((l, _, _) => actualName = l.Name);
 
         CreateList model = new ListBuilder().WithName(" List name ").BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
         const string expected = "List name";
 
         Assert.Equal(expected, actualName);
@@ -73,14 +73,14 @@ public class CreateTests
     public async Task SplitsTextIntoTasksByNewline(string tasksText, int expectedTaskCount)
     {
         var resultingTasks = new List<ToDoTask>();
-        _listsRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoList>(), It.IsAny<ISpan>()))
-            .Callback<ToDoList, ISpan>((l, s) => resultingTasks = l.Tasks);
+        _listsRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoList>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<ToDoList, ISpan, CancellationToken>((l, _, _) => resultingTasks = l.Tasks);
 
         CreateList model = new ListBuilder().WithTasksText(tasksText).BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
-        _listsRepositoryMock.Verify(x => x.CreateAsync(It.IsAny<ToDoList>(), It.IsAny<ISpan>()));
+        _listsRepositoryMock.Verify(x => x.CreateAsync(It.IsAny<ToDoList>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()));
 
         Assert.Equal(expectedTaskCount, resultingTasks.Count);
     }
@@ -93,17 +93,17 @@ public class CreateTests
         CreateList model = new ListBuilder().WithTasksText(tasksText).BuildCreateModel();
 
         var resultingTasks = new List<ToDoTask>();
-        _listsRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoList>(), It.IsAny<ISpan>()))
-            .Callback<ToDoList, ISpan>((l, s) => resultingTasks = l.Tasks);
+        _listsRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoList>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<ToDoList, ISpan, CancellationToken>((l, _, _) => resultingTasks = l.Tasks);
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
         var expectedTasks = new List<ToDoTask>
         {
             new ToDoTask { Name = "Task 1" },
             new ToDoTask { Name = "Task 2" }
         };
 
-        _listsRepositoryMock.Verify(x => x.CreateAsync(It.IsAny<ToDoList>(), It.IsAny<ISpan>()));
+        _listsRepositoryMock.Verify(x => x.CreateAsync(It.IsAny<ToDoList>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()));
 
         for (var i = 0; i < expectedTasks.Count; i++)
         {
@@ -115,14 +115,14 @@ public class CreateTests
     public async Task ResultingTasksHaveIsOneTimeSetFromList()
     {
         var resultingTasks = new List<ToDoTask>();
-        _listsRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoList>(), It.IsAny<ISpan>()))
-            .Callback<ToDoList, ISpan>((l, s) => resultingTasks = l.Tasks);
+        _listsRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoList>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<ToDoList, ISpan, CancellationToken>((l, _, _) => resultingTasks = l.Tasks);
 
         CreateList model = new ListBuilder().WithTasksText("Task 1\nTask 2").BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
-        _listsRepositoryMock.Verify(x => x.CreateAsync(It.IsAny<ToDoList>(), It.IsAny<ISpan>()));
+        _listsRepositoryMock.Verify(x => x.CreateAsync(It.IsAny<ToDoList>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()));
 
         for (var i = 0; i < resultingTasks.Count; i++)
         {
@@ -134,12 +134,12 @@ public class CreateTests
     public async Task SetsCreatedDate()
     {
         var actualCreatedDate = new DateTime();
-        _listsRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoList>(), It.IsAny<ISpan>()))
-            .Callback<ToDoList, ISpan>((l, s) => actualCreatedDate = l.CreatedDate);
+        _listsRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoList>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<ToDoList, ISpan, CancellationToken>((l, _, _) => actualCreatedDate = l.CreatedDate);
 
         CreateList model = new ListBuilder().BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         Assert.NotEqual(DateTime.MinValue, actualCreatedDate);
     }
@@ -148,12 +148,12 @@ public class CreateTests
     public async Task SetsModifiedDate()
     {
         var actualModifiedDate = new DateTime();
-        _listsRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoList>(), It.IsAny<ISpan>()))
-            .Callback<ToDoList, ISpan>((l, s) => actualModifiedDate = l.ModifiedDate);
+        _listsRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoList>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<ToDoList, ISpan, CancellationToken>((l, _, _) => actualModifiedDate = l.ModifiedDate);
 
         CreateList model = new ListBuilder().BuildCreateModel();
 
-        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.CreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         Assert.NotEqual(DateTime.MinValue, actualModifiedDate);
     }

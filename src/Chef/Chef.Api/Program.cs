@@ -15,7 +15,7 @@ if (builder.Environment.IsProduction())
     builder.Host.AddKeyVault();
     builder.Services.AddDataProtectionWithCertificate(builder.Configuration);
 
-    builder.Host.AddSentryLogging(builder.Configuration, "Chef", new HashSet<string> { "GET /health", "GET /hub", "POST /hub/negotiate" });
+    builder.Host.AddSentryLogging(builder.Configuration, "Chef", new HashSet<string> { "GET /health" });
 }
 
 builder.Services

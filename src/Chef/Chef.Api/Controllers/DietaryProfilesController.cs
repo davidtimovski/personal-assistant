@@ -88,7 +88,7 @@ public class DietaryProfilesController : BaseController
     }
 
     [HttpPut]
-    public async Task<IActionResult> CreateOrUpdate([FromBody] UpdateDietaryProfileRequest request)
+    public async Task<IActionResult> CreateOrUpdate([FromBody] UpdateDietaryProfileRequest request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -146,7 +146,7 @@ public class DietaryProfilesController : BaseController
                 CustomMagnesium = request.CustomMagnesium,
                 TrackMagnesium = request.TrackMagnesium
             };
-            await _dietaryProfileService.CreateOrUpdateAsync(model, _updateDietaryProfileValidator, tr);
+            await _dietaryProfileService.CreateOrUpdateAsync(model, _updateDietaryProfileValidator, tr, cancellationToken);
         }
         finally
         {
@@ -157,7 +157,7 @@ public class DietaryProfilesController : BaseController
     }
 
     [HttpDelete]
-    public async Task<IActionResult> Delete()
+    public async Task<IActionResult> Delete(CancellationToken cancellationToken)
     {
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} api/dietaryprofiles",
@@ -167,7 +167,7 @@ public class DietaryProfilesController : BaseController
 
         try
         {
-            await _dietaryProfileService.DeleteAsync(UserId, tr);
+            await _dietaryProfileService.DeleteAsync(UserId, tr, cancellationToken);
 
             return NoContent();
         }

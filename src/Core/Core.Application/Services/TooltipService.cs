@@ -66,13 +66,13 @@ public class TooltipService : ITooltipService
         }
     }
 
-    public async Task ToggleDismissedAsync(int userId, string key, string application, bool isDismissed, ISpan metricsSpan)
+    public async Task ToggleDismissedAsync(int userId, string key, string application, bool isDismissed, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(TooltipService)}.{nameof(ToggleDismissedAsync)}");
 
         try
         {
-            await _tooltipsRepository.ToggleDismissedAsync(userId, key, application, isDismissed, metric);
+            await _tooltipsRepository.ToggleDismissedAsync(userId, key, application, isDismissed, metric, cancellationToken);
         }
         catch (Exception ex)
         {

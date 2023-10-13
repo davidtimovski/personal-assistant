@@ -381,7 +381,7 @@ public class MidnightJob
         try
         {
             var olderThan = now.AddDays(-2);
-            await _cdnService.DeleteTemporaryResourcesAsync(olderThan);
+            await _cdnService.DeleteTemporaryResourcesAsync(olderThan, CancellationToken.None);
         }
         catch (Exception ex)
         {

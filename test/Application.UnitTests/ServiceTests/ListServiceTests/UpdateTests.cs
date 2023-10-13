@@ -36,12 +36,12 @@ public class UpdateTests
     [Fact]
     public async Task ValidatesModel()
     {
-        _listsRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<ToDoList>(), It.IsAny<int>(), It.IsAny<ISpan>()))
+        _listsRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<ToDoList>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ToDoList());
 
         UpdateList model = new ListBuilder().BuildUpdateModel();
 
-        await _sut.UpdateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.UpdateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         _successfulValidatorMock.Verify(x => x.Validate(model));
     }
@@ -52,20 +52,20 @@ public class UpdateTests
         UpdateList model = new ListBuilder().BuildUpdateModel();
         var failedValidator = ValidatorMocker.GetFailed<UpdateList>();
 
-        await Assert.ThrowsAsync<ValidationException>(() => _sut.UpdateAsync(model, failedValidator.Object, _metricsSpanMock.Object));
+        await Assert.ThrowsAsync<ValidationException>(() => _sut.UpdateAsync(model, failedValidator.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>()));
     }
 
     [Fact]
     public async Task TrimsListName()
     {
         string? actualName = null;
-        _listsRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<ToDoList>(), It.IsAny<int>(), It.IsAny<ISpan>()))
-            .Callback<ToDoList, int, ISpan>((l, id, s) => actualName = l.Name)
+        _listsRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<ToDoList>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<ToDoList, int, ISpan, CancellationToken>((l, _, _, _) => actualName = l.Name)
             .ReturnsAsync(new ToDoList());
 
         UpdateList model = new ListBuilder().WithName(" List name ").BuildUpdateModel();
 
-        await _sut.UpdateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.UpdateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
         const string expected = "List name";
 
         Assert.Equal(expected, actualName);

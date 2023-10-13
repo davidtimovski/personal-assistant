@@ -244,7 +244,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
             new { IngredientId = id, RecipeId = recipeId });
     }
 
-    public async Task UpdateAsync(Ingredient ingredient, ISpan metricsSpan)
+    public async Task UpdateAsync(Ingredient ingredient, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(IngredientsRepository)}.{nameof(UpdateAsync)}");
 
@@ -307,12 +307,12 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
             EFContext.IngredientsTasks.Remove(ingredientTask);
         }
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
     }
 
-    public async Task UpdatePublicAsync(int id, int? taskId, int userId, DateTime createdDate, ISpan metricsSpan)
+    public async Task UpdatePublicAsync(int id, int? taskId, int userId, DateTime createdDate, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(IngredientsRepository)}.{nameof(UpdatePublicAsync)}");
 
@@ -347,24 +347,24 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
             EFContext.IngredientsTasks.Remove(ingredientTask);
         }
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
     }
 
-    public async Task DeleteAsync(int id, ISpan metricsSpan)
+    public async Task DeleteAsync(int id, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(IngredientsRepository)}.{nameof(DeleteAsync)}");
 
         Ingredient ingredient = EFContext.Ingredients.First(x => x.Id == id);
         EFContext.Ingredients.Remove(ingredient);
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
     }
 
-    public async Task RemoveFromRecipesAsync(int id, int userId, ISpan metricsSpan)
+    public async Task RemoveFromRecipesAsync(int id, int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(IngredientsRepository)}.{nameof(RemoveFromRecipesAsync)}");
 
@@ -379,7 +379,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
             EFContext.IngredientsTasks.Remove(ingredientTask);
         }
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
     }

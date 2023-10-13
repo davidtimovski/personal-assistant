@@ -27,15 +27,15 @@ public interface IRecipeService
     int Count(int userId);
     (bool canSend, bool alreadySent) CheckSendRequest(int recipeId, int sendToId, int userId, ISpan metricsSpan);
     bool CheckIfUserCanBeNotifiedOfRecipeChange(int id, int userId, ISpan metricsSpan);
-    Task<int> CreateAsync(CreateRecipe model, IValidator<CreateRecipe> validator, ISpan metricsSpan);
-    Task CreateSampleAsync(int userId, Dictionary<string, string> translations, ISpan metricsSpan);
-    Task<UpdateRecipeResult> UpdateAsync(UpdateRecipe model, IValidator<UpdateRecipe> validator, ISpan metricsSpan);
-    Task<DeleteRecipeResult> DeleteAsync(int id, int userId, ISpan metricsSpan);
-    Task ShareAsync(ShareRecipe model, IValidator<ShareRecipe> validator, ISpan metricsSpan);
-    Task<SetShareIsAcceptedResult> SetShareIsAcceptedAsync(int recipeId, int userId, bool isAccepted, ISpan metricsSpan);
-    Task<LeaveRecipeResult> LeaveAsync(int id, int userId, ISpan metricsSpan);
-    Task<SendRecipeResult> SendAsync(CreateSendRequest model, IValidator<CreateSendRequest> validator, ISpan metricsSpan);
-    Task<DeclineSendRequestResult> DeclineSendRequestAsync(int recipeId, int userId, ISpan metricsSpan);
-    Task DeleteSendRequestAsync(int recipeId, int userId, ISpan metricsSpan);
-    Task<int> ImportAsync(ImportRecipe model, IValidator<ImportRecipe> validator, ISpan metricsSpan);
+    Task<int> CreateAsync(CreateRecipe model, IValidator<CreateRecipe> validator, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task CreateSampleAsync(int userId, Dictionary<string, string> translations, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task<UpdateRecipeResult> UpdateAsync(UpdateRecipe model, IValidator<UpdateRecipe> validator, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task<DeleteRecipeResult> DeleteAsync(int id, int userId, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task ShareAsync(ShareRecipe model, IValidator<ShareRecipe> validator, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task<SetShareIsAcceptedResult> SetShareIsAcceptedAsync(int recipeId, int userId, bool isAccepted, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task<LeaveRecipeResult> LeaveAsync(int id, int userId, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task<SendRecipeResult> SendAsync(CreateSendRequest model, IValidator<CreateSendRequest> validator, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task<DeclineSendRequestResult> DeclineSendRequestAsync(int recipeId, int userId, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task DeleteSendRequestAsync(int recipeId, int userId, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task<int> ImportAsync(ImportRecipe model, IValidator<ImportRecipe> validator, ISpan metricsSpan, CancellationToken cancellationToken);
 }

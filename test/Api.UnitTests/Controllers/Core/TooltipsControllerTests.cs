@@ -1,6 +1,7 @@
 ﻿using Api.UnitTests.Builders;
 using Core.Api.Controllers;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
 using Xunit;
 
 namespace Api.UnitTests.Controllers.Core;
@@ -20,7 +21,7 @@ public class TooltipsControllerTests
     [Fact]
     public async Task ToggleDismissed_Returns400_IfBodyMissing()
     {
-        var result = await _sut.ToggleDismissed(null);
+        var result = await _sut.ToggleDismissed(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 }

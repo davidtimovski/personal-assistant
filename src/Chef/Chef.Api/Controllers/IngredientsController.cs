@@ -194,7 +194,7 @@ public class IngredientsController : BaseController
     }
 
     [HttpPut]
-    public async Task<IActionResult> Update([FromBody] UpdateIngredientRequest request)
+    public async Task<IActionResult> Update([FromBody] UpdateIngredientRequest request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -247,7 +247,7 @@ public class IngredientsController : BaseController
                     Currency = request.PriceData.Currency,
                 },
             };
-            await _ingredientService.UpdateAsync(model, _updateValidator, tr);
+            await _ingredientService.UpdateAsync(model, _updateValidator, tr, cancellationToken);
         }
         finally
         {
@@ -258,7 +258,7 @@ public class IngredientsController : BaseController
     }
 
     [HttpPut("public")]
-    public async Task<IActionResult> UpdatePublic([FromBody] UpdatePublicIngredientRequest request)
+    public async Task<IActionResult> UpdatePublic([FromBody] UpdatePublicIngredientRequest request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -279,7 +279,7 @@ public class IngredientsController : BaseController
                 Id = request.Id,
                 TaskId = request.TaskId,
             };
-            await _ingredientService.UpdateAsync(model, _updatePublicValidator, tr);
+            await _ingredientService.UpdateAsync(model, _updatePublicValidator, tr, cancellationToken);
         }
         finally
         {
@@ -290,7 +290,7 @@ public class IngredientsController : BaseController
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteOrRemoveFromRecipesAsync(int id)
+    public async Task<IActionResult> DeleteOrRemoveFromRecipesAsync(int id, CancellationToken cancellationToken)
     {
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} api/ingredients/{id}",
@@ -300,7 +300,7 @@ public class IngredientsController : BaseController
 
         try
         {
-            await _ingredientService.DeleteOrRemoveFromRecipesAsync(id, UserId, tr);
+            await _ingredientService.DeleteOrRemoveFromRecipesAsync(id, UserId, tr, cancellationToken);
         }
         finally
         {

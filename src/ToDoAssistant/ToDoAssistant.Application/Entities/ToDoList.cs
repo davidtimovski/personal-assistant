@@ -5,6 +5,8 @@ namespace ToDoAssistant.Application.Entities;
 
 public class ToDoList : Entity
 {
+    public const string DefaultIcon = "Regular";
+
     public int Id { get; set; }
     public int UserId { get; set; }
     public string Name { get; set; } = null!;

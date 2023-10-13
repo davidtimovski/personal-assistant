@@ -46,7 +46,7 @@ public class UpdateTests
     {
         UpdateTask model = new TaskBuilder().BuildUpdateModel();
 
-        await _sut.UpdateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.UpdateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         _successfulValidatorMock.Verify(x => x.Validate(model));
     }
@@ -57,19 +57,19 @@ public class UpdateTests
         UpdateTask model = new TaskBuilder().BuildUpdateModel();
         var failedValidator = ValidatorMocker.GetFailed<UpdateTask>();
 
-        await Assert.ThrowsAsync<ValidationException>(() => _sut.UpdateAsync(model, failedValidator.Object, _metricsSpanMock.Object));
+        await Assert.ThrowsAsync<ValidationException>(() => _sut.UpdateAsync(model, failedValidator.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>()));
     }
 
     [Fact]
     public async Task TrimsName()
     {
         string? actualName = null;
-        _tasksRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<ToDoTask>(), It.IsAny<int>(), It.IsAny<ISpan>()))
-            .Callback<ToDoTask, int, ISpan>((t, i, s) => actualName = t.Name);
+        _tasksRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<ToDoTask>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<ToDoTask, int, ISpan, CancellationToken>((t, _, _, _) => actualName = t.Name);
 
         UpdateTask model = new TaskBuilder().WithName(" Task name ").BuildUpdateModel();
 
-        await _sut.UpdateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.UpdateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
         const string expected = "Task name";
 
         Assert.Equal(expected, actualName);

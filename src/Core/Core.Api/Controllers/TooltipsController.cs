@@ -61,7 +61,7 @@ public class TooltipsController : BaseController
     }
 
     [HttpPut]
-    public async Task<IActionResult> ToggleDismissed([FromBody] TooltipToggleDismissedRequest request)
+    public async Task<IActionResult> ToggleDismissed([FromBody] TooltipToggleDismissedRequest request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
@@ -76,7 +76,7 @@ public class TooltipsController : BaseController
 
         try
         {
-            await _tooltipService.ToggleDismissedAsync(UserId, request.Key, request.Application, request.IsDismissed, tr);
+            await _tooltipService.ToggleDismissedAsync(UserId, request.Key, request.Application, request.IsDismissed, tr, cancellationToken);
         }
         finally
         {

@@ -37,8 +37,8 @@ public class CompleteTests
         _tasksRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
             .Returns(new ToDoTask { IsCompleted = true });
 
-        await _sut.CompleteAsync(new CompleteUncomplete { Id = 0, UserId = 0 }, _metricsSpanMock.Object);
+        await _sut.CompleteAsync(new CompleteUncomplete { Id = 0, UserId = 0 }, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
-        _tasksRepositoryMock.Verify(x => x.CompleteAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()), Times.Never);
+        _tasksRepositoryMock.Verify(x => x.CompleteAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 }

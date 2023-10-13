@@ -42,12 +42,12 @@ public class UsersRepository : BaseRepository, IUsersRepository
         return conn.ExecuteScalar<bool>("SELECT COUNT(*) FROM users WHERE email = @email", new { email });
     }
 
-    public async Task<int> CreateAsync(string auth0Id, User user, ISpan metricsSpan)
+    public async Task<int> CreateAsync(string auth0Id, User user, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(UsersRepository)}.{nameof(CreateAsync)}");
 
         EFContext.Users.Add(user);
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         using IDbConnection conn = OpenConnection();
         await conn.ExecuteAsync("INSERT INTO user_id_map (user_id, auth0_id) VALUES (@userId, @auth0Id)",
@@ -58,7 +58,7 @@ public class UsersRepository : BaseRepository, IUsersRepository
         return user.Id;
     }
 
-    public async Task UpdateAsync(User user, ISpan metricsSpan)
+    public async Task UpdateAsync(User user, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(UsersRepository)}.{nameof(UpdateAsync)}");
 
@@ -73,19 +73,19 @@ public class UsersRepository : BaseRepository, IUsersRepository
         dbUser.ImageUri = user.ImageUri;
         dbUser.ModifiedDate = user.ModifiedDate;
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
     }
 
-    public async Task DeleteAsync(int id, ISpan metricsSpan)
+    public async Task DeleteAsync(int id, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(UsersRepository)}.{nameof(DeleteAsync)}");
 
         var person = EFContext.Users.Attach(new User { Id = id });
         person.State = EntityState.Deleted;
 
-        await EFContext.SaveChangesAsync();
+        await EFContext.SaveChangesAsync(cancellationToken);
 
         metric.Finish();
     }

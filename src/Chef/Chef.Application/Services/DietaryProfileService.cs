@@ -441,7 +441,7 @@ public class DietaryProfileService : IDietaryProfileService
         }
     }
 
-    public async Task CreateOrUpdateAsync(UpdateDietaryProfile model, IValidator<UpdateDietaryProfile> validator, ISpan metricsSpan)
+    public async Task CreateOrUpdateAsync(UpdateDietaryProfile model, IValidator<UpdateDietaryProfile> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         ValidationUtil.ValidOrThrow(model, validator);
 
@@ -472,7 +472,7 @@ public class DietaryProfileService : IDietaryProfileService
                 dietaryProfile.Weight = (float)Math.Round(model.WeightKg!.Value, 1);
             }
 
-            await _dietaryProfilesRepository.CreateOrUpdateAsync(dietaryProfile, metric);
+            await _dietaryProfilesRepository.CreateOrUpdateAsync(dietaryProfile, metric, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -485,13 +485,13 @@ public class DietaryProfileService : IDietaryProfileService
         }
     }
 
-    public async Task DeleteAsync(int userId, ISpan metricsSpan)
+    public async Task DeleteAsync(int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(DietaryProfileService)}.{nameof(DeleteAsync)}");
 
         try
         {
-            await _dietaryProfilesRepository.DeleteAsync(userId, metric);
+            await _dietaryProfilesRepository.DeleteAsync(userId, metric, cancellationToken);
         }
         catch (Exception ex)
         {

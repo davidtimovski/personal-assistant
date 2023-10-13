@@ -59,42 +59,42 @@ public class TasksControllerTests
     [Fact]
     public async Task Create_Returns400_IfBodyMissing()
     {
-        var result = await _sut.Create(null);
+        var result = await _sut.Create(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 
     [Fact]
     public async Task BulkCreate_Returns400_IfBodyMissing()
     {
-        var result = await _sut.BulkCreate(null);
+        var result = await _sut.BulkCreate(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 
     [Fact]
     public async Task Update_Returns400_IfBodyMissing()
     {
-        var result = await _sut.Update(null);
+        var result = await _sut.Update(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 
     [Fact]
     public async Task Complete_Returns400_IfBodyMissing()
     {
-        var result = await _sut.Complete(null);
+        var result = await _sut.Complete(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 
     [Fact]
     public async Task Uncomplete_Returns400_IfBodyMissing()
     {
-        var result = await _sut.Uncomplete(null);
+        var result = await _sut.Uncomplete(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 
     //[Fact]
     //public async Task Reorder_Returns400_IfBodyMissing()
     //{
-    //    var result = await _sut.Reorder(null);
+    //    var result = await _sut.Reorder(null, It.IsAny<CancellationToken>());
     //    Assert.IsType<BadRequestResult>(result);
     //}
 }

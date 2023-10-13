@@ -416,7 +416,7 @@ public class ListService : IListService
         }
     }
 
-    public async Task<int> CreateAsync(CreateList model, IValidator<CreateList> validator, ISpan metricsSpan)
+    public async Task<int> CreateAsync(CreateList model, IValidator<CreateList> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         ValidationUtil.ValidOrThrow(model, validator);
 
@@ -443,7 +443,7 @@ public class ListService : IListService
                     ).ToList();
             }
 
-            return await _listsRepository.CreateAsync(list, metric);
+            return await _listsRepository.CreateAsync(list, metric, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -456,7 +456,7 @@ public class ListService : IListService
         }
     }
 
-    public async Task CreateSampleAsync(int userId, Dictionary<string, string> translations, ISpan metricsSpan)
+    public async Task CreateSampleAsync(int userId, Dictionary<string, string> translations, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var now = DateTime.UtcNow;
 
@@ -494,7 +494,7 @@ public class ListService : IListService
                     ModifiedDate = list.CreatedDate
                 }
             };
-            await _listsRepository.CreateAsync(list, metric);
+            await _listsRepository.CreateAsync(list, metric, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -507,7 +507,7 @@ public class ListService : IListService
         }
     }
 
-    public async Task<UpdateListResult> UpdateAsync(UpdateList model, IValidator<UpdateList> validator, ISpan metricsSpan)
+    public async Task<UpdateListResult> UpdateAsync(UpdateList model, IValidator<UpdateList> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         ValidationUtil.ValidOrThrow(model, validator);
 
@@ -520,7 +520,7 @@ public class ListService : IListService
             list.Name = list.Name.Trim();
             list.ModifiedDate = DateTime.UtcNow;
 
-            ToDoList original = await _listsRepository.UpdateAsync(list, model.UserId, metric);
+            ToDoList original = await _listsRepository.UpdateAsync(list, model.UserId, metric, cancellationToken);
 
             var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(model.Id, model.UserId, metric).ToList();
             if (!usersToBeNotified.Any())
@@ -565,7 +565,7 @@ public class ListService : IListService
         }
     }
 
-    public async Task UpdateSharedAsync(UpdateSharedList model, IValidator<UpdateSharedList> validator, ISpan metricsSpan)
+    public async Task UpdateSharedAsync(UpdateSharedList model, IValidator<UpdateSharedList> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         ValidationUtil.ValidOrThrow(model, validator);
 
@@ -576,7 +576,7 @@ public class ListService : IListService
             var list = _mapper.Map<ToDoList>(model);
 
             list.ModifiedDate = DateTime.UtcNow;
-            await _listsRepository.UpdateSharedAsync(list, metric);
+            await _listsRepository.UpdateSharedAsync(list, metric, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -589,7 +589,7 @@ public class ListService : IListService
         }
     }
 
-    public async Task<DeleteListResult> DeleteAsync(int id, int userId, ISpan metricsSpan)
+    public async Task<DeleteListResult> DeleteAsync(int id, int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(DeleteAsync)}");
 
@@ -602,7 +602,7 @@ public class ListService : IListService
 
             var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfDeletion(id, metric).ToList();
 
-            string deletedListName = await _listsRepository.DeleteAsync(id, metric);
+            string deletedListName = await _listsRepository.DeleteAsync(id, metric, cancellationToken);
 
             if (!usersToBeNotified.Any())
             {
@@ -631,7 +631,7 @@ public class ListService : IListService
         }
     }
 
-    public async Task ShareAsync(ShareList model, IValidator<ShareList> validator, ISpan metricsSpan)
+    public async Task ShareAsync(ShareList model, IValidator<ShareList> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         ValidationUtil.ValidOrThrow(model, validator);
 
@@ -674,11 +674,11 @@ public class ListService : IListService
                 IsAdmin = x.IsAdmin
             });
 
-            await _listsRepository.SaveSharingDetailsAsync(newShares, editedShares, removedShares, metric);
+            await _listsRepository.SaveSharingDetailsAsync(newShares, editedShares, removedShares, metric, cancellationToken);
 
             foreach (ListShare share in removedShares)
             {
-                await _notificationsRepository.DeleteForUserAndListAsync(share.UserId, share.ListId, metric);
+                await _notificationsRepository.DeleteForUserAndListAsync(share.UserId, share.ListId, metric, cancellationToken);
             }
         }
         catch (Exception ex)
@@ -692,20 +692,20 @@ public class ListService : IListService
         }
     }
 
-    public async Task<LeaveListResult> LeaveAsync(int id, int userId, ISpan metricsSpan)
+    public async Task<LeaveListResult> LeaveAsync(int id, int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(LeaveAsync)}");
 
         try
         {
-            ListShare share = await _listsRepository.LeaveAsync(id, userId, metric);
+            ListShare share = await _listsRepository.LeaveAsync(id, userId, metric, cancellationToken);
 
             if (share.IsAccepted == false)
             {
                 return new LeaveListResult();
             }
 
-            await _notificationsRepository.DeleteForUserAndListAsync(userId, id, metric);
+            await _notificationsRepository.DeleteForUserAndListAsync(userId, id, metric, cancellationToken);
 
             var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(id, userId, metric).ToList();
             if (!usersToBeNotified.Any())
@@ -737,7 +737,7 @@ public class ListService : IListService
         }
     }
 
-    public async Task<int> CopyAsync(CopyList model, IValidator<CopyList> validator, ISpan metricsSpan)
+    public async Task<int> CopyAsync(CopyList model, IValidator<CopyList> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         ValidationUtil.ValidOrThrow(model, validator);
 
@@ -750,7 +750,7 @@ public class ListService : IListService
             list.Name = list.Name.Trim();
             list.CreatedDate = list.ModifiedDate = DateTime.UtcNow;
 
-            return await _listsRepository.CopyAsync(list, metric);
+            return await _listsRepository.CopyAsync(list, metric, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -763,7 +763,7 @@ public class ListService : IListService
         }
     }
 
-    public async Task SetIsArchivedAsync(int id, int userId, bool isArchived, ISpan metricsSpan)
+    public async Task SetIsArchivedAsync(int id, int userId, bool isArchived, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(SetIsArchivedAsync)}");
 
@@ -774,7 +774,7 @@ public class ListService : IListService
                 throw new ValidationException("Unauthorized");
             }
 
-            await _listsRepository.SetIsArchivedAsync(id, userId, isArchived, DateTime.UtcNow, metric);
+            await _listsRepository.SetIsArchivedAsync(id, userId, isArchived, DateTime.UtcNow, metric, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -787,7 +787,7 @@ public class ListService : IListService
         }
     }
 
-    public async Task<SetTasksAsNotCompletedResult> UncompleteAllAsync(int id, int userId, ISpan metricsSpan)
+    public async Task<SetTasksAsNotCompletedResult> UncompleteAllAsync(int id, int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(UncompleteAllAsync)}");
 
@@ -798,7 +798,7 @@ public class ListService : IListService
                 throw new ValidationException("Unauthorized");
             }
 
-            bool nonPrivateTasksWereUncompleted = await _listsRepository.UncompleteAllAsync(id, userId, DateTime.UtcNow, metric);
+            bool nonPrivateTasksWereUncompleted = await _listsRepository.UncompleteAllAsync(id, userId, DateTime.UtcNow, metric, cancellationToken);
             if (!nonPrivateTasksWereUncompleted)
             {
                 return new SetTasksAsNotCompletedResult();
@@ -834,13 +834,13 @@ public class ListService : IListService
         }
     }
 
-    public async Task<SetShareIsAcceptedResult> SetShareIsAcceptedAsync(int id, int userId, bool isAccepted, ISpan metricsSpan)
+    public async Task<SetShareIsAcceptedResult> SetShareIsAcceptedAsync(int id, int userId, bool isAccepted, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(SetShareIsAcceptedAsync)}");
 
         try
         {
-            await _listsRepository.SetShareIsAcceptedAsync(id, userId, isAccepted, DateTime.UtcNow, metric);
+            await _listsRepository.SetShareIsAcceptedAsync(id, userId, isAccepted, DateTime.UtcNow, metric, cancellationToken);
 
             var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(id, userId, metric).ToList();
             if (!usersToBeNotified.Any())
@@ -872,7 +872,7 @@ public class ListService : IListService
         }
     }
 
-    public async Task ReorderAsync(int id, int userId, short oldOrder, short newOrder)
+    public async Task ReorderAsync(int id, int userId, short oldOrder, short newOrder, CancellationToken cancellationToken)
     {
         try
         {
@@ -881,7 +881,7 @@ public class ListService : IListService
                 throw new ValidationException("Unauthorized");
             }
 
-            await _listsRepository.ReorderAsync(id, userId, oldOrder, newOrder, DateTime.UtcNow);
+            await _listsRepository.ReorderAsync(id, userId, oldOrder, newOrder, DateTime.UtcNow, cancellationToken);
         }
         catch (Exception ex)
         {

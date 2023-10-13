@@ -45,7 +45,7 @@ public class BulkCreateTests
     {
         BulkCreate model = new TaskBuilder().BuildBulkCreateModel();
 
-        await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         _successfulValidatorMock.Verify(x => x.Validate(model));
     }
@@ -56,7 +56,7 @@ public class BulkCreateTests
         BulkCreate model = new TaskBuilder().BuildBulkCreateModel();
         var failedValidator = ValidatorMocker.GetFailed<BulkCreate>();
 
-        await Assert.ThrowsAsync<ValidationException>(() => _sut.BulkCreateAsync(model, failedValidator.Object, _metricsSpanMock.Object));
+        await Assert.ThrowsAsync<ValidationException>(() => _sut.BulkCreateAsync(model, failedValidator.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>()));
     }
 
     [Theory]
@@ -65,15 +65,15 @@ public class BulkCreateTests
     public async Task SplitsTextIntoTasksByNewline(string tasksText, int expectedTaskCount)
     {
         var actualTasks = new List<ToDoTask>();
-        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<IEnumerable<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>()))
-            .Callback<IEnumerable<ToDoTask>, bool, int, ISpan>((t, p, u, s) => actualTasks = t.ToList());
+        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<IEnumerable<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<IEnumerable<ToDoTask>, bool, int, ISpan, CancellationToken>((t, _, _, _, _) => actualTasks = t.ToList());
 
         BulkCreate model = new TaskBuilder().WithTasksText(tasksText).BuildBulkCreateModel();
 
-        await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         _tasksRepositoryMock.Verify(x => x.BulkCreateAsync(
-            It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>()));
+            It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()));
 
         Assert.Equal(expectedTaskCount, actualTasks.Count);
     }
@@ -84,18 +84,18 @@ public class BulkCreateTests
     public async Task SplitsTextIntoTasksWithListIdSet(string tasksText, int listId)
     {
         var actualTasks = new List<ToDoTask>();
-        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<IEnumerable<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>()))
-            .Callback<IEnumerable<ToDoTask>, bool, int, ISpan>((t, p, u, s) => actualTasks = t.ToList());
+        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<IEnumerable<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<IEnumerable<ToDoTask>, bool, int, ISpan, CancellationToken>((t, _, _, _, _) => actualTasks = t.ToList());
 
         BulkCreate model = new TaskBuilder()
             .WithListId(listId)
             .WithTasksText(tasksText)
             .BuildBulkCreateModel();
 
-        await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         _tasksRepositoryMock.Verify(x => x.BulkCreateAsync(
-            It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>()));
+            It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()));
 
         for (var i = 0; i < actualTasks.Count; i++)
         {
@@ -109,12 +109,12 @@ public class BulkCreateTests
     public async Task SplitsTextIntoTasksWithTrimmedNames(string tasksText)
     {
         var actualTasks = new List<ToDoTask>();
-        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<IEnumerable<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>()))
-            .Callback<IEnumerable<ToDoTask>, bool, int, ISpan>((t, p, u, s) => actualTasks = t.ToList());
+        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<IEnumerable<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<IEnumerable<ToDoTask>, bool, int, ISpan, CancellationToken>((t, _, _, _, _) => actualTasks = t.ToList());
 
         BulkCreate model = new TaskBuilder().WithTasksText(tasksText).BuildBulkCreateModel();
 
-        await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
         var expectedTasks = new List<ToDoTask>
         {
             new() { Name = "Task 1" },
@@ -122,7 +122,7 @@ public class BulkCreateTests
         };
 
         _tasksRepositoryMock.Verify(x => x.BulkCreateAsync(
-            It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>()));
+            It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()));
 
         for (var i = 0; i < expectedTasks.Count; i++)
         {
@@ -136,18 +136,18 @@ public class BulkCreateTests
     public async Task SplitsTextIntoTasksWithIsOneTimeSet(string tasksText, bool tasksAreOneTime)
     {
         var actualTasks = new List<ToDoTask>();
-        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<IEnumerable<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>()))
-            .Callback<IEnumerable<ToDoTask>, bool, int, ISpan>((t, p, u, s) => actualTasks = t.ToList());
+        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<IEnumerable<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<IEnumerable<ToDoTask>, bool, int, ISpan, CancellationToken>((t, _, _, _, _) => actualTasks = t.ToList());
 
         BulkCreate model = new TaskBuilder()
             .WithTasksText(tasksText)
             .WithTasksAreOneTime(tasksAreOneTime)
             .BuildBulkCreateModel();
 
-        await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         _tasksRepositoryMock.Verify(x => x.BulkCreateAsync(
-            It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>()));
+            It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()));
 
         foreach (var task in actualTasks)
         {
@@ -161,8 +161,8 @@ public class BulkCreateTests
     public async Task SplitsTextIntoTasksWithPrivateToUserIdSet(string tasksText, bool tasksArePrivate, int userId)
     {
         var actualTasks = new List<ToDoTask>();
-        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<IEnumerable<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>()))
-            .Callback<IEnumerable<ToDoTask>, bool, int, ISpan>((t, p, u, s) => actualTasks = t.ToList());
+        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<IEnumerable<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<IEnumerable<ToDoTask>, bool, int, ISpan, CancellationToken>((t, _, _, _, _) => actualTasks = t.ToList());
 
         BulkCreate model = new TaskBuilder()
             .WithUserId(userId)
@@ -170,11 +170,11 @@ public class BulkCreateTests
             .WithTasksArePrivate(tasksArePrivate)
             .BuildBulkCreateModel();
 
-        await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
         int? expectedPrivateToUserId = tasksArePrivate ? userId : null;
 
         _tasksRepositoryMock.Verify(x => x.BulkCreateAsync(
-            It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>()));
+            It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()));
 
         foreach (var task in actualTasks)
         {
@@ -186,17 +186,17 @@ public class BulkCreateTests
     public async Task ResultingTasksHaveCreatedDateSet()
     {
         var actualTasks = new List<ToDoTask>();
-        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<IEnumerable<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>()))
-            .Callback<IEnumerable<ToDoTask>, bool, int, ISpan>((t, p, u, s) => actualTasks = t.ToList());
+        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<IEnumerable<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<IEnumerable<ToDoTask>, bool, int, ISpan, CancellationToken>((t, _, _, _, _) => actualTasks = t.ToList());
 
         BulkCreate model = new TaskBuilder()
             .WithTasksText("Task 1\nTask 2")
             .BuildBulkCreateModel();
 
-        await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         _tasksRepositoryMock.Verify(x => x.BulkCreateAsync(
-            It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>()));
+            It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()));
 
         foreach (var task in actualTasks)
         {
@@ -208,17 +208,17 @@ public class BulkCreateTests
     public async Task ResultingTasksHaveModifiedDateSet()
     {
         var actualTasks = new List<ToDoTask>();
-        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<IEnumerable<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>()))
-            .Callback<IEnumerable<ToDoTask>, bool, int, ISpan>((t, p, u, s) => actualTasks = t.ToList());
+        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<IEnumerable<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<IEnumerable<ToDoTask>, bool, int, ISpan, CancellationToken>((t, _, _, _, _) => actualTasks = t.ToList());
 
         BulkCreate model = new TaskBuilder()
             .WithTasksText("Task 1\nTask 2")
             .BuildBulkCreateModel();
 
-        await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.BulkCreateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         _tasksRepositoryMock.Verify(x => x.BulkCreateAsync(
-            It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>()));
+            It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()));
 
         foreach (var task in actualTasks)
         {

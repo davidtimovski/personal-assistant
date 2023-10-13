@@ -1,6 +1,7 @@
 ﻿using Api.UnitTests.Builders;
 using Chef.Api.Controllers;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
 using Xunit;
 
 namespace Api.UnitTests.Controllers.Chef;
@@ -27,7 +28,7 @@ public class DietaryProfilesControllerTests
     [Fact]
     public async Task CreateOrUpdate_Returns400_IfBodyMissing()
     {
-        var result = await _sut.CreateOrUpdate(null);
+        var result = await _sut.CreateOrUpdate(null, It.IsAny<CancellationToken>());
         Assert.IsType<BadRequestResult>(result);
     }
 }

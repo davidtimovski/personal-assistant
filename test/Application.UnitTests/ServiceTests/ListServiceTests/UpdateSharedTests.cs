@@ -37,7 +37,7 @@ public class UpdateSharedTests
     {
         UpdateSharedList model = new ListBuilder().BuildUpdateSharedModel();
 
-        await _sut.UpdateSharedAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object);
+        await _sut.UpdateSharedAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
 
         _successfulValidatorMock.Verify(x => x.Validate(model));
     }
@@ -48,6 +48,6 @@ public class UpdateSharedTests
         UpdateSharedList model = new ListBuilder().BuildUpdateSharedModel();
         var failedValidator = ValidatorMocker.GetFailed<UpdateSharedList>();
 
-        await Assert.ThrowsAsync<ValidationException>(() => _sut.UpdateSharedAsync(model, failedValidator.Object, _metricsSpanMock.Object));
+        await Assert.ThrowsAsync<ValidationException>(() => _sut.UpdateSharedAsync(model, failedValidator.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>()));
     }
 }

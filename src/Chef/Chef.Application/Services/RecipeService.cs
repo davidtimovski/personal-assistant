@@ -501,7 +501,7 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public async Task<int> CreateAsync(CreateRecipe model, IValidator<CreateRecipe> validator, ISpan metricsSpan)
+    public async Task<int> CreateAsync(CreateRecipe model, IValidator<CreateRecipe> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         ValidationUtil.ValidOrThrow(model, validator);
 
@@ -554,11 +554,11 @@ public class RecipeService : IRecipeService
             recipe.CookDuration = recipe.CookDuration < minute ? null : recipe.CookDuration;
 
             recipe.CreatedDate = recipe.ModifiedDate = recipe.LastOpenedDate = now;
-            int id = await _recipesRepository.CreateAsync(recipe, metric);
+            int id = await _recipesRepository.CreateAsync(recipe, metric, cancellationToken);
 
             if (model.ImageUri != null)
             {
-                await _cdnService.RemoveTempTagAsync(model.ImageUri, metric);
+                await _cdnService.RemoveTempTagAsync(model.ImageUri, metric, cancellationToken);
             }
 
             return id;
@@ -574,7 +574,7 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public async Task CreateSampleAsync(int userId, Dictionary<string, string> translations, ISpan metricsSpan)
+    public async Task CreateSampleAsync(int userId, Dictionary<string, string> translations, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(CreateSampleAsync)}");
 
@@ -623,7 +623,7 @@ public class RecipeService : IRecipeService
                 }
             };
 
-            await _recipesRepository.CreateAsync(recipe, metric);
+            await _recipesRepository.CreateAsync(recipe, metric, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -636,7 +636,7 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public async Task<UpdateRecipeResult> UpdateAsync(UpdateRecipe model, IValidator<UpdateRecipe> validator, ISpan metricsSpan)
+    public async Task<UpdateRecipeResult> UpdateAsync(UpdateRecipe model, IValidator<UpdateRecipe> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         ValidationUtil.ValidOrThrow(model, validator);
 
@@ -693,7 +693,7 @@ public class RecipeService : IRecipeService
 
             recipe.ModifiedDate = now;
 
-            string originalName = await _recipesRepository.UpdateAsync(recipe, model.UserId, metric);
+            string originalName = await _recipesRepository.UpdateAsync(recipe, model.UserId, metric, cancellationToken);
 
             // If the recipe image was changed
             if (oldImageUri != model.ImageUri)
@@ -701,13 +701,13 @@ public class RecipeService : IRecipeService
                 // and it previously had one, delete it
                 if (oldImageUri != null)
                 {
-                    await _cdnService.DeleteAsync(oldImageUri, metric);
+                    await _cdnService.DeleteAsync(oldImageUri, metric, cancellationToken);
                 }
 
                 // and a new one was set, remove its temp tag
                 if (model.ImageUri != null)
                 {
-                    await _cdnService.RemoveTempTagAsync(model.ImageUri, metric);
+                    await _cdnService.RemoveTempTagAsync(model.ImageUri, metric, cancellationToken);
                 }
             }
 
@@ -739,7 +739,7 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public async Task<DeleteRecipeResult> DeleteAsync(int id, int userId, ISpan metricsSpan)
+    public async Task<DeleteRecipeResult> DeleteAsync(int id, int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(DeleteAsync)}");
 
@@ -752,11 +752,11 @@ public class RecipeService : IRecipeService
 
             string imageUri = _recipesRepository.GetImageUri(id, metric);
 
-            var recipeName = await _recipesRepository.DeleteAsync(id, metric);
+            var recipeName = await _recipesRepository.DeleteAsync(id, metric, cancellationToken);
 
             if (imageUri != null)
             {
-                await _cdnService.DeleteAsync($"users/{userId}/recipes/{imageUri}", metric);
+                await _cdnService.DeleteAsync($"users/{userId}/recipes/{imageUri}", metric, cancellationToken);
             }
 
             var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeDeletion(id, metric).ToList();
@@ -787,7 +787,7 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public async Task ShareAsync(ShareRecipe model, IValidator<ShareRecipe> validator, ISpan metricsSpan)
+    public async Task ShareAsync(ShareRecipe model, IValidator<ShareRecipe> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         ValidationUtil.ValidOrThrow(model, validator);
 
@@ -821,7 +821,7 @@ public class RecipeService : IRecipeService
                 UserId = x
             });
 
-            await _recipesRepository.SaveSharingDetailsAsync(newShares, removedShares, metric);
+            await _recipesRepository.SaveSharingDetailsAsync(newShares, removedShares, metric, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -834,13 +834,13 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public async Task<SetShareIsAcceptedResult> SetShareIsAcceptedAsync(int recipeId, int userId, bool isAccepted, ISpan metricsSpan)
+    public async Task<SetShareIsAcceptedResult> SetShareIsAcceptedAsync(int recipeId, int userId, bool isAccepted, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(SetShareIsAcceptedAsync)}");
 
         try
         {
-            await _recipesRepository.SetShareIsAcceptedAsync(recipeId, userId, isAccepted, DateTime.UtcNow, metric);
+            await _recipesRepository.SetShareIsAcceptedAsync(recipeId, userId, isAccepted, DateTime.UtcNow, metric, cancellationToken);
 
             var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(recipeId, userId, metric).ToList();
             if (!usersToBeNotified.Any())
@@ -872,13 +872,13 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public async Task<LeaveRecipeResult> LeaveAsync(int id, int userId, ISpan metricsSpan)
+    public async Task<LeaveRecipeResult> LeaveAsync(int id, int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(LeaveAsync)}");
 
         try
         {
-            RecipeShare share = await _recipesRepository.LeaveAsync(id, userId, metric);
+            RecipeShare share = await _recipesRepository.LeaveAsync(id, userId, metric, cancellationToken);
 
             if (share.IsAccepted == false)
             {
@@ -915,7 +915,7 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public async Task<SendRecipeResult> SendAsync(CreateSendRequest model, IValidator<CreateSendRequest> validator, ISpan metricsSpan)
+    public async Task<SendRecipeResult> SendAsync(CreateSendRequest model, IValidator<CreateSendRequest> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         ValidationUtil.ValidOrThrow(model, validator);
 
@@ -946,7 +946,7 @@ public class RecipeService : IRecipeService
                 request.CreatedDate = request.ModifiedDate = now;
             }
 
-            await _recipesRepository.CreateSendRequestsAsync(sendRequests, metric);
+            await _recipesRepository.CreateSendRequestsAsync(sendRequests, metric, cancellationToken);
 
             var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeSent(model.RecipeId, metric).ToList();
             if (!usersToBeNotified.Any())
@@ -978,13 +978,13 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public async Task<DeclineSendRequestResult> DeclineSendRequestAsync(int recipeId, int userId, ISpan metricsSpan)
+    public async Task<DeclineSendRequestResult> DeclineSendRequestAsync(int recipeId, int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(DeclineSendRequestAsync)}");
 
         try
         {
-            await _recipesRepository.DeclineSendRequestAsync(recipeId, userId, DateTime.UtcNow, metric);
+            await _recipesRepository.DeclineSendRequestAsync(recipeId, userId, DateTime.UtcNow, metric, cancellationToken);
 
             Recipe recipe = _recipesRepository.Get(recipeId, metric);
             var userToBeNotified = _userService.Get(recipe.UserId);
@@ -1011,13 +1011,13 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public async Task DeleteSendRequestAsync(int recipeId, int userId, ISpan metricsSpan)
+    public async Task DeleteSendRequestAsync(int recipeId, int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(DeleteSendRequestAsync)}");
 
         try
         {
-            await _recipesRepository.DeleteSendRequestAsync(recipeId, userId, metric);
+            await _recipesRepository.DeleteSendRequestAsync(recipeId, userId, metric, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -1030,7 +1030,7 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public async Task<int> ImportAsync(ImportRecipe model, IValidator<ImportRecipe> validator, ISpan metricsSpan)
+    public async Task<int> ImportAsync(ImportRecipe model, IValidator<ImportRecipe> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         ValidationUtil.ValidOrThrow(model, validator);
 
@@ -1041,7 +1041,7 @@ public class RecipeService : IRecipeService
             var ingredientReplacements = model.IngredientReplacements
                 .Select(x => (x.Id, x.ReplacementId, x.TransferNutritionData, x.TransferPriceData));
 
-            return await _recipesRepository.ImportAsync(model.Id, ingredientReplacements, model.ImageUri, model.UserId, metric);
+            return await _recipesRepository.ImportAsync(model.Id, ingredientReplacements, model.ImageUri, model.UserId, metric, cancellationToken);
         }
         catch (Exception ex)
         {

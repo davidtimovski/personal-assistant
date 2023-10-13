@@ -239,7 +239,7 @@ public class IngredientService : IIngredientService
         }
     }
 
-    public async Task UpdateAsync(UpdateIngredient model, IValidator<UpdateIngredient> validator, ISpan metricsSpan)
+    public async Task UpdateAsync(UpdateIngredient model, IValidator<UpdateIngredient> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         ValidationUtil.ValidOrThrow(model, validator);
 
@@ -251,7 +251,7 @@ public class IngredientService : IIngredientService
             ingredient.Name = ingredient.Name.Trim();
             ingredient.ModifiedDate = DateTime.UtcNow;
 
-            await _ingredientsRepository.UpdateAsync(ingredient, metric);
+            await _ingredientsRepository.UpdateAsync(ingredient, metric, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -264,7 +264,7 @@ public class IngredientService : IIngredientService
         }
     }
 
-    public async Task UpdateAsync(UpdatePublicIngredient model, IValidator<UpdatePublicIngredient> validator, ISpan metricsSpan)
+    public async Task UpdateAsync(UpdatePublicIngredient model, IValidator<UpdatePublicIngredient> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         ValidationUtil.ValidOrThrow(model, validator);
 
@@ -272,7 +272,7 @@ public class IngredientService : IIngredientService
 
         try
         {
-            await _ingredientsRepository.UpdatePublicAsync(model.Id, model.TaskId, model.UserId, DateTime.UtcNow, metric);
+            await _ingredientsRepository.UpdatePublicAsync(model.Id, model.TaskId, model.UserId, DateTime.UtcNow, metric, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -285,7 +285,7 @@ public class IngredientService : IIngredientService
         }
     }
 
-    public async Task DeleteOrRemoveFromRecipesAsync(int id, int userId, ISpan metricsSpan)
+    public async Task DeleteOrRemoveFromRecipesAsync(int id, int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(IngredientService)}.{nameof(DeleteOrRemoveFromRecipesAsync)}");
 
@@ -294,11 +294,11 @@ public class IngredientService : IIngredientService
             var ingredient = _ingredientsRepository.Get(id, metric);
             if (ingredient.UserId == 1)
             {
-                await _ingredientsRepository.RemoveFromRecipesAsync(id, userId, metric);
+                await _ingredientsRepository.RemoveFromRecipesAsync(id, userId, metric, cancellationToken);
             }
             else if (ingredient.UserId == userId)
             {
-                await _ingredientsRepository.DeleteAsync(id, metric);
+                await _ingredientsRepository.DeleteAsync(id, metric, cancellationToken);
             }
         }
         catch (Exception ex)

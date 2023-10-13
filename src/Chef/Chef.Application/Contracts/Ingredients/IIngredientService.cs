@@ -15,7 +15,7 @@ public interface IIngredientService
     bool Exists(int id, int userId);
     bool Exists(int id, string name, int userId);
     bool ExistsInRecipe(int id, int recipeId);
-    Task UpdateAsync(UpdateIngredient model, IValidator<UpdateIngredient> validator, ISpan metricsSpan);
-    Task UpdateAsync(UpdatePublicIngredient model, IValidator<UpdatePublicIngredient> validator, ISpan metricsSpan);
-    Task DeleteOrRemoveFromRecipesAsync(int id, int userId, ISpan metricsSpan);
+    Task UpdateAsync(UpdateIngredient model, IValidator<UpdateIngredient> validator, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task UpdateAsync(UpdatePublicIngredient model, IValidator<UpdatePublicIngredient> validator, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task DeleteOrRemoveFromRecipesAsync(int id, int userId, ISpan metricsSpan, CancellationToken cancellationToken);
 }

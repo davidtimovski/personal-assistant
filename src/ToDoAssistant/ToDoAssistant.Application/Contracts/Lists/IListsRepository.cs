@@ -30,15 +30,15 @@ public interface IListsRepository
     IEnumerable<User> GetUsersToBeNotifiedOfChange(int id, int excludeUserId, ISpan metricsSpan);
     IEnumerable<User> GetUsersToBeNotifiedOfDeletion(int id, ISpan metricsSpan);
     bool CheckIfUserCanBeNotifiedOfChange(int id, int userId, ISpan metricsSpan);
-    Task<int> CreateAsync(ToDoList list, ISpan metricsSpan);
-    Task<ToDoList> UpdateAsync(ToDoList list, int userId, ISpan metricsSpan);
-    Task UpdateSharedAsync(ToDoList list, ISpan metricsSpan);
-    Task<string> DeleteAsync(int id, ISpan metricsSpan);
-    Task SaveSharingDetailsAsync(IEnumerable<ListShare> newShares, IEnumerable<ListShare> editedShares, IEnumerable<ListShare> removedShares, ISpan metricsSpan);
-    Task<ListShare> LeaveAsync(int id, int userId, ISpan metricsSpan);
-    Task<int> CopyAsync(ToDoList list, ISpan metricsSpan);
-    Task SetIsArchivedAsync(int id, int userId, bool isArchived, DateTime modifiedDate, ISpan metricsSpan);
-    Task<bool> UncompleteAllAsync(int id, int userId, DateTime modifiedDate, ISpan metricsSpan);
-    Task SetShareIsAcceptedAsync(int id, int userId, bool isAccepted, DateTime modifiedDate, ISpan metricsSpan);
-    Task ReorderAsync(int id, int userId, short oldOrder, short newOrder, DateTime modifiedDate);
+    Task<int> CreateAsync(ToDoList list, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task<ToDoList> UpdateAsync(ToDoList list, int userId, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task UpdateSharedAsync(ToDoList list, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task<string> DeleteAsync(int id, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task SaveSharingDetailsAsync(IEnumerable<ListShare> newShares, IEnumerable<ListShare> editedShares, IEnumerable<ListShare> removedShares, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task<ListShare> LeaveAsync(int id, int userId, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task<int> CopyAsync(ToDoList list, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task SetIsArchivedAsync(int id, int userId, bool isArchived, DateTime modifiedDate, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task<bool> UncompleteAllAsync(int id, int userId, DateTime modifiedDate, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task SetShareIsAcceptedAsync(int id, int userId, bool isAccepted, DateTime modifiedDate, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task ReorderAsync(int id, int userId, short oldOrder, short newOrder, DateTime modifiedDate, CancellationToken cancellationToken);
 }
