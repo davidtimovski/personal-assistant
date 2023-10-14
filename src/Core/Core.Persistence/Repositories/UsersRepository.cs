@@ -50,8 +50,9 @@ public class UsersRepository : BaseRepository, IUsersRepository
         await EFContext.SaveChangesAsync(cancellationToken);
 
         using IDbConnection conn = OpenConnection();
-        await conn.ExecuteAsync("INSERT INTO user_id_map (user_id, auth0_id) VALUES (@userId, @auth0Id)",
-            new { userId = user.Id, auth0Id });
+        await conn.ExecuteAsync(new CommandDefinition("INSERT INTO user_id_map (user_id, auth0_id) VALUES (@userId, @auth0Id)",
+            new { userId = user.Id, auth0Id },
+            cancellationToken: cancellationToken));
 
         metric.Finish();
 

@@ -331,7 +331,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
 
         using IDbConnection conn = OpenConnection();
 
-        var userThatsImportingHasIngredients = conn.ExecuteScalar<bool>("SELECT COUNT(*) FROM chef.ingredients WHERE user_id = @UserId", new { UserId = userId });
+        var importRecipientHasIngredients = conn.ExecuteScalar<bool>("SELECT COUNT(*) FROM chef.ingredients WHERE user_id = @UserId", new { UserId = userId });
 
         var recipeHasCustomIngredients = conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
                                                                     FROM chef.recipes_ingredients AS ri
@@ -340,7 +340,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
 
         metric.Finish();
 
-        return userThatsImportingHasIngredients && recipeHasCustomIngredients;
+        return importRecipientHasIngredients && recipeHasCustomIngredients;
     }
 
     public Recipe? GetForReview(int id, ISpan metricsSpan)
@@ -684,11 +684,17 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         using IDbConnection conn = OpenConnection();
         var transaction = conn.BeginTransaction();
 
-        await conn.ExecuteAsync(@"DELETE FROM chef.shares
-                                  WHERE recipe_id = @RecipeId AND user_id = @UserId AND is_accepted IS DISTINCT FROM FALSE", removedShares, transaction);
+        await conn.ExecuteAsync(new CommandDefinition(@"DELETE FROM chef.shares
+                                  WHERE recipe_id = @RecipeId AND user_id = @UserId AND is_accepted IS DISTINCT FROM FALSE",
+                                  removedShares,
+                                  transaction,
+                                  cancellationToken: cancellationToken));
 
-        await conn.ExecuteAsync(@"INSERT INTO chef.shares (recipe_id, user_id, last_opened_date, created_date, modified_date) 
-                                  VALUES (@RecipeId, @UserId, @LastOpenedDate, @CreatedDate, @ModifiedDate)", newShares, transaction);
+        await conn.ExecuteAsync(new CommandDefinition(@"INSERT INTO chef.shares (recipe_id, user_id, last_opened_date, created_date, modified_date) 
+                                  VALUES (@RecipeId, @UserId, @LastOpenedDate, @CreatedDate, @ModifiedDate)",
+                                  newShares,
+                                  transaction,
+                                  cancellationToken: cancellationToken));
 
         transaction.Commit();
 

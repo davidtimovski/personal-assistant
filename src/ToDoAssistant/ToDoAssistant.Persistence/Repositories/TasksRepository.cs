@@ -147,15 +147,17 @@ public class TasksRepository : BaseRepository, ITasksRepository
             incrementOrderTaskIds = GetPublicTaskIds(task.ListId, false, null, conn);
         }
 
-        await conn.ExecuteAsync(@"UPDATE todo.tasks SET ""order"" = ""order"" + 1 WHERE id = ANY(@Ids)",
+        await conn.ExecuteAsync(new CommandDefinition(@"UPDATE todo.tasks SET ""order"" = ""order"" + 1 WHERE id = ANY(@Ids)",
             new { Ids = incrementOrderTaskIds.ToList() },
-            transaction);
+            transaction,
+            cancellationToken: cancellationToken));
 
-        var id = await conn.ExecuteScalarAsync<int>(@"INSERT INTO todo.tasks(
+        var id = await conn.ExecuteScalarAsync<int>(new CommandDefinition(@"INSERT INTO todo.tasks(
 	        list_id, name, url, is_completed, is_one_time, is_high_priority, private_to_user_id, assigned_to_user_id, ""order"", created_date, modified_date)
 	        VALUES (@ListId, @Name, @Url, @IsCompleted, @IsOneTime, @IsHighPriority, @PrivateToUserId, @AssignedToUserId, @Order, @CreatedDate, @ModifiedDate) RETURNING id",
             task,
-            transaction);
+            transaction,
+            cancellationToken: cancellationToken));
 
         transaction.Commit();
 
@@ -274,15 +276,19 @@ public class TasksRepository : BaseRepository, ITasksRepository
 
         if (decrementOrderTaskIds != null)
         {
-            await conn.ExecuteAsync(@"UPDATE todo.tasks SET ""order"" = ""order"" - 1 WHERE id = ANY(@Ids)",
+            await conn.ExecuteAsync(new CommandDefinition(@"UPDATE todo.tasks SET ""order"" = ""order"" - 1 WHERE id = ANY(@Ids)",
                new { Ids = decrementOrderTaskIds.ToList() },
-               transaction);
+               transaction,
+               cancellationToken: cancellationToken));
         }
     
-        await conn.ExecuteAsync(@"UPDATE todo.tasks
+        await conn.ExecuteAsync(new CommandDefinition(@"UPDATE todo.tasks
 	        SET list_id = @ListId, name = @Name, url = @Url, is_one_time = @IsOneTime, is_high_priority = @IsHighPriority,
                 private_to_user_id = @PrivateToUserId, assigned_to_user_id = @AssignedToUserId, ""order"" = @Order, modified_date = @ModifiedDate
-	        WHERE id = @Id", task, transaction);
+	        WHERE id = @Id",
+            task,
+            transaction,
+            cancellationToken: cancellationToken));
 
         transaction.Commit();
 
@@ -308,11 +314,15 @@ public class TasksRepository : BaseRepository, ITasksRepository
             decrementOrderTaskIds = GetPublicTaskIds(task.ListId, task.IsCompleted, task.Order, conn);
         }
 
-        await conn.ExecuteAsync(@"UPDATE todo.tasks SET ""order"" = ""order"" - 1 WHERE id = ANY(@Ids)",
+        await conn.ExecuteAsync(new CommandDefinition(@"UPDATE todo.tasks SET ""order"" = ""order"" - 1 WHERE id = ANY(@Ids)",
             new { Ids = decrementOrderTaskIds.ToList() },
-            transaction);
+            transaction,
+            cancellationToken: cancellationToken));
 
-        await conn.ExecuteAsync("DELETE FROM todo.tasks WHERE id = @Id", new { Id = id }, transaction);
+        await conn.ExecuteAsync(new CommandDefinition("DELETE FROM todo.tasks WHERE id = @Id",
+            new { Id = id },
+            transaction,
+            cancellationToken: cancellationToken));
 
         transaction.Commit();
 
@@ -341,17 +351,20 @@ public class TasksRepository : BaseRepository, ITasksRepository
             decrementOrderTaskIds = GetPublicTaskIds(task.ListId, false, task.Order, conn);
         }
 
-        await conn.ExecuteAsync(@"UPDATE todo.tasks SET ""order"" = ""order"" + 1 WHERE id = ANY(@Ids)",
+        await conn.ExecuteAsync(new CommandDefinition(@"UPDATE todo.tasks SET ""order"" = ""order"" + 1 WHERE id = ANY(@Ids)",
             new { Ids = incrementOrderTaskIds.ToList() },
-            transaction);
+            transaction,
+            cancellationToken: cancellationToken));
 
-        await conn.ExecuteAsync(@"UPDATE todo.tasks SET ""order"" = ""order"" - 1 WHERE id = ANY(@Ids)",
+        await conn.ExecuteAsync(new CommandDefinition(@"UPDATE todo.tasks SET ""order"" = ""order"" - 1 WHERE id = ANY(@Ids)",
             new { Ids = decrementOrderTaskIds.ToList() },
-            transaction);
+            transaction,
+            cancellationToken: cancellationToken));
 
-        await conn.ExecuteAsync(@"UPDATE todo.tasks SET is_completed = TRUE, ""order"" = 1, modified_date = @ModifiedDate WHERE id = @Id",
+        await conn.ExecuteAsync(new CommandDefinition(@"UPDATE todo.tasks SET is_completed = TRUE, ""order"" = 1, modified_date = @ModifiedDate WHERE id = @Id",
             new { Id = id, ModifiedDate = DateTime.UtcNow },
-            transaction);
+            transaction,
+            cancellationToken: cancellationToken));
 
         transaction.Commit();
 
@@ -384,13 +397,15 @@ public class TasksRepository : BaseRepository, ITasksRepository
             decrementOrderTaskIds = GetPublicTaskIds(task.ListId, true, task.Order, conn);
         }
 
-        await conn.ExecuteAsync(@"UPDATE todo.tasks SET ""order"" = ""order"" - 1 WHERE id = ANY(@Ids)",
+        await conn.ExecuteAsync(new CommandDefinition(@"UPDATE todo.tasks SET ""order"" = ""order"" - 1 WHERE id = ANY(@Ids)",
             new { Ids = decrementOrderTaskIds.ToList() },
-            transaction);
+            transaction,
+            cancellationToken: cancellationToken));
 
-        await conn.ExecuteAsync(@"UPDATE todo.tasks SET is_completed = FALSE, ""order"" = @Order, modified_date = @ModifiedDate WHERE id = @Id",
+        await conn.ExecuteAsync(new CommandDefinition(@"UPDATE todo.tasks SET is_completed = FALSE, ""order"" = @Order, modified_date = @ModifiedDate WHERE id = @Id",
             new { Id = id, Order = newOrder, ModifiedDate = DateTime.UtcNow },
-            transaction);
+            transaction,
+            cancellationToken: cancellationToken));
 
         transaction.Commit();
 
