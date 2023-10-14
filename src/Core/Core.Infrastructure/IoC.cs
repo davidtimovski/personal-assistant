@@ -16,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Sentry;
 
 namespace Core.Infrastructure;
 
@@ -108,9 +109,11 @@ public static class IoC
             {
                 opt.Dsn = config.Dsn;
                 opt.SampleRate = 1;
+                opt.MinimumEventLevel = LogLevel.Warning;
+                opt.StackTraceMode = StackTraceMode.Enhanced;
                 opt.TracesSampler = samplingCtx =>
                 {
-                    if (samplingCtx?.TransactionContext == null)
+                    if (samplingCtx?.TransactionContext is null)
                     {
                         return 1;
                     }

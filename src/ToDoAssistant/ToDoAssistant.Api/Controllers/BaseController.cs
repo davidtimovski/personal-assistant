@@ -52,7 +52,7 @@ public abstract class BaseController : Controller
     {
         get
         {
-            if (User?.Identity?.IsAuthenticated == false || User?.Identity?.Name == null)
+            if (User?.Identity?.IsAuthenticated == false || User?.Identity?.Name is null)
             {
                 throw new Exception($"The {nameof(AuthId)} property is only available for authenticated users");
             }

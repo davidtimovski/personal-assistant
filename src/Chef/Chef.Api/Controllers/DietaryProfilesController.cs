@@ -6,6 +6,7 @@ using Core.Application.Contracts;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Sentry;
 
 namespace Chef.Api.Controllers;
 
@@ -16,7 +17,7 @@ public class DietaryProfilesController : BaseController
     private readonly IDietaryProfileService _dietaryProfileService;
     private readonly IValidator<GetRecommendedDailyIntake> _getRecommendedDailyIntakeValidator;
     private readonly IValidator<UpdateDietaryProfile> _updateDietaryProfileValidator;
-
+    
     public DietaryProfilesController(
         IUserIdLookup userIdLookup,
         IUsersRepository usersRepository,
@@ -42,6 +43,11 @@ public class DietaryProfilesController : BaseController
         {
             var dietaryProfile = _dietaryProfileService.Get(UserId, tr);
             return Ok(dietaryProfile);
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {
@@ -80,6 +86,11 @@ public class DietaryProfilesController : BaseController
             RecommendedDailyIntake recommended = _dietaryProfileService.GetRecommendedDailyIntake(model, _getRecommendedDailyIntakeValidator, tr);
 
             return Ok(recommended);
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {
@@ -148,6 +159,11 @@ public class DietaryProfilesController : BaseController
             };
             await _dietaryProfileService.CreateOrUpdateAsync(model, _updateDietaryProfileValidator, tr, cancellationToken);
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -170,6 +186,11 @@ public class DietaryProfilesController : BaseController
             await _dietaryProfileService.DeleteAsync(UserId, tr, cancellationToken);
 
             return NoContent();
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {

@@ -14,6 +14,7 @@ public static class Metrics
     {
         var tr = StartTransaction(name, operation);
         tr.User = new User { Id = userId.ToString() };
+        tr.Status = SpanStatus.Ok;
 
         return tr;
     }

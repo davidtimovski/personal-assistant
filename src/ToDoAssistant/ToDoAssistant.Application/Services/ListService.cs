@@ -50,7 +50,7 @@ public class ListService : IListService
         {
             IEnumerable<ToDoList> lists = _listsRepository.GetAllWithTasksAndSharingDetails(userId, metric);
 
-            var result = lists.Select(x => _mapper.Map<ListDto>(x, opts => { opts.Items["UserId"] = userId; }));
+            var result = lists.Select(x => _mapper.Map<ListDto>(x, opts => opts.Items["UserId"] = userId));
 
             return result;
         }
@@ -96,6 +96,7 @@ public class ListService : IListService
         {
             if (!_listsRepository.UserOwnsOrShares(id, userId))
             {
+                metric.Status = SpanStatus.PermissionDenied;
                 throw new ValidationException("Unauthorized");
             }
 
@@ -105,7 +106,7 @@ public class ListService : IListService
 
             return result;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not ValidationException)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(GetMembersAsAssigneeOptions)}");
             throw;
@@ -141,7 +142,7 @@ public class ListService : IListService
         {
             ToDoList? list = _listsRepository.GetWithShares(id, userId, metric);
 
-            var result = _mapper.Map<EditListDto>(list, opts => { opts.Items["UserId"] = userId; });
+            var result = _mapper.Map<EditListDto>(list, opts => opts.Items["UserId"] = userId);
 
             return result;
         }
@@ -170,7 +171,7 @@ public class ListService : IListService
 
             list.Shares.AddRange(_listsRepository.GetShares(id, metric));
 
-            var result = _mapper.Map<ListWithShares>(list, opts => { opts.Items["UserId"] = userId; });
+            var result = _mapper.Map<ListWithShares>(list, opts => opts.Items["UserId"] = userId);
             result.Shares.RemoveAll(x => x.UserId == userId);
 
             return result;
@@ -194,7 +195,7 @@ public class ListService : IListService
         {
             IEnumerable<ListShare> shareRequests = _listsRepository.GetShareRequests(userId, metric);
 
-            var result = shareRequests.Select(x => _mapper.Map<ShareListRequest>(x, opts => { opts.Items["UserId"] = userId; }));
+            var result = shareRequests.Select(x => _mapper.Map<ShareListRequest>(x, opts => opts.Items["UserId"] = userId));
 
             return result;
         }
@@ -303,7 +304,7 @@ public class ListService : IListService
 
             return _listsRepository.IsShared(id);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not ValidationException)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(IsShared)}");
             throw;
@@ -597,6 +598,7 @@ public class ListService : IListService
         {
             if (!_listsRepository.UserOwns(id, userId))
             {
+                metric.Status = SpanStatus.PermissionDenied;
                 throw new ValidationException("Unauthorized");
             }
 
@@ -620,7 +622,7 @@ public class ListService : IListService
 
             return result;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not ValidationException)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(DeleteAsync)}");
             throw;
@@ -771,12 +773,13 @@ public class ListService : IListService
         {
             if (!UserOwnsOrShares(id, userId))
             {
+                metric.Status = SpanStatus.PermissionDenied;
                 throw new ValidationException("Unauthorized");
             }
 
             await _listsRepository.SetIsArchivedAsync(id, userId, isArchived, DateTime.UtcNow, metric, cancellationToken);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not ValidationException)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(SetIsArchivedAsync)}");
             throw;
@@ -795,6 +798,7 @@ public class ListService : IListService
         {
             if (!UserOwnsOrShares(id, userId))
             {
+                metric.Status = SpanStatus.PermissionDenied;
                 throw new ValidationException("Unauthorized");
             }
 
@@ -823,7 +827,7 @@ public class ListService : IListService
 
             return result;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not ValidationException)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(UncompleteAllAsync)}");
             throw;
@@ -883,7 +887,7 @@ public class ListService : IListService
 
             await _listsRepository.ReorderAsync(id, userId, oldOrder, newOrder, DateTime.UtcNow, cancellationToken);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not ValidationException)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(ReorderAsync)}");
             throw;

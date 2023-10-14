@@ -3,6 +3,7 @@ using Core.Api.Models.Tooltips.Requests;
 using Core.Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Sentry;
 
 namespace Core.Api.Controllers;
 
@@ -34,6 +35,11 @@ public class TooltipsController : BaseController
             var tooltipDtos = _tooltipService.GetAll(application, UserId, tr);
             return Ok(tooltipDtos);
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -53,6 +59,11 @@ public class TooltipsController : BaseController
         {
             var tooltipDto = _tooltipService.GetByKey(UserId, key, application, tr);
             return Ok(tooltipDto);
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {
@@ -77,6 +88,11 @@ public class TooltipsController : BaseController
         try
         {
             await _tooltipService.ToggleDismissedAsync(UserId, request.Key, request.Application, request.IsDismissed, tr, cancellationToken);
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {

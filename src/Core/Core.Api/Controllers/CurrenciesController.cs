@@ -2,6 +2,7 @@
 using Core.Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Sentry;
 
 namespace Core.Api.Controllers;
 
@@ -32,6 +33,11 @@ public class CurrenciesController : BaseController
         {
             IDictionary<string, decimal> currencyRates = _currenciesRepository.GetAll(date, tr);
             return Json(currencyRates);
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {

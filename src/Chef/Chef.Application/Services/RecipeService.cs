@@ -56,7 +56,7 @@ public class RecipeService : IRecipeService
             var result = new List<SimpleRecipe>(recipes.Count);
             foreach (Recipe recipe in recipes)
             {
-                var simpleRecipe = _mapper.Map<SimpleRecipe>(recipe, opts => { opts.Items["UserId"] = userId; });
+                var simpleRecipe = _mapper.Map<SimpleRecipe>(recipe, opts => opts.Items["UserId"] = userId);
                 simpleRecipe.SharingState = GetSharingState(recipe, userId);
 
                 result.Add(simpleRecipe);
@@ -178,7 +178,7 @@ public class RecipeService : IRecipeService
 
             recipe.Shares.AddRange(_recipesRepository.GetShares(id, metric));
 
-            var result = _mapper.Map<RecipeWithShares>(recipe, opts => { opts.Items["UserId"] = userId; });
+            var result = _mapper.Map<RecipeWithShares>(recipe, opts => opts.Items["UserId"] = userId);
             result.Shares.RemoveAll(x => x.UserId == userId);
 
             result.SharingState = GetSharingState(recipe, userId);
@@ -204,7 +204,7 @@ public class RecipeService : IRecipeService
         {
             IEnumerable<RecipeShare> shareRequests = _recipesRepository.GetShareRequests(userId, metric);
 
-            var result = shareRequests.Select(x => _mapper.Map<ShareRecipeRequest>(x, opts => { opts.Items["UserId"] = userId; }));
+            var result = shareRequests.Select(x => _mapper.Map<ShareRecipeRequest>(x, opts => opts.Items["UserId"] = userId));
 
             return result;
         }
@@ -747,6 +747,7 @@ public class RecipeService : IRecipeService
         {
             if (!_recipesRepository.UserOwns(id, userId, metric))
             {
+                metric.Status = SpanStatus.PermissionDenied;
                 throw new ValidationException("Unauthorized");
             }
 
@@ -776,7 +777,7 @@ public class RecipeService : IRecipeService
 
             return result;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not ValidationException)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(DeleteAsync)}");
             throw;
@@ -1098,7 +1099,7 @@ public class RecipeService : IRecipeService
             RecipeIngredient[] validRecipeIngredients = recipe.RecipeIngredients
                 .Where(x => x.Amount.HasValue
                             && x.Ingredient!.Price.HasValue
-                            && (x.Ingredient.ProductSizeIsOneUnit && x.Unit == null || !x.Ingredient.ProductSizeIsOneUnit && x.Unit != null))
+                            && (x.Ingredient.ProductSizeIsOneUnit && x.Unit is null || !x.Ingredient.ProductSizeIsOneUnit && x.Unit != null))
                 .ToArray();
 
             var costSummary = new RecipeCostSummary();

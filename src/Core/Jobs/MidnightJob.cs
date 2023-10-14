@@ -157,7 +157,7 @@ public class MidnightJob
                         VALUES 
                         (@FromAccountId, @ToAccountId, @CategoryId, @Amount, @Currency, @Description, @Date, FALSE, @Generated, @CreatedDate, @ModifiedDate)", transaction, dbTransaction);
 
-                    if (transaction.FromAccountId.HasValue && transaction.ToAccountId == null)
+                    if (transaction.FromAccountId.HasValue && transaction.ToAccountId is null)
                     {
                         var relatedUpcomingExpenses = conn.Query<UpcomingExpense>(@"SELECT * FROM accountant.upcoming_expenses
                             WHERE category_id = @CategoryId 
@@ -171,7 +171,7 @@ public class MidnightJob
                                 && transaction.Description != null
                                 && string.Equals(ue.Description, transaction.Description, StringComparison.OrdinalIgnoreCase);
 
-                            if (ue.Description == null || bothWithDescriptionsAndTheyMatch)
+                            if (ue.Description is null || bothWithDescriptionsAndTheyMatch)
                             {
                                 if (ue.Amount > transaction.Amount)
                                 {
