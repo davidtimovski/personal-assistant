@@ -16,27 +16,30 @@ public class ListsRepository : BaseRepository, IListsRepository
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(GetAllAsOptions)}");
 
-        using IDbConnection conn = OpenConnection();
+        try
+        {
+            using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT DISTINCT l.*, s.user_id, s.is_accepted
+            const string query = @"SELECT DISTINCT l.*, s.user_id, s.is_accepted
                                FROM todo.lists AS l
                                LEFT JOIN todo.shares AS s ON l.id = s.list_id
                                WHERE l.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted)
                                ORDER BY l.order";
 
-        var result = conn.Query<ToDoList, ListShare, ToDoList>(query,
-            (list, share) =>
-            {
-                if (share != null && share.IsAccepted != false)
+            return conn.Query<ToDoList, ListShare, ToDoList>(query,
+                (list, share) =>
                 {
-                    list.Shares.Add(share);
-                }
-                return list;
-            }, new { UserId = userId }, null, true, "user_id");
-
-        metric.Finish();
-
-        return result;
+                    if (share != null && share.IsAccepted != false)
+                    {
+                        list.Shares.Add(share);
+                    }
+                    return list;
+                }, new { UserId = userId }, null, true, "user_id");
+        }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public IEnumerable<int> GetNonArchivedSharedListIds(int userId)
@@ -53,60 +56,68 @@ public class ListsRepository : BaseRepository, IListsRepository
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(GetAllWithTasksAndSharingDetails)}");
 
-        using IDbConnection conn = OpenConnection();
+        try
+        {
+            using IDbConnection conn = OpenConnection();
 
-        var lists = conn.Query<ToDoList>(@"SELECT l.*
+            var lists = conn.Query<ToDoList>(@"SELECT l.*
                                            FROM todo.lists AS l
                                            LEFT JOIN todo.shares AS s ON l.id = s.list_id 
                                                AND s.user_id = @UserId
                                                AND s.is_accepted 
                                            WHERE (l.user_id = @UserId OR s.user_id = @UserId)",
-            new { UserId = userId }).ToList();
+                new { UserId = userId }).ToList();
 
-        var listIds = lists.Select(x => x.Id).ToArray();
-        var shares = conn.Query<ListShare>("SELECT * FROM todo.shares WHERE list_id = ANY(@ListIds)", new { ListIds = listIds }).ToList();
+            var listIds = lists.Select(x => x.Id).ToArray();
+            var shares = conn.Query<ListShare>("SELECT * FROM todo.shares WHERE list_id = ANY(@ListIds)", new { ListIds = listIds }).ToList();
 
-        const string tasksSql = @"SELECT t.*, u.id, u.name, u.image_uri
+            const string tasksSql = @"SELECT t.*, u.id, u.name, u.image_uri
                                   FROM todo.tasks AS t
                                   LEFT JOIN users AS u ON t.assigned_to_user_id = u.id
                                   WHERE t.list_id = ANY(@ListIds)
                                     AND (t.private_to_user_id IS NULL OR t.private_to_user_id = @UserId)";
 
-        var tasks = conn.Query<ToDoTask, User, ToDoTask>(tasksSql,
-            (task, user) =>
+            var tasks = conn.Query<ToDoTask, User, ToDoTask>(tasksSql,
+                (task, user) =>
+                {
+                    task.AssignedToUser = user;
+                    return task;
+                }, new { ListIds = listIds, UserId = userId }).ToList();
+
+
+            foreach (var list in lists)
             {
-                task.AssignedToUser = user;
-                return task;
-            }, new { ListIds = listIds, UserId = userId }).ToList();
+                list.Tasks.AddRange(tasks.Where(x => x.ListId == list.Id));
+                list.Shares.AddRange(shares.Where(x => x.ListId == list.Id));
+            }
 
-
-        foreach (var list in lists)
-        {
-            list.Tasks.AddRange(tasks.Where(x => x.ListId == list.Id));
-            list.Shares.AddRange(shares.Where(x => x.ListId == list.Id));
+            return lists;
         }
-
-        metric.Finish();
-
-        return lists;
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public IEnumerable<User> GetMembersAsAssigneeOptions(int id, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(GetMembersAsAssigneeOptions)}");
 
-        using IDbConnection conn = OpenConnection();
+        try
+        {
+            using IDbConnection conn = OpenConnection();
 
-        var result = conn.Query<User>(@"SELECT DISTINCT u.id, u.name, u.image_uri
+            return conn.Query<User>(@"SELECT DISTINCT u.id, u.name, u.image_uri
                                   FROM users AS u
                                   LEFT JOIN todo.lists AS l ON u.id = l.user_id
                                   LEFT JOIN todo.shares AS s ON u.id = s.user_id
                                   WHERE l.id = @ListId OR (s.list_id = @ListId AND s.is_accepted IS NOT FALSE)
                                   ORDER BY u.name", new { ListId = id });
-
-        metric.Finish();
-
-        return result;
+        }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public ToDoList Get(int id)
@@ -120,101 +131,113 @@ public class ListsRepository : BaseRepository, IListsRepository
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(GetWithShares)}");
 
-        using IDbConnection conn = OpenConnection();
+        try
+        {
+            using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT l.*, s.user_id, s.is_admin, s.is_accepted, 
+            const string query = @"SELECT l.*, s.user_id, s.is_admin, s.is_accepted, 
                                s.order, s.notifications_enabled, s.is_archived
                                FROM todo.lists AS l
                                LEFT JOIN todo.shares AS s ON l.id = s.list_id
                                WHERE l.id = @Id AND (l.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))";
 
-        var result = conn.Query<ToDoList, ListShare, ToDoList>(query,
-            (list, share) =>
-            {
-                if (share != null)
+            return conn.Query<ToDoList, ListShare, ToDoList>(query,
+                (list, share) =>
                 {
-                    list.Shares.Add(share);
-                }
-                return list;
-            }, new { Id = id, UserId = userId }, null, true, "user_id").FirstOrDefault();
-
-        metric.Finish();
-
-        return result;
+                    if (share != null)
+                    {
+                        list.Shares.Add(share);
+                    }
+                    return list;
+                }, new { Id = id, UserId = userId }, null, true, "user_id").FirstOrDefault();
+        }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public ToDoList? GetWithOwner(int id, int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(GetWithOwner)}");
 
-        using IDbConnection conn = OpenConnection();
+        try
+        {
+            using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT DISTINCT l.*, u.id, u.email, u.image_uri
+            const string query = @"SELECT DISTINCT l.*, u.id, u.email, u.image_uri
                                FROM todo.lists AS l
                                LEFT JOIN todo.shares AS s ON l.id = s.list_id
                                INNER JOIN users AS u ON l.user_id = u.id
                                WHERE l.id = @Id AND (l.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))";
 
-        var result = conn.Query<ToDoList, User, ToDoList>(query,
-            (list, user) =>
-            {
-                list.User = user;
-                return list;
-            }, new { Id = id, UserId = userId }).FirstOrDefault();
-
-        metric.Finish();
-
-        return result;
+            return conn.Query<ToDoList, User, ToDoList>(query,
+                (list, user) =>
+                {
+                    list.User = user;
+                    return list;
+                }, new { Id = id, UserId = userId }).FirstOrDefault();
+        }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public IEnumerable<ListShare> GetShares(int id, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(GetShares)}");
 
-        using IDbConnection conn = OpenConnection();
+        try
+        {
+            using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT s.*, u.id, u.email, u.name, u.image_uri
+            const string query = @"SELECT s.*, u.id, u.email, u.name, u.image_uri
                                FROM todo.shares AS s
                                INNER JOIN users AS u ON s.user_id = u.id
                                WHERE s.list_id = @ListId AND s.is_accepted IS NOT FALSE
                                ORDER BY (CASE WHEN s.is_accepted THEN 1 ELSE 2 END) ASC, s.created_date";
 
-        var result = conn.Query<ListShare, User, ListShare>(query,
-            (share, user) =>
-            {
-                share.User = user;
-                return share;
-            }, new { ListId = id });
-
-        metric.Finish();
-
-        return result;
+            return conn.Query<ListShare, User, ListShare>(query,
+                (share, user) =>
+                {
+                    share.User = user;
+                    return share;
+                }, new { ListId = id });
+        }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public IEnumerable<ListShare> GetShareRequests(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(GetShareRequests)}");
 
-        using IDbConnection conn = OpenConnection();
+        try
+        {
+            using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT s.*, l.name, u.name
+            const string query = @"SELECT s.*, l.name, u.name
                                FROM todo.shares AS s
                                INNER JOIN todo.lists AS l ON s.list_id = l.id
                                INNER JOIN users AS u ON l.user_id = u.id
                                WHERE s.user_id = @UserId
                                ORDER BY s.modified_date DESC";
 
-        var result = conn.Query<ListShare, ToDoList, User, ListShare>(query,
-            (share, list, user) =>
-            {
-                share.List = list;
-                share.User = user;
-                return share;
-            }, new { UserId = userId }, null, true, "name,Name");
-
-        metric.Finish();
-
-        return result;
+            return conn.Query<ListShare, ToDoList, User, ListShare>(query,
+                (share, list, user) =>
+                {
+                    share.List = list;
+                    share.User = user;
+                    return share;
+                }, new { UserId = userId }, null, true, "name,Name");
+        }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public int GetPendingShareRequestsCount(int userId)
@@ -360,9 +383,11 @@ public class ListsRepository : BaseRepository, IListsRepository
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(GetUsersToBeNotifiedOfChange)}");
 
-        using IDbConnection conn = OpenConnection();
+        try
+        {
+            using IDbConnection conn = OpenConnection();
 
-        var result = conn.Query<User>(@"SELECT u.*
+            return conn.Query<User>(@"SELECT u.*
                                   FROM users AS u
                                   INNER JOIN todo.shares AS s ON u.id = s.user_id
                                   WHERE u.id != @ExcludeUserId AND s.list_id = @ListId AND s.is_accepted AND u.todo_notifications_enabled AND s.notifications_enabled
@@ -371,120 +396,142 @@ public class ListsRepository : BaseRepository, IListsRepository
                                   FROM users AS u
                                   INNER JOIN todo.lists AS l ON u.id = l.user_id
                                   WHERE u.id != @ExcludeUserId AND l.id = @ListId AND u.todo_notifications_enabled AND l.notifications_enabled",
-            new { ListId = id, ExcludeUserId = excludeUserId });
-
-        metric.Finish();
-
-        return result;
+                new { ListId = id, ExcludeUserId = excludeUserId });
+        }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public IEnumerable<User> GetUsersToBeNotifiedOfDeletion(int id, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(GetUsersToBeNotifiedOfDeletion)}");
 
-        using IDbConnection conn = OpenConnection();
+        try
+        {
+            using IDbConnection conn = OpenConnection();
 
-        var result = conn.Query<User>(@"SELECT u.*
+            return conn.Query<User>(@"SELECT u.*
                                   FROM users AS u
                                   INNER JOIN todo.shares AS s ON u.id = s.user_id
                                   WHERE s.list_id = @ListId AND s.is_accepted AND u.todo_notifications_enabled AND s.notifications_enabled",
-            new { ListId = id });
-
-        metric.Finish();
-
-        return result;
+                new { ListId = id });
+        }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public bool CheckIfUserCanBeNotifiedOfChange(int id, int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(CheckIfUserCanBeNotifiedOfChange)}");
 
-        using IDbConnection conn = OpenConnection();
+        try
+        {
+            using IDbConnection conn = OpenConnection();
 
-        var result = conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
+            return conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
                                           FROM users AS u
                                           INNER JOIN todo.shares AS s ON u.id = s.user_id
                                           WHERE u.id = @UserId AND s.list_id = @ListId AND s.is_accepted AND u.todo_notifications_enabled AND s.notifications_enabled",
-            new { ListId = id, UserId = userId });
-
-        metric.Finish();
-
-        return result;
+                new { ListId = id, UserId = userId });
+        }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public async Task<int> CreateAsync(ToDoList list, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(CreateAsync)}");
 
-        using IDbConnection conn = OpenConnection();
+        try
+        {
+            using IDbConnection conn = OpenConnection();
 
-        var listsCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*)
+            var listsCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*)
                                                      FROM todo.lists AS l
                                                      LEFT JOIN todo.shares AS s ON l.id = s.list_id
                                                      WHERE l.is_archived = FALSE AND l.user_id = @UserId 
                                                          OR (s.user_id = @UserId AND s.is_accepted AND s.is_archived = FALSE)",
-            new { list.UserId });
-        list.Order = ++listsCount;
+                new { list.UserId });
+            list.Order = ++listsCount;
 
-        for (short i = 0; i < list.Tasks.Count; i++)
-        {
-            list.Tasks[i].ListId = list.Id;
-            list.Tasks[i].Order = (short)(i + 1);
+            for (short i = 0; i < list.Tasks.Count; i++)
+            {
+                list.Tasks[i].ListId = list.Id;
+                list.Tasks[i].Order = (short)(i + 1);
+            }
+
+            EFContext.Lists.Add(list);
+
+            await EFContext.SaveChangesAsync(cancellationToken);
+
+            return list.Id;
         }
-
-        EFContext.Lists.Add(list);
-
-        await EFContext.SaveChangesAsync(cancellationToken);
-
-        metric.Finish();
-
-        return list.Id;
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public async Task<ToDoList> UpdateAsync(ToDoList list, int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(UpdateAsync)}");
 
-        using IDbConnection conn = OpenConnection();
-
-        var originalList = conn.QueryFirst<ToDoList>("SELECT * FROM todo.lists WHERE id = @Id", new { list.Id });
-
-        ToDoList dbList = EFContext.Lists.First(x => x.Id == list.Id);
-
-        dbList.Name = list.Name;
-        dbList.Icon = list.Icon;
-        dbList.IsOneTimeToggleDefault = list.IsOneTimeToggleDefault;
-        dbList.ModifiedDate = list.ModifiedDate;
-
-        if (dbList.UserId == userId)
+        try
         {
-            dbList.NotificationsEnabled = list.NotificationsEnabled;
+            using IDbConnection conn = OpenConnection();
+
+            var originalList = conn.QueryFirst<ToDoList>("SELECT * FROM todo.lists WHERE id = @Id", new { list.Id });
+
+            ToDoList dbList = EFContext.Lists.First(x => x.Id == list.Id);
+
+            dbList.Name = list.Name;
+            dbList.Icon = list.Icon;
+            dbList.IsOneTimeToggleDefault = list.IsOneTimeToggleDefault;
+            dbList.ModifiedDate = list.ModifiedDate;
+
+            if (dbList.UserId == userId)
+            {
+                dbList.NotificationsEnabled = list.NotificationsEnabled;
+            }
+            else
+            {
+                ListShare share = EFContext.ListShares.First(x => x.ListId == list.Id && x.UserId == userId);
+                share.NotificationsEnabled = list.NotificationsEnabled;
+                share.ModifiedDate = list.ModifiedDate;
+            }
+
+            await EFContext.SaveChangesAsync(cancellationToken);
+
+            return originalList;
         }
-        else
+        finally
         {
-            ListShare share = EFContext.ListShares.First(x => x.ListId == list.Id && x.UserId == userId);
-            share.NotificationsEnabled = list.NotificationsEnabled;
-            share.ModifiedDate = list.ModifiedDate;
+            metric.Finish();
         }
-
-        await EFContext.SaveChangesAsync(cancellationToken);
-
-        metric.Finish();
-
-        return originalList;
     }
 
     public async Task UpdateSharedAsync(ToDoList list, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(UpdateSharedAsync)}");
 
-        ToDoList dbList = EFContext.Lists.First(x => x.Id == list.Id && x.UserId == list.UserId);
-        dbList.NotificationsEnabled = list.NotificationsEnabled;
-        dbList.ModifiedDate = list.ModifiedDate;
+        try
+        {
+            ToDoList dbList = EFContext.Lists.First(x => x.Id == list.Id && x.UserId == list.UserId);
+            dbList.NotificationsEnabled = list.NotificationsEnabled;
+            dbList.ModifiedDate = list.ModifiedDate;
 
-        await EFContext.SaveChangesAsync(cancellationToken);
-
-        metric.Finish();
+            await EFContext.SaveChangesAsync(cancellationToken);
+        }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public async Task<string> DeleteAsync(int id, ISpan metricsSpan, CancellationToken cancellationToken)
@@ -493,59 +540,69 @@ public class ListsRepository : BaseRepository, IListsRepository
 
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(DeleteAsync)}");
 
-        ToDoList list = Get(id);
+        try
+        {
+            ToDoList list = Get(id);
 
-        using IDbConnection conn = OpenConnection();
+            using IDbConnection conn = OpenConnection();
 
-        var affectedUsers = new List<(int, short?)> {
+            var affectedUsers = new List<(int, short?)> {
             (list.UserId, list.Order)
         };
-        affectedUsers.AddRange(conn.Query<(int, short?)>(@"SELECT user_id, ""order""
+            affectedUsers.AddRange(conn.Query<(int, short?)>(@"SELECT user_id, ""order""
                                                            FROM todo.shares
                                                            WHERE list_id = @Id AND is_accepted = TRUE", new { Id = id }));
 
-        EFContext.Lists.Remove(list);
+            EFContext.Lists.Remove(list);
 
-        foreach (var affectedUser in affectedUsers)
-        {
-            var lists = EFContext.Lists.Where(x => x.UserId == affectedUser.Item1 && !x.IsArchived && x.Order > affectedUser.Item2);
-            foreach (ToDoList dbList in lists)
+            foreach (var affectedUser in affectedUsers)
             {
-                dbList.Order--;
+                var lists = EFContext.Lists.Where(x => x.UserId == affectedUser.Item1 && !x.IsArchived && x.Order > affectedUser.Item2);
+                foreach (ToDoList dbList in lists)
+                {
+                    dbList.Order--;
+                }
+
+                var shares = EFContext.ListShares.Where(x => x.UserId == affectedUser.Item1 && x.IsAccepted == true && !x.IsArchived && x.Order > affectedUser.Item2);
+                foreach (ListShare share in shares)
+                {
+                    share.Order--;
+                }
             }
 
-            var shares = EFContext.ListShares.Where(x => x.UserId == affectedUser.Item1 && x.IsAccepted == true && !x.IsArchived && x.Order > affectedUser.Item2);
-            foreach (ListShare share in shares)
-            {
-                share.Order--;
-            }
+            await EFContext.SaveChangesAsync(cancellationToken);
+
+            return list.Name;
         }
-
-        await EFContext.SaveChangesAsync(cancellationToken);
-
-        metric.Finish();
-
-        return list.Name;
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public async Task SaveSharingDetailsAsync(IEnumerable<ListShare> newShares, IEnumerable<ListShare> editedShares, IEnumerable<ListShare> removedShares, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(SaveSharingDetailsAsync)}");
 
-        EFContext.ListShares.RemoveRange(removedShares);
-
-        foreach (ListShare share in editedShares)
+        try
         {
-            ListShare dbShare = EFContext.ListShares.First(x => x.ListId == share.ListId && x.UserId == share.UserId && x.IsAccepted != false);
-            dbShare.IsAdmin = share.IsAdmin;
-            dbShare.ModifiedDate = share.ModifiedDate;
+            EFContext.ListShares.RemoveRange(removedShares);
+
+            foreach (ListShare share in editedShares)
+            {
+                ListShare dbShare = EFContext.ListShares.First(x => x.ListId == share.ListId && x.UserId == share.UserId && x.IsAccepted != false);
+                dbShare.IsAdmin = share.IsAdmin;
+                dbShare.ModifiedDate = share.ModifiedDate;
+            }
+
+            EFContext.ListShares.AddRange(newShares);
+
+            await EFContext.SaveChangesAsync(cancellationToken);
         }
-
-        EFContext.ListShares.AddRange(newShares);
-
-        await EFContext.SaveChangesAsync(cancellationToken);
-
-        metric.Finish();
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public async Task<ListShare> LeaveAsync(int id, int userId, ISpan metricsSpan, CancellationToken cancellationToken)
@@ -554,272 +611,297 @@ public class ListsRepository : BaseRepository, IListsRepository
 
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(LeaveAsync)}");
 
-        using IDbConnection conn = OpenConnection();
+        try
+        {
+            using IDbConnection conn = OpenConnection();
 
-        var share = conn.QueryFirst<ListShare>(@"SELECT * 
+            var share = conn.QueryFirst<ListShare>(@"SELECT * 
                                                  FROM todo.shares 
                                                  WHERE list_id = @ListId AND user_id = @UserId",
-            new { ListId = id, UserId = userId });
+                new { ListId = id, UserId = userId });
 
-        EFContext.ListShares.Remove(share);
+            EFContext.ListShares.Remove(share);
 
-        var lists = NonArchivedLists(userId).Where(x => x.Order > share.Order);
-        foreach (ToDoList dbList in lists)
-        {
-            dbList.Order--;
+            var lists = NonArchivedLists(userId).Where(x => x.Order > share.Order);
+            foreach (ToDoList dbList in lists)
+            {
+                dbList.Order--;
+            }
+
+            var shares = AcceptedShares(userId).Where(x => !x.IsArchived && x.Order > share.Order);
+            foreach (ListShare dbShare in shares)
+            {
+                dbShare.Order--;
+            }
+
+            var sharesCount = conn.ExecuteScalar<short>("SELECT COUNT(*) FROM todo.shares WHERE list_id = @ListId AND is_accepted IS NOT FALSE", new { ListId = id });
+            if (sharesCount == 1)
+            {
+                var uncompletedTasks = EFContext.Tasks.Where(x => x.ListId == id && !x.IsCompleted && !x.PrivateToUserId.HasValue);
+                var uncompletedOrderOffset = (short)uncompletedTasks.Count();
+                foreach (ToDoTask task in uncompletedTasks)
+                {
+                    task.Order += uncompletedOrderOffset;
+                }
+
+                var completedTasks = EFContext.Tasks.Where(x => x.ListId == id && x.IsCompleted && !x.PrivateToUserId.HasValue);
+                var completedOrderOffset = (short)completedTasks.Count();
+                foreach (ToDoTask task in completedTasks)
+                {
+                    task.Order += completedOrderOffset;
+                }
+
+                var userPrivateTasks = EFContext.Tasks.Where(x => x.ListId == id && x.PrivateToUserId == userId);
+                foreach (ToDoTask task in userPrivateTasks)
+                {
+                    EFContext.Tasks.Remove(task);
+                }
+
+                var privateTasks = EFContext.Tasks.Where(x => x.ListId == id && x.PrivateToUserId.HasValue && x.PrivateToUserId != userId);
+                foreach (ToDoTask task in privateTasks)
+                {
+                    task.PrivateToUserId = null;
+                }
+            }
+
+            await EFContext.SaveChangesAsync(cancellationToken);
+
+            return share;
         }
-
-        var shares = AcceptedShares(userId).Where(x => !x.IsArchived && x.Order > share.Order);
-        foreach (ListShare dbShare in shares)
+        finally
         {
-            dbShare.Order--;
+            metric.Finish();
         }
-
-        var sharesCount = conn.ExecuteScalar<short>("SELECT COUNT(*) FROM todo.shares WHERE list_id = @ListId AND is_accepted IS NOT FALSE", new { ListId = id });
-        if (sharesCount == 1)
-        {
-            var uncompletedTasks = EFContext.Tasks.Where(x => x.ListId == id && !x.IsCompleted && !x.PrivateToUserId.HasValue);
-            var uncompletedOrderOffset = (short)uncompletedTasks.Count();
-            foreach (ToDoTask task in uncompletedTasks)
-            {
-                task.Order += uncompletedOrderOffset;
-            }
-
-            var completedTasks = EFContext.Tasks.Where(x => x.ListId == id && x.IsCompleted && !x.PrivateToUserId.HasValue);
-            var completedOrderOffset = (short)completedTasks.Count();
-            foreach (ToDoTask task in completedTasks)
-            {
-                task.Order += completedOrderOffset;
-            }
-
-            var userPrivateTasks = EFContext.Tasks.Where(x => x.ListId == id && x.PrivateToUserId == userId);
-            foreach (ToDoTask task in userPrivateTasks)
-            {
-                EFContext.Tasks.Remove(task);
-            }
-
-            var privateTasks = EFContext.Tasks.Where(x => x.ListId == id && x.PrivateToUserId.HasValue && x.PrivateToUserId != userId);
-            foreach (ToDoTask task in privateTasks)
-            {
-                task.PrivateToUserId = null;
-            }
-        }
-
-        await EFContext.SaveChangesAsync(cancellationToken);
-
-        metric.Finish();
-
-        return share;
     }
 
     public async Task<int> CopyAsync(ToDoList list, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(CopyAsync)}");
 
-        using IDbConnection conn = OpenConnection();
+        try
+        {
+            using IDbConnection conn = OpenConnection();
 
-        list.Tasks = conn.Query<ToDoTask>(@"SELECT * FROM todo.tasks
+            list.Tasks = conn.Query<ToDoTask>(@"SELECT * FROM todo.tasks
                                             WHERE list_id = @ListId AND (private_to_user_id IS NULL OR private_to_user_id = @UserId)
                                             ORDER BY private_to_user_id NULLS LAST",
-            new { ListId = list.Id, list.UserId }).ToList();
+                new { ListId = list.Id, list.UserId }).ToList();
 
-        var listsCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*)
+            var listsCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*)
                                                      FROM todo.lists AS l
                                                      LEFT JOIN todo.shares AS s ON l.id = s.list_id
                                                      WHERE l.is_archived = FALSE AND l.user_id = @UserId 
                                                          OR (s.user_id = @UserId AND s.is_accepted AND s.is_archived = FALSE)",
-            new { list.UserId });
+                new { list.UserId });
 
-        ToDoList dbList = conn.QueryFirst<ToDoList>("SELECT * FROM todo.lists WHERE id = @Id", new { list.Id });
+            ToDoList dbList = conn.QueryFirst<ToDoList>("SELECT * FROM todo.lists WHERE id = @Id", new { list.Id });
 
-        list.Id = default;
-        list.Order = ++listsCount;
-        list.NotificationsEnabled = dbList.NotificationsEnabled;
-        list.IsOneTimeToggleDefault = dbList.IsOneTimeToggleDefault;
+            list.Id = default;
+            list.Order = ++listsCount;
+            list.NotificationsEnabled = dbList.NotificationsEnabled;
+            list.IsOneTimeToggleDefault = dbList.IsOneTimeToggleDefault;
 
-        foreach (ToDoTask task in list.Tasks)
-        {
-            task.Id = default;
-            task.ListId = default;
-            task.PrivateToUserId = null;
-            task.AssignedToUserId = null;
-            task.CreatedDate = task.ModifiedDate = list.CreatedDate;
+            foreach (ToDoTask task in list.Tasks)
+            {
+                task.Id = default;
+                task.ListId = default;
+                task.PrivateToUserId = null;
+                task.AssignedToUserId = null;
+                task.CreatedDate = task.ModifiedDate = list.CreatedDate;
+            }
+
+            EFContext.Lists.Add(list);
+
+            await EFContext.SaveChangesAsync(cancellationToken);
+
+            return list.Id;
         }
-
-        EFContext.Lists.Add(list);
-
-        await EFContext.SaveChangesAsync(cancellationToken);
-
-        metric.Finish();
-
-        return list.Id;
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public async Task SetIsArchivedAsync(int id, int userId, bool isArchived, DateTime modifiedDate, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(SetIsArchivedAsync)}");
 
-        ToDoList? list = EFContext.Lists.FirstOrDefault(x => x.Id == id && x.UserId == userId);
-
-        if (list != null)
+        try
         {
-            if (isArchived)
+            ToDoList? list = EFContext.Lists.FirstOrDefault(x => x.Id == id && x.UserId == userId);
+
+            if (list != null)
             {
-                var lists = NonArchivedLists(userId).Where(x => x.Order >= list.Order);
-                foreach (ToDoList dbList in lists)
+                if (isArchived)
                 {
-                    dbList.Order--;
-                }
+                    var lists = NonArchivedLists(userId).Where(x => x.Order >= list.Order);
+                    foreach (ToDoList dbList in lists)
+                    {
+                        dbList.Order--;
+                    }
 
-                var shares = NonArchivedShares(userId).Where(x => x.Order >= list.Order);
-                foreach (ListShare dbShare in shares)
+                    var shares = NonArchivedShares(userId).Where(x => x.Order >= list.Order);
+                    foreach (ListShare dbShare in shares)
+                    {
+                        dbShare.Order--;
+                    }
+
+                    list.IsArchived = true;
+                    list.NotificationsEnabled = false;
+                    list.Order = null;
+                    list.ModifiedDate = modifiedDate;
+                }
+                else
                 {
-                    dbShare.Order--;
-                }
+                    using IDbConnection conn = OpenConnection();
 
-                list.IsArchived = true;
-                list.NotificationsEnabled = false;
-                list.Order = null;
-                list.ModifiedDate = modifiedDate;
-            }
-            else
-            {
-                using IDbConnection conn = OpenConnection();
-
-                var listsCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*)
+                    var listsCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*)
                                                              FROM todo.lists AS l
                                                              LEFT JOIN todo.shares AS s ON l.id = s.list_id
                                                              WHERE l.is_archived = FALSE AND l.user_id = @UserId 
                                                                  OR (s.user_id = @UserId AND s.is_accepted AND s.is_archived = FALSE)",
-                    new { UserId = userId });
+                        new { UserId = userId });
 
-                list.IsArchived = false;
-                list.NotificationsEnabled = true;
-                list.Order = ++listsCount;
-                list.ModifiedDate = modifiedDate;
-            }
-        }
-        else
-        {
-            ListShare share = EFContext.ListShares.First(x => x.ListId == id && x.UserId == userId);
-
-            if (isArchived)
-            {
-                var lists = NonArchivedLists(userId).Where(x => x.Order >= share.Order);
-                foreach (ToDoList dbList in lists)
-                {
-                    dbList.Order--;
+                    list.IsArchived = false;
+                    list.NotificationsEnabled = true;
+                    list.Order = ++listsCount;
+                    list.ModifiedDate = modifiedDate;
                 }
-
-                var shares = NonArchivedShares(userId).Where(x => x.Order >= share.Order);
-                foreach (ListShare dbShare in shares)
-                {
-                    dbShare.Order--;
-                }
-
-                share.IsArchived = true;
-                share.NotificationsEnabled = false;
-                share.Order = null;
-                share.ModifiedDate = modifiedDate;
             }
             else
             {
-                using IDbConnection conn = OpenConnection();
+                ListShare share = EFContext.ListShares.First(x => x.ListId == id && x.UserId == userId);
 
-                var listsCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*)
+                if (isArchived)
+                {
+                    var lists = NonArchivedLists(userId).Where(x => x.Order >= share.Order);
+                    foreach (ToDoList dbList in lists)
+                    {
+                        dbList.Order--;
+                    }
+
+                    var shares = NonArchivedShares(userId).Where(x => x.Order >= share.Order);
+                    foreach (ListShare dbShare in shares)
+                    {
+                        dbShare.Order--;
+                    }
+
+                    share.IsArchived = true;
+                    share.NotificationsEnabled = false;
+                    share.Order = null;
+                    share.ModifiedDate = modifiedDate;
+                }
+                else
+                {
+                    using IDbConnection conn = OpenConnection();
+
+                    var listsCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*)
                                                              FROM todo.lists AS l
                                                              LEFT JOIN todo.shares AS s ON l.id = s.list_id
                                                              WHERE l.is_archived = FALSE 
                                                                  AND l.user_id = @UserId 
                                                                  OR (s.user_id = @UserId AND s.is_accepted AND s.is_archived = FALSE)",
-                    new { UserId = userId });
+                        new { UserId = userId });
 
-                share.IsArchived = false;
-                share.NotificationsEnabled = true;
-                share.Order = ++listsCount;
-                share.ModifiedDate = modifiedDate;
+                    share.IsArchived = false;
+                    share.NotificationsEnabled = true;
+                    share.Order = ++listsCount;
+                    share.ModifiedDate = modifiedDate;
+                }
             }
+
+            await EFContext.SaveChangesAsync(cancellationToken);
         }
-
-        await EFContext.SaveChangesAsync(cancellationToken);
-
-        metric.Finish();
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public async Task<bool> UncompleteAllAsync(int id, int userId, DateTime modifiedDate, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(UncompleteAllAsync)}");
 
-        List<ToDoTask> tasks = EFContext.Tasks.Where(x => x.ListId == id).ToList();
-
-        // Public tasks
-        List<ToDoTask> completedTasks = tasks.Where(x => x.IsCompleted && !x.PrivateToUserId.HasValue).ToList();
-        short uncompletedTasksCount = (short)tasks.Count(x => !x.IsCompleted && !x.PrivateToUserId.HasValue);
-        foreach (var task in completedTasks)
+        try
         {
-            task.IsCompleted = false;
-            task.Order = ++uncompletedTasksCount;
-            task.ModifiedDate = modifiedDate;
-        }
+            List<ToDoTask> tasks = EFContext.Tasks.Where(x => x.ListId == id).ToList();
 
-        // Private tasks
-        List<ToDoTask> completedPrivateTasks = tasks.Where(x => x.IsCompleted && x.PrivateToUserId.HasValue && x.PrivateToUserId.Value == userId).ToList();
-        short uncompletedPrivateTasksCount = (short)tasks.Count(x => !x.IsCompleted && x.PrivateToUserId.HasValue && x.PrivateToUserId.Value == userId);
-        foreach (var task in completedPrivateTasks)
+            // Public tasks
+            List<ToDoTask> completedTasks = tasks.Where(x => x.IsCompleted && !x.PrivateToUserId.HasValue).ToList();
+            short uncompletedTasksCount = (short)tasks.Count(x => !x.IsCompleted && !x.PrivateToUserId.HasValue);
+            foreach (var task in completedTasks)
+            {
+                task.IsCompleted = false;
+                task.Order = ++uncompletedTasksCount;
+                task.ModifiedDate = modifiedDate;
+            }
+
+            // Private tasks
+            List<ToDoTask> completedPrivateTasks = tasks.Where(x => x.IsCompleted && x.PrivateToUserId.HasValue && x.PrivateToUserId.Value == userId).ToList();
+            short uncompletedPrivateTasksCount = (short)tasks.Count(x => !x.IsCompleted && x.PrivateToUserId.HasValue && x.PrivateToUserId.Value == userId);
+            foreach (var task in completedPrivateTasks)
+            {
+                task.IsCompleted = false;
+                task.Order = ++uncompletedPrivateTasksCount;
+                task.ModifiedDate = modifiedDate;
+            }
+
+            await EFContext.SaveChangesAsync(cancellationToken);
+
+            return completedTasks.Any();
+        }
+        finally
         {
-            task.IsCompleted = false;
-            task.Order = ++uncompletedPrivateTasksCount;
-            task.ModifiedDate = modifiedDate;
+            metric.Finish();
         }
-
-        await EFContext.SaveChangesAsync(cancellationToken);
-
-        metric.Finish();
-
-        return completedTasks.Any();
     }
 
     public async Task SetShareIsAcceptedAsync(int id, int userId, bool isAccepted, DateTime modifiedDate, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(SetShareIsAcceptedAsync)}");
 
-        using IDbConnection conn = OpenConnection();
-
-        short? order = null;
-        if (isAccepted)
+        try
         {
-            var listsCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*)
+            using IDbConnection conn = OpenConnection();
+
+            short? order = null;
+            if (isAccepted)
+            {
+                var listsCount = conn.ExecuteScalar<short>(@"SELECT COUNT(*)
                                                          FROM todo.lists AS l
                                                          LEFT JOIN todo.shares AS s ON l.id = s.list_id
                                                          WHERE l.is_archived = FALSE AND l.user_id = @UserId 
                                                             OR (s.user_id = @UserId AND s.is_accepted AND s.is_archived = FALSE)",
-                new { UserId = userId });
-            order = ++listsCount;
-        }
+                    new { UserId = userId });
+                order = ++listsCount;
+            }
 
-        ListShare share = EFContext.ListShares.First(x => x.ListId == id && x.UserId == userId && x.IsAccepted != true);
-        share.IsAccepted = isAccepted;
-        share.Order = order;
-        share.ModifiedDate = modifiedDate;
+            ListShare share = EFContext.ListShares.First(x => x.ListId == id && x.UserId == userId && x.IsAccepted != true);
+            share.IsAccepted = isAccepted;
+            share.Order = order;
+            share.ModifiedDate = modifiedDate;
 
-        if (!isAccepted)
-        {
-            var sharesCount = conn.ExecuteScalar<short>("SELECT COUNT(*) FROM todo.shares WHERE list_id = @ListId AND is_accepted IS NOT FALSE", new { ListId = id });
-
-            // If this is the last share make all private tasks public
-            if (sharesCount == 1)
+            if (!isAccepted)
             {
-                var privateTasks = EFContext.Tasks.Where(x => x.ListId == id && x.PrivateToUserId.HasValue);
-                foreach (ToDoTask task in privateTasks)
+                var sharesCount = conn.ExecuteScalar<short>("SELECT COUNT(*) FROM todo.shares WHERE list_id = @ListId AND is_accepted IS NOT FALSE", new { ListId = id });
+
+                // If this is the last share make all private tasks public
+                if (sharesCount == 1)
                 {
-                    task.PrivateToUserId = null;
+                    var privateTasks = EFContext.Tasks.Where(x => x.ListId == id && x.PrivateToUserId.HasValue);
+                    foreach (ToDoTask task in privateTasks)
+                    {
+                        task.PrivateToUserId = null;
+                    }
                 }
             }
+
+            await EFContext.SaveChangesAsync(cancellationToken);
         }
-
-        await EFContext.SaveChangesAsync(cancellationToken);
-
-        metric.Finish();
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public async Task ReorderAsync(int id, int userId, short oldOrder, short newOrder, DateTime modifiedDate, CancellationToken cancellationToken)

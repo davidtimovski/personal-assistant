@@ -17,37 +17,50 @@ public class ForecastsRepository : BaseRepository, IForecastsRepository
     {
         var metric = metricsSpan.StartChild($"{nameof(ForecastsRepository)}.{nameof(Get)}");
 
-        using IDbConnection conn = OpenConnection();
+        try
+        {
+            using IDbConnection conn = OpenConnection();
 
-        var result = conn.QueryFirstOrDefault<Forecast>(@"SELECT * FROM weatherman.forecasts 
-            WHERE latitude = @Latitude AND longitude = @Longitude 
+            return conn.QueryFirstOrDefault<Forecast>(@"SELECT * FROM weatherman.forecasts 
+                WHERE latitude = @Latitude AND longitude = @Longitude 
                 AND temperature_unit = @TemperatureUnit AND precipitation_unit = @PrecipitationUnit AND wind_speed_unit = @WindSpeedUnit", parameters);
-
-        metric.Finish();
-
-        return result;
+        }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public async Task CreateAsync(Forecast model, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ForecastsRepository)}.{nameof(CreateAsync)}");
 
-        EFContext.Forecasts.Add(model);
-        await EFContext.SaveChangesAsync();
-
-        metric.Finish();
+        try
+        {
+            EFContext.Forecasts.Add(model);
+            await EFContext.SaveChangesAsync();
+        }
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public async Task UpdateAsync(int id, DateTime lastUpdate, string data, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ForecastsRepository)}.{nameof(UpdateAsync)}");
 
-        Forecast dbForecast = EFContext.Forecasts.First(x => x.Id == id);
+        try
+        {
+            Forecast dbForecast = EFContext.Forecasts.First(x => x.Id == id);
 
-        dbForecast.LastUpdate = lastUpdate;
-        dbForecast.Data = data;
-        await EFContext.SaveChangesAsync();
-
-        metric.Finish();
+            dbForecast.LastUpdate = lastUpdate;
+            dbForecast.Data = data;
+            await EFContext.SaveChangesAsync();
+        }
+        finally
+        {
+            metric.Finish();
+        }
     }
 }

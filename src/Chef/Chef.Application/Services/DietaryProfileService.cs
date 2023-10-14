@@ -143,7 +143,7 @@ public class DietaryProfileService : IDietaryProfileService
         {
             RecipeIngredient[] validRecipeIngredients = recipe.RecipeIngredients
             .Where(x => x.Amount.HasValue
-                        && (x.Ingredient!.ServingSizeIsOneUnit && x.Unit == null || !x.Ingredient.ServingSizeIsOneUnit && x.Unit != null))
+                        && (x.Ingredient!.ServingSizeIsOneUnit && x.Unit is null || !x.Ingredient.ServingSizeIsOneUnit && x.Unit != null))
             .ToArray();
 
             var nutritionSummary = new RecipeNutritionSummary();

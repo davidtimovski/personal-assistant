@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using Sentry;
 using ToDoAssistant.Api.Models;
 using ToDoAssistant.Api.Models.Lists.Requests;
 using ToDoAssistant.Api.Models.Lists.Responses;
@@ -79,6 +80,11 @@ public class ListsController : BaseController
 
             return Ok(lists);
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -100,6 +106,11 @@ public class ListsController : BaseController
 
             return Ok(options);
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -120,6 +131,11 @@ public class ListsController : BaseController
             var list = _listService.GetForEdit(id, UserId, tr);
 
             return list is null ? NotFound() : Ok(list);
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {

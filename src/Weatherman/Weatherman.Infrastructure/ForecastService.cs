@@ -48,23 +48,26 @@ public class ForecastService : IForecastService
 
         var metric = metricsSpan.StartChild($"{nameof(ForecastService)}.{nameof(GetAsync)}");
 
-        if (!ValidTemperatureUnits.Contains(parameters.TemperatureUnit))
-        {
-            throw new ValidationException("Forecasts.InvalidTemperatureUnit");
-        }
-
-        if (!ValidPrecipitationUnits.Contains(parameters.PrecipitationUnit))
-        {
-            throw new ValidationException("Forecasts.InvalidPrecipitationUnit");
-        }
-
-        if (!ValidWindSpeedUnits.Contains(parameters.WindSpeedUnit))
-        {
-            throw new ValidationException("Forecasts.InvalidWindSpeedUnit");
-        }
-
         try
         {
+            if (!ValidTemperatureUnits.Contains(parameters.TemperatureUnit))
+            {
+                metric.Status = SpanStatus.InvalidArgument;
+                throw new ValidationException("Forecasts.InvalidTemperatureUnit");
+            }
+
+            if (!ValidPrecipitationUnits.Contains(parameters.PrecipitationUnit))
+            {
+                metric.Status = SpanStatus.InvalidArgument;
+                throw new ValidationException("Forecasts.InvalidPrecipitationUnit");
+            }
+
+            if (!ValidWindSpeedUnits.Contains(parameters.WindSpeedUnit))
+            {
+                metric.Status = SpanStatus.InvalidArgument;
+                throw new ValidationException("Forecasts.InvalidWindSpeedUnit");
+            }
+
             parameters.Latitude = (float)Math.Round(parameters.Latitude, 2);
             parameters.Longitude = (float)Math.Round(parameters.Longitude, 2);
 
@@ -121,7 +124,7 @@ public class ForecastService : IForecastService
 
             return cachedResult;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not ValidationException)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(GetAsync)}");
             throw;

@@ -7,6 +7,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Sentry;
 
 namespace Chef.Api.Controllers;
 
@@ -53,6 +54,11 @@ public class IngredientsController : BaseController
 
             return Ok(ingredientDtos);
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -73,11 +79,16 @@ public class IngredientsController : BaseController
             EditIngredient? editIngredientDto = _ingredientService.GetForUpdate(id, UserId, tr);
             if (editIngredientDto is null)
             {
-                tr.Finish();
+                tr.Status = SpanStatus.NotFound;
                 return NotFound();
             }
 
             return Ok(editIngredientDto);
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {
@@ -99,7 +110,7 @@ public class IngredientsController : BaseController
             ViewIngredient? viewIngredientDto = _ingredientService.GetPublic(id, UserId, tr);
             if (viewIngredientDto is null)
             {
-                tr.Finish();
+                tr.Status = SpanStatus.NotFound;
                 return NotFound();
             }
 
@@ -109,6 +120,11 @@ public class IngredientsController : BaseController
             }
 
             return Ok(viewIngredientDto);
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {
@@ -129,6 +145,11 @@ public class IngredientsController : BaseController
         {
             var suggestionsDtos = _ingredientService.GetUserSuggestions(UserId, tr);
             return Ok(suggestionsDtos);
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {
@@ -166,6 +187,11 @@ public class IngredientsController : BaseController
 
             return Ok(suggestionsDto);
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -186,6 +212,11 @@ public class IngredientsController : BaseController
             IEnumerable<TaskSuggestion> taskSuggestions = _ingredientService.GetTaskSuggestions(UserId, tr);
 
             return Ok(taskSuggestions);
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {
@@ -249,6 +280,11 @@ public class IngredientsController : BaseController
             };
             await _ingredientService.UpdateAsync(model, _updateValidator, tr, cancellationToken);
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -281,6 +317,11 @@ public class IngredientsController : BaseController
             };
             await _ingredientService.UpdateAsync(model, _updatePublicValidator, tr, cancellationToken);
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -301,6 +342,11 @@ public class IngredientsController : BaseController
         try
         {
             await _ingredientService.DeleteOrRemoveFromRecipesAsync(id, UserId, tr, cancellationToken);
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {

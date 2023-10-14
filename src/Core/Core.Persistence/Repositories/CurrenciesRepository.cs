@@ -17,16 +17,21 @@ public class CurrenciesRepository : BaseRepository, ICurrenciesRepository
     {
         var metric = metricsSpan.StartChild($"{nameof(CurrenciesRepository)}.{nameof(GetAll)}");
 
-        using IDbConnection conn = OpenConnection();
-        var rates = GetCurrencyRates(conn, date, 0);
-        if (rates is null)
+        try
         {
-            throw new Exception("No currencies were found");
+            using IDbConnection conn = OpenConnection();
+            var rates = GetCurrencyRates(conn, date, 0);
+            if (rates is null)
+            {
+                throw new Exception("No currencies were found");
+            }
+
+            return rates;
         }
-
-        metric.Finish();
-
-        return rates;
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public decimal Convert(decimal amount, string fromCurrency, string toCurrency, DateTime date)

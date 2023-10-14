@@ -54,28 +54,33 @@ public class CloudinaryService : ICdnService
     {
         var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(UploadAsync)}");
 
-        string uri = GenerateRandomString();
-        Transformation transformation = _templates[template];
-
-        var uploadParams = new ImageUploadParams
+        try
         {
-            File = new FileDescription(filePath),
-            Folder = $"{_environment}/{uploadPath}/",
-            PublicId = uri,
-            Transformation = transformation
-        };
+            string uri = GenerateRandomString();
+            Transformation transformation = _templates[template];
 
-        ImageUploadResult uploadResult = await _cloudinary.UploadAsync(uploadParams, cancellationToken);
-        if (uploadResult.Error != null)
-        {
-            throw new Exception($"{nameof(CloudinaryService)}.{nameof(UploadAsync)}() returned error: {uploadResult.Error.Message}");
+            var uploadParams = new ImageUploadParams
+            {
+                File = new FileDescription(filePath),
+                Folder = $"{_environment}/{uploadPath}/",
+                PublicId = uri,
+                Transformation = transformation
+            };
+
+            ImageUploadResult uploadResult = await _cloudinary.UploadAsync(uploadParams, cancellationToken);
+            if (uploadResult.Error != null)
+            {
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(UploadAsync)}() returned error: {uploadResult.Error.Message}");
+            }
+
+            File.Delete(filePath);
+
+            return _baseUrl + $"{uploadPath}/{uri}.{Format}";
         }
-
-        File.Delete(filePath);
-
-        metric.Finish();
-
-        return _baseUrl + $"{uploadPath}/{uri}.{Format}";
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public async Task<string> UploadTempAsync(UploadTempImage model, IValidator<UploadTempImage> validator, ISpan metricsSpan, CancellationToken cancellationToken)
@@ -84,60 +89,70 @@ public class CloudinaryService : ICdnService
 
         var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(UploadTempAsync)}");
 
-        string extension = Path.GetExtension(model.FileName);
-
-        if (!Directory.Exists(model.LocalTempPath))
+        try
         {
-            Directory.CreateDirectory(model.LocalTempPath);
-        }
+            string extension = Path.GetExtension(model.FileName);
 
-        string tempImagePath = Path.Combine(model.LocalTempPath, Guid.NewGuid() + extension);
-        using (var stream = new FileStream(tempImagePath, FileMode.Create))
+            if (!Directory.Exists(model.LocalTempPath))
+            {
+                Directory.CreateDirectory(model.LocalTempPath);
+            }
+
+            string tempImagePath = Path.Combine(model.LocalTempPath, Guid.NewGuid() + extension);
+            using (var stream = new FileStream(tempImagePath, FileMode.Create))
+            {
+                model.File.Position = 0;
+                await model.File.CopyToAsync(stream, cancellationToken);
+                await stream.FlushAsync(cancellationToken);
+            }
+
+            string imageUri = await UploadTempAsync(
+                filePath: tempImagePath,
+                uploadPath: model.UploadPath,
+                template: model.TransformationTemplate,
+                cancellationToken
+            );
+
+            return imageUri;
+        }
+        finally
         {
-            model.File.Position = 0;
-            await model.File.CopyToAsync(stream, cancellationToken);
-            await stream.FlushAsync(cancellationToken);
+            metric.Finish();
         }
-
-        string imageUri = await UploadTempAsync(
-            filePath: tempImagePath,
-            uploadPath: model.UploadPath,
-            template: model.TransformationTemplate,
-            cancellationToken
-        );
-
-        metric.Finish();
-
-        return imageUri;
     }
 
     public async Task<string> UploadProfileTempAsync(string filePath, string uploadPath, string template, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(UploadProfileTempAsync)}");
 
-        string uri = GenerateRandomString();
-        Transformation transformation = _templates[template];
-
-        var uploadParams = new ImageUploadParams
+        try
         {
-            File = new FileDescription(filePath),
-            Folder = $"{_environment}/{uploadPath}/",
-            PublicId = uri,
-            Transformation = transformation,
-            Tags = "temp"
-        };
+            string uri = GenerateRandomString();
+            Transformation transformation = _templates[template];
 
-        ImageUploadResult uploadResult = await _cloudinary.UploadAsync(uploadParams, cancellationToken);
-        if (uploadResult.Error != null)
-        {
-            throw new Exception($"{nameof(CloudinaryService)}.{nameof(UploadProfileTempAsync)}() returned error: {uploadResult.Error.Message}");
+            var uploadParams = new ImageUploadParams
+            {
+                File = new FileDescription(filePath),
+                Folder = $"{_environment}/{uploadPath}/",
+                PublicId = uri,
+                Transformation = transformation,
+                Tags = "temp"
+            };
+
+            ImageUploadResult uploadResult = await _cloudinary.UploadAsync(uploadParams, cancellationToken);
+            if (uploadResult.Error != null)
+            {
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(UploadProfileTempAsync)}() returned error: {uploadResult.Error.Message}");
+            }
+
+            File.Delete(filePath);
+
+            return _baseUrl + $"{uploadPath}/{uri}.{Format}";
         }
-
-        File.Delete(filePath);
-
-        metric.Finish();
-
-        return _baseUrl + $"{uploadPath}/{uri}.{Format}";
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public async Task<string> CopyAndUploadAsync(string localTempPath, string imageUriToCopy, string uploadPath, string template, ISpan metricsSpan, CancellationToken cancellationToken)
@@ -149,32 +164,37 @@ public class CloudinaryService : ICdnService
 
         var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(CopyAndUploadAsync)}");
 
-        var result = await _httpClient.GetAsync(new Uri(imageUriToCopy), cancellationToken);
-
-        if (!Directory.Exists(localTempPath))
+        try
         {
-            Directory.CreateDirectory(localTempPath);
+            var result = await _httpClient.GetAsync(new Uri(imageUriToCopy), cancellationToken);
+
+            if (!Directory.Exists(localTempPath))
+            {
+                Directory.CreateDirectory(localTempPath);
+            }
+
+            string tempImagePath = Path.Combine(localTempPath, Guid.NewGuid().ToString());
+
+            using (var stream = new FileStream(tempImagePath, FileMode.Create))
+            using (Stream image = await result.Content.ReadAsStreamAsync(cancellationToken))
+            {
+                await image.CopyToAsync(stream, cancellationToken);
+            }
+
+            string imageUri = await UploadAsync(
+                filePath: tempImagePath,
+                uploadPath: uploadPath,
+                template: template,
+                metricsSpan: metric,
+                cancellationToken
+            );
+
+            return imageUri;
         }
-
-        string tempImagePath = Path.Combine(localTempPath, Guid.NewGuid().ToString());
-
-        using (var stream = new FileStream(tempImagePath, FileMode.Create))
-        using (Stream image = await result.Content.ReadAsStreamAsync(cancellationToken))
+        finally
         {
-            await image.CopyToAsync(stream, cancellationToken);
+            metric.Finish();
         }
-
-        string imageUri = await UploadAsync(
-            filePath: tempImagePath,
-            uploadPath: uploadPath,
-            template: template,
-            metricsSpan: metric,
-            cancellationToken
-        );
-
-        metric.Finish();
-
-        return imageUri;
     }
 
     public async Task RemoveTempTagAsync(string imageUri, ISpan metricsSpan, CancellationToken cancellationToken)
@@ -186,22 +206,27 @@ public class CloudinaryService : ICdnService
 
         var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(RemoveTempTagAsync)}");
 
-        string publicId = GetPublicIdFromUri(imageUri);
-
-        var tagParams = new TagParams
+        try
         {
-            PublicIds = new List<string> { publicId },
-            Tag = "temp",
-            Command = TagCommand.Remove
-        };
+            string publicId = GetPublicIdFromUri(imageUri);
 
-        TagResult tagResult = await _cloudinary.TagAsync(tagParams, cancellationToken);
-        if (tagResult.Error != null)
-        {
-            throw new Exception($"{nameof(CloudinaryService)}.{nameof(RemoveTempTagAsync)}() returned error: {tagResult.Error.Message}");
+            var tagParams = new TagParams
+            {
+                PublicIds = new List<string> { publicId },
+                Tag = "temp",
+                Command = TagCommand.Remove
+            };
+
+            TagResult tagResult = await _cloudinary.TagAsync(tagParams, cancellationToken);
+            if (tagResult.Error != null)
+            {
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(RemoveTempTagAsync)}() returned error: {tagResult.Error.Message}");
+            }
         }
-
-        metric.Finish();
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public async Task DeleteAsync(string imageUri, ISpan metricsSpan, CancellationToken cancellationToken)
@@ -213,60 +238,75 @@ public class CloudinaryService : ICdnService
 
         var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(DeleteAsync)}");
 
-        string publicId = GetPublicIdFromUri(imageUri);
+        try
+        {
+            string publicId = GetPublicIdFromUri(imageUri);
 
-        DelResResult deleteResult = await _cloudinary.DeleteResourcesAsync(new DelResParams
-        {
-            PublicIds = new List<string> { publicId }
-        }, cancellationToken);
-        if (deleteResult.Error != null)
-        {
-            throw new Exception($"{nameof(CloudinaryService)}.{nameof(DeleteAsync)}() returned error: {deleteResult.Error.Message}");
+            DelResResult deleteResult = await _cloudinary.DeleteResourcesAsync(new DelResParams
+            {
+                PublicIds = new List<string> { publicId }
+            }, cancellationToken);
+            if (deleteResult.Error != null)
+            {
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(DeleteAsync)}() returned error: {deleteResult.Error.Message}");
+            }
         }
-
-        metric.Finish();
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public async Task CreateFolderForUserAsync(int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(CreateFolderForUserAsync)}");
 
-        CreateFolderResult result = await _cloudinary.CreateFolderAsync($"{_environment}/users/{userId}", cancellationToken);
-        if (result.Error != null)
+        try
         {
-            throw new Exception($"{nameof(CloudinaryService)}.{nameof(CreateFolderForUserAsync)}() returned error: {result.Error.Message}");
+            CreateFolderResult result = await _cloudinary.CreateFolderAsync($"{_environment}/users/{userId}", cancellationToken);
+            if (result.Error != null)
+            {
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(CreateFolderForUserAsync)}() returned error: {result.Error.Message}");
+            }
         }
-
-        metric.Finish();
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public async Task DeleteUserResourcesAsync(int userId, IEnumerable<string> imageUris, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(DeleteUserResourcesAsync)}");
 
-        var publicIds = new List<string>();
-        foreach (string uri in imageUris.Where(x => !IsDefaultImage(x)))
+        try
         {
-            string publicId = GetPublicIdFromUri(uri);
-            publicIds.Add(publicId);
-        }
+            var publicIds = new List<string>();
+            foreach (string uri in imageUris.Where(x => !IsDefaultImage(x)))
+            {
+                string publicId = GetPublicIdFromUri(uri);
+                publicIds.Add(publicId);
+            }
 
-        DelResResult deleteResult = await _cloudinary.DeleteResourcesAsync(new DelResParams
-        {
-            PublicIds = publicIds
-        }, cancellationToken);
-        if (deleteResult.Error != null)
-        {
-            throw new Exception($"{nameof(CloudinaryService)}.{nameof(DeleteUserResourcesAsync)}() returned error: {deleteResult.Error.Message}");
-        }
+            DelResResult deleteResult = await _cloudinary.DeleteResourcesAsync(new DelResParams
+            {
+                PublicIds = publicIds
+            }, cancellationToken);
+            if (deleteResult.Error != null)
+            {
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(DeleteUserResourcesAsync)}() returned error: {deleteResult.Error.Message}");
+            }
 
-        DeleteFolderResult deleteFolderResult = await _cloudinary.DeleteFolderAsync($"{_environment}/users/{userId}", cancellationToken);
-        if (deleteFolderResult.Error != null)
-        {
-            throw new Exception($"{nameof(CloudinaryService)}.{nameof(DeleteUserResourcesAsync)}() returned error: {deleteFolderResult.Error.Message}");
+            DeleteFolderResult deleteFolderResult = await _cloudinary.DeleteFolderAsync($"{_environment}/users/{userId}", cancellationToken);
+            if (deleteFolderResult.Error != null)
+            {
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(DeleteUserResourcesAsync)}() returned error: {deleteFolderResult.Error.Message}");
+            }
         }
-
-        metric.Finish();
+        finally
+        {
+            metric.Finish();
+        }
     }
 
     public async Task DeleteTemporaryResourcesAsync(DateTime olderThan, CancellationToken cancellationToken)

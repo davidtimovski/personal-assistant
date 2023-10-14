@@ -81,7 +81,7 @@ public class TaskService : ITaskService
                 return null;
             }
 
-            var result = _mapper.Map<TaskForUpdate>(task, opts => { opts.Items["UserId"] = userId; });
+            var result = _mapper.Map<TaskForUpdate>(task, opts => opts.Items["UserId"] = userId);
 
             result.IsInSharedList = _listService.IsShared(task.ListId, userId);
             result.Recipes = _tasksRepository.GetRecipes(id, userId);
@@ -210,7 +210,7 @@ public class TaskService : ITaskService
 
             return result;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not ValidationException)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(CreateAsync)}");
             throw;
@@ -277,7 +277,7 @@ public class TaskService : ITaskService
 
             return result;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not ValidationException)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(BulkCreateAsync)}");
             throw;
@@ -363,7 +363,7 @@ public class TaskService : ITaskService
 
             return result;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not ValidationException)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(UpdateAsync)}");
             throw;
@@ -388,6 +388,7 @@ public class TaskService : ITaskService
 
             if (!Exists(id, userId))
             {
+                metric.Status = SpanStatus.PermissionDenied;
                 throw new ValidationException("Unauthorized");
             }
 
@@ -419,7 +420,7 @@ public class TaskService : ITaskService
 
             return result;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not ValidationException)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(DeleteAsync)}");
             throw;
@@ -438,6 +439,7 @@ public class TaskService : ITaskService
         {
             if (!Exists(model.Id, model.UserId))
             {
+                metric.Status = SpanStatus.PermissionDenied;
                 throw new ValidationException("Unauthorized");
             }
 
@@ -475,7 +477,7 @@ public class TaskService : ITaskService
 
             return result;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not ValidationException)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(CompleteAsync)}");
             throw;
@@ -494,6 +496,7 @@ public class TaskService : ITaskService
         {
             if (!Exists(model.Id, model.UserId))
             {
+                metric.Status = SpanStatus.PermissionDenied;
                 throw new ValidationException("Unauthorized");
             }
 
@@ -531,7 +534,7 @@ public class TaskService : ITaskService
 
             return result;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not ValidationException)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(UncompleteAsync)}");
             throw;
@@ -550,6 +553,7 @@ public class TaskService : ITaskService
         {
             if (!Exists(model.Id, model.UserId))
             {
+                metric.Status = SpanStatus.PermissionDenied;
                 throw new ValidationException("Unauthorized");
             }
 
@@ -565,7 +569,7 @@ public class TaskService : ITaskService
             var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
             return new ReorderTaskResult(list.Id, notifySignalR);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not ValidationException)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(ReorderAsync)}");
             throw;

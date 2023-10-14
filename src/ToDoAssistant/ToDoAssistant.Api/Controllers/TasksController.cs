@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using Sentry;
 using ToDoAssistant.Api.Hubs;
 using ToDoAssistant.Api.Models;
 using ToDoAssistant.Api.Models.Tasks.Requests;
@@ -135,6 +136,11 @@ public class TasksController : BaseController
 
             return StatusCode(201, result.TaskId);
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -197,6 +203,11 @@ public class TasksController : BaseController
                     _senderService.Enqueue(toDoAssistantPushNotification);
                 }
             }
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {
@@ -318,6 +329,11 @@ public class TasksController : BaseController
                 _senderService.Enqueue(toDoAssistantPushNotification);
             }
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -361,6 +377,11 @@ public class TasksController : BaseController
 
                 _senderService.Enqueue(toDoAssistantPushNotification);
             }
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {
@@ -416,6 +437,11 @@ public class TasksController : BaseController
                 _senderService.Enqueue(toDoAssistantPushNotification);
             }
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -469,6 +495,11 @@ public class TasksController : BaseController
 
                 _senderService.Enqueue(toDoAssistantPushNotification);
             }
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {

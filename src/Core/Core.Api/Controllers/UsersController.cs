@@ -3,6 +3,7 @@ using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Sentry;
 
 namespace Core.Api.Controllers;
 
@@ -62,6 +63,11 @@ public class UsersController : BaseController
             ChefPreferences preferences = _userService.GetChefPreferences(UserId, tr);
             return Ok(preferences);
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -85,6 +91,11 @@ public class UsersController : BaseController
         try
         {
             await _userService.UpdateToDoNotificationsEnabledAsync(UserId, dto.ToDoNotificationsEnabled, tr, cancellationToken);
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {
@@ -112,6 +123,11 @@ public class UsersController : BaseController
         {
             await _userService.UpdateChefNotificationsEnabledAsync(UserId, dto.ChefNotificationsEnabled, tr, cancellationToken);
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -137,6 +153,11 @@ public class UsersController : BaseController
         try
         {
             await _userService.UpdateImperialSystemAsync(UserId, dto.ImperialSystem, tr, cancellationToken);
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {

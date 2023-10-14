@@ -21,7 +21,7 @@ public class CoreContext : DbContext
             x.Property(e => e.ToDoNotificationsEnabled).HasColumnName("todo_notifications_enabled");
         });
 
-        modelBuilder.Entity<Tooltip>(x => { x.ToTable("tooltips"); });
+        modelBuilder.Entity<Tooltip>(x => x.ToTable("tooltips"));
         modelBuilder.Entity<TooltipDismissed>(x =>
         {
             x.ToTable("tooltips_dismissed");

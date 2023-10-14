@@ -151,6 +151,7 @@ public class AccountController : BaseController
         }
         catch (Exception ex)
         {
+            tr.Status = SpanStatus.InternalError;
             _logger.LogError(ex, $"User registration failed for: {model.Email}");
 
             ModelState.AddModelError(string.Empty, _localizer["AnErrorOccurred"]);
@@ -178,26 +179,36 @@ public class AccountController : BaseController
             $"{nameof(AccountController)}.{nameof(VerifyReCaptcha)}"
         );
 
-        using var payload = new FormUrlEncodedContent(new[]
+        try
         {
-            new KeyValuePair<string, string>("secret", _config.PersonalAssistant.ReCaptchaSecret),
-            new KeyValuePair<string, string>("response", model.Token)
-        });
+            using var payload = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("secret", _config.PersonalAssistant.ReCaptchaSecret),
+                new KeyValuePair<string, string>("response", model.Token)
+            });
 
-        using HttpClient httpClient = _httpClientFactory.CreateClient();
-        using var result = await httpClient.PostAsync(new Uri(_config.ReCaptchaVerificationUrl), payload);
+            using HttpClient httpClient = _httpClientFactory.CreateClient();
+            using var result = await httpClient.PostAsync(new Uri(_config.ReCaptchaVerificationUrl), payload);
 
-        var content = await result.Content.ReadAsStringAsync();
+            var content = await result.Content.ReadAsStringAsync();
 
-        var response = JsonSerializer.Deserialize<ReCaptchaResponse>(content);
-        if (response is null)
-        {
-            throw new SerializationException($"Could not deserialize {nameof(ReCaptchaResponse)} from content: {content}");
+            var response = JsonSerializer.Deserialize<ReCaptchaResponse>(content);
+            if (response is null)
+            {
+                throw new SerializationException($"Could not deserialize {nameof(ReCaptchaResponse)} from content: {content}");
+            }
+
+            return Ok(response.Score);
         }
-
-        tr.Finish();
-
-        return Ok(response.Score);
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpGet]
@@ -212,15 +223,25 @@ public class AccountController : BaseController
 
         var viewModel = new ResetPasswordViewModel();
 
-        if (User?.Identity?.IsAuthenticated == true)
+        try
         {
-            using var httpClient = await InitializeAuth0ClientAsync(tr, cancellationToken);
+            if (User?.Identity?.IsAuthenticated == true)
+            {
+                using var httpClient = await InitializeAuth0ClientAsync(tr, cancellationToken);
 
-            var user = await Auth0Proxy.GetUserAsync(httpClient, AuthId, tr, cancellationToken);
-            viewModel.Email = user.email;
+                var user = await Auth0Proxy.GetUserAsync(httpClient, AuthId, tr, cancellationToken);
+                viewModel.Email = user.email;
+            }
         }
-
-        tr.Finish();
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
+        finally
+        {
+            tr.Finish();
+        }
 
         return View(viewModel);
     }
@@ -249,6 +270,7 @@ public class AccountController : BaseController
         }
         catch (Exception ex)
         {
+            tr.Status = SpanStatus.InternalError;
             _logger.LogError(ex, $"Resetting user password failed for user: {model.Email}");
 
             ModelState.AddModelError(string.Empty, _localizer["AnErrorOccurred"]);
@@ -301,6 +323,7 @@ public class AccountController : BaseController
         }
         catch (Exception ex)
         {
+            tr.Status = SpanStatus.InternalError;
             _logger.LogError(ex, $"User account deletion failed for user: {UserId}");
 
             ModelState.AddModelError(string.Empty, _localizer["AnErrorOccurred"]);
@@ -324,23 +347,33 @@ public class AccountController : BaseController
             UserId
         );
 
-        using var httpClient = await InitializeAuth0ClientAsync(tr, cancellationToken);
+        try
+        {
+            using var httpClient = await InitializeAuth0ClientAsync(tr, cancellationToken);
 
-        var authUser = await Auth0Proxy.GetUserAsync(httpClient, AuthId, tr, cancellationToken);
-        var user = _userService.Get(UserId);
+            var authUser = await Auth0Proxy.GetUserAsync(httpClient, AuthId, tr, cancellationToken);
+            var user = _userService.Get(UserId);
 
-        var viewModel = new ViewProfileViewModel(
-            authUser.name,
-            user.Language,
-            user.Culture,
-            user.ImageUri,
-            _cdnService.GetDefaultProfileImageUri(),
-            _config.Urls.PersonalAssistant
-        );
+            var viewModel = new ViewProfileViewModel(
+                authUser.name,
+                user.Language,
+                user.Culture,
+                user.ImageUri,
+                _cdnService.GetDefaultProfileImageUri(),
+                _config.Urls.PersonalAssistant
+            );
 
-        tr.Finish();
-
-        return View(viewModel);
+            return View(viewModel);
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
+        finally
+        {
+            tr.Finish();
+        }
     }
 
     [HttpPost]
@@ -375,14 +408,39 @@ public class AccountController : BaseController
 
             var imageUri = string.IsNullOrEmpty(model.ImageUri) ? _cdnService.GetDefaultProfileImageUri() : model.ImageUri;
             await _userService.UpdateProfileAsync(UserId, model.Name, model.Language, model.Culture, imageUri, tr, cancellationToken);
+
+            var user = _userService.Get(UserId);
+
+            string oldImageUri = user.ImageUri;
+
+            // If the user changed his image
+            if (oldImageUri != model.ImageUri)
+            {
+                // and had a previous one, delete it
+                if (oldImageUri != null)
+                {
+                    await _cdnService.DeleteAsync(oldImageUri, tr, cancellationToken);
+                }
+
+                // and has a new one, remove its temp tag
+                if (user.ImageUri != null)
+                {
+                    await _cdnService.RemoveTempTagAsync(user.ImageUri, tr, cancellationToken);
+                }
+            }
+
+            SetLanguageCookie(model.Language);
+
+            return model.Language != user.Language
+                ? RedirectToAction(nameof(Logout), "Account", new { returnUrlSlug = "?alert=" + IndexAlert.LanguageChanged })
+                : RedirectToAction(nameof(HomeController.Overview), "Home", new { alert = OverviewAlert.ProfileUpdated });
         }
         catch (Exception ex)
         {
+            tr.Status = SpanStatus.InternalError;
             _logger.LogError(ex, $"Updating user profile failed for user: {model.Name}");
 
             ModelState.AddModelError(string.Empty, _localizer["AnErrorOccurred"]);
-
-            tr.Finish();
 
             return View(new ViewProfileViewModel
             (
@@ -394,34 +452,10 @@ public class AccountController : BaseController
                 _config.Urls.PersonalAssistant
             ));
         }
-
-        var user = _userService.Get(UserId);
-
-        string oldImageUri = user.ImageUri;
-
-        // If the user changed his image
-        if (oldImageUri != model.ImageUri)
+        finally
         {
-            // and had a previous one, delete it
-            if (oldImageUri != null)
-            {
-                await _cdnService.DeleteAsync(oldImageUri, tr, cancellationToken);
-            }
-
-            // and has a new one, remove its temp tag
-            if (user.ImageUri != null)
-            {
-                await _cdnService.RemoveTempTagAsync(user.ImageUri, tr, cancellationToken);
-            }
+            tr.Finish();
         }
-
-        SetLanguageCookie(model.Language);
-
-        tr.Finish();
-
-        return model.Language != user.Language
-            ? RedirectToAction(nameof(Logout), "Account", new { returnUrlSlug = "?alert=" + IndexAlert.LanguageChanged })
-            : RedirectToAction(nameof(HomeController.Overview), "Home", new { alert = OverviewAlert.ProfileUpdated });
     }
 
     [HttpPost]
@@ -448,20 +482,20 @@ public class AccountController : BaseController
             UserId
         );
 
-        if (image.Length == 0)
-        {
-            ModelState.AddModelError(string.Empty, _localizer["InvalidImage"]);
-            return new UnprocessableEntityObjectResult(ModelState);
-        }
-
-        string tempFolder = Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp");
-        if (!Directory.Exists(tempFolder))
-        {
-            Directory.CreateDirectory(tempFolder);
-        }
-
         try
         {
+            if (image.Length == 0)
+            {
+                ModelState.AddModelError(string.Empty, _localizer["InvalidImage"]);
+                return new UnprocessableEntityObjectResult(ModelState);
+            }
+
+            string tempFolder = Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp");
+            if (!Directory.Exists(tempFolder))
+            {
+                Directory.CreateDirectory(tempFolder);
+            }
+
             string tempImagePath = Path.Combine(tempFolder, Guid.NewGuid() + extension);
             using (var stream = new FileStream(tempImagePath, FileMode.Create))
             {
@@ -480,8 +514,9 @@ public class AccountController : BaseController
         }
         catch (Exception ex)
         {
+            tr.Status = SpanStatus.InternalError;
             _logger.LogError(ex, nameof(UploadProfileImage));
-            throw;
+            return StatusCode(500);
         }
         finally
         {

@@ -13,9 +13,14 @@ public class PushSubscriptionsRepository : BaseRepository, IPushSubscriptionsRep
     {
         var metric = metricsSpan.StartChild($"{nameof(PushSubscriptionsRepository)}.{nameof(CreateSubscriptionAsync)}");
 
-        EFContext.PushSubscriptions.Add(subscription);
-        await EFContext.SaveChangesAsync(cancellationToken);
-
-        metric.Finish();
+        try
+        {
+            EFContext.PushSubscriptions.Add(subscription);
+            await EFContext.SaveChangesAsync(cancellationToken);
+        }
+        finally
+        {
+            metric.Finish();
+        }
     }
 }

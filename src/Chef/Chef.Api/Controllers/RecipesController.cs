@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using Sentry;
 using User = Core.Application.Entities.User;
 
 namespace Chef.Api.Controllers;
@@ -92,6 +93,11 @@ public class RecipesController : BaseController
 
             return Ok(recipeDtos);
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -112,6 +118,7 @@ public class RecipesController : BaseController
             RecipeDto? recipeDto = _recipeService.Get(id, UserId, currency, tr);
             if (recipeDto is null)
             {
+                tr.Status = SpanStatus.NotFound;
                 return NotFound();
             }
 
@@ -121,6 +128,11 @@ public class RecipesController : BaseController
             }
 
             return Ok(recipeDto);
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {
@@ -142,6 +154,7 @@ public class RecipesController : BaseController
             RecipeForUpdate? recipeDto = _recipeService.GetForUpdate(id, UserId, tr);
             if (recipeDto is null)
             {
+                tr.Status = SpanStatus.NotFound;
                 return NotFound();
             }
 
@@ -152,6 +165,11 @@ public class RecipesController : BaseController
 
             return Ok(recipeDto);
 
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {
@@ -174,6 +192,11 @@ public class RecipesController : BaseController
 
             return recipeDto is null ? NotFound() : Ok(recipeDto);
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -194,6 +217,11 @@ public class RecipesController : BaseController
             IEnumerable<Application.Contracts.Recipes.Models.ShareRecipeRequest> shareRequests = _recipeService.GetShareRequests(UserId, tr);
 
             return Ok(shareRequests);
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {
@@ -216,6 +244,11 @@ public class RecipesController : BaseController
 
             return Ok(pendingShareRequestsCount);
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -236,6 +269,11 @@ public class RecipesController : BaseController
             RecipeForSending recipeDto = _recipeService.GetForSending(id, UserId, tr);
 
             return recipeDto is null ? NotFound() : Ok(recipeDto);
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {
@@ -258,6 +296,11 @@ public class RecipesController : BaseController
 
             return Ok(sendRequestDtos);
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -279,6 +322,11 @@ public class RecipesController : BaseController
 
             return Ok(pendingSendRequestsCount);
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -299,6 +347,11 @@ public class RecipesController : BaseController
             RecipeForReview? recipeDto = _recipeService.GetForReview(id, UserId, tr);
 
             return recipeDto is null ? NotFound() : Ok(recipeDto);
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {
@@ -345,6 +398,11 @@ public class RecipesController : BaseController
 
             return StatusCode(201, id);
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -375,6 +433,11 @@ public class RecipesController : BaseController
             string tempImageUri = await _cdnService.UploadTempAsync(uploadModel, _uploadTempImageValidator, tr, cancellationToken);
 
             return StatusCode(201, new { tempImageUri });
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {
@@ -435,6 +498,11 @@ public class RecipesController : BaseController
                 _senderService.Enqueue(pushNotification);
             }
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -471,6 +539,11 @@ public class RecipesController : BaseController
                 _senderService.Enqueue(pushNotification);
             }
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -505,6 +578,11 @@ public class RecipesController : BaseController
             }
 
             return Ok(response);
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {
@@ -561,6 +639,11 @@ public class RecipesController : BaseController
             };
             await _recipeService.ShareAsync(model, _shareValidator, tr, cancellationToken);
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -607,6 +690,11 @@ public class RecipesController : BaseController
                 _senderService.Enqueue(pushNotification);
             }
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -642,6 +730,11 @@ public class RecipesController : BaseController
 
                 _senderService.Enqueue(pushNotification);
             }
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {
@@ -679,6 +772,11 @@ public class RecipesController : BaseController
             }
 
             return Ok(response);
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {
@@ -728,6 +826,11 @@ public class RecipesController : BaseController
 
             return StatusCode(201, null);
         }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
+        }
         finally
         {
             tr.Finish();
@@ -753,7 +856,6 @@ public class RecipesController : BaseController
             DeclineSendRequestResult result = await _recipeService.DeclineSendRequestAsync(dto.RecipeId, UserId, tr, cancellationToken);
             if (!result.Notify())
             {
-                tr.Finish();
                 return NoContent();
             }
 
@@ -769,6 +871,11 @@ public class RecipesController : BaseController
             };
 
             _senderService.Enqueue(pushNotification);
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {
@@ -790,6 +897,11 @@ public class RecipesController : BaseController
         try
         {
             await _recipeService.DeleteSendRequestAsync(recipeId, UserId, tr, cancellationToken);
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {
@@ -858,6 +970,11 @@ public class RecipesController : BaseController
             _senderService.Enqueue(pushNotification);
 
             return StatusCode(201, id);
+        }
+        catch
+        {
+            tr.Status = SpanStatus.InternalError;
+            return StatusCode(500);
         }
         finally
         {
