@@ -1,7 +1,7 @@
 ﻿module Validation
 
-open Accountant.Persistence.Fs
-open Accountant.Persistence.Fs.Models
+open Accountant.Persistence
+open Accountant.Persistence.Models
 
 let private validCurrencies =
     set

@@ -49,7 +49,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Accountant.Persistence.Fs\Accountant.Persistence.Fs.fsproj" />
+		<ProjectReference Include="..\Accountant.Persistence\Accountant.Persistence.fsproj" />
 		<ProjectReference Include="..\..\Core\Api.Common.Fs\Api.Common.Fs.fsproj" />
 		<ProjectReference Include="..\..\Core\Core.Persistence\Core.Persistence.csproj" />
 		<ProjectReference Include="..\..\Core\Core.Infrastructure\Core.Infrastructure.csproj" />

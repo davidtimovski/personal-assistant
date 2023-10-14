@@ -19,7 +19,7 @@ using PersonalAssistant.Web.ViewModels.Account;
 using PersonalAssistant.Web.ViewModels.Home;
 using Sentry;
 using ToDoAssistant.Application.Contracts.Lists;
-using static Accountant.Persistence.Fs.AccountsRepository;
+using static Accountant.Persistence.AccountsRepository;
 
 namespace PersonalAssistant.Web.Controllers;
 
@@ -555,7 +555,7 @@ public class AccountController : BaseController
     private async Task CreateRequiredDataAsync(int userId, ISpan metricsSpan)
     {
         var now = DateTime.UtcNow;
-        await createMain(new Accountant.Persistence.Fs.Models.Account(0, userId, _localizer["MainAccountName"], true, "EUR", FSharpOption<decimal>.None, now, now), _config.ConnectionString, metricsSpan);
+        await createMain(new Accountant.Persistence.Models.Account(0, userId, _localizer["MainAccountName"], true, "EUR", FSharpOption<decimal>.None, now, now), _config.ConnectionString, metricsSpan);
     }
 
     private async Task CreateSamplesAsync(int userId, ISpan metricsSpan, CancellationToken cancellationToken)

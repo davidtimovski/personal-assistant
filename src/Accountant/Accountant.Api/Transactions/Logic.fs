@@ -1,6 +1,6 @@
 ﻿namespace Accountant.Api.Transactions
 
-open Accountant.Persistence.Fs
+open Accountant.Persistence
 open Models
 open CommonHandlers
 

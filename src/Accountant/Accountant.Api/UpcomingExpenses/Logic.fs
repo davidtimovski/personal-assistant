@@ -1,7 +1,7 @@
 ﻿namespace Accountant.Api.UpcomingExpenses
 
 open System
-open Accountant.Persistence.Fs
+open Accountant.Persistence
 open CommonHandlers
 open Models
 

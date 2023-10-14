@@ -1,4 +1,4 @@
-﻿namespace Accountant.Persistence.Fs
+﻿namespace Accountant.Persistence
 
 open Npgsql
 open Npgsql.FSharp

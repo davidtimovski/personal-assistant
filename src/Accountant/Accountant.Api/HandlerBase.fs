@@ -2,7 +2,7 @@
 
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Localization
-open Accountant.Persistence.Fs.ConnectionUtils
+open Accountant.Persistence.ConnectionUtils
 
 module HandlerBase =
 

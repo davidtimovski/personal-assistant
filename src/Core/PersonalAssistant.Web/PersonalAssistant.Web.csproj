@@ -28,7 +28,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Accountant\Accountant.Persistence.Fs\Accountant.Persistence.Fs.fsproj" />
+		<ProjectReference Include="..\..\Accountant\Accountant.Persistence\Accountant.Persistence.fsproj" />
 		<ProjectReference Include="..\..\Chef\Chef.Persistence\Chef.Persistence.csproj" />
 		<ProjectReference Include="..\..\ToDoAssistant\ToDoAssistant.Persistence\ToDoAssistant.Persistence.csproj" />
 		<ProjectReference Include="..\Api.Common\Api.Common.csproj" />

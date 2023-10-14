@@ -3,7 +3,7 @@
 open System
 open Giraffe
 open Microsoft.AspNetCore.Http
-open Accountant.Persistence.Fs
+open Accountant.Persistence
 open Accountant.Api
 open Api.Common.Fs
 open CommonHandlers

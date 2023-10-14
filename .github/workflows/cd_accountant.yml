@@ -10,7 +10,7 @@ on:
       - "src/Core/Core.Application/**"
       - "src/Core/Core.Infrastructure/**"
       - "src/Core/Core.Persistence/**"
-      - "src/Accountant/Accountant.Persistence.Fs/**"
+      - "src/Accountant/Accountant.Persistence/**"
       - "src/Accountant/Accountant.Api/**"
 
 env:
