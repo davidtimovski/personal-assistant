@@ -21,9 +21,36 @@ public class CreateTaskValidator : AbstractValidator<CreateTask>
     {
         RuleFor(dto => dto.UserId)
             .NotEmpty().WithMessage("Unauthorized")
-            .Must((dto, userId) => listService.UserOwnsOrShares(dto.ListId, userId)).WithMessage("Unauthorized")
-            .Must((dto, userId) => !taskService.Exists(dto.Name, dto.ListId, userId)).WithMessage("AlreadyExists")
-            .Must((dto, userId) => taskService.Count(dto.ListId) < 250).WithMessage("TasksPerListLimitReached");
+            .Must((dto, userId) =>
+            {
+                var ownsOrSharesResult = listService.UserOwnsOrShares(dto.ListId, userId);
+                if (ownsOrSharesResult.Failed)
+                {
+                    throw new Exception("Failed to perform validation");
+                }
+
+                return ownsOrSharesResult.Data;
+            }).WithMessage("Unauthorized")
+            .Must((dto, userId) =>
+            {
+                var existsResult = taskService.Exists(dto.Name, dto.ListId, userId);
+                if (existsResult.Failed)
+                {
+                    throw new Exception("Failed to perform validation");
+                }
+
+                return !existsResult.Data;
+            }).WithMessage("AlreadyExists")
+            .Must((dto, userId) =>
+            {
+                var countResult = taskService.Count(dto.ListId);
+                if (countResult.Failed)
+                {
+                    throw new Exception("Failed to perform validation");
+                }
+
+                return countResult.Data < 250;
+            }).WithMessage("TasksPerListLimitReached");
 
         RuleFor(dto => dto.Name)
             .NotEmpty().WithMessage("Tasks.ModifyTask.NameIsRequired")

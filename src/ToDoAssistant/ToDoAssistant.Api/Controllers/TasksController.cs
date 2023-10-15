@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using Api.Common;
 using Core.Application.Contracts;
-using Core.Application.Contracts.Models.Sender;
+using Core.Application.Contracts.Models;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +12,7 @@ using Sentry;
 using ToDoAssistant.Api.Hubs;
 using ToDoAssistant.Api.Models;
 using ToDoAssistant.Api.Models.Tasks.Requests;
+using ToDoAssistant.Application.Contracts;
 using ToDoAssistant.Application.Contracts.Notifications;
 using ToDoAssistant.Application.Contracts.Notifications.Models;
 using ToDoAssistant.Application.Contracts.Tasks;
@@ -46,7 +47,8 @@ public class TasksController : BaseController
         IValidator<UpdateTask> updateValidator,
         IStringLocalizer<TasksController> localizer,
         IOptions<AppConfiguration> config,
-        ILogger<TasksController> logger) : base(userIdLookup, usersRepository)
+        ILogger<TasksController> logger,
+        IStringLocalizer<BaseController> baseLocalizer) : base(userIdLookup, usersRepository, baseLocalizer)
     {
         _listActionsHubContext = listActionsHubContext;
         _taskService = taskService;
@@ -63,35 +65,42 @@ public class TasksController : BaseController
     [HttpGet("{id}")]
     public IActionResult Get(int id)
     {
-        TaskDto? taskDto = _taskService.Get(id, UserId);
-        if (taskDto is null)
+        var result = _taskService.Get(id, UserId);
+
+        if (result.Failed)
+        {
+            return StatusCode(500);
+        }
+
+        if (result.Data is null)
         {
             return NotFound();
         }
 
-        return Ok(taskDto);
+        return Ok(result.Data);
     }
 
     [HttpGet("{id}/update")]
     public IActionResult GetForUpdate(int id)
     {
-        TaskForUpdate? taskDto = _taskService.GetForUpdate(id, UserId);
-        if (taskDto is null)
+        var result = _taskService.GetForUpdate(id, UserId);
+
+        if (result.Failed)
+        {
+            return StatusCode(500);
+        }
+
+        if (result.Data is null)
         {
             return NotFound();
         }
 
-        return Ok(taskDto);
+        return Ok(result.Data);
     }
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateTaskRequest request, CancellationToken cancellationToken)
     {
-        if (request is null)
-        {
-            return BadRequest();
-        }
-
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} api/tasks",
             $"{nameof(TasksController)}.{nameof(Create)}",
@@ -100,6 +109,12 @@ public class TasksController : BaseController
 
         try
         {
+            if (request is null)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return BadRequest();
+            }
+
             var model = new CreateTask
             {
                 UserId = UserId,
@@ -116,22 +131,21 @@ public class TasksController : BaseController
                 await _listActionsHubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", AuthId);
             }
 
-            foreach (var recipient in result.NotificationRecipients)
+            var message = _localizer["CreatedTaskNotification", result.ActionUserName, result.TaskName, result.ListName];
+
+            var createResult = await CreateAndEnqueueNotificationsAsync(
+                result.NotificationRecipients,
+                result.ActionUserImageUri,
+                request.ListId,
+                result.TaskId,
+                message,
+                tr,
+                cancellationToken);
+
+            if (createResult.Failed)
             {
-                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-                var message = _localizer["CreatedTaskNotification", result.ActionUserName, result.TaskName, result.ListName];
-
-                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, request.ListId, result.TaskId, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
-                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
-                {
-                    SenderImageUri = result.ActionUserImageUri,
-                    UserId = recipient.Id,
-                    Message = message,
-                    OpenUrl = GetNotificationsPageUrl(notificationId)
-                };
-
-                _senderService.Enqueue(toDoAssistantPushNotification);
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
             }
 
             return StatusCode(201, result.TaskId);
@@ -185,24 +199,25 @@ public class TasksController : BaseController
 
             foreach (BulkCreatedTask task in result.CreatedTasks)
             {
-                foreach (var recipient in result.NotificationRecipients)
+                var message = _localizer["CreatedTaskNotification", result.ActionUserName, task.Name, result.ListName];
+
+                var createResult = await CreateAndEnqueueNotificationsAsync(
+                    result.NotificationRecipients,
+                    result.ActionUserImageUri,
+                    request.ListId,
+                    task.Id,
+                    message,
+                    tr,
+                    cancellationToken);
+
+                if (createResult.Failed)
                 {
-                    CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-                    var message = _localizer["CreatedTaskNotification", result.ActionUserName, task.Name, result.ListName];
-
-                    var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, request.ListId, task.Id, message);
-                    var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
-                    var toDoAssistantPushNotification = new ToDoAssistantPushNotification
-                    {
-                        SenderImageUri = result.ActionUserImageUri,
-                        UserId = recipient.Id,
-                        Message = message,
-                        OpenUrl = GetNotificationsPageUrl(notificationId)
-                    };
-
-                    _senderService.Enqueue(toDoAssistantPushNotification);
+                    tr.Status = SpanStatus.InternalError;
+                    return StatusCode(500);
                 }
             }
+
+            return StatusCode(201);
         }
         catch
         {
@@ -213,8 +228,6 @@ public class TasksController : BaseController
         {
             tr.Finish();
         }
-
-        return StatusCode(201);
     }
 
     [HttpPut]
@@ -259,75 +272,85 @@ public class TasksController : BaseController
 
             foreach (var recipient in result.NotificationRecipients)
             {
-                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-                var message = _localizer["UpdatedTaskNotification", result.ActionUserName, result.OriginalTaskName, result.ListName];
+                var message = _localizer["UpdatedTaskNotification", result.ActionUserName, result.OriginalTaskName!, result.ListName!];
 
-                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, result.ListId, request.Id, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
-                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+                var createResult = await CreateAndEnqueueNotificationsAsync(
+                    result.NotificationRecipients,
+                    result.ActionUserImageUri,
+                    request.ListId,
+                    request.Id,
+                    message,
+                    tr,
+                    cancellationToken);
+
+                if (createResult.Failed)
                 {
-                    SenderImageUri = result.ActionUserImageUri,
-                    UserId = recipient.Id,
-                    Message = message,
-                    OpenUrl = GetNotificationsPageUrl(notificationId)
-                };
-
-                _senderService.Enqueue(toDoAssistantPushNotification);
+                    tr.Status = SpanStatus.InternalError;
+                    return StatusCode(500);
+                }
             }
 
             foreach (var recipient in result.RemovedNotificationRecipients)
             {
-                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-                var message = _localizer["RemovedTaskNotification", result.ActionUserName, result.OriginalTaskName, result.OldListName];
+                var message = _localizer["RemovedTaskNotification", result.ActionUserName, result.OriginalTaskName!, result.OldListName!];
 
-                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, result.OldListId, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
-                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+                var createResult = await CreateAndEnqueueNotificationsAsync(
+                    result.RemovedNotificationRecipients,
+                    result.ActionUserImageUri,
+                    result.OldListId,
+                    null,
+                    message,
+                    tr,
+                    cancellationToken);
+
+                if (createResult.Failed)
                 {
-                    SenderImageUri = result.ActionUserImageUri,
-                    UserId = recipient.Id,
-                    Message = message,
-                    OpenUrl = GetNotificationsPageUrl(notificationId)
-                };
-
-                _senderService.Enqueue(toDoAssistantPushNotification);
+                    tr.Status = SpanStatus.InternalError;
+                    return StatusCode(500);
+                }
             }
 
             foreach (var recipient in result.CreatedNotificationRecipients)
             {
-                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-                var message = _localizer["CreatedTaskNotification", result.ActionUserName, request.Name, result.ListName];
+                var message = _localizer["CreatedTaskNotification", result.ActionUserName, request.Name, result.ListName!];
 
-                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, result.ListId, request.Id, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
-                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+                var createResult = await CreateAndEnqueueNotificationsAsync(
+                    result.CreatedNotificationRecipients,
+                    result.ActionUserImageUri,
+                    result.ListId,
+                    request.Id,
+                    message,
+                    tr,
+                    cancellationToken);
+
+                if (createResult.Failed)
                 {
-                    SenderImageUri = result.ActionUserImageUri,
-                    UserId = recipient.Id,
-                    Message = message,
-                    OpenUrl = GetNotificationsPageUrl(notificationId)
-                };
-
-                _senderService.Enqueue(toDoAssistantPushNotification);
+                    tr.Status = SpanStatus.InternalError;
+                    return StatusCode(500);
+                }
             }
 
             if (result.AssignedNotificationRecipient != null)
             {
-                CultureInfo.CurrentCulture = new CultureInfo(result.AssignedNotificationRecipient.Language, false);
-                var message = _localizer["AssignedTaskNotification", result.ActionUserName, result.OriginalTaskName, result.ListName];
+                var message = _localizer["AssignedTaskNotification", result.ActionUserName, result.OriginalTaskName!, result.ListName!];
 
-                var createNotificationDto = new CreateOrUpdateNotification(result.AssignedNotificationRecipient.Id, UserId, result.ListId, request.Id, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
-                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+                var createResult = await CreateAndEnqueueNotificationsAsync(
+                    new List<NotificationRecipient> { new NotificationRecipient(result.AssignedNotificationRecipient.Id, result.AssignedNotificationRecipient.Language) },
+                    result.ActionUserImageUri,
+                    result.ListId,
+                    request.Id,
+                    message,
+                    tr,
+                    cancellationToken);
+
+                if (createResult.Failed)
                 {
-                    SenderImageUri = result.ActionUserImageUri,
-                    UserId = result.AssignedNotificationRecipient.Id,
-                    Message = message,
-                    OpenUrl = GetNotificationsPageUrl(notificationId)
-                };
-
-                _senderService.Enqueue(toDoAssistantPushNotification);
+                    tr.Status = SpanStatus.InternalError;
+                    return StatusCode(500);
+                }
             }
+
+            return NoContent();
         }
         catch
         {
@@ -338,8 +361,6 @@ public class TasksController : BaseController
         {
             tr.Finish();
         }
-
-        return NoContent();
     }
 
     [HttpDelete("{id}")]
@@ -360,23 +381,24 @@ public class TasksController : BaseController
                 await _listActionsHubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskDeleted", AuthId, id, result.ListId);
             }
 
-            foreach (var recipient in result.NotificationRecipients)
+            var message = _localizer["RemovedTaskNotification", result.ActionUserName, result.TaskName, result.ListName];
+
+            var createResult = await CreateAndEnqueueNotificationsAsync(
+                result.NotificationRecipients,
+                result.ActionUserImageUri,
+                result.ListId,
+                null,
+                message,
+                tr,
+                cancellationToken);
+
+            if (createResult.Failed)
             {
-                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-                var message = _localizer["RemovedTaskNotification", result.ActionUserName, result.TaskName, result.ListName];
-
-                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, result.ListId, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
-                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
-                {
-                    SenderImageUri = result.ActionUserImageUri,
-                    UserId = recipient.Id,
-                    Message = message,
-                    OpenUrl = GetNotificationsPageUrl(notificationId)
-                };
-
-                _senderService.Enqueue(toDoAssistantPushNotification);
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
             }
+
+            return NoContent();
         }
         catch
         {
@@ -387,8 +409,6 @@ public class TasksController : BaseController
         {
             tr.Finish();
         }
-
-        return NoContent();
     }
 
     [HttpPut("complete")]
@@ -419,23 +439,24 @@ public class TasksController : BaseController
                 await _listActionsHubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskCompletedChanged", AuthId, request.Id, result.ListId, true);
             }
 
-            foreach (var recipient in result.NotificationRecipients)
+            var message = _localizer["CompletedTaskNotification", result.ActionUserName, result.TaskName, result.ListName];
+
+            var createResult = await CreateAndEnqueueNotificationsAsync(
+                result.NotificationRecipients,
+                result.ActionUserImageUri,
+                result.ListId,
+                request.Id,
+                message,
+                tr,
+                cancellationToken);
+
+            if (createResult.Failed)
             {
-                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-                string message = _localizer["CompletedTaskNotification", result.ActionUserName, result.TaskName, result.ListName];
-
-                var updateNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, result.ListId, request.Id, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto, tr, cancellationToken);
-                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
-                {
-                    SenderImageUri = result.ActionUserImageUri,
-                    UserId = recipient.Id,
-                    Message = message,
-                    OpenUrl = GetNotificationsPageUrl(notificationId)
-                };
-
-                _senderService.Enqueue(toDoAssistantPushNotification);
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
             }
+
+            return NoContent();
         }
         catch
         {
@@ -446,8 +467,6 @@ public class TasksController : BaseController
         {
             tr.Finish();
         }
-
-        return NoContent();
     }
 
     [HttpPut("uncomplete")]
@@ -478,23 +497,24 @@ public class TasksController : BaseController
                 await _listActionsHubContext.Clients.Group(result.ListId.ToString()).SendAsync("TaskCompletedChanged", AuthId, request.Id, result.ListId, false);
             }
 
-            foreach (var recipient in result.NotificationRecipients)
+            var message = _localizer["UncompletedTaskNotification", result.ActionUserName, result.TaskName, result.ListName];
+
+            var createResult = await CreateAndEnqueueNotificationsAsync(
+                result.NotificationRecipients,
+                result.ActionUserImageUri,
+                result.ListId,
+                request.Id,
+                message,
+                tr,
+                cancellationToken);
+
+            if (createResult.Failed)
             {
-                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-                string message = _localizer["UncompletedTaskNotification", result.ActionUserName, result.TaskName, result.ListName];
-
-                var updateNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, result.ListId, request.Id, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(updateNotificationDto, tr, cancellationToken);
-                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
-                {
-                    SenderImageUri = result.ActionUserImageUri,
-                    UserId = recipient.Id,
-                    Message = message,
-                    OpenUrl = GetNotificationsPageUrl(notificationId)
-                };
-
-                _senderService.Enqueue(toDoAssistantPushNotification);
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
             }
+
+            return NoContent();
         }
         catch
         {
@@ -505,8 +525,40 @@ public class TasksController : BaseController
         {
             tr.Finish();
         }
+    }
 
-        return NoContent();
+    private async Task<Result> CreateAndEnqueueNotificationsAsync(
+        IReadOnlyCollection<NotificationRecipient> recipients,
+        string actionUserImageUri,
+        int? listId,
+        int? taskId,
+        string message,
+        ITransaction tr,
+        CancellationToken cancellationToken)
+    {
+        foreach (var recipient in recipients)
+        {
+            CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+            var model = new CreateOrUpdateNotification(recipient.Id, UserId, listId, null, message);
+            var result = await _notificationService.CreateOrUpdateAsync(model, tr, cancellationToken);
+
+            if (result.Failed)
+            {
+                return new();
+            }
+
+            var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+            {
+                SenderImageUri = actionUserImageUri,
+                UserId = recipient.Id,
+                Message = message,
+                OpenUrl = $"{_config.Url}/notifications/{result.Data}"
+            };
+
+            _senderService.Enqueue(toDoAssistantPushNotification);
+        }
+
+        return new(true);
     }
 
     //[HttpPut("reorder")]
@@ -534,9 +586,4 @@ public class TasksController : BaseController
 
     //    return NoContent();
     //}
-
-    private string GetNotificationsPageUrl(int notificationId)
-    {
-        return $"{_config.Url}/notifications/{notificationId}";
-    }
 }

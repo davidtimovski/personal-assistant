@@ -15,6 +15,15 @@ public class UpdateSharedListValidator : AbstractValidator<UpdateSharedList>
     {
         RuleFor(dto => dto.UserId)
             .NotEmpty().WithMessage("Unauthorized")
-            .Must((dto, userId) => listService.UserOwnsOrSharesAsAdmin(dto.Id, userId)).WithMessage("Unauthorized");
+            .Must((dto, userId) =>
+            {
+                var ownsOrSharesResult = listService.UserOwnsOrSharesAsAdmin(dto.Id, userId);
+                if (ownsOrSharesResult.Failed)
+                {
+                    throw new Exception("Failed to perform validation");
+                }
+
+                return ownsOrSharesResult.Data;
+            }).WithMessage("Unauthorized");
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using PersonalAssistant.Web.Models;
 using PersonalAssistant.Web.ViewModels.Home;
+using Sentry;
 
 namespace PersonalAssistant.Web.Controllers;
 
@@ -39,11 +40,15 @@ public class HomeController : BaseController
     [Authorize]
     public IActionResult Overview(OverviewAlert alert = OverviewAlert.None)
     {
-        var user = _userService.Get(UserId);
+        var userResult = _userService.Get(UserId);
+        if (userResult.Failed)
+        {
+            return StatusCode(500);
+        }
 
         var model = new OverviewViewModel
         (
-            user.Name,
+            userResult.Data!.Name,
             new List<ClientApplicationViewModel>
             {
                 new ClientApplicationViewModel("To Do Assistant", _config.Urls.ToDoAssistant, "to-do-assistant"),
@@ -52,7 +57,7 @@ public class HomeController : BaseController
                 new ClientApplicationViewModel("Chef", _config.Urls.Chef, "chef", ReleaseStatus.Beta),
             },
             alert
-        );;
+        );
 
         return View(model);
     }

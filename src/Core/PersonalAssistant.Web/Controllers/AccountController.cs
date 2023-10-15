@@ -130,12 +130,17 @@ public class AccountController : BaseController
             using var httpClient = await InitializeAuth0ClientAsync(tr, cancellationToken);
 
             var authId = await Auth0Proxy.RegisterUserAsync(httpClient, model.Email, model.Password, model.Name, tr, cancellationToken);
-            var userId = await _userService.CreateAsync(authId, model.Email, model.Name, model.Language, model.Culture, _cdnService.GetDefaultProfileImageUri(), tr, cancellationToken);
 
-            await _cdnService.CreateFolderForUserAsync(userId, tr, cancellationToken);
+            var createResult = await _userService.CreateAsync(authId, model.Email, model.Name, model.Language, model.Culture, _cdnService.GetDefaultProfileImageUri(), tr, cancellationToken);
+            if (createResult.Failed)
+            {
+                throw new Exception("User creation failed");
+            }
 
-            await CreateRequiredDataAsync(userId, tr);
-            await CreateSamplesAsync(userId, tr, cancellationToken);
+            await _cdnService.CreateFolderForUserAsync(createResult.Data, tr, cancellationToken);
+
+            await CreateRequiredDataAsync(createResult.Data, tr);
+            await CreateSamplesAsync(createResult.Data, tr, cancellationToken);
         }
         catch (PasswordTooWeakException)
         {
@@ -308,11 +313,17 @@ public class AccountController : BaseController
             await Auth0Proxy.DeleteUserAsync(httpClient, AuthId, tr, cancellationToken);
 
             // Delete resources
-            var user = _userService.Get(UserId);
-            var filePaths = new List<string> { user.ImageUri };
-            IEnumerable<string> recipeUris = _recipeService.GetAllImageUris(user.Id, tr);
+            var userResult = _userService.Get(UserId);
+            if (userResult.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            var filePaths = new List<string> { userResult.Data!.ImageUri };
+            IEnumerable<string> recipeUris = _recipeService.GetAllImageUris(userResult.Data.Id, tr);
             filePaths.AddRange(recipeUris);
-            await _cdnService.DeleteUserResourcesAsync(user.Id, filePaths, tr, cancellationToken);
+            await _cdnService.DeleteUserResourcesAsync(userResult.Data.Id, filePaths, tr, cancellationToken);
 
             await _usersRepository.DeleteAsync(UserId, tr, cancellationToken);
 
@@ -352,13 +363,19 @@ public class AccountController : BaseController
             using var httpClient = await InitializeAuth0ClientAsync(tr, cancellationToken);
 
             var authUser = await Auth0Proxy.GetUserAsync(httpClient, AuthId, tr, cancellationToken);
-            var user = _userService.Get(UserId);
+
+            var userResult = _userService.Get(UserId);
+            if (userResult.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
 
             var viewModel = new ViewProfileViewModel(
                 authUser.name,
-                user.Language,
-                user.Culture,
-                user.ImageUri,
+                userResult.Data!.Language,
+                userResult.Data.Culture,
+                userResult.Data.ImageUri,
                 _cdnService.GetDefaultProfileImageUri(),
                 _config.Urls.PersonalAssistant
             );
@@ -409,9 +426,14 @@ public class AccountController : BaseController
             var imageUri = string.IsNullOrEmpty(model.ImageUri) ? _cdnService.GetDefaultProfileImageUri() : model.ImageUri;
             await _userService.UpdateProfileAsync(UserId, model.Name, model.Language, model.Culture, imageUri, tr, cancellationToken);
 
-            var user = _userService.Get(UserId);
+            var userResult = _userService.Get(UserId);
+            if (userResult.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
 
-            string oldImageUri = user.ImageUri;
+            string oldImageUri = userResult.Data!.ImageUri;
 
             // If the user changed his image
             if (oldImageUri != model.ImageUri)
@@ -423,15 +445,15 @@ public class AccountController : BaseController
                 }
 
                 // and has a new one, remove its temp tag
-                if (user.ImageUri != null)
+                if (userResult.Data.ImageUri != null)
                 {
-                    await _cdnService.RemoveTempTagAsync(user.ImageUri, tr, cancellationToken);
+                    await _cdnService.RemoveTempTagAsync(userResult.Data.ImageUri, tr, cancellationToken);
                 }
             }
 
             SetLanguageCookie(model.Language);
 
-            return model.Language != user.Language
+            return model.Language != userResult.Data.Language
                 ? RedirectToAction(nameof(Logout), "Account", new { returnUrlSlug = "?alert=" + IndexAlert.LanguageChanged })
                 : RedirectToAction(nameof(HomeController.Overview), "Home", new { alert = OverviewAlert.ProfileUpdated });
         }

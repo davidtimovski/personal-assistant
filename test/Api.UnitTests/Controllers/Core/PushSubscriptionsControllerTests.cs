@@ -1,5 +1,6 @@
 ﻿using Api.UnitTests.Builders;
 using Core.Api.Controllers;
+using Core.Application.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -8,11 +9,15 @@ namespace Api.UnitTests.Controllers.Core;
 
 public class PushSubscriptionsControllerTests
 {
+    private readonly Mock<IUserIdLookup> _userIdLookupMock = new();
     private readonly PushSubscriptionsController _sut;
 
     public PushSubscriptionsControllerTests()
     {
-        _sut = new PushSubscriptionsController(null, null, null)
+        _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
+        _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
+
+        _sut = new PushSubscriptionsController(_userIdLookupMock.Object, null, null)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };

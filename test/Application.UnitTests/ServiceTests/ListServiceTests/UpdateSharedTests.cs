@@ -1,4 +1,5 @@
 ﻿using Application.UnitTests.Builders;
+using Core.Application.Contracts;
 using FluentValidation;
 using Moq;
 using Sentry;
@@ -43,11 +44,13 @@ public class UpdateSharedTests
     }
 
     [Fact]
-    public async Task Validate_Throws_IfInvalidModel()
+    public async Task ReturnsInvalidStatus_IfValidationFails()
     {
         UpdateSharedList model = new ListBuilder().BuildUpdateSharedModel();
         var failedValidator = ValidatorMocker.GetFailed<UpdateSharedList>();
 
-        await Assert.ThrowsAsync<ValidationException>(() => _sut.UpdateSharedAsync(model, failedValidator.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>()));
+        var result = await _sut.UpdateSharedAsync(model, failedValidator.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
+
+        Assert.Equal(result.Status, ResultStatus.Invalid);
     }
 }

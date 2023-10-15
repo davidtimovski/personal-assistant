@@ -18,13 +18,27 @@ public class BulkCreateValidator : AbstractValidator<BulkCreate>
     {
         RuleFor(dto => dto.UserId)
             .NotEmpty().WithMessage("Unauthorized")
-            .Must((dto, userId) => listService.UserOwnsOrShares(dto.ListId, userId)).WithMessage("Unauthorized");
+            .Must((dto, userId) => {
+                var ownsOrSharesResult = listService.UserOwnsOrShares(dto.ListId, userId);
+                if (ownsOrSharesResult.Failed)
+                {
+                    throw new Exception("Failed to perform validation");
+                }
+
+                return ownsOrSharesResult.Data;
+            }).WithMessage("Unauthorized");
 
         RuleFor(dto => dto.ListId)
             .Must((dto, listId) =>
             {
                 var taskNames = dto.TasksText.Split("\n").Where(x => !string.IsNullOrWhiteSpace(x));
-                return taskService.Count(listId) + taskNames.Count() <= 250;
+                var countResult = taskService.Count(listId);
+                if (countResult.Failed)
+                {
+                    throw new Exception("Failed to perform validation");
+                }
+
+                return countResult.Data + taskNames.Count() <= 250;
             }).WithMessage("TasksPerListLimitReached");
 
         RuleFor(dto => dto.TasksText).NotEmpty().WithMessage("Tasks.BulkCreate.TextIsRequired").Must(tasksText =>
@@ -34,7 +48,13 @@ public class BulkCreateValidator : AbstractValidator<BulkCreate>
         }).WithMessage("Tasks.BulkCreate.NoTasks").Must((dto, tasksText) =>
         {
             IEnumerable<string> taskNames = tasksText.Split("\n").Where(x => !string.IsNullOrWhiteSpace(x));
-            return !taskService.Exists(taskNames, dto.ListId, dto.UserId);
+            var existsResult = taskService.Exists(taskNames, dto.ListId, dto.UserId);
+            if (existsResult.Failed)
+            {
+                throw new Exception("Failed to perform validation");
+            }
+
+            return !existsResult.Data;
         }).WithMessage("Tasks.BulkCreate.SomeTasksAlreadyExist").Must(tasksText =>
         {
             var tasks = tasksText.Split("\n").Where(x => !string.IsNullOrWhiteSpace(x));

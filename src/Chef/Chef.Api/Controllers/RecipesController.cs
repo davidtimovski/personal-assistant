@@ -3,12 +3,13 @@ using Api.Common;
 using Chef.Api.Models;
 using Chef.Api.Models.Recipes.Requests;
 using Chef.Api.Models.Recipes.Responses;
+using Chef.Application.Contracts;
 using Chef.Application.Contracts.Ingredients;
 using Chef.Application.Contracts.Recipes;
 using Chef.Application.Contracts.Recipes.Models;
+using CloudinaryDotNet.Actions;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
-using Core.Application.Contracts.Models.Sender;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -568,13 +569,18 @@ public class RecipesController : BaseController
                 CanShare = false
             };
 
-            var user = _userService.Get(email);
-
-            if (user != null)
+            var userResult = _userService.Get(email);
+            if (userResult.Failed)
             {
-                response.UserId = user.Id;
-                response.ImageUri = user.ImageUri;
-                response.CanShare = _recipeService.CanShareWithUser(user.Id, UserId, tr);
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            if (userResult.Data != null)
+            {
+                response.UserId = userResult.Data.Id;
+                response.ImageUri = userResult.Data.ImageUri;
+                response.CanShare = _recipeService.CanShareWithUser(userResult.Data.Id, UserId, tr);
             }
 
             return Ok(response);
@@ -613,17 +619,29 @@ public class RecipesController : BaseController
                     continue;
                 }
 
-                var currentUser = _userService.Get(UserId);
-                var user = _userService.Get(removedUserId);
+                var currentUserResult = _userService.Get(UserId);
+                if (currentUserResult.Failed)
+                {
+                    tr.Status = SpanStatus.InternalError;
+                    return StatusCode(500);
+                }
+
+                var userResult = _userService.Get(removedUserId);
+                if (userResult.Failed)
+                {
+                    tr.Status = SpanStatus.InternalError;
+                    return StatusCode(500);
+                }
+
                 RecipeToNotify recipe = _recipeService.Get(request.RecipeId, tr);
 
-                CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
-                var message = _localizer["RemovedShareNotification", currentUser.Name, recipe.Name];
+                CultureInfo.CurrentCulture = new CultureInfo(userResult.Data!.Language, false);
+                var message = _localizer["RemovedShareNotification", currentUserResult.Data!.Name, recipe.Name];
 
                 var pushNotification = new ChefPushNotification
                 {
-                    SenderImageUri = currentUser.ImageUri,
-                    UserId = user.Id,
+                    SenderImageUri = currentUserResult.Data.ImageUri,
+                    UserId = userResult.Data.Id,
                     Message = message
                 };
 
@@ -760,13 +778,19 @@ public class RecipesController : BaseController
                 CanSend = false,
             };
 
-            var user = _userService.Get(email);
-            if (user != null)
+            var userResult = _userService.Get(email);
+            if (userResult.Failed)
             {
-                var (canSend, alreadySent) = _recipeService.CheckSendRequest(recipeId, user.Id, UserId, tr);
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
 
-                response.UserId = user.Id;
-                response.ImageUri = user.ImageUri;
+            if (userResult.Data != null)
+            {
+                var (canSend, alreadySent) = _recipeService.CheckSendRequest(recipeId, userResult.Data.Id, UserId, tr);
+
+                response.UserId = userResult.Data.Id;
+                response.ImageUri = userResult.Data.ImageUri;
                 response.CanSend = canSend;
                 response.AlreadySent = alreadySent;
             }
@@ -954,16 +978,27 @@ public class RecipesController : BaseController
 
             int id = await _recipeService.ImportAsync(importModel, _importRecipeValidator, tr, cancellationToken);
 
-            User currentUser = _userService.Get(importModel.UserId);
-            User recipeUser = _userService.Get(recipe.UserId);
+            var currentUserResult = _userService.Get(importModel.UserId);
+            if (currentUserResult.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
 
-            CultureInfo.CurrentCulture = new CultureInfo(recipeUser.Language, false);
-            var message = _localizer["AcceptedSendRequestNotification", currentUser.Name, recipe.Name];
+            var recipeUserResult = _userService.Get(recipe.UserId);
+            if (recipeUserResult.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            CultureInfo.CurrentCulture = new CultureInfo(recipeUserResult.Data!.Language, false);
+            var message = _localizer["AcceptedSendRequestNotification", currentUserResult.Data!.Name, recipe.Name];
 
             var pushNotification = new ChefPushNotification
             {
-                SenderImageUri = currentUser.ImageUri,
-                UserId = recipeUser.Id,
+                SenderImageUri = currentUserResult.Data.ImageUri,
+                UserId = recipeUserResult.Data.Id,
                 Message = message
             };
 

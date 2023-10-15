@@ -1,7 +1,21 @@
-﻿namespace ToDoAssistant.Application.Contracts.Tasks.Models;
+﻿using Core.Application.Contracts;
 
-public class ReorderTaskResult
+namespace ToDoAssistant.Application.Contracts.Tasks.Models;
+
+public class ReorderTaskResult : IResult
 {
+    public ReorderTaskResult()
+    {
+        Failed = true;
+    }
+
+    public ReorderTaskResult(bool success)
+    {
+        Failed = !success;
+    }
+
+    public bool Failed { get; private set; }
+
     public ReorderTaskResult(int listId, bool notifySignalR)
     {
         ListId = listId;

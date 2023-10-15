@@ -17,6 +17,15 @@ public class ShareUserAndPermissionValidator : AbstractValidator<ShareUserAndPer
     {
         RuleFor(dto => dto.UserId)
             .NotEmpty().WithMessage("Unauthorized")
-            .Must(userId => userService.Exists(userId)).WithMessage($"{prefix}.UserDoesNotExist");
+            .Must(userId =>
+            {
+                var existsResult = userService.Exists(userId);
+                if (existsResult.Failed)
+                {
+                    throw new Exception("Failed to perform validation");
+                }
+
+                return existsResult.Data;
+            }).WithMessage($"{prefix}.UserDoesNotExist");
     }
 }

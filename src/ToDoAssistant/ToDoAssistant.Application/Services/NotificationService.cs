@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Core.Application.Contracts;
 using Microsoft.Extensions.Logging;
 using Sentry;
 using ToDoAssistant.Application.Contracts.Notifications;
@@ -23,7 +24,7 @@ public class NotificationService : INotificationService
         _logger = logger;
     }
 
-    public IEnumerable<NotificationDto> GetAllAndFlagUnseen(int userId)
+    public Result<IEnumerable<NotificationDto>> GetAllAndFlagUnseen(int userId)
     {
         try
         {
@@ -31,29 +32,30 @@ public class NotificationService : INotificationService
 
             var result = notifications.Select(x => _mapper.Map<NotificationDto>(x));
 
-            return result;
+            return new (result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(GetAllAndFlagUnseen)}");
-            throw;
+            return new();
         }
     }
 
-    public int GetUnseenNotificationsCount(int userId)
+    public Result<int> GetUnseenNotificationsCount(int userId)
     {
         try
         {
-            return _notificationsRepository.GetUnseenNotificationsCount(userId);
+            var count = _notificationsRepository.GetUnseenNotificationsCount(userId);
+            return new(count);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(GetUnseenNotificationsCount)}");
-            throw;
+            return new();
         }
     }
 
-    public Task<int> CreateOrUpdateAsync(CreateOrUpdateNotification model, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<Result<int>> CreateOrUpdateAsync(CreateOrUpdateNotification model, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(NotificationService)}.{nameof(CreateOrUpdateAsync)}");
 
@@ -63,12 +65,14 @@ public class NotificationService : INotificationService
 
             notification.CreatedDate = notification.ModifiedDate = DateTime.UtcNow;
 
-            return _notificationsRepository.CreateOrUpdateAsync(notification, metric, cancellationToken);
+            var id = await _notificationsRepository.CreateOrUpdateAsync(notification, metric, cancellationToken);
+
+            return new(id);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(CreateOrUpdateAsync)}");
-            throw;
+            return new();
         }
         finally
         {

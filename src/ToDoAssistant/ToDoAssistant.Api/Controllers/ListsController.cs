@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using Api.Common;
 using Core.Application.Contracts;
-using Core.Application.Contracts.Models.Sender;
+using Core.Application.Contracts.Models;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +11,7 @@ using Sentry;
 using ToDoAssistant.Api.Models;
 using ToDoAssistant.Api.Models.Lists.Requests;
 using ToDoAssistant.Api.Models.Lists.Responses;
+using ToDoAssistant.Application.Contracts;
 using ToDoAssistant.Application.Contracts.Lists;
 using ToDoAssistant.Application.Contracts.Lists.Models;
 using ToDoAssistant.Application.Contracts.Notifications;
@@ -49,7 +50,8 @@ public class ListsController : BaseController
         IValidator<CopyList> copyValidator,
         IStringLocalizer<ListsController> localizer,
         IOptions<AppConfiguration> config,
-        ILogger<ListsController> logger) : base(userIdLookup, usersRepository)
+        ILogger<ListsController> logger,
+        IStringLocalizer<BaseController> baseLocalizer) : base(userIdLookup, usersRepository, baseLocalizer)
     {
         _listService = listService;
         _notificationService = notificationService;
@@ -76,14 +78,15 @@ public class ListsController : BaseController
 
         try
         {
-            IEnumerable<ListDto> lists = _listService.GetAll(UserId, tr);
+            var result = _listService.GetAll(UserId, tr);
 
-            return Ok(lists);
-        }
-        catch
-        {
-            tr.Status = SpanStatus.InternalError;
-            return StatusCode(500);
+            if (result.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            return Ok(result.Data);
         }
         finally
         {
@@ -102,14 +105,15 @@ public class ListsController : BaseController
 
         try
         {
-            IEnumerable<ToDoListOption> options = _listService.GetAllAsOptions(UserId, tr);
+            var result = _listService.GetAllAsOptions(UserId, tr);
 
-            return Ok(options);
-        }
-        catch
-        {
-            tr.Status = SpanStatus.InternalError;
-            return StatusCode(500);
+            if (result.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            return Ok(result.Data);
         }
         finally
         {
@@ -128,14 +132,21 @@ public class ListsController : BaseController
 
         try
         {
-            var list = _listService.GetForEdit(id, UserId, tr);
+            var result = _listService.GetForEdit(id, UserId, tr);
 
-            return list is null ? NotFound() : Ok(list);
-        }
-        catch
-        {
-            tr.Status = SpanStatus.InternalError;
-            return StatusCode(500);
+            if (result.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            if (result.Data is null)
+            {
+                tr.Status = SpanStatus.NotFound;
+                return NotFound();
+            }
+
+            return Ok(result.Data);
         }
         finally
         {
@@ -154,9 +165,21 @@ public class ListsController : BaseController
 
         try
         {
-            var list = _listService.GetWithShares(id, UserId, tr);
+            var result = _listService.GetWithShares(id, UserId, tr);
 
-            return list is null ? NotFound() : Ok(list);
+            if (result.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            if (result.Data is null)
+            {
+                tr.Status = SpanStatus.NotFound;
+                return NotFound();
+            }
+
+            return Ok(result.Data);
         }
         finally
         {
@@ -175,9 +198,15 @@ public class ListsController : BaseController
 
         try
         {
-            IEnumerable<Application.Contracts.Lists.Models.ShareListRequest> shareRequests = _listService.GetShareRequests(UserId, tr);
+            var result = _listService.GetShareRequests(UserId, tr);
 
-            return Ok(shareRequests);
+            if (result.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            return Ok(result.Data);
         }
         finally
         {
@@ -188,17 +217,32 @@ public class ListsController : BaseController
     [HttpGet("pending-share-requests-count")]
     public IActionResult GetPendingShareRequestsCount()
     {
-        int pendingShareRequestsCount = _listService.GetPendingShareRequestsCount(UserId);
+        var result = _listService.GetPendingShareRequestsCount(UserId);
 
-        return Ok(pendingShareRequestsCount);
+        if (result.Failed)
+        {
+            return StatusCode(500);
+        }
+
+        return Ok(result.Data);
     }
 
     [HttpGet("{id}/shared")]
     public IActionResult GetIsShared(int id)
     {
-        bool isShared = _listService.IsShared(id, UserId);
+        var result = _listService.IsShared(id, UserId);
 
-        return Ok(isShared);
+        if (result.Failed)
+        {
+            return StatusCode(500);
+        }
+
+        if (result.Data is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(result.Data);
     }
 
     [HttpGet("{id}/members")]
@@ -212,9 +256,21 @@ public class ListsController : BaseController
 
         try
         {
-            var assigneeOptions = _listService.GetMembersAsAssigneeOptions(id, UserId, tr);
+            var result = _listService.GetMembersAsAssigneeOptions(id, UserId, tr);
 
-            return Ok(assigneeOptions);
+            if (result.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            if (result.Data is null)
+            {
+                tr.Status = SpanStatus.NotFound;
+                return NotFound();
+            }
+
+            return Ok(result.Data);
         }
         finally
         {
@@ -225,11 +281,6 @@ public class ListsController : BaseController
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateListRequest request, CancellationToken cancellationToken)
     {
-        if (request is null)
-        {
-            return BadRequest();
-        }
-
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} api/lists",
             $"{nameof(ListsController)}.{nameof(Create)}",
@@ -238,6 +289,12 @@ public class ListsController : BaseController
 
         try
         {
+            if (request is null)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return BadRequest();
+            }
+
             var model = new CreateList
             {
                 UserId = UserId,
@@ -246,9 +303,21 @@ public class ListsController : BaseController
                 IsOneTimeToggleDefault = request.IsOneTimeToggleDefault,
                 TasksText = request.TasksText,
             };
-            int id = await _listService.CreateAsync(model, _createValidator, tr, cancellationToken);
+            var result = await _listService.CreateAsync(model, _createValidator, tr, cancellationToken);
 
-            return StatusCode(201, id);
+            if (result.Status == ResultStatus.Invalid)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return UnprocessableEntityResult(result.ValidationErrors!);
+            }
+
+            if (result.Status == ResultStatus.Error)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            return StatusCode(201, result.Data);
         }
         finally
         {
@@ -259,11 +328,6 @@ public class ListsController : BaseController
     [HttpPut]
     public async Task<IActionResult> Update([FromBody] UpdateListRequest request, CancellationToken cancellationToken)
     {
-        if (request is null)
-        {
-            return BadRequest();
-        }
-
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} api/lists",
             $"{nameof(ListsController)}.{nameof(Update)}",
@@ -272,6 +336,12 @@ public class ListsController : BaseController
 
         try
         {
+            if (request is null)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return BadRequest();
+            }
+
             var model = new UpdateList
             {
                 Id = request.Id,
@@ -281,7 +351,20 @@ public class ListsController : BaseController
                 IsOneTimeToggleDefault = request.IsOneTimeToggleDefault,
                 NotificationsEnabled = request.NotificationsEnabled,
             };
-            UpdateListResult result = await _listService.UpdateAsync(model, _updateValidator, tr, cancellationToken);
+            var result = await _listService.UpdateAsync(model, _updateValidator, tr, cancellationToken);
+
+            if (result.Status == ResultStatus.Invalid)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return UnprocessableEntityResult(result.ValidationErrors!);
+            }
+
+            if (result.Status == ResultStatus.Error)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
             if (!result.Notify())
             {
                 return NoContent();
@@ -301,40 +384,33 @@ public class ListsController : BaseController
                     break;
             }
 
-            foreach (var recipient in result.NotificationRecipients)
+            var message = _localizer[resourceKey, result.ActionUserName, result.OriginalListName];
+
+            var createResult = await CreateAndEnqueueNotificationsAsync(
+                result.NotificationRecipients,
+                result.ActionUserImageUri,
+                request.Id,
+                message,
+                tr,
+                cancellationToken);
+
+            if (createResult.Failed)
             {
-                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-                var message = _localizer[resourceKey, result.ActionUserName, result.OriginalListName];
-
-                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, request.Id, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
-                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
-                {
-                    SenderImageUri = result.ActionUserImageUri,
-                    UserId = recipient.Id,
-                    Message = message,
-                    OpenUrl = GetNotificationsPageUrl(notificationId)
-                };
-
-                _senderService.Enqueue(toDoAssistantPushNotification);
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
             }
+
+            return NoContent();
         }
         finally
         {
             tr.Finish();
         }
-
-        return NoContent();
     }
 
     [HttpPut("shared")]
     public async Task<IActionResult> UpdateShared([FromBody] UpdateSharedListRequest request, CancellationToken cancellationToken)
     {
-        if (request is null)
-        {
-            return BadRequest();
-        }
-
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} api/lists/shared",
             $"{nameof(ListsController)}.{nameof(UpdateShared)}",
@@ -343,6 +419,12 @@ public class ListsController : BaseController
 
         try
         {
+            if (request is null)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return BadRequest();
+            }
+
             var model = new UpdateSharedList
             {
                 Id = request.Id,
@@ -350,13 +432,13 @@ public class ListsController : BaseController
                 NotificationsEnabled = request.NotificationsEnabled
             };
             await _listService.UpdateSharedAsync(model, _updateSharedValidator, tr, cancellationToken);
+
+            return NoContent();
         }
         finally
         {
             tr.Finish();
         }
-
-        return NoContent();
     }
 
     [HttpDelete("{id}")]
@@ -370,32 +452,36 @@ public class ListsController : BaseController
 
         try
         {
-            DeleteListResult result = await _listService.DeleteAsync(id, UserId, tr, cancellationToken);
+            var result = await _listService.DeleteAsync(id, UserId, tr, cancellationToken);
 
-            foreach (var recipient in result.NotificationRecipients)
+            if (result.Failed)
             {
-                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-                var message = _localizer["DeletedListNotification", result.ActionUserName, result.DeletedListName];
-
-                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, null, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
-                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
-                {
-                    SenderImageUri = result.ActionUserImageUri,
-                    UserId = recipient.Id,
-                    Message = message,
-                    OpenUrl = GetNotificationsPageUrl(notificationId)
-                };
-
-                _senderService.Enqueue(toDoAssistantPushNotification);
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
             }
+
+            var message = _localizer["DeletedListNotification", result.ActionUserName, result.DeletedListName];
+
+            var createResult = await CreateAndEnqueueNotificationsAsync(
+                result.NotificationRecipients,
+                result.ActionUserImageUri,
+                null,
+                message,
+                tr,
+                cancellationToken);
+
+            if (createResult.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            return NoContent();
         }
         finally
         {
             tr.Finish();
         }
-
-        return NoContent();
     }
 
     [HttpGet("can-share-with-user/{email}")]
@@ -414,13 +500,27 @@ public class ListsController : BaseController
                 CanShare = false
             };
 
-            var user = _userService.Get(email);
-
-            if (user != null)
+            var userResult = _userService.Get(email);
+            if (userResult.Failed)
             {
-                response.UserId = user.Id;
-                response.ImageUri = user.ImageUri;
-                response.CanShare = _listService.CanShareWithUser(user.Id, UserId);
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            if (userResult.Data != null)
+            {
+                response.UserId = userResult.Data.Id;
+                response.ImageUri = userResult.Data.ImageUri;
+
+                var canShareResult = _listService.CanShareWithUser(userResult.Data.Id, UserId);
+
+                if (canShareResult.Failed)
+                {
+                    tr.Status = SpanStatus.InternalError;
+                    return StatusCode(500);
+                }
+
+                response.CanShare = canShareResult.Data;
             }
 
             return Ok(response);
@@ -434,11 +534,6 @@ public class ListsController : BaseController
     [HttpPut("share")]
     public async Task<IActionResult> Share([FromBody] Models.Lists.Requests.ShareListRequest request, CancellationToken cancellationToken)
     {
-        if (request is null)
-        {
-            return BadRequest();
-        }
-
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} api/lists/share",
             $"{nameof(ListsController)}.{nameof(Share)}",
@@ -447,31 +542,64 @@ public class ListsController : BaseController
 
         try
         {
+            if (request is null)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return BadRequest();
+            }
+
             foreach (Models.Lists.Requests.ShareUserAndPermission removedShare in request.RemovedShares)
             {
-                if (!_listService.CheckIfUserCanBeNotifiedOfChange(request.ListId, removedShare.UserId, tr))
+                var canBeNotifiedResult = _listService.CheckIfUserCanBeNotifiedOfChange(request.ListId, removedShare.UserId, tr);
+
+                if (canBeNotifiedResult.Failed)
+                {
+                    tr.Status = SpanStatus.InternalError;
+                    return StatusCode(500);
+                }
+
+                if (!canBeNotifiedResult.Data)
                 {
                     continue;
                 }
 
                 var currentUser = _userService.Get(UserId);
-                var user = _userService.Get(removedShare.UserId);
-                SimpleList list = _listService.Get(request.ListId);
 
-                CultureInfo.CurrentCulture = new CultureInfo(user.Language, false);
-                var message = _localizer["RemovedShareNotification", currentUser.Name, list.Name];
-
-                var createNotificationDto = new CreateOrUpdateNotification(user.Id, UserId, null, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
-                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+                var currentUserResult = _userService.Get(UserId);
+                if (currentUserResult.Failed)
                 {
-                    SenderImageUri = currentUser.ImageUri,
-                    UserId = user.Id,
-                    Message = message,
-                    OpenUrl = GetNotificationsPageUrl(notificationId)
-                };
+                    return StatusCode(500);
+                }
 
-                _senderService.Enqueue(toDoAssistantPushNotification);
+                var userResult = _userService.Get(removedShare.UserId);
+                if (userResult.Failed)
+                {
+                    return StatusCode(500);
+                }
+
+                var listResult = _listService.Get(request.ListId);
+
+                if (listResult.Failed)
+                {
+                    tr.Status = SpanStatus.InternalError;
+                    return StatusCode(500);
+                }
+
+                var message = _localizer["RemovedShareNotification", currentUserResult.Data!.Name, listResult.Data!.Name];
+
+                var createResult = await CreateAndEnqueueNotificationsAsync(
+                    new List<NotificationRecipient> { new NotificationRecipient(userResult.Data!.Id, userResult.Data.Language) },
+                    currentUserResult.Data.ImageUri,
+                    null,
+                    message,
+                    tr,
+                    cancellationToken);
+
+                if (createResult.Failed)
+                {
+                    tr.Status = SpanStatus.InternalError;
+                    return StatusCode(500);
+                }
             }
 
             var model = new ShareList
@@ -483,13 +611,13 @@ public class ListsController : BaseController
                 RemovedShares = request.RemovedShares.Select(x => new Application.Contracts.Lists.Models.ShareUserAndPermission { UserId = x.UserId, IsAdmin = x.IsAdmin }).ToList()
             };
             await _listService.ShareAsync(model, _shareValidator, tr, cancellationToken);
+
+            return NoContent();
         }
         finally
         {
             tr.Finish();
         }
-
-        return NoContent();
     }
 
     [HttpDelete("{id}/leave")]
@@ -501,44 +629,43 @@ public class ListsController : BaseController
             UserId
         );
 
-        LeaveListResult result = await _listService.LeaveAsync(id, UserId, tr, cancellationToken);
-
         try
         {
-            foreach (var recipient in result.NotificationRecipients)
+            var result = await _listService.LeaveAsync(id, UserId, tr, cancellationToken);
+
+            if (result.Failed)
             {
-                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-                var message = _localizer["LeftListNotification", result.ActionUserName, result.ListName];
-
-                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, id, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
-                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
-                {
-                    SenderImageUri = result.ActionUserImageUri,
-                    UserId = recipient.Id,
-                    Message = message,
-                    OpenUrl = GetNotificationsPageUrl(notificationId)
-                };
-
-                _senderService.Enqueue(toDoAssistantPushNotification);
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
             }
+
+            var message = _localizer["LeftListNotification", result.ActionUserName, result.ListName];
+
+            var createResult = await CreateAndEnqueueNotificationsAsync(
+                result.NotificationRecipients,
+                result.ActionUserImageUri,
+                id,
+                message,
+                tr,
+                cancellationToken);
+
+            if (createResult.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            return NoContent();
         }
         finally
         {
             tr.Finish();
         }
-
-        return NoContent();
     }
 
     [HttpPost("copy")]
     public async Task<IActionResult> Copy([FromBody] CopyListRequest request, CancellationToken cancellationToken)
     {
-        if (request is null)
-        {
-            return BadRequest();
-        }
-
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} api/lists/copy",
             $"{nameof(ListsController)}.{nameof(Copy)}",
@@ -547,6 +674,12 @@ public class ListsController : BaseController
 
         try
         {
+            if (request is null)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return BadRequest();
+            }
+
             var model = new CopyList
             {
                 Id = request.Id,
@@ -554,9 +687,21 @@ public class ListsController : BaseController
                 Name = request.Name,
                 Icon = request.Icon
             };
-            int id = await _listService.CopyAsync(model, _copyValidator, tr, cancellationToken);
+            var result = await _listService.CopyAsync(model, _copyValidator, tr, cancellationToken);
 
-            return StatusCode(201, id);
+            if (result.Status == ResultStatus.Invalid)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return UnprocessableEntityResult(result.ValidationErrors!);
+            }
+
+            if (result.Status == ResultStatus.Error)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            return StatusCode(201, result.Data);
         }
         finally
         {
@@ -567,11 +712,6 @@ public class ListsController : BaseController
     [HttpPut("is-archived")]
     public async Task<IActionResult> SetIsArchived([FromBody] SetIsArchivedRequest request, CancellationToken cancellationToken)
     {
-        if (request is null)
-        {
-            return BadRequest();
-        }
-
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} api/lists/is-archived",
             $"{nameof(ListsController)}.{nameof(SetIsArchived)}",
@@ -580,68 +720,80 @@ public class ListsController : BaseController
 
         try
         {
+            if (request is null)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return BadRequest();
+            }
+
             await _listService.SetIsArchivedAsync(request.ListId, UserId, request.IsArchived, tr, cancellationToken);
+
+            return NoContent();
         }
         finally
         {
             tr.Finish();
         }
-
-        return NoContent();
     }
 
     [HttpPut("uncomplete-all")]
     public async Task<IActionResult> UncompleteAll([FromBody] SetTasksAsNotCompletedRequest request, CancellationToken cancellationToken)
     {
-        if (request is null)
-        {
-            return BadRequest();
-        }
-
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} api/lists/uncomplete-all",
             $"{nameof(ListsController)}.{nameof(UncompleteAll)}",
             UserId
         );
 
-        SetTasksAsNotCompletedResult result = await _listService.UncompleteAllAsync(request.ListId, UserId, tr, cancellationToken);
-
         try
         {
-            foreach (var recipient in result.NotificationRecipients)
+            if (request is null)
             {
-                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-                var message = _localizer["UncompletedAllTasksNotification", result.ActionUserName, result.ListName];
-
-                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, request.ListId, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
-                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
-                {
-                    SenderImageUri = result.ActionUserImageUri,
-                    UserId = recipient.Id,
-                    Message = message,
-                    OpenUrl = GetNotificationsPageUrl(notificationId)
-                };
-
-                _senderService.Enqueue(toDoAssistantPushNotification);
+                tr.Status = SpanStatus.InvalidArgument;
+                return BadRequest();
             }
+
+            var result = await _listService.UncompleteAllAsync(request.ListId, UserId, tr, cancellationToken);
+
+            if (result.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            if (result is null)
+            {
+                tr.Status = SpanStatus.NotFound;
+                return NotFound();
+            }
+
+            var message = _localizer["UncompletedAllTasksNotification", result.ActionUserName, result.ListName];
+
+            var createResult = await CreateAndEnqueueNotificationsAsync(
+                result.NotificationRecipients,
+                result.ActionUserImageUri,
+                request.ListId,
+                message,
+                tr,
+                cancellationToken);
+
+            if (createResult.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            return NoContent();
         }
         finally
         {
             tr.Finish();
         }
-
-        return NoContent();
     }
 
     [HttpPut("share-is-accepted")]
     public async Task<IActionResult> SetShareIsAccepted([FromBody] SetShareIsAcceptedRequest request, CancellationToken cancellationToken)
     {
-        if (request is null)
-        {
-            return BadRequest();
-        }
-
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} api/lists/share-is-accepted",
             $"{nameof(ListsController)}.{nameof(SetShareIsAccepted)}",
@@ -650,37 +802,82 @@ public class ListsController : BaseController
 
         try
         {
-            SetShareIsAcceptedResult result = await _listService.SetShareIsAcceptedAsync(request.ListId, UserId, request.IsAccepted, tr, cancellationToken);
+            if (request is null)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return BadRequest();
+            }
+
+            var result = await _listService.SetShareIsAcceptedAsync(request.ListId, UserId, request.IsAccepted, tr, cancellationToken);
+
+            if (result.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
             if (!result.Notify())
             {
                 return NoContent();
             }
 
             var localizerKey = request.IsAccepted ? "JoinedListNotification" : "DeclinedShareRequestNotification";
-            foreach (var recipient in result.NotificationRecipients)
+
+            var message = _localizer[localizerKey, result.ActionUserName, result.ListName];
+
+            var createResult = await CreateAndEnqueueNotificationsAsync(
+                result.NotificationRecipients,
+                result.ActionUserImageUri,
+                request.ListId,
+                message,
+                tr,
+                cancellationToken);
+
+            if (createResult.Failed)
             {
-                CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
-                var message = _localizer[localizerKey, result.ActionUserName, result.ListName];
-
-                var createNotificationDto = new CreateOrUpdateNotification(recipient.Id, UserId, request.ListId, null, message);
-                var notificationId = await _notificationService.CreateOrUpdateAsync(createNotificationDto, tr, cancellationToken);
-                var toDoAssistantPushNotification = new ToDoAssistantPushNotification
-                {
-                    SenderImageUri = result.ActionUserImageUri,
-                    UserId = recipient.Id,
-                    Message = message,
-                    OpenUrl = GetNotificationsPageUrl(notificationId)
-                };
-
-                _senderService.Enqueue(toDoAssistantPushNotification);
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
             }
+
+            return NoContent();
         }
         finally
         {
             tr.Finish();
         }
+    }
 
-        return NoContent();
+    private async Task<Result> CreateAndEnqueueNotificationsAsync(
+        IReadOnlyCollection<NotificationRecipient> recipients,
+        string actionUserImageUri,
+        int? listId,
+        string message,
+        ITransaction tr,
+        CancellationToken cancellationToken)
+    {
+        foreach (var recipient in recipients)
+        {
+            CultureInfo.CurrentCulture = new CultureInfo(recipient.Language, false);
+            var model = new CreateOrUpdateNotification(recipient.Id, UserId, listId, null, message);
+            var result = await _notificationService.CreateOrUpdateAsync(model, tr, cancellationToken);
+
+            if (result.Failed)
+            {
+                return new();
+            }
+
+            var toDoAssistantPushNotification = new ToDoAssistantPushNotification
+            {
+                SenderImageUri = actionUserImageUri,
+                UserId = recipient.Id,
+                Message = message,
+                OpenUrl = $"{_config.Url}/notifications/{result.Data}"
+            };
+
+            _senderService.Enqueue(toDoAssistantPushNotification);
+        }
+
+        return new(true);
     }
 
     //[HttpPut("reorder")]
@@ -695,9 +892,4 @@ public class ListsController : BaseController
 
     //    return NoContent();
     //}
-
-    private string GetNotificationsPageUrl(int notificationId)
-    {
-        return $"{_config.Url}/notifications/{notificationId}";
-    }
 }

@@ -1,4 +1,5 @@
 ﻿using Application.UnitTests.Builders;
+using Core.Application.Contracts;
 using FluentValidation;
 using Moq;
 using Sentry;
@@ -47,12 +48,14 @@ public class UpdateTests
     }
 
     [Fact]
-    public async Task Validate_Throws_IfInvalidModel()
+    public async Task ReturnsInvalidStatus_IfValidationFails()
     {
         UpdateList model = new ListBuilder().BuildUpdateModel();
         var failedValidator = ValidatorMocker.GetFailed<UpdateList>();
 
-        await Assert.ThrowsAsync<ValidationException>(() => _sut.UpdateAsync(model, failedValidator.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>()));
+        var result = await _sut.UpdateAsync(model, failedValidator.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
+
+        Assert.Equal(result.Status, ResultStatus.Invalid);
     }
 
     [Fact]

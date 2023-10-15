@@ -24,28 +24,46 @@ public class UsersController : BaseController
     [HttpGet]
     public IActionResult Get(string application)
     {
-        UserDto? user = null;
-
         switch (application)
         {
             case "To Do Assistant":
-                user = _userService.Get<ToDoAssistantUser>(UserId);
-                break;
+                var todoUserResult = _userService.Get<ToDoAssistantUser>(UserId);
+                if (todoUserResult.Failed)
+                {
+                    return StatusCode(500);
+                }
+                return Ok(todoUserResult.Data);
             case "Chef":
-                user = _userService.Get<ChefUser>(UserId);
-                break;
+                var chefUserResult = _userService.Get<ChefUser>(UserId);
+                if (chefUserResult.Failed)
+                {
+                    return StatusCode(500);
+                }
+                return Ok(chefUserResult.Data);
             case "Accountant":
-                user = _userService.Get<AccountantUser>(UserId);
-                break;
+                var accountantUserResult = _userService.Get<AccountantUser>(UserId);
+                if (accountantUserResult.Failed)
+                {
+                    return StatusCode(500);
+                }
+                return Ok(accountantUserResult.Data);
             case "Weatherman":
-                user = _userService.Get<WeathermanUser>(UserId);
-                break;
+                var weathermanUserResult = _userService.Get<WeathermanUser>(UserId);
+                if (weathermanUserResult.Failed)
+                {
+                    return StatusCode(500);
+                }
+                return Ok(weathermanUserResult.Data);
             case "Trainer":
-                user = _userService.Get<TrainerUser>(UserId);
-                break;
+                var trainerUserResult = _userService.Get<TrainerUser>(UserId);
+                if (trainerUserResult.Failed)
+                {
+                    return StatusCode(500);
+                }
+                return Ok(trainerUserResult.Data);
+            default:
+                return BadRequest();
         }
-
-        return Ok(user);
     }
 
     [HttpGet("chef-preferences")]
@@ -59,14 +77,14 @@ public class UsersController : BaseController
 
         try
         {
+            var result = _userService.GetChefPreferences(UserId, tr);
+            if (result.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
 
-            ChefPreferences preferences = _userService.GetChefPreferences(UserId, tr);
-            return Ok(preferences);
-        }
-        catch
-        {
-            tr.Status = SpanStatus.InternalError;
-            return StatusCode(500);
+            return Ok(result.Data);
         }
         finally
         {
@@ -77,11 +95,6 @@ public class UsersController : BaseController
     [HttpPut("to-do-notifications-enabled")]
     public async Task<IActionResult> UpdateToDoNotificationsEnabled([FromBody] UpdateUserPreferences dto, CancellationToken cancellationToken)
     {
-        if (dto is null)
-        {
-            return BadRequest();
-        }
-
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} api/users/to-do-notifications-enabled",
             $"{nameof(UsersController)}.{nameof(UpdateToDoNotificationsEnabled)}",
@@ -90,29 +103,30 @@ public class UsersController : BaseController
 
         try
         {
-            await _userService.UpdateToDoNotificationsEnabledAsync(UserId, dto.ToDoNotificationsEnabled, tr, cancellationToken);
-        }
-        catch
-        {
-            tr.Status = SpanStatus.InternalError;
-            return StatusCode(500);
+            if (dto is null)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return BadRequest();
+            }
+
+            var result = await _userService.UpdateToDoNotificationsEnabledAsync(UserId, dto.ToDoNotificationsEnabled, tr, cancellationToken);
+            if (result.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            return NoContent();
         }
         finally
         {
             tr.Finish();
         }
-
-        return NoContent();
     }
 
     [HttpPut("chef-notifications-enabled")]
     public async Task<IActionResult> UpdateChefNotificationsEnabled([FromBody] UpdateUserPreferences dto, CancellationToken cancellationToken)
     {
-        if (dto is null)
-        {
-            return BadRequest();
-        }
-
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} api/users/chef-notifications-enabled",
             $"{nameof(UsersController)}.{nameof(UpdateChefNotificationsEnabled)}",
@@ -121,29 +135,30 @@ public class UsersController : BaseController
 
         try
         {
-            await _userService.UpdateChefNotificationsEnabledAsync(UserId, dto.ChefNotificationsEnabled, tr, cancellationToken);
-        }
-        catch
-        {
-            tr.Status = SpanStatus.InternalError;
-            return StatusCode(500);
+            if (dto is null)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return BadRequest();
+            }
+
+            var result = await _userService.UpdateChefNotificationsEnabledAsync(UserId, dto.ChefNotificationsEnabled, tr, cancellationToken);
+            if (result.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            return NoContent();
         }
         finally
         {
             tr.Finish();
         }
-
-        return NoContent();
     }
 
     [HttpPut("imperial-system")]
     public async Task<IActionResult> UpdateImperialSystem([FromBody] UpdateUserPreferences dto, CancellationToken cancellationToken)
     {
-        if (dto is null)
-        {
-            return BadRequest();
-        }
-
         var tr = Metrics.StartTransactionWithUser(
            $"{Request.Method} api/users/imperial-system",
             $"{nameof(UsersController)}.{nameof(UpdateImperialSystem)}",
@@ -152,18 +167,24 @@ public class UsersController : BaseController
 
         try
         {
-            await _userService.UpdateImperialSystemAsync(UserId, dto.ImperialSystem, tr, cancellationToken);
-        }
-        catch
-        {
-            tr.Status = SpanStatus.InternalError;
-            return StatusCode(500);
+            if (dto is null)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return BadRequest();
+            }
+
+            var result = await _userService.UpdateImperialSystemAsync(UserId, dto.ImperialSystem, tr, cancellationToken);
+            if (result.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            return NoContent();
         }
         finally
         {
             tr.Finish();
         }
-
-        return NoContent();
     }
 }

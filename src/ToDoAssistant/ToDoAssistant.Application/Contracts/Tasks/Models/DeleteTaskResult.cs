@@ -3,27 +3,28 @@ using Core.Application.Contracts.Models;
 
 namespace ToDoAssistant.Application.Contracts.Tasks.Models;
 
-public class DeleteTaskResult : INotificationResult
+public class DeleteTaskResult : INotificationResult, IResult
 {
-    public DeleteTaskResult(bool notifySignalR)
+    public DeleteTaskResult()
     {
-        NotifySignalR = notifySignalR;
+        Failed = true;
     }
 
-    public DeleteTaskResult(int listId, bool notifySignalR)
+    public DeleteTaskResult(bool success)
     {
-        ListId = listId;
-        NotifySignalR = notifySignalR;
+        Failed = !success;
     }
 
-    public int ListId { get; }
-    public bool NotifySignalR { get; }
+    public bool Failed { get; private set; }
 
-    public string TaskName { get; set; } = null!;
-    public string ListName { get; set; } = null!;
-    public string ActionUserName { get; set; } = null!;
-    public string ActionUserImageUri { get; set; } = null!;
-    public List<NotificationRecipient> NotificationRecipients { get; set; } = new();
+    public int ListId { get; init; }
+    public bool NotifySignalR { get; init; }
+
+    public string TaskName { get; init; } = null!;
+    public string ListName { get; init; } = null!;
+    public string ActionUserName { get; init; } = null!;
+    public string ActionUserImageUri { get; init; } = null!;
+    public IReadOnlyCollection<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
 
     public bool Notify()
     {

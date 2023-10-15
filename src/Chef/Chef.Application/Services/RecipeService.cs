@@ -7,6 +7,7 @@ using Chef.Application.Entities;
 using Chef.Utility;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
+using Core.Application.Entities;
 using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
@@ -717,13 +718,18 @@ public class RecipeService : IRecipeService
                 return new UpdateRecipeResult();
             }
 
-            var user = _userService.Get(model.UserId);
+            var userResult = _userService.Get(model.UserId);
+            if (userResult.Failed)
+            {
+                throw new Exception("User retrieval failed");
+            }
+
             var result = new UpdateRecipeResult
             {
                 RecipeName = originalName,
-                ActionUserName = user.Name,
-                ActionUserImageUri = user.ImageUri,
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList()
+                ActionUserName = userResult.Data!.Name,
+                ActionUserImageUri = userResult.Data.ImageUri,
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient(x.Id, x.Language)).ToList()
             };
 
             return result;
@@ -766,13 +772,18 @@ public class RecipeService : IRecipeService
                 return new DeleteRecipeResult();
             }
 
-            var user = _userService.Get(userId);
+            var userResult = _userService.Get(userId);
+            if (userResult.Failed)
+            {
+                throw new Exception("User retrieval failed");
+            }
+
             var result = new DeleteRecipeResult
             {
                 RecipeName = recipeName,
-                ActionUserName = user.Name,
-                ActionUserImageUri = user.ImageUri,
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList()
+                ActionUserName = userResult.Data!.Name,
+                ActionUserImageUri = userResult.Data.ImageUri,
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient(x.Id, x.Language)).ToList()
             };
 
             return result;
@@ -851,13 +862,18 @@ public class RecipeService : IRecipeService
 
             Recipe recipe = _recipesRepository.Get(recipeId, metric);
 
-            var user = _userService.Get(userId);
+            var userResult = _userService.Get(userId);
+            if (userResult.Failed)
+            {
+                throw new Exception("User retrieval failed");
+            }
+
             var result = new SetShareIsAcceptedResult
             {
                 RecipeName = recipe.Name,
-                ActionUserName = user.Name,
-                ActionUserImageUri = user.ImageUri,
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList()
+                ActionUserName = userResult.Data!.Name,
+                ActionUserImageUri = userResult.Data.ImageUri,
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient(x.Id, x.Language)).ToList()
             };
 
             return result;
@@ -894,13 +910,18 @@ public class RecipeService : IRecipeService
 
             Recipe recipe = _recipesRepository.Get(id, metric);
 
-            var user = _userService.Get(userId);
+            var userResult = _userService.Get(userId);
+            if (userResult.Failed)
+            {
+                throw new Exception("User retrieval failed");
+            }
+
             var result = new LeaveRecipeResult
             {
                 RecipeName = recipe.Name,
-                ActionUserName = user.Name,
-                ActionUserImageUri = user.ImageUri,
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList()
+                ActionUserName = userResult.Data!.Name,
+                ActionUserImageUri = userResult.Data.ImageUri,
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient(x.Id, x.Language)).ToList()
             };
 
             return result;
@@ -957,13 +978,18 @@ public class RecipeService : IRecipeService
 
             Recipe recipe = _recipesRepository.Get(model.RecipeId, metric);
 
-            var user = _userService.Get(model.UserId);
+            var userResult = _userService.Get(model.UserId);
+            if (userResult.Failed)
+            {
+                throw new Exception("User retrieval failed");
+            }
+
             var result = new SendRecipeResult
             {
                 RecipeName = recipe.Name,
-                ActionUserName = user.Name,
-                ActionUserImageUri = user.ImageUri,
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList()
+                ActionUserName = userResult.Data!.Name,
+                ActionUserImageUri = userResult.Data.ImageUri,
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient(x.Id, x.Language)).ToList()
             };
 
             return result;
@@ -988,15 +1014,25 @@ public class RecipeService : IRecipeService
             await _recipesRepository.DeclineSendRequestAsync(recipeId, userId, DateTime.UtcNow, metric, cancellationToken);
 
             Recipe recipe = _recipesRepository.Get(recipeId, metric);
-            var userToBeNotified = _userService.Get(recipe.UserId);
 
-            var user = _userService.Get(userId);
+            var userToBeNotifiedResult = _userService.Get(recipe.UserId);
+            if (userToBeNotifiedResult.Failed)
+            {
+                throw new Exception("User retrieval failed");
+            }
+
+            var userResult = _userService.Get(userId);
+            if (userResult.Failed)
+            {
+                throw new Exception("User retrieval failed");
+            }
+
             var result = new DeclineSendRequestResult
             {
                 RecipeName = recipe.Name,
-                ActionUserName = user.Name,
-                ActionUserImageUri = user.ImageUri,
-                NotificationRecipients = new List<NotificationRecipient> { new NotificationRecipient { Id = userToBeNotified.Id, Language = userToBeNotified.Language } }
+                ActionUserName = userResult.Data!.Name,
+                ActionUserImageUri = userResult.Data.ImageUri,
+                NotificationRecipients = new List<NotificationRecipient> { new NotificationRecipient(userToBeNotifiedResult.Data!.Id, userToBeNotifiedResult.Data.Language) }
             };
 
             return result;

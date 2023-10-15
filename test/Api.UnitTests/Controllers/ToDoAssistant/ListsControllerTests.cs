@@ -21,11 +21,14 @@ public class ListsControllerTests
 
     public ListsControllerTests()
     {
+        _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
+        _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
+
         _sut = new ListsController(
             _userIdLookupMock.Object, null,
             _listServiceMock.Object,
             null, null, null, null, null, null, null, null, null,
-            new Mock<IOptions<AppConfiguration>>().Object, null)
+            new Mock<IOptions<AppConfiguration>>().Object, null, null)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };
@@ -34,10 +37,8 @@ public class ListsControllerTests
     [Fact]
     public void Get_Returns404_IfNotFound()
     {
-        _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
-        _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
         _listServiceMock.Setup(x => x.GetForEdit(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()))
-            .Returns((EditListDto?)null);
+            .Returns(new Result<EditListDto?>(null));
 
         var result = _sut.Get(It.IsAny<int>());
 
@@ -47,10 +48,8 @@ public class ListsControllerTests
     [Fact]
     public void GetWithShares_Returns404_IfNotFound()
     {
-        _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
-        _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
         _listServiceMock.Setup(x => x.GetWithShares(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()))
-            .Returns((ListWithShares?)null);
+            .Returns(new Result<ListWithShares?>(null));
 
         var result = _sut.GetWithShares(It.IsAny<int>());
 

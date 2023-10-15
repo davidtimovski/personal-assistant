@@ -1,4 +1,5 @@
 ﻿using Application.UnitTests.Builders;
+using Core.Application.Contracts;
 using FluentValidation;
 using Moq;
 using Sentry;
@@ -9,12 +10,14 @@ using ToDoAssistant.Application.Entities;
 using ToDoAssistant.Application.Mappings;
 using ToDoAssistant.Application.Services;
 using Xunit;
+using User = Core.Application.Entities.User;
 
 namespace Application.UnitTests.ServiceTests.TaskServiceTests;
 
 public class CreateTests
 {
     private readonly Mock<IValidator<CreateTask>> _successfulValidatorMock;
+    private readonly Mock<IListService> _listServiceMock = new();
     private readonly Mock<ITasksRepository> _tasksRepositoryMock = new();
     private readonly Mock<IListsRepository> _listsRepositoryMock = new();
     private readonly Mock<ISpan> _metricsSpanMock = new();
@@ -23,6 +26,9 @@ public class CreateTests
     public CreateTests()
     {
         _successfulValidatorMock = ValidatorMocker.GetSuccessful<CreateTask>();
+
+        _listServiceMock.Setup(x => x.IsShared(It.IsAny<int>(), It.IsAny<int>())).Returns(new Result<bool?>(true));
+        _listServiceMock.Setup(x => x.GetUsersToBeNotifiedOfChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>(), It.IsAny<ISpan>())).Returns(new Result<IEnumerable<User>>(new List<User>()));
 
         _listsRepositoryMock.Setup(x => x.GetWithShares(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>())).Returns(new ToDoList
         {
@@ -33,7 +39,7 @@ public class CreateTests
 
         _sut = new TaskService(
             null,
-            new Mock<IListService>().Object,
+            _listServiceMock.Object,
             _tasksRepositoryMock.Object,
             _listsRepositoryMock.Object,
             MapperMocker.GetMapper<ToDoAssistantProfile>(),
@@ -51,12 +57,14 @@ public class CreateTests
     }
 
     [Fact]
-    public async Task Validate_Throws_IfInvalidModel()
+    public async Task ReturnsInvalidStatus_IfValidationFails()
     {
         CreateTask model = new TaskBuilder().BuildCreateModel();
         var failedValidator = ValidatorMocker.GetFailed<CreateTask>();
 
-        await Assert.ThrowsAsync<ValidationException>(() => _sut.CreateAsync(model, failedValidator.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>()));
+        var result = await _sut.CreateAsync(model, failedValidator.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
+
+        Assert.Equal(result.Status, ResultStatus.Invalid);
     }
 
     [Fact]
@@ -78,6 +86,7 @@ public class CreateTests
     public async Task SetsCreatedDate()
     {
         var actualCreatedDate = new DateTime();
+
         _tasksRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ToDoTask>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
             .Callback<ToDoTask, int, ISpan, CancellationToken>((t, _, _, _) => actualCreatedDate = t.CreatedDate);
 

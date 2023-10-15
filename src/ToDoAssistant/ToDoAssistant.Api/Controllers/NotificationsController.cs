@@ -1,6 +1,7 @@
 ﻿using Core.Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using ToDoAssistant.Application.Contracts.Notifications;
 
 namespace ToDoAssistant.Api.Controllers;
@@ -14,7 +15,8 @@ public class NotificationsController : BaseController
     public NotificationsController(
         IUserIdLookup userIdLookup,
         IUsersRepository usersRepository,
-        INotificationService notificationService) : base(userIdLookup, usersRepository)
+        INotificationService notificationService,
+        IStringLocalizer<BaseController> baseLocalizer) : base(userIdLookup, usersRepository, baseLocalizer)
     {
         _notificationService = notificationService;
     }
@@ -22,16 +24,26 @@ public class NotificationsController : BaseController
     [HttpGet]
     public IActionResult GetAll()
     {
-        var notificationDtos = _notificationService.GetAllAndFlagUnseen(UserId);
+        var result = _notificationService.GetAllAndFlagUnseen(UserId);
 
-        return Ok(notificationDtos);
+        if (result.Failed)
+        {
+            return StatusCode(500);
+        }
+
+        return Ok(result.Data);
     }
 
     [HttpGet("unseen-notifications-count")]
     public IActionResult GetUnseenNotificationsCount()
     {
-        int unseenNotificationsCount = _notificationService.GetUnseenNotificationsCount(UserId);
+        var result = _notificationService.GetUnseenNotificationsCount(UserId);
 
-        return Ok(unseenNotificationsCount);
+        if (result.Failed)
+        {
+            return StatusCode(500);
+        }
+
+        return Ok(result.Data);
     }
 }

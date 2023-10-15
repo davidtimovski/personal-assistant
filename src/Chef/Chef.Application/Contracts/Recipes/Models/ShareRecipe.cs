@@ -23,7 +23,13 @@ public class ShareRecipeValidator : AbstractValidator<ShareRecipe>
         {
             foreach (var userId in newShares)
             {
-                if (!userService.Exists(userId))
+                var existsResult = userService.Exists(userId);
+                if (existsResult.Failed)
+                {
+                    throw new Exception("Failed to perform validation");
+                }
+
+                if (!existsResult.Data)
                 {
                     return false;
                 }
@@ -34,7 +40,13 @@ public class ShareRecipeValidator : AbstractValidator<ShareRecipe>
         {
             foreach (var userId in removedShares)
             {
-                if (!userService.Exists(userId))
+                var existsResult = userService.Exists(userId);
+                if (existsResult.Failed)
+                {
+                    throw new Exception("Failed to perform validation");
+                }
+
+                if (!existsResult.Data)
                 {
                     return false;
                 }

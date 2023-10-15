@@ -37,9 +37,9 @@ public class NotificationTests
         _listsRepositoryMock.Setup(x => x.GetUsersToBeNotifiedOfChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()))
             .Returns(new List<User> { new() });
 
-        IEnumerable<User> result = _sut.GetUsersToBeNotifiedOfChange(It.IsAny<int>(), It.IsAny<int>(), isPrivate, _metricsSpanMock.Object);
+        var result = _sut.GetUsersToBeNotifiedOfChange(It.IsAny<int>(), It.IsAny<int>(), isPrivate, _metricsSpanMock.Object);
 
-        Assert.Empty(result);
+        Assert.Empty(result.Data!);
     }
 
     [Fact]
@@ -52,8 +52,8 @@ public class NotificationTests
         _listsRepositoryMock.Setup(x => x.GetUsersToBeNotifiedOfChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()))
             .Returns(new List<User> { new() });
 
-        IEnumerable<User> result = _sut.GetUsersToBeNotifiedOfChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), _metricsSpanMock.Object);
+        var result = _sut.GetUsersToBeNotifiedOfChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), _metricsSpanMock.Object);
 
-        Assert.Empty(result);
+        Assert.Empty(result.Data!);
     }
 }

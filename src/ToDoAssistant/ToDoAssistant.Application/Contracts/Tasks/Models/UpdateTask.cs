@@ -22,15 +22,35 @@ public class UpdateTaskValidator : AbstractValidator<UpdateTask>
     {
         RuleFor(dto => dto.UserId)
             .NotEmpty().WithMessage("Unauthorized")
-            .Must((dto, userId) => !taskService.Exists(dto.Id, dto.Name, dto.ListId, userId)).WithMessage("AlreadyExists");
+            .Must((dto, userId) =>
+            {
+                var existsResult = taskService.Exists(dto.Id, dto.Name, dto.ListId, userId);
+                if (existsResult.Failed)
+                {
+                    throw new Exception("Failed to perform validation");
+                }
+
+                return !existsResult.Data;
+            }).WithMessage("AlreadyExists");
 
         RuleFor(dto => dto.ListId)
             .Must((dto, listId) =>
             {
-                SimpleTask originalTask = taskService.Get(dto.Id);
-                bool listChanged = listId != originalTask.ListId;
+                var taskResult = taskService.Get(dto.Id);
+                if (taskResult.Failed || taskResult.Data is null)
+                {
+                    throw new Exception("Failed to perform validation");
+                }
 
-                if (listChanged && taskService.Count(dto.ListId) == 250)
+                bool listChanged = listId != taskResult.Data.ListId;
+
+                var countResult = taskService.Count(dto.ListId);
+                if (countResult.Failed)
+                {
+                    throw new Exception("Failed to perform validation");
+                }
+
+                if (listChanged && countResult.Data == 250)
                 {
                     return false;
                 }
@@ -41,12 +61,18 @@ public class UpdateTaskValidator : AbstractValidator<UpdateTask>
         RuleFor(dto => dto.AssignedToUserId)
             .Must((dto, assignedToUserId) =>
             {
-                if (assignedToUserId.HasValue && !listService.UserOwnsOrSharesAsPending(dto.ListId, assignedToUserId.Value))
+                if (assignedToUserId is null)
                 {
-                    return false;
+                    return true;
                 }
 
-                return true;
+                var ownsOrSharesAsPendingResult = listService.UserOwnsOrSharesAsPending(dto.ListId, assignedToUserId.Value);
+                if (ownsOrSharesAsPendingResult.Failed)
+                {
+                    throw new Exception("Failed to perform validation");
+                }
+
+                return !ownsOrSharesAsPendingResult.Data;
             }).WithMessage("Tasks.UpdateTask.TheAssignedUserIsNotAMember");
 
         RuleFor(dto => dto.Name)

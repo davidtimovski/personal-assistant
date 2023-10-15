@@ -1,4 +1,5 @@
 ﻿using Application.UnitTests.Builders;
+using Core.Application.Contracts;
 using FluentValidation;
 using Moq;
 using Sentry;
@@ -9,12 +10,14 @@ using ToDoAssistant.Application.Entities;
 using ToDoAssistant.Application.Mappings;
 using ToDoAssistant.Application.Services;
 using Xunit;
+using User = Core.Application.Entities.User;
 
 namespace Application.UnitTests.ServiceTests.TaskServiceTests;
 
 public class UpdateTests
 {
     private readonly Mock<IValidator<UpdateTask>> _successfulValidatorMock;
+    private readonly Mock<IListService> _listServiceMock = new();
     private readonly Mock<ITasksRepository> _tasksRepositoryMock = new();
     private readonly Mock<IListsRepository> _listsRepositoryMock = new();
     private readonly Mock<ISpan> _metricsSpanMock = new();
@@ -23,6 +26,9 @@ public class UpdateTests
     public UpdateTests()
     {
         _successfulValidatorMock = ValidatorMocker.GetSuccessful<UpdateTask>();
+
+        _listServiceMock.Setup(x => x.IsShared(It.IsAny<int>(), It.IsAny<int>())).Returns(new Result<bool?>(true));
+        _listServiceMock.Setup(x => x.GetUsersToBeNotifiedOfChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>())).Returns(new Result<IEnumerable<User>>(new List<User>()));
 
         _tasksRepositoryMock.Setup(x => x.Get(It.IsAny<int>())).Returns(new ToDoTask());
         _listsRepositoryMock.Setup(x => x.GetWithShares(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>())).Returns(new ToDoList
@@ -34,7 +40,7 @@ public class UpdateTests
 
         _sut = new TaskService(
             null,
-            new Mock<IListService>().Object,
+            _listServiceMock.Object,
             _tasksRepositoryMock.Object,
             _listsRepositoryMock.Object,
             MapperMocker.GetMapper<ToDoAssistantProfile>(),
@@ -52,12 +58,14 @@ public class UpdateTests
     }
 
     [Fact]
-    public async Task Validate_Throws_IfInvalidModel()
+    public async Task ReturnsInvalidStatus_IfValidationFails()
     {
         UpdateTask model = new TaskBuilder().BuildUpdateModel();
         var failedValidator = ValidatorMocker.GetFailed<UpdateTask>();
 
-        await Assert.ThrowsAsync<ValidationException>(() => _sut.UpdateAsync(model, failedValidator.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>()));
+        var result = await _sut.UpdateAsync(model, failedValidator.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
+
+        Assert.Equal(result.Status, ResultStatus.Invalid);
     }
 
     [Fact]

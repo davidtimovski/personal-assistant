@@ -18,7 +18,16 @@ public class ShareListValidator : AbstractValidator<ShareList>
     {
         RuleFor(dto => dto.UserId)
             .NotEmpty().WithMessage("Unauthorized")
-            .Must((dto, userId) => listService.UserOwnsOrSharesAsAdmin(dto.ListId, userId)).WithMessage("Unauthorized");
+            .Must((dto, userId) =>
+            {
+                var ownsOrSharesResult = listService.UserOwnsOrSharesAsAdmin(dto.ListId, userId);
+                if (ownsOrSharesResult.Failed)
+                {
+                    throw new Exception("Failed to perform validation");
+                }
+
+                return ownsOrSharesResult.Data;
+            }).WithMessage("Unauthorized");
 
         RuleForEach(dto => dto.NewShares).SetValidator(new ShareUserAndPermissionValidator(userService));
         RuleForEach(dto => dto.EditedShares).SetValidator(new ShareUserAndPermissionValidator(userService));

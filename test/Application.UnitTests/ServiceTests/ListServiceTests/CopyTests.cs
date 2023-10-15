@@ -1,4 +1,5 @@
 ﻿using Application.UnitTests.Builders;
+using Core.Application.Contracts;
 using FluentValidation;
 using Moq;
 using Sentry;
@@ -44,12 +45,14 @@ public class CopyTests
     }
 
     [Fact]
-    public async Task Validate_Throws_IfInvalidModel()
+    public async Task ReturnsInvalidStatus_IfValidationFails()
     {
         CopyList model = new ListBuilder().BuildCopyModel();
         var failedValidator = ValidatorMocker.GetFailed<CopyList>();
 
-        await Assert.ThrowsAsync<ValidationException>(() => _sut.CopyAsync(model, failedValidator.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>()));
+        var result = await _sut.CopyAsync(model, failedValidator.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
+
+        Assert.Equal(result.Status, ResultStatus.Invalid);
     }
 
     [Fact]

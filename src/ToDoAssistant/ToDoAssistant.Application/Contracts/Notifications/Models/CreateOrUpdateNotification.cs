@@ -11,9 +11,9 @@ public class CreateOrUpdateNotification
         Message = message;
     }
 
-    public int UserId { get; set; }
-    public int ActionUserId { get; set; }
-    public int? ListId { get; set; }
-    public int? TaskId { get; set; }
-    public string Message { get; set; }
+    public int UserId { get; private set; }
+    public int ActionUserId { get; private set; }
+    public int? ListId { get; private set; }
+    public int? TaskId { get; private set; }
+    public string Message { get; private set; }
 }
