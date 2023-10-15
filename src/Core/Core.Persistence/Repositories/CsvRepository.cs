@@ -15,9 +15,11 @@ public class CsvRepository : BaseRepository, ICsvRepository
     {
         var metric = metricsSpan.StartChild($"{nameof(CsvRepository)}.{nameof(GetAllTransactionsForExport)}");
 
-        using IDbConnection conn = OpenConnection();
+        try
+        {
+            using IDbConnection conn = OpenConnection();
 
-        const string query = @"SELECT t.*, fa.id, fa.name, ta.id, ta.name, c.id, c.name, pc.id, pc.name
+            const string query = @"SELECT t.*, fa.id, fa.name, ta.id, ta.name, c.id, c.name, pc.id, pc.name
                         FROM accountant.transactions AS t
                         LEFT JOIN accountant.accounts AS fa ON t.from_account_id = fa.id
                         LEFT JOIN accountant.accounts AS ta ON t.to_account_id = ta.id
@@ -25,31 +27,34 @@ public class CsvRepository : BaseRepository, ICsvRepository
                         LEFT JOIN accountant.categories AS pc ON c.parent_id = pc.id
                         WHERE fa.user_id = @UserId OR ta.user_id = @UserId ORDER BY date";
 
-        var transactions = conn.Query<TransactionForExport, AccountForExport, AccountForExport, CategoryForExport, CategoryForExport, TransactionForExport>(query,
-            (transaction, fromAccount, toAccount, category, parentCategory) =>
-            {
-                transaction.FromAccount = fromAccount ?? new AccountForExport();
-                transaction.ToAccount = toAccount ?? new AccountForExport();
+            var transactions = conn.Query<TransactionForExport, AccountForExport, AccountForExport, CategoryForExport, CategoryForExport, TransactionForExport>(query,
+                (transaction, fromAccount, toAccount, category, parentCategory) =>
+                {
+                    transaction.FromAccount = fromAccount ?? new AccountForExport();
+                    transaction.ToAccount = toAccount ?? new AccountForExport();
 
-                if (category is null)
-                {
-                    transaction.Category = new CategoryForExport { Name = uncategorized };
-                }
-                else
-                {
-                    if (parentCategory != null)
+                    if (category is null)
                     {
-                        category.Name = $"{parentCategory.Name}/{category.Name}";
+                        transaction.Category = new CategoryForExport { Name = uncategorized };
+                    }
+                    else
+                    {
+                        if (parentCategory != null)
+                        {
+                            category.Name = $"{parentCategory.Name}/{category.Name}";
+                        }
+
+                        transaction.Category = category;
                     }
 
-                    transaction.Category = category;
-                }
+                    return transaction;
+                }, new { UserId = userId }).ToList();
 
-                return transaction;
-            }, new { UserId = userId }).ToList();
-
-        metric.Finish();
-
-        return transactions;
+            return transactions;
+        }
+        finally
+        {
+            metric.Finish();
+        }
     }
 }

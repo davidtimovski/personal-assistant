@@ -1,5 +1,7 @@
 ﻿using Core.Application.Contracts;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace ToDoAssistant.Api.Controllers;
 
@@ -7,11 +9,16 @@ public abstract class BaseController : Controller
 {
     private readonly IUserIdLookup _userIdLookup;
     private readonly IUsersRepository _usersRepository;
+    private readonly IStringLocalizer<BaseController> _localizer;
 
-    public BaseController(IUserIdLookup userIdLookup, IUsersRepository usersRepository)
+    public BaseController(
+        IUserIdLookup userIdLookup,
+        IUsersRepository usersRepository,
+        IStringLocalizer<BaseController> localizer)
     {
         _userIdLookup = userIdLookup;
         _usersRepository = usersRepository;
+        _localizer = localizer;
     }
 
     private int? userId;
@@ -59,5 +66,24 @@ public abstract class BaseController : Controller
 
             return User.Identity.Name;
         }
+    }
+
+    protected IActionResult UnprocessableEntityResult(IReadOnlyCollection<ValidationFailure> validationErrors)
+    {
+        var result = new Dictionary<string, List<string>>();
+
+        foreach (ValidationFailure error in validationErrors)
+        {
+            if (result.ContainsKey(error.PropertyName))
+            {
+                result[error.PropertyName].Add(_localizer[error.ErrorMessage]);
+            }
+            else
+            {
+                result.Add(error.PropertyName, new List<string> { _localizer[error.ErrorMessage] });
+            }
+        }
+
+        return new UnprocessableEntityObjectResult(result);
     }
 }

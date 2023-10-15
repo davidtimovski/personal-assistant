@@ -18,8 +18,26 @@ public class CreateListValidator : AbstractValidator<CreateList>
     {
         RuleFor(dto => dto.UserId)
             .NotEmpty().WithMessage("Unauthorized")
-            .Must((dto, userId) => !listService.Exists(dto.Name, userId)).WithMessage("AlreadyExists")
-            .Must((dto, userId) => listService.Count(userId) < 50).WithMessage("Lists.ListLimitReached");
+            .Must((dto, userId) =>
+            {
+                var existsResult = listService.Exists(dto.Name, userId);
+                if (existsResult.Failed)
+                {
+                    throw new Exception("Failed to perform validation");
+                }
+
+                return !existsResult.Data;
+            }).WithMessage("AlreadyExists")
+            .Must(userId =>
+            {
+                var countResult = listService.Count(userId);
+                if (countResult.Failed)
+                {
+                    throw new Exception("Failed to perform validation");
+                }
+
+                return countResult.Data < 50;
+            }).WithMessage("Lists.ListLimitReached");
 
         RuleFor(dto => dto.Name)
             .NotEmpty().WithMessage("Lists.ModifyList.NameIsRequired")

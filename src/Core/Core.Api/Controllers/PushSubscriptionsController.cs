@@ -24,11 +24,6 @@ public class PushSubscriptionsController : BaseController
     [HttpPost]
     public async Task<IActionResult> CreateSubscription([FromBody] PushNotificationsSubscriptionRequest request, CancellationToken cancellationToken)
     {
-        if (request is null)
-        {
-            return BadRequest();
-        }
-
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} api/pushsubscriptions",
             $"{nameof(PushSubscriptionsController)}.{nameof(CreateSubscription)}",
@@ -37,24 +32,31 @@ public class PushSubscriptionsController : BaseController
 
         try
         {
-            await _pushSubscriptionService.CreateSubscriptionAsync(UserId,
+            if (request is null)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return BadRequest();
+            }
+
+            var result = await _pushSubscriptionService.CreateSubscriptionAsync(UserId,
                 request.Application,
                 request.Subscription.Endpoint,
                 request.Subscription.Keys["auth"],
                 request.Subscription.Keys["p256dh"],
                 tr,
                 cancellationToken);
-        }
-        catch
-        {
-            tr.Status = SpanStatus.InternalError;
-            return StatusCode(500);
+
+            if (result.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            return StatusCode(201);
         }
         finally
         {
             tr.Finish();
         }
-
-        return StatusCode(201);
     }
 }

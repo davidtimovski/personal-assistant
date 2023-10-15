@@ -19,9 +19,36 @@ public class UpdateListValidator : AbstractValidator<UpdateList>
     {
         RuleFor(dto => dto.UserId)
             .NotEmpty().WithMessage("Unauthorized")
-            .Must((dto, userId) => listService.UserOwnsOrSharesAsAdmin(dto.Id, userId)).WithMessage("Unauthorized")
-            .Must((dto, userId) => !listService.UserOwnsOrSharesAsAdmin(dto.Id, dto.Name, userId)).WithMessage("AlreadyExists")
-            .Must((dto, userId) => !listService.Exists(dto.Id, dto.Name, userId)).WithMessage("AlreadyExists");
+            .Must((dto, userId) =>
+            {
+                var ownsOrSharesAsAdminResult = listService.UserOwnsOrSharesAsAdmin(dto.Id, userId);
+                if (ownsOrSharesAsAdminResult.Failed)
+                {
+                    throw new Exception("Failed to perform validation");
+                }
+
+                return ownsOrSharesAsAdminResult.Data;
+            }).WithMessage("Unauthorized")
+            .Must((dto, userId) =>
+            {
+                var ownsOrSharesAsAdminResult = listService.UserOwnsOrSharesAsAdmin(dto.Id, dto.Name, userId);
+                if (ownsOrSharesAsAdminResult.Failed)
+                {
+                    throw new Exception("Failed to perform validation");
+                }
+
+                return !ownsOrSharesAsAdminResult.Data;
+            }).WithMessage("AlreadyExists")
+            .Must((dto, userId) =>
+            {
+                var existsResult = listService.Exists(dto.Id, dto.Name, userId);
+                if (existsResult.Failed)
+                {
+                    throw new Exception("Failed to perform validation");
+                }
+
+                return !existsResult.Data;
+            }).WithMessage("AlreadyExists");
 
         RuleFor(dto => dto.Name)
             .NotEmpty().WithMessage("Lists.ModifyList.NameIsRequired")

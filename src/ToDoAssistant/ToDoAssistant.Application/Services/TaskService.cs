@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
-using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Sentry;
@@ -37,7 +36,7 @@ public class TaskService : ITaskService
         _logger = logger;
     }
 
-    public SimpleTask Get(int id)
+    public Result<SimpleTask> Get(int id)
     {
         try
         {
@@ -45,16 +44,16 @@ public class TaskService : ITaskService
 
             var result = _mapper.Map<SimpleTask>(task);
 
-            return result;
+            return new(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(Get)}");
-            throw;
+            return new();
         }
     }
 
-    public TaskDto? Get(int id, int userId)
+    public Result<TaskDto?> Get(int id, int userId)
     {
         try
         {
@@ -62,119 +61,145 @@ public class TaskService : ITaskService
 
             var result = _mapper.Map<TaskDto>(task);
 
-            return result;
+            return new(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(Get)}");
-            throw;
+            return new();
         }
     }
 
-    public TaskForUpdate? GetForUpdate(int id, int userId)
+    public Result<TaskForUpdate?> GetForUpdate(int id, int userId)
     {
         try
         {
             ToDoTask task = _tasksRepository.GetForUpdate(id, userId);
             if (task is null)
             {
-                return null;
+                return new(null);
             }
 
             var result = _mapper.Map<TaskForUpdate>(task, opts => opts.Items["UserId"] = userId);
 
-            result.IsInSharedList = _listService.IsShared(task.ListId, userId);
+            var isSharedResult = _listService.IsShared(task.ListId, userId);
+            if (isSharedResult.Failed)
+            {
+                return new();
+            }
+
+            if (isSharedResult.Data is null)
+            {
+                return new(null);
+            }
+
+            result.IsInSharedList = isSharedResult.Data.Value;
             result.Recipes = _tasksRepository.GetRecipes(id, userId);
 
-            return result;
+            return new(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(GetForUpdate)}");
-            throw;
+            return new();
         }
     }
 
-    public bool Exists(int id, int userId)
+    public Result<bool> Exists(int id, int userId)
     {
         try
         {
-            return _tasksRepository.Exists(id, userId);
+            var result = _tasksRepository.Exists(id, userId);
+            return new(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(Exists)}");
-            throw;
+            return new();
         }
     }
 
-    public bool Exists(string name, int listId, int userId)
+    public Result<bool> Exists(string name, int listId, int userId)
     {
         try
         {
-            return _tasksRepository.Exists(name.Trim(), listId, userId);
+            var result = _tasksRepository.Exists(name.Trim(), listId, userId);
+            return new(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(Exists)}");
-            throw;
+            return new();
         }
     }
 
-    public bool Exists(IEnumerable<string> names, int listId, int userId)
+    public Result<bool> Exists(IEnumerable<string> names, int listId, int userId)
     {
         try
         {
             var upperCaseNames = names.Select(name => name.Trim().ToUpperInvariant()).ToList();
-            return _tasksRepository.Exists(upperCaseNames, listId, userId);
+            var result = _tasksRepository.Exists(upperCaseNames, listId, userId);
+            return new(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(Exists)}");
-            throw;
+            return new();
         }
     }
 
-    public bool Exists(int id, string name, int listId, int userId)
+    public Result<bool> Exists(int id, string name, int listId, int userId)
     {
         try
         {
-            return _tasksRepository.Exists(id, name.Trim(), listId, userId);
+            var result = _tasksRepository.Exists(id, name.Trim(), listId, userId);
+            return new(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(Exists)}");
-            throw;
+            return new();
         }
     }
 
-    public int Count(int listId)
+    public Result<int> Count(int listId)
     {
         try
         {
-            return _tasksRepository.Count(listId);
+            var count = _tasksRepository.Count(listId);
+            return new(count);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(Count)}");
-            throw;
+            return new();
         }
     }
 
     public async Task<CreatedTaskResult> CreateAsync(CreateTask model, IValidator<CreateTask> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
-        ValidationUtil.ValidOrThrow(model, validator);
-
         var metric = metricsSpan.StartChild($"{nameof(TaskService)}.{nameof(CreateAsync)}");
 
         try
         {
+            var validationResult = validator.Validate(model);
+            if (!validationResult.IsValid)
+            {
+                return new(validationResult.Errors);
+            }
+
             var task = _mapper.Map<ToDoTask>(model);
 
             task.Name = task.Name.Trim();
             task.Url = string.IsNullOrEmpty(task.Url) ? null : task.Url.Trim();
 
-            if (!_listService.IsShared(task.ListId, model.UserId))
+            var isSharedResult = _listService.IsShared(task.ListId, model.UserId);
+            if (isSharedResult.Failed || isSharedResult.Data is null)
+            {
+                return new(ResultStatus.Error);
+            }
+
+            if (!isSharedResult.Data.Value)
             {
                 task.PrivateToUserId = null;
                 task.AssignedToUserId = null;
@@ -188,32 +213,46 @@ public class TaskService : ITaskService
             ToDoList? list = _listsRepository.GetWithShares(model.ListId, model.UserId, metric);
             if (list is null)
             {
-                throw new InvalidOperationException("Cannot create task in non-existing list");
+                return new(ResultStatus.Error);
             }
 
             var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
-            var result = new CreatedTaskResult(id, task.ListId, notifySignalR);
 
-            var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(model.ListId, model.UserId, model.IsPrivate == true, metric).ToList();
-            if (!usersToBeNotified.Any())
+            var usersToBeNotifiedResult = _listService.GetUsersToBeNotifiedOfChange(model.ListId, model.UserId, model.IsPrivate == true, metric);
+            if (usersToBeNotifiedResult.Failed)
             {
-                return result;
+                return new CreatedTaskResult(ResultStatus.Successful) { TaskId = id, ListId = task.ListId, NotifySignalR = notifySignalR };
             }
 
-            var user = _userService.Get(model.UserId);
+            if (!usersToBeNotifiedResult.Data!.Any())
+            {
+                return new(ResultStatus.Successful);
+            }
 
-            result.TaskName = task.Name;
-            result.ListName = list.Name;
-            result.ActionUserName = user.Name;
-            result.ActionUserImageUri = user.ImageUri;
-            result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList();
+            var userResult = _userService.Get(model.UserId);
+            if (userResult.Failed)
+            {
+                throw new Exception("User retrieval failed");
+            }
+
+            var result = new CreatedTaskResult(ResultStatus.Successful)
+            {
+                TaskId = id,
+                ListId = task.ListId, 
+                NotifySignalR = notifySignalR,
+                TaskName = task.Name,
+                ListName = list.Name,
+                ActionUserName = userResult.Data!.Name,
+                ActionUserImageUri = userResult.Data.ImageUri,
+                NotificationRecipients = usersToBeNotifiedResult.Data!.Select(x => new NotificationRecipient(x.Id, x.Language)).ToList()
+            };
 
             return result;
         }
-        catch (Exception ex) when (ex is not ValidationException)
+        catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(CreateAsync)}");
-            throw;
+            return new(ResultStatus.Error);
         }
         finally
         {
@@ -223,13 +262,17 @@ public class TaskService : ITaskService
 
     public async Task<BulkCreateResult> BulkCreateAsync(BulkCreate model, IValidator<BulkCreate> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
-        ValidationUtil.ValidOrThrow(model, validator);
-
         var metric = metricsSpan.StartChild($"{nameof(TaskService)}.{nameof(BulkCreateAsync)}");
 
         try
         {
             var now = DateTime.UtcNow;
+
+            var validationResult = validator.Validate(model);
+            if (!validationResult.IsValid)
+            {
+                return new(validationResult.Errors);
+            }
 
             var tasks = model.TasksText.Split("\n")
                 .Where(task => !string.IsNullOrWhiteSpace(task))
@@ -250,37 +293,48 @@ public class TaskService : ITaskService
             ToDoList? list = _listsRepository.GetWithShares(model.ListId, model.UserId, metric);
             if (list is null)
             {
-                throw new InvalidOperationException("Cannot create tasks in non-existing list");
+                return new(ResultStatus.Error);
             }
 
-            var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(model.ListId, model.UserId, model.TasksArePrivate, metric).ToList();
+            var usersToBeNotifiedResult = _listService.GetUsersToBeNotifiedOfChange(model.ListId, model.UserId, model.TasksArePrivate, metric);
+            if (usersToBeNotifiedResult.Failed)
+            {
+                return new(ResultStatus.Error);
+            }
 
             var notifySignalR = !tasks[0].PrivateToUserId.HasValue && list.IsShared;
-            var result = new BulkCreateResult(list.Id, notifySignalR);
-
-            if (!usersToBeNotified.Any())
+            if (!usersToBeNotifiedResult.Data!.Any())
             {
-                return result;
+                return new BulkCreateResult(ResultStatus.Successful) { ListId = list.Id, NotifySignalR = notifySignalR };
             }
 
-            var user = _userService.Get(model.UserId);
-
-            result.ListName = list.Name;
-            result.CreatedTasks.AddRange(createdTasks.Select(x => new BulkCreatedTask
+            var userResult = _userService.Get(model.UserId);
+            if (userResult.Failed)
             {
-                Id = x.Id,
-                Name = x.Name
-            }));
-            result.ActionUserName = user.Name;
-            result.ActionUserImageUri = user.ImageUri;
-            result.NotificationRecipients.AddRange(usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }));
+                throw new Exception("User retrieval failed");
+            }
+
+            var result = new BulkCreateResult(ResultStatus.Successful) 
+            { 
+                ListId = list.Id, 
+                NotifySignalR = notifySignalR,
+                ListName = list.Name,
+                CreatedTasks = createdTasks.Select(x => new BulkCreatedTask
+                {
+                    Id = x.Id,
+                    Name = x.Name
+                }).ToList(),
+                ActionUserName = userResult.Data!.Name,
+                ActionUserImageUri = userResult.Data.ImageUri,
+                NotificationRecipients = usersToBeNotifiedResult.Data!.Select(x => new NotificationRecipient(x.Id, x.Language)).ToList()
+            };
 
             return result;
         }
-        catch (Exception ex) when (ex is not ValidationException)
+        catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(BulkCreateAsync)}");
-            throw;
+            return new(ResultStatus.Error);
         }
         finally
         {
@@ -290,12 +344,16 @@ public class TaskService : ITaskService
 
     public async Task<UpdateTaskResult> UpdateAsync(UpdateTask model, IValidator<UpdateTask> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
-        ValidationUtil.ValidOrThrow(model, validator);
-
         var metric = metricsSpan.StartChild($"{nameof(TaskService)}.{nameof(UpdateAsync)}");
 
         try
         {
+            var validationResult = validator.Validate(model);
+            if (!validationResult.IsValid)
+            {
+                return new(validationResult.Errors);
+            }
+
             var task = _mapper.Map<ToDoTask>(model);
 
             task.Name = task.Name.Trim();
@@ -306,7 +364,13 @@ public class TaskService : ITaskService
                 task.AssignedToUserId = null;
             }
 
-            if (!_listService.IsShared(task.ListId, model.UserId))
+            var isSharedResult = _listService.IsShared(task.ListId, model.UserId);
+            if (isSharedResult.Failed || isSharedResult.Data is null)
+            {
+                return new(ResultStatus.Error);
+            }
+
+            if (!isSharedResult.Data.Value)
             {
                 task.PrivateToUserId = null;
                 task.AssignedToUserId = null;
@@ -320,16 +384,21 @@ public class TaskService : ITaskService
             ToDoList? list = _listsRepository.GetWithShares(model.ListId, model.UserId, metric);
             if (list is null)
             {
-                throw new InvalidOperationException("Cannot update task in non-existing list");
+                return new(ResultStatus.Error);
             }
 
             var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
-            var result = new UpdateTaskResult(originalTask.Name, list.Id, list.Name, notifySignalR);
+            var result = new UpdateTaskResult(ResultStatus.Successful) { OriginalTaskName = originalTask.Name, ListId = list.Id, ListName = list.Name, NotifySignalR = notifySignalR };
 
             if (model.ListId == originalTask.ListId)
             {
-                var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(model.ListId, model.UserId, model.Id, metric);
-                result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList();
+                var usersToBeNotifiedResult = _listService.GetUsersToBeNotifiedOfChange(model.ListId, model.UserId, model.Id, metric);
+                if (usersToBeNotifiedResult.Failed)
+                {
+                    return new(ResultStatus.Error);
+                }
+
+                result.NotificationRecipients = usersToBeNotifiedResult.Data!.Select(x => new NotificationRecipient(x.Id, x.Language)).ToList();
             }
             else
             {
@@ -338,35 +407,61 @@ public class TaskService : ITaskService
                 result.OldListId = originalTask.ListId;
                 result.OldListName = oldList.Name;
 
-                var usersToBeNotifiedOfRemoval = _listService.GetUsersToBeNotifiedOfChange(oldList.Id, model.UserId, model.Id, metric);
-                result.RemovedNotificationRecipients = usersToBeNotifiedOfRemoval.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList();
+                var usersToBeNotifiedOfRemovalResult = _listService.GetUsersToBeNotifiedOfChange(oldList.Id, model.UserId, model.Id, metric);
+                if (usersToBeNotifiedOfRemovalResult.Failed)
+                {
+                    return new(ResultStatus.Error);
+                }
+                result.RemovedNotificationRecipients = usersToBeNotifiedOfRemovalResult.Data!.Select(x => new NotificationRecipient(x.Id, x.Language)).ToList();
 
-                var usersToBeNotifiedOfCreation = _listService.GetUsersToBeNotifiedOfChange(model.ListId, model.UserId, model.Id, metric);
-                result.CreatedNotificationRecipients = usersToBeNotifiedOfCreation.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList();
+                var usersToBeNotifiedOfCreationResult = _listService.GetUsersToBeNotifiedOfChange(model.ListId, model.UserId, model.Id, metric);
+                if (usersToBeNotifiedOfCreationResult.Failed)
+                {
+                    return new(ResultStatus.Error);
+                }
+                result.CreatedNotificationRecipients = usersToBeNotifiedOfCreationResult.Data!.Select(x => new NotificationRecipient(x.Id, x.Language)).ToList();
             }
 
             if (model.AssignedToUserId.HasValue
                 && model.AssignedToUserId.Value != originalTask.AssignedToUserId
-                && model.AssignedToUserId.Value != model.UserId
-                && _listService.CheckIfUserCanBeNotifiedOfChange(model.ListId, model.AssignedToUserId.Value, metric))
+                && model.AssignedToUserId.Value != model.UserId)
             {
-                var assignedUser = _userService.Get(model.AssignedToUserId.Value);
-                result.AssignedNotificationRecipient = new NotificationRecipient { Id = assignedUser.Id, Language = assignedUser.Language };
+                var canBeNotifiedResult = _listService.CheckIfUserCanBeNotifiedOfChange(model.ListId, model.AssignedToUserId.Value, metric);
+                if (canBeNotifiedResult.Failed)
+                {
+                    return new(ResultStatus.Error);
+                }
+
+                if (canBeNotifiedResult.Data)
+                {
+                    var assignedUserResult = _userService.Get(model.AssignedToUserId.Value);
+                    if (assignedUserResult.Failed)
+                    {
+                        throw new Exception("User retrieval failed");
+                    }
+
+                    result.AssignedNotificationRecipient = new NotificationRecipient(assignedUserResult.Data!.Id, assignedUserResult.Data.Language);
+                }
             }
 
             if (result.Notify())
             {
-                var user = _userService.Get(model.UserId);
-                result.ActionUserName = user.Name;
-                result.ActionUserImageUri = user.ImageUri;
+                var userResult = _userService.Get(model.UserId);
+                if (userResult.Failed)
+                {
+                    throw new Exception("User retrieval failed");
+                }
+
+                result.ActionUserName = userResult.Data!.Name;
+                result.ActionUserImageUri = userResult.Data.ImageUri;
             }
 
             return result;
         }
-        catch (Exception ex) when (ex is not ValidationException)
+        catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(UpdateAsync)}");
-            throw;
+            return new(ResultStatus.Error);
         }
         finally
         {
@@ -383,13 +478,14 @@ public class TaskService : ITaskService
             ToDoTask task = _tasksRepository.Get(id);
             if (task is null)
             {
-                return new DeleteTaskResult(false);
+                return new DeleteTaskResult(true);
             }
 
-            if (!Exists(id, userId))
+            var exists = _tasksRepository.Exists(id, userId);
+            if (!exists)
             {
                 metric.Status = SpanStatus.PermissionDenied;
-                throw new ValidationException("Unauthorized");
+                return new();
             }
 
             await _tasksRepository.DeleteAsync(id, userId, metric, cancellationToken);
@@ -397,33 +493,44 @@ public class TaskService : ITaskService
             ToDoList? list = _listsRepository.GetWithShares(task.ListId, userId, metric);
             if (list is null)
             {
-                throw new InvalidOperationException("Cannot delete task from non-existing list");
+                return new();
             }
 
-            var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(task.ListId, userId, task.PrivateToUserId == userId, metric).ToList();
+            var usersToBeNotifiedResult = _listService.GetUsersToBeNotifiedOfChange(task.ListId, userId, task.PrivateToUserId == userId, metric);
+            if (usersToBeNotifiedResult.Failed)
+            {
+                return new();
+            }
 
             var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
-            var result = new DeleteTaskResult(task.ListId, notifySignalR);
-
-            if (!usersToBeNotified.Any())
+            if (!usersToBeNotifiedResult.Data!.Any())
             {
-                return result;
+                return new DeleteTaskResult(true) { ListId = task.ListId, NotifySignalR = notifySignalR };
             }
 
-            var user = _userService.Get(userId);
+            var userResult = _userService.Get(userId);
+            if (userResult.Failed)
+            {
+                throw new Exception("User retrieval failed");
+            }
 
-            result.TaskName = task.Name;
-            result.ListName = list.Name;
-            result.ActionUserName = user.Name;
-            result.ActionUserImageUri = user.ImageUri;
-            result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList();
+            var result = new DeleteTaskResult(true)
+            {
+                ListId = task.ListId,
+                NotifySignalR = notifySignalR,
+                TaskName = task.Name,
+                ListName = list.Name,
+                ActionUserName = userResult.Data!.Name,
+                ActionUserImageUri = userResult.Data.ImageUri,
+                NotificationRecipients = usersToBeNotifiedResult.Data!.Select(x => new NotificationRecipient(x.Id, x.Language)).ToList()
+            };
 
             return result;
         }
-        catch (Exception ex) when (ex is not ValidationException)
+        catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(DeleteAsync)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -437,10 +544,11 @@ public class TaskService : ITaskService
 
         try
         {
-            if (!Exists(model.Id, model.UserId))
+            var exists = _tasksRepository.Exists(model.Id, model.UserId);
+            if (!exists)
             {
                 metric.Status = SpanStatus.PermissionDenied;
-                throw new ValidationException("Unauthorized");
+                return new();
             }
 
             ToDoTask task = _tasksRepository.Get(model.Id);
@@ -454,33 +562,44 @@ public class TaskService : ITaskService
             ToDoList? list = _listsRepository.GetWithShares(task.ListId, model.UserId, metric);
             if (list is null)
             {
-                throw new InvalidOperationException("Cannot complete task in non-existing list");
+                return new();
             }
 
-            var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(task.ListId, model.UserId, model.Id, metric).ToList();
+            var usersToBeNotifiedResult = _listService.GetUsersToBeNotifiedOfChange(task.ListId, model.UserId, model.Id, metric);
+            if (usersToBeNotifiedResult.Failed)
+            {
+                return new();
+            }
 
             var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
-            var result = new CompleteUncompleteTaskResult(task.ListId, notifySignalR: notifySignalR);
-
-            if (!usersToBeNotified.Any())
+            if (!usersToBeNotifiedResult.Data!.Any())
             {
-                return result;
+                return new CompleteUncompleteTaskResult(true) { ListId = task.ListId, NotifySignalR = notifySignalR };
             }
 
-            var user = _userService.Get(model.UserId);
+            var userResult = _userService.Get(model.UserId);
+            if (userResult.Failed)
+            {
+                throw new Exception("User retrieval failed");
+            }
 
-            result.TaskName = task.Name;
-            result.ListName = list.Name;
-            result.ActionUserName = user.Name;
-            result.ActionUserImageUri = user.ImageUri;
-            result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList();
+            var result = new CompleteUncompleteTaskResult(true)
+            {
+                ListId = task.ListId,
+                NotifySignalR = notifySignalR,
+                TaskName = task.Name,
+                ListName = list.Name,
+                ActionUserName = userResult.Data!.Name,
+                ActionUserImageUri = userResult.Data.ImageUri,
+                NotificationRecipients = usersToBeNotifiedResult.Data!.Select(x => new NotificationRecipient(x.Id, x.Language)).ToList()
+            };
 
             return result;
         }
-        catch (Exception ex) when (ex is not ValidationException)
+        catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(CompleteAsync)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -494,16 +613,17 @@ public class TaskService : ITaskService
 
         try
         {
-            if (!Exists(model.Id, model.UserId))
+            var exists = _tasksRepository.Exists(model.Id, model.UserId);
+            if (!exists)
             {
                 metric.Status = SpanStatus.PermissionDenied;
-                throw new ValidationException("Unauthorized");
+                return new();
             }
 
             ToDoTask task = _tasksRepository.Get(model.Id);
             if (!task.IsCompleted)
             {
-                return new CompleteUncompleteTaskResult(false);
+                return new CompleteUncompleteTaskResult(true);
             }
 
             await _tasksRepository.UncompleteAsync(model.Id, model.UserId, metric, cancellationToken);
@@ -511,33 +631,44 @@ public class TaskService : ITaskService
             ToDoList? list = _listsRepository.GetWithShares(task.ListId, model.UserId, metric);
             if (list is null)
             {
-                throw new InvalidOperationException("Cannot uncomplete task in non-existing list");
+                return new();
             }
 
-            var usersToBeNotified = _listService.GetUsersToBeNotifiedOfChange(task.ListId, model.UserId, model.Id, metric).ToList();
+            var usersToBeNotifiedResult = _listService.GetUsersToBeNotifiedOfChange(task.ListId, model.UserId, model.Id, metric);
+            if (usersToBeNotifiedResult.Failed)
+            {
+                return new();
+            }
 
             var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
-            var result = new CompleteUncompleteTaskResult(task.ListId, notifySignalR);
-
-            if (!usersToBeNotified.Any())
+            if (!usersToBeNotifiedResult.Data!.Any())
             {
-                return result;
+                return new CompleteUncompleteTaskResult(true) { ListId = task.ListId, NotifySignalR = notifySignalR };
             }
 
-            var user = _userService.Get(model.UserId);
+            var userResult = _userService.Get(model.UserId);
+            if (userResult.Failed)
+            {
+                throw new Exception("User retrieval failed");
+            }
 
-            result.TaskName = task.Name;
-            result.ListName = list.Name;
-            result.ActionUserName = user.Name;
-            result.ActionUserImageUri = user.ImageUri;
-            result.NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList();
+            var result = new CompleteUncompleteTaskResult(true)
+            {
+                ListId = task.ListId,
+                NotifySignalR = notifySignalR,
+                TaskName = task.Name,
+                ListName = list.Name,
+                ActionUserName = userResult.Data!.Name,
+                ActionUserImageUri = userResult.Data.ImageUri,
+                NotificationRecipients = usersToBeNotifiedResult.Data!.Select(x => new NotificationRecipient(x.Id, x.Language)).ToList()
+            };
 
             return result;
         }
-        catch (Exception ex) when (ex is not ValidationException)
+        catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(UncompleteAsync)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -545,38 +676,39 @@ public class TaskService : ITaskService
         }
     }
 
-    public async Task<ReorderTaskResult> ReorderAsync(ReorderTask model, ISpan metricsSpan, CancellationToken cancellationToken)
-    {
-        var metric = metricsSpan.StartChild($"{nameof(TaskService)}.{nameof(ReorderAsync)}");
+    //public async Task<Result<ReorderTaskResult>> ReorderAsync(ReorderTask model, ISpan metricsSpan, CancellationToken cancellationToken)
+    //{
+    //    var metric = metricsSpan.StartChild($"{nameof(TaskService)}.{nameof(ReorderAsync)}");
 
-        try
-        {
-            if (!Exists(model.Id, model.UserId))
-            {
-                metric.Status = SpanStatus.PermissionDenied;
-                throw new ValidationException("Unauthorized");
-            }
+    //    try
+    //    {
+    //        var exists = _tasksRepository.Exists(model.Id, model.UserId);
+    //        if (!exists)
+    //        {
+    //            metric.Status = SpanStatus.PermissionDenied;
+    //            return new();
+    //        }
 
-            await _tasksRepository.ReorderAsync(model.Id, model.UserId, model.OldOrder, model.NewOrder, DateTime.UtcNow, cancellationToken);
+    //        await _tasksRepository.ReorderAsync(model.Id, model.UserId, model.OldOrder, model.NewOrder, DateTime.UtcNow, cancellationToken);
 
-            ToDoTask task = _tasksRepository.Get(model.Id);
-            ToDoList? list = _listsRepository.GetWithShares(task.ListId, model.UserId, metric);
-            if (list is null)
-            {
-                throw new InvalidOperationException("Cannot reorder task in non-existing list");
-            }
+    //        ToDoTask task = _tasksRepository.Get(model.Id);
+    //        ToDoList? list = _listsRepository.GetWithShares(task.ListId, model.UserId, metric);
+    //        if (list is null)
+    //        {
+    //            return new();
+    //        }
 
-            var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
-            return new ReorderTaskResult(list.Id, notifySignalR);
-        }
-        catch (Exception ex) when (ex is not ValidationException)
-        {
-            _logger.LogError(ex, $"Unexpected error in {nameof(ReorderAsync)}");
-            throw;
-        }
-        finally
-        {
-            metric.Finish();
-        }
-    }
+    //        var notifySignalR = !task.PrivateToUserId.HasValue && list.IsShared;
+    //        return new(new ReorderTaskResult(list.Id, notifySignalR));
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        _logger.LogError(ex, $"Unexpected error in {nameof(ReorderAsync)}");
+    //        return new();
+    //    }
+    //    finally
+    //    {
+    //        metric.Finish();
+    //    }
+    //}
 }

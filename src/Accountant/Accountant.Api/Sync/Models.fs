@@ -2,7 +2,7 @@
 
 open System
 open System.Collections.Generic
-open Accountant.Persistence.Fs.Models
+open Accountant.Persistence.Models
 open Accountant.Api.Accounts.Models
 open Accountant.Api.AutomaticTransactions.Models
 open Accountant.Api.Categories.Models

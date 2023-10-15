@@ -1,30 +1,42 @@
 ﻿using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
+using FluentValidation.Results;
 
 namespace ToDoAssistant.Application.Contracts.Tasks.Models;
 
-public class UpdateTaskResult : INotificationResult
+public class UpdateTaskResult : INotificationResult, IValidatedResult
 {
-    public UpdateTaskResult(string originalTaskName, int listId, string listName, bool notifySignalR)
+    public UpdateTaskResult(ResultStatus status)
     {
-        OriginalTaskName = originalTaskName;
-        ListId = listId;
-        ListName = listName;
-        NotifySignalR = notifySignalR;
+        if (status == ResultStatus.Invalid)
+        {
+            throw new ArgumentException($"Use this constructor only with {nameof(ResultStatus.Successful)} and {nameof(ResultStatus.Error)} status");
+        }
+
+        Status = status;
     }
 
-    public string OriginalTaskName { get; } = null!;
-    public int ListId { get; }
-    public string ListName { get; } = null!;
-    public bool NotifySignalR { get; }
+    public UpdateTaskResult(List<ValidationFailure> validationErrors)
+    {
+        Status = ResultStatus.Invalid;
+        ValidationErrors = validationErrors;
+    }
+
+    public ResultStatus Status { get; private set; }
+    public IReadOnlyCollection<ValidationFailure>? ValidationErrors { get; private set; }
+
+    public string? OriginalTaskName { get; init; }
+    public int ListId { get; init; }
+    public string? ListName { get; init; }
+    public bool NotifySignalR { get; init; }
 
     public int? OldListId { get; set; }
     public string? OldListName { get; set; }
     public string ActionUserName { get; set; } = null!;
     public string ActionUserImageUri { get; set; } = null!;
-    public List<NotificationRecipient> NotificationRecipients { get; set; } = new();
-    public List<NotificationRecipient> RemovedNotificationRecipients { get; set; } = new();
-    public List<NotificationRecipient> CreatedNotificationRecipients { get; set; } = new();
+    public IReadOnlyCollection<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
+    public IReadOnlyCollection<NotificationRecipient> RemovedNotificationRecipients { get; set; } = new List<NotificationRecipient>();
+    public IReadOnlyCollection<NotificationRecipient> CreatedNotificationRecipients { get; set; } = new List<NotificationRecipient>();
     public NotificationRecipient? AssignedNotificationRecipient { get; set; }
 
     public bool Notify()

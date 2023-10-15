@@ -6,7 +6,7 @@ open Giraffe
 open Microsoft.AspNetCore.Hosting
 open Microsoft.AspNetCore.Http
 open Core.Application.Contracts
-open Accountant.Persistence.Fs
+open Accountant.Persistence
 open Accountant.Api
 open Api.Common.Fs
 open CommonHandlers

@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
-using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Sentry;
@@ -42,7 +41,7 @@ public class ListService : IListService
 
     public static HashSet<string> IconOptions => new HashSet<string> { "list", "shopping-cart", "shopping-bag", "home", "birthday", "cheers", "vacation", "passport", "plane", "car", "pickup-truck", "world", "camping", "tree", "motorcycle", "bicycle", "workout", "ski", "snowboard", "swimming", "work", "baby", "dog", "cat", "bird", "fish", "camera", "medicine", "file", "book", "mountain", "facebook", "twitter", "instagram", "tiktok" };
 
-    public IEnumerable<ListDto> GetAll(int userId, ISpan metricsSpan)
+    public Result<IEnumerable<ListDto>> GetAll(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(GetAll)}");
 
@@ -52,12 +51,12 @@ public class ListService : IListService
 
             var result = lists.Select(x => _mapper.Map<ListDto>(x, opts => opts.Items["UserId"] = userId));
 
-            return result;
+            return new(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(GetAll)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -65,7 +64,7 @@ public class ListService : IListService
         }
     }
 
-    public IEnumerable<ToDoListOption> GetAllAsOptions(int userId, ISpan metricsSpan)
+    public Result<IEnumerable<ToDoListOption>> GetAllAsOptions(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(GetAllAsOptions)}");
 
@@ -75,12 +74,12 @@ public class ListService : IListService
 
             var result = lists.Select(x => _mapper.Map<ToDoListOption>(x));
 
-            return result;
+            return new(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(GetAllAsOptions)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -88,28 +87,29 @@ public class ListService : IListService
         }
     }
 
-    public IEnumerable<Assignee> GetMembersAsAssigneeOptions(int id, int userId, ISpan metricsSpan)
+    public Result<IEnumerable<Assignee>?> GetMembersAsAssigneeOptions(int id, int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(GetMembersAsAssigneeOptions)}");
 
         try
         {
-            if (!_listsRepository.UserOwnsOrShares(id, userId))
+            var ownsOrShares = _listsRepository.UserOwnsOrShares(id, userId);
+            if (!ownsOrShares)
             {
                 metric.Status = SpanStatus.PermissionDenied;
-                throw new ValidationException("Unauthorized");
+                return new(null);
             }
 
             IEnumerable<User> members = _listsRepository.GetMembersAsAssigneeOptions(id, metric);
 
             var result = members.Select(x => _mapper.Map<Assignee>(x));
 
-            return result;
+            return new(result);
         }
-        catch (Exception ex) when (ex is not ValidationException)
+        catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(GetMembersAsAssigneeOptions)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -117,7 +117,7 @@ public class ListService : IListService
         }
     }
 
-    public SimpleList Get(int id)
+    public Result<SimpleList> Get(int id)
     {
         try
         {
@@ -125,16 +125,16 @@ public class ListService : IListService
 
             var result = _mapper.Map<SimpleList>(list);
 
-            return result;
+            return new(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(Get)}");
-            throw;
+            return new();
         }
     }
 
-    public EditListDto? GetForEdit(int id, int userId, ISpan metricsSpan)
+    public Result<EditListDto?> GetForEdit(int id, int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(GetForEdit)}");
 
@@ -144,12 +144,12 @@ public class ListService : IListService
 
             var result = _mapper.Map<EditListDto>(list, opts => opts.Items["UserId"] = userId);
 
-            return result;
+            return new(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(GetForEdit)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -157,7 +157,7 @@ public class ListService : IListService
         }
     }
 
-    public ListWithShares? GetWithShares(int id, int userId, ISpan metricsSpan)
+    public Result<ListWithShares?> GetWithShares(int id, int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(GetWithShares)}");
 
@@ -166,7 +166,7 @@ public class ListService : IListService
             ToDoList? list = _listsRepository.GetWithOwner(id, userId, metric);
             if (list is null)
             {
-                return null;
+                return new(null);
             }
 
             list.Shares.AddRange(_listsRepository.GetShares(id, metric));
@@ -174,12 +174,12 @@ public class ListService : IListService
             var result = _mapper.Map<ListWithShares>(list, opts => opts.Items["UserId"] = userId);
             result.Shares.RemoveAll(x => x.UserId == userId);
 
-            return result;
+            return new(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(GetWithShares)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -187,7 +187,7 @@ public class ListService : IListService
         }
     }
 
-    public IEnumerable<ShareListRequest> GetShareRequests(int userId, ISpan metricsSpan)
+    public Result<IEnumerable<ShareListRequest>> GetShareRequests(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(GetShareRequests)}");
 
@@ -197,12 +197,12 @@ public class ListService : IListService
 
             var result = shareRequests.Select(x => _mapper.Map<ShareListRequest>(x, opts => opts.Items["UserId"] = userId));
 
-            return result;
+            return new(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(GetShareRequests)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -210,147 +210,158 @@ public class ListService : IListService
         }
     }
 
-    public int GetPendingShareRequestsCount(int userId)
+    public Result<int> GetPendingShareRequestsCount(int userId)
     {
         try
         {
-            return _listsRepository.GetPendingShareRequestsCount(userId);
+            var count = _listsRepository.GetPendingShareRequestsCount(userId);
+            return new(count);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(GetPendingShareRequestsCount)}");
-            throw;
+            return new();
         }
     }
 
-    public bool CanShareWithUser(int shareWithId, int userId)
+    public Result<bool> CanShareWithUser(int shareWithId, int userId)
     {
         try
         {
             if (shareWithId == userId)
             {
-                return false;
+                return new(false);
             }
 
-            return _listsRepository.CanShareWithUser(shareWithId, userId);
+            var canShare = _listsRepository.CanShareWithUser(shareWithId, userId);
+            return new(canShare);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(CanShareWithUser)}");
-            throw;
+            return new();
         }
     }
 
-    public bool UserOwnsOrShares(int id, int userId)
+    public Result<bool> UserOwnsOrShares(int id, int userId)
     {
         try
         {
-            return _listsRepository.UserOwnsOrShares(id, userId);
+            var ownsOrShares = _listsRepository.UserOwnsOrShares(id, userId);
+            return new(ownsOrShares);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(UserOwnsOrShares)}");
-            throw;
+            return new();
         }
     }
 
-    public bool UserOwnsOrSharesAsPending(int id, int userId)
+    public Result<bool> UserOwnsOrSharesAsPending(int id, int userId)
     {
         try
         {
-            return _listsRepository.UserOwnsOrSharesAsPending(id, userId);
+            var ownsOrShares = _listsRepository.UserOwnsOrSharesAsPending(id, userId);
+            return new(ownsOrShares);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(UserOwnsOrSharesAsPending)}");
-            throw;
+            return new();
         }
     }
 
-    public bool UserOwnsOrSharesAsAdmin(int id, int userId)
+    public Result<bool> UserOwnsOrSharesAsAdmin(int id, int userId)
     {
         try
         {
-            return _listsRepository.UserOwnsOrSharesAsAdmin(id, userId);
+            var ownsOrShares = _listsRepository.UserOwnsOrSharesAsAdmin(id, userId);
+            return new(ownsOrShares);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(UserOwnsOrSharesAsAdmin)}");
-            throw;
+            return new();
         }
     }
 
-    public bool UserOwnsOrSharesAsAdmin(int id, string name, int userId)
+    public Result<bool> UserOwnsOrSharesAsAdmin(int id, string name, int userId)
     {
         try
         {
-            return _listsRepository.UserOwnsOrSharesAsAdmin(id, name.Trim(), userId);
+            var ownsOrShares = _listsRepository.UserOwnsOrSharesAsAdmin(id, name.Trim(), userId);
+            return new(ownsOrShares);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(UserOwnsOrSharesAsAdmin)}");
-            throw;
+            return new();
         }
     }
 
-    public bool IsShared(int id, int userId)
+    public Result<bool?> IsShared(int id, int userId)
     {
         try
         {
-            if (!UserOwnsOrShares(id, userId))
+            var ownsOrShares = _listsRepository.UserOwnsOrShares(id, userId);
+            if (!ownsOrShares)
             {
-                throw new ValidationException("Unauthorized");
+                return new(null);
             }
 
-            return _listsRepository.IsShared(id);
+            var shared = _listsRepository.IsShared(id);
+            return new(shared);
         }
-        catch (Exception ex) when (ex is not ValidationException)
+        catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(IsShared)}");
-            throw;
+            return new();
         }
     }
 
-    public bool Exists(string name, int userId)
+    public Result<bool> Exists(string name, int userId)
     {
         try
         {
-            return _listsRepository.Exists(name.Trim(), userId);
+            var exists = _listsRepository.Exists(name.Trim(), userId);
+            return new(exists);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(Exists)}");
-            throw;
+            return new();
         }
     }
 
-    public bool Exists(int id, string name, int userId)
+    public Result<bool> Exists(int id, string name, int userId)
     {
         try
         {
-            return _listsRepository.Exists(id, name.Trim(), userId);
+            var exists = _listsRepository.Exists(id, name.Trim(), userId);
+            return new(exists);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(Exists)}");
-            throw;
+            return new();
         }
     }
 
-    public int Count(int userId)
+    public Result<int> Count(int userId)
     {
         try
         {
-            return _listsRepository.Count(userId);
+            var count = _listsRepository.Count(userId);
+            return new(count);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(Count)}");
-            throw;
+            return new();
         }
     }
 
-    public IEnumerable<User> GetUsersToBeNotifiedOfChange(int id, int excludeUserId, bool isPrivate, ISpan metricsSpan)
+    public Result<IEnumerable<User>> GetUsersToBeNotifiedOfChange(int id, int excludeUserId, bool isPrivate, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(GetUsersToBeNotifiedOfChange)}");
 
@@ -358,15 +369,16 @@ public class ListService : IListService
         {
             if (isPrivate)
             {
-                return new List<User>();
+                return new(new List<User>());
             }
 
-            return _listsRepository.GetUsersToBeNotifiedOfChange(id, excludeUserId, metric);
+            var result = _listsRepository.GetUsersToBeNotifiedOfChange(id, excludeUserId, metric);
+            return new(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(GetUsersToBeNotifiedOfChange)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -374,7 +386,7 @@ public class ListService : IListService
         }
     }
 
-    public IEnumerable<User> GetUsersToBeNotifiedOfChange(int id, int excludeUserId, int taskId, ISpan metricsSpan)
+    public Result<IEnumerable<User>> GetUsersToBeNotifiedOfChange(int id, int excludeUserId, int taskId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(GetUsersToBeNotifiedOfChange)}");
 
@@ -382,15 +394,16 @@ public class ListService : IListService
         {
             if (_tasksRepository.IsPrivate(taskId, excludeUserId))
             {
-                return new List<User>();
+                return new(new List<User>());
             }
 
-            return _listsRepository.GetUsersToBeNotifiedOfChange(id, excludeUserId, metric);
+            var result = _listsRepository.GetUsersToBeNotifiedOfChange(id, excludeUserId, metric);
+            return new(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(GetUsersToBeNotifiedOfChange)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -398,18 +411,19 @@ public class ListService : IListService
         }
     }
 
-    public bool CheckIfUserCanBeNotifiedOfChange(int id, int userId, ISpan metricsSpan)
+    public Result<bool> CheckIfUserCanBeNotifiedOfChange(int id, int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(CheckIfUserCanBeNotifiedOfChange)}");
 
         try
         {
-            return _listsRepository.CheckIfUserCanBeNotifiedOfChange(id, userId, metric);
+            var canBeNotified = _listsRepository.CheckIfUserCanBeNotifiedOfChange(id, userId, metric);
+            return new(canBeNotified);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(CheckIfUserCanBeNotifiedOfChange)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -417,14 +431,18 @@ public class ListService : IListService
         }
     }
 
-    public async Task<int> CreateAsync(CreateList model, IValidator<CreateList> validator, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<ValidatedResult<int>> CreateAsync(CreateList model, IValidator<CreateList> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
-        ValidationUtil.ValidOrThrow(model, validator);
-
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(CreateAsync)}");
 
         try
         {
+            var validationResult = validator.Validate(model);
+            if (!validationResult.IsValid)
+            {
+                return new(validationResult.Errors);
+            }
+
             var list = _mapper.Map<ToDoList>(model);
 
             list.Name = list.Name.Trim();
@@ -444,12 +462,14 @@ public class ListService : IListService
                     ).ToList();
             }
 
-            return await _listsRepository.CreateAsync(list, metric, cancellationToken);
+            var id = await _listsRepository.CreateAsync(list, metric, cancellationToken);
+
+            return new(id);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(CreateAsync)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -457,7 +477,7 @@ public class ListService : IListService
         }
     }
 
-    public async Task CreateSampleAsync(int userId, Dictionary<string, string> translations, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<Result> CreateSampleAsync(int userId, Dictionary<string, string> translations, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var now = DateTime.UtcNow;
 
@@ -496,11 +516,13 @@ public class ListService : IListService
                 }
             };
             await _listsRepository.CreateAsync(list, metric, cancellationToken);
+
+            return new Result(true);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(CreateSampleAsync)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -510,12 +532,16 @@ public class ListService : IListService
 
     public async Task<UpdateListResult> UpdateAsync(UpdateList model, IValidator<UpdateList> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
-        ValidationUtil.ValidOrThrow(model, validator);
-
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(UpdateAsync)}");
 
         try
         {
+            var validationResult = validator.Validate(model);
+            if (!validationResult.IsValid)
+            {
+                return new(validationResult.Errors);
+            }
+
             var list = _mapper.Map<ToDoList>(model);
 
             list.Name = list.Name.Trim();
@@ -526,7 +552,7 @@ public class ListService : IListService
             var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(model.Id, model.UserId, metric).ToList();
             if (!usersToBeNotified.Any())
             {
-                return new UpdateListResult();
+                return new UpdateListResult(ResultStatus.Successful);
             }
 
             ListNotificationType notificationType;
@@ -543,14 +569,19 @@ public class ListService : IListService
                 notificationType = ListNotificationType.Other;
             }
 
-            var user = _userService.Get(model.UserId);
-            var result = new UpdateListResult
+            var userResult = _userService.Get(model.UserId);
+            if (userResult.Failed)
+            {
+                throw new Exception("User retrieval failed");
+            }
+
+            var result = new UpdateListResult(ResultStatus.Successful)
             {
                 Type = notificationType,
                 OriginalListName = original.Name,
-                ActionUserName = user.Name,
-                ActionUserImageUri = user.ImageUri,
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList()
+                ActionUserName = userResult.Data!.Name,
+                ActionUserImageUri = userResult.Data.ImageUri,
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient(x.Id, x.Language)).ToList()
             };
 
             return result;
@@ -558,7 +589,7 @@ public class ListService : IListService
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(UpdateAsync)}");
-            throw;
+            return new(ResultStatus.Error);
         }
         finally
         {
@@ -566,23 +597,29 @@ public class ListService : IListService
         }
     }
 
-    public async Task UpdateSharedAsync(UpdateSharedList model, IValidator<UpdateSharedList> validator, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<ValidatedResult> UpdateSharedAsync(UpdateSharedList model, IValidator<UpdateSharedList> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
-        ValidationUtil.ValidOrThrow(model, validator);
-
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(UpdateSharedAsync)}");
 
         try
         {
+            var validationResult = validator.Validate(model);
+            if (!validationResult.IsValid)
+            {
+                return new(validationResult.Errors);
+            }
+
             var list = _mapper.Map<ToDoList>(model);
 
             list.ModifiedDate = DateTime.UtcNow;
             await _listsRepository.UpdateSharedAsync(list, metric, cancellationToken);
+
+            return new(ResultStatus.Successful);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(UpdateSharedAsync)}");
-            throw;
+            return new(ResultStatus.Error);
         }
         finally
         {
@@ -599,7 +636,7 @@ public class ListService : IListService
             if (!_listsRepository.UserOwns(id, userId))
             {
                 metric.Status = SpanStatus.PermissionDenied;
-                throw new ValidationException("Unauthorized");
+                return new();
             }
 
             var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfDeletion(id, metric).ToList();
@@ -608,24 +645,29 @@ public class ListService : IListService
 
             if (!usersToBeNotified.Any())
             {
-                return new DeleteListResult();
+                return new DeleteListResult(true);
             }
 
-            var user = _userService.Get(userId);
-            var result = new DeleteListResult
+            var userResult = _userService.Get(userId);
+            if (userResult.Failed)
+            {
+                throw new Exception("User retrieval failed");
+            }
+
+            var result = new DeleteListResult(true)
             {
                 DeletedListName = deletedListName,
-                ActionUserName = user.Name,
-                ActionUserImageUri = user.ImageUri,
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList()
+                ActionUserName = userResult.Data!.Name,
+                ActionUserImageUri = userResult.Data.ImageUri,
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient(x.Id, x.Language)).ToList()
             };
 
             return result;
         }
-        catch (Exception ex) when (ex is not ValidationException)
+        catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(DeleteAsync)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -633,15 +675,19 @@ public class ListService : IListService
         }
     }
 
-    public async Task ShareAsync(ShareList model, IValidator<ShareList> validator, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<ValidatedResult> ShareAsync(ShareList model, IValidator<ShareList> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
-        ValidationUtil.ValidOrThrow(model, validator);
-
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(ShareAsync)}");
 
         try
         {
             var now = DateTime.UtcNow;
+
+            var validationResult = validator.Validate(model);
+            if (!validationResult.IsValid)
+            {
+                return new(validationResult.Errors);
+            }
 
             var newShares = new List<ListShare>();
             foreach (ShareUserAndPermission newShare in model.NewShares)
@@ -682,11 +728,13 @@ public class ListService : IListService
             {
                 await _notificationsRepository.DeleteForUserAndListAsync(share.UserId, share.ListId, metric, cancellationToken);
             }
+
+            return new(ResultStatus.Successful);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(ShareAsync)}");
-            throw;
+            return new(ResultStatus.Error);
         }
         finally
         {
@@ -704,7 +752,7 @@ public class ListService : IListService
 
             if (share.IsAccepted == false)
             {
-                return new LeaveListResult();
+                return new LeaveListResult(true);
             }
 
             await _notificationsRepository.DeleteForUserAndListAsync(userId, id, metric, cancellationToken);
@@ -712,26 +760,31 @@ public class ListService : IListService
             var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(id, userId, metric).ToList();
             if (!usersToBeNotified.Any())
             {
-                return new LeaveListResult();
+                return new LeaveListResult(true);
             }
 
             ToDoList list = _listsRepository.Get(id);
 
-            var user = _userService.Get(userId);
-            var result = new LeaveListResult
+            var userResult = _userService.Get(userId);
+            if (userResult.Failed)
+            {
+                throw new Exception("User retrieval failed");
+            }
+
+            var result = new LeaveListResult(true)
             {
                 ListName = list.Name,
-                ActionUserName = user.Name,
-                ActionUserImageUri = user.ImageUri,
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList()
+                ActionUserName = userResult.Data!.Name,
+                ActionUserImageUri = userResult.Data.ImageUri,
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient(x.Id, x.Language)).ToList()
             };
 
-            return result;
-        }
+            return result
+;        }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(LeaveAsync)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -739,25 +792,30 @@ public class ListService : IListService
         }
     }
 
-    public async Task<int> CopyAsync(CopyList model, IValidator<CopyList> validator, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<ValidatedResult<int>> CopyAsync(CopyList model, IValidator<CopyList> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
-        ValidationUtil.ValidOrThrow(model, validator);
-
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(CopyAsync)}");
 
         try
         {
+            var validationResult = validator.Validate(model);
+            if (!validationResult.IsValid)
+            {
+                return new(validationResult.Errors);
+            }
+
             var list = _mapper.Map<ToDoList>(model);
 
             list.Name = list.Name.Trim();
             list.CreatedDate = list.ModifiedDate = DateTime.UtcNow;
 
-            return await _listsRepository.CopyAsync(list, metric, cancellationToken);
+            var id = await _listsRepository.CopyAsync(list, metric, cancellationToken);
+            return new(id);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(CopyAsync)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -765,24 +823,27 @@ public class ListService : IListService
         }
     }
 
-    public async Task SetIsArchivedAsync(int id, int userId, bool isArchived, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<Result> SetIsArchivedAsync(int id, int userId, bool isArchived, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(SetIsArchivedAsync)}");
 
         try
         {
-            if (!UserOwnsOrShares(id, userId))
+            var ownsOrShares = _listsRepository.UserOwnsOrShares(id, userId);
+            if (!ownsOrShares)
             {
                 metric.Status = SpanStatus.PermissionDenied;
-                throw new ValidationException("Unauthorized");
+                return new();
             }
 
             await _listsRepository.SetIsArchivedAsync(id, userId, isArchived, DateTime.UtcNow, metric, cancellationToken);
+
+            return new Result(true);
         }
-        catch (Exception ex) when (ex is not ValidationException)
+        catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(SetIsArchivedAsync)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -796,41 +857,47 @@ public class ListService : IListService
 
         try
         {
-            if (!UserOwnsOrShares(id, userId))
+            var ownsOrShares = _listsRepository.UserOwnsOrShares(id, userId);
+            if (!ownsOrShares)
             {
                 metric.Status = SpanStatus.PermissionDenied;
-                throw new ValidationException("Unauthorized");
+                return new();
             }
 
             bool nonPrivateTasksWereUncompleted = await _listsRepository.UncompleteAllAsync(id, userId, DateTime.UtcNow, metric, cancellationToken);
             if (!nonPrivateTasksWereUncompleted)
             {
-                return new SetTasksAsNotCompletedResult();
+                return new SetTasksAsNotCompletedResult(true);
             }
 
             var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(id, userId, metric).ToList();
             if (!usersToBeNotified.Any())
             {
-                return new SetTasksAsNotCompletedResult();
+                return new SetTasksAsNotCompletedResult(true);
             }
 
             ToDoList list = _listsRepository.Get(id);
 
-            var user = _userService.Get(userId);
-            var result = new SetTasksAsNotCompletedResult
+            var userResult = _userService.Get(userId);
+            if (userResult.Failed)
+            {
+                throw new Exception("User retrieval failed");
+            }
+
+            var result = new SetTasksAsNotCompletedResult(true)
             {
                 ListName = list.Name,
-                ActionUserName = user.Name,
-                ActionUserImageUri = user.ImageUri,
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList()
+                ActionUserName = userResult.Data!.Name,
+                ActionUserImageUri = userResult.Data.ImageUri,
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient(x.Id, x.Language)).ToList()
             };
 
             return result;
         }
-        catch (Exception ex) when (ex is not ValidationException)
+        catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(UncompleteAllAsync)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -849,18 +916,23 @@ public class ListService : IListService
             var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(id, userId, metric).ToList();
             if (!usersToBeNotified.Any())
             {
-                return new SetShareIsAcceptedResult();
+                return new SetShareIsAcceptedResult(true);
             }
 
             ToDoList list = _listsRepository.Get(id);
 
-            var user = _userService.Get(userId);
-            var result = new SetShareIsAcceptedResult
+            var userResult = _userService.Get(userId);
+            if (userResult.Failed)
+            {
+                throw new Exception("User retrieval failed");
+            }
+
+            var result = new SetShareIsAcceptedResult(true)
             {
                 ListName = list.Name,
-                ActionUserName = user.Name,
-                ActionUserImageUri = user.ImageUri,
-                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient { Id = x.Id, Language = x.Language }).ToList()
+                ActionUserName = userResult.Data!.Name,
+                ActionUserImageUri = userResult.Data.ImageUri,
+                NotificationRecipients = usersToBeNotified.Select(x => new NotificationRecipient(x.Id, x.Language)).ToList()
             };
 
             return result;
@@ -868,7 +940,7 @@ public class ListService : IListService
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(SetShareIsAcceptedAsync)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -876,21 +948,24 @@ public class ListService : IListService
         }
     }
 
-    public async Task ReorderAsync(int id, int userId, short oldOrder, short newOrder, CancellationToken cancellationToken)
+    public async Task<Result> ReorderAsync(int id, int userId, short oldOrder, short newOrder, CancellationToken cancellationToken)
     {
         try
         {
-            if (!UserOwnsOrShares(id, userId))
+            var ownsOrShares = _listsRepository.UserOwnsOrShares(id, userId);
+            if (!ownsOrShares)
             {
-                throw new ValidationException("Unauthorized");
+                return new();
             }
 
             await _listsRepository.ReorderAsync(id, userId, oldOrder, newOrder, DateTime.UtcNow, cancellationToken);
+
+            return new Result(true);
         }
-        catch (Exception ex) when (ex is not ValidationException)
+        catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(ReorderAsync)}");
-            throw;
+            return new();
         }
     }
 }

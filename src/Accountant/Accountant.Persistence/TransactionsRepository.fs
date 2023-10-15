@@ -1,4 +1,4 @@
-﻿namespace Accountant.Persistence.Fs
+﻿namespace Accountant.Persistence
 
 open System
 open Npgsql.FSharp
@@ -7,7 +7,7 @@ open Models
 open Npgsql
 open Sentry
 
-type TransactionModel = Accountant.Persistence.Fs.Models.Transaction
+type TransactionModel = Accountant.Persistence.Models.Transaction
 
 module TransactionsRepository =
 

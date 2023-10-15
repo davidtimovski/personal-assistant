@@ -2,7 +2,7 @@
 
 open System
 open Microsoft.AspNetCore.Http
-open Accountant.Persistence.Fs.Models
+open Accountant.Persistence.Models
 
 module Models =
 

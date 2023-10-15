@@ -11,9 +11,9 @@ public class Email : ISendable
         BodyHtml = bodyHtml;
     }
 
-    public string ToAddress { get; set; }
-    public string ToName { get; set; }
-    public string Subject { get; set; }
-    public string BodyText { get; set; }
-    public string BodyHtml { get; set; }
+    public string ToAddress { get; init; }
+    public string ToName { get; init; }
+    public string Subject { get; init; }
+    public string BodyText { get; init; }
+    public string BodyHtml { get; init; }
 }

@@ -1,10 +1,10 @@
-﻿namespace Accountant.Persistence.Fs
+﻿namespace Accountant.Persistence
 
 open Npgsql
 open ConnectionUtils
 open Models
 open Sentry
-type Transaction = Accountant.Persistence.Fs.Models.Transaction
+type Transaction = Accountant.Persistence.Models.Transaction
 
 module SyncRepository =
 

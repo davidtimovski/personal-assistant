@@ -1,6 +1,6 @@
 ﻿namespace Accountant.Api.Categories
 
-open Accountant.Persistence.Fs.Models
+open Accountant.Persistence.Models
 open Models
 open CommonHandlers
 

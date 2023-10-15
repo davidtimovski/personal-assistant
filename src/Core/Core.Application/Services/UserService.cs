@@ -23,76 +23,81 @@ public class UserService : IUserService
         _logger = logger;
     }
 
-    public User Get(int id)
+    public Result<User> Get(int id)
     {
         try
         {
-            return _usersRepository.Get(id);
+            var result = _usersRepository.Get(id);
+            return new(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(Get)}");
-            throw;
+            return new();
         }
     }
 
-    public User Get(string email)
+    public Result<User> Get(string email)
     {
         try
         {
-            return _usersRepository.Get(email.Trim());
+            var result = _usersRepository.Get(email.Trim());
+            return new(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(Get)}");
-            throw;
+            return new();
         }
     }
 
-    public T Get<T>(int id) where T : UserDto
+    public Result<T> Get<T>(int id) where T : UserDto
     {
         try
         {
             var user = _usersRepository.Get(id);
             var result = _mapper.Map<T>(user);
 
-            return result;
+            return new(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(Get)}<T>");
-            throw;
+            return new();
         }
     }
 
-    public bool Exists(int id)
+    public Result<bool> Exists(int id)
     {
         try
         {
-            return _usersRepository.Exists(id);
+            var exists = _usersRepository.Exists(id);
+            return new(exists);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(Exists)}");
-            throw;
+            return new();
         }
     }
 
-    public ChefPreferences GetChefPreferences(int id, ISpan metricsSpan)
+    public Result<ChefPreferences> GetChefPreferences(int id, ISpan metricsSpan)
     {
         try
         {
             User user = _usersRepository.Get(id);
-            return _mapper.Map<ChefPreferences>(user);
+            var result = _mapper.Map<ChefPreferences>(user);
+
+            return new(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(GetChefPreferences)}");
-            throw;
+            return new();
         }
     }
 
-    public async Task<int> CreateAsync(string auth0Id, string email, string name, string language, string culture, string imageUri, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<Result<int>> CreateAsync(string auth0Id, string email, string name, string language, string culture, string imageUri, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(UserService)}.{nameof(CreateAsync)}");
 
@@ -111,12 +116,14 @@ public class UserService : IUserService
                 ModifiedDate = DateTime.UtcNow,
             };
 
-            return await _usersRepository.CreateAsync(auth0Id, user, metric, cancellationToken);
+            var id = await _usersRepository.CreateAsync(auth0Id, user, metric, cancellationToken);
+
+            return new(id);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(CreateAsync)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -124,7 +131,7 @@ public class UserService : IUserService
         }
     }
 
-    public async Task UpdateProfileAsync(int id, string name, string language, string culture, string imageUri, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<Result> UpdateProfileAsync(int id, string name, string language, string culture, string imageUri, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(UserService)}.{nameof(UpdateProfileAsync)}");
 
@@ -138,11 +145,13 @@ public class UserService : IUserService
             user.ModifiedDate = DateTime.UtcNow;
 
             await _usersRepository.UpdateAsync(user, metric, cancellationToken);
+
+            return new(true);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(UpdateProfileAsync)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -150,7 +159,7 @@ public class UserService : IUserService
         }
     }
 
-    public async Task UpdateToDoNotificationsEnabledAsync(int id, bool enabled, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<Result> UpdateToDoNotificationsEnabledAsync(int id, bool enabled, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(UserService)}.{nameof(UpdateToDoNotificationsEnabledAsync)}");
 
@@ -161,11 +170,13 @@ public class UserService : IUserService
             user.ModifiedDate = DateTime.UtcNow;
 
             await _usersRepository.UpdateAsync(user, metric, cancellationToken);
+
+            return new(true);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(UpdateToDoNotificationsEnabledAsync)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -173,7 +184,7 @@ public class UserService : IUserService
         }
     }
 
-    public async Task UpdateChefNotificationsEnabledAsync(int id, bool enabled, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<Result> UpdateChefNotificationsEnabledAsync(int id, bool enabled, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(UserService)}.{nameof(UpdateChefNotificationsEnabledAsync)}");
 
@@ -184,11 +195,13 @@ public class UserService : IUserService
             user.ModifiedDate = DateTime.UtcNow;
 
             await _usersRepository.UpdateAsync(user, metric, cancellationToken);
+
+            return new(true);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(UpdateChefNotificationsEnabledAsync)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -196,7 +209,7 @@ public class UserService : IUserService
         }
     }
 
-    public async Task UpdateImperialSystemAsync(int id, bool imperialSystem, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<Result> UpdateImperialSystemAsync(int id, bool imperialSystem, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(UserService)}.{nameof(UpdateImperialSystemAsync)}");
 
@@ -207,11 +220,13 @@ public class UserService : IUserService
             user.ModifiedDate = DateTime.UtcNow;
 
             await _usersRepository.UpdateAsync(user, metric, cancellationToken);
+
+            return new(true);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(UpdateImperialSystemAsync)}");
-            throw;
+            return new();
         }
         finally
         {

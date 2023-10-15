@@ -18,28 +18,30 @@ public class PushSubscriptionService : IPushSubscriptionService
         _logger = logger;
     }
 
-    public async Task CreateSubscriptionAsync(int userId, string application, string endpoint, string authKey, string p256dhKey, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<Result> CreateSubscriptionAsync(int userId, string application, string endpoint, string authKey, string p256dhKey, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(PushSubscriptionService)}.{nameof(CreateSubscriptionAsync)}");
 
-        var subscription = new PushSubscription
-        {
-            UserId = userId,
-            Application = application,
-            Endpoint = endpoint,
-            AuthKey = authKey,
-            P256dhKey = p256dhKey,
-            CreatedDate = DateTime.UtcNow
-        };
-
         try
         {
+            var subscription = new PushSubscription
+            {
+                UserId = userId,
+                Application = application,
+                Endpoint = endpoint,
+                AuthKey = authKey,
+                P256dhKey = p256dhKey,
+                CreatedDate = DateTime.UtcNow
+            };
+
             await _pushSubscriptionsRepository.CreateSubscriptionAsync(subscription, metric, cancellationToken);
+
+            return new(true);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(CreateSubscriptionAsync)}");
-            throw;
+            return new();
         }
         finally
         {

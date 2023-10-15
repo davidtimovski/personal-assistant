@@ -19,12 +19,15 @@ public class TasksControllerTests
 
     public TasksControllerTests()
     {
+        _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
+        _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
+
         _sut = new TasksController(
             _userIdLookupMock.Object, null, null,
             _taskServiceMock.Object,
             null, null, null, null, null, null,
             new Mock<IOptions<AppConfiguration>>().Object,
-            null)
+            null, null)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };
@@ -33,10 +36,8 @@ public class TasksControllerTests
     [Fact]
     public void Get_Returns404_IfNotFound()
     {
-        _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
-        _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
         _taskServiceMock.Setup(x => x.Get(It.IsAny<int>(), It.IsAny<int>()))
-            .Returns((TaskDto?)null);
+            .Returns(new Result<TaskDto?>(null));
 
         var result = _sut.Get(It.IsAny<int>());
 
@@ -46,10 +47,8 @@ public class TasksControllerTests
     [Fact]
     public void GetForUpdate_Returns404_IfNotFound()
     {
-        _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
-        _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
         _taskServiceMock.Setup(x => x.GetForUpdate(It.IsAny<int>(), It.IsAny<int>()))
-            .Returns((TaskForUpdate?)null);
+            .Returns(new Result<TaskForUpdate?>(null));
 
         var result = _sut.GetForUpdate(It.IsAny<int>());
 

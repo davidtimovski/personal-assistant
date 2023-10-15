@@ -1,26 +1,39 @@
 ﻿using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
+using FluentValidation.Results;
 
 namespace ToDoAssistant.Application.Contracts.Tasks.Models;
 
-public class CreatedTaskResult : INotificationResult
+public class CreatedTaskResult : INotificationResult, IValidatedResult
 {
-    public CreatedTaskResult(int taskId, int listId, bool notifySignalR)
+    public CreatedTaskResult(ResultStatus status)
     {
-        TaskId = taskId;
-        ListId = listId;
-        NotifySignalR = notifySignalR;
+        if (status == ResultStatus.Invalid)
+        {
+            throw new ArgumentException($"Use this constructor only with {nameof(ResultStatus.Successful)} and {nameof(ResultStatus.Error)} status");
+        }
+
+        Status = status;
     }
 
-    public int TaskId { get; }
-    public int ListId { get; }
-    public bool NotifySignalR { get; }
+    public CreatedTaskResult(List<ValidationFailure> validationErrors)
+    {
+        Status = ResultStatus.Invalid;
+        ValidationErrors = validationErrors;
+    }
 
-    public string TaskName { get; set; } = null!;
-    public string ListName { get; set; } = null!;
-    public string ActionUserName { get; set; } = null!;
-    public string ActionUserImageUri { get; set; } = null!;
-    public List<NotificationRecipient> NotificationRecipients { get; set; } = new();
+    public ResultStatus Status { get; private set; }
+    public IReadOnlyCollection<ValidationFailure>? ValidationErrors { get; private set; }
+
+    public int TaskId { get; init; }
+    public int ListId { get; init; }
+    public bool NotifySignalR { get; init; }
+
+    public string TaskName { get; init; } = null!;
+    public string ListName { get; init; } = null!;
+    public string ActionUserName { get; init; } = null!;
+    public string ActionUserImageUri { get; init; } = null!;
+    public IReadOnlyCollection<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
 
     public bool Notify()
     {

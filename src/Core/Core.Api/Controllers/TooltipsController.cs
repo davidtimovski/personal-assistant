@@ -32,13 +32,14 @@ public class TooltipsController : BaseController
 
         try
         {
-            var tooltipDtos = _tooltipService.GetAll(application, UserId, tr);
-            return Ok(tooltipDtos);
-        }
-        catch
-        {
-            tr.Status = SpanStatus.InternalError;
-            return StatusCode(500);
+            var result = _tooltipService.GetAll(application, UserId, tr);
+            if (result.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            return Ok(result.Data);
         }
         finally
         {
@@ -57,13 +58,14 @@ public class TooltipsController : BaseController
 
         try
         {
-            var tooltipDto = _tooltipService.GetByKey(UserId, key, application, tr);
-            return Ok(tooltipDto);
-        }
-        catch
-        {
-            tr.Status = SpanStatus.InternalError;
-            return StatusCode(500);
+            var result = _tooltipService.GetByKey(UserId, key, application, tr);
+            if (result.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            return Ok(result.Data);
         }
         finally
         {
@@ -74,11 +76,6 @@ public class TooltipsController : BaseController
     [HttpPut]
     public async Task<IActionResult> ToggleDismissed([FromBody] TooltipToggleDismissedRequest request, CancellationToken cancellationToken)
     {
-        if (request is null)
-        {
-            return BadRequest();
-        }
-
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} api/tooltips",
             $"{nameof(TooltipsController)}.{nameof(ToggleDismissed)}",
@@ -87,18 +84,24 @@ public class TooltipsController : BaseController
 
         try
         {
-            await _tooltipService.ToggleDismissedAsync(UserId, request.Key, request.Application, request.IsDismissed, tr, cancellationToken);
-        }
-        catch
-        {
-            tr.Status = SpanStatus.InternalError;
-            return StatusCode(500);
+            if (request is null)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return BadRequest();
+            }
+
+            var result = await _tooltipService.ToggleDismissedAsync(UserId, request.Key, request.Application, request.IsDismissed, tr, cancellationToken);
+            if (result.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            return NoContent();
         }
         finally
         {
             tr.Finish();
         }
-
-        return NoContent();
     }
 }

@@ -23,7 +23,7 @@ public class TooltipService : ITooltipService
         _logger = logger;
     }
 
-    public IEnumerable<TooltipDto> GetAll(string application, int userId, ISpan metricsSpan)
+    public Result<IEnumerable<TooltipDto>> GetAll(string application, int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(TooltipService)}.{nameof(GetAll)}");
 
@@ -31,14 +31,14 @@ public class TooltipService : ITooltipService
         {
             var tooltips = _tooltipsRepository.GetAll(application, userId, metric);
 
-            var tooltipDtos = tooltips.Select(x => _mapper.Map<TooltipDto>(x));
+            var result = tooltips.Select(x => _mapper.Map<TooltipDto>(x));
 
-            return tooltipDtos;
+            return new(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(GetAll)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -46,19 +46,21 @@ public class TooltipService : ITooltipService
         }
     }
 
-    public TooltipDto GetByKey(int userId, string key, string application, ISpan metricsSpan)
+    public Result<TooltipDto> GetByKey(int userId, string key, string application, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(TooltipService)}.{nameof(GetByKey)}");
 
         try
         {
             Tooltip tooltip = _tooltipsRepository.GetByKey(userId, key, application, metric);
-            return _mapper.Map<TooltipDto>(tooltip);
+            var result = _mapper.Map<TooltipDto>(tooltip);
+
+            return new(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(GetByKey)}");
-            throw;
+            return new();
         }
         finally
         {
@@ -66,18 +68,19 @@ public class TooltipService : ITooltipService
         }
     }
 
-    public async Task ToggleDismissedAsync(int userId, string key, string application, bool isDismissed, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<Result> ToggleDismissedAsync(int userId, string key, string application, bool isDismissed, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(TooltipService)}.{nameof(ToggleDismissedAsync)}");
 
         try
         {
             await _tooltipsRepository.ToggleDismissedAsync(userId, key, application, isDismissed, metric, cancellationToken);
+            return new(true);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(ToggleDismissedAsync)}");
-            throw;
+            return new();
         }
         finally
         {

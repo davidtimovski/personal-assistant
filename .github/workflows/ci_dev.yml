@@ -5,6 +5,7 @@ on:
     branches:
       - dev
     paths-ignore:
+      - "src/docs/**"
       - "src/Accountant/accountant/**"
       - "src/Accountant/accountant2/**"
       - "src/Chef/cooking-assistant/**"
