@@ -113,31 +113,36 @@ public class AccountController : BaseController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model, string? returnUrl, CancellationToken cancellationToken)
     {
-        if (!ModelState.IsValid)
-        {
-            return View(model);
-        }
-
         var tr = Metrics.StartTransaction(
             $"{Request.Method} account/register",
             $"{nameof(AccountController)}.{nameof(Register)}"
         );
 
-        ViewData["ReturnUrl"] = returnUrl;
-
         try
         {
+            if (!ModelState.IsValid)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return View(model);
+            }
+
+            ViewData["ReturnUrl"] = returnUrl;
+
             using var httpClient = await InitializeAuth0ClientAsync(tr, cancellationToken);
 
             var authId = await Auth0Proxy.RegisterUserAsync(httpClient, model.Email, model.Password, model.Name, tr, cancellationToken);
 
-            var createResult = await _userService.CreateAsync(authId, model.Email, model.Name, model.Language, model.Culture, _cdnService.GetDefaultProfileImageUri(), tr, cancellationToken);
+            var createResult = await _userService.CreateAsync(authId, model.Email, model.Name, model.Language, model.Culture, _cdnService.DefaultProfileImageUri.ToString(), tr, cancellationToken);
             if (createResult.Failed)
             {
                 throw new Exception("User creation failed");
             }
 
-            await _cdnService.CreateFolderForUserAsync(createResult.Data, tr, cancellationToken);
+            var createFolderResult = await _cdnService.CreateFolderForUserAsync(createResult.Data, tr, cancellationToken);
+            if (createFolderResult.Failed)
+            {
+                throw new Exception("Failed to create folder on CDN for user");
+            }
 
             await CreateRequiredDataAsync(createResult.Data, tr);
             await CreateSamplesAsync(createResult.Data, tr, cancellationToken);
@@ -257,11 +262,6 @@ public class AccountController : BaseController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model, CancellationToken cancellationToken)
     {
-        if (!ModelState.IsValid)
-        {
-            return View(model);
-        }
-
         var tr = Metrics.StartTransaction(
             $"{Request.Method} account/reset-password",
             $"{nameof(AccountController)}.{nameof(ResetPassword)}"
@@ -269,6 +269,12 @@ public class AccountController : BaseController
 
         try
         {
+            if (!ModelState.IsValid)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return View(model);
+            }
+
             using var httpClient = await InitializeAuth0ClientAsync(tr, cancellationToken);
 
             await Auth0Proxy.ResetPasswordAsync(httpClient, model.Email, tr, cancellationToken);
@@ -320,10 +326,15 @@ public class AccountController : BaseController
                 return StatusCode(500);
             }
 
-            var filePaths = new List<string> { userResult.Data!.ImageUri };
+            var filePaths = new List<Uri> { new Uri(userResult.Data!.ImageUri) };
             IEnumerable<string> recipeUris = _recipeService.GetAllImageUris(userResult.Data.Id, tr);
-            filePaths.AddRange(recipeUris);
-            await _cdnService.DeleteUserResourcesAsync(userResult.Data.Id, filePaths, tr, cancellationToken);
+            filePaths.AddRange(recipeUris.Select(x => new Uri(x)));
+
+            var deleteResult = await _cdnService.DeleteUserResourcesAsync(userResult.Data.Id, filePaths, tr, cancellationToken);
+            if (deleteResult.Failed)
+            {
+                throw new Exception("Failed to delete user resources");
+            }
 
             await _usersRepository.DeleteAsync(UserId, tr, cancellationToken);
 
@@ -376,7 +387,7 @@ public class AccountController : BaseController
                 userResult.Data!.Language,
                 userResult.Data.Culture,
                 userResult.Data.ImageUri,
-                _cdnService.GetDefaultProfileImageUri(),
+                _cdnService.DefaultProfileImageUri.ToString(),
                 _config.Urls.PersonalAssistant
             );
 
@@ -398,19 +409,6 @@ public class AccountController : BaseController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditProfile(EditProfileViewModel model, CancellationToken cancellationToken)
     {
-        if (!ModelState.IsValid)
-        {
-            return View(new ViewProfileViewModel
-            (
-                model.Name,
-                model.Language,
-                model.Culture,
-                model.ImageUri,
-                _cdnService.GetDefaultProfileImageUri(),
-                _config.Urls.PersonalAssistant
-            ));
-        }
-
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} account/edit-profile",
             $"{nameof(AccountController)}.{nameof(EditProfile)}",
@@ -419,11 +417,25 @@ public class AccountController : BaseController
 
         try
         {
+            if (!ModelState.IsValid)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return View(new ViewProfileViewModel
+                (
+                    model.Name,
+                    model.Language,
+                    model.Culture,
+                    model.ImageUri,
+                    _cdnService.DefaultProfileImageUri.ToString(),
+                    _config.Urls.PersonalAssistant
+                ));
+            }
+
             using var httpClient = await InitializeAuth0ClientAsync(tr, cancellationToken);
 
             await Auth0Proxy.UpdateNameAsync(httpClient, AuthId, model.Name, tr, cancellationToken);
 
-            var imageUri = string.IsNullOrEmpty(model.ImageUri) ? _cdnService.GetDefaultProfileImageUri() : model.ImageUri;
+            var imageUri = string.IsNullOrEmpty(model.ImageUri) ? _cdnService.DefaultProfileImageUri.ToString() : model.ImageUri;
             await _userService.UpdateProfileAsync(UserId, model.Name, model.Language, model.Culture, imageUri, tr, cancellationToken);
 
             var userResult = _userService.Get(UserId);
@@ -441,13 +453,21 @@ public class AccountController : BaseController
                 // and had a previous one, delete it
                 if (oldImageUri != null)
                 {
-                    await _cdnService.DeleteAsync(oldImageUri, tr, cancellationToken);
+                    var deleteResult = await _cdnService.DeleteAsync(new Uri(oldImageUri), tr, cancellationToken);
+                    if (deleteResult.Failed)
+                    {
+                        throw new Exception("Failed to delete image");
+                    }
                 }
 
                 // and has a new one, remove its temp tag
                 if (userResult.Data.ImageUri != null)
                 {
-                    await _cdnService.RemoveTempTagAsync(userResult.Data.ImageUri, tr, cancellationToken);
+                    var removeTagResult = await _cdnService.RemoveTempTagAsync(new Uri(userResult.Data.ImageUri), tr, cancellationToken);
+                    if (removeTagResult.Failed)
+                    {
+                        throw new Exception("Failed remove temporary tag");
+                    }
                 }
             }
 
@@ -470,7 +490,7 @@ public class AccountController : BaseController
                 model.Language,
                 model.Culture,
                 model.ImageUri,
-                _cdnService.GetDefaultProfileImageUri(),
+                _cdnService.DefaultProfileImageUri.ToString(),
                 _config.Urls.PersonalAssistant
             ));
         }
@@ -484,20 +504,6 @@ public class AccountController : BaseController
     [ActionName("upload-profile-image")]
     public async Task<IActionResult> UploadProfileImage(IFormFile image, CancellationToken cancellationToken)
     {
-        if (image.Length > 10 * 1024 * 1024)
-        {
-            ModelState.AddModelError(string.Empty, _localizer["ImageTooLarge", 10]);
-            return new UnprocessableEntityObjectResult(ModelState);
-        }
-
-        string extension = Path.GetExtension(image.FileName);
-
-        if (!new[] { ".JPG", ".PNG", ".JPEG" }.Contains(extension.ToUpperInvariant()))
-        {
-            ModelState.AddModelError(string.Empty, _localizer["InvalidImageFormat"]);
-            return new UnprocessableEntityObjectResult(ModelState);
-        }
-
         var tr = Metrics.StartTransactionWithUser(
             $"{Request.Method} account/upload-profile-image",
             $"{nameof(AccountController)}.{nameof(UploadProfileImage)}",
@@ -506,9 +512,26 @@ public class AccountController : BaseController
 
         try
         {
+            if (image.Length > 10 * 1024 * 1024)
+            {
+                ModelState.AddModelError(string.Empty, _localizer["ImageTooLarge", 10]);
+                tr.Status = SpanStatus.InvalidArgument;
+                return new UnprocessableEntityObjectResult(ModelState);
+            }
+
+            string extension = Path.GetExtension(image.FileName);
+
+            if (!new[] { ".JPG", ".PNG", ".JPEG" }.Contains(extension.ToUpperInvariant()))
+            {
+                ModelState.AddModelError(string.Empty, _localizer["InvalidImageFormat"]);
+                tr.Status = SpanStatus.InvalidArgument;
+                return new UnprocessableEntityObjectResult(ModelState);
+            }
+
             if (image.Length == 0)
             {
                 ModelState.AddModelError(string.Empty, _localizer["InvalidImage"]);
+                tr.Status = SpanStatus.InvalidArgument;
                 return new UnprocessableEntityObjectResult(ModelState);
             }
 
@@ -524,13 +547,20 @@ public class AccountController : BaseController
                 await image.CopyToAsync(stream);
             }
 
-            string imageUri = await _cdnService.UploadProfileTempAsync(
+            var imageUriResult = await _cdnService.UploadProfileTempAsync(
                 filePath: tempImagePath,
                 uploadPath: $"users/{UserId}",
                 template: "profile",
                 tr,
                 cancellationToken
             );
+            if (imageUriResult.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            var imageUri = imageUriResult.Data!.ToString();
 
             return StatusCode(201, new { imageUri });
         }

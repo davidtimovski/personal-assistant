@@ -3,8 +3,8 @@ using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
-using Core.Application.Utils;
 using FluentValidation;
+using Microsoft.Extensions.Logging;
 using Sentry;
 
 namespace Cdn;
@@ -14,8 +14,6 @@ public class CloudinaryService : ICdnService
     private const string Format = "webp";
 
     private readonly string _environment;
-    private readonly string _defaultProfileImageUri;
-    private readonly string _defaultRecipeImageUri;
     private readonly string _baseUrl;
     private readonly IReadOnlyDictionary<string, Transformation> _templates = new Dictionary<string, Transformation>
     {
@@ -24,33 +22,35 @@ public class CloudinaryService : ICdnService
     };
     private readonly HttpClient _httpClient;
     private readonly CloudinaryDotNet.Cloudinary _cloudinary;
+    private readonly ILogger<CloudinaryService> _logger;
 
     public CloudinaryService(
         Account cloudinaryAccount,
         string environment,
-        string defaultProfileImageUri,
-        string defaultRecipeImageUri,
-        HttpClient httpClient)
+        Uri defaultProfileImageUri,
+        Uri defaultRecipeImageUri,
+        HttpClient httpClient,
+        ILogger<CloudinaryService> logger)
     {
         _environment = environment.ToLowerInvariant();
-        _defaultProfileImageUri = defaultProfileImageUri;
-        _defaultRecipeImageUri = defaultRecipeImageUri;
+        DefaultProfileImageUri = defaultProfileImageUri;
+        DefaultRecipeImageUri = defaultRecipeImageUri;
         _baseUrl = $"https://res.cloudinary.com/personalassistant/{_environment}/";
         _httpClient = httpClient;
         _cloudinary = new CloudinaryDotNet.Cloudinary(cloudinaryAccount);
+        _logger = logger;
     }
 
-    public string GetDefaultProfileImageUri() => _defaultProfileImageUri;
+    public Uri DefaultProfileImageUri { get; private set; }
+    public Uri DefaultRecipeImageUri { get; private set; }
 
-    public string GetDefaultRecipeImageUri() => _defaultRecipeImageUri;
-
-    public string ImageUriToThumbnail(string imageUri)
+    public Uri ImageUriToThumbnail(Uri imageUri)
     {
-        string[] parts = imageUri.Split("personalassistant");
-        return parts[0] + "personalassistant/w_80,h_80,c_limit" + parts[1];
+        string[] parts = imageUri.ToString().Split("personalassistant");
+        return new Uri(parts[0] + "personalassistant/w_80,h_80,c_limit" + parts[1]);
     }
 
-    public async Task<string> UploadAsync(string filePath, string uploadPath, string template, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<Result<Uri>> UploadAsync(string filePath, string uploadPath, string template, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(UploadAsync)}");
 
@@ -75,7 +75,14 @@ public class CloudinaryService : ICdnService
 
             File.Delete(filePath);
 
-            return _baseUrl + $"{uploadPath}/{uri}.{Format}";
+            var url = new Uri(_baseUrl + $"{uploadPath}/{uri}.{Format}");
+
+            return new(url);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(UploadAsync)}");
+            return new();
         }
         finally
         {
@@ -83,14 +90,18 @@ public class CloudinaryService : ICdnService
         }
     }
 
-    public async Task<string> UploadTempAsync(UploadTempImage model, IValidator<UploadTempImage> validator, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<ValidatedResult<string>> UploadTempAsync(UploadTempImage model, IValidator<UploadTempImage> validator, ISpan metricsSpan, CancellationToken cancellationToken)
     {
-        ValidationUtil.ValidOrThrow(model, validator);
-
         var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(UploadTempAsync)}");
 
         try
         {
+            var validationResult = validator.Validate(model);
+            if (!validationResult.IsValid)
+            {
+                return new(validationResult.Errors);
+            }
+
             string extension = Path.GetExtension(model.FileName);
 
             if (!Directory.Exists(model.LocalTempPath))
@@ -113,7 +124,12 @@ public class CloudinaryService : ICdnService
                 cancellationToken
             );
 
-            return imageUri;
+            return new(imageUri);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(UploadTempAsync)}");
+            return new();
         }
         finally
         {
@@ -121,7 +137,7 @@ public class CloudinaryService : ICdnService
         }
     }
 
-    public async Task<string> UploadProfileTempAsync(string filePath, string uploadPath, string template, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<Result<Uri>> UploadProfileTempAsync(string filePath, string uploadPath, string template, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(UploadProfileTempAsync)}");
 
@@ -147,7 +163,14 @@ public class CloudinaryService : ICdnService
 
             File.Delete(filePath);
 
-            return _baseUrl + $"{uploadPath}/{uri}.{Format}";
+            var url = new Uri(_baseUrl + $"{uploadPath}/{uri}.{Format}");
+
+            return new(url);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(UploadProfileTempAsync)}");
+            return new();
         }
         finally
         {
@@ -155,18 +178,18 @@ public class CloudinaryService : ICdnService
         }
     }
 
-    public async Task<string> CopyAndUploadAsync(string localTempPath, string imageUriToCopy, string uploadPath, string template, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<Result<Uri>> CopyAndUploadAsync(string localTempPath, Uri imageUriToCopy, string uploadPath, string template, ISpan metricsSpan, CancellationToken cancellationToken)
     {
-        if (imageUriToCopy == _defaultRecipeImageUri)
+        if (imageUriToCopy.Equals(DefaultRecipeImageUri))
         {
-            return imageUriToCopy;
+            return new(imageUriToCopy);
         }
 
         var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(CopyAndUploadAsync)}");
 
         try
         {
-            var result = await _httpClient.GetAsync(new Uri(imageUriToCopy), cancellationToken);
+            var result = await _httpClient.GetAsync(imageUriToCopy, cancellationToken);
 
             if (!Directory.Exists(localTempPath))
             {
@@ -181,15 +204,24 @@ public class CloudinaryService : ICdnService
                 await image.CopyToAsync(stream, cancellationToken);
             }
 
-            string imageUri = await UploadAsync(
+            var imageUriResult = await UploadAsync(
                 filePath: tempImagePath,
                 uploadPath: uploadPath,
                 template: template,
                 metricsSpan: metric,
                 cancellationToken
             );
+            if (imageUriResult.Failed)
+            {
+                return new();
+            }
 
-            return imageUri;
+            return new(imageUriResult.Data!);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(CopyAndUploadAsync)}");
+            return new();
         }
         finally
         {
@@ -197,11 +229,11 @@ public class CloudinaryService : ICdnService
         }
     }
 
-    public async Task RemoveTempTagAsync(string imageUri, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<Result> RemoveTempTagAsync(Uri imageUri, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         if (IsDefaultImage(imageUri))
         {
-            return;
+            return new(true);
         }
 
         var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(RemoveTempTagAsync)}");
@@ -222,6 +254,13 @@ public class CloudinaryService : ICdnService
             {
                 throw new Exception($"{nameof(CloudinaryService)}.{nameof(RemoveTempTagAsync)}() returned error: {tagResult.Error.Message}");
             }
+
+            return new(true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(RemoveTempTagAsync)}");
+            return new();
         }
         finally
         {
@@ -229,11 +268,11 @@ public class CloudinaryService : ICdnService
         }
     }
 
-    public async Task DeleteAsync(string imageUri, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<Result> DeleteAsync(Uri imageUri, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         if (IsDefaultImage(imageUri))
         {
-            return;
+            return new(true);
         }
 
         var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(DeleteAsync)}");
@@ -246,10 +285,18 @@ public class CloudinaryService : ICdnService
             {
                 PublicIds = new List<string> { publicId }
             }, cancellationToken);
+
             if (deleteResult.Error != null)
             {
                 throw new Exception($"{nameof(CloudinaryService)}.{nameof(DeleteAsync)}() returned error: {deleteResult.Error.Message}");
             }
+
+            return new(true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(DeleteAsync)}");
+            return new();
         }
         finally
         {
@@ -257,7 +304,7 @@ public class CloudinaryService : ICdnService
         }
     }
 
-    public async Task CreateFolderForUserAsync(int userId, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<Result> CreateFolderForUserAsync(int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(CreateFolderForUserAsync)}");
 
@@ -268,6 +315,13 @@ public class CloudinaryService : ICdnService
             {
                 throw new Exception($"{nameof(CloudinaryService)}.{nameof(CreateFolderForUserAsync)}() returned error: {result.Error.Message}");
             }
+
+            return new(true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(CreateFolderForUserAsync)}");
+            return new();
         }
         finally
         {
@@ -275,14 +329,14 @@ public class CloudinaryService : ICdnService
         }
     }
 
-    public async Task DeleteUserResourcesAsync(int userId, IEnumerable<string> imageUris, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<Result> DeleteUserResourcesAsync(int userId, IEnumerable<Uri> imageUris, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(DeleteUserResourcesAsync)}");
 
         try
         {
             var publicIds = new List<string>();
-            foreach (string uri in imageUris.Where(x => !IsDefaultImage(x)))
+            foreach (var uri in imageUris.Where(x => !IsDefaultImage(x)))
             {
                 string publicId = GetPublicIdFromUri(uri);
                 publicIds.Add(publicId);
@@ -302,6 +356,13 @@ public class CloudinaryService : ICdnService
             {
                 throw new Exception($"{nameof(CloudinaryService)}.{nameof(DeleteUserResourcesAsync)}() returned error: {deleteFolderResult.Error.Message}");
             }
+
+            return new(true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Unexpected error in {nameof(DeleteUserResourcesAsync)}");
+            return new();
         }
         finally
         {
@@ -309,33 +370,44 @@ public class CloudinaryService : ICdnService
         }
     }
 
-    public async Task DeleteTemporaryResourcesAsync(DateTime olderThan, CancellationToken cancellationToken)
+    public async Task<Result> DeleteTemporaryResourcesAsync(DateTime olderThan, CancellationToken cancellationToken)
     {
-        var searchResult = _cloudinary.ListResourcesByTag("temp");
-        if (!searchResult.Resources.Any())
+        try
         {
-            return;
-        }
+            var searchResult = _cloudinary.ListResourcesByTag("temp");
+            if (!searchResult.Resources.Any())
+            {
+                return new(true);
+            }
 
-        var publicIds = searchResult.Resources.Where(x => DateTime.Parse(x.CreatedAt) < olderThan).Select(x => x.PublicId).ToList();
-        if (!publicIds.Any())
-        {
-            return;
-        }
+            var publicIds = searchResult.Resources.Where(x => DateTime.Parse(x.CreatedAt) < olderThan).Select(x => x.PublicId).ToList();
+            if (!publicIds.Any())
+            {
+                return new(true);
+            }
 
-        DelResResult deleteResult = await _cloudinary.DeleteResourcesAsync(new DelResParams
+            DelResResult deleteResult = await _cloudinary.DeleteResourcesAsync(new DelResParams
+            {
+                PublicIds = publicIds
+            }, cancellationToken);
+
+            if (deleteResult.Error != null)
+            {
+                throw new Exception($"{nameof(CloudinaryService)}.{nameof(DeleteTemporaryResourcesAsync)}() returned error: {deleteResult.Error.Message}");
+            }
+
+            return new(true);
+        }
+        catch (Exception ex)
         {
-            PublicIds = publicIds
-        }, cancellationToken);
-        if (deleteResult.Error != null)
-        {
-            throw new Exception($"{nameof(CloudinaryService)}.{nameof(DeleteTemporaryResourcesAsync)}() returned error: {deleteResult.Error.Message}");
+            _logger.LogError(ex, $"Unexpected error in {nameof(DeleteTemporaryResourcesAsync)}");
+            return new();
         }
     }
 
-    private bool IsDefaultImage(string uri)
+    private bool IsDefaultImage(Uri uri)
     {
-        var defaults = new[] { _defaultProfileImageUri, _defaultRecipeImageUri };
+        var defaults = new[] { DefaultProfileImageUri, DefaultRecipeImageUri };
         return defaults.Contains(uri);
     }
 
@@ -364,10 +436,10 @@ public class CloudinaryService : ICdnService
         return _baseUrl + $"{uploadPath}/{uri}.{Format}";
     }
 
-    private string GetPublicIdFromUri(string uri)
+    private string GetPublicIdFromUri(Uri uri)
     {
         var pathRegex = new Regex(@$"personalassistant\/(.*).{Format}");
-        Match match = pathRegex.Match(uri);
+        Match match = pathRegex.Match(uri.ToString());
         return match.Groups[1].Value;
     }
 

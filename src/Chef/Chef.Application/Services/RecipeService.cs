@@ -559,7 +559,11 @@ public class RecipeService : IRecipeService
 
             if (model.ImageUri != null)
             {
-                await _cdnService.RemoveTempTagAsync(model.ImageUri, metric, cancellationToken);
+                var removeTagResult = await _cdnService.RemoveTempTagAsync(new Uri(model.ImageUri), metric, cancellationToken);
+                if (removeTagResult.Failed)
+                {
+                    throw new Exception("Failed to remove temporary tag");
+                }
             }
 
             return id;
@@ -592,7 +596,7 @@ public class RecipeService : IRecipeService
                 PrepDuration = TimeSpan.FromMinutes(10),
                 CookDuration = TimeSpan.FromMinutes(15),
                 Servings = 2,
-                ImageUri = _cdnService.GetDefaultRecipeImageUri(),
+                ImageUri = _cdnService.DefaultRecipeImageUri.ToString(),
                 LastOpenedDate = now,
                 CreatedDate = now,
                 ModifiedDate = now
@@ -702,13 +706,21 @@ public class RecipeService : IRecipeService
                 // and it previously had one, delete it
                 if (oldImageUri != null)
                 {
-                    await _cdnService.DeleteAsync(oldImageUri, metric, cancellationToken);
+                    var deleteResult = await _cdnService.DeleteAsync(new Uri(oldImageUri), metric, cancellationToken);
+                    if (deleteResult.Failed)
+                    {
+                        throw new Exception("Failed to delete image");
+                    }
                 }
 
                 // and a new one was set, remove its temp tag
                 if (model.ImageUri != null)
                 {
-                    await _cdnService.RemoveTempTagAsync(model.ImageUri, metric, cancellationToken);
+                    var removeTagResult = await _cdnService.RemoveTempTagAsync(new Uri(model.ImageUri), metric, cancellationToken);
+                    if (removeTagResult.Failed)
+                    {
+                        throw new Exception("Failed to remove temporary tag");
+                    }
                 }
             }
 
@@ -763,7 +775,11 @@ public class RecipeService : IRecipeService
 
             if (imageUri != null)
             {
-                await _cdnService.DeleteAsync($"users/{userId}/recipes/{imageUri}", metric, cancellationToken);
+                var deleteResult = await _cdnService.DeleteAsync(new Uri($"users/{userId}/recipes/{imageUri}", UriKind.Relative), metric, cancellationToken);
+                if (deleteResult.Failed)
+                {
+                    throw new Exception("Failed to delete image");
+                }
             }
 
             var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeDeletion(id, metric).ToList();
