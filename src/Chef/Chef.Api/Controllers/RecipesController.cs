@@ -7,7 +7,6 @@ using Chef.Application.Contracts;
 using Chef.Application.Contracts.Ingredients;
 using Chef.Application.Contracts.Recipes;
 using Chef.Application.Contracts.Recipes.Models;
-using CloudinaryDotNet.Actions;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
 using FluentValidation;
@@ -16,7 +15,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Sentry;
-using User = Core.Application.Entities.User;
 
 namespace Chef.Api.Controllers;
 
@@ -431,7 +429,21 @@ public class RecipesController : BaseController
 
             await image.CopyToAsync(uploadModel.File);
 
-            string tempImageUri = await _cdnService.UploadTempAsync(uploadModel, _uploadTempImageValidator, tr, cancellationToken);
+            var tempImageUriResult = await _cdnService.UploadTempAsync(uploadModel, _uploadTempImageValidator, tr, cancellationToken);
+
+            if (tempImageUriResult.Status == ResultStatus.Error)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            if (tempImageUriResult.Status == ResultStatus.Invalid)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return StatusCode(422);
+            }
+
+            var tempImageUri = tempImageUriResult.Data!.ToString();
 
             return StatusCode(201, new { tempImageUri });
         }
@@ -967,14 +979,21 @@ public class RecipesController : BaseController
             // Copy recipe image if not default
             RecipeToNotify recipe = _recipeService.Get(importModel.Id, tr);
 
-            importModel.ImageUri = await _cdnService.CopyAndUploadAsync(
+            var imageUriResult = await _cdnService.CopyAndUploadAsync(
                 localTempPath: Path.Combine(_webHostEnvironment.ContentRootPath, "storage", "temp"),
-                imageUriToCopy: recipe.ImageUri,
+                imageUriToCopy: new Uri(recipe.ImageUri),
                 uploadPath: $"users/{importModel.UserId}/recipes",
                 template: "recipe",
                 tr,
                 cancellationToken
             );
+            if (imageUriResult.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            importModel.ImageUri = imageUriResult.Data!.ToString();
 
             int id = await _recipeService.ImportAsync(importModel, _importRecipeValidator, tr, cancellationToken);
 

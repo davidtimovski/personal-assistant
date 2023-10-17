@@ -209,7 +209,7 @@ public class ListWithSharesUserShareResolver : IValueResolver<ToDoList, ListWith
         if (userShare != null)
         {
             shareDto.Email = userShare.User!.Email;
-            shareDto.ImageUri = _cdnService.ImageUriToThumbnail(userShare.User.ImageUri);
+            shareDto.ImageUri = _cdnService.ImageUriToThumbnail(new Uri(userShare.User.ImageUri)).ToString();
             shareDto.IsAdmin = userShare.IsAdmin;
             return shareDto;
         }

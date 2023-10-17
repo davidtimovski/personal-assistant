@@ -22,6 +22,8 @@
 
 	let data = new HomePageData();
 	let showBalance = false;
+	let showUpcomingExpenses = false;
+	let showDebt = false;
 	let currency: string;
 	let dataLoaded = false;
 	const unsubscriptions: Unsubscriber[] = [];
@@ -41,9 +43,6 @@
 	let accountsService: AccountsService;
 
 	async function getCapital() {
-		const showUpcomingExpenses = localStorage.getBool(LocalStorageKeys.ShowUpcomingExpensesOnHomePage);
-		const showDebt = localStorage.getBool(LocalStorageKeys.ShowDebtOnHomePage);
-
 		const mainAccountId = await accountsService.getMainId();
 
 		const balancePromise = accountsService.getBalance(mainAccountId, currency);
@@ -51,11 +50,13 @@
 		const expendituresPromise = capitalService.getSpent(mainAccountId, $t('uncategorized'), currency);
 
 		const upcomingExpensesPromise = new Promise<{
-			upcomingSum: number;
 			upcomingExpenses: HomePageUpcomingExpense[];
-		} | null>(async (resolve) => {
+			upcomingAmount: number;
+		}>(async (resolve) => {
 			if (!showUpcomingExpenses) {
-				resolve(null);
+				const upcomingAmount = await capitalService.getUpcomingExpensesAmount(currency);
+
+				resolve({ upcomingExpenses: [], upcomingAmount });
 				return;
 			}
 
@@ -74,12 +75,12 @@
 
 		const result = await Promise.all([balancePromise, expendituresPromise, upcomingExpensesPromise, debtPromise]);
 		data = {
-			available: result[0] - (result[2] === null ? 0 : result[2].upcomingSum),
+			available: result[0] - result[2].upcomingAmount,
 			balance: result[0],
 			spent: result[1].spent,
 			expenditures: result[1].expenditures,
-			upcomingSum: result[2] === null ? 0 : result[2].upcomingSum,
-			upcomingExpenses: result[2] === null ? [] : result[2].upcomingExpenses,
+			upcomingAmount: result[2].upcomingAmount,
+			upcomingExpenses: result[2].upcomingExpenses,
 			debt: result[3]
 		};
 
@@ -150,6 +151,8 @@
 		accountsService = new AccountsService();
 
 		showBalance = localStorage.getBool(LocalStorageKeys.ShowBalanceOnHomePage);
+		showUpcomingExpenses = localStorage.getBool(LocalStorageKeys.ShowUpcomingExpensesOnHomePage);
+		showDebt = localStorage.getBool(LocalStorageKeys.ShowDebtOnHomePage);
 
 		const cache = localStorage.getObject<HomePageData>('homePageData');
 		if (cache) {
@@ -284,7 +287,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td colspan="3" class="table-sum">{Formatter.money(data.upcomingSum, currency, $user.language)}</td>
+								<td colspan="3" class="table-sum">{Formatter.money(data.upcomingAmount, currency, $user.language)}</td>
 							</tr>
 						</tfoot>
 					{/if}

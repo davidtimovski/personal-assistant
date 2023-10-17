@@ -305,16 +305,16 @@ public class ListsController : BaseController
             };
             var result = await _listService.CreateAsync(model, _createValidator, tr, cancellationToken);
 
-            if (result.Status == ResultStatus.Invalid)
-            {
-                tr.Status = SpanStatus.InvalidArgument;
-                return UnprocessableEntityResult(result.ValidationErrors!);
-            }
-
             if (result.Status == ResultStatus.Error)
             {
                 tr.Status = SpanStatus.InternalError;
                 return StatusCode(500);
+            }
+
+            if (result.Status == ResultStatus.Invalid)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return UnprocessableEntityResult(result.ValidationErrors!);
             }
 
             return StatusCode(201, result.Data);
@@ -353,16 +353,16 @@ public class ListsController : BaseController
             };
             var result = await _listService.UpdateAsync(model, _updateValidator, tr, cancellationToken);
 
-            if (result.Status == ResultStatus.Invalid)
-            {
-                tr.Status = SpanStatus.InvalidArgument;
-                return UnprocessableEntityResult(result.ValidationErrors!);
-            }
-
             if (result.Status == ResultStatus.Error)
             {
                 tr.Status = SpanStatus.InternalError;
                 return StatusCode(500);
+            }
+
+            if (result.Status == ResultStatus.Invalid)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return UnprocessableEntityResult(result.ValidationErrors!);
             }
 
             if (!result.Notify())
@@ -689,16 +689,16 @@ public class ListsController : BaseController
             };
             var result = await _listService.CopyAsync(model, _copyValidator, tr, cancellationToken);
 
-            if (result.Status == ResultStatus.Invalid)
-            {
-                tr.Status = SpanStatus.InvalidArgument;
-                return UnprocessableEntityResult(result.ValidationErrors!);
-            }
-
             if (result.Status == ResultStatus.Error)
             {
                 tr.Status = SpanStatus.InternalError;
                 return StatusCode(500);
+            }
+
+            if (result.Status == ResultStatus.Invalid)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return UnprocessableEntityResult(result.ValidationErrors!);
             }
 
             return StatusCode(201, result.Data);

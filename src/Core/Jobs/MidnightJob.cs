@@ -378,12 +378,10 @@ public class MidnightJob
 
     private async Task DeleteTemporaryCdnResourcesAsync(DateTime now)
     {
-        try
-        {
-            var olderThan = now.AddDays(-2);
-            await _cdnService.DeleteTemporaryResourcesAsync(olderThan, CancellationToken.None);
-        }
-        catch (Exception ex)
+        var olderThan = now.AddDays(-2);
+        var result = await _cdnService.DeleteTemporaryResourcesAsync(olderThan, CancellationToken.None);
+
+        if (result.Failed)
         {
             _logger.LogError(ex, $"{nameof(DeleteTemporaryCdnResourcesAsync)} failed");
         }

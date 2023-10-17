@@ -4,7 +4,7 @@ export class HomePageData {
 	available = 0;
 	spent = 0;
 	balance = 0;
-	upcomingSum = 0;
+	upcomingAmount = 0;
 	expenditures: AmountByCategory[] | null = null;
 	upcomingExpenses: HomePageUpcomingExpense[] | null = null;
 	debt: HomePageDebt[] | null = null;
