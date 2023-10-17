@@ -39,14 +39,14 @@ export class CapitalService {
 	async getUpcomingExpenses(
 		uncategorizedLabel: string,
 		currency: string
-	): Promise<{ upcomingExpenses: HomePageUpcomingExpense[]; upcomingSum: number }> {
+	): Promise<{ upcomingExpenses: HomePageUpcomingExpense[]; upcomingAmount: number }> {
 		try {
 			const monthUpcomingExpenses = await this.upcomingExpensesIDBHelper.getAllForMonth();
 
-			let upcomingSum = 0;
+			let upcomingAmount = 0;
 			monthUpcomingExpenses.forEach((x: UpcomingExpense) => {
 				x.amount = this.currenciesService.convert(x.amount, x.currency, currency);
-				upcomingSum += x.amount;
+				upcomingAmount += x.amount;
 			});
 
 			let upcomingExpenses = new Array<HomePageUpcomingExpense>();
@@ -65,7 +65,24 @@ export class CapitalService {
 				return b.amount - a.amount;
 			});
 
-			return { upcomingExpenses, upcomingSum };
+			return { upcomingExpenses, upcomingAmount };
+		} catch (e) {
+			this.logger.logError(e);
+			throw e;
+		}
+	}
+
+	async getUpcomingExpensesAmount(currency: string): Promise<number> {
+		try {
+			const monthUpcomingExpenses = await this.upcomingExpensesIDBHelper.getAllForMonth();
+
+			let upcomingAmount = 0;
+			monthUpcomingExpenses.forEach((x: UpcomingExpense) => {
+				x.amount = this.currenciesService.convert(x.amount, x.currency, currency);
+				upcomingAmount += x.amount;
+			});
+
+			return upcomingAmount;
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;

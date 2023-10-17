@@ -14,7 +14,7 @@
 
 	import AmountInput from '$lib/components/AmountInput.svelte';
 
-	let accountId: number;
+	let accountId: number | null = null;
 	let balance: number | null = null;
 	let description: string;
 	let originalBalance: number;
@@ -31,21 +31,16 @@
 	let min = 0.01;
 	$: adjustedBy = !balance ? 0 : balance - originalBalance;
 
-	$: if (currency) {
+	$: if (currency && accountId) {
 		loadBalance();
 	}
 
 	async function loadBalance() {
 		balance = null;
-		const accountBalance = await accountsService.getBalance(accountId, <string>currency);
+		const accountBalance = await accountsService.getBalance(<number>accountId, <string>currency);
 		originalBalance = accountBalance;
 		balance = originalBalance;
 		balanceLoaded = true;
-	}
-
-	async function accountChanged() {
-		const accountBalance = await accountsService.getBalance(accountId, <string>currency);
-		originalBalance = balance = accountBalance;
 	}
 
 	function validate(): ValidationResult {
@@ -72,7 +67,7 @@
 			try {
 				const amount = parseFloat(<any>balance) - originalBalance;
 
-				await transactionsService.adjust(accountId, amount, description, <string>currency);
+				await transactionsService.adjust(<number>accountId, amount, description, <string>currency);
 
 				alertState.update((x) => {
 					x.showSuccess('balanceAdjustment.adjustmentSuccessful');
@@ -102,8 +97,6 @@
 		accountOptions = await accountsService.getNonInvestmentFundsAsOptions();
 		const mainAccountId = <number>accountOptions[0].id;
 		accountId = mainAccountId;
-
-		loadBalance();
 
 		description = $t('balanceAdjustment.balanceAdjustment');
 	});
@@ -135,7 +128,7 @@
 			<div class="form-control inline">
 				<label for="account">{$t('account')}</label>
 				<div class="loadable-select" class:loaded={accountOptions}>
-					<select id="account" bind:value={accountId} on:change={accountChanged} disabled={!accountOptions} class="category-select">
+					<select id="account" bind:value={accountId} disabled={!accountOptions} class="category-select">
 						{#if accountOptions}
 							{#each accountOptions as account}
 								<option value={account.id}>{account.name}</option>
