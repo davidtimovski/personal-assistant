@@ -16,22 +16,22 @@ public class IngredientService : IIngredientService
     private readonly ILogger<IngredientService> _logger;
 
     public IngredientService(
-        IIngredientsRepository ingredientsRepository,
-        IMapper mapper,
-        ILogger<IngredientService> logger)
+        IIngredientsRepository? ingredientsRepository,
+        IMapper? mapper,
+        ILogger<IngredientService>? logger)
     {
-        _ingredientsRepository = ingredientsRepository;
-        _mapper = mapper;
-        _logger = logger;
+        _ingredientsRepository = ArgValidator.NotNull(ingredientsRepository);
+        _mapper = ArgValidator.NotNull(mapper);
+        _logger = ArgValidator.NotNull(logger);
     }
 
-    public List<IngredientDto> GetUserAndUsedPublicIngredients(int userId, ISpan metricsSpan)
+    public IReadOnlyList<IngredientDto> GetUserAndUsedPublicIngredients(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(IngredientService)}.{nameof(GetUserAndUsedPublicIngredients)}");
 
         try
         {
-            IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetUserAndUsedPublicIngredients(userId, metric);
+            var ingredients = _ingredientsRepository.GetUserAndUsedPublicIngredients(userId, metric);
 
             var result = ingredients.Select(x => _mapper.Map<IngredientDto>(x)).ToList();
 
@@ -94,13 +94,13 @@ public class IngredientService : IIngredientService
         }
     }
 
-    public IEnumerable<IngredientSuggestion> GetUserSuggestions(int userId, ISpan metricsSpan)
+    public IReadOnlyList<IngredientSuggestion> GetUserSuggestions(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(IngredientService)}.{nameof(GetUserSuggestions)}");
 
         try
         {
-            IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetForSuggestions(userId, metric);
+            var ingredients = _ingredientsRepository.GetForSuggestions(userId, metric);
 
             var suggestions = ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x)).ToList();
 
@@ -132,8 +132,8 @@ public class IngredientService : IIngredientService
         {
             var result = new PublicIngredientSuggestions();
 
-            IEnumerable<Ingredient> ingredients = _ingredientsRepository.GetForSuggestions(1, metric);
-            IEnumerable<IngredientCategory> categories = _ingredientsRepository.GetIngredientCategories(metric);
+            var ingredients = _ingredientsRepository.GetForSuggestions(1, metric);
+            var categories = _ingredientsRepository.GetIngredientCategories(metric);
 
             List<IngredientSuggestion> suggestions = ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x)).ToList();
 
@@ -176,16 +176,17 @@ public class IngredientService : IIngredientService
         }
     }
 
-    public IEnumerable<TaskSuggestion> GetTaskSuggestions(int userId, ISpan metricsSpan)
+    public IReadOnlyList<TaskSuggestion> GetTaskSuggestions(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(IngredientService)}.{nameof(GetTaskSuggestions)}");
 
         try
         {
-            IEnumerable<ToDoTask> tasks = _ingredientsRepository.GetTaskSuggestions(userId, metric);
+            var tasks = _ingredientsRepository.GetTaskSuggestions(userId, metric);
 
-            var result = tasks.Select(x => _mapper.Map<TaskSuggestion>(x));
-            result = result.OrderBy(x => x.Group);
+            var result = tasks.Select(x => _mapper.Map<TaskSuggestion>(x))
+                            .OrderBy(x => x.Group)
+                            .ToList();
 
             return result;
         }

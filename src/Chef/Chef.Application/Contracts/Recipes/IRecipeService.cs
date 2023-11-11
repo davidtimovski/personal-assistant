@@ -6,21 +6,21 @@ namespace Chef.Application.Contracts.Recipes;
 
 public interface IRecipeService
 {
-    IEnumerable<SimpleRecipe> GetAll(int userId, ISpan metricsSpan);
+    IReadOnlyList<SimpleRecipe> GetAll(int userId, ISpan metricsSpan);
     RecipeToNotify Get(int id, ISpan metricsSpan);
     RecipeDto? Get(int id, int userId, string currency, ISpan metricsSpan);
     RecipeForUpdate? GetForUpdate(int id, int userId, ISpan metricsSpan);
-    RecipeForSending GetForSending(int id, int userId, ISpan metricsSpan);
+    RecipeForSending? GetForSending(int id, int userId, ISpan metricsSpan);
     RecipeWithShares? GetWithShares(int id, int userId, ISpan metricsSpan);
-    IEnumerable<ShareRecipeRequest> GetShareRequests(int userId, ISpan metricsSpan);
+    IReadOnlyList<ShareRecipeRequest> GetShareRequests(int userId, ISpan metricsSpan);
     int GetPendingShareRequestsCount(int userId, ISpan metricsSpan);
     bool CanShareWithUser(int shareWithId, int userId, ISpan metricsSpan);
-    IEnumerable<SendRequestDto> GetSendRequests(int userId, ISpan metricsSpan);
+    IReadOnlyList<SendRequestDto> GetSendRequests(int userId, ISpan metricsSpan);
     int GetPendingSendRequestsCount(int userId, ISpan metricsSpan);
     bool SendRequestExists(int id, int userId);
     bool IngredientsReviewIsRequired(int id, int userId, ISpan metricsSpan);
     RecipeForReview? GetForReview(int id, int userId, ISpan metricsSpan);
-    IEnumerable<string> GetAllImageUris(int userId, ISpan metricsSpan);
+    IReadOnlyList<string> GetAllImageUris(int userId, ISpan metricsSpan);
     bool Exists(int id, int userId);
     bool Exists(string name, int userId);
     bool Exists(int id, string name, int userId);

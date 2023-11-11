@@ -1,6 +1,7 @@
 ﻿using Application.UnitTests.Builders;
 using Core.Application.Contracts;
 using FluentValidation;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Sentry;
 using ToDoAssistant.Application.Contracts.Lists;
@@ -28,7 +29,7 @@ public class CreateTests
         _successfulValidatorMock = ValidatorMocker.GetSuccessful<CreateTask>();
 
         _listServiceMock.Setup(x => x.IsShared(It.IsAny<int>(), It.IsAny<int>())).Returns(new Result<bool?>(true));
-        _listServiceMock.Setup(x => x.GetUsersToBeNotifiedOfChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>(), It.IsAny<ISpan>())).Returns(new Result<IEnumerable<User>>(new List<User>()));
+        _listServiceMock.Setup(x => x.GetUsersToBeNotifiedOfChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>(), It.IsAny<ISpan>())).Returns(new Result<IReadOnlyList<User>>(new List<User>()));
 
         _listsRepositoryMock.Setup(x => x.GetWithShares(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>())).Returns(new ToDoList
         {
@@ -38,12 +39,12 @@ public class CreateTests
         _metricsSpanMock.Setup(x => x.StartChild(It.IsAny<string>())).Returns(new Mock<ISpan>().Object);
 
         _sut = new TaskService(
-            null,
+            new Mock<IUserService>().Object,
             _listServiceMock.Object,
             _tasksRepositoryMock.Object,
             _listsRepositoryMock.Object,
             MapperMocker.GetMapper<ToDoAssistantProfile>(),
-            null);
+            new Mock<ILogger<TaskService>>().Object);
     }
 
     [Fact]

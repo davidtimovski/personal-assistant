@@ -105,7 +105,7 @@ public class RecipeWithSharesUserShareResolver : IValueResolver<Recipe, RecipeWi
         var userId = (int)context.Items["UserId"];
 
         var userShare = source.Shares.FirstOrDefault(x => x.UserId == userId);
-        if (userShare != null)
+        if (userShare is not null)
         {
             shareDto.Email = userShare.User.Email;
             shareDto.ImageUri = _cdnService.ImageUriToThumbnail(new Uri(userShare.User.ImageUri)).ToString();

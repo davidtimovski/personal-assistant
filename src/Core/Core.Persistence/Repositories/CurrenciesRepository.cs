@@ -70,7 +70,7 @@ public class CurrenciesRepository : BaseRepository, ICurrenciesRepository
         }
 
         var rates = conn.QueryFirstOrDefault<string>("SELECT rates FROM currency_rates WHERE date = @Date", new { Date = date });
-        if (rates != null)
+        if (rates is not null)
         {
             return JsonSerializer.Deserialize<Dictionary<string, decimal>>(rates);
         }

@@ -5,13 +5,13 @@ namespace Chef.Application.Contracts.Ingredients;
 
 public interface IIngredientsRepository
 {
-    IEnumerable<Ingredient> GetUserAndUsedPublicIngredients(int userId, ISpan metricsSpan);
-    Ingredient Get(int id, ISpan metricsSpan);
+    IReadOnlyList<Ingredient> GetUserAndUsedPublicIngredients(int userId, ISpan metricsSpan);
+    Ingredient? Get(int id, ISpan metricsSpan);
     Ingredient? GetForUpdate(int id, int userId, ISpan metricsSpan);
     Ingredient? GetPublic(int id, int userId, ISpan metricsSpan);
-    IEnumerable<Ingredient> GetForSuggestions(int userId, ISpan metricsSpan);
-    IEnumerable<IngredientCategory> GetIngredientCategories(ISpan metricsSpan);
-    IEnumerable<ToDoTask> GetTaskSuggestions(int userId, ISpan metricsSpan);
+    IReadOnlyList<Ingredient> GetForSuggestions(int userId, ISpan metricsSpan);
+    IReadOnlyList<IngredientCategory> GetIngredientCategories(ISpan metricsSpan);
+    IReadOnlyList<ToDoTask> GetTaskSuggestions(int userId, ISpan metricsSpan);
     bool Exists(int id, int userId);
     bool Exists(int id, string name, int userId);
     bool ExistsInRecipe(int id, int recipeId);

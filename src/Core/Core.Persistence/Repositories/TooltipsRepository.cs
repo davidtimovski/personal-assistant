@@ -11,7 +11,7 @@ public class TooltipsRepository : BaseRepository, ITooltipsRepository
     public TooltipsRepository(CoreContext efContext)
         : base(efContext) { }
 
-    public IEnumerable<Tooltip> GetAll(string application, int userId, ISpan metricsSpan)
+    public IReadOnlyList<Tooltip> GetAll(string application, int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(TooltipsRepository)}.{nameof(GetAll)}");
 
@@ -23,7 +23,7 @@ public class TooltipsRepository : BaseRepository, ITooltipsRepository
                                      FROM tooltips AS t
                                      LEFT JOIN tooltips_dismissed AS td ON t.id = td.tooltip_id AND td.user_id = @UserId
                                      WHERE application = @Application",
-                new { Application = application, UserId = userId });
+                new { Application = application, UserId = userId }).ToList();
 
             return result;
         }

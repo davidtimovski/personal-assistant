@@ -23,19 +23,19 @@ public class DietaryProfileService : IDietaryProfileService
     private readonly ILogger<DietaryProfileService> _logger;
 
     public DietaryProfileService(
-        IConversion conversion,
-        IDailyIntakeHelper dailyIntakeHelper,
-        IOptions<DailyIntakeReference> dailyIntakeRef,
-        IDietaryProfilesRepository dietaryProfilesRepository,
-        IMapper mapper,
-        ILogger<DietaryProfileService> logger)
+        IConversion? conversion,
+        IDailyIntakeHelper? dailyIntakeHelper,
+        IOptions<DailyIntakeReference>? dailyIntakeRef,
+        IDietaryProfilesRepository? dietaryProfilesRepository,
+        IMapper? mapper,
+        ILogger<DietaryProfileService>? logger)
     {
-        _conversion = conversion;
-        _dailyIntakeHelper = dailyIntakeHelper;
-        _dailyIntakeRef = dailyIntakeRef.Value;
-        _dietaryProfilesRepository = dietaryProfilesRepository;
-        _mapper = mapper;
-        _logger = logger;
+        _conversion = ArgValidator.NotNull(conversion);
+        _dailyIntakeHelper = ArgValidator.NotNull(dailyIntakeHelper);
+        _dailyIntakeRef = ArgValidator.NotNull(dailyIntakeRef).Value;
+        _dietaryProfilesRepository = ArgValidator.NotNull(dietaryProfilesRepository);
+        _mapper = ArgValidator.NotNull(mapper);
+        _logger = ArgValidator.NotNull(logger);
     }
 
     public EditDietaryProfile? Get(int userId, ISpan metricsSpan)
@@ -74,7 +74,7 @@ public class DietaryProfileService : IDietaryProfileService
 
         try
         {
-            IEnumerable<DailyIntakeAgeGroup> intakeByGender = model.Gender == "Male" ? _dailyIntakeRef.Male : _dailyIntakeRef.Female;
+            List<DailyIntakeAgeGroup> intakeByGender = model.Gender == "Male" ? _dailyIntakeRef.Male : _dailyIntakeRef.Female;
             short age = model.GetAge();
             RecommendedIntake intake = intakeByGender.First(x => age >= x.AgeFrom && age <= x.AgeTo).RecommendedIntake;
 
@@ -143,7 +143,7 @@ public class DietaryProfileService : IDietaryProfileService
         {
             RecipeIngredient[] validRecipeIngredients = recipe.RecipeIngredients
             .Where(x => x.Amount.HasValue
-                        && (x.Ingredient!.ServingSizeIsOneUnit && x.Unit is null || !x.Ingredient.ServingSizeIsOneUnit && x.Unit != null))
+                        && (x.Ingredient!.ServingSizeIsOneUnit && x.Unit is null || !x.Ingredient.ServingSizeIsOneUnit && x.Unit is not null))
             .ToArray();
 
             var nutritionSummary = new RecipeNutritionSummary();
@@ -229,15 +229,15 @@ public class DietaryProfileService : IDietaryProfileService
             RecommendedIntake? intake = null;
             DietaryProfile? dietaryProfile = recipe.User?.DietaryProfile;
 
-            if (dietaryProfile != null)
+            if (dietaryProfile is not null)
             {
-                IEnumerable<DailyIntakeAgeGroup> intakeByGender = dietaryProfile.Gender == "Male" ? _dailyIntakeRef.Male : _dailyIntakeRef.Female;
+                List<DailyIntakeAgeGroup> intakeByGender = dietaryProfile.Gender == "Male" ? _dailyIntakeRef.Male : _dailyIntakeRef.Female;
                 intake = intakeByGender.First(x => dietaryProfile.PersonAge >= x.AgeFrom && dietaryProfile.PersonAge <= x.AgeTo).RecommendedIntake;
             }
 
             if (nutritionSummary.Calories.HasValue)
             {
-                if (dietaryProfile != null && intake != null && dietaryProfile.TrackCalories)
+                if (dietaryProfile is not null && intake is not null && dietaryProfile.TrackCalories)
                 {
                     short dailyCalories = dietaryProfile.CustomCalories ?? _dailyIntakeHelper.DeriveDailyCaloriesIntake(dietaryProfile.PersonAge, dietaryProfile.Gender!,
                         dietaryProfile.Height!.Value, dietaryProfile.Weight!.Value, dietaryProfile.ActivityLevel!, dietaryProfile.Goal!);
@@ -253,7 +253,7 @@ public class DietaryProfileService : IDietaryProfileService
             }
             if (nutritionSummary.SaturatedFat.HasValue)
             {
-                if (dietaryProfile != null && intake != null && dietaryProfile.TrackSaturatedFat)
+                if (dietaryProfile is not null && intake is not null && dietaryProfile.TrackSaturatedFat)
                 {
                     short dailySaturatedFat = dietaryProfile.CustomSaturatedFat ?? intake.SaturatedFatMax;
                     nutritionSummary.SaturatedFatFromDaily = GetPercentageFromRecommendedDailyIntake(dailySaturatedFat, nutritionSummary.SaturatedFat.Value);
@@ -264,7 +264,7 @@ public class DietaryProfileService : IDietaryProfileService
             }
             if (nutritionSummary.Carbohydrate.HasValue)
             {
-                if (dietaryProfile != null && intake != null && dietaryProfile.TrackCarbohydrate)
+                if (dietaryProfile is not null && intake is not null && dietaryProfile.TrackCarbohydrate)
                 {
                     short dailyCarbohydrate = dietaryProfile.CustomCarbohydrate ?? intake.Carbohydrate;
                     nutritionSummary.CarbohydrateFromDaily = GetPercentageFromRecommendedDailyIntake(dailyCarbohydrate, nutritionSummary.Carbohydrate.Value);
@@ -279,7 +279,7 @@ public class DietaryProfileService : IDietaryProfileService
             }
             if (nutritionSummary.AddedSugars.HasValue)
             {
-                if (dietaryProfile != null && intake != null && dietaryProfile.TrackAddedSugars)
+                if (dietaryProfile is not null && intake is not null && dietaryProfile.TrackAddedSugars)
                 {
                     short dailyAddedSugars = dietaryProfile.CustomAddedSugars ?? intake.AddedSugarsMax;
                     nutritionSummary.AddedSugarsFromDaily = GetPercentageFromRecommendedDailyIntake(dailyAddedSugars, nutritionSummary.AddedSugars.Value);
@@ -290,7 +290,7 @@ public class DietaryProfileService : IDietaryProfileService
             }
             if (nutritionSummary.Fiber.HasValue)
             {
-                if (dietaryProfile != null && intake != null && dietaryProfile.TrackFiber)
+                if (dietaryProfile is not null && intake is not null && dietaryProfile.TrackFiber)
                 {
                     float dailyFiber = dietaryProfile.CustomFiber ?? intake.Fiber;
                     nutritionSummary.FiberFromDaily = GetPercentageFromRecommendedDailyIntake(dailyFiber, nutritionSummary.Fiber.Value);
@@ -301,7 +301,7 @@ public class DietaryProfileService : IDietaryProfileService
             }
             if (nutritionSummary.Protein.HasValue)
             {
-                if (dietaryProfile != null && intake != null && dietaryProfile.TrackProtein)
+                if (dietaryProfile is not null && intake is not null && dietaryProfile.TrackProtein)
                 {
                     short dailyProtein = dietaryProfile.CustomProtein ?? intake.Protein;
                     nutritionSummary.ProteinFromDaily = GetPercentageFromRecommendedDailyIntake(dailyProtein, nutritionSummary.Protein.Value);
@@ -312,7 +312,7 @@ public class DietaryProfileService : IDietaryProfileService
             }
             if (nutritionSummary.Sodium.HasValue)
             {
-                if (dietaryProfile != null && intake != null && dietaryProfile.TrackSodium)
+                if (dietaryProfile is not null && intake is not null && dietaryProfile.TrackSodium)
                 {
                     short dailySodium = dietaryProfile.CustomSodium ?? intake.Sodium;
                     nutritionSummary.SodiumFromDaily = GetPercentageFromRecommendedDailyIntake(dailySodium, nutritionSummary.Sodium.Value);
@@ -323,7 +323,7 @@ public class DietaryProfileService : IDietaryProfileService
             }
             if (nutritionSummary.Cholesterol.HasValue)
             {
-                if (dietaryProfile != null && intake != null && dietaryProfile.TrackCholesterol)
+                if (dietaryProfile is not null && intake is not null && dietaryProfile.TrackCholesterol)
                 {
                     short dailyCholesterol = dietaryProfile.CustomCholesterol ?? intake.CholesterolMax;
                     nutritionSummary.CholesterolFromDaily = GetPercentageFromRecommendedDailyIntake(dailyCholesterol, nutritionSummary.Cholesterol.Value);
@@ -334,7 +334,7 @@ public class DietaryProfileService : IDietaryProfileService
             }
             if (nutritionSummary.VitaminA.HasValue)
             {
-                if (dietaryProfile != null && intake != null && dietaryProfile.TrackVitaminA)
+                if (dietaryProfile is not null && intake is not null && dietaryProfile.TrackVitaminA)
                 {
                     short dailyVitaminA = dietaryProfile.CustomVitaminA ?? intake.VitaminA;
                     nutritionSummary.VitaminAFromDaily = GetPercentageFromRecommendedDailyIntake(dailyVitaminA, nutritionSummary.VitaminA.Value);
@@ -345,7 +345,7 @@ public class DietaryProfileService : IDietaryProfileService
             }
             if (nutritionSummary.VitaminC.HasValue)
             {
-                if (dietaryProfile != null && intake != null && dietaryProfile.TrackVitaminC)
+                if (dietaryProfile is not null && intake is not null && dietaryProfile.TrackVitaminC)
                 {
                     short dailyVitaminC = dietaryProfile.CustomVitaminC ?? intake.VitaminC;
                     nutritionSummary.VitaminCFromDaily = GetPercentageFromRecommendedDailyIntake(dailyVitaminC, nutritionSummary.VitaminC.Value);
@@ -356,7 +356,7 @@ public class DietaryProfileService : IDietaryProfileService
             }
             if (nutritionSummary.VitaminD.HasValue)
             {
-                if (dietaryProfile != null && intake != null && dietaryProfile.TrackVitaminD)
+                if (dietaryProfile is not null && intake is not null && dietaryProfile.TrackVitaminD)
                 {
                     short dailyVitaminD = dietaryProfile.CustomVitaminD ?? intake.VitaminD;
                     nutritionSummary.VitaminDFromDaily = GetPercentageFromRecommendedDailyIntake(dailyVitaminD, nutritionSummary.VitaminD.Value);
@@ -367,7 +367,7 @@ public class DietaryProfileService : IDietaryProfileService
             }
             if (nutritionSummary.Calcium.HasValue)
             {
-                if (dietaryProfile != null && intake != null && dietaryProfile.TrackCalcium)
+                if (dietaryProfile is not null && intake is not null && dietaryProfile.TrackCalcium)
                 {
                     short dailyCalcium = dietaryProfile.CustomCalcium ?? intake.Calcium;
                     nutritionSummary.CalciumFromDaily = GetPercentageFromRecommendedDailyIntake(dailyCalcium, nutritionSummary.Calcium.Value);
@@ -378,7 +378,7 @@ public class DietaryProfileService : IDietaryProfileService
             }
             if (nutritionSummary.Iron.HasValue)
             {
-                if (dietaryProfile != null && intake != null && dietaryProfile.TrackIron)
+                if (dietaryProfile is not null && intake is not null && dietaryProfile.TrackIron)
                 {
                     short dailyIron = dietaryProfile.CustomIron ?? intake.Iron;
                     nutritionSummary.IronFromDaily = GetPercentageFromRecommendedDailyIntake(dailyIron, nutritionSummary.Iron.Value);
@@ -389,7 +389,7 @@ public class DietaryProfileService : IDietaryProfileService
             }
             if (nutritionSummary.Potassium.HasValue)
             {
-                if (dietaryProfile != null && intake != null && dietaryProfile.TrackPotassium)
+                if (dietaryProfile is not null && intake is not null && dietaryProfile.TrackPotassium)
                 {
                     short dailyPotassium = dietaryProfile.CustomPotassium ?? intake.Potassium;
                     nutritionSummary.PotassiumFromDaily = GetPercentageFromRecommendedDailyIntake(dailyPotassium, nutritionSummary.Potassium.Value);
@@ -400,7 +400,7 @@ public class DietaryProfileService : IDietaryProfileService
             }
             if (nutritionSummary.Magnesium.HasValue)
             {
-                if (dietaryProfile != null && intake != null && dietaryProfile.TrackMagnesium)
+                if (dietaryProfile is not null && intake is not null && dietaryProfile.TrackMagnesium)
                 {
                     short dailyMagnesium = dietaryProfile.CustomMagnesium ?? intake.Magnesium;
                     nutritionSummary.MagnesiumFromDaily = GetPercentageFromRecommendedDailyIntake(dailyMagnesium, nutritionSummary.Magnesium.Value);
@@ -508,7 +508,7 @@ public class DietaryProfileService : IDietaryProfileService
     {
         try
         {
-            IEnumerable<DailyIntakeAgeGroup> intakeByGender = profile.Gender == "Male" ? _dailyIntakeRef.Male : _dailyIntakeRef.Female;
+            List<DailyIntakeAgeGroup> intakeByGender = profile.Gender == "Male" ? _dailyIntakeRef.Male : _dailyIntakeRef.Female;
             RecommendedIntake intake = intakeByGender.First(x => profile.PersonAge >= x.AgeFrom && profile.PersonAge <= x.AgeTo).RecommendedIntake;
 
             var dailyIntake = new DailyIntake

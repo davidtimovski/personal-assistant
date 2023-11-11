@@ -26,7 +26,7 @@ public struct ValidatedResult : IValidatedResult
     }
 
     public ResultStatus Status { get; private set; }
-    public IReadOnlyCollection<ValidationFailure>? ValidationErrors { get; private set; }
+    public IReadOnlyList<ValidationFailure>? ValidationErrors { get; private set; }
 }
 
 /// <summary>
@@ -53,6 +53,6 @@ public struct ValidatedResult<T> : IValidatedResult
     }
 
     public ResultStatus Status { get; private set; }
-    public IReadOnlyCollection<ValidationFailure>? ValidationErrors { get; private set; }
+    public IReadOnlyList<ValidationFailure>? ValidationErrors { get; private set; }
     public T? Data { get; private set; }
 }

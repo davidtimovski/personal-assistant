@@ -17,7 +17,10 @@ public class TooltipsControllerTests
         _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
         _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
 
-        _sut = new TooltipsController(_userIdLookupMock.Object, null, null)
+        _sut = new TooltipsController(
+            _userIdLookupMock.Object,
+            new Mock<IUsersRepository>().Object,
+            new Mock<ITooltipService>().Object)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };

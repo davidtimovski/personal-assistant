@@ -12,7 +12,7 @@ public interface ITaskService
     Result<TaskForUpdate?> GetForUpdate(int id, int userId);
     Result<bool> Exists(int id, int userId);
     Result<bool> Exists(string name, int listId, int userId);
-    Result<bool> Exists(IEnumerable<string> names, int listId, int userId);
+    Result<bool> Exists(List<string> names, int listId, int userId);
     Result<bool> Exists(int id, string name, int listId, int userId);
     Result<int> Count(int listId);
     Task<CreatedTaskResult> CreateAsync(CreateTask model, IValidator<CreateTask> validator, ISpan metricsSpan, CancellationToken cancellationToken);

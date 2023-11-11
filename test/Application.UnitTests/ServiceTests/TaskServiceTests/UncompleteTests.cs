@@ -1,5 +1,8 @@
-﻿using Moq;
+﻿using Core.Application.Contracts;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Sentry;
+using ToDoAssistant.Application.Contracts.Lists;
 using ToDoAssistant.Application.Contracts.Tasks;
 using ToDoAssistant.Application.Contracts.Tasks.Models;
 using ToDoAssistant.Application.Entities;
@@ -20,12 +23,12 @@ public class UncompleteTests
         _metricsSpanMock.Setup(x => x.StartChild(It.IsAny<string>())).Returns(new Mock<ISpan>().Object);
 
         _sut = new TaskService(
-            null,
-            null,
+            new Mock<IUserService>().Object,
+            new Mock<IListService>().Object,
             _tasksRepositoryMock.Object,
-            null,
+            new Mock<IListsRepository>().Object,
             MapperMocker.GetMapper<ToDoAssistantProfile>(),
-            null);
+            new Mock<ILogger<TaskService>>().Object);
     }
 
     [Fact]

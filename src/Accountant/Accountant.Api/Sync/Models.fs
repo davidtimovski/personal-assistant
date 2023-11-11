@@ -1,7 +1,6 @@
 ﻿namespace Accountant.Api.Sync
 
 open System
-open System.Collections.Generic
 open Accountant.Persistence.Models
 open Accountant.Api.Accounts.Models
 open Accountant.Api.AutomaticTransactions.Models
@@ -17,23 +16,23 @@ module Models =
     type ChangedDto =
         { LastSynced: DateTime
 
-          DeletedAccountIds: IEnumerable<int>
+          DeletedAccountIds: seq<int>
           Accounts: seq<AccountDto>
 
-          DeletedCategoryIds: IEnumerable<int>
-          Categories: IEnumerable<CategoryDto>
+          DeletedCategoryIds: seq<int>
+          Categories: seq<CategoryDto>
 
-          DeletedTransactionIds: IEnumerable<int>
-          Transactions: IEnumerable<TransactionDto>
+          DeletedTransactionIds: seq<int>
+          Transactions: seq<TransactionDto>
 
-          DeletedUpcomingExpenseIds: IEnumerable<int>
-          UpcomingExpenses: IEnumerable<UpcomingExpenseDto>
+          DeletedUpcomingExpenseIds: seq<int>
+          UpcomingExpenses: seq<UpcomingExpenseDto>
 
-          DeletedDebtIds: IEnumerable<int>
-          Debts: IEnumerable<DebtDto>
+          DeletedDebtIds: seq<int>
+          Debts: seq<DebtDto>
 
-          DeletedAutomaticTransactionIds: IEnumerable<int>
-          AutomaticTransactions: IEnumerable<AutomaticTransactionDto> }
+          DeletedAutomaticTransactionIds: seq<int>
+          AutomaticTransactions: seq<AutomaticTransactionDto> }
 
     type SyncEntitiesRequest =
         { Accounts: Account list

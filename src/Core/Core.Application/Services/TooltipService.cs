@@ -2,6 +2,7 @@
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
 using Core.Application.Entities;
+using Core.Application.Utils;
 using Microsoft.Extensions.Logging;
 using Sentry;
 
@@ -14,16 +15,16 @@ public class TooltipService : ITooltipService
     private readonly ILogger<TooltipService> _logger;
 
     public TooltipService(
-        ITooltipsRepository tooltipsRepository,
-        IMapper mapper,
-        ILogger<TooltipService> logger)
+        ITooltipsRepository? tooltipsRepository,
+        IMapper? mapper,
+        ILogger<TooltipService>? logger)
     {
-        _tooltipsRepository = tooltipsRepository;
-        _mapper = mapper;
-        _logger = logger;
+        _tooltipsRepository = ArgValidator.NotNull(tooltipsRepository);
+        _mapper = ArgValidator.NotNull(mapper);
+        _logger = ArgValidator.NotNull(logger);
     }
 
-    public Result<IEnumerable<TooltipDto>> GetAll(string application, int userId, ISpan metricsSpan)
+    public Result<IReadOnlyList<TooltipDto>> GetAll(string application, int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(TooltipService)}.{nameof(GetAll)}");
 
@@ -31,7 +32,7 @@ public class TooltipService : ITooltipService
         {
             var tooltips = _tooltipsRepository.GetAll(application, userId, metric);
 
-            var result = tooltips.Select(x => _mapper.Map<TooltipDto>(x));
+            var result = tooltips.Select(x => _mapper.Map<TooltipDto>(x)).ToList();
 
             return new(result);
         }

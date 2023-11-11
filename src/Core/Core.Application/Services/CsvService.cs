@@ -2,6 +2,7 @@
 using AutoMapper;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
+using Core.Application.Utils;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
@@ -16,13 +17,13 @@ public class CsvService : ICsvService
     private readonly ILogger<CsvService> _logger;
 
     public CsvService(
-        ICsvRepository csvRepository,
-        IMapper mapper,
-        ILogger<CsvService> logger)
+        ICsvRepository? csvRepository,
+        IMapper? mapper,
+        ILogger<CsvService>? logger)
     {
-        _csvRepository = csvRepository;
-        _mapper = mapper;
-        _logger = logger;
+        _csvRepository = ArgValidator.NotNull(csvRepository);
+        _mapper = ArgValidator.NotNull(mapper);
+        _logger = ArgValidator.NotNull(logger);
     }
 
     public FileStream ExportTransactionsAsCsv(ExportTransactionsAsCsv model, ISpan metricsSpan)

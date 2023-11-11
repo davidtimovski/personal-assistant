@@ -1,6 +1,7 @@
 ﻿using Api.Common;
 using Core.Api.Models.Tooltips.Requests;
 using Core.Application.Contracts;
+using Core.Application.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
@@ -14,11 +15,11 @@ public class TooltipsController : BaseController
     private readonly ITooltipService _tooltipService;
 
     public TooltipsController(
-        IUserIdLookup userIdLookup,
-        IUsersRepository usersRepository,
-        ITooltipService tooltipService) : base(userIdLookup, usersRepository)
+        IUserIdLookup? userIdLookup,
+        IUsersRepository? usersRepository,
+        ITooltipService? tooltipService) : base(userIdLookup, usersRepository)
     {
-        _tooltipService = tooltipService;
+        _tooltipService = ArgValidator.NotNull(tooltipService);
     }
 
     [HttpGet("application/{application}")]

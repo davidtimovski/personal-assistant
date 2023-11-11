@@ -23,13 +23,13 @@ public class UpdateListResult : INotificationResult, IValidatedResult
     }
 
     public ResultStatus Status { get; private set; }
-    public IReadOnlyCollection<ValidationFailure>? ValidationErrors { get; private set; }
+    public IReadOnlyList<ValidationFailure>? ValidationErrors { get; private set; }
 
     public ListNotificationType Type { get; set; }
     public string OriginalListName { get; set; } = null!;
     public string ActionUserName { get; set; } = null!;
     public string ActionUserImageUri { get; set; } = null!;
-    public IReadOnlyCollection<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
+    public IReadOnlyList<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
 
     public bool Notify()
     {

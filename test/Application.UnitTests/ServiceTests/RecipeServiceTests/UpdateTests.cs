@@ -1,10 +1,14 @@
 ﻿using Application.UnitTests.Builders;
+using Chef.Application.Contracts.DietaryProfiles;
 using Chef.Application.Contracts.Recipes;
 using Chef.Application.Contracts.Recipes.Models;
 using Chef.Application.Entities;
 using Chef.Application.Mappings;
 using Chef.Application.Services;
+using Chef.Utility;
+using Core.Application.Contracts;
 using FluentValidation;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Sentry;
 using Xunit;
@@ -24,16 +28,23 @@ public class UpdateTests
 
         _metricsSpanMock.Setup(x => x.StartChild(It.IsAny<string>())).Returns(new Mock<ISpan>().Object);
 
-        _sut = new RecipeService(null, null, null, null,
+        _sut = new RecipeService(
+            new Mock<IDietaryProfileService>().Object,
+            new Mock<IConversion>().Object,
+            new Mock<ICdnService>().Object,
+            new Mock<IUserService>().Object,
             _recipesRepositoryMock.Object,
-            null,
+            new Mock<ICurrenciesRepository>().Object,
             MapperMocker.GetMapper<ChefProfile>(),
-            null);
+            new Mock<ILogger<RecipeService>>().Object);
     }
 
     [Fact]
     public async Task ValidatesModel()
     {
+        _recipesRepositoryMock.Setup(x => x.GetUsersToBeNotifiedOfRecipeChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()))
+            .Returns(new List<Chef.Application.Entities.User>());
+
         UpdateRecipe model = new RecipeBuilder().BuildUpdateModel();
 
         await _sut.UpdateAsync(model, _successfulValidatorMock.Object, _metricsSpanMock.Object, It.IsAny<CancellationToken>());
@@ -56,6 +67,8 @@ public class UpdateTests
         string? actualName = null;
         _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
             .Callback<Recipe, int, ISpan, CancellationToken>((r, _, _, _) => actualName = r.Name);
+        _recipesRepositoryMock.Setup(x => x.GetUsersToBeNotifiedOfRecipeChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()))
+            .Returns(new List<Chef.Application.Entities.User>());
 
         UpdateRecipe model = new RecipeBuilder().WithName(" Recipe name ").BuildUpdateModel();
 
@@ -71,6 +84,8 @@ public class UpdateTests
         string? actualDescription = null;
         _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
             .Callback<Recipe, int, ISpan, CancellationToken>((r, _, _, _) => actualDescription = r.Description);
+        _recipesRepositoryMock.Setup(x => x.GetUsersToBeNotifiedOfRecipeChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()))
+            .Returns(new List<Chef.Application.Entities.User>());
 
         UpdateRecipe model = new RecipeBuilder().WithDescription(" Description ").BuildUpdateModel();
 
@@ -86,6 +101,8 @@ public class UpdateTests
         List<RecipeIngredient> actualRecipeIngredients = null!;
         _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
             .Callback<Recipe, int, ISpan, CancellationToken>((r, _, _, _) => actualRecipeIngredients = r.RecipeIngredients);
+        _recipesRepositoryMock.Setup(x => x.GetUsersToBeNotifiedOfRecipeChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()))
+            .Returns(new List<Chef.Application.Entities.User>());
 
         UpdateRecipe model = new RecipeBuilder()
             .WithRecipeIngredients(" Ingredient 1", "Ingredient 2 ", " Ingredient 3 ").BuildUpdateModel();
@@ -110,6 +127,8 @@ public class UpdateTests
         List<RecipeIngredient> actualRecipeIngredients = null!;
         _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
             .Callback<Recipe, int, ISpan, CancellationToken>((r, _, _, _) => actualRecipeIngredients = r.RecipeIngredients);
+        _recipesRepositoryMock.Setup(x => x.GetUsersToBeNotifiedOfRecipeChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()))
+            .Returns(new List<Chef.Application.Entities.User>());
 
         UpdateRecipe model = new RecipeBuilder().WithRecipeIngredientsWithAmounts(0, 0).BuildUpdateModel();
 
@@ -127,6 +146,8 @@ public class UpdateTests
         List<RecipeIngredient> actualRecipeIngredients = null!;
         _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
             .Callback<Recipe, int, ISpan, CancellationToken>((r, _, _, _) => actualRecipeIngredients = r.RecipeIngredients);
+        _recipesRepositoryMock.Setup(x => x.GetUsersToBeNotifiedOfRecipeChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()))
+            .Returns(new List<Chef.Application.Entities.User>());
 
         UpdateRecipe model = new RecipeBuilder().WithRecipeIngredientsWithAmounts(0, 0).BuildUpdateModel();
 
@@ -144,6 +165,8 @@ public class UpdateTests
         List<RecipeIngredient> actualRecipeIngredients = null!;
         _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
             .Callback<Recipe, int, ISpan, CancellationToken>((r, _, _, _) => actualRecipeIngredients = r.RecipeIngredients);
+        _recipesRepositoryMock.Setup(x => x.GetUsersToBeNotifiedOfRecipeChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()))
+            .Returns(new List<Chef.Application.Entities.User>());
 
         UpdateRecipe model = new RecipeBuilder().WithRecipeIngredientsWithAmounts(null, null).BuildUpdateModel();
 
@@ -164,6 +187,10 @@ public class UpdateTests
         string? actualInstructions = null;
         _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
             .Callback<Recipe, int, ISpan, CancellationToken>((r, _, _, _) => actualInstructions = r.Instructions);
+        _recipesRepositoryMock.Setup(x => x.GetUsersToBeNotifiedOfRecipeChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()))
+            .Returns(new List<Chef.Application.Entities.User>());
+        _recipesRepositoryMock.Setup(x => x.GetUsersToBeNotifiedOfRecipeChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()))
+            .Returns(new List<Chef.Application.Entities.User>());
 
         UpdateRecipe model = new RecipeBuilder().WithInstructions(instructions).BuildUpdateModel();
 
@@ -178,6 +205,8 @@ public class UpdateTests
         string? actualInstructions = null;
         _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
             .Callback<Recipe, int, ISpan, CancellationToken>((r, _, _, _) => actualInstructions = r.Instructions);
+        _recipesRepositoryMock.Setup(x => x.GetUsersToBeNotifiedOfRecipeChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()))
+            .Returns(new List<Chef.Application.Entities.User>());
 
         UpdateRecipe model = new RecipeBuilder().WithInstructions(" Instructions ").BuildUpdateModel();
 
@@ -193,6 +222,8 @@ public class UpdateTests
         TimeSpan? actualPrepDuration = null;
         _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
             .Callback<Recipe, int, ISpan, CancellationToken>((r, _, _, _) => actualPrepDuration = r.PrepDuration);
+        _recipesRepositoryMock.Setup(x => x.GetUsersToBeNotifiedOfRecipeChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()))
+            .Returns(new List<Chef.Application.Entities.User>());
 
         UpdateRecipe model = new RecipeBuilder().WithPrepDuration(TimeSpan.FromSeconds(59)).BuildUpdateModel();
 
@@ -207,6 +238,8 @@ public class UpdateTests
         TimeSpan? actualCookDuration = null;
         _recipesRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Recipe>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
             .Callback<Recipe, int, ISpan, CancellationToken>((r, _, _, _) => actualCookDuration = r.CookDuration);
+        _recipesRepositoryMock.Setup(x => x.GetUsersToBeNotifiedOfRecipeChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()))
+            .Returns(new List<Chef.Application.Entities.User>());
 
         UpdateRecipe model = new RecipeBuilder().WithCookDuration(TimeSpan.FromSeconds(59)).BuildUpdateModel();
 

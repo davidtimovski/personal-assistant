@@ -30,7 +30,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
             new { Id = id, UserId = userId });
     }
 
-    public ToDoTask GetForUpdate(int id, int userId)
+    public ToDoTask? GetForUpdate(int id, int userId)
     {
         using IDbConnection conn = OpenConnection();
 
@@ -44,7 +44,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
         return task;
     }
 
-    public List<string> GetRecipes(int id, int userId)
+    public IReadOnlyList<string> GetRecipes(int id, int userId)
     {
         using IDbConnection conn = OpenConnection();
 
@@ -171,7 +171,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
         }
     }
 
-    public async Task<IEnumerable<ToDoTask>> BulkCreateAsync(IEnumerable<ToDoTask> tasks, bool tasksArePrivate, int userId, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<ToDoTask>> BulkCreateAsync(List<ToDoTask> tasks, bool tasksArePrivate, int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(TasksRepository)}.{nameof(BulkCreateAsync)}");
 
@@ -286,7 +286,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
                 task.Order = existingTask.Order;
             }
 
-            if (decrementOrderTaskIds != null)
+            if (decrementOrderTaskIds is not null)
             {
                 await conn.ExecuteAsync(new CommandDefinition(@"UPDATE todo.tasks SET ""order"" = ""order"" - 1 WHERE id = ANY(@Ids)",
                    new { Ids = decrementOrderTaskIds.ToList() },
@@ -495,7 +495,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
 
     private static ToDoTask GetById(int id, IDbConnection conn)
     {
-        return conn.QueryFirstOrDefault<ToDoTask>("SELECT * FROM todo.tasks WHERE id = @Id", new { Id = id });
+        return conn.QueryFirst<ToDoTask>("SELECT * FROM todo.tasks WHERE id = @Id", new { Id = id });
     }
 
     private static short GetPrivateTasksCount(int listId, int userId, bool isCompleted, IDbConnection conn)

@@ -17,7 +17,10 @@ public class UsersControllerTests
         _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
         _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
 
-        _sut = new UsersController(_userIdLookupMock.Object, null, null)
+        _sut = new UsersController(
+            _userIdLookupMock.Object,
+            new Mock<IUsersRepository>().Object,
+            new Mock<IUserService>().Object)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };

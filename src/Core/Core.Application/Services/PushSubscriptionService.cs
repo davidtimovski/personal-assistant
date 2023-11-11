@@ -1,5 +1,6 @@
 ﻿using Core.Application.Contracts;
 using Core.Application.Entities;
+using Core.Application.Utils;
 using Microsoft.Extensions.Logging;
 using Sentry;
 
@@ -11,11 +12,11 @@ public class PushSubscriptionService : IPushSubscriptionService
     private readonly ILogger<PushSubscriptionService> _logger;
 
     public PushSubscriptionService(
-        IPushSubscriptionsRepository pushSubscriptionsRepository,
-        ILogger<PushSubscriptionService> logger)
+        IPushSubscriptionsRepository? pushSubscriptionsRepository,
+        ILogger<PushSubscriptionService>? logger)
     {
-        _pushSubscriptionsRepository = pushSubscriptionsRepository;
-        _logger = logger;
+        _pushSubscriptionsRepository = ArgValidator.NotNull(pushSubscriptionsRepository);
+        _logger = ArgValidator.NotNull(logger);
     }
 
     public async Task<Result> CreateSubscriptionAsync(int userId, string application, string endpoint, string authKey, string p256dhKey, ISpan metricsSpan, CancellationToken cancellationToken)

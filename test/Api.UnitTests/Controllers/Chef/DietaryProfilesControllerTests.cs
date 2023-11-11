@@ -1,5 +1,10 @@
 ﻿using Api.UnitTests.Builders;
 using Chef.Api.Controllers;
+using Chef.Application.Contracts.DietaryProfiles;
+using Chef.Application.Contracts.DietaryProfiles.Models;
+using Chef.Application.Services;
+using Core.Application.Contracts;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -12,7 +17,12 @@ public class DietaryProfilesControllerTests
 
     public DietaryProfilesControllerTests()
     {
-        _sut = new DietaryProfilesController(null, null, null, null, null)
+        _sut = new DietaryProfilesController(
+            new Mock<IUserIdLookup>().Object,
+            new Mock<IUsersRepository>().Object,
+            new Mock<IDietaryProfileService>().Object,
+            new Mock<IValidator<GetRecommendedDailyIntake>>().Object,
+            new Mock<IValidator<UpdateDietaryProfile>>().Object)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };

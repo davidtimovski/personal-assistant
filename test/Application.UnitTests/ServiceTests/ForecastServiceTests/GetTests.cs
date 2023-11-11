@@ -1,5 +1,6 @@
 ﻿using Application.UnitTests.Builders;
 using FluentValidation;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Sentry;
 using Weatherman.Application.Contracts.Forecasts;
@@ -19,9 +20,9 @@ public class GetTests
         _metricsSpanMock.Setup(x => x.StartChild(It.IsAny<string>())).Returns(new Mock<ISpan>().Object);
 
         _sut = new ForecastService(
-            null,
+            new Mock<IHttpClientFactory>().Object,
             _forecastsRepositoryMock.Object,
-            null);
+            new Mock<ILogger<ForecastService>>().Object);
     }
 
     [Fact]

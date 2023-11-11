@@ -3,6 +3,7 @@ using System.Text.Json.Nodes;
 using Azure.Storage.Blobs;
 using Core.Application.Contracts;
 using Core.Application.Entities;
+using Core.Application.Utils;
 using Dapper;
 using Jobs.Models;
 using Jobs.Models.Accountant;
@@ -22,17 +23,17 @@ public class MidnightJob
     private readonly ILogger<MidnightJob> _logger;
 
     public MidnightJob(
-        ICdnService cdnService,
-        IHttpClientFactory httpClientFactory,
-        IHostEnvironment hostEnvironment,
-        IOptions<AppConfiguration> config,
-        ILogger<MidnightJob> logger)
+        ICdnService? cdnService,
+        IHttpClientFactory? httpClientFactory,
+        IHostEnvironment? hostEnvironment,
+        IOptions<AppConfiguration>? config,
+        ILogger<MidnightJob>? logger)
     {
-        _cdnService = cdnService;
-        _httpClientFactory = httpClientFactory;
-        _hostEnvironment = hostEnvironment;
-        _config = config.Value;
-        _logger = logger;
+        _cdnService = ArgValidator.NotNull(cdnService);
+        _httpClientFactory = ArgValidator.NotNull(httpClientFactory);
+        _hostEnvironment = ArgValidator.NotNull(hostEnvironment);
+        _config = ArgValidator.NotNull(config).Value;
+        _logger = ArgValidator.NotNull(logger);
     }
 
     public async Task RunAsync()
@@ -167,8 +168,8 @@ public class MidnightJob
                         foreach (var ue in relatedUpcomingExpenses)
                         {
                             var bothWithDescriptionsAndTheyMatch =
-                                ue.Description != null
-                                && transaction.Description != null
+                                ue.Description is not null
+                                && transaction.Description is not null
                                 && string.Equals(ue.Description, transaction.Description, StringComparison.OrdinalIgnoreCase);
 
                             if (ue.Description is null || bothWithDescriptionsAndTheyMatch)
@@ -209,7 +210,7 @@ public class MidnightJob
     /// </summary>
     private async Task GenerateUpcomingExpenses(NpgsqlConnection conn, DateTime now)
     {
-        string getMostFrequentCurrency(IEnumerable<Transaction> expenses)
+        string getMostFrequentCurrency(IReadOnlyList<Transaction> expenses)
         {
             if (expenses.Count() == 1)
             {
@@ -233,7 +234,7 @@ public class MidnightJob
             return biggestCurrencyGroup.First().Currency;
         }
 
-        bool ShouldGenerate(IReadOnlyCollection<Transaction> expenses)
+        bool ShouldGenerate(IReadOnlyList<Transaction> expenses)
         {
             if (!expenses.Any())
             {
@@ -383,7 +384,7 @@ public class MidnightJob
 
         if (result.Failed)
         {
-            _logger.LogError(ex, $"{nameof(DeleteTemporaryCdnResourcesAsync)} failed");
+            _logger.LogError($"{nameof(DeleteTemporaryCdnResourcesAsync)} failed");
         }
     }
 

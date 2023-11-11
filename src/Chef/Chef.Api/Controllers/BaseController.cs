@@ -1,4 +1,5 @@
 ﻿using Core.Application.Contracts;
+using Core.Application.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Chef.Api.Controllers;
@@ -8,10 +9,10 @@ public abstract class BaseController : Controller
     private readonly IUserIdLookup _userIdLookup;
     private readonly IUsersRepository _usersRepository;
 
-    public BaseController(IUserIdLookup userIdLookup, IUsersRepository usersRepository)
+    public BaseController(IUserIdLookup? userIdLookup, IUsersRepository? usersRepository)
     {
-        _userIdLookup = userIdLookup;
-        _usersRepository = usersRepository;
+        _userIdLookup = ArgValidator.NotNull(userIdLookup);
+        _usersRepository = ArgValidator.NotNull(usersRepository);
     }
 
     private int? userId;

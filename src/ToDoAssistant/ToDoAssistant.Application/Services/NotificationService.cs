@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Core.Application.Contracts;
+using Core.Application.Utils;
 using Microsoft.Extensions.Logging;
 using Sentry;
 using ToDoAssistant.Application.Contracts.Notifications;
@@ -15,22 +16,22 @@ public class NotificationService : INotificationService
     private readonly ILogger<NotificationService> _logger;
 
     public NotificationService(
-        INotificationsRepository notificationsRepository,
-        IMapper mapper,
-        ILogger<NotificationService> logger)
+        INotificationsRepository? notificationsRepository,
+        IMapper? mapper,
+        ILogger<NotificationService>? logger)
     {
-        _notificationsRepository = notificationsRepository;
-        _mapper = mapper;
-        _logger = logger;
+        _notificationsRepository = ArgValidator.NotNull(notificationsRepository);
+        _mapper = ArgValidator.NotNull(mapper);
+        _logger = ArgValidator.NotNull(logger);
     }
 
-    public Result<IEnumerable<NotificationDto>> GetAllAndFlagUnseen(int userId)
+    public Result<IReadOnlyList<NotificationDto>> GetAllAndFlagUnseen(int userId)
     {
         try
         {
-            IEnumerable<Notification> notifications = _notificationsRepository.GetAllAndFlagUnseen(userId);
+            var notifications = _notificationsRepository.GetAllAndFlagUnseen(userId);
 
-            var result = notifications.Select(x => _mapper.Map<NotificationDto>(x));
+            var result = notifications.Select(x => _mapper.Map<NotificationDto>(x)).ToList();
 
             return new (result);
         }

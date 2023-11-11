@@ -5,6 +5,7 @@ using Chef.Application.Entities;
 using Chef.Application.Mappings;
 using Chef.Application.Services;
 using FluentValidation;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Sentry;
 using Xunit;
@@ -27,7 +28,7 @@ public class UpdateTests
         _sut = new IngredientService(
             _ingredientsRepositoryMock.Object,
             MapperMocker.GetMapper<ChefProfile>(),
-            null);
+            new Mock<ILogger<IngredientService>>().Object);
     }
 
     [Fact]

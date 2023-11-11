@@ -9,7 +9,7 @@ public interface INotificationResult
 {
     public string ActionUserName { get; }
     public string ActionUserImageUri { get; }
-    public IReadOnlyCollection<NotificationRecipient> NotificationRecipients { get; }
+    public IReadOnlyList<NotificationRecipient> NotificationRecipients { get; }
 
     public bool Notify();
 }

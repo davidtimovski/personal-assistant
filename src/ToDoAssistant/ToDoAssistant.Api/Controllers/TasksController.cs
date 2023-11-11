@@ -2,6 +2,7 @@
 using Api.Common;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
+using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -36,30 +37,30 @@ public class TasksController : BaseController
     private readonly ILogger<TasksController> _logger;
 
     public TasksController(
-        IUserIdLookup userIdLookup,
-        IUsersRepository usersRepository,
-        IHubContext<ListActionsHub> listActionsHubContext,
-        ITaskService taskService,
-        INotificationService notificationService,
-        ISenderService senderService,
-        IValidator<CreateTask> createValidator,
-        IValidator<BulkCreate> bulkCreateValidator,
-        IValidator<UpdateTask> updateValidator,
-        IStringLocalizer<TasksController> localizer,
-        IOptions<AppConfiguration> config,
-        ILogger<TasksController> logger,
-        IStringLocalizer<BaseController> baseLocalizer) : base(userIdLookup, usersRepository, baseLocalizer)
+        IUserIdLookup? userIdLookup,
+        IUsersRepository? usersRepository,
+        IHubContext<ListActionsHub>? listActionsHubContext,
+        ITaskService? taskService,
+        INotificationService? notificationService,
+        ISenderService? senderService,
+        IValidator<CreateTask>? createValidator,
+        IValidator<BulkCreate>? bulkCreateValidator,
+        IValidator<UpdateTask>? updateValidator,
+        IStringLocalizer<TasksController>? localizer,
+        IOptions<AppConfiguration>? config,
+        ILogger<TasksController>? logger,
+        IStringLocalizer<BaseController>? baseLocalizer) : base(userIdLookup, usersRepository, baseLocalizer)
     {
-        _listActionsHubContext = listActionsHubContext;
-        _taskService = taskService;
-        _notificationService = notificationService;
-        _senderService = senderService;
-        _createValidator = createValidator;
-        _bulkCreateValidator = bulkCreateValidator;
-        _updateValidator = updateValidator;
-        _localizer = localizer;
-        _config = config.Value;
-        _logger = logger;
+        _listActionsHubContext = ArgValidator.NotNull(listActionsHubContext);
+        _taskService = ArgValidator.NotNull(taskService);
+        _notificationService = ArgValidator.NotNull(notificationService);
+        _senderService = ArgValidator.NotNull(senderService);
+        _createValidator = ArgValidator.NotNull(createValidator);
+        _bulkCreateValidator = ArgValidator.NotNull(bulkCreateValidator);
+        _updateValidator = ArgValidator.NotNull(updateValidator);
+        _localizer = ArgValidator.NotNull(localizer);
+        _config = ArgValidator.NotNull(config).Value;
+        _logger = ArgValidator.NotNull(logger);
     }
 
     [HttpGet("{id}")]
@@ -330,7 +331,7 @@ public class TasksController : BaseController
                 }
             }
 
-            if (result.AssignedNotificationRecipient != null)
+            if (result.AssignedNotificationRecipient is not null)
             {
                 var message = _localizer["AssignedTaskNotification", result.ActionUserName, result.OriginalTaskName!, result.ListName!];
 
@@ -528,7 +529,7 @@ public class TasksController : BaseController
     }
 
     private async Task<Result> CreateAndEnqueueNotificationsAsync(
-        IReadOnlyCollection<NotificationRecipient> recipients,
+        IReadOnlyList<NotificationRecipient> recipients,
         string actionUserImageUri,
         int? listId,
         int? taskId,

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
+using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Sentry;
@@ -21,19 +22,19 @@ public class TaskService : ITaskService
     private readonly ILogger<TaskService> _logger;
 
     public TaskService(
-        IUserService userService,
-        IListService listService,
-        ITasksRepository tasksRepository,
-        IListsRepository listsRepository,
-        IMapper mapper,
-        ILogger<TaskService> logger)
+        IUserService? userService,
+        IListService? listService,
+        ITasksRepository? tasksRepository,
+        IListsRepository? listsRepository,
+        IMapper? mapper,
+        ILogger<TaskService>? logger)
     {
-        _userService = userService;
-        _listService = listService;
-        _tasksRepository = tasksRepository;
-        _listsRepository = listsRepository;
-        _mapper = mapper;
-        _logger = logger;
+        _userService = ArgValidator.NotNull(userService);
+        _listService = ArgValidator.NotNull(listService);
+        _tasksRepository = ArgValidator.NotNull(tasksRepository);
+        _listsRepository = ArgValidator.NotNull(listsRepository);
+        _mapper = ArgValidator.NotNull(mapper);
+        _logger = ArgValidator.NotNull(logger);
     }
 
     public Result<SimpleTask> Get(int id)
@@ -74,7 +75,7 @@ public class TaskService : ITaskService
     {
         try
         {
-            ToDoTask task = _tasksRepository.GetForUpdate(id, userId);
+            var task = _tasksRepository.GetForUpdate(id, userId);
             if (task is null)
             {
                 return new(null);
@@ -133,7 +134,7 @@ public class TaskService : ITaskService
         }
     }
 
-    public Result<bool> Exists(IEnumerable<string> names, int listId, int userId)
+    public Result<bool> Exists(List<string> names, int listId, int userId)
     {
         try
         {
@@ -288,7 +289,7 @@ public class TaskService : ITaskService
                 }
                 ).ToList();
 
-            IEnumerable<ToDoTask> createdTasks = await _tasksRepository.BulkCreateAsync(tasks, model.TasksArePrivate, model.UserId, metric, cancellationToken);
+            var createdTasks = await _tasksRepository.BulkCreateAsync(tasks, model.TasksArePrivate, model.UserId, metric, cancellationToken);
 
             ToDoList? list = _listsRepository.GetWithShares(model.ListId, model.UserId, metric);
             if (list is null)

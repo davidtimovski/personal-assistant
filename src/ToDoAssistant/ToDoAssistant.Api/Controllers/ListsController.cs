@@ -2,6 +2,7 @@
 using Api.Common;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
+using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -37,34 +38,34 @@ public class ListsController : BaseController
     private readonly ILogger<ListsController> _logger;
 
     public ListsController(
-        IUserIdLookup userIdLookup,
-        IUsersRepository usersRepository,
-        IListService listService,
-        INotificationService notificationService,
-        ISenderService senderService,
-        IUserService userService,
-        IValidator<CreateList> createValidator,
-        IValidator<UpdateList> updateValidator,
-        IValidator<UpdateSharedList> updateSharedValidator,
-        IValidator<ShareList> shareValidator,
-        IValidator<CopyList> copyValidator,
-        IStringLocalizer<ListsController> localizer,
-        IOptions<AppConfiguration> config,
-        ILogger<ListsController> logger,
-        IStringLocalizer<BaseController> baseLocalizer) : base(userIdLookup, usersRepository, baseLocalizer)
+        IUserIdLookup? userIdLookup,
+        IUsersRepository? usersRepository,
+        IListService? listService,
+        INotificationService? notificationService,
+        ISenderService? senderService,
+        IUserService? userService,
+        IValidator<CreateList>? createValidator,
+        IValidator<UpdateList>? updateValidator,
+        IValidator<UpdateSharedList>? updateSharedValidator,
+        IValidator<ShareList>? shareValidator,
+        IValidator<CopyList>? copyValidator,
+        IStringLocalizer<ListsController>? localizer,
+        IOptions<AppConfiguration>? config,
+        ILogger<ListsController>? logger,
+        IStringLocalizer<BaseController>? baseLocalizer) : base(userIdLookup, usersRepository, baseLocalizer)
     {
-        _listService = listService;
-        _notificationService = notificationService;
-        _senderService = senderService;
-        _userService = userService;
-        _createValidator = createValidator;
-        _updateValidator = updateValidator;
-        _updateSharedValidator = updateSharedValidator;
-        _shareValidator = shareValidator;
-        _copyValidator = copyValidator;
-        _localizer = localizer;
-        _config = config.Value;
-        _logger = logger;
+        _listService = ArgValidator.NotNull(listService);
+        _notificationService = ArgValidator.NotNull(notificationService);
+        _senderService = ArgValidator.NotNull(senderService);
+        _userService = ArgValidator.NotNull(userService);
+        _createValidator = ArgValidator.NotNull(createValidator);
+        _updateValidator = ArgValidator.NotNull(updateValidator);
+        _updateSharedValidator = ArgValidator.NotNull(updateSharedValidator);
+        _shareValidator = ArgValidator.NotNull(shareValidator);
+        _copyValidator = ArgValidator.NotNull(copyValidator);
+        _localizer = ArgValidator.NotNull(localizer);
+        _config = ArgValidator.NotNull(config).Value;
+        _logger = ArgValidator.NotNull(logger);
     }
 
     [HttpGet]
@@ -507,7 +508,7 @@ public class ListsController : BaseController
                 return StatusCode(500);
             }
 
-            if (userResult.Data != null)
+            if (userResult.Data is not null)
             {
                 response.UserId = userResult.Data.Id;
                 response.ImageUri = userResult.Data.ImageUri;
@@ -848,7 +849,7 @@ public class ListsController : BaseController
     }
 
     private async Task<Result> CreateAndEnqueueNotificationsAsync(
-        IReadOnlyCollection<NotificationRecipient> recipients,
+        IReadOnlyList<NotificationRecipient> recipients,
         string actionUserImageUri,
         int? listId,
         string message,

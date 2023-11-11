@@ -7,8 +7,8 @@ public interface ITasksRepository
 {
     ToDoTask Get(int id);
     ToDoTask? Get(int id, int userId);
-    ToDoTask GetForUpdate(int id, int userId);
-    List<string> GetRecipes(int id, int userId);
+    ToDoTask? GetForUpdate(int id, int userId);
+    IReadOnlyList<string> GetRecipes(int id, int userId);
     bool Exists(int id, int userId);
     bool Exists(string name, int listId, int userId);
     bool Exists(List<string> names, int listId, int userId);
@@ -16,7 +16,7 @@ public interface ITasksRepository
     bool IsPrivate(int id, int userId);
     int Count(int listId);
     Task<int> CreateAsync(ToDoTask task, int userId, ISpan metricsSpan, CancellationToken cancellationToken);
-    Task<IEnumerable<ToDoTask>> BulkCreateAsync(IEnumerable<ToDoTask> tasks, bool tasksArePrivate, int userId, ISpan metricsSpan, CancellationToken cancellationToken);
+    Task<IReadOnlyList<ToDoTask>> BulkCreateAsync(List<ToDoTask> tasks, bool tasksArePrivate, int userId, ISpan metricsSpan, CancellationToken cancellationToken);
     Task UpdateAsync(ToDoTask task, int userId, ISpan metricsSpan, CancellationToken cancellationToken);
     Task DeleteAsync(int id, int userId, ISpan metricsSpan, CancellationToken cancellationToken);
     Task CompleteAsync(int id, int userId, ISpan metricsSpan, CancellationToken cancellationToken);

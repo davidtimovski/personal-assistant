@@ -46,7 +46,7 @@ public static class IoC
                     NameClaimType = ClaimTypes.NameIdentifier
                 };
 
-                if (signalrHub != null)
+                if (signalrHub is not null)
                 {
                     opt.Events = new JwtBearerEvents
                     {

@@ -9,6 +9,7 @@ using Chef.Application.Contracts.Recipes;
 using Chef.Application.Contracts.Recipes.Models;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
+using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -40,41 +41,41 @@ public class RecipesController : BaseController
     private readonly ILogger<RecipesController> _logger;
 
     public RecipesController(
-        IUserIdLookup userIdLookup,
-        IUsersRepository usersRepository,
-        IRecipeService recipeService,
-        IIngredientService ingredientService,
-        IStringLocalizer<RecipesController> localizer,
-        IStringLocalizer<IngredientsController> ingredientsLocalizer,
-        IWebHostEnvironment webHostEnvironment,
-        ICdnService cdnService,
-        IUserService userService,
-        ISenderService senderService,
-        IValidator<CreateRecipe> createRecipeValidator,
-        IValidator<UpdateRecipe> updateRecipeValidator,
-        IValidator<ShareRecipe> shareValidator,
-        IValidator<CreateSendRequest> createSendRequestValidator,
-        IValidator<ImportRecipe> importRecipeValidator,
-        IValidator<UploadTempImage> uploadTempImageValidator,
-        IOptions<AppConfiguration> config,
-        ILogger<RecipesController> logger) : base(userIdLookup, usersRepository)
+        IUserIdLookup? userIdLookup,
+        IUsersRepository? usersRepository,
+        IRecipeService? recipeService,
+        IIngredientService? ingredientService,
+        IStringLocalizer<RecipesController>? localizer,
+        IStringLocalizer<IngredientsController>? ingredientsLocalizer,
+        IWebHostEnvironment? webHostEnvironment,
+        ICdnService? cdnService,
+        IUserService? userService,
+        ISenderService? senderService,
+        IValidator<CreateRecipe>? createRecipeValidator,
+        IValidator<UpdateRecipe>? updateRecipeValidator,
+        IValidator<ShareRecipe>? shareValidator,
+        IValidator<CreateSendRequest>? createSendRequestValidator,
+        IValidator<ImportRecipe>? importRecipeValidator,
+        IValidator<UploadTempImage>? uploadTempImageValidator,
+        IOptions<AppConfiguration>? config,
+        ILogger<RecipesController>? logger) : base(userIdLookup, usersRepository)
     {
-        _recipeService = recipeService;
-        _ingredientService = ingredientService;
-        _localizer = localizer;
-        _ingredientsLocalizer = ingredientsLocalizer;
-        _webHostEnvironment = webHostEnvironment;
-        _cdnService = cdnService;
-        _userService = userService;
-        _senderService = senderService;
-        _createRecipeValidator = createRecipeValidator;
-        _updateRecipeValidator = updateRecipeValidator;
-        _shareValidator = shareValidator;
-        _createSendRequestValidator = createSendRequestValidator;
-        _importRecipeValidator = importRecipeValidator;
-        _uploadTempImageValidator = uploadTempImageValidator;
-        _config = config.Value;
-        _logger = logger;
+        _recipeService = ArgValidator.NotNull(recipeService);
+        _ingredientService = ArgValidator.NotNull(ingredientService);
+        _localizer = ArgValidator.NotNull(localizer);
+        _ingredientsLocalizer = ArgValidator.NotNull(ingredientsLocalizer);
+        _webHostEnvironment = ArgValidator.NotNull(webHostEnvironment);
+        _cdnService = ArgValidator.NotNull(cdnService);
+        _userService = ArgValidator.NotNull(userService);
+        _senderService = ArgValidator.NotNull(senderService);
+        _createRecipeValidator = ArgValidator.NotNull(createRecipeValidator);
+        _updateRecipeValidator = ArgValidator.NotNull(updateRecipeValidator);
+        _shareValidator = ArgValidator.NotNull(shareValidator);
+        _createSendRequestValidator = ArgValidator.NotNull(createSendRequestValidator);
+        _importRecipeValidator = ArgValidator.NotNull(importRecipeValidator);
+        _uploadTempImageValidator = ArgValidator.NotNull(uploadTempImageValidator);
+        _config = ArgValidator.NotNull(config).Value;
+        _logger = ArgValidator.NotNull(logger);
     }
 
     [HttpGet]
@@ -88,7 +89,7 @@ public class RecipesController : BaseController
 
         try
         {
-            IEnumerable<SimpleRecipe> recipeDtos = _recipeService.GetAll(UserId, tr);
+            var recipeDtos = _recipeService.GetAll(UserId, tr);
 
             return Ok(recipeDtos);
         }
@@ -213,7 +214,7 @@ public class RecipesController : BaseController
 
         try
         {
-            IEnumerable<Application.Contracts.Recipes.Models.ShareRecipeRequest> shareRequests = _recipeService.GetShareRequests(UserId, tr);
+            var shareRequests = _recipeService.GetShareRequests(UserId, tr);
 
             return Ok(shareRequests);
         }
@@ -291,7 +292,7 @@ public class RecipesController : BaseController
 
         try
         {
-            IEnumerable<SendRequestDto> sendRequestDtos = _recipeService.GetSendRequests(UserId, tr);
+            var sendRequestDtos = _recipeService.GetSendRequests(UserId, tr);
 
             return Ok(sendRequestDtos);
         }
@@ -588,7 +589,7 @@ public class RecipesController : BaseController
                 return StatusCode(500);
             }
 
-            if (userResult.Data != null)
+            if (userResult.Data is not null)
             {
                 response.UserId = userResult.Data.Id;
                 response.ImageUri = userResult.Data.ImageUri;
@@ -797,7 +798,7 @@ public class RecipesController : BaseController
                 return StatusCode(500);
             }
 
-            if (userResult.Data != null)
+            if (userResult.Data is not null)
             {
                 var (canSend, alreadySent) = _recipeService.CheckSendRequest(recipeId, userResult.Data.Id, UserId, tr);
 

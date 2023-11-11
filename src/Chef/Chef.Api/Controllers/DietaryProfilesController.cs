@@ -3,6 +3,7 @@ using Chef.Api.Models.DietaryProfiles.Requests;
 using Chef.Application.Contracts.DietaryProfiles;
 using Chef.Application.Contracts.DietaryProfiles.Models;
 using Core.Application.Contracts;
+using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,15 +20,15 @@ public class DietaryProfilesController : BaseController
     private readonly IValidator<UpdateDietaryProfile> _updateDietaryProfileValidator;
     
     public DietaryProfilesController(
-        IUserIdLookup userIdLookup,
-        IUsersRepository usersRepository,
-        IDietaryProfileService dietaryProfileService,
-        IValidator<GetRecommendedDailyIntake> getRecommendedDailyIntakeValidator,
-        IValidator<UpdateDietaryProfile> updateDietaryProfileValidator) : base(userIdLookup, usersRepository)
+        IUserIdLookup? userIdLookup,
+        IUsersRepository? usersRepository,
+        IDietaryProfileService? dietaryProfileService,
+        IValidator<GetRecommendedDailyIntake>? getRecommendedDailyIntakeValidator,
+        IValidator<UpdateDietaryProfile>? updateDietaryProfileValidator) : base(userIdLookup, usersRepository)
     {
-        _dietaryProfileService = dietaryProfileService;
-        _getRecommendedDailyIntakeValidator = getRecommendedDailyIntakeValidator;
-        _updateDietaryProfileValidator = updateDietaryProfileValidator;
+        _dietaryProfileService = ArgValidator.NotNull(dietaryProfileService);
+        _getRecommendedDailyIntakeValidator = ArgValidator.NotNull(getRecommendedDailyIntakeValidator);
+        _updateDietaryProfileValidator = ArgValidator.NotNull(updateDietaryProfileValidator);
     }
 
     [HttpGet]

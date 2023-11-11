@@ -1,6 +1,7 @@
 ﻿using Api.Common;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
+using Core.Application.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
@@ -14,11 +15,11 @@ public class UsersController : BaseController
     private readonly IUserService _userService;
 
     public UsersController(
-        IUserIdLookup userIdLookup,
-        IUsersRepository usersRepository,
-        IUserService userService) : base(userIdLookup, usersRepository)
+        IUserIdLookup? userIdLookup,
+        IUsersRepository? usersRepository,
+        IUserService? userService) : base(userIdLookup, usersRepository)
     {
-        _userService = userService;
+        _userService = ArgValidator.NotNull(userService);
     }
 
     [HttpGet]

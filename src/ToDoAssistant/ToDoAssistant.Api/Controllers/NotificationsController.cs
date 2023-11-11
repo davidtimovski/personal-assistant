@@ -1,4 +1,5 @@
 ﻿using Core.Application.Contracts;
+using Core.Application.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -13,12 +14,12 @@ public class NotificationsController : BaseController
     private readonly INotificationService _notificationService;
 
     public NotificationsController(
-        IUserIdLookup userIdLookup,
-        IUsersRepository usersRepository,
-        INotificationService notificationService,
-        IStringLocalizer<BaseController> baseLocalizer) : base(userIdLookup, usersRepository, baseLocalizer)
+        IUserIdLookup? userIdLookup,
+        IUsersRepository? usersRepository,
+        INotificationService? notificationService,
+        IStringLocalizer<BaseController>? baseLocalizer) : base(userIdLookup, usersRepository, baseLocalizer)
     {
-        _notificationService = notificationService;
+        _notificationService = ArgValidator.NotNull(notificationService);
     }
 
     [HttpGet]

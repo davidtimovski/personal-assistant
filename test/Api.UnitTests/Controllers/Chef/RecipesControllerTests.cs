@@ -1,10 +1,16 @@
 ﻿using Api.UnitTests.Builders;
 using Chef.Api.Controllers;
 using Chef.Api.Models;
+using Chef.Application.Contracts.Ingredients;
 using Chef.Application.Contracts.Recipes;
 using Chef.Application.Contracts.Recipes.Models;
 using Core.Application.Contracts;
+using Core.Application.Contracts.Models;
+using FluentValidation;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Sentry;
@@ -20,9 +26,25 @@ public class RecipesControllerTests
 
     public RecipesControllerTests()
     {
-        _sut = new RecipesController(_userIdLookupMock.Object, null, _recipeServiceMock.Object,
-            null, null, null, null, null, null, null, null, null,
-            null, null, null, null, new Mock<IOptions<AppConfiguration>>().Object, null)
+        _sut = new RecipesController(
+            _userIdLookupMock.Object,
+            new Mock<IUsersRepository>().Object,
+            _recipeServiceMock.Object,
+            new Mock<IIngredientService>().Object,
+            new Mock<IStringLocalizer<RecipesController>>().Object,
+            new Mock<IStringLocalizer<IngredientsController>>().Object,
+            new Mock<IWebHostEnvironment>().Object,
+            new Mock<ICdnService>().Object,
+            new Mock<IUserService>().Object,
+            new Mock<ISenderService>().Object,
+            new Mock<IValidator<CreateRecipe>>().Object,
+            new Mock<IValidator<UpdateRecipe>>().Object,
+            new Mock<IValidator<ShareRecipe>>().Object,
+            new Mock<IValidator<CreateSendRequest>>().Object,
+            new Mock<IValidator<ImportRecipe>>().Object,
+            new Mock<IValidator<UploadTempImage>>().Object,
+            new Mock<IOptions<AppConfiguration>>().Object,
+            new Mock<ILogger<RecipesController>>().Object)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };
