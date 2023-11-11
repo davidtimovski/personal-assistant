@@ -23,7 +23,7 @@ public class TooltipService : ITooltipService
         _logger = logger;
     }
 
-    public Result<IEnumerable<TooltipDto>> GetAll(string application, int userId, ISpan metricsSpan)
+    public Result<IReadOnlyList<TooltipDto>> GetAll(string application, int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(TooltipService)}.{nameof(GetAll)}");
 
@@ -31,7 +31,7 @@ public class TooltipService : ITooltipService
         {
             var tooltips = _tooltipsRepository.GetAll(application, userId, metric);
 
-            var result = tooltips.Select(x => _mapper.Map<TooltipDto>(x));
+            var result = tooltips.Select(x => _mapper.Map<TooltipDto>(x)).ToList();
 
             return new(result);
         }

@@ -39,6 +39,8 @@ public class UpdateTests
     {
         _listsRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<ToDoList>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ToDoList());
+        _listsRepositoryMock.Setup(x => x.GetUsersToBeNotifiedOfChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()))
+            .Returns(new List<Core.Application.Entities.User>());
 
         UpdateList model = new ListBuilder().BuildUpdateModel();
 
@@ -65,6 +67,8 @@ public class UpdateTests
         _listsRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<ToDoList>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
             .Callback<ToDoList, int, ISpan, CancellationToken>((l, _, _, _) => actualName = l.Name)
             .ReturnsAsync(new ToDoList());
+        _listsRepositoryMock.Setup(x => x.GetUsersToBeNotifiedOfChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>()))
+            .Returns(new List<Core.Application.Entities.User>());
 
         UpdateList model = new ListBuilder().WithName(" List name ").BuildUpdateModel();
 

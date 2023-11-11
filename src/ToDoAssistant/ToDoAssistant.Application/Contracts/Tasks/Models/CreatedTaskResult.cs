@@ -23,7 +23,7 @@ public class CreatedTaskResult : INotificationResult, IValidatedResult
     }
 
     public ResultStatus Status { get; private set; }
-    public IReadOnlyCollection<ValidationFailure>? ValidationErrors { get; private set; }
+    public IReadOnlyList<ValidationFailure>? ValidationErrors { get; private set; }
 
     public int TaskId { get; init; }
     public int ListId { get; init; }
@@ -33,7 +33,7 @@ public class CreatedTaskResult : INotificationResult, IValidatedResult
     public string ListName { get; init; } = null!;
     public string ActionUserName { get; init; } = null!;
     public string ActionUserImageUri { get; init; } = null!;
-    public IReadOnlyCollection<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
+    public IReadOnlyList<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
 
     public bool Notify()
     {

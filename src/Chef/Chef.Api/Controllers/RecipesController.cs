@@ -88,7 +88,7 @@ public class RecipesController : BaseController
 
         try
         {
-            IEnumerable<SimpleRecipe> recipeDtos = _recipeService.GetAll(UserId, tr);
+            var recipeDtos = _recipeService.GetAll(UserId, tr);
 
             return Ok(recipeDtos);
         }
@@ -213,7 +213,7 @@ public class RecipesController : BaseController
 
         try
         {
-            IEnumerable<Application.Contracts.Recipes.Models.ShareRecipeRequest> shareRequests = _recipeService.GetShareRequests(UserId, tr);
+            var shareRequests = _recipeService.GetShareRequests(UserId, tr);
 
             return Ok(shareRequests);
         }
@@ -291,7 +291,7 @@ public class RecipesController : BaseController
 
         try
         {
-            IEnumerable<SendRequestDto> sendRequestDtos = _recipeService.GetSendRequests(UserId, tr);
+            var sendRequestDtos = _recipeService.GetSendRequests(UserId, tr);
 
             return Ok(sendRequestDtos);
         }

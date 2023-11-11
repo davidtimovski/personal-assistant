@@ -68,7 +68,7 @@ public abstract class BaseController : Controller
         }
     }
 
-    protected IActionResult UnprocessableEntityResult(IReadOnlyCollection<ValidationFailure> validationErrors)
+    protected IActionResult UnprocessableEntityResult(IReadOnlyList<ValidationFailure> validationErrors)
     {
         var result = new Dictionary<string, List<string>>();
 

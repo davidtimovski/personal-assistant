@@ -329,7 +329,7 @@ public class CloudinaryService : ICdnService
         }
     }
 
-    public async Task<Result> DeleteUserResourcesAsync(int userId, IEnumerable<Uri> imageUris, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<Result> DeleteUserResourcesAsync(int userId, List<Uri> imageUris, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(CloudinaryService)}.{nameof(DeleteUserResourcesAsync)}");
 

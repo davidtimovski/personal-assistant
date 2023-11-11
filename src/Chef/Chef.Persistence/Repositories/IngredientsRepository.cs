@@ -12,7 +12,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
     public IngredientsRepository(ChefContext efContext)
         : base(efContext) { }
 
-    public IEnumerable<Ingredient> GetUserAndUsedPublicIngredients(int userId, ISpan metricsSpan)
+    public IReadOnlyList<Ingredient> GetUserAndUsedPublicIngredients(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(IngredientsRepository)}.{nameof(GetUserAndUsedPublicIngredients)}");
 
@@ -41,7 +41,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
 	                                        WHERE i.user_id = 1
 	                                        GROUP BY i.id, it.task_id
                                         ) t
-                                        ORDER BY t.modified_date DESC, t.name", new { UserId = userId });
+                                        ORDER BY t.modified_date DESC, t.name", new { UserId = userId }).ToList();
         }
         finally
         {
@@ -49,7 +49,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
         }
     }
 
-    public Ingredient Get(int id, ISpan metricsSpan)
+    public Ingredient? Get(int id, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(IngredientsRepository)}.{nameof(Get)}");
 
@@ -177,7 +177,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
         }
     }
 
-    public IEnumerable<Ingredient> GetForSuggestions(int userId, ISpan metricsSpan)
+    public IReadOnlyList<Ingredient> GetForSuggestions(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(IngredientsRepository)}.{nameof(GetForSuggestions)}");
 
@@ -195,7 +195,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
         }
     }
 
-    public IEnumerable<IngredientCategory> GetIngredientCategories(ISpan metricsSpan)
+    public IReadOnlyList<IngredientCategory> GetIngredientCategories(ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(IngredientsRepository)}.{nameof(GetIngredientCategories)}");
 
@@ -203,7 +203,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
         {
             using IDbConnection conn = OpenConnection();
 
-            return conn.Query<IngredientCategory>("SELECT * FROM chef.ingredient_categories ORDER BY id");
+            return conn.Query<IngredientCategory>("SELECT * FROM chef.ingredient_categories ORDER BY id").ToList();
         }
         finally
         {
@@ -211,7 +211,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
         }
     }
 
-    public IEnumerable<ToDoTask> GetTaskSuggestions(int userId, ISpan metricsSpan)
+    public IReadOnlyList<ToDoTask> GetTaskSuggestions(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(IngredientsRepository)}.{nameof(GetTaskSuggestions)}");
 
@@ -233,7 +233,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
                 {
                     task.List = list;
                     return task;
-                }, new { UserId = userId });
+                }, new { UserId = userId }).ToList();
         }
         finally
         {

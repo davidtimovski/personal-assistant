@@ -209,7 +209,7 @@ public class IngredientsController : BaseController
 
         try
         {
-            IEnumerable<TaskSuggestion> taskSuggestions = _ingredientService.GetTaskSuggestions(UserId, tr);
+            var taskSuggestions = _ingredientService.GetTaskSuggestions(UserId, tr);
 
             return Ok(taskSuggestions);
         }

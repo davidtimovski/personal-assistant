@@ -24,13 +24,13 @@ public class NotificationService : INotificationService
         _logger = logger;
     }
 
-    public Result<IEnumerable<NotificationDto>> GetAllAndFlagUnseen(int userId)
+    public Result<IReadOnlyList<NotificationDto>> GetAllAndFlagUnseen(int userId)
     {
         try
         {
-            IEnumerable<Notification> notifications = _notificationsRepository.GetAllAndFlagUnseen(userId);
+            var notifications = _notificationsRepository.GetAllAndFlagUnseen(userId);
 
-            var result = notifications.Select(x => _mapper.Map<NotificationDto>(x));
+            var result = notifications.Select(x => _mapper.Map<NotificationDto>(x)).ToList();
 
             return new (result);
         }

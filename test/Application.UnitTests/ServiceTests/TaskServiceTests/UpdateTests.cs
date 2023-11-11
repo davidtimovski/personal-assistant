@@ -28,7 +28,7 @@ public class UpdateTests
         _successfulValidatorMock = ValidatorMocker.GetSuccessful<UpdateTask>();
 
         _listServiceMock.Setup(x => x.IsShared(It.IsAny<int>(), It.IsAny<int>())).Returns(new Result<bool?>(true));
-        _listServiceMock.Setup(x => x.GetUsersToBeNotifiedOfChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>())).Returns(new Result<IEnumerable<User>>(new List<User>()));
+        _listServiceMock.Setup(x => x.GetUsersToBeNotifiedOfChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>())).Returns(new Result<IReadOnlyList<User>>(new List<User>()));
 
         _tasksRepositoryMock.Setup(x => x.Get(It.IsAny<int>())).Returns(new ToDoTask());
         _listsRepositoryMock.Setup(x => x.GetWithShares(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>())).Returns(new ToDoList

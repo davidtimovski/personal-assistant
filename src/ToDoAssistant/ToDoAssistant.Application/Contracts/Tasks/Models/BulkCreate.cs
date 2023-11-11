@@ -47,7 +47,7 @@ public class BulkCreateValidator : AbstractValidator<BulkCreate>
             return tasks.Any();
         }).WithMessage("Tasks.BulkCreate.NoTasks").Must((dto, tasksText) =>
         {
-            IEnumerable<string> taskNames = tasksText.Split("\n").Where(x => !string.IsNullOrWhiteSpace(x));
+            var taskNames = tasksText.Split("\n").Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
             var existsResult = taskService.Exists(taskNames, dto.ListId, dto.UserId);
             if (existsResult.Failed)
             {

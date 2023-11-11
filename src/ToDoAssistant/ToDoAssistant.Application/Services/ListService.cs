@@ -41,15 +41,15 @@ public class ListService : IListService
 
     public static HashSet<string> IconOptions => new HashSet<string> { "list", "shopping-cart", "shopping-bag", "home", "birthday", "cheers", "vacation", "passport", "plane", "car", "pickup-truck", "world", "camping", "tree", "motorcycle", "bicycle", "workout", "ski", "snowboard", "swimming", "work", "baby", "dog", "cat", "bird", "fish", "camera", "medicine", "file", "book", "mountain", "facebook", "twitter", "instagram", "tiktok" };
 
-    public Result<IEnumerable<ListDto>> GetAll(int userId, ISpan metricsSpan)
+    public Result<IReadOnlyList<ListDto>> GetAll(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(GetAll)}");
 
         try
         {
-            IEnumerable<ToDoList> lists = _listsRepository.GetAllWithTasksAndSharingDetails(userId, metric);
+            IReadOnlyList<ToDoList> lists = _listsRepository.GetAllWithTasksAndSharingDetails(userId, metric);
 
-            var result = lists.Select(x => _mapper.Map<ListDto>(x, opts => opts.Items["UserId"] = userId));
+            var result = lists.Select(x => _mapper.Map<ListDto>(x, opts => opts.Items["UserId"] = userId)).ToList();
 
             return new(result);
         }
@@ -64,15 +64,15 @@ public class ListService : IListService
         }
     }
 
-    public Result<IEnumerable<ToDoListOption>> GetAllAsOptions(int userId, ISpan metricsSpan)
+    public Result<IReadOnlyList<ToDoListOption>> GetAllAsOptions(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(GetAllAsOptions)}");
 
         try
         {
-            IEnumerable<ToDoList> lists = _listsRepository.GetAllAsOptions(userId, metric);
+            IReadOnlyList<ToDoList> lists = _listsRepository.GetAllAsOptions(userId, metric);
 
-            var result = lists.Select(x => _mapper.Map<ToDoListOption>(x));
+            var result = lists.Select(x => _mapper.Map<ToDoListOption>(x)).ToList();
 
             return new(result);
         }
@@ -87,7 +87,7 @@ public class ListService : IListService
         }
     }
 
-    public Result<IEnumerable<Assignee>?> GetMembersAsAssigneeOptions(int id, int userId, ISpan metricsSpan)
+    public Result<IReadOnlyList<Assignee>?> GetMembersAsAssigneeOptions(int id, int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(GetMembersAsAssigneeOptions)}");
 
@@ -100,9 +100,9 @@ public class ListService : IListService
                 return new(null);
             }
 
-            IEnumerable<User> members = _listsRepository.GetMembersAsAssigneeOptions(id, metric);
+            IReadOnlyList<User> members = _listsRepository.GetMembersAsAssigneeOptions(id, metric);
 
-            var result = members.Select(x => _mapper.Map<Assignee>(x));
+            var result = members.Select(x => _mapper.Map<Assignee>(x)).ToList();
 
             return new(result);
         }
@@ -187,15 +187,15 @@ public class ListService : IListService
         }
     }
 
-    public Result<IEnumerable<ShareListRequest>> GetShareRequests(int userId, ISpan metricsSpan)
+    public Result<IReadOnlyList<ShareListRequest>> GetShareRequests(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(GetShareRequests)}");
 
         try
         {
-            IEnumerable<ListShare> shareRequests = _listsRepository.GetShareRequests(userId, metric);
+            IReadOnlyList<ListShare> shareRequests = _listsRepository.GetShareRequests(userId, metric);
 
-            var result = shareRequests.Select(x => _mapper.Map<ShareListRequest>(x, opts => opts.Items["UserId"] = userId));
+            var result = shareRequests.Select(x => _mapper.Map<ShareListRequest>(x, opts => opts.Items["UserId"] = userId)).ToList();
 
             return new(result);
         }
@@ -361,7 +361,7 @@ public class ListService : IListService
         }
     }
 
-    public Result<IEnumerable<User>> GetUsersToBeNotifiedOfChange(int id, int excludeUserId, bool isPrivate, ISpan metricsSpan)
+    public Result<IReadOnlyList<User>> GetUsersToBeNotifiedOfChange(int id, int excludeUserId, bool isPrivate, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(GetUsersToBeNotifiedOfChange)}");
 
@@ -386,7 +386,7 @@ public class ListService : IListService
         }
     }
 
-    public Result<IEnumerable<User>> GetUsersToBeNotifiedOfChange(int id, int excludeUserId, int taskId, ISpan metricsSpan)
+    public Result<IReadOnlyList<User>> GetUsersToBeNotifiedOfChange(int id, int excludeUserId, int taskId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListService)}.{nameof(GetUsersToBeNotifiedOfChange)}");
 
@@ -549,7 +549,7 @@ public class ListService : IListService
 
             ToDoList original = await _listsRepository.UpdateAsync(list, model.UserId, metric, cancellationToken);
 
-            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(model.Id, model.UserId, metric).ToList();
+            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(model.Id, model.UserId, metric);
             if (!usersToBeNotified.Any())
             {
                 return new UpdateListResult(ResultStatus.Successful);
@@ -639,7 +639,7 @@ public class ListService : IListService
                 return new();
             }
 
-            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfDeletion(id, metric).ToList();
+            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfDeletion(id, metric);
 
             string deletedListName = await _listsRepository.DeleteAsync(id, metric, cancellationToken);
 
@@ -713,14 +713,14 @@ public class ListService : IListService
                 UserId = x.UserId,
                 IsAdmin = x.IsAdmin,
                 ModifiedDate = now
-            });
+            }).ToList();
 
             var removedShares = model.RemovedShares.Select(x => new ListShare
             {
                 ListId = model.ListId,
                 UserId = x.UserId,
                 IsAdmin = x.IsAdmin
-            });
+            }).ToList();
 
             await _listsRepository.SaveSharingDetailsAsync(newShares, editedShares, removedShares, metric, cancellationToken);
 
@@ -757,7 +757,7 @@ public class ListService : IListService
 
             await _notificationsRepository.DeleteForUserAndListAsync(userId, id, metric, cancellationToken);
 
-            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(id, userId, metric).ToList();
+            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(id, userId, metric);
             if (!usersToBeNotified.Any())
             {
                 return new LeaveListResult(true);
@@ -870,7 +870,7 @@ public class ListService : IListService
                 return new SetTasksAsNotCompletedResult(true);
             }
 
-            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(id, userId, metric).ToList();
+            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(id, userId, metric);
             if (!usersToBeNotified.Any())
             {
                 return new SetTasksAsNotCompletedResult(true);
@@ -913,7 +913,7 @@ public class ListService : IListService
         {
             await _listsRepository.SetShareIsAcceptedAsync(id, userId, isAccepted, DateTime.UtcNow, metric, cancellationToken);
 
-            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(id, userId, metric).ToList();
+            var usersToBeNotified = _listsRepository.GetUsersToBeNotifiedOfChange(id, userId, metric);
             if (!usersToBeNotified.Any())
             {
                 return new SetShareIsAcceptedResult(true);

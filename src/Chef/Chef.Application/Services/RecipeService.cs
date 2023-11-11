@@ -7,7 +7,6 @@ using Chef.Application.Entities;
 using Chef.Utility;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
-using Core.Application.Entities;
 using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
@@ -46,13 +45,13 @@ public class RecipeService : IRecipeService
         _logger = logger;
     }
 
-    public IEnumerable<SimpleRecipe> GetAll(int userId, ISpan metricsSpan)
+    public IReadOnlyList<SimpleRecipe> GetAll(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(GetAll)}");
 
         try
         {
-            List<Recipe> recipes = _recipesRepository.GetAll(userId, metric).ToList();
+            var recipes = _recipesRepository.GetAll(userId, metric);
 
             var result = new List<SimpleRecipe>(recipes.Count);
             foreach (Recipe recipe in recipes)
@@ -63,7 +62,9 @@ public class RecipeService : IRecipeService
                 result.Add(simpleRecipe);
             }
 
-            return result.OrderBy(x => x.IngredientsMissing).ThenByDescending(x => x.LastOpenedDate);
+            return result.OrderBy(x => x.IngredientsMissing)
+                         .ThenByDescending(x => x.LastOpenedDate)
+                         .ToList();
         }
         catch (Exception ex)
         {
@@ -82,7 +83,7 @@ public class RecipeService : IRecipeService
 
         try
         {
-            Recipe recipe = _recipesRepository.Get(id, metric);
+            var recipe = _recipesRepository.Get(id, metric);
 
             var result = _mapper.Map<RecipeToNotify>(recipe);
 
@@ -197,15 +198,15 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public IEnumerable<ShareRecipeRequest> GetShareRequests(int userId, ISpan metricsSpan)
+    public IReadOnlyList<ShareRecipeRequest> GetShareRequests(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(GetShareRequests)}");
 
         try
         {
-            IEnumerable<RecipeShare> shareRequests = _recipesRepository.GetShareRequests(userId, metric);
+            var shareRequests = _recipesRepository.GetShareRequests(userId, metric);
 
-            var result = shareRequests.Select(x => _mapper.Map<ShareRecipeRequest>(x, opts => opts.Items["UserId"] = userId));
+            var result = shareRequests.Select(x => _mapper.Map<ShareRecipeRequest>(x, opts => opts.Items["UserId"] = userId)).ToList();
 
             return result;
         }
@@ -263,13 +264,17 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public RecipeForSending GetForSending(int id, int userId, ISpan metricsSpan)
+    public RecipeForSending? GetForSending(int id, int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(GetForSending)}");
 
         try
         {
-            Recipe recipe = _recipesRepository.GetForSending(id, userId, metric);
+            var recipe = _recipesRepository.GetForSending(id, userId, metric);
+            if (recipe is null)
+            {
+                return null;
+            }
 
             var result = _mapper.Map<RecipeForSending>(recipe);
 
@@ -286,15 +291,15 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public IEnumerable<SendRequestDto> GetSendRequests(int userId, ISpan metricsSpan)
+    public IReadOnlyList<SendRequestDto> GetSendRequests(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(GetSendRequests)}");
 
         try
         {
-            IEnumerable<SendRequest> sendRequests = _recipesRepository.GetSendRequests(userId, metric);
+            var sendRequests = _recipesRepository.GetSendRequests(userId, metric);
 
-            var result = sendRequests.Select(x => _mapper.Map<SendRequestDto>(x));
+            var result = sendRequests.Select(x => _mapper.Map<SendRequestDto>(x)).ToList();
 
             return result;
         }
@@ -388,7 +393,7 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public IEnumerable<string> GetAllImageUris(int userId, ISpan metricsSpan)
+    public IReadOnlyList<string> GetAllImageUris(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipeService)}.{nameof(GetAllImageUris)}");
 
@@ -724,7 +729,7 @@ public class RecipeService : IRecipeService
                 }
             }
 
-            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(model.Id, model.UserId, metric).ToList();
+            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(model.Id, model.UserId, metric);
             if (!usersToBeNotified.Any())
             {
                 return new UpdateRecipeResult();
@@ -782,7 +787,7 @@ public class RecipeService : IRecipeService
                 }
             }
 
-            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeDeletion(id, metric).ToList();
+            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeDeletion(id, metric);
             if (!usersToBeNotified.Any())
             {
                 return new DeleteRecipeResult();
@@ -847,7 +852,7 @@ public class RecipeService : IRecipeService
             {
                 RecipeId = model.RecipeId,
                 UserId = x
-            });
+            }).ToList();
 
             await _recipesRepository.SaveSharingDetailsAsync(newShares, removedShares, metric, cancellationToken);
         }
@@ -870,7 +875,7 @@ public class RecipeService : IRecipeService
         {
             await _recipesRepository.SetShareIsAcceptedAsync(recipeId, userId, isAccepted, DateTime.UtcNow, metric, cancellationToken);
 
-            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(recipeId, userId, metric).ToList();
+            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(recipeId, userId, metric);
             if (!usersToBeNotified.Any())
             {
                 return new SetShareIsAcceptedResult();
@@ -918,7 +923,7 @@ public class RecipeService : IRecipeService
                 return new LeaveRecipeResult();
             }
 
-            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(id, userId, metric).ToList();
+            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeChange(id, userId, metric);
             if (!usersToBeNotified.Any())
             {
                 return new LeaveRecipeResult();
@@ -986,7 +991,7 @@ public class RecipeService : IRecipeService
 
             await _recipesRepository.CreateSendRequestsAsync(sendRequests, metric, cancellationToken);
 
-            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeSent(model.RecipeId, metric).ToList();
+            var usersToBeNotified = _recipesRepository.GetUsersToBeNotifiedOfRecipeSent(model.RecipeId, metric);
             if (!usersToBeNotified.Any())
             {
                 return new SendRecipeResult();
@@ -1029,7 +1034,11 @@ public class RecipeService : IRecipeService
         {
             await _recipesRepository.DeclineSendRequestAsync(recipeId, userId, DateTime.UtcNow, metric, cancellationToken);
 
-            Recipe recipe = _recipesRepository.Get(recipeId, metric);
+            var recipe = _recipesRepository.Get(recipeId, metric);
+            if (recipe is null)
+            {
+                throw new Exception("Recipe was not found");
+            }
 
             var userToBeNotifiedResult = _userService.Get(recipe.UserId);
             if (userToBeNotifiedResult.Failed)
@@ -1092,7 +1101,8 @@ public class RecipeService : IRecipeService
         try
         {
             var ingredientReplacements = model.IngredientReplacements
-                .Select(x => (x.Id, x.ReplacementId, x.TransferNutritionData, x.TransferPriceData));
+                .Select(x => (x.Id, x.ReplacementId, x.TransferNutritionData, x.TransferPriceData))
+                .ToList();
 
             return await _recipesRepository.ImportAsync(model.Id, ingredientReplacements, model.ImageUri, model.UserId, metric, cancellationToken);
         }

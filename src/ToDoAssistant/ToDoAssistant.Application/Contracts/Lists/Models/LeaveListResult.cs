@@ -20,7 +20,7 @@ public class LeaveListResult : INotificationResult, IResult
     public string ListName { get; set; } = null!;
     public string ActionUserName { get; set; } = null!;
     public string ActionUserImageUri { get; set; } = null!;
-    public IReadOnlyCollection<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
+    public IReadOnlyList<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
 
     public bool Notify()
     {

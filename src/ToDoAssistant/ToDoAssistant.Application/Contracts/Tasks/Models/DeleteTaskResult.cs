@@ -24,7 +24,7 @@ public class DeleteTaskResult : INotificationResult, IResult
     public string ListName { get; init; } = null!;
     public string ActionUserName { get; init; } = null!;
     public string ActionUserImageUri { get; init; } = null!;
-    public IReadOnlyCollection<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
+    public IReadOnlyList<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
 
     public bool Notify()
     {

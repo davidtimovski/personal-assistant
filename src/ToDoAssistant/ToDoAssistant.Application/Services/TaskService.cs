@@ -74,7 +74,7 @@ public class TaskService : ITaskService
     {
         try
         {
-            ToDoTask task = _tasksRepository.GetForUpdate(id, userId);
+            var task = _tasksRepository.GetForUpdate(id, userId);
             if (task is null)
             {
                 return new(null);
@@ -133,7 +133,7 @@ public class TaskService : ITaskService
         }
     }
 
-    public Result<bool> Exists(IEnumerable<string> names, int listId, int userId)
+    public Result<bool> Exists(List<string> names, int listId, int userId)
     {
         try
         {
@@ -288,7 +288,7 @@ public class TaskService : ITaskService
                 }
                 ).ToList();
 
-            IEnumerable<ToDoTask> createdTasks = await _tasksRepository.BulkCreateAsync(tasks, model.TasksArePrivate, model.UserId, metric, cancellationToken);
+            var createdTasks = await _tasksRepository.BulkCreateAsync(tasks, model.TasksArePrivate, model.UserId, metric, cancellationToken);
 
             ToDoList? list = _listsRepository.GetWithShares(model.ListId, model.UserId, metric);
             if (list is null)

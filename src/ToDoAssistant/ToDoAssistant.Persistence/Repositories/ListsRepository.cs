@@ -12,7 +12,7 @@ public class ListsRepository : BaseRepository, IListsRepository
     public ListsRepository(ToDoAssistantContext efContext)
         : base(efContext) { }
 
-    public IEnumerable<ToDoList> GetAllAsOptions(int userId, ISpan metricsSpan)
+    public IReadOnlyList<ToDoList> GetAllAsOptions(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(GetAllAsOptions)}");
 
@@ -34,7 +34,7 @@ public class ListsRepository : BaseRepository, IListsRepository
                         list.Shares.Add(share);
                     }
                     return list;
-                }, new { UserId = userId }, null, true, "user_id");
+                }, new { UserId = userId }, null, true, "user_id").ToList();
         }
         finally
         {
@@ -42,17 +42,17 @@ public class ListsRepository : BaseRepository, IListsRepository
         }
     }
 
-    public IEnumerable<int> GetNonArchivedSharedListIds(int userId)
+    public IReadOnlyList<int> GetNonArchivedSharedListIds(int userId)
     {
         using IDbConnection conn = OpenConnection();
 
         return conn.Query<int>(@"SELECT id FROM todo.lists WHERE user_id = @UserId AND is_archived = FALSE
                                  UNION ALL
                                  SELECT list_id FROM todo.shares WHERE user_id = @UserId AND is_archived = FALSE AND is_accepted",
-            new { UserId = userId });
+            new { UserId = userId }).ToList();
     }
 
-    public IEnumerable<ToDoList> GetAllWithTasksAndSharingDetails(int userId, ISpan metricsSpan)
+    public IReadOnlyList<ToDoList> GetAllWithTasksAndSharingDetails(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(GetAllWithTasksAndSharingDetails)}");
 
@@ -99,7 +99,7 @@ public class ListsRepository : BaseRepository, IListsRepository
         }
     }
 
-    public IEnumerable<User> GetMembersAsAssigneeOptions(int id, ISpan metricsSpan)
+    public IReadOnlyList<User> GetMembersAsAssigneeOptions(int id, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(GetMembersAsAssigneeOptions)}");
 
@@ -112,7 +112,7 @@ public class ListsRepository : BaseRepository, IListsRepository
                                   LEFT JOIN todo.lists AS l ON u.id = l.user_id
                                   LEFT JOIN todo.shares AS s ON u.id = s.user_id
                                   WHERE l.id = @ListId OR (s.list_id = @ListId AND s.is_accepted IS NOT FALSE)
-                                  ORDER BY u.name", new { ListId = id });
+                                  ORDER BY u.name", new { ListId = id }).ToList();
         }
         finally
         {
@@ -184,7 +184,7 @@ public class ListsRepository : BaseRepository, IListsRepository
         }
     }
 
-    public IEnumerable<ListShare> GetShares(int id, ISpan metricsSpan)
+    public IReadOnlyList<ListShare> GetShares(int id, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(GetShares)}");
 
@@ -203,7 +203,7 @@ public class ListsRepository : BaseRepository, IListsRepository
                 {
                     share.User = user;
                     return share;
-                }, new { ListId = id });
+                }, new { ListId = id }).ToList();
         }
         finally
         {
@@ -211,7 +211,7 @@ public class ListsRepository : BaseRepository, IListsRepository
         }
     }
 
-    public IEnumerable<ListShare> GetShareRequests(int userId, ISpan metricsSpan)
+    public IReadOnlyList<ListShare> GetShareRequests(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(GetShareRequests)}");
 
@@ -232,7 +232,7 @@ public class ListsRepository : BaseRepository, IListsRepository
                     share.List = list;
                     share.User = user;
                     return share;
-                }, new { UserId = userId }, null, true, "name,Name");
+                }, new { UserId = userId }, null, true, "name,Name").ToList();
         }
         finally
         {
@@ -379,7 +379,7 @@ public class ListsRepository : BaseRepository, IListsRepository
         return conn.ExecuteScalar<int>("SELECT COUNT(*) FROM todo.lists WHERE user_id = @UserId", new { UserId = userId });
     }
 
-    public IEnumerable<User> GetUsersToBeNotifiedOfChange(int id, int excludeUserId, ISpan metricsSpan)
+    public IReadOnlyList<User> GetUsersToBeNotifiedOfChange(int id, int excludeUserId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(GetUsersToBeNotifiedOfChange)}");
 
@@ -396,7 +396,7 @@ public class ListsRepository : BaseRepository, IListsRepository
                                   FROM users AS u
                                   INNER JOIN todo.lists AS l ON u.id = l.user_id
                                   WHERE u.id != @ExcludeUserId AND l.id = @ListId AND u.todo_notifications_enabled AND l.notifications_enabled",
-                new { ListId = id, ExcludeUserId = excludeUserId });
+                new { ListId = id, ExcludeUserId = excludeUserId }).ToList();
         }
         finally
         {
@@ -404,7 +404,7 @@ public class ListsRepository : BaseRepository, IListsRepository
         }
     }
 
-    public IEnumerable<User> GetUsersToBeNotifiedOfDeletion(int id, ISpan metricsSpan)
+    public IReadOnlyList<User> GetUsersToBeNotifiedOfDeletion(int id, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(GetUsersToBeNotifiedOfDeletion)}");
 
@@ -416,7 +416,7 @@ public class ListsRepository : BaseRepository, IListsRepository
                                   FROM users AS u
                                   INNER JOIN todo.shares AS s ON u.id = s.user_id
                                   WHERE s.list_id = @ListId AND s.is_accepted AND u.todo_notifications_enabled AND s.notifications_enabled",
-                new { ListId = id });
+                new { ListId = id }).ToList();
         }
         finally
         {
@@ -580,7 +580,7 @@ public class ListsRepository : BaseRepository, IListsRepository
         }
     }
 
-    public async Task SaveSharingDetailsAsync(IEnumerable<ListShare> newShares, IEnumerable<ListShare> editedShares, IEnumerable<ListShare> removedShares, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task SaveSharingDetailsAsync(List<ListShare> newShares, List<ListShare> editedShares, List<ListShare> removedShares, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(ListsRepository)}.{nameof(SaveSharingDetailsAsync)}");
 

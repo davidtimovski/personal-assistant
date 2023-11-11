@@ -10,5 +10,5 @@ namespace Core.Application.Contracts;
 public interface IValidatedResult
 {
     ResultStatus Status { get; }
-    IReadOnlyCollection<ValidationFailure>? ValidationErrors { get; }
+    IReadOnlyList<ValidationFailure>? ValidationErrors { get; }
 }

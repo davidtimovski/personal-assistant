@@ -74,7 +74,7 @@ public class DietaryProfileService : IDietaryProfileService
 
         try
         {
-            IEnumerable<DailyIntakeAgeGroup> intakeByGender = model.Gender == "Male" ? _dailyIntakeRef.Male : _dailyIntakeRef.Female;
+            List<DailyIntakeAgeGroup> intakeByGender = model.Gender == "Male" ? _dailyIntakeRef.Male : _dailyIntakeRef.Female;
             short age = model.GetAge();
             RecommendedIntake intake = intakeByGender.First(x => age >= x.AgeFrom && age <= x.AgeTo).RecommendedIntake;
 
@@ -231,7 +231,7 @@ public class DietaryProfileService : IDietaryProfileService
 
             if (dietaryProfile != null)
             {
-                IEnumerable<DailyIntakeAgeGroup> intakeByGender = dietaryProfile.Gender == "Male" ? _dailyIntakeRef.Male : _dailyIntakeRef.Female;
+                List<DailyIntakeAgeGroup> intakeByGender = dietaryProfile.Gender == "Male" ? _dailyIntakeRef.Male : _dailyIntakeRef.Female;
                 intake = intakeByGender.First(x => dietaryProfile.PersonAge >= x.AgeFrom && dietaryProfile.PersonAge <= x.AgeTo).RecommendedIntake;
             }
 
@@ -508,7 +508,7 @@ public class DietaryProfileService : IDietaryProfileService
     {
         try
         {
-            IEnumerable<DailyIntakeAgeGroup> intakeByGender = profile.Gender == "Male" ? _dailyIntakeRef.Male : _dailyIntakeRef.Female;
+            List<DailyIntakeAgeGroup> intakeByGender = profile.Gender == "Male" ? _dailyIntakeRef.Male : _dailyIntakeRef.Female;
             RecommendedIntake intake = intakeByGender.First(x => profile.PersonAge >= x.AgeFrom && profile.PersonAge <= x.AgeTo).RecommendedIntake;
 
             var dailyIntake = new DailyIntake

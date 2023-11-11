@@ -848,7 +848,7 @@ public class ListsController : BaseController
     }
 
     private async Task<Result> CreateAndEnqueueNotificationsAsync(
-        IReadOnlyCollection<NotificationRecipient> recipients,
+        IReadOnlyList<NotificationRecipient> recipients,
         string actionUserImageUri,
         int? listId,
         string message,

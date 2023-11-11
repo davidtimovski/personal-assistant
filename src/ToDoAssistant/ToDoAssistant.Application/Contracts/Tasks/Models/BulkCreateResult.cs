@@ -23,16 +23,16 @@ public class BulkCreateResult : INotificationResult, IValidatedResult
     }
 
     public ResultStatus Status { get; private set; }
-    public IReadOnlyCollection<ValidationFailure>? ValidationErrors { get; private set; }
+    public IReadOnlyList<ValidationFailure>? ValidationErrors { get; private set; }
 
     public int ListId { get; init; }
     public bool NotifySignalR { get; init; }
 
     public string ListName { get; set; } = null!;
-    public IReadOnlyCollection<BulkCreatedTask> CreatedTasks { get; set; } = new List<BulkCreatedTask>();
+    public IReadOnlyList<BulkCreatedTask> CreatedTasks { get; set; } = new List<BulkCreatedTask>();
     public string ActionUserName { get; set; } = null!;
     public string ActionUserImageUri { get; set; } = null!;
-    public IReadOnlyCollection<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
+    public IReadOnlyList<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
 
     public bool Notify()
     {

@@ -28,7 +28,7 @@ public class BulkCreateTests
         _successfulValidatorMock = ValidatorMocker.GetSuccessful<BulkCreate>();
 
         _listServiceMock.Setup(x => x.IsShared(It.IsAny<int>(), It.IsAny<int>())).Returns(new Result<bool?>(true));
-        _listServiceMock.Setup(x => x.GetUsersToBeNotifiedOfChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>(), It.IsAny<ISpan>())).Returns(new Result<IEnumerable<User>>(new List<User>()));
+        _listServiceMock.Setup(x => x.GetUsersToBeNotifiedOfChange(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>(), It.IsAny<ISpan>())).Returns(new Result<IReadOnlyList<User>>(new List<User>()));
 
         _listsRepositoryMock.Setup(x => x.GetWithShares(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISpan>())).Returns(new ToDoList
         {
@@ -73,8 +73,8 @@ public class BulkCreateTests
     public async Task SplitsTextIntoTasksByNewline(string tasksText, int expectedTaskCount)
     {
         var actualTasks = new List<ToDoTask>();
-        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<IEnumerable<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
-            .Callback<IEnumerable<ToDoTask>, bool, int, ISpan, CancellationToken>((t, _, _, _, _) => actualTasks = t.ToList());
+        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<IReadOnlyList<ToDoTask>, bool, int, ISpan, CancellationToken>((t, _, _, _, _) => actualTasks = t.ToList());
 
         BulkCreate model = new TaskBuilder().WithTasksText(tasksText).BuildBulkCreateModel();
 
@@ -92,8 +92,8 @@ public class BulkCreateTests
     public async Task SplitsTextIntoTasksWithListIdSet(string tasksText, int listId)
     {
         var actualTasks = new List<ToDoTask>();
-        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<IEnumerable<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
-            .Callback<IEnumerable<ToDoTask>, bool, int, ISpan, CancellationToken>((t, _, _, _, _) => actualTasks = t.ToList());
+        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<IReadOnlyList<ToDoTask>, bool, int, ISpan, CancellationToken>((t, _, _, _, _) => actualTasks = t.ToList());
 
         BulkCreate model = new TaskBuilder()
             .WithListId(listId)
@@ -117,8 +117,8 @@ public class BulkCreateTests
     public async Task SplitsTextIntoTasksWithTrimmedNames(string tasksText)
     {
         var actualTasks = new List<ToDoTask>();
-        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<IEnumerable<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
-            .Callback<IEnumerable<ToDoTask>, bool, int, ISpan, CancellationToken>((t, _, _, _, _) => actualTasks = t.ToList());
+        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<IReadOnlyList<ToDoTask>, bool, int, ISpan, CancellationToken>((t, _, _, _, _) => actualTasks = t.ToList());
 
         BulkCreate model = new TaskBuilder().WithTasksText(tasksText).BuildBulkCreateModel();
 
@@ -144,8 +144,8 @@ public class BulkCreateTests
     public async Task SplitsTextIntoTasksWithIsOneTimeSet(string tasksText, bool tasksAreOneTime)
     {
         var actualTasks = new List<ToDoTask>();
-        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<IEnumerable<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
-            .Callback<IEnumerable<ToDoTask>, bool, int, ISpan, CancellationToken>((t, _, _, _, _) => actualTasks = t.ToList());
+        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<IReadOnlyList<ToDoTask>, bool, int, ISpan, CancellationToken>((t, _, _, _, _) => actualTasks = t.ToList());
 
         BulkCreate model = new TaskBuilder()
             .WithTasksText(tasksText)
@@ -169,8 +169,8 @@ public class BulkCreateTests
     public async Task SplitsTextIntoTasksWithPrivateToUserIdSet(string tasksText, bool tasksArePrivate, int userId)
     {
         var actualTasks = new List<ToDoTask>();
-        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<IEnumerable<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
-            .Callback<IEnumerable<ToDoTask>, bool, int, ISpan, CancellationToken>((t, _, _, _, _) => actualTasks = t.ToList());
+        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<IReadOnlyList<ToDoTask>, bool, int, ISpan, CancellationToken>((t, _, _, _, _) => actualTasks = t.ToList());
 
         BulkCreate model = new TaskBuilder()
             .WithUserId(userId)
@@ -194,8 +194,8 @@ public class BulkCreateTests
     public async Task ResultingTasksHaveCreatedDateSet()
     {
         var actualTasks = new List<ToDoTask>();
-        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<IEnumerable<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
-            .Callback<IEnumerable<ToDoTask>, bool, int, ISpan, CancellationToken>((t, _, _, _, _) => actualTasks = t.ToList());
+        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<IReadOnlyList<ToDoTask>, bool, int, ISpan, CancellationToken>((t, _, _, _, _) => actualTasks = t.ToList());
 
         BulkCreate model = new TaskBuilder()
             .WithTasksText("Task 1\nTask 2")
@@ -216,8 +216,8 @@ public class BulkCreateTests
     public async Task ResultingTasksHaveModifiedDateSet()
     {
         var actualTasks = new List<ToDoTask>();
-        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<IEnumerable<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
-            .Callback<IEnumerable<ToDoTask>, bool, int, ISpan, CancellationToken>((t, _, _, _, _) => actualTasks = t.ToList());
+        _tasksRepositoryMock.Setup(x => x.BulkCreateAsync(It.IsAny<List<ToDoTask>>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<ISpan>(), It.IsAny<CancellationToken>()))
+            .Callback<IReadOnlyList<ToDoTask>, bool, int, ISpan, CancellationToken>((t, _, _, _, _) => actualTasks = t.ToList());
 
         BulkCreate model = new TaskBuilder()
             .WithTasksText("Task 1\nTask 2")

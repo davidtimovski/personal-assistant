@@ -209,7 +209,7 @@ public class MidnightJob
     /// </summary>
     private async Task GenerateUpcomingExpenses(NpgsqlConnection conn, DateTime now)
     {
-        string getMostFrequentCurrency(IEnumerable<Transaction> expenses)
+        string getMostFrequentCurrency(IReadOnlyList<Transaction> expenses)
         {
             if (expenses.Count() == 1)
             {
@@ -233,7 +233,7 @@ public class MidnightJob
             return biggestCurrencyGroup.First().Currency;
         }
 
-        bool ShouldGenerate(IReadOnlyCollection<Transaction> expenses)
+        bool ShouldGenerate(IReadOnlyList<Transaction> expenses)
         {
             if (!expenses.Any())
             {
@@ -383,7 +383,7 @@ public class MidnightJob
 
         if (result.Failed)
         {
-            _logger.LogError(ex, $"{nameof(DeleteTemporaryCdnResourcesAsync)} failed");
+            _logger.LogError($"{nameof(DeleteTemporaryCdnResourcesAsync)} failed");
         }
     }
 

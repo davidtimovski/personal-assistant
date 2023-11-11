@@ -12,7 +12,7 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
     public NotificationsRepository(ToDoAssistantContext efContext)
         : base(efContext) { }
 
-    public IEnumerable<Notification> GetAllAndFlagUnseen(int userId)
+    public IReadOnlyList<Notification> GetAllAndFlagUnseen(int userId)
     {
         using IDbConnection conn = OpenConnection();
 

@@ -11,7 +11,7 @@ public class RecipeForReview : IMapFrom<Recipe>
     public string Name { get; set; } = null!;
     public string? Description { get; set; }
     public string ImageUri { get; set; } = null!;
-    public IEnumerable<IngredientForReview> Ingredients { get; set; }
+    public IReadOnlyList<IngredientForReview> Ingredients { get; set; } = new List<IngredientForReview>();
 
     public void Mapping(Profile profile)
     {

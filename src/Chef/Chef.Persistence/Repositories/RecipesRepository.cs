@@ -13,7 +13,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
     public RecipesRepository(ChefContext efContext)
         : base(efContext) { }
 
-    public IEnumerable<Recipe> GetAll(int userId, ISpan metricsSpan)
+    public IReadOnlyList<Recipe> GetAll(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetAll)}");
 
@@ -47,7 +47,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         }
     }
 
-    public Recipe Get(int id, ISpan metricsSpan)
+    public Recipe? Get(int id, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(Get)}");
 
@@ -200,7 +200,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         }
     }
 
-    public IEnumerable<RecipeShare> GetShares(int id, ISpan metricsSpan)
+    public IReadOnlyList<RecipeShare> GetShares(int id, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetShares)}");
 
@@ -219,7 +219,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                 {
                     share.User = user;
                     return share;
-                }, new { RecipeId = id });
+                }, new { RecipeId = id }).ToList();
         }
         finally
         {
@@ -227,7 +227,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         }
     }
 
-    public IEnumerable<RecipeShare> GetShareRequests(int userId, ISpan metricsSpan)
+    public IReadOnlyList<RecipeShare> GetShareRequests(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetShareRequests)}");
 
@@ -248,7 +248,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                     share.Recipe = recipe;
                     share.User = user;
                     return share;
-                }, new { UserId = userId }, null, true, "name,Name");
+                }, new { UserId = userId }, null, true, "name,Name").ToList();
         }
         finally
         {
@@ -293,7 +293,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         }
     }
 
-    public Recipe GetForSending(int id, int userId, ISpan metricsSpan)
+    public Recipe? GetForSending(int id, int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetForSending)}");
 
@@ -313,7 +313,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         }
     }
 
-    public IEnumerable<SendRequest> GetSendRequests(int userId, ISpan metricsSpan)
+    public IReadOnlyList<SendRequest> GetSendRequests(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetSendRequests)}");
 
@@ -334,7 +334,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                     sendRequest.Recipe = recipe;
                     sendRequest.User = user;
                     return sendRequest;
-                }, new { UserId = userId }, null, true, "name,Name");
+                }, new { UserId = userId }, null, true, "name,Name").ToList();
         }
         finally
         {
@@ -427,7 +427,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         }
     }
 
-    public IEnumerable<string> GetAllImageUris(int userId, ISpan metricsSpan)
+    public IReadOnlyList<string> GetAllImageUris(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetAllImageUris)}");
 
@@ -436,7 +436,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
             using IDbConnection conn = OpenConnection();
 
             return conn.Query<string>("SELECT image_uri FROM chef.recipes WHERE user_id = @UserId",
-                new { UserId = userId });
+                new { UserId = userId }).ToList();
         }
         finally
         {
@@ -452,7 +452,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         {
             using IDbConnection conn = OpenConnection();
 
-            return conn.ExecuteScalar<string>("SELECT image_uri FROM chef.recipes WHERE id = @Id",
+            return conn.QueryFirst<string>("SELECT image_uri FROM chef.recipes WHERE id = @Id",
                 new { Id = id });
         }
         finally
@@ -563,7 +563,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         }
     }
 
-    public IEnumerable<User> GetUsersToBeNotifiedOfRecipeChange(int id, int excludeUserId, ISpan metricsSpan)
+    public IReadOnlyList<User> GetUsersToBeNotifiedOfRecipeChange(int id, int excludeUserId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetUsersToBeNotifiedOfRecipeChange)}");
 
@@ -580,7 +580,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                                   FROM users AS u
                                   INNER JOIN chef.recipes AS r ON u.id = r.user_id
                                   WHERE u.id != @ExcludeUserId AND r.id = @RecipeId AND u.todo_notifications_enabled",
-                new { RecipeId = id, ExcludeUserId = excludeUserId });
+                new { RecipeId = id, ExcludeUserId = excludeUserId }).ToList();
         }
         finally
         {
@@ -608,7 +608,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         }
     }
 
-    public IEnumerable<User> GetUsersToBeNotifiedOfRecipeDeletion(int id, ISpan metricsSpan)
+    public IReadOnlyList<User> GetUsersToBeNotifiedOfRecipeDeletion(int id, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetUsersToBeNotifiedOfRecipeDeletion)}");
 
@@ -620,7 +620,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                                   FROM users AS u
                                   INNER JOIN chef.shares AS s ON u.id = s.user_id
                                   WHERE s.recipe_id = @RecipeId AND s.is_accepted AND u.todo_notifications_enabled",
-                new { RecipeId = id });
+                new { RecipeId = id }).ToList();
         }
         finally
         {
@@ -628,7 +628,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         }
     }
 
-    public IEnumerable<User> GetUsersToBeNotifiedOfRecipeSent(int id, ISpan metricsSpan)
+    public IReadOnlyList<User> GetUsersToBeNotifiedOfRecipeSent(int id, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(GetUsersToBeNotifiedOfRecipeSent)}");
 
@@ -640,7 +640,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                                   FROM users AS u
                                   INNER JOIN chef.send_requests AS sr ON u.id = sr.user_id
                                   WHERE sr.recipe_id = @RecipeId AND u.chef_notifications_enabled",
-                new { RecipeId = id });
+                new { RecipeId = id }).ToList();
         }
         finally
         {
@@ -716,7 +716,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
             dbRecipe.ModifiedDate = recipe.ModifiedDate;
             dbRecipe.RecipeIngredients.RemoveAll(x => true);
 
-            IEnumerable<Ingredient> ownerAndPublicIngredients = EFContext.Ingredients.Where(x => x.UserId == dbRecipe.UserId || x.UserId == 1).ToList();
+            IReadOnlyList<Ingredient> ownerAndPublicIngredients = EFContext.Ingredients.Where(x => x.UserId == dbRecipe.UserId || x.UserId == 1).ToList();
 
             var existingRecipeIngredients = recipe.RecipeIngredients.Where(x => x.IngredientId != 0).ToList();
             foreach (var recipeIngredient in existingRecipeIngredients)
@@ -774,7 +774,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         }
     }
 
-    public async Task SaveSharingDetailsAsync(IEnumerable<RecipeShare> newShares, IEnumerable<RecipeShare> removedShares, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task SaveSharingDetailsAsync(List<RecipeShare> newShares, List<RecipeShare> removedShares, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(SaveSharingDetailsAsync)}");
 
@@ -831,9 +831,9 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         {
             using IDbConnection conn = OpenConnection();
 
-            var share = conn.QueryFirstOrDefault<RecipeShare>(@"SELECT * 
-                                                            FROM chef.shares 
-                                                            WHERE recipe_id = @RecipeId AND user_id = @UserId",
+            var share = conn.QueryFirst<RecipeShare>(@"SELECT * 
+                                                       FROM chef.shares 
+                                                       WHERE recipe_id = @RecipeId AND user_id = @UserId",
                 new { RecipeId = id, UserId = userId });
 
             RecipeShare recipeShare = EFContext.RecipeShares.First(x => x.RecipeId == id && x.UserId == userId);
@@ -849,7 +849,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         }
     }
 
-    public async Task CreateSendRequestsAsync(IEnumerable<SendRequest> sendRequests, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task CreateSendRequestsAsync(List<SendRequest> sendRequests, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(CreateSendRequestsAsync)}");
 
@@ -900,7 +900,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
         }
     }
 
-    public async Task<int> ImportAsync(int id, IEnumerable<(int Id, int ReplacementId, bool TransferNutritionData, bool TransferPriceData)> ingredientReplacements, string imageUri, int userId, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<int> ImportAsync(int id, List<(int Id, int ReplacementId, bool TransferNutritionData, bool TransferPriceData)> ingredientReplacements, string imageUri, int userId, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(RecipesRepository)}.{nameof(ImportAsync)}");
 

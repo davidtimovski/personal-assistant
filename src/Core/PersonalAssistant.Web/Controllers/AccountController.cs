@@ -327,7 +327,7 @@ public class AccountController : BaseController
             }
 
             var filePaths = new List<Uri> { new Uri(userResult.Data!.ImageUri) };
-            IEnumerable<string> recipeUris = _recipeService.GetAllImageUris(userResult.Data.Id, tr);
+            var recipeUris = _recipeService.GetAllImageUris(userResult.Data.Id, tr);
             filePaths.AddRange(recipeUris.Select(x => new Uri(x)));
 
             var deleteResult = await _cdnService.DeleteUserResourcesAsync(userResult.Data.Id, filePaths, tr, cancellationToken);

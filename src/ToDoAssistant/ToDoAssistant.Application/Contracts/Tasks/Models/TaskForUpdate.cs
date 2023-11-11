@@ -16,7 +16,7 @@ public class TaskForUpdate : IMapFrom<ToDoTask>
     public bool IsHighPriority { get; set; }
     public int? AssignedToUserId { get; set; }
     public bool IsInSharedList { get; set; }
-    public List<string> Recipes { get; set; } = new();
+    public IReadOnlyList<string> Recipes { get; set; } = new List<string>();
 
     public void Mapping(Profile profile)
     {
