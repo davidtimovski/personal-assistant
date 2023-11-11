@@ -29,7 +29,7 @@ public class ListsRepository : BaseRepository, IListsRepository
             return conn.Query<ToDoList, ListShare, ToDoList>(query,
                 (list, share) =>
                 {
-                    if (share != null && share.IsAccepted != false)
+                    if (share is not null && share.IsAccepted != false)
                     {
                         list.Shares.Add(share);
                     }
@@ -144,7 +144,7 @@ public class ListsRepository : BaseRepository, IListsRepository
             return conn.Query<ToDoList, ListShare, ToDoList>(query,
                 (list, share) =>
                 {
-                    if (share != null)
+                    if (share is not null)
                     {
                         list.Shares.Add(share);
                     }
@@ -730,7 +730,7 @@ public class ListsRepository : BaseRepository, IListsRepository
         {
             ToDoList? list = EFContext.Lists.FirstOrDefault(x => x.Id == id && x.UserId == userId);
 
-            if (list != null)
+            if (list is not null)
             {
                 if (isArchived)
                 {

@@ -41,6 +41,6 @@ public class UpdateTaskResult : INotificationResult, IValidatedResult
 
     public bool Notify()
     {
-        return NotificationRecipients.Any() || RemovedNotificationRecipients.Any() || CreatedNotificationRecipients.Any() || AssignedNotificationRecipient != null;
+        return NotificationRecipients.Any() || RemovedNotificationRecipients.Any() || CreatedNotificationRecipients.Any() || AssignedNotificationRecipient is not null;
     }
 }

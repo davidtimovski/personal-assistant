@@ -330,7 +330,7 @@ public class TasksController : BaseController
                 }
             }
 
-            if (result.AssignedNotificationRecipient != null)
+            if (result.AssignedNotificationRecipient is not null)
             {
                 var message = _localizer["AssignedTaskNotification", result.ActionUserName, result.OriginalTaskName!, result.ListName!];
 

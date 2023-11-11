@@ -451,7 +451,7 @@ public class AccountController : BaseController
             if (oldImageUri != model.ImageUri)
             {
                 // and had a previous one, delete it
-                if (oldImageUri != null)
+                if (oldImageUri is not null)
                 {
                     var deleteResult = await _cdnService.DeleteAsync(new Uri(oldImageUri), tr, cancellationToken);
                     if (deleteResult.Failed)
@@ -461,7 +461,7 @@ public class AccountController : BaseController
                 }
 
                 // and has a new one, remove its temp tag
-                if (userResult.Data.ImageUri != null)
+                if (userResult.Data.ImageUri is not null)
                 {
                     var removeTagResult = await _cdnService.RemoveTempTagAsync(new Uri(userResult.Data.ImageUri), tr, cancellationToken);
                     if (removeTagResult.Failed)

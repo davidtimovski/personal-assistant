@@ -114,7 +114,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
             var recipeIngredients = conn.Query<RecipeIngredient, Ingredient, ToDoTask, RecipeIngredient>(recipeIngredientsSql,
                 (recipeIngredient, ingredient, task) =>
                 {
-                    if (task != null)
+                    if (task is not null)
                     {
                         ingredient.Task = task;
                     }
@@ -146,7 +146,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                                                         WHERE id = @Id AND (r.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))",
                 new { Id = id, UserId = userId });
 
-            if (recipe != null)
+            if (recipe is not null)
             {
                 recipe.Shares = conn.Query<RecipeShare>("SELECT * FROM chef.shares WHERE recipe_id = @Id", new { Id = id }).ToList();
 

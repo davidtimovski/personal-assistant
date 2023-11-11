@@ -562,7 +562,7 @@ public class RecipeService : IRecipeService
             recipe.CreatedDate = recipe.ModifiedDate = recipe.LastOpenedDate = now;
             int id = await _recipesRepository.CreateAsync(recipe, metric, cancellationToken);
 
-            if (model.ImageUri != null)
+            if (model.ImageUri is not null)
             {
                 var removeTagResult = await _cdnService.RemoveTempTagAsync(new Uri(model.ImageUri), metric, cancellationToken);
                 if (removeTagResult.Failed)
@@ -709,7 +709,7 @@ public class RecipeService : IRecipeService
             if (oldImageUri != model.ImageUri)
             {
                 // and it previously had one, delete it
-                if (oldImageUri != null)
+                if (oldImageUri is not null)
                 {
                     var deleteResult = await _cdnService.DeleteAsync(new Uri(oldImageUri), metric, cancellationToken);
                     if (deleteResult.Failed)
@@ -719,7 +719,7 @@ public class RecipeService : IRecipeService
                 }
 
                 // and a new one was set, remove its temp tag
-                if (model.ImageUri != null)
+                if (model.ImageUri is not null)
                 {
                     var removeTagResult = await _cdnService.RemoveTempTagAsync(new Uri(model.ImageUri), metric, cancellationToken);
                     if (removeTagResult.Failed)
@@ -778,7 +778,7 @@ public class RecipeService : IRecipeService
 
             var recipeName = await _recipesRepository.DeleteAsync(id, metric, cancellationToken);
 
-            if (imageUri != null)
+            if (imageUri is not null)
             {
                 var deleteResult = await _cdnService.DeleteAsync(new Uri($"users/{userId}/recipes/{imageUri}", UriKind.Relative), metric, cancellationToken);
                 if (deleteResult.Failed)
@@ -1161,7 +1161,7 @@ public class RecipeService : IRecipeService
             RecipeIngredient[] validRecipeIngredients = recipe.RecipeIngredients
                 .Where(x => x.Amount.HasValue
                             && x.Ingredient!.Price.HasValue
-                            && (x.Ingredient.ProductSizeIsOneUnit && x.Unit is null || !x.Ingredient.ProductSizeIsOneUnit && x.Unit != null))
+                            && (x.Ingredient.ProductSizeIsOneUnit && x.Unit is null || !x.Ingredient.ProductSizeIsOneUnit && x.Unit is not null))
                 .ToArray();
 
             var costSummary = new RecipeCostSummary();

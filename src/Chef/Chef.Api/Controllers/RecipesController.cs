@@ -588,7 +588,7 @@ public class RecipesController : BaseController
                 return StatusCode(500);
             }
 
-            if (userResult.Data != null)
+            if (userResult.Data is not null)
             {
                 response.UserId = userResult.Data.Id;
                 response.ImageUri = userResult.Data.ImageUri;
@@ -797,7 +797,7 @@ public class RecipesController : BaseController
                 return StatusCode(500);
             }
 
-            if (userResult.Data != null)
+            if (userResult.Data is not null)
             {
                 var (canSend, alreadySent) = _recipeService.CheckSendRequest(recipeId, userResult.Data.Id, UserId, tr);
 

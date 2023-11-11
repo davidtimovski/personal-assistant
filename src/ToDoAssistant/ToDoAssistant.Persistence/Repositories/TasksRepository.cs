@@ -286,7 +286,7 @@ public class TasksRepository : BaseRepository, ITasksRepository
                 task.Order = existingTask.Order;
             }
 
-            if (decrementOrderTaskIds != null)
+            if (decrementOrderTaskIds is not null)
             {
                 await conn.ExecuteAsync(new CommandDefinition(@"UPDATE todo.tasks SET ""order"" = ""order"" - 1 WHERE id = ANY(@Ids)",
                    new { Ids = decrementOrderTaskIds.ToList() },

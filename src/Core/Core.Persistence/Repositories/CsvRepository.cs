@@ -39,7 +39,7 @@ public class CsvRepository : BaseRepository, ICsvRepository
                     }
                     else
                     {
-                        if (parentCategory != null)
+                        if (parentCategory is not null)
                         {
                             category.Name = $"{parentCategory.Name}/{category.Name}";
                         }

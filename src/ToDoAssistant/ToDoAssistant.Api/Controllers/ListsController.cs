@@ -507,7 +507,7 @@ public class ListsController : BaseController
                 return StatusCode(500);
             }
 
-            if (userResult.Data != null)
+            if (userResult.Data is not null)
             {
                 response.UserId = userResult.Data.Id;
                 response.ImageUri = userResult.Data.ImageUri;

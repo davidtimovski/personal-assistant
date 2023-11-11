@@ -136,7 +136,7 @@ public class HomeController : BaseController
             }
         );
 
-        if (returnUrl != null)
+        if (returnUrl is not null)
         {
             return RedirectToLocal(returnUrl);
         }

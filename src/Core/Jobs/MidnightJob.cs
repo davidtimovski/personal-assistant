@@ -167,8 +167,8 @@ public class MidnightJob
                         foreach (var ue in relatedUpcomingExpenses)
                         {
                             var bothWithDescriptionsAndTheyMatch =
-                                ue.Description != null
-                                && transaction.Description != null
+                                ue.Description is not null
+                                && transaction.Description is not null
                                 && string.Equals(ue.Description, transaction.Description, StringComparison.OrdinalIgnoreCase);
 
                             if (ue.Description is null || bothWithDescriptionsAndTheyMatch)

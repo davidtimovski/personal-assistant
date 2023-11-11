@@ -81,7 +81,7 @@ public class NotificationsRepository : BaseRepository, INotificationsRepository
                 new { notification.UserId, notification.Message },
                 cancellationToken: cancellationToken));
 
-            if (id != null)
+            if (id is not null)
             {
                 notification.Id = id.Value;
 

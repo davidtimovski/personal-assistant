@@ -329,7 +329,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
                     });
                 }
             }
-            else if (ingredientTask != null)
+            else if (ingredientTask is not null)
             {
                 EFContext.IngredientsTasks.Remove(ingredientTask);
             }
@@ -374,7 +374,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
                     });
                 }
             }
-            else if (ingredientTask != null)
+            else if (ingredientTask is not null)
             {
                 EFContext.IngredientsTasks.Remove(ingredientTask);
             }
@@ -416,7 +416,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
             EFContext.RecipesIngredients.RemoveRange(recipeIngredients);
 
             IngredientTask? ingredientTask = EFContext.IngredientsTasks.FirstOrDefault(x => x.IngredientId == id && x.UserId == userId);
-            if (ingredientTask != null)
+            if (ingredientTask is not null)
             {
                 EFContext.IngredientsTasks.Remove(ingredientTask);
             }
