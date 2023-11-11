@@ -1,5 +1,6 @@
 ﻿using Api.Common;
 using Core.Application.Contracts;
+using Core.Application.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
@@ -13,11 +14,11 @@ public class CurrenciesController : BaseController
     private readonly ICurrenciesRepository _currenciesRepository;
 
     public CurrenciesController(
-        IUserIdLookup userIdLookup,
-        IUsersRepository usersRepository,
-        ICurrenciesRepository currenciesRepository) : base(userIdLookup, usersRepository)
+        IUserIdLookup? userIdLookup,
+        IUsersRepository? usersRepository,
+        ICurrenciesRepository? currenciesRepository) : base(userIdLookup, usersRepository)
     {
-        _currenciesRepository = currenciesRepository;
+        _currenciesRepository = ArgValidator.NotNull(currenciesRepository);
     }
 
     [HttpGet("{date}")]

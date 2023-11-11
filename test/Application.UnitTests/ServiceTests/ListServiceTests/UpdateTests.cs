@@ -1,10 +1,13 @@
 ﻿using Application.UnitTests.Builders;
 using Core.Application.Contracts;
 using FluentValidation;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Sentry;
 using ToDoAssistant.Application.Contracts.Lists;
 using ToDoAssistant.Application.Contracts.Lists.Models;
+using ToDoAssistant.Application.Contracts.Notifications;
+using ToDoAssistant.Application.Contracts.Tasks;
 using ToDoAssistant.Application.Entities;
 using ToDoAssistant.Application.Mappings;
 using ToDoAssistant.Application.Services;
@@ -26,12 +29,12 @@ public class UpdateTests
         _metricsSpanMock.Setup(x => x.StartChild(It.IsAny<string>())).Returns(new Mock<ISpan>().Object);
 
         _sut = new ListService(
-            null,
+            new Mock<IUserService>().Object,
             _listsRepositoryMock.Object,
-            null,
-            null,
+            new Mock<ITasksRepository>().Object,
+            new Mock<INotificationsRepository>().Object,
             MapperMocker.GetMapper<ToDoAssistantProfile>(),
-            null);
+            new Mock<ILogger<ListService>>().Object);
     }
 
     [Fact]

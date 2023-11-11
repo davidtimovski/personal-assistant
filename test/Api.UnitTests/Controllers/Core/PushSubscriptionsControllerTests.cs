@@ -17,7 +17,10 @@ public class PushSubscriptionsControllerTests
         _userIdLookupMock.Setup(x => x.Contains(It.IsAny<string>())).Returns(true);
         _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
 
-        _sut = new PushSubscriptionsController(_userIdLookupMock.Object, null, null)
+        _sut = new PushSubscriptionsController(
+            _userIdLookupMock.Object,
+            new Mock<IUsersRepository>().Object,
+            new Mock<IPushSubscriptionService>().Object)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };

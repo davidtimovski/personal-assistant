@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using Core.Application.Contracts;
+using Core.Application.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,13 +17,13 @@ public class HomeController : BaseController
     private readonly AppConfiguration _config;
 
     public HomeController(
-        IUserIdLookup userIdLookup,
-        IUsersRepository usersRepository,
-        IUserService userService,
-        IOptions<AppConfiguration> config) : base(userIdLookup, usersRepository)
+        IUserIdLookup? userIdLookup,
+        IUsersRepository? usersRepository,
+        IUserService? userService,
+        IOptions<AppConfiguration>? config) : base(userIdLookup, usersRepository)
     {
-        _userService = userService;
-        _config = config.Value;
+        _userService = ArgValidator.NotNull(userService);
+        _config = ArgValidator.NotNull(config).Value;
     }
 
     [HttpGet]

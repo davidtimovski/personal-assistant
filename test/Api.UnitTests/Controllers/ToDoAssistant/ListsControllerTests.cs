@@ -1,6 +1,9 @@
 ﻿using Api.UnitTests.Builders;
 using Core.Application.Contracts;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Sentry;
@@ -8,6 +11,7 @@ using ToDoAssistant.Api.Controllers;
 using ToDoAssistant.Api.Models;
 using ToDoAssistant.Application.Contracts.Lists;
 using ToDoAssistant.Application.Contracts.Lists.Models;
+using ToDoAssistant.Application.Contracts.Notifications;
 using Xunit;
 
 namespace Api.UnitTests.Controllers.ToDoAssistant;
@@ -25,10 +29,21 @@ public class ListsControllerTests
         _userIdLookupMock.Setup(x => x.Get(It.IsAny<string>())).Returns(1);
 
         _sut = new ListsController(
-            _userIdLookupMock.Object, null,
+            _userIdLookupMock.Object,
+            new Mock<IUsersRepository>().Object,
             _listServiceMock.Object,
-            null, null, null, null, null, null, null, null, null,
-            new Mock<IOptions<AppConfiguration>>().Object, null, null)
+            new Mock<INotificationService>().Object,
+            new Mock<ISenderService>().Object,
+            new Mock<IUserService>().Object,
+            new Mock<IValidator<CreateList>>().Object,
+            new Mock<IValidator<UpdateList>>().Object,
+            new Mock<IValidator<UpdateSharedList>>().Object,
+            new Mock<IValidator<ShareList>>().Object,
+            new Mock<IValidator<CopyList>>().Object,
+            new Mock<IStringLocalizer<ListsController>>().Object,
+            new Mock<IOptions<AppConfiguration>>().Object,
+            new Mock<ILogger<ListsController>>().Object,
+            new Mock<IStringLocalizer<BaseController>>().Object)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };

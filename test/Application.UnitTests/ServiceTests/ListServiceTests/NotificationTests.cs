@@ -1,6 +1,9 @@
-﻿using Moq;
+﻿using Core.Application.Contracts;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Sentry;
 using ToDoAssistant.Application.Contracts.Lists;
+using ToDoAssistant.Application.Contracts.Notifications;
 using ToDoAssistant.Application.Contracts.Tasks;
 using ToDoAssistant.Application.Mappings;
 using ToDoAssistant.Application.Services;
@@ -21,12 +24,12 @@ public class NotificationTests
         _metricsSpanMock.Setup(x => x.StartChild(It.IsAny<string>())).Returns(new Mock<ISpan>().Object);
 
         _sut = new ListService(
-            null,
+            new Mock<IUserService>().Object,
             _listsRepositoryMock.Object,
             _tasksRepositoryMock.Object,
-            null,
+            new Mock<INotificationsRepository>().Object,
             MapperMocker.GetMapper<ToDoAssistantProfile>(),
-            null);
+            new Mock<ILogger<ListService>>().Object);
     }
 
     [Fact]

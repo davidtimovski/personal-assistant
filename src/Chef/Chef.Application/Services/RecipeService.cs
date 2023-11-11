@@ -26,23 +26,23 @@ public class RecipeService : IRecipeService
     private readonly ILogger<RecipeService> _logger;
 
     public RecipeService(
-        IDietaryProfileService dietaryProfileService,
-        IConversion conversion,
-        ICdnService cdnService,
-        IUserService userService,
-        IRecipesRepository recipesRepository,
-        ICurrenciesRepository currenciesRepository,
-        IMapper mapper,
-        ILogger<RecipeService> logger)
+        IDietaryProfileService? dietaryProfileService,
+        IConversion? conversion,
+        ICdnService? cdnService,
+        IUserService? userService,
+        IRecipesRepository? recipesRepository,
+        ICurrenciesRepository? currenciesRepository,
+        IMapper? mapper,
+        ILogger<RecipeService>? logger)
     {
-        _dietaryProfileService = dietaryProfileService;
-        _conversion = conversion;
-        _cdnService = cdnService;
-        _userService = userService;
-        _recipesRepository = recipesRepository;
-        _currenciesRepository = currenciesRepository;
-        _mapper = mapper;
-        _logger = logger;
+        _dietaryProfileService = ArgValidator.NotNull(dietaryProfileService);
+        _conversion = ArgValidator.NotNull(conversion);
+        _cdnService = ArgValidator.NotNull(cdnService);
+        _userService = ArgValidator.NotNull(userService);
+        _recipesRepository = ArgValidator.NotNull(recipesRepository);
+        _currenciesRepository = ArgValidator.NotNull(currenciesRepository);
+        _mapper = ArgValidator.NotNull(mapper);
+        _logger = ArgValidator.NotNull(logger);
     }
 
     public IReadOnlyList<SimpleRecipe> GetAll(int userId, ISpan metricsSpan)

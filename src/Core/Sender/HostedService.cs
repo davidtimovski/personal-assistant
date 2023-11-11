@@ -1,6 +1,7 @@
 ﻿using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
+using Core.Application.Utils;
 using Dapper;
 using Microsoft.Extensions.Options;
 using Npgsql;
@@ -25,16 +26,16 @@ public sealed class HostedService : IHostedService, IDisposable
     private readonly ILogger<HostedService> _logger;
 
     public HostedService(
-        IOptions<AppConfiguration> config,
-        ILogger<HostedService> logger)
+        IOptions<AppConfiguration>? config,
+        ILogger<HostedService>? logger)
     {
-        _config = config.Value;
+        _config = ArgValidator.NotNull(config).Value;
         _vapidConfig = new Dictionary<string, VapidConfiguration>
         {
             { "To Do Assistant", _config.Sender.ToDoAssistantVapid },
             { "Chef", _config.Sender.ChefVapid },
         };
-        _logger = logger;
+        _logger = ArgValidator.NotNull(logger);
     }
 
     public Task StartAsync(CancellationToken cancellationToken)

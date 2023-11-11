@@ -3,6 +3,7 @@ using Chef.Api.Models.Ingredients.Requests;
 using Chef.Application.Contracts.Ingredients;
 using Chef.Application.Contracts.Ingredients.Models;
 using Core.Application.Contracts;
+using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,17 +22,17 @@ public class IngredientsController : BaseController
     private readonly IValidator<UpdatePublicIngredient> _updatePublicValidator;
 
     public IngredientsController(
-        IUserIdLookup userIdLookup,
-        IUsersRepository usersRepository,
-        IIngredientService ingredientService,
-        IStringLocalizer<IngredientsController> localizer,
-        IValidator<UpdateIngredient> updateValidator,
-        IValidator<UpdatePublicIngredient> updatePublicValidator) : base(userIdLookup, usersRepository)
+        IUserIdLookup? userIdLookup,
+        IUsersRepository? usersRepository,
+        IIngredientService? ingredientService,
+        IStringLocalizer<IngredientsController>? localizer,
+        IValidator<UpdateIngredient>? updateValidator,
+        IValidator<UpdatePublicIngredient>? updatePublicValidator) : base(userIdLookup, usersRepository)
     {
-        _ingredientService = ingredientService;
-        _localizer = localizer;
-        _updateValidator = updateValidator;
-        _updatePublicValidator = updatePublicValidator;
+        _ingredientService = ArgValidator.NotNull(ingredientService);
+        _localizer = ArgValidator.NotNull(localizer);
+        _updateValidator = ArgValidator.NotNull(updateValidator);
+        _updatePublicValidator = ArgValidator.NotNull(updatePublicValidator);
     }
 
     [HttpGet]

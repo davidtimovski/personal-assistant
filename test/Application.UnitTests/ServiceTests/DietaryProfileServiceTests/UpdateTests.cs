@@ -6,6 +6,7 @@ using Chef.Application.Mappings;
 using Chef.Application.Services;
 using Chef.Utility;
 using FluentValidation;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Sentry;
@@ -28,7 +29,7 @@ public class UpdateTests
             new Mock<IOptions<DailyIntakeReference>>().Object,
             new Mock<IDietaryProfilesRepository>().Object,
             MapperMocker.GetMapper<ChefProfile>(),
-            null);
+            new Mock<ILogger<DietaryProfileService>>().Object);
     }
 
     [Fact]

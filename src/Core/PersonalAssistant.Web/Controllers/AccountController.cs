@@ -4,6 +4,7 @@ using Api.Common;
 using Auth0.AspNetCore.Authentication;
 using Chef.Application.Contracts.Recipes;
 using Core.Application.Contracts;
+using Core.Application.Utils;
 using Core.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -39,30 +40,30 @@ public class AccountController : BaseController
     private readonly ILogger<AccountController> _logger;
 
     public AccountController(
-        IUserIdLookup userIdLookup,
-        IUsersRepository usersRepository,
-        IEmailTemplateService emailTemplateService,
-        IUserService userService,
-        IListService listService,
-        IRecipeService recipeService,
-        ICdnService cdnService,
-        IHttpClientFactory httpClientFactory,
-        IStringLocalizer<AccountController> localizer,
-        IWebHostEnvironment webHostEnvironment,
-        IOptions<AppConfiguration> config,
-        ILogger<AccountController> logger) : base(userIdLookup, usersRepository)
+        IUserIdLookup? userIdLookup,
+        IUsersRepository? usersRepository,
+        IEmailTemplateService? emailTemplateService,
+        IUserService? userService,
+        IListService? listService,
+        IRecipeService? recipeService,
+        ICdnService? cdnService,
+        IHttpClientFactory? httpClientFactory,
+        IStringLocalizer<AccountController>? localizer,
+        IWebHostEnvironment? webHostEnvironment,
+        IOptions<AppConfiguration>? config,
+        ILogger<AccountController>? logger) : base(userIdLookup, usersRepository)
     {
-        _usersRepository = usersRepository;
-        _emailTemplateService = emailTemplateService;
-        _userService = userService;
-        _listService = listService;
-        _recipeService = recipeService;
-        _cdnService = cdnService;
-        _httpClientFactory = httpClientFactory;
-        _localizer = localizer;
-        _webHostEnvironment = webHostEnvironment;
-        _config = config.Value;
-        _logger = logger;
+        _usersRepository = ArgValidator.NotNull(usersRepository);
+        _emailTemplateService = ArgValidator.NotNull(emailTemplateService);
+        _userService = ArgValidator.NotNull(userService);
+        _listService = ArgValidator.NotNull(listService);
+        _recipeService = ArgValidator.NotNull(recipeService);
+        _cdnService = ArgValidator.NotNull(cdnService);
+        _httpClientFactory = ArgValidator.NotNull(httpClientFactory);
+        _localizer = ArgValidator.NotNull(localizer);
+        _webHostEnvironment = ArgValidator.NotNull(webHostEnvironment);
+        _config = ArgValidator.NotNull(config).Value;
+        _logger = ArgValidator.NotNull(logger);
     }
 
     [HttpGet]

@@ -2,6 +2,7 @@
 using System.Text;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models.Sender;
+using Core.Application.Utils;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using PersonalAssistant.Web.Models;
@@ -21,15 +22,15 @@ public class EmailTemplateService : IEmailTemplateService
     private readonly AppConfiguration _config;
 
     public EmailTemplateService(
-        ISenderService senderService,
-        IWebHostEnvironment env,
-        IOptions<AppConfiguration> config,
-        IStringLocalizer<EmailTemplateService> localizer)
+        ISenderService? senderService,
+        IWebHostEnvironment? env,
+        IOptions<AppConfiguration>? config,
+        IStringLocalizer<EmailTemplateService>? localizer)
     {
-        _senderService = senderService;
-        _env = env;
-        _localizer = localizer;
-        _config = config.Value;
+        _senderService = ArgValidator.NotNull(senderService);
+        _env = ArgValidator.NotNull(env);
+        _localizer = ArgValidator.NotNull(localizer);
+        _config = ArgValidator.NotNull(config).Value;
     }
 
     public async Task EnqueueNewRegistrationEmailAsync(string newUserName, string newUserEmail)

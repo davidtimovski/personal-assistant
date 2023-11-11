@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Web;
+using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Sentry;
@@ -33,13 +34,13 @@ public class ForecastService : IForecastService
     private readonly ILogger<ForecastService> _logger;
 
     public ForecastService(
-        IHttpClientFactory httpClientFactory,
-        IForecastsRepository forecastsRepository,
-        ILogger<ForecastService> logger)
+        IHttpClientFactory? httpClientFactory,
+        IForecastsRepository? forecastsRepository,
+        ILogger<ForecastService>? logger)
     {
-        _httpClientFactory = httpClientFactory;
-        _forecastsRepository = forecastsRepository;
-        _logger = logger;
+        _httpClientFactory = ArgValidator.NotNull(httpClientFactory);
+        _forecastsRepository = ArgValidator.NotNull(forecastsRepository);
+        _logger = ArgValidator.NotNull(logger);
     }
 
     public async Task<ForecastResult> GetAsync(GetForecast parameters, ISpan metricsSpan)

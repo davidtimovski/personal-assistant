@@ -1,4 +1,5 @@
 ﻿using Core.Application.Contracts;
+using Core.Application.Utils;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -12,13 +13,13 @@ public abstract class BaseController : Controller
     private readonly IStringLocalizer<BaseController> _localizer;
 
     public BaseController(
-        IUserIdLookup userIdLookup,
-        IUsersRepository usersRepository,
-        IStringLocalizer<BaseController> localizer)
+        IUserIdLookup? userIdLookup,
+        IUsersRepository? usersRepository,
+        IStringLocalizer<BaseController>? localizer)
     {
-        _userIdLookup = userIdLookup;
-        _usersRepository = usersRepository;
-        _localizer = localizer;
+        _userIdLookup = ArgValidator.NotNull(userIdLookup);
+        _usersRepository = ArgValidator.NotNull(usersRepository);
+        _localizer = ArgValidator.NotNull(localizer);
     }
 
     private int? userId;

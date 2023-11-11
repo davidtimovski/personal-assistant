@@ -16,13 +16,13 @@ public class IngredientService : IIngredientService
     private readonly ILogger<IngredientService> _logger;
 
     public IngredientService(
-        IIngredientsRepository ingredientsRepository,
-        IMapper mapper,
-        ILogger<IngredientService> logger)
+        IIngredientsRepository? ingredientsRepository,
+        IMapper? mapper,
+        ILogger<IngredientService>? logger)
     {
-        _ingredientsRepository = ingredientsRepository;
-        _mapper = mapper;
-        _logger = logger;
+        _ingredientsRepository = ArgValidator.NotNull(ingredientsRepository);
+        _mapper = ArgValidator.NotNull(mapper);
+        _logger = ArgValidator.NotNull(logger);
     }
 
     public IReadOnlyList<IngredientDto> GetUserAndUsedPublicIngredients(int userId, ISpan metricsSpan)

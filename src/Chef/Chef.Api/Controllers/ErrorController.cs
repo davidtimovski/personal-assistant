@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using Core.Application.Utils;
+using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +13,11 @@ public class ErrorController : ControllerBase
     private readonly IStringLocalizer<ErrorController> _localizer;
 
     public ErrorController(
-        ILogger<ErrorController> logger,
-        IStringLocalizer<ErrorController> localizer)
+        ILogger<ErrorController>? logger,
+        IStringLocalizer<ErrorController>? localizer)
     {
-        _logger = logger;
-        _localizer = localizer;
+        _logger = ArgValidator.NotNull(logger);
+        _localizer = ArgValidator.NotNull(localizer);
     }
 
     [Route("/error")]

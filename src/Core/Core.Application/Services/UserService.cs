@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
+using Core.Application.Utils;
 using Microsoft.Extensions.Logging;
 using Sentry;
 using User = Core.Application.Entities.User;
@@ -14,13 +15,13 @@ public class UserService : IUserService
     private readonly ILogger<UserService> _logger;
 
     public UserService(
-        IUsersRepository usersRepository,
-        IMapper mapper,
-        ILogger<UserService> logger)
+        IUsersRepository? usersRepository,
+        IMapper? mapper,
+        ILogger<UserService>? logger)
     {
-        _usersRepository = usersRepository;
-        _mapper = mapper;
-        _logger = logger;
+        _usersRepository = ArgValidator.NotNull(usersRepository);
+        _mapper = ArgValidator.NotNull(mapper);
+        _logger = ArgValidator.NotNull(logger);
     }
 
     public Result<User> Get(int id)

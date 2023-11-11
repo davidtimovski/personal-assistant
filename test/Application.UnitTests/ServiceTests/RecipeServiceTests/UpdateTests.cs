@@ -1,10 +1,14 @@
 ﻿using Application.UnitTests.Builders;
+using Chef.Application.Contracts.DietaryProfiles;
 using Chef.Application.Contracts.Recipes;
 using Chef.Application.Contracts.Recipes.Models;
 using Chef.Application.Entities;
 using Chef.Application.Mappings;
 using Chef.Application.Services;
+using Chef.Utility;
+using Core.Application.Contracts;
 using FluentValidation;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Sentry;
 using Xunit;
@@ -24,11 +28,15 @@ public class UpdateTests
 
         _metricsSpanMock.Setup(x => x.StartChild(It.IsAny<string>())).Returns(new Mock<ISpan>().Object);
 
-        _sut = new RecipeService(null, null, null, null,
+        _sut = new RecipeService(
+            new Mock<IDietaryProfileService>().Object,
+            new Mock<IConversion>().Object,
+            new Mock<ICdnService>().Object,
+            new Mock<IUserService>().Object,
             _recipesRepositoryMock.Object,
-            null,
+            new Mock<ICurrenciesRepository>().Object,
             MapperMocker.GetMapper<ChefProfile>(),
-            null);
+            new Mock<ILogger<RecipeService>>().Object);
     }
 
     [Fact]

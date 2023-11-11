@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
+using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Sentry;
@@ -24,19 +25,19 @@ public class ListService : IListService
     private readonly ILogger<ListService> _logger;
 
     public ListService(
-        IUserService userService,
-        IListsRepository listsRepository,
-        ITasksRepository tasksRepository,
-        INotificationsRepository notificationsRepository,
-        IMapper mapper,
-        ILogger<ListService> logger)
+        IUserService? userService,
+        IListsRepository? listsRepository,
+        ITasksRepository? tasksRepository,
+        INotificationsRepository? notificationsRepository,
+        IMapper? mapper,
+        ILogger<ListService>? logger)
     {
-        _userService = userService;
-        _listsRepository = listsRepository;
-        _tasksRepository = tasksRepository;
-        _notificationsRepository = notificationsRepository;
-        _mapper = mapper;
-        _logger = logger;
+        _userService = ArgValidator.NotNull(userService);
+        _listsRepository = ArgValidator.NotNull(listsRepository);
+        _tasksRepository = ArgValidator.NotNull(tasksRepository);
+        _notificationsRepository = ArgValidator.NotNull(notificationsRepository);
+        _mapper = ArgValidator.NotNull(mapper);
+        _logger = ArgValidator.NotNull(logger);
     }
 
     public static HashSet<string> IconOptions => new HashSet<string> { "list", "shopping-cart", "shopping-bag", "home", "birthday", "cheers", "vacation", "passport", "plane", "car", "pickup-truck", "world", "camping", "tree", "motorcycle", "bicycle", "workout", "ski", "snowboard", "swimming", "work", "baby", "dog", "cat", "bird", "fish", "camera", "medicine", "file", "book", "mountain", "facebook", "twitter", "instagram", "tiktok" };

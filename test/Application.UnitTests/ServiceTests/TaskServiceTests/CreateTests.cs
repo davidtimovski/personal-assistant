@@ -1,6 +1,7 @@
 ﻿using Application.UnitTests.Builders;
 using Core.Application.Contracts;
 using FluentValidation;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Sentry;
 using ToDoAssistant.Application.Contracts.Lists;
@@ -38,12 +39,12 @@ public class CreateTests
         _metricsSpanMock.Setup(x => x.StartChild(It.IsAny<string>())).Returns(new Mock<ISpan>().Object);
 
         _sut = new TaskService(
-            null,
+            new Mock<IUserService>().Object,
             _listServiceMock.Object,
             _tasksRepositoryMock.Object,
             _listsRepositoryMock.Object,
             MapperMocker.GetMapper<ToDoAssistantProfile>(),
-            null);
+            new Mock<ILogger<TaskService>>().Object);
     }
 
     [Fact]

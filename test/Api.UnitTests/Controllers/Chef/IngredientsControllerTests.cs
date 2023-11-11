@@ -3,7 +3,9 @@ using Chef.Api.Controllers;
 using Chef.Application.Contracts.Ingredients;
 using Chef.Application.Contracts.Ingredients.Models;
 using Core.Application.Contracts;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Moq;
 using Sentry;
 using Xunit;
@@ -18,7 +20,13 @@ public class IngredientsControllerTests
 
     public IngredientsControllerTests()
     {
-        _sut = new IngredientsController(_userIdLookupMock.Object, null, _ingredientServiceMock.Object, null, null, null)
+        _sut = new IngredientsController(
+            _userIdLookupMock.Object,
+            new Mock<IUsersRepository>().Object,
+            _ingredientServiceMock.Object,
+            new Mock<IStringLocalizer<IngredientsController>>().Object,
+            new Mock<IValidator<UpdateIngredient>>().Object,
+            new Mock<IValidator<UpdatePublicIngredient>>().Object)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };

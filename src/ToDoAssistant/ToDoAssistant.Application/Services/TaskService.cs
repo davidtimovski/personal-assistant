@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
+using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Sentry;
@@ -21,19 +22,19 @@ public class TaskService : ITaskService
     private readonly ILogger<TaskService> _logger;
 
     public TaskService(
-        IUserService userService,
-        IListService listService,
-        ITasksRepository tasksRepository,
-        IListsRepository listsRepository,
-        IMapper mapper,
-        ILogger<TaskService> logger)
+        IUserService? userService,
+        IListService? listService,
+        ITasksRepository? tasksRepository,
+        IListsRepository? listsRepository,
+        IMapper? mapper,
+        ILogger<TaskService>? logger)
     {
-        _userService = userService;
-        _listService = listService;
-        _tasksRepository = tasksRepository;
-        _listsRepository = listsRepository;
-        _mapper = mapper;
-        _logger = logger;
+        _userService = ArgValidator.NotNull(userService);
+        _listService = ArgValidator.NotNull(listService);
+        _tasksRepository = ArgValidator.NotNull(tasksRepository);
+        _listsRepository = ArgValidator.NotNull(listsRepository);
+        _mapper = ArgValidator.NotNull(mapper);
+        _logger = ArgValidator.NotNull(logger);
     }
 
     public Result<SimpleTask> Get(int id)

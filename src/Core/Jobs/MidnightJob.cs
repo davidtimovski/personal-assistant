@@ -3,6 +3,7 @@ using System.Text.Json.Nodes;
 using Azure.Storage.Blobs;
 using Core.Application.Contracts;
 using Core.Application.Entities;
+using Core.Application.Utils;
 using Dapper;
 using Jobs.Models;
 using Jobs.Models.Accountant;
@@ -22,17 +23,17 @@ public class MidnightJob
     private readonly ILogger<MidnightJob> _logger;
 
     public MidnightJob(
-        ICdnService cdnService,
-        IHttpClientFactory httpClientFactory,
-        IHostEnvironment hostEnvironment,
-        IOptions<AppConfiguration> config,
-        ILogger<MidnightJob> logger)
+        ICdnService? cdnService,
+        IHttpClientFactory? httpClientFactory,
+        IHostEnvironment? hostEnvironment,
+        IOptions<AppConfiguration>? config,
+        ILogger<MidnightJob>? logger)
     {
-        _cdnService = cdnService;
-        _httpClientFactory = httpClientFactory;
-        _hostEnvironment = hostEnvironment;
-        _config = config.Value;
-        _logger = logger;
+        _cdnService = ArgValidator.NotNull(cdnService);
+        _httpClientFactory = ArgValidator.NotNull(httpClientFactory);
+        _hostEnvironment = ArgValidator.NotNull(hostEnvironment);
+        _config = ArgValidator.NotNull(config).Value;
+        _logger = ArgValidator.NotNull(logger);
     }
 
     public async Task RunAsync()

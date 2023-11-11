@@ -23,19 +23,19 @@ public class DietaryProfileService : IDietaryProfileService
     private readonly ILogger<DietaryProfileService> _logger;
 
     public DietaryProfileService(
-        IConversion conversion,
-        IDailyIntakeHelper dailyIntakeHelper,
-        IOptions<DailyIntakeReference> dailyIntakeRef,
-        IDietaryProfilesRepository dietaryProfilesRepository,
-        IMapper mapper,
-        ILogger<DietaryProfileService> logger)
+        IConversion? conversion,
+        IDailyIntakeHelper? dailyIntakeHelper,
+        IOptions<DailyIntakeReference>? dailyIntakeRef,
+        IDietaryProfilesRepository? dietaryProfilesRepository,
+        IMapper? mapper,
+        ILogger<DietaryProfileService>? logger)
     {
-        _conversion = conversion;
-        _dailyIntakeHelper = dailyIntakeHelper;
-        _dailyIntakeRef = dailyIntakeRef.Value;
-        _dietaryProfilesRepository = dietaryProfilesRepository;
-        _mapper = mapper;
-        _logger = logger;
+        _conversion = ArgValidator.NotNull(conversion);
+        _dailyIntakeHelper = ArgValidator.NotNull(dailyIntakeHelper);
+        _dailyIntakeRef = ArgValidator.NotNull(dailyIntakeRef).Value;
+        _dietaryProfilesRepository = ArgValidator.NotNull(dietaryProfilesRepository);
+        _mapper = ArgValidator.NotNull(mapper);
+        _logger = ArgValidator.NotNull(logger);
     }
 
     public EditDietaryProfile? Get(int userId, ISpan metricsSpan)
