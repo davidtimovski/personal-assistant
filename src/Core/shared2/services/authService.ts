@@ -8,11 +8,11 @@ import Variables from "$lib/variables";
 export class AuthService {
   private readonly client: Auth0Client;
 
-  constructor() {
+  constructor(useRefreshTokens: boolean = false) {
     this.client = new Auth0Client({
       domain: Variables.auth0Domain,
       clientId: Variables.auth0ClientId,
-      useRefreshTokens: true,
+      useRefreshTokens: useRefreshTokens,
       cacheLocation: "localstorage",
       authorizationParams: {
         audience: Variables.urls.gateway,

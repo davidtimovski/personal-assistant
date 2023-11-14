@@ -10,6 +10,8 @@ on:
       - "src/Accountant/accountant2/**"
       - "src/Chef/cooking-assistant/**"
       - "src/Chef/chef/**"
+      - "src/Core/shared/**"
+      - "src/Core/shared2/**"
       - "src/ToDoAssistant/to-do-assistant/**"
       - "src/ToDoAssistant/to-do-assistant2/**"
       - "src/Trainer/trainer/**"
