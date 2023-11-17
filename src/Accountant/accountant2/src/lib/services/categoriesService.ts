@@ -19,7 +19,7 @@ export class CategoriesService {
 		return this.idbHelper.getAll();
 	}
 
-	async getAllAsOptions(uncategorizedLabel: string, type: CategoryType): Promise<Array<SelectOption>> {
+	async getAllAsOptions(uncategorizedLabel: string, type: CategoryType): Promise<SelectOption[]> {
 		try {
 			const categories = await this.idbHelper.getAllAsOptions(type);
 
@@ -36,7 +36,7 @@ export class CategoriesService {
 		}
 	}
 
-	async getParentAsOptions(notSelectedLabel: string, excludeCategoryId: number): Promise<Array<SelectOption>> {
+	async getParentAsOptions(notSelectedLabel: string, excludeCategoryId: number): Promise<SelectOption[]> {
 		try {
 			const categories = await this.idbHelper.getParentAsOptions();
 

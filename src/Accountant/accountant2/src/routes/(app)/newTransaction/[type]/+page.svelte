@@ -13,7 +13,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { alertState, syncStatus, user } from '$lib/stores';
-	import type { SelectOption } from '$lib/models/viewmodels/selectOption';
+	import type { SelectOption, SelectOptionExtended } from '$lib/models/viewmodels/selectOption';
 	import { TransactionsService } from '$lib/services/transactionsService';
 	import { AccountsService } from '$lib/services/accountsService';
 	import { CategoriesService } from '$lib/services/categoriesService';
@@ -22,12 +22,14 @@
 	import { SyncEvents } from '$lib/models/syncStatus';
 
 	import AmountInput from '$lib/components/AmountInput.svelte';
+	import type { Account } from '$lib/models/entities/account';
 
 	export let data: PageData;
 
 	let accountId: number | null = null;
 	let categoryId: number | null = null;
 	let amount: number | null = null;
+	let toStocks: number | null = null;
 	let currency: string | null = null;
 	let description: string | null = null;
 	let date = DateHelper.format(new Date());
@@ -36,16 +38,20 @@
 	let debtId: number | null = null;
 	let userIsDebtor: boolean;
 	let debtPerson: string;
-	let accountOptions: SelectOption[] | null = null;
+	let accountOptions: SelectOptionExtended<Account>[] | null = null;
 	let categoryOptions: SelectOption[] | null = null;
 	const maxDate = date;
 	let passwordShown = false;
 	let amountIsInvalid = false;
+	let toStocksIsInvalid = false;
 	let dateIsInvalid = false;
 	let encryptionPasswordIsInvalid = false;
 	let submitButtonIsLoading = false;
+	let stocksInput: HTMLInputElement | null = null;
 	let passwordInput: HTMLInputElement | null = null;
 	let passwordShowIconLabel: string;
+	let accountIsFund = false;
+	let selectedAccountOption: SelectOptionExtended<Account> | null = null;
 
 	let localStorage: LocalStorageUtil;
 	let transactionsService: TransactionsService;
@@ -55,6 +61,8 @@
 
 	let amountFrom = 0.01;
 	let amountTo = 8000000;
+	const toStocksFrom = 0.0001;
+	const toStocksTo = 100000;
 
 	const alertUnsubscriber = alertState.subscribe((value) => {
 		if (value.hidden) {
@@ -100,6 +108,34 @@
 		return canEncrypt;
 	};
 
+	function deriveAmountBasedOnStocks() {
+		let decimals = 2;
+		if (selectedAccountOption!.data.currency === 'MKD') {
+			decimals = 0;
+		}
+
+		amount = parseFloat((toStocks! * selectedAccountOption!.data.stockPrice!).toFixed(decimals));
+	}
+
+	function accountChanged() {
+		if (data.isExpense) {
+			return;
+		}
+
+		selectedAccountOption = accountOptions!.find((x) => x.id === accountId)!;
+		accountIsFund = selectedAccountOption.data.stockPrice !== null;
+
+		if (accountIsFund) {
+			deriveAmountBasedOnStocks();
+			currency = selectedAccountOption.data.currency;
+
+			stocksInput?.focus();
+		} else {
+			amount = null;
+			toStocks = null;
+		}
+	}
+
 	function togglePasswordShow() {
 		if (!passwordInput) {
 			return;
@@ -119,7 +155,9 @@
 	function validate(): ValidationResult {
 		const result = new ValidationResult();
 
-		if (!ValidationUtil.between(amount, amountFrom, amountTo)) {
+		if (accountIsFund && !ValidationUtil.between(toStocks, toStocksFrom, toStocksTo)) {
+			result.fail('toStocks');
+		} else if (!ValidationUtil.between(amount, amountFrom, amountTo)) {
 			result.fail('amount');
 		}
 
@@ -165,6 +203,7 @@
 					toAccountId,
 					categoryId,
 					amount,
+					toStocks,
 					currency,
 					description,
 					<string>date,
@@ -199,6 +238,12 @@
 			if (invalidAmount) {
 				messages.push($t('amountBetween', { from: amountFrom, to: amountTo }));
 				amountIsInvalid = true;
+			}
+
+			const invalidToStocks = result.erroredFields.includes('toStocks');
+			if (invalidToStocks) {
+				messages.push($t('stocksBetween', { from: toStocksFrom, to: toStocksTo }));
+				toStocksIsInvalid = true;
 			}
 
 			const invalidDate = result.erroredFields.includes('date');
@@ -247,7 +292,8 @@
 
 		const categoryType = data.isExpense ? CategoryType.ExpenseOnly : CategoryType.DepositOnly;
 
-		accountsService.getNonInvestmentFundsAsOptions().then((options) => {
+		const exlcudeFunds = data.isExpense;
+		accountsService.getAllAsOptionsExtended(exlcudeFunds).then((options) => {
 			accountOptions = options;
 			accountId = <number>options[0].id;
 		});
@@ -308,15 +354,34 @@
 		{/if}
 
 		<form on:submit|preventDefault={submit} autocomplete="off">
+			{#if accountIsFund}
+				<div class="form-control inline">
+					<label for="stocks">{$t('stocks')}</label>
+					<input
+						type="number"
+						id="stocks"
+						bind:this={stocksInput}
+						bind:value={toStocks}
+						on:keyup={deriveAmountBasedOnStocks}
+						min={toStocksFrom}
+						max={toStocksTo}
+						step="0.0001"
+						class="stocks-input"
+						class:invalid={toStocksIsInvalid}
+						required
+					/>
+				</div>
+			{/if}
+
 			<div class="form-control inline">
 				<label for="amount">{$t('amount')}</label>
-				<AmountInput bind:amount bind:currency invalid={amountIsInvalid} focusOnInit={true} />
+				<AmountInput bind:amount bind:currency disabled={accountIsFund} invalid={amountIsInvalid} focusOnInit={true} />
 			</div>
 
 			<div class="form-control inline">
 				<label for="account">{$t(data.isExpense ? 'fromAccount' : 'toAccount')}</label>
 				<div class="loadable-select" class:loaded={accountOptions}>
-					<select id="account" bind:value={accountId} disabled={!accountOptions} class="category-select">
+					<select id="account" bind:value={accountId} on:change={accountChanged} disabled={!accountOptions} class="category-select">
 						{#if accountOptions}
 							{#each accountOptions as account}
 								<option value={account.id}>{account.name}</option>

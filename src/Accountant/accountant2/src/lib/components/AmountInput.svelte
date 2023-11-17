@@ -97,6 +97,7 @@
 	<button
 		type="button"
 		on:click={toggleChangeCurrency}
+		{disabled}
 		class="selected-currency-button"
 		title={$t('changeCurrency')}
 		aria-label={$t('changeCurrency')}
