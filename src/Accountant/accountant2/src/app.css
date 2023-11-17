@@ -124,6 +124,11 @@ textarea {
 	letter-spacing: unset;
 }
 
+input[type='number'].stocks-input {
+	width: 100px;
+	text-align: center;
+}
+
 .loadable-select {
 	position: relative;
 }

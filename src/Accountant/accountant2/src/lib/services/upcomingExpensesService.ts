@@ -16,7 +16,7 @@ export class UpcomingExpensesService {
 	private readonly currenciesService = new CurrenciesService('Accountant');
 	private readonly logger = new ErrorLogger('Accountant');
 
-	async getAll(currency: string): Promise<Array<UpcomingExpense>> {
+	async getAll(currency: string): Promise<UpcomingExpense[]> {
 		try {
 			const upcomingExpenses = await this.idbHelper.getAll();
 

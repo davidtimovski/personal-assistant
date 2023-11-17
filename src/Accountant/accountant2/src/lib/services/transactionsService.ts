@@ -28,7 +28,7 @@ export class TransactionsService {
 		return this.idbHelper.count(filters);
 	}
 
-	async getAllByPage(filters: SearchFilters, currency: string): Promise<Array<TransactionModel>> {
+	async getAllByPage(filters: SearchFilters, currency: string): Promise<TransactionModel[]> {
 		try {
 			const transactions = await this.idbHelper.getAllByPage(filters);
 
@@ -43,7 +43,7 @@ export class TransactionsService {
 		}
 	}
 
-	async getByCategory(transactions: TransactionModel[], currency: string, uncategorizedLabel: string): Promise<Array<AmountByCategory>> {
+	async getByCategory(transactions: TransactionModel[], currency: string, uncategorizedLabel: string): Promise<AmountByCategory[]> {
 		try {
 			transactions.forEach((x: TransactionModel) => {
 				x.amount = this.currenciesService.convert(x.amount, x.currency, currency);
@@ -104,7 +104,7 @@ export class TransactionsService {
 		type: TransactionType,
 		currency: string,
 		uncategorizedLabel: string
-	): Promise<Array<AmountByCategory>> {
+	): Promise<AmountByCategory[]> {
 		try {
 			let transactions = await this.idbHelper.getExpendituresAndDepositsBetweenDates(fromDate, toDate, accountId, type);
 
@@ -125,7 +125,7 @@ export class TransactionsService {
 		categoryId: number,
 		type: TransactionType,
 		currency: string
-	): Promise<Array<TransactionModel>> {
+	): Promise<TransactionModel[]> {
 		try {
 			let transactions = await this.idbHelper.getForBarChart(fromDate, mainAccountId, categoryId, type);
 
@@ -221,6 +221,7 @@ export class TransactionsService {
 		toAccountId: number | null,
 		categoryId: number | null,
 		amount: number,
+		toStocks: number | null,
 		currency: string,
 		description: string | null,
 		date: string,
@@ -234,6 +235,10 @@ export class TransactionsService {
 
 			if (typeof amount === 'string') {
 				amount = parseFloat(amount);
+			}
+
+			if (toStocks && typeof toStocks === 'string') {
+				toStocks = parseFloat(toStocks);
 			}
 
 			if (description) {
@@ -265,7 +270,7 @@ export class TransactionsService {
 				categoryId,
 				amount,
 				null,
-				null,
+				toStocks,
 				currency,
 				description,
 				date,

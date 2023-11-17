@@ -159,7 +159,18 @@
 				if (fromStocks || toStocks) {
 					await transactionsService.buySellStocks(fromAccountId, toAccountId, amount, fromStocks, toStocks, currency);
 				} else {
-					await transactionsService.create(fromAccountId, toAccountId, null, amount, currency, null, DateHelper.format(new Date()), false, null);
+					await transactionsService.create(
+						fromAccountId,
+						toAccountId,
+						null,
+						amount,
+						null,
+						currency,
+						null,
+						DateHelper.format(new Date()),
+						false,
+						null
+					);
 				}
 
 				alertState.update((x) => {

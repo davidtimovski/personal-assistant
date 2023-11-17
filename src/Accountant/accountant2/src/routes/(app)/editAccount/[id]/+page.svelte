@@ -32,6 +32,7 @@
 	let nameIsInvalid = false;
 	let stockPriceIsInvalid = false;
 	let investmentFund: boolean;
+	let investmentFundCheckboxDisabled = true;
 	let saveButtonText: string;
 	let transactionsWarningVisible = false;
 	let deleteInProgress = false;
@@ -146,6 +147,7 @@
 			saveButtonText = $t('create');
 
 			nameInput.focus();
+			investmentFundCheckboxDisabled = false;
 		} else {
 			saveButtonText = $t('save');
 
@@ -165,6 +167,9 @@
 			modifiedDate = account.modifiedDate;
 			synced = account.synced;
 			investmentFund = !!account.stockPrice;
+
+			const balance = await accountsService.getBalance(data.id, account.currency);
+			investmentFundCheckboxDisabled = balance !== 0;
 		}
 	});
 
@@ -217,7 +222,7 @@
 			{#if !isMainAccount}
 				<div>
 					<div class="form-control">
-						<Checkbox labelKey="editAccount.investmentFund" bind:value={investmentFund} />
+						<Checkbox labelKey="editAccount.investmentFund" bind:value={investmentFund} disabled={investmentFundCheckboxDisabled} />
 					</div>
 
 					{#if investmentFund}

@@ -7,7 +7,7 @@ import { AccountsIDBHelper } from '$lib/utils/accountsIDBHelper';
 import { TransactionsIDBHelper } from '$lib/utils/transactionsIDBHelper';
 import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 import type { Account } from '$lib/models/entities/account';
-import { SelectOption } from '$lib/models/viewmodels/selectOption';
+import { SelectOption, SelectOptionExtended } from '$lib/models/viewmodels/selectOption';
 import type { TransactionModel } from '$lib/models/entities/transaction';
 import { CreateAccount, UpdateAccount } from '$lib/models/server/requests/account';
 import Variables from '$lib/variables';
@@ -24,7 +24,7 @@ export class AccountsService {
 		return this.idbHelper.getMainId();
 	}
 
-	async getAllWithBalance(currency: string): Promise<Array<Account>> {
+	async getAllWithBalance(currency: string): Promise<Account[]> {
 		try {
 			const accounts = await this.idbHelper.getAll();
 
@@ -53,7 +53,7 @@ export class AccountsService {
 		}
 	}
 
-	async getAllAsOptions(): Promise<Array<SelectOption>> {
+	async getAllAsOptions(): Promise<SelectOption[]> {
 		try {
 			const accounts = await this.idbHelper.getAllAsOptions();
 
@@ -69,8 +69,24 @@ export class AccountsService {
 		}
 	}
 
+	async getAllAsOptionsExtended(excludeFunds: boolean): Promise<SelectOptionExtended<Account>[]> {
+		try {
+			const accounts = await this.idbHelper.getAllAsOptions(excludeFunds);
+
+			const options = new Array<SelectOptionExtended<Account>>();
+			for (const account of accounts) {
+				options.push(new SelectOptionExtended<Account>(account.id, account.name, account));
+			}
+
+			return options;
+		} catch (e) {
+			this.logger.logError(e);
+			throw e;
+		}
+	}
+
 	/** The first item in the array will be the main account. */
-	async getNonInvestmentFundsAsOptions(): Promise<Array<SelectOption>> {
+	async getNonInvestmentFundsAsOptions(): Promise<SelectOption[]> {
 		try {
 			const accounts = await this.idbHelper.getAllAsOptions(true);
 
