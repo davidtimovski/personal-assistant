@@ -10,5 +10,5 @@ module Metrics =
 
     let startTransactionWithUser (name: string) (operation: string) (userId: int) =
         let tr = startTransaction name operation
-        tr.User <- new User(Id = userId.ToString())
+        tr.User <- new SentryUser(Id = userId.ToString())
         tr

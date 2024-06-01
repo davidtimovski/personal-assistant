@@ -853,7 +853,7 @@ public class ListsController : BaseController
         string actionUserImageUri,
         int? listId,
         string message,
-        ITransaction tr,
+        ITransactionTracer tr,
         CancellationToken cancellationToken)
     {
         foreach (var recipient in recipients)

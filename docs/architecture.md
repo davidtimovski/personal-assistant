@@ -52,4 +52,4 @@ The APIs built with C# follow a common theme.
 
 ## Front-end apps
 
-The front-end apps are build with SvelteKit and follow a common structure. They share code contained in the [shared2](../src/Core/shared2) folder which supercedes the v1 [shared](../src/Core/shared) folder that was used when the apps were built with Aurelia.
+The front-end apps are build with SvelteKit and follow a common structure. They share code contained in the [shared2](../src/Core/shared2) folder which replaces the v1 [shared](../src/Core/shared) folder that was used when the apps were built with Aurelia.

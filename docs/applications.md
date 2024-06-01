@@ -6,7 +6,7 @@ Applications that contain core functionality and are not specific to any app.
 
 * [PersonalAssistant.Web](../src/Core/PersonalAssistant.Web)
 
-  Web application that deals with the user account. User registration, profile settings, password changing, deleting account, etc.
+  Web application that deals with user accounts. User registration, profile settings, password changing, deleting account, etc.
 
 * [Core.Api](../src/Core/Core.Api)
 

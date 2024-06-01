@@ -11,7 +11,7 @@ jobs:
       matrix:
         # os: [windows-latest, ubuntu-latest]
         os: [ windows-latest ]
-        dotnet: ['7.0.203']
+        dotnet: ['8.0.205']
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
