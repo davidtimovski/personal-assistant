@@ -577,7 +577,7 @@ public class AccountController : BaseController
         }
     }
 
-    private async Task<HttpClient> InitializeAuth0ClientAsync(ITransaction tr, CancellationToken cancellationToken)
+    private async Task<HttpClient> InitializeAuth0ClientAsync(ITransactionTracer tr, CancellationToken cancellationToken)
     {
         var httpClient = _httpClientFactory.CreateClient();
 

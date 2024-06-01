@@ -534,7 +534,7 @@ public class TasksController : BaseController
         int? listId,
         int? taskId,
         string message,
-        ITransaction tr,
+        ITransactionTracer tr,
         CancellationToken cancellationToken)
     {
         foreach (var recipient in recipients)

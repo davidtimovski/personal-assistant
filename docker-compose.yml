@@ -97,5 +97,5 @@ services:
     restart: always
 
   rabbitmq:
-    image: rabbitmq:3.12-management-alpine
+    image: rabbitmq:3.13-management-alpine
     container_name: personal-assistant-rabbitmq

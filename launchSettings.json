@@ -68,7 +68,7 @@
         "weatherman-api": "DoNotStart"
       }
     },
-	"Chef.Api": {
+    "Chef.Api": {
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "serviceActions": {
