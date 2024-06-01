@@ -15,12 +15,12 @@ public class RegisterViewModel
             .Select(x => new CultureOption(x.Name, x.EnglishName)).ToList();
     }
 
-    public string Name { get; set; } = "";
-    public string Email { get; set; } = "";
-    public string Password { get; set; } = "";
-    public string ConfirmPassword { get; set; } = "";
-    public string Language { get; set; } = "";
-    public string Culture { get; set; } = "";
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+    public string ConfirmPassword { get; set; } = string.Empty;
+    public string Language { get; set; } = string.Empty;
+    public string Culture { get; set; } = string.Empty;
     public float GoogleReCaptchaScore { get; set; }
     public List<CultureOption> CultureOptions { get; }
 }
@@ -33,10 +33,12 @@ public class RegisterViewModelValidator : AbstractValidator<RegisterViewModel>
     {
         var cultures = CultureInfo.GetCultures(CultureTypes.AllCultures).Where(x => !string.IsNullOrEmpty(x.Name)).Select(x => x.Name).ToHashSet();
 
-        RuleFor(dto => dto.Name).NotEmpty().WithMessage(localizer["NameIsRequired"])
+        RuleFor(dto => dto.Name)
+            .NotEmpty().WithMessage(localizer["NameIsRequired"])
             .MaximumLength(30).WithMessage(localizer["NameMaxLength", 30]);
 
-        RuleFor(dto => dto.Email).NotEmpty().WithMessage(localizer["EmailIsRequired"])
+        RuleFor(dto => dto.Email)
+            .NotEmpty().WithMessage(localizer["EmailIsRequired"])
             .EmailAddress().WithMessage(localizer["InvalidEmailAddress"])
             .Must(email => !usersRepository.Exists(email)).WithMessage(localizer["UserAlreadyExists"]);
 
@@ -44,10 +46,12 @@ public class RegisterViewModelValidator : AbstractValidator<RegisterViewModel>
 
         RuleFor(dto => dto.ConfirmPassword).Must((vm, confirmPassword) => vm.Password == confirmPassword).WithMessage(localizer["PasswordsMustMatch"]);
 
-        RuleFor(dto => dto.Language).NotEmpty().WithMessage(localizer["LanguageIsRequired"])
+        RuleFor(dto => dto.Language)
+            .NotEmpty().WithMessage(localizer["LanguageIsRequired"])
             .Must(language => Languages.Contains(language)).WithMessage(localizer["InvalidLanguage"]);
 
-        RuleFor(dto => dto.Culture).NotEmpty().WithMessage(localizer["CultureIsRequired"])
+        RuleFor(dto => dto.Culture)
+            .NotEmpty().WithMessage(localizer["CultureIsRequired"])
             .Must(culture => cultures.Contains(culture)).WithMessage(localizer["InvalidCulture"]);
 
         RuleFor(dto => dto.GoogleReCaptchaScore).Must(score => score > 0.5).WithMessage(localizer["YouDontSeemToBeHuman"]);

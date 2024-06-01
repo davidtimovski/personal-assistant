@@ -4,7 +4,6 @@ using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using ToDoAssistant.Api.Controllers;
@@ -40,7 +39,6 @@ public class TasksControllerTests
             new Mock<IValidator<UpdateTask>>().Object,
             new Mock<IStringLocalizer<TasksController>>().Object,
             new Mock<IOptions<AppConfiguration>>().Object,
-            new Mock<ILogger<TasksController>>().Object,
             new Mock<IStringLocalizer<BaseController>>().Object)
         {
             ControllerContext = new ControllerContextBuilder().Build()

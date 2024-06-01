@@ -32,6 +32,7 @@ public static class IoC
         services.AddTransient<ITooltipsRepository, TooltipsRepository>();
         services.AddTransient<ICurrenciesRepository, CurrenciesRepository>();
         services.AddTransient<ICsvRepository, CsvRepository>();
+        services.AddTransient<IFriendshipsRepository, FriendshipsRepository>();
 
         return services;
     }

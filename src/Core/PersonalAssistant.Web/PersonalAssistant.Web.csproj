@@ -55,6 +55,10 @@
 		<EmbeddedResource Update="Resources\Views\Account\delete.en-US.resx">
 			<Generator>ResXFileCodeGenerator</Generator>
 		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Views\Friendships\index.en-US.resx">
+		  <Generator>ResXFileCodeGenerator</Generator>
+		  <LastGenOutput>index.en-US.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
 		<EmbeddedResource Update="Resources\Views\Home\accountant.en-US.resx">
 			<Generator>ResXFileCodeGenerator</Generator>
 		</EmbeddedResource>
@@ -99,6 +103,14 @@
 
 	<ItemGroup>
 		<Folder Include="wwwroot\images\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Resources\Views\Friendships\index.en-US.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>index.en-US.resx</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 </Project>

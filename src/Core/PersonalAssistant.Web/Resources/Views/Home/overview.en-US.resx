@@ -129,6 +129,9 @@
   <data name="EditProfile" xml:space="preserve">
     <value>Edit profile</value>
   </data>
+  <data name="Friendships" xml:space="preserve">
+    <value>Friendships</value>
+  </data>
   <data name="GoTo" xml:space="preserve">
     <value>Go to</value>
   </data>

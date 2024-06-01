@@ -20,8 +20,16 @@ public class EditProfileViewModelValidator : AbstractValidator<EditProfileViewMo
     {
         var cultures = CultureInfo.GetCultures(CultureTypes.AllCultures).Where(x => !string.IsNullOrEmpty(x.Name)).Select(x => x.Name).ToHashSet();
 
-        RuleFor(dto => dto.Name).NotEmpty().WithMessage(localizer["NameIsRequired"]).MaximumLength(30).WithMessage(localizer["NameMaxLength", 30]);
-        RuleFor(dto => dto.Language).NotEmpty().WithMessage(localizer["LanguageIsRequired"]).Must(language => Languages.Contains(language)).WithMessage(localizer["InvalidLanguage"]);
-        RuleFor(dto => dto.Culture).NotEmpty().WithMessage(localizer["CultureIsRequired"]).Must(culture => cultures.Contains(culture)).WithMessage(localizer["InvalidCulture"]);
+        RuleFor(dto => dto.Name)
+            .NotEmpty().WithMessage(localizer["NameIsRequired"])
+            .MaximumLength(30).WithMessage(localizer["NameMaxLength", 30]);
+
+        RuleFor(dto => dto.Language)
+            .NotEmpty().WithMessage(localizer["LanguageIsRequired"])
+            .Must(language => Languages.Contains(language)).WithMessage(localizer["InvalidLanguage"]);
+
+        RuleFor(dto => dto.Culture)
+            .NotEmpty().WithMessage(localizer["CultureIsRequired"])
+            .Must(culture => cultures.Contains(culture)).WithMessage(localizer["InvalidCulture"]);
     }
 }

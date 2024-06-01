@@ -177,7 +177,7 @@ public class AccountController : BaseController
 
         SetLanguageCookie(model.Language);
 
-        return RedirectToAction(nameof(HomeController.Index), "Home", new { alert = IndexAlert.SuccessfullyRegistered });
+        return RedirectToAction(nameof(HomeController.Index), "Home", new { alert = OverviewIndexAlert.SuccessfullyRegistered });
     }
 
     [HttpPost]
@@ -357,7 +357,7 @@ public class AccountController : BaseController
             tr.Finish();
         }
 
-        return RedirectToAction(nameof(HomeController.Index), "Home", new { alert = IndexAlert.AccountDeleted });
+        return RedirectToAction(nameof(HomeController.Index), "Home", new { alert = OverviewIndexAlert.AccountDeleted });
     }
 
     [HttpGet]
@@ -475,7 +475,7 @@ public class AccountController : BaseController
             SetLanguageCookie(model.Language);
 
             return model.Language != userResult.Data.Language
-                ? RedirectToAction(nameof(Logout), "Account", new { returnUrlSlug = "?alert=" + IndexAlert.LanguageChanged })
+                ? RedirectToAction(nameof(Logout), "Account", new { returnUrlSlug = "?alert=" + OverviewIndexAlert.LanguageChanged })
                 : RedirectToAction(nameof(HomeController.Overview), "Home", new { alert = OverviewAlert.ProfileUpdated });
         }
         catch (Exception ex)

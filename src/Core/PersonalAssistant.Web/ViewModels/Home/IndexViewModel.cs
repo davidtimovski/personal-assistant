@@ -1,6 +1,6 @@
 ﻿namespace PersonalAssistant.Web.ViewModels.Home;
 
-public enum IndexAlert
+public enum OverviewIndexAlert
 {
     None,
     LoggedOut,
@@ -11,10 +11,10 @@ public enum IndexAlert
 
 public class IndexViewModel
 {
-    public IndexViewModel(IndexAlert alert)
+    public IndexViewModel(OverviewIndexAlert alert)
     {
         Alert = alert;
     }
 
-    public IndexAlert Alert { get; }
+    public OverviewIndexAlert Alert { get; }
 }

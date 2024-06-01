@@ -15,6 +15,7 @@ public static class IoC
         services.AddTransient<IPushSubscriptionService, PushSubscriptionService>();
         services.AddTransient<ITooltipService, TooltipService>();
         services.AddTransient<ICsvService, CsvService>();
+        services.AddTransient<IFriendshipService, FriendshipService>();
 
         return services;
     }

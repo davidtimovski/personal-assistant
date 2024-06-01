@@ -13,6 +13,7 @@ public class CoreContext : DbContext
 
     public DbSet<PushSubscription> PushSubscriptions { get; set; }
     public DbSet<TooltipDismissed> TooltipsDismissed { get; set; }
+    public DbSet<Friendship> Friendships { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -26,6 +27,13 @@ public class CoreContext : DbContext
         {
             x.ToTable("tooltips_dismissed");
             x.HasKey(e => new { e.TooltipId, e.UserId });
+        });
+
+        modelBuilder.Entity<Friendship>(x =>
+        {
+            x.ToTable("friendships");
+
+            x.HasKey(e => new { e.SenderId, e.RecipientId });
         });
     }
 }

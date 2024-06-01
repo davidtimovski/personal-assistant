@@ -650,7 +650,26 @@ select {
             color: var(--weatherman-main-color);
         }
 
+/* Friendships */
+.tabs-menu {
+    background: #eee;
+}
 
+.tab-button {
+
+}
+
+.tab-button.selected {
+    background: #666;
+}
+
+.tab {
+    display: none;
+}
+
+.tab.visible {
+    display: block;
+}
 
 @media screen and ( max-width: 1200px ) {
     main {

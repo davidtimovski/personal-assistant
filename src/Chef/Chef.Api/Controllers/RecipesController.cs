@@ -38,7 +38,6 @@ public class RecipesController : BaseController
     private readonly IValidator<ImportRecipe> _importRecipeValidator;
     private readonly IValidator<UploadTempImage> _uploadTempImageValidator;
     private readonly AppConfiguration _config;
-    private readonly ILogger<RecipesController> _logger;
 
     public RecipesController(
         IUserIdLookup? userIdLookup,
@@ -57,8 +56,7 @@ public class RecipesController : BaseController
         IValidator<CreateSendRequest>? createSendRequestValidator,
         IValidator<ImportRecipe>? importRecipeValidator,
         IValidator<UploadTempImage>? uploadTempImageValidator,
-        IOptions<AppConfiguration>? config,
-        ILogger<RecipesController>? logger) : base(userIdLookup, usersRepository)
+        IOptions<AppConfiguration>? config) : base(userIdLookup, usersRepository)
     {
         _recipeService = ArgValidator.NotNull(recipeService);
         _ingredientService = ArgValidator.NotNull(ingredientService);
@@ -75,7 +73,6 @@ public class RecipesController : BaseController
         _importRecipeValidator = ArgValidator.NotNull(importRecipeValidator);
         _uploadTempImageValidator = ArgValidator.NotNull(uploadTempImageValidator);
         _config = ArgValidator.NotNull(config).Value;
-        _logger = ArgValidator.NotNull(logger);
     }
 
     [HttpGet]
@@ -266,7 +263,7 @@ public class RecipesController : BaseController
 
         try
         {
-            RecipeForSending recipeDto = _recipeService.GetForSending(id, UserId, tr);
+            var recipeDto = _recipeService.GetForSending(id, UserId, tr);
 
             return recipeDto is null ? NotFound() : Ok(recipeDto);
         }

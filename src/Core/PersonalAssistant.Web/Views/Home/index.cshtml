@@ -1,4 +1,5 @@
-﻿@model IndexViewModel
+﻿@using PersonalAssistant.Web.ViewModels.Home;
+@model IndexViewModel
 @inject IViewLocalizer Localizer
 @{
     ViewData["Title"] = Localizer["Home"];
@@ -7,16 +8,16 @@
 
 @switch (Model.Alert)
 {
-    case IndexAlert.LoggedOut:
+    case OverviewIndexAlert.LoggedOut:
         <p class="alert success">@Localizer["LoggedOut"]</p>
         break;
-    case IndexAlert.SuccessfullyRegistered:
+    case OverviewIndexAlert.SuccessfullyRegistered:
         <p class="alert success">@Localizer["SuccessfullyRegistered"]</p>
         break;
-    case IndexAlert.LanguageChanged:
+    case OverviewIndexAlert.LanguageChanged:
         <p class="alert success">@Localizer["LanguageChanged"]</p>
         break;
-    case IndexAlert.AccountDeleted:
+    case OverviewIndexAlert.AccountDeleted:
         <p class="alert success">@Localizer["AccountDeleted"]</p>
         break;
 }

@@ -1,0 +1,73 @@
+﻿@model PersonalAssistant.Web.ViewModels.Friendships.ViewFriendshipViewModel
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["Friendship"];
+    ViewData["Description"] = Localizer["Friendship"];
+}
+
+<h1>@Localizer["Friendship"]</h1>
+
+@Model.Name
+@Model.Email
+
+<div>Permissions</div>
+
+<div>
+    <div>To Do Assistant</div>
+
+    <label>
+        <div><input type="checkbox" @(Model.Permissions.Contains("todo_share_lists") ? "checked" : string.Empty) disabled /> Share lists</div>
+
+        <div>Hehe</div>
+    </label>
+</div>
+
+<div>
+    <div>Chef</div>
+
+    <label>
+        <div><input type="checkbox" @(Model.Permissions.Contains("chef_share_recipes") ? "checked" : string.Empty) disabled /> Share recipes</div>
+
+        <div>Hehe</div>
+    </label>
+
+    <label>
+        <div><input type="checkbox" @(Model.Permissions.Contains("chef_send_recipes") ? "checked" : string.Empty) disabled /> Send recipes</div>
+
+        <div>Hehe</div>
+    </label>
+</div>
+
+<div>
+    <div>Accountant</div>
+
+    <label>
+        <div><input type="checkbox" @(Model.Permissions.Contains("accountant_split_expenses") ? "checked" : string.Empty) disabled /> Split expenses</div>
+
+        <div>Hehe</div>
+    </label>
+</div>
+
+@if (Model.IsAccepted is null && !Model.UserIsSender)
+{
+    <form asp-controller="friendships" asp-action="accept" method="post" role="form">
+        <input type="hidden" name="FriendId" value="@Model.UserId" />
+        <button type="submit" class="button">@Localizer["Accept"]</button>
+    </form>
+
+    <form asp-controller="friendships" asp-action="decline" method="post" role="form">
+        <input type="hidden" name="FriendId" value="@Model.UserId" />
+        <button type="submit" class="button">@Localizer["Decline"]</button>
+    </form>
+
+    <form asp-controller="friendships" asp-action="delete" method="post" role="form">
+        <input type="hidden" name="FriendId" value="@Model.UserId" />
+        <button type="submit" class="button">@Localizer["Delete"]</button>
+    </form>
+}
+
+<footer>
+    <a asp-controller="friendships" asp-action="index" class="button">@Localizer["Back"]</a>
+
+    <a asp-controller="friendships" asp-action="edit" asp-route-userid="@Model.UserId" class="button">@Localizer["Edit"]</a>
+</footer>

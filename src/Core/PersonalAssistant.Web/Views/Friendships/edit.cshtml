@@ -1,0 +1,22 @@
+﻿@model PersonalAssistant.Web.ViewModels.Friendships.ViewFriendshipViewModel
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["EditFriendship"];
+    ViewData["Description"] = Localizer["EditFriendship"];
+}
+
+<form asp-controller="friendships" asp-action="edit" method="post" role="form">
+    <h1>@Localizer["EditFriendship"]</h1>
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+@*     <div class="form-group">
+        <input type="email" asp-for="Email" maxlength="254" placeholder="@Localizer["Email"]" aria-label="@Localizer["Email"]" required />
+    </div>
+ *@
+    <footer>
+        <a asp-controller="friendships" asp-action="index" class="button">@Localizer["Back"]</a>
+        
+        <button type="submit" class="button">@Localizer["Save"]</button>
+    </footer>
+</form>

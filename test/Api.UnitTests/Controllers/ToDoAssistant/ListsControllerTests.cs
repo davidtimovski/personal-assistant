@@ -3,7 +3,6 @@ using Core.Application.Contracts;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Sentry;
@@ -42,7 +41,6 @@ public class ListsControllerTests
             new Mock<IValidator<CopyList>>().Object,
             new Mock<IStringLocalizer<ListsController>>().Object,
             new Mock<IOptions<AppConfiguration>>().Object,
-            new Mock<ILogger<ListsController>>().Object,
             new Mock<IStringLocalizer<BaseController>>().Object)
         {
             ControllerContext = new ControllerContextBuilder().Build()

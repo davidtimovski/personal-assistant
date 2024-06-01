@@ -117,46 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="About" xml:space="preserve">
-    <value>За нас</value>
-  </data>
-  <data name="Beta" xml:space="preserve">
-    <value>- бета -</value>
-  </data>
-  <data name="DeleteAccount" xml:space="preserve">
-    <value>Избриши сметка</value>
-  </data>
-  <data name="EditProfile" xml:space="preserve">
-    <value>Ажурирај профил</value>
+  <data name="Back" xml:space="preserve">
+    <value>Back</value>
   </data>
   <data name="Friendships" xml:space="preserve">
-    <value>Пријателства</value>
-  </data>
-  <data name="GoTo" xml:space="preserve">
-    <value>Оди во</value>
-  </data>
-  <data name="Hello" xml:space="preserve">
-    <value>Здраво</value>
-  </data>
-  <data name="InDevelopment" xml:space="preserve">
-    <value>- се развива -</value>
-  </data>
-  <data name="Logout" xml:space="preserve">
-    <value>Одјава</value>
-  </data>
-  <data name="Overview" xml:space="preserve">
-    <value>Преглед</value>
-  </data>
-  <data name="PasswordResetSuccess" xml:space="preserve">
-    <value>Емаил за ресетирање на лозинката беше испратен</value>
-  </data>
-  <data name="PrivacyPolicy" xml:space="preserve">
-    <value>Полиса за приватност</value>
-  </data>
-  <data name="ProfileUpdatedSuccess" xml:space="preserve">
-    <value>Профилот беше успешно ажуриран</value>
-  </data>
-  <data name="ResetPassword" xml:space="preserve">
-    <value>Ресетирај лозинка</value>
+    <value>Friendships</value>
   </data>
 </root>

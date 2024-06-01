@@ -34,7 +34,6 @@ public class TasksController : BaseController
     private readonly IValidator<UpdateTask> _updateValidator;
     private readonly IStringLocalizer<TasksController> _localizer;
     private readonly AppConfiguration _config;
-    private readonly ILogger<TasksController> _logger;
 
     public TasksController(
         IUserIdLookup? userIdLookup,
@@ -48,7 +47,6 @@ public class TasksController : BaseController
         IValidator<UpdateTask>? updateValidator,
         IStringLocalizer<TasksController>? localizer,
         IOptions<AppConfiguration>? config,
-        ILogger<TasksController>? logger,
         IStringLocalizer<BaseController>? baseLocalizer) : base(userIdLookup, usersRepository, baseLocalizer)
     {
         _listActionsHubContext = ArgValidator.NotNull(listActionsHubContext);
@@ -60,7 +58,6 @@ public class TasksController : BaseController
         _updateValidator = ArgValidator.NotNull(updateValidator);
         _localizer = ArgValidator.NotNull(localizer);
         _config = ArgValidator.NotNull(config).Value;
-        _logger = ArgValidator.NotNull(logger);
     }
 
     [HttpGet("{id}")]

@@ -10,7 +10,6 @@ using FluentValidation;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Sentry;
@@ -43,8 +42,7 @@ public class RecipesControllerTests
             new Mock<IValidator<CreateSendRequest>>().Object,
             new Mock<IValidator<ImportRecipe>>().Object,
             new Mock<IValidator<UploadTempImage>>().Object,
-            new Mock<IOptions<AppConfiguration>>().Object,
-            new Mock<ILogger<RecipesController>>().Object)
+            new Mock<IOptions<AppConfiguration>>().Object)
         {
             ControllerContext = new ControllerContextBuilder().Build()
         };

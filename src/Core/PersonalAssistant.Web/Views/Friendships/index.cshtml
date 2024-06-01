@@ -1,0 +1,116 @@
+﻿@using PersonalAssistant.Web.ViewModels.Friendships;
+@model IndexViewModel
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["Friendships"];
+    ViewData["Description"] = Localizer["Friendships"];
+
+    var activeFriendships = Model.Friendships.Where(x => x.IsAccepted is true).ToList();
+    var pendingFriendships = Model.Friendships.Where(x => !x.IsAccepted.HasValue).ToList();
+    var declinedFriendships = Model.Friendships.Where(x => x.IsAccepted is false).ToList();
+}
+
+@switch (Model.Alert)
+{
+    case FriendshipsIndexAlert.FriendshipRequestSent:
+        <p class="alert success">@Localizer["FriendshipRequestSent"]</p>
+        break;
+    case FriendshipsIndexAlert.FriendshipUpdated:
+        <p class="alert success">@Localizer["FriendshipUpdated"]</p>
+        break;
+    case FriendshipsIndexAlert.FriendshipAccepted:
+        <p class="alert success">@Localizer["FriendshipAccepted"]</p>
+        break;
+    case FriendshipsIndexAlert.FriendshipDeclined:
+        <p class="alert success">@Localizer["FriendshipDeclined"]</p>
+        break;
+    case FriendshipsIndexAlert.FriendshipDeleted:
+        <p class="alert success">@Localizer["FriendshipDeleted"]</p>
+        break;
+}
+
+<div class="tabs-menu">
+    <button type="button" id="friendships-tab-button" class="tab-button selected">Friendships</button>
+    <button type="button" id="requests-tab-button" class="tab-button">Requests</button>
+    <button type="button" id="declined-tab-button" class="tab-button">Declined</button>
+</div>
+
+<div id="friendships-tab" class="tab visible">
+    @if (activeFriendships.Count == 0)
+    {
+        <div>You have no active friendships, <a asp-controller="friendships" asp-action="new" class="button">@Localizer["StartOne"]</a>!</div>
+    }
+    else
+    {
+        <a asp-controller="friendships" asp-action="new" class="button">@Localizer["New"]</a>
+
+        <table>
+            @foreach (var item in activeFriendships)
+            {
+                <tr>
+                    <td><img src="@item.ImageUri" /> @item.Name<br />@item.Email</td>
+                    <td>
+                        <a asp-controller="friendships" asp-action="view" asp-route-userid="@item.UserId" class="button">@Localizer["View"]</a>
+                        <a asp-controller="friendships" asp-action="edit" asp-route-userid="@item.UserId" class="button">@Localizer["Edit"]</a>
+                    </td>
+                </tr>
+            }
+        </table>
+    }
+</div>
+
+<div id="requests-tab" class="tab">
+    @if (pendingFriendships.Count == 0)
+    {
+        <div>You have no pending requests for friendships</div>
+    }
+    else
+    {
+        <table>
+            @foreach (var item in pendingFriendships)
+            {
+                <tr>
+                    <td><img src="@item.ImageUri" /> @item.Name<br />@item.Email</td>
+                    <td>
+                        <a asp-controller="friendships" asp-action="view" asp-route-userid="@item.UserId" class="button">@Localizer["View"]</a>
+                    </td>
+                </tr>
+            }
+        </table>
+    }
+</div>
+
+<div id="declined-tab" class="tab">
+    @if (declinedFriendships.Count == 0)
+    {
+        <div>You haven't declined any friendships</div>
+    }
+    else
+    {
+        <table>
+            @foreach (var item in declinedFriendships)
+            {
+                <tr>
+                    <td><img src="@item.ImageUri" /> @item.Name<br />@item.Email</td>
+                    <td>
+                        <form asp-controller="friendships" asp-action="delete" method="post" role="form">
+                            <input type="hidden" name="FriendId" value="@item.UserId" />
+                            <button type="submit" class="button">@Localizer["Delete"]</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </table>
+    }
+</div>
+
+<footer>
+    <a href="/" class="button">@Localizer["Back"]</a>
+</footer>
+
+<environment include="Development">
+    <script src="~/js/friendships/index.js" asp-append-version="true"></script>
+</environment>
+<environment include="Production">
+    <script src="https://cdn.personalassistant.site/js/friendships/index.min.js"></script>
+</environment>

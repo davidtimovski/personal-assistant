@@ -27,7 +27,7 @@ public class HomeController : BaseController
     }
 
     [HttpGet]
-    public IActionResult Index(IndexAlert alert = IndexAlert.None)
+    public IActionResult Index(OverviewIndexAlert alert = OverviewIndexAlert.None)
     {
         if (User?.Identity?.IsAuthenticated == true)
         {

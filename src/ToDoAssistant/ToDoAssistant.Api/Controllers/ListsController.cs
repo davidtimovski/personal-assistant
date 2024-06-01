@@ -35,7 +35,6 @@ public class ListsController : BaseController
     private readonly IValidator<CopyList> _copyValidator;
     private readonly IStringLocalizer<ListsController> _localizer;
     private readonly AppConfiguration _config;
-    private readonly ILogger<ListsController> _logger;
 
     public ListsController(
         IUserIdLookup? userIdLookup,
@@ -51,7 +50,6 @@ public class ListsController : BaseController
         IValidator<CopyList>? copyValidator,
         IStringLocalizer<ListsController>? localizer,
         IOptions<AppConfiguration>? config,
-        ILogger<ListsController>? logger,
         IStringLocalizer<BaseController>? baseLocalizer) : base(userIdLookup, usersRepository, baseLocalizer)
     {
         _listService = ArgValidator.NotNull(listService);
@@ -65,7 +63,6 @@ public class ListsController : BaseController
         _copyValidator = ArgValidator.NotNull(copyValidator);
         _localizer = ArgValidator.NotNull(localizer);
         _config = ArgValidator.NotNull(config).Value;
-        _logger = ArgValidator.NotNull(logger);
     }
 
     [HttpGet]
