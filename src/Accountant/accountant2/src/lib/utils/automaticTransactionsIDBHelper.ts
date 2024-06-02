@@ -20,7 +20,16 @@ export class AutomaticTransactionsIDBHelper {
 			}
 		}
 
-		return automaticTransactions.sort((a: AutomaticTransaction, b: AutomaticTransaction) => (a.dayInMonth > b.dayInMonth ? 1 : -1));
+		return automaticTransactions.sort((a: AutomaticTransaction, b: AutomaticTransaction) => {
+			if (a.dayInMonth === 0) {
+				return 1;
+			}
+			if (b.dayInMonth === 0) {
+				return -1;
+			}
+
+			return a.dayInMonth > b.dayInMonth ? 1 : -1;
+		});
 	}
 
 	async get(id: number): Promise<AutomaticTransaction> {

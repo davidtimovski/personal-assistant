@@ -36,7 +36,7 @@
 					automaticTransaction.amount,
 					automaticTransaction.currency,
 					automaticTransaction.categoryName || $t('uncategorized'),
-					$t(`dayOrdinal${automaticTransaction.dayInMonth}`),
+					automaticTransaction.dayInMonth === 0 ? $t('automaticTransactions.lastDayOfMonth') : $t(`dayOrdinal${automaticTransaction.dayInMonth}`),
 					automaticTransaction.synced
 				)
 			);

@@ -6,7 +6,7 @@ open CommonHandlers
 
 module Logic =
     [<Literal>]
-    let private descriptionMaxLength = 2000
+    let private descriptionMaxLength = 5000
 
     let mapAll (debts: seq<Debt>) : seq<DebtDto> =
         debts

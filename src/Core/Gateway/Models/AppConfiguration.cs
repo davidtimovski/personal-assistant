@@ -2,29 +2,29 @@
 
 namespace Gateway.Models;
 
-public class AppConfiguration
+public sealed class AppConfiguration
 {
     /// <summary>
     /// Coming from appsettings.*.json.
     /// </summary>
     [Required]
-    public required AppUrls Urls { get; set; }
+    public required AppUrls Urls { get; init; }
 }
 
-public class AppUrls
+public sealed class AppUrls
 {
     [Required]
-    public required string ToDoAssistant { get; set; }
+    public required string ToDoAssistant { get; init; }
 
     [Required]
-    public required string Chef { get; set; }
+    public required string Chef { get; init; }
 
     [Required]
-    public required string Accountant { get; set; }
+    public required string Accountant { get; init; }
 
     [Required]
-    public required string Weatherman { get; set; }
+    public required string Weatherman { get; init; }
 
     [Required]
-    public required string Trainer { get; set; }
+    public required string Trainer { get; init; }
 }

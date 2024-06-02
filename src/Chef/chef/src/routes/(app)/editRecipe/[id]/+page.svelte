@@ -132,12 +132,12 @@
 			? '00'
 			: parseInt(prepDurationHours, 10).toLocaleString('en-US', {
 					minimumIntegerDigits: 2
-			  });
+				});
 		const prepMinutes = !prepDurationMinutes
 			? '00'
 			: parseInt(prepDurationMinutes, 10).toLocaleString('en-US', {
 					minimumIntegerDigits: 2
-			  });
+				});
 
 		if (prepHours === '00' && prepMinutes === '00') {
 			prepDuration = '';
@@ -151,12 +151,12 @@
 			? '00'
 			: parseInt(cookDurationHours, 10).toLocaleString('en-US', {
 					minimumIntegerDigits: 2
-			  });
+				});
 		const cookMinutes = !cookDurationMinutes
 			? '00'
 			: parseInt(cookDurationMinutes, 10).toLocaleString('en-US', {
 					minimumIntegerDigits: 2
-			  });
+				});
 
 		if (cookHours === '00' && cookMinutes === '00') {
 			cookDuration = '';
@@ -257,8 +257,8 @@
 							description,
 							parseIngredientsAmount(ingredients),
 							instructions,
-							prepDuration,
-							cookDuration,
+							prepDuration.length > 0 ? prepDuration : null,
+							cookDuration.length > 0 ? cookDuration : null,
 							servings,
 							imageUri,
 							videoUrl
@@ -283,8 +283,8 @@
 							description,
 							parseIngredientsAmount(ingredients),
 							instructions,
-							prepDuration,
-							cookDuration,
+							prepDuration.length > 0 ? prepDuration : null,
+							cookDuration.length > 0 ? cookDuration : null,
 							servings,
 							imageUri,
 							videoUrl

@@ -110,6 +110,63 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pipelines", "pipelines", "{
 		.github\workflows\test.yml = .github\workflows\test.yml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sql", "sql", "{C034C1DC-532B-40C8-8F03-4B223E716199}"
+	ProjectSection(SolutionItems) = preProject
+		sql\currency_rates.sql = sql\currency_rates.sql
+		sql\prod_to_dev.sql = sql\prod_to_dev.sql
+		sql\push_subscriptions.sql = sql\push_subscriptions.sql
+		sql\tooltips.sql = sql\tooltips.sql
+		sql\tooltips_dismissed.sql = sql\tooltips_dismissed.sql
+		sql\users.sql = sql\users.sql
+		sql\user_id_map.sql = sql\user_id_map.sql
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "accountant", "accountant", "{4B66FB59-3B86-436E-9DE3-F2241A9BBE00}"
+	ProjectSection(SolutionItems) = preProject
+		sql\accountant\accounts.sql = sql\accountant\accounts.sql
+		sql\accountant\automatic_transactions.sql = sql\accountant\automatic_transactions.sql
+		sql\accountant\categories.sql = sql\accountant\categories.sql
+		sql\accountant\debts.sql = sql\accountant\debts.sql
+		sql\accountant\deleted_entities.sql = sql\accountant\deleted_entities.sql
+		sql\accountant\transactions.sql = sql\accountant\transactions.sql
+		sql\accountant\upcoming_expenses.sql = sql\accountant\upcoming_expenses.sql
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "chef", "chef", "{64E2AC43-7977-4A9A-A52D-7295EEE7A823}"
+	ProjectSection(SolutionItems) = preProject
+		sql\chef\dietary_profiles.sql = sql\chef\dietary_profiles.sql
+		sql\chef\ingredients.sql = sql\chef\ingredients.sql
+		sql\chef\ingredients_tasks.sql = sql\chef\ingredients_tasks.sql
+		sql\chef\ingredient_brands.sql = sql\chef\ingredient_brands.sql
+		sql\chef\ingredient_categories.sql = sql\chef\ingredient_categories.sql
+		sql\chef\recipes.sql = sql\chef\recipes.sql
+		sql\chef\recipes_ingredients.sql = sql\chef\recipes_ingredients.sql
+		sql\chef\send_requests.sql = sql\chef\send_requests.sql
+		sql\chef\shares.sql = sql\chef\shares.sql
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "todo", "todo", "{BB063EDE-5C95-4B28-9CDB-AFC506EEFF07}"
+	ProjectSection(SolutionItems) = preProject
+		sql\todo\lists.sql = sql\todo\lists.sql
+		sql\todo\notifications.sql = sql\todo\notifications.sql
+		sql\todo\shares.sql = sql\todo\shares.sql
+		sql\todo\tasks.sql = sql\todo\tasks.sql
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "trainer", "trainer", "{01CE32D6-E967-417B-B420-DC2AA0346DC8}"
+	ProjectSection(SolutionItems) = preProject
+		sql\trainer\exercise_2x_amount.sql = sql\trainer\exercise_2x_amount.sql
+		sql\trainer\exercise_amount.sql = sql\trainer\exercise_amount.sql
+		sql\trainer\exercise_amount_time.sql = sql\trainer\exercise_amount_time.sql
+		sql\trainer\exercise_time.sql = sql\trainer\exercise_time.sql
+		sql\trainer\progress_amount.sql = sql\trainer\progress_amount.sql
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "weatherman", "weatherman", "{09D024E3-6411-4015-BE20-A77B336AAB0B}"
+	ProjectSection(SolutionItems) = preProject
+		sql\weatherman\forecasts.sql = sql\weatherman\forecasts.sql
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -269,6 +326,12 @@ Global
 		{12D4332C-9D5A-4BDE-B7A2-0C6C1D78DCD8} = {10726412-16C3-4B3D-907D-B43558757665}
 		{8031945C-A0F5-429F-A2A4-0CDC44C70AD6} = {BB91D65B-985A-462E-9085-B8C32599AD08}
 		{9F224D0C-1D08-4743-AF9A-82A064EB495C} = {BB91D65B-985A-462E-9085-B8C32599AD08}
+		{C034C1DC-532B-40C8-8F03-4B223E716199} = {BB91D65B-985A-462E-9085-B8C32599AD08}
+		{4B66FB59-3B86-436E-9DE3-F2241A9BBE00} = {C034C1DC-532B-40C8-8F03-4B223E716199}
+		{64E2AC43-7977-4A9A-A52D-7295EEE7A823} = {C034C1DC-532B-40C8-8F03-4B223E716199}
+		{BB063EDE-5C95-4B28-9CDB-AFC506EEFF07} = {C034C1DC-532B-40C8-8F03-4B223E716199}
+		{01CE32D6-E967-417B-B420-DC2AA0346DC8} = {C034C1DC-532B-40C8-8F03-4B223E716199}
+		{09D024E3-6411-4015-BE20-A77B336AAB0B} = {C034C1DC-532B-40C8-8F03-4B223E716199}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1296A1BD-7B9D-40F2-9873-972EB471C47D}

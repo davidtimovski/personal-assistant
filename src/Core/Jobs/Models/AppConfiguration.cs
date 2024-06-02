@@ -3,25 +3,25 @@ using Cdn.Configuration;
 
 namespace Jobs.Models;
 
-public class AppConfiguration
+public sealed class AppConfiguration
 {
     /// <summary>
     /// Coming from appsettings.*.json.
     /// </summary>
     [Required]
-    public required string ConnectionString { get; set; }
+    public required string ConnectionString { get; init; }
 
     /// <summary>
     /// Coming from appsettings.*.json.
     /// </summary>
     [Required]
-    public required FixerApiConfig FixerApi { get; set; }
+    public required FixerApiConfig FixerApi { get; init; }
 
     /// <summary>
     /// Coming from appsettings.json and environment variables.
     /// </summary>
     [Required]
-    public required CloudinaryConfig Cloudinary { get; set; }
+    public required CloudinaryConfig Cloudinary { get; init; }
 
     /// <summary>
     /// Coming from appsettings.Production.json.
@@ -29,30 +29,30 @@ public class AppConfiguration
 #if !DEBUG
     [Required]
 #endif
-    public required DbBackupConfig DbBackup { get; set; }
+    public required DbBackupConfig DbBackup { get; init; }
 }
 
-public class FixerApiConfig
+public sealed class FixerApiConfig
 {
     [Required]
-    public required string BaseUrl { get; set; }
+    public required string BaseUrl { get; init; }
 
 #if !DEBUG
     [Required]
 #endif
-    public required string AccessKey { get; set; }
+    public required string AccessKey { get; init; }
 }
 
-public class DbBackupConfig
+public sealed class DbBackupConfig
 {
 #if !DEBUG
     [Required]
 #endif
-    public required string AzureStorageConnectionString { get; set; }
+    public required string AzureStorageConnectionString { get; init; }
 
     [Required]
-    public required string AzureStorageContainerName { get; set; }
+    public required string AzureStorageContainerName { get; init; }
 
     [Required]
-    public required string BackupsPath { get; set; }
+    public required string BackupsPath { get; init; }
 }

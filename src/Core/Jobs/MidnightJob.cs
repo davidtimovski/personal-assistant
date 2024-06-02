@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Npgsql;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Jobs;
 
@@ -93,7 +94,10 @@ public class MidnightJob
 
         try
         {
-            var automaticTransactions = conn.Query<AutomaticTransaction>("SELECT * FROM accountant.automatic_transactions WHERE day_in_month = @DayInMonth", new { DayInMonth = now.Day });
+            var isLastDayOfMonth = now.Day == DateTime.DaysInMonth(now.Year, now.Month);
+            var automaticTransactions = conn.Query<AutomaticTransaction>(@"SELECT * FROM accountant.automatic_transactions
+                                                                           WHERE day_in_month = @DayInMonth OR (day_in_month = 0 AND @IsLastDayOfMonth)",
+                                                                           new { DayInMonth = now.Day, IsLastDayOfMonth = isLastDayOfMonth });
 
             var userGroups = automaticTransactions.GroupBy(x => x.UserId);
 

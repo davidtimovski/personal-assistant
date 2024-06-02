@@ -222,7 +222,7 @@
 			<div class="form-control">
 				<textarea
 					bind:value={description}
-					maxlength="2000"
+					maxlength="5000"
 					class="description-textarea"
 					placeholder={$t('description')}
 					aria-label={$t('description')}
