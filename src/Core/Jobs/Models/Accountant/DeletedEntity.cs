@@ -1,6 +1,6 @@
 ﻿namespace Jobs.Models.Accountant;
 
-public class DeletedEntity
+public sealed class DeletedEntity
 {
     public int UserId { get; set; }
     public EntityType EntityType { get; set; }

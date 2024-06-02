@@ -46,7 +46,13 @@ export class RecipesService {
 	async get(id: number, currency: string): Promise<ViewRecipe> {
 		const result = await this.httpProxy.ajax<ViewRecipe>(`${Variables.urls.api}/recipes/${id}/${currency}`);
 
-		// Update last load date
+		// Update last opened date
+		let cachedRecipes = this.localStorage.getObject<RecipeModel[]>('homePageData');
+		let recipe = cachedRecipes?.find((x) => x.id === result.id);
+		recipe!.lastOpenedDate = new Date();
+
+		this.localStorage.set('homePageData', JSON.stringify(cachedRecipes));
+		state.set(new State(cachedRecipes, false));
 
 		return result;
 	}
@@ -86,7 +92,7 @@ export class RecipesService {
 				body: window.JSON.stringify(dto)
 			});
 
-			// TODO: Refresh recipes
+			this.getAll();
 
 			return result;
 		} catch (e) {
@@ -116,7 +122,7 @@ export class RecipesService {
 				body: window.JSON.stringify(dto)
 			});
 
-			// TODO: Refresh recipes
+			this.getAll();
 
 			return id;
 		} catch (e) {
@@ -149,7 +155,7 @@ export class RecipesService {
 				body: window.JSON.stringify(dto)
 			});
 
-			// TODO: Refresh recipes
+			this.getAll();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -162,7 +168,7 @@ export class RecipesService {
 				method: 'delete'
 			});
 
-			// TODO: Refresh recipes
+			this.getAll();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -180,7 +186,7 @@ export class RecipesService {
 				body: window.JSON.stringify(dto)
 			});
 
-			// TODO: Refresh recipes
+			this.getAll();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -194,7 +200,7 @@ export class RecipesService {
 				body: window.JSON.stringify(dto)
 			});
 
-			// TODO: Refresh recipes
+			this.getAll();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -207,7 +213,7 @@ export class RecipesService {
 				method: 'delete'
 			});
 
-			// TODO: Refresh recipes
+			this.getAll();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;

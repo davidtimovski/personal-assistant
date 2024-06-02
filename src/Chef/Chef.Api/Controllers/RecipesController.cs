@@ -266,7 +266,7 @@ public class RecipesController : BaseController
 
         try
         {
-            RecipeForSending recipeDto = _recipeService.GetForSending(id, UserId, tr);
+            RecipeForSending? recipeDto = _recipeService.GetForSending(id, UserId, tr);
 
             return recipeDto is null ? NotFound() : Ok(recipeDto);
         }

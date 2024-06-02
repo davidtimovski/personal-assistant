@@ -238,6 +238,7 @@ export default {
 		},
 		automaticTransactions: {
 			automaticTransactions: 'Automatic transactions',
+			lastDayOfMonth: 'Last day of month',
 			onEvery: 'On every',
 			month: 'Month',
 			emptyListMessage: "You don't have any automatic transactions",
@@ -246,6 +247,7 @@ export default {
 		editAutomaticTransaction: {
 			newAutomaticTransaction: 'New automatic transaction',
 			editAutomaticTransaction: 'Edit automatic transaction',
+			lastDayOfMonth: 'Last day of month',
 			deposit: 'Deposit',
 			expense: 'Expense',
 			onEvery: 'On every',
@@ -653,6 +655,7 @@ export default {
 		},
 		automaticTransactions: {
 			automaticTransactions: 'Автоматски трансакции',
+			lastDayOfMonth: 'Последен ден од месецот',
 			onEvery: 'На секој',
 			month: 'Месец',
 			emptyListMessage: 'Немате автоматски трансакции',
@@ -661,6 +664,7 @@ export default {
 		editAutomaticTransaction: {
 			newAutomaticTransaction: 'Нова автоматска трансакција',
 			editAutomaticTransaction: 'Ажурирај автоматска трансакција',
+			lastDayOfMonth: 'Последен ден од месецот',
 			deposit: 'Депозит',
 			expense: 'Трошок',
 			onEvery: 'На секој',

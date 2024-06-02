@@ -253,6 +253,7 @@
 					{#each dayInMonthOptions as day}
 						<option value={day.id}>{day.name}</option>
 					{/each}
+					<option value={0}>{$t('editAutomaticTransaction.lastDayOfMonth')}</option>
 				</select>
 			</div>
 
