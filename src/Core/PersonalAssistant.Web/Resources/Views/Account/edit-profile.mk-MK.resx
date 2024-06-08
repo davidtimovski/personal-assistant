@@ -123,6 +123,9 @@
   <data name="Change" xml:space="preserve">
     <value>Промени</value>
   </data>
+  <data name="Country" xml:space="preserve">
+    <value>Земја</value>
+  </data>
   <data name="Culture" xml:space="preserve">
     <value>Култура</value>
   </data>
@@ -149,6 +152,9 @@
   </data>
   <data name="SaveProfile" xml:space="preserve">
     <value>Зачувај профил</value>
+  </data>
+  <data name="SelectCountry" xml:space="preserve">
+    <value>Изберете земја</value>
   </data>
   <data name="Uploading" xml:space="preserve">
     <value>Прикачување..</value>

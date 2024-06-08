@@ -7,11 +7,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { ingredientPickerState } from '$lib/stores';
 	import { IngredientsService } from '$lib/services/ingredientsService';
-	import {
-		IngredientCategory,
-		IngredientSuggestion,
-		IngredientSuggestions
-	} from '$lib/models/viewmodels/ingredientSuggestions';
+	import { IngredientCategory, IngredientSuggestion, IngredientSuggestions } from '$lib/models/viewmodels/ingredientSuggestions';
 	import { IngredientPickEvent } from '$lib/models/ingredientPickerState';
 
 	import PublicCategorySuggestion from '$lib/components/PublicCategorySuggestion.svelte';
@@ -128,10 +124,7 @@
 		return category.matched;
 	}
 
-	function findInIngredientRecursive(
-		ingredient: IngredientSuggestion,
-		ingredientId: number
-	): IngredientSuggestion | null {
+	function findInIngredientRecursive(ingredient: IngredientSuggestion, ingredientId: number): IngredientSuggestion | null {
 		if (ingredient.id === ingredientId) {
 			return ingredient;
 		}
@@ -144,9 +137,7 @@
 	}
 
 	function findSuggestion(ingredientId: number) {
-		let foundSuggestion: IngredientSuggestion | null | undefined = suggestions.userIngredients.find(
-			(x) => x.id === ingredientId
-		);
+		let foundSuggestion: IngredientSuggestion | null | undefined = suggestions.userIngredients.find((x) => x.id === ingredientId);
 		if (foundSuggestion) {
 			return foundSuggestion;
 		}

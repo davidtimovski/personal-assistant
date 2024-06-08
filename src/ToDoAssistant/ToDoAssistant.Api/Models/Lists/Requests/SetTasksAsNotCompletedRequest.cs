@@ -1,5 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace ToDoAssistant.Api.Models.Lists.Requests;
 
-namespace ToDoAssistant.Api.Models.Lists.Requests;
-
-public record SetTasksAsNotCompletedRequest([Required] int ListId);
+public record SetTasksAsNotCompletedRequest(int ListId);

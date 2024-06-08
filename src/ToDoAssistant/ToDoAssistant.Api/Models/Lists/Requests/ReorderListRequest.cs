@@ -1,5 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace ToDoAssistant.Api.Models.Lists.Requests;
 
-namespace ToDoAssistant.Api.Models.Lists.Requests;
-
-public record ReorderListRequest([Required] int Id, [Required] short OldOrder, [Required] short NewOrder);
+public record ReorderListRequest(int Id, short OldOrder, short NewOrder);

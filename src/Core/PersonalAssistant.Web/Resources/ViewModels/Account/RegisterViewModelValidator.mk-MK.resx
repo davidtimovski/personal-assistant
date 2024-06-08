@@ -120,6 +120,9 @@
   <data name="EmailIsRequired" xml:space="preserve">
     <value>Емаил-от е задолжителен</value>
   </data>
+  <data name="InvalidCountry" xml:space="preserve">
+    <value>Избраната земја не е валидна</value>
+  </data>
   <data name="InvalidEmailAddress" xml:space="preserve">
     <value>Емаил адресата не е валидна</value>
   </data>

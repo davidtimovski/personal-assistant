@@ -5,8 +5,8 @@ namespace PersonalAssistant.Web.ViewModels.Account;
 
 public class ResetPasswordViewModel
 {
-    public string Email { get; set; } = null!;
-    public float GoogleReCaptchaScore { get; set; }
+    public string Email { get; set; } = "";
+    public float GoogleReCaptchaScore { get; init; }
 }
 
 public class ChangePasswordViewModelValidator : AbstractValidator<ResetPasswordViewModel>

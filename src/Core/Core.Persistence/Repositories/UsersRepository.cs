@@ -15,13 +15,13 @@ public class UsersRepository : BaseRepository, IUsersRepository
     public User Get(int id)
     {
         using IDbConnection conn = OpenConnection();
-        return conn.QueryFirstOrDefault<User>("SELECT * FROM users WHERE id = @id", new { id });
+        return conn.QueryFirst<User>("SELECT * FROM users WHERE id = @id", new { id });
     }
 
     public User Get(string email)
     {
         using IDbConnection conn = OpenConnection();
-        return conn.QueryFirstOrDefault<User>("SELECT * FROM users WHERE email = @email", new { email });
+        return conn.QueryFirst<User>("SELECT * FROM users WHERE email = @email", new { email });
     }
 
     public int? GetId(string auth0Id)
@@ -73,6 +73,7 @@ public class UsersRepository : BaseRepository, IUsersRepository
             User dbUser = EFContext.Users.First(x => x.Id == user.Id);
 
             dbUser.Name = user.Name;
+            dbUser.Country = user.Country;
             dbUser.Language = user.Language;
             dbUser.Culture = user.Culture;
             dbUser.ToDoNotificationsEnabled = user.ToDoNotificationsEnabled;

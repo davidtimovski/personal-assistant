@@ -2,6 +2,8 @@
 using Chef.Application.Contracts.Ingredients;
 using Chef.Application.Contracts.Ingredients.Models;
 using Chef.Application.Entities;
+using Core.Application.Contracts;
+using Core.Application.Entities;
 using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
@@ -11,15 +13,18 @@ namespace Chef.Application.Services;
 
 public class IngredientService : IIngredientService
 {
+    private readonly IUserService _userService;
     private readonly IIngredientsRepository _ingredientsRepository;
     private readonly IMapper _mapper;
     private readonly ILogger<IngredientService> _logger;
 
     public IngredientService(
+        IUserService? userService,
         IIngredientsRepository? ingredientsRepository,
         IMapper? mapper,
         ILogger<IngredientService>? logger)
     {
+        _userService = ArgValidator.NotNull(userService);
         _ingredientsRepository = ArgValidator.NotNull(ingredientsRepository);
         _mapper = ArgValidator.NotNull(mapper);
         _logger = ArgValidator.NotNull(logger);
@@ -77,7 +82,13 @@ public class IngredientService : IIngredientService
 
         try
         {
-            Ingredient? ingredient = _ingredientsRepository.GetPublic(id, userId, metric);
+            var userResult = _userService.Get(userId);
+            if (userResult.Failed)
+            {
+                throw new Exception("User retrieval failed");
+            }
+
+            Ingredient? ingredient = _ingredientsRepository.GetPublic(id, userId, userResult.Data!.Country, metric);
 
             var result = _mapper.Map<ViewIngredient>(ingredient);
 
@@ -124,15 +135,21 @@ public class IngredientService : IIngredientService
         }
     }
 
-    public PublicIngredientSuggestions GetPublicSuggestions(ISpan metricsSpan)
+    public PublicIngredientSuggestions GetPublicSuggestions(int userId, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(IngredientService)}.{nameof(GetPublicSuggestions)}");
 
         try
         {
+            var userResult = _userService.Get(userId);
+            if (userResult.Failed)
+            {
+                throw new Exception("User retrieval failed");
+            }
+
             var result = new PublicIngredientSuggestions();
 
-            var ingredients = _ingredientsRepository.GetForSuggestions(1, metric);
+            var ingredients = _ingredientsRepository.GetPublicForSuggestions(userResult.Data!.Country, metric);
             var categories = _ingredientsRepository.GetIngredientCategories(metric);
 
             List<IngredientSuggestion> suggestions = ingredients.Select(x => _mapper.Map<IngredientSuggestion>(x)).ToList();

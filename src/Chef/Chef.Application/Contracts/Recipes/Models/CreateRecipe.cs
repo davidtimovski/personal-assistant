@@ -9,8 +9,8 @@ public class CreateRecipe
     public required string? Description { get; init; }
     public required List<UpdateRecipeIngredient> Ingredients { get; init; }
     public required string? Instructions { get; init; }
-    public required TimeSpan? PrepDuration { get; init; }
-    public required TimeSpan? CookDuration { get; init; }
+    public required TimeSpan PrepDuration { get; init; }
+    public required TimeSpan CookDuration { get; init; }
     public required byte Servings { get; init; }
     public required string? ImageUri { get; init; }
     public required string? VideoUrl { get; init; }
@@ -48,10 +48,10 @@ public class CreateRecipeValidator : AbstractValidator<CreateRecipe>
         RuleFor(dto => dto.Instructions).MaximumLength(5000).WithMessage("Recipes.ModifyRecipe.InstructionsMaxLength");
 
         RuleFor(dto => dto.PrepDuration)
-            .Must(prepDuration => !prepDuration.HasValue || prepDuration >= TimeSpan.FromMinutes(0) && prepDuration < TimeSpan.FromMinutes(120)).WithMessage("Recipes.ModifyRecipe.PrepDurationRange");
+            .Must(prepDuration => prepDuration >= TimeSpan.FromMinutes(0) && prepDuration < TimeSpan.FromHours(5)).WithMessage("Recipes.ModifyRecipe.PrepDurationRange");
 
         RuleFor(dto => dto.CookDuration)
-            .Must(cookDuration => !cookDuration.HasValue || cookDuration >= TimeSpan.FromMinutes(0) && cookDuration < TimeSpan.FromMinutes(120)).WithMessage("Recipes.ModifyRecipe.CookDurationRange");
+            .Must(cookDuration => cookDuration >= TimeSpan.FromMinutes(0) && cookDuration < TimeSpan.FromHours(5)).WithMessage("Recipes.ModifyRecipe.CookDurationRange");
 
         RuleFor(dto => (int)dto.Servings)
             .InclusiveBetween(1, 50).WithMessage("Recipes.ModifyRecipe.ServingsMustBeBetween");

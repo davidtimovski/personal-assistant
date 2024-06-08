@@ -3,6 +3,7 @@ CREATE TABLE chef.ingredients
     id serial NOT NULL,
     parent_id integer,
     user_id integer NOT NULL,
+	country character varying(2) COLLATE pg_catalog."default",
     category_id integer,
     brand_id integer,
     name character varying(50) COLLATE pg_catalog."default" NOT NULL,

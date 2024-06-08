@@ -1,5 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace Core.Api.Models.Tooltips.Requests;
 
-namespace Core.Api.Models.Tooltips.Requests;
-
-public record TooltipToggleDismissedRequest([Required] string Key, [Required] string Application, [Required] bool IsDismissed);
+public record TooltipToggleDismissedRequest(string Key, string Application, bool IsDismissed);

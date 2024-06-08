@@ -1,5 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace ToDoAssistant.Api.Models.Tasks.Requests;
 
-namespace ToDoAssistant.Api.Models.Tasks.Requests;
-
-public record UpdateTaskRequest([Required] int Id, [Required] int ListId, [Required] string Name, [Required] string? Url, [Required] bool IsOneTime, [Required] bool IsHighPriority, [Required] bool? IsPrivate, [Required] int? AssignedToUserId);
+public record UpdateTaskRequest(int Id, int ListId, string Name, string? Url, bool IsOneTime, bool IsHighPriority, bool? IsPrivate, int? AssignedToUserId);

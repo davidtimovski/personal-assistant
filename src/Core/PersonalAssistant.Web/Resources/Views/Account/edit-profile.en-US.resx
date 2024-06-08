@@ -123,6 +123,9 @@
   <data name="Change" xml:space="preserve">
     <value>Change</value>
   </data>
+  <data name="Country" xml:space="preserve">
+    <value>Country</value>
+  </data>
   <data name="Culture" xml:space="preserve">
     <value>Culture</value>
   </data>
@@ -149,6 +152,9 @@
   </data>
   <data name="SaveProfile" xml:space="preserve">
     <value>Save profile</value>
+  </data>
+  <data name="SelectCountry" xml:space="preserve">
+    <value>Select country</value>
   </data>
   <data name="Uploading" xml:space="preserve">
     <value>Uploading..</value>

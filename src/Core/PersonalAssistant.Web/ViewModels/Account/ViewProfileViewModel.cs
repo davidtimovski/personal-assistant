@@ -4,9 +4,10 @@ namespace PersonalAssistant.Web.ViewModels.Account;
 
 public class ViewProfileViewModel
 {
-    public ViewProfileViewModel(string name, string language, string culture, string imageUri, string defaultImageUri, string baseUrl)
+    public ViewProfileViewModel(string name, string? country, string language, string culture, string imageUri, string defaultImageUri, string baseUrl)
     {
         Name = name;
+        Country = country;
         Language = language;
         Culture = culture;
         ImageUri = imageUri;
@@ -19,11 +20,12 @@ public class ViewProfileViewModel
             .Select(x => new CultureOption(x.Name, x.EnglishName)).ToList();
     }
 
-    public string Name { get; set; }
-    public string Language { get; set; }
-    public string Culture { get; set; }
-    public string ImageUri { get; set; }
-    public string DefaultImageUri { get; set; }
-    public string BaseUrl { get; set; }
+    public string Name { get; }
+    public string? Country { get; }
+    public string Language { get; }
+    public string Culture { get; }
+    public string ImageUri { get; }
+    public string DefaultImageUri { get; }
+    public string BaseUrl { get; }
     public List<CultureOption> CultureOptions { get; }
 }

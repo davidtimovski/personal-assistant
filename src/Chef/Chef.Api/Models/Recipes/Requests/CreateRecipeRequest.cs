@@ -1,5 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace Chef.Api.Models.Recipes.Requests;
 
-namespace Chef.Api.Models.Recipes.Requests;
-
-public record CreateRecipeRequest([Required] string Name, [Required] string? Description, [Required] List<UpdateRecipeIngredient> Ingredients, [Required] string? Instructions, [Required] TimeSpan? PrepDuration, [Required] TimeSpan? CookDuration, [Required] byte Servings, [Required] string? ImageUri, [Required] string? VideoUrl);
+public record CreateRecipeRequest(string Name, string? Description, List<UpdateRecipeIngredient> Ingredients, string? Instructions, TimeSpan PrepDuration, TimeSpan CookDuration, byte Servings, string? ImageUri, string? VideoUrl);

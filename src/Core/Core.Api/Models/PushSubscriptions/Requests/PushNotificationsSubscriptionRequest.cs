@@ -1,5 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace Core.Api.Models.PushNotifications.Requests;
 
-namespace Core.Api.Models.PushNotifications.Requests;
-
-public record PushNotificationsSubscriptionRequest([Required] string Application, [Required] Subscription Subscription);
+public record PushNotificationsSubscriptionRequest(string Application, Subscription Subscription);
