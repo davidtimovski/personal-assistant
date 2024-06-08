@@ -120,6 +120,9 @@
   <data name="CultureIsRequired" xml:space="preserve">
     <value>Културата е задолжителна</value>
   </data>
+  <data name="InvalidCountry" xml:space="preserve">
+    <value>Избраната земја не е валидна</value>
+  </data>
   <data name="InvalidCulture" xml:space="preserve">
     <value>Избраната култура не е валидна</value>
   </data>

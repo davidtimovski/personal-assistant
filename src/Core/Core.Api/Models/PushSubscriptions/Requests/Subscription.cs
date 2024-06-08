@@ -1,5 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace Core.Api.Models.PushNotifications.Requests;
 
-namespace Core.Api.Models.PushNotifications.Requests;
-
-public record Subscription([Required] string Endpoint, [Required] Dictionary<string, string> Keys);
+public record Subscription(string Endpoint, Dictionary<string, string> Keys);

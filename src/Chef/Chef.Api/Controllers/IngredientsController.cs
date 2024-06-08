@@ -8,7 +8,6 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using Sentry;
 
 namespace Chef.Api.Controllers;
 
@@ -158,7 +157,6 @@ public class IngredientsController : BaseController
         }
     }
 
-    [ResponseCache(Duration = 60 * 60 * 24)]
     [HttpGet("public-suggestions")]
     public IActionResult GetPublicSuggestions()
     {
@@ -170,7 +168,7 @@ public class IngredientsController : BaseController
 
         try
         {
-            var suggestionsDto = _ingredientService.GetPublicSuggestions(tr);
+            var suggestionsDto = _ingredientService.GetPublicSuggestions(UserId, tr);
 
             suggestionsDto.Uncategorized.ForEach(TranslateSuggestion);
 

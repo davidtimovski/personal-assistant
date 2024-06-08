@@ -1,5 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace ToDoAssistant.Api.Models.Lists.Requests;
 
-namespace ToDoAssistant.Api.Models.Lists.Requests;
-
-public record CopyListRequest([Required] int Id, [Required] string Name, [Required] string Icon);
+public record CopyListRequest(int Id, string Name, string Icon);

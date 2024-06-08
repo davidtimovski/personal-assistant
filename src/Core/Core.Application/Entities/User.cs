@@ -5,6 +5,7 @@ public class User
     public int Id { get; set; }
     public string Email { get; set; } = null!;
     public string Name { get; set; } = null!;
+    public string? Country { get; set; }
     public string Language { get; set; } = null!;
     public string Culture { get; set; } = null!;
     public bool ToDoNotificationsEnabled { get; set; }

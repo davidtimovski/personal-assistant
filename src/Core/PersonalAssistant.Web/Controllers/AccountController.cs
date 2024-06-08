@@ -133,7 +133,7 @@ public class AccountController : BaseController
 
             var authId = await Auth0Proxy.RegisterUserAsync(httpClient, model.Email, model.Password, model.Name, tr, cancellationToken);
 
-            var createResult = await _userService.CreateAsync(authId, model.Email, model.Name, model.Language, model.Culture, _cdnService.DefaultProfileImageUri.ToString(), tr, cancellationToken);
+            var createResult = await _userService.CreateAsync(authId, model.Email, model.Name, model.Country, model.Language, model.Culture, _cdnService.DefaultProfileImageUri.ToString(), tr, cancellationToken);
             if (createResult.Failed)
             {
                 throw new Exception("User creation failed");
@@ -385,6 +385,7 @@ public class AccountController : BaseController
 
             var viewModel = new ViewProfileViewModel(
                 authUser.name,
+                userResult.Data!.Country,
                 userResult.Data!.Language,
                 userResult.Data.Culture,
                 userResult.Data.ImageUri,
@@ -424,6 +425,7 @@ public class AccountController : BaseController
                 return View(new ViewProfileViewModel
                 (
                     model.Name,
+                    model.Country,
                     model.Language,
                     model.Culture,
                     model.ImageUri,
@@ -437,7 +439,7 @@ public class AccountController : BaseController
             await Auth0Proxy.UpdateNameAsync(httpClient, AuthId, model.Name, tr, cancellationToken);
 
             var imageUri = string.IsNullOrEmpty(model.ImageUri) ? _cdnService.DefaultProfileImageUri.ToString() : model.ImageUri;
-            await _userService.UpdateProfileAsync(UserId, model.Name, model.Language, model.Culture, imageUri, tr, cancellationToken);
+            await _userService.UpdateProfileAsync(UserId, model.Name, model.Country, model.Language, model.Culture, imageUri, tr, cancellationToken);
 
             var userResult = _userService.Get(UserId);
             if (userResult.Failed)
@@ -488,6 +490,7 @@ public class AccountController : BaseController
             return View(new ViewProfileViewModel
             (
                 model.Name,
+                model.Country,
                 model.Language,
                 model.Culture,
                 model.ImageUri,

@@ -10,7 +10,7 @@ public interface IIngredientService
     EditIngredient? GetForUpdate(int id, int userId, ISpan metricsSpan);
     ViewIngredient? GetPublic(int id, int userId, ISpan metricsSpan);
     IReadOnlyList<IngredientSuggestion> GetUserSuggestions(int userId, ISpan metricsSpan);
-    PublicIngredientSuggestions GetPublicSuggestions(ISpan metricsSpan);
+    PublicIngredientSuggestions GetPublicSuggestions(int userId, ISpan metricsSpan);
     IReadOnlyList<TaskSuggestion> GetTaskSuggestions(int userId, ISpan metricsSpan);
     bool Exists(int id, int userId);
     bool Exists(int id, string name, int userId);

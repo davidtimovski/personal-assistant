@@ -98,7 +98,7 @@ public class UserService : IUserService
         }
     }
 
-    public async Task<Result<int>> CreateAsync(string auth0Id, string email, string name, string language, string culture, string imageUri, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<Result<int>> CreateAsync(string auth0Id, string email, string name, string? country, string language, string culture, string imageUri, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(UserService)}.{nameof(CreateAsync)}");
 
@@ -108,8 +108,9 @@ public class UserService : IUserService
             {
                 Email = email.Trim(),
                 Name = name.Trim(),
+                Country = country,
                 Language = language,
-                Culture = culture.Trim(),
+                Culture = culture,
                 ToDoNotificationsEnabled = false,
                 ChefNotificationsEnabled = false,
                 ImperialSystem = false,
@@ -132,7 +133,7 @@ public class UserService : IUserService
         }
     }
 
-    public async Task<Result> UpdateProfileAsync(int id, string name, string language, string culture, string imageUri, ISpan metricsSpan, CancellationToken cancellationToken)
+    public async Task<Result> UpdateProfileAsync(int id, string name, string? country, string language, string culture, string imageUri, ISpan metricsSpan, CancellationToken cancellationToken)
     {
         var metric = metricsSpan.StartChild($"{nameof(UserService)}.{nameof(UpdateProfileAsync)}");
 
@@ -140,6 +141,7 @@ public class UserService : IUserService
         {
             var user = _usersRepository.Get(id);
             user.Name = name;
+            user.Country = country;
             user.Language = language;
             user.Culture = culture;
             user.ImageUri = imageUri;

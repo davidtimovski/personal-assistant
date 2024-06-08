@@ -8,8 +8,8 @@ internal class RecipeBuilder
     private string? description;
     private List<UpdateRecipeIngredient> recipeIngredients = new();
     private string? instructions;
-    private TimeSpan? prepDuration;
-    private TimeSpan? cookDuration;
+    private TimeSpan prepDuration;
+    private TimeSpan cookDuration;
 
     internal RecipeBuilder()
     {
@@ -66,13 +66,13 @@ internal class RecipeBuilder
         return this;
     }
 
-    internal RecipeBuilder WithPrepDuration(TimeSpan? newPrepDuration)
+    internal RecipeBuilder WithPrepDuration(TimeSpan newPrepDuration)
     {
         prepDuration = newPrepDuration;
         return this;
     }
 
-    internal RecipeBuilder WithCookDuration(TimeSpan? newCookDuration)
+    internal RecipeBuilder WithCookDuration(TimeSpan newCookDuration)
     {
         cookDuration = newCookDuration;
         return this;

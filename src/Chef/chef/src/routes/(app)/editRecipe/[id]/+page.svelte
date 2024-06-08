@@ -257,8 +257,8 @@
 							description,
 							parseIngredientsAmount(ingredients),
 							instructions,
-							prepDuration.length > 0 ? prepDuration : null,
-							cookDuration.length > 0 ? cookDuration : null,
+							prepDuration.length > 0 ? `0.${prepDuration}:00` : '0.00:00:00',
+							cookDuration.length > 0 ? `0.${cookDuration}:00` : '0.00:00:00',
 							servings,
 							imageUri,
 							videoUrl
@@ -283,8 +283,8 @@
 							description,
 							parseIngredientsAmount(ingredients),
 							instructions,
-							prepDuration.length > 0 ? prepDuration : null,
-							cookDuration.length > 0 ? cookDuration : null,
+							prepDuration.length > 0 ? `0.${prepDuration}:00` : '00:00',
+							cookDuration.length > 0 ? `0.${cookDuration}:00` : '00:00',
 							servings,
 							imageUri,
 							videoUrl

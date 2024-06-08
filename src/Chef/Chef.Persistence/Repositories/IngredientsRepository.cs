@@ -117,7 +117,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
         }
     }
 
-    public Ingredient? GetPublic(int id, int userId, ISpan metricsSpan)
+    public Ingredient? GetPublic(int id, int userId, string? country, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(IngredientsRepository)}.{nameof(GetPublic)}");
 
@@ -129,13 +129,13 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
                                FROM chef.ingredients AS i
                                LEFT JOIN chef.ingredient_brands AS b ON i.brand_id = b.id
                                LEFT JOIN chef.ingredients_tasks AS it ON i.id = it.ingredient_id AND it.user_id = @UserId
-                               WHERE i.id = @Id AND i.user_id = 1";
+                               WHERE i.id = @Id AND i.user_id = 1 AND (i.country IS NULL OR i.country = @Country)";
 
             var ingredient = conn.Query<Ingredient, IngredientBrand, Ingredient>(query, (ingredient, brand) =>
             {
                 ingredient.Brand = brand;
                 return ingredient;
-            }, new { Id = id, UserId = userId }).FirstOrDefault();
+            }, new { Id = id, UserId = userId, Country = country }).FirstOrDefault();
 
             if (ingredient is null)
             {
@@ -185,6 +185,24 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
         {
             return EFContext.Ingredients.AsNoTracking()
                 .Where(x => x.UserId == userId)
+                .Include(x => x.Brand)
+                .Include(x => x.RecipesIngredients.Where(x => x.Unit != null))
+                .ToList();
+        }
+        finally
+        {
+            metric.Finish();
+        }
+    }
+
+    public IReadOnlyList<Ingredient> GetPublicForSuggestions(string? country, ISpan metricsSpan)
+    {
+        var metric = metricsSpan.StartChild($"{nameof(IngredientsRepository)}.{nameof(GetForSuggestions)}");
+
+        try
+        {
+            return EFContext.Ingredients.AsNoTracking()
+                .Where(x => x.UserId == 1 && (x.Country == null || x.Country == country))
                 .Include(x => x.Brand)
                 .Include(x => x.RecipesIngredients.Where(x => x.Unit != null))
                 .ToList();

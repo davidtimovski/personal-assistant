@@ -4,6 +4,7 @@ using Chef.Application.Contracts.Ingredients.Models;
 using Chef.Application.Entities;
 using Chef.Application.Mappings;
 using Chef.Application.Services;
+using Core.Application.Contracts;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -26,6 +27,7 @@ public class UpdateTests
         _metricsSpanMock.Setup(x => x.StartChild(It.IsAny<string>())).Returns(new Mock<ISpan>().Object);
 
         _sut = new IngredientService(
+            new Mock<IUserService>().Object,
             _ingredientsRepositoryMock.Object,
             MapperMocker.GetMapper<ChefProfile>(),
             new Mock<ILogger<IngredientService>>().Object);

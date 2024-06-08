@@ -1,5 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace ToDoAssistant.Api.Models.Lists.Requests;
 
-namespace ToDoAssistant.Api.Models.Lists.Requests;
-
-public record SetIsArchivedRequest([Required] int ListId, [Required] bool IsArchived);
+public record SetIsArchivedRequest(int ListId, bool IsArchived);

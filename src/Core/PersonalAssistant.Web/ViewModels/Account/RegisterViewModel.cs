@@ -15,18 +15,20 @@ public class RegisterViewModel
             .Select(x => new CultureOption(x.Name, x.EnglishName)).ToList();
     }
 
-    public string Name { get; set; } = "";
-    public string Email { get; set; } = "";
-    public string Password { get; set; } = "";
-    public string ConfirmPassword { get; set; } = "";
-    public string Language { get; set; } = "";
-    public string Culture { get; set; } = "";
-    public float GoogleReCaptchaScore { get; set; }
+    public string Name { get; init; } = "";
+    public string Email { get; init; } = "";
+    public string Password { get; init; } = "";
+    public string ConfirmPassword { get; init; } = "";
+    public string? Country { get; init; }
+    public string Language { get; init; } = "";
+    public string Culture { get; init; } = "";
+    public float GoogleReCaptchaScore { get; init; }
     public List<CultureOption> CultureOptions { get; }
 }
 
 public class RegisterViewModelValidator : AbstractValidator<RegisterViewModel>
 {
+    private static readonly HashSet<string> Countries = new HashSet<string> { "CZ", "MK" };
     private static readonly HashSet<string> Languages = new HashSet<string> { "en-US", "mk-MK" };
 
     public RegisterViewModelValidator(IStringLocalizer<RegisterViewModelValidator> localizer, IUsersRepository usersRepository)
@@ -43,6 +45,8 @@ public class RegisterViewModelValidator : AbstractValidator<RegisterViewModel>
         RuleFor(dto => dto.Password).NotEmpty().WithMessage(localizer["PasswordIsRequired"]);
 
         RuleFor(dto => dto.ConfirmPassword).Must((vm, confirmPassword) => vm.Password == confirmPassword).WithMessage(localizer["PasswordsMustMatch"]);
+
+        RuleFor(dto => dto.Country).Must(country => country is null || Countries.Contains(country)).WithMessage(localizer["InvalidCountry"]);
 
         RuleFor(dto => dto.Language).NotEmpty().WithMessage(localizer["LanguageIsRequired"])
             .Must(language => Languages.Contains(language)).WithMessage(localizer["InvalidLanguage"]);

@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Text.Json.Serialization;
 
 namespace Chef.Api.Models.Recipes.Requests;
 
-public record UpdateRecipeRequest([Required] int Id, [Required] string Name, [Required] string? Description, [Required] List<UpdateRecipeIngredient> Ingredients, [Required] string? Instructions, [Required] TimeSpan? PrepDuration, [Required] TimeSpan? CookDuration, [Required] byte Servings, [Required] string? ImageUri, [Required] string? VideoUrl);
+public record UpdateRecipeRequest(int Id, string Name, string? Description, List<UpdateRecipeIngredient> Ingredients, string? Instructions, TimeSpan PrepDuration, TimeSpan CookDuration, byte Servings, string? ImageUri, string? VideoUrl);
 
-public record UpdateRecipeIngredient([Required] int? Id, [Required] string Name, [Required] float? Amount, [Required] string? Unit);
+public record UpdateRecipeIngredient(int? Id, string Name, float? Amount, string? Unit);

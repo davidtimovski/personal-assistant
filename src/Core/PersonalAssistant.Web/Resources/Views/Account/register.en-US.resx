@@ -123,6 +123,9 @@
   <data name="ConfirmPassword" xml:space="preserve">
     <value>Confirm password</value>
   </data>
+  <data name="Country" xml:space="preserve">
+    <value>Country</value>
+  </data>
   <data name="CreateANewAccount" xml:space="preserve">
     <value>Create a new account</value>
   </data>
@@ -137,6 +140,9 @@
   </data>
   <data name="Register" xml:space="preserve">
     <value>Register</value>
+  </data>
+  <data name="SelectCountry" xml:space="preserve">
+    <value>Select country</value>
   </data>
   <data name="SelectCulture" xml:space="preserve">
     <value>Select culture</value>

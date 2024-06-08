@@ -1,5 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace ToDoAssistant.Api.Models.Tasks.Requests;
 
-namespace ToDoAssistant.Api.Models.Tasks.Requests;
-
-public record BulkCreateRequest([Required] int ListId, [Required] string TasksText, [Required] bool TasksAreOneTime, [Required] bool TasksArePrivate);
+public record BulkCreateRequest(int ListId, string TasksText, bool TasksAreOneTime, bool TasksArePrivate);

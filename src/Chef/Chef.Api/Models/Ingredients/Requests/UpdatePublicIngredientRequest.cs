@@ -1,5 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace Chef.Api.Models.Ingredients.Requests;
 
-namespace Chef.Api.Models.Ingredients.Requests;
-
-public record UpdatePublicIngredientRequest([Required] int Id, [Required] int? TaskId);
+public record UpdatePublicIngredientRequest(int Id, int? TaskId);

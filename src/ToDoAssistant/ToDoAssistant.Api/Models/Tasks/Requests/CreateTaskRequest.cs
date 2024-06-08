@@ -1,5 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace ToDoAssistant.Api.Models.Tasks.Requests;
 
-namespace ToDoAssistant.Api.Models.Tasks.Requests;
-
-public record CreateTaskRequest([Required] int ListId, [Required] string Name, [Required] string? Url, [Required] bool IsOneTime, [Required] bool? IsPrivate);
+public record CreateTaskRequest(int ListId, string Name, string? Url, bool IsOneTime, bool? IsPrivate);
