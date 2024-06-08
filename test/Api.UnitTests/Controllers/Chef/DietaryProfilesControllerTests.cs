@@ -2,7 +2,6 @@
 using Chef.Api.Controllers;
 using Chef.Application.Contracts.DietaryProfiles;
 using Chef.Application.Contracts.DietaryProfiles.Models;
-using Chef.Application.Services;
 using Core.Application.Contracts;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;

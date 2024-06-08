@@ -10,7 +10,6 @@ using Core.Application.Contracts;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Sentry;
 using Xunit;
 
 namespace Application.UnitTests.ServiceTests.RecipeServiceTests;

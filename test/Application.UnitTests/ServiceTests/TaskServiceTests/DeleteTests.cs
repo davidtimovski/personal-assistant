@@ -1,7 +1,6 @@
 ﻿using Core.Application.Contracts;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Sentry;
 using ToDoAssistant.Application.Contracts.Lists;
 using ToDoAssistant.Application.Contracts.Tasks;
 using ToDoAssistant.Application.Entities;
