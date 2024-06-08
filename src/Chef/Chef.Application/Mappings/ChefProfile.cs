@@ -42,6 +42,7 @@ public class ChefProfile : Profile
 
         CreateMap<UpdateIngredient, Ingredient>()
             .ForMember(x => x.ParentId, src => src.Ignore())
+            .ForMember(x => x.Country, src => src.Ignore())
             .ForMember(x => x.CategoryId, src => src.Ignore())
             .ForMember(x => x.BrandId, src => src.Ignore())
             .ForMember(x => x.ServingSize, opt => opt.MapFrom(src => src.NutritionData.ServingSize))
