@@ -78,7 +78,7 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
                                    LEFT JOIN chef.shares AS s ON r.id = s.recipe_id
                                    WHERE r.id = @Id AND (r.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))";
 
-            var recipes = conn.Query<Recipe, User, DietaryProfile, Recipe>(recipeSql,
+            var recipes = conn.Query<Recipe, User, DietaryProfile?, Recipe>(recipeSql,
                 (dbRecipe, user, dietaryProfile) =>
                 {
                     user.DietaryProfile = dietaryProfile;
@@ -104,23 +104,30 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
 
             recipe.Shares = conn.Query<RecipeShare>("SELECT * FROM chef.shares WHERE recipe_id = @Id", new { Id = id }).ToList();
 
-            const string recipeIngredientsSql = @"SELECT ri.amount, ri.unit, i.*, it.task_id, t.id, t.is_completed
+            const string recipeIngredientsSql = @"SELECT ri.amount, ri.unit, i.*, pi.id, pi.name, it.task_id, t.id, t.is_completed
                                               FROM chef.recipes_ingredients AS ri
                                               INNER JOIN chef.ingredients AS i ON ri.ingredient_id = i.id
+                                              LEFT JOIN chef.ingredients AS pi ON i.parent_id = pi.id
                                               LEFT JOIN chef.ingredients_tasks AS it ON i.id = it.ingredient_id AND it.user_id = @UserId
                                               LEFT JOIN todo.tasks AS t ON it.task_id = t.id
                                               WHERE ri.recipe_id = @RecipeId";
 
-            var recipeIngredients = conn.Query<RecipeIngredient, Ingredient, ToDoTask, RecipeIngredient>(recipeIngredientsSql,
-                (recipeIngredient, ingredient, task) =>
+            var recipeIngredients = conn.Query<RecipeIngredient, Ingredient, Ingredient?, ToDoTask?, RecipeIngredient>(recipeIngredientsSql,
+                (recipeIngredient, ingredient, parentIngredient, task) =>
                 {
                     if (task is not null)
                     {
                         ingredient.Task = task;
                     }
+
+                    if (parentIngredient is not null)
+                    {
+                        ingredient.Parent = parentIngredient;
+                    }
+
                     recipeIngredient.Ingredient = ingredient;
                     return recipeIngredient;
-                }, new { RecipeId = id, UserId = userId }, null, true, "id,id");
+                }, new { RecipeId = id, UserId = userId }, null, true, "id,id,id");
 
             recipe.RecipeIngredients.AddRange(recipeIngredients);
 
@@ -183,8 +190,8 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
 
             const string query = @"SELECT DISTINCT r.*, u.id, u.email, u.image_uri
                                FROM chef.recipes AS r
-                               LEFT JOIN chef.shares AS s ON r.id = s.recipe_id
                                INNER JOIN users AS u ON r.user_id = u.id
+                               LEFT JOIN chef.shares AS s ON r.id = s.recipe_id
                                WHERE r.id = @Id AND (r.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted))";
 
             return conn.Query<Recipe, User, Recipe>(query,

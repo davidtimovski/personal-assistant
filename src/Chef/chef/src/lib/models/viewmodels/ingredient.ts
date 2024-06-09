@@ -3,6 +3,7 @@ export class Ingredient {
 		public id: number,
 		public recipeId: number,
 		public name: string,
+		public parentName: string | null,
 		public amount: number,
 		public amountPerServing: number,
 		public unit: string,

@@ -217,7 +217,7 @@
 									{#each model.ingredients as ingredient}
 										<tr class:missing={ingredient.missing}>
 											<td class="recipe-ingredient-name">
-												{ingredient.name}
+												{ingredient.parentName ? `${ingredient.parentName} (${ingredient.name})` : ingredient.name}
 												<span class="icons-container">
 													{#if ingredient.hasNutritionData}
 														<i class="fas fa-clipboard" title={$t('hasNutrition')} aria-label={$t('hasNutrition')} />

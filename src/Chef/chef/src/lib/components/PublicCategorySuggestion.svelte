@@ -37,11 +37,4 @@
 	.category-body {
 		padding: 0 15px;
 	}
-
-	.subcategory-suggestion .category-name {
-		background: #eeffee;
-		padding: 0 30px;
-		margin: 0 -15px 0;
-		color: var(--primary-color-dark);
-	}
 </style>

@@ -26,7 +26,7 @@ public class ListsRepository : BaseRepository, IListsRepository
                                WHERE l.user_id = @UserId OR (s.user_id = @UserId AND s.is_accepted)
                                ORDER BY l.order";
 
-            return conn.Query<ToDoList, ListShare, ToDoList>(query,
+            return conn.Query<ToDoList, ListShare?, ToDoList>(query,
                 (list, share) =>
                 {
                     if (share is not null && share.IsAccepted != false)
@@ -77,7 +77,7 @@ public class ListsRepository : BaseRepository, IListsRepository
                                   WHERE t.list_id = ANY(@ListIds)
                                     AND (t.private_to_user_id IS NULL OR t.private_to_user_id = @UserId)";
 
-            var tasks = conn.Query<ToDoTask, User, ToDoTask>(tasksSql,
+            var tasks = conn.Query<ToDoTask, User?, ToDoTask>(tasksSql,
                 (task, user) =>
                 {
                     task.AssignedToUser = user;
@@ -108,11 +108,11 @@ public class ListsRepository : BaseRepository, IListsRepository
             using IDbConnection conn = OpenConnection();
 
             return conn.Query<User>(@"SELECT DISTINCT u.id, u.name, u.image_uri
-                                  FROM users AS u
-                                  LEFT JOIN todo.lists AS l ON u.id = l.user_id
-                                  LEFT JOIN todo.shares AS s ON u.id = s.user_id
-                                  WHERE l.id = @ListId OR (s.list_id = @ListId AND s.is_accepted IS NOT FALSE)
-                                  ORDER BY u.name", new { ListId = id }).ToList();
+                                      FROM users AS u
+                                      LEFT JOIN todo.lists AS l ON u.id = l.user_id
+                                      LEFT JOIN todo.shares AS s ON u.id = s.user_id
+                                      WHERE l.id = @ListId OR (s.list_id = @ListId AND s.is_accepted IS NOT FALSE)
+                                      ORDER BY u.name", new { ListId = id }).ToList();
         }
         finally
         {

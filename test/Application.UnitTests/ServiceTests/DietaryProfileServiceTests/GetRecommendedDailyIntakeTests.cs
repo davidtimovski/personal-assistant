@@ -9,7 +9,6 @@ using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using Sentry;
 using Xunit;
 
 namespace Application.UnitTests.ServiceTests.DietaryProfileServiceTests;

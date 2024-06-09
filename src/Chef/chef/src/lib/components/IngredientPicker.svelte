@@ -8,7 +8,7 @@
 	import { ingredientPickerState } from '$lib/stores';
 	import { IngredientsService } from '$lib/services/ingredientsService';
 	import { IngredientCategory, IngredientSuggestion, IngredientSuggestions } from '$lib/models/viewmodels/ingredientSuggestions';
-	import { IngredientPickEvent } from '$lib/models/ingredientPickerState';
+	import { IngredientPickEvent, IngredientPickerState } from '$lib/models/ingredientPickerState';
 
 	import PublicCategorySuggestion from '$lib/components/PublicCategorySuggestion.svelte';
 	import PublicIngredientSuggestion from '$lib/components/PublicIngredientSuggestion.svelte';
@@ -30,11 +30,7 @@
 		ingredientNameIsInvalid = ValidationUtil.isEmptyOrWhitespace(ingredientName);
 
 		if (!ingredientNameIsInvalid) {
-			ingredientPickerState.update((x) => {
-				x.event = IngredientPickEvent.Added;
-				x.data = ingredientName;
-				return x;
-			});
+			$ingredientPickerState = new IngredientPickerState(IngredientPickEvent.Added, ingredientName);
 
 			ingredientName = '';
 		}
@@ -61,6 +57,10 @@
 	}
 
 	function resetIngredientMatches() {
+		if (!suggestions) {
+			return;
+		}
+
 		suggestions.userIngredients.forEach((x) => matchIngredient(x, false));
 		suggestions.userIngredients = [...suggestions.userIngredients];
 
@@ -137,6 +137,10 @@
 	}
 
 	function findSuggestion(ingredientId: number) {
+		if (!suggestions) {
+			return null;
+		}
+
 		let foundSuggestion: IngredientSuggestion | null | undefined = suggestions.userIngredients.find((x) => x.id === ingredientId);
 		if (foundSuggestion) {
 			return foundSuggestion;
@@ -191,6 +195,10 @@
 
 				const ingredientId = <number>value.data;
 				const suggestion = findSuggestion(ingredientId);
+				if (!suggestion) {
+					return;
+				}
+
 				suggestion.selected = false;
 
 				suggestions.userIngredients = [...suggestions.userIngredients];
@@ -229,13 +237,19 @@
 			if (recipeIngredientIds) {
 				for (const id of recipeIngredientIds) {
 					const suggestion = findSuggestion(id);
-					suggestion.selected = true;
+					if (suggestion) {
+						suggestion.selected = true;
+					}
 				}
 			}
 		});
 	});
 
 	onDestroy(() => {
+		for (const unsubscribe of unsubscriptions) {
+			unsubscribe();
+		}
+
 		ingredientsService?.release();
 	});
 </script>
@@ -339,18 +353,6 @@
 				line-height: 37px;
 				color: #fff;
 			}
-		}
-	}
-
-	.category-suggestion {
-		.category-name {
-			background: #eeffee;
-			padding: 0 15px;
-			color: var(--primary-color-dark);
-		}
-
-		.category-body {
-			padding: 0 15px;
 		}
 	}
 </style>

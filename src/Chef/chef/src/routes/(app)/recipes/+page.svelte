@@ -127,6 +127,9 @@
 	});
 
 	onDestroy(() => {
+		for (const unsubscribe of unsubscriptions) {
+			unsubscribe();
+		}
 		resizeObserver?.disconnect();
 		usersService?.release();
 		recipesService?.release();

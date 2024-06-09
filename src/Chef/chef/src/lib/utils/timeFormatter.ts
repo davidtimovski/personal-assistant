@@ -11,4 +11,13 @@ export class TimeFormatter {
 
 		return hours + hoursLetter + ' ' + minutes + minutesLetter;
 	}
+
+	/** Accepts a null or string formatted as HH:mm and reformats it for the back-end: d.HH:mm:ss */
+	static formatTimeSpan(value: string | null) {
+		if (!value) {
+			return '0.00:00:00';
+		}
+
+		return `0.${value}:00`;
+	}
 }

@@ -7,7 +7,6 @@ using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Moq;
-using Sentry;
 using Xunit;
 
 namespace Api.UnitTests.Controllers.Chef;

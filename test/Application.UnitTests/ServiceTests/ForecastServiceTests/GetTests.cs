@@ -2,7 +2,6 @@
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Sentry;
 using Weatherman.Application.Contracts.Forecasts;
 using Weatherman.Infrastructure;
 using Xunit;

@@ -3,7 +3,6 @@ using Core.Application.Contracts;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Sentry;
 using ToDoAssistant.Application.Contracts.Lists;
 using ToDoAssistant.Application.Contracts.Tasks;
 using ToDoAssistant.Application.Contracts.Tasks.Models;

@@ -129,6 +129,9 @@
   <data name="almonds" xml:space="preserve">
     <value>Бадеми</value>
   </data>
+  <data name="almond_milk" xml:space="preserve">
+    <value>Бадемово млеко</value>
+  </data>
   <data name="apples" xml:space="preserve">
     <value>Јаболка</value>
   </data>
@@ -257,6 +260,9 @@
   </data>
   <data name="cherries" xml:space="preserve">
     <value>Цреши</value>
+  </data>
+  <data name="cherry_tomatoes" xml:space="preserve">
+    <value>Шери домати</value>
   </data>
   <data name="chia_seeds" xml:space="preserve">
     <value>Чиа семиња</value>
@@ -674,6 +680,9 @@
   </data>
   <data name="sardines" xml:space="preserve">
     <value>Сардини</value>
+  </data>
+  <data name="sauce" xml:space="preserve">
+    <value>Сос</value>
   </data>
   <data name="sausage" xml:space="preserve">
     <value>Колбас</value>

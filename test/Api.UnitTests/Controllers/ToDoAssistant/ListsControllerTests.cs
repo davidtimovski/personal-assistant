@@ -6,7 +6,6 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using Sentry;
 using ToDoAssistant.Api.Controllers;
 using ToDoAssistant.Api.Models;
 using ToDoAssistant.Application.Contracts.Lists;

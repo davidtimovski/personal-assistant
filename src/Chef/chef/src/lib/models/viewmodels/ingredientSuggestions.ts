@@ -4,6 +4,7 @@ export class IngredientSuggestion {
 		public taskId: number,
 		public brandName: string,
 		public name: string,
+		public parentName: string | null,
 		public unit: string,
 		public unitImperial: string,
 		public selected: boolean,
@@ -16,13 +17,24 @@ export class IngredientSuggestion {
 }
 
 export class IngredientCategory {
-	constructor(public name: string, public ingredients: IngredientSuggestion[], public subcategories: IngredientCategory[], public matched: boolean) {}
+	constructor(
+		public name: string,
+		public ingredients: IngredientSuggestion[],
+		public subcategories: IngredientCategory[],
+		public matched: boolean
+	) {}
 }
 
 export class PublicIngredientSuggestions {
-	constructor(public uncategorized: IngredientSuggestion[], public categories: IngredientCategory[]) {}
+	constructor(
+		public uncategorized: IngredientSuggestion[],
+		public categories: IngredientCategory[]
+	) {}
 }
 
 export class IngredientSuggestions {
-	constructor(public userIngredients: IngredientSuggestion[], public publicIngredients: PublicIngredientSuggestions) {}
+	constructor(
+		public userIngredients: IngredientSuggestion[],
+		public publicIngredients: PublicIngredientSuggestions
+	) {}
 }
