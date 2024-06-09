@@ -2,7 +2,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { ingredientPickerState } from '$lib/stores';
 	import type { IngredientSuggestion } from '$lib/models/viewmodels/ingredientSuggestions';
-	import { IngredientPickEvent } from '$lib/models/ingredientPickerState';
+	import { IngredientPickEvent, IngredientPickerState } from '$lib/models/ingredientPickerState';
 
 	import PublicIngredientSuggestion from '$lib/components/PublicIngredientSuggestion.svelte';
 
@@ -13,11 +13,7 @@
 			return;
 		}
 
-		ingredientPickerState.update((x) => {
-			x.event = IngredientPickEvent.Selected;
-			x.data = ingredient;
-			return x;
-		});
+		$ingredientPickerState = new IngredientPickerState(IngredientPickEvent.Selected, ingredient);
 
 		ingredient.selected = true;
 	}

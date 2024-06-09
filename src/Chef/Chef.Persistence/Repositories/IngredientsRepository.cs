@@ -131,7 +131,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
                                LEFT JOIN chef.ingredients_tasks AS it ON i.id = it.ingredient_id AND it.user_id = @UserId
                                WHERE i.id = @Id AND i.user_id = 1 AND (i.country IS NULL OR i.country = @Country)";
 
-            var ingredient = conn.Query<Ingredient, IngredientBrand, Ingredient>(query, (ingredient, brand) =>
+            var ingredient = conn.Query<Ingredient, IngredientBrand?, Ingredient>(query, (ingredient, brand) =>
             {
                 ingredient.Brand = brand;
                 return ingredient;
@@ -185,6 +185,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
         {
             return EFContext.Ingredients.AsNoTracking()
                 .Where(x => x.UserId == userId)
+                .Include(x => x.Parent)
                 .Include(x => x.Brand)
                 .Include(x => x.RecipesIngredients.Where(x => x.Unit != null))
                 .ToList();
@@ -203,6 +204,7 @@ public class IngredientsRepository : BaseRepository, IIngredientsRepository
         {
             return EFContext.Ingredients.AsNoTracking()
                 .Where(x => x.UserId == 1 && (x.Country == null || x.Country == country))
+                .Include(x => x.Parent)
                 .Include(x => x.Brand)
                 .Include(x => x.RecipesIngredients.Where(x => x.Unit != null))
                 .ToList();

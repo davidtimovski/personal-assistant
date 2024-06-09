@@ -27,7 +27,7 @@ public class CsvRepository : BaseRepository, ICsvRepository
                         LEFT JOIN accountant.categories AS pc ON c.parent_id = pc.id
                         WHERE fa.user_id = @UserId OR ta.user_id = @UserId ORDER BY date";
 
-            var transactions = conn.Query<TransactionForExport, AccountForExport, AccountForExport, CategoryForExport, CategoryForExport, TransactionForExport>(query,
+            var transactions = conn.Query<TransactionForExport, AccountForExport?, AccountForExport?, CategoryForExport, CategoryForExport, TransactionForExport>(query,
                 (transaction, fromAccount, toAccount, category, parentCategory) =>
                 {
                     transaction.FromAccount = fromAccount ?? new AccountForExport();

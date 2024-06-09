@@ -125,6 +125,11 @@ public class RecipesController : BaseController
             foreach (var ingredient in recipeDto.Ingredients.Where(x => x.IsPublic))
             {
                 ingredient.Name = _ingredientsLocalizer[ingredient.Name];
+                
+                if (ingredient.ParentName is not null)
+                {
+                    ingredient.ParentName = _ingredientsLocalizer[ingredient.ParentName];
+                }
             }
 
             return Ok(recipeDto);

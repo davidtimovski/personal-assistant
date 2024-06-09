@@ -357,6 +357,11 @@ public class IngredientsController : BaseController
 
     private void TranslateSuggestion(IngredientSuggestion suggestion)
     {
+        if (suggestion.ParentName is not null)
+        {
+            suggestion.ParentName = _localizer[suggestion.ParentName];
+        }
+
         if (suggestion.IsProduct)
         {
             return;

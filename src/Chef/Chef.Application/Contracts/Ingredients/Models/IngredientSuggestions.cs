@@ -12,6 +12,7 @@ public class IngredientSuggestion : IMapFrom<Ingredient>
     public int? CategoryId { get; set; }
     public string? BrandName { get; set; }
     public string Name { get; set; } = null!;
+    public string? ParentName { get; set; }
     public bool IsProduct { get; set; }
     public string? Unit { get; set; }
     public string? UnitImperial { get; set; }
@@ -25,6 +26,7 @@ public class IngredientSuggestion : IMapFrom<Ingredient>
     {
         profile.CreateMap<Ingredient, IngredientSuggestion>()
             .ForMember(x => x.BrandName, opt => opt.MapFrom(src => src.Brand != null ? src.Brand.Name : null))
+            .ForMember(x => x.ParentName, opt => opt.MapFrom(src => src.Parent == null ? null : src.Parent.Name))
             .ForMember(x => x.Unit, opt => opt.Ignore())
             .ForMember(x => x.UnitImperial, opt => opt.Ignore())
             .ForMember(x => x.Children, opt => opt.Ignore())

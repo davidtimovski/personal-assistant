@@ -129,6 +129,9 @@
   <data name="almonds" xml:space="preserve">
     <value>Almonds</value>
   </data>
+  <data name="almond_milk" xml:space="preserve">
+    <value>Almond milk</value>
+  </data>
   <data name="apples" xml:space="preserve">
     <value>Apples</value>
   </data>
@@ -257,6 +260,9 @@
   </data>
   <data name="cherries" xml:space="preserve">
     <value>Cherries</value>
+  </data>
+  <data name="cherry_tomatoes" xml:space="preserve">
+    <value>Cherry tomatoes</value>
   </data>
   <data name="chia_seeds" xml:space="preserve">
     <value>Chia seeds</value>
@@ -674,6 +680,9 @@
   </data>
   <data name="sardines" xml:space="preserve">
     <value>Sardines</value>
+  </data>
+  <data name="sauce" xml:space="preserve">
+    <value>Sauce</value>
   </data>
   <data name="sausage" xml:space="preserve">
     <value>Sausage</value>

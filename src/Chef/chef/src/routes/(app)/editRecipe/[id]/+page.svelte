@@ -22,7 +22,8 @@
 
 	import IngredientPicker from '$lib/components/IngredientPicker.svelte';
 	import ServingsSelectorSimple from '$lib/components/ServingsSelectorSimple.svelte';
-	import { IngredientPickEvent } from '$lib/models/ingredientPickerState';
+	import { IngredientPickEvent, IngredientPickerState } from '$lib/models/ingredientPickerState';
+	import { TimeFormatter } from '$lib/utils/timeFormatter';
 
 	export let data: PageData;
 
@@ -84,7 +85,7 @@
 				return;
 			}
 
-			ingredients = ingredients.concat(new EditRecipeIngredient(0, ingredientName, '', null, false, false, true));
+			ingredients = ingredients.concat(new EditRecipeIngredient(0, ingredientName, null, '', null, false, false, true));
 		})
 	);
 
@@ -98,7 +99,16 @@
 
 			const unit = imperialSystem ? ingredient.unitImperial : ingredient.unit;
 			ingredients = ingredients.concat(
-				new EditRecipeIngredient(ingredient.id, ingredient.name, '', unit, ingredient.hasNutritionData, ingredient.hasPriceData, false)
+				new EditRecipeIngredient(
+					ingredient.id,
+					ingredient.name,
+					ingredient.parentName,
+					'',
+					unit,
+					ingredient.hasNutritionData,
+					ingredient.hasPriceData,
+					false
+				)
 			);
 		})
 	);
@@ -190,11 +200,7 @@
 
 	function removeIngredient(ingredient: EditRecipeIngredient) {
 		if (!ingredient.isNew) {
-			ingredientPickerState.update((x) => {
-				x.event = IngredientPickEvent.Unselected;
-				x.data = ingredient.id;
-				return x;
-			});
+			$ingredientPickerState = new IngredientPickerState(IngredientPickEvent.Unselected, ingredient.id);
 		}
 
 		ingredients = ingredients.filter((x) => x !== ingredient);
@@ -257,8 +263,8 @@
 							description,
 							parseIngredientsAmount(ingredients),
 							instructions,
-							prepDuration.length > 0 ? `0.${prepDuration}:00` : '0.00:00:00',
-							cookDuration.length > 0 ? `0.${cookDuration}:00` : '0.00:00:00',
+							TimeFormatter.formatTimeSpan(prepDuration),
+							TimeFormatter.formatTimeSpan(cookDuration),
 							servings,
 							imageUri,
 							videoUrl
@@ -283,8 +289,8 @@
 							description,
 							parseIngredientsAmount(ingredients),
 							instructions,
-							prepDuration.length > 0 ? `0.${prepDuration}:00` : '00:00',
-							cookDuration.length > 0 ? `0.${cookDuration}:00` : '00:00',
+							TimeFormatter.formatTimeSpan(prepDuration),
+							TimeFormatter.formatTimeSpan(cookDuration),
 							servings,
 							imageUri,
 							videoUrl
@@ -546,7 +552,7 @@
 											<input type="text" bind:value={ingredient.name} maxlength="50" class="ingredient-name-input" />
 										{:else}
 											<div class="ingredient-name">
-												<span>{ingredient.name}</span>
+												<span>{ingredient.parentName ? `${ingredient.parentName} (${ingredient.name})` : ingredient.name}</span>
 												<span class="icons-container">
 													{#if ingredient.hasNutritionData}
 														<i class="fas fa-clipboard" title={$t('hasNutrition')} aria-label={$t('hasNutrition')} />
@@ -847,15 +853,6 @@
 		.new-ingredient {
 			&:nth-child(n + 2) {
 				margin-top: 15px;
-			}
-
-			.fa-list {
-				display: none;
-				position: absolute;
-				top: 10px;
-				right: 10px;
-				font-size: 27px;
-				color: var(--primary-color);
 			}
 
 			.ingredient-wrap {
