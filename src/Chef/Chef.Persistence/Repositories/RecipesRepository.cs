@@ -157,17 +157,24 @@ public class RecipesRepository : BaseRepository, IRecipesRepository
             {
                 recipe.Shares = conn.Query<RecipeShare>("SELECT * FROM chef.shares WHERE recipe_id = @Id", new { Id = id }).ToList();
 
-                const string recipeIngredientsSql = @"SELECT ri.amount, ri.unit, i.*
-                                                  FROM chef.recipes_ingredients AS ri
-                                                  INNER JOIN chef.ingredients AS i ON ri.ingredient_id = i.id
-                                                  WHERE ri.recipe_id = @RecipeId";
+                const string recipeIngredientsSql = @"SELECT ri.amount, ri.unit, i.*, pi.id, pi.name
+                                                      FROM chef.recipes_ingredients AS ri
+                                                      INNER JOIN chef.ingredients AS i ON ri.ingredient_id = i.id
+                                                      LEFT JOIN chef.ingredients AS pi ON i.parent_id = pi.id
+                                                      WHERE ri.recipe_id = @RecipeId";
 
-                var recipeIngredients = conn.Query<RecipeIngredient, Ingredient, RecipeIngredient>(recipeIngredientsSql,
-                    (recipeIngredient, ingredient) =>
+                var recipeIngredients = conn.Query<RecipeIngredient, Ingredient, Ingredient?, RecipeIngredient>(recipeIngredientsSql,
+                    (recipeIngredient, ingredient, parentIngredient) =>
                     {
                         recipeIngredient.Ingredient = ingredient;
+
+                        if (parentIngredient is not null)
+                        {
+                            recipeIngredient.Ingredient.Parent = parentIngredient;
+                        }
+
                         return recipeIngredient;
-                    }, new { RecipeId = id, UserId = userId }, null, true, "id");
+                    }, new { RecipeId = id, UserId = userId }, null, true, "id,id");
 
                 recipe.RecipeIngredients.AddRange(recipeIngredients);
             }

@@ -120,12 +120,16 @@ export class HttpProxy {
   }
 
   private setHeaders(init?: RequestInit): RequestInit {
-    const headers = {
+    const headers: HeadersInit = {
       Accept: "application/json",
       Authorization: `Bearer ${this.token}`,
-      "Content-Type": "application/json",
       "X-Requested-With": "Fetch",
     };
+
+    // Skip header for file uploads
+    if (!(init?.body instanceof FormData)) {
+      headers["Content-Type"] = "application/json";
+    }
 
     if (init) {
       init.headers = headers;

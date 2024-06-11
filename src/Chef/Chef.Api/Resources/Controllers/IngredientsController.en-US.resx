@@ -129,6 +129,9 @@
   <data name="almonds" xml:space="preserve">
     <value>Almonds</value>
   </data>
+  <data name="almond_flour" xml:space="preserve">
+    <value>Almond flour</value>
+  </data>
   <data name="almond_milk" xml:space="preserve">
     <value>Almond milk</value>
   </data>
@@ -230,6 +233,9 @@
   </data>
   <data name="caesar_sauce" xml:space="preserve">
     <value>Caesar sauce</value>
+  </data>
+  <data name="camembert" xml:space="preserve">
+    <value>Camembert</value>
   </data>
   <data name="canola_oil" xml:space="preserve">
     <value>Canola oil</value>
@@ -407,6 +413,9 @@
   </data>
   <data name="gnocchi" xml:space="preserve">
     <value>Gnocchi</value>
+  </data>
+  <data name="gouda" xml:space="preserve">
+    <value>Gouda</value>
   </data>
   <data name="grain" xml:space="preserve">
     <value>Grain</value>
