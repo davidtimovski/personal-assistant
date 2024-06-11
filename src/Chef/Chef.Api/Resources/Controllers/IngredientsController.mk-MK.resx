@@ -129,6 +129,9 @@
   <data name="almonds" xml:space="preserve">
     <value>Бадеми</value>
   </data>
+  <data name="almond_flour" xml:space="preserve">
+    <value>Бадемово брашно</value>
+  </data>
   <data name="almond_milk" xml:space="preserve">
     <value>Бадемово млеко</value>
   </data>
@@ -230,6 +233,9 @@
   </data>
   <data name="caesar_sauce" xml:space="preserve">
     <value>Цезар сос</value>
+  </data>
+  <data name="camembert" xml:space="preserve">
+    <value>Камемберт</value>
   </data>
   <data name="canola_oil" xml:space="preserve">
     <value>Масло од канола</value>
@@ -407,6 +413,9 @@
   </data>
   <data name="gnocchi" xml:space="preserve">
     <value>Њоки</value>
+  </data>
+  <data name="gouda" xml:space="preserve">
+    <value>Гауда</value>
   </data>
   <data name="grain" xml:space="preserve">
     <value>Житарици</value>

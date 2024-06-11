@@ -79,3 +79,9 @@
 <div class="ingredient-amount">
 	{amountLabel()}
 </div>
+
+<style lang="scss">
+	.ingredient-amount {
+		white-space: nowrap;
+	}
+</style>
