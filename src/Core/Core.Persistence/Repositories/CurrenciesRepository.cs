@@ -2,7 +2,6 @@
 using System.Text.Json;
 using Core.Application.Contracts;
 using Dapper;
-using Sentry;
 
 namespace Core.Persistence.Repositories;
 
@@ -66,6 +65,11 @@ public class CurrenciesRepository : BaseRepository, ICurrenciesRepository
         if (daysSearched == DaysSearchLimit)
         {
             var latestRates = conn.QueryFirstOrDefault<string>("SELECT rates FROM currency_rates ORDER BY date DESC LIMIT 1");
+            if (latestRates is null)
+            {
+                return null;
+            }
+
             return JsonSerializer.Deserialize<Dictionary<string, decimal>>(latestRates);
         }
 

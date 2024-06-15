@@ -3,7 +3,6 @@ using Chef.Application.Contracts.Recipes;
 using Chef.Application.Entities;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
-using Sentry;
 using User = Chef.Application.Entities.User;
 
 namespace Chef.Persistence.Repositories;

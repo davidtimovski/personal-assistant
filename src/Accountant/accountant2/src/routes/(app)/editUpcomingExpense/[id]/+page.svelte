@@ -40,7 +40,7 @@
 	let saveButtonIsLoading = false;
 	let deleteButtonIsLoading = false;
 
-	let localStorage: LocalStorageUtil;
+	const localStorage = new LocalStorageUtil();
 	let upcomingExpensesService: UpcomingExpensesService;
 	let categoriesService: CategoriesService;
 
@@ -148,7 +148,6 @@
 	onMount(() => {
 		deleteButtonText = $t('delete');
 
-		localStorage = new LocalStorageUtil();
 		upcomingExpensesService = new UpcomingExpensesService();
 		categoriesService = new CategoriesService();
 

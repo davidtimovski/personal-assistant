@@ -7,7 +7,7 @@
 	import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 	import Variables from '$lib/variables';
 
-	let localStorage: LocalStorageUtil;
+	const localStorage = new LocalStorageUtil();
 
 	const personalAssistantUrl = Variables.urls.account;
 	let reportsDrawerIsOpen = false;
@@ -25,8 +25,6 @@
 	}
 
 	onMount(async () => {
-		localStorage = new LocalStorageUtil();
-
 		caches.keys().then((cacheNames) => {
 			if (cacheNames.length > 0) {
 				version = cacheNames.sort().reverse()[0];
@@ -48,13 +46,13 @@
 
 	<div class="content-wrap">
 		<div class="horizontal-buttons-wrap">
-			<a href="/transactions" class="wide-button">{$t('menu.transactions')}</a>
-			<a href="/upcomingExpenses" class="wide-button">{$t('menu.upcomingExpenses')}</a>
-			<a href="/debt" class="wide-button">{$t('menu.debt')}</a>
-			<a href="/categories" class="wide-button">{$t('menu.categories')}</a>
-			<a href="/accounts" class="wide-button">{$t('menu.accounts')}</a>
-			<a href="/balanceAdjustment" class="wide-button">{$t('menu.balanceAdjustment')}</a>
-			<a href="/automaticTransactions" class="wide-button">{$t('menu.automaticTransactions')}</a>
+			<a data-sveltekit-preload-data="tap" href="/transactions" class="wide-button">{$t('menu.transactions')}</a>
+			<a data-sveltekit-preload-data="tap" href="/upcomingExpenses" class="wide-button">{$t('menu.upcomingExpenses')}</a>
+			<a data-sveltekit-preload-data="tap" href="/debt" class="wide-button">{$t('menu.debt')}</a>
+			<a data-sveltekit-preload-data="tap" href="/categories" class="wide-button">{$t('menu.categories')}</a>
+			<a data-sveltekit-preload-data="tap" href="/accounts" class="wide-button">{$t('menu.accounts')}</a>
+			<a data-sveltekit-preload-data="tap" href="/balanceAdjustment" class="wide-button">{$t('menu.balanceAdjustment')}</a>
+			<a data-sveltekit-preload-data="tap" href="/automaticTransactions" class="wide-button">{$t('menu.automaticTransactions')}</a>
 
 			<div class="drawer-button-wrap" class:open={reportsDrawerIsOpen}>
 				<button type="button" on:click={toggleReportsDrawer} class="wide-button drawer-button">
@@ -62,18 +60,18 @@
 				</button>
 				<div class="drawer-content-wrap">
 					<div class="drawer-content">
-						<a href="/pieChartReport" class="wide-button">{$t('menu.pieChart')}</a>
-						<a href="/barChartReport" class="wide-button">{$t('menu.barChart')}</a>
-						<a href="/expenditureHeatmap" class="wide-button">{$t('menu.expenditureHeatmap')}</a>
+						<a data-sveltekit-preload-data="tap" href="/pieChartReport" class="wide-button">{$t('menu.pieChart')}</a>
+						<a data-sveltekit-preload-data="tap" href="/barChartReport" class="wide-button">{$t('menu.barChart')}</a>
+						<a data-sveltekit-preload-data="tap" href="/expenditureHeatmap" class="wide-button">{$t('menu.expenditureHeatmap')}</a>
 					</div>
 				</div>
 			</div>
 
-			<a href="/earlyRetirementCalculator" class="wide-button">{$t('menu.earlyRetirementCalculator')}</a>
-			<a href="/export" class="wide-button">{$t('menu.export')}</a>
-			<a href="/totalSync" class="wide-button">{$t('menu.totalSync')}</a>
-			<a href="/preferences" class="wide-button">{$t('menu.preferences')}</a>
-			<a href="/help" class="wide-button">{$t('menu.help')}</a>
+			<a data-sveltekit-preload-data="tap" href="/earlyRetirementCalculator" class="wide-button">{$t('menu.earlyRetirementCalculator')}</a>
+			<a data-sveltekit-preload-data="tap" href="/export" class="wide-button">{$t('menu.export')}</a>
+			<a data-sveltekit-preload-data="tap" href="/totalSync" class="wide-button">{$t('menu.totalSync')}</a>
+			<a data-sveltekit-preload-data="tap" href="/preferences" class="wide-button">{$t('menu.preferences')}</a>
+			<a data-sveltekit-preload-data="tap" href="/help" class="wide-button">{$t('menu.help')}</a>
 		</div>
 
 		<hr />

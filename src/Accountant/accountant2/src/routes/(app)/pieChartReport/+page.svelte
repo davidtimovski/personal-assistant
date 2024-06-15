@@ -28,7 +28,7 @@
 	let canvasCtx: CanvasRenderingContext2D | null = null;
 	const colors = ['#7a79e6', '#dbd829', '#49e09b', '#e88042', '#5aacf1', '#f55551', '#b6ca53'];
 
-	let localStorage: LocalStorageUtil;
+	const localStorage = new LocalStorageUtil();
 	let transactionsService: TransactionsService;
 	let accountsService: AccountsService;
 
@@ -112,7 +112,6 @@
 	}
 
 	onMount(async () => {
-		localStorage = new LocalStorageUtil();
 		transactionsService = new TransactionsService();
 		accountsService = new AccountsService();
 

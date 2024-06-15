@@ -39,7 +39,7 @@
 	let saveButtonIsLoading = false;
 	let deleteButtonIsLoading = false;
 
-	let localStorage: LocalStorageUtil;
+	const localStorage = new LocalStorageUtil();
 	let automaticTransactionsService: AutomaticTransactionsService;
 	let categoriesService: CategoriesService;
 
@@ -156,7 +156,6 @@
 			dayInMonthOptions.push(new SelectOption(i, $t(`dayOrdinal${i}`)));
 		}
 
-		localStorage = new LocalStorageUtil();
 		automaticTransactionsService = new AutomaticTransactionsService();
 		categoriesService = new CategoriesService();
 

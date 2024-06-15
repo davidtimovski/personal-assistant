@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using Dapper;
-using Sentry;
 using ToDoAssistant.Application.Contracts.Lists;
 using ToDoAssistant.Application.Entities;
 using User = Core.Application.Entities.User;

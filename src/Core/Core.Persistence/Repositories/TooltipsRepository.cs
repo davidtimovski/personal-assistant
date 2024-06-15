@@ -2,7 +2,6 @@
 using Core.Application.Contracts;
 using Core.Application.Entities;
 using Dapper;
-using Sentry;
 
 namespace Core.Persistence.Repositories;
 
