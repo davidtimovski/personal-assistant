@@ -663,10 +663,6 @@
 		tr.missing td {
 			color: var(--danger-color);
 		}
-
-		.ingredient-amount {
-			white-space: nowrap;
-		}
 	}
 
 	.instructions-wrap {

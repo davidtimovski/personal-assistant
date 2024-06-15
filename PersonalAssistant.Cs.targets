@@ -8,6 +8,6 @@
 	
 	<ItemGroup>
 		<PackageReference Include="Roslynator.Analyzers" Version="4.12.4" />
-		<PackageReference Include="SonarAnalyzer.CSharp" Version="9.26.0.92422" />
+		<PackageReference Include="SonarAnalyzer.CSharp" Version="9.27.0.93347" />
 	</ItemGroup>
 </Project>

@@ -33,7 +33,7 @@
 	let categoryType = CategoryType.AllTransactions;
 	let type = TransactionType.Any;
 
-	let localStorage: LocalStorageUtil;
+	const localStorage = new LocalStorageUtil();
 	let transactionsService: TransactionsService;
 	let accountsService: AccountsService;
 	let categoriesService: CategoriesService;
@@ -220,7 +220,6 @@
 	}
 
 	onMount(async () => {
-		localStorage = new LocalStorageUtil();
 		transactionsService = new TransactionsService();
 		accountsService = new AccountsService();
 		categoriesService = new CategoriesService();

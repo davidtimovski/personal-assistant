@@ -60,7 +60,7 @@
 	const ageOfDeath = 85;
 	const inflation = 0.02;
 
-	let localStorage: LocalStorageUtil;
+	const localStorage = new LocalStorageUtil();
 	let accountsService: AccountsService;
 	let currenciesService: CurrenciesService;
 
@@ -369,7 +369,6 @@
 	}
 
 	onMount(async () => {
-		localStorage = new LocalStorageUtil();
 		accountsService = new AccountsService();
 		currenciesService = new CurrenciesService('Accountant');
 

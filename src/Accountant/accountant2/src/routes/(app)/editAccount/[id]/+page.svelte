@@ -41,7 +41,7 @@
 	let deleteButtonIsLoading = false;
 	let accountHasTransactionsHtml: string;
 
-	let localStorage: LocalStorageUtil;
+	const localStorage = new LocalStorageUtil();
 	let accountsService: AccountsService;
 
 	const alertUnsubscriber = alertState.subscribe((value) => {
@@ -138,7 +138,6 @@
 		accountHasTransactionsHtml = $t('editAccount.accountHasTransactions');
 		deleteButtonText = $t('delete');
 
-		localStorage = new LocalStorageUtil();
 		accountsService = new AccountsService();
 
 		if (isNew) {

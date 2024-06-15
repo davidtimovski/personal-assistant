@@ -37,7 +37,7 @@
 	let progressIntervalId: number | undefined;
 	let progressBarVisible = false;
 
-	let localStorage: LocalStorageUtil;
+	const localStorage = new LocalStorageUtil();
 	let usersService: UsersServiceBase;
 	let capitalService: CapitalService;
 	let accountsService: AccountsService;
@@ -145,7 +145,6 @@
 			dataLoaded = true;
 		}
 
-		localStorage = new LocalStorageUtil();
 		usersService = new UsersServiceBase('Accountant');
 		capitalService = new CapitalService();
 		accountsService = new AccountsService();
@@ -185,7 +184,13 @@
 <section class="container">
 	<div class="page-title-wrap-loader">
 		<div class="title-wrap">
-			<a href="/menu" class="profile-image-container" title={$t('dashboard.menu')} aria-label={$t('dashboard.menu')}>
+			<a
+				data-sveltekit-preload-data="tap"
+				href="/menu"
+				class="profile-image-container"
+				title={$t('dashboard.menu')}
+				aria-label={$t('dashboard.menu')}
+			>
 				<img src={$user.imageUri} class="profile-image" width="40" height="40" alt="" />
 			</a>
 
@@ -210,14 +215,14 @@
 
 	<div class="content-wrap">
 		<div class="capital-summary" class:with-balance={showBalance}>
-			<a href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
+			<a data-sveltekit-preload-data="tap" href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
 				<div class="summary-item">
 					<div class="summary-title">{$t('dashboard.available')}</div>
 					<div class="summary-value">{Formatter.moneyWithoutCurrency(data.available, currency, $user.language)}</div>
 				</div>
 			</a>
 
-			<a href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
+			<a data-sveltekit-preload-data="tap" href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
 				<div class="summary-item">
 					<div class="summary-title">{$t('dashboard.spent')}</div>
 					<div class="summary-value">{Formatter.moneyWithoutCurrency(data.spent, currency, $user.language)}</div>
@@ -225,7 +230,7 @@
 			</a>
 
 			{#if showBalance}
-				<a href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
+				<a data-sveltekit-preload-data="tap" href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
 					<div class="summary-item">
 						<div class="summary-title">{$t('balance')}</div>
 						<div class="summary-value">{Formatter.moneyWithoutCurrency(data.balance, currency, $user.language)}</div>
@@ -235,17 +240,17 @@
 		</div>
 
 		<div class="home-buttons">
-			<a href="newTransaction/1" class="home-button">
+			<a data-sveltekit-preload-data="tap" href="/newTransaction/1" class="home-button">
 				{$t('dashboard.newDeposit')}
 			</a>
-			<a href="newTransaction/0" class="home-button">
+			<a data-sveltekit-preload-data="tap" href="/newTransaction/0" class="home-button">
 				{$t('dashboard.newExpense')}
 			</a>
 		</div>
 
 		{#if data.expenditures && data.expenditures.length > 0}
 			<div>
-				<a href="/transactions" class="home-table-title">{$t('dashboard.expenditures')}</a>
+				<a data-sveltekit-preload-data="tap" href="/transactions" class="home-table-title">{$t('dashboard.expenditures')}</a>
 				<table class="amount-by-category-table">
 					<tbody>
 						{#each data.expenditures as expenditure}
@@ -268,7 +273,7 @@
 
 		{#if data.upcomingExpenses && data.upcomingExpenses.length > 0}
 			<div>
-				<a href="/upcomingExpenses" class="home-table-title">{$t('dashboard.upcomingExpenses')}</a>
+				<a data-sveltekit-preload-data="tap" href="/upcomingExpenses" class="home-table-title">{$t('dashboard.upcomingExpenses')}</a>
 				<table class="home-table">
 					<tbody>
 						{#each data.upcomingExpenses as upcomingExpense}
@@ -297,7 +302,7 @@
 
 		{#if data.debt && data.debt.length > 0}
 			<div>
-				<a href="/debt" class="home-table-title">{$t('dashboard.debt')}</a>
+				<a data-sveltekit-preload-data="tap" href="/debt" class="home-table-title">{$t('dashboard.debt')}</a>
 				<table class="home-table">
 					<tbody>
 						{#each data.debt as debtItem}

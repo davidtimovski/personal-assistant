@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using Dapper;
-using Sentry;
 using ToDoAssistant.Application.Contracts.Tasks;
 using ToDoAssistant.Application.Entities;
 

@@ -47,7 +47,7 @@
 	let passwordInput: HTMLInputElement | null = null;
 	let passwordShowIconLabel: string;
 
-	let localStorage: LocalStorageUtil;
+	const localStorage = new LocalStorageUtil();
 	let transactionsService: TransactionsService;
 	let categoriesService: CategoriesService;
 	let accountsService: AccountsService;
@@ -123,7 +123,6 @@
 			fromExpenditureHeatmap = fromExpenditureHeatmapParam === 'true';
 		}
 
-		localStorage = new LocalStorageUtil();
 		transactionsService = new TransactionsService();
 		categoriesService = new CategoriesService();
 		accountsService = new AccountsService();

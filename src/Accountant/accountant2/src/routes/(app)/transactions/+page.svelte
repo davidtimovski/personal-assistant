@@ -26,7 +26,7 @@
 	let categoryOptions: SelectOption[] | null = null;
 	let accountOptions: SelectOption[] | null = null;
 
-	let localStorage: LocalStorageUtil;
+	const localStorage = new LocalStorageUtil();
 	let transactionsService: TransactionsService;
 	let categoriesService: CategoriesService;
 	let accountsService: AccountsService;
@@ -203,7 +203,6 @@
 			editedId = parseInt(edited, 10);
 		}
 
-		localStorage = new LocalStorageUtil();
 		transactionsService = new TransactionsService();
 		categoriesService = new CategoriesService();
 		accountsService = new AccountsService();

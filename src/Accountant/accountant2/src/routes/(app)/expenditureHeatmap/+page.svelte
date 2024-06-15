@@ -86,7 +86,7 @@
 	let maxSpent = 0;
 	let minSpent = 10000000;
 
-	let localStorage: LocalStorageUtil;
+	const localStorage = new LocalStorageUtil();
 	let transactionsService: TransactionsService;
 	let accountsService: AccountsService;
 
@@ -125,7 +125,6 @@
 	$: selectedDayDate = selectedDay?.date;
 
 	onMount(async () => {
-		localStorage = new LocalStorageUtil();
 		transactionsService = new TransactionsService();
 		accountsService = new AccountsService();
 
@@ -345,7 +344,9 @@
 		&.loaded .date {
 			animation: unset;
 			background-size: initial;
-			transition: background var(--transition), border var(--transition);
+			transition:
+				background var(--transition),
+				border var(--transition);
 		}
 	}
 

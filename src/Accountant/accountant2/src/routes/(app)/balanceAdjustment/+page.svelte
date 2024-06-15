@@ -24,7 +24,7 @@
 	let adjustButtonIsLoading = false;
 	let balanceLoaded = false;
 
-	let localStorage: LocalStorageUtil;
+	const localStorage = new LocalStorageUtil();
 	let accountsService: AccountsService;
 	let transactionsService: TransactionsService;
 
@@ -84,7 +84,6 @@
 	}
 
 	onMount(async () => {
-		localStorage = new LocalStorageUtil();
 		accountsService = new AccountsService();
 		transactionsService = new TransactionsService();
 

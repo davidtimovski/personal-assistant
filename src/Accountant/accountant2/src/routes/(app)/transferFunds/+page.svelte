@@ -32,7 +32,7 @@
 	let transferButtonLabel = '';
 	let transferButtonIsLoading = false;
 
-	let localStorage: LocalStorageUtil;
+	const localStorage = new LocalStorageUtil();
 	let accountsService: AccountsService;
 	let transactionsService: TransactionsService;
 	let currenciesService: CurrenciesService;
@@ -203,7 +203,6 @@
 	}
 
 	onMount(async () => {
-		localStorage = new LocalStorageUtil();
 		accountsService = new AccountsService();
 		transactionsService = new TransactionsService();
 		currenciesService = new CurrenciesService('Accountant');

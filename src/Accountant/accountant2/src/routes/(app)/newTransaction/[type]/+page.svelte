@@ -53,7 +53,7 @@
 	let accountIsFund = false;
 	let selectedAccountOption: SelectOptionExtended<Account> | null = null;
 
-	let localStorage: LocalStorageUtil;
+	const localStorage = new LocalStorageUtil();
 	let transactionsService: TransactionsService;
 	let accountsService: AccountsService;
 	let categoriesService: CategoriesService;
@@ -277,7 +277,6 @@
 			debtId = parseInt(debtIdParam, 10);
 		}
 
-		localStorage = new LocalStorageUtil();
 		transactionsService = new TransactionsService();
 		accountsService = new AccountsService();
 		categoriesService = new CategoriesService();

@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using Core.Persistence;
 using Dapper;
-using Sentry;
 using Weatherman.Application.Contracts.Forecasts;
 using Weatherman.Application.Contracts.Forecasts.Models;
 using Weatherman.Application.Entities;

@@ -18,7 +18,7 @@
 	let currency: string;
 	let editedId: number | undefined;
 
-	let localStorage: LocalStorageUtil;
+	const localStorage = new LocalStorageUtil();
 	let upcomingExpensesService: UpcomingExpensesService;
 
 	function formatDate(dateString: string): string {
@@ -39,7 +39,6 @@
 			editedId = parseInt(edited, 10);
 		}
 
-		localStorage = new LocalStorageUtil();
 		upcomingExpensesService = new UpcomingExpensesService();
 
 		currency = localStorage.get(LocalStorageKeys.Currency);

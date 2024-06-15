@@ -36,7 +36,7 @@
 	let saveButtonIsLoading = false;
 	let deleteButtonIsLoading = false;
 
-	let localStorage: LocalStorageUtil;
+	const localStorage = new LocalStorageUtil();
 	let debtsService: DebtsService;
 
 	let amountTo = 8000000;
@@ -133,7 +133,6 @@
 	onMount(() => {
 		deleteButtonText = $t('delete');
 
-		localStorage = new LocalStorageUtil();
 		debtsService = new DebtsService();
 
 		mergeDebtPerPerson = localStorage.getBool('mergeDebtPerPerson');

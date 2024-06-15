@@ -2,7 +2,6 @@
 using Chef.Application.Contracts.DietaryProfiles;
 using Chef.Application.Entities;
 using Dapper;
-using Sentry;
 using User = Chef.Application.Entities.User;
 
 namespace Chef.Persistence.Repositories;

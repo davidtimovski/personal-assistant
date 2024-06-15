@@ -7,7 +7,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 
-	let localStorage: LocalStorageUtil;
+	const localStorage = new LocalStorageUtil();
 
 	let mergeDebtPerPerson: boolean;
 	let showBalanceOnHomePage: boolean;
@@ -31,8 +31,6 @@
 	}
 
 	onMount(() => {
-		localStorage = new LocalStorageUtil();
-
 		mergeDebtPerPerson = localStorage.getBool(LocalStorageKeys.MergeDebtPerPerson);
 		showBalanceOnHomePage = localStorage.getBool(LocalStorageKeys.ShowBalanceOnHomePage);
 		showUpcomingExpensesOnHomePage = localStorage.getBool(LocalStorageKeys.ShowUpcomingExpensesOnHomePage);

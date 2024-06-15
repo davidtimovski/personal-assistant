@@ -19,7 +19,7 @@
 	let editedId: number | undefined;
 	let editedId2: number | undefined;
 
-	let localStorage: LocalStorageUtil;
+	const localStorage = new LocalStorageUtil();
 	let accountsService: AccountsService;
 
 	function toggleViewStocks() {
@@ -37,7 +37,6 @@
 			editedId2 = parseInt(edited2, 10);
 		}
 
-		localStorage = new LocalStorageUtil();
 		accountsService = new AccountsService();
 
 		currency = localStorage.get(LocalStorageKeys.Currency);
