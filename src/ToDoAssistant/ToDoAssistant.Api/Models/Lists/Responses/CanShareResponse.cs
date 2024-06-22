@@ -2,7 +2,20 @@
 
 public class CanShareResponse
 {
-    public int UserId { get; set; }
-    public string ImageUri { get; set; } = null!;
-    public bool CanShare { get; set; }
+    public CanShareResponse(bool canShare)
+    {
+        CanShare = canShare;
+    }
+
+    public CanShareResponse(bool canShare, int userId, string imageUri)
+    {
+        CanShare = canShare;
+        UserId = userId;
+        ImageUri = imageUri;
+    }
+
+
+    public bool CanShare { get; }
+    public int UserId { get; }
+    public string? ImageUri { get; }
 }

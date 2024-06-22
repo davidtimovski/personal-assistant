@@ -109,6 +109,11 @@ export class ListsService {
 		return this.httpProxy.ajax<ListOption[]>(`${Variables.urls.api}/lists/options`);
 	}
 
+	async getNonArchivedAsOptions(): Promise<ListOption[]> {
+		const listOptions = await this.httpProxy.ajax<ListOption[]>(`${Variables.urls.api}/lists/options`);
+		return listOptions.filter((x) => !x.isArchived);
+	}
+
 	get(id: number): Promise<EditListModel> {
 		return this.httpProxy.ajax<EditListModel>(`${Variables.urls.api}/lists/${id}`);
 	}

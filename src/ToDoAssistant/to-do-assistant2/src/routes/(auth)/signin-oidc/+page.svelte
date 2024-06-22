@@ -1,8 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { AuthService } from '../../../../../../Core/shared2/services/authService';
+	import { LocalStorageKeys, LocalStorageUtil } from '$lib/utils/localStorageUtil';
 
 	let containerHeight = 768;
+
+	const localStorage = new LocalStorageUtil();
 
 	onMount(async () => {
 		if (window.innerHeight < containerHeight) {
@@ -18,9 +21,12 @@
 		const authService = new AuthService();
 		await authService.handleRedirectCallback();
 
+		const immediateListId = localStorage.getObject<number | null>(LocalStorageKeys.ImmediateList);
+		const location = immediateListId ? `/list/${immediateListId}` : '/lists';
+
 		// Use replaceState to redirect the user away and remove the querystring parameters
-		window.history.replaceState({}, document.title, '/lists');
-		window.location.href = '/lists';
+		window.history.replaceState({}, document.title, location);
+		window.location.href = location;
 	});
 </script>
 

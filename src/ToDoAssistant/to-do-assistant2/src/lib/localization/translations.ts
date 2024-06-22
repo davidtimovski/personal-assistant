@@ -174,6 +174,8 @@ export default {
 			notificationsWereEnabled: 'Notifications were successfully enabled.',
 			notificationsUnpermitted: 'Notifications are currently unpermitted. Please permit Notifications for To Do Assistant in your browser first.',
 			sounds: 'Sounds',
+			immediateList: 'Immediate list',
+			none: 'None',
 			derivedLists: 'Derived lists',
 			highPriority: 'High Priority',
 			staleTasks: 'Stale Tasks'
@@ -387,6 +389,8 @@ export default {
 			notificationsWereEnabled: 'Известувањата беа успешно вклучени.',
 			notificationsUnpermitted: 'Известувањата моментално се забранети. Дадете дозвола за известувања на To Do Assistant во вашиот пребарувач прво.',
 			sounds: 'Звуци',
+			immediateList: 'Почетна листа',
+			none: 'Ниедна',
 			derivedLists: 'Изведени листи',
 			highPriority: 'Висок Приоритет',
 			staleTasks: 'Застарени Задачи'

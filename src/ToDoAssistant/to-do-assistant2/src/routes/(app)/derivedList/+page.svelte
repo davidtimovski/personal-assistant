@@ -28,7 +28,7 @@
 	const derivedListNameLookup = new Map<string, string>();
 	const unsubscriptions: Unsubscriber[] = [];
 
-	let localStorage: LocalStorageUtil;
+	const localStorage = new LocalStorageUtil();
 	let tasksService: TasksService;
 	let soundPlayer: SoundPlayer;
 
@@ -114,7 +114,6 @@
 
 		type = <string>$page.url.searchParams.get('type');
 
-		localStorage = new LocalStorageUtil();
 		tasksService = new TasksService();
 		soundPlayer = new SoundPlayer();
 
