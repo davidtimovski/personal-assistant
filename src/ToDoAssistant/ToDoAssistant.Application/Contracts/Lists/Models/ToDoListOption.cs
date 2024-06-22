@@ -8,6 +8,7 @@ public class ToDoListOption : IMapFrom<ToDoList>
 {
     public int Id { get; set; }
     public string Name { get; set; } = null!;
+    public bool IsArchived { get; set; }
     public bool IsShared { get; set; }
 
     public void Mapping(Profile profile)

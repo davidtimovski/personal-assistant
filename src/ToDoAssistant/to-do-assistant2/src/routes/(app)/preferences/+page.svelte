@@ -10,6 +10,7 @@
 	import { NotificationsService } from '$lib/services/notificationsService';
 	import { ListsService } from '$lib/services/listsService';
 	import { SoundPlayer } from '$lib/utils/soundPlayer';
+	import type { ListOption } from '$lib/models/viewmodels/listOption';
 
 	const notificationsVapidKey = 'BCL8HRDvXuYjw011VypF_TtfmklYFmqXAADY7pV3WB9vL609d8wNK0zTUs4hB0V3uAnCTpzOd2pANBmsMQoUhD0';
 	let notificationsState: string;
@@ -19,8 +20,10 @@
 	let soundsEnabled: boolean;
 	let highPriorityListEnabled: boolean;
 	let staleTasksListEnabled: boolean;
+	let immediateListId: number | null;
+	let listOptions: ListOption[] | null = null;
 
-	let localStorage: LocalStorageUtil;
+	const localStorage = new LocalStorageUtil();
 	let usersService: UsersService;
 	let notificationsService: NotificationsService;
 	let listsService: ListsService;
@@ -91,7 +94,7 @@
 		}
 	}
 
-	async function soundsEnabledChanged() {
+	function soundsEnabledChanged() {
 		localStorage.set(LocalStorageKeys.SoundsEnabled, soundsEnabled);
 
 		if (soundsEnabled) {
@@ -109,8 +112,11 @@
 		listsService.getAll();
 	}
 
+	function immediateListChanged() {
+		localStorage.set(LocalStorageKeys.ImmediateList, immediateListId);
+	}
+
 	onMount(async () => {
-		localStorage = new LocalStorageUtil();
 		usersService = new UsersService();
 		notificationsService = new NotificationsService();
 		listsService = new ListsService();
@@ -137,6 +143,9 @@
 		soundsEnabled = localStorage.getBool(LocalStorageKeys.SoundsEnabled);
 		highPriorityListEnabled = localStorage.getBool(LocalStorageKeys.HighPriorityListEnabled);
 		staleTasksListEnabled = localStorage.getBool(LocalStorageKeys.StaleTasksListEnabled);
+
+		listOptions = await listsService.getNonArchivedAsOptions();
+		immediateListId = localStorage.getObject<number | null>(LocalStorageKeys.ImmediateList);
 	});
 
 	onDestroy(() => {
@@ -182,12 +191,28 @@
 
 			<div class="form-control-group">
 				<div class="setting-descriptor">{$t('preferences.derivedLists')}</div>
+
 				<div class="form-control">
 					<Checkbox labelKey="preferences.highPriority" bind:value={highPriorityListEnabled} on:change={highPriorityListEnabledChanged} />
 				</div>
 
 				<div class="form-control">
 					<Checkbox labelKey="preferences.staleTasks" bind:value={staleTasksListEnabled} on:change={staleTasksListEnabledChanged} />
+				</div>
+			</div>
+
+			<div class="form-control-group">
+				<div class="setting-descriptor">{$t('preferences.immediateList')}</div>
+
+				<div class="form-control">
+					<select bind:value={immediateListId} on:change={immediateListChanged} disabled={!listOptions} aria-label={$t('preferences.immediateList')}>
+						<option value={null}>{$t('preferences.none')}</option>
+						{#if listOptions}
+							{#each listOptions as list}
+								<option value={list.id}>{list.name}</option>
+							{/each}
+						{/if}
+					</select>
 				</div>
 			</div>
 		</form>

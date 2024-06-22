@@ -2,9 +2,12 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 
+	import { LocalStorageKeys, LocalStorageUtil } from '$lib/utils/localStorageUtil';
 	import { authInfo } from '$lib/stores';
 
 	let containerHeight = 768;
+
+	const localStorage = new LocalStorageUtil();
 
 	onMount(() => {
 		if (window.innerHeight < containerHeight) {
@@ -16,7 +19,10 @@
 				return;
 			}
 
-			await goto('/lists');
+			const immediateListId = localStorage.getObject<number | null>(LocalStorageKeys.ImmediateList);
+			const location = immediateListId ? `/list/${immediateListId}` : '/lists';
+
+			await goto(location);
 		});
 	});
 </script>

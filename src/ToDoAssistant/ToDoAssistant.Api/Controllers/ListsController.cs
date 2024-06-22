@@ -496,11 +496,6 @@ public class ListsController : BaseController
 
         try
         {
-            var response = new CanShareResponse
-            {
-                CanShare = false
-            };
-
             var userResult = _userService.Get(email);
             if (userResult.Failed)
             {
@@ -508,21 +503,24 @@ public class ListsController : BaseController
                 return StatusCode(500);
             }
 
-            if (userResult.Data is not null)
+            if (userResult.Data is null)
             {
-                response.UserId = userResult.Data.Id;
-                response.ImageUri = userResult.Data.ImageUri;
-
-                var canShareResult = _listService.CanShareWithUser(userResult.Data.Id, UserId);
-
-                if (canShareResult.Failed)
-                {
-                    tr.Status = SpanStatus.InternalError;
-                    return StatusCode(500);
-                }
-
-                response.CanShare = canShareResult.Data;
+                return Ok(new CanShareResponse(false));
             }
+
+            var canShareResult = _listService.CanShareWithUser(userResult.Data.Id, UserId);
+            if (canShareResult.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
+
+            var response = new CanShareResponse
+            (
+                canShare: canShareResult.Data,
+                userId: userResult.Data.Id,
+                imageUri: userResult.Data.ImageUri
+            );
 
             return Ok(response);
         }

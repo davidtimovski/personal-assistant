@@ -59,7 +59,7 @@
 	let addNewPlaceholderText: string;
 	const unsubscriptions: Unsubscriber[] = [];
 
-	let localStorage: LocalStorageUtil;
+	const localStorage = new LocalStorageUtil();
 	let listsService: ListsService;
 	let tasksService: TasksService;
 	let soundPlayer: SoundPlayer;
@@ -433,7 +433,6 @@
 			editedId = parseInt(edited, 10);
 		}
 
-		localStorage = new LocalStorageUtil();
 		listsService = new ListsService();
 		tasksService = new TasksService();
 		soundPlayer = new SoundPlayer();

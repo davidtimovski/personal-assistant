@@ -16,7 +16,7 @@
 	const personalAssistantUrl = Variables.urls.account;
 	let version = '--';
 
-	let localStorage: LocalStorageUtil;
+	const localStorage = new LocalStorageUtil();
 	let notificationsService: NotificationsService;
 	let listsService: ListsService;
 
@@ -33,7 +33,6 @@
 	}
 
 	onMount(async () => {
-		localStorage = new LocalStorageUtil();
 		notificationsService = new NotificationsService();
 		listsService = new ListsService();
 
