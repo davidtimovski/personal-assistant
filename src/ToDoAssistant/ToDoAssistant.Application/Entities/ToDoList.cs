@@ -6,6 +6,7 @@ namespace ToDoAssistant.Application.Entities;
 public class ToDoList : Entity
 {
     public const string DefaultIcon = "Regular";
+    public const int MaxTasks = 400;
 
     public int Id { get; set; }
     public int UserId { get; set; }
@@ -20,11 +21,5 @@ public class ToDoList : Entity
     public List<ToDoTask> Tasks { get; set; } = new();
     public List<ListShare> Shares { get; set; } = new();
 
-    public bool IsShared
-    {
-        get
-        {
-            return Shares.Any(x => x.IsAccepted == true);
-        }
-    }
+    public bool IsShared => Shares.Any(x => x.IsAccepted == true);
 }

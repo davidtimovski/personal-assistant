@@ -639,6 +639,9 @@
   <data name="pumpkin" xml:space="preserve">
     <value>Тиква</value>
   </data>
+  <data name="pumpkin_seeds" xml:space="preserve">
+    <value>Семки од тиква</value>
+  </data>
   <data name="pâté" xml:space="preserve">
     <value>Паштета</value>
   </data>

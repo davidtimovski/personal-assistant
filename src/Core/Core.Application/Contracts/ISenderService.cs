@@ -4,5 +4,5 @@ namespace Core.Application.Contracts;
 
 public interface ISenderService
 {
-    void Enqueue(ISendable sendable);
+    Task EnqueueAsync(ISendable sendable);
 }

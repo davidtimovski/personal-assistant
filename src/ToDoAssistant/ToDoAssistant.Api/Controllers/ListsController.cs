@@ -432,7 +432,13 @@ public class ListsController : BaseController
                 UserId = UserId,
                 NotificationsEnabled = request.NotificationsEnabled
             };
-            await _listService.UpdateSharedAsync(model, _updateSharedValidator, tr, cancellationToken);
+            var result = await _listService.UpdateSharedAsync(model, _updateSharedValidator, tr, cancellationToken);
+
+            if (result.Status == ResultStatus.Invalid)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return UnprocessableEntityResult(result.ValidationErrors!);
+            }
 
             return NoContent();
         }
@@ -725,7 +731,12 @@ public class ListsController : BaseController
                 return BadRequest();
             }
 
-            await _listService.SetIsArchivedAsync(request.ListId, UserId, request.IsArchived, tr, cancellationToken);
+            var result = await _listService.SetIsArchivedAsync(request.ListId, UserId, request.IsArchived, tr, cancellationToken);
+            if (result.Failed)
+            {
+                tr.Status = SpanStatus.InternalError;
+                return StatusCode(500);
+            }
 
             return NoContent();
         }
@@ -873,7 +884,7 @@ public class ListsController : BaseController
                 OpenUrl = $"{_config.Url}/notifications/{result.Data}"
             };
 
-            _senderService.Enqueue(toDoAssistantPushNotification);
+            await _senderService.EnqueueAsync(toDoAssistantPushNotification);
         }
 
         return new(true);

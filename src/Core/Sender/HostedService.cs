@@ -38,7 +38,7 @@ public sealed class HostedService : IHostedService, IDisposable
         _logger = ArgValidator.NotNull(logger);
     }
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
         var factory = new ConnectionFactory
         {
@@ -47,16 +47,14 @@ public sealed class HostedService : IHostedService, IDisposable
             Password = _config.RabbitMQ.EventBusPassword
         };
 
-        using (var connection = factory.CreateConnection())
-        using (var channel = connection.CreateModel())
+        using (var connection = await factory.CreateConnectionAsync())
+        using (var channel = await connection.CreateChannelAsync())
         {
-            SetupEmailQueue(channel);
-            SetupPushNotificationQueue(channel);
+            await SetupEmailQueueAsync(channel);
+            await SetupPushNotificationQueueAsync(channel);
 
             Thread.Sleep(Timeout.Infinite);
         }
-
-        return Task.CompletedTask;
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -69,9 +67,9 @@ public sealed class HostedService : IHostedService, IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private void SetupEmailQueue(IModel channel)
+    private async Task SetupEmailQueueAsync(IChannel channel)
     {
-        async void Received(object? model, BasicDeliverEventArgs ea)
+        async Task ReceivedAsync(object? model, BasicDeliverEventArgs ea)
         {
             var body = ea.Body;
             var emailJson = Encoding.UTF8.GetString(body.ToArray());
@@ -99,16 +97,16 @@ public sealed class HostedService : IHostedService, IDisposable
             }
             finally
             {
-                channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                await channel.BasicAckAsync(deliveryTag: ea.DeliveryTag, multiple: false);
             }
         }
 
-        SetupQueue("email_queue", Received, channel);
+        await SetupQueueAsync("email_queue", ReceivedAsync, channel);
     }
 
-    private void SetupPushNotificationQueue(IModel channel)
+    private async Task SetupPushNotificationQueueAsync(IChannel channel)
     {
-        async void Received(object? model, BasicDeliverEventArgs ea)
+        async Task ReceivedAsync(object? model, BasicDeliverEventArgs ea)
         {
             var body = ea.Body;
             string notificationJson = Encoding.UTF8.GetString(body.ToArray());
@@ -164,28 +162,28 @@ public sealed class HostedService : IHostedService, IDisposable
             }
             finally
             {
-                channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                await channel.BasicAckAsync(deliveryTag: ea.DeliveryTag, multiple: false);
                 webPushClient.Dispose();
             }
         }
 
-        SetupQueue("push_notification_queue", Received, channel);
+        await SetupQueueAsync("push_notification_queue", ReceivedAsync, channel);
     }
 
-    private static void SetupQueue(string queue, EventHandler<BasicDeliverEventArgs> received, IModel channel)
+    private static async Task SetupQueueAsync(string queue, AsyncEventHandler<BasicDeliverEventArgs> received, IChannel channel)
     {
-        channel.QueueDeclare(queue: queue,
+        await channel.QueueDeclareAsync(queue: queue,
             durable: true,
             exclusive: false,
             autoDelete: false,
             arguments: null);
 
-        channel.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
+        await channel.BasicQosAsync(prefetchSize: 0, prefetchCount: 1, global: false);
 
-        var consumer = new EventingBasicConsumer(channel);
-        consumer.Received += received;
+        var consumer = new AsyncEventingBasicConsumer(channel);
+        consumer.ReceivedAsync += received;
 
-        channel.BasicConsume(queue: queue,
+        await channel.BasicConsumeAsync(queue: queue,
             autoAck: false,
             consumer: consumer);
     }

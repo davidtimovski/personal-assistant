@@ -127,6 +127,12 @@ public class TasksController : BaseController
             };
             CreatedTaskResult result = await _taskService.CreateAsync(model, _createValidator, tr, cancellationToken);
 
+            if (result.Status == ResultStatus.Invalid)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return UnprocessableEntityResult(result.ValidationErrors!);
+            }
+
             if (result.NotifySignalR)
             {
                 await _listActionsHubContext.Clients.Group(result.ListId.ToString()).SendAsync("TasksModified", AuthId);
@@ -187,6 +193,12 @@ public class TasksController : BaseController
                 TasksArePrivate = request.TasksArePrivate,
             };
             BulkCreateResult result = await _taskService.BulkCreateAsync(model, _bulkCreateValidator, tr, cancellationToken);
+
+            if (result.Status == ResultStatus.Invalid)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return UnprocessableEntityResult(result.ValidationErrors!);
+            }
 
             if (result.NotifySignalR)
             {
@@ -260,6 +272,12 @@ public class TasksController : BaseController
                 AssignedToUserId = request.AssignedToUserId,
             };
             UpdateTaskResult result = await _taskService.UpdateAsync(model, _updateValidator, tr, cancellationToken);
+
+            if (result.Status == ResultStatus.Invalid)
+            {
+                tr.Status = SpanStatus.InvalidArgument;
+                return UnprocessableEntityResult(result.ValidationErrors!);
+            }
 
             if (result.NotifySignalR)
             {
@@ -556,7 +574,7 @@ public class TasksController : BaseController
                 OpenUrl = $"{_config.Url}/notifications/{result.Data}"
             };
 
-            _senderService.Enqueue(toDoAssistantPushNotification);
+            await _senderService.EnqueueAsync(toDoAssistantPushNotification);
         }
 
         return new(true);

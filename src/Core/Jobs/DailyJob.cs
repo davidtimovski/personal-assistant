@@ -11,24 +11,23 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Npgsql;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Jobs;
 
-public class MidnightJob
+public class DailyJob
 {
     private readonly ICdnService _cdnService;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IHostEnvironment _hostEnvironment;
     private readonly AppConfiguration _config;
-    private readonly ILogger<MidnightJob> _logger;
+    private readonly ILogger<DailyJob> _logger;
 
-    public MidnightJob(
+    public DailyJob(
         ICdnService? cdnService,
         IHttpClientFactory? httpClientFactory,
         IHostEnvironment? hostEnvironment,
         IOptions<AppConfiguration>? config,
-        ILogger<MidnightJob>? logger)
+        ILogger<DailyJob>? logger)
     {
         _cdnService = ArgValidator.NotNull(cdnService);
         _httpClientFactory = ArgValidator.NotNull(httpClientFactory);
@@ -46,50 +45,60 @@ public class MidnightJob
 
         await DeleteOldNotificationsAsync(conn, now);
         await DeleteOldDeletedEntityEntriesAsync(conn, now);
-        await GenerateUpcomingExpenses(conn, now);
-        await GenerateTransactions(conn, now);
+        await GenerateUpcomingExpensesAsync(conn, now);
+        await GenerateTransactionsAsync(conn, now);
 
         if (_hostEnvironment.IsProduction())
         {
-            await GetAndSaveCurrencyRates(conn, now);
+            await GetAndSaveCurrencyRatesAsync(conn, now);
             await DeleteTemporaryCdnResourcesAsync(now);
             await UploadDatabaseBackupAsync();
         }
 
-        _logger.LogInformation("Midnight job run completed.");
+        _logger.LogInformation("Daily job run completed");
     }
 
     private async Task DeleteOldNotificationsAsync(NpgsqlConnection conn, DateTime now)
     {
+        _logger.StartingOperation(nameof(DeleteOldNotificationsAsync));
+
         try
         {
             var aWeekAgo = now.AddDays(-7);
             await conn.ExecuteAsync("DELETE FROM todo.notifications WHERE created_date < @DeleteTo", new { DeleteTo = aWeekAgo });
+
+            _logger.CompletedOperation(nameof(DeleteOldNotificationsAsync));
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"{nameof(DeleteOldNotificationsAsync)} failed");
+            _logger.OperationFailed(nameof(DeleteOldNotificationsAsync), ex);
         }
     }
 
     private async Task DeleteOldDeletedEntityEntriesAsync(NpgsqlConnection conn, DateTime now)
     {
+        _logger.StartingOperation(nameof(DeleteOldDeletedEntityEntriesAsync));
+
         try
         {
             var oneYearAgo = now.AddYears(-1);
             await conn.ExecuteAsync("DELETE FROM accountant.deleted_entities WHERE deleted_date < @DeleteTo", new { DeleteTo = oneYearAgo });
+
+            _logger.CompletedOperation(nameof(DeleteOldDeletedEntityEntriesAsync));
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"{nameof(DeleteOldDeletedEntityEntriesAsync)} failed");
+            _logger.OperationFailed(nameof(DeleteOldDeletedEntityEntriesAsync), ex);
         }
     }
 
     /// <summary>
     /// For the automatic transactions functionality in Accountant.
     /// </summary>
-    private async Task GenerateTransactions(NpgsqlConnection conn, DateTime now)
+    private async Task GenerateTransactionsAsync(NpgsqlConnection conn, DateTime now)
     {
+        _logger.StartingOperation(nameof(GenerateTransactionsAsync));
+
         var dbTransaction = conn.BeginTransaction();
 
         try
@@ -162,6 +171,8 @@ public class MidnightJob
                         VALUES 
                         (@FromAccountId, @ToAccountId, @CategoryId, @Amount, @Currency, @Description, @Date, FALSE, @Generated, @CreatedDate, @ModifiedDate)", transaction, dbTransaction);
 
+                    _logger.LogInformation("Generated transaction");
+
                     if (transaction.FromAccountId.HasValue && transaction.ToAccountId is null)
                     {
                         var relatedUpcomingExpenses = conn.Query<UpcomingExpense>(@"SELECT * FROM accountant.upcoming_expenses
@@ -202,17 +213,19 @@ public class MidnightJob
             }
 
             await dbTransaction.CommitAsync();
+
+            _logger.CompletedOperation(nameof(GenerateTransactionsAsync));
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"{nameof(GenerateTransactions)} failed");
+            _logger.OperationFailed(nameof(GenerateTransactionsAsync), ex);
         }
     }
 
     /// <summary>
     /// For the upcoming expenses functionality in Accountant.
     /// </summary>
-    private async Task GenerateUpcomingExpenses(NpgsqlConnection conn, DateTime now)
+    private async Task GenerateUpcomingExpensesAsync(NpgsqlConnection conn, DateTime now)
     {
         string getMostFrequentCurrency(IReadOnlyList<Transaction> expenses)
         {
@@ -250,6 +263,8 @@ public class MidnightJob
 
             return earliest.Date < twoMonthsAgo;
         }
+
+        _logger.StartingOperation(nameof(GenerateUpcomingExpensesAsync));
 
         try
         {
@@ -326,17 +341,23 @@ public class MidnightJob
 
                     await conn.ExecuteAsync(@"INSERT INTO accountant.upcoming_expenses (user_id, category_id, amount, currency, description, date, generated, created_date, modified_date)
                                               VALUES (@UserId, @CategoryId, @Amount, @Currency, @Description, @Date, @Generated, @CreatedDate, @ModifiedDate)", upcomingExpense);
+
+                    _logger.LogInformation("Generated upcoming expense");
                 }
             }
+
+            _logger.CompletedOperation(nameof(GenerateUpcomingExpensesAsync));
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"{nameof(GenerateUpcomingExpenses)} failed");
+            _logger.OperationFailed(nameof(GenerateUpcomingExpensesAsync), ex);
         }
     }
 
-    private async Task GetAndSaveCurrencyRates(NpgsqlConnection conn, DateTime now)
+    private async Task GetAndSaveCurrencyRatesAsync(NpgsqlConnection conn, DateTime now)
     {
+        _logger.StartingOperation(nameof(GetAndSaveCurrencyRatesAsync));
+
         var today = new DateTime(now.Year, now.Month, now.Day);
 
         try
@@ -366,7 +387,6 @@ public class MidnightJob
 
             string ratesData = rates.ToJsonString();
 
-            // Save to database
             var parameters = new CurrencyRates
             {
                 Date = today,
@@ -374,26 +394,32 @@ public class MidnightJob
             };
 
             await conn.ExecuteAsync("INSERT INTO currency_rates (date, rates) VALUES (@Date, CAST(@Rates AS json))", parameters);
+
+            _logger.CompletedOperation(nameof(GetAndSaveCurrencyRatesAsync));
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"{nameof(GetAndSaveCurrencyRates)} failed");
+            _logger.OperationFailed(nameof(GetAndSaveCurrencyRatesAsync), ex);
         }
     }
 
     private async Task DeleteTemporaryCdnResourcesAsync(DateTime now)
     {
+        _logger.StartingOperation(nameof(DeleteTemporaryCdnResourcesAsync));
+
         var olderThan = now.AddDays(-2);
         var result = await _cdnService.DeleteTemporaryResourcesAsync(olderThan, CancellationToken.None);
 
-        if (result.Failed)
+        if (!result.Failed)
         {
-            _logger.LogError($"{nameof(DeleteTemporaryCdnResourcesAsync)} failed");
+            _logger.CompletedOperation(nameof(DeleteTemporaryCdnResourcesAsync));
         }
     }
 
     private async Task UploadDatabaseBackupAsync()
     {
+        _logger.StartingOperation(nameof(UploadDatabaseBackupAsync));
+
         try
         {
             var blobServiceClient = new BlobServiceClient(_config.DbBackup.AzureStorageConnectionString);
@@ -406,10 +432,14 @@ public class MidnightJob
 
             var path = Path.Combine(_config.DbBackup.BackupsPath, backupFileName);
             await blobClient.UploadAsync(path, true);
+
+            _logger.LogInformation($"Uploaded database backup with name: {backupFileName}");
+
+            _logger.CompletedOperation(nameof(UploadDatabaseBackupAsync));
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"{nameof(UploadDatabaseBackupAsync)} failed");
+            _logger.OperationFailed(nameof(UploadDatabaseBackupAsync), ex);
         }
     }
 }

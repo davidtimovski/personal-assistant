@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using ToDoAssistant.Application.Contracts.Lists;
+using ToDoAssistant.Application.Entities;
 
 namespace ToDoAssistant.Application.Contracts.Tasks.Models;
 
@@ -38,7 +39,7 @@ public class BulkCreateValidator : AbstractValidator<BulkCreate>
                     throw new Exception("Failed to perform validation");
                 }
 
-                return countResult.Data + taskNames.Count() <= 250;
+                return countResult.Data + taskNames.Count() <= ToDoList.MaxTasks;
             }).WithMessage("TasksPerListLimitReached");
 
         RuleFor(dto => dto.TasksText).NotEmpty().WithMessage("Tasks.BulkCreate.TextIsRequired").Must(tasksText =>

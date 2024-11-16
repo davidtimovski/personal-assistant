@@ -16,22 +16,22 @@ public class SenderService : ISenderService
         _config = config;
     }
 
-    public void Enqueue(ISendable sendable)
+    public async Task EnqueueAsync(ISendable sendable)
     {
         switch (sendable)
         {
             case Email email:
-                SendToQueue("email_queue", email);
+                await SendToQueueAsync("email_queue", email);
                 break;
             case PushNotification pushNotification:
-                SendToQueue("push_notification_queue", pushNotification);
+                await SendToQueueAsync("push_notification_queue", pushNotification);
                 break;
             default:
                 throw new ArgumentException("The message parameter type is not valid.");
         }
     }
 
-    private void SendToQueue(string queue, object message)
+    private async Task SendToQueueAsync(string queue, object message)
     {
         var factory = new ConnectionFactory
         {
@@ -40,13 +40,13 @@ public class SenderService : ISenderService
             Password = _config.EventBusPassword
         };
 
-        using var connection = factory.CreateConnection();
-        using var channel = connection.CreateModel();
+        using var connection = await factory.CreateConnectionAsync();
+        using var channel = await connection.CreateChannelAsync();
 
-        var properties = channel.CreateBasicProperties();
-        properties.Persistent = true;
+        var props = new BasicProperties();
+        props.Persistent = true;
 
-        channel.QueueDeclare(queue: queue,
+        await channel.QueueDeclareAsync(queue: queue,
             durable: true,
             exclusive: false,
             autoDelete: false,
@@ -54,9 +54,11 @@ public class SenderService : ISenderService
 
         byte[] body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message));
 
-        channel.BasicPublish(exchange: string.Empty,
+        await channel.BasicPublishAsync(
+            exchange: string.Empty,
             routingKey: queue,
-            basicProperties: properties,
+            mandatory: true,
+            basicProperties: props,
             body: body);
     }
 }

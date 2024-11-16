@@ -31,20 +31,16 @@ public class UploadTempImageValidator : AbstractValidator<UploadTempImage>
     {
         RuleFor(dto => dto.UserId).NotEmpty().WithMessage("Unauthorized");
 
+        const int maxSizeInMegabytes = 10;
         RuleFor(dto => dto.Length)
             .NotEmpty().WithMessage("Common.ImageIsEmpty")
-            .LessThan(10 * 1024 * 1024).WithMessage("Common.ImageTooLarge");
+            .LessThanOrEqualTo(maxSizeInMegabytes * 1024 * 1024).WithMessage("Common.ImageIsTooLarge");
 
         RuleFor(dto => dto.FileName)
             .Must(fileName =>
             {
                 string extension = Path.GetExtension(fileName);
-
-                if (!ValidFormats.Contains(extension.ToUpperInvariant()))
-                {
-                    return false;
-                }
-                return true;
+                return ValidFormats.Contains(extension.ToUpperInvariant());
             }).WithMessage("Common.InvalidImageFormat");
     }
 }

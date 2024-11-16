@@ -96,7 +96,7 @@ public class ToDoAssistantProfile : Profile
 
 public class ListSharingStateResolver : IValueResolver<ToDoList, object, ListSharingState>
 {
-    public ListSharingState Resolve(ToDoList source, object dest, ListSharingState destMember, ResolutionContext context)
+    public ListSharingState Resolve(ToDoList source, object destination, ListSharingState destinationMember, ResolutionContext context)
     {
         var userId = (int)context.Items["UserId"];
 
@@ -127,17 +127,14 @@ public class ListSharingStateResolver : IValueResolver<ToDoList, object, ListSha
 
 public class ListOrderResolver : IValueResolver<ToDoList, object, short?>
 {
-    public short? Resolve(ToDoList source, object dest, short? destMember, ResolutionContext context)
+    public short? Resolve(ToDoList source, object destination, short? destinationMember, ResolutionContext context)
     {
         var userId = (int)context.Items["UserId"];
 
-        if (source.Shares.Any())
+        var share = source.Shares.FirstOrDefault(x => x.UserId == userId);
+        if (share is not null)
         {
-            var share = source.Shares.First();
-            if (share.UserId == userId)
-            {
-                return share.Order;
-            }
+            return share.Order;
         }
 
         return source.Order;
@@ -146,17 +143,14 @@ public class ListOrderResolver : IValueResolver<ToDoList, object, short?>
 
 public class ListNotificationsEnabledResolver : IValueResolver<ToDoList, EditListDto, bool>
 {
-    public bool Resolve(ToDoList source, EditListDto dest, bool destMember, ResolutionContext context)
+    public bool Resolve(ToDoList source, EditListDto destination, bool destinationMember, ResolutionContext context)
     {
         var userId = (int)context.Items["UserId"];
 
-        if (source.Shares.Any())
+        var share = source.Shares.FirstOrDefault(x => x.UserId == userId);
+        if (share is not null)
         {
-            var share = source.Shares.First();
-            if (share.UserId == userId)
-            {
-                return share.NotificationsEnabled;
-            }
+            return share.NotificationsEnabled;
         }
 
         return source.NotificationsEnabled;
@@ -165,17 +159,14 @@ public class ListNotificationsEnabledResolver : IValueResolver<ToDoList, EditLis
 
 public class IsArchivedResolver : IValueResolver<ToDoList, object, bool>
 {
-    public bool Resolve(ToDoList source, object dest, bool destMember, ResolutionContext context)
+    public bool Resolve(ToDoList source, object destination, bool destinationMember, ResolutionContext context)
     {
         var userId = (int)context.Items["UserId"];
 
-        if (source.Shares.Any())
+        var share = source.Shares.FirstOrDefault(x => x.UserId == userId);
+        if (share is not null)
         {
-            var share = source.Shares.First();
-            if (share.UserId == userId)
-            {
-                return share.IsArchived;
-            }
+            return share.IsArchived;
         }
 
         return source.IsArchived;
@@ -184,7 +175,7 @@ public class IsArchivedResolver : IValueResolver<ToDoList, object, bool>
 
 public class IsPrivateResolver : IValueResolver<ToDoTask, TaskForUpdate, bool>
 {
-    public bool Resolve(ToDoTask source, TaskForUpdate dest, bool destMember, ResolutionContext context)
+    public bool Resolve(ToDoTask source, TaskForUpdate destination, bool destinationMember, ResolutionContext context)
     {
         var userId = (int)context.Items["UserId"];
         return source.PrivateToUserId.HasValue && source.PrivateToUserId == userId ? true : false;
@@ -200,7 +191,7 @@ public class ListWithSharesUserShareResolver : IValueResolver<ToDoList, ListWith
         _cdnService = cdnService;
     }
 
-    public ListShareDto? Resolve(ToDoList source, ListWithShares dest, ListShareDto? destMember, ResolutionContext context)
+    public ListShareDto? Resolve(ToDoList source, ListWithShares destination, ListShareDto? destinationMember, ResolutionContext context)
     {
         var shareDto = new ListShareDto();
         var userId = (int)context.Items["UserId"];

@@ -120,7 +120,7 @@
   <data name="AnErrorOccurred" xml:space="preserve">
     <value>An error occurred</value>
   </data>
-  <data name="ImageTooLarge" xml:space="preserve">
+  <data name="ImageIsTooLarge" xml:space="preserve">
     <value>The image you chose is too large. Maximum size is {0}MB.</value>
   </data>
   <data name="InvalidImage" xml:space="preserve">

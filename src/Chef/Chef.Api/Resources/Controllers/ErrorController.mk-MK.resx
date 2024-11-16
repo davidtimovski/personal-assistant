@@ -126,7 +126,7 @@
   <data name="Common.ImageIsEmpty" xml:space="preserve">
     <value>Сликата е празна</value>
   </data>
-  <data name="Common.ImageTooLarge" xml:space="preserve">
+  <data name="Common.ImageIsTooLarge" xml:space="preserve">
     <value>Сликата која ја одбравте е преголема. Максималната големина е 10MB.</value>
   </data>
   <data name="Common.InvalidImageFormat" xml:space="preserve">

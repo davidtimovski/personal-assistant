@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using ToDoAssistant.Application.Contracts.Lists;
+using ToDoAssistant.Application.Entities;
 
 namespace ToDoAssistant.Application.Contracts.Tasks.Models;
 
@@ -15,8 +16,6 @@ public class CreateTask
 
 public class CreateTaskValidator : AbstractValidator<CreateTask>
 {
-    private const string prefix = nameof(CreateTask);
-
     public CreateTaskValidator(ITaskService taskService, IListService listService)
     {
         RuleFor(dto => dto.UserId)
@@ -49,7 +48,7 @@ public class CreateTaskValidator : AbstractValidator<CreateTask>
                     throw new Exception("Failed to perform validation");
                 }
 
-                return countResult.Data < 250;
+                return countResult.Data < ToDoList.MaxTasks;
             }).WithMessage("TasksPerListLimitReached");
 
         RuleFor(dto => dto.Name)

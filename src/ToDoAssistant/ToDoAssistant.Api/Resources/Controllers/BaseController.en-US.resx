@@ -172,13 +172,13 @@
     <value>Name cannot be longer than 50 characters</value>
   </data>
   <data name="Tasks.UpdateTask.SelectedListAlreadyContainsMaxTasks" xml:space="preserve">
-    <value>The selected list already contains the maximum of 250 tasks</value>
+    <value>The selected list already contains the maximum of 400 tasks</value>
   </data>
   <data name="Tasks.UpdateTask.TheAssignedUserIsNotAMember" xml:space="preserve">
     <value>The assigned user is not a member of the list</value>
   </data>
   <data name="TasksPerListLimitReached" xml:space="preserve">
-    <value>You cannot create more than 250 tasks per list, sorry</value>
+    <value>You cannot create more than 400 tasks per list, sorry</value>
   </data>
   <data name="Unauthorized" xml:space="preserve">
     <value>Unauthorized</value>

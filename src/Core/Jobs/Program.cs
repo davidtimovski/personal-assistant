@@ -18,11 +18,11 @@ using IHost host = Host.CreateDefaultBuilder(args)
     {
         if (hostContext.HostingEnvironment.IsProduction())
         {
-            Log.Logger = new LoggerConfiguration()
+            Serilog.Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(hostContext.Configuration)
                 .CreateLogger();
 
-            logging.AddSerilog(Log.Logger, dispose: true);
+            logging.AddSerilog(Serilog.Log.Logger, dispose: true);
         }
     })
     .ConfigureServices((hostContext, services) =>
@@ -46,14 +46,14 @@ using IHost host = Host.CreateDefaultBuilder(args)
 
         Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
-        services.AddTransient<MidnightJob>();
+        services.AddTransient<DailyJob>();
     })
     .Build();
 
 static async Task RunWorkerAsync(IServiceProvider services)
 {
     using IServiceScope serviceScope = services.CreateScope();
-    var job = serviceScope.ServiceProvider.GetRequiredService<MidnightJob>();
+    var job = serviceScope.ServiceProvider.GetRequiredService<DailyJob>();
     await job.RunAsync();
 }
 

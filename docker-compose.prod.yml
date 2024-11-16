@@ -141,7 +141,7 @@ services:
       - rabbitmq
 
   postgres:
-    image: postgres:15
+    image: postgres:16
     container_name: pa-postgres
     restart: always
     ports:
@@ -153,7 +153,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
 
   rabbitmq:
-    image: rabbitmq:3.12-management-alpine
+    image: rabbitmq:4.0-management-alpine
     container_name: pa-rabbitmq
     restart: always
     environment:
@@ -162,7 +162,6 @@ services:
       RABBITMQ_DEFAULT_PASS: ${EVENT_BUS_PASSWORD}
     ports:
       - "15672:15672"
-      - "5672:5672"
 
 volumes:
   postgres-data:
