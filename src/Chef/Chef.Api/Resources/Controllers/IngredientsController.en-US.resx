@@ -639,6 +639,9 @@
   <data name="pumpkin" xml:space="preserve">
     <value>Pumpkin</value>
   </data>
+  <data name="pumpkin_seeds" xml:space="preserve">
+    <value>Pumpkin seeds</value>
+  </data>
   <data name="pâté" xml:space="preserve">
     <value>Pâté</value>
   </data>

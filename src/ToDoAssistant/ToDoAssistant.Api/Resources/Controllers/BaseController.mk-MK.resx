@@ -172,13 +172,13 @@
     <value>Името неможе да биде подолго од 50 карактери</value>
   </data>
   <data name="Tasks.UpdateTask.SelectedListAlreadyContainsMaxTasks" xml:space="preserve">
-    <value>Избраната листа веќе го содржи максималниот број од 250 задачи</value>
+    <value>Избраната листа веќе го содржи максималниот број од 400 задачи</value>
   </data>
   <data name="Tasks.UpdateTask.TheAssignedUserIsNotAMember" xml:space="preserve">
     <value>Доделениот корисник не е член на листата</value>
   </data>
   <data name="TasksPerListLimitReached" xml:space="preserve">
-    <value>Неможе да креирате повеќе од 250 задачи по листа, се извинуваме</value>
+    <value>Неможе да креирате повеќе од 400 задачи по листа, се извинуваме</value>
   </data>
   <data name="Unauthorized" xml:space="preserve">
     <value>Ненајавен/а</value>

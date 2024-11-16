@@ -126,7 +126,7 @@
   <data name="Common.ImageIsEmpty" xml:space="preserve">
     <value>Image is empty</value>
   </data>
-  <data name="Common.ImageTooLarge" xml:space="preserve">
+  <data name="Common.ImageIsTooLarge" xml:space="preserve">
     <value>The image you chose is too large. Maximum size is 10MB.</value>
   </data>
   <data name="Common.InvalidImageFormat" xml:space="preserve">

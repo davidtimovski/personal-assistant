@@ -54,7 +54,7 @@ public class EmailTemplateService : IEmailTemplateService
 
         var email = new Email(_config.AdminEmail, "Admin", subject, bodyText, bodyHtml);
 
-        _senderService.Enqueue(email);
+        await _senderService.EnqueueAsync(email);
     }
 
     private static async Task<string> GetTemplateContentsAsync(string templateName, string language)

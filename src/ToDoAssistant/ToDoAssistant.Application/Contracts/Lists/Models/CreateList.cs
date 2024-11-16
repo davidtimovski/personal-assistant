@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using ToDoAssistant.Application.Entities;
 using ToDoAssistant.Application.Services;
 
 namespace ToDoAssistant.Application.Contracts.Lists.Models;
@@ -71,7 +72,7 @@ public class CreateListValidator : AbstractValidator<CreateList>
                 return true;
             }
             var tasks = tasksText.Split("\n").Where(x => !string.IsNullOrWhiteSpace(x));
-            return tasks.Count() < 250;
+            return tasks.Count() < ToDoList.MaxTasks;
         }).WithMessage("TasksPerListLimitReached").Must(tasksText =>
         {
             if (string.IsNullOrEmpty(tasksText))

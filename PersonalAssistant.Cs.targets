@@ -7,7 +7,7 @@
 	<Import Project="PersonalAssistant.targets" />
 	
 	<ItemGroup>
-		<PackageReference Include="Roslynator.Analyzers" Version="4.12.4" />
-		<PackageReference Include="SonarAnalyzer.CSharp" Version="9.27.0.93347" />
+		<PackageReference Include="Roslynator.Analyzers" Version="4.12.9" />
+		<PackageReference Include="SonarAnalyzer.CSharp" Version="9.32.0.97167" />
 	</ItemGroup>
 </Project>

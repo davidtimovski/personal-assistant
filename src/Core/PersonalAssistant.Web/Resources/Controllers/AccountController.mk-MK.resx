@@ -120,7 +120,7 @@
   <data name="AnErrorOccurred" xml:space="preserve">
     <value>Се случи неочекувана грешка</value>
   </data>
-  <data name="ImageTooLarge" xml:space="preserve">
+  <data name="ImageIsTooLarge" xml:space="preserve">
     <value>Сликата која ја одбравте е преголема. Максималната големина е {0}MB.</value>
   </data>
   <data name="InvalidImage" xml:space="preserve">

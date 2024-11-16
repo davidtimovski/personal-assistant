@@ -506,6 +506,7 @@ public class AccountController : BaseController
 
     [HttpPost]
     [ActionName("upload-profile-image")]
+    [RequestSizeLimit(15 * 1024 * 1024)]
     public async Task<IActionResult> UploadProfileImage(IFormFile image, CancellationToken cancellationToken)
     {
         var tr = Metrics.StartTransactionWithUser(
@@ -516,9 +517,10 @@ public class AccountController : BaseController
 
         try
         {
-            if (image.Length > 10 * 1024 * 1024)
+            const int maxSizeInMegabytes = 10;
+            if (image.Length > maxSizeInMegabytes * 1024 * 1024)
             {
-                ModelState.AddModelError(string.Empty, _localizer["ImageTooLarge", 10]);
+                ModelState.AddModelError(string.Empty, _localizer["ImageIsTooLarge", maxSizeInMegabytes]);
                 tr.Status = SpanStatus.InvalidArgument;
                 return new UnprocessableEntityObjectResult(ModelState);
             }

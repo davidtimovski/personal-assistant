@@ -420,6 +420,7 @@ public class RecipesController : BaseController
     }
 
     [HttpPost("upload-temp-image")]
+    [RequestSizeLimit(15 * 1024 * 1024)]
     public async Task<IActionResult> UploadTempImage(IFormFile image, CancellationToken cancellationToken)
     {
         var tr = Metrics.StartTransactionWithUser(
@@ -519,7 +520,7 @@ public class RecipesController : BaseController
                     Message = message
                 };
 
-                _senderService.Enqueue(pushNotification);
+                await _senderService.EnqueueAsync(pushNotification);
             }
         }
         catch
@@ -560,7 +561,7 @@ public class RecipesController : BaseController
                     Message = message
                 };
 
-                _senderService.Enqueue(pushNotification);
+                await _senderService.EnqueueAsync(pushNotification);
             }
         }
         catch
@@ -668,7 +669,7 @@ public class RecipesController : BaseController
                     Message = message
                 };
 
-                _senderService.Enqueue(pushNotification);
+                await _senderService.EnqueueAsync(pushNotification);
             }
 
             var model = new ShareRecipe
@@ -728,7 +729,7 @@ public class RecipesController : BaseController
                     Message = message
                 };
 
-                _senderService.Enqueue(pushNotification);
+                await _senderService.EnqueueAsync(pushNotification);
             }
         }
         catch
@@ -769,7 +770,7 @@ public class RecipesController : BaseController
                     Message = message
                 };
 
-                _senderService.Enqueue(pushNotification);
+                await _senderService.EnqueueAsync(pushNotification);
             }
         }
         catch
@@ -868,7 +869,7 @@ public class RecipesController : BaseController
                     OpenUrl = $"{_config.Url}/inbox"
                 };
 
-                _senderService.Enqueue(pushNotification);
+                await _senderService.EnqueueAsync(pushNotification);
             }
 
             return StatusCode(201, null);
@@ -917,7 +918,7 @@ public class RecipesController : BaseController
                 Message = message
             };
 
-            _senderService.Enqueue(pushNotification);
+            await _senderService.EnqueueAsync(pushNotification);
         }
         catch
         {
@@ -1032,7 +1033,7 @@ public class RecipesController : BaseController
                 Message = message
             };
 
-            _senderService.Enqueue(pushNotification);
+            await _senderService.EnqueueAsync(pushNotification);
 
             return StatusCode(201, id);
         }

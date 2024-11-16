@@ -127,8 +127,7 @@ services:
       RABBITMQ_DEFAULT_USER: ${EVENT_BUS_USERNAME:-rabbitmq}
       RABBITMQ_DEFAULT_PASS: ${EVENT_BUS_PASSWORD:-rabbitmq}
     ports:
-      - "15672:15672"  # Important: In a production environment your should remove the external port
-      - "5672:5672"    # Important: In a production environment your should remove the external port
+      - "15672:15672"
 
 volumes:
   personalassistant-volume:

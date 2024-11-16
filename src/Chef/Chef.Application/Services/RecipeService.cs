@@ -881,7 +881,11 @@ public class RecipeService : IRecipeService
                 return new SetShareIsAcceptedResult();
             }
 
-            Recipe recipe = _recipesRepository.Get(recipeId, metric);
+            Recipe? recipe = _recipesRepository.Get(recipeId, metric);
+            if (recipe is null)
+            {
+                throw new Exception("Recipe retrieval failed");
+            }
 
             var userResult = _userService.Get(userId);
             if (userResult.Failed)
@@ -929,7 +933,11 @@ public class RecipeService : IRecipeService
                 return new LeaveRecipeResult();
             }
 
-            Recipe recipe = _recipesRepository.Get(id, metric);
+            Recipe? recipe = _recipesRepository.Get(id, metric);
+            if (recipe is null)
+            {
+                throw new Exception("Recipe retrieval failed");
+            }
 
             var userResult = _userService.Get(userId);
             if (userResult.Failed)
@@ -997,7 +1005,11 @@ public class RecipeService : IRecipeService
                 return new SendRecipeResult();
             }
 
-            Recipe recipe = _recipesRepository.Get(model.RecipeId, metric);
+            Recipe? recipe = _recipesRepository.Get(model.RecipeId, metric);
+            if (recipe is null)
+            {
+                throw new Exception("Recipe retrieval failed");
+            }
 
             var userResult = _userService.Get(model.UserId);
             if (userResult.Failed)

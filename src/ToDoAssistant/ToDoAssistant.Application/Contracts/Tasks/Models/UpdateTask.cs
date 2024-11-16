@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using ToDoAssistant.Application.Contracts.Lists;
+using ToDoAssistant.Application.Entities;
 
 namespace ToDoAssistant.Application.Contracts.Tasks.Models;
 
@@ -50,7 +51,7 @@ public class UpdateTaskValidator : AbstractValidator<UpdateTask>
                     throw new Exception("Failed to perform validation");
                 }
 
-                if (listChanged && countResult.Data == 250)
+                if (listChanged && countResult.Data >= ToDoList.MaxTasks)
                 {
                     return false;
                 }
