@@ -2,7 +2,6 @@
 using Core.Application.Contracts;
 using Core.Application.Utils;
 using Microsoft.Extensions.Logging;
-using Sentry;
 using ToDoAssistant.Application.Contracts.Notifications;
 using ToDoAssistant.Application.Contracts.Notifications.Models;
 using ToDoAssistant.Application.Entities;
@@ -33,7 +32,7 @@ public class NotificationService : INotificationService
 
             var result = notifications.Select(x => _mapper.Map<NotificationDto>(x)).ToList();
 
-            return new (result);
+            return new(result);
         }
         catch (Exception ex)
         {

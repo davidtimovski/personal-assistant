@@ -4,7 +4,6 @@ using Core.Application.Contracts.Models;
 using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
-using Sentry;
 using ToDoAssistant.Application.Contracts.Lists;
 using ToDoAssistant.Application.Contracts.Tasks;
 using ToDoAssistant.Application.Contracts.Tasks.Models;
@@ -239,7 +238,7 @@ public class TaskService : ITaskService
             var result = new CreatedTaskResult(ResultStatus.Successful)
             {
                 TaskId = id,
-                ListId = task.ListId, 
+                ListId = task.ListId,
                 NotifySignalR = notifySignalR,
                 TaskName = task.Name,
                 ListName = list.Name,
@@ -315,9 +314,9 @@ public class TaskService : ITaskService
                 throw new Exception("User retrieval failed");
             }
 
-            var result = new BulkCreateResult(ResultStatus.Successful) 
-            { 
-                ListId = list.Id, 
+            var result = new BulkCreateResult(ResultStatus.Successful)
+            {
+                ListId = list.Id,
                 NotifySignalR = notifySignalR,
                 ListName = list.Name,
                 CreatedTasks = createdTasks.Select(x => new BulkCreatedTask
@@ -403,7 +402,11 @@ public class TaskService : ITaskService
             }
             else
             {
-                ToDoList oldList = _listsRepository.Get(originalTask.ListId);
+                ToDoList? oldList = _listsRepository.Get(originalTask.ListId);
+                if (oldList is null)
+                {
+                    throw new Exception("Original list could not be found");
+                }
 
                 result.OldListId = originalTask.ListId;
                 result.OldListName = oldList.Name;

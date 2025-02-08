@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
-using Sentry;
 using ToDoAssistant.Api.Hubs;
 using ToDoAssistant.Api.Models;
 using ToDoAssistant.Api.Models.Tasks.Requests;

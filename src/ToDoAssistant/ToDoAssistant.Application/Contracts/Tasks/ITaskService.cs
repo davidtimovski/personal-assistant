@@ -1,6 +1,5 @@
 ﻿using Core.Application.Contracts;
 using FluentValidation;
-using Sentry;
 using ToDoAssistant.Application.Contracts.Tasks.Models;
 
 namespace ToDoAssistant.Application.Contracts.Tasks;

@@ -119,7 +119,7 @@ public class ListsRepository : BaseRepository, IListsRepository
         }
     }
 
-    public ToDoList Get(int id)
+    public ToDoList? Get(int id)
     {
         using IDbConnection conn = OpenConnection();
 
@@ -541,13 +541,14 @@ public class ListsRepository : BaseRepository, IListsRepository
 
         try
         {
-            ToDoList list = Get(id);
+            ToDoList? list = Get(id);
 
             using IDbConnection conn = OpenConnection();
 
-            var affectedUsers = new List<(int, short?)> {
-            (list.UserId, list.Order)
-        };
+            var affectedUsers = new List<(int, short?)>
+            {
+                (list.UserId, list.Order)
+            };
             affectedUsers.AddRange(conn.Query<(int, short?)>(@"SELECT user_id, ""order""
                                                            FROM todo.shares
                                                            WHERE list_id = @Id AND is_accepted = TRUE", new { Id = id }));

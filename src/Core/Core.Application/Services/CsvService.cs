@@ -6,7 +6,6 @@ using Core.Application.Utils;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
-using Sentry;
 
 namespace Core.Application.Services;
 

@@ -5,7 +5,6 @@ using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
-using Sentry;
 
 namespace Cdn;
 

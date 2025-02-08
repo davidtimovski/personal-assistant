@@ -10,7 +10,6 @@ using Core.Application.Contracts.Models;
 using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
-using Sentry;
 
 namespace Chef.Application.Services;
 

@@ -1,5 +1,4 @@
-﻿using Sentry;
-using ToDoAssistant.Application.Entities;
+﻿using ToDoAssistant.Application.Entities;
 using User = Core.Application.Entities.User;
 
 namespace ToDoAssistant.Application.Contracts.Lists;
@@ -10,7 +9,7 @@ public interface IListsRepository
     IReadOnlyList<int> GetNonArchivedSharedListIds(int userId);
     IReadOnlyList<ToDoList> GetAllWithTasksAndSharingDetails(int userId, ISpan metricsSpan);
     IReadOnlyList<User> GetMembersAsAssigneeOptions(int id, ISpan metricsSpan);
-    ToDoList Get(int id);
+    ToDoList? Get(int id);
     ToDoList? GetWithShares(int id, int userId, ISpan metricsSpan);
     ToDoList? GetWithOwner(int id, int userId, ISpan metricsSpan);
     IReadOnlyList<ListShare> GetShares(int id, ISpan metricsSpan);

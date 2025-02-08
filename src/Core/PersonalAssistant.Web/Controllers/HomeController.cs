@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using PersonalAssistant.Web.Models;
 using PersonalAssistant.Web.ViewModels.Home;
-using Sentry;
 
 namespace PersonalAssistant.Web.Controllers;
 

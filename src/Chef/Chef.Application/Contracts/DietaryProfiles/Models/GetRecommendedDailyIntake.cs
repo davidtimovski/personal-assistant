@@ -29,7 +29,7 @@ public class GetRecommendedDailyIntake
 
 public class GetRecommendedDailyIntakeValidator : AbstractValidator<GetRecommendedDailyIntake>
 {
-    private static readonly HashSet<string> Genders = new () { "Male", "Female" };
+    private static readonly HashSet<string> Genders = new() { "Male", "Female" };
     private static readonly HashSet<string> ActivityLevels = new() { "Sedentary", "Light", "Moderate", "Active", "VeryActive" };
     private static readonly HashSet<string> Goals = new() { "None", "MildWeightLoss", "WeightLoss", "MildWeightGain", "WeightGain" };
 

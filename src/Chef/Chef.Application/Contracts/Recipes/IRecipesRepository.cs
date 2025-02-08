@@ -1,5 +1,4 @@
 ﻿using Chef.Application.Entities;
-using Sentry;
 using User = Chef.Application.Entities.User;
 
 namespace Chef.Application.Contracts.Recipes;

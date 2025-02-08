@@ -3,11 +3,9 @@ using Chef.Application.Contracts.Ingredients;
 using Chef.Application.Contracts.Ingredients.Models;
 using Chef.Application.Entities;
 using Core.Application.Contracts;
-using Core.Application.Entities;
 using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
-using Sentry;
 
 namespace Chef.Application.Services;
 

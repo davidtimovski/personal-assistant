@@ -1,5 +1,4 @@
 ﻿using Chef.Application.Entities;
-using Sentry;
 
 namespace Chef.Application.Contracts.DietaryProfiles;
 

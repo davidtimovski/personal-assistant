@@ -19,7 +19,8 @@ public class BulkCreateValidator : AbstractValidator<BulkCreate>
     {
         RuleFor(dto => dto.UserId)
             .NotEmpty().WithMessage("Unauthorized")
-            .Must((dto, userId) => {
+            .Must((dto, userId) =>
+            {
                 var ownsOrSharesResult = listService.UserOwnsOrShares(dto.ListId, userId);
                 if (ownsOrSharesResult.Failed)
                 {

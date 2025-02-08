@@ -1,5 +1,4 @@
-﻿using Sentry;
-using ToDoAssistant.Application.Entities;
+﻿using ToDoAssistant.Application.Entities;
 
 namespace ToDoAssistant.Application.Contracts.Notifications;
 

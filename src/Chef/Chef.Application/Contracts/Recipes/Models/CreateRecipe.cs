@@ -63,7 +63,7 @@ public class CreateRecipeValidator : AbstractValidator<CreateRecipe>
 
 public class UpdateRecipeIngredientValidator : AbstractValidator<UpdateRecipeIngredient>
 {
-    private static readonly HashSet<string> Units = new () { "g", "ml", "oz", "cup", "tbsp", "tsp", "pinch" };
+    private static readonly HashSet<string> Units = new() { "g", "ml", "oz", "cup", "tbsp", "tsp", "pinch" };
 
     public UpdateRecipeIngredientValidator()
     {

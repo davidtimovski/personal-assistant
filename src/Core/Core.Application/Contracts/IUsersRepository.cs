@@ -1,5 +1,4 @@
-﻿using Sentry;
-using User = Core.Application.Entities.User;
+﻿using User = Core.Application.Entities.User;
 
 namespace Core.Application.Contracts;
 

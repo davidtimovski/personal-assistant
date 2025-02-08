@@ -3,7 +3,6 @@ using System.Web;
 using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
-using Sentry;
 using Weatherman.Application.Contracts.Forecasts;
 using Weatherman.Application.Contracts.Forecasts.Models;
 using Weatherman.Application.Entities;
