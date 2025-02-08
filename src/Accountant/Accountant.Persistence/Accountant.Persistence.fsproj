@@ -20,7 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Npgsql.FSharp" Version="5.7.0" />
+		<PackageReference Include="Npgsql.FSharp" Version="8.0.0" />
 		<PackageReference Include="Sentry.Extensions.Logging" Version="$(SentryVersion)" />
 	</ItemGroup>
 
