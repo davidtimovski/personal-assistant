@@ -1,6 +1,4 @@
-﻿using Sentry;
-
-namespace Core.Application.Contracts;
+﻿namespace Core.Application.Contracts;
 
 public interface ICurrenciesRepository
 {

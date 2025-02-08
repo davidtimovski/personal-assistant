@@ -1,6 +1,5 @@
 ﻿using Core.Application.Contracts;
 using FluentValidation;
-using Sentry;
 using ToDoAssistant.Application.Contracts.Lists.Models;
 using User = Core.Application.Entities.User;
 

@@ -1,5 +1,4 @@
-﻿using Sentry;
-using Weatherman.Application.Contracts.Forecasts.Models;
+﻿using Weatherman.Application.Contracts.Forecasts.Models;
 using Weatherman.Application.Entities;
 
 namespace Weatherman.Application.Contracts.Forecasts;

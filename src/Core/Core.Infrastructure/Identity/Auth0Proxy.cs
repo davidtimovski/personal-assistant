@@ -3,7 +3,6 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
 using Core.Infrastructure.Configuration;
-using Sentry;
 
 namespace Core.Infrastructure.Identity;
 

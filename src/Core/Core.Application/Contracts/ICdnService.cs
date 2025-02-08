@@ -1,6 +1,5 @@
 ﻿using Core.Application.Contracts.Models;
 using FluentValidation;
-using Sentry;
 
 namespace Core.Application.Contracts;
 

@@ -3,7 +3,6 @@ using Core.Application.Contracts;
 using Core.Application.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Sentry;
 
 namespace Core.Api.Controllers;
 

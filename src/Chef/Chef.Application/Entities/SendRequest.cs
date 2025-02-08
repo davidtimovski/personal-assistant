@@ -1,5 +1,4 @@
 ﻿using Core.Application;
-using Core.Application.Entities;
 
 namespace Chef.Application.Entities;
 

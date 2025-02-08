@@ -18,7 +18,6 @@ using PersonalAssistant.Web.Models;
 using PersonalAssistant.Web.Services;
 using PersonalAssistant.Web.ViewModels.Account;
 using PersonalAssistant.Web.ViewModels.Home;
-using Sentry;
 using ToDoAssistant.Application.Contracts.Lists;
 using static Accountant.Persistence.AccountsRepository;
 

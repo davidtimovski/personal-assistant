@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Chef.Api.Models.Recipes.Responses;
+﻿namespace Chef.Api.Models.Recipes.Responses;
 
 public class CanSendResponse
 {

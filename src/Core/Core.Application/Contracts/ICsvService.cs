@@ -1,5 +1,4 @@
 ﻿using Core.Application.Contracts.Models;
-using Sentry;
 
 namespace Core.Application.Contracts;
 

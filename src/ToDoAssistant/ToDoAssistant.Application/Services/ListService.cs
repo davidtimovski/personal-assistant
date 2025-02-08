@@ -4,7 +4,6 @@ using Core.Application.Contracts.Models;
 using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
-using Sentry;
 using ToDoAssistant.Application.Contracts;
 using ToDoAssistant.Application.Contracts.Lists;
 using ToDoAssistant.Application.Contracts.Lists.Models;
@@ -122,7 +121,7 @@ public class ListService : IListService
     {
         try
         {
-            ToDoList list = _listsRepository.Get(id);
+            ToDoList? list = _listsRepository.Get(id);
 
             var result = _mapper.Map<SimpleList>(list);
 
@@ -764,7 +763,11 @@ public class ListService : IListService
                 return new LeaveListResult(true);
             }
 
-            ToDoList list = _listsRepository.Get(id);
+            ToDoList? list = _listsRepository.Get(id);
+            if (list is null)
+            {
+                throw new Exception("List could not be found");
+            }
 
             var userResult = _userService.Get(userId);
             if (userResult.Failed)
@@ -781,7 +784,8 @@ public class ListService : IListService
             };
 
             return result
-;        }
+;
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Unexpected error in {nameof(LeaveAsync)}");
@@ -877,7 +881,11 @@ public class ListService : IListService
                 return new SetTasksAsNotCompletedResult(true);
             }
 
-            ToDoList list = _listsRepository.Get(id);
+            ToDoList? list = _listsRepository.Get(id);
+            if (list is null)
+            {
+                throw new Exception("List could not be found");
+            }
 
             var userResult = _userService.Get(userId);
             if (userResult.Failed)
@@ -920,7 +928,11 @@ public class ListService : IListService
                 return new SetShareIsAcceptedResult(true);
             }
 
-            ToDoList list = _listsRepository.Get(id);
+            ToDoList? list = _listsRepository.Get(id);
+            if (list is null)
+            {
+                throw new Exception("List could not be found");
+            }
 
             var userResult = _userService.Get(userId);
             if (userResult.Failed)

@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
-using Sentry;
 using ToDoAssistant.Api.Models;
 using ToDoAssistant.Api.Models.Lists.Requests;
 using ToDoAssistant.Api.Models.Lists.Responses;

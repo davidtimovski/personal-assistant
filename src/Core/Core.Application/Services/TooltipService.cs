@@ -4,7 +4,6 @@ using Core.Application.Contracts.Models;
 using Core.Application.Entities;
 using Core.Application.Utils;
 using Microsoft.Extensions.Logging;
-using Sentry;
 
 namespace Core.Application.Services;
 

@@ -7,7 +7,6 @@ using Core.Application.Utils;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Sentry;
 
 namespace Chef.Api.Controllers;
 
@@ -18,7 +17,7 @@ public class DietaryProfilesController : BaseController
     private readonly IDietaryProfileService _dietaryProfileService;
     private readonly IValidator<GetRecommendedDailyIntake> _getRecommendedDailyIntakeValidator;
     private readonly IValidator<UpdateDietaryProfile> _updateDietaryProfileValidator;
-    
+
     public DietaryProfilesController(
         IUserIdLookup? userIdLookup,
         IUsersRepository? usersRepository,

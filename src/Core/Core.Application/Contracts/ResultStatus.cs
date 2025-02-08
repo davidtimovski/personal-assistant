@@ -1,6 +1,4 @@
-﻿using FluentValidation.Results;
-
-namespace Core.Application.Contracts;
+﻿namespace Core.Application.Contracts;
 
 /// <summary>
 /// Represents the status of an operation that includes validation.

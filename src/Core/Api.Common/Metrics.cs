@@ -1,6 +1,4 @@
-﻿using Sentry;
-
-namespace Api.Common;
+﻿namespace Api.Common;
 
 public static class Metrics
 {

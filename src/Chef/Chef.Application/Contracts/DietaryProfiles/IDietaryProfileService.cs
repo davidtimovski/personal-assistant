@@ -2,7 +2,6 @@
 using Chef.Application.Contracts.Recipes.Models;
 using Chef.Application.Entities;
 using FluentValidation;
-using Sentry;
 
 namespace Chef.Application.Contracts.DietaryProfiles;
 

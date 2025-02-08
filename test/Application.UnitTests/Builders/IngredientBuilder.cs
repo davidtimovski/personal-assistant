@@ -7,7 +7,7 @@ internal class IngredientBuilder
 {
     private string name = "Dummy name";
     private int? taskId;
-    private List<RecipeIngredient> recipesIngredients = new ();
+    private List<RecipeIngredient> recipesIngredients = new();
 
     internal IngredientBuilder WithName(string newName)
     {

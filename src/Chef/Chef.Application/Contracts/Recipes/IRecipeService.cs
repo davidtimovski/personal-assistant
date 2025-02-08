@@ -1,6 +1,5 @@
 ﻿using Chef.Application.Contracts.Recipes.Models;
 using FluentValidation;
-using Sentry;
 
 namespace Chef.Application.Contracts.Recipes;
 

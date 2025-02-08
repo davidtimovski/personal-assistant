@@ -3,7 +3,6 @@ using Core.Application.Contracts;
 using Core.Application.Contracts.Models;
 using Core.Application.Utils;
 using Microsoft.Extensions.Logging;
-using Sentry;
 using User = Core.Application.Entities.User;
 
 namespace Core.Application.Services;
