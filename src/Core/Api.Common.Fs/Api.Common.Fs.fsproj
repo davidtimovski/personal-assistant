@@ -11,7 +11,7 @@
 		<PackageReference Include="Azure.Identity" Version="1.13.2" />
 		<PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.7.0" />
 		<PackageReference Include="Giraffe" Version="$(GiraffeVersion)" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.12" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
 		<PackageReference Include="Sentry.AspNetCore" Version="$(SentryVersion)" />
 	</ItemGroup>
