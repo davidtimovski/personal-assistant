@@ -3,8 +3,4 @@
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
-
-	<PropertyGroup>
-		<SentryVersion>6.0.0</SentryVersion>
-	</PropertyGroup>
 </Project>

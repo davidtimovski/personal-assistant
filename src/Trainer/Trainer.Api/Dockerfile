@@ -4,7 +4,7 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY ["PersonalAssistant.targets", "PersonalAssistant.Fs.targets", "./"]
+COPY ["Directory.Packages.props", "PersonalAssistant.targets", "./"]
 COPY ["src/Trainer/Trainer.Api/Trainer.Api.fsproj", "src/Trainer/Trainer.Api/"]
 RUN dotnet restore "src/Trainer/Trainer.Api/Trainer.Api.fsproj"
 COPY . .
