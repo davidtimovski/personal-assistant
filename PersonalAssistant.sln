@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.1.31903.286
+# Visual Studio Version 18
+VisualStudioVersion = 18.1.11312.151 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api.UnitTests", "test\Api.UnitTests\Api.UnitTests.csproj", "{CE8059EA-4799-4E38-999D-BE7D599FAD04}"
 EndProject
@@ -96,19 +96,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8031945C-A
 		docs\architecture.md = docs\architecture.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pipelines", "pipelines", "{9F224D0C-1D08-4743-AF9A-82A064EB495C}"
-	ProjectSection(SolutionItems) = preProject
-		.github\workflows\cd_accountant.yml = .github\workflows\cd_accountant.yml
-		.github\workflows\cd_chef.yml = .github\workflows\cd_chef.yml
-		.github\workflows\cd_core.yml = .github\workflows\cd_core.yml
-		.github\workflows\cd_gateway.yml = .github\workflows\cd_gateway.yml
-		.github\workflows\cd_personalassistant.yml = .github\workflows\cd_personalassistant.yml
-		.github\workflows\cd_sender.yml = .github\workflows\cd_sender.yml
-		.github\workflows\cd_todo.yml = .github\workflows\cd_todo.yml
-		.github\workflows\cd_weatherman.yml = .github\workflows\cd_weatherman.yml
-		.github\workflows\ci_dev.yml = .github\workflows\ci_dev.yml
-		.github\workflows\test.yml = .github\workflows\test.yml
-	EndProjectSection
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{9F224D0C-1D08-4743-AF9A-82A064EB495C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sql", "sql", "{C034C1DC-532B-40C8-8F03-4B223E716199}"
 	ProjectSection(SolutionItems) = preProject
@@ -165,6 +153,20 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "weatherman", "weatherman", "{09D024E3-6411-4015-BE20-A77B336AAB0B}"
 	ProjectSection(SolutionItems) = preProject
 		sql\weatherman\forecasts.sql = sql\weatherman\forecasts.sql
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{8A067375-5DC5-4A92-8BF9-FF9C1868B1EF}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\cd_accountant.yml = .github\workflows\cd_accountant.yml
+		.github\workflows\cd_chef.yml = .github\workflows\cd_chef.yml
+		.github\workflows\cd_core.yml = .github\workflows\cd_core.yml
+		.github\workflows\cd_gateway.yml = .github\workflows\cd_gateway.yml
+		.github\workflows\cd_personalassistant.yml = .github\workflows\cd_personalassistant.yml
+		.github\workflows\cd_sender.yml = .github\workflows\cd_sender.yml
+		.github\workflows\cd_todo.yml = .github\workflows\cd_todo.yml
+		.github\workflows\cd_weatherman.yml = .github\workflows\cd_weatherman.yml
+		.github\workflows\ci_dev.yml = .github\workflows\ci_dev.yml
+		.github\workflows\test.yml = .github\workflows\test.yml
 	EndProjectSection
 EndProject
 Global
@@ -332,6 +334,7 @@ Global
 		{BB063EDE-5C95-4B28-9CDB-AFC506EEFF07} = {C034C1DC-532B-40C8-8F03-4B223E716199}
 		{01CE32D6-E967-417B-B420-DC2AA0346DC8} = {C034C1DC-532B-40C8-8F03-4B223E716199}
 		{09D024E3-6411-4015-BE20-A77B336AAB0B} = {C034C1DC-532B-40C8-8F03-4B223E716199}
+		{8A067375-5DC5-4A92-8BF9-FF9C1868B1EF} = {9F224D0C-1D08-4743-AF9A-82A064EB495C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1296A1BD-7B9D-40F2-9873-972EB471C47D}

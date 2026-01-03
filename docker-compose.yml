@@ -1,5 +1,3 @@
-version: '3.4'
-
 services:
   personalassistant-web:
     image: personalassistant-web:latest

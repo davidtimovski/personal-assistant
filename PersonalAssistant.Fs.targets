@@ -2,6 +2,6 @@
 	<Import Project="PersonalAssistant.targets" />
 
 	<PropertyGroup>
-		<GiraffeVersion>7.0.2</GiraffeVersion>
+		<GiraffeVersion>8.2.0</GiraffeVersion>
 	</PropertyGroup>
 </Project>
