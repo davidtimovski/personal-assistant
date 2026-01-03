@@ -11,22 +11,36 @@ module UpcomingExpensesRepository =
     [<Literal>]
     let private table = "accountant.upcoming_expenses"
 
+    let private rowToEntity (read: RowReader) =
+        { Id = read.int "id"
+          UserId = read.int "user_id"
+          CategoryId = read.intOrNone "category_id"
+          Amount = read.decimal "amount"
+          Currency = read.string "currency"
+          Description = read.stringOrNone "description"
+          Date = read.dateTime "date"
+          Generated = read.bool "generated"
+          CreatedDate = read.dateTime "created_date"
+          ModifiedDate = read.dateTime "modified_date" }
+
+    let get (id: int) connectionString =
+        task {
+            let! upcomingExpenses =
+                connectionString
+                |> Sql.connect
+                |> Sql.query $"SELECT * FROM {table} WHERE id = @id"
+                |> Sql.parameters [ "id", Sql.int id ]
+                |> Sql.executeAsync rowToEntity
+            
+            return if upcomingExpenses.Length > 0 then Some upcomingExpenses[0] else None
+        }
+
     let getAll (userId: int) (fromModifiedDate: DateTime) connectionString =
         connectionString
         |> Sql.connect
         |> Sql.query $"SELECT * FROM {table} WHERE user_id = @user_id AND modified_date > @modified_date"
         |> Sql.parameters [ "user_id", Sql.int userId; "modified_date", Sql.timestamptz fromModifiedDate ]
-        |> Sql.executeAsync (fun read ->
-            { Id = read.int "id"
-              UserId = read.int "user_id"
-              CategoryId = read.intOrNone "category_id"
-              Amount = read.decimal "amount"
-              Currency = read.string "currency"
-              Description = read.stringOrNone "description"
-              Date = read.dateTime "date"
-              Generated = read.bool "generated"
-              CreatedDate = read.dateTime "created_date"
-              ModifiedDate = read.dateTime "modified_date" })
+        |> Sql.executeAsync rowToEntity
 
     let create (upcomingExpense: UpcomingExpense) (conn: RegularOrTransactionalConn) (metricsSpan: ISpan) =
         let metric = metricsSpan.StartChild("UpcomingExpensesRepository.create")

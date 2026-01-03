@@ -50,7 +50,7 @@ module Logic =
         >> bind validateCreateCurrency
         >> bind validateCreateDescription
 
-    let prepareForCreate (request: CreateDebtRequest) (userId: int) =
+    let createRequestToEntity (request: CreateDebtRequest) (userId: int) =
         { Id = 0
           UserId = userId
           Person = request.Person.Trim()
@@ -61,7 +61,7 @@ module Logic =
           CreatedDate = request.CreatedDate
           ModifiedDate = request.ModifiedDate }
 
-    let prepareForCreateMerged (request: CreateDebtRequest) (userId: int) =
+    let createMergedRequestToEntity (request: CreateDebtRequest) (userId: int) =
         { Id = 0
           UserId = userId
           Person = request.Person.Trim()
@@ -72,36 +72,41 @@ module Logic =
           CreatedDate = request.CreatedDate
           ModifiedDate = request.ModifiedDate }
 
-    let private validateUpdateDebt (request: UpdateDebtRequest) =
-        let userId = getUserId request.HttpContext
-        let connectionString = getConnectionString request.HttpContext
+    type UpdateValidationParams =
+        { CurrentUserId: int
+          Request: UpdateDebtRequest
+          ExistingDebt: Debt option }
 
-        if Validation.debtBelongsTo request.Id userId connectionString then
-            Success request
-        else
-            Failure "Debt is not valid"
+    let private validateUpdateDebt (parameters: UpdateValidationParams) =
+        match parameters.ExistingDebt with
+        | Some debt ->
+            if debt.UserId = parameters.CurrentUserId then
+                Success parameters
+            else
+                Failure "Debt does not belong to user"
+        | None -> Failure "Debt does not exist"
 
-    let private validateUpdatePerson (request: UpdateDebtRequest) =
-        if Validation.textIsNotEmpty request.Person then
-            Success request
+    let private validateUpdatePerson (parameters: UpdateValidationParams) =
+        if Validation.textIsNotEmpty parameters.Request.Person then
+            Success parameters
         else
             Failure "Person is not valid"
 
-    let private validateUpdateAmount (request: UpdateDebtRequest) =
-        if Validation.amountIsValid request.Amount then
-            Success request
+    let private validateUpdateAmount (parameters: UpdateValidationParams) =
+        if Validation.amountIsValid parameters.Request.Amount then
+            Success parameters
         else
             Failure "Amount has to be a positive number"
 
-    let private validateUpdateCurrency (request: UpdateDebtRequest) =
-        if Validation.currencyIsValid request.Currency then
-            Success request
+    let private validateUpdateCurrency (parameters: UpdateValidationParams) =
+        if Validation.currencyIsValid parameters.Request.Currency then
+            Success parameters
         else
             Failure "Currency is not valid"
 
-    let private validateUpdateDescription (request: UpdateDebtRequest) =
-        if Validation.textIsNoneOrLengthIsValid request.Description descriptionMaxLength then
-            Success request
+    let private validateUpdateDescription (parameters: UpdateValidationParams) =
+        if Validation.textIsNoneOrLengthIsValid parameters.Request.Description descriptionMaxLength then
+            Success parameters
         else
             Failure $"Description cannot exceed {descriptionMaxLength} characters"
 
@@ -112,7 +117,7 @@ module Logic =
         >> bind validateUpdateCurrency
         >> bind validateUpdateDescription
 
-    let prepareForUpdate (request: UpdateDebtRequest) (userId: int) =
+    let updateRequestToEntity (request: UpdateDebtRequest) (userId: int) =
         { Id = request.Id
           UserId = userId
           Person = request.Person.Trim()

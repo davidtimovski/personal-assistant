@@ -26,8 +26,7 @@ module Logic =
         let userId = getUserId request.HttpContext
         let connectionString = getConnectionString request.HttpContext
 
-        if
-            request.CategoryId.IsNone
+        if request.CategoryId.IsNone
             || Validation.categoryBelongsTo request.CategoryId.Value userId connectionString
         then
             Success request
@@ -58,7 +57,7 @@ module Logic =
         >> bind validateCreateCurrency
         >> bind validateCreateDescription
 
-    let prepareForCreate (request: CreateUpcomingExpenseRequest) (userId: int) =
+    let createRequestToEntity (request: CreateUpcomingExpenseRequest) (userId: int) =
         { Id = 0
           UserId = userId
           CategoryId = request.CategoryId
@@ -70,42 +69,45 @@ module Logic =
           CreatedDate = request.CreatedDate
           ModifiedDate = request.ModifiedDate }
 
-    let private validateUpdateUpcomingExpense (request: UpdateUpcomingExpenseRequest) =
-        let userId = getUserId request.HttpContext
-        let connectionString = getConnectionString request.HttpContext
+    type UpdateValidationParams =
+        { CurrentUserId: int
+          Request: UpdateUpcomingExpenseRequest
+          ExistingUpcomingExpense: UpcomingExpense option
+          ExistingCategory: Category option }
 
-        if Validation.upcomingExpenseBelongsTo request.Id userId connectionString then
-            Success request
-        else
-            Failure "Upcoming expense is not valid"
+    let private validateUpdateUpcomingExpense (parameters: UpdateValidationParams) =
+        match parameters.ExistingUpcomingExpense with
+        | Some upcomingExpense ->
+            if upcomingExpense.UserId = parameters.CurrentUserId then
+                Success parameters
+            else
+                Failure "Upcoming expense does not belong to user"
+        | None -> Failure "Upcoming expense does not exist"
 
-    let private validateUpdateCategory (request: UpdateUpcomingExpenseRequest) =
-        let userId = getUserId request.HttpContext
-        let connectionString = getConnectionString request.HttpContext
+    let private validateUpdateCategory (parameters: UpdateValidationParams) =
+        match parameters.ExistingCategory with
+        | Some category ->
+            if category.UserId = parameters.CurrentUserId then
+                Success parameters
+            else
+                Failure "Category does not belong to user"
+        | None -> Failure "Category does not exist"
 
-        if
-            request.CategoryId.IsNone
-            || Validation.categoryBelongsTo request.CategoryId.Value userId connectionString
-        then
-            Success request
-        else
-            Failure "Category is not valid"
-
-    let private validateUpdateAmount (request: UpdateUpcomingExpenseRequest) =
-        if Validation.amountIsValid request.Amount then
-            Success request
+    let private validateUpdateAmount (parameters: UpdateValidationParams) =
+        if Validation.amountIsValid parameters.Request.Amount then
+            Success parameters
         else
             Failure "Amount has to be a positive number"
 
-    let private validateUpdateCurrency (request: UpdateUpcomingExpenseRequest) =
-        if Validation.currencyIsValid request.Currency then
-            Success request
+    let private validateUpdateCurrency (parameters: UpdateValidationParams) =
+        if Validation.currencyIsValid parameters.Request.Currency then
+            Success parameters
         else
             Failure "Currency is not valid"
 
-    let private validateUpdateDescription (request: UpdateUpcomingExpenseRequest) =
-        if Validation.textIsNoneOrLengthIsValid request.Description descriptionMaxLength then
-            Success request
+    let private validateUpdateDescription (parameters: UpdateValidationParams) =
+        if Validation.textIsNoneOrLengthIsValid parameters.Request.Description descriptionMaxLength then
+            Success parameters
         else
             Failure $"Description cannot exceed {descriptionMaxLength} characters"
 
@@ -116,7 +118,7 @@ module Logic =
         >> bind validateUpdateCurrency
         >> bind validateUpdateDescription
 
-    let prepareForUpdate (request: UpdateUpcomingExpenseRequest) (userId: int) =
+    let updateRequestToEntity (request: UpdateUpcomingExpenseRequest) (userId: int) =
         { Id = request.Id
           UserId = userId
           CategoryId = request.CategoryId

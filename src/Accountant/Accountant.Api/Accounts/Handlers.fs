@@ -8,6 +8,7 @@ open Api.Common.Fs
 open CommonHandlers
 open HandlerBase
 open Models
+open Logic
 
 module Handlers =
 
@@ -23,7 +24,7 @@ module Handlers =
 
                 match Logic.validateCreate request with
                 | Success _ ->
-                    let account = Logic.prepareForCreate request userId
+                    let account = Logic.createRequestToEntity request userId
 
                     let connection = getDbConnection ctx
                     let! id = AccountsRepository.create account connection tr
@@ -49,11 +50,19 @@ module Handlers =
                 let! request = ctx.BindJsonAsync<UpdateAccountRequest>()
                 request.HttpContext <- ctx
 
-                match Logic.validateUpdate request with
-                | Success _ ->
-                    let account = Logic.prepareForUpdate request userId
+                let connectionString = getConnectionString ctx
+                let! existingAccount = AccountsRepository.get request.Id connectionString
 
-                    let connectionString = getConnectionString ctx
+                let validationParams =
+                    {
+                        CurrentUserId = userId
+                        Request = request
+                        ExistingAccount = existingAccount
+                    }
+
+                match Logic.validateUpdate validationParams with
+                | Success _ ->
+                    let account = Logic.updateRequestToEntity request userId
                     let! _ = AccountsRepository.update account connectionString tr
 
                     let! result = Successful.NO_CONTENT next ctx

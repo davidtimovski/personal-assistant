@@ -12,21 +12,35 @@ module DebtsRepository =
     [<Literal>]
     let private table = "accountant.debts"
 
+    let private rowToEntity (read: RowReader) =
+        { Id = read.int "id"
+          UserId = read.int "user_id"
+          Person = read.string "person"
+          Amount = read.decimal "amount"
+          Currency = read.string "currency"
+          UserIsDebtor = read.bool "user_is_debtor"
+          Description = read.stringOrNone "description"
+          CreatedDate = read.dateTime "created_date"
+          ModifiedDate = read.dateTime "modified_date" }
+
+    let get (id: int) connectionString =
+        task {
+            let! debts =
+                connectionString
+                |> Sql.connect
+                |> Sql.query $"SELECT * FROM {table} WHERE id = @id"
+                |> Sql.parameters [ "id", Sql.int id ]
+                |> Sql.executeAsync rowToEntity
+            
+            return if debts.Length > 0 then Some debts[0] else None
+        }
+
     let getAll (userId: int) (fromModifiedDate: DateTime) connectionString =
         connectionString
         |> Sql.connect
         |> Sql.query $"SELECT * FROM {table} WHERE user_id = @user_id AND modified_date > @modified_date"
         |> Sql.parameters [ "user_id", Sql.int userId; "modified_date", Sql.timestamptz fromModifiedDate ]
-        |> Sql.executeAsync (fun read ->
-            { Id = read.int "id"
-              UserId = read.int "user_id"
-              Person = read.string "person"
-              Amount = read.decimal "amount"
-              Currency = read.string "currency"
-              UserIsDebtor = read.bool "user_is_debtor"
-              Description = read.stringOrNone "description"
-              CreatedDate = read.dateTime "created_date"
-              ModifiedDate = read.dateTime "modified_date" })
+        |> Sql.executeAsync rowToEntity
 
     let create (debt: Debt) (conn: RegularOrTransactionalConn) (metricsSpan: ISpan) =
         let metric = metricsSpan.StartChild("DebtsRepository.create")

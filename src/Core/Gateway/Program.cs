@@ -1,4 +1,5 @@
 using Gateway.Models;
+using Microsoft.AspNetCore.Http.Features;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 
@@ -35,6 +36,12 @@ builder.Services.AddCors(opt =>
             .AllowCredentials() // For SignalR
             .SetPreflightMaxAge(TimeSpan.FromDays(20));
     });
+});
+
+builder.Services.Configure<FormOptions>(options =>
+{
+    const int bodyLengthLimitInMegabytes = 10;
+    options.MultipartBodyLengthLimit = bodyLengthLimitInMegabytes * 1024 * 1024;
 });
 
 builder.Services.AddOcelot();

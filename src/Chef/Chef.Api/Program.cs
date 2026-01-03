@@ -6,6 +6,7 @@ using Chef.Persistence;
 using Core.Application;
 using Core.Infrastructure;
 using Core.Persistence;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,12 @@ if (builder.Environment.IsProduction())
 
     builder.Host.AddSentryLogging(builder.Configuration, "Chef", new HashSet<string> { "GET /health" });
 }
+
+builder.Services.Configure<FormOptions>(options =>
+{
+    const int bodyLengthLimitInMegabytes = 10;
+    options.MultipartBodyLengthLimit = bodyLengthLimitInMegabytes * 1024 * 1024;
+});
 
 builder.Services
     .AddApplication()

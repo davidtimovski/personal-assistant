@@ -24,8 +24,7 @@ module Logic =
         let userId = getUserId request.HttpContext
         let connectionString = getConnectionString request.HttpContext
 
-        if
-            request.ParentId.IsNone
+        if request.ParentId.IsNone
             || Validation.categoryBelongsTo request.ParentId.Value userId connectionString
         then
             Success request
@@ -33,17 +32,18 @@ module Logic =
             Failure "Category is not valid"
 
     let private validateCreateName (request: CreateCategoryRequest) =
-        if
-            (Validation.textIsNotEmpty request.Name)
+        if (Validation.textIsNotEmpty request.Name)
             && (Validation.textLengthIsValid request.Name nameMaxLength)
         then
             Success request
         else
             Failure "Name is not valid"
 
-    let validateCreate = validateCreateParentCategory >> bind validateCreateName
+    let validateCreate =
+        validateCreateParentCategory
+        >> bind validateCreateName
 
-    let prepareForCreate (request: CreateCategoryRequest) (userId: int) =
+    let createRequestToEntity (request: CreateCategoryRequest) (userId: int) =
         { Id = 0
           UserId = userId
           ParentId = request.ParentId
@@ -57,33 +57,35 @@ module Logic =
           CreatedDate = request.CreatedDate
           ModifiedDate = request.ModifiedDate }
 
-    let private validateUpdateCategory (request: UpdateCategoryRequest) =
-        let userId = getUserId request.HttpContext
-        let connectionString = getConnectionString request.HttpContext
+    type UpdateValidationParams =
+        { CurrentUserId: int
+          Request: UpdateCategoryRequest
+          ExistingCategory: Category option
+          ExistingParentCategory: Category option }
 
-        if Validation.categoryBelongsTo request.Id userId connectionString then
-            Success request
-        else
-            Failure "Category is not valid"
+    let private validateUpdateCategory (parameters: UpdateValidationParams) =
+        match parameters.ExistingCategory with
+        | Some category ->
+            if category.UserId = parameters.CurrentUserId then
+                Success parameters
+            else
+                Failure "Category does not belong to user"
+        | None -> Failure "Category does not exist"
 
-    let private validateUpdateParentCategory (request: UpdateCategoryRequest) =
-        let userId = getUserId request.HttpContext
-        let connectionString = getConnectionString request.HttpContext
+    let private validateUpdateParentCategory (parameters: UpdateValidationParams) =
+        match parameters.ExistingParentCategory with
+        | Some category ->
+            if category.UserId = parameters.CurrentUserId then
+                Success parameters
+            else
+                Failure "Parent category does not belong to user"
+        | None -> Success parameters
 
-        if
-            request.ParentId.IsNone
-            || Validation.categoryBelongsTo request.ParentId.Value userId connectionString
+    let private validateUpdateName (parameters: UpdateValidationParams) =
+        if (Validation.textIsNotEmpty parameters.Request.Name)
+            && (Validation.textLengthIsValid parameters.Request.Name nameMaxLength)
         then
-            Success request
-        else
-            Failure "Category is not valid"
-
-    let private validateUpdateName (request: UpdateCategoryRequest) =
-        if
-            (Validation.textIsNotEmpty request.Name)
-            && (Validation.textLengthIsValid request.Name nameMaxLength)
-        then
-            Success request
+            Success parameters
         else
             Failure "Name is not valid"
 
@@ -92,7 +94,7 @@ module Logic =
         >> bind validateUpdateParentCategory
         >> bind validateUpdateName
 
-    let prepareForUpdate (request: UpdateCategoryRequest) (userId: int) =
+    let updateRequestToEntity (request: UpdateCategoryRequest) (userId: int) =
         { Id = request.Id
           UserId = userId
           ParentId = request.ParentId
