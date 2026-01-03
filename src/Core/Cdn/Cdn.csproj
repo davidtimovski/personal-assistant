@@ -7,7 +7,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CloudinaryDotNet" Version="1.27.3" />
+		<PackageReference Include="CloudinaryDotNet" Version="1.27.9" />
 	</ItemGroup>
 
 	<ItemGroup>
