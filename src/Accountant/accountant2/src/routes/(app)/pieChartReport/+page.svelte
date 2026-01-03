@@ -64,18 +64,6 @@
 			if (item.subItems.length === 0) {
 				item.color = legendColors.length > 0 ? <string>legendColors.shift() : '#e0e0e0';
 				flatItems.push(item);
-
-				sum += item.amount;
-			} else if (item.subItems.length === 1) {
-				item.color = legendColors.length > 0 ? <string>legendColors.shift() : '#e0e0e0';
-
-				const subItem = item.subItems[0];
-				item.categoryId = subItem.categoryId;
-				item.categoryName += '/' + subItem.categoryName?.replace('- ', '');
-				item.subItems = [];
-				flatItems.push(item);
-
-				sum += item.amount;
 			} else {
 				for (const subItem of item.subItems) {
 					subItem.color = legendColors.length > 0 ? <string>legendColors.shift() : '#e0e0e0';
@@ -84,6 +72,8 @@
 					sum += subItem.amount;
 				}
 			}
+
+			sum += item.amount;
 		}
 
 		items = byCategory;

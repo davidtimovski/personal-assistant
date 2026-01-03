@@ -50,33 +50,24 @@ export class TransactionsService {
 			});
 
 			const categories = await this.categoriesService.getAll();
-			const expendituresByCategory = new Array<AmountByCategory>();
 
+			const expendituresByCategory = new Array<AmountByCategory>();
 			for (const category of categories) {
 				const categoryTransactions = transactions.filter((t) => t.categoryId === category.id);
-				const expenditure = new AmountByCategory(category.id, category.parentId, null, 0);
-				expenditure.categoryName = category.parentId === null ? category.name : '- ' + category.name;
 
-				if (categoryTransactions.length) {
-					for (const transaction of categoryTransactions) {
-						expenditure.amount += transaction.amount;
-					}
-				}
+				const expenditure = new AmountByCategory(category.id, category.parentId, category.name, 0);
+				expenditure.amount = categoryTransactions.map((x) => x.amount).reduce((prev, curr) => prev + curr, 0);
 
 				expendituresByCategory.push(expenditure);
 			}
 
-			for (const expenditure of expendituresByCategory) {
-				const subExpenditures = expendituresByCategory.filter((e) => e.amount !== 0 && e.parentCategoryId === expenditure.categoryId);
+			const parentCategoryExpenditures = expendituresByCategory.filter((x) => x.parentCategoryId === null);
 
-				if (subExpenditures.length === 1) {
-					expenditure.categoryId = subExpenditures[0].categoryId;
-					expenditure.categoryName += '/' + subExpenditures[0].categoryName?.replace('- ', '');
-					expenditure.amount = subExpenditures[0].amount;
-				} else if (subExpenditures.length > 1) {
-					expenditure.amount += subExpenditures.map((c) => c.amount).reduce((prev, curr) => prev + curr, 0);
-					expenditure.subItems = subExpenditures.sort((a, b) => b.amount - a.amount);
-				}
+			for (const expenditure of parentCategoryExpenditures) {
+				const childCategoryExpenditures = expendituresByCategory.filter((e) => e.amount !== 0 && e.parentCategoryId === expenditure.categoryId);
+
+				expenditure.amount += childCategoryExpenditures.map((c) => c.amount).reduce((prev, curr) => prev + curr, 0);
+				expenditure.subItems = childCategoryExpenditures.sort((a, b) => b.amount - a.amount);
 			}
 
 			const uncategorizedTransactions = transactions.filter((t) => t.categoryId === null);
@@ -87,10 +78,10 @@ export class TransactionsService {
 					expenditure.amount += transaction.amount;
 				}
 
-				expendituresByCategory.push(expenditure);
+				parentCategoryExpenditures.push(expenditure);
 			}
 
-			return expendituresByCategory.filter((e) => e.amount !== 0 && e.parentCategoryId === null).sort((a, b) => b.amount - a.amount);
+			return parentCategoryExpenditures.filter((e) => e.amount !== 0).sort((a, b) => b.amount - a.amount);
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
