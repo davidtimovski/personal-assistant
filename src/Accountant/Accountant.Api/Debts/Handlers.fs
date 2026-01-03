@@ -8,6 +8,7 @@ open Api.Common.Fs
 open CommonHandlers
 open HandlerBase
 open Models
+open Logic
 
 module Handlers =
 
@@ -23,7 +24,7 @@ module Handlers =
 
                 match Logic.validateCreate request with
                 | Success _ ->
-                    let debt = Logic.prepareForCreate request userId
+                    let debt = Logic.createRequestToEntity request userId
 
                     let connection = getDbConnection ctx
                     let! id = DebtsRepository.create debt connection tr
@@ -53,7 +54,7 @@ module Handlers =
 
                 match Logic.validateCreate request with
                 | Success _ ->
-                    let debt = Logic.prepareForCreateMerged request userId
+                    let debt = Logic.createMergedRequestToEntity request userId
 
                     let connectionString = getConnectionString ctx
                     let! id = DebtsRepository.createMerged debt connectionString tr
@@ -79,11 +80,19 @@ module Handlers =
                 let! request = ctx.BindJsonAsync<UpdateDebtRequest>()
                 request.HttpContext <- ctx
 
-                match Logic.validateUpdate request with
-                | Success _ ->
-                    let debt = Logic.prepareForUpdate request userId
+                let connectionString = getConnectionString ctx
+                let! existingDebt = DebtsRepository.get request.Id connectionString
 
-                    let connectionString = getConnectionString ctx
+                let validationParams =
+                    {
+                        CurrentUserId = userId
+                        Request = request
+                        ExistingDebt = existingDebt
+                    }
+
+                match Logic.validateUpdate validationParams with
+                | Success _ ->
+                    let debt = Logic.updateRequestToEntity request userId
                     let! _ = DebtsRepository.update debt connectionString tr
 
                     let! result = Successful.NO_CONTENT next ctx

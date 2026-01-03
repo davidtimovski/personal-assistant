@@ -57,7 +57,7 @@ module Logic =
         >> bind validateCreateCurrency
         >> bind validateCreateDescription
 
-    let prepareForCreate (request: CreateAutomaticTransactionRequest) (userId: int) =
+    let createRequestToEntity (request: CreateAutomaticTransactionRequest) (userId: int) =
         { Id = 0
           UserId = userId
           IsDeposit = request.IsDeposit
@@ -69,42 +69,45 @@ module Logic =
           CreatedDate = request.CreatedDate
           ModifiedDate = request.ModifiedDate }
 
-    let private validateUpdateAutomaticTransaction (request: UpdateAutomaticTransactionRequest) =
-        let userId = getUserId request.HttpContext
-        let connectionString = getConnectionString request.HttpContext
+    type UpdateValidationParams =
+        { CurrentUserId: int
+          Request: UpdateAutomaticTransactionRequest
+          ExistingAutomaticTransaction: AutomaticTransaction option
+          ExistingCategory: Category option }
 
-        if Validation.automaticTransactionBelongsTo request.Id userId connectionString then
-            Success request
-        else
-            Failure "Automatic transaction is not valid"
+    let private validateUpdateAutomaticTransaction (parameters: UpdateValidationParams) =
+        match parameters.ExistingAutomaticTransaction with
+        | Some automaticTransaction ->
+            if automaticTransaction.UserId = parameters.CurrentUserId then
+                Success parameters
+            else
+                Failure "Automatic transaction does not belong to user"
+        | None -> Failure "Automatic transaction does not exist"
 
-    let private validateUpdateCategory (request: UpdateAutomaticTransactionRequest) =
-        let userId = getUserId request.HttpContext
-        let connectionString = getConnectionString request.HttpContext
+    let private validateUpdateCategory (parameters: UpdateValidationParams) =
+        match parameters.ExistingCategory with
+        | Some category ->
+            if category.UserId = parameters.CurrentUserId then
+                Success parameters
+            else
+                Failure "Category does not belong to user"
+        | None -> Failure "Category does not exist"
 
-        if
-            request.CategoryId.IsNone
-            || Validation.categoryBelongsTo request.CategoryId.Value userId connectionString
-        then
-            Success request
-        else
-            Failure "Category is not valid"
-
-    let private validateUpdateAmount (request: UpdateAutomaticTransactionRequest) =
-        if Validation.amountIsValid request.Amount then
-            Success request
+    let private validateUpdateAmount (parameters: UpdateValidationParams) =
+        if Validation.amountIsValid parameters.Request.Amount then
+            Success parameters
         else
             Failure "Amount has to be a positive number"
 
-    let private validateUpdateCurrency (request: UpdateAutomaticTransactionRequest) =
-        if Validation.currencyIsValid request.Currency then
-            Success request
+    let private validateUpdateCurrency (parameters: UpdateValidationParams) =
+        if Validation.currencyIsValid parameters.Request.Currency then
+            Success parameters
         else
             Failure "Currency is not valid"
 
-    let private validateUpdateDescription (request: UpdateAutomaticTransactionRequest) =
-        if Validation.textIsNoneOrLengthIsValid request.Description descriptionMaxLength then
-            Success request
+    let private validateUpdateDescription (parameters: UpdateValidationParams) =
+        if Validation.textIsNoneOrLengthIsValid parameters.Request.Description descriptionMaxLength then
+            Success parameters
         else
             Failure $"Description cannot exceed {descriptionMaxLength} characters"
 
@@ -115,7 +118,7 @@ module Logic =
         >> bind validateUpdateCurrency
         >> bind validateUpdateDescription
 
-    let prepareForUpdate (request: UpdateAutomaticTransactionRequest) (userId: int) =
+    let updateRequestToEntity (request: UpdateAutomaticTransactionRequest) (userId: int) =
         { Id = request.Id
           UserId = userId
           IsDeposit = request.IsDeposit

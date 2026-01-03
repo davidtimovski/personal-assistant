@@ -11,21 +11,35 @@ module CategoriesRepository =
     [<Literal>]
     let private table = "accountant.categories"
 
+    let private rowToEntity (read: RowReader) =
+        { Id = read.int "id"
+          UserId = read.int "user_id"
+          ParentId = read.intOrNone "parent_id"
+          Name = read.string "name"
+          Type = enum<CategoryType> (read.int "type")
+          GenerateUpcomingExpense = read.bool "generate_upcoming_expense"
+          IsTax = read.bool "is_tax"
+          CreatedDate = read.dateTime "created_date"
+          ModifiedDate = read.dateTime "modified_date" }
+
+    let get (id: int) connectionString =
+        task {
+            let! categories =
+                connectionString
+                |> Sql.connect
+                |> Sql.query $"SELECT * FROM {table} WHERE id = @id"
+                |> Sql.parameters [ "id", Sql.int id ]
+                |> Sql.executeAsync rowToEntity
+            
+            return if categories.Length > 0 then Some categories[0] else None
+        }
+
     let getAll (userId: int) (fromModifiedDate: DateTime) connectionString =
         connectionString
         |> Sql.connect
         |> Sql.query $"SELECT * FROM {table} WHERE user_id = @user_id AND modified_date > @modified_date"
         |> Sql.parameters [ "user_id", Sql.int userId; "modified_date", Sql.timestamptz fromModifiedDate ]
-        |> Sql.executeAsync (fun read ->
-            { Id = read.int "id"
-              UserId = read.int "user_id"
-              ParentId = read.intOrNone "parent_id"
-              Name = read.string "name"
-              Type = enum<CategoryType> (read.int "type")
-              GenerateUpcomingExpense = read.bool "generate_upcoming_expense"
-              IsTax = read.bool "is_tax"
-              CreatedDate = read.dateTime "created_date"
-              ModifiedDate = read.dateTime "modified_date" })
+        |> Sql.executeAsync rowToEntity
 
     let create (category: Category) (conn: RegularOrTransactionalConn) (metricsSpan: ISpan) =
         let metric = metricsSpan.StartChild("CategoriesRepository.create")

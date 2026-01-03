@@ -2,7 +2,6 @@
 
 open Accountant.Persistence.Models
 open Models
-open CommonHandlers
 
 module Logic =
     [<Literal>]
@@ -34,9 +33,11 @@ module Logic =
         else
             Failure "Currency is not valid"
 
-    let validateCreate = validateCreateName >> bind validateCreateCurrency
+    let validateCreate =
+        validateCreateName
+        >> bind validateCreateCurrency
 
-    let prepareForCreate (request: CreateAccountRequest) (userId: int) =
+    let createRequestToEntity (request: CreateAccountRequest) (userId: int) =
         { Id = 0
           UserId = userId
           Name = request.Name.Trim()
@@ -46,33 +47,40 @@ module Logic =
           CreatedDate = request.CreatedDate
           ModifiedDate = request.ModifiedDate }
 
-    let private validateUpdateAccount (request: UpdateAccountRequest) =
-        let userId = getUserId request.HttpContext
-        let connectionString = getConnectionString request.HttpContext
+    type UpdateValidationParams =
+        { CurrentUserId: int
+          Request: UpdateAccountRequest
+          ExistingAccount: Account option }
 
-        if Validation.accountBelongsTo request.Id userId connectionString then
-            Success request
-        else
-            Failure "Account is not valid"
+    let private validateUpdateAccount (parameters: UpdateValidationParams) =
+        match parameters.ExistingAccount with
+        | Some account ->
+            if account.UserId = parameters.CurrentUserId then
+                Success parameters
+            else
+                Failure "Account does not belong to user"
+        | None -> Failure "Account does not exist"
 
-    let private validateUpdateName (request: UpdateAccountRequest) =
-        if
-            (Validation.textIsNotEmpty request.Name)
-            && (Validation.textLengthIsValid request.Name nameMaxLength)
+    let private validateUpdateName (parameters: UpdateValidationParams) =
+        if (Validation.textIsNotEmpty parameters.Request.Name)
+            && (Validation.textLengthIsValid parameters.Request.Name nameMaxLength)
         then
-            Success request
+            Success parameters
         else
             Failure "Name is not valid"
 
-    let private validateUpdateCurrency (request: UpdateAccountRequest) =
-        if Validation.currencyIsValid request.Currency then
-            Success request
+    let private validateUpdateCurrency (parameters: UpdateValidationParams) =
+        if Validation.currencyIsValid parameters.Request.Currency then
+            Success parameters
         else
             Failure "Currency is not valid"
 
-    let validateUpdate = validateUpdateAccount >> bind validateUpdateName >> bind validateUpdateCurrency
+    let validateUpdate =
+        validateUpdateAccount
+        >> bind validateUpdateName
+        >> bind validateUpdateCurrency
 
-    let prepareForUpdate (request: UpdateAccountRequest) (userId: int) =
+    let updateRequestToEntity (request: UpdateAccountRequest) (userId: int) =
         { Id = request.Id
           UserId = userId
           Name = request.Name.Trim()

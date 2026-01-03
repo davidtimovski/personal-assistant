@@ -8,6 +8,7 @@ open Api.Common.Fs
 open CommonHandlers
 open HandlerBase
 open Models
+open Logic
 
 module Handlers =
 
@@ -27,7 +28,7 @@ module Handlers =
 
                 match Logic.validateCreate request with
                 | Success _ ->
-                    let category = Logic.prepareForCreate request userId
+                    let category = Logic.createRequestToEntity request userId
 
                     let connection = getDbConnection ctx
                     let! id = CategoriesRepository.create category connection tr
@@ -56,11 +57,26 @@ module Handlers =
                 let! request = ctx.BindJsonAsync<UpdateCategoryRequest>()
                 request.HttpContext <- ctx
 
-                match Logic.validateUpdate request with
-                | Success _ ->
-                    let category = Logic.prepareForUpdate request userId
+                let connectionString = getConnectionString ctx
+                let! existingCategory = CategoriesRepository.get request.Id connectionString
+                let! existingParentCategory = 
+                    task {
+                        match request.ParentId with
+                        | Some parentId -> return! CategoriesRepository.get parentId connectionString
+                        | None -> return None
+                    }
 
-                    let connectionString = getConnectionString ctx
+                let validationParams =
+                    {
+                        CurrentUserId = userId
+                        Request = request
+                        ExistingCategory = existingCategory
+                        ExistingParentCategory = existingParentCategory
+                    }
+
+                match Logic.validateUpdate validationParams with
+                | Success _ ->
+                    let category = Logic.updateRequestToEntity request userId
                     let! _ = CategoriesRepository.update category connectionString tr
 
                     let! result = Successful.NO_CONTENT next ctx

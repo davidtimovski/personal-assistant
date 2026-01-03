@@ -59,7 +59,7 @@
 	let leaveButtonIsLoading = false;
 	let videoIFrame: HTMLIFrameElement;
 	let videoIFrameSrc = '';
-	let addIngredientsInputPlaceholder: string;
+	let addIngredientsInputPlaceholder = '';
 	let measuringUnits: (string | null)[];
 	let imperialSystem: boolean;
 	let loading = !isNew;

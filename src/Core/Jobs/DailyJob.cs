@@ -55,7 +55,7 @@ public class DailyJob
             await UploadDatabaseBackupAsync();
         }
 
-        _logger.LogInformation("Daily job run completed");
+        _logger.DailyJobRunCompleted();
     }
 
     private async Task DeleteOldNotificationsAsync(NpgsqlConnection conn, DateTime now)
@@ -171,7 +171,7 @@ public class DailyJob
                         VALUES 
                         (@FromAccountId, @ToAccountId, @CategoryId, @Amount, @Currency, @Description, @Date, FALSE, @Generated, @CreatedDate, @ModifiedDate)", transaction, dbTransaction);
 
-                    _logger.LogInformation("Generated transaction");
+                    _logger.GeneratedAutomaticTransaction();
 
                     if (transaction.FromAccountId.HasValue && transaction.ToAccountId is null)
                     {
@@ -195,6 +195,8 @@ public class DailyJob
                                         SET amount = amount - @Amount, modified_date = @ModifiedDate
                                         WHERE id = @Id",
                                         new { ue.Id, transaction.Amount, ModifiedDate = now }, dbTransaction);
+
+                                    _logger.UpdatedUpcomingExpense();
                                 }
                                 else
                                 {
@@ -205,6 +207,8 @@ public class DailyJob
 
                                     await conn.ExecuteAsync("DELETE FROM accountant.upcoming_expenses WHERE id = @Id AND user_id = @UserId",
                                         new { ue.Id, UserId = userId }, dbTransaction);
+
+                                    _logger.DeletedUpcomingExpense();
                                 }
                             }
                         }
@@ -342,7 +346,7 @@ public class DailyJob
                     await conn.ExecuteAsync(@"INSERT INTO accountant.upcoming_expenses (user_id, category_id, amount, currency, description, date, generated, created_date, modified_date)
                                               VALUES (@UserId, @CategoryId, @Amount, @Currency, @Description, @Date, @Generated, @CreatedDate, @ModifiedDate)", upcomingExpense);
 
-                    _logger.LogInformation("Generated upcoming expense");
+                    _logger.GeneratedUpcomingExpense();
                 }
             }
 
@@ -433,7 +437,7 @@ public class DailyJob
             var path = Path.Combine(_config.DbBackup.BackupsPath, backupFileName);
             await blobClient.UploadAsync(path, true);
 
-            _logger.LogInformation($"Uploaded database backup with name: {backupFileName}");
+            _logger.UploadedDatabaseBackup(backupFileName);
 
             _logger.CompletedOperation(nameof(UploadDatabaseBackupAsync));
         }

@@ -8,6 +8,7 @@ open Api.Common.Fs
 open CommonHandlers
 open HandlerBase
 open Models
+open Logic
 
 module Handlers =
 
@@ -27,7 +28,7 @@ module Handlers =
 
                 match Logic.validateCreate request with
                 | Success _ ->
-                    let automaticTransaction = Logic.prepareForCreate request userId
+                    let automaticTransaction = Logic.createRequestToEntity request userId
 
                     let connection = getDbConnection ctx
                     let! id = AutomaticTransactionsRepository.create automaticTransaction connection tr
@@ -56,11 +57,26 @@ module Handlers =
                 let! request = ctx.BindJsonAsync<UpdateAutomaticTransactionRequest>()
                 request.HttpContext <- ctx
 
-                match Logic.validateUpdate request with
-                | Success _ ->
-                    let automaticTransaction = Logic.prepareForUpdate request userId
+                let connectionString = getConnectionString ctx
+                let! existingAutomaticTransaction = AutomaticTransactionsRepository.get request.Id connectionString
+                let! existingCategory = 
+                    task {
+                        match request.CategoryId with
+                        | Some categoryId -> return! CategoriesRepository.get categoryId connectionString
+                        | None -> return None
+                    }
 
-                    let connectionString = getConnectionString ctx
+                let validationParams =
+                    {
+                        CurrentUserId = userId
+                        Request = request
+                        ExistingAutomaticTransaction = existingAutomaticTransaction
+                        ExistingCategory = existingCategory
+                    }
+
+                match Logic.validateUpdate validationParams with
+                | Success _ ->
+                    let automaticTransaction = Logic.updateRequestToEntity request userId
                     let! _ = AutomaticTransactionsRepository.update automaticTransaction connectionString tr
 
                     let! result = Successful.NO_CONTENT next ctx

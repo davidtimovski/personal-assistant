@@ -9,6 +9,7 @@ using Core.Infrastructure;
 using Core.Persistence;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
@@ -27,6 +28,12 @@ if (builder.Environment.IsProduction())
 
     builder.Host.AddSentryLogging(builder.Configuration, "PersonalAssistant", new HashSet<string> { "GET /health" });
 }
+
+builder.Services.Configure<FormOptions>(options =>
+{
+    const int bodyLengthLimitInMegabytes = 10;
+    options.MultipartBodyLengthLimit = bodyLengthLimitInMegabytes * 1024 * 1024;
+});
 
 builder.Services
     .AddApplication()
