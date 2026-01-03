@@ -4,7 +4,7 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY ["PersonalAssistant.targets", "PersonalAssistant.Cs.targets", "./"]
+COPY ["Directory.Packages.props", "PersonalAssistant.targets", "PersonalAssistant.Cs.targets", "./"]
 COPY ["src/Core/PersonalAssistant.Web/PersonalAssistant.Web.csproj", "src/Core/PersonalAssistant.Web/"]
 RUN dotnet restore "src/Core/PersonalAssistant.Web/PersonalAssistant.Web.csproj"
 COPY . .

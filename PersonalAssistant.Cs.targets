@@ -1,13 +1,12 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<PropertyGroup>
-		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<Import Project="PersonalAssistant.targets" />
 	
 	<ItemGroup>
-		<PackageReference Include="Roslynator.Analyzers" Version="4.15.0" />
-		<PackageReference Include="SonarAnalyzer.CSharp" Version="10.17.0.131074" />
+		<PackageReference Include="Roslynator.Analyzers" />
+		<PackageReference Include="SonarAnalyzer.CSharp" />
 	</ItemGroup>
 </Project>

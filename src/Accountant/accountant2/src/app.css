@@ -62,7 +62,7 @@ textarea {
 }
 
 .amount-by-category-table td.sub-category-cell {
-	padding-left: 10px;
+	padding-left: 15px;
 }
 
 .amount-by-category-table .amount-cell {
@@ -265,7 +265,9 @@ td.sync-icon-cell {
 	cursor: pointer;
 	user-select: none;
 
-	transition: background var(--transition), color var(--transition);
+	transition:
+		background var(--transition),
+		color var(--transition);
 }
 .multi-radio-part label.selected {
 	background: var(--primary-color);

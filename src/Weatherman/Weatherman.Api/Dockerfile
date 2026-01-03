@@ -4,7 +4,7 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY ["PersonalAssistant.targets", "PersonalAssistant.Fs.targets", "./"]
+COPY ["Directory.Packages.props", "PersonalAssistant.targets", "./"]
 COPY ["src/Weatherman/Weatherman.Api/Weatherman.Api.fsproj", "src/Weatherman/Weatherman.Api/"]
 RUN dotnet restore "src/Weatherman/Weatherman.Api/Weatherman.Api.fsproj"
 COPY . .

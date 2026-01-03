@@ -104,9 +104,9 @@ export class TransactionsIDBHelper {
 
 		const categoriesPromise = this.db.categories.toArray();
 
-		let transactions = new Array<TransactionModel>();
+		const transactions = new Array<TransactionModel>();
 		await Promise.all([transactionsPromise, categoriesPromise]).then((result) => {
-			transactions = result[0];
+			transactions.push(...result[0]);
 			const categories = result[1];
 
 			for (const transaction of transactions) {
@@ -136,9 +136,9 @@ export class TransactionsIDBHelper {
 
 		const categoriesPromise = this.db.categories.toArray();
 
-		let transactions = new Array<TransactionModel>();
+		const transactions = new Array<TransactionModel>();
 		await Promise.all([transactionsPromise, categoriesPromise]).then((result) => {
-			transactions = result[0];
+			transactions.push(...result[0]);
 			const categories = result[1];
 
 			for (const transaction of transactions) {
@@ -199,7 +199,7 @@ export class TransactionsIDBHelper {
 			return false;
 		}
 
-		let inAccount = accountId === 0 || t.fromAccountId === accountId || t.toAccountId === accountId;
+		const inAccount = accountId === 0 || t.fromAccountId === accountId || t.toAccountId === accountId;
 		if (!inAccount) {
 			return false;
 		}
@@ -243,7 +243,7 @@ export class TransactionsIDBHelper {
 			return false;
 		}
 
-		let inAccount = t.fromAccountId === accountId || t.toAccountId === accountId;
+		const inAccount = t.fromAccountId === accountId || t.toAccountId === accountId;
 
 		return inAccount;
 	}
@@ -315,9 +315,9 @@ export class TransactionsIDBHelper {
 
 		const categoriesPromise = this.db.categories.toArray();
 
-		let transactions = new Array<TransactionModel>();
+		const transactions = new Array<TransactionModel>();
 		await Promise.all([transactionsPromise, categoriesPromise]).then((result) => {
-			transactions = result[0];
+			transactions.push(...result[0]);
 			const categories = result[1];
 
 			for (const transaction of transactions) {
@@ -337,9 +337,9 @@ export class TransactionsIDBHelper {
 
 		const categoriesPromise = this.db.categories.toArray();
 
-		let transactions = new Array<TransactionModel>();
+		const transactions = new Array<TransactionModel>();
 		await Promise.all([transactionsPromise, categoriesPromise]).then((result) => {
-			transactions = result[0];
+			transactions.push(...result[0]);
 			const categories = result[1];
 
 			for (const transaction of transactions) {

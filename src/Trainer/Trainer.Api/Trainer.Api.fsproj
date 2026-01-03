@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-	<Import Project="..\..\..\PersonalAssistant.Fs.targets" />
+	<Import Project="..\..\..\PersonalAssistant.targets" />
 
 	<PropertyGroup>
 		<EnableDefaultContentItems>false</EnableDefaultContentItems>
@@ -9,9 +9,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Giraffe" Version="$(GiraffeVersion)" />
-		<PackageReference Include="Giraffe.ViewEngine" Version="1.4.0" />
-		<PackageReference Include="Ply" Version="0.3.1" />
+		<PackageReference Include="Giraffe" />
+		<PackageReference Include="Giraffe.ViewEngine" />
+		<PackageReference Include="Ply" />
 	</ItemGroup>
 
 	<ItemGroup>
