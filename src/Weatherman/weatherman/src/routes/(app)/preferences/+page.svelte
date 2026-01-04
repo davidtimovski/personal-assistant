@@ -12,9 +12,9 @@
 	let localStorage: LocalStorageUtil;
 	let forecastsService: ForecastsService;
 
-	let temperatureUnit: string | null = null;
-	let precipitationUnit: string | null = null;
-	let windSpeedUnit: string | null = null;
+	let temperatureUnit: string | null = $state(null);
+	let precipitationUnit: string | null = $state(null);
+	let windSpeedUnit: string | null = $state(null);
 
 	function temperatureUnitChanged() {
 		localStorage.set(LocalStorageKeys.TemperatureUnit, temperatureUnit);
@@ -50,11 +50,11 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive small">
-			<i class="fas fa-sliders-h" />
+			<i class="fas fa-sliders-h"></i>
 		</div>
 		<div class="page-title">{$t('preferences.preferences')}</div>
 		<a href="/weather" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -69,7 +69,7 @@
 					leftValue="celsius"
 					rightValue="fahrenheit"
 					bind:value={temperatureUnit}
-					on:change={temperatureUnitChanged}
+					onchange={temperatureUnitChanged}
 				/>
 			</div>
 
@@ -82,7 +82,7 @@
 					leftValue="mm"
 					rightValue="inch"
 					bind:value={precipitationUnit}
-					on:change={precipitationUnitChanged}
+					onchange={precipitationUnitChanged}
 				/>
 			</div>
 
@@ -95,7 +95,7 @@
 					leftValue="kmh"
 					rightValue="mph"
 					bind:value={windSpeedUnit}
-					on:change={windSpeedUnitChanged}
+					onchange={windSpeedUnitChanged}
 				/>
 			</div>
 		</form>

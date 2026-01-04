@@ -28,8 +28,7 @@
 	import SunLower from '$lib/components/illustrations/SunLower.svelte';
 	import Thunderstorm from '$lib/components/illustrations/Thunderstorm.svelte';
 
-	export let weatherCode: WeatherCode | null;
-	export let timeOfDay: TimeOfDay | null;
+	let { weatherCode, timeOfDay }: { weatherCode: WeatherCode | null; timeOfDay: TimeOfDay | null } = $props();
 </script>
 
 {#if weatherCode === WeatherCode.ClearSky || weatherCode === WeatherCode.MainlyClear}

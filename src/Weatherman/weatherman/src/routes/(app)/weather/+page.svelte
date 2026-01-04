@@ -17,27 +17,27 @@
 	import NextDayForecast from '$lib/components/NextDayForecast.svelte';
 
 	let now = new Date();
-	let selectedDate = '';
-	let currentTime = '';
-	let currentDate = selectedDate;
-	let weatherDescription = '';
-	let windSpeedUnit = '';
-	let precipitationUnit = '';
+	let selectedDate = $state('');
+	let currentTime = $state('');
+	let currentDate = $state(selectedDate);
+	let weatherDescription = $state('');
+	let windSpeedUnit = $state('');
+	let precipitationUnit = $state('');
 	const weatherDescriptionTr = new Map<WeatherCode, string>();
 	const windSpeedUnitsTr = new Map<string, string>();
 	const precipitationUnitsTr = new Map<string, string>();
 	const unsubscriptions: Unsubscriber[] = [];
 
-	$: currentTempColor = $forecast.temperature !== null ? ForecastsService.getTempColor(<number>$forecast.temperature) : 'inherit';
+	let currentTempColor = $derived($forecast.temperature !== null ? ForecastsService.getTempColor(<number>$forecast.temperature) : 'inherit');
 
 	// Progress bar
-	let progressBarActive = false;
+	let progressBarActive = $state(false);
 	const progress = tweened(0, {
 		duration: 500,
 		easing: cubicOut
 	});
 	let progressIntervalId: number | undefined;
-	let progressBarVisible = false;
+	let progressBarVisible = $state(false);
 
 	let localStorage: LocalStorageUtil;
 	let usersService: UsersServiceBase;
@@ -176,24 +176,24 @@
 			<div class="page-title">{currentTime}</div>
 			<button
 				type="button"
-				on:click={sync}
+				onclick={sync}
 				class="sync-button"
 				disabled={$isOffline || progressBarActive}
 				title={$t('weather.refresh')}
 				aria-label={$t('weather.refresh')}
 			>
-				<i class="fas fa-sync-alt" />
+				<i class="fas fa-sync-alt"></i>
 			</button>
 		</div>
 		<div class="progress-bar">
-			<div class="progress" class:visible={progressBarVisible} style="width: {$progress}%;" />
+			<div class="progress" class:visible={progressBarVisible} style="width: {$progress}%;"></div>
 		</div>
 	</div>
 
 	<div class="content-wrap">
 		<div class="days">
 			{#each $forecast.weekDays as weekDay}
-				<button type="button" on:click={() => selectDate(weekDay.date)} class="week-day" class:selected={selectedDate === weekDay.date}
+				<button type="button" onclick={() => selectDate(weekDay.date)} class="week-day" class:selected={selectedDate === weekDay.date}
 					>{weekDay.weekDay}</button
 				>
 			{/each}
@@ -217,50 +217,54 @@
 							<div class="weather-description">{weatherDescription}</div>
 
 							<table class="wind-and-precipitation">
-								<tr class="wind">
-									<td><i class="fa-solid fa-wind" /></td>
-									<td>
-										<span class="current-value">{$forecast.windSpeed}</span>
-										<span>{windSpeedUnit}</span>
-									</td>
-								</tr>
-								<tr class="precipitation">
-									<td><i class="fa-solid fa-droplet" /></td>
-									<td>
-										<span class="current-value">{$forecast.precipitation}</span>
-										<span>{precipitationUnit}</span>
-									</td>
-								</tr>
+								<tbody>
+									<tr class="wind">
+										<td><i class="fa-solid fa-wind"></i></td>
+										<td>
+											<span class="current-value">{$forecast.windSpeed}</span>
+											<span>{windSpeedUnit}</span>
+										</td>
+									</tr>
+									<tr class="precipitation">
+										<td><i class="fa-solid fa-droplet"></i></td>
+										<td>
+											<span class="current-value">{$forecast.precipitation}</span>
+											<span>{precipitationUnit}</span>
+										</td>
+									</tr>
+								</tbody>
 							</table>
 						{:else if $forecast.hourly.length > 0}
 							<div class="loader-wrap">
 								<div class="double-circle-loading">
-									<div class="double-bounce1" />
-									<div class="double-bounce2" />
+									<div class="double-bounce1"></div>
+									<div class="double-bounce2"></div>
 								</div>
 							</div>
 						{/if}
 					</div>
 
-					<div class="gutter" />
+					<div class="gutter"></div>
 
 					<div class="hourly-forecast">
 						<table>
-							{#each $forecast.hourly as hourForecast}
-								<tr>
-									<td>{hourForecast.timeString} {$t('h')}</td>
-									<td class="hourly-illustration">
-										{#if hourForecast.timeOfDay !== null}
-											<Illustration weatherCode={hourForecast.weatherCode} timeOfDay={hourForecast.timeOfDay} />
-										{/if}
-									</td>
-									<td>
-										{#if hourForecast.temperature !== null}
-											<span>{hourForecast.temperature}°</span>
-										{/if}
-									</td>
-								</tr>
-							{/each}
+							<tbody>
+								{#each $forecast.hourly as hourForecast}
+									<tr>
+										<td>{hourForecast.timeString} {$t('h')}</td>
+										<td class="hourly-illustration">
+											{#if hourForecast.timeOfDay !== null}
+												<Illustration weatherCode={hourForecast.weatherCode} timeOfDay={hourForecast.timeOfDay} />
+											{/if}
+										</td>
+										<td>
+											{#if hourForecast.temperature !== null}
+												<span>{hourForecast.temperature}°</span>
+											{/if}
+										</td>
+									</tr>
+								{/each}
+							</tbody>
 						</table>
 					</div>
 				</div>
