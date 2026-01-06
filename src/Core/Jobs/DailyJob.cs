@@ -151,7 +151,7 @@ public class DailyJob
                         Amount = automaticTransaction.Amount,
                         Currency = automaticTransaction.Currency,
                         Description = automaticTransaction.Description,
-                        Date = now.Date,
+                        Date = DateOnly.FromDateTime(now),
                         Generated = true,
                         CreatedDate = now,
                         ModifiedDate = now
@@ -263,7 +263,7 @@ public class DailyJob
             }
 
             Transaction earliest = expenses.OrderBy(x => x.Date).First();
-            var twoMonthsAgo = new DateTime(now.Year, now.Month, 1).AddMonths(-2);
+            var twoMonthsAgo = new DateOnly(now.Year, now.Month, 1).AddMonths(-2);
 
             return earliest.Date < twoMonthsAgo;
         }
