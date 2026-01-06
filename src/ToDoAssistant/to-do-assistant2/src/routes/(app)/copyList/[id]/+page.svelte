@@ -8,20 +8,24 @@
 	import { ValidationErrors } from '../../../../../../../Core/shared2/models/validationErrors';
 
 	import { t } from '$lib/localization/i18n';
-	import { alertState, state } from '$lib/stores';
+	import { alertState, localState } from '$lib/stores';
 	import { ListsService } from '$lib/services/listsService';
 	import type { Task } from '$lib/models/entities';
 	import { CopyList } from '$lib/models/server/requests/copyList';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
 
-	let name = '';
-	let icon = '';
+	let { data }: Props = $props();
+
+	let name = $state('');
+	let icon = $state('');
 	let tasks: Task[];
-	let nameIsInvalid: boolean;
+	let nameIsInvalid = $state(false);
 	const iconOptions = ListsService.getIconOptions();
-	let saveButtonIsLoading = false;
-	let copyAsTextCompleted = false;
+	let saveButtonIsLoading = $state(false);
+	let copyAsTextCompleted = $state(false);
 	let originalListName: string;
 	const unsubscriptions: Unsubscriber[] = [];
 
@@ -35,7 +39,7 @@
 
 	let listsService: ListsService;
 
-	$: canSave = !ValidationUtil.isEmptyOrWhitespace(name);
+	let canSave = $derived(!ValidationUtil.isEmptyOrWhitespace(name));
 
 	function selectIcon(i: string) {
 		icon = i;
@@ -50,7 +54,9 @@
 		}, 1500);
 	}
 
-	async function save() {
+	async function save(event: Event) {
+		event.preventDefault();
+
 		saveButtonIsLoading = true;
 		alertState.update((x) => {
 			x.hide();
@@ -87,7 +93,7 @@
 		listsService = new ListsService();
 
 		unsubscriptions.push(
-			state.subscribe((s) => {
+			localState.subscribe((s) => {
 				if (s.lists === null) {
 					return;
 				}
@@ -116,16 +122,16 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive small">
-			<i class="fas fa-copy" />
+			<i class="fas fa-copy"></i>
 		</div>
 		<div class="page-title">{name}</div>
 		<a href="/list/{data.id}" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
 	<div class="content-wrap">
-		<form on:submit|preventDefault={save}>
+		<form onsubmit={save}>
 			<div class="form-control">
 				<input
 					type="text"
@@ -143,8 +149,8 @@
 					<span class="placeholder">{$t('editList.icon')}</span>
 					<div class="icon-options">
 						{#each iconOptions as i}
-							<button type="button" on:click={() => selectIcon(i.icon)} class:selected={icon === i.icon} class="icon-option">
-								<i class={i.cssClass} />
+							<button type="button" onclick={() => selectIcon(i.icon)} class:selected={icon === i.icon} class="icon-option">
+								<i class={i.cssClass}></i>
 							</button>
 						{/each}
 					</div>
@@ -153,9 +159,9 @@
 		</form>
 
 		<div class="save-delete-wrap">
-			<button type="button" on:click={save} class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
+			<button type="button" onclick={save} class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
 				<span class="button-loader" class:loading={saveButtonIsLoading}>
-					<i class="fas fa-circle-notch fa-spin" />
+					<i class="fas fa-circle-notch fa-spin"></i>
 				</span>
 				<span>{$t('copyList.createCopy')}</span>
 			</button>
@@ -165,9 +171,9 @@
 		<hr />
 
 		<div class="horizontal-buttons-wrap">
-			<button type="button" on:click={copyAsText} class="wide-button with-badge">
+			<button type="button" onclick={copyAsText} class="wide-button with-badge">
 				<span>{$t('copyList.copyAsText')}</span>
-				<i class="fas fa-check badge toggled" class:visible={copyAsTextCompleted} />
+				<i class="fas fa-check badge toggled" class:visible={copyAsTextCompleted}></i>
 			</button>
 		</div>
 	</div>

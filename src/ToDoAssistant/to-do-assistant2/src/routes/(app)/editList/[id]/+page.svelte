@@ -19,30 +19,34 @@
 	import { UpdateSharedList } from '$lib/models/server/requests/updateSharedList';
 	import { CreateList } from '$lib/models/server/requests/createList';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
 
 	const isNew = data.id === 0;
 
-	let name = '';
-	let icon = '';
-	let tasksText = '';
-	let notificationsEnabled: boolean;
-	let isOneTimeToggleDefault: boolean;
+	let name = $state('');
+	let icon = $state('');
+	let tasksText = $state('');
+	let notificationsEnabled: boolean | null = $state(null);
+	let isOneTimeToggleDefault: boolean | null = $state(null);
 	let isArchived = false;
-	let sharingState: SharingState;
-	let nameIsInvalid = false;
-	let tasksTextIsInvalid = false;
-	let tasksInputIsVisible = false;
-	let confirmationInProgress = false;
-	let saveButtonText: string;
-	let deleteButtonText: string;
-	let leaveButtonText: string;
+	let sharingState: SharingState | null = $state(null);
+	let nameIsInvalid = $state(false);
+	let tasksTextIsInvalid = $state(false);
+	let tasksInputIsVisible = $state(false);
+	let confirmationInProgress = $state(false);
+	let saveButtonText: string = $state('');
+	let deleteButtonText: string = $state('');
+	let leaveButtonText: string = $state('');
 	let iconOptions = ListsService.getIconOptions();
-	let nameInput: HTMLInputElement;
-	let saveButtonIsLoading = false;
-	let deleteButtonIsLoading = false;
-	let leaveButtonIsLoading = false;
-	let loading = !isNew;
+	let nameInput: HTMLInputElement | null = $state(null);
+	let saveButtonIsLoading = $state(false);
+	let deleteButtonIsLoading = $state(false);
+	let leaveButtonIsLoading = $state(false);
+	let loading = $state(!isNew);
 
 	const alertStateUnsub = alertState.subscribe((value) => {
 		if (value.hidden) {
@@ -53,9 +57,9 @@
 	let listsService: ListsService;
 	let usersService: UsersService;
 
-	$: canSave = !ValidationUtil.isEmptyOrWhitespace(name);
+	let canSave = $derived(!ValidationUtil.isEmptyOrWhitespace(name));
 
-	$: notificationsCheckboxEnabled = sharingState !== SharingState.NotShared && $user.toDoNotificationsEnabled;
+	let notificationsCheckboxEnabled = $derived(sharingState !== SharingState.NotShared && $user.toDoNotificationsEnabled);
 
 	function showTasksTextarea() {
 		tasksInputIsVisible = true;
@@ -65,7 +69,13 @@
 		icon = i;
 	}
 
-	async function save() {
+	async function save(event: Event) {
+		if (notificationsEnabled === null || isOneTimeToggleDefault === null) {
+			throw new Error('Data not initialized');
+		}
+
+		event.preventDefault();
+
 		saveButtonIsLoading = true;
 		alertState.update((x) => {
 			x.hide();
@@ -177,7 +187,7 @@
 			sharingState = SharingState.NotShared;
 			saveButtonText = $t('editList.create');
 
-			nameInput.focus();
+			nameInput?.focus();
 		} else {
 			saveButtonText = $t('save');
 
@@ -206,32 +216,34 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive small">
-			<i class="fas fa-pencil-alt" />
+			<i class="fas fa-pencil-alt"></i>
 		</div>
 		<div class="page-title">
-			{#if isNew}
-				<span>{$t('editList.newList')}</span>
-			{:else}
-				<span>{$t('editList.edit')}</span>&nbsp;<span class="colored-text">{name}</span>
-			{/if}
+			<span>
+				{#if isNew}
+					<span>{$t('editList.newList')}</span>
+				{:else}
+					<span>{$t('editList.edit')}</span>&nbsp;<span class="colored-text">{name}</span>
+				{/if}
+			</span>
 		</div>
-		<button type="button" on:click={back} class="back-button">
-			<i class="fas fa-times" />
+		<button type="button" onclick={back} class="back-button">
+			<i class="fas fa-times"></i>
 		</button>
 	</div>
 
 	<div class="content-wrap">
 		{#if loading}
 			<div class="double-circle-loading">
-				<div class="double-bounce1" />
-				<div class="double-bounce2" />
+				<div class="double-bounce1"></div>
+				<div class="double-bounce2"></div>
 			</div>
 		{:else}
 			{#if sharingState === 4}
 				<AlertBlock type="info" message={$t('editList.forAccessTo')} />
 			{/if}
 
-			<form on:submit|preventDefault={save}>
+			<form onsubmit={save}>
 				{#if sharingState !== 4}
 					<div class="form-control">
 						<input
@@ -251,7 +263,7 @@
 					<div class="form-control">
 						{#if !tasksInputIsVisible}
 							<div class="horizontal-buttons-wrap">
-								<button type="button" on:click={showTasksTextarea} class="wide-button">
+								<button type="button" onclick={showTasksTextarea} class="wide-button">
 									{$t('editList.addTasks')}
 								</button>
 							</div>
@@ -262,7 +274,7 @@
 								in:slide
 								placeholder={$t('editList.eachRow')}
 								aria-label={$t('editList.eachRow')}
-							/>
+							></textarea>
 						{/if}
 					</div>
 				{/if}
@@ -273,8 +285,8 @@
 							<span class="placeholder">{$t('editList.icon')}</span>
 							<div class="icon-options">
 								{#each iconOptions as i}
-									<button type="button" on:click={() => selectIcon(i.icon)} class:selected={icon === i.icon} class="icon-option">
-										<i class={i.cssClass} />
+									<button type="button" onclick={() => selectIcon(i.icon)} class:selected={icon === i.icon} class="icon-option">
+										<i class={i.cssClass}></i>
 									</button>
 								{/each}
 							</div>
@@ -299,9 +311,9 @@
 
 			<div class="save-delete-wrap">
 				{#if !confirmationInProgress}
-					<button type="button" on:click={save} class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
+					<button type="button" onclick={save} class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
 						<span class="button-loader" class:loading={saveButtonIsLoading}>
-							<i class="fas fa-circle-notch fa-spin" />
+							<i class="fas fa-circle-notch fa-spin"></i>
 						</span>
 						<span>{saveButtonText}</span>
 					</button>
@@ -310,13 +322,13 @@
 				{#if (!isNew && sharingState === 0) || sharingState === 1 || sharingState === 2}
 					<button
 						type="button"
-						on:click={deleteList}
+						onclick={deleteList}
 						class="button danger-button"
 						disabled={deleteButtonIsLoading}
 						class:confirm={confirmationInProgress}
 					>
 						<span class="button-loader" class:loading={deleteButtonIsLoading}>
-							<i class="fas fa-circle-notch fa-spin" />
+							<i class="fas fa-circle-notch fa-spin"></i>
 						</span>
 						<span>{deleteButtonText}</span>
 					</button>
@@ -325,20 +337,20 @@
 				{#if sharingState === 3 || sharingState === 4}
 					<button
 						type="button"
-						on:click={leaveList}
+						onclick={leaveList}
 						class="button danger-button"
 						disabled={leaveButtonIsLoading}
 						class:confirm={confirmationInProgress}
 					>
 						<span class="button-loader" class:loading={leaveButtonIsLoading}>
-							<i class="fas fa-circle-notch fa-spin" />
+							<i class="fas fa-circle-notch fa-spin"></i>
 						</span>
 						<span>{leaveButtonText}</span>
 					</button>
 				{/if}
 
 				{#if isNew || confirmationInProgress}
-					<button type="button" on:click={cancel} class="button secondary-button">
+					<button type="button" onclick={cancel} class="button secondary-button">
 						{$t('cancel')}
 					</button>
 				{/if}

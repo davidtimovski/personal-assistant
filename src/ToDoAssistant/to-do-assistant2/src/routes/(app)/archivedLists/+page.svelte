@@ -5,14 +5,14 @@
 	import EmptyListMessage from '../../../../../../Core/shared2/components/EmptyListMessage.svelte';
 
 	import { t } from '$lib/localization/i18n';
-	import { state } from '$lib/stores';
+	import { localState } from '$lib/stores';
 	import { ListsService } from '$lib/services/listsService';
 	import type { ArchivedList } from '$lib/models/viewmodels/archivedList';
 	import type { ListIcon } from '$lib/models/viewmodels/listIcon';
 
-	let archivedLists: Array<ArchivedList> | null = null;
+	let archivedLists: Array<ArchivedList> | null = $state(null);
 	const iconOptions = ListsService.getIconOptions();
-	let editedId: number | undefined;
+	let editedId: number | undefined = $state(undefined);
 
 	function getClassFromIcon(icon: string): string {
 		return (<ListIcon>iconOptions.find((x) => x.icon === icon)).cssClass;
@@ -24,7 +24,7 @@
 			editedId = parseInt(edited, 10);
 		}
 
-		return state.subscribe((s) => {
+		return localState.subscribe((s) => {
 			if (s.lists === null) {
 				return;
 			}
@@ -37,27 +37,27 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive small">
-			<i class="fas fa-archive" />
+			<i class="fas fa-archive"></i>
 		</div>
 		<div class="page-title">{$t('archivedLists.archivedLists')}</div>
 		<a href="/lists" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
 	<div class="content-wrap">
 		{#if !archivedLists}
 			<div class="double-circle-loading">
-				<div class="double-bounce1" />
-				<div class="double-bounce2" />
+				<div class="double-bounce1"></div>
+				<div class="double-bounce2"></div>
 			</div>
 		{:else}
 			{#each archivedLists as list}
 				<div class="to-do-list" class:is-shared={list.sharingState !== 0 && list.sharingState !== 1} class:pending-share={list.sharingState === 1}>
-					<i class="icon {getClassFromIcon(list.icon)}" />
+					<i class="icon {getClassFromIcon(list.icon)}"></i>
 					<a href="/list/{list.id}" class="name" class:highlighted={list.id === editedId}>{list.name}</a>
-					<i class="fas fa-users shared-icon" title={$t('index.shared')} aria-label={$t('index.shared')} />
-					<i class="fas fa-user-clock shared-icon" title={$t('index.pendingAccept')} aria-label={$t('index.pendingAccept')} />
+					<i class="fas fa-users shared-icon" title={$t('index.shared')} aria-label={$t('index.shared')}></i>
+					<i class="fas fa-user-clock shared-icon" title={$t('index.pendingAccept')} aria-label={$t('index.pendingAccept')}></i>
 				</div>
 			{/each}
 		{/if}

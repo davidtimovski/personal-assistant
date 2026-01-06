@@ -1,28 +1,23 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 	import { t } from '$lib/localization/i18n';
 
 	let {
 		name,
 		leftLabelKey,
 		rightLabelKey,
-		value = $bindable<boolean | null>()
-	}: { name: string; leftLabelKey: string; rightLabelKey: string; value: boolean | null } = $props();
+		value = $bindable<boolean | null>(),
+		onchange
+	}: { name: string; leftLabelKey: string; rightLabelKey: string; value: boolean | null; onchange?: any } = $props();
 
 	const leftLabel = $t(leftLabelKey);
 	const rightLabel = $t(rightLabelKey);
-
-	const dispatch = createEventDispatcher();
-	function changeState() {
-		dispatch('change', value);
-	}
 </script>
 
 <div class="double-radio-wrap">
 	<div class="double-radio-side">
 		<label class:selected={!value}>
 			<span>{leftLabel}</span>
-			<input type="radio" {name} bind:group={value} value={false} onchange={changeState} />
+			<input type="radio" {name} bind:group={value} value={false} {onchange} />
 			<span class="checkbox-icon">
 				<i class="fas fa-check"></i>
 			</span>
@@ -31,7 +26,7 @@
 	<div class="double-radio-side">
 		<label class:selected={value}>
 			<span>{rightLabel}</span>
-			<input type="radio" {name} bind:group={value} value={true} onchange={changeState} />
+			<input type="radio" {name} bind:group={value} value={true} {onchange} />
 			<span class="checkbox-icon">
 				<i class="fas fa-check"></i>
 			</span>

@@ -7,7 +7,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { ThrottleHelper } from '$lib/utils/throttleHelper';
-	import { state, remoteEvents } from '$lib/stores';
+	import { localState, remoteEvents } from '$lib/stores';
 	import { TasksService } from '$lib/services/tasksService';
 	import { DerivedLists, ListsService } from '$lib/services/listsService';
 	import type { ListTask } from '$lib/models/viewmodels/listTask';
@@ -16,14 +16,14 @@
 
 	import DerivedTask from './components/DerivedTask.svelte';
 
-	let type: string;
-	let name = '';
-	let tasks = new Array<ListTask>();
-	let privateTasks = new Array<ListTask>();
-	let iconClass: string | null = null;
+	let type: string | null = $state(null);
+	let name = $state('');
+	let tasks = $state(new Array<ListTask>());
+	let privateTasks = $state(new Array<ListTask>());
+	let iconClass: string | null = $state(null);
 	let shadowTasks: ListTask[];
 	let shadowPrivateTasks: ListTask[];
-	let searchTasksText = '';
+	let searchTasksText = $state('');
 	let soundsEnabled = false;
 	const derivedListNameLookup = new Map<string, string>();
 	const unsubscriptions: Unsubscriber[] = [];
@@ -75,7 +75,7 @@
 		disableTasks();
 
 		ThrottleHelper.executeAfterDelay(async () => {
-			if ($state.lists === null) {
+			if ($localState.lists === null) {
 				throw new Error('Lists not loaded yet');
 			}
 
@@ -83,12 +83,12 @@
 				if (!remote) {
 					await tasksService.delete(task.id);
 				}
-				tasksService.deleteLocal(task.id, task.listId, $state.lists);
+				tasksService.deleteLocal(task.id, task.listId, $localState.lists);
 			} else {
 				if (!remote) {
 					await tasksService.complete(task.id);
 				}
-				tasksService.completeLocal(task.id, task.listId, $state.lists);
+				tasksService.completeLocal(task.id, task.listId, $localState.lists);
 			}
 		}, Date.now());
 	}
@@ -120,9 +120,13 @@
 		soundsEnabled = localStorage.getBool(LocalStorageKeys.SoundsEnabled);
 
 		unsubscriptions.push(
-			state.subscribe((s) => {
+			localState.subscribe((s) => {
 				if (s.lists === null) {
 					return;
+				}
+
+				if (type === null) {
+					throw new Error('Type from URL missing or uninitialized');
 				}
 
 				const list = s.lists.find((x) => x.derivedListType === type);
@@ -143,7 +147,7 @@
 
 		unsubscriptions.push(
 			remoteEvents.subscribe((e) => {
-				if ($state.lists === null) {
+				if ($localState.lists === null) {
 					return;
 				}
 
@@ -155,7 +159,7 @@
 						complete(task, true);
 					}
 				} else if (e.type === RemoteEventType.TaskUncompletedRemotely) {
-					const list = $state.lists.find((x) => x.derivedListType === type);
+					const list = $localState.lists.find((x) => x.derivedListType === type);
 					if (!list) {
 						throw new Error('List not found');
 					}
@@ -186,11 +190,11 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive medium">
-			<i class={iconClass} />
+			<i class={iconClass}></i>
 		</div>
 		<div class="page-title">{name}</div>
 		<a href="/lists" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -201,13 +205,13 @@
 					<input
 						type="text"
 						bind:value={searchTasksText}
-						on:keyup={searchTasksInputChanged}
+						onkeyup={searchTasksInputChanged}
 						placeholder={$t('derivedList.searchTasks')}
 						aria-label={$t('derivedList.searchTasks')}
 						maxlength="50"
 					/>
-					<button type="button" on:click={clearFilter} title={$t('clear')} aria-label={$t('clear')}>
-						<i class="fas fa-times" />
+					<button type="button" onclick={clearFilter} title={$t('clear')} aria-label={$t('clear')}>
+						<i class="fas fa-times"></i>
 					</button>
 				</div>
 			</form>
@@ -215,7 +219,7 @@
 			{#if privateTasks.length > 0}
 				<div class="to-do-tasks-wrap private">
 					<div class="private-tasks-label">
-						<i class="fas fa-key" />
+						<i class="fas fa-key"></i>
 						<span>{$t('derivedList.privateTasks')}</span>
 					</div>
 
@@ -229,7 +233,7 @@
 							url={task.url}
 							isOneTime={task.isOneTime}
 							modifiedDate={task.modifiedDate}
-							on:click={() => complete(task)}
+							onclick={() => complete(task)}
 						/>
 					{/each}
 				</div>
@@ -247,7 +251,7 @@
 						url={task.url}
 						isOneTime={task.isOneTime}
 						modifiedDate={task.modifiedDate}
-						on:click={() => complete(task)}
+						onclick={() => complete(task)}
 					/>
 				{/each}
 			</div>

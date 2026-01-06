@@ -3,7 +3,7 @@ import { ErrorLogger } from '../../../../../Core/shared2/services/errorLogger';
 import { ValidationUtil, ValidationResult } from '../../../../../Core/shared2/utils/validationUtils';
 
 import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
-import { state } from '$lib/stores';
+import { localState } from '$lib/stores';
 import { List, type Task } from '$lib/models/entities';
 import type { ListWithShares } from '$lib/models/viewmodels/listWithShares';
 import type { ShareRequest } from '$lib/models/viewmodels/shareRequest';
@@ -24,7 +24,7 @@ import type { SetIsArchived } from '$lib/models/server/requests/setIsArchived';
 import { SetTasksAsNotCompleted } from '$lib/models/server/requests/setTasksAsNotCompleted';
 import type { SetShareIsAccepted } from '$lib/models/server/requests/setShareIsAccepted';
 import Variables from '$lib/variables';
-import { State } from '$lib/models/state';
+import { LocalState } from '$lib/models/localState';
 
 export enum DerivedLists {
 	HighPriority = 'high-priority',
@@ -40,7 +40,7 @@ export class ListsService {
 		if (includeCache) {
 			const cachedLists = this.localStorage.getObject<List[]>('homePageData');
 			if (cachedLists) {
-				state.set(new State(cachedLists, true));
+				localState.set(new LocalState(cachedLists, true));
 			}
 		}
 
@@ -66,7 +66,7 @@ export class ListsService {
 		}
 
 		this.localStorage.set('homePageData', JSON.stringify(allLists));
-		state.set(new State(allLists, false));
+		localState.set(new LocalState(allLists, false));
 	}
 
 	private generateHighPriorityList(allLists: List[], allTasks: Task[]) {

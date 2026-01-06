@@ -6,17 +6,25 @@
 
 	import { t } from '$lib/localization/i18n';
 
-	let tooltips: Tooltip[];
+	let tooltips: Tooltip[] | null = $state(null);
 
 	let tooltipsService: TooltipsService;
 
 	async function dismiss(tooltip: Tooltip) {
+		if (tooltips === null) {
+			throw new Error('Tooltips not initialized');
+		}
+
 		tooltip.isDismissed = true;
 		await tooltipsService.toggleDismissed(tooltip.key, true);
 		tooltips = tooltips.slice(0);
 	}
 
 	async function retain(tooltip: Tooltip) {
+		if (tooltips === null) {
+			throw new Error('Tooltips not initialized');
+		}
+
 		tooltip.isDismissed = false;
 		await tooltipsService.toggleDismissed(tooltip.key, false);
 		tooltips = tooltips.slice(0);
@@ -37,19 +45,19 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive">
-			<i class="fas fa-info-circle" />
+			<i class="fas fa-info-circle"></i>
 		</div>
 		<div class="page-title">{$t('help.help')}</div>
 		<a href="/lists" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
 	<div class="content-wrap">
 		{#if !tooltips}
 			<div class="double-circle-loading">
-				<div class="double-bounce1" />
-				<div class="double-bounce2" />
+				<div class="double-bounce1"></div>
+				<div class="double-bounce2"></div>
 			</div>
 		{:else}
 			<div class="share-requests-wrap">
@@ -57,18 +65,18 @@
 					<div class="tooltip-item">
 						<div class="tooltip-header">
 							{#if tooltip.isDismissed}
-								<button type="button" on:click={() => retain(tooltip)} title={$t('help.show')} aria-label={$t('help.show')}>
-									<i class="fas fa-eye-slash" />
+								<button type="button" onclick={() => retain(tooltip)} title={$t('help.show')} aria-label={$t('help.show')}>
+									<i class="fas fa-eye-slash"></i>
 								</button>
 							{:else}
-								<button type="button" on:click={() => dismiss(tooltip)} title={$t('help.hide')} aria-label={$t('help.hide')}>
-									<i class="fas fa-eye" />
+								<button type="button" onclick={() => dismiss(tooltip)} title={$t('help.hide')} aria-label={$t('help.hide')}>
+									<i class="fas fa-eye"></i>
 								</button>
 							{/if}
 
 							<span class="tooltip-title">{tooltip.title}</span>
 							<i class="side hidden">
-								<i class="fas fa-eye" />
+								<i class="fas fa-eye"></i>
 							</i>
 						</div>
 						<hr />

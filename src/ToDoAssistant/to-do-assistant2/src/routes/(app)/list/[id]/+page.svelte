@@ -11,7 +11,7 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { ThrottleHelper } from '$lib/utils/throttleHelper';
-	import { alertState, state, remoteEvents } from '$lib/stores';
+	import { alertState, localState, remoteEvents } from '$lib/stores';
 	import { SharingState } from '$lib/models/viewmodels/sharingState';
 	import { ListsService } from '$lib/services/listsService';
 	import { TasksService } from '$lib/services/tasksService';
@@ -64,7 +64,9 @@
 	let tasksService: TasksService;
 	let soundPlayer: SoundPlayer;
 
-	function toggleTopDrawer() {
+	function toggleTopDrawer(event: Event) {
+		event.stopPropagation();
+
 		topDrawerIsOpen = !topDrawerIsOpen;
 	}
 
@@ -184,7 +186,9 @@
 		completedTasksAreVisible = !completedTasksAreVisible;
 	}
 
-	async function create() {
+	async function create(event: Event) {
+		event.preventDefault();
+
 		newTaskIsLoading = true;
 		editedId = 0;
 
@@ -230,11 +234,11 @@
 						newTaskName = '';
 						newTaskUrl = '';
 
-						if ($state.lists === null) {
+						if ($localState.lists === null) {
 							throw new Error('Lists not loaded yet');
 						}
 
-						const list = $state.lists.find((x) => x.id === data.id);
+						const list = $localState.lists.find((x) => x.id === data.id);
 						if (!list) {
 							throw new Error('List not found');
 						}
@@ -275,7 +279,7 @@
 		disableTasks();
 
 		ThrottleHelper.executeAfterDelay(async () => {
-			if ($state.lists === null) {
+			if ($localState.lists === null) {
 				throw new Error('Lists not loaded yet');
 			}
 
@@ -283,12 +287,12 @@
 				if (!remote) {
 					await tasksService.delete(task.id);
 				}
-				tasksService.deleteLocal(task.id, data.id, $state.lists);
+				tasksService.deleteLocal(task.id, data.id, $localState.lists);
 			} else {
 				if (!remote) {
 					await tasksService.complete(task.id);
 				}
-				tasksService.completeLocal(task.id, data.id, $state.lists);
+				tasksService.completeLocal(task.id, data.id, $localState.lists);
 			}
 		}, Date.now());
 	}
@@ -309,14 +313,14 @@
 		disableTasks();
 
 		ThrottleHelper.executeAfterDelay(async () => {
-			if ($state.lists === null) {
+			if ($localState.lists === null) {
 				throw new Error('Lists not loaded yet');
 			}
 
 			if (!remote) {
 				await tasksService.uncomplete(task.id);
 			}
-			tasksService.uncompleteLocal(task.id, data.id, $state.lists);
+			tasksService.uncompleteLocal(task.id, data.id, $localState.lists);
 		}, Date.now());
 	}
 
@@ -440,7 +444,7 @@
 		soundsEnabled = localStorage.getBool(LocalStorageKeys.SoundsEnabled);
 
 		unsubscriptions.push(
-			state.subscribe((s) => {
+			localState.subscribe((s) => {
 				if (s.lists === null) {
 					return;
 				}
@@ -495,21 +499,21 @@
 	});
 </script>
 
-<section class="container" on:click={closeDrawer}>
+<section class="container" onclick={closeDrawer}>
 	<div class="page-title-wrap">
 		<a href="/editList/{data.id}" class="edit-button" title={$t('list.edit')} aria-label={$t('list.edit')}>
-			<i class="fas fa-pencil-alt" />
+			<i class="fas fa-pencil-alt"></i>
 		</a>
 
 		<div class="page-title">{name}</div>
 
 		<label class="search-toggle" class:checked={isSearching} title={$t('list.searchTasks')} aria-label={$t('list.searchTasks')}>
-			<input type="checkbox" bind:checked={isSearching} on:change={isSearchingToggleChanged} />
-			<i class="fas fa-search" />
+			<input type="checkbox" bind:checked={isSearching} onchange={isSearchingToggleChanged} />
+			<i class="fas fa-search"></i>
 		</label>
 
-		<button type="button" on:click={back} class="back-button">
-			<i class="fas fa-times" />
+		<button type="button" onclick={back} class="back-button">
+			<i class="fas fa-times"></i>
 		</button>
 	</div>
 
@@ -529,9 +533,9 @@
 					</div>
 				</div>
 
-				<button type="button" on:click|stopPropagation={toggleTopDrawer} class="top-drawer-handle">
-					<i class="fas fa-angle-down" />
-					<i class="fas fa-angle-up" />
+				<button type="button" onclick={toggleTopDrawer} class="top-drawer-handle">
+					<i class="fas fa-angle-down"></i>
+					<i class="fas fa-angle-up"></i>
 				</button>
 			</div>
 		</div>
@@ -540,30 +544,30 @@
 			{#if isArchived}
 				<div class="archived-list-alert">
 					<span class="side inactive small">
-						<i class="fas fa-archive" />
+						<i class="fas fa-archive"></i>
 					</span>
-					<div class="alert-message" contenteditable="false" bind:innerHTML={listIsArchivedText} />
-					<button type="button" on:click={restore} class="side" title={$t('list.restore')} aria-label={$t('list.restore')}>
-						<i class="fas fa-check-circle" />
+					<div class="alert-message" contenteditable="false" bind:innerHTML={listIsArchivedText}></div>
+					<button type="button" onclick={restore} class="side" title={$t('list.restore')} aria-label={$t('list.restore')}>
+						<i class="fas fa-check-circle"></i>
 					</button>
 				</div>
 			{/if}
 
 			{#if duplicateAlertIsVisible}
 				<div class="duplicate-task-alert" transition:slide>
-					<button type="button" on:click={hideDuplicateTaskAlert} class="side">
-						<i class="fas fa-times-circle" />
+					<button type="button" onclick={hideDuplicateTaskAlert} class="side">
+						<i class="fas fa-times-circle"></i>
 					</button>
 					<div class="alert-message danger">{duplicateTaskMessageText}</div>
 					<button
 						type="button"
-						on:click={uncompleteDuplicate}
+						onclick={uncompleteDuplicate}
 						class="side"
 						class:hidden={!uncompleteDuplicateButtonVisible}
 						title={$t('list.uncomplete')}
 						aria-label={$t('list.uncomplete')}
 					>
-						<i class="fas fa-check-circle" />
+						<i class="fas fa-check-circle"></i>
 					</button>
 				</div>
 			{/if}
@@ -571,24 +575,24 @@
 			{#if similarTasksAlertIsVisible}
 				<div class="duplicate-task-alert" transition:slide>
 					<span class="side inactive">
-						<i class="fas fa-info-circle" />
+						<i class="fas fa-info-circle"></i>
 					</span>
-					<div class="alert-message danger" contenteditable="false" bind:innerHTML={similarTasksMessageText} />
-					<button type="button" on:click={create} class="side" title={$t('list.add')} aria-label={$t('list.add')}>
-						<i class="fas fa-check-circle" />
+					<div class="alert-message danger" contenteditable="false" bind:innerHTML={similarTasksMessageText}></div>
+					<button type="button" onclick={create} class="side" title={$t('list.add')} aria-label={$t('list.add')}>
+						<i class="fas fa-check-circle"></i>
 					</button>
 				</div>
 			{/if}
 
-			<form on:submit|preventDefault={create}>
+			<form onsubmit={create}>
 				<div class="add-input-wrap" class:with-private-toggle={sharingState !== 0} class:searching={isSearching}>
 					<div class="new-task-input-wrap" class:invalid={newTaskIsInvalid}>
 						<input
 							type="text"
 							bind:value={newTaskName}
 							bind:this={newTaskNameInput}
-							on:keyup={newTaskNameInputChange}
-							on:paste={newTaskNameInputPaste}
+							onkeyup={newTaskNameInputChange}
+							onpaste={newTaskNameInputPaste}
 							class="new-task-input"
 							placeholder={addNewPlaceholderText}
 							aria-label={addNewPlaceholderText}
@@ -600,8 +604,8 @@
 							<div transition:slide class="new-task-url-wrap">
 								<hr />
 								<input type="url" bind:value={newTaskUrl} maxlength="1000" readonly />
-								<button type="button" on:click={clearUrl} class="clear-url-button" title={$t('clear')} aria-label={$t('clear')}>
-									<i class="fas fa-times" />
+								<button type="button" onclick={clearUrl} class="clear-url-button" title={$t('clear')} aria-label={$t('clear')}>
+									<i class="fas fa-times"></i>
 								</button>
 							</div>
 						{/if}
@@ -614,9 +618,9 @@
 							title={$t('list.togglePrivateTasks')}
 							aria-label={$t('list.togglePrivateTasks')}
 						>
-							<input type="checkbox" bind:checked={isPrivate} on:change={isPrivateToggleChanged} />
-							<i class="fas fa-lock" />
-							<i class="fas fa-unlock" />
+							<input type="checkbox" bind:checked={isPrivate} onchange={isPrivateToggleChanged} />
+							<i class="fas fa-lock"></i>
+							<i class="fas fa-unlock"></i>
 						</label>
 					{/if}
 
@@ -627,28 +631,28 @@
 							title={$t('list.toggleTaskDeletionOnCompletion')}
 							aria-label={$t('list.toggleTaskDeletionOnCompletion')}
 						>
-							<input type="checkbox" bind:checked={isOneTime} on:change={isOneTimeToggleChanged} />
-							<i class="fas fa-trash-alt" />
-							<i class="far fa-trash-alt" />
+							<input type="checkbox" bind:checked={isOneTime} onchange={isOneTimeToggleChanged} />
+							<i class="fas fa-trash-alt"></i>
+							<i class="far fa-trash-alt"></i>
 						</label>
 					{/if}
 
 					{#if !newTaskIsLoading && !isSearching}
 						<button
 							type="button"
-							on:click={create}
-							disabled={$state.fromCache}
+							onclick={create}
+							disabled={$localState.fromCache}
 							class="add-task-button"
 							title={$t('list.add')}
 							aria-label={$t('list.add')}
 						>
-							<i class="fas fa-plus-circle" />
+							<i class="fas fa-plus-circle"></i>
 						</button>
 					{/if}
 
 					{#if newTaskIsLoading && !isSearching}
 						<div class="loader">
-							<i class="fas fa-circle-notch fa-spin" />
+							<i class="fas fa-circle-notch fa-spin"></i>
 						</div>
 					{/if}
 				</div>
@@ -657,7 +661,7 @@
 			{#if privateTasks.length > 0}
 				<div class="to-do-tasks-wrap private">
 					<div class="private-tasks-label">
-						<i class="fas fa-key" />
+						<i class="fas fa-key"></i>
 						<span>{$t('list.privateTasks')}</span>
 					</div>
 
@@ -672,7 +676,7 @@
 							url={task.url}
 							completed={task.isCompleted}
 							isOneTime={task.isOneTime}
-							on:click={() => complete(task)}
+							onclick={() => complete(task)}
 						/>
 					{/each}
 				</div>
@@ -691,16 +695,16 @@
 						url={task.url}
 						completed={task.isCompleted}
 						isOneTime={task.isOneTime}
-						on:click={() => complete(task)}
+						onclick={() => complete(task)}
 					/>
 				{/each}
 			</div>
 
 			{#if completedTasks.length > 0 || completedPrivateTasks.length > 0}
 				<div>
-					<button type="button" on:click={toggleCompletedTasksAreVisible} class="toggle-completed-visible">
+					<button type="button" onclick={toggleCompletedTasksAreVisible} class="toggle-completed-visible">
 						<div class="labeled-separator-text">
-							<i class="fas fa-check" />
+							<i class="fas fa-check"></i>
 
 							{#if !completedTasksAreVisible}
 								<span><span>{$t('list.showDone')}</span> ({completedTasks.length + completedPrivateTasks.length})</span>
@@ -715,7 +719,7 @@
 						{#if completedPrivateTasks.length > 0}
 							<div class="to-do-tasks-wrap private">
 								<div class="private-tasks-label">
-									<i class="fas fa-key" />
+									<i class="fas fa-key"></i>
 									<span>{$t('list.donePrivateTasks')}</span>
 								</div>
 
@@ -730,7 +734,7 @@
 										url={task.url}
 										completed={task.isCompleted}
 										isOneTime={task.isOneTime}
-										on:click={() => uncomplete(task)}
+										onclick={() => uncomplete(task)}
 									/>
 								{/each}
 							</div>
@@ -749,7 +753,7 @@
 									url={task.url}
 									completed={task.isCompleted}
 									isOneTime={task.isOneTime}
-									on:click={() => uncomplete(task)}
+									onclick={() => uncomplete(task)}
 								/>
 							{/each}
 						</div>
@@ -762,7 +766,7 @@
 			{/if}
 		</div>
 
-		<button type="button" on:click={closeDrawer} class="body-overlay" class:visible={topDrawerIsOpen} />
+		<button type="button" onclick={closeDrawer} class="body-overlay" class:visible={topDrawerIsOpen}></button>
 	</div>
 </section>
 

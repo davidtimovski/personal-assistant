@@ -10,8 +10,8 @@
 	import type { ShareRequest } from '$lib/models/viewmodels/shareRequest';
 	import { SetShareIsAccepted } from '$lib/models/server/requests/setShareIsAccepted';
 
-	let pendingShareRequests: Array<ShareRequest> | null = null;
-	let declinedShareRequests: Array<ShareRequest> | null = null;
+	let pendingShareRequests: Array<ShareRequest> | null = $state(null);
+	let declinedShareRequests: Array<ShareRequest> | null = $state(null);
 
 	let listsService: ListsService;
 
@@ -56,19 +56,19 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive">
-			<i class="fas fa-handshake" />
+			<i class="fas fa-handshake"></i>
 		</div>
 		<div class="page-title">{$t('shareRequests.shareRequests')}</div>
 		<a href="/lists" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
 	<div class="content-wrap">
 		{#if !pendingShareRequests || !declinedShareRequests}
 			<div class="double-circle-loading">
-				<div class="double-bounce1" />
-				<div class="double-bounce2" />
+				<div class="double-bounce1"></div>
+				<div class="double-bounce2"></div>
 			</div>
 		{:else if pendingShareRequests.length === 0 && declinedShareRequests.length === 0}
 			<EmptyListMessage messageKey="shareRequests.emptyListMessage" />
@@ -82,12 +82,12 @@
 					<div class="share-request">
 						<button
 							type="button"
-							on:click={() => decline(request)}
+							onclick={() => decline(request)}
 							class="action"
 							title={$t('shareRequests.decline')}
 							aria-label={$t('shareRequests.decline')}
 						>
-							<i class="fas fa-ban" />
+							<i class="fas fa-ban"></i>
 						</button>
 
 						<span class="name">
@@ -98,12 +98,12 @@
 
 						<button
 							type="button"
-							on:click={() => accept(request)}
+							onclick={() => accept(request)}
 							class="action"
 							title={$t('shareRequests.accept')}
 							aria-label={$t('shareRequests.accept')}
 						>
-							<i class="fas fa-check" />
+							<i class="fas fa-check"></i>
 						</button>
 					</div>
 				{/each}
@@ -119,7 +119,7 @@
 			<div class="share-requests-wrap declined">
 				{#each declinedShareRequests as request}
 					<div class="share-request">
-						<div class="action inactive" />
+						<div class="action inactive"></div>
 
 						<span class="name">
 							<span class="colored-text">{request.listName}</span>
@@ -129,12 +129,12 @@
 
 						<button
 							type="button"
-							on:click={() => accept(request)}
+							onclick={() => accept(request)}
 							class="action"
 							title={$t('shareRequests.accept')}
 							aria-label={$t('shareRequests.accept')}
 						>
-							<i class="fas fa-check" />
+							<i class="fas fa-check"></i>
 						</button>
 					</div>
 				{/each}

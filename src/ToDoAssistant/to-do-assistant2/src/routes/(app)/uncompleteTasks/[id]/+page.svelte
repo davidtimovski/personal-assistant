@@ -5,15 +5,20 @@
 	import type { PageData } from './$types';
 
 	import { t } from '$lib/localization/i18n';
-	import { alertState, state } from '$lib/stores';
+	import { alertState, localState } from '$lib/stores';
 	import { ListsService } from '$lib/services/listsService';
 	import { SharingState } from '$lib/models/viewmodels/sharingState';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
 
-	let name = '';
-	let uncompleteText = '';
-	let uncompleteButtonIsLoading = false;
+	let { data }: Props = $props();
+
+	let name = $state('');
+	let uncompleteText = $state('');
+	let uncompleteButtonIsLoading = $state(false);
+
 	const unsubscriptions: Unsubscriber[] = [];
 
 	let listsService: ListsService;
@@ -38,7 +43,7 @@
 		listsService = new ListsService();
 
 		unsubscriptions.push(
-			state.subscribe((s) => {
+			localState.subscribe((s) => {
 				if (s.lists === null) {
 					return;
 				}
@@ -67,13 +72,13 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive">
-			<i class="fas fa-check-circle" />
+			<i class="fas fa-check-circle"></i>
 		</div>
 		<div class="page-title">
-			<span>{$t('uncompleteTasks.uncompleteTasksIn')}</span>&nbsp;<span class="colored-text">{name}</span>?
+			<span><span>{$t('uncompleteTasks.uncompleteTasksIn')}</span>&nbsp;<span class="colored-text">{name}</span>?</span>
 		</div>
 		<a href="/list/{data.id}" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -81,9 +86,9 @@
 		<div class="text-wrap">{uncompleteText}</div>
 
 		<div class="save-delete-wrap">
-			<button type="button" on:click={uncomplete} class="button primary-button" disabled={uncompleteButtonIsLoading}>
+			<button type="button" onclick={uncomplete} class="button primary-button" disabled={uncompleteButtonIsLoading}>
 				<span class="button-loader" class:loading={uncompleteButtonIsLoading}>
-					<i class="fas fa-circle-notch fa-spin" />
+					<i class="fas fa-circle-notch fa-spin"></i>
 				</span>
 				<span>{$t('uncompleteTasks.uncomplete')}</span>
 			</button>

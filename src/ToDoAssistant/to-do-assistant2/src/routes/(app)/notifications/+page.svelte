@@ -11,10 +11,10 @@
 	import { NotificationsService } from '$lib/services/notificationsService';
 	import type { Notification } from '$lib/models/viewmodels/notification';
 
-	let highlightedId: number | undefined;
-	let unseenNotifications: Array<Notification> | null = null;
-	let seenNotifications: Array<Notification> | null = null;
-	let seenNotificationsVisible = false;
+	let highlightedId: number | undefined = $state(undefined);
+	let unseenNotifications: Array<Notification> | null = $state(null);
+	let seenNotifications: Array<Notification> | null = $state(null);
+	let seenNotificationsVisible = $state(false);
 	const unsubscriptions: Unsubscriber[] = [];
 
 	let notificationsService: NotificationsService;
@@ -80,19 +80,19 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive small">
-			<i class="fas fa-bell" />
+			<i class="fas fa-bell"></i>
 		</div>
 		<div class="page-title">{$t('notifications.notifications')}</div>
 		<a href="/lists" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
 	<div class="content-wrap">
 		{#if !unseenNotifications || !seenNotifications}
 			<div class="double-circle-loading">
-				<div class="double-bounce1" />
-				<div class="double-bounce2" />
+				<div class="double-bounce1"></div>
+				<div class="double-bounce2"></div>
 			</div>
 		{:else if unseenNotifications.length === 0 && seenNotifications.length === 0}
 			<EmptyListMessage messageKey="notifications.emptyListMessage" />
@@ -109,7 +109,7 @@
 							alt={$t('profilePicture', { name: notification.userName })}
 						/>
 						<div class="notification-content">
-							<div class="name" contenteditable="false" bind:innerHTML={notification.message} />
+							<div class="name" contenteditable="false" bind:innerHTML={notification.message}></div>
 							<div class="notification-time">{notification.formattedCreatedDate}</div>
 						</div>
 					</a>
@@ -121,7 +121,7 @@
 			<div>
 				<div class="centering-wrap">
 					{#if !seenNotificationsVisible}
-						<button type="button" on:click={showSeenNotifications} class="show-button">
+						<button type="button" onclick={showSeenNotifications} class="show-button">
 							{$t('notifications.showSeen')}
 						</button>
 					{/if}
@@ -143,7 +143,7 @@
 									alt={$t('profilePicture', { name: notification.userName })}
 								/>
 								<div class="notification-content">
-									<div class="name" contenteditable="false" bind:innerHTML={notification.message} />
+									<div class="name" contenteditable="false" bind:innerHTML={notification.message}></div>
 									<div class="notification-time">{notification.formattedCreatedDate}</div>
 								</div>
 							</a>
