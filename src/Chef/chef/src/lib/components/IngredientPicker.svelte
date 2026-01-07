@@ -13,15 +13,17 @@
 	import PublicCategorySuggestion from '$lib/components/PublicCategorySuggestion.svelte';
 	import PublicIngredientSuggestion from '$lib/components/PublicIngredientSuggestion.svelte';
 
-	export let inputPlaceholder: string;
-	export let addingEnabled: boolean;
-	export let userIngredientsAllowed = true;
-	export let recipeIngredientIds: number[];
+	let {
+		inputPlaceholder,
+		addingEnabled,
+		userIngredientsAllowed = true,
+		recipeIngredientIds
+	}: { inputPlaceholder: string; addingEnabled: boolean; userIngredientsAllowed: boolean | null; recipeIngredientIds: number[] } = $props();
 
-	let ingredientName = '';
-	let ingredientNameIsInvalid: boolean;
-	let suggestions: IngredientSuggestions;
-	let suggestionsMatched = false;
+	let ingredientName = $state('');
+	let ingredientNameIsInvalid = $state(false);
+	let suggestions: IngredientSuggestions | null = $state(null);
+	let suggestionsMatched = $state(false);
 	const unsubscriptions: Unsubscriber[] = [];
 
 	let ingredientsService: IngredientsService;
@@ -39,6 +41,11 @@
 	}
 
 	function ingredientInputChanged() {
+		if (suggestions === null) {
+			console.warn('Suggestions are not initialized yet');
+			return;
+		}
+
 		resetIngredientMatches();
 
 		const search = ingredientName.trim().toUpperCase();
@@ -171,7 +178,7 @@
 			}
 		}
 
-		throw new Error('Could not find suggestion');
+		return null;
 	}
 
 	onMount(() => {
@@ -200,6 +207,11 @@
 				}
 
 				suggestion.selected = false;
+
+				if (suggestions === null) {
+					console.warn('Suggestions are not initialized yet');
+					return;
+				}
 
 				suggestions.userIngredients = [...suggestions.userIngredients];
 
@@ -259,7 +271,7 @@
 		<input
 			type="text"
 			bind:value={ingredientName}
-			on:keyup={ingredientInputChanged}
+			onkeyup={ingredientInputChanged}
 			disabled={!suggestions}
 			class:invalid={ingredientNameIsInvalid}
 			placeholder={inputPlaceholder}
@@ -268,13 +280,13 @@
 		/>
 
 		{#if addingEnabled}
-			<button type="button" on:click={addNewIngredient} title={$t('addIngredient')} aria-label={$t('addIngredient')}>
-				<i class="fas fa-plus-circle" />
+			<button type="button" onclick={addNewIngredient} title={$t('addIngredient')} aria-label={$t('addIngredient')}>
+				<i class="fas fa-plus-circle"></i>
 			</button>
 		{/if}
 	</div>
 
-	{#if suggestionsMatched}
+	{#if suggestions !== null && suggestionsMatched}
 		<div>
 			{#if userIngredientsAllowed}
 				<div class="suggestions">

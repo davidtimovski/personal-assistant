@@ -6,27 +6,27 @@
 	import { page } from '$app/stores';
 
 	import { t } from '$lib/localization/i18n';
-	import { isOffline, user, state } from '$lib/stores';
+	import { isOffline, user, localState } from '$lib/stores';
 	import { UsersService } from '$lib/services/usersService';
 	import { RecipesService } from '$lib/services/recipesService';
 	import type { RecipeModel } from '$lib/models/viewmodels/recipeModel';
 
-	let recipes: RecipeModel[] | null = null;
-	let editedId: number | undefined;
+	let recipes: RecipeModel[] | null = $state(null);
+	let editedId: number | undefined = $state(undefined);
 	const unsubscriptions: Unsubscriber[] = [];
 	let recipesContainer: HTMLDivElement;
 	let resizeObserver: ResizeObserver;
-	let imageWidth: number;
-	let imageHeight: number;
+	let imageWidth: number | null = $state(null);
+	let imageHeight: number | null = $state(null);
 
 	// Progress bar
-	let progressBarActive = false;
+	let progressBarActive = $state(false);
 	const progress = tweened(0, {
 		duration: 500,
 		easing: cubicOut
 	});
 	let progressIntervalId: number | undefined;
-	let progressBarVisible = false;
+	let progressBarVisible = $state(false);
 
 	let usersService: UsersService;
 	let recipesService: RecipesService;
@@ -38,11 +38,11 @@
 	}
 
 	function setRecipesFromState() {
-		if ($state.recipes === null) {
-			throw new Error('Recipes not loaded yet');
+		if ($localState.recipes === null) {
+			return;
 		}
 
-		recipes = $state.recipes
+		recipes = $localState.recipes
 			.sort((a: RecipeModel, b: RecipeModel) => {
 				const aDate = new Date(a.lastOpenedDate);
 				const bDate = new Date(b.lastOpenedDate);
@@ -65,7 +65,7 @@
 	}
 
 	unsubscriptions.push(
-		state.subscribe((s) => {
+		localState.subscribe((s) => {
 			if (s.recipes === null) {
 				return;
 			}
@@ -121,7 +121,7 @@
 		usersService = new UsersService();
 		recipesService = new RecipesService();
 
-		if ($state.recipes === null) {
+		if ($localState.recipes === null) {
 			startProgressBar();
 		}
 	});
@@ -143,20 +143,20 @@
 				<img src={$user.imageUri} class="profile-image" width="40" height="40" alt="" />
 			</a>
 
-			<div class="page-title" />
+			<div class="page-title"></div>
 			<button
 				type="button"
-				on:click={sync}
+				onclick={sync}
 				class="sync-button"
 				disabled={$isOffline || progressBarActive}
 				title={$t('recipes.refresh')}
 				aria-label={$t('recipes.refresh')}
 			>
-				<i class="fas fa-sync-alt" />
+				<i class="fas fa-sync-alt"></i>
 			</button>
 		</div>
 		<div class="progress-bar">
-			<div class="progress" class:visible={progressBarVisible} style="width: {$progress}%;" />
+			<div class="progress" class:visible={progressBarVisible} style="width: {$progress}%;"></div>
 		</div>
 	</div>
 
@@ -174,8 +174,8 @@
 					>
 						<img src={recipe.imageUri} alt={recipe.name} width={imageWidth} height={imageHeight} />
 						<div class="recipe-name">
-							<i class="fas fa-users" />
-							<i class="fas fa-user-clock" />
+							<i class="fas fa-users"></i>
+							<i class="fas fa-user-clock"></i>
 							<span>{recipe.name}</span>
 						</div>
 						<div class="num-ingredients-missing">{recipe.ingredientsMissingLabel}</div>
@@ -186,7 +186,7 @@
 
 		<div class="centering-wrap">
 			<a href="/editRecipe/0" class="new-button" title={$t('recipes.newRecipe')} aria-label={$t('recipes.newRecipe')}>
-				<i class="fas fa-plus" />
+				<i class="fas fa-plus"></i>
 			</a>
 		</div>
 	</div>

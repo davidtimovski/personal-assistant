@@ -6,7 +6,7 @@
 
 	import PublicIngredientSuggestion from '$lib/components/PublicIngredientSuggestion.svelte';
 
-	export let ingredient: IngredientSuggestion;
+	let { ingredient }: { ingredient: IngredientSuggestion } = $props();
 
 	function ingredientClicked() {
 		if (ingredient.selected) {
@@ -20,13 +20,7 @@
 </script>
 
 {#if ingredient.matched}
-	<button
-		type="button"
-		on:click={ingredientClicked}
-		disabled={ingredient.selected}
-		class="ingredient-suggestion"
-		class:selected={ingredient.selected}
-	>
+	<button type="button" onclick={ingredientClicked} disabled={ingredient.selected} class="ingredient-suggestion" class:selected={ingredient.selected}>
 		{#if ingredient.brandName}
 			<span>{ingredient.name} ({ingredient.brandName})</span>
 		{:else}
@@ -35,12 +29,12 @@
 
 		<span class="icons-container">
 			{#if ingredient.hasNutritionData}
-				<i class="fas fa-clipboard" title={$t('hasNutrition')} aria-label={$t('hasNutrition')} />
+				<i class="fas fa-clipboard" title={$t('hasNutrition')} aria-label={$t('hasNutrition')}></i>
 			{/if}
 			{#if ingredient.hasPriceData}
-				<i class="fas fa-tag" title={$t('hasPrice')} aria-label={$t('hasPrice')} />
+				<i class="fas fa-tag" title={$t('hasPrice')} aria-label={$t('hasPrice')}></i>
 			{/if}
-			<i class="fas fa-check" />
+			<i class="fas fa-check"></i>
 		</span>
 	</button>
 

@@ -11,10 +11,10 @@
 	import { RecipesService } from '$lib/services/recipesService';
 
 	const notificationsVapidKey = 'BIWWy4ZjIrLMVBxYwsq4rlixA3miMGeMw0yCqldR5Cpv5mozBw1oQxEbbp5q1I9SL9_zUjaLfYheoqb578becPY';
-	let notificationsState: string;
+	let notificationsState: string | null = $state(null);
 	const notificationIconSrc = '/images/icons/app-icon-x96.png';
-	let notificationsAreSupported = false;
-	let notificationsCheckboxChecked: boolean;
+	let notificationsAreSupported = $state(false);
+	let notificationsCheckboxChecked: boolean | null = $state(null);
 
 	let localStorage: LocalStorageUtil;
 	let usersService: UsersService;
@@ -22,6 +22,10 @@
 	let recipesService: RecipesService;
 
 	async function notificationsCheckboxCheckedChanged() {
+		if (notificationsCheckboxChecked === null) {
+			throw new Error('Notifications checkbox state not initialized');
+		}
+
 		const previousNotificationsPermission = (Notification as any).permission;
 
 		if (previousNotificationsPermission === 'denied') {
@@ -73,7 +77,7 @@
 		if (sub === null) {
 			const newSub = await swReg.pushManager.subscribe({
 				userVisibleOnly: true,
-				applicationServerKey: NotificationsServiceBase.getApplicationServerKey(notificationsVapidKey)
+				applicationServerKey: notificationsVapidKey
 			});
 
 			await notificationsService.createSubscription('Chef', newSub);
@@ -121,11 +125,11 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive small">
-			<i class="fas fa-sliders-h" />
+			<i class="fas fa-sliders-h"></i>
 		</div>
 		<div class="page-title">{$t('preferences.preferences')}</div>
 		<a href="/recipes" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -143,7 +147,7 @@
 						labelKey="preferences.notifications"
 						bind:value={notificationsCheckboxChecked}
 						disabled={notificationsState === 'denied'}
-						on:change={notificationsCheckboxCheckedChanged}
+						onchange={notificationsCheckboxCheckedChanged}
 					/>
 				</div>
 			{/if}

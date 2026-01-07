@@ -9,7 +9,7 @@
 	}: { labelKey: string | null; value: boolean | null; disabled?: boolean; onchange?: any } = $props();
 </script>
 
-<!-- svelte-ignore a11y-label-has-associated-control -->
+<!-- svelte-ignore a11y_label_has_associated_control -->
 <label class="checkbox-toggle" class:disabled class:no-label={!labelKey}>
 	{#if labelKey}
 		<span>{$t(labelKey)}</span>
