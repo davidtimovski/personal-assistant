@@ -10,12 +10,12 @@
 	import { user } from '$lib/stores';
 	import { TransactionsService } from '$lib/services/transactionsService';
 	import { AccountsService } from '$lib/services/accountsService';
-	import { HeatmapDay, HeatmapExpense } from '$lib/models/viewmodels/expenditureHeatmap';
+	import { HeatmapDay, HeatmapExpense } from '$lib/models/viewmodels/expenditureHeatmap.svelte';
 
-	let days: HeatmapDay[] | null = null;
-	let selectedDay: HeatmapDay | null = null;
-	let selectedExpenditureCaret = 0;
-	let loaded = false;
+	let days: HeatmapDay[] | null = $state(null);
+	let selectedDay: HeatmapDay | null = $state(null);
+	let selectedExpenditureCaret = $state(0);
+	let loaded = $state(false);
 	const colors = [
 		'#241432',
 		'#2b1637',
@@ -68,7 +68,7 @@
 		'#f9ddc9',
 		'#f9e5d4'
 	];
-	let currency: string;
+	let currency: string | null = $state(null);
 
 	const now = new Date();
 	const month = now.getMonth() - 1;
@@ -83,8 +83,8 @@
 	const fromDate = new Date(aMonthAgo.getFullYear(), aMonthAgo.getMonth(), aMonthAgo.getDate());
 	const todayString = DateHelper.format(now);
 
-	let maxSpent = 0;
-	let minSpent = 10000000;
+	let maxSpent = $state(0);
+	let minSpent = $state(10000000);
 
 	const localStorage = new LocalStorageUtil();
 	let transactionsService: TransactionsService;
@@ -122,7 +122,7 @@
 		goto(`/transaction/${id}?fromExpenditureHeatmap=true`);
 	}
 
-	$: selectedDayDate = selectedDay?.date;
+	let selectedDayDate = $derived(() => (selectedDay === null ? '' : selectedDay.date));
 
 	onMount(async () => {
 		transactionsService = new TransactionsService();
@@ -204,11 +204,11 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive medium">
-			<i class="fas fa-th" />
+			<i class="fas fa-th"></i>
 		</div>
 		<div class="page-title">{$t('expenditureHeatmap.expenditureHeatmap')}</div>
 		<a href="/dashboard" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -226,10 +226,10 @@
 				{#each days as day}
 					<button
 						type="button"
-						on:click={() => select(day)}
+						onclick={() => select(day)}
 						class="heatmap-cell date"
 						class:today={day.isToday}
-						class:selected={day.date === selectedDayDate}
+						class:selected={day.date === selectedDayDate()}
 						style="background: {day.backgroundColor}; color: {day.textColor};"
 					>
 						{day.day}
@@ -242,9 +242,9 @@
 			<div>
 				<div class="heatmap-legend">
 					<div style="width: {selectedExpenditureCaret}%;" class="heatmap-caret-wrap">
-						<i class="fas fa-caret-down" />
+						<i class="fas fa-caret-down"></i>
 					</div>
-					<div class="heatmap-legend-line" />
+					<div class="heatmap-legend-line"></div>
 					<div class="heatmap-legend-amounts">
 						<span>{Formatter.moneyWithoutCurrency(minSpent, currency, $user.culture)}</span>
 						<span>{Formatter.moneyWithoutCurrency(maxSpent, currency, $user.culture)}</span>
@@ -256,7 +256,7 @@
 					<table class="expenditure-heatmap-table">
 						<tbody>
 							{#each selectedDay.expenditures as expenditure}
-								<tr on:click={() => viewTransaction(expenditure.transactionId)} role="button">
+								<tr onclick={() => viewTransaction(expenditure.transactionId)} role="button">
 									<td>{expenditure.category}</td>
 									<td>{expenditure.description}</td>
 									<td class="amount-cell">{Formatter.money(expenditure.amount, currency, $user.culture)}</td>

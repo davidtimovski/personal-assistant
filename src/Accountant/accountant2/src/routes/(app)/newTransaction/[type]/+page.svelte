@@ -24,33 +24,37 @@
 	import AmountInput from '$lib/components/AmountInput.svelte';
 	import type { Account } from '$lib/models/entities/account';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
 
-	let accountId: number | null = null;
-	let categoryId: number | null = null;
-	let amount: number | null = null;
-	let toStocks: number | null = null;
-	let currency: string | null = null;
-	let description: string | null = null;
-	let date = DateHelper.format(new Date());
-	let encrypt = false;
-	let encryptionPassword: string | null = null;
-	let debtId: number | null = null;
-	let userIsDebtor: boolean;
-	let debtPerson: string;
-	let accountOptions: SelectOptionExtended<Account>[] | null = null;
-	let categoryOptions: SelectOption[] | null = null;
+	let { data }: Props = $props();
+
+	let accountId: number | null = $state(null);
+	let categoryId: number | null = $state(null);
+	let amount: number | null = $state(null);
+	let toStocks: number | null = $state(null);
+	let currency: string | null = $state(null);
+	let description: string | null = $state(null);
+	let date = $state(DateHelper.format(new Date()));
+	let encrypt = $state(false);
+	let encryptionPassword: string | null = $state(null);
+	let debtId: number | null = $state(null);
+	let userIsDebtor: boolean | null = $state(null);
+	let debtPerson: string | null = $state(null);
+	let accountOptions: SelectOptionExtended<Account>[] | null = $state(null);
+	let categoryOptions: SelectOption[] | null = $state(null);
 	const maxDate = date;
-	let passwordShown = false;
-	let amountIsInvalid = false;
-	let toStocksIsInvalid = false;
-	let dateIsInvalid = false;
-	let encryptionPasswordIsInvalid = false;
-	let submitButtonIsLoading = false;
-	let stocksInput: HTMLInputElement | null = null;
-	let passwordInput: HTMLInputElement | null = null;
-	let passwordShowIconLabel: string;
-	let accountIsFund = false;
+	let passwordShown = $state(false);
+	let amountIsInvalid = $state(false);
+	let toStocksIsInvalid = $state(false);
+	let dateIsInvalid = $state(false);
+	let encryptionPasswordIsInvalid = $state(false);
+	let submitButtonIsLoading = $state(false);
+	let stocksInput: HTMLInputElement | null = $state(null);
+	let passwordInput: HTMLInputElement | null = $state(null);
+	let passwordShowIconLabel = $state('');
+	let accountIsFund = $state(false);
 	let selectedAccountOption: SelectOptionExtended<Account> | null = null;
 
 	const localStorage = new LocalStorageUtil();
@@ -72,7 +76,7 @@
 		}
 	});
 
-	$: pastMidnight = (): string | null => {
+	let pastMidnight = $derived.by((): string | null => {
 		if (!date) {
 			return null;
 		}
@@ -91,22 +95,21 @@
 		}
 
 		return null;
-	};
+	});
 
-	$: canEncrypt = () => {
+	let canEncrypt = $derived(!!description);
+
+	$effect(() => {
 		if (!description) {
 			encrypt = false;
 			encryptionPassword = null;
-			return false;
 		}
 
-		const canEncrypt = description.trim().length > 0;
 		if (!canEncrypt) {
 			encrypt = false;
 			encryptionPassword = null;
 		}
-		return canEncrypt;
-	};
+	});
 
 	function deriveAmountBasedOnStocks() {
 		let decimals = 2;
@@ -172,10 +175,12 @@
 		return result;
 	}
 
-	async function submit() {
+	async function submit(event: Event) {
 		if (!amount || !currency) {
 			throw new Error('Unexpected error: required fields missing');
 		}
+
+		event.preventDefault();
 
 		submitButtonIsLoading = true;
 		alertState.update((x) => {
@@ -322,11 +327,11 @@
 	<div class="page-title-wrap">
 		{#if data.isExpense}
 			<div class="side inactive small">
-				<i class="fas fa-wallet" />
+				<i class="fas fa-wallet"></i>
 			</div>
 		{:else}
 			<div class="side inactive medium">
-				<i class="fas fa-donate" />
+				<i class="fas fa-donate"></i>
 			</div>
 		{/if}
 
@@ -335,7 +340,7 @@
 		</div>
 
 		<a href={debtId ? '/debt' : '/dashboard'} class="back-button" role="button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -348,11 +353,11 @@
 			{/if}
 		{/if}
 
-		{#if pastMidnight()}
-			<AlertBlock type="info" message={$t('newTransaction.considerUsingYesterday', { time: pastMidnight() })} />
+		{#if pastMidnight}
+			<AlertBlock type="info" message={$t('newTransaction.considerUsingYesterday', { time: pastMidnight })} />
 		{/if}
 
-		<form on:submit|preventDefault={submit} autocomplete="off">
+		<form onsubmit={submit} autocomplete="off">
 			{#if accountIsFund}
 				<div class="form-control inline">
 					<label for="stocks">{$t('stocks')}</label>
@@ -361,7 +366,7 @@
 						id="stocks"
 						bind:this={stocksInput}
 						bind:value={toStocks}
-						on:keyup={deriveAmountBasedOnStocks}
+						onkeyup={deriveAmountBasedOnStocks}
 						min={toStocksFrom}
 						max={toStocksTo}
 						step="0.0001"
@@ -380,14 +385,14 @@
 			<div class="form-control inline">
 				<label for="account">{$t(data.isExpense ? 'fromAccount' : 'toAccount')}</label>
 				<div class="loadable-select" class:loaded={accountOptions}>
-					<select id="account" bind:value={accountId} on:change={accountChanged} disabled={!accountOptions} class="category-select">
+					<select id="account" bind:value={accountId} onchange={accountChanged} disabled={!accountOptions} class="category-select">
 						{#if accountOptions}
 							{#each accountOptions as account}
 								<option value={account.id}>{account.name}</option>
 							{/each}
 						{/if}
 					</select>
-					<i class="fas fa-circle-notch fa-spin" />
+					<i class="fas fa-circle-notch fa-spin"></i>
 				</div>
 			</div>
 
@@ -401,7 +406,7 @@
 							{/each}
 						{/if}
 					</select>
-					<i class="fas fa-circle-notch fa-spin" />
+					<i class="fas fa-circle-notch fa-spin"></i>
 				</div>
 			</div>
 
@@ -418,9 +423,9 @@
 						class="description-textarea"
 						placeholder={$t('description')}
 						aria-label={$t('description')}
-					/>
+					></textarea>
 
-					<Checkbox labelKey="newTransaction.encryptDescription" bind:value={encrypt} disabled={!canEncrypt()} />
+					<Checkbox labelKey="newTransaction.encryptDescription" bind:value={encrypt} disabled={!canEncrypt} />
 
 					{#if encrypt}
 						<Tooltip key="encryptedDescription" application="Accountant" />
@@ -438,14 +443,14 @@
 							/>
 							<button
 								type="button"
-								on:click={togglePasswordShow}
+								onclick={togglePasswordShow}
 								class="password-show-button"
 								class:shown={passwordShown}
 								title={passwordShowIconLabel}
 								aria-label={passwordShowIconLabel}
 							>
-								<i class="fas fa-eye" />
-								<i class="fas fa-eye-slash" />
+								<i class="fas fa-eye"></i>
+								<i class="fas fa-eye-slash"></i>
 							</button>
 						</div>
 					{/if}
@@ -460,7 +465,7 @@
 					disabled={$syncStatus.status === SyncEvents.SyncStarted || !amount || !accountId || submitButtonIsLoading}
 				>
 					<span class="button-loader" class:loading={submitButtonIsLoading}>
-						<i class="fas fa-circle-notch fa-spin" />
+						<i class="fas fa-circle-notch fa-spin"></i>
 					</span>
 					<span>{$t('newTransaction.submit')}</span>
 				</button>

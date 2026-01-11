@@ -1,4 +1,7 @@
 export class HeatmapDay {
+	backgroundColor: string | null = $state(null);
+	textColor: string | null = $state(null);
+
 	constructor(
 		public day: number,
 		public date: string,
@@ -6,10 +9,12 @@ export class HeatmapDay {
 		public isToday: boolean,
 		public spent: number,
 		public spentPercentage: number,
-		public backgroundColor: string | null,
-		public textColor: string | null,
+		backgroundColor: string | null,
+		textColor: string | null,
 		public expenditures: HeatmapExpense[]
 	) {
+		this.backgroundColor = backgroundColor;
+		this.textColor = textColor;
 		this.expenditures = [];
 	}
 }

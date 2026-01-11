@@ -14,9 +14,9 @@
 	import { DebtItem } from '$lib/models/viewmodels/debtItem';
 	import { SyncEvents } from '$lib/models/syncStatus';
 
-	let debts: DebtItem[] | null = null;
-	let currency: string;
-	let editedId: number | undefined;
+	let debts: DebtItem[] | null = $state(null);
+	let currency: string | null = $state(null);
+	let editedId: number | undefined = $state(undefined);
 
 	const localStorage = new LocalStorageUtil();
 	let debtsService: DebtsService;
@@ -76,11 +76,11 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive medium">
-			<i class="fas fa-hand-holding-usd" />
+			<i class="fas fa-hand-holding-usd"></i>
 		</div>
 		<div class="page-title">{$t('debt.debt')}</div>
 		<a href="/dashboard" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -88,19 +88,19 @@
 		<div class="content-body">
 			{#if !debts}
 				<div class="double-circle-loading">
-					<div class="double-bounce1" />
-					<div class="double-bounce2" />
+					<div class="double-bounce1"></div>
+					<div class="double-bounce2"></div>
 				</div>
 			{:else if debts.length > 0}
 				<table class="editable-table">
 					<thead>
 						<tr>
-							<th class="edit-link-cell" />
-							<th class="edit-link-cell" />
+							<th class="edit-link-cell"></th>
+							<th class="edit-link-cell"></th>
 							<th>{$t('amount')}</th>
 							<th>{$t('debt.person')}</th>
 							<th>{$t('debt.occurred')}</th>
-							<th class="sync-icon-cell" />
+							<th class="sync-icon-cell"></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -108,18 +108,18 @@
 							<tr class:highlighted-row={debt.id === editedId}>
 								<td class="edit-link-cell">
 									<a href="/editDebt/{debt.id}" class="link" title={$t('edit')} aria-label={$t('edit')}>
-										<i class="fas fa-pencil-alt" />
+										<i class="fas fa-pencil-alt"></i>
 									</a>
 								</td>
 								<td class="edit-link-cell">
 									<button
 										type="button"
-										on:click={() => settleDebt(debt.id, debt.userIsDebtor)}
+										onclick={() => settleDebt(debt.id, debt.userIsDebtor)}
 										class="settle-debt-button"
 										title={$t('debt.settleDebt')}
 										aria-label={$t('debt.settleDebt')}
 									>
-										<i class="fas fa-hand-holding-usd {debt.userIsDebtor ? 'debtor' : 'lender'}" />
+										<i class="fas fa-hand-holding-usd {debt.userIsDebtor ? 'debtor' : 'lender'}"></i>
 									</button>
 								</td>
 								<td>{Formatter.money(debt.amount, currency, $user.culture)}</td>
@@ -127,7 +127,7 @@
 								<td>{debt.created}</td>
 								<td class="sync-icon-cell">
 									{#if !debt.synced}
-										<i class="fas fa-sync-alt" title={$t('notSynced')} aria-label={$t('notSynced')} />
+										<i class="fas fa-sync-alt" title={$t('notSynced')} aria-label={$t('notSynced')}></i>
 									{/if}
 								</td>
 							</tr>
@@ -142,13 +142,13 @@
 		<div class="centering-wrap">
 			<button
 				type="button"
-				on:click={() => goto('/editDebt/0')}
+				onclick={() => goto('/editDebt/0')}
 				class="new-button"
 				disabled={$syncStatus.status === SyncEvents.SyncStarted}
 				title={$t('debt.newDebt')}
 				aria-label={$t('debt.newDebt')}
 			>
-				<i class="fas fa-plus" />
+				<i class="fas fa-plus"></i>
 			</button>
 		</div>
 	</div>

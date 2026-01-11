@@ -83,10 +83,10 @@
 </script>
 
 <main>
-	<div />
+	<div></div>
 	<div class="center">
 		<slot />
 		<Alert />
 	</div>
-	<div />
+	<div></div>
 </main>

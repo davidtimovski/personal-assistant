@@ -18,26 +18,30 @@
 
 	import AmountInput from '$lib/components/AmountInput.svelte';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
 
 	const isNew = data.id === 0;
 
-	let isDeposit: boolean;
-	let categoryId: number | null = null;
-	let amount: number | null = null;
-	let currency: string | null = null;
-	let description: string | null = null;
-	let dayInMonth: number;
+	let isDeposit = $state(false);
+	let categoryId: number | null = $state(null);
+	let amount: number | null = $state(null);
+	let currency: string | null = $state(null);
+	let description: string | null = $state(null);
+	let dayInMonth = $state(1);
 	let createdDate: Date | null;
-	let synced: boolean;
-	let categoryOptions: SelectOption[] | null = null;
-	let dayInMonthOptions = new Array<SelectOption>();
-	let amountIsInvalid = false;
-	let saveButtonText: string;
-	let deleteInProgress = false;
-	let deleteButtonText: string;
-	let saveButtonIsLoading = false;
-	let deleteButtonIsLoading = false;
+	let synced = $state(false);
+	let categoryOptions: SelectOption[] | null = $state(null);
+	let dayInMonthOptions = $state(new Array<SelectOption>());
+	let amountIsInvalid = $state(false);
+	let saveButtonText = $state('');
+	let deleteInProgress = $state(false);
+	let deleteButtonText = $state('');
+	let saveButtonIsLoading = $state(false);
+	let deleteButtonIsLoading = $state(false);
 
 	const localStorage = new LocalStorageUtil();
 	let automaticTransactionsService: AutomaticTransactionsService;
@@ -64,9 +68,11 @@
 		});
 	}
 
-	$: canSave = $syncStatus.status !== SyncEvents.SyncStarted && !!amount && !(!$isOnline && synced);
+	let canSave = $derived($syncStatus.status !== SyncEvents.SyncStarted && !!amount && !(!$isOnline && synced));
 
-	async function save() {
+	async function save(event: Event) {
+		event.preventDefault();
+
 		if (!amount || !currency) {
 			throw new Error('Unexpected error: required fields missing');
 		}
@@ -201,13 +207,13 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive small">
-			<i class="fas fa-pencil-alt" />
+			<i class="fas fa-pencil-alt"></i>
 		</div>
 		<div class="page-title">
 			<span>{$t(isNew ? 'editAutomaticTransaction.newAutomaticTransaction' : 'editAutomaticTransaction.editAutomaticTransaction')}</span>
 		</div>
 		<a href="/automaticTransactions" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -216,14 +222,14 @@
 			<AlertBlock type="warning" message={$t('whileOfflineCannotModify')} />
 		{/if}
 
-		<form on:submit|preventDefault={save}>
+		<form onsubmit={save}>
 			<div class="form-control">
 				<DoubleRadioBool
 					name="depositExpenseToggle"
 					leftLabelKey="editAutomaticTransaction.expense"
 					rightLabelKey="editAutomaticTransaction.deposit"
 					bind:value={isDeposit}
-					on:change={isDepositChanged}
+					onchange={isDepositChanged}
 				/>
 			</div>
 
@@ -242,7 +248,7 @@
 							{/each}
 						{/if}
 					</select>
-					<i class="fas fa-circle-notch fa-spin" />
+					<i class="fas fa-circle-notch fa-spin"></i>
 				</div>
 			</div>
 
@@ -257,13 +263,8 @@
 			</div>
 
 			<div class="form-control">
-				<textarea
-					bind:value={description}
-					maxlength="250"
-					class="description-textarea"
-					placeholder={$t('description')}
-					aria-label={$t('description')}
-				/>
+				<textarea bind:value={description} maxlength="250" class="description-textarea" placeholder={$t('description')} aria-label={$t('description')}
+				></textarea>
 			</div>
 
 			<hr />
@@ -272,7 +273,7 @@
 				{#if !deleteInProgress}
 					<button class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
 						<span class="button-loader" class:loading={saveButtonIsLoading}>
-							<i class="fas fa-circle-notch fa-spin" />
+							<i class="fas fa-circle-notch fa-spin"></i>
 						</span>
 						<span>{saveButtonText}</span>
 					</button>
@@ -281,20 +282,20 @@
 				{#if !isNew}
 					<button
 						type="button"
-						on:click={deleteAutomaticTransaction}
+						onclick={deleteAutomaticTransaction}
 						class="button danger-button"
 						disabled={deleteButtonIsLoading}
 						class:confirm={deleteInProgress}
 					>
 						<span class="button-loader" class:loading={deleteButtonIsLoading}>
-							<i class="fas fa-circle-notch fa-spin" />
+							<i class="fas fa-circle-notch fa-spin"></i>
 						</span>
 						<span>{deleteButtonText}</span>
 					</button>
 				{/if}
 
 				{#if isNew || deleteInProgress}
-					<button type="button" on:click={cancel} class="button secondary-button">
+					<button type="button" onclick={cancel} class="button secondary-button">
 						{$t('cancel')}
 					</button>
 				{/if}

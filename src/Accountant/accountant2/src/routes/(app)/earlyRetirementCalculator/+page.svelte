@@ -14,26 +14,26 @@
 	import AmountInput from '$lib/components/AmountInput.svelte';
 
 	// Answers
-	let age: number;
-	let capital: number | null = null;
-	let capitalCurrency: string;
-	let savedPerMonth: number | null = null;
-	let savedPerMonthCurrency: string;
-	let savingInterestRate: number;
-	let eligibleForPension = false;
-	let pensionAge: number;
-	let pensionPerMonth: number | null = null;
-	let pensionPerMonthCurrency: string;
-	let hasLifeInsurance = false;
-	let lifeInsuranceAge: number;
-	let lifeInsuranceReturn: number | null = null;
-	let lifeInsuranceReturnCurrency: string;
-	let upcomingExpenses: LargeUpcomingExpense[] = [];
-	let retirementIncome: number | null = null;
-	let retirementIncomeCurrency: string;
-	let consideringTheAnswersMessage: string;
+	let age: number | null = $state(null);
+	let capital: number | null = $state(null);
+	let capitalCurrency: string | null = $state(null);
+	let savedPerMonth: number | null = $state(null);
+	let savedPerMonthCurrency: string | null = $state(null);
+	let savingInterestRate: number | null = $state(null);
+	let eligibleForPension = $state(false);
+	let pensionAge: number | null = $state(null);
+	let pensionPerMonth: number | null = $state(null);
+	let pensionPerMonthCurrency: string | null = $state(null);
+	let hasLifeInsurance = $state(false);
+	let lifeInsuranceAge: number | null = $state(null);
+	let lifeInsuranceReturn: number | null = $state(null);
+	let lifeInsuranceReturnCurrency: string | null = $state(null);
+	let upcomingExpenses: LargeUpcomingExpense[] = $state([]);
+	let retirementIncome: number | null = $state(null);
+	let retirementIncomeCurrency: string | null = $state(null);
+	let consideringTheAnswersMessage: string | null = $state(null);
 
-	let currentSection = 'start';
+	let currentSection = $state('start');
 	const sections = [
 		'start',
 		'age',
@@ -49,16 +49,16 @@
 		'result'
 	];
 	let currency: string;
-	let ageIsInvalid: boolean;
-	let pensionAgeIsInvalid: boolean;
-	let pensionPerMonthIsInvalid: boolean;
-	let lifeInsuranceAgeIsInvalid: boolean;
-	let lifeInsuranceReturnIsInvalid: boolean;
-	let preferredRetirementIncomeIsInvalid: boolean;
-	let earlyRetirementAge: number;
-	let summaryItems: SummaryItem[];
+	let ageIsInvalid = $state(false);
+	let pensionAgeIsInvalid = $state(false);
+	let pensionPerMonthIsInvalid = $state(false);
+	let lifeInsuranceAgeIsInvalid = $state(false);
+	let lifeInsuranceReturnIsInvalid = $state(false);
+	let preferredRetirementIncomeIsInvalid = $state(false);
+	let earlyRetirementAge: number | null = $state(null);
+	let summaryItems: SummaryItem[] = $state([]);
 	const ageOfDeath = 85;
-	const inflation = 0.02;
+	const inflation = 0.025;
 
 	const localStorage = new LocalStorageUtil();
 	let accountsService: AccountsService;
@@ -270,6 +270,10 @@
 	}
 
 	function calculate() {
+		if (age === null) {
+			throw new Error('Age is not set');
+		}
+
 		const largeUpcomingExpensesSum = upcomingExpenses
 			.map((x) => getConvertedValueOrZero(<number>x.amount, x.currency))
 			.reduce((a: number, b: number) => a + b, 0);
@@ -282,11 +286,11 @@
 		}
 
 		lifeInsuranceAge = getIntValueOrZero(lifeInsuranceAge);
-		lifeInsuranceReturn = hasLifeInsurance ? getConvertedValueOrZero(<number>lifeInsuranceReturn, lifeInsuranceReturnCurrency) : 0;
+		const lifeInsuranceConverted = hasLifeInsurance ? getConvertedValueOrZero(<number>lifeInsuranceReturn, lifeInsuranceReturnCurrency) : 0;
 
 		const monthlyInflationFactor = 1 - inflation / 12;
 		const savingInterestMonthlyFactor = 1 + getFloatValueOrZero(savingInterestRate) / 100 / 12;
-		savedPerMonth = getConvertedValueOrZero(<number>savedPerMonth, savedPerMonthCurrency);
+		const savedPerMonthConverted = getConvertedValueOrZero(<number>savedPerMonth, savedPerMonthCurrency);
 
 		let currentAge = parseInt(age.toString(), 10);
 		let saved = getConvertedValueOrZero(<number>capital, capitalCurrency);
@@ -301,11 +305,11 @@
 			for (let i = 0; i < 12; i++) {
 				saved *= monthlyInflationFactor;
 				saved *= savingInterestMonthlyFactor;
-				saved += savedPerMonth;
+				saved += savedPerMonthConverted;
 			}
 
 			if (hasLifeInsurance && currentAge === lifeInsuranceAge) {
-				saved += lifeInsuranceReturn;
+				saved += lifeInsuranceConverted;
 			}
 
 			currentAge++;
@@ -330,19 +334,19 @@
 
 	function sumRequiredCapital(currentAge: number, largeUpcomingExpensesSum: number, pensionSum: number) {
 		const monthsInRetirement = (ageOfDeath - currentAge) * 12;
-		retirementIncome = getConvertedValueOrZero(<number>retirementIncome, retirementIncomeCurrency);
+		const retirementIncomeConverted = getConvertedValueOrZero(<number>retirementIncome, retirementIncomeCurrency);
 		const monthlyInflation = inflation / 12;
 
 		let retirementAmountNeeded = 0;
 		for (let i = 0; i < monthsInRetirement; i++) {
-			retirementAmountNeeded += retirementIncome;
+			retirementAmountNeeded += retirementIncomeConverted;
 			retirementAmountNeeded *= 1 + monthlyInflation;
 		}
 
 		return retirementAmountNeeded + largeUpcomingExpensesSum - pensionSum;
 	}
 
-	function getIntValueOrZero(value: number): number {
+	function getIntValueOrZero(value: number | null): number {
 		if (!value || value.toString().trim() === '') {
 			return 0;
 		}
@@ -350,7 +354,7 @@
 		return parseInt(value.toString(), 10);
 	}
 
-	function getFloatValueOrZero(value: number): number {
+	function getFloatValueOrZero(value: number | null): number {
 		if (!value || value.toString().trim() === '') {
 			return 0;
 		}
@@ -358,8 +362,8 @@
 		return parseFloat(value.toString());
 	}
 
-	function getConvertedValueOrZero(amount: number, amountCurrency: string): number {
-		if (!amount || amount.toString().trim() === '') {
+	function getConvertedValueOrZero(amount: number | null, amountCurrency: string | null): number {
+		if (!amount || !amountCurrency || amount.toString().trim() === '') {
 			return 0;
 		}
 
@@ -401,11 +405,11 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive medium">
-			<i class="fas fa-piggy-bank" />
+			<i class="fas fa-piggy-bank"></i>
 		</div>
 		<div class="page-title">{$t('earlyRetirementCalculator.earlyRetirementCalculator')}</div>
 		<a href="/dashboard" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -414,7 +418,7 @@
 			<p class="er-calc-explanation">{$t('earlyRetirementCalculator.explanation')}</p>
 
 			<div class="centering-wrap">
-				<button type="button" on:click={start} class="er-calc-button big start">{$t('earlyRetirementCalculator.start')}</button>
+				<button type="button" onclick={start} class="er-calc-button big start">{$t('earlyRetirementCalculator.start')}</button>
 			</div>
 		</section>
 
@@ -430,10 +434,10 @@
 			</div>
 
 			<div class="buttons-wrap">
-				<button type="button" on:click={back} class="er-calc-button back">
+				<button type="button" onclick={back} class="er-calc-button back">
 					{$t('earlyRetirementCalculator.back')}
 				</button>
-				<button type="button" on:click={goToCapital} class="er-calc-button">
+				<button type="button" onclick={goToCapital} class="er-calc-button">
 					{$t('earlyRetirementCalculator.next')}
 				</button>
 			</div>
@@ -453,10 +457,10 @@
 			</div>
 
 			<div class="buttons-wrap">
-				<button type="button" on:click={back} class="er-calc-button back">
+				<button type="button" onclick={back} class="er-calc-button back">
 					{$t('earlyRetirementCalculator.back')}
 				</button>
-				<button type="button" on:click={goToSaving} class="er-calc-button">
+				<button type="button" onclick={goToSaving} class="er-calc-button">
 					{$t('earlyRetirementCalculator.next')}
 				</button>
 			</div>
@@ -486,10 +490,10 @@
 			</div>
 
 			<div class="buttons-wrap">
-				<button type="button" on:click={back} class="er-calc-button back">
+				<button type="button" onclick={back} class="er-calc-button back">
 					{$t('earlyRetirementCalculator.back')}
 				</button>
-				<button type="button" on:click={goToPensionEligibility} class="er-calc-button">
+				<button type="button" onclick={goToPensionEligibility} class="er-calc-button">
 					{$t('earlyRetirementCalculator.next')}
 				</button>
 			</div>
@@ -504,10 +508,10 @@
 			</div>
 
 			<div class="buttons-wrap">
-				<button type="button" on:click={back} class="er-calc-button back">
+				<button type="button" onclick={back} class="er-calc-button back">
 					{$t('earlyRetirementCalculator.back')}
 				</button>
-				<button type="button" on:click={goToPension} class="er-calc-button">
+				<button type="button" onclick={goToPension} class="er-calc-button">
 					{$t('earlyRetirementCalculator.next')}
 				</button>
 			</div>
@@ -534,10 +538,10 @@
 			</div>
 
 			<div class="buttons-wrap">
-				<button type="button" on:click={back} class="er-calc-button back">
+				<button type="button" onclick={back} class="er-calc-button back">
 					{$t('earlyRetirementCalculator.back')}
 				</button>
-				<button type="button" on:click={goToHaveLifeInsurance} class="er-calc-button">
+				<button type="button" onclick={goToHaveLifeInsurance} class="er-calc-button">
 					{$t('earlyRetirementCalculator.next')}
 				</button>
 			</div>
@@ -554,10 +558,10 @@
 			</div>
 
 			<div class="buttons-wrap">
-				<button type="button" on:click={back} class="er-calc-button back">
+				<button type="button" onclick={back} class="er-calc-button back">
 					{$t('earlyRetirementCalculator.back')}
 				</button>
-				<button type="button" on:click={goToLifeInsurance} class="er-calc-button">
+				<button type="button" onclick={goToLifeInsurance} class="er-calc-button">
 					{$t('earlyRetirementCalculator.next')}
 				</button>
 			</div>
@@ -584,10 +588,10 @@
 			</div>
 
 			<div class="buttons-wrap">
-				<button type="button" on:click={back} class="er-calc-button back">
+				<button type="button" onclick={back} class="er-calc-button back">
 					{$t('earlyRetirementCalculator.back')}
 				</button>
-				<button type="button" on:click={goToUpcomingExpenses} class="er-calc-button">
+				<button type="button" onclick={goToUpcomingExpenses} class="er-calc-button">
 					{$t('earlyRetirementCalculator.next')}
 				</button>
 			</div>
@@ -603,38 +607,38 @@
 				<div class="large-upcoming-expenses">
 					{#each upcomingExpenses as expense}
 						<div class="large-upcoming-expense">
-							<i class="large-upcoming-expense-icon {expense.iconClass}" />
+							<i class="large-upcoming-expense-icon {expense.iconClass}"></i>
 							<input type="text" bind:value={expense.name} />
 							<AmountInput bind:amount={expense.amount} bind:currency={expense.currency} />
 							<button
 								type="button"
-								on:click={() => removeUpcomingExpense(expense)}
+								onclick={() => removeUpcomingExpense(expense)}
 								class="remove-button"
 								title={$t('earlyRetirementCalculator.removeExpense')}
 								aria-label={$t('earlyRetirementCalculator.removeExpense')}
 							>
-								<i class="fas fa-times-circle" />
+								<i class="fas fa-times-circle"></i>
 							</button>
 						</div>
 					{/each}
 
 					<button
 						type="button"
-						on:click={addUpcomingExpense}
+						onclick={addUpcomingExpense}
 						class="add-button"
 						title={$t('earlyRetirementCalculator.addExpense')}
 						aria-label={$t('earlyRetirementCalculator.addExpense')}
 					>
-						<i class="fas fa-plus" />
+						<i class="fas fa-plus"></i>
 					</button>
 				</div>
 			</div>
 
 			<div class="buttons-wrap">
-				<button type="button" on:click={back} class="er-calc-button back">
+				<button type="button" onclick={back} class="er-calc-button back">
 					{$t('earlyRetirementCalculator.back')}
 				</button>
-				<button type="button" on:click={goToRetirementIncome} class="er-calc-button">
+				<button type="button" onclick={goToRetirementIncome} class="er-calc-button">
 					{$t('earlyRetirementCalculator.next')}
 				</button>
 			</div>
@@ -651,10 +655,10 @@
 			</div>
 
 			<div class="buttons-wrap">
-				<button type="button" on:click={back} class="er-calc-button back">
+				<button type="button" onclick={back} class="er-calc-button back">
 					{$t('earlyRetirementCalculator.back')}
 				</button>
-				<button type="button" on:click={goToSummary} class="er-calc-button">
+				<button type="button" onclick={goToSummary} class="er-calc-button">
 					{$t('earlyRetirementCalculator.next')}
 				</button>
 			</div>
@@ -667,12 +671,12 @@
 				<ul>
 					{#each summaryItems as summaryItem}
 						<li>
-							<span contenteditable="false" bind:innerHTML={summaryItem.contentHtml} />
+							<span contenteditable="false" bind:innerHTML={summaryItem.contentHtml}></span>
 
 							{#if summaryItem.children.length > 0}
 								<ul>
 									{#each summaryItem.children as childItem}
-										<li contenteditable="false" bind:innerHTML={childItem.contentHtml} />
+										<li contenteditable="false" bind:innerHTML={childItem.contentHtml}></li>
 									{/each}
 								</ul>
 							{/if}
@@ -682,10 +686,10 @@
 			{/if}
 
 			<div class="buttons-wrap">
-				<button type="button" on:click={back} class="er-calc-button back">
+				<button type="button" onclick={back} class="er-calc-button back">
 					{$t('earlyRetirementCalculator.back')}
 				</button>
-				<button type="button" on:click={calculate} class="er-calc-button big">
+				<button type="button" onclick={calculate} class="er-calc-button big">
 					{$t('earlyRetirementCalculator.calculate')}
 				</button>
 			</div>
@@ -694,16 +698,18 @@
 		<section class="step" class:shown={currentSection === 'result'}>
 			<div class="section-title">{$t('earlyRetirementCalculator.result')}</div>
 
-			<div class="result-message">
-				{#if earlyRetirementAge < 85}
-					<span contenteditable="false" bind:innerHTML={consideringTheAnswersMessage} />
-				{:else}
-					<span>{$t('earlyRetirementCalculator.notLikelyToRetire')}</span>
-				{/if}
-			</div>
+			{#if earlyRetirementAge}
+				<div class="result-message">
+					{#if earlyRetirementAge < 85}
+						<span contenteditable="false" bind:innerHTML={consideringTheAnswersMessage}></span>
+					{:else}
+						<span>{$t('earlyRetirementCalculator.notLikelyToRetire')}</span>
+					{/if}
+				</div>
+			{/if}
 
 			<div class="buttons-wrap">
-				<button type="button" on:click={back} class="er-calc-button back">
+				<button type="button" onclick={back} class="er-calc-button back">
 					{$t('earlyRetirementCalculator.back')}
 				</button>
 			</div>
@@ -788,14 +794,6 @@
 
 	.er-calc-input-wrap {
 		text-align: center;
-
-		.input-wrap {
-			display: inline-flex;
-
-			input {
-				width: 60px;
-			}
-		}
 	}
 
 	.interest-rate-input-wrap {
@@ -909,10 +907,6 @@
 
 		.question-detail {
 			line-height: 27px;
-		}
-
-		.er-calc-input-wrap .input-wrap input {
-			width: 100px;
 		}
 
 		.interest-rate-input-wrap .add-on {

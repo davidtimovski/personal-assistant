@@ -12,8 +12,8 @@
 	import { AutomaticTransactionItem } from '$lib/models/viewmodels/automaticTransactionItem';
 	import { SyncEvents } from '$lib/models/syncStatus';
 
-	let automaticTransactions: AutomaticTransactionItem[] | null = null;
-	let editedId: number | undefined;
+	let automaticTransactions: AutomaticTransactionItem[] | null = $state(null);
+	let editedId: number | undefined = $state(undefined);
 
 	let automaticTransactionsService: AutomaticTransactionsService;
 
@@ -53,11 +53,11 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive small">
-			<i class="fa-solid fa-robot" />
+			<i class="fa-solid fa-robot"></i>
 		</div>
 		<div class="page-title">{$t('automaticTransactions.automaticTransactions')}</div>
 		<a href="/dashboard" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -65,18 +65,18 @@
 		<div class="content-body">
 			{#if !automaticTransactions}
 				<div class="double-circle-loading">
-					<div class="double-bounce1" />
-					<div class="double-bounce2" />
+					<div class="double-bounce1"></div>
+					<div class="double-bounce2"></div>
 				</div>
 			{:else if automaticTransactions.length > 0}
 				<table class="editable-table">
 					<thead>
 						<tr>
-							<th class="edit-link-cell" />
+							<th class="edit-link-cell"></th>
 							<th>{$t('automaticTransactions.onEvery')}</th>
 							<th>{$t('amount')}</th>
 							<th>{$t('category')}</th>
-							<th class="sync-icon-cell" />
+							<th class="sync-icon-cell"></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -84,18 +84,18 @@
 							<tr class:highlighted-row={automaticTransaction.id === editedId}>
 								<td class="edit-link-cell">
 									<a href="/editAutomaticTransaction/{automaticTransaction.id}" class="link" title={$t('edit')} aria-label={$t('edit')}>
-										<i class="fas fa-pencil-alt" />
+										<i class="fas fa-pencil-alt"></i>
 									</a>
 								</td>
 								<td>{automaticTransaction.dayInMonth}</td>
 								<td>
 									{Formatter.money(automaticTransaction.amount, automaticTransaction.currency, $user.culture)}
-									<i class="fas deposit-or-expense-icon {automaticTransaction.isDeposit ? 'fa-donate deposit-color' : 'fa-wallet expense-color'}" />
+									<i class="fas deposit-or-expense-icon {automaticTransaction.isDeposit ? 'fa-donate deposit-color' : 'fa-wallet expense-color'}"></i>
 								</td>
 								<td>{automaticTransaction.category}</td>
 								<td class="sync-icon-cell">
 									{#if !automaticTransaction.synced}
-										<i class="fas fa-sync-alt" title={$t('notSynced')} aria-label={$t('notSynced')} />
+										<i class="fas fa-sync-alt" title={$t('notSynced')} aria-label={$t('notSynced')}></i>
 									{/if}
 								</td>
 							</tr>
@@ -110,13 +110,13 @@
 		<div class="centering-wrap">
 			<button
 				type="button"
-				on:click={() => goto('/editAutomaticTransaction/0')}
+				onclick={() => goto('/editAutomaticTransaction/0')}
 				class="new-button"
 				disabled={$syncStatus.status === SyncEvents.SyncStarted}
 				title={$t('automaticTransactions.newAutomaticTransaction')}
 				aria-label={$t('automaticTransactions.newAutomaticTransaction')}
 			>
-				<i class="fas fa-plus" />
+				<i class="fas fa-plus"></i>
 			</button>
 		</div>
 	</div>

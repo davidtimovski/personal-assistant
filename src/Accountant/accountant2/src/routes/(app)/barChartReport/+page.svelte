@@ -18,20 +18,20 @@
 	import type { TransactionModel } from '$lib/models/entities/transaction';
 	import { AmountByMonth } from '$lib/models/viewmodels/amountByMonth';
 
-	let mainAccountId: number;
-	let currency: string;
+	let mainAccountId: number | null = $state(null);
+	let currency: string | null = $state(null);
 	let chart: Chart;
-	let fromOptions: FromOption[] | null = null;
-	let categoryOptions: SelectOption[] | null = null;
-	let balanceAverage: number;
-	let spentAverage: number;
-	let depositedAverage: number;
-	let savedAverage: number;
+	let fromOptions: FromOption[] | null = $state(null);
+	let categoryOptions: SelectOption[] | null = $state(null);
+	let balanceAverage: number | null = $state(null);
+	let spentAverage: number | null = $state(null);
+	let depositedAverage: number | null = $state(null);
+	let savedAverage: number | null = $state(null);
 	let canvas: HTMLCanvasElement;
 	let canvasCtx: CanvasRenderingContext2D | null = null;
-	let categoryId = 0;
-	let categoryType = CategoryType.AllTransactions;
-	let type = TransactionType.Any;
+	let categoryId = $state(0);
+	let categoryType = $state(CategoryType.AllTransactions);
+	let type = $state(TransactionType.Any);
 
 	const localStorage = new LocalStorageUtil();
 	let transactionsService: TransactionsService;
@@ -40,7 +40,7 @@
 
 	const now = new Date();
 	const from = new Date(now.getFullYear(), now.getMonth() - 6, 1);
-	let fromDate = DateHelper.format(from);
+	let fromDate = $state(DateHelper.format(from));
 
 	Chart.register(BarController, BarElement, CategoryScale, LinearScale);
 	Chart.defaults.font.family = '"Didact Gothic", sans-serif';
@@ -60,6 +60,10 @@
 	}
 
 	async function loadData() {
+		if (mainAccountId === null || currency === null) {
+			throw new Error('Data not initialized yet');
+		}
+
 		chart.data.labels = [];
 		chart.data.datasets[0].data = [];
 		chart.update();
@@ -265,11 +269,11 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive medium">
-			<i class="fas fa-chart-bar" />
+			<i class="fas fa-chart-bar"></i>
 		</div>
 		<div class="page-title">{$t('barChartReport.barChart')}</div>
 		<a href="/dashboard" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -277,7 +281,7 @@
 		<form>
 			<div class="form-control inline">
 				<label for="from-the-past">{$t('barChartReport.fromThePast')}</label>
-				<select id="from-the-past" bind:value={fromDate} on:change={loadData} class="category-select">
+				<select id="from-the-past" bind:value={fromDate} onchange={loadData} class="category-select">
 					{#if fromOptions}
 						{#each fromOptions as from}
 							<option value={from.value}>{from.label}</option>
@@ -288,14 +292,14 @@
 			<div class="form-control inline">
 				<label for="category">{$t('category')}</label>
 				<div class="loadable-select" class:loaded={categoryOptions}>
-					<select id="category" bind:value={categoryId} on:change={loadData} disabled={!categoryOptions} class="category-select">
+					<select id="category" bind:value={categoryId} onchange={loadData} disabled={!categoryOptions} class="category-select">
 						{#if categoryOptions}
 							{#each categoryOptions as category}
 								<option value={category.id}>{category.name}</option>
 							{/each}
 						{/if}
 					</select>
-					<i class="fas fa-circle-notch fa-spin" />
+					<i class="fas fa-circle-notch fa-spin"></i>
 				</div>
 			</div>
 			<div class="form-control">
@@ -304,7 +308,7 @@
 						<div class="multi-radio-part">
 							<label class:selected={type === 0}>
 								<span>{$t('barChartReport.balance')}</span>
-								<input type="radio" name="typeToggle" value={0} bind:group={type} on:change={loadData} />
+								<input type="radio" name="typeToggle" value={0} bind:group={type} onchange={loadData} />
 							</label>
 						</div>
 					{/if}
@@ -313,7 +317,7 @@
 						<div class="multi-radio-part">
 							<label class:selected={type === 1}>
 								<span>{$t('barChartReport.expenses')}</span>
-								<input type="radio" name="typeToggle" value={1} bind:group={type} on:change={loadData} />
+								<input type="radio" name="typeToggle" value={1} bind:group={type} onchange={loadData} />
 							</label>
 						</div>
 					{/if}
@@ -322,7 +326,7 @@
 						<div class="multi-radio-part">
 							<label class:selected={type === 2}>
 								<span>{$t('barChartReport.deposits')}</span>
-								<input type="radio" name="typeToggle" value={2} bind:group={type} on:change={loadData} />
+								<input type="radio" name="typeToggle" value={2} bind:group={type} onchange={loadData} />
 							</label>
 						</div>
 					{/if}
@@ -331,7 +335,7 @@
 						<div class="multi-radio-part">
 							<label class:selected={type === 4}>
 								<span>{$t('barChartReport.savings')}</span>
-								<input type="radio" name="typeToggle" value={4} bind:group={type} on:change={loadData} />
+								<input type="radio" name="typeToggle" value={4} bind:group={type} onchange={loadData} />
 							</label>
 						</div>
 					{/if}
@@ -340,39 +344,41 @@
 		</form>
 
 		<div class="bar-chart-wrap">
-			<canvas bind:this={canvas} />
+			<canvas bind:this={canvas}></canvas>
 		</div>
 
 		<div class="per-month-table-title">{$t('barChartReport.perMonth')}</div>
 
 		<table class="per-month-table">
-			{#if type === 0}
-				<tr>
-					<td>{$t('balance')}</td>
-					<td>{Formatter.money(balanceAverage, currency, $user.culture)}</td>
-				</tr>
-			{/if}
+			<tbody>
+				{#if type === 0}
+					<tr>
+						<td>{$t('balance')}</td>
+						<td>{Formatter.money(balanceAverage, currency, $user.culture)}</td>
+					</tr>
+				{/if}
 
-			{#if type === 0 || type === 1}
-				<tr>
-					<td>{$t('barChartReport.spent')}</td>
-					<td>{Formatter.money(spentAverage, currency, $user.culture)}</td>
-				</tr>
-			{/if}
+				{#if type === 0 || type === 1}
+					<tr>
+						<td>{$t('barChartReport.spent')}</td>
+						<td>{Formatter.money(spentAverage, currency, $user.culture)}</td>
+					</tr>
+				{/if}
 
-			{#if type === 0 || type === 2}
-				<tr>
-					<td>{$t('barChartReport.deposited')}</td>
-					<td>{Formatter.money(depositedAverage, currency, $user.culture)}</td>
-				</tr>
-			{/if}
+				{#if type === 0 || type === 2}
+					<tr>
+						<td>{$t('barChartReport.deposited')}</td>
+						<td>{Formatter.money(depositedAverage, currency, $user.culture)}</td>
+					</tr>
+				{/if}
 
-			{#if type === 4}
-				<tr>
-					<td>{$t('barChartReport.saved')}</td>
-					<td>{Formatter.money(savedAverage, currency, $user.culture)}</td>
-				</tr>
-			{/if}
+				{#if type === 4}
+					<tr>
+						<td>{$t('barChartReport.saved')}</td>
+						<td>{Formatter.money(savedAverage, currency, $user.culture)}</td>
+					</tr>
+				{/if}
+			</tbody>
 		</table>
 	</div>
 </section>

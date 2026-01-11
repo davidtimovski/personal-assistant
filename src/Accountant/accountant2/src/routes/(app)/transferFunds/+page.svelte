@@ -17,20 +17,20 @@
 
 	import AmountInput from '$lib/components/AmountInput.svelte';
 
-	let fromAccountId: number;
-	let fromAccount: Account | null = null;
-	let toAccountId: number;
-	let toAccount: Account | null = null;
-	let amount: number | null = null;
-	let currency: string | null = null;
-	let accountOptions: SelectOption[] | null = null;
+	let fromAccountId: number | null = $state(null);
+	let fromAccount: Account | null = $state(null);
+	let toAccountId: number | null = $state(null);
+	let toAccount: Account | null = $state(null);
+	let amount: number | null = $state(null);
+	let currency: string | null = $state(null);
+	let accountOptions: SelectOption[] | null = $state(null);
 	let accounts: Account[];
 	let mainAccountId: number;
-	let fromAccountLabel = '---';
-	let toAccountLabel = '---';
-	let amountIsInvalid = false;
-	let transferButtonLabel = '';
-	let transferButtonIsLoading = false;
+	let fromAccountLabel = $state('---');
+	let toAccountLabel = $state('---');
+	let amountIsInvalid = $state(false);
+	let transferButtonLabel = $state('');
+	let transferButtonIsLoading = $state(false);
 
 	const localStorage = new LocalStorageUtil();
 	let accountsService: AccountsService;
@@ -127,10 +127,12 @@
 		return result;
 	}
 
-	async function transfer() {
+	async function transfer(event: Event) {
 		if (!fromAccount || !toAccount || !amount || !currency || !accountOptions) {
 			throw new Error('Unexpected error: required fields missing');
 		}
+
+		event.preventDefault();
 
 		transferButtonIsLoading = true;
 		alertState.update((x) => {
@@ -243,27 +245,27 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive small">
-			<i class="fa-solid fa-money-bill-transfer" />
+			<i class="fa-solid fa-money-bill-transfer"></i>
 		</div>
 		<div class="page-title">{$t('transferFunds.transferFunds')}</div>
 		<a href="/accounts" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
 	<div class="content-wrap">
-		<form on:submit|preventDefault={transfer}>
+		<form onsubmit={transfer}>
 			<div class="form-control">
 				<label for="from-account" class="transfer-funds-label">{fromAccountLabel}</label>
 				<div class="loadable-select" class:loaded={accountOptions}>
-					<select id="from-account" bind:value={fromAccountId} on:change={fromAccountChanged} disabled={!accountOptions}>
+					<select id="from-account" bind:value={fromAccountId} onchange={fromAccountChanged} disabled={!accountOptions}>
 						{#if accountOptions}
 							{#each accountOptions as account}
 								<option value={account.id}>{account.name}</option>
 							{/each}
 						{/if}
 					</select>
-					<i class="fas fa-circle-notch fa-spin" />
+					<i class="fas fa-circle-notch fa-spin"></i>
 				</div>
 
 				{#if fromAccount?.stockPrice}
@@ -282,14 +284,14 @@
 			<div class="form-control">
 				<label for="to-account" class="transfer-funds-label">{toAccountLabel}</label>
 				<div class="loadable-select" class:loaded={accountOptions}>
-					<select id="to-account" bind:value={toAccountId} on:change={toAccountChanged} disabled={!accountOptions}>
+					<select id="to-account" bind:value={toAccountId} onchange={toAccountChanged} disabled={!accountOptions}>
 						{#if accountOptions}
 							{#each accountOptions as account}
 								<option value={account.id}>{account.name}</option>
 							{/each}
 						{/if}
 					</select>
-					<i class="fas fa-circle-notch fa-spin" />
+					<i class="fas fa-circle-notch fa-spin"></i>
 				</div>
 
 				{#if toAccount?.stockPrice}
@@ -316,7 +318,7 @@
 			<div class="save-delete-wrap">
 				<button class="button primary-button" class:disabled={!amount || transferButtonIsLoading}>
 					<span class="button-loader" class:loading={transferButtonIsLoading}>
-						<i class="fas fa-circle-notch fa-spin" />
+						<i class="fas fa-circle-notch fa-spin"></i>
 					</span>
 					<span>{transferButtonLabel}</span>
 				</button>

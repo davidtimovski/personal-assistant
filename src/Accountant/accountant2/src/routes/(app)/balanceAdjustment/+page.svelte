@@ -14,26 +14,31 @@
 
 	import AmountInput from '$lib/components/AmountInput.svelte';
 
-	let accountId: number | null = null;
-	let balance: number | null = null;
-	let description: string;
-	let originalBalance: number;
-	let currency: string | null = null;
-	let accountOptions: SelectOption[] | null = null;
-	let balanceIsInvalid = false;
-	let adjustButtonIsLoading = false;
-	let balanceLoaded = false;
+	let accountId: number | null = $state(null);
+	let balance: number | null = $state(null);
+	let description = $state('');
+	let originalBalance: number | null = $state(null);
+	let currency: string | null = $state(null);
+	let accountOptions: SelectOption[] | null = $state(null);
+	let balanceIsInvalid = $state(false);
+	let adjustButtonIsLoading = $state(false);
+	let balanceLoaded = $state(false);
 
 	const localStorage = new LocalStorageUtil();
 	let accountsService: AccountsService;
 	let transactionsService: TransactionsService;
 
 	let min = 0.01;
-	$: adjustedBy = !balance ? 0 : balance - originalBalance;
+	let adjustedByLabel = $derived(() => {
+		const adjustedBy = !balance || originalBalance === null ? 0 : balance - originalBalance;
+		return (adjustedBy > 0 ? '+' : '') + Formatter.moneyWithoutCurrency(adjustedBy, currency, $user.culture);
+	});
 
-	$: if (currency && accountId) {
-		loadBalance();
-	}
+	$effect(() => {
+		if (currency && accountId) {
+			loadBalance();
+		}
+	});
 
 	async function loadBalance() {
 		balance = null;
@@ -53,7 +58,13 @@
 		return result;
 	}
 
-	async function adjust() {
+	async function adjust(event: Event) {
+		if (originalBalance === null) {
+			throw new Error("Original balance hasn't been initialized yet");
+		}
+
+		event.preventDefault();
+
 		adjustButtonIsLoading = true;
 		alertState.update((x) => {
 			x.hide();
@@ -109,16 +120,16 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive medium">
-			<i class="fas fa-coins" />
+			<i class="fas fa-coins"></i>
 		</div>
 		<div class="page-title">{$t('balanceAdjustment.balanceAdjustment')}</div>
 		<a href="/dashboard" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
 	<div class="content-wrap">
-		<form on:submit|preventDefault={adjust}>
+		<form onsubmit={adjust}>
 			<div class="form-control inline">
 				<label for="balance">{$t('balance')}</label>
 				<AmountInput bind:amount={balance} bind:currency invalid={balanceIsInvalid} inputId="balance" disabled={!balanceLoaded} />
@@ -134,23 +145,18 @@
 							{/each}
 						{/if}
 					</select>
-					<i class="fas fa-circle-notch fa-spin" />
+					<i class="fas fa-circle-notch fa-spin"></i>
 				</div>
 			</div>
 
 			<div class="form-control inline">
 				<span>{$t('balanceAdjustment.adjustedBy')}</span>
-				<span> {(adjustedBy > 0 ? '+' : '') + Formatter.moneyWithoutCurrency(adjustedBy, currency, $user.culture)}</span>
+				<span> {adjustedByLabel()}</span>
 			</div>
 
 			<div class="form-control">
-				<textarea
-					bind:value={description}
-					maxlength="500"
-					class="description-textarea"
-					placeholder={$t('description')}
-					aria-label={$t('description')}
-				/>
+				<textarea bind:value={description} maxlength="500" class="description-textarea" placeholder={$t('description')} aria-label={$t('description')}
+				></textarea>
 			</div>
 
 			<hr />
@@ -158,7 +164,7 @@
 			<div class="save-delete-wrap">
 				<button class="button primary-button" disabled={!balance || adjustButtonIsLoading}>
 					<span class="button-loader" class:loading={adjustButtonIsLoading}>
-						<i class="fas fa-circle-notch fa-spin" />
+						<i class="fas fa-circle-notch fa-spin"></i>
 					</span>
 					<span>{$t('balanceAdjustment.adjust')}</span>
 				</button>

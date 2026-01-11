@@ -15,26 +15,30 @@
 
 	import AmountInput from '$lib/components/AmountInput.svelte';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
 
 	const isNew = data.id === 0;
 
-	let person = '';
-	let amount: number | null = null;
-	let currency: string | null = null;
-	let description: string | null;
-	let userIsDebtor: boolean | null = null;
-	let createdDate: Date | null;
-	let synced: boolean;
+	let person = $state('');
+	let amount: number | null = $state(null);
+	let currency: string | null = $state(null);
+	let description: string | null = $state(null);
+	let userIsDebtor: boolean | null = $state(null);
+	let createdDate: Date | null = $state(null);
+	let synced = $state(false);
 	let personInput: HTMLInputElement;
-	let mergeDebtPerPerson: boolean | null = null;
-	let personIsInvalid = false;
-	let amountIsInvalid = false;
-	let saveButtonText: string;
-	let deleteInProgress = false;
-	let deleteButtonText: string;
-	let saveButtonIsLoading = false;
-	let deleteButtonIsLoading = false;
+	let mergeDebtPerPerson: boolean | null = $state(null);
+	let personIsInvalid = $state(false);
+	let amountIsInvalid = $state(false);
+	let saveButtonText = $state('');
+	let deleteInProgress = $state(false);
+	let deleteButtonText = $state('');
+	let saveButtonIsLoading = $state(false);
+	let deleteButtonIsLoading = $state(false);
 
 	const localStorage = new LocalStorageUtil();
 	let debtsService: DebtsService;
@@ -48,9 +52,11 @@
 		}
 	});
 
-	$: canSave = $syncStatus.status !== SyncEvents.SyncStarted && !!amount && !(!$isOnline && synced);
+	let canSave = $derived($syncStatus.status !== SyncEvents.SyncStarted && !!amount && !(!$isOnline && synced));
 
-	async function save() {
+	async function save(event: Event) {
+		event.preventDefault();
+
 		if (!amount || !currency || userIsDebtor === null) {
 			throw new Error('Unexpected error: required fields missing');
 		}
@@ -178,13 +184,13 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive small">
-			<i class="fas fa-pencil-alt" />
+			<i class="fas fa-pencil-alt"></i>
 		</div>
 		<div class="page-title">
 			<span>{$t(isNew ? 'editDebt.newDebt' : 'editDebt.editDebt')}</span>
 		</div>
 		<a href="/debt" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -193,7 +199,7 @@
 			<AlertBlock type="warning" message={$t('whileOfflineCannotModify')} />
 		{/if}
 
-		<form on:submit|preventDefault={save}>
+		<form onsubmit={save}>
 			<div class="form-control">
 				<input
 					type="text"
@@ -225,7 +231,7 @@
 					class="description-textarea"
 					placeholder={$t('description')}
 					aria-label={$t('description')}
-				/>
+				></textarea>
 			</div>
 
 			<hr />
@@ -234,23 +240,23 @@
 				{#if !deleteInProgress}
 					<button class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
 						<span class="button-loader" class:loading={saveButtonIsLoading}>
-							<i class="fas fa-circle-notch fa-spin" />
+							<i class="fas fa-circle-notch fa-spin"></i>
 						</span>
 						<span>{saveButtonText}</span>
 					</button>
 				{/if}
 
 				{#if !isNew}
-					<button type="button" on:click={deleteDebt} class="button danger-button" disabled={deleteButtonIsLoading} class:confirm={deleteInProgress}>
+					<button type="button" onclick={deleteDebt} class="button danger-button" disabled={deleteButtonIsLoading} class:confirm={deleteInProgress}>
 						<span class="button-loader" class:loading={deleteButtonIsLoading}>
-							<i class="fas fa-circle-notch fa-spin" />
+							<i class="fas fa-circle-notch fa-spin"></i>
 						</span>
 						<span>{deleteButtonText}</span>
 					</button>
 				{/if}
 
 				{#if isNew || deleteInProgress}
-					<button type="button" on:click={cancel} class="button secondary-button">
+					<button type="button" onclick={cancel} class="button secondary-button">
 						{$t('cancel')}
 					</button>
 				{/if}

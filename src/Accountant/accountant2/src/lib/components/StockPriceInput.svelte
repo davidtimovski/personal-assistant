@@ -8,11 +8,17 @@
 
 	import { t } from '$lib/localization/i18n';
 
-	export let stockPrice: number | null;
-	export let currency: string;
-	export let invalid = false;
+	let {
+		stockPrice = $bindable<number | null>(),
+		currency,
+		invalid = false
+	}: {
+		stockPrice: number | null;
+		currency: string | null;
+		invalid?: boolean;
+	} = $props();
 
-	let changing = false;
+	let changing = $state(false);
 	let autocompleteResult: AutocompleteResult;
 	let selectCurrencyInput: HTMLInputElement | null;
 
@@ -73,7 +79,7 @@
 	/>
 	<button
 		type="button"
-		on:click={toggleChangeCurrency}
+		onclick={toggleChangeCurrency}
 		class="selected-currency-button"
 		title={$t('changeCurrency')}
 		aria-label={$t('changeCurrency')}
@@ -118,7 +124,10 @@
 			line-height: 27px;
 			color: inherit;
 			cursor: pointer;
-			transition: background var(--transition-quick), box-shadow var(--transition-quick), color var(--transition-quick);
+			transition:
+				background var(--transition-quick),
+				box-shadow var(--transition-quick),
+				color var(--transition-quick);
 		}
 
 		&.changing {

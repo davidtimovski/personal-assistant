@@ -8,16 +8,16 @@
 </script>
 
 <main>
-	<div />
+	<div></div>
 	<div class="center">
 		<section class="container">
 			<div class="page-title-wrap">
 				<div class="side inactive">
-					<i class="fas fa-exclamation-circle" />
+					<i class="fas fa-exclamation-circle"></i>
 				</div>
 				<div class="page-title">{$page.status}</div>
 				<div class="side inactive">
-					<i class="fas fa-exclamation-circle" />
+					<i class="fas fa-exclamation-circle"></i>
 				</div>
 			</div>
 
@@ -30,5 +30,5 @@
 			</div>
 		</section>
 	</div>
-	<div />
+	<div></div>
 </main>

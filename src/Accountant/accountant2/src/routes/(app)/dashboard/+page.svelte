@@ -20,22 +20,22 @@
 	import { AccountsService } from '$lib/services/accountsService';
 	import { SyncStatus, SyncEvents } from '$lib/models/syncStatus';
 
-	let data = new HomePageData();
-	let showBalance = false;
+	let data = $state(new HomePageData());
+	let showBalance = $state(false);
 	let showUpcomingExpenses = false;
 	let showDebt = false;
-	let currency: string;
-	let dataLoaded = false;
+	let currency: string | null = $state(null);
+	let dataLoaded = $state(false);
 	const unsubscriptions: Unsubscriber[] = [];
 
 	// Progress bar
-	let progressBarActive = false;
+	let progressBarActive = $state(false);
 	const progress = tweened(0, {
 		duration: 500,
 		easing: cubicOut
 	});
 	let progressIntervalId: number | undefined;
-	let progressBarVisible = false;
+	let progressBarVisible = $state(false);
 
 	const localStorage = new LocalStorageUtil();
 	let usersService: UsersServiceBase;
@@ -43,6 +43,10 @@
 	let accountsService: AccountsService;
 
 	async function getCapital() {
+		if (currency === null) {
+			throw new Error('Currency not initialized yet');
+		}
+
 		const mainAccountId = await accountsService.getMainId();
 
 		const balancePromise = accountsService.getBalance(mainAccountId, currency);
@@ -54,13 +58,13 @@
 			upcomingAmount: number;
 		}>(async (resolve) => {
 			if (!showUpcomingExpenses) {
-				const upcomingAmount = await capitalService.getUpcomingExpensesAmount(currency);
+				const upcomingAmount = await capitalService.getUpcomingExpensesAmount(currency!);
 
 				resolve({ upcomingExpenses: [], upcomingAmount });
 				return;
 			}
 
-			const result = await capitalService.getUpcomingExpenses($t('uncategorized'), currency);
+			const result = await capitalService.getUpcomingExpenses($t('uncategorized'), currency!);
 			resolve(result);
 		});
 
@@ -70,7 +74,7 @@
 				return;
 			}
 
-			resolve(await capitalService.getDebt(currency, $t('dashboard.combined')));
+			resolve(await capitalService.getDebt(currency!, $t('dashboard.combined')));
 		});
 
 		const result = await Promise.all([balancePromise, expendituresPromise, upcomingExpensesPromise, debtPromise]);
@@ -195,21 +199,21 @@
 			</a>
 
 			<div class="page-title reduced">
-				<span />
+				<span></span>
 			</div>
 			<button
 				type="button"
-				on:click={sync}
+				onclick={sync}
 				class="sync-button"
 				disabled={!$isOnline || progressBarActive}
 				title={$t('dashboard.refresh')}
 				aria-label={$t('dashboard.refresh')}
 			>
-				<i class="fas fa-sync-alt" />
+				<i class="fas fa-sync-alt"></i>
 			</button>
 		</div>
 		<div class="progress-bar">
-			<div class="progress" class:visible={progressBarVisible} style="width: {$progress}%;" />
+			<div class="progress" class:visible={progressBarVisible} style="width: {$progress}%;"></div>
 		</div>
 	</div>
 
@@ -254,13 +258,13 @@
 				<table class="amount-by-category-table">
 					<tbody>
 						{#each data.expenditures as expenditure}
-							<tr on:click={() => goToTransactions(expenditure)} role="button">
+							<tr onclick={() => goToTransactions(expenditure)} role="button">
 								<td>{expenditure.categoryName}</td>
 								<td class="amount-cell">{Formatter.money(expenditure.amount, currency, $user.language)}</td>
 							</tr>
 
 							{#each expenditure.subItems as subExpenditure}
-								<tr on:click={() => goToTransactions(subExpenditure)} role="button">
+								<tr onclick={() => goToTransactions(subExpenditure)} role="button">
 									<td class="sub-category-cell">{subExpenditure.categoryName}</td>
 									<td class="amount-cell">{Formatter.money(subExpenditure.amount, currency, $user.language)}</td>
 								</tr>
@@ -277,7 +281,7 @@
 				<table class="home-table">
 					<tbody>
 						{#each data.upcomingExpenses as upcomingExpense}
-							<tr on:click={() => editUpcomingExpense(upcomingExpense.id)} role="button">
+							<tr onclick={() => editUpcomingExpense(upcomingExpense.id)} role="button">
 								<td>{upcomingExpense.category}</td>
 								<td>{upcomingExpense.description}</td>
 								<td class="amount-cell">{Formatter.money(upcomingExpense.amount, currency, $user.language)}</td>
@@ -306,7 +310,7 @@
 				<table class="home-table">
 					<tbody>
 						{#each data.debt as debtItem}
-							<tr on:click={() => editDebt(debtItem.id)} role="button">
+							<tr onclick={() => editDebt(debtItem.id)} role="button">
 								<td>
 									{#if debtItem.userIsDebtor}
 										<span>{$t('dashboard.to')}</span>

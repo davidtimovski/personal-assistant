@@ -19,12 +19,12 @@
 	import { CategoryType } from '$lib/models/entities/category';
 	import { DebounceHelper } from '$lib/utils/debounceHelper';
 
-	let transactions: TransactionItem[] | null = null;
-	let currency: string;
-	let editedId: number | undefined;
-	let pageCount: number;
-	let categoryOptions: SelectOption[] | null = null;
-	let accountOptions: SelectOption[] | null = null;
+	let transactions: TransactionItem[] | null = $state(null);
+	let currency: string | null = $state(null);
+	let editedId: number | undefined = $state(undefined);
+	let pageCount: number | null = $state(null);
+	let categoryOptions: SelectOption[] | null = $state(null);
+	let accountOptions: SelectOption[] | null = $state(null);
 
 	const localStorage = new LocalStorageUtil();
 	let transactionsService: TransactionsService;
@@ -32,6 +32,10 @@
 	let accountsService: AccountsService;
 
 	function getTransactions(filterChanged: boolean) {
+		if (currency === null) {
+			throw new Error('Currency not initialized yet');
+		}
+
 		if (filterChanged) {
 			searchFilters.update((x) => {
 				x.page = 1;
@@ -149,7 +153,9 @@
 		return `${month} ${date.getDate()}, ${date.getFullYear()}`;
 	}
 
-	function filterChanged() {
+	function filterChanged(event: Event) {
+		event.preventDefault();
+
 		getTransactions(true);
 	}
 
@@ -171,6 +177,10 @@
 
 	function last() {
 		searchFilters.update((x) => {
+			if (pageCount === null) {
+				throw new Error('Page count not initialized yet');
+			}
+
 			x.page = pageCount;
 			return x;
 		});
@@ -236,48 +246,48 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive">
-			<i class="fas fa-search-dollar" />
+			<i class="fas fa-search-dollar"></i>
 		</div>
 		<div class="page-title">{$t('transactions.transactions')}</div>
 		<a href="/dashboard" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
 	<div class="content-wrap">
-		<form on:submit|preventDefault={filterChanged}>
+		<form onsubmit={filterChanged}>
 			<div class="form-control inline">
 				<label for="from-date">{$t('transactions.from')}</label>
-				<input type="date" id="from-date" bind:value={$searchFilters.fromDate} on:change={filterChanged} />
+				<input type="date" id="from-date" bind:value={$searchFilters.fromDate} onchange={filterChanged} />
 			</div>
 			<div class="form-control inline">
 				<label for="to-date">{$t('transactions.to')}</label>
-				<input type="date" id="to-date" bind:value={$searchFilters.toDate} on:change={filterChanged} />
+				<input type="date" id="to-date" bind:value={$searchFilters.toDate} onchange={filterChanged} />
 			</div>
 			<div class="form-control inline">
 				<label for="category">{$t('category')}</label>
 				<div class="loadable-select" class:loaded={categoryOptions}>
-					<select id="category" bind:value={$searchFilters.categoryId} on:change={filterChanged} disabled={!categoryOptions} class="category-select">
+					<select id="category" bind:value={$searchFilters.categoryId} onchange={filterChanged} disabled={!categoryOptions} class="category-select">
 						{#if categoryOptions}
 							{#each categoryOptions as category}
 								<option value={category.id}>{category.name}</option>
 							{/each}
 						{/if}
 					</select>
-					<i class="fas fa-circle-notch fa-spin" />
+					<i class="fas fa-circle-notch fa-spin"></i>
 				</div>
 			</div>
 			<div class="form-control inline">
 				<label for="account">{$t('account')}</label>
 				<div class="loadable-select" class:loaded={accountOptions}>
-					<select id="account" bind:value={$searchFilters.accountId} on:change={filterChanged} disabled={!accountOptions} class="category-select">
+					<select id="account" bind:value={$searchFilters.accountId} onchange={filterChanged} disabled={!accountOptions} class="category-select">
 						{#if accountOptions}
 							{#each accountOptions as account}
 								<option value={account.id}>{account.name}</option>
 							{/each}
 						{/if}
 					</select>
-					<i class="fas fa-circle-notch fa-spin" />
+					<i class="fas fa-circle-notch fa-spin"></i>
 				</div>
 			</div>
 			<div class="form-control">
@@ -285,26 +295,26 @@
 					<div class="multi-radio-part">
 						<label class:selected={$searchFilters.type === 0}>
 							<span>{$t('transactions.all')}</span>
-							<input type="radio" name="typeToggle" value={0} bind:group={$searchFilters.type} on:change={filterChanged} />
+							<input type="radio" name="typeToggle" value={0} bind:group={$searchFilters.type} onchange={filterChanged} />
 						</label>
 					</div>
 					<div class="multi-radio-part">
 						<label class:selected={$searchFilters.type === 1}>
 							<span>{$t('transactions.expenses')}</span>
-							<input type="radio" name="typeToggle" value={1} bind:group={$searchFilters.type} on:change={filterChanged} />
+							<input type="radio" name="typeToggle" value={1} bind:group={$searchFilters.type} onchange={filterChanged} />
 						</label>
 					</div>
 					<div class="multi-radio-part">
 						<label class:selected={$searchFilters.type === 2}>
 							<span>{$t('transactions.deposits')}</span>
-							<input type="radio" name="typeToggle" value={2} bind:group={$searchFilters.type} on:change={filterChanged} />
+							<input type="radio" name="typeToggle" value={2} bind:group={$searchFilters.type} onchange={filterChanged} />
 						</label>
 					</div>
 					{#if $searchFilters.accountId === 0}
 						<div class="multi-radio-part">
 							<label class:selected={$searchFilters.type === 3}>
 								<span>{$t('transactions.transfers')}</span>
-								<input type="radio" name="typeToggle" value={3} bind:group={$searchFilters.type} on:change={filterChanged} />
+								<input type="radio" name="typeToggle" value={3} bind:group={$searchFilters.type} onchange={filterChanged} />
 							</label>
 						</div>
 					{/if}
@@ -315,13 +325,13 @@
 					<input
 						type="text"
 						bind:value={$searchFilters.description}
-						on:keyup={() => DebounceHelper.debounce(() => getTransactions(true), 1000)}
+						onkeyup={() => DebounceHelper.debounce(() => getTransactions(true), 1000)}
 						maxlength="30"
 						placeholder={$t('transactions.searchByDescription')}
 						aria-label={$t('transactions.searchByDescription')}
 					/>
-					<button type="button" on:click={clearDescriptionFilter} title={$t('transactions.clear')} aria-label={$t('transactions.clear')}>
-						<i class="fas fa-times" />
+					<button type="button" onclick={clearDescriptionFilter} title={$t('transactions.clear')} aria-label={$t('transactions.clear')}>
+						<i class="fas fa-times"></i>
 					</button>
 				</div>
 			</div>
@@ -329,41 +339,41 @@
 
 		{#if !transactions}
 			<div class="double-circle-loading">
-				<div class="double-bounce1" />
-				<div class="double-bounce2" />
+				<div class="double-bounce1"></div>
+				<div class="double-bounce2"></div>
 			</div>
 		{:else}
 			<div id="transactions-table-wrap">
 				<table class="editable-table">
 					<thead>
 						<tr>
-							<th class="type-cell" />
+							<th class="type-cell"></th>
 							<th>{$t('amount')}</th>
 							<th>{$t('transactions.detail')}</th>
 							<th>{$t('date')}</th>
-							<th class="sync-icon-cell" />
+							<th class="sync-icon-cell"></th>
 						</tr>
 					</thead>
 					{#if transactions.length > 0}
 						<tbody>
 							{#each transactions as transaction}
 								<tr
-									on:click={() => viewTransaction(transaction.id)}
+									onclick={() => viewTransaction(transaction.id)}
 									class="clickable"
 									class:highlighted-row={transaction.id === editedId}
 									role="button"
 								>
 									<td class="type-cell">
 										{#if transaction.type === 1}
-											<i class="fas fa-wallet expense-color" />
+											<i class="fas fa-wallet expense-color"></i>
 										{/if}
 
 										{#if transaction.type === 2}
-											<i class="fas fa-donate deposit-color" />
+											<i class="fas fa-donate deposit-color"></i>
 										{/if}
 
 										{#if transaction.type === 3}
-											<i class="fas fa-exchange-alt transfer-color" />
+											<i class="fas fa-exchange-alt transfer-color"></i>
 										{/if}
 									</td>
 									<td>{Formatter.moneyWithoutCurrency(transaction.amount, currency, $user.culture)}</td>
@@ -372,7 +382,7 @@
 
 									<td class="sync-icon-cell">
 										{#if !transaction.synced}
-											<i class="fas fa-sync-alt" title={$t('notSynced')} aria-label={$t('notSynced')} />
+											<i class="fas fa-sync-alt" title={$t('notSynced')} aria-label={$t('notSynced')}></i>
 										{/if}
 									</td>
 								</tr>
@@ -380,7 +390,9 @@
 						</tbody>
 					{:else}
 						<tfoot>
-							<td class="no-data-column" colspan="5">{$t('transactions.thereIsNothingHere')}</td>
+							<tr>
+								<td class="no-data-column" colspan="5">{$t('transactions.thereIsNothingHere')}</td>
+							</tr>
 						</tfoot>
 					{/if}
 				</table>
@@ -389,46 +401,46 @@
 					<div class="transactions-pagination">
 						<button
 							type="button"
-							on:click={first}
+							onclick={first}
 							title={$t('transactions.first')}
 							aria-label={$t('transactions.first')}
 							class="transactions-pagination-arrow-wrap left"
 							class:hidden={$searchFilters.page === 1}
 						>
-							<i class="fas fa-angle-double-left" />
+							<i class="fas fa-angle-double-left"></i>
 						</button>
 						<button
 							type="button"
-							on:click={previous}
+							onclick={previous}
 							title={$t('transactions.previous')}
 							aria-label={$t('transactions.previous')}
 							class="transactions-pagination-arrow-wrap left"
 							class:hidden={$searchFilters.page === 1}
 						>
-							<i class="fas fa-angle-left" />
+							<i class="fas fa-angle-left"></i>
 						</button>
 						<div class="transactions-pagination-numbering">
 							<span>{$searchFilters.page}</span>/<span>{pageCount}</span>
 						</div>
 						<button
 							type="button"
-							on:click={next}
+							onclick={next}
 							title={$t('transactions.next')}
 							aria-label={$t('transactions.next')}
 							class="transactions-pagination-arrow-wrap right"
 							class:hidden={$searchFilters.page === pageCount}
 						>
-							<i class="fas fa-angle-right" />
+							<i class="fas fa-angle-right"></i>
 						</button>
 						<button
 							type="button"
-							on:click={last}
+							onclick={last}
 							title={$t('transactions.last')}
 							aria-label={$t('transactions.last')}
 							class="transactions-pagination-arrow-wrap right"
 							class:hidden={$searchFilters.page === pageCount}
 						>
-							<i class="fas fa-angle-double-right" />
+							<i class="fas fa-angle-double-right"></i>
 						</button>
 					</div>
 				{/if}

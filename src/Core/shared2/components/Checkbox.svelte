@@ -2,11 +2,11 @@
 	import { t } from '$lib/localization/i18n';
 
 	let {
-		labelKey,
 		value = $bindable<boolean | null>(),
+		labelKey,
 		disabled = false,
 		onchange
-	}: { labelKey: string | null; value: boolean | null; disabled?: boolean; onchange?: any } = $props();
+	}: { value: boolean | null; labelKey?: string | null; disabled?: boolean; onchange?: any } = $props();
 </script>
 
 <!-- svelte-ignore a11y_label_has_associated_control -->

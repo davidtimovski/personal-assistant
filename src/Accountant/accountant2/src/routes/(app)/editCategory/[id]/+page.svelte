@@ -15,30 +15,34 @@
 	import { SelectOption } from '$lib/models/viewmodels/selectOption';
 	import { SyncEvents } from '$lib/models/syncStatus';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
 
 	const isNew = data.id === 0;
 
-	let parentId: number | null = null;
-	let name: string;
-	let type: CategoryType | null = null;
-	let generateUpcomingExpense: boolean;
-	let isTax: boolean;
+	let parentId: number | null = $state(null);
+	let name = $state('');
+	let type: CategoryType | null = $state(null);
+	let generateUpcomingExpense = $state(false);
+	let isTax = $state(false);
 	let createdDate: Date | null;
 	let modifiedDate: Date | null;
-	let synced: boolean;
-	let isParent: boolean;
-	let parentCategoryOptions: SelectOption[];
-	let typeOptions: SelectOption[];
+	let synced = $state(false);
+	let isParent = $state(false);
+	let parentCategoryOptions: SelectOption[] | null = $state(null);
+	let typeOptions: SelectOption[] = $state([]);
 	let nameInput: HTMLInputElement;
-	let nameIsInvalid = false;
-	let saveButtonText: string;
-	let transactionsWarningVisible = false;
-	let deleteInProgress = false;
-	let deleteButtonText: string;
-	let saveButtonIsLoading = false;
-	let deleteButtonIsLoading = false;
-	let categoryHasTransactionsHtml: string;
+	let nameIsInvalid = $state(false);
+	let saveButtonText = $state('');
+	let transactionsWarningVisible = $state(false);
+	let deleteInProgress = $state(false);
+	let deleteButtonText = $state('');
+	let saveButtonIsLoading = $state(false);
+	let deleteButtonIsLoading = $state(false);
+	let categoryHasTransactionsHtml = $state('');
 
 	let categoriesService: CategoriesService;
 
@@ -48,7 +52,7 @@
 		}
 	});
 
-	$: canSave = $syncStatus.status !== SyncEvents.SyncStarted && !ValidationUtil.isEmptyOrWhitespace(name) && !(!$isOnline && synced);
+	let canSave = $derived($syncStatus.status !== SyncEvents.SyncStarted && !ValidationUtil.isEmptyOrWhitespace(name) && !(!$isOnline && synced));
 
 	function typeChanged() {
 		if (type !== CategoryType.ExpenseOnly) {
@@ -57,7 +61,9 @@
 		}
 	}
 
-	async function save() {
+	async function save(event: Event) {
+		event.preventDefault();
+
 		saveButtonIsLoading = true;
 		alertState.update((x) => {
 			x.hide();
@@ -136,11 +142,13 @@
 	onMount(async () => {
 		categoryHasTransactionsHtml = $t('editCategory.categoryHasTransactions');
 		deleteButtonText = $t('delete');
-		typeOptions = [
-			new SelectOption(CategoryType.AllTransactions, $t('editCategory.allTransactions')),
-			new SelectOption(CategoryType.DepositOnly, $t('editCategory.depositOnly')),
-			new SelectOption(CategoryType.ExpenseOnly, $t('editCategory.expenseOnly'))
-		];
+		typeOptions.push(
+			...[
+				new SelectOption(CategoryType.AllTransactions, $t('editCategory.allTransactions')),
+				new SelectOption(CategoryType.DepositOnly, $t('editCategory.depositOnly')),
+				new SelectOption(CategoryType.ExpenseOnly, $t('editCategory.expenseOnly'))
+			]
+		);
 
 		categoriesService = new CategoriesService();
 
@@ -185,7 +193,7 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive small">
-			<i class="fas fa-pencil-alt" />
+			<i class="fas fa-pencil-alt"></i>
 		</div>
 		<div class="page-title">
 			{#if isNew}
@@ -195,7 +203,7 @@
 			{/if}
 		</div>
 		<a href="/categories" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -208,7 +216,7 @@
 			<AlertBlock type="info" message={$t('editCategory.thisIsAParentCategory')} />
 		{/if}
 
-		<form on:submit|preventDefault={save}>
+		<form onsubmit={save}>
 			<div class="form-control">
 				<input
 					type="text"
@@ -233,14 +241,14 @@
 								{/each}
 							{/if}
 						</select>
-						<i class="fas fa-circle-notch fa-spin" />
+						<i class="fas fa-circle-notch fa-spin"></i>
 					</div>
 				</div>
 			{/if}
 
 			<div class="form-control inline">
 				<label for="type">{$t('editCategory.type')}</label>
-				<select id="type" bind:value={type} on:change={typeChanged} class="category-select">
+				<select id="type" bind:value={type} onchange={typeChanged} class="category-select">
 					{#if typeOptions}
 						{#each typeOptions as type}
 							<option value={type.id}>{type.name}</option>
@@ -268,7 +276,7 @@
 				{#if !deleteInProgress}
 					<button class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
 						<span class="button-loader" class:loading={saveButtonIsLoading}>
-							<i class="fas fa-circle-notch fa-spin" />
+							<i class="fas fa-circle-notch fa-spin"></i>
 						</span>
 						<span>{saveButtonText}</span>
 					</button>
@@ -277,20 +285,20 @@
 				{#if !isNew}
 					<button
 						type="button"
-						on:click={deleteCategory}
+						onclick={deleteCategory}
 						class="button danger-button"
 						disabled={deleteButtonIsLoading}
 						class:confirm={deleteInProgress}
 					>
 						<span class="button-loader" class:loading={deleteButtonIsLoading}>
-							<i class="fas fa-circle-notch fa-spin" />
+							<i class="fas fa-circle-notch fa-spin"></i>
 						</span>
 						<span>{deleteButtonText}</span>
 					</button>
 				{/if}
 
 				{#if isNew || deleteInProgress}
-					<button type="button" on:click={cancel} class="button secondary-button">
+					<button type="button" onclick={cancel} class="button secondary-button">
 						{$t('cancel')}
 					</button>
 				{/if}
