@@ -73,7 +73,7 @@ public class UpdateTaskValidator : AbstractValidator<UpdateTask>
                     throw new Exception("Failed to perform validation");
                 }
 
-                return !ownsOrSharesAsPendingResult.Data;
+                return ownsOrSharesAsPendingResult.Data;
             }).WithMessage("Tasks.UpdateTask.TheAssignedUserIsNotAMember");
 
         RuleFor(dto => dto.Name)

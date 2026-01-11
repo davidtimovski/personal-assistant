@@ -9,25 +9,25 @@
 
 	const localStorage = new LocalStorageUtil();
 
-	let mergeDebtPerPerson: boolean;
-	let showBalanceOnHomePage: boolean;
-	let showUpcomingExpensesOnHomePage: boolean;
-	let showDebtOnHomePage: boolean;
+	let mergeDebtPerPerson = $state(false);
+	let showBalanceOnHomePage = $state(false);
+	let showUpcomingExpensesOnHomePage = $state(false);
+	let showDebtOnHomePage = $state(false);
 
-	function mergeDebtPerPersonChanged(ev: { detail: boolean }) {
-		localStorage.set(LocalStorageKeys.MergeDebtPerPerson, ev.detail);
+	function mergeDebtPerPersonChanged() {
+		localStorage.set(LocalStorageKeys.MergeDebtPerPerson, mergeDebtPerPerson);
 	}
 
-	function showBalanceOnHomePageChanged(ev: { detail: boolean }) {
-		localStorage.set(LocalStorageKeys.ShowBalanceOnHomePage, ev.detail);
+	function showBalanceOnHomePageChanged() {
+		localStorage.set(LocalStorageKeys.ShowBalanceOnHomePage, showBalanceOnHomePage);
 	}
 
-	function showUpcomingExpensesOnHomePageChanged(ev: { detail: boolean }) {
-		localStorage.set(LocalStorageKeys.ShowUpcomingExpensesOnHomePage, ev.detail);
+	function showUpcomingExpensesOnHomePageChanged() {
+		localStorage.set(LocalStorageKeys.ShowUpcomingExpensesOnHomePage, showUpcomingExpensesOnHomePage);
 	}
 
-	function showDebtOnHomePageChanged(ev: { detail: boolean }) {
-		localStorage.set(LocalStorageKeys.ShowDebtOnHomePage, ev.detail);
+	function showDebtOnHomePageChanged() {
+		localStorage.set(LocalStorageKeys.ShowDebtOnHomePage, showDebtOnHomePage);
 	}
 
 	onMount(() => {
@@ -41,11 +41,11 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive small">
-			<i class="fas fa-sliders-h" />
+			<i class="fas fa-sliders-h"></i>
 		</div>
 		<div class="page-title">{$t('preferences.preferences')}</div>
 		<a href="/dashboard" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -56,26 +56,26 @@
 			</div>
 
 			<div class="form-control">
-				<Checkbox labelKey="preferences.mergeDebtPerPerson" value={mergeDebtPerPerson} on:change={mergeDebtPerPersonChanged} />
+				<Checkbox labelKey="preferences.mergeDebtPerPerson" bind:value={mergeDebtPerPerson} onchange={mergeDebtPerPersonChanged} />
 			</div>
 
 			<div class="form-control-group">
 				<div class="setting-descriptor">{$t('preferences.showOnHomePage')}</div>
 
 				<div class="form-control">
-					<Checkbox labelKey="balance" value={showBalanceOnHomePage} on:change={showBalanceOnHomePageChanged} />
+					<Checkbox labelKey="balance" bind:value={showBalanceOnHomePage} onchange={showBalanceOnHomePageChanged} />
 				</div>
 
 				<div class="form-control">
 					<Checkbox
 						labelKey="preferences.upcomingExpenses"
-						value={showUpcomingExpensesOnHomePage}
-						on:change={showUpcomingExpensesOnHomePageChanged}
+						bind:value={showUpcomingExpensesOnHomePage}
+						onchange={showUpcomingExpensesOnHomePageChanged}
 					/>
 				</div>
 
 				<div class="form-control">
-					<Checkbox labelKey="preferences.debt" value={showDebtOnHomePage} on:change={showDebtOnHomePageChanged} />
+					<Checkbox labelKey="preferences.debt" bind:value={showDebtOnHomePage} onchange={showDebtOnHomePageChanged} />
 				</div>
 			</div>
 		</form>

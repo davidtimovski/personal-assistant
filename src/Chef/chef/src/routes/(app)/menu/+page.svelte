@@ -10,9 +10,9 @@
 	import Variables from '$lib/variables';
 
 	let pendingShareRequestCount = 0;
-	let preferencesButtonIsLoading = false;
+	let preferencesButtonIsLoading = $state(false);
 	const personalAssistantUrl = Variables.urls.account;
-	let version = '--';
+	let version = $state('--');
 
 	let localStorage: LocalStorageUtil;
 	let recipesService: RecipesService;
@@ -52,11 +52,11 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive">
-			<i class="fas fa-bars" />
+			<i class="fas fa-bars"></i>
 		</div>
 		<div class="page-title">{$t('menu.menu')}</div>
 		<a href="/recipes" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -71,9 +71,9 @@
 				{/if}
 			</a> -->
 
-			<button type="button" on:click={goToPreferences} class="wide-button with-badge">
+			<button type="button" onclick={goToPreferences} class="wide-button with-badge">
 				<span class="button-loader" class:loading={preferencesButtonIsLoading}>
-					<i class="fas fa-circle-notch fa-spin" />
+					<i class="fas fa-circle-notch fa-spin"></i>
 				</span>
 				<span>{$t('menu.preferences')}</span>
 			</button>
@@ -85,7 +85,7 @@
 
 		<div class="horizontal-buttons-wrap">
 			<a href={personalAssistantUrl} class="wide-button">{$t('menu.goToPersonalAssistant')}</a>
-			<button type="button" on:click={logOut} class="wide-button">{$t('menu.logOut')}</button>
+			<button type="button" onclick={logOut} class="wide-button">{$t('menu.logOut')}</button>
 		</div>
 
 		<hr />

@@ -11,13 +11,13 @@
 	import { AccountItem } from '$lib/models/viewmodels/accountItem';
 	import { SyncEvents } from '$lib/models/syncStatus';
 
-	let accounts: AccountItem[] | null = null;
-	let sum = 0;
-	let currency: string;
-	let viewStocks = false;
-	let someAreInvestmentFunds = false;
-	let editedId: number | undefined;
-	let editedId2: number | undefined;
+	let accounts: AccountItem[] | null = $state(null);
+	let sum = $state(0);
+	let currency: string | null = $state(null);
+	let viewStocks = $state(false);
+	let someAreInvestmentFunds = $state(false);
+	let editedId: number | undefined = $state(undefined);
+	let editedId2: number | undefined = $state(undefined);
 
 	const localStorage = new LocalStorageUtil();
 	let accountsService: AccountsService;
@@ -67,11 +67,11 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive small">
-			<i class="fas fa-money-check-alt" />
+			<i class="fas fa-money-check-alt"></i>
 		</div>
 		<div class="page-title">{$t('accounts.accounts')}</div>
 		<a href="/dashboard" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -79,19 +79,19 @@
 		<div class="content-body">
 			{#if !accounts}
 				<div class="double-circle-loading">
-					<div class="double-bounce1" />
-					<div class="double-bounce2" />
+					<div class="double-bounce1"></div>
+					<div class="double-bounce2"></div>
 				</div>
 			{:else}
 				<div>
 					<table class="editable-table accounts-table">
 						<thead>
 							<tr>
-								<th class="type-cell" />
+								<th class="type-cell"></th>
 								<th class="left-col">{$t('name')}</th>
 								{#if someAreInvestmentFunds}
 									<th
-										on:click={toggleViewStocks}
+										onclick={toggleViewStocks}
 										class="right-col clickable-cell"
 										role="button"
 										title={$t('accounts.toggleStockPriceStocks')}
@@ -102,7 +102,7 @@
 								{/if}
 
 								<th class="right-col">{$t('balance')}</th>
-								<th class="sync-icon-cell" />
+								<th class="sync-icon-cell"></th>
 							</tr>
 						</thead>
 
@@ -111,7 +111,7 @@
 								<tr class:highlighted-row={account.id === editedId || account.id === editedId2}>
 									<td class="edit-link-cell">
 										<a href="/editAccount/{account.id}" class="link" title={$t('edit')} aria-label={$t('edit')}>
-											<i class="fas fa-pencil-alt" />
+											<i class="fas fa-pencil-alt"></i>
 										</a>
 									</td>
 									<td class="left-col">{account.name}</td>
@@ -127,7 +127,7 @@
 									<td class="right-col">{Formatter.money(account.balance, currency, $user.culture)}</td>
 									<td class="sync-icon-cell">
 										{#if !account.synced}
-											<i class="fas fa-sync-alt" title={$t('notSynced')} aria-label={$t('notSynced')} />
+											<i class="fas fa-sync-alt" title={$t('notSynced')} aria-label={$t('notSynced')}></i>
 										{/if}
 									</td>
 								</tr>
@@ -148,13 +148,13 @@
 		<div class="centering-wrap">
 			<button
 				type="button"
-				on:click={() => goto('/editAccount/0')}
+				onclick={() => goto('/editAccount/0')}
 				class="new-button"
 				disabled={$syncStatus.status === SyncEvents.SyncStarted}
 				title={$t('accounts.newAccount')}
 				aria-label={$t('accounts.newAccount')}
 			>
-				<i class="fas fa-plus" />
+				<i class="fas fa-plus"></i>
 			</button>
 		</div>
 

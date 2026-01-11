@@ -23,49 +23,53 @@
 
 	import AmountInput from '$lib/components/AmountInput.svelte';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
 
-	let fromAccountId: number | null = null;
-	let fromAccountName = '---';
-	let toAccountId: number | null = null;
-	let toAccountName = '---';
-	let categoryId: number | null = null;
-	let amount: number | null = null;
-	let fromStocks: number | null = null;
-	let toStocks: number | null = null;
-	let currency: string | null = null;
-	let description: string | null = null;
-	let date = DateHelper.format(new Date());
-	let isEncrypted: boolean;
+	let { data }: Props = $props();
+
+	let fromAccountId: number | null = $state(null);
+	let fromAccountName = $state('---');
+	let toAccountId: number | null = $state(null);
+	let toAccountName = $state('---');
+	let categoryId: number | null = $state(null);
+	let amount: number | null = $state(null);
+	let fromStocks: number | null = $state(null);
+	let toStocks: number | null = $state(null);
+	let currency: string | null = $state(null);
+	let description: string | null = $state(null);
+	let date = $state(DateHelper.format(new Date()));
+	let isEncrypted = $state(false);
 	let encryptedDescription: string | null = null;
 	let salt: string | null = null;
 	let nonce: string | null = null;
-	let generated: boolean;
-	let decryptionPassword: string | null = null;
-	let encrypt = false;
-	let encryptionPassword: string | null = null;
+	let generated = $state(false);
+	let decryptionPassword: string | null = $state(null);
+	let encrypt = $state(false);
+	let encryptionPassword: string | null = $state(null);
 	let createdDate: Date | null = null;
-	let synced: boolean;
-	let type: TransactionType;
-	let accountOptions: SelectOption[] | null = null;
-	let categoryOptions: SelectOption[] | null = null;
+	let synced = $state(false);
+	let type: TransactionType | null = $state(null);
+	let accountOptions: SelectOption[] | null = $state(null);
+	let categoryOptions: SelectOption[] | null = $state(null);
 	const maxDate = date;
-	let decPasswordShown = false;
-	let encPasswordShown = false;
-	let amountIsInvalid = false;
-	let dateIsInvalid = false;
-	let decryptionPasswordIsInvalid = false;
-	let encryptionPasswordIsInvalid = false;
-	let decryptButtonIsLoading = false;
-	let deleteInProgress = false;
-	let deleteButtonText: string;
-	let saveButtonIsLoading = false;
-	let deleteButtonIsLoading = false;
-	let encryptPasswordInput: HTMLInputElement | null = null;
-	let decryptPasswordInput: HTMLInputElement | null = null;
-	let passwordShowIconLabel: string;
-	let stockPurchase = false;
-	let stockSelling = false;
+	let decPasswordShown = $state(false);
+	let encPasswordShown = $state(false);
+	let amountIsInvalid = $state(false);
+	let dateIsInvalid = $state(false);
+	let decryptionPasswordIsInvalid = $state(false);
+	let encryptionPasswordIsInvalid = $state(false);
+	let decryptButtonIsLoading = $state(false);
+	let deleteInProgress = $state(false);
+	let deleteButtonText = $state('');
+	let saveButtonIsLoading = $state(false);
+	let deleteButtonIsLoading = $state(false);
+	let encryptPasswordInput: HTMLInputElement | null = $state(null);
+	let decryptPasswordInput: HTMLInputElement | null = $state(null);
+	let passwordShowIconLabel = $state('');
+	let stockPurchase = $state(false);
+	let stockSelling = $state(false);
 
 	let transactionsService: TransactionsService;
 	let accountsService: AccountsService;
@@ -82,20 +86,19 @@
 		}
 	});
 
-	$: canEncrypt = () => {
+	let canEncrypt = $derived(!!description);
+
+	$effect(() => {
 		if (!description) {
 			encrypt = false;
 			encryptionPassword = null;
-			return false;
 		}
 
-		const canEncrypt = description.trim().length > 0;
 		if (!canEncrypt) {
 			encrypt = false;
 			encryptionPassword = null;
 		}
-		return canEncrypt;
-	};
+	});
 
 	function toggleDecPasswordShow() {
 		if (!decryptPasswordInput) {
@@ -161,9 +164,11 @@
 		decryptionPassword = null;
 	}
 
-	$: canSave = $syncStatus.status !== SyncEvents.SyncStarted && !!amount && !(!$isOnline && synced);
+	let canSave = $derived($syncStatus.status !== SyncEvents.SyncStarted && !!amount && !(!$isOnline && synced));
 
-	async function save() {
+	async function save(event: Event) {
+		event.preventDefault();
+
 		if (!amount || !currency) {
 			throw new Error('Unexpected error: required fields missing');
 		}
@@ -352,7 +357,7 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive small">
-			<i class="fas fa-pencil-alt" />
+			<i class="fas fa-pencil-alt"></i>
 		</div>
 		<div class="page-title">
 			{#if type === 1}
@@ -366,7 +371,7 @@
 			{/if}
 		</div>
 		<a href="/transaction/{data.id}" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -376,7 +381,7 @@
 				<AlertBlock type="warning" message={$t('whileOfflineCannotModify')} />
 			{/if}
 
-			<form on:submit|preventDefault={save} autocomplete="off">
+			<form onsubmit={save} autocomplete="off">
 				<div class="form-control inline">
 					<label for="amount">{$t('amount')}</label>
 					<AmountInput bind:amount bind:currency invalid={amountIsInvalid} />
@@ -397,7 +402,7 @@
 										{/each}
 									{/if}
 								</select>
-								<i class="fas fa-circle-notch fa-spin" />
+								<i class="fas fa-circle-notch fa-spin"></i>
 							</div>
 						{/if}
 					</div>
@@ -418,7 +423,7 @@
 										{/each}
 									{/if}
 								</select>
-								<i class="fas fa-circle-notch fa-spin" />
+								<i class="fas fa-circle-notch fa-spin"></i>
 							</div>
 						{/if}
 					</div>
@@ -448,7 +453,7 @@
 								{/each}
 							{/if}
 						</select>
-						<i class="fas fa-circle-notch fa-spin" />
+						<i class="fas fa-circle-notch fa-spin"></i>
 					</div>
 				</div>
 
@@ -469,30 +474,30 @@
 								placeholder={$t('password')}
 								aria-label={$t('password')}
 							/>
-							<button type="button" on:click={toggleDecPasswordShow} class="password-show-button" class:shown={decPasswordShown}>
-								<i class="fas fa-eye" />
-								<i class="fas fa-eye-slash" />
+							<button type="button" onclick={toggleDecPasswordShow} class="password-show-button" class:shown={decPasswordShown}>
+								<i class="fas fa-eye"></i>
+								<i class="fas fa-eye-slash"></i>
 							</button>
 						</div>
 						<button
 							type="button"
-							on:click={decrypt}
+							onclick={decrypt}
 							class="decrypt-button"
 							class:loading={decryptButtonIsLoading}
 							title={$t('decryptDescription')}
 							aria-label={$t('decryptDescription')}
 						>
-							<i class="fas fa-unlock" />
-							<i class="fas fa-circle-notch fa-spin" />
+							<i class="fas fa-unlock"></i>
+							<i class="fas fa-circle-notch fa-spin"></i>
 						</button>
 						<button
 							type="button"
-							on:click={erase}
+							onclick={erase}
 							class="erase-button"
 							title={$t('editTransaction.resetDescription')}
 							aria-label={$t('editTransaction.resetDescription')}
 						>
-							<i class="fas fa-eraser" />
+							<i class="fas fa-eraser"></i>
 						</button>
 					</div>
 				{:else}
@@ -504,9 +509,9 @@
 								class="description-textarea"
 								placeholder={$t('description')}
 								aria-label={$t('description')}
-							/>
+							></textarea>
 
-							<Checkbox labelKey="editTransaction.encryptDescription" bind:value={encrypt} disabled={!canEncrypt()} />
+							<Checkbox labelKey="editTransaction.encryptDescription" bind:value={encrypt} disabled={!canEncrypt} />
 
 							{#if encrypt}
 								<div>
@@ -525,14 +530,14 @@
 										/>
 										<button
 											type="button"
-											on:click={toggleEncPasswordShow}
+											onclick={toggleEncPasswordShow}
 											class="password-show-button"
 											class:shown={encPasswordShown}
 											title={passwordShowIconLabel}
 											aria-label={passwordShowIconLabel}
 										>
-											<i class="fas fa-eye" />
-											<i class="fas fa-eye-slash" />
+											<i class="fas fa-eye"></i>
+											<i class="fas fa-eye-slash"></i>
 										</button>
 									</div>
 								</div>
@@ -547,7 +552,7 @@
 					{#if !deleteInProgress}
 						<button class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
 							<span class="button-loader" class:loading={saveButtonIsLoading}>
-								<i class="fas fa-circle-notch fa-spin" />
+								<i class="fas fa-circle-notch fa-spin"></i>
 							</span>
 							<span>{$t('save')}</span>
 						</button>
@@ -555,19 +560,19 @@
 
 					<button
 						type="button"
-						on:click={deleteTransaction}
+						onclick={deleteTransaction}
 						class="button danger-button"
 						disabled={deleteButtonIsLoading}
 						class:confirm={deleteInProgress}
 					>
 						<span class="button-loader" class:loading={deleteButtonIsLoading}>
-							<i class="fas fa-circle-notch fa-spin" />
+							<i class="fas fa-circle-notch fa-spin"></i>
 						</span>
 						<span>{deleteButtonText}</span>
 					</button>
 
 					{#if deleteInProgress}
-						<button type="button" on:click={cancel} class="button secondary-button">
+						<button type="button" onclick={cancel} class="button secondary-button">
 							{$t('cancel')}
 						</button>
 					{/if}

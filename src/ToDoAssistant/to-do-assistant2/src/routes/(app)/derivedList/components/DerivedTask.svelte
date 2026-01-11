@@ -5,19 +5,31 @@
 	import { user } from '$lib/stores';
 	import type { Assignee } from '$lib/models/viewmodels/assignee';
 
-	export let active: boolean;
-	export let disabled: boolean;
-	export let highPriority: boolean;
-	export let stale = false;
-	export let assignedUser: Assignee | null = null;
-	export let name: string;
-	export let url: string | null;
-	export let isOneTime: boolean;
-	export let modifiedDate: string;
+	let {
+		active,
+		disabled,
+		highPriority,
+		stale = false,
+		assignedUser = null,
+		name,
+		url,
+		isOneTime,
+		modifiedDate,
+		onclick
+	}: {
+		active: boolean;
+		disabled: boolean;
+		highPriority: boolean;
+		stale: boolean;
+		assignedUser?: Assignee | null;
+		name: string;
+		url: string | null;
+		isOneTime: boolean;
+		modifiedDate: string;
+		onclick: any;
+	} = $props();
 
-	function formatStaleTaskDate(modifiedDate: string): string {
-		return DateHelper.formatDayMonth(new Date(modifiedDate), $user.language);
-	}
+	const formattedStaleTaskDate = $derived(DateHelper.formatDayMonth(new Date(modifiedDate), $user.language));
 </script>
 
 <div class="to-do-task" class:active class:high-priority={highPriority}>
@@ -32,7 +44,7 @@
 
 	<div class="to-do-task-content" class:assigned={assignedUser}>
 		{#if stale}
-			<span class="unchanged-since">{formatStaleTaskDate(modifiedDate)}</span>
+			<span class="unchanged-since">{formattedStaleTaskDate}</span>
 		{/if}
 
 		{#if url}
@@ -43,16 +55,16 @@
 
 		<button
 			type="button"
-			on:click
+			{onclick}
 			class="check-button"
 			class:one-time={isOneTime}
 			{disabled}
 			title={$t('derivedList.complete')}
 			aria-label={$t('derivedList.complete')}
 		>
-			<i class="far fa-square" />
-			<i class="fas fa-check-square" />
-			<i class="fas fa-trash-alt" />
+			<i class="far fa-square"></i>
+			<i class="fas fa-check-square"></i>
+			<i class="fas fa-trash-alt"></i>
 		</button>
 	</div>
 </div>

@@ -3,7 +3,7 @@
 	import { AuthService } from '../../../../../../Core/shared2/services/authService';
 	import { LocalStorageKeys, LocalStorageUtil } from '$lib/utils/localStorageUtil';
 
-	let containerHeight = 768;
+	let containerHeight = $state(768);
 
 	const localStorage = new LocalStorageUtil();
 
@@ -33,8 +33,8 @@
 <section class="container" style="height: {containerHeight}px">
 	<div>
 		<div class="loader-wrap">
-			<div class="loader" />
-			<i class="fas fa-lock" />
+			<div class="loader"></div>
+			<i class="fas fa-lock"></i>
 		</div>
 
 		<div class="authorizing">Logging in</div>

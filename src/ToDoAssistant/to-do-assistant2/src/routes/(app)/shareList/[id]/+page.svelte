@@ -16,32 +16,35 @@
 	import type { CanShareList } from '$lib/models/viewmodels/canShareList';
 	import { ShareList } from '$lib/models/server/requests/shareList';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
 
-	let name = '';
-	let sharingState: SharingState;
-	let ownerEmail = '';
-	let ownerName = '';
-	let ownerImageUri = '';
-	let userShare: Share;
-	let shares: Array<Share>;
+	let { data }: Props = $props();
+
+	let name = $state('');
+	let sharingState: SharingState | null = $state(null);
+	let ownerEmail = $state('');
+	let ownerName = $state('');
+	let ownerImageUri = $state('');
+	let userShare: Share | null = $state(null);
+	let shares: Array<Share> | null = $state(null);
 	let originalShares: Share[];
-	let emailIsInvalid = false;
-	let emailInput: HTMLInputElement;
-	let canSave = false;
-	let newShares = new Array<ShareUserAndPermission>();
-	let editedShares = new Array<ShareUserAndPermission>();
-	let removedShares = new Array<ShareUserAndPermission>();
-	let saveButtonIsLoading = false;
-	let membersLabel = '';
+	let emailIsInvalid = $state(false);
+	let emailInput: HTMLInputElement | null = $state(null);
+	let newShares = $state(new Array<ShareUserAndPermission>());
+	let editedShares = $state(new Array<ShareUserAndPermission>());
+	let removedShares = $state(new Array<ShareUserAndPermission>());
+	let saveButtonIsLoading = $state(false);
+	let membersLabel = $state('');
 	const unsubscriptions: Unsubscriber[] = [];
 
 	// Selected share
-	let selectedShareUserId = 0;
-	let selectedShareEmail = '';
+	let selectedShareUserId = $state(0);
+	let selectedShareEmail = $state('');
 	let selectedShareName = '';
 	let selectedShareImageUri = '';
-	let selectedShareIsAdmin = false;
+	let selectedShareIsAdmin = $state(false);
 
 	unsubscriptions.push(
 		alertState.subscribe((value) => {
@@ -53,9 +56,9 @@
 
 	let listsService: ListsService;
 
-	$: emailPlaceholderText = $t(selectedShareIsAdmin ? 'shareList.newAdminEmail' : 'shareList.newMemberEmail');
+	let emailPlaceholderText = $derived($t(selectedShareIsAdmin ? 'shareList.newAdminEmail' : 'shareList.newMemberEmail'));
 
-	$: canSave = newShares.length + editedShares.length + removedShares.length > 0;
+	let canSave = $derived(newShares.length + editedShares.length + removedShares.length > 0);
 
 	function resetSelectedShare() {
 		selectedShareUserId = 0;
@@ -67,6 +70,10 @@
 	}
 
 	async function addShare() {
+		if (shares === null) {
+			throw new Error('Shares not initialized');
+		}
+
 		alertState.update((x) => {
 			x.hide();
 			return x;
@@ -136,6 +143,10 @@
 	}
 
 	async function saveShare() {
+		if (shares === null) {
+			throw new Error('Shares not initialized');
+		}
+
 		if (!newShares.find((x) => x.userId === selectedShareUserId) && !editedShares.find((x) => x.userId === selectedShareUserId)) {
 			editedShares = editedShares.concat(
 				new Share(selectedShareUserId, selectedShareEmail.trim(), selectedShareName, selectedShareImageUri, selectedShareIsAdmin, false, null)
@@ -149,13 +160,19 @@
 		resetSelectedShare();
 	}
 
-	function submit() {
+	function submit(event: Event) {
+		event.preventDefault();
+
 		if (selectedShareUserId === 0) {
 			addShare();
 		}
 	}
 
 	function removeShare(share: Share) {
+		if (shares === null) {
+			throw new Error('Shares not initialized');
+		}
+
 		shares = shares.filter((x) => x.userId !== share.userId);
 		newShares = newShares.filter((x) => x.userId !== share.userId);
 		editedShares = editedShares.filter((x) => x.userId !== share.userId);
@@ -236,7 +253,7 @@
 		originalShares = list.shares.slice();
 
 		if (sharingState === SharingState.NotShared) {
-			emailInput.focus();
+			emailInput?.focus();
 		}
 	});
 
@@ -251,19 +268,19 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive small">
-			<i class="fas fa-handshake" />
+			<i class="fas fa-handshake"></i>
 		</div>
 		<div class="page-title">
-			<span>{$t('shareList.share')}</span>&nbsp;<span class="colored-text">{name}</span>
+			<span><span>{$t('shareList.share')}</span>&nbsp;<span class="colored-text">{name}</span></span>
 		</div>
 		<a href="/list/{data.id}" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
 	<div class="content-wrap">
 		{#if sharingState !== 4}
-			<form on:submit|preventDefault={submit}>
+			<form onsubmit={submit}>
 				<div class="form-control">
 					<div class="add-input-wrap">
 						<input
@@ -279,12 +296,12 @@
 						/>
 
 						{#if selectedShareUserId !== 0}
-							<button type="button" on:click={saveShare} title={$t('save')} aria-label={$t('save')}>
-								<i class="fas fa-save" />
+							<button type="button" onclick={saveShare} title={$t('save')} aria-label={$t('save')}>
+								<i class="fas fa-save"></i>
 							</button>
 						{:else}
-							<button type="button" on:click={addShare} title={$t('shareList.addMember')} aria-label={$t('shareList.addMember')}>
-								<i class="fas fa-plus-circle" />
+							<button type="button" onclick={addShare} title={$t('shareList.addMember')} aria-label={$t('shareList.addMember')}>
+								<i class="fas fa-plus-circle"></i>
 							</button>
 						{/if}
 					</div>
@@ -311,7 +328,7 @@
 			<img class="share-image" src={ownerImageUri} title={ownerName} alt={$t('profilePicture', { name: ownerName })} />
 			<div class="share-content not-editable">
 				<div class="icon" title={$t('shareList.owner')} aria-label={$t('shareList.owner')}>
-					<i class="fas fa-crown" />
+					<i class="fas fa-crown"></i>
 				</div>
 				<span class="name">{ownerEmail}</span>
 			</div>
@@ -323,11 +340,11 @@
 				<div class="share-content not-editable">
 					{#if userShare.isAdmin}
 						<div class="icon" title={$t('shareList.admin')} aria-label={$t('shareList.admin')}>
-							<i class="fas fa-user-tie" />
+							<i class="fas fa-user-tie"></i>
 						</div>
 					{:else}
 						<div class="icon" title={$t('shareList.member')} aria-label={$t('shareList.member')}>
-							<i class="fas fa-user" />
+							<i class="fas fa-user"></i>
 						</div>
 					{/if}
 
@@ -343,44 +360,44 @@
 					<div class="share-content" class:selected={share.email === selectedShareEmail}>
 						{#if share.userId && !share.createdDate && share.userId !== 0 && share.email !== selectedShareEmail}
 							<div class="icon" title={$t('shareList.newlyAddedMember')} aria-label={$t('shareList.newlyAddedMember')}>
-								<i class="fas fa-user-plus" />
+								<i class="fas fa-user-plus"></i>
 							</div>
 						{/if}
 
 						{#if share.isAccepted === null && !!share.createdDate && share.email !== selectedShareEmail}
 							<div class="icon" title={$t('shareList.pendingAccept')} aria-label={$t('shareList.pendingAccept')}>
-								<i class="fas fa-user-clock" />
+								<i class="fas fa-user-clock"></i>
 							</div>
 						{/if}
 
 						{#if share.isAccepted && !share.isAdmin && share.email !== selectedShareEmail}
 							<div class="icon" title={$t('shareList.member')} aria-label={$t('shareList.member')}>
-								<i class="fas fa-user" />
+								<i class="fas fa-user"></i>
 							</div>
 						{/if}
 
 						{#if share.isAccepted && share.isAdmin && share.email !== selectedShareEmail}
 							<div class="icon" title={$t('shareList.admin')} aria-label={$t('shareList.admin')}>
-								<i class="fas fa-user-tie" />
+								<i class="fas fa-user-tie"></i>
 							</div>
 						{/if}
 
 						{#if share.email === selectedShareEmail}
 							<div class="share-content-button" title={$t('shareList.editing')} aria-label={$t('shareList.editing')}>
-								<i class="fas fa-user-edit" />
+								<i class="fas fa-user-edit"></i>
 							</div>
 						{/if}
 
-						<button type="button" on:click={() => select(share)} class="name">{share.email}</button>
+						<button type="button" onclick={() => select(share)} class="name">{share.email}</button>
 
 						<button
 							type="button"
-							on:click={() => removeShare(share)}
+							onclick={() => removeShare(share)}
 							class="share-content-button remove-button"
 							title={$t('shareList.remove')}
 							aria-label={$t('shareList.remove')}
 						>
-							<i class="fas fa-times-circle" />
+							<i class="fas fa-times-circle"></i>
 						</button>
 					</div>
 				</div>
@@ -390,9 +407,9 @@
 		<hr />
 
 		<div class="save-delete-wrap">
-			<button type="button" on:click={save} class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
+			<button type="button" onclick={save} class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
 				<span class="button-loader" class:loading={saveButtonIsLoading}>
-					<i class="fas fa-circle-notch fa-spin" />
+					<i class="fas fa-circle-notch fa-spin"></i>
 				</span>
 				<span>{$t('save')}</span>
 			</button>

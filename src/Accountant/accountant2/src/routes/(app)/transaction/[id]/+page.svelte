@@ -18,34 +18,38 @@
 	import { AccountsService } from '$lib/services/accountsService';
 	import { EncryptionService } from '$lib/services/encryptionService';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
 
 	let fromExpenditureHeatmap = false;
-	let type: TransactionType;
-	let typeLabel = '---';
-	let accountLabel = '---';
-	let accountValue = '---';
-	let amount: number | undefined;
-	let originalAmount: number;
-	let currency = '';
-	let fromStocks: number | null;
-	let toStocks: number | null;
-	let categoryName = '---';
-	let description: string | null;
-	let date = '---';
-	let isEncrypted: boolean;
-	let encryptedDescription: string | null;
+	let type: TransactionType | null = null;
+	let typeLabel = $state('---');
+	let accountLabel = $state('---');
+	let accountValue = $state('---');
+	let amount: number | undefined = $state(undefined);
+	let originalAmount: number | null = $state(null);
+	let currency: string | null = $state(null);
+	let fromStocks: number | null = $state(null);
+	let toStocks: number | null = $state(null);
+	let categoryName = $state('---');
+	let description: string | null = $state(null);
+	let date = $state('---');
+	let isEncrypted = $state(false);
+	let encryptedDescription: string | null = $state(null);
 	let salt: string | null;
 	let nonce: string | null;
-	let generated: boolean;
-	let decryptionPassword: string | null = null;
-	let preferredCurrency: string;
-	let passwordShown = false;
-	let decryptButtonIsLoading = false;
-	let decryptionPasswordIsInvalid = false;
+	let generated = $state(false);
+	let decryptionPassword: string | null = $state(null);
+	let preferredCurrency: string | null = $state(null);
+	let passwordShown = $state(false);
+	let decryptButtonIsLoading = $state(false);
+	let decryptionPasswordIsInvalid = $state(false);
 	const typeStringMap = new Map<TransactionType, string>();
-	let passwordInput: HTMLInputElement | null = null;
-	let passwordShowIconLabel: string;
+	let passwordInput: HTMLInputElement | null = $state(null);
+	let passwordShowIconLabel = $state('');
 
 	const localStorage = new LocalStorageUtil();
 	let transactionsService: TransactionsService;
@@ -81,7 +85,9 @@
 		passwordShown = !passwordShown;
 	}
 
-	async function decrypt() {
+	async function decrypt(event: Event) {
+		event.preventDefault();
+
 		if (ValidationUtil.isEmptyOrWhitespace(decryptionPassword)) {
 			decryptionPasswordIsInvalid = true;
 			return;
@@ -139,7 +145,7 @@
 			passwordShowIconLabel = $t('showPassword');
 		}
 
-		const type = TransactionsService.getType(transaction.fromAccountId, transaction.toAccountId);
+		type = TransactionsService.getType(transaction.fromAccountId, transaction.toAccountId);
 
 		typeLabel = <string>typeStringMap.get(type);
 		amount = transaction.convertedAmount;
@@ -192,11 +198,11 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<a href="/editTransaction/{data.id}" class="side small" title={$t('edit')} aria-label={$t('edit')}>
-			<i class="fas fa-pencil-alt" />
+			<i class="fas fa-pencil-alt"></i>
 		</a>
 		<div class="page-title">{typeLabel}</div>
-		<button type="button" on:click={back} class="back-button">
-			<i class="fas fa-times" />
+		<button type="button" onclick={back} class="back-button">
+			<i class="fas fa-times"></i>
 		</button>
 	</div>
 
@@ -208,9 +214,7 @@
 
 			<div class="form-control inline">
 				<span>{$t('amount')}</span>
-				<span class:expense-color={type === 1} class:deposit-color={type === 2} class:transfer-color={type === 3}
-					>{Formatter.money(amount, preferredCurrency, $user.culture)}</span
-				>
+				<span>{Formatter.money(amount, preferredCurrency, $user.culture)}</span>
 			</div>
 
 			{#if currency && currency !== preferredCurrency}
@@ -253,7 +257,7 @@
 				<div class="form-control">
 					<div class="description-view">
 						<span>{$t('description')}</span>
-						<textarea bind:value={description} readonly />
+						<textarea bind:value={description} readonly></textarea>
 					</div>
 				</div>
 			{/if}
@@ -263,7 +267,7 @@
 					<div class="description-view encrypted">
 						<span>{$t('description')}</span>
 
-						<form on:submit|preventDefault={decrypt} class="decrypt-form">
+						<form onsubmit={decrypt} class="decrypt-form">
 							<div class="viewable-password">
 								<input
 									type="password"
@@ -278,26 +282,26 @@
 								/>
 								<button
 									type="button"
-									on:click={togglePasswordShow}
+									onclick={togglePasswordShow}
 									class="password-show-button"
 									class:shown={passwordShown}
 									title={passwordShowIconLabel}
 									aria-label={passwordShowIconLabel}
 								>
-									<i class="fas fa-eye" />
-									<i class="fas fa-eye-slash" />
+									<i class="fas fa-eye"></i>
+									<i class="fas fa-eye-slash"></i>
 								</button>
 							</div>
 							<button
 								type="button"
-								on:click={decrypt}
+								onclick={decrypt}
 								class="decrypt-button"
 								class:loading={decryptButtonIsLoading}
 								title={$t('decryptDescription')}
 								aria-label={$t('decryptDescription')}
 							>
-								<i class="fas fa-unlock" />
-								<i class="fas fa-circle-notch fa-spin" />
+								<i class="fas fa-unlock"></i>
+								<i class="fas fa-circle-notch fa-spin"></i>
 							</button>
 						</form>
 					</div>

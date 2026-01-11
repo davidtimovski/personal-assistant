@@ -13,15 +13,15 @@
 	import type { ListOption } from '$lib/models/viewmodels/listOption';
 
 	const notificationsVapidKey = 'BCL8HRDvXuYjw011VypF_TtfmklYFmqXAADY7pV3WB9vL609d8wNK0zTUs4hB0V3uAnCTpzOd2pANBmsMQoUhD0';
-	let notificationsState: string;
+	let notificationsState: string | null = $state(null);
 	const notificationIconSrc = '/images/icons/app-icon-x96.png';
-	let notificationsAreSupported = false;
-	let notificationsCheckboxChecked: boolean;
-	let soundsEnabled: boolean;
-	let highPriorityListEnabled: boolean;
-	let staleTasksListEnabled: boolean;
-	let immediateListId: number | null;
-	let listOptions: ListOption[] | null = null;
+	let notificationsAreSupported = $state(false);
+	let notificationsCheckboxChecked: boolean | null = $state(null);
+	let soundsEnabled: boolean | null = $state(null);
+	let highPriorityListEnabled: boolean | null = $state(null);
+	let staleTasksListEnabled: boolean | null = $state(null);
+	let immediateListId: number | null = $state(null);
+	let listOptions: ListOption[] | null = $state(null);
 
 	const localStorage = new LocalStorageUtil();
 	let usersService: UsersService;
@@ -30,6 +30,10 @@
 	let soundPlayer: SoundPlayer;
 
 	async function notificationsCheckboxCheckedChanged() {
+		if (notificationsCheckboxChecked === null) {
+			throw new Error('Notifications checkbox state not initialized');
+		}
+
 		const previousNotificationsPermission = (Notification as any).permission;
 
 		if (previousNotificationsPermission === 'denied') {
@@ -81,7 +85,7 @@
 		if (sub === null) {
 			const newSub = await swReg.pushManager.subscribe({
 				userVisibleOnly: true,
-				applicationServerKey: NotificationsService.getApplicationServerKey(notificationsVapidKey)
+				applicationServerKey: notificationsVapidKey
 			});
 
 			await notificationsService.createSubscription('To Do Assistant', newSub);
@@ -158,11 +162,11 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive small">
-			<i class="fas fa-sliders-h" />
+			<i class="fas fa-sliders-h"></i>
 		</div>
 		<div class="page-title">{$t('preferences.preferences')}</div>
 		<a href="/lists" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -180,24 +184,24 @@
 						labelKey="preferences.notifications"
 						bind:value={notificationsCheckboxChecked}
 						disabled={notificationsState === 'denied'}
-						on:change={notificationsCheckboxCheckedChanged}
+						onchange={notificationsCheckboxCheckedChanged}
 					/>
 				</div>
 			{/if}
 
 			<div class="form-control">
-				<Checkbox labelKey="preferences.sounds" bind:value={soundsEnabled} on:change={soundsEnabledChanged} />
+				<Checkbox labelKey="preferences.sounds" bind:value={soundsEnabled} onchange={soundsEnabledChanged} />
 			</div>
 
 			<div class="form-control-group">
 				<div class="setting-descriptor">{$t('preferences.derivedLists')}</div>
 
 				<div class="form-control">
-					<Checkbox labelKey="preferences.highPriority" bind:value={highPriorityListEnabled} on:change={highPriorityListEnabledChanged} />
+					<Checkbox labelKey="preferences.highPriority" bind:value={highPriorityListEnabled} onchange={highPriorityListEnabledChanged} />
 				</div>
 
 				<div class="form-control">
-					<Checkbox labelKey="preferences.staleTasks" bind:value={staleTasksListEnabled} on:change={staleTasksListEnabledChanged} />
+					<Checkbox labelKey="preferences.staleTasks" bind:value={staleTasksListEnabled} onchange={staleTasksListEnabledChanged} />
 				</div>
 			</div>
 
@@ -205,7 +209,7 @@
 				<div class="setting-descriptor">{$t('preferences.immediateList')}</div>
 
 				<div class="form-control">
-					<select bind:value={immediateListId} on:change={immediateListChanged} disabled={!listOptions} aria-label={$t('preferences.immediateList')}>
+					<select bind:value={immediateListId} onchange={immediateListChanged} disabled={!listOptions} aria-label={$t('preferences.immediateList')}>
 						<option value={null}>{$t('preferences.none')}</option>
 						{#if listOptions}
 							{#each listOptions as list}

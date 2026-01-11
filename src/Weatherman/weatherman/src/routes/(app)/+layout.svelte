@@ -78,16 +78,16 @@
 </script>
 
 <main>
-	<div />
+	<div></div>
 	<div class="center">
 		<slot />
 		<Alert />
 	</div>
-	<div />
+	<div></div>
 
 	<div class="connection-warning-overlay" class:visible={$isOffline}>
 		<div class="connection-warning">
-			<i class="fas fa-wifi" />
+			<i class="fas fa-wifi"></i>
 			<br />
 			<span>{$t('waitingForConnection')}</span>
 		</div>

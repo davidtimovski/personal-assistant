@@ -8,7 +8,7 @@
 	import EmptyListMessage from '../../../../../../Core/shared2/components/EmptyListMessage.svelte';
 
 	import { t } from '$lib/localization/i18n';
-	import { isOffline, user, state, remoteEvents } from '$lib/stores';
+	import { isOffline, user, localState, remoteEvents } from '$lib/stores';
 	import { UsersService } from '$lib/services/usersService';
 	import { DerivedLists, ListsService } from '$lib/services/listsService';
 	import { TasksService } from '$lib/services/tasksService';
@@ -16,21 +16,21 @@
 	import type { ListIcon } from '$lib/models/viewmodels/listIcon';
 	import { RemoteEventType } from '$lib/models/remoteEvents';
 
-	let derivedLists: ListModel[] | null = null;
-	let regularLists: ListModel[] | null = null;
+	let derivedLists: ListModel[] | null = $state(null);
+	let regularLists: ListModel[] | null = $state(null);
 	let iconOptions = ListsService.getIconOptions();
-	let editedId: number | undefined;
+	let editedId: number | undefined = $state(undefined);
 	const derivedListNameLookup = new Map<string, string>();
 	const unsubscriptions: Unsubscriber[] = [];
 
 	// Progress bar
-	let progressBarActive = false;
+	let progressBarActive = $state(false);
 	const progress = tweened(0, {
 		duration: 500,
 		easing: cubicOut
 	});
 	let progressIntervalId: number | undefined;
-	let progressBarVisible = false;
+	let progressBarVisible = $state(false);
 
 	let usersService: UsersService;
 	let listsService: ListsService;
@@ -43,12 +43,12 @@
 	}
 
 	function setListsFromState() {
-		if ($state.lists === null) {
+		if ($localState.lists === null) {
 			throw new Error('Lists not loaded yet');
 		}
 
-		derivedLists = ListsService.getDerivedForHomeScreen($state.lists, derivedListNameLookup);
-		regularLists = ListsService.getForHomeScreen($state.lists);
+		derivedLists = ListsService.getDerivedForHomeScreen($localState.lists, derivedListNameLookup);
+		regularLists = ListsService.getForHomeScreen($localState.lists);
 	}
 
 	function getClassFromIcon(icon: string): string {
@@ -95,12 +95,12 @@
 		listsService = new ListsService();
 		tasksService = new TasksService();
 
-		if ($state.lists === null) {
+		if ($localState.lists === null) {
 			startProgressBar();
 		}
 
 		unsubscriptions.push(
-			state.subscribe((s) => {
+			localState.subscribe((s) => {
 				if (s.lists === null) {
 					return;
 				}
@@ -115,16 +115,16 @@
 
 		unsubscriptions.push(
 			remoteEvents.subscribe((e) => {
-				if ($state.lists === null) {
+				if ($localState.lists === null) {
 					return;
 				}
 
 				if (e.type === RemoteEventType.TaskCompletedRemotely) {
-					tasksService.completeLocal(e.data.id, e.data.listId, $state.lists);
+					tasksService.completeLocal(e.data.id, e.data.listId, $localState.lists);
 				} else if (e.type === RemoteEventType.TaskUncompletedRemotely) {
-					tasksService.uncompleteLocal(e.data.id, e.data.listId, $state.lists);
+					tasksService.uncompleteLocal(e.data.id, e.data.listId, $localState.lists);
 				} else if (e.type === RemoteEventType.TaskDeletedRemotely) {
-					tasksService.deleteLocal(e.data.id, e.data.listId, $state.lists);
+					tasksService.deleteLocal(e.data.id, e.data.listId, $localState.lists);
 				}
 
 				setListsFromState();
@@ -149,20 +149,20 @@
 				<img src={$user.imageUri} class="profile-image" width="40" height="40" alt="" />
 			</a>
 
-			<div class="page-title" />
+			<div class="page-title"></div>
 			<button
 				type="button"
-				on:click={sync}
+				onclick={sync}
 				class="sync-button"
 				disabled={$isOffline || progressBarActive}
 				title={$t('index.refresh')}
 				aria-label={$t('index.refresh')}
 			>
-				<i class="fas fa-sync-alt" />
+				<i class="fas fa-sync-alt"></i>
 			</button>
 		</div>
 		<div class="progress-bar">
-			<div class="progress" class:visible={progressBarVisible} style="width: {$progress}%;" />
+			<div class="progress" class:visible={progressBarVisible} style="width: {$progress}%;"></div>
 		</div>
 	</div>
 
@@ -172,7 +172,7 @@
 				{#if regularLists.length > 0}
 					{#each derivedLists as list}
 						<div class="to-do-list derived-list {list.derivedListType}">
-							<i class="icon {list.derivedListIconClass}" />
+							<i class="icon {list.derivedListIconClass}"></i>
 							<a href="/derivedList?type={list.derivedListType}" class="name-container">{list.name}</a>
 						</div>
 					{/each}
@@ -184,12 +184,12 @@
 							class:is-shared={list.sharingState !== 0 && list.sharingState !== 1}
 							class:pending-share={list.sharingState === 1}
 						>
-							<i class="icon {getClassFromIcon(list.icon)}" />
+							<i class="icon {getClassFromIcon(list.icon)}"></i>
 							<a href="/list/{list.id}" class="name-container" class:highlighted={list.id === editedId}>
 								<span class="name">{list.name}</span>
-								<span class="sharing-icon shared" title={$t('index.shared')} aria-label={$t('index.shared')}><i class="fas fa-users" /></span>
+								<span class="sharing-icon shared" title={$t('index.shared')} aria-label={$t('index.shared')}><i class="fas fa-users"></i></span>
 								<span class="sharing-icon pending-accept" title={$t('index.pendingAccept')} aria-label={$t('index.pendingAccept')}
-									><i class="fas fa-user-clock" /></span
+									><i class="fas fa-user-clock"></i></span
 								>
 							</a>
 						</div>
@@ -202,7 +202,7 @@
 
 		<div class="centering-wrap">
 			<a href="/editList/0" class="new-button" title={$t('index.newList')} aria-label={$t('index.newList')}>
-				<i class="fas fa-plus" />
+				<i class="fas fa-plus"></i>
 			</a>
 		</div>
 	</div>

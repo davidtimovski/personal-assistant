@@ -15,6 +15,7 @@ input[type='email'],
 input[type='url'],
 select,
 textarea {
+	display: block;
 	background-color: var(--input-background);
 }
 

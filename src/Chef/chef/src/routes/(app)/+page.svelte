@@ -4,7 +4,7 @@
 
 	import { authInfo } from '$lib/stores';
 
-	let containerHeight = 768;
+	let containerHeight = $state(768);
 
 	onMount(() => {
 		if (window.innerHeight < containerHeight) {
@@ -24,7 +24,7 @@
 <section class="container" style="height: {containerHeight}px">
 	<div>
 		<div class="loader-wrap">
-			<div class="loader" />
+			<div class="loader"></div>
 		</div>
 
 		<div class="app-name">Chef</div>

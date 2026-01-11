@@ -8,20 +8,29 @@
 
 	import { t } from '$lib/localization/i18n';
 
-	export let amount: number | null;
-	export let currency: string | null;
-	export let invalid = false;
-	export let inputId: string = 'amount';
-	export let focusOnInit = false;
-	export let disabled = false;
+	let {
+		amount = $bindable<number | null>(),
+		currency = $bindable<string | null>(),
+		invalid = false,
+		inputId = 'amount',
+		focusOnInit = false,
+		disabled = false
+	}: {
+		amount: number | null;
+		currency: string | null;
+		invalid?: boolean;
+		inputId?: string;
+		focusOnInit?: boolean;
+		disabled?: boolean;
+	} = $props();
 
-	let changing = false;
+	let changing = $state(false);
 	let autocompleteResult: AutocompleteResult;
 	let amountInput: HTMLInputElement | null;
 	let selectCurrencyInput: HTMLInputElement | null;
-	let min = 0.01;
-	let max = 1500000;
-	let step = 'any';
+	let min = $state(0.01);
+	let max = $state(1500000);
+	let step = $state('any');
 
 	let currenciesService: CurrenciesService;
 
@@ -96,7 +105,7 @@
 	/>
 	<button
 		type="button"
-		on:click={toggleChangeCurrency}
+		onclick={toggleChangeCurrency}
 		{disabled}
 		class="selected-currency-button"
 		title={$t('changeCurrency')}
@@ -145,7 +154,10 @@
 			font-size: inherit;
 			line-height: 27px;
 			color: inherit;
-			transition: background var(--transition-quick), box-shadow var(--transition-quick), color var(--transition-quick);
+			transition:
+				background var(--transition-quick),
+				box-shadow var(--transition-quick),
+				color var(--transition-quick);
 		}
 
 		&.changing {

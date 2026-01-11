@@ -2,22 +2,37 @@
 	import { t } from '$lib/localization/i18n';
 	import type { Assignee } from '$lib/models/viewmodels/assignee';
 
-	export let active: boolean;
-	export let disabled: boolean;
-	export let highPriority: boolean;
-	export let highlighted: boolean;
-	export let assignedUser: Assignee | null = null;
-	export let id: number;
-	export let name: string;
-	export let url: string | null;
-	export let completed: boolean;
-	export let isOneTime: boolean;
+	let {
+		active,
+		disabled,
+		highPriority,
+		highlighted,
+		assignedUser = null,
+		id,
+		name,
+		url,
+		completed,
+		isOneTime,
+		onclick
+	}: {
+		active: boolean;
+		disabled: boolean;
+		highPriority: boolean;
+		highlighted: boolean;
+		assignedUser?: Assignee | null;
+		id: number;
+		name: string;
+		url: string | null;
+		completed: boolean;
+		isOneTime: boolean;
+		onclick: any;
+	} = $props();
 </script>
 
 <div class="to-do-task" class:completed class:active class:high-priority={highPriority}>
 	<div class="to-do-task-content" class:highlighted class:assigned={assignedUser}>
 		<a href="/editTask/{id}" class="edit-button" title={$t('list.edit')} aria-label={$t('list.edit')}>
-			<i class="fas fa-pencil-alt" />
+			<i class="fas fa-pencil-alt"></i>
 		</a>
 
 		{#if assignedUser}
@@ -37,7 +52,7 @@
 
 		<button
 			type="button"
-			on:click
+			{onclick}
 			class:check-button={!completed}
 			class:uncheck-button={completed}
 			class:one-time={isOneTime}
@@ -45,9 +60,9 @@
 			title={$t(completed ? 'list.uncomplete' : 'list.complete')}
 			aria-label={$t(completed ? 'list.uncomplete' : 'list.complete')}
 		>
-			<i class="far fa-square" />
-			<i class="fas fa-check-square" />
-			<i class="fas fa-trash-alt" />
+			<i class="far fa-square"></i>
+			<i class="fas fa-check-square"></i>
+			<i class="fas fa-trash-alt"></i>
 		</button>
 	</div>
 </div>

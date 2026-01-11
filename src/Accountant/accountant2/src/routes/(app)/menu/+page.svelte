@@ -10,8 +10,8 @@
 	const localStorage = new LocalStorageUtil();
 
 	const personalAssistantUrl = Variables.urls.account;
-	let reportsDrawerIsOpen = false;
-	let version = '--';
+	let reportsDrawerIsOpen = $state(false);
+	let version = $state('--');
 
 	function toggleReportsDrawer() {
 		reportsDrawerIsOpen = !reportsDrawerIsOpen;
@@ -36,11 +36,11 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive">
-			<i class="fas fa-bars" />
+			<i class="fas fa-bars"></i>
 		</div>
 		<div class="page-title">{$t('menu.menu')}</div>
 		<a href="/dashboard" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -55,7 +55,7 @@
 			<a data-sveltekit-preload-data="tap" href="/automaticTransactions" class="wide-button">{$t('menu.automaticTransactions')}</a>
 
 			<div class="drawer-button-wrap" class:open={reportsDrawerIsOpen}>
-				<button type="button" on:click={toggleReportsDrawer} class="wide-button drawer-button">
+				<button type="button" onclick={toggleReportsDrawer} class="wide-button drawer-button">
 					{$t('menu.reports')}
 				</button>
 				<div class="drawer-content-wrap">
@@ -78,7 +78,7 @@
 
 		<div class="horizontal-buttons-wrap">
 			<a href={personalAssistantUrl} class="wide-button">{$t('menu.goToPersonalAssistant')}</a>
-			<button type="button" on:click={logOut} class="wide-button">{$t('menu.logOut')}</button>
+			<button type="button" onclick={logOut} class="wide-button">{$t('menu.logOut')}</button>
 		</div>
 
 		<hr />

@@ -16,30 +16,33 @@
 
 	import StockPriceInput from '$lib/components/StockPriceInput.svelte';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
 
 	const isNew = data.id === 0;
 
-	let name: string;
-	let currency: string;
-	let isMain: boolean;
-	let stockPrice: number | null;
-	let createdDate: Date | null;
-	let modifiedDate: Date | null;
-	let synced = false;
-	let isMainAccount: boolean;
+	let name: string = $state('');
+	let currency: string | null = $state(null);
+	let stockPrice: number | null = $state(null);
+	let createdDate: Date | null = $state(null);
+	let modifiedDate: Date | null = $state(null);
+	let synced = $state(false);
+	let isMainAccount: boolean | null = $state(null);
 	let nameInput: HTMLInputElement;
-	let nameIsInvalid = false;
-	let stockPriceIsInvalid = false;
-	let investmentFund: boolean;
-	let investmentFundCheckboxDisabled = true;
-	let saveButtonText: string;
-	let transactionsWarningVisible = false;
-	let deleteInProgress = false;
-	let deleteButtonText: string;
-	let saveButtonIsLoading = false;
-	let deleteButtonIsLoading = false;
-	let accountHasTransactionsHtml: string;
+	let nameIsInvalid = $state(false);
+	let stockPriceIsInvalid = $state(false);
+	let investmentFund = $state(false);
+	let investmentFundCheckboxDisabled = $state(true);
+	let saveButtonText = $state('');
+	let transactionsWarningVisible = $state(false);
+	let deleteInProgress = $state(false);
+	let deleteButtonText = $state('');
+	let saveButtonIsLoading = $state(false);
+	let deleteButtonIsLoading = $state(false);
+	let accountHasTransactionsHtml = $state('');
 
 	const localStorage = new LocalStorageUtil();
 	let accountsService: AccountsService;
@@ -51,9 +54,15 @@
 		}
 	});
 
-	$: canSave = $syncStatus.status !== SyncEvents.SyncStarted && !ValidationUtil.isEmptyOrWhitespace(name) && !(!$isOnline && synced);
+	let canSave = $derived($syncStatus.status !== SyncEvents.SyncStarted && !ValidationUtil.isEmptyOrWhitespace(name) && !(!$isOnline && synced));
 
-	async function save() {
+	async function save(event: Event) {
+		if (currency === null || isMainAccount === null) {
+			throw new Error('Data not initialized yet');
+		}
+
+		event.preventDefault();
+
 		saveButtonIsLoading = true;
 		alertState.update((x) => {
 			x.hide();
@@ -78,7 +87,7 @@
 				}
 			} else {
 				try {
-					const account = new Account(data.id, name, currency, isMain, createdDate, modifiedDate);
+					const account = new Account(data.id, name, currency, isMainAccount, createdDate, modifiedDate);
 					account.stockPrice = investmentFund ? stockPrice : null;
 
 					await accountsService.update(account);
@@ -150,9 +159,6 @@
 		} else {
 			saveButtonText = $t('save');
 
-			const mainId = await accountsService.getMainId();
-			isMainAccount = data.id === mainId;
-
 			const account = await accountsService.get(data.id);
 			if (account === null) {
 				throw new Error('Account not found');
@@ -160,7 +166,7 @@
 
 			name = account.name;
 			currency = account.currency;
-			isMain = account.isMain;
+			isMainAccount = account.isMain;
 			stockPrice = account.stockPrice;
 			createdDate = account.createdDate;
 			modifiedDate = account.modifiedDate;
@@ -181,7 +187,7 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive small">
-			<i class="fas fa-pencil-alt" />
+			<i class="fas fa-pencil-alt"></i>
 		</div>
 		<div class="page-title">
 			{#if isNew}
@@ -191,7 +197,7 @@
 			{/if}
 		</div>
 		<a href="/accounts" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -204,7 +210,7 @@
 			<AlertBlock type="info" message={$t('editAccount.mainAccount')} />
 		{/if}
 
-		<form on:submit|preventDefault={save}>
+		<form onsubmit={save}>
 			<div class="form-control">
 				<input
 					type="text"
@@ -227,7 +233,7 @@
 					{#if investmentFund}
 						<div class="form-control inline">
 							<label for="stock-price">{$t('editAccount.stockPrice')}</label>
-							<StockPriceInput bind:stockPrice bind:currency bind:invalid={stockPriceIsInvalid} />
+							<StockPriceInput bind:stockPrice {currency} invalid={stockPriceIsInvalid} />
 						</div>
 					{/if}
 				</div>
@@ -243,7 +249,7 @@
 				{#if !deleteInProgress}
 					<button class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
 						<span class="button-loader" class:loading={saveButtonIsLoading}>
-							<i class="fas fa-circle-notch fa-spin" />
+							<i class="fas fa-circle-notch fa-spin"></i>
 						</span>
 						<span>{saveButtonText}</span>
 					</button>
@@ -252,20 +258,20 @@
 				{#if !isNew && !isMainAccount}
 					<button
 						type="button"
-						on:click={deleteAccount}
+						onclick={deleteAccount}
 						class="button danger-button"
 						disabled={deleteButtonIsLoading}
 						class:confirm={deleteInProgress}
 					>
 						<span class="button-loader" class:loading={deleteButtonIsLoading}>
-							<i class="fas fa-circle-notch fa-spin" />
+							<i class="fas fa-circle-notch fa-spin"></i>
 						</span>
 						<span>{deleteButtonText}</span>
 					</button>
 				{/if}
 
 				{#if isNew || deleteInProgress || isMainAccount}
-					<button type="button" on:click={cancel} class="button secondary-button">
+					<button type="button" onclick={cancel} class="button secondary-button">
 						{$t('cancel')}
 					</button>
 				{/if}

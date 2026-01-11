@@ -9,13 +9,12 @@
 	import { isOnline } from '$lib/stores';
 	import { TransactionsService } from '$lib/services/transactionsService';
 
-	let synced: boolean;
-	let exportText: string;
-	let exportButtonIsLoading = false;
+	let exportText = $state('');
+	let exportButtonIsLoading = $state(false);
 
 	let transactionsService: TransactionsService;
 
-	$: canExport = isOnline && !exportButtonIsLoading;
+	let canExport = $derived(isOnline && !exportButtonIsLoading);
 
 	async function exportTransactions() {
 		exportButtonIsLoading = true;
@@ -61,25 +60,25 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive small">
-			<i class="fas fa-download" />
+			<i class="fas fa-download"></i>
 		</div>
 		<div class="page-title">{$t('export.export')}</div>
 		<a href="/dashboard" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
 	<div class="content-wrap">
-		{#if !$isOnline && synced}
+		{#if !$isOnline}
 			<AlertBlock type="warning" message={$t('export.offlineText')} />
 		{/if}
 
-		<div contenteditable="false" bind:innerHTML={exportText} class="text-wrap" />
+		<div contenteditable="false" bind:innerHTML={exportText} class="text-wrap"></div>
 
 		<div class="save-delete-wrap">
-			<button type="button" on:click={exportTransactions} class="button primary-button" disabled={!canExport}>
+			<button type="button" onclick={exportTransactions} class="button primary-button" disabled={!canExport}>
 				<span class="button-loader" class:loading={exportButtonIsLoading}>
-					<i class="fas fa-circle-notch fa-spin" />
+					<i class="fas fa-circle-notch fa-spin"></i>
 				</span>
 				<span>{$t('export.export')}</span>
 			</button>

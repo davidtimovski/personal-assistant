@@ -17,13 +17,13 @@
 	import { SearchFilters } from '$lib/models/viewmodels/searchFilters';
 	import { TransactionType } from '$lib/models/viewmodels/transactionType';
 
-	let chartPrepared = false;
-	let isDeposits = false;
+	let chartPrepared = $state(false);
+	let isDeposits = $state(false);
 	let mainAccountId: number;
-	let currency: string;
+	let currency: string | null = $state(null);
 	let chart: Chart<'pie', number[], unknown>;
-	let items: PieChartItem[] | null = null;
-	let sum = 0;
+	let items: PieChartItem[] | null = $state(null);
+	let sum = $state(0);
 	let canvas: HTMLCanvasElement;
 	let canvasCtx: CanvasRenderingContext2D | null = null;
 	const colors = ['#7a79e6', '#dbd829', '#49e09b', '#e88042', '#5aacf1', '#f55551', '#b6ca53'];
@@ -34,16 +34,20 @@
 
 	const from = new Date();
 	from.setDate(1);
-	let fromDate = DateHelper.format(from);
-	let toDate = DateHelper.format(new Date());
+	let fromDate = $state(DateHelper.format(from));
+	let toDate = $state(DateHelper.format(new Date()));
 	const maxDate = toDate;
 
 	Chart.register(ArcElement, PieController);
 	Chart.defaults.font.family = '"Didact Gothic", sans-serif';
 
-	$: type = isDeposits ? TransactionType.Deposit : TransactionType.Expense;
+	let type = $derived(isDeposits ? TransactionType.Deposit : TransactionType.Expense);
 
 	async function loadData() {
+		if (currency === null) {
+			throw new Error('Currency not initialized yet');
+		}
+
 		chartPrepared = false;
 		chart.data.labels = [];
 		chart.data.datasets[0].data = [];
@@ -140,11 +144,11 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive medium">
-			<i class="fas fa-chart-pie" />
+			<i class="fas fa-chart-pie"></i>
 		</div>
 		<div class="page-title">{$t('pieChartReport.pieChart')}</div>
 		<a href="/dashboard" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -152,11 +156,11 @@
 		<form>
 			<div class="form-control inline">
 				<label for="from-date">{$t('pieChartReport.from')}</label>
-				<input type="date" id="from-date" bind:value={fromDate} on:change={loadData} />
+				<input type="date" id="from-date" bind:value={fromDate} onchange={loadData} />
 			</div>
 			<div class="form-control inline">
 				<label for="to-date">{$t('pieChartReport.to')}</label>
-				<input type="date" id="to-date" bind:value={toDate} on:change={loadData} max={maxDate} />
+				<input type="date" id="to-date" bind:value={toDate} onchange={loadData} max={maxDate} />
 			</div>
 			<div class="form-control">
 				<DoubleRadioBool
@@ -164,20 +168,20 @@
 					leftLabelKey="pieChartReport.expenses"
 					rightLabelKey="pieChartReport.deposits"
 					bind:value={isDeposits}
-					on:change={loadData}
+					onchange={loadData}
 				/>
 			</div>
 		</form>
 
 		{#if !items}
 			<div class="double-circle-loading">
-				<div class="double-bounce1" />
-				<div class="double-bounce2" />
+				<div class="double-bounce1"></div>
+				<div class="double-bounce2"></div>
 			</div>
 		{/if}
 
 		<div class="pie-chart-wrap">
-			<canvas bind:this={canvas} />
+			<canvas bind:this={canvas}></canvas>
 
 			{#if items && items.length === 0}
 				<div class="empty-list-message-wrap">
@@ -192,13 +196,13 @@
 					<tbody>
 						{#each items as item}
 							<tr
-								on:click={() => {
+								onclick={() => {
 									goToTransactions(item);
 								}}
 							>
 								<td>
 									{#if item.color}
-										<span class="legend-color" style="background: {item.color};" />
+										<span class="legend-color" style="background: {item.color};"></span>
 									{/if}
 									<span>{item.categoryName}</span></td
 								>
@@ -206,12 +210,12 @@
 							</tr>
 							{#each item.subItems as subItem}
 								<tr
-									on:click={() => {
+									onclick={() => {
 										goToTransactions(subItem);
 									}}
 								>
 									<td class="sub-category-cell">
-										<span class="legend-color" style="background: {subItem.color};" />{subItem.categoryName}
+										<span class="legend-color" style="background: {subItem.color};"></span>{subItem.categoryName}
 									</td>
 									<td class="amount-cell">{Formatter.money(subItem.amount, currency, $user.culture)}</td>
 								</tr>

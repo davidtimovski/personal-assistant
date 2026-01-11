@@ -4,7 +4,7 @@
 	import PublicCategorySuggestion from '$lib/components/PublicCategorySuggestion.svelte';
 	import PublicIngredientSuggestion from '$lib/components/PublicIngredientSuggestion.svelte';
 
-	export let category: IngredientCategory;
+	let { category }: { category: IngredientCategory } = $props();
 </script>
 
 {#if category.matched}

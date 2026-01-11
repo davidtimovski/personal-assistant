@@ -7,11 +7,11 @@
 	import { SyncService } from '$lib/services/syncService';
 	import { isOnline } from '$lib/stores';
 
-	let syncButtonIsLoading = false;
+	let syncButtonIsLoading = $state(false);
 
 	let syncService: SyncService;
 
-	$: canSync = $isOnline && !syncButtonIsLoading;
+	let canSync = $derived($isOnline && !syncButtonIsLoading);
 
 	async function sync() {
 		syncButtonIsLoading = true;
@@ -39,11 +39,11 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive medium">
-			<i class="fas fa-cloud-download-alt" />
+			<i class="fas fa-cloud-download-alt"></i>
 		</div>
 		<div class="page-title">{$t('totalSync.totalSync')}</div>
-		<button type="button" on:click={back} class="back-button">
-			<i class="fas fa-times" />
+		<button type="button" onclick={back} class="back-button">
+			<i class="fas fa-times"></i>
 		</button>
 	</div>
 
@@ -55,9 +55,9 @@
 		<AlertBlock type="warning" message={$t('totalSync.syncText')} />
 
 		<div class="save-delete-wrap">
-			<button type="button" on:click={sync} class="button primary-button" disabled={!canSync}>
+			<button type="button" onclick={sync} class="button primary-button" disabled={!canSync}>
 				<span class="button-loader" class:loading={syncButtonIsLoading}>
-					<i class="fas fa-circle-notch fa-spin" />
+					<i class="fas fa-circle-notch fa-spin"></i>
 				</span>
 				<span>{$t('totalSync.sync')}</span>
 			</button>

@@ -13,15 +13,19 @@
 	import { ListsService } from '$lib/services/listsService';
 	import { BulkCreate } from '$lib/models/server/requests/bulkCreate';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
 
-	let tasksText = '';
-	let tasksAreOneTime = false;
-	let tasksArePrivate = false;
-	let listIsShared: boolean;
-	let tasksTextIsInvalid: boolean;
+	let { data }: Props = $props();
+
+	let tasksText = $state('');
+	let tasksAreOneTime = $state(false);
+	let tasksArePrivate = $state(false);
+	let listIsShared: boolean | null = $state(null);
+	let tasksTextIsInvalid: boolean | null = $state(null);
 	let tasksTextInput: HTMLTextAreaElement;
-	let saveButtonIsLoading = false;
+	let saveButtonIsLoading = $state(false);
 
 	const alertStateUnsub = alertState.subscribe((value) => {
 		if (value.hidden) {
@@ -32,9 +36,11 @@
 	let tasksService: TasksService;
 	let listsService: ListsService;
 
-	$: canSave = !ValidationUtil.isEmptyOrWhitespace(tasksText);
+	let canSave = $derived(!ValidationUtil.isEmptyOrWhitespace(tasksText));
 
-	async function save() {
+	async function save(event: Event) {
+		event.preventDefault();
+
 		saveButtonIsLoading = true;
 		alertState.update((x) => {
 			x.hide();
@@ -87,16 +93,16 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive">
-			<i class="fas fa-list-ol" />
+			<i class="fas fa-list-ol"></i>
 		</div>
 		<div class="page-title">{$t('bulkAddTasks.bulkAddTasks')}</div>
 		<a href="/list/{data.id}" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
 	<div class="content-wrap">
-		<form on:submit|preventDefault={save}>
+		<form onsubmit={save}>
 			<div class="form-control">
 				<textarea
 					bind:value={tasksText}
@@ -104,7 +110,7 @@
 					class:invalid={tasksTextIsInvalid}
 					placeholder={$t('bulkAddTasks.eachRow')}
 					aria-label={$t('bulkAddTasks.eachRow')}
-				/>
+				></textarea>
 			</div>
 
 			<div class="form-control">
@@ -119,9 +125,9 @@
 		</form>
 
 		<div class="save-delete-wrap">
-			<button type="button" on:click={save} class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
+			<button type="button" onclick={save} class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
 				<span class="button-loader" class:loading={saveButtonIsLoading}>
-					<i class="fas fa-circle-notch fa-spin" />
+					<i class="fas fa-circle-notch fa-spin"></i>
 				</span>
 				<span>{$t('bulkAddTasks.add')}</span>
 			</button>

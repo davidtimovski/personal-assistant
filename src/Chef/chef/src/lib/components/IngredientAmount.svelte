@@ -3,8 +3,7 @@
 
 	const pluralizableUnits = ['cup', 'tbsp', 'tsp'];
 
-	export let amount: number;
-	export let unit: string;
+	let { amount = $bindable<number>(), unit = $bindable<string>() }: { amount: number; unit: string } = $props();
 
 	function decimalToFractionString(number: number): string {
 		if (Number.isInteger(number)) {
@@ -56,7 +55,7 @@
 		return new Intl.NumberFormat().format(number).toString();
 	}
 
-	$: amountLabel = () => {
+	let amountLabel = $derived.by(() => {
 		if (unit === 'pinch') {
 			return 'pinch';
 		}
@@ -73,11 +72,11 @@
 		const unitText = amount > 1 && pluralizableUnits.includes(unit) ? $t(`recipe.${unit}Plural`) : $t(unit);
 
 		return amountText + ' ' + unitText;
-	};
+	});
 </script>
 
 <div class="ingredient-amount">
-	{amountLabel()}
+	{amountLabel}
 </div>
 
 <style lang="scss">

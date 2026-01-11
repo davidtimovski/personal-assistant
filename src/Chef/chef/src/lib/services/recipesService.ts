@@ -3,7 +3,7 @@ import { ErrorLogger } from '../../../../../Core/shared2/services/errorLogger';
 import { ValidationResult, ValidationUtil } from '../../../../../Core/shared2/utils/validationUtils';
 
 import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
-import { state } from '$lib/stores';
+import { localState } from '$lib/stores';
 import type { RecipeModel } from '$lib/models/viewmodels/recipeModel';
 import type { ViewRecipe } from '$lib/models/viewmodels/viewRecipe';
 import type { ShareRequest } from '$lib/models/viewmodels/shareRequest';
@@ -21,7 +21,7 @@ import type { SetShareIsAccepted } from '$lib/models/server/requests/setShareIsA
 import type { CreateSendRequest } from '$lib/models/server/requests/createSendRequest';
 import { DeclineSendRequest } from '$lib/models/server/requests/declineSendRequest';
 import type { ImportRecipe } from '$lib/models/server/requests/importRecipe';
-import { State } from '$lib/models/state';
+import { LocalState } from '$lib/models/localState';
 import Variables from '$lib/variables';
 
 export class RecipesService {
@@ -33,14 +33,14 @@ export class RecipesService {
 		if (includeCache) {
 			let cachedRecipes = this.localStorage.getObject<RecipeModel[]>('homePageData');
 			if (cachedRecipes) {
-				state.set(new State(cachedRecipes, true));
+				localState.set(new LocalState(cachedRecipes, true));
 			}
 		}
 
 		const recipes = await this.httpProxy.ajax<RecipeModel[]>(`${Variables.urls.api}/recipes`);
 
 		this.localStorage.set('homePageData', JSON.stringify(recipes));
-		state.set(new State(recipes, false));
+		localState.set(new LocalState(recipes, false));
 	}
 
 	async get(id: number, currency: string): Promise<ViewRecipe> {
@@ -52,7 +52,7 @@ export class RecipesService {
 		recipe!.lastOpenedDate = new Date();
 
 		this.localStorage.set('homePageData', JSON.stringify(cachedRecipes));
-		state.set(new State(cachedRecipes, false));
+		localState.set(new LocalState(cachedRecipes, false));
 
 		return result;
 	}

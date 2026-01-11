@@ -4,22 +4,20 @@
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
 	import { ForecastsService } from '$lib/services/forecastsService';
-	import { TimeOfDay, type DailyForecast } from '$lib/models/forecast';
+	import { DailyForecast, TimeOfDay } from '$lib/models/forecast';
 	import { WeatherCode } from '$lib/models/weatherCode';
 
 	import Illustration from '$lib/components/Illustration.svelte';
 
-	export let forecast: DailyForecast;
+	let { forecast }: { forecast: DailyForecast } = $props();
 
-	let weatherDescription = '';
-	let precipitationUnit = '';
+	let weatherDescription = $state('');
+	let precipitationUnit = $state('');
 	const weatherDescriptionTr = new Map<WeatherCode, string>();
 	const precipitationUnitsTr = new Map<string, string>();
 
-	$: maxTempColor =
-		forecast.temperatureMax !== null ? ForecastsService.getTempColor(forecast.temperatureMax) : 'inherit';
-	$: minTempColor =
-		forecast.temperatureMax !== null ? ForecastsService.getTempColor(forecast.temperatureMin) : 'inherit';
+	let maxTempColor = $derived(forecast.temperatureMax !== null ? ForecastsService.getTempColor(forecast.temperatureMax) : 'inherit');
+	let minTempColor = $derived(forecast.temperatureMax !== null ? ForecastsService.getTempColor(forecast.temperatureMin) : 'inherit');
 
 	let localStorage: LocalStorageUtil;
 
@@ -78,29 +76,33 @@
 		<div class="weather-description">{weatherDescription}</div>
 
 		<table class="precipitation">
-			<tr class="precipitation">
-				<td><i class="fa-solid fa-droplet" /></td>
-				<td>
-					<span class="current-value">{forecast.precipitation}</span>
-					<span>{precipitationUnit}</span>
-				</td>
-			</tr>
+			<tbody>
+				<tr class="precipitation">
+					<td><i class="fa-solid fa-droplet"></i></td>
+					<td>
+						<span class="current-value">{forecast.precipitation}</span>
+						<span>{precipitationUnit}</span>
+					</td>
+				</tr>
+			</tbody>
 		</table>
 	</div>
 
-	<div class="gutter" />
+	<div class="gutter"></div>
 
 	<div class="hourly-forecast">
 		<table>
-			{#each forecast.hourly as hourForecast}
-				<tr>
-					<td>{hourForecast.timeString} {$t('h')}</td>
-					<td class="hourly-illustration">
-						<Illustration weatherCode={hourForecast.weatherCode} timeOfDay={hourForecast.timeOfDay} />
-					</td>
-					<td>{hourForecast.temperature}°</td>
-				</tr>
-			{/each}
+			<tbody>
+				{#each forecast.hourly as hourForecast}
+					<tr>
+						<td>{hourForecast.timeString} {$t('h')}</td>
+						<td class="hourly-illustration">
+							<Illustration weatherCode={hourForecast.weatherCode} timeOfDay={hourForecast.timeOfDay} />
+						</td>
+						<td>{hourForecast.temperature}°</td>
+					</tr>
+				{/each}
+			</tbody>
 		</table>
 	</div>
 </div>
@@ -145,9 +147,6 @@
 			font-size: 1.5rem;
 		}
 
-		.wind i {
-			color: #999;
-		}
 		.precipitation i {
 			color: #5aacf1;
 		}

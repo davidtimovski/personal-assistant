@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
 	import { t } from '$lib/localization/i18n';
@@ -18,27 +17,33 @@
 	import IngredientAmount from '$lib/components/IngredientAmount.svelte';
 	import ServingsSelector from '$lib/components/ServingsSelector.svelte';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
 
-	let editedId: number | undefined;
-	let topDrawerIsOpen = false;
-	let shareButtonText: string;
-	let model: ViewRecipe | undefined;
-	let instructionsInHtml: string | undefined;
-	let videoIFrame: HTMLIFrameElement;
-	let videoIFrameSrc = '';
-	let servingsSelectorIsVisible = false;
-	let currency: string;
-	let wakeLockSupported: boolean | undefined;
+	let { data }: Props = $props();
+
+	let editedId: number | undefined = $state(undefined);
+	let topDrawerIsOpen = $state(false);
+	let shareButtonText = $state('');
+	let model: ViewRecipe | undefined = $state(undefined);
+	let instructionsInHtml: string | undefined = $state(undefined);
+	let videoIFrame: HTMLIFrameElement | null = $state(null);
+	let videoIFrameSrc = $state('');
+	let servingsSelectorIsVisible = $state(false);
+	let currency: string | null = $state(null);
+	let wakeLockSupported: boolean | undefined = $state(undefined);
 	let wakeLock: any;
-	let copyAsTextCompleted = false;
+	let copyAsTextCompleted = $state(false);
 	let recipeContainer: HTMLDivElement;
 	let resizeObserver: ResizeObserver;
 
 	let localStorage: LocalStorageUtil;
 	let recipesService: RecipesService;
 
-	function toggleTopDrawer() {
+	function toggleTopDrawer(event: Event) {
+		event.stopPropagation();
+
 		topDrawerIsOpen = !topDrawerIsOpen;
 	}
 
@@ -131,16 +136,16 @@
 	});
 </script>
 
-<section class="container" on:click={closeDrawer}>
+<section class="container" onclick={closeDrawer}>
 	<div class="page-title-wrap">
 		<a href="/editRecipe/{data.id}" class="edit-button" title={$t('recipe.edit')} aria-label={$t('recipe.edit')}>
-			<i class="fas fa-pencil-alt" />
+			<i class="fas fa-pencil-alt"></i>
 		</a>
 
 		<div class="page-title">{model ? model.name : ''}</div>
 
 		<a href="/recipes" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -151,16 +156,16 @@
 					<div class="top-buttons-drawer-content horizontal-buttons-wrap">
 						<!-- <a href="/shareRecipe/{data.id}" class="wide-button">{shareButtonText}</a>
 						<a href="/sendRecipe/{data.id}" class="wide-button">{$t('recipe.sendRecipe')}</a> -->
-						<a on:click={copyAsText} class="wide-button with-badge">
+						<a onclick={copyAsText} class="wide-button with-badge">
 							<span>{$t('recipe.copyAsText')}</span>
-							<i class="fas fa-check badge toggled" class:visible={copyAsTextCompleted} />
+							<i class="fas fa-check badge toggled" class:visible={copyAsTextCompleted}></i>
 						</a>
 					</div>
 				</div>
 
-				<button type="button" on:click|stopPropagation={toggleTopDrawer} class="top-drawer-handle">
-					<i class="fas fa-angle-down" />
-					<i class="fas fa-angle-up" />
+				<button type="button" onclick={toggleTopDrawer} class="top-drawer-handle">
+					<i class="fas fa-angle-down"></i>
+					<i class="fas fa-angle-up"></i>
 				</button>
 			</div>
 		</div>
@@ -169,8 +174,8 @@
 			<div class="recipe-wrap" bind:this={recipeContainer}>
 				{#if !model}
 					<div class="double-circle-loading">
-						<div class="double-bounce1" />
-						<div class="double-bounce2" />
+						<div class="double-bounce1"></div>
+						<div class="double-bounce2"></div>
 					</div>
 				{:else}
 					<div>
@@ -184,8 +189,7 @@
 								bind:this={videoIFrame}
 								src={videoIFrameSrc}
 								class="video-iframe"
-								allowfullscreen
-							/></pre>
+								allowfullscreen></iframe></pre>
 
 						{#if model.prepDuration || model.cookDuration}
 							<div class="prep-cook-duration-wrap">
@@ -214,24 +218,26 @@
 								<header>{$t('recipe.ingredients')}</header>
 
 								<table class="recipe-ingredients-table">
-									{#each model.ingredients as ingredient}
-										<tr class:missing={ingredient.missing}>
-											<td class="recipe-ingredient-name">
-												{ingredient.parentName ? `${ingredient.parentName} (${ingredient.name})` : ingredient.name}
-												<span class="icons-container">
-													{#if ingredient.hasNutritionData}
-														<i class="fas fa-clipboard" title={$t('hasNutrition')} aria-label={$t('hasNutrition')} />
-													{/if}
-													{#if ingredient.hasPriceData}
-														<i class="fas fa-tag" title={$t('hasPrice')} aria-label={$t('hasPrice')} />
-													{/if}
-												</span>
-											</td>
-											<td>
-												<IngredientAmount bind:amount={ingredient.amount} bind:unit={ingredient.unit} />
-											</td>
-										</tr>
-									{/each}
+									<tbody>
+										{#each model.ingredients as ingredient}
+											<tr class:missing={ingredient.missing}>
+												<td class="recipe-ingredient-name">
+													{ingredient.parentName ? `${ingredient.parentName} (${ingredient.name})` : ingredient.name}
+													<span class="icons-container">
+														{#if ingredient.hasNutritionData}
+															<i class="fas fa-clipboard" title={$t('hasNutrition')} aria-label={$t('hasNutrition')}></i>
+														{/if}
+														{#if ingredient.hasPriceData}
+															<i class="fas fa-tag" title={$t('hasPrice')} aria-label={$t('hasPrice')}></i>
+														{/if}
+													</span>
+												</td>
+												<td>
+													<IngredientAmount bind:amount={ingredient.amount} bind:unit={ingredient.unit} />
+												</td>
+											</tr>
+										{/each}
+									</tbody>
 								</table>
 							</section>
 						{/if}
@@ -262,7 +268,7 @@
 												<div
 													style="width: {model.nutritionSummary.caloriesFromDaily}%;"
 													class="nutrition-row-progress {model.nutritionSummary.caloriesFromDailyGrade}"
-												/>
+												></div>
 											{/if}
 										</div>
 									</div>
@@ -274,7 +280,7 @@
 											<div>{$t('fat')}</div>
 											<div>{AmountFormatter.formatGrams(model.nutritionSummary.fat)} g</div>
 										</div>
-										<div class="nutrition-row-progress-wrap" />
+										<div class="nutrition-row-progress-wrap"></div>
 									</div>
 								{/if}
 
@@ -289,7 +295,7 @@
 												<div
 													style="width: {model.nutritionSummary.saturatedFatFromDaily}%;"
 													class="nutrition-row-progress {model.nutritionSummary.saturatedFatFromDailyGrade}"
-												/>
+												></div>
 											{/if}
 										</div>
 									</div>
@@ -306,7 +312,7 @@
 												<div
 													style="width: {model.nutritionSummary.carbohydrateFromDaily}%;"
 													class="nutrition-row-progress {model.nutritionSummary.carbohydrateFromDailyGrade}"
-												/>
+												></div>
 											{/if}
 										</div>
 									</div>
@@ -323,7 +329,7 @@
 												<div
 													style="width: {model.nutritionSummary.sugarsFromDaily}%;"
 													class="nutrition-row-progress {model.nutritionSummary.sugarsFromDailyGrade}"
-												/>
+												></div>
 											{/if}
 										</div>
 									</div>
@@ -340,7 +346,7 @@
 												<div
 													style="width: {model.nutritionSummary.addedSugarsFromDaily}%;"
 													class="nutrition-row-progress {model.nutritionSummary.addedSugarsFromDailyGrade}"
-												/>
+												></div>
 											{/if}
 										</div>
 									</div>
@@ -357,7 +363,7 @@
 												<div
 													style="width: {model.nutritionSummary.fiberFromDaily}%;"
 													class="nutrition-row-progress {model.nutritionSummary.fiberFromDailyGrade}"
-												/>
+												></div>
 											{/if}
 										</div>
 									</div>
@@ -374,7 +380,7 @@
 												<div
 													style="width: {model.nutritionSummary.proteinFromDaily}%;"
 													class="nutrition-row-progress {model.nutritionSummary.proteinFromDailyGrade}"
-												/>
+												></div>
 											{/if}
 										</div>
 									</div>
@@ -391,7 +397,7 @@
 												<div
 													style="width: {model.nutritionSummary.sodiumFromDaily}%;"
 													class="nutrition-row-progress {model.nutritionSummary.sodiumFromDailyGrade}"
-												/>
+												></div>
 											{/if}
 										</div>
 									</div>
@@ -408,7 +414,7 @@
 												<div
 													style="width: {model.nutritionSummary.cholesterolFromDaily}%;"
 													class="nutrition-row-progress {model.nutritionSummary.cholesterolFromDailyGrade}"
-												/>
+												></div>
 											{/if}
 										</div>
 									</div>
@@ -425,7 +431,7 @@
 												<div
 													style="width: {model.nutritionSummary.vitaminAFromDaily}%;"
 													class="nutrition-row-progress {model.nutritionSummary.vitaminAFromDailyGrade}"
-												/>
+												></div>
 											{/if}
 										</div>
 									</div>
@@ -442,7 +448,7 @@
 												<div
 													style="width: {model.nutritionSummary.vitaminCFromDaily}%;"
 													class="nutrition-row-progress {model.nutritionSummary.vitaminCFromDailyGrade}"
-												/>
+												></div>
 											{/if}
 										</div>
 									</div>
@@ -459,7 +465,7 @@
 												<div
 													style="width: {model.nutritionSummary.vitaminDFromDaily}%;"
 													class="nutrition-row-progress {model.nutritionSummary.vitaminDFromDailyGrade}"
-												/>
+												></div>
 											{/if}
 										</div>
 									</div>
@@ -476,7 +482,7 @@
 												<div
 													style="width: {model.nutritionSummary.calciumFromDaily}%;"
 													class="nutrition-row-progress {model.nutritionSummary.calciumFromDailyGrade}"
-												/>
+												></div>
 											{/if}
 										</div>
 									</div>
@@ -493,7 +499,7 @@
 												<div
 													style="width: {model.nutritionSummary.ironFromDaily}%;"
 													class="nutrition-row-progress {model.nutritionSummary.ironFromDailyGrade}"
-												/>
+												></div>
 											{/if}
 										</div>
 									</div>
@@ -510,7 +516,7 @@
 												<div
 													style="width: {model.nutritionSummary.potassiumFromDaily}%;"
 													class="nutrition-row-progress {model.nutritionSummary.potassiumFromDailyGrade}"
-												/>
+												></div>
 											{/if}
 										</div>
 									</div>
@@ -527,7 +533,7 @@
 												<div
 													style="width: {model.nutritionSummary.magnesiumFromDaily}%;"
 													class="nutrition-row-progress {model.nutritionSummary.magnesiumFromDailyGrade}"
-												/>
+												></div>
 											{/if}
 										</div>
 									</div>
@@ -554,7 +560,7 @@
 			</div>
 		</div>
 
-		<button type="button" on:click={closeDrawer} class="body-overlay" class:visible={topDrawerIsOpen} />
+		<button type="button" onclick={closeDrawer} class="body-overlay" class:visible={topDrawerIsOpen}></button>
 	</div>
 </section>
 

@@ -1,39 +1,44 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 	import { t } from '$lib/localization/i18n';
 
-	export let name: string;
-	export let leftLabelKey: string;
-	export let rightLabelKey: string;
-	export let leftValue: string;
-	export let rightValue: string;
-	export let value: string | null;
+	let {
+		name,
+		leftLabelKey,
+		rightLabelKey,
+		leftValue,
+		rightValue,
+		value = $bindable<string | null>(),
+		onchange
+	}: {
+		name: string;
+		leftLabelKey: string;
+		rightLabelKey: string;
+		leftValue: string;
+		rightValue: string;
+		value: string | null;
+		onchange: any;
+	} = $props();
 
 	let leftLabel = $t(leftLabelKey);
 	let rightLabel = $t(rightLabelKey);
-
-	const dispatch = createEventDispatcher();
-	function changeState() {
-		dispatch('change', value);
-	}
 </script>
 
 <div class="double-radio-wrap">
 	<div class="double-radio-side">
 		<label class:selected={value === leftValue}>
 			<span>{leftLabel}</span>
-			<input type="radio" {name} bind:group={value} value={leftValue} on:change={changeState} />
+			<input type="radio" {name} bind:group={value} value={leftValue} {onchange} />
 			<span class="checkbox-icon">
-				<i class="fas fa-check" />
+				<i class="fas fa-check"></i>
 			</span>
 		</label>
 	</div>
 	<div class="double-radio-side">
 		<label class:selected={value === rightValue}>
 			<span>{rightLabel}</span>
-			<input type="radio" {name} bind:group={value} value={rightValue} on:change={changeState} />
+			<input type="radio" {name} bind:group={value} value={rightValue} {onchange} />
 			<span class="checkbox-icon">
-				<i class="fas fa-check" />
+				<i class="fas fa-check"></i>
 			</span>
 		</label>
 	</div>
@@ -71,7 +76,9 @@
 				cursor: pointer;
 				user-select: none;
 
-				transition: background var(--transition), color var(--transition);
+				transition:
+					background var(--transition),
+					color var(--transition);
 
 				&.selected {
 					background: var(--primary-color);

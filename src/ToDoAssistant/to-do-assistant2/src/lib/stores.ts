@@ -7,11 +7,11 @@ import { AlertStatus } from '../../../../Core/shared2/models/enums/alertEvents';
 import { ToDoAssistantUser } from './models/toDoAssistantUser';
 import { RemoteEvent, RemoteEventType } from './models/remoteEvents';
 import Variables from '$lib/variables';
-import { State } from '$lib/models/state';
+import { LocalState } from '$lib/models/localState';
 
 export const isOffline = writable<boolean>(false);
 export const authInfo = writable<AuthInfo | null>(null);
 export const user = writable<ToDoAssistantUser>(new ToDoAssistantUser('', '', 'en-US', 'en-US', Variables.urls.defaultProfileImageUrl, false));
 export const remoteEvents = writable<RemoteEvent>(new RemoteEvent(RemoteEventType.None, null));
 export const alertState = writable<AlertState>(new AlertState(AlertStatus.Hidden, null, []));
-export const state = writable<State>(new State(null, true));
+export const localState = writable<LocalState>(new LocalState(null, true));

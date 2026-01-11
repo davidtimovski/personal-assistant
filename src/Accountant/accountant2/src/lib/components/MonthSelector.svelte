@@ -4,12 +4,18 @@
 	import { user } from '$lib/stores';
 	import { SelectOption } from '$lib/models/viewmodels/selectOption';
 
-	export let month: number | null;
-	export let year: number | null;
-	export let disabled: boolean;
+	let {
+		month = $bindable<number | null>(),
+		year = $bindable<number | null>(),
+		disabled
+	}: {
+		month: number | null;
+		year: number | null;
+		disabled: boolean;
+	} = $props();
 
-	let monthOptions: SelectOption[] | null = null;
-	let yearOptions: number[] | null = null;
+	let monthOptions: SelectOption[] | null = $state(null);
+	let yearOptions: number[] | null = $state(null);
 
 	const now = new Date();
 	let currentMonth = now.getMonth();
@@ -57,7 +63,7 @@
 		{/if}
 	</select>
 
-	<select bind:value={year} on:change={yearSet} {disabled} class="year-select">
+	<select bind:value={year} onchange={yearSet} {disabled} class="year-select">
 		{#if yearOptions}
 			{#each yearOptions as yearOption}
 				<option value={yearOption}>{yearOption}</option>

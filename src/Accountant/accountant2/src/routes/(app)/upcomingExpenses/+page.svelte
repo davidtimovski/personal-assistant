@@ -14,9 +14,9 @@
 	import { UpcomingExpenseItem } from '$lib/models/viewmodels/upcomingExpenseItem';
 	import { SyncEvents } from '$lib/models/syncStatus';
 
-	let upcomingExpenses: UpcomingExpenseItem[] | null = null;
-	let currency: string;
-	let editedId: number | undefined;
+	let upcomingExpenses: UpcomingExpenseItem[] | null = $state(null);
+	let currency: string | null = $state(null);
+	let editedId: number | undefined = $state(undefined);
 
 	const localStorage = new LocalStorageUtil();
 	let upcomingExpensesService: UpcomingExpensesService;
@@ -70,11 +70,11 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive medium">
-			<i class="far fa-calendar-alt" />
+			<i class="far fa-calendar-alt"></i>
 		</div>
 		<div class="page-title">{$t('upcomingExpenses.upcomingExpenses')}</div>
 		<a href="/dashboard" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -82,18 +82,18 @@
 		<div class="content-body">
 			{#if !upcomingExpenses}
 				<div class="double-circle-loading">
-					<div class="double-bounce1" />
-					<div class="double-bounce2" />
+					<div class="double-bounce1"></div>
+					<div class="double-bounce2"></div>
 				</div>
 			{:else if upcomingExpenses.length > 0}
 				<table class="editable-table">
 					<thead>
 						<tr>
-							<th class="edit-link-cell" />
+							<th class="edit-link-cell"></th>
 							<th>{$t('upcomingExpenses.month')}</th>
 							<th>{$t('amount')}</th>
 							<th>{$t('category')}</th>
-							<th class="sync-icon-cell" />
+							<th class="sync-icon-cell"></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -101,7 +101,7 @@
 							<tr class:highlighted-row={upcomingExpense.id === editedId}>
 								<td class="edit-link-cell">
 									<a href="/editUpcomingExpense/{upcomingExpense.id}" class="link" title={$t('edit')} aria-label={$t('edit')}>
-										<i class="fas fa-pencil-alt" />
+										<i class="fas fa-pencil-alt"></i>
 									</a>
 								</td>
 								<td>{upcomingExpense.date}</td>
@@ -109,7 +109,7 @@
 								<td>{upcomingExpense.category}</td>
 								<td class="sync-icon-cell">
 									{#if !upcomingExpense.synced}
-										<i class="fas fa-sync-alt" title={$t('notSynced')} aria-label={$t('notSynced')} />
+										<i class="fas fa-sync-alt" title={$t('notSynced')} aria-label={$t('notSynced')}></i>
 									{/if}
 								</td>
 							</tr>
@@ -124,13 +124,13 @@
 		<div class="centering-wrap">
 			<button
 				type="button"
-				on:click={() => goto('/editUpcomingExpense/0')}
+				onclick={() => goto('/editUpcomingExpense/0')}
 				class="new-button"
 				disabled={$syncStatus.status === SyncEvents.SyncStarted}
 				title={$t('upcomingExpenses.newUpcomingExpense')}
 				aria-label={$t('upcomingExpenses.newUpcomingExpense')}
 			>
-				<i class="fas fa-plus" />
+				<i class="fas fa-plus"></i>
 			</button>
 		</div>
 	</div>

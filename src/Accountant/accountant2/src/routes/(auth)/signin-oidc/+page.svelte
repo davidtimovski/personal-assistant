@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { AuthService } from '../../../../../../Core/shared2/services/authService';
 
-	let containerHeight = 768;
+	let containerHeight = $state(768);
 
 	onMount(async () => {
 		if (window.innerHeight < containerHeight) {
@@ -27,8 +27,8 @@
 <section class="container" style="height: {containerHeight}px">
 	<div>
 		<div class="loader-wrap">
-			<div class="loader" />
-			<i class="fas fa-lock" />
+			<div class="loader"></div>
+			<i class="fas fa-lock"></i>
 		</div>
 
 		<div class="authorizing">Logging in</div>

@@ -24,7 +24,7 @@
 <section class="container" style="height: {containerHeight}px">
 	<div>
 		<div class="loader-wrap">
-			<div class="loader" />
+			<div class="loader"></div>
 		</div>
 
 		<div class="app-name">Weatherman</div>

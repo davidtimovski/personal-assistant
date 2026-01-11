@@ -9,7 +9,7 @@
 	import Tooltip from '../../../../../../../Core/shared2/components/Tooltip.svelte';
 
 	import { t } from '$lib/localization/i18n';
-	import { alertState, state } from '$lib/stores';
+	import { alertState, localState } from '$lib/stores';
 	import { TasksService } from '$lib/services/tasksService';
 	import { ListsService } from '$lib/services/listsService';
 	import type { List } from '$lib/models/entities';
@@ -19,30 +19,34 @@
 	import { UpdateTask } from '$lib/models/server/requests/updateTask';
 	import Variables from '$lib/variables';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
 
-	let listId: number;
-	let name = '';
-	let url = '';
-	let isOneTime = false;
-	let isPrivate = false;
-	let isHighPriority = false;
-	let assignedToUserId: number | null = null;
-	let isInSharedList = false;
-	let recipes: Array<string>;
-	let listOptions: ListOption[] | null = null;
-	let assigneeOptions: Assignee[] | null = null;
+	let { data }: Props = $props();
+
+	let listId: number | null = $state(null);
+	let name = $state('');
+	let url = $state('');
+	let isOneTime: boolean | null = $state(null);
+	let isPrivate: boolean | null = $state(null);
+	let isHighPriority: boolean | null = $state(null);
+	let assignedToUserId: number | null = $state(null);
+	let isInSharedList: boolean | null = $state(null);
+	let recipes: Array<string> | null = $state(null);
+	let listOptions: ListOption[] | null = $state(null);
+	let assigneeOptions: Assignee[] | null = $state(null);
 	let nobodyImageUri = Variables.urls.defaultProfileImageUrl;
-	let nameIsInvalid = false;
-	let urlIsInvalid = false;
-	let recipesText: string;
-	let deleteInProgress = false;
-	let deleteButtonText: string;
-	let saveButtonIsLoading = false;
-	let deleteButtonIsLoading = false;
-	let taskUsedAsIngredientText: string;
-	let deletingWillUnlinkText: string;
-	let loading = true;
+	let nameIsInvalid = $state(false);
+	let urlIsInvalid = $state(false);
+	let recipesText = $state('');
+	let deleteInProgress = $state(false);
+	let deleteButtonText = $state('');
+	let saveButtonIsLoading = $state(false);
+	let deleteButtonIsLoading = $state(false);
+	let taskUsedAsIngredientText: string | null = $state(null);
+	let deletingWillUnlinkText: string | null = $state(null);
+	let loading = $state(true);
 
 	const alertStateUnsub = alertState.subscribe((value) => {
 		if (value.hidden) {
@@ -53,19 +57,21 @@
 	let tasksService: TasksService;
 	let listsService: ListsService;
 
-	$: canSave = () => {
+	$effect(() => {
 		if (isPrivate) {
 			assignedToUserId = null;
 		}
+	});
 
-		return !ValidationUtil.isEmptyOrWhitespace(name);
-	};
+	let canSave = $derived(!ValidationUtil.isEmptyOrWhitespace(name));
 
-	$: assignToUserLabel = () => {
-		return $t(assignedToUserId ? 'editTask.assignedTo' : 'editTask.assignToUser');
-	};
+	let assignToUserLabel = $derived($t(assignedToUserId ? 'editTask.assignedTo' : 'editTask.assignToUser'));
 
 	async function loadAssigneeOptions() {
+		if (listId === null) {
+			throw new Error('ListId not initialized');
+		}
+
 		const selectedList = <ListOption>(<ListOption[]>listOptions).find((x) => x.id === listId);
 		isInSharedList = selectedList.isShared;
 
@@ -80,7 +86,13 @@
 		url = '';
 	}
 
-	async function save() {
+	async function save(event: Event) {
+		if (listId === null || isOneTime === null || isHighPriority === null) {
+			throw new Error('Data not initialized');
+		}
+
+		event.preventDefault();
+
 		saveButtonIsLoading = true;
 		alertState.update((x) => {
 			x.hide();
@@ -112,11 +124,15 @@
 	}
 
 	async function deleteTask() {
+		if (listId === null || recipes === null) {
+			throw new Error('Data not initialized');
+		}
+
 		if (deleteInProgress) {
 			deleteButtonIsLoading = true;
 
 			await tasksService.delete(data.id);
-			tasksService.deleteLocal(data.id, listId, <List[]>$state.lists);
+			tasksService.deleteLocal(data.id, listId, <List[]>$localState.lists);
 
 			alertState.update((x) => {
 				x.showSuccess('editTask.deleteSuccessful');
@@ -192,25 +208,25 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive small">
-			<i class="fas fa-pencil-alt" />
+			<i class="fas fa-pencil-alt"></i>
 		</div>
 		<div class="page-title">
 			<span><span>{$t('editTask.edit')}</span>&nbsp;<span class="colored-text">{name}</span></span>
 		</div>
 
 		<a href="/list/{listId}" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
 	<div class="content-wrap">
 		{#if loading}
 			<div class="double-circle-loading">
-				<div class="double-bounce1" />
-				<div class="double-bounce2" />
+				<div class="double-bounce1"></div>
+				<div class="double-bounce2"></div>
 			</div>
 		{:else}
-			<form on:submit|preventDefault={save}>
+			<form onsubmit={save}>
 				<div class="form-control">
 					<input
 						type="text"
@@ -233,14 +249,14 @@
 						aria-label={$t('editTask.url')}
 					/>
 					{#if url}
-						<button type="button" on:click={clearUrl} class="clear-url-button" title={$t('clear')} aria-label={$t('clear')}>
-							<i class="fas fa-times" />
+						<button type="button" onclick={clearUrl} class="clear-url-button" title={$t('clear')} aria-label={$t('clear')}>
+							<i class="fas fa-times"></i>
 						</button>
 					{/if}
 				</div>
 
 				<div class="form-control">
-					<select id="from-account" bind:value={listId} on:change={loadAssigneeOptions} disabled={!listOptions} aria-label={$t('editTask.list')}>
+					<select id="from-account" bind:value={listId} onchange={loadAssigneeOptions} disabled={!listOptions} aria-label={$t('editTask.list')}>
 						{#if listOptions}
 							{#each listOptions as list}
 								<option value={list.id}>{list.name}</option>
@@ -266,7 +282,7 @@
 
 					{#if !isPrivate && assigneeOptions}
 						<div class="assign-to-user">
-							<div class="assign-to-user-header">{assignToUserLabel()}</div>
+							<div class="assign-to-user-header">{assignToUserLabel}</div>
 							<div class="assign-to-user-content">
 								<label class="radio" class:selected={!assignedToUserId}>
 									<img src={nobodyImageUri} class="assign-to-user-image" alt="" />
@@ -285,7 +301,7 @@
 											alt={$t('profilePicture', { name: assigneeOption.name })}
 										/>
 										<div class="assign-to-user-item">
-											<span>{assigneeOption.name} <i class="fas fa-check" /></span>
+											<span>{assigneeOption.name} <i class="fas fa-check"></i></span>
 											<input type="radio" name="assign" bind:group={assignedToUserId} value={assigneeOption.id} />
 										</div>
 									</label>
@@ -298,35 +314,35 @@
 
 			<hr />
 
-			{#if deleteInProgress && recipes.length > 0}
+			{#if deleteInProgress && recipes !== null && recipes.length > 0}
 				<div class="delete-confirmation-alert">
-					<span contenteditable="false" bind:innerHTML={taskUsedAsIngredientText} />
+					<span contenteditable="false" bind:innerHTML={taskUsedAsIngredientText}></span>
 					<br />
-					<span contenteditable="false" bind:innerHTML={recipesText} />.
+					<span contenteditable="false" bind:innerHTML={recipesText}></span>.
 					<br />
-					<span contenteditable="false" bind:innerHTML={deletingWillUnlinkText} />
+					<span contenteditable="false" bind:innerHTML={deletingWillUnlinkText}></span>
 				</div>
 			{/if}
 
 			<div class="save-delete-wrap">
 				{#if !deleteInProgress}
-					<button type="button" on:click={save} class="button primary-button" disabled={!canSave() || saveButtonIsLoading}>
+					<button type="button" onclick={save} class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
 						<span class="button-loader" class:loading={saveButtonIsLoading}>
-							<i class="fas fa-circle-notch fa-spin" />
+							<i class="fas fa-circle-notch fa-spin"></i>
 						</span>
 						<span>{$t('save')}</span>
 					</button>
 				{/if}
 
-				<button type="button" on:click={deleteTask} class="button danger-button" disabled={deleteButtonIsLoading} class:confirm={deleteInProgress}>
+				<button type="button" onclick={deleteTask} class="button danger-button" disabled={deleteButtonIsLoading} class:confirm={deleteInProgress}>
 					<span class="button-loader" class:loading={deleteButtonIsLoading}>
-						<i class="fas fa-circle-notch fa-spin" />
+						<i class="fas fa-circle-notch fa-spin"></i>
 					</span>
 					<span>{deleteButtonText}</span>
 				</button>
 
 				{#if deleteInProgress}
-					<button type="button" on:click={cancel} class="button secondary-button">
+					<button type="button" onclick={cancel} class="button secondary-button">
 						{$t('cancel')}
 					</button>
 				{/if}

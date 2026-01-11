@@ -1,4 +1,4 @@
-import type { EditRecipeIngredient } from './editRecipeIngredient';
+import type { EditRecipeIngredient } from './editRecipeIngredient.svelte';
 import type { SharingState } from './sharingState';
 
 export class EditRecipeModel {

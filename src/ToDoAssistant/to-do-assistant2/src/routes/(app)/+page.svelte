@@ -5,7 +5,7 @@
 	import { LocalStorageKeys, LocalStorageUtil } from '$lib/utils/localStorageUtil';
 	import { authInfo } from '$lib/stores';
 
-	let containerHeight = 768;
+	let containerHeight = $state(768);
 
 	const localStorage = new LocalStorageUtil();
 
@@ -30,7 +30,7 @@
 <section class="container" style="height: {containerHeight}px">
 	<div>
 		<div class="loader-wrap">
-			<div class="loader" />
+			<div class="loader"></div>
 		</div>
 
 		<div class="app-name">To Do Assistant</div>

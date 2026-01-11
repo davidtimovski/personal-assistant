@@ -2,7 +2,7 @@ import { HttpProxy } from '../../../../../Core/shared2/services/httpProxy';
 import { ErrorLogger } from '../../../../../Core/shared2/services/errorLogger';
 import { ValidationResult, ValidationUtil } from '../../../../../Core/shared2/utils/validationUtils';
 
-import { state } from '$lib/stores';
+import { localState } from '$lib/stores';
 import { DerivedLists } from '$lib/services/listsService';
 import { LocalStorageKeys, LocalStorageUtil } from '$lib/utils/localStorageUtil';
 import { List, type Task } from '$lib/models/entities';
@@ -13,7 +13,7 @@ import type { CreateTask } from '$lib/models/server/requests/createTask';
 import type { BulkCreate } from '$lib/models/server/requests/bulkCreate';
 import type { UpdateTask } from '$lib/models/server/requests/updateTask';
 import { CompleteUncomplete } from '$lib/models/server/requests/completeUncomplete';
-import { State } from '$lib/models/state';
+import { LocalState } from '$lib/models/localState';
 import Variables from '$lib/variables';
 
 export class TasksService {
@@ -153,7 +153,7 @@ export class TasksService {
 			}
 		}
 
-		state.set(new State(localLists, false));
+		localState.set(new LocalState(localLists, false));
 	}
 
 	async complete(id: number): Promise<void> {
@@ -237,7 +237,7 @@ export class TasksService {
 			}
 		}
 
-		state.set(new State(localLists, false));
+		localState.set(new LocalState(localLists, false));
 	}
 
 	async uncomplete(id: number): Promise<void> {
@@ -296,7 +296,7 @@ export class TasksService {
 			}
 		}
 
-		state.set(new State(localLists, false));
+		localState.set(new LocalState(localLists, false));
 	}
 
 	// async reorder(id: number, listId: number, oldOrder: number, newOrder: number): Promise<void> {

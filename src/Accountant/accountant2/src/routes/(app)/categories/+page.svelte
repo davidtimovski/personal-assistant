@@ -12,8 +12,8 @@
 	import { SyncEvents } from '$lib/models/syncStatus';
 	import type { Category } from '$lib/models/entities/category';
 
-	let categories: CategoryItem[] | null = null;
-	let editedId: number | undefined;
+	let categories: CategoryItem[] | null = $state(null);
+	let editedId: number | undefined = $state(undefined);
 
 	let categoriesService: CategoriesService;
 
@@ -62,11 +62,11 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive medium">
-			<i class="fas fa-inbox" />
+			<i class="fas fa-inbox"></i>
 		</div>
 		<div class="page-title">{$t('categories.categories')}</div>
 		<a href="/dashboard" class="back-button">
-			<i class="fas fa-times" />
+			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
@@ -74,8 +74,8 @@
 		<div class="content-body">
 			{#if !categories}
 				<div class="double-circle-loading">
-					<div class="double-bounce1" />
-					<div class="double-bounce2" />
+					<div class="double-bounce1"></div>
+					<div class="double-bounce2"></div>
 				</div>
 			{:else if categories.length > 0}
 				{#each categories as category}
@@ -90,19 +90,19 @@
 											title={$t('categories.generatingUpcomingExpenses')}
 											aria-label={$t('categories.generatingUpcomingExpenses')}
 										>
-											<i class="far fa-calendar-alt" />
+											<i class="far fa-calendar-alt"></i>
 										</span>
 									{/if}
 
 									{#if category.type === 1}
 										<span class="category-indicator" title={$t('categories.depositOnly')} aria-label={$t('categories.depositOnly')}>
-											<i class="fas fa-donate" />
+											<i class="fas fa-donate"></i>
 										</span>
 									{/if}
 
 									{#if category.type === 2}
 										<span class="category-indicator" title={$t('categories.expenseOnly')} aria-label={$t('categories.expenseOnly')}>
-											<i class="fas fa-wallet" />
+											<i class="fas fa-wallet"></i>
 										</span>
 									{/if}
 								</span>
@@ -110,7 +110,7 @@
 
 							<div class="sync">
 								{#if !category.synced}
-									<i class="fas fa-sync-alt" title={$t('notSynced')} aria-label={$t('notSynced')} />
+									<i class="fas fa-sync-alt" title={$t('notSynced')} aria-label={$t('notSynced')}></i>
 								{/if}
 							</div>
 						</div>
@@ -127,19 +127,19 @@
 												title={$t('categories.generatingUpcomingExpenses')}
 												aria-label={$t('categories.generatingUpcomingExpenses')}
 											>
-												<i class="far fa-calendar-alt" />
+												<i class="far fa-calendar-alt"></i>
 											</span>
 										{/if}
 
 										{#if sub.type === 1}
 											<span class="category-indicator" title={$t('categories.depositOnly')} aria-label={$t('categories.depositOnly')}>
-												<i class="fas fa-donate" />
+												<i class="fas fa-donate"></i>
 											</span>
 										{/if}
 
 										{#if sub.type === 2}
 											<span class="category-indicator" title={$t('categories.expenseOnly')} aria-label={$t('categories.expenseOnly')}>
-												<i class="fas fa-wallet" />
+												<i class="fas fa-wallet"></i>
 											</span>
 										{/if}
 									</span>
@@ -147,7 +147,7 @@
 
 								<div class="sync">
 									{#if !sub.synced}
-										<i class="fas fa-sync-alt" title={$t('notSynced')} aria-label={$t('notSynced')} />
+										<i class="fas fa-sync-alt" title={$t('notSynced')} aria-label={$t('notSynced')}></i>
 									{/if}
 								</div>
 							</div>
@@ -162,13 +162,13 @@
 		<div class="centering-wrap">
 			<button
 				type="button"
-				on:click={() => goto('/editCategory/0')}
+				onclick={() => goto('/editCategory/0')}
 				class="new-button"
 				disabled={$syncStatus.status === SyncEvents.SyncStarted}
 				title={$t('categories.newCategory')}
 				aria-label={$t('categories.newCategory')}
 			>
-				<i class="fas fa-plus" />
+				<i class="fas fa-plus"></i>
 			</button>
 		</div>
 	</div>

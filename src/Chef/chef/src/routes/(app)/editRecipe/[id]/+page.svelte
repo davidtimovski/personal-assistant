@@ -12,7 +12,7 @@
 	import { RecipesService } from '$lib/services/recipesService';
 	import { UsersService } from '$lib/services/usersService';
 	import type { SharingState } from '$lib/models/viewmodels/sharingState';
-	import { EditRecipeIngredient } from '$lib/models/viewmodels/editRecipeIngredient';
+	import { EditRecipeIngredient } from '$lib/models/viewmodels/editRecipeIngredient.svelte';
 	import { CreateRecipe } from '$lib/models/server/requests/createRecipe';
 	import { UpdateRecipe } from '$lib/models/server/requests/updateRecipe';
 	import type { ChefUser } from '$lib/models/chefUser';
@@ -25,44 +25,48 @@
 	import { IngredientPickEvent, IngredientPickerState } from '$lib/models/ingredientPickerState';
 	import { TimeFormatter } from '$lib/utils/timeFormatter';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
 
 	const isNew = data.id === 0;
 
-	let name = '';
-	let description: string | null;
-	let ingredients = new Array<EditRecipeIngredient>();
-	let instructions: string | null;
+	let name = $state('');
+	let description: string | null = $state(null);
+	let ingredients = $state(new Array<EditRecipeIngredient>());
+	let instructions: string | null = $state(null);
 	let prepDuration: string;
 	let cookDuration: string;
-	let servings = 1;
-	let imageUri = Variables.urls.defaultRecipeImageUrl;
-	let videoUrl: string | null;
-	let sharingState: SharingState;
-	let userIsOwner: boolean;
-	let imageInput: HTMLInputElement;
-	let imageIsUploading = false;
-	let nameInput: HTMLInputElement;
-	let nameIsInvalid: boolean;
-	let videoUrlIsInvalid: boolean;
-	let recipeIngredientIds = new Array<number>();
-	let prepDurationHours = '00';
-	let prepDurationMinutes = '00';
-	let cookDurationHours = '00';
-	let cookDurationMinutes = '00';
-	let confirmationInProgress = false;
-	let saveButtonText: string;
-	let deleteButtonText: string;
-	let leaveButtonText: string;
-	let saveButtonIsLoading = false;
-	let deleteButtonIsLoading = false;
-	let leaveButtonIsLoading = false;
-	let videoIFrame: HTMLIFrameElement;
-	let videoIFrameSrc = '';
+	let servings = $state(1);
+	let imageUri = $state(Variables.urls.defaultRecipeImageUrl);
+	let videoUrl: string | null = $state(null);
+	let sharingState: SharingState | null = $state(null);
+	let userIsOwner: boolean | null = $state(null);
+	let imageInput: HTMLInputElement | null = $state(null);
+	let imageIsUploading = $state(false);
+	let nameInput: HTMLInputElement | null = $state(null);
+	let nameIsInvalid = $state(false);
+	let videoUrlIsInvalid = $state(false);
+	let recipeIngredientIds = $state(new Array<number>());
+	let prepDurationHours = $state('00');
+	let prepDurationMinutes = $state('00');
+	let cookDurationHours = $state('00');
+	let cookDurationMinutes = $state('00');
+	let confirmationInProgress = $state(false);
+	let saveButtonText = $state('');
+	let deleteButtonText = $state('');
+	let leaveButtonText = $state('');
+	let saveButtonIsLoading = $state(false);
+	let deleteButtonIsLoading = $state(false);
+	let leaveButtonIsLoading = $state(false);
+	let videoIFrame: HTMLIFrameElement | null = $state(null);
+	let videoIFrameSrc = $state('');
 	let addIngredientsInputPlaceholder = '';
 	let measuringUnits: (string | null)[];
 	let imperialSystem: boolean;
-	let loading = !isNew;
+	let loading = $state(!isNew);
 	const unsubscriptions: Unsubscriber[] = [];
 
 	unsubscriptions.push(
@@ -116,7 +120,7 @@
 	let recipesService: RecipesService;
 	let usersService: UsersService;
 
-	$: canSave = !ValidationUtil.isEmptyOrWhitespace(name) && !videoUrlIsInvalid;
+	let canSave = $derived(!ValidationUtil.isEmptyOrWhitespace(name) && !videoUrlIsInvalid);
 
 	function videoUrlChanged() {
 		if (!videoUrl) {
@@ -207,7 +211,7 @@
 	}
 
 	async function uploadImage() {
-		if (imageInput.files?.length !== 1) {
+		if (imageInput === null || imageInput.files?.length !== 1) {
 			throw new Error('No files were selected');
 		}
 
@@ -226,7 +230,7 @@
 		imageUri = Variables.urls.defaultRecipeImageUrl;
 	}
 
-	$: imageIsNotDefault = imageUri !== Variables.urls.defaultRecipeImageUrl;
+	let imageIsNotDefault = $derived(imageUri !== Variables.urls.defaultRecipeImageUrl);
 
 	function parseIngredientsAmount(ingredients: EditRecipeIngredient[]) {
 		return ingredients.map((ingredient: EditRecipeIngredient) => {
@@ -242,7 +246,9 @@
 		});
 	}
 
-	async function save() {
+	async function save(event: Event) {
+		event?.preventDefault();
+
 		saveButtonIsLoading = true;
 		alertState.update((x) => {
 			x.hide();
@@ -451,7 +457,7 @@
 <section class="container">
 	<div class="page-title-wrap">
 		<div class="side inactive small">
-			<i class="fas fa-pencil-alt" />
+			<i class="fas fa-pencil-alt"></i>
 		</div>
 		<div class="page-title">
 			{#if isNew}
@@ -460,19 +466,19 @@
 				<span>{$t('editRecipe.edit')}</span>&nbsp;<span class="colored-text">{name}</span>
 			{/if}
 		</div>
-		<button type="button" on:click={back} class="back-button">
-			<i class="fas fa-times" />
+		<button type="button" onclick={back} class="back-button">
+			<i class="fas fa-times"></i>
 		</button>
 	</div>
 
 	<div class="content-wrap">
 		{#if loading}
 			<div class="double-circle-loading">
-				<div class="double-bounce1" />
-				<div class="double-bounce2" />
+				<div class="double-bounce1"></div>
+				<div class="double-bounce2"></div>
 			</div>
 		{:else}
-			<form on:submit|preventDefault={save} class="edit-recipe-form">
+			<form onsubmit={save} class="edit-recipe-form">
 				<div class="form-control">
 					<input
 						type="text"
@@ -488,12 +494,12 @@
 				<div class="edit-image-wrap">
 					<img src={imageUri} class="image" alt={$t('editRecipe.imageOfMeal')} />
 					<div class="image-loader" class:uploading={imageIsUploading}>
-						<i class="fas fa-circle-notch fa-spin" />
+						<i class="fas fa-circle-notch fa-spin"></i>
 					</div>
 					<div hidden={imageIsUploading} class="edit-image-buttons">
-						<input type="file" on:change={uploadImage} bind:this={imageInput} id="file-input" accept="image/*" />
+						<input type="file" onchange={uploadImage} bind:this={imageInput} id="file-input" accept="image/*" />
 						<label for="file-input">{$t('editRecipe.change')}</label>
-						<button type="button" hidden={!imageIsNotDefault} on:click={removeImage}>
+						<button type="button" hidden={!imageIsNotDefault} onclick={removeImage}>
 							{$t('editRecipe.remove')}
 						</button>
 					</div>
@@ -506,7 +512,7 @@
 						maxlength="250"
 						placeholder={$t('editRecipe.description')}
 						aria-label={$t('editRecipe.description')}
-					/>
+					></textarea>
 				</div>
 
 				<div class="form-control">
@@ -514,12 +520,12 @@
 						<input
 							type="text"
 							bind:value={videoUrl}
-							on:change={videoUrlChanged}
+							onchange={videoUrlChanged}
 							class:invalid={videoUrlIsInvalid}
 							placeholder={$t('editRecipe.youTubeUrl')}
 							aria-label={$t('editRecipe.youTubeUrl')}
 						/>
-						<i class="fab fa-youtube" />
+						<i class="fab fa-youtube"></i>
 					</div>
 
 					<pre hidden={videoIFrameSrc.length === 0} class="video-wrap"><iframe
@@ -527,8 +533,7 @@
 							src={videoIFrameSrc}
 							class="video-iframe"
 							title={$t('editRecipe.youTubeUrl')}
-							allowfullscreen
-						/></pre>
+							allowfullscreen></iframe></pre>
 				</div>
 
 				<div class="form-control">
@@ -555,11 +560,11 @@
 												<span>{ingredient.parentName ? `${ingredient.parentName} (${ingredient.name})` : ingredient.name}</span>
 												<span class="icons-container">
 													{#if ingredient.hasNutritionData}
-														<i class="fas fa-clipboard" title={$t('hasNutrition')} aria-label={$t('hasNutrition')} />
+														<i class="fas fa-clipboard" title={$t('hasNutrition')} aria-label={$t('hasNutrition')}></i>
 													{/if}
 
 													{#if ingredient.hasPriceData}
-														<i class="fas fa-tag" title={$t('hasPrice')} aria-label={$t('hasPrice')} />
+														<i class="fas fa-tag" title={$t('hasPrice')} aria-label={$t('hasPrice')}></i>
 													{/if}
 												</span>
 											</div>
@@ -568,12 +573,12 @@
 
 									<button
 										type="button"
-										on:click={() => removeIngredient(ingredient)}
+										onclick={() => removeIngredient(ingredient)}
 										class="remove-button"
 										title={$t('editRecipe.removeIngredient')}
 										aria-label={$t('editRecipe.removeIngredient')}
 									>
-										<i class="fas fa-times-circle" />
+										<i class="fas fa-times-circle"></i>
 									</button>
 								</div>
 
@@ -589,7 +594,7 @@
 									/>
 									<button
 										type="button"
-										on:click={() => toggleUnit(ingredient)}
+										onclick={() => toggleUnit(ingredient)}
 										class="unit-toggle {ingredient.unit === null ? 'fas fa-asterisk' : ''}"
 										class:pinch={ingredient.unit === 'pinch'}
 										title={$t('editRecipe.toggleUnitOfMeasure')}
@@ -602,12 +607,8 @@
 				</div>
 
 				<div class="form-control">
-					<textarea
-						bind:value={instructions}
-						maxlength="5000"
-						placeholder={$t('editRecipe.instructions')}
-						aria-label={$t('editRecipe.instructions')}
-					/>
+					<textarea bind:value={instructions} maxlength="5000" placeholder={$t('editRecipe.instructions')} aria-label={$t('editRecipe.instructions')}
+					></textarea>
 				</div>
 
 				<div class="form-control">
@@ -617,7 +618,7 @@
 							<input
 								type="number"
 								bind:value={prepDurationHours}
-								on:keyup={prepDurationChanged}
+								onkeyup={prepDurationChanged}
 								min="0"
 								max="23"
 								class="duration-input hours"
@@ -627,7 +628,7 @@
 							<input
 								type="number"
 								bind:value={prepDurationMinutes}
-								on:keyup={prepDurationChanged}
+								onkeyup={prepDurationChanged}
 								min="0"
 								max="59"
 								class="duration-input minutes"
@@ -640,7 +641,7 @@
 							<input
 								type="number"
 								bind:value={cookDurationHours}
-								on:keyup={cookDurationChanged}
+								onkeyup={cookDurationChanged}
 								min="0"
 								max="23"
 								class="duration-input hours"
@@ -650,7 +651,7 @@
 							<input
 								type="number"
 								bind:value={cookDurationMinutes}
-								on:keyup={cookDurationChanged}
+								onkeyup={cookDurationChanged}
 								min="0"
 								max="59"
 								class="duration-input minutes"
@@ -668,9 +669,9 @@
 
 			<div class="save-delete-wrap">
 				{#if !confirmationInProgress}
-					<button type="button" on:click={save} class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
+					<button type="button" onclick={save} class="button primary-button" disabled={!canSave || saveButtonIsLoading}>
 						<span class="button-loader" class:loading={saveButtonIsLoading}>
-							<i class="fas fa-circle-notch fa-spin" />
+							<i class="fas fa-circle-notch fa-spin"></i>
 						</span>
 						<span>{saveButtonText}</span>
 					</button>
@@ -679,13 +680,13 @@
 				{#if !isNew && sharingState !== 3}
 					<button
 						type="button"
-						on:click={deleteRecipe}
+						onclick={deleteRecipe}
 						class="button danger-button"
 						disabled={deleteButtonIsLoading}
 						class:confirm={confirmationInProgress}
 					>
 						<span class="button-loader" class:loading={deleteButtonIsLoading}>
-							<i class="fas fa-circle-notch fa-spin" />
+							<i class="fas fa-circle-notch fa-spin"></i>
 						</span>
 						<span>{deleteButtonText}</span>
 					</button>
@@ -694,20 +695,20 @@
 				{#if sharingState === 3}
 					<button
 						type="button"
-						on:click={leaveRecipe}
+						onclick={leaveRecipe}
 						class="button danger-button"
 						disabled={leaveButtonIsLoading}
 						class:confirm={confirmationInProgress}
 					>
 						<span class="button-loader" class:loading={leaveButtonIsLoading}>
-							<i class="fas fa-circle-notch fa-spin" />
+							<i class="fas fa-circle-notch fa-spin"></i>
 						</span>
 						<span>{leaveButtonText}</span>
 					</button>
 				{/if}
 
 				{#if isNew || confirmationInProgress}
-					<button type="button" on:click={cancel} class="button secondary-button">
+					<button type="button" onclick={cancel} class="button secondary-button">
 						{$t('cancel')}
 					</button>
 				{/if}
@@ -834,7 +835,7 @@
 			justify-content: space-around;
 			margin-bottom: 20px;
 
-			.duration-side label {
+			.duration-side .label {
 				padding: 0;
 				margin-bottom: 5px;
 				text-align: center;
