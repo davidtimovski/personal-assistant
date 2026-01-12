@@ -2,6 +2,7 @@
 	import { onDestroy } from 'svelte';
 
 	import { AlertStatus } from '../models/enums/alertEvents';
+	import { AlertState } from '../models/alertState';
 
 	import { t } from '$lib/localization/i18n';
 	import { alertState } from '$lib/stores';
@@ -13,7 +14,7 @@
 	let hideTimeout = 0;
 	let resetMessageTimeout = 0;
 
-	const unsubscriber = alertState.subscribe((value) => {
+	const unsubscriber = alertState.subscribe((value: AlertState) => {
 		if (value.status === AlertStatus.Error) {
 			let message = '';
 			let showRefreshLink = false;
@@ -76,7 +77,7 @@
 			reset();
 		}, 1000);
 
-		alertState.update((x) => {
+		alertState.update((x: AlertState) => {
 			x.hide();
 			return x;
 		});
@@ -108,7 +109,7 @@
 <style lang="scss">
 	.alert {
 		position: fixed;
-		bottom: -45px;
+		bottom: -70px;
 		z-index: 1;
 		width: calc(100% - 30px);
 		padding: 0 15px;
@@ -162,7 +163,7 @@
 
 	@media screen and (min-width: 1200px) {
 		.alert {
-			top: -50px;
+			top: -75px;
 			bottom: unset;
 			right: 30px;
 			width: unset;

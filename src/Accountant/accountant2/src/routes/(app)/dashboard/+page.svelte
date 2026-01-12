@@ -449,11 +449,6 @@
 		}
 	}
 
-	/* Workaround for sticky :hover on mobile devices */
-	.touch-device .home-buttons .home-button:hover {
-		color: var(--primary-color);
-	}
-
 	@media screen and (min-width: 1200px) {
 		.home-table td {
 			font-size: 1.1rem;

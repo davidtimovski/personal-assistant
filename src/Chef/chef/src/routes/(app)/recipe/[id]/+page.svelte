@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { page } from '$app/stores';
 	import type { PageData } from './$types';
 
 	import { t } from '$lib/localization/i18n';
@@ -79,7 +78,9 @@
 	onMount(async () => {
 		wakeLockSupported = 'wakeLock' in navigator;
 
-		const edited = $page.url.searchParams.get('edited');
+		const url = new URL(window.location.href);
+		const queryParams = new URLSearchParams(url.search);
+		const edited = queryParams.get('edited');
 		if (edited) {
 			editedId = parseInt(edited, 10);
 		}
