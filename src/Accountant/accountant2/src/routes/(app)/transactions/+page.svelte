@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
 
 	import { DateHelper } from '../../../../../../Core/shared2/utils/dateHelper';
 
@@ -208,7 +207,9 @@
 	}
 
 	onMount(() => {
-		const edited = $page.url.searchParams.get('edited');
+		const url = new URL(window.location.href);
+		const queryParams = new URLSearchParams(url.search);
+		const edited = queryParams.get('edited');
 		if (edited) {
 			editedId = parseInt(edited, 10);
 		}

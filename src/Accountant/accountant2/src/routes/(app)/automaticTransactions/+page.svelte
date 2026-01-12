@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
 
 	import EmptyListMessage from '../../../../../../Core/shared2/components/EmptyListMessage.svelte';
 
@@ -18,7 +17,9 @@
 	let automaticTransactionsService: AutomaticTransactionsService;
 
 	onMount(async () => {
-		const edited = $page.url.searchParams.get('edited');
+		const url = new URL(window.location.href);
+		const queryParams = new URLSearchParams(url.search);
+		const edited = queryParams.get('edited');
 		if (edited) {
 			editedId = parseInt(edited, 10);
 		}

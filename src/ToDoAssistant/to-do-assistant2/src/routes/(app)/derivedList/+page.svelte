@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import type { Unsubscriber } from 'svelte/store';
-	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 
 	import { t } from '$lib/localization/i18n';
@@ -112,7 +111,9 @@
 		derivedListNameLookup.set(DerivedLists.HighPriority, $t('highPriority'));
 		derivedListNameLookup.set(DerivedLists.StaleTasks, $t('staleTasks'));
 
-		type = <string>$page.url.searchParams.get('type');
+		const url = new URL(window.location.href);
+		const queryParams = new URLSearchParams(url.search);
+		type = queryParams.get('type');
 
 		tasksService = new TasksService();
 		soundPlayer = new SoundPlayer();

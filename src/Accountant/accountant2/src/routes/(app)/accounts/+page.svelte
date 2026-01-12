@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
@@ -27,12 +26,14 @@
 	}
 
 	onMount(async () => {
-		const edited = $page.url.searchParams.get('edited');
+		const url = new URL(window.location.href);
+		const queryParams = new URLSearchParams(url.search);
+		const edited = queryParams.get('edited');
 		if (edited) {
 			editedId = parseInt(edited, 10);
 		}
 
-		const edited2 = $page.url.searchParams.get('edited2');
+		const edited2 = queryParams.get('edited2');
 		if (edited2) {
 			editedId2 = parseInt(edited2, 10);
 		}

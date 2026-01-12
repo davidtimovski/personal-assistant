@@ -3,7 +3,6 @@
 	import type { Unsubscriber } from 'svelte/store';
 	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
-	import { page } from '$app/stores';
 
 	import { t } from '$lib/localization/i18n';
 	import { isOffline, user, localState } from '$lib/stores';
@@ -113,7 +112,9 @@
 		});
 		resizeObserver.observe(document.body);
 
-		const edited = $page.url.searchParams.get('edited');
+		const url = new URL(window.location.href);
+		const queryParams = new URLSearchParams(url.search);
+		const edited = queryParams.get('edited');
 		if (edited) {
 			editedId = parseInt(edited, 10);
 		}

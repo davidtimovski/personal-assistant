@@ -1,5 +1,5 @@
-import { HttpProxy } from "../services/httpProxy";
 import { ErrorLogger } from "./errorLogger";
+import { HttpProxy } from "../services/httpProxy";
 import Variables from "$lib/variables";
 
 export class NotificationsServiceBase {

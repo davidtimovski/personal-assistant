@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
 	import type { PageData } from './$types';
 
 	import { DateHelper } from '../../../../../../../Core/shared2/utils/dateHelper';
@@ -277,7 +276,9 @@
 	onMount(async () => {
 		passwordShowIconLabel = $t('showPassword');
 
-		const debtIdParam = $page.url.searchParams.get('debtId');
+		const url = new URL(window.location.href);
+		const queryParams = new URLSearchParams(url.search);
+		const debtIdParam = queryParams.get('debtId');
 		if (debtIdParam) {
 			debtId = parseInt(debtIdParam, 10);
 		}

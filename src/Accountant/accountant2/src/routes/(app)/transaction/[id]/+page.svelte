@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
 	import type { PageData } from './$types';
 
 	import { DateHelper } from '../../../../../../../Core/shared2/utils/dateHelper';
@@ -124,7 +123,9 @@
 		typeStringMap.set(TransactionType.Deposit, $t('transaction.deposit'));
 		typeStringMap.set(TransactionType.Transfer, $t('transaction.transfer'));
 
-		const fromExpenditureHeatmapParam = $page.url.searchParams.get('fromExpenditureHeatmap');
+		const url = new URL(window.location.href);
+		const queryParams = new URLSearchParams(url.search);
+		const fromExpenditureHeatmapParam = queryParams.get('fromExpenditureHeatmap');
 		if (fromExpenditureHeatmapParam) {
 			fromExpenditureHeatmap = fromExpenditureHeatmapParam === 'true';
 		}
