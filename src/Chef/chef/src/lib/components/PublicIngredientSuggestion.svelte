@@ -93,9 +93,4 @@
 	.ingredient-suggestion-children {
 		padding-left: 15px;
 	}
-
-	/* Workaround for sticky :hover on mobile devices */
-	.touch-device .ingredient-suggestion:hover {
-		color: var(--primary-color);
-	}
 </style>
