@@ -61,7 +61,3 @@ An ecosystem of PWAs that cooperate with each other to provide unique functional
 ## Development
 
 You will need an `.env` file if you want to start it locally with Docker. Just create a copy of `.env.example` and update the variables with the appropriate values.
-
-## License
-
-This project is licensed under the GNU GPLv3 License - see the [LICENSE](LICENSE) file for details.
