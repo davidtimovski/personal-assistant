@@ -960,13 +960,6 @@
 		}
 	}
 
-	/* Workaround for sticky :hover on mobile devices */
-	.touch-device .new-ingredient .unit-toggle > button:hover,
-	.touch-device .new-ingredient .unit-toggle > .fa-asterisk:hover,
-	.touch-device .edit-image-wrap label:hover {
-		background: var(--primary-color);
-	}
-
 	@media screen and (min-width: 1200px) {
 		.new-ingredients-wrap .new-ingredient {
 			.ingredient-name {

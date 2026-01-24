@@ -61,7 +61,7 @@
 	async function save(event: Event) {
 		event.preventDefault();
 
-		if (!amount || !currency || !year || !month) {
+		if (!amount || !currency || year === null || month === null) {
 			throw new Error('Unexpected error: required fields missing');
 		}
 

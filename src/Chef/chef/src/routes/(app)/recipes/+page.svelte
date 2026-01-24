@@ -273,9 +273,4 @@
 	.ingredients-missing .num-ingredients-missing {
 		display: block;
 	}
-
-	/* Workaround for sticky :hover on mobile devices */
-	.touch-device .recipe:hover {
-		color: var(--primary-color);
-	}
 </style>

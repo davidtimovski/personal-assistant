@@ -230,3 +230,18 @@ section header {
 		line-height: 43px;
 	}
 }
+
+/* Workaround for sticky :hover on mobile devices */
+.touch-device .recipe:hover {
+	color: var(--primary-color);
+}
+
+.touch-device .ingredient-suggestion:hover {
+	color: var(--primary-color);
+}
+
+.touch-device .new-ingredient .unit-toggle > button:hover,
+.touch-device .new-ingredient .unit-toggle > .fa-asterisk:hover,
+.touch-device .edit-image-wrap label:hover {
+	background: var(--primary-color);
+}
