@@ -146,9 +146,13 @@
 						{
 							const movedFromMain = monthTransactions.filter((x) => x.fromAccountId === mainAccountId);
 							const movedToMain = monthTransactions.filter((x) => x.toAccountId === mainAccountId);
+							const depositedToInvestmentFunds = monthTransactions.filter(
+								(x) => x.fromAccountId !== mainAccountId && x.toAccountId !== mainAccountId
+							);
 
 							item.amount += movedFromMain.map((x) => x.amount).reduce((a, b) => a + b, 0);
 							item.amount -= movedToMain.map((x) => x.amount).reduce((a, b) => a + b, 0);
+							item.amount += depositedToInvestmentFunds.map((x) => x.amount).reduce((a, b) => a + b, 0);
 
 							savedSum += item.amount;
 						}

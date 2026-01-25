@@ -22,7 +22,7 @@ export class CapitalService {
 	async getSpent(mainAccountId: number, uncategorizedLabel: string, currency: string): Promise<{ expenditures: AmountByCategory[]; spent: number }> {
 		try {
 			const transactions = await this.transactionsIDBHelper.getExpendituresForCurrentMonth(mainAccountId);
-			const expenditures = await this.transactionsService.getByCategory(transactions, currency, uncategorizedLabel);
+			const expenditures = await this.transactionsService.getAmountByCategory(transactions, currency, uncategorizedLabel);
 
 			const spent = transactions
 				.filter((x) => !x.isTax)

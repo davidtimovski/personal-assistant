@@ -393,6 +393,16 @@ td.sync-icon-cell {
 	background: #e1e1e1;
 }
 
+/* Early retirement calculator */
+.er-calc-highlight {
+	color: var(--primary-color);
+}
+.retirement-age {
+	color: var(--primary-color);
+	font-size: 1.1rem;
+	font-weight: bold;
+}
+
 @media screen and (min-width: 1200px) {
 	table tr td,
 	.editable-table tr td {

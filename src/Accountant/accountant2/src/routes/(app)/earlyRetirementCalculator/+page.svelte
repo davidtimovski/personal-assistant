@@ -10,6 +10,7 @@
 	import { user } from '$lib/stores';
 	import { AccountsService } from '$lib/services/accountsService';
 	import { LargeUpcomingExpense, SummaryItem } from '$lib/models/viewmodels/earlyRetirementCalculator';
+	import { YearSummaryItem } from './viewmodels/yearSummaryItem';
 
 	import AmountInput from '$lib/components/AmountInput.svelte';
 
@@ -48,7 +49,7 @@
 		'summary',
 		'result'
 	];
-	let currency: string;
+	let currency: string | null = $state(null);
 	let ageIsInvalid = $state(false);
 	let pensionAgeIsInvalid = $state(false);
 	let pensionPerMonthIsInvalid = $state(false);
@@ -57,14 +58,19 @@
 	let preferredRetirementIncomeIsInvalid = $state(false);
 	let earlyRetirementAge: number | null = $state(null);
 	let summaryItems: SummaryItem[] = $state([]);
-	const ageOfDeath = 85;
-	const inflation = 0.025;
+	let yearlySummaryItems: YearSummaryItem[] = $state([]);
+	const lifespan = 85;
+	const yearlyInflation = 0.025;
 
 	const localStorage = new LocalStorageUtil();
 	let accountsService: AccountsService;
 	let currenciesService: CurrenciesService;
 
 	function addUpcomingExpense() {
+		if (currency === null) {
+			throw new Error('Currency not initialized yet');
+		}
+
 		upcomingExpenses = upcomingExpenses.concat(new LargeUpcomingExpense('', 'fas fa-wallet', currency));
 	}
 
@@ -165,7 +171,7 @@
 			summaryItems.push(
 				new SummaryItem(
 					$t('earlyRetirementCalculator.summaryItem2a', {
-						capital: Formatter.money(capital, capitalCurrency, $user.culture)
+						capital: Formatter.moneyPrecise(capital, capitalCurrency, $user.culture, 0)
 					})
 				)
 			);
@@ -174,16 +180,26 @@
 		}
 
 		if (savedPerMonth && parseFloat(savedPerMonth.toString()) > 0) {
-			summaryItems.push(
-				new SummaryItem(
-					$t('earlyRetirementCalculator.summaryItem3a', {
-						savedPerMonth: Formatter.money(savedPerMonth, savedPerMonthCurrency, $user.culture),
-						savingInterestRate: savingInterestRate
-					})
-				)
-			);
+			if (savingInterestRate) {
+				summaryItems.push(
+					new SummaryItem(
+						$t('earlyRetirementCalculator.summaryItem3a', {
+							savedPerMonth: Formatter.moneyPrecise(savedPerMonth, savedPerMonthCurrency, $user.culture, 0),
+							savingInterestRate: savingInterestRate
+						})
+					)
+				);
+			} else {
+				summaryItems.push(
+					new SummaryItem(
+						$t('earlyRetirementCalculator.summaryItem3b', {
+							savedPerMonth: Formatter.moneyPrecise(savedPerMonth, savedPerMonthCurrency, $user.culture, 0)
+						})
+					)
+				);
+			}
 		} else {
-			summaryItems.push(new SummaryItem($t('earlyRetirementCalculator.summaryItem3b')));
+			summaryItems.push(new SummaryItem($t('earlyRetirementCalculator.summaryItem3c')));
 		}
 
 		if (eligibleForPension) {
@@ -191,7 +207,7 @@
 				new SummaryItem(
 					$t('earlyRetirementCalculator.summaryItem4a', {
 						pensionAge: pensionAge,
-						pensionPerMonth: Formatter.money(pensionPerMonth, pensionPerMonthCurrency, $user.culture)
+						pensionPerMonth: Formatter.moneyPrecise(pensionPerMonth, pensionPerMonthCurrency, $user.culture, 0)
 					})
 				)
 			);
@@ -203,7 +219,7 @@
 			summaryItems.push(
 				new SummaryItem(
 					$t('earlyRetirementCalculator.summaryItem5a', {
-						lifeInsuranceReturn: Formatter.money(lifeInsuranceReturn, lifeInsuranceReturnCurrency, $user.culture),
+						lifeInsuranceReturn: Formatter.moneyPrecise(lifeInsuranceReturn, lifeInsuranceReturnCurrency, $user.culture, 0),
 						lifeInsuranceAge: lifeInsuranceAge
 					})
 				)
@@ -219,7 +235,7 @@
 				expensesSummaryItem.children.push(
 					new SummaryItem(
 						$t('earlyRetirementCalculator.summaryItem6a', {
-							amount: Formatter.money(expense.amount, expense.currency, $user.culture),
+							amount: Formatter.moneyPrecise(expense.amount, expense.currency, $user.culture, 0),
 							expense: expense.name
 						})
 					)
@@ -232,12 +248,12 @@
 		summaryItems.push(
 			new SummaryItem(
 				$t('earlyRetirementCalculator.summaryItem7', {
-					retirementIncome: Formatter.money(retirementIncome, retirementIncomeCurrency, $user.culture)
+					retirementIncome: Formatter.moneyPrecise(retirementIncome, retirementIncomeCurrency, $user.culture, 0)
 				})
 			)
 		);
 
-		summaryItems.push(new SummaryItem($t('earlyRetirementCalculator.summaryItem8', { inflation: inflation * 100 })));
+		summaryItems.push(new SummaryItem($t('earlyRetirementCalculator.summaryItem8', { lifespan: lifespan, inflation: yearlyInflation * 100 })));
 
 		currentSection = 'summary';
 	}
@@ -280,7 +296,7 @@
 
 		let pensionSum = 0;
 		if (eligibleForPension) {
-			const yearsTakingPension = ageOfDeath - getIntValueOrZero(pensionAge);
+			const yearsTakingPension = lifespan - getIntValueOrZero(pensionAge);
 			const pension = getConvertedValueOrZero(<number>pensionPerMonth, pensionPerMonthCurrency);
 			pensionSum = yearsTakingPension * 12 * pension;
 		}
@@ -288,43 +304,61 @@
 		lifeInsuranceAge = getIntValueOrZero(lifeInsuranceAge);
 		const lifeInsuranceConverted = hasLifeInsurance ? getConvertedValueOrZero(<number>lifeInsuranceReturn, lifeInsuranceReturnCurrency) : 0;
 
-		const monthlyInflationFactor = 1 - inflation / 12;
 		const savingInterestMonthlyFactor = 1 + getFloatValueOrZero(savingInterestRate) / 100 / 12;
 		const savedPerMonthConverted = getConvertedValueOrZero(<number>savedPerMonth, savedPerMonthCurrency);
 
-		let currentAge = parseInt(age.toString(), 10);
+		let ageInYear = parseInt(age.toString(), 10);
+		const currentAge = ageInYear;
 		let saved = getConvertedValueOrZero(<number>capital, capitalCurrency);
 
-		let requiredCapital = sumRequiredCapital(currentAge, largeUpcomingExpensesSum, pensionSum);
+		let requiredCapitalToRetireAtAge = sumRequiredCapital(currentAge, ageInYear, largeUpcomingExpensesSum, pensionSum);
+
+		let currentYear = new Date().getFullYear();
+		let yearlySummaryItemsTemp: YearSummaryItem[] = [];
+		let totalInterest = 0;
 
 		while (true) {
-			if (saved >= requiredCapital) {
+			yearlySummaryItemsTemp.push(
+				new YearSummaryItem(currentYear, ageInYear, Math.floor(totalInterest), Math.floor(requiredCapitalToRetireAtAge), Math.floor(saved))
+			);
+
+			if (saved >= requiredCapitalToRetireAtAge) {
 				break;
 			}
 
+			// Apply savings and interest for year
 			for (let i = 0; i < 12; i++) {
-				saved *= monthlyInflationFactor;
 				saved *= savingInterestMonthlyFactor;
 				saved += savedPerMonthConverted;
+
+				if (savingInterestRate !== null) {
+					totalInterest += saved * savingInterestMonthlyFactor - saved;
+				}
 			}
 
-			if (hasLifeInsurance && currentAge === lifeInsuranceAge) {
+			// Apply any insurance payments that may occur in the year
+			if (hasLifeInsurance && ageInYear === lifeInsuranceAge) {
 				saved += lifeInsuranceConverted;
 			}
 
-			currentAge++;
-			if (currentAge === ageOfDeath) {
+			currentYear++;
+			ageInYear++;
+
+			if (ageInYear === lifespan) {
 				break;
 			}
 
-			requiredCapital = sumRequiredCapital(currentAge, largeUpcomingExpensesSum, pensionSum);
+			requiredCapitalToRetireAtAge = sumRequiredCapital(currentAge, ageInYear, largeUpcomingExpensesSum, pensionSum);
 		}
 
-		earlyRetirementAge = currentAge;
+		yearlySummaryItems = yearlySummaryItemsTemp;
 
-		if (earlyRetirementAge < 85) {
+		earlyRetirementAge = ageInYear;
+
+		if (earlyRetirementAge < lifespan) {
 			consideringTheAnswersMessage = $t('earlyRetirementCalculator.consideringTheAnswers', {
-				earlyRetirementAge: earlyRetirementAge
+				earlyRetirementAge: earlyRetirementAge,
+				requiredCapitalToRetireAtAge: Formatter.moneyPrecise(Math.floor(requiredCapitalToRetireAtAge), currency, $user.culture, 0)
 			});
 		}
 
@@ -332,15 +366,22 @@
 		currentSection = sections[currentIndex + 1];
 	}
 
-	function sumRequiredCapital(currentAge: number, largeUpcomingExpensesSum: number, pensionSum: number) {
-		const monthsInRetirement = (ageOfDeath - currentAge) * 12;
-		const retirementIncomeConverted = getConvertedValueOrZero(<number>retirementIncome, retirementIncomeCurrency);
-		const monthlyInflation = inflation / 12;
+	function sumRequiredCapital(currentAge: number, ageInYear: number, largeUpcomingExpensesSum: number, pensionSum: number) {
+		const monthlyInflationFactor = 1 + yearlyInflation / 12;
 
+		let retirementIncomeConverted = getConvertedValueOrZero(<number>retirementIncome, retirementIncomeCurrency);
 		let retirementAmountNeeded = 0;
-		for (let i = 0; i < monthsInRetirement; i++) {
-			retirementAmountNeeded += retirementIncomeConverted;
-			retirementAmountNeeded *= 1 + monthlyInflation;
+
+		// Loop from current age and inflate desired retirement income
+		// Once the retirement year occurs, start summing the required retirement income amount
+		for (let age = currentAge; age < lifespan; age++) {
+			for (let month = 0; month < 12; month++) {
+				retirementIncomeConverted = retirementIncomeConverted * monthlyInflationFactor;
+
+				if (age >= ageInYear) {
+					retirementAmountNeeded += retirementIncomeConverted;
+				}
+			}
 		}
 
 		return retirementAmountNeeded + largeUpcomingExpensesSum - pensionSum;
@@ -363,6 +404,10 @@
 	}
 
 	function getConvertedValueOrZero(amount: number | null, amountCurrency: string | null): number {
+		if (currency === null) {
+			throw new Error('Currency not initialized yet');
+		}
+
 		if (!amount || !amountCurrency || amount.toString().trim() === '') {
 			return 0;
 		}
@@ -700,8 +745,35 @@
 
 			{#if earlyRetirementAge}
 				<div class="result-message">
-					{#if earlyRetirementAge < 85}
+					{#if earlyRetirementAge < lifespan}
 						<span contenteditable="false" bind:innerHTML={consideringTheAnswersMessage}></span>
+
+						<table class="summary-table">
+							<thead>
+								<tr>
+									<th>{$t('earlyRetirementCalculator.year')}</th>
+									<th>{$t('earlyRetirementCalculator.age')}</th>
+									{#if savingInterestRate}
+										<th>{$t('earlyRetirementCalculator.interest', { savingInterestRate: savingInterestRate })}</th>
+									{/if}
+									<th>{$t('earlyRetirementCalculator.required')}</th>
+									<th>{$t('earlyRetirementCalculator.saved')}</th>
+								</tr>
+							</thead>
+							<tbody>
+								{#each yearlySummaryItems as savedSummaryItem}
+									<tr>
+										<td>{savedSummaryItem.year}</td>
+										<td>{savedSummaryItem.age}</td>
+										{#if savingInterestRate}
+											<td>{Formatter.moneyPrecise(savedSummaryItem.totalInterest, currency, $user.culture, 0)}</td>
+										{/if}
+										<td>{Formatter.moneyPrecise(savedSummaryItem.required, currency, $user.culture, 0)}</td>
+										<td>{Formatter.moneyPrecise(savedSummaryItem.totalSaved, currency, $user.culture, 0)}</td>
+									</tr>
+								{/each}
+							</tbody>
+						</table>
 					{:else}
 						<span>{$t('earlyRetirementCalculator.notLikelyToRetire')}</span>
 					{/if}
@@ -723,10 +795,6 @@
 		font-size: 1.1rem;
 		line-height: 28px;
 		text-align: center;
-	}
-
-	.er-calc-highlight {
-		color: var(--primary-color);
 	}
 
 	.er-calc-button {
@@ -894,10 +962,22 @@
 		text-align: center;
 	}
 
-	.retirement-age {
-		color: var(--primary-color);
-		font-size: 1.2rem;
-		font-weight: bold;
+	.summary-table {
+		width: 100%;
+		margin-top: 40px;
+
+		th,
+		td {
+			text-align: right;
+		}
+		th:nth-child(-n + 2),
+		td:nth-child(-n + 2) {
+			text-align: left;
+		}
+
+		th {
+			border-bottom: 1px solid #ddd;
+		}
 	}
 
 	@media screen and (min-width: 1200px) {
