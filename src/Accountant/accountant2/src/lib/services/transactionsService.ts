@@ -43,7 +43,7 @@ export class TransactionsService {
 		}
 	}
 
-	async getByCategory(transactions: TransactionModel[], currency: string, uncategorizedLabel: string): Promise<AmountByCategory[]> {
+	async getAmountByCategory(transactions: TransactionModel[], currency: string, uncategorizedLabel: string): Promise<AmountByCategory[]> {
 		try {
 			transactions.forEach((x: TransactionModel) => {
 				x.amount = this.currenciesService.convert(x.amount, x.currency, currency);
@@ -55,55 +55,53 @@ export class TransactionsService {
 			for (const category of categories) {
 				const categoryTransactions = transactions.filter((t) => t.categoryId === category.id);
 
-				const expenditure = new AmountByCategory(category.id, category.parentId, category.name, 0);
-				expenditure.amount = categoryTransactions.map((x) => x.amount).reduce((prev, curr) => prev + curr, 0);
+				const amount = categoryTransactions.map((t) => t.amount).reduce((prev, curr) => prev + curr, 0);
+				const expenditure = new AmountByCategory(category.id, category.parentId, category.name, amount, amount);
 
 				expendituresByCategory.push(expenditure);
 			}
 
-			const parentCategoryExpenditures = expendituresByCategory.filter((x) => x.parentCategoryId === null);
+			const parentCategoryExpenditures = expendituresByCategory.filter((e) => e.parentCategoryId === null);
 
 			for (const expenditure of parentCategoryExpenditures) {
 				const childCategoryExpenditures = expendituresByCategory.filter((e) => e.amount !== 0 && e.parentCategoryId === expenditure.categoryId);
-
-				expenditure.amount += childCategoryExpenditures.map((c) => c.amount).reduce((prev, curr) => prev + curr, 0);
 				expenditure.subItems = childCategoryExpenditures.sort((a, b) => b.amount - a.amount);
+
+				const subItemsAmountSum = expenditure.subItems.map((t) => t.amount).reduce((prev, curr) => prev + curr, 0);
+				expenditure.totalAmount = expenditure.amount + subItemsAmountSum;
 			}
 
 			const uncategorizedTransactions = transactions.filter((t) => t.categoryId === null);
 			if (uncategorizedTransactions.length) {
-				const expenditure = new AmountByCategory(null, null, uncategorizedLabel, 0);
+				const amount = uncategorizedTransactions.map((t) => t.amount).reduce((prev, curr) => prev + curr, 0);
 
-				for (const transaction of uncategorizedTransactions) {
-					expenditure.amount += transaction.amount;
-				}
-
+				const expenditure = new AmountByCategory(null, null, uncategorizedLabel, amount, amount);
 				parentCategoryExpenditures.push(expenditure);
 			}
 
-			return parentCategoryExpenditures.filter((e) => e.amount !== 0).sort((a, b) => b.amount - a.amount);
+			return parentCategoryExpenditures.filter((e) => e.amount > 0 || e.subItems.length > 0).sort((a, b) => b.totalAmount - a.totalAmount);
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
 		}
 	}
 
-	async getExpendituresAndDepositsByCategory(
+	async getDataForPieChart(
 		fromDate: string,
 		toDate: string,
-		accountId: number,
+		mainAccountId: number,
 		type: TransactionType,
 		currency: string,
 		uncategorizedLabel: string
 	): Promise<AmountByCategory[]> {
 		try {
-			let transactions = await this.idbHelper.getExpendituresAndDepositsBetweenDates(fromDate, toDate, accountId, type);
+			let transactions = await this.idbHelper.getForPieChart(fromDate, toDate, mainAccountId, type);
 
 			if (type === TransactionType.Expense) {
 				transactions = transactions.filter((x) => !x.isTax);
 			}
 
-			return await this.getByCategory(transactions, currency, uncategorizedLabel);
+			return await this.getAmountByCategory(transactions, currency, uncategorizedLabel);
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;

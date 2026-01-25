@@ -22,7 +22,7 @@
 	let mainAccountId: number;
 	let currency: string | null = $state(null);
 	let chart: Chart<'pie', number[], unknown>;
-	let items: PieChartItem[] | null = $state(null);
+	let legendItems: PieChartItem[] | null = $state(null);
 	let sum = $state(0);
 	let canvas: HTMLCanvasElement;
 	let canvasCtx: CanvasRenderingContext2D | null = null;
@@ -52,44 +52,47 @@
 		chart.data.labels = [];
 		chart.data.datasets[0].data = [];
 		chart.update();
-		items = null;
+		legendItems = null;
 		sum = 0;
 
-		const byCategory = (
-			await transactionsService.getExpendituresAndDepositsByCategory(fromDate, toDate, mainAccountId, type, currency, $t('uncategorized'))
-		).map((x) => new PieChartItem(x));
+		const byCategory = (await transactionsService.getDataForPieChart(fromDate, toDate, mainAccountId, type, currency, $t('uncategorized'))).map(
+			(x) => new PieChartItem(x)
+		);
 
 		const labels = new Array<string>();
 		const amounts = new Array<number>();
 
-		const flatItems = new Array<PieChartItem>();
+		const legendItemsTemp = new Array<PieChartItem>();
+		const chartEntries = new Array<PieChartItem>();
 		const legendColors = [...colors];
-		for (const item of byCategory) {
-			if (item.subItems.length === 0) {
-				item.color = legendColors.length > 0 ? <string>legendColors.shift() : '#e0e0e0';
-				flatItems.push(item);
-			} else {
-				for (const subItem of item.subItems) {
-					subItem.color = legendColors.length > 0 ? <string>legendColors.shift() : '#e0e0e0';
-					flatItems.push(subItem);
 
-					sum += subItem.amount;
-				}
+		for (const item of byCategory) {
+			if (item.amount > 0) {
+				item.color = legendColors.length > 0 ? <string>legendColors.shift() : '#e0e0e0';
+				chartEntries.push(item);
+				sum += item.amount;
 			}
 
-			sum += item.amount;
+			for (const subItem of item.subItems) {
+				subItem.color = legendColors.length > 0 ? <string>legendColors.shift() : '#e0e0e0';
+				chartEntries.push(subItem);
+
+				sum += subItem.amount;
+			}
+
+			legendItemsTemp.push(item);
 		}
 
-		items = byCategory;
+		legendItems = legendItemsTemp;
 
-		for (let i = 0; i < flatItems.length; i++) {
-			(<any>chart.data.datasets[0]).backgroundColor[i] = flatItems[i].color;
+		for (let i = 0; i < chartEntries.length; i++) {
+			(<any>chart.data.datasets[0]).backgroundColor[i] = chartEntries[i].color;
 
-			labels.push(<string>flatItems[i].categoryName);
-			amounts.push(flatItems[i].amount);
+			labels.push(<string>chartEntries[i].categoryName);
+			amounts.push(chartEntries[i].amount);
 		}
 
-		if (flatItems.length > 0) {
+		if (chartEntries.length > 0) {
 			chart.data.labels = labels;
 			chart.data.datasets[0].data = amounts;
 		} else {
@@ -173,7 +176,7 @@
 			</div>
 		</form>
 
-		{#if !items}
+		{#if !legendItems}
 			<div class="double-circle-loading">
 				<div class="double-bounce1"></div>
 				<div class="double-bounce2"></div>
@@ -183,18 +186,18 @@
 		<div class="pie-chart-wrap">
 			<canvas bind:this={canvas}></canvas>
 
-			{#if items && items.length === 0}
+			{#if legendItems && legendItems.length === 0}
 				<div class="empty-list-message-wrap">
 					<EmptyListMessage messageKey={isDeposits ? 'pieChartReport.emptyListMessageDeposits' : 'pieChartReport.emptyListMessageExpenses'} />
 				</div>
 			{/if}
 		</div>
 
-		{#if chartPrepared && items}
-			{#if items.length > 0}
+		{#if chartPrepared && legendItems}
+			{#if legendItems.length > 0}
 				<table class="amount-by-category-table au-animate">
 					<tbody>
-						{#each items as item}
+						{#each legendItems as item}
 							<tr
 								onclick={() => {
 									goToTransactions(item);
@@ -206,7 +209,7 @@
 									{/if}
 									<span>{item.categoryName}</span></td
 								>
-								<td class="amount-cell">{Formatter.money(item.amount, currency, $user.culture)}</td>
+								<td class="amount-cell">{item.amount === 0 ? '-' : Formatter.money(item.amount, currency, $user.culture)}</td>
 							</tr>
 							{#each item.subItems as subItem}
 								<tr
@@ -223,7 +226,7 @@
 						{/each}
 					</tbody>
 
-					{#if items.length > 1}
+					{#if legendItems.length > 1}
 						<tfoot>
 							<tr>
 								<td colspan="3">

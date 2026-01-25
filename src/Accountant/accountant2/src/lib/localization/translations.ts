@@ -330,7 +330,8 @@ export default {
 			summaryItem2b: "You don't have anything saved up currently",
 			summaryItem3a:
 				'You save <span class="er-calc-highlight">{{savedPerMonth}}</span> per month on an account or fund with a <span class="er-calc-highlight">{{savingInterestRate}}%</span> yearly interest rate',
-			summaryItem3b: "You don't put aside any money montly",
+			summaryItem3b: 'You save <span class="er-calc-highlight">{{savedPerMonth}}</span> per month',
+			summaryItem3c: "You don't put aside any money montly",
 			summaryItem4a:
 				'You are eligible for pension at age <span class="er-calc-highlight">{{pensionAge}}</span> and will receive <span class="er-calc-highlight">{{pensionPerMonth}}</span> per month',
 			summaryItem4b: 'You are not eligible for pension',
@@ -341,11 +342,16 @@ export default {
 			summaryItem6a: '<span class="er-calc-highlight">{{amount}}</span> for <span class="er-calc-highlight">{{expense}}</span>',
 			summaryItem7:
 				'You estimate that you\'ll need <span class="er-calc-highlight">{{retirementIncome}}</span> per month to live comfortably in retirement',
-			summaryItem8: 'The calculation will assume a flat yearly inflation rate of {{inflation}}%',
+			summaryItem8:
+				'The calculation will assume a lifespan of <span class="er-calc-highlight">{{lifespan}}</span> years and a flat yearly inflation rate of <span class="er-calc-highlight">{{inflation}}%</span>',
 			calculate: 'Calculate',
 			result: 'Result',
 			consideringTheAnswers:
-				'Considering the answers you provided you will be able to retire at age <span class="retirement-age er-calc-highlight">{{earlyRetirementAge}}</span>.',
+				'Considering the answers you provided you will be able to retire at the age of <span class="retirement-age er-calc-highlight">{{earlyRetirementAge}}</span>.<br><br>In order do to so, you will require a capital of <span class="er-calc-highlight">{{requiredCapitalToRetireAtAge}}</span>, which at your current rate of saving you will manage to attain!',
+			year: 'Year',
+			interest: 'Interest ({{savingInterestRate}}%)',
+			required: 'Required',
+			saved: 'Saved',
 			notLikelyToRetire: 'You are not likely to retire at a reasonable age considering the answers you provided.'
 		},
 		export: {
@@ -747,7 +753,8 @@ export default {
 			summaryItem2b: 'Немате заштедено ништо моментално',
 			summaryItem3a:
 				'Штедите <span class="er-calc-highlight">{{savedPerMonth}}</span> месечно на сметка или фонд со годишна камата од <span class="er-calc-highlight">{{savingInterestRate}}%</span>',
-			summaryItem3b: 'Не штедите месечно',
+			summaryItem3b: 'Штедите <span class="er-calc-highlight">{{savedPerMonth}}</span> месечно',
+			summaryItem3c: 'Не штедите месечно',
 			summaryItem4a:
 				'Се квалификувате за пензија на <span class="er-calc-highlight">{{pensionAge}}</span> години и ќе примате <span class="er-calc-highlight">{{pensionPerMonth}}</span> месечно',
 			summaryItem4b: 'Не се квалификувате за пензија',
@@ -758,11 +765,16 @@ export default {
 			summaryItem6a: '<span class="er-calc-highlight">{{amount}}</span> за <span class="er-calc-highlight">{{expense}}</span>',
 			summaryItem7:
 				'Сметате дека ќе ви се потребни <span class="er-calc-highlight">{{retirementIncome}}</span> месечно за да живеете комфорно во пензија',
-			summaryItem8: 'Калкулацијата ќе земе во предвид рамна годишна инфлација од {{inflation}}%',
+			summaryItem8:
+				'Калкулацијата ќе земе во предвид животен рок од <span class="er-calc-highlight">{{lifespan}}</span> години и рамна годишна инфлација од <span class="er-calc-highlight">{{inflation}}%</span>',
 			calculate: 'Пресметај',
 			result: 'Резултат',
 			consideringTheAnswers:
-				'Со оглед на одговорите што ги дадовте ќе можете да се пензионирате на <span class="retirement-age er-calc-highlight">{{earlyRetirementAge}}</span> години.',
+				'Со оглед на одговорите што ги дадовте ќе можете да се пензионирате на <span class="retirement-age er-calc-highlight">{{earlyRetirementAge}}</span> години.<br><br>За да го сторите тоа, ќе ви е потребен капитал од <span class="er-calc-highlight">{{requiredCapitalToRetireAtAge}}</span>, кој со вашето моментално темпо на штедење ќе успеете да го соберете!',
+			year: 'Година',
+			interest: 'Камата ({{savingInterestRate}}%)',
+			required: 'Потребно',
+			saved: 'Зачувано',
 			notLikelyToRetire: 'Не се чини дека ќе можете да се пензионирате на разумно годиште со оглед на одговорите што ги дадовте.'
 		},
 		export: {

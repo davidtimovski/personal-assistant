@@ -260,13 +260,13 @@
 						{#each data.expenditures as expenditure}
 							<tr onclick={() => goToTransactions(expenditure)} role="button">
 								<td>{expenditure.categoryName}</td>
-								<td class="amount-cell">{Formatter.money(expenditure.amount, currency, $user.language)}</td>
+								<td class="amount-cell">{expenditure.amount === 0 ? '-' : Formatter.money(expenditure.amount, currency, $user.culture)}</td>
 							</tr>
 
 							{#each expenditure.subItems as subExpenditure}
 								<tr onclick={() => goToTransactions(subExpenditure)} role="button">
 									<td class="sub-category-cell">{subExpenditure.categoryName}</td>
-									<td class="amount-cell">{Formatter.money(subExpenditure.amount, currency, $user.language)}</td>
+									<td class="amount-cell">{Formatter.money(subExpenditure.amount, currency, $user.culture)}</td>
 								</tr>
 							{/each}
 						{/each}
@@ -284,7 +284,7 @@
 							<tr onclick={() => editUpcomingExpense(upcomingExpense.id)} role="button">
 								<td>{upcomingExpense.category}</td>
 								<td>{upcomingExpense.description}</td>
-								<td class="amount-cell">{Formatter.money(upcomingExpense.amount, currency, $user.language)}</td>
+								<td class="amount-cell">{Formatter.money(upcomingExpense.amount, currency, $user.culture)}</td>
 							</tr>
 						{/each}
 					</tbody>
@@ -296,7 +296,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td colspan="3" class="table-sum">{Formatter.money(data.upcomingAmount, currency, $user.language)}</td>
+								<td colspan="3" class="table-sum">{Formatter.money(data.upcomingAmount, currency, $user.culture)}</td>
 							</tr>
 						</tfoot>
 					{/if}
@@ -321,7 +321,7 @@
 								</td>
 								<td>{debtItem.description}</td>
 								<td class="amount-cell {debtItem.userIsDebtor ? 'expense-color' : 'deposit-color'}">
-									{Formatter.money(debtItem.amount, currency, $user.language)}
+									{Formatter.money(debtItem.amount, currency, $user.culture)}
 								</td>
 							</tr>
 						{/each}

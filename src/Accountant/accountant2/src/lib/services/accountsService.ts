@@ -133,17 +133,19 @@ export class AccountsService {
 	async getAverageMonthlySavingsFromThePastYear(currency: string) {
 		try {
 			const mainAccountId = await this.getMainId();
-			const transferTransactions = await this.transactionsIDBHelper.getAllSavingTransactionsInThePastYear(mainAccountId);
+			const savingTransactions = await this.transactionsIDBHelper.getAllSavingTransactionsInThePastYear(mainAccountId);
 
-			const movedFromMain = transferTransactions.filter((x) => x.fromAccountId === mainAccountId);
-			const movedToMain = transferTransactions.filter((x) => x.toAccountId === mainAccountId);
+			const movedFromMain = savingTransactions.filter((x) => x.fromAccountId === mainAccountId);
+			const movedToMain = savingTransactions.filter((x) => x.toAccountId === mainAccountId);
+			const depositedToInvestmentFunds = savingTransactions.filter((x) => x.fromAccountId !== mainAccountId && x.toAccountId !== mainAccountId);
 
 			let saving = 0;
 
 			saving += movedFromMain.map((x) => this.currenciesService.convert(x.amount, x.currency, currency)).reduce((a, b) => a + b, 0);
 			saving -= movedToMain.map((x) => this.currenciesService.convert(x.amount, x.currency, currency)).reduce((a, b) => a + b, 0);
+			saving += depositedToInvestmentFunds.map((x) => this.currenciesService.convert(x.amount, x.currency, currency)).reduce((a, b) => a + b, 0);
 
-			const earliestTransaction = transferTransactions.sort((a: TransactionModel, b: TransactionModel) => {
+			const earliestTransaction = savingTransactions.sort((a: TransactionModel, b: TransactionModel) => {
 				const aDate = new Date(a.date);
 				const bDate = new Date(b.date);
 				if (aDate < bDate) return -1;

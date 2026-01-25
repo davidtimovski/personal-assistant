@@ -26,11 +26,13 @@ export class TransactionsIDBHelper {
 		const aYearAgo = new Date(now.getFullYear() - 1, now.getMonth(), 1);
 		const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
+		const investmentFundAccountIds = await this.getInvestmentFundAccountIds();
+
 		return transactions.filter(
 			(t) =>
 				new Date(t.date) >= aYearAgo &&
 				new Date(t.date) < firstOfMonth &&
-				this.isSavingOrWithdrawingFromSavings(t.fromAccountId, t.toAccountId, mainAccountId)
+				this.isSavingOrWithdrawingFromSavings(t.fromAccountId, t.toAccountId, mainAccountId, investmentFundAccountIds)
 		);
 	}
 
@@ -90,16 +92,48 @@ export class TransactionsIDBHelper {
 		});
 	}
 
-	async getExpendituresAndDepositsBetweenDates(
-		fromDate: string,
-		toDate: string,
-		accountId: number,
-		type: TransactionType
-	): Promise<TransactionModel[]> {
+	async getForPieChart(fromDate: string, toDate: string, mainAccountId: number, type: TransactionType): Promise<TransactionModel[]> {
+		const investmentFundAccountIds = await this.getInvestmentFundAccountIds();
+
 		const transactionsPromise = this.db.transactions
 			.orderBy('date')
 			.reverse()
-			.filter((t) => this.checkAgainstFilters2(t, fromDate, toDate, accountId, type))
+			.filter((t) => {
+				const withinDates = (!fromDate || new Date(t.date) >= new Date(fromDate)) && (!toDate || new Date(t.date) <= new Date(toDate));
+				if (!withinDates) {
+					return false;
+				}
+
+				switch (type) {
+					case TransactionType.Expense:
+						if (!this.isExpense(t.fromAccountId, t.toAccountId)) {
+							return false;
+						}
+						break;
+					case TransactionType.Deposit:
+						if (!this.isDeposit(t.fromAccountId, t.toAccountId)) {
+							return false;
+						}
+						break;
+				}
+
+				if (t.fromAccountId === mainAccountId) {
+					// Expense from main account
+					return true;
+				}
+
+				if (t.toAccountId === mainAccountId) {
+					// Deposit to main account
+					return true;
+				}
+
+				if (t.toAccountId && investmentFundAccountIds.includes(t.toAccountId)) {
+					// Deposit to savings account
+					return true;
+				}
+
+				return false;
+			})
 			.toArray();
 
 		const categoriesPromise = this.db.categories.toArray();
@@ -123,15 +157,62 @@ export class TransactionsIDBHelper {
 		const now = new Date();
 		const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
+		const investmentFundAccountIds = await this.getInvestmentFundAccountIds();
 		const transactionsPromise = this.db.transactions
 			.orderBy('date')
 			.reverse()
-			.filter(
-				(t) =>
-					new Date(t.date) >= new Date(fromDate) &&
-					new Date(t.date) < firstOfMonth &&
-					this.checkAgainstFilters3(t, mainAccountId, categoryId !== 0, categoryIds, type)
-			)
+			.filter((t) => {
+				if (new Date(t.date) < new Date(fromDate) || new Date(t.date) >= firstOfMonth) {
+					return false;
+				}
+
+				if (categoryId !== 0) {
+					if (categoryIds === null) {
+						if (t.categoryId !== null) {
+							return false;
+						}
+					} else if (!categoryIds.includes(<number>t.categoryId)) {
+						return false;
+					}
+				}
+
+				switch (type) {
+					case TransactionType.Any:
+						if (this.isTransfer(t.fromAccountId, t.toAccountId)) {
+							return false;
+						}
+						if (
+							t.fromAccountId !== mainAccountId &&
+							t.toAccountId !== mainAccountId &&
+							t.toAccountId !== null &&
+							!investmentFundAccountIds.includes(t.toAccountId)
+						) {
+							// If the transaction isn't related to the main account or investment fund accounts
+							return false;
+						}
+						break;
+					case TransactionType.Expense:
+						if (t.fromAccountId !== mainAccountId || !!t.toAccountId) {
+							return false;
+						}
+						break;
+					case TransactionType.Deposit:
+						if (t.fromAccountId) {
+							return false;
+						}
+						if (t.toAccountId !== null && t.toAccountId !== mainAccountId && !investmentFundAccountIds.includes(t.toAccountId)) {
+							return false;
+						}
+						break;
+					case TransactionType.Saving:
+						if (!this.isSavingOrWithdrawingFromSavings(t.fromAccountId, t.toAccountId, mainAccountId, investmentFundAccountIds)) {
+							return false;
+						}
+						break;
+				}
+
+				return true;
+			})
 			.toArray();
 
 		const categoriesPromise = this.db.categories.toArray();
@@ -171,6 +252,28 @@ export class TransactionsIDBHelper {
 		type: TransactionType,
 		description: string | null
 	): boolean {
+		const withinDates = (!fromDate || new Date(t.date) >= new Date(fromDate)) && (!toDate || new Date(t.date) <= new Date(toDate));
+		if (!withinDates) {
+			return false;
+		}
+
+		const inAccount = accountId === 0 || t.fromAccountId === accountId || t.toAccountId === accountId;
+		if (!inAccount) {
+			return false;
+		}
+
+		let inCategory = true;
+		if (searchByCategory) {
+			if (categoryIds === null) {
+				inCategory = t.categoryId === null;
+			} else {
+				inCategory = categoryIds.includes(<number>t.categoryId);
+			}
+		}
+		if (!inCategory) {
+			return false;
+		}
+
 		let inType = type === TransactionType.Any;
 		if (!inType) {
 			if (!accountId) {
@@ -194,28 +297,6 @@ export class TransactionsIDBHelper {
 			return false;
 		}
 
-		const withinDates = (!fromDate || new Date(t.date) >= new Date(fromDate)) && (!toDate || new Date(t.date) <= new Date(toDate));
-		if (!withinDates) {
-			return false;
-		}
-
-		const inAccount = accountId === 0 || t.fromAccountId === accountId || t.toAccountId === accountId;
-		if (!inAccount) {
-			return false;
-		}
-
-		let inCategory = true;
-		if (searchByCategory) {
-			if (categoryIds === null) {
-				inCategory = t.categoryId === null;
-			} else {
-				inCategory = categoryIds.includes(<number>t.categoryId);
-			}
-		}
-		if (!inCategory) {
-			return false;
-		}
-
 		const hasDescription = !description || (!!t.description && t.description.toUpperCase().includes(description.toUpperCase()));
 
 		return hasDescription;
@@ -225,33 +306,9 @@ export class TransactionsIDBHelper {
 	 * Finds whether a transaction fits the filters.
 	 * @param t The transaction
 	 * @param fromDate
-	 * @param toDate
-	 * @param accountId
-	 * @param type
-	 * @returns true if a transaction matches the filters
-	 */
-	private checkAgainstFilters2(t: TransactionModel, fromDate: string, toDate: string, accountId: number, type: TransactionType): boolean {
-		let inType =
-			(type === TransactionType.Expense && this.isExpense(t.fromAccountId, t.toAccountId)) ||
-			(type === TransactionType.Deposit && this.isDeposit(t.fromAccountId, t.toAccountId));
-		if (!inType) {
-			return false;
-		}
-
-		const withinDates = (!fromDate || new Date(t.date) >= new Date(fromDate)) && (!toDate || new Date(t.date) <= new Date(toDate));
-		if (!withinDates) {
-			return false;
-		}
-
-		const inAccount = t.fromAccountId === accountId || t.toAccountId === accountId;
-
-		return inAccount;
-	}
-
-	/**
-	 * Finds whether a transaction fits the filters.
-	 * @param t The transaction
+	 * @param firstOfMonth
 	 * @param mainAccountId
+	 * @param investmentFundAccountIds Used for savings calculations
 	 * @param searchByCategory False if the all categories option is selected
 	 * @param categoryIds The selected category plus any potential child categories
 	 * @param type
@@ -259,19 +316,15 @@ export class TransactionsIDBHelper {
 	 */
 	private checkAgainstFilters3(
 		t: TransactionModel,
+		fromDate: string,
+		firstOfMonth: Date,
 		mainAccountId: number,
+		investmentFundAccountIds: number[],
 		searchByCategory: boolean,
 		categoryIds: number[] | null,
 		type: TransactionType
 	): boolean {
-		let inType =
-			(type === TransactionType.Any &&
-				!this.isTransfer(t.fromAccountId, t.toAccountId) &&
-				(t.fromAccountId === mainAccountId || t.toAccountId === mainAccountId)) ||
-			(type === TransactionType.Expense && t.fromAccountId === mainAccountId && !t.toAccountId) ||
-			(type === TransactionType.Deposit && !t.fromAccountId && t.toAccountId === mainAccountId) ||
-			(type === TransactionType.Saving && this.isSavingOrWithdrawingFromSavings(t.fromAccountId, t.toAccountId, mainAccountId));
-		if (!inType) {
+		if (new Date(t.date) < new Date(fromDate) || new Date(t.date) >= firstOfMonth) {
 			return false;
 		}
 
@@ -281,6 +334,41 @@ export class TransactionsIDBHelper {
 			}
 
 			return categoryIds.includes(<number>t.categoryId);
+		}
+
+		switch (type) {
+			case TransactionType.Any:
+				if (this.isTransfer(t.fromAccountId, t.toAccountId)) {
+					return false;
+				}
+				if (
+					t.fromAccountId !== mainAccountId &&
+					t.toAccountId !== mainAccountId &&
+					t.toAccountId !== null &&
+					!investmentFundAccountIds.includes(t.toAccountId)
+				) {
+					// If the money isn't related to the main account or the investment fund accounts
+					return false;
+				}
+				break;
+			case TransactionType.Expense:
+				if (t.fromAccountId !== mainAccountId || !!t.toAccountId) {
+					return false;
+				}
+				break;
+			case TransactionType.Deposit:
+				if (t.fromAccountId) {
+					return false;
+				}
+				if (t.toAccountId !== null && t.toAccountId !== mainAccountId && !investmentFundAccountIds.includes(t.toAccountId)) {
+					return false;
+				}
+				break;
+			case TransactionType.Saving:
+				if (!this.isSavingOrWithdrawingFromSavings(t.fromAccountId, t.toAccountId, mainAccountId, investmentFundAccountIds)) {
+					return false;
+				}
+				break;
 		}
 
 		return true;
@@ -298,8 +386,28 @@ export class TransactionsIDBHelper {
 		return !!fromAccountId && !!toAccountId;
 	}
 
-	private isSavingOrWithdrawingFromSavings(fromAccountId: number | null, toAccountId: number | null, mainAccountId: number) {
-		return (fromAccountId === mainAccountId && !!toAccountId) || (toAccountId === mainAccountId && !!fromAccountId);
+	private isSavingOrWithdrawingFromSavings(
+		fromAccountId: number | null,
+		toAccountId: number | null,
+		mainAccountId: number,
+		investmentFundAccountIds: number[]
+	) {
+		// Transferred from main account
+		if (fromAccountId === mainAccountId && !!toAccountId) {
+			return true;
+		}
+
+		// Withdrawn from main account
+		if (toAccountId === mainAccountId && !!fromAccountId) {
+			return true;
+		}
+
+		// Deposited to investment fund account directly
+		if (!fromAccountId && toAccountId && investmentFundAccountIds.includes(toAccountId)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	async getExpendituresForCurrentMonth(accountId: number): Promise<TransactionModel[]> {
@@ -461,6 +569,10 @@ export class TransactionsIDBHelper {
 				await this.db.transactions.add(transaction);
 			}
 		});
+	}
+
+	private async getInvestmentFundAccountIds() {
+		return (await this.db.accounts.filter((a) => !!a.stockPrice).toArray()).map((x) => x.id);
 	}
 
 	private async getWithSubCategoryIds(categoryId: number | null): Promise<Array<number> | null> {
