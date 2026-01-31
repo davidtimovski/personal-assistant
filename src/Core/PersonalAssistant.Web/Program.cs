@@ -23,10 +23,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsProduction())
 {
-    builder.Host.AddKeyVault();
-    builder.Services.AddDataProtectionWithCertificate(builder.Configuration);
+    builder.Host.ConfigureAppConfiguration((hostContext, configBuilder) => configBuilder.AddKeyVault())
+                .ConfigureLogging(configureLogging => configureLogging.AddSentryLogging(builder.Configuration, "PersonalAssistant", new HashSet<string> { "GET /health" }));
 
-    builder.Host.AddSentryLogging(builder.Configuration, "PersonalAssistant", new HashSet<string> { "GET /health" });
+    builder.Services.AddDataProtectionWithCertificate(builder.Configuration);
 }
 
 builder.Services.Configure<FormOptions>(options =>
@@ -64,8 +64,8 @@ if (builder.Environment.EnvironmentName == Environments.Production)
 builder.Services
     .AddAuth0WebAppAuthentication(opt =>
     {
-        opt.Domain = builder.Configuration["Auth0:Domain"];
-        opt.ClientId = builder.Configuration["Auth0:ClientId"];
+        opt.Domain = builder.Configuration["Auth0:Domain"]!;
+        opt.ClientId = builder.Configuration["Auth0:ClientId"]!;
     });
 
 builder.Services

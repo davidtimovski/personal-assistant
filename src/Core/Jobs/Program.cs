@@ -1,18 +1,23 @@
 using Cdn;
+using Core.Infrastructure;
 using Jobs;
 using Jobs.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Serilog;
 
-using IHost host = Host.CreateDefaultBuilder(args)
-    .ConfigureAppConfiguration((hostContext, config) =>
+var hostBuilder = Host.CreateDefaultBuilder(args);
+
+using var host = hostBuilder
+    .ConfigureAppConfiguration((hostContext, configBuilder) =>
     {
-        config.SetBasePath(Directory.GetCurrentDirectory());
-        config.AddJsonFile("appsettings.json", false);
-        config.AddJsonFile($"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json", true, true);
-        config.AddEnvironmentVariables();
+        configBuilder.SetBasePath(Directory.GetCurrentDirectory())
+                     .AddJsonFile("appsettings.json", false)
+                     .AddJsonFile($"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json", true, true)
+                     .AddEnvironmentVariables()
+                     .AddKeyVault();
     })
     .ConfigureLogging((hostContext, logging) =>
     {
@@ -48,7 +53,18 @@ using IHost host = Host.CreateDefaultBuilder(args)
 
         services.AddTransient<DailyJob>();
     })
-    .Build();
+    .ConfigureHostOptions((hostBuilderContext, _) =>
+    {
+        if (hostBuilderContext.HostingEnvironment.IsProduction())
+        {
+            SentrySdk.Init(opt =>
+            {
+                opt.Dsn = hostBuilderContext.Configuration["Jobs:Sentry:Dsn"];
+                opt.SampleRate = 1;
+                opt.StackTraceMode = StackTraceMode.Enhanced;
+            });
+        }
+    }).Build();
 
 static async Task RunWorkerAsync(IServiceProvider services)
 {

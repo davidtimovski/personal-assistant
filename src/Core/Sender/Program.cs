@@ -5,12 +5,14 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-if (builder.Environment.IsProduction())
-{
-    builder.Host.AddKeyVault();
-}
-
 builder.Host
+    .ConfigureAppConfiguration((hostContext, configBuilder) =>
+    {
+        if (builder.Environment.IsProduction())
+        {
+            configBuilder.AddKeyVault();
+        }
+    })
     .ConfigureLogging((hostContext, logging) =>
     {
         if (hostContext.HostingEnvironment.IsProduction())

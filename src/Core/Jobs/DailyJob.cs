@@ -1,5 +1,6 @@
 using System.Runtime.Serialization;
 using System.Text.Json.Nodes;
+using Azure.Core;
 using Azure.Storage.Blobs;
 using Core.Application.Contracts;
 using Core.Application.Entities;
@@ -10,6 +11,8 @@ using Jobs.Models.Accountant;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Identity.Client;
+using Microsoft.Win32;
 using Npgsql;
 
 namespace Jobs;
@@ -40,7 +43,7 @@ public class DailyJob
     {
         var now = DateTime.UtcNow;
 
-        using var conn = new NpgsqlConnection(_config.ConnectionString);
+        using var conn = new NpgsqlConnection(_config.JobsConnectionString);
         conn.Open();
 
         await DeleteOldNotificationsAsync(conn, now);
@@ -60,6 +63,11 @@ public class DailyJob
 
     private async Task DeleteOldNotificationsAsync(NpgsqlConnection conn, DateTime now)
     {
+        var tr = StartMetricsTransaction(
+            nameof(DeleteOldNotificationsAsync),
+            $"{nameof(DailyJob)}.{nameof(DeleteOldNotificationsAsync)}"
+        );
+
         _logger.StartingOperation(nameof(DeleteOldNotificationsAsync));
 
         try
@@ -71,12 +79,23 @@ public class DailyJob
         }
         catch (Exception ex)
         {
+            tr.Status = SpanStatus.InternalError;
+
             _logger.OperationFailed(nameof(DeleteOldNotificationsAsync), ex);
+        }
+        finally
+        {
+            tr.Finish();
         }
     }
 
     private async Task DeleteOldDeletedEntityEntriesAsync(NpgsqlConnection conn, DateTime now)
     {
+        var tr = StartMetricsTransaction(
+            nameof(DeleteOldDeletedEntityEntriesAsync),
+            $"{nameof(DailyJob)}.{nameof(DeleteOldDeletedEntityEntriesAsync)}"
+        );
+
         _logger.StartingOperation(nameof(DeleteOldDeletedEntityEntriesAsync));
 
         try
@@ -88,7 +107,13 @@ public class DailyJob
         }
         catch (Exception ex)
         {
+            tr.Status = SpanStatus.InternalError;
+
             _logger.OperationFailed(nameof(DeleteOldDeletedEntityEntriesAsync), ex);
+        }
+        finally
+        {
+            tr.Finish();
         }
     }
 
@@ -97,6 +122,11 @@ public class DailyJob
     /// </summary>
     private async Task GenerateTransactionsAsync(NpgsqlConnection conn, DateTime now)
     {
+        var tr = StartMetricsTransaction(
+            nameof(GenerateTransactionsAsync),
+            $"{nameof(DailyJob)}.{nameof(GenerateTransactionsAsync)}"
+        );
+
         _logger.StartingOperation(nameof(GenerateTransactionsAsync));
 
         var dbTransaction = conn.BeginTransaction();
@@ -222,7 +252,13 @@ public class DailyJob
         }
         catch (Exception ex)
         {
+            tr.Status = SpanStatus.InternalError;
+
             _logger.OperationFailed(nameof(GenerateTransactionsAsync), ex);
+        }
+        finally
+        {
+            tr.Finish();
         }
     }
 
@@ -231,6 +267,11 @@ public class DailyJob
     /// </summary>
     private async Task GenerateUpcomingExpensesAsync(NpgsqlConnection conn, DateTime now)
     {
+        var tr = StartMetricsTransaction(
+            nameof(GenerateUpcomingExpensesAsync),
+            $"{nameof(DailyJob)}.{nameof(GenerateUpcomingExpensesAsync)}"
+        );
+
         string getMostFrequentCurrency(IReadOnlyList<Transaction> expenses)
         {
             if (expenses.Count() == 1)
@@ -354,12 +395,23 @@ public class DailyJob
         }
         catch (Exception ex)
         {
+            tr.Status = SpanStatus.InternalError;
+
             _logger.OperationFailed(nameof(GenerateUpcomingExpensesAsync), ex);
+        }
+        finally
+        {
+            tr.Finish();
         }
     }
 
     private async Task GetAndSaveCurrencyRatesAsync(NpgsqlConnection conn, DateTime now)
     {
+        var tr = StartMetricsTransaction(
+            nameof(GetAndSaveCurrencyRatesAsync),
+            $"{nameof(DailyJob)}.{nameof(GetAndSaveCurrencyRatesAsync)}"
+        );
+
         _logger.StartingOperation(nameof(GetAndSaveCurrencyRatesAsync));
 
         var today = new DateTime(now.Year, now.Month, now.Day);
@@ -403,25 +455,47 @@ public class DailyJob
         }
         catch (Exception ex)
         {
+            tr.Status = SpanStatus.InternalError;
+
             _logger.OperationFailed(nameof(GetAndSaveCurrencyRatesAsync), ex);
+        }
+        finally
+        {
+            tr.Finish();
         }
     }
 
     private async Task DeleteTemporaryCdnResourcesAsync(DateTime now)
     {
+        var tr = StartMetricsTransaction(
+            nameof(DeleteTemporaryCdnResourcesAsync),
+            $"{nameof(DailyJob)}.{nameof(DeleteTemporaryCdnResourcesAsync)}"
+        );
+
         _logger.StartingOperation(nameof(DeleteTemporaryCdnResourcesAsync));
 
         var olderThan = now.AddDays(-2);
         var result = await _cdnService.DeleteTemporaryResourcesAsync(olderThan, CancellationToken.None);
 
-        if (!result.Failed)
+        if (result.Failed)
+        {
+            tr.Status = SpanStatus.InternalError;
+        }
+        else
         {
             _logger.CompletedOperation(nameof(DeleteTemporaryCdnResourcesAsync));
         }
+
+        tr.Finish();
     }
 
     private async Task UploadDatabaseBackupAsync()
     {
+        var tr = StartMetricsTransaction(
+            nameof(UploadDatabaseBackupAsync),
+            $"{nameof(DailyJob)}.{nameof(UploadDatabaseBackupAsync)}"
+        );
+
         _logger.StartingOperation(nameof(UploadDatabaseBackupAsync));
 
         try
@@ -443,7 +517,19 @@ public class DailyJob
         }
         catch (Exception ex)
         {
+            tr.Status = SpanStatus.InternalError;
+
             _logger.OperationFailed(nameof(UploadDatabaseBackupAsync), ex);
         }
+        finally
+        {
+            tr.Finish();
+        }
+    }
+
+    private static ITransactionTracer StartMetricsTransaction(string name, string operation)
+    {
+        SentrySdk.ConfigureScope(scope => scope.TransactionName = name);
+        return SentrySdk.StartTransaction(name, operation);
     }
 }

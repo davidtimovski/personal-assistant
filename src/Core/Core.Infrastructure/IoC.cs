@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System;
+using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
@@ -69,65 +70,62 @@ public static class IoC
         return services;
     }
 
-    public static IHostBuilder AddKeyVault(this IHostBuilder host)
+    /// <summary>
+    /// Adds Azure Key Vault that allows pulling of secrets into configuration.
+    /// </summary>
+    public static IConfigurationBuilder AddKeyVault(this IConfigurationBuilder configBuilder)
     {
-        host.ConfigureAppConfiguration((context, configBuilder) =>
+        var config = configBuilder.Build();
+
+        var keyVaultConfig = config.GetSection("KeyVault").Get<KeyVaultConfiguration>();
+        if (keyVaultConfig is null)
         {
-            var config = configBuilder.Build();
+            throw new ArgumentNullException("KeyVault configuration is missing");
+        }
 
-            var keyVaultConfig = config.GetSection("KeyVault").Get<KeyVaultConfiguration>();
-            if (keyVaultConfig is null)
-            {
-                throw new ArgumentNullException("KeyVault configuration is missing");
-            }
+        var tokenCredential = new ClientSecretCredential(keyVaultConfig.TenantId, keyVaultConfig.ClientId, keyVaultConfig.ClientSecret);
+        var secretClient = new SecretClient(new Uri(keyVaultConfig.Url), tokenCredential);
 
-            var tokenCredential = new ClientSecretCredential(keyVaultConfig.TenantId, keyVaultConfig.ClientId, keyVaultConfig.ClientSecret);
-            var secretClient = new SecretClient(new Uri(keyVaultConfig.Url), tokenCredential);
+        configBuilder.AddAzureKeyVault(secretClient, new AzureKeyVaultConfigurationOptions());
 
-            configBuilder.AddAzureKeyVault(secretClient, new AzureKeyVaultConfigurationOptions());
-        });
-
-        return host;
+        return configBuilder;
     }
 
-    public static IHostBuilder AddSentryLogging(
-        this IHostBuilder hostBuilder,
+    public static ILoggingBuilder AddSentryLogging(
+        this ILoggingBuilder loggingBuilder,
         IConfiguration configuration,
         string configSection,
         HashSet<string> excludeTransactions)
     {
-        hostBuilder.ConfigureLogging((context, loggingBuilder) =>
+        var config = configuration.GetSection($"{configSection}:Sentry").Get<SentryConfiguration>();
+        if (config is null)
         {
-            var config = configuration.GetSection($"{configSection}:Sentry").Get<SentryConfiguration>();
-            if (config is null)
-            {
-                throw new ArgumentNullException($"{configSection}:Sentry configuration is missing");
-            }
+            throw new ArgumentNullException($"{configSection}:Sentry configuration is missing");
+        }
 
-            loggingBuilder.AddSentry(opt =>
+        loggingBuilder.AddSentry(opt =>
+        {
+            opt.Dsn = config.Dsn;
+            opt.SampleRate = 1;
+            opt.MinimumEventLevel = LogLevel.Warning;
+            opt.StackTraceMode = StackTraceMode.Enhanced;
+            opt.TracesSampler = samplingCtx =>
             {
-                opt.Dsn = config.Dsn;
-                opt.SampleRate = 1;
-                opt.MinimumEventLevel = LogLevel.Warning;
-                opt.StackTraceMode = StackTraceMode.Enhanced;
-                opt.TracesSampler = samplingCtx =>
+                if (samplingCtx?.TransactionContext is null)
                 {
-                    if (samplingCtx?.TransactionContext is null)
-                    {
-                        return 1;
-                    }
-
-                    if (excludeTransactions.Contains(samplingCtx.TransactionContext.Name))
-                    {
-                        return 0;
-                    }
-
                     return 1;
-                };
-            });
+                }
+
+                if (excludeTransactions.Contains(samplingCtx.TransactionContext.Name))
+                {
+                    return 0;
+                }
+
+                return 1;
+            };
         });
 
-        return hostBuilder;
+        return loggingBuilder;
     }
 
     public static IServiceCollection AddDataProtectionWithCertificate(

@@ -39,9 +39,9 @@ let configureBuilder (builder: WebApplicationBuilder) (appName: string) =
 
     match builder.Environment.IsProduction() with
     | true ->
-        builder.Host.AddKeyVault() |> ignore
+        builder.Host.ConfigureAppConfiguration(fun (configBuilder) -> configBuilder.AddKeyVault() |> ignore) |> ignore
 
-        builder.Host.AddSentryLogging(builder.Configuration, appName, HashSet<string>(["GET /health"])) |> ignore
+        builder.Host.ConfigureLogging(fun configureLogging -> configureLogging.AddSentryLogging(builder.Configuration, appName, HashSet<string>(["GET /health"])) |> ignore) |> ignore
     | false ->
         builder.Host.ConfigureLogging(fun (loggingBuilder: ILoggingBuilder) ->
             loggingBuilder.AddConsole().AddDebug() |> ignore)
