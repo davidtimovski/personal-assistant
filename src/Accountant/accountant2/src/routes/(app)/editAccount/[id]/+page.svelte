@@ -151,6 +151,7 @@
 
 		if (isNew) {
 			currency = localStorage.get(LocalStorageKeys.Currency);
+			isMainAccount = false;
 			investmentFund = false;
 			saveButtonText = $t('create');
 

@@ -7,10 +7,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsProduction())
 {
-    builder.Host.AddKeyVault();
-    builder.Services.AddDataProtectionWithCertificate(builder.Configuration);
+    builder.Host.ConfigureAppConfiguration((hostContext, configBuilder) => configBuilder.AddKeyVault())
+                .ConfigureLogging(configureLogging => configureLogging.AddSentryLogging(builder.Configuration, "Core", new HashSet<string> { "GET /health" }));
 
-    builder.Host.AddSentryLogging(builder.Configuration, "Core", new HashSet<string> { "GET /health" });
+    builder.Services.AddDataProtectionWithCertificate(builder.Configuration);
 }
 
 builder.Services.AddApplication();

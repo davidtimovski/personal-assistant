@@ -9,7 +9,7 @@ public sealed class AppConfiguration
     /// Coming from appsettings.*.json.
     /// </summary>
     [Required]
-    public required string ConnectionString { get; init; }
+    public required string JobsConnectionString { get; init; }
 
     /// <summary>
     /// Coming from appsettings.*.json.

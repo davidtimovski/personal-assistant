@@ -38,28 +38,34 @@ public class DailyJob
 
     public async Task RunAsync()
     {
+        var tr = SentrySdk.StartTransaction(nameof(DailyJob), nameof(RunAsync));
+
         var now = DateTime.UtcNow;
 
-        using var conn = new NpgsqlConnection(_config.ConnectionString);
+        using var conn = new NpgsqlConnection(_config.JobsConnectionString);
         conn.Open();
 
-        await DeleteOldNotificationsAsync(conn, now);
-        await DeleteOldDeletedEntityEntriesAsync(conn, now);
-        await GenerateUpcomingExpensesAsync(conn, now);
-        await GenerateTransactionsAsync(conn, now);
+        await DeleteOldNotificationsAsync(conn, now, tr);
+        await DeleteOldDeletedEntityEntriesAsync(conn, now, tr);
+        await GenerateUpcomingExpensesAsync(conn, now, tr);
+        await GenerateTransactionsAsync(conn, now, tr);
 
         if (_hostEnvironment.IsProduction())
         {
-            await GetAndSaveCurrencyRatesAsync(conn, now);
-            await DeleteTemporaryCdnResourcesAsync(now);
-            await UploadDatabaseBackupAsync();
+            await GetAndSaveCurrencyRatesAsync(conn, now, tr);
+            await DeleteTemporaryCdnResourcesAsync(now, tr);
+            await UploadDatabaseBackupAsync(tr);
         }
 
         _logger.DailyJobRunCompleted();
+
+        tr.Finish();
     }
 
-    private async Task DeleteOldNotificationsAsync(NpgsqlConnection conn, DateTime now)
+    private async Task DeleteOldNotificationsAsync(NpgsqlConnection conn, DateTime now, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(DailyJob)}.{nameof(DeleteOldNotificationsAsync)}");
+
         _logger.StartingOperation(nameof(DeleteOldNotificationsAsync));
 
         try
@@ -71,12 +77,20 @@ public class DailyJob
         }
         catch (Exception ex)
         {
+            metric.Status = SpanStatus.InternalError;
+
             _logger.OperationFailed(nameof(DeleteOldNotificationsAsync), ex);
+        }
+        finally
+        {
+            metric.Finish();
         }
     }
 
-    private async Task DeleteOldDeletedEntityEntriesAsync(NpgsqlConnection conn, DateTime now)
+    private async Task DeleteOldDeletedEntityEntriesAsync(NpgsqlConnection conn, DateTime now, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(DailyJob)}.{nameof(DeleteOldDeletedEntityEntriesAsync)}");
+
         _logger.StartingOperation(nameof(DeleteOldDeletedEntityEntriesAsync));
 
         try
@@ -88,15 +102,23 @@ public class DailyJob
         }
         catch (Exception ex)
         {
+            metric.Status = SpanStatus.InternalError;
+
             _logger.OperationFailed(nameof(DeleteOldDeletedEntityEntriesAsync), ex);
+        }
+        finally
+        {
+            metric.Finish();
         }
     }
 
     /// <summary>
     /// For the automatic transactions functionality in Accountant.
     /// </summary>
-    private async Task GenerateTransactionsAsync(NpgsqlConnection conn, DateTime now)
+    private async Task GenerateTransactionsAsync(NpgsqlConnection conn, DateTime now, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(DailyJob)}.{nameof(GenerateTransactionsAsync)}");
+
         _logger.StartingOperation(nameof(GenerateTransactionsAsync));
 
         var dbTransaction = conn.BeginTransaction();
@@ -222,15 +244,23 @@ public class DailyJob
         }
         catch (Exception ex)
         {
+            metric.Status = SpanStatus.InternalError;
+
             _logger.OperationFailed(nameof(GenerateTransactionsAsync), ex);
+        }
+        finally
+        {
+            metric.Finish();
         }
     }
 
     /// <summary>
     /// For the upcoming expenses functionality in Accountant.
     /// </summary>
-    private async Task GenerateUpcomingExpensesAsync(NpgsqlConnection conn, DateTime now)
+    private async Task GenerateUpcomingExpensesAsync(NpgsqlConnection conn, DateTime now, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(DailyJob)}.{nameof(GenerateUpcomingExpensesAsync)}");
+
         string getMostFrequentCurrency(IReadOnlyList<Transaction> expenses)
         {
             if (expenses.Count() == 1)
@@ -354,12 +384,20 @@ public class DailyJob
         }
         catch (Exception ex)
         {
+            metric.Status = SpanStatus.InternalError;
+
             _logger.OperationFailed(nameof(GenerateUpcomingExpensesAsync), ex);
+        }
+        finally
+        {
+            metric.Finish();
         }
     }
 
-    private async Task GetAndSaveCurrencyRatesAsync(NpgsqlConnection conn, DateTime now)
+    private async Task GetAndSaveCurrencyRatesAsync(NpgsqlConnection conn, DateTime now, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(DailyJob)}.{nameof(GetAndSaveCurrencyRatesAsync)}");
+
         _logger.StartingOperation(nameof(GetAndSaveCurrencyRatesAsync));
 
         var today = new DateTime(now.Year, now.Month, now.Day);
@@ -403,25 +441,41 @@ public class DailyJob
         }
         catch (Exception ex)
         {
+            metric.Status = SpanStatus.InternalError;
+
             _logger.OperationFailed(nameof(GetAndSaveCurrencyRatesAsync), ex);
+        }
+        finally
+        {
+            metric.Finish();
         }
     }
 
-    private async Task DeleteTemporaryCdnResourcesAsync(DateTime now)
+    private async Task DeleteTemporaryCdnResourcesAsync(DateTime now, ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(DailyJob)}.{nameof(DeleteTemporaryCdnResourcesAsync)}");
+
         _logger.StartingOperation(nameof(DeleteTemporaryCdnResourcesAsync));
 
         var olderThan = now.AddDays(-2);
         var result = await _cdnService.DeleteTemporaryResourcesAsync(olderThan, CancellationToken.None);
 
-        if (!result.Failed)
+        if (result.Failed)
+        {
+            metric.Status = SpanStatus.InternalError;
+        }
+        else
         {
             _logger.CompletedOperation(nameof(DeleteTemporaryCdnResourcesAsync));
         }
+
+        metric.Finish();
     }
 
-    private async Task UploadDatabaseBackupAsync()
+    private async Task UploadDatabaseBackupAsync(ISpan metricsSpan)
     {
+        var metric = metricsSpan.StartChild($"{nameof(DailyJob)}.{nameof(UploadDatabaseBackupAsync)}");
+
         _logger.StartingOperation(nameof(UploadDatabaseBackupAsync));
 
         try
@@ -443,7 +497,13 @@ public class DailyJob
         }
         catch (Exception ex)
         {
+            metric.Status = SpanStatus.InternalError;
+
             _logger.OperationFailed(nameof(UploadDatabaseBackupAsync), ex);
+        }
+        finally
+        {
+            metric.Finish();
         }
     }
 }

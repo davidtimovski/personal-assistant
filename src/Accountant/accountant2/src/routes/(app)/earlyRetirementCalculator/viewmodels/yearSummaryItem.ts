@@ -4,6 +4,6 @@ export class YearSummaryItem {
 		public age: number,
 		public totalInterest: number,
 		public required: number,
-		public totalSaved: number
+		public saved: number
 	) {}
 }

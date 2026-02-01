@@ -294,24 +294,24 @@
 			.map((x) => getConvertedValueOrZero(<number>x.amount, x.currency))
 			.reduce((a: number, b: number) => a + b, 0);
 
-		let pensionSum = 0;
-		if (eligibleForPension) {
-			const yearsTakingPension = lifespan - getIntValueOrZero(pensionAge);
-			const pension = getConvertedValueOrZero(<number>pensionPerMonth, pensionPerMonthCurrency);
-			pensionSum = yearsTakingPension * 12 * pension;
-		}
-
-		lifeInsuranceAge = getIntValueOrZero(lifeInsuranceAge);
+		const lifeInsuranceAgeConverted = lifeInsuranceAge ? getIntValueOrZero(lifeInsuranceAge) : null;
 		const lifeInsuranceConverted = hasLifeInsurance ? getConvertedValueOrZero(<number>lifeInsuranceReturn, lifeInsuranceReturnCurrency) : 0;
 
-		const savingInterestMonthlyFactor = 1 + getFloatValueOrZero(savingInterestRate) / 100 / 12;
 		const savedPerMonthConverted = getConvertedValueOrZero(<number>savedPerMonth, savedPerMonthCurrency);
 
-		let ageInYear = parseInt(age.toString(), 10);
-		const currentAge = ageInYear;
+		let retirementYearAge = parseInt(age.toString(), 10);
+		const currentAge = retirementYearAge;
 		let saved = getConvertedValueOrZero(<number>capital, capitalCurrency);
 
-		let requiredCapitalToRetireAtAge = sumRequiredCapital(currentAge, ageInYear, largeUpcomingExpensesSum, pensionSum);
+		const pensionAgeConverted = getIntValueOrZero(pensionAge);
+		const pensionPerMonthConverted = getConvertedValueOrZero(<number>pensionPerMonth, pensionPerMonthCurrency);
+		const retirementIncomeConverted = getConvertedValueOrZero(<number>retirementIncome, retirementIncomeCurrency);
+		const monthlyInflationFactor = 1 + yearlyInflation / 12;
+
+		const pension = sumPension(currentAge, eligibleForPension, pensionAgeConverted, pensionPerMonthConverted, monthlyInflationFactor);
+
+		let requiredCapitalToRetireAtAge =
+			sumRequiredIncomeAmount(currentAge, retirementYearAge, retirementIncomeConverted, monthlyInflationFactor) + largeUpcomingExpensesSum - pension;
 
 		let currentYear = new Date().getFullYear();
 		let yearlySummaryItemsTemp: YearSummaryItem[] = [];
@@ -319,72 +319,138 @@
 
 		while (true) {
 			yearlySummaryItemsTemp.push(
-				new YearSummaryItem(currentYear, ageInYear, Math.floor(totalInterest), Math.floor(requiredCapitalToRetireAtAge), Math.floor(saved))
+				new YearSummaryItem(currentYear, retirementYearAge, Math.floor(totalInterest), Math.floor(requiredCapitalToRetireAtAge), Math.floor(saved))
 			);
 
 			if (saved >= requiredCapitalToRetireAtAge) {
 				break;
 			}
 
-			// Apply savings and interest for year
-			for (let i = 0; i < 12; i++) {
-				saved *= savingInterestMonthlyFactor;
-				saved += savedPerMonthConverted;
-
-				if (savingInterestRate !== null) {
-					totalInterest += saved * savingInterestMonthlyFactor - saved;
-				}
-			}
-
-			// Apply any insurance payments that may occur in the year
-			if (hasLifeInsurance && ageInYear === lifeInsuranceAge) {
-				saved += lifeInsuranceConverted;
-			}
+			const result = sumSavedWithInterest(
+				saved,
+				totalInterest,
+				savedPerMonthConverted,
+				savingInterestRate,
+				hasLifeInsurance,
+				lifeInsuranceAgeConverted,
+				lifeInsuranceConverted,
+				retirementYearAge
+			);
+			saved = result.totalSaved;
+			totalInterest = result.interest;
 
 			currentYear++;
-			ageInYear++;
+			retirementYearAge++;
 
-			if (ageInYear === lifespan) {
+			if ((eligibleForPension && retirementYearAge === pensionAge) || retirementYearAge === lifespan) {
 				break;
 			}
 
-			requiredCapitalToRetireAtAge = sumRequiredCapital(currentAge, ageInYear, largeUpcomingExpensesSum, pensionSum);
+			requiredCapitalToRetireAtAge =
+				sumRequiredIncomeAmount(currentAge, retirementYearAge, retirementIncomeConverted, monthlyInflationFactor) +
+				largeUpcomingExpensesSum -
+				pension;
 		}
 
 		yearlySummaryItems = yearlySummaryItemsTemp;
 
-		earlyRetirementAge = ageInYear;
+		earlyRetirementAge = retirementYearAge;
 
-		if (earlyRetirementAge < lifespan) {
-			consideringTheAnswersMessage = $t('earlyRetirementCalculator.consideringTheAnswers', {
-				earlyRetirementAge: earlyRetirementAge,
-				requiredCapitalToRetireAtAge: Formatter.moneyPrecise(Math.floor(requiredCapitalToRetireAtAge), currency, $user.culture, 0)
-			});
+		if ((!eligibleForPension || earlyRetirementAge < pensionAge!) && earlyRetirementAge < lifespan) {
+			if (eligibleForPension) {
+				consideringTheAnswersMessage = $t('earlyRetirementCalculator.consideringTheAnswers1', {
+					earlyRetirementAge: earlyRetirementAge,
+					requiredCapitalToRetireAtAge: Formatter.moneyPrecise(Math.floor(requiredCapitalToRetireAtAge), currency, $user.culture, 0),
+					pensionSum: Formatter.moneyPrecise(Math.floor(pension), currency, $user.culture, 0)
+				});
+			} else {
+				consideringTheAnswersMessage = $t('earlyRetirementCalculator.consideringTheAnswers2', {
+					earlyRetirementAge: earlyRetirementAge,
+					requiredCapitalToRetireAtAge: Formatter.moneyPrecise(Math.floor(requiredCapitalToRetireAtAge), currency, $user.culture, 0)
+				});
+			}
 		}
 
 		const currentIndex = sections.indexOf(currentSection);
 		currentSection = sections[currentIndex + 1];
 	}
 
-	function sumRequiredCapital(currentAge: number, ageInYear: number, largeUpcomingExpensesSum: number, pensionSum: number) {
-		const monthlyInflationFactor = 1 + yearlyInflation / 12;
+	function sumSavedWithInterest(
+		totalSaved: number,
+		totalInterest: number,
+		savedPerMonth: number,
+		savingInterestRate: number | null,
+		hasLifeInsurance: boolean,
+		lifeInsuranceAge: number | null,
+		lifeInsuranceReturn: number,
+		retirementYearAge: number
+	) {
+		const savingInterestMonthlyFactor = savingInterestRate === null ? null : 1 + getFloatValueOrZero(savingInterestRate) / 100 / 12;
 
-		let retirementIncomeConverted = getConvertedValueOrZero(<number>retirementIncome, retirementIncomeCurrency);
-		let retirementAmountNeeded = 0;
+		// Apply any insurance payments that may occur in the year
+		if (hasLifeInsurance && retirementYearAge >= lifeInsuranceAge!) {
+			totalSaved += lifeInsuranceReturn;
+		}
 
-		// Loop from current age and inflate desired retirement income
-		// Once the retirement year occurs, start summing the required retirement income amount
-		for (let age = currentAge; age < lifespan; age++) {
-			for (let month = 0; month < 12; month++) {
-				retirementIncomeConverted = retirementIncomeConverted * monthlyInflationFactor;
+		for (let month = 0; month < 12; month++) {
+			if (savingInterestRate) {
+				totalSaved *= savingInterestMonthlyFactor!;
+			}
+			totalSaved += savedPerMonth;
 
-				if (age >= ageInYear) {
-					retirementAmountNeeded += retirementIncomeConverted;
-				}
+			if (savingInterestRate) {
+				totalInterest += totalSaved * savingInterestMonthlyFactor! - totalSaved;
 			}
 		}
 
-		return retirementAmountNeeded + largeUpcomingExpensesSum - pensionSum;
+		return { totalSaved: totalSaved, interest: totalInterest };
+	}
+
+	function sumPension(currentAge: number, eligibleForPension: boolean, pensionAge: number, pensionPerMonth: number, monthlyInflationFactor: number) {
+		if (!eligibleForPension) {
+			return 0;
+		}
+
+		let pensionSum = 0;
+
+		// Loop from current age and apply inflation to amounts
+		// Once the retirement year occurs, start summing the required retirement income amount
+		while (currentAge < lifespan) {
+			for (let month = 0; month < 12; month++) {
+				// Apply inflation to retirement income and pension
+				pensionPerMonth = pensionPerMonth * monthlyInflationFactor;
+
+				// Add up pension if eligible and of age
+				if (currentAge >= pensionAge) {
+					pensionSum += pensionPerMonth;
+				}
+			}
+
+			currentAge++;
+		}
+
+		return pensionSum;
+	}
+
+	function sumRequiredIncomeAmount(currentAge: number, retirementYearAge: number, retirementIncomePerMonth: number, monthlyInflationFactor: number) {
+		let retirementAmountNeeded = 0;
+
+		// Loop from current age and apply inflation to amounts
+		// Once the retirement year occurs, start summing the required retirement income amount
+		while (currentAge < lifespan) {
+			for (let month = 0; month < 12; month++) {
+				// Apply inflation to retirement income and pension
+				retirementIncomePerMonth = retirementIncomePerMonth * monthlyInflationFactor;
+
+				if (currentAge >= retirementYearAge) {
+					retirementAmountNeeded += retirementIncomePerMonth;
+				}
+			}
+
+			currentAge++;
+		}
+
+		return retirementAmountNeeded;
 	}
 
 	function getIntValueOrZero(value: number | null): number {
@@ -745,7 +811,7 @@
 
 			{#if earlyRetirementAge}
 				<div class="result-message">
-					{#if earlyRetirementAge < lifespan}
+					{#if (!eligibleForPension || earlyRetirementAge < pensionAge!) && earlyRetirementAge < lifespan}
 						<span contenteditable="false" bind:innerHTML={consideringTheAnswersMessage}></span>
 
 						<table class="summary-table">
@@ -769,7 +835,7 @@
 											<td>{Formatter.moneyPrecise(savedSummaryItem.totalInterest, currency, $user.culture, 0)}</td>
 										{/if}
 										<td>{Formatter.moneyPrecise(savedSummaryItem.required, currency, $user.culture, 0)}</td>
-										<td>{Formatter.moneyPrecise(savedSummaryItem.totalSaved, currency, $user.culture, 0)}</td>
+										<td>{Formatter.moneyPrecise(savedSummaryItem.saved, currency, $user.culture, 0)}</td>
 									</tr>
 								{/each}
 							</tbody>
