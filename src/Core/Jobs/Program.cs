@@ -1,6 +1,8 @@
 using Cdn;
 using Core.Infrastructure;
+using Dapper;
 using Jobs;
+using Jobs.Dapper;
 using Jobs.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -50,6 +52,7 @@ using var host = hostBuilder
         });
 
         Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+        SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
 
         services.AddTransient<DailyJob>();
     })
