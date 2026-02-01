@@ -216,6 +216,8 @@
 			amountTo = 450000000;
 		}
 
+		accounts = await accountsService.getAllWithBalance(currency);
+
 		accountsService.getMainId().then(async (id: number) => {
 			mainAccountId = id;
 
@@ -231,8 +233,6 @@
 
 			accountOptions = options;
 		});
-
-		accounts = await accountsService.getAllWithBalance(currency);
 	});
 
 	onDestroy(() => {

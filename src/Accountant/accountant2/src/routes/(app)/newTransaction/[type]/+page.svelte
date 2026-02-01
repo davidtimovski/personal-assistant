@@ -75,6 +75,10 @@
 		}
 	});
 
+	let pageTitle = $derived(
+		$t(data.isExpense ? 'newTransaction.newExpense' : accountIsFund ? 'newTransaction.newInvestment' : 'newTransaction.newDeposit')
+	);
+
 	let pastMidnight = $derived.by((): string | null => {
 		if (!date) {
 			return null;
@@ -223,7 +227,11 @@
 						return x;
 					});
 				} else {
-					const messageKey = data.isExpense ? 'newTransaction.expenseSubmitted' : 'newTransaction.depositSubmitted';
+					const messageKey = data.isExpense
+						? 'newTransaction.expenseSubmitted'
+						: accountIsFund
+							? 'newTransaction.investmentSubmitted'
+							: 'newTransaction.depositSubmitted';
 
 					alertState.update((x) => {
 						x.showSuccess(messageKey);
@@ -337,7 +345,7 @@
 		{/if}
 
 		<div class="page-title">
-			<span>{$t(data.isExpense ? 'newTransaction.newExpense' : 'newTransaction.newDeposit')}</span>
+			<span>{pageTitle}</span>
 		</div>
 
 		<a href={debtId ? '/debt' : '/dashboard'} class="back-button" role="button">
@@ -380,7 +388,7 @@
 
 			<div class="form-control inline">
 				<label for="amount">{$t('amount')}</label>
-				<AmountInput bind:amount bind:currency disabled={accountIsFund} invalid={amountIsInvalid} focusOnInit={true} />
+				<AmountInput bind:amount bind:currency invalid={amountIsInvalid} focusOnInit={true} />
 			</div>
 
 			<div class="form-control inline">

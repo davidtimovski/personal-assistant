@@ -85,6 +85,7 @@ export default {
 		newTransaction: {
 			newExpense: 'New expense',
 			newDeposit: 'New deposit',
+			newInvestment: 'New investment',
 			settleDebtTo: 'Settle debt to {{person}}.',
 			settleDebtFrom: 'Settle debt from {{person}}.',
 			considerUsingYesterday: "It's currently {{time}} past midnight. Consider using yesterday's date.",
@@ -92,13 +93,16 @@ export default {
 			submit: 'Submit',
 			debtSettlingSuccessful: 'Debt was successfully settled',
 			expenseSubmitted: 'Expense was successfully submitted',
-			depositSubmitted: 'Deposit was successfully submitted'
+			depositSubmitted: 'Deposit was successfully submitted',
+			investmentSubmitted: 'Investment was succeffully submitted'
 		},
 		transaction: {
 			generatedAlert: 'This transaction was automatically generated.',
 			originalAmount: 'Original amount',
 			expense: 'Expense',
 			deposit: 'Deposit',
+			investment: 'Investment',
+			divestment: 'Divestment',
 			transfer: 'Transfer',
 			accounts: 'Accounts',
 			to: '{{from}} to {{to}}'
@@ -106,6 +110,8 @@ export default {
 		editTransaction: {
 			editExpense: 'Edit expense',
 			editDeposit: 'Edit deposit',
+			editInvestment: 'Edit investment',
+			editDivestment: 'Edit divestment',
 			editTransaction: 'Edit transaction',
 			none: 'None',
 			fromAccount: 'From account',
@@ -346,8 +352,10 @@ export default {
 				'The calculation will assume a lifespan of <span class="er-calc-highlight">{{lifespan}}</span> years and a flat yearly inflation rate of <span class="er-calc-highlight">{{inflation}}%</span>',
 			calculate: 'Calculate',
 			result: 'Result',
-			consideringTheAnswers:
-				'Considering the answers you provided you will be able to retire at the age of <span class="retirement-age er-calc-highlight">{{earlyRetirementAge}}</span>.<br><br>In order do to so, you will require a capital of <span class="er-calc-highlight">{{requiredCapitalToRetireAtAge}}</span>, which at your current rate of saving you will manage to attain!',
+			consideringTheAnswers1:
+				'Considering the answers you provided you will be able to retire at the age of <span class="retirement-age er-calc-highlight">{{earlyRetirementAge}}</span>.<br><br>In order do to so, you will require a capital of <span class="er-calc-highlight">{{requiredCapitalToRetireAtAge}}</span>. You will acquire <span class="er-calc-highlight">{{pensionSum}}</span> through your pension, and with your current rate of saving you will manage to attain the required capital.',
+			consideringTheAnswers2:
+				'Considering the answers you provided you will be able to retire at the age of <span class="retirement-age er-calc-highlight">{{earlyRetirementAge}}</span>.<br><br>In order do to so, you will require a capital of <span class="er-calc-highlight">{{requiredCapitalToRetireAtAge}}</span>, and with your current rate of saving you will manage to attain it.',
 			year: 'Year',
 			interest: 'Interest ({{savingInterestRate}}%)',
 			required: 'Required',
@@ -510,6 +518,7 @@ export default {
 		newTransaction: {
 			newExpense: 'Нов трошок',
 			newDeposit: 'Нов депозит',
+			newInvestment: 'Нова инвестиција',
 			settleDebtTo: 'Расчисти го долгот со {{person}}.',
 			settleDebtFrom: 'Расчисти го долгот од {{person}}.',
 			considerUsingYesterday: 'Моментално е {{time}} после полноќ. Можеби треба да го користите вчерашниот датум.',
@@ -517,13 +526,16 @@ export default {
 			submit: 'Поднеси',
 			debtSettlingSuccessful: 'Долгот беше успешно расчистен',
 			expenseSubmitted: 'Трошокот беше успешно поднесен',
-			depositSubmitted: 'Депозитот беше успешно поднесен'
+			depositSubmitted: 'Депозитот беше успешно поднесен',
+			investmentSubmitted: 'Инвестицијата беше успешно поднесена'
 		},
 		transaction: {
 			generatedAlert: 'Оваа трансакција беше автоматски креирана.',
 			originalAmount: 'Оригинална сума',
 			expense: 'Трошок',
 			deposit: 'Депозит',
+			investment: 'Инвестиција',
+			divestment: 'Дивестиција',
 			transfer: 'Префрлање',
 			accounts: 'Сметки',
 			to: '{{from}} до {{to}}'
@@ -531,6 +543,8 @@ export default {
 		editTransaction: {
 			editExpense: 'Ажурирај трошок',
 			editDeposit: 'Ажурирај депозит',
+			editInvestment: 'Ажурирај инвестиција',
+			editDivestment: 'Ажурирај дивестиција',
 			editTransaction: 'Ажурирај трансакција',
 			none: 'Ниедна',
 			encryptDescription: 'Шифрирај опис',
@@ -769,8 +783,10 @@ export default {
 				'Калкулацијата ќе земе во предвид животен рок од <span class="er-calc-highlight">{{lifespan}}</span> години и рамна годишна инфлација од <span class="er-calc-highlight">{{inflation}}%</span>',
 			calculate: 'Пресметај',
 			result: 'Резултат',
-			consideringTheAnswers:
-				'Со оглед на одговорите што ги дадовте ќе можете да се пензионирате на <span class="retirement-age er-calc-highlight">{{earlyRetirementAge}}</span> години.<br><br>За да го сторите тоа, ќе ви е потребен капитал од <span class="er-calc-highlight">{{requiredCapitalToRetireAtAge}}</span>, кој со вашето моментално темпо на штедење ќе успеете да го соберете!',
+			consideringTheAnswers1:
+				'Со оглед на одговорите што ги дадовте ќе можете да се пензионирате на <span class="retirement-age er-calc-highlight">{{earlyRetirementAge}}</span> години.<br><br>За да го сторите тоа, ќе ви е потребен капитал од <span class="er-calc-highlight">{{requiredCapitalToRetireAtAge}}</span>. Ќе се здобиете со <span class="er-calc-highlight">{{pensionSum}}</span> преку вашата пензија, и со вашето моментално темпо на штедење ќе успеете да го соберете потребниот капитал.',
+			consideringTheAnswers2:
+				'Со оглед на одговорите што ги дадовте ќе можете да се пензионирате на <span class="retirement-age er-calc-highlight">{{earlyRetirementAge}}</span> години.<br><br>За да го сторите тоа, ќе ви е потребен капитал од <span class="er-calc-highlight">{{requiredCapitalToRetireAtAge}}</span>, и со вашето моментално темпо на штедење ќе успеете да го соберете.',
 			year: 'Година',
 			interest: 'Камата ({{savingInterestRate}}%)',
 			required: 'Потребно',

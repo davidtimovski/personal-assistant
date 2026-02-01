@@ -155,15 +155,17 @@
 		const transactions = await transactionsService.getExpendituresFrom(mainAccountId, fromDate, currency);
 
 		for (const day of daysArray) {
-			transactions.forEach((x) => {
-				if (day.date === x.date.slice(0, 10)) {
-					const categoryName = x.category ? x.category.fullName : $t('uncategorized');
-					const trimmedDescription = formatDescription(x.description, x.isEncrypted);
+			transactions
+				.sort((a, b) => b.amount - a.amount)
+				.forEach((x) => {
+					if (day.date === x.date.slice(0, 10)) {
+						const categoryName = x.category ? x.category.fullName : $t('uncategorized');
+						const trimmedDescription = formatDescription(x.description, x.isEncrypted);
 
-					day.spent += x.amount;
-					day.expenditures.push(new HeatmapExpense(x.id, categoryName, trimmedDescription, x.amount));
-				}
-			});
+						day.spent += x.amount;
+						day.expenditures.push(new HeatmapExpense(x.id, categoryName, trimmedDescription, x.amount));
+					}
+				});
 
 			if (day.spent > maxSpent) {
 				maxSpent = day.spent;

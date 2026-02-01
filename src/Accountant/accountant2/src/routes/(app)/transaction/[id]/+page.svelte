@@ -25,7 +25,7 @@
 
 	let fromExpenditureHeatmap = false;
 	let type: TransactionType | null = null;
-	let typeLabel = $state('---');
+	let pageTitle = $state('---');
 	let accountLabel = $state('---');
 	let accountValue = $state('---');
 	let amount: number | undefined = $state(undefined);
@@ -46,7 +46,6 @@
 	let passwordShown = $state(false);
 	let decryptButtonIsLoading = $state(false);
 	let decryptionPasswordIsInvalid = $state(false);
-	const typeStringMap = new Map<TransactionType, string>();
 	let passwordInput: HTMLInputElement | null = $state(null);
 	let passwordShowIconLabel = $state('');
 
@@ -119,10 +118,6 @@
 	}
 
 	onMount(async () => {
-		typeStringMap.set(TransactionType.Expense, $t('transaction.expense'));
-		typeStringMap.set(TransactionType.Deposit, $t('transaction.deposit'));
-		typeStringMap.set(TransactionType.Transfer, $t('transaction.transfer'));
-
 		const url = new URL(window.location.href);
 		const queryParams = new URLSearchParams(url.search);
 		const fromExpenditureHeatmapParam = queryParams.get('fromExpenditureHeatmap');
@@ -147,8 +142,6 @@
 		}
 
 		type = TransactionsService.getType(transaction.fromAccountId, transaction.toAccountId);
-
-		typeLabel = <string>typeStringMap.get(type);
 		amount = transaction.convertedAmount;
 		originalAmount = transaction.amount;
 		currency = transaction.currency;
@@ -169,6 +162,26 @@
 		salt = transaction.salt;
 		nonce = transaction.nonce;
 		generated = transaction.generated;
+
+		switch (type) {
+			case TransactionType.Expense:
+				pageTitle = $t('transaction.expense');
+				break;
+			case TransactionType.Deposit:
+				if (toStocks) {
+					pageTitle = $t('transaction.investment');
+				} else {
+					pageTitle = $t('transaction.deposit');
+				}
+				break;
+			case TransactionType.Transfer:
+				if (fromStocks) {
+					pageTitle = $t('transaction.divestment');
+				} else if (!toStocks) {
+					pageTitle = $t('transaction.transfer');
+				}
+				break;
+		}
 
 		if (type === TransactionType.Transfer) {
 			const fromAccount = await accountsService.get(<number>transaction.fromAccountId);
@@ -201,7 +214,7 @@
 		<a href="/editTransaction/{data.id}" class="side small" title={$t('edit')} aria-label={$t('edit')}>
 			<i class="fas fa-pencil-alt"></i>
 		</a>
-		<div class="page-title">{typeLabel}</div>
+		<div class="page-title">{pageTitle}</div>
 		<button type="button" onclick={back} class="back-button">
 			<i class="fas fa-times"></i>
 		</button>

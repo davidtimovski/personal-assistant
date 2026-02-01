@@ -159,7 +159,7 @@
 			</button>
 		</div>
 
-		{#if accounts && accounts.length > 0}
+		{#if accounts && accounts.length > 1}
 			<div>
 				<hr />
 

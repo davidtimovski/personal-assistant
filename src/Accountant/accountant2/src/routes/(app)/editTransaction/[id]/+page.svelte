@@ -360,14 +360,22 @@
 			<i class="fas fa-pencil-alt"></i>
 		</div>
 		<div class="page-title">
-			{#if type === 1}
+			{#if type === TransactionType.Expense}
 				<span>{$t('editTransaction.editExpense')}</span>
 			{/if}
-			{#if type === 2}
-				<span>{$t('editTransaction.editDeposit')}</span>
+			{#if type === TransactionType.Deposit}
+				{#if stockPurchase}
+					<span>{$t('editTransaction.editInvestment')}</span>
+				{:else}
+					<span>{$t('editTransaction.editDeposit')}</span>
+				{/if}
 			{/if}
-			{#if type !== 1 && type !== 2}
-				<span>{$t('editTransaction.editTransaction')}</span>
+			{#if type === TransactionType.Transfer}
+				{#if stockSelling}
+					<span>{$t('editTransaction.editDivestment')}</span>
+				{:else}
+					<span>{$t('editTransaction.editTransaction')}</span>
+				{/if}
 			{/if}
 		</div>
 		<a href="/transaction/{data.id}" class="back-button">
