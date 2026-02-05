@@ -24,9 +24,13 @@
 	let fromOptions: FromOption[] | null = $state(null);
 	let categoryOptions: SelectOption[] | null = $state(null);
 	let balanceAverage: number | null = $state(null);
+	let balanceTotal: number | null = $state(null);
 	let spentAverage: number | null = $state(null);
+	let spentTotal: number | null = $state(null);
 	let depositedAverage: number | null = $state(null);
+	let depositedTotal: number | null = $state(null);
 	let savedAverage: number | null = $state(null);
+	let savedTotal: number | null = $state(null);
 	let canvas: HTMLCanvasElement;
 	let canvasCtx: CanvasRenderingContext2D | null = null;
 	let categoryId = $state(0);
@@ -159,7 +163,7 @@
 						break;
 				}
 
-				item.amount = parseFloat(item.amount.toFixed(2));
+				item.amount = Formatter.truncateDecimals(item.amount, currency);
 
 				items.push(item);
 			} else {
@@ -172,17 +176,23 @@
 		switch (type) {
 			case TransactionType.Any:
 				balanceAverage = balanceSum / monthsDiff;
+				balanceTotal = balanceSum;
 				spentAverage = Math.abs(spentSum) / monthsDiff;
+				spentTotal = Math.abs(spentSum);
 				depositedAverage = depositedSum / monthsDiff;
+				depositedTotal = depositedSum;
 				break;
 			case TransactionType.Expense:
 				spentAverage = Math.abs(spentSum) / monthsDiff;
+				spentTotal = Math.abs(spentSum);
 				break;
 			case TransactionType.Deposit:
 				depositedAverage = depositedSum / monthsDiff;
+				depositedTotal = depositedSum;
 				break;
 			case TransactionType.Saving:
 				savedAverage = savedSum / monthsDiff;
+				savedTotal = savedSum;
 				break;
 		}
 
@@ -308,36 +318,36 @@
 			</div>
 			<div class="form-control">
 				<div class="multi-radio-wrap">
-					{#if categoryType === 0}
+					{#if categoryType === CategoryType.AllTransactions}
 						<div class="multi-radio-part">
-							<label class:selected={type === 0}>
+							<label class:selected={type === TransactionType.Any}>
 								<span>{$t('barChartReport.balance')}</span>
 								<input type="radio" name="typeToggle" value={0} bind:group={type} onchange={loadData} />
 							</label>
 						</div>
 					{/if}
 
-					{#if categoryType !== 1}
+					{#if categoryType !== CategoryType.DepositOnly}
 						<div class="multi-radio-part">
-							<label class:selected={type === 1}>
+							<label class:selected={type === TransactionType.Expense}>
 								<span>{$t('barChartReport.expenses')}</span>
 								<input type="radio" name="typeToggle" value={1} bind:group={type} onchange={loadData} />
 							</label>
 						</div>
 					{/if}
 
-					{#if categoryType !== 2}
+					{#if categoryType !== CategoryType.ExpenseOnly}
 						<div class="multi-radio-part">
-							<label class:selected={type === 2}>
+							<label class:selected={type === TransactionType.Deposit}>
 								<span>{$t('barChartReport.deposits')}</span>
 								<input type="radio" name="typeToggle" value={2} bind:group={type} onchange={loadData} />
 							</label>
 						</div>
 					{/if}
 
-					{#if categoryType === 0}
+					{#if categoryType === CategoryType.AllTransactions}
 						<div class="multi-radio-part">
-							<label class:selected={type === 4}>
+							<label class:selected={type === TransactionType.Saving}>
 								<span>{$t('barChartReport.savings')}</span>
 								<input type="radio" name="typeToggle" value={4} bind:group={type} onchange={loadData} />
 							</label>
@@ -351,35 +361,44 @@
 			<canvas bind:this={canvas}></canvas>
 		</div>
 
-		<div class="per-month-table-title">{$t('barChartReport.perMonth')}</div>
-
-		<table class="per-month-table">
+		<table class="summary-table">
+			<thead>
+				<tr>
+					<th></th>
+					<th>{$t('barChartReport.average')}</th>
+					<th>{$t('barChartReport.total')}</th>
+				</tr>
+			</thead>
 			<tbody>
-				{#if type === 0}
+				{#if type === TransactionType.Any}
 					<tr>
 						<td>{$t('balance')}</td>
 						<td>{Formatter.money(balanceAverage, currency, $user.culture)}</td>
+						<td>{Formatter.money(balanceTotal, currency, $user.culture)}</td>
 					</tr>
 				{/if}
 
-				{#if type === 0 || type === 1}
+				{#if type === TransactionType.Any || type === TransactionType.Expense}
 					<tr>
 						<td>{$t('barChartReport.spent')}</td>
 						<td>{Formatter.money(spentAverage, currency, $user.culture)}</td>
+						<td>{Formatter.money(spentTotal, currency, $user.culture)}</td>
 					</tr>
 				{/if}
 
-				{#if type === 0 || type === 2}
+				{#if type === TransactionType.Any || type === TransactionType.Deposit}
 					<tr>
 						<td>{$t('barChartReport.deposited')}</td>
 						<td>{Formatter.money(depositedAverage, currency, $user.culture)}</td>
+						<td>{Formatter.money(depositedTotal, currency, $user.culture)}</td>
 					</tr>
 				{/if}
 
-				{#if type === 4}
+				{#if type === TransactionType.Saving}
 					<tr>
 						<td>{$t('barChartReport.saved')}</td>
 						<td>{Formatter.money(savedAverage, currency, $user.culture)}</td>
+						<td>{Formatter.money(savedTotal, currency, $user.culture)}</td>
 					</tr>
 				{/if}
 			</tbody>
@@ -389,38 +408,40 @@
 
 <style lang="scss">
 	.bar-chart-wrap {
-		margin: 30px 0 20px;
+		margin: 30px 0 50px;
 	}
 
-	.per-month-table-title {
-		display: block;
-		border-bottom: 1px solid #ddd;
-		padding-bottom: 5px;
-		margin: 35px 0 10px;
-		text-decoration: none;
-		color: var(--primary-color);
-	}
-
-	.per-month-table {
+	.summary-table {
 		width: 100%;
-		font-size: 1rem;
 
+		th,
 		td {
-			padding: 5px 15px 5px 0;
-			line-height: 1.2rem;
-		}
-
-		td:last-child {
-			padding-right: 0;
+			padding: 6px 0 6px 15px;
+			line-height: 1rem;
 			text-align: right;
 			white-space: nowrap;
+		}
+
+		th:first-child,
+		td:first-child {
+			padding: 6px 15px 6px 0;
+			text-align: left;
+		}
+
+		th {
+			border-bottom: 1px solid #ddd;
+			line-height: 1.3rem;
+			color: var(--primary-color);
 		}
 	}
 
 	@media screen and (min-width: 1200px) {
-		.per-month-table td {
-			font-size: 1.1rem;
-			line-height: 1.3rem;
+		.summary-table {
+			th,
+			td {
+				font-size: 1.1rem;
+				line-height: 1.3rem;
+			}
 		}
 	}
 </style>

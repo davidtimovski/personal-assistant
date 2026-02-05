@@ -10,6 +10,7 @@ import type { Account } from '$lib/models/entities/account';
 import { SelectOption, SelectOptionExtended } from '$lib/models/viewmodels/selectOption';
 import type { TransactionModel } from '$lib/models/entities/transaction';
 import { CreateAccount, UpdateAccount } from '$lib/models/server/requests/account';
+import { Formatter } from '$lib/utils/formatter';
 import Variables from '$lib/variables';
 
 export class AccountsService {
@@ -123,7 +124,7 @@ export class AccountsService {
 				}
 			});
 
-			return parseFloat(balance.toFixed(2));
+			return Formatter.truncateDecimals(balance, currency);
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -159,7 +160,7 @@ export class AccountsService {
 			const monthsPassed = now.getMonth() - earliestTransactionDate.getMonth() + 12 * (now.getFullYear() - earliestTransactionDate.getFullYear());
 			const savingsPerMonth = saving / monthsPassed;
 
-			return parseFloat(savingsPerMonth.toFixed(2));
+			return Formatter.truncateDecimals(savingsPerMonth, currency);
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -186,7 +187,7 @@ export class AccountsService {
 			const amount = stocks * account.stockPrice;
 			const balance = this.currenciesService.convert(amount, account.currency, currency);
 
-			return [parseFloat(balance.toFixed(2)), parseInt(stocks.toString())];
+			return [Formatter.truncateDecimals(balance, currency), parseInt(stocks.toString())];
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
