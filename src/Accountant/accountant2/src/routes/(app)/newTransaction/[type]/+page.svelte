@@ -22,6 +22,7 @@
 
 	import AmountInput from '$lib/components/AmountInput.svelte';
 	import type { Account } from '$lib/models/entities/account';
+	import { Formatter } from '$lib/utils/formatter';
 
 	interface Props {
 		data: PageData;
@@ -115,12 +116,8 @@
 	});
 
 	function deriveAmountBasedOnStocks() {
-		let decimals = 2;
-		if (selectedAccountOption!.data.currency === 'MKD') {
-			decimals = 0;
-		}
-
-		amount = parseFloat((toStocks! * selectedAccountOption!.data.stockPrice!).toFixed(decimals));
+		amount =
+			toStocks === null ? null : Formatter.truncateDecimals(toStocks * selectedAccountOption!.data.stockPrice!, selectedAccountOption!.data.currency);
 	}
 
 	function accountChanged() {

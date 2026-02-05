@@ -1,4 +1,4 @@
-import type { Category, CategoryType } from '$lib/models/entities/category';
+import { CategoryType, type Category } from '$lib/models/entities/category';
 import type { CreatedIdPair } from '$lib/models/server/responses/sync';
 import { IDBContext } from './idbContext';
 
@@ -13,7 +13,7 @@ export class CategoriesIDBHelper {
 		let categories = await this.db.categories.toArray();
 
 		categories = categories.filter((x: Category): boolean => {
-			return type === 0 || x.type === 0 || x.type === type;
+			return type === CategoryType.AllTransactions || x.type === CategoryType.AllTransactions || x.type === type;
 		});
 
 		const getCountPromises = Array<Promise<void>>();

@@ -1,6 +1,14 @@
 export class Formatter {
 	private static withFractions = new Set(['EUR', 'USD']);
 
+	static truncateDecimals(value: number, currency: string, fractionDigits?: number | undefined) {
+		if (fractionDigits === undefined) {
+			fractionDigits = Formatter.withFractions.has(currency) ? 2 : 0;
+		}
+
+		return parseFloat(value.toFixed(fractionDigits));
+	}
+
 	static number(value: any, culture: string | string[] | undefined, fractionDigits?: number | undefined) {
 		if (isNaN(parseFloat(value))) {
 			return '';
@@ -36,14 +44,14 @@ export class Formatter {
 			return '';
 		}
 
-		const fraction = Formatter.withFractions.has(currency) ? 2 : 0;
+		const fractionDigits = Formatter.withFractions.has(currency) ? 2 : 0;
 
 		const formatConfig = new Intl.NumberFormat(culture, {
 			style: 'currency',
 			currency: currency,
 			currencyDisplay: 'narrowSymbol',
-			minimumFractionDigits: fraction,
-			maximumFractionDigits: fraction
+			minimumFractionDigits: fractionDigits,
+			maximumFractionDigits: fractionDigits
 		});
 
 		return formatConfig.format(value);

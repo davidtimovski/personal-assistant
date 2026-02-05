@@ -9,7 +9,7 @@
 	import { CategoriesService } from '$lib/services/categoriesService';
 	import { CategoryItem } from '$lib/models/viewmodels/categoryItem';
 	import { SyncEvents } from '$lib/models/syncStatus';
-	import type { Category } from '$lib/models/entities/category';
+	import { CategoryType, type Category } from '$lib/models/entities/category';
 
 	let categories: CategoryItem[] | null = $state(null);
 	let editedId: number | undefined = $state(undefined);
@@ -95,13 +95,13 @@
 										</span>
 									{/if}
 
-									{#if category.type === 1}
+									{#if category.type === CategoryType.DepositOnly}
 										<span class="category-indicator" title={$t('categories.depositOnly')} aria-label={$t('categories.depositOnly')}>
 											<i class="fas fa-donate"></i>
 										</span>
 									{/if}
 
-									{#if category.type === 2}
+									{#if category.type === CategoryType.ExpenseOnly}
 										<span class="category-indicator" title={$t('categories.expenseOnly')} aria-label={$t('categories.expenseOnly')}>
 											<i class="fas fa-wallet"></i>
 										</span>
@@ -132,13 +132,13 @@
 											</span>
 										{/if}
 
-										{#if sub.type === 1}
+										{#if sub.type === CategoryType.DepositOnly}
 											<span class="category-indicator" title={$t('categories.depositOnly')} aria-label={$t('categories.depositOnly')}>
 												<i class="fas fa-donate"></i>
 											</span>
 										{/if}
 
-										{#if sub.type === 2}
+										{#if sub.type === CategoryType.ExpenseOnly}
 											<span class="category-indicator" title={$t('categories.expenseOnly')} aria-label={$t('categories.expenseOnly')}>
 												<i class="fas fa-wallet"></i>
 											</span>

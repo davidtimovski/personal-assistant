@@ -42,7 +42,7 @@
 			});
 		}
 
-		if ($searchFilters.accountId !== 0 && $searchFilters.type === 3) {
+		if ($searchFilters.accountId !== 0 && $searchFilters.type === TransactionType.Transfer) {
 			searchFilters.update((x) => {
 				x.type = 0;
 				return x;
@@ -294,28 +294,28 @@
 			<div class="form-control">
 				<div class="multi-radio-wrap">
 					<div class="multi-radio-part">
-						<label class:selected={$searchFilters.type === 0}>
+						<label class:selected={$searchFilters.type === TransactionType.Any}>
 							<span>{$t('transactions.all')}</span>
-							<input type="radio" name="typeToggle" value={0} bind:group={$searchFilters.type} onchange={filterChanged} />
+							<input type="radio" name="typeToggle" value={TransactionType.Any} bind:group={$searchFilters.type} onchange={filterChanged} />
 						</label>
 					</div>
 					<div class="multi-radio-part">
-						<label class:selected={$searchFilters.type === 1}>
+						<label class:selected={$searchFilters.type === TransactionType.Expense}>
 							<span>{$t('transactions.expenses')}</span>
-							<input type="radio" name="typeToggle" value={1} bind:group={$searchFilters.type} onchange={filterChanged} />
+							<input type="radio" name="typeToggle" value={TransactionType.Expense} bind:group={$searchFilters.type} onchange={filterChanged} />
 						</label>
 					</div>
 					<div class="multi-radio-part">
-						<label class:selected={$searchFilters.type === 2}>
+						<label class:selected={$searchFilters.type === TransactionType.Deposit}>
 							<span>{$t('transactions.deposits')}</span>
-							<input type="radio" name="typeToggle" value={2} bind:group={$searchFilters.type} onchange={filterChanged} />
+							<input type="radio" name="typeToggle" value={TransactionType.Deposit} bind:group={$searchFilters.type} onchange={filterChanged} />
 						</label>
 					</div>
 					{#if $searchFilters.accountId === 0}
 						<div class="multi-radio-part">
-							<label class:selected={$searchFilters.type === 3}>
+							<label class:selected={$searchFilters.type === TransactionType.Transfer}>
 								<span>{$t('transactions.transfers')}</span>
-								<input type="radio" name="typeToggle" value={3} bind:group={$searchFilters.type} onchange={filterChanged} />
+								<input type="radio" name="typeToggle" value={TransactionType.Transfer} bind:group={$searchFilters.type} onchange={filterChanged} />
 							</label>
 						</div>
 					{/if}
@@ -365,15 +365,15 @@
 									role="button"
 								>
 									<td class="type-cell">
-										{#if transaction.type === 1}
+										{#if transaction.type === TransactionType.Expense}
 											<i class="fas fa-wallet expense-color"></i>
 										{/if}
 
-										{#if transaction.type === 2}
+										{#if transaction.type === TransactionType.Deposit}
 											<i class="fas fa-donate deposit-color"></i>
 										{/if}
 
-										{#if transaction.type === 3}
+										{#if transaction.type === TransactionType.Transfer}
 											<i class="fas fa-exchange-alt transfer-color"></i>
 										{/if}
 									</td>

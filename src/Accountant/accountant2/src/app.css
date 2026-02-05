@@ -82,6 +82,7 @@ textarea {
 
 .form-control.inline label {
 	padding-right: 25px;
+	white-space: nowrap;
 }
 
 .form-control.inline span:nth-child(2) {

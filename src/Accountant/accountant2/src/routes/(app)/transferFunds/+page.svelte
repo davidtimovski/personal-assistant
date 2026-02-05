@@ -150,12 +150,12 @@
 			try {
 				let fromStocks: number | null = null;
 				if (fromAccount.stockPrice !== null) {
-					fromStocks = parseFloat((amount / fromAccount.stockPrice).toFixed(4));
+					fromStocks = Formatter.truncateDecimals(amount / fromAccount.stockPrice, currency, 4);
 				}
 
 				let toStocks: number | null = null;
 				if (toAccount.stockPrice !== null) {
-					toStocks = parseFloat((amount / toAccount.stockPrice).toFixed(4));
+					toStocks = Formatter.truncateDecimals(amount / toAccount.stockPrice, currency, 4);
 				}
 
 				if (fromStocks || toStocks) {
