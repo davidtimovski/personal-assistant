@@ -4,6 +4,9 @@ namespace Jobs;
 
 public static partial class Log
 {
+    [LoggerMessage(LogLevel.Information, "Executing jobs for the following time: {dateTime}")]
+    public static partial void ExecutingJobs(this ILogger logger, string dateTime);
+
     [LoggerMessage(LogLevel.Information, "Starting {operation}")]
     public static partial void StartingOperation(this ILogger logger, string operation);
 

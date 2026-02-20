@@ -18,8 +18,12 @@ using var host = hostBuilder
         configBuilder.SetBasePath(Directory.GetCurrentDirectory())
                      .AddJsonFile("appsettings.json", false)
                      .AddJsonFile($"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json", true, true)
-                     .AddEnvironmentVariables()
-                     .AddKeyVault();
+                     .AddEnvironmentVariables();
+
+        if (hostContext.HostingEnvironment.IsProduction())
+        {
+            configBuilder.AddKeyVault();
+        }
     })
     .ConfigureLogging((hostContext, logging) =>
     {
@@ -69,13 +73,13 @@ using var host = hostBuilder
         }
     }).Build();
 
-static async Task RunWorkerAsync(IServiceProvider services)
+static async Task RunWorkerAsync(string[] arguments, IServiceProvider services)
 {
     using IServiceScope serviceScope = services.CreateScope();
     var job = serviceScope.ServiceProvider.GetRequiredService<DailyJob>();
-    await job.RunAsync();
+    await job.RunAsync(arguments);
 }
 
 await host.StartAsync();
-await RunWorkerAsync(host.Services);
+await RunWorkerAsync(args, host.Services);
 await host.StopAsync();

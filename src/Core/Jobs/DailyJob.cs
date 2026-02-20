@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Runtime.Serialization;
 using System.Text.Json.Nodes;
 using Azure.Storage.Blobs;
@@ -36,33 +37,52 @@ public class DailyJob
         _logger = ArgValidator.NotNull(logger);
     }
 
-    public async Task RunAsync()
+    public async Task RunAsync(string[] arguments)
     {
         var tr = SentrySdk.StartTransaction(nameof(DailyJob), nameof(RunAsync));
 
-        var now = DateTime.UtcNow;
+        const string argumentTimeFormat = "yyyy-MM-dd HH";
+
+        var utcNow = DateTime.UtcNow;
+        var dateTime = arguments.Length == 0
+            ? utcNow
+            : DateTime.ParseExact(arguments[0], argumentTimeFormat, CultureInfo.InvariantCulture).ToUniversalTime();
 
         using var conn = new NpgsqlConnection(_config.JobsConnectionString);
         conn.Open();
 
-        await DeleteOldNotificationsAsync(conn, now, tr);
-        await DeleteOldDeletedEntityEntriesAsync(conn, now, tr);
-        await GenerateUpcomingExpensesAsync(conn, now, tr);
-        await GenerateTransactionsAsync(conn, now, tr);
-
-        if (_hostEnvironment.IsProduction())
+        do
         {
-            await GetAndSaveCurrencyRatesAsync(conn, now, tr);
-            await DeleteTemporaryCdnResourcesAsync(now, tr);
-            await UploadDatabaseBackupAsync(tr);
+            _logger.ExecutingJobs(dateTime.ToString(argumentTimeFormat));
+
+            await RunJobsAsync(conn, dateTime, tr);
+
+            dateTime = dateTime.AddDays(1);
+            await Task.Delay(3000);
         }
+        while (dateTime <= utcNow);
 
         _logger.DailyJobRunCompleted();
 
         tr.Finish();
     }
 
-    private async Task DeleteOldNotificationsAsync(NpgsqlConnection conn, DateTime now, ISpan metricsSpan)
+    private async Task RunJobsAsync(NpgsqlConnection conn, DateTime dateTime, ISpan metricsSpan)
+    {
+        await DeleteOldNotificationsAsync(conn, dateTime, metricsSpan);
+        await DeleteOldDeletedEntityEntriesAsync(conn, dateTime, metricsSpan);
+        await GenerateUpcomingExpensesAsync(conn, dateTime, metricsSpan);
+        await GenerateTransactionsAsync(conn, dateTime, metricsSpan);
+
+        if (_hostEnvironment.IsProduction())
+        {
+            await GetAndSaveCurrencyRatesAsync(conn, dateTime, metricsSpan);
+            await DeleteTemporaryCdnResourcesAsync(dateTime, metricsSpan);
+            await UploadDatabaseBackupAsync(metricsSpan);
+        }
+    }
+
+    private async Task DeleteOldNotificationsAsync(NpgsqlConnection conn, DateTime dateTime, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(DailyJob)}.{nameof(DeleteOldNotificationsAsync)}");
 
@@ -70,7 +90,7 @@ public class DailyJob
 
         try
         {
-            var aWeekAgo = now.AddDays(-7);
+            var aWeekAgo = dateTime.AddDays(-7);
             await conn.ExecuteAsync("DELETE FROM todo.notifications WHERE created_date < @DeleteTo", new { DeleteTo = aWeekAgo });
 
             _logger.CompletedOperation(nameof(DeleteOldNotificationsAsync));
@@ -80,6 +100,7 @@ public class DailyJob
             metric.Status = SpanStatus.InternalError;
 
             _logger.OperationFailed(nameof(DeleteOldNotificationsAsync), ex);
+            throw;
         }
         finally
         {
@@ -87,7 +108,7 @@ public class DailyJob
         }
     }
 
-    private async Task DeleteOldDeletedEntityEntriesAsync(NpgsqlConnection conn, DateTime now, ISpan metricsSpan)
+    private async Task DeleteOldDeletedEntityEntriesAsync(NpgsqlConnection conn, DateTime dateTime, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(DailyJob)}.{nameof(DeleteOldDeletedEntityEntriesAsync)}");
 
@@ -95,7 +116,7 @@ public class DailyJob
 
         try
         {
-            var oneYearAgo = now.AddYears(-1);
+            var oneYearAgo = dateTime.AddYears(-1);
             await conn.ExecuteAsync("DELETE FROM accountant.deleted_entities WHERE deleted_date < @DeleteTo", new { DeleteTo = oneYearAgo });
 
             _logger.CompletedOperation(nameof(DeleteOldDeletedEntityEntriesAsync));
@@ -105,6 +126,148 @@ public class DailyJob
             metric.Status = SpanStatus.InternalError;
 
             _logger.OperationFailed(nameof(DeleteOldDeletedEntityEntriesAsync), ex);
+            throw;
+        }
+        finally
+        {
+            metric.Finish();
+        }
+    }
+
+    /// <summary>
+    /// For the upcoming expenses functionality in Accountant.
+    /// </summary>
+    private async Task GenerateUpcomingExpensesAsync(NpgsqlConnection conn, DateTime dateTime, ISpan metricsSpan)
+    {
+        var metric = metricsSpan.StartChild($"{nameof(DailyJob)}.{nameof(GenerateUpcomingExpensesAsync)}");
+
+        string getMostFrequentCurrency(IReadOnlyList<Transaction> expenses)
+        {
+            if (expenses.Count() == 1)
+            {
+                return expenses.First().Currency;
+            }
+
+            var groupedByCurrency = expenses.GroupBy(x => x.Currency);
+            var biggestCurrencyGroup = groupedByCurrency.OrderByDescending(g => g.Count()).First();
+
+            var groupsWithMaxExpenses = groupedByCurrency.Where(g => g.Count() == biggestCurrencyGroup.Count());
+
+            // There are multiple biggest groups
+            if (groupsWithMaxExpenses.Count() > 1)
+            {
+                // Use currency from last expense that belongs to biggest groups
+                var expensesFromBiggestGroups = groupsWithMaxExpenses.SelectMany(x => x.ToList());
+                return expensesFromBiggestGroups.OrderByDescending(x => x.Date).First().Currency;
+            }
+
+            // Use currency from biggest group
+            return biggestCurrencyGroup.First().Currency;
+        }
+
+        bool ShouldGenerate(IReadOnlyList<Transaction> expenses)
+        {
+            if (!expenses.Any())
+            {
+                return false;
+            }
+
+            Transaction earliest = expenses.OrderBy(x => x.Date).First();
+            var twoMonthsAgo = new DateOnly(dateTime.Year, dateTime.Month, 1).AddMonths(-2);
+
+            return earliest.Date < twoMonthsAgo;
+        }
+
+        _logger.StartingOperation(nameof(GenerateUpcomingExpensesAsync));
+
+        try
+        {
+            var categories = conn.Query<Category>("SELECT * FROM accountant.categories WHERE generate_upcoming_expense");
+
+            var userGroups = categories.GroupBy(x => x.UserId);
+
+            foreach (var userGroup in userGroups)
+            {
+                foreach (Category category in userGroup)
+                {
+                    bool exists = conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
+                                                             FROM accountant.upcoming_expenses
+                                                             WHERE generated AND category_id = @CategoryId
+                                                                 AND to_char(created_date, 'YYYY-MM') = to_char(@Now, 'YYYY-MM')",
+                        new { CategoryId = category.Id, Now = dateTime });
+                    if (exists)
+                    {
+                        continue;
+                    }
+
+                    var firstOfThisMonth = new DateTime(dateTime.Year, dateTime.Month, 1);
+                    var transactionsExistThisMonth = conn.ExecuteScalar<bool>(@"SELECT COUNT(*) 
+                                                                            FROM accountant.transactions AS t 
+                                                                            INNER JOIN accountant.accounts AS a ON a.id = t.from_account_id 
+                                                                                OR a.id = t.to_account_id 
+                                                                            WHERE a.user_id = @UserId 
+                                                                                AND category_id = @CategoryId 
+                                                                                AND date >= @From 
+                                                                                AND from_account_id IS NOT NULL AND to_account_id IS NULL",
+                        new { category.UserId, CategoryId = category.Id, From = firstOfThisMonth });
+                    if (transactionsExistThisMonth)
+                    {
+                        continue;
+                    }
+
+                    var threeMonthsAgo = new DateTime(dateTime.Year, dateTime.Month, 1).AddMonths(-3);
+                    var expenses = conn.Query<Transaction>(@"SELECT t.* 
+                                                        FROM accountant.transactions AS t 
+                                                        INNER JOIN accountant.accounts AS a ON a.id = t.from_account_id 
+                                                            OR a.id = t.to_account_id 
+                                                        WHERE a.user_id = @UserId 
+                                                            AND category_id = @CategoryId 
+                                                            AND date >= @From AND date < @To 
+                                                            AND from_account_id IS NOT NULL AND to_account_id IS NULL",
+                        new { category.UserId, CategoryId = category.Id, From = threeMonthsAgo, To = firstOfThisMonth }).ToList();
+
+                    if (!ShouldGenerate(expenses))
+                    {
+                        continue;
+                    }
+
+                    decimal sum = expenses.Sum(x => x.Amount);
+                    int months = expenses.GroupBy(x => x.Date.ToString("yyyy-MM")).Count();
+                    decimal amount = sum / months;
+                    var currency = getMostFrequentCurrency(expenses);
+                    if (currency == "MKD")
+                    {
+                        amount = Math.Round(amount);
+                        amount -= amount % 10;
+                    }
+
+                    var upcomingExpense = new UpcomingExpense
+                    {
+                        UserId = category.UserId,
+                        CategoryId = category.Id,
+                        Amount = amount,
+                        Currency = currency,
+                        Date = new DateOnly(dateTime.Year, dateTime.Month, 1),
+                        Generated = true,
+                        CreatedDate = dateTime,
+                        ModifiedDate = dateTime
+                    };
+
+                    await conn.ExecuteAsync(@"INSERT INTO accountant.upcoming_expenses (user_id, category_id, amount, currency, description, date, generated, created_date, modified_date)
+                                              VALUES (@UserId, @CategoryId, @Amount, @Currency, @Description, @Date, @Generated, @CreatedDate, @ModifiedDate)", upcomingExpense);
+
+                    _logger.GeneratedUpcomingExpense();
+                }
+            }
+
+            _logger.CompletedOperation(nameof(GenerateUpcomingExpensesAsync));
+        }
+        catch (Exception ex)
+        {
+            metric.Status = SpanStatus.InternalError;
+
+            _logger.OperationFailed(nameof(GenerateUpcomingExpensesAsync), ex);
+            throw;
         }
         finally
         {
@@ -115,7 +278,7 @@ public class DailyJob
     /// <summary>
     /// For the automatic transactions functionality in Accountant.
     /// </summary>
-    private async Task GenerateTransactionsAsync(NpgsqlConnection conn, DateTime now, ISpan metricsSpan)
+    private async Task GenerateTransactionsAsync(NpgsqlConnection conn, DateTime dateTime, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(DailyJob)}.{nameof(GenerateTransactionsAsync)}");
 
@@ -125,10 +288,10 @@ public class DailyJob
 
         try
         {
-            var isLastDayOfMonth = now.Day == DateTime.DaysInMonth(now.Year, now.Month);
+            var isLastDayOfMonth = dateTime.Day == DateTime.DaysInMonth(dateTime.Year, dateTime.Month);
             var automaticTransactions = conn.Query<AutomaticTransaction>(@"SELECT * FROM accountant.automatic_transactions
                                                                            WHERE day_in_month = @DayInMonth OR (day_in_month = 0 AND @IsLastDayOfMonth)",
-                                                                           new { DayInMonth = now.Day, IsLastDayOfMonth = isLastDayOfMonth });
+                                                                           new { DayInMonth = dateTime.Day, IsLastDayOfMonth = isLastDayOfMonth });
 
             var userGroups = automaticTransactions.GroupBy(x => x.UserId);
 
@@ -158,7 +321,7 @@ public class DailyJob
                             automaticTransaction.Currency,
                             automaticTransaction.CategoryId,
                             automaticTransaction.Description,
-                            Date = now.Date,
+                            Date = dateTime.Date,
                             MainAccountId = userMainAccountId
                         });
 
@@ -173,10 +336,10 @@ public class DailyJob
                         Amount = automaticTransaction.Amount,
                         Currency = automaticTransaction.Currency,
                         Description = automaticTransaction.Description,
-                        Date = DateOnly.FromDateTime(now),
+                        Date = DateOnly.FromDateTime(dateTime),
                         Generated = true,
-                        CreatedDate = now,
-                        ModifiedDate = now
+                        CreatedDate = dateTime,
+                        ModifiedDate = dateTime
                     };
 
                     if (automaticTransaction.IsDeposit)
@@ -216,7 +379,7 @@ public class DailyJob
                                     await conn.ExecuteAsync(@"UPDATE accountant.upcoming_expenses
                                         SET amount = amount - @Amount, modified_date = @ModifiedDate
                                         WHERE id = @Id",
-                                        new { ue.Id, transaction.Amount, ModifiedDate = now }, dbTransaction);
+                                        new { ue.Id, transaction.Amount, ModifiedDate = dateTime }, dbTransaction);
 
                                     _logger.UpdatedUpcomingExpense();
                                 }
@@ -225,7 +388,7 @@ public class DailyJob
                                     await conn.ExecuteAsync(@"INSERT INTO accountant.deleted_entities
                                         (user_id, entity_type, entity_id, deleted_date) VALUES
                                         (@UserId, @EntityType, @EntityId, @DeletedDate)",
-                                        new DeletedEntity { UserId = userId, EntityType = EntityType.UpcomingExpense, EntityId = ue.Id, DeletedDate = now }, dbTransaction);
+                                        new DeletedEntity { UserId = userId, EntityType = EntityType.UpcomingExpense, EntityId = ue.Id, DeletedDate = dateTime }, dbTransaction);
 
                                     await conn.ExecuteAsync("DELETE FROM accountant.upcoming_expenses WHERE id = @Id AND user_id = @UserId",
                                         new { ue.Id, UserId = userId }, dbTransaction);
@@ -247,6 +410,7 @@ public class DailyJob
             metric.Status = SpanStatus.InternalError;
 
             _logger.OperationFailed(nameof(GenerateTransactionsAsync), ex);
+            throw;
         }
         finally
         {
@@ -254,153 +418,13 @@ public class DailyJob
         }
     }
 
-    /// <summary>
-    /// For the upcoming expenses functionality in Accountant.
-    /// </summary>
-    private async Task GenerateUpcomingExpensesAsync(NpgsqlConnection conn, DateTime now, ISpan metricsSpan)
-    {
-        var metric = metricsSpan.StartChild($"{nameof(DailyJob)}.{nameof(GenerateUpcomingExpensesAsync)}");
-
-        string getMostFrequentCurrency(IReadOnlyList<Transaction> expenses)
-        {
-            if (expenses.Count() == 1)
-            {
-                return expenses.First().Currency;
-            }
-
-            var groupedByCurrency = expenses.GroupBy(x => x.Currency);
-            var biggestCurrencyGroup = groupedByCurrency.OrderByDescending(g => g.Count()).First();
-
-            var groupsWithMaxExpenses = groupedByCurrency.Where(g => g.Count() == biggestCurrencyGroup.Count());
-
-            // There are multiple biggest groups
-            if (groupsWithMaxExpenses.Count() > 1)
-            {
-                // Use currency from last expense that belongs to biggest groups
-                var expensesFromBiggestGroups = groupsWithMaxExpenses.SelectMany(x => x.ToList());
-                return expensesFromBiggestGroups.OrderByDescending(x => x.Date).First().Currency;
-            }
-
-            // Use currency from biggest group
-            return biggestCurrencyGroup.First().Currency;
-        }
-
-        bool ShouldGenerate(IReadOnlyList<Transaction> expenses)
-        {
-            if (!expenses.Any())
-            {
-                return false;
-            }
-
-            Transaction earliest = expenses.OrderBy(x => x.Date).First();
-            var twoMonthsAgo = new DateOnly(now.Year, now.Month, 1).AddMonths(-2);
-
-            return earliest.Date < twoMonthsAgo;
-        }
-
-        _logger.StartingOperation(nameof(GenerateUpcomingExpensesAsync));
-
-        try
-        {
-            var categories = conn.Query<Category>("SELECT * FROM accountant.categories WHERE generate_upcoming_expense");
-
-            var userGroups = categories.GroupBy(x => x.UserId);
-
-            foreach (var userGroup in userGroups)
-            {
-                foreach (Category category in userGroup)
-                {
-                    bool exists = conn.ExecuteScalar<bool>(@"SELECT COUNT(*)
-                                                             FROM accountant.upcoming_expenses
-                                                             WHERE generated AND category_id = @CategoryId
-                                                                 AND to_char(created_date, 'YYYY-MM') = to_char(@Now, 'YYYY-MM')",
-                        new { CategoryId = category.Id, Now = now });
-                    if (exists)
-                    {
-                        continue;
-                    }
-
-                    var firstOfThisMonth = new DateTime(now.Year, now.Month, 1);
-                    var transactionsExistThisMonth = conn.ExecuteScalar<bool>(@"SELECT COUNT(*) 
-                                                                            FROM accountant.transactions AS t 
-                                                                            INNER JOIN accountant.accounts AS a ON a.id = t.from_account_id 
-                                                                                OR a.id = t.to_account_id 
-                                                                            WHERE a.user_id = @UserId 
-                                                                                AND category_id = @CategoryId 
-                                                                                AND date >= @From 
-                                                                                AND from_account_id IS NOT NULL AND to_account_id IS NULL",
-                        new { category.UserId, CategoryId = category.Id, From = firstOfThisMonth });
-                    if (transactionsExistThisMonth)
-                    {
-                        continue;
-                    }
-
-                    var threeMonthsAgo = new DateTime(now.Year, now.Month, 1).AddMonths(-3);
-                    var expenses = conn.Query<Transaction>(@"SELECT t.* 
-                                                        FROM accountant.transactions AS t 
-                                                        INNER JOIN accountant.accounts AS a ON a.id = t.from_account_id 
-                                                            OR a.id = t.to_account_id 
-                                                        WHERE a.user_id = @UserId 
-                                                            AND category_id = @CategoryId 
-                                                            AND date >= @From AND date < @To 
-                                                            AND from_account_id IS NOT NULL AND to_account_id IS NULL",
-                        new { category.UserId, CategoryId = category.Id, From = threeMonthsAgo, To = firstOfThisMonth }).ToList();
-
-                    if (!ShouldGenerate(expenses))
-                    {
-                        continue;
-                    }
-
-                    decimal sum = expenses.Sum(x => x.Amount);
-                    int months = expenses.GroupBy(x => x.Date.ToString("yyyy-MM")).Count();
-                    decimal amount = sum / months;
-                    var currency = getMostFrequentCurrency(expenses);
-                    if (currency == "MKD")
-                    {
-                        amount = Math.Round(amount);
-                        amount -= amount % 10;
-                    }
-
-                    var upcomingExpense = new UpcomingExpense
-                    {
-                        UserId = category.UserId,
-                        CategoryId = category.Id,
-                        Amount = amount,
-                        Currency = currency,
-                        Date = new DateTime(now.Year, now.Month, 1),
-                        Generated = true,
-                        CreatedDate = now,
-                        ModifiedDate = now
-                    };
-
-                    await conn.ExecuteAsync(@"INSERT INTO accountant.upcoming_expenses (user_id, category_id, amount, currency, description, date, generated, created_date, modified_date)
-                                              VALUES (@UserId, @CategoryId, @Amount, @Currency, @Description, @Date, @Generated, @CreatedDate, @ModifiedDate)", upcomingExpense);
-
-                    _logger.GeneratedUpcomingExpense();
-                }
-            }
-
-            _logger.CompletedOperation(nameof(GenerateUpcomingExpensesAsync));
-        }
-        catch (Exception ex)
-        {
-            metric.Status = SpanStatus.InternalError;
-
-            _logger.OperationFailed(nameof(GenerateUpcomingExpensesAsync), ex);
-        }
-        finally
-        {
-            metric.Finish();
-        }
-    }
-
-    private async Task GetAndSaveCurrencyRatesAsync(NpgsqlConnection conn, DateTime now, ISpan metricsSpan)
+    private async Task GetAndSaveCurrencyRatesAsync(NpgsqlConnection conn, DateTime dateTime, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(DailyJob)}.{nameof(GetAndSaveCurrencyRatesAsync)}");
 
         _logger.StartingOperation(nameof(GetAndSaveCurrencyRatesAsync));
 
-        var today = new DateTime(now.Year, now.Month, now.Day);
+        var today = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day);
 
         try
         {
@@ -444,6 +468,7 @@ public class DailyJob
             metric.Status = SpanStatus.InternalError;
 
             _logger.OperationFailed(nameof(GetAndSaveCurrencyRatesAsync), ex);
+            throw;
         }
         finally
         {
@@ -451,13 +476,13 @@ public class DailyJob
         }
     }
 
-    private async Task DeleteTemporaryCdnResourcesAsync(DateTime now, ISpan metricsSpan)
+    private async Task DeleteTemporaryCdnResourcesAsync(DateTime dateTime, ISpan metricsSpan)
     {
         var metric = metricsSpan.StartChild($"{nameof(DailyJob)}.{nameof(DeleteTemporaryCdnResourcesAsync)}");
 
         _logger.StartingOperation(nameof(DeleteTemporaryCdnResourcesAsync));
 
-        var olderThan = now.AddDays(-2);
+        var olderThan = dateTime.AddDays(-2);
         var result = await _cdnService.DeleteTemporaryResourcesAsync(olderThan, CancellationToken.None);
 
         if (result.Failed)
@@ -500,6 +525,7 @@ public class DailyJob
             metric.Status = SpanStatus.InternalError;
 
             _logger.OperationFailed(nameof(UploadDatabaseBackupAsync), ex);
+            throw;
         }
         finally
         {
