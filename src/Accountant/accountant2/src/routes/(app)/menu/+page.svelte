@@ -24,7 +24,7 @@
 		await authService.logout();
 	}
 
-	onMount(async () => {
+	onMount(() => {
 		caches.keys().then((cacheNames) => {
 			if (cacheNames.length > 0) {
 				version = cacheNames.sort().reverse()[0];

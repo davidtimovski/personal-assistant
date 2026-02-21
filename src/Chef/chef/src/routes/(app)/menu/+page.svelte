@@ -29,7 +29,7 @@
 		await authService.logout();
 	}
 
-	onMount(async () => {
+	onMount(() => {
 		localStorage = new LocalStorageUtil();
 		recipesService = new RecipesService();
 
