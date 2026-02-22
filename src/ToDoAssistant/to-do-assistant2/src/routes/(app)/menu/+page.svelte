@@ -32,7 +32,7 @@
 		await authService.logout();
 	}
 
-	onMount(async () => {
+	onMount(() => {
 		notificationsService = new NotificationsService();
 		listsService = new ListsService();
 
