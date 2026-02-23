@@ -1,7 +1,7 @@
 import type { EditRecipeIngredient } from './editRecipeIngredient.svelte';
-import type { SharingState } from './sharingState';
+import type { SharingState } from '../../../../../lib/models/sharingState';
 
-export class EditRecipeModel {
+export class EditRecipeResponse {
 	constructor(
 		public id: number,
 		public name: string,

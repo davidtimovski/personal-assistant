@@ -1,3 +1,29 @@
+import type { Ingredient } from '../../viewmodels/ingredient';
+import type { SharingState } from '../../sharingState';
+
+export class ViewRecipeResponse {
+	constructor(
+		public id: number,
+		public name: string,
+		public description: string,
+		public ingredients: Array<Ingredient>,
+		public instructions: string,
+		public prepDuration: string,
+		public cookDuration: string,
+		public servings: number,
+		public imageUri: string,
+		public videoUrl: string,
+		public lastOpenedDate: Date,
+		public nutritionSummary: NutritionSummary,
+		public costSummary: CostSummary,
+		public sharingState: SharingState,
+		public imageWidth: number,
+		public imageHeight: number
+	) {
+		this.ingredients = ingredients || new Array<Ingredient>();
+	}
+}
+
 export class NutritionSummary {
 	constructor(
 		public isSet: boolean,
@@ -53,5 +79,16 @@ export class NutritionSummary {
 		public magnesium: number,
 		public magnesiumFromDaily: number,
 		public magnesiumFromDailyGrade: string
+	) {}
+}
+
+export class CostSummary {
+	constructor(
+		public isSet: boolean,
+		public productSize: number,
+		public productSizeIsOneUnit: boolean,
+		public cost: number,
+		public costPerServing: number,
+		public currency: string
 	) {}
 }

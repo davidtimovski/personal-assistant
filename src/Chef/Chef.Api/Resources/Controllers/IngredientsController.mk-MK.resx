@@ -816,6 +816,9 @@
   <data name="watermelon" xml:space="preserve">
     <value>Лубеница</value>
   </data>
+  <data name="whey_protein" xml:space="preserve">
+    <value>Протеин од сурутка</value>
+  </data>
   <data name="white_rice" xml:space="preserve">
     <value>Бел ориз</value>
   </data>

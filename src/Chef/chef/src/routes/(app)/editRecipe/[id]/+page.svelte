@@ -11,8 +11,8 @@
 	import { user, alertState, ingredientPickerState } from '$lib/stores';
 	import { RecipesService } from '$lib/services/recipesService';
 	import { UsersService } from '$lib/services/usersService';
-	import type { SharingState } from '$lib/models/viewmodels/sharingState';
-	import { EditRecipeIngredient } from '$lib/models/viewmodels/editRecipeIngredient.svelte';
+	import type { SharingState } from '$lib/models/sharingState';
+	import { EditRecipeIngredient } from './viewmodels/editRecipeIngredient.svelte';
 	import { CreateRecipe } from '$lib/models/server/requests/createRecipe';
 	import { UpdateRecipe } from '$lib/models/server/requests/updateRecipe';
 	import type { ChefUser } from '$lib/models/chefUser';
@@ -189,15 +189,6 @@
 	function toggleUnit(ingredient: EditRecipeIngredient) {
 		const index = measuringUnits.indexOf(ingredient.unit);
 		ingredient.unit = index === measuringUnits.length - 1 ? measuringUnits[0] : measuringUnits[index + 1];
-
-		// Hack to activate the this.canSave() getter
-		if (instructions) {
-			instructions = instructions + ' ';
-			instructions = instructions.trim();
-		} else {
-			instructions = ' ';
-			instructions = null;
-		}
 
 		ingredients = [...ingredients];
 	}
@@ -381,6 +372,8 @@
 			userIsOwner = true;
 
 			saveButtonText = $t('editRecipe.create');
+
+			nameInput?.focus();
 		} else {
 			saveButtonText = $t('save');
 
@@ -401,7 +394,7 @@
 			sharingState = recipe.sharingState;
 			userIsOwner = recipe.userIsOwner;
 
-			recipeIngredientIds = recipe.ingredients.map((x) => x.id);
+			recipeIngredientIds = recipe.ingredients.map((x: EditRecipeIngredient) => x.id);
 
 			if (recipe.videoUrl) {
 				videoIFrameSrc = recipesService.videoUrlToEmbedSrc(recipe.videoUrl, $user.language);

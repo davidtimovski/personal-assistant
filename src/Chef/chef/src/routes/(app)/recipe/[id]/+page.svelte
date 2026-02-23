@@ -8,9 +8,9 @@
 	import { AmountFormatter } from '$lib/utils/amountFormatter';
 	import { user } from '$lib/stores';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
-	import { SharingState } from '$lib/models/viewmodels/sharingState';
+	import { SharingState } from '$lib/models/sharingState';
 	import { RecipesService } from '$lib/services/recipesService';
-	import type { ViewRecipe } from '$lib/models/viewmodels/viewRecipe';
+	import type { ViewRecipeResponse } from '$lib/models/server/responses/viewRecipeResponse';
 	import type { Ingredient } from '$lib/models/viewmodels/ingredient';
 
 	import IngredientAmount from '$lib/components/IngredientAmount.svelte';
@@ -22,10 +22,9 @@
 
 	let { data }: Props = $props();
 
-	let editedId: number | undefined = $state(undefined);
 	let topDrawerIsOpen = $state(false);
 	let shareButtonText = $state('');
-	let model: ViewRecipe | undefined = $state(undefined);
+	let model: ViewRecipeResponse | undefined = $state(undefined);
 	let instructionsInHtml: string | undefined = $state(undefined);
 	let videoIFrame: HTMLIFrameElement | null = $state(null);
 	let videoIFrameSrc = $state('');
@@ -77,13 +76,6 @@
 
 	onMount(async () => {
 		wakeLockSupported = 'wakeLock' in navigator;
-
-		const url = new URL(window.location.href);
-		const queryParams = new URLSearchParams(url.search);
-		const edited = queryParams.get('edited');
-		if (edited) {
-			editedId = parseInt(edited, 10);
-		}
 
 		localStorage = new LocalStorageUtil();
 		recipesService = new RecipesService();

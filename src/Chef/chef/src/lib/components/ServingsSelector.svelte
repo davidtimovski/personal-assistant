@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { t } from '$lib/localization/i18n';
-	import { ViewRecipe } from '$lib/models/viewmodels/viewRecipe';
+	import { ViewRecipeResponse } from '$lib/models/server/responses/viewRecipeResponse';
 
-	let { recipe = $bindable<ViewRecipe>() }: { recipe: ViewRecipe } = $props();
+	let { recipe = $bindable<ViewRecipeResponse>() }: { recipe: ViewRecipeResponse } = $props();
 
 	function decrementServings() {
 		if (recipe.servings > 1) {

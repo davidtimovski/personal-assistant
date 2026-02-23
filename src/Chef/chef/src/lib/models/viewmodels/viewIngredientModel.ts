@@ -1,5 +1,5 @@
-import type { NutritionData } from './nutritionData';
-import type { PriceData } from './priceData';
+import type { NutritionData } from '../nutritionData';
+import type { PriceData } from '../priceData';
 import type { SimpleRecipe } from './simpleRecipe';
 
 export class ViewIngredientModel {

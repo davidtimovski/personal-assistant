@@ -1,8 +1,8 @@
-import type { RecipeModel } from './viewmodels/recipeModel';
+import type { RecipeResponse } from './server/responses/recipeResponse';
 
 export class LocalState {
 	constructor(
-		public recipes: RecipeModel[] | null,
+		public recipes: RecipeResponse[] | null,
 		public fromCache: boolean
 	) {}
 }

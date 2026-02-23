@@ -1,6 +1,6 @@
-import type { SharingState } from './sharingState';
+import type { SharingState } from '../../sharingState';
 
-export class RecipeModel {
+export class RecipeResponse {
 	constructor(
 		public id: number,
 		public name: string,

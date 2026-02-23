@@ -7,7 +7,7 @@
 	import Alert from '../../../../../Core/shared2/components/Alert.svelte';
 
 	import { t } from '$lib/localization/i18n';
-	import { isOffline, user } from '$lib/stores';
+	import { alertState, isOffline, user } from '$lib/stores';
 	import { UsersService } from '$lib/services/usersService';
 	import { RecipesService } from '$lib/services/recipesService';
 	import type { ChefUser } from '$lib/models/chefUser';
@@ -50,6 +50,16 @@
 		window.addEventListener('offline', () => {
 			isOffline.set(true);
 		});
+
+		// Show alert for new versions
+		navigator.serviceWorker.onmessage = (event) => {
+			if (event.data) {
+				alertState.update((x) => {
+					x.showSuccess('versionUpdatedTo', { version: event.data.version });
+					return x;
+				});
+			}
+		};
 	});
 
 	onDestroy(() => {
