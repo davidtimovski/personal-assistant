@@ -2,9 +2,12 @@
     try {
         const token = await grecaptcha.execute('6LfpNqYUAAAAAPlCVjWxJQEKQKmQMKqXDBFrtjAX', { action: 'register' });
 
+        const form = new FormData();
+        form.set('token', token);
+
         const response = await fetch('/account/verify-recaptcha', {
             method: 'post',
-            body: JSON.stringify({ token: token })
+            body: form
         });
 
         if (!response.ok) {
@@ -17,7 +20,6 @@
         document.getElementById('register-button').removeAttribute('disabled');
     } catch (error) {
         console.error(error.message);
-        alert(error.message);
     }
 });
 
