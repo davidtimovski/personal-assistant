@@ -4,12 +4,12 @@ import { ValidationResult, ValidationUtil } from '../../../../../Core/shared2/ut
 
 import { LocalStorageUtil } from '$lib/utils/localStorageUtil';
 import { localState } from '$lib/stores';
-import type { RecipeModel } from '$lib/models/viewmodels/recipeModel';
-import type { ViewRecipe } from '$lib/models/viewmodels/viewRecipe';
+import type { RecipeResponse } from '$lib/models/server/responses/recipeResponse';
+import type { ViewRecipeResponse } from '$lib/models/server/responses/viewRecipeResponse';
 import type { ShareRequest } from '$lib/models/viewmodels/shareRequest';
-import type { EditRecipeModel } from '$lib/models/viewmodels/editRecipeModel';
-import type { RecipeWithShares } from '$lib/models/viewmodels/recipeWithShares';
-import type { SendRecipeModel } from '$lib/models/viewmodels/sendRecipeModel';
+import type { EditRecipeResponse } from '../../routes/(app)/editRecipe/[id]/viewmodels/editRecipeModel';
+import type { RecipeWithSharesResponse } from '$lib/models/server/responses/recipeWithSharesResponse';
+import type { RecipeForSendingResponse } from '$lib/models/server/responses/recipeForSendingResponse';
 import type { ReceivedRecipe } from '$lib/models/viewmodels/receivedRecipe';
 import type { ReviewIngredientsModel } from '$lib/models/viewmodels/reviewIngredientsModel';
 import type { CanShareRecipe } from '$lib/models/server/responses/canShareRecipe';
@@ -31,23 +31,23 @@ export class RecipesService {
 
 	async getAll(includeCache = false) {
 		if (includeCache) {
-			let cachedRecipes = this.localStorage.getObject<RecipeModel[]>('homePageData');
+			let cachedRecipes = this.localStorage.getObject<RecipeResponse[]>('homePageData');
 			if (cachedRecipes) {
 				localState.set(new LocalState(cachedRecipes, true));
 			}
 		}
 
-		const recipes = await this.httpProxy.ajax<RecipeModel[]>(`${Variables.urls.api}/recipes`);
+		const recipes = await this.httpProxy.ajax<RecipeResponse[]>(`${Variables.urls.api}/recipes`);
 
 		this.localStorage.set('homePageData', JSON.stringify(recipes));
 		localState.set(new LocalState(recipes, false));
 	}
 
-	async get(id: number, currency: string): Promise<ViewRecipe> {
-		const result = await this.httpProxy.ajax<ViewRecipe>(`${Variables.urls.api}/recipes/${id}/${currency}`);
+	async get(id: number, currency: string): Promise<ViewRecipeResponse> {
+		const result = await this.httpProxy.ajax<ViewRecipeResponse>(`${Variables.urls.api}/recipes/${id}/${currency}`);
 
 		// Update last opened date
-		let cachedRecipes = this.localStorage.getObject<RecipeModel[]>('homePageData');
+		let cachedRecipes = this.localStorage.getObject<RecipeResponse[]>('homePageData');
 		let recipe = cachedRecipes?.find((x) => x.id === result.id);
 		recipe!.lastOpenedDate = new Date();
 
@@ -57,12 +57,12 @@ export class RecipesService {
 		return result;
 	}
 
-	getForUpdate(id: number): Promise<EditRecipeModel> {
-		return this.httpProxy.ajax<EditRecipeModel>(`${Variables.urls.api}/recipes/${id}/update`);
+	getForUpdate(id: number): Promise<EditRecipeResponse> {
+		return this.httpProxy.ajax<EditRecipeResponse>(`${Variables.urls.api}/recipes/${id}/update`);
 	}
 
-	getWithShares(id: number): Promise<RecipeWithShares> {
-		return this.httpProxy.ajax<RecipeWithShares>(`${Variables.urls.api}/recipes/${id}/with-shares`);
+	getWithShares(id: number): Promise<RecipeWithSharesResponse> {
+		return this.httpProxy.ajax<RecipeWithSharesResponse>(`${Variables.urls.api}/recipes/${id}/with-shares`);
 	}
 
 	getShareRequests(): Promise<ShareRequest[]> {
@@ -73,8 +73,8 @@ export class RecipesService {
 		return this.httpProxy.ajax<number>(`${Variables.urls.api}/recipes/pending-share-requests-count`);
 	}
 
-	getForSending(id: number): Promise<SendRecipeModel> {
-		return this.httpProxy.ajax<SendRecipeModel>(`${Variables.urls.api}/recipes/${id}/sending`);
+	getForSending(id: number): Promise<RecipeForSendingResponse> {
+		return this.httpProxy.ajax<RecipeForSendingResponse>(`${Variables.urls.api}/recipes/${id}/sending`);
 	}
 
 	getSendRequests(): Promise<ReceivedRecipe[]> {
@@ -260,7 +260,7 @@ export class RecipesService {
 	}
 
 	copyAsText(
-		recipe: ViewRecipe,
+		recipe: ViewRecipeResponse,
 		ingredientsLabel: string,
 		instructionsLabel: string,
 		youTubeUrlLabel: string,

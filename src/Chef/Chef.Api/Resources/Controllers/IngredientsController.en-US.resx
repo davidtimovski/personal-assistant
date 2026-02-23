@@ -816,6 +816,9 @@
   <data name="watermelon" xml:space="preserve">
     <value>Watermelon</value>
   </data>
+  <data name="whey_protein" xml:space="preserve">
+    <value>Whey protein</value>
+  </data>
   <data name="white_rice" xml:space="preserve">
     <value>White rice</value>
   </data>

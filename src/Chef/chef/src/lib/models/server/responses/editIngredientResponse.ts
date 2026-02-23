@@ -1,8 +1,8 @@
-import type { NutritionData } from './nutritionData';
-import type { PriceData } from './priceData';
-import type { SimpleRecipe } from './simpleRecipe';
+import type { NutritionData } from '../../nutritionData';
+import type { PriceData } from '../../priceData';
+import type { SimpleRecipe } from '../../viewmodels/simpleRecipe';
 
-export class EditIngredientModel {
+export class EditIngredientResponse {
 	constructor(
 		public id: number,
 		public taskId: number,

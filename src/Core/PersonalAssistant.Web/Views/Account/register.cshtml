@@ -73,42 +73,10 @@
     </footer>
 </form>
 
+<environment include="Development">
+    <script src="~/js/account/register.js" asp-append-version="true"></script>
+</environment>
 <environment include="Production">
     <script src="https://www.google.com/recaptcha/api.js?render=6LfpNqYUAAAAAPlCVjWxJQEKQKmQMKqXDBFrtjAX"></script>
-    <script>
-        grecaptcha.ready(() => {
-            grecaptcha.execute('6LfpNqYUAAAAAPlCVjWxJQEKQKmQMKqXDBFrtjAX', { action: 'register' }).then(async token => {
-                const formData = new FormData();
-                formData.append('token', token);
-
-                try {
-                    const response = await fetch('/account/verify-recaptcha', {
-                        method: 'post',
-                        body: formData
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`Response status: ${response.status}`);
-                    }
-
-                    const score = await response.text();
-
-                    document.getElementById('GoogleReCaptchaScore').value = score;
-                    document.getElementById('register-button').removeAttribute('disabled');
-                } catch (error) {
-                    console.error(error.message);
-                    alert(error.message);
-                }
-            });
-        });
-
-        (async function () {
-            const response = await fetch('https://api.ipgeolocation.io/ipgeo?apiKey=8d6cd8bdac9a4b2f8edef66b785a45ee&fields=country_code2', { mode: 'cors' });
-            const data = await response.json();
-            if (data.country_code2 === 'MK') {
-                const languageSelect = document.getElementById('Language');
-                languageSelect.value = 'mk-MK';
-            }
-        })();
-    </script>
+    <script src="https://cdn.personalassistant.site/js/account/register.min.js"></script>
 </environment>

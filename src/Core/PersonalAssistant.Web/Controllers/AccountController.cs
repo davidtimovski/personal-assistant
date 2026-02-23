@@ -210,9 +210,12 @@ public class AccountController : BaseController
 
             return Ok(response.Score);
         }
-        catch
+        catch (Exception ex)
         {
             tr.Status = SpanStatus.InternalError;
+
+            _logger.LogError(ex, $"{Request.Method} account/verify-recaptcha failed");
+
             return StatusCode(500);
         }
         finally
@@ -243,9 +246,12 @@ public class AccountController : BaseController
                 viewModel.Email = user.email;
             }
         }
-        catch
+        catch (Exception ex)
         {
             tr.Status = SpanStatus.InternalError;
+
+            _logger.LogError(ex, $"{Request.Method} account/reset-password failed");
+
             return StatusCode(500);
         }
         finally
@@ -394,9 +400,11 @@ public class AccountController : BaseController
 
             return View(viewModel);
         }
-        catch
+        catch (Exception ex)
         {
             tr.Status = SpanStatus.InternalError;
+            _logger.LogError(ex, $"{Request.Method} account/edit-profile failed for user: {UserId}");
+
             return StatusCode(500);
         }
         finally
@@ -572,7 +580,7 @@ public class AccountController : BaseController
         catch (Exception ex)
         {
             tr.Status = SpanStatus.InternalError;
-            _logger.LogError(ex, nameof(UploadProfileImage));
+            _logger.LogError(ex, $"{Request.Method} account/upload-profile-image failed");
             return StatusCode(500);
         }
         finally

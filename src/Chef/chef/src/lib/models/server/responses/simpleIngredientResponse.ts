@@ -1,4 +1,4 @@
-export class SimpleIngredient {
+export class SimpleIngredientResponse {
 	constructor(
 		public id: number,
 		public taskId: number,

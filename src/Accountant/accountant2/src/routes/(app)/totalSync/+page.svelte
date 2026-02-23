@@ -13,11 +13,26 @@
 
 	let canSync = $derived($isOnline && !syncButtonIsLoading);
 
+	async function deleteOldCaches() {
+		const cacheKeys = await caches.keys();
+
+		if (cacheKeys.length > 1) {
+			const latestCacheName = cacheKeys.sort().reverse()[0];
+
+			for (const key of cacheKeys) {
+				if (key !== latestCacheName) {
+					await caches.delete(key);
+				}
+			}
+		}
+	}
+
 	async function sync() {
 		syncButtonIsLoading = true;
 
 		try {
 			await syncService.totalSync();
+			await deleteOldCaches();
 		} catch {
 			syncButtonIsLoading = false;
 		}

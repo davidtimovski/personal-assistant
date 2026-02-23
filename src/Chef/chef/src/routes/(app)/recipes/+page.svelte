@@ -8,9 +8,9 @@
 	import { isOffline, user, localState } from '$lib/stores';
 	import { UsersService } from '$lib/services/usersService';
 	import { RecipesService } from '$lib/services/recipesService';
-	import type { RecipeModel } from '$lib/models/viewmodels/recipeModel';
+	import type { RecipeResponse } from '$lib/models/server/responses/recipeResponse';
 
-	let recipes: RecipeModel[] | null = $state(null);
+	let recipes: RecipeResponse[] | null = $state(null);
 	let editedId: number | undefined = $state(undefined);
 	const unsubscriptions: Unsubscriber[] = [];
 	let recipesContainer: HTMLDivElement;
@@ -42,7 +42,7 @@
 		}
 
 		recipes = $localState.recipes
-			.sort((a: RecipeModel, b: RecipeModel) => {
+			.sort((a: RecipeResponse, b: RecipeResponse) => {
 				const aDate = new Date(a.lastOpenedDate);
 				const bDate = new Date(b.lastOpenedDate);
 
@@ -53,7 +53,7 @@
 				}
 				return 0;
 			})
-			.map((recipe: RecipeModel) => {
+			.map((recipe: RecipeResponse) => {
 				if (recipe.ingredientsMissing !== 0) {
 					const missingIngredientsKey = recipe.ingredientsMissing > 1 ? 'recipes.missingIngredients' : 'recipes.missingIngredient';
 					recipe.ingredientsMissingLabel = recipe.ingredientsMissing + ' ' + $t(missingIngredientsKey);

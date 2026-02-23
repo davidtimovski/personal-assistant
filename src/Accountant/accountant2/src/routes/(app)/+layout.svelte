@@ -57,6 +57,16 @@
 			isOnline.set(false);
 		});
 
+		// Show alert for new versions
+		navigator.serviceWorker.onmessage = (event) => {
+			if (event.data) {
+				alertState.update((x) => {
+					x.showSuccess('versionUpdatedTo', { version: event.data.version });
+					return x;
+				});
+			}
+		};
+
 		unsubscriptions.push(
 			syncStatus.subscribe((value) => {
 				if (value.status === SyncEvents.SyncFinished) {

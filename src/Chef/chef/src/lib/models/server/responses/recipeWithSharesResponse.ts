@@ -1,7 +1,7 @@
-import type { SharingState } from './sharingState';
-import type { Share } from './share';
+import type { SharingState } from '../../sharingState';
+import type { Share } from '../../viewmodels/share';
 
-export class RecipeWithShares {
+export class RecipeWithSharesResponse {
 	constructor(
 		public id: number,
 		public name: string,
