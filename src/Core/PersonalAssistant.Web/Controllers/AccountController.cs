@@ -65,8 +65,8 @@ public class AccountController : BaseController
         _logger = ArgValidator.NotNull(logger);
     }
 
-    [HttpGet]
     [AllowAnonymous]
+    [HttpGet]
     public async Task Login()
     {
         // Indicate here where Auth0 should redirect the user after a login.
@@ -96,8 +96,8 @@ public class AccountController : BaseController
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
     }
 
-    [HttpGet]
     [AllowAnonymous]
+    [HttpGet]
     public IActionResult Register(string? returnUrl)
     {
         if (User?.Identity?.IsAuthenticated == true)
@@ -108,8 +108,8 @@ public class AccountController : BaseController
         return View(new RegisterViewModel());
     }
 
-    [HttpPost]
     [AllowAnonymous]
+    [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model, string? returnUrl, CancellationToken cancellationToken)
     {
@@ -179,10 +179,11 @@ public class AccountController : BaseController
         return RedirectToAction(nameof(HomeController.Index), "Home", new { alert = IndexAlert.SuccessfullyRegistered });
     }
 
-    [HttpPost]
     [AllowAnonymous]
+    [SkipStatusCodePages]
+    [HttpPost]
     [ActionName("verify-recaptcha")]
-    public async Task<IActionResult> VerifyReCaptcha(VerifyReCaptchaViewModel model, CancellationToken cancellationToken)
+    public async Task<IActionResult> VerifyReCaptcha(VerifyReCaptchaRequest request, CancellationToken cancellationToken)
     {
         var tr = Metrics.StartTransaction(
             $"{Request.Method} account/verify-recaptcha",
@@ -194,18 +195,26 @@ public class AccountController : BaseController
             using var payload = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("secret", _config.PersonalAssistant.ReCaptchaSecret),
-                new KeyValuePair<string, string>("response", model.Token)
+                new KeyValuePair<string, string>("response", request.Token)
             });
 
             using HttpClient httpClient = _httpClientFactory.CreateClient();
-            using var result = await httpClient.PostAsync(new Uri(_config.ReCaptchaVerificationUrl), payload);
+            using var result = await httpClient.PostAsync(new Uri(_config.ReCaptchaVerificationUrl), payload, cancellationToken);
 
-            var content = await result.Content.ReadAsStringAsync();
+            var content = await result.Content.ReadAsStringAsync(cancellationToken);
 
             var response = JsonSerializer.Deserialize<ReCaptchaResponse>(content);
             if (response is null)
             {
                 throw new SerializationException($"Could not deserialize {nameof(ReCaptchaResponse)} from content: {content}");
+            }
+
+            if (!response.Success)
+            {
+                tr.Status = SpanStatus.InternalError;
+                _logger.LogError($"Invoking recaptcha verification returned a failed result: {content}");
+
+                return StatusCode(500);
             }
 
             return Ok(response.Score);
@@ -224,8 +233,8 @@ public class AccountController : BaseController
         }
     }
 
-    [HttpGet]
     [AllowAnonymous]
+    [HttpGet]
     [ActionName("reset-password")]
     public async Task<IActionResult> ResetPassword(CancellationToken cancellationToken)
     {
@@ -262,8 +271,8 @@ public class AccountController : BaseController
         return View(viewModel);
     }
 
-    [HttpPost]
     [AllowAnonymous]
+    [HttpPost]
     [ActionName("reset-password")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model, CancellationToken cancellationToken)
