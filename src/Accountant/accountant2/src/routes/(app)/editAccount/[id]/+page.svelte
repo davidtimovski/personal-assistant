@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import type { PageData } from './$types';
 
 	import { ValidationUtil } from '../../../../../../../Core/shared2/utils/validationUtils';
@@ -116,7 +117,7 @@
 					x.showSuccess('editAccount.deleteSuccessful');
 					return x;
 				});
-				goto('/accounts');
+				goto(resolve('/accounts'));
 			} catch {
 				deleteButtonText = $t('delete');
 				deleteInProgress = false;
@@ -136,7 +137,7 @@
 
 	function cancel() {
 		if (!deleteInProgress) {
-			goto('/accounts');
+			goto(resolve('/accounts'));
 		}
 		deleteButtonText = $t('delete');
 		deleteInProgress = false;
@@ -197,7 +198,7 @@
 				<span>{$t('editAccount.edit')}</span>&nbsp;<span class="colored-text">{name}</span>
 			{/if}
 		</div>
-		<a href="/accounts" class="back-button">
+		<a href={resolve('/accounts')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>

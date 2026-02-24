@@ -4,6 +4,7 @@
 	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	import { UsersServiceBase } from '../../../../../../Core/shared2/services/usersServiceBase';
 	import { DateHelper } from '../../../../../../Core/shared2/utils/dateHelper';
@@ -106,7 +107,7 @@
 
 		searchFilters.set(new SearchFilters(1, 15, fromDate, toDate, 0, expenditure.categoryId, TransactionType.Any, null));
 
-		goto('/transactions');
+		goto(resolve('/transactions'));
 	}
 
 	function editUpcomingExpense(id: number) {
@@ -190,7 +191,7 @@
 		<div class="title-wrap">
 			<a
 				data-sveltekit-preload-data="tap"
-				href="/menu"
+				href={resolve('/menu')}
 				class="profile-image-container"
 				title={$t('dashboard.menu')}
 				aria-label={$t('dashboard.menu')}
@@ -219,14 +220,14 @@
 
 	<div class="content-wrap">
 		<div class="capital-summary" class:with-balance={showBalance}>
-			<a data-sveltekit-preload-data="tap" href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
+			<a data-sveltekit-preload-data="tap" href={resolve('/transactions')} class="summary-item-wrap" class:loaded={dataLoaded}>
 				<div class="summary-item">
 					<div class="summary-title">{$t('dashboard.available')}</div>
 					<div class="summary-value">{Formatter.moneyWithoutCurrency(data.available, currency, $user.language)}</div>
 				</div>
 			</a>
 
-			<a data-sveltekit-preload-data="tap" href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
+			<a data-sveltekit-preload-data="tap" href={resolve('/transactions')} class="summary-item-wrap" class:loaded={dataLoaded}>
 				<div class="summary-item">
 					<div class="summary-title">{$t('dashboard.spent')}</div>
 					<div class="summary-value">{Formatter.moneyWithoutCurrency(data.spent, currency, $user.language)}</div>
@@ -234,7 +235,7 @@
 			</a>
 
 			{#if showBalance}
-				<a data-sveltekit-preload-data="tap" href="/transactions" class="summary-item-wrap" class:loaded={dataLoaded}>
+				<a data-sveltekit-preload-data="tap" href={resolve('/transactions')} class="summary-item-wrap" class:loaded={dataLoaded}>
 					<div class="summary-item">
 						<div class="summary-title">{$t('balance')}</div>
 						<div class="summary-value">{Formatter.moneyWithoutCurrency(data.balance, currency, $user.language)}</div>
@@ -244,26 +245,26 @@
 		</div>
 
 		<div class="home-buttons">
-			<a data-sveltekit-preload-data="tap" href="/newTransaction/1" class="home-button">
+			<a data-sveltekit-preload-data="tap" href={resolve('/newTransaction/1')} class="home-button">
 				{$t('dashboard.newDeposit')}
 			</a>
-			<a data-sveltekit-preload-data="tap" href="/newTransaction/0" class="home-button">
+			<a data-sveltekit-preload-data="tap" href={resolve('/newTransaction/0')} class="home-button">
 				{$t('dashboard.newExpense')}
 			</a>
 		</div>
 
 		{#if data.expenditures && data.expenditures.length > 0}
 			<div>
-				<a data-sveltekit-preload-data="tap" href="/transactions" class="home-table-title">{$t('dashboard.expenditures')}</a>
+				<a data-sveltekit-preload-data="tap" href={resolve('/transactions')} class="home-table-title">{$t('dashboard.expenditures')}</a>
 				<table class="amount-by-category-table">
 					<tbody>
-						{#each data.expenditures as expenditure}
+						{#each data.expenditures as expenditure (expenditure.categoryId)}
 							<tr onclick={() => goToTransactions(expenditure)} role="button">
 								<td>{expenditure.categoryName}</td>
 								<td class="amount-cell">{expenditure.amount === 0 ? '-' : Formatter.money(expenditure.amount, currency, $user.culture)}</td>
 							</tr>
 
-							{#each expenditure.subItems as subExpenditure}
+							{#each expenditure.subItems as subExpenditure (subExpenditure.categoryId)}
 								<tr onclick={() => goToTransactions(subExpenditure)} role="button">
 									<td class="sub-category-cell">{subExpenditure.categoryName}</td>
 									<td class="amount-cell">{Formatter.money(subExpenditure.amount, currency, $user.culture)}</td>
@@ -277,10 +278,10 @@
 
 		{#if data.upcomingExpenses && data.upcomingExpenses.length > 0}
 			<div>
-				<a data-sveltekit-preload-data="tap" href="/upcomingExpenses" class="home-table-title">{$t('dashboard.upcomingExpenses')}</a>
+				<a data-sveltekit-preload-data="tap" href={resolve('/upcomingExpenses')} class="home-table-title">{$t('dashboard.upcomingExpenses')}</a>
 				<table class="home-table">
 					<tbody>
-						{#each data.upcomingExpenses as upcomingExpense}
+						{#each data.upcomingExpenses as upcomingExpense (upcomingExpense.id)}
 							<tr onclick={() => editUpcomingExpense(upcomingExpense.id)} role="button">
 								<td>{upcomingExpense.category}</td>
 								<td>{upcomingExpense.description}</td>
@@ -306,10 +307,10 @@
 
 		{#if data.debt && data.debt.length > 0}
 			<div>
-				<a data-sveltekit-preload-data="tap" href="/debt" class="home-table-title">{$t('dashboard.debt')}</a>
+				<a data-sveltekit-preload-data="tap" href={resolve('/debt')} class="home-table-title">{$t('dashboard.debt')}</a>
 				<table class="home-table">
 					<tbody>
-						{#each data.debt as debtItem}
+						{#each data.debt as debtItem (debtItem.id)}
 							<tr onclick={() => editDebt(debtItem.id)} role="button">
 								<td>
 									{#if debtItem.userIsDebtor}

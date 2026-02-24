@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import type { PageData } from './$types';
 
 	import { DateHelper } from '../../../../../../../Core/shared2/utils/dateHelper';
@@ -263,7 +264,7 @@
 					x.showSuccess('editTransaction.deleteSuccessful');
 					return x;
 				});
-				goto('/transactions');
+				goto(resolve('/transactions'));
 			} catch {
 				deleteButtonText = $t('delete');
 				deleteInProgress = false;
@@ -378,7 +379,7 @@
 				{/if}
 			{/if}
 		</div>
-		<a href="/transaction/{data.id}" class="back-button">
+		<a href={resolve(`/transaction/${data.id}`)} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -405,7 +406,7 @@
 							<div class="loadable-select" class:loaded={accountOptions}>
 								<select id="from-account" bind:value={fromAccountId} disabled={!accountOptions} class="category-select">
 									{#if accountOptions}
-										{#each accountOptions as account}
+										{#each accountOptions as account (account.id)}
 											<option value={account.id}>{account.name}</option>
 										{/each}
 									{/if}
@@ -426,7 +427,7 @@
 							<div class="loadable-select" class:loaded={accountOptions}>
 								<select id="to-account" bind:value={toAccountId} disabled={!accountOptions} class="category-select">
 									{#if accountOptions}
-										{#each accountOptions as account}
+										{#each accountOptions as account (account.id)}
 											<option value={account.id}>{account.name}</option>
 										{/each}
 									{/if}
@@ -456,7 +457,7 @@
 					<div class="loadable-select" class:loaded={categoryOptions}>
 						<select id="category" bind:value={categoryId} disabled={!categoryOptions} class="category-select">
 							{#if categoryOptions}
-								{#each categoryOptions as category}
+								{#each categoryOptions as category (category.id)}
 									<option value={category.id}>{category.name}</option>
 								{/each}
 							{/if}

@@ -2,6 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import type { Unsubscriber } from 'svelte/store';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import type { PageData } from './$types';
 
 	import DoubleRadioBool from '../../../../../../../Core/shared2/components/DoubleRadioBool.svelte';
@@ -273,7 +274,7 @@
 		<div class="page-title">
 			<span><span>{$t('shareList.share')}</span>&nbsp;<span class="colored-text">{name}</span></span>
 		</div>
-		<a href="/list/{data.id}" class="back-button">
+		<a href={resolve(`/list/${data.id}`)} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -354,7 +355,7 @@
 		{/if}
 
 		{#if shares}
-			{#each shares as share}
+			{#each shares as share, i (i)}
 				<div class="share-with">
 					<img class="share-image" src={share.imageUri} title={share.name} alt={$t('profilePicture', { name: share.name })} />
 					<div class="share-content" class:selected={share.email === selectedShareEmail}>
@@ -413,7 +414,7 @@
 				</span>
 				<span>{$t('save')}</span>
 			</button>
-			<a href="/list/{data.id}" class="button secondary-button">{$t('cancel')}</a>
+			<a href={resolve(`/list/${data.id}`)} class="button secondary-button">{$t('cancel')}</a>
 		</div>
 	</div>
 </section>

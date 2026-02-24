@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	import EmptyListMessage from '../../../../../../Core/shared2/components/EmptyListMessage.svelte';
 
@@ -66,7 +67,7 @@
 			<i class="fas fa-inbox"></i>
 		</div>
 		<div class="page-title">{$t('categories.categories')}</div>
-		<a href="/dashboard" class="back-button">
+		<a href={resolve('/dashboard')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -79,10 +80,10 @@
 					<div class="double-bounce2"></div>
 				</div>
 			{:else if categories.length > 0}
-				{#each categories as category}
+				{#each categories as category (category.id)}
 					<div>
 						<div class="category-wrap">
-							<a class="category" class:highlighted-row={category.id === editedId} href="/editCategory/{category.id}">
+							<a class="category" class:highlighted-row={category.id === editedId} href={resolve(`/editCategory/${category.id}`)}>
 								<span class="name">{category.name}</span>
 								<span>
 									{#if category.generateUpcomingExpense}
@@ -117,9 +118,9 @@
 						</div>
 
 						<!-- SUB -->
-						{#each category.subCategories as sub}
+						{#each category.subCategories as sub (sub.id)}
 							<div class="subcategory-wrap">
-								<a class="category" class:highlighted-row={sub.id === editedId} href="editCategory/{sub.id}">
+								<a class="category" class:highlighted-row={sub.id === editedId} href={resolve(`/editCategory/${sub.id}`)}>
 									<span class="name">{sub.name}</span>
 									<span>
 										{#if sub.generateUpcomingExpense}

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	import { authInfo } from '$lib/stores';
 
@@ -16,7 +17,7 @@
 				return;
 			}
 
-			await goto('/recipes');
+			await goto(resolve('/recipes'));
 		});
 	});
 </script>

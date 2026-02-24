@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { resolve } from '$app/paths';
 
 	import { AuthService } from '../../../../../../Core/shared2/services/authService';
 
@@ -39,20 +40,20 @@
 			<i class="fas fa-bars"></i>
 		</div>
 		<div class="page-title">{$t('menu.menu')}</div>
-		<a href="/dashboard" class="back-button">
+		<a href={resolve('/dashboard')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
 	<div class="content-wrap">
 		<div class="horizontal-buttons-wrap">
-			<a data-sveltekit-preload-data="tap" href="/transactions" class="wide-button">{$t('menu.transactions')}</a>
-			<a data-sveltekit-preload-data="tap" href="/upcomingExpenses" class="wide-button">{$t('menu.upcomingExpenses')}</a>
-			<a data-sveltekit-preload-data="tap" href="/debt" class="wide-button">{$t('menu.debt')}</a>
-			<a data-sveltekit-preload-data="tap" href="/categories" class="wide-button">{$t('menu.categories')}</a>
-			<a data-sveltekit-preload-data="tap" href="/accounts" class="wide-button">{$t('menu.accounts')}</a>
-			<a data-sveltekit-preload-data="tap" href="/balanceAdjustment" class="wide-button">{$t('menu.balanceAdjustment')}</a>
-			<a data-sveltekit-preload-data="tap" href="/automaticTransactions" class="wide-button">{$t('menu.automaticTransactions')}</a>
+			<a data-sveltekit-preload-data="tap" href={resolve('/transactions')} class="wide-button">{$t('menu.transactions')}</a>
+			<a data-sveltekit-preload-data="tap" href={resolve('/upcomingExpenses')} class="wide-button">{$t('menu.upcomingExpenses')}</a>
+			<a data-sveltekit-preload-data="tap" href={resolve('/debt')} class="wide-button">{$t('menu.debt')}</a>
+			<a data-sveltekit-preload-data="tap" href={resolve('/categories')} class="wide-button">{$t('menu.categories')}</a>
+			<a data-sveltekit-preload-data="tap" href={resolve('/accounts')} class="wide-button">{$t('menu.accounts')}</a>
+			<a data-sveltekit-preload-data="tap" href={resolve('/balanceAdjustment')} class="wide-button">{$t('menu.balanceAdjustment')}</a>
+			<a data-sveltekit-preload-data="tap" href={resolve('/automaticTransactions')} class="wide-button">{$t('menu.automaticTransactions')}</a>
 
 			<div class="drawer-button-wrap" class:open={reportsDrawerIsOpen}>
 				<button type="button" onclick={toggleReportsDrawer} class="wide-button drawer-button">
@@ -60,24 +61,24 @@
 				</button>
 				<div class="drawer-content-wrap">
 					<div class="drawer-content">
-						<a data-sveltekit-preload-data="tap" href="/pieChartReport" class="wide-button">{$t('menu.pieChart')}</a>
-						<a data-sveltekit-preload-data="tap" href="/barChartReport" class="wide-button">{$t('menu.barChart')}</a>
-						<a data-sveltekit-preload-data="tap" href="/expenditureHeatmap" class="wide-button">{$t('menu.expenditureHeatmap')}</a>
+						<a data-sveltekit-preload-data="tap" href={resolve('/pieChartReport')} class="wide-button">{$t('menu.pieChart')}</a>
+						<a data-sveltekit-preload-data="tap" href={resolve('/barChartReport')} class="wide-button">{$t('menu.barChart')}</a>
+						<a data-sveltekit-preload-data="tap" href={resolve('/expenditureHeatmap')} class="wide-button">{$t('menu.expenditureHeatmap')}</a>
 					</div>
 				</div>
 			</div>
 
-			<a data-sveltekit-preload-data="tap" href="/earlyRetirementCalculator" class="wide-button">{$t('menu.earlyRetirementCalculator')}</a>
-			<a data-sveltekit-preload-data="tap" href="/export" class="wide-button">{$t('menu.export')}</a>
-			<a data-sveltekit-preload-data="tap" href="/totalSync" class="wide-button">{$t('menu.totalSync')}</a>
-			<a data-sveltekit-preload-data="tap" href="/preferences" class="wide-button">{$t('menu.preferences')}</a>
-			<a data-sveltekit-preload-data="tap" href="/help" class="wide-button">{$t('menu.help')}</a>
+			<a data-sveltekit-preload-data="tap" href={resolve('/earlyRetirementCalculator')} class="wide-button">{$t('menu.earlyRetirementCalculator')}</a>
+			<a data-sveltekit-preload-data="tap" href={resolve('/export')} class="wide-button">{$t('menu.export')}</a>
+			<a data-sveltekit-preload-data="tap" href={resolve('/totalSync')} class="wide-button">{$t('menu.totalSync')}</a>
+			<a data-sveltekit-preload-data="tap" href={resolve('/preferences')} class="wide-button">{$t('menu.preferences')}</a>
+			<a data-sveltekit-preload-data="tap" href={resolve('/help')} class="wide-button">{$t('menu.help')}</a>
 		</div>
 
 		<hr />
 
 		<div class="horizontal-buttons-wrap">
-			<a href={personalAssistantUrl} class="wide-button">{$t('menu.goToPersonalAssistant')}</a>
+			<a href={resolve(personalAssistantUrl)} class="wide-button">{$t('menu.goToPersonalAssistant')}</a>
 			<button type="button" onclick={logOut} class="wide-button">{$t('menu.logOut')}</button>
 		</div>
 

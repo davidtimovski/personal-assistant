@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import type { PageData } from './$types';
 
 	import AlertBlock from '../../../../../../../Core/shared2/components/AlertBlock.svelte';
@@ -116,7 +117,7 @@
 					x.showSuccess('editDebt.deleteSuccessful');
 					return x;
 				});
-				goto('/debt');
+				goto(resolve('/debt'));
 			} catch {
 				deleteButtonText = $t('delete');
 				deleteInProgress = false;
@@ -130,7 +131,7 @@
 
 	function cancel() {
 		if (!deleteInProgress) {
-			goto('/debt');
+			goto(resolve('/debt'));
 		}
 		deleteButtonText = $t('delete');
 		deleteInProgress = false;
@@ -189,7 +190,7 @@
 		<div class="page-title">
 			<span>{$t(isNew ? 'editDebt.newDebt' : 'editDebt.editDebt')}</span>
 		</div>
-		<a href="/debt" class="back-button">
+		<a href={resolve('/debt')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>

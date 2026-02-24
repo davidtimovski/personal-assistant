@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { ArcElement, Chart, PieController } from 'chart.js';
 
 	import { DateHelper } from '../../../../../../Core/shared2/utils/dateHelper';
@@ -105,7 +106,7 @@
 
 	function goToTransactions(item: PieChartItem) {
 		searchFilters.set(new SearchFilters(1, 15, fromDate, toDate, 0, item.categoryId, type, null));
-		goto('/transactions');
+		goto(resolve('/transactions'));
 	}
 
 	onMount(async () => {
@@ -150,7 +151,7 @@
 			<i class="fas fa-chart-pie"></i>
 		</div>
 		<div class="page-title">{$t('pieChartReport.pieChart')}</div>
-		<a href="/dashboard" class="back-button">
+		<a href={resolve('/dashboard')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -197,7 +198,7 @@
 			{#if legendItems.length > 0}
 				<table class="amount-by-category-table au-animate">
 					<tbody>
-						{#each legendItems as item}
+						{#each legendItems as item (item.categoryId)}
 							<tr
 								onclick={() => {
 									goToTransactions(item);
@@ -211,7 +212,7 @@
 								>
 								<td class="amount-cell">{item.amount === 0 ? '-' : Formatter.money(item.amount, currency, $user.culture)}</td>
 							</tr>
-							{#each item.subItems as subItem}
+							{#each item.subItems as subItem (subItem.categoryId)}
 								<tr
 									onclick={() => {
 										goToTransactions(subItem);

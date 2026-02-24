@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	import { DateHelper } from '../../../../../../Core/shared2/utils/dateHelper';
 	import EmptyListMessage from '../../../../../../Core/shared2/components/EmptyListMessage.svelte';
@@ -74,7 +75,7 @@
 			<i class="far fa-calendar-alt"></i>
 		</div>
 		<div class="page-title">{$t('upcomingExpenses.upcomingExpenses')}</div>
-		<a href="/dashboard" class="back-button">
+		<a href={resolve('/dashboard')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -98,10 +99,10 @@
 						</tr>
 					</thead>
 					<tbody>
-						{#each upcomingExpenses as upcomingExpense}
+						{#each upcomingExpenses as upcomingExpense (upcomingExpense.id)}
 							<tr class:highlighted-row={upcomingExpense.id === editedId}>
 								<td class="edit-link-cell">
-									<a href="/editUpcomingExpense/{upcomingExpense.id}" class="link" title={$t('edit')} aria-label={$t('edit')}>
+									<a href={resolve(`/editUpcomingExpense/${upcomingExpense.id}`)} class="link" title={$t('edit')} aria-label={$t('edit')}>
 										<i class="fas fa-pencil-alt"></i>
 									</a>
 								</td>
@@ -125,7 +126,7 @@
 		<div class="centering-wrap">
 			<button
 				type="button"
-				onclick={() => goto('/editUpcomingExpense/0')}
+				onclick={() => goto(resolve('/editUpcomingExpense/0'))}
 				class="new-button"
 				disabled={$syncStatus.status === SyncEvents.SyncStarted}
 				title={$t('upcomingExpenses.newUpcomingExpense')}

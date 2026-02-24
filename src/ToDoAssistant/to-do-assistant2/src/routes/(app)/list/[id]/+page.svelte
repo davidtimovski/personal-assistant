@@ -3,6 +3,7 @@
 	import type { Unsubscriber } from 'svelte/store';
 	import { slide } from 'svelte/transition';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import type { PageData } from './$types';
 
 	import EmptyListMessage from '../../../../../../../Core/shared2/components/EmptyListMessage.svelte';
@@ -352,9 +353,9 @@
 
 	async function back() {
 		if (isArchived) {
-			await goto('/archivedLists');
+			await goto(resolve('/archivedLists'));
 		} else {
-			await goto('/lists');
+			await goto(resolve('/lists'));
 		}
 	}
 
@@ -502,7 +503,7 @@
 
 <section class="container" onclick={closeDrawer}>
 	<div class="page-title-wrap">
-		<a href="/editList/{data.id}" class="edit-button" title={$t('list.edit')} aria-label={$t('list.edit')}>
+		<a href={resolve(`/editList/${data.id}`)} class="edit-button" title={$t('list.edit')} aria-label={$t('list.edit')}>
 			<i class="fas fa-pencil-alt"></i>
 		</a>
 
@@ -523,13 +524,13 @@
 			<div class="top-buttons-drawer" class:open={topDrawerIsOpen}>
 				<div class="top-buttons-drawer-wrap">
 					<div class="top-buttons-drawer-content horizontal-buttons-wrap">
-						<a href="/bulkAddTasks/{data.id}" class="wide-button">{$t('list.bulkAddTasks')}</a>
-						<a href="/shareList/{data.id}" class="wide-button">{shareButtonText}</a>
-						<a href="/copyList/{data.id}" class="wide-button">{$t('list.copy')}</a>
-						<a href="/uncompleteTasks/{data.id}" class="wide-button">{$t('list.uncompleteAllTasks')}</a>
+						<a href={resolve(`/bulkAddTasks/${data.id}`)} class="wide-button">{$t('list.bulkAddTasks')}</a>
+						<a href={resolve(`/shareList/${data.id}`)} class="wide-button">{shareButtonText}</a>
+						<a href={resolve(`/copyList/${data.id}`)} class="wide-button">{$t('list.copy')}</a>
+						<a href={resolve(`/uncompleteTasks/${data.id}`)} class="wide-button">{$t('list.uncompleteAllTasks')}</a>
 
 						{#if !isArchived}
-							<a href="/archiveList/{data.id}" class="wide-button">{$t('list.archive')}</a>
+							<a href={resolve(`/archiveList/${data.id}`)} class="wide-button">{$t('list.archive')}</a>
 						{/if}
 					</div>
 				</div>
@@ -666,7 +667,7 @@
 						<span>{$t('list.privateTasks')}</span>
 					</div>
 
-					{#each privateTasks as task}
+					{#each privateTasks as task (task.id)}
 						<Task
 							active={task.active}
 							disabled={task.disabled}
@@ -684,7 +685,7 @@
 			{/if}
 
 			<div class="to-do-tasks-wrap">
-				{#each tasks as task}
+				{#each tasks as task (task.id)}
 					<Task
 						active={task.active}
 						disabled={task.disabled}
@@ -724,7 +725,7 @@
 									<span>{$t('list.donePrivateTasks')}</span>
 								</div>
 
-								{#each completedPrivateTasks as task}
+								{#each completedPrivateTasks as task (task.id)}
 									<Task
 										active={task.active}
 										disabled={task.disabled}
@@ -742,7 +743,7 @@
 						{/if}
 
 						<div class="to-do-tasks-wrap">
-							{#each completedTasks as task}
+							{#each completedTasks as task (task.id)}
 								<Task
 									active={task.active}
 									disabled={task.disabled}

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	import EmptyListMessage from '../../../../../../Core/shared2/components/EmptyListMessage.svelte';
 
@@ -57,7 +58,7 @@
 			<i class="fa-solid fa-robot"></i>
 		</div>
 		<div class="page-title">{$t('automaticTransactions.automaticTransactions')}</div>
-		<a href="/dashboard" class="back-button">
+		<a href={resolve('/dashboard')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -81,10 +82,10 @@
 						</tr>
 					</thead>
 					<tbody>
-						{#each automaticTransactions as automaticTransaction}
+						{#each automaticTransactions as automaticTransaction (automaticTransaction.id)}
 							<tr class:highlighted-row={automaticTransaction.id === editedId}>
 								<td class="edit-link-cell">
-									<a href="/editAutomaticTransaction/{automaticTransaction.id}" class="link" title={$t('edit')} aria-label={$t('edit')}>
+									<a href={resolve(`/editAutomaticTransaction/${automaticTransaction.id}`)} class="link" title={$t('edit')} aria-label={$t('edit')}>
 										<i class="fas fa-pencil-alt"></i>
 									</a>
 								</td>
@@ -111,7 +112,7 @@
 		<div class="centering-wrap">
 			<button
 				type="button"
-				onclick={() => goto('/editAutomaticTransaction/0')}
+				onclick={() => goto(resolve('/editAutomaticTransaction/0'))}
 				class="new-button"
 				disabled={$syncStatus.status === SyncEvents.SyncStarted}
 				title={$t('automaticTransactions.newAutomaticTransaction')}

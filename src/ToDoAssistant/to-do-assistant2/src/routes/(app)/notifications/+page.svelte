@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { resolve } from '$app/paths';
 	import type { Unsubscriber } from 'svelte/store';
 
 	import EmptyListMessage from '../../../../../../Core/shared2/components/EmptyListMessage.svelte';
@@ -84,7 +85,7 @@
 			<i class="fas fa-bell"></i>
 		</div>
 		<div class="page-title">{$t('notifications.notifications')}</div>
-		<a href="/lists" class="back-button">
+		<a href={resolve('/lists')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -101,7 +102,7 @@
 
 		{#if unseenNotifications && unseenNotifications.length > 0}
 			<div class="notifications-wrap">
-				{#each unseenNotifications as notification}
+				{#each unseenNotifications as notification (notification.id)}
 					<a href={notification.url} class="notification" class:highlighted={notification.id === highlightedId}>
 						<img
 							class="notification-image"
@@ -135,7 +136,7 @@
 					</div>
 
 					<div class="notifications-wrap seen">
-						{#each seenNotifications as notification}
+						{#each seenNotifications as notification (notification.id)}
 							<a href={notification.url} class="notification" class:highlighted={notification.id === highlightedId}>
 								<img
 									class="notification-image"

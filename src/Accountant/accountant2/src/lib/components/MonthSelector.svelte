@@ -57,7 +57,7 @@
 <div class="month-selector">
 	<select bind:value={month} {disabled} id="month-selector" class="month-select">
 		{#if monthOptions}
-			{#each monthOptions as monthOption}
+			{#each monthOptions as monthOption (monthOption.id)}
 				<option value={monthOption.id}>{monthOption.name}</option>
 			{/each}
 		{/if}
@@ -65,7 +65,7 @@
 
 	<select bind:value={year} onchange={yearSet} {disabled} class="year-select">
 		{#if yearOptions}
-			{#each yearOptions as yearOption}
+			{#each yearOptions as yearOption (yearOption)}
 				<option value={yearOption}>{yearOption}</option>
 			{/each}
 		{/if}

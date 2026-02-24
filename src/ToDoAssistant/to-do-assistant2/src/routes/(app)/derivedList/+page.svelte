@@ -2,6 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import type { Unsubscriber } from 'svelte/store';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
@@ -132,7 +133,7 @@
 
 				const list = s.lists.find((x) => x.derivedListType === type);
 				if (!list) {
-					goto('/lists');
+					goto(resolve('/lists'));
 				} else {
 					name = <string>derivedListNameLookup.get(type);
 					iconClass = ListsService.getDerivedListIconClass(type);
@@ -194,7 +195,7 @@
 			<i class={iconClass}></i>
 		</div>
 		<div class="page-title">{name}</div>
-		<a href="/lists" class="back-button">
+		<a href={resolve('/lists')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -224,7 +225,7 @@
 						<span>{$t('derivedList.privateTasks')}</span>
 					</div>
 
-					{#each privateTasks as task}
+					{#each privateTasks as task (task.id)}
 						<DerivedTask
 							active={task.active}
 							disabled={task.disabled}
@@ -241,7 +242,7 @@
 			{/if}
 
 			<div class="to-do-tasks-wrap">
-				{#each tasks as task}
+				{#each tasks as task (task.id)}
 					<DerivedTask
 						active={task.active}
 						disabled={task.disabled}

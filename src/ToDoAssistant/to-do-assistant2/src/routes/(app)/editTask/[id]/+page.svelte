@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import type { PageData } from './$types';
 
 	import { ValidationUtil } from '../../../../../../../Core/shared2/utils/validationUtils';
@@ -214,7 +215,7 @@
 			<span><span>{$t('editTask.edit')}</span>&nbsp;<span class="colored-text">{name}</span></span>
 		</div>
 
-		<a href="/list/{listId}" class="back-button">
+		<a href={resolve(`/list/${listId}`)} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -258,7 +259,7 @@
 				<div class="form-control">
 					<select id="from-account" bind:value={listId} onchange={loadAssigneeOptions} disabled={!listOptions} aria-label={$t('editTask.list')}>
 						{#if listOptions}
-							{#each listOptions as list}
+							{#each listOptions as list (list.id)}
 								<option value={list.id}>{list.name}</option>
 							{/each}
 						{/if}
@@ -292,7 +293,7 @@
 									</div>
 								</label>
 
-								{#each assigneeOptions as assigneeOption}
+								{#each assigneeOptions as assigneeOption (assigneeOption.id)}
 									<label class="radio" class:selected={assignedToUserId === assigneeOption.id}>
 										<img
 											src={assigneeOption.imageUri}

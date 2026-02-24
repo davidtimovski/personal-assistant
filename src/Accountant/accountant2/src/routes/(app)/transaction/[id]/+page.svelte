@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import type { PageData } from './$types';
 
 	import { DateHelper } from '../../../../../../../Core/shared2/utils/dateHelper';
@@ -111,9 +112,9 @@
 
 	function back() {
 		if (fromExpenditureHeatmap) {
-			goto('/expenditureHeatmap');
+			goto(resolve('/expenditureHeatmap'));
 		} else {
-			goto('/transactions');
+			goto(resolve('/transactions'));
 		}
 	}
 
@@ -211,7 +212,7 @@
 
 <section class="container">
 	<div class="page-title-wrap">
-		<a href="/editTransaction/{data.id}" class="side small" title={$t('edit')} aria-label={$t('edit')}>
+		<a href={resolve(`/editTransaction/${data.id}`)} class="side small" title={$t('edit')} aria-label={$t('edit')}>
 			<i class="fas fa-pencil-alt"></i>
 		</a>
 		<div class="page-title">{pageTitle}</div>

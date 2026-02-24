@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { resolve } from '$app/paths';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
@@ -53,7 +54,7 @@
 			<i class="fas fa-sliders-h"></i>
 		</div>
 		<div class="page-title">{$t('preferences.preferences')}</div>
-		<a href="/weather" class="back-button">
+		<a href={resolve('/weather')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { resolve } from '$app/paths';
 	import { BarController, BarElement, CategoryScale, Chart, LinearScale } from 'chart.js';
 
 	import { DateHelper } from '../../../../../../Core/shared2/utils/dateHelper';
@@ -286,7 +287,7 @@
 			<i class="fas fa-chart-bar"></i>
 		</div>
 		<div class="page-title">{$t('barChartReport.barChart')}</div>
-		<a href="/dashboard" class="back-button">
+		<a href={resolve('/dashboard')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -297,7 +298,7 @@
 				<label for="from-the-past">{$t('barChartReport.fromThePast')}</label>
 				<select id="from-the-past" bind:value={fromDate} onchange={loadData} class="category-select">
 					{#if fromOptions}
-						{#each fromOptions as from}
+						{#each fromOptions as from (from.value)}
 							<option value={from.value}>{from.label}</option>
 						{/each}
 					{/if}
@@ -308,7 +309,7 @@
 				<div class="loadable-select" class:loaded={categoryOptions}>
 					<select id="category" bind:value={categoryId} onchange={loadData} disabled={!categoryOptions} class="category-select">
 						{#if categoryOptions}
-							{#each categoryOptions as category}
+							{#each categoryOptions as category (category.id)}
 								<option value={category.id}>{category.name}</option>
 							{/each}
 						{/if}

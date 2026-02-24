@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	import { DateHelper } from '../../../../../../Core/shared2/utils/dateHelper';
 	import EmptyListMessage from '../../../../../../Core/shared2/components/EmptyListMessage.svelte';
@@ -80,7 +81,7 @@
 			<i class="fas fa-hand-holding-usd"></i>
 		</div>
 		<div class="page-title">{$t('debt.debt')}</div>
-		<a href="/dashboard" class="back-button">
+		<a href={resolve('/dashboard')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -105,10 +106,10 @@
 						</tr>
 					</thead>
 					<tbody>
-						{#each debts as debt}
+						{#each debts as debt (debt.id)}
 							<tr class:highlighted-row={debt.id === editedId}>
 								<td class="edit-link-cell">
-									<a href="/editDebt/{debt.id}" class="link" title={$t('edit')} aria-label={$t('edit')}>
+									<a href={resolve(`/editDebt/${debt.id}`)} class="link" title={$t('edit')} aria-label={$t('edit')}>
 										<i class="fas fa-pencil-alt"></i>
 									</a>
 								</td>
@@ -143,7 +144,7 @@
 		<div class="centering-wrap">
 			<button
 				type="button"
-				onclick={() => goto('/editDebt/0')}
+				onclick={() => goto(resolve('/editDebt/0'))}
 				class="new-button"
 				disabled={$syncStatus.status === SyncEvents.SyncStarted}
 				title={$t('debt.newDebt')}

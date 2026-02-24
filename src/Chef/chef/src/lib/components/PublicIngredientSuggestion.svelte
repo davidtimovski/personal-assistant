@@ -38,7 +38,7 @@
 		</span>
 	</button>
 
-	{#each ingredient.children as childIngredient}
+	{#each ingredient.children as childIngredient (childIngredient.id)}
 		<div class="ingredient-suggestion-children">
 			<PublicIngredientSuggestion ingredient={childIngredient} />
 		</div>

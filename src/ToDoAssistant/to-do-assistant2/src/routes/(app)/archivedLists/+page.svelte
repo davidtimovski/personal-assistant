@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { resolve } from '$app/paths';
 
 	import EmptyListMessage from '../../../../../../Core/shared2/components/EmptyListMessage.svelte';
 
@@ -41,7 +42,7 @@
 			<i class="fas fa-archive"></i>
 		</div>
 		<div class="page-title">{$t('archivedLists.archivedLists')}</div>
-		<a href="/lists" class="back-button">
+		<a href={resolve('/lists')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -53,10 +54,10 @@
 				<div class="double-bounce2"></div>
 			</div>
 		{:else}
-			{#each archivedLists as list}
+			{#each archivedLists as list (list.id)}
 				<div class="to-do-list" class:is-shared={list.sharingState !== 0 && list.sharingState !== 1} class:pending-share={list.sharingState === 1}>
 					<i class="icon {getClassFromIcon(list.icon)}"></i>
-					<a href="/list/{list.id}" class="name" class:highlighted={list.id === editedId}>{list.name}</a>
+					<a href={resolve(`/list/${list.id}`)} class="name" class:highlighted={list.id === editedId}>{list.name}</a>
 					<i class="fas fa-users shared-icon" title={$t('index.shared')} aria-label={$t('index.shared')}></i>
 					<i class="fas fa-user-clock shared-icon" title={$t('index.pendingAccept')} aria-label={$t('index.pendingAccept')}></i>
 				</div>

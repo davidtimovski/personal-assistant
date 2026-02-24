@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	import { DateHelper } from '../../../../../../Core/shared2/utils/dateHelper';
 	import { ValidationResult, ValidationUtil } from '../../../../../../Core/shared2/utils/validationUtils';
@@ -248,7 +249,7 @@
 			<i class="fa-solid fa-money-bill-transfer"></i>
 		</div>
 		<div class="page-title">{$t('transferFunds.transferFunds')}</div>
-		<a href="/accounts" class="back-button">
+		<a href={resolve('/accounts')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -260,7 +261,7 @@
 				<div class="loadable-select" class:loaded={accountOptions}>
 					<select id="from-account" bind:value={fromAccountId} onchange={fromAccountChanged} disabled={!accountOptions}>
 						{#if accountOptions}
-							{#each accountOptions as account}
+							{#each accountOptions as account (account.id)}
 								<option value={account.id}>{account.name}</option>
 							{/each}
 						{/if}
@@ -286,7 +287,7 @@
 				<div class="loadable-select" class:loaded={accountOptions}>
 					<select id="to-account" bind:value={toAccountId} onchange={toAccountChanged} disabled={!accountOptions}>
 						{#if accountOptions}
-							{#each accountOptions as account}
+							{#each accountOptions as account (account.id)}
 								<option value={account.id}>{account.name}</option>
 							{/each}
 						{/if}
@@ -322,7 +323,7 @@
 					</span>
 					<span>{transferButtonLabel}</span>
 				</button>
-				<a href="/accounts" class="button secondary-button">{$t('cancel')}</a>
+				<a href={resolve('/accounts')} class="button secondary-button">{$t('cancel')}</a>
 			</div>
 		</form>
 	</div>

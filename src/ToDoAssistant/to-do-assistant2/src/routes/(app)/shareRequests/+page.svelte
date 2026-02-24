@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	import Tooltip from '../../../../../../Core/shared2/components/Tooltip.svelte';
 	import EmptyListMessage from '../../../../../../Core/shared2/components/EmptyListMessage.svelte';
@@ -59,7 +60,7 @@
 			<i class="fas fa-handshake"></i>
 		</div>
 		<div class="page-title">{$t('shareRequests.shareRequests')}</div>
-		<a href="/lists" class="back-button">
+		<a href={resolve('/lists')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -78,7 +79,7 @@
 			<div class="share-requests-wrap">
 				<Tooltip key="shareRequests" application="To Do Assistant" />
 
-				{#each pendingShareRequests as request}
+				{#each pendingShareRequests as request, i (i)}
 					<div class="share-request">
 						<button
 							type="button"
@@ -117,7 +118,7 @@
 			</div>
 
 			<div class="share-requests-wrap declined">
-				{#each declinedShareRequests as request}
+				{#each declinedShareRequests as request, i (i)}
 					<div class="share-request">
 						<div class="action inactive"></div>
 

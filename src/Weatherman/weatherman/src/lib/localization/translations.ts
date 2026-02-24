@@ -7,7 +7,6 @@ export default {
 			'We were unable to retrieve your location. Please make sure you have provided location permission and your location is turned on.',
 		refresh: 'Refresh',
 		failedToFetchError: 'Please check your internet connection.',
-		h: 'h',
 		weather: {
 			menu: 'Menu',
 			refresh: 'Refresh',
@@ -77,7 +76,6 @@ export default {
 			'Неможевме да ја одредиме вашата локација. Ве молиме осигурајтѐ се дека дадовте дозвола за пристап до вашата локација и дека локацијата е пуштена.',
 		refresh: 'Освежи',
 		failedToFetchError: 'Вѐ молиме да ја проверите вашата интернет конекција.',
-		h: 'ч',
 		weather: {
 			menu: 'Мени',
 			refresh: 'Освежи',

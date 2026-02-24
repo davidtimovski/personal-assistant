@@ -93,9 +93,9 @@
 	<div class="hourly-forecast">
 		<table>
 			<tbody>
-				{#each forecast.hourly as hourForecast}
+				{#each forecast.hourly as hourForecast, i (i)}
 					<tr>
-						<td>{hourForecast.timeString} {$t('h')}</td>
+						<td>{hourForecast.timeString}</td>
 						<td class="hourly-illustration">
 							<Illustration weatherCode={hourForecast.weatherCode} timeOfDay={hourForecast.timeOfDay} />
 						</td>

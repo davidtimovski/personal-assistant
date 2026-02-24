@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import type { PageData } from './$types';
 
 	import { DateHelper } from '../../../../../../../Core/shared2/utils/dateHelper';
@@ -131,7 +132,7 @@
 					x.showSuccess('editUpcomingExpense.deleteSuccessful');
 					return x;
 				});
-				goto('/upcomingExpenses');
+				goto(resolve('/upcomingExpenses'));
 			} catch {
 				deleteButtonText = $t('delete');
 				deleteInProgress = false;
@@ -145,7 +146,7 @@
 
 	function cancel() {
 		if (!deleteInProgress) {
-			goto('/upcomingExpenses');
+			goto(resolve('/upcomingExpenses'));
 		}
 		deleteButtonText = $t('delete');
 		deleteInProgress = false;
@@ -209,7 +210,7 @@
 		<div class="page-title">
 			<span>{$t(isNew ? 'editUpcomingExpense.newUpcomingExpense' : 'editUpcomingExpense.editUpcomingExpense')}</span>
 		</div>
-		<a href="/upcomingExpenses" class="back-button">
+		<a href={resolve('/upcomingExpenses')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -234,7 +235,7 @@
 				<div class="loadable-select" class:loaded={categoryOptions}>
 					<select id="category" bind:value={categoryId} disabled={!categoryOptions} class="category-select">
 						{#if categoryOptions}
-							{#each categoryOptions as category}
+							{#each categoryOptions as category (category.id)}
 								<option value={category.id}>{category.name}</option>
 							{/each}
 						{/if}

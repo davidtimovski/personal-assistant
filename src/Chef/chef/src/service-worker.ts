@@ -1,6 +1,6 @@
 import { build, files } from '$service-worker';
 
-const APP_VERSION = '2.0.0-beta.13';
+const APP_VERSION = '2.0.0-beta.14';
 const ASSETS: string[] = [
 	...build, // the app itself
 	...files // everything in `static`
