@@ -31,7 +31,7 @@ export class RecipesService {
 
 	async getAll(includeCache = false) {
 		if (includeCache) {
-			let cachedRecipes = this.localStorage.getObject<RecipeResponse[]>('homePageData');
+			const cachedRecipes = this.localStorage.getObject<RecipeResponse[]>('homePageData');
 			if (cachedRecipes) {
 				localState.set(new LocalState(cachedRecipes, true));
 			}
@@ -47,8 +47,8 @@ export class RecipesService {
 		const result = await this.httpProxy.ajax<ViewRecipeResponse>(`${Variables.urls.api}/recipes/${id}/${currency}`);
 
 		// Update last opened date
-		let cachedRecipes = this.localStorage.getObject<RecipeResponse[]>('homePageData');
-		let recipe = cachedRecipes?.find((x) => x.id === result.id);
+		const cachedRecipes = this.localStorage.getObject<RecipeResponse[]>('homePageData');
+		const recipe = cachedRecipes?.find((x) => x.id === result.id);
 		recipe!.lastOpenedDate = new Date();
 
 		this.localStorage.set('homePageData', JSON.stringify(cachedRecipes));

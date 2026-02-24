@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { t } from '$lib/localization/i18n';
 	import type { Assignee } from '$lib/models/viewmodels/assignee';
 
@@ -31,7 +32,7 @@
 
 <div class="to-do-task" class:completed class:active class:high-priority={highPriority}>
 	<div class="to-do-task-content" class:highlighted class:assigned={assignedUser}>
-		<a href="/editTask/{id}" class="edit-button" title={$t('list.edit')} aria-label={$t('list.edit')}>
+		<a href={resolve(`/editTask/${id}`)} class="edit-button" title={$t('list.edit')} aria-label={$t('list.edit')}>
 			<i class="fas fa-pencil-alt"></i>
 		</a>
 
@@ -45,7 +46,7 @@
 		{/if}
 
 		{#if url}
-			<a href={url} class="name" target="_blank" rel="noreferrer">{name}</a>
+			<a href={resolve(url)} class="name" target="_blank" rel="noreferrer">{name}</a>
 		{:else}
 			<span class="name">{name}</span>
 		{/if}

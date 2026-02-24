@@ -2,6 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import type { Unsubscriber } from 'svelte/store';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import type { PageData } from './$types';
 
 	import { ValidationUtil } from '../../../../../../../Core/shared2/utils/validationUtils';
@@ -321,7 +322,7 @@
 				x.showSuccess('editRecipe.deleteSuccessful');
 				return x;
 			});
-			goto('/recipes');
+			goto(resolve('/recipes'));
 		} else {
 			deleteButtonText = $t('sure');
 			confirmationInProgress = true;
@@ -338,7 +339,7 @@
 				x.showSuccess('editRecipe.youHaveLeftTheRecipe');
 				return x;
 			});
-			goto('/recipes');
+			goto(resolve('/recipes'));
 		} else {
 			leaveButtonText = $t('sure');
 			confirmationInProgress = true;
@@ -355,7 +356,7 @@
 
 	function back() {
 		if (isNew) {
-			goto('/recipes');
+			goto(resolve('/recipes'));
 		} else {
 			goto(`/recipe/${data.id}`);
 		}
@@ -542,7 +543,7 @@
 					/>
 
 					<div hidden={ingredients.length === 0} class="new-ingredients-wrap">
-						{#each ingredients as ingredient}
+						{#each ingredients as ingredient, i (i)}
 							<div class="new-ingredient au-animate animate-fade-in">
 								<div class="ingredient-wrap">
 									<div class="ingredient-name-wrap">

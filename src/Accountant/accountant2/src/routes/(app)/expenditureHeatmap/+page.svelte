@@ -209,7 +209,7 @@
 			<i class="fas fa-th"></i>
 		</div>
 		<div class="page-title">{$t('expenditureHeatmap.expenditureHeatmap')}</div>
-		<a href="/dashboard" class="back-button">
+		<a href={resolve('/dashboard')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -225,7 +225,7 @@
 			<div class="heatmap-cell header">{$t('expenditureHeatmap.sun')}</div>
 
 			{#if days}
-				{#each days as day}
+				{#each days as day (day.date)}
 					<button
 						type="button"
 						onclick={() => select(day)}
@@ -257,7 +257,7 @@
 					<div class="expenditure-heatmap-table-title">{selectedDay.formattedDate}</div>
 					<table class="expenditure-heatmap-table">
 						<tbody>
-							{#each selectedDay.expenditures as expenditure}
+							{#each selectedDay.expenditures as expenditure (expenditure.transactionId)}
 								<tr onclick={() => viewTransaction(expenditure.transactionId)} role="button">
 									<td>{expenditure.category}</td>
 									<td>{expenditure.description}</td>

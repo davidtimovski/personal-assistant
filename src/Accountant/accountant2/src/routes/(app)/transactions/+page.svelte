@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	import { DateHelper } from '../../../../../../Core/shared2/utils/dateHelper';
 
@@ -250,7 +251,7 @@
 			<i class="fas fa-search-dollar"></i>
 		</div>
 		<div class="page-title">{$t('transactions.transactions')}</div>
-		<a href="/dashboard" class="back-button">
+		<a href={resolve('/dashboard')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -270,7 +271,7 @@
 				<div class="loadable-select" class:loaded={categoryOptions}>
 					<select id="category" bind:value={$searchFilters.categoryId} onchange={filterChanged} disabled={!categoryOptions} class="category-select">
 						{#if categoryOptions}
-							{#each categoryOptions as category}
+							{#each categoryOptions as category (category.id)}
 								<option value={category.id}>{category.name}</option>
 							{/each}
 						{/if}
@@ -283,7 +284,7 @@
 				<div class="loadable-select" class:loaded={accountOptions}>
 					<select id="account" bind:value={$searchFilters.accountId} onchange={filterChanged} disabled={!accountOptions} class="category-select">
 						{#if accountOptions}
-							{#each accountOptions as account}
+							{#each accountOptions as account (account.id)}
 								<option value={account.id}>{account.name}</option>
 							{/each}
 						{/if}
@@ -357,7 +358,7 @@
 					</thead>
 					{#if transactions.length > 0}
 						<tbody>
-							{#each transactions as transaction}
+							{#each transactions as transaction (transaction.id)}
 								<tr
 									onclick={() => viewTransaction(transaction.id)}
 									class="clickable"

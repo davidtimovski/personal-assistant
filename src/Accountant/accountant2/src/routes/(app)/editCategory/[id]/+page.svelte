@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import type { PageData } from './$types';
 
 	import { ValidationUtil } from '../../../../../../../Core/shared2/utils/validationUtils';
@@ -111,7 +112,7 @@
 					x.showSuccess('editCategory.deleteSuccessful');
 					return x;
 				});
-				goto('/categories');
+				goto(resolve('/categories'));
 			} catch {
 				deleteButtonText = $t('delete');
 				deleteInProgress = false;
@@ -132,7 +133,7 @@
 
 	function cancel() {
 		if (!deleteInProgress) {
-			goto('/categories');
+			goto(resolve('/categories'));
 		}
 		deleteButtonText = $t('delete');
 		deleteInProgress = false;
@@ -202,7 +203,7 @@
 				<span>{$t('editCategory.edit')}</span>&nbsp;<span class="colored-text">{name}</span>
 			{/if}
 		</div>
-		<a href="/categories" class="back-button">
+		<a href={resolve('/categories')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -236,7 +237,7 @@
 					<div class="loadable-select" class:loaded={parentCategoryOptions}>
 						<select id="parent-category" bind:value={parentId} disabled={!parentCategoryOptions} class="category-select">
 							{#if parentCategoryOptions}
-								{#each parentCategoryOptions as category}
+								{#each parentCategoryOptions as category (category.id)}
 									<option value={category.id}>{category.name}</option>
 								{/each}
 							{/if}
@@ -250,7 +251,7 @@
 				<label for="type">{$t('editCategory.type')}</label>
 				<select id="type" bind:value={type} onchange={typeChanged} class="category-select">
 					{#if typeOptions}
-						{#each typeOptions as type}
+						{#each typeOptions as type (type.id)}
 							<option value={type.id}>{type.name}</option>
 						{/each}
 					{/if}

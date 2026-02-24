@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { resolve } from '$app/paths';
 	import type { PageData } from './$types';
 
 	import { t } from '$lib/localization/i18n';
@@ -131,13 +132,13 @@
 
 <section class="container" onclick={closeDrawer}>
 	<div class="page-title-wrap">
-		<a href="/editRecipe/{data.id}" class="edit-button" title={$t('recipe.edit')} aria-label={$t('recipe.edit')}>
+		<a href={resolve(`/editRecipe/${data.id}`)} class="edit-button" title={$t('recipe.edit')} aria-label={$t('recipe.edit')}>
 			<i class="fas fa-pencil-alt"></i>
 		</a>
 
 		<div class="page-title">{model ? model.name : ''}</div>
 
-		<a href="/recipes" class="back-button">
+		<a href={resolve('/recipes')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -212,7 +213,7 @@
 
 								<table class="recipe-ingredients-table">
 									<tbody>
-										{#each model.ingredients as ingredient}
+										{#each model.ingredients as ingredient (ingredient.id)}
 											<tr class:missing={ingredient.missing}>
 												<td class="recipe-ingredient-name">
 													{ingredient.parentName ? `${ingredient.parentName} (${ingredient.name})` : ingredient.name}

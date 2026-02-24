@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { resolve } from '$app/paths';
 	import type { Unsubscriber } from 'svelte/store';
 	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
@@ -146,7 +147,7 @@
 <section class="container">
 	<div class="page-title-wrap-loader">
 		<div class="title-wrap">
-			<a href="/menu" class="profile-image-container" title={$t('index.menu')} aria-label={$t('index.menu')}>
+			<a href={resolve('/menu')} class="profile-image-container" title={$t('index.menu')} aria-label={$t('index.menu')}>
 				<img src={$user.imageUri} class="profile-image" width="40" height="40" alt="" />
 			</a>
 
@@ -171,14 +172,14 @@
 		<div class="to-do-lists-wrap">
 			{#if derivedLists && regularLists}
 				{#if regularLists.length > 0}
-					{#each derivedLists as list}
+					{#each derivedLists as list (list.derivedListType)}
 						<div class="to-do-list derived-list {list.derivedListType}">
 							<i class="icon {list.derivedListIconClass}"></i>
 							<a href="/derivedList?type={list.derivedListType}" class="name-container">{list.name}</a>
 						</div>
 					{/each}
 
-					{#each regularLists as list}
+					{#each regularLists as list (list.id)}
 						<div
 							class="to-do-list"
 							class:empty={list.uncompletedTaskCount === 0}
@@ -186,7 +187,7 @@
 							class:pending-share={list.sharingState === 1}
 						>
 							<i class="icon {getClassFromIcon(list.icon)}"></i>
-							<a href="/list/{list.id}" class="name-container" class:highlighted={list.id === editedId}>
+							<a href={resolve(`/list/${list.id}`)} class="name-container" class:highlighted={list.id === editedId}>
 								<span class="name">{list.name}</span>
 								<span class="sharing-icon shared" title={$t('index.shared')} aria-label={$t('index.shared')}><i class="fas fa-users"></i></span>
 								<span class="sharing-icon pending-accept" title={$t('index.pendingAccept')} aria-label={$t('index.pendingAccept')}
@@ -202,7 +203,7 @@
 		</div>
 
 		<div class="centering-wrap">
-			<a href="/editList/0" class="new-button" title={$t('index.newList')} aria-label={$t('index.newList')}>
+			<a href={resolve('/editList/0')} class="new-button" title={$t('index.newList')} aria-label={$t('index.newList')}>
 				<i class="fas fa-plus"></i>
 			</a>
 		</div>

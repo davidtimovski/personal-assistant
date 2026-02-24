@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import type { PageData } from './$types';
 
 	import { ValidationUtil } from '../../../../../../../Core/shared2/utils/validationUtils';
@@ -96,7 +97,7 @@
 			<i class="fas fa-list-ol"></i>
 		</div>
 		<div class="page-title">{$t('bulkAddTasks.bulkAddTasks')}</div>
-		<a href="/list/{data.id}" class="back-button">
+		<a href={resolve(`/list/${data.id}`)} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -131,7 +132,7 @@
 				</span>
 				<span>{$t('bulkAddTasks.add')}</span>
 			</button>
-			<a href="/list/{data.id}" class="button secondary-button">{$t('cancel')}</a>
+			<a href={resolve(`/list/${data.id}`)} class="button secondary-button">{$t('cancel')}</a>
 		</div>
 	</div>
 </section>

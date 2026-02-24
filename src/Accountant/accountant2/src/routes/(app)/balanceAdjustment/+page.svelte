@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	import { ValidationResult, ValidationUtil } from '../../../../../../Core/shared2/utils/validationUtils';
 
@@ -84,7 +85,7 @@
 					x.showSuccess('balanceAdjustment.adjustmentSuccessful');
 					return x;
 				});
-				goto('/dashboard');
+				goto(resolve('/dashboard'));
 			} catch {
 				adjustButtonIsLoading = false;
 			}
@@ -123,7 +124,7 @@
 			<i class="fas fa-coins"></i>
 		</div>
 		<div class="page-title">{$t('balanceAdjustment.balanceAdjustment')}</div>
-		<a href="/dashboard" class="back-button">
+		<a href={resolve('/dashboard')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -140,7 +141,7 @@
 				<div class="loadable-select" class:loaded={accountOptions}>
 					<select id="account" bind:value={accountId} disabled={!accountOptions} class="category-select">
 						{#if accountOptions}
-							{#each accountOptions as account}
+							{#each accountOptions as account (account.id)}
 								<option value={account.id}>{account.name}</option>
 							{/each}
 						{/if}
@@ -169,7 +170,7 @@
 					<span>{$t('balanceAdjustment.adjust')}</span>
 				</button>
 
-				<a href="/menu" class="button secondary-button">{$t('cancel')}</a>
+				<a href={resolve('/menu')} class="button secondary-button">{$t('cancel')}</a>
 			</div>
 		</form>
 	</div>

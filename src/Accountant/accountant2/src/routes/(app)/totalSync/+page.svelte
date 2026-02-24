@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { resolve } from '$app/paths';
 
 	import AlertBlock from '../../../../../../Core/shared2/components/AlertBlock.svelte';
 
@@ -76,7 +77,7 @@
 				</span>
 				<span>{$t('totalSync.sync')}</span>
 			</button>
-			<a href="/menu" class="button secondary-button">{$t('cancel')}</a>
+			<a href={resolve('/menu')} class="button secondary-button">{$t('cancel')}</a>
 		</div>
 	</div>
 </section>

@@ -1,9 +1,8 @@
 <script lang="ts">
 	import '../app.css';
 
-	export const prerender = true;
-
 	import { page } from '$app/stores';
+	import { resolve } from '$app/paths';
 	import { t } from '$lib/localization/i18n';
 </script>
 
@@ -26,7 +25,7 @@
 					{$t($page.status === 404 ? 'error.youSeemLost' : 'error.somethingWentWrong')}
 				</div>
 
-				<a href="/dashboard" class="wide-button">{$t('error.takeMeHome')}</a>
+				<a href={resolve('/dashboard')} class="wide-button">{$t('error.takeMeHome')}</a>
 			</div>
 		</section>
 	</div>

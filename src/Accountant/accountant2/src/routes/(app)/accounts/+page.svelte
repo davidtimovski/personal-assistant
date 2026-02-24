@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	import { t } from '$lib/localization/i18n';
 	import { LocalStorageUtil, LocalStorageKeys } from '$lib/utils/localStorageUtil';
@@ -46,7 +47,7 @@
 
 		const accountItems = new Array<AccountItem>();
 		for (const account of accountDtos) {
-			if (!!account.stockPrice) {
+			if (account.stockPrice) {
 				someAreInvestmentFunds = true;
 			}
 
@@ -71,7 +72,7 @@
 			<i class="fas fa-money-check-alt"></i>
 		</div>
 		<div class="page-title">{$t('accounts.accounts')}</div>
-		<a href="/dashboard" class="back-button">
+		<a href={resolve('/dashboard')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -108,10 +109,10 @@
 						</thead>
 
 						<tbody>
-							{#each accounts as account}
+							{#each accounts as account (account.id)}
 								<tr class:highlighted-row={account.id === editedId || account.id === editedId2}>
 									<td class="edit-link-cell">
-										<a href="/editAccount/{account.id}" class="link" title={$t('edit')} aria-label={$t('edit')}>
+										<a href={resolve(`/editAccount/${account.id}`)} class="link" title={$t('edit')} aria-label={$t('edit')}>
 											<i class="fas fa-pencil-alt"></i>
 										</a>
 									</td>
@@ -149,7 +150,7 @@
 		<div class="centering-wrap">
 			<button
 				type="button"
-				onclick={() => goto('/editAccount/0')}
+				onclick={() => goto(resolve('/editAccount/0'))}
 				class="new-button"
 				disabled={$syncStatus.status === SyncEvents.SyncStarted}
 				title={$t('accounts.newAccount')}
@@ -163,7 +164,7 @@
 			<div>
 				<hr />
 
-				<a href="/transferFunds" class="wide-button">{$t('accounts.transferFunds')}</a>
+				<a href={resolve('/transferFunds')} class="wide-button">{$t('accounts.transferFunds')}</a>
 			</div>
 		{/if}
 	</div>

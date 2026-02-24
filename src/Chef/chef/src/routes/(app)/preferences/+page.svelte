@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { resolve } from '$app/paths';
 
 	import Checkbox from '../../../../../../Core/shared2/components/Checkbox.svelte';
 
@@ -128,7 +129,7 @@
 			<i class="fas fa-sliders-h"></i>
 		</div>
 		<div class="page-title">{$t('preferences.preferences')}</div>
-		<a href="/recipes" class="back-button">
+		<a href={resolve('/recipes')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>

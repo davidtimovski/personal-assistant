@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { resolve } from '$app/paths';
 	import type { Unsubscriber } from 'svelte/store';
 	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
@@ -169,7 +170,7 @@
 <section class="container">
 	<div class="page-title-wrap-loader">
 		<div class="title-wrap">
-			<a href="/menu" class="profile-image-container" title={$t('weather.menu')} aria-label={$t('weather.menu')}>
+			<a href={resolve('/menu')} class="profile-image-container" title={$t('weather.menu')} aria-label={$t('weather.menu')}>
 				<img src={$user.imageUri} class="profile-image" width="40" height="40" alt="" />
 			</a>
 
@@ -192,7 +193,7 @@
 
 	<div class="content-wrap">
 		<div class="days">
-			{#each $forecast.weekDays as weekDay}
+			{#each $forecast.weekDays as weekDay (weekDay.weekDay)}
 				<button type="button" onclick={() => selectDate(weekDay.date)} class="week-day" class:selected={selectedDate === weekDay.date}
 					>{weekDay.weekDay}</button
 				>
@@ -249,9 +250,9 @@
 					<div class="hourly-forecast">
 						<table>
 							<tbody>
-								{#each $forecast.hourly as hourForecast}
+								{#each $forecast.hourly as hourForecast, i (i)}
 									<tr>
-										<td>{hourForecast.timeString} {$t('h')}</td>
+										<td>{hourForecast.timeString}</td>
 										<td class="hourly-illustration">
 											{#if hourForecast.timeOfDay !== null}
 												<Illustration weatherCode={hourForecast.weatherCode} timeOfDay={hourForecast.timeOfDay} />
@@ -270,7 +271,7 @@
 				</div>
 			</div>
 
-			{#each $forecast.nextDays as nextDay}
+			{#each $forecast.nextDays as nextDay (nextDay.date)}
 				<div class="tab" class:visible={nextDay.date === selectedDate}>
 					<NextDayForecast forecast={nextDay} />
 				</div>

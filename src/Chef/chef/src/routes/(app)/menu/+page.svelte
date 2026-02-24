@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	import { AuthService } from '../../../../../../Core/shared2/services/authService';
 
@@ -19,7 +20,7 @@
 
 	async function goToPreferences() {
 		preferencesButtonIsLoading = true;
-		await goto('/preferences');
+		await goto(resolve('/preferences'));
 	}
 
 	async function logOut() {
@@ -55,16 +56,16 @@
 			<i class="fas fa-bars"></i>
 		</div>
 		<div class="page-title">{$t('menu.menu')}</div>
-		<a href="/recipes" class="back-button">
+		<a href={resolve('/recipes')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
 
 	<div class="content-wrap">
 		<div class="horizontal-buttons-wrap">
-			<!-- <a href="/archivedLists" class="wide-button">{$t('menu.archivedLists')}</a> -->
+			<!-- <a href={resolve('/archivedLists')} class="wide-button">{$t('menu.archivedLists')}</a> -->
 
-			<!-- <a href="/shareRequests" class="wide-button with-badge">
+			<!-- <a href={resolve('/shareRequests')} class="wide-button with-badge">
 				<span>{$t('menu.shareRequests')}</span>
 				{#if pendingShareRequestCount > 0}
 					<span class="badge">{pendingShareRequestCount}</span>
@@ -78,13 +79,13 @@
 				<span>{$t('menu.preferences')}</span>
 			</button>
 
-			<a href="/help" class="wide-button">{$t('menu.help')}</a>
+			<a href={resolve('/help')} class="wide-button">{$t('menu.help')}</a>
 		</div>
 
 		<hr />
 
 		<div class="horizontal-buttons-wrap">
-			<a href={personalAssistantUrl} class="wide-button">{$t('menu.goToPersonalAssistant')}</a>
+			<a href={resolve(personalAssistantUrl)} class="wide-button">{$t('menu.goToPersonalAssistant')}</a>
 			<button type="button" onclick={logOut} class="wide-button">{$t('menu.logOut')}</button>
 		</div>
 

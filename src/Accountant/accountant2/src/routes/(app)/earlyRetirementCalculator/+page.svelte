@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { resolve } from '$app/paths';
 
 	import { CurrenciesService } from '../../../../../../Core/shared2/services/currenciesService';
 	import Checkbox from '../../../../../../Core/shared2/components/Checkbox.svelte';
@@ -519,7 +520,7 @@
 			<i class="fas fa-piggy-bank"></i>
 		</div>
 		<div class="page-title">{$t('earlyRetirementCalculator.earlyRetirementCalculator')}</div>
-		<a href="/dashboard" class="back-button">
+		<a href={resolve('/dashboard')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -716,7 +717,7 @@
 			</div>
 			<div class="er-calc-input-wrap">
 				<div class="large-upcoming-expenses">
-					{#each upcomingExpenses as expense}
+					{#each upcomingExpenses as expense, i (i)}
 						<div class="large-upcoming-expense">
 							<i class="large-upcoming-expense-icon {expense.iconClass}"></i>
 							<input type="text" bind:value={expense.name} />
@@ -780,13 +781,13 @@
 
 			{#if summaryItems}
 				<ul>
-					{#each summaryItems as summaryItem}
+					{#each summaryItems as summaryItem, i (i)}
 						<li>
 							<span contenteditable="false" bind:innerHTML={summaryItem.contentHtml}></span>
 
 							{#if summaryItem.children.length > 0}
 								<ul>
-									{#each summaryItem.children as childItem}
+									{#each summaryItem.children as childItem, i (i)}
 										<li contenteditable="false" bind:innerHTML={childItem.contentHtml}></li>
 									{/each}
 								</ul>
@@ -827,7 +828,7 @@
 								</tr>
 							</thead>
 							<tbody>
-								{#each yearlySummaryItems as savedSummaryItem}
+								{#each yearlySummaryItems as savedSummaryItem, i (i)}
 									<tr>
 										<td>{savedSummaryItem.year}</td>
 										<td>{savedSummaryItem.age}</td>

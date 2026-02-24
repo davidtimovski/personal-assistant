@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import type { PageData } from './$types';
 
 	import AlertBlock from '../../../../../../../Core/shared2/components/AlertBlock.svelte';
@@ -135,7 +136,7 @@
 					x.showSuccess('editAutomaticTransaction.deleteSuccessful');
 					return x;
 				});
-				goto('/automaticTransactions');
+				goto(resolve('/automaticTransactions'));
 			} catch {
 				deleteButtonText = $t('delete');
 				deleteInProgress = false;
@@ -149,7 +150,7 @@
 
 	function cancel() {
 		if (!deleteInProgress) {
-			goto('/automaticTransactions');
+			goto(resolve('/automaticTransactions'));
 		}
 		deleteButtonText = $t('delete');
 		deleteInProgress = false;
@@ -212,7 +213,7 @@
 		<div class="page-title">
 			<span>{$t(isNew ? 'editAutomaticTransaction.newAutomaticTransaction' : 'editAutomaticTransaction.editAutomaticTransaction')}</span>
 		</div>
-		<a href="/automaticTransactions" class="back-button">
+		<a href={resolve('/automaticTransactions')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -243,7 +244,7 @@
 				<div class="loadable-select" class:loaded={categoryOptions}>
 					<select id="category" bind:value={categoryId} disabled={!categoryOptions} class="category-select">
 						{#if categoryOptions}
-							{#each categoryOptions as category}
+							{#each categoryOptions as category (category.id)}
 								<option value={category.id}>{category.name}</option>
 							{/each}
 						{/if}
@@ -255,7 +256,7 @@
 			<div class="form-control inline">
 				<label for="day-in-month">{$t('editAutomaticTransaction.onEvery')}</label>
 				<select id="day-in-month" bind:value={dayInMonth} class="category-select">
-					{#each dayInMonthOptions as day}
+					{#each dayInMonthOptions as day (day.id)}
 						<option value={day.id}>{day.name}</option>
 					{/each}
 					<option value={0}>{$t('editAutomaticTransaction.lastDayOfMonth')}</option>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { resolve } from '$app/paths';
 	import type { Unsubscriber } from 'svelte/store';
 	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
@@ -140,7 +141,7 @@
 <section class="container">
 	<div class="page-title-wrap-loader">
 		<div class="title-wrap">
-			<a href="/menu" class="profile-image-container" title={$t('recipes.menu')} aria-label={$t('recipes.menu')}>
+			<a href={resolve('/menu')} class="profile-image-container" title={$t('recipes.menu')} aria-label={$t('recipes.menu')}>
 				<img src={$user.imageUri} class="profile-image" width="40" height="40" alt="" />
 			</a>
 
@@ -164,9 +165,9 @@
 	<div class="content-wrap recipes">
 		<div class="recipes-wrap" bind:this={recipesContainer}>
 			{#if recipes}
-				{#each recipes as recipe}
+				{#each recipes as recipe (recipe.id)}
 					<a
-						href="/recipe/{recipe.id}"
+						href={resolve(`/recipe/${recipe.id}`)}
 						class="recipe"
 						class:highlighted={recipe.id === editedId}
 						class:is-shared={recipe.sharingState !== 0 && recipe.sharingState !== 1}
@@ -186,7 +187,7 @@
 		</div>
 
 		<div class="centering-wrap">
-			<a href="/editRecipe/0" class="new-button" title={$t('recipes.newRecipe')} aria-label={$t('recipes.newRecipe')}>
+			<a href={resolve('/editRecipe/0')} class="new-button" title={$t('recipes.newRecipe')} aria-label={$t('recipes.newRecipe')}>
 				<i class="fas fa-plus"></i>
 			</a>
 		</div>

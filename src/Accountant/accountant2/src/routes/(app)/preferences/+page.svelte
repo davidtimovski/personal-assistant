@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { resolve } from '$app/paths';
 
 	import CurrencySelector from '../../../../../../Core/shared2/components/CurrencySelector.svelte';
 	import Checkbox from '../../../../../../Core/shared2/components/Checkbox.svelte';
@@ -44,7 +45,7 @@
 			<i class="fas fa-sliders-h"></i>
 		</div>
 		<div class="page-title">{$t('preferences.preferences')}</div>
-		<a href="/dashboard" class="back-button">
+		<a href={resolve('/dashboard')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>

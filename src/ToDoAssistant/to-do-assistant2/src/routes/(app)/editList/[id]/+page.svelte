@@ -2,6 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { slide } from 'svelte/transition';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import type { PageData } from './$types';
 
 	import { ValidationUtil } from '../../../../../../../Core/shared2/utils/validationUtils';
@@ -134,7 +135,7 @@
 				x.showSuccess('editList.deleteSuccessful');
 				return x;
 			});
-			goto('/lists');
+			goto(resolve('/lists'));
 		} else {
 			deleteButtonText = $t('sure');
 			confirmationInProgress = true;
@@ -151,7 +152,7 @@
 				x.showSuccess('editList.youHaveLeftTheList');
 				return x;
 			});
-			goto('/lists');
+			goto(resolve('/lists'));
 		} else {
 			leaveButtonText = $t('sure');
 			confirmationInProgress = true;
@@ -169,7 +170,7 @@
 
 	function back() {
 		if (isNew) {
-			goto('/lists');
+			goto(resolve('/lists'));
 		} else {
 			goto(`/list/${data.id}`);
 		}
@@ -284,9 +285,9 @@
 						<div class="icon-wrap">
 							<span class="placeholder">{$t('editList.icon')}</span>
 							<div class="icon-options">
-								{#each iconOptions as i}
-									<button type="button" onclick={() => selectIcon(i.icon)} class:selected={icon === i.icon} class="icon-option">
-										<i class={i.cssClass}></i>
+								{#each iconOptions as iconOption (iconOption.icon)}
+									<button type="button" onclick={() => selectIcon(iconOption.icon)} class:selected={icon === iconOption.icon} class="icon-option">
+										<i class={iconOption.cssClass}></i>
 									</button>
 								{/each}
 							</div>

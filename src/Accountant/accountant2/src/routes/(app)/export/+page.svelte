@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	import { DateHelper } from '../../../../../../Core/shared2/utils/dateHelper';
 	import AlertBlock from '../../../../../../Core/shared2/components/AlertBlock.svelte';
@@ -35,7 +36,7 @@
 
 		transactionsService.deleteExportedFile(fileId);
 
-		await goto('/dashboard');
+		await goto(resolve('/dashboard'));
 	}
 
 	function generateGuid(): string {
@@ -63,7 +64,7 @@
 			<i class="fas fa-download"></i>
 		</div>
 		<div class="page-title">{$t('export.export')}</div>
-		<a href="/dashboard" class="back-button">
+		<a href={resolve('/dashboard')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -82,7 +83,7 @@
 				</span>
 				<span>{$t('export.export')}</span>
 			</button>
-			<a href="/menu" class="button secondary-button">{$t('cancel')}</a>
+			<a href={resolve('/menu')} class="button secondary-button">{$t('cancel')}</a>
 		</div>
 	</div>
 </section>

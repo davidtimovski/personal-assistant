@@ -12,13 +12,13 @@
 		<div class="category-name">{category.name}</div>
 
 		<div class="category-body">
-			{#each category.ingredients as ingredient}
+			{#each category.ingredients as ingredient (ingredient.id)}
 				<div>
 					<PublicIngredientSuggestion {ingredient} />
 				</div>
 			{/each}
 
-			{#each category.subcategories as subcategory}
+			{#each category.subcategories as subcategory, i (i)}
 				<div class="subcategory-suggestion">
 					<PublicCategorySuggestion category={subcategory} />
 				</div>

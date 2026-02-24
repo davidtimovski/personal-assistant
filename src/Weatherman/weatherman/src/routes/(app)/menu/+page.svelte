@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	import { AuthService } from '../../../../../../Core/shared2/services/authService';
 
@@ -16,7 +17,7 @@
 
 	async function goToPreferences() {
 		preferencesButtonIsLoading = true;
-		await goto('/preferences');
+		await goto(resolve('/preferences'));
 	}
 
 	async function logOut() {
@@ -43,7 +44,7 @@
 			<i class="fas fa-bars"></i>
 		</div>
 		<div class="page-title">{$t('menu.menu')}</div>
-		<a href="/weather" class="back-button">
+		<a href={resolve('/weather')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -61,7 +62,7 @@
 		<hr />
 
 		<div class="horizontal-buttons-wrap">
-			<a href={personalAssistantUrl} class="wide-button">{$t('menu.goToPersonalAssistant')}</a>
+			<a href={resolve(personalAssistantUrl)} class="wide-button">{$t('menu.goToPersonalAssistant')}</a>
 			<button type="button" onclick={logOut} class="wide-button">{$t('menu.logOut')}</button>
 		</div>
 

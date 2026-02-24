@@ -2,6 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import type { Unsubscriber } from 'svelte/store';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import type { PageData } from './$types';
 
 	import { t } from '$lib/localization/i18n';
@@ -77,7 +78,7 @@
 		<div class="page-title">
 			<span><span>{$t('uncompleteTasks.uncompleteTasksIn')}</span>&nbsp;<span class="colored-text">{name}</span>?</span>
 		</div>
-		<a href="/list/{data.id}" class="back-button">
+		<a href={resolve(`/list/${data.id}`)} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -92,7 +93,7 @@
 				</span>
 				<span>{$t('uncompleteTasks.uncomplete')}</span>
 			</button>
-			<a href="/list/{data.id}" class="button secondary-button">{$t('cancel')}</a>
+			<a href={resolve(`/list/${data.id}`)} class="button secondary-button">{$t('cancel')}</a>
 		</div>
 	</div>
 </section>

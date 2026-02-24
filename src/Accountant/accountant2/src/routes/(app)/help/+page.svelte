@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { resolve } from '$app/paths';
 
 	import { TooltipsService } from '../../../../../../Core/shared2/services/tooltipsService';
 	import type { Tooltip } from '../../../../../../Core/shared2/models/tooltip';
@@ -52,7 +53,7 @@
 			<i class="fas fa-info-circle"></i>
 		</div>
 		<div class="page-title">{$t('help.help')}</div>
-		<a href="/dashboard" class="back-button">
+		<a href={resolve('/dashboard')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -65,7 +66,7 @@
 			</div>
 		{:else}
 			<div class="share-requests-wrap">
-				{#each tooltips as tooltip}
+				{#each tooltips as tooltip (tooltip.key)}
 					<div class="tooltip-item">
 						<div class="tooltip-header">
 							{#if tooltip.isDismissed}

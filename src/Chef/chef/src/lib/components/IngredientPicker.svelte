@@ -293,7 +293,7 @@
 					<div class="suggestions-header">{$t('mine')}</div>
 
 					<div class="suggestions-body">
-						{#each suggestions.userIngredients as ingredient}
+						{#each suggestions.userIngredients as ingredient (ingredient.id)}
 							<PublicIngredientSuggestion {ingredient} />
 						{/each}
 					</div>
@@ -304,12 +304,12 @@
 				<div class="suggestions-header">{$t('public')}</div>
 
 				<div class="ingredients">
-					{#each suggestions.publicIngredients.uncategorized as ingredient}
+					{#each suggestions.publicIngredients.uncategorized as ingredient (ingredient.id)}
 						<PublicIngredientSuggestion {ingredient} />
 					{/each}
 				</div>
 
-				{#each suggestions.publicIngredients.categories as category}
+				{#each suggestions.publicIngredients.categories as category, i (i)}
 					<div class="category-suggestion">
 						<PublicCategorySuggestion {category} />
 					</div>

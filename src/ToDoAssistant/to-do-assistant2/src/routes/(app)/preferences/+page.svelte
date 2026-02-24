@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { resolve } from '$app/paths';
 
 	import Checkbox from '../../../../../../Core/shared2/components/Checkbox.svelte';
 
@@ -165,7 +166,7 @@
 			<i class="fas fa-sliders-h"></i>
 		</div>
 		<div class="page-title">{$t('preferences.preferences')}</div>
-		<a href="/lists" class="back-button">
+		<a href={resolve('/lists')} class="back-button">
 			<i class="fas fa-times"></i>
 		</a>
 	</div>
@@ -212,7 +213,7 @@
 					<select bind:value={immediateListId} onchange={immediateListChanged} disabled={!listOptions} aria-label={$t('preferences.immediateList')}>
 						<option value={null}>{$t('preferences.none')}</option>
 						{#if listOptions}
-							{#each listOptions as list}
+							{#each listOptions as list (list.id)}
 								<option value={list.id}>{list.name}</option>
 							{/each}
 						{/if}
