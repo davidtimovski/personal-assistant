@@ -9,6 +9,7 @@ open CommonHandlers
 open HandlerBase
 open Models
 open Logic
+open Sentry
 
 module Handlers =
 
@@ -23,24 +24,25 @@ module Handlers =
                     userId
 
             task {
-                let! request = ctx.BindJsonAsync<CreateCategoryRequest>()
-                request.HttpContext <- ctx
+                try
+                    let! request = ctx.BindJsonAsync<CreateCategoryRequest>()
+                    request.HttpContext <- ctx
 
-                match Logic.validateCreate request with
-                | Success _ ->
-                    let category = Logic.createRequestToEntity request userId
+                    match Logic.validateCreate request with
+                    | Success _ ->
+                        let category = Logic.createRequestToEntity request userId
 
-                    let connection = getDbConnection ctx
-                    let! id = CategoriesRepository.create category connection tr
+                        let connection = getDbConnection ctx
+                        let! id = CategoriesRepository.create category connection tr
 
-                    let! result = Successful.CREATED id next ctx
+                        let! result = Successful.CREATED id next ctx
 
+                        return result
+                    | Failure error ->
+                        tr.Status <- SpanStatus.InvalidArgument;
+                        return! RequestErrors.BAD_REQUEST error next ctx
+                finally
                     tr.Finish()
-
-                    return result
-                | Failure error ->
-                    tr.Finish()
-                    return! RequestErrors.BAD_REQUEST error next ctx
             })
 
     let update: HttpHandler =
@@ -54,39 +56,40 @@ module Handlers =
                     userId
 
             task {
-                let! request = ctx.BindJsonAsync<UpdateCategoryRequest>()
-                request.HttpContext <- ctx
+                try
+                    let! request = ctx.BindJsonAsync<UpdateCategoryRequest>()
+                    request.HttpContext <- ctx
 
-                let connectionString = getConnectionString ctx
-                let! existingCategory = CategoriesRepository.get request.Id connectionString
-                let! existingParentCategory = 
-                    task {
-                        match request.ParentId with
-                        | Some parentId -> return! CategoriesRepository.get parentId connectionString
-                        | None -> return None
-                    }
+                    let connectionString = getConnectionString ctx
+                    let! existingCategory = CategoriesRepository.get request.Id connectionString
+                    let! existingParentCategory = 
+                        task {
+                            match request.ParentId with
+                            | Some parentId -> return! CategoriesRepository.get parentId connectionString
+                            | None -> return None
+                        }
 
-                let validationParams =
-                    {
-                        CurrentUserId = userId
-                        Request = request
-                        ExistingCategory = existingCategory
-                        ExistingParentCategory = existingParentCategory
-                    }
+                    let validationParams =
+                        {
+                            CurrentUserId = userId
+                            Request = request
+                            ExistingCategory = existingCategory
+                            ExistingParentCategory = existingParentCategory
+                        }
 
-                match Logic.validateUpdate validationParams with
-                | Success _ ->
-                    let category = Logic.updateRequestToEntity request userId
-                    let! _ = CategoriesRepository.update category connectionString tr
+                    match Logic.validateUpdate validationParams with
+                    | Success _ ->
+                        let category = Logic.updateRequestToEntity request userId
+                        let! _ = CategoriesRepository.update category connectionString tr
 
-                    let! result = Successful.NO_CONTENT next ctx
+                        let! result = Successful.NO_CONTENT next ctx
 
+                        return result
+                    | Failure error ->
+                        tr.Status <- SpanStatus.InvalidArgument;
+                        return! RequestErrors.BAD_REQUEST error next ctx
+                finally
                     tr.Finish()
-
-                    return result
-                | Failure error ->
-                    tr.Finish()
-                    return! RequestErrors.BAD_REQUEST error next ctx
             })
 
     let delete (id: int) : HttpHandler =
@@ -100,13 +103,14 @@ module Handlers =
                     userId
 
             task {
-                let connectionString = getConnectionString ctx
+                try
+                    let connectionString = getConnectionString ctx
 
-                let! _ = CategoriesRepository.delete id userId connectionString tr
+                    let! _ = CategoriesRepository.delete id userId connectionString tr
 
-                let! result = Successful.NO_CONTENT next ctx
+                    let! result = Successful.NO_CONTENT next ctx
 
-                tr.Finish()
-
-                return result
+                    return result
+                finally
+                    tr.Finish()
             })

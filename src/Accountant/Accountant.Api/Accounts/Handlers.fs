@@ -9,6 +9,7 @@ open CommonHandlers
 open HandlerBase
 open Models
 open Logic
+open Sentry
 
 module Handlers =
 
@@ -20,23 +21,24 @@ module Handlers =
                 Metrics.startTransactionWithUser $"{ctx.Request.Method} /api/accounts" "Accounts/Handlers.create" userId
 
             task {
-                let! request = ctx.BindJsonAsync<CreateAccountRequest>()
+                try
+                    let! request = ctx.BindJsonAsync<CreateAccountRequest>()
 
-                match Logic.validateCreate request with
-                | Success _ ->
-                    let account = Logic.createRequestToEntity request userId
+                    match Logic.validateCreate request with
+                    | Success _ ->
+                        let account = Logic.createRequestToEntity request userId
 
-                    let connection = getDbConnection ctx
-                    let! id = AccountsRepository.create account connection tr
+                        let connection = getDbConnection ctx
+                        let! id = AccountsRepository.create account connection tr
 
-                    let! result = Successful.CREATED id next ctx
+                        let! result = Successful.CREATED id next ctx
 
+                        return result
+                    | Failure error ->
+                        tr.Status <- SpanStatus.InvalidArgument;
+                        return! RequestErrors.BAD_REQUEST error next ctx
+                finally
                     tr.Finish()
-
-                    return result
-                | Failure error ->
-                    tr.Finish()
-                    return! RequestErrors.BAD_REQUEST error next ctx
             })
 
     let update: HttpHandler =
@@ -47,32 +49,33 @@ module Handlers =
                 Metrics.startTransactionWithUser $"{ctx.Request.Method} /api/accounts" "Accounts/Handlers.update" userId
 
             task {
-                let! request = ctx.BindJsonAsync<UpdateAccountRequest>()
-                request.HttpContext <- ctx
+                try
+                    let! request = ctx.BindJsonAsync<UpdateAccountRequest>()
+                    request.HttpContext <- ctx
 
-                let connectionString = getConnectionString ctx
-                let! existingAccount = AccountsRepository.get request.Id connectionString
+                    let connectionString = getConnectionString ctx
+                    let! existingAccount = AccountsRepository.get request.Id connectionString
 
-                let validationParams =
-                    {
-                        CurrentUserId = userId
-                        Request = request
-                        ExistingAccount = existingAccount
-                    }
+                    let validationParams =
+                        {
+                            CurrentUserId = userId
+                            Request = request
+                            ExistingAccount = existingAccount
+                        }
 
-                match Logic.validateUpdate validationParams with
-                | Success _ ->
-                    let account = Logic.updateRequestToEntity request userId
-                    let! _ = AccountsRepository.update account connectionString tr
+                    match Logic.validateUpdate validationParams with
+                    | Success _ ->
+                        let account = Logic.updateRequestToEntity request userId
+                        let! _ = AccountsRepository.update account connectionString tr
 
-                    let! result = Successful.NO_CONTENT next ctx
+                        let! result = Successful.NO_CONTENT next ctx
 
+                        return result
+                    | Failure error ->
+                        tr.Status <- SpanStatus.InvalidArgument;
+                        return! RequestErrors.BAD_REQUEST error next ctx
+                finally
                     tr.Finish()
-
-                    return result
-                | Failure error ->
-                    tr.Finish()
-                    return! RequestErrors.BAD_REQUEST error next ctx
             })
 
     let delete (id: int) : HttpHandler =
@@ -85,20 +88,21 @@ module Handlers =
                     "Accounts/Handlers.delete"
                     userId
 
-            let connectionString = getConnectionString ctx
-
-            let isMain = AccountsRepository.isMain id userId connectionString
-
             task {
-                if isMain then
+                try
+                    let connectionString = getConnectionString ctx
+
+                    let isMain = AccountsRepository.isMain id userId connectionString
+
+                    if isMain then
+                        tr.Status <- SpanStatus.InvalidArgument;
+                        return! RequestErrors.BAD_REQUEST "Cannot delete main account" next ctx
+                    else
+                        let! _ = AccountsRepository.delete id userId connectionString tr
+
+                        let! result = Successful.NO_CONTENT next ctx
+
+                        return result
+                finally
                     tr.Finish()
-                    return! RequestErrors.BAD_REQUEST "Cannot delete main account" next ctx
-                else
-                    let! _ = AccountsRepository.delete id userId connectionString tr
-
-                    let! result = Successful.NO_CONTENT next ctx
-
-                    tr.Finish()
-
-                    return result
             })

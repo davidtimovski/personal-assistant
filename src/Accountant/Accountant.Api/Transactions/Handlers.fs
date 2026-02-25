@@ -12,6 +12,7 @@ open Api.Common.Fs
 open CommonHandlers
 open HandlerBase
 open Models
+open Sentry
 
 module Handlers =
 
@@ -26,24 +27,25 @@ module Handlers =
                     userId
 
             task {
-                let! request = ctx.BindJsonAsync<CreateTransactionRequest>()
-                request.HttpContext <- ctx
+                try
+                    let! request = ctx.BindJsonAsync<CreateTransactionRequest>()
+                    request.HttpContext <- ctx
 
-                match Logic.validateCreate request with
-                | Success _ ->
-                    let transaction = Logic.prepareForCreate request
-                    let connection = getDbConnection ctx
+                    match Logic.validateCreate request with
+                    | Success _ ->
+                        let transaction = Logic.prepareForCreate request
+                        let connection = getDbConnection ctx
 
-                    let! id = TransactionsRepository.create transaction connection None tr
+                        let! id = TransactionsRepository.create transaction connection None tr
 
-                    let! result = Successful.CREATED id next ctx
+                        let! result = Successful.CREATED id next ctx
 
+                        return result
+                    | Failure error ->
+                        tr.Status <- SpanStatus.InvalidArgument;
+                        return! RequestErrors.BAD_REQUEST error next ctx
+                finally
                     tr.Finish()
-
-                    return result
-                | Failure error ->
-                    tr.Finish()
-                    return! RequestErrors.BAD_REQUEST error next ctx
             })
 
     let update: HttpHandler =
@@ -57,24 +59,25 @@ module Handlers =
                     userId
 
             task {
-                let! request = ctx.BindJsonAsync<UpdateTransactionRequest>()
-                request.HttpContext <- ctx
+                try
+                    let! request = ctx.BindJsonAsync<UpdateTransactionRequest>()
+                    request.HttpContext <- ctx
 
-                match Logic.validateUpdate request with
-                | Success _ ->
-                    let transaction = Logic.prepareForUpdate request
-                    let connectionString = getConnectionString ctx
+                    match Logic.validateUpdate request with
+                    | Success _ ->
+                        let transaction = Logic.prepareForUpdate request
+                        let connectionString = getConnectionString ctx
 
-                    let! _ = TransactionsRepository.update transaction connectionString tr
+                        let! _ = TransactionsRepository.update transaction connectionString tr
 
-                    let! result = Successful.NO_CONTENT next ctx
+                        let! result = Successful.NO_CONTENT next ctx
 
+                        return result
+                    | Failure error ->
+                        tr.Status <- SpanStatus.InvalidArgument;
+                        return! RequestErrors.BAD_REQUEST error next ctx
+                finally
                     tr.Finish()
-
-                    return result
-                | Failure error ->
-                    tr.Finish()
-                    return! RequestErrors.BAD_REQUEST error next ctx
             })
 
     let delete (id: int) : HttpHandler =
@@ -88,14 +91,15 @@ module Handlers =
                     userId
 
             task {
-                let connectionString = getConnectionString ctx
-                let! _ = TransactionsRepository.delete id userId connectionString tr
+                try
+                    let connectionString = getConnectionString ctx
+                    let! _ = TransactionsRepository.delete id userId connectionString tr
 
-                let! result = Successful.NO_CONTENT next ctx
+                    let! result = Successful.NO_CONTENT next ctx
 
-                tr.Finish()
-
-                return result
+                    return result
+                finally
+                    tr.Finish()
             })
 
     let export: HttpHandler =
@@ -109,28 +113,29 @@ module Handlers =
                     userId
 
             task {
-                let! dto = ctx.BindJsonAsync<ExportDto>()
+                try
+                    let! dto = ctx.BindJsonAsync<ExportDto>()
 
-                let service = ctx.GetService<ICsvService>()
-                let webHostEnvironment = ctx.GetService<IWebHostEnvironment>()
+                    let service = ctx.GetService<ICsvService>()
+                    let webHostEnvironment = ctx.GetService<IWebHostEnvironment>()
 
-                let directory = Path.Combine(webHostEnvironment.ContentRootPath, "storage", "temp")
+                    let directory = Path.Combine(webHostEnvironment.ContentRootPath, "storage", "temp")
 
-                let uncategorized = localize ctx "Uncategorized"
-                let encrypted = localize ctx "Encrypted"
+                    let uncategorized = localize ctx "Uncategorized"
+                    let encrypted = localize ctx "Encrypted"
 
-                let exportAsCsvModel =
-                    new ExportTransactionsAsCsv(userId, directory, dto.FileId, uncategorized, encrypted)
+                    let exportAsCsvModel =
+                        new ExportTransactionsAsCsv(userId, directory, dto.FileId, uncategorized, encrypted)
 
-                let file = service.ExportTransactionsAsCsv(exportAsCsvModel, tr)
+                    let file = service.ExportTransactionsAsCsv(exportAsCsvModel, tr)
 
-                ctx.SetHttpHeader("Content-Disposition", "attachment; filename=\"transactions.csv\"")
+                    ctx.SetHttpHeader("Content-Disposition", "attachment; filename=\"transactions.csv\"")
 
-                let! result = ctx.WriteStreamAsync(true, file, None, None)
+                    let! result = ctx.WriteStreamAsync(true, file, None, None)
 
-                tr.Finish()
-
-                return result
+                    return result
+                finally
+                    tr.Finish()
             })
 
     let deleteExportedFile (fileId: Guid) : HttpHandler =
@@ -144,16 +149,17 @@ module Handlers =
                     userId
 
             task {
-                let webHostEnvironment = ctx.GetService<IWebHostEnvironment>()
+                try
+                    let webHostEnvironment = ctx.GetService<IWebHostEnvironment>()
 
-                let filePath =
-                    Path.Combine(webHostEnvironment.ContentRootPath, "storage", "temp", $"{fileId}.csv")
+                    let filePath =
+                        Path.Combine(webHostEnvironment.ContentRootPath, "storage", "temp", $"{fileId}.csv")
 
-                File.Delete(filePath)
+                    File.Delete(filePath)
 
-                let! result = Successful.NO_CONTENT next ctx
+                    let! result = Successful.NO_CONTENT next ctx
 
-                tr.Finish()
-
-                return result
+                    return result
+                finally
+                    tr.Finish()
             })

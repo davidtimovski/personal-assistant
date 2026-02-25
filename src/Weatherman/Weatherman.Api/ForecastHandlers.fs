@@ -7,6 +7,7 @@ open Weatherman.Application.Contracts.Forecasts.Models
 open Api.Common.Fs
 open Models
 open CommonHandlers
+open Sentry
 
 let get: HttpHandler =
     successOrLog (fun (next: HttpFunc) (ctx: HttpContext) ->
@@ -15,31 +16,32 @@ let get: HttpHandler =
         let tr =
             Metrics.startTransactionWithUser $"{ctx.Request.Method} /api/forecasts" "ForecastHandlers.get" userId
 
-        let result = ctx.TryBindQueryString<GetForecastDto>()
+        task {
+            try
+                let result = ctx.TryBindQueryString<GetForecastDto>()
 
-        (match result with
-         | Error _ ->
-            tr.Finish()
-            RequestErrors.BAD_REQUEST "Bad request" next ctx
-         | Ok dto ->
-             let service = ctx.GetService<IForecastService>()
+                match result with
+                | Error _ ->
+                   tr.Status <- SpanStatus.InvalidArgument;
+                   return! RequestErrors.BAD_REQUEST "Bad request" next ctx
+                | Ok dto ->
+                    let service = ctx.GetService<IForecastService>()
 
-             let parameters =
-                 GetForecast(
-                     Latitude = dto.latitude,
-                     Longitude = dto.longitude,
-                     TemperatureUnit = dto.temperatureUnit,
-                     PrecipitationUnit = dto.precipitationUnit,
-                     WindSpeedUnit = dto.windSpeedUnit,
-                     Time = dto.time
-                 )
+                    let parameters =
+                        GetForecast(
+                            Latitude = dto.latitude,
+                            Longitude = dto.longitude,
+                            TemperatureUnit = dto.temperatureUnit,
+                            PrecipitationUnit = dto.precipitationUnit,
+                            WindSpeedUnit = dto.windSpeedUnit,
+                            Time = dto.time
+                        )
 
-             task {
-                 let! forecast = service.GetAsync(parameters, tr)
+                    let! forecast = service.GetAsync(parameters, tr)
 
-                 let! result = Successful.OK forecast next ctx
+                    let! result = Successful.OK forecast next ctx
 
-                 tr.Finish()
-
-                 return result
-             }))
+                    return result
+            finally
+                tr.Finish()
+        })
