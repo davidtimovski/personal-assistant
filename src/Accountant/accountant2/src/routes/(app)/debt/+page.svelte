@@ -165,6 +165,7 @@
 		padding: 5px;
 		font-size: 1.4rem;
 		color: var(--primary-color);
+		cursor: pointer;
 
 		.debtor {
 			color: var(--expense-color);

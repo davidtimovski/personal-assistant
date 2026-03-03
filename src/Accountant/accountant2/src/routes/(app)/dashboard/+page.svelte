@@ -69,9 +69,9 @@
 			resolve(result);
 		});
 
-		const debtPromise = new Promise<HomePageDebt[]>(async (resolve) => {
+		const debtPromise = new Promise<{ debts: HomePageDebt[]; debtBalance: number }>(async (resolve) => {
 			if (!showDebt) {
-				resolve([]);
+				resolve({ debts: [], debtBalance: 0 });
 				return;
 			}
 
@@ -80,13 +80,13 @@
 
 		const result = await Promise.all([balancePromise, expendituresPromise, upcomingExpensesPromise, debtPromise]);
 		data = {
-			available: result[0] - result[2].upcomingAmount,
+			available: result[0] - result[2].upcomingAmount + result[3].debtBalance,
 			balance: result[0],
 			spent: result[1].spent,
 			expenditures: result[1].expenditures,
 			upcomingAmount: result[2].upcomingAmount,
 			upcomingExpenses: result[2].upcomingExpenses,
-			debt: result[3]
+			debt: result[3].debts
 		};
 
 		finishProgressBar();

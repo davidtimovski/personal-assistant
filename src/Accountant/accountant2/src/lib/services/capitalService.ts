@@ -89,7 +89,7 @@ export class CapitalService {
 		}
 	}
 
-	async getDebt(currency: string, combinedLabel: string): Promise<HomePageDebt[]> {
+	async getDebt(currency: string, combinedLabel: string): Promise<{ debts: HomePageDebt[]; debtBalance: number }> {
 		try {
 			const debt = await this.debtsIDBHelper.getAll();
 
@@ -97,13 +97,20 @@ export class CapitalService {
 				x.amount = this.currenciesService.convert(x.amount, x.currency, currency);
 			});
 
-			const homePageDebt = new Array<HomePageDebt>();
+			const debts = new Array<HomePageDebt>();
+			let debtBalance = 0;
 			for (const debtItem of debt) {
 				const trimmedDescription = this.trimDebtDescription(debtItem.description, combinedLabel);
-				homePageDebt.push(new HomePageDebt(debtItem.id, debtItem.person, debtItem.userIsDebtor, trimmedDescription, debtItem.amount));
+				debts.push(new HomePageDebt(debtItem.id, debtItem.person, debtItem.userIsDebtor, trimmedDescription, debtItem.amount));
+
+				if (debtItem.userIsDebtor) {
+					debtBalance += debtItem.amount;
+				} else {
+					debtBalance -= debtItem.amount;
+				}
 			}
 
-			return homePageDebt;
+			return { debts, debtBalance };
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
