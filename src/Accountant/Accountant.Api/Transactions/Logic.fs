@@ -44,7 +44,7 @@ module Logic =
         if validateAccounts request.FromAccountId request.ToAccountId userId connectionString then
             Success request
         else
-            Failure "Accounts are not valid"
+            Failure { Field = "ToAccountId"; ErrorMessage = "Accounts are not valid" }
 
     let private validateCreateCategory (request: CreateTransactionRequest) =
         let userId = getUserId request.HttpContext
@@ -56,25 +56,25 @@ module Logic =
         then
             Success request
         else
-            Failure "Category is not valid"
+            Failure { Field = "CategoryId"; ErrorMessage = "Category is not valid" }
 
     let private validateCreateAmount (request: CreateTransactionRequest) =
         if Validation.amountIsValid request.Amount then
             Success request
         else
-            Failure "Amount has to be a positive number"
+            Failure { Field = "Amount"; ErrorMessage = "Amount has to be a positive number" }
 
     let private validateCreateCurrency (request: CreateTransactionRequest) =
         if Validation.currencyIsValid request.Currency then
             Success request
         else
-            Failure "Currency is not valid"
+            Failure { Field = "Currency"; ErrorMessage = "Currency is not valid" }
 
     let private validateCreateDescription (request: CreateTransactionRequest) =
         if Validation.textIsNoneOrLengthIsValid request.Description descriptionMaxLength then
             Success request
         else
-            Failure $"Description cannot exceed {descriptionMaxLength} characters"
+            Failure { Field = "Description"; ErrorMessage = $"Description cannot exceed {descriptionMaxLength} characters" }
 
     let validateCreate =
         validateCreateAccounts
@@ -109,7 +109,7 @@ module Logic =
         if Validation.transactionBelongsTo request.Id userId connectionString then
             Success request
         else
-            Failure "Transaction is not valid"
+            Failure { Field = "Id"; ErrorMessage = "Transaction is not valid" }
 
     let private validateUpdateAccounts (request: UpdateTransactionRequest) =
         let userId = getUserId request.HttpContext
@@ -118,7 +118,7 @@ module Logic =
         if validateAccounts request.FromAccountId request.ToAccountId userId connectionString then
             Success request
         else
-            Failure "Accounts are not valid"
+            Failure { Field = "FromAccountId"; ErrorMessage = "Accounts are not valid" }
 
     let private validateUpdateCategory (request: UpdateTransactionRequest) =
         let userId = getUserId request.HttpContext
@@ -130,25 +130,25 @@ module Logic =
         then
             Success request
         else
-            Failure "Category is not valid"
+            Failure { Field = "CategoryId"; ErrorMessage = "Category is not valid" }
 
     let private validateUpdateAmount (request: UpdateTransactionRequest) =
         if Validation.amountIsValid request.Amount then
             Success request
         else
-            Failure "Amount has to be a positive number"
+            Failure { Field = "Amount"; ErrorMessage = "Amount has to be a positive number" }
 
     let private validateUpdateCurrency (request: UpdateTransactionRequest) =
         if Validation.currencyIsValid request.Currency then
             Success request
         else
-            Failure "Currency is not valid"
+            Failure { Field = "Currency"; ErrorMessage = "Currency is not valid" }
 
     let private validateUpdateDescription (request: UpdateTransactionRequest) =
         if Validation.textIsNoneOrLengthIsValid request.Description descriptionMaxLength then
             Success request
         else
-            Failure $"Description cannot exceed {descriptionMaxLength} characters"
+            Failure { Field = "Description"; ErrorMessage = $"Description cannot exceed {descriptionMaxLength} characters" }
 
     let validateUpdate =
         validateUpdateTransaction

@@ -1,8 +1,12 @@
 ﻿module Models
 
-type Result<'TSuccess, 'TFailure> =
+type ValidationFailure =
+    { Field: string
+      ErrorMessage: string }
+
+type Result<'TSuccess> =
     | Success of 'TSuccess
-    | Failure of 'TFailure
+    | Failure of ValidationFailure
 
 let bind switchFunction twoTrackInput =
     match twoTrackInput with

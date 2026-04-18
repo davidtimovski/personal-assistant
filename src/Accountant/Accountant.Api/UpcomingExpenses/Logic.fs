@@ -31,25 +31,25 @@ module Logic =
         then
             Success request
         else
-            Failure "Category is not valid"
+            Failure { Field = "CategoryId"; ErrorMessage = "Category is not valid" }
 
     let private validateCreateAmount (request: CreateUpcomingExpenseRequest) =
         if Validation.amountIsValid request.Amount then
             Success request
         else
-            Failure "Amount has to be a positive number"
+            Failure { Field = "Amount"; ErrorMessage = "Amount has to be a positive number" }
 
     let private validateCreateCurrency (request: CreateUpcomingExpenseRequest) =
         if Validation.currencyIsValid request.Currency then
             Success request
         else
-            Failure "Currency is not valid"
+            Failure { Field = "Currency"; ErrorMessage = "Currency is not valid" }
 
     let private validateCreateDescription (request: CreateUpcomingExpenseRequest) =
         if Validation.textIsNoneOrLengthIsValid request.Description descriptionMaxLength then
             Success request
         else
-            Failure $"Description cannot exceed {descriptionMaxLength} characters"
+            Failure { Field = "Description"; ErrorMessage = $"Description cannot exceed {descriptionMaxLength} characters" }
 
     let validateCreate =
         validateCreateCategory
@@ -81,35 +81,38 @@ module Logic =
             if upcomingExpense.UserId = parameters.CurrentUserId then
                 Success parameters
             else
-                Failure "Upcoming expense does not belong to user"
-        | None -> Failure "Upcoming expense does not exist"
+                Failure { Field = "CurrentUserId"; ErrorMessage = "Upcoming expense does not belong to user" }
+        | None -> Failure { Field = "CurrentUserId"; ErrorMessage = "Upcoming expense does not exist" }
 
     let private validateUpdateCategory (parameters: UpdateValidationParams) =
-        match parameters.ExistingCategory with
-        | Some category ->
-            if category.UserId = parameters.CurrentUserId then
-                Success parameters
-            else
-                Failure "Category does not belong to user"
-        | None -> Failure "Category does not exist"
+        if parameters.Request.CategoryId.IsNone
+        then Success parameters
+        else
+            match parameters.ExistingCategory with
+            | Some category ->
+                if category.UserId = parameters.CurrentUserId then
+                    Success parameters
+                else
+                    Failure { Field = "CategoryId"; ErrorMessage = "Upcoming expense does not belong to user" }
+            | None -> Failure { Field = "CategoryId"; ErrorMessage = "Upcoming expense does not exist" }
 
     let private validateUpdateAmount (parameters: UpdateValidationParams) =
         if Validation.amountIsValid parameters.Request.Amount then
             Success parameters
         else
-            Failure "Amount has to be a positive number"
+            Failure { Field = "Amount"; ErrorMessage = "Amount has to be a positive number" }
 
     let private validateUpdateCurrency (parameters: UpdateValidationParams) =
         if Validation.currencyIsValid parameters.Request.Currency then
             Success parameters
         else
-            Failure "Currency is not valid"
+            Failure { Field = "Currency"; ErrorMessage = "Currency is not valid" }
 
     let private validateUpdateDescription (parameters: UpdateValidationParams) =
         if Validation.textIsNoneOrLengthIsValid parameters.Request.Description descriptionMaxLength then
             Success parameters
         else
-            Failure $"Description cannot exceed {descriptionMaxLength} characters"
+            Failure { Field = "Description"; ErrorMessage = $"Description cannot exceed {descriptionMaxLength} characters" }
 
     let validateUpdate =
         validateUpdateUpcomingExpense

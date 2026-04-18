@@ -35,12 +35,10 @@ module Handlers =
                         let connection = getDbConnection ctx
                         let! id = UpcomingExpensesRepository.create upcomingExpense connection tr
 
-                        let! result = Successful.CREATED id next ctx
-
-                        return result
+                        return! Successful.CREATED id next ctx
                     | Failure error ->
                         tr.Status <- SpanStatus.InvalidArgument;
-                        return! RequestErrors.BAD_REQUEST error next ctx
+                        return! unprocessableEntityResponse error next ctx
                 finally
                     tr.Finish()
             })
@@ -82,12 +80,10 @@ module Handlers =
                         let upcomingExpense = Logic.updateRequestToEntity request userId
                         let! _ = UpcomingExpensesRepository.update upcomingExpense connectionString tr
 
-                        let! result = Successful.NO_CONTENT next ctx
-
-                        return result
+                        return! Successful.NO_CONTENT next ctx
                     | Failure error ->
                         tr.Status <- SpanStatus.InvalidArgument;
-                        return! RequestErrors.BAD_REQUEST error next ctx
+                        return! unprocessableEntityResponse error next ctx
                 finally
                     tr.Finish()
             })
@@ -107,9 +103,7 @@ module Handlers =
                     let connectionString = getConnectionString ctx
                     let! _ = UpcomingExpensesRepository.delete id userId connectionString tr
 
-                    let! result = Successful.NO_CONTENT next ctx
-
-                    return result
+                    return! Successful.NO_CONTENT next ctx
                 finally
                     tr.Finish()
             })

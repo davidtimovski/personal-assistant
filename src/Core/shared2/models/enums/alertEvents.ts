@@ -1,5 +1,6 @@
 export enum AlertStatus {
-  Hidden,
-  Success,
-  Error,
+	Hidden,
+	Success,
+	Warning,
+	Error
 }

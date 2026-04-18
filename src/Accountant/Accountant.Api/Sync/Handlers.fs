@@ -92,9 +92,7 @@ module Handlers =
                           DeletedAutomaticTransactionIds = deletedAutomaticTransactionIds
                           AutomaticTransactions = automaticTransactionDtos }
 
-                    let! result = Successful.OK changed next ctx
-
-                    return result
+                    return! Successful.OK changed next ctx
                 finally
                     tr.Finish()
             })
@@ -164,9 +162,7 @@ module Handlers =
                                     { LocalId = request.AutomaticTransactions[x].Id
                                       Id = automaticTransactionIds[x] }) }
 
-                    let! result = Successful.OK changedEntitiesDto next ctx
-
-                    return result
+                    return! Successful.OK changedEntitiesDto next ctx
                 finally
                     tr.Finish()
             })

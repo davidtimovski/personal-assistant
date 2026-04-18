@@ -29,7 +29,7 @@ module Logic =
         then
             Success request
         else
-            Failure "Category is not valid"
+            Failure { Field = "ParentId"; ErrorMessage = "Category is not valid" }
 
     let private validateCreateName (request: CreateCategoryRequest) =
         if (Validation.textIsNotEmpty request.Name)
@@ -37,7 +37,7 @@ module Logic =
         then
             Success request
         else
-            Failure "Name is not valid"
+            Failure { Field = "Name"; ErrorMessage = "Name is not valid" }
 
     let validateCreate =
         validateCreateParentCategory
@@ -69,8 +69,8 @@ module Logic =
             if category.UserId = parameters.CurrentUserId then
                 Success parameters
             else
-                Failure "Category does not belong to user"
-        | None -> Failure "Category does not exist"
+                Failure { Field = "CurrentUserId"; ErrorMessage = "Category does not belong to user" }
+        | None -> Failure { Field = "CurrentUserId"; ErrorMessage = "Category does not exist" }
 
     let private validateUpdateParentCategory (parameters: UpdateValidationParams) =
         match parameters.ExistingParentCategory with
@@ -78,7 +78,7 @@ module Logic =
             if category.UserId = parameters.CurrentUserId then
                 Success parameters
             else
-                Failure "Parent category does not belong to user"
+                Failure { Field = "CurrentUserId"; ErrorMessage = "Parent category does not belong to user" }
         | None -> Success parameters
 
     let private validateUpdateName (parameters: UpdateValidationParams) =
@@ -87,7 +87,7 @@ module Logic =
         then
             Success parameters
         else
-            Failure "Name is not valid"
+            Failure { Field = "Name"; ErrorMessage = "Name is not valid" }
 
     let validateUpdate =
         validateUpdateCategory

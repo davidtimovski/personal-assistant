@@ -24,25 +24,25 @@ module Logic =
         if Validation.textIsNotEmpty request.Person then
             Success request
         else
-            Failure "Person is not valid"
+            Failure { Field = "Person"; ErrorMessage = "Person is not valid" }
 
     let private validateCreateAmount (request: CreateDebtRequest) =
         if Validation.amountIsValid request.Amount then
             Success request
         else
-            Failure "Amount has to be a positive number"
+            Failure { Field = "Amount"; ErrorMessage = "Amount has to be a positive number" }
 
     let private validateCreateCurrency (request: CreateDebtRequest) =
         if Validation.currencyIsValid request.Currency then
             Success request
         else
-            Failure "Currency is not valid"
+            Failure { Field = "Currency"; ErrorMessage = "Currency is not valid" }
 
     let private validateCreateDescription (request: CreateDebtRequest) =
         if Validation.textIsNoneOrLengthIsValid request.Description descriptionMaxLength then
             Success request
         else
-            Failure $"Description cannot exceed {descriptionMaxLength} characters"
+            Failure { Field = "Description"; ErrorMessage = $"Description cannot exceed {descriptionMaxLength} characters" }
 
     let validateCreate =
         validateCreatePerson
@@ -83,32 +83,32 @@ module Logic =
             if debt.UserId = parameters.CurrentUserId then
                 Success parameters
             else
-                Failure "Debt does not belong to user"
-        | None -> Failure "Debt does not exist"
+                Failure { Field = "CurrentUserId"; ErrorMessage = "Debt does not belong to user" }
+        | None -> Failure { Field = "CurrentUserId"; ErrorMessage = "Debt does not exist" }
 
     let private validateUpdatePerson (parameters: UpdateValidationParams) =
         if Validation.textIsNotEmpty parameters.Request.Person then
             Success parameters
         else
-            Failure "Person is not valid"
+            Failure { Field = "CurrentUserId"; ErrorMessage = "Person is not valid" }
 
     let private validateUpdateAmount (parameters: UpdateValidationParams) =
         if Validation.amountIsValid parameters.Request.Amount then
             Success parameters
         else
-            Failure "Amount has to be a positive number"
+            Failure { Field = "Amount"; ErrorMessage = "Amount has to be a positive number" }
 
     let private validateUpdateCurrency (parameters: UpdateValidationParams) =
         if Validation.currencyIsValid parameters.Request.Currency then
             Success parameters
         else
-            Failure "Currency is not valid"
+            Failure { Field = "Currency"; ErrorMessage = "Currency is not valid" }
 
     let private validateUpdateDescription (parameters: UpdateValidationParams) =
         if Validation.textIsNoneOrLengthIsValid parameters.Request.Description descriptionMaxLength then
             Success parameters
         else
-            Failure $"Description cannot exceed {descriptionMaxLength} characters"
+            Failure { Field = "Description"; ErrorMessage = $"Description cannot exceed {descriptionMaxLength} characters" }
 
     let validateUpdate =
         validateUpdateDebt

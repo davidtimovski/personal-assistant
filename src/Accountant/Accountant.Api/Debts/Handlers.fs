@@ -31,12 +31,10 @@ module Handlers =
                         let connection = getDbConnection ctx
                         let! id = DebtsRepository.create debt connection tr
 
-                        let! result = Successful.CREATED id next ctx
-
-                        return result
+                        return! Successful.CREATED id next ctx
                     | Failure error ->
                         tr.Status <- SpanStatus.InvalidArgument;
-                        return! RequestErrors.BAD_REQUEST error next ctx
+                        return! unprocessableEntityResponse error next ctx
                 finally
                     tr.Finish()
             })
@@ -62,12 +60,10 @@ module Handlers =
                         let connectionString = getConnectionString ctx
                         let! id = DebtsRepository.createMerged debt connectionString tr
 
-                        let! result = Successful.CREATED id next ctx
-
-                        return result
+                        return! Successful.CREATED id next ctx
                     | Failure error ->
                         tr.Status <- SpanStatus.InvalidArgument;
-                        return! RequestErrors.BAD_REQUEST error next ctx
+                        return! unprocessableEntityResponse error next ctx
                 finally
                     tr.Finish()
             })
@@ -99,12 +95,10 @@ module Handlers =
                         let debt = Logic.updateRequestToEntity request userId
                         let! _ = DebtsRepository.update debt connectionString tr
 
-                        let! result = Successful.NO_CONTENT next ctx
-
-                        return result
+                        return! Successful.NO_CONTENT next ctx
                     | Failure error ->
                         tr.Status <- SpanStatus.InvalidArgument;
-                        return! RequestErrors.BAD_REQUEST error next ctx
+                        return! unprocessableEntityResponse error next ctx
                 finally
                     tr.Finish()
             })
@@ -121,9 +115,7 @@ module Handlers =
                     let connectionString = getConnectionString ctx
                     let! _ = DebtsRepository.delete id userId connectionString tr
 
-                    let! result = Successful.NO_CONTENT next ctx
-
-                    return result
+                    return! Successful.NO_CONTENT next ctx
                 finally
                     tr.Finish()
             })

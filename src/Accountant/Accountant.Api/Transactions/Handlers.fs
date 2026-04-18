@@ -38,12 +38,10 @@ module Handlers =
 
                         let! id = TransactionsRepository.create transaction connection None tr
 
-                        let! result = Successful.CREATED id next ctx
-
-                        return result
+                        return! Successful.CREATED id next ctx
                     | Failure error ->
                         tr.Status <- SpanStatus.InvalidArgument;
-                        return! RequestErrors.BAD_REQUEST error next ctx
+                        return! unprocessableEntityResponse error next ctx
                 finally
                     tr.Finish()
             })
@@ -70,12 +68,10 @@ module Handlers =
 
                         let! _ = TransactionsRepository.update transaction connectionString tr
 
-                        let! result = Successful.NO_CONTENT next ctx
-
-                        return result
+                        return! Successful.NO_CONTENT next ctx
                     | Failure error ->
                         tr.Status <- SpanStatus.InvalidArgument;
-                        return! RequestErrors.BAD_REQUEST error next ctx
+                        return! unprocessableEntityResponse error next ctx
                 finally
                     tr.Finish()
             })
@@ -95,9 +91,7 @@ module Handlers =
                     let connectionString = getConnectionString ctx
                     let! _ = TransactionsRepository.delete id userId connectionString tr
 
-                    let! result = Successful.NO_CONTENT next ctx
-
-                    return result
+                    return! Successful.NO_CONTENT next ctx
                 finally
                     tr.Finish()
             })
@@ -131,9 +125,7 @@ module Handlers =
 
                     ctx.SetHttpHeader("Content-Disposition", "attachment; filename=\"transactions.csv\"")
 
-                    let! result = ctx.WriteStreamAsync(true, file, None, None)
-
-                    return result
+                    return! ctx.WriteStreamAsync(true, file, None, None)
                 finally
                     tr.Finish()
             })
@@ -157,9 +149,7 @@ module Handlers =
 
                     File.Delete(filePath)
 
-                    let! result = Successful.NO_CONTENT next ctx
-
-                    return result
+                    return! Successful.NO_CONTENT next ctx
                 finally
                     tr.Finish()
             })
