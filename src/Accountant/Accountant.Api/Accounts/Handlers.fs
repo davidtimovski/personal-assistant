@@ -1,5 +1,6 @@
 ﻿namespace Accountant.Api.Accounts
 
+open System
 open Giraffe
 open Microsoft.AspNetCore.Http
 open Accountant.Persistence
@@ -31,12 +32,10 @@ module Handlers =
                         let connection = getDbConnection ctx
                         let! id = AccountsRepository.create account connection tr
 
-                        let! result = Successful.CREATED id next ctx
-
-                        return result
+                        return! Successful.CREATED id next ctx
                     | Failure error ->
                         tr.Status <- SpanStatus.InvalidArgument;
-                        return! RequestErrors.BAD_REQUEST error next ctx
+                        return! unprocessableEntityResponse error next ctx
                 finally
                     tr.Finish()
             })
@@ -68,12 +67,10 @@ module Handlers =
                         let account = Logic.updateRequestToEntity request userId
                         let! _ = AccountsRepository.update account connectionString tr
 
-                        let! result = Successful.NO_CONTENT next ctx
-
-                        return result
+                        return! Successful.NO_CONTENT next ctx
                     | Failure error ->
                         tr.Status <- SpanStatus.InvalidArgument;
-                        return! RequestErrors.BAD_REQUEST error next ctx
+                        return! unprocessableEntityResponse error next ctx
                 finally
                     tr.Finish()
             })
@@ -96,13 +93,12 @@ module Handlers =
 
                     if isMain then
                         tr.Status <- SpanStatus.InvalidArgument;
-                        return! RequestErrors.BAD_REQUEST "Cannot delete main account" next ctx
+                        let error = { Field = String.Empty; ErrorMessage = "Cannot delete main account" }
+                        return! unprocessableEntityResponse error next ctx
                     else
                         let! _ = AccountsRepository.delete id userId connectionString tr
 
-                        let! result = Successful.NO_CONTENT next ctx
-
-                        return result
+                        return! Successful.NO_CONTENT next ctx
                 finally
                     tr.Finish()
             })

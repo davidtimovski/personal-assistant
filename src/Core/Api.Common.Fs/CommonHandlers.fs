@@ -7,6 +7,7 @@ open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.Logging
 open Core.Application.Contracts
+open Models
 
 let authorize: HttpHandler =
     requiresAuthentication (challenge JwtBearerDefaults.AuthenticationScheme)
@@ -41,3 +42,7 @@ let getUserId (ctx: HttpContext) =
 let getConnectionString (ctx: HttpContext) =
     let config = ctx.GetService<IConfiguration>()
     config.GetValue "ConnectionString"
+
+let unprocessableEntityResponse (validationError: ValidationFailure) (next: HttpFunc) (ctx: HttpContext) =
+    let unprocessableResult = dict [ (validationError.Field, [| validationError.ErrorMessage |]) ]
+    RequestErrors.UNPROCESSABLE_ENTITY unprocessableResult next ctx

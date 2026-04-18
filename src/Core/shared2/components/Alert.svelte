@@ -30,6 +30,9 @@
 			}
 
 			showError(message, showRefreshLink);
+		} else if (value.status === AlertStatus.Warning) {
+			const message = value.messages.join('<br>');
+			showWarning(message);
 		} else if (value.status === AlertStatus.Success) {
 			showSuccess($t(<string>value.messageKey, value.messageData));
 		} else {
@@ -47,6 +50,27 @@
 		message = alertMessage;
 		refreshButtonVisible = showRefreshLink;
 		shown = true;
+	}
+
+	function showWarning(alertMessage: string) {
+		if (resetMessageTimeout) {
+			window.clearTimeout(resetMessageTimeout);
+			resetMessageTimeout = 0;
+		}
+
+		type = 'warning';
+		message = alertMessage;
+		refreshButtonVisible = false;
+		shown = true;
+
+		if (hideTimeout) {
+			window.clearTimeout(hideTimeout);
+			hideTimeout = 0;
+		}
+
+		hideTimeout = window.setTimeout(() => {
+			hide();
+		}, 5000);
 	}
 
 	function showSuccess(alertMessage: string) {
@@ -147,6 +171,16 @@
 
 			.alert-body {
 				background: #fdd;
+			}
+		}
+
+		&.warning {
+			.alert-message {
+				color: var(--warning-color-dark);
+			}
+
+			.alert-body {
+				background: #fec;
 			}
 		}
 

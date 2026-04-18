@@ -39,9 +39,7 @@ let get: HttpHandler =
 
                     let! forecast = service.GetAsync(parameters, tr)
 
-                    let! result = Successful.OK forecast next ctx
-
-                    return result
+                    return! Successful.OK forecast next ctx
             finally
                 tr.Finish()
         })

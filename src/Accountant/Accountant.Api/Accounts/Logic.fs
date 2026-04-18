@@ -25,13 +25,13 @@ module Logic =
         then
             Success request
         else
-            Failure "Name is not valid"
+            Failure { Field = "Name"; ErrorMessage = "Name is not valid" }
 
     let private validateCreateCurrency (request: CreateAccountRequest) =
         if Validation.currencyIsValid request.Currency then
             Success request
         else
-            Failure "Currency is not valid"
+            Failure { Field = "Currency"; ErrorMessage = "Currency is not valid" }
 
     let validateCreate =
         validateCreateName
@@ -58,8 +58,8 @@ module Logic =
             if account.UserId = parameters.CurrentUserId then
                 Success parameters
             else
-                Failure "Account does not belong to user"
-        | None -> Failure "Account does not exist"
+                Failure { Field = "CurrentUserId"; ErrorMessage = "Account does not belong to user" }
+        | None -> Failure { Field = "CurrentUserId"; ErrorMessage = "Account does not exist" }
 
     let private validateUpdateName (parameters: UpdateValidationParams) =
         if (Validation.textIsNotEmpty parameters.Request.Name)
@@ -67,13 +67,13 @@ module Logic =
         then
             Success parameters
         else
-            Failure "Name is not valid"
+            Failure { Field = "Name"; ErrorMessage = "Name is not valid" }
 
     let private validateUpdateCurrency (parameters: UpdateValidationParams) =
         if Validation.currencyIsValid parameters.Request.Currency then
             Success parameters
         else
-            Failure "Currency is not valid"
+            Failure { Field = "Currency"; ErrorMessage = "Currency is not valid" }
 
     let validateUpdate =
         validateUpdateAccount
