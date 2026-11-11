@@ -10,7 +10,7 @@
 
 	let {
 		stockPrice = $bindable<number | null>(),
-		currency,
+		currency = $bindable<string | null>(),
 		invalid = false
 	}: {
 		stockPrice: number | null;

@@ -1,0 +1,120 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".dockerignore" />
+    <File Path=".env.dev.example" />
+    <File Path=".env.prod.example" />
+    <File Path=".gitignore" />
+  </Folder>
+  <Folder Name="/Solution Items/.github/" />
+  <Folder Name="/Solution Items/.github/workflows/">
+    <File Path=".github/workflows/cd_accountant.yml" />
+    <File Path=".github/workflows/cd_chef.yml" />
+    <File Path=".github/workflows/cd_core.yml" />
+    <File Path=".github/workflows/cd_gateway.yml" />
+    <File Path=".github/workflows/cd_personalassistant.yml" />
+    <File Path=".github/workflows/cd_sender.yml" />
+    <File Path=".github/workflows/cd_todo.yml" />
+    <File Path=".github/workflows/cd_weatherman.yml" />
+    <File Path=".github/workflows/ci_dev.yml" />
+    <File Path=".github/workflows/test.yml" />
+  </Folder>
+  <Folder Name="/Solution Items/docs/">
+    <File Path="docs/applications.md" />
+    <File Path="docs/architecture.md" />
+  </Folder>
+  <Folder Name="/Solution Items/sql/">
+    <File Path="sql/currency_rates.sql" />
+    <File Path="sql/prod_to_dev.sql" />
+    <File Path="sql/push_subscriptions.sql" />
+    <File Path="sql/tooltips.sql" />
+    <File Path="sql/tooltips_dismissed.sql" />
+    <File Path="sql/users.sql" />
+    <File Path="sql/user_id_map.sql" />
+  </Folder>
+  <Folder Name="/Solution Items/sql/accountant/">
+    <File Path="sql/accountant/accounts.sql" />
+    <File Path="sql/accountant/automatic_transactions.sql" />
+    <File Path="sql/accountant/categories.sql" />
+    <File Path="sql/accountant/debts.sql" />
+    <File Path="sql/accountant/deleted_entities.sql" />
+    <File Path="sql/accountant/transactions.sql" />
+    <File Path="sql/accountant/upcoming_expenses.sql" />
+  </Folder>
+  <Folder Name="/Solution Items/sql/chef/">
+    <File Path="sql/chef/dietary_profiles.sql" />
+    <File Path="sql/chef/ingredients.sql" />
+    <File Path="sql/chef/ingredients_tasks.sql" />
+    <File Path="sql/chef/ingredient_brands.sql" />
+    <File Path="sql/chef/ingredient_categories.sql" />
+    <File Path="sql/chef/recipes.sql" />
+    <File Path="sql/chef/recipes_ingredients.sql" />
+    <File Path="sql/chef/send_requests.sql" />
+    <File Path="sql/chef/shares.sql" />
+  </Folder>
+  <Folder Name="/Solution Items/sql/todo/">
+    <File Path="sql/todo/lists.sql" />
+    <File Path="sql/todo/notifications.sql" />
+    <File Path="sql/todo/shares.sql" />
+    <File Path="sql/todo/tasks.sql" />
+  </Folder>
+  <Folder Name="/Solution Items/sql/trainer/">
+    <File Path="sql/trainer/exercise_2x_amount.sql" />
+    <File Path="sql/trainer/exercise_amount.sql" />
+    <File Path="sql/trainer/exercise_amount_time.sql" />
+    <File Path="sql/trainer/exercise_time.sql" />
+    <File Path="sql/trainer/progress_amount.sql" />
+  </Folder>
+  <Folder Name="/Solution Items/sql/weatherman/">
+    <File Path="sql/weatherman/forecasts.sql" />
+  </Folder>
+  <Folder Name="/Solution Items/targets/">
+    <File Path="Directory.Packages.props" />
+    <File Path="PersonalAssistant.Cs.targets" />
+    <File Path="PersonalAssistant.targets" />
+  </Folder>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Accountant/">
+    <Project Path="src/Accountant/Accountant.Api/Accountant.Api.fsproj" />
+    <Project Path="src/Accountant/Accountant.Persistence/Accountant.Persistence.fsproj" />
+  </Folder>
+  <Folder Name="/src/Chef/">
+    <Project Path="src/Chef/Chef.Api/Chef.Api.csproj" />
+    <Project Path="src/Chef/Chef.Application/Chef.Application.csproj" />
+    <Project Path="src/Chef/Chef.Persistence/Chef.Persistence.csproj" />
+    <Project Path="src/Chef/Chef.Utility/Chef.Utility.fsproj" />
+  </Folder>
+  <Folder Name="/src/Core/">
+    <Project Path="src/Core/Api.Common.Fs/Api.Common.Fs.fsproj" />
+    <Project Path="src/Core/Api.Common/Api.Common.csproj" />
+    <Project Path="src/Core/Cdn/Cdn.csproj" />
+    <Project Path="src/Core/Core.Api/Core.Api.csproj" />
+    <Project Path="src/Core/Core.Application/Core.Application.csproj" />
+    <Project Path="src/Core/Core.Infrastructure/Core.Infrastructure.csproj" />
+    <Project Path="src/Core/Core.Persistence/Core.Persistence.csproj" />
+    <Project Path="src/Core/Gateway/Gateway.csproj" />
+    <Project Path="src/Core/Jobs/Jobs.csproj" />
+    <Project Path="src/Core/PersonalAssistant.Web/PersonalAssistant.Web.csproj" />
+    <Project Path="src/Core/Sender/Sender.csproj" />
+  </Folder>
+  <Folder Name="/src/ToDoAssistant/">
+    <Project Path="src/ToDoAssistant/ToDoAssistant.Api/ToDoAssistant.Api.csproj" />
+    <Project Path="src/ToDoAssistant/ToDoAssistant.Application/ToDoAssistant.Application.csproj" />
+    <Project Path="src/ToDoAssistant/ToDoAssistant.Persistence/ToDoAssistant.Persistence.csproj" />
+  </Folder>
+  <Folder Name="/src/Trainer/">
+    <Project Path="src/Trainer/Trainer.Api/Trainer.Api.fsproj" />
+  </Folder>
+  <Folder Name="/src/Weatherman/">
+    <Project Path="src/Weatherman/Weatherman.Api/Weatherman.Api.fsproj" />
+    <Project Path="src/Weatherman/Weatherman.Application/Weatherman.Application.csproj" />
+    <Project Path="src/Weatherman/Weatherman.Infrastructure/Weatherman.Infrastructure.csproj" />
+    <Project Path="src/Weatherman/Weatherman.Persistence/Weatherman.Persistence.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/Api.UnitTests/Api.UnitTests.csproj" />
+    <Project Path="test/Application.UnitTests/Application.UnitTests.csproj" />
+  </Folder>
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
+</Solution>

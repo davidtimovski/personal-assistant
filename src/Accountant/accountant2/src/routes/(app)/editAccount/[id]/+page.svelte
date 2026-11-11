@@ -235,7 +235,7 @@
 					{#if investmentFund}
 						<div class="form-control inline">
 							<label for="stock-price">{$t('editAccount.stockPrice')}</label>
-							<StockPriceInput bind:stockPrice {currency} invalid={stockPriceIsInvalid} />
+							<StockPriceInput bind:stockPrice bind:currency invalid={stockPriceIsInvalid} />
 						</div>
 					{/if}
 				</div>
