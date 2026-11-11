@@ -20,8 +20,10 @@
 
 	let fromAccountId: number | null = $state(null);
 	let fromAccount: Account | null = $state(null);
+	let fromCurrency: string | null = $state(null);
 	let toAccountId: number | null = $state(null);
 	let toAccount: Account | null = $state(null);
+	let toCurrency: string | null = $state(null);
 	let amount: number | null = $state(null);
 	let currency: string | null = $state(null);
 	let accountOptions: SelectOption[] | null = $state(null);
@@ -88,11 +90,16 @@
 	function setFromAccount() {
 		fromAccount = <Account>accounts.find((x) => x.id === fromAccountId);
 		fromAccountLabel = $t(fromAccount.stockPrice === null ? 'transferFunds.fromAccount' : 'transferFunds.fromInvestmentFund');
+		fromCurrency = fromAccount?.stockPrice ? fromAccount.currency : localStorage.get(LocalStorageKeys.Currency);
 	}
 
 	function setToAccount() {
 		toAccount = <Account>accounts.find((x) => x.id === toAccountId);
 		toAccountLabel = $t(toAccount.stockPrice === null ? 'transferFunds.toAccount' : 'transferFunds.toInvestmentFund');
+
+		// Set the amount currency based on the target account
+		// If the account is a fund, use its currency, otherwise default to the one in preferences
+		currency = toCurrency = toAccount?.stockPrice ? toAccount.currency : localStorage.get(LocalStorageKeys.Currency);
 	}
 
 	function setTransferButtonLabel() {
@@ -272,12 +279,12 @@
 				{#if fromAccount?.stockPrice}
 					<div class="account-stock-price-balance-label">
 						<span>{$t('transferFunds.stockPrice')}</span>
-						<span>{Formatter.moneyPrecise(fromAccount.stockPrice, currency, $user.culture, 4)}</span>
+						<span>{Formatter.moneyPrecise(fromAccount.stockPrice, fromCurrency, $user.culture, 4)}</span>
 					</div>
 				{:else}
 					<div class="account-stock-price-balance-label">
 						<span>{$t('balance')}</span>
-						<span>{Formatter.moneyPrecise(fromAccount?.balance, currency, $user.culture)}</span>
+						<span>{Formatter.moneyPrecise(fromAccount?.balance, fromCurrency, $user.culture)}</span>
 					</div>
 				{/if}
 			</div>
@@ -298,12 +305,12 @@
 				{#if toAccount?.stockPrice}
 					<div class="account-stock-price-balance-label">
 						<span>{$t('transferFunds.stockPrice')}</span>
-						<span>{Formatter.moneyPrecise(toAccount?.stockPrice, currency, $user.culture, 4)}</span>
+						<span>{Formatter.moneyPrecise(toAccount?.stockPrice, toCurrency, $user.culture, 4)}</span>
 					</div>
 				{:else}
 					<div class="account-stock-price-balance-label">
 						<span>{$t('balance')}</span>
-						<span>{Formatter.moneyPrecise(toAccount?.balance, currency, $user.culture)}</span>
+						<span>{Formatter.moneyPrecise(toAccount?.balance, toCurrency, $user.culture)}</span>
 					</div>
 				{/if}
 			</div>

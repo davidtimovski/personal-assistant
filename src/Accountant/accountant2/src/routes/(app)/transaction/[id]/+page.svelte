@@ -176,10 +176,12 @@
 				}
 				break;
 			case TransactionType.Transfer:
-				if (fromStocks) {
-					pageTitle = $t('transaction.divestment');
-				} else if (!toStocks) {
+				if (fromStocks && toStocks) {
 					pageTitle = $t('transaction.transfer');
+				} else if (toStocks) {
+					pageTitle = $t('transaction.investment');
+				} else if (fromStocks) {
+					pageTitle = $t('transaction.divestment');
 				}
 				break;
 		}
