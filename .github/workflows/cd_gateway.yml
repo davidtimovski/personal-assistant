@@ -6,6 +6,7 @@ on:
     branches:
       - master
     paths:
+      - "*.props"
       - "*.targets"
       - "src/Core/Gateway/**"
 
