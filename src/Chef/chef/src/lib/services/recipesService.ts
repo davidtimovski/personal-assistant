@@ -92,7 +92,7 @@ export class RecipesService {
 				body: window.JSON.stringify(dto)
 			});
 
-			this.getAll();
+			await this.getAll();
 
 			return result;
 		} catch (e) {
@@ -122,7 +122,7 @@ export class RecipesService {
 				body: window.JSON.stringify(dto)
 			});
 
-			this.getAll();
+			await this.getAll();
 
 			return id;
 		} catch (e) {
@@ -155,7 +155,7 @@ export class RecipesService {
 				body: window.JSON.stringify(dto)
 			});
 
-			this.getAll();
+			await this.getAll();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -168,7 +168,7 @@ export class RecipesService {
 				method: 'delete'
 			});
 
-			this.getAll();
+			await this.getAll();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -186,7 +186,7 @@ export class RecipesService {
 				body: window.JSON.stringify(dto)
 			});
 
-			this.getAll();
+			await this.getAll();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -200,7 +200,7 @@ export class RecipesService {
 				body: window.JSON.stringify(dto)
 			});
 
-			this.getAll();
+			await this.getAll();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
@@ -213,7 +213,7 @@ export class RecipesService {
 				method: 'delete'
 			});
 
-			this.getAll();
+			await this.getAll();
 		} catch (e) {
 			this.logger.logError(e);
 			throw e;
